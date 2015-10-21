@@ -14,6 +14,7 @@ namespace ZoneAirLoopEquipmentManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	extern bool GetAirDistUnitsFlag; // If TRUE, Air Distribution Data has not been read in yet
+	extern bool MyOneTimeFlag;
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -24,6 +25,8 @@ namespace ZoneAirLoopEquipmentManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ZoneAirLoopEquipmentManager
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageZoneAirLoopEquipment(
@@ -43,7 +46,8 @@ namespace ZoneAirLoopEquipmentManager {
 	void
 	InitZoneAirLoopEquipment(
 		bool const FirstHVACIteration, // unused1208
-		int const AirDistUnitNum
+		int const AirDistUnitNum,
+		int const ZoneNum
 	);
 
 	void
@@ -60,12 +64,14 @@ namespace ZoneAirLoopEquipmentManager {
 	void
 	UpdateZoneAirLoopEquipment();
 
-	void
-	ReportZoneAirLoopEquipment();
+	// void
+	// ReportZoneAirLoopEquipment(
+	// 	int const AirDistUnitNum
+	// );
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -35,7 +35,7 @@ namespace DataZoneEnergyDemands {
 	Array1D< ZoneSystemMoistureDemand > ZoneSysMoistureDemand;
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
@@ -52,6 +52,17 @@ namespace DataZoneEnergyDemands {
 	//     distribute copies to the public, perform publicly and display publicly, and to
 	//     permit others to do so.
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+
+	void
+	clear_state()
+	{
+		DeadBandOrSetback.deallocate();
+		Setback.deallocate();
+		CurDeadBandOrSetback.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		ZoneSysMoistureDemand.deallocate();
+	
+	}
 
 } // DataZoneEnergyDemands
 

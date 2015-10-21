@@ -1,5 +1,5 @@
 <!--RemoveStart-->
-Simulation Models – Encyclopedic Reference
+Simulation Models – Encyclopedic Reference 
 ==========================================
 
 The following descriptions are grouped alphabetically (as much as possible) with some also having additional tags of “Heat Balance”, “HVAC”, and “Plant”.  With the integrated solution, these designations signify where the effects of these models have their first impacts.
@@ -91,11 +91,11 @@ An energy balance on the water and air sides of the air/water interface yields t
 
 where
 
-<span>${\dot m_w}$</span> = mass flow rate of water, kg/s
+<span>\({\dot m_w}\)</span> = mass flow rate of water, kg/s
 
-<span>${\dot m_a}$</span> = mass flow rate of air, kg/s
+<span>\({\dot m_a}\)</span> = mass flow rate of air, kg/s
 
-Assuming that the heat capacity rate (<span>$\dot mcp$</span>) for the cooling tower water is less than that for the air,the effectiveness of the cooling tower can be defined by analogy to the effectiveness of a simple heat exchanger:
+Assuming that the heat capacity rate (<span>\(\dot mcp\)</span>) for the cooling tower water is less than that for the air,the effectiveness of the cooling tower can be defined by analogy to the effectiveness of a simple heat exchanger:
 
 <div>$$\varepsilon  = \frac{{{T_{win}} - {T_{wout}}}}{{{T_{win}} - {T_{wbin}}}}$$</div>
 
@@ -115,31 +115,31 @@ Combining equations , , and and integrating over the entire heat transfer surfac
 
 where
 
-<span>${\dot C_w} = {\dot m_w}c{p_w}$</span> and <span>${\dot C_a} = {\dot m_a}\bar c{p_e}$</span>
+<span>\({\dot C_w} = {\dot m_w}c{p_w}\)</span> and <span>\({\dot C_a} = {\dot m_a}\bar c{p_e}\)</span>
 
 <div>$$NTU = Number\,of\,Transfer\,Units = \frac{{UAe}}{{{{\dot C}_w}}}$$</div>
 
 This equation is identical to the expression for effectiveness of an indirect contact (i.e., fluids separated by a solid wall) counterflow heat exchanger (Incropera and DeWitt 1981). Therefore, the cooling tower can be modeled, in the steady-state regime, by an equivalent counterflow heat exchanger as shown in the following figure.
 
-![](EngineeringReference/media/image4542.png)
+![](media/image4542.png)
 
 Figure 194. Cooling Tower Schematic
 
-The first fluid is water and the second fluid is an equivalent fluid entering the heat exchanger at temperature T<sub>wbin</sub> and specific heat <span>$\bar cpe$</span>. The heat exchanger is characterized by a single parameter, its overall heat transfer coefficient-area product UA<sub>e</sub>. The actual cooling tower heat transfer coefficient-area product is related to UA<sub>e</sub> by the following expression:
+The first fluid is water and the second fluid is an equivalent fluid entering the heat exchanger at temperature T<sub>wbin</sub> and specific heat <span>\(\bar cpe\)</span>. The heat exchanger is characterized by a single parameter, its overall heat transfer coefficient-area product UA<sub>e</sub>. The actual cooling tower heat transfer coefficient-area product is related to UA<sub>e</sub> by the following expression:
 
 <div>$$UA = UAe\frac{{cp}}{{\bar cpe}}$$</div>
 
 This heat transfer coefficient-area product is assumed to be a function of the air mass flow rate only and can be estimated from laboratory test results or manufacturers’ catalog data.
 
-The model for the variable speed Merkel tower also includes Scheier’s modifications.  Scheier has extended the Merkel model to also include terms that adjust UA with three factors that model how UA values change when the tower is operating away from its rated conditions.  The first factor, <span>${f_{UA,wetbulb}}$</span>, adjusts UA for the current outdoor wetbulb temperature.  The user enters a performance curve or lookup table that is a function of one independent variable.  The independent variable is the difference between the design wetbulb temperature and the current wetbulb temperature, in degrees Celsius.
+The model for the variable speed Merkel tower also includes Scheier’s modifications.  Scheier has extended the Merkel model to also include terms that adjust UA with three factors that model how UA values change when the tower is operating away from its rated conditions.  The first factor, <span>\({f_{UA,wetbulb}}\)</span>, adjusts UA for the current outdoor wetbulb temperature.  The user enters a performance curve or lookup table that is a function of one independent variable.  The independent variable is the difference between the design wetbulb temperature and the current wetbulb temperature, in degrees Celsius.
 
 <div>$${f_{UA,wetbulb}} = func\left( {\left( {{T_{des,wetbulb}} - {T_{current,wetbulb}}} \right)} \right)$$</div>
 
-The second factor, <span>${f_{UA,airflow}}$</span>, adjusts UA for the current air flow rate.  The user enters a performance curve or lookup table that is a function of one independent variable.  The independent variable is the ratio of the current air flow rate to the design air flow rate at full speed.
+The second factor, <span>\({f_{UA,airflow}}\)</span>, adjusts UA for the current air flow rate.  The user enters a performance curve or lookup table that is a function of one independent variable.  The independent variable is the ratio of the current air flow rate to the design air flow rate at full speed.
 
 <div>$${f_{UA,airflow}} = func\left( {AirFlowRatio} \right)$$</div>
 
-The third factor, <span>${f_{UA,waterflow}}$</span>, adjusts UA for the current water flow rate.  The user enters a performance curve or lookup table that is a function of one independent variable.  The independent variable is the ratio of the current water flow rate to the design water flow rate.
+The third factor, <span>\({f_{UA,waterflow}}\)</span>, adjusts UA for the current water flow rate.  The user enters a performance curve or lookup table that is a function of one independent variable.  The independent variable is the ratio of the current water flow rate to the design water flow rate.
 
 <div>$${f_{UA,waterflow}} = func\left( {WaterFlowRatio} \right)$$</div>
 
@@ -159,15 +159,15 @@ With the overall heat transfer coefficient-area product for the cooling tower en
 
 <div>$$UAe = UA\frac{{\bar cpe}}{{cp}}$$</div>
 
-With <span>$\bar cpe$</span> and <span>$UAe$</span> known, the effectiveness of the heat exchanger is then calculated:
+With <span>\(\bar cpe\)</span> and <span>\(UAe\)</span> known, the effectiveness of the heat exchanger is then calculated:
 
 <div>$$\varepsilon \,\, = \,\frac{{1 - \exp \left\{ { - NTU\left[ {1 - \left( {\frac{{{{\dot C}_{\min }}}}{{{{\dot C}_{\max }}}}} \right)} \right]} \right\}}}{{1 - \left( {\frac{{{{\dot C}_{\min }}}}{{{{\dot C}_{\max }}}}} \right)\exp \left\{ { - NTU\left[ {1 - \left( {\frac{{{{\dot C}_{\min }}}}{{{{\dot C}_{\max }}}}} \right)} \right]} \right\}}}$$</div>
 
 where
 
-<span>${\dot C_{\min }} = \,Minimum\,({\dot C_w},\,{\dot C_a})$</span> and <span>${\dot C_{\max }} = \,Maximum\,({\dot C_w},\,{\dot C_a})$</span>
+<span>\({\dot C_{\min }} = \,Minimum\,({\dot C_w},\,{\dot C_a})\)</span> and <span>\({\dot C_{\max }} = \,Maximum\,({\dot C_w},\,{\dot C_a})\)</span>
 
-<span>${\dot C_w} = {\dot m_w}c{p_w}$</span> and <span>${\dot C_a} = {\dot m_a}\bar cpe$</span>
+<span>\({\dot C_w} = {\dot m_w}c{p_w}\)</span> and <span>\({\dot C_a} = {\dot m_a}\bar cpe\)</span>
 
 <div>$$NTU = Number\,of\,Transfer\,Units = \frac{{UAe}}{{{{\dot C}_{\min }}}}$$</div>
 
@@ -179,7 +179,7 @@ The outlet air wet-bulb temperature is then recalculated:
 
 <div>$${T_{wbout}} = {T_{wbin}} + \frac{{{{\dot Q}_{total}}}}{{{{\dot C}_a}}}$$</div>
 
-The iterative process of calculating <span>${T_{wbout}}$</span> continues until convergence is reached.
+The iterative process of calculating <span>\({T_{wbout}}\)</span> continues until convergence is reached.
 
 Finally, the outlet water temperature is calculated as follows:
 
@@ -199,13 +199,13 @@ The fraction of time that the tower fan must operate is calculated based on the 
 
 where
 
-<span>${T_{set}}$</span> = exiting water setpoint temperature, <sup>o</sup>C
+<span>\({T_{set}}\)</span> = exiting water setpoint temperature, <sup>o</sup>C
 
-<span>${T_{wout,off}}$</span> = exiting water temperature with tower fan off, <sup>o</sup>C
+<span>\({T_{wout,off}}\)</span> = exiting water temperature with tower fan off, <sup>o</sup>C
 
-<span>${T_{wout,on}}$</span> = exiting water temperature with tower fan on, <sup>o</sup>C
+<span>\({T_{wout,on}}\)</span> = exiting water temperature with tower fan on, <sup>o</sup>C
 
-The average fan power for the simulation time step is calculated by multiplying <span>$\omega \,$</span>by the steady-state fan power specified by the user.
+The average fan power for the simulation time step is calculated by multiplying <span>\(\omega \,\)</span>by the steady-state fan power specified by the user.
 
 The calculation method for the two-speed tower is similar to that for the single-speed tower example described above. The model first checks to see if “free convection” is specified and if the resulting exiting water temperature is below the setpoint temperature. If not, then the model calculates the steady-state exiting water temperature with the tower fan at low speed. If the exiting water temperature at low fan speed is below the setpoint temperature, then the average fan power is calculated based on the result of equation and the steady-state, low speed fan power specified by the user. If low-speed fan operation is unable to reduce the exiting water temperature below the setpoint, then the tower fan is increased to its high speed and the steady-state exiting water temperature is calculated. If this temperature is below the setpoint, then a modified version of equation is used to calculate runtime at high fan speed:
 
@@ -213,11 +213,11 @@ The calculation method for the two-speed tower is similar to that for the single
 
 where
 
-<span>${T_{set}}$</span> = exiting water setpoint temperature, <sup>o</sup>C
+<span>\({T_{set}}\)</span> = exiting water setpoint temperature, <sup>o</sup>C
 
-<span>${T_{wout,low}}$</span> = exiting water temperature with tower fan at low speed, <sup>o</sup>C
+<span>\({T_{wout,low}}\)</span> = exiting water temperature with tower fan at low speed, <sup>o</sup>C
 
-<span>${T_{wout,high}}$</span> = exiting water temperature with tower fan at high speed, <sup>o</sup>C
+<span>\({T_{wout,high}}\)</span> = exiting water temperature with tower fan at high speed, <sup>o</sup>C
 
 The average fan power for the simulation time step is calculated for the two-speed cooling tower as follows:
 
@@ -607,21 +607,21 @@ The approach temperature correlation(s) used to simulate cooling tower heat reje
 
 Due to the inherent reference condition used to generate the tower performance curves, the water flow rate at the reference condition must be determined using the design performance information specified by the user and the tower model’s approach temperature correlation. This is done by using the model’s approach temperature correlation (described earlier in this section) to calculate the water flow rate ratio which yields the user-defined design approach temperature based on an air flow rate ratio of 1.0 (*FR<sub>air</sub>* = 1.0), the design inlet air wet-bulb temperature, and the design range temperature. The calculated approach temperature (using the model correlation) must satisfy the following two equations:
 
-<span>${T_{water,outlet,design}} = {T_{wb,air,design}} + {T_{approach,design}}\quad \{ F{R_{air}} = 1.0\} $</span><span>${T_{water,inlet,design}} = {T_{wb,air,design}} + {T_{approach,design}} + {T_{range,design}}\quad \{ F{R_{air}} = 1.0\} $</span>
+<span>\({T_{water,outlet,design}} = {T_{wb,air,design}} + {T_{approach,design}}\quad \{ F{R_{air}} = 1.0\} \)</span><span>\({T_{water,inlet,design}} = {T_{wb,air,design}} + {T_{approach,design}} + {T_{range,design}}\quad \{ F{R_{air}} = 1.0\} \)</span>
 
 where:
 
-<span>${T_{water,outlet,design}}$</span>= design outlet water temperature (<sup>o</sup>C)
+<span>\({T_{water,outlet,design}}\)</span>= design outlet water temperature (<sup>o</sup>C)
 
-<span>${T_{water,inlet,design}}$</span>= design inlet water temperature (<sup>o</sup>C)
+<span>\({T_{water,inlet,design}}\)</span>= design inlet water temperature (<sup>o</sup>C)
 
-<span>${T_{wb,air,design}}$</span>= design inlet air wet-bulb temperature (<sup>o</sup>C)
+<span>\({T_{wb,air,design}}\)</span>= design inlet air wet-bulb temperature (<sup>o</sup>C)
 
-<span>${T_{approach,design}}$</span>= design approach temperature (<sup>o</sup>C)
+<span>\({T_{approach,design}}\)</span>= design approach temperature (<sup>o</sup>C)
 
-<span>${T_{range,design}}$</span>= design range temperature (<sup>o</sup>C)
+<span>\({T_{range,design}}\)</span>= design range temperature (<sup>o</sup>C)
 
-<span>$F{R_{air}}$</span>= air flow rate ratio (actual air flow rate divided by design air flow rate)
+<span>\(F{R_{air}}\)</span>= air flow rate ratio (actual air flow rate divided by design air flow rate)
 
 The water flow rate ratio used in the approach temperature correlation which satisfies these two equations is the ratio of the design water flow rate (specified by the user) to the water flow rate at the reference condition. This ratio is used to calculate the reference water volumetric flow rate, which is then used throughout the simulation to determine the actual water flow rate ratio used in the approach temperature correlation for each simulation time step.
 
@@ -629,11 +629,11 @@ The water flow rate ratio used in the approach temperature correlation which sat
 
 where:
 
-<span>${\dot V_{reference}}$</span>= water volumetric flow rate at the reference condition (m<sup>3</sup>/s)
+<span>\({\dot V_{reference}}\)</span>= water volumetric flow rate at the reference condition (m<sup>3</sup>/s)
 
-<span>${\dot V_{design}}$</span>= design water volumetric flow rate specified by the user (m<sup>3</sup>/s)
+<span>\({\dot V_{design}}\)</span>= design water volumetric flow rate specified by the user (m<sup>3</sup>/s)
 
-<span>$F{R_{water,reference}}$</span>= design water flow rate divided by the reference water flow rate
+<span>\(F{R_{water,reference}}\)</span>= design water flow rate divided by the reference water flow rate
 
 The cooling tower seeks to maintain the temperature of the water exiting the cooling tower at (or below) a setpoint. The setpoint temperature is defined by the field “Condenser Loop Temperature Setpoint schedule or reference” for the CondenserLoop object. The model simulates the outlet water temperature in four successive steps:
 
@@ -651,13 +651,13 @@ For each simulation time step, the model first calculates the outlet water tempe
 
 where:
 
-<span>${T_{water,outlet,fanMAX}}$</span> = tower outlet water temperature at maximum fan speed (<sup>o</sup>C)
+<span>\({T_{water,outlet,fanMAX}}\)</span> = tower outlet water temperature at maximum fan speed (<sup>o</sup>C)
 
-<span>${T_{wb,air}}$</span> = tower inlet air wet-bulb temperature (<sup>o</sup>C)
+<span>\({T_{wb,air}}\)</span> = tower inlet air wet-bulb temperature (<sup>o</sup>C)
 
-<span>${T_{approach}}$</span>= approach temperature at current operating conditions (<sup>o</sup>C)
+<span>\({T_{approach}}\)</span>= approach temperature at current operating conditions (<sup>o</sup>C)
 
-<span>${T_{range}}$</span>= range temperature at current operating conditions (<sup>o</sup>C)
+<span>\({T_{range}}\)</span>= range temperature at current operating conditions (<sup>o</sup>C)
 
 Note that the approach temperature correlation as described previously is a function of range temperature, so the equations above must be solved iteratively to converge on a solution. If the resulting outlet water temperature is above the desired setpoint temperature, then the fan runs at maximum speed and does not cycle on/off (fan part-load ratio = FanPLR = 1.0 and *FR<sub>air</sub>* = 1.0).
 
@@ -667,11 +667,11 @@ If the outlet water temperature with maximum fan speed is below the setpoint tem
 
 where:
 
-<span>${T_{water,outlet,fanOFF}}$</span> = tower outlet water temperature in free convection regime (<sup>o</sup>C)
+<span>\({T_{water,outlet,fanOFF}}\)</span> = tower outlet water temperature in free convection regime (<sup>o</sup>C)
 
-<span>${T_{water,inlet}}$</span> = tower inlet water temperature (<sup>o</sup>C)
+<span>\({T_{water,inlet}}\)</span> = tower inlet water temperature (<sup>o</sup>C)
 
-<span>$Fra{c_{freeconv}}$</span>= fraction of tower capacity in free convection regime (user specified)
+<span>\(Fra{c_{freeconv}}\)</span>= fraction of tower capacity in free convection regime (user specified)
 
 If the outlet water temperature in the free convection regime is below the setpoint temperature, the tower fan is not turned on and the fan part-load ratio is set equal to 0. In addition, the air flow rate ratio through the tower is assumed to be equal to the fraction of tower capacity in the free convection regime.
 
@@ -681,11 +681,11 @@ If the outlet water temperature in the free convection regime is below the setpo
 
 where:
 
-<span>$FanPLR$</span>= fan part-load ratio
+<span>\(FanPLR\)</span>= fan part-load ratio
 
-<span>$FanPL{R_{freeconv}}$</span>= fan part-load ratio in free convection regime
+<span>\(FanPL{R_{freeconv}}\)</span>= fan part-load ratio in free convection regime
 
-<span>$F{R_{air,freeconv}}$</span> = air flow rate ratio in free convection regime
+<span>\(F{R_{air,freeconv}}\)</span> = air flow rate ratio in free convection regime
 
 If the outlet water temperature in the free convection regime is above the setpoint temperature, then the fan is turned on at the minimum fan speed (minimum air flow rate ratio, FR<sub>air,min</sub> , entered by the user) and the outlet water temperature is calculated as the inlet air wet-bulb temperature plus the calculated approach temperature:
 
@@ -695,9 +695,9 @@ If the outlet water temperature in the free convection regime is above the setpo
 
 where:
 
-<span>${T_{water,outlet,FanMIN}}$</span> = outlet water temperature at minimum fan speed (<sup>o</sup>C)
+<span>\({T_{water,outlet,FanMIN}}\)</span> = outlet water temperature at minimum fan speed (<sup>o</sup>C)
 
-<span>$F{R_{air,\min }}$</span> = air flow rate ratio at the minimum fan speed
+<span>\(F{R_{air,\min }}\)</span> = air flow rate ratio at the minimum fan speed
 
 If the outlet water temperature at minimum fan speed is below the setpoint temperature, the cooling tower fan cycles on and off at the minimum air flow rate ratio in order to meet the setpoint temperature.
 
@@ -705,7 +705,7 @@ If the outlet water temperature at minimum fan speed is below the setpoint tempe
 
 where:
 
-<span>${T_{{\rm{setpoint}}}}$</span> = outlet water setpoint temperature (<sup>o</sup>C)
+<span>\({T_{{\rm{setpoint}}}}\)</span> = outlet water setpoint temperature (<sup>o</sup>C)
 
 If the outlet water temperature at minimum fan speed is above the outlet water temperature setpoint, then the cooling tower fan speed (*FR<sub>air</sub>*) is increased until the calculated approach temperature produces the required outlet water temperature to meet the setpoint.
 
@@ -713,7 +713,7 @@ If the outlet water temperature at minimum fan speed is above the outlet water t
 
 <div>$${T_{water,outlet}} = {T_{{\rm{setpoint}}}}\, = {T_{wb,air}}{\rm{ + }}\,{T_{approach}}$$</div>
 
-<span>$FanPLR = 1.0$</span> *(i.e., fan does not cycle on/off)*
+<span>\(FanPLR = 1.0\)</span> *(i.e., fan does not cycle on/off)*
 
 #### Fan Power
 
@@ -725,15 +725,15 @@ When the cooling tower fan is operating, fan electric power is calculated based 
 
 where:
 
-<span>$FanPowerCurveObject$</span> = name of fan power ratio as a function of air flow rate ratio curve
+<span>\(FanPowerCurveObject\)</span> = name of fan power ratio as a function of air flow rate ratio curve
 
-<span>${P_{fan}}$</span> = tower fan electric power (W)
+<span>\({P_{fan}}\)</span> = tower fan electric power (W)
 
-<span>${E_{fan}}$</span> = tower fan electric consumption (J)
+<span>\({E_{fan}}\)</span> = tower fan electric consumption (J)
 
-<span>$CurveOutput$</span> = output of FanPowerCurveObject evaluated at the operating air flow rate ratio (*FR<sub>air</sub>*)
+<span>\(CurveOutput\)</span> = output of FanPowerCurveObject evaluated at the operating air flow rate ratio (*FR<sub>air</sub>*)
 
-<span>${P_{fan,design}}$</span> = design fan power at design (maximum) air flow through the tower (W)
+<span>\({P_{fan,design}}\)</span> = design fan power at design (maximum) air flow through the tower (W)
 
 *TimeStepSys* = HVAC system simulation time step (hr)
 
@@ -747,9 +747,9 @@ Calculations are also made to estimate the electric power input to the tower bas
 
 where:
 
-<span>${P_{{\rm{heater,basin}}}}$</span> = tower basin heater electric power (W)
+<span>\({P_{{\rm{heater,basin}}}}\)</span> = tower basin heater electric power (W)
 
-<span>${E_{{\rm{heater,basin}}}}$</span> = tower basin heater electric consumption (J)
+<span>\({E_{{\rm{heater,basin}}}}\)</span> = tower basin heater electric consumption (J)
 
 *T<sub>setpoint,basin</sub>* = basin heater setpoint temperature (<sup>o</sup>C)
 
@@ -783,7 +783,7 @@ Many towers are constructed to be capable of being grouped together to achieve t
 
 For the operation of multi-cell towers, the first step is to determine the number of cells *n,* which will be operating during the timestep using the calculation logic from DOE-2.1E.
 
-The maximum and minimum flow rates per cell are determined according to the input fractions (*Minimum  Water Flow Rate Fraction:*<span>${k_{min}}$</span>* * and *Maximum  Water Flow Rate Fraction:* <span>${k_{max}}$</span>) as follows:
+The maximum and minimum flow rates per cell are determined according to the input fractions (*Minimum  Water Flow Rate Fraction:*<span>\({k_{min}}\)</span>* * and *Maximum  Water Flow Rate Fraction:* <span>\({k_{max}}\)</span>) as follows:
 
 <div>$$
   \left\{
@@ -794,7 +794,7 @@ The maximum and minimum flow rates per cell are determined according to the inpu
   \right.
 $$</div>
 
-where <span>${{{\dot m}_{w,des}}}$</span> is the design water flow rate through the entire cooling tower.
+where <span>\({{{\dot m}_{w,des}}}\)</span> is the design water flow rate through the entire cooling tower.
 
 Then, we determine the minimum and maximum number of cells that can operate with this water flow rate:
 
@@ -807,19 +807,19 @@ Then, we determine the minimum and maximum number of cells that can operate with
   \right.
 $$</div>
 
-where *n<sub>tot</sub>* is the total number of cells of the tower, and<span>${{{\dot m}_{w,tot}}}$</span> is the water flow rate to the tower.
+where *n<sub>tot</sub>* is the total number of cells of the tower, and<span>\({{{\dot m}_{w,tot}}}\)</span> is the water flow rate to the tower.
 
 The number of cells operating*n* is set accordingly:
 
 If the *Cell Control* method is *MinimalCell,*
 
-*n =* <span>${{n_{min}}}$</span>
+*n =* <span>\({{n_{min}}}\)</span>
 
 If the *Cell Control* method is *MaximalCell,*
 
-*n =* <span>${{n_{max}}}$</span>
+*n =* <span>\({{n_{max}}}\)</span>
 
-Finally, the water mass flow rate per cell (<span>${{\dot m}_w})$</span> will be:
+Finally, the water mass flow rate per cell (<span>\({{\dot m}_w})\)</span> will be:
 
 <div>$${{\dot m}_w} = \frac{{{{\dot m}_{w,tot}}}}{n}$$</div>
 
@@ -845,17 +845,17 @@ Makeup water use for all types of cooling towers is made up of three components:
 
 where:
 
-<span>${\dot Q_{water}}$</span> = water-side heat transfer (W)
+<span>\({\dot Q_{water}}\)</span> = water-side heat transfer (W)
 
-<span>${\dot m_{_{water}}}$</span> = mass flow rate of water through the tower (kg/s)
+<span>\({\dot m_{_{water}}}\)</span> = mass flow rate of water through the tower (kg/s)
 
-<span>${C_p}$</span> = specific heat of water (W/kg-K)
+<span>\({C_p}\)</span> = specific heat of water (W/kg-K)
 
-<span>${h_{sat\,air,outlet}}$</span> = saturated outlet air enthalpy (J/kg)
+<span>\({h_{sat\,air,outlet}}\)</span> = saturated outlet air enthalpy (J/kg)
 
-<span>${h_{air,inlet}}$</span> = inlet air enthalpy (J/kg)
+<span>\({h_{air,inlet}}\)</span> = inlet air enthalpy (J/kg)
 
-<span>${\dot m_{air}}$</span> = mass flow rate of air through the tower (kg/s)
+<span>\({\dot m_{air}}\)</span> = mass flow rate of air through the tower (kg/s)
 
 The saturation temperature and humidity ratio are then calculated for the tower’s outlet air.
 
@@ -865,15 +865,15 @@ The saturation temperature and humidity ratio are then calculated for the tower�
 
 where:
 
-<span>${T_{sat\,air,outlet}}$</span> = saturated outlet air temperature (<sup>o</sup>C)
+<span>\({T_{sat\,air,outlet}}\)</span> = saturated outlet air temperature (<sup>o</sup>C)
 
-<span>$PsyTsatFnHPb$</span> = EnergyPlus psychrometric function, returns saturation temperature given enthalpy and barometric pressure
+<span>\(PsyTsatFnHPb\)</span> = EnergyPlus psychrometric function, returns saturation temperature given enthalpy and barometric pressure
 
-<span>${\rm{OutBaroPress}}$</span> = outdoor barometric pressure (Pa)
+<span>\({\rm{OutBaroPress}}\)</span> = outdoor barometric pressure (Pa)
 
-<span>${\omega_{sat\,air,outlet}}$</span> = saturated outlet air humidity ratio (kg<sub>water</sub>/kg<sub>dry\\ air</sub>)
+<span>\({\omega_{sat\,air,outlet}}\)</span> = saturated outlet air humidity ratio (kg<sub>water</sub>/kg<sub>dry\\ air</sub>)
 
-<span>$PsyWFnTdbH$</span> = EnergyPlus psychrometric function, returns humidity ratio given dry-bulb temperature and enthalpy
+<span>\(PsyWFnTdbH\)</span> = EnergyPlus psychrometric function, returns humidity ratio given dry-bulb temperature and enthalpy
 
 The makeup water quantity required to replenish the water lost due to evaporation is then calculated as the product of the air mass flow rate and the difference between the entering and leaving air humidity ratio divided by the density of water.
 
@@ -881,13 +881,13 @@ The makeup water quantity required to replenish the water lost due to evaporatio
 
 where:
 
-<span>${\dot V_{evaporation,makeup}}$</span> = makeup water usage due to evaporation (m<sup>3</sup>/s)
+<span>\({\dot V_{evaporation,makeup}}\)</span> = makeup water usage due to evaporation (m<sup>3</sup>/s)
 
-<span>${\dot m_{air}}$</span> = mass flow rate of air through tower (kg/s)
+<span>\({\dot m_{air}}\)</span> = mass flow rate of air through tower (kg/s)
 
-<span>${\omega_{air,inlet}}$</span> = humidity ratio of tower inlet air (kg<sub>water</sub>/kg<sub>dry\\ air</sub>)
+<span>\({\omega_{air,inlet}}\)</span> = humidity ratio of tower inlet air (kg<sub>water</sub>/kg<sub>dry\\ air</sub>)
 
-<span>${\rho_{water}}$</span> = density of water evaluated at the tower inlet air temperature (kg/m<sup>3</sup>)
+<span>\({\rho_{water}}\)</span> = density of water evaluated at the tower inlet air temperature (kg/m<sup>3</sup>)
 
 The second method available for calculating water makeup for evaporation is for the user to provide a value for a loss factor.  The evaporation loss is then calculated as a fraction of the circulating condenser water flow and varies with the temperature change in the condenser water.  The value provided by the user is in units of percent-per-degree Kelvin.  The evaporation rate will equal this value times each degree Kelvin of temperature drop in the condenser water.  Typical values are from 0.15 to 0.27 [percent/K]. The default is 0.2.  The rate of water makeup for evaporation is then calculated by multiplying this factor times the condenser water flow rate and the temperature decrease in the condenser water flow rate. For evaporative fluid coolers, a numerical value of loss factor can be entered in the same manner as for cooling towers. If this field is blank, an empirical correlation will be used to calculate the value based on current outdoor dry bulb temperature and relative humidity. The following correlation from Qureshi and Zubair (2007) is used to calculate the loss factor:
 
@@ -895,9 +895,9 @@ The second method available for calculating water makeup for evaporation is for 
 
 where:
 
-<span>$\phi $</span> = relative humidity of inlet air
+<span>\(\phi \)</span> = relative humidity of inlet air
 
-<span>${t_{db}}$</span> = Dry-bulb temperature of inlet air
+<span>\({t_{db}}\)</span> = Dry-bulb temperature of inlet air
 
 Additional makeup water usage is modeled as a percentage of design water flow rate through the tower to account for drift, and as a scheduled flow rate to model blowdown. Drift is water loss due to the entrainment of small water droplets in the air stream passing through the tower. Drift is defined by the model user as a percentage of the tower’s design water flow rate, and is assumed to vary with tower air flow rate ratio as follows:
 
@@ -905,13 +905,13 @@ Additional makeup water usage is modeled as a percentage of design water flow ra
 
 where:
 
-<span>${\dot V_{drift,makeup}}$</span> = makeup water usage due to drift (m<sup>3</sup>/s)
+<span>\({\dot V_{drift,makeup}}\)</span> = makeup water usage due to drift (m<sup>3</sup>/s)
 
-<span>${\dot m_{water,design}}$</span> = design (volumetric) water flow rate (m<sup>3</sup>/s)
+<span>\({\dot m_{water,design}}\)</span> = design (volumetric) water flow rate (m<sup>3</sup>/s)
 
-<span>$PercentWatertoDrift$</span> = percent of design water flow rate lost to drift at the tower design air flow rate
+<span>\(PercentWatertoDrift\)</span> = percent of design water flow rate lost to drift at the tower design air flow rate
 
-<span>$F{R_{air}}$</span>= ratio of actual air flow rate to tower design air flow rate
+<span>\(F{R_{air}}\)</span>= ratio of actual air flow rate to tower design air flow rate
 
 Blowdown is water flushed from the basin on a periodic basis to purge the concentration of mineral scale or other contaminants. There are two ways that blowdown is calculated in EnergyPlus.  Blowdown water rates can be scheduled so that we have:.
 
@@ -919,7 +919,7 @@ Blowdown is water flushed from the basin on a periodic basis to purge the concen
 
 where:
 
-<span>${\dot V_{blowdown,makeup}}$</span> = makeup water usage due to blowdown (m<sup>3</sup>/s)
+<span>\({\dot V_{blowdown,makeup}}\)</span> = makeup water usage due to blowdown (m<sup>3</sup>/s)
 
 *ScheduleValue<sub>blowdown</sub>* = blowdown schedule value for the time step being simulated (m<sup>3</sup>/s)
 
@@ -929,7 +929,7 @@ The second (and default) way that blowdown can be calculated is to assume that b
 
 where,
 
-<span>${R_{concentration}}$</span> is the concentration ratio or the ratio of solids in the blowdown water to solids in the makeup water.
+<span>\({R_{concentration}}\)</span> is the concentration ratio or the ratio of solids in the blowdown water to solids in the makeup water.
 
 The tower makeup water consumption (m<sup>3</sup>) for each simulation time step is calculated as the sum of the individual components of makeup water usage multiplied by the simulation time step in hours and the conversion for hours to seconds (3600 sec/hr). Makeup water usage is only calculated when the cooling tower is active and water is flowing through the cooling tower.
 
@@ -937,7 +937,7 @@ The tower makeup water consumption (m<sup>3</sup>) for each simulation time step
 
 where:
 
-<span>${V_{water,makeup}}$</span> = tower makeup water consumption (m<sup>3</sup>)
+<span>\({V_{water,makeup}}\)</span> = tower makeup water consumption (m<sup>3</sup>)
 
 #### References
 
@@ -961,19 +961,19 @@ The expression for fluid cooler effectiveness is as follows:
 
 Where
 
-<span>$\varepsilon $</span><span>$\varepsilon $</span>* *= heat exchanger effectiveness
+<span>\(\varepsilon \)</span><span>\(\varepsilon \)</span>* *= heat exchanger effectiveness
 
 <div>$${C_r} = \frac{{{{\dot C}_{\min }}}}{{{{\dot C}_{\max }}}}$$</div>
 
-<span>${\dot C_a} = {\dot m_a}{c_{pa}}$</span><span>${\dot C_a} = {\dot m_a}{c_{pa}}$</span> and<span>${\dot C_w} = {\dot m_w}{c_{pw}}$</span>
+<span>\({\dot C_a} = {\dot m_a}{c_{pa}}\)</span><span>\({\dot C_a} = {\dot m_a}{c_{pa}}\)</span> and<span>\({\dot C_w} = {\dot m_w}{c_{pw}}\)</span>
 
-<span>${\dot C_{\max }} = Max({\dot C_a},{\dot C_w})$</span><span>${\dot C_{\max }} = Max({\dot C_a},{\dot C_w})$</span>;<span>${\dot C_{\min }} = Min({\dot C_a},{\dot C_w})$</span>
+<span>\({\dot C_{\max }} = Max({\dot C_a},{\dot C_w})\)</span><span>\({\dot C_{\max }} = Max({\dot C_a},{\dot C_w})\)</span>;<span>\({\dot C_{\min }} = Min({\dot C_a},{\dot C_w})\)</span>
 
 <div>$$NTU = \frac{{UA}}{{{{\dot C}_{\min }}}}$$</div>
 
-<span>$\eta  = NT{U^{( - 0.22)}}$</span><span>$\eta  = NT{U^{( - 0.22)}}$</span>
+<span>\(\eta  = NT{U^{( - 0.22)}}\)</span><span>\(\eta  = NT{U^{( - 0.22)}}\)</span>
 
-The first fluid is water and the second fluid is air entering the heat exchanger at temperature <span>${T_{db,in}}$</span><span>${T_{db,in}}$</span> and specific heat <span>${c_{pa}}$</span><span>${c_{pa}}$</span>. The heat exchanger is characterized by a single parameter, its overall heat transfer coefficient-area product UA.
+The first fluid is water and the second fluid is air entering the heat exchanger at temperature <span>\({T_{db,in}}\)</span><span>\({T_{db,in}}\)</span> and specific heat <span>\({c_{pa}}\)</span><span>\({c_{pa}}\)</span>. The heat exchanger is characterized by a single parameter, its overall heat transfer coefficient-area product UA.
 
 When the user selects the nominal capacity method, the UA is calculated as follows:
 
@@ -989,7 +989,7 @@ With the overall heat transfer coefficient-area product for the fluid cooler cal
 
 The heat transfer rate is then calculated as follows:
 
-<span>$\dot Q = \varepsilon {\dot C_{\min }}({T_{w,in}} - {T_{db,in}})$</span><span>$\dot Q = \varepsilon {\dot C_{\min }}({T_{w,in}} - {T_{db,in}})$</span>
+<span>\(\dot Q = \varepsilon {\dot C_{\min }}({T_{w,in}} - {T_{db,in}})\)</span><span>\(\dot Q = \varepsilon {\dot C_{\min }}({T_{w,in}} - {T_{db,in}})\)</span>
 
 Then the outlet air dry-bulb and outlet water temperature are calculated:
 
@@ -997,13 +997,13 @@ Then the outlet air dry-bulb and outlet water temperature are calculated:
 
 <div>$${T_{w,out}} = {T_{w,in}} - \frac{{\mathop Q\limits^. }}{{{{\mathop C\limits^. }_w}}}$$</div>
 
-<span>${T_{w,in}}$</span>= inlet water temperature, <sup>o</sup>C
+<span>\({T_{w,in}}\)</span>= inlet water temperature, <sup>o</sup>C
 
-<span>${T_{w,out}}$</span>= outlet water temperature, <sup>o</sup>C
+<span>\({T_{w,out}}\)</span>= outlet water temperature, <sup>o</sup>C
 
-<span>${T_{db,in}}$</span> = dry-bulb temperature of the inlet air, <sup>o</sup>C
+<span>\({T_{db,in}}\)</span> = dry-bulb temperature of the inlet air, <sup>o</sup>C
 
-<span>${T_{db,out}}$</span>= dry-bulb temperature of the outlet air, <sup>o</sup>C
+<span>\({T_{db,out}}\)</span>= dry-bulb temperature of the outlet air, <sup>o</sup>C
 
 #### Calculating the Actual Exiting Water Temperature and Fan Power
 
@@ -1017,13 +1017,13 @@ The fluid cooler fans are turned on to reduce the exiting water temperature to t
 
 Where
 
-<span>${T_{set}}$</span> = exiting water setpoint temperature, <sup>o</sup>C
+<span>\({T_{set}}\)</span> = exiting water setpoint temperature, <sup>o</sup>C
 
-<span>${T_{wout,off}}$</span> = exiting water temperature with all fluid cooler fans off, <sup>o</sup>C
+<span>\({T_{wout,off}}\)</span> = exiting water temperature with all fluid cooler fans off, <sup>o</sup>C
 
-<span>${T_{wout,on}}$</span> = exiting water temperature with all fluid cooler fans on, <sup>o</sup>C
+<span>\({T_{wout,on}}\)</span> = exiting water temperature with all fluid cooler fans on, <sup>o</sup>C
 
-The average fan power for the simulation time step is calculated by multiplying <span>$\omega \,$</span>by the steady-state fan power specified by the user.
+The average fan power for the simulation time step is calculated by multiplying <span>\(\omega \,\)</span>by the steady-state fan power specified by the user.
 
 The calculation method for the two-speed fluid cooler is similar to that for the single-speed fluid cooler example described above. The model first calculates the steady-state exiting water temperature with the fluid cooler fans at low speed. If the exiting water temperature at low fan speed is below the setpoint temperature, then the average fan power is calculated based on the result of previous equation and the steady-state, low speed fan power specified by the user.  If low-speed fan operation is unable to reduce the exiting water temperature below the setpoint, then the fluid cooler fans’ speed is increased to high speed and the steady-state exiting water temperature is calculated. If this temperature is below the setpoint, then a modified version of previous equation is used to calculate runtime at high fan speed:
 
@@ -1031,11 +1031,11 @@ The calculation method for the two-speed fluid cooler is similar to that for the
 
 where
 
-<span>${T_{set}}$</span> = exiting water setpoint temperature, <sup>o</sup>C
+<span>\({T_{set}}\)</span> = exiting water setpoint temperature, <sup>o</sup>C
 
-<span>${T_{wout,low}}$</span> = exiting water temperature with fluid cooler fans at low speed, <sup>o</sup>C
+<span>\({T_{wout,low}}\)</span> = exiting water temperature with fluid cooler fans at low speed, <sup>o</sup>C
 
-<span>${T_{wout,high}}$</span> = exiting water temperature with fluid cooler fans at high speed, <sup>o</sup>C
+<span>\({T_{wout,high}}\)</span> = exiting water temperature with fluid cooler fans at high speed, <sup>o</sup>C
 
 The average fan power for the simulation time step is calculated for the two-speed fluid cooler as follows
 
@@ -1074,17 +1074,17 @@ For the i-th zone, first the breathing-zone outdoor air flow is calculated:
 
 Where:
 
-<span>${V_{bz,i}}$</span>= the breathing-zone outdoor air flow, m³/s
+<span>\({V_{bz,i}}\)</span>= the breathing-zone outdoor air flow, m³/s
 
-<span>${R_{p,i}}$</span>= the ventilation rate per person, m³/s-person
+<span>\({R_{p,i}}\)</span>= the ventilation rate per person, m³/s-person
 
-<span>${P_i}$</span>  = the number of occupants for the zone
+<span>\({P_i}\)</span>  = the number of occupants for the zone
 
-<span>${R_{a,i}}$</span>= the ventilation rate per floor area, m³/s-m²
+<span>\({R_{a,i}}\)</span>= the ventilation rate per floor area, m³/s-m²
 
-<span>${A_i}$</span>  = the floor area of the zone, m²
+<span>\({A_i}\)</span>  = the floor area of the zone, m²
 
-<span>$i$</span>    = the index of the zone or zone list
+<span>\(i\)</span>    = the index of the zone or zone list
 
 Next, the i-th zone outdoor air flow is calculated:
 
@@ -1092,11 +1092,11 @@ Next, the i-th zone outdoor air flow is calculated:
 
 Where:
 
-<span>${V_{oz,i}}$</span>= the zone outdoor air flow, m³/s
+<span>\({V_{oz,i}}\)</span>= the zone outdoor air flow, m³/s
 
-<span>${E_i}$</span>= the zone air distribution effectiveness, see following figure for ASHRAE recommended values.
+<span>\({E_i}\)</span>= the zone air distribution effectiveness, see following figure for ASHRAE recommended values.
 
-![](EngineeringReference/media/image4716.png)
+![](media/image4716.png)
 
 Figure 195. Zone Air Distribution Effectiveness Typical Values (Source: ASHRAE Standard 62.1-2010)
 
@@ -1116,23 +1116,23 @@ For non 100% outdoor air multi-zone systems, the system outdoor air flow,
 
 Where:
 
-<span>${V_{ou}}$</span> the uncorrected system outdoor air flow, m³/s
+<span>\({V_{ou}}\)</span> the uncorrected system outdoor air flow, m³/s
 
 <div>$${V_{ou}} = \mathop \sum \limits_{i = 1}^{allzones} ({R_{p,i}} \times {P_i}) + \mathop \sum \limits_{i = 1}^{allzones} ({R_{a,i}} \times {A_i})$$</div>
 
-<span>${X_s}$</span> = the uncorrected system outdoor air fraction
+<span>\({X_s}\)</span> = the uncorrected system outdoor air fraction
 
 <div>$${X_s} = {V_{ou}}/{V_{ps}}$$</div>
 
-<span>${V_{ps}}$</span>= the system supply air flow, m³/s
+<span>\({V_{ps}}\)</span>= the system supply air flow, m³/s
 
-<span>${Z_{d,i}}$</span> = the zone outdoor air fraction
+<span>\({Z_{d,i}}\)</span> = the zone outdoor air fraction
 
 <div>$${Z_{d,i}} = {V_{oz,i}}/{V_{dz,i}}$$</div>
 
-<span>${V_{dz,i}}$</span> = the zone supply air flow, m³/s
+<span>\({V_{dz,i}}\)</span> = the zone supply air flow, m³/s
 
-<span>${E_v}$</span> = the system ventilation efficiency, determined as the minimum of the zone ventilation efficiency among all ventilation zones served by the air handler.
+<span>\({E_v}\)</span> = the system ventilation efficiency, determined as the minimum of the zone ventilation efficiency among all ventilation zones served by the air handler.
 
 *Ev*= minimum (*Evz*)
 
@@ -1166,7 +1166,7 @@ The zone secondary recirculation fraction Er is determined by the designer based
 
 The program then calculates the minimum outdoor air flow fraction based on the information provided in the object Controller:MechanicalVentilation and the maximum branch air flow rate as follows:
 
-MechVentOutsideAirMinFrac = <span>${V_{ot}}$</span> RhoStd / <span>$\dot m{_{maxbranch}}$</span>here:
+MechVentOutsideAirMinFrac = <span>\({V_{ot}}\)</span> RhoStd / <span>\(\dot m{_{maxbranch}}\)</span>here:
 
 MechVentOutsideAirMinFrac = outdoor air minimum fraction based on all zones specified in the Controller:MechanicalVentilation object
 
@@ -1178,7 +1178,7 @@ The method used to calculate the outdoor ventilation air flow rate for each syst
 
 
 
-![](EngineeringReference/media/image4731.png)
+![](media/image4731.png)
 
 Figure 196.  Demand Control Ventilation -- Air Flow Paths
 
@@ -1188,9 +1188,9 @@ The minimum outdoor air flow rate is first calculated based on the minimum outdo
 
 where:
 
-<span>${\mathop m\limits^ \bullet_{_{\min OA}}}$</span>       = minimum outdoor air flow rate for this time step, kg/s
+<span>\({\mathop m\limits^ \bullet_{_{\min OA}}}\)</span>       = minimum outdoor air flow rate for this time step, kg/s
 
-<span>${\mathop V\limits^ \bullet_{_{\min OA}}}$</span>        = minimum outdoor air flow rate defined in Controller:OutdoorAir, m<sup>3</sup>/s
+<span>\({\mathop V\limits^ \bullet_{_{\min OA}}}\)</span>        = minimum outdoor air flow rate defined in Controller:OutdoorAir, m<sup>3</sup>/s
 
 *MinOAScheduleValue* = minimum outdoor air schedule value defined by the schedule identified in Controller:OutdoorAir
 
@@ -1202,7 +1202,7 @@ The outdoor air minimum fraction is then calculated as the ratio of the minimum 
 
 where:
 
-<span>${\mathop m\limits^ \bullet_{\max branch}}$</span>    = Max branch air volume flow rate times *RhoStd,* kg/s
+<span>\({\mathop m\limits^ \bullet_{\max branch}}\)</span>    = Max branch air volume flow rate times *RhoStd,* kg/s
 
 The program then calculates the minimum outdoor air flow fraction (*MechVentOutsideAirMinFrac*) according to the VRP based on the information provided in the object Controller:MechanicalVentilation and the maximum branch air flow rate.
 
@@ -1222,11 +1222,11 @@ The mass flow rate of outdoor air is then calculated based on the outdoor air fr
 
 where:
 
-<span>${\dot m_{OA}}$</span>           = mass flow rate of outdoor air, kg/s
+<span>\({\dot m_{OA}}\)</span>           = mass flow rate of outdoor air, kg/s
 
-<span>$OAFrac$</span>    = fraction of outdoor air in the mixed (supply) air stream
+<span>\(OAFrac\)</span>    = fraction of outdoor air in the mixed (supply) air stream
 
-<span>${\mathop m\limits^ \bullet_{MixedAir}}$</span>     = mass flow rate of the mixture of return air and outdoor ventilation air, kg/s
+<span>\({\mathop m\limits^ \bullet_{MixedAir}}\)</span>     = mass flow rate of the mixture of return air and outdoor ventilation air, kg/s
 
 The algorithm checks to make sure the calculated outdoor air mass flow rate is greater than or equal to the air flow rate being exhausted.
 
@@ -1246,7 +1246,7 @@ The outdoor air mass flow rate should also be less than or equal to the maximum 
 
 where:
 
-<span>${\dot m_{MaxOA}}$</span>= maximum outdoor air mass flow rate, kg/s = maximum outdoor air volume flow rate from Controller:OutdoorAir times *RhoStd*
+<span>\({\dot m_{MaxOA}}\)</span>= maximum outdoor air mass flow rate, kg/s = maximum outdoor air volume flow rate from Controller:OutdoorAir times *RhoStd*
 
 Finally, the relief air flow rate is calculated as the difference between the outside and exhaust air mass flow rates.
 
@@ -1268,13 +1268,13 @@ The outdoor air mass flow rate provided by the air loop is calculated as below:
 
 where:
 
-<span>${\dot m_{OA,z,i}}$</span>= outdoor air mass flow rate for the ith zone as calculated according to section Carbon Dioxide Prediction located elsewhere in this document.
+<span>\({\dot m_{OA,z,i}}\)</span>= outdoor air mass flow rate for the ith zone as calculated according to section Carbon Dioxide Prediction located elsewhere in this document.
 
 N = number of zones served by the air loop, which is provided in the input for a Controller:MechanicalVentilation object
 
 ### Proportional Control
 
-Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
+The control has two choices: ProportionalControlBasedonOccupancySchedule and ProportionalControlBasedonDesignOccupancy. The difference is occupancy level. The former uses real time occupancy, while the latter uses design occupancy level. Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO<sub>2</sub>-based DCV with Proportional Control:
 
 n **AirLoopHVAC:OutdoorAirSystem** to simulate the mixed air box of the air loop
 
@@ -1292,47 +1292,50 @@ For the i-th zone, the outdoor air mass flow rate provided by the air loop is ca
 
 <div>$${V_{ot - min,i}} = \frac{{({R_{a,i}}.{A_{z,i}})}}{{{E_i}}}$$</div>
 
-3)   The target indoor CO<sub>2</sub> concentration at <span>${V_{ot - design,i}}$</span>
+3)   The target indoor CO<sub>2</sub> concentration at <span>\({V_{ot - design,i}}\)</span>
 
 <div>$${C_{s - design,i}} = {C_o} + \frac{N}{{\left( {{V_{ot - design,i}}/{P_{z,i}}} \right)}}$$</div>
 
-4)   The target indoor CO<sub>2</sub> concentration at <span>${V_{ot - min}}$</span> is either a user input in the object ZoneControl:ContaminantController or equal to the outdoor CO<sub>2</sub> concentration. The default is outdoor CO<sub>2</sub> concentration.
+4)   The target indoor CO<sub>2</sub> concentration at <span>\({V_{ot - min}}\)</span> is either a user input in the object ZoneControl:ContaminantController or equal to the outdoor CO<sub>2</sub> concentration. The default is outdoor CO<sub>2</sub> concentration.
 
 <div>$${C_{s - min,i}} = {C_o}$$</div>
 
-When the indoor CO<sub>2</sub> concentration equals <span>${C_{s - design,i}}$</span>, <span>${V_{ot}}$</span> should equal <span>${V_{ot - design,i}}$</span>. When the indoor CO<sub>2</sub> concentration equals <span>${C_{s - min,i}}$</span>, <span>${V_{ot}}$</span> should equal <span>${V_{ot - min,i}}$</span>. When the indoor CO<sub>2</sub> concentration is between <span>${C_{s - min,i}}$</span> and <span>${C_{s - design,i}}$</span>, a controller should adjust outdoor air intake flow <span>${V_{ot}}$</span> proportionally between <span>${V_{ot - min,i}}$</span> and <span>${V_{ot - design,i}}$</span>:
+When the indoor CO<sub>2</sub> concentration equals <span>\({C_{s - design,i}}\)</span>, <span>\({V_{ot}}\)</span> should equal <span>\({V_{ot - design,i}}\)</span>. When the indoor CO<sub>2</sub> concentration equals <span>\({C_{s - min,i}}\)</span>, <span>\({V_{ot}}\)</span> should equal <span>\({V_{ot - min,i}}\)</span>. When the indoor CO<sub>2</sub> concentration is between <span>\({C_{s - min,i}}\)</span> and <span>\({C_{s - design,i}}\)</span>, a controller should adjust outdoor air intake flow <span>\({V_{ot}}\)</span> proportionally between <span>\({V_{ot - min,i}}\)</span> and <span>\({V_{ot - design,i}}\)</span>:
 
 <div>$${V_{ot,i}} = {V_{ot - min,i}} + ({V_{ot - design,i}} - {V_{ot - min,i}})\frac{{({C_{s - actual,i}} - {C_{s - min,i}})}}{{({C_{s - design,i}} - {C_{s - min,i}})}}$$</div>
 
 Where,
 
-<span>${R_{p,i}}$</span> = Required outdoor air flow rate per person, (m<sup>3</sup>/s)/person
+<span>\({R_{p,i}}\)</span> = Required outdoor air flow rate per person, (m<sup>3</sup>/s)/person
 
-<span>${R_{a,i}}$</span> = Required outdoor air flow rate per unit area, (m<sup>3</sup>/s)/m<sup>2</sup>
+<span>\({R_{a,i}}\)</span> = Required outdoor air flow rate per unit area, (m<sup>3</sup>/s)/m<sup>2</sup>
 
-<span>${P_{z,i}}$</span> = Design zone population, number of people
+<span>\({P_{z,i}}\)</span> = Design zone population, number of people
 
-<span>${A_{z,i}}$</span> = Zone floor area, m<sup>2</sup>
+When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy * current schedule value. When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy.
 
-<span>${E_i}$</span> = The zone air distribution effectiveness
 
-<span>$N$</span> = CO<sub>2</sub> generation rate, (m<sup>3</sup>/s)/person (Specified in the People object)
+<span>\({A_{z,i}}\)</span> = Zone floor area, m<sup>2</sup>
 
-<span>${C_o}$</span> = CO<sub>2</sub> concentration in the outdoor air, ppm
+<span>\({E_i}\)</span> = The zone air distribution effectiveness
 
-<span>${C_{s - design,i}}$</span> = CO<sub>2</sub> concentration in the space for the design conditions, ppm
+<span>\(N\)</span> = CO<sub>2</sub> generation rate, (m<sup>3</sup>/s)/person (Specified in the People object)
 
-<span>${C_{s - min,i}}$</span> = Minimum CO<sub>2</sub> concentration in the space, ppm
+<span>\({C_o}\)</span> = CO<sub>2</sub> concentration in the outdoor air, ppm
 
-<span>${C_{s - actual,i}}$</span> = Actual CO<sub>2</sub> concentration in the space, ppm
+<span>\({C_{s - design,i}}\)</span> = CO<sub>2</sub> concentration in the space for the design conditions, ppm
 
-<span>${V_{ot - design,i}}$</span> = Required intake of outdoor air flow rate at <span>${C_{s - design}}$</span>, (m<sup>3</sup>/s)
+<span>\({C_{s - min,i}}\)</span> = Minimum CO<sub>2</sub> concentration in the space, ppm
 
-<span>${V_{ot - min,i}}$</span> = Required intake of outdoor air flow rate at <span>${C_{s - min}}$</span>, (m<sup>3</sup>/s)
+<span>\({C_{s - actual,i}}\)</span> = Actual CO<sub>2</sub> concentration in the space, ppm
 
-<span>${V_{ot,i}}$</span> = Required intake of outdoor air flow rate at <span>${C_{s - actual}}$</span>, (m<sup>3</sup>/s)
+<span>\({V_{ot - design,i}}\)</span> = Required intake of outdoor air flow rate at <span>\({C_{s - design}}\)</span>, (m<sup>3</sup>/s)
 
-Except <span>${C_{s - min,i}}$</span> above, all other variables are already available in EnergyPlus (See Eng. Reference for “Ventilation Rate Procedure” above for further details). <span>${C_{s - min}}$</span> can be specified in the ZoneControl:ContaminantController object as a schedule. If  <span>${C_{s - min}}$</span> is not specified in the ZoneControl:ContaminantController object, then outdoor air CO2 concentration will be used as the minimum. In order for “ProportionalControl” to be active, the following conditions must be met, otherwise default “VentilationProcedure” will be modeled and a warning will be issued during runtime:
+<span>\({V_{ot - min,i}}\)</span> = Required intake of outdoor air flow rate at <span>\({C_{s - min}}\)</span>, (m<sup>3</sup>/s)
+
+<span>\({V_{ot,i}}\)</span> = Required intake of outdoor air flow rate at <span>\({C_{s - actual}}\)</span>, (m<sup>3</sup>/s)
+
+Except <span>\({C_{s - min,i}}\)</span> above, all other variables are already available in EnergyPlus (See Eng. Reference for “Ventilation Rate Procedure” above for further details). <span>\({C_{s - min}}\)</span> can be specified in the ZoneControl:ContaminantController object as a schedule. If  <span>\({C_{s - min}}\)</span> is not specified in the ZoneControl:ContaminantController object, then outdoor air CO2 concentration will be used as the minimum. In order for “ProportionalControl” to be active, the following conditions must be met, otherwise default “VentilationProcedure” will be modeled and a warning will be issued during runtime:
 
 1)   “Carbon Dioxide Control Availability Schedule Name” input field in the ZoneControl:ContaminantController object must be greater than zero.
 
@@ -1361,13 +1364,13 @@ This section describes the evaporative coolers models for HVAC in EnergyPlus.
 
 The input object EvaporativeCooler:Direct:CelDekPad provides a model of a direct stage evaporative cooler, shown in the figure below, that consists of a rigid media evaporative pad, with water recirculated from a reservoir.  The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media.  The evaporative pad provides the area for the adiabatic saturation of the air.  While the process provides a lower dry-bulb temperature, the moisture content of the leaving air is higher than the entering condition.  The direct stage is used for comfort cooling in a building where adding humidity to the air can be tolerated.
 
-![](EngineeringReference/media/image4789.png)
+![](media/image4789.png)
 
 Figure 197.  Direct Stage Evaporative Cooler
 
 The thermodynamic process is a simultaneous heat and mass transfer, or adiabatic cooling, and follows a constant enthalpy line on the psychrometric chart; it is shown in the figure below as a process from A to B.  Since the deviation of the constant wet-bulb line and the constant enthalpy line is small, it is assumed that the wet-bulb temperature is constant across the direct evaporative stage.
 
-![](EngineeringReference/media/image4790.png)
+![](media/image4790.png)
 
 Figure 198.  Psychrometric Chart -- Constant Enthalpy
 
@@ -1403,7 +1406,7 @@ Thus, adiabatic saturation in evaporative cooling is only an approximation, howe
 
 The saturation efficiency is usually reported as a function of airflow, pad face velocity, and pad thickness.  The Figure below shows a typical graph of manufacturer's data for the saturation efficiency.  A multi-variate least squares curve fit of the data was used to generate saturation efficiency functions for the evaporative models that use the CelDek rigid media pad.
 
-![](EngineeringReference/media/image4793.png)
+![](media/image4793.png)
 
 Figure 199.  Graph of Saturation Efficiency
 
@@ -1417,13 +1420,13 @@ Where Airvel is in meters per second and Depth is in meters.  This curve fit is
 
 The input object EvaporativeCooler:Indirect:CelDekPad provides a model of a dry coil indirect evaporative cooler, shown in the figure below, that has a rigid media pad, similar to the direct evaporative stage, where the adiabatic cooling takes place.  The secondary air leaves the rigid media pad and enters an air-to-air heat exchanger where it cools the supply air flowing through the heat exchanger tubes.  The moist secondary air is then exhausted to the environment.  The secondary air stream has its own fan and includes consists of a rigid media evaporative pad, with water recirculated from a reservoir.  The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media.  The evaporative pad provides the area for the adiabatic saturation of the air.
 
-![](EngineeringReference/media/image4794.png)
+![](media/image4794.png)
 
 Figure 200.  Evaporative Cooler -- Indirect Dry Coil
 
 The process that the secondary air goes through, A to C to D, is shown by the dashed lines in  the following figure.  Process A to C is adiabatic cooling in the rigid media pad.  Then the air enters the shell side of the heat exchanger and is sensibly heated from C to D by the warm supply air passing through the tube side.
 
-![](EngineeringReference/media/image4795.png)
+![](media/image4795.png)
 
 Figure 201.  Secondary Air Process -- Indirect Dry Coil Evap Cooler
 
@@ -1437,7 +1440,7 @@ QHx = eHx \* Min( CFMsec , CFMsupply) \* rair \* cp air \* ( Todb - Tdb se
 
 After the heat transfer for the heat exchanger has been determined, an energy balance is done on the supply airside to determine the dry-bulb temperature leaving the indirect evaporative cooler.  This assumes all the energy for is provided by the primary air stream so the effectiveness value includes the air-to-air effectiveness of the heat exchanger.
 
-Tdb sup out =  Tdb sup in   -  <span>$\frac{{{Q_{Hx}}}}{{{r_{air}}*{c_{pair}}*CF{M_{\sup ply}}}}$</span>
+Tdb sup out =  Tdb sup in   -  <span>\(\frac{{{Q_{Hx}}}}{{{r_{air}}*{c_{pair}}*CF{M_{\sup ply}}}}\)</span>
 
 The wet-bulb temperature is determined from psychrometric routines using the leaving dry-bulb temperature, humidity ratio, and barometric pressure, since humidity ratio is constant for the supply air across the indirect stage.  The effectiveness of the heat exchanger is determined from a parameter estimation using manufacturer's performance data.  For the indirect evaporative cooler it was found that a value of 0.67 represented reasonable default effectiveness.
 
@@ -1447,13 +1450,13 @@ The input object EvaporativeCooler:Indirect:WetCoil provides a model for a wette
 
 
 
-![](EngineeringReference/media/image4797.png)
+![](media/image4797.png)
 
 Figure 202.  Wet Coil Indirect Evaporative Cooler
 
 The process that the secondary air goes through, A to C on the following figure, is a path of simultaneous heat and mass transfer, but it does not follow a line of constant enthalpy as in the direct stage.  The process is not adiabatic due to the heat gain from the supply air flowing through the tubes of the heat exchanger.
 
-![](EngineeringReference/media/image4798.png)
+![](media/image4798.png)
 
 Figure 203.  Secondary Air Process – Indirect Wet Coil Evaporative Cooler
 
@@ -1463,17 +1466,17 @@ The wet coil heat exchanger can have a higher stage efficiency than the dry coil
 
 In an indirect stage of an evaporative cooler, the secondary or wet side air stream acts as a heat sink for the supply air.  The efficiency of the indirect stage is given as the effectiveness of the sensible heat exchange, eHx, and the saturation efficiency on the wet streamside, ese.  These are expressed as:
 
-eHx = <span>$\frac{q}{{{q_{max}}}}$</span>=  <span>$\frac{{{C_{sup}}({T_{supin}} - {T_{supout}})}}{{{C_{min}}({T_{secin}} - {T_{secout}})}}$</span>,
+eHx = <span>\(\frac{q}{{{q_{max}}}}\)</span>=  <span>\(\frac{{{C_{sup}}({T_{supin}} - {T_{supout}})}}{{{C_{min}}({T_{secin}} - {T_{secout}})}}\)</span>,
 
-ese =  <span>$\frac{{{T_{dbsecin}} - {T_{dbsecout}}}}{{{T_{odb}} - {T_{owb}}}}$</span>,
+ese =  <span>\(\frac{{{T_{dbsecin}} - {T_{dbsecout}}}}{{{T_{odb}} - {T_{owb}}}}\)</span>,
 
 where Tdb sup in = Tdb sec in  for the indirect cooler.  The maximum heat transfer possible would be obtained if the supply stream was cooled all the way to the wet-bulb temperature.  So the efficiency of the indirect evaporative cooler is defined by:
 
-eind =  <span>$\frac{{({T_{dbsupin}} - {T_{dbsupout}})}}{{({T_{odb}} - {T_{owb}})}}$</span>.
+eind =  <span>\(\frac{{({T_{dbsupin}} - {T_{dbsupout}})}}{{({T_{odb}} - {T_{owb}})}}\)</span>.
 
 Using the combination of the effectiveness and saturation efficiency, the total efficiency of the indirect stage can be expressed by:
 
-eind = eHx  ese  <span>$\frac{{{C_{sup}}}}{{{C_{min}}}}$</span>.
+eind = eHx  ese  <span>\(\frac{{{C_{sup}}}}{{{C_{min}}}}\)</span>.
 
 In many cases Csup = Cmin and the efficiency of the indirect stage reduces to:
 
@@ -1481,7 +1484,7 @@ eind = eHx  ese.
 
 An intuitive model determining the performance of the wet coil indirect model was developed.  This model can be used for all indirect models by curve fitting data from the evaporative cooler of interest.  The model development starts with the total efficiency of the indirect evaporative cooler:
 
-eind =  <span>$\frac{{({T_{dbsupin}} - {T_{dbsupout}})}}{{({T_{odb}} - {T_{owb}})}}$</span>
+eind =  <span>\(\frac{{({T_{dbsupin}} - {T_{dbsupout}})}}{{({T_{odb}} - {T_{owb}})}}\)</span>
 
 Solving for T db sup out gives the leaving conditions of the supply air at a constant humidity ratio:
 
@@ -1489,7 +1492,7 @@ T db sup out = Tdb sup in - eind \* (Todb - Towb)
 
 A form for the efficiency of the indirect stage was devised using a maximum efficiency with a coefficient to reduce the efficiency depending on the ratio of the airflows.
 
-eind = emax - C1 \* (<span>$\frac{{CF{M_{sup}}}}{{CF{M_{sec}}}}$</span>)
+eind = emax - C1 \* (<span>\(\frac{{CF{M_{sup}}}}{{CF{M_{sec}}}}\)</span>)
 
 C1 is the "Flow Efficiency Ratio" and is determined from performance data.
 
@@ -1501,13 +1504,13 @@ The maximum efficiency of the stage is a combination of the efficiency due to th
 
 A two stage cooler can be modeled by combining either a wet coil or the dry coil indirect evaporative cooler staged with a direct evaporative cooler.  The figure below shows a dry coil indirect evaporative cooler with a direct evaporative cooler.  This configuration is mainly used for total comfort cooling for a building and would not normally be used as a pre-cooler for a refrigeration coil, since the direct stage would increase the latent load on a refrigeration coil.
 
-![](EngineeringReference/media/image4806.png)
+![](media/image4806.png)
 
 Figure 204.  Two Stage Evaporative Cooler
 
 The thermodynamic process for the supply air is shown below, going from A to B to C.  The process from A to B is sensible cooling in the indirect stage.  The process from B to C is simultaneous heat and mass transfer following a constant enthalpy line.  The air leaving the final stage has a lower dry-bulb and wet-bulb temperature, and an increase in moisture from the direct stage.
 
-![](EngineeringReference/media/image4807.png)
+![](media/image4807.png)
 
 Figure 205.  Thermodynamic Process for Supply Air Through Two Stage Evaporative Cooler
 
@@ -1519,7 +1522,7 @@ This section summarizes the model implemented in the component EvaporativeCooler
 
 The indirect research special evaporative cooler (IEC) machine provides improved modeling features needed for data center and other hybrid cooling applications.  The new model includes performance curves for variable effectiveness, fan power, and pump power.  It is intended to be able to model IEC machines that have 1) variable speed secondary fans, 2) variable speed pumps for water recirculation and spraying, and 3) ability to operate in a dry mode.  Such IEC machines can modulate the cooling power during operation by varying either the secondary side fan speed or the intensity of water spray or both.  To simplify the model it is assumed that the device’s internal controls are such that, when it is operating as a “Wet” evaporative cooler, secondary fan and spray pump operation are linked together so that there is a one-to-one mapping between them at any given part load situation.  This allows formulating the fan and pump power performance curves to be based on the same independent variable, secondary air flow fraction.
 
-![figure 166 renamed](EngineeringReference/media/image4808.png)
+![figure 166 renamed](media/image4808.png)
 
 Figure 206. Research Special Indirect Evaporative Cooler
 
@@ -1527,7 +1530,7 @@ Figure 206. Research Special Indirect Evaporative Cooler
 
 Each time the model is called it takes the inputs on the left and produces the outputs on the right as shown in [Figure](#IndEvapCoolerFig2). “sys” is primary air stream and typically sits on an AirLoop HVAC branch. “sec” is secondary purge air stream and is typically outdoor air.  The model will set node flow rates and “out_sec” state variables on the secondary outlet. 
 
-![](EngineeringReference/media/image8005.png)
+![](media/image8005.png)
 
 Figure: Illustration of Inputs-Outputs of Indirect Evaporative Cooler Research Special <a name="IndEvapCoolerFig2"></a>
 
@@ -1544,15 +1547,15 @@ If running “wet,” use wet bulb effectiveness and wet bulb temperature depres
 
 Where:
 
-* <span>$\epsilon_{wb,op}$</span> = current operation effectiveness with respect to wet bulb temperature depression.
+* <span>\(\epsilon_{wb,op}\)</span> = current operation effectiveness with respect to wet bulb temperature depression.
 
-* <span>$\epsilon_{wb,design}$</span> = user input for effectiveness at design air flow rates and full spray power
+* <span>\(\epsilon_{wb,design}\)</span> = user input for effectiveness at design air flow rates and full spray power
 
-* <span>$f_{wb,mod}$</span> = normalized wet mode operation effectiveness modifier performance curve as a function of flow fraction. The curve value describes how effectiveness varies at different flow rates.  When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint. 
+* <span>\(f_{wb,mod}\)</span> = normalized wet mode operation effectiveness modifier performance curve as a function of flow fraction. The curve value describes how effectiveness varies at different flow rates.  When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint. 
 
-* <span>$\dot{m}_{sys}$</span> = primary air current time step mass flow rate in kg/s
+* <span>\(\dot{m}_{sys}\)</span> = primary air current time step mass flow rate in kg/s
 
-* <span>$\dot{m}_{sec}$</span> = secondary air current time step mass flow rate in kg/s
+* <span>\(\dot{m}_{sec}\)</span> = secondary air current time step mass flow rate in kg/s
 
 The leaving primary air dry bulb temperature in wet operating mode is calculated as follows:
 
@@ -1599,11 +1602,11 @@ Similarly, if running “dry” use dry bulb effectiveness and dry bulb based de
 
 Where:
 
-* <span>$ \epsilon_{db,op} $</span> = current operation effectiveness with respect to dry bulb temperature depression.
+* <span>\(\epsilon_{db,op} \)</span> = current operation effectiveness with respect to dry bulb temperature depression.
 
-* <span>$ \epsilon_{db,design} $</span> = user input for effectiveness at design air flow rates and dry operation mode (no water spray on the secondary air side)
+* <span>\(\epsilon_{db,design} \)</span> = user input for effectiveness at design air flow rates and dry operation mode (no water spray on the secondary air side)
 
-* <span>$ f_{db,mod} $</span> = normalized dry mode operation effectiveness modifier performance curve as a function of flow fraction.  The curve value describes how the dry mode effectiveness varies with different flow rates.  When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint 
+* <span>\(f_{db,mod} \)</span> = normalized dry mode operation effectiveness modifier performance curve as a function of flow fraction.  The curve value describes how the dry mode effectiveness varies with different flow rates.  When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint 
 
 The leaving primary air dry bulb temperature in dry operating mode is calculated as follows:
 
@@ -1637,7 +1640,7 @@ The IEC in dry and wet operating mode transfers no moisture to the primary syste
 
 #### Secondary Air Flow Fraction
 
-The secondary air mass flow rate will either be set to <span>$\dot{m}_{sec}$</span> or solved for numerically as described below. The secondary side flow fraction, <span>$ff_{sec}$</span>, is defined as.  (Note this is another flow ratio that differs from the one used above which combined both streams into one ratio in effectiveness modifier curves.)  
+The secondary air mass flow rate will either be set to <span>\(\dot{m}_{sec}\)</span> or solved for numerically as described below. The secondary side flow fraction, <span>\(ff_{sec}\)</span>, is defined as.  (Note this is another flow ratio that differs from the one used above which combined both streams into one ratio in effectiveness modifier curves.)  
 
 <div>$$ff_{sec} = \frac{\dot{m}_{sec}}{\dot{m}_{sec,design}}$$</div>
 
@@ -1647,13 +1650,13 @@ The secondary air mass flow rate will either be set to  or solved for numericall
 
 Where:
 
-<span>$ P_{sec,fan} $</span> = secondary air fan electric power value at current secondary air flow rate in W.
+<span>\(P_{sec,fan} \)</span> = secondary air fan electric power value at current secondary air flow rate in W.
 
-<span>$ P_{sec,fan,design} $</span> = secondary air fan electric power value at design air flow rate in W.
+<span>\(P_{sec,fan,design} \)</span> = secondary air fan electric power value at design air flow rate in W.
 
-<span>$ f_{sec,fan,mod} $</span> = secondary air fan power modifier normalized performance curve as a function of secondary air flow fraction.
+<span>\(f_{sec,fan,mod} \)</span> = secondary air fan power modifier normalized performance curve as a function of secondary air flow fraction.
 
-<span>$ \dot{m}_{sec,design} $</span> = secondary air design mass flow rate in kg/s
+<span>\(\dot{m}_{sec,design} \)</span> = secondary air design mass flow rate in kg/s
 
 Recirculation and spray pump electric power is calculated using design pump electric power and a normalized pump power modifier performance curve that describes how power varies as a function of the secondary air flow fraction is given by:
 
@@ -1661,49 +1664,49 @@ Recirculation and spray pump electric power is calculated using design pump elec
 
 Where:
 
-<span>$ P_{pump} $</span> = recirculation and spray pump power value at current operation in W.
+<span>\(P_{pump} \)</span> = recirculation and spray pump power value at current operation in W.
 
-<span>$ P_{pump,design} $</span> = recirculation and spray pump power value at design air flow rate in W.
+<span>\(P_{pump,design} \)</span> = recirculation and spray pump power value at design air flow rate in W.
 
-<span>$ f_{pump,mod} $</span> = recirculation and spray pump power modifier normalized performance curve as a function of secondary air flow fraction.
+<span>\(f_{pump,mod} \)</span> = recirculation and spray pump power modifier normalized performance curve as a function of secondary air flow fraction.
 
 User specified three operating temperature limits are included in the model.  These allow controlling when operation should shift from wet to dry and when the cooler should just be shut down because the outdoor conditions are too warm or too wet to do anything beneficial. 
 
-<span>$ T_{db,evapMinLimit} $</span> = Evaporative Operation Minimum Limit Outdoor Drybulb Temperature, user input.  Shut down wet mode with outdoor temperature is lower than this limit, typically shifting to dry mode.  
+<span>\(T_{db,evapMinLimit} \)</span> = Evaporative Operation Minimum Limit Outdoor Drybulb Temperature, user input.  Shut down wet mode with outdoor temperature is lower than this limit, typically shifting to dry mode.  
 
-<span>$ T_{wb,evapMaxLimit} $</span> = Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature, user input.  Shut down fan and pump and don’t operate when outdoor Wetbulb is higher than this limit.  The wet bulb is maybe warmer than the return air and attempting evaporative cooling is wasteful. 
+<span>\(T_{wb,evapMaxLimit} \)</span> = Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature, user input.  Shut down fan and pump and don’t operate when outdoor Wetbulb is higher than this limit.  The wet bulb is maybe warmer than the return air and attempting evaporative cooling is wasteful. 
 
-<span>$ T_{db,evapMaxLimit} $</span> = Dry Operation Maximum Limit Outdoor Drybulb Temperature, user input.  Shut down dry operation attempts and don’t operate secondary fan when outdoor dry bulb is higher than this limit.  The dry bulb is maybe warmer than the return air and attempting to do heat exchange is wasteful. 
+<span>\(T_{db,evapMaxLimit} \)</span> = Dry Operation Maximum Limit Outdoor Drybulb Temperature, user input.  Shut down dry operation attempts and don’t operate secondary fan when outdoor dry bulb is higher than this limit.  The dry bulb is maybe warmer than the return air and attempting to do heat exchange is wasteful. 
 
 Algorithm to determine cooler operation proceeds as follows
 
-1. Retrieve leaving setpoint, <span>$T_{db,out,setpoint}$</span>
+1. Retrieve leaving setpoint, <span>\(T_{db,out,setpoint}\)</span>
 
-2. Calculate leaving dry bulb for max cooling power available at full secondary air flow rate for dry operation, <span>$T_{db,out,sys,dry,min}$</span>
+2. Calculate leaving dry bulb for max cooling power available at full secondary air flow rate for dry operation, <span>\(T_{db,out,sys,dry,min}\)</span>
 
-3. Check if dry operation limit (input field called Evaporative Operation Minimum Limit Outdoor Dry-Bulb Temperature) reached, <span>$T_{db,in,sec}<T_{db,evapMinLimit}$</span>
+3. Check if dry operation limit (input field called Evaporative Operation Minimum Limit Outdoor Dry-Bulb Temperature) reached, <span>\(T_{db,in,sec}<T_{db,evapMinLimit}\)</span>
 
-4. If dry limit not exceeded, then leaving dry bulb for max cooling power available at full secondary air flow rate for wet operation, <span>$T_{db,out,sys,wet,min}$</span>
+4. If dry limit not exceeded, then leaving dry bulb for max cooling power available at full secondary air flow rate for wet operation, <span>\(T_{db,out,sys,wet,min}\)</span>
 
 5. Compare setpoint temperature needed to temperatures available, evaluate limits and choose which case for operation is called for. The following table outlines the five cases in order of increasing cooling power.
 
 INSERT TABLE
 
-“Modulated” cases solve for a secondary flow rate using numerical method, such as regula falsi.  Residual is formulated by a difference between the dry bulb temperature leaving the cooler and the setpoint.  As the solver progress it varies flow rate on the secondary side until the setpoint is met.  For each iteration, a new effectiveness is calculated as a function of Flow Ratio.  The new flow is used for the <span>$\left(\dot{m}c_{p}\right)_{min}$</span> term and the new effectiveness is used to calculate a result for leaving drybulb.  The numerical method is the same for dry and wet operation, only the functions will use different curves and state variables to describe performance. The regula falsi solver can vary secondary flow rate, <span>$\dot{V}_{sec}$</span>, to drive the following residual to zero:
+“Modulated” cases solve for a secondary flow rate using numerical method, such as regula falsi.  Residual is formulated by a difference between the dry bulb temperature leaving the cooler and the setpoint.  As the solver progress it varies flow rate on the secondary side until the setpoint is met.  For each iteration, a new effectiveness is calculated as a function of Flow Ratio.  The new flow is used for the <span>\(\left(\dot{m}c_{p}\right)_{min}\)</span> term and the new effectiveness is used to calculate a result for leaving drybulb.  The numerical method is the same for dry and wet operation, only the functions will use different curves and state variables to describe performance. The regula falsi solver can vary secondary flow rate, <span>\(\dot{V}_{sec}\)</span>, to drive the following residual to zero:
 
 <div>$$\text{residual} = T_{db,out,sys} - T_{db,out,setpoint}$$</div> 
 
 “Dry or Wet Op Modulated” is the most complex situation.  There is an overlap and the cooler could deliver the setpoint air using either dry operation or wet operation.  The model proceeds separately to calculate both wet and dry operation, with separate numerical solvers for modulation in each mode.  Then the fan and pump power is calculated for each mode.  Select the lowest power mode as the preferred choice.  (This doesn’t really count the value of water, could bring in a source factor but …). Discard results for the unused mode. 
 
-The purge air, or secondary airside, is the stream that evaporates water and indirectly cools the primary, or system air.  The result from Equation is then compared to a lower bound, <span>${T_{db,out,bound}}$</span>, determined from the dewpoint of the incoming purge air using Equation .
+The purge air, or secondary airside, is the stream that evaporates water and indirectly cools the primary, or system air.  The result from Equation is then compared to a lower bound, <span>\({T_{db,out,bound}}\)</span>, determined from the dewpoint of the incoming purge air using Equation .
 
 <div>$${T_{db,out,bound}} = {T_{db,in,sys}} - \beta ({T_{db,in,sys}} - {T_{dew,in,purge}})$$</div>
 
 where,
 
-<span>${T_{dew,in,purge}}$</span>  is the dewpoint of purge air entering the wet side of cooler [ºC]
+<span>\({T_{dew,in,purge}}\)</span>  is the dewpoint of purge air entering the wet side of cooler [ºC]
 
-<span>$\beta $</span>              is a factor for how close to dewpoint is possible (eg. 0.9)
+<span>\(\beta \)</span>              is a factor for how close to dewpoint is possible (eg. 0.9)
 
 The final result (for PLF = 1) is the larger of the results from Equations and .
 
@@ -1717,7 +1720,7 @@ The indirect cooler has the ability to overcool the air and therefore needs some
 
 where,
 
-<span>$PLF$</span>                     is the Part Load Fraction
+<span>\(PLF\)</span>                     is the Part Load Fraction
 
 When PLF is less than 1.0 it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn’t need heating).  The PLF is used to modify the auxiliary fan power when the fan power modifier curve is not specified and find when the unit will overcool.
 
@@ -1739,23 +1742,23 @@ The three components of water consumption are evaporation, drift, and blowdown.�
 
 where,
 
-<span>${\dot V_{evap}}$</span> is the volume flow rate of useful water evaporation [m<sup>3</sup>/s]
+<span>\({\dot V_{evap}}\)</span> is the volume flow rate of useful water evaporation [m<sup>3</sup>/s]
 
-<span>${h_{fg}}$</span> is the heat of vaporization of water (taken as 2,500,000 J/kg)
+<span>\({h_{fg}}\)</span> is the heat of vaporization of water (taken as 2,500,000 J/kg)
 
-<span>${\dot Q_{IEC}}$</span> is the rate of heat transfer calculated as by Equation or Equation [W]
+<span>\({\dot Q_{IEC}}\)</span> is the rate of heat transfer calculated as by Equation or Equation [W]
 
-<span>${\rho_{water}}$</span> is the density of water [kg/m3]
+<span>\({\rho_{water}}\)</span> is the density of water [kg/m3]
 
-Drift is water that leaves the secondary side as droplets and does not contribute to the evaporative cooling process in a useful manner.  It is calculated using a user input factor that describes drift as a fraction of <span>${\dot V_{evap}}$</span>.
+Drift is water that leaves the secondary side as droplets and does not contribute to the evaporative cooling process in a useful manner.  It is calculated using a user input factor that describes drift as a fraction of <span>\({\dot V_{evap}}\)</span>.
 
 <div>$${\dot V_{drift}} = {\dot V_{evap}} * {f_{drift}}$$</div>
 
-Blowdown is water drained from the sump to counter the build up of solids in the water that would otherwise occur because of evaporation.  It is calculated using a user input factor for the blowdown concentration ratio ,<span>${R_{concentration}}$</span> , which is the ratio of solids in in the blowdown water compared to the solids in the fresh makeup water and is limited to values of 2 or higher.  The make up water needed for blowdown is calculated using:
+Blowdown is water drained from the sump to counter the build up of solids in the water that would otherwise occur because of evaporation.  It is calculated using a user input factor for the blowdown concentration ratio ,<span>\({R_{concentration}}\)</span> , which is the ratio of solids in in the blowdown water compared to the solids in the fresh makeup water and is limited to values of 2 or higher.  The make up water needed for blowdown is calculated using:
 
 <div>$${\dot V_{blowdown}} = \frac{{{{\dot V}_{evap}}}}{{\left( {{R_{concentration}} - 1.0} \right)}} - {\dot V_{drift}}$$</div>
 
-![figure 167 renamed](EngineeringReference/media/image4833.png)
+![figure 167 renamed](media/image4833.png)
 
 Figure 207. Research Special Indirect Evaporative Cooler Using Relief Air
 
@@ -1789,15 +1792,15 @@ The Recirculating Water Design Pump Power is sized from secondary air design flo
 
 Where,
 
-<span>$ \dot{V}_{sys,design} $</span> = primary air design volume flow rate in m3/s
+<span>\(\dot{V}_{sys,design} \)</span> = primary air design volume flow rate in m3/s
 
-<span>$ \dot{V}_{sec,design} $</span> = secondary air design volume flow rate in m3/s
+<span>\(\dot{V}_{sec,design} \)</span> = secondary air design volume flow rate in m3/s
 
-<span>$ \text{SecAirFlowScalingFactor} $</span> = user specified Secondary air flow sizing factor in units of W/(m3/s) for secondary design air flow rate calculation.
+<span>\(\text{SecAirFlowScalingFactor} \)</span> = user specified Secondary air flow sizing factor in units of W/(m3/s) for secondary design air flow rate calculation.
 
-<span>$ \text{FanPowerScalingFactor} $</span> = user specified secondary air fan sizing specific power in units of W/(m3/s) for design fan power calculation.
+<span>\(\text{FanPowerScalingFactor} \)</span> = user specified secondary air fan sizing specific power in units of W/(m3/s) for design fan power calculation.
 
-<span>$ \text{PumpPowerScalingFactor} $</span> = user specified recirculating and spraying water pump power sizing factor in units of W/(m3/s) for design pump power calculation.
+<span>\(\text{PumpPowerScalingFactor} \)</span> = user specified recirculating and spraying water pump power sizing factor in units of W/(m3/s) for design pump power calculation.
 
 ### Direct Evaporative Cooler Special Research Model
 
@@ -1819,17 +1822,17 @@ This section summarizes the model implemented in the component EvaporativeCooler
 
 where,
 
-* <span>${T_{db,out,sys}}$</span> is the drybub temperature of the air leaving the cooler [ºC],
+* <span>\({T_{db,out,sys}}\)</span> is the drybub temperature of the air leaving the cooler [ºC],
 
-* <span>${T_{db,in,sys}}$</span> is the drybulb temperature of the air entering the cooler [ºC],
+* <span>\({T_{db,in,sys}}\)</span> is the drybulb temperature of the air entering the cooler [ºC],
 
-* <span>${T_{wb,in,sys}}$</span> is the wetbulb temperature of the air entering the cooler [ºC], and
+* <span>\({T_{wb,in,sys}}\)</span> is the wetbulb temperature of the air entering the cooler [ºC], and
 
-* <span>$\epsilon_{design} $</span> is the cooler design effectiveness.
+* <span>\(\epsilon_{design} \)</span> is the cooler design effectiveness.
 
-* <span>$\epsilon_{op} $</span> is the cooler current operation effectiveness.
+* <span>\(\epsilon_{op} \)</span> is the cooler current operation effectiveness.
 
-* <span>$f_{mod} $</span> is the effectiveness modifier curve as a function of system air flow fraction
+* <span>\(f_{mod} \)</span> is the effectiveness modifier curve as a function of system air flow fraction
 
 The wetbulb temperature of air leaving a direct cooler is the same as the wetbulb temperature entering the cooler.  The leaving humidity ratio of the air is calculated using psychrometric functions with leaving drybulb and wetbulb temperatures and outdoor air pressure as inputs.  The leaving enthalpy of air is calculated using psychrometric functions with leaving drybulb temperature, leaving humidity ratio, and outdoor air pressure as inputs.
 
@@ -1855,21 +1858,21 @@ The three components of water consumption are evaporation, drift, and blowdown.�
 
 where,
 
-<span>${\dot V_{evap}}$</span> is the volume flow rate of useful water evaporation [m<sup>3</sup>/s]
+<span>\({\dot V_{evap}}\)</span> is the volume flow rate of useful water evaporation [m<sup>3</sup>/s]
 
-<span>${w_{out}}$</span> is the humidity ratio of the air leaving the cooler [kg/kg]
+<span>\({w_{out}}\)</span> is the humidity ratio of the air leaving the cooler [kg/kg]
 
-<span>${w_{in}}$</span> is the humidity ratio of air entering the cooler [kg/kg]
+<span>\({w_{in}}\)</span> is the humidity ratio of air entering the cooler [kg/kg]
 
-<span>$\dot m$</span> is the mass flow rate of air moving through the cooler [kg/s]
+<span>\(\dot m\)</span> is the mass flow rate of air moving through the cooler [kg/s]
 
-<span>${\rho_{water}}$</span> is the density of water [kg/m3]
+<span>\({\rho_{water}}\)</span> is the density of water [kg/m3]
 
-Drift is water that leaves the cooler (and supply air duct) as droplets and does not contribute to the evaporative cooling process in a useful manner.  It is calculated using a user input factor that describes drift as a fraction of <span>${\dot V_{evap}}$</span>.
+Drift is water that leaves the cooler (and supply air duct) as droplets and does not contribute to the evaporative cooling process in a useful manner.  It is calculated using a user input factor that describes drift as a fraction of <span>\({\dot V_{evap}}\)</span>.
 
 <div>$${\dot V_{drift}} = {\dot V_{evap}} * {f_{drift}}$$</div>
 
-Blowdown is water drained from the sump to counter the build up of solids in the water that would otherwise occur because of evaporation.  It is calculated using a user input factor for the blowdown concentration ratio ,<span>${R_{concentration}}$</span>, which is the ratio of solids in the blowdown water compared to the solids in the fresh makeup water and is limited to values of 2 or higher.  The make up water needed for blowdown is calculated using:
+Blowdown is water drained from the sump to counter the build up of solids in the water that would otherwise occur because of evaporation.  It is calculated using a user input factor for the blowdown concentration ratio ,<span>\({R_{concentration}}\)</span>, which is the ratio of solids in the blowdown water compared to the solids in the fresh makeup water and is limited to values of 2 or higher.  The make up water needed for blowdown is calculated using:
 
 <div>$${\dot V_{blowdown}} = \frac{{{{\dot V}_{evap}}}}{{\left( {{R_{concentration}} - 1.0} \right)}} - {\dot V_{drift}}$$</div>
 
@@ -1972,37 +1975,37 @@ The rest of the calculation is the same as for the simple fan.
 
 #### Nomenclature for Simple Models
 
-<span>${\dot Q_{tot}}$</span> is the fan power in watts;
+<span>\({\dot Q_{tot}}\)</span> is the fan power in watts;
 
-<span>$\dot m$</span>is the air mass flow in kg/s;
+<span>\(\dot m\)</span>is the air mass flow in kg/s;
 
-<span>${\dot m_{design}}$</span>is the design (maximum) air flow in kg/s;
+<span>\({\dot m_{design}}\)</span>is the design (maximum) air flow in kg/s;
 
-<span>$\Delta P$</span>is the fan design pressure increase in Pascals;
+<span>\(\Delta P\)</span>is the fan design pressure increase in Pascals;
 
-<span>${e_{tot}}$</span> is the fan total efficiency;
+<span>\({e_{tot}}\)</span> is the fan total efficiency;
 
-<span>${\rho_{air}}$</span>is the air density at standard conditions in kg/m<sup>3</sup>;
+<span>\({\rho_{air}}\)</span>is the air density at standard conditions in kg/m<sup>3</sup>;
 
-<span>${e_{motor}}$</span> is the motor efficiency;
+<span>\({e_{motor}}\)</span> is the motor efficiency;
 
-<span>${\dot Q_{shaft}}$</span>is the fan shaft power in watts;
+<span>\({\dot Q_{shaft}}\)</span>is the fan shaft power in watts;
 
-<span>${\dot Q_{toair}}$</span>is the power entering the air in watts;
+<span>\({\dot Q_{toair}}\)</span>is the power entering the air in watts;
 
-<span>${N_{ratio}}$</span>is the ratio of actual fan flow rate (or speed) to maximum fan flow rate (or speed)
+<span>\({N_{ratio}}\)</span>is the ratio of actual fan flow rate (or speed) to maximum fan flow rate (or speed)
 
-<span>${h_{in}},{h_{out}}$</span> are the inlet and outlet air stream specific enthalpies in J/kg;
+<span>\({h_{in}},{h_{out}}\)</span> are the inlet and outlet air stream specific enthalpies in J/kg;
 
-<span>${w_{in}},{w_{out}}$</span> are the inlet and outlet air stream humidity ratios;
+<span>\({w_{in}},{w_{out}}\)</span> are the inlet and outlet air stream humidity ratios;
 
-<span>${T_{out}}$</span> is the outlet air temperature in degrees C;
+<span>\({T_{out}}\)</span> is the outlet air temperature in degrees C;
 
-<span>$PsyTdbFnHW$</span>is the EnergyPlus psychrometric routine relating enthalpy and humidity ratio to temperature;
+<span>\(PsyTdbFnHW\)</span>is the EnergyPlus psychrometric routine relating enthalpy and humidity ratio to temperature;
 
-<span>${f_{flow}}$</span>is the flow fraction or part-load ratio;
+<span>\({f_{flow}}\)</span>is the flow fraction or part-load ratio;
 
-<span>${f_{pl}}$</span> is the part load factor.
+<span>\({f_{pl}}\)</span> is the part load factor.
 
 Component Fan Model
 
@@ -2010,7 +2013,7 @@ The Fan:ComponentModel object is based upon combining: modified forms of fan, be
 
 Fan *electric* power depends on fan *air* power (product of the airflow through and pressure rise across the fan), mechanical efficiencies (fan and belt), and electrical efficiencies (motor and drive). For systems with variable flows, none of these parameters is constant and all are interrelated. For example, Figure 208 shows that fan efficiency strongly depends on fan flow *as well as* pressure rise, although this is not obvious from the manufacturer’s power and speed performance map (top left). Fan efficiency maps can be derived from the manufacturer’s performance map using a commercially-available software-based data extraction tool such as DigitizeIt and by applying the following equation to the extracted data:
 
-<span>${\eta_{fan}} = \frac{{\Delta {P_{fan}} \cdot {Q_{fan}}}}{{{H_{fan}}}}$</span>                                                                                     ()
+<span>\({\eta_{fan}} = \frac{{\Delta {P_{fan}} \cdot {Q_{fan}}}}{{{H_{fan}}}}\)</span>                                                                                     ()
 
 where **Δ***P<sub>fan</sub>*is the fan pressure rise (Pa); *Q<sub>fan</sub>* is the fan flow at standard conditions (m<sup>3</sup>/s); and *H<sub>fan</sub>* is the fan shaft power (W). Fan speed values also can be derived from the manufacturer’s performance map using a similar software-based data extraction tool.
 
@@ -2018,20 +2021,20 @@ Fan pressure rise must be sufficient to overcome the air-handling system pressur
 
 The relation between system pressure drop and flow defines what is commonly called a “system curve”. When system characteristics change, such as when the duct static pressure set point is varied, a family of system curves results. The intersections of these curves with fan curves (e.g., power as a function of pressure rise and flow) on a pressure versus flow plot define one or more loci of unique fan operating points. Each of these points has an associated fan efficiency, power, and speed.
 
-![Fancomp1](EngineeringReference/media/image4888.png)
+![Fancomp1](media/image4888.png)
 
 Figure 208. Example Fan Performance Maps - Manufacturer’s Data from Loren Cook Company, plus Derived Static Efficiency (Three-Dimensional and Contours)
  (Dashed Parabolic Curve is “Do Not Select Line”)
 
 *Fan Pressure Rise Model*: To calculate fan pressure rise based on flow through the fan, Sherman and Wray (2010) have developed a simple physics-based data-driven four parameter duct system model for the purpose of simulating its system curve. The embodiment of the model for a fixed outdoor air fraction that can be applied to constant- or variable-volume central air-handling systems is:
 
-<span>$\Delta {P_{fan,tot}} = {A_{fpr}}Q_{fan}^2 + {B_{fpr}}Q_{fan}^{} + {C_{fpr}}Q_{fan}^{}\sqrt {{P_{sm}} - {P_o}}  + {D_{fpr}}\left( {{P_{sm}} - {P_o}} \right)$</span>                            ()
+<span>\(\Delta {P_{fan,tot}} = {A_{fpr}}Q_{fan}^2 + {B_{fpr}}Q_{fan}^{} + {C_{fpr}}Q_{fan}^{}\sqrt {{P_{sm}} - {P_o}}  + {D_{fpr}}\left( {{P_{sm}} - {P_o}} \right)\)</span>                            ()
 
 where **Δ***P<sub>fan,tot</sub>* is the fan total pressure rise (Pa); *Q<sub>fan</sub>* is the fan flow at standard conditions (m<sup>3</sup>/s); *P<sub>sm</sub>* is the duct static pressure set point (Pa); *P<sub>o</sub>* is the static pressure of the spaces surrounding the ducts (Pa); and *A<sub>fpr</sub>*, *B<sub>fpr</sub>*, *C<sub>fpr</sub>*, and *D<sub>fpr</sub>* are constant coefficients that represent different aspects of the fan pressure rise model as described below.
 
 Fan static pressure rise is determined from the total pressure rise by subtracting the outlet velocity pressure:
 
-<span>$\Delta {P_{fan}} = \Delta {P_{fan,tot}} - \frac{\rho }{2}{\left( {\frac{{{Q_{fan}}}}{{{A_{fan,out}}}}} \right)^2}$</span>                                                                         ()
+<span>\(\Delta {P_{fan}} = \Delta {P_{fan,tot}} - \frac{\rho }{2}{\left( {\frac{{{Q_{fan}}}}{{{A_{fan,out}}}}} \right)^2}\)</span>                                                                         ()
 
 where *A<sub>fan,out</sub>* is the fan outlet area (m<sup>2</sup>) and *ρ* is the air density at the fan inlet (kg/m<sup>3</sup>).
 
@@ -2047,30 +2050,30 @@ In principle, especially for research applications of Energy Plus, the four indi
 
 *SPR Model*: The model for duct-static-pressure reset (SPR) is based on a simple diagnostic procedure and a linear correlation between duct static pressure and supply fan airflow (Federspiel 2004, 2005). The diagnostic method involves measuring the static pressure at the duct static pressure sensor and the velocity pressure at the fan inlet (represents the fan flow) at multiple points over the fan’s operating range, while the VAV box dampers attempt to control flow in response to a constant thermostat setpoint. The goal of the test is to define the lowest duct static pressure where all VAV boxes are still in control (dampers modulating). In the model, the correlation between *P<sub>sm</sub>* and *Q<sub>fan</sub>* is as follows for *Q<sub>fan,min</sub>* ≤ *Q<sub>fan</sub>* ≤ *Q<sub>fan,max</sub>*:
 
-<span>${P_{sm}} = {P_{sm,\min }} + \left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)*\frac{{\left( {{Q_{fan}} - {Q_{fan,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}} = {C_1} + {C_2}*{Q_{fan}}$</span>                         ()
+<span>\({P_{sm}} = {P_{sm,\min }} + \left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)*\frac{{\left( {{Q_{fan}} - {Q_{fan,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}} = {C_1} + {C_2}*{Q_{fan}}\)</span>                         ()
 
 Where
 
- <span>${C_1} = {P_{sm,\min }} - {C_2}*{Q_{fan,\min }}$</span> and <span>${C_2} = \frac{{\left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}}$</span>                                ()
+ <span>\({C_1} = {P_{sm,\min }} - {C_2}*{Q_{fan,\min }}\)</span> and <span>\({C_2} = \frac{{\left( {{P_{sm,\max }} - {P_{sm,\min }}} \right)}}{{\left( {{Q_{fan,\max }} - {Q_{fan,\min }}} \right)}}\)</span>                                ()
 
 For *Q<sub>fan</sub>* &lt; *Q<sub>fan,min</sub>*, *P<sub>sm</sub>* = *P<sub>sm,min</sub>*;for*Q<sub>fan</sub>* &gt; *Q<sub>fan,max</sub>*, *P<sub>sm</sub>* = *P<sub>sm,max</sub>*
 
 *Fan Efficiency and Shaft Input Power Model*: A dimensionless parameter in the form of an Euler number can be used to simplify the description of fan static efficiency variations:
 
-<span>$Eu = \frac{{\left( {\Delta {P_{fan}} * D_{fan}^4} \right)}}{{\left( {\rho  * Q_{fan}^2} \right)}}$</span>                                                                                      ()
+<span>\(Eu = \frac{{\left( {\Delta {P_{fan}} * D_{fan}^4} \right)}}{{\left( {\rho  * Q_{fan}^2} \right)}}\)</span>                                                                                      ()
 
 where **Δ***P<sub>fan</sub>* is the fan static pressure rise (Pa), *D<sub>fan</sub>* is the fan wheel outer diameter (m), *ρ* is the air density at the fan inlet (kg/m<sup>3</sup>), and *Q<sub>fan</sub>* is the fan flow at standard conditions (m<sup>3</sup>/s). *Eu* is nominally the ratio of pressure forces across the fan to inertial forces at the fan wheel exit.
 
 By plotting the normalized fan static efficiency (*static efficiency / maximum static efficiency*) versus the logarithm base 10 of the normalized Euler number (*Eu* */* *Eu* *at maximum static efficiency*), the dimensionless performance of various fan sizes is very similar (as one might expect from the “fan laws”), but so also is the dimensionless performance of different *types* of fans (e.g., single-inlet plenum fans, double-inlet housed centrifugal fans, mixed flow fans, vane axial fans, fans with backward or forward curved blades). An example of this correlation for the “normal operation” (non-stall) and stall regions of eight fans is shown in Figure 209.
 
-![Fancomp2](EngineeringReference/media/image4895.png)
+![Fancomp2](media/image4895.png)
 
 Figure 209. Normalized Efficiency Curves for Eight Fans in Dimensionless Space
  *(BC=backward curved, FC=forward curved; SI=single inlet, DI=double inlet)*
 
 This model uses a continuous function to represent the normalized fan efficiency (*η<sub>fan</sub>*) variation. The normalized exponential-conditioned skew-normal functional relationship is:
 
-<span>$\frac{{{\eta_{fan}}({x_{fan}})}}{{{\eta_{fan,\max }}}} = \frac{{{e^{( - 0.5*Z_1^2)}}[1 + \frac{{{Z_2}}}{{\left| {{Z_2}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_2}} \right|}}{{\sqrt 2 }}} \right)}}{{{e^{( - 0.5*Z_3^2)}}[1 + \frac{{{Z_3}}}{{\left| {{Z_3}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_3}} \right|}}{{\sqrt 2 }}} \right)}}$</span>                                                   ()
+<span>\(\frac{{{\eta_{fan}}({x_{fan}})}}{{{\eta_{fan,\max }}}} = \frac{{{e^{( - 0.5*Z_1^2)}}[1 + \frac{{{Z_2}}}{{\left| {{Z_2}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_2}} \right|}}{{\sqrt 2 }}} \right)}}{{{e^{( - 0.5*Z_3^2)}}[1 + \frac{{{Z_3}}}{{\left| {{Z_3}} \right|}} \bullet erf\left( {\frac{{\left| {{Z_3}} \right|}}{{\sqrt 2 }}} \right)}}\)</span>                                                   ()
 
 where
 
@@ -2086,7 +2089,7 @@ In this case, the coefficient of determination R<sup>2</sup> is 0.994. Also, the
 
 If more accuracy is needed for a specific fan, a similarly shaped curve can be developed for that fan (using extracted data, Equation , and least-squares regression techniques), segmented into normal operation and stall regions with specific coefficients fitted for each region. Figure 210 shows an example, using the data from Figure 208.
 
-![](EngineeringReference/media/image4897.svg.png)
+![](media/image4897.svg.png)
 
 Figure 210. Example Normalized Efficiency Data for One Fan
 
@@ -2125,11 +2128,11 @@ In this case, the average and RMS differences between the efficiency values base
 
 To determine fan efficiency and fan shaft power at a particular time step, first calculate the fan pressure rise (**Δ***P<sub>fan</sub>*) using the time step fan flow (*Q<sub>fan</sub>*) and Equation (and also using Equations and if there is SPR). Next, calculate *Eu* using Equation and then *x<sub>fan</sub>* (log<sub>10</sub> normalized *Eu*), which is based on *Eu* and the specified *Eu<sub>max</sub>* (*Eu* at maximum efficiency) for the fan. The corresponding normalized efficiency (*η<sub>fan</sub>*(*x<sub>fan</sub>*) */ η<sub>fan,max</sub>*) is obtained using Equation . The fan efficiency (*η<sub>fan</sub>*(*x<sub>fan</sub>*)) therefore is:
 
-<span>${\eta_{fan}}\left( {{x_{fan}}} \right) = {\eta_{fan,\max }}\left[ {\frac{{{\eta_{fan}}\left( {{x_{fan}}} \right)}}{{{\eta_{fan,\max }}}}} \right]$</span>                                                                  ()
+<span>\({\eta_{fan}}\left( {{x_{fan}}} \right) = {\eta_{fan,\max }}\left[ {\frac{{{\eta_{fan}}\left( {{x_{fan}}} \right)}}{{{\eta_{fan,\max }}}}} \right]\)</span>                                                                  ()
 
 The fan shaft input power (mechanical, W) is:
 
-<span>${H_{fan}} = \frac{{\Delta {P_{fan}} \cdot {Q_{fan}}}}{{{\eta_{fan}}\left( {{x_{fan}}} \right)}}$</span>                                                                                      ()
+<span>\({H_{fan}} = \frac{{\Delta {P_{fan}} \cdot {Q_{fan}}}}{{{\eta_{fan}}\left( {{x_{fan}}} \right)}}\)</span>                                                                                      ()
 
 *Fan Shaft Speed and Torque Modeling*: For rotating elements, power (*H*) is the product of torque (*τ*) and rotational speed (ω), or conversely, torque is power divided by rotational speed (*τ =H / ω*).
 
@@ -2140,17 +2143,17 @@ To make use of the available data, the Stein and Hydeman linear correlation must
 
 For the fan, dimensionless flow (*φ*) can be defined as (ASHRAE 1993):
 
-<span>$\varphi  = \frac{{{Q_{fan}}}}{{{\omega_{fan}} \cdot D_{fan}^3}}$</span>                                                                                           ()
+<span>\(\varphi  = \frac{{{Q_{fan}}}}{{{\omega_{fan}} \cdot D_{fan}^3}}\)</span>                                                                                           ()
 
 where *ω<sub>fan</sub>* is the fan speed (rad/s). This parameter can be calculated for each operating point on the fan manufacturer’s performance map that represents fan speed as a function of flow and fan pressure rise. To simplify the data representation to a single curve (as we have done for fan efficiency), one can plot normalized dimensionless flow (dimensionless flow divided by maximum dimensionless flow, (*φ*(*x<sub>fan</sub>*) */* *φ<sub>max</sub>*) as a function of the log base 10 of the normalized Euler (*Eu*) parameter (*x<sub>fan</sub>*). Figure 211 shows an example plot derived from the manufacturer’s data in Figure 208.
 
-![](EngineeringReference/media/image4901.svg.png)
+![](media/image4901.svg.png)
 
 Figure 211. Example Normalized Dimensionless Flow Data for One Fan
 
 Equation describes the sigmoidal functional form for normalized *φ*:
 
-<span>$\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}} = ({A_{spd}} + {B_{spd}}/({(1 + {e^{\left[ {{{({C_{spd}} - {x_{spd}})} \mathord{\left/ {\vphantom {{({C_{spd}} - {x_{spd}})} {{D_{spd}}}}} \right. } {{D_{spd}}}}} \right]}})^{{E_{spd}}}})$</span>                                             ()
+<span>\(\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}} = ({A_{spd}} + {B_{spd}}/({(1 + {e^{\left[ {{{({C_{spd}} - {x_{spd}})} \mathord{\left/ {\vphantom {{({C_{spd}} - {x_{spd}})} {{D_{spd}}}}} \right. } {{D_{spd}}}}} \right]}})^{{E_{spd}}}})\)</span>                                             ()
 
 where *A<sub>spd</sub>*, *B<sub>spd</sub>*, *C<sub>spd</sub>*, *D<sub>spd</sub>*, and *E<sub>spd</sub>* are coefficients for the fan. Separate sets of coefficients for the normal operation and stall regions can be specified. For the curve shown in Figure 211, these coefficients are:
 
@@ -2220,21 +2223,21 @@ Table 67. Dimensionless Flow Coefficients – Generic Backward-Curved Fan
 
 For any operating point of flow (*Q<sub>fan</sub>*) and fan pressure rise (**Δ***P<sub>fan</sub>*), one can calculate the corresponding Euler number (*Eu*) for the given fan, and then determine the corresponding normalized dimensionless flow (*φ*(*x<sub>fan</sub>*) */* *φ<sub>max</sub>*) from the sigmoidal dimensionless flow function (Equation ). With *φ*(*x<sub>fan</sub>*) */* *φ<sub>max</sub>* determined and knowing *φ<sub>max</sub>* for the fan, the dimensionless flow is:
 
-<span>$\varphi \left( {{x_{fan}}} \right) = {\varphi_{\max }}\left[ {\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}}} \right]$</span>                                                                              ()
+<span>\(\varphi \left( {{x_{fan}}} \right) = {\varphi_{\max }}\left[ {\frac{{\varphi \left( {{x_{fan}}} \right)}}{{{\varphi_{\max }}}}} \right]\)</span>                                                                              ()
 
 With *φ*(*x<sub>fan</sub>*) determined, the fan rotational speed (rad/s) is:
 
-<span>${\omega_{fan}} = \frac{{{Q_{fan}}}}{{\left( {\varphi ({x_{fan}}) * D_{fan}^3} \right)}}$</span>                                                                                ()
+<span>\({\omega_{fan}} = \frac{{{Q_{fan}}}}{{\left( {\varphi ({x_{fan}}) * D_{fan}^3} \right)}}\)</span>                                                                                ()
 
 Fan shaft torque (N∙m), which the belt drive must supply to the fan shaft, is then:
 
-<span>${\tau_{fan}} = \frac{{{H_{fan}}}}{{{\omega_{fan}}}}$</span>                                                                                                ()
+<span>\({\tau_{fan}} = \frac{{{H_{fan}}}}{{{\omega_{fan}}}}\)</span>                                                                                                ()
 
 The fraction of full-load driven torque for the belt (*τ<sub>fan</sub> / τ<sub>belt,max</sub>*), which is typically called “belt load”, is thus *τ<sub>fan</sub>* divided by the belt torque capacity (*τ<sub>belt,max</sub>*). For a particular belt type and cross-section, belt torque capacity can be determined from manufacturer’s information such as a shaft speed versus power chart.
 
 Ignoring belt slip, motor shaft speed (*ω<sub>motor</sub>*, rad/s) can then be determined using the fan speed (*ω<sub>fan</sub>*) and the motor/fan pulley diameter ratio (*D<sub>pulley,motor</sub> / D<sub>pulley,fan</sub>*), which is typically called the “drive” ratio:
 
-<span>${\omega_{motor}} = \frac{{{\omega_{fan}}}}{{\left( {\frac{{{D_{pulley,motor}}}}{{{D_{pulley,fan}}}}} \right)}}$</span>                                                                                 ()
+<span>\({\omega_{motor}} = \frac{{{\omega_{fan}}}}{{\left( {\frac{{{D_{pulley,motor}}}}{{{D_{pulley,fan}}}}} \right)}}\)</span>                                                                                 ()
 
 *Belt, Motor, and Variable-Frequency-Drive Efficiency and Input Power Models – Overview*: The models for belt drives, motors, and VFDs that Stein and Hydeman included in their air-handling system model represent maximum efficiency as a function of power input to the adjacent downstream component (e.g., the power input to a fan shaft by a belt drive), but they do not include part-load models. The part-load models are needed, because part-load efficiency for these components can fall off rapidly at low load (e.g., to zero at zero load) and many systems operate occasionally (and some much of the time) at low loads, in part because of current practices that result in substantial oversizing of components.
 
@@ -2246,13 +2249,13 @@ To determine *η<sub>belt,max</sub>* if data for a specific belt are not availab
 
 Then, use Equations and , along with a choice of low, medium, or high efficiency coefficients from Table 68, to calculate *η<sub>belt,max</sub>*.
 
-![](EngineeringReference/media/image4907.svg.png)
+![](media/image4907.svg.png)
 
 Figure 212. Belt Maximum Efficiency vs. Fan Shaft Power Input
 
 The quartic polynomial curves in Figure 212 and their coefficients are as follows:
 
-<span>${\eta_{belt,\max ,\ln }} = {c_1} + {c_2} \cdot {x_{belt,\max }} + {c_3} \cdot x_{_{belt,\max }}^2 + {c_4} \cdot x_{_{belt,\max }}^3 + {c_5} \cdot x_{_{belt,\max }}^4$</span>                    ()
+<span>\({\eta_{belt,\max ,\ln }} = {c_1} + {c_2} \cdot {x_{belt,\max }} + {c_3} \cdot x_{_{belt,\max }}^2 + {c_4} \cdot x_{_{belt,\max }}^3 + {c_5} \cdot x_{_{belt,\max }}^4\)</span>                    ()
 
 Table 68. Belt Maximum Efficiency Curve Coefficients
 
@@ -2296,11 +2299,11 @@ Table 68. Belt Maximum Efficiency Curve Coefficients
 
 The belt maximum efficiency is therefore:
 
-<span>${\eta_{belt,\max }} = {e^{{\eta_{belt,\max ,\ln }}}}$</span>                                                                                   ()
+<span>\({\eta_{belt,\max }} = {e^{{\eta_{belt,\max ,\ln }}}}\)</span>                                                                                   ()
 
 The normalized *part-load* belt efficiency model is provided to modify the maximum efficiency of the belt. This model is based on part-load data for belts in ACEEE’s handbook on motor systems (Nadel et al. 2002). To determine the normalized belt efficiency at part-load (*η<sub>belt</sub>*(*x<sub>belt</sub>*)/* η<sub>belt,max</sub>*), use the fan shaft (belt output) fractional torque (*x<sub>belt</sub>* = *τ<sub>belt</sub>* / *τ<sub>belt,max;</sub> τ<sub>belt</sub> = τ<sub>fan</sub>*) as the belt fractional load in Equation or (select the equation for the region that contains *x<sub>belt</sub>*) and use coefficients from Table 69 that correspond to that region and the belt type: V-Belt or synchronous (toothed). Figure 213 shows a graphical representation of the curves defined by these equations and coefficients.
 
-![](EngineeringReference/media/image4910.svg.png)
+![](media/image4910.svg.png)
 
 Figure 213. Belt Normalized Efficiency vs. Belt Fractional Load)
 
@@ -2308,23 +2311,23 @@ The belt normalized (part-load) efficiency curves in Figure 213 for Regions 1 an
 
 Region 1 (0 &lt;= *x<sub>belt</sub>* &lt; *x<sub>belt,trans</sub>*) and Region 3 (*x<sub>belt</sub>* &gt; 1):
 
-<span>$\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}} = \left[ {\frac{{{a_{belt}} \cdot {x_{belt}}}}{{{b_{belt}} + {x_{belt}}}}} \right] + {c_{belt}} \cdot {x_{belt}}$</span>                                                             ()
+<span>\(\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}} = \left[ {\frac{{{a_{belt}} \cdot {x_{belt}}}}{{{b_{belt}} + {x_{belt}}}}} \right] + {c_{belt}} \cdot {x_{belt}}\)</span>                                                             ()
 
 Region 2 (*x<sub>belt,trans</sub>* &lt;= *x<sub>belt</sub>* &lt;= 1):
 
-<span>$\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}} = {a_{belt}} + {b_{belt}} \cdot {e^{\left( {{c_{belt}} \cdot {x_{belt}}} \right)}}$</span>                                                               ()
+<span>\(\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}} = {a_{belt}} + {b_{belt}} \cdot {e^{\left( {{c_{belt}} \cdot {x_{belt}}} \right)}}\)</span>                                                               ()
 
-where x<sub>belt</sub> = <span>$\tau $</span><sub>belt</sub> / <span>$\tau $</span><sub>belt,max</sub>
+where x<sub>belt</sub> = <span>\(\tau \)</span><sub>belt</sub> / <span>\(\tau \)</span><sub>belt,max</sub>
 
 
 
 Belt efficiency therefore is:
 
-<span>${\eta_{belt}}({x_{belt}}) = {\eta_{belt,\max }}\left[ {\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}}} \right]$</span>                                                                   ()
+<span>\({\eta_{belt}}({x_{belt}}) = {\eta_{belt,\max }}\left[ {\frac{{{\eta_{belt}}({x_{belt}})}}{{{\eta_{belt,\max }}}}} \right]\)</span>                                                                   ()
 
 Belt input power (mechanical, W) at the motor shaft is:
 
-<span>${H_{belt}} = \frac{{{H_{fan}}}}{{{\eta_{belt}}({x_{belt}})}}$</span>                                                                                       ()
+<span>\({H_{belt}} = \frac{{{H_{fan}}}}{{{\eta_{belt}}({x_{belt}})}}\)</span>                                                                                       ()
 
 Table 69. Belt Normalized Efficiency Curve Coefficients
 
@@ -2381,7 +2384,7 @@ Table 69. Belt Normalized Efficiency Curve Coefficients
 
 *Motor Efficiency and Input Power Model:* Figure 214 shows three maximum efficiency (*η<sub>motor,max</sub>*) curves for motors (low, medium, and high) as a function of rated motor output power (belt input power). This set of efficiency curves is based on maximum efficiency data in DOE’s MotorMaster+ database (2003) from about 800 tests. It is provided for use in the absence of manufacturer’s data.
 
-![](EngineeringReference/media/image4917.svg.png)
+![](media/image4917.svg.png)
 
 Figure 214. Maximum Motor Efficiency vs. Belt Power Input (Motor Output)
 
@@ -2393,7 +2396,7 @@ Then, use Equation , along with a choice of low, medium, or high efficiency coef
 
 The maximum motor efficiency curves in Figure 214 (single rectangular hyperbola type 1) and their coefficients are as follows:
 
-<span>${\eta_{motor,\max }} = \left[ {\frac{{{a_{motor,\max }} \cdot {x_{motor,\max }}}}{{{b_{motor,\max }} + {x_{motor,\max }}}}} \right] + {c_{motor,\max }}$</span>                                              ()
+<span>\({\eta_{motor,\max }} = \left[ {\frac{{{a_{motor,\max }} \cdot {x_{motor,\max }}}}{{{b_{motor,\max }} + {x_{motor,\max }}}}} \right] + {c_{motor,\max }}\)</span>                                              ()
 
 Table 70. Motor Maximum Efficiency Curve Coefficients
 
@@ -2429,13 +2432,13 @@ Table 70. Motor Maximum Efficiency Curve Coefficients
 
 The normalized *part-load* motor efficiency model is provided to modify the maximum efficiency of the motor. This model is based on part-load data for motors from DOE’s MotorMaster+ database (2003). To determine the normalized motor efficiency at part-load (*η<sub>motor</sub>*(*x<sub>motor</sub>*)/* η<sub>motor,max</sub>*), use the motor fractional power output (*x<sub>motor</sub> =H<sub>belt</sub>* / *H<sub>belt,max</sub>*) as the fraction of motor output power in Equation and use coefficients from Table 71, or for a specific motor, determined from DOE MotorMaster+ data or from manufacturer’s data. Figure 215 shows a graphical representation of eight example curves defined by these equations and coefficients.
 
-![](EngineeringReference/media/image4919.svg.png)
+![](media/image4919.svg.png)
 
 Figure 215. Motor Normalized Efficiency vs. Motor Load Fraction
 
 The example motor normalized efficiency curves (single rectangular hyperbola type 2) and their coefficients as a function of motor load fraction in Figure 215 are determined from DOE MotorMaster+ data and are as follows:
 
-<span>$\frac{{{\eta_{motor}}({x_{motor}})}}{{{\eta_{motor,\max }}}} = \left[ {\frac{{{a_{PLmotor}} \cdot {x_{motor}}}}{{{b_{PLmotor}} + {x_{motor}}}}} \right] + {c_{PLmotor}} \cdot {x_{motor}}$</span>                                             ()
+<span>\(\frac{{{\eta_{motor}}({x_{motor}})}}{{{\eta_{motor,\max }}}} = \left[ {\frac{{{a_{PLmotor}} \cdot {x_{motor}}}}{{{b_{PLmotor}} + {x_{motor}}}}} \right] + {c_{PLmotor}} \cdot {x_{motor}}\)</span>                                             ()
 
 Table 71. Example Motor Normalized Efficiency Curve Coefficients
 
@@ -2518,27 +2521,27 @@ Table 71. Example Motor Normalized Efficiency Curve Coefficients
 
 Motor efficiency therefore is:
 
-<span>${\eta_{motor}}({x_{motor}}) = {\eta_{motor,\max }}\left[ {\frac{{{\eta_{motor}}({x_{motor}})}}{{{\eta_{motor,\max }}}}} \right]$</span>                                                          ()
+<span>\({\eta_{motor}}({x_{motor}}) = {\eta_{motor,\max }}\left[ {\frac{{{\eta_{motor}}({x_{motor}})}}{{{\eta_{motor,\max }}}}} \right]\)</span>                                                          ()
 
 Motor input power (electrical, W) is:
 
-<span>${H_{motor}} = \frac{{{H_{belt}}}}{{{\eta_{motor}}({x_{motor}})}}$</span>                                                                                  ()
+<span>\({H_{motor}} = \frac{{{H_{belt}}}}{{{\eta_{motor}}({x_{motor}})}}\)</span>                                                                                  ()
 
 *VFD Efficiency and Input Power Model:* For VFDs, published performance data are limited. Data from DOE (2008) suggest using a functional relation similar to that used for motors to represent VFD efficiency (*η<sub>VFD</sub>*) as a function of the fraction of full-load motor input power (*x<sub>VFD</sub> =H<sub>motor</sub>* / *H<sub>motor,max</sub>*), as shown in Figure 216, or as a function of the fraction of full-load speed (*x<sub>VFD</sub> =ω<sub>motor</sub> / ω<sub>motor,max</sub>*), as shown in Figure 217.
 
-![](EngineeringReference/media/image4923.svg.png)
+![](media/image4923.svg.png)
 
 Figure 216. VFD Efficiency vs. Fraction of Motor Full-Load Input Power
  (*Source: DOE 2008*)
 
-![](EngineeringReference/media/image4924.svg.png)
+![](media/image4924.svg.png)
 
 Figure 217. VFD Efficiency vs. Fraction of Full-Load Motor Speed
  (*Courtesy of Saftronics*)
 
 The performance curve (single rectangular hyperbola type 2) used here for VFD efficiency is:
 
-<span>${\eta_{VFD}} = \left[ {\frac{{{a_{VFD}} \cdot {x_{VFD}}}}{{{b_{VFD}} + {x_{VFD}}}}} \right] + {c_{VFD}} \cdot {x_{VFD}}$</span>                                                              ()
+<span>\({\eta_{VFD}} = \left[ {\frac{{{a_{VFD}} \cdot {x_{VFD}}}}{{{b_{VFD}} + {x_{VFD}}}}} \right] + {c_{VFD}} \cdot {x_{VFD}}\)</span>                                                              ()
 
 Example coefficients derived from the DOE data as a function of the fraction of full-load motor input power are listed in Table 72.
 
@@ -2618,15 +2621,15 @@ Table 72. Example VFD Efficiency Curve Coefficients
 
 VFD input power (electrical, W) is:
 
-<span>${H_{VFD}} = \frac{{{H_{motor}}}}{{{\eta_{VFD}}}}$</span>                                                                                          ()
+<span>\({H_{VFD}} = \frac{{{H_{motor}}}}{{{\eta_{VFD}}}}\)</span>                                                                                          ()
 
 *System Total Efficiency: T*he combined efficiency of the fan system components (i.e., fan, belt, motor, and VFD) is:
 
-<span>${\eta_{TOTAL}} = {\eta_{fan}} \cdot {\eta_{belt}} \cdot {\eta_{motor}} \cdot {\eta_{VFD}}$</span>    <span>$\left( { = \frac{{{Q_{fan}} \cdot \Delta {P_{fan}}}}{{{H_{VFD}}}}} \right)$</span>                                     ()
+<span>\({\eta_{TOTAL}} = {\eta_{fan}} \cdot {\eta_{belt}} \cdot {\eta_{motor}} \cdot {\eta_{VFD}}\)</span>    <span>\(\left( { = \frac{{{Q_{fan}} \cdot \Delta {P_{fan}}}}{{{H_{VFD}}}}} \right)\)</span>                                     ()
 
 *Heat Loss to Air*: To calculate the temperature rise from waste heat entering the air stream from the fan, belt, and motor, it is assumed that the user-specified “motor in air fraction” applies to the belt and motor but not to the VFD. The power “lost” to the air (W) is:
 
-<span>${\dot Q_{toair}} = {H_{fan}} + \left( {{H_{motor}} - {H_{fan}}} \right) \cdot {f_{motortoair}}$</span>                                                    ()
+<span>\({\dot Q_{toair}} = {H_{fan}} + \left( {{H_{motor}} - {H_{fan}}} \right) \cdot {f_{motortoair}}\)</span>                                                    ()
 
 ### References
 
@@ -2673,7 +2676,7 @@ Air System Compound Component Groups <a name="AirComponentGroups"></a>
 
 The input object AirLoopHVAC:UnitarySystem provide a “virtual” component that collect and control a set of components: fan, heating coil, cooling coil, and/or reheat coil. Reheat coil is modeled for controlling high zone humidity levels. The unit may be configured to have either a blow through or draw through fan. In a blow through configuration, fan is generally the fist component upstream of heating ro cooling coil. In a draw through fan configuration, fan is placed directly after the heating coil and before reheat coil.
 
-![](EngineeringReference/media/image4930.png)
+![](media/image4930.png)
 
 Figure 218. Schematic of the EnergyPlus Unitary System (Blow Through Configuration)
 
@@ -2687,7 +2690,7 @@ There are two types of control types allowed to be specified in the unitary syst
 
 
 
-Setpoint based control:
+####Setpoint based control:
 
 The unitary system calculates the current sensible load using the temperature of the inlet node and the System Node Setpoint Temp on the control node. If the control node is not the outlet node, the desired outlet node temperature is adjusted for the current temperature difference between the outlet node and the control node. Likewise, the current latent load is calculated using the humidity ratio of the inlet node and the System Node Humidity Ratio Max on the control node. The controls determine the required coil run-time fraction and dehumidification mode (if applicable) using the steps outlined below.
 
@@ -2709,7 +2712,7 @@ If the humidity control type is CoolReheat, the coil is re-simulated to achieve 
 
 
 
-Load based control:
+####Load based control:
 
 While the unitary system may be configured to serve multiple zones, system operation is controlled by a thermostat located in a single “control” zone. One of the key parameters for the unitary system component is the fraction of the total system air flow that goes through the control zone. This fraction is calculated as the ratio of the maximum air mass flow rate for the air loop’s supply inlet node for the control zone (e.g., AirTerminal:SingleDuct:Uncontrolled, field = Maximum Air Flow Rate, converted to mass flow) to the sum of the maximum air mass flow rates for the air loop’s supply inlet nodes for all zones served by this air loop. The unitary system module scales the calculated load for the control zone upward based on this fraction to determine the total load to be met by the unitary system. The module then proceeds to calculate the required part-load ratio for the system coil and the supply air fan to meet this total load. The heating or cooling capacity delivered by the unitary system is distributed to all of the zones served by this system via the terminal units that supply air to each zone. The supply air fraction that goes though the control zone is calculated as follows:
 
@@ -2738,28 +2741,25 @@ If the supply air fan operating mode schedule requests cycling fan operation, th
 The model then calculates the unitary system’s sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions and when the cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is configured to run continuously regardless of coil operation, then the sensible cooling energy rate will probably not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat), the cooling coil, and the heating and reheat coil (simply to pass the air properties and mass flow rate from its inlet node to its outlet node). For each of these cases (full load and cooling coil OFF), the sensible cooling energy rate delivered by the unitary system is calculated as follows:
 
 
-
-<div>$$Full\;Cool\;Output = (Mass\;Flow\;Rat{e_{ful\;load}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;full\;load}}$$</div>
+<div>$$Full\;Cool\;Output = (Mass\;Flow\;Rat{e_{full\;load}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;full\;load}}$$</div>
 
 <div>$$No\;Cool\;Output = (Mass\;Flow\;Rat{e_{coil\;off}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}$$</div>
 
 where:
 
-*Mass Flow Rate<sub>full\\ load</sub>* = air mass flow rate through unitary system at full-load conditions, kg/s
+*Mass Flow Rate<sub>full load</sub>* = air mass flow rate through unitary system at full-load conditions, kg/s
 
-*h<sub>out,\\ full\\ load</sub>* = enthalpy of air exiting the unitary system at full-load conditions, J/kg
+*h<sub>out, full load</sub>* = enthalpy of air exiting the unitary system at full-load conditions, J/kg
 
-*h<sub>control\\ zone</sub>*<sub> </sub> = enthalpy of air in the control zone (where thermostat is located), J/kg
+*h<sub>control zone</sub>*<sub> </sub> = enthalpy of air in the control zone (where thermostat is located), J/kg
 
-*HR<sub>min</sub>      =* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio
+*HR<sub>min</sub>      =* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air in the control zone
 
-of the unitary system exiting air or the air in the control zone
+*Mass Flow Rate<sub>coil off</sub>* = air mass flow rate through the unitary system with the cooling coil OFF, kg/s
 
-*Mass Flow Rate<sub>coil\\ off</sub>* = air mass flow rate through the unitary system with the cooling coil OFF, kg/s
+*h<sub>out, coil off</sub>*  = enthalpy of air exiting the unitary system with the cooling coil OFF, J/kg
 
-*h<sub>out,\\ coil\\ off</sub>*  = enthalpy of air exiting the unitary system with the cooling coil OFF, J/kg
-
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>sen,</sub> *<sub>full load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;full\;load}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{full\;load}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2767,7 +2767,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ<sub>sen,coil off</sub>=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{coil\;off}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2787,13 +2787,13 @@ If the unitary system has been specified with cycling fan/cycling coil (AUTO fan
 
 If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the cooling coil is ON and the user-specified air flow rate when the cooling coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{CoolCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{CoolCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
 
 where:
 
-<span>$\mathop m\limits^ \bullet  CoolCoilON$</span> = air mass flow rate through unitary system when the cooling coil is ON (kg/s)
+<span>$\mathop m\limits^ \bullet  <sub>CoolCoilON</sub>$</span> = air mass flow rate through unitary system when the cooling coil is ON (kg/s)
 
-<span>$\mathop m\limits^ \bullet  CoilOFF$</span> = air mass flow rate through unitary system when no cooling or heating is needed (kg/s)
+<span>$\mathop m\limits^ \bullet  <sub>CoilOFF</sub>$</span> = air mass flow rate through unitary system when no cooling or heating is needed (kg/s)
 
 In this case, the air conditions at nodes downstream of the cooling coil are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and inlet air conditions when the coil is OFF).
 
@@ -2805,35 +2805,34 @@ After the unitary system cooling load is determined as described in Eq. above, t
 
 The model calculates the unitary system’s sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions at the highest speed and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is scheduled to run continuously regardless of coil operation, then the sensible cooling energy rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat) and the multi/variable speed DX cooling coil. The multi/variable speed DX heating coil and the supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load at highest cooling speed and DX cooling coil OFF), the sensible cooling energy rate delivered by the unitary system is calculated as follows:
 
-<span>$FullCoolOutpu{t_{Highest\;Speed}} = ({\dot m_{HighestSpeed}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;HighestSpeed}}$</span><span>$NoCoolOutput = ({\dot m_{CoilOff}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}$</span>
+<div>$$FullCoolOutpu{t_{Highest\;Speed}} = ({\dot m_{HighestSpeed}}){({h_{out,full\;load}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;HighestSpeed}}$$</div>
+<div>$$NoCoolOutput = ({\dot m_{CoilOff}}){({h_{out,\;coil\;off}} - {h_{control\;zone}})_{HR\min }} - {\Delta_{sen,\;coil\;off}}$$</div>
 
 where:
 
 *<span>${\dot m_{HighestSpeed}}$</span>* = air mass flow rate through unitary system at the highest cooling speed [kg/s]
 
-*h<sub>out,\\ full\\ load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
+*h<sub>out, full load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
 
-*h<sub>control \\ zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
+*h<sub>control zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
 
 *HR<sub>min</sub>=* the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone [kg/kg]
 
 <span>${\dot m_{CoilOff}}$</span> = air mass flow rate through the unitary system with the cooling coil OFF [kg/s]
 
-*h<sub>out,coil \\ off</sub>*    = enthalpy of air exiting the unitary system with the cooling coil OFF [J/kg]
+*h<sub>out,coil off</sub>*    = enthalpy of air exiting the unitary system with the cooling coil OFF [J/kg]
 
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>*sen,*</sub> *<sub>HighestSpeed</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+
+Δ<sub>*sen,coil off*</sub>=Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;HighestSpeed}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad \quad  + \left( {{{\dot m}_{_{HighestSpeed}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
+
+<div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
 where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
-
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the cooling coil OFF conditions
-
-<div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
-
-
 
 If the unitary system’s sensible cooling rate at the highest speed (full load, no cycling) is insufficient to meet the entire cooling load, the controlled zone conditions will not be met. The reported cycling rate and speed ratio are 1, and the speed number is set to the highest index number. If the total sensible cooling load to be met by the system is less than the sensible cooling rate at the highest speed, then the following steps are performed.
 
@@ -2845,21 +2844,21 @@ where
 
 *<span>${\dot m_{Speed1}}$</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
 
-Δ<sub>sen,</sub> <sub>Speed1</sub>**=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+Δ<sub>*sen,*</sub> <sub>*Speed1*</sub>=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;Speed1}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{Speed1}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
 ·        If the sensible cooling energy rate delivered by the unitary system at Speed 1 is greater or equal to the sensible load, the cycling ratio (part-load ratio) for the unitary system is estimated.
 
-<div>$$\begin{array}{l}CyclingRatio = \frac{{\left( {ABS(CoolingCoilSensibleLoad)} \right)}}{{FullCoolingCoilCapacity}}\\ = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - AddedFanHeat} \right)}}{{\left( {FullCoolOutpu{t_{speed1}} - AddedFanHea{t_{speed1}}} \right)}}} \right)\end{array}$$</div>
+<div>$$\begin{array}{l}CyclingRatio = \frac{{\left( {ABS(CoolingCoilSensibleLoad)} \right)}}{{FullCoolingCoilCapacity}}\\ = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - AddedFanHeat} \right)}}{{\left( {FullCoolOutpu{t_{Speed1}} - AddedFanHea{t_{Speed1}}} \right)}}} \right)\end{array}$$</div>
 
 
 
 where
 
-AddedFanHeat  = generated supply air fan heat, which is a function of part load ratio and as internal component cooling load [W].
+*AddedFanHeat*  = generated supply air fan heat, which is a function of part load ratio and as internal component cooling load [W].
 
-AddedFanHeat<sub>Speed1</sub>        = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
+*AddedFanHeat<sub>Speed1</sub>*        = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
 
 Since the part-load performance of the DX cooling coil is frequently non-linear,and the supply air fan heat varies based on cooling coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the cooling coil and fan) until the unitary system’s cooling output matches the cooling load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the unitary system’s cooling output divided by the load to be met.
 
@@ -2873,17 +2872,17 @@ Unitary systemOutput<sub>Cycling</sub> = unitary system delivered sensible capac
 
 where
 
-<span>${\mathop m\limits^ \bullet_{UnitarySystem}}$</span>      = average air mass flow rate defined in the next section [kg/s]
+<span>${\dot m{_{UnitarySystem}}}$</span>      = average air mass flow rate defined in the next section [kg/s]
 
-h<sub>out,</sub>        = enthalpy of air exiting the unitary system at part load conditions [J/kg]
+*h<sub>out,</sub>*        = enthalpy of air exiting the unitary system at part load conditions [J/kg]
 
-Δ<sub>cycling</sub>    =average sensible load difference between the system output node and the zone inlet node
+Δ<sub>*cycling*</sub>    =average sensible load difference between the system output node and the zone inlet node
 
 <div>$${\Delta_{cycling}} = \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{ControlZone}}} \right) + \left( {{{\mathop m\limits^ \bullet  }_{UnitarySystem}} - \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{ControlZone}}} \right)$$</div>
 
 
 
-<span>${\dot m_{_{ZoneInlet}}}$</span> = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
+<span>${\dot m{_{ZoneInlet}}}$</span> = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
 
 For this case where speed 1 operation was able to meet the required cooling load, the speed ratio is set to zero and speed number is equal to 1.
 
@@ -2897,13 +2896,13 @@ Although a linear relationship is assumed by applying the speed ratio to obtain 
 
 where:
 
-Unitary systemOutput<sub>Speed,n</sub>= unitary system delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
+*UnitarySystemOutput<sub>Speedn</sub>*= unitary system delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
 
-<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullCoolOutpu{t_{speedn}} + \\\(1 - SpeedRatio)FullCoolOutpu{t_{speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
+<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullCoolOutpu{t_{Speedn}} + \\\quad \quad \quad \quad \quad (1 - SpeedRatio)FullCoolOutpu{t_{Speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
 
 Where
 
-AddedFanHeat<sub>SpeedRatio</sub>          = generated supply air fan heat at a specific speed ratio [W]
+*AddedFanHeat<sub>SpeedRatio</sub>*          = generated supply air fan heat at a specific speed ratio [W]
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -2913,15 +2912,15 @@ Speed 1 operation
 
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system’s operating supply air mass flow rate is determined by the cycling ratio (PartLoadRatio) for Speed 1. The supply air mass flow rate is multiplied by the cycling ratio to determine the average air mass flow rate for the system simulation time step. The air conditions at nodes downstream of the cooling coils represent the full-load (steady-state) values when the coil is operating.
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = \left( {CyclingRatio} \right){\mathop m\limits^ \bullet_{speed1}}$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = \left( {CyclingRatio} \right){{\mathop m\limits^ \bullet  }_{Speed1}}$$</div>
 
 If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the unitary system cooling coil is ON at Speed 1 and the user-specified air flow rate when the unitary system cooling coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = \left( {CyclingRatio} \right){\mathop m\limits^ \bullet_{speed1}} + \left( {1 - CyclingRatio} \right){\mathop m\limits^ \bullet_{coiloff}}$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = \left( {CyclingRatio} \right){{\mathop m\limits^ \bullet  }_{Speed1}} + \left( {1 - CyclingRatio} \right){{\mathop m\limits^ \bullet  }_{CoilOff}}$$</div>
 
 where:
 
-<span>${\mathop m\limits^ \bullet_{UnitarySystem}}$</span> = average air mass flow rate through unitary system [kg/s]
+<span>${\dot m_{UnitarySystem}}$</span> = average air mass flow rate through unitary system [kg/s]
 
 <span>${\dot m_{Speed1}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed 1 [kg/s]
 
@@ -2933,15 +2932,15 @@ In this case, the air conditions at nodes downstream of the cooling coils are ca
 
 When the unitary system operates at higher speeds to meet the required cooling load, the supply air mass flow rate is linearly interpolated between two consecutive speeds:
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = \left( {SpeedRatio} \right){\mathop m\limits^ \bullet_{Speedn}} + \left( {1 - SpeedRatio} \right){\mathop m\limits^ \bullet_{Speedn - 1}}$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = \left( {SpeedRatio} \right){{\mathop m\limits^ \bullet  }_{Speedn}} + \left( {1 - SpeedRatio} \right){{\mathop m\limits^ \bullet  }_{Speedn - 1}}$$</div>
 
 where:
 
-<span>${\mathop m\limits^ \bullet_{UnitarySystem}}$</span>= average air mass flow rate through the unitary system for the time step [kg/s]
+<span>${{\mathop m\limits^ \bullet  }_{UnitarySystem}}$</span>= average air mass flow rate through the unitary system for the time step [kg/s]
 
-<span>${\dot m_{Speed\;n}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n [kg/s]
+<span>${\dot m_{Speedn}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n [kg/s]
 
-<span>${\dot m_{Speed\;n - 1}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n-1 [kg/s]
+<span>${\dot m_{Speedn - 1}}$</span>= air mass flow rate through unitary system when cooling coil is ON at Speed n-1 [kg/s]
 
 For this case of higher speed operation, the air conditions at nodes downstream of the cooling coils are determined by the delivered cooling capacity and supply air mass flow rates between two consecutive speeds.
 
@@ -2965,19 +2964,19 @@ The model then calculates the unitary system’s sensible heating energy rate de
 
 where:
 
-*Mass Flow Rate <sub>full\\ load</sub>*  = air mass flow rate through unitary system at full-load conditions, kg/s
+*Mass Flow Rate <sub>full load</sub>*  = air mass flow rate through unitary system at full-load conditions, kg/s
 
-*h<sub>out,\\ full\\ load</sub>*  = enthalpy of air exiting the unitary system at full-load conditions, J/kg
+*h<sub>out, full load</sub>*  = enthalpy of air exiting the unitary system at full-load conditions, J/kg
 
-*h<sub>control \\ zone</sub>*  = enthalpy of air leaving the control zone (where thermostat is located), J/kg
+*h<sub>control zone</sub>*  = enthalpy of air leaving the control zone (where thermostat is located), J/kg
 
 *HR<sub>min</sub>=* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
 
-*Mass Flow Rate <sub>coil \\ off</sub>*  = air mass flow rate through the unitary system with the heating coil OFF, kg/s
+*Mass Flow Rate <sub>coil off</sub>*  = air mass flow rate through the unitary system with the heating coil OFF, kg/s
 
-*h<sub>out,\\ coil \\ off</sub>*  = enthalpy of air exiting the unitary system with the heating coil OFF, J/kg
+*h<sub>out, coil off</sub>*  = enthalpy of air exiting the unitary system with the heating coil OFF, J/kg
 
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>sen,</sub> *<sub>full load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;full\;load}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{full\;load}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -2985,7 +2984,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ<sub>sen,coil off</sub>=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {Mass\;Flow\;Rat{e_{_{coil\;off}}} - \frac{{Mass\;Flow\;Rat{e_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3005,17 +3004,15 @@ If the unitary system’s  heating coil output at full load is insufficient to 
 
 If the unitary system has been specified with cycling fan/cycling coil (AUTO fan), then the unitary system’s operating supply air mass flow rate is multiplied by PartLoadRatio to determine the average air mass flow rate for the system simulation time step. The air conditions at nodes downstream of the heating coils represent the full-load (steady-state) values when the coils are operating. If the fan operates continuously (i.e., when the supply air fan operating mode schedule values are NOT equal to 0), the operating air mass flow rate through the unitary system is calculated as the average of the user-specified air flow rate when the unitary system heating coil is ON and the user-specified air flow rate when the unitary system heating coil is OFF (user-specified supply air volumetric flow rates converted to dry air mass flow rates).
 
-<div>$${\mathop m\limits^ \bullet_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{HeatCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
+<div>$${{\mathop m\limits^ \bullet  }_{UnitarySystem}} = PartLoadRatio\left( {{{\mathop m\limits^ \bullet  }_{HeatCoilON}}} \right) + \left( {1 - PartLoadRatio} \right)\left( {{{\mathop m\limits^ \bullet  }_{CoilOFF}}} \right)$$</div>
 
 where:
 
-<span>$\mathop m\limits^ \bullet  HeatCoilON$</span> = air mass flow rate through unitary system when the heating coil is ON (kg/s)
+<span>${\dot m_{HeatCoilON}}$</span> = air mass flow rate through unitary system when the heating coil is ON (kg/s)
 
-<span>$\mathop m\limits^ \bullet  CoilOFF$</span> = air mass flow rate through unitary system when no heating or cooling is needed (kg/s)
+<span>${\dot m_{CoilOFF}}$</span> = air mass flow rate through unitary system when no heating or cooling is needed (kg/s)
 
 In this case, the air conditions at nodes downstream of the heating coils are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coils are operating and inlet air conditions when the coils are OFF).
-
-
 
 #### Heating Operation (multi or variable speed coils )
 
@@ -3031,17 +3028,17 @@ where:
 
 *<span>${\dot m_{HighestSpeed}}$</span>* = air mass flow rate through unitary system at the highest heating speed [kg/s]
 
-*h<sub>out,\\ full\\ load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
+*h<sub>out, full load</sub>*   = enthalpy of air exiting the unitary system at full-load conditions [J/kg]
 
-*h<sub>control \\ zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
+*h<sub>control zone</sub>*   = enthalpy of air leaving the control zone (where thermostat is located) [J/kg]
 
 *HR<sub>min</sub>=* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the unitary system exiting air or the air leaving the control zone
 
 <span>${\dot m_{CoilOff}}$</span>= air mass flow rate through the unitary system with the heating coil OFF [kg/s]
 
-*h<sub>out,coil \\ off</sub>*    = enthalpy of air exiting the unitary system with the heating coil OFF [J/kg]
+*h<sub>out,coil off</sub>*    = enthalpy of air exiting the unitary system with the heating coil OFF [J/kg]
 
-Δ<sub>sen,</sub> *<sub>full\\ load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
+Δ<sub>sen,</sub> *<sub>full load</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;HighestSpeed}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad \quad  + \left( {{{\dot m}_{_{HighestSpeed}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3049,7 +3046,7 @@ where:
 
 Frac = Control zone air fraction with respect to the system mass flow rate
 
-Δ<sub>sen,coil\\ off</sub>**=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
+Δ*<sub>sen,coil off</sub>*=Sensible load difference between the system output node and the zone inlet node with the heating coil OFF conditions
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;coil\;off}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;coil\;off}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{coil\;off}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;coil\;off}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3065,7 +3062,7 @@ where:
 
 *<span>${\dot m_{Speed1}}$</span>* = air mass flow rate through unitary system at Speed 1 [kg/s]
 
-Δ<sub>sen,</sub> <sub>Speed1</sub>**=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
+Δ*<sub>sen,</sub> <sub>Speed1</sub>*=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
 <div>$$\begin{array}{l}{\Delta_{sen,\;Speed1}} = \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}{\left( {{h_{Out,\;full\;load}} - {h_{Zone\;Inlet}}} \right)_{HR\min }}\\\quad \quad \quad \quad  + \left( {{{\dot m}_{_{Speed1}}} - \frac{{{{\dot m}_{_{Zone\;Inlet}}}}}{{Frac}}} \right){\left( {{h_{Out,\;full\;load}} - {h_{_{Control\;Zone}}}} \right)_{HR\min }}\end{array}$$</div>
 
@@ -3077,9 +3074,9 @@ where:
 
 where
 
-AddedFanHeat        = generated supply air fan heat, which is a function of part load ratio and as internal component heating load [W].
+*AddedFanHeat*        = generated supply air fan heat, which is a function of part load ratio and as internal component heating load [W].
 
-AddedFanHeat<sub>Speed1</sub>  = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
+*AddedFanHeat<sub>Speed1</sub>*  = generated supply air fan heat at Speed 1 (part load ratio=1) [W].
 
 Since the part-load performance of the DX heating coil is frequently non-linear, and the supply air fan heat varies based on heating coil operation for the case of cycling fan/cycling coil (AUTO fan), the final part-load ratio for the heating coil compressor and fan are determined through iterative calculations (successive modeling of the heating coil and fan) until the unitary system’s heating output matches the heating load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the unitary system’s heating output divided by the load to be met.
 
@@ -3087,25 +3084,25 @@ Since the part-load performance of the DX heating coil is frequently non-linear,
 
 where:
 
-Unitary systemOutput<sub>Cycling</sub>= unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
+*UnitarySystemOutput<sub>cycling</sub>* = unitary system delivered sensible capacity for Speed 1 operating at a specific cycling ratio (W)
 
-<div>$$UnitarySystemOutpu{t_{cycling}} = {\mathop m\limits^ \bullet_{UnitarySystem}}{\left( {{h_{out}} - {h_{ControlZone}}} \right)_{HR\min }} - {\Delta_{cycling}}$$</div>
+<div>$$UnitarySystemOutpu{t_{cycling}} = {{\mathop m\limits^ \bullet  }_{UnitarySystem}}{\left( {{h_{out}} - {h_{ControlZone}}} \right)_{HR\min }} - {\Delta_{cycling}}$$</div>
 
 where
 
-<span>${\mathop m\limits^ \bullet_{UnitarySystem}}$</span> = average air mass flow rate defined in the next section [kg/s]
+<span>${{\mathop m\limits^ \bullet  }_{UnitarySystem}}$</span> = average air mass flow rate defined in the next section [kg/s]
 
-h<sub>out,</sub>              = enthalpy of air exiting the unitary system at part load conditions [J/kg]
+*h<sub>out,</sub>*              = enthalpy of air exiting the unitary system at part load conditions [J/kg]
 
-Δ<sub>cycling</sub>          =average sensible load difference between the system output node and the zone inlet node
+Δ*<sub>cycling</sub>*          =average sensible load difference between the system output node and the zone inlet node
 
 <div>$${\Delta_{cycling}} = \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{ControlZone}}} \right) + \left( {{{\mathop m\limits^ \bullet  }_{UnitarySystem}} - \frac{{{{\mathop m\limits^ \bullet  }_{ZoneInlet}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{ControlZone}}} \right)$$</div>
 
-<span>${\dot m_{_{ZoneInlet}}}$</span>       = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
+<span>${\dot m_{ZoneInlet}}$</span>       = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
 
-For this case where speed 1 operation was able to meet the required heating load, the speed ratio is set to zero and speed number is equal to 1.
+For this case where Speed 1 operation was able to meet the required heating load, the speed ratio is set to zero and speed number is equal to 1.
 
-3.    If the unitary system’s heating output at full load for Speed 1 is insufficient to meet the entire heatling load, the Cycling ratio (PartLoadRatio) is set equal to 1.0 (compressor and fan are not cycling). Then the heating speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the unitary system is estimated:
+3.    If the unitary system’s heating output at full load for Speed 1 is insufficient to meet the entire heating load, the Cycling ratio (PartLoadRatio) is set equal to 1.0 (compressor and fan are not cycling). Then the heating speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the unitary system is estimated:
 
 <div>$$SpeedRatio = \frac{{ABS\left( {UnitarySystemHeatingLoad - AddedFanHeat - FullHeatOutpu{t_{Speedn - 1}}} \right)}}{{ABS\left( {FullHeatOutpu{t_{Speedn}} - FullHeatOutpu{t_{Speedn - 1}}} \right)}}$$</div>
 
@@ -3115,13 +3112,13 @@ Although a linear relationship is assumed by applying the speed ratio to obtain 
 
 where:
 
-UnitarySystemOutput<sub>SpeedRatio</sub>= unitary system delivered sensible capacity between two consecutive speeds at a specific ratio [W]
+*UnitarySystemOutput<sub>SpeedRatio</sub>*= unitary system delivered sensible capacity between two consecutive speeds at a specific ratio [W]
 
-<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullHeatOutpu{t_{speedn}} + \\\(1 - SpeedRatio)FullHeatOutpu{t_{speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
+<div>$$\begin{array}{l}UnitarySystemOutpu{t_{SpeedRatio}} = (SpeedRatio)FullHeatOutpu{t_{speedn}} + \\\quad \quad \quad \quad (1 - SpeedRatio)FullHeatOutpu{t_{speedn - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$$</div>
 
 Where
 
-AddedFanHeat<sub>SpeedRatio</sub>          = generated supply air fan heat at a specific speed ratio [W]
+*AddedFanHeat<sub>SpeedRatio</sub>*          = generated supply air fan heat at a specific speed ratio [W]
 
 In this case, the reported cycling ratio is 1 and speed number is equal to n.
 
@@ -3143,13 +3140,14 @@ The unitary system’s sensible cooling load to be met and the full load cooling
 
 <div>$$PartLoadRatio = MAX\left( {0.0,\frac{{\left( {UnitarySystemCoolingLoad - NoCoolOutput} \right)}}{{\left( {FullCoolOutput - NoCoolOutput} \right)}}} \right)$$</div>
 
-hen the unitary system’s sensible cooling capacity meets the system sensible cooling load at a given sensible part load ratio, then the Unitary system meets the controlled zone cooling setpoint temperature. If a moisture (latent) load exists because the control zone humidity has exceeded the setpoint, the total moisture load to be met by the unitary systems (Unitary systemMoistureLoad) is calculated based on the control zone moisture load and the control zone air flow fraction.
+When the unitary system’s sensible cooling capacity meets the system sensible cooling load at a given sensible part load ratio, then the Unitary system meets the controlled zone cooling setpoint temperature. If a moisture (latent) load exists because the control zone humidity has exceeded the setpoint, the total moisture load to be met by the unitary systems (Unitary systemMoistureLoad) is calculated based on the control zone moisture load and the control zone air flow fraction.
 
 <div>$$UnitarySystemMoistureLoad = \frac{{ControlZoneMoistureLoad}}{{ControlZoneAirFlowFraction}}$$</div>
 
 Then the *LatentPartLoadRatio* required to meet the high humidity setpoint is calculated as follows:
 
-<span>$LatentPartLoadRatio = MIN\left( {PL{R_{Min}},\frac{{\left( {UnitarySystemMoistureLoad - NoLatentOutput} \right)}}{{\left( {FullLatentOutput - NoLatentOutput} \right)}}} \right)$</span>The model uses the greater of the two part-load ratios, *PartLoadRatio* or *LatentPartLoadRatio*, to determine the operating part-load ratio of the Unitary system’s DX cooling coil.
+<div>$$LatentPartLoadRatio = MIN\left( {PL{R_{Min}},\frac{{\left( {UnitarySystemMoistureLoad - NoLatentOutput} \right)}}{{\left( {FullLatentOutput - NoLatentOutput} \right)}}} \right)$$</div>
+The model uses the greater of the two part-load ratios, *PartLoadRatio* or *LatentPartLoadRatio*, to determine the operating part-load ratio of the Unitary system’s DX cooling coil.
 
 <div>$$LatentPartLoadRatio = MAX\left( {PartLoadRatio,LatentPartLoadRatio} \right)$$</div>
 
@@ -3173,15 +3171,15 @@ Where,
 
 <span>$PL{R_{Min}}$</span>*=*the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
 
-When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 228. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the unitary system’s cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the unitary system cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists, the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, thesupplemental heating coil is used to offset the excess sensible cooling energy provided by the cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
+When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 228. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the unitary system’s cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the unitary system cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists, the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, the supplemental heating coil is used to offset the excess sensible cooling energy provided by the cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
 
-![HiHumidControl](EngineeringReference/media/image5015.png)
+![HiHumidControl](media/image5015.png)
 
 Figure 219. Supplemental heating coil load when predicted zone air temperature is above the heating Setpoint
 
 If a heating load exists (Figure 229), the supplementalheating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the unitary system operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
 
-![HiHumidControl-1](EngineeringReference/media/image5016.png)
+![HiHumidControl-1](media/image5016.png)
 
 Figure 220. Supplemental heating coil load when predicted zone air temperature is below the heating setpoint
 
@@ -3193,17 +3191,65 @@ Waste heat calculations are done when the multi speed cooling and heating coils 
 
 where
 
-T<sub>outlet</sub>            = outlet node temperature of heat recovery, C
+*T<sub>outlet</sub>*            = outlet node temperature of heat recovery, C
 
-T<sub>inlet</sub> = inlet node temperature of heat recovery, C
+*T<sub>inlet</sub>* = inlet node temperature of heat recovery, C
 
-Q<sub>WasteHeat</sub>      = recoverable waste heat generated by its child objects, W
+*Q<sub>WasteHeat</sub>*      = recoverable waste heat generated by its child objects, W
 
-C<sub>p</sub>              = inlet node temperature of heat recovery, C
+*C<sub>p</sub>*              = inlet node temperature of heat recovery, C
 
 <span>${\dot m_{hr}}$</span>            = mass flow rate of heat recovery, kg/s
 
 If the outlet node temperature is above the value of the Maximum Temp for Heat Recovery field, the outlet node temperature is reset to the value of Maximum Temp for Heat Recovery.
+
+#### Multi-Speed Fan with Water Coils In Unitary System 
+
+When modeling multi-speed fan and water coils in unitary system object, the coil's capacity is modulated using speed ratio or part-load ratio.  The system load is met by varying the supply air fan speed while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed.  This method of capacity control is called two-position coil control. When the supply fan is cycling between stages, then the speed ratio is calculated, but when the unit cycles between the minimum fan speed and off-position, part-load ratio is calculated. The fan may be off or run at lowest speed continuously to provide ventilation air depending the fan operating schedule. When the fan is operating at the lowest fan speed (Speed = 1), then the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated iteratively. The set of equations used for the multi-speed fan capacity control in unitary system for water coil AHU modeling are summarized next
+
+##### Cycling Between Stages:
+When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
+
+<div>$${SR_{n}} = Abs({SystemLoad} - {FullLoadOutput_{n-1}}) / Abs({FullLoadOutput_{n}} - {FullLoadOutput_{n-1}})$$</div>
+<div>$${\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})$$</div>
+<div>$${\dot m{w}} = {\dot m_{w, max}}$$</div>
+
+##### Cycling OnOff at Lowest Stage:
+The average supply air flow rate calculation when the fan is running at the lowest fan speed level depends on the fan operating schedule and load. The unitary system part load ratio is given by:
+
+<div>$${PLR} = Abs({SystemLoad} - {NoLoadOutput}) / Abs({FullLoadOutput_{1}} - {NoLoadOutput})$$</div>
+
+###### Continuous Fan:
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR} + {\dot m_{off}} (1 - {PLR})$$</div>
+
+###### Cycling Fan:
+<div>$${\dot m} = {\dot m_{on, 1}} {PLR}$$</div>
+<div>$${\dot m{w}} = {\dot m_{w, max}} * {PLR}$$</div>
+
+where:
+
+{SR_{n}}		=	 speed ratio of the water coil unitary system at speed n, (-)
+
+{PLR}			=	 part load ratio of the unitary system at speed 1, (-)
+
+{\dot m}		=	 average mass flow rate of supply air, (kg/s
+
+{\dot m_{on, n-1}}	=	mass flow rate of supply air at fan speed level n-1, (kg/s)
+
+{\dot m_{on, n}}}	=	mass flow rate of supply air at fan speed level n, (kg/s)
+
+{\dot m_{off}}	=	mass flow rate of supply air when the coils are off, (kg/s)
+
+{\dot m_{w}}	=	 average mass flow rate of chilled or hot water, (kg/s)
+
+{\dot m_{w, max}}	=	maximum or full mass flow rate of chilled or hot water, (kg/s)
+
+SystemLoad 	= system load to be met by the unitary system, (W)
+
+{FullLoadOutput_{n-1}} 	= fully load system output at fan speed level n-1, (W)
+
+{FullLoadOutput_{n}} 	= fully load system output at fan speed level n, (W)
+
 
 ### Forced-Air Furnace and Central Air Conditioning
 
@@ -3213,7 +3259,7 @@ The input objects AirLoopHVAC:Unitary:Furnace:HeatOnly and AirLoopHVAC:Unitary:F
 
 Note: the coil order shown here has been revised from previous versions of Energyplus to configure the cooling coil upstream of the heating coil. This configuration provides uniformity with all unitary equipment. However, for unitary HeatCool systems that do not use a reheat coil, the heating coil can also be placed upstream of the cooling coil. This optional coil placement is retained to allow compatibility with previous versions of Energyplus. For input files developed using previous versions of Energyplus, it is recommended that the coil order be revised according to the figure below.
 
-![FurnaceSchematic\_BlowThru](EngineeringReference/media/image5019.png)
+![FurnaceSchematic\_BlowThru](media/image5019.png)
 
 Figure 221. Schematic of the EnergyPlus Furnace (Blow Through Configuration)
 
@@ -3223,15 +3269,15 @@ While the furnace may be configured to serve multiple zones, system operation is
 
 where:
 
-<span>${\dot m_{TUMax\,ControlledZone}}$</span>    =    maximum air mass flow rate for the air loop’s supply inlet node (terminal unit) for the control zone (kg/s)
+<span>\({\dot m_{TUMax\,ControlledZone}}\)</span>    =    maximum air mass flow rate for the air loop’s supply inlet node (terminal unit) for the control zone (kg/s)
 
-<span>${\dot m_{TUMax\,Zone\,j}}$</span>            =    maximum air mass flow rate for the air loop’s supply inlet node for the jth zone (kg/s)
+<span>\({\dot m_{TUMax\,Zone\,j}}\)</span>            =    maximum air mass flow rate for the air loop’s supply inlet node for the jth zone (kg/s)
 
-<span>$NumOfZones$</span>                =    number of zones, or number of air loop supply air inlet nodes for all zones served by the air loop (-)
+<span>\(NumOfZones\)</span>                =    number of zones, or number of air loop supply air inlet nodes for all zones served by the air loop (-)
 
 The furnace component is able to model supply air fan operation in two modes: cycling fan – cycling coil (i.e., AUTO fan) and continuous fan – cycling coil (i.e., fan ON). Fan:OnOff must be used to model AUTO fan, while Fan:OnOff or Fan:ConstantVolume can be used to model fan ON. The fan operation mode is specified using a supply air fan operating mode schedule where schedule values of 0 denote cycling fan operation and schedule values other than 0 (a 1 is usually used) denote continuous fan operation. Using this schedule, the furnace fan may be cycled with cooling or heating coil operation or operated continuously based on time of day (e.g., cycling fan operation at night and continuous fan operation during the daytime). If the fan operating mode schedule name field is left blank in the furnace object, the furnace assumes cycling or AUTO fan mode operation throughout the simulation.
 
-The only output variables reported by the furnace object are the fan part-load ratio and the compressor part-load ratio (HeatCool only). The fan part-load ratio is defined as the actual air mass flow rate through the system for the time step divided by the design supply air mass flow rate specified for the furnace (<span>${{{{\dot m}_{actual}}} \mathord{\left/ {\vphantom {{{{\dot m}_{actual}}} {{{\dot m}_{design}}}}} \right. } {{{\dot m}_{design}}}}$</span>)..The furnace operates based on the user-specified (or autosized) design supply air flow rate(s). The ‘design’ supply air mass flow rate may be different for cooling, heating, and when no cooling or heating is required and the fan operates continuously based on user-specified inputs (HeatCool only). For the HeatCool version, If alternate air flow rates are specified for cooling, heating, and when no cooling or heating is required, the design supply air mass flow rate is the maximum of these specified values. Also for the HeatCool version, the compressor part-load ratio is reported as the ratio of the actual cooling load to the full-load sensible capacity (see Eqn. ). Reporting of other variables of interest for the furnace (heating rate, cooling rate, energy consumption, etc.) is done by the individual system components (fan, heating coil and DX cooling coil).
+The only output variables reported by the furnace object are the fan part-load ratio and the compressor part-load ratio (HeatCool only). The fan part-load ratio is defined as the actual air mass flow rate through the system for the time step divided by the design supply air mass flow rate specified for the furnace (<span>\({{{{\dot m}_{actual}}} \mathord{\left/ {\vphantom {{{{\dot m}_{actual}}} {{{\dot m}_{design}}}}} \right. } {{{\dot m}_{design}}}}\)</span>)..The furnace operates based on the user-specified (or autosized) design supply air flow rate(s). The ‘design’ supply air mass flow rate may be different for cooling, heating, and when no cooling or heating is required and the fan operates continuously based on user-specified inputs (HeatCool only). For the HeatCool version, If alternate air flow rates are specified for cooling, heating, and when no cooling or heating is required, the design supply air mass flow rate is the maximum of these specified values. Also for the HeatCool version, the compressor part-load ratio is reported as the ratio of the actual cooling load to the full-load sensible capacity (see Eqn. ). Reporting of other variables of interest for the furnace (heating rate, cooling rate, energy consumption, etc.) is done by the individual system components (fan, heating coil and DX cooling coil).
 
 #### Model Description
 
@@ -3285,19 +3331,19 @@ With the calculated sensible heating energy rates and the total sensible heating
 
 
 
-The part-load ratio calculated above is used to determine the required heating coil capacity as <span>$Qheating\,coil = Qdesign\,*PartLoadRatio$</span> where *Q<sub>design</sub>* is the nominal heating coil capacity as specified in the heating coil object. If the fan cycles on and off with the heating coil (i.e.,  when the supply air fan operating mode schedule values are equal to 0), then this part-load ratio is also used to determine the operating mass flow rate of the furnace as
+The part-load ratio calculated above is used to determine the required heating coil capacity as <span>\(Qheating\,coil = Qdesign\,*PartLoadRatio\)</span> where *Q<sub>design</sub>* is the nominal heating coil capacity as specified in the heating coil object. If the fan cycles on and off with the heating coil (i.e.,  when the supply air fan operating mode schedule values are equal to 0), then this part-load ratio is also used to determine the operating mass flow rate of the furnace as
 
 <div>$${\dot m_{furnace}} = {\dot m_{design}}*PartLoadRatio$$</div>
 
- If the fan operates continuously (i.e. fan ON), the operating mass flow rate is specified as <span>${\dot m_{design}}$</span>. The furnace’s fan and heating coil are then re-simulated to determine the furnace’s delivered sensible heating capacity at the above calculated part-load ratio.
+ If the fan operates continuously (i.e. fan ON), the operating mass flow rate is specified as <span>\({\dot m_{design}}\)</span>. The furnace’s fan and heating coil are then re-simulated to determine the furnace’s delivered sensible heating capacity at the above calculated part-load ratio.
 
 <div>$${Q_{furnace}} = \left( {{{\dot m}_{furnace}}} \right){\left( {{h_{out,actual}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,\;actual}}$$</div>
 
 where:
 
-<span>$Qfurnace$</span>          =sensible heating capacity delivered by the furnace (W)
+<span>\(Qfurnace\)</span>          =sensible heating capacity delivered by the furnace (W)
 
-<span>${\dot m_{furnace}}$</span>          = air mass flow rate through the furnace (kg/s)
+<span>\({\dot m_{furnace}}\)</span>          = air mass flow rate through the furnace (kg/s)
 
 *h<sub>out,\\ actual</sub>*<sub>          \\      </sub> = enthalpy of air exiting the furnace (J/kg)
 
@@ -3377,7 +3423,7 @@ Since the part-load performance of the DX cooling coil is frequently non-linear 
 
 where:
 
-<span>$Qfurnace$</span>= Furnace delivered sensible capacity (W)
+<span>\(Qfurnace\)</span>= Furnace delivered sensible capacity (W)
 
 If the furnace has been specified with cycling fan/cycling coil (AUTO fan) and high humidity control *has not* been specified, then the furnace’s operating supply air mass flow rate is multiplied by PartLoadRatio to determine the average air mass flow rate for the system simulation time step. The air conditions at nodes downstream of the cooling coil represent the full-load (steady-state) values when the coil is operating. If a cycling fan is used and high humidity control *has* been specified, the calculation of average air mass flow rate is based on the greater of the heating or cooling part-load ratio (see following section on high humidity control). When the heating part-load ratio is greater than the cooling part-load ratio, the air conditions at nodes downstream of the cooling coil represent the weighted average of full-load conditions when the cooling coil is operating and inlet air conditions when the cooling coil is off (i.e., the fan continues to operate due to a heating requirement where the heating PLR is greater than the cooling PLR). If the supply air fan is specified to run continuously (fan ON), then the air mass flow rate continues to operate at the user-specified supply air mass flow rate when no cooling or heating is required. In this case, the air conditions at nodes downstream of the cooling coil are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and inlet air conditions when the coil is OFF). The furnace exiting air conditions and energy consumption are calculated and reported by the individual component models (fan and DX cooling coil).
 
@@ -3403,17 +3449,17 @@ where:
 
 The model uses the greater of the two part-load ratios, PartLoadRatio or LatentPartLoadRatio, to determine the operating part-load ratio of the furnace’s DX cooling coil. As previously described, iterations are performed to converge on the solution within the convergence tolerance.
 
-![FurnaceSchematic\_BlowThru\_HighRHControl](EngineeringReference/media/image5049.png)
+![FurnaceSchematic\_BlowThru\_HighRHControl](media/image5049.png)
 
 Figure 222. Schematic for Blow Through Furnace with High Humidity Control
 
 If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the furnace’s cooling coil, the reheat coil is used to offset the excess sensible capacity provided by the unit. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists (Figure 223), the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, the reheat coil is used to offset the excess sensible cooling energy provided by the DX cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists. If a heating load exists (Figure 224), the reheat coil is used to offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint) and the heating coil is used to meet the entire heating load as described in the HeatOnly configuration section above. Note that when a heating load exists and high humidity control is required, the furnace operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, DX cooling coil, and heating coil, report variables associated with reheat coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric consumption, heating coil runtime fraction, etc.) are managed in the reheat (heating) coil object.
 
-![ZoneLoadSchematic](EngineeringReference/media/image5050.png)
+![ZoneLoadSchematic](media/image5050.png)
 
 Figure 223. Reheat Coil Load when Predicted Zone Temperature is Above Heating Setpoint
 
-![ZoneLoadSchematic2](EngineeringReference/media/image5051.png)
+![ZoneLoadSchematic2](media/image5051.png)
 
 Figure 224. Reheat Coil Load when Predicted Zone Temperature is Below Heating Setpoint
 
@@ -3429,7 +3475,7 @@ The input object AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass provides a mode
 
 
 
-![DrawthruCBVAV](EngineeringReference/media/image5052.png)
+![DrawthruCBVAV](media/image5052.png)
 
 
 
@@ -3437,7 +3483,7 @@ Figure 225. Schematic of a Changeover Bypass VAV Unitary System with Draw Throug
 
 
 
-![BlowthruCBVAV](EngineeringReference/media/image5053.png)
+![BlowthruCBVAV](media/image5053.png)
 
 Figure 226. Schematic of Changeover Bypass VAV Unitary System with Blow Through Fan
 
@@ -3481,27 +3527,27 @@ The operation of this system is unique in that it uses constant-air-volume equip
 
 where:
 
-<span>$BypassFrac$</span>      = fraction of system air directed to the bypass duct mixer node
+<span>\(BypassFrac\)</span>      = fraction of system air directed to the bypass duct mixer node
 
-<span>${\dot m_{supply}}$</span>                 = Air mass flow rate at the system’s air outlet node, kg/s
+<span>\({\dot m_{supply}}\)</span>                 = Air mass flow rate at the system’s air outlet node, kg/s
 
-<span>${\dot m_{system}}$</span>                 = Air mass flow rate through CBVAV system (coils and supply air fan), kg/s
+<span>\({\dot m_{system}}\)</span>                 = Air mass flow rate through CBVAV system (coils and supply air fan), kg/s
 
-<span>${T_{bypassductmixernode}}$</span>    = Air temperature at the bypass duct mixer node, °C
+<span>\({T_{bypassductmixernode}}\)</span>    = Air temperature at the bypass duct mixer node, °C
 
-<span>${T_{inlet}}$</span>                    = Air inlet node temperature, °C
+<span>\({T_{inlet}}\)</span>                    = Air inlet node temperature, °C
 
-<span>${T_{outlet}}$</span>                   = Air outlet node temperature, °C
+<span>\({T_{outlet}}\)</span>                   = Air outlet node temperature, °C
 
-<span>${\omega_{bypassductmixernode}}$</span>   = Air humidity ratio at the bypass duct mixer node, kg/kg
+<span>\({\omega_{bypassductmixernode}}\)</span>   = Air humidity ratio at the bypass duct mixer node, kg/kg
 
-<span>${\omega_{inlet}}$</span>                   = Air inlet node humidity ratio, kg/kg
+<span>\({\omega_{inlet}}\)</span>                   = Air inlet node humidity ratio, kg/kg
 
-<span>${\omega_{outlet}}$</span>                  = Air outlet node humidity ratio, kg/kg
+<span>\({\omega_{outlet}}\)</span>                  = Air outlet node humidity ratio, kg/kg
 
-<span>${h_{bypassductmixernode}}$</span>    = Air enthalpy at the bypass duct mixer node, J/kg
+<span>\({h_{bypassductmixernode}}\)</span>    = Air enthalpy at the bypass duct mixer node, J/kg
 
-<span>$PsyHFnTdbW$</span>  = Psychrometric function calculating enthalpy given dry-bulb temperature and humidity ratio
+<span>\(PsyHFnTdbW\)</span>  = Psychrometric function calculating enthalpy given dry-bulb temperature and humidity ratio
 
 ##### Cooling Operation
 
@@ -3513,17 +3559,17 @@ If the model determines that the CBVAV system must supply cooling to the zones, 
 
 where:
 
-<span>$T_{target}^i$</span>      = Target supply air temperature for zone *i*, °C
+<span>\(T_{target}^i\)</span>      = Target supply air temperature for zone *i*, °C
 
-<span>$T_{zone}^i$</span>        = Air temperature in zone *i*, °C
+<span>\(T_{zone}^i\)</span>        = Air temperature in zone *i*, °C
 
-<span>$Q_{zone}^i$</span>       = Cooling or heating load for zone *i* (cooling loads are negative values,      heating loads are positive values), W
+<span>\(Q_{zone}^i\)</span>       = Cooling or heating load for zone *i* (cooling loads are negative values,      heating loads are positive values), W
 
-<span>$Cp$</span>          = Specific heat of supply air with coils off, J/kg-K
+<span>\(Cp\)</span>          = Specific heat of supply air with coils off, J/kg-K
 
-<span>$\dot m_{zone,max}^i$</span>  = Maximum terminal unit mass flow rate in zone *i*, kg/s
+<span>\(\dot m_{zone,max}^i\)</span>  = Maximum terminal unit mass flow rate in zone *i*, kg/s
 
-<span>$T_{target}^{}$</span>      = Target supply (outlet) air temperature for the CBVAV system, °C
+<span>\(T_{target}^{}\)</span>      = Target supply (outlet) air temperature for the CBVAV system, °C
 
 The model then calculates the part-load ratio of the DX compressor required to meet the target supply (outlet) air temperature. Since the part-load performance of the DX cooling coil is frequently non-linear (Ref: Coil:Cooling:DX:SingleSpeed model), the actual part-load ratio for the cooling coil compressor is determined through iterative calculations (successive modeling of the DX cooling coil model) until the CBVAV system’s outlet air temperature (including on/off cycling effects of the DX coil) matches the target supply (outlet) air temperature within a small temperature convergence tolerance (1E-5 ˚C).
 
@@ -3543,11 +3589,11 @@ When a gas or electric heating coil is used instead of a DX heating coil, the am
 
 where:
 
-<span>${Q_{heating}}$</span>       = Heating coil load, W
+<span>\({Q_{heating}}\)</span>       = Heating coil load, W
 
-<span>${C_p}$</span>             = Specific heat of heating coil inlet air, J/kg-K
+<span>\({C_p}\)</span>             = Specific heat of heating coil inlet air, J/kg-K
 
-<span>${T_{inlet,heatcoil}}$</span>  = Heating coil inlet air temperature, °C
+<span>\({T_{inlet,heatcoil}}\)</span>  = Heating coil inlet air temperature, °C
 
 ##### Floating Operation (no cooling or heating)
 
@@ -3563,9 +3609,9 @@ The user also specifies a minimum outlet air temperature during cooling operatio
 
 where:
 
-<span>${T_{min,cooling}}$</span>= Minimum outlet air temperature during cooling operation, °C
+<span>\({T_{min,cooling}}\)</span>= Minimum outlet air temperature during cooling operation, °C
 
-<span>${T_{max,heating}}$</span>= Maximum outlet air temperature during heating operation, °C
+<span>\({T_{max,heating}}\)</span>= Maximum outlet air temperature during heating operation, °C
 
 ##### Air Flow Calculations
 
@@ -3585,13 +3631,13 @@ There is one special case. If the user has specified constant fan operation and 
 
 where:
 
-<span>$\rho air,std$</span>             = standard air density (1.204 kg/m<sup>3</sup>) adjusted for the local barometric pressure (standard barometric pressure corrected for altitude, ASHRAE 1997 HOF pg. 6.1), kg/m<sup>3</sup>
+<span>\(\rho air,std\)</span>             = standard air density (1.204 kg/m<sup>3</sup>) adjusted for the local barometric pressure (standard barometric pressure corrected for altitude, ASHRAE 1997 HOF pg. 6.1), kg/m<sup>3</sup>
 
-<span>${\dot V_{mode}}$</span>                = User-specified system volumetric flow rate in cooling, heating, or no cooling or heating mode, m<sup>3</sup>/s
+<span>\({\dot V_{mode}}\)</span>                = User-specified system volumetric flow rate in cooling, heating, or no cooling or heating mode, m<sup>3</sup>/s
 
-<span>${\dot m_{system,OA}}$</span>          = Outdoor air mass flow rate introduced through the CBVAV system, kg/s
+<span>\({\dot m_{system,OA}}\)</span>          = Outdoor air mass flow rate introduced through the CBVAV system, kg/s
 
-<span>${\dot V_{mode,OA}}$</span>            = User-specified outdoor air volumetric flow rate in cooling, heating, or no cooling or heating mode, m<sup>3</sup>/s
+<span>\({\dot V_{mode,OA}}\)</span>            = User-specified outdoor air volumetric flow rate in cooling, heating, or no cooling or heating mode, m<sup>3</sup>/s
 
 ##### Calculation of System Heating and Cooling Rates
 
@@ -3605,27 +3651,27 @@ At the end of each HVAC simulation time step, this object reports the heating or
 
 where:
 
-<sub><span>${\dot Q_{total}}$</span>            </sub>= total energy transfer rate by the system, W
+<sub><span>\({\dot Q_{total}}\)</span>            </sub>= total energy transfer rate by the system, W
 
-<sub><span>${\dot Q_{sensible}}$</span>        </sub>= sensible energy transfer rate by the system, W
+<sub><span>\({\dot Q_{sensible}}\)</span>        </sub>= sensible energy transfer rate by the system, W
 
-<sub><span>${\dot Q_{latent}}$</span>           </sub>= latent energy transfer rate by the system, W
+<sub><span>\({\dot Q_{latent}}\)</span>           </sub>= latent energy transfer rate by the system, W
 
 *h<sub>inlet</sub>*                        = enthalpy of the air entering the unit at its inlet node, J/kg
 
 *h<sub>outlet</sub>*          = enthalpy of the air leaving the unit at its outlet node, J/kg
 
-<span>$H{R_{min}}$</span>        = minimum of the inlet air and outlet air humidity ratio, kg/kg
+<span>\(H{R_{min}}\)</span>        = minimum of the inlet air and outlet air humidity ratio, kg/kg
 
 Since each of these energy transfer rates can be calculated as positive or negative values, individual reporting variables are established for cooling and heating and only positive values are reported. The following calculations are representative of what is done for each of the energy transfer rates:
 
-<div>$$\begin{array}{l}If\;({{\dot Q}_{total}} < 0.0)\;Then\\\quad {{\dot Q}_{total,cooling}} = ABS({{\dot Q}_{total}})\\\quad {{\dot Q}_{total,heating}} = 0.0\\Else\\\quad {{\dot Q}_{total,cooling}} = 0.0\\\quad {{\dot Q}_{total,heating}} = {{\dot Q}_{total}}\\Endif\end{array}$$</div>
+<div>$$\begin{array}{l}If\;({{\dot Q}_{total}} &lt; 0.0)\;Then\\\quad {{\dot Q}_{total,cooling}} = ABS({{\dot Q}_{total}})\\\quad {{\dot Q}_{total,heating}} = 0.0\\Else\\\quad {{\dot Q}_{total,cooling}} = 0.0\\\quad {{\dot Q}_{total,heating}} = {{\dot Q}_{total}}\\Endif\end{array}$$</div>
 
 where:
 
-<sub><span>${\dot Q_{total,cooling}}$</span>          </sub>= output variable ‘Unitary System Total Cooling Rate, W’
+<sub><span>\({\dot Q_{total,cooling}}\)</span>          </sub>= output variable ‘Unitary System Total Cooling Rate, W’
 
-<sub><span>${\dot Q_{total,heating}}$</span>          </sub>= output variable ‘Unitary System Total Heating Rate, W’
+<sub><span>\({\dot Q_{total,heating}}\)</span>          </sub>= output variable ‘Unitary System Total Heating Rate, W’
 
 In addition to heating and cooling rates, the heating and cooling energy supplied by the system are also calculated for the time step being reported. The following example for total zone cooling energy is representative of what is done for the sensible and latent energy as well as the heating counterparts.
 
@@ -3633,7 +3679,7 @@ In addition to heating and cooling rates, the heating and cooling energy supplie
 
 where:
 
-<sub><span>${Q_{total,cooling}}$</span>      </sub>= output variable ‘Unitary System Total Cooling Energy, J’
+<sub><span>\({Q_{total,cooling}}\)</span>      </sub>= output variable ‘Unitary System Total Cooling Energy, J’
 
 *TimeStepSys*  = HVAC system simulation time step, hr
 
@@ -3661,7 +3707,7 @@ The changeover-bypass VAV system is modeled as an air loop component and is size
 
 The input object AirLoopHVAC:UnitaryHeatPump:AirToAir provides a model for an air-to-air heat pump that is a “virtual” component that consists of an on/off or constant volume fan component, a DX cooling coil, a DX heating coil, and a gas or electric supplemental heating coil. The specific configuration of the blow through heat pump is shown in the following figure. For a draw through heat pump, the fan is located between the DX heating coil and the supplemental heating coil.
 
-![FurnaceSchematic\_HeatPump](EngineeringReference/media/image5106.png)
+![FurnaceSchematic\_HeatPump](media/image5106.png)
 
 Figure 227. Schematic of a Blow Through Air-to-Air Heat Pump
 
@@ -3671,15 +3717,15 @@ While the heat pump may be configured to serve multiple zones, system operation 
 
 where:
 
-<span>${\dot m_{TUMax\,ControlledZone}}$</span>    =    maximum air mass flow rate for the air loop’s supply inlet node (terminal unit) for the control zone (kg/s)
+<span>\({\dot m_{TUMax\,ControlledZone}}\)</span>    =    maximum air mass flow rate for the air loop’s supply inlet node (terminal unit) for the control zone (kg/s)
 
-<span>${\dot m_{TUMax\,Zone\,j}}$</span>            =    maximum air mass flow rate for the air loop’s supply inlet node for the jth zone (kg/s)
+<span>\({\dot m_{TUMax\,Zone\,j}}\)</span>            =    maximum air mass flow rate for the air loop’s supply inlet node for the jth zone (kg/s)
 
-<span>$NumOfZones$</span>                =    number of zones, or number of air loop supply air inlet nodes for all zones served by the air loop (-)
+<span>\(NumOfZones\)</span>                =    number of zones, or number of air loop supply air inlet nodes for all zones served by the air loop (-)
 
 The heat pump component is able to model supply air fan operation in two modes: cycling fan – cycling coil (i.e., AUTO fan) and continuous fan – cycling coil (i.e., fan ON). Fan:OnOff must be used to model AUTO fan, while Fan:OnOff or Fan:ConstantVolume can be used to model fan ON. The fan operation mode is specified using a supply air fan operating mode schedule where schedule values of 0 denote cycling fan operation and schedule values other than 0 (a 1 is usually used) denote continuous fan operation. Using this schedule, the furnace fan may be cycled with cooling or heating coil operation or operated continuously based on time of day (e.g. cycling fan operation at night and continuous fan operation during the day). If the fan operating mode schedule name field is left blank in the heat pump object, the heat pump assumes cycling or AUTO fan mode operation throughout the simulation.
 
-The output variables reported by the heat pump object are fan part-load ratio and compressor part-load ratio. Fan part-load ratio is defined as the actual air mass flow rate through the system for the time step divided by the operating supply air mass flow rate specified for the heat pump (<span>${{\mathop m\limits^\cdot  actual} \mathord{\left/ {\vphantom {{\mathop m\limits^\cdot  actual} {\mathop m\limits^\cdot  }}} \right. } {\mathop m\limits^\cdot  }}ON$</span>). The operating supply air mass flow rate may be different for cooling, heating, and when no cooling or heating is required and the fan operates continuously. Compressor part-load ratio is the actual load for the time step divided by the full-load sensible capacity (see Eqn. or Eqn.). Reporting of other variables of interest for the heat pump (heating rate, cooling rate, energy consumption, etc.) is done by the individual system components (fan, DX cooling coil, DX heating coil, and supplemental heating coil).
+The output variables reported by the heat pump object are fan part-load ratio and compressor part-load ratio. Fan part-load ratio is defined as the actual air mass flow rate through the system for the time step divided by the operating supply air mass flow rate specified for the heat pump (<span>\({{\mathop m\limits^\cdot  actual} \mathord{\left/ {\vphantom {{\mathop m\limits^\cdot  actual} {\mathop m\limits^\cdot  }}} \right. } {\mathop m\limits^\cdot  }}ON\)</span>). The operating supply air mass flow rate may be different for cooling, heating, and when no cooling or heating is required and the fan operates continuously. Compressor part-load ratio is the actual load for the time step divided by the full-load sensible capacity (see Eqn. or Eqn.). Reporting of other variables of interest for the heat pump (heating rate, cooling rate, energy consumption, etc.) is done by the individual system components (fan, DX cooling coil, DX heating coil, and supplemental heating coil).
 
 #### Model Description
 
@@ -3735,7 +3781,7 @@ Since the part-load performance of the DX cooling coil is frequently non-linear,
 
 where:
 
-<span>$QHeatPump$</span>= Heat pump delivered sensible capacity (W)
+<span>\(QHeatPump\)</span>= Heat pump delivered sensible capacity (W)
 
 If the heat pump has been specified with cycling fan/cycling coil (AUTO fan), then the heat pump’s operating supply air mass flow rate is multiplied by PartLoadRatio to determine the average air mass flow rate for the system simulation time step. In this case, the air conditions at nodes downstream of the cooling coil represent the full-load (steady-state) values when the coil is operating.
 
@@ -3745,9 +3791,9 @@ If the fan operates continuously (i.e., when the supply air fan operating mode s
 
 where:
 
-<span>$\mathop m\limits^ \bullet  CoolCoilON$</span> = air mass flow rate through heat pump when the cooling coil is ON (kg/s)
+<span>\(\mathop m\limits^ \bullet  CoolCoilON\)</span> = air mass flow rate through heat pump when the cooling coil is ON (kg/s)
 
-<span>$\mathop m\limits^ \bullet  CoilOFF$</span> = air mass flow rate through heat pump when no cooling or heating is needed (kg/s)
+<span>\(\mathop m\limits^ \bullet  CoilOFF\)</span> = air mass flow rate through heat pump when no cooling or heating is needed (kg/s)
 
 In this case, the air conditions at nodes downstream of the cooling coil are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and inlet air conditions when the coil is OFF).
 
@@ -3801,7 +3847,7 @@ Since the part-load performance of the DX heating coil is frequently non-linear 
 
 where:
 
-<span>$QHeatPump$</span>= Heat pump delivered sensible capacity (W)
+<span>\(QHeatPump\)</span>= Heat pump delivered sensible capacity (W)
 
 If the heat pump’s DX heating coil output at full load is insufficient to meet the entire heating load, PartLoadRatio is set equal to 1.0 (compressor and fan are not cycling) and the remaining heating load is passed to the supplemental heating coil. If the heat pump model determines that the outdoor air temperature is below the minimum outdoor air temperature for compressor operation, the compressor is turned off and the entire heating load is passed to the supplemental gas or electric heating coil. The heat pump exiting air conditions and energy consumption are calculated and reported by the individual component models (fan, DX heating coil, and supplemental gas or electric heating coil).
 
@@ -3811,9 +3857,9 @@ If the heat pump has been specified with cycling fan/cycling coil (AUTO fan), th
 
 where:
 
-<span>$\mathop m\limits^ \bullet  HeatCoilON$</span> = air mass flow rate through heat pump when the heating coil is ON (kg/s)
+<span>\(\mathop m\limits^ \bullet  HeatCoilON\)</span> = air mass flow rate through heat pump when the heating coil is ON (kg/s)
 
-<span>$\mathop m\limits^ \bullet  CoilOFF$</span> = air mass flow rate through heat pump when no heating or cooling is needed (kg/s)
+<span>\(\mathop m\limits^ \bullet  CoilOFF\)</span> = air mass flow rate through heat pump when no heating or cooling is needed (kg/s)
 
 In this case, the air conditions at nodes downstream of the heating coils are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coils are operating and inlet air conditions when the coils are OFF).
 
@@ -3845,31 +3891,31 @@ As previously described, iterations are performed to converge on the solution wi
 
 Where,
 
-<span>$ControlZoneCoolingLoad$</span>= the control zone sensible cooling load to the cooling setpoint, (W).
+<span>\(ControlZoneCoolingLoad\)</span>= the control zone sensible cooling load to the cooling setpoint, (W).
 
-<span>$ControlZoneMoistureLoad$</span>         = the control zone moisture load to the dehumidifying relative humidity setpoint, (W).
+<span>\(ControlZoneMoistureLoad\)</span>         = the control zone moisture load to the dehumidifying relative humidity setpoint, (W).
 
-<span>$ControlZoneAirFlowFraction$</span>     = the supply air fraction that goes though the control zone, (-).
+<span>\(ControlZoneAirFlowFraction\)</span>     = the supply air fraction that goes though the control zone, (-).
 
 *FullLatentOutput*      =         the Heat Pump’s latent cooling energy rate at full-load conditions, W
 
 *NoLatentOutput*       =          the Heat Pump’s latent cooling energy rate with cooling coil OFF, W
 
-<span>$PartLoadRatio$</span>     =          the heat pump’s part-load-ratio required to meet system sensible load, (-).
+<span>\(PartLoadRatio\)</span>     =          the heat pump’s part-load-ratio required to meet system sensible load, (-).
 
-<span>$LatentPartLoadRatio$</span>      =          the heat pump’s part-load-ratio required to meet system moisture load, (-).
+<span>\(LatentPartLoadRatio\)</span>      =          the heat pump’s part-load-ratio required to meet system moisture load, (-).
 
-<span>$PL{R_{MIN}}$</span>*       =  *the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
+<span>\(PL{R_{MIN}}\)</span>*       =  *the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
 
 When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 228. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the heatpump’s cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the heat pump DX cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists (see Figure 2),  the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, thesupplemental heating coil is used to offset the excess sensible cooling energy provided by the DX cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
 
-![HiHumidControl](EngineeringReference/media/image5145.png)
+![HiHumidControl](media/image5145.png)
 
 Figure 228. Supplemental heating coil load when predicted zone air temperature is above the heating Setpoint
 
 If a heating load exists (Figure 229), the supplementalheating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the heat pump operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and DX cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
 
-![HiHumidControl-1](EngineeringReference/media/image5146.png)
+![HiHumidControl-1](media/image5146.png)
 
 Figure 229. Supplemental heating coil load when predicted zone air temperature is below the heating setpoint
 
@@ -3879,7 +3925,7 @@ Figure 229. Supplemental heating coil load when predicted zone air temperature i
 
 The input object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed provides a model for a multispeed air-to-air heat pump that is a “virtual” component that consists of an on/off or constant volume fan component, a multispeed DX cooling coil, a multispeed DX heating coil, and a gas or electric supplemental heating coil. The main difference between this heat pump object and other EnergyPlus heat pump objects is that this object allows from two to four discrete compressor speeds for heating and cooling operation (instead of a single speed for each mode). The specific configuration of the blow through heat pump is shown in the following figure. For a draw through heat pump, the fan is located between the DX heating coil and the supplemental heating coil.
 
-![FurnaceSchematic\_BlowThru\_Multispeed](EngineeringReference/media/image5147.png)
+![FurnaceSchematic\_BlowThru\_Multispeed](media/image5147.png)
 
 Figure 230. Schematic of a Multispeed Air-to-Air Heat Pump (Blow-through Configuration)
 
@@ -3887,7 +3933,7 @@ While the heat pump may be configured to serve multiple zones, system operation 
 
 The heat pump component is able to model supply air fan operation in two modes: cycling fan – cycling coil (i.e., AUTO fan) and continuous fan – cycling coil (i.e., fan ON). Fan:OnOff must be used to model AUTO fan, while Fan:OnOff or Fan:ConstantVolume can be used to model fan ON. The fan operation mode is specified using a supply air fan operating mode schedule where schedule values of 0 denote cycling fan operation and schedule values other than 0 (a 1 is usually used) denote continuous fan operation. Using this schedule, the supply air fan may be cycled with cooling or heating coil operation or operated continuously based on time of day (e.g. cycling fan operation at night and continuous fan operation during the day).
 
-Several output variables are reported by the heat pump object including fan part-load ratio, compressor part-load ratio, cycling ratio, speed ratio and speed number. Fan part-load ratio is defined as the actual air mass flow rate through the system for the time step divided by the operating supply air mass flow rate specified for the heat pump (<span>${{{{\dot m}_{actual}}} \mathord{\left/ {\vphantom {{{{\dot m}_{actual}}} {{{\dot m}_{design}}}}} \right. } {{{\dot m}_{ON}}}}$</span>) at speed 1. Fan part-load ratio is set to 1.0 when the heat pump operates at speeds above 1. The operating supply air mass flow rate may be different for cooling, heating, and when no cooling or heating is required. Compressor part-load ratio is the actual load for the time step divided by the full-load sensible capacity (see Eqn. or Eqn.). If the defrost strategy is reverse cycle for a DX heating coil, the compressor part-load ratio is the sum of the actual load and the defrost load divided by the full-load sensible capacity. Therefore, the compressor part load ratio for the DX heating coil may be greater than the cycling ratio. This heat pump object also reports the sensible, latent and total cooling and heating rate, as well as the electricity consumption for the unit with separate accounting of auxiliary electric consumption. Furthermore, five report variables related to waste heat recovery are available if the user chooses to model this option.
+Several output variables are reported by the heat pump object including fan part-load ratio, compressor part-load ratio, cycling ratio, speed ratio and speed number. Fan part-load ratio is defined as the actual air mass flow rate through the system for the time step divided by the operating supply air mass flow rate specified for the heat pump (<span>\({{{{\dot m}_{actual}}} \mathord{\left/ {\vphantom {{{{\dot m}_{actual}}} {{{\dot m}_{design}}}}} \right. } {{{\dot m}_{ON}}}}\)</span>) at speed 1. Fan part-load ratio is set to 1.0 when the heat pump operates at speeds above 1. The operating supply air mass flow rate may be different for cooling, heating, and when no cooling or heating is required. Compressor part-load ratio is the actual load for the time step divided by the full-load sensible capacity (see Eqn. or Eqn.). If the defrost strategy is reverse cycle for a DX heating coil, the compressor part-load ratio is the sum of the actual load and the defrost load divided by the full-load sensible capacity. Therefore, the compressor part load ratio for the DX heating coil may be greater than the cycling ratio. This heat pump object also reports the sensible, latent and total cooling and heating rate, as well as the electricity consumption for the unit with separate accounting of auxiliary electric consumption. Furthermore, five report variables related to waste heat recovery are available if the user chooses to model this option.
 
 #### Model Description
 
@@ -3905,11 +3951,11 @@ If EnergyPlus determines that the heat pump must supply cooling to the control z
 
 The model then calculates the heat pump’s sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions at the highest speed and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is scheduled to run continuously regardless of coil operation, then the sensible cooling energy rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat) and the multispeed DX cooling coil. The multispeed DX heating coil and the supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load at highest cooling speed and DX cooling coil OFF), the sensible cooling energy rate delivered by the heat pump is calculated as follows:
 
-<span>$FullCoolOutpu{t_{Highest\;Speed}} = \left( {{{\dot m}_{HighestSpeed}}} \right){\left( {{h_{out,full\;load}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,HighestSpeed}}$</span><span>$NoCoolOutput = \left( {{{\dot m}_{CoilOff}}} \right){\left( {{h_{out,coil\;off}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,coil\;off}}$</span>
+<span>\(FullCoolOutpu{t_{Highest\;Speed}} = \left( {{{\dot m}_{HighestSpeed}}} \right){\left( {{h_{out,full\;load}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,HighestSpeed}}\)</span><span>\(NoCoolOutput = \left( {{{\dot m}_{CoilOff}}} \right){\left( {{h_{out,coil\;off}} - {h_{control\;zone}}} \right)_{HR\min }} - {\Delta_{sen,coil\;off}}\)</span>
 
 where:
 
-*<span>${\dot m}_{HighestSpeed}$</span>* = air mass flow rate through heat pump at the highest cooling speed [kg/s]
+*<span>\({\dot m}_{HighestSpeed}\)</span>* = air mass flow rate through heat pump at the highest cooling speed [kg/s]
 
 *h<sub>out,\\ full\\ load</sub>*   = enthalpy of air exiting the heat pump at full-load conditions [J/kg]
 
@@ -3917,7 +3963,7 @@ where:
 
 *HR<sub>min</sub>=* the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone [kg/kg]
 
-<span>${\dot m}_{CoilOff}$</span> = air mass flow rate through the heat pump with the cooling coil OFF [kg/s]
+<span>\({\dot m}_{CoilOff}\)</span> = air mass flow rate through the heat pump with the cooling coil OFF [kg/s]
 
 *h<sub>out,coil \\ off</sub>*    = enthalpy of air exiting the heat pump with the cooling coil OFF [J/kg]
 
@@ -3943,7 +3989,7 @@ If the heat pump’s sensible cooling rate at the highest speed (full load, no c
 
 where
 
-*<span>${{{\dot m}_{Speed1}}}$</span>* = air mass flow rate through heat pump at Speed 1 [kg/s]
+*<span>\({{{\dot m}_{Speed1}}}\)</span>* = air mass flow rate through heat pump at Speed 1 [kg/s]
 
 Δ<sub>sen,</sub> <sub>Speed1</sub>**=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
@@ -3971,7 +4017,7 @@ HeatPumpOutput<sub>Cycling</sub> = heat pump delivered sensible capacity for Spe
 
 where
 
-<span>${\dot m_{HeatPump}}$</span>          = average air mass flow rate defined in the next section [kg/s]
+<span>\({\dot m_{HeatPump}}\)</span>          = average air mass flow rate defined in the next section [kg/s]
 
 h<sub>out,</sub>        = enthalpy of air exiting the heat pump at part load conditions [J/kg]
 
@@ -3979,13 +4025,13 @@ h<sub>out,</sub>        = enthalpy of air exiting the heat pump at part lo
 
 <div>$$\begin{array}{l}\;{\Delta_{cycling}} = \frac{{{{\dot m}_{_{ZoneInlet}}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{Control\;Zone}}} \right) + \left( {{{\dot m}_{_{HeatPump}}} - \frac{{{{\dot m}_{_{ZoneInlet}}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{Control\;Zone}}} \right)\\\;\end{array}$$</div>
 
-<span>${{{\dot m}_{ZoneInlet}}}$</span> = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
+<span>\({{{\dot m}_{ZoneInlet}}}\)</span> = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
 
 For this case where speed 1 operation was able to meet the required cooling load, the speed ratio is set to zero and speed number is equal to 1.
 
 ·        If the heat pump’s cooling output at full load for Speed 1 is insufficient to meet the entire cooling load, the Cycling ratio is set equal to 1.0 (compressor and fan are not cycling). Then the cooling speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the heat pump is estimated:
 
-<span>$Speed{\kern 1pt} Ratio = \frac{{ABS(Heat{\kern 1pt} Pump{\kern 1pt} Cooling{\kern 1pt} Load - AddeFanHeat - Full{\kern 1pt} Cool{\kern 1pt} Outpu{t_{Speed{\kern 1pt} n - 1}})}}{{ABS(Full{\kern 1pt} CoolOutpu{t_{Speed{\kern 1pt} n}} - Full{\kern 1pt} CoolOutpu{t_{Speed{\kern 1pt} n - 1}})}}$</span>Although a linear relationship is assumed by applying the speed ratio to obtain the effective capacity and mass flow rate between speed n and n-1, the outlet air node conditions are dependent on the combined outputs and may not be linear. In addition, the supply air fan heat varies with the speed ratio due to different supply mass flow rates between speed n and n-1 . Therefore, the final speed ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the cooling coil and fan) until the heat pump’s cooling output matches the cooling load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the heat pump’s cooling output divided by the load to be met.
+<span>\(Speed{\kern 1pt} Ratio = \frac{{ABS(Heat{\kern 1pt} Pump{\kern 1pt} Cooling{\kern 1pt} Load - AddeFanHeat - Full{\kern 1pt} Cool{\kern 1pt} Outpu{t_{Speed{\kern 1pt} n - 1}})}}{{ABS(Full{\kern 1pt} CoolOutpu{t_{Speed{\kern 1pt} n}} - Full{\kern 1pt} CoolOutpu{t_{Speed{\kern 1pt} n - 1}})}}\)</span>Although a linear relationship is assumed by applying the speed ratio to obtain the effective capacity and mass flow rate between speed n and n-1, the outlet air node conditions are dependent on the combined outputs and may not be linear. In addition, the supply air fan heat varies with the speed ratio due to different supply mass flow rates between speed n and n-1 . Therefore, the final speed ratio for the cooling coil compressor and fan are determined through iterative calculations (successive modeling of the cooling coil and fan) until the heat pump’s cooling output matches the cooling load to be met within the convergence tolerance. The convergence tolerance is fixed at 0.001 and is calculated based on the difference between the load to be met and the heat pump’s cooling output divided by the load to be met.
 
 <div>$$Tolerance = 0.001 \ge \frac{{Heat\,Pump\,Cooling\,Load - HeatPumpOutpu{t_{SpeedRatio}}}}{{Heat\,Pump\,Cooling\,Load}}$$</div>
 
@@ -3993,7 +4039,7 @@ where:
 
 HeatPumpOutput<sub>Speed,n</sub>= heat pump delivered sensible capacity between two consecutive speeds at a specific speed ratio (W)
 
-       <span>$\begin{array}{l}HeatPumpOutpu{t_{SpeedRatio}} = (SpeedRatio)FullCoolOutpu{t_{Speed\;n}}\\\;\;\;\;\;\;\; = (1 - SpeedRatio)FullCoolOutpu{t_{Speed\;n - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$</span>
+       <span>\(\begin{array}{l}HeatPumpOutpu{t_{SpeedRatio}} = (SpeedRatio)FullCoolOutpu{t_{Speed\;n}}\\\;\;\;\;\;\;\; = (1 - SpeedRatio)FullCoolOutpu{t_{Speed\;n - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}\)</span>
 
 Where
 
@@ -4019,11 +4065,11 @@ If the fan operates continuously (i.e., when the supply air fan operating mode s
 
 where:
 
-<span>${\dot m_{HeatPump}}$</span> = average air mass flow rate through heat pump [kg/s]
+<span>\({\dot m_{HeatPump}}\)</span> = average air mass flow rate through heat pump [kg/s]
 
-<span>${{{\dot m}_{Speed1}}}$</span>= air mass flow rate through heat pump when cooling coil is ON at Speed 1 [kg/s]
+<span>\({{{\dot m}_{Speed1}}}\)</span>= air mass flow rate through heat pump when cooling coil is ON at Speed 1 [kg/s]
 
-<span>${{{\dot m}_{CoilOff}}}$</span> = air mass flow rate through heat pump when no heating or cooling is needed [kg/s]
+<span>\({{{\dot m}_{CoilOff}}}\)</span> = air mass flow rate through heat pump when no heating or cooling is needed [kg/s]
 
 In this case, the air conditions at nodes downstream of the cooling coils are calculated as the average conditions over the simulation time step (i.e., the weighted average of full-load conditions when the coil is operating and inlet air conditions when the coil is OFF).
 
@@ -4035,11 +4081,11 @@ When the heat pump operates at higher speeds to meet the required cooling load, 
 
 where:
 
-<span>${\dot m_{HeatPump}}$</span>= average air mass flow rate through the heat pump for the time step [kg/s]
+<span>\({\dot m_{HeatPump}}\)</span>= average air mass flow rate through the heat pump for the time step [kg/s]
 
-<span>${\dot m_{Speed\;n}}$</span>= air mass flow rate through heat pump when cooling coil is ON at Speed n [kg/s]
+<span>\({\dot m_{Speed\;n}}\)</span>= air mass flow rate through heat pump when cooling coil is ON at Speed n [kg/s]
 
-<span>${\dot m_{Speed\;n - 1}}$</span>= air mass flow rate through heat pump when cooling coil is ON at Speed n-1 [kg/s]
+<span>\({\dot m_{Speed\;n - 1}}\)</span>= air mass flow rate through heat pump when cooling coil is ON at Speed n-1 [kg/s]
 
 For this case of higher speed operation, the air conditions at nodes downstream of the cooling coils are determined by the delivered cooling capacity and supply air mass flow rates between two consecutive speeds.
 
@@ -4063,7 +4109,7 @@ The model then calculates the heat pump’s sensible heating energy rate deliver
 
 where:
 
-*<span>${\dot m}_{HighestSpeed}$</span>* = air mass flow rate through heat pump at the highest heating speed [kg/s]
+*<span>\({\dot m}_{HighestSpeed}\)</span>* = air mass flow rate through heat pump at the highest heating speed [kg/s]
 
 *h<sub>out,\\ full\\ load</sub>*   = enthalpy of air exiting the heat pump at full-load conditions [J/kg]
 
@@ -4071,7 +4117,7 @@ where:
 
 *HR<sub>min</sub>=* enthalpies evaluated at a constant humidity ratio, the minimum humidity ratio of the heat pump exiting air or the air leaving the control zone
 
-<span>${\dot m}_{CoilOff}$</span>= air mass flow rate through the heat pump with the heating coil OFF [kg/s]
+<span>\({\dot m}_{CoilOff}\)</span>= air mass flow rate through the heat pump with the heating coil OFF [kg/s]
 
 *h<sub>out,coil \\ off</sub>*    = enthalpy of air exiting the heat pump with the heating coil OFF [J/kg]
 
@@ -4097,7 +4143,7 @@ If the total heating load to be met by the system is less than the sensible heat
 
 where:
 
-*<span>${{{\dot m}_{Speed1}}}$</span>* = air mass flow rate through heat pump at Speed 1 [kg/s]
+*<span>\({{{\dot m}_{Speed1}}}\)</span>* = air mass flow rate through heat pump at Speed 1 [kg/s]
 
 Δ<sub>sen,</sub> <sub>Speed1</sub>**=Sensible load difference between the system output node and the zone inlet node at full-load conditions at Speed 1
 
@@ -4125,7 +4171,7 @@ HeatPumpOutput<sub>Cycling</sub>= heat pump delivered sensible capacity for Spee
 
 where
 
-<span>${\dot m_{HeatPump}}$</span>    = average air mass flow rate defined in the next section [kg/s]
+<span>\({\dot m_{HeatPump}}\)</span>    = average air mass flow rate defined in the next section [kg/s]
 
 h<sub>out,</sub>              = enthalpy of air exiting the heat pump at part load conditions [J/kg]
 
@@ -4133,7 +4179,7 @@ h<sub>out,</sub>              = enthalpy of air exiting the heat pum
 
 <div>$$\begin{array}{l}\;{\Delta_{cycling}} = \frac{{{{\dot m}_{_{ZoneInlet}}}}}{{frac}}\left( {{h_{ZoneInlet}} - {h_{Control\;Zone}}} \right) + \left( {{{\dot m}_{_{HeatPump}}} - \frac{{{{\dot m}_{_{ZoneInlet}}}}}{{frac}}} \right)\left( {{h_{Out}} - {h_{Control\;Zone}}} \right)\\\;\end{array}$$</div>
 
-<span>${{{\dot m}_{ZoneInlet}}}$</span>       = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
+<span>\({{{\dot m}_{ZoneInlet}}}\)</span>       = Air mass flow rate in the supply inlet node in the controlled zone [kg/s]
 
 For this case where speed 1 operation was able to meet the required heating load, the speed ratio is set to zero and speed number is equal to 1.
 
@@ -4149,7 +4195,7 @@ where:
 
 HeatPumpOutput<sub>SpeedRatio</sub>= heat pump delivered sensible capacity between two consecutive speeds at a specific ratio [W]
 
-       <span>$\begin{array}{l}HeatPumpOutpu{t_{SpeedRatio}} = (SpeedRatio)FullHeatOutpu{t_{Speed\;n}}\\\;\;\;\;\;\;\; = (1 - SpeedRatio)FullHeatOutpu{t_{Speed\;n - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}$</span>
+       <span>\(\begin{array}{l}HeatPumpOutpu{t_{SpeedRatio}} = (SpeedRatio)FullHeatOutpu{t_{Speed\;n}}\\\;\;\;\;\;\;\; = (1 - SpeedRatio)FullHeatOutpu{t_{Speed\;n - 1}} - AddedFanHea{t_{SpeedRatio}}\end{array}\)</span>
 
 Where
 
@@ -4181,7 +4227,7 @@ Q<sub>WasteHeat</sub>      = recoverable waste heat generated by its child 
 
 C<sub>p</sub>              = inlet node temperature of heat recovery, C
 
-<span>${{{\dot m}_{hr}}}$</span>            = mass flow rate of heat recovery, kg/s
+<span>\({{{\dot m}_{hr}}}\)</span>            = mass flow rate of heat recovery, kg/s
 
 If the outlet node temperature is above the value of the Maximum Temp for Heat Recovery field, the outlet node temperature is reset to the value of Maximum Temp for Heat Recovery.
 
@@ -4193,7 +4239,7 @@ The DX cooling package subsystem model provides a “virtual” component that c
 
 This system does not need any plant specification and will provide the electric consumption necessary to operate the compressor and the condenser fan.
 
-![](EngineeringReference/media/image5198.png)
+![](media/image5198.png)
 
 Figure 231.  Schematic of Packaged DX Cooling Subsystem in Air Loop for a Blow-Thru Application
 
@@ -4239,13 +4285,13 @@ The input object Dehumidifier:Desiccant:System provides a model that packages co
 
 The Dehumidifier:Desiccant:System desiccant dehumidifier object in EnergyPlus is a compound object that can be placed anywhere in an air loop. Common locations for this object are in an AirLoopHVAC:OutdoorAirSystem or in the main air loop downstream of a cooling coil (postcooling desiccant dehumidifier). This compound object coordinates the operation of several ‘children’ objects: a desiccant heat exchanger, a regeneration air fan, and an optional regeneration air heater. If this dehumidifier is placed in the main air loop immediately downstream of a direct expansion (DX) cooling coil, then the dehumidifier’s operation can be coordinated with the operation of the companion DX coil and it is also possible to specify that the DX system’s condenser waste heat can be used to help regenerate the desiccant heat exchanger. For the case of condenser waste heat regeneration, an optional exhaust fan can also be modeled by this desiccant dehumidifier compound object to help maintain a setpoint temperature for air entering the regeneration side of the desiccant heat exchanger. Refer to the EnergyPlus Input Output Reference for the specific input syntax for this desiccant dehumidifier object.
 
-![DesiccantDehumidifier\_DrawThrough](EngineeringReference/media/image5199.png)
+![DesiccantDehumidifier\_DrawThrough](media/image5199.png)
 
 Figure 232. Schematic of a Desiccant Dehumidifier with Draw Through Regeneration Fan Placement
 
 
 
-![DesiccantDehumidifier\_BlowThrough](EngineeringReference/media/image5200.png)
+![DesiccantDehumidifier\_BlowThrough](media/image5200.png)
 
 Figure 233. Schematic of a Desiccant Dehumidifier in Blow Through Regeneration Fan Placement
 
@@ -4265,19 +4311,19 @@ The exhaust fan power is determined as follows:
 
 where:
 
-<span>$PL{R_{exhaust}}$</span>  = part load ratio of the exhaust fan
+<span>\(PL{R_{exhaust}}\)</span>  = part load ratio of the exhaust fan
 
-<span>${\mathop {\rm{V}}\limits^ \bullet_{exhaust,\,max}}$</span>  = exhaust fan maximum volumetric flow rate, user input (m<sup>3</sup>/s)
+<span>\({\mathop {\rm{V}}\limits^ \bullet_{exhaust,\,max}}\)</span>  = exhaust fan maximum volumetric flow rate, user input (m<sup>3</sup>/s)
 
-<span>${\rho_{Std}}$</span>           = density of air at standard temperature and pressure [dry air at 20°C] (m<sup>3</sup>/kg)
+<span>\({\rho_{Std}}\)</span>           = density of air at standard temperature and pressure [dry air at 20°C] (m<sup>3</sup>/kg)
 
-<span>${P_{exhaust,\,max}}$</span>   = exhaust fan maximum power, user input (W)
+<span>\({P_{exhaust,\,max}}\)</span>   = exhaust fan maximum power, user input (W)
 
-<span>$ExhFanModFac$</span>= exhaust fan power modifier curve evaluated at PLR<sub>exhaust</sub>. If modifier                                        curve not provided by the user, then this factor is assumed to be 1.0.
+<span>\(ExhFanModFac\)</span>= exhaust fan power modifier curve evaluated at PLR<sub>exhaust</sub>. If modifier                                        curve not provided by the user, then this factor is assumed to be 1.0.
 
-<span>$PL{R_{companion\,coil}}$</span>     = part load ratio of the companion cooling coil
+<span>\(PL{R_{companion\,coil}}\)</span>     = part load ratio of the companion cooling coil
 
-<span>${P_{exhaust}}$</span>        = output variable ‘Dehumidifier Exhaust Fan Electric Power, W’
+<span>\({P_{exhaust}}\)</span>        = output variable ‘Dehumidifier Exhaust Fan Electric Power, W’
 
 The exhaust fan electric consumption is then calculated as:
 
@@ -4285,9 +4331,9 @@ The exhaust fan electric consumption is then calculated as:
 
 where:
 
-<span>${E_{exhaust}}$</span>          = output variable ‘Dehumidifier Exhaust Fan Electric Energy, J’
+<span>\({E_{exhaust}}\)</span>          = output variable ‘Dehumidifier Exhaust Fan Electric Energy, J’
 
-<span>$TimeStepSys$</span>= HVAC system simulation time step, hr
+<span>\(TimeStepSys\)</span>= HVAC system simulation time step, hr
 
 Once the outlet conditions from the companion coil condenser are determined (if present), then the regeneration air fan (if blow through configuration) and regeneration air heater (if present) are simulated. To the extent possible (e.g., if the heater is available to operate based on its availability schedule and it has sufficient heating capacity), the regeneration air heater operates to raise its outlet air temperature to the specified regeneration inlet air setpoint temperature.
 
@@ -4297,13 +4343,13 @@ With the inlet air conditions to the regeneration and process sides of the desic
 
 where:
 
-<span>$\,DDPartLoadRatio$</span> = output variable ‘Dehumidifier Part Load Ratio’
+<span>\(\,DDPartLoadRatio\)</span> = output variable ‘Dehumidifier Part Load Ratio’
 
-<span>${w_{Proc,\,\,in}}$</span>      = process inlet air humidity ratio (kg/kg)
+<span>\({w_{Proc,\,\,in}}\)</span>      = process inlet air humidity ratio (kg/kg)
 
-<span>${w_{max, set\,point}}$</span> = target humidity ratio (setpoint) for the process outlet air (kg/kg)
+<span>\({w_{max, set\,point}}\)</span> = target humidity ratio (setpoint) for the process outlet air (kg/kg)
 
-<span>${w_{Proc,\,\,out,HXon}}$</span>= process outlet air humidity ratio when the desiccant heat exchanger operates       (kg/kg)
+<span>\({w_{Proc,\,\,out,HXon}}\)</span>= process outlet air humidity ratio when the desiccant heat exchanger operates       (kg/kg)
 
 After all of the desiccant dehumidifier components are modeled at the appropriate part load ratio, the water removal rate and water removed are calculated.
 
@@ -4316,13 +4362,13 @@ $$</div>
 
 where:
 
-<span>${\mathop m\limits^ \bullet_{water\_removed,Proc}}$</span> = output variable ‘Dehumidifier Removed Water Mass Flow Rate, kg/s’
+<span>\({\mathop m\limits^ \bullet_{water\_removed,Proc}}\)</span> = output variable ‘Dehumidifier Removed Water Mass Flow Rate, kg/s’
 
-<span>${\mathop m\limits^ \bullet_{Proc,in}}$</span>       = air mass flow rate at the process air inlet node (kg/s)
+<span>\({\mathop m\limits^ \bullet_{Proc,in}}\)</span>       = air mass flow rate at the process air inlet node (kg/s)
 
-<span>${w_{Proc,\,\,out}}$</span>     = process outlet air humidity ratio (kg/kg)
+<span>\({w_{Proc,\,\,out}}\)</span>     = process outlet air humidity ratio (kg/kg)
 
-<span>${m_{water\_removed,Proc}}$</span>= output variable ‘Dehumidifier Removed Water Mass, kg’
+<span>\({m_{water\_removed,Proc}}\)</span>= output variable ‘Dehumidifier Removed Water Mass, kg’
 
 #### References
 
@@ -4338,7 +4384,7 @@ Kosar, D. et al. 2006. Dehumidification Enhancement of Direct Expansion Systems 
 
 The input object AirLoopHVAC:UnitaryHeatPump:WaterToAir provides a model for a water-to-Air heat pump that is a “virtual” component that consists of an on/off fan component, a water-to-air heat pump cooling coil, a water-to-air heat pump heating coil, and a gas or electric supplemental heating coil. The specific configuration of the blowthru heat pump is shown in the following figure. For a drawthru heat pump, the fan is located between the water-to-air heat pump heating coil and the supplemental heating coil. The configuration of the water-to-air heat pump in the air loop is similar to an air-to-air heat pump. In addition, a water-to-air heat pump has a water loop connection on its source side. The water loop can be served by a condenser loop (like GHE for Ground source systems), or by a cooling tower/ boiler plant loop (for water loop systems).
 
-![FurnaceSchematic\_WSHP](EngineeringReference/media/image5222.png)
+![FurnaceSchematic\_WSHP](media/image5222.png)
 
 Figure 234.  Source Side and Load Side Configuration of a BlowThru WateroToAir Heat Pump
 
@@ -4370,43 +4416,43 @@ Assuming no losses, the source side heat transfer rate for cooling and heating m
 
 where:
 
-<span>$A1 - F5$</span>     = Equation fit coefficients for the cooling and heating mode
+<span>\(A1 - F5\)</span>     = Equation fit coefficients for the cooling and heating mode
 
-<span>${T_{ref}}$</span>            = 283K
+<span>\({T_{ref}}\)</span>            = 283K
 
-<span>${T_{w,in}}$</span>           = Entering water temperature, K
+<span>\({T_{w,in}}\)</span>           = Entering water temperature, K
 
-<span>${T_{db}}$</span>             = Entering air dry-bulb temperature, K
+<span>\({T_{db}}\)</span>             = Entering air dry-bulb temperature, K
 
-<span>${T_{wb}}$</span>            = Entering air wet-bulb temperature, K
+<span>\({T_{wb}}\)</span>            = Entering air wet-bulb temperature, K
 
-<span>${\dot V_{air}}$</span>            = Load side air volumetric flow rate, m<sup>3</sup>/s
+<span>\({\dot V_{air}}\)</span>            = Load side air volumetric flow rate, m<sup>3</sup>/s
 
-<span>${\dot V_w}$</span>                         = Source side water volumetric flow rate, m<sup>3</sup>/s
+<span>\({\dot V_w}\)</span>                         = Source side water volumetric flow rate, m<sup>3</sup>/s
 
-<span>${Q_{total}}$</span>          = Total cooling capacity, W
+<span>\({Q_{total}}\)</span>          = Total cooling capacity, W
 
-<span>${Q_{sens}}$</span>          = Sensible cooling capacity, W
+<span>\({Q_{sens}}\)</span>          = Sensible cooling capacity, W
 
-<span>$Powe{r_c}$</span>     = Power consumption (cooling mode), W
+<span>\(Powe{r_c}\)</span>     = Power consumption (cooling mode), W
 
-<span>${Q_{source,c}}$</span>      = Source side heat transfer rate (cooling mode), W
+<span>\({Q_{source,c}}\)</span>      = Source side heat transfer rate (cooling mode), W
 
-<span>${Q_h}$</span>                         = Total heating capacity, W
+<span>\({Q_h}\)</span>                         = Total heating capacity, W
 
-<span>$Powe{r_h}$</span>     = Power consumption (heating mode), W
+<span>\(Powe{r_h}\)</span>     = Power consumption (heating mode), W
 
-<span>${Q_{source,h}}$</span>      = Source side heat transfer rate (heating mode), W
+<span>\({Q_{source,h}}\)</span>      = Source side heat transfer rate (heating mode), W
 
-The inlet conditions or variables are divided by the reference conditions. This formulation allows the coefficients to fall into smaller range of values. Moreover, the value of the coefficient indirectly represents the sensitivity of the output to that particular inlet variable. The reference conditions used when generating the performance coefficients must be the same as the reference conditions used later in the model. The reference temperature <span>${T_{ref}}$</span>is fixed at 283K. Temperature unit of Kelvin is used instead of Celsius to keep the ratio of the water inlet temperature and reference temperature positive value should the water inlet temperature drop below the freezing point.
+The inlet conditions or variables are divided by the reference conditions. This formulation allows the coefficients to fall into smaller range of values. Moreover, the value of the coefficient indirectly represents the sensitivity of the output to that particular inlet variable. The reference conditions used when generating the performance coefficients must be the same as the reference conditions used later in the model. The reference temperature <span>\({T_{ref}}\)</span>is fixed at 283K. Temperature unit of Kelvin is used instead of Celsius to keep the ratio of the water inlet temperature and reference temperature positive value should the water inlet temperature drop below the freezing point.
 
-For cooling mode, the reference conditions; reference load side air volumetric flow rate <span>$\left( {{{\dot V}_{air,ref}}} \right)$</span>,reference source side water volumetric flow rate<span>$\left( {{{\dot V}_{w,ref}}} \right)$</span>,reference sensible capacity <span>$\left( {{Q_{sens,ref}}} \right)$</span> and reference power input <span>$\left( {Powe{r_{c,ref}}} \right)$</span> are the conditions when the heat pump is operating at the highest cooling capacity or reference cooling capacity<span>$\left( {{Q_{total,ref}}} \right)$</span> indicated in the manufacturer’s catalog. Note that the reference conditions for heating mode might differ from the reference conditions specified for the cooling mode.
+For cooling mode, the reference conditions; reference load side air volumetric flow rate <span>\(\left( {{{\dot V}_{air,ref}}} \right)\)</span>,reference source side water volumetric flow rate<span>\(\left( {{{\dot V}_{w,ref}}} \right)\)</span>,reference sensible capacity <span>\(\left( {{Q_{sens,ref}}} \right)\)</span> and reference power input <span>\(\left( {Powe{r_{c,ref}}} \right)\)</span> are the conditions when the heat pump is operating at the highest cooling capacity or reference cooling capacity<span>\(\left( {{Q_{total,ref}}} \right)\)</span> indicated in the manufacturer’s catalog. Note that the reference conditions for heating mode might differ from the reference conditions specified for the cooling mode.
 
 #### Coefficient estimation procedure:
 
 The generalized least square method is used to generate the coefficients. This method utilizes an optimization method which calculates the coefficients that will give the least amount of differences between the model outputs and the catalog data. A set of coefficients for the cooling mode is generated which includes A1-A5 for total cooling capacity, B1-B6 for sensible cooling capacity, and C1-C5 for power consumption. The same procedure is repeated for the heating mode to generate the coefficients E1-E5 and F1-F5. An information flow chart showing the inputs, reference conditions, performance coefficients and outputs are shown in the figure below:
 
-![](EngineeringReference/media/image5250.png)
+![](media/image5250.png)
 
 Figure 235. Information Flow Chart for Water-to-Air Heat Pump Equation Fit Model (Tang 2005)
 
@@ -4438,33 +4484,33 @@ As previously described, iterations are performed to converge on the solution wi
 
 Where,
 
-<span>$ControlZoneCoolingLoad$</span>= the control zone sensible cooling load to the cooling setpoint, (W).
+<span>\(ControlZoneCoolingLoad\)</span>= the control zone sensible cooling load to the cooling setpoint, (W).
 
-<span>$ControlZoneMoistureLoad$</span>         = the control zone moisture load to the dehumidifying relative humidity setpoint, (W).
+<span>\(ControlZoneMoistureLoad\)</span>         = the control zone moisture load to the dehumidifying relative humidity setpoint, (W).
 
-<span>$ControlZoneAirFlowFraction$</span>     = the supply air fraction that goes though the control zone, (-).
+<span>\(ControlZoneAirFlowFraction\)</span>     = the supply air fraction that goes though the control zone, (-).
 
 *FullLatentOutput*      =         the Heat Pump’s latent cooling energy rate at full-load conditions, W
 
 *NoLatentOutput*       =          the Heat Pump’s latent cooling energy rate with cooling coil OFF, W
 
-<span>$PartLoadRatio$</span>     =          the heat pump’s part-load-ratio required to meet system sensible load, (-).
+<span>\(PartLoadRatio\)</span>     =          the heat pump’s part-load-ratio required to meet system sensible load, (-).
 
-<span>$LatentPartLoadRatio$</span>      =          the heat pump’s part-load-ratio required to meet system moisture load, (-).
+<span>\(LatentPartLoadRatio\)</span>      =          the heat pump’s part-load-ratio required to meet system moisture load, (-).
 
-<span>$PL{R_{MIN}}$</span>*       =  *the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
+<span>\(PL{R_{MIN}}\)</span>*       =  *the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
 
 When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure 236. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the heatpump’s cooling coil, the supplemental coil is used to offset the excess sensible capacity provided by the unit. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists (see Figure 236),  the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the heat pump (with LatentPartLoadRatio). In this case, thesupplemental heating coil is used to offset the excess sensible cooling energy provided by the DX cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
 
 
 
-![HiHumidControl-2](EngineeringReference/media/image5262.png)
+![HiHumidControl-2](media/image5262.png)
 
 Figure 236. Supplemental heating coil load when predicted zone air temperature is above the heating Setpoint
 
 If a heating load exists (Figure 237), the supplementalheating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the heat pump operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and DX cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
 
-![HiHumidControl-3](EngineeringReference/media/image5263.png)
+![HiHumidControl-3](media/image5263.png)
 
 Figure 237. Supplemental heating coil load when predicted zone air temperature is below the heating setpoint
 
@@ -4515,29 +4561,29 @@ Assuming no losses, the source side heat transfer rate for cooling and heating m
 
 Where:
 
-<span>$A1 - B5$</span>     = Equation fit coefficients for the cooling and heating mode
+<span>\(A1 - B5\)</span>     = Equation fit coefficients for the cooling and heating mode
 
-<span>${T_{ref}}$</span>            = 283.15K
+<span>\({T_{ref}}\)</span>            = 283.15K
 
-<span>${T_{L,in}}$</span>           = Entering load side water temperature, K
+<span>\({T_{L,in}}\)</span>           = Entering load side water temperature, K
 
-<span>${T_{S,in}}$</span>           = Entering source side water temperature, K
+<span>\({T_{S,in}}\)</span>           = Entering source side water temperature, K
 
-<span>${\dot V_L}$</span>                         = Load side volumetric flow rate, m<sup>3</sup>/s
+<span>\({\dot V_L}\)</span>                         = Load side volumetric flow rate, m<sup>3</sup>/s
 
-<span>${\dot V_S}$</span>                         = Source side volumetric flow rate, m<sup>3</sup>/s
+<span>\({\dot V_S}\)</span>                         = Source side volumetric flow rate, m<sup>3</sup>/s
 
-<span>${Q_c}$</span>                         = Load side heat transfer rate (cooling mode), W
+<span>\({Q_c}\)</span>                         = Load side heat transfer rate (cooling mode), W
 
-<span>$Powe{r_c}$</span>     = Power consumption (cooling mode), W
+<span>\(Powe{r_c}\)</span>     = Power consumption (cooling mode), W
 
-<span>${Q_{source,c}}$</span>      = Source side heat transfer rate (cooling mode), W
+<span>\({Q_{source,c}}\)</span>      = Source side heat transfer rate (cooling mode), W
 
-<span>${Q_h}$</span>                         = Load side heat transfer rate (heating mode), W
+<span>\({Q_h}\)</span>                         = Load side heat transfer rate (heating mode), W
 
-<span>$Powe{r_h}$</span>     = Power consumption (heating mode), W
+<span>\(Powe{r_h}\)</span>     = Power consumption (heating mode), W
 
-<span>${Q_{source,h}}$</span>      = Source side heat transfer rate (heating mode), W
+<span>\({Q_{source,h}}\)</span>      = Source side heat transfer rate (heating mode), W
 
 *COP<sub>c</sub>*          = Cooling coefficient of performance, W/W
 
@@ -4547,15 +4593,15 @@ Where:
 
 If the load side heat transfer rate (*Q<sub>c</sub>* or *Q<sub>h</sub>*) or power consumption (*Power<sub>c</sub>* or *Power<sub>h</sub>*) are less than or equal to zero, then the heat pump is turned off for that simulation time step, a warning is issued, and the simulation continues.
 
-The inlet conditions or variables are divided by the reference conditions. This formulation allows the coefficients to fall into smaller range of values. Moreover, the value of the coefficient indirectly represents the sensitivity of the output to that particular inlet variable. The reference conditions used when generating the performance coefficients must be the same as the reference conditions used later in the model. The reference temperature <span>${T_{ref}}$</span>is fixed at 283K. Temperature unit of Kelvin is used instead of Celsius to keep the ratio of the water inlet temperature and reference temperature positive value should the water inlet temperature drop below the freezing point.
+The inlet conditions or variables are divided by the reference conditions. This formulation allows the coefficients to fall into smaller range of values. Moreover, the value of the coefficient indirectly represents the sensitivity of the output to that particular inlet variable. The reference conditions used when generating the performance coefficients must be the same as the reference conditions used later in the model. The reference temperature <span>\({T_{ref}}\)</span>is fixed at 283K. Temperature unit of Kelvin is used instead of Celsius to keep the ratio of the water inlet temperature and reference temperature positive value should the water inlet temperature drop below the freezing point.
 
-For cooling mode, the reference conditions; reference load side volumetric flow rate, <span>${\dot V_{L,ref}}$</span>, reference source side volumetric flow rate, <span>${\dot V_{S,ref}}$</span>, <span>$Powe{r_{c,ref}}$</span>  and reference source side heat transfer rate, <span>${Q_{source,c,ref}}$</span>  are the conditions when the heat pump is operating at the highest cooling capacity or reference cooling capacity, <span>${Q_{c,ref}}$</span> indicated in the manufacturer’s catalog. Note that the reference conditions for heating mode might differ from the reference conditions specified for the cooling mode.
+For cooling mode, the reference conditions; reference load side volumetric flow rate, <span>\({\dot V_{L,ref}}\)</span>, reference source side volumetric flow rate, <span>\({\dot V_{S,ref}}\)</span>, <span>\(Powe{r_{c,ref}}\)</span>  and reference source side heat transfer rate, <span>\({Q_{source,c,ref}}\)</span>  are the conditions when the heat pump is operating at the highest cooling capacity or reference cooling capacity, <span>\({Q_{c,ref}}\)</span> indicated in the manufacturer’s catalog. Note that the reference conditions for heating mode might differ from the reference conditions specified for the cooling mode.
 
 #### Coefficient estimation procedure:
 
 The generalized least square method is used to generate the coefficients. This method utilizes an optimization method which calculates for the coefficients that will give the least amount of differences between the model outputs and the catalog data. A set of coefficients for the cooling mode is generated which includes A1-A5 for load side heat transfer. The same procedure is repeated for the heating mode to generate the coefficients B1-B5. An information flow chart showing the inputs, reference conditions, performance coefficients and outputs are shown in the figure below:
 
-![](EngineeringReference/media/image5290.png)
+![](media/image5290.png)
 
 Figure 238.  Information Flow Chart for Water-To-Water Heat Pump Equation Fit (Tang 2005)
 
@@ -4567,15 +4613,15 @@ A steady state simulation model for a water-to-water reciprocating vapor compres
 
 Where:
 
-<span>${\dot Q_s}$</span> = Source side heat transfer rate
+<span>\({\dot Q_s}\)</span> = Source side heat transfer rate
 
-<span>${\dot Q_L}$</span> = Load side heat transfer rate
+<span>\({\dot Q_L}\)</span> = Load side heat transfer rate
 
-<span>$\dot W$</span>= Compressor power input
+<span>\(\dot W\)</span>= Compressor power input
 
 The compressor model is based on an isentropic process shown in Figure 239 governed by
 
-<span>$P{V^\gamma }$</span> = Constant
+<span>\(P{V^\gamma }\)</span> = Constant
 
 Where:
 
@@ -4583,7 +4629,7 @@ P = Pressure
 
 v = Specific volume
 
-![](EngineeringReference/media/image5296.png)
+![](media/image5296.png)
 
 Figure 239.  Schematic indicator diagram for a reciprocating Compressor(Jin 2002)
 
@@ -4593,17 +4639,17 @@ Since the refrigerant vapor in the clearance volume as shown in the previous fig
 
 Where:
 
-<span>$\mathop m\limits^ \bullet  $</span>  = refrigerant mass flow rate
+<span>\(\mathop m\limits^ \bullet  \)</span>  = refrigerant mass flow rate
 
 PD = Piston displacement
 
 C   = Clearance factor
 
-<span>$P{}_{dis}$</span> = discharge pressure
+<span>\(P{}_{dis}\)</span> = discharge pressure
 
-<span>$P{}_{suc}$</span> = Suction pressure
+<span>\(P{}_{suc}\)</span> = Suction pressure
 
-<span>$\gamma $</span>     = Isentropic exponent
+<span>\(\gamma \)</span>     = Isentropic exponent
 
 #### Parameter estimation procedure:
 
@@ -4615,19 +4661,19 @@ n Piston displacement, PD
 
 n Clearance factor, C
 
-n Pressure drop across the suction and discharge valves, <span>${\rm{\Delta P}}$</span>
+n Pressure drop across the suction and discharge valves, <span>\({\rm{\Delta P}}\)</span>
 
-n Loss factor used to define the electromechanical losses supposed to be proportional to the theoretical power, <span>${\rm{\eta }}$</span>
+n Loss factor used to define the electromechanical losses supposed to be proportional to the theoretical power, <span>\({\rm{\eta }}\)</span>
 
-n Superheat in <sup>ο</sup>C or F, <span>${\rm{\Delta T}}{}_{{\rm{sh}}}$</span>
+n Superheat in <sup>ο</sup>C or F, <span>\({\rm{\Delta T}}{}_{{\rm{sh}}}\)</span>
 
-n Constant part of the electromechanical losses,<span>${\rm{W}}{}_{{\rm{loss}}}$</span>
+n Constant part of the electromechanical losses,<span>\({\rm{W}}{}_{{\rm{loss}}}\)</span>
 
 n Source side heat transfer coefficient, (UA)<sub>S</sub>
 
 n Load side heat transfer coefficient, (UA)<sub>L</sub>
 
-![](EngineeringReference/media/image5306.png)
+![](media/image5306.png)
 
 Figure 240.  Information Flowchart for Water-To-Water Heat Pump Parameter Estimation Mmodel implementation (Jin 2002)
 
@@ -4637,9 +4683,9 @@ TWiL   = Entering water Load side temperature
 
 TWiS   = Entering water Source side temperature
 
-<span>$\mathop {\rm{m}}\limits^ \bullet  {}_{{\rm{WiL}}}$</span>= Entering water Load side mass flow rate
+<span>\(\mathop {\rm{m}}\limits^ \bullet  {}_{{\rm{WiL}}}\)</span>= Entering water Load side mass flow rate
 
-<span>$\mathop {\rm{m}}\limits^ \bullet  {}_{{\rm{WiS}}}$</span>= Entering water Source side mass flow rate
+<span>\(\mathop {\rm{m}}\limits^ \bullet  {}_{{\rm{WiS}}}\)</span>= Entering water Source side mass flow rate
 
 S      =  Thermostatic Signal
 
@@ -4649,17 +4695,17 @@ The parameter estimation procedure incorporates an objective function that compu
 
 Where
 
-<span>${\rm{W}}{}_{{\rm{cat}}}$</span>= Catalog power consumption
+<span>\({\rm{W}}{}_{{\rm{cat}}}\)</span>= Catalog power consumption
 
-<span>${\rm{W}}{}_{}$</span> = Model power consumption
+<span>\({\rm{W}}{}_{}\)</span> = Model power consumption
 
-<span>${\rm{QL}}{}_{{\rm{cat}}}$</span>= Catalog load side heat transfer
+<span>\({\rm{QL}}{}_{{\rm{cat}}}\)</span>= Catalog load side heat transfer
 
-<span>${\rm{QL}}{}_{}$</span> = Model load side heat transfer
+<span>\({\rm{QL}}{}_{}\)</span> = Model load side heat transfer
 
 Extrapolation beyond the catalog data grants the parameter estimation model an upper hand in comparison with the equation fit and deterministic models. However, the detailed model is computationally more intensive. Moreover, when the model is implemented within a transient system simulation program, it may come across figures that are random and unplanned by the manufacturer such as low water flow rates or extreme temperatures. This oddity may result in unrealistic set of results.
 
-![Jin's flow chart](EngineeringReference/media/image5314.png)
+![Jin's flow chart](media/image5314.png)
 
 Figure 241.  Flow diagram of EnergyPlus Water to Water HeatPump implementation
 
@@ -4677,22 +4723,33 @@ Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simul
 
 Murugappan, Arun. 2002.  Implementing Ground Source Heat Pump and Ground Loop Heat Exchanger Models in the EnergyPlus Simulation Environment, M.S. Thesis, Department of Mechanical and Aerospace Engineering, Oklahoma State University (downloadable from [http://www.hvac.okstate.edu/](http://www.hvac.okstate.edu))
 
+
+
 Variable Refrigerant Flow Heat Pumps <a name="VRF"></a>
 ------------------------------------
 
-There are two common types of variable refrigerant flow heat pump systems:
+A Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
 
-n cooling only or heating only air-conditioning systems (a.k.a. heat pump), or
+There are two common types of VRF systems. 
 
-n heat recovery systems that allow simultaneous cooling and heating
+ * Heat Pump (HP) type: the most general type that can be used for either cooling or heating, but not simultaneously. 
+ 
+ * Heat Recovery (HR) type: can deliver simultaneous heating and cooling to different zones by transferring heat between the cooling and heating indoor units. This generally occurs in the winter season in medium-sized to large-sized commercial buildings with a substantial core such as computer rooms.
 
-Energyplus models heat pump and heat recovery operating modes as described in the section entitled Variable Refrigerant Flow Heat Pump Model. The variable refrigerant flow model currently supports air-, evaporatively-, or water-cooled condenser equipment. Throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located.
+There are two alternative VRF models availabe in EnergyPlus to simulate the energy performance of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems: 
 
-### Variable Refrigerant Flow Heat Pump Model
+ 1. **System Curve based Model (VRF-SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. It corresponds to the *AirConditioner:VariableRefrigerantFlow* object. 
+ 
+ 2. **Physics based Model (VRF-FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
+ 
+ 
+### Variable Refrigerant Flow Heat Pump Model (System Curve Based Model)
 
 #### Overview
 
-The figure below schematically depicts the AirConditioner:VariableRefrigerantFlow (VRF AC) system. The outdoor unit is connected directly to the zone terminal units using a zone terminal unit list (ref: ZoneTerminalUnitList). The VRF AC system conditions multiple zones and is controlled by thermostats located in each zone. Zone terminal units operate to meet the zone sensible cooling or sensible heating requirements as determined by the zone thermostat schedule.
+This section describes the System Curve based VRF Model (VRF-SysCurve), which can address both the heat pump and heat recovery operating modes and support air-, evaporatively-, or water-cooled condenser equipment ( throughout this section, the term “condenser” refers to the outdoor unit where the compressor is located. )
+
+The figure below schematically depicts the AirConditioner:VariableRefrigerantFlow (VRF AC) system. The outdoor unit is connected directly to the zone terminal units using a zone terminal unit list (ref: ZoneTerminalUnitList). The VRF AC system conditions multiple zones and is controlled by thermostats located in each zone. Zone terminal units operate to meet the zone sensible cooling or sensible heating requirements as determined by the zone thermostat schedule. 
 
 When the heat pump does not operate to reclaim waste heat, the VRF AC system can only operate in either cooling *or* heating mode. Based on the master thermostat priority control selection, the operating mode is determined by polling the appropriate zone(s) served by the VRF HP system. When the system is operating in cooling mode, the cooling coils will be enabled only in the terminal units where zone cooling is required. When the system is operating in heating mode, the heating coils will be enabled only in the terminal units where zone heating is required. Supply air fans will continue to operate if the zone terminal unit’s fan operating mode is set to continuous fan.
 
@@ -4700,15 +4757,15 @@ When the heat pump does operate to reclaim waste heat, the VRF AC system can sim
 
 The figure below shows the VRF AC terminal units with draw through fan placement. Blow through fan placement can also be modeled by connecting the supply air fan inlet node to the outside air mixer’s mixed air node if an outdoor air mixer is used or to the zone terminal unit inlet node if an outdoor air mixer is not used. The variable refrigerant flow heat pump coordinates the operation of these components and is modeled as a type of zone equipment where the *zone terminal units* are specified in a zone equipment list (Ref. ZoneHVAC: EquipmentList and ZoneHVAC:EquipmentConnections). The AirConditioner: VariableRefrigerantFlow object *is not* specified in an air primary loop or a zone equipment list object.
 
-![](EngineeringReference/media/image5315.png)
+![](media/image5315.png)
 
 Figure 242. Variable Refrigerant Flow Heat Pump (draw through fan placement)
 
 
 
-![](EngineeringReference/media/image5316.png)
+![](media/image5316.png)
 
-Figure 243. Variable Refrigerant Flow object connections in Energyplus
+Figure 243. Energyplus object connections for VRF-SysCurve model 
 
 The terminal unit is able to model supply air fan operation in two modes: cycling fan – cycling coil (i.e., AUTO fan) and continuous fan – cycling coil (i.e., fan ON). Fan:Simple:OnOff must be used to model AUTO fan, while Fan:Simple:OnOff or Fan:Simple:ConstVolume can be used to model fan ON.
 
@@ -4734,15 +4791,15 @@ The cooling combination ratio correction factor is defined as the total terminal
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{coil(i)\,,\,cooling\,,\,rated}}$</span> = rated total (sensible + latent) cooling capacity in zone *i* (W)
+<span>\({\mathop Q\limits^ \bullet_{coil(i)\,,\,cooling\,,\,rated}}\)</span> = rated total (sensible + latent) cooling capacity in zone *i* (W)
 
-<span>${\mathop Q\limits^ \bullet_{cooling,\,total\,,\,rated}}$</span>   = rated total cooling capacity of heat pump (W)
+<span>\({\mathop Q\limits^ \bullet_{cooling,\,total\,,\,rated}}\)</span>   = rated total cooling capacity of heat pump (W)
 
-<span>$C{R_{\,cooling\,,\,correction}}$</span> = Cooling Combination Ratio capacity correction factor at rated conditions (this value is reported in the eio file)
+<span>\(C{R_{\,cooling\,,\,correction}}\)</span> = Cooling Combination Ratio capacity correction factor at rated conditions (this value is reported in the eio file)
 
-<span>$a - d$</span>                = equation coefficients for cooling combination ratio correction factor
+<span>\(a - d\)</span>                = equation coefficients for cooling combination ratio correction factor
 
-<span>$C{R_{cooling\,,\,rated}}$</span>      = the cooling combination ratio defined as the total indoor terminal unit’s rated total cooling capacity divided by the rated total cooling capacity of the heat pump condenser.
+<span>\(C{R_{cooling\,,\,rated}}\)</span>      = the cooling combination ratio defined as the total indoor terminal unit’s rated total cooling capacity divided by the rated total cooling capacity of the heat pump condenser.
 
 The sum of the individual zone total cooling requirements is used to calculate the performance of the outdoor condensing unit. The operating capacities of the indoor cooling coils are calculated based on the indoor cooling coil’s rated cooling capacity and the actual operating conditions. The operating capacity of the heat pump condenser is calculated in a similar fashion using a load-weighted average indoor wet-bulb temperature of all operating cooling coils.
 
@@ -4768,21 +4825,21 @@ The operating capacity of the terminal unit’s DX cooling coil is calculated us
 
 where
 
-<span>${T_{wb,i}}$</span> = wet-bulb temperature of the air entering the cooling coil in zone *i* (°C)
+<span>\({T_{wb,i}}\)</span> = wet-bulb temperature of the air entering the cooling coil in zone *i* (°C)
 
-<span>${T_{wb,avg}}$</span>= load-weighted average wet-bulb temperature of the air entering all operating cooling coils (°C)
+<span>\({T_{wb,avg}}\)</span>= load-weighted average wet-bulb temperature of the air entering all operating cooling coils (°C)
 
-<span>${\mathop Q\limits^ \bullet_{zone(i)}}$</span> = total (sensible + latent) cooling load in zone *i* (W)
+<span>\({\mathop Q\limits^ \bullet_{zone(i)}}\)</span> = total (sensible + latent) cooling load in zone *i* (W)
 
-<span>${\mathop Q\limits^ \bullet_{zone,\,total}}$</span> =total (sensible + latent) cooling load in all zones (W)
+<span>\({\mathop Q\limits^ \bullet_{zone,\,total}}\)</span> =total (sensible + latent) cooling load in all zones (W)
 
-<span>$CAPF{T_{\,HP,cooling}}$</span> = heat pump Cooling Capacity Ratio Modifier (function of temperature)
+<span>\(CAPF{T_{\,HP,cooling}}\)</span> = heat pump Cooling Capacity Ratio Modifier (function of temperature)
 
-<span>$CAPF{T_{\,coil,cooling}}$</span> = zone coil Cooling Capacity Ratio Modifier (function of temperature)
+<span>\(CAPF{T_{\,coil,cooling}}\)</span> = zone coil Cooling Capacity Ratio Modifier (function of temperature)
 
-<span>$a - f$</span>  = equation coefficients for Cooling Capacity Ratio Modifier
+<span>\(a - f\)</span>  = equation coefficients for Cooling Capacity Ratio Modifier
 
-<span>${T_c}$</span>    = temperature of the air entering an air-cooled or evaporatively-cooled condenser (°C)
+<span>\({T_c}\)</span>    = temperature of the air entering an air-cooled or evaporatively-cooled condenser (°C)
 
 #### Using multiple curves to define Cooling Capacity Ratio Modifier
 
@@ -4812,11 +4869,11 @@ For the performance data shown below, the boundary curve would be created by ide
 
 Table 73. Performance Data for Variable Refrigerant Flow Air Conditioner Model
 
-![](EngineeringReference/media/image5339.svg.png)
+![](media/image5339.svg.png)
 
 Although the capacity and energy performance curves each have an independent boundary curve input, in this example the same boundary curve may be used for both the capacity and energy input ratio curves. When the “low” and “high” predicted performance data do not line up at the boundary curve points, the boundary curve may have to be modified slightly to allow a smooth transition in performance from the “low” to “high” temperature region. In this case, the boundary curves for capacity and energy may be different.
 
-![](EngineeringReference/media/image5340.png)
+![](media/image5340.png)
 
 Figure 244. Non-Linear Performance of VRF Heat Pump in Cooling Mode
 
@@ -4834,15 +4891,15 @@ The zone terminal unit’s cooling coil is controlled by a zone thermostat and m
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{coil(i)\,,\,cooling\,,\,total}}$</span>= zone terminal unit total (sensible + latent) cooling capacity, [W], report variable “Zone VRF Air Terminal Total Cooling Rate”
+<span>\({\mathop Q\limits^ \bullet_{coil(i)\,,\,cooling\,,\,total}}\)</span>= zone terminal unit total (sensible + latent) cooling capacity, [W], report variable “Zone VRF Air Terminal Total Cooling Rate”
 
-<span>${\mathop Q\limits^ \bullet_{coil(i),\,cooling,\,sensible}}$</span>= zone terminal unit sensible cooling capacity [W], report variable “Zone VRF Air Terminal Sensible Cooling Rate”
+<span>\({\mathop Q\limits^ \bullet_{coil(i),\,cooling,\,sensible}}\)</span>= zone terminal unit sensible cooling capacity [W], report variable “Zone VRF Air Terminal Sensible Cooling Rate”
 
-<span>$PL{R_i}$</span>= cooling coil sensible part-load ratio in zone *i*
+<span>\(PL{R_i}\)</span>= cooling coil sensible part-load ratio in zone *i*
 
-<span>$SH{R_{PLR}}$</span> = cooling coil sensible heat ratio (function of PLR, inlet air wet-bulb temperature, and cooling coil inlet air mass flow rate)
+<span>\(SH{R_{PLR}}\)</span> = cooling coil sensible heat ratio (function of PLR, inlet air wet-bulb temperature, and cooling coil inlet air mass flow rate)
 
-<span>${\mathop m\limits^ \bullet_{_i}}$</span> = cooling coil inlet air mass flow rate [m<sup>3</sup>/s]
+<span>\({\mathop m\limits^ \bullet_{_i}}\)</span> = cooling coil inlet air mass flow rate [m<sup>3</sup>/s]
 
 The terminal unit total cooling (sensible + latent) capacity is then summed to provide the total terminal unit cooling requirement. The cooling coils capacity includes the impacts of fan heat and any outdoor air provided to the zone.
 
@@ -4850,7 +4907,7 @@ The terminal unit total cooling (sensible + latent) capacity is then summed to p
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{cooling,\,TerminalUnits\,}}$</span>= total terminal unit cooling requirement (sensible + latent) in all zones, [W]
+<span>\({\mathop Q\limits^ \bullet_{cooling,\,TerminalUnits\,}}\)</span>= total terminal unit cooling requirement (sensible + latent) in all zones, [W]
 
 The piping correction factor is then used to adjust the total zone cooling requirement to account for piping losses in the air conditioner’s refrigeration piping system.
 
@@ -4868,21 +4925,21 @@ The cooling piping correction factor is calculated using either one or two indep
 
 where
 
-<span>${P_{\,correction,\,cooling}}$</span> = Piping Correction Factor in Cooling Mode
+<span>\({P_{\,correction,\,cooling}}\)</span> = Piping Correction Factor in Cooling Mode
 
 *a - f*       = equation coefficients for piping correction factor in cooling mode
 
 *g*              = user specified piping correction factor for height in cooling mode coefficient
 
-<span>${P_{\,EQ,\,cooling}}$</span> = user specified equivalent piping length in cooling mode [m]
+<span>\({P_{\,EQ,\,cooling}}\)</span> = user specified equivalent piping length in cooling mode [m]
 
-<span>$C{R_{cooling}}$</span> = combination ratio in cooling mode (total rated indoor terminal unit capacity divided by the rated condenser cooling capacity) (reported to eio file)
+<span>\(C{R_{cooling}}\)</span> = combination ratio in cooling mode (total rated indoor terminal unit capacity divided by the rated condenser cooling capacity) (reported to eio file)
 
-<span>${P_H}$</span>           = user specified vertical height used for piping correction factor calculation [m]
+<span>\({P_H}\)</span>           = user specified vertical height used for piping correction factor calculation [m]
 
 An example piping correction factor chart is shown in the following figure. The height selected for use in the equation above is selected to minimize the piping correction factor and serves to identify the worst case piping losses.
 
-![PipingFactorCorrectionChart](EngineeringReference/media/image5358.png)
+![PipingFactorCorrectionChart](media/image5358.png)
 
 Figure 245. Typical Piping Factor Correction Chart
 
@@ -4896,15 +4953,15 @@ The heat pump’s total available cooling capacity is then calculated as:
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{cooling\,,\,total}}$</span> = total heat pump condenser cooling load (W)
+<span>\({\mathop Q\limits^ \bullet_{cooling\,,\,total}}\)</span> = total heat pump condenser cooling load (W)
 
-<span>${\mathop Q\limits^ \bullet_{HP,\,cooling,\,\,total}}$</span> = heat pump total available cooling capacity (W)
+<span>\({\mathop Q\limits^ \bullet_{HP,\,cooling,\,\,total}}\)</span> = heat pump total available cooling capacity (W)
 
 #### Heat Recovery Cooling Capacity Modifier
 
 When operating in heat recovery mode, the heat pump’s available cooling capacity is typically different than the available capacity when operating in cooling only mode. This modifier is used to adjust the available cooling capacity using a fraction when heat recovery is active. This fraction is based on a bi-quadratic equation with indoor and outdoor temperatures used as the independent terms.
 
-*HRCapMod* *<sub>HP,cooling</sub>* = <span>$a + b\left( {T{}_{ent}} \right) + c{\left( {T{}_{ent}} \right)^2} + d\left( {{T_{cond}}} \right) + e{\left( {{T_{cond}}} \right)^2} + f\left( {T{}_{ent}} \right)\left( {{T_{cond}}} \right)$</span>
+*HRCapMod* *<sub>HP,cooling</sub>* = <span>\(a + b\left( {T{}_{ent}} \right) + c{\left( {T{}_{ent}} \right)^2} + d\left( {{T_{cond}}} \right) + e{\left( {{T_{cond}}} \right)^2} + f\left( {T{}_{ent}} \right)\left( {{T_{cond}}} \right)\)</span>
 
 This equation can be used to provide a constant fractional difference for available cooling capacity in heat recovery mode (i.e., only *a* is non-zero) or a fractional term that varies with indoor and outdoor conditions. With very limited performance data available at this time, it is recommended that only the constant (a) term be used at this time. When the VRF system is not operating in heat recovery mode, this fraction is set to 1.The available cooling capacity in heat recovery mode is then:
 
@@ -4912,11 +4969,11 @@ This equation can be used to provide a constant fractional difference for availa
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{HR,cooling,\,total}}$</span> = heat recovery total available cooling capacity (W)
+<span>\({\mathop Q\limits^ \bullet_{HR,cooling,\,total}}\)</span> = heat recovery total available cooling capacity (W)
 
 The figure below shows VRF system laboratory data for cooling only mode (solid characters) and heat recovery mode (dotted characters). Using the limited laboratory data, the available cooling capacity fraction used to model heat recovery mode is approximately 0.91 and the cooling energy fraction is approximately 1.14. This is the only data available at this time to estimate the impact of heat recovery mode on performance. In the bi-quadratic equation, only coefficient a should be used until more complete data sets exist. Laboratory testing will eventually provide more data and better estimates of performance in heat recovery mode.
 
-![](EngineeringReference/media/image5366.png)
+![](media/image5366.png)
 
 Figure 246.  Comparison of cooling only and heat recovery mode operation
 
@@ -4928,7 +4985,7 @@ When the VRF system transitions from cooling only operation to heat recovery ope
 
 
 
-![](EngineeringReference/media/image5367.png)
+![](media/image5367.png)
 
 Figure 247.  Laboratory test identifies performance changes during transition period
 
@@ -4946,7 +5003,7 @@ where:
 
 *Q<sub>HR,avail,cooling</sub>* = available cooling capacity in heat recovery mode (W)
 
-*<span>$\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{t_{c,cool}}}}}\right.}\!\lower0.7ex\hbox{${{t_{c,cool}}}$}}} \right)}}} \right)$</span>*= The multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable “VRF Heat Pump Heat Recovery Status Change Multiplier” (ref: object Output:Variable).
+*<span>\(\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{t_{c,cool}}}}}\right.}\!\lower0.7ex\hbox{${{t_{c,cool}}}$}}} \right)}}} \right)\)</span>*= The multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable “VRF Heat Pump Heat Recovery Status Change Multiplier” (ref: object Output:Variable).
 
 
 
@@ -4954,9 +5011,9 @@ The operating part-load ratio of the VRF system can then be calculated:
 
 <div>$$PLR = {\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{cooling,\,total}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{cooling,\,total}}} {{{\mathop Q\limits^ \bullet  }_{HR,\,avail,\,cooling}}}}}\right.}\!\lower0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{HR,\,avail,\,cooling}}}$}}$$</div>
 
-<span>$PLR$</span>         = heat pump part-load ratio, report variable “VRF Heat Pump Part Load Ratio”
+<span>\(PLR\)</span>         = heat pump part-load ratio, report variable “VRF Heat Pump Part Load Ratio”
 
-Note: for calculation purposes <span>${\mathop Q\limits^ \bullet_{HR,\,avail,\,cooling}}$</span> is equivalent to <span>${\mathop Q\limits^ \bullet_{HR,\,cooling,\,total}}$</span> when heat recovery mode is not active.
+Note: for calculation purposes <span>\({\mathop Q\limits^ \bullet_{HR,\,avail,\,cooling}}\)</span> is equivalent to <span>\({\mathop Q\limits^ \bullet_{HR,\,cooling,\,total}}\)</span> when heat recovery mode is not active.
 
 The heat pump total available cooling capacity must be greater than or equal to the total cooling capacity requested by the zone terminal units. When the total operating capacity of all terminal unit’s will be greater than the available operating capacity of the heat pump condenser, one or more of the terminal unit’s operating capacity must be reduced to the point where the sum of the indoor terminal unit demand request plus piping losses is equal to the total available cooling capacity of the outdoor condenser. At this point, the part-load ratio of the heat pump condenser will be equal to 1.
 
@@ -4966,11 +5023,11 @@ A maximum terminal unit cooling capacity limit is used to restrict the cooling c
 
 where:
 
-<span>$CoolingCapacityLimit(C{L_{cooling}})$</span>= Report variable (ref: Output:Variable) describing the “VRF Heat Pump Maximum Capacity Cooling Rate”, W
+<span>\(CoolingCapacityLimit(C{L_{cooling}})\)</span>= Report variable (ref: Output:Variable) describing the “VRF Heat Pump Maximum Capacity Cooling Rate”, W
 
 When multiple terminal units are operating, the terminal units near their maximum capacity are more likely to be capacity limited than those terminal units operating well below their available capacity. The assumption here is that terminal units that are not capacity limited can provide more refrigerant to meet the same load. When the model finds that there is no terminal unit capacity limit, this variable will report 1E+20 indicating that no limit exists.  The figure below demonstrates the application of the capacity limit factor for the case where all indoor terminal units are operating at different capacities. A solution is reached when the sum of the indoor terminal unit’s cooling capacities (accounting for piping losses) is equal to the heat pump condenser’s available cooling capacity.
 
-![](EngineeringReference/media/image5376.png)
+![](media/image5376.png)
 
 Figure 248. Example of Cooling Capacity Limit
 
@@ -5014,7 +5071,7 @@ As described previously (Ref. Application of Dual Performance Curves), the cooli
 
 where
 
-<span>$EIRF{T_{\,cooling}}$</span> = cooling energy input ratio modifier (function of temperature)
+<span>\(EIRF{T_{\,cooling}}\)</span> = cooling energy input ratio modifier (function of temperature)
 
 #### Cooling Energy Input Ratio Modifier Function of Part-Load Ratio
 
@@ -5024,7 +5081,7 @@ The cooling energy input ratio calculation is based on 2 EIR curves. One is used
 
 where
 
-<span>$EIRFPL{R_{cooling}}$</span> = cooling energy input ratio correction factor (function of part-load ratio)
+<span>\(EIRFPL{R_{cooling}}\)</span> = cooling energy input ratio correction factor (function of part-load ratio)
 
 a-d = coefficient for cooling energy input ratio correlation when part-load ratio ≤ 1
 
@@ -5046,11 +5103,11 @@ P<sub>CrankcaseHeater</sub> = report variable for electric consumption rate of c
 
 P<sub>EvapCoolerPump</sub> = report variable for electric consumption rate of evaporatively-cooled condenser water pump (W)
 
-<span>${P_{defrost}}$</span>         = report variable for average defrost power for the simulation time step (W)
+<span>\({P_{defrost}}\)</span>         = report variable for average defrost power for the simulation time step (W)
 
 When operating in heat recovery mode, equations similar to those used for available cooling capacity are used to model heating electric consumption rate.
 
-*HREIRMod* *<sub>HP,cooling</sub>* = <span>$a + b\left( {{T_{ent}}} \right) + c{\left( {{T_{ent}}} \right)^2} + d\left( {{T_{cond}}} \right) + e{\left( {{T_{cond}}} \right)^2} + f\left( {{T_{ent}}} \right)\left( {{T_{cond}}} \right)$</span>
+*HREIRMod* *<sub>HP,cooling</sub>* = <span>\(a + b\left( {{T_{ent}}} \right) + c{\left( {{T_{ent}}} \right)^2} + d\left( {{T_{cond}}} \right) + e{\left( {{T_{cond}}} \right)^2} + f\left( {{T_{ent}}} \right)\left( {{T_{cond}}} \right)\)</span>
 
 This equation can be used to provide a constant fractional difference for cooling electric consumption rate in heat recovery mode (i.e., only *a* is non-zero) or a fractional term that varies with indoor and outdoor conditions. With very limited performance data available at this time, it is recommended that only the constant (a) term be used at this time. When the VRF system is not operating in heat recovery mode, this fraction is set to 1. The cooling electric consumption rate in heat recovery mode is then:
 
@@ -5058,7 +5115,7 @@ This equation can be used to provide a constant fractional difference for coolin
 
 <div>$$CoolingPowe{r_{HR}} = CoolingPower\left( {HREIRMo{d_{HP,\,cooling}}} \right)$$</div>
 
-<span>$Powe{r_{HR}} = {k_{EIR,\,cool}}\left( {CoolingPowe{r_{HR}}} \right) + \left( {1 - {k_{EIR,\,cool}}} \right)\left( {CoolingPowe{r_{HR}}} \right)\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{\tau_{c,\,EIR,\,cool}}}}}\right.}\!\lower0.7ex\hbox{${{\tau_{c,\,EIR,\,cool}}}$}}} \right)}}} \right)$</span>where:
+<span>\(Powe{r_{HR}} = {k_{EIR,\,cool}}\left( {CoolingPowe{r_{HR}}} \right) + \left( {1 - {k_{EIR,\,cool}}} \right)\left( {CoolingPowe{r_{HR}}} \right)\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{\tau_{c,\,EIR,\,cool}}}}}\right.}\!\lower0.7ex\hbox{${{\tau_{c,\,EIR,\,cool}}}$}}} \right)}}} \right)\)</span>where:
 
 *k<sub>EIR,\\ copl</sub>* = fraction of steady-state cooling electric consumption rate at beginning of heat recovery mode
 
@@ -5066,7 +5123,7 @@ This equation can be used to provide a constant fractional difference for coolin
 
 *CoolingPower<sub>HR</sub>* = cooling electric consumption rate in heat recovery mode (W)
 
-*<span>$\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{\tau_{c,\,EIR,\,cool}}}}}\right.}\!\lower0.7ex\hbox{${{\tau_{c,\,cool}}}$}}} \right)}}} \right)$</span>*= The multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable “VRF Heat Pump Heat Recovery Status Change Multiplier” (ref: Output:Variable).
+*<span>\(\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{\tau_{c,\,EIR,\,cool}}}}}\right.}\!\lower0.7ex\hbox{${{\tau_{c,\,cool}}}$}}} \right)}}} \right)\)</span>*= The multiplier used during the transition period from cooling mode to heat recovery mode. This multiplier can be viewed using the report variable “VRF Heat Pump Heat Recovery Status Change Multiplier” (ref: Output:Variable).
 
 #### Heating Operation
 
@@ -5086,15 +5143,15 @@ The heating combination ratio correction factor is defined as the total terminal
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{coil(i)\,,\,heating\,,\,rated}}$</span> = rated total heating capacity in zone *i* (W)
+<span>\({\mathop Q\limits^ \bullet_{coil(i)\,,\,heating\,,\,rated}}\)</span> = rated total heating capacity in zone *i* (W)
 
-<span>${\mathop Q\limits^ \bullet_{heating,\,total\,,\,rated}}$</span> = rated total heating capacity of heat pump (W)
+<span>\({\mathop Q\limits^ \bullet_{heating,\,total\,,\,rated}}\)</span> = rated total heating capacity of heat pump (W)
 
-<span>$C{R_{\,heating\,,\,\,correction}}$</span> = Heating Combination Ratio capacity correction factor at rated conditions
+<span>\(C{R_{\,heating\,,\,\,correction}}\)</span> = Heating Combination Ratio capacity correction factor at rated conditions
 
-<span>$a - d$</span>        = cubic equation coefficients for heating combination ratio correction factor
+<span>\(a - d\)</span>        = cubic equation coefficients for heating combination ratio correction factor
 
-<span>$C{R_{heating}}$</span> = combination ratio in heating mode (total rated indoor terminal unit capacity divided by the rated condenser heating capacity) (reported to eio file)
+<span>\(C{R_{heating}}\)</span> = combination ratio in heating mode (total rated indoor terminal unit capacity divided by the rated condenser heating capacity) (reported to eio file)
 
 #### Heating Capacity Ratio Modifier (function of temperature)
 
@@ -5112,15 +5169,15 @@ Note that some manufacturers do not provide performance data as a function of ou
 
 where
 
-<span>${T_{db,i}}$</span>= dry-bulb temperature of the air entering the heating coil in zone *i*, °C
+<span>\({T_{db,i}}\)</span>= dry-bulb temperature of the air entering the heating coil in zone *i*, °C
 
-<span>${T_{db,avg}}$</span>= weighted-average dry-bulb temperature of the air entering all operating heating coils, °C
+<span>\({T_{db,avg}}\)</span>= weighted-average dry-bulb temperature of the air entering all operating heating coils, °C
 
-<span>$CAPF{T_{\,heating}}$</span> = Heating Capacity Correction Factor (function of temperature)
+<span>\(CAPF{T_{\,heating}}\)</span> = Heating Capacity Correction Factor (function of temperature)
 
-<span>$a - f$</span>  = bi-quadratic equation coefficients
+<span>\(a - f\)</span>  = bi-quadratic equation coefficients
 
-<span>${T_c}$</span>    = wet-bulb temperature of the air entering an air-cooled condenser, °C
+<span>\({T_c}\)</span>    = wet-bulb temperature of the air entering an air-cooled condenser, °C
 
 The total terminal unit heating capacity required is the simple sum of the terminal unit capacity. If the heat pump is off or there is no zone heating requirement, the terminal unit total heating requirement will be zero. The heating coils capacity includes the impacts of fan heat and any outdoor air provided to the zone.
 
@@ -5128,9 +5185,9 @@ The total terminal unit heating capacity required is the simple sum of the termi
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{heating\,,\,TerminalUnits\,}}$</span>= heat pump’s outdoor condenser total zone heating requirement (W)
+<span>\({\mathop Q\limits^ \bullet_{heating\,,\,TerminalUnits\,}}\)</span>= heat pump’s outdoor condenser total zone heating requirement (W)
 
-<span>${\mathop Q\limits^ \bullet_{coil(i),\,heating,\,total}}$</span>= zone terminal unit total heating capacity [W], report variable “Zone VRF Air Terminal Total Heating Rate”
+<span>\({\mathop Q\limits^ \bullet_{coil(i),\,heating,\,total}}\)</span>= zone terminal unit total heating capacity [W], report variable “Zone VRF Air Terminal Total Heating Rate”
 
 The piping correction factor is then used to adjust the zone heating requirement to account for piping losses in the AC refrigeration system.
 
@@ -5146,15 +5203,15 @@ The piping correction factor in heating mode is calculated based on the length o
 
 where
 
-<span>${P_{correction,\,heating}}$</span> = Piping Correction Factor in Heating Mode
+<span>\({P_{correction,\,heating}}\)</span> = Piping Correction Factor in Heating Mode
 
 *a-f* = equation coefficients for piping correction factor in heating mode
 
 *g  * = user specified piping correction factor for height in heating mode coefficient
 
-<span>${P_{EQ,\,heating}}$</span>= the equivalent piping length for heating specified by the user [m]
+<span>\({P_{EQ,\,heating}}\)</span>= the equivalent piping length for heating specified by the user [m]
 
-<span>${P_H}$</span>          = user specified vertical height used for piping correction factor [m]
+<span>\({P_H}\)</span>          = user specified vertical height used for piping correction factor [m]
 
 The heat pump’s total available heating capacity is then determined using the previously described modifiers.
 
@@ -5164,7 +5221,7 @@ The heat pump’s total available heating capacity is then determined using the 
 
 When operating in heat recovery mode, the heat pump’s available heating capacity is typically different than the available capacity when operating in heating only mode. This modifier is used to adjust the available heating capacity using a fraction when heat recovery is active. This fraction is based on a bi-quadratic equation with indoor and outdoor temperatures used as the independent terms.
 
-*HRCapMod* *<sub>HP,heating</sub>* = <span>$a + b\left( {{T_{ent}}} \right) + c{\left( {{T_{ent}}} \right)^2} + d\left( {{T_{cond}}} \right) + e{\left( {{T_{cond}}} \right)^2} + f\left( {{T_{ent}}} \right)\left( {{T_{cond}}} \right)$</span>
+*HRCapMod* *<sub>HP,heating</sub>* = <span>\(a + b\left( {{T_{ent}}} \right) + c{\left( {{T_{ent}}} \right)^2} + d\left( {{T_{cond}}} \right) + e{\left( {{T_{cond}}} \right)^2} + f\left( {{T_{ent}}} \right)\left( {{T_{cond}}} \right)\)</span>
 
 This equation can be used to provide a constant fractional difference for available heating capacity in heat recovery mode (i.e., only *a* is non-zero) or a fractional term that varies with indoor and outdoor conditions. With very limited performance data available at this time, it is recommended that only the constant (a) term be used at this time. The available heating capacity in heat recovery mode is then:
 
@@ -5188,7 +5245,7 @@ where:
 
 *Q<sub>HR,avail,heating</sub>* = available heating capacity in heat recovery mode (W)
 
-*<span>$\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{t_{c,heat}}}}}\right.}\!\lower0.7ex\hbox{${{t_{c,heat}}}$}}} \right)}}} \right)$</span>*= The multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable “VRF Heat Pump Heat Recovery Status Change Multiplier” (ref: Output:Variable).
+*<span>\(\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{t_{c,heat}}}}}\right.}\!\lower0.7ex\hbox{${{t_{c,heat}}}$}}} \right)}}} \right)\)</span>*= The multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable “VRF Heat Pump Heat Recovery Status Change Multiplier” (ref: Output:Variable).
 
 #### Defrost Energy Input Ratio Modifier (function of temperature)
 
@@ -5208,11 +5265,11 @@ The heat pump’s total (gross) heating capacity is then calculated based on the
 
 where
 
-<span>${\mathop Q\limits^ \bullet_{HP\,,\,total}}$</span> = heat pump total available heating capacity (W)
+<span>\({\mathop Q\limits^ \bullet_{HP\,,\,total}}\)</span> = heat pump total available heating capacity (W)
 
-<span>$PLR$</span>     = heat pump part-load ratio
+<span>\(PLR\)</span>     = heat pump part-load ratio
 
-<span>$HCA{P_{defrost}}$</span>= heating capacity correction factor for defrost mode
+<span>\(HCA{P_{defrost}}\)</span>= heating capacity correction factor for defrost mode
 
 As described for cooling operation, the available heating capacity of the heat pump is compared to the requested heating capacity of all indoor terminal units. If the requested heating capacity of all indoor terminal units is greater than the available heating capacity of the heat pump, one or more of the indoor terminal unit’s capacity is limited such that the sum of the zone terminal unit heating demand plus piping losses is equal to the available heat pump heating capacity (including the impact due to defrost).
 
@@ -5256,7 +5313,7 @@ As described previously (Ref. Application of Dual Performance Curves), the heati
 
 where
 
-<span>$EIRF{T_{\,heating}}$</span> = heating energy input ratio correction factor (function of temperature) (0-1)
+<span>\(EIRF{T_{\,heating}}\)</span> = heating energy input ratio correction factor (function of temperature) (0-1)
 
 Heating Energy Input Ratio Modifier (function of part-load ratio)
 
@@ -5264,7 +5321,7 @@ Heating Energy Input Ratio Modifier (function of part-load ratio)
 
 where
 
-<span>$EIRFPL{R_{heating}}$</span> = heating energy input ratio modifier (function of part-load ratio)
+<span>\(EIRFPL{R_{heating}}\)</span> = heating energy input ratio modifier (function of part-load ratio)
 
 a-d = coefficient for heating energy input ratio modifier when part-load ratio ≤ 1
 
@@ -5278,7 +5335,7 @@ The total power consumed by the heat pump condenser in heating mode is based on 
 
 The operating COP is then calculated as:
 
-The heating COP is then calculated as the ratio of the outdoor unit heating capacity divided by the total electric consumption rate of all components associated with the outdoor unit. Evaporatively-cooled condenser pump power is typically 0 during heating mode operation.<span>$CO{P_{heating}} = {\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{heating,total}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{heating,total}}} {\left( {HeatingPower + {P_{CrankaseHeater}} + {P_{EvapCoolerPower}} + {P_{defrost}}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {HeatingPower + {P_{CrankaseHeater}} + {P_{EvapCoolerPower}} + {P_{defrost}}} \right)}$}}$</span>
+The heating COP is then calculated as the ratio of the outdoor unit heating capacity divided by the total electric consumption rate of all components associated with the outdoor unit. Evaporatively-cooled condenser pump power is typically 0 during heating mode operation.<span>\(CO{P_{heating}} = {\raise0.7ex\hbox{${{{\mathop Q\limits^ \bullet  }_{heating,total}}}$} \!\mathord{\left/ {\vphantom {{{{\mathop Q\limits^ \bullet  }_{heating,total}}} {\left( {HeatingPower + {P_{CrankaseHeater}} + {P_{EvapCoolerPower}} + {P_{defrost}}} \right)}}}\right.}\!\lower0.7ex\hbox{${\left( {HeatingPower + {P_{CrankaseHeater}} + {P_{EvapCoolerPower}} + {P_{defrost}}} \right)}$}}\)</span>
 
 COP<sub>heating</sub>        = operating coefficient of performance, report variable “VRF Heat Pump Heating COP”
 
@@ -5286,7 +5343,7 @@ HeatingPower = operating electric consumption rate, [W], report variable “VRF 
 
 When operating in heat recovery mode, equations similar to those used for available heating capacity are used to model operating power.
 
-*HREIRMod* *<sub>HP,heating</sub>* = <span>$a + b\left( {{T_{ent}}} \right) + c{\left( {{T_{ent}}} \right)^2} + d\left( {{T_{cond}}} \right) + e{\left( {{T_{cond}}} \right)^2} + f\left( {{T_{ent}}} \right)\left( {{T_{cond}}} \right)$</span>
+*HREIRMod* *<sub>HP,heating</sub>* = <span>\(a + b\left( {{T_{ent}}} \right) + c{\left( {{T_{ent}}} \right)^2} + d\left( {{T_{cond}}} \right) + e{\left( {{T_{cond}}} \right)^2} + f\left( {{T_{ent}}} \right)\left( {{T_{cond}}} \right)\)</span>
 
 This equation can be used to provide a constant fractional difference for heating electric consumption rate in heat recovery mode (i.e., only *a* is non-zero) or a fractional term that varies with indoor and outdoor conditions. With very limited performance data available at this time, it is recommended that only the constant (a) term be used at this time. When the VRF system is not operating in heat recovery mode, this fraction is set to 1.The available heating electric consumption rate in heat recovery mode is then calculated as:
 
@@ -5302,7 +5359,7 @@ where:
 
 *HeatingPower<sub>HR</sub>* = heating electric consumption rate in heat recovery mode (W)
 
-*<span>$\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{\tau_{c,\,EIR,\,heat}}}}}\right.}\!\lower0.7ex\hbox{${{\tau_{c,\,EIR,\,heat}}}$}}} \right)}}} \right)$</span>*= The multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable “VRF Heat Pump Heat Recovery Status Change Multiplier” (ref: Output:Variable).
+*<span>\(\left( {1 - {e^{\left( {{\raise0.7ex\hbox{${ - t}$} \!\mathord{\left/ {\vphantom {{ - t} {{\tau_{c,\,EIR,\,heat}}}}}\right.}\!\lower0.7ex\hbox{${{\tau_{c,\,EIR,\,heat}}}$}}} \right)}}} \right)\)</span>*= The multiplier used during the transition period from heating mode to heat recovery mode. This multiplier can be viewed using the report variable “VRF Heat Pump Heat Recovery Status Change Multiplier” (ref: Output:Variable).
 
 #### Operating Coefficient of Performance
 
@@ -5332,7 +5389,7 @@ The difference between the outdoor air humidity ratio (from the weather file) an
 
 <div>$$\Delta {\omega_{coil,out}} = MAX\left[ {1.0E - 6,{\omega_{outdoor}} - {\omega_{sat}}\left( {{T_{coil,out}},OutBaroPress} \right)} \right]$$</div>
 
-Frost formation on the outdoor coil must be periodically removed. The fraction of compressor runtime when the coil is being defrosted is entered by the user. Adjustment factors to total heating coil capacity and input power due to frost formation on the outdoor coil are calculated by an empirical model with <span>$\Delta {\omega_{coil,out}}$</span> as the independent variable as shown below.
+Frost formation on the outdoor coil must be periodically removed. The fraction of compressor runtime when the coil is being defrosted is entered by the user. Adjustment factors to total heating coil capacity and input power due to frost formation on the outdoor coil are calculated by an empirical model with <span>\(\Delta {\omega_{coil,out}}\)</span> as the independent variable as shown below.
 
 <div>$$HCA{P_{defrost}} = 0.909 - 107.33\left( {\Delta {w_{coil\,,\,out}}} \right)$$</div>
 
@@ -5350,25 +5407,1084 @@ If the fractional defrost time period is greater than zero for the simulation ti
 
 where:
 
-<span>${Q_{defrost}}$</span>        = additional indoor heating load due to reverse-cycle defrost (*W*)
+<span>\({Q_{defrost}}\)</span>        = additional indoor heating load due to reverse-cycle defrost (*W*)
 
-<span>${{Q_{total,rated}}}$</span>= total full-load heating capacity of the coil at rated conditions (W)
+<span>\({{Q_{total,rated}}}\)</span>= total full-load heating capacity of the coil at rated conditions (W)
 
-<span>${P_{defrost}}$</span>         = report variable for average defrost power for the simulation time step (W)
+<span>\({P_{defrost}}\)</span>         = report variable for average defrost power for the simulation time step (W)
 
 *DefrostEIRTempModFac* = energy input ratio modifier curve applicable during defrost
 
-<span>${t_{frac\,,\,defrost}}$</span>= defrost time period fraction specified by user
+<span>\({t_{frac\,,\,defrost}}\)</span>= defrost time period fraction specified by user
 
 <div>$$RTF = \left( {{\raise0.7ex\hbox{${PLR}$} \!\mathord{\left/ {\vphantom {{PLR} {PartLoadFrac}}}\right.}\!\lower0.7ex\hbox{${PartLoadFrac}$}}} \right) = runtime\;fraction\;of\;the\;heating\;coil$$</div>
+
+
+### Variable Refrigerant Flow Heat Pump Model (Physics Based Model)
+
+#### Overview
+
+This section describes the Physics based VRF Model (VRF-FluidTCtrl) to simulate the energy performance of Variable Refrigerant Flow (VRF) systems in the heat pump (HP) operation mode (either cooling or heating is provided but not simultaneously). 
+
+Compared with the VRF-SysCurve model, VRF-FluidTCtrl model is more physics-based and thus able to consider the dynamics of more operational parameters which is essential for the description of many enhanced control logics (e.g., the adjustment of superheating degrees during small load operations). Furthermore, this model implements component-level curves rather than the system-level curves, and thus requires much fewer curves as model inputs. The definition of VRF performance data for simulation as part of ASHRAE Standard 205 will ensure VRF manufacturers provide adequate data to create the required performance curves.
+
+The main features of the VRF-FluidTCtrl model include:
+
+ * Introduction of separate curves for capacities and power inputs of indoor and outdoor units instead of overall curves for the entire system.
+
+ * Allowing of variable evaporating and condensing temperatures in the indoor and outdoor units under various operational conditions.
+
+ * Allowing of variable fan speed based on the temperature and zone load in the indoor unit.
+
+ * Allowing of further modifications of operational parameters (e.g., evaporating temperature, superheating degrees, and supply air flow rate) during low load conditions.
+
+ * Development of a physics-based model to calculate thermal loss in the refrigerant piping network (varies with refrigerant flow rate, operational conditions, pipe length, and pipe and insulation materials) instead of a constant correction factor.
+
+These features enhance the simulation accuracy of the VRF system performance in both heating and cooling modes, especially during low load operations. In addition, these features enable the modeling of a multi-stage control strategy to adjust the system capacity during low load conditions, as shown in Figure VRF-FluidTCtrl-1. Further more, the VRF-FluidTCtrl model enables the potential simulation of demand response of VRF systems by directly slowing down the speed of compressors in the outdoor units with invertor technology.
+
+![](media/VRF-FluidTCtrl-1a.png)
+
+Figure VRF-FluidTCtrl-1a. Multi-stage control strategy to adjust the system capacity during low load conditions
+
+Note that a number of calculation steps are coupled together in the VRF-FluidTCtrl model, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the system, which may lead to a different control strategy and thus in reverse affect the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem (refer to Figure VRF-FluidTCtrl-3 for more details). Therefore, the VRF-FluidTCtrl model can have a longer execution time to perform the simulation than the VRF-SysCurve model. 
+
+The object connections for VRF-FluidTCtrl model is similar to those for VRF-SysCurve model. The difference lies in the object used to describe a specific components. For example, VRF-SysCurve model uses  *AirConditioner:VariableRefrigerantFlow* object to describe the VRF outdoor unit performance, while in VRF-FluidTCtrl model the *AirConditioner:VariableRefrigerantFlow* object is used.
+
+![](media/VRF-FluidTCtrl-1b.png)
+
+Figure VRF-FluidTCtrl-1b. Energyplus object connections for VRF-FluidTCtrl model 
+
+
+#### Model Description
+
+Figures VRF-FluidTCtrl-2 and VRF-FluidTCtrl-3 illustrate the overall logic of the VRF-FluidTCtrl algorithms. Detailed calculation procedures and explanations of equations are described in the following sections.
+
+![](media/VRF-FluidTCtrl-2a.png)
+
+*(a)	Heating Mode*
+
+![](media/VRF-FluidTCtrl-2b.png)
+
+*(b)	Cooling Mode*
+
+Figure VRF-FluidTCtrl-2. Schematic Pressure-Enthalpy Diagram for VRF Operation 
+
+![](media/VRF-FluidTCtrl-3a.png)
+
+*(a)	Heating Mode*
+
+![](media/VRF-FluidTCtrl-3b.png)
+
+*(b)	Cooling Mode*
+
+Figure VRF-FluidTCtrl-3. Flow Chart of the VRF-FluidTCtrl Model 
+
+The VRF-FluidTCtrl algorithms are described in details below, including the models of both the indoor and outdoor unit(s) of the VRF system. Because of the different control algorithms used in the outdoor unit for cooling and heating modes, the heating and cooling modes are described separately.
+
+#### *Modeling of the indoor unit (I/U) - Part I*
+
+##### Step 1.1: Obtaining zonal load/condition information
+
+Obtain the following information for each zone from the zone modules within EnergyPlus: 
+
+* zone sensible loads <span>$Q_{in, sensible}$</span>
+
+* zone total loads <span>$Q_{in, total}$</span>
+
+* indoor air temperature <span>$T_{in}$</span>
+
+* indoor air humidity ratio <span>$W_{in}$</span>
+
+The operation mode of the VRF system can therefore be determined from <span>$Q_{in, sensible}$</span>.
+
+##### Step 1.2: Calculate I/U required evaporator/condenser temperature
+
+Evaluate the required coil surface air temperature <span>$T_{fs}$</span> and the required evaporator/condenser refrigerant temperature <span>$T_{e,req}/{T_{c,req}}$</span> for each indoor unit. 
+
+Assuming the coil air flow rate is at the maximum (<span>$G_{a,rate}$</span>), the entering air temperature after the indoor coil fan can be calculated for each indoor unit:
+
+<div>$$T_{coil,in}=T_{in}+Q_{fan}/(G_{a,rate}\times{c_p}\times\rho_{in})$$</div>
+
+Where
+
+<span>$c_p$</span>	air heat capacity (kJ/(kg<span>$\cdot$</span>K))
+
+<span>$G_{a,rate}$</span>	volumetric flow rate of the air through the indoor unit, at the rated conditions (m<sup>3</sup>/s)
+
+<span>$Q_{fan}$</span>	sensible heat released by fan (W)
+
+<span>$T_{coil,in}$</span>	temperature of air entering the indoor coil (°C)
+
+<span>$\rho_{in}$</span>  	density of indoor air, <span>$f_{\rho}(T_{in},W_{in})$</span>  (kg/m<sup>3</sup>)
+
+The supply air temperature <span>$T_{out}$</span> can be calculated by:
+
+<div>$$T_{out}=T_{coil,in}-Q_{in, sensible}/(G_{a,rate}\times{c_p}\times\rho_{in})$$</div>
+
+Where
+
+<span>$T_{out}$</span>	temperature of the air leaving the indoor unit (supply air) (°C)
+
+The coil surface air temperature <span>$T_{fs}$</span> can be calculated, given the bypass factor <span>$BF$</span>:
+
+<div>$$T_{fs}= T_{coil,in}-(T_{coil,in}-T_{out})/(1-BF)$$</div>
+
+Where
+
+<span>$BF$</span>	bypass factor (different values for cooling mode and heating mode) 
+
+<span>$T_{fs}$</span>	indoor unit coil surface air temperature (°C)
+
+In the cooling mode, the superheating degree <span>$SH$</span> is given and thus the required evaporating temperature <span>$Te_{req}$</span> for the associated indoor unit can be obtained:
+
+<div>$$Te_{req}=T_{fs}-[A_c\cdot SH^2+B_c\cdot SH+C_c]$$</div>
+ 
+Where
+
+<span>$A_c$</span>, <span>$B_c$</span>, <span>$C_c$</span>   	coefficients (°C)
+
+<span>$SH$</span> 		superheating degrees for the indoor unit (°C) 
+
+<span>$SH_{ref}$</span> 		reference superheating degrees for the indoor unit (e.g., 3) (°C)
+
+<span>$Te_{req}$</span>		required evaporating temperature for a specific indoor unit (°C)
+
+In the heating mode, the subcooling degree <span>$SC$</span> is given and thus the required condensing temperature <span>$Tc_{req}$</span> for the associated indoor unit can be obtained:
+
+<div>$$Tc_{req}=T_{fs}+[A_h\cdot SC^2+B_h\cdot SC+C_h]$$</div>
+ 
+Where
+
+<span>$A_h$</span>, <span>$B_h$</span>, <span>$C_h$</span>  	coefficients (°C)
+
+<span>$SC$</span> 		subcooling degrees for the indoor unit (°C) 
+
+<span>$SC_{ref}$</span> 		reference subcooling degrees for the indoor unit (e.g., 5) (°C)
+
+<span>$Tc_{req}$</span>		required condensing temperature for a specific indoor unit (°C)
+
+##### Step 1.3: Calculate effective evaporating /condensing temperature
+
+There are two refrigerant temperature control strategies for the indoor unit: (1) *ConstantTemp*, (2) *VariableTemp*.
+
+ - In the *ConstantTemp* strategy, <span>$T_e$</span> and <span>$T_c$</span> are kept at constant values provided by the user.
+
+ - In the *VariableTemp* strategy, <span>$T_e$</span> and <span>$T_c$</span> are determined using the equations below:
+
+In the cooling mode:
+
+<div>$$Te=min\{max[min(Te_{req,i}),Te_{min}],Te_{max}\}$$</div>
+ 
+Where
+
+<span>$Te_{req,i}$</span>		required evaporating temperature for the ith indoor unit (°C)
+
+<span>$Te_{min}$</span>		minimum evaporating temperature for the indoor unit (e.g. 3) (°C)
+
+<span>$Te_{max}$</span>		maximum evaporating temperature for the indoor unit (e.g. 13) (°C)
+
+In the heating mode:
+
+<div>$$Tc=min\{max[min(Tc_{req,i}),Tc_{min}],Tc_{max}\}$$</div>
+ 
+Where
+
+<span>$Tc_{req,i}$</span>		required condensing temperature for the ith indoor unit (°C)
+
+<span>$Tc_{min}$</span>		minimum condensing temperature for the indoor unit (e.g. 42) (°C)
+
+<span>$Tc_{max}$</span>		maximum condensing temperature for the indoor unit (e.g. 46) (°C)
+
+#### *Modeling of the outdoor unit (O/U) - Cooling Mode*
+
+##### Step 2c.1: Piping loss calculation in the cooling mode
+
+Piping loss occurs when the refrigerant flows through the main pipe connecting the indoor and outdoor units. It includes both the refrigerant pressure drop and heat loss. It affects the VRF system operation in several ways. First, the heat loss creates an extra load to the system and leads to higher energy consumptions. Second, the pressure drop and heat loss changes the operational conditions of the compressor (i.e., compressor suction pressure and compressor suction temperature) and thus affects its operational performance. Therefore, the piping loss calculation is critical for the analysis of the whole system.
+
+Note that the change of compressor operational conditions may lead to different control strategies of the system, which in reverse affects the amount of piping loss. So the piping loss analysis and system performance analysis are coupled together. Numerical iterations are designed to address the coupling effect, as described below.
+
+Calculate the refrigerant flow rate for each indoor unit using assumed <span>$h_{Hexin}$</span>:
+
+<div>$$G_i=Q_i/(h_{Hexout,i}-h_{Hexin})$$</div>
+
+Where
+
+<span>$G_i$</span>   	refrigerant flow rate for the i<sup>th</sup> indoor unit (kg/s) 
+
+<span>$Q_i$</span>   	total cooling load of the i<sup>th</sup> zone (W) 
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span>	enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span> is a function of <span>$P_e$</span>, <span>$T_e$</span>, and <span>$SH_i$</span>. It can be calculated using refrigerant thermodynamic property equations <span>$f_{g\_h}(P_e,T_e+SH_i)$</span>.
+
+The enthalpy of the refrigerant in the main loop <span>$h_{Hexout}$</span> can be obtained by calculating the weighted average of the enthalpy of the refrigerant in each indoor unit:
+
+<div>$$h_{Hexout}=\sum(h_{Hexout,i}\times{G_i}/{G_{tot}})$$</div>
+
+<div>$$G_{tot}=\sum{G_i}$$</div>
+
+Where
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+<span>$h_{Hexout}$</span>	enthalpy of the main loop refrigerant leaving indoor units (kJ/kg)
+
+The viscosity of the refrigerant within the pipe can be calculated via:
+
+<div>$$k_{v,1}=P_e/4926000$$</div>
+
+<div>$$k_{v,2}=h_{Hexout}/383.55$$</div>
+
+<div>$$k_{v,3}=(T_{Hexout}+273.15)/344.39$$</div>
+
+<div>$$\mu=10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2+118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}}-8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)$$</div>
+
+Where
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$k_{v,i}$</span>	coefficients to calculate the refrigerant viscosity 
+
+<span>$T_{Hexout}$</span>	temperature of main loop refrigerant leaving indoor units, <span>$f_{g\_t}(P_e,h_{Hexout})$</span> (°C)
+
+<span>$f_{g\_t}$</span> 	functions calculating the temperature of superheating refrigerant 
+
+Given <span>$h_{Hexout}$</span> and <span>$P_e=f_{s\_p}(T_e)$</span>, the following dimensionless quantities describing the refrigerant flow state can be obtained:
+
+<div>$$Re=G_{tot}/3600/(0.25\times\pi\times{D^2})\times{D}/\mu$$</div>
+
+<div>$$Pr=\mu\times{f_{g\_Cp}(P_e,h_{Hexout})}\times{0.001}/f_{g\_\lambda}(P_e,h_{Hexout})$$</div>
+
+<div>$$Nu=0.023\times{Re^{0.8}\times{Pr^{0.3}}}$$</div>
+
+<div>$$St=Nu/Re/Pr$$</div>
+
+Where
+
+<span>$P_e$</span>  	evaporating pressure (Pa) 
+
+<span>$Re$</span> 	Reynolds number 
+
+<span>$Pr$</span> 	Prandtl number 
+
+<span>$Nu$</span> 	Nusselt number 
+
+<span>$St$</span> 	Stanton number 
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$f_{s\_p}$</span> 	functions calculating the pressure of saturated refrigerant 
+
+<span>$f_{g\_Cp}$</span> 	functions calculating the specific heat of superheating refrigerant 
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+Then the piping pressure loss <span>$\Delta{P_{pipe}}$</span> can be obtained using the above dimensionless quantities:
+
+<div>$$\Delta{P_{pipe}}=8\times{St}\times{Pr^{2/3}}\times{L/D}\times{f_{g\_\rho}(P_e,h_{Hexout})}\times{V^2}/2+H\times{f_{g\_\rho}(P_e,h_{Hexout})}\times9.80665$$</div>
+
+<div>$$P_s=P_e-\Delta{P_{pipe}}$$</div>
+
+Where
+
+<span>$f_{g\_\rho}$</span>	functions calculating the density of superheating refrigerant 
+
+<span>$D$</span>   	main pipe diameter (m) 
+
+<span>$H$</span> 	height difference between the outdoor unit node and indoor unit node of the main pipe (m)
+
+<span>$L$</span>   	main pipe length (m) 
+
+<span>$P_s$</span>   	compressor suction pressure (Pa) 
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the pipe (Pa)
+
+<span>$V$</span>	refrigerant flow velocity (m/s)
+
+The suction saturated temperature <span>$T'_e$</span> (i.e., saturated vapor temperature corresponding to the compressor suction pressure) can be obtained via refrigerant thermodynamic property equations:
+
+<div>$$T'_e=f_{s\_t}(P_e-\Delta{P_{pipe}})$$</div>
+
+Where
+
+<span>$f_{s\_t}$</span>	functions calculating the temperature of saturated refrigerant
+
+<span>$T'_e$</span>   	suction saturated temperature at the compressor inlet (°C)
+
+The heat loss through the pipe can be obtained via:
+
+<div>$$k_1=Nu\times{f_{g\_\lambda}(P_e,h_{Hexout})}$$</div>
+
+<div>$$k_2=2\times{\lambda_i}/Ln(1+2\times{W_i}/D)$$</div>
+
+<div>$$k_3=h\times(D+2\times{W_i})$$</div>
+
+<div>$$Q_{pipe}=(\pi\times{L})\times(T_a-T_{Hexout})/(1/k_1+1/k_2+1/k_3)$$</div>
+
+Where
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+<span>$T_a$</span> 	average of outdoor air temperature and indoor temperature (°C)
+
+<span>$T_{Hexout}$</span>	temperature of main pipe refrigerant leaving indoor units (°C) 
+
+<span>$w_i$</span>	pipe insulation thickness (m) 
+
+<span>$k_i$</span>	coefficients for the piping loss calculation  
+
+Note that <span>$Q_{pipe}$</span> is calculated using an assumed <span>$h_{Hexin}$</span>. Its value affects the compressor operation calculations as shown in Step 2c.2~2c.6 and may change the value of condensing temperature <span>$T_c$</span>. This leads to an updated <span>$h_{Hexin}=f(P_c,T_c-SC)$</span>. If the difference between the calculated <span>$h_{Hexin}$</span> and the assumed <span>$h_{Hexin}$</span> is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$h_{Hexin}$</span>.
+
+##### Step 2c.2: Initialize O/U operation conditions
+
+The compressor operation is coupled with a number operational parameters, which makes it difficult to obtain an analytical solution. In the algorithm, an iterative approach is designed to obtain the energy consumption of the compressor (Step 2c.2 – 2c.6).
+
+For the first iteration, 
+
+* Initialize outdoor unit <span>$SC$</span> with the reference value (from IDF input, e.g., 5°C)
+
+* Initialize the compressor power <span>$N_{comp}$</span> with the value calculated from the reference <span>$COP$</span> (e.g., 3.5):
+
+<div>$$N'_{comp}=\frac{\sum_iQ_{in,total,i}}{COP}$$</div>
+
+Where
+
+<span>$N_{comp}$</span>	compressor power (W)
+
+<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (W)
+
+<span>$Q_{in,total,i}$</span>	total cooling load for zone <span>$i$</span> (W)
+
+For the following iterations,
+
+* Initialize <span>$SC$</span> with the calculated value in the previous iteration  
+
+* Initialize the compressor power <span>$N_{comp}$</span> with the calculated value in the previous iteration
+
+The heat rate released from the outdoor unit can be calculated by:
+
+<div>$$Q_{out}=\sum_iQ_{in,total,i}+N_{comp}+Q_{pipe}$$</div> 
+
+Where
+
+<span>$Q_{out}$</span>	heat rate released from the outdoor unit (W)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+##### Step 2c.3: Calculate O/U effective condensing temperature
+
+ (1) Calculate the required coil surface air temperature <span>${T_{fs}}'$</span> for the outdoor unit.
+
+The temperature of the air leaving the outdoor unit <span>${T_{out}}'$</span> can be calculated by:
+ 
+<div>$${T_{out}}'={T_{in}}'+Q_{out}/({G_{a,rate}}'\times{c_p}\times{{\rho_{in}}'})$$</div>
+ 
+Where
+
+<span>${G_{a,rate}}'$</span>	volumetric flow rate of the air through the outdoor unit, at the rating conditions (m<sup>3</sup>/s)
+
+<span>${T_{out}}'$</span>	temperature of the air leaving the outdoor unit (°C)
+
+<span>${T_{in}}'$</span>	temperature of the air entering the outdoor unit, i.e., outdoor air (°C)
+
+<span>${\rho_{in}}'$</span>  	air density at outdoor conditions,<span>$f_{\rho}({T_{in}}',{W_{in}}')$</span>   (kg/m<sup>3</sup>)
+
+The condenser surface temperature <span>${T_{fs}}'$</span> can be calculated by:
+ 
+<div>$${T_{fs}}'={T_{in}}'+({T_{out}}'-{T_{in}}')/(1-{BF_c}')$$</div>
+ 
+Where
+
+<span>${BF_c}'$</span> 	bypass factor for the outdoor unit  
+
+(2) Calculate required condensing temperature for the outdoor unit <span>$Tc_{req}$</span> and then the effective condensing temperature <span>$Tc$</span> (between 42-46°C)
+ 
+<div>$$Tc_{req}={T_{fs}}'+[A_h\cdot SC^2+B_h\cdot SC+C_h]$$</div>
+
+<div>$$Tc=Tc_{req}$$</div>
+
+Where	
+
+<span>$A_h$</span>,<span>$B_h$</span>,<span>$C_h$</span>   	coefficients (°C)
+
+<span>$SC$</span> 		subcooling degrees for the outdoor unit (°C)
+
+<span>$SC_{ref}$</span> 		reference subcooling degrees for the outdoor unit (°C)
+
+<span>$Tc_{req}$</span>		required condensing temperature for the outdoor unit (°C)
+
+<span>$Tc$</span>		effective condensing temperature (°C)
+
+##### Step 2c.4: Calculate required Loading Index 
+
+Loading Index is used to describe the operational mode of the compressor system. The first index represents minimal capacity operation, while the last index represents full capacity operation. 
+
+The required Loading Index can be calculated by the following procedures. 
+
+a. Calculate the evaporative capacity at a variety of Loading Index:
+
+<div>$$M_{cap}=(r_1+r_2T_c+r_3{T_e}'+r_4T_c^2+r_5T_c{T_e}'+r_6{T_e}'^2)$$</div>
+<div>$$Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref} $$</div>
+
+Where	
+
+<span>$C_{cap,system}$</span>	evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (a constant value obtained from manufacturer data)  
+
+<span>$r_1$</span>,…,<span>$r_6$</span>  	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>$rps$</span>	compressor speed (r/s) 
+
+<span>${T_e}'$</span>   	suction saturated temperature at the compressor inlet (°C)
+
+<span>$T_c$</span>	effective condensing temperature (°C)
+
+<span>$M_{cap}$</span>	multiplier for the evaporative capacity calculation (--)
+
+<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (W) 
+
+<span>$Q_{ref}$</span>	rated evaporative capacity (W) 
+
+An example of resulting capacity for different <span>$rps$</span> (at <span>$T_c$</span>=36°C and <span>${T_e}'$</span>=9°C) is presented in Table 1.
+
+Table 1– Evaporative capacity at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>$T_c$</span>=36°C,<span>${T_e}'$</span>=9°C| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>$T_c$</span>=36°C,<span>${T_e}'$</span>=9°C|
+|---------------------|-----------------------------|---------------------|-----------------------------|
+|    1 (18)           |    3.951                    |    2 (25)           |    5.400                    |
+|    3 (30)           |    6.435                    |    4 (36)           |    8.516                    |
+|    5 (45)           |    10.756                   |    6 (60)           |    14.445                   |
+|    7 (75)           |    18.412                   |    8 (90)           |    22.045                   |
+|    9 (108)          |    26.162                   |                     |                             |
+
+b. Find the <span>$rps$</span> range that covers the required evaporative capacity <span>$Q_{rps,modify}$</span>.  
+
+<div>$$Q_{rps,modify}=C_{cap,operation}\times(\sum{Q_{in,total}}+Q_{pipe})$$</div>
+
+<div>$$C_{cap,operation}=C_{cap,density}\times{C_{cap,enthalpy}}$$</div>
+
+<div>$$C_{cap,density}=\rho_{test}/\rho_{real}$$</div>
+
+<div>$$C_{cap,enthalpy}=\frac{h_{Evapout,test}-h_{Evapin,test}}{h_{Compin,real}-h_{Evapin,real}}$$</div>
+
+<div>$$h_{Compin,real}=h_{Hexout,real}+Q_{pipe}/G_{tot}$$</div>
+
+Where	
+
+<span>$C_{cap,operation}$</span> evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., <span>$SH$</span> and <span>$SC$</span>)  
+
+<span>$C_{cap,density}$</span> evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions  
+
+<span>$C_{cap,enthalpy}$</span> evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions  
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+<span>$h_{Evapin,real}$</span> enthalpy of refrigerant entering the evaporators (IU) at real conditions [kJ/kg]
+
+<span>$h_{Evapout,real}$</span> average enthalpy of refrigerant leaving the evaporators (IU) at real conditions [kJ/kg] 
+
+<span>$h_{Evapin,test}$</span> enthalpy of refrigerant entering the evaporator at test conditions (It corresponds to <span>$SC$</span> at test condition(e.g., 5 °C)  and Tc) (kJ/kg)
+
+<span>$h_{Evapout,test}$</span> enthalpy of refrigerant leaving the evaporator at test conditions  (It corresponds to <span>$SH$</span> at test condition(e.g., 8 °C)  and Te) (kJ/kg) 
+
+<span>$h_{Compin}$</span>	enthalpy of refrigerant entering the compressor (kJ/kg)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+For example, if the required capacity is 8 kW, the <span>$rps$</span> range is 30 to 36.
+
+c. Calculate the <span>$rps$</span> that meets the required capacity by interpolation. In the above example, the resulting <span>$rps$</span> is 34.5 <span>$rps$</span>.
+
+d. If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18<span>$rps$</span>), go to Step 2c.5, otherwise skip Step 2c.5 and directly go to Step 2c. 6.
+
+##### Step 2c.5: Modify evaporating temperature to further reduce outdoor unit capacity
+
+If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18<span>$rps$</span>), it means that the zone cooling load is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature <span>$T_e$</span> as well as the superheating degree <span>$SH$</span> is modified to further reduce the outdoor unit capacity. More specifically: 
+
+a. Set <span>$rps$</span> at its minimum value (e.g., 18 <span>$rps$</span>).
+
+b. Update <span>${T_e}'$</span> to meet the required evaporative capacity, using equations described in Step 2c.4a.
+
+c. Update <span>$T_e$</span> to meet the updated <span>${T_e}'$</span>. Note that due to the <span>$T_e$</span> updates, the refrigerant state and flow rate are changed and thus the piping loss analysis should also be repeated (Step 2c.1). So is the calculation of <span>$C_{cap,operation}$</span> (Step 2c.2-2c.3).
+
+d. <span>$SH$</span> can be updated based on the updated <span>$T_e$</span>, using the equations shown in Step 1.2. 
+
+##### Step 2c.6: Calculate the compressor power
+
+(1) Calculate the compressor power by the following procedures.
+
+a. Calculate the compressor power at a variety of loading index using the following equation. The resulting table (Table 2) from the same example used above is shown below. 
+
+<div>$$M_{comp}=c_1+c_2T_c+c_3{T_e}'+c_4T_c^2+c_5T_c{T_e}'+c_6{T_e}'^2$$</div>
+<div>$$N_{comp,rps}=M_{comp} \times N_{comp,ref}$$</div>
+
+Where	
+
+<span>$c_1$</span>,…,<span>$c_6$</span>   	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>${T_e}'$</span> 		suction saturated temperature at the compressor inlet (°C)
+
+<span>$T_c$</span>		effective condensing temperature (°C)
+
+<span>$M_{comp}$</span>		multiplier for the compressor power calculation (--)
+
+<span>$N_{comp,ref}$</span>	rated compressor power  (W)
+
+<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (W)
+
+Table 2 – Outdoor unit compressor power at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>$T_c$</span>=36°C, <span>${T_e}'$</span>=9°C| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>$T_c$</span>=36°C, <span>${T_e}'$</span>=9°C|
+|---------------------|----------------------------|---------------------|----------------------------|
+|    1 (18)           |    0.527                   |    2 (25)           |    0.766                   |
+|    3 (30)           |    0.936                   |    4 (36)           |    1.227                   |
+|    5 (45)           |    1.546                   |    6 (60)           |    2.149                   |
+|    7 (75)           |    2.760                   |    8 (90)           |    3.357                   |
+|    9 (108)          |    4.359                   |                     |                            |
+
+b. According to the <span>$rps$</span> range determined, calculate the compressor power <span>$N_{comp}$</span>  by interpolation. In the above example, the compressor power is 1.155 kW. 
+
+(2) Compare the calculated <span>$N_{comp}$</span> above with the initialized <span>${N_{comp}}'$</span> in Step 2c.2:
+
+* If  <span>${N_{comp}}'-N_{comp}>\delta$</span> then go to Step 2c.2 for a new round of iteration.
+
+* Else, end the iteration and go to Step 2c.7.
+
+##### Step 2c.7: Total power consumption of the outdoor unit
+
+Calculate the total electric power consumption by the outdoor unit:
+
+<div>$$N_{out}=N_{fan}+N_{comp}/e_{inv}$$</div>
+
+Where	
+
+<span>$e_{inv}$</span>	efficiency of the inverter of compressor  
+
+<span>$N_{fan}$</span>	electric power consumption by the outdoor fan (W)
+
+<span>$N_{out}$</span>	total electric power consumption by the outdoor unit (W)
+
+#### *Modeling of the outdoor unit (O/U) - Heating Mode*
+
+##### Step 2h.1: Piping loss calculation in the heating mode
+
+Similarly to that in the cooling mode, the piping loss analysis in the heating mode needs to address the coupling effect between the piping loss and system operations. However, due to the control strategy difference between the two modes, the piping loss algorithm in the heating mode requires different calculation steps and more numerical iterations, as shown below.
+
+Calculate the refrigerant flow rate for each indoor unit using assumed <span>$h_{Hexin}$</span>:
+
+<div>$$G_i=Q_i/(h_{Hexin}-h_{Hexout,i})$$</div>
+
+Where
+
+<span>$G_i$</span>   	refrigerant flow rate for the i<sup>th</sup> indoor unit (kg/s) 
+
+<span>$Q_i$</span>   	total heating load of the i<sup>th</sup> zone (W) 
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span>	enthalpy of the refrigerant leaving a specific indoor unit (kJ/kg)
+
+<span>$h_{Hexout,i}$</span> is a function of <span>$P_c$</span>, <span>$T_c$</span>, and <span>$SC_i$</span>. It can be calculated using refrigerant thermodynamic property equations <span>$f_{g\_h}(P_c,T_c-SC_i)$</span>.
+
+The refrigerant flow rate in the main loop can be obtained by summing up the flow rate in each indoor unit:
+
+<div>$$G_{tot}=\sum{G_i}$$</div>
+
+Where
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+Calculate the average refrigerant pressure and enthalpy within the pipes, using assumed piping pressure loss <span>$\Delta{P_{pipe}}$</span> and <span>$h_{Tdi}$</span>: 
+
+<div>$$P_{ave}=P_c+\Delta{P_{pipe}}/2$$</div>
+
+<div>$$h_{ave}=(h_{Hexin}+h_{Tdi})/2$$</div>
+
+Where
+
+<span>$h_{ave}$</span> 	average refrigerant enthalpy within the main pipe (kJ/kg)
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Tdi}$</span> enthalpy of the refrigerant leaving the compressor (kJ/kg)
+
+<span>$P_{ave}$</span> 	average refrigerant pressure within the main pipe (Pa)
+
+<span>$P_c$</span>   	condensing pressure (Pa) 
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the main pipe (Pa)
+
+The viscosity of the refrigerant within the pipe can be calculated given <span>$P_{ave}$</span> and <span>$h_{ave}$</span>, using the following equations:
+
+<div>$$k_{v,1}=P_{ave}/4926000$$</div>
+
+<div>$$k_{v,2}=h_{ave}/383.55$$</div>
+
+<div>$$k_{v,3}=(T_{ave}+273.15)/344.39$$</div>
+
+<div>$$\mu=10^6\times(4.302\times{k_{v,1}}+0.81622\times{k_{v,1}}^2-120.98\times{k_{v,2}}+139.17\times{k_{v,2}}^2+118.76\times{k_{v,3}}+81.04\times{k_{v,3}}^2+5.7858\times{k_{v,1}}\times{k_{v,2}}-8.3817\times{k_{v,1}}\times{k_{v,3}}-218.48\times{k_{v,2}}\times{k_{v,3}}+21.58)$$</div>
+
+Where
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$k_{v,i}$</span>	coefficients to calculate the refrigerant viscosity 
+
+<span>$h_{ave}$</span> 	average refrigerant enthalpy within the pipes (kJ/kg)
+
+<span>$P_{ave}$</span> 	average refrigerant pressure within the pipes (Pa)
+
+<span>$T_{ave}$</span>	average temperature of refrigerant leaving indoor units, which corresponds to <span>$P_{ave}$</span> and <span>$h_{ave}$</span> (°C)
+
+Given <span>$P_{ave}$</span> and <span>$h_{ave}$</span>, the following dimensionless quantities describing the refrigerant flow state can be obtained:
+
+<div>$$Re=G_{tot}/3600/(0.25\times\pi\times{D^2})\times{D}/\mu$$</div>
+
+<div>$$Pr=\mu\times{f_{g\_Cp}(P_{ave},h_{ave})}\times{0.001}/f_{g\_\lambda}(P_{ave},h_{ave})$$</div>
+
+<div>$$Nu=0.023\times{Re^{0.8}\times{Pr^{0.4}}}$$</div>
+
+<div>$$St=Nu/Re/Pr$$</div>
+
+Where
+
+<span>$Re$</span> 	Reynolds number 
+
+<span>$Pr$</span> 	Prandtl number 
+
+<span>$Nu$</span> 	Nusselt number 
+
+<span>$St$</span> 	Stanton number 
+
+<span>$\mu$</span>	viscosity of the refrigerant within the pipe (Pa-s)
+
+<span>$f_{g\_Cp}$</span> 	functions calculating the specific heat of superheating refrigerant 
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+Then the piping pressure loss <span>$\Delta{P_{pipe}}$</span> can be obtained using the above dimensionless quantities:
+
+<div>$$\Delta{P_{pipe}}=8\times{St}\times{Pr^{2/3}}\times{L/D}\times{f_{g\_\rho}(P_{ave},h_{ave})}\times{V^2}/2-H\times{f_{g\_\rho}(P_{ave},h_{ave})}\times9.80665$$</div>
+
+Where
+
+<span>$f_{g\_\rho}$</span>	functions calculating the density of superheating refrigerant 
+
+<span>$D$</span>   	main pipe diameter (m) 
+
+<span>$H$</span> 	height difference between the outdoor unit node and indoor unit node of the main pipe (m)
+
+<span>$L$</span>   	main pipe length (m) 
+
+<span>$St$</span> 	Stanton number 
+
+<span>$Re$</span> 	Reynolds number 
+
+<span>$Pr$</span> 	Prandtl number 
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the pipe (Pa)
+
+<span>$V$</span>	refrigerant flow velocity (m/s)
+
+Compare the calculated <span>$\Delta{P_{pipe}}$</span> and the one assumed above. If the difference is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$\Delta{P_{pipe}}$</span>.
+
+The compressor discharge saturated temperature <span>$T'_c$</span> (i.e., saturated vapor temperature corresponding to compressor discharge pressure) can be obtained via:
+
+<div>$$T'_c=f_{s\_t}(P_c+\Delta{P_{pipe}})$$</div>
+
+Where
+
+<span>$f_{s\_t}$</span>	functions calculating the temperature of saturated refrigerant
+
+<span>$T'_c$</span>    	discharge saturated temperature at the compressor outlet (°C)
+
+<span>$P_c$</span>    	condensing pressure (Pa)
+
+<span>$\Delta{P_{pipe}}$</span>	pressure drop in the pipe (Pa)
+
+The heat loss through the pipe can be obtained via:
+
+<div>$$k_1=Nu\times{f_{g\_\lambda}(P_{ave},h_{ave})}$$</div>
+
+<div>$$k_2=2\times{\lambda_i}/Ln(1+2\times{W_i}/D)$$</div>
+
+<div>$$k_3=h\times(D+2\times{W_i})$$</div>
+
+<div>$$Q_{pipe}=(\pi\times{L})\times(T_a-T_{Hexin})/(1/k_1+1/k_2+1/k_3)$$</div>
+
+Where
+
+<span>$f_{g\_\lambda}$</span>	functions calculating the conductivity of superheating refrigerant 
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+<span>$T_a$</span> 	average of outdoor air temperature and indoor temperature (°C)
+
+<span>$T_{Hexin}$</span>	average of entering indoor units (°C)
+
+<span>$w_i$</span>	pipe insulation thickness (m) 
+
+<span>$k_i$</span>	coefficients for the piping loss calculation  
+
+The enthalpy of the refrigerant entering the indoor unit can be updated using the calculated <span>$Q_{pipe}$</span>:
+
+<div>$$h_{Tdi}=h_{Hexin}+Q_{pipe}/G_{tot}$$</div>
+
+Where
+
+<span>$h_{Hexin}$</span>	enthalpy of the refrigerant entering the indoor unit (kJ/kg)
+
+<span>$h_{Tdi}$</span> enthalpy of the refrigerant leaving the compressor (kJ/kg)
+
+<span>$G_{tot}$</span>   	refrigerant flow rate in the main loop (kg/s) 
+
+Compare the calculated <span>$h_{Tdi}$</span> and the one assumed above. If the difference is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$h_{Tdi}$</span>.
+
+Note that <span>$Q_{pipe}$</span> is calculated using an assumed <span>$h_{Hexin}$</span> at the beginning of the piping loss algorithm. Its value affects the compressor operation calculations as shown in Step 2h.2~2h.6 and may change the value of evaporating temperature <span>$T_e$</span>. This leads to an updated <span>$h_{Hexin}=f(P_e,T_e+SH,N_{comp},G_{tot})$</span>. If the difference between the calculated result and the assumed value is higher than the assigned tolerance (5%), a new round of iteration is performed using the calculated <span>$h_{Hexin}$</span>.
+
+##### Step 2h.2: Initialize O/U operation conditions
+
+Similar to that in cooling mode, an iteration approach is designed to determine the energy consumption of the compressor (Step 2h. 2 to Step 2h. 6).
+
+For the first iteration, 
+
+* Initialize outdoor unit <span>$SH$</span> with the reference value (from IDF input, e.g., 1.5°C)
+
+* Iinitialize the compressor power <span>$N_{comp}$</span> with the value calculated from the reference <span>$COP$</span> (e.g., 3.5):
+
+<div>$$N'_{comp}=\frac{\sum_iQ_{in,total,i}}{COP}$$</div>
+
+Where
+
+<span>$N_{comp}$</span>	compressor power (W)
+
+<span>$N'_{comp}$</span>	assumed compressor power for the first iteration (W)
+
+<span>$Q_{in,total,i}$</span>	total heating load for zone <span>$i$</span> (W)
+
+For the following iterations,
+
+* Initialize <span>$SH$</span> with the calculated value in the previous iteration  
+
+* Initialize the compressor power <span>$N_{comp}$</span> with the calculated value in the previous iteration
+
+Calculate the heat rate extracted by the outdoor unit by:
+
+<div>$$Q_{out}=\sum_iQ_{in,total,i}+Q_{pipe}-N_{comp}$$</div> 
+
+Where
+
+<span>$Q_{out}$</span>	heat rate extracted by the outdoor unit (W)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+##### Step 2h.3: Calculate O/U effective evaporating temperature
+
+(1) Calculate the required coil surface air temperature <span>${T_{fs}}'$</span> for the outdoor unit.
+
+The enthalpy of the air leaving the outdoor unit can be calculated by:
+ 
+<div>$${H_{fs}}'={H_{in}}'-Q_{out}/({G_{a,rate}}'\times{\rho_o})/(1-BF')$$</div>
+
+The coil surface air temperature <span>${T_{fs}}'$</span> can be calculated from the <span>${H_{fs}}'$</span>:
+
+<div>$$if\quad{H_{fs}}'<H_{98\%,W_o}\quad{then}\quad{T_{fs}}'=f({H_{fs}}',98\%)$$</div>
+
+<div>$$if\quad{H_{fs}}'\ge{H_{98\%,W_o}}\quad{then}\quad{T_{fs}}'=f({H_{fs}}',W_o)$$</div>
+ 
+Where
+
+<span>$BF'$</span> 	bypass factor for the outdoor unit  
+
+<span>${G_{a,rate}}'$</span>	volumetric flow rate of the air through the outdoor unit, at the rating conditions (m<sup>3</sup>/s)
+
+<span>${H_{fs}}'$</span>	enthalpy of the air leaving the outdoor unit (kJ/kg)
+
+<span>${H_{in}}'$</span>	enthalpy of the air entering the outdoor unit, i.e., outdoor air (kJ/kg)
+
+<span>$W_o$</span>       humidity ratio of the outdoor air (kg/kg)
+
+<span>$\rho_o$</span>     density of the outdoor air (kg/m<sup>3</sup>)
+
+(2) Calculate required evaporating temperature for the outdoor unit <span>$Te_{req}$</span> and then the effective evaporating temperature <span>$Te$</span>.
+ 
+<div>$$Te_{req}={T_{fs}}'-[{A_c}'\cdot SH^2+{B_c}'\cdot SH+{C_c}']$$</div>
+
+<div>$$Te=Te_{req}$$</div>
+
+Where	
+
+<span>${A_c}'$</span>,<span>${B_c}'$</span>,<span>${C_c}'$</span>   	coefficients (°C)
+
+<span>$SH$</span>			superheating degrees for the outdoor unit (°C)
+
+<span>$SH_{ref}$</span>	reference superheating degrees for the outdoor unit (°C)
+
+<span>$Te_{req}$</span>	required evaporating temperature for the outdoor unit (°C)
+
+<span>$Te$</span>		effective evaporating temperature (°C)
+
+##### Step 2h.4: Calculate required compressor Loading Index
+
+Calculate the required compressor Loading Index by the following procedures.
+
+a. Calculate the evaporative capacity at a variety of speeds:
+
+<div>$$M_{cap}=C_{cap,system}\times(r_1+r_2{T_c}'+r_3T_e+r_4{T_c}'^2+r_5{T_c}'T_e+r_6T_e^2)$$</div>
+<div>$$Q_{rps}=C_{cap,system} \times M_{cap} \times Q_{ref}$$</div>
+
+Where	
+
+<span>$C_{cap,system}$</span>	evaporative capacity correction factor, describing the possible system configuration difference between test bed and real system (obtained from manufacturer data)  
+
+<span>$r_1$</span>,…,<span>$r_6$</span>  	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>$rps$</span>	compressor speed (r/s) 
+
+<span>$T_e$</span>   	effective evaporating temperature (°C)
+
+<span>$M_{cap}$</span>	multiplier for the evaporative capacity calculation (--)
+
+<span>${T_c}'$</span>	discharge saturated temperature at the compressor outlet (°C)
+
+<span>$Q_{rps}$</span>	evaporative capacity corresponding to <span>$rps$</span> (W) 
+
+<span>$Q_{ref}$</span>	rated evaporative capacity (W) 
+
+An example of resulting capacity for different <span>$rps$</span> (at <span>${T_c}'$</span>=36°C and <span>$T_e$</span>=9°C) is presented in Table 3.
+
+Table 3– evaporative capacity at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>${T_c}'$</span>=36°C,<span>$T_e$</span>=9°C| Loading Index (<span>$rps$</span>) | Evaporative Capacity (kW),<span>${T_c}'$</span>=36°C,<span>$T_e$</span>=9°C|
+|---------------------|-----------------------------|---------------------|-----------------------------|
+|    1 (18)           |    3.951                    |    2 (25)           |    5.400                    |
+|    3 (30)           |    6.435                    |    4 (36)           |    8.516                    |
+|    5 (45)           |    10.756                   |    6 (60)           |    14.445                   |
+|    7 (75)           |    18.412                   |    8 (90)           |    22.045                   |
+|    9 (108)          |    26.162                   |                     |                             |
+
+b. Find the <span>$rps$</span> range that covers the required evaporative capacity <span>$Q_{rps,modify}$</span>.  
+
+<div>$$Q_{rps,modify}=C_{cap,operation}\times(\sum{Q_{in,total}}+Q_{pipe}-N_{comp})$$</div>
+
+<div>$$C_{cap,operation}=C_{cap,density}\times{C_{cap,enthalpy}}$$</div>
+
+<div>$$C_{cap,density}=\rho_{test}/\rho_{real}$$</div>
+
+<div>$$C_{cap,enthalpy}=\frac{h_{Evapout,test}-h_{Condout,test}}{h_{Compin,real}-h_{Condout,real}}$$</div>
+
+Where	
+
+<span>$C_{cap,operation}$</span>	evaporative capacity correction factor, describing the operational difference between test cases and real cases (i.e., <span>$SH$</span> and <span>$SC$</span>)  
+
+<span>$C_{cap,density}$</span>	evaporative capacity correction factor, describing the variations of refrigerant density at test conditions and real operational conditions  
+
+<span>$C_{cap,enthalpy}$</span>	evaporative capacity correction factor, describing the variations of refrigerant enthalpy at test conditions and real operational conditions  
+
+<span>$h_{Condout,test}$</span> 	enthalpy of refrigerant leaving the condensers (IU) at test conditions  (It corresponds to <span>$SH$</span> at test condition(e.g., 8°C)  and <span>$Te$</span>) (kJ/kg) 
+
+<span>$h_{Condout,real}$</span> 	average enthalpy of refrigerant leaving the condensers (IU) at real conditions (kJ/kg)
+
+<span>$h_{Compin,real}$</span>	enthalpy of refrigerant entering the compressor at real conditions (It corresponds to <span>$SH$</span> and <span>$Te$</span> at real conditions) (kJ/kg)
+
+<span>$Q_{pipe}$</span> 	heat loss through the pipe (W)
+
+For example, if the required capacity is 8 kW, the <span>$rps$</span> range is 30 to 36 <span>$rps$</span> based on Table 3.
+
+c. Calculate the <span>$rps$</span> that meets the need by interpolation. In the above example, the resulting <span>$rps$</span> is 34.5 <span>$rps$</span>.
+
+d. If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18<span>$rps$</span>), go to Step 2h. 5; otherwise, skip Step 2h. 5 and go to Step 2h. 6.
+
+##### Step 2h.5: Modify evaporating temperature to further reduce outdoor unit capacity 
+
+If the calculated <span>$rps$</span> is lower than the minimum <span>$rps$</span> (e.g. 18 <span>$rps$</span>), it means that the zone heating load (indoor unit side) is so low that it leads to an evaporative capacity (outdoor unit side) which is even lower than the system evaporative capacity corresponding to the minimum compressor speed. In this situation, the evaporating temperature <span>$Te$</span> as well as the superheating degree <span>$SH$</span> is modified to further reduce the outdoor unit capacity. More specifically: 
+
+a. Set <span>$rps$</span> at its minimum value (e.g., 18 <span>$rps$</span>).
+
+b. Update <span>$Te$</span> to meet the required evaporative capacity, using equations described in Step 2h.4a.
+
+c. <span>$SH$</span> for each indoor unit can be updated using the equations shown in Step 1.2.
+
+It should be noted that, different from the corresponding step in the cooling mode (Step 2c.5), the <span>$Te$</span> and <span>$SH$</span> updates in the heating mode do not affect the refrigerant state and flow rate calculations (as shown in Step 2h.1). Therefore, the piping loss analysis does not need to be repeated here.
+
+##### Step 2h.6: Calculate the compressor power
+
+(1) Calculate the compressor power by the following procedures.
+
+a. Calculate the compressor power at a variety of Loading Index using the following equation. The resulting table (Table 4) from the same example is shown below.
+
+<div>$$M_{comp}=c_1+c_2{T_c}'+c_3T_e+c_4{T_c}'^2+c_5{T_c}'T_e+c_6T_e^2$$</div>
+<div>$$N_{comp,rps}=M_{comp} \times N_{comp,ref}$$</div>
+
+Where
+
+<span>$c_1$</span>,…,<span>$c_6$</span>   	empirical coefficients corresponding to <span>$rps$</span>  
+
+<span>$T_e$</span>		effective evaporating temperature (°C)
+
+<span>$T_{e,ref}$</span>		reference evaporating temperature (°C)
+
+<span>${T_c}'$</span>   		discharge saturated temperature at the compressor outlet (°C)
+
+<span>$T_{c,ref}$</span>		reference condensing temperature (°C) 
+
+<span>$M_{comp}$</span>		multiplier for the compressor power calculation (--)
+
+<span>$N_{comp,ref}$</span>	rated compressor power  (W)
+
+<span>$N_{comp,rps}$</span>	compressor power corresponding to <span>$rps$</span> (W)
+
+Table 4 – Outdoor unit compressor power at different Loading Index 
+
+| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>${T_c}'$</span>=36°C, <span>$T_e$</span>=9°C| Loading Index (<span>$rps$</span>) | Elec. Power (kW), <span>${T_c}'$</span>=36°C, <span>$T_e$</span>=9°C|
+|---------------------|----------------------------|---------------------|----------------------------|
+|    1 (18)           |    0.527                   |    2 (25)           |    0.766                   |
+|    3 (30)           |    0.936                   |    4 (36)           |    1.227                   |
+|    5 (45)           |    1.546                   |    6 (60)           |    2.149                   |
+|    7 (75)           |    2.760                   |    8 (90)           |    3.357                   |
+|    9 (108)          |    4.359                   |                     |                            |
+
+b. According to the <span>$rps$</span> range determined, calculate the compressor power <span>$N_{comp}$</span>  by interpolation. In the above example, the compressor power is 1.155 kW. 
+
+(2) Compare the calculated <span>$N_{comp}$</span> above with the initialized <span>${N_{comp}}'$</span> in Step 2h.2:
+
+* If  <span>${N_{comp}}'-N_{comp}>\delta$</span> then go to Step 2h.2 for a new round of iteration.
+
+* Else, end the iteration and go to Step 2h.7.
+
+##### Step 2h.7: Total power consumption of the outdoor unit
+
+Same as that in the cooling mode (Step 2c. 7)
+
+#### *Modeling of the indoor unit (I/U) - Part II - Cooling Mode*
+##### Step 3c.1: Update air flow rate for each indoor unit
+(1) Calculate coil surface temperature for each indoor unit:
+
+<div>$$T_{fs}=T_e+[A_c\cdot SH^2+B_c\cdot SH+C_c]$$</div>
+
+Where	
+
+<span>$T_e$</span>	evaporating temperature decided in the outdoor unit calculations (°C)
+
+<span>$T_{fs}$</span>	coil surface temperature (°C)
+
+<span>$SH$</span>	superheating degrees decided in the outdoor unit calculations (°C)
+
+2)	Calculate the enthalpy of the air at the coil surface, <span>$H_{fs}$</span>:
+
+<div>$$if\quad{T_{fs}}<T_{98\%,W_{in}}\quad{then}\quad{H_{fs}}=f(T_{fs},98\%)$$</div>
+
+<div>$$if\quad{T_{fs}}\ge{T_{98\%,W_{in}}}\quad{then}\quad{H_{fs}}=f(T_{fs},W_{in})$$</div>
+
+Where
+
+<span>$T_{98\%,W_{in}}$</span>	dew point temperature of the indoor air (°C)
+
+<span>$H_{fs}$</span> 		enthalpy of the air at the coil surface (kJ/kg)
+
+3)	Calculate the required air flow rate <span>$G_a$</span> for each indoor unit:
+
+<div>$$G_a=Q_{in,total}/[(H_{coil,in}-H_{fs})\times{(1-BF)}\times{\rho_{in}}]$$</div> 
+
+Where
+
+<span>$Q_{in,total}$</span>	total cooling load for the zone (W)
+
+<span>$H_{coil,in}$</span>	enthalpy of the entering air of the indoor unit (kJ/kg)
+
+<span>$\rho_{in}$</span> density of indoor air,<span>$f_{\rho}(T_{in},W_{in})$</span> (kg/m<sup>3</sup>)
+
+4)	Decide whether to modify <span>$SH$</span> for further indoor unit capacity reduction.
+
+* If <span>$G_a$</span> < <span>$G_{a,min}$</span> (e.g., <span>$0.7\times$</span><span>$G_{a,rate}$</span>) go to Step 3c. 2
+
+* Else, directly go to Step 3c. 3
+
+##### Step 3c.2: Modify <span>$SH$</span> to adjust the indoor unit capacity 
+
+Set <span>$G_a$</span> at its minimum value (e.g., <span>$0.7\times$</span><span>$G_{a,rate}$</span>).
+
+The required coil surface temperature <span>$T_{fs}$</span> can be determined as described in Step 1.2.
+
+Given <span>$T_{fs}$</span> and <span>$T_e$</span>, <span>$SH$</span> can be determined using the equation shown in Step 1.3.
+
+* If <span>$SH$</span> > 15°C, Set <span>$SH$</span> as 15°C. On/Off control strategy may be implemented when needed.
+
+#####Step 3c. 3: Total power consumption of the indoor unit
+
+The power consumption of the indoor unit comes from the fan operations. This can be calculated using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
+
+#### *Modeling of the indoor unit (I/U) - Part II - Heating Mode*
+
+#####Step 3h.1:  Update air flow rate for each indoor unit.
+
+1)	Calculate coil surface temperature for all the indoor units:
+
+<div>$$T_{fs}=T_c-[A_h\cdot SC^2+B_h\cdot SC+C_h]$$</div>
+
+Where
+
+<span>$T_c$</span>	condensing temperature decided in the outdoor unit calculations (°C)
+
+<span>$T_{fs}$</span>	coil surface temperature (°C)
+
+<span>$SC$</span>	subcooling degrees decided in the outdoor unit calculations (°C)
+
+2)	Calculate the required air flow rate <span>$G_a$</span> for each indoor unit:
+
+<div>$$G_a=Q_{in,total}/[(T_{fs}-T_{coil,in})\times{(1-BF)}\times{\rho_{in}}]$$</div> 
+
+Where
+
+<span>$Q_{in,total}$</span>	total heating load for the zone (W)
+
+<span>$T_{coil,in}$</span>	temperature of the entering air of the indoor unit (°C)
+
+<span>$\rho_{in}$</span>density of indoor air,<span>$f_{\rho}(T_{in},W_{in})$</span>   (kg/m<sup>3</sup>)
+
+3)	Decide whether to modify <span>$SH$</span> for further indoor unit capacity reduction
+
+* If <span>$G_a$</span> < <span>$G_{a,min}$</span> (e.g., <span>$0.7\times$</span><span>$G_{a,rate}$</span>) go to Step 3h. 2
+
+* Else, directly go to Step 3h. 3 
+
+##### Step 3h.2:  Modify <span>$SC$</span> to modify the indoor unit capacity
+
+Set <span>$G_a$</span> at its minimum value (<span>$0.7\times$</span><span>$G_{a,rate}$</span>).
+
+The required coil surface temperature <span>$T_{fs}$</span> can be determined as described in Step 2.
+
+Given <span>$T_{fs}$</span> and <span>$T_e$</span>, <span>$SC$</span> can be determined using the equation shown in Step 1.3.
+
+* If <span>$SC$</span> > 20°C, Set <span>$SC$</span> as 20°C. On/Off control strategy may be implemented when needed.
+
+##### Step 3h.3: Total power consumption of the indoor unit
+
+Calculate electric power consumption by the indoor unit using the existing VAV fan model in EnergyPlus. Please refer to the current EnergyPlus Engineering Reference for more details.
+
+#### Additional energy consumption by defrost and crankcase heater 
+
+There may be additional energy consumption due to the defrost operation and crankcase heater operation. These components have no impact on the heat pump operations. The calculation methods in the VRF-FluidTCtrl model are the same as those in VRF-SysCurve model. Please refer to the VRF-SysCurve section for more details.
+
 
 ### Zone Terminal Unit List
 
 The zone terminal unit list identifies the terminal units that are connected to a single variable refrigerant flow heat pump. The zone terminal unit list is used exclusively in the variable refrigerant flow (VRF) heat pump object (ref: AirConditioner:VariableRefrigerantFlow) and VRF zone terminal units (ref: ZoneHVAC: TerminalUnit:VariableRefrigerantFlow). Up to 20 terminal units may be connected to a single VRF outdoor condensing unit. This list is extensible if additional indoor terminal units are required. The following figure shows the connection scheme between the zone terminal units, the zone terminal unit list, and finally the VRF AC system. The zone terminal units are connected to the zone through zone inlet and outlet zone nodes. Each zone terminal unit is entered in a list which represents all terminal units connected to a single VRF AC system. And finally, the zone terminal unit list name is entered in the corresponding VRF AC object.
 
-![](EngineeringReference/media/image5454.png)
+![](media/image5454.png)
 
 Figure 249. Zone Terminal List connections in EnergyPlus objects
+
+
+#### References
+
+Raustad R. A variable refrigerant flow heat pump computer model in EnergyPlus, ASHRAE Transactions (2013), 119 (1):1–9.
+
+Hong T, Sun K, Zhang R, Hinokuma R, Kasahara S, Yura Y. Development and Validation of a New VRF Model in EnergyPlus. ASHRAE Winter Conference.
+
 
 Heat Exchangers <a name="HX"></a>
 ---------------
@@ -5379,7 +6495,7 @@ Heat Exchangers <a name="HX"></a>
 
 The input object HeatExchanger:AirToAir:SensibleAndLatent provides a model for a generic, sensible and latent air-to-air heat exchanger that is an HVAC air system component that consists of a heat exchanger and primary/secondary airflow bypass dampers. The specific configuration of the component is shown in the following figure.
 
-![](EngineeringReference/media/image5455.png)
+![](media/image5455.png)
 
 
 
@@ -5427,25 +6543,25 @@ The user must enter the sensible and latent effectiveness of the heat exchanger 
 
 To obtain the “operating” effectiveness of the heat exchanger at different air flow rates, the model first calculates the average volumetric air flow rate through the heat exchanger (average of the supply and exhaust air flow rates) for each simulation time step. Air flows through the heat exchanger may be unbalanced (supply greater than exhaust, or vice versa), but an unbalanced air flow ratio greater than 2:1 is not recommended  (beyond this range a warning message is issued). The model determines the operating effectiveness of the heat exchanger by linear interpolation or extrapolation of the 100% flow and 75% flow effectiveness values specified in the input data file, using the average volumetric air flow rate through the heat exchanger. Extrapolation is allowed down to 50% and up to 130% of the nominal supply air flow rate (beyond this range a warning message is issued).
 
-<span>${\varepsilon_{operating,sensible}} = {\varepsilon_{sensible,75\% \,flow}} + ({\varepsilon_{sensible,100\% \,flow}} - {\varepsilon_{sensible,75\% \,flow}})\left( {\frac{{H{X_{flowratio}} - 0.75}}{{1 - 0.75}}} \right)$</span>  
+<span>\({\varepsilon_{operating,sensible}} = {\varepsilon_{sensible,75\% \,flow}} + ({\varepsilon_{sensible,100\% \,flow}} - {\varepsilon_{sensible,75\% \,flow}})\left( {\frac{{H{X_{flowratio}} - 0.75}}{{1 - 0.75}}} \right)\)</span>  
 
 <div>$${\varepsilon_{operating,latent}} = {\varepsilon_{latent,75\% \,flow}} + ({\varepsilon_{latent,100\% \,flow}} - {\varepsilon_{latent,75\% \,flow}})\left( {\frac{{H{X_{flowratio}} - 0.75}}{{1 - 0.75}}} \right)$$</div>
 
 *where*:
 
-<span>${\varepsilon_{operating,sensible}}$</span> = operating sensible effectiveness of the heat exchanger
+<span>\({\varepsilon_{operating,sensible}}\)</span> = operating sensible effectiveness of the heat exchanger
 
-<span>${\varepsilon_{operating,latent}}$</span>    = operating latent effectiveness of the heat exchanger
+<span>\({\varepsilon_{operating,latent}}\)</span>    = operating latent effectiveness of the heat exchanger
 
-<span>${\varepsilon_{sensible,75\% \,flow}}$</span>  =  sensible effectiveness at 75% airflow condition
+<span>\({\varepsilon_{sensible,75\% \,flow}}\)</span>  =  sensible effectiveness at 75% airflow condition
 
-<span>${\varepsilon_{sensible,100\% \,flow}}$</span> =  sensible effectiveness at 100% airflow condition
+<span>\({\varepsilon_{sensible,100\% \,flow}}\)</span> =  sensible effectiveness at 100% airflow condition
 
-<span>${\varepsilon_{latent,75\% \,flow}}$</span>  =  latent effectiveness at 75% airflow condition
+<span>\({\varepsilon_{latent,75\% \,flow}}\)</span>  =  latent effectiveness at 75% airflow condition
 
-<span>${\varepsilon_{latent,100\% \,flow}}$</span> =  latent effectiveness at 100% airflow condition
+<span>\({\varepsilon_{latent,100\% \,flow}}\)</span> =  latent effectiveness at 100% airflow condition
 
-<span>$H{X_{flowratio}}$</span> = the ratio of the average operating volumetric air flow rate [(supply flow plus exhaust flow) / 2.0] to the nominal supply air flow rate
+<span>\(H{X_{flowratio}}\)</span> = the ratio of the average operating volumetric air flow rate [(supply flow plus exhaust flow) / 2.0] to the nominal supply air flow rate
 
 If the heat exchanger’s supply air inlet temperature is less than the exhaust air inlet temperature, the operating sensible and latent effectivenesses are calculated using the 75% and 100% heating condition values; otherwise, the 75% and 100% cooling effectiveness values are used in Equations and .
 
@@ -5459,11 +6575,11 @@ The supply air conditions leaving the heat exchanger are determined using the he
 
 *where*:
 
-<span>$\mathop m\limits^ \bullet  cp,\min $</span>           = minimum heat capacity rate (W/K)
+<span>\(\mathop m\limits^ \bullet  cp,\min \)</span>           = minimum heat capacity rate (W/K)
 
-<span>$\mathop m\limits^ \bullet  cp,\sup $</span>            = heat capacity rate of the supply air stream (W/K)
+<span>\(\mathop m\limits^ \bullet  cp,\sup \)</span>            = heat capacity rate of the supply air stream (W/K)
 
-<span>$\mathop {\,m}\limits^ \bullet  cp,exh$</span>           = heat capacity rate of the exhaust air stream (W/K)
+<span>\(\mathop {\,m}\limits^ \bullet  cp,exh\)</span>           = heat capacity rate of the exhaust air stream (W/K)
 
 *T<sub>SupAirOut</sub>*<sub>                     </sub> = supply air temperature leaving the heat exchanger (°C)
 
@@ -5471,11 +6587,11 @@ The supply air conditions leaving the heat exchanger are determined using the he
 
 *T<sub>ExhAirIn</sub>*<sub>                         </sub> = exhaust air inlet temperature (°C)
 
-<span>${\omega_{SupAirOut}}$</span>          = supply air humidity ratio leaving the heat exchanger (kg/kg)
+<span>\({\omega_{SupAirOut}}\)</span>          = supply air humidity ratio leaving the heat exchanger (kg/kg)
 
-<span>${\omega_{SupAirIn}}$</span>           = supply air inlet humidity ratio (kg/kg)
+<span>\({\omega_{SupAirIn}}\)</span>           = supply air inlet humidity ratio (kg/kg)
 
-<span>${\omega_{ExhAirIn}}$</span>           = exhaust air inlet humidity ratio (kg/kg)
+<span>\({\omega_{ExhAirIn}}\)</span>           = exhaust air inlet humidity ratio (kg/kg)
 
 Using the supply air outlet temperature and humidity ratio, the enthalpy of the supply air leaving the heat exchanger is calculated.
 
@@ -5501,11 +6617,11 @@ where:
 
 <div>$${\mathop Q\limits^ \bullet_{Sensible}}$$</div>            = sensible heat recovery rate (W)
 
-<span>${\mathop Q\limits^ \bullet_{Total}}$</span>               = total heat recovery rate (W)
+<span>\({\mathop Q\limits^ \bullet_{Total}}\)</span>               = total heat recovery rate (W)
 
 *h<sub>SupAirIn</sub>*            = supply air inlet enthalpy (J/kg)
 
-<span>${\mathop m\limits^ \bullet_{SupAir}}$</span>             = mass flow rate of the supply air stream (kg/s)
+<span>\({\mathop m\limits^ \bullet_{SupAir}}\)</span>             = mass flow rate of the supply air stream (kg/s)
 
 The conditions of the exhaust (secondary) air leaving the heat exchanger are then calculated:
 
@@ -5521,9 +6637,9 @@ The conditions of the exhaust (secondary) air leaving the heat exchanger are the
 
 *h<sub>ExhAirOut</sub>*           = exhaust air enthalpy leaving the heat exchanger (J/kg)
 
-<span>${\mathop m\limits^ \bullet_{ExhAir}}$</span>             = mass flow rate of the exhaust air stream (kg/s)
+<span>\({\mathop m\limits^ \bullet_{ExhAir}}\)</span>             = mass flow rate of the exhaust air stream (kg/s)
 
-<span>${\omega_{ExhAirOut}}$</span>          = exhaust air humidity ratio leaving the heat exchanger (kg/kg)
+<span>\({\omega_{ExhAirOut}}\)</span>          = exhaust air humidity ratio leaving the heat exchanger (kg/kg)
 
 *PsyWFnTdbH* = psychrometric routine calculating air humidity ratio as a function of temperature and enthalpy
 
@@ -5553,45 +6669,45 @@ At the end of each HVAC simulation time step, this object reports the sensible, 
 
 where:
 
-<sub><span>${Q_{SensibleCooling}}$</span>             </sub>= output variable ‘Heat Exchanger Sensible Cooling Energy, J’
+<sub><span>\({Q_{SensibleCooling}}\)</span>             </sub>= output variable ‘Heat Exchanger Sensible Cooling Energy, J’
 
-<span>$\,{\mathop Q\limits^ \bullet_{SensibleCooling}}$</span>          = output variable ‘Heat Exchanger Sensible Cooling Rate, W’ = <div>$${\mathop Q\limits^ \bullet_{Sensible}}$$</div>
+<span>\(\,{\mathop Q\limits^ \bullet_{SensibleCooling}}\)</span>          = output variable ‘Heat Exchanger Sensible Cooling Rate, W’ = <div>$${\mathop Q\limits^ \bullet_{Sensible}}$$</div>
 
                                    during times when the supply air is cooled
 
 *TimeStepSys*           = HVAC system simulation time step, hr
 
-<sub><span>${Q_{LatentCooling}}$</span>                               </sub>= output variable ‘Heat Exchanger Latent Cooling Energy, J’
+<sub><span>\({Q_{LatentCooling}}\)</span>                               </sub>= output variable ‘Heat Exchanger Latent Cooling Energy, J’
 
-<span>$\,{\mathop Q\limits^ \bullet_{LatentCooling}}$</span>           = output variable ‘Heat Exchanger Latent Cooling Rate, W’ = <div>$${\mathop Q\limits^ \bullet_{Latent}}$$</div>
+<span>\(\,{\mathop Q\limits^ \bullet_{LatentCooling}}\)</span>           = output variable ‘Heat Exchanger Latent Cooling Rate, W’ = <div>$${\mathop Q\limits^ \bullet_{Latent}}$$</div>
 
    during times when the supply air is dehumidified
 
-<sub><span>${Q_{TotalCooling}}$</span>                 </sub>= output variable ‘Heat Exchanger Total Cooling Energy, J’
+<sub><span>\({Q_{TotalCooling}}\)</span>                 </sub>= output variable ‘Heat Exchanger Total Cooling Energy, J’
 
-<span>$\,{\mathop Q\limits^ \bullet_{TotalCooling}}$</span>             = output variable ‘Heat Exchanger Total Cooling Rate, W’ = <span>${\mathop Q\limits^ \bullet_{Total}}$</span>during
+<span>\(\,{\mathop Q\limits^ \bullet_{TotalCooling}}\)</span>             = output variable ‘Heat Exchanger Total Cooling Rate, W’ = <span>\({\mathop Q\limits^ \bullet_{Total}}\)</span>during
 
     times when the supply air enthalpy is reduced
 
-<sub><span>${Q_{SensibleHeating}}$</span>             </sub>= output variable ‘Heat Exchanger Sensible Heating Energy, J’
+<sub><span>\({Q_{SensibleHeating}}\)</span>             </sub>= output variable ‘Heat Exchanger Sensible Heating Energy, J’
 
-<span>$\,{\mathop Q\limits^ \bullet_{SensibleHeating}}$</span>          = output variable ‘Heat Exchanger Sensible Heating Rate, W’ = <div>$${\mathop Q\limits^ \bullet_{Sensible}}$$</div>
+<span>\(\,{\mathop Q\limits^ \bullet_{SensibleHeating}}\)</span>          = output variable ‘Heat Exchanger Sensible Heating Rate, W’ = <div>$${\mathop Q\limits^ \bullet_{Sensible}}$$</div>
 
    during times when the supply air is heated
 
-<sub><span>${Q_{LatentHeating}}$</span>                               </sub>= output variable ‘Heat Exchanger Latent Heating Energy, J’
+<sub><span>\({Q_{LatentHeating}}\)</span>                               </sub>= output variable ‘Heat Exchanger Latent Heating Energy, J’
 
-<sub><span>${Q_{LatentHeating}}$</span>                               </sub>= output variable ‘Heat Exchanger Latent Gain Energy, J’
+<sub><span>\({Q_{LatentHeating}}\)</span>                               </sub>= output variable ‘Heat Exchanger Latent Gain Energy, J’
 
-<span>$\,{\mathop Q\limits^ \bullet_{LatentHeating}}$</span>           = output variable ‘Heat Exchanger Latent Gain Rate, W’ = <div>$${\mathop Q\limits^ \bullet_{Latent}}$$</div> during times when the supply air is humidified
+<span>\(\,{\mathop Q\limits^ \bullet_{LatentHeating}}\)</span>           = output variable ‘Heat Exchanger Latent Gain Rate, W’ = <div>$${\mathop Q\limits^ \bullet_{Latent}}$$</div> during times when the supply air is humidified
 
-<sub><span>${Q_{TotalHeating}}$</span>                 </sub>= output variable ‘Heat Exchanger Total Heating Energy, J’
+<sub><span>\({Q_{TotalHeating}}\)</span>                 </sub>= output variable ‘Heat Exchanger Total Heating Energy, J’
 
-<span>$\,{\mathop Q\limits^ \bullet_{TotalHeating}}$</span>             = output variable ‘Heat Exchanger Total Heating Rate, W’ = <span>${\mathop Q\limits^ \bullet_{Total}}$</span>during times when the supply air enthalpy is increased
+<span>\(\,{\mathop Q\limits^ \bullet_{TotalHeating}}\)</span>             = output variable ‘Heat Exchanger Total Heating Rate, W’ = <span>\({\mathop Q\limits^ \bullet_{Total}}\)</span>during times when the supply air enthalpy is increased
 
-<span>$\,{E_{HXUnit}}$</span>                  = output variable ‘Heat Exchanger Electric Energy, J’
+<span>\(\,{E_{HXUnit}}\)</span>                  = output variable ‘Heat Exchanger Electric Energy, J’
 
-<span>${P_{HXUnit}}$</span>                   = output variable ‘Heat Exchanger Electric Power, W’
+<span>\({P_{HXUnit}}\)</span>                   = output variable ‘Heat Exchanger Electric Power, W’
 
 #### Frost Control Methods
 
@@ -5613,15 +6729,15 @@ The user enters a threshold temperature, an initial defrost time fraction, and a
 
 where:
 
-<span>${X_{DefrostTime}}$</span>  = Fractional time period for frost control <span>$\left( {0\,\, \le \,\,\,{X_{DefrostTime}}\,\, \le \,\,1} \right)$</span>
+<span>\({X_{DefrostTime}}\)</span>  = Fractional time period for frost control <span>\(\left( {0\,\, \le \,\,\,{X_{DefrostTime}}\,\, \le \,\,1} \right)\)</span>
 
-<span>${X_{Initial}}$</span>        = Initial defrost time fraction
+<span>\({X_{Initial}}\)</span>        = Initial defrost time fraction
 
-<span>${X_{RateofIncrease}}$</span>= Rate of defrost time fraction increase (K<sup>-1</sup>)
+<span>\({X_{RateofIncrease}}\)</span>= Rate of defrost time fraction increase (K<sup>-1</sup>)
 
-<span>${T_{Threshold}}$</span>     = Threshold temperature (°C)
+<span>\({T_{Threshold}}\)</span>     = Threshold temperature (°C)
 
-<span>${T_{SupAirIn}}$</span>       = Supply air inlet temperature (°C)
+<span>\({T_{SupAirIn}}\)</span>       = Supply air inlet temperature (°C)
 
 During the defrost time, supply air flow is fully bypassed around the heat exchanger core and no heat transfer takes place. For the remainder of the time period, no air is bypassed and full heat exchange is achieved. The average supply air flow bypassed around the heat exchanger core is calculated as follows:
 
@@ -5745,7 +6861,7 @@ This control strategy is typically used in conjunction with economizer operation
 
 As the outdoor air temperature falls further below the setpoint for the supply air outlet temperature (same as the economizer lower temperature limit), the heat exchanger bypass dampers will modulate closed to maintain the desired supply air temperature for a plate heat exchanger. For a rotary heat exchanger the rotary heat exchanger speed will gradually increase to maintain the desired supply air temperature. Modulation of heat exchanger performance will continue until the supply air temperature setpoint can no longer be maintained. This control will attempt to achieve the desired temperature set point whether the heat exchanger is cooling or heating the supply air stream. Care should be used to set the supply outlet air temperature set point to the desired value for proper control.
 
-![](EngineeringReference/media/image5550.png)
+![](media/image5550.png)
 
 Figure 251.  Air to Air Heat Exchanger with Supply Air Temperature Control
 
@@ -5775,7 +6891,7 @@ The time varying calculations proceed as follows. First the *UA* is determined:
 
 <div>$$UA = U{A_{des}}({r_{hA}} + 1)/({({\dot m_{p,des}}{T_{p,des}}/{\dot m_p}{T_p})^{.78}} + {r_{hA}}{({\dot m_{s,des}}{T_{s,des}}/{\dot m_s}{T_s})^{.78}})$$</div>
 
-where *des* means *design*, *p* means *primary*, *s* means *secondary*, *T* is air stream temperature, and <span>$\dot m$</span>is air stream mass flow rate. From the *UA* and the capacity flow ratio the *NTU* is determined: <span>$NTU = UA/{C_{\min }}$</span>. Then the NTU – effectiveness formulas are used to calculate the effectiveness. From the effectiveness and the inlet conditions, outlet condtions are determined.
+where *des* means *design*, *p* means *primary*, *s* means *secondary*, *T* is air stream temperature, and <span>\(\dot m\)</span>is air stream mass flow rate. From the *UA* and the capacity flow ratio the *NTU* is determined: <span>\(NTU = UA/{C_{\min }}\)</span>. Then the NTU – effectiveness formulas are used to calculate the effectiveness. From the effectiveness and the inlet conditions, outlet condtions are determined.
 
 #### Economizer Operation
 
@@ -5791,7 +6907,7 @@ M. Wetter. 1999. *Simulation Model: Air-To-Air Plate Heat Exchanger*, LBNL-42354
 
 The input object HeatExchanger:Desiccant:BalancedFlow provides a model for a desiccant heat exchanger that is an HVAC component used to model both temperature (sensible) and moisture (latent) heat exchange between two air streams (Figure 252). The model assumes balanced air flow through the regeneration and process sides of the heat exchanger (i.e., regeneration and process air volume flow rates and face velocities are the same). Heat exchanger performance is specified through a performance data type object (e.g., Heat Exchanger:Desiccant:BalancedFlow:Performance Data Type 1). Refer to the EnergyPlus Input Output Reference for the specific input syntax for this desiccant heat exchanger object.
 
-![BalancedFlowDesiccantHeatExchanger\_Schematic](EngineeringReference/media/image5554.png)
+![BalancedFlowDesiccantHeatExchanger\_Schematic](media/image5554.png)
 
 Figure 252. Schematic of the Balanced Flow Desiccant Heat Exchanger
 
@@ -5835,35 +6951,35 @@ where:
 
 <div>$${\mathop Q\limits^ \bullet_{Sensible}}$$</div>      = sensible heat transfer rate to the process air stream (W)
 
-<span>${\mathop Q\limits^ \bullet_{Total}}$</span>         = total heat transfer rate to the process air stream (W)
+<span>\({\mathop Q\limits^ \bullet_{Total}}\)</span>         = total heat transfer rate to the process air stream (W)
 
 <div>$${\mathop Q\limits^ \bullet_{Latent}}$$</div>        = latent heat transfer rate to the process air stream (W)
 
-<span>${\mathop m\limits^ \bullet_{Proc}}$</span>         = process air mass flow rate (kg/s)
+<span>\({\mathop m\limits^ \bullet_{Proc}}\)</span>         = process air mass flow rate (kg/s)
 
-<span>$C{p_{Proc,\,\,in}}$</span>     = specific heat of inlet process air (J/kg-K)
+<span>\(C{p_{Proc,\,\,in}}\)</span>     = specific heat of inlet process air (J/kg-K)
 
-<span>${T_{Proc,\,\,out}}$</span>      = process air outlet temperature (°C)
+<span>\({T_{Proc,\,\,out}}\)</span>      = process air outlet temperature (°C)
 
-<span>${T_{Proc,\,\,in}}$</span>        = process air inlet temperature (°C)
+<span>\({T_{Proc,\,\,in}}\)</span>        = process air inlet temperature (°C)
 
-<span>${h_{Proc,\,\,out}}$</span>      = process air outlet enthalpy (J/kg)
+<span>\({h_{Proc,\,\,out}}\)</span>      = process air outlet enthalpy (J/kg)
 
-<span>${h_{Proc,\,\,in}}$</span>        = process air inlet enthalpy (J/kg)
+<span>\({h_{Proc,\,\,in}}\)</span>        = process air inlet enthalpy (J/kg)
 
 
 
 To simplify the accounting of heat exchanger performance, the sensible, latent, and total heat transfer rates for the process side of the heat exchanger are stored in cooling and heating report variables. For example, if the sensible heat transfer rate is negative, the absolute value is stored in a “cooling” rate report variable. Conversely, if the sensible heat transfer rate is positive, the value is stored in a “heating” rate report variable. Similar accounting is performed for the latent and total heat transfer rate variables as follows:
 
-<div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Sensible}} <  = 0} \right){\mathop Q\limits^ \bullet_{SensibleCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Sensible}}} \right)$$</div>
+<div> $$ IF\left( {{{\mathop Q\limits^ \bullet  }_{Sensible}} &lt;  = 0} \right){\mathop Q\limits^ \bullet_{SensibleCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Sensible}}} \right) $$ </div>
 
 <div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Sensible}} > 0} \right){\mathop Q\limits^ \bullet_{SensibleHeating}} = {\mathop Q\limits^ \bullet_{Sensible}}$$</div>
 
-<div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Latent}} <  = 0} \right){\mathop Q\limits^ \bullet_{LatentCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Latent}}} \right)$$</div>
+<div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Latent}} &lt;  = 0} \right){\mathop Q\limits^ \bullet_{LatentCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Latent}}} \right)$$</div>
 
 <div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Latent}} > 0} \right){\mathop Q\limits^ \bullet_{LatentHeating}} = {\mathop Q\limits^ \bullet_{Latent}}$$</div>
 
-<div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Total}} <  = 0} \right){\mathop Q\limits^ \bullet_{TotalCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Total}}} \right)$$</div>
+<div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Total}} &lt;  = 0} \right){\mathop Q\limits^ \bullet_{TotalCooling}} = ABS\left( {{{\mathop Q\limits^ \bullet  }_{Total}}} \right)$$</div>
 
 <div>$$IF\left( {{{\mathop Q\limits^ \bullet  }_{Total}} > 0} \right){\mathop Q\limits^ \bullet_{TotalHeating}} = {\mathop Q\limits^ \bullet_{Total}}$$</div>
 
@@ -5885,43 +7001,43 @@ At the end of each HVAC simulation time step, this object reports the sensible, 
 
 where:
 
-<sub><span>${Q_{SensibleCooling}}$</span>             </sub>= output variable ‘Heat Exchanger Sensible Cooling Energy, J’
+<sub><span>\({Q_{SensibleCooling}}\)</span>             </sub>= output variable ‘Heat Exchanger Sensible Cooling Energy, J’
 
-<span>${\dot Q_{SensibleCooling}}$</span>          = output variable ‘Heat Exchanger Sensible Cooling Rate, W’ = <div>$${\dot Q_{Sensible}}$$</div>
+<span>\({\dot Q_{SensibleCooling}}\)</span>          = output variable ‘Heat Exchanger Sensible Cooling Rate, W’ = <div>$${\dot Q_{Sensible}}$$</div>
 
                                    during times when the process air is cooled
 
 *TimeStepSys*           = HVAC system simulation time step, hr
 
-<sub><span>${Q_{LatentCooling}}$</span>               \\                </sub>= output variable ‘Heat Exchanger Latent Cooling Energy, J’
+<sub><span>\({Q_{LatentCooling}}\)</span>               \\                </sub>= output variable ‘Heat Exchanger Latent Cooling Energy, J’
 
-<span>${\dot Q_{LatentCooling}}$</span>           = output variable ‘Heat Exchanger Latent Cooling Rate, W’ = <span>${\dot Q_{Latent}}$</span>
+<span>\({\dot Q_{LatentCooling}}\)</span>           = output variable ‘Heat Exchanger Latent Cooling Rate, W’ = <span>\({\dot Q_{Latent}}\)</span>
 
    during times when the process air is dehumidified
 
-<sub><span>${Q_{TotalCooling}}$</span>                 </sub>= output variable ‘Heat Exchanger Total Cooling Energy, J’
+<sub><span>\({Q_{TotalCooling}}\)</span>                 </sub>= output variable ‘Heat Exchanger Total Cooling Energy, J’
 
-<span>${\dot Q_{TotalCooling}}$</span>             = output variable ‘Heat Exchanger Total Cooling Rate, W’ = <span>${\dot Q_{Total}}$</span>during
+<span>\({\dot Q_{TotalCooling}}\)</span>             = output variable ‘Heat Exchanger Total Cooling Rate, W’ = <span>\({\dot Q_{Total}}\)</span>during
 
     times when the process air enthalpy is reduced
 
-<sub><span>${Q_{SensibleHeating}}$</span>             </sub>= output variable ‘Heat Exchanger Sensible Heating Energy, J’
+<sub><span>\({Q_{SensibleHeating}}\)</span>             </sub>= output variable ‘Heat Exchanger Sensible Heating Energy, J’
 
-<span>${\dot Q_{SensibleHeating}}$</span>          = output variable ‘Heat Exchanger Sensible Heating Rate, W’ = <span>${\dot Q_{Sensible}}$</span>
+<span>\({\dot Q_{SensibleHeating}}\)</span>          = output variable ‘Heat Exchanger Sensible Heating Rate, W’ = <span>\({\dot Q_{Sensible}}\)</span>
 
    during times when the process air is heated
 
-<sub><span>${Q_{LatentHeating}}$</span>               </sub>= output variable ‘Heat Exchanger Latent Gain Energy, J’
+<sub><span>\({Q_{LatentHeating}}\)</span>               </sub>= output variable ‘Heat Exchanger Latent Gain Energy, J’
 
-<span>${\dot Q_{LatentHeating}}$</span>           = output variable ‘Heat Exchanger Latent Gain Rate, W’ = <span>${\dot Q_{Latent}}$</span> during times when the process air is humidified
+<span>\({\dot Q_{LatentHeating}}\)</span>           = output variable ‘Heat Exchanger Latent Gain Rate, W’ = <span>\({\dot Q_{Latent}}\)</span> during times when the process air is humidified
 
-<sub><span>${Q_{TotalHeating}}$</span>                 </sub>= output variable ‘Heat Exchanger Total Heating Energy, J’
+<sub><span>\({Q_{TotalHeating}}\)</span>                 </sub>= output variable ‘Heat Exchanger Total Heating Energy, J’
 
-<span>${\dot Q_{TotalHeating}}$</span>             = output variable ‘Heat Exchanger Total Heating Rate, W’ = <span>${\dot Q_{Total}}$</span>during times when the process air enthalpy is increased
+<span>\({\dot Q_{TotalHeating}}\)</span>             = output variable ‘Heat Exchanger Total Heating Rate, W’ = <span>\({\dot Q_{Total}}\)</span>during times when the process air enthalpy is increased
 
-<span>${E_{HXUnit}}$</span>                  = output variable ‘Heat Exchanger Electric Energy, J’
+<span>\({E_{HXUnit}}\)</span>                  = output variable ‘Heat Exchanger Electric Energy, J’
 
-<span>${P_{HXUnit}}$</span>                   = output variable ‘Heat Exchanger Electric Power, W’
+<span>\({P_{HXUnit}}\)</span>                   = output variable ‘Heat Exchanger Electric Power, W’
 
 #### Economizer Operation
 
@@ -5945,17 +7061,17 @@ The user is required to enter a nominal volumetric air flow rate and a nominal f
 
 where:
 
-<span>${A_{face}}$</span>          = heat exchanger face area (m<sup>2</sup>)
+<span>\({A_{face}}\)</span>          = heat exchanger face area (m<sup>2</sup>)
 
-<span>${V_{face,nom}}$</span>      = nominal air volume flow rate specified for the heat exchanger (m<sup>3</sup>/s)
+<span>\({V_{face,nom}}\)</span>      = nominal air volume flow rate specified for the heat exchanger (m<sup>3</sup>/s)
 
-<span>${\mathop v\limits^ \bullet_{face,nom}}$</span>      = nominal air face velocity specified for the heat exchanger (m/s)
+<span>\({\mathop v\limits^ \bullet_{face,nom}}\)</span>      = nominal air face velocity specified for the heat exchanger (m/s)
 
-<span>$RFV$</span>         = face velocity of the regeneration (and process) air stream (m/s)
+<span>\(RFV\)</span>         = face velocity of the regeneration (and process) air stream (m/s)
 
-<span>${\mathop m\limits^ \bullet_{Reg,in}}$</span>       = mass flow rate of the regeneration air stream (kg/s)
+<span>\({\mathop m\limits^ \bullet_{Reg,in}}\)</span>       = mass flow rate of the regeneration air stream (kg/s)
 
-<span>${\rho_{Std}}$</span>           = density of air at standard temperature and pressure [dry air at 20°C] (m<sup>3</sup>/kg)
+<span>\({\rho_{Std}}\)</span>           = density of air at standard temperature and pressure [dry air at 20°C] (m<sup>3</sup>/kg)
 
 
 
@@ -5971,17 +7087,17 @@ The dry-bulb temperature of the regeneration outlet air is determined using the 
 
 where:
 
-<span>$RTO$</span> = regeneration outlet air dry-bulb temperature (°C)
+<span>\(RTO\)</span> = regeneration outlet air dry-bulb temperature (°C)
 
-<span>$RWI$</span> = regeneration inlet air humidity ratio (kg/kg)
+<span>\(RWI\)</span> = regeneration inlet air humidity ratio (kg/kg)
 
-<span>$RTI$</span>  = regeneration inlet air dry-bulb temperature (°C)
+<span>\(RTI\)</span>  = regeneration inlet air dry-bulb temperature (°C)
 
-<span>$PWI$</span> = process inlet air humidity ratio (kg/kg)
+<span>\(PWI\)</span> = process inlet air humidity ratio (kg/kg)
 
-<span>$PTI$</span>  = process inlet air dry-bulb temperature (°C)
+<span>\(PTI\)</span>  = process inlet air dry-bulb temperature (°C)
 
-<span>$RFV$</span> = regeneration (and process) face velocity (m/s)
+<span>\(RFV\)</span> = regeneration (and process) face velocity (m/s)
 
 
 
@@ -5991,7 +7107,7 @@ Similarly, the humidity ratio of the regeneration outlet air is defined using th
 
 where:
 
-<span>$RWO$</span> = regeneration outlet air humidity ratio (kg/kg)
+<span>\(RWO\)</span> = regeneration outlet air humidity ratio (kg/kg)
 
 
 
@@ -6005,13 +7121,13 @@ Once the regeneration outlet air conditions are determined as described above, t
 
 where:
 
-<span>${T_{Reg,\,\,in}}$</span>         = actual regeneration inlet air dry-bulb temperature (°C)
+<span>\({T_{Reg,\,\,in}}\)</span>         = actual regeneration inlet air dry-bulb temperature (°C)
 
-<span>${w_{Reg,\,\,in}}$</span>        = actual regeneration inlet air humidity ratio (kg/kg)
+<span>\({w_{Reg,\,\,in}}\)</span>        = actual regeneration inlet air humidity ratio (kg/kg)
 
-<span>${T_{diff}}$</span>           = regeneration air temperature difference based on empirical model (°C)
+<span>\({T_{diff}}\)</span>           = regeneration air temperature difference based on empirical model (°C)
 
-<span>$wdiff$</span>          = regeneration air humidity ratio difference based on empirical model (kg/kg)
+<span>\(wdiff\)</span>          = regeneration air humidity ratio difference based on empirical model (kg/kg)
 
 
 
@@ -6019,7 +7135,7 @@ The regeneration outlet air conditions described above represent the full load o
 
 
 
-<span>$\begin{array}{l}IF\,\,\left( {{w_{diff}} > 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,humidified,\,process\,air\,dehumidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{max, set\,point}}} \right)}}{{{w_{diff}}}}\\ELSE\,IF\,\left( {{w_{diff}} < 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,dehumidified,\,process\,air\,humidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{min, set\,point}}} \right)}}{{{w_{diff}}}}\\END\,IF\\HXPartLoadRatio = MAX\left( {0.0,HXPartLoadRatio} \right)\\HXPartLoadRatio = MIN\,\left( {1.0,HXPartLoadRatio} \right)\end{array}$</span>
+<span>\(\begin{array}{l}IF\,\,\left( {{w_{diff}} > 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,humidified,\,process\,air\,dehumidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{max, set\,point}}} \right)}}{{{w_{diff}}}}\\ELSE\,IF\,\left( {{w_{diff}} &lt; 0.0} \right)\,\,THEN\,\,!\,\,Regen\,\,air\,dehumidified,\,process\,air\,humidified\\\,\,\,\,\,\,\,\,HXPartLoadRatio = \,\frac{{\left( {{w_{Proc,\,\,in}} - {w_{min, set\,point}}} \right)}}{{{w_{diff}}}}\\END\,IF\\HXPartLoadRatio = MAX\left( {0.0,HXPartLoadRatio} \right)\\HXPartLoadRatio = MIN\,\left( {1.0,HXPartLoadRatio} \right)\end{array}\)</span>
 
 If this heat exchanger is not being called by a parent object and no humidity setpoints are placed on the process air outlet node, then the model assumes that the heat exchanger operates for the entire simulation time step when it is available to operate (based on its availability schedule) and there is a temperature and/or humidity ratio difference between the two air streams.
 
@@ -6029,11 +7145,11 @@ EnergyPlus has an established convention for placing information on outlet air n
 
 where:
 
-<span>${T_{Reg,\,\,out}}$</span>       = regeneration outlet air dry-bulb temperature (°C)
+<span>\({T_{Reg,\,\,out}}\)</span>       = regeneration outlet air dry-bulb temperature (°C)
 
-<span>${w_{Reg,\,\,out}}$</span>      = regeneration outlet air humidity ratio (kg/kg)
+<span>\({w_{Reg,\,\,out}}\)</span>      = regeneration outlet air humidity ratio (kg/kg)
 
-<span>$HXPartLoadRatio$</span> = heat exchanger part-load ratio (determined by parent object calling this model, or calculated based on a minimum/maximum humidity ratio setpoints as shown above).
+<span>\(HXPartLoadRatio\)</span> = heat exchanger part-load ratio (determined by parent object calling this model, or calculated based on a minimum/maximum humidity ratio setpoints as shown above).
 
 
 
@@ -6051,13 +7167,13 @@ Using the regeneration outlet air conditions, the heat transfer on the regenerat
 
 where:
 
-<span>${\mathop Q\limits^ \bullet_{Sensible,Reg}}$</span>  = sensible heat transfer rate to the regeneration air stream (W)
+<span>\({\mathop Q\limits^ \bullet_{Sensible,Reg}}\)</span>  = sensible heat transfer rate to the regeneration air stream (W)
 
-<span>${\mathop Q\limits^ \bullet_{Total,Reg}}$</span>     = total heat transfer rate to the regeneration air stream (W)
+<span>\({\mathop Q\limits^ \bullet_{Total,Reg}}\)</span>     = total heat transfer rate to the regeneration air stream (W)
 
-<span>${\mathop m\limits^ \bullet_{Reg}}$</span>          = regeneration air mass flow rate (kg/s)
+<span>\({\mathop m\limits^ \bullet_{Reg}}\)</span>          = regeneration air mass flow rate (kg/s)
 
-<span>$C{p_{Reg,\,\,in}}$</span>      = specific heat of inlet regeneration air (J/kg-K)
+<span>\(C{p_{Reg,\,\,in}}\)</span>      = specific heat of inlet regeneration air (J/kg-K)
 
 
 
@@ -6071,15 +7187,15 @@ Since the model assumes that total and sensible heat transfer is conserved, thes
 
 where:
 
-<span>${h_{Proc,\,\,out}}$</span>      = process outlet air enthalpy (J/kg)
+<span>\({h_{Proc,\,\,out}}\)</span>      = process outlet air enthalpy (J/kg)
 
-<span>${T_{Proc,\,\,out}}$</span>      = process outlet air dry-bulb temperature (°C)
+<span>\({T_{Proc,\,\,out}}\)</span>      = process outlet air dry-bulb temperature (°C)
 
-<span>${w_{Proc,\,\,out}}$</span>      = process outlet air humidity ratio (kg/kg)
+<span>\({w_{Proc,\,\,out}}\)</span>      = process outlet air humidity ratio (kg/kg)
 
-<span>${\dot m_{Proc}}$</span>         = process air mass flow rate (kg/s)
+<span>\({\dot m_{Proc}}\)</span>         = process air mass flow rate (kg/s)
 
-<span>$C{p_{Proc,in}}$</span>     = specific heat of inlet process air (J/kg-K)
+<span>\(C{p_{Proc,in}}\)</span>     = specific heat of inlet process air (J/kg-K)
 
 Like the regeneration outlet air conditions, the process outlet air conditions are also checked for exceeding saturated conditions and, if detected, the temperature and humidity ratio are reset assuming constant enthalpy.
 
@@ -6091,9 +7207,9 @@ Heat recovery electric power is the electric consumption rate of the unit in wat
 
 where:
 
-<span>${P_{HXUnit}}$</span>       = output variable ‘Heat Exchanger Electric Power, W’ reported by the HeatExchanger:Desiccant:BalancedFlow object.
+<span>\({P_{HXUnit}}\)</span>       = output variable ‘Heat Exchanger Electric Power, W’ reported by the HeatExchanger:Desiccant:BalancedFlow object.
 
-<span>${P_{HX,\,nom}}$</span>       = user specified ‘Nominal Electric Power, W’
+<span>\({P_{HX,\,nom}}\)</span>       = user specified ‘Nominal Electric Power, W’
 
 ##### Empirical Model Boundaries (Minimum and Maximum)
 
@@ -6119,15 +7235,15 @@ This model (Object: GroundHeatExchanger:Vertical) documentation is derived from 
 
 #### Long Time-Step Response Factors
 
-Eskilson developed *g*-functions for various borehole configurations. He plotted the g function curves for different sets of borehole spacing to borehole length ratio <span>$B/H$</span> typically for .05, 0.1, 0.15, 0.2, 0.3 and ∞ (∞ represents the single borehole configuration. All the plots were for the ratio of 0.0005 between the borehole radius and the borehole length <span>${r_b}/H$</span>. For any other radius a simple relation between the two radii as given by Eskilson (1987) can be used. Eskilson gives the *g*-function curves for 38 different configurations.
+Eskilson developed *g*-functions for various borehole configurations. He plotted the g function curves for different sets of borehole spacing to borehole length ratio <span>\(B/H\)</span> typically for .05, 0.1, 0.15, 0.2, 0.3 and ∞ (∞ represents the single borehole configuration. All the plots were for the ratio of 0.0005 between the borehole radius and the borehole length <span>\({r_b}/H\)</span>. For any other radius a simple relation between the two radii as given by Eskilson (1987) can be used. Eskilson gives the *g*-function curves for 38 different configurations.
 
-Figure 253 shows the *g*-function plotted against the non-dimensional time defined as <span>$\ln (t/{t_s})$</span>, <span>${t_s} = {H^2}/9\alpha $</span> for various configurations of vertical boreholes with *B/H* ratio of .1 along with single borehole. It is seen from this figure that the thermal interaction between boreholes increases with time and with the number of boreholes in field.
+Figure 253 shows the *g*-function plotted against the non-dimensional time defined as <span>\(\ln (t/{t_s})\)</span>, <span>\({t_s} = {H^2}/9\alpha \)</span> for various configurations of vertical boreholes with *B/H* ratio of .1 along with single borehole. It is seen from this figure that the thermal interaction between boreholes increases with time and with the number of boreholes in field.
 
-![](EngineeringReference/media/image5651.png)
+![](media/image5651.png)
 
 Figure 253.  Short Time Step g Function Curve as an Extension of Long Time Step g Function Curves for Different Configuration of Boreholes (Eskilson 1987, Yavuzturk 1999).
 
-The *g*-functions developed by Eskilson are valid only after time estimated by Eskilson as <span>$5r_b^2/\alpha $</span>. This time varies from 3-6 hours for a typical borehole field. This is because the analytical line source model, based on which the Eskilson’s model was developed, does not give a prompt increase in borehole wall temperature at <span>$r = {r_b}$</span>. It gives acceptable results only after the non-dimensional times of <span>$\alpha t/r_b^2 > 5$</span>. But to model short time responses of a borehole we need response factors, which can give accurate results down to minutes.
+The *g*-functions developed by Eskilson are valid only after time estimated by Eskilson as <span>\(5r_b^2/\alpha \)</span>. This time varies from 3-6 hours for a typical borehole field. This is because the analytical line source model, based on which the Eskilson’s model was developed, does not give a prompt increase in borehole wall temperature at <span>\(r = {r_b}\)</span>. It gives acceptable results only after the non-dimensional times of <span>\(\alpha t/r_b^2 > 5\)</span>. But to model short time responses of a borehole we need response factors, which can give accurate results down to minutes.
 
 #### Short Time-Step Response Factors
 
@@ -6149,7 +7265,7 @@ For example, let us take the sub hourly loads 1,2 & 3. These loads occurred at 0
 
 Thus for each time step since the time step increments are not uniform we need to store the simulation times at which these time-steps occurred, and calculate corresponding *g*-functions at each time-step.
 
-![](EngineeringReference/media/image5655.png)
+![](media/image5655.png)
 
 Figure 254.  Variable Timestep Ground Loop Heat Exchanger Model Schematic Explaining the *g* Function Estimation.
 
@@ -6159,7 +7275,7 @@ Yavuzturk model calculates the outlet fluid temperature by iteration beginning w
 
 A load aggregation scheme was developed for energy simulation software with variable short time steps down to one minute. A major issue in the development was the calculation of the *g*-functions.  As discussed previously in the variable time step environments, the time step increments are not uniform. As a result, g-functions cannot e pre-calculated. Figure 255 shows a schematic of the variable time step ground loop heat exchanger model. The figure shows the larger monthly block loads, hourly loads and sub hourly loads and along with the time of occurrence of those loads. The figure also shows the time at which the *g*-functions are applied to different load blocks.
 
-![](EngineeringReference/media/image5656.png)
+![](media/image5656.png)
 
 Figure 255.  Schematic of Variable Time Step Model *g* Function Calculation.
 
@@ -6169,7 +7285,7 @@ For example from the schematic (Figure 256), for the sub hourly load 1, which oc
 
 Thus, the algorithm keeps track of the sub hourly loads along with their time of occurrence for a user-defined length of time during which the sub hourly calculations are made. The algorithm also estimates the time weighted hourly load from their corresponding sub hourly loads as each hour passes. The sub-hourly loads are time weighted because of the irregular intervals at which the time-step occurs. This is also illustrated in Figure 256. The sub hourly loads 1,2 &3 occur for varying length of time. The load 3 occurs for a longer duration than 1 and 2 in that order. This implies that the load 3 has to be given more weight than 1 and 2. So the sub hourly loads for a particular hour are multiplied by the length of their respective period of occurrence and averaged over the hour. This is further explained by the schematic in Figure 5.
 
-![](EngineeringReference/media/image5657.png)
+![](media/image5657.png)
 
 Figure 256.  Schematic Showing the Calculation of Hourly Load from the Sub Houly Loads.
 
@@ -6177,7 +7293,7 @@ The bottom text in the boxes represents the magnitude of the sub hourly loads in
 
 <div>$${\overline q_1} = \left[ \begin{array}{l}\left( {8.36 \times .159} \right) + \left( {6.51 \times .339} \right) + \left( {10.3 \times .107} \right)\\ + \left( {6.92 \times .162} \right) + \left( {9.03 \times .181} \right) + \left( {12 \times .05} \right)\end{array} \right] = 7.993W/m$$</div>
 
-Where <span>${\overline q_1}$</span> = the first hourly load in W/m
+Where <span>\({\overline q_1}\)</span> = the first hourly load in W/m
 
 The algorithm keeps track of enough of these past hourly loads to calculate the monthly load. As each month or user defined time passes, hourly loads over the entire month or user defined time “blocks” are averaged and stored in arrays for the respective monthly user defined block of time.
 
@@ -6191,9 +7307,9 @@ The borehole temperature for any time step is computed by superposing the monthl
 
 Where
 
-<span>$\overline{\overline q} $</span> = The average monthly loads
+<span>\(\overline{\overline q} \)</span> = The average monthly loads
 
-<span>$\overline q $</span>  = The average hourly loads
+<span>\(\overline q \)</span>  = The average hourly loads
 
 *Q* = the sub-hourly loads
 
@@ -6241,7 +7357,7 @@ The load aggregation scheme developed in line with the above example is summariz
 
 <div>$$ + \sum\limits_{n = nh - [calb(mb) + sh]}^{nh - sh} {\left[ {\frac{{{{\overline q }_n} - {{\overline q }_{n - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{n - 1}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]} $$</div>
 
-**<span>$ + \sum\limits_{p = nts - sh}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]} $</span>                                                       **
+**<span>\(+ \sum\limits_{p = nts - sh}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]} \)</span>                                                       **
 
 8.    If the difference between the simulation time and product of a monthly block period and the current number of monthly blocks is less than the sum of the minimum hourly history and sub hourly history periods, then NumMonths is set to one month less than the actual number of months of simulation completed. The average borehole temperature is calculated by superposing the long and time step temperature differences using the following equation.
 
@@ -6249,7 +7365,7 @@ The load aggregation scheme developed in line with the above example is summariz
 
 <div>$$ + \sum\limits_{n = nh - [(calb - 1)(mb) + sh]}^{nh - sh} {\left[ {\frac{{{{\overline q }_n} - {{\overline q }_{n - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_{n - 1}}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]} $$</div>
 
-**<span>$ + \sum\limits_{p = nts - sh}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]} $</span>                          **
+**<span>\(+ \sum\limits_{p = nts - sh}^{nts} {\left[ {\frac{{{q_p} - {q_{p - 1}}}}{{2\pi {\kappa_{ground}}}}g\left( {\frac{{{t_{nts}} - {t_p}}}{{{t_s}}},\frac{{{r_b}}}{H}} \right)} \right]} \)</span>                          **
 
 Define Monthly block duration, minimum hourly history period and minimum sub hourly history period (step 1)
 
@@ -6376,7 +7492,7 @@ The third and final simplification takes advantatge of geometric similarity that
 
 For more information, see [Xiong et al. 2015](#SlinkyReferenceXiong).
 
-![](EngineeringReference/media/image8001.png)
+![](media/image8001.png)
 
 Figure: Schematic of first and second improvements to the algorithm for computational efficiency. <a name="SlinkyGHX1"></a>
 
@@ -6388,7 +7504,7 @@ Xiong, Z., D.E. Fisher, and J.D. Spitler. 2015. Development and Validation of a 
 
 The pond model (Object: GroundHeatExchanger:Pond) is a ‘lumped parameter’ model where the pond is represented by a single node with thermal mass. The pond surface temperature is the same as the temperature at this node, i.e. the surface temperature is the same as the bulk temperature. A first order differential equation is solved in the model to calculate the pond temperature at each time step. This type of heat rejecter is modeled as several circuits connected in parallel.
 
-![](EngineeringReference/media/image5676.png)
+![](media/image5676.png)
 
 Figure 257.  Heat Transfer Mechanisms in a Pond (Chiasson 1999)
 
@@ -6398,19 +7514,19 @@ Rees(2002) implemented the model developed by Chiasson(1999) for the shallow pon
 
 Where
 
-<span>$q{}_{in}$</span>   =   Heat transfer to the pond
+<span>\(q{}_{in}\)</span>   =   Heat transfer to the pond
 
-<span>$q{}_{out}$</span>  =   Heat transfer from the pond
+<span>\(q{}_{out}\)</span>  =   Heat transfer from the pond
 
-<span>$V$</span>     =   Pond Volume
+<span>\(V\)</span>     =   Pond Volume
 
-<span>$\rho $</span>     =   Density of pond water
+<span>\(\rho \)</span>     =   Density of pond water
 
-<span>${q_{in}}$</span> = Heat transfer to the pond
+<span>\({q_{in}}\)</span> = Heat transfer to the pond
 
-<span>$C{}_p$</span> = Specific heat capacity of pond water
+<span>\(C{}_p\)</span> = Specific heat capacity of pond water
 
-<span>$\frac{{dT}}{{dt}}$</span> = rate of change of temperature of the pond water
+<span>\(\frac{{dT}}{{dt}}\)</span> = rate of change of temperature of the pond water
 
 Rate of change in average pond temperature is given as
 
@@ -6434,7 +7550,7 @@ q<sub>fluid                    </sub> = Total heat transfer 
 
 A heat balance is calculated at a single node that represents the pond. Heat transfer takes place by surface convection, long-wave radiation to the sky, absorption of solar energy, ground heat transfer and heat exchange with the fluid. A heat exchanger analogy is used to calculate the heat transfer between the heat transfer fluid and the pond. The differential equation defined by the heat balance is solved using a fourth order Runge-Kutta numerical integration method. The implementation along with the model equations are summarized in the figure below.
 
-![](EngineeringReference/media/image5686.png)
+![](media/image5686.png)
 
 Figure 258.  Pond Model Component Configuration (Chiasson 1999)
 
@@ -6446,9 +7562,9 @@ The model overall pond model consists in a number of sub-models which are enumer
 
 where
 
-<span>$\rho '$</span>is the reflectance
+<span>\(\rho '\)</span>is the reflectance
 
-<span>$\tau $</span> is the transmittance of solar radiation by the pond surface and the subscript ‘a’ refers to the absorbed component.
+<span>\(\tau \)</span> is the transmittance of solar radiation by the pond surface and the subscript ‘a’ refers to the absorbed component.
 
 <div>$${\tau_a} = {e^{\frac{{ - \mu 'd}}{{\cos {\theta_r}}}}}$$</div>
 
@@ -6458,29 +7574,29 @@ and
 
 where
 
-<span>$\mu '$</span>is the extinction coefficient for water
+<span>\(\mu '\)</span>is the extinction coefficient for water
 
-<span>$d$</span> is the pond depth
+<span>\(d\)</span> is the pond depth
 
-<span>${r_{par}}$</span>represents the parallel component of unpolarized radiation and
+<span>\({r_{par}}\)</span>represents the parallel component of unpolarized radiation and
 
-<span>${r_ \bot }$</span>represents the perpendicular component of unpolarized radiation which are computed by Duffie and Beckman (1991) as:
+<span>\({r_ \bot }\)</span>represents the perpendicular component of unpolarized radiation which are computed by Duffie and Beckman (1991) as:
 
-<sub><span>${r_{par}} = \frac{{{{\tan }^2}\left( {{\theta_r} - \theta } \right)}}{{{{\tan }^2}\left( {{\theta_r} + \theta } \right)}}$</span></sub>
+<sub><span>\({r_{par}} = \frac{{{{\tan }^2}\left( {{\theta_r} - \theta } \right)}}{{{{\tan }^2}\left( {{\theta_r} + \theta } \right)}}\)</span></sub>
 
-<sub><span>${r_ \bot } = \frac{{{{\sin }^2}\left( {{\theta_r} - \theta } \right)}}{{{{\sin }^2}\left( {{\theta_r} - \theta } \right)}}$</span></sub>
+<sub><span>\({r_ \bot } = \frac{{{{\sin }^2}\left( {{\theta_r} - \theta } \right)}}{{{{\sin }^2}\left( {{\theta_r} - \theta } \right)}}\)</span></sub>
 
-Finally, the amount of solar radiation absorbed by the pond (<span>${q_{solar}}$</span>) is expressed as:
+Finally, the amount of solar radiation absorbed by the pond (<span>\({q_{solar}}\)</span>) is expressed as:
 
 <div>$${q_{solar}} = I\left( {1 - \rho '} \right){A_{pond}}$$</div>
 
 where
 
-<span>$I$</span>is the solar radiation flux incident on the pond surface (here, the total reflectance is approximated by the beam reflectance)
+<span>\(I\)</span>is the solar radiation flux incident on the pond surface (here, the total reflectance is approximated by the beam reflectance)
 
-<span>${A_{pond}}$</span>is the area of the pond surface.
+<span>\({A_{pond}}\)</span>is the area of the pond surface.
 
-The model also accepts solar radiation in the form of beam <span>$\left( {{I_b}} \right)$</span>and diffuse <span>$\left( {{I_d}} \right)$</span> components, in which case <span>$I$</span>is computed from:
+The model also accepts solar radiation in the form of beam <span>\(\left( {{I_b}} \right)\)</span>and diffuse <span>\(\left( {{I_d}} \right)\)</span> components, in which case <span>\(I\)</span>is computed from:
 
 <div>$$I = {I_b}\cos \theta  + {I_d}$$</div>
 
@@ -6490,9 +7606,9 @@ The model also accepts solar radiation in the form of beam <span>$\left( {{I_b}}
 
 Where
 
-<span>$\alpha $</span>= Thermal absorptivity
+<span>\(\alpha \)</span>= Thermal absorptivity
 
-<span>$\sigma $</span>= Stefan Boltzman constant
+<span>\(\sigma \)</span>= Stefan Boltzman constant
 
 #### Convection heat transfer at the pond surface
 
@@ -6510,13 +7626,13 @@ Hull et al (1984) expressed the following equation for ground heat losses from a
 
 Where
 
-<span>$k{}_{ground}$</span>        = Thermal conductivity of the ground
+<span>\(k{}_{ground}\)</span>        = Thermal conductivity of the ground
 
- <span>$d{}_{groundwater}$</span> = depth of water table
+ <span>\(d{}_{groundwater}\)</span> = depth of water table
 
-<span>$d{}_{pond}$</span>          = Pond depth
+<span>\(d{}_{pond}\)</span>          = Pond depth
 
-<span>$P{}_{pond}$</span>         = Pond perimeter
+<span>\(P{}_{pond}\)</span>         = Pond perimeter
 
 #### Heat transfer due to evaporation at the pond surface
 
@@ -6546,9 +7662,9 @@ Air properties are obtained by applying the existing the psychometric functions 
 
 Where
 
-<span>$UA{}_{pipe}$</span> = overall heat transfer coefficient expressed in terms of inside pipe area
+<span>\(UA{}_{pipe}\)</span> = overall heat transfer coefficient expressed in terms of inside pipe area
 
-<span>$N{}_{circuit}$</span>= number of spools installed in the pond
+<span>\(N{}_{circuit}\)</span>= number of spools installed in the pond
 
 The fluid temperature Tfluid is computed as the average fluid temperatures of the inlet and the outlet node at a given temperature.
 
@@ -6556,13 +7672,13 @@ The fluid temperature Tfluid is computed as the average fluid temperatures of th
 
 where
 
-<span>${r_i}$</span>= inner pipe radius
+<span>\({r_i}\)</span>= inner pipe radius
 
-<span>${L_{spool}}$</span>l= length of one spool
+<span>\({L_{spool}}\)</span>l= length of one spool
 
-<span>$\sum {{r_t}} $</span>= composite thermal resistance defined as
+<span>\(\sum {{r_t}} \)</span>= composite thermal resistance defined as
 
-<span>$\sum {{r_t}} $</span>=Resistance due to fluid flow in the pipe +external pipe thermal resistance +fouling factor
+<span>\(\sum {{r_t}} \)</span>=Resistance due to fluid flow in the pipe +external pipe thermal resistance +fouling factor
 
 #### References
 
@@ -6590,9 +7706,9 @@ Where
 
 T<sub>s</sub>    = temperature of the node where the heat source or sink is present
 
-<span>$QS$</span>= Surface heat balance
+<span>\(QS\)</span>= Surface heat balance
 
-<span>${q''}$</span>= Heat flux
+<span>\({q''}\)</span>= Heat flux
 
 T   = Temperature
 
@@ -6614,11 +7730,11 @@ Where
 
 q = heat transferred between the water loop and the building elements.
 
-<span>$\dot m$</span>= mass flow rate of water
+<span>\(\dot m\)</span>= mass flow rate of water
 
-<span>$T{}_{wi}$</span>= Inlet water temperature
+<span>\(T{}_{wi}\)</span>= Inlet water temperature
 
-<span>$T{}_{wo}$</span>= Outlet water temperature
+<span>\(T{}_{wo}\)</span>= Outlet water temperature
 
 From the second law of thermodynamics the maximum amount of heat transfer is
 
@@ -6648,17 +7764,17 @@ Pr is the Prandtl number, Re is the Reynolds number and k is the thermal conduct
 
 <div>$${\mathop{\rm Re}\nolimits} {}_D = \frac{{4\dot m}}{{\pi \mu D}}$$</div>
 
-with <span>$\mu $</span> being the absolute viscosity of water
+with <span>\(\mu \)</span> being the absolute viscosity of water
 
 ### Plant Loop Fluid-to-Fluid Heat Exchanger
 
 This component (Object: HeatExchanger:FluidToFluid) is a simple hydronic heat exchanger that can be used to couple two (hydronic) plant or condenser loops.  Sizing and nominal capacity calculations are discussed elsewhere in this document, see the section called Plant Heat Exchanger Sizing. This section first discusses the heat transfer modeling and the control issues.
 
-Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model can be specified as one of seven types:  cross flow both fluid streams unmixed, cross flow both fluid streams mixed, cross flow maximum capacity flow mixed min), counter flow, parallel flow, or ideal. The model correlations determine a heat transfer effectiveness value, <span>$\varepsilon $</span>, which is a function of heat exchanger UA, the mass flow rates through boths sides, and the specific heat of the fluids in the streams.  The effectiveness of an ideal heat exchanger is set to 1.0 and no correlation is needed.
+Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model can be specified as one of seven types:  cross flow both fluid streams unmixed, cross flow both fluid streams mixed, cross flow maximum capacity flow mixed min), counter flow, parallel flow, or ideal. The model correlations determine a heat transfer effectiveness value, <span>\(\varepsilon \)</span>, which is a function of heat exchanger UA, the mass flow rates through boths sides, and the specific heat of the fluids in the streams.  The effectiveness of an ideal heat exchanger is set to 1.0 and no correlation is needed.
 
 Because the heat exchanger is intended to be generic, its two sides are distinguished by the nature of loop side being connected.  One side is called “Loop Supply Side” to indicate the heat exchanger is situated on the supply side of a loop. The other side is called “Loop Demand Side” to indicate it is on the demand side of a loop.  The heat exchanger is intended to act as a supply component for the loop connected to it as the “Loop Supply Side” and as a demand component for the loop connected to it as the “Loop Demand Side.”  From the point of view of the heat exchanger component itself, the Loop Demand Side acts like a supply source/sink for the Loop Supply Side which acts like a demand to the component.
 
-The mass flow rates and specific heat capacity are multiplied together to evaluate flow thermal capacity for each side and the minimum, maximum, and capacity ratio, <span>${R_C}$</span>, are determined.
+The mass flow rates and specific heat capacity are multiplied together to evaluate flow thermal capacity for each side and the minimum, maximum, and capacity ratio, <span>\({R_C}\)</span>, are determined.
 
 <div>$${\left( {\dot m{c_p}} \right)_{SupLoop}} = {\dot m_{SupLoop}}*{c_p}_{SupLoop}$$</div>
 
@@ -6809,15 +7925,15 @@ If the humidifier is off, the water addition rate is set to zero. If the humidif
 
 where
 
-<span>${\dot m_a}$</span> = the air mass flow rate [kg/s]
+<span>\({\dot m_a}\)</span> = the air mass flow rate [kg/s]
 
-<span>${w_{in}}$</span>= the inlet air humidity ratio [kg/kg]
+<span>\({w_{in}}\)</span>= the inlet air humidity ratio [kg/kg]
 
-<span>${\dot m_{w,add,needed}}$</span> = water addition rate needed to meet the setpoint [kg/s]
+<span>\({\dot m_{w,add,needed}}\)</span> = water addition rate needed to meet the setpoint [kg/s]
 
-<span>${w_{set}}$</span>= the humidity ratio setpoint [kg/kg]
+<span>\({w_{set}}\)</span>= the humidity ratio setpoint [kg/kg]
 
-Equation is the moisture balance equation for the component. It is solved for <span>${\dot m_{w,add,needed}}$</span> (the other variables are known) which is passed to the humidifier component model as its desired inlet water addition rate.
+Equation is the moisture balance equation for the component. It is solved for <span>\({\dot m_{w,add,needed}}\)</span> (the other variables are known) which is passed to the humidifier component model as its desired inlet water addition rate.
 
 #### Component
 
@@ -6827,31 +7943,31 @@ The inputs to the component model are the air inlet conditions and mass flow rat
 
 where
 
-<span>$Ca{p_{nom}}$</span> = the humidifier nominal capacity [kg/s], a user input.
+<span>\(Ca{p_{nom}}\)</span> = the humidifier nominal capacity [kg/s], a user input.
 
-If <span>${\dot m_{w,add,needed,{\rm{max}}}}$</span> is zero, the outlet conditions are set to the inlet conditions and the water addition rate is set to zero. If the humidifier is scheduled on the component power consumption is set to the standby power consumption: <span>${W_{hum}} = {W_{stby}}$</span>. Otherwise <span>${W_{hum}}$</span> = 0.
+If <span>\({\dot m_{w,add,needed,{\rm{max}}}}\)</span> is zero, the outlet conditions are set to the inlet conditions and the water addition rate is set to zero. If the humidifier is scheduled on the component power consumption is set to the standby power consumption: <span>\({W_{hum}} = {W_{stby}}\)</span>. Otherwise <span>\({W_{hum}}\)</span> = 0.
 
-If <span>${\dot m_{w,add,needed,{\rm{max}}}}$</span> &gt; 0, then the moisture and enthalpy balance equations
+If <span>\({\dot m_{w,add,needed,{\rm{max}}}}\)</span> &gt; 0, then the moisture and enthalpy balance equations
 
 <div>$${\dot m_a} \cdot {w_{in}} + {\dot m_w} = {\dot m_a} \cdot {w_{out}}$$</div>
 
 <div>$${\dot m_a} \cdot {h_{in}} + {\dot m_w} \cdot {h_w} = {\dot m_a} \cdot {h_{out}}$$</div>
 
-with <span>${\dot m_w}$</span> set equal to <span>${\dot m_{w,add,needed,{\rm{max}}}}$</span> are solved for <span>${w_{out}}$</span> and <span>${h_{out}}$</span>. Here
+with <span>\({\dot m_w}\)</span> set equal to <span>\({\dot m_{w,add,needed,{\rm{max}}}}\)</span> are solved for <span>\({w_{out}}\)</span> and <span>\({h_{out}}\)</span>. Here
 
-<span>${\dot m_a}$</span> = the air mass flow rate [kg/s]
+<span>\({\dot m_a}\)</span> = the air mass flow rate [kg/s]
 
-<span>${w_{in}}$</span>= the inlet air humidity ratio [kg/kg]
+<span>\({w_{in}}\)</span>= the inlet air humidity ratio [kg/kg]
 
-<span>${\dot m_w}$</span> = the inlet water addition rate [kg/s]
+<span>\({\dot m_w}\)</span> = the inlet water addition rate [kg/s]
 
-<span>${w_{out}}$</span> = the outlet air humidity ratio [kg/kg]
+<span>\({w_{out}}\)</span> = the outlet air humidity ratio [kg/kg]
 
-<span>${h_{in}}$</span> = the inlet air specific enthalpy [J/kg]
+<span>\({h_{in}}\)</span> = the inlet air specific enthalpy [J/kg]
 
-<span>${h_w}$</span> = the steam specific enthalpy = 2676125.  [J/kg] at 100 <sup>o</sup>C
+<span>\({h_w}\)</span> = the steam specific enthalpy = 2676125.  [J/kg] at 100 <sup>o</sup>C
 
-<span>${h_{out}}$</span> = the outlet air specific enthalpy [J/kg]
+<span>\({h_{out}}\)</span> = the outlet air specific enthalpy [J/kg]
 
 The outlet temperature is obtained from
 
@@ -6859,9 +7975,9 @@ The outlet temperature is obtained from
 
 where
 
-<span>${T_{out}}$</span> = outlet air temperature [<sup>o</sup>C],
+<span>\({T_{out}}\)</span> = outlet air temperature [<sup>o</sup>C],
 
-<span>$PsyHFnTdbW({h_{out}},{w_{out}})$</span> is an EnergyPlus psychrometric function.
+<span>\(PsyHFnTdbW({h_{out}},{w_{out}})\)</span> is an EnergyPlus psychrometric function.
 
 The humidity ratio at saturation at the outlet temperature is
 
@@ -6869,21 +7985,21 @@ The humidity ratio at saturation at the outlet temperature is
 
 where
 
-<span>${P_{atmo}}$</span> = the barometric pressure [Pa],
+<span>\({P_{atmo}}\)</span> = the barometric pressure [Pa],
 
 1.0 is the relative humidity at saturation,
 
-<span>$PsyWFnTdbRhPb$</span> is an EnergyPlus psychrometric function.
+<span>\(PsyWFnTdbRhPb\)</span> is an EnergyPlus psychrometric function.
 
-IF <span>${w_{out}} \le {w_{out,sat}}$</span> then the outlet condition is below the saturation curve and the desired moisture addition rate can be met. <span>${\dot m_{w,add}}$</span> is set to <span>${\dot m_{w,add,needed,{\rm{max}}}}$</span> and the calculation of outlet conditions is done. But if <span>${w_{out}} > {w_{out,sat}}$</span> then it is assumed that this condition will be detected and the steam addition rate throttled back to bring the outlet conditions back to the saturation condition. We need to find the point where the line drawn between state 1 (inlet) and state 2 (our desired outlet) crosses the saturation curve. This will be the new outlet condition. Rather than iterate to obtain this point, we find it approximately by solving for the point where 2 lines cross: the first drawn from state 1 to state 2, the second from <span>${T_1}$</span>, <span>${w_{1,sat}}$</span> to <span>${T_2}$</span>, <span>${w_{2,sat}}$</span>; where
+IF <span>\({w_{out}} \le {w_{out,sat}}\)</span> then the outlet condition is below the saturation curve and the desired moisture addition rate can be met. <span>\({\dot m_{w,add}}\)</span> is set to <span>\({\dot m_{w,add,needed,{\rm{max}}}}\)</span> and the calculation of outlet conditions is done. But if <span>\({w_{out}} > {w_{out,sat}}\)</span> then it is assumed that this condition will be detected and the steam addition rate throttled back to bring the outlet conditions back to the saturation condition. We need to find the point where the line drawn between state 1 (inlet) and state 2 (our desired outlet) crosses the saturation curve. This will be the new outlet condition. Rather than iterate to obtain this point, we find it approximately by solving for the point where 2 lines cross: the first drawn from state 1 to state 2, the second from <span>\({T_1}\)</span>, <span>\({w_{1,sat}}\)</span> to <span>\({T_2}\)</span>, <span>\({w_{2,sat}}\)</span>; where
 
-<span>${w_{1,sat}}$</span> is the inlet temperature [<sup>o</sup>C],
+<span>\({w_{1,sat}}\)</span> is the inlet temperature [<sup>o</sup>C],
 
-<span>${w_{2,sat}}$</span> is the humidity ratio at saturation at temperature <span>${w_{1,sat}}$</span> [kg/kg],
+<span>\({w_{2,sat}}\)</span> is the humidity ratio at saturation at temperature <span>\({w_{1,sat}}\)</span> [kg/kg],
 
-<span>${T_2}$</span> is the desired outlet temperature [<sup>o</sup>C],
+<span>\({T_2}\)</span> is the desired outlet temperature [<sup>o</sup>C],
 
-<span>${w_{2,sat}}$</span> is the humidity ratio at saturation at temperature <span>${T_2}$</span> [kg/kg].
+<span>\({w_{2,sat}}\)</span> is the humidity ratio at saturation at temperature <span>\({T_2}\)</span> [kg/kg].
 
 The 2 lines are given by the equations:
 
@@ -6897,13 +8013,13 @@ Solving for the point (state 3) where the lines cross:
 
 <div>$${T_3} = {T_1} + ({w_3} - {w_1}) \cdot (({T_2} - {T_1})/({w_2} - {w_1}))$$</div>
 
-This point isn't quite on the saturation curve since we made a linear approximation of the curve, but the temperature should be very close to the correct outlet temperature. We will use this temperature as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy. Thus we set <span>${T_{out}}$</span> = <span>${T_3}$</span> and
+This point isn't quite on the saturation curve since we made a linear approximation of the curve, but the temperature should be very close to the correct outlet temperature. We will use this temperature as the outlet temperature and move to the saturation curve for the outlet humidity and enthalpy. Thus we set <span>\({T_{out}}\)</span> = <span>\({T_3}\)</span> and
 
 <div>$${w_{out}} = PsyWFnTdbRhPb({T_{out}},1.0,{P_{atmo}})$$</div>
 
 <div>$${h_{out}} = PsyHFnTdbW({T_{out}},{w_{out}})$$</div>
 
-where <span>$PsyHFnTdbW$</span> is an EnergyPlus psychrometric function. The water addition rate is set to
+where <span>\(PsyHFnTdbW\)</span> is an EnergyPlus psychrometric function. The water addition rate is set to
 
 <div>$${\dot m_{w,add}} = {\dot m_a} \cdot ({w_{out}} - {w_{in}})$$</div>
 
@@ -6915,9 +8031,9 @@ The electric steam humidifier electric consumption is given by
 
 where
 
-<span>${W_{fan}}$</span> = nominal fan power [W], a user input,
+<span>\({W_{fan}}\)</span> = nominal fan power [W], a user input,
 
-<span>${W_{stby}}$</span> = standby power [W], a user input.
+<span>\({W_{stby}}\)</span> = standby power [W], a user input.
 
 The gas steam humidifier performance calculation is done for fixed and variable entering water temperature. The calculation procedure for fixed and variable entering water temperature are as follows.
 
@@ -6976,9 +8092,9 @@ The water consumption rate is, in m3/s, for electric and steam humidifier at a r
 
 where
 
-<span>${\dot V_{cons}}$</span> = the water consumption rate [m<sup>3</sup>],
+<span>\({\dot V_{cons}}\)</span> = the water consumption rate [m<sup>3</sup>],
 
-<span>${\rho_w}$</span> = water density (998.2 kg/m<sup>3</sup>).
+<span>\({\rho_w}\)</span> = water density (998.2 kg/m<sup>3</sup>).
 
 #### References
 

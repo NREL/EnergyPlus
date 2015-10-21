@@ -202,6 +202,20 @@ namespace OutputProcessor {
 
 	int MaxNumSubcategories( 1 );
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of OutputProcessor should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		int ReportNumberCounter( 0 ); // The report number is used in output reports as a key.
+		int LHourP( -1 ); // Helps set hours for timestamp output
+		Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
+		Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+		bool GetMeterIndexFirstCall( true ); //trigger setup in GetMeterIndex
+		bool InitFlag( true );
+	}
+
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar
 	//PUBLIC  SetReportNow
@@ -243,6 +257,79 @@ namespace OutputProcessor {
 	//  UpdateMeterReporting
 
 	// Functions
+
+	// Clears the global data in OutputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		InstMeterCacheSize = 1000;
+		InstMeterCacheSizeInc = 1000;
+		InstMeterCache.deallocate();
+		InstMeterCacheLastUsed = 0;
+		CurrentReportNumber = 0;
+		NumVariablesForOutput = 0;
+		MaxVariablesForOutput = 0;
+		NumOfRVariable_Setup = 0;
+		NumTotalRVariable = 0;
+		NumOfRVariable_Sum = 0;
+		NumOfRVariable_Meter = 0;
+		NumOfRVariable = 0;
+		MaxRVariable = 0;
+		NumOfIVariable_Setup = 0;
+		NumTotalIVariable = 0;
+		NumOfIVariable_Sum = 0;
+		NumOfIVariable = 0;
+		MaxIVariable = 0;
+		OutputInitialized = false;
+		ProduceReportVDD = ReportVDD_No;
+		OutputFileMeterDetails = 0;
+		NumHoursInDay = 24;
+		NumHoursInMonth = 0;
+		NumHoursInSim = 0;
+		ReportList.deallocate();
+		NumReportList = 0;
+		NumExtraVars = 0;
+		FreqNotice.dimension( {1,2}, {-1,4} );
+		NumOfReqVariables = 0;
+		NumVarMeterArrays = 0;
+		NumEnergyMeters = 0;
+		MeterValue.deallocate();
+		TimeStepStampReportNbr = 0;
+		TimeStepStampReportChr = "";
+		TrackingHourlyVariables = false;
+		DailyStampReportNbr = 0;
+		DailyStampReportChr = "";
+		TrackingDailyVariables = false;
+		MonthlyStampReportNbr = 0;
+		MonthlyStampReportChr = "";
+		TrackingMonthlyVariables = false;
+		RunPeriodStampReportNbr = 0;
+		RunPeriodStampReportChr = "";
+		TrackingRunPeriodVariables = false;
+		TimeStepZoneSec = 0;
+		ErrorsLogged = false;
+		ProduceVariableDictionary = false;
+		MaxNumSubcategories = 1;
+		ReportNumberCounter = 0;
+		LHourP = -1;
+		LStartMin = -1.0;
+		LEndMin = -1.0;
+		GetMeterIndexFirstCall = true ;
+		InitFlag = true;
+		TimeValue.deallocate();
+		RVariableTypes.deallocate();
+		IVariableTypes.deallocate();
+		DDVariableTypes.deallocate();
+		RVariable.deallocate();
+		IVariable.deallocate();
+		RVar.deallocate();
+		IVar.deallocate();
+		ReqRepVars.deallocate();
+		VarMeterArrays.deallocate();
+		EnergyMeters.deallocate();
+		EndUseCategory.deallocate();
+	}
 
 	void
 	InitializeOutput()
@@ -476,7 +563,7 @@ namespace OutputProcessor {
 
 		if ( NumOfReqVariables > 0 ) {
 			// Do a quick check
-			Item = FindItem( VarName, ReqRepVars( {1,NumOfReqVariables} ).VarName(), NumOfReqVariables );
+			Item = FindItem( VarName, ReqRepVars, &ReqReportVariables::VarName );
 
 			NumExtraVars = 0;
 			ReportList = 0;
@@ -494,7 +581,7 @@ namespace OutputProcessor {
 						ReqRepVars( Loop ).Used = true;
 					}
 					if ( Loop < NumOfReqVariables ) {
-						Pos = FindItem( VarName, ReqRepVars( {Loop + 1,NumOfReqVariables} ).VarName(), NumOfReqVariables - Loop );
+						Pos = FindItem( VarName, ReqRepVars( {Loop+1,NumOfReqVariables} ), &ReqReportVariables::VarName );
 						if ( Pos != 0 ) {
 							MinLook = min( MinLook, Loop + Pos );
 							MaxLook = max( MaxLook, Loop + Pos );
@@ -1186,8 +1273,8 @@ namespace OutputProcessor {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Array1D_string StateVariables( 3 );
-		Array1D_string NonStateVariables( 4 );
+		static Array1D_string StateVariables( 3 );
+		static Array1D_string NonStateVariables( 4 );
 		static bool Initialized( false );
 		int Item;
 
@@ -1199,6 +1286,7 @@ namespace OutputProcessor {
 			NonStateVariables( 2 ) = "NONSTATE";
 			NonStateVariables( 3 ) = "SUM";
 			NonStateVariables( 4 ) = "SUMMED";
+			Initialized = true;
 		}
 
 		ValidateVariableType = 1;
@@ -1696,7 +1784,7 @@ namespace OutputProcessor {
 
 			lbrackPos = index( cAlphaArgs( 3 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
-			WhichMeter = FindItem( cAlphaArgs( 3 ), EnergyMeters.Name(), NumEnergyMeters );
+			WhichMeter = FindItem( cAlphaArgs( 3 ), EnergyMeters );
 			if ( WhichMeter == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				ErrorsFound = true;
@@ -2132,7 +2220,7 @@ namespace OutputProcessor {
 		// Make sure this isn't already in the list of meter names
 		int Found;
 		if ( NumEnergyMeters > 0 ) {
-			Found = FindItemInList( Name, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItemInList( Name, EnergyMeters );
 		} else {
 			Found = 0;
 		}
@@ -2275,19 +2363,19 @@ namespace OutputProcessor {
 		VarMeterArrays( NumVarMeterArrays ).NumOnMeters = 0;
 		VarMeterArrays( NumVarMeterArrays ).RepVariable = RepVarNum;
 		VarMeterArrays( NumVarMeterArrays ).OnMeters = 0;
-		int Found = FindItem( ResourceType + ":Facility", EnergyMeters.Name(), NumEnergyMeters );
+		int Found = FindItem( ResourceType + ":Facility", EnergyMeters );
 		if ( Found != 0 ) {
 			++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 			VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 		}
 		if ( ! Group.empty() ) {
-			Found = FindItem( ResourceType + ':' + Group, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( ResourceType + ':' + Group, EnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 				VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 			}
 			if ( SameString( Group, "Building" ) ) { // Match to Zone
-				Found = FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 					VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2297,13 +2385,13 @@ namespace OutputProcessor {
 
 		//!! Following if EndUse is by ResourceType
 		if ( ! EndUse.empty() ) {
-			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 				VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 			}
 			if ( SameString( Group, "Building" ) ) { // Match to Zone
-				Found = FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 					VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2312,7 +2400,7 @@ namespace OutputProcessor {
 
 			// End use subcategory
 			if ( ! EndUseSub.empty() ) {
-				Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 					VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2320,7 +2408,7 @@ namespace OutputProcessor {
 					AddEndUseSubcategory( ResourceType, EndUse, EndUseSub );
 				}
 				if ( SameString( Group, "Building" ) ) { // Match to Zone
-					Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+					Found = FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 					if ( Found != 0 ) {
 						++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 						VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2447,7 +2535,7 @@ namespace OutputProcessor {
 
 		if ( ! LocalErrorsFound ) {
 			if ( NumEnergyMeters > 0 ) {
-				Found = FindItem( ResourceType + ":Facility", EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( ResourceType + ":Facility", EnergyMeters );
 			} else {
 				Found = 0;
 			}
@@ -2475,10 +2563,10 @@ namespace OutputProcessor {
 		}}
 
 		if ( ! LocalErrorsFound && ! Group.empty() ) {
-			Found = FindItem( ResourceType + ':' + Group, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( ResourceType + ':' + Group, EnergyMeters );
 			if ( Found == 0 ) AddMeter( ResourceType + ':' + Group, MtrUnits, ResourceType, "", "", Group );
 			if ( Group == "Building" ) {
-				Found = FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found == 0 ) {
 					AddMeter( ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, "", "", "Zone" );
 				}
@@ -2648,11 +2736,11 @@ namespace OutputProcessor {
 
 		//!! Following if we do EndUse by ResourceType
 		if ( ! LocalErrorsFound && ! EndUse.empty() ) {
-			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( EndUse + ':' + ResourceType, EnergyMeters );
 			if ( Found == 0 ) AddMeter( EndUse + ':' + ResourceType, MtrUnits, ResourceType, EndUse, "", "" );
 
 			if ( Group == "Building" ) { // Match to Zone
-				Found = FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters.Name(), NumEnergyMeters );
+				Found = FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found == 0 ) {
 					AddMeter( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, EndUse, "", "Zone" );
 				}
@@ -2664,7 +2752,7 @@ namespace OutputProcessor {
 		// End-Use Subcategories
 		if ( ! LocalErrorsFound && ! EndUseSub.empty() ) {
 			MeterName = EndUseSub + ':' + EndUse + ':' + ResourceType;
-			Found = FindItem( MeterName, EnergyMeters.Name(), NumEnergyMeters );
+			Found = FindItem( MeterName, EnergyMeters );
 			if ( Found == 0 ) AddMeter( MeterName, MtrUnits, ResourceType, EndUse, EndUseSub, "" );
 		} else if ( LocalErrorsFound ) {
 			ErrorsFound = true;
@@ -2890,6 +2978,93 @@ namespace OutputProcessor {
 	}
 
 	void
+	ResetAccumulationWhenWarmupComplete()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jason Glazer
+		//       DATE WRITTEN   June 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Resets the accumulating meter values. Needed after warmup period is over to
+		// reset the totals on meters so that they are not accumulated over the warmup period
+
+		// METHODOLOGY EMPLOYED:
+		// Cycle through the meters and reset all accumulating values
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Meter; // Loop Control
+		int Loop; // Loop Variable
+
+		for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
+			EnergyMeters( Meter ).HRValue = 0.0;
+			EnergyMeters( Meter ).HRMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).HRMaxValDate = 0;
+			EnergyMeters( Meter ).HRMinVal = MinSetValue;
+			EnergyMeters( Meter ).HRMinValDate = 0;
+
+			EnergyMeters( Meter ).DYValue = 0.0;
+			EnergyMeters( Meter ).DYMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).DYMaxValDate = 0;
+			EnergyMeters( Meter ).DYMinVal = MinSetValue;
+			EnergyMeters( Meter ).DYMinValDate = 0;
+
+			EnergyMeters( Meter ).MNValue = 0.0;
+			EnergyMeters( Meter ).MNMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).MNMaxValDate = 0;
+			EnergyMeters( Meter ).MNMinVal = MinSetValue;
+			EnergyMeters( Meter ).MNMinValDate = 0;
+
+			EnergyMeters( Meter ).SMValue = 0.0;
+			EnergyMeters( Meter ).SMMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).SMMaxValDate = 0;
+			EnergyMeters( Meter ).SMMinVal = MinSetValue;
+			EnergyMeters( Meter ).SMMinValDate = 0;
+
+		}
+
+		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
+			RVar >>= RVariableTypes( Loop ).VarPtr;
+			auto & rVar( RVar() );
+			if ( rVar.ReportFreq == ReportMonthly || rVar.ReportFreq == ReportSim ) {
+				rVar.StoreValue = 0.0;
+				rVar.NumStored = 0;
+			}
+		}
+
+		for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
+			IVar >>= IVariableTypes( Loop ).VarPtr;
+			auto & iVar( IVar() );
+			if ( iVar.ReportFreq == ReportMonthly || iVar.ReportFreq == ReportSim ) {
+				iVar.StoreValue = 0;
+				iVar.NumStored = 0;
+			}
+		}
+	}
+
+
+
+
+	void
 	SetMinMax(
 		Real64 const TestValue, // Candidate new value
 		int const TimeStamp, // TimeStamp to be stored if applicable
@@ -2949,7 +3124,8 @@ namespace OutputProcessor {
 	ReportTSMeters(
 		Real64 const StartMinute, // Start Minute for TimeStep
 		Real64 const EndMinute, // End Minute for TimeStep
-		bool & PrintESOTimeStamp // True if the ESO Time Stamp also needs to be printed
+		bool & PrintESOTimeStamp, // True if the ESO Time Stamp also needs to be printed
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
 	)
 	{
 
@@ -3004,8 +3180,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( PrintESOTimeStamp && ! EnergyMeters( Loop ).RptTSFO && ! EnergyMeters( Loop ).RptAccTSFO ) {
@@ -3013,7 +3190,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintESOTimeStamp = false;
 			}
 
@@ -3035,7 +3212,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportHRMeters()
+	ReportHRMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3088,8 +3267,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptHR ) {
@@ -3109,7 +3289,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportDYMeters()
+	ReportDYMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3158,8 +3340,9 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptDY ) {
@@ -3179,7 +3362,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportMNMeters()
+	ReportMNMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3223,8 +3408,9 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			if ( ! EnergyMeters( Loop ).RptMN && ! EnergyMeters( Loop ).RptAccMN ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, false, Month );
+				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL, Month );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptMN ) {
@@ -3244,7 +3430,9 @@ namespace OutputProcessor {
 	}
 
 	void
-	ReportSMMeters()
+	ReportSMMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3293,8 +3481,9 @@ namespace OutputProcessor {
 			EnergyMeters( Loop ).LastSMMaxValDate = EnergyMeters( Loop ).SMMaxValDate;
 			if ( ! EnergyMeters( Loop ).RptSM && ! EnergyMeters( Loop ).RptAccSM ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, false );
+				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp && PrintTimeStampToSQL );
 				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptSM ) {
@@ -3425,64 +3614,71 @@ namespace OutputProcessor {
 		//   Convert the coded date format into a usable
 		//   string
 
-		// Using/Aliasing
-		using General::DecodeMonDayHrMin;
+		if ( codedDate == 0 ) return "-";
 
-		// Return value
-		std::string StringOut;
-
-		// Locals
-		// ((month*100 + day)*100 + hour)*100 + minute
 		static gio::Fmt DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
 
+		// ((month*100 + day)*100 + hour)*100 + minute
 		int Month; // month in integer format (1-12)
 		int Day; // day in integer format (1-31)
 		int Hour; // hour in integer format (1-24)
 		int Minute; // minute in integer format (0:59)
-		std::string monthName;
 
-		if ( codedDate != 0 ) {
-			monthName = "";
-			DecodeMonDayHrMin( codedDate, Month, Day, Hour, Minute );
-			--Hour;
-			if ( Minute == 60 ) {
-				++Hour;
-				Minute = 0;
-			}
-			if ( Month == 1 ) {
-				monthName = "JAN";
-			} else if ( Month == 2 ) {
-				monthName = "FEB";
-			} else if ( Month == 3 ) {
-				monthName = "MAR";
-			} else if ( Month == 4 ) {
-				monthName = "APR";
-			} else if ( Month == 5 ) {
-				monthName = "MAY";
-			} else if ( Month == 6 ) {
-				monthName = "JUN";
-			} else if ( Month == 7 ) {
-				monthName = "JUL";
-			} else if ( Month == 8 ) {
-				monthName = "AUG";
-			} else if ( Month == 9 ) {
-				monthName = "SEP";
-			} else if ( Month == 10 ) {
-				monthName = "OCT";
-			} else if ( Month == 11 ) {
-				monthName = "NOV";
-			} else if ( Month == 12 ) {
-				monthName = "DEC";
-			} else {
-				monthName = "***";
-			}
-			gio::write( StringOut, DateFmt ) << Day << monthName << Hour << Minute;
-			if ( has( StringOut, "*" ) ) {
-				StringOut = "-";
-			}
-		} else { // codeddate = 0
-			StringOut = "-";
+		General::DecodeMonDayHrMin( codedDate, Month, Day, Hour, Minute );
+
+		if ( Month < 1 || Month > 12 ) return "-";
+		if ( Day < 1 || Day > 31 ) return "-";
+		if ( Hour < 1 || Hour > 24 ) return "-";
+		if ( Minute < 0 || Minute > 60 ) return "-";
+
+		--Hour;
+		if ( Minute == 60 ) {
+			++Hour;
+			Minute = 0;
 		}
+
+		std::string monthName;
+		switch ( Month ) {
+			case 1:
+				monthName = "JAN";
+				break;
+			case 2:
+				monthName = "FEB";
+				break;
+			case 3:
+				monthName = "MAR";
+				break;
+			case 4:
+				monthName = "APR";
+				break;
+			case 5:
+				monthName = "MAY";
+				break;
+			case 6:
+				monthName = "JUN";
+				break;
+			case 7:
+				monthName = "JUL";
+				break;
+			case 8:
+				monthName = "AUG";
+				break;
+			case 9:
+				monthName = "SEP";
+				break;
+			case 10:
+				monthName = "OCT";
+				break;
+			case 11:
+				monthName = "NOV";
+				break;
+			case 12:
+				monthName = "DEC";
+				break;
+		}
+
+		std::string StringOut;
+		gio::write( StringOut, DateFmt ) << Day << monthName << Hour << Minute;
 
 		return StringOut;
 	}
@@ -4774,13 +4970,13 @@ namespace OutputProcessor {
 		} else if ( has( meterName, "Electricity:HVAC" ) ) {
 			indexGroupKey = 301;
 
-			// InteriorLights:Electricity indices are in the 400s
-		} else if ( has( meterName, "InteriorLights:Electricity" ) ) {
-			indexGroupKey = 401;
-
 			// InteriorLights:Electricity:Zone indices are in the 500s
 		} else if ( has( meterName, "InteriorLights:Electricity:Zone" ) ) {
 			indexGroupKey = 501;
+
+			// InteriorLights:Electricity indices are in the 400s
+		} else if ( has( meterName, "InteriorLights:Electricity" ) ) {
+			indexGroupKey = 401;
 
 			// Unknown items have negative indices
 		} else {
@@ -5502,14 +5698,16 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	Real64 CurVal; // Current value for real variables
 	Real64 ICurVal; // Current value for integer variables
 	int MDHM; // Month,Day,Hour,Minute
-	bool TimePrint; // True if the time needs to be printed
+	bool TimePrint( true ); // True if the time needs to be printed
 	Real64 StartMinute; // StartMinute for UpdateData call
 	Real64 MinuteNow; // What minute it is now
 	bool ReportNow; // True if this variable should be reported now
 	int CurDayType; // What kind of day it is (weekday (sunday, etc) or holiday)
-	static int LHourP( -1 ); // Helps set hours for timestamp output
-	static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
-	static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+	//////////// hoisted into namespace ////////////////////////////////////////////////
+	// static int LHourP( -1 ); // Helps set hours for timestamp output
+	// static Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
+	// static Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
+	////////////////////////////////////////////////////////////////////////////////////
 	static bool EndTimeStepFlag( false ); // True when it's the end of the Zone Time Step
 	Real64 rxTime; // (MinuteNow-StartMinute)/REAL(MinutesPerTimeStep,r64) - for execution time
 
@@ -5768,7 +5966,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 		UpdateMeters( MDHM );
 
-		ReportTSMeters( StartMinute, TimeValue( 1 ).CurMinute, TimePrint );
+		ReportTSMeters( StartMinute, TimeValue( 1 ).CurMinute, TimePrint, TimePrint );
 
 	} // TimeStep Block
 
@@ -5780,6 +5978,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				CurDayType = 7 + HolidayIndex;
 			}
 			WriteTimeStampFormatData( eso_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			TimePrint = false;
 		}
 
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
@@ -5838,7 +6037,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // IndexType (Zone or HVAC)
 
-		ReportHRMeters();
+		ReportHRMeters( TimePrint );
 
 	} // Hour Block
 
@@ -5852,6 +6051,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				CurDayType = 7 + HolidayIndex;
 			}
 			WriteTimeStampFormatData( eso_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			TimePrint = false;
 		}
 		NumHoursInMonth += 24;
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) {
@@ -5870,7 +6070,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // Index type (Zone or HVAC)
 
-		ReportDYMeters();
+		ReportDYMeters( TimePrint );
 
 	} // Day Block
 
@@ -5880,7 +6080,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Month Block
 	if ( EndMonthFlag || EndEnvrnFlag ) {
 		if ( TrackingMonthlyVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, false, Month );
+			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, true, Month );
+			TimePrint = false;
 		}
 		NumHoursInSim += NumHoursInMonth;
 		EndMonthFlag = false;
@@ -5900,7 +6101,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // IndexType (Zone, HVAC)
 
-		ReportMNMeters();
+		ReportMNMeters( TimePrint );
 
 		NumHoursInMonth = 0;
 	} // Month Block
@@ -5908,7 +6109,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Sim/Environment Block
 	if ( EndEnvrnFlag ) {
 		if ( TrackingRunPeriodVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, false );
+			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, true );
+			TimePrint = false;
 		}
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
@@ -5926,7 +6128,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			} // Number of I Variables
 		} // Index Type (Zone, HVAC)
 
-		ReportSMMeters();
+		ReportSMMeters( TimePrint );
 
 		NumHoursInSim = 0;
 	}
@@ -5954,7 +6156,7 @@ AssignReportNumber( int & ReportNumber )
 	// na
 
 	// USE STATEMENTS:
-	// na
+	using namespace OutputProcessor;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5969,7 +6171,9 @@ AssignReportNumber( int & ReportNumber )
 	// na
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-	static int ReportNumberCounter( 0 );
+	//////////// hoisted into namespace ////////////
+	// static int ReportNumberCounter( 0 );
+	////////////////////////////////////////////////
 
 	++ReportNumberCounter;
 	ReportNumber = ReportNumberCounter;
@@ -6161,7 +6365,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = FindItem( Alphas( 1 ), EnergyMeters.Name(), NumEnergyMeters );
+			Meter = FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6202,7 +6406,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = FindItem( Alphas( 1 ), EnergyMeters.Name(), NumEnergyMeters );
+			Meter = FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6244,7 +6448,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = FindItem( Alphas( 1 ), EnergyMeters.Name(), NumEnergyMeters );
+			Meter = FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6285,7 +6489,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = FindItem( Alphas( 1 ), EnergyMeters.Name(), NumEnergyMeters );
+			Meter = FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6565,10 +6769,12 @@ GetMeterIndex( std::string const & MeterName )
 	static Array1D_string ValidMeterNames;
 	static Array1D_int iValidMeterNames;
 	static int NumValidMeters( 0 );
-	static bool FirstCall( true );
+	//////////// hoisted into namespace changed to GetMeterIndexFirstCall////////////
+	// static bool FirstCall( true );
+	////////////////////////////////////////////////
 	int Found;
 
-	if ( FirstCall || ( NumValidMeters != NumEnergyMeters ) ) {
+	if ( GetMeterIndexFirstCall || ( NumValidMeters != NumEnergyMeters ) ) {
 		NumValidMeters = NumEnergyMeters;
 		ValidMeterNames.allocate( NumValidMeters );
 		for ( Found = 1; Found <= NumValidMeters; ++Found ) {
@@ -6576,7 +6782,7 @@ GetMeterIndex( std::string const & MeterName )
 		}
 		iValidMeterNames.allocate( NumValidMeters );
 		SetupAndSort( ValidMeterNames, iValidMeterNames );
-		FirstCall = false;
+		GetMeterIndexFirstCall = false;
 	}
 
 	MeterIndex = FindItemInSortedList( MeterName, ValidMeterNames, NumValidMeters );
@@ -7294,7 +7500,9 @@ GetVariableKeyCountandType(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	static Array1D_int keyVarIndexes; // Array index for specific key name
 	static int curKeyVarIndexLimit; // current limit for keyVarIndexes
-	static bool InitFlag( true ); // for initting the keyVarIndexes array
+	//////////// hoisted into namespace ////////////////////////////////////////////////
+	// static bool InitFlag( true ); // for initting the keyVarIndexes array
+	////////////////////////////////////////////////////////////////////////////////////
 	int Loop; // Loop counters
 	int Loop2;
 	std::string::size_type Position; // Starting point of search string
@@ -7616,13 +7824,13 @@ ReportingThisVariable( std::string const & RepVarName )
 	int Found;
 
 	BeingReported = false;
-	Found = FindItem( RepVarName, ReqRepVars.VarName(), NumOfReqVariables );
+	Found = FindItem( RepVarName, ReqRepVars, &ReqReportVariables::VarName );
 	if ( Found > 0 ) {
 		BeingReported = true;
 	}
 
 	if ( ! BeingReported ) { // check meter names too
-		Found = FindItem( RepVarName, EnergyMeters.Name(), NumEnergyMeters );
+		Found = FindItem( RepVarName, EnergyMeters );
 		if ( Found > 0 ) {
 			if ( EnergyMeters( Found ).RptTS || EnergyMeters( Found ).RptHR || EnergyMeters( Found ).RptDY || EnergyMeters( Found ).RptMN || EnergyMeters( Found ).RptSM || EnergyMeters( Found ).RptTSFO || EnergyMeters( Found ).RptHRFO || EnergyMeters( Found ).RptDYFO || EnergyMeters( Found ).RptMNFO || EnergyMeters( Found ).RptSMFO || EnergyMeters( Found ).RptAccTS || EnergyMeters( Found ).RptAccHR || EnergyMeters( Found ).RptAccDY || EnergyMeters( Found ).RptAccMN || EnergyMeters( Found ).RptAccSM || EnergyMeters( Found ).RptAccTSFO || EnergyMeters( Found ).RptAccHRFO || EnergyMeters( Found ).RptAccDYFO || EnergyMeters( Found ).RptAccMNFO || EnergyMeters( Found ).RptAccSMFO ) {
 				BeingReported = true;
@@ -7719,7 +7927,7 @@ InitPollutionMeterReporting( std::string const & ReportFreqName )
 
 	for ( Loop = 1; Loop <= NumReqMeters; ++Loop ) {
 
-		Meter = FindItem( PollutionMeters( Loop ), EnergyMeters.Name(), NumEnergyMeters );
+		Meter = FindItem( PollutionMeters( Loop ), EnergyMeters );
 		if ( Meter > 0 ) { //All the active meters for this run are set, but all are still searched for.
 
 			indexGroupKey = DetermineIndexGroupKeyFromMeterName( EnergyMeters( Meter ).Name );
@@ -8027,7 +8235,7 @@ AddToOutputVariableList(
 
 	int dup = 0;// for duplicate variable name
 	if ( NumVariablesForOutput > 0 ) {
-		dup = FindItemInList( VarName, DDVariableTypes.VarNameOnly(), NumVariablesForOutput );
+		dup = FindItemInList( VarName, DDVariableTypes, &VariableTypeForDDOutput::VarNameOnly, NumVariablesForOutput );
 	} else {
 		DDVariableTypes.allocate( LVarAllocInc );
 		MaxVariablesForOutput = LVarAllocInc;
@@ -8068,24 +8276,27 @@ AddToOutputVariableList(
 
 }
 
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	//     NOTICE
+
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

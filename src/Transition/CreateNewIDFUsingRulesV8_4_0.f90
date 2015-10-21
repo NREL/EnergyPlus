@@ -125,6 +125,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   REAL :: IndirectNewFieldThirteen
   CHARACTER(len=10) :: IndirectNewFieldString
 
+  INTEGER :: HeightFieldNum
+  INTEGER :: TankSearchNum
+  INTEGER :: HeaterNum
+  CHARACTER(len=MaxNameLength) :: ThisObjectType
+  CHARACTER(len=MaxNameLength) :: ThisObjectName
+  CHARACTER(len=MaxNameLength) :: LookingForTankName
+
+  INTEGER :: I, CurField, KAindex=0, SearchNum
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -344,7 +353,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               SELECT CASE (MakeUPPERCase(TRIM(IDFRecords(Num)%Name)))
 
               CASE ('VERSION')
-                IF ((InArgs(1)(1:3)) == '8.3' .and. ArgFile) THEN
+                IF ((InArgs(1)(1:3)) == sVersionNum .and. ArgFile) THEN
                   CALL ShowWarningError('File is already at latest version.  No new diff file made.',Auditf)
                   CLOSE(diflfn,STATUS='DELETE')
                   LatestVersion=.true.
@@ -355,8 +364,358 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
 
     !!!    Changes for this version
-              !CASE('SOMETHING')
+              CASE('COIL:WATERHEATING:AIRTOWATERHEATPUMP')
+                ! object rename only
+                ObjectName = "Coil:WaterHeating:AirToWaterHeatPump:Pumped"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                                
+              CASE('WATERHEATER:STRATIFIED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:63)  = InArgs(1:63)
+                OutArgs(64:65) = '' ! add two new blank fields
+                OutArgs(66:67) = InArgs(64:65)
+                CurArgs = CurArgs + 2
+                nodiff=.true.
+             
+              CASE('WATERHEATER:HEATPUMP')
+                ObjectName = "WaterHeater:HeatPump:PumpedCondenser"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:20)  = InArgs(1:20) ! no change
+                IF (SameString(InArgs(21), 'COIL:WATERHEATING:AIRTOWATERHEATPUMP')) THEN
+                  OutArgs(21) = 'COIL:WATERHEATING:AIRTOWATERHEATPUMP:PUMPED'
+                ELSE
+                  OutArgs(21) = InArgs(21)
+                END IF
+                OutArgs(22:23) = InArgs(22:23) ! no change
+                OutArgs(24) = '' ! Add new blank field F24
+                OutArgs(25:35) = InArgs(24:34) ! move these up by 1 for added F24
+                ! DELETE InArgs(35)
+                OutArgs(36) = '' ! add new blank field F35
                 
+                ! For OutArgs(36) "Control Sensor 1 Height In Stratified Tank", we need to mine it from the stratified tank child object
+                ! We will start by initializing it to a blank string in case we couldn't find it
+                OutArgs(37) = '' ! Get appropriate height from waterheater:stratified object or leave blank in
+                IF ( SameString(InArgs(17), "WaterHeater:Stratified" ) ) THEN ! Make sure we are dealing with a stratified tank child object
+                  HeaterNum = 0
+                  IF ( MakeUPPERCase(InArgs(35)) == "HEATER1" ) THEN
+                    HeaterNum = 1
+                  ELSE IF ( MakeUPPERCASE(InArgs(35)) == "HEATER2" ) THEN
+                    HeaterNum = 2
+                  END IF
+                  LookingForTankName = InArgs(18)
+                  IF ( HeaterNum > 0 ) THEN
+                    ! Then the child tank name is InArgs(18)
+                    DO TankSearchNum = 1, NumIDFRecords
+                      ThisObjectType = IDFRecords(TankSearchNum)%Name
+                      IF ( UBOUND(IDFRecords(TankSearchNum)%Alphas, 1) > 0 ) THEN
+                        ThisObjectName = IDFRecords(TankSearchNum)%Alphas(1)
+                      ELSE
+                        ThisObjectName = "<nothing>"
+                      END IF
+                      IF (MakeUPPERCase(ThisObjectType) /= 'WATERHEATER:STRATIFIED') CYCLE
+                      IF (MakeUPPERCase(ThisObjectName) == MakeUPPERCase(LookingForTankName)) THEN
+                        ! We have our match for the stratified tank child
+                        WRITE(diflfn,fmta) '! Found a stratified tank child component; name ='//IDFRecords(TankSearchNum)%Alphas(1)
+                        ! Now simply get the tank height
+                        IF ( HeaterNum == 1 ) THEN
+                          HeightFieldNum = 7
+                        ELSE IF ( HeaterNum == 2 ) THEN
+                          HeightFieldNum = 10
+                        END IF
+                        OutArgs(37) = IDFRecords(TankSearchNum)%Numbers(HeightFieldNum)
+                      END IF
+                    END DO
+                  END IF
+                END IF
+                OutArgs(38:39) = '' ! Finish 
+                nodiff = .true.
+                CurArgs = CurArgs + 2 ! the net gain is +1 field
+                
+              CASE('BRANCH')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                ! replace HPWH object type name
+                ! object types are on fields: 4, 9, 14, 19, ...
+                I = 0
+                DO WHILE (.TRUE.)
+                  I = I + 1
+                  CurField = 5*(I-1) + 4
+                  IF ( CurField > CurArgs ) EXIT
+                  IF ( SameString( InArgs(CurField), "WaterHeater:HeatPump" ) ) THEN
+                    OutArgs(CurField) = "WaterHeater:HeatPump:PumpedCondenser"
+                  END IF
+                END DO
+
+              CASE('ZONEHVAC:EQUIPMENTLIST')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                ! replace HPWH object type name
+                ! object types are on fields: 2, 6, 10, ...
+                I = 0
+                DO WHILE (.TRUE.)
+                  I = I + 1
+                  CurField = 4*(I-1) + 2
+                  IF ( CurField > CurArgs ) EXIT
+                  IF ( SameString( InArgs(CurField), "WaterHeater:HeatPump" ) ) THEN
+                    OutArgs(CurField) = "WaterHeater:HeatPump:PumpedCondenser"
+                  END IF
+                END DO
+
+              CASE('PLANTEQUIPMENTLIST')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+                ! replace HPWH object type name
+                ! object types are on fields: 2, 4, 6, 8, ...
+                I = 0
+                DO WHILE (.TRUE.)
+                  I = I + 1
+                  CurField = 2*(I-1) + 2
+                  IF ( CurField > CurArgs ) EXIT
+                  IF ( SameString( InArgs(CurField), "WaterHeater:HeatPump" ) ) THEN
+                    OutArgs(CurField) = "WaterHeater:HeatPump:PumpedCondenser"
+                  END IF
+                END DO
+
+              CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! we'll be adding a new flow rate field F5 to autosize
+                OutArgs(1:4) = InArgs(1:4)
+                OutArgs(5) = 'Autosize'
+                OutArgs(6:17) = InArgs(5:16)
+                CurArgs = CurArgs + 1
+                
+              CASE('CONTROLLER:MECHANICALVENTILATION')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! just override a single value
+                IF ( SameString( InArgs(4), "ProportionalControl" ) ) THEN
+                  OutArgs(4) = 'ProportionalControlBasedonOccupancySchedule'
+                END IF
+
+              CASE('SITE:GROUNDDOMAIN:SLAB')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:4)=InArgs(1:4) ! No change at all
+                OutArgs(5:7)=InArgs(5:7) ! No change -- store for later -- yes redundant here I know
+                OutArgs(8:9)=InArgs(8:9) ! No change at all
+                OutArgs(10)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(11),'(A6,I2)') "KATemp", KAindex
+                OutArgs(12:23) = InArgs(13:24)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(5:7)
+                OutArgs(5:7)=InArgs(10:12)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.
+
+              CASE('SITE:GROUNDDOMAIN:BASEMENT')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:4)=InArgs(1:4) ! No change at all
+                OutArgs(5:7)=InArgs(5:7) ! No change -- store for later -- yes redundant here I know
+                OutArgs(8:9)=InArgs(8:9) ! No change at all
+                OutArgs(10)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(11),'(A6,I2)') "KATemp", KAindex
+                OutArgs(12:24) = InArgs(13:25)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(5:7)
+                OutArgs(5:7)=InArgs(10:12)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.
+
+              CASE('PIPINGSYSTEM:UNDERGROUND:DOMAIN')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:13)=InArgs(1:13) ! No change at all
+                OutArgs(14:16)=InArgs(14:16) ! No change -- store for later -- yes redundant here I know
+                OutArgs(17:18)=InArgs(17:18) ! No change at all
+                OutArgs(19)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(20),'(A6,I2)') "KATemp", KAindex
+                OutArgs(21:CurArgs-1) = InArgs(22:CurArgs)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(14:16)
+                OutArgs(5:7)=InArgs(19:21)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.                
+
+              CASE('PIPE:UNDERGROUND')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:7)=InArgs(1:7) ! No change at all
+                OutArgs(8)=InArgs(8) ! No change -- store for later -- yes redundant here I know
+                OutArgs(9)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(10),'(A6,I2)') "KATemp", KAindex
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                DO SearchNum = 1, NumIDFRecords
+                  ThisObjectType = IDFRecords(SearchNum)%Name
+                  IF ( UBOUND(IDFRecords(SearchNum)%Alphas, 1) > 0 ) THEN
+                    ThisObjectName = IDFRecords(SearchNum)%Alphas(1)
+                  ELSE
+                    ThisObjectName = "<nothing>"
+                  END IF
+                  IF (MakeUPPERCase(ThisObjectType) /= 'MATERIAL') CYCLE
+                  IF (MakeUPPERCase(ThisObjectName) == MakeUPPERCase(InArgs(8))) THEN
+                    ! We have our match
+                    WRITE(diflfn,fmta) '! Found a material to match the soil material; name ='//IDFRecords(SearchNum)%Alphas(1)
+                    OutArgs(2) = IDFRecords(SearchNum)%Numbers(2)
+                    OutArgs(3) = IDFRecords(SearchNum)%Numbers(3)
+                    OutArgs(4) = IDFRecords(SearchNum)%Numbers(4)
+                  END IF
+                END DO
+                OutArgs(5:7)=InArgs(9:11)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.     
+
+              CASE('GROUNDHEATEXCHANGER:HORIZONTALTRENCH')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:10)=InArgs(1:10) ! No change at all
+                OutArgs(11:13)=InArgs(11:13) ! No change -- store for later -- yes redundant here I know
+                OutArgs(14:18)=InArgs(14:18) ! No change at all
+                OutArgs(19)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(20),'(A6,I2)') "KATemp", KAindex
+                OutArgs(21) = InArgs(22)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(11:13)
+                OutArgs(5:7)=InArgs(19:21)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.                
+
+              CASE('GROUNDHEATEXCHANGER:SLINKY')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:4)=InArgs(1:4) ! No change at all
+                OutArgs(5:7)=InArgs(5:7) ! No change -- store for later -- yes redundant here I know
+                OutArgs(8:19)=InArgs(8:19) ! No change at all
+                OutArgs(20)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(21),'(A6,I2)') "KATemp", KAindex
+                OutArgs(22) = InArgs(23)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(5:7)
+                OutArgs(5:7)=InArgs(20:22)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.                
+              
+              ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
+              CASE('HVACTEMPLATE:PLANT:CHILLEDWATERLOOP')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! then check the value of 32, the chw loop load distribution type and make a decision:
+                if (SameString(InArgs(32), "SEQUENTIAL")) then
+                  OutArgs(32)="SequentialLoad"
+                elseif (SameString(InArgs(32), "UNIFORM")) then
+                  OutArgs(32)="UniformLoad"
+                else
+                  OutArgs(32)=InArgs(32) ! Redundant, but clear
+                endif
+                ! then check the value of 33, the cond loop load distribution type and make a decision:
+                if (SameString(InArgs(33), "SEQUENTIAL")) then
+                  OutArgs(33)="SequentialLoad"
+                elseif (SameString(InArgs(33), "UNIFORM")) then
+                  OutArgs(33)="UniformLoad"
+                else
+                  OutArgs(33)=InArgs(33) ! Redundant, but clear
+                endif
+
+              ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
+              CASE('HVACTEMPLATE:PLANT:HOTWATERLOOP')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! then check the value of 21, the load distribution type and make a decision:
+                if (SameString(InArgs(21), "SEQUENTIAL")) then
+                  OutArgs(21)="SequentialLoad"
+                elseif (SameString(InArgs(21), "UNIFORM")) then
+                  OutArgs(21)="UniformLoad"
+                else
+                  OutArgs(21)=InArgs(21) ! Redundant, but clear
+                endif
+
+              ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
+              CASE('HVACTEMPLATE:PLANT:MIXEDWATERLOOP')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! assign the entire contents of IN to OUT to start
+                OutArgs=InArgs
+                ! then check the value of 17, the load distribution type and make a decision:
+                if (SameString(InArgs(17), "SEQUENTIAL")) then
+                  OutArgs(17)="SequentialLoad"
+                elseif (SameString(InArgs(17), "UNIFORM")) then
+                  OutArgs(17)="UniformLoad"
+                else
+                  OutArgs(17)=InArgs(17) ! Redundant, but clear
+                endif
+
+              CASE('ZONEAIRMASSFLOWCONSERVATION')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1) ! no change to F1
+                if (SameString(InArgs(1), "YES")) then
+                  OutArgs(2) = InArgs(2)
+                else ! IDD validation should require either YES or NO, so this is "NO"
+                  OutArgs(2) = "None"
+                endif
+                OutArgs(3) = "MixingSourceZonesOnly"
+                CurArgs = CurArgs + 1
+
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)

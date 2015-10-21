@@ -175,7 +175,7 @@ namespace SteamBaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, SteamBaseboard.EquipID(), NumSteamBaseboards );
+			BaseboardNum = FindItemInList( EquipName, SteamBaseboard, &SteamBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimSteamBaseboard: Unit not found=" + EquipName );
 			}
@@ -269,7 +269,6 @@ namespace SteamBaseboardRadiator {
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using GlobalNames::VerifyUniqueBaseboardName;
@@ -336,7 +335,7 @@ namespace SteamBaseboardRadiator {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SteamBaseboard.EquipID(), BaseboardNum, IsNotOK, IsBlank, cCMO_BBRadiator_Steam + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SteamBaseboard, &SteamBaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCMO_BBRadiator_Steam + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -506,7 +505,7 @@ namespace SteamBaseboardRadiator {
 			AllFracsSummed = SteamBaseboard( BaseboardNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= SteamBaseboard( BaseboardNum ).TotSurfToDistrib; ++SurfNum ) {
 				SteamBaseboard( BaseboardNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 5 );
-				SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 5 ), Surface.Name(), TotSurfaces );
+				SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 5 ), Surface );
 				SteamBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 8 );
 				if ( SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 5 ) + "=\"" + cAlphaArgs( SurfNum + 5 ) + "\" invalid - not found." );
@@ -1006,8 +1005,8 @@ namespace SteamBaseboardRadiator {
 			// Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
 			DistributeBBSteamRadGains();
 			// Now "simulate" the system by recalculating the heat balances
-			CalcHeatBalanceOutsideSurf( ZoneNum );
-			CalcHeatBalanceInsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+			HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 			// Here an assumption is made regarding radiant heat transfer to people.
 			// While the radiant heat transfer to people array will be used by the thermal comfort
@@ -1212,7 +1211,6 @@ namespace SteamBaseboardRadiator {
 		using DataHeatBalFanSys::QSteamBaseboardSurf;
 		using DataHeatBalFanSys::MaxRadHeatFlux;
 		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -1442,7 +1440,7 @@ namespace SteamBaseboardRadiator {
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( BaseboardName, SteamBaseboard.EquipID(), NumSteamBaseboards );
+			BaseboardNum = FindItemInList( BaseboardName, SteamBaseboard, &SteamBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "UpdateSteamBaseboardPlantConnection: Specified baseboard not valid =" + BaseboardName );
 			}
@@ -1476,7 +1474,7 @@ namespace SteamBaseboardRadiator {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

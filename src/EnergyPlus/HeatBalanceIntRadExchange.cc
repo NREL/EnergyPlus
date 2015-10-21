@@ -80,11 +80,19 @@ namespace HeatBalanceIntRadExchange {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	int MaxNumOfZoneSurfaces; // Max saved to get large enough space for user input view factors
-
+	int MaxNumOfZoneSurfaces( 0 ); // Max saved to get large enough space for user input view factors
+	namespace {
+		bool CalcInteriorRadExchangefirstTime( true ); // Logical flag for one-time initializations
+	}
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
 	// Functions
+	void
+	clear_state()
+	{
+		MaxNumOfZoneSurfaces = 0 ;
+		CalcInteriorRadExchangefirstTime = true;
+	}
 
 	void
 	CalcInteriorRadExchange(
@@ -140,7 +148,7 @@ namespace HeatBalanceIntRadExchange {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool firstTime( true ); // Logical flag for one-time initializations
+
 		int RecSurfNum; // Counter within DO loop (refers to main surface derived type index) RECEIVING SURFACE
 		int SendSurfNum; // Counter within DO loop (refers to main surface derived type index) SENDING SURFACE
 
@@ -166,14 +174,14 @@ namespace HeatBalanceIntRadExchange {
 #ifdef EP_Detailed_Timings
 		epStartTime( "CalcInteriorRadExchange=" );
 #endif
-		if ( firstTime ) {
+		if ( CalcInteriorRadExchangefirstTime ) {
 			InitInteriorRadExchange();
 #ifdef EP_HBIRE_SEQ
 			SendSurfaceTempInKto4thPrecalc.allocate( MaxNumOfZoneSurfaces );
 #else
 			SendSurfaceTempInKto4thPrecalc.allocate( TotSurfaces );
 #endif
-			firstTime = false;
+			CalcInteriorRadExchangefirstTime = false;
 			if ( DeveloperFlag ) {
 				std::string tdstring;
 				gio::write( tdstring, fmtLD ) << " OMP turned off, HBIRE loop executed in serial";
@@ -1433,7 +1441,7 @@ namespace HeatBalanceIntRadExchange {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

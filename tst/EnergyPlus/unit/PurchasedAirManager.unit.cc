@@ -3,14 +3,16 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
-
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::PurchasedAirManager;
@@ -40,6 +42,7 @@ TEST( SizePurchasedAirTest, Test1 )
 	//Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
+	DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 24 );
 	CurSysNum = 0;
 	ZoneHVACSizing.allocate( 1 );

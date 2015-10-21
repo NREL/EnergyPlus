@@ -81,6 +81,12 @@ namespace SizingManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+	 NumAirLoops = 0;
+	}
+
 
 	void
 	ManageSizing()
@@ -164,6 +170,9 @@ namespace SizingManager {
 		int iZoneCalcIter; // index for repeating the zone sizing calcs
 		static bool runZeroingOnce( true );
 		bool isUserReqCompLoadReport;
+		Real64 DOASHeatGainRateAtHtPk( 0.0 ); // zone heat gain rate from the DOAS at the heating peak [W]
+		Real64 DOASHeatGainRateAtClPk( 0.0 ); // zone heat gain rate from the DOAS at the cooling peak [W]
+		Real64 TStatSetPtAtPk( 0.0 ); // thermostat set point at peak
 
 		// FLOW:
 
@@ -572,11 +581,19 @@ namespace SizingManager {
 					if ( DDNum > 0 && TimeStepAtPeak > 0 ) {
 						TempAtPeak = DesDayWeath( DDNum ).Temp( TimeStepAtPeak );
 						HumRatAtPeak = DesDayWeath( DDNum ).HumRat( TimeStepAtPeak );
+						DOASHeatGainRateAtClPk = CalcZoneSizing( DDNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepAtPeak );
+						TStatSetPtAtPk = ZoneSizing( DDNum, CtrlZoneNum ).CoolTstatTempSeq( TimeStepAtPeak );
 					} else {
 						TempAtPeak = 0.0;
 						HumRatAtPeak = 0.0;
+						DOASHeatGainRateAtClPk = 0.0;
+						TStatSetPtAtPk = 0.0;
 					}
-					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Cooling", CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad, FinalZoneSizing( CtrlZoneNum ).DesCoolLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).CoolDesDay, CoolPeakDateHrMin( CtrlZoneNum ), TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, FinalZoneSizing( CtrlZoneNum ).MinOA );
+					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Cooling", CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad, 
+						FinalZoneSizing( CtrlZoneNum ).DesCoolLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, 
+						FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).CoolDesDay, CoolPeakDateHrMin( CtrlZoneNum ), 
+						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, 
+						FinalZoneSizing( CtrlZoneNum ).MinOA, DOASHeatGainRateAtClPk );
 					curName = FinalZoneSizing( CtrlZoneNum ).ZoneName;
 					PreDefTableEntry( pdchZnClCalcDesLd, curName, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad );
 					PreDefTableEntry( pdchZnClUserDesLd, curName, FinalZoneSizing( CtrlZoneNum ).DesCoolLoad );
@@ -587,11 +604,13 @@ namespace SizingManager {
 					PreDefTableEntry( pdchZnClUserDesAirFlow, curName, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, 3 );
 					PreDefTableEntry( pdchZnClDesDay, curName, FinalZoneSizing( CtrlZoneNum ).CoolDesDay );
 					PreDefTableEntry( pdchZnClPkTime, curName, CoolPeakDateHrMin( CtrlZoneNum ) );
-					PreDefTableEntry( pdchZnClPkTstatTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).CoolTstatTemp );
+					PreDefTableEntry( pdchZnClPkTstatTemp, curName, TStatSetPtAtPk );
 					PreDefTableEntry( pdchZnClPkIndTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak );
 					PreDefTableEntry( pdchZnClPkIndHum, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, 5 );
 					PreDefTableEntry( pdchZnClPkOATemp, curName, TempAtPeak );
 					PreDefTableEntry( pdchZnClPkOAHum, curName, HumRatAtPeak, 5 );
+					PreDefTableEntry(pdchZnClPkOAMinFlow, curName, FinalZoneSizing( CtrlZoneNum ).MinOA, 3 );
+					PreDefTableEntry( pdchZnClPkDOASHeatGain, curName, DOASHeatGainRateAtClPk );
 				}
 				if ( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
 					TimeStepAtPeak = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax;
@@ -599,11 +618,19 @@ namespace SizingManager {
 					if ( DDNum > 0 && TimeStepAtPeak > 0 ) {
 						TempAtPeak = DesDayWeath( DDNum ).Temp( TimeStepAtPeak );
 						HumRatAtPeak = DesDayWeath( DDNum ).HumRat( TimeStepAtPeak );
+						DOASHeatGainRateAtHtPk = CalcZoneSizing( DDNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepAtPeak );
+						TStatSetPtAtPk = ZoneSizing( DDNum, CtrlZoneNum ).HeatTstatTempSeq( TimeStepAtPeak );
 					} else {
 						TempAtPeak = 0.0;
 						HumRatAtPeak = 0.0;
+						DOASHeatGainRateAtHtPk = 0.0;
+						TStatSetPtAtPk = 0.0;
 					}
-					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Heating", CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad, FinalZoneSizing( CtrlZoneNum ).DesHeatLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).HeatDesDay, HeatPeakDateHrMin( CtrlZoneNum ), TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, FinalZoneSizing( CtrlZoneNum ).MinOA );
+					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Heating", CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad, 
+						FinalZoneSizing( CtrlZoneNum ).DesHeatLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, 
+						FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).HeatDesDay, HeatPeakDateHrMin( CtrlZoneNum ), 
+						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, 
+						FinalZoneSizing( CtrlZoneNum ).MinOA, DOASHeatGainRateAtHtPk );
 					curName = FinalZoneSizing( CtrlZoneNum ).ZoneName;
 					PreDefTableEntry( pdchZnHtCalcDesLd, curName, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad );
 					PreDefTableEntry( pdchZnHtUserDesLd, curName, FinalZoneSizing( CtrlZoneNum ).DesHeatLoad );
@@ -614,16 +641,18 @@ namespace SizingManager {
 					PreDefTableEntry( pdchZnHtUserDesAirFlow, curName, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, 3 );
 					PreDefTableEntry( pdchZnHtDesDay, curName, FinalZoneSizing( CtrlZoneNum ).HeatDesDay );
 					PreDefTableEntry( pdchZnHtPkTime, curName, HeatPeakDateHrMin( CtrlZoneNum ) );
-					PreDefTableEntry( pdchZnHtPkTstatTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).HeatTstatTemp );
+					PreDefTableEntry( pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk );
 					PreDefTableEntry( pdchZnHtPkIndTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak );
 					PreDefTableEntry( pdchZnHtPkIndHum, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, 5 );
 					PreDefTableEntry( pdchZnHtPkOATemp, curName, TempAtPeak );
 					PreDefTableEntry( pdchZnHtPkOAHum, curName, HumRatAtPeak, 5 );
+					PreDefTableEntry( pdchZnHtPkOAMinFlow, curName, FinalZoneSizing( CtrlZoneNum ).MinOA, 3 );
+					PreDefTableEntry( pdchZnHtPkDOASHeatGain, curName, DOASHeatGainRateAtHtPk );
 				}
 			}
 			// Deallocate arrays no longer needed
 			ZoneSizing.deallocate();
-			CalcZoneSizing.deallocate();
+			// CalcZoneSizing.deallocate();
 		}
 		if ( SysSizingRunDone ) {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
@@ -750,7 +779,7 @@ namespace SizingManager {
 
 				GetObjectItem( CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-				VerifyName( Alphas( 1 ), OARequirements.Name(), OAIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), OARequirements, OAIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -994,7 +1023,7 @@ namespace SizingManager {
 
 				GetObjectItem( CurrentModuleObject, ZADIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-				VerifyName( Alphas( 1 ), ZoneAirDistribution.Name(), ZADIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), ZoneAirDistribution, ZADIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1284,7 +1313,7 @@ namespace SizingManager {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SizingZoneObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SizingZoneObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -1294,7 +1323,7 @@ namespace SizingManager {
 
 			Item1 = FindItemInList( cAlphaArgs( 1 ), ZoneNames, NumZones );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 1 ), ZoneListNames.Name(), NumZoneLists );
+			if ( Item1 == 0 && NumZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 1 ), ZoneListNames );
 			if ( Item1 > 0 ) {
 				SizingZoneObjects( Item ).StartPtr = NumZoneSizingInput + 1;
 				++NumZoneSizingInput;
@@ -1352,7 +1381,7 @@ namespace SizingManager {
 					}
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneSizingInput.ZoneName(), ZoneSizIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+					VerifyName( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName, ZoneSizIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1490,7 +1519,7 @@ namespace SizingManager {
 
 					// Getting zone OA parameters from Design Specification object
 					if ( ! lAlphaFieldBlanks( 4 ) ) {
-						OAIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).DesignSpecOAObjName, OARequirements.Name(), NumOARequirements );
+						OAIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).DesignSpecOAObjName, OARequirements );
 						if ( OAIndex > 0 ) {
 							ZoneSizingInput( ZoneSizIndex ).OADesMethod = OARequirements( OAIndex ).OAFlowMethod;
 							ZoneSizingInput( ZoneSizIndex ).DesOAFlowPPer = OARequirements( OAIndex ).OAFlowPerPerson;
@@ -1681,7 +1710,7 @@ namespace SizingManager {
 					//  A7, \field Zone Air Distribution Object Name
 					if ( ! lAlphaFieldBlanks( 7 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName = cAlphaArgs( 7 );
-						ObjIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName, ZoneAirDistribution.Name(), NumZoneAirDistribution );
+						ObjIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName, ZoneAirDistribution );
 						if ( ObjIndex > 0 ) {
 							ZoneSizingInput( ZoneSizIndex ).ZoneADEffCooling = ZoneAirDistribution( ObjIndex ).ZoneADEffCooling;
 							ZoneSizingInput( ZoneSizIndex ).ZoneADEffHeating = ZoneAirDistribution( ObjIndex ).ZoneADEffHeating;
@@ -1726,6 +1755,38 @@ namespace SizingManager {
 						ShowContinueError( "... valid values are DesignDay, Flow/Zone or DesignDayWithLimit." );
 						ErrorsFound = true;
 					}}
+					if ( cAlphaArgs( 8 ) == "YES" ) {
+						ZoneSizingInput( ZoneSizIndex ).AccountForDOAS = true;
+					}
+					else { 
+						ZoneSizingInput( ZoneSizIndex ).AccountForDOAS = false;
+					}
+					if ( ZoneSizingInput( ZoneSizIndex ).AccountForDOAS ) {
+						{auto const DOASControlMethod( cAlphaArgs( 9 ) );
+							if ( DOASControlMethod == "NEUTRALSUPPLYAIR" ) {
+								ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy = DOANeutralSup;
+							}
+							else if ( DOASControlMethod == "NEUTRALDEHUMIDIFIEDSUPPLYAIR" ) {
+								ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy = DOANeutralDehumSup;
+							}
+							else if ( DOASControlMethod == "COLDSUPPLYAIR" ) {
+								ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy = DOACoolSup;
+							}
+							else {
+								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+								ShowContinueError( "... incorrect " + cAlphaFieldNames( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
+								ShowContinueError( "... valid values are NeutralSupplyAir, NeutralDehumidifiedSupplyAir or ColdSupplyAir." );
+								ErrorsFound = true;
+							}
+						}
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = rNumericArgs( 17 );
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = rNumericArgs( 18 );
+						if ( rNumericArgs( 17 ) > 0.0 && rNumericArgs( 18 ) > 0.0 && rNumericArgs( 17 ) >= rNumericArgs( 18 ) ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+							ShowContinueError( "... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint" );
+							ErrorsFound = true;
+						}
+					}
 				}
 			}
 		}
@@ -1816,7 +1877,7 @@ namespace SizingManager {
 		for ( Item = 1; Item <= NumZoneLists; ++Item ) {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// validation, but no error
-			Found = FindItemInList( cAlphaArgs( 1 ), ZoneListNames.Name(), Item - 1 );
+			Found = FindItemInList( cAlphaArgs( 1 ), ZoneListNames, Item - 1 );
 			if ( Found == 0 ) {
 				ZoneListNames( Item ).Name = cAlphaArgs( 1 );
 			} else {
@@ -1942,7 +2003,7 @@ namespace SizingManager {
 			GetObjectItem( cCurrentModuleObject, SysSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( iNameAlphaNum ), SysSizInput.AirPriLoopName(), SysSizIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( iNameAlphaNum ), SysSizInput, &SystemSizingInputData::AirPriLoopName, SysSizIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if (IsBlank) cAlphaArgs( iNameAlphaNum ) = "xxxxx";
@@ -2398,7 +2459,7 @@ namespace SizingManager {
 			GetObjectItem( cCurrentModuleObject, PltSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PlantSizData.PlantLoopName(), PltSizIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), PlantSizData, &PlantSizingData::PlantLoopName, PltSizIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2591,7 +2652,8 @@ namespace SizingManager {
 		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
 		Real64 const FloorArea, // zone floor area [m2]
 		Real64 const TotOccs, // design number of occupants for the zone
-		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
+		Real64 const MinOAVolFlow, // zone design minimum outside air flow rate [m3/s]
+		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 	)
 	{
 
@@ -2631,19 +2693,19 @@ namespace SizingManager {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		static gio::Fmt Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}')" );
-		static gio::Fmt Format_991( "(' Zone Sizing Information',13(', ',A))" );
+		static gio::Fmt Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, Calc DOAS Heat Addition Rate {W}')" );
+		static gio::Fmt Format_991( "(' Zone Sizing Information',14(', ',A))" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );
 			MyOneTimeFlag = false;
 		}
 
-		gio::write( OutputFileInits, Format_991 ) << ZoneName << LoadType << RoundSigDigits( CalcDesLoad, 5 ) << RoundSigDigits( UserDesLoad, 5 ) << RoundSigDigits( CalcDesFlow, 5 ) << RoundSigDigits( UserDesFlow, 5 ) << DesDayName << PeakHrMin << RoundSigDigits( PeakTemp, 5 ) << RoundSigDigits( PeakHumRat, 5 ) << RoundSigDigits( FloorArea, 5 ) << RoundSigDigits( TotOccs, 5 ) << RoundSigDigits( MinOAVolFlow, 5 );
+		gio::write( OutputFileInits, Format_991 ) << ZoneName << LoadType << RoundSigDigits( CalcDesLoad, 5 ) << RoundSigDigits( UserDesLoad, 5 ) << RoundSigDigits( CalcDesFlow, 5 ) << RoundSigDigits( UserDesFlow, 5 ) << DesDayName << PeakHrMin << RoundSigDigits( PeakTemp, 5 ) << RoundSigDigits( PeakHumRat, 5 ) << RoundSigDigits( FloorArea, 5 ) << RoundSigDigits( TotOccs, 5 ) << RoundSigDigits( MinOAVolFlow, 5 ) << RoundSigDigits( DOASHeatAddRate , 5 );
 
 		// BSLLC Start
 		if ( sqlite ) {
-			sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow );
+			sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
 		}
 		// BSLLC Finish
 
@@ -2859,7 +2921,7 @@ namespace SizingManager {
 
 				GetObjectItem( CurrentModuleObject, zSIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-				VerifyName( Alphas( 1 ), ZoneHVACSizing.Name(), zSIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), ZoneHVACSizing, zSIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3318,7 +3380,7 @@ namespace SizingManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

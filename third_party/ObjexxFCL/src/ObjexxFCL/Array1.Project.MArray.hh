@@ -318,8 +318,6 @@
 	inline MA1c_double BmSolRefldInsReveal() const { return ma( &T::BmSolRefldInsReveal ); }
 	inline MA1c_double BmSolRefldInsRevealReport() const { return ma( &T::BmSolRefldInsRevealReport ); }
 	inline MA1c_double BmSolRefldOutsRevealReport() const { return ma( &T::BmSolRefldOutsRevealReport ); }
-	inline MA1c_double BmSolTransThruIntWinRep() const { return ma( &T::BmSolTransThruIntWinRep ); }
-	inline MA1c_double BmSolTransThruIntWinRepEnergy() const { return ma( &T::BmSolTransThruIntWinRepEnergy ); }
 	inline MA1c_double BulkTemperature() const { return ma( &T::BulkTemperature ); }
 	inline MA1c_double BypassFrac() const { return ma( &T::BypassFrac ); }
 	inline MA1c_double CoeffA0() const { return ma( &T::CoeffA0 ); }
@@ -407,8 +405,6 @@
 	inline MA1c_double DiffLatLossJ() const { return ma( &T::DiffLatLossJ ); }
 	inline MA1c_double DiffLatLossW() const { return ma( &T::DiffLatLossW ); }
 	inline MA1c_double DistPipeZoneHeatGain() const { return ma( &T::DistPipeZoneHeatGain ); }
-	inline MA1c_double DividerQRadInAbs() const { return ma( &T::DividerQRadInAbs ); }
-	inline MA1c_double DividerQRadOutAbs() const { return ma( &T::DividerQRadOutAbs ); }
 	inline MA1c_double DividerTempSurfIn() const { return ma( &T::DividerTempSurfIn ); }
 	inline MA1c_double DividerTempSurfInOld() const { return ma( &T::DividerTempSurfInOld ); }
 	inline MA1c_double DividerTempSurfOut() const { return ma( &T::DividerTempSurfOut ); }
@@ -459,8 +455,6 @@
 	inline MA1c_double FloorArea() const { return ma( &T::FloorArea ); }
 	inline MA1c_double FLOW() const { return ma( &T::FLOW ); }
 	inline MA1c_double FLOW2() const { return ma( &T::FLOW2 ); }
-	inline MA1c_double FrameQRadInAbs() const { return ma( &T::FrameQRadInAbs ); }
-	inline MA1c_double FrameQRadOutAbs() const { return ma( &T::FrameQRadOutAbs ); }
 	inline MA1c_double FrameTempSurfIn() const { return ma( &T::FrameTempSurfIn ); }
 	inline MA1c_double FrameTempSurfInOld() const { return ma( &T::FrameTempSurfInOld ); }
 	inline MA1c_double FrameTempSurfOut() const { return ma( &T::FrameTempSurfOut ); }
@@ -909,8 +903,6 @@
 	inline MA1_double BmSolRefldInsReveal() { return ma( &T::BmSolRefldInsReveal ); }
 	inline MA1_double BmSolRefldInsRevealReport() { return ma( &T::BmSolRefldInsRevealReport ); }
 	inline MA1_double BmSolRefldOutsRevealReport() { return ma( &T::BmSolRefldOutsRevealReport ); }
-	inline MA1_double BmSolTransThruIntWinRep() { return ma( &T::BmSolTransThruIntWinRep ); }
-	inline MA1_double BmSolTransThruIntWinRepEnergy() { return ma( &T::BmSolTransThruIntWinRepEnergy ); }
 	inline MA1_double BulkTemperature() { return ma( &T::BulkTemperature ); }
 	inline MA1_double BypassFrac() { return ma( &T::BypassFrac ); }
 	inline MA1_double CoeffA0() { return ma( &T::CoeffA0 ); }
@@ -998,8 +990,6 @@
 	inline MA1_double DiffLatLossJ() { return ma( &T::DiffLatLossJ ); }
 	inline MA1_double DiffLatLossW() { return ma( &T::DiffLatLossW ); }
 	inline MA1_double DistPipeZoneHeatGain() { return ma( &T::DistPipeZoneHeatGain ); }
-	inline MA1_double DividerQRadInAbs() { return ma( &T::DividerQRadInAbs ); }
-	inline MA1_double DividerQRadOutAbs() { return ma( &T::DividerQRadOutAbs ); }
 	inline MA1_double DividerTempSurfIn() { return ma( &T::DividerTempSurfIn ); }
 	inline MA1_double DividerTempSurfInOld() { return ma( &T::DividerTempSurfInOld ); }
 	inline MA1_double DividerTempSurfOut() { return ma( &T::DividerTempSurfOut ); }
@@ -1050,8 +1040,6 @@
 	inline MA1_double FloorArea() { return ma( &T::FloorArea ); }
 	inline MA1_double FLOW() { return ma( &T::FLOW ); }
 	inline MA1_double FLOW2() { return ma( &T::FLOW2 ); }
-	inline MA1_double FrameQRadInAbs() { return ma( &T::FrameQRadInAbs ); }
-	inline MA1_double FrameQRadOutAbs() { return ma( &T::FrameQRadOutAbs ); }
 	inline MA1_double FrameTempSurfIn() { return ma( &T::FrameTempSurfIn ); }
 	inline MA1_double FrameTempSurfInOld() { return ma( &T::FrameTempSurfInOld ); }
 	inline MA1_double FrameTempSurfOut() { return ma( &T::FrameTempSurfOut ); }
@@ -1477,126 +1465,36 @@
 	inline MA1_double ZoneTempAtHeatPeak() { return ma( &T::ZoneTempAtHeatPeak ); }
 
 	// string const Members
-	inline MA1c_string AirLoopName() const { return ma( &T::AirLoopName ); }
-	inline MA1c_string AirPriLoopName() const { return ma( &T::AirPriLoopName ); }
 	inline MA1c_string AssignedLoopName() const { return ma( &T::AssignedLoopName ); }
-	inline MA1c_string CompName() const { return ma( &T::CompName ); }
-	inline MA1c_string ComponentListName() const { return ma( &T::ComponentListName ); }
-	inline MA1c_string CompType() const { return ma( &T::CompType ); }
 	inline MA1c_string computeName() const { return ma( &T::computeName ); }
-	inline MA1c_string ConstituentName() const { return ma( &T::ConstituentName ); }
-	inline MA1c_string ControllerListName() const { return ma( &T::ControllerListName ); }
-	inline MA1c_string ControllerName() const { return ma( &T::ControllerName ); }
-	inline MA1c_string ControlName() const { return ma( &T::ControlName ); }
 	inline MA1c_string CoolDesDay() const { return ma( &T::CoolDesDay ); }
-	inline MA1c_string DamperName() const { return ma( &T::DamperName ); }
-	inline MA1c_string EquipID() const { return ma( &T::EquipID ); }
-	inline MA1c_string EquipListName() const { return ma( &T::EquipListName ); }
-	inline MA1c_string EquipName() const { return ma( &T::EquipName ); }
-	inline MA1c_string EquipType() const { return ma( &T::EquipType ); }
-	inline MA1c_string EvapCoolerName() const { return ma( &T::EvapCoolerName ); }
-	inline MA1c_string ExhaustAirFanName() const { return ma( &T::ExhaustAirFanName ); }
-	inline MA1c_string ExtFanName() const { return ma( &T::ExtFanName ); }
 	inline MA1c_string FanName() const { return ma( &T::FanName ); }
 	inline MA1c_string HeatDesDay() const { return ma( &T::HeatDesDay ); }
-	inline MA1c_string HeatExchangerName() const { return ma( &T::HeatExchangerName ); }
-	inline MA1c_string InverterName() const { return ma( &T::InverterName ); }
 	inline MA1c_string keyValue() const { return ma( &T::keyValue ); }
 	inline MA1c_string LoopName() const { return ma( &T::LoopName ); }
 	inline MA1c_string LoopType_s() const { return ma( &T::LoopType ); } // Also used as int so name decorated
-	inline MA1c_string MatchValue() const { return ma( &T::MatchValue ); }
-	inline MA1c_string MatchValue1() const { return ma( &T::MatchValue1 ); }
-	inline MA1c_string MatchValue2() const { return ma( &T::MatchValue2 ); }
-	inline MA1c_string MixerName() const { return ma( &T::MixerName ); }
 	inline MA1c_string Name() const { return ma( &T::Name ); }
-	inline MA1c_string name() const { return ma( &T::name ); }
-	inline MA1c_string NameElecStorage() const { return ma( &T::NameElecStorage ); }
-	inline MA1c_string NameExhaustHX() const { return ma( &T::NameExhaustHX ); }
-	inline MA1c_string NameFCAirSup() const { return ma( &T::NameFCAirSup ); }
-	inline MA1c_string NameFCAuxilHeat() const { return ma( &T::NameFCAuxilHeat ); }
-	inline MA1c_string NameFCPM() const { return ma( &T::NameFCPM ); }
-	inline MA1c_string NameFCWaterSup() const { return ma( &T::NameFCWaterSup ); }
-	inline MA1c_string NameInverter() const { return ma( &T::NameInverter ); }
-	inline MA1c_string NameStackCooler() const { return ma( &T::NameStackCooler ); }
-	inline MA1c_string NodeName() const { return ma( &T::NodeName ); }
-	inline MA1c_string ObjName() const { return ma( &T::ObjName ); }
-	inline MA1c_string OldName() const { return ma( &T::OldName ); }
 	inline MA1c_string PlantLoopName() const { return ma( &T::PlantLoopName ); }
-	inline MA1c_string SFanName() const { return ma( &T::SFanName ); }
-	inline MA1c_string SplitterName() const { return ma( &T::SplitterName ); }
-	inline MA1c_string StorageName() const { return ma( &T::StorageName ); }
-	inline MA1c_string SupplyAirFanName() const { return ma( &T::SupplyAirFanName ); }
-	inline MA1c_string SurfName() const { return ma( &T::SurfName ); }
-	inline MA1c_string SysName() const { return ma( &T::SysName ); }
-	inline MA1c_string Title() const { return ma( &T::Title ); }
 	inline MA1c_string units() const { return ma( &T::units ); }
-	inline MA1c_string VarName() const { return ma( &T::VarName ); }
 	inline MA1c_string varName() const { return ma( &T::varName ); }
 	inline MA1c_string VarNameOnly() const { return ma( &T::VarNameOnly ); }
-	inline MA1c_string ZoneHVACUnitName() const { return ma( &T::ZoneHVACUnitName ); }
 	inline MA1c_string ZoneName() const { return ma( &T::ZoneName ); }
-	inline MA1c_string ZonePlenumName() const { return ma( &T::ZonePlenumName ); }
 
 	// string Members
-	inline MA1_string AirLoopName() { return ma( &T::AirLoopName ); }
-	inline MA1_string AirPriLoopName() { return ma( &T::AirPriLoopName ); }
 	inline MA1_string AssignedLoopName() { return ma( &T::AssignedLoopName ); }
-	inline MA1_string CompName() { return ma( &T::CompName ); }
-	inline MA1_string ComponentListName() { return ma( &T::ComponentListName ); }
-	inline MA1_string CompType() { return ma( &T::CompType ); }
 	inline MA1_string computeName() { return ma( &T::computeName ); }
-	inline MA1_string ConstituentName() { return ma( &T::ConstituentName ); }
-	inline MA1_string ControllerListName() { return ma( &T::ControllerListName ); }
-	inline MA1_string ControllerName() { return ma( &T::ControllerName ); }
-	inline MA1_string ControlName() { return ma( &T::ControlName ); }
 	inline MA1_string CoolDesDay() { return ma( &T::CoolDesDay ); }
-	inline MA1_string DamperName() { return ma( &T::DamperName ); }
-	inline MA1_string EquipID() { return ma( &T::EquipID ); }
-	inline MA1_string EquipListName() { return ma( &T::EquipListName ); }
-	inline MA1_string EquipName() { return ma( &T::EquipName ); }
-	inline MA1_string EquipType() { return ma( &T::EquipType ); }
-	inline MA1_string EvapCoolerName() { return ma( &T::EvapCoolerName ); }
-	inline MA1_string ExhaustAirFanName() { return ma( &T::ExhaustAirFanName ); }
-	inline MA1_string ExtFanName() { return ma( &T::ExtFanName ); }
 	inline MA1_string FanName() { return ma( &T::FanName ); }
 	inline MA1_string HeatDesDay() { return ma( &T::HeatDesDay ); }
-	inline MA1_string HeatExchangerName() { return ma( &T::HeatExchangerName ); }
-	inline MA1_string InverterName() { return ma( &T::InverterName ); }
 	inline MA1_string keyValue() { return ma( &T::keyValue ); }
 	inline MA1_string LoopName() { return ma( &T::LoopName ); }
 	inline MA1_string LoopType_s() { return ma( &T::LoopType ); } // Also used as int so name decorated
-	inline MA1_string MatchValue() { return ma( &T::MatchValue ); }
-	inline MA1_string MatchValue1() { return ma( &T::MatchValue1 ); }
-	inline MA1_string MatchValue2() { return ma( &T::MatchValue2 ); }
-	inline MA1_string MixerName() { return ma( &T::MixerName ); }
 	inline MA1_string Name() { return ma( &T::Name ); }
-	inline MA1_string name() { return ma( &T::name ); }
-	inline MA1_string NameElecStorage() { return ma( &T::NameElecStorage ); }
-	inline MA1_string NameExhaustHX() { return ma( &T::NameExhaustHX ); }
-	inline MA1_string NameFCAirSup() { return ma( &T::NameFCAirSup ); }
-	inline MA1_string NameFCAuxilHeat() { return ma( &T::NameFCAuxilHeat ); }
-	inline MA1_string NameFCPM() { return ma( &T::NameFCPM ); }
-	inline MA1_string NameFCWaterSup() { return ma( &T::NameFCWaterSup ); }
-	inline MA1_string NameInverter() { return ma( &T::NameInverter ); }
-	inline MA1_string NameStackCooler() { return ma( &T::NameStackCooler ); }
-	inline MA1_string NodeName() { return ma( &T::NodeName ); }
-	inline MA1_string ObjName() { return ma( &T::ObjName ); }
-	inline MA1_string OldName() { return ma( &T::OldName ); }
 	inline MA1_string PlantLoopName() { return ma( &T::PlantLoopName ); }
-	inline MA1_string SFanName() { return ma( &T::SFanName ); }
-	inline MA1_string SplitterName() { return ma( &T::SplitterName ); }
-	inline MA1_string StorageName() { return ma( &T::StorageName ); }
-	inline MA1_string SupplyAirFanName() { return ma( &T::SupplyAirFanName ); }
-	inline MA1_string SurfName() { return ma( &T::SurfName ); }
-	inline MA1_string SysName() { return ma( &T::SysName ); }
-	inline MA1_string Title() { return ma( &T::Title ); }
 	inline MA1_string units() { return ma( &T::units ); }
-	inline MA1_string VarName() { return ma( &T::VarName ); }
 	inline MA1_string varName() { return ma( &T::varName ); }
 	inline MA1_string VarNameOnly() { return ma( &T::VarNameOnly ); }
-	inline MA1_string ZoneHVACUnitName() { return ma( &T::ZoneHVACUnitName ); }
 	inline MA1_string ZoneName() { return ma( &T::ZoneName ); }
-	inline MA1_string ZonePlenumName() { return ma( &T::ZonePlenumName ); }
 
 	// Array1D< int >
 	inline MA1< Array1D< int > > adjs() { return ma( &T::adjs ); }

@@ -14,8 +14,7 @@
 ! Cooling and Heating Load Calculations.
 !===============================================================================
 
-!  Version,
-!    8.3;                    !- Version Identifier
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Construction,
     Light Exterior Wall,     !- Name

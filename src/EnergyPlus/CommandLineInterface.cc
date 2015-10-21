@@ -327,7 +327,12 @@ ProcessArgs(int argc, const char * argv[])
 	outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
 	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
 	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
-	outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+	if (suffixType == "L" || suffixType == "l") {
+		outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+	}
+	else {
+		outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
+	}
 	outputScreenCsvFileName = outputFilePrefix + screenSuffix + ".csv";
 	outputDelightInFileName = "eplusout.delightin";
 	outputDelightOutFileName = "eplusout.delightout";
@@ -403,7 +408,8 @@ ProcessArgs(int argc, const char * argv[])
 		LFN = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file "+EnergyPlusIniFileName+" for input (read)." );
+			DisplayString( "ERROR: Could not open file " + EnergyPlusIniFileName + " for input (read)." );
+			exit(EXIT_FAILURE);
 		}
 		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
 		// Relying on compiler to supply full path name here
@@ -448,7 +454,8 @@ ProcessArgs(int argc, const char * argv[])
 	OutputFileDebug = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDebug, outputDbgFileName, flags ); iostatus = flags.ios(); }
 	if ( iostatus != 0 ) {
-		ShowFatalError( "EnergyPlus: Could not open output debug file: " + outputDbgFileName + "." );
+		DisplayString( "ERROR: Could not open output debug file: " + outputDbgFileName + "." );
+		exit(EXIT_FAILURE);
 	}
 
 	// Preprocessors (These will likely move to a new file)

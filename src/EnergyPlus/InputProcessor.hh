@@ -412,6 +412,11 @@ namespace InputProcessor {
 
 	// Functions
 
+	// Clears the global data in InputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	ProcessInput();
 
@@ -573,9 +578,36 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
+		Array1D_string const & ListOfItems,
+		int const NumItems
+	);
+
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Array1D_string const & ListOfItems
+	)
+	{
+		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	int
+	FindItemInList(
+		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
 	);
+
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Array1S_string const ListOfItems
+	)
+	{
+		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+	}
 
 	template< typename A >
 	inline
@@ -592,12 +624,87 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
+	template< typename A >
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		MArray1< A, std::string > const & ListOfItems
+	)
+	{
+		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Container const & ListOfItems,
+		int const NumItems
+	)
+	{
+		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
+			if ( String == ListOfItems[ i ].Name ) return int( i + 1 ); // 1-based return index
+		}
+		return 0; // Not found
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Container const & ListOfItems
+	)
+	{
+		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and value_type
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Container const & ListOfItems,
+		std::string Container::value_type::*name_p,
+		int const NumItems
+	)
+	{
+		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
+			if ( String == ListOfItems[ i ].*name_p ) return int( i + 1 ); // 1-based return index
+		}
+		return 0; // Not found
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and value_type
+	inline
+	int
+	FindItemInList(
+		std::string const & String,
+		Container const & ListOfItems,
+		std::string Container::value_type::*name_p
+	)
+	{
+		return FindItemInList( String, ListOfItems, name_p, ListOfItems.isize() );
+	}
+
 	int
 	FindItemInSortedList(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
 	);
+
+	inline
+	int
+	FindItemInSortedList(
+		std::string const & String,
+		Array1S_string const ListOfItems
+	)
+	{
+		return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
+	}
 
 	template< typename A >
 	inline
@@ -628,12 +735,50 @@ namespace InputProcessor {
 		return Probe;
 	}
 
+	template< typename A >
+	inline
+	int
+	FindItemInSortedList(
+		std::string const & String,
+		MArray1< A, std::string > const & ListOfItems
+	)
+	{
+		return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	int
+	FindItem(
+		std::string const & String,
+		Array1D_string const & ListOfItems,
+		int const NumItems
+	);
+
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Array1D_string const & ListOfItems
+	)
+	{
+		return FindItem( String, ListOfItems, ListOfItems.isize() );
+	}
+
 	int
 	FindItem(
 		std::string const & String,
 		Array1S_string const ListOfItems,
 		int const NumItems
 	);
+
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Array1S_string const ListOfItems
+	)
+	{
+		return FindItem( String, ListOfItems, ListOfItems.isize() );
+	}
 
 	template< typename A >
 	inline
@@ -652,8 +797,81 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
+	template< typename A >
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		MArray1< A, std::string > const & ListOfItems
+	)
+	{
+		return FindItem( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Container const & ListOfItems,
+		int const NumItems
+	)
+	{
+		int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
+		if ( item_number != 0 ) return item_number;
+		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
+			if ( equali( String, ListOfItems[ i ].Name ) ) return i + 1; // 1-based return index
+		}
+		return 0; // Not found
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Container const & ListOfItems
+	)
+	{
+		return FindItem( String, ListOfItems, ListOfItems.isize() );
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and value_type
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Container const & ListOfItems,
+		std::string Container::value_type::*name_p,
+		int const NumItems
+	)
+	{
+		int const item_number( FindItemInList( String, ListOfItems, name_p, NumItems ) );
+		if ( item_number != 0 ) return item_number;
+		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
+			if ( equali( String, ListOfItems[ i ].*name_p ) ) return i + 1; // 1-based return index
+		}
+		return 0; // Not found
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and value_type
+	inline
+	int
+	FindItem(
+		std::string const & String,
+		Container const & ListOfItems,
+		std::string Container::value_type::*name_p
+	)
+	{
+		return FindItem( String, ListOfItems, name_p, ListOfItems.isize() );
+	}
+
 	std::string
 	MakeUPPERCase( std::string const & InputString ); // Input String
+
+	std::string
+	deAllCaps( std::string const & );
+
 
 	typedef char const * c_cstring;
 
@@ -692,6 +910,16 @@ namespace InputProcessor {
 	void
 	VerifyName(
 		std::string const & NameToVerify,
+		Array1D_string const & NamesList,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	);
+
+	void
+	VerifyName(
+		std::string const & NameToVerify,
 		Array1S_string const NamesList,
 		int const NumOfNames,
 		bool & ErrorFound,
@@ -711,11 +939,70 @@ namespace InputProcessor {
 		std::string const & StringToDisplay
 	)
 	{ // Overload for member arrays: Implemented here to avoid copy to Array_string to forward to other VerifyName
-		int Found;
-
 		ErrorFound = false;
 		if ( NumOfNames > 0 ) {
-			Found = FindItem( NameToVerify, NamesList, NumOfNames ); // Calls FindItem overload that accepts member arrays
+			int const Found = FindItem( NameToVerify, NamesList, NumOfNames ); // Calls FindItem overload that accepts member arrays
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	inline
+	void
+	VerifyName(
+		std::string const & NameToVerify,
+		Container const & NamesList,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			int const Found = FindItem( NameToVerify, NamesList, NumOfNames ); // Calls FindItem overload that accepts member arrays
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
+	}
+
+	template< typename Container > // Container needs size() and operator[i] and value_type
+	inline
+	void
+	VerifyName(
+		std::string const & NameToVerify,
+		Container const & NamesList,
+		std::string Container::value_type::*name_p,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			int const Found = FindItem( NameToVerify, NamesList, name_p, NumOfNames );
 			if ( Found != 0 ) {
 				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
 				ErrorFound = true;
@@ -872,7 +1159,7 @@ namespace InputProcessor {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

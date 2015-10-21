@@ -70,7 +70,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.3;
+  Version,8.4;
 
   AirLoopHVAC:UnitaryHeatCool,
     FURNACE_PACU_CAV:1_Unitary_Package,  !- Name
@@ -3198,7 +3198,7 @@
     units_gr_lf Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-  SetpointManager:SingleZone:Reheat,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp Mngrunits_gr_lf,  !- Name
     Temperature,             !- Control Variable
     10.0,                    !- Minimum Supply Air Temperature {C}
@@ -3728,7 +3728,7 @@
     units_gr_rt Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-  SetpointManager:SingleZone:Reheat,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp Mngrunits_gr_rt,  !- Name
     Temperature,             !- Control Variable
     10.0,                    !- Minimum Supply Air Temperature {C}
@@ -4084,7 +4084,7 @@
     unit_s_g Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-  SetpointManager:SingleZone:Reheat,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp Mngrunit_s_g, !- Name
     Temperature,             !- Control Variable
     10.0,                    !- Minimum Supply Air Temperature {C}
@@ -4440,7 +4440,7 @@
     unit_n_g Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-  SetpointManager:SingleZone:Reheat,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp Mngrunit_n_g, !- Name
     Temperature,             !- Control Variable
     10.0,                    !- Minimum Supply Air Temperature {C}
@@ -4625,6 +4625,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Primary Design Air Flow Rate  
     30.0,                    !- Recirculating Water Pump Design Power {W}
     ,                        !- Water Pump Power Sizing Factor
     ,                        !- Water Pump Power Modifier Curve Name
@@ -4893,6 +4894,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Primary Design Air Flow Rate  
     30.0,                    !- Recirculating Water Pump Design Power {W}
     ,                        !- Water Pump Power Sizing Factor
     ,                        !- Water Pump Power Modifier Curve Name
@@ -5186,6 +5188,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Primary Design Air Flow Rate  
     30.0,                    !- Recirculating Water Pump Design Power {W}
     ,                        !- Water Pump Power Sizing Factor
     ,                        !- Water Pump Power Modifier Curve Name
@@ -5479,6 +5482,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Primary Design Air Flow Rate  
     30.0,                    !- Recirculating Water Pump Design Power {W}
     ,                        !- Water Pump Power Sizing Factor
     ,                        !- Water Pump Power Modifier Curve Name

@@ -49,6 +49,7 @@ namespace DataEnvironment {
 	Real64 const EarthRadius( 6356000.0 ); // Radius of the Earth (m)
 	Real64 const AtmosphericTempGradient( 0.0065 ); // Standard atmospheric air temperature gradient (K/m)
 	Real64 const SunIsUpValue( 0.00001 ); // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
+	Real64 const StdPressureSeaLevel( 101325.0 ); // Standard barometric pressure at sea level (Pa)
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -80,8 +81,6 @@ namespace DataEnvironment {
 	Real64 GroundTempFC; // Current ground temperature defined for F or C factor method {C}
 	Real64 GroundTemp_Surface; // Current surface ground temperature {C}
 	Real64 GroundTemp_Deep; // Current deep ground temperature
-	Array1D< Real64 > PubGroundTempSurface( 12 ); // All 12 Surf Gnd Temps (assigned in Weather Mgr, used in PlantPipeHeatTransfer)
-	bool PubGroundTempSurfFlag; // Flag for if Surf Ground Temps Exist in idf  (assigned, used same as PubGroundTempSurface)
 	int HolidayIndex; // Indicates whether current day is a holiday and if so what type
 	// HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
 	int HolidayIndexTomorrow; // Tomorrow's Holiday Index
@@ -128,8 +127,9 @@ namespace DataEnvironment {
 	Real64 PDIFLW; // Luminous efficacy (lum/W) of sky diffuse solar radiation
 	Real64 SkyClearness; // Sky clearness (see subr. DayltgLuminousEfficacy)
 	Real64 SkyBrightness; // Sky brightness (see subr. DayltgLuminousEfficacy)
-	Real64 StdBaroPress( 101325.0 ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
+	Real64 StdBaroPress( StdPressureSeaLevel ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
 	Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress
+	Real64 rhoAirSTP; // Standard density of dry air at 101325 Pa, 20.0C temperaure 
 	Real64 TimeZoneNumber; // Time Zone Number of building location
 	Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
 	std::string EnvironmentName; // Current environment name (longer for weather file names)
@@ -180,6 +180,120 @@ namespace DataEnvironment {
 	//PUBLIC OutAirDensityAt
 
 	// Functions
+
+	// Clears the global data in DataEnvironment.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		BeamSolarRad = Real64();
+		EMSBeamSolarRadOverrideOn = false;
+		EMSBeamSolarRadOverrideValue = Real64();
+		DayOfMonth = int();
+		DayOfMonthTomorrow = int();
+		DayOfWeek = int();
+		DayOfWeekTomorrow = int();
+		DayOfYear = int();
+		DayOfYear_Schedule = int();
+		DifSolarRad = Real64();
+		EMSDifSolarRadOverrideOn = false;
+		EMSDifSolarRadOverrideValue = Real64();
+		DSTIndicator = int();
+		Elevation = Real64();
+		EndMonthFlag = bool();
+		GndReflectanceForDayltg = Real64();
+		GndReflectance = Real64();
+		GndSolarRad = Real64();
+		GroundTemp = Real64();
+		GroundTempKelvin = Real64();
+		GroundTempFC = Real64();
+		GroundTemp_Surface = Real64();
+		GroundTemp_Deep = Real64();
+		HolidayIndex = int();
+		HolidayIndexTomorrow = int();
+		IsRain = bool();
+		IsSnow = bool();
+		Latitude = Real64();
+		Longitude = Real64();
+		Month = int();
+		MonthTomorrow = int();
+		OutBaroPress = Real64();
+		OutDryBulbTemp = Real64();
+		EMSOutDryBulbOverrideOn = false;
+		EMSOutDryBulbOverrideValue = Real64();
+		OutHumRat = Real64();
+		OutRelHum = Real64();
+		OutRelHumValue = Real64();
+		EMSOutRelHumOverrideOn = false;
+		EMSOutRelHumOverrideValue = Real64();
+		OutEnthalpy = Real64();
+		OutAirDensity = Real64();
+		OutWetBulbTemp = Real64();
+		OutDewPointTemp = Real64();
+		EMSOutDewPointTempOverrideOn = false;
+		EMSOutDewPointTempOverrideValue = Real64();
+		SkyTemp = Real64();
+		SkyTempKelvin = Real64();
+		LiquidPrecipitation = Real64();
+		SunIsUp = bool();
+		WindDir = Real64();
+		EMSWindDirOverrideOn = false;
+		EMSWindDirOverrideValue = Real64();
+		WindSpeed = Real64();
+		EMSWindSpeedOverrideOn = false;
+		EMSWindSpeedOverrideValue = Real64();
+		WaterMainsTemp = Real64();
+		Year = int();
+		YearTomorrow = int();
+		SOLCOS.dimension( 3 );
+		CloudFraction = Real64();
+		HISKF = Real64();
+		HISUNF = Real64();
+		HISUNFnorm = Real64();
+		PDIRLW = Real64();
+		PDIFLW = Real64();
+		SkyClearness = Real64();
+		SkyBrightness = Real64();
+		StdBaroPress = 101325.0;
+		StdRhoAir = Real64();
+		TimeZoneNumber = Real64();
+		TimeZoneMeridian = Real64();
+		EnvironmentName = std::string();
+		WeatherFileLocationTitle = std::string();
+		CurMnDyHr = std::string();
+		CurMnDy = std::string();
+		CurEnvirNum = int();
+		TotDesDays = 0;
+		TotRunDesPersDays = 0;
+		CurrentOverallSimDay = int();
+		TotalOverallSimDays = int();
+		MaxNumberSimYears = int();
+		RunPeriodStartDayOfWeek = int();
+		CosSolarDeclinAngle = Real64();
+		EquationOfTime = Real64();
+		SinLatitude = Real64();
+		CosLatitude = Real64();
+		SinSolarDeclinAngle = Real64();
+		TS1TimeOffset = -0.5;
+		WeatherFileWindModCoeff = 1.5863;
+		WeatherFileTempModCoeff = 0.0;
+		SiteWindExp = 0.22;
+		SiteWindBLHeight = 370.0;
+		SiteTempGradient = 0.0065;
+		GroundTempObjInput = false;
+		GroundTemp_SurfaceObjInput = false;
+		GroundTemp_DeepObjInput = false;
+		FCGroundTemps = false;
+		DisplayWeatherMissingDataWarnings = false;
+		IgnoreSolarRadiation = false;
+		IgnoreBeamRadiation = false;
+		IgnoreDiffuseRadiation = false;
+		PrintEnvrnStampWarmup = false;
+		PrintEnvrnStampWarmupPrinted = false;
+		RunPeriodEnvironment = false;
+		EnvironmentStartEnd = std::string();
+		CurrentYearIsLeapYear = false;
+	}
 
 	Real64
 	OutDryBulbTempAt( Real64 const Z ) // Height above ground (m)
@@ -578,7 +692,7 @@ namespace DataEnvironment {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

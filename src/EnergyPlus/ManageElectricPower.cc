@@ -876,7 +876,6 @@ namespace ManageElectricPower {
 		using DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageSimple;
 		using DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageBattery;
 		using DataHeatBalance::IntGainTypeOf_ElectricLoadCenterTransformer;
-		using DataGlobals::NumOfZones;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::ScheduleAlwaysOn;
 		using General::RoundSigDigits;
@@ -979,7 +978,7 @@ namespace ManageElectricPower {
 						}
 					}
 
-					Inverter( InvertNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+					Inverter( InvertNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 					if ( Inverter( InvertNum ).ZoneNum > 0 ) Inverter( InvertNum ).HeatLossesDestination = ZoneGains;
 					if ( Inverter( InvertNum ).ZoneNum == 0 ) {
 						if ( lAlphaFieldBlanks( 3 ) ) {
@@ -1034,7 +1033,7 @@ namespace ManageElectricPower {
 						}
 					}
 
-					Inverter( InvertNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+					Inverter( InvertNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 					if ( Inverter( InvertNum ).ZoneNum > 0 ) Inverter( InvertNum ).HeatLossesDestination = ZoneGains;
 					if ( Inverter( InvertNum ).ZoneNum == 0 ) {
 						if ( lAlphaFieldBlanks( 3 ) ) {
@@ -1091,7 +1090,7 @@ namespace ManageElectricPower {
 						}
 					}
 
-					Inverter( InvertNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+					Inverter( InvertNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 					if ( Inverter( InvertNum ).ZoneNum > 0 ) Inverter( InvertNum ).HeatLossesDestination = ZoneGains;
 					if ( Inverter( InvertNum ).ZoneNum == 0 ) {
 						if ( lAlphaFieldBlanks( 3 ) ) {
@@ -1167,7 +1166,7 @@ namespace ManageElectricPower {
 						}
 					}
 
-					ElecStorage( StorNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+					ElecStorage( StorNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 					if ( ElecStorage( StorNum ).ZoneNum > 0 ) ElecStorage( StorNum ).HeatLossesDestination = ZoneGains;
 					if ( ElecStorage( StorNum ).ZoneNum == 0 ) {
 						if ( lAlphaFieldBlanks( 3 ) ) {
@@ -1221,7 +1220,7 @@ namespace ManageElectricPower {
 						}
 					}
 
-					ElecStorage( StorNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+					ElecStorage( StorNum ).ZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
 					if ( ElecStorage( StorNum ).ZoneNum > 0 ) ElecStorage( StorNum ).HeatLossesDestination = ZoneGains;
 					if ( ElecStorage( StorNum ).ZoneNum == 0 ) {
 						if ( lAlphaFieldBlanks( 3 ) ) {
@@ -1411,7 +1410,7 @@ namespace ManageElectricPower {
 					ErrorsFound = true;
 				}
 
-				Transformer( TransfNum ).ZoneNum = FindItemInList( cAlphaArgs( 4 ), Zone.Name(), NumOfZones );
+				Transformer( TransfNum ).ZoneNum = FindItemInList( cAlphaArgs( 4 ), Zone );
 				if ( Transformer( TransfNum ).ZoneNum > 0 ) Transformer( TransfNum ).HeatLossesDestination = ZoneGains;
 				if ( Transformer( TransfNum ).ZoneNum == 0 ) {
 					if ( lAlphaFieldBlanks( 4 ) ) {
@@ -1568,7 +1567,7 @@ namespace ManageElectricPower {
 			GetObjectItem( cCurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElecLoadCenter.Name(), Count - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ElecLoadCenter, Count - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1665,7 +1664,7 @@ namespace ManageElectricPower {
 				} else {
 					// check if previous elec load center already uses this inverter.
 					if ( Count - 1 > 0 ) {
-						Found = FindItemInList( cAlphaArgs( 7 ), ElecLoadCenter.InverterName(), Count - 1 );
+						Found = FindItemInList( cAlphaArgs( 7 ), ElecLoadCenter, &ElectricPowerLoadCenter::InverterName, Count - 1 );
 						if ( Found != 0 ) {
 							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
 							ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + " = " + cAlphaArgs( 7 ) );
@@ -1692,7 +1691,7 @@ namespace ManageElectricPower {
 				} else {
 					// check if previous elec load center already uses this storage.
 					if ( Count - 1 > 0 ) {
-						Found = FindItemInList( cAlphaArgs( 8 ), ElecLoadCenter.StorageName(), Count - 1 );
+						Found = FindItemInList( cAlphaArgs( 8 ), ElecLoadCenter, &ElectricPowerLoadCenter::StorageName, Count - 1 );
 						if ( Found != 0 ) {
 							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid entry." );
 							ShowContinueError( "Invalid " + cAlphaFieldNames( 8 ) + " = " + cAlphaArgs( 8 ) );
@@ -3745,7 +3744,7 @@ namespace ManageElectricPower {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

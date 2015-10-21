@@ -199,7 +199,7 @@ namespace HVACDXSystem {
 
 		// Find the correct DXSystemNumber
 		if ( CompIndex == 0 ) {
-			DXSystemNum = FindItemInList( DXCoolingSystemName, DXCoolingSystem.Name(), NumDXSystem );
+			DXSystemNum = FindItemInList( DXCoolingSystemName, DXCoolingSystem );
 			if ( DXSystemNum == 0 ) {
 				ShowFatalError( "SimDXCoolingSystem: DXUnit not found=" + DXCoolingSystemName );
 			}
@@ -377,7 +377,7 @@ namespace HVACDXSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), DXCoolingSystem.Name(), DXCoolSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), DXCoolingSystem, DXCoolSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -820,6 +820,7 @@ namespace HVACDXSystem {
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 		using PackagedThermalStorageCoil::SimTESCoil;
+		using PackagedThermalStorageCoil::ControlTESIceStorageTankCoil;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1932,133 +1933,13 @@ namespace HVACDXSystem {
 
 				} else if ( SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling ) {
 
-					// First get the control mode that the child coil is in
-					SimTESCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).FanOpMode, DXCoolingSystem( DXSystemNum ).TESOpMode, DXCoolingSystem( DXSystemNum ).PartLoadFrac );
-					if ( DXCoolingSystem( DXSystemNum ).TESOpMode == OffMode || DXCoolingSystem( DXSystemNum ).TESOpMode == ChargeOnlyMode ) { // cannot cool
-						PartLoadFrac = 0.0;
-					} else {
-						// Get no load result
-						PartLoadFrac = 0.0;
-						SimTESCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).FanOpMode, DXCoolingSystem( DXSystemNum ).TESOpMode, PartLoadFrac );
-						NoOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-						NoLoadHumRatOut = Node( OutletNode ).HumRat;
-
-						// Get full load result
-						PartLoadFrac = 1.0;
-						SimTESCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).FanOpMode, DXCoolingSystem( DXSystemNum ).TESOpMode, PartLoadFrac );
-						FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-						FullLoadHumRatOut = Node( OutletNode ).HumRat;
-
-						ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-						//         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
-						if ( ( NoOutput - ReqOutput ) < Acc ) {
-							PartLoadFrac = 0.0;
-							//         If the FullOutput is greater than (insufficient cooling) or very near the ReqOutput,
-							//         run the compressor at PartLoadFrac = 1.
-						} else if ( ( FullOutput - ReqOutput ) > Acc ) {
-							PartLoadFrac = 1.0;
-							//         Else find the PLR to meet the load
-						} else {
-							if ( Node( OutletNode ).Temp > DesOutTemp ) {
-								PartLoadFrac = 1.0;
-							} else {
-								Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
-								Par( 2 ) = DesOutTemp;
-								Par( 3 ) = DXCoolingSystem( DXSystemNum ).TESOpMode;
-								Par( 4 ) = DXCoolingSystem( DXSystemNum ).DXCoolingCoilOutletNodeNum;
-								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, TESCoilResidual, 0.0, 1.0, Par );
-								if ( SolFla == -1 ) {
-									if ( ! WarmupFlag ) {
-										if ( DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
-											++DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter;
-											ShowWarningError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + DXCoolingSystem( DXSystemNum ).Name );
-											ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
-											ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
-										}
-										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
-									}
-								} else if ( SolFla == -2 ) {
-									PartLoadFrac = ReqOutput / FullOutput;
-									if ( ! WarmupFlag ) {
-										if ( DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail < 1 ) {
-											++DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail;
-											ShowWarningError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + DXCoolingSystem( DXSystemNum ).Name );
-											ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
-										}
-										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
-									}
-
-								}
-
-							}
-						}
-						//         If system does not operate to meet sensible load, use no load humidity ratio to test against humidity setpoint,
-						//         else use operating humidity ratio to test against humidity setpoint
-						if ( PartLoadFrac == 0.0 ) {
-							OutletHumRatDXCoil = NoLoadHumRatOut;
-						} else {
-							OutletHumRatDXCoil = Node( OutletNode ).HumRat;
-						}
-						// If humidity setpoint is not satisfied and humidity control type is CoolReheat,
-						// then overcool to meet moisture load
-
-						if ( ( OutletHumRatDXCoil > DesOutHumRat ) && ( PartLoadFrac < 1.0 ) && ( DXCoolingSystem( DXSystemNum ).DehumidControlType == DehumidControl_CoolReheat ) ) {
-							//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
-							//           do not run the compressor
-							if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-								//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
-								//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
-								//           run the compressor at PartLoadFrac = 1.
-							} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
-								PartLoadFrac = 1.0;
-								//           Else find the PLR to meet the load
-							} else {
-								Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
-								Par( 2 ) = DesOutHumRat;
-								Par( 3 ) = DXCoolingSystem( DXSystemNum ).TESOpMode;
-								Par( 4 ) = DXCoolingSystem( DXSystemNum ).DXCoolingCoilOutletNodeNum;
-								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, TESCoilHumRatResidual, 0.0, 1.0, Par );
-								if ( SolFla == -1 ) {
-									if ( ! WarmupFlag ) {
-										if ( DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter < 1 ) {
-											++DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter;
-											ShowWarningError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " + DXCoolingSystem( DXSystemNum ).Name );
-											ShowContinueError( "Estimated part-load ratio   = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
-											ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
-										}
-										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.", DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIterIndex, PartLoadFrac, PartLoadFrac );
-									}
-								} else if ( SolFla == -2 ) {
-									//               RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
-									if ( NoLoadHumRatOut - FullLoadHumRatOut != 0.0 ) {
-										PartLoadFrac = ( NoLoadHumRatOut - DesOutHumRat ) / ( NoLoadHumRatOut - FullLoadHumRatOut );
-									} else {
-										PartLoadFrac = 1.0;
-									}
-									if ( ! WarmupFlag ) {
-										if ( DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFail < 1 ) {
-											++DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFail;
-											ShowWarningError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + DXCoolingSystem( DXSystemNum ).Name );
-											ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
-										}
-										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics follow.", DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFailIndex, PartLoadFrac, PartLoadFrac );
-									}
-								}
-							}
-						} // End if humidity ratio setpoint not met - CoolReheat humidity control
-
-					} // operating mode can cool
-					if ( PartLoadFrac > 1.0 ) {
-						PartLoadFrac = 1.0;
-					} else if ( PartLoadFrac < 0.0 ) {
-						PartLoadFrac = 0.0;
-					}
+					ControlTESIceStorageTankCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).DXCoolingSystemType, 
+						DXCoolingSystem( DXSystemNum ).FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac, 
+						DXCoolingSystem( DXSystemNum ).TESOpMode, DXCoolingSystem( DXSystemNum ).DehumidControlType, 
+						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIterIndex, 
+						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFailIndex, 
+						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIterIndex, 
+						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFailIndex );
 
 				} else {
 					ShowFatalError( "ControlDXSystem: Invalid DXCoolingSystem coil type = " + DXCoolingSystem( DXSystemNum ).CoolingCoilType );
@@ -2930,7 +2811,7 @@ namespace HVACDXSystem {
 
 		DXCoolSysNum = 0;
 		if ( NumDXSystem > 0 ) {
-			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem.Name(), NumDXSystem );
+			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem );
 			if ( DXCoolSysNum > 0 && DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil ) {
 				//DXCoolingSystem(DXCoolSysNum)%ISHundredPercentDOASDXCoil = .TRUE.
 				SetDXCoilTypeData( DXCoolingSystem( DXCoolSysNum ).CoolingCoilName );
@@ -2985,7 +2866,7 @@ namespace HVACDXSystem {
 
 		DXCoolSysNum = 0;
 		if ( NumDXSystem > 0 ) {
-			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem.Name(), NumDXSystem );
+			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem );
 			if ( DXCoolSysNum > 0 && DXCoolSysNum <= NumDXSystem ) {
 				CoolCoilType = DXCoolingSystem( DXCoolSysNum ).CoolingCoilType_Num;
 				CoolCoilIndex = DXCoolingSystem( DXCoolSysNum ).CoolingCoilIndex;
@@ -3269,7 +3150,7 @@ namespace HVACDXSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

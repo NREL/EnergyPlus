@@ -50,6 +50,7 @@ namespace GlobalNames {
 	int NumBoilers( 0 );
 	int NumBaseboards( 0 );
 	int NumCoils( 0 );
+	int numAirDistUnits( 0 );
 	int CurMaxChillers( 0 );
 	int CurMaxBoilers( 0 );
 	int CurMaxBaseboards( 0 );
@@ -62,6 +63,7 @@ namespace GlobalNames {
 	Array1D< ComponentNameData > BoilerNames;
 	Array1D< ComponentNameData > BaseboardNames;
 	Array1D< ComponentNameData > CoilNames;
+	Array1D< ComponentNameData > aDUNames;
 
 	// Functions
 
@@ -111,7 +113,7 @@ namespace GlobalNames {
 
 		ErrorFound = false;
 		int Found = 0;
-		if ( NumChillers > 0 ) Found = FindItemInList( NameToVerify, ChillerNames.CompName(), NumChillers );
+		if ( NumChillers > 0 ) Found = FindItemInList( NameToVerify, ChillerNames, &ComponentNameData::CompName, NumChillers );
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + ChillerNames( Found ).CompType + "\"." );
 			ShowContinueError( "...Current entry is Chiller Type=\"" + TypeToVerify + "\"." );
@@ -177,7 +179,7 @@ namespace GlobalNames {
 		ErrorFound = false;
 		int Found = 0;
 
-		if ( NumBaseboards > 0 ) Found = FindItemInList( NameToVerify, BaseboardNames.CompName(), NumBaseboards );
+		if ( NumBaseboards > 0 ) Found = FindItemInList( NameToVerify, BaseboardNames, &ComponentNameData::CompName, NumBaseboards );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + BaseboardNames( Found ).CompType + "\"." );
@@ -245,7 +247,7 @@ namespace GlobalNames {
 		ErrorFound = false;
 		int Found = 0;
 
-		if ( NumBoilers > 0 ) Found = FindItemInList( NameToVerify, BoilerNames.CompName(), NumBoilers );
+		if ( NumBoilers > 0 ) Found = FindItemInList( NameToVerify, BoilerNames, &ComponentNameData::CompName, NumBoilers );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + BoilerNames( Found ).CompType + "\"." );
@@ -313,7 +315,7 @@ namespace GlobalNames {
 		ErrorFound = false;
 		int Found = 0;
 
-		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames.CompName(), NumCoils );
+		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames, &ComponentNameData::CompName, NumCoils );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + CoilNames( Found ).CompType + "\"" );
@@ -334,9 +336,59 @@ namespace GlobalNames {
 
 	}
 
+	void
+	VerifyUniqueADUName(
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		std::string const & StringToDisplay
+	)
+	{
+
+		ComponentNameData aDUData;
+		ErrorFound = false;
+		int Found = 0;
+
+		if ( numAirDistUnits > 0 ) Found = FindItemInList( NameToVerify, aDUNames, &ComponentNameData::CompName, numAirDistUnits );
+
+		if ( Found != 0 ) {
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + aDUNames( Found ).CompType + "\"" );
+			ShowContinueError( "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\"." );
+			ErrorFound = true;
+		} else {
+			++numAirDistUnits;
+			aDUData.CompType = MakeUPPERCase( TypeToVerify );
+			aDUData.CompName = NameToVerify;
+			aDUNames.push_back( aDUData );
+		}
+
+	}
+
+	// Clears the global data in GlobalNames.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumChillers = 0;
+		NumBoilers = 0;
+		NumBaseboards = 0;
+		NumCoils = 0;
+		numAirDistUnits = 0;
+		CurMaxChillers = 0;
+		CurMaxBoilers = 0;
+		CurMaxBaseboards = 0;
+		CurMaxCoils = 0;
+
+		ChillerNames.deallocate();
+		BoilerNames.deallocate();
+		BaseboardNames.deallocate();
+		CoilNames.deallocate();
+		aDUNames.deallocate();
+	}
+
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

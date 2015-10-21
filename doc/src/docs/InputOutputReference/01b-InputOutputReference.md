@@ -298,7 +298,7 @@ The X, Y, and Z coordinates, in the same coordinate system, of the second daylig
 
 
 
-![](InputOutputReference/media/image095.svg)
+![](media/image095.svg)
 
 Figure 53. Example showing location of daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters.
 
@@ -436,7 +436,7 @@ Table 19. Recommended Values -- Discomfort Glare Index
 
 For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
 
-![](InputOutputReference/media/image096.svg)
+![](media/image096.svg)
 
 Figure 54. Illustration of continuous dimming relationship
 
@@ -450,7 +450,7 @@ For Lighting Control Type = 1 (continuous), the lowest lighting output the light
 
 The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be &gt;0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
 
-![](InputOutputReference/media/image097.svg)
+![](media/image097.svg)
 
 Figure 55. Stepped lighting control with Number of Steps = 3.
 
@@ -506,13 +506,13 @@ To correctly calculate both direct and inter-reflected daylight illuminance you 
 
 Interior walls IW-1, IW-2 and IW-3 should be treated as adiabatic, i.e., they should have Outside Boundary Condition = Surface and Outside Boundary Condition Object = IW-1, IW-2, or IW-3, respectively (ref: BuildingSurface:Detailed). Similarly, if the ceiling and floor of Room-1 are interior surfaces, they should be treated as adiabatic.
 
-![](InputOutputReference/media/image098.svg)
+![](media/image098.svg)
 
 Figure 56. For daylighting purposes the thermal zone enclosed by the dashed boundary line should be modeled as a typical zone (Room-1) with a zone multiplier of 4.
 
 Sometimes a representative room cannot be found. Figure 57 shows a section of a building with four rooms having different daylighting characteristics because of different floor area, orientation and/or window size. In this case lumping the rooms into a single thermal zone would give nonsensical daylighting illuminance values because of the presence of the interior walls, which EnergyPlus ignores when calculating illuminance reaching a reference point directly from a window (i.e., without reflection). The solution in this case is to describe each room as a separate thermal zone with its own daylighting reference points, and input the interior walls because these will participate in the calculation of inter-reflected illuminance.
 
-![](InputOutputReference/media/image099.svg)
+![](media/image099.svg)
 
 Figure 57. Rooms A, B, C and D have different daylighting characteristics. If lumped into a single thermal zone the daylighting calculation will be less accurate because the blockage of direct light by the interior walls between these rooms is modeled with some simplifications (see Interior Obstructions below). To get a good daylighting calculation each room should be input as a separate thermal zone.
 
@@ -520,7 +520,7 @@ Figure 57. Rooms A, B, C and D have different daylighting characteristics. If lu
 
 The detailed daylighting calculation allows a thermal zone to be divided into two independently-controlled lighting zones. (See the fields: Fraction of Zone Controlled by First Reference Point, Fraction of Zone Controlled by Second Reference Point, Illuminance SetPoint at First Reference Point, and Illuminance SetPoint at Second Reference Point.) An example is shown in Figure 58, where a relatively deep thermal zone has two lighting zones of equal area.
 
-![](InputOutputReference/media/image100.svg)
+![](media/image100.svg)
 
 Figure 58. Two independently-controlled lighting zones, each with 50% of the area of the thermal zone.
 
@@ -556,7 +556,7 @@ An example of an interior obstruction that is a wall in an L-shaped room is show
 
 
 
-![](InputOutputReference/media/image101.svg)
+![](media/image101.svg)
 
 Figure 59. Wall A (or Wall B) is an interior obstruction that prevents light from directly reaching the daylighting reference point from the window.
 
@@ -576,7 +576,7 @@ PurchAirWithDoubleFacadeDaylighting.idf is an input example of daylighting throu
 
 
 
-![](InputOutputReference/media/image102.svg)
+![](media/image102.svg)
 
 Figure 60. Vertical section through a double-façade building showing daylighting through interior windows. The dashed lines show that (1) reference point RP1 receives direct light from exterior window EW1 via interior window IW1; (2) RP2 receives direct light from EW1 and EW2 via IW2; and (3) RP3 receives direct light from EW2 via IW3.
 
@@ -584,7 +584,7 @@ Figure 60. Vertical section through a double-façade building showing daylightin
 
 Figure 61 shows schematically the general configuration of daylighting through interior windows that can be calculated with EnergyPlus. Here, daylit zone ZD has one or more interior windows that are adjacent to other zones, each of which has one or more exterior windows. ZD itself may or may not have exterior windows. If it does, than the daylight illuminance from its exterior and interior windows will be additive. The zones adjacent to ZD may or may not be daylit and may or may not have other interior windows that are not adjacent to ZD. (The program does not consider the illuminance in ZD from electric lighting in adjacent zones.)
 
-![](InputOutputReference/media/image103.svg)
+![](media/image103.svg)
 
 Figure 61. General configuration of daylighting through interior windows that can be calculated with EnergyPlus. IW = interior window, EW = exterior window.
 
@@ -594,7 +594,7 @@ Figure 62 shows schematically a configuration of daylighting through interior wi
 
 
 
-![](InputOutputReference/media/image104.svg)
+![](media/image104.svg)
 
 Figure 62. Configuration in which daylighting of zone Z through its interior window  cannot be calculated with EnergyPlus. IW = interior window, EW = exterior window.
 
@@ -670,7 +670,7 @@ Lighting Control Type = 3 (continuous/off) is the same as Lighting Control Type 
 
 For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
 
-![](InputOutputReference/media/image105.svg)
+![](media/image105.svg)
 
 Figure 63. Illustration of continuous dimming relationship
 
@@ -684,7 +684,7 @@ For Lighting Control Type = 1 (continuous), the lowest lighting output the light
 
 The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be &gt;0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
 
-![](InputOutputReference/media/image106.svg)
+![](media/image106.svg)
 
 Figure 64. Stepped lighting control with Number of Steps = 3.
 
@@ -733,7 +733,7 @@ These three fields are the X, Y and Z values of the Reference point in the coord
 
 
 
-![](InputOutputReference/media/image107.svg)
+![](media/image107.svg)
 
 Figure 65. Example showing location of two daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters.
 
@@ -1035,7 +1035,7 @@ Tubular daylighting devices (TDDs), also known as tubular skylights or light pip
 
 TDDs consist of three components: a dome, a pipe, and a diffuser.
 
-![DaylightingTubular](InputOutputReference/media/image108.png)
+![DaylightingTubular](media/image108.png)
 
 Figure 66. Tubular daylighting device diagram.
 
@@ -1065,7 +1065,7 @@ Since commercial TDDs are assumed to be cylindrical in shape, it is recommended 
 
 Note that the TubularDaylightDome surface is allowed to have a different position and tilt from the roof base surface. If the actual TDD projects some height above the roof surface, the TubularDaylightDome coordinates should be located accordingly.
 
-![](InputOutputReference/media/image109.png)
+![](media/image109.png)
 
 Figure 67. Tubular daylighting device DXF output.
 
@@ -1254,7 +1254,7 @@ Daylighting shelves, or simply light shelves, are another device for bringing mo
 
 
 
-![DaylightingShelf](InputOutputReference/media/image110.png)
+![DaylightingShelf](media/image110.png)
 
 Figure 68. Daylighting shelf diagram.
 
@@ -1264,7 +1264,7 @@ The inside shelf redistributes light that would have entered the zone anyway. In
 
 The outside shelf changes the amount of light entering the zone. If the shelf surface is more reflective than the ground, it can increase the amount of light incident on the upper part of the window. However, the shading effect of the outside shelf on the lower part of the window must also be considered as it can easily negate any gain achieved in the upper part of the window. All light reflected from the outside shelf that enters the upper window is assumed to strike the ceiling.
 
-![](InputOutputReference/media/image111.png)
+![](media/image111.png)
 
 Figure 69. Daylighting shelf DXF output.
 
@@ -1422,7 +1422,7 @@ This object is used to model the impacts on daylighting of a “light well” th
 
 The input object describes the light well using basic characteristics of the geometry along with the visible reflectance of the well’s side walls.  The following figure diagrams how the geometry is characterized.
 
-![](InputOutputReference/media/image112.svg)
+![](media/image112.svg)
 
 Figure 70. Skylight with light well: (a) perspective view, (b) vertical section.
  If the bottom of the light well is a rectangle of side lengths c and d, as shown in (a), then the perimeter of the bottom of the well = 2(c+d) and the area = cd (see description of field names for the Light Well object).
@@ -1921,7 +1921,7 @@ ZoneInfiltration:EffectiveLeakageArea model is similar to the other infiltration
 
 <div>\[Infiltration = \left( {{F_{Schedule}}} \right)\frac{{{A_L}}}{{1000}}\sqrt {{C_s}\Delta T + {C_w}{{\left( {WindSpeed} \right)}^2}} \]</div>
 
-where <span>$\Delta T$</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
+where <span>\(\Delta T\)</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
 Note that the coefficients for the “EffectiveLeakageArea” model are not interchangeable with the similarly named coefficients in the “FlowCoefficient” model (see ZoneInfiltration:FlowCoefficient object).
 
@@ -1941,11 +1941,11 @@ This field is the name of a schedule (ref: Schedule) that modifies the volume fl
 
 #### Field: Effective Air Leakage Area
 
-This field is the effective air leakage area, in cm<sup>2</sup>, at 4 Pa.  This is the value <span>${A_L}$</span>in the equation above.  Effective leakage area data can be obtained from a whole-building pressure test (eg. blower door test).  ASHRAE Handbook of Fundamentals also lists typical values component leakage areas for low-rise residential (e.g. Table 1 in Chapter 26 of HoF 2001).  The value should correspond to a pressure difference of 4 Pa.
+This field is the effective air leakage area, in cm<sup>2</sup>, at 4 Pa.  This is the value <span>\({A_L}\)</span>in the equation above.  Effective leakage area data can be obtained from a whole-building pressure test (eg. blower door test).  ASHRAE Handbook of Fundamentals also lists typical values component leakage areas for low-rise residential (e.g. Table 1 in Chapter 26 of HoF 2001).  The value should correspond to a pressure difference of 4 Pa.
 
 #### Field: Stack Coefficient
 
-This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·K).  Values for the “Basic Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the stack coefficient, <span>\({C_s}\)</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·K).  Values for the “Basic Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -1966,7 +1966,7 @@ This field is the value of the stack coefficient, <span>${C_s}$</span> in the e
 
 #### Field: Wind Coefficient
 
-This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>).  Values for the “Basic Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
+This field is the value of the wind coefficient, <span>\({C_w}\)</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>).  Values for the “Basic Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.
 
 
 
@@ -2061,7 +2061,7 @@ ZoneInfiltration:FlowCoefficient model is similar to the other infiltration obje
 
 <div>\[Infiltration = \left( {{F_{Schedule}}} \right)\sqrt {{{\left( {c\,{C_s}\Delta {T^n}} \right)}^2} + {{\left( {c\,{C_w}{{\left( {s * WindSpeed} \right)}^{2n}}} \right)}^2}} \]</div>
 
-Where <span>$\Delta T$</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
+Where <span>\(\Delta T\)</span> is the average difference between zone air temperature and the outdoor air temperature and the other coefficients are described below.
 
 Note that the coefficients for the “Flow Coefficient” model are not interchangeable with the similarly named coefficients in the “Effective Leakage Area” model (see ZoneInfiltration:EffectiveLeakageArea object).
 
@@ -2081,11 +2081,11 @@ This field is the name of a schedule (ref: Schedule) that modifies the volume fl
 
 #### Field: Flow Coefficient
 
-This field is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>).  This is the value <span>$c$</span> in the equation above.  The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).
+This field is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>).  This is the value <span>\(c\)</span> in the equation above.  The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).
 
 #### Field: Stack Coefficient
 
-This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (Pa/K)<sup>n</sup>. Values for the “Enhanced Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the stack coefficient, <span>\({C_s}\)</span> in the equation above.  The coefficient has units of (Pa/K)<sup>n</sup>. Values for the “Enhanced Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -2118,7 +2118,7 @@ This field is the value of the pressure exponent, *n* in the equation above.  T
 
 #### Field: Wind Coefficient
 
-This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup> .  Values for the “Enhanced Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the wind coefficient, <span>\({C_w}\)</span> in the equation above.  The coefficient has units of (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup> .  Values for the “Enhanced Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 
 
@@ -2160,7 +2160,7 @@ No Flue</td>
 
 #### Field: Shelter Factor
 
-This field is the value of the wind coefficient, <span>$s$</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the wind coefficient, <span>\(s\)</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 <table class="table table-striped">
 <tr>
@@ -4011,79 +4011,92 @@ The temperature of the air which is discharged from the thermal chimney through 
 
 ### ZoneAirMassFlowConservation
 
-This global object allows users to trigger the zone air mass flow conservation calculation when desired. This object has two input fields; the first choice input field allows the user whether to enforce or not to enforce the zone air mass flow conservation; and the second input field allows the user to specify how infiltration object mass flow rate is calculated for zone air mass flow balance calculation.  The first input field of this object has two choice KEYs: “Yes” and “No”. If this input is specified as “Yes”, then energy plus attempts to enforce the zone mass conservation, or else if it is specified as “No”, then EnergyPlus calculation defaults to zone air flow balance calculation that does not include zone mixing objects and that assumes self-balanced simple flow objects procedure, which may not necessarily enforce zone air mass flow conservation unless the user has specified a balanced flow to begin with. The zone air mass flow conservation primarily accounts for the zonemixing objects air flow in the zone air flow mass balance calculation. In additional to the zonemixing object flow, the procedure accounts for zone exhaust fan flows by providing additional infiltration air flows when required in order to balance the zone air mass flow.  Hence, zonemixing object must to be defined to trigger zone air mass flow conservation calculation, whereas infiltration object is required only for zones which are used as a source zone of the zone mixing object.  Zone air mass flow balance calculation is enforced both for the receiving and source zones of every mixing object defined. The zone air mass flow conservation calculation uses two steps procedure.
+This global object allows users to trigger the zone air mass flow conservation calculation when desired. This object has three input fields; the first choice input field allows the user whether to adjust mixing flows to enforce the zone air mass flow conservation; and the other fields allows the user to specify how infiltration object mass flow rate is calculated for zone air mass flow balance calculation.  If adjustments for either mixing or infiltration is specified then the zone air mass balance attempts to enforce conservation. If both mixing and infiltration adjustments are off, then the zone air mass flow calculation uses the default method which does not include zone mixing objects and assumes self-balanced simple infiltration. The default method may not necessarily enforce zone air mass flow conservation unless the user has specified a balanced flow to begin with. The zone air mass flow conservation primarily accounts for the zonemixing objects air flow in the zone air flow mass balance calculation. In addition to the zonemixing object flow, the procedure accounts for zone supply, exhaust, and return flows and adjusts infiltration air flows (up or down) when required in order to balance the zone air mass flow.  Mixing and infiltration adjustments will only be made in zones which have zonemixing or infiltration objects defined in the input. For example, if a zone does not have any infiltration objects, then no infiltration adjustment will be made for that zone.
 
-First, the ZoneMixing object mass flow rate is adjusted or modified in order to balance zone air mass flow while assuming the zone infiltration object air mass flow self-balanced. This step will always results in balanced zone air mass for receiving zones of ZoneMixing object but it may not necessarily result in a balanced air mass flow for source zones.  Infiltration objects air mass flow rate defined for receiving zones are always calculated based on user inputs and assumed to be self-balanced. The infiltration mass flow rate of zones that serve only as a source zone may require adjusting base infiltration flow, which is calculated based on user inputs in the infiltration objects, in order to balance the zone air mass flow, i.e., the second calculation step replenishes the source zones with additional infiltration air mass flow when required. This second step is required in zones which serve as a source zone for zone mixing objects and when the zone mixing source mass flow rate exceeds the supply air mass flow rate.  There are two calculation procedures that users can choose from on how the infiltration flow rate is calculated for source zones that need infiltration object mass flow in order to balance the zone air mass flow.  The second optional input field “Source Zone Infiltration Treatment” provides two Key choice inputs: “**AddInfiltrationFlow**” and “**AdjustInfiltrationFlow**”.
+First, the ZoneMixing object mass flow rate is adjusted or modified in order to balance zone air mass flow while assuming any zone infiltration objects are self-balanced. This step will always results in balanced zone air mass for receiving zones of ZoneMixing object but it may not necessarily result in a balanced air mass flow for source zones.  
 
-**AddInfiltrationFlow**: Energyplus adds infiltration air mass flow rate on top of the base infiltration flow, which is calculated using the infiltration object user inputs, in order to balance the zone air mass flow.  This additional infiltration air mass flow is not self-balanced, i.e., it is always assumed incoming flow. If no infiltration air is required in order to be balance the zone air mass flow, then the additional infiltration air mass flow rate is set to zero. The base infiltration flow calculated using the infiltration object user inputs is always assumed to be self-balanced.
+Second, infiltration flow rates are adjusted accoring to the options set. Infiltration flow will be increased or decreased to balance the net flow from supply, exhaust, mixing, and return air flows. If a negative infiltration rate (exfiltration) is required to balance a zone's airflow, then the infiltration rate will be set to zero. This can happen, for example, if the total supply flow exceeds the total exahust plus return flow. 
 
-**AdjustInfiltrationFlow**: Energyplus may adjust the base flow calculated using the infiltration object user inputs if it is required in order to balance the zone air mass flow.  If it is not required to adjust the base infiltration air flow, then the base infiltration air mass flow, which is calculated from user input of the infiltration object, is retained and assumed self-balanced. The report variable “Zone Infiltration Air Mass Flow Balance Status” indicates whether the infiltration object air mass flow is adjusted or not.  If the value of this report variable is **0**, then the zone infiltration object mass flow rate is not included in the zone mass flow balance hence the infiltration air flow rate calculated based on the user specified inputs is manintained as is and assumed self-balanced for current timestep.  If the value of this report variable is 1, then the zone infiltration object mass flow rate is included in the zone mass flow balance, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for current time step.
-
-This object is optional, only required in the input data file if the user wishes to enforce the zone air mass flow balance calculation that includes zonemixing and infiltration objects.
+This object is optional. If it is not present in the input file, the default zone air mass flow calculastion are used which do not account for zonemixing and infiltration flows.
 
 
 
 #### Field: Adjust Zone Mixing For Zone Air Mass Flow Balance
 
-It has two choice KEYs: “Yes” and “No”.  If this input is specified as “Yes”, then Energyplus attempts to enforce the zone mass conservation, or else if it is specified as “No”, then EnergyPlus calculation defaults to the existing procedure, which may not necessarily enforce zone mass conservation unless the user specified a balanced flow to begin with.  The default input is “No”.  Note that “No” input may also results in balanced flow depending on the system specified. If this input field is specified as “No”, then the next input field it not used.
+This field has two choices: *Yes* or *No*.  When set to *Yes*, the zone air mass flow balance attempts to enforce conservation by adjusting zone mixing flow rates. When set to *No*, mixing flow rates are not adjusted; the mixing flows specified in ZoneMixing obects will be used.  The default is *No*.
 
-#### Field: Source Zone Infiltration Treatment
+#### Field: Infiltration Balancing Method
 
-It has two choice KEYs: “AddInfiltrationFlow” and “AdjustInfiltrationFlow”.  If this input is specified as “AddInfiltrationFlow”, then Energyplus adds infiltration air mass flow on top of the base infiltration flow calculated using the infiltration object user inputs in order to balance the zone air mass flow.  The additional infiltration air mass flow is not self-balanced.  If this input is specified as “AdjustInfiltrationFlow”, then Energyplus may adjust the base flow calculated using the infiltration object user inputs if it is required inorder to balance the zone air mass flow.  If it not required to adjust the base infiltration flow calculated using the user specified infiltration object inputs, then the base infiltration air mass flow is assumed self-balanced.
+This field has three choices: *AddInfiltrationFlow*, *AdjustInfiltrationFlow*, or *None*. The default is *AddInfiltrationFlow*. With all three options, the base infiltration flow rate is the flow specified in all Infiltration:\* objects for a given zone.
 
-And, a default IDF example is shown below:
+*AddInfiltrationFlow*: The base infiltration flow may be increased in order to balance the zone air mass flow.  This additional infiltration air mass flow is not self-balanced, i.e., it is always assumed to be incoming flow which leaves by exahust, mixing, or return. If no infiltration air is required in order to balance the zone air mass flow, then the additional infiltration air mass flow rate is set to zero. For this option, the base infiltration flow is always assumed to be self-balanced (i.e., exfiltration = infiltration) and is not included in the zone air mass flow balance.
+
+*AdjustInfiltrationFlow*: The base infiltration flow may be increased or decreased in order to balance the zone air mass flow. If no infiltration is required to balance the zone air flow, then the base infiltration flow rate is retained and assumed to be self-balanced (i.e., exfiltration = infiltration). If the required infiltration flow rate is negative (exfiltration), then the infiltration flow rate is set to zero and surplus flow in the zone is assumed to leave as exfiltration.
+
+*None*: The base infiltration flow is always assumed to be self-balanced (i.e., exfiltration = infiltration) and is not included in the zone air mass flow balance. No changes are made to the base infiltration flow rate.
+
+#### Field: Infiltration Balancing Zones
+This field allows user to choose which zones are included in infiltration balancing. There are two choices: *MixingSourceZoneOnly* or *AllZones*.
+
+*MixingSourceZonesOnly*: Infiltration balancing is active only in zones which are source zones for mixing and which have a base infiltration object defined.
+
+*AllZones*: Infiltration balance is active in any zone which has a base infiltration object defined.
+ 
+
+An IDF example is shown below:
 
 ```idf
 ZoneAirMassFlowConservation,
   Yes,                       !- Adjust Zone Mixing For Zone Air Mass Flow Balance
-  AdjustInfiltrationFlow;    !- Source Zone Infiltration Treatment
+  AdjustInfiltrationFlow;    !- Infiltration Balancing Method
+  AllZones;                  !- Infiltration Balancing Zones
 ```
 
 ### ZoneAirMassFlowConservation Outputs
 
-Current ZoneAirMassFlowConservation output variables:
+Current ZoneAirMassFlowConservation output variables (only applicable variables will be generated):
 
-* HVAC, Average, Zone Supply Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Supply Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Exhaust Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Return Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Return Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Mixing Receiving Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]
 
-* HVAC, Average, Zone Mixing Source Air Mass Flow Rate [kg/s]
+* HVAC, Average, Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]
 
 * HVAC, Average, Zone Infiltration Air Mass Flow Balance Status, []
 
 * HVAC, Average, Zone Mass Balance Infiltration Air Mass Flow Rate, [kg/s]
 
-#### Zone Supply Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Supply Mass Flow Rate [kg/s]
 
 This output variable represents the total supply air mass flow rate of a zone. The value is determined by summing the supply air mass flow rates contributions from all supply air inlet nodes of a zone.
 
-#### Zone Exhaust Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]
 
 This output variable represents the total exhaust air mass flow rate of a zone. The value is determined by summing the exhaust air mass flow rates contributions from all exhaust air nodes of a zone.
 
-#### Zone Return Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Return Mass Flow Rate [kg/s]
 
 This output variable represents the total return air mass flow rate of a zone. The value is determined by summing the return air mass flow rates contributions from return air nodes of a zone.
 
-#### Zone Mixing Receiving Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]
 
 This output variable represents the total zone mixing air mass flow rate of a receiving zone from one or more mixing objects. The value is determined by summing the air mass flow contributions from all zone mixing objects connected to a single receiving zone.
 
-#### Zone Mixing Source Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]
 
 This output variable represents the total zone mixing source air mass flow rate of a source zone feeding one or more mixing objects. The value is determined by summing the air mass flow contributions from all zone mixing objects connected to a single source zone.
 
-#### Zone Infiltration Air Mass Flow Balance Status []
+#### Zone Air Mass Balance Infiltration Status []
 
-This output variable indicates the status of the infiltration object mass flow rate use for balancing the zone mass flow at each time step. It has values of either **0** or **1**.  If the value of this report variable is **0** then the zone infiltration object mass flow rate is not used in the zone mass conservation calculation, hence the infiltration rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for current timestep.  If the value is 1 then the zone infiltration object mass flow rate is included in the zone air mass flow balance calculation, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
+This output variable indicates the status of the infiltration object mass flow rate use for balancing the zone mass flow at each time step. It has values of either **0** or **1**.  If the value of this report variable is **0** then the zone infiltration object mass flow rate is not used in the zone mass conservation calculation, hence the infiltration rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for the current timestep.  If the value is 1 then the zone infiltration object mass flow rate is included in the zone air mass flow balance calculation, hence the user specified infiltration rate is modified and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
 
-#### Zone Mass Balance Infiltration Air Mass Flow Rate [kg/s]
+#### Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]
 
-This output variable represents the zone infiltration air mass flow rate in kg/s.  This output variable is reported only for source zones and when the zone air mass flow balance flag is set to “Yes” and its value depends on the “Source Zone Infiltration Treatment” method specified.  When the infiltration treatment method selected is “AddInfiltrationFlow” this report variable represents additional infiltration air mass flow rate added on top of the base infiltration air flow calculated using the user inputs inroder to balance the zone air mass flow. In this case, the base infiltration air mass flow calculated using the user specified input is assumed self-balanced.  When the infiltration treatment method selected is “AdjustInfiltrationFlow” this report variable represents the base infiltration air mass flow calculated using the user inputs and can be adjuted as needed in roder to balance the zone air mass flow. If the value of the output variable “Zone Infiltration Air Mass Flow Balance Status” is **0**, then the infiltration air mass flow rate calculated based on the user specified inputs is manintained and the infiltration rate is assumed as self-balanced for current timestep, or else  if Zone Infiltration Air Mass Flow Balance Status” is **1**, then user specified infiltration rate is adjusted and it is considered as incoming flow to the zone, i.e., self-balanced assumption is not valid for this zone and current time step.
+This output variable represents the zone infiltration air mass flow rate in kg/s.  This output variable is reported only for source zones and when the zone air mass flow balance is active.  Its value depends on the Infiltration Balancing Method specified.  When the infiltration method is *AddInfiltrationFlow* this output represents the additional infiltration air mass flow rate added on top of the base infiltration air flow in order to balance the zone air mass flow. In this case, the base infiltration air mass flow calculated using the user specified input is assumed self-balanced.  When the infiltration method is *AdjustInfiltrationFlow* and the value of "Zone Air Mass Balance Infiltration Status" is **1**, this output represents the infiltration air mass flow rate required to balance the zone air mass flow. This value could be negative if the zone supply exceeds all other outflows. If the value of "Zone Air Mass Balance Infiltration Status" is **0**, then this output is the self-balanced base infiltration flow rate for current timestep.
 
 Group – Design Objects
 ----------------------
@@ -4116,7 +4129,7 @@ None of these applications are necessarily recommended but these and other uses 
 
 - Other than zone thermostat setpoints, the sizing calculations generally know nothing about the system control inputs such as setpoints and availability schedules. The user must coordinate sizing inputs with the actual simulation control inputs.
 
-- The sizing calculations only recognize the presence of central heating and cooling coils, preheat and precool coils and reheat coils. These are assumed to deliver the various supply temperatures specified in the Sizing:System and Sizing:Zone objects. The impact of ther components such as heat recovery, dehumidifiers, fans, and pumps are not accounted for in the sizing calculations.
+- The sizing calculations only recognize the presence of central heating and cooling coils, preheat and precool coils and reheat coils. These are assumed to deliver the various supply temperatures specified in the Sizing:System and Sizing:Zone objects. The impact of other components such as heat recovery, dehumidifiers, and pumps are not accounted for in the sizing calculations. Central supply and return fan temperature rise is taken into account in sizing the central cooling coils.
 
 #### Component Autosizing
 
@@ -7039,7 +7052,7 @@ The positive numeric input for this field is the zone air distribution effective
 
 The positive numeric input for this field is the zone air distribution effectiveness when the zone is in heating mode. Default value of this field is 1.0. ASHRAE Standard 62.1-2010 provides typical values as follows:
 
-![](InputOutputReference/media/image133.svg)
+![](media/image133.svg)
 
 Figure 71. Zone Air Distribution Effectiveness (Source: ASHRAE Standard 62.1-2010)
 
@@ -7140,6 +7153,8 @@ The Sizing:Zone object is also the place where the user can specify the design o
 
 The user can also place limits on the heating and design cooling air flow rates. See * Heating Design Air Flow Method* and *Cooling Design Air Flow Method* below and the explanations of the various heating and cooling flow input fields.
 
+The user can ask the zone design calculation to take into account the effect of a Dedicated Outdoor Air System on the zone design loads and airflow rates. The design calculation will calculate the heat addition rate to the zone of an idealized SOA system and add or subtract the result from the total zone loads and flow rates. 
+
 #### Field: Zone Name
 
 The name of the Zone corresponding to this Sizing:Zone object. This is the zone for which the design air flow calculation will be made using the input data of this Sizing:Zone Object.
@@ -7232,6 +7247,26 @@ The maximum zone design heating volumetric flow rate expressed as a fraction of 
 
 The name of the DesignSpecification:ZoneAirDistribution object, defining the air distribution effectiveness and secondary recirculation air fraction, that applies to the zone or zone list. This object may be used for the same zone in the Controller:MechanicalVentilation object if no such DesignSpecification:ZoneAirDistribution object is specified.
 
+#### Field: Account for Dedicated Outdoor Air System
+
+This is a choice field with choices *Yes* or *No*. The default is *No*. Choosing *Yes* means that the zone sizing calculation will use the subsequent inputs to calculate the heat gain or loss (heat gains are positive, heat loss is negative) imposed on the zone by a Dedicated Outdoor Air System (DOAS). This heat gain is then added to the zone design heat gain for the zone and the zone design air flow rate is adjusted to meet the DOAS heat gain plus the zone design heat gain.
+
+#### Field: Dedicated Outdoor Air System Control Strategy
+
+This is a choice field with a choice of three ideal control strategies for the DOA system. The choices are *NeutralSupplyAir*, *NeutralDehumidifiedSupplyAir*, or *ColdSupplyAir*. The default is *NeutralSupplyAir*.
+
+*NeutralSupplyAir* implies that the ventilation air supplied to the zone will cause little heating or cooling. The air will be heated or cooled to keep it between the low and high temperature setpoints specified in the subsequent two fields. A good choice for these fields might be 21.1 and 23.9 degrees C.
+
+*NeutralDehumidifiedSupplyAir* means that the ventilation air will be cooled and dehumidified and then reheated to a neutral temperature. The ventilation air is cooled to the lower setpoint temperature (if necessary) and reheated to the upper setpoint temperature. A good choice for the setpoints would be 14.4 and 22.2 degrees C.
+
+*ColdSupplyAir* means that the ventilation air will be used to supply cooling to the zone. Cold outside air is heated to the upper setpoint; warm outside air is cooled to the lower setpoint. A good choice for the setpoints would be 12.2 and 14.4 degrees C.
+
+#### Field: Dedicated Outdoor Air Low Temperatue Setpoint for Design
+The lower setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
+
+#### Field: Dedicated Outdoor Air High Temperature Setpoint for Design
+The higher setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
+
 An IDF example:
 
 ```idf
@@ -7254,7 +7289,11 @@ Sizing:Zone,
     ,                        !- heating max air flow per zone area {m3/s-m2}
     ,                        !- heating max air flow {m3/s}
     ,                        !- fraction of the cooling design air flow rate
-    DSZADO1;                 !- Design Specification Zone Air Distribution Object Name
+    DSZADO1,                 !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outside Air System
+    ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
+    12.2,                    !- Dedicated Outside Air Low Setpoint for Design
+    14.4;                    !- Dedicated Outside Air High Setpoint for Design
 
 DesignSpecification:OutdoorAir,
     DSOA1,                   !- Name
@@ -7279,6 +7318,264 @@ DesignSpecification:ZoneAirDistribution,
 The zone design air flow rates and loads are output onto the local file “epluszsz.&lt;ext&gt;” where &lt;ext&gt; is the extension from the sizing style object (default is csv – a comma separated file *epluszsz.csv)*. The columns are clearly labeled. It will easily import into Excel or other spreadsheet program that accepts delimited files. All of these values are design air flow rates and loads *calculated by the program*. No sizing factors have been applied.
 
 The calculated zone design air flow rates and the user input or altered zone design air flow rates are also reported on the *eplusout.eio* file. The values are printed out for each zone as comma separated records beginning with *Zone Sizing*. Items output on the *eio* file are: zone name, load type (heating or cooling), design load, calculated design air flow rate, user design air flow rate, design day name, time of peak, outside temperature at peak, outside humidity ratio at peak.
+
+### DesignSpecification:ZoneHVAC:Sizing
+
+This object is used to describe general sizing and scalable sizing methods which are referenced by zone HVAC equipment objects. It is optional input field in zone HVAC objects. If a name of this optional input is not specified or is blank then the sizing method or input specified in the parent object is used.  If the name of this object is entered, then the values or method specified overrides the sizing method in the parent zone HVAC objects. This object is meant to provide scalable sizing method to users. The name of this object is an optional input field in the zoneHVAC objects. When this name in not specified in the zone HVAC object the sizing method or the value specified in the zone HVAC object will be used.
+
+List of zoneHVAC objects than can reference this object include:
+
+* ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+
+* ZoneHVAC:PackagedTerminalAirConditioner
+
+* ZoneHVAC:PackagedTerminalHeatPump
+
+* ZoneHVAC:WaterToAirHeatPump
+
+* ZoneHVAC:WindowAirConditioner
+
+* ZoneHVAC:UnitHeater
+
+* ZoneHVAC:UnitVentilator
+
+* ZoneHVAC:FourPipeFanCoil
+
+* ZoneHVAC:VentilatedSlab
+
+* ZoneHVAC:EvaporativeCoolerUnit
+
+* ZoneHVAC:IdealLoadsAirSystem
+
+The sizing methods input fields available in this objects are for supply air flow and capacity for heating and cooling operating modes. Some zone HVAC equipment has single supply air flow rate input field that serves both cooling and heating operating modes.  So entering either of the cooling or heating scalable sizing input field is sufficient.  When there are separate input fields for cooling, heating, no-cooling, and no-heating operating modes, the corresponding input fields are specified.  The child components supply air flow rate are also sized using scalable sizing methods specified in the parent objects. The methods allow users to enter a fixed or hard sized values, autosizable, or scalable sizing methods.  Methods allowed for sizing supply air flow rates include: *SupplyAirFlowRate*, *FractionOfAutosizedCoolingAirflow*, *FractionOfAutosizedHeatingAirflow*, *FlowPerFloorArea, FlowPerCoolingCapacity*, and *FlowPerHeatingCapacity*.  The different sizing options are defined as follows:
+
+* **SupplyAirFlowRate**: entered when it is intended that the user specified either hard value or the simulation engine autosize the supply air flow rates for cooling, heating, and no-cooling or no-heating operating modes.
+
+* **FlowPerFloorArea**: entered when it is intended that the simulation engine determine the supply air flow rates from the user specified *supply air flow rates per unit floor area* and the zone floor area of the zone served by the zone HVAC equipment.
+
+* **FractionOfAutosizedCoolingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized cooling design supply air flow rate*.
+
+* **FractionOfAutosizedHeatingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized heating design supply air flow rate*.
+
+* **FlowPerCoolingCapacity**: entered when it is intended t that he simulation engine determines the supply air flow rates from the user specified *supply air flow per cooling capacity value* and *autosized cooling design capacity*.
+
+* **FlowPerHeatingCapacity**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *supply air flow per heating capacity value* and *autosized heating design capacity*.
+
+The  Design Specification ZoneHVAC Sizing object also has input fields for sizing or scalable sizing of cooling and heating capacity. However, most of the parent zone HVAC objects do not have input fields for sizing capacities. So, the capacity scalable sizing fields in the parent objects are used for sizing child components capacity sizings.  The scalable capacity sizing may be indirectly impacted by the scalable supply air flow rates sizing values. Moreover, the autosized cold water, hot water and steam flow rates in the parent zone HVAC objects (e.g. FanCoils, UnitHeaters, UnitVentilators, and VentilatedSlabs) and capacity in child components are determined using the scalable sizing methods.  Sizing methods allowed for cooling and heating capacity include: *CoolingDesignCapacity, HeatingDesignCapacity*, *CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity*, *FractionOfAutosizedHeatingCapacity*.
+
+* **CoolingDesignCapacity**: entered when it is intended that user specifies either a hard sized cooling capacity value or the simulation engine autosizes cooling capacity value for the cooling design capacity.
+
+* **HeatingDesignCapacity**: entered when it is intended that user specifies either a hard sized heating capacity value or the simulation engine autosized heating capacity value for the heating design capacity.
+
+* **CapacityPerFloorArea**: is entered when it is intended that the simulation engine determines the cooling or heating capacity from user specified capacity per floor area value and the floor area of the zone served by the zone HVAC equipment.
+
+* **FractionOfAutosizedCoolingCapacity**: entered when it is intended that the simulation engine sizes the cooling capacity from the user specified *capacity fraction* and *autosized cooling design capacity* value.
+
+* **FractionOfAutosizedHeatingCapacity**: entered when it is intended that the simulation engine sizes the heating capacity from the user specified *capacity fraction* and *autosized heating design capacity* value.
+
+Description of the input fields of the design specification zone HVAC sizing object “DesignSpecification:ZoneHVAC:Sizing”:
+
+#### Field: Name
+
+Unique identifier name of the DesignSpecification:ZoneHVAC:Sizing object. This sizing specification object referenced by a zone HVAC equipment whose design calculation will be made using the input data of this object.
+
+#### Field: Cooling Design Air Flow Method
+
+The input of this field must be the method used to determine the cooling supply air volume flow rate. Input allowed is either *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*.  None means cooling coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means the user specifies the magnitude of supply air flow rate or the program calculates the design cooling supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the cooling supply air volume flow rate from zone floor area served by the zone HVAC unit and user specified *Flow Per Floor Area* value. *FractionOfAutosizedCoolingAirflow* means the program calculates the cooling supply air volume flow rate from user specified fraction and the autosized design cooling supply air volume flow rate value determined by the simulation. FlowPerCoolingCapacity means the supply air volume is calculated from user specified flow per cooling capacity and design cooling capacity determined by the simulation. The default method is *SupplyAirFlowRate*.
+
+#### Field: Cooling Design Supply Air Flow Rate {m3/s}
+
+Enter the magnitude of the cooling supply air volume flow rate in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Cooling Design air Flow Method is *SupplyAirFlowRate*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment. This input field is also autosizable.
+
+#### Field: Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+
+Enter the cooling supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Cooling Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the cooling supply air volume flow rate from the zone conditioned floor area served by the zone HVAC equipment and the flow per unit area value specified by the user. Zone sizing object (Sizing:Zone) is not required.
+
+#### Field: Fraction of Autosized Cooling Design Supply Air Flow Rate {-}
+
+Enter the cooling supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required when the Cooling Design air Flow Method is *FractionOfAutosizedCoolingAirflow*. This input field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design air Flow Method is not *FractionOfAutosizedCoolingAirflow*. The program calculates the cooling supply air volume flow rate from the design autosized cooling supply air flow rate and user specified fraction. Zone sizing object (Sizing:Zone) is required.
+
+#### Field: Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+
+Enter the cooling supply air volume flow rate per unit cooling capacity in m3/s-W. This input field is required when the Cooling Design air Flow Method is *FlowPerCoolingCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design air Flow Method is not *FlowPerCoolingCapacity*. The program calculates the cooling supply air volume flow rate from the design autosized cooling capacity and user specified flow per cooling capacity value. Zone sizing object (Sizing:Zone) is required.
+
+#### Field: Supply Air Flow Rate Method When No Cooling or Heating is Required
+
+Enter the method used to determine the supply air volume flow rate when No Cooling or Heating is required. Inputs allowed are *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, and *FractionOfAutosizedHeatingAirflow.* *None* is used when a cooling or heating coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means user specifies the magnitude of supply air flow rate or the program calculates the design supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the supply air volume flow rate from the zone floor area served by the zone HVAC unit and Flow Per Floor Area value specified by user. *FractionOfAutosizedCoolingAirflow* means the program calculates the supply air volume flow rate from user specified fraction and autosized design cooling supply air volume flow rate value determined by the program. FractionOfAutosizedHeatingAirflow means the program calculates the supply air volume flow rate from user specified fraction and autosized heating supply air flow rate value determined by the program. The default method is *SupplyAirFlowRate*.
+
+#### Field: Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
+
+Enter the magnitude of the supply air volume flow rate when no cooling or heating is required in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Supply Air Flow Rate Method When No Cooling or Heating is Required is *SupplyAirFlowRate*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment. This input field is also autosizable.
+
+#### Field: Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required  {m3/s-m2}
+
+Enter the magnitude of supply air volume flow rate per zone floor area in m3/s-m2. This input is a required field when Supply Air  Flow Rate Method When No Cooling or Heating is Required is *FlowPerFloorArea*. The program calculates the supply air flow rate when no cooling or heating is required from user specified flow per floor area and the zone area served by current zoneHVAC equipment.
+
+####  Field: Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required {-}
+
+Enter the fraction of supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required field when Supply Air Flow Rate Method When No Cooling or Heating is Required is *FractionOfAutosizedCoolingAirflow*.  The program calculates the supply air flow rate when no cooling or heating is required from user specified fraction and the design cooling autosized supply air flow rate.
+
+#### Field: Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required {-}
+
+Enter the fraction of supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required field when Supply Air Flow Rate Method When No Cooling or Heating is Required is *FractionOfAutosizedHeatingAirflow*.  The program calculates the supply air flow rate when no cooling or heating is required from user specified fraction and the design heating autosized supply air flow rate.
+
+#### Field: Heating Design Air Flow Method
+
+The input of this field must be the method used to determine the heating supply air volume flow rate. Input allowed is either *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*.  *None* means heating coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means the user specifies the magnitude of supply air flow rate or the program calculates the design heating supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the heating supply air volume flow rate from zone floor area served by the zone HVAC unit and user specified *Flow Per Floor Area* value. *FractionOfAutosizedHeatingAirflow* means the program calculates the heating supply air volume flow rate from user specified fraction and the autosized design heating supply air volume flow rate value determined by the simulation. *FlowPerHeatingCapacity* means the supply air volume is calculated from user specified flow per heating capacity and design heating capacity determined by the simulation. The default method is *SupplyAirFlowRate*.
+
+#### Field: Heating Design Supply Air Flow Rate {m3/s}
+
+Enter the magnitude of the heating supply air volume flow rate in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Heating Design air Flow Method is *SupplyAirFlowRate*. This field may be left blank if a heating coil is not included in the zone HVAC equipment. This input field is also autosizable.
+
+#### Field: Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+
+Enter the heating supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Heating Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the heating supply air volume flow rate from the zone conditioned floor area served by the zone HVAC equipment and the flow per unit area value specified by the user.
+
+#### Field: Fraction of Autosized Heating Design Supply Air Flow Rate {-}
+
+Enter the heating supply air volume flow rate as a fraction of the autosized heating supply air flow rate. This input field is required when the Heating Design air Flow Method is *FractionOfAutosizedHeatingAirflow*. This input field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design air Flow Method is not *FractionOfAutosizedHeatingAirflow*. The program calculates the heating supply air volume flow rate from the design autosized heating supply air flow rate and user specified fraction.
+
+#### Field: Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+
+Enter the heating supply air volume flow rate per unit heating capacity in m3/s-W. This input field is required when the Heating Design air Flow Method is *FlowPerHeatingCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Heating Design air Flow Method is not *FlowPerHeatingCapacity*. The program calculates the heating supply air volume flow rate from the design autosized heating capacity and user specified flow per unit heating capacity value.
+
+#### Field Cooling Design Capacity Method
+
+Enter the method used to determine the cooling design capacity for scalable sizing. Input allowed is either *None*, *CoolingDesignCapacity*, *CapacityPerFloorArea*, and *FractionOfAutosizedCoolingCapacity*. None is used when a cooling coil is not included in the Zone HVAC equipment or this field may be left blank. If this input field is left blank, then the design cooling capacity is set to zero. *CoolingDesignCapacity* means user specifies the magnitude of cooling capacity or the program calculates the design cooling capacity if autosize is specified. *CapacityPerFloorArea* means the program calculates the design cooling capacity from user specified cooling capacity per floor area and floor area of the zone served by the HVAC unit. *FractionOfAutosizedCoolingCapacity* means the program calculates the design cooling capacity from user specified fraction and the auto-sized design cooling capacity. The default method is *CoolingDesignCapacity*.
+
+#### Field: Cooling Design Capacity {W}
+
+Enter the magnitude of the cooling capacity in Watts. This input is an alternative to using the program auto-calculated cooling capacity value. This input is a required field when the Cooling Design Capacity Method is *CoolingDesignCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or alternative method is specified. This input field is autosizable. Design day sizing run must be specified.
+
+#### Field: Cooling Design Capacity Per Floor Area {W/m2}
+
+Enter the cooling capacity per unit floor area in m3/s-m2. This field is required field when the Cooling Design Capacity Method is *CapacityPerFloorArea*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Capacity Method is not *CapacityPerFloorArea*. The program calculates the cooling capacity from floor area of the zone served by the zone HVAC equipment and the cooling capacity per unit floor area value specified by the user.
+
+#### Field: Fraction of Autosized Cooling Design Capacity {-}
+
+Enter the cooling capacity as a fraction of the autosized cooling capacity. This input field is required when the Cooling Design Capacity Method is *FractionOfAutosizedCoolingCapacity*. This input field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Capacity Method is not *FractionOfAutosizedCoolingCapacity*. The program calculates the cooling capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified.
+
+#### Field: Heating Design Capacity Method
+
+Enter the method used to determine the heating design capacity for scalable sizing. Input allowed is either *None*, *HeatingDesignCapacity*, *CapacityPerFloorArea*, and *FractionOfAutosizedHeatingCapacity*. None is used when a heating coil is not included in the Zone HVAC equipment or this field may be left blank. If this input field is left blank, then the design heating capacity is set to zero. *HeatingDesignCapacity* means user specifies the magnitude of heating capacity or the program calculates the design heating capacity if autosize is specified. *CapacityPerFloorArea* means the program calculates the design heating capacity from user specified heating capacity per floor area and floor area of the zone served by the HVAC unit. *FractionOfAutosizedHeatingCapacity* means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity. The default method is *HeatingDesignCapacity*.
+
+#### Field: Heating Design Capacity {W}
+
+Enter the magnitude of the heating capacity in Watts. This input is an alternative to using the program auto-calculated heating capacity value. This input is a required field when the Heating Design Capacity Method is *HeatingDesignCapacity*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or alternative method is specified. This input field is autosizable. Design day sizing run must be specified.
+
+#### Field: Heating Design Capacity Per Floor Area {W/m2}
+
+Enter the heating capacity per unit floor area in m3/s-m2. This field is required field when the Heating Design Capacity Method is *CapacityPerFloorArea*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Capacity Method is not *CapacityPerFloorArea*. The program calculates the heating capacity from floor area of the zone served by the zone HVAC equipment and the heating capacity per unit floor area value specified by the user.
+
+#### Field: Fraction of Autosized Heating Design Capacity {-}
+
+Enter the heating capacity as a fraction of the autosized heating capacity. This input field is required when the Heating Design Capacity Method is *FractionOfAutosizedHeatingCapacity*. This input field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Capacity Method is not *FractionOfAutosizedHeatingCapacity*. The program calculates the heating capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified.
+
+```idf
+  DesignSpecification:ZoneHVAC:Sizing,
+    VRFDesignSpec1,          !- Name
+    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
+    autosize,                !- Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+    ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
+    ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    SupplyAirFlowRate,       !- Heating Design Air Flow Method
+    autosize,                !- Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+
+  DesignSpecification:ZoneHVAC:Sizing,
+    VRFDesignSpec2,          !- Name
+    FlowPerFloorArea,        !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Supply Air Flow Rate
+    3.6311418E-03,           !- Cooling Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    FlowPerFloorArea,        !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
+    3.6311418E-03,           !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+    ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
+    ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    FlowPerFloorArea,        !- Heating Design Air Flow Method
+    ,                        !- Heating Design Supply Air Flow Rate
+    3.6311418E-03,           !- Heating Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+
+DesignSpecification:ZoneHVAC:Sizing,
+    VRFDesignSpec3,          !- Name
+    FractionOfAutosizedCoolingAirflow,  !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
+    0.5,                     !- Fraction of Autosized Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+  FractionOfAutosizedCoolingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+    0.5,                 !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
+    ,                    !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    FractionOfAutosizedHeatingAirflow,  !- Heating Design Air Flow Method
+    ,                        !- Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
+    0.5,                     !- Fraction of Autosized Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+
+DesignSpecification:ZoneHVAC:Sizing,
+    VRFDesignSpec4,          !- Name
+    FlowPerCoolingCapacity,  !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
+    2.9541628E-05,           !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+  FractionOfAutosizedHeatingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+    ,                    !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
+    0.413231177,         !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    FlowPerHeatingCapacity,  !- Heating Design Air Flow Method
+    ,                        !- Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
+    2.9541628E-05,           !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+```
 
 ### Sizing:System
 
@@ -7560,7 +7857,7 @@ Components are linked together to form various loops within the simulation. Thus
 
 Loop nodes are a key defining feature in EnergyPlus. As a result, it is recommended that one of the first steps taken in defining an HVAC system in EnergyPlus be the definition of a node diagram or map. This is helpful for visualization of the entire system. Such a map could be created electronically within an interface or could be kept in the background out of the sight of the user.
 
-![](InputOutputReference/media/image134.svg)
+![](media/image134.svg)
 
 Figure 72. Example Node Diagram
 
@@ -8293,19 +8590,13 @@ This alpha field is used as an identifying field for the pipe.
 
 This references a Material object that contains the soil properties and thickness.  Note that when defining the soil layer, the thickness should be the thickness of soil between the pipe wall and the ground surface.
 
-#### Field: Average Soil Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-If a GroundTemperatures:Surface object is not given in the input, this is \#1 of 3 inputs that must be given directly.  This represents the annual average soil temperature above the pipe.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
-#### Field: Amplitude of Soil Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-If a GroundTemperatures:Surface object is not given in the input, this is \#2 of 3 inputs that must be given directly.  This represents the annual average soil temperature variation from the average temperature itself.  For example, if this were represented as a sine wave, this would simply be the amplitude of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program.
-
-#### Field: Phase Constant of Soil Surface Temperature
-
-If a GroundTemperatures:Surface object is not given in the input, this is \#3 of 3 inputs that must be given directly.  This represents the time elapsed from the beginning of the year to the date of minimum surface temperature.  For example, if this were represented as a sine wave, this would simply be the phase shift of the curve.  This field can be calculated in advance using the separate CalcSoilSurfTemp program
-
-In order to avoid having to run the preprocessor program to generate soil temperature, the user may choose to simply input a GroundTemperatures:Surface object.  This object inputs average monthly surface temperatures.  These temperatures are then used within the model to develop average ground surface data.  This ground surface data can then be used as part of the model boundary condition set.  Without a set of surface ground temperatures, the model will require user input of the three last input fields.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 An example of this object in an IDF is:
 
@@ -8318,11 +8609,10 @@ Pipe:Underground,
     Water,                              !- Fluid Name
     SunExposed,                         !- Sun Exposure
     0.05,                               !- Pipe Inside Diameter    
-    20.0,                               !- pipe Length
+    20.0,                               !- Pipe Length
     Buried Pipe Soil,                   !- Soil Material
-    13,                                 !- Average Soil Surface Temperature
-    1.5,                                !- Amplitude of Soil Surface Temperature
-    30;                                 !- Phase Constant of Soil Surface Temperature
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                            !- Name of Undisturbed Ground Temperature Object
 
   Construction,
     Insulated Buried Pipe,              !- Name
@@ -8459,17 +8749,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil
 
-#### Field: Kusuda-Achenbach Average Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation.
+The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-#### Field: Kusuda-Achenbach Average Amplitude of Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual average surface temperature variation from average.  This is also used in the Kusuda-Achenbach temperature correlation.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-
-The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
+The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
 #### Field: This Domain Includes Basement Surface Interaction
 
@@ -8502,6 +8788,9 @@ The maximum temperature deviation within any cell between one iteration and anot
 #### Field: Maximum Iterations in the Outer Cartesian Domain Iteration Loop
 
 The maximum number of iterations to make when performing temperature updates of the Cartesian coordinate system.  The actual number of iterations made will of course depend on transient conditions and convergence tolerance.
+
+#### Field: Evapotranspiration Ground Cover Parameter
+Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, nonpermeable ground surface) to 1.5 (wild growth).
 
 #### Field: Number of Pipe Circuits Entered for this Domain
 
@@ -8619,9 +8908,8 @@ An example of this object in an IDF is offered here for a foundation heat exchan
     2576,                    !- GroundSpecificHeat
     30,                      !- MoistureContent
     50,                      !- MoistureContentAtSaturation
-    15.5,                    !- KusudaGroundTemp
-    12.8,                    !- KusudaGroundTempAmplitude
-    17.3,                    !- KusudaPhaseShift
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps,                 !- Name of Undisturbed Ground Temperature Object
     Yes,                     !- DomainHasBasement
     6,                       !- BasementWidthInDomain
     2.5,                     !- BasementDepthInDomain
@@ -8774,7 +9062,7 @@ Group – Plant-Condenser Loops
 
 The main elements of the PlantLoop syntax are described in further detail below. A map of how the input for this portion of the HVAC input fits together is provided in the following diagram.
 
-![PlantLoopSyntax (Medium)](InputOutputReference/media/image135.png)
+![PlantLoopSyntax (media/image135.png)
 
 Figure 73. Plant Loop Input Syntax Map
 
@@ -9071,7 +9359,7 @@ This output is available for every component on every branch in a plant (or cond
 
 The condenser loop input is very similar to that for the plant loop. As of version 7, the two loops are modeled the same way and inside the program all condenser loops are just plant loops. (In future versions of the program, this CondenserLoop object might be deprecated and these loops will be described using the PlantLoop object.)  The main differences are the applicable components and operation schemes. This is depicted in the following diagram.
 
-![CondenserLoopSyntax (Medium)](InputOutputReference/media/image136.png)
+![CondenserLoopSyntax (media/image136.png)
 
 Figure 74. Condenser Loop Input Syntax Map
 
@@ -9311,6 +9599,8 @@ This alpha field contains the keyword for the type of control scheme used. The o
 - PlantEquipmentOperation:HeatingLoad
 
 - PlantEquipmentOperation:ComponentSetpoint
+
+- PlantEquipmentOperation:ThermalEnergyStorage
 
 - PlantEquipmentOperation:UserDefined
 
@@ -9616,6 +9906,86 @@ PlantEquipmentOperation:ComponentSetpoint,
     COOLING;                 !- Operation 2 Type
 ```
 
+### PlantEquipmentOperation:ThermalEnergyStorage
+
+Users of thermal energy storage, particularly ice storage systems, are often faced with a challenge of specifying input for these systems.  Essentially, they have to define various setpoint managers, temperature schedules, etc. in order to make the system functional.  This plant/condenser control type simplifies the input somewhat by eliminating both a setpoint manager and a schedule for each piece of equipment that makes up the ice storage system.  In fact, this operation scheme internally creates the setpoint managers required by the equipment listed as operated by the scheme defined by this syntax.  While the more complex definition is possible and provides more flexibility like hourly variation of setpoint temperatures at the outlet of each piece of equipment, this input provides the most convenient method for making the system to work and assumes a single charging setpoint temperature and a single discharging setpoint temperature.  For most systems, this is all that is needed.
+
+#### Field: Name
+
+This field defines the name of the thermal energy (ice) storage plant equipment operation scheme that will be referenced by the PlantEquipmentOperationSchemes list in the plant input.
+
+#### Field: On-Peak Schedule
+
+This field defines the name of an integer schedule that determines when on-peak electric pricing is in effect.  This value is used to determine whether or not the ice storage system should be charging the ice storage unit.  In the schedule, a value of 1 (or greater) corresponds to being in the on-peak period while any value of 0 or less corresponds to being in the off-peak period.
+
+#### Field: Charging Availability Schedule
+
+This field defines the name of an integer schedule that determines whether or not the system may enter charging mode off-peak.  If the current value of the on-peak schedule is “off”, then charging can take place if the charging availability schedule is “on”.  If the on-peak schedule is “off” and charging availability is “off”, then charging is not allowed and the chiller and ice storage units controlled by this statement are operating to meet the non-charging chilled water temperature defined by the next input parameter. In this schedule, a value of 1 (or greater) corresponds to “on” when charging is available during an off-peak period while any value of 0 or less corresponds to chillers not being allowed to charge even during off-peak.
+
+#### Field: Non-Charging Chilled Water Temperature
+
+This field defines the chilled water temperature when the ice storage system is NOT in charging mode.  During these times, the storage system could be discharging or dormant depending on HVAC load conditions and ice storage controls.  This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during non-cooling season and during cooling season during the on-peak period.  The cooling season and on-peak periods are defined by schedules reference to input above.
+
+#### Field: Charging Chilled Water Temperature
+
+This field defines the chilled water temperature when the ice storage system is in charging mode.  During these times, the chiller is producing a temperature low enough to generate ice in the ice storage unit.  This value is used as the setpoint temperature for chillers associated with this plant equipment operation scheme during the cooling season during the off-peak period.  The cooling season and on-peak periods are defined by schedules reference to input above.
+
+#### Field Set: (Component Object Type, Name, Demand Calculation Node, Setpoint Node, Flow Rate, Operation Type)
+
+#### Field: Component &lt;\#&gt; Object Type
+
+This field specifies the type of equipment controlled by scheme.  This must be a thermal energy storage device (simple or detailed ice storage) or a chiller.
+
+#### Field: Component &lt;\#&gt; Name
+
+This field specifies the name of the controlled equipment.  This name must be defined in the input as a valid ice storage device or chiller.
+
+#### Field: Component &lt;\#&gt; Demand Calculation Node Name
+
+The component demand will be calculated using the difference between the temperature at the demand node and the component set point temperature.
+
+#### Field: Component &lt;\#&gt; Setpoint Node Name
+
+Each component controlled under temperature based control will have its own set point different from the loop set point. This field specifies component set point node (Generally its outlet temperatures). This node is acted upon by a SetpointManager in order to obtain the setpoint at any simulation timestep.
+
+#### Field: Component &lt;\#&gt; Flow Rate
+
+This numeric field specifies the design flow rate for the component specified in earlier fields.  This flow rate is used to calculate the component demand. The field can be set to autosize, if the user wants the program to calculate the design flow. This would generally be set to autosize when the user does not know the component flow rate and does a sizing calculation for the corresponding component.
+
+#### Field: Component &lt;\#&gt; Operation Type
+
+This alpha field specifies the operation mode for the equipment. The equipment can be in any of the three modes viz. Cooling, Heating and Dual. Dual is used when the components both as heating and cooling equipment (for example heat pumps).  Ice storage units can potentially either heat or cool the circulating fluid and thus should be defined as Dual mode.
+
+
+An example IDF is shown below:
+
+
+```idf
+  PlantEquipmentOperationSchemes,
+    CW Loop Operation,       !- Name
+    PlantEquipmentOperation:ThermalEnergyStorage,  !- Control Scheme 1 Object Type
+    Chiller and Partial Ice Storage,  !- Control Scheme 1 Name
+    PlantOnSched;            !- Control Scheme 1 Schedule Name
+
+  PlantEquipmentOperation:ThermalEnergyStorage,
+    Chiller and Partial Ice Storage,  !- Name
+    OnPeakEnergy,            !- On-Peak Schedule Name
+    ChargingAvail,           !- Charging Availability Schedule Name
+    7.22,                    !- Non-charging Chilled Water Temperature
+    -5.0,                    !- Charging Chilled Water Temperature
+    Chiller:Electric,        !- Component 1 Object Type
+    Central Chiller,         !- Component 1 Name
+    Central Chiller Inlet Node,  !- Component 1 Demand Calculation Node Name
+    Central Chiller Outlet Node,  !- Component 1 Setpoint Node Name
+    autosize,                !- Component 1 Flow Rate {m3/s}
+    COOLING,                 !- Component 1 Operation Type
+    ThermalStorage:Ice:Detailed,  !- Component 2 Object Type
+    Ice Tank,                !- Component 2 Name
+    Ice Tank Inlet Node,     !- Component 2 Demand Calculation Node Name
+    Ice Tank Outlet Node,    !- Component 2 Setpoint Node Name
+    0.13506E-02,             !- Component 2 Flow Rate {m3/s}
+    DUAL;                    !- Component 2 Operation Type
+```
 
 ### PlantEquipmentList
 
@@ -10682,7 +11052,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load Power at Available Capacity to Full Load Power at Nominal Capacity. The defining equation is:
 
-<span>$FullLoadPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FullLoadPowerRatio = {C_1} + {C_2}AvailToNominalCapRatio + {C_3}AvailToNominalCapRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient1 of the power ratio curve
 
@@ -11051,11 +11421,11 @@ This numeric field contains the chiller’s optimum part-load ratio. This is the
 
 This numeric field contains the chiller’s minimum unloading ratio. The expected range is between 0 and 1. The minimum unloading ratio is where the chiller capacity can no longer be reduced by unloading and must be false loaded to meet smaller cooling loads. A typical false loading strategy is hot-gas bypass. The minimum unloading ratio must be greater than or equal to the Minimum Part Load Ratio, and less than or equal to the Maximum Part Load Ratio. The default value is 0.2.
 
-#### Field: Chilled Water Side Inlet Node
+#### Field: Chilled Water Inlet Node Name
 
 This required alpha field contains the identifying name for the chiller plant side (chilled water) inlet node.
 
-#### Field: Chilled Water Side Outlet Node
+#### Field: Chilled Water Outlet Node Name
 
 This required alpha field contains the identifying name for the chiller plant side (chilled water) outlet node.
 
@@ -11091,11 +11461,11 @@ This choice field determines how the chiller operates with respect to the intend
 
 This is the design heat recovery water flow rate if the heat recovery option is being simulated. If this value is greater than 0.0 (or Autosize), a heat recovery loop must be specified and attached to the chiller using the next two node fields. The units are in cubic meters per second.  This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below.
 
-#### Field: Heat Recovery Side Inlet Node
+#### Field: Heat Recovery Inlet Node Name
 
 This alpha field contains the identifying name for the chiller heat recovery side inlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified.
 
-#### Field: Heat Recovery Side Outlet Node
+#### Field: Heat Recovery Outlet Node Name
 
 This alpha field contains the identifying name for the chiller heat recovery side outlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified.
 
@@ -11450,11 +11820,11 @@ This choice field determines how the chiller operates with respect to the intend
 
 This is the design heat recovery water flow rate if the heat recovery option is being simulated. If this value is greater than 0.0 (or autosize), a heat recovery loop must be specified and attached to the chiller using the next two node fields. The units are in cubic meters per second.  This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below.
 
-#### Field: Heat Recovery Side Inlet Node
+#### Field: Heat Recovery Inlet Node Name
 
 This alpha field contains the identifying name for the chiller heat recovery side inlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified and it can only be used with a water-cooled condenser.
 
-#### Field: Heat Recovery Side Outlet Node
+#### Field: Heat Recovery Outlet Node Name
 
 This alpha field contains the identifying name for the chiller heat recovery side outlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified and it can only be used with a water-cooled condenser.
 
@@ -11674,7 +12044,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power. The defining equation is:
 
-<span>$FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient 1 of Power Ratio Curve
 
@@ -12130,7 +12500,7 @@ This numeric field contains the third coefficient for the capacity ratio curve.
 
 The Power Ratio Curve is a quadratic equation that determines the Ratio of Full Load to Power. The defining equation is:
 
-<span>$FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}$</span>The following three fields contain the coefficients for the quadratic equation.
+<span>\(FracFullLoadPower = {C_1} + {C_2}PartLoadRatio + {C_3}PartLoadRati{o^2}\)</span>The following three fields contain the coefficients for the quadratic equation.
 
 #### Field: Coefficient 1 of Power Ratio Curve
 
@@ -12208,7 +12578,7 @@ This numeric field contains the third coefficient for the Temperature Based Fuel
 
 The Exhaust Flow Curve is a quadratic equation that determines the Ratio of Exhaust Gas Flow Rate to Engine Capacity. The defining equation is:
 
-*<span>$ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15$</span> *
+*<span>\(ExhaustTemperature = ({C_1} + {C_2}RLoad + {C_3}RLoa{d^2}) * (TB{C_1} + TB{C_2}A{T_{air}} + TB{C_3}AT_{air}^2) - 273.15\)</span> *
 
 where GTCapacity is the Combustion Turbine Engine Capacity, and AT<sub>air</sub> is the difference between the current ambient and design ambient temperatures.
 
@@ -12228,7 +12598,7 @@ This numeric field contains the third coefficient for the Exhaust Flow Curve.
 
 The Exhaust Gas Temperature Curve is a polynomial equation that determines the Exhaust Gas Temperature. The equation combines both the Exhaust Gas Temperature Curve Coefficients (Based on the Part Load Ratio) and the (Ambient) Temperature Based Exhaust Gas Temperature Curve Coefficients. The defining equation is:
 
- <span>$RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})$</span>
+ <span>\(RecoveryLubeEnergy = PLoad * ({C_1} + {C_2}RL + {C_3}R{L^2})\)</span>
 
 where C represents the Exhaust Gas Temperature Curve Coefficients, TBC are the Temperature Based Exhaust Gas Temperature Curve Coefficients, RLoad is the Ratio of Load to Combustion Turbine Engine Capacity, and AT<sub>air</sub> is the difference between the actual ambient and design ambient temperatures.
 
@@ -13773,7 +14143,7 @@ Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simul
 
 The Supply side of the heat pump is usually connected to a Ground Heat Exchanger. The figure below shows the layout and piping diagram of the water-to-water heat pump.
 
-![](InputOutputReference/media/image184.svg)
+![](media/image184.svg)
 
 Figure 75. Schematic of EnergyPlus Ground Loop Heat Exchanger
 
@@ -14675,19 +15045,19 @@ The order of the multiple chiller-heaters’ operation is assumed to be sequenti
 
 
 
-![](InputOutputReference/media/image185.png)
+![](media/image185.png)
 
 Figure 76. Diagram of a central heat pump system with three chiller-heaters in cooling-only mode (Condensers reject heat to the ground source loop)
 
 
 
-![](InputOutputReference/media/image186.png)
+![](media/image186.png)
 
 Figure 77. Diagram of a central heat pump system with three chiller-heaters in heat recovery mode         (No heat is exchanged with the ground source loop)
 
 
 
-![](InputOutputReference/media/image187.png)
+![](media/image187.png)
 
 Figure 78. Diagram of a central heat pump system with one chiller-heater in heat recovery mode and two chiller-heaters in cooling-only mode
 
@@ -14695,7 +15065,7 @@ In the above example, the cooling load needs 3 chiller-heaters and the heating l
 
 
 
-![](InputOutputReference/media/image188.png)
+![](media/image188.png)
 
 Figure 79. Diagram of a central heat pump system with two chiller-heaters in heat recovery mode and one chiller-heater in heating-only mode
 
@@ -15908,7 +16278,7 @@ An additional destratification conductivity [W/m-K] is added to the fluid conduc
 
 #### Field: Node 1-10 Additional Loss Coefficient
 
-An additional heat gain coefficient [W/m-K] added to the skin gains for a given node to account for thermal shorting due to pipe penetrations, tank feet, and any other loss effects.
+An additional heat gain coefficient [W/K] added to the skin gains for a given node to account for thermal shorting due to pipe penetrations, tank feet, and any other loss effects.
 
 
 
@@ -16064,7 +16434,7 @@ When coupled to the plant loop, the water heater has an inlet node and outlet no
 
 However, for a water heater that is indirectly heated (e.g. with a separate boiler), the source side can be used to provide remotely heated water to the tank.  The source side is configured to operate as a component on the demand side of a plant loop.  The design flow rate through the source side can be set by the user or autosized.  If autosized, then a Plant Sizing object is needed elsewhere in the input file for the Plant Loop serving the source side.  The water heater input includes an additional design parameter that describes how rapidly the tank can recover.
 
-![WHFig](InputOutputReference/media/image191.png)
+![WHFig](media/image191.png)
 
 Figure 80. Water Heater Configuration
 
@@ -16078,9 +16448,10 @@ There are currently two water heater objects in EnergyPlus:
 
 - WaterHeater:Stratified
 
-There is also a compound object that uses the WaterHeater:Mixed as part of its strategy:
+There are also compound objects that uses the WaterHeater:Mixed and/or WaterHeater:Stratified as part of their strategy:
 
-- WaterHeater:HeatPump
+- WaterHeater:HeatPump:PumpedCondenser (WaterHeater:Mixed or WaterHeater:Stratified)
+- WaterHeater:HeatPump:WrappedCondenser (WaterHeater:Stratified only)
 
 The WaterHeater:Mixed object simulates a well-mixed, single-node water tank. The WaterHeater:Stratified object simulates a stratified, multi-node water tank. Both water heater objects can be appropriate for simulating many types of water heaters and storage tanks, including gas and electric residential water heaters, and a variety of large commercial water heaters. Both objects share similar features, such as stand-alone operation, on- and off-cycle parasitic loads, and thermal losses to the zone. However, each object has its advantages which may make one water heater object more appropriate than the other depending on the application.
 
@@ -16910,15 +17281,15 @@ This field is optional and is used to provide a design parameter for autosizing 
 
 #### Field: Number Of Nodes
 
-The number of stratified nodes in the tank. There must be at least one node. The maximum number of nodes is 10, although this limit can be increased by editing the IDD.
+The number of stratified nodes in the tank. There must be at least one node. The maximum number of nodes is 12, although this limit can be increased by editing the IDD.
 
 #### Field: Additional Destratification Conductivity
 
 An additional destratification conductivity [W/m-K] is added to the fluid conductivity of water (0.6 W/m-K) to account for vertical conduction effects along the inside of the tank wall, and perhaps other vertical components such as the flue, the cold water inlet pipe (dip tube), and the anode rod.
 
-#### Field: Node 1-10 Additional Loss Coefficient
+#### Field: Node 1-12 Additional Loss Coefficient
 
-An additional loss coefficient [W/m-K] added to the skin losses for a given node to account for thermal shorting due to pipe penetrations, water heater feet, and any other loss effects.
+An additional loss coefficient [W/K] added to the skin losses for a given node to account for thermal shorting due to pipe penetrations, water heater feet, and any other loss effects.
 
 #### Field: Source Side Flow Control Mode
 
@@ -17075,11 +17446,11 @@ The fraction of the time period that Heater 1 was running.
 
 The fraction of the time period that Heater 2 was running.
 
-#### Water Heater Temperature Node 1-10 [C]
+#### Water Heater Temperature Node 1-12 [C]
 
 The average node temperature.
 
-#### Water Heater Final Temperature Node 1-10 [C]
+#### Water Heater Final Temperature Node 1-12 [C]
 
 The final node temperature at the end of the system timestep.
 
@@ -17167,11 +17538,11 @@ This field is used to enter the tank’s storage volume on per-solar-collector-a
 
 This field is used to scale the height of a stratified tank to preserve relative geometry for different size tanks. The Height Aspect Ratio is defined at the length scale in the vertical direction (height) divided by the length scale in the horizontal direction (diameter).  This field is only used if the water heater being sized is a Water Heater:Stratified, the tank height has been set to Autosize, and the tank shape is set to **VerticalCylinder**. This field can be used with any Design Mode.
 
-### WaterHeater:HeatPump
+### WaterHeater:HeatPump:PumpedCondenser
 
-The heat pump water heater (HPWH) is a compound object consisting of a water heater tank (e.g., WaterHeater:Mixed or WaterHeater:Stratified), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled, with one common configuration shown below.
+The heat pump water heater with pumped condenser (HPWH) is a compound object consisting of a water heater tank (e.g., `WaterHeater:Mixed` or `WaterHeater:Stratified`), a direct expansion (DX) “coil” (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. Numerous configurations of tank location, inlet air source, and DX coil compressor location can be modeled, with one common configuration shown below.
 
-![HPHotWaterHeater](InputOutputReference/media/image192.png)
+![HPHotWaterHeater](media/image192.png)
 
 Figure 81. Schematic diagram for a heat pump water heater located in a zone
 
@@ -17179,19 +17550,19 @@ In this model, the heat pump water heater’s DX coil is considered the primary 
 
 To model a heat pump water heater, the input data file must include some combination of the following objects depending on the configuration to be modeled:
 
-- WaterHeater:HeatPump (required)
+- `WaterHeater:HeatPump:PumpedCondenser` (required)
 
-- WaterHeater:Mixed or WaterHeater:Stratified (required)
+- `WaterHeater:Mixed` or `WaterHeater:Stratified` (required)
 
-- Coil:WaterHeating:AirToWaterHeatPump (required)
+- `Coil:WaterHeating:AirToWaterHeatPump:Pumped` or `Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed` (required)
 
-- Fan:OnOff (required)
+- `Fan:OnOff` (required)
 
-- ZoneHVAC:EquipmentList (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
+- `ZoneHVAC:EquipmentList` (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
 
-- ZoneHVAC:EquipmentConnections (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
+- `ZoneHVAC:EquipmentConnections` (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
 
-- OutdoorAir:NodeList (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
+- `OutdoorAir:NodeList` (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
 
 The input fields for the compound object are described in detail below:
 
@@ -17227,7 +17598,7 @@ This numeric field contains the heat pump’s condenser water flow rate in cubic
 
 #### Field: Evaporator Air Flow Rate
 
-This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
+This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump:Pumped). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump:Pumped), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
 
 #### Field: Inlet Air Configuration
 
@@ -17267,31 +17638,31 @@ This alpha (choice) field contains the type of water heater tank used by this he
 
 #### Field: Tank Name
 
-This alpha field contains the name of the specific water heater tank (WaterHeater:Mixed object) used by this heat pump water heater.
+This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type `WaterHeater:Mixed` or `WaterHeater:Stratified`.
 
 #### Field: Tank Use Side Inlet Node Name
 
-This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. WaterHeater:Mixed). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a WaterHeater:HeatPump object (see branch object example below).
+This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. `WaterHeater:Mixed`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:PumpedCondenser` object (see branch object example below).
 
 #### Field: Tank Use Side Outlet Node Name
 
-This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. WaterHeater:Mixed). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a WaterHeater:HeatPump object (see branch object example below).
+This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. `WaterHeater:Mixed`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:PumpedCondenser` object (see branch object example below).
 
 #### Field: DX Coil Object Type
 
-This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump.
+This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump:Pumped.
 
 #### Field: DX Coil Name
 
-This alpha field contains the name of the specific DX coil (Coil:WaterHeating:AirToWaterHeatPump object) used by this heat pump water heater.
+This alpha field contains the name of the specific DX coil (`Coil:WaterHeating:AirToWaterHeatPump:Pumped` or `Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed` object) used by this heat pump water heater.
 
 #### Field: Minimum Inlet Air Temperature for Compressor Operation
 
-This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. The minimum inlet air dry-bulb temperature should be greater than or equal to 5°C. If this field is left blank, the default value is 10°C.
+This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. The minimum inlet air dry-bulb temperature should be greater than or equal to -5°C. If this field is left blank, the default value is 10°C.
 
 #### Field: Compressor Location
 
-This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
+This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump:Pumped object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
 
 #### Field: Compressor Ambient Temperature Schedule Name
 
@@ -17303,7 +17674,7 @@ This alpha (choice) field contains the type of fan used by this heat pump water 
 
 #### Field: Fan Name
 
-This alpha field contains the name of the specific fan (Fan:OnOff object) used by this heat pump water heater.
+This alpha field contains the name of the specific fan (`Fan:OnOff` object) used by this heat pump water heater.
 
 #### Field: Fan Placement
 
@@ -17333,26 +17704,29 @@ This alpha field defines the name of the air node to which the heat pump air coi
 
 This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the heat pump draws its inlet air from the zone, outdoors, or a combination of zone and outdoor air. A schedule value equal to 0 indicates that the heat pump draws its inlet air from the zone. A schedule value equal to 1 denotes that the heat pump draws its inlet air from outdoors. Values between 0 and 1 denote a mixture of zone and outdoor air proportional to the schedule value. The Inlet Air Mixer schedule controls both the inlet air mixer and outlet air splitter nodes in unison to ensure that the operation of the heat pump does not contribute to zone pressurization or depressurization. For example if the Inlet Air Mixer schedule value is 0.4, then the inlet air mixer node is composed of 40% outdoor air and 60% zone air. For this same case, the outlet air splitter directs 60% of the HPWH outlet air back to the zone and 40% of the outlet air flow is exhausted outdoors. This schedule name must be provided if the Inlet Air Configuration field is specified as ‘Zone and Outdoor Air’, otherwise this field should be left blank.
 
-#### Field: Control Sensor Location In Stratified Tank
+#### Field: Tank Element Control Logic
 
-This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is WaterHeater:Stratified.  The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.  There are six choices that, when combined with the input for the stratified tank, indicate which of the nodes should be used.  The default is “Heater1”. The choices include:
+This alpha field defines settings for the control logic of when to run the tank element in relation to whether the heat pump is running. 
 
-- **Heater1**.  This indicates the tank node associated with (backup) heater \#1 should be used for tank temperature control.  This is determined by the field called Heater 1 Height in the WaterHeater:Stratified object.
+  - **MutuallyExclusive** means that once the tank heating element(s) are active, the heat pump is shut down until the heating element setpoint is reached. 
+  - **Simultaneous** (default) means that both the tank heating element and heat pump are used at the same time to recover the tank temperature. 
 
-- **Heater2**.  This indicates the tank node associated with (backup) heater \#2 should be used for tank temperature control.  This is determined by the field called Heater 2 Height in the WaterHeater:Stratified object.
+#### Field: Control Sensor 1 Height In Stratified Tank
 
-- **SourceInlet**. This indicates the tank node associated with the source side inlet should be used for tank temperature control.  This is determined by the field called Source Side Inlet Heightin the WaterHeater:Stratified object.
+This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is `WaterHeater:Stratified`.  The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.  This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
 
-- **SourceOutlet**. This indicates the tank node associated with the source side outlet should be used for tank temperature control.  This is determined by the field called Source Side Outlet Heightin the WaterHeater:Stratified object.
+#### Field: Control Sensor 1 Weight
 
-- **UseInlet**. This indicates the tank node associated with the use side inlet should be used for tank temperature control.  This is determined by the field called Use Side Inlet Heightin the WaterHeater:Stratified object.
+The model can optionally use two control sensor locations in stratified tanks. When that is the case, the temperature sensed at each location is weighted. This alpha input specifies the weight associated with Control Sensor 1. It is input as a value between 0 and 1. The weight of Control Sensor 2 is determined by subtracting this weight from 1. The default for this field is 1, indicating that only Control Sensor 1 is used. 
 
-- **UseOutlet**. This indicates the tank node associated with the use side outlet should be used for tank temperature control.  This is determined by the field called Use Side Outlet Heightin the WaterHeater:Stratified object.
+#### Field: Control Sensor 2 Height in Stratified Tank
 
-Following is an example input for the Heat Pump:Water Heater compound object and the other required component objects that it references.
+This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is `WaterHeater:Stratified`. If omitted, this defaults to the height of Heater2.
+
+Following is an example input for the `WaterHeater:HeatPump:PumpedCondenser` compound object and the other required component objects that it references.
 
 ```idf
-WaterHeater:HeatPump,
+WaterHeater:HeatPump:PumpedCondenser,
     PlantHeatPumpWaterHeater,!- Name
     PlantHPWHSch,            !- Availability Schedule Name
     PlantHPWHTempSch,        !- Compressor Setpoint Temperature Schedule Name
@@ -17373,7 +17747,7 @@ WaterHeater:HeatPump,
     HPWHPlantTank,           !- Tank Name
     HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
     HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
-    Coil:WaterHeating:AirToWaterHeatPump,  !- DX Coil Object Type
+    Coil:WaterHeating:AirToWaterHeatPump:Pumped,  !- DX Coil Object Type
     HPWHPlantDXCoil,         !- DX Coil Name
     11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
@@ -17398,7 +17772,7 @@ NOTE: branch object required only when tank use inlet nodes are used.
     Central HPWH Branch,     !- Name
     0,                       !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
-    WaterHeater:HeatPump,    !- Component 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
     PlantHeatPumpWaterHeater,!- Component 1 Name
     HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
     HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
@@ -17451,7 +17825,7 @@ NOTE: branch object required only when tank use inlet nodes are used.
     HPWHPlantTank OA Node;   !- Name
 
 
-  Coil:WaterHeating:AirToWaterHeatPump,
+  Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     HPWHPlantDXCoil,         !- Name
     25000.0,                 !- Rated Heating Capacity {W}
     3.2,                     !- Rated COP {W/W}
@@ -17495,7 +17869,7 @@ NOTE: branch object required only when tank use inlet nodes are used.
 ```
 
 
-### Heat Pump Water Heater  Outputs
+### Pumped Condenser Heat Pump Water Heater Outputs
 
 * **HVAC,Average,Water Heater Compressor Part Load Ratio**
 
@@ -17511,7 +17885,7 @@ NOTE: branch object required only when tank use inlet nodes are used.
 
 #### Water Heater Compressor Part Load Ratio
 
-This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part- load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
+This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part-load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
 
 #### Water Heater On Cycle Ancillary Electric Power [W]
 
@@ -17523,8 +17897,355 @@ This output is the average part-load ratio of the heat pump water heater’s com
 
 These outputs are the parasitic electric power and consumption associated with the heat pump water heater. Specific outputs represent parasitic electrical usage during the compressor/fan on and off cycles. These outputs represent electronic controls or other electric component. The model assumes that the parasitic power does not contribute to heating the water, but it can impact the zone air heat balance depending on user inputs. The parasitic electric consumption outputs are also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
+### WaterHeater:HeatPump:WrappedCondenser
+
+The heat pump water heater with wrapped condenser is a compound object very similar to the `WaterHeater:HeatPump:PumpedCondenser` object. It likewise combines a water heater tank, a direct expansion (DX) “coil”, and a fan to provide air flow across the air coil associated with the DX compression system. The primary difference is that instead of pumping water through an external condenser, the heating coils are wrapped around or submerged in the tank. This type of HPWH is most common in packaged units meant for residential applications.
+
+To model a wrapped condenser heat pump water, the input data file must include some combination of the following objects depending on the configuration to be modeled:
+
+- `WaterHeater:HeatPump:WrappedCondenser` (required)
+
+- `WaterHeater:Stratified` (required)
+
+- `Coil:WaterHeating:AirToWaterHeatPump:Wrapped` (required)
+
+- `Fan:OnOff` (required)
+
+- `ZoneHVAC:EquipmentList` (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
+
+- `ZoneHVAC:EquipmentConnections` (when the HPWH draws some or all of its air from the zone, the HPWH air inlet and outlet node names must be provided in this object)
+
+- `OutdoorAir:NodeList` (for HPWHs that use outdoor air as all or part of the heat source, the HPWH outdoor air node name must be provided in this list)
+
+The input fields for the compound object are described in detail below:
+
+#### Field: Name
+
+This alpha field contains a unique user-assigned name for an instance of a heat pump water heater. Any reference to this heat pump water heater by another object will use this name.
+
+#### Field: Availability Schedule Name
+
+This alpha field contains the name of the schedule (ref: Schedule) that denotes whether the heat pump compressor is available to operate during a given time period. A schedule value equal to 0 denotes that the heat pump compressor is off for that time period. A value other than 0 denotes that the heat pump compressor is available to operate during that time period. During times when the heat pump compressor is scheduled off, the heater (element or burner) in the water tank object operates based on its tank set point temperature schedule and the heat pump’s parasitic electric power is also off for that time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+#### Field: Compressor Setpoint Temperature Schedule Name
+
+This alpha field contains the name of the schedule (ref: Schedule) that specifies the set point (or “cut-out”) temperature for the heat pump compressor. Temperature values used in this schedule should be in degrees Celsius. The heat pump compressor cycles off when the tank water reaches this set point temperature. Once the heat pump compressor cycles off, the tank water temperature floats downward until it falls below the set point temperature minus the dead band temperature difference defined below (i.e., the “cut-in” temperature). At this point, the heat pump compressor cycles on and remains on until the heat pump compressor set point temperature is reached.
+
+#### Field: Dead Band Temperature Difference
+
+This numeric field contains the dead band temperature difference in degrees Celsius. The heat pump compressor “cut-in” temperature is defined as the compressor set point temperature defined above minus this dead band temperature difference. The heat pump compressor cycles on when the water temperature in the tank falls below the “cut-in” temperature. The heat pump compressor remains on until the water temperature in the tank rises above the compressor set point (“cut-out”) temperature defined above. The dead band temperature difference must be greater than 0°C and less than or equal to 20°C. If this field is left blank, the default value is 5°C.
+
+In this model, the heat pump water heater’s DX compression system is considered the primary heat source and the water tank’s heater (element or burner) provides supplemental heat as necessary. Therefore, the cut-in temperature for the heat pump compressor (set point minus dead band temperature difference) is usually higher than the set point temperature for the heater (element or burner) in the associated water heater tank object. At times when the water heater tank set point temperature is greater than the cut-in temperature of the heat pump compressor, the heat pump compressor is disabled and the tank’s heater is used to heat the water.
+
+#### Field: Condenser Bottom Location
+
+This numeric field contains the distance from the bottom of the tank to the bottom of the wrapped condenser. 
+
+#### Field: Condenser Top Location
+
+This numeric field contains the distance from the bottom of the tank to the top of the wrapped condenser.
+
+#### Field: Evaporator Air Flow Rate
+
+This numeric field contains the air flow rate across the heat pump’s air coil (evaporator) in cubic meters per second. It is the actual air flow rate to be simulated, which may differ from the rated evaporator air volumetric flow rate specified for the heat pump’s DX coil (Ref. Coil:WaterHeating:AirToWaterHeatPump:Wrapped). Values must be greater than 0 or this field is autocalculatable. If autocalculated (field value = **autocalculate**), the evaporator air flow rate is set equal to the rated heating capacity of the heat pump’s DX coil multiplied by 5.035E-5 m<sup>3</sup>/s/W. When this flow rate is different from the Rated Evaporator Air Volumetric Flow Rate specified in the heat pump’s DX coil object (Ref. Coil:WaterHeating:AirToWaterHeatPump:Wrapped), the user should also specify a Total Heating Capacity Modifier Curve Name (function of air flow fraction) and a Heating COP Modifier Curve Name (function of air flow fraction) in the associated DX coil object to account for differences in capacity and power consumption at the off-rated air flow rate.
+
+#### Field: Inlet Air Configuration
+
+This choice field defines the configuration of the air flow path through the heat pump air coil (evaporator) and fan section. Valid entries are **Schedule**, **ZoneAirOnly**, **OutdoorAirOnly**, or **ZoneAndOutdoorAir**. If ‘Schedule’ is selected, names for an inlet air temperature schedule and an inlet air humidity schedule must be defined in the fields below. If ‘ZoneAirOnly’ is selected, the corresponding zone name must be entered in the Inlet Air Zone Name field below. If ‘ZoneAndOutdoorAir’ is selected, the corresponding Inlet Air Zone Name, Inlet Air Mixer Node Name, Outlet Air Splitter Node Name, and an Inlet Air Mixer Schedule Name must be entered in the corresponding fields below.
+
+#### Field: Air Inlet Node Name
+
+This alpha field contains the name of the node from which the heat pump water heater draws its inlet air. If the Inlet Air Configuration field defined above is set to ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’, then this node name should be the name of a zone air exhaust node (Ref. ZoneHVAC:EquipmentConnections). If the Inlet Air Configuration field is set to ‘OutdoorAirOnly’, this node name should be left blank. If the Inlet Air Configuration field is set to ‘Schedule’, this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+
+#### Field: Air Outlet Node Name
+
+This alpha field contains the name of the node to which the heat pump water heater sends its outlet air. If the Inlet Air Configuration field defined above is set to ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’, then this node name should be the name of a zone air inlet node (Ref. ZoneHVAC:EquipmentConnections). If the Inlet Air Configuration field is set to ‘OutdoorAirOnly’, this node name should be left blank. If the Inlet Air Configuration field is set to ‘Schedule’, this node name should simply be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+
+#### Field: Outdoor Air Node Name
+
+This alpha field contains the name of the node from which the heat pump water heater draws its outdoor air. If the Inlet Air Configuration field defined above is set to ‘ZoneAirOnly’ or ‘Schedule’, this node name should be left blank. If the Inlet Air Configuration field is set to ‘ZoneAndOutdoorAir’ or ‘OutdoorAirOnly’, this node name should be the name of an outdoor air node (Ref. OutdoorAir:NodeList).
+
+#### Field: Exhaust Air Node Name
+
+This alpha field contains the name of the node to which the heat pump water heater sends its exhaust air. If the Inlet Air Configuration field defined above is set to ‘ZoneAirOnly’ or ‘Schedule’, this node name should be left blank. If the Inlet Air Configuration field is set to ‘ZoneAndOutdoorAir’ or ‘OutdoorAirOnly’, then this node name should be a unique name that allows the user to receive output on conditions at this node for verification purposes.
+
+#### Field: Inlet Air Temperature Schedule Name
+
+This alpha field contains the name of a schedule used to define the dry-bulb temperature of the inlet air to the heat pump air coil (evaporator) and fan section. Schedule values should be in degrees Celsius. This field is only used when the Inlet Air Configuration defined above is specified as ‘Schedule’, otherwise leave this field blank.
+
+#### Field: Inlet Air Humidity Schedule Name
+
+This alpha field contains the name of a schedule used to define the humidity of the inlet air to the heat pump evaporator and fan section. Schedule values must be entered as relative humidity fraction from 0 to 1 (e.g., a schedule value of 0.5 means 50%RH). This field is only used when the Inlet Air Configuration defined above is specified as ‘Schedule’, otherwise leave this field blank.
+
+#### Field: Inlet Air Zone Name
+
+This alpha field contains the name of the zone from which the heat pump evaporator and fan section draws some or all of its inlet air. This field is only used when the Inlet Air Configuration defined above is specified as ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’.
+
+#### Field: Tank Object Type
+
+This alpha (choice) field contains the type of water heater tank used by this heat pump water heater. Currently, the only valid choice is WaterHeater:Stratified.
+
+#### Field: Tank Name
+
+This alpha field contains the name of the specific water heater tank used by this heat pump water heater. This must be a tank of type `WaterHeater:Stratified`.
+
+#### Field: Tank Use Side Inlet Node Name
+
+This alpha field contains the name of the use side inlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Inlet Node Name in the water heater tank object (Ref. `WaterHeater:Stratified`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:WrappedCondenser` object (see branch object example below).
+
+#### Field: Tank Use Side Outlet Node Name
+
+This alpha field contains the name of the use side outlet node of the water heater tank used by this heat pump water heater. This name must match the Use Side Outlet Node Name in the water heater tank object (Ref. `WaterHeater:Stratified`). This field is required if the water heater tank use side nodes are connected to a plant loop, otherwise leave this field blank. When used, the branch object should reflect that this node is part of a `WaterHeater:HeatPump:WrappedCondenser` object (see branch object example below).
+
+#### Field: DX Coil Object Type
+
+This alpha (choice) field contains the type of DX coil used by this heat pump water heater. Currently, the only valid choice is Coil:WaterHeating:AirToWaterHeatPump:Wrapped.
+
+#### Field: DX Coil Name
+
+This alpha field contains the name of the specific DX coil (`Coil:WaterHeating:AirToWaterHeatPump:Wrapped`) used by this heat pump water heater.
+
+#### Field: Minimum Inlet Air Temperature for Compressor Operation
+
+This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. The minimum inlet air dry-bulb temperature should be greater than or equal to -5°C. If this field is left blank, the default value is 10°C.
+
+#### Field: Compressor Location
+
+This alpha (choice) field contains the location of the heat pump compressor and the air temperature for this location is used to control operation of the compressor’s crankcase heater in the Coil:WaterHeating:AirToWaterHeatPump:Wrapped object. Valid entries are **Schedule**, **Zone**, or **Outdoors**. If ‘Schedule’ is selected, a compressor ambient temperature schedule name must be defined in the field below; otherwise, the field below should be left blank. If ‘Zone’ is selected, the crankcase heater operation is controlled based on the air temperature in the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’. If ‘Outdoors’ is selected, crankcase heater operation is controlled based on the outdoor air temperature.
+
+#### Field: Compressor Ambient Temperature Schedule Name
+
+This alpha field contains the name of a schedule that defines the ambient air temperature surrounding the heat pump compressor, which is used to control the compressor’s crankcase heater operation. This field is only used when the compressor location field defined above is specified as ‘Schedule’, otherwise it should be left blank.
+
+#### Field: Fan Object Type
+
+This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choice is Fan: OnOff.
+
+#### Field: Fan Name
+
+This alpha field contains the name of the specific fan (`Fan:OnOff` object) used by this heat pump water heater.
+
+#### Field: Fan Placement
+
+This alpha (choice) field defines the placement of the fan in the heat pump water heater. Valid choices are **BlowThrough** (fan upstream of the air coil) and **DrawThrough** (fan downstream of the air coil). If this field is left blank, the default value is DrawThrough.
+
+#### Field: On Cycle Parasitic Electric Load
+
+This numeric field contains the on-cycle parasitic electric power in Watts. This is the parasitic electric power consumed by controls or other electrical devices associated with the heat pump water heater. This parasitic electric load is consumed whenever the heat pump compressor is operating and the model assumes that this parasitic power does not contribute to heating the water. This parasitic load does, however, affect the zone air heat balance when the heat pump water heater sends some or all of its outlet air to a zone (i.e., Inlet Air Configuration field specified as ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’) and the Parasitic Heat Rejection Location field is specified as ‘Zone’. The minimum value for this field is 0.0, and the default value is also 0.0 if this field is left blank.
+
+#### Field: Off Cycle Parasitic Electric Load
+
+This numeric field contains the off-cycle parasitic electric power in Watts. This is the parasitic electric power consumed by controls or other electrical devices associated with the heat pump compressor. This parasitic electric load is consumed whenever the heat pump water heater is available but the compressor is not operating, and the model assumes that this parasitic power does not contribute to heating the water. This parasitic load does, however, affect the zone air heat balance when the heat pump water heater sends some or all of its outlet air to a zone (i.e., Inlet Air Configuration field specified as ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir’) and the Parasitic Heat Rejection Location field is specified as ‘Zone’. The minimum value for this field is 0.0, and the default value is also 0.0 if this field is left blank.
+
+#### Field: Parasitic Heat Rejection Location
+
+This alpha (choice) field determines where the on-cycle and off-cycle parasitic heat is rejected. Valid choices are Zone and Exterior. If ‘Zone’ is selected, both the on-cycle and off-cycle parasitic heat is rejected to the zone defined in the field Inlet Air Zone Name, and the Inlet Air Configuration must be ‘ZoneAirOnly’ or ‘ZoneAndOutdoorAir. If ’Outdoors’ is selected, this parasitic heat is rejected outdoors (does not impact the zone air heat balance) regardless of the specified Inlet Air Configuration. If this field is left blank, the default value is ’Outdoors’.
+
+#### Field: Inlet Air Mixer Node Name
+
+This optional alpha field defines the name of the HVAC node which represents the mixture of outdoor air and zone air that enters the heat pump air coil (evaporator) and fan section. The model mixes outdoor air with zone air and places the result on this inlet air mixer node based on the Inlet Air Mixer Schedule defined below. When the schedule value is equal to 0, 100% zone air enters the evaporator coil and fan section of the heat pump water heater. When the schedule value is equal to 1, 100% outdoor air enters the evaporator coil and fan section. This node name must be provided if the Inlet Air Configuration field above is specified as ‘ZoneAndOutdoor Air’, otherwise this field should be left blank.
+
+#### Field: Outlet Air Splitter Node Name
+
+This alpha field defines the name of the air node to which the heat pump air coil (evaporator) and fan sends all of its outlet air. The supply air flow downstream of this node is split between the zone and outdoors based on the Inlet Air Mixer schedule defined below. When the schedule value is equal to 0, the entire outlet air stream is diverted to the zone. When the schedule value is equal to 1, the entire outlet air stream is exhausted to outdoors. This node name must be provided if the Inlet Air Configuration field above is specified as ‘Zone and Outdoor Air’, otherwise this field should be left blank.
+
+#### Field: Inlet Air Mixer Schedule Name
+
+This alpha field defines the name of the schedule (ref: Schedule) that denotes whether the heat pump draws its inlet air from the zone, outdoors, or a combination of zone and outdoor air. A schedule value equal to 0 indicates that the heat pump draws its inlet air from the zone. A schedule value equal to 1 denotes that the heat pump draws its inlet air from outdoors. Values between 0 and 1 denote a mixture of zone and outdoor air proportional to the schedule value. The Inlet Air Mixer schedule controls both the inlet air mixer and outlet air splitter nodes in unison to ensure that the operation of the heat pump does not contribute to zone pressurization or depressurization. For example if the Inlet Air Mixer schedule value is 0.4, then the inlet air mixer node is composed of 40% outdoor air and 60% zone air. For this same case, the outlet air splitter directs 60% of the HPWH outlet air back to the zone and 40% of the outlet air flow is exhausted outdoors. This schedule name must be provided if the Inlet Air Configuration field is specified as ‘Zone and Outdoor Air’, otherwise this field should be left blank.
+
+#### Field: Tank Element Control Logic
+
+This alpha field defines settings for the control logic of when to run the tank element in relation to whether the heat pump is running. 
+
+  - **MutuallyExclusive** means that once the tank heating element(s) are active, the heat pump is shut down until the heating element setpoint is reached. 
+  - **Simultaneous** (default) means that both the tank heating element and heat pump are used at the same time to recover the tank temperature. 
+
+#### Field: Control Sensor 1 Height In Stratified Tank
+
+This alpha field defines where the tank temperature is sensed for heat pump control when the tank type is `WaterHeater:Stratified`.  The stratified tank model produces tank temperature at different nodes in the vertical direction and various options are available for how this temperature should be sensed to control the heat pump.  This is measured in height from the bottom of the tank. Internally the appropriate node is determined based on this height. If omitted, this defaults to the height of Heater1.
+
+#### Field: Control Sensor 1 Weight
+
+The model can optionally use two control sensor locations in stratified tanks. When that is the case, the temperature sensed at each location is weighted. This alpha input specifies the weight associated with Control Sensor 1. It is input as a value between 0 and 1. The weight of Control Sensor 2 is determined by subtracting this weight from 1. The default for this field is 1, indicating that only Control Sensor 1 is used. 
+
+#### Field: Control Sensor 2 Height in Stratified Tank
+
+This alpha field defines the optional second location where the tank temperature is sensed for heat pump control when the tank type is `WaterHeater:Stratified`. If omitted, this defaults to the height of Heater2.
+
+Following is an example input for the `WaterHeater:HeatPump:WrappedCondenser` compound object and the other required component objects that it references.
+
+```idf
+WaterHeater:HeatPump:WrappedCondenser,
+    PlantHeatPumpWaterHeater,!- Name
+    PlantHPWHSch,            !- Availability Schedule Name
+    PlantHPWHTempSch,        !- Compressor Setpoint Temperature Schedule Name
+    3.89,                    !- Dead Band Temperature Difference {deltaC}
+    0.0664166667,            !- Condenser Bottom Location
+    0.8634166667,            !- Condenser Top Location
+    0.2279,                  !- Evaporator Air Flow Rate {m3/s}
+    OutdoorAirOnly,          !- Inlet Air Configuration
+    ,                        !- Air Inlet Node Name
+    ,                        !- Air Outlet Node Name
+    HPPlantAirInletNode,     !- Outdoor Air Node Name
+    HPPlantAirOutletNode,    !- Exhaust Air Node Name
+    ,                        !- Inlet Air Temperature Schedule Name
+    ,                        !- Inlet Air Humidity Schedule Name
+    ,                        !- Inlet Air Zone Name
+    WaterHeater:Stratified,  !- Tank Object Type
+    HPWHPlantTank,           !- Tank Name
+    HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
+    HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
+    Coil:WaterHeating:AirToWaterHeatPump:Wrapped,  !- DX Coil Object Type
+    HPWHPlantDXCoil,         !- DX Coil Name
+    7.2,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
+    Outdoors,                !- Compressor Location
+    ,                        !- Compressor Ambient Temperature Schedule Name
+    Fan:OnOff,               !- Fan Object Type
+    HPWHPlantFan,            !- Fan Name
+    DrawThrough,             !- Fan Placement
+    0,                       !- On Cycle Parasitic Electric Load {W}
+    0,                       !- Off Cycle Parasitic Electric Load {W}
+    ,                        !- Parasitic Heat Rejection Location
+    ,                        !- Inlet Air Mixer Node Name
+    ,                        !- Outlet Air Splitter Node Name
+    ,                        !- Inlet Air Mixer Schedule Name
+    MutuallyExclusive,       !- Tank Element Control Logic
+    1.262,                   !- Control Sensor 1 Height In Stratified Tank
+    0.75,                    !- Control Sensor 1 Weight
+    0.464;                   !- Control Sensor 2 Height In Stratified Tank
+```
+
+NOTE: branch object required only when tank use inlet nodes are used.
+
+```idf
+Branch,
+    Central HPWH Branch,     !- Name
+    0,                       !- Maximum Flow Rate {m3/s}
+    ,                        !- Pressure Drop Curve Name
+    WaterHeater:HeatPump:WrappedCondenser,    !- Component 1 Object Type
+    PlantHeatPumpWaterHeater,!- Component 1 Name
+    HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
+    HPWH Use Outlet Node,    !- Component 1 Outlet Node Name
+    PASSIVE;                 !- Component 1 Branch Control Type
+
+WaterHeater:Stratified,
+    HPWHPlantTank,           !- Name
+    Water Heater,            !- End-Use Subcategory
+    0.287691,                !- Tank Volume {m3}
+    1.594,                   !- Tank Height {m}
+    VerticalCylinder,        !- Tank Shape
+    ,                        !- Tank Perimeter {m}
+    100,                     !- Maximum Temperature Limit {C}
+    MasterSlave,             !- Heater Priority Control
+    Plant Hot Water Setpoint Temp Schedule,  !- Heater 1 Setpoint Temperature Schedule Name
+    18.5,                      !- Heater 1 Deadband Temperature Difference {deltaC}
+    4500,                    !- Heater 1 Capacity {W}
+    1.129,                   !- Heater 1 Height {m}
+    Plant Hot Water Setpoint Temp Schedule,  !- Heater 2 Setpoint Temperature Schedule Name
+    18.5,                      !- Heater 2 Deadband Temperature Difference {deltaC}
+    0,                    !- Heater 2 Capacity {W}
+    0.266,                   !- Heater 2 Height {m}
+    Electricity,             !- Heater Fuel Type
+    1,                       !- Heater Thermal Efficiency
+    8.3,                     !- Off Cycle Parasitic Fuel Consumption Rate {W}
+    Electricity,             !- Off Cycle Parasitic Fuel Type
+    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
+    1,                       !- Off Cycle Parasitic Height {m}
+    8.3,                     !- On Cycle Parasitic Fuel Consumption Rate {W}
+    Electricity,             !- On Cycle Parasitic Fuel Type
+    0,                       !- On Cycle Parasitic Heat Fraction to Tank
+    1,                       !- On Cycle Parasitic Height {m}
+    Outdoors,                !- Ambient Temperature Indicator
+    ,                        !- Ambient Temperature Schedule Name
+    ,                        !- Ambient Temperature Zone Name
+    ,                        !- Ambient Temperature Outdoor Air Node Name
+    0.7878,                  !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}
+    1,                       !- Skin Loss Fraction to Zone
+    ,                        !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}
+    1,                       !- Off Cycle Flue Loss Fraction to Zone
+    0.001,                   !- Peak Use Flow Rate {m3/s}
+    ,                        !- Use Flow Rate Fraction Schedule Name
+    ,                        !- Cold Water Supply Temperature Schedule Name
+    HPWH Use Inlet Node,     !- Use Side Inlet Node Name
+    HPWH Use Outlet Node,    !- Use Side Outlet Node Name
+    1,                       !- Use Side Effectiveness
+    0,                       !- Use Side Inlet Height {m}
+    autocalculate,           !- Use Side Outlet Height {m}
+    HPPlantWaterOutletNode,  !- Source Side Inlet Node Name
+    HPPlantWaterInletNode,   !- Source Side Outlet Node Name
+    1,                       !- Source Side Effectiveness
+    0.7,                     !- Source Side Inlet Height {m}
+    0,                       !- Source Side Outlet Height {m}
+    Fixed,                   !- Inlet Mode
+    autosize,                !- Use Side Design Flow Rate {m3/s}
+    autosize,                !- Source Side Design Flow Rate {m3/s}
+    1.5,                     !- Indirect Water Heating Recovery Time {hr}
+    12;                      !- Number of Nodes
+
+OutdoorAir:Node,
+    HPWHPlantTank OA Node;   !- Name
+
+Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
+    HPWHPlantDXCoil,               !- Name
+    2349.6,                  !- Rated Heating Capacity {W}
+    2.4,                     !- Rated COP {W/W}
+    0.981,                   !- Rated Sensible Heat Ratio
+    19.72,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
+    13.5,                    !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
+    48.89,                   !- Rated Condenser Water Temperature {C}
+    0.189,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    Yes,                     !- Evaporator Fan Power Included in Rated COP
+    HPPlantFanAirOutletNode, !- Evaporator Air Inlet Node Name
+    HPPlantAirOutletNode,    !- Evaporator Air Outlet Node Name
+    0,                       !- Crankcase Heater Capacity {W}
+    10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
+    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
+    HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name
+    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name
+    HPWH-Htg-COP-fT,         !- Heating COP Function of Temperature Curve Name
+    ,                        !- Heating COP Function of Air Flow Fraction Curve Name
+    HPWH-COP-fPLR;           !- Part Load Fraction Correlation Curve Name
+
+Fan:OnOff,
+    HPWHPlantFan,            !- Name
+    PlantHPWHSch,            !- Availability Schedule Name
+    0.1722,                  !- Fan Total Efficiency
+    65,                      !- Pressure Rise {Pa}
+    0.2279,                  !- Maximum Flow Rate {m3/s}
+    1,                       !- Motor Efficiency
+    0,                       !- Motor In Airstream Fraction
+    HPPlantAirInletNode,     !- Air Inlet Node Name
+    HPPlantFanAirOutletNode; !- Air Outlet Node Name
+```
 
 
+### Wrapped Condenser Heat Pump Water Heater Outputs
+
+* **HVAC,Average,Water Heater Compressor Part Load Ratio**
+
+* **HVAC,Average,Water Heater On Cycle Ancillary Electric Power [W]**
+
+* **HVAC,Sum,Water Heater On Cycle Ancillary Electric Energy [J]**
+
+* **HVAC,Average,Water Heater Off Cycle Ancillary Electric Power [W]**
+
+* **HVAC,Sum,Water Heater Off Cycle Ancillary Electric Energy [J]**
+
+
+
+#### Water Heater Compressor Part Load Ratio
+
+This output is the average part-load ratio of the heat pump water heater’s compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the “Water Heater Part Load Ratio” (Ref. Water Heater Outputs) which represents the part-load ratio of the supplemental heater (element or burner) in the water tank. When the water tank’s (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater’s compressor, the heat pump compressor is disabled and the water tank’s heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
+
+#### Water Heater On Cycle Ancillary Electric Power [W]
+
+#### Water Heater On Cycle Ancillary Electric Energy [J]
+
+#### Water Heater Off Cycle Ancillary Electric Power [W]
+
+#### Water Heater Off Cycle Ancillary Electric Energy [J]
+
+These outputs are the parasitic electric power and consumption associated with the heat pump water heater. Specific outputs represent parasitic electrical usage during the compressor/fan on and off cycles. These outputs represent electronic controls or other electric component. The model assumes that the parasitic power does not contribute to heating the water, but it can impact the zone air heat balance depending on user inputs. The parasitic electric consumption outputs are also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
 
 Group – Condenser Equipment
@@ -18430,7 +19151,7 @@ This represents the fan speed operating at each time step: 2 for High Speed, 1 f
 
 ### CoolingTower:VariableSpeed:Merkel
 
-This variable speed tower model is based on Merkel's theory and is similar to the single-speed and two-speed tower models.  The closed-circuit cooling tower is modeled as a counter flow heat exchanger with a variable-speed fan drawing air through the tower (induced-draft configuration). The model also includes a “free convection” regime where cooling tower performance modeled with the fan off.
+This variable speed tower model is based on Merkel's theory and is similar to the single-speed and two-speed tower models.  The open wet cooling tower is modeled as a counter flow heat exchanger with a variable-speed fan drawing air through the tower (induced-draft configuration). The model also includes a “free convection” regime where cooling tower performance modeled with the fan off.
 
 For this model, Merkel’s theory is modified to include adjustments developed by Scheier to alter the heat transfer effectiveness based on current wetbulb, air flow rates, and water flow rates. The input requires performance curves or lookup tables to describe these three adjustment factors.
 
@@ -19434,7 +20155,7 @@ The evaporative fluid cooler seeks to maintain the temperature of the water exit
 
 Evaporative fluid coolers consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the fluid coolers. For this purpose, the last seven input fields can either be provided in the input or if nothing is specified then the default values for these fields will be used. These fields provide the methods of controlling details of the water consumption calculations. The user can specify connections to the rest of the building’s water system by providing the name of a water storage tanks (i.e. WaterUse:Storage objects). The schematic of the system is shown below:
 
-![EvaporativeFluidCooler](InputOutputReference/media/image201.svg)
+![EvaporativeFluidCooler](media/image201.svg)
 
 Figure 82. Schematic diagram for evaporative fluid cooler
 

@@ -589,23 +589,8 @@ namespace RoomAirModelUserTempPattern {
 		{ auto const SELECT_CASE_var( RoomAirPattern( PattrnID ).TwoGradPatrn.InterpolationMode );
 
 		if ( SELECT_CASE_var == OutdoorDryBulbMode ) {
-			if ( Zone( ZoneNum ).OutDryBulbTemp >= RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale ) {
-				Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.HiGradient;
 
-			} else if ( Zone( ZoneNum ).OutDryBulbTemp <= RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) {
-
-				Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient;
-			} else { // interpolate
-
-				if ( ( RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) != 0.0 ) {
-					// bad user input. should be trapped during get input in RoomAirManager.cc
-					Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient;
-				} else {
-
-					Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient + ( ( Zone( ZoneNum ).OutDryBulbTemp - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) / ( RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) ) * ( RoomAirPattern( PattrnID ).TwoGradPatrn.HiGradient - RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient );
-
-				}
-			}
+			Grad = OutdoorDryBulbGrad(Zone(ZoneNum).OutDryBulbTemp, RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale, RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient, RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale, RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
 
 		} else if ( SELECT_CASE_var == ZoneAirTempMode ) {
 
@@ -701,6 +686,38 @@ namespace RoomAirModelUserTempPattern {
 
 		AirPatternZoneInfo( ZoneNum ).Gradient = Grad;
 
+	}
+	Real64
+	OutdoorDryBulbGrad(
+		Real64 DryBulbTemp, // Zone(ZoneNum).OutDryBulbTemp
+		Real64 UpperBound, // RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale
+		Real64 HiGradient, // RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient
+		Real64 LowerBound, // RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale
+		Real64 LowGradient // RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient
+	)
+	{
+		Real64 Grad;
+		if (DryBulbTemp >= UpperBound) {
+			Grad = HiGradient;
+
+		}
+		else if (DryBulbTemp <= LowerBound) {
+
+			Grad = LowGradient;
+		}
+		else { // interpolate
+
+			if ((UpperBound - LowerBound) == 0.0) {
+				// bad user input. should be trapped during get input in RoomAirManager.cc
+				Grad = LowGradient;
+			}
+			else {
+
+				Grad = LowGradient + ((DryBulbTemp - LowerBound) / (UpperBound -LowerBound)) * (HiGradient - LowGradient);
+
+			}
+		}
+		return Grad;
 	}
 
 	void
@@ -1141,7 +1158,7 @@ namespace RoomAirModelUserTempPattern {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

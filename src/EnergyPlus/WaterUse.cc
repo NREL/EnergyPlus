@@ -241,7 +241,7 @@ namespace WaterUse {
 		}
 
 		if ( CompIndex == 0 ) {
-			WaterConnNum = FindItemInList( CompName, WaterConnections.Name(), NumWaterConnections );
+			WaterConnNum = FindItemInList( CompName, WaterConnections );
 			if ( WaterConnNum == 0 ) {
 				ShowFatalError( "SimulateWaterUseConnection: Unit not found=" + CompName );
 			}
@@ -374,7 +374,7 @@ namespace WaterUse {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterEquipment.Name(), WaterEquipNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), WaterEquipment, WaterEquipNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -430,7 +430,7 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 6 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
-					WaterEquipment( WaterEquipNum ).Zone = FindItemInList( cAlphaArgs( 7 ), Zone.Name(), NumOfZones );
+					WaterEquipment( WaterEquipNum ).Zone = FindItemInList( cAlphaArgs( 7 ), Zone );
 
 					if ( WaterEquipment( WaterEquipNum ).Zone == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
@@ -476,7 +476,7 @@ namespace WaterUse {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterConnections.Name(), WaterConnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), WaterConnections, WaterConnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -560,7 +560,7 @@ namespace WaterUse {
 				WaterConnections( WaterConnNum ).WaterEquipment.allocate( NumAlphas - 9 );
 
 				for ( AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum ) {
-					WaterEquipNum = FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment.Name(), NumWaterEquipment );
+					WaterEquipNum = FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment );
 
 					if ( WaterEquipNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( AlphaNum ) + '=' + cAlphaArgs( AlphaNum ) );
@@ -1535,7 +1535,7 @@ namespace WaterUse {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

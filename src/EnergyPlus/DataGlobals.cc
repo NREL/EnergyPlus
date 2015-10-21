@@ -1,13 +1,11 @@
 // C++ Headers
 #include <ostream>
-#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -36,7 +34,6 @@ namespace DataGlobals {
 	// na
 
 	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -58,6 +55,7 @@ namespace DataGlobals {
 	int const ksRunPeriodWeather( 3 );
 	int const ksHVACSizeDesignDay ( 4 );  // a regular design day run during HVAC Sizing Simulation
 	int const ksHVACSizeRunPeriodDesign( 5 ); // a weather period design day run during HVAC Sizing Simulation
+	int const ksReadAllWeatherData( 6 ); // a weather period for reading all weather data proir to the simulation
 
 	int const ZoneTSReporting( 1 ); // value for Zone Time Step Reporting (UpdateDataAndReport)
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -139,6 +137,8 @@ namespace DataGlobals {
 	bool WarmupFlag( false ); // True during the warmup portion of a simulation
 	int OutputFileStandard( 0 ); // Unit number for the standard output file (hourly data only)
 	std::ostream * eso_stream( nullptr ); // Internal stream used for eso output (used for performance)
+	int OutputStandardError( 0 ); // Unit number for the standard error output file
+	std::ostream * err_stream( nullptr ); // Internal stream used for err output (used for performance)
 	int StdOutputRecordCount( 0 ); // Count of Standard output records
 	int OutputFileInits( 0 ); // Unit number for the standard Initialization output file
 	int OutputFileDebug( 0 ); // Unit number for debug outputs
@@ -197,8 +197,98 @@ namespace DataGlobals {
 	void ( *fProgressPtr )( int const );
 	void ( *fMessagePtr )( std::string const & );
 
+	// Clears the global data in DataGlobals.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		runReadVars = false;
+		DDOnlySimulation = false;
+		AnnualSimulation = false;
+		BeginDayFlag = false;
+		BeginEnvrnFlag = false;
+		BeginHourFlag = false;
+		BeginSimFlag = false;
+		BeginFullSimFlag = false;
+		BeginTimeStepFlag = false;
+		DayOfSim = 0;
+		DayOfSimChr = "0";
+		EndEnvrnFlag = false;
+		EndDesignDayEnvrnsFlag = false;
+		EndDayFlag = false;
+		EndHourFlag = false;
+		PreviousHour = 0;
+		HourOfDay = 0;
+		WeightPreviousHour = 0.0;
+		WeightNow = 0.0;
+		NumOfDayInEnvrn = 0;
+		NumOfTimeStepInHour = 0;
+		NumOfZones = 0;
+		TimeStep = 0;
+		TimeStepZone = 0.0;
+		WarmupFlag = false;
+		OutputFileStandard = 0;
+		OutputStandardError = 0;
+		StdOutputRecordCount = 0;
+		OutputFileInits = 0;
+		OutputFileDebug = 0;
+		OutputFileZoneSizing = 0;
+		OutputFileSysSizing = 0;
+		OutputFileMeters = 0;
+		StdMeterRecordCount = 0;
+		OutputFileBNDetails = 0;
+		ZoneSizingCalc = false;
+		SysSizingCalc = false;
+		DoZoneSizing = false;
+		DoSystemSizing = false;
+		DoPlantSizing = false;
+		DoDesDaySim = false;
+		DoWeathSim = false;
+		DoHVACSizingSimulation = false;
+		HVACSizingSimMaxIterations = 0;
+		WeathSimReq = false;
+		KindOfSim = 0;
+		DoOutputReporting = false;
+		DoingSizing = false;
+		DoingHVACSizingSimulations = false;
+		DoingInputProcessing = false;
+		DisplayAllWarnings = false;
+		DisplayExtraWarnings = false;
+		DisplayUnusedObjects = false;
+		DisplayUnusedSchedules = false;
+		DisplayAdvancedReportVariables = false;
+		DisplayZoneAirHeatBalanceOffBalance = false;
+		DisplayInputInAudit = false;
+		CreateMinimalSurfaceVariables = false;
+		CurrentTime = 0.0;
+		SimTimeSteps = 0;
+		MinutesPerTimeStep = 0;
+		TimeStepZoneSec = 0.0;
+		MetersHaveBeenInitialized = false;
+		KickOffSimulation = false;
+		KickOffSizing = false;
+		RedoSizesHVACSimulation = false;
+		FinalSizingHVACSizingSimIteration = false;
+		AnyEnergyManagementSystemInModel = false;
+		AnyPlantInModel = false;
+		CacheIPErrorFile = 0;
+		AnyIdealCondEntSetPointInModel = false;
+		RunOptCondEntTemp = false;
+		CompLoadReportIsReq = false;
+		isPulseZoneSizing = false;
+		OutputFileZonePulse = 0;
+		doLoadComponentPulseNow = false;
+		ShowDecayCurvesInEIO = false;
+		AnySlabsInModel = false;
+		AnyBasementsInModel = false;
+		Progress = 0;
+		eso_stream = nullptr;
+		mtr_stream = nullptr;
+		err_stream = nullptr;
+	}
+
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

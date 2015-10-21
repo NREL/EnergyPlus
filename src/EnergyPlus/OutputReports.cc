@@ -1696,7 +1696,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	static gio::Fmt Format_701( "('! <HeatTransfer/Shading/Frame/Divider_Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
 	static gio::Fmt Format_7011( "(',Construction/Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value,','Nominal U (with film coefs)/Max Schedule Value,Solar Diffusing,','Area (Net),Area (Gross),Area (Sunlit Calc),Azimuth,Tilt,~Width,~Height,Reveal,','<ExtBoundCondition>,<ExtConvCoeffCalc>,<IntConvCoeffCalc>,<SunExposure>,<WindExposure>,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
 	static gio::Fmt Format_7012( "(',#Sides')" );
-	static gio::Fmt Format_702( "('! <Units>,,,,')" );
+	static gio::Fmt Format_702( "('! <Units>,,,,,')" );
 	static gio::Fmt Format_7021( "(',{W/m2-K}/{},{W/m2-K}/{},{},{m2},{m2},{m2},{deg},{deg},{m},{m},{m},,,,,,,,,,')" );
 	static gio::Fmt Format_7022( "(',')" );
 	static gio::Fmt Format_703( "(A,',',A,',',I5)" );
@@ -2443,24 +2443,27 @@ VRMLOut(
 
 }
 
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	//     NOTICE
+
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

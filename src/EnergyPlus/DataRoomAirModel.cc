@@ -42,7 +42,8 @@ namespace DataRoomAirModel {
 	int const RoomAirModel_UCSDCV( 5 ); // UCSD-CV
 	int const RoomAirModel_UCSDUFI( 6 ); // UCSD UFAD interior zone model
 	int const RoomAirModel_UCSDUFE( 7 ); // UCSD UFAD interior zone model
-	Array1D_string const ChAirModel( {0,7}, { "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE" } );
+	int const RoomAirModel_AirflowNetwork( 8 ); // Room Air model using AirflowNetwork
+	Array1D_string const ChAirModel( {0,8}, { "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork" } );
 
 	// Parameters to indicate air temperature coupling scheme
 	int const DirectCoupling( 1 ); // direct coupling scheme
@@ -55,6 +56,7 @@ namespace DataRoomAirModel {
 	int const CeilingAirNode( 3 ); // air node at ceiling (for Mundt Model)
 	int const MundtRoomAirNode( 4 ); // air node for vertical walls (for Mundt Model)
 	int const ReturnAirNode( 10 ); // air node for return (for Mundt and Rees&Haves Models)
+	int const AirflowNetworkRoomAirNode( 11 ); // air node for airflow network based room air model
 	int const PlumeAirNode1( 2 ); // air node for plume load (for Rees&Haves Model)
 	int const PlumeAirNode2( 3 ); // air node for plume load (for Rees&Haves Model)
 	int const PlumeAirNode3( 4 ); // air node for plume load (for Rees&Haves Model)
@@ -111,6 +113,7 @@ namespace DataRoomAirModel {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int TotNumOfAirNodes( 0 );
+	int TotNumOfRoomAFNNodes( 0 );
 	Array1D_int TotNumOfZoneAirNodes;
 	Array1D< Real64 > ConvectiveFloorSplit;
 	Array1D< Real64 > InfiltratFloorSplit;
@@ -235,6 +238,9 @@ namespace DataRoomAirModel {
 	bool UserDefinedUsed( false ); // true if user-defined model used anywhere
 	// End User-defined patterns
 
+	// RoomAirflowNetwork
+	int NumOfRoomAirflowNetControl( 0 ); // count of RoomAirSettings:AirflowNetwork
+
 	// Object Data
 	Array1D< AirModelData > AirModel;
 	Array1D< AirNodeData > AirNode;
@@ -246,11 +252,12 @@ namespace DataRoomAirModel {
 	Array1D< CVDVParameters > SurfParametersCVDV; // Surface parameters
 	Array1D< TemperaturePatternStruct > RoomAirPattern; // user defined patterns ,various types
 	Array1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
+	Array1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info 
 
 	//**********************************************************************************************
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

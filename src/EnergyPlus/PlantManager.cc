@@ -357,7 +357,7 @@ namespace PlantManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alpha( 1 ), PlantLoop.Name(), LoopNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alpha( 1 ), PlantLoop, LoopNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alpha( 1 ) = "xxxxx";
@@ -1045,8 +1045,12 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
 							this_comp.GeneralEquipType = GenEquipTypes_Generator;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( this_comp_type, "WaterHeater:HeatPump" ) ) {
-							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeater;
+						} else if ( SameString( this_comp_type, "WaterHeater:HeatPump:PumpedCondenser" ) ) {
+							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
+							this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "WaterHeater:HeatPump:WrappedCondenser" ) ) {
+							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterWrapped;
 							this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else if ( SameString( this_comp_type, "HeatPump:WatertoWater:EquationFit:Cooling" ) ) {
@@ -1183,6 +1187,10 @@ namespace PlantManager {
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else if ( SameString( this_comp_type, "AirTerminal:SingleDuct:ConstantVolume:CooledBeam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_CooledBeamAirTerminal;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam" ) ) {
+							this_comp.TypeOf_Num = TypeOf_FourPipeBeamAirTerminal;
 							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else if ( SameString( this_comp_type, "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ) ) {
@@ -1592,7 +1600,7 @@ namespace PlantManager {
 					if ( GeneralEquipType == 0 ) {
 						if ( has_prefixi( this_comp.TypeOf, "HeaderedPumps" ) ) {
 							GeneralEquipType = GenEquipTypes_Pump;
-						} else if ( SameString( this_comp.TypeOf, "WaterHeater:HeatPump" ) ) {
+						} else if ( has_prefixi( this_comp.TypeOf, "WaterHeater:HeatPump" ) ) {
 							GeneralEquipType = GenEquipTypes_WaterThermalTank;
 						} else if ( SameString( this_comp.TypeOf, "TemperingValve" ) ) {
 							GeneralEquipType = GenEquipTypes_Valve;
@@ -1636,7 +1644,11 @@ namespace PlantManager {
 					// Set up "TypeOf" Num
 					TypeOfNum = FindItemInList( this_comp.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
 					if ( TypeOfNum == 0 ) {
-						if ( ! has_prefixi( this_comp.TypeOf, "Pump" ) && ! has_prefixi( this_comp.TypeOf, "HeaderedPump" ) ) {
+						if ( SameString(this_comp.TypeOf, "WaterHeater:HeatPump:PumpedCondenser") ) {
+							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
+						} else if ( SameString(this_comp.TypeOf, "WaterHeater:HeatPump:WrappedCondenser")) {
+							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterWrapped;
+						} else if ( ! has_prefixi( this_comp.TypeOf, "Pump" ) && ! has_prefixi( this_comp.TypeOf, "HeaderedPump" ) ) {
 							// Error.  May have already been flagged under General
 							if ( GeneralEquipType != 0 ) { // if GeneralEquipmentType == 0, then already flagged
 								ShowSevereError( "GetPlantInput: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\" invalid equipment type." );
@@ -2960,6 +2972,7 @@ namespace PlantManager {
 		// Using/Aliasing
 		using DataSizing::NumPltSizInput;
 		using DataSizing::PlantSizData;
+		using DataSizing::PlantSizingData;
 		using InputProcessor::FindItemInList;
 
 		// Locals
@@ -2980,7 +2993,7 @@ namespace PlantManager {
 		PlantSizNum = 0;
 		if ( PlantLoop( LoopNum ).PlantSizNum == 0 ) {
 			if ( NumPltSizInput > 0 ) {
-				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData.PlantLoopName(), NumPltSizInput );
+				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
 				if ( PlantSizNum > 0 ) {
 					PlantLoop( LoopNum ).PlantSizNum = PlantSizNum;
 				}
@@ -3073,7 +3086,7 @@ namespace PlantManager {
 			// PlantSizData(PlantSizNum)%DesVolFlowRate = 0.0D0 ! DSU2
 		} else {
 			if ( NumPltSizInput > 0 ) {
-				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData.PlantLoopName(), NumPltSizInput );
+				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
 			}
 		}
 		PlantLoop( LoopNum ).PlantSizNum = PlantSizNum;
@@ -3694,7 +3707,7 @@ namespace PlantManager {
 		int const nPumpsAfterIncrement = loop_side.TotalPumps = pumps.size() + 1;
 		pumps.redimension( nPumpsAfterIncrement );
 		pumps( nPumpsAfterIncrement ).PumpName = PumpName;
-		// pumps( nPumpsAfterIncrement ).PumpTypeOf = FindItemInList( PumpType, SimPlantEquipTypes, SimPlantEquipTypes.size() );
+		// pumps( nPumpsAfterIncrement ).PumpTypeOf = FindItemInList( PumpType, SimPlantEquipTypes );
 		pumps( nPumpsAfterIncrement ).BranchNum = BranchNum;
 		pumps( nPumpsAfterIncrement ).CompNum = CompNum;
 		pumps( nPumpsAfterIncrement ).PumpOutletNode = PumpOutletNode;
@@ -3905,7 +3918,7 @@ namespace PlantManager {
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_PassiveCap;
 
-						} else if ( SELECT_CASE_var == TypeOf_HeatPumpWtrHeater ) { //                = 16
+						} else if ( SELECT_CASE_var == TypeOf_HeatPumpWtrHeaterPumped || SELECT_CASE_var == TypeOf_HeatPumpWtrHeaterWrapped ) { //                = 16, 92
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
 							this_component.HowLoadServed = HowMet_PassiveCap;
@@ -4205,6 +4218,10 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
+						} else if ( SELECT_CASE_var == TypeOf_FourPipeBeamAirTerminal ) {
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else if ( SELECT_CASE_var == TypeOf_CoilWAHPHeatingEquationFit ) {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -4461,7 +4478,7 @@ namespace PlantManager {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

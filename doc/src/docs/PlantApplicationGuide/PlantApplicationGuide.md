@@ -1,15 +1,12 @@
-
-![](PlantApplicationGuide/media/ep.gif)
+![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Application Guide for Plant Loops</h1>
 <h2>User Guide for Modeling Plant Systems</h2>
 <br/>
 <p><i>(a central location for central plant knowledge)</i></p>
-<br/>
-<br/>
 <br/>
 <p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
 <p style="page-break-after:always;"></p>
@@ -39,7 +36,7 @@ The scope of modeling plant loops in EnergyPlus is limited depending on the appl
 
 
 
-![](PlantApplicationGuide/media/image001.png)
+![](media/image001.png)
 
 Figure 1 - Central plant chilled water schematic for the University of California, Riverside (recreated from Hyman and Little, 2004)
 
@@ -101,7 +98,7 @@ The following list of steps will outline the process for converting an engineeri
 
 A flowchart for this process is provided in Figure 2 .
 
-![](PlantApplicationGuide/media/image002.png)
+![](media/image002.png)
 
 Figure 2 - Flowchart for EnergyPlus line diagram generation
 
@@ -112,7 +109,7 @@ A series of figures are provided below to detail the process for generating an E
 
 1.    **Obtain a simple engineering line diagram for the system.** This system is a simple cooling system that employs a primary/secondary pumping setup with a one-way common pipe to circulate chilled water through a building. Figure 3 shows the simple line diagram for the system.
 
-![](PlantApplicationGuide/media/image003.png)
+![](media/image003.png)
 
 Figure 3 - Simple line diagram for the example system, (recreated from Reed and Davis 2007)
 
@@ -120,7 +117,7 @@ Figure 3 - Simple line diagram for the example system, (recreated from Reed and 
 
 **3.    Identify the demand side and supply side of the loop.**  The half loops are depicted in Figure 4.
 
-![](PlantApplicationGuide/media/image004.png)
+![](media/image004.png)
 
 Figure 4 - Breakdown of a loop into its constituent half-loops
 
@@ -128,19 +125,19 @@ Figure 4 - Breakdown of a loop into its constituent half-loops
 
 4.    **Identify the components in the system.** While identifying the main components in the loop, it should be noted that this loop has a primary/secondary pumping setup, and that there is a common pipe that allows for flow imbalance. (Note: The *PlantLoop* object in EnergyPlus has a provision for the input of a common pipe. The user only has to specify the existence of a common pipe in the loop, and the program calculates its position in the loop). The primary pump is shown below is shown in Figure 5.
 
-![](PlantApplicationGuide/media/image005.png)
+![](media/image005.png)
 
 Figure 5 - A component in the loop
 
 5.    **Identify all the nodes in the system.** As mentioned above, placing a node on each side of a component is a good way to pinpoint all the nodes in the system. This process should be repeated for every component in the loop. Figure 6 shows the placement of all the nodes on Individual components, while Figure 7 shows all the nodes in the system.
 
-![](PlantApplicationGuide/media/image006.png)
+![](media/image006.png)
 
 Figure 6 - Node placement on components
 
 
 
-![](PlantApplicationGuide/media/image007.png)
+![](media/image007.png)
 
 Figure 7 - Nodes in the system
 
@@ -150,7 +147,7 @@ Note: No nodes were placed on the common pipe, but its existence should be speci
 
 
 
-![](PlantApplicationGuide/media/image008.png)
+![](media/image008.png)
 
 Figure 8 - Branch definition
 
@@ -160,7 +157,7 @@ Figure 8 - Branch definition
 
 
 
-![](PlantApplicationGuide/media/image009.png)
+![](media/image009.png)
 
 Figure 9 - Splitters and mixers in the loop
 
@@ -170,7 +167,7 @@ Figure 9 - Splitters and mixers in the loop
 
 
 
-![](PlantApplicationGuide/media/image010.png)
+![](media/image010.png)
 
 Figure 10 - Complete EnergyPlus line diagram
 
@@ -179,7 +176,7 @@ Inputting the system into the IDF file
 
 Since, it is not possible to input schematics into the input file, it is important to add descriptive comments to all of the entries to ensure that all the components in the system have been accounted for. Such documentation will also make debugging easier. It should be noted that all of the syntax for the inputs is documented in the Input-Output reference guide. A flowchart for the basic input process is provided in Figure 11.
 
-![](PlantApplicationGuide/media/image011.png)
+![](media/image011.png)
 
 Figure 11 - Flowchart for input process
 
@@ -192,13 +189,13 @@ This particular system consists of two unique sub-systems/loops. It contains the
 
 
 
-![](PlantApplicationGuide/media/image012.png)
+![](media/image012.png)
 
 Figure 12 - Simple cooling system line diagram
 
 
 
-**![](PlantApplicationGuide/media/image013.png)**
+**![](media/image013.png)**
 
 Figure 13 – EnergyPlus line diagram for the simple cooling system
 
@@ -210,7 +207,7 @@ The cooling system consists of a chilled water loop which is defined by the *Pla
 
 
 
-![](PlantApplicationGuide/media/image014.png)
+![](media/image014.png)
 
 Figure 14 - Flowchart for loop identification
 
@@ -221,7 +218,7 @@ The chilled water loop is constructed by using a *PlantLoop* object*.* This loop
 
 
 
-![](PlantApplicationGuide/media/image015.png)
+![](media/image015.png)
 
 Figure 15 - Simple line diagram for the chilled water loop
 
@@ -231,7 +228,7 @@ Figure 15 - Simple line diagram for the chilled water loop
 
 This series of flow charts serve as a process guide for identifying and inputting the chilled water loop and its components into the input file. Refer to Figure 16 for an EnergyPlus schematic of the Chilled Water Loop.
 
-![](PlantApplicationGuide/media/image016.png)
+![](media/image016.png)
 
 Figure 16 - EnergyPlus line diagram for the chilled water loop
 
@@ -239,7 +236,7 @@ The “PlantLoop” object is entered into the input file, with water as the wor
 
 
 
-![](PlantApplicationGuide/media/image017.png)
+![](media/image017.png)
 
 Figure 17 - Simple flowchart for separation of half loops in the chilled water loop
 
@@ -253,11 +250,11 @@ The main components in the supply side of the chilled water loop are the circula
 
 
 
-![](PlantApplicationGuide/media/image018.png)
+![](media/image018.png)
 
 Figure 18 - EnergyPlus line diagram for the supply side of the chilled water loop
 
-![](PlantApplicationGuide/media/image019.png)
+![](media/image019.png)
 
 Figure 19 – Flowchart for chilled water loop supply side branches and components
 
@@ -265,7 +262,7 @@ Figure 19 – Flowchart for chilled water loop supply side branches and componen
 
 
 
-![](PlantApplicationGuide/media/image020.png)
+![](media/image020.png)
 
 Figure 20 – Flowchart for chilled water loop supply side connectors
 
@@ -277,17 +274,17 @@ Figure 20 – Flowchart for chilled water loop supply side connectors
 
 The demand side of the loop is entered next. The main component in this side of the loop is the cooling load profile(instead of the cooling coil). This load profile is input by using a Schedule:Compact object which indicates the hourly cooling loads for the annual run period. In a more general scenario a cooling coil would take the place of the load profile and the cooling load will be simulated from the data obtained in the building system energy simulation. Apart from the load profile, the structure of the loop is very similar to the structure of the supply side. This side of the loop also has eight nodes, four components, and four branches. An EnergyPlus schematic for the demand side is provided in Figure 21. The flowchart for demand side branch definition is provided in Figure 22. The flowchart for the demand side connectors is provided in Figure 23.
 
-**![](PlantApplicationGuide/media/image021.png)**
+**![](media/image021.png)**
 
 Figure 21 - EnergyPlus line diagram for the demand side of the chilled water loop
 
-![](PlantApplicationGuide/media/image022.png)
+![](media/image022.png)
 
 Figure 22 – Flowchart for chilled water loop demand side branches and components
 
 
 
-**![](PlantApplicationGuide/media/image023.png)**
+**![](media/image023.png)**
 
 Figure 23 – Flowchart for chilled water loop demand side connectors
 
@@ -311,7 +308,7 @@ The chilled water loop uses two different schedules to operate properly. The *Ch
 
 * *
 
-![](PlantApplicationGuide/media/image024.png)
+![](media/image024.png)
 
 Figure 24 – Flowchart for chilled water loop schedules
 
@@ -325,7 +322,7 @@ The *PlantEquipmentOperationschemes* object uses the *Chiller AlwaysOnSchedule* 
 
 
 
-![](PlantApplicationGuide/media/image025.png)
+![](media/image025.png)
 
 Figure 25 – Flowchart for chilled water loop plant equipment operation schemes
 
@@ -337,7 +334,7 @@ The *Chilled Water Loop Setpoint Manager* uses the *CW Loop Temp Schedule* to se
 
 
 
-![](PlantApplicationGuide/media/image026.png)
+![](media/image026.png)
 
 Figure 26 – Flowchart for chilled water Loop setpoints
 
@@ -349,7 +346,7 @@ The chilled water loop is sized such a way that the design loop exit temperature
 
 
 
-![](PlantApplicationGuide/media/image027.png)
+![](media/image027.png)
 
 Figure 27 – Flowchart for chilled water loop sizing
 
@@ -364,7 +361,7 @@ The condenser loop uses a cooling tower to supply cooling water to the water-coo
 
 
 
-![](PlantApplicationGuide/media/image028.png)
+![](media/image028.png)
 
 Figure 28 - Simple line diagram for the condenser loop
 
@@ -374,13 +371,13 @@ As discussed in Section 1 the supply side and the demand side of the loop are mo
 
 A *PlantLoop* object is used to model the condenser loop with the chiller and the cooling tower as its main components. The working fluid is water. This loop is also sized such that the loop exit temperature is set to 20 degrees Celsius and the loop design temperature difference is 5 degrees Celsius. The chiller serves as the bridge between the chilled water loop and the condenser loop. This is achieved by managing the nodal connections on the chiller, hence the chiller appears on two branches in the system (supply branch of the CW loop, and the demand branch of the condenser loop). The EnergyPlus line diagram for the condenser loop is provided in Figure 29. A simple flow chart for the separation of the half loops is provided in Figure 30.
 
-![](PlantApplicationGuide/media/image029.png)
+![](media/image029.png)
 
 Figure 29 - EnergyPlus line diagram for the condenser loop
 
 
 
-![](PlantApplicationGuide/media/image030.png)
+![](media/image030.png)
 
 Figure 30 - Simple flowchart for separation of half loops in the condenser loop
 
@@ -394,7 +391,7 @@ The main components in the supply side of the condenser loop are the condenser c
 
 
 
-![](PlantApplicationGuide/media/image031.png)
+![](media/image031.png)
 
 Figure 31 - EnergyPlus line diagram for the supply side of the condenser loop
 
@@ -402,13 +399,13 @@ Figure 31 - EnergyPlus line diagram for the supply side of the condenser loop
 
 
 
-![](PlantApplicationGuide/media/image032.png)
+![](media/image032.png)
 
 Figure 32 - Flowchart for condenser supply side branches and components
 
 
 
-![](PlantApplicationGuide/media/image033.png)
+![](media/image033.png)
 
 Figure 33 - Condenser loop supply side connectors
 
@@ -420,7 +417,7 @@ The central component of the demand side is the chiller. The flowchart for the c
 
 
 
-![](PlantApplicationGuide/media/image034.png)
+![](media/image034.png)
 
 Figure 34 - EnergyPlus line diagram for the demand side of the condenser loop
 
@@ -428,13 +425,13 @@ Figure 34 - EnergyPlus line diagram for the demand side of the condenser loop
 
 
 
-![](PlantApplicationGuide/media/image035.png)
+![](media/image035.png)
 
 Figure 35 - Condenser loop demand side construction
 
 
 
-![](PlantApplicationGuide/media/image036.png)
+![](media/image036.png)
 
 Figure 36 - Condenser loop demand side schedules, equipment schemes and setpoints
 
@@ -450,7 +447,7 @@ The *Tower AlwaysOnSchedule* is a compact schedule that keeps the tower ON at al
 
 * *
 
-![](PlantApplicationGuide/media/image037.png)
+![](media/image037.png)
 
 Figure 37 - Condenser loop schedules
 
@@ -460,7 +457,7 @@ The plant equipment operation schemes for the condenser loop are very similar to
 
 
 
-![](PlantApplicationGuide/media/image038.png)
+![](media/image038.png)
 
 Figure 38 - Condenser loop plant equipment operation schemes
 
@@ -474,7 +471,7 @@ The *Condensercontrol setpointmanager* places a temperature setpoint at the *Con
 
 
 
-![](PlantApplicationGuide/media/image039.png)
+![](media/image039.png)
 
 Figure 39 - Condenser loop setpoints
 
@@ -484,7 +481,7 @@ The condenser loop is sized such that the loop exit temperature is 20 degrees Ce
 
 
 
-![](PlantApplicationGuide/media/image040.png)
+![](media/image040.png)
 
 Figure 40 - Condenser loop sizing
 
@@ -499,11 +496,11 @@ This system will detail the process required to model a Plant Loop coupled with 
 
 The TES tank will be charged by using a chiller loop, which will in turn be cooled by a condenser loop. The schedules for this system are setup such that the TES tank will be charged by the chiller during the night and then the stored chilled water is used to satisfy the building cooling load during the day. The TES tank used in this system is a stratified tank. This system also includes one heating loop which satisfies the heating load. The cooling and heating system operate in conjunction with an air loop that is spread across a total of five zones. The air loop modeling will not be discussed in this guide. This system consists of a total of three separate plant loops, the cooling side is comprised of two loops and the heating side contains one loop. A simple line diagram for the cooling system is provided in Figure 41. The EnergyPlus line diagram for the cooling loop is provided in Figure 43. A simple line diagram for the heating loop is provided in Figure 42, whereas its EnergyPlus line diagram is provided in Figure 44.
 
-![](PlantApplicationGuide/media/image041.png)
+![](media/image041.png)
 
 Figure 41 – Simple line diagram for cooling system
 
-      ![](PlantApplicationGuide/media/image042.png)
+      ![](media/image042.png)
 
 Figure 42 - Simple line diagram for heating loop
 
@@ -511,11 +508,11 @@ Figure 42 - Simple line diagram for heating loop
 
 
 
-![](PlantApplicationGuide/media/image043.png)
+![](media/image043.png)
 
 Figure 43 - EnergyPlus line diagram for cooling system
 
-![](PlantApplicationGuide/media/image044.png)
+![](media/image044.png)
 
 Figure 44 - EnergyPlus line diagram for heating loop
 
@@ -525,7 +522,7 @@ The cooling side of the system will be modeled first. The primary cooling loop (
 
 The building also has one heating loop. The heating loop (named “HeatSys 1”) uses a boiler to provide hot water to five heating coils that are located in the five zones. This heating loop also supplies hot water to the reheat coil. A flow chart for loop identification is provided in Figure 45.
 
-![](PlantApplicationGuide/media/image045.png)
+![](media/image045.png)
 
 Figure 45 - Flowchart for loop identification
 
@@ -538,7 +535,7 @@ The primary cooling system is constructed by using a *PlantLoop* object. It uses
 
 
 
-![](PlantApplicationGuide/media/image046.png)
+![](media/image046.png)
 
 Figure 46 - Simple line diagram for the primary cooling system
 
@@ -550,13 +547,13 @@ This series of flowcharts serve as a guide for identifying and inputting the Coo
 
 
 
-![](PlantApplicationGuide/media/image047.png)
+![](media/image047.png)
 
 Figure 47 - EnergyPlus line diagram for the primary cooling system
 
 
 
-![](PlantApplicationGuide/media/image048.png)
+![](media/image048.png)
 
 Figure 48 - Simple flowchart for the separation of half-loops in the primary cooling system
 
@@ -570,19 +567,19 @@ The main components on the supply side half loop for the primary cooling system 
 
 
 
-![](PlantApplicationGuide/media/image049.png)
+![](media/image049.png)
 
 Figure 49 - EnergyPlus line diagram for the supply side of the primary cooling loop
 
 
 
-![](PlantApplicationGuide/media/image050.png)
+![](media/image050.png)
 
 Figure 50 – Flowchart for primary cooling loop supply side branches and components
 
 
 
-![](PlantApplicationGuide/media/image051.png)
+![](media/image051.png)
 
 Figure 51 – Flowchart for primary cooling loop supply side connectors
 
@@ -594,17 +591,17 @@ Figure 51 – Flowchart for primary cooling loop supply side connectors
 
 The main component on the demand side half loop is the cooling coil which cools the air in the building by using the chilled water that is supplied by the supply side half loop. This side of the loop has eight nodes, four components, four branches, and one splitter mixer pair. An EnergyPlus line diagram for the demand side is provided in Figure 52. The flowchart for demand side branch definition is provided in Figure 53. The flowchart for the demand side connectors is provided in Figure 54.
 
-**![](PlantApplicationGuide/media/image052.png)**
+**![](media/image052.png)**
 
 Figure 52 - EnergyPlus line diagram for the demand side of the primary cooling loop
 
-![](PlantApplicationGuide/media/image053.png)
+![](media/image053.png)
 
 Figure 53 – Flowchart for primary cooling loop demand side branches and components
 
 
 
-![](PlantApplicationGuide/media/image054.png)
+![](media/image054.png)
 
 Figure 54 – Flowchart for primary cooling loop demand side connectors
 
@@ -628,7 +625,7 @@ The *TES Charge Schedule* is a very important schedule for the functioning of th
 
 
 
-![](PlantApplicationGuide/media/image055.png)
+![](media/image055.png)
 
 Figure 55 - TES Charge Schedule
 
@@ -636,7 +633,7 @@ Figure 55 - TES Charge Schedule
 
 
 
-![](PlantApplicationGuide/media/image056.png)
+![](media/image056.png)
 
 Figure 56 – Flowchart for primary cooling loop schedules
 
@@ -654,7 +651,7 @@ This loop has two plant equipment operation schemes, one for the chiller and one
 
 
 
-![](PlantApplicationGuide/media/image057.png)
+![](media/image057.png)
 
 Figure 57 – Flowchart for Chiller plant equipment operation schemes
 
@@ -662,7 +659,7 @@ The TES tank operation is modeled here. The *PlantEquipmentOperationschemes* obj
 
 
 
-![](PlantApplicationGuide/media/image058.png)
+![](media/image058.png)
 
 Figure 58 – Flowchart for Thermal Energy Storage plant equipment operation schemes
 
@@ -674,7 +671,7 @@ The *CoolSysPrimary Loop Setpoint Manager* uses the *CoolSysPrimary Loop Temp Sc
 
 
 
-![](PlantApplicationGuide/media/image059.png)
+![](media/image059.png)
 
 Figure 59 – Flowchart for primary cooling loop setpoints
 
@@ -686,7 +683,7 @@ The chilled water loop is sized such a way that the design loop exit temperature
 
 
 
-![](PlantApplicationGuide/media/image060.png)
+![](media/image060.png)
 
 Figure 60 – Flowchart for primary cooling loop sizing
 
@@ -701,7 +698,7 @@ The Condenser Loop is constructed by using a *PlantLoop* object. It uses a cooli
 
 
 
-![](PlantApplicationGuide/media/image061.png)
+![](media/image061.png)
 
 Figure 61 - Simple line diagram for the condenser loop
 
@@ -711,7 +708,7 @@ Figure 61 - Simple line diagram for the condenser loop
 
 This series of flowcharts serve as a guide for identifying and inputting the Condenser Loop and its components into the input file. The EnergyPlus line diagram for this loop is provided in Figure 62. A simple flowchart for the separation of the half loops is provided in Figure 63.
 
-![](PlantApplicationGuide/media/image062.png)
+![](media/image062.png)
 
 Figure 62 - EnergyPlus line diagram for the condenser loop
 
@@ -719,7 +716,7 @@ Figure 62 - EnergyPlus line diagram for the condenser loop
 
 
 
-![](PlantApplicationGuide/media/image063.png)
+![](media/image063.png)
 
 Figure 63 - Simple flow chart for separation on half loops in the condenser loop
 
@@ -733,19 +730,19 @@ The main components on the supply side half loop for the Condenser Loop are the 
 
 
 
-![](PlantApplicationGuide/media/image064.png)
+![](media/image064.png)
 
 Figure 64 - EnergyPlus line diagram for the supply side of the condenser loop
 
 
 
-![](PlantApplicationGuide/media/image065.png)
+![](media/image065.png)
 
 Figure 65 – Flowchart for condenser loop supply side branches and components
 
 
 
-![](PlantApplicationGuide/media/image066.png)
+![](media/image066.png)
 
 Figure 66 – Flowchart for condenser loop supply side connectors
 
@@ -757,19 +754,19 @@ Figure 66 – Flowchart for condenser loop supply side connectors
 
 The main component on the demand side half loop is the Chiller that uses the cooling water supplied by the cooling tower. The chiller in turn is used to supply chilled water in the Primary Cooling loop.  This side of the loop also has eight nodes, four components, four branches and one splitter-mixer pair. An EnergyPlus schematic for the demand side is provided in Figure 67. The flowchart for demand side branch definition is provided in Figure 68. The flowchart for the demand side connectors is provided in Figure 69.
 
-**![](PlantApplicationGuide/media/image067.png)**
+**![](media/image067.png)**
 
 Figure 67 - EnergyPlus line diagram for the demand side of the condenser loop
 
 
 
-![](PlantApplicationGuide/media/image068.png)
+![](media/image068.png)
 
 Figure 68 – Flowchart for condenser loop demand side branches and components
 
 
 
-![](PlantApplicationGuide/media/image069.png)
+![](media/image069.png)
 
 Figure 69 – Flowchart for condenser loop demand side connectors
 
@@ -789,7 +786,7 @@ The flowchart for condenser loop schedule definition is provided in Figure 70. T
 
 
 
-![](PlantApplicationGuide/media/image070.png)
+![](media/image070.png)
 
 Figure 70 – Flowchart for condenser loop schedules
 
@@ -801,7 +798,7 @@ The *PlantEquipmentOperationschemes* object uses the *PlantOnSchedule* and the *
 
 
 
-![](PlantApplicationGuide/media/image071.png)
+![](media/image071.png)
 
 Figure 71 – Flowchart for condenser loop plant equipment operation schemes
 
@@ -811,7 +808,7 @@ The *MyCondenserControl* setpointmanager places a temperature setpoint at the *C
 
 
 
-![](PlantApplicationGuide/media/image072.png)
+![](media/image072.png)
 
 Figure 72 – Flowchart for condenser loop setpoints
 
@@ -823,7 +820,7 @@ The Condenser loop is sized such a way that the design loop exit temperature is 
 
 
 
-![](PlantApplicationGuide/media/image073.png)
+![](media/image073.png)
 
 Figure 73 – Flowchart for condenser loop sizing
 
@@ -838,7 +835,7 @@ The Heating loop is constructed by using a *PlantLoop* object. It uses an electr
 
 
 
-![](PlantApplicationGuide/media/image074.png)
+![](media/image074.png)
 
 Figure 74 - Simple line diagram for the heating loop
 
@@ -848,13 +845,13 @@ This series of flowcharts serve as a guide for identifying and inputting the Hea
 
 
 
-![](PlantApplicationGuide/media/image075.png)
+![](media/image075.png)
 
 Figure 75 - EnergyPlus line diagram for the heating loop
 
 
 
-![](PlantApplicationGuide/media/image076.png)
+![](media/image076.png)
 
 Figure 76 - Simple flow chart for separation on half loops in the heating loop
 
@@ -868,19 +865,19 @@ The main components on the supply side half loop for the Heating Loop are the ho
 
 
 
-![](PlantApplicationGuide/media/image077.png)
+![](media/image077.png)
 
 Figure 77 - EnergyPlus line diagram for the supply side of the heating loop
 
 
 
-![](PlantApplicationGuide/media/image078.png)
+![](media/image078.png)
 
 Figure 78 – Flowchart for heating loop supply side branches and components
 
 
 
-![](PlantApplicationGuide/media/image079.png)
+![](media/image079.png)
 
 Figure 79 – Flowchart for heating loop supply side connectors
 
@@ -894,17 +891,17 @@ The demand side half loop contains five heating coils that heat the air in the d
 
 
 
-**![](PlantApplicationGuide/media/image080.png)**
+**![](media/image080.png)**
 
 Figure 80 - EnergyPlus line diagram for the demand side of the heating loop
 
-![](PlantApplicationGuide/media/image081.png)
+![](media/image081.png)
 
 Figure 81 – Flowchart for heating loop demand side branches and components
 
 
 
-![](PlantApplicationGuide/media/image082.png)
+![](media/image082.png)
 
 Figure 82 – Flowchart for heating loop demand side connectors
 
@@ -922,7 +919,7 @@ The flowchart for Primary Cooling loop schedule definition is provided in Figure
 
 
 
-![](PlantApplicationGuide/media/image083.png)
+![](media/image083.png)
 
 Figure 83 – Flowchart for heating loop schedules
 
@@ -934,7 +931,7 @@ The *PlantEquipmentOperationschemes* object uses the *PlantOnSchedule* and the *
 
 
 
-![](PlantApplicationGuide/media/image084.png)
+![](media/image084.png)
 
 Figure 84 – Flowchart for heating loop plant equipment operation schemes
 
@@ -944,7 +941,7 @@ The *HeatSys1 Loop Setpoint Manager* uses the *HW Loop Temp Schedule* to set a t
 
 
 
-![](PlantApplicationGuide/media/image085.png)
+![](media/image085.png)
 
 Figure 85 – Flowchart for heating loop setpoints
 
@@ -956,7 +953,7 @@ The Heating Loop is sized such a way that the design loop exit temperature is 82
 
 
 
-![](PlantApplicationGuide/media/image086.png)
+![](media/image086.png)
 
 Figure 86 - Flowchart for heating loop sizing
 
@@ -971,7 +968,7 @@ This example will discuss the basics of primary/secondary pumping systems and so
 
 Although it is common for these systems to have a common pipe setup to allow for flow imbalance as shown in Figure 87 and even though there is a provision in EnergyPlus to model common pipes, this example will not discuss them. In the future, the common pipe is expected to be obsolesced, and therefore using a heat exchanger and two separate loops is recommended for future primary/secondary pumping arrangements.
 
-![](PlantApplicationGuide/media/image087.png)
+![](media/image087.png)
 
 Figure 87 – Example of a common pipe setup
 
@@ -983,13 +980,13 @@ The plant equipment operation scheme for the primary chilled water loop and the 
 
 The simple line diagram for the system is shown in Figure 89. The EnergyPlus line diagram is shown in Figure 89.
 
-![](PlantApplicationGuide/media/image088.png)
+![](media/image088.png)
 
 Figure 88 - Simple line diagram for the cooling system
 
 
 
-![](PlantApplicationGuide/media/image089.png)
+![](media/image089.png)
 
 Figure 89 - EnergyPlus line diagram for the cooling system
 
@@ -1000,7 +997,7 @@ The Secondary Cooling system is constructed by using a *PlantLoop* object. It us
 
 
 
-![](PlantApplicationGuide/media/image090.png)
+![](media/image090.png)
 
 Figure 90 - Simple line diagram for the primary chilled water loop
 
@@ -1012,13 +1009,13 @@ This series of flowcharts serve as a guide for identifying and inputting the Pri
 
 
 
-![](PlantApplicationGuide/media/image091.png)
+![](media/image091.png)
 
 Figure 91 - EnergyPlus line diagram for the primary chilled water loop
 
 
 
-![](PlantApplicationGuide/media/image092.png)
+![](media/image092.png)
 
 Figure 92 - Simple flowchart for the separation of half-loops in the primary chilled water loop
 
@@ -1032,19 +1029,19 @@ The main components on the supply side half loop for the primary chilled water l
 
 
 
-![](PlantApplicationGuide/media/image093.png)
+![](media/image093.png)
 
 Figure 93 - EnergyPlus line diagram for the supply side of the primary chilled water loop
 
 
 
-![](PlantApplicationGuide/media/image094.png)
+![](media/image094.png)
 
 Figure 94 – Flowchart for Primary Cooling Loop supply side branches and components
 
 
 
-![](PlantApplicationGuide/media/image095.png)
+![](media/image095.png)
 
 Figure 95 – Flowchart for Primary Cooling Loop supply side connectors
 
@@ -1056,17 +1053,17 @@ Figure 95 – Flowchart for Primary Cooling Loop supply side connectors
 
 The main component on the demand side half loop is the plate heat exchanger that facilitates the exchange of heat between the fluids of the primary and secondary chilled water loop. The plate heat exchanger will not be discussed in this loop. Instead the object will be discussed in the supply side half loop of the secondary chilled water loop. This side of the loop also has eight nodes, four components, four branches, and one splitter mixer pair. An EnergyPlus schematic for the demand side is provided in Figure 96. The flowchart for demand side branch definition is provided in Figure 97. The flowchart for the demand side connectors is provided in Figure 98.
 
-**![](PlantApplicationGuide/media/image096.png)**
+**![](media/image096.png)**
 
 Figure 96 - EnergyPlus line diagram for the demand side of the primary chilled water loop
 
-![](PlantApplicationGuide/media/image097.png)
+![](media/image097.png)
 
 Figure 97 – Flowchart for primary chilled water loop demand side branches and components
 
 
 
-![](PlantApplicationGuide/media/image098.png)
+![](media/image098.png)
 
 Figure 98 – Flowchart for primary chilled water loop demand side connectors
 
@@ -1086,7 +1083,7 @@ The Primary Cooling loop uses three different schedules to operate properly. *On
 
 
 
-![](PlantApplicationGuide/media/image099.png)
+![](media/image099.png)
 
 Figure 99 – Flowchart for primary chilled water loop schedules
 
@@ -1098,13 +1095,13 @@ Figure 99 – Flowchart for primary chilled water loop schedules
 
 There are two important operation schemes in the primary chilled water loop. The *CW Loop Operation* plant equipment operation scheme used two schedules (*On Peak* and *off Peak*) to control the supply components in the primary cooling loop. *Peak Operation* is set up such that different components or combinations of components are operated for different values of cooling load during the peak hours (9AM to 6PM everyday) of the simulation period. Up to 25,000 W of cooling load, the small constant COP chiller is operated, for 25,000-245,000 W the big electric chiller and purchased cooling are used and for 245,000-500,000 W purchased cooling is used. This setup serves to increase the efficiency of the system. *Off Peak Operation* is set up such that both the chillers are operated during the off peak hours (6 PM to 9 AM). Flowcharts detailing the chilled water loop plant equipment operation schemes are provided in Figure 100 and Figure 101.
 
-![](PlantApplicationGuide/media/image100.png)
+![](media/image100.png)
 
 Figure 100 – Flowchart for on peak operation of the primary chilled water loop
 
 
 
-![](PlantApplicationGuide/media/image101.png)
+![](media/image101.png)
 
 Figure 101 - Flowchart for off peak plant operation of the primary chilled water loop
 
@@ -1114,7 +1111,7 @@ The *Primary CW Loop Setpoint Manager* uses the *CW Loop Temp Schedule* to set a
 
 
 
-![](PlantApplicationGuide/media/image102.png)
+![](media/image102.png)
 
 Figure 102 – Flowchart for Primary Cooling Loop setpoints
 
@@ -1133,7 +1130,7 @@ The Secondary Cooling system is constructed by using a *PlantLoop* object, the w
 
 
 
-![](PlantApplicationGuide/media/image103.png)
+![](media/image103.png)
 
 Figure 103 - Simple line diagram for the secondary chilled water loop
 
@@ -1147,13 +1144,13 @@ This series of flowcharts serve as a guide for identifying and inputting the sec
 
 
 
-![](PlantApplicationGuide/media/image104.png)
+![](media/image104.png)
 
 Figure 104 - EnergyPlus line diagram for the secondary chilled water loop
 
 
 
-![](PlantApplicationGuide/media/image105.png)
+![](media/image105.png)
 
 Figure 105 - Simple flow chart for separation on half loops in the secondary chilled water loop
 
@@ -1167,19 +1164,19 @@ The main components on the supply side half loop for the Secondary Cooling Syste
 
 
 
-![](PlantApplicationGuide/media/image106.png)
+![](media/image106.png)
 
 Figure 106 - EnergyPlus line diagram for the supply side of the secondary chilled water loop
 
 
 
-![](PlantApplicationGuide/media/image107.png)
+![](media/image107.png)
 
 Figure 107 – Flowchart for secondary chilled water loop supply side branches and components
 
 
 
-![](PlantApplicationGuide/media/image108.png)
+![](media/image108.png)
 
 Figure 108 – Flowchart for secondary chilled water loop supply side connectors
 
@@ -1191,7 +1188,7 @@ Figure 108 – Flowchart for secondary chilled water loop supply side connectors
 
 The main component on the demand side half loop is the Cooling Coil that cools the air in the building by using the chilled water that is supplied by the plate heat exchanger. This side of the loop also has eight nodes, four components, four branches, and one splitter-mixer pair. An EnergyPlus schematic for the demand side is provided in Figure 109. The flowchart for demand side branch definition is provided in Figure 110. The flowchart for the demand side connectors is provided in Figure 111.
 
-**![](PlantApplicationGuide/media/image109.png)**
+**![](media/image109.png)**
 
 Figure 109 - EnergyPlus line diagram for the demand side of the secondary chilled water loop
 
@@ -1199,13 +1196,13 @@ Figure 109 - EnergyPlus line diagram for the demand side of the secondary chille
 
 
 
-![](PlantApplicationGuide/media/image110.png)
+![](media/image110.png)
 
 Figure 110 – Flowchart for secondary chilled water loop demand side branches and components
 
 
 
-![](PlantApplicationGuide/media/image111.png)
+![](media/image111.png)
 
 Figure 111 – Flowchart for secondary chilled water loop demand side connectors
 
@@ -1225,7 +1222,7 @@ The flowchart for Primary Cooling loop schedule definition is provided in Figure
 
 
 
-![](PlantApplicationGuide/media/image112.png)
+![](media/image112.png)
 
 Figure 112 – Flowchart for secondary chilled water loop schedules
 
@@ -1239,7 +1236,7 @@ The *PlantEquipmentOperationschemes* object uses the *ON* schedule and the *CW S
 
 
 
-![](PlantApplicationGuide/media/image113.png)
+![](media/image113.png)
 
 Figure 113 – Flowchart for secondary chilled water loop plant equipment operation schemes
 
@@ -1249,7 +1246,7 @@ The *CW Sec Loop Setpoint Manager* uses the *CW Sec Loop Temp Schedule* to set a
 
 
 
-![](PlantApplicationGuide/media/image114.png)
+![](media/image114.png)
 
 Figure 114 – Flowchart for secondary chilled water loop setpoints
 
@@ -1261,7 +1258,7 @@ The secondary chilled water loop is sized such a way that the design loop exit t
 
 
 
-![](PlantApplicationGuide/media/image115.png)
+![](media/image115.png)
 
 Figure 115 – Flowchart for secondary chilled water loop sizing
 
@@ -1277,7 +1274,7 @@ The Condenser Loop is constructed by using a *PlantLoop* object. It uses a cooli
 
 
 
-![](PlantApplicationGuide/media/image116.png)
+![](media/image116.png)
 
 Figure 116 - Simple line diagram for the condenser loop
 
@@ -1287,7 +1284,7 @@ Figure 116 - Simple line diagram for the condenser loop
 
 This series of flowcharts serve as a guide for identifying and inputting the Condenser Loop and its components into the input file. The EnergyPlus line diagram for this loop is provided in Figure 117. A simple flowchart for the separation of the half loops is provided in Figure 118.
 
-![](PlantApplicationGuide/media/image117.png)
+![](media/image117.png)
 
 Figure 117 - EnergyPlus line diagram for the condenser loop
 
@@ -1295,7 +1292,7 @@ Figure 117 - EnergyPlus line diagram for the condenser loop
 
 
 
-![](PlantApplicationGuide/media/image118.png)
+![](media/image118.png)
 
 Figure 118 - Simple flow chart for separation on half loops in the condenser loop
 
@@ -1309,19 +1306,19 @@ The main components on the supply side half loop for the Condenser Loop are the 
 
 
 
-![](PlantApplicationGuide/media/image119.png)
+![](media/image119.png)
 
 Figure 119 - EnergyPlus line diagram for the supply side of the Condenser Loop
 
 
 
-![](PlantApplicationGuide/media/image120.png)
+![](media/image120.png)
 
 Figure 120 – Flowchart for Condenser Loop supply side branches and components
 
 
 
-![](PlantApplicationGuide/media/image121.png)
+![](media/image121.png)
 
 Figure 121 – Flowchart for Condenser Loop supply side connectors
 
@@ -1333,17 +1330,17 @@ Figure 121 – Flowchart for Condenser Loop supply side connectors
 
 The main components on the demand side half loop are the small constant COP chiller and the bigger electric chiller that use the cooling water supplied by the cooling tower. The chillers are in turn used to supply chilled water in the Primary Cooling loop.  This side of the loop also has ten nodes, five components, five branches and one splitter-mixer pair. An EnergyPlus schematic for the demand side is provided in Figure 122. The flowchart for demand side branch definition is provided in Figure 123. The flowchart for the demand side connectors is provided in Figure 123.
 
-**![](PlantApplicationGuide/media/image122.png)**
+**![](media/image122.png)**
 
 Figure 122 - EnergyPlus line diagram for the demand side of the Condenser Loop
 
-![](PlantApplicationGuide/media/image123.png)
+![](media/image123.png)
 
 Figure 123 – Flowchart for Condenser Loop demand side branches and components
 
 
 
-![](PlantApplicationGuide/media/image124.png)
+![](media/image124.png)
 
 Figure 124 – Flowchart for Condenser Loop demand side connectors
 
@@ -1363,7 +1360,7 @@ The flowchart for condenser loop schedule definition is provided in Figure 125. 
 
 
 
-![](PlantApplicationGuide/media/image125.png)
+![](media/image125.png)
 
 Figure 125 – Flowchart for condenser loop schedules
 
@@ -1375,7 +1372,7 @@ The *PlantEquipmentOperationschemes* object uses the *ON* schedule and the *Towe
 
 
 
-![](PlantApplicationGuide/media/image126.png)
+![](media/image126.png)
 
 Figure 126 – Flowchart for Condenser Loop plant equipment operation schemes
 
@@ -1385,7 +1382,7 @@ The *MyCondenserControl* setpoint manager places a temperature setpoint at the *
 
 
 
-![](PlantApplicationGuide/media/image127.png)
+![](media/image127.png)
 
 Figure 127 – Flowchart for Condenser Loop setpoints
 

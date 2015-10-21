@@ -306,7 +306,7 @@ namespace Furnaces {
 
 		// Find the correct Furnace
 		if ( CompIndex == 0 ) {
-			FurnaceNum = FindItemInList( FurnaceName, Furnace.Name(), NumFurnaces );
+			FurnaceNum = FindItemInList( FurnaceName, Furnace );
 			if ( FurnaceNum == 0 ) {
 				ShowFatalError( "SimFurnace: Unit not found=" + FurnaceName );
 			}
@@ -855,7 +855,7 @@ namespace Furnaces {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Furnace.Name(), FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -888,7 +888,7 @@ namespace Furnaces {
 			}
 
 			//Get the Controlling Zone or Location of the Furnace Thermostat
-			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 6 ), Zone.Name(), NumOfZones );
+			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 6 ), Zone );
 			if ( Furnace( FurnaceNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
@@ -1372,7 +1372,7 @@ namespace Furnaces {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Furnace.Name(), FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1405,7 +1405,7 @@ namespace Furnaces {
 			}
 
 			//Get the Controlling Zone or Location of the Furnace Thermostat
-			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 6 ), Zone.Name(), NumOfZones );
+			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 6 ), Zone );
 			if ( Furnace( FurnaceNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
@@ -2456,7 +2456,7 @@ namespace Furnaces {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Furnace.Name(), FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -2481,7 +2481,7 @@ namespace Furnaces {
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
 			//Get the Controlling Zone or Location of the Furnace Thermostat
-			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 5 ), Zone.Name(), NumOfZones );
+			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 5 ), Zone );
 			if ( Furnace( FurnaceNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
@@ -3281,7 +3281,7 @@ namespace Furnaces {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), Furnace.Name(), FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), Furnace, FurnaceNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -3306,7 +3306,7 @@ namespace Furnaces {
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
 
 			//Get the Controlling Zone or Location of the Furnace Thermostat
-			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 5 ), Zone.Name(), NumOfZones );
+			Furnace( FurnaceNum ).ControlZoneNum = FindItemInList( Alphas( 5 ), Zone );
 			if ( Furnace( FurnaceNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
 				ShowContinueError( "Illegal " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
@@ -4290,6 +4290,7 @@ namespace Furnaces {
 			// Pass the fan cycling schedule index up to the air loop. Set the air loop unitary system flag.
 			AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr = Furnace( FurnaceNum ).FanSchedPtr;
 			AirLoopControlInfo( AirLoopNum ).UnitarySys = true;
+			// RR this is wrong, Op mode needs to be updated each time atep
 			AirLoopControlInfo( AirLoopNum ).FanOpMode = Furnace( FurnaceNum ).OpMode;
 
 			//Check that heat pump heating capacity is within 20% of cooling capacity
@@ -4609,6 +4610,9 @@ namespace Furnaces {
 				Furnace( FurnaceNum ).OpMode = CycFanCycCoil;
 			} else {
 				Furnace( FurnaceNum ).OpMode = ContFanCycCoil;
+			}
+			if( AirLoopNum > 0 ) {
+				AirLoopControlInfo( AirLoopNum ).FanOpMode = Furnace( FurnaceNum ).OpMode;
 			}
 		}
 
@@ -7895,7 +7899,8 @@ namespace Furnaces {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
+		Real64 ratio;
+		Real64 OnOffRatio;
 
 		// Report the Furnace Fan Part Load Ratio
 		if ( Furnace( FurnaceNum ).NumOfSpeedCooling < 1 ) {
@@ -7911,6 +7916,19 @@ namespace Furnaces {
 		LoopSystemOffMassFlowrate = CompOffMassFlow;
 		LoopFanOperationMode = Furnace( FurnaceNum ).OpMode;
 		LoopOnOffFanPartLoadRatio = Furnace( FurnaceNum ).FanPartLoadRatio;
+		OnOffRatio = LoopOnOffFanPartLoadRatio;
+		if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_AirToAir ) {
+			LoopOnOffFanPartLoadRatio = max( Furnace( FurnaceNum ).FanPartLoadRatio, Furnace( FurnaceNum ).HeatPartLoadRatio, Furnace( FurnaceNum ).CoolPartLoadRatio );
+			LoopOnOffFanPartLoadRatio = min( 1.0, LoopOnOffFanPartLoadRatio );
+		}
+		if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatCool ) {
+			if ( Furnace( FurnaceNum ).HeatPartLoadRatio == 0.0 && Furnace( FurnaceNum ).CoolPartLoadRatio == 0.0 && Furnace( FurnaceNum ).FanPartLoadRatio > 0.0 ) {
+				if ( CompOnMassFlow < max( Furnace( FurnaceNum ).MaxCoolAirMassFlow, Furnace( FurnaceNum ).MaxHeatAirMassFlow ) && CompOnMassFlow  > 0.0 ) {
+					ratio = max( Furnace( FurnaceNum ).MaxCoolAirMassFlow, Furnace( FurnaceNum ).MaxHeatAirMassFlow ) / CompOnMassFlow;
+					LoopOnOffFanPartLoadRatio = LoopOnOffFanPartLoadRatio * ratio;
+				}
+			}
+		}
 
 	}
 
@@ -9498,7 +9516,7 @@ namespace Furnaces {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

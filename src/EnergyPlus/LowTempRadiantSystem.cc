@@ -257,7 +257,7 @@ namespace LowTempRadiantSystem {
 
 		// Find the correct High Temp Radiant System
 		if ( CompIndex == 0 ) {
-			RadSysNum = FindItemInList( CompName, RadSysTypes.Name(), TotalNumOfRadSystems );
+			RadSysNum = FindItemInList( CompName, RadSysTypes );
 			if ( RadSysNum == 0 ) {
 				ShowFatalError( "SimLowTempRadiantSystem: Unit not found=" + CompName );
 			}
@@ -265,11 +265,11 @@ namespace LowTempRadiantSystem {
 			SystemType = RadSysTypes( RadSysNum ).SystemType;
 			{ auto const SELECT_CASE_var( SystemType );
 			if ( SELECT_CASE_var == HydronicSystem ) {
-				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, HydrRadSys.Name(), NumOfHydrLowTempRadSys );
+				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, HydrRadSys );
 			} else if ( SELECT_CASE_var == ConstantFlowSystem ) {
-				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, CFloRadSys.Name(), NumOfCFloLowTempRadSys );
+				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, CFloRadSys );
 			} else if ( SELECT_CASE_var == ElectricSystem ) {
-				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, ElecRadSys.Name(), NumOfElecLowTempRadSys );
+				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, ElecRadSys );
 			}}
 		} else {
 			RadSysNum = CompIndex;
@@ -327,7 +327,6 @@ namespace LowTempRadiantSystem {
 
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
-		using DataGlobals::NumOfZones;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::ScheduleAlwaysOn;
 		using DataHeatBalance::Zone;
@@ -486,7 +485,7 @@ namespace LowTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -510,7 +509,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			HydrRadSys( Item ).ZoneName = Alphas( 3 );
-			HydrRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
+			HydrRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone );
 			if ( HydrRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -525,7 +524,7 @@ namespace LowTempRadiantSystem {
 
 			HydrRadSys( Item ).SurfListName = Alphas( 4 );
 			SurfListNum = 0;
-			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( HydrRadSys( Item ).SurfListName, SurfList.Name(), NumOfSurfaceLists );
+			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( HydrRadSys( Item ).SurfListName, SurfList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				HydrRadSys( Item ).NumOfSurfaces = SurfList( SurfListNum ).NumOfSurfaces;
 				HydrRadSys( Item ).SurfacePtr.allocate( HydrRadSys( Item ).NumOfSurfaces );
@@ -547,7 +546,7 @@ namespace LowTempRadiantSystem {
 				HydrRadSys( Item ).SurfaceFlowFrac.allocate( HydrRadSys( Item ).NumOfSurfaces );
 				HydrRadSys( Item ).NumCircuits.allocate( HydrRadSys( Item ).NumOfSurfaces );
 				HydrRadSys( Item ).SurfaceName( 1 ) = HydrRadSys( Item ).SurfListName;
-				HydrRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( HydrRadSys( Item ).SurfaceName( 1 ), Surface.Name(), TotSurfaces );
+				HydrRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( HydrRadSys( Item ).SurfaceName( 1 ), Surface );
 				HydrRadSys( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				HydrRadSys( Item ).NumCircuits( 1 ) = 0.0;
 				// Error checking for single surfaces
@@ -819,7 +818,7 @@ namespace LowTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -843,7 +842,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			CFloRadSys( Item ).ZoneName = Alphas( 3 );
-			CFloRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
+			CFloRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone );
 			if ( CFloRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -858,7 +857,7 @@ namespace LowTempRadiantSystem {
 
 			CFloRadSys( Item ).SurfListName = Alphas( 4 );
 			SurfListNum = 0;
-			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( CFloRadSys( Item ).SurfListName, SurfList.Name(), NumOfSurfaceLists );
+			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( CFloRadSys( Item ).SurfListName, SurfList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				CFloRadSys( Item ).NumOfSurfaces = SurfList( SurfListNum ).NumOfSurfaces;
 				CFloRadSys( Item ).SurfacePtr.allocate( CFloRadSys( Item ).NumOfSurfaces );
@@ -883,7 +882,7 @@ namespace LowTempRadiantSystem {
 				CFloRadSys( Item ).NumCircuits.allocate( CFloRadSys( Item ).NumOfSurfaces );
 				MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, CFloRadSys( Item ).NumOfSurfaces );
 				CFloRadSys( Item ).SurfaceName( 1 ) = CFloRadSys( Item ).SurfListName;
-				CFloRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( CFloRadSys( Item ).SurfaceName( 1 ), Surface.Name(), TotSurfaces );
+				CFloRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( CFloRadSys( Item ).SurfaceName( 1 ), Surface );
 				CFloRadSys( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				CFloRadSys( Item ).NumCircuits( 1 ) = 0.0;
 				// Error checking for single surfaces
@@ -1075,7 +1074,7 @@ namespace LowTempRadiantSystem {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes.Name(), BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
@@ -1099,7 +1098,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			ElecRadSys( Item ).ZoneName = Alphas( 3 );
-			ElecRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone.Name(), NumOfZones );
+			ElecRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone );
 			if ( ElecRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -1114,7 +1113,7 @@ namespace LowTempRadiantSystem {
 
 			ElecRadSys( Item ).SurfListName = Alphas( 4 );
 			SurfListNum = 0;
-			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( ElecRadSys( Item ).SurfListName, SurfList.Name(), NumOfSurfaceLists );
+			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( ElecRadSys( Item ).SurfListName, SurfList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				ElecRadSys( Item ).NumOfSurfaces = SurfList( SurfListNum ).NumOfSurfaces;
 				ElecRadSys( Item ).SurfacePtr.allocate( ElecRadSys( Item ).NumOfSurfaces );
@@ -1131,7 +1130,7 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).SurfaceName.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfacePowerFrac.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfaceName( 1 ) = ElecRadSys( Item ).SurfListName;
-				ElecRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( ElecRadSys( Item ).SurfaceName( 1 ), Surface.Name(), TotSurfaces );
+				ElecRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( ElecRadSys( Item ).SurfaceName( 1 ), Surface );
 				ElecRadSys( Item ).SurfacePowerFrac( 1 ) = 1.0;
 				// Error checking for single surfaces
 				if ( ElecRadSys( Item ).SurfacePtr( 1 ) == 0 ) {
@@ -1172,6 +1171,7 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).HeatingCapMethod = HeatingDesignCapacity;
 				if ( !lNumericBlanks( iHeatDesignCapacityNumericNum ) ) {
 					ElecRadSys( Item ).ScaledHeatingCapacity = Numbers( iHeatDesignCapacityNumericNum );
+					ElecRadSys( Item ).MaxElecPower = ElecRadSys( Item ).ScaledHeatingCapacity;
 					if (ElecRadSys( Item ).ScaledHeatingCapacity < 0.0 && ElecRadSys( Item ).ScaledHeatingCapacity != AutoSize) {
 						ShowSevereError( CurrentModuleObject + " = " + ElecRadSys( Item ).Name );
 						ShowContinueError( "Illegal " + cNumericFields( iHeatDesignCapacityNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatDesignCapacityNumericNum ), 7 ) );
@@ -1187,6 +1187,7 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).HeatingCapMethod = CapacityPerFloorArea;
 				if ( !lNumericBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 					ElecRadSys( Item ).ScaledHeatingCapacity = Numbers( iHeatCapacityPerFloorAreaNumericNum );
+					ElecRadSys( Item ).MaxElecPower = ElecRadSys( Item ).ScaledHeatingCapacity;
 					if ( ElecRadSys( Item ).ScaledHeatingCapacity <= 0.0 ) {
 						ShowSevereError( CurrentModuleObject + " = " + ElecRadSys( Item ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iHeatCAPMAlphaNum ) + " = " + Alphas( iHeatCAPMAlphaNum ) );
@@ -1208,6 +1209,7 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( !lNumericBlanks(iHeatFracOfAutosizedCapacityNumericNum ) ) {
 					ElecRadSys( Item ).ScaledHeatingCapacity = Numbers( iHeatFracOfAutosizedCapacityNumericNum );
+					ElecRadSys( Item ).MaxElecPower = ElecRadSys( Item ).ScaledHeatingCapacity;
 					if ( ElecRadSys( Item ).ScaledHeatingCapacity < 0.0 ) {
 						ShowSevereError( CurrentModuleObject + " = " + ElecRadSys( Item ).Name );
 						ShowContinueError( "Illegal " + cNumericFields( iHeatFracOfAutosizedCapacityNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFracOfAutosizedCapacityNumericNum ), 7 ) );
@@ -1352,11 +1354,13 @@ namespace LowTempRadiantSystem {
 		}
 
 		// Set up the output variables for low temperature radiant systems
+		// ZoneHVAC:LowTemperatureRadiant:VariableFlow (HydrRadSys)
 		for ( Item = 1; Item <= NumOfHydrLowTempRadSys; ++Item ) {
 			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", HydrRadSys( Item ).HeatPower, "System", "Average", HydrRadSys( Item ).Name );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Energy [J]", HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate [W]", HydrRadSys( Item ).CoolPower, "System", "Average", HydrRadSys( Item ).Name );
+
 			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy [J]", HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Energy [J]", HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate [kg/s]", HydrRadSys( Item ).WaterMassFlowRate, "System", "Average", HydrRadSys( Item ).Name );
@@ -1370,6 +1374,8 @@ namespace LowTempRadiantSystem {
 			}
 		}
 
+		// Set up the output variables for low temperature radiant systems
+		// ZoneHVAC:LowTemperatureRadiant:ConstantFlow (CFloRadSys)
 		for ( Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item ) {
 			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", CFloRadSys( Item ).HeatPower, "System", "Average", CFloRadSys( Item ).Name );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
@@ -1396,6 +1402,8 @@ namespace LowTempRadiantSystem {
 		}
 
 		for ( Item = 1; Item <= NumOfElecLowTempRadSys; ++Item ) {
+			// Set up the output variables for low temperature radiant systems
+			// ZoneHVAC:LowTemperatureRadiant:Electric (ElecRadSys)
 			SetupOutputVariable( "Zone Radiant HVAC Electric Power [W]", ElecRadSys( Item ).ElecPower, "System", "Average", ElecRadSys( Item ).Name );
 			SetupOutputVariable( "Zone Radiant HVAC Electric Energy [J]", ElecRadSys( Item ).ElecEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
 			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", ElecRadSys( Item ).HeatPower, "System", "Average", ElecRadSys( Item ).Name );
@@ -1909,6 +1917,7 @@ namespace LowTempRadiantSystem {
 		using General::RoundSigDigits;
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHVACGlobals::CoolingCapacitySizing;
+		using DataHVACGlobals::AutoCalculateSizing;
 		using DataHeatBalance::Zone;
 
 		// Locals
@@ -1959,6 +1968,7 @@ namespace LowTempRadiantSystem {
 
 		ErrorsFound = false;
 		IsAutoSize = false;
+		DesCoilLoad = 0.0;
 		MaxElecPowerDes = 0.0;
 		MaxElecPowerDes = 0.0;
 		WaterVolFlowMaxHeatDes = 0.0;
@@ -1968,7 +1978,10 @@ namespace LowTempRadiantSystem {
 		TubeLengthDes = 0.0;
 		TubeLengthUser = 0.0;
 		DataScalableCapSizingON = false;
+		DataFracOfAutosizedHeatingCapacity = 1.0;
 		OpMode = 1;
+		PltSizHeatNum = 0;
+		PltSizCoolNum = 0;
 
 		if ( SystemType == ElectricSystem ) {
 
@@ -1980,47 +1993,145 @@ namespace LowTempRadiantSystem {
 
 				CompType = "ZoneHVAC:LowTemperatureRadiant:Electric";
 				CompName = ElecRadSys( RadSysNum ).Name;
-				DataFracOfAutosizedHeatingCapacity = 1.0;
-				DataZoneNumber = ElecRadSys( RadSysNum ).ZonePtr;
 				SizingMethod = HeatingCapacitySizing;
 				FieldNum = 1;
 				PrintFlag = true;
 				SizingString = ElecRadSysNumericFields( RadSysNum ).FieldNames( FieldNum ) + " [W]";
 				CapSizingMethod = ElecRadSys( RadSysNum ).HeatingCapMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-				if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-					if ( CapSizingMethod == HeatingDesignCapacity ) {
-						if ( ElecRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
-							CheckZoneSizing( CompType, CompName );
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-						} else {
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
-						}
-						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-						TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
-						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
-						TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-						DataScalableCapSizingON = true;
-					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-						CheckZoneSizing( CompType, CompName );
-						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-						DataFracOfAutosizedHeatingCapacity = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
-						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-						TempSize = AutoSize;
-						DataScalableCapSizingON = true;
-					} else {
+
+				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
+					if ( CapSizingMethod == HeatingDesignCapacity && ElecRadSys( RadSysNum ).ScaledHeatingCapacity > 0.0 ) {
 						TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+						DataScalableCapSizingON = true;
+						TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( ElecRadSys( RadSysNum ).ZonePtr ).FloorArea;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
+						ElecRadSys( RadSysNum ).MaxElecPower = TempSize;
 					}
-					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-					ElecRadSys(RadSysNum).MaxElecPower = TempSize;
+				} else {
+					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						if ( CapSizingMethod == HeatingDesignCapacity ) {
+							if ( ZoneSizingRunDone ) {
+								CheckZoneSizing( CompType, CompName );
+								SizingMethod = AutoCalculateSizing;
+								DataConstantUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
+								DataFractionUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							}
+							if ( ElecRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
+								TempSize = AutoSize;
+							} else {
+								TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
+							}
+						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+							if ( ZoneSizingRunDone ) {
+								CheckZoneSizing( CompType, CompName );
+								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							}
+							TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( ElecRadSys( RadSysNum ).ZonePtr ).FloorArea;
+							DataScalableCapSizingON = true;
+
+						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+							CheckZoneSizing( CompType, CompName );
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad * ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
+							DataScalableCapSizingON = true;
+						} else {
+							TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
+						}
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						ElecRadSys( RadSysNum ).MaxElecPower = TempSize;
+						DataConstantUsedForSizing = 0.0;
+						DataFractionUsedForSizing = 0.0;
+						DataScalableCapSizingON = false;
+					}
+
 				}
 			}
 		}
 
 		if ( SystemType == HydronicSystem ) {
 
+			CompType = "ZoneHVAC:LowTemperatureRadiant:VariableFlow";
+			CompName = HydrRadSys( RadSysNum ).Name;
+
+			IsAutoSize = false;
+			if ( HydrRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
+				IsAutoSize = true;
+			}
+
+			if ( CurZoneEqNum > 0 ) {
+
+				SizingMethod = HeatingCapacitySizing;
+				FieldNum = 3;
+				PrintFlag = true;
+				SizingString = HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( FieldNum ) + " [W]";
+				CapSizingMethod = HydrRadSys( RadSysNum ).HeatingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+
+				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
+					if ( CapSizingMethod == HeatingDesignCapacity && HydrRadSys( RadSysNum ).ScaledHeatingCapacity > 0.0 ) {
+						TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+						DataScalableCapSizingON = true;
+						TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
+					}
+				} else { // Autosize or hard-size with sizing run
+					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						if ( CapSizingMethod == HeatingDesignCapacity ) {
+							if ( ZoneSizingRunDone ) {
+								CheckZoneSizing( CompType, CompName );
+								SizingMethod = AutoCalculateSizing;
+								DataConstantUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
+								DataFractionUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							}
+							if ( HydrRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
+								TempSize = AutoSize;
+							} else {
+								TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
+							}
+						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+							if ( ZoneSizingRunDone ) {
+								CheckZoneSizing( CompType, CompName );
+								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							}
+							TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
+							DataScalableCapSizingON = true;
+						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+							CheckZoneSizing( CompType, CompName );
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad * HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
+							DataScalableCapSizingON = true;
+						} else {
+							TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
+						}
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+						DataConstantUsedForSizing = 0.0;
+						DataFractionUsedForSizing = 0.0;
+						DataScalableCapSizingON = false;
+					} else {
+						DesCoilLoad = 0.0;
+					}
+				}
+				// finally heating capacity is saved in this variable
+				HydrRadSys( RadSysNum ).ScaledHeatingCapacity = DesCoilLoad;
+			}
+
+			IsAutoSize = false;
 			if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat == AutoSize ) {
 				IsAutoSize = true;
 			}
@@ -2028,76 +2139,33 @@ namespace LowTempRadiantSystem {
 			if ( CurZoneEqNum > 0 ) {
 				if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation continue
 					if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat > 0.0 ) {
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "User-Specified Maximum Hot Water Flow [m3/s]", HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat );
+						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "User-Specified Maximum Hot Water Flow [m3/s]", HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat );
 					}
 				} else { // Autosize or hard-size with sizing run
-					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name );
-
-					if ( IsAutoSize ) {
-						PltSizHeatNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).HotWaterInNode, HydrRadSys( RadSysNum ).HotWaterOutNode, ErrorsFound );
+					if ( HydrRadSys( RadSysNum ).HotWaterInNode > 0 && HydrRadSys( RadSysNum ).HotWaterOutNode > 0 ) {
+						PltSizHeatNum = MyPlantSizingIndex( CompType, HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).HotWaterInNode, HydrRadSys( RadSysNum ).HotWaterOutNode, ErrorsFound );
 						if ( PltSizHeatNum > 0 ) {
-							CompType = "ZoneHVAC:LowTemperatureRadiant:VariableFlow";
-							CompName = HydrRadSys( RadSysNum ).Name;
-							DataFracOfAutosizedHeatingCapacity = 1.0;
-							DataZoneNumber = HydrRadSys( RadSysNum ).ZonePtr;
-							SizingMethod = HeatingCapacitySizing;
-							FieldNum = 3;
-							PrintFlag = false;
-							SizingString = HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( FieldNum ) + " [W]";
-							CapSizingMethod = HydrRadSys( RadSysNum ).HeatingCapMethod;
-							ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-							if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-								if ( CapSizingMethod == HeatingDesignCapacity ) {
-									if ( HydrRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
-										CheckZoneSizing( CompType, CompName );
-										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-										ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-									}
-									TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
-
-								} else if ( CapSizingMethod == CapacityPerFloorArea ) {
-									ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-									ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HydrRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
-									TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-									DataScalableCapSizingON = true;
-								} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-									CheckZoneSizing( CompType, CompName );
-									ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-									DataFracOfAutosizedHeatingCapacity = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
-									ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-									TempSize = AutoSize;
-									DataScalableCapSizingON = true;
-								} else {
-									TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
-								}
-								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-								DesCoilLoad = TempSize;
-							} else {
-								DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
-							}
 							if ( DesCoilLoad >= SmallLoad ) {
 								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60., PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
-
 								Cp = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
-
-								WaterVolFlowMaxHeatDes = DesCoilLoad  / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
+								WaterVolFlowMaxHeatDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
 								WaterVolFlowMaxHeatDes = 0.0;
 							}
-
 						} else {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
 							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:VariableFlow Object=" + HydrRadSys( RadSysNum ).Name );
 							ErrorsFound = true;
 						}
 					}
+
 					if ( IsAutoSize ) {
 						HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat = WaterVolFlowMaxHeatDes;
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatDes );
+						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatDes );
 					} else { // hard-size with sizing data
 						if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat > 0.0 && WaterVolFlowMaxHeatDes > 0.0 ) {
 							WaterVolFlowMaxHeatUser = HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat;
-							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatDes, "User-Specified Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatUser );
+							ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatDes, "User-Specified Maximum Hot Water Flow [m3/s]", WaterVolFlowMaxHeatUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxHeatDes - WaterVolFlowMaxHeatUser ) / WaterVolFlowMaxHeatUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" + HydrRadSys( RadSysNum ).Name + "\"." );
@@ -2112,6 +2180,78 @@ namespace LowTempRadiantSystem {
 				}
 			}
 
+
+			IsAutoSize = false;
+			if ( HydrRadSys( RadSysNum ).ScaledCoolingCapacity == AutoSize ) {
+				IsAutoSize = true;
+			}
+
+			if ( CurZoneEqNum > 0 ) {
+
+				SizingMethod = CoolingCapacitySizing;
+				FieldNum = 8;
+				PrintFlag = true;
+				SizingString = HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( FieldNum ) + " [W]";
+				CapSizingMethod = HydrRadSys( RadSysNum ).CoolingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+
+				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
+					if ( CapSizingMethod == CoolingDesignCapacity && HydrRadSys( RadSysNum ).ScaledCoolingCapacity > 0.0 ) {
+						TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+						DataScalableCapSizingON = true;
+						TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+						DataScalableCapSizingON = false;
+					}
+				} else { // Autosize or hard-size with sizing run
+					if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+						if ( CapSizingMethod == CoolingDesignCapacity ) {
+							if ( ZoneSizingRunDone ) {
+								CheckZoneSizing( CompType, CompName );
+								SizingMethod = AutoCalculateSizing;
+								DataConstantUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad;
+								DataFractionUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+							}
+							if ( HydrRadSys( RadSysNum ).ScaledCoolingCapacity == AutoSize ) {
+								TempSize = AutoSize;
+							} else {
+								TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
+							}
+						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+							if ( ZoneSizingRunDone ) {
+								CheckZoneSizing( CompType, CompName );
+								ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+								ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+							}
+							TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
+							DataScalableCapSizingON = true;
+						} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+							CheckZoneSizing( CompType, CompName );
+							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
+							DataScalableCapSizingON = true;
+
+						} else {
+							TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
+						}
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+						DataConstantUsedForSizing = 0.0;
+						DataFractionUsedForSizing = 0.0;
+						DataScalableCapSizingON = false;
+					} else {
+						DesCoilLoad = 0.0;
+					}
+				}
+				// finally cooling capacity is saved in this variable
+				HydrRadSys( RadSysNum ).ScaledCoolingCapacity = DesCoilLoad;
+			}
+
 			IsAutoSize = false;
 			if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxCool == AutoSize ) {
 				IsAutoSize = true;
@@ -2119,59 +2259,16 @@ namespace LowTempRadiantSystem {
 			if ( CurZoneEqNum > 0 ) {
 				if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation continue
 					if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxCool > 0.0 ) {
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", HydrRadSys( RadSysNum ).WaterVolFlowMaxCool );
+						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", HydrRadSys( RadSysNum ).WaterVolFlowMaxCool );
 					}
 				} else { // Autosize or hard-size with sizing run
-					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name );
-					if ( IsAutoSize ) {
-						PltSizCoolNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).ColdWaterInNode, HydrRadSys( RadSysNum ).ColdWaterOutNode, ErrorsFound );
+					if ( HydrRadSys( RadSysNum ).ColdWaterInNode > 0 && HydrRadSys( RadSysNum ).ColdWaterOutNode > 0 ) {
+						PltSizCoolNum = MyPlantSizingIndex( CompType, HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).ColdWaterInNode, HydrRadSys( RadSysNum ).ColdWaterOutNode, ErrorsFound );
 						if ( PltSizCoolNum > 0 ) {
-							CompType = "ZoneHVAC:LowTemperatureRadiant:VariableFlow";
-							CompName = HydrRadSys( RadSysNum ).Name;
-							DataFracOfAutosizedCoolingCapacity = 1.0;
-							DataZoneNumber = HydrRadSys( RadSysNum ).ZonePtr;
-							SizingMethod = CoolingCapacitySizing;
-							FieldNum = 8;
-							PrintFlag = false;
-							SizingString = HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( FieldNum ) + " [W]";
-							CapSizingMethod = HydrRadSys( RadSysNum ).CoolingCapMethod;
-							ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-							if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-								if ( CapSizingMethod == CoolingDesignCapacity ) {
-									if ( HydrRadSys( RadSysNum ).ScaledCoolingCapacity == AutoSize ) {
-										CheckZoneSizing( CompType, CompName );
-										ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-										ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing(CurZoneEqNum).CoolSizingFactor;
-									}
-									TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
-
-								} else if ( CapSizingMethod == CapacityPerFloorArea ) {
-									ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-									ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = HydrRadSys( RadSysNum ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
-									TempSize = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad;
-									DataScalableCapSizingON = true;
-								} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-									CheckZoneSizing( CompType, CompName );
-									ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-									DataFracOfAutosizedCoolingCapacity = HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
-									ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
-									TempSize = AutoSize;
-									DataScalableCapSizingON = true;
-								} else {
-									TempSize = HydrRadSys(RadSysNum).ScaledCoolingCapacity;
-								}
-								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-								DesCoilLoad = TempSize;
-							} else {
-								DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesCoolLoad * CalcFinalZoneSizing(CurZoneEqNum).CoolSizingFactor;
-							}
-
 							if ( DesCoilLoad >= SmallLoad ) {
 								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, 5., PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
-
 								Cp = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
-
-								WaterVolFlowMaxCoolDes = ( CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor ) / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
+								WaterVolFlowMaxCoolDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
 							} else {
 								WaterVolFlowMaxCoolDes = 0.0;
 							}
@@ -2181,13 +2278,14 @@ namespace LowTempRadiantSystem {
 							ErrorsFound = true;
 						}
 					}
+
 					if ( IsAutoSize ) {
 						HydrRadSys( RadSysNum ).WaterVolFlowMaxCool = WaterVolFlowMaxCoolDes;
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes );
+						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes );
 					} else { // hard-size with sizing data
 						if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxCool > 0.0 && WaterVolFlowMaxCoolDes > 0.0 ) {
 							WaterVolFlowMaxCoolUser = HydrRadSys( RadSysNum ).WaterVolFlowMaxCool;
-							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes, "User-Specified Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolUser );
+							ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes, "User-Specified Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser ) / WaterVolFlowMaxCoolUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" + HydrRadSys( RadSysNum ).Name + "\"." );
@@ -2199,6 +2297,7 @@ namespace LowTempRadiantSystem {
 							}
 						}
 					}
+
 				}
 			}
 
@@ -2209,19 +2308,19 @@ namespace LowTempRadiantSystem {
 			if ( CurZoneEqNum > 0 ) {
 				if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation continue
 					if ( HydrRadSys( RadSysNum ).TubeLength > 0.0 ) {
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "User-Specified Hydronic Tubing Length [m]", HydrRadSys( RadSysNum ).TubeLength );
+						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "User-Specified Hydronic Tubing Length [m]", HydrRadSys( RadSysNum ).TubeLength );
 					}
 				} else { // Autosize or hard-size with sizing run
 					// assume tube spacing of 15 cm
-					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name );
+					// CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
 					TubeLengthDes = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
 					if ( IsAutoSize ) {
 						HydrRadSys( RadSysNum ).TubeLength = TubeLengthDes;
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes );
+						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes );
 					} else { // hard-size with sizing data
 						if ( HydrRadSys( RadSysNum ).TubeLength > 0.0 && TubeLengthDes > 0.0 ) {
 							TubeLengthUser = HydrRadSys( RadSysNum ).TubeLength;
-							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes, "User-Specified Hydronic Tubing Length [m]", TubeLengthUser );
+							ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes, "User-Specified Hydronic Tubing Length [m]", TubeLengthUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( TubeLengthDes - TubeLengthUser ) / TubeLengthUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" + HydrRadSys( RadSysNum ).Name + "\"." );
@@ -2251,6 +2350,10 @@ namespace LowTempRadiantSystem {
 		}
 
 		if ( SystemType == ConstantFlowSystem ) {
+
+			CompType = "ZoneHVAC:LowTemperatureRadiant:ConstantFlow";
+			CompName = CFloRadSys( RadSysNum ).Name;
+
 			// Check which operating system it is
 			HeatNode = CFloRadSys( RadSysNum ).HotWaterInNode;
 			CoolNode = CFloRadSys( RadSysNum ).ColdWaterInNode;
@@ -2271,15 +2374,15 @@ namespace LowTempRadiantSystem {
 			if ( CurZoneEqNum > 0 ) {
 				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
 					if ( CFloRadSys( RadSysNum ).WaterVolFlowMax > 0.0 ) {
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+						ReportSizingOutput( CompType, CFloRadSys( RadSysNum ).Name,
 							"User-Specified Maximum Water Flow [m3/s]", CFloRadSys( RadSysNum ).WaterVolFlowMax );
 					}
 				} else { // Autosize or hard-size with sizing run
-					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name );
+					CheckZoneSizing( CompType, CFloRadSys( RadSysNum ).Name );
 					// Estimate hot water and chilled water flows
 					// Index only if it provides heating to avoid severe error
 					if ( OpMode == ClgHtg || OpMode == HtgOnly ) {
-						PltSizHeatNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+						PltSizHeatNum = MyPlantSizingIndex( CompType, CFloRadSys( RadSysNum ).Name,
 											CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, ErrorsFound );
 					}
 					if ( PltSizHeatNum > 0 ) {
@@ -2288,7 +2391,7 @@ namespace LowTempRadiantSystem {
 								60.0, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
 							Cp = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName,
 								60.0, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
-							WaterVolFlowMaxHeatDes = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatAirDesMethod  /
+							WaterVolFlowMaxHeatDes = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor /
                                                         ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 						} else {
 							WaterVolFlowMaxHeatDes = 0.0;
@@ -2303,7 +2406,7 @@ namespace LowTempRadiantSystem {
 
 					// Index only if it provides cooling system to avoid severe error
 					if ( OpMode == ClgHtg || OpMode == ClgOnly ) {
-						PltSizCoolNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+						PltSizCoolNum = MyPlantSizingIndex( CompType, CFloRadSys( RadSysNum ).Name,
 							CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, ErrorsFound );
 					}
 					if ( PltSizCoolNum > 0 ) {
@@ -2338,12 +2441,12 @@ namespace LowTempRadiantSystem {
 
 					if ( IsAutoSize ) {
 						CFloRadSys( RadSysNum ).WaterVolFlowMax = WaterVolFlowMaxDes;
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+						ReportSizingOutput( CompType, CFloRadSys( RadSysNum ).Name,
 							"Design Size Maximum Water Flow [m3/s]", WaterVolFlowMaxDes );
 					} else { // hard-size with sizing data
 						if ( CFloRadSys( RadSysNum ).WaterVolFlowMax > 0.0 && WaterVolFlowMaxDes > 0.0 ) {
 							WaterVolFlowMaxUser = CFloRadSys( RadSysNum ).WaterVolFlowMax;
-							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+							ReportSizingOutput( CompType, CFloRadSys( RadSysNum ).Name,
 								"Design Size Maximum Water Flow [m3/s]", WaterVolFlowMaxDes, "User-Specified Maximum Water Flow [m3/s]", WaterVolFlowMaxUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxDes - WaterVolFlowMaxUser ) / WaterVolFlowMaxUser ) > AutoVsHardSizingThreshold ) {
@@ -2373,7 +2476,7 @@ namespace LowTempRadiantSystem {
 					}
 				} else {	// Autosize or hard-size with sizing run
 					// assume tube spacing of 15 cm
-					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name );
+					// CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
 					TubeLengthDes = CFloRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
 					if (IsAutoSize ) {
 						CFloRadSys( RadSysNum ).TubeLength = TubeLengthDes;
@@ -2939,8 +3042,8 @@ namespace LowTempRadiantSystem {
 						if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
 					}
 					// Redo the heat balances since we have changed the heat source (set it to zero)
-					CalcHeatBalanceOutsideSurf( ZoneNum );
-					CalcHeatBalanceInsideSurf( ZoneNum );
+					HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+					HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 					// Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
 					for ( RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys( RadSysNum ).NumOfSurfaces; ++RadSurfNum2 ) {
 						if ( TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
@@ -2989,8 +3092,8 @@ namespace LowTempRadiantSystem {
 						}
 
 						// Redo the heat balances since we have changed the heat source
-						CalcHeatBalanceOutsideSurf( ZoneNum );
-						CalcHeatBalanceInsideSurf( ZoneNum );
+						HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+						HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 						// Check for condensation one more time.  If no condensation, we are done.  If there is
 						// condensation, shut things down and be done.
@@ -3037,8 +3140,8 @@ namespace LowTempRadiantSystem {
 		// the new SumHATsurf value for the zone.  Note that the difference between the new
 		// SumHATsurf and the value originally calculated by the heat balance with a zero
 		// source for all radiant systems in the zone is the load met by the system (approximately).
-		CalcHeatBalanceOutsideSurf( ZoneNum );
-		CalcHeatBalanceInsideSurf( ZoneNum );
+		HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+		HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 		LoadMet = SumHATsurf( ZoneNum ) - ZeroSourceSumHATsurf( ZoneNum );
 
@@ -4019,8 +4122,8 @@ namespace LowTempRadiantSystem {
 		// the new SumHATsurf value for the zone.  Note that the difference between the new
 		// SumHATsurf and the value originally calculated by the heat balance with a zero
 		// source for all radiant systems in the zone is the load met by the system (approximately).
-		CalcHeatBalanceOutsideSurf( ZoneNum );
-		CalcHeatBalanceInsideSurf( ZoneNum );
+		HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+		HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 		LoadMet = SumHATsurf( CFloRadSys( RadSysNum ).ZonePtr ) - ZeroSourceSumHATsurf( CFloRadSys( RadSysNum ).ZonePtr );
 
@@ -4151,8 +4254,8 @@ namespace LowTempRadiantSystem {
 				}
 
 				// Now "simulate" the system by recalculating the heat balances
-				CalcHeatBalanceOutsideSurf( ZoneNum );
-				CalcHeatBalanceInsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+				HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
 
 				LoadMet = SumHATsurf( ZoneNum ) - ZeroSourceSumHATsurf( ZoneNum );
 
@@ -5011,7 +5114,7 @@ namespace LowTempRadiantSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
