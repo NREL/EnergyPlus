@@ -3,7 +3,7 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -245,7 +245,7 @@ TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
 
 }
 
-	TEST_F( HVACFixture, ZoneTempPredictorCorrector_ReportingTest )
+	TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest )
 	{
 		// AUTHOR: R. Raustad, FSEC
 		// DATE WRITTEN: Aug 2015

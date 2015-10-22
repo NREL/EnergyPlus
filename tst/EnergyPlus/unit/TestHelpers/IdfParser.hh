@@ -17,6 +17,8 @@ namespace EnergyPlus {
 		static std::vector< std::vector< std::string > > decode( std::string const & idf );
 
 		static std::vector< std::vector< std::string > > decode( std::string const & idf, bool & success );
+
+		static std::string encode( std::vector< std::vector< std::string > > const & idf_list );
 		
 		enum class Token : size_t { NONE = 0, END = 1, EXCLAMATION = 2, COMMA = 3, SEMICOLON = 4, STRING = 5 };
 

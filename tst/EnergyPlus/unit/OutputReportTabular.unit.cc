@@ -3,12 +3,13 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -23,11 +24,13 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
+using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::OutputReportTabular;
+using namespace EnergyPlus::OutputProcessor;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
@@ -181,7 +184,7 @@ TEST( OutputReportTabularTest, GetUnitConversion )
 }
 
 
-TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
+TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {
 	// AUTHOR: R. Raustad, FSEC
 	// DATE WRITTEN: Sep 2015
@@ -972,6 +975,113 @@ TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
 
 	// Save data to compare to next unit test
 	Test1People = DataHeatBalance::ZnRpt( 1 ).PeopleNumOcc;
+
+}
+
+
+TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+		"Output:Table:Monthly,",
+		"Space Gains Annual Report, !- Name",
+		"2, !-  Digits After Decimal",
+		"Exterior Lights Electric Energy, !- Variable or Meter 1 Name",
+		"SumOrAverage, !- Aggregation Type for Variable or Meter 1",
+		"Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+		"Maximum, !- Aggregation Type for Variable or Meter 2",
+		"Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+		"Minimum; !- Aggregation Type for Variable or Meter 2",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	Real64 extLitUse;
+
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+
+	DataGlobals::DoWeathSim = true;
+	DataGlobals::TimeStepZone = 0.25;
+
+	GetInputTabularMonthly();
+	EXPECT_EQ( MonthlyInputCount, 1 );
+	InitializeTabularMonthly();
+
+	extLitUse = 1.01;
+
+	DataEnvironment::Month = 12;
+
+	GatherMonthlyResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 1, MonthlyColumns( 1 ).reslt( 12 ));
+
+	GatherMonthlyResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 2, MonthlyColumns( 1 ).reslt( 12 ) );
+
+	GatherMonthlyResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 3, MonthlyColumns( 1 ).reslt( 12 ) );
+
+	ResetMonthlyGathering();
+
+	EXPECT_EQ( 0., MonthlyColumns( 1 ).reslt( 12 ) );
+
+	GatherMonthlyResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 1, MonthlyColumns( 1 ).reslt( 12 ) );
+
+}
+
+TEST( OutputReportTabularTest, ConfirmResetBEPSGathering )
+{
+
+	Real64 extLitUse;
+
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+
+	DataGlobals::DoWeathSim = true;
+	DataGlobals::TimeStepZone = 1.0;
+	displayTabularBEPS = true;
+	TimeValue.allocate( 2 );
+
+	auto timeStep = 1.0;
+
+	SetupTimePointers( "Zone", timeStep );
+	SetupTimePointers( "HVAC", timeStep );
+
+	TimeValue( 1 ).TimeStep = 60;
+	TimeValue( 2 ).TimeStep = 60;
+
+	GetInputTabularPredefined();
+
+	extLitUse = 1.01;
+
+	DataEnvironment::Month = 12;
+
+	UpdateMeterReporting();
+	UpdateDataandReport( 1 );
+	GatherBEPSResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 3, gatherEndUseBEPS( 1, endUseExteriorLights ) );
+
+	UpdateMeterReporting();
+	UpdateDataandReport( 1 );
+	GatherBEPSResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 6, gatherEndUseBEPS( 1, endUseExteriorLights ) );
+
+	UpdateMeterReporting();
+	UpdateDataandReport( 1 );
+	GatherBEPSResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 9, gatherEndUseBEPS( 1, endUseExteriorLights )  );
+
+	ResetBEPSGathering();
+
+	EXPECT_EQ( 0., gatherEndUseBEPS( 1, endUseExteriorLights ) );
+
+	UpdateMeterReporting();
+	UpdateDataandReport( 1 );
+	GatherBEPSResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 3, gatherEndUseBEPS( 1, endUseExteriorLights ) );
 
 }
 TEST_F( HVACFixture, OutputReportTabular_ZoneSumTest )
