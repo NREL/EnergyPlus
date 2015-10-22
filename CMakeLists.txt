@@ -66,8 +66,9 @@ mark_as_advanced( ENABLE_INSTALL_REMOTE )
 # 1. Doing regression testing; which would be: BUILD_TESTING AND ENABLE_REGRESSION_TESTING
 # 2. Doing package building, since Python is going to be our tool for some things; thus: BUILD_PACKAGE
 
-if( ( BUILD_TESTING AND ENABLE_REGRESSION_TESTING ) OR ( BUILD_PACKAGE ) )
+if( BUILD_TESTING OR BUILD_PACKAGE )
   find_package(PythonInterp 2.7 REQUIRED)
+  add_test( NAME VerifyIDFsInCMakeFolder COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/scripts/dev/VerifyIDFsInCMake.py" "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" )
 endif()
 
 if( BUILD_TESTING )
