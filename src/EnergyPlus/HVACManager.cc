@@ -1494,6 +1494,7 @@ namespace HVACManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IterAir; // counts iterations to enforce maximum iteration limit
 		static bool MyEnvrnFlag( true );
+		static bool FlowMaxAvailAlreadyReset( false );
 		static bool FlowResolutionNeeded( false );
 
 		// FLOW:
@@ -1534,6 +1535,7 @@ namespace HVACManager {
 			SimAirLoops = true; //Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
 			AirLoopsSimOnce = true; // air loops simulated once for this environment
 			ResetTerminalUnitFlowLimits();
+			FlowMaxAvailAlreadyReset = true;
 			ManageZoneEquipment( FirstHVACIteration, SimZoneEquipment, SimAirLoops );
 			SimZoneEquipment = true; //needs to be simulated at least twice for flow resolution to propagate to this routine
 			ManageNonZoneEquipment( FirstHVACIteration, SimNonZoneEquipment );
@@ -1563,12 +1565,18 @@ namespace HVACManager {
 					SimZoneEquipment = true;
 				}
 				if ( SimZoneEquipment ) {
-					ResolveAirLoopFlowLimits();
-					FlowResolutionNeeded = false;
+					if ( ( IterAir == 1 ) && ( ! FlowMaxAvailAlreadyReset ) ) { // don't do reset if already done in FirstHVACIteration
+						// ResetTerminalUnitFlowLimits(); // don't do reset at all - interferes with convergence and terminal unit flow controls
+						FlowResolutionNeeded = true;
+					} else {
+						ResolveAirLoopFlowLimits();
+						FlowResolutionNeeded = false;
+					}
 					ManageZoneEquipment( FirstHVACIteration, SimZoneEquipment, SimAirLoops );
 					SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
 
 				}
+				FlowMaxAvailAlreadyReset = false;
 
 				//      IterAir = IterAir + 1   ! Increment the iteration counter
 				if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
