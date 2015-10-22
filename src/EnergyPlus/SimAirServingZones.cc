@@ -1844,8 +1844,7 @@ namespace SimAirServingZones {
 
 			} // end of AirLoop loop
 
-			// Check whether there are central heating coils
-			//@@ May need further checks to assure they are "central" heating coils, not "preheat" or "reheat" coils
+			// Check whether there are Central Heating Coils in the Primary Air System
 			for( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 
 				FoundCentralHeatCoil = false;

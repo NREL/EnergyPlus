@@ -717,6 +717,9 @@ namespace SingleDuct {
 		int & ATMixerOutNode // air terminal mixer outlet air node number
 	);
 
+	Real64
+	GetReheatCoilInTempForSizing();
+
 	void
 	SetATMixerPriFlow(
 		int const ATMixerNum, // Air terminal mixer index

@@ -10,6 +10,7 @@
 #include <BranchNodeConnections.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
+#include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataDefineEquip.hh>
@@ -2032,7 +2033,7 @@ namespace SingleDuct {
 							ErrorsFound = true;
 						}
 						if ( PltSizHeatNum > 0 ) {
-							CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
+							CoilInTemp = GetReheatCoilInTempForSizing();
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
 							DesZoneHeatLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 							ZoneDesTemp = CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
@@ -2102,7 +2103,7 @@ namespace SingleDuct {
 							ErrorsFound = true;
 						}
 						if ( PltSizHeatNum > 0 ) {
-							CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
+							CoilInTemp = GetReheatCoilInTempForSizing();
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
 							DesZoneHeatLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 							ZoneDesTemp = CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
@@ -5025,6 +5026,73 @@ namespace SingleDuct {
 
 	}
 
+	Real64
+	GetReheatCoilInTempForSizing()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl, Rongpeng Zhang
+		//       DATE WRITTEN   October 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine get the proper reheat coil inlet temperature for sizing, depending on 
+		// the system configurations: 
+		// (1) Central heating coils exist
+		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
+		// (3) No central heating coils; No preheating coils or OA heat-exchangers
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataSizing;
+		using DataAirSystems::PrimaryAirSystem;
+		
+		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
+
+		// Locals
+		Real64 ReheatCoilInTempForSizing;
+		
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		
+		if( PrimaryAirSystem( CurSysNum ).CentralHeatCoilExists ){
+		//Case: Central heating coils exist
+			
+			ReheatCoilInTempForSizing = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
+			
+		} else if(( PrimaryAirSystem( CurSysNum ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( CurSysNum ).NumOAHXs ) ){
+		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
+			
+			ReheatCoilInTempForSizing = FinalZoneSizing( CurZoneEqNum ).ZoneOAFracHeating * FinalSysSizing( CurSysNum ).PreheatTemp + ( 1 - FinalZoneSizing( CurZoneEqNum ).ZoneOAFracHeating ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
+			
+		} else {
+		//Case: No central heating coils; No preheating coils or OA heat-exchangers
+			
+			ReheatCoilInTempForSizing = FinalSysSizing( CurSysNum ).HeatMixTemp;
+		
+		}
+		
+		return ReheatCoilInTempForSizing;
+
+	}
+	
+	
 	//        End of Reporting subroutines for the Sys Module
 	// *****************************************************************************
 
