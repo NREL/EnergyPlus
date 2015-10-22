@@ -6172,7 +6172,6 @@ namespace WaterThermalTanks {
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 		Real64 SecInTimeStep; // Seconds in one timestep (s)
 		Real64 TimeRemaining; // Time remaining in the current timestep (s)
-		int NumNodes; // Number of stratified nodes
 		int NodeNum; // Node number index
 		Real64 NodeMass; // Mass of water in a node (kg)
 		Real64 NodeTemp; // Instantaneous node temperature (C)
@@ -6245,7 +6244,9 @@ namespace WaterThermalTanks {
 		if ( Tank.TimeElapsed != TimeElapsed ) {
 			// The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
 			// timestep for use as the initial conditions of each iteration that does not advance the system timestep.
-			Tank.Node.SavedTemp() = Tank.Node.Temp();
+			for ( int i = 1; i <= Tank.Nodes; ++i ) {
+				Tank.Node(i).SavedTemp = Tank.Node(i).Temp;
+			}
 			Tank.SavedHeaterOn1 = Tank.HeaterOn1;
 			Tank.SavedHeaterOn2 = Tank.HeaterOn2;
 
@@ -6256,12 +6257,13 @@ namespace WaterThermalTanks {
 			Tank.TimeElapsed = TimeElapsed;
 		}
 
-		Tank.Node.Temp() = Tank.Node.SavedTemp();
+		for ( int i = 1; i <= Tank.Nodes; ++i ) {
+			Tank.Node(i).Temp = Tank.Node(i).SavedTemp;
+		}
 		Tank.HeaterOn1 = Tank.SavedHeaterOn1;
 		Tank.HeaterOn2 = Tank.SavedHeaterOn2;
 
 		SecInTimeStep = TimeStepSys * SecInHour;
-		NumNodes = Tank.Nodes;
 
 		AmbientTemp = Tank.AmbientTemp;
 		UseInletTemp = Tank.UseInletTemp;
@@ -6398,7 +6400,7 @@ namespace WaterThermalTanks {
 			}
 
 			// Loop through all nodes and simulate heat balance
-			for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
+			for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
 				NodeMass = Tank.Node( NodeNum ).Mass;
 				NodeTemp = Tank.Node( NodeNum ).Temp;
 
@@ -6416,7 +6418,7 @@ namespace WaterThermalTanks {
 				}
 
 				InvMixDn = 0.0;
-				if ( NodeNum < NumNodes ) {
+				if ( NodeNum < Tank.Nodes ) {
 					TempDn = Tank.Node( NodeNum + 1 ).Temp;
 					if ( TempDn > NodeTemp ) InvMixDn = Tank.InversionMixingRate;
 				}
@@ -6480,8 +6482,10 @@ namespace WaterThermalTanks {
 			}
 
 			// Update node temperatures
-			Tank.Node.Temp() = Tank.Node.NewTemp();
-			Tank.Node.TempSum() += Tank.Node.Temp() * dt;
+			for ( int i = 1; i <= Tank.Nodes; ++i ) {
+				Tank.Node(i).Temp = Tank.Node(i).NewTemp;
+				Tank.Node(i).TempSum += Tank.Node(i).Temp * dt;
+			}
 
 			TimeRemaining -= dt;
 
@@ -6514,12 +6518,20 @@ namespace WaterThermalTanks {
 		Qfuel = Efuel / SecInTimeStep;
 
 		// Calculate average node temperatures over the time step
-		Tank.Node.TempAvg() = Tank.Node.TempSum() / SecInTimeStep;
-		Tank.Node.TempSum() = 0.0; // Reset for next time step
+		for ( int i = 1; i <= Tank.Nodes; ++i ) {
+			Tank.Node(i).TempAvg = Tank.Node(i).TempSum / SecInTimeStep;
+			Tank.Node(i).TempSum = 0.0; // Reset for next time step
+		}
 
 		// Calculate instantaneous and average tank temperature (all nodes have equal mass)
-		Tank.TankTemp = sum( Tank.Node.Temp() ) / NumNodes;
-		Tank.TankTempAvg = sum( Tank.Node.TempAvg() ) / NumNodes;
+		Tank.TankTemp = 0.0;
+		Tank.TankTempAvg = 0.0;
+		for ( int i = 1; i <= Tank.Nodes; ++i ) {
+			Tank.TankTemp += Tank.Node(i).Temp;
+			Tank.TankTempAvg += Tank.Node(i).TempAvg;
+		}
+		Tank.TankTemp /= Tank.Nodes;
+		Tank.TankTempAvg /= Tank.Nodes;
 
 		NodeNum = Tank.UseOutletStratNode;
 		if ( NodeNum > 0 ) Tank.UseOutletTemp = Tank.Node( NodeNum ).TempAvg;
@@ -6681,12 +6693,14 @@ namespace WaterThermalTanks {
 		UseMassFlowRate = Tank.UseMassFlowRate * Tank.UseEffectiveness;
 		SourceMassFlowRate = Tank.SourceMassFlowRate * Tank.SourceEffectiveness;
 
-		Tank.Node.UseMassFlowRate() = 0.0;
-		Tank.Node.SourceMassFlowRate() = 0.0;
-		Tank.Node.MassFlowFromUpper() = 0.0;
-		Tank.Node.MassFlowFromLower() = 0.0;
-		Tank.Node.MassFlowToUpper() = 0.0;
-		Tank.Node.MassFlowToLower() = 0.0;
+		for ( int i = 1; i <= Tank.Nodes; ++i ) {
+			Tank.Node(i).UseMassFlowRate = 0.0;
+			Tank.Node(i).SourceMassFlowRate = 0.0;
+			Tank.Node(i).MassFlowFromUpper = 0.0;
+			Tank.Node(i).MassFlowFromLower = 0.0;
+			Tank.Node(i).MassFlowToUpper = 0.0;
+			Tank.Node(i).MassFlowToLower = 0.0;
+		}
 
 		if ( InletMode == InletModeSeeking ) {
 			// 'Seek' the node with the temperature closest to the inlet temperature
