@@ -174,9 +174,6 @@ namespace HeatBalanceIntRadExchange {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int RecSurfNum; // Counter within DO loop (refers to main surface derived type index) RECEIVING SURFACE
-		int SendSurfNum; // Counter within DO loop (refers to main surface derived type index) SENDING SURFACE
-
 		int ConstrNumRec; // Receiving surface construction number
 		int SurfNum; // Surface number
 		int ConstrNum; // Construction number
@@ -203,11 +200,10 @@ namespace HeatBalanceIntRadExchange {
 #endif
 		if ( CalcInteriorRadExchangefirstTime ) {
 			InitInteriorRadExchange();
-#ifdef EP_HBIRE_SEQ
-			SendSurfaceTempInKto4thPrecalc.allocate( MaxNumOfZoneSurfaces );
-#else
-			SendSurfaceTempInKto4thPrecalc.allocate( TotSurfaces );
-#endif
+			SurfaceTempK4.allocate( MaxNumOfZoneSurfaces );
+			SurfaceEmiss.allocate( MaxNumOfZoneSurfaces );
+			NetLWRadToSurf_Temp.allocate( MaxNumOfZoneSurfaces );
+			IRfromParentZone_Temp.allocate( MaxNumOfZoneSurfaces );
 			CalcInteriorRadExchangefirstTime = false;
 			if ( DeveloperFlag ) {
 				std::string tdstring;
