@@ -71,6 +71,7 @@ set( test_src
   SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
+  SurfaceGeometry.unit.cc
   SQLite.unit.cc
   SwimmingPool.unit.cc
   VariableSpeedCoils.unit.cc
