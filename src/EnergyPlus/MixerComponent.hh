@@ -119,6 +119,9 @@ namespace MixerComponent {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimAirMixer(
 		std::string const & CompName,
 		int & CompIndex

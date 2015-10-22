@@ -182,10 +182,8 @@
 ! Compressor Type = Centrifugal, Condenser Type = Water
 ! Refrigerant = N/A, Voltage & Phase = N/A
 ! Unloading Mechanism = Inlet Vanes
-!
 
-!  Version,
-!    8.0;                    !- Version Identifier
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Chiller:Electric:EIR,
     ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes,  !- Name
@@ -13653,6 +13651,7 @@
     0.01924,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.08,                    !- Maximum Part Load Ratio
@@ -13742,6 +13741,7 @@
     0.0241,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 563kW/10.61COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 563kW/10.61COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 563kW/10.61COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -13831,6 +13831,7 @@
     0.02902,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PEH 703kW/7.03COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PEH 703kW/7.03COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PEH 703kW/7.03COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -13920,6 +13921,7 @@
     0.01956,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 23XL 724kW/6.04COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 23XL 724kW/6.04COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 23XL 724kW/6.04COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -14009,6 +14011,7 @@
     0.01956,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 742kW/5.42COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 742kW/5.42COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 742kW/5.42COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -14098,6 +14101,7 @@
     0.04164,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay WSC 816kW/6.74COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay WSC 816kW/6.74COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay WSC 816kW/6.74COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -14187,6 +14191,7 @@
     0.03785,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PEH 819kW/8.11COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PEH 819kW/8.11COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PEH 819kW/8.11COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -14276,6 +14281,7 @@
     0.04744,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 823kW/6.28COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 823kW/6.28COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 823kW/6.28COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -14365,6 +14371,7 @@
     0.02593,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 869kW/5.57COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 869kW/5.57COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 869kW/5.57COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.18,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -14454,6 +14461,7 @@
     0.0436,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 897kW/7.23COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 897kW/7.23COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 897kW/7.23COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -14543,6 +14551,7 @@
     0.04423,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 897kW/6.50COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 897kW/6.50COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 897kW/6.50COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -14632,6 +14641,7 @@
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 897kW/7.60COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 897kW/7.60COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 897kW/7.60COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -14721,6 +14731,7 @@
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 897kW/6.27COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 897kW/6.27COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 897kW/6.27COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -14810,6 +14821,7 @@
     0.04442,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 897kW/6.23COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 897kW/6.23COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 897kW/6.23COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -14899,6 +14911,7 @@
     0.04732,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PFH 932kW/5.09COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PFH 932kW/5.09COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PFH 932kW/5.09COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -14988,6 +15001,7 @@
     0.04732,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 960kW/4.64COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 960kW/4.64COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 960kW/4.64COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.1,                     !- Maximum Part Load Ratio
@@ -15077,6 +15091,7 @@
     0.04732,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1023kW/5.81COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1023kW/5.81COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1023kW/5.81COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -15166,6 +15181,7 @@
     0.03407,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PEH 1030kW/8.58COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PEH 1030kW/8.58COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PEH 1030kW/8.58COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.08,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -15255,6 +15271,7 @@
     0.05678,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1048kW/6.06COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1048kW/6.06COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1048kW/6.06COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -15344,6 +15361,7 @@
     0.05678,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1055kW/5.96COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1055kW/5.96COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1055kW/5.96COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -15433,6 +15451,7 @@
     0.04744,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1076kW/5.52COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1076kW/5.52COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1076kW/5.52COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -15522,6 +15541,7 @@
     0.06416,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHE 1080kW/7.39COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHE 1080kW/7.39COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHE 1080kW/7.39COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -15611,6 +15631,7 @@
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1090kW/7.57COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1090kW/7.57COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1090kW/7.57COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.14,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -15700,6 +15721,7 @@
     0.03028,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PEH 1104kW/8.00COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PEH 1104kW/8.00COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PEH 1104kW/8.00COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.08,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -15789,6 +15811,7 @@
     0.05173,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1125kW/7.92COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -15878,6 +15901,7 @@
     0.02618,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHE 1125kW/4.89COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHE 1125kW/4.89COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHE 1125kW/4.89COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -15967,6 +15991,7 @@
     0.05173,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1125kW/7.92COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1125kW/7.92COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -16056,6 +16081,7 @@
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHE 1129kW/7.19COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHE 1129kW/7.19COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHE 1129kW/7.19COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.15,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -16145,6 +16171,7 @@
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1143kW/6.57COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1143kW/6.57COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1143kW/6.57COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -16234,6 +16261,7 @@
     0.03186,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1157kW/5.62COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1157kW/5.62COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1157kW/5.62COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -16323,6 +16351,7 @@
     0.04252,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1196kW/6.50COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1196kW/6.50COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1196kW/6.50COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -16412,6 +16441,7 @@
     0.04782,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1213kW/7.78COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1213kW/7.78COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1213kW/7.78COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.17,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -16501,6 +16531,7 @@
     0.0511,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PEH 1231kW/6.18COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PEH 1231kW/6.18COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PEH 1231kW/6.18COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -16590,6 +16621,7 @@
     0.03861,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1234kW/5.39COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1234kW/5.39COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1234kW/5.39COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -16679,6 +16711,7 @@
     0.03823,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.18,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -16768,6 +16801,7 @@
     0.06246,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 1259kW/6.45COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 1259kW/6.45COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 1259kW/6.45COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.18,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -16857,6 +16891,7 @@
     0.05773,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1266kW/4.39COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1266kW/4.39COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1266kW/4.39COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.11,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -16946,6 +16981,7 @@
     0.05337,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1284kW/6.20COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1284kW/6.20COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1284kW/6.20COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -17035,6 +17071,7 @@
     0.04732,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1294kW/7.61COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1294kW/7.61COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1294kW/7.61COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.16,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -17124,6 +17161,7 @@
     0.07098,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHE 1329kW/5.38COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHE 1329kW/5.38COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHE 1329kW/5.38COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.29,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -17213,6 +17251,7 @@
     0.05337,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1350kW/7.90COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1350kW/7.90COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1350kW/7.90COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -17302,6 +17341,7 @@
     0.07571,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1368kW/7.35COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1368kW/7.35COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1368kW/7.35COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -17391,6 +17431,7 @@
     0.07571,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHE 1372kW/7.49COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHE 1372kW/7.49COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHE 1372kW/7.49COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.41,                    !- Minimum Part Load Ratio
     1.11,                    !- Maximum Part Load Ratio
@@ -17480,6 +17521,7 @@
     0.07571,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1396kW/7.35COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1396kW/7.35COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1396kW/7.35COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -17569,6 +17611,7 @@
     0.04252,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1403kW/7.09COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1403kW/7.09COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1403kW/7.09COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.17,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -17658,6 +17701,7 @@
     0.05047,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1403kW/6.94COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1403kW/6.94COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1403kW/6.94COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.13,                    !- Maximum Part Load Ratio
@@ -17747,6 +17791,7 @@
     0.07571,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHE 1407kW/7.14COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHE 1407kW/7.14COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHE 1407kW/7.14COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.30,                    !- Minimum Part Load Ratio
     1.07,                    !- Maximum Part Load Ratio
@@ -17836,6 +17881,7 @@
     0.05804,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PFH 1407kW/6.60COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PFH 1407kW/6.60COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PFH 1407kW/6.60COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -17925,6 +17971,7 @@
     0.07571,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1407kW/6.04COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1407kW/6.04COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1407kW/6.04COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -18014,6 +18061,7 @@
     0.05861,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1410kW/8.54COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1410kW/8.54COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1410kW/8.54COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.18,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -18103,6 +18151,7 @@
     0.05047,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHE 1442kW/6.61COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHE 1442kW/6.61COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHE 1442kW/6.61COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -18192,6 +18241,7 @@
     0.05047,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1459kW/6.40COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1459kW/6.40COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1459kW/6.40COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.17,                    !- Maximum Part Load Ratio
@@ -18281,6 +18331,7 @@
     0.09085,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHE 1484kW/9.96COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHE 1484kW/9.96COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHE 1484kW/9.96COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.24,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -18370,6 +18421,7 @@
     0.06719,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1495kW/7.51COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1495kW/7.51COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1495kW/7.51COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.11,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -18459,6 +18511,7 @@
     0.08139,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay WSC 1519kW/7.10COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay WSC 1519kW/7.10COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay WSC 1519kW/7.10COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -18548,6 +18601,7 @@
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1558kW/5.81COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1558kW/5.81COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1558kW/5.81COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -18637,6 +18691,7 @@
     0.04669,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1586kW/5.53COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1586kW/5.53COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1586kW/5.53COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -18726,6 +18781,7 @@
     0.06624,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PEH 1635kW/7.47COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PEH 1635kW/7.47COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PEH 1635kW/7.47COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.08,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -18815,6 +18871,7 @@
     0.05035,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1635kW/6.36COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1635kW/6.36COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1635kW/6.36COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.18,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -18904,6 +18961,7 @@
     0.06296,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1656kW/8.24COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1656kW/8.24COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1656kW/8.24COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.17,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -18993,6 +19051,7 @@
     0.0776,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1663kW/9.34COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1663kW/9.34COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1663kW/9.34COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.17,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -19082,6 +19141,7 @@
     0.09085,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XL 1674kW/7.89COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XL 1674kW/7.89COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XL 1674kW/7.89COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.32,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -19171,6 +19231,7 @@
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 1681kW/6.59COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 1681kW/6.59COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 1681kW/6.59COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -19260,6 +19321,7 @@
     0.06934,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1723kW/8.32COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1723kW/8.32COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1723kW/8.32COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.18,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -19349,6 +19411,7 @@
     0.07192,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1727kW/9.04COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1727kW/9.04COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1727kW/9.04COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.17,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -19438,6 +19501,7 @@
     0.09337,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay WSC 1751kW/6.73COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay WSC 1751kW/6.73COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay WSC 1751kW/6.73COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.07,                    !- Maximum Part Load Ratio
@@ -19527,6 +19591,7 @@
     0.06309,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 1758kW/5.96COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 1758kW/5.96COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 1758kW/5.96COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -19616,6 +19681,7 @@
     0.06309,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1758kW/5.76COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1758kW/5.76COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1758kW/5.76COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -19705,6 +19771,7 @@
     0.06309,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1758kW/6.26COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1758kW/6.26COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1758kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.16,                    !- Maximum Part Load Ratio
@@ -19794,6 +19861,7 @@
     0.06309,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1758kW/5.96COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1758kW/5.96COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1758kW/5.96COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -19883,6 +19951,7 @@
     0.09464,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHE 1758kW/5.96COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHE 1758kW/5.96COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHE 1758kW/5.96COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -19972,6 +20041,7 @@
     0.09464,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1758kW/6.28COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1758kW/6.28COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1758kW/6.28COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -20061,6 +20131,7 @@
     0.07337,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1758kW/5.86COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1758kW/5.86COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1758kW/5.86COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -20150,6 +20221,7 @@
     0.06309,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 1758kW/6.46COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 1758kW/6.46COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 1758kW/6.46COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -20239,6 +20311,7 @@
     0.06309,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 1758kW/6.87COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 1758kW/6.87COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 1758kW/6.87COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -20328,6 +20401,7 @@
     0.07003,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1776kW/8.00COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1776kW/8.00COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1776kW/8.00COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.17,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -20417,6 +20491,7 @@
     0.08858,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XL 1779kW/6.18COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XL 1779kW/6.18COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XL 1779kW/6.18COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -20506,6 +20581,7 @@
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 1779kW/6.18COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 1779kW/6.18COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 1779kW/6.18COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -20595,6 +20671,7 @@
     0.09653,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1794kW/8.11COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1794kW/8.11COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1794kW/8.11COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.08,                    !- Maximum Part Load Ratio
@@ -20684,6 +20761,7 @@
     0.09653,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1794kW/7.90COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1794kW/7.90COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1794kW/7.90COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -20773,6 +20851,7 @@
     0.09672,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XL 1797kW/5.69COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XL 1797kW/5.69COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XL 1797kW/5.69COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.39,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -20862,6 +20941,7 @@
     0.06385,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 1801kW/6.34COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 1801kW/6.34COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1801kW/6.34COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -20951,6 +21031,7 @@
     0.09085,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1867kW/10.09COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1867kW/10.09COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1867kW/10.09COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -21040,6 +21121,7 @@
     0.0877,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XL 1871kW/6.49COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XL 1871kW/6.49COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XL 1871kW/6.49COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -21129,6 +21211,7 @@
     0.09464,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1881kW/6.77COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1881kW/6.77COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1881kW/6.77COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -21218,6 +21301,7 @@
     0.1041,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -21307,6 +21391,7 @@
     0.1041,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 1881kW/6.53COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 1881kW/6.53COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -21396,6 +21481,7 @@
     0.09085,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PEH 1895kW/6.42COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PEH 1895kW/6.42COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PEH 1895kW/6.42COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.1,                     !- Maximum Part Load Ratio
@@ -21485,6 +21571,7 @@
     0.08675,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 1934kW/7.55COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 1934kW/7.55COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 1934kW/7.55COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -21574,6 +21661,7 @@
     0.07981,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PEH 1934kW/6.01COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PEH 1934kW/6.01COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PEH 1934kW/6.01COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -21663,6 +21751,7 @@
     0.09337,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay WDC 1973kW/6.28COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay WDC 1973kW/6.28COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay WDC 1973kW/6.28COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -21752,6 +21841,7 @@
     0.1041,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 1997kW/7.24COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 1997kW/7.24COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 1997kW/7.24COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.18,                    !- Minimum Part Load Ratio
     1.07,                    !- Maximum Part Load Ratio
@@ -21841,6 +21931,7 @@
     0.06814,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PFH 2043kW/8.44COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PFH 2043kW/8.44COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PFH 2043kW/8.44COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.08,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -21930,6 +22021,7 @@
     0.11356,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 2043kW/9.08COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 2043kW/9.08COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 2043kW/9.08COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.28,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -22019,6 +22111,7 @@
     0.09722,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XL 2057kW/6.05COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XL 2057kW/6.05COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XL 2057kW/6.05COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.28,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -22108,6 +22201,7 @@
     0.09464,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 2110kW/7.15COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 2110kW/7.15COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 2110kW/7.15COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -22197,6 +22291,7 @@
     0.07981,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PFH 2124kW/6.03COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PFH 2124kW/6.03COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PFH 2124kW/6.03COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -22286,6 +22381,7 @@
     0.11356,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 2159kW/6.85COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 2159kW/6.85COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 2159kW/6.85COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.14,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -22375,6 +22471,7 @@
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 2184kW/6.78COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 2184kW/6.78COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 2184kW/6.78COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -22464,6 +22561,7 @@
     0.11356,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 2201kW/6.69COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 2201kW/6.69COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 2201kW/6.69COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.14,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -22553,6 +22651,7 @@
     0.1164,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 2233kW/9.54COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -22642,6 +22741,7 @@
     0.11451,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 2233kW/9.54COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 2233kW/9.54COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -22731,6 +22831,7 @@
     0.11356,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 2237kW/6.41COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 2237kW/6.41COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 2237kW/6.41COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.13,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -22820,6 +22921,7 @@
     0.11356,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.13,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -22909,6 +23011,7 @@
     0.11356,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 2275kW/6.32COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 2275kW/6.32COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.13,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -22998,6 +23101,7 @@
     0.09085,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 2300kW/8.10COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 2300kW/8.10COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 2300kW/8.10COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.23,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -23087,6 +23191,7 @@
     0.11356,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 2317kW/6.33COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 2317kW/6.33COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 2317kW/6.33COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -23176,6 +23281,7 @@
     0.0846,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 2391kW/6.77COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 2391kW/6.77COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 2391kW/6.77COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -23265,6 +23371,7 @@
     0.0846,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19XR 2391kW/6.44COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19XR 2391kW/6.44COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 2391kW/6.44COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -23354,6 +23461,7 @@
     0.11356,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 2412kW/5.58COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 2412kW/5.58COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 2412kW/5.58COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.12,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -23443,6 +23551,7 @@
     0.10157,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PFH 2462kW/6.67COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PFH 2462kW/6.67COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PFH 2462kW/6.67COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -23524,9 +23633,12 @@
 ! Unloading Mechanism = Inlet Guide Vanes
 !
 
- Output:PreprocessorMessage,Conversion 7.2 => 8.0,Warning,
-Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.5COP",
- defaults for this object have changed. See InputOutputReference document for details.;
+  Output:PreprocessorMessage,
+    Conversion 7.2 => 8.0,   !- Preprocessor Name
+    Warning,                 !- Error Severity
+    Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.5COP",  !- Message Line 1
+    defaults for this object have changed. See InputOutputReference document for details.;  !- Message Line 2
+
   Chiller:Electric:ReformulatedEIR,
     ReformEIRChiller Trane CVHG670-44&86 2490kW/6.5COP,  !- Name
     2490036,                 !- Reference Capacity {W}
@@ -23537,6 +23649,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.13400,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHG670-44&86 2490kW/6.5COP CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHG670-44&86 2490kW/6.5COP EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHG670-44&86 2490kW/6.5COP EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.087,                   !- Minimum Part Load Ratio
     1.001,                   !- Maximum Part Load Ratio
@@ -23626,6 +23739,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.15142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 2567kW/11.77COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 2567kW/11.77COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 2567kW/11.77COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.11,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -23715,6 +23829,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.15142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 2771kW/6.84COP/VSD CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 2771kW/6.84COP/VSD EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 2771kW/6.84COP/VSD EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -23804,6 +23919,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.13761,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 2799kW/6.40COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 2799kW/6.40COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 2799kW/6.40COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -23893,6 +24009,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.12618,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YT 3133kW/9.16COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YT 3133kW/9.16COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YT 3133kW/9.16COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.07,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -23982,6 +24099,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.13627,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PFH 3165kW/6.48COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PFH 3165kW/6.48COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PFH 3165kW/6.48COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -24071,6 +24189,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.09842,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller McQuay PFH 4020kW/7.35COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller McQuay PFH 4020kW/7.35COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller McQuay PFH 4020kW/7.35COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.14,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -24160,6 +24279,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.24605,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 4396kW/6.63COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 4396kW/6.63COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 4396kW/6.63COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.41,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -24249,6 +24369,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.24605,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 4477kW/6.64COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 4477kW/6.64COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 4477kW/6.64COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.41,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -24338,6 +24459,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.24605,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 4515kW/6.22COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 4515kW/6.22COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 4515kW/6.22COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.40,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -24427,6 +24549,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.24605,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 4537kW/6.28COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 4537kW/6.28COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 4537kW/6.28COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.40,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -24516,6 +24639,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.24757,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 4610kW/6.34COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 4610kW/6.34COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 4610kW/6.34COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -24605,6 +24729,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.24605,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19EX 4667kW/6.16COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19EX 4667kW/6.16COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19EX 4667kW/6.16COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.40,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -24694,6 +24819,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.24605,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CVHF 4677kW/6.27COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CVHF 4677kW/6.27COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CVHF 4677kW/6.27COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.41,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -24783,6 +24909,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.26498,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 4966kW/6.05COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 4966kW/6.05COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 4966kW/6.05COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.12,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -24872,6 +24999,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.26498,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 4969kW/7.14COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 4969kW/7.14COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 4969kW/7.14COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.16,                    !- Minimum Part Load Ratio
     1.07,                    !- Maximum Part Load Ratio
@@ -24961,6 +25089,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.26498,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 4969kW/7.07COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 4969kW/7.07COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 4969kW/7.07COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.16,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -25050,6 +25179,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.24605,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19EX 4997kW/6.40COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19EX 4997kW/6.40COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19EX 4997kW/6.40COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.40,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -25139,6 +25269,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.25526,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19EX 5148kW/6.34COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19EX 5148kW/6.34COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19EX 5148kW/6.34COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -25228,6 +25359,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.26498,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 5170kW/7.15COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 5170kW/7.15COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 5170kW/7.15COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.15,                    !- Minimum Part Load Ratio
     1.07,                    !- Maximum Part Load Ratio
@@ -25317,6 +25449,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.25293,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19EX 5208kW/6.88COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19EX 5208kW/6.88COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19EX 5208kW/6.88COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.04,                    !- Maximum Part Load Ratio
@@ -25406,6 +25539,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.27444,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 5465kW/6.94COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 5465kW/6.94COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 5465kW/6.94COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.14,                    !- Minimum Part Load Ratio
     1.06,                    !- Maximum Part Load Ratio
@@ -25495,6 +25629,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.27444,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YK 5549kW/6.50COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YK 5549kW/6.50COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YK 5549kW/6.50COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.14,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -25584,6 +25719,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.18927,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 19FA 5651kW/5.50COP/Vanes CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 19FA 5651kW/5.50COP/Vanes EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19FA 5651kW/5.50COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.19,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -25673,6 +25809,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.00959,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Multistack MS 172kW/3.67COP/None CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Multistack MS 172kW/3.67COP/None EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Multistack MS 172kW/3.67COP/None EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.40,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -25762,6 +25899,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.02063,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane RTWA 383kW/4.17COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane RTWA 383kW/4.17COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane RTWA 383kW/4.17COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.25,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -25851,6 +25989,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.01577,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane RTHB 531kW/4.83COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane RTHB 531kW/4.83COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane RTHB 531kW/4.83COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.30,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -25940,6 +26079,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.01956,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane RTHB 538kW/5.12COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane RTHB 538kW/5.12COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane RTHB 538kW/5.12COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.30,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -26029,6 +26169,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.01577,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane RTHB 542kW/5.26COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane RTHB 542kW/5.26COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane RTHB 542kW/5.26COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.30,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -26118,6 +26259,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.0241,                  !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YS 672kW/7.90COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YS 672kW/7.90COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YS 672kW/7.90COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -26207,6 +26349,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.03255,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 23XL 686kW/5.91COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 23XL 686kW/5.91COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 23XL 686kW/5.91COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -26296,6 +26439,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.03268,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane RTHC 707kW/7.77COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane RTHC 707kW/7.77COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane RTHC 707kW/7.77COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.28,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -26385,6 +26529,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YS 756kW/7.41COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YS 756kW/7.41COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YS 756kW/7.41COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.11,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -26474,6 +26619,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.03785,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YS 781kW/5.42COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YS 781kW/5.42COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YS 781kW/5.42COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -26563,6 +26709,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.04744,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 23XL 830kW/6.97COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 23XL 830kW/6.97COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 23XL 830kW/6.97COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -26652,6 +26799,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.04296,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 23XL 862kW/6.11COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 23XL 862kW/6.11COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 23XL 862kW/6.11COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -26741,6 +26889,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.04296,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 23XL 862kW/6.84COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 23XL 862kW/6.84COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 23XL 862kW/6.84COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.30,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -26830,6 +26979,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.04366,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 23XL 865kW/6.05COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 23XL 865kW/6.05COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 23XL 865kW/6.05COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.03,                    !- Maximum Part Load Ratio
@@ -26919,6 +27069,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.04732,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YS 879kW/5.82COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YS 879kW/5.82COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YS 879kW/5.82COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -27008,6 +27159,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.04618,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane RTHC 1009kW/5.37COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane RTHC 1009kW/5.37COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane RTHC 1009kW/5.37COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.30,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -27097,6 +27249,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.05659,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane RTHB 1051kW/5.05COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane RTHB 1051kW/5.05COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane RTHB 1051kW/5.05COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -27186,6 +27339,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.05716,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 23XL 1062kW/5.50COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 23XL 1062kW/5.50COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 23XL 1062kW/5.50COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -27275,6 +27429,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.04416,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane RTHC 1066kW/5.73COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane RTHC 1066kW/5.73COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane RTHC 1066kW/5.73COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.30,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -27364,6 +27519,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.04524,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane RTHC 1094kW/6.55COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane RTHC 1094kW/6.55COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane RTHC 1094kW/6.55COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.25,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -27453,6 +27609,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.05142,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 23XL 1108kW/6.92COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 23XL 1108kW/6.92COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 23XL 1108kW/6.92COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -27542,6 +27699,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.05173,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YS 1171kW/9.15COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YS 1171kW/9.15COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YS 1171kW/9.15COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.09,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio
@@ -27631,6 +27789,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.04271,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Carrier 23XL 1196kW/6.39COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Carrier 23XL 1196kW/6.39COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 23XL 1196kW/6.39COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -27720,6 +27879,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.07949,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YS 1554kW/9.31COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YS 1554kW/9.31COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YS 1554kW/9.31COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.10,                    !- Minimum Part Load Ratio
     1.02,                    !- Maximum Part Load Ratio
@@ -27809,6 +27969,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.09464,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller York YS 1758kW/5.84COP/Valve CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller York YS 1758kW/5.84COP/Valve EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller York YS 1758kW/5.84COP/Valve EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.20,                    !- Minimum Part Load Ratio
     1.05,                    !- Maximum Part Load Ratio
@@ -27898,6 +28059,7 @@ Chiller:Electric:ReformulatedEIR="ReformEIRChiller Trane CVHG670-44&86 2490kW/6.
     0.01122,                 !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CGWD 207kW/3.99COP/None CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CGWD 207kW/3.99COP/None EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    LeavingCondenserWaterTemperature,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CGWD 207kW/3.99COP/None EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.25,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio

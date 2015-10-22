@@ -6229,7 +6229,7 @@ namespace WaterThermalTanks {
 		Real64 Eneeded; // Energy change needed over the timestep (J)
 		Real64 Eunmet; // Energy change unmet over the timestep (J)
 		Real64 Efuel; // Energy change for fuel consumed over the timestep (J)
-		int HPWHCondenserConfig; // Condenser configuration of HPWH
+		int HPWHCondenserConfig( 0 ); // Condenser configuration of HPWH
 		bool SetPointRecovered; // Flag to indicate when set point is recovered for the first time
 		static int DummyWaterIndex( 1 );
 

@@ -1,0 +1,23 @@
+3.1.0.027,4.0.0,
+20,20, This number should be the number of report variables in the following list
+View Factor To Outside Shelf,<DELETE>,
+UF UCSD SYS FLOW RATE,<DELETE>,
+UF UCSD POWER IN PLUMES,<DELETE>,
+UF UCSD PLUME POWER FROM WINDOWS,<DELETE>,
+UF UCSD SUPPLY AIR TEMP,<DELETE>,
+CHILLER EVAP EFFECTIVENESS,<DELETE>,
+CHILLER COND EFFECTIVENESS,<DELETE>,
+CHILLER COMP VOLUMETRIC EFFICIENCY,<DELETE>,
+CHILLER COMP VOLUMETRIC FLOW RATE,<DELETE>,
+CHILLER REFRIGERANT MASS FLOW RATE,<DELETE>,
+System Node VolFlowRate,System Node Volume Flow Rate Standard Density,
+Refrigeration System Total Cases Heat Transfer Rate,Refrigeration System Total Cases and Walk-Ins Heat Transfer Rate,
+Damper Position,VAV Terminal Damper Position,
+Cold Air Damper Position,Dual Duct Terminal Cold Air Damper Position,
+Hot Air Damper Position,Dual Duct Terminal Hot Air Damper Position
+Zone Infiltration Volume,Zone Infiltration Volume Current Density
+Zone Ventilation Volume,Zone Ventilation Volume Current Density
+Zone Mechanical Ventilation Total Mass of Outside Air,Zone Mechanical Ventilation Mass
+Zone Mechanical Ventilation Volume Flow Rate,Zone Mechanical Ventilation Volume Flow Rate Standard Density
+Zone Mechanical Ventilation Total Volume of Outside Air,Zone Mechanical Ventilation Volume Standard Density
+old variable name,new variable name -- add variable names (before this line) and leave off units -- <DELETE> to delete

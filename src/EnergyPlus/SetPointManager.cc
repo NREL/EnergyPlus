@@ -254,7 +254,10 @@ namespace SetPointManager {
 
 	bool ManagerOn( false );
 	bool GetInputFlag( true ); // First time, input is "gotten"
-
+	namespace {
+		bool InitSetPointManagersOneTimeFlag( true );
+		bool InitSetPointManagersOneTimeFlag2( true );
+	}
 	// temperature-based flow control manager
 	// Average Cooling Set Pt Mgr
 	// Average Heating Set Pt Mgr
@@ -340,6 +343,8 @@ namespace SetPointManager {
 		ManagerOn = false ;
 		GetInputFlag = true ; // First time, input is "gotten"
 		// Object Data
+		InitSetPointManagersOneTimeFlag = true;
+		InitSetPointManagersOneTimeFlag2 = true;
 		AllSetPtMgr.deallocate(); // Array for all Setpoint Manager data(warnings)
 		SchSetPtMgr.deallocate(); // Array for Scheduled Setpoint Manager data
 		DualSchSetPtMgr.deallocate(); // Dual Scheduled Setpoint Manager data
@@ -3179,9 +3184,9 @@ namespace SetPointManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
+
 		static bool MyEnvrnFlag( true ); // flag for init once at start of environment
-		static bool MyOneTimeFlag2( true );
+
 
 		int SetZoneNum;
 		int ControlledZoneNum;
@@ -3223,7 +3228,7 @@ namespace SetPointManager {
 
 		if ( ZoneEquipInputsFilled && AirLoopInputsFilled ) { // check that the zone equipment and air loop data has been read in
 
-			if ( MyOneTimeFlag ) {
+			if ( InitSetPointManagersOneTimeFlag ) {
 
 				// Minimum humidity setpoint managers
 				cSetPointManagerType = cValidSPMTypes( iSPMType_SZMinHum );
@@ -3362,8 +3367,9 @@ namespace SetPointManager {
 						SingZoneRhSetPtMgr( SetPtMgrNum ).MixedAirNode = MixedAirNode;
 						SingZoneRhSetPtMgr( SetPtMgrNum ).AirLoopNum = AirLoopNum;
 						SingZoneRhSetPtMgr( SetPtMgrNum ).OAInNode = PrimaryAirSystem( AirLoopNum ).OAMixOAInNodeNum;
+						// this next line assumes that OA system is the first thing on the branch, what if there is a relief fan or heat recovery coil or other component in there first? does it matter?
 						SingZoneRhSetPtMgr( SetPtMgrNum ).RetNode = PrimaryAirSystem( AirLoopNum ).OASysInletNodeNum;
-						SingZoneRhSetPtMgr( SetPtMgrNum ).OAInNode = PrimaryAirSystem( AirLoopNum ).OAMixOAInNodeNum;
+
 						SingZoneRhSetPtMgr( SetPtMgrNum ).LoopInNode = LoopInNode;
 					}
 				}
@@ -3786,7 +3792,7 @@ namespace SetPointManager {
 
 			}
 
-			MyOneTimeFlag = false;
+			InitSetPointManagersOneTimeFlag = false;
 
 			if ( ErrorsFound ) {
 				ShowFatalError( "InitSetPointManagers: Errors found in getting SetPointManager input." );
@@ -3794,7 +3800,7 @@ namespace SetPointManager {
 
 		}
 
-		if ( ( BeginEnvrnFlag && MyEnvrnFlag ) || MyOneTimeFlag2 ) {
+		if ( ( BeginEnvrnFlag && MyEnvrnFlag ) || InitSetPointManagersOneTimeFlag2 ) {
 
 			ManagerOn = false;
 
@@ -4214,7 +4220,7 @@ namespace SetPointManager {
 			}
 
 			MyEnvrnFlag = false;
-			if ( ! MyOneTimeFlag ) MyOneTimeFlag2 = false;
+			if ( ! InitSetPointManagersOneTimeFlag ) InitSetPointManagersOneTimeFlag2 = false;
 
 			if ( ErrorsFound ) {
 				ShowFatalError( "InitSetPointManagers: Errors found. Program Terminates." );
@@ -4715,7 +4721,7 @@ namespace SetPointManager {
 		Real64 EnthMixAtMinOA;
 		Real64 HumRatMixAtMinOA;
 		int AirLoopNum;
-		Real64 MinOAFrac;
+		Real64 OAFrac;
 		int LoopInNode;
 		static Real64 ExtrRateNoHC( 0.0 ); // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
 
@@ -4727,7 +4733,7 @@ namespace SetPointManager {
 		RetNode = this->RetNode;
 		OAMixOAInNode = this->OAInNode;
 		AirLoopNum = this->AirLoopNum;
-		MinOAFrac = AirLoopFlow( AirLoopNum ).OAMinFrac;
+		OAFrac = AirLoopFlow( AirLoopNum ).OAFrac; // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
 		ZoneMassFlow = Node( ZoneInletNode ).MassFlowRate;
 		ZoneLoad = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
 		ZoneLoadToCoolSetPt = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP;
@@ -4736,8 +4742,8 @@ namespace SetPointManager {
 		ZoneTemp = Node( ZoneNode ).Temp;
 		LoopInNode = this->LoopInNode;
 		if ( OAMixOAInNode > 0 ) {
-			HumRatMixAtMinOA = ( 1.0 - MinOAFrac ) * Node( RetNode ).HumRat + MinOAFrac * Node( OAMixOAInNode ).HumRat;
-			EnthMixAtMinOA = ( 1.0 - MinOAFrac ) * Node( RetNode ).Enthalpy + MinOAFrac * Node( OAMixOAInNode ).Enthalpy;
+			HumRatMixAtMinOA = ( 1.0 - OAFrac ) * Node( RetNode ).HumRat + OAFrac * Node( OAMixOAInNode ).HumRat;
+			EnthMixAtMinOA = ( 1.0 - OAFrac ) * Node( RetNode ).Enthalpy + OAFrac * Node( OAMixOAInNode ).Enthalpy;
 			TMixAtMinOA = PsyTdbFnHW( EnthMixAtMinOA, HumRatMixAtMinOA );
 		} else {
 			TMixAtMinOA = Node( LoopInNode ).Temp;
@@ -5739,6 +5745,7 @@ namespace SetPointManager {
 		TotSupFlow = Node( MixerOutNode ).MassFlowRate;
 		TempRAB = Node( MixerRABInNode ).Temp;
 		RABFlow = ( TotSupFlow * TempSetPtMod - SupFlow * TempSup ) / max( TempRAB, 1.0 );
+		RABFlow = min( RABFlow, TotSupFlow );
 		RABFlow = max( 0.0, RABFlow );
 		this->FlowSetPt = RABFlow;
 
