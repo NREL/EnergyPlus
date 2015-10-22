@@ -141,7 +141,11 @@ TEST_F( PrintTest, PrintLD_1E_Big )
 {
 	Print( "*" ) << 8.0e-309; // Intel C++ says this underflows
 #ifdef _MSC_VER // Overflow
+#if _MSC_VER < 1900
 	EXPECT_EQ( "  1.#INF00000000000E-309\n", buf.str() );
+#else
+	EXPECT_EQ( "                infE-309\n", buf.str() );
+#endif
 #else
 	EXPECT_EQ( "  8.000000000000000E-309\n", buf.str() );
 #endif

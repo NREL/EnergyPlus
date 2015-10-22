@@ -52,6 +52,8 @@
 ! found in InputOutput Reference. Information for supply fan, and supplementel heating coil needs to be specified by the user for
 ! their specific case. Following the example, only the curve fits of DX cooling and heating coils are provided.
 
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
   AirLoopHVAC:UnitaryHeatPump:AirToAir,
     RooftopPackagedHeatpumpExample,  !- Name
     HVACAvailSched,          !- Availability Schedule Name

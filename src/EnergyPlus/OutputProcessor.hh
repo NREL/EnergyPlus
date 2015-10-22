@@ -137,6 +137,7 @@ namespace OutputProcessor {
 	extern bool ProduceVariableDictionary;
 
 	extern int MaxNumSubcategories;
+	extern bool isFinalYear;
 
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar
@@ -622,6 +623,11 @@ namespace OutputProcessor {
 		int LastSMMaxValDate; // Date stamp of maximum
 		Real64 LastSMMinVal; // Minimum Value (Sim)
 		int LastSMMinValDate; // Date stamp of minimum
+		Real64 FinYrSMValue; // Final Year Simulation Value
+		Real64 FinYrSMMaxVal; // Maximum Value (Sim)
+		int FinYrSMMaxValDate; // Date stamp of maximum
+		Real64 FinYrSMMinVal; // Minimum Value (Sim)
+		int FinYrSMMinValDate; // Date stamp of minimum
 		bool RptAccTS; // Report Cumulative Meter at Time Step
 		bool RptAccTSFO; // Report Cumulative Meter at Time Step -- meter file only
 		bool RptAccHR; // Report Cumulative Meter at Hour
@@ -687,6 +693,11 @@ namespace OutputProcessor {
 			LastSMMaxValDate( 0 ),
 			LastSMMinVal( 99999.0 ),
 			LastSMMinValDate( 0 ),
+			FinYrSMValue( 0.0 ),
+			FinYrSMMaxVal( -99999.0 ),
+			FinYrSMMaxValDate( 0 ),
+			FinYrSMMinVal( 99999.0 ),
+			FinYrSMMinValDate( 0 ),
 			RptAccTS( false ),
 			RptAccTSFO( false ),
 			RptAccHR( false ),
@@ -764,6 +775,11 @@ namespace OutputProcessor {
 			int const LastSMMaxValDate, // Date stamp of maximum
 			Real64 const LastSMMinVal, // Minimum Value (Sim)
 			int const LastSMMinValDate, // Date stamp of minimum
+			Real64 const FinYrSMValue, // Final year Simulation Value
+			Real64 const FinYrSMMaxVal, // Maximum Value (Sim)
+			int const FinYrSMMaxValDate, // Date stamp of maximum
+			Real64 const FinYrSMMinVal, // Minimum Value (Sim)
+			int const FinYrSMMinValDate, // Date stamp of minimum
 			bool const RptAccTS, // Report Cumulative Meter at Time Step
 			bool const RptAccTSFO, // Report Cumulative Meter at Time Step -- meter file only
 			bool const RptAccHR, // Report Cumulative Meter at Hour
@@ -838,6 +854,11 @@ namespace OutputProcessor {
 			LastSMMaxValDate( LastSMMaxValDate ),
 			LastSMMinVal( LastSMMinVal ),
 			LastSMMinValDate( LastSMMinValDate ),
+			FinYrSMValue( FinYrSMValue ),
+			FinYrSMMaxVal( FinYrSMMaxVal ),
+			FinYrSMMaxValDate( FinYrSMMaxValDate ),
+			FinYrSMMinVal( FinYrSMMinVal ),
+			FinYrSMMinValDate( FinYrSMMinValDate ),
 			RptAccTS( RptAccTS ),
 			RptAccTSFO( RptAccTSFO ),
 			RptAccHR( RptAccHR ),
@@ -902,6 +923,11 @@ namespace OutputProcessor {
 	extern Array1D< EndUseCategoryType > EndUseCategory;
 
 	// Functions
+
+	// Clears the global data in OutputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	InitializeOutput();
@@ -1080,6 +1106,9 @@ namespace OutputProcessor {
 	UpdateMeters( int const TimeStamp ); // Current TimeStamp (for max/min)
 
 	void
+	ResetAccumulationWhenWarmupComplete();
+
+	void
 	SetMinMax(
 		Real64 const TestValue, // Candidate new value
 		int const TimeStamp, // TimeStamp to be stored if applicable
@@ -1093,20 +1122,29 @@ namespace OutputProcessor {
 	ReportTSMeters(
 		Real64 const StartMinute, // Start Minute for TimeStep
 		Real64 const EndMinute, // End Minute for TimeStep
-		bool & PrintESOTimeStamp // True if the ESO Time Stamp also needs to be printed
+		bool & PrintESOTimeStamp, // True if the ESO Time Stamp also needs to be printed
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
 	);
 
 	void
-	ReportHRMeters();
+	ReportHRMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	);
 
 	void
-	ReportDYMeters();
+	ReportDYMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	);
 
 	void
-	ReportMNMeters();
+	ReportMNMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	);
 
 	void
-	ReportSMMeters();
+	ReportSMMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	);
 
 	void
 	ReportForTabularReports();
@@ -1428,24 +1466,27 @@ AddToOutputVariableList(
 	std::string const & UnitsString
 );
 
-//     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-//     and The Regents of the University of California through Ernest Orlando Lawrence
-//     Berkeley National Laboratory.  All rights reserved.
-//     Portions of the EnergyPlus software package have been developed and copyrighted
-//     by other individuals, companies and institutions.  These portions have been
-//     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in main.cc.
-//     NOTICE: The U.S. Government is granted for itself and others acting on its
-//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-//     reproduce, prepare derivative works, and perform publicly and display publicly.
-//     Beginning five (5) years after permission to assert copyright is granted,
-//     subject to two possible five year renewals, the U.S. Government is granted for
-//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-//     worldwide license in this data to reproduce, prepare derivative works,
-//     distribute copies to the public, perform publicly and display publicly, and to
-//     permit others to do so.
-//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	//     NOTICE
+
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

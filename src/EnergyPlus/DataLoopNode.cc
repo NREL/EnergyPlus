@@ -88,8 +88,23 @@ namespace DataLoopNode {
 	Array1D< MoreNodeData > MoreNodeInfo;
 	Array1D< MarkedNodeData > MarkedNode;
 
+	// Clears the global data in DataLoopNode.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumOfNodes = 0;
+		NumofSplitters = 0;
+		NumofMixers = 0;
+		NodeID.deallocate();
+		Node.deallocate();
+		DefaultNodeValues = NodeData( 0, 0, 0.0, 0.0, 0.0, SensedNodeFlagValue, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, SensedNodeFlagValue, SensedNodeFlagValue, SensedNodeFlagValue, SensedNodeFlagValue, SensedNodeFlagValue, -1.0, 0.0, false, 0.0, 0.0, false, 0.0, 0.0, 0.0, 0.0, 0.0, false );
+		MoreNodeInfo.deallocate();
+		MarkedNode.deallocate();
+	}
+
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

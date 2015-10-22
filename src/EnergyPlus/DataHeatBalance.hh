@@ -177,8 +177,11 @@ namespace DataHeatBalance {
 	extern int const AirBalanceQuadrature;
 
 	// Parameter for source zone air flow mass balance infiltration treatment
+	extern int const NoInfiltrationFlow;
 	extern int const AddInfiltrationFlow;
 	extern int const AdjustInfiltrationFlow;
+	extern int const MixingSourceZonesOnly;
+	extern int const AllZones;
 
 	extern int const NumZoneIntGainDeviceTypes;
 
@@ -3594,22 +3597,30 @@ namespace DataHeatBalance {
 	{
 		// Members
 		bool EnforceZoneMassBalance;     // flag to enforce zone air mass conservation
+		bool BalanceMixing;              // flag to allow mixing to be adjusted for zone mass balance
 		int InfiltrationTreatment;       // determines how infiltration is treated for zone mass balance
+		int InfiltrationZoneType;        // specifies which types of zones allo infiltration to be changed
 		//Note, unique global object
 
 		// Default Constructor
 		ZoneAirMassFlowConservation() :
 			EnforceZoneMassBalance( false ),
-			InfiltrationTreatment( 0 )
+			BalanceMixing( false ),
+			InfiltrationTreatment( 0 ),
+			InfiltrationZoneType( 0 )
 		{}
 
 		// Member Constructor
 		ZoneAirMassFlowConservation(
-			bool EnforceZoneMassBalance,
-			int InfiltrationTreatment
+			bool const EnforceZoneMassBalance,
+			bool const BalanceMixing,
+			int const InfiltrationTreatment,
+			int const InfiltrationZoneType
 			) :
 			EnforceZoneMassBalance( EnforceZoneMassBalance ),
-			InfiltrationTreatment( InfiltrationTreatment )
+			BalanceMixing( BalanceMixing ),
+			InfiltrationTreatment( InfiltrationTreatment ),
+			InfiltrationZoneType( InfiltrationZoneType )
 		{}
 	};
 
@@ -4706,143 +4717,6 @@ namespace DataHeatBalance {
 			OABalanceFanElec( 0.0 )
 		{}
 
-		// Member Constructor
-		AirReportVars(
-			Real64 const MeanAirTemp, // Mean Air Temperature {C}
-			Real64 const OperativeTemp, // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
-			Real64 const MeanAirHumRat, // Mean Air Humidity Ratio {kg/kg} (averaged over zone time step)
-			Real64 const MeanAirDewPointTemp, // Mean Air Dewpoint Temperature {C}
-			Real64 const ThermOperativeTemp, // Mix or MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}
-			Real64 const InfilHeatGain, // Heat Gain {J} due to infiltration
-			Real64 const InfilHeatLoss, // Heat Loss {J} due to infiltration
-			Real64 const InfilLatentGain, // Latent Gain {J} due to infiltration
-			Real64 const InfilLatentLoss, // Latent Loss {J} due to infiltration
-			Real64 const InfilTotalGain, // Total Gain {J} due to infiltration (sensible+latent)
-			Real64 const InfilTotalLoss, // Total Loss {J} due to infiltration (sensible+latent)
-			Real64 const InfilVolumeCurDensity, // Volume of Air {m3} due to infiltration at current zone air density
-			Real64 const InfilVolumeStdDensity, // Volume of Air {m3} due to infiltration at standard density (adjusted for elevation)
-			Real64 const InfilVdotCurDensity, // Volume flow rate of Air {m3/s} due to infiltration at current zone air density
-			Real64 const InfilVdotStdDensity, // Volume flow rate of Air {m3/s} due to infiltration standard density (adjusted elevation)
-			Real64 const InfilMass, // Mass of Air {kg} due to infiltration
-			Real64 const InfilMdot, // Mass flow rate of Air (kg/s) due to infiltration
-			Real64 const InfilAirChangeRate, // Infiltration air change rate {ach}
-			Real64 const VentilHeatLoss, // Heat Gain {J} due to ventilation
-			Real64 const VentilHeatGain, // Heat Loss {J} due to ventilation
-			Real64 const VentilLatentLoss, // Latent Gain {J} due to ventilation
-			Real64 const VentilLatentGain, // Latent Loss {J} due to ventilation
-			Real64 const VentilTotalLoss, // Total Gain {J} due to ventilation
-			Real64 const VentilTotalGain, // Total Loss {J} due to ventilation
-			Real64 const VentilVolumeCurDensity, // Volume of Air {m3} due to ventilation at current zone air density
-			Real64 const VentilVolumeStdDensity, // Volume of Air {m3} due to ventilation at standard density (adjusted for elevation)
-			Real64 const VentilVdotCurDensity, // Volume flow rate of Air {m3/s} due to ventilation at current zone air density
-			Real64 const VentilVdotStdDensity, // Volume flowr of Air {m3/s} due to ventilation at standard density (adjusted elevation)
-			Real64 const VentilMass, // Mass of Air {kg} due to ventilation
-			Real64 const VentilMdot, // Mass flow rate of Air {kg/s} due to ventilation
-			Real64 const VentilAirChangeRate, // Ventilation air change rate (ach)
-			Real64 const VentilFanElec, // Fan Electricity {W} due to ventilation
-			Real64 const VentilAirTemp, // Air Temp {C} of ventilation
-			Real64 const MixVolume, // Mixing volume of Air {m3}
-			Real64 const MixVdotCurDensity, // Mixing volume flow rate of Air {m3/s} at current zone air density
-			Real64 const MixVdotStdDensity, // Mixing volume flow rate of Air {m3/s} at standard density (adjusted for elevation)
-			Real64 const MixMass, // Mixing mass of air {kg}
-			Real64 const MixMdot, // Mixing mass flow rate of air {kg/s}
-			Real64 const MixHeatLoss, // Heat Gain {J} due to mixing and cross mixing and refrigeration door mixing
-			Real64 const MixHeatGain, // Heat Loss {J} due to mixing and cross mixing and refrigeration door mixing
-			Real64 const MixLatentLoss, // Latent Gain {J} due to mixing and cross mixing and refrigeration door mixing
-			Real64 const MixLatentGain, // Latent Loss {J} due to mixing and cross mixing and refrigeration door mixing
-			Real64 const MixTotalLoss, // Total Gain {J} due to mixing and cross mixing and refrigeration door mixing
-			Real64 const MixTotalGain, // Total Loss {J} due to mixing and cross mixing and refrigeration door mixing
-			Real64 const SumIntGains, // Zone sum of convective internal gains
-			Real64 const SumHADTsurfs, // Zone sum of Hc*Area*(Tsurf - Tz)
-			Real64 const SumMCpDTzones, // zone sum of MassFlowRate*cp*(TremotZone - Tz) transfer air from other zone, Mixing
-			Real64 const SumMCpDtInfil, // Zone sum of MassFlowRate*Cp*(Tout - Tz) transfer from outside, ventil, earth tube
-			Real64 const SumMCpDTsystem, // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
-			Real64 const SumNonAirSystem, // Zone sum of system convective gains, collected via NonAirSystemResponse
-			Real64 const CzdTdt, // Zone air energy storage term.
-			Real64 const imBalance, // put all terms in eq. 5 on RHS , should be zero
-			Real64 const OABalanceHeatLoss, // Heat Gain {J} due to OA air balance
-			Real64 const OABalanceHeatGain, // Heat Loss {J} due to OA air balance
-			Real64 const OABalanceLatentLoss, // Latent Gain {J} due to OA air balance
-			Real64 const OABalanceLatentGain, // Latent Loss {J} due to OA air balance
-			Real64 const OABalanceTotalLoss, // Total Gain {J} due to OA air balance
-			Real64 const OABalanceTotalGain, // Total Loss {J} due to OA air balance
-			Real64 const OABalanceVolumeCurDensity, // Volume of Air {m3} due to OA air balance
-			Real64 const OABalanceVolumeStdDensity, // Volume of Air {m3} due to OA air balance
-			Real64 const OABalanceVdotCurDensity, // Volume flow rate of Air {m3/s} due to OA air balance
-			Real64 const OABalanceVdotStdDensity, // Volume flow rate of Air {m3/s} due to OA air balance
-			Real64 const OABalanceMass, // Mass of Air {kg} due to OA air balance
-			Real64 const OABalanceMdot, // Mass flow rate of Air {kg/s} due to OA air balance
-			Real64 const OABalanceAirChangeRate, // OA air balance air change rate (ach)
-			Real64 const OABalanceFanElec // Fan Electricity {W} due to OA air balance
-		) :
-			MeanAirTemp( MeanAirTemp ),
-			OperativeTemp( OperativeTemp ),
-			MeanAirHumRat( MeanAirHumRat ),
-			MeanAirDewPointTemp( MeanAirDewPointTemp ),
-			ThermOperativeTemp( ThermOperativeTemp ),
-			InfilHeatGain( InfilHeatGain ),
-			InfilHeatLoss( InfilHeatLoss ),
-			InfilLatentGain( InfilLatentGain ),
-			InfilLatentLoss( InfilLatentLoss ),
-			InfilTotalGain( InfilTotalGain ),
-			InfilTotalLoss( InfilTotalLoss ),
-			InfilVolumeCurDensity( InfilVolumeCurDensity ),
-			InfilVolumeStdDensity( InfilVolumeStdDensity ),
-			InfilVdotCurDensity( InfilVdotCurDensity ),
-			InfilVdotStdDensity( InfilVdotStdDensity ),
-			InfilMass( InfilMass ),
-			InfilMdot( InfilMdot ),
-			InfilAirChangeRate( InfilAirChangeRate ),
-			VentilHeatLoss( VentilHeatLoss ),
-			VentilHeatGain( VentilHeatGain ),
-			VentilLatentLoss( VentilLatentLoss ),
-			VentilLatentGain( VentilLatentGain ),
-			VentilTotalLoss( VentilTotalLoss ),
-			VentilTotalGain( VentilTotalGain ),
-			VentilVolumeCurDensity( VentilVolumeCurDensity ),
-			VentilVolumeStdDensity( VentilVolumeStdDensity ),
-			VentilVdotCurDensity( VentilVdotCurDensity ),
-			VentilVdotStdDensity( VentilVdotStdDensity ),
-			VentilMass( VentilMass ),
-			VentilMdot( VentilMdot ),
-			VentilAirChangeRate( VentilAirChangeRate ),
-			VentilFanElec( VentilFanElec ),
-			VentilAirTemp( VentilAirTemp ),
-			MixVolume( MixVolume ),
-			MixVdotCurDensity( MixVdotCurDensity ),
-			MixVdotStdDensity( MixVdotStdDensity ),
-			MixMass( MixMass ),
-			MixMdot( MixMdot ),
-			MixHeatLoss( MixHeatLoss ),
-			MixHeatGain( MixHeatGain ),
-			MixLatentLoss( MixLatentLoss ),
-			MixLatentGain( MixLatentGain ),
-			MixTotalLoss( MixTotalLoss ),
-			MixTotalGain( MixTotalGain ),
-			SumIntGains( SumIntGains ),
-			SumHADTsurfs( SumHADTsurfs ),
-			SumMCpDTzones( SumMCpDTzones ),
-			SumMCpDtInfil( SumMCpDtInfil ),
-			SumMCpDTsystem( SumMCpDTsystem ),
-			SumNonAirSystem( SumNonAirSystem ),
-			CzdTdt( CzdTdt ),
-			imBalance( imBalance ),
-			OABalanceHeatLoss( OABalanceHeatLoss ),
-			OABalanceHeatGain( OABalanceHeatGain ),
-			OABalanceLatentLoss( OABalanceLatentLoss ),
-			OABalanceLatentGain( OABalanceLatentGain ),
-			OABalanceTotalLoss( OABalanceTotalLoss ),
-			OABalanceTotalGain( OABalanceTotalGain ),
-			OABalanceVolumeCurDensity( OABalanceVolumeCurDensity ),
-			OABalanceVolumeStdDensity( OABalanceVolumeStdDensity ),
-			OABalanceVdotCurDensity( OABalanceVdotCurDensity ),
-			OABalanceVdotStdDensity( OABalanceVdotStdDensity ),
-			OABalanceMass( OABalanceMass ),
-			OABalanceMdot( OABalanceMdot ),
-			OABalanceAirChangeRate( OABalanceAirChangeRate ),
-			OABalanceFanElec( OABalanceFanElec )
-		{}
-
 	};
 
 	struct ZonePreDefRepType
@@ -4866,6 +4740,8 @@ namespace DataHeatBalance {
 		//annual
 		Real64 SHGSAnHvacHt; // hvac air heating
 		Real64 SHGSAnHvacCl; // hvac air cooling
+		Real64 SHGSAnHvacATUHt; // heating by Air Terminal Unit [J]
+		Real64 SHGSAnHvacATUCl; // coolinging by Air Terminal Unit [J]
 		Real64 SHGSAnSurfHt; // heated surface heating
 		Real64 SHGSAnSurfCl; // cooled surface cooling
 		Real64 SHGSAnPeoplAdd; // people additions
@@ -4885,6 +4761,8 @@ namespace DataHeatBalance {
 		Real64 clPeak; // cooling peak value (hvac air cooling + cooled surface)
 		Real64 SHGSClHvacHt; // hvac air heating
 		Real64 SHGSClHvacCl; // hvac air cooling
+		Real64 SHGSClHvacATUHt; // heating by air terminal unit at cool peak [W]
+		Real64 SHGSClHvacATUCl; // cooling by air terminal unit at cool peak [W]
 		Real64 SHGSClSurfHt; // heated surface heating
 		Real64 SHGSClSurfCl; // cooled surface cooling
 		Real64 SHGSClPeoplAdd; // people additions
@@ -4904,6 +4782,8 @@ namespace DataHeatBalance {
 		Real64 htPeak; // heating peak value (hvac air heating + heated surface)
 		Real64 SHGSHtHvacHt; // hvac air heating
 		Real64 SHGSHtHvacCl; // hvac air cooling
+		Real64 SHGSHtHvacATUHt; // heating by air terminal unit at heat peak [W]
+		Real64 SHGSHtHvacATUCl; // cooling by air terminal unit at heat peak [W]
 		Real64 SHGSHtSurfHt; // heated surface heating
 		Real64 SHGSHtSurfCl; // cooled surface cooling
 		Real64 SHGSHtPeoplAdd; // people additions
@@ -4935,6 +4815,8 @@ namespace DataHeatBalance {
 			SimpVentVolMin( 9.9e9 ),
 			SHGSAnHvacHt( 0.0 ),
 			SHGSAnHvacCl( 0.0 ),
+			SHGSAnHvacATUHt( 0.0 ),
+			SHGSAnHvacATUCl( 0.0 ),
 			SHGSAnSurfHt( 0.0 ),
 			SHGSAnSurfCl( 0.0 ),
 			SHGSAnPeoplAdd( 0.0 ),
@@ -4953,6 +4835,8 @@ namespace DataHeatBalance {
 			clPeak( 0.0 ),
 			SHGSClHvacHt( 0.0 ),
 			SHGSClHvacCl( 0.0 ),
+			SHGSClHvacATUHt( 0.0 ),
+			SHGSClHvacATUCl( 0.0 ),
 			SHGSClSurfHt( 0.0 ),
 			SHGSClSurfCl( 0.0 ),
 			SHGSClPeoplAdd( 0.0 ),
@@ -4971,6 +4855,8 @@ namespace DataHeatBalance {
 			htPeak( 0.0 ),
 			SHGSHtHvacHt( 0.0 ),
 			SHGSHtHvacCl( 0.0 ),
+			SHGSHtHvacATUHt( 0.0 ),
+			SHGSHtHvacATUCl( 0.0 ),
 			SHGSHtSurfHt( 0.0 ),
 			SHGSHtSurfCl( 0.0 ),
 			SHGSHtPeoplAdd( 0.0 ),
@@ -4985,139 +4871,6 @@ namespace DataHeatBalance {
 			SHGSHtIzaRem( 0.0 ),
 			SHGSHtInfilRem( 0.0 ),
 			SHGSHtOtherRem( 0.0 )
-		{}
-
-		// Member Constructor
-		ZonePreDefRepType(
-			bool const isOccupied, // occupied during the current time step
-			Real64 const NumOccAccum, // number of occupants accumulating for entire simulation
-			Real64 const NumOccAccumTime, // time that the number of occupants is accumulating to compute average
-			Real64 const TotTimeOcc, // time occuped (and the mechnical ventilation volume is accumulating)
-			Real64 const MechVentVolTotal, // volume for mechnical ventilation of outside air for entire simulation
-			Real64 const MechVentVolMin, // a large number since finding minimum volume
-			Real64 const InfilVolTotal, // volume for infiltration of outside air for entire simulation
-			Real64 const InfilVolMin, // a large number since finding minimum volume
-			Real64 const AFNInfilVolTotal, // volume for infiltration of outside air for entire simulation
-			Real64 const AFNInfilVolMin, // a large number since finding minimum volume
-			Real64 const SimpVentVolTotal, // volume for simple 'ZoneVentilation' of outside air for entire simulation
-			Real64 const SimpVentVolMin, // a large number since finding minimum volume
-			Real64 const SHGSAnHvacHt, // hvac air heating
-			Real64 const SHGSAnHvacCl, // hvac air cooling
-			Real64 const SHGSAnSurfHt, // heated surface heating
-			Real64 const SHGSAnSurfCl, // cooled surface cooling
-			Real64 const SHGSAnPeoplAdd, // people additions
-			Real64 const SHGSAnLiteAdd, // lighing addition
-			Real64 const SHGSAnEquipAdd, // equipment addition
-			Real64 const SHGSAnWindAdd, // window addition
-			Real64 const SHGSAnIzaAdd, // inter zone air addition
-			Real64 const SHGSAnInfilAdd, // infiltration addition
-			Real64 const SHGSAnOtherAdd, // opaque surface and other addition
-			Real64 const SHGSAnEquipRem, // equipment removal
-			Real64 const SHGSAnWindRem, // window removal
-			Real64 const SHGSAnIzaRem, // inter-zone air removal
-			Real64 const SHGSAnInfilRem, // infiltration removal
-			Real64 const SHGSAnOtherRem, // opaque surface and other removal
-			int const clPtTimeStamp, // timestamp for the cooling peak
-			Real64 const clPeak, // cooling peak value (hvac air cooling + cooled surface)
-			Real64 const SHGSClHvacHt, // hvac air heating
-			Real64 const SHGSClHvacCl, // hvac air cooling
-			Real64 const SHGSClSurfHt, // heated surface heating
-			Real64 const SHGSClSurfCl, // cooled surface cooling
-			Real64 const SHGSClPeoplAdd, // people additions
-			Real64 const SHGSClLiteAdd, // lighing addition
-			Real64 const SHGSClEquipAdd, // equipment addition
-			Real64 const SHGSClWindAdd, // window addition
-			Real64 const SHGSClIzaAdd, // inter zone air addition
-			Real64 const SHGSClInfilAdd, // infiltration addition
-			Real64 const SHGSClOtherAdd, // opaque surface and other addition
-			Real64 const SHGSClEquipRem, // equipment removal
-			Real64 const SHGSClWindRem, // window removal
-			Real64 const SHGSClIzaRem, // inter-zone air removal
-			Real64 const SHGSClInfilRem, // infiltration removal
-			Real64 const SHGSClOtherRem, // opaque surface and other removal
-			int const htPtTimeStamp, // timestamp for the heating peak
-			Real64 const htPeak, // heating peak value (hvac air heating + heated surface)
-			Real64 const SHGSHtHvacHt, // hvac air heating
-			Real64 const SHGSHtHvacCl, // hvac air cooling
-			Real64 const SHGSHtSurfHt, // heated surface heating
-			Real64 const SHGSHtSurfCl, // cooled surface cooling
-			Real64 const SHGSHtPeoplAdd, // people additions
-			Real64 const SHGSHtLiteAdd, // lighing addition
-			Real64 const SHGSHtEquipAdd, // equipment addition
-			Real64 const SHGSHtWindAdd, // window addition
-			Real64 const SHGSHtIzaAdd, // inter zone air addition
-			Real64 const SHGSHtInfilAdd, // infiltration addition
-			Real64 const SHGSHtOtherAdd, // opaque surface and other addition
-			Real64 const SHGSHtEquipRem, // equipment removal
-			Real64 const SHGSHtWindRem, // window removal
-			Real64 const SHGSHtIzaRem, // inter-zone air removal
-			Real64 const SHGSHtInfilRem, // infiltration removal
-			Real64 const SHGSHtOtherRem // opaque surface and other removal
-		) :
-			isOccupied( isOccupied ),
-			NumOccAccum( NumOccAccum ),
-			NumOccAccumTime( NumOccAccumTime ),
-			TotTimeOcc( TotTimeOcc ),
-			MechVentVolTotal( MechVentVolTotal ),
-			MechVentVolMin( MechVentVolMin ),
-			InfilVolTotal( InfilVolTotal ),
-			InfilVolMin( InfilVolMin ),
-			AFNInfilVolTotal( AFNInfilVolTotal ),
-			AFNInfilVolMin( AFNInfilVolMin ),
-			SimpVentVolTotal( SimpVentVolTotal ),
-			SimpVentVolMin( SimpVentVolMin ),
-			SHGSAnHvacHt( SHGSAnHvacHt ),
-			SHGSAnHvacCl( SHGSAnHvacCl ),
-			SHGSAnSurfHt( SHGSAnSurfHt ),
-			SHGSAnSurfCl( SHGSAnSurfCl ),
-			SHGSAnPeoplAdd( SHGSAnPeoplAdd ),
-			SHGSAnLiteAdd( SHGSAnLiteAdd ),
-			SHGSAnEquipAdd( SHGSAnEquipAdd ),
-			SHGSAnWindAdd( SHGSAnWindAdd ),
-			SHGSAnIzaAdd( SHGSAnIzaAdd ),
-			SHGSAnInfilAdd( SHGSAnInfilAdd ),
-			SHGSAnOtherAdd( SHGSAnOtherAdd ),
-			SHGSAnEquipRem( SHGSAnEquipRem ),
-			SHGSAnWindRem( SHGSAnWindRem ),
-			SHGSAnIzaRem( SHGSAnIzaRem ),
-			SHGSAnInfilRem( SHGSAnInfilRem ),
-			SHGSAnOtherRem( SHGSAnOtherRem ),
-			clPtTimeStamp( clPtTimeStamp ),
-			clPeak( clPeak ),
-			SHGSClHvacHt( SHGSClHvacHt ),
-			SHGSClHvacCl( SHGSClHvacCl ),
-			SHGSClSurfHt( SHGSClSurfHt ),
-			SHGSClSurfCl( SHGSClSurfCl ),
-			SHGSClPeoplAdd( SHGSClPeoplAdd ),
-			SHGSClLiteAdd( SHGSClLiteAdd ),
-			SHGSClEquipAdd( SHGSClEquipAdd ),
-			SHGSClWindAdd( SHGSClWindAdd ),
-			SHGSClIzaAdd( SHGSClIzaAdd ),
-			SHGSClInfilAdd( SHGSClInfilAdd ),
-			SHGSClOtherAdd( SHGSClOtherAdd ),
-			SHGSClEquipRem( SHGSClEquipRem ),
-			SHGSClWindRem( SHGSClWindRem ),
-			SHGSClIzaRem( SHGSClIzaRem ),
-			SHGSClInfilRem( SHGSClInfilRem ),
-			SHGSClOtherRem( SHGSClOtherRem ),
-			htPtTimeStamp( htPtTimeStamp ),
-			htPeak( htPeak ),
-			SHGSHtHvacHt( SHGSHtHvacHt ),
-			SHGSHtHvacCl( SHGSHtHvacCl ),
-			SHGSHtSurfHt( SHGSHtSurfHt ),
-			SHGSHtSurfCl( SHGSHtSurfCl ),
-			SHGSHtPeoplAdd( SHGSHtPeoplAdd ),
-			SHGSHtLiteAdd( SHGSHtLiteAdd ),
-			SHGSHtEquipAdd( SHGSHtEquipAdd ),
-			SHGSHtWindAdd( SHGSHtWindAdd ),
-			SHGSHtIzaAdd( SHGSHtIzaAdd ),
-			SHGSHtInfilAdd( SHGSHtInfilAdd ),
-			SHGSHtOtherAdd( SHGSHtOtherAdd ),
-			SHGSHtEquipRem( SHGSHtEquipRem ),
-			SHGSHtWindRem( SHGSHtWindRem ),
-			SHGSHtIzaRem( SHGSHtIzaRem ),
-			SHGSHtInfilRem( SHGSHtInfilRem ),
-			SHGSHtOtherRem( SHGSHtOtherRem )
 		{}
 
 	};
@@ -5391,261 +5144,6 @@ namespace DataHeatBalance {
 			GCRate( 0.0 )
 		{}
 
-		// Member Constructor
-		ZoneReportVars(
-			Real64 const PeopleRadGain,
-			Real64 const PeopleConGain,
-			Real64 const PeopleSenGain,
-			Real64 const PeopleNumOcc,
-			Real64 const PeopleLatGain,
-			Real64 const PeopleTotGain,
-			Real64 const PeopleRadGainRate,
-			Real64 const PeopleConGainRate,
-			Real64 const PeopleSenGainRate,
-			Real64 const PeopleLatGainRate,
-			Real64 const PeopleTotGainRate,
-			Real64 const LtsPower,
-			Real64 const LtsElecConsump,
-			Real64 const LtsRadGain,
-			Real64 const LtsVisGain,
-			Real64 const LtsConGain,
-			Real64 const LtsRetAirGain,
-			Real64 const LtsTotGain,
-			Real64 const LtsRadGainRate,
-			Real64 const LtsVisGainRate,
-			Real64 const LtsConGainRate,
-			Real64 const LtsRetAirGainRate,
-			Real64 const LtsTotGainRate,
-			Real64 const BaseHeatPower,
-			Real64 const BaseHeatElecCons,
-			Real64 const BaseHeatRadGain,
-			Real64 const BaseHeatConGain,
-			Real64 const BaseHeatTotGain,
-			Real64 const BaseHeatRadGainRate,
-			Real64 const BaseHeatConGainRate,
-			Real64 const BaseHeatTotGainRate,
-			Real64 const ElecPower,
-			Real64 const ElecConsump,
-			Real64 const ElecRadGain,
-			Real64 const ElecConGain,
-			Real64 const ElecLatGain,
-			Real64 const ElecLost,
-			Real64 const ElecTotGain,
-			Real64 const ElecRadGainRate,
-			Real64 const ElecConGainRate,
-			Real64 const ElecLatGainRate,
-			Real64 const ElecLostRate,
-			Real64 const ElecTotGainRate,
-			Real64 const GasPower,
-			Real64 const GasConsump,
-			Real64 const GasRadGain,
-			Real64 const GasConGain,
-			Real64 const GasLatGain,
-			Real64 const GasLost,
-			Real64 const GasTotGain,
-			Real64 const GasRadGainRate,
-			Real64 const GasConGainRate,
-			Real64 const GasLatGainRate,
-			Real64 const GasLostRate,
-			Real64 const GasTotGainRate,
-			Real64 const HWPower,
-			Real64 const HWConsump,
-			Real64 const HWRadGain,
-			Real64 const HWConGain,
-			Real64 const HWLatGain,
-			Real64 const HWLost,
-			Real64 const HWTotGain,
-			Real64 const HWRadGainRate,
-			Real64 const HWConGainRate,
-			Real64 const HWLatGainRate,
-			Real64 const HWLostRate,
-			Real64 const HWTotGainRate,
-			Real64 const SteamPower,
-			Real64 const SteamConsump,
-			Real64 const SteamRadGain,
-			Real64 const SteamConGain,
-			Real64 const SteamLatGain,
-			Real64 const SteamLost,
-			Real64 const SteamTotGain,
-			Real64 const SteamRadGainRate,
-			Real64 const SteamConGainRate,
-			Real64 const SteamLatGainRate,
-			Real64 const SteamLostRate,
-			Real64 const SteamTotGainRate,
-			Real64 const OtherRadGain,
-			Real64 const OtherConGain,
-			Real64 const OtherLatGain,
-			Real64 const OtherLost,
-			Real64 const OtherTotGain,
-			Real64 const OtherRadGainRate,
-			Real64 const OtherConGainRate,
-			Real64 const OtherLatGainRate,
-			Real64 const OtherLostRate,
-			Real64 const OtherTotGainRate,
-			Real64 const ITEqCPUPower, // Zone ITE CPU Electric Power [W]
-			Real64 const ITEqFanPower, // Zone ITE Fan Electric Power [W]
-			Real64 const ITEqUPSPower, // Zone ITE UPS Electric Power [W]
-			Real64 const ITEqCPUPowerAtDesign, // Zone ITE CPU Electric Power at Design Inlet Conditions [W]
-			Real64 const ITEqFanPowerAtDesign, // Zone ITE Fan Electric Power at Design Inlet Conditions [W]
-			Real64 const ITEqUPSGainRateToZone, // Zone ITE UPS Heat Gain toZone Rate [W] - convective gain
-			Real64 const ITEqConGainRateToZone, // Zone ITE Total Heat Gain toZone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
-			Real64 const ITEqCPUConsumption, // Zone ITE CPU Electric Energy [J]
-			Real64 const ITEqFanConsumption, // Zone ITE Fan Electric Energy [J]
-			Real64 const ITEqUPSConsumption, // Zone ITE UPS Electric Energy [J]
-			Real64 const ITEqCPUEnergyAtDesign, // Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
-			Real64 const ITEqFanEnergyAtDesign, // Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
-			Real64 const ITEqUPSGainEnergyToZone, // Zone ITE UPS Heat Gain toZone Energy [J] - convective gain
-			Real64 const ITEqConGainEnergyToZone, // Zone ITE Total Heat Gain toZone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
-			Real64 const ITEqAirVolFlowStdDensity, // Zone Air volume flow rate at standard density [m3/s]
-			Real64 const ITEqAirMassFlow, // Zone Air mass flow rate [kg/s]
-			Real64 const ITEqSHI, // Zone Supply Heat Index []
-			Real64 const ITEqTimeOutOfOperRange, // Zone ITE Air Inlet Operating Range Exceeded Time [hr]
-			Real64 const ITEqTimeAboveDryBulbT, // Zone ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
-			Real64 const ITEqTimeBelowDryBulbT, // Zone ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
-			Real64 const ITEqTimeAboveDewpointT, // Zone ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
-			Real64 const ITEqTimeBelowDewpointT, // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
-			Real64 const ITEqTimeAboveRH, // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
-			Real64 const ITEqTimeBelowRH, // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
-			Real64 const TotRadiantGain,
-			Real64 const TotVisHeatGain,
-			Real64 const TotConvectiveGain,
-			Real64 const TotLatentGain,
-			Real64 const TotTotalHeatGain,
-			Real64 const TotRadiantGainRate,
-			Real64 const TotVisHeatGainRate,
-			Real64 const TotConvectiveGainRate,
-			Real64 const TotLatentGainRate,
-			Real64 const TotTotalHeatGainRate,
-			Real64 const CO2Rate,
-			Real64 const GCRate
-		) :
-			PeopleRadGain( PeopleRadGain ),
-			PeopleConGain( PeopleConGain ),
-			PeopleSenGain( PeopleSenGain ),
-			PeopleNumOcc( PeopleNumOcc ),
-			PeopleLatGain( PeopleLatGain ),
-			PeopleTotGain( PeopleTotGain ),
-			PeopleRadGainRate( PeopleRadGainRate ),
-			PeopleConGainRate( PeopleConGainRate ),
-			PeopleSenGainRate( PeopleSenGainRate ),
-			PeopleLatGainRate( PeopleLatGainRate ),
-			PeopleTotGainRate( PeopleTotGainRate ),
-			LtsPower( LtsPower ),
-			LtsElecConsump( LtsElecConsump ),
-			LtsRadGain( LtsRadGain ),
-			LtsVisGain( LtsVisGain ),
-			LtsConGain( LtsConGain ),
-			LtsRetAirGain( LtsRetAirGain ),
-			LtsTotGain( LtsTotGain ),
-			LtsRadGainRate( LtsRadGainRate ),
-			LtsVisGainRate( LtsVisGainRate ),
-			LtsConGainRate( LtsConGainRate ),
-			LtsRetAirGainRate( LtsRetAirGainRate ),
-			LtsTotGainRate( LtsTotGainRate ),
-			BaseHeatPower( BaseHeatPower ),
-			BaseHeatElecCons( BaseHeatElecCons ),
-			BaseHeatRadGain( BaseHeatRadGain ),
-			BaseHeatConGain( BaseHeatConGain ),
-			BaseHeatTotGain( BaseHeatTotGain ),
-			BaseHeatRadGainRate( BaseHeatRadGainRate ),
-			BaseHeatConGainRate( BaseHeatConGainRate ),
-			BaseHeatTotGainRate( BaseHeatTotGainRate ),
-			ElecPower( ElecPower ),
-			ElecConsump( ElecConsump ),
-			ElecRadGain( ElecRadGain ),
-			ElecConGain( ElecConGain ),
-			ElecLatGain( ElecLatGain ),
-			ElecLost( ElecLost ),
-			ElecTotGain( ElecTotGain ),
-			ElecRadGainRate( ElecRadGainRate ),
-			ElecConGainRate( ElecConGainRate ),
-			ElecLatGainRate( ElecLatGainRate ),
-			ElecLostRate( ElecLostRate ),
-			ElecTotGainRate( ElecTotGainRate ),
-			GasPower( GasPower ),
-			GasConsump( GasConsump ),
-			GasRadGain( GasRadGain ),
-			GasConGain( GasConGain ),
-			GasLatGain( GasLatGain ),
-			GasLost( GasLost ),
-			GasTotGain( GasTotGain ),
-			GasRadGainRate( GasRadGainRate ),
-			GasConGainRate( GasConGainRate ),
-			GasLatGainRate( GasLatGainRate ),
-			GasLostRate( GasLostRate ),
-			GasTotGainRate( GasTotGainRate ),
-			HWPower( HWPower ),
-			HWConsump( HWConsump ),
-			HWRadGain( HWRadGain ),
-			HWConGain( HWConGain ),
-			HWLatGain( HWLatGain ),
-			HWLost( HWLost ),
-			HWTotGain( HWTotGain ),
-			HWRadGainRate( HWRadGainRate ),
-			HWConGainRate( HWConGainRate ),
-			HWLatGainRate( HWLatGainRate ),
-			HWLostRate( HWLostRate ),
-			HWTotGainRate( HWTotGainRate ),
-			SteamPower( SteamPower ),
-			SteamConsump( SteamConsump ),
-			SteamRadGain( SteamRadGain ),
-			SteamConGain( SteamConGain ),
-			SteamLatGain( SteamLatGain ),
-			SteamLost( SteamLost ),
-			SteamTotGain( SteamTotGain ),
-			SteamRadGainRate( SteamRadGainRate ),
-			SteamConGainRate( SteamConGainRate ),
-			SteamLatGainRate( SteamLatGainRate ),
-			SteamLostRate( SteamLostRate ),
-			SteamTotGainRate( SteamTotGainRate ),
-			OtherRadGain( OtherRadGain ),
-			OtherConGain( OtherConGain ),
-			OtherLatGain( OtherLatGain ),
-			OtherLost( OtherLost ),
-			OtherTotGain( OtherTotGain ),
-			OtherRadGainRate( OtherRadGainRate ),
-			OtherConGainRate( OtherConGainRate ),
-			OtherLatGainRate( OtherLatGainRate ),
-			OtherLostRate( OtherLostRate ),
-			OtherTotGainRate( OtherTotGainRate ),
-			ITEqCPUPower( ITEqCPUPower ),
-			ITEqFanPower( ITEqFanPower ),
-			ITEqUPSPower( ITEqUPSPower ),
-			ITEqCPUPowerAtDesign( ITEqCPUPowerAtDesign ),
-			ITEqFanPowerAtDesign( ITEqFanPowerAtDesign ),
-			ITEqUPSGainRateToZone( ITEqUPSGainRateToZone ),
-			ITEqConGainRateToZone( ITEqConGainRateToZone ),
-			ITEqCPUConsumption( ITEqCPUConsumption ),
-			ITEqFanConsumption( ITEqFanConsumption ),
-			ITEqUPSConsumption( ITEqUPSConsumption ),
-			ITEqCPUEnergyAtDesign( ITEqCPUEnergyAtDesign ),
-			ITEqFanEnergyAtDesign( ITEqFanEnergyAtDesign ),
-			ITEqUPSGainEnergyToZone( ITEqUPSGainEnergyToZone ),
-			ITEqConGainEnergyToZone( ITEqConGainEnergyToZone ),
-			ITEqAirVolFlowStdDensity( ITEqAirVolFlowStdDensity ),
-			ITEqAirMassFlow( ITEqAirMassFlow ),
-			ITEqSHI( ITEqSHI ),
-			ITEqTimeOutOfOperRange( ITEqTimeOutOfOperRange ),
-			ITEqTimeAboveDryBulbT( ITEqTimeAboveDryBulbT ),
-			ITEqTimeBelowDryBulbT( ITEqTimeBelowDryBulbT ),
-			ITEqTimeAboveDewpointT( ITEqTimeAboveDewpointT ),
-			ITEqTimeBelowDewpointT( ITEqTimeBelowDewpointT ),
-			ITEqTimeAboveRH( ITEqTimeAboveRH ),
-			ITEqTimeBelowRH( ITEqTimeBelowRH ),
-			TotRadiantGain( TotRadiantGain ),
-			TotVisHeatGain( TotVisHeatGain ),
-			TotConvectiveGain( TotConvectiveGain ),
-			TotLatentGain( TotLatentGain ),
-			TotTotalHeatGain( TotTotalHeatGain ),
-			TotRadiantGainRate( TotRadiantGainRate ),
-			TotVisHeatGainRate( TotVisHeatGainRate ),
-			TotConvectiveGainRate( TotConvectiveGainRate ),
-			TotLatentGainRate( TotLatentGainRate ),
-			TotTotalHeatGainRate( TotTotalHeatGainRate ),
-			CO2Rate( CO2Rate ),
-			GCRate( GCRate )
-		{}
-
 	};
 
 	// Object Data
@@ -5703,6 +5201,11 @@ namespace DataHeatBalance {
 
 	// Functions
 
+	// Clears the global data in DataHeatBalance.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	CheckAndSetConstructionProperties(
 		int const ConstrNum, // Construction number to be set/checked
@@ -5741,7 +5244,7 @@ namespace DataHeatBalance {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

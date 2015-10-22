@@ -863,6 +863,12 @@ namespace OutputReportTabular {
 	void
 	WriteBEPSTable();
 
+	std::string
+	ResourceWarningMessage(std::string resource);
+
+	Real64
+	WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
+
 	void
 	WriteSourceEnergyEndUseSummary();
 
@@ -957,6 +963,42 @@ namespace OutputReportTabular {
 
 	void
 	DetermineBuildingFloorArea();
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	//    ROUTINES TO RESET GATHERED VALUES TO ZERO
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	void
+	ResetTabularReports();
+
+	void
+	ResetMonthlyGathering();
+
+	void
+	ResetBinGathering();
+
+	void
+	ResetBEPSGathering();
+
+	void
+	ResetSourceEnergyEndUseGathering();
+
+	void
+	ResetPeakDemandGathering();
+
+	void
+	ResetHeatGainGathering();
+
+	void
+	ResetRemainingPredefinedEntries();
+
+	void
+	ResetAdaptiveComfort();
+
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -1074,7 +1116,7 @@ namespace OutputReportTabular {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of
 	//     Berkeley National Laboratory.  All rights reserved.
 

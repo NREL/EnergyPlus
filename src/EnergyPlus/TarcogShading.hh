@@ -16,38 +16,38 @@ namespace TarcogShading {
 
 	void
 	shading(
-		Array1A< Real64 > const theta,
-		Array1A< Real64 > const gap,
-		Array1A< Real64 > hgas,
-		Array1A< Real64 > hcgas,
-		Array1A< Real64 > hrgas,
-		Array2A< Real64 > const frct,
-		Array2A_int const iprop,
-		Array1A< Real64 > const pressure,
-		Array1A_int const nmix,
-		Array1A< Real64 > const xwght,
-		Array2A< Real64 > const xgcon,
-		Array2A< Real64 > const xgvis,
-		Array2A< Real64 > const xgcp,
+		Array1< Real64 > const & theta,
+		Array1< Real64 > const & gap,
+		Array1< Real64 > & hgas,
+		Array1< Real64 > & hcgas,
+		Array1< Real64 > & hrgas,
+		Array2< Real64 > const & frct,
+		Array2_int const & iprop,
+		Array1< Real64 > const & pressure,
+		Array1_int const & nmix,
+		Array1< Real64 > const & xwght,
+		Array2< Real64 > const & xgcon,
+		Array2< Real64 > const & xgvis,
+		Array2< Real64 > const & xgcp,
 		int const nlayer,
 		Real64 const width,
 		Real64 const height,
 		Real64 const angle,
 		Real64 const Tout,
 		Real64 const Tin,
-		Array1A< Real64 > const Atop,
-		Array1A< Real64 > const Abot,
-		Array1A< Real64 > const Al,
-		Array1A< Real64 > const Ar,
-		Array1A< Real64 > const Ah,
-		Array1A< Real64 > const vvent,
-		Array1A< Real64 > const tvent,
-		Array1A_int const LayerType,
-		Array1A< Real64 > Tgaps,
-		Array1A< Real64 > qv,
+		Array1< Real64 > const & Atop,
+		Array1< Real64 > const & Abot,
+		Array1< Real64 > const & Al,
+		Array1< Real64 > const & Ar,
+		Array1< Real64 > const & Ah,
+		Array1< Real64 > const & vvent,
+		Array1< Real64 > const & tvent,
+		Array1_int const & LayerType,
+		Array1< Real64 > & Tgaps,
+		Array1< Real64 > & qv,
 		int & nperr,
 		std::string & ErrorMessage,
-		Array1A< Real64 > vfreevent
+		Array1< Real64 > & vfreevent
 	);
 
 	void
@@ -150,7 +150,7 @@ namespace TarcogShading {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

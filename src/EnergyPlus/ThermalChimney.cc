@@ -215,7 +215,7 @@ namespace ThermalChimney {
 			// First Alpha is Thermal Chimney Name
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ThermalChimneySys.Name(), Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ThermalChimneySys, Loop, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) {
@@ -227,7 +227,7 @@ namespace ThermalChimney {
 			ThermalChimneySys( Loop ).Name = cAlphaArgs( 1 );
 
 			// Second Alpha is Zone Name
-			ThermalChimneySys( Loop ).RealZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ThermalChimneySys( Loop ).RealZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ThermalChimneySys( Loop ).RealZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid Zone" );
 				ShowContinueError( "invalid - not found " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -280,7 +280,7 @@ namespace ThermalChimney {
 			AllRatiosSummed = 0.0;
 			for ( TCZoneNum = 1; TCZoneNum <= ThermalChimneySys( Loop ).TotZoneToDistrib; ++TCZoneNum ) {
 				ThermalChimneySys( Loop ).ZoneName( TCZoneNum ) = cAlphaArgs( TCZoneNum + 3 );
-				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone.Name(), NumOfZones );
+				ThermalChimneySys( Loop ).ZonePtr( TCZoneNum ) = FindItemInList( cAlphaArgs( TCZoneNum + 3 ), Zone );
 				ThermalChimneySys( Loop ).DistanceThermChimInlet( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 1 );
 				ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = rNumericArgs( 3 * TCZoneNum + 2 );
 				if ( lNumericFieldBlanks( 3 * TCZoneNum + 2 ) ) ThermalChimneySys( Loop ).RatioThermChimAirFlow( TCZoneNum ) = 1.0;
@@ -874,7 +874,7 @@ namespace ThermalChimney {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

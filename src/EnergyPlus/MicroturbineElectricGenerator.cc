@@ -144,7 +144,7 @@ namespace MicroturbineElectricGenerator {
 
 		// SELECT and CALL GENERATOR MODEL
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, MTGenerator.Name(), NumMTGenerators );
+			GenNum = FindItemInList( GeneratorName, MTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimMTGenerator: Specified Generator not a valid COMBUSTION Turbine Generator " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -223,7 +223,7 @@ namespace MicroturbineElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, MTGenerator.Name(), NumMTGenerators );
+			CompNum = FindItemInList( CompName, MTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMTPlantHeatRecovery: Microturbine Generator Unit not found=" + CompName );
 				return;
@@ -332,7 +332,7 @@ namespace MicroturbineElectricGenerator {
 			GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), MTGenerator.Name(), GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), MTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -2021,7 +2021,7 @@ namespace MicroturbineElectricGenerator {
 
 		ExhaustOutletNodeNum = 0;
 
-		CompNum = FindItemInList( CompName, MTGenerator.Name(), NumMTGenerators );
+		CompNum = FindItemInList( CompName, MTGenerator );
 
 		if ( CompNum == 0 ) {
 			ShowFatalError( "GetMTGeneratorExhaustNode: Unit not found=" + CompName );

@@ -60,7 +60,14 @@ namespace PlantLoopSolver {
 	int RefrigIndex( 0 ); // Index denoting refrigerant used (possibly steam)
 
 	static std::string const fluidNameSteam( "STEAM" );
-
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool EstablishedCompPumpIndeces( false );
+	}
 	// SUBROUTINE SPECIFICATIONS:
 	//PRIVATE EvaluatePumpFlowConditions
 
@@ -69,6 +76,18 @@ namespace PlantLoopSolver {
 	//==================================================================!
 
 	// Functions
+	void
+	clear_state()
+	{
+		InitialDemandToLoopSetPoint = 0.0;
+		CurrentAlterationsToDemand = 0.0;
+		UpdatedDemandToLoopSetPoint = 0.0;
+		LoadToLoopSetPointThatWasntMet = 0.0; // Unmet Demand
+		InitialDemandToLoopSetPointSAVED = 0.0;
+		RefrigIndex = 0 ; // Index denoting refrigerant used (possibly steam)
+		EstablishedCompPumpIndeces = false;
+	}
+
 
 	void
 	PlantHalfLoopSolver(
@@ -1411,8 +1430,9 @@ namespace PlantLoopSolver {
 		int PumpBranchNum;
 		int PumpCompNum;
 		int PumpOutletNode;
-		static bool EstablishedCompPumpIndeces( false );
-
+		/////////// hoisted into namespace 
+		//static bool EstablishedCompPumpIndeces( false );
+		//////////////////////////////
 		//~ One time sweep through all loops/loopsides/pumps, assigning indeces to the pl%ls%br%comp%indexinloopsidepumps variable
 		if ( ! EstablishedCompPumpIndeces ) {
 			for ( LoopCounter = 1; LoopCounter <= TotNumLoops; ++LoopCounter ) {
@@ -2559,7 +2579,7 @@ namespace PlantLoopSolver {
 				//sometimes these coils are children in ZoneHVAC equipment
 				// PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
 
-			} else if ( ( SELECT_CASE_var == TypeOf_Baseboard_Conv_Water ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow ) || ( SELECT_CASE_var == TypeOf_CooledBeamAirTerminal ) || ( SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined ) || ( SELECT_CASE_var == TypeOf_AirTerminalUserDefined ) ) { //zone connected components
+			} else if ( ( SELECT_CASE_var == TypeOf_Baseboard_Conv_Water ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam ) || ( SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow ) || ( SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow ) || ( SELECT_CASE_var == TypeOf_CooledBeamAirTerminal ) || ( SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined ) || ( SELECT_CASE_var == TypeOf_AirTerminalUserDefined ) || ( SELECT_CASE_var == TypeOf_FourPipeBeamAirTerminal ) ) { //zone connected components
 
 				this_loopside.SimZoneEquipNeeded = true;
 
@@ -2941,7 +2961,7 @@ namespace PlantLoopSolver {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

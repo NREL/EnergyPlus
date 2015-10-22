@@ -16,11 +16,11 @@ To calculate the mass or volume of each pollutant, consumption is multiplied by 
 
 EPA categorizes pollutants as either Criteria Pollutants or Hazardous Pollutants. Criteria pollutants are the six substances for which EPA has set health-based standards, including carbon monoxide (CO), nitrogen oxides (NO<sub>x</sub>), sulfur dioxide (SO<sub>2</sub>), and particulate matter (PM10 and PM2.5), ozone (O<sub>3</sub>), and lead (Pb).  Because ozone is created in atmospheric photochemical reactions of volatile organic compounds, ammonia, and other substances rather than direct building-related energy emissions, we do not calculated ozone emissions in EnergyPlus.  But we do include ozone precursors: methane (CH<sub>4</sub>), non-methane volatile organic compounds (NMVOC), and ammonia (NH<sub>3</sub>). Hazardous pollutants are substances that are known or suspected to cause serious health problems such as cancer.  We include typical hazardous substances associated with energy production and use including lead (Pb) and mercury (Hg). We also include CO<sub>2</sub> (carbon dioxide) since it is largest greenhouse gas in terms of impact.
 
-![](EngineeringReference/media/image7910.svg.png)
+![](media/image7910.svg.png)
 
 Figure 341.  Example Annual Atmospheric Pollutants and Water Consumption
 
-![](EngineeringReference/media/image7911.svg.png)
+![](media/image7911.svg.png)
 
 Figure 342.  Example Annual Total Carbon Equivalent for Major Greenhouse Gases
 
@@ -2343,13 +2343,13 @@ The response of each surface to a pulse of radiant heat is used to estimate the 
 
 4) For each surface, a "decay curve" is developed by subtracting the results from the normal sizing (1) from the "pulse" sizing run (3). This represents the delay in converting incoming radiant heat into convected heat for each surface in the zone. The graphs below show the decay curves for an exterior wall (RIGHT-1) and an interior wall (SB23) for a test file.
 
-![](EngineeringReference/media/image7912.png)
+![](media/image7912.png)
 
 Figure 343. Load Component - Decay Curve of Exterior Wall
 
 
 
-![](EngineeringReference/media/image7913.png)
+![](media/image7913.png)
 
 Figure 344. Load Component - Decay Curve of Interior Wall
 
@@ -2497,5 +2497,8 @@ The ComputeDelayedComponents routine applies the decay curve to the load compone
 
 5. Store the estimated values in a sequence to be later averaged over the averaging window.
 
+Output:Table:Annual
+-------------------
 
+No special algorithms were employed to implement the Output:Table:Annual object.
 

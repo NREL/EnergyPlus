@@ -33,6 +33,7 @@ namespace DataGlobals {
 	extern int const ksRunPeriodWeather;
 	extern int const ksHVACSizeDesignDay; // a regular design day run during HVAC Sizing Simulation
 	extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
+	extern int const ksReadAllWeatherData; // a weather period for reading all weather data proir to the simulation
 
 	extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
 	extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -114,6 +115,8 @@ namespace DataGlobals {
 	extern bool WarmupFlag; // True during the warmup portion of a simulation
 	extern int OutputFileStandard; // Unit number for the standard output file (hourly data only)
 	extern std::ostream * eso_stream; // Internal stream used for eso output (used for performance)
+	extern int OutputStandardError; // Unit number for the standard error output file
+	extern std::ostream * err_stream; // Internal stream used for err output (used for performance)
 	extern int StdOutputRecordCount; // Count of Standard output records
 	extern int OutputFileInits; // Unit number for the standard Initialization output file
 	extern int OutputFileDebug; // Unit number for debug outputs
@@ -171,6 +174,11 @@ namespace DataGlobals {
 	extern int Progress;
 	extern void ( *fProgressPtr )( int const );
 	extern void ( *fMessagePtr )( std::string const & );
+
+	// Clears the global data in DataGlobals.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 } // DataGlobals
 

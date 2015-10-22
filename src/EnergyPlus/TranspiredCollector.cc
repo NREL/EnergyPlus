@@ -147,7 +147,7 @@ namespace TranspiredCollector {
 
 		// Find the correct transpired collector with the Component name and/or index
 		if ( CompIndex == 0 ) {
-			UTSCNum = FindItemInList( CompName, UTSC.Name(), NumUTSC );
+			UTSCNum = FindItemInList( CompName, UTSC );
 			if ( UTSCNum == 0 ) {
 				ShowFatalError( "Transpired Collector not found=" + CompName );
 			}
@@ -229,8 +229,6 @@ namespace TranspiredCollector {
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceData;
 		using DataSurfaces::OSCM;
-		using DataSurfaces::TotOSCM;
-		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::OtherSideCondModeledExt;
 		using ScheduleManager::GetScheduleIndex;
 		using DataLoopNode::NodeType_Air;
@@ -368,7 +366,7 @@ namespace TranspiredCollector {
 			} // any UTSC Multisystem present
 
 			UTSC( Item ).OSCMName = Alphas( 2 );
-			Found = FindItemInList( UTSC( Item ).OSCMName, OSCM.Name(), TotOSCM );
+			Found = FindItemInList( UTSC( Item ).OSCMName, OSCM );
 			if ( Found == 0 ) {
 				ShowSevereError( cAlphaFieldNames( 2 ) + " not found=" + UTSC( Item ).OSCMName + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
@@ -457,7 +455,7 @@ namespace TranspiredCollector {
 			UTSC( Item ).SurfPtrs.allocate( UTSC( Item ).NumSurfs );
 			UTSC( Item ).SurfPtrs = 0;
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
-				Found = FindItemInList( Alphas( ThisSurf + AlphaOffset ), Surface.Name(), TotSurfaces );
+				Found = FindItemInList( Alphas( ThisSurf + AlphaOffset ), Surface );
 				if ( Found == 0 ) {
 					ShowSevereError( "Surface Name not found=" + Alphas( ThisSurf + AlphaOffset ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
@@ -1398,7 +1396,7 @@ namespace TranspiredCollector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

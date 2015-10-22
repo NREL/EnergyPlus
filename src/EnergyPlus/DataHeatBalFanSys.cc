@@ -121,7 +121,6 @@ namespace DataHeatBalFanSys {
 
 	Array1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag
 	Array1D_bool ZoneInfiltrationFlag; // Zone Infiltration flag
-	Array1D_bool ZoneMassBalanceRepVarFlag; // zone mass flow balance reporting flag
 	Array1D_int ZoneReOrder;           // zone number reordered for zone mass balance
 
 	//REAL Variables for the Heat Balance Simulation
@@ -191,7 +190,7 @@ namespace DataHeatBalFanSys {
 	Array1D< ZoneComfortControlsFangerData > ZoneComfortControlsFanger;
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
@@ -208,6 +207,119 @@ namespace DataHeatBalFanSys {
 	//     distribute copies to the public, perform publicly and display publicly, and to
 	//     permit others to do so.
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+
+	void
+	clear_state()
+	{
+		SumConvHTRadSys.deallocate(); 
+		SumLatentHTRadSys.deallocate(); 
+		SumConvPool.deallocate(); 
+		SumLatentPool.deallocate(); 
+		QHTRadSysToPerson.deallocate(); 
+		QHWBaseboardToPerson.deallocate(); 
+		QSteamBaseboardToPerson.deallocate(); 
+		QElecBaseboardToPerson.deallocate(); 
+		ZTAV.deallocate(); 
+		MAT.deallocate(); 
+		TempTstatAir.deallocate(); 
+		ZT.deallocate();
+		XMAT.deallocate(); 
+		XM2T.deallocate();
+		XM3T.deallocate();
+		XM4T.deallocate();
+		DSXMAT.deallocate(); 
+		DSXM2T.deallocate(); 
+		DSXM3T.deallocate(); 
+		DSXM4T.deallocate(); 
+		XMPT.deallocate(); 
+		ZTAVComf.deallocate(); 
+		ZoneAirHumRatAvgComf.deallocate(); 
+		ZoneAirHumRatAvg.deallocate(); 
+		ZoneAirHumRat.deallocate(); 
+		WZoneTimeMinus1.deallocate(); 
+		WZoneTimeMinus2.deallocate(); 
+		WZoneTimeMinus3.deallocate();
+		WZoneTimeMinus4.deallocate(); 
+		DSWZoneTimeMinus1.deallocate(); 
+		DSWZoneTimeMinus2.deallocate(); 
+		DSWZoneTimeMinus3.deallocate();
+		DSWZoneTimeMinus4.deallocate();
+		WZoneTimeMinusP.deallocate(); 
+		ZoneAirHumRatTemp.deallocate(); 
+		WZoneTimeMinus1Temp.deallocate(); 
+		WZoneTimeMinus2Temp.deallocate();
+		WZoneTimeMinus3Temp.deallocate(); 
+		ZoneAirHumRatOld.deallocate(); 
+		MCPI.deallocate(); 
+		MCPTI.deallocate(); 
+		MCPV.deallocate(); 
+		MCPTV.deallocate(); 
+		MCPM.deallocate(); 
+		MCPTM.deallocate(); 
+		MCPE.deallocate(); 
+		EAMFL.deallocate(); 
+		MCPTE.deallocate(); 
+		MCPC.deallocate(); 
+		CTMFL.deallocate(); 
+		MCPTC.deallocate(); 
+		ThermChimAMFL.deallocate(); 
+		MCPTThermChim.deallocate(); 
+		MCPThermChim.deallocate(); 
+		ZoneLatentGain.deallocate(); 
+		OAMFL.deallocate(); 
+		VAMFL.deallocate(); 
+		NonAirSystemResponse.deallocate(); 
+		SysDepZoneLoads.deallocate(); 
+		SysDepZoneLoadsLagged.deallocate(); 
+		MDotCPOA.deallocate(); 
+		MDotOA.deallocate();
+		MixingMassFlowZone.deallocate(); 
+		MixingMassFlowXHumRat.deallocate(); 
+		ZoneMassBalanceFlag.deallocate(); 
+		ZoneInfiltrationFlag.deallocate(); 
+		ZoneReOrder.deallocate(); 
+		QRadSysSource.deallocate();
+		TCondFDSourceNode.deallocate();
+		QPVSysSource.deallocate(); 
+		CTFTsrcConstPart.deallocate(); 
+		QHTRadSysSurf.deallocate();
+		QHWBaseboardSurf.deallocate(); 
+		QSteamBaseboardSurf.deallocate(); 
+		QElecBaseboardSurf.deallocate(); 
+		QPoolSurfNumerator.deallocate(); 
+		PoolHeatTransCoefs.deallocate(); 
+		RadSysTiHBConstCoef.deallocate(); 
+		RadSysTiHBToutCoef.deallocate(); 
+		RadSysTiHBQsrcCoef.deallocate(); 
+		RadSysToHBConstCoef.deallocate(); 
+		RadSysToHBTinCoef.deallocate(); 
+		RadSysToHBQsrcCoef.deallocate(); 
+		SumHmAW.deallocate(); 
+		SumHmARa.deallocate();
+		SumHmARaW.deallocate(); 
+		TempZoneThermostatSetPoint.deallocate();
+		ZoneThermostatSetPointHi.deallocate();
+		ZoneThermostatSetPointLo.deallocate();
+		LoadCorrectionFactor.deallocate(); 
+		CrossMixingFlag.deallocate(); 
+		AIRRAT.deallocate(); 
+		ZTM1.deallocate(); 
+		ZTM2.deallocate(); 
+		ZTM3.deallocate(); 
+		ZoneTMX.deallocate(); 
+		ZoneTM2.deallocate(); 
+		ZoneT1.deallocate(); 
+		ZoneWMX.deallocate(); 
+		ZoneWM2.deallocate();
+		ZoneW1.deallocate(); 
+		ZoneVolCapMultpSens= 0.0; 
+		ZoneVolCapMultpMoist = 0.0; 
+		ZoneVolCapMultpCO2 = 0.0; 
+		ZoneVolCapMultpGenContam =0.0; 
+		TempControlType.deallocate();
+		ComfortControlType.deallocate();
+		ZoneComfortControlsFanger.deallocate();
+	}
 
 } // DataHeatBalFanSys
 

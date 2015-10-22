@@ -127,7 +127,7 @@ The effect of the fouling air filter on the fan performance is related with a nu
 
 In this case, the fan operation state changes from point A (intersection of the fan curve corresponding to a lower speed and the system curve with clean filters) to point B (intersection of the fan curve corresponding to a higher speed and the system curve with dirty filters), as shown in Figure 345. Point B corresponds to a higher fan pressure rise than Point A, and the same air flow rate.
 
-![](EngineeringReference/media/image8006.png)
+![](media/image8006.png)
 
 Figure 345. Effect of dirty air filter on variable speed fan operation – flow rate maintained 
 
@@ -175,7 +175,7 @@ $_{df}$ is for the parameters in the dirty filter case.
 
 In this case, the fan operation state changes from point A (intersection of the fan curve corresponding to a lower speed and the system curve with clean filters) to point B (intersection of the fan curve corresponding to a higher speed and the system curve with dirty filters), as shown in Figure 346. Point B corresponds to a higher fan pressure rise and a lower air flow rate than Point A.
 
-![](EngineeringReference/media/image8007.png)
+![](media/image8007.png)
 
 Figure 346. Effect of dirty air filter on variable speed fan operation – flow rate reduced 
 
@@ -223,7 +223,7 @@ $_{df}$ is for the parameters in the dirty filter case.
 
 In this case, the fan operation state changes from point A (intersection of the fan curve and the system curve with clean filters) to point B (intersection of the fan curve and the system curve with dirty filters), as shown in Figure 347. Point B corresponds to a higher fan pressure rise and a lower air flow rate than Point A.
 
-![](EngineeringReference/media/image8008.png)
+![](media/image8008.png)
 
 Figure 347. Effect of dirty air filter on constant speed fan operation
 
