@@ -516,16 +516,11 @@ ADD_SIMULATION_TEST(IDF_FILE gasAbsorptionChillerHeater.idf EPW_FILE USA_IL_Chic
 # Additional files in subdirectories
 ADD_SIMULATION_TEST(IDF_FILE AdvancedOutput/ExerciseOutput1.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AdvancedOutput/ExerciseOutput1A-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/AdultEducationCenter.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise1A.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise1B-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise1C-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise1D-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise2.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise2A-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise2B-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise2C-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-
 
 
 # Macro files
@@ -571,4 +566,9 @@ IF (BUILD_FORTRAN)
     # Basement/slab dependent files
     ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooledWithSlab.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw COST 10)
     ADD_SIMULATION_TEST(IDF_FILE LgOffVAVusingBasement.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw COST 10)
+    # Additional files in subdirectories that depend on ExpandObjects
+    ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/AdultEducationCenter.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -x COST 2)
+    ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise2A-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -x COST 2)
+    ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise2B-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -x COST 2)
+    ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise2C-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -x COST 2)
 ENDIF ()

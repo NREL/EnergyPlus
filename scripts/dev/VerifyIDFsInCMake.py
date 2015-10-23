@@ -46,4 +46,3 @@ if len(need_to_add_to_cmake) > 0:
     print("[decent_ci:test_result:warn]: Files in idf folder missing from CMakeLists.txt.  Files:")
     for ffile in sorted(need_to_add_to_cmake):
 	print("  " + ffile)
-    sys.exit(1)
