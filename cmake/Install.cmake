@@ -142,7 +142,7 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/ep.gif" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/ObjectStatus.xls" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/readme.html" "./" "readme.html" TRUE)
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/${RULES_XLS}" "./")
+install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/InputRulesFiles/${RULES_XLS}" DESTINATION "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" "PreProcess/HVACCurveFitTool/")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/Report%20Variables%208-4-0%20to%208-5-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-4-0 to 8-5-0.csv")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-4-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
