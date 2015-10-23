@@ -1,7 +1,7 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <SimulationManager.hh>
 #include <OutputReportPredefined.hh>
 #include <HeatBalanceManager.hh>
@@ -12,11 +12,12 @@
 #include <WeatherManager.hh>
 #include <DataLoopNode.hh>
 #include <DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 
 
-	TEST_F( HVACFixture, PlantLoopSourceSideTest ) {
+	TEST_F( EnergyPlusFixture, PlantLoopSourceSideTest ) {
 
 		std::string const idf_objects = delimited_string( { 
 		"Version,8.3;",

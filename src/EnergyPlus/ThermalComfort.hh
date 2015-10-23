@@ -426,7 +426,13 @@ namespace ThermalComfort {
 	CalcThermalComfortSimpleASH55();
 
 	void
+	ResetThermalComfortSimpleASH55();
+
+	void
 	CalcIfSetPointMet();
+
+	void
+	ResetSetPointMet();
 
 	void
 	CalcThermalComfortAdaptiveASH55(

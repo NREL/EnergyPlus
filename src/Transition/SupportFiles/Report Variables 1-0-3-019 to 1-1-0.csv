@@ -1,0 +1,32 @@
+1.0.2.008,1.0.3.xxx
+30     This number should be the number of following lines
+'old variable name','new variable name'
+'Gas Absorption Chiller Heating Rate','Direct Fired Absorption Chiller Heating Rate'
+'Gas Absorption Chiller Heating Energy','Direct Fired Absorption Chiller Heating Energy'
+'Gas Absorption Chiller Cooling Gas Consumption Rate','Direct Fired Absorption Chiller Cooling Gas Consumption Rate'
+'Gas Absorption Chiller Cooling Gas Consumption','Direct Fired Absorption Chiller Cooling Gas Consumption'
+'Gas Absorption Chiller Heating Gas Consumption Rate','Direct Fired Absorption Chiller Heating Gas Consumption Rate'
+'Gas Absorption Chiller Heating Gas Consumption','Direct Fired Absorption Chiller Heating Gas Consumption'
+'Gas Absorption Chiller Cooling Electric Power','Direct Fired Absorption Chiller Cooling Electric Power'
+'Gas Absorption Chiller Cooling Electric Consumption','Direct Fired Absorption Chiller Cooling Electric Consumption'
+'Gas Absorption Chiller Heating Electric Power','Direct Fired Absorption Chiller Heating Electric Power'
+'Gas Absorption Chiller Heating Electric Consumption','Direct Fired Absorption Chiller Heating Electric Consumption'
+'Gas Absorption Chiller Hot Water Inlet Temp','Direct Fired Absorption Chiller Hot Water Inlet Temp'
+'Gas Absorption Chiller Hot Water Outlet Temp','Direct Fired Absorption Chiller Hot Water Outlet Temp'
+'Gas Absorption Chiller Hot Water Mass Flow Rate','Direct Fired Absorption Chiller Hot Water Mass Flow Rate'
+'Gas Absorption Chiller Cooling Part Load Ratio','Direct Fired Absorption Chiller Cooling Part Load Ratio'
+'Gas Absorption Chiller Cooling Capacity','Direct Fired Absorption Chiller Cooling Capacity'
+'Gas Absorption Chiller Heating Part Load Ratio','Direct Fired Absorption Chiller Heating Part Load Ratio'
+'Gas Absorption Chiller Heating Capacity','Direct Fired Absorption Chiller Heating Capacity'
+'Gas Absorption Chiller Fraction of Period Running','Direct Fired Absorption Chiller Fraction of Period Running'
+'Purchased Air Cooling Rate','Purchased Air Sensible Cooling Rate'
+'Purchased Air Cooling Energy','Purchased Air Sensible Cooling Energy'
+'PV Array Max Power Produced',<DELETE>
+'Debug Unmet Plant Loop Demand','Plant Loop Unmet Demand'
+'Debug Plant Loop RemDemand',<DELETE>
+'Zone-Total Electric Consumption',<DELETE>
+'Zone-Total Latent Gain','Zone-Total Internal Latent Gain'
+'Zone-Total Radiant Heat Gain','Zone-Total Internal Radiant Heat Gain'
+'Zone-Total Convective Heat Gain','Zone-Total Internal Convective Heat Gain'
+'Zone-Total Lost Heat Gain','Zone-Total Internal Lost Heat Gain'
+'Zone-Total Visible Heat Gain','Zone-Total Internal Visible Heat Gain'

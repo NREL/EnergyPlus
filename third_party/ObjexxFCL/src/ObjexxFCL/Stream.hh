@@ -89,6 +89,14 @@ public: // Properties
 		return flags_;
 	}
 
+	// Status
+	inline
+	IOFlags::Status
+	status() const
+	{
+		return flags_.status();
+	}
+
 	// Old?
 	inline
 	bool
@@ -105,6 +113,40 @@ public: // Properties
 		return flags_.scratch();
 	}
 
+	// Access
+	inline
+	IOFlags::Access
+	access() const
+	{
+		return flags_.access();
+	}
+
+	// Action
+	inline
+	IOFlags::Action
+	action() const
+	{
+		return flags_.action();
+	}
+
+	// Read?
+	virtual
+	bool
+	read() const = 0;
+
+	// Write?
+	virtual
+	bool
+	write() const = 0;
+
+	// Form
+	inline
+	IOFlags::Form
+	form() const
+	{
+		return flags_.form();
+	}
+
 	// Binary?
 	inline
 	bool
@@ -113,12 +155,12 @@ public: // Properties
 		return flags_.binary();
 	}
 
-	// Append?
+	// Positioning
 	inline
-	bool
-	append() const
+	IOFlags::Positioning
+	positioning() const
 	{
-		return flags_.append();
+		return flags_.positioning();
 	}
 
 	// AsIs?
@@ -127,6 +169,22 @@ public: // Properties
 	asis() const
 	{
 		return flags_.asis();
+	}
+
+	// AsIs Compatible?
+	inline
+	bool
+	asis_compatible( IOFlags const & flags ) const
+	{
+		return flags_.asis_compatible( flags );
+	}
+
+	// Append?
+	inline
+	bool
+	append() const
+	{
+		return flags_.append();
 	}
 
 	// Delete?
@@ -146,16 +204,6 @@ public: // Properties
 	virtual
 	std::ios &
 	stream() = 0;
-
-	// Read?
-	virtual
-	bool
-	read() const = 0;
-
-	// Write?
-	virtual
-	bool
-	write() const = 0;
 
 	// File Stream?
 	virtual
@@ -183,14 +231,6 @@ public: // Properties
 	ter() const
 	{
 		return flags_.ter();
-	}
-
-	// AsIs Compatible?
-	inline
-	bool
-	asis_compatible( IOFlags const & flags ) const
-	{
-		return flags_.asis_compatible( flags );
 	}
 
 public: // Operators

@@ -1,0 +1,13 @@
+3.0.0.028,3.1.0,
+10,10, This number should be the number of report variables in the following list
+View Factor To Outside Shelf,<DELETE>
+UF UCSD SYS FLOW RATE,<DELETE>
+UF UCSD POWER IN PLUMES,<DELETE>
+UF UCSD PLUME POWER FROM WINDOWS,<DELETE>
+UF UCSD SUPPLY AIR TEMP,<DELETE>
+CHILLER EVAP EFFECTIVENESS,<DELETE>
+CHILLER COND EFFECTIVENESS,<DELETE>
+CHILLER COMP VOLUMETRIC EFFICIENCY,<DELETE>
+CHILLER COMP VOLUMETRIC FLOW RATE,<DELETE>
+CHILLER REFRIGERANT MASS FLOW RATE,<DELETE>
+old variable name,new variable name -- add variable names (before this line) and leave off units -- <DELETE> to delete
