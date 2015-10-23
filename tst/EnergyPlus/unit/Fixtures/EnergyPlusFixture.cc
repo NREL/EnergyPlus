@@ -86,6 +86,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -199,6 +200,7 @@ namespace EnergyPlus {
 		SizingManager::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
+		SurfaceGeometry::clear_state();
 		SystemAvailabilityManager::clear_state();
 		ThermalComfort::clear_state();
 		VariableSpeedCoils::clear_state();
