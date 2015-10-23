@@ -297,6 +297,7 @@
 !      V/K                    =>   V/F                 0.555555555555556
 !      W                      =>   Btu/h               3.4121412858518
 !      W/(m3/s)               =>   W/(ft3/min)         0.0004719475
+!      W/((m3/s)-Pa)          =>   W/(gpm-ftH20)       ??????
 !      W/K                    =>   Btu/h-F             1.89563404769544
 !      W/m                    =>   Btu/h-ft            1.04072
 !      W/m2                   =>   Btu/h-ft2           0.316957210776545
@@ -58985,40 +58986,40 @@ Pump:VariableSpeed,
        \memo This pump model is described in the ASHRAE secondary HVAC toolkit.
        \min-fields 14
   A1 , \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Rated Flow Rate
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
-  N2 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N3 , \field Rated Power Consumption
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \required-field
+       \type node
+  N1 , \field Design Maximum Flow Rate
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
+  N2 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N3 , \field Design Power Consumption
+       \note When autosized the scaling factor is the input field Design Power per Unit Flow Rate per Unit Head
+       \note autosized Design Power Consumption = Design Maximum Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \units W
+       \autosizable
+       \ip-units W
   N4 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized,
+       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N5 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   N6 , \field Coefficient 1 of the Part Load Performance Curve
        \default 0.0
   N7 , \field Coefficient 2 of the Part Load Performance Curve
@@ -59027,10 +59028,10 @@ Pump:VariableSpeed,
        \default 0.0
   N9 , \field Coefficient 4 of the Part Load Performance Curve
        \default 0.0
-  N10, \field Minimum Flow Rate
-        \note This value can be zero and will be defaulted to that if not specified.
+  N10, \field Design Minimum Flow Rate
+        \note When autosized the scaling factor is the input field Design Minimum Flow Rate Sizing Factor
         \units m3/s
-        \default 0.0
+        \autosizable
         \ip-units gal/min
   A4 , \field Pump Control Type
         \type choice
@@ -59059,11 +59060,11 @@ Pump:VariableSpeed,
         \units m
         \type real
         \note "D" in above expression in field A6
-  A7 , \field VFD Control Type
-         \type choice
-         \key ManualControl
-         \key PressureSetpointControl
-  A8 , \field Pump rpm Schedule Name
+  A7 ,  \field VFD Control Type
+        \type choice
+        \key ManualControl
+        \key PressureSetpointControl
+  A8 ,  \field Pump rpm Schedule Name
         \note Modifies the rpm of the pump on a time basis. Default is
         \note that the pump is on and runs according to its other operational requirements
         \note specified above.  The schedule is for special pump operations.
@@ -59089,309 +59090,344 @@ Pump:VariableSpeed,
         \note optional, if used pump losses transfered to zone as internal gains
         \type object-list
         \object-list ZoneNames
-  N12;  \field Skin Loss Radiative Fraction
+  N12,  \field Skin Loss Radiative Fraction
         \note optional. If zone identified in previous field then this determines
         \note the split between convection and radiation for the skin losses
         \type real
         \minimum 0.0
+        \maximum 1.0
+  N13,  \field Design Power per Unit Flow Rate per Unit Head
+        \note Used to size Design Power Consumption
+        \default 0.78
+        \units W/((m3/s)-Pa)
+        \ip-units W/(gpm-ftH20)
+        \minimum> 0
+  N14;  \field Design Minimum Flow Rate Sizing Factor
+        \note Used to size Design Minimum Flow Rate
+        \default 0.0
+        \minimum 0
         \maximum 1.0
 
 Pump:ConstantSpeed,
        \memo This pump model is described in the ASHRAE secondary HVAC toolkit.
        \min-fields 9
   A1,  \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Rated Flow Rate
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
-  N2 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N3 , \field Rated Power Consumption
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \required-field
+       \type node
+  N1 , \field Design Flow Rate
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
+  N2 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N3 , \field Design Power Consumption
+       \note When autoszed the scaling factor is the input field Design Power per Unit Flow Rate Per Unit Head
+       \note autosized Design Power Consumption = Design Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \units W
+       \autosizable
+       \ip-units W
   N4 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized,
+       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N5 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   A4 , \field Pump Control Type
-        \type choice
-        \key Continuous
-        \key Intermittent
-        \default Continuous
+       \type choice
+       \key Continuous
+       \key Intermittent
+       \default Continuous
   A5 , \field Pump Flow Rate Schedule Name
-        \note Modifies the rated flow rate of the pump on a time basis. Default is
-        \note that the pump is on and runs according to its other operational requirements
-        \note specified above.  The schedule is for special pump operations.
-        \type object-list
-        \object-list ScheduleNames
+       \note Modifies the rated flow rate of the pump on a time basis. Default is
+       \note that the pump is on and runs according to its other operational requirements
+       \note specified above.  The schedule is for special pump operations.
+       \type object-list
+       \object-list ScheduleNames
   A6 , \field Pump Curve Name
-        \type object-list
-        \object-list UniVariateCurves
-        \object-list UniVariateTables
-        \note This references any single independent variable polynomial curve in order to
-        \note  do pressure vs. flow calculations for this pump.  The available types are then:
-        \note  Linear, Quadratic, Cubic, and Quartic
-        \note The non-dimensional pump pressure relationship is of the following form:
-        \note  (psi = C4*phi^4 + C3*phi^3 + C2*phi^2 + C1*phi + C0)
-        \note Where the non-dimensional variables are defined as:
-        \note  delP = rho * ((N/60)^2) * (D^2) * psi
-        \note  mdot = rho * (N/60) * (D^3) * phi
+       \type object-list
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+       \note This references any single independent variable polynomial curve in order to
+       \note  do pressure vs. flow calculations for this pump.  The available types are then:
+       \note  Linear, Quadratic, Cubic, and Quartic
+       \note The non-dimensional pump pressure relationship is of the following form:
+       \note  (psi = C4*phi^4 + C3*phi^3 + C2*phi^2 + C1*phi + C0)
+       \note Where the non-dimensional variables are defined as:
+       \note  delP = rho * ((N/60)^2) * (D^2) * psi
+       \note  mdot = rho * (N/60) * (D^3) * phi
   N6 , \field Impeller Diameter
-        \units m
-        \type real
-        \note "D" in above expression in field A6
+       \units m
+       \type real
+       \note "D" in above expression in field A6
   N7 , \field Rotational Speed
-        \units rev/min
-        \type real
-        \note "N" in above expression in field A6
-  A7,   \field Zone Name
-        \note optional, if used pump losses transfered to zone as internal gains
-        \type object-list
-        \object-list ZoneNames
-  N8;   \field Skin Loss Radiative Fraction
-        \note optional. If zone identified in previous field then this determines
-        \note the split between convection and radiation for the skin losses
-        \type real
-        \minimum 0.0
-        \maximum 1.0
+       \units rev/min
+       \type real
+       \note "N" in above expression in field A6
+  A7,  \field Zone Name
+       \note optional, if used pump losses transfered to zone as internal gains
+       \type object-list
+       \object-list ZoneNames
+  N8,  \field Skin Loss Radiative Fraction
+       \note optional. If zone identified in previous field then this determines
+       \note the split between convection and radiation for the skin losses
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N9;  \field Design Power per Unit Flow Rate per Unit Head
+       \note Used to size Design Power Consumption
+       \default 0.78
+       \units W/((m3/s)-Pa)
+       \ip-units W/(gpm-ftH20)
+       \minimum> 0
 
 Pump:VariableSpeed:Condensate,
        \memo This pump model is described in the ASHRAE secondary HVAC toolkit.
        \memo Variable Speed Condensate pump for Steam Systems
        \min-fields 13
   A1 , \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Rated Flow Rate
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
-  N2 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N3 , \field Rated Power Consumption
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \required-field
+       \type node
+  N1 , \field Design Flow Rate
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
+  N2 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N3 , \field Design Power Consumption
+       \note When autoszed the scaling factor is the input field Design Power per Unit Flow Rate Per Unit Head
+       \note autosized Design Power Consumption = Design Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \units W
+       \autosizable
+       \ip-units W
   N4 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized,
+       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N5 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   N6 , \field Coefficient 1 of the Part Load Performance Curve
        \default 0.0
   N7 , \field Coefficient 2 of the Part Load Performance Curve
        \default 1.0
   N8 , \field Coefficient 3 of the Part Load Performance Curve
        \default 0.0
-  N9 , \field Coefficient 4 of the Part Load Performance Curve
+  N9,  \field Coefficient 4 of the Part Load Performance Curve
        \default 0.0
   A4 , \field Pump Flow Rate Schedule Name
-        \note Modifies the rated flow rate of the pump on a time basis. Default is
-        \note that the pump is on and runs according to its other operational requirements
-        \note specified above.  The schedule is for special pump operations.
-        \type object-list
-        \object-list ScheduleNames
-  A5 ,  \field Zone Name
-        \note optional, if used pump losses transfered to zone as internal gains
-        \type object-list
-        \object-list ZoneNames
-  N10;  \field Skin Loss Radiative Fraction
-        \note optional. If zone identified in previous field then this determines
-        \note the split between convection and radiation for the skin losses
-        \type real
-        \minimum 0.0
-        \maximum 1.0
+       \note Modifies the rated flow rate of the pump on a time basis. Default is
+       \note that the pump is on and runs according to its other operational requirements
+       \note specified above.  The schedule is for special pump operations.
+       \type object-list
+       \object-list ScheduleNames
+  A5 , \field Zone Name
+       \note optional, if used pump losses transfered to zone as internal gains
+       \type object-list
+       \object-list ZoneNames
+  N10, \field Skin Loss Radiative Fraction
+       \note optional. If zone identified in previous field then this determines
+       \note the split between convection and radiation for the skin losses
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N11; \field Rated Power per Unit Flow Rate per Unit Head
+       \note Used to size Design Power Consumption
+       \default 0.78
+       \units W/((m3/s)-Pa)
+       \ip-units W/(gpm-ftH20)
+       \minimum> 0
 
 HeaderedPumps:ConstantSpeed,
        \memo This Headered pump object describes a pump bank with more than 1 pump in parallel
        \min-fields 9
   A1 , \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Total Rated Flow Rate
-        \note If the field is not autosized set to the flow rate to
-        \note the total flow when all pumps are running at full load
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
+       \required-field
+       \type node
+  N1 , \field Total Design Flow Rate
+       \note If the field is not autosized set to the flow rate to
+       \note the total flow when all pumps are running at full load
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
   N2 , \field Number of Pumps in Bank
        \type integer
   A4 , \field Flow Sequencing Control Scheme
-        \type choice
-        \key Sequential
-        \default Sequential
-  N3 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N4 , \field Rated Power Consumption
-        \note If the field is not autosized set to the power consumed by the pump bank
-        \note when all the pumps are running at nominal flow
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Total Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \type choice
+       \key Sequential
+       \default Sequential
+  N3 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N4 , \field Design Power Consumption
+       \note If the field is not autosized set to the power consumed by the pump bank
+       \note when all the pumps are running at nominal flow
+       \note When autoszed the scaling factor is the input field Design Power per Unit Flow Rate Per Unit Head
+       \note autosized Design Power Consumption = Design Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \units W
+       \autosizable
+       \ip-units W
   N5 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
+       \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N6 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   A5 , \field Pump Control Type
-        \type choice
-        \key Continuous
-        \key Intermittent
-        \default Continuous
+       \type choice
+       \key Continuous
+       \key Intermittent
+       \default Continuous
   A6 , \field Pump Flow Rate Schedule Name
-        \note Modifies the rated flow rate of the pump on a time basis. Default is
-        \note that the pump is on and runs according to its other operational requirements
-        \note specified above.  The schedule is for special pump operations.
-        \type object-list
-        \object-list ScheduleNames
-  A7 ,  \field Zone Name
-        \note optional, if used pump losses transfered to zone as internal gains
-        \type object-list
-        \object-list ZoneNames
-  N7 ;  \field Skin Loss Radiative Fraction
-        \note optional. If zone identified in previous field then this determines
-        \note the split between convection and radiation for the skin losses
-        \type real
-        \minimum 0.0
-        \maximum 1.0
-
+       \note Modifies the rated flow rate of the pump on a time basis. Default is
+       \note that the pump is on and runs according to its other operational requirements
+       \note specified above.  The schedule is for special pump operations.
+       \type object-list
+       \object-list ScheduleNames
+  A7 , \field Zone Name
+       \note optional, if used pump losses transfered to zone as internal gains
+       \type object-list
+       \object-list ZoneNames
+  N7 , \field Skin Loss Radiative Fraction
+       \note optional. If zone identified in previous field then this determines
+       \note the split between convection and radiation for the skin losses
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N8 ; \field Design Power per Unit Flow Rate per Unit Head
+       \note Used to size Design Power Consumption
+       \default 0.78
+       \units W/((m3/s)-Pa)
+       \ip-units W/(gpm-ftH20)
+       \minimum> 0
+       
 HeaderedPumps:VariableSpeed,
        \memo This Headered pump object describes a pump bank with more than 1 pump in parallel
        \min-fields 14
   A1 , \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Total Rated Flow Rate
-        \note If the field is not autosized set to the flow rate to
-        \note the total flow when all pumps are running at full load
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
+       \required-field
+       \type node
+  N1 , \field Total Design Flow Rate
+       \note If the field is not autosized set to the flow rate to
+       \note the total flow when all pumps are running at full load
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
   N2 , \field Number of Pumps in Bank
        \type integer
   A4 , \field Flow Sequencing Control Scheme
-        \type choice
-        \key Sequential
-        \default Sequential
-  N3 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N4 , \field Rated Power Consumption
-        \note If the field is not autosized set to the power consumed by the pump bank
-        \note when all the pumps are running at nominal flow
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Total Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \type choice
+       \key Sequential
+       \default Sequential
+  N3 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N4 , \field Design Power Consumption
+       \note If the field is not autosized set to the power consumed by the pump bank
+       \note when all the pumps are running at nominal flow
+       \note When autoszed the scaling factor is the input field Design Power per Unit Flow Rate Per Unit Head
+       \note autosized Design Power Consumption = Design Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \units W
+       \autosizable
+       \ip-units W
   N5 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
+       \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N6 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   N7 , \field Coefficient 1 of the Part Load Performance Curve
        \default 0.0
   N8 , \field Coefficient 2 of the Part Load Performance Curve
        \default 1.0
-  N9 , \field Coefficient 3 of the Part Load Performance Curve
+  N9, \field Coefficient 3 of the Part Load Performance Curve
        \default 0.0
   N10, \field Coefficient 4 of the Part Load Performance Curve
        \default 0.0
   N11, \field Minimum Flow Rate Fraction
-        \note This value can be zero and will be defaulted to that if not specified.
-        \default 0.0
-        \minimum 0.0
-        \maximum 1.0
+       \note This value can be zero and will be defaulted to that if not specified.
+       \default 0.0
+       \minimum 0.0
+       \maximum 1.0
   A5 , \field Pump Control Type
-        \type choice
-        \key Continuous
-        \key Intermittent
-        \default Continuous
+       \type choice
+       \key Continuous
+       \key Intermittent
+       \default Continuous
   A6 , \field Pump Flow Rate Schedule Name
-        \note Modifies the rated flow rate of the pump on a time basis. Default is
-        \note that the pump is on and runs according to its other operational requirements
-        \note specified above.  The schedule is for special pump operations.
-        \type object-list
-        \object-list ScheduleNames
-  A7 ,  \field Zone Name
-        \note optional, if used pump losses transfered to zone as internal gains
-        \type object-list
-        \object-list ZoneNames
-  N12;  \field Skin Loss Radiative Fraction
-        \note optional. If zone identified in previous field then this determines
-        \note the split between convection and radiation for the skin losses
-        \type real
-        \minimum 0.0
-        \maximum 1.0
+       \note Modifies the rated flow rate of the pump on a time basis. Default is
+       \note that the pump is on and runs according to its other operational requirements
+       \note specified above.  The schedule is for special pump operations.
+       \type object-list
+       \object-list ScheduleNames
+  A7 , \field Zone Name
+       \note optional, if used pump losses transfered to zone as internal gains
+       \type object-list
+       \object-list ZoneNames
+  N12, \field Skin Loss Radiative Fraction
+       \note optional. If zone identified in previous field then this determines
+       \note the split between convection and radiation for the skin losses
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  N13; \field Design Power per Unit Flow Rate per Unit Head
+       \note Used to size Design Power Consumption
+       \default 0.78
+       \units W/((m3/s)-Pa)
+       \ip-units W/(gpm-ftH20)
+       \minimum> 0
 
 \group Plant-Condenser Flow Control
 

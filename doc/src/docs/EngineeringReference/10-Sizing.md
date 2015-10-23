@@ -2084,11 +2084,12 @@ For the variable-speed DX heating coil, we specify a nominal speed level. During
 
 ### Pump Sizing
 
-The loop pumps' autosizable inputs are nominal volumetric flow rate and nominal power consumption. We have
+The loop pumps' autosizable inputs are design volume flow rate and design power consumption. We have
 
 *Eff<sub>tot</sub>*=*Eff<sub>mot</sub>* \**Eff<sub>impeller</sub>*
 
-The motor efficiency is an input. Since we need the total efficiency to calculate the nominal power consumption we assume an impeller efficiency of 0,78 for purposes of sizing.
+The motor efficiency, *Eff<sub>mot</sub>*, is an input with a default of 0.9. 
+The impeller efficiency, *Eff<sub>impeller</sub>*, is an input, called Design Power per Unit Flow Rate per Unit Head, with a default of 0.78. Units are W/((m3/s)-Pa).
 
 #### Rated Volumetric Flow Rate
 
