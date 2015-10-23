@@ -1150,11 +1150,6 @@ namespace PipeHeatTransfer {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine updates report variables for pipe heat transfer objects
 
-		this->MassFlowRate = this->MassFlowRate;
-		this->VolumeFlowRate = this->VolumeFlowRate;
-
-		// update other variables from module variables
-		this->FluidHeatLossRate = this->FluidHeatLossRate;
 		this->FluidHeatLossEnergy = this->FluidHeatLossRate * this->DeltaTime; // DeltaTime is in seconds
 		this->PipeInletTemp = this->PipeTemp( 1 );
 		this->PipeOutletTemp = this->PipeTemp( this->NumSections );
