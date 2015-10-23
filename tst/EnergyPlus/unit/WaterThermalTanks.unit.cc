@@ -48,29 +48,6 @@ TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 	// SourceMassFlowRate is zero
 	EXPECT_DOUBLE_EQ(SourceMassFlowRate, 0.0);
 	
-	// Stratified Tank
-	SourceMassFlowRate = SourceMassFlowRateOrig;
-	Real64 const NodeTemp = 58.0;
-	
-	WaterThermalTanks::StratifiedNodeData StratNode;
-	StratNode.Temp = 58.0;
-	StratNode.HPWHWrappedCondenserHeatingFrac = 0.5;
-	
-	// Test case without HPWH
-	Qheatpump = 0.0;
-	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(Qheatpump, SourceInletTemp, Cp, SourceMassFlowRate, StratNode);
-	EXPECT_DOUBLE_EQ(Qsource, SourceMassFlowRate * Cp * (SourceInletTemp - NodeTemp));
-	
-	// Test case with Pumped HPWH
-	Qheatpump = 100.0;
-	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(Qheatpump, SourceInletTemp, Cp, SourceMassFlowRate, StratNode);
-	EXPECT_DOUBLE_EQ(Qsource, Qheatpump);
-	
-	// Test case with Wrapped HPWH
-	SourceMassFlowRate = 0.0;
-	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(Qheatpump, SourceInletTemp, Cp, SourceMassFlowRate, StratNode);
-	EXPECT_DOUBLE_EQ(Qsource, Qheatpump * StratNode.HPWHWrappedCondenserHeatingFrac );
-	
 }
 
 TEST( WaterThermalTankData, GetDeadBandTemp )

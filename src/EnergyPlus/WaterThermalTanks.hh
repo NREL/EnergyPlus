@@ -1503,15 +1503,6 @@ namespace WaterThermalTanks {
 		int const WaterThermalTankNum // Water Heater being simulated
 	);
 
-	Real64
-	CalcStratifiedTankSourceSideHeatTransferRate(
-		Real64 Qheatpump, // input, the heat rate from the heat pump (W), zero if there is no heat pump or if the heat pump is off
-		Real64 SourceInletTemp, // input, Source inlet temperature (C)
-		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
-		Real64 SourceMassFlowRate, // source mass flow rate (kg/s)
-		const StratifiedNodeData & StratNode // The stratified node at the source inlet
-	);
-
 	void
 	CalcNodeMassFlows(
 		int const WaterThermalTankNum, // Water Heater being simulated

@@ -6409,7 +6409,22 @@ namespace WaterThermalTanks {
 
 				// Heat transfer due to fluid flow entering an inlet node
 				Quse = UseMassFlowRate * Cp * ( UseInletTemp - NodeTemp );
-				Qsource = CalcStratifiedTankSourceSideHeatTransferRate(Qheatpump, SourceInletTemp, Cp, SourceMassFlowRate, Tank.Node( NodeNum ));
+				if ( Tank.HeatPumpNum > 0 ) {
+					// Heat Pump Water Heater
+					if ( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped ) {
+						if ( SourceMassFlowRate > 0.0 ) {
+							Qsource = Qheatpump;
+						} else {
+							Qsource = 0.0;
+						}
+					} else {
+						assert( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped );
+						Qsource = Qheatpump * Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac;
+					}
+				} else {
+					// Constant temperature source side flow
+					Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - Tank.Node( NodeNum ).Temp );
+				}
 
 				InvMixUp = 0.0;
 				if ( NodeNum > 1 ) {
@@ -6600,41 +6615,6 @@ namespace WaterThermalTanks {
 		// Add water heater skin losses and venting losses to ambient zone, if specified
 		if ( Tank.AmbientTempZone > 0 ) WaterThermalTank( WaterThermalTankNum ).AmbientZoneGain = -Qlosszone - Qvent;
 
-	}
-
-	Real64
-	CalcStratifiedTankSourceSideHeatTransferRate(
-		Real64 Qheatpump, // input, the heat rate from the heat pump (W), zero if there is no heat pump or if the heat pump is off
-		Real64 SourceInletTemp, // input, Source inlet temperature (C)
-		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
-		Real64 SourceMassFlowRate, // source mass flow rate (kg/s)
-		const StratifiedNodeData & StratNode // The stratified node at the source inlet
-	)
-	{
-		// Function Information:
-		//	Author: Noel Merket
-		//	Date Written: January 2015
-
-		// Purpose of this function:
-		// Calculates the source side heat transfer rate of a stratified tank.
-
-		// Methodology:
-		// If the source side heat transfer is coming from a heat pump, then
-		Real64 Qsource;
-		if ( Qheatpump > 0.0 ) {
-			// heat pump water heater
-			if ( SourceMassFlowRate > 0.0 ) {
-				// pumped condenser
-				Qsource = Qheatpump;
-			} else {
-				// wrapped condenser
-				Qsource = Qheatpump * StratNode.HPWHWrappedCondenserHeatingFrac;
-			}
-		} else {
-			// constant temperature source side flows
-			Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - StratNode.Temp );
-		}
-		return Qsource;
 	}
 
 	void
