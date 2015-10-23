@@ -39,7 +39,6 @@ else()
   set(GIT_DIR "")
 endif()
 
-
 set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
 option( BUILD_PACKAGE "Build package" OFF )
@@ -47,6 +46,7 @@ option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
 option( BUILD_DOCS "Build markdown based documentation" OFF )
+option( BUILD_PYTHON_TESTS "Build Python-based tests -- requires Python 2.7+" OFF )
 
 if (BUILD_DOCS)
   option( BUILD_MONOLITHIC_ENGINEERINGREFERENCE  "Build all-in-one EngineeringReference (has caveats)" ON )
@@ -66,8 +66,11 @@ mark_as_advanced( ENABLE_INSTALL_REMOTE )
 # 1. Doing regression testing; which would be: BUILD_TESTING AND ENABLE_REGRESSION_TESTING
 # 2. Doing package building, since Python is going to be our tool for some things; thus: BUILD_PACKAGE
 
-if( BUILD_TESTING OR BUILD_PACKAGE )
+if( ( BUILD_TESTING AND ENABLE_REGRESSION_TESTING ) OR ( BUILD_PACKAGE ) OR ( BUILD_PYTHON_TESTS ) )
   find_package(PythonInterp 2.7 REQUIRED)
+endif()
+
+if ( BUILD_PYTHON_TESTS )
   add_test( NAME VerifyIDFsInCMakeFolder COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/scripts/dev/VerifyIDFsInCMake.py" "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" )
 endif()
 
