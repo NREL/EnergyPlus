@@ -38,7 +38,15 @@ for root, dirs, files in os.walk(testfiles_dir):
 
 # there are a few files we purposely skip
 files_to_skip = Set(["_1a-Long0.0.idf", "_ExternalInterface-actuator.idf", "_ExternalInterface-schedule.idf", "_ExternalInterface-variable.idf", "HVAC3Zone-IntGains-Def.imf", "HVAC3ZoneChillerSpec.imf", "HVAC3ZoneGeometry.imf", "HVAC3ZoneMat-Const.imf"])
-found_idfs_refined = found_idfs - files_to_skip
+found_idfs_trimmed = found_idfs - files_to_skip
+
+# the CMakeLists file will always have forward slashes
+# on Linux and Mac, the found_idfs will also have forward slashes
+# but on Windows, the path delimiter will be a backslash
+# so replace all backslashes here before comparing anything.
+found_idfs_refined = Set()
+for fil in found_idfs_trimmed:
+    found_idfs_refined.add(fil.replace("\\","/"))
 
 # check if any are missing in cmake
 need_to_add_to_cmake = found_idfs_refined.difference(cmake_idfs)
