@@ -718,7 +718,9 @@ namespace SingleDuct {
 	);
 
 	Real64
-	GetReheatCoilInTempForSizing();
+	GetReheatCoilInAirForSizing(
+		int const ParameterType // Return air temperature or humidity ratio
+	);
 
 	void
 	SetATMixerPriFlow(

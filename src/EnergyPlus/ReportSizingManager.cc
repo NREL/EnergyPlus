@@ -22,6 +22,7 @@
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
 #include <SQLiteProcedures.hh>
+#include <SingleDuct.hh>
 #include <UtilityRoutines.hh>
 #include <FluidProperties.hh>
 #include <DataPlant.hh>
@@ -305,6 +306,7 @@ namespace ReportSizingManager {
 		using Psychrometrics::PsyWFnTdbRhPb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyTwbFnTdbWPb;
+		using SingleDuct::GetReheatCoilInAirForSizing;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;
 		using DataPlant::PlantLoop;
@@ -699,7 +701,7 @@ namespace ReportSizingManager {
 					} else if ( TermUnitIU ) {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
 					} else if ( TermUnitSingDuct ) {
-						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
+						AutosizeDes = GetReheatCoilInAirForSizing( HeatingWaterDesAirInletTempSizing ); 
 					} else if ( ZoneEqFanCoil ) {
 						if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow > 0.0 ) {
 							OutAirFrac = min( StdRhoAir * ZoneEqSizing( CurZoneEqNum ).OAVolFlow / FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow, 1.0 );
@@ -718,7 +720,7 @@ namespace ReportSizingManager {
 					} else if ( TermUnitIU ) {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
 					} else if ( TermUnitSingDuct ) {
-						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU;
+						AutosizeDes = GetReheatCoilInAirForSizing( HeatingWaterDesAirInletHumRatSizing );
 					} else if ( ZoneEqFanCoil ) {
 						if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow > 0.0 ) {
 							OutAirFrac = min( StdRhoAir * ZoneEqSizing( CurZoneEqNum ).OAVolFlow / FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow, 1.0 );
