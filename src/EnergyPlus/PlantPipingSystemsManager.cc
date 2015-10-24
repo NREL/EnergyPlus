@@ -1621,7 +1621,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Farfield ground temperature model
-			PipingSystemDomains( BasementCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 			// Domain perimeter offset
 			PipingSystemDomains( DomainNum ).PerimeterOffset = Domain( BasementCtr ).PerimeterOffset;
