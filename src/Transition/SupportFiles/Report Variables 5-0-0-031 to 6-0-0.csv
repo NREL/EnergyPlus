@@ -1,0 +1,31 @@
+5.0.0.031,5.5.0,
+15,15, These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+Refrigerated Case Evaporator Total Heat Transfer,Refrigerated Case Evaporator Total Heat Transfer Energy,
+Refrigeration Secondary Loop Pump Electric Energy,Refrigeration Secondary Loop Pump Electric Consumption,
+Refrigeration Secondary Loop Pipe Heat Gain,Refrigeration Secondary Loop Pipe Heat Gain Rate,
+Refrigeration Secondary Loop Receiver Heat Gain,Refrigeration Secondary Loop Receiver Heat Gain Rate,
+Rack Sensible Heating Rate to Zone,Refrigeration Compressor Rack Sensible Heating Rate to Zone,
+Rack Sensible Heating Energy To Zone,Refrigeration Compressor Rack Sensible Heating Energy To Zone,
+Rack Sensible Heating Rate To HVAC Return Air,Refrigeration Compressor Rack Sensible Heating Rate To HVAC Return Air,
+Rack Sensible Heating Energy To HVAC Return Air,Refrigeration Compressor Rack Sensible Heating Energy To HVAC Return Air,
+Refrigeration System Total Heat Rejected Rate,Refrigeration System Net Heat Rejected Rate,
+Refrigeration System Total Heat Rejected Energy,Refrigeration System Net Heat Rejected Energy,
+Refrigeration System Total Heat Recovered Rate,Refrigeration System Condenser Total Recovered Heat Rate,
+Heat Transfer Rate,Refrigeration System Condenser Heat Transfer Rate,
+Refrigeration System Condenser Fan Electric Energy,Refrigeration System Condenser Fan Electric Consumption,
+Refrigeration System Condenser Pump Electric Energy,Refrigeration System Condenser Pump Electric Consumption,
+Refrigeration System Condenser Basin Heater Electric Energy,Refrigeration System Condenser Basin Heater Electric Consumption
+old variable name,new variable name -- add variable names (before this line) and leave off units -- <DELETE> to delete
+,
+,
+,
+
+
+,
+,
+,
+
+,
+,
+,
+,
