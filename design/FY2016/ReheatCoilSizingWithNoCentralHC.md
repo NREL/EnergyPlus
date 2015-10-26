@@ -9,7 +9,7 @@ Reheat Coil Sizing when there is No Central Heating Coil
 
 ## Justification for New Feature ##
 
-The current reheat coil sizing approach in EnergyPlus is designed assuming there are central heating coils. It does not apply for the system without central heating coils. This feature aims to improve it to handle various systems  configurations. Different sizing parameters will be selected depending on the existance of central heating coil, preheating coil, and outdoor air heat exchangers.
+The current reheat coil sizing approach in EnergyPlus is designed assuming there are central heating coils in the primary air systems. It does not apply for the system without central heating coils. This feature aims to improve it to handle various system configurations. Different sizing parameters will be selected depending on the existance of central heating coil, preheating coil, and outdoor air heat exchangers.
 
 
 ## E-mail and  Conference Call Conclusions ##
