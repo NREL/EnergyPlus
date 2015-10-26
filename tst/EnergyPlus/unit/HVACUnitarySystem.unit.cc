@@ -1893,7 +1893,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 		"  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
 		"  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
 		"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
-		"  ,                       !- Supply air Flow Rate Method During Heating Operation",
+		"  ,                       !- Supply air Flow Rate Method During Heating Operation", // blank input not allowed with gas heating coil (no air flow input field)
 		"  ,                       !- Supply Air Flow Rate During Heating Operation{ m3/s }",
 		"  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
 		"  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
@@ -2007,8 +2007,8 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 	EXPECT_TRUE( ErrorsFound ); // expect error on ill-formed input
 
 }
-TEST_F( HVACFixture, UnitarySystem_MultispeedDXCoilSizing ) {
-	UnitarySystemData thisUnSys;
+
+TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
 	std::string const idf_objects = delimited_string( {
 		"Version,8.3;",
