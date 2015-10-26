@@ -2084,22 +2084,41 @@ For the variable-speed DX heating coil, we specify a nominal speed level. During
 
 ### Pump Sizing
 
-The loop pumps' autosizable inputs are design volume flow rate and design power consumption. We have
+The loop pumps' autosizable inputs are design volume flow rate and design power consumption. 
 
-*Eff<sub>tot</sub>*=*Eff<sub>mot</sub>* \**Eff<sub>impeller</sub>*
+#### Design Volume Flow Rate
 
-The motor efficiency, *Eff<sub>mot</sub>*, is an input with a default of 0.9. 
-The impeller efficiency, *Eff<sub>impeller</sub>*, is an input, called Design Power per Unit Flow Rate per Unit Head, with a default of 0.78. Units are W/((m3/s)-Pa).
+This is set equal to the design flow rate for the loop which is obtained from summing the needs of the components on the demand side of the loop.  Each component on the plant loop registers its design flow rate and central routines sum them up. 
 
-#### Rated Volumetric Flow Rate
+#### Design Power Consumption
 
-This is just set equal to the design loop demand obtained from summing the needs of the components on the demand side of the loop.
+There are two methods available for calculating the design flow rate. The pump object has a input field to select which method to use.  
 
-#### Rated Power Consumption
+The first, and original, method is selected by choosing PowerPerFlowPerPressure.  And the design power is calculated using 
 
-<div>$$\dot Qnom = Hnom\cdot \dot Vnom/Efftot$$</div>
 
-*H<sub>nom</sub>*, the nominal head, is an input.
+<div>$$\dot Q<sub>nom</sub> = H<sub>nom</sub> \cdot \dot V<sub>nom</sub> \cdot ScalingFactor /Eff<sub>mot</sub>$$</div>
+
+where,
+
+*Eff<sub>mot</sub>* is the motor efficiency, often the default value of 0.9.
+
+*V<sub>nom</sub>* is the design volume flow rate in m<sup>3</sup>/s.
+
+*ScalingFactor* is an input called Design Power per Unit Flow Rate per Unit Head, with a default of 1.282051 W/((m<sup>3</sup>/s)-Pa).  (This is the inverse of 0.78 for impeller efficiency that was used prior to version 8.5.)
+
+*H<sub>nom</sub>* the nominal head, or pressure rise across the pump, is an input in Pascals.
+
+
+The second method is selected by choosing PowerPerFlow.  Then the power is calculated more simply and does not use head pressure or motor efficiency  
+
+<div>$$\dot Q<sub>nom</sub> = \dot V<sub>nom</sub> \cdot ScalingFactor$$</div>
+
+where 
+
+*ScalingFactor* is an input called Design Power per Unit Flow Rate, with a default of 348701.1 W/(m<sup>3</sup>/s) or 22 W/gpm. 
+
+
 
 ### Electric Chiller Sizing
 

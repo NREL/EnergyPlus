@@ -297,7 +297,6 @@
 !      V/K                    =>   V/F                 0.555555555555556
 !      W                      =>   Btu/h               3.4121412858518
 !      W/(m3/s)               =>   W/(ft3/min)         0.0004719475
-!      W/((m3/s)-Pa)          =>   W/(gpm-ftH20)       ??????
 !      W/K                    =>   Btu/h-F             1.89563404769544
 !      W/m                    =>   Btu/h-ft            1.04072
 !      W/m2                   =>   Btu/h-ft2           0.316957210776545
@@ -322,6 +321,8 @@
 !      W/m2                   =>   W/m2                1
 !      W/m-K                  =>   Btu/h-ft-F          0.577796066000163
 !      W/person               =>   W/person            1
+!      W/(m3/s)               =>   W/(gal/min)         0.0000630902
+!      W/((m3/s)-Pa)          =>   W/((gal/min)-ftH20) 0.188554
 !
 ! Units fields that are not translated
 !      $
@@ -59004,13 +59005,12 @@ Pump:VariableSpeed,
        \note default head is 60 feet
        \ip-units ftH2O
   N3 , \field Design Power Consumption
-       \note When autosized the scaling factor is the input field Design Power per Unit Flow Rate per Unit Head
-       \note autosized Design Power Consumption = Design Maximum Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
        \units W
        \autosizable
        \ip-units W
   N4 , \field Motor Efficiency
-       \note This is the motor efficiency only. When the Design Power Consumption is autosized,
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
        \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
@@ -59096,13 +59096,32 @@ Pump:VariableSpeed,
         \type real
         \minimum 0.0
         \maximum 1.0
-  N13,  \field Design Power per Unit Flow Rate per Unit Head
-        \note Used to size Design Power Consumption
-        \default 0.78
-        \units W/((m3/s)-Pa)
-        \ip-units W/(gpm-ftH20)
+  A14,  \field Design Power Sizing Method
+        \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+        \type choice
+        \key PowerPerFlow
+        \note PowerPerFlow indicates that Design Power per Unit Flow Rate is used as scaling factor.
+        \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+        \key PowerPerFlowPerPressure
+        \note PowerPerFlowPerPressure indicates that Design Power per Unit Flow Rate per Unit Head is used as scaling factor.
+        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+        \default PowerPerFlowPerPressure
+  N13,  \field Design Power per Unit Flow Rate
+        \type real
+        \note Used to size Design Power Consumption from design flow rate
+        \default 348701.1
+        \units W/(m3/s)
+        \ip-units W/(gal/min)
         \minimum> 0
-  N14;  \field Design Minimum Flow Rate Sizing Factor
+  N14,  \field Design Power per Unit Flow Rate per Unit Head
+        \type real
+        \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+        \default 1.282051
+        \units W/((m3/s)-Pa)
+        \ip-units W/((gal/min)-ftH20)
+        \minimum> 0
+  N15;  \field Design Minimum Flow Rate Sizing Factor
+        \type real
         \note Used to size Design Minimum Flow Rate
         \default 0.0
         \minimum 0
@@ -59130,13 +59149,12 @@ Pump:ConstantSpeed,
        \note default head is 60 feet
        \ip-units ftH2O
   N3 , \field Design Power Consumption
-       \note When autoszed the scaling factor is the input field Design Power per Unit Flow Rate Per Unit Head
-       \note autosized Design Power Consumption = Design Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
        \units W
        \autosizable
        \ip-units W
   N4 , \field Motor Efficiency
-       \note This is the motor efficiency only. When the Design Power Consumption is autosized,
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
        \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
@@ -59187,11 +59205,29 @@ Pump:ConstantSpeed,
        \type real
        \minimum 0.0
        \maximum 1.0
-  N9;  \field Design Power per Unit Flow Rate per Unit Head
-       \note Used to size Design Power Consumption
-       \default 0.78
+  A8,  \field Design Power Sizing Method
+       \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+       \type choice
+       \key PowerPerFlow
+       \note PowerPerFlow indicates that Design Power per Unit Flow Rate is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \key PowerPerFlowPerPressure
+       \note PowerPerFlowPerPressure indicates that Design Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+       \default PowerPerFlowPerPressure
+  N9,  \field Design Power per Unit Flow Rate
+       \type real
+       \note Used to size Design Power Consumption from design flow rate
+       \default 348701.1
+       \units W/(m3/s)
+       \ip-units W/(gal/min)
+       \minimum> 0
+  N10; \field Design Power per Unit Flow Rate per Unit Head
+       \type real
+       \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+       \default 1.282051
        \units W/((m3/s)-Pa)
-       \ip-units W/(gpm-ftH20)
+       \ip-units W/((gal/min)-ftH20)
        \minimum> 0
 
 Pump:VariableSpeed:Condensate,
@@ -59217,13 +59253,12 @@ Pump:VariableSpeed:Condensate,
        \note default head is 60 feet
        \ip-units ftH2O
   N3 , \field Design Power Consumption
-       \note When autoszed the scaling factor is the input field Design Power per Unit Flow Rate Per Unit Head
-       \note autosized Design Power Consumption = Design Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
        \units W
        \autosizable
        \ip-units W
   N4 , \field Motor Efficiency
-       \note This is the motor efficiency only. When the Design Power Consumption is autosized,
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
        \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
@@ -59296,14 +59331,13 @@ HeaderedPumps:ConstantSpeed,
   N4 , \field Design Power Consumption
        \note If the field is not autosized set to the power consumed by the pump bank
        \note when all the pumps are running at nominal flow
-       \note When autoszed the scaling factor is the input field Design Power per Unit Flow Rate Per Unit Head
-       \note autosized Design Power Consumption = Design Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
        \units W
        \autosizable
        \ip-units W
   N5 , \field Motor Efficiency
-       \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-       \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
+       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
        \maximum 1.0
@@ -59333,11 +59367,29 @@ HeaderedPumps:ConstantSpeed,
        \type real
        \minimum 0.0
        \maximum 1.0
-  N8 ; \field Design Power per Unit Flow Rate per Unit Head
-       \note Used to size Design Power Consumption
-       \default 0.78
+  A8,  \field Design Power Sizing Method
+       \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+       \type choice
+       \key PowerPerFlow
+       \note PowerPerFlow indicates that Design Power per Unit Flow Rate is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \key PowerPerFlowPerPressure
+       \note PowerPerFlowPerPressure indicates that Design Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+       \default PowerPerFlowPerPressure
+  N8,  \field Design Power per Unit Flow Rate
+       \type real
+       \note Used to size Design Power Consumption from design flow rate
+       \default 348701.1
+       \units W/(m3/s)
+       \ip-units W/(gal/min)
+       \minimum> 0
+  N9; \field Design Power per Unit Flow Rate per Unit Head
+       \type real
+       \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+       \default 1.282051
        \units W/((m3/s)-Pa)
-       \ip-units W/(gpm-ftH20)
+       \ip-units W/((gal/min)-ftH20)
        \minimum> 0
        
 HeaderedPumps:VariableSpeed,
@@ -59372,14 +59424,13 @@ HeaderedPumps:VariableSpeed,
   N4 , \field Design Power Consumption
        \note If the field is not autosized set to the power consumed by the pump bank
        \note when all the pumps are running at nominal flow
-       \note When autoszed the scaling factor is the input field Design Power per Unit Flow Rate Per Unit Head
-       \note autosized Design Power Consumption = Design Flow Rate * Design Pump Head / (scaling factor * Motor Efficiency)
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
        \units W
        \autosizable
        \ip-units W
   N5 , \field Motor Efficiency
-       \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-       \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
+       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
        \maximum 1.0
@@ -59422,11 +59473,29 @@ HeaderedPumps:VariableSpeed,
        \type real
        \minimum 0.0
        \maximum 1.0
-  N13; \field Design Power per Unit Flow Rate per Unit Head
-       \note Used to size Design Power Consumption
-       \default 0.78
+  A8,  \field Design Power Sizing Method
+       \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+       \type choice
+       \key PowerPerFlow
+       \note PowerPerFlow indicates that Design Power per Unit Flow Rate is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \key PowerPerFlowPerPressure
+       \note PowerPerFlowPerPressure indicates that Design Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+       \default PowerPerFlowPerPressure
+  N11, \field Design Power per Unit Flow Rate
+       \type real
+       \note Used to size Design Power Consumption from design flow rate
+       \default 348701.1
+       \units W/(m3/s)
+       \ip-units W/(gal/min)
+       \minimum> 0
+  N12; \field Design Power per Unit Flow Rate per Unit Head
+       \type real
+       \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+       \default 1.282051
        \units W/((m3/s)-Pa)
-       \ip-units W/(gpm-ftH20)
+       \ip-units W/((gal/min)-ftH20)
        \minimum> 0
 
 \group Plant-Condenser Flow Control
