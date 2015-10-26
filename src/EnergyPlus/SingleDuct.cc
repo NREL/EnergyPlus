@@ -5062,6 +5062,7 @@ namespace SingleDuct {
 		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
 
 		// Locals
+		Real64 ReturnValue;
 		Real64 ReheatCoilInTempForSizing;
 		Real64 ReheatCoilInHumRatForSizing;
 		Real64 OutAirFrac;
@@ -5101,7 +5102,7 @@ namespace SingleDuct {
 			
 			}
 
-			return ReheatCoilInTempForSizing;
+			ReturnValue = ReheatCoilInTempForSizing;
 			
 		} else if ( ParameterType == HeatingWaterDesAirInletHumRatSizing ) {
 			
@@ -5125,9 +5126,10 @@ namespace SingleDuct {
 			
 			}
 
-			return ReheatCoilInHumRatForSizing;
+			ReturnValue = ReheatCoilInHumRatForSizing;
 		}
 
+		return ReturnValue;
 	}
 	
 	
