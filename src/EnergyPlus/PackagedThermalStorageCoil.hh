@@ -1053,6 +1053,14 @@ namespace PackagedThermalStorageCoil {
 		std::string const CurrentModuleObject
 	);
 
+	void
+	GetTESCoilCoolingAirFlowRate(
+		std::string const & CoilName,
+		Real64 & CoilCoolAirFlow,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	);
+
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

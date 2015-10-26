@@ -85,6 +85,7 @@ public: // Types
 	using Super::l3;
 	using Super::l4;
 	using Super::l5;
+	using Super::move_if;
 	using Super::operator ();
 	using Super::operator [];
 	using Super::resize;
@@ -973,7 +974,7 @@ public: // Modifier
 						size_type l( index( i1, i2, i3, i4, b5 ) );
 						size_type m( o.index( i1, i2, i3, i4, b5 ) );
 						for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
-							o[ m ] = operator []( l );
+							o[ m ] = move_if( operator []( l ) );
 						}
 					}
 				}
@@ -1000,7 +1001,7 @@ public: // Modifier
 						size_type l( index( i1, i2, i3, i4, b5 ) );
 						size_type m( o.index( i1, i2, i3, i4, b5 ) );
 						for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
-							o[ m ] = operator []( l );
+							o[ m ] = move_if( operator []( l ) );
 						}
 					}
 				}
@@ -1028,7 +1029,7 @@ public: // Modifier
 						size_type l( index( i1, i2, i3, i4, b5 ) );
 						size_type m( o.index( i1, i2, i3, i4, b5 ) );
 						for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
-							o[ m ] = operator []( l );
+							o[ m ] = move_if( operator []( l ) );
 						}
 					}
 				}
@@ -1056,7 +1057,7 @@ public: // Modifier
 						size_type l( index( i1, i2, i3, i4, b5 ) );
 						size_type m( o.index( i1, i2, i3, i4, b5 ) );
 						for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
-							o[ m ] = operator []( l );
+							o[ m ] = move_if( operator []( l ) );
 						}
 					}
 				}

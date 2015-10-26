@@ -3,13 +3,10 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 # public API headers go in the src/EnergyPlus/public folder
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 
-if(MSVC)
-#  add_definitions(/Za)
-endif()
-
 # Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
 if(NOT PROFILE_USE)
   configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
+  configure_file( ConfiguredFunctions.in.hh "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh" )
 endif()
 
 SET( SRC
@@ -45,12 +42,11 @@ SET( SRC
   ChillerIndirectAbsorption.hh
   ChillerReformulatedEIR.cc
   ChillerReformulatedEIR.hh
-  #CommandLineInterface.cc
-  #CommandLineInterface.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc
   ConductionTransferFunctionCalc.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh"
   ConvectionCoefficients.cc
   ConvectionCoefficients.hh
   CoolTower.cc

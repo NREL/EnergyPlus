@@ -23,8 +23,7 @@
 ! converted into EnergyPlus objects using a spreadsheet called ConvertENCOSTtoEnergyPlusLifeCycleCost.xls
 ! which is available upon request.
 
-!  Version,
-!    8.3;                    !- Version Identifier
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   LifeCycleCost:UsePriceEscalation,
     NorthEast  Residential-Electricity,  !- Name

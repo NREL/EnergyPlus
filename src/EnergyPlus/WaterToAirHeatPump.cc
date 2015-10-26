@@ -395,14 +395,12 @@ namespace WaterToAirHeatPump {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Water Nodes" );
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 6 ), AlphArray( 7 ), "Air Nodes" );
 
+			// Setup Report variables for the detailed cooling Heat Pump
+			// CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation"
 			SetupOutputVariable( "Cooling Coil Electric Energy [J]", WatertoAirHP( HPNum ).Energy, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "Electric", "Cooling", _, "System" );
-
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", WatertoAirHP( HPNum ).EnergyLoadTotal, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-
 			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", WatertoAirHP( HPNum ).EnergySensible, "System", "Summed", WatertoAirHP( HPNum ).Name );
-
 			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", WatertoAirHP( HPNum ).EnergyLatent, "System", "Summed", WatertoAirHP( HPNum ).Name );
-
 			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy [J]", WatertoAirHP( HPNum ).EnergySource, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 
 			// save the design source side flow rate for use by plant loop sizing algorithms
@@ -499,10 +497,9 @@ namespace WaterToAirHeatPump {
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Water Nodes" );
 			TestCompSet( CurrentModuleObject, AlphArray( 1 ), AlphArray( 6 ), AlphArray( 7 ), "Air Nodes" );
 
+			// CurrentModuleObject = "Coil:Heating:WaterToAirHeatPump:ParameterEstimation"
 			SetupOutputVariable( "Heating Coil Electric Energy [J]", WatertoAirHP( HPNum ).Energy, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "Electric", "Heating", _, "System" );
-
 			SetupOutputVariable( "Heating Coil Heating Energy [J]", WatertoAirHP( HPNum ).EnergyLoadTotal, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-
 			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy [J]", WatertoAirHP( HPNum ).EnergySource, "System", "Summed", WatertoAirHP( HPNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
 
 			// save the design source side flow rate for use by plant loop sizing algorithms

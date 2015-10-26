@@ -3124,6 +3124,7 @@ namespace RuntimeLanguageProcessor {
 						ErrorsFound = true;
 					}}
 
+					//Resource Type
 					{ auto const SELECT_CASE_var( cAlphaArgs( 5 ) );
 
 					if ( SELECT_CASE_var == "ELECTRICITY" ) {
@@ -3178,6 +3179,7 @@ namespace RuntimeLanguageProcessor {
 						ErrorsFound = true;
 					}}
 
+					//Group Type
 					{ auto const SELECT_CASE_var( cAlphaArgs( 6 ) );
 
 					if ( SELECT_CASE_var == "BUILDING" ) {
@@ -3186,12 +3188,15 @@ namespace RuntimeLanguageProcessor {
 						GroupTypeString = "HVAC";
 					} else if ( SELECT_CASE_var == "PLANT" ) {
 						GroupTypeString = "Plant";
+					} else if (SELECT_CASE_var == "SYSTEM") {
+						GroupTypeString = "System";
 					} else {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
 						ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 						ErrorsFound = true;
 					}}
 
+					//End Use Type
 					{ auto const SELECT_CASE_var( cAlphaArgs( 7 ) );
 
 					if ( SELECT_CASE_var == "HEATING" ) {
@@ -3222,11 +3227,33 @@ namespace RuntimeLanguageProcessor {
 						EndUseTypeString = "Refrigeration";
 					} else if ( SELECT_CASE_var == "ONSITEGENERATION" ) {
 						EndUseTypeString = "Cogeneration";
+					} else if ( SELECT_CASE_var == "HEATINGCOILS" ) {
+						EndUseTypeString = "HeatingCoils";
+					} else if ( SELECT_CASE_var == "COOLINGCOILS" ) {
+						EndUseTypeString = "CoolingCoils";
+					} else if ( SELECT_CASE_var == "CHILLERS" ) {
+						EndUseTypeString = "Chillers";
+					} else if ( SELECT_CASE_var == "BOILERS" ) {
+						EndUseTypeString = "Boilers";
+					} else if ( SELECT_CASE_var == "BASEBOARD" ) {
+						EndUseTypeString = "Baseboard";
+					} else if ( SELECT_CASE_var == "HEATRECOVERYFORCOOLING" ) {
+						EndUseTypeString = "HeatRecoveryForCooling";
+					} else if ( SELECT_CASE_var == "HEATRECOVERYFORHEATING" ) {
+						EndUseTypeString = "HeatRecoveryForHeating";
 					} else {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
 						ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 						ErrorsFound = true;
 					}}
+					
+					//Additional End Use Types Only Used for EnergyTransfer
+					if ( ( ResourceTypeString != "EnergyTransfer" ) && ( EndUseTypeString == "HeatingCoils" || EndUseTypeString == "CoolingCoils" || EndUseTypeString == "Chillers" || EndUseTypeString == "Boilers" || EndUseTypeString == "Baseboard" || EndUseTypeString == "HeatRecoveryForCooling" || EndUseTypeString == "HeatRecoveryForHeating" ) ) {
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
+						ShowContinueError( "Invalid " + cAlphaFieldNames( 5 ) + "=" + cAlphaArgs( 5 ) + " for " + cAlphaFieldNames( 7 ) + "=" + cAlphaArgs( 7 ) );
+						ShowContinueError( "Field " + cAlphaFieldNames( 5 ) + " is reset from " + cAlphaArgs( 5 ) + " to EnergyTransfer" );
+						ResourceTypeString = "EnergyTransfer";
+					}
 
 					if ( ! lAlphaFieldBlanks( 8 ) ) {
 						EndUseSubCatString = cAlphaArgs( 8 );

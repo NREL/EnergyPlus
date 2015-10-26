@@ -84,6 +84,7 @@ namespace ObjexxFCL {
 				}
 			}
 		}
+		assert( legal() );
 		return *this;
 	}
 
@@ -110,6 +111,7 @@ namespace ObjexxFCL {
 			u_ = 0;
 			size_ = 0u;
 		}
+		assert( legal() );
 		return *this;
 	}
 

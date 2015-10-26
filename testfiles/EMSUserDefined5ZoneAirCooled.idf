@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.4;
 
   Building,
     Building,                !- Name
@@ -2525,6 +2525,7 @@
     Set OACoil_Air_Tout          = Air_Tout,  !- Program Line 2
     Set OACoil_Air_Wout          = Air_Wout,  !- <none>
     Set OACoil_tot_cool_Power    = Tot_Cool_Power,  !- <none>
+    Set OACoil_tot_cool_Energy   = Tot_Cool_Power * SystemTimestep * 3600,  !- <none>
     Set OACoil_Air_MdotOut       = Air_Mdot,  !- <none>
     Set OACoil_Water_Tout        = Water_Tout;  !- <none>
 
@@ -2725,6 +2726,7 @@
     Set CWcoil1_Air_Tout          = Air_Tout,  !- Program Line 2
     Set CWcoil1_Air_Wout          = Air_Wout,  !- <none>
     Set CWcoil1_tot_cool_Power    = Tot_Cool_Power,  !- <none>
+    Set CWcoil1_tot_cool_Energy   = Tot_Cool_Power * SystemTimestep * 3600,  !- <none>
     Set CWcoil1_Air_MdotOut       = Air_Mdot,  !- <none>
     Set CWcoil1_Water_Tout        = Water_Tout;  !- <none>
 
@@ -2977,6 +2979,7 @@
     Set HWcoil1_Air_Tout          = Air_Tout,  !- Program Line 2
     Set HWcoil1_Air_Wout          = Air_Wout,  !- <none>
     Set HWcoil1_tot_heat_Power    = Tot_heat_Power,  !- <none>
+    Set HWcoil1_tot_heat_Energy   = Tot_heat_Power * SystemTimestep * 3600,  !- <none>
     Set HWcoil1_Air_MdotOut       = Air_Mdot,  !- <none>
     Set HWcoil1_Water_Tout        = Water_Tout;  !- <none>
 
@@ -3882,6 +3885,39 @@
     HVAC,                    !- Group Type
     Cooling,                 !- End-Use Category
     Custom air coolled chiller,  !- End-Use Subcategory
+    J;                       !- Units
+
+  EnergyManagementSystem:MeteredOutputVariable,
+    CWcoil1 tot cool Energy, !- Name
+    CWcoil1_tot_cool_Energy, !- EMS Variable Name
+    SystemTimestep,          !- Update Frequency
+    MainCWCoil1_ModelOuput,  !- EMS Program or Subroutine Name
+    ENERGYTRANSFER,          !- Resource Type
+    System,                  !- Group Type
+    COOLINGCOILS,            !- End-Use Category
+    ,                        !- End-Use Subcategory
+    J;                       !- Units
+
+  EnergyManagementSystem:MeteredOutputVariable,
+    HWcoil1 tot heat Energy,  !- Name
+    HWcoil1_tot_heat_Energy, !- EMS Variable Name
+    SystemTimestep,          !- Update Frequency
+    MainHWCoil1_ModelOuput,  !- EMS Program or Subroutine Name
+    ENERGYTRANSFER,          !- Resource Type
+    System,                  !- Group Type
+    HEATINGCOILS,            !- End-Use Category
+    ,                        !- End-Use Subcategory
+    J;                       !- Units
+
+  EnergyManagementSystem:MeteredOutputVariable,
+    OACoil tot cool Energy,  !- Name
+    OACoil_tot_cool_Energy,  !- EMS Variable Name
+    SystemTimestep,          !- Update Frequency
+    OA_CWCoil_ModelOuput,    !- EMS Program or Subroutine Name
+    ENERGYTRANSFER,          !- Resource Type
+    System,                  !- Group Type
+    COOLINGCOILS,            !- End-Use Category
+    ,                        !- End-Use Subcategory
     J;                       !- Units
 
 ! input data

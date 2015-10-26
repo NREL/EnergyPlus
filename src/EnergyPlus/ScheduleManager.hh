@@ -288,8 +288,9 @@ namespace ScheduleManager {
 		Array2A_bool SetMinuteValue,
 		bool & ErrorsFound,
 		std::string const & DayScheduleName, // Name (used for errors)
-		std::string const & ErrContext // Context (used for errors)
-	);
+		std::string const & ErrContext, // Context (used for errors)
+		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
+		);
 
 	void
 	DecodeHHMMField(
@@ -298,8 +299,12 @@ namespace ScheduleManager {
 		int & RetMM, // Returned "minute"
 		bool & ErrorsFound, // True if errors found in this field
 		std::string const & DayScheduleName, // originating day schedule name
-		std::string const & FullFieldValue // Full Input field value
-	);
+		std::string const & FullFieldValue, // Full Input field value
+		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
+		);
+
+	bool
+	isMinuteMultipleOfTimestep( int minute, int numMinutesPerTimestep );
 
 	void
 	ProcessForDayTypes(

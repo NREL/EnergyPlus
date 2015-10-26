@@ -1293,6 +1293,11 @@ namespace HVACUnitarySystem {
 	void
 	GetUnitarySystemInput();
 
+	void
+	GetUnitarySystemInputData(
+		bool & ErrorFlag
+	);
+
 	// End of Get Input subroutines for the Module
 	//******************************************************************************
 
