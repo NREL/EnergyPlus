@@ -959,8 +959,8 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 	EXPECT_EQ( DataHeatBalance::ZonePreDefRep( 1 ).NumOccAccumTime, DataHeatBalance::ZonePreDefRep( 2 ).NumOccAccumTime );
 	EXPECT_EQ( DataHeatBalance::ZonePreDefRep( 1 ).TotTimeOcc, DataHeatBalance::ZonePreDefRep( 2 ).TotTimeOcc );
 
-	//expect reported occupancy to be based on multipliers
-	EXPECT_NEAR( 10.0, ( DataHeatBalance::ZonePreDefRep( 2 ).NumOccAccum / DataHeatBalance::ZonePreDefRep( 1 ).NumOccAccum ), 0.00001 );
+	// occupancy is reported on a zone basis without multipliers (until this changes, expect results to be equal)
+	EXPECT_EQ( DataHeatBalance::ZonePreDefRep( 1 ).NumOccAccum, DataHeatBalance::ZonePreDefRep( 2 ).NumOccAccum );
 
 	//expect energy to report according to multipliers
 	EXPECT_NEAR( 10.0, ( DataHeatBalance::ZonePreDefRep( 2 ).MechVentVolTotal / DataHeatBalance::ZonePreDefRep( 1 ).MechVentVolTotal ), 0.00001 );
@@ -977,7 +977,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 
 }
 
-TEST_F( HVACFixture, OutputReportTabular_ZoneSumTest )
+TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneSumTest )
 {
 	// AUTHOR: R. Raustad, FSEC
 	// DATE WRITTEN: Sep 2015
