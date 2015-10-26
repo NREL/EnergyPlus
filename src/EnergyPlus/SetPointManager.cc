@@ -4650,7 +4650,13 @@ namespace SetPointManager {
 	}
 
 	Real64
-	CalcSetPoint(Real64 OutLowTemp, Real64 OutHighTemp, Real64 OutDryBulbTemp, Real64 SetTempAtOutLow, Real64 SetTempAtOutHigh)
+	DefineOutsideAirSetPointManager::CalcSetPoint(
+		Real64 OutLowTemp, 
+		Real64 OutHighTemp, 
+		Real64 OutDryBulbTemp, 
+		Real64 SetTempAtOutLow, 
+		Real64 SetTempAtOutHigh
+	)
 	{
 		Real64 SetPt;
 		if ( OutLowTemp < OutHighTemp) { // && SetTempAtOutLow > SetTempAtOutHigh 
