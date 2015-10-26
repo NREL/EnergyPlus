@@ -33,6 +33,9 @@ namespace OutputReportTabularAnnual {
 	GatherAnnualResultsForTimeStep( int kindOfTypeStep );
 
 	void
+	ResetAnnualGathering();
+
+	void
 	WriteAnnualTables();
 
 	void
@@ -83,6 +86,9 @@ public:
 
 	void
 	gatherForTimestep( int kindOfTypeStep );
+
+	void
+	resetGathering();
 
 	void
 	writeTable( int unitsStyle );

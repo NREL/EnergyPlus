@@ -17,8 +17,9 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/OutAirNodeManager.hh>
 
 using namespace EnergyPlus::MixedAir;
@@ -36,7 +37,7 @@ using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
 
-	TEST_F( HVACFixture, MixedAir_ProcessOAControllerTest )
+	TEST_F( EnergyPlusFixture, MixedAir_ProcessOAControllerTest )
 	{
 		std::string const idf_objects = delimited_string({
 			"Version,8.3;",
@@ -121,7 +122,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, MixedAir_HXBypassOptionTest )
+	TEST_F( EnergyPlusFixture, MixedAir_HXBypassOptionTest )
 	{
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
@@ -248,9 +249,9 @@ namespace EnergyPlus {
 		int OAControllerNum;
 		int AirLoopNum;
 
-		AirLoopControlInfo.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in HVACFixture
-		AirLoopFlow.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in HVACFixture
-		Node.allocate( 16 ); // will be deallocated by DataLoopNode::clear_state(); in HVACFixture
+		AirLoopControlInfo.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
+		AirLoopFlow.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
+		Node.allocate( 16 ); // will be deallocated by DataLoopNode::clear_state(); in EnergyPlusFixture
 
 		// Initialize common AirLoop data
 		for ( AirLoopNum = 1; AirLoopNum <=4; ++AirLoopNum ) {
@@ -368,7 +369,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, CO2ControlDesignOccupancyTest )
+	TEST_F( EnergyPlusFixture, CO2ControlDesignOccupancyTest )
 	{
 		Contaminant.CO2Simulation = true;
 		Contaminant.CO2OutdoorSchedPtr = 1;
@@ -498,7 +499,7 @@ namespace EnergyPlus {
 		ZoneCO2GainFromPeople.deallocate();
 	}
 
-	TEST_F( HVACFixture, MissingDesignOccupancyTest )
+	TEST_F( EnergyPlusFixture, MissingDesignOccupancyTest )
 	{
 
 		bool ErrorsFound( false );

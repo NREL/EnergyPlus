@@ -163,6 +163,9 @@ namespace Psychrometrics {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	InitializePsychRoutines();
 
 	void

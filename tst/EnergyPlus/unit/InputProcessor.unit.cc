@@ -165,7 +165,7 @@ namespace EnergyPlus {
 				"SimulationControl, NO, NO, NO, YES, YES;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects, false ) );
+			ASSERT_FALSE( process_idf( idf_objects, true, false ) );
 
 			EXPECT_FALSE( OverallErrorFlag );
 
