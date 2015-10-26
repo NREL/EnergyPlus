@@ -44,6 +44,7 @@ set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
+option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
 option( BUILD_DOCS "Build markdown based documentation" OFF )
@@ -169,7 +170,15 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
   ADD_SUBDIRECTORY(tst/jsoncpp/unit)
+
+  if (BUILD_PERFORMANCE_TESTS)
+    if (UNIX AND NOT APPLE)
+      find_program(VALGRIND NAMES valgrind PATH /usr/bin /usr/local/bin)
+    endif()
+    ADD_SUBDIRECTORY(performance_tests)
+  endif()
 endif()
+
 
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
