@@ -3113,8 +3113,8 @@ namespace ManageElectricPower {
 			//output1
 			if ( TotalSOC > q0 ) {
 				ElecStorage( ElecStorNum ).StorageMode = 2;
-				ElecStorage( ElecStorNum ).StoredPower = Volt * I0 * Numbattery;
-				ElecStorage( ElecStorNum ).StoredEnergy = Volt * I0 * Numbattery * TimeStepSys * SecInHour;
+				ElecStorage( ElecStorNum ).StoredPower = -1.0 * Volt * I0 * Numbattery;
+				ElecStorage( ElecStorNum ).StoredEnergy = -1.0 * Volt * I0 * Numbattery * TimeStepSys * SecInHour;
 				ElecStorage( ElecStorNum ).DecrementedEnergyStored = -1.0 * ElecStorage( ElecStorNum ).StoredEnergy;
 				ElecStorage( ElecStorNum ).DrawnPower = 0.0;
 				ElecStorage( ElecStorNum ).DrawnEnergy = 0.0;
@@ -3124,8 +3124,8 @@ namespace ManageElectricPower {
 				ElecStorage( ElecStorNum ).StoredPower = 0.0;
 				ElecStorage( ElecStorNum ).StoredEnergy = 0.0;
 				ElecStorage( ElecStorNum ).DecrementedEnergyStored = 0.0;
-				ElecStorage( ElecStorNum ).DrawnPower = Volt * I0 * Numbattery;
-				ElecStorage( ElecStorNum ).DrawnEnergy = Volt * I0 * Numbattery * TimeStepSys * SecInHour;
+				ElecStorage( ElecStorNum ).DrawnPower = -1.0 * Volt * I0 * Numbattery;
+				ElecStorage( ElecStorNum ).DrawnEnergy = -1.0 * Volt * I0 * Numbattery * TimeStepSys * SecInHour;
 
 			} else {
 				ElecStorage( ElecStorNum ).StorageMode = 0;
