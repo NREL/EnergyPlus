@@ -185,7 +185,15 @@ namespace EnergyPlus {
 					}else{
 						fldStIt->m_cell[tableRowIndex].indexesForKeyVar = -1; // flag value that cell is not gathered
 					}
-					fldStIt->m_cell[tableRowIndex].result = 0.0;
+					if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum || fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximumDuringHoursShown ){
+						fldStIt->m_cell[tableRowIndex].result = -9.9e99;
+					}
+					else if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum || fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimumDuringHoursShown ){
+						fldStIt->m_cell[tableRowIndex].result = 9.9e99;
+					}
+					else {
+						fldStIt->m_cell[tableRowIndex].result = 0.0;
+					}
 					fldStIt->m_cell[tableRowIndex].duration = 0.0;
 					fldStIt->m_cell[tableRowIndex].timeStamp = 0;
 				}
@@ -470,6 +478,42 @@ namespace EnergyPlus {
 				}
 			}
 		}
+
+		void
+		ResetAnnualGathering()
+		{
+			// Jason Glazer, October 2015
+			// This function is not part of the class but acts as an interface between procedural code and the class by
+			// reseting data for each of the AnnualTable objects
+			std::vector<AnnualTable>::iterator annualTableIt;
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+				annualTableIt->resetGathering();
+			}
+		}
+
+		void
+		AnnualTable::resetGathering()
+		{
+			std::vector<AnnualFieldSet>::iterator fldStIt;
+			std::vector<AnnualFieldSet>::iterator fldStRemainIt;
+			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+					if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum || fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximumDuringHoursShown ){
+						fldStIt->m_cell[row].result = -9.9e99;
+					} else if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum || fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimumDuringHoursShown ){
+						fldStIt->m_cell[row].result = 9.9e99;
+					} else {
+						fldStIt->m_cell[row].result = 0.0;
+					}
+					fldStIt->m_cell[row].duration = 0.0;
+					fldStIt->m_cell[row].timeStamp = 0;
+					// if any defered results
+					fldStIt->m_cell[row].deferredResults.clear();
+					fldStIt->m_cell[row].deferredElapsed.clear();
+				}
+			}
+		}
+
 
 		Real64
 		AnnualTable::getElapsedTime( int kindOfTimeStep )
