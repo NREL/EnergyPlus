@@ -38,6 +38,12 @@ namespace EnergyPlus {
 	// TODO: simplify macro by combining with __restrict?
 	// TODO: encapsulate in aligned/padded ArrayXD templates?
 
+#define EXPLICIT_VECTORIZATION
+
+#undef WTF
+
+#define __round_2(I) (((I + 1) >> 1) << 1)
+
 #if defined(__GNUC__) && !defined(__clang__)
 #define __ep_assume_aligned(T, A, N) A = (T)__builtin_assume_aligned(A, N)
 #elif defined(__INTEL_COMPILER) 
@@ -192,11 +198,13 @@ namespace HeatBalanceIntRadExchange {
 #endif
 		if ( firstTime ) {
 			InitInteriorRadExchange();
-			SurfaceTempK4.allocate( MaxNumOfZoneSurfaces );
-			SurfaceEmiss.allocate( MaxNumOfZoneSurfaces );
 
-			NetLWRadToSurf_Temp.allocate( MaxNumOfZoneSurfaces );
-			IRfromParentZone_Temp.allocate( MaxNumOfZoneSurfaces );
+			// Amir Roth 2015-07-25: For vectorization, pad these arrays up to nearest multiple of 2 if necessary
+			SurfaceTempK4.allocate( __round_2( MaxNumOfZoneSurfaces ) );
+			SurfaceEmiss.allocate( __round_2( MaxNumOfZoneSurfaces ) );
+
+			NetLWRadToSurf_Temp.allocate( __round_2( MaxNumOfZoneSurfaces ) );
+			IRfromParentZone_Temp.allocate( __round_2( MaxNumOfZoneSurfaces ) );
 
 			firstTime = false;
 			if ( DeveloperFlag ) {
@@ -239,8 +247,11 @@ namespace HeatBalanceIntRadExchange {
 
 		for ( int ZoneNum = ( PartialResimulate ? ZoneToResimulate() : 1 ), ZoneNum_end = ( PartialResimulate ? ZoneToResimulate() : NumOfZones ); ZoneNum <= ZoneNum_end; ++ZoneNum ) {
 
+
 			ZoneData const & zone( Zone( ZoneNum ) );
 			ZoneViewFactorInformation & zvfi( ZoneInfo( ZoneNum ) );
+
+			int zvfiNumOfSurfaces2 = __round_2( zvfi.NumOfSurfaces );
 
 			// Calculate ScriptF if first time step in environment and surface heat-balance iterations not yet started;
 			// recalculate ScriptF if status of window interior shades or blinds has changed from
@@ -290,14 +301,27 @@ namespace HeatBalanceIntRadExchange {
 					CalcScriptF( zvfi.NumOfSurfaces, zvfi.Area, zvfi.F, zvfi.Emissivity, zvfi.ScriptF );
 					// precalc - multiply by StefanBoltzmannConstant
 
-					int Npad = (( zvfi.NumOfSurfaces + 1) >> 1 ) << 1;
-					for (int i = 0; i < zvfi.NumOfSurfaces; ++i) {
-						Real64 * __restrict ScriptFi0 ( &zvfi.ScriptF[(i*Npad)] );
-						__ep_assume_aligned(Real64 *, ScriptFi0, 16);
-						for (int j = 0; j < zvfi.NumOfSurfaces; ++j)
-							ScriptFi0[j] *= StefanBoltzmannConst;
+					Real64 * __restrict vecZvfiScriptF ( &zvfi.ScriptF[ 0 ] );
+					__ep_assume_aligned(Real64 *, vecZvfiScriptF, 16);
+
+#ifndef EXPLICIT_VECTORIZATION 
+					int zvfiNumOfSurfacesTimesNumOfSurfaces2 = zvfi.NumOfSurfaces * zvfiNumOfSurfaces2;
+					assert( (zvfiNumOfSurfacesTimesNumOfSurfaces2 % 2) == 0);
+					for (int i = 0; i < zvfiNumOfSurfacesTimesNumOfSurfaces2; ++i) {
+						vecZvfiScriptF[ i ] *= StefanBoltzmannConst;
 					} // for i
-				}
+
+#else // ! EXPLICIT_VECTORIZATION
+
+					__m128d pdStefanBoltzmannConst = _mm_loaddup_pd( &StefanBoltzmannConst );
+					for ( int i = 0; i < zvfi.NumOfSurfaces * __round_2( zvfi.NumOfSurfaces ); i += 2 ) {
+						__m128d pdZvfiScriptF = _mm_load_pd( &vecZvfiScriptF[ i ] );
+						pdZvfiScriptF = _mm_mul_pd( pdZvfiScriptF, pdStefanBoltzmannConst );
+						_mm_store_pd( &vecZvfiScriptF[ i ], pdZvfiScriptF );
+					} // for i
+#endif // ! EXPLICIT_VECTORIZATION
+
+				} // if IntShadOrBlindStatusChanged || BeginEnvrnFlag 
 
 			} // End of check if SurfIterations = 0
 
@@ -345,9 +369,29 @@ namespace HeatBalanceIntRadExchange {
 			// Both __restrict and __assume_aligned hints require raw pointers, hence need to use raw pointers here.  These 
 			// pointers do not manage or "own" memory, they simply point at memory in a way that allows the compiler to optimize
 			// better
-			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfaces; ++ZoneSurfNum ) {
+
+#ifndef EXPLICIT_VECTORIZATION			
+
+			assert( ( zvfiNumOfSurfaces2 % 2 ) == 0 );
+			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfiNumOfSurfaces2; ++ZoneSurfNum ) {
 				vecSurfaceTempK4[ ZoneSurfNum ] = pow_4( vecSurfaceTempK4 [ ZoneSurfNum ] + KelvinConv );
 			} // for ZoneSurfNum
+
+#else // !EXPLICIT_VECTORIZATION
+			
+			// Load KelvinConv into both doubles of an SSE register
+			__m128d pdKelvinConv = _mm_loaddup_pd( &KelvinConv );
+			// Hand vectorize the pow_4 loop
+			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfiNumOfSurfaces2; ZoneSurfNum += 2 ) {
+			    __m128d pdSurfaceTempK4 = _mm_load_pd( &vecSurfaceTempK4[ ZoneSurfNum ] );
+			    pdSurfaceTempK4 = _mm_add_pd( pdSurfaceTempK4, pdKelvinConv );
+			    pdSurfaceTempK4 = _mm_mul_pd( pdSurfaceTempK4, pdSurfaceTempK4 );
+			    pdSurfaceTempK4 = _mm_mul_pd( pdSurfaceTempK4, pdSurfaceTempK4 );
+				_mm_store_pd( &vecSurfaceTempK4[ ZoneSurfNum ], pdSurfaceTempK4 );
+			} // for ZoneSurfNum
+
+#endif // !EXPLICIT_VECTORIZATION
+
 
 
 			// See comments above for explanation of __restrict and __ep_assume_aligned
@@ -356,10 +400,24 @@ namespace HeatBalanceIntRadExchange {
 			Real64 * __restrict vecIRfromParentZone_Temp( &IRfromParentZone_Temp[ 0 ] );
 			__ep_assume_aligned(Real64 *, vecIRfromParentZone_Temp, 16);
 
-			for (int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfaces; ++ZoneSurfNum) {
+#ifndef EXPLICIT_VECTORIZATION
+
+			assert( ( zvfiNumOfSurfaces2 % 2 ) == 0 );
+			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfiNumOfSurfaces2; ++ZoneSurfNum ) {
 				vecNetLWRadToSurf_Temp[ZoneSurfNum] = 0.0;
 				vecIRfromParentZone_Temp[ZoneSurfNum] = 0.0;
 			} // ZoneSurfNum
+
+#else // ! EXPLICIT_VECTORIZATION
+
+			__m128d z;
+			z = _mm_xor_pd( z, z );
+			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfiNumOfSurfaces2; ZoneSurfNum += 2 ) {
+			    _mm_store_pd( &vecNetLWRadToSurf_Temp[ ZoneSurfNum ], z );
+			    _mm_store_pd( &vecIRfromParentZone_Temp[ ZoneSurfNum ], z );
+			} // ZoneSurfNum
+
+#endif // ! EXPLICIT_VECTORIZATION
 
 			// These are the money loops
 			
@@ -378,16 +436,18 @@ namespace HeatBalanceIntRadExchange {
 				__ep_assume_aligned(Real64 *, vecSurfaceTempK4, 16);
 
 				// ScriptF is a "hand-rolled" padded 2D array.  Npad is the size of a padded row.
-				int Npad = (( zvfi.NumOfSurfaces + 1 ) >> 1 ) << 1;
-				Real64 * __restrict vecZvfiScriptF( &zvfi.ScriptF[ (SendZoneSurfNum * Npad) + RecZoneSurfNum ] );
+				Real64 * __restrict vecZvfiScriptF( &zvfi.ScriptF[ (SendZoneSurfNum * zvfiNumOfSurfaces2) + RecZoneSurfNum ] );
 				__ep_assume_aligned(Real64 *, vecZvfiScriptF, 16);
 
 			
 				// Calculate net long-wave radiation for opaque surfaces and incident
 				// long-wave radiation for windows.
 
+#ifndef EXPLICIT_VECTORIZATION
+
 				// Amir Roth 2015-07-01: vectorized inner loop.
-				for ( ; RecZoneSurfNum < zvfi.NumOfSurfaces; ++RecZoneSurfNum ) {
+				assert( ( zvfiNumOfSurfaces2 % 2 ) == 0 );
+				for ( ; RecZoneSurfNum < zvfiNumOfSurfaces2; ++RecZoneSurfNum ) {
 					// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
 
 					vecIRfromParentZone_Temp[ RecZoneSurfNum ] += vecZvfiScriptF[ RecZoneSurfNum ] * vecSurfaceTempK4[ SendZoneSurfNum ];
@@ -403,8 +463,43 @@ namespace HeatBalanceIntRadExchange {
 					//          ENDIF
 					
 
-				} // for SendZoneSurfNum
-			} // for RecZoneSurfNum
+				} // for RecZoneSurfNum
+
+#else // ! EXPLICIT_VECTORIZATION
+
+				__m128d pdSurfaceTempK4Send = _mm_loaddup_pd( &vecSurfaceTempK4[ SendZoneSurfNum ] );
+				for ( ; RecZoneSurfNum < zvfiNumOfSurfaces2; RecZoneSurfNum += 2 ) {
+
+					__m128d pdZvfiScriptF = _mm_load_pd( &vecZvfiScriptF[ RecZoneSurfNum ] );
+					__m128d pdSurfaceTempK4 = _mm_load_pd( &vecSurfaceTempK4[ RecZoneSurfNum ] );
+					
+					__m128d a = _mm_mul_pd( pdZvfiScriptF, pdSurfaceTempK4Send );
+					__m128d pdIRfromParentZone = _mm_load_pd( &vecIRfromParentZone_Temp[ RecZoneSurfNum ] );
+					pdIRfromParentZone = _mm_add_pd( pdIRfromParentZone, a );
+					_mm_store_pd( &vecIRfromParentZone_Temp[ RecZoneSurfNum ], pdIRfromParentZone );
+
+					__m128d pdNetLWRadToSurf = _mm_load_pd( &vecNetLWRadToSurf_Temp[ RecZoneSurfNum ] );
+
+#ifdef WTF
+					// NetLWRadToSurf += ScriptF * (SurfaceTempK4[ Send ] - SurfaceTempK4[ Rec ]) 
+					// This works
+					pdNetLWRadToSurf = _mm_add_pd( pdNetLWRadToSurf, a );
+					__m128d b = _mm_mul_pd( pdZvfiScriptF, pdSurfaceTempK4 );
+					pdNetLWRadToSurf = _mm_sub_pd( pdNetLWRadToSurf, b );
+#else // ! WTF
+					// NetLWRadToSurf += (ScriptF * SurfaceTempK4[ Send ]) - (ScriptF * SurfaceTempK4[ Rec ])
+					// This generates "big" diffs despite being the same thing
+					__m128d b = _mm_sub_pd( pdSurfaceTempK4Send, pdSurfaceTempK4 );
+					b = _mm_mul_pd( pdZvfiScriptF, b );
+					pdNetLWRadToSurf = _mm_add_pd( pdNetLWRadToSurf, b );
+#endif // ! WTF
+					_mm_store_pd( &vecNetLWRadToSurf_Temp[ RecZoneSurfNum ], pdNetLWRadToSurf );
+
+				} // fpr RecZoneSurfNum
+
+#endif // ! EXPLICIT_VECTORIZATION
+
+			} // for SendZoneSurfNum
 
 
 			// Amir Roth 2015-07-01: because loops with conditionals will not vectorize and because "money" Send->Recv inner loop had a 
@@ -1344,7 +1439,7 @@ namespace HeatBalanceIntRadExchange {
 
 		// Form ScriptF matrix 
 		// Amir Roth 2015-07-01: Npad is the size of a "padded" row
-		unsigned int Npad = ((N+1) >> 1) << 1;
+		unsigned int Npad = __round_2( N );
 
 		for ( int i = 1; i <= N; ++i ) { 
 			for ( int j = 1, lj = EMISS.index(j), ill = Cinverse.index(i, j), sll = (i-1)*Npad+(j-1); j <= N; ++j, ++lj, ++ill, ++sll ) {
