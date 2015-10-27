@@ -348,7 +348,9 @@ namespace RuntimeLanguageProcessor {
 			}
 			if ( CycleThisVariable ) continue;
 
-			ErlVariable( ErlVariableNum ).Value = SetErlValueNumber( 0.0, ErlVariable( ErlVariableNum ).Value );
+			if ( ErlVariable( ErlVariableNum ).Value.initialized ) {
+				ErlVariable( ErlVariableNum ).Value = SetErlValueNumber( 0.0, ErlVariable( ErlVariableNum ).Value );
+			}
 
 		}
 		//reinitialize state of actuators
@@ -1997,15 +1999,24 @@ namespace RuntimeLanguageProcessor {
 				if ( Operand( OperandNum ).Type == ValueExpression ) {
 					Operand( OperandNum ) = EvaluateExpression( Operand( OperandNum ).Expression ); //recursive call
 				} else if ( Operand( OperandNum ).Type == ValueVariable ) {
-					Operand( OperandNum ) = ErlVariable( Operand( OperandNum ).Variable ).Value;
+					if ( ErlVariable( Operand( OperandNum ).Variable ).Value.initialized ) { // check that value has been initialized
+						Operand( OperandNum ) = ErlVariable( Operand( OperandNum ).Variable ).Value;
+					} else { // value has never been set
+						ReturnValue.Type = ValueError;
+						ReturnValue.Error = "Variable " + ErlVariable( Operand( OperandNum ).Variable ).Name + " used in expression has not been initialized!" ;
+					}
+					
 				}
 			}
+
+			if ( ReturnValue.Type != ValueError) {
 
 			// Perform the operation
 			{ auto const SELECT_CASE_var( ErlExpression( ExpressionNum ).Operator );
 
 			if ( SELECT_CASE_var == OperatorLiteral ) {
 				ReturnValue = Operand( 1 );
+				ReturnValue.initialized = true;
 			} else if ( SELECT_CASE_var == OperatorNegative ) { // unary minus sign.  parsing does not work yet
 				ReturnValue = SetErlValueNumber( -1.0 * Operand( 1 ).Number );
 			} else if ( SELECT_CASE_var == OperatorDivide ) {
@@ -2423,6 +2434,7 @@ namespace RuntimeLanguageProcessor {
 				// throw Error!
 				ShowFatalError( "caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression" );
 			}}
+			}
 			Operand.deallocate();
 		}
 
@@ -3411,6 +3423,7 @@ namespace RuntimeLanguageProcessor {
 			newValue.Number = Number;
 		}
 
+		newValue.initialized = true;
 		return newValue;
 
 	}

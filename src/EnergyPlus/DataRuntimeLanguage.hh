@@ -433,6 +433,7 @@ namespace DataRuntimeLanguage {
 		bool TrendVariable; // true if Erl variable is really a trend variable
 		int TrendVarPointer; // index to match in TrendVariable structure
 		std::string Error; // holds error message string for reporting
+		bool initialized; // true if number value has been SET (ie. has been on LHS in SET expression)
 
 		// Default Constructor
 		ErlValueType() :
@@ -441,7 +442,8 @@ namespace DataRuntimeLanguage {
 			Variable( 0 ),
 			Expression( 0 ),
 			TrendVariable( false ),
-			TrendVarPointer( 0 )
+			TrendVarPointer( 0 ),
+			initialized( false )
 		{}
 
 		// Member Constructor
@@ -453,7 +455,8 @@ namespace DataRuntimeLanguage {
 			int const Expression, // Pointer to another Erl expression (e.g. compound operators)
 			bool const TrendVariable, // true if Erl variable is really a trend variable
 			int const TrendVarPointer, // index to match in TrendVariable structure
-			std::string const & Error // holds error message string for reporting
+			std::string const & Error, // holds error message string for reporting
+			bool const initialized
 		) :
 			Type( Type ),
 			Number( Number ),
@@ -462,7 +465,8 @@ namespace DataRuntimeLanguage {
 			Expression( Expression ),
 			TrendVariable( TrendVariable ),
 			TrendVarPointer( TrendVarPointer ),
-			Error( Error )
+			Error( Error ),
+			initialized( initialized )
 		{}
 
 	};
