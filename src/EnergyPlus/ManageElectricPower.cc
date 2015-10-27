@@ -1343,7 +1343,6 @@ namespace ManageElectricPower {
 				SetupOutputVariable( "Electric Storage Production Decrement Energy [J]", ElecStorage( StorNum ).DecrementedEnergyStored, "System", "Sum", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Discharge Power [W]", ElecStorage( StorNum ).DrawnPower, "System", "Average", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Discharge Energy [J]", ElecStorage( StorNum ).DrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name);
-				ElecStorage( StorNum ).DecrementDrawnEnergy = -1.0 * ElecStorage( StorNum ).DrawnEnergy;
 				SetupOutputVariable( "Electric Storage Discharge Decrement Energy [J]", ElecStorage( StorNum ).DecrementDrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "Electricity", "Cogeneration", "Batteries", "Plant" );
 				SetupOutputVariable( "Electric Storage Thermal Loss Rate [W]", ElecStorage( StorNum ).ThermLossRate, "System", "Average", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Thermal Loss Energy [J]", ElecStorage( StorNum ).ThermLossEnergy, "System", "Sum", ElecStorage( StorNum ).Name );
@@ -2674,6 +2673,7 @@ namespace ManageElectricPower {
 				ElecStorage( ElecStorNum ).DecrementedEnergyStored = 0.0;
 				ElecStorage( ElecStorNum ).DrawnPower = 0.0;
 				ElecStorage( ElecStorNum ).DrawnEnergy = 0.0;
+				ElecStorage( ElecStorNum ).DecrementDrawnEnergy = 0.0;
 				ElecStorage( ElecStorNum ).ThermLossRate = 0.0;
 				ElecStorage( ElecStorNum ).ThermLossEnergy = 0.0;
 
@@ -3079,6 +3079,7 @@ namespace ManageElectricPower {
 			ElecStorage( ElecStorNum ).DecrementedEnergyStored = -1.0 * ElecStorage( ElecStorNum ).StoredEnergy;
 			ElecStorage( ElecStorNum ).DrawnPower = ElecStorage( ElecStorNum ).PelFromStorage;
 			ElecStorage( ElecStorNum ).DrawnEnergy = ElecStorage( ElecStorNum ).PelFromStorage * TimeStepSys * SecInHour;
+			ElecStorage( ElecStorNum ).DecrementDrawnEnergy = -1.0 * ElecStorage( ElecStorNum ).DrawnEnergy;
 			ElecStorage( ElecStorNum ).ThermLossRate = max( ElecStorage( ElecStorNum ).StoredPower * ( 1.0 - ElecStorage( ElecStorNum ).EnergeticEfficCharge ), ElecStorage( ElecStorNum ).DrawnPower * ( 1.0 - ElecStorage( ElecStorNum ).EnergeticEfficDischarge ) );
 			ElecStorage( ElecStorNum ).ThermLossEnergy = ElecStorage( ElecStorNum ).ThermLossRate * TimeStepSys * SecInHour;
 
@@ -3135,6 +3136,7 @@ namespace ManageElectricPower {
 				ElecStorage( ElecStorNum ).DrawnEnergy = 0.0;
 			}
 
+			ElecStorage( ElecStorNum ).DecrementDrawnEnergy = -1.0 * ElecStorage( ElecStorNum ).DrawnEnergy;
 			ElecStorage( ElecStorNum ).AbsoluteSOC = TotalSOC * Numbattery;
 			ElecStorage( ElecStorNum ).FractionSOC = TotalSOC / qmax;
 			ElecStorage( ElecStorNum ).BatteryCurrent = I0 * Numpar;
