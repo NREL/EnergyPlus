@@ -1339,12 +1339,12 @@ namespace ManageElectricPower {
 			//For any battery
 			for ( StorNum = 1; StorNum <= NumofSimpleElecStorage + NumofKiBaMElecStorage; ++StorNum ) {
 				SetupOutputVariable( "Electric Storage Charge Power [W]", ElecStorage( StorNum ).StoredPower, "System", "Average", ElecStorage( StorNum ).Name );
-				SetupOutputVariable( "Electric Storage Charge Energy [J]", ElecStorage( StorNum ).StoredEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "Electricity", "ExteriorEquipment", "Batteries", "Plant" );
+				SetupOutputVariable( "Electric Storage Charge Energy [J]", ElecStorage( StorNum ).StoredEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "Electricity", "Cogeneration", "Batteries", "Plant" );
 				SetupOutputVariable( "Electric Storage Production Decrement Energy [J]", ElecStorage( StorNum ).DecrementedEnergyStored, "System", "Sum", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Discharge Power [W]", ElecStorage( StorNum ).DrawnPower, "System", "Average", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Discharge Energy [J]", ElecStorage( StorNum ).DrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name);
 				ElecStorage( StorNum ).DecrementDrawnEnergy = -1.0 * ElecStorage( StorNum ).DrawnEnergy;
-				SetupOutputVariable( "Electric Storage Discharge Decrement Energy [J]", ElecStorage( StorNum ).DecrementDrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "Electricity", "ExteriorEquipment", "Batteries", "Plant" );
+				SetupOutputVariable( "Electric Storage Discharge Decrement Energy [J]", ElecStorage( StorNum ).DecrementDrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "Electricity", "Cogeneration", "Batteries", "Plant" );
 				SetupOutputVariable( "Electric Storage Thermal Loss Rate [W]", ElecStorage( StorNum ).ThermLossRate, "System", "Average", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Thermal Loss Energy [J]", ElecStorage( StorNum ).ThermLossEnergy, "System", "Sum", ElecStorage( StorNum ).Name );
 				if ( AnyEnergyManagementSystemInModel ) {
