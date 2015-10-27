@@ -11,7 +11,22 @@ The defaults for maximum heating flow also do not reflect current practice. The 
 
 ### **Conference Call Conclusions**
 
-* None Yet
+* Mike Witte: Why can't we have an option to set the minimum cfm ratio to the minimum outdoor air ratio?
+
+This is certainly possible. The result of all the outdoor air calculations done in the zone and system sizing calculations is stored in *FinalZoneSizng().MinOA*. This includes the VRP calculations and the result of applying *Zone Maximum Outdoor Air Fraction* from *Sizing:System*. We could add an option to *Zone Minimum Air Flow Method* to have the default set by *MinOA*. Fo instance: \key MinOutdoorAir.
+
+
+* Can we address the following from Mike Rosenberg at PNNL? 
+
+Currently we manually calculate system OA for MZ systems based on Standard 62.1 VRP. To do this, we run a design day simulation to determine primary airflow to each zone first. Then we manually raise the minimum damper position of critical zones to keep the system ventilation efficiency greater than 0.6. This prevents very high percentages of OA for occupancies such as schools, and is typical design practice.  This is a time consuming process and we would like to automate it using the E+ built in system sizing VRP. But we are concerned that without the step of increasing minimum damper position at design we will have very high OA levels. Does the E+ VRP calculation assume minimum damper position and maximum OA? I understand you can increase the damper position dynamically to limit the % OA using the Mechanical Ventilation Controller using the Zone Maximum OA Fraction, but that is not standard practice. In general, we would like an overview of how E+ does the system OA sizing when using VRP method and what happens during the annual simulation. Is it possible we will not get required OA during low load situations?
+
+*Answer:* This is beyond the scope of this project.
+
+* Brent Griffith: Can't we default fan minimum flow ratio to be the same as the minimum flow ratios of the terminal units?
+
+It should be straightforward to use *FinalSysSizing().DesCoolVolFlowMin* (see below) to default the central fan minimum flow ratio. 
+
+
 
 ### **Overview**
 
@@ -107,7 +122,7 @@ The third input - *Cooling Minimum Air Flow Fraction* - if entered by the user- 
      Zone( ZoneIndex ).FloorArea * Zone( ZoneIndex ).Multiplier * 
      Zone( ZoneIndex ).ListMultiplier;
 
-*FinalZoneSizing().DesCoolVolFlowMin* is used in *SimAirServingZones* in the Std 62.1 cooling ventilation calculations. It is also summed into *FinalSysSizing().DesCoolVolFlowMin* :
+*FinalZoneSizing().DesCoolVolFlowMin* is used in *SimAirServingZones* in the Std 62.1 VRP calculations. It is also summed into *FinalSysSizing().DesCoolVolFlowMin* :
 
      FinalSysSizing( AirLoopNum ).DesCoolVolFlowMin += 
       FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin;
@@ -192,7 +207,7 @@ We will input the VAV terminal unit minimum flow rate with the following logical
 
 3. If the 3 fields *Constant Minimum Air Flow Fraction*, *Fixed Minimum Air Flow Rate*, and *Minimum Air Flow Fraction Schedule Name* are blank the program will attempt to get a default from the *Sizing:Zone* object. First the program will check whether the appropriate *Sizing:Zone* object exists. Next it will check whether field *Cooling Minimum Air Flow Fraction* in *Sizing:Zone* has been entered by the user. A flag for user input for this field will have to added to the Zone Sizing arrays. If these 2 conditions are met, the minimum flow ratio will be set to a value derived from *FinalZoneSizing().DesCoolVolFlowMin*.
 
-4. If no zone sizing calculation was performed, or the user didn't enter a value for *Cooling Minimum Air Flow Fraction* in *Sizing:Zone*, the value .000762 m2/m3 (.15 cfm/sqft) times the zone floor area will be used to derive a minimum flow ratio. We will impose a minimum of 0.1 and a maximum of 0.4 on the resulting value. Steps 3 and  4 will be performed in the terminal unit *Sizing* function, while the actual IDD fields will be set to *autocalculate*.
+4. If no zone sizing calculation was performed, or the user didn't enter a value for *Cooling Minimum Air Flow Fraction* in *Sizing:Zone*, the value .000762 m2/m3 (.15 cfm/sqft) times the zone floor area will be used to derive a minimum flow ratio. We will impose a minimum of 0.1 and a maximum of 0.4 on the resulting value. We will also impose a minimum flow ratio set by the zone design ventilation requirement. Steps 3 and  4 will be performed in the terminal unit *Sizing* function, while the actual IDD fields will be set to *autocalculate*.
 
 **Note** The VAV air mass flow rate is checked against the current (time step) ventilation requirement if *Design Specification Outdoor Air Object Name* is entered in the VAV terminal unit input. When the field is blank the minimum air flow isn't checked against the ventilation requirement. We will leave this unchanged.  
 
@@ -207,6 +222,8 @@ We will input the VAV terminal unit minimum flow rate with the following logical
 4. If no zone sizing calculation was performed, or the user didn't enter a value for any of the 3 *Zone:Sizing*  inputs, the current defaults will be used. Note that in the IDD *Maximum Flow per Zone Floor Area During Reheat* and *Maximum Flow Fraction During Reheat* defaults will be set to *autocalculate*. The defaulting described above will be done in the relevant *Sizing* function.
 
 **Question** Currently if both terminal unit inputs are blank, the maximum reheat air flow is limited only by the maximum air flow. How shall we propagate this input into our new scheme? Should we leave *Reverse* alone and introduce a *ReverseWithLimits*?
+
+Yes - it was agreed during the conference call that a new choice *ReverseWithLimits* would be added to *Damper Heating Action*.  
 
 
 
@@ -226,8 +243,9 @@ We will compare results with new defaulted inputs with results from user inputs 
        \key Constant
        \key FixedFlowRate
        \key Scheduled
+       \key MinOA
        \note Constant = Constant Minimum Air Flow Fraction (a fraction
-       /note of Maximum Air 
+       \note of Maximum Air 
        \note Flow Rate)
        \note FixedFlowRate = Fixed Minimum Air Flow Rate (a fixed
        \note minimum air volume flow 
@@ -269,13 +287,14 @@ We will compare results with new defaulted inputs with results from user inputs 
        \note If the field Constant Minimum Air Flow Fraction is blank,  
        \note then the average of the minimum and maximum schedule  
        \note values is used for sizing normal-action reheat coils.
-
+.....
 
     A10, \field Damper Heating Action
        \type choice
        \key Normal
        \key Reverse
-       \default Reverse
+       \key ReverseWithLimits
+       \default ReverseWithLimits
     N7 , \field Maximum Flow per Zone Floor Area During Reheat
        \type real
        \units m3/s-m2
@@ -312,6 +331,6 @@ We will compare results with new defaulted inputs with results from user inputs 
 ### **Eng Ref (draft):**
 *required*
 ### **Example File and Transition Changes**
-*as needed*
+The example files will remain unchanged. There will be no transition changes.
 ### **Other Documents**
 See https://escholarship.org/uc/item/3jn5m7kg for ASHRAE RP-1515 report.
