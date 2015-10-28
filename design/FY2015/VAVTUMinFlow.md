@@ -13,18 +13,26 @@ The defaults for maximum heating flow also do not reflect current practice. The 
 
 * Mike Witte: Why can't we have an option to set the minimum cfm ratio to the minimum outdoor air ratio?
 
-This is certainly possible. The result of all the outdoor air calculations done in the zone and system sizing calculations is stored in *FinalZoneSizng().MinOA*. This includes the VRP calculations and the result of applying *Zone Maximum Outdoor Air Fraction* from *Sizing:System*. We could add an option to *Zone Minimum Air Flow Method* to have the default set by *MinOA*. Fo instance: \key MinOutdoorAir.
-
+This is certainly possible. The result of all the outdoor air calculations done in the zone and system sizing calculations is stored in *FinalZoneSizng().MinOA*. This includes the VRP calculations and the result of applying *Zone Maximum Outdoor Air Fraction* from *Sizing:System*. We could add an option to *Zone Minimum Air Flow Method* to have the default set by *MinOA*. For instance: \key MinOutdoorAir. But on thinking this over, I'm 
+not sure I want to do this. For one thing, this could set the min cfm ratio unrealistically low.
 
 * Can we address the following from Mike Rosenberg at PNNL? 
 
 Currently we manually calculate system OA for MZ systems based on Standard 62.1 VRP. To do this, we run a design day simulation to determine primary airflow to each zone first. Then we manually raise the minimum damper position of critical zones to keep the system ventilation efficiency greater than 0.6. This prevents very high percentages of OA for occupancies such as schools, and is typical design practice.  This is a time consuming process and we would like to automate it using the E+ built in system sizing VRP. But we are concerned that without the step of increasing minimum damper position at design we will have very high OA levels. Does the E+ VRP calculation assume minimum damper position and maximum OA? I understand you can increase the damper position dynamically to limit the % OA using the Mechanical Ventilation Controller using the Zone Maximum OA Fraction, but that is not standard practice. In general, we would like an overview of how E+ does the system OA sizing when using VRP method and what happens during the annual simulation. Is it possible we will not get required OA during low load situations?
 
-*Answer:* This is beyond the scope of this project.
+*Answer:* For the VRP method, for cooling, the ventilation efficiency for multi-path systems is
+
+    SysCoolingEv = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
+
+For single-Path it is 
+
+    SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
+
+Clearly ZoneOAFrac is key to the ventilation efficiency. For multi-path systems the denominator of ZoneOAFrac is basically the design cooling volumetric flow rate. This should never be a problem. For single-path systems the denominator is *FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin*, the design minimum cooling flow rate. This is a problem. *DesCoolVolFlowMin* is user input from *Sizing:Zone* items N10 - N12 shown below. Most users will never enter a value for for any of these inputs. In which case *DesCoolVolFlowMin* will be defaulted to .15 cfm/sqft. At a low-end rule-of-thumb 1 cfm/sqft supply air flow rate, this is a min cfm ratio of 0.15 and in most cases it will be lower. This would likely yield a large ZoneOAFrac and thus a low system ventilation efficiency. It might be wise to force the system ventilation efficiency to be greater than 60% by back-calculating a *DesCoolVolFlowMin* that will give a minimum of 60%. It looks like we have all the information needed to do this. This would be a smart default for *Cooling Minimum Air Flow Fraction* in *Sizing:Zone*. This value could then be passed up to the VAV terminal unit for sizing the minimum damper position as described below.
 
 * Brent Griffith: Can't we default fan minimum flow ratio to be the same as the minimum flow ratios of the terminal units?
 
-It should be straightforward to use *FinalSysSizing().DesCoolVolFlowMin* (see below) to default the central fan minimum flow ratio. 
+It should be straightforward to use *FinalSysSizing().DesCoolVolFlowMin* (see below) to default the central fan minimum flow ratio. But this wouldn't reflect the actual values for minimum air flow fraction that the VAV terminal units end up with as input. There may be defaulted and user inputs. So in the *SizeFan* routine we would need to sum up the terminal unit minimum flow rates and calculate a minimum fan flow ratio. It looks like the terminal unit sizing is done first so this would be fairly straight forward. Or we could do the summing in *SizeSys* (the VAV TU sizing routine) and save the result in *PrimaryAirSystem*. 
 
 
 
