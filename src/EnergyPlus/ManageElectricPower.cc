@@ -1117,7 +1117,7 @@ namespace ManageElectricPower {
 				SetupOutputVariable( "Inverter Thermal Loss Rate [W]", Inverter( InvertNum ).ThermLossRate, "System", "Average", Inverter( InvertNum ).Name );
 				SetupOutputVariable( "Inverter Thermal Loss Energy [J]", Inverter( InvertNum ).ThermLossEnergy, "System", "Sum", Inverter( InvertNum ).Name );
 				SetupOutputVariable( "Inverter Ancillary AC Electric Power [W]", Inverter( InvertNum ).AncillACuseRate, "System", "Average", Inverter( InvertNum ).Name );
-				SetupOutputVariable( "Inverter Ancillary AC Electric Energy [J]", Inverter( InvertNum ).AncillACuseEnergy, "System", "Sum", Inverter( InvertNum ).Name, _, "Electricity", "Cogeneration", _, "Plant" ); // called cogeneration for end use table
+				SetupOutputVariable( "Inverter Ancillary AC Electric Energy [J]", Inverter( InvertNum ).AncillACuseEnergy, "System", "Sum", Inverter( InvertNum ).Name, _, "Electricity", "Cogeneration", "Inverter", "Plant" ); // called cogeneration for end use table
 				if ( Inverter( InvertNum ).ZoneNum > 0 ) {
 					{ auto const SELECT_CASE_var( Inverter( InvertNum ).ModelType );
 					if ( SELECT_CASE_var == SimpleConstantEff ) {
@@ -1522,7 +1522,7 @@ namespace ManageElectricPower {
 				SetupOutputVariable( "Transformer Thermal Loss Rate [W]", Transformer( TransfNum ).ThermalLossRate, "System", "Average", Transformer( TransfNum ).Name );
 				SetupOutputVariable( "Transformer Thermal Loss Energy [J]", Transformer( TransfNum ).ThermalLossEnergy, "System", "Sum", Transformer( TransfNum ).Name );
 				SetupOutputVariable( "Transformer Distribution Electric Loss Energy [J]", Transformer( TransfNum ).ElecUseUtility, "System", "Sum", Transformer( TransfNum ).Name, _, "Electricity", "ExteriorEquipment", "Transformer", "System" );
-				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", Transformer( TransfNum ).ElecProducedCoGen, "System", "Sum", Transformer( TransfNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "System" );
+				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", Transformer( TransfNum ).ElecProducedCoGen, "System", "Sum", Transformer( TransfNum ).Name, _, "ElectricityProduced", "COGENERATION", "Transformer", "System" );
 
 				if ( Transformer( TransfNum ).ZoneNum > 0 ) {
 					SetupZoneInternalGain( Transformer( TransfNum ).ZoneNum, "ElectricLoadCenter:Transformer", Transformer( TransfNum ).Name, IntGainTypeOf_ElectricLoadCenterTransformer, Transformer( TransfNum ).QdotConvZone, _, Transformer( TransfNum ).QdotRadZone );
@@ -3124,8 +3124,8 @@ namespace ManageElectricPower {
 				ElecStorage( ElecStorNum ).StoredPower = 0.0;
 				ElecStorage( ElecStorNum ).StoredEnergy = 0.0;
 				ElecStorage( ElecStorNum ).DecrementedEnergyStored = 0.0;
-				ElecStorage( ElecStorNum ).DrawnPower = -1.0 * Volt * I0 * Numbattery;
-				ElecStorage( ElecStorNum ).DrawnEnergy = -1.0 * Volt * I0 * Numbattery * TimeStepSys * SecInHour;
+				ElecStorage( ElecStorNum ).DrawnPower = Volt * I0 * Numbattery;
+				ElecStorage( ElecStorNum ).DrawnEnergy = Volt * I0 * Numbattery * TimeStepSys * SecInHour;
 
 			} else {
 				ElecStorage( ElecStorNum ).StorageMode = 0;
