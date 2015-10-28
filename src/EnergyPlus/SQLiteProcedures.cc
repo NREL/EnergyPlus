@@ -895,13 +895,13 @@ void SQLite::initializeZoneSizingTable()
 		"CREATE TABLE ZoneSizes ( "
 		"ZoneSizesIndex INTEGER PRIMARY KEY, ZoneName TEXT, LoadType TEXT, "
 		"CalcDesLoad REAL, UserDesLoad REAL, CalcDesFlow REAL, UserDesFlow REAL, DesDayName TEXT, PeakHrMin TEXT, "
-		"PeakTemp REAL, PeakHumRat REAL, CalcOutsideAirFlow REAL"
+		"PeakTemp REAL, PeakHumRat REAL, CalcOutsideAirFlow REAL, DOASHeatAddRate REAL"
 		");";
 
 	sqliteExecuteCommand(zoneSizesTableSQL);
 
 	const std::string zoneSizingInsertSQL =
-		"INSERT INTO ZoneSizes VALUES(?,?,?,?,?,?,?,?,?,?,?,?);";
+		"INSERT INTO ZoneSizes VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_zoneSizingInsertStmt,zoneSizingInsertSQL);
 }
@@ -1690,7 +1690,8 @@ void SQLite::addSQLiteZoneSizingRecord(
 	std::string const & peakHrMin, // time stamp of the peak
 	Real64 const peakTemp, // temperature at peak [C]
 	Real64 const peakHumRat, // humidity ratio at peak [kg water/kg dry air]
-	Real64 const minOAVolFlow // zone design minimum outside air flow rate [m3/s]
+	Real64 const minOAVolFlow, // zone design minimum outside air flow rate [m3/s]
+	Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 )
 {
 	if ( m_writeOutputToSQLite ) {
@@ -1710,6 +1711,7 @@ void SQLite::addSQLiteZoneSizingRecord(
 		sqliteBindDouble(m_zoneSizingInsertStmt, 10, peakTemp);
 		sqliteBindDouble(m_zoneSizingInsertStmt, 11, peakHumRat);
 		sqliteBindDouble(m_zoneSizingInsertStmt, 12, minOAVolFlow);
+		sqliteBindDouble( m_zoneSizingInsertStmt, 13, DOASHeatAddRate );
 
 		sqliteStepCommand(m_zoneSizingInsertStmt);
 		sqliteResetCommand(m_zoneSizingInsertStmt);
@@ -2065,7 +2067,7 @@ void SQLite::createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const s
 	}
 }
 
-void SQLite::addScheduleData( int const number, std::string const name, std::string const type, double const minValue, double const maxValue )
+void SQLite::addScheduleData( int const number, std::string const & name, std::string const & type, double const minValue, double const maxValue )
 {
 	schedules.push_back(
 		std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, name, type, minValue, maxValue))
@@ -2086,7 +2088,7 @@ void SQLite::addZoneListData( int const number, DataHeatBalance::ZoneListData co
 	);
 }
 
-void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass )
+void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass )
 {
 	surfaces.push_back(
 		std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, surfaceClass))

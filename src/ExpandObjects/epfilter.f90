@@ -14391,9 +14391,9 @@ DO iSys = 1, numCompactSysUnit
   END IF
   CALL AddToObjFld('Relief Air Stream Node Name', base + usAirHandlerNameOff,' Relief Air Outlet')
   CALL AddToObjStr('Return Air Stream Node Name', TRIM(returnInletToOAMIxer),.TRUE.)
-  !SET POINT MANAGER:SINGLE ZONE REHEAT
-  CALL CreateNewObj('SetpointManager:SingleZone:Reheat')
-  CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Supply Air Temp Manager')
+  !SetpointManager:SingleZone:Cooling
+  CALL CreateNewObj('SetpointManager:SingleZone:Cooling')
+  CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Economizer Supply Air Temp Manager')
   CALL AddToObjStr('Control Variable','Temperature')
   CALL AddToObjStr('minimum supply air temperature {C}','13')
   CALL AddToObjStr('maximum supply air temperature {C}','45')
@@ -15331,9 +15331,9 @@ DO iSys = 1, numCompactSysUnitHP
   END IF
   CALL AddToObjFld('Relief Air Stream Node Name', base + uhpsAirHandlerNameOff,' Relief Air Outlet')
   CALL AddToObjStr('Return Air Stream Node Name', TRIM(returnInletToOAMIxer),.TRUE.)
-  !Object ==> SetpointManager:SingleZone:Reheat
-  CALL CreateNewObj('SetpointManager:SingleZone:Reheat')
-  CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' Supply Air Temp Manager')
+  !Object ==> SetpointManager:SingleZone:Cooling
+  CALL CreateNewObj('SetpointManager:SingleZone:Cooling')
+  CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' Economizer Supply Air Temp Manager')
   CALL AddToObjStr('Control Variable','Temperature')
   CALL AddToObjStr('minimum supply air temperature {C}','13')
   CALL AddToObjStr('maximum supply air temperature {C}','45')
@@ -16130,15 +16130,15 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('Heat Recovery Water Inlet Node Name', '')
   CALL AddToObjStr('Heat Recovery Water Outlet Node Name', '')
   IF (.NOT. isMultiSpeed) THEN
-    CALL AddToObjStr('Design Specification Multispeed Heat Pump Object Type', '')
-    CALL AddToObjStr('Design Specification Multispeed Heat Pump Object Name', '',.TRUE.)
+    CALL AddToObjStr('Design Specification Multispeed Object Type', '')
+    CALL AddToObjStr('Design Specification Multispeed Object Name', '',.TRUE.)
   ELSE
-    CALL AddToObjStr('Design Specification Multispeed Heat Pump Object Type', 'UnitarySystemPerformance:HeatPump:Multispeed')
-    CALL AddToObjFld('Design Specification Multispeed Heat Pump Object Name', base + ussAirHandlerNameOff, &
+    CALL AddToObjStr('Design Specification Multispeed Object Type', 'UnitarySystemPerformance:Multispeed')
+    CALL AddToObjFld('Design Specification Multispeed Object Name', base + ussAirHandlerNameOff, &
                      ' Unitary System MultiSpeed Performance',.TRUE.)
 
-    !Object ==> UnitarySystemPerformance:HeatPump:Multispeed
-    CALL CreateNewObj('UnitarySystemPerformance:HeatPump:Multispeed')
+    !Object ==> UnitarySystemPerformance:Multispeed
+    CALL CreateNewObj('UnitarySystemPerformance:Multispeed')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Unitary System MultiSpeed Performance')
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
@@ -17798,9 +17798,9 @@ DO iSys = 1, numCompactSysUnitarySystem
   END IF
   CALL AddToObjFld('Relief Air Stream Node Name', base + ussAirHandlerNameOff,' Relief Air Outlet')
   CALL AddToObjFld('Return Air Stream Node Name', base + ussAirHandlerNameOff, TRIM(returnInletToOAMIxer),.TRUE.)
-  !Object ==> SetpointManager:SingleZone:Reheat
-  CALL CreateNewObj('SetpointManager:SingleZone:Reheat')
-  CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Supply Air Temp Manager')
+  !Object ==> SetpointManager:SingleZone:Cooling
+  CALL CreateNewObj('SetpointManager:SingleZone:Cooling')
+  CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Economizer Supply Air Temp Manager')
   CALL AddToObjStr('Control Variable','Temperature')
   CALL AddToObjStr('minimum supply air temperature {C}','13')
   CALL AddToObjStr('maximum supply air temperature {C}','45')

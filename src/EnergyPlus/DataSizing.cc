@@ -79,6 +79,10 @@ namespace DataSizing {
 	int const InpDesAirFlow( 2 );
 	int const DesAirFlowWithLim( 3 );
 
+	int const DOANeutralSup( 1 );
+	int const DOANeutralDehumSup( 2 );
+	int const DOACoolSup( 3 );
+
 	// parameters for Type of Load to Size On
 	int const Sensible( 0 );
 	int const Latent( 1 );
@@ -105,12 +109,14 @@ namespace DataSizing {
 	//  considering the zone air distribution effectiveness and the system ventilation efficiency
 	int const SOAM_IAQP( 3 ); // Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
 	// based on the CO2 setpoint
-	int const SOAM_ProportionalControl( 4 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-	// to calculate the system level outdoor air flow rates
+	int const SOAM_ProportionalControlSchOcc( 4 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+	// to calculate the system level outdoor air flow rates based on scheduled occupancy
 	int const SOAM_IAQPGC( 5 ); // Use ASHRAE Standard 62.1-2004 IAQP to calculate the system level outdoor air flow rates
 	// based on the generic contaminant setpoint
 	int const SOAM_IAQPCOM( 6 ); // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	// based on the generic contaminant setpoint
+	int const SOAM_ProportionalControlDesOcc( 7 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+	// to calculate the system level outdoor air flow rates based on design occupancy
 
 	// Zone HVAC Equipment Supply Air Sizing Option
 	int const None( 1 );
@@ -164,6 +170,7 @@ namespace DataSizing {
 	int NumTimeStepsInAvg( 0 ); // number of time steps in the averaging window for the design flow and load sequences
 	int SaveNumPlantComps( 0 ); // Number of components using water as an energy source or sink (e.g. water coils)
 	int DataTotCapCurveIndex( 0 ); // index to total capacity as a function of temperature curve
+	Real64 DataTotCapCurveValue( 0 ); // value of total capacity as a function of temperature curve for CoilVRF_FluidTCtrl_*
 	int DataPltSizCoolNum( 0 ); // index to cooling plant sizing data
 	int DataPltSizHeatNum( 0 ); // index to heating plant sizing data
 	int DataWaterLoopNum( 0 ); // index to plant water loop
@@ -365,7 +372,7 @@ namespace DataSizing {
 	}
 
 	//     NOTICE
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

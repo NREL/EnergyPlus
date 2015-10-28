@@ -1,16 +1,12 @@
-
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Guide for Interface Developers</h1>
 <h2>Everything You Need to Know about EnergyPlus Input and Output</h2>
 <br/>
 <p><i>(to develop a user-friendly interface)</i></p>
-<br/>
-<br/>
-<br/>
 <br/>
 <p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
 <p style="page-break-after:always;"></p>
@@ -1108,7 +1104,7 @@ Licensing
 
 In order to make efficient distribution of your interface, you should consider licensing EnergyPlus.  First, you must license/register to use EnergyPlus.  Since we are distributing EnergyPlus via the World Wide Web, at no charge, it will be easy to get your hands on a copy for testing out your interface.  However, you may wish to understand more of the internals and, to make a complete distribution package, will need to at least execute a distribution license.
 
-http://www.eere.energy.gov/buildings/energyplus/energyplus_licensing.html contains the details on licensing EnergyPlus for commercial or non-commercial use.
+https://energyplus.net/licensing contains the details on licensing EnergyPlus for commercial or non-commercial use.
 
 Appendix A.  Simple IDF file
 ============================

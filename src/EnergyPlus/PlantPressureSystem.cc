@@ -61,7 +61,9 @@ namespace PlantPressureSystem {
 	// Data
 	// MODULE PARAMETER/ENUMERATIONS DEFINITIONS:
 	static std::string const BlankString;
-
+	namespace{
+		bool InitPressureDropOneTimeInit( true );
+	}
 	// DERIVED TYPE DEFINITIONS:
 	//TYPE, PUBLIC:: PlantPressureCurveData
 	//  CHARACTER(len=MaxNameLength) :: Name                    = Blank
@@ -95,6 +97,11 @@ namespace PlantPressureSystem {
 	//PUBLIC GetPressureCurveTypeAndIndex
 
 	// Functions
+	void
+	clear_state()
+	{
+		InitPressureDropOneTimeInit = true;
+	}
 
 	void
 	SimPressureDropSystem(
@@ -215,7 +222,7 @@ namespace PlantPressureSystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//Initialization Variables
-		static bool OneTimeInit( true );
+
 		static Array1D_bool LoopInit;
 
 		//Simulation Variables
@@ -224,11 +231,11 @@ namespace PlantPressureSystem {
 		static Array1D_bool FullParallelBranchSetFound( 2 );
 		static bool CommonPipeErrorEncountered( false );
 
-		if ( OneTimeInit ) {
+		if ( InitPressureDropOneTimeInit ) {
 			//First allocate the initialization array to each plant loop
 			LoopInit.allocate( size( PlantLoop ) );
 			LoopInit = true;
-			OneTimeInit = false;
+			InitPressureDropOneTimeInit = false;
 		}
 
 		auto & loop( PlantLoop( LoopNum ) );
@@ -1445,7 +1452,7 @@ namespace PlantPressureSystem {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

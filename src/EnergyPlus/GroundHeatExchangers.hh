@@ -1,18 +1,23 @@
 #ifndef GroundHeatExchangers_hh_INCLUDED
 #define GroundHeatExchangers_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
 namespace GroundHeatExchangers {
 
 	// Using/Aliasing
+	using namespace GroundTemperatureManager;
 
 	// Data
 	// DERIVED TYPE DEFINITIONS
@@ -77,6 +82,7 @@ namespace GroundHeatExchangers {
 		Real64 totalTubeLength; // The total length of pipe. NumBoreholes * BoreholeDepth OR Pi * Dcoil * NumCoils
 		Real64 timeSS; // Steady state time
 		Real64 timeSSFactor; // Steady state time factor for calculation
+		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 
 		// Default Constructor
 		GLHEBase() :
@@ -116,6 +122,8 @@ namespace GroundHeatExchangers {
 			timeSS( 0.0 ),
 			timeSSFactor( 0.0 )
 		{}
+		void
+		clear_state();
 
 		virtual void
 		calcGFunctions()=0;
@@ -143,15 +151,6 @@ namespace GroundHeatExchangers {
 
 		virtual void
 		getAnnualTimeConstant()=0;
-
-		Real64
-		getKAGrndTemp(
-			Real64 const z,
-			Real64 const dayOfYear,
-			Real64 const aveGroundTemp,
-			Real64 const aveGroundTempAmplitude,
-			Real64 const phaseShift
-		);
 
 	};
 
@@ -210,10 +209,6 @@ namespace GroundHeatExchangers {
 		int numTrenches;		// Number of parallel trenches [m]
 		Real64 trenchSpacing;	// Spacing between parallel trenches [m]
 		int numCoils;			// Number of coils
-		bool useGroundTempDataForKusuda; // Use Ground Temp Data Flag
-		Real64 averageGroundTemp;
-		Real64 averageGroundTempAmplitude;
-		Real64 phaseShiftOfMinGroundTempDays;
 		int monthOfMinSurfTemp;
 		Real64 maxSimYears;
 		Real64 minSurfTemp;
@@ -232,10 +227,6 @@ namespace GroundHeatExchangers {
 			numTrenches( 0 ),
 			trenchSpacing( 0.0 ),
 			numCoils( 0 ),
-			useGroundTempDataForKusuda( false ),
-			averageGroundTemp( 0.0 ),
-			averageGroundTempAmplitude( 0.0 ),
-			phaseShiftOfMinGroundTempDays( 0.0 ),
 			monthOfMinSurfTemp( 0 ),
 			maxSimYears( 0.0 ),
 			minSurfTemp( 0.0 )
@@ -359,7 +350,7 @@ namespace GroundHeatExchangers {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

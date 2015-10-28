@@ -494,14 +494,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -567,14 +567,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -646,14 +646,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -704,14 +704,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -763,14 +763,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -820,14 +820,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -891,14 +891,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -962,14 +962,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1017,14 +1017,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1092,14 +1092,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1198,14 +1198,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1294,14 +1294,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1345,14 +1345,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1401,14 +1401,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1460,14 +1460,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1520,14 +1520,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1578,14 +1578,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1636,14 +1636,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1694,14 +1694,14 @@ namespace CurveManager {
 			++CurveNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1760,14 +1760,14 @@ namespace CurveManager {
 			TableData( TableNum ).Y.allocate( NumTableEntries );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -1946,14 +1946,14 @@ namespace CurveManager {
 			TableData( TableNum ).Y.allocate( NumTableEntries );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -2195,14 +2195,14 @@ namespace CurveManager {
 			++TableNum;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PerfCurve, CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if ( NumPressureCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
@@ -5109,7 +5109,7 @@ Label999: ;
 		}
 
 		if ( NumCurves > 0 ) {
-			GetCurveIndex = FindItemInList( CurveName, PerfCurve( {1,NumCurves} ).Name(), NumCurves );
+			GetCurveIndex = FindItemInList( CurveName, PerfCurve );
 		} else {
 			GetCurveIndex = 0;
 		}
@@ -5349,14 +5349,14 @@ Label999: ;
 			GetObjectItem( CurveObjectName, CurveNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PressureCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurveObjectName + " Name" );
+			VerifyName( Alphas( 1 ), PressureCurve, CurveNum - 1, IsNotOK, IsBlank, CurveObjectName + " Name" );
 			if ( IsNotOK ) {
 				ErrsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 			}
 			// Need to verify that this name isn't used in Performance Curves as well.
 			if ( NumCurves > 0 ) {
-				CurveFound = FindItemInList( Alphas( 1 ), PerfCurve.Name(), NumCurves );
+				CurveFound = FindItemInList( Alphas( 1 ), PerfCurve );
 				if ( CurveFound != 0 ) {
 					ShowSevereError( "GetPressureCurveInput: " + CurveObjectName + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
 					ShowContinueError( "...Curve name duplicates one of the Performance Curves. Names must be unique across all curves." );
@@ -5473,7 +5473,7 @@ Label999: ;
 		//Then try to retrieve a pressure curve object
 		if ( allocated( PressureCurve ) ) {
 			if ( size( PressureCurve ) > 0 ) {
-				TempCurveIndex = FindItemInList( PressureCurveName, PressureCurve( {1,isize( PressureCurve )} ).Name(), isize( PressureCurve ) );
+				TempCurveIndex = FindItemInList( PressureCurveName, PressureCurve );
 			} else {
 				TempCurveIndex = 0;
 			}
@@ -5737,7 +5737,7 @@ Label999: ;
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

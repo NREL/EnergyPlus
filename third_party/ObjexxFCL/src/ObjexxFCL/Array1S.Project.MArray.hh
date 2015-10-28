@@ -106,27 +106,13 @@ template< typename > class Array1D;
 	inline MA1S_double z() { return ma( &T::z ); }
 
 	// string const Members
-	inline MA1Sc_string ComponentTypeName() const { return ma( &T::ComponentTypeName ); }
-	inline MA1Sc_string ControlTypeName() const { return ma( &T::ControlTypeName ); }
-	inline MA1Sc_string DataTypeName() const { return ma( &T::DataTypeName ); }
-	inline MA1Sc_string EquipName() const { return ma( &T::EquipName ); }
-	inline MA1Sc_string EquipType() const { return ma( &T::EquipType ); }
 	inline MA1Sc_string FieldName() const { return ma( &T::FieldName ); }
 	inline MA1Sc_string Name() const { return ma( &T::Name ); }
-	inline MA1Sc_string SurfaceName() const { return ma( &T::SurfaceName ); }
-	inline MA1Sc_string VarName() const { return ma( &T::VarName ); }
 	inline MA1Sc_string VarNameOnly() const { return ma( &T::VarNameOnly ); }
 
 	// string Members
-	inline MA1S_string ComponentTypeName() { return ma( &T::ComponentTypeName ); }
-	inline MA1S_string ControlTypeName() { return ma( &T::ControlTypeName ); }
-	inline MA1S_string DataTypeName() { return ma( &T::DataTypeName ); }
-	inline MA1S_string EquipName() { return ma( &T::EquipName ); }
-	inline MA1S_string EquipType() { return ma( &T::EquipType ); }
 	inline MA1S_string FieldName() { return ma( &T::FieldName ); }
 	inline MA1S_string Name() { return ma( &T::Name ); }
-	inline MA1S_string SurfaceName() { return ma( &T::SurfaceName ); }
-	inline MA1S_string VarName() { return ma( &T::VarName ); }
 	inline MA1S_string VarNameOnly() { return ma( &T::VarNameOnly ); }
 
 	// Array1D< double >

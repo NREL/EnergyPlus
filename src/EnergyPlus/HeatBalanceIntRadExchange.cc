@@ -40,7 +40,7 @@ namespace EnergyPlus {
 
 #define EXPLICIT_VECTORIZATION
 
-#undef WTF
+#define WTF
 
 #define __round_2(I) (((I + 1) >> 1) << 1)
 
@@ -103,8 +103,10 @@ namespace HeatBalanceIntRadExchange {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	int MaxNumOfZoneSurfaces; // Max saved to get large enough space for user input view factors
-
+	int MaxNumOfZoneSurfaces( 0 ); // Max saved to get large enough space for user input view factors
+	namespace {
+		bool CalcInteriorRadExchangefirstTime( true ); // Logical flag for one-time initializations
+	}
 	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
 	// Functions
@@ -116,6 +118,13 @@ namespace HeatBalanceIntRadExchange {
 		Array1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
 		Real64 * ScriptF
 	);
+
+	void
+	clear_state()
+	{
+		MaxNumOfZoneSurfaces = 0 ;
+		CalcInteriorRadExchangefirstTime = true;
+	}
 
 	void
 	CalcInteriorRadExchange(
@@ -170,8 +179,7 @@ namespace HeatBalanceIntRadExchange {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool firstTime( true ); // Logical flag for one-time initializations
-	
+
 		int ConstrNumRec; // Receiving surface construction number
 		int SurfNum; // Surface number
 		int ConstrNum; // Construction number
@@ -196,7 +204,7 @@ namespace HeatBalanceIntRadExchange {
 #ifdef EP_Detailed_Timings
 		epStartTime( "CalcInteriorRadExchange=" );
 #endif
-		if ( firstTime ) {
+		if ( CalcInteriorRadExchangefirstTime ) {
 			InitInteriorRadExchange();
 
 			// Amir Roth 2015-07-25: For vectorization, pad these arrays up to nearest multiple of 2 if necessary
@@ -206,7 +214,12 @@ namespace HeatBalanceIntRadExchange {
 			NetLWRadToSurf_Temp.allocate( __round_2( MaxNumOfZoneSurfaces ) );
 			IRfromParentZone_Temp.allocate( __round_2( MaxNumOfZoneSurfaces ) );
 
-			firstTime = false;
+			SurfaceTempK4.allocate( MaxNumOfZoneSurfaces );
+			SurfaceEmiss.allocate( MaxNumOfZoneSurfaces );
+			NetLWRadToSurf_Temp.allocate( MaxNumOfZoneSurfaces );
+			IRfromParentZone_Temp.allocate( MaxNumOfZoneSurfaces );
+			CalcInteriorRadExchangefirstTime = false;
+
 			if ( DeveloperFlag ) {
 				std::string tdstring;
 				gio::write( tdstring, fmtLD ) << " OMP turned off, HBIRE loop executed in serial";
@@ -480,19 +493,19 @@ namespace HeatBalanceIntRadExchange {
 
 					__m128d pdNetLWRadToSurf = _mm_load_pd( &vecNetLWRadToSurf_Temp[ RecZoneSurfNum ] );
 
-#ifdef WTF
+#ifndef WTF
 					// NetLWRadToSurf += ScriptF * (SurfaceTempK4[ Send ] - SurfaceTempK4[ Rec ]) 
 					// This works
-					pdNetLWRadToSurf = _mm_add_pd( pdNetLWRadToSurf, a );
-					__m128d b = _mm_mul_pd( pdZvfiScriptF, pdSurfaceTempK4 );
-					pdNetLWRadToSurf = _mm_sub_pd( pdNetLWRadToSurf, b );
-#else // ! WTF
-					// NetLWRadToSurf += (ScriptF * SurfaceTempK4[ Send ]) - (ScriptF * SurfaceTempK4[ Rec ])
-					// This generates "big" diffs despite being the same thing
 					__m128d b = _mm_sub_pd( pdSurfaceTempK4Send, pdSurfaceTempK4 );
 					b = _mm_mul_pd( pdZvfiScriptF, b );
 					pdNetLWRadToSurf = _mm_add_pd( pdNetLWRadToSurf, b );
-#endif // ! WTF
+#else // ! WTF
+					// NetLWRadToSurf += (ScriptF * SurfaceTempK4[ Send ]) - (ScriptF * SurfaceTempK4[ Rec ])
+					// This generates "big" diffs despite being the same thing
+					pdNetLWRadToSurf = _mm_add_pd( pdNetLWRadToSurf, a );
+					__m128d b = _mm_mul_pd( pdZvfiScriptF, pdSurfaceTempK4 );
+					pdNetLWRadToSurf = _mm_sub_pd( pdNetLWRadToSurf, b );
+#endif // WTF
 					_mm_store_pd( &vecNetLWRadToSurf_Temp[ RecZoneSurfNum ], pdNetLWRadToSurf );
 
 				} // fpr RecZoneSurfNum
@@ -1572,7 +1585,7 @@ namespace HeatBalanceIntRadExchange {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -181,7 +181,8 @@ namespace VariableSpeedCoils {
 		int BranchNum; // plant branch index
 		int CompNum; // plant component index
 		// set by parent object and "pushed" to this structure in SetVSWSHPData subroutine
-		bool FindCompanionUpStreamCoil; // Flag to get the companion coil in Init.
+		bool FindCompanionUpStreamCoil; // Flag to get the companion coil in Init
+		bool IsDXCoilInZone; // true means dx coil is in zone instead of outside
 		int CompanionCoolingCoilNum; // Heating coil companion cooling coil index
 		int CompanionHeatingCoilNum; // Cooling coil companion heating coil index
 		Real64 FanDelayTime; // Fan delay time, time delay for the HP's fan to
@@ -377,6 +378,7 @@ namespace VariableSpeedCoils {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			FindCompanionUpStreamCoil( true ),
+			IsDXCoilInZone( false ),
 			CompanionCoolingCoilNum( 0 ),
 			CompanionHeatingCoilNum( 0 ),
 			FanDelayTime( 0.0 ),
@@ -540,6 +542,7 @@ namespace VariableSpeedCoils {
 			int const BranchNum, // plant branch index
 			int const CompNum, // plant component index
 			bool const FindCompanionUpStreamCoil, // Flag to get the companion coil in Init.
+			bool const IsDXCoilInZone, // true means dx coil is in zone instead of outside
 			int const CompanionCoolingCoilNum, // Heating coil companion cooling coil index
 			int const CompanionHeatingCoilNum, // Cooling coil companion heating coil index
 			Real64 const FanDelayTime, // Fan delay time, time delay for the HP's fan to
@@ -702,6 +705,7 @@ namespace VariableSpeedCoils {
 			BranchNum( BranchNum ),
 			CompNum( CompNum ),
 			FindCompanionUpStreamCoil( FindCompanionUpStreamCoil ),
+			IsDXCoilInZone( IsDXCoilInZone ),
 			CompanionCoolingCoilNum( CompanionCoolingCoilNum ),
 			CompanionHeatingCoilNum( CompanionHeatingCoilNum ),
 			FanDelayTime( FanDelayTime ),
@@ -806,6 +810,8 @@ namespace VariableSpeedCoils {
 	extern Array1D< VariableSpeedCoilData > VarSpeedCoil;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimVariableSpeedCoils(
@@ -1015,7 +1021,7 @@ namespace VariableSpeedCoils {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

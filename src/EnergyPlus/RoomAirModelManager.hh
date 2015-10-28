@@ -18,6 +18,7 @@ namespace RoomAirModelManager {
 	// MODULE VARIABLE DECLARATIONS:
 
 	extern bool GetUCSDDVDataFlag; // UCSD
+	extern bool GetAirModelData;  // Used to "get" all air model data
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -54,10 +55,19 @@ namespace RoomAirModelManager {
 	void
 	SharedDVCVUFDataInit( int & ZoneNum );
 
+	void
+	GetRoomAirflowNetworkData( bool & ErrorsFound ); // True if errors found during this get input routine
+
+	void
+	GetRAFNNodeNum( std::string const & RAFNNodeName, int & ZoneNum, int & RAFNNodeNum, bool & Errorfound ); // find zone number and node number based on the node name
+
+	bool
+	CheckEquipName( int ZoneNum, std::string const & EquipType, std::string const & EquipName, std::string & SupplyNodeName, std::string & ReturnNodeName, int TotNumEquip, int TypeNum ); // Ensure valid equipment name
+
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

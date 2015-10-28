@@ -98,7 +98,6 @@ namespace Fans {
 	int const ExhaustFanCoupledToAvailManagers( 150 );
 	int const ExhaustFanDecoupledFromAvailManagers( 151 );
 	static std::string const BlankString;
-
 	//na
 
 	// DERIVED TYPE DEFINITIONS
@@ -107,11 +106,22 @@ namespace Fans {
 	int NumFans( 0 ); // The Number of Fans found in the Input
 	int NumNightVentPerf( 0 ); // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
 	bool GetFanInputFlag( true ); // Flag set to make sure you get input once
-	Array1D_bool CheckEquipName;
 	bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and
-	// forces ZoneHVAC comp fans off
-	static Array1D_bool MySizeFlag;
+	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
+
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this module should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool MyOneTimeFlag( true ); // used for allocation in Init
+		bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+
+		Array1D_bool MySizeFlag;
+		Array1D_bool MyEnvrnFlag;
+		Array1D_bool CheckEquipName;
+	}
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -135,8 +145,6 @@ namespace Fans {
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
-
-	// Functions
 
 	void
 	SimulateFanComponents(
@@ -192,7 +200,7 @@ namespace Fans {
 		}
 
 		if ( CompIndex == 0 ) {
-			FanNum = FindItemInList( CompName, Fan.FanName(), NumFans );
+			FanNum = FindItemInList( CompName, Fan, &FanEquipConditions::FanName );
 			if ( FanNum == 0 ) {
 				ShowFatalError( "SimulateFanComponents: Fan not found=" + CompName );
 			}
@@ -398,7 +406,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -452,7 +460,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -525,7 +533,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -645,7 +653,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -719,7 +727,7 @@ namespace Fans {
 			GetObjectItem( cCurrentModuleObject, NVPerfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), NightVentPerf.FanName(), NVPerfNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), NightVentPerf, &NightVentPerfData::FanName, NVPerfNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -759,7 +767,7 @@ namespace Fans {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Fan, &FanEquipConditions::FanName, FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -944,11 +952,7 @@ namespace Fans {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode;
 		int OutletNode;
-		//unused0909  Integer             :: InNode
 		int OutNode;
-		static bool MyOneTimeFlag( true );
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static Array1D_bool MyEnvrnFlag;
 		int Loop;
 
 		// FLOW:
@@ -2551,7 +2555,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		FanIndex = FindItemInList( FanName, Fan.FanName(), NumFans );
+		FanIndex = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) ) {
 				ShowSevereError( ThisObjectType() + ", GetFanIndex: Fan not found=" + FanName );
@@ -2709,7 +2713,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		FanIndex = FindItemInList( FanName, Fan.FanName(), NumFans );
+		FanIndex = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) && present( ThisObjectName ) ) {
 				ShowSevereError( "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\", invalid Fan specified=\"" + FanName + "\"." );
@@ -2782,7 +2786,7 @@ namespace Fans {
 		if ( present( FanIndex ) ) {
 			DesignVolumeFlowRate = Fan( FanIndex ).MaxAirFlowRate;
 		} else {
-			WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+			WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 			if ( WhichFan != 0 ) {
 				DesignVolumeFlowRate = Fan( WhichFan ).MaxAirFlowRate;
 			} else {
@@ -2849,7 +2853,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+		WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).InletNodeNum;
 		} else {
@@ -2914,7 +2918,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+		WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			NodeNumber = Fan( WhichFan ).OutletNodeNum;
 		} else {
@@ -2979,7 +2983,7 @@ namespace Fans {
 			GetFanInputFlag = false;
 		}
 
-		WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+		WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		if ( WhichFan != 0 ) {
 			FanAvailSchPtr = Fan( WhichFan ).AvailSchedPtrNum;
 		} else {
@@ -3050,11 +3054,11 @@ namespace Fans {
 				FanType = Fan( WhichFan ).FanType;
 				FanName = Fan( WhichFan ).FanName;
 			} else {
-				WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+				WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 				IndexIn = WhichFan;
 			}
 		} else {
-			WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+			WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		}
 
 		if ( WhichFan != 0 ) {
@@ -3121,7 +3125,7 @@ namespace Fans {
 		}
 
 		if ( FanNum == 0 ) {
-			WhichFan = FindItemInList( FanName, Fan.FanName(), NumFans );
+			WhichFan = FindItemInList( FanName, Fan, &FanEquipConditions::FanName );
 		} else {
 			WhichFan = FanNum;
 		}
@@ -3165,7 +3169,6 @@ namespace Fans {
 		// REFERENCES: EnergyPlus Engineering Reference
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		Real64 DesignDeltaT; // returned delta T of matched fan [delta deg C]
@@ -3198,7 +3201,7 @@ namespace Fans {
 
 	Real64
 	CalFaultyFanAirFlowReduction(
-		std::string const FanName,            // name of the fan
+		std::string const & FanName,          // name of the fan
 		Real64 const FanDesignAirFlowRate,    // Fan Design Volume Flow Rate [m3/sec]
 		Real64 const FanDesignDeltaPress,     // Fan Design Delta Pressure [Pa]
 		Real64 const FanFaultyDeltaPressInc,  // Increase of Fan Delta Pressure in the Faulty Case [Pa]
@@ -3297,7 +3300,6 @@ namespace Fans {
 		// REFERENCES: EnergyPlus Engineering Reference
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataSizing::CurSysNum;
 		using DataAirLoop::AirLoopControlInfo;
 
@@ -3332,12 +3334,34 @@ namespace Fans {
 
 	} // FanDesHeatGain
 
+	// Clears the global data in Fans.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumFans = 0;
+		NumNightVentPerf = 0;
+		GetFanInputFlag = true;
+		LocalTurnFansOn = false;
+		LocalTurnFansOff = false;
+		MyOneTimeFlag = true;
+		ZoneEquipmentListChecked = false;
+
+		CheckEquipName.deallocate();
+		MySizeFlag.deallocate();
+		MyEnvrnFlag.deallocate();
+		Fan.deallocate();
+		NightVentPerf.deallocate();
+		FanNumericFields.deallocate();
+
+	}
+
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

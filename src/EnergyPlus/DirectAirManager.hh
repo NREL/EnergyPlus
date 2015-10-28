@@ -50,6 +50,9 @@ namespace DirectAirManager {
 		Real64 CoolRate;
 		Real64 HeatEnergy;
 		Real64 CoolEnergy;
+		// pointers
+		int ZoneEqNum;
+		int ZoneNum;
 
 		// Default Constructor
 		DirectAirProps() :
@@ -66,46 +69,9 @@ namespace DirectAirManager {
 			HeatRate( 0.0 ),
 			CoolRate( 0.0 ),
 			HeatEnergy( 0.0 ),
-			CoolEnergy( 0.0 )
-		{}
-
-		// Member Constructor
-		DirectAirProps(
-			std::string const & cObjectName,
-			std::string const & EquipID,
-			std::string const & Schedule,
-			int const ZoneSupplyAirNode,
-			int const SchedPtr,
-			Real64 const MaxAirVolFlowRate, // Max Specified Volume Flow Rate of Sys [m3/sec]
-			Real64 const AirMassFlowRateMax, // Max mass flow [kg/sec]
-			Real64 const InitMaxAvailMassFlow, // The Initial max mass Flow to set the Control Flow Fraction
-			Real64 const AirMassFlowFraction,
-			int const ZoneEquipAirInletNode,
-			Real64 const SensOutputProvided,
-			bool const EMSOverrideAirFlow, // if true, EMS is calling to override flow rate
-			Real64 const EMSMassFlowRateValue, // value EMS is directing to use for flow rate [kg/s]
-			Real64 const HeatRate,
-			Real64 const CoolRate,
-			Real64 const HeatEnergy,
-			Real64 const CoolEnergy
-		) :
-			cObjectName( cObjectName ),
-			EquipID( EquipID ),
-			Schedule( Schedule ),
-			ZoneSupplyAirNode( ZoneSupplyAirNode ),
-			SchedPtr( SchedPtr ),
-			MaxAirVolFlowRate( MaxAirVolFlowRate ),
-			AirMassFlowRateMax( AirMassFlowRateMax ),
-			InitMaxAvailMassFlow( InitMaxAvailMassFlow ),
-			AirMassFlowFraction( AirMassFlowFraction ),
-			ZoneEquipAirInletNode( ZoneEquipAirInletNode ),
-			SensOutputProvided( SensOutputProvided ),
-			EMSOverrideAirFlow( EMSOverrideAirFlow ),
-			EMSMassFlowRateValue( EMSMassFlowRateValue ),
-			HeatRate( HeatRate ),
-			CoolRate( CoolRate ),
-			HeatEnergy( HeatEnergy ),
-			CoolEnergy( CoolEnergy )
+			CoolEnergy( 0.0 ),
+			ZoneEqNum( 0 ),
+			ZoneNum( 0 )
 		{}
 
 	};
@@ -134,6 +100,7 @@ namespace DirectAirManager {
 	void
 	InitDirectAir(
 		int const DirectAirNum,
+		int const ControlledZoneNum,
 		bool const FirstHVACIteration
 	);
 
@@ -151,12 +118,9 @@ namespace DirectAirManager {
 		Real64 & LatOutputProvided // Latent output provided, kg/s, dehumidification = negative
 	);
 
-	void
-	ReportDirectAir( int & DirectAirNum );
-
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

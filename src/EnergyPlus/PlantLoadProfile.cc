@@ -59,6 +59,9 @@ namespace PlantLoadProfile {
 	// MODULE VARIABLE DECLARATIONS:
 	int NumOfPlantProfile;
 
+	namespace {
+		bool GetInput( true );
+	}
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
@@ -67,6 +70,12 @@ namespace PlantLoadProfile {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state(){
+		NumOfPlantProfile = 0;
+		GetInput= true;
+		PlantProfile.deallocate();
+	}
 
 	void
 	SimulatePlantProfile(
@@ -104,7 +113,7 @@ namespace PlantLoadProfile {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "SimulatePlantProfile" );
 		Real64 DeltaTemp;
-		static bool GetInput( true );
+
 		Real64 Cp; // local fluid specific heat
 
 		// FLOW:
@@ -114,7 +123,7 @@ namespace PlantLoadProfile {
 		}
 
 		if ( InitLoopEquip ) {
-			ProfileNum = FindItemInList( EquipName, PlantProfile.Name(), NumOfPlantProfile );
+			ProfileNum = FindItemInList( EquipName, PlantProfile );
 			if ( ProfileNum != 0 ) {
 				InitPlantProfile( ProfileNum );
 				return;
@@ -201,7 +210,7 @@ namespace PlantLoadProfile {
 				// PlantProfile name
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), PlantProfile.Name(), ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
+				VerifyName( cAlphaArgs( 1 ), PlantProfile, ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -432,7 +441,7 @@ namespace PlantLoadProfile {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

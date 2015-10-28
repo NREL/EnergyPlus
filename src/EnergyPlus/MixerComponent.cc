@@ -75,6 +75,14 @@ namespace MixerComponent {
 	// Functions
 
 	void
+		clear_state()
+	{
+		NumMixers = 0; // The Number of Mixers found in the Input
+		GetInputFlag = true; // Flag set to make sure you get input once
+		CheckEquipName.deallocate();
+	}
+
+	void
 	SimAirMixer(
 		std::string const & CompName,
 		int & CompIndex
@@ -130,7 +138,7 @@ namespace MixerComponent {
 
 		// Find the correct MixerNumber
 		if ( CompIndex == 0 ) {
-			MixerNum = FindItemInList( CompName, MixerCond.MixerName(), NumMixers );
+			MixerNum = FindItemInList( CompName, MixerCond, &MixerConditions::MixerName );
 			if ( MixerNum == 0 ) {
 				ShowFatalError( "SimAirLoopMixer: Mixer not found=" + CompName );
 			}
@@ -244,7 +252,7 @@ namespace MixerComponent {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( AlphArray( 1 ), MixerCond.MixerName(), MixerNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( AlphArray( 1 ), MixerCond, &MixerConditions::MixerName, MixerNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
@@ -673,7 +681,7 @@ namespace MixerComponent {
 			GetInputFlag = false;
 		}
 
-		MixerIndex = FindItemInList( MixerName, MixerCond.MixerName(), NumMixers );
+		MixerIndex = FindItemInList( MixerName, MixerCond, &MixerConditions::MixerName );
 		if ( MixerIndex == 0 ) {
 			if ( ! ThisObjectType.empty() ) {
 				ShowSevereError( ThisObjectType + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName );
@@ -692,7 +700,7 @@ namespace MixerComponent {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

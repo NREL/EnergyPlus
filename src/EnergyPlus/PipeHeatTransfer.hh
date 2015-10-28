@@ -1,6 +1,9 @@
 #ifndef PipeHeatTransfer_hh_INCLUDED
 #define PipeHeatTransfer_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array4D.hh>
@@ -9,12 +12,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
 namespace PipeHeatTransfer {
 
 	// Using/Aliasing
+	using namespace GroundTemperatureManager;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -117,9 +122,6 @@ namespace PipeHeatTransfer {
 		std::string SoilMaterial; // name of soil material:regular object
 		int SoilMaterialNum; // soil material index in material data structure
 		int MonthOfMinSurfTemp; // month of minimum ground surface temperature
-		Real64 AvgGroundTemp; // annual average ground temperature [C]
-		Real64 AvgGndTempAmp; // annual average amplitude of gnd temp [C]
-		int PhaseShiftDays; // shift of minimum gnd surf temp from 1/1  [days]
 		Real64 MinSurfTemp; // minimum annual surface temperature [C]
 		Real64 SoilDensity; // density of soil [kg/m3]
 		Real64 SoilDepth; // thickness of soil [m]
@@ -135,7 +137,6 @@ namespace PipeHeatTransfer {
 		Real64 FourierDS; // soil Fourier number based on grid spacing
 		Real64 SoilDiffusivity; // soil thermal diffusivity [m2/s]
 		Real64 SoilDiffusivityPerDay; // soil thermal diffusivity [m2/day]
-		int AvgAnnualManualInput; // flag for method of bringing in annual avg data yes-1 no-0
 		Array4D< Real64 > T; // soil temperature array
 		bool BeginSimInit; // begin sim and begin environment flag
 		bool BeginSimEnvrn; // begin sim and begin environment flag
@@ -149,6 +150,7 @@ namespace PipeHeatTransfer {
 		int BranchNum; // ..LoopSide%Branch index where this pipe lies
 		int CompNum; // ..Branch%Comp index where this pipe lies
 		bool CheckEquipName;
+		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 
 		// Default Constructor
 		PipeHTData() :
@@ -193,9 +195,6 @@ namespace PipeHeatTransfer {
 			OutdoorConvCoef( 0.0 ),
 			SoilMaterialNum( 0 ),
 			MonthOfMinSurfTemp( 0 ),
-			AvgGroundTemp( 0.0 ),
-			AvgGndTempAmp( 0.0 ),
-			PhaseShiftDays( 0 ),
 			MinSurfTemp( 0.0 ),
 			SoilDensity( 0.0 ),
 			SoilDepth( 0.0 ),
@@ -211,7 +210,6 @@ namespace PipeHeatTransfer {
 			FourierDS( 0.0 ),
 			SoilDiffusivity( 0.0 ),
 			SoilDiffusivityPerDay( 0.0 ),
-			AvgAnnualManualInput( 0 ),
 			BeginSimInit( true ),
 			BeginSimEnvrn( true ),
 			FirstHVACupdateFlag( true ),
@@ -285,9 +283,6 @@ namespace PipeHeatTransfer {
 			std::string const & SoilMaterial, // name of soil material:regular object
 			int const SoilMaterialNum, // soil material index in material data structure
 			int const MonthOfMinSurfTemp, // month of minimum ground surface temperature
-			Real64 const AvgGroundTemp, // annual average ground temperature [C]
-			Real64 const AvgGndTempAmp, // annual average amplitude of gnd temp [C]
-			int const PhaseShiftDays, // shift of minimum gnd surf temp from 1/1  [days]
 			Real64 const MinSurfTemp, // minimum annual surface temperature [C]
 			Real64 const SoilDensity, // density of soil [kg/m3]
 			Real64 const SoilDepth, // thickness of soil [m]
@@ -303,7 +298,6 @@ namespace PipeHeatTransfer {
 			Real64 const FourierDS, // soil Fourier number based on grid spacing
 			Real64 const SoilDiffusivity, // soil thermal diffusivity [m2/s]
 			Real64 const SoilDiffusivityPerDay, // soil thermal diffusivity [m2/day]
-			int const AvgAnnualManualInput, // flag for method of bringing in annual avg data yes-1 no-0
 			Array4< Real64 > const & T, // soil temperature array
 			bool const BeginSimInit, // begin sim and begin environment flag
 			bool const BeginSimEnvrn, // begin sim and begin environment flag
@@ -375,9 +369,6 @@ namespace PipeHeatTransfer {
 			SoilMaterial( SoilMaterial ),
 			SoilMaterialNum( SoilMaterialNum ),
 			MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
-			AvgGroundTemp( AvgGroundTemp ),
-			AvgGndTempAmp( AvgGndTempAmp ),
-			PhaseShiftDays( PhaseShiftDays ),
 			MinSurfTemp( MinSurfTemp ),
 			SoilDensity( SoilDensity ),
 			SoilDepth( SoilDepth ),
@@ -393,7 +384,6 @@ namespace PipeHeatTransfer {
 			FourierDS( FourierDS ),
 			SoilDiffusivity( SoilDiffusivity ),
 			SoilDiffusivityPerDay( SoilDiffusivityPerDay ),
-			AvgAnnualManualInput( AvgAnnualManualInput ),
 			T( T ),
 			BeginSimInit( BeginSimInit ),
 			BeginSimEnvrn( BeginSimEnvrn ),
@@ -576,7 +566,7 @@ namespace PipeHeatTransfer {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

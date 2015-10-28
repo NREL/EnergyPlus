@@ -158,7 +158,7 @@ namespace UserDefinedComponents {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = FindItemInList( EquipName, UserPlantComp.Name(), NumUserPlantComps );
+			CompNum = FindItemInList( EquipName, UserPlantComp );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Plant Component not found" );
 			}
@@ -286,7 +286,7 @@ namespace UserDefinedComponents {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = FindItemInList( EquipName, UserCoil.Name(), NumUserCoils );
+			CompNum = FindItemInList( EquipName, UserCoil );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );
 			}
@@ -328,7 +328,7 @@ namespace UserDefinedComponents {
 
 		if ( AirLoopNum != -1 ) { // IF the sysem is not an equipment of outdoor air unit
 			// determine if heating or cooling on primary air stream
-			if ( Node( UserCoil( CompNum ).Air( 1 ).InletNodeNum ).Temp < Node( UserCoil( CompNum ).Air( 1 ).InletNodeNum ).Temp ) {
+			if ( Node( UserCoil( CompNum ).Air( 1 ).InletNodeNum ).Temp < Node( UserCoil( CompNum ).Air( 1 ).OutletNodeNum ).Temp ) {
 				HeatingActive = true;
 			} else {
 				HeatingActive = false;
@@ -405,7 +405,7 @@ namespace UserDefinedComponents {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = FindItemInList( CompName, UserZoneAirHVAC.Name(), NumUserZoneAir );
+			CompNum = FindItemInList( CompName, UserZoneAirHVAC );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );
 			}
@@ -517,7 +517,7 @@ namespace UserDefinedComponents {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = FindItemInList( CompName, UserAirTerminal.Name(), NumUserAirTerminals );
+			CompNum = FindItemInList( CompName, UserAirTerminal );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );
 			}
@@ -669,7 +669,7 @@ namespace UserDefinedComponents {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), UserPlantComp.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), UserPlantComp, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -678,7 +678,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model simulations
 				if ( ! lAlphaFieldBlanks( 2 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserPlantComp( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
@@ -730,7 +730,7 @@ namespace UserDefinedComponents {
 
 						// find program manager for initial setup, begin environment and sizing of this plant connection
 						if ( ! lAlphaFieldBlanks( aArgCount + 4 ) ) {
-							StackMngrNum = FindItemInList( cAlphaArgs( aArgCount + 4 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+							StackMngrNum = FindItemInList( cAlphaArgs( aArgCount + 4 ), EMSProgramCallManager );
 							if ( StackMngrNum > 0 ) { // found it
 								UserPlantComp( CompLoop ).Loop( ConnectionLoop ).ErlInitProgramMngr = StackMngrNum;
 							} else {
@@ -743,7 +743,7 @@ namespace UserDefinedComponents {
 
 						// find program to call for model simulations for just this plant connection
 						if ( ! lAlphaFieldBlanks( aArgCount + 5 ) ) {
-							StackMngrNum = FindItemInList( cAlphaArgs( aArgCount + 5 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+							StackMngrNum = FindItemInList( cAlphaArgs( aArgCount + 5 ), EMSProgramCallManager );
 							if ( StackMngrNum > 0 ) { // found it
 								UserPlantComp( CompLoop ).Loop( ConnectionLoop ).ErlSimProgramMngr = StackMngrNum;
 							} else {
@@ -808,7 +808,7 @@ namespace UserDefinedComponents {
 
 				if ( ! lAlphaFieldBlanks( 31 ) ) {
 
-					UserPlantComp( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 31 ), Zone.Name(), NumOfZones );
+					UserPlantComp( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 31 ), Zone );
 					if ( UserPlantComp( CompLoop ).Zone.ZoneNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 31 ) );
 						ErrorsFound = true;
@@ -855,7 +855,7 @@ namespace UserDefinedComponents {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), UserCoil.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), UserCoil, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -868,7 +868,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model simulations
 				if ( ! lAlphaFieldBlanks( 2 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserCoil( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
@@ -881,7 +881,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model initializations
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserCoil( CompLoop ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -972,7 +972,7 @@ namespace UserDefinedComponents {
 
 					if ( ! lAlphaFieldBlanks( 13 ) ) {
 
-						UserCoil( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 13 ), Zone.Name(), NumOfZones );
+						UserCoil( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 13 ), Zone );
 						if ( UserCoil( CompLoop ).Zone.ZoneNum == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 13 ) );
 							ErrorsFound = true;
@@ -1008,7 +1008,7 @@ namespace UserDefinedComponents {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), UserZoneAirHVAC.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), UserZoneAirHVAC, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1017,7 +1017,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model simulations
 				if ( ! lAlphaFieldBlanks( 2 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserZoneAirHVAC( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
@@ -1030,7 +1030,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model initializations
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserZoneAirHVAC( CompLoop ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -1126,7 +1126,7 @@ namespace UserDefinedComponents {
 
 				if ( ! lAlphaFieldBlanks( 16 ) ) {
 
-					UserZoneAirHVAC( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 16 ), Zone.Name(), NumOfZones );
+					UserZoneAirHVAC( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 16 ), Zone );
 					if ( UserZoneAirHVAC( CompLoop ).Zone.ZoneNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 16 ) );
 						ErrorsFound = true;
@@ -1160,7 +1160,7 @@ namespace UserDefinedComponents {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), UserAirTerminal.Name(), CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), UserAirTerminal, CompLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1169,7 +1169,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model simulations
 				if ( ! lAlphaFieldBlanks( 2 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 2 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserAirTerminal( CompLoop ).ErlSimProgramMngr = StackMngrNum;
 					} else {
@@ -1182,7 +1182,7 @@ namespace UserDefinedComponents {
 
 				// now get program manager for model initializations
 				if ( ! lAlphaFieldBlanks( 3 ) ) {
-					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager.Name(), NumProgramCallManagers );
+					StackMngrNum = FindItemInList( cAlphaArgs( 3 ), EMSProgramCallManager );
 					if ( StackMngrNum > 0 ) { // found it
 						UserAirTerminal( CompLoop ).ErlInitProgramMngr = StackMngrNum;
 					} else {
@@ -1300,7 +1300,7 @@ namespace UserDefinedComponents {
 
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
 
-					UserAirTerminal( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 14 ), Zone.Name(), NumOfZones );
+					UserAirTerminal( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 14 ), Zone );
 					if ( UserZoneAirHVAC( CompLoop ).Zone.ZoneNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 16 ) );
 						ErrorsFound = true;
@@ -1829,6 +1829,10 @@ namespace UserDefinedComponents {
 				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).HumRat = UserCoil( CompNum ).Air( Loop ).OutletHumRat;
 				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).MassFlowRate = UserCoil( CompNum ).Air( Loop ).OutletMassFlowRate;
 				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserCoil( CompNum ).Air( Loop ).OutletTemp, UserCoil( CompNum ).Air( Loop ).OutletHumRat );
+
+				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).MassFlowRateMinAvail = Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).MassFlowRateMinAvail;
+				Node( UserCoil( CompNum ).Air( Loop ).OutletNodeNum ).MassFlowRateMaxAvail = Node( UserCoil( CompNum ).Air( Loop ).InletNodeNum ).MassFlowRateMaxAvail;
+
 			}
 		}
 
@@ -1895,6 +1899,7 @@ namespace UserDefinedComponents {
 		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).HumRat = UserZoneAirHVAC( CompNum ).ZoneAir.OutletHumRat;
 		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).MassFlowRate = UserZoneAirHVAC( CompNum ).ZoneAir.OutletMassFlowRate;
 		Node( UserZoneAirHVAC( CompNum ).ZoneAir.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserZoneAirHVAC( CompNum ).ZoneAir.OutletTemp, UserZoneAirHVAC( CompNum ).ZoneAir.OutletHumRat );
+
 		if ( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum > 0 ) {
 			Node( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum ).Temp = UserZoneAirHVAC( CompNum ).SourceAir.OutletTemp;
 			Node( UserZoneAirHVAC( CompNum ).SourceAir.OutletNodeNum ).HumRat = UserZoneAirHVAC( CompNum ).SourceAir.OutletHumRat;
@@ -1995,9 +2000,201 @@ namespace UserDefinedComponents {
 
 	}
 
+	void
+	GetUserDefinedCoilIndex(
+		std::string const & CoilName,
+		int & CoilIndex,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   August 2013
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets an index for a given user defined Cooling Coil -- issues error message if that
+		// coil is not a legal user defined Cooling Coil.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// na
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetInput ) { // First time subroutine has been called, get input data
+			GetUserDefinedComponents();
+			GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumUserCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, UserCoil.Name(), NumUserCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetUserDefinedCoilIndex: User Defined Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+		}
+
+	}
+
+	void
+	GetUserDefinedCoilAirInletNode(
+		std::string const & CoilName,
+		int & CoilAirInletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   July 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets a given user defined Cooling Coil's air inlet node -- issues error message if that
+		// coil is not a legal user defined Cooling Coil and sets air node to 0, otherwise, returns inlet air node number.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex;
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetInput ) { // First time subroutine has been called, get input data
+			GetUserDefinedComponents();
+			GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumUserCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, UserCoil.Name(), NumUserCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+			CoilAirInletNode = 0;
+		} else {
+			CoilAirInletNode = UserCoil( CoilIndex ).Air( 1 ).InletNodeNum;
+		}
+
+	}
+
+	void
+	GetUserDefinedCoilAirOutletNode(
+		std::string const & CoilName,
+		int & CoilAirOutletNode,
+		bool & ErrorsFound,
+		std::string const CurrentModuleObject
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   July 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets a given user defined Cooling Coil's air outlet node -- issues error message if that
+		// coil is not a legal user defined Cooling Coil and sets air node to 0, otherwise, returns outlet air node number.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int CoilIndex;
+
+		// Obtains and allocates TESCoil related parameters from input file
+		if ( GetInput ) { // First time subroutine has been called, get input data
+			GetUserDefinedComponents();
+			GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( NumUserCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, UserCoil.Name(), NumUserCoils );
+		} else {
+			CoilIndex = 0;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( CurrentModuleObject + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName );
+			ErrorsFound = true;
+			CoilAirOutletNode = 0;
+		} else {
+			CoilAirOutletNode = UserCoil( CoilIndex ).Air( 1 ).OutletNodeNum;
+		}
+
+	}
+
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

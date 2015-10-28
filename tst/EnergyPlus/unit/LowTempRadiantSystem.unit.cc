@@ -59,6 +59,7 @@ public:
 		HydronicRadiantSysNumericFields.allocate( 1 );
 		HydronicRadiantSysNumericFields( RadSysNum ).FieldNames.allocate( 15 );
 		HydrRadSys( RadSysNum ).NumCircuits.allocate( 1 );
+		CFloRadSys( RadSysNum ).NumCircuits.allocate( 1 );
 		// set up plant loop
 		TotNumLoops = 2;
 		PlantLoop.allocate( TotNumLoops );
@@ -169,21 +170,21 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantElectric )
 	EXPECT_NEAR( 1200.0, ElecRadSys( RadSysNum ).MaxElecPower, 0.1 );
 
 	//Electric - CapacityPerFloorArea method - hold until scalable sizing issue is resolved
-	//ElecRadSys( RadSysNum ).MaxElecPower = AutoSize;
-	//ElecRadSys( RadSysNum ).HeatingCapMethod = CapacityPerFloorArea;
-	//ElecRadSys( RadSysNum ).ScaledHeatingCapacity = 1.5;
-	//Zone( 1 ).FloorArea = 500.0;
-	//SizeLowTempRadiantSystem( RadSysNum, SystemType );
-	//EXPECT_NEAR( 750.0, ElecRadSys( RadSysNum ).MaxElecPower, 0.1 );
+	ElecRadSys( RadSysNum ).MaxElecPower = AutoSize;
+	ElecRadSys( RadSysNum ).HeatingCapMethod = CapacityPerFloorArea;
+	ElecRadSys( RadSysNum ).ScaledHeatingCapacity = 1.5;
+	Zone( 1 ).FloorArea = 500.0;
+	SizeLowTempRadiantSystem( RadSysNum, SystemType );
+	EXPECT_NEAR( 750.0, ElecRadSys( RadSysNum ).MaxElecPower, 0.1 );
 
 	//Electric - FractionOfAutosizedHeatingCapacity method - hold until scalable sizing issue is resolved
-	//ElecRadSys( RadSysNum ).MaxElecPower = AutoSize;
-	//ElecRadSys( RadSysNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
-	//ElecRadSys( RadSysNum ).ScaledHeatingCapacity = 10.0;
-	//CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad = 800.0;
-	//CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.1;
-	//SizeLowTempRadiantSystem( RadSysNum, SystemType );
-	//EXPECT_NEAR( 8800.0, ElecRadSys( RadSysNum ).MaxElecPower, 0.1 );
+	ElecRadSys( RadSysNum ).MaxElecPower = AutoSize;
+	ElecRadSys( RadSysNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+	ElecRadSys( RadSysNum ).ScaledHeatingCapacity = 10.0;
+	CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad = 800.0;
+	CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.1;
+	SizeLowTempRadiantSystem( RadSysNum, SystemType );
+	EXPECT_NEAR( 8800.0, ElecRadSys( RadSysNum ).MaxElecPower, 0.1 );
 }
 
 TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow )
@@ -272,5 +273,134 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow )
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat, 0.1 );
 	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).WaterVolFlowMaxCool, 0.1 );
+}
+TEST_F( LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow ) {
+	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow" );
 
+	SystemType = HydronicSystem;
+	HydrRadSys( RadSysNum ).Name = "LowTempVarFlow 1";
+	HydrRadSys( RadSysNum ).ZonePtr = 1;
+	HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( 3 ) = "Heating Design Capacity";
+	HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( 8 ) = "Cooling Design Capacity";
+
+	HydrRadSys( RadSysNum ).HotWaterInNode = 1;
+	HydrRadSys( RadSysNum ).HotWaterOutNode = 2;
+	HydrRadSys( RadSysNum ).HWLoopNum = 1;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = HydrRadSys( RadSysNum ).HotWaterInNode;
+
+	HydrRadSys( RadSysNum ).ColdWaterInNode = 3;
+	HydrRadSys( RadSysNum ).ColdWaterOutNode = 4;
+	HydrRadSys( RadSysNum ).CWLoopNum = 2;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = HydrRadSys( RadSysNum ).ColdWaterInNode;
+
+	//Hydronic - HeatingDesignCapacity/CoolingDesignCapacity Autosize Method
+	HydrRadSys( RadSysNum ).HeatingCapMethod = HeatingDesignCapacity;
+	HydrRadSys( RadSysNum ).ScaledHeatingCapacity = AutoSize;
+	CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad = 1000.0;
+	CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.2;
+	ExpectedResult1 = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+
+	HydrRadSys( RadSysNum ).CoolingCapMethod = CoolingDesignCapacity;
+	HydrRadSys( RadSysNum ).ScaledCoolingCapacity = AutoSize;
+	CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad = 2000.0;
+	CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor = 1.1;
+	ExpectedResult2 = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+
+	SizeLowTempRadiantSystem( RadSysNum, SystemType );
+	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).ScaledHeatingCapacity, 0.1 );
+	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).ScaledCoolingCapacity, 0.1 );
+
+	//Hydronic - CapacityPerFloorArea Capacity Sizing Method
+	Zone( 1 ).FloorArea = 50.0;
+	HydrRadSys( RadSysNum ).HeatingCapMethod = CapacityPerFloorArea;
+	HydrRadSys( RadSysNum ).ScaledHeatingCapacity = 200.0;
+	ExpectedResult1 = HydrRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( 1 ).FloorArea;
+
+	HydrRadSys( RadSysNum ).CoolingCapMethod = CapacityPerFloorArea;
+	HydrRadSys( RadSysNum ).ScaledCoolingCapacity = 250.0;
+	ExpectedResult2 = HydrRadSys( RadSysNum ).ScaledCoolingCapacity * Zone( 1 ).FloorArea;
+
+	SizeLowTempRadiantSystem( RadSysNum, SystemType );
+	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).ScaledHeatingCapacity, 0.1 );
+	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).ScaledCoolingCapacity, 0.1 );
+
+	//Hydronic - FractionOfAutosizedHeating/CoolingCapacity Sizing Method
+	HydrRadSys( RadSysNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+	HydrRadSys( RadSysNum ).ScaledHeatingCapacity = 1.2;
+	CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad = 800.0;
+	CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.1;
+	ExpectedResult1 = HydrRadSys( RadSysNum ).ScaledHeatingCapacity * CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+
+	HydrRadSys( RadSysNum ).CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
+	HydrRadSys( RadSysNum ).ScaledCoolingCapacity = 1.5;
+	CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad = 1000.0;
+	CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor = 1.2;
+	ExpectedResult2 = HydrRadSys( RadSysNum ).ScaledCoolingCapacity * CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+
+	SizeLowTempRadiantSystem( RadSysNum, SystemType );
+	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).ScaledHeatingCapacity, 0.1 );
+	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).ScaledCoolingCapacity, 0.1 );
+}
+TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow ) {
+	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow" );
+
+	SystemType = ConstantFlowSystem;
+	CFloRadSys( RadSysNum ).Name = "LowTempConstantFlow 1";
+	CFloRadSys( RadSysNum ).ZonePtr = 1;
+	HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( 2 ) = "Rated Flow Rate";
+	HydronicRadiantSysNumericFields( RadSysNum ).FieldNames( 3 ) = "Total length of pipe embedded in surface";
+
+	CFloRadSys( RadSysNum ).HotWaterInNode = 1;
+	CFloRadSys( RadSysNum ).HotWaterOutNode = 2;
+	CFloRadSys( RadSysNum ).HWLoopNum = 1;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = CFloRadSys( RadSysNum ).HotWaterInNode;
+
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 3;
+	CFloRadSys( RadSysNum ).ColdWaterOutNode = 4;
+	CFloRadSys( RadSysNum ).CWLoopNum = 2;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = CFloRadSys( RadSysNum ).ColdWaterInNode;
+
+	//Hydronic - Hot water volume flow rate autosize
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 0;
+	CFloRadSys( RadSysNum ).ColdWaterOutNode = 0;
+	CFloRadSys( RadSysNum ).WaterVolFlowMax = AutoSize;
+	CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad = 1000.0;
+	CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.2;
+	ExpectedResult1 = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+	ExpectedResult1 = ExpectedResult1 / ( PlantSizData( 1 ).DeltaT * RhoWater * CpWater );
+	
+	SizeLowTempRadiantSystem( RadSysNum, SystemType );
+	EXPECT_NEAR( ExpectedResult1, CFloRadSys( RadSysNum ).WaterVolFlowMax, 0.001 );
+
+	//Hydronic - cold water volume flow rate autosize 
+	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
+	CFloRadSys( RadSysNum ).HotWaterOutNode = 0;
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 3;
+	CFloRadSys( RadSysNum ).ColdWaterOutNode = 4;
+	CFloRadSys( RadSysNum ).WaterVolFlowMax = AutoSize;
+	CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad = 2000.0;
+	CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor = 1.1;
+	ExpectedResult2 = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+	ExpectedResult2 = ExpectedResult2 / ( PlantSizData( 2 ).DeltaT * RhoWater * CpWater );
+
+	SizeLowTempRadiantSystem( RadSysNum, SystemType );
+	EXPECT_NEAR( ExpectedResult2, CFloRadSys( RadSysNum ).WaterVolFlowMax, 0.001 );
+
+	//Hydronic - maximum water volume flow rate autosize 
+	CFloRadSys( RadSysNum ).WaterVolFlowMax = AutoSize;
+	CFloRadSys( RadSysNum ).HotWaterInNode = 1;
+	CFloRadSys( RadSysNum ).HotWaterOutNode = 2;
+	CFloRadSys( RadSysNum ).ColdWaterInNode = 3;
+	CFloRadSys( RadSysNum ).ColdWaterOutNode = 4;
+
+	//Hydronic - embeded tube length autosize 
+	CFloRadSys( RadSysNum ).NumCircCalcMethod = 0;
+	CFloRadSys( RadSysNum ).NumOfSurfaces = 1;
+	CFloRadSys( RadSysNum ).TubeLength = AutoSize;
+	CFloRadSys( RadSysNum ).TotalSurfaceArea = 150.0;
+	ExpectedResult3 = CFloRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+
+	SizeLowTempRadiantSystem( RadSysNum, SystemType );
+	EXPECT_NEAR( std::max( ExpectedResult1, ExpectedResult2), CFloRadSys( RadSysNum ).WaterVolFlowMax, 0.001 );
+	EXPECT_NEAR( ExpectedResult3, CFloRadSys( RadSysNum ).TubeLength, 0.1 );
 }

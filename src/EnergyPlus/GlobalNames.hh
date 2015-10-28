@@ -29,6 +29,7 @@ namespace GlobalNames {
 	extern int CurMaxBoilers;
 	extern int CurMaxBaseboards;
 	extern int CurMaxCoils;
+	extern int numAirDistUnits; // count of air distribution units
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
 
@@ -60,8 +61,13 @@ namespace GlobalNames {
 	extern Array1D< ComponentNameData > BoilerNames;
 	extern Array1D< ComponentNameData > BaseboardNames;
 	extern Array1D< ComponentNameData > CoilNames;
+	extern Array1D< ComponentNameData > aDUNames;
 
 	// Functions
+
+	// for unit tests
+	void
+	clear_state();
 
 	void
 	VerifyUniqueChillerName(
@@ -95,9 +101,22 @@ namespace GlobalNames {
 		std::string const & StringToDisplay
 	);
 
+	void 
+	VerifyUniqueADUName(
+		std::string const & TypeToVerify,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		std::string const & StringToDisplay
+	);
+
+	// Clears the global data in GlobalNames.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

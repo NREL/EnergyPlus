@@ -71,6 +71,13 @@ namespace Pipes {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumLocalPipes = 0;
+		GetPipeInputFlag = true;
+		LocalPipe.deallocate();
+	}
 
 	void
 	SimPipes(
@@ -131,7 +138,7 @@ namespace Pipes {
 		}
 
 		if ( CompIndex == 0 ) {
-			PipeNum = FindItemInList( PipeName, LocalPipe.Name(), NumLocalPipes );
+			PipeNum = FindItemInList( PipeName, LocalPipe );
 			if ( PipeNum == 0 ) {
 				ShowFatalError( "SimPipes: Pipe requested not found =" + PipeName ); // Catch any bad names before crashing
 			}
@@ -263,7 +270,7 @@ namespace Pipes {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), LocalPipe.Name(), PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), LocalPipe, PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -285,7 +292,7 @@ namespace Pipes {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), LocalPipe.Name(), PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), LocalPipe, PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -358,7 +365,7 @@ namespace Pipes {
 		}
 
 		if ( PipeNum == 0 ) {
-			PipeNum = FindItemInList( PipeName, LocalPipe.Name(), NumLocalPipes );
+			PipeNum = FindItemInList( PipeName, LocalPipe );
 			if ( PipeNum == 0 ) {
 				ShowFatalError( "SimPipes: Pipe requested not found =" + PipeName ); // Catch any bad names before crashing
 			}
@@ -392,7 +399,7 @@ namespace Pipes {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

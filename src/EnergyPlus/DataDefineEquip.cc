@@ -48,6 +48,7 @@ namespace DataDefineEquip {
 	int const SingleDuctUserDefined( 14 );
 	int const SingleDuctInletATMixer( 15 );
 	int const SingleDuctSupplyATMixer( 16 );
+	int const SingleDuctConstVolFourPipeBeam( 17 );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -58,8 +59,17 @@ namespace DataDefineEquip {
 	// Object Data
 	Array1D< ZoneAirEquip > AirDistUnit; // Used to specify zone related
 
+	// Clears the global data in DataDefineEquip.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumAirDistUnits = 0;
+		AirDistUnit.deallocate();
+	}
+
 	//     NOTICE
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

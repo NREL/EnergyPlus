@@ -574,6 +574,8 @@ namespace WaterCoils {
 	extern Array1D< WaterCoilNumericFieldData > WaterCoilNumericFields;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimulateWaterCoilComponents(
@@ -862,6 +864,13 @@ namespace WaterCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	Real64
+	GetWaterCoilDesAirFlow(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	);
+
 	void
 	CheckActuatorNode(
 		int const ActuatorNodeNum, // input actuator node number
@@ -930,7 +939,7 @@ namespace WaterCoils {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -1,18 +1,12 @@
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Application Guide for EMS</h1>
 <h2>Energy Management System User Guide</h2>
 <br/>
 <p><i>(a.k.a. The Book of Erl)</i></p>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 <br/>
 <br/>
 <p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
@@ -1201,6 +1195,12 @@ The internal variable called “Outdoor Air Controller Minimum Mass Flow Rate”
 
 The internal variable called “Pump Maximum Mass Flow Rate” provides information about the size of the pump. The units are kg/s. This is the mass flow rate associated with the volume flow rate entered into the Rated Flow Rate (m<sup>3</sup>/s) in the various pump input objects. This internal variable is useful for scaling the flow rates assigned to the “Pump Mass Flow Rate” control in the “Pump” EMS actuator.
 
+### Unitary Systems
+
+#### Unitary System Control Zone Mass Flow Fraction
+
+The internal variable called “Unitary System Control Zone Mass Flow Fraction” is used to adjust the zone load such that the total load met by the HVAC system, when distributed to the conditioned zones, will meet the controlling zones load. The controlling zone is the zone with the thermostat. See the AirloopHVAC:UnitarySystem input field named "Controlling Zone or Thermostat Location."
+
 ### Low Temperature Radiant Hydronic
 
 #### Constant Flow Low Temp Radiant Design Water Mass Flow Rate
@@ -1215,6 +1215,17 @@ The internal variable called “Hydronic Low Temp Radiant Design Water Mass Flow
 
 The internal variable called “Hydronic Low Temp Radiant Design Water Mass Flow Rate for Heating” provides information about the cooling design water flow rate for radiant systems defined using a ZoneHVAC:LowTemperatureRadiant:VariableFlow input object. The units are m<sup>3</sup>/s. This internal variable is useful for scaling the flow rates assigned to the “Water Mass Flow Rate” control in the “Hydronic Low Temp Radiant” EMS actuator.
 
+### Boiler Nominal Ratings
+
+#### Boiler Nominal Capacity
+
+The internal variable called “Boiler Nominal Capacity” provides information about the nominal heating capacity of boiler equipment. The units are Watts. 
+
+### Chiller Nominal Ratings
+
+#### Chiller Nominal Capacity
+
+The internal variable called “Chiller Nominal Capacity” provides information about the nominal cooling capacity of chiller equipment. The units are Watts. 
 
 
 On-Site Electricity Production

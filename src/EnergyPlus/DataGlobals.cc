@@ -55,6 +55,7 @@ namespace DataGlobals {
 	int const ksRunPeriodWeather( 3 );
 	int const ksHVACSizeDesignDay ( 4 );  // a regular design day run during HVAC Sizing Simulation
 	int const ksHVACSizeRunPeriodDesign( 5 ); // a weather period design day run during HVAC Sizing Simulation
+	int const ksReadAllWeatherData( 6 ); // a weather period for reading all weather data proir to the simulation
 
 	int const ZoneTSReporting( 1 ); // value for Zone Time Step Reporting (UpdateDataAndReport)
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -136,6 +137,8 @@ namespace DataGlobals {
 	bool WarmupFlag( false ); // True during the warmup portion of a simulation
 	int OutputFileStandard( 0 ); // Unit number for the standard output file (hourly data only)
 	std::ostream * eso_stream( nullptr ); // Internal stream used for eso output (used for performance)
+	int OutputStandardError( 0 ); // Unit number for the standard error output file
+	std::ostream * err_stream( nullptr ); // Internal stream used for err output (used for performance)
 	int StdOutputRecordCount( 0 ); // Count of Standard output records
 	int OutputFileInits( 0 ); // Unit number for the standard Initialization output file
 	int OutputFileDebug( 0 ); // Unit number for debug outputs
@@ -225,6 +228,7 @@ namespace DataGlobals {
 		TimeStepZone = 0.0;
 		WarmupFlag = false;
 		OutputFileStandard = 0;
+		OutputStandardError = 0;
 		StdOutputRecordCount = 0;
 		OutputFileInits = 0;
 		OutputFileDebug = 0;
@@ -280,10 +284,11 @@ namespace DataGlobals {
 		Progress = 0;
 		eso_stream = nullptr;
 		mtr_stream = nullptr;
+		err_stream = nullptr;
 	}
 
 	//     NOTICE
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

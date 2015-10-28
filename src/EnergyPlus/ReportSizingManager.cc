@@ -15,6 +15,7 @@
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <DXCoils.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <InputProcessor.hh>
@@ -432,7 +433,7 @@ namespace ReportSizingManager {
 			if ( !IsAutoSize && !SizingDesRunThisZone && !SizingDesValueFromParent ) {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
-				if ( PrintWarningFlag && SizingResult > 0.0 ) {
+				if ( PrintWarningFlag && SizingResult > 0.0 && !DataScalableCapSizingON ) {
 					if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 						SizingResult /= ( 1 - DataBypassFrac ); // back out bypass fraction applied in GetInput
 						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
@@ -864,9 +865,9 @@ namespace ReportSizingManager {
 								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad;
 							} else {
 								CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-								CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-								CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 								CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+								CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp);
+								CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat);
 								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
 								DesVolFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow / StdRhoAir;
 							}
@@ -889,8 +890,8 @@ namespace ReportSizingManager {
 									CoilInTemp = FinalZoneSizing ( CurZoneEqNum ).DesCoolCoilInTemp;
 									CoilInHumRat = FinalZoneSizing ( CurZoneEqNum ).DesCoolCoilInHumRat;
 								}
-								CoilOutTemp = FinalZoneSizing ( CurZoneEqNum ).CoolDesTemp;
-								CoilOutHumRat = FinalZoneSizing ( CurZoneEqNum ).CoolDesHumRat;
+								CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp );
+								CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat);
 								TimeStepNumAtMax = FinalZoneSizing ( CurZoneEqNum ).TimeStepNumAtCoolMax;
 								DDNum = FinalZoneSizing ( CurZoneEqNum ).CoolDDNum;
 								if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
@@ -904,6 +905,8 @@ namespace ReportSizingManager {
 								CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
 								if ( DataTotCapCurveIndex > 0 ) {
 									TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
+								} else if ( DataTotCapCurveValue > 0 ) {
+									TotCapTempModFac = DataTotCapCurveValue;
 								} else {
 									TotCapTempModFac = 1.0;
 								}
@@ -1531,6 +1534,8 @@ namespace ReportSizingManager {
 							} else {
 								rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine );
 							}
+							CoilOutTemp = min( CoilInTemp, CoilOutTemp );
+							CoilOutHumRat = min( CoilInHumRat, CoilOutHumRat );
 							CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat );
 							CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine );
 							CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
@@ -1570,8 +1575,10 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingCapacitySizing ) {
 					DataFracOfAutosizedHeatingCapacity = 1.0;
 					if (CurOASysNum > 0) {
-						if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
+						if (OASysEqSizing(CurOASysNum).AirFlow) {
 							DesVolFlow = OASysEqSizing(CurOASysNum).AirVolFlow;
+						} else if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
+							DesVolFlow = OASysEqSizing(CurOASysNum).HeatingAirVolFlow;
 						} else {
 							DesVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 						}
@@ -1857,7 +1864,7 @@ namespace ReportSizingManager {
 			if ( DataEMSOverrideON ) {
 				SizingResult = DataEMSOverride;
 			} else {
-				SizingResult = AutosizeDes;
+				AutosizeUser = SizingResult;
 			}
 		} else {
 			AutosizeUser = SizingResult;
@@ -1868,11 +1875,11 @@ namespace ReportSizingManager {
 				if ( SELECT_CASE_var == SupplyAirFlowRate || SELECT_CASE_var == None ) {
 					ScalableSM = "User-Specified (scaled by flow / zone) ";
 				} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-					ScalableSM = "User-Specified(scaled by flow / area) ";
+					ScalableSM = "User-Specified (scaled by flow / area) ";
 				} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow || SELECT_CASE_var == FractionOfAutosizedHeatingAirflow ) {
-					ScalableSM = "User-Specified(scaled by fractional multiplier) ";
+					ScalableSM = "User-Specified (scaled by fractional multiplier) ";
 				} else if ( SELECT_CASE_var == FlowPerCoolingCapacity || SELECT_CASE_var == FlowPerHeatingCapacity ) {
-					ScalableSM = "User-Specified(scaled by flow / capacity) ";
+					ScalableSM = "User-Specified (scaled by flow / capacity) ";
 				} else {
 					ScalableSM = "Design Size ";
 				}}
@@ -1885,9 +1892,9 @@ namespace ReportSizingManager {
 				ScalableSM = "User-Specified ";
 				if ( SizingResult == AutoSize ) ScalableSM = "Design Size ";
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				ScalableSM = "User-Specified(scaled by capacity / area) ";
+				ScalableSM = "User-Specified (scaled by capacity / area) ";
 			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity || SELECT_CASE_var == FractionOfAutosizedCoolingCapacity ) {
-				ScalableSM = "User-Specified(scaled by fractional multiplier) ";
+				ScalableSM = "User-Specified (scaled by fractional multiplier) ";
 			} else {
 				ScalableSM = "Design Size ";
 			}
@@ -1968,12 +1975,23 @@ namespace ReportSizingManager {
 						}
 					}
 				} else {
-					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag ) {
+					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag && !( DataScalableSizingON || DataScalableCapSizingON ) ) {
 						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
 								ShowContinueError( "User-Specified " + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
+								ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
+								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+							}
+						}
+					} else if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag && ( DataScalableSizingON || DataScalableCapSizingON ) ) {
+						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, ScalableSM + SizingString, AutosizeUser );
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
+								ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
+								ShowContinueError( ScalableSM + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
 								ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
@@ -2107,7 +2125,7 @@ namespace ReportSizingManager {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

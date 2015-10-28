@@ -475,7 +475,7 @@ namespace FluidProperties {
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), FluidNames.Name(), FluidNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), FluidNames, FluidNum, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...Fluid names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -1700,7 +1700,7 @@ namespace FluidProperties {
 			// Check to see if glycol name is one of the defaults or is listed in the Fluid Name list
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), GlycolData.Name(), NumOfGlyConcs, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), GlycolData, NumOfGlyConcs, ErrorInName, IsBlank, CurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...Fluid names must be unique regardless of subtype." );
 				ErrorsFound = true;
@@ -4111,14 +4111,14 @@ namespace FluidProperties {
 				RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrCount += SatErrCount;
 				// send warning
 				if ( RefrigErrorTracking( RefrigNum ).SatTempDensityErrCount <= RefrigerantErrorLimitTest ) {
-					ShowSevereMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **" );
+					ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **" );
 					ShowContinueError( "...Called From:" + CalledFrom );
 					ShowContinueError( "Refrigerant temperature = " + RoundSigDigits( Temperature, 2 ) );
 					ShowContinueError( "Refrigerant pressure = " + RoundSigDigits( Pressure, 0 ) );
 					ShowContinueError( "Returned Enthalpy value = " + RoundSigDigits( ReturnValue, 3 ) );
 					ShowContinueErrorTimeStamp( "" );
 				}
-				ShowRecurringSevereErrorAtEnd( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] saturated at the given conditions **", RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
+				ShowRecurringWarningErrorAtEnd( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] saturated at the given conditions **", RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
 			return ReturnValue;
 		}
@@ -4623,7 +4623,7 @@ namespace FluidProperties {
 			RefrigErrorTracking( RefrigNum ).SatSupDensityErrCount += SatErrCount;
 			// send warning
 			if ( RefrigErrorTracking( RefrigNum ).SatSupDensityErrCount <= RefrigerantErrorLimitTest ) {
-				ShowSevereMessage( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, saturated density at given temperature returned. **" );
+				ShowWarningMessage( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, saturated density at given temperature returned. **" );
 				ShowContinueError( "...Called From:" + CalledFrom );
 				ShowContinueError( "Refrigerant temperature = " + RoundSigDigits( Temperature, 2 ) );
 				ShowContinueError( "Refrigerant pressure = " + RoundSigDigits( Pressure, 0 ) );
@@ -4631,7 +4631,7 @@ namespace FluidProperties {
 				ShowContinueErrorTimeStamp( "" );
 			}
 			if ( SatErrCount > 0 ) {
-				ShowRecurringSevereErrorAtEnd( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] saturated at the given conditions **", RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
+				ShowRecurringWarningErrorAtEnd( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] saturated at the given conditions **", RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
 			return saturated_density;
 		}
@@ -5397,7 +5397,7 @@ namespace FluidProperties {
 		}
 
 		// Check to see if this glycol shows up in the glycol data
-		Found = FindItemInList( MakeUPPERCase( Refrigerant ), RefrigData.Name(), NumOfRefrigerants );
+		Found = FindItemInList( MakeUPPERCase( Refrigerant ), RefrigData );
 
 		if ( Found > 0 ) {
 			FindRefrigerant = Found;
@@ -5465,7 +5465,7 @@ namespace FluidProperties {
 		}
 
 		// Check to see if this glycol shows up in the glycol data
-		Found = FindItemInList( MakeUPPERCase( Glycol ), GlycolData.Name(), NumOfGlycols );
+		Found = FindItemInList( MakeUPPERCase( Glycol ), GlycolData, NumOfGlycols ); // GlycolData is allocated to NumOfGlyConcs
 
 		if ( Found > 0 ) {
 			FindGlycol = Found;
@@ -5737,12 +5737,12 @@ namespace FluidProperties {
 			++TempRangeErrCount;
 			// send warning
 			if ( TempRangeErrCount <= RefrigerantErrorLimitTest ) {
-				ShowSevereError( "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **" );
+				ShowWarningError( "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **" );
 				ShowContinueErrorTimeStamp( " Called from:" + CalledFrom );
 				ShowContinueError( "Refrigerant temperature = " + RoundSigDigits( Temperature, 2 ) );
 				ShowContinueError( "Returned saturated property value = " + RoundSigDigits( ReturnValue, 3 ) );
 			} else {
-				ShowRecurringSevereErrorAtEnd( "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error", TempRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
+				ShowRecurringWarningErrorAtEnd( "GetInterpolatedSatProp: Refrigerant temperature for interpolation out of range error", TempRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
 		}
 
@@ -5800,11 +5800,11 @@ namespace FluidProperties {
 		// Item must be either in Refrigerant or Glycol list
 		Found = 0;
 		if ( NumOfRefrigerants > 0 ) {
-			Found = FindItemInList( NameToCheck, RefrigData.Name(), NumOfRefrigerants );
+			Found = FindItemInList( NameToCheck, RefrigData );
 		}
 		if ( Found == 0 ) {
 			if ( NumOfGlycols > 0 ) {
-				Found = FindItemInList( NameToCheck, GlycolData.Name(), NumOfGlycols );
+				Found = FindItemInList( NameToCheck, GlycolData, NumOfGlycols ); // GlycolData is allocated to NumOfGlyConcs
 			}
 		}
 
@@ -6133,7 +6133,7 @@ namespace FluidProperties {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

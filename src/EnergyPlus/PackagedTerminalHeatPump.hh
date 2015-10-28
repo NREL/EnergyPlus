@@ -75,6 +75,7 @@ namespace PackagedTerminalHeatPump {
 		std::string UnitType; // type of unit
 		int UnitType_Num; // paramter equivalent to type of unit
 		int ZoneEquipType; // Type of PT unit
+		bool useVSCoilModel; // does PT use VS coil models
 		int SchedPtr; // index number to availability schedule
 		Real64 MaxCoolAirVolFlow; // supply air volumetric flow rate during cooling operation [m3/s]
 		Real64 MaxHeatAirVolFlow; // supply air volumetric flow rate during heating operation [m3/s]
@@ -221,6 +222,7 @@ namespace PackagedTerminalHeatPump {
 		PTUnitData() :
 			UnitType_Num( 0 ),
 			ZoneEquipType( 0 ),
+			useVSCoilModel( false ),
 			SchedPtr( 0 ),
 			MaxCoolAirVolFlow( 0.0 ),
 			MaxHeatAirVolFlow( 0.0 ),
@@ -866,7 +868,7 @@ namespace PackagedTerminalHeatPump {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

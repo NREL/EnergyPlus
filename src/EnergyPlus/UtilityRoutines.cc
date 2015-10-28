@@ -45,6 +45,10 @@ extern "C" {
 
 namespace EnergyPlus {
 
+namespace UtilityRoutines {
+	bool outputErrorHeader( true );
+}
+
 void
 AbortEnergyPlus()
 {
@@ -1536,6 +1540,7 @@ ShowErrorMessage(
 	using DataStringGlobals::IDDVerString;
 	using DataGlobals::DoingInputProcessing;
 	using DataGlobals::CacheIPErrorFile;
+	using DataGlobals::err_stream;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1551,25 +1556,14 @@ ShowErrorMessage(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static int TotalErrors( 0 ); // used to determine when to open standard error output file.
-	static int StandardErrorOutput;
-	int write_stat;
-	static bool ErrFileOpened( false );
 
-	if ( TotalErrors == 0 && ! ErrFileOpened ) {
-		StandardErrorOutput = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags ); write_stat = flags.ios(); }
-		if ( write_stat != 0 ) {
-			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
-			ShowFatalError( "ShowErrorMessage: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write)." );
-		}
-		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
-		ErrFileOpened = true;
+	if ( UtilityRoutines::outputErrorHeader && err_stream ) {
+		*err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
+		UtilityRoutines::outputErrorHeader = false;
 	}
 
 	if ( ! DoingInputProcessing ) {
-		++TotalErrors;
-		gio::write( StandardErrorOutput, ErrorFormat ) << ErrorMessage;
+		if ( err_stream ) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
 	} else {
 		gio::write( CacheIPErrorFile, fmtA ) << ErrorMessage;
 	}
@@ -1747,7 +1741,7 @@ ShowRecurringErrors()
 }
 
 //     NOTICE
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

@@ -869,29 +869,6 @@ public: // Inspector
 		return array_.isize6();
 	}
 
-public: // Modifier
-
-	// Assign Default Value to all Elements
-	inline
-	MArray6 &
-	to_default()
-	{
-		for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-			for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
-				for ( int i3 = 1, e3 = u3(); i3 <= e3; ++i3 ) {
-					for ( int i4 = 1, e4 = u4(); i4 <= e4; ++i4 ) {
-						for ( int i5 = 1, e5 = u5(); i5 <= e5; ++i5 ) {
-							for ( int i6 = 1, e6 = u6(); i6 <= e6; ++i6 ) {
-								operator ()( i1, i2, i3, i4, i5, i6 ) = Traits::initial_value();
-							}
-						}
-					}
-				}
-			}
-		}
-		return *this;
-	}
-
 public: // MArray Generators
 
 	// Template Helpers

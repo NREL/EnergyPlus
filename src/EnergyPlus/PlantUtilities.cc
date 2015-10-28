@@ -48,18 +48,55 @@ namespace PlantUtilities {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+	namespace { 
+		struct CriteriaData
+		{
+			// Members
+			int CallingCompLoopNum; // for debug error handling
+			int CallingCompLoopSideNum; // for debug error handling
+			int CallingCompBranchNum; // for debug error handling
+			int CallingCompCompNum; // for debug error handling
+			Real64 ThisCriteriaCheckValue; // the previous value, to check the current against
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+			// Default Constructor
+			CriteriaData() :
+				CallingCompLoopNum( 0 ),
+				CallingCompLoopSideNum( 0 ),
+				CallingCompBranchNum( 0 ),
+				CallingCompCompNum( 0 ),
+				ThisCriteriaCheckValue( 0.0 )
+			{}
 
+			// Member Constructor
+			CriteriaData(
+				int const CallingCompLoopNum, // for debug error handling
+				int const CallingCompLoopSideNum, // for debug error handling
+				int const CallingCompBranchNum, // for debug error handling
+				int const CallingCompCompNum, // for debug error handling
+				Real64 const ThisCriteriaCheckValue // the previous value, to check the current against
+			) :
+				CallingCompLoopNum( CallingCompLoopNum ),
+				CallingCompLoopSideNum( CallingCompLoopSideNum ),
+				CallingCompBranchNum( CallingCompBranchNum ),
+				CallingCompCompNum( CallingCompCompNum ),
+				ThisCriteriaCheckValue( ThisCriteriaCheckValue )
+			{}
+
+		};
+
+		// Object Data
+		Array1D< CriteriaData > CriteriaChecks; // stores criteria information
+	}
 	// MODULE VARIABLE DECLARATIONS:
 	// na
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Functions
+	void
+	clear_state(){
+		CriteriaChecks.deallocate();
+	}
 
 	void
 	InitComponentNodes(
@@ -1367,43 +1404,7 @@ namespace PlantUtilities {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		struct CriteriaData
-		{
-			// Members
-			int CallingCompLoopNum; // for debug error handling
-			int CallingCompLoopSideNum; // for debug error handling
-			int CallingCompBranchNum; // for debug error handling
-			int CallingCompCompNum; // for debug error handling
-			Real64 ThisCriteriaCheckValue; // the previous value, to check the current against
 
-			// Default Constructor
-			CriteriaData() :
-				CallingCompLoopNum( 0 ),
-				CallingCompLoopSideNum( 0 ),
-				CallingCompBranchNum( 0 ),
-				CallingCompCompNum( 0 ),
-				ThisCriteriaCheckValue( 0.0 )
-			{}
-
-			// Member Constructor
-			CriteriaData(
-				int const CallingCompLoopNum, // for debug error handling
-				int const CallingCompLoopSideNum, // for debug error handling
-				int const CallingCompBranchNum, // for debug error handling
-				int const CallingCompCompNum, // for debug error handling
-				Real64 const ThisCriteriaCheckValue // the previous value, to check the current against
-			) :
-				CallingCompLoopNum( CallingCompLoopNum ),
-				CallingCompLoopSideNum( CallingCompLoopSideNum ),
-				CallingCompBranchNum( CallingCompBranchNum ),
-				CallingCompCompNum( CallingCompCompNum ),
-				ThisCriteriaCheckValue( ThisCriteriaCheckValue )
-			{}
-
-		};
-
-		// Object Data
-		static Array1D< CriteriaData > CriteriaChecks; // stores criteria information
 		CriteriaData CurCriteria; // for convenience
 
 		if ( UniqueCriteriaCheckIndex <= 0 ) { // If we don't yet have an index, we need to initialize
@@ -2488,7 +2489,7 @@ namespace PlantUtilities {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

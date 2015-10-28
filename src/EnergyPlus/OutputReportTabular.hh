@@ -967,6 +967,42 @@ namespace OutputReportTabular {
 	//======================================================================================================================
 	//======================================================================================================================
 
+	//    ROUTINES TO RESET GATHERED VALUES TO ZERO
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	void
+	ResetTabularReports();
+
+	void
+	ResetMonthlyGathering();
+
+	void
+	ResetBinGathering();
+
+	void
+	ResetBEPSGathering();
+
+	void
+	ResetSourceEnergyEndUseGathering();
+
+	void
+	ResetPeakDemandGathering();
+
+	void
+	ResetHeatGainGathering();
+
+	void
+	ResetRemainingPredefinedEntries();
+
+	void
+	ResetAdaptiveComfort();
+
+
+	//======================================================================================================================
+	//======================================================================================================================
+
 	//    ROUTINES RELATED TO IF VALUE IS IN A RANGE
 
 	//======================================================================================================================
@@ -1080,7 +1116,7 @@ namespace OutputReportTabular {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of
 	//     Berkeley National Laboratory.  All rights reserved.
 

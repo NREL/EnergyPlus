@@ -75,6 +75,15 @@ namespace HeatBalanceAirManager {
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
+
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool ManageAirHeatBalanceGetInputFlag( true );
+	}
 	//         Subroutine Specifications for the Heat Balance Module
 	// Driver Routines
 
@@ -89,6 +98,12 @@ namespace HeatBalanceAirManager {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		ManageAirHeatBalanceGetInputFlag =  true;
+	}
+
 
 	void
 	ManageAirHeatBalance()
@@ -129,14 +144,15 @@ namespace HeatBalanceAirManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true );
-
+		/////////// hoisted into namespace changed to ManageAirHeatBalanceGetInputFlag////////////
+		//static bool ManageAirHeatBalanceGetInputFlag( true );
+		/////////////////////////////////////////////
 		// FLOW:
 
 		// Obtains and Allocates heat balance related parameters from input file
-		if ( GetInputFlag ) {
+		if ( ManageAirHeatBalanceGetInputFlag ) {
 			GetAirHeatBalanceInput();
-			GetInputFlag = false;
+			ManageAirHeatBalanceGetInputFlag = false;
 		}
 
 		InitAirHeatBalance(); // Initialize all heat balance related parameters
@@ -305,7 +321,7 @@ namespace HeatBalanceAirManager {
 
 			// flow
 
-			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.BalanceMixing) {
 				for (Loop = 1; Loop <= TotMixing; ++Loop) {
 					ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
 					ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
@@ -515,19 +531,19 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ZoneAirBalance.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ZoneAirBalance, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			ZoneAirBalance( Loop ).Name = cAlphaArgs( 1 );
 			ZoneAirBalance( Loop ).ZoneName = cAlphaArgs( 2 );
-			ZoneAirBalance( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ZoneAirBalance( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneAirBalance( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
-			VerifyName( cAlphaArgs( 2 ), ZoneAirBalance.ZoneName(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 2 ), ZoneAirBalance, &ZoneAirBalanceData::ZoneName, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", a duplicated object " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" is found." );
 				ShowContinueError( "A zone can only have one " + cCurrentModuleObject + " object." );
@@ -610,16 +626,16 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), InfiltrationObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), InfiltrationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			InfiltrationObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				InfiltrationObjects( Item ).StartPtr = TotDesignFlowInfiltration + 1;
 				++TotDesignFlowInfiltration;
@@ -811,14 +827,14 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration.Name(), InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -865,14 +881,14 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration.Name(), InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -961,7 +977,7 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentilationObjects.Name(), Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), VentilationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				errFlag = true;
@@ -969,9 +985,9 @@ namespace HeatBalanceAirManager {
 			}
 			VentilationObjects( Item ).Name = cAlphaArgs( 1 );
 
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList.Name(), NumOfZoneLists );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				VentilationObjects( Item ).StartPtr = TotDesignFlowVentilation + 1;
 				++TotDesignFlowVentilation;
@@ -1405,7 +1421,7 @@ namespace HeatBalanceAirManager {
 			IsNotOK = false;
 			IsBlank = false;
 			VentiCount = TotDesignFlowVentilation + Loop;
-			VerifyName( cAlphaArgs( 1 ), Ventilation.Name(), VentiCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Ventilation, VentiCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1413,7 +1429,7 @@ namespace HeatBalanceAirManager {
 			Ventilation( VentiCount ).Name = cAlphaArgs( 1 );
 			Ventilation( VentiCount ).ModelType = VentilationWindAndStack;
 
-			Ventilation( VentiCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Ventilation( VentiCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Ventilation( VentiCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1662,14 +1678,14 @@ namespace HeatBalanceAirManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Mixing.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Mixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			Mixing( Loop ).Name = cAlphaArgs( 1 );
 
-			Mixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			Mixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Mixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1747,7 +1763,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			Mixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+			Mixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( Mixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cAlphaFieldNames( 5 ) + " not found=" + cAlphaArgs( 5 ) + " for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
@@ -1974,32 +1990,6 @@ namespace HeatBalanceAirManager {
 				ZoneReOrder( Loop ) = ZoneNum;
 			}
 		}
-		if ( TotMixing > 0 ) {
-			for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
-
-				if (ZoneMassBalanceRepVarFlag( Mixing( Loop ).ZonePtr ) ) {
-					ZoneMassBalanceRepVarFlag( Mixing( Loop ).ZonePtr ) = false;
-					SetupOutputVariable("Zone Supply Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).InMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Exhaust Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).ExhMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Return Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).RetMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Mixing Receiving Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).MixingMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Mixing Source Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).MixingSourceMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-					SetupOutputVariable("Zone Infiltration Air Mass Flow Balance Status []", MassConservation(Mixing(Loop).ZonePtr).IncludeInfilToZoneMassBal, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
-				}
-
-				if (ZoneMassBalanceRepVarFlag( Mixing( Loop ).FromZone ) ) {
-					ZoneMassBalanceRepVarFlag( Mixing( Loop ).FromZone ) = false;
-					SetupOutputVariable("Zone Supply Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).InMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Exhaust Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).ExhMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Return Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).RetMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Mixing Receiving Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).MixingMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Mixing Source Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).MixingSourceMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-					SetupOutputVariable("Zone Infiltration Air Mass Flow Balance Status []", MassConservation(Mixing(Loop).FromZone).IncludeInfilToZoneMassBal, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
-				}
-			}
-		}
-		if (allocated( ZoneMassBalanceRepVarFlag ) ) ZoneMassBalanceRepVarFlag.deallocate();
-
 
 		cCurrentModuleObject = "ZoneCrossMixing";
 		TotCrossMixing = GetNumObjectsFound( cCurrentModuleObject );
@@ -2011,7 +2001,7 @@ namespace HeatBalanceAirManager {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CrossMixing.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), CrossMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -2019,7 +2009,7 @@ namespace HeatBalanceAirManager {
 			}
 			CrossMixing( Loop ).Name = cAlphaArgs( 1 );
 
-			CrossMixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			CrossMixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( CrossMixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -2096,7 +2086,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			CrossMixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone.Name(), NumOfZones );
+			CrossMixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( CrossMixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 				ErrorsFound = true;
@@ -2301,7 +2291,7 @@ namespace HeatBalanceAirManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), RefDoorMixing.Name(), Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), RefDoorMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -2309,14 +2299,14 @@ namespace HeatBalanceAirManager {
 				NameThisObject = cAlphaArgs( 1 );
 
 				AlphaNum = 2;
-				Zone1Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone.Name(), NumOfZones );
+				Zone1Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone1Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
 				}
 
 				++AlphaNum; //3
-				Zone2Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone.Name(), NumOfZones );
+				Zone2Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone2Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
@@ -2554,10 +2544,11 @@ namespace HeatBalanceAirManager {
 			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
-		for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
-			ZoneNum = Infiltration(Loop).ZonePtr;
-			MassConservation(ZoneNum).InfiltrationPtr = Loop;
-			SetupOutputVariable("Zone Mass Balance Infiltration Air Mass Flow Rate [kg/s]", MassConservation(Infiltration(Loop).ZonePtr).InfiltrationMassFlowRate, "System", "Average", Zone(Infiltration(Loop).ZonePtr).Name);
+		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
+			for ( Loop = 1; Loop <= TotInfiltration; ++Loop ) {
+				ZoneNum = Infiltration(Loop).ZonePtr;
+				MassConservation(ZoneNum).InfiltrationPtr = Loop;
+			}
 		}
 
 		for ( Loop = 1; Loop <= TotVentilation; ++Loop ) {
@@ -2735,11 +2726,30 @@ namespace HeatBalanceAirManager {
 		}
 
 		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			// Check for infiltration in zone which are only a mixing source zone
 			for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-				if (MassConservation(ZoneNum).IsOnlySourceZone) {
+				if ( ( ZoneAirMassFlow.BalanceMixing && MassConservation( ZoneNum ).IsOnlySourceZone ) && ( ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow ) ) {
 					if (MassConservation(ZoneNum).InfiltrationPtr == 0) {
 						ShowSevereError(RoutineName + ": Infiltration object is not defined for zone = " + Zone(ZoneNum).Name);
 						ShowContinueError("Zone air mass flow balance requires infiltration object for source zones of mixing objects");
+					}
+				}
+			}
+			// Set up zone air mass balance output variables
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				SetupOutputVariable( "Zone Air Mass Balance Supply Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).InMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).ExhMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Return Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).RetMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				if ( ZoneAirMassFlow.BalanceMixing && ( ( MassConservation( ZoneNum ).NumSourceZonesMixingObject + MassConservation( ZoneNum ).NumReceivingZonesMixingObject ) > 0 ) ) {
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).MixingMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]", MassConservation( Mixing( Loop ).ZonePtr ).MixingSourceMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				}
+				if ( ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow ) {
+					if ( ZoneAirMassFlow.InfiltrationZoneType == AllZones || (MassConservation( ZoneNum ).NumSourceZonesMixingObject > 0 ) ) {
+						if ( MassConservation( ZoneNum ).InfiltrationPtr > 0 ) {
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]", MassConservation( Infiltration( Loop ).ZonePtr ).InfiltrationMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Status []", MassConservation( Mixing( Loop ).ZonePtr ).IncludeInfilToZoneMassBal, "System", "Average", Zone( ZoneNum ).Name );
+						}
 					}
 				}
 			}
@@ -2796,6 +2806,7 @@ namespace HeatBalanceAirManager {
 		using DataRoomAirModel::RoomAirModel_UserDefined;
 		using DataRoomAirModel::RoomAirModel_UCSDUFI;
 		using DataRoomAirModel::RoomAirModel_UCSDUFE;
+		using DataRoomAirModel::RoomAirModel_AirflowNetwork;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2837,7 +2848,7 @@ namespace HeatBalanceAirManager {
 
 		for ( AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum ) {
 			GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum != 0 ) {
 				if ( ! AirModel( ZoneNum ).AirModelName.empty() ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -2906,6 +2917,14 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UserDefined;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UserDefinedUsed = true;
+				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
+					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
+					AirModel( ZoneNum ).SimAirModel = true;
+					ValidateComponent( "RoomAirSettings:AirflowNetwork", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					if ( IsNotOK ) {
+						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
+						ErrorsFound = true;
+					}
 					// Need to make sure that Room Air controls are used for this one.
 				} else {
 					ShowWarningError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
@@ -2961,6 +2980,8 @@ namespace HeatBalanceAirManager {
 				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "UnderFloorAirDistributionExterior";
 			} else if ( SELECT_CASE_var == RoomAirModel_UserDefined ) {
 				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "UserDefined";
+			} else if ( SELECT_CASE_var == RoomAirModel_AirflowNetwork ) {
+				gio::write( OutputFileInits, RoomAirZoneFmt ) << Zone( ZoneNum ).Name << "AirflowNetwork";
 			}}
 		}
 
@@ -3331,7 +3352,7 @@ namespace HeatBalanceAirManager {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

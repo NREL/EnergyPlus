@@ -189,6 +189,8 @@ namespace ZoneTempPredictorCorrector {
 	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageZoneAirUpdates(
@@ -216,10 +218,10 @@ namespace ZoneTempPredictorCorrector {
 	CalcZoneAirTempSetPoints();
 
 	void
-	CalcPredictedSystemLoad( int const ZoneNum );
+	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );
 
 	void
-	CalcPredictedHumidityRatio( int const ZoneNum );
+	CalcPredictedHumidityRatio( int const ZoneNum, Real64 RAFNFrac );
 
 	void
 	CorrectZoneAirTemp(
@@ -331,7 +333,7 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

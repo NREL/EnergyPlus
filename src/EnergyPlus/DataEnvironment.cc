@@ -49,6 +49,7 @@ namespace DataEnvironment {
 	Real64 const EarthRadius( 6356000.0 ); // Radius of the Earth (m)
 	Real64 const AtmosphericTempGradient( 0.0065 ); // Standard atmospheric air temperature gradient (K/m)
 	Real64 const SunIsUpValue( 0.00001 ); // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
+	Real64 const StdPressureSeaLevel( 101325.0 ); // Standard barometric pressure at sea level (Pa)
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -80,8 +81,6 @@ namespace DataEnvironment {
 	Real64 GroundTempFC; // Current ground temperature defined for F or C factor method {C}
 	Real64 GroundTemp_Surface; // Current surface ground temperature {C}
 	Real64 GroundTemp_Deep; // Current deep ground temperature
-	Array1D< Real64 > PubGroundTempSurface( 12 ); // All 12 Surf Gnd Temps (assigned in Weather Mgr, used in PlantPipeHeatTransfer)
-	bool PubGroundTempSurfFlag; // Flag for if Surf Ground Temps Exist in idf  (assigned, used same as PubGroundTempSurface)
 	int HolidayIndex; // Indicates whether current day is a holiday and if so what type
 	// HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
 	int HolidayIndexTomorrow; // Tomorrow's Holiday Index
@@ -128,8 +127,9 @@ namespace DataEnvironment {
 	Real64 PDIFLW; // Luminous efficacy (lum/W) of sky diffuse solar radiation
 	Real64 SkyClearness; // Sky clearness (see subr. DayltgLuminousEfficacy)
 	Real64 SkyBrightness; // Sky brightness (see subr. DayltgLuminousEfficacy)
-	Real64 StdBaroPress( 101325.0 ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
+	Real64 StdBaroPress( StdPressureSeaLevel ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
 	Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress
+	Real64 rhoAirSTP; // Standard density of dry air at 101325 Pa, 20.0C temperaure 
 	Real64 TimeZoneNumber; // Time Zone Number of building location
 	Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
 	std::string EnvironmentName; // Current environment name (longer for weather file names)
@@ -209,8 +209,6 @@ namespace DataEnvironment {
 		GroundTempFC = Real64();
 		GroundTemp_Surface = Real64();
 		GroundTemp_Deep = Real64();
-		PubGroundTempSurface.dimension( 12 );
-		PubGroundTempSurfFlag = bool();
 		HolidayIndex = int();
 		HolidayIndexTomorrow = int();
 		IsRain = bool();
@@ -694,7 +692,7 @@ namespace DataEnvironment {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

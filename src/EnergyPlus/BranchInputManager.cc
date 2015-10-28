@@ -91,6 +91,15 @@ namespace BranchInputManager {
 
 	std::string CurrentModuleObject; // for ease in getting objects
 
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool GetBranchInputOneTimeFlag( true );
+	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE BranchInputManager
 	//PUBLIC  TestAirPathIntegrity
 	//PRIVATE TestSupplyAirPathIntegrity
@@ -105,6 +114,27 @@ namespace BranchInputManager {
 	Array1D< MixerData > Mixers; // Mixer Data for each Mixer
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumOfBranchLists = 0; // Number of Branch Lists found in IDF
+		NumOfBranches = 0; // Number of Branches found in IDF
+		NumOfConnectorLists = 0; // Number of Connector Lists found in IDF
+		NumSplitters = 0; // Number of Splitters found in IDF
+		NumMixers = 0; // Number of Mixers found in IDF
+		GetBranchInputFlag = true ; // Flag used to retrieve Input
+		GetBranchListInputFlag = true ; // Flag used to retrieve Input
+		GetSplitterInputFlag = true ; // Flag used to retrieve Input
+		GetMixerInputFlag = true ; // Flag used to retrieve Input
+		GetConnectorListInputFlag = true ; // Flag used to retrieve Input
+		InvalidBranchDefinitions = false ;
+		GetBranchInputOneTimeFlag = true;
+		BranchList.deallocate(); // Branch List data for each Branch List
+		Branch.deallocate(); // Branch Data for each Branch
+		ConnectorLists.deallocate(); // Connector List data for each Connector List
+		Splitters.deallocate(); // Splitter Data for each Splitter
+		Mixers.deallocate(); // Mixer Data for each Mixer
+	}
 
 	void
 	ManageBranchInput()
@@ -215,7 +245,7 @@ namespace BranchInputManager {
 		}
 
 		//  Find this BranchList in the master BranchList Names
-		Found = FindItemInList( BranchListName, BranchList.Name(), NumOfBranchLists );
+		Found = FindItemInList( BranchListName, BranchList );
 		if ( Found == 0 ) {
 			ShowFatalError( "GetBranchList: BranchList Name not found=" + BranchListName );
 		}
@@ -296,7 +326,7 @@ namespace BranchInputManager {
 		}
 
 		//  Find this BranchList in the master BranchList Names
-		Found = FindItemInList( BranchListName, BranchList.Name(), NumOfBranchLists );
+		Found = FindItemInList( BranchListName, BranchList );
 		if ( Found == 0 ) {
 			ShowFatalError( "NumBranchesInBranchList: BranchList Name not found=" + BranchListName );
 		}
@@ -438,7 +468,7 @@ namespace BranchInputManager {
 			GetBranchInput();
 		}
 
-		Found = FindItemInList( BranchName, Branch.Name(), NumOfBranches );
+		Found = FindItemInList( BranchName, Branch );
 		if ( Found == 0 ) {
 			ShowSevereError( "NumCompsInBranch:  Branch not found=" + BranchName );
 			NumCompsInBranch = 0;
@@ -792,7 +822,7 @@ namespace BranchInputManager {
 			GetBranchInputFlag = false;
 		}
 
-		Found = FindItemInList( BranchName, Branch.Name(), NumOfBranches );
+		Found = FindItemInList( BranchName, Branch );
 		if ( Found == 0 ) {
 			ShowSevereError( "GetInternalBranchData:  Branch not found=" + BranchName );
 			ErrorsFound = true;
@@ -883,7 +913,7 @@ namespace BranchInputManager {
 
 		NumSplitters = 0;
 		NumMixers = 0;
-		ConnNum = FindItemInList( ConnectorListName, ConnectorLists.Name(), NumOfConnectorLists );
+		ConnNum = FindItemInList( ConnectorListName, ConnectorLists );
 
 		if ( ConnNum > 0 ) {
 			NumSplitters = ConnectorLists( ConnNum ).NumOfSplitters;
@@ -958,7 +988,7 @@ namespace BranchInputManager {
 		}
 
 		if ( not_blank( ConnectorListName ) ) {
-			Count = FindItemInList( ConnectorListName, ConnectorLists.Name(), NumOfConnectorLists );
+			Count = FindItemInList( ConnectorListName, ConnectorLists );
 			if ( Count == 0 ) {
 				ShowFatalError( "GetConnectorList: Connector List not found=" + ConnectorListName );
 			}
@@ -1054,13 +1084,13 @@ namespace BranchInputManager {
 
 		GetConnectorList( ConnectorListName, Connectoid, ConnectorNumber );
 		if ( SameString( Connectoid.ConnectorType( 1 ), cMIXER ) ) {
-			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Mixers.Name(), NumMixers );
+			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Mixers );
 			if ( present( MixerNumber ) ) ++MixerNumber;
 			if ( Count == 0 ) {
 				ShowFatalError( "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName( 1 ) );
 			}
 		} else if ( SameString( Connectoid.ConnectorType( 2 ), cMIXER ) ) {
-			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Mixers.Name(), NumMixers );
+			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Mixers );
 			if ( Count == 0 ) {
 				ShowFatalError( "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName( 2 ) );
 			}
@@ -1207,13 +1237,13 @@ namespace BranchInputManager {
 		}
 		GetConnectorList( ConnectorListName, Connectoid, ConnectorNumber );
 		if ( SameString( Connectoid.ConnectorType( 1 ), cSPLITTER ) ) {
-			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Splitters.Name(), NumSplitters );
+			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Splitters );
 			if ( present( SplitterNumber ) ) ++SplitterNumber;
 			if ( Count == 0 ) {
 				ShowFatalError( "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName( 1 ) );
 			}
 		} else if ( SameString( Connectoid.ConnectorType( 2 ), cSPLITTER ) ) {
-			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Splitters.Name(), NumSplitters );
+			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Splitters );
 			if ( Count == 0 ) {
 				ShowFatalError( "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName( 2 ) );
 			}
@@ -1329,12 +1359,12 @@ namespace BranchInputManager {
 			GetBranchListInput();
 		}
 
-		Found1 = FindItemInList( BranchListName, BranchList.Name(), NumOfBranchLists );
+		Found1 = FindItemInList( BranchListName, BranchList );
 		if ( Found1 == 0 ) {
 			ShowSevereError( "GetFirstBranchInletNodeName: BranchList=\"" + BranchListName + "\", not a valid BranchList Name" );
 			InletNodeName = "Invalid Node Name";
 		} else {
-			Found2 = FindItemInList( BranchList( Found1 ).BranchNames( 1 ), Branch.Name(), NumOfBranches );
+			Found2 = FindItemInList( BranchList( Found1 ).BranchNames( 1 ), Branch );
 			if ( Found2 == 0 ) {
 				ShowSevereError( "GetFirstBranchInletNodeName: BranchList=\"" + BranchListName + "\", Branch=\"" + BranchList( Found1 ).BranchNames( 1 ) + "\" not a valid Branch Name" );
 				InletNodeName = "Invalid Node Name";
@@ -1394,12 +1424,12 @@ namespace BranchInputManager {
 			GetBranchListInput();
 		}
 
-		Found1 = FindItemInList( BranchListName, BranchList.Name(), NumOfBranchLists );
+		Found1 = FindItemInList( BranchListName, BranchList );
 		if ( Found1 == 0 ) {
 			ShowSevereError( "GetLastBranchOutletNodeName: BranchList=\"" + BranchListName + "\", not a valid BranchList Name" );
 			OutletNodeName = "Invalid Node Name";
 		} else {
-			Found2 = FindItemInList( BranchList( Found1 ).BranchNames( BranchList( Found1 ).NumOfBranchNames ), Branch.Name(), NumOfBranches );
+			Found2 = FindItemInList( BranchList( Found1 ).BranchNames( BranchList( Found1 ).NumOfBranchNames ), Branch );
 			if ( Found2 == 0 ) {
 				ShowSevereError( "GetLastBranchOutletNodeName: BranchList=\"" + BranchListName + "\", Branch=\"" + BranchList( Found1 ).BranchNames( BranchList( Found1 ).NumOfBranchNames ) + "\" not a valid Branch Name" );
 				OutletNodeName = "Invalid Node Name";
@@ -1571,7 +1601,9 @@ namespace BranchInputManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // Set for first time call
+		//////////// hoisted into namespace changed GetBranchInputOneTimeFlag////////////
+		// static bool GetInputFlag( true ); // Set for first time call
+		////////////////////////////////////////////////
 		int Count; // Loop Counter
 		int BCount; // Actual Num of Branches
 		int Comp; // Loop Counter
@@ -1596,7 +1628,7 @@ namespace BranchInputManager {
 		int PressureCurveType;
 		int PressureCurveIndex;
 
-		if ( GetInputFlag ) {
+		if ( GetBranchInputOneTimeFlag ) {
 			CurrentModuleObject = "Branch";
 			NumOfBranches = GetNumObjectsFound( CurrentModuleObject );
 			if ( NumOfBranches > 0 ) {
@@ -1617,7 +1649,7 @@ namespace BranchInputManager {
 					GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					IsNotOK = false;
 					IsBlank = false;
-					VerifyName( Alphas( 1 ), Branch.Name(), BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+					VerifyName( Alphas( 1 ), Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
 						ErrFound = true;
 						if ( IsBlank ) {
@@ -1734,7 +1766,7 @@ namespace BranchInputManager {
 					InvalidBranchDefinitions = true;
 				}
 				TestInletOutletNodes( ErrFound );
-				GetInputFlag = false;
+				GetBranchInputOneTimeFlag = false;
 			}
 		}
 
@@ -1833,10 +1865,11 @@ namespace BranchInputManager {
 		}
 		BCount = 0;
 		for ( Count = 1; Count <= NumOfBranchLists; ++Count ) {
+			CurrentModuleObject = "BranchList";
 			GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), BranchList.Name(), BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), BranchList, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrFound = true;
 				continue;
@@ -1857,7 +1890,7 @@ namespace BranchInputManager {
 						GetBranchInput();
 					}
 					if ( ! BranchList( BCount ).BranchNames( Loop ).empty() ) {
-						Found = FindItemInList( BranchList( BCount ).BranchNames( Loop ), Branch.Name(), NumOfBranches );
+						Found = FindItemInList( BranchList( BCount ).BranchNames( Loop ), Branch );
 						if ( Found == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + BranchList( BCount ).Name + "\", invalid data." );
 							ShowContinueError( "..invalid Branch Name not found=\"" + BranchList( BCount ).BranchNames( Loop ) + "\"." );
@@ -2048,7 +2081,7 @@ namespace BranchInputManager {
 				if ( SameString( ConnectorLists( Count ).ConnectorType( Loop ), cSPLITTER ) ) {
 					CurSplitter = true;
 					CurMixer = false;
-					SplitNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop ), Splitters.Name(), NumSplitters );
+					SplitNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop ), Splitters );
 					// Following code sets up branch names to be matched from Splitter/Mixer data structure
 					if ( SplitNum == 0 ) {
 						ShowSevereError( "Invalid Connector:Splitter(none)=" + ConnectorLists( Count ).ConnectorName( Loop ) + ", referenced by " + CurrentModuleObject + '=' + ConnectorLists( Count ).Name );
@@ -2060,7 +2093,7 @@ namespace BranchInputManager {
 				} else if ( SameString( ConnectorLists( Count ).ConnectorType( Loop ), cMIXER ) ) {
 					CurSplitter = true;
 					CurMixer = false;
-					MixerNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop ), Mixers.Name(), NumMixers );
+					MixerNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop ), Mixers );
 					if ( MixerNum == 0 ) {
 						ShowSevereError( "Invalid Connector:Mixer(none)=" + ConnectorLists( Count ).ConnectorName( Loop ) + ", referenced by " + CurrentModuleObject + '=' + ConnectorLists( Count ).Name );
 						ErrorsFound = true;
@@ -2079,7 +2112,7 @@ namespace BranchInputManager {
 					{ auto const SELECT_CASE_var( CurSplitter );
 					if ( SELECT_CASE_var ) {
 						// Current "item" is a splitter, candidate is a mixer.
-						MixerNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Mixers.Name(), NumMixers );
+						MixerNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Mixers );
 						if ( MixerNum == 0 ) continue;
 						if ( Mixers( MixerNum ).NumInletBranches != NumBranchNames ) continue;
 						MatchFound = true;
@@ -2096,7 +2129,7 @@ namespace BranchInputManager {
 						}
 					} else {
 						// Current "item" is a splitter, candidate is a mixer.
-						SplitNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Splitters.Name(), NumSplitters );
+						SplitNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Splitters );
 						if ( SplitNum == 0 ) continue;
 						if ( Splitters( SplitNum ).NumOutletBranches != NumBranchNames ) continue;
 						MatchFound = true;
@@ -2253,13 +2286,13 @@ namespace BranchInputManager {
 			GetBranchInputFlag = false;
 		}
 		for ( Count = 1; Count <= NumSplitters; ++Count ) {
-			Found = FindItemInList( Splitters( Count ).InletBranchName, Branch.Name(), NumOfBranches );
+			Found = FindItemInList( Splitters( Count ).InletBranchName, Branch );
 			if ( Found == 0 ) {
 				ShowSevereError( "GetSplitterInput: Invalid Branch=" + Splitters( Count ).InletBranchName + ", referenced as Inlet Branch to " + CurrentModuleObject + '=' + Splitters( Count ).Name );
 				ErrorsFound = true;
 			}
 			for ( Loop = 1; Loop <= Splitters( Count ).NumOutletBranches; ++Loop ) {
-				Found = FindItemInList( Splitters( Count ).OutletBranchNames( Loop ), Branch.Name(), NumOfBranches );
+				Found = FindItemInList( Splitters( Count ).OutletBranchNames( Loop ), Branch );
 				if ( Found == 0 ) {
 					ShowSevereError( "GetSplitterInput: Invalid Branch=" + Splitters( Count ).OutletBranchNames( Loop ) + ", referenced as Outlet Branch # " + TrimSigDigits( Loop ) + " to " + CurrentModuleObject + '=' + Splitters( Count ).Name );
 					ErrorsFound = true;
@@ -2488,13 +2521,13 @@ namespace BranchInputManager {
 			GetBranchInputFlag = false;
 		}
 		for ( Count = 1; Count <= NumMixers; ++Count ) {
-			Found = FindItemInList( Mixers( Count ).OutletBranchName, Branch.Name(), NumOfBranches );
+			Found = FindItemInList( Mixers( Count ).OutletBranchName, Branch );
 			if ( Found == 0 ) {
 				ShowSevereError( "GetMixerInput: Invalid Branch=" + Mixers( Count ).OutletBranchName + ", referenced as Outlet Branch in " + CurrentModuleObject + '=' + Mixers( Count ).Name );
 				ErrorsFound = true;
 			}
 			for ( Loop = 1; Loop <= Mixers( Count ).NumInletBranches; ++Loop ) {
-				Found = FindItemInList( Mixers( Count ).InletBranchNames( Loop ), Branch.Name(), NumOfBranches );
+				Found = FindItemInList( Mixers( Count ).InletBranchNames( Loop ), Branch );
 				if ( Found == 0 ) {
 					ShowSevereError( "GetMixerInput: Invalid Branch=" + Mixers( Count ).InletBranchNames( Loop ) + ", referenced as Inlet Branch # " + TrimSigDigits( Loop ) + " in " + CurrentModuleObject + '=' + Mixers( Count ).Name );
 					ErrorsFound = true;
@@ -3156,7 +3189,7 @@ namespace BranchInputManager {
 			BranchPtrs.allocate( BranchList( BCount ).NumOfBranchNames + 2 );
 			BranchPtrs = 0;
 			for ( Count = 1; Count <= BranchList( BCount ).NumOfBranchNames; ++Count ) {
-				Found = FindItemInList( BranchList( BCount ).BranchNames( Count ), Branch.Name(), NumOfBranches );
+				Found = FindItemInList( BranchList( BCount ).BranchNames( Count ), Branch );
 				if ( Found > 0 ) {
 					NumNodesOnBranchList += Branch( Found ).NumOfComponents * 2;
 					FoundBranches( Count ) = Found;
@@ -3386,7 +3419,7 @@ namespace BranchInputManager {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

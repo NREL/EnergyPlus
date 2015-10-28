@@ -28,6 +28,11 @@ namespace DataAirLoop {
 	// MODULE VARIABLE DECLARATIONS:
 
 	extern int NumOASystems; // Number of Outdoor Air Systems
+	extern bool AirLoopInputsFilled; // Set to TRUE after first pass through air loop
+
+	// Variables specific to AirflowNetwork simulations.
+	// Avoid using these for other purposes since these variables are only reset to 0 within AirflowNetworkBalanceManager, line 322.
+	// Non-AFN simulations may have multiple air loops and use of these variables may yield unintended results.
 	extern int LoopFanOperationMode; // OnOff fan operation mode
 	extern Real64 LoopSystemOnMassFlowrate; // Loop mass flow rate during on cycle using an OnOff fan
 	extern Real64 LoopSystemOffMassFlowrate; // Loop mass flow rate during off cycle using an OnOff fan
@@ -36,7 +41,6 @@ namespace DataAirLoop {
 	extern Real64 LoopOnOffFanRTF; // OnOff fan run time fraction in an HVAC Air Loop
 	extern Real64 LoopDXCoilRTF; // OnOff fan run time fraction in an HVAC Air Loop
 	extern Real64 LoopCompCycRatio; // Loop compressor cycling ratio for multispeed heat pump
-	extern bool AirLoopInputsFilled; // Set to TRUE after first pass through air loop
 
 	// Types
 
@@ -353,7 +357,6 @@ namespace DataAirLoop {
 		Real64 ZoneExhaustBalanced; // zone exhaust air that is balanced by simple air flow for loop [kg/s]
 		Real64 DesSupply; // design supply air mass flow rate for loop [kg/s]
 		Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
-		Real64 TotReturn; // the return air mass flow rate for this loop [kg/s]
 		Real64 ReqSupplyFrac; // required flow (as a fraction of DesSupply) set by a manager
 		Real64 MinOutAir; // minimum outside air mass flow rate [kg/s]
 		Real64 MaxOutAir; // maximum outside air mass flow rate [kg/s]
@@ -366,6 +369,7 @@ namespace DataAirLoop {
 		Real64 FanPLR; // Operating PLR of air loop fan
 		Real64 OAFrac; // fraction of outside air to mixed air mass flow rate
 		Real64 ZoneMixingFlow; // total zone mixing net flow used to cap the return flow
+		Real64 RetFlowAdjustment; // difference between user-specified return flow and default return flow
 		bool FlowError; // error flag for flow error message
 
 		// Default Constructor
@@ -374,7 +378,6 @@ namespace DataAirLoop {
 			ZoneExhaustBalanced( 0.0 ),
 			DesSupply( 0.0 ),
 			SysToZoneDesFlowRatio( 0.0 ),
-			TotReturn( 0.0 ),
 			ReqSupplyFrac( 1.0 ),
 			MinOutAir( 0.0 ),
 			MaxOutAir( 0.0 ),
@@ -387,48 +390,8 @@ namespace DataAirLoop {
 			FanPLR( 0.0 ),
 			OAFrac( 0.0 ),
 			ZoneMixingFlow( 0.0 ),
+			RetFlowAdjustment( 0.0 ),
 			FlowError( false )
-		{}
-
-		// Member Constructor
-		AirLoopFlowData(
-			Real64 const ZoneExhaust, // total of zone exhaust air mass flow rate for this loop [kg/s]
-			Real64 const ZoneExhaustBalanced, // zone exhaust air that is balanced by simple air flow for loop [kg/s]
-			Real64 const DesSupply, // design supply air mass flow rate for loop [kg/s]
-			Real64 const SysToZoneDesFlowRatio, // System design flow divided by the sum of the zone design flows
-			Real64 const TotReturn, // the return air mass flow rate for this loop [kg/s]
-			Real64 const ReqSupplyFrac, // required flow (as a fraction of DesSupply) set by a manager
-			Real64 const MinOutAir, // minimum outside air mass flow rate [kg/s]
-			Real64 const MaxOutAir, // maximum outside air mass flow rate [kg/s]
-			Real64 const OAMinFrac, // minimum outside air flow fraction this time step
-			Real64 const Previous, // Previous mass air flow rate for this loop [kg/s]
-			Real64 const SupFlow, // supply air flow rate [kg/s]
-			Real64 const RetFlow, // return air flow rate [kg/s]
-			Real64 const RetFlow0, // sum of zone return flows before adjusting for total loop exhaust
-			Real64 const RecircFlow, // sum of zone plenum recirculated flows
-			Real64 const FanPLR, // Operating PLR of air loop fan
-			Real64 const OAFrac, // fraction of outside air to mixed air mass flow rate
-			Real64 const ZoneMixingFlow, // total zone mixing net flow used to cap the return flow
-			bool const FlowError // error flag for flow error message
-		) :
-			ZoneExhaust( ZoneExhaust ),
-			ZoneExhaustBalanced( ZoneExhaustBalanced ),
-			DesSupply( DesSupply ),
-			SysToZoneDesFlowRatio( SysToZoneDesFlowRatio ),
-			TotReturn( TotReturn ),
-			ReqSupplyFrac( ReqSupplyFrac ),
-			MinOutAir( MinOutAir ),
-			MaxOutAir( MaxOutAir ),
-			OAMinFrac( OAMinFrac ),
-			Previous( Previous ),
-			SupFlow( SupFlow ),
-			RetFlow( RetFlow ),
-			RetFlow0( RetFlow0 ),
-			RecircFlow( RecircFlow ),
-			FanPLR( FanPLR ),
-			OAFrac( OAFrac ),
-			ZoneMixingFlow( ZoneMixingFlow ),
-			FlowError( FlowError )
 		{}
 
 	};

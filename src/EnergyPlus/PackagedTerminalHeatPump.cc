@@ -220,7 +220,7 @@ namespace PackagedTerminalHeatPump {
 
 		// Find the correct packaged terminal heat pump
 		if ( CompIndex == 0 ) {
-			PTUnitNum = FindItemInList( CompName, PTUnit.Name(), NumPTUs );
+			PTUnitNum = FindItemInList( CompName, PTUnit );
 			if ( PTUnitNum == 0 ) {
 				ShowFatalError( "SimPackagedTerminalUnit: Unit not found=" + CompName );
 			}
@@ -372,7 +372,7 @@ namespace PackagedTerminalHeatPump {
 		OnOffFanPartLoadFraction = 1.0;
 
 		if ( UnitOn ) {
-			if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 ) {
+			if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 				SimVariableSpeedHP( PTUnitNum, ZoneNum, FirstHVACIteration, QZnReq, QLatReq, OnOffAirFlowRatio, OpMode, HXUnitOn );
 			} else {
 				ControlPTUnitOutput( PTUnitNum, FirstHVACIteration, OpMode, QZnReq, ZoneNum, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
@@ -389,7 +389,7 @@ namespace PackagedTerminalHeatPump {
 		// calculate delivered capacity
 		AirMassFlow = Node( InletNode ).MassFlowRate;
 
-		if ( PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 ) {
+		if ( ! PTUnit( PTUnitNum ).useVSCoilModel ) {
 			CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 		} else {
 			// calculate delivered capacity
@@ -404,7 +404,7 @@ namespace PackagedTerminalHeatPump {
 		QSensUnitOutNoATM = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 		QTotUnitOut = AirMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 
-		if ( PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 ) {
+		if ( ! PTUnit( PTUnitNum ).useVSCoilModel ) {
 			// report variables
 			if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 				PTUnit( PTUnitNum ).CompPartLoadRatio = PartLoadFrac;
@@ -530,7 +530,6 @@ namespace PackagedTerminalHeatPump {
 		using DataHVACGlobals::WaterConstant;
 		using DataHVACGlobals::WaterConstantOnDemand;
 		using SingleDuct::GetATMixer;
-		using DataSizing::NumZoneHVACSizing;
 		using DataSizing::ZoneHVACSizing;
 
 		// Locals
@@ -661,7 +660,7 @@ namespace PackagedTerminalHeatPump {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PTUnit.Name(), PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -885,6 +884,7 @@ namespace PackagedTerminalHeatPump {
 			if ( Alphas( 9 ) == "COIL:HEATING:DX:VARIABLESPEED" && Alphas( 11 ) == "COIL:COOLING:DX:VARIABLESPEED" ) {
 				if ( PTUnit( PTUnitNum ).DXHeatCoilIndex > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
 					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndex );
+					PTUnit( PTUnitNum ).useVSCoilModel = true;
 				}
 			}
 
@@ -1162,7 +1162,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 18 )) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 18 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 18 ), ZoneHVACSizing );
 				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 18 ) + " = " + Alphas( 18 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1276,7 +1276,7 @@ namespace PackagedTerminalHeatPump {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PTUnit.Name(), PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -1716,7 +1716,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 16 ) ) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing );
 				if ( PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 16 ) + " = " + Alphas( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1759,6 +1759,7 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
 				errFlag = false;
 				PTUnit( PTUnitNum ).DesignCoolingCapacity = GetCoilCapacityVariableSpeed( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag );
+				PTUnit( PTUnitNum ).useVSCoilModel = true;
 				if ( errFlag ) {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
@@ -1822,7 +1823,7 @@ namespace PackagedTerminalHeatPump {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( Alphas( 1 ), PTUnit.Name(), PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			VerifyName( Alphas( 1 ), PTUnit, PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			PTUnit( PTUnitNum ).PTObjectIndex = PTUnitIndex;
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -2036,6 +2037,7 @@ namespace PackagedTerminalHeatPump {
 			} else if ( Alphas( 9 ) == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" && Alphas( 11 ) == "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) {
 				if ( PTUnit( PTUnitNum ).DXHeatCoilIndex > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
 					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndex );
+					PTUnit( PTUnitNum ).useVSCoilModel = true;
 				}
 			} else {
 				ShowContinueError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
@@ -2166,7 +2168,7 @@ namespace PackagedTerminalHeatPump {
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 20 ) ) {
-				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -2920,7 +2922,7 @@ namespace PackagedTerminalHeatPump {
 			MySizeFlag( PTUnitNum ) = false;
 		}
 
-		if ( ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) && ( 0 == PTUnit( PTUnitNum ).NumOfSpeedCooling ) ) {
+		if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 && ! MySizeFlag( PTUnitNum ) ) {
 
 			SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 			PTUnit( PTUnitNum ).NumOfSpeedCooling = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NumOfSpeeds;
@@ -3013,7 +3015,7 @@ namespace PackagedTerminalHeatPump {
 			PartLoadFrac = 0.0;
 		}
 
-		if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 ) { //BoS, variable-speed water source hp
+		if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 && ! MySizeFlag( PTUnitNum ) ) { //BoS, variable-speed water source hp
 			//PTUnit(PTUnitNum)%IdleMassFlowRate = RhoAir*PTUnit(PTUnitNum)%IdleVolumeAirRate
 			NumOfSpeedCooling = PTUnit( PTUnitNum ).NumOfSpeedCooling;
 			NumOfSpeedHeating = PTUnit( PTUnitNum ).NumOfSpeedHeating;
@@ -3207,7 +3209,7 @@ namespace PackagedTerminalHeatPump {
 		if ( ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil || PTUnit( PTUnitNum ).ATMixerExists ) && GetCurrentScheduleValue( PTUnit( PTUnitNum ).SchedPtr ) > 0.0 && ( ( GetCurrentScheduleValue( PTUnit( PTUnitNum ).FanAvailSchedPtr ) > 0.0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) ) {
 
 			SupHeaterLoad = 0.0;
-			if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+			if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 				CalcVarSpeedHeatPump( PTUnitNum, ZoneNum, FirstHVACIteration, Off, 1, 0.0, 0.0, NoCompOutput, LatentOutput, QZnReq, 0.0, OnOffAirFlowRatio, SupHeaterLoad, false );
 			} else {
 				CalcPTUnit( PTUnitNum, FirstHVACIteration, 0.0, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, false );
@@ -3230,7 +3232,7 @@ namespace PackagedTerminalHeatPump {
 						HeatingLoad = true;
 					}
 					PartLoadFrac = 1.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, &
 						//      ZoneEquipConfig(ZoneNum)%AirLoopNum, OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
@@ -3244,7 +3246,7 @@ namespace PackagedTerminalHeatPump {
 						QZnReq = 0.0;
 						HeatingLoad = false;
 						PartLoadFrac = 0.0;
-						if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+						if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 							SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 							//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 							//       OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3257,7 +3259,7 @@ namespace PackagedTerminalHeatPump {
 					QZnReq = 0.0;
 					CoolingLoad = false;
 					PartLoadFrac = 0.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 						//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 						//         OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3278,7 +3280,7 @@ namespace PackagedTerminalHeatPump {
 					}
 					HeatingLoad = false;
 					PartLoadFrac = 1.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 						// CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 						//     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3293,7 +3295,7 @@ namespace PackagedTerminalHeatPump {
 						QZnReq = 0.0;
 						CoolingLoad = false;
 						PartLoadFrac = 0.0;
-						if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+						if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 							SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 							//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 							//      OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3306,7 +3308,7 @@ namespace PackagedTerminalHeatPump {
 					QZnReq = 0.0;
 					HeatingLoad = false;
 					PartLoadFrac = 0.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 						//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 						//     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -6650,7 +6652,7 @@ namespace PackagedTerminalHeatPump {
 
 	//     NOTICE
 
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

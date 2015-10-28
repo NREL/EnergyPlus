@@ -27,15 +27,17 @@ namespace HeatBalanceSurfaceManager {
 	// Initialization routines for module
 
 	// Algorithms for the module
-	// These are now external subroutines
-	//PUBLIC  CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
-	//PUBLIC  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
+	// These old external subroutines have been moved into the namespace and are no longer externals
+	// CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
+	//  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
 
 	// Record Keeping/Utility Routines for Module
 
 	// Reporting routines for module
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageSurfaceHeatBalance();
@@ -106,14 +108,14 @@ namespace HeatBalanceSurfaceManager {
 	// End of Reporting subroutines for the HB Module
 	// *****************************************************************************
 
-} // HeatBalanceSurfaceManager
+
 
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
 
-// EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager)
+// Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
 void
 CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
@@ -136,6 +138,7 @@ CalcExteriorVentedCavity( int const SurfNum ); // index of surface
 void
 GatherComponentLoadsSurfAbsFact();
 
+} // HeatBalanceSurfaceManager
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
@@ -143,7 +146,7 @@ GatherComponentLoadsSurfAbsFact();
 
 	//     NOTICE
 	
-	//     Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	
