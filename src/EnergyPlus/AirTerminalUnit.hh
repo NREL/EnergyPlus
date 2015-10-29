@@ -34,9 +34,6 @@ enum AirTerminalUnitType {
 // base class for all air distribution units.  zone air terminals for connecting to central air handlers
 class AirTerminalUnit
 {
-public:
-	friend class HVACFixture;
-
 protected: // Creation
 
 	// Default Constructor

@@ -12,7 +12,8 @@
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include "Fixtures/HVACFixture.hh"
+#include <EnergyPlus/Psychrometrics.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::DataSizing;
@@ -24,7 +25,7 @@ using namespace EnergyPlus::CurveManager;
 
 namespace EnergyPlus {
 
-	TEST_F( HVACFixture, Humidifiers_Sizing ) {
+	TEST_F( EnergyPlusFixture, Humidifiers_Sizing ) {
 		SysSizingRunDone = true;
 		CurSysNum = 1;
 		NumElecSteamHums = 0;
@@ -59,7 +60,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, Humidifiers_AutoSizing ) {
+	TEST_F( EnergyPlusFixture, Humidifiers_AutoSizing ) {
 		SysSizingRunDone = true;
 		CurSysNum = 1;
 		NumElecSteamHums = 0;
@@ -98,7 +99,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 265257.67, thisHum.NomPower, 1.0E-02 ); // Watts
 	}
 
-	TEST_F( HVACFixture, Humidifiers_EnergyUse ) {
+	TEST_F( EnergyPlusFixture, Humidifiers_EnergyUse ) {
 		HumidifierData thisHum;
 
 		TimeStepSys = 0.25;
@@ -149,7 +150,7 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( 93339384.987223208, thisHum.GasUseEnergy );
 	}
 
-	TEST_F( HVACFixture, Humidifiers_GetHumidifierInput ) {
+	TEST_F( EnergyPlusFixture, Humidifiers_GetHumidifierInput ) {
 		std::string const idf_objects = delimited_string({
 			"Version,8.3;",
 			"Humidifier:Steam:Gas,",
@@ -186,7 +187,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, Humidifiers_ThermalEfficiency ) {
+	TEST_F( EnergyPlusFixture, Humidifiers_ThermalEfficiency ) {
 		// tests thermal efficiency modifier curve use
 
 		HumidifierData thisHum;

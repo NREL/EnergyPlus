@@ -9,6 +9,10 @@
 
 namespace EnergyPlus {
 
+namespace UtilityRoutines {
+	extern bool outputErrorHeader;
+}
+
 void
 AbortEnergyPlus();
 
