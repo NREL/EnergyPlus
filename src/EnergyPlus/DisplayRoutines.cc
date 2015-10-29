@@ -49,7 +49,7 @@ DisplayString( std::string const & String ) // String to be displayed
 	// na
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	std::cout << String << '\n';
+	std::cout << String << '\n' << std::flush;
 
 }
 
@@ -93,7 +93,7 @@ DisplayString( char const * String ) // String to be displayed
 	if ( fMessagePtr ) fMessagePtr( String );
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	std::cout << String << '\n';
+	std::cout << String << '\n' << std::flush;
 
 }
 
@@ -142,7 +142,7 @@ DisplayNumberAndString(
 	if ( fMessagePtr ) fMessagePtr( sstm.str() );
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
-	std::cout << String << ' ' << Number << '\n';
+	std::cout << String << ' ' << Number << '\n' << std::flush;
 }
 
 void
