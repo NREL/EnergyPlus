@@ -48,6 +48,98 @@ namespace EnergyPlus {
 		EXPECT_TRUE( success );
 	}
 
+	TEST_F( IdfParserFixture, decode_success_2 ) {
+		bool success = true;
+		std::string const test_object( delimited_string( {
+			"Version,8.3;",
+			"  Building,",
+			"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+			"    0.0000,                  !- North Axis {deg}",
+			"    ,                        !- Terrain",
+			"    0.0400,                  !- Loads Convergence Tolerance Value",
+			"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+			"    ,                        !- Solar Distribution",
+			"    25,                      !- Maximum Number of Warmup Days",
+			"    6;  ",
+		} ) );
+
+		auto const output = IdfParser::decode( test_object, success );
+
+		EXPECT_EQ( std::vector< std::vector< std::string > >({ { "Version", "8.3" }, { "Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "", "0.0400", "0.2000", "", "25", "6" } }), output );
+		EXPECT_TRUE( success );
+	}
+
+	TEST_F( IdfParserFixture, decode_success_3 ) {
+		bool success = true;
+		std::string const test_object( delimited_string( {
+			"Version,8.3;",
+			"  Building,",
+			"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+			"    0.0000,                  !- North Axis {deg}",
+			"    ,                        !- Terrain",
+			"    0.0400,                  !- Loads Convergence Tolerance Value",
+			"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+			"    ,                        !- Solar Distribution",
+			"    25,                      !- Maximum Number of Warmup Days",
+			"    ;  ",
+		} ) );
+
+		auto const output = IdfParser::decode( test_object, success );
+
+		EXPECT_EQ( std::vector< std::vector< std::string > >({ { "Version", "8.3" }, { "Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "", "0.0400", "0.2000", "", "25", "" } }), output );
+		EXPECT_TRUE( success );
+	}
+
+	TEST_F( IdfParserFixture, decode_success_4 ) {
+		bool success = true;
+		std::string const test_object( delimited_string( {
+			"Version,8.3;",
+			"Schedule:Constant,OnSch,,1.0;",
+			"Schedule:Constant,Aula people sched,,0.0;",
+		} ) );
+
+		auto const output = IdfParser::decode( test_object, success );
+
+		EXPECT_EQ( std::vector< std::vector< std::string > >({ { "Version", "8.3" }, { "Schedule:Constant", "OnSch", "", "1.0" }, { "Schedule:Constant", "Aula people sched", "", "0.0" } }), output );
+		EXPECT_TRUE( success );
+	}
+
+	TEST_F( IdfParserFixture, decode_encode ) {
+		bool success = true;
+		std::string const test_object( delimited_string( {
+			"Version,8.3;",
+			"Schedule:Constant,OnSch,,1.0;",
+			"Schedule:Constant,Aula people sched,,0.0;",
+		} ) );
+
+		auto const output = IdfParser::decode( test_object, success );
+
+		EXPECT_EQ( std::vector< std::vector< std::string > >({ { "Version", "8.3" }, { "Schedule:Constant", "OnSch", "", "1.0" }, { "Schedule:Constant", "Aula people sched", "", "0.0" } }), output );
+		EXPECT_TRUE( success );
+
+		auto const encoded_string = IdfParser::encode( output );
+
+		EXPECT_EQ( test_object, encoded_string );
+	}
+
+	TEST_F( IdfParserFixture, decode_encode_2 ) {
+		bool success = true;
+		std::string const test_object( delimited_string( {
+			"Version,8.3;",
+			"Schedule:Constant,OnSch,,;",
+			"Schedule:Constant,Aula people sched,,;",
+		} ) );
+
+		auto const output = IdfParser::decode( test_object, success );
+
+		EXPECT_EQ( std::vector< std::vector< std::string > >({ { "Version", "8.3" }, { "Schedule:Constant", "OnSch", "", "" }, { "Schedule:Constant", "Aula people sched", "", "" } }), output );
+		EXPECT_TRUE( success );
+
+		auto const encoded_string = IdfParser::encode( output );
+
+		EXPECT_EQ( test_object, encoded_string );
+	}
+
 	TEST_F( IdfParserFixture, parse_idf ) {
 		size_t index = 0;
 		bool success = true;

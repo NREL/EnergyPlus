@@ -14,7 +14,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::HVACControllers;
@@ -25,7 +25,7 @@ using namespace EnergyPlus::WaterCoils;
 namespace EnergyPlus {
 
 
-	TEST_F( HVACFixture, HVACControllers_ResetHumidityRatioCtrlVarType ) {
+	TEST_F( EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType ) {
 		std::string const idf_objects = delimited_string( {
 		" Version,8.3;",
 		" Coil:Cooling:Water,",
