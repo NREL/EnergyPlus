@@ -4,9 +4,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EMSManager.hh>
 #include <DataRuntimeLanguage.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
@@ -58,5 +62,56 @@ TEST( EMSManager, TestForUniqueEMSActuators )
 	EXPECT_EQ( 6, numEMSActuatorsAvailable );
 
 	EMSActuatorAvailable.deallocate();
+
+}
+
+TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
+
+		std::string const idf_objects = delimited_string( { 
+		"Version,8.4;",
+
+		"OutdoorAir:Node, Test node;",
+
+		"EnergyManagementSystem:Actuator,",
+		"TempSetpointLo,          !- Name",
+		"Test node,  !- Actuated Component Unique Name",
+		"System Node Setpoint,    !- Actuated Component Type",
+		"Temperature Minimum Setpoint;    !- Actuated Component Control Type",
+
+		"EnergyManagementSystem:Actuator,",
+		"TempSetpointHi,          !- Name",
+		"Test node,  !- Actuated Component Unique Name",
+		"System Node Setpoint,    !- Actuated Component Type",
+		"Temperature Maximum Setpoint;    !- Actuated Component Control Type",
+
+
+		"EnergyManagementSystem:ProgramCallingManager,",
+		"Dual Setpoint Test Manager,  !- Name",
+		"BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
+		"DualSetpiontTestControl;  !- Program Name 1",
+
+		"EnergyManagementSystem:Program,",
+		"DualSetpiontTestControl,",
+		"Set TempSetpointLo = 16.0,",
+		"Set TempSetpointHi  = 20.0;",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		OutAirNodeManager::SetOutAirNodes();
+
+		EMSManager::CheckIfAnyEMS();
+
+		EMSManager::FinishProcessingUserInput = true;
+
+		EMSManager::ManageEMS( DataGlobals::emsCallFromSetupSimulation );
+
+		EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment );
+
+
+		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001 );
+
+		EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointLo, 16.0, 0.000001 );
 
 }
