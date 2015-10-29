@@ -1,4 +1,6 @@
-Notices and Acknowledgments
+(EnergyPlus Documentation, v8.4.0)
+
+Notices and Acknowledgments 
 ===========================
 
 Copyright Notice

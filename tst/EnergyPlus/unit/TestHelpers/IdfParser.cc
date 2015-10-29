@@ -1,5 +1,11 @@
 #include "IdfParser.hh"
 
+#ifdef _WIN32
+#define NL "\r\n"
+#else
+#define NL "\n"
+#endif
+
 namespace EnergyPlus {
 
 	std::vector< std::vector< std::string > > IdfParser::decode( std::string const & idf )
@@ -15,6 +21,19 @@ namespace EnergyPlus {
 
 		size_t index = 0;
 		return parse_idf( idf, index, success );
+	}
+
+	std::string IdfParser::encode( std::vector< std::vector< std::string > > const & idf_list ) {
+		std::string idf;
+		for ( auto const & object : idf_list ) {
+			int const size = object.size();
+			for (int i = 0; i < size - 1; ++i)
+			{
+				idf += object[ i ] + ',';
+			}
+			idf += object[ size - 1 ] + ';' + NL;
+		}
+		return idf;
 	}
 
 	std::vector< std::vector< std::string > > IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success )
@@ -55,6 +74,17 @@ namespace EnergyPlus {
 				return std::vector< std::string >();
 			} else if ( token == Token::COMMA ) {
 				next_token( idf, index );
+				token = look_ahead( idf, index );
+				if ( Token::EXCLAMATION == token ) {
+					eat_comment( idf, index );
+				}
+				token = look_ahead( idf, index );
+				if ( Token::COMMA == token ) {
+					array.push_back( "" );
+				} else if ( Token::SEMICOLON == token ) {
+					array.push_back( "" );
+					break;
+				}
 			} else if ( token == Token::SEMICOLON ) {
 				next_token( idf, index );
 				break;

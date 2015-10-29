@@ -87,6 +87,20 @@ namespace SurfaceGeometry {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool ProcessSurfaceVerticesOneTimeFlag( true );
+		Array1D< Real64 > Xpsv;
+		Array1D< Real64 > Ypsv;
+		Array1D< Real64 > Zpsv;
+	}
+
+
 	// Following are used only during getting vertices, so are module variables here.
 	Real64 CosBldgRelNorth( 0.0 ); // Cosine of the building rotation (relative north) (includes appendix G rotation)
 	Real64 SinBldgRelNorth( 0.0 ); // Sine of the building rotation (relative north)   (includes appendix G rotation)
@@ -110,6 +124,31 @@ namespace SurfaceGeometry {
 	Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
 
 	// Functions
+
+	// Clears the global data in HeatBalanceManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state( )
+	{
+		ProcessSurfaceVerticesOneTimeFlag = true;
+		Xpsv.deallocate( );
+		Ypsv.deallocate( );
+		Zpsv.deallocate( );
+		// Following are used only during getting vertices, so are module variables here.
+		CosBldgRelNorth = 0.0;
+		SinBldgRelNorth = 0.0;
+		CosBldgRotAppGonly = 0.0;
+		SinBldgRotAppGonly = 0.0;
+		CosZoneRelNorth.deallocate();
+		SinZoneRelNorth.deallocate();
+		NoGroundTempObjWarning = true;
+		NoFCGroundTempObjWarning = true;
+		RectSurfRefWorldCoordSystem = false;
+		Warning1Count = 0;
+		Warning2Count = 0;
+		Warning3Count =0;
+		SurfaceTmp.deallocate();
+	}
 
 	void
 	SetupZoneGeometry( bool & ErrorsFound )
@@ -8314,7 +8353,12 @@ namespace SurfaceGeometry {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
+		//////////// hoisted into namespace
+		//static bool OneTimeFlag( true ); // now ProcessSurfaceVerticesOneTimeFlag
+		//static Array1D< Real64 > X; // now Xpsv (to avoid conflicts with CheckConvexity)
+		//static Array1D< Real64 > Y; // now Ypsv
+		//static Array1D< Real64 > Z; // now Zpsv
+		////////////////////////////////////////////////
 
 		// LOCAL VARIABLES
 		//  REAL(r64) :: X00    ! Intermediate Result
@@ -8330,10 +8374,6 @@ namespace SurfaceGeometry {
 		Real64 XLLC; // X-coordinate of lower left corner
 		Real64 YLLC; // Y-coordinate of lower left corner
 		Real64 ZLLC; // Z-coordinate of lower left corner
-		static Array1D< Real64 > X;
-		static Array1D< Real64 > Y;
-		static Array1D< Real64 > Z;
-		static bool OneTimeFlag( true );
 		//  INTEGER :: I  ! Loop Control
 		//  INTEGER :: J  ! Loop Control
 		int n; // Vertex Number in Loop
@@ -8369,8 +8409,6 @@ namespace SurfaceGeometry {
 		Real64 DivArea; // Divider area for exterior windows (m2)
 		Real64 DivFrac; // Fraction of divider area without overlaps
 		bool ErrorInSurface; // false/true, depending on pass through routine
-		Real64 Diagonal1; // Length of diagonal of 4-sided figure (m)
-		Real64 Diagonal2; // Length of diagonal of 4-sided figure (m)
 		bool SError;
 		bool HeatTransSurf;
 		bool IsCoPlanar;
@@ -8384,14 +8422,14 @@ namespace SurfaceGeometry {
 
 		ErrorInSurface = false;
 
-		if ( OneTimeFlag ) {
-			X.allocate( MaxVerticesPerSurface );
-			Y.allocate( MaxVerticesPerSurface );
-			Z.allocate( MaxVerticesPerSurface );
-			X = 0.0;
-			Y = 0.0;
-			Z = 0.0;
-			OneTimeFlag = false;
+		if ( ProcessSurfaceVerticesOneTimeFlag ) {
+			Xpsv.allocate( MaxVerticesPerSurface );
+			Ypsv.allocate( MaxVerticesPerSurface );
+			Zpsv.allocate( MaxVerticesPerSurface );
+			Xpsv = 0.0;
+			Ypsv = 0.0;
+			Zpsv = 0.0;
+			ProcessSurfaceVerticesOneTimeFlag = false;
 		}
 
 		// Categorize this surface
@@ -8432,9 +8470,9 @@ namespace SurfaceGeometry {
 			BaseCosTilt = std::cos( SurfTilt * DegToRadians );
 			BaseSinTilt = std::sin( SurfTilt * DegToRadians );
 			for ( n = 1; n <= Surface( ThisSurf ).Sides; ++n ) {
-				X( n ) = Surface( ThisSurf ).Vertex( n ).x;
-				Y( n ) = Surface( ThisSurf ).Vertex( n ).y;
-				Z( n ) = Surface( ThisSurf ).Vertex( n ).z;
+				Xpsv( n ) = Surface( ThisSurf ).Vertex( n ).x;
+				Ypsv( n ) = Surface( ThisSurf ).Vertex( n ).y;
+				Zpsv( n ) = Surface( ThisSurf ).Vertex( n ).z;
 			}
 			BaseXLLC = Surface( ThisSurf ).Vertex( 2 ).x;
 			BaseYLLC = Surface( ThisSurf ).Vertex( 2 ).y;
@@ -8445,18 +8483,16 @@ namespace SurfaceGeometry {
 			ThisHeight = VecLength( TVect );
 			Surface( ThisSurf ).Width = ThisWidth;
 			Surface( ThisSurf ).Height = ThisHeight; // For a horizontal surface this is actually length!
-			if ( Surface( ThisSurf ).Sides == 3 ) Surface( ThisSurf ).Shape = Triangle;
-			if ( Surface( ThisSurf ).Sides == 4 ) {
-				Diagonal1 = VecLength( Surface( ThisSurf ).Vertex( 1 ) - Surface( ThisSurf ).Vertex( 3 ) );
-				Diagonal2 = VecLength( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 4 ) );
+			if ( Surface( ThisSurf ).Sides == 3 ) {
+				Surface( ThisSurf ).Shape = Triangle;
+			} else if ( Surface( ThisSurf ).Sides == 4 ) {
 				// Test for rectangularity
-				if ( std::abs( Diagonal1 - Diagonal2 ) < 0.020 ) {
+				if ( isRectangle( ThisSurf ) ) {
 					Surface( ThisSurf ).Shape = Rectangle;
 				} else {
 					Surface( ThisSurf ).Shape = Quadrilateral;
 				}
-			}
-			if ( Surface( ThisSurf ).Sides > 4 ) {
+			} else { // Surface( ThisSurf ).Sides > 4 
 				Surface( ThisSurf ).Shape = Polygonal;
 				if ( std::abs( ThisHeight * ThisWidth - Surface( ThisSurf ).GrossArea ) > 0.001 ) {
 					Surface( ThisSurf ).Width = std::sqrt( Surface( ThisSurf ).GrossArea );
@@ -8524,28 +8560,26 @@ namespace SurfaceGeometry {
 				ThisHeight = VecLength( TVect );
 				Surface( ThisSurf ).Width = ThisWidth;
 				Surface( ThisSurf ).Height = ThisHeight;
-				Diagonal1 = VecLength( Surface( ThisSurf ).Vertex( 1 ) - Surface( ThisSurf ).Vertex( 3 ) );
-				Diagonal2 = VecLength( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 4 ) );
 
 				// Test for rectangularity
-				if ( std::abs( Diagonal1 - Diagonal2 ) > 0.020 ) {
+				if ( ! isRectangle( ThisSurf ) ) {
 					ShowSevereError( RoutineName + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:" );
-					ShowContinueError( "Surface=" + Surface( ThisSurf ).Name + ", Diagonal1=" + TrimSigDigits( Diagonal1, 3 ) + ", Diagonal2=" + TrimSigDigits( Diagonal2, 3 ) );
+					ShowContinueError( "Surface=" + Surface( ThisSurf ).Name );
 					ErrorInSurface = true;
 				}
 
-				X( 1 ) = XLLC;
-				X( 2 ) = XLLC;
-				X( 3 ) = XLLC + Surface( ThisSurf ).Width;
-				X( 4 ) = XLLC + Surface( ThisSurf ).Width;
-				Y( 1 ) = YLLC + Surface( ThisSurf ).Height;
-				Y( 4 ) = YLLC + Surface( ThisSurf ).Height;
-				Y( 2 ) = YLLC;
-				Y( 3 ) = YLLC;
-				Z( 1 ) = ZLLC;
-				Z( 2 ) = ZLLC;
-				Z( 3 ) = ZLLC;
-				Z( 4 ) = ZLLC;
+				Xpsv( 1 ) = XLLC;
+				Xpsv( 2 ) = XLLC;
+				Xpsv( 3 ) = XLLC + Surface( ThisSurf ).Width;
+				Xpsv( 4 ) = XLLC + Surface( ThisSurf ).Width;
+				Ypsv( 1 ) = YLLC + Surface( ThisSurf ).Height;
+				Ypsv( 4 ) = YLLC + Surface( ThisSurf ).Height;
+				Ypsv( 2 ) = YLLC;
+				Ypsv( 3 ) = YLLC;
+				Zpsv( 1 ) = ZLLC;
+				Zpsv( 2 ) = ZLLC;
+				Zpsv( 3 ) = ZLLC;
+				Zpsv( 4 ) = ZLLC;
 
 				if ( Surface( ThisSurf ).Class == SurfaceClass_Window && Surface( ThisSurf ).ExtBoundCond == ExternalEnvironment && Surface( ThisSurf ).FrameDivider > 0 ) {
 					FrDivNum = Surface( ThisSurf ).FrameDivider;
@@ -8615,9 +8649,9 @@ namespace SurfaceGeometry {
 				Xp = Surface( ThisSurf ).Vertex( 2 ).x - BaseXLLC;
 				Yp = Surface( ThisSurf ).Vertex( 2 ).y - BaseYLLC;
 				Zp = Surface( ThisSurf ).Vertex( 2 ).z - BaseZLLC;
-				X( 2 ) = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-				Y( 2 ) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-				Z( 2 ) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
+				Xpsv( 2 ) = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
+				Ypsv( 2 ) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
+				Zpsv( 2 ) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
 				TVect = Surface( ThisSurf ).Vertex( 3 ) - Surface( ThisSurf ).Vertex( 2 );
 				ThisWidth = VecLength( TVect );
 				TVect = Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 );
@@ -8632,16 +8666,16 @@ namespace SurfaceGeometry {
 				Xp = Surface( ThisSurf ).Vertex( 1 ).x - BaseXLLC;
 				Yp = Surface( ThisSurf ).Vertex( 1 ).y - BaseYLLC;
 				Zp = Surface( ThisSurf ).Vertex( 1 ).z - BaseZLLC;
-				X( 1 ) = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-				Y( 1 ) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-				Z( 1 ) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
+				Xpsv( 1 ) = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
+				Ypsv( 1 ) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
+				Zpsv( 1 ) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
 
 				Xp = Surface( ThisSurf ).Vertex( 3 ).x - BaseXLLC;
 				Yp = Surface( ThisSurf ).Vertex( 3 ).y - BaseYLLC;
 				Zp = Surface( ThisSurf ).Vertex( 3 ).z - BaseZLLC;
-				X( 3 ) = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-				Y( 3 ) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-				Z( 3 ) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
+				Xpsv( 3 ) = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
+				Ypsv( 3 ) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
+				Zpsv( 3 ) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
 
 			} else if ( SELECT_CASE_var == RectangularOverhang ) {
 
@@ -8657,18 +8691,18 @@ namespace SurfaceGeometry {
 				ThisHeight = VecLength( TVect );
 				Surface( ThisSurf ).Width = ThisWidth;
 				Surface( ThisSurf ).Height = ThisHeight;
-				X( 1 ) = XLLC;
-				X( 2 ) = XLLC;
-				X( 3 ) = XLLC + Surface( ThisSurf ).Width;
-				X( 4 ) = XLLC + Surface( ThisSurf ).Width;
-				Y( 1 ) = YLLC;
-				Y( 2 ) = YLLC;
-				Y( 3 ) = YLLC;
-				Y( 4 ) = YLLC;
-				Z( 1 ) = Surface( ThisSurf ).Height;
-				Z( 4 ) = Surface( ThisSurf ).Height;
-				Z( 2 ) = 0.0;
-				Z( 3 ) = 0.0;
+				Xpsv( 1 ) = XLLC;
+				Xpsv( 2 ) = XLLC;
+				Xpsv( 3 ) = XLLC + Surface( ThisSurf ).Width;
+				Xpsv( 4 ) = XLLC + Surface( ThisSurf ).Width;
+				Ypsv( 1 ) = YLLC;
+				Ypsv( 2 ) = YLLC;
+				Ypsv( 3 ) = YLLC;
+				Ypsv( 4 ) = YLLC;
+				Zpsv( 1 ) = Surface( ThisSurf ).Height;
+				Zpsv( 4 ) = Surface( ThisSurf ).Height;
+				Zpsv( 2 ) = 0.0;
+				Zpsv( 3 ) = 0.0;
 
 			} else if ( SELECT_CASE_var == RectangularLeftFin ) {
 
@@ -8684,18 +8718,18 @@ namespace SurfaceGeometry {
 				ThisHeight = VecLength( TVect );
 				Surface( ThisSurf ).Width = ThisWidth;
 				Surface( ThisSurf ).Height = ThisHeight;
-				X( 1 ) = XLLC;
-				X( 2 ) = XLLC;
-				X( 3 ) = XLLC;
-				X( 4 ) = XLLC;
-				Y( 1 ) = YLLC;
-				Y( 2 ) = YLLC;
-				Y( 3 ) = YLLC + Surface( ThisSurf ).Width;
-				Y( 4 ) = YLLC + Surface( ThisSurf ).Width;
-				Z( 1 ) = Surface( ThisSurf ).Height;
-				Z( 4 ) = Surface( ThisSurf ).Height;
-				Z( 2 ) = 0.0;
-				Z( 3 ) = 0.0;
+				Xpsv( 1 ) = XLLC;
+				Xpsv( 2 ) = XLLC;
+				Xpsv( 3 ) = XLLC;
+				Xpsv( 4 ) = XLLC;
+				Ypsv( 1 ) = YLLC;
+				Ypsv( 2 ) = YLLC;
+				Ypsv( 3 ) = YLLC + Surface( ThisSurf ).Width;
+				Ypsv( 4 ) = YLLC + Surface( ThisSurf ).Width;
+				Zpsv( 1 ) = Surface( ThisSurf ).Height;
+				Zpsv( 4 ) = Surface( ThisSurf ).Height;
+				Zpsv( 2 ) = 0.0;
+				Zpsv( 3 ) = 0.0;
 
 			} else if ( SELECT_CASE_var == RectangularRightFin ) {
 
@@ -8711,18 +8745,18 @@ namespace SurfaceGeometry {
 				ThisHeight = VecLength( TVect );
 				Surface( ThisSurf ).Width = ThisWidth;
 				Surface( ThisSurf ).Height = ThisHeight;
-				X( 1 ) = XLLC;
-				X( 2 ) = XLLC;
-				X( 3 ) = XLLC;
-				X( 4 ) = XLLC;
-				Y( 1 ) = YLLC + Surface( ThisSurf ).Width;
-				Y( 2 ) = YLLC + Surface( ThisSurf ).Width;
-				Y( 3 ) = YLLC;
-				Y( 4 ) = YLLC;
-				Z( 1 ) = Surface( ThisSurf ).Height;
-				Z( 4 ) = Surface( ThisSurf ).Height;
-				Z( 2 ) = 0.0;
-				Z( 3 ) = 0.0;
+				Xpsv( 1 ) = XLLC;
+				Xpsv( 2 ) = XLLC;
+				Xpsv( 3 ) = XLLC;
+				Xpsv( 4 ) = XLLC;
+				Ypsv( 1 ) = YLLC + Surface( ThisSurf ).Width;
+				Ypsv( 2 ) = YLLC + Surface( ThisSurf ).Width;
+				Ypsv( 3 ) = YLLC;
+				Ypsv( 4 ) = YLLC;
+				Zpsv( 1 ) = Surface( ThisSurf ).Height;
+				Zpsv( 4 ) = Surface( ThisSurf ).Height;
+				Zpsv( 2 ) = 0.0;
+				Zpsv( 3 ) = 0.0;
 
 			} else {
 				// Error Condition
@@ -8734,12 +8768,12 @@ namespace SurfaceGeometry {
 
 			for ( n = 1; n <= Surface( ThisSurf ).Sides; ++n ) {
 				// if less than 1/10 inch
-				X( n ) = nint64( 10000.0 * X( n ) ) / 10000.0;
-				if ( std::abs( X( n ) ) < 0.0025 ) X( n ) = 0.0;
-				Y( n ) = nint64( 10000.0 * Y( n ) ) / 10000.0;
-				if ( std::abs( Y( n ) ) < 0.0025 ) Y( n ) = 0.0;
-				Z( n ) = nint64( 10000.0 * Z( n ) ) / 10000.0;
-				if ( std::abs( Z( n ) ) < 0.0025 ) Z( n ) = 0.0;
+				Xpsv( n ) = nint64( 10000.0 * Xpsv( n ) ) / 10000.0;
+				if ( std::abs( Xpsv( n ) ) < 0.0025 ) Xpsv( n ) = 0.0;
+				Ypsv( n ) = nint64( 10000.0 * Ypsv( n ) ) / 10000.0;
+				if ( std::abs( Ypsv( n ) ) < 0.0025 ) Ypsv( n ) = 0.0;
+				Zpsv( n ) = nint64( 10000.0 * Zpsv( n ) ) / 10000.0;
+				if ( std::abs( Zpsv( n ) ) < 0.0025 ) Zpsv( n ) = 0.0;
 			}
 
 			Surface( ThisSurf ).Shape = ThisShape;
@@ -8760,9 +8794,9 @@ namespace SurfaceGeometry {
 
 		for ( n = 1; n <= Surface( ThisSurf ).Sides; ++n ) {
 			// if less than 1/10 inch
-			ShadeV( ThisSurf ).XV( n ) = X( n );
-			ShadeV( ThisSurf ).YV( n ) = Y( n );
-			ShadeV( ThisSurf ).ZV( n ) = Z( n );
+			ShadeV( ThisSurf ).XV( n ) = Xpsv( n );
+			ShadeV( ThisSurf ).YV( n ) = Ypsv( n );
+			ShadeV( ThisSurf ).ZV( n ) = Zpsv( n );
 		}
 
 		// Process Surfaces According to Type of Coordinate Origin.
@@ -8780,9 +8814,9 @@ namespace SurfaceGeometry {
 				Z0( ThisBaseSurface ) = CoordinateTransVector.z;
 
 				// COMPUTE INVERSE TRANSFORMATION.
-				X1 = X( 2 ) - CoordinateTransVector.x;
-				Y1 = Y( 2 ) - CoordinateTransVector.y;
-				Z1 = Z( 2 ) - CoordinateTransVector.z;
+				X1 = Xpsv( 2 ) - CoordinateTransVector.x;
+				Y1 = Ypsv( 2 ) - CoordinateTransVector.y;
+				Z1 = Zpsv( 2 ) - CoordinateTransVector.z;
 				XSHIFT = Surface( ThisBaseSurface ).lcsx.x * X1 + Surface( ThisBaseSurface ).lcsx.y * Y1 + Surface( ThisBaseSurface ).lcsx.z * Z1;
 				YSHIFT = Surface( ThisBaseSurface ).lcsy.x * X1 + Surface( ThisBaseSurface ).lcsy.y * Y1 + Surface( ThisBaseSurface ).lcsy.z * Z1;
 
@@ -10589,6 +10623,44 @@ namespace SurfaceGeometry {
 
 	}
 
+	bool
+	isRectangle(
+		int const ThisSurf // Surface number
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   October 2015
+
+		// PURPOSE: Check if a 4-sided surface is a rectangle
+
+		using namespace Vectors;
+
+		Real64 Diagonal1; // Length of diagonal of 4-sided figure from vertex 1 to vertex 3 (m)
+		Real64 Diagonal2; // Length of diagonal of 4-sided figure from vertex 2 to vertex 4 (m)
+		Real64 DotProd; // Dot product of two adjacent sides - to test for right angle
+		Real64 const cos89deg = std::cos( 89.0 * DegToRadians ); // tolerance for right angle
+		Vector Vect32; // normalized vector from vertex 3 to vertex 2
+		Vector Vect21; // normalized vector from vertex 2 to vertex 1
+
+		Diagonal1 = VecLength( Surface( ThisSurf ).Vertex( 1 ) - Surface( ThisSurf ).Vertex( 3 ) );
+		Diagonal2 = VecLength( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 4 ) );
+		// Test for rectangularity
+		if ( std::abs( Diagonal1 - Diagonal2 ) < 0.020 ) { // This tolerance based on coincident vertex tolerance of 0.01
+			Vect32 = VecNormalize( Surface( ThisSurf ).Vertex( 3 ) - Surface( ThisSurf ).Vertex( 2 ) );
+			Vect21 = VecNormalize( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 ) );
+			DotProd = dot( Vect32, Vect21 );
+			if ( abs( DotProd ) <= cos89deg ) { 
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+
+	}
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

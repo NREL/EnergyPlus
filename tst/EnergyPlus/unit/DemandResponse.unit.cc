@@ -6,7 +6,7 @@
 #include <DataGlobals.hh>
 #include <MixedAir.hh>
 #include <DemandManager.hh>
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -15,7 +15,7 @@ using namespace EnergyPlus::DemandManager;
 
 namespace EnergyPlus {
 
-TEST_F(HVACFixture, DemandManagerGetInput)
+TEST_F(EnergyPlusFixture, DemandManagerGetInput)
 {
 	// Test input processing for DemandManager:Ventilation
 

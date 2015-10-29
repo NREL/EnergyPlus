@@ -10769,7 +10769,7 @@ are compound components usually placed in the primary air loop as the sole compo
 
 The following HVAC equipment types are allowed in the air loop. The component matrix shows which coils and fans are allowed with which equipment models.
 
-![](media/AirloopComponentMatrix.png)
+![](media/AirLoopComponentMatrix.png)
 
 ### AirLoopHVAC:UnitarySystem
 

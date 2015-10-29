@@ -85,6 +85,7 @@ public: // Types
 	using Super::isize;
 	using Super::npos;
 	using Super::overlap;
+	using Super::shift_set;
 	using Super::size;
 	using Super::size_of;
 	using Super::slice_k;
@@ -1591,6 +1592,7 @@ public: // Modifier
 	{
 		Super::clear();
 		I_.clear();
+		shift_set( 1 );
 		return *this;
 	}
 
@@ -3044,6 +3046,7 @@ protected: // Functions
 	clear_move()
 	{
 		I_.clear();
+		shift_set( 1 );
 	}
 
 	// Swap
