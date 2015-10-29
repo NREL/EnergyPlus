@@ -276,6 +276,9 @@ namespace MoistureBalanceEMPDManager {
 		// METHODOLOGY EMPLOYED:
 
 		// USE STATEMENTS:
+		using DataHeatBalFanSys::MAT;
+		using Psychrometrics::PsyRhovFnTdbWPb_fast;
+		using Psychrometrics::PsyRhovFnTdbRh;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -310,23 +313,14 @@ namespace MoistureBalanceEMPDManager {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			ZoneNum = Surface( SurfNum ).Zone;
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
-			if ( ZoneAirHumRat( ZoneNum ) == 0.0 ) {
-				RVSurfaceOld(SurfNum) = ZoneAirHumRat(ZoneNum);
-				RVSurface(SurfNum) = ZoneAirHumRat(ZoneNum);
-				RVSurfLayer(SurfNum) = RhoVaporAirIn(SurfNum);
-				RVSurfLayerOld(SurfNum) = RhoVaporAirIn(SurfNum);
-				RVDeepLayer(SurfNum) = RhoVaporAirIn(SurfNum);
-				RVdeepOld(SurfNum) = RhoVaporAirIn(SurfNum);
-				RVwall(SurfNum) = RhoVaporAirIn(SurfNum);
-			} else {
-				RVSurfaceOld( SurfNum ) = ZoneAirHumRat( ZoneNum ); // Surface moisture level initialization
-				RVSurface( SurfNum ) = ZoneAirHumRat( ZoneNum );
-				RVSurfLayer( SurfNum ) = RhoVaporAirIn( SurfNum );
-				RVSurfLayerOld( SurfNum ) = RhoVaporAirIn( SurfNum );
-				RVDeepLayer( SurfNum ) = RhoVaporAirIn( SurfNum );
-				RVdeepOld( SurfNum ) = RhoVaporAirIn( SurfNum );
-				RVwall( SurfNum ) = RhoVaporAirIn( SurfNum );
-			}
+			RVSurfaceOld(SurfNum) = ZoneAirHumRat(ZoneNum);
+			RVSurface(SurfNum) = ZoneAirHumRat(ZoneNum);
+			Real64 const rv_air_in_initval = min( PsyRhovFnTdbWPb_fast( MAT( ZoneNum ), max( ZoneAirHumRat( ZoneNum ), 1.0e-5 ), OutBaroPress ), PsyRhovFnTdbRh( MAT( ZoneNum ), 1.0, "InitMoistureBalanceEMPD" ) );
+			RVSurfLayer(SurfNum) = rv_air_in_initval;
+			RVSurfLayerOld(SurfNum) = rv_air_in_initval;
+			RVDeepLayer(SurfNum) = rv_air_in_initval;
+			RVdeepOld(SurfNum) = rv_air_in_initval;
+			RVwall(SurfNum) = rv_air_in_initval;
 		}
 		if ( ! InitEnvrnFlag ) return;
 		//Initialize the report variable
