@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -14,10 +14,11 @@
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 using namespace EnergyPlus;
 
-TEST_F( HVACFixture, CheckEMPDCalc )
+TEST_F( EnergyPlusFixture, CheckEMPDCalc )
 {
 	std::string const idf_objects = delimited_string({
 		"Version, 8.3;",
