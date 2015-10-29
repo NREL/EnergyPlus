@@ -1206,7 +1206,7 @@ fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint,
 		exit(EXIT_FAILURE);
 }
 
-fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index){
+fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index, fmiInteger *fmiEndSimulation){
 	printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
 	exit(EXIT_FAILURE);
 }
@@ -1234,7 +1234,7 @@ fmiValueReference getValueReferenceByNameFMUOutputVariables(char* variableName,
 		exit(EXIT_FAILURE);
 }
 
-fmiInteger model_ID_GUID(char* fmuWorkingFolder,
+fmiInteger model_ID_GUID(char* fmuInstanceName, char* fmuWorkingFolder,
 	fmiInteger *sizefmuWorkingFolder, fmiInteger *numInputs,
 	fmiInteger *numOutputs){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux.");
