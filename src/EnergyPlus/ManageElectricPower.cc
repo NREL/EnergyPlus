@@ -1117,7 +1117,7 @@ namespace ManageElectricPower {
 				SetupOutputVariable( "Inverter Thermal Loss Rate [W]", Inverter( InvertNum ).ThermLossRate, "System", "Average", Inverter( InvertNum ).Name );
 				SetupOutputVariable( "Inverter Thermal Loss Energy [J]", Inverter( InvertNum ).ThermLossEnergy, "System", "Sum", Inverter( InvertNum ).Name );
 				SetupOutputVariable( "Inverter Ancillary AC Electric Power [W]", Inverter( InvertNum ).AncillACuseRate, "System", "Average", Inverter( InvertNum ).Name );
-				SetupOutputVariable( "Inverter Ancillary AC Electric Energy [J]", Inverter( InvertNum ).AncillACuseEnergy, "System", "Sum", Inverter( InvertNum ).Name, _, "Electricity", "Cogeneration", _, "Plant" ); // called cogeneration for end use table
+				SetupOutputVariable( "Inverter Ancillary AC Electric Energy [J]", Inverter( InvertNum ).AncillACuseEnergy, "System", "Sum", Inverter( InvertNum ).Name, _, "Electricity", "Cogeneration", "Inverter", "Plant" ); // called cogeneration for end use table
 				if ( Inverter( InvertNum ).ZoneNum > 0 ) {
 					{ auto const SELECT_CASE_var( Inverter( InvertNum ).ModelType );
 					if ( SELECT_CASE_var == SimpleConstantEff ) {
@@ -1339,10 +1339,11 @@ namespace ManageElectricPower {
 			//For any battery
 			for ( StorNum = 1; StorNum <= NumofSimpleElecStorage + NumofKiBaMElecStorage; ++StorNum ) {
 				SetupOutputVariable( "Electric Storage Charge Power [W]", ElecStorage( StorNum ).StoredPower, "System", "Average", ElecStorage( StorNum ).Name );
-				SetupOutputVariable( "Electric Storage Charge Energy [J]", ElecStorage( StorNum ).StoredEnergy, "System", "Sum", ElecStorage( StorNum ).Name );
-				SetupOutputVariable( "Electric Storage Production Decrement Energy [J]", ElecStorage( StorNum ).DecrementedEnergyStored, "System", "Sum", ElecStorage( StorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Electric Storage Charge Energy [J]", ElecStorage( StorNum ).StoredEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "Electricity", "Cogeneration", "Batteries", "Plant" );
+				SetupOutputVariable( "Electric Storage Production Decrement Energy [J]", ElecStorage( StorNum ).DecrementedEnergyStored, "System", "Sum", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Discharge Power [W]", ElecStorage( StorNum ).DrawnPower, "System", "Average", ElecStorage( StorNum ).Name );
-				SetupOutputVariable( "Electric Storage Discharge Energy [J]", ElecStorage( StorNum ).DrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Electric Storage Discharge Energy [J]", ElecStorage( StorNum ).DrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name);
+				SetupOutputVariable( "Electric Storage Discharge Decrement Energy [J]", ElecStorage( StorNum ).DecrementDrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "Electricity", "Cogeneration", "Batteries", "Plant" );
 				SetupOutputVariable( "Electric Storage Thermal Loss Rate [W]", ElecStorage( StorNum ).ThermLossRate, "System", "Average", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Thermal Loss Energy [J]", ElecStorage( StorNum ).ThermLossEnergy, "System", "Sum", ElecStorage( StorNum ).Name );
 				if ( AnyEnergyManagementSystemInModel ) {
@@ -1521,7 +1522,7 @@ namespace ManageElectricPower {
 				SetupOutputVariable( "Transformer Thermal Loss Rate [W]", Transformer( TransfNum ).ThermalLossRate, "System", "Average", Transformer( TransfNum ).Name );
 				SetupOutputVariable( "Transformer Thermal Loss Energy [J]", Transformer( TransfNum ).ThermalLossEnergy, "System", "Sum", Transformer( TransfNum ).Name );
 				SetupOutputVariable( "Transformer Distribution Electric Loss Energy [J]", Transformer( TransfNum ).ElecUseUtility, "System", "Sum", Transformer( TransfNum ).Name, _, "Electricity", "ExteriorEquipment", "Transformer", "System" );
-				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", Transformer( TransfNum ).ElecProducedCoGen, "System", "Sum", Transformer( TransfNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "System" );
+				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", Transformer( TransfNum ).ElecProducedCoGen, "System", "Sum", Transformer( TransfNum ).Name, _, "ElectricityProduced", "COGENERATION", "Transformer", "System" );
 
 				if ( Transformer( TransfNum ).ZoneNum > 0 ) {
 					SetupZoneInternalGain( Transformer( TransfNum ).ZoneNum, "ElectricLoadCenter:Transformer", Transformer( TransfNum ).Name, IntGainTypeOf_ElectricLoadCenterTransformer, Transformer( TransfNum ).QdotConvZone, _, Transformer( TransfNum ).QdotRadZone );
@@ -2672,6 +2673,7 @@ namespace ManageElectricPower {
 				ElecStorage( ElecStorNum ).DecrementedEnergyStored = 0.0;
 				ElecStorage( ElecStorNum ).DrawnPower = 0.0;
 				ElecStorage( ElecStorNum ).DrawnEnergy = 0.0;
+				ElecStorage( ElecStorNum ).DecrementDrawnEnergy = 0.0;
 				ElecStorage( ElecStorNum ).ThermLossRate = 0.0;
 				ElecStorage( ElecStorNum ).ThermLossEnergy = 0.0;
 
@@ -3077,6 +3079,7 @@ namespace ManageElectricPower {
 			ElecStorage( ElecStorNum ).DecrementedEnergyStored = -1.0 * ElecStorage( ElecStorNum ).StoredEnergy;
 			ElecStorage( ElecStorNum ).DrawnPower = ElecStorage( ElecStorNum ).PelFromStorage;
 			ElecStorage( ElecStorNum ).DrawnEnergy = ElecStorage( ElecStorNum ).PelFromStorage * TimeStepSys * SecInHour;
+			ElecStorage( ElecStorNum ).DecrementDrawnEnergy = -1.0 * ElecStorage( ElecStorNum ).DrawnEnergy;
 			ElecStorage( ElecStorNum ).ThermLossRate = max( ElecStorage( ElecStorNum ).StoredPower * ( 1.0 - ElecStorage( ElecStorNum ).EnergeticEfficCharge ), ElecStorage( ElecStorNum ).DrawnPower * ( 1.0 - ElecStorage( ElecStorNum ).EnergeticEfficDischarge ) );
 			ElecStorage( ElecStorNum ).ThermLossEnergy = ElecStorage( ElecStorNum ).ThermLossRate * TimeStepSys * SecInHour;
 
@@ -3110,8 +3113,8 @@ namespace ManageElectricPower {
 			//output1
 			if ( TotalSOC > q0 ) {
 				ElecStorage( ElecStorNum ).StorageMode = 2;
-				ElecStorage( ElecStorNum ).StoredPower = Volt * I0 * Numbattery;
-				ElecStorage( ElecStorNum ).StoredEnergy = Volt * I0 * Numbattery * TimeStepSys * SecInHour;
+				ElecStorage( ElecStorNum ).StoredPower = -1.0 * Volt * I0 * Numbattery;
+				ElecStorage( ElecStorNum ).StoredEnergy = -1.0 * Volt * I0 * Numbattery * TimeStepSys * SecInHour;
 				ElecStorage( ElecStorNum ).DecrementedEnergyStored = -1.0 * ElecStorage( ElecStorNum ).StoredEnergy;
 				ElecStorage( ElecStorNum ).DrawnPower = 0.0;
 				ElecStorage( ElecStorNum ).DrawnEnergy = 0.0;
@@ -3133,6 +3136,7 @@ namespace ManageElectricPower {
 				ElecStorage( ElecStorNum ).DrawnEnergy = 0.0;
 			}
 
+			ElecStorage( ElecStorNum ).DecrementDrawnEnergy = -1.0 * ElecStorage( ElecStorNum ).DrawnEnergy;
 			ElecStorage( ElecStorNum ).AbsoluteSOC = TotalSOC * Numbattery;
 			ElecStorage( ElecStorNum ).FractionSOC = TotalSOC / qmax;
 			ElecStorage( ElecStorNum ).BatteryCurrent = I0 * Numpar;
