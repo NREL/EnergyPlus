@@ -98,7 +98,6 @@ namespace Fans {
 	int const ExhaustFanCoupledToAvailManagers( 150 );
 	int const ExhaustFanDecoupledFromAvailManagers( 151 );
 	static std::string const BlankString;
-
 	//na
 
 	// DERIVED TYPE DEFINITIONS
@@ -108,8 +107,7 @@ namespace Fans {
 	int NumNightVentPerf( 0 ); // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
 	bool GetFanInputFlag( true ); // Flag set to make sure you get input once
 	bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and
-	// forces ZoneHVAC comp fans off
+	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
 
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
@@ -117,7 +115,7 @@ namespace Fans {
 	// These are purposefully not in the header file as an extern variable. No one outside of this module should
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-		bool MyOneTimeFlag( true );
+		bool MyOneTimeFlag( true ); // used for allocation in Init
 		bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 
 		Array1D_bool MySizeFlag;

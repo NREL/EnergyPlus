@@ -1782,7 +1782,11 @@ The impact of using outside air/mechanical ventilation is described in the secti
 
 ### AirLoopHVAC:OutdoorAirSystem:EquipmentList
 
-Used to specify the components in the outdoor air system. The components will be simulated in the order in which they occur in the list.
+Used to specify the components in the outdoor air system. The components will be simulated in the order in which they occur in the list. 
+
+The following HVAC equipment types are allowed as outdoor air system equipment. The component matrix shows which coils and fans are allowed with which equipment models.
+
+![](media/OASysComponentMatrix.png)
 
 #### Field: Name
 
@@ -4783,6 +4787,9 @@ ZoneHVAC:EquipmentConnections,
     SPACE3-1 Out Node;     !- Zone Return Air Node Name
 ```
 
+The following HVAC equipment types are allowed as zone equipment. The component matrix shows which coils and fans are allowed with which equipment models.
+
+![](media/ZoneComponentMatrix.png)
 
 ### ZoneHVAC:EquipmentList
 
@@ -10759,6 +10766,10 @@ The components
 * AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed
 
 are compound components usually placed in the primary air loop as the sole component. On the zone equipment side they are usually connected to one or more zones through uncontrolled terminal units (i.e., AirTerminal:SingleDuct:Uncontrolled objects). The maximum or design air flow rate through the furnace or unitary system should usually be set equal to the sum of the maximum air flow rates through the terminal unit objects. However, the simulation program can usually account for unequal air flows if the user wishes to model this scenario.
+
+The following HVAC equipment types are allowed in the air loop. The component matrix shows which coils and fans are allowed with which equipment models.
+
+![](media/AirLoopComponentMatrix.png)
 
 ### AirLoopHVAC:UnitarySystem
 

@@ -1,12 +1,12 @@
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 set( test_src
   TestHelpers/IdfParser.cc
   TestHelpers/IdfParser.hh
   Fixtures/EnergyPlusFixture.cc
   Fixtures/EnergyPlusFixture.hh
-  Fixtures/HVACFixture.hh
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
   Fixtures/SQLiteFixture.hh
@@ -17,6 +17,7 @@ set( test_src
   CondenserLoopTowers.unit.cc;
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
+  Datasets.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
   DOASEffectOnZoneSizing.unit.cc
@@ -41,6 +42,7 @@ set( test_src
   HVACStandaloneERV.unit.cc
   HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
+  HWBaseboardRadiator.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
@@ -58,6 +60,7 @@ set( test_src
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SiteBuildingSurfaceGroundTemperatures.unit.cc
@@ -69,6 +72,7 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  SurfaceGeometry.unit.cc
   SwimmingPool.unit.cc
   VariableSpeedCoils.unit.cc
   Vectors.unit.cc

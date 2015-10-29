@@ -660,31 +660,32 @@ namespace EvaporativeCoolers {
 				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, cCurrentModuleObject, EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
 			}
 			EvapCond( EvapCoolNum ).DirectEffectiveness = rNumericArgs( 1 );
-			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 2 );
 
-			if ( lNumericFieldBlanks( 3 ) ) {
+			EvapCond( EvapCoolNum ).VolFlowRate = rNumericArgs( 2 );
+			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 3 );
+			if ( lNumericFieldBlanks( 4 ) ) {
 				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = 0.0;
 			} else {
-				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 3 );
-			}
-			if ( lNumericFieldBlanks( 4 ) ) {
-				EvapCond( EvapCoolNum ).DriftFraction = 0.0;
-			} else {
-				EvapCond( EvapCoolNum ).DriftFraction = rNumericArgs( 4 );
+				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 4 );
 			}
 			if ( lNumericFieldBlanks( 5 ) ) {
+				EvapCond( EvapCoolNum ).DriftFraction = 0.0;
+			} else {
+				EvapCond( EvapCoolNum ).DriftFraction = rNumericArgs( 5 );
+			}
+			if ( lNumericFieldBlanks( 6 ) ) {
 				EvapCond( EvapCoolNum ).BlowDownRatio = 0.0;
 			} else {
-				EvapCond( EvapCoolNum ).BlowDownRatio = rNumericArgs( 5 );
+				EvapCond( EvapCoolNum ).BlowDownRatio = rNumericArgs( 6 );
 			}
-			if ( lNumericFieldBlanks( 6 ) || lNumericFieldBlanks( 7 ) || lNumericFieldBlanks( 8 ) ) {
+			if ( lNumericFieldBlanks( 7 ) || lNumericFieldBlanks( 8 ) || lNumericFieldBlanks( 9 ) ) {
 				EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = false;
 			} else {
-				if ( !lNumericFieldBlanks( 6 ) && !lNumericFieldBlanks( 7 ) && !lNumericFieldBlanks( 8 ) ) {
+				if ( !lNumericFieldBlanks( 7 ) && !lNumericFieldBlanks( 8 ) && !lNumericFieldBlanks( 9 ) ) {
 					EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = true;
-					EvapCond( EvapCoolNum ).MinOATDBEvapCooler = rNumericArgs( 6 );
-					EvapCond( EvapCoolNum ).MaxOATWBEvapCooler = rNumericArgs( 7 );
-					EvapCond( EvapCoolNum ).MaxOATDBEvapCooler = rNumericArgs( 8 );
+					EvapCond( EvapCoolNum ).MinOATDBEvapCooler = rNumericArgs( 7 );
+					EvapCond( EvapCoolNum ).MaxOATWBEvapCooler = rNumericArgs( 8 );
+					EvapCond( EvapCoolNum ).MaxOATDBEvapCooler = rNumericArgs( 9 );
 				} else {
 					EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = false;
 				}
@@ -1129,15 +1130,13 @@ namespace EvaporativeCoolers {
 		if ( !HardSizeNoDesRun ) {
 			if ( IsAutoSize ) {
 				EvapCond( EvapCoolNum ).VolFlowRate = volFlowRateDes;
-				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
-				//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
-					//"Design Size Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
-
 				// only these two evap coolers has primary air design flow rate
-				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial || EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial  ) {
-					ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName, "Design Size Primary Air Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
+					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+				} else if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
+					ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
 				}
-
 			} else {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 && IndirectVolFlowRateDes > 0.0 ) {
@@ -1265,7 +1264,7 @@ namespace EvaporativeCoolers {
 				}
 			}
 		}
-		
+
 		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectCELDEKPAD ) {
 			IsAutoSize = false;
 
@@ -3653,7 +3652,7 @@ namespace EvaporativeCoolers {
 		for ( UnitLoop = 1; UnitLoop <= NumZoneEvapUnits; ++UnitLoop ) {
 
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Rate [W]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Rate [W]", ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Heating Rate [W]", ZoneEvapUnit( UnitLoop ).UnitLatentHeatingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );

@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <CurveManager.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
@@ -36,7 +36,7 @@ using namespace EnergyPlus::ScheduleManager;
 
 namespace EnergyPlus {
 
-	TEST_F( HVACFixture, OutdoorAirUnit_AutoSize ) {
+	TEST_F( EnergyPlusFixture, OutdoorAirUnit_AutoSize ) {
 		
 		bool ErrorsFound( false );        // function returns true on error
 		bool FirstHVACIteration( true );  // simulate the first pass through HVAC simulation, use false for next iteration

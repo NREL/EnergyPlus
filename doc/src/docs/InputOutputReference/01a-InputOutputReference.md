@@ -1,24 +1,12 @@
-
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Input Output Reference</h1>
 <h2>The Encyclopedic Reference to EnergyPlus Input and Output</h2>
 <br/>
 <p><i>(the ins and outs of EnergyPlus)</i></p>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 <br/>
 <p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
 <p style="page-break-after:always;"></p>
@@ -2781,17 +2769,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
 
-#### Field: Kusuda-Achebach Average Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation, in °C
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
-#### Field: Kusuda-Achebach Average Amplitude of Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean surface temperature variation from average used in determining the farfield boundary conditions.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-
-The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 
@@ -2852,11 +2836,10 @@ Site:GroundDomain:Slab,
     1.8,                !- Soil Thermal Conductivity
     3200,               !- Soil Density
     836,                !- Soil Specific Heat
-    30,   !- Soil Moisture Content Volume Fraction
-    50,   !- Soil Moisture Content Volume Fraction at Saturation
-    15.5, !- Kusuda-Achenbach Average Surface Temperature
-    12.8, !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3, !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+    30,                 !- Soil Moisture Content Volume Fraction
+    50,                 !- Soil Moisture Content Volume Fraction at Saturation
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                            !- Name of Undisturbed Ground Temperature Object
     1,    !- Evapotranspiration Ground Cover Parameter
     GroundCoupledOSCM,      !- Name of Floor Boundary Condition Model
     InGrade,                !- Slab Location (InGrade/OnGrade)
@@ -2882,12 +2865,11 @@ Site:GroundDomain:Slab,
     1.8,                !- Soil Thermal Conductivity {W/m-K}
     3200,               !- Soil Density {kg/m3}
     836,                !- Soil Specific Heat {J/kg-K}
-    30,          !- Soil Moisture Content Volume Fraction
-    50,          !- Soil Moisture Content Volume Fraction at Saturation
-    15.5,        !- Kusuda-Achenbach Average Surface Temperature
-    12.8,   !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3,   !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-    1,           !- Evapotranspiration Ground Cover Parameter
+    30,                 !- Soil Moisture Content Volume Fraction
+    50,                 !- Soil Moisture Content Volume Fraction at Saturation
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;            !- Name of Undisturbed Ground Temperature Object
+    1,                  !- Evapotranspiration Ground Cover Parameter
     GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
     OnGrade,            !- Slab Location (InGrade/OnGrade)
     ,                   !- Slab Material Name
@@ -2920,7 +2902,7 @@ This is the value of the OthersideConditionModel surface temperature. This is th
 
 This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the SurfaceProperty:OtherSideConditionsModel object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the BuildingSurface:Detailed object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects.
 
-![](media/image012.png)
+![](media/image900.png)
 
 Figure: Basement Configuration
 
@@ -2935,9 +2917,8 @@ Site:GroundDomain:Basement,
     836,                     !- Soil Specific Heat {J/kg-K}
     30,                      !- Soil Moisture Content Volume Fraction {percent}
     50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    15.5,                    !- Kusuda-Achenbach Average Surface Temperature {C}
-    12.8,                    !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-    17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                 !- Name of Undisturbed Ground Temperature Object
     1,                       !- Evapotranspiration Ground Cover Parameter
     BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
     Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
@@ -2989,17 +2970,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
 
-#### Field: Kusuda-Achebach Average Ground Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average ground surface temperature to be applied to the Kusuda-Achenbach far-field boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this, and the following two parameters for the simulation. In which case, this field and the following two can be left blank.
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
-#### Field: Kusuda-Achebach Average Amplitude of Ground Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous and following parameters. In which case, this field, the previous field, and the following field can be left blank.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
-
-The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous two parameters. In which case, this field, the previous two fields can be left blank.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 

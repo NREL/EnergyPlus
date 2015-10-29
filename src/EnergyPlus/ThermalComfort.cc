@@ -94,6 +94,11 @@ namespace ThermalComfort {
 	//Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyRhFnTdbWPb;
 
+	namespace {
+		// clear_state variables
+		static bool FirstTimeFlag( true ); // Flag set to make sure you get input once
+	}
+
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	Real64 const TAbsConv( KelvinConv ); // Converter for absolute temperature
@@ -209,6 +214,11 @@ namespace ThermalComfort {
 	Array1D< AngleFactorData > AngleFactorList; // Angle Factor List data for each Angle Factor List
 
 	// Functions
+	void
+	clear_state()
+	{
+		FirstTimeFlag = true;
+	}
 
 	void
 	ManageThermalComfort( bool const InitializeOnly ) // when called from ZTPC and calculations aren't needed
@@ -245,7 +255,6 @@ namespace ThermalComfort {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool FirstTimeFlag( true ); // Flag set to make sure you get input once
 		static bool ASH55Flag( false );
 		static bool CEN15251Flag( false );
 
@@ -2205,6 +2214,22 @@ namespace ThermalComfort {
 	}
 
 	void
+	ResetThermalComfortSimpleASH55(){
+		// Jason Glazer - October 2015
+		// Reset thermal comfort table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		int iZone;
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			ThermalComfortInASH55( iZone ).totalTimeNotWinter = 0.0;
+			ThermalComfortInASH55( iZone ).totalTimeNotSummer = 0.0;
+			ThermalComfortInASH55( iZone ).totalTimeNotEither = 0.0;
+		}
+		TotalAnyZoneTimeNotSimpleASH55Winter = 0.0;
+		TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;
+		TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
+	}
+
+	void
 	CalcIfSetPointMet()
 	{
 		// SUBROUTINE INFORMATION:
@@ -2370,6 +2395,26 @@ namespace ThermalComfort {
 			}}
 		}
 	}
+
+	void
+	ResetSetPointMet(){
+		// Jason Glazer - October 2015
+		// Reset set point not met table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		int iZone;
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			ThermalComfortSetPoint( iZone ).totalNotMetHeating = 0.0;
+			ThermalComfortSetPoint( iZone ).totalNotMetCooling = 0.0;
+			ThermalComfortSetPoint( iZone ).totalNotMetHeatingOccupied = 0.0;
+			ThermalComfortSetPoint( iZone ).totalNotMetCoolingOccupied = 0.0;
+		}
+		TotalAnyZoneNotMetHeating = 0.0;
+		TotalAnyZoneNotMetCooling = 0.0;
+		TotalAnyZoneNotMetHeatingOccupied = 0.0;
+		TotalAnyZoneNotMetCoolingOccupied = 0.0;
+		TotalAnyZoneNotMetOccupied = 0.0;
+	}
+
 
 	void
 	CalcThermalComfortAdaptiveASH55(
