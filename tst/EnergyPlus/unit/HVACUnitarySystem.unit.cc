@@ -7,7 +7,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 #include <General.hh>
 #include <ObjexxFCL/gio.hh>
@@ -27,6 +27,7 @@
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -70,7 +71,7 @@ using WaterCoils::WaterCoil_Cooling;
 using WaterCoils::SimpleAnalysis;
 using General::TrimSigDigits;
 
-TEST_F( HVACFixture, SetOnOffMassFlowRateTest )
+TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 {
 		std::string const idf_objects = delimited_string( {
 		"Version,8.3;",
@@ -724,7 +725,7 @@ TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
 
 }
 
-TEST_F( HVACFixture, UnitarySystem_GetInput ) {
+TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 
 	bool ErrorsFound( false );
 	bool FirstHVACIteration( false );
@@ -1035,7 +1036,7 @@ TEST_F( HVACFixture, UnitarySystem_GetInput ) {
 
 }
 
-TEST_F( HVACFixture, UnitarySystem_VSDXCoilSizing ) {
+TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 	UnitarySystemData thisUnSys;
 
 	bool ErrorsFound( false );
@@ -1413,7 +1414,7 @@ TEST_F( HVACFixture, UnitarySystem_VSDXCoilSizing ) {
 }
 
 
-TEST_F( HVACFixture, UnitarySystem_VarSpeedCoils ) {
+TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 
 	bool ErrorsFound( false );
 	bool FirstHVACIteration( false );
@@ -1830,7 +1831,7 @@ TEST_F( HVACFixture, UnitarySystem_VarSpeedCoils ) {
 
 }
 
-TEST_F( HVACFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
+TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 
 	bool ErrorsFound( false );
 

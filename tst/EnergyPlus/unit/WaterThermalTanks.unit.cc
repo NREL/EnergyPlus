@@ -7,7 +7,7 @@
 #include <WaterThermalTanks.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 
@@ -87,7 +87,7 @@ TEST( WaterThermalTankData, GetDeadBandTemp )
 
 }
 
-TEST_F( HVACFixture, HPWHZoneEquipSeqenceNumberWarning )
+TEST_F( EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning )
 {
 	std::string const idf_objects = delimited_string({
 		"  Schedule:Constant, DummySch, , 1.0;",
@@ -314,7 +314,7 @@ TEST_F( HVACFixture, HPWHZoneEquipSeqenceNumberWarning )
 	EXPECT_FALSE( WaterThermalTanks::GetWaterThermalTankInput() );
 }
 
-TEST_F( HVACFixture, HPWHWrappedDummyNodeConfig )
+TEST_F( EnergyPlusFixture, HPWHWrappedDummyNodeConfig )
 {
 	// Unit test for #5127
 

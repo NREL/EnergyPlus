@@ -15,7 +15,6 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include "Fixtures/HVACFixture.hh"
 #include <BranchInputManager.hh>
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
@@ -389,7 +388,7 @@ namespace EnergyPlus {
 		TerminalUnitList.deallocate( );
 	}
 
-	TEST_F( HVACFixture, VRFTest_SysCurve ) {
+	TEST_F( EnergyPlusFixture, VRFTest_SysCurve ) {
 
 		bool ErrorsFound( false );        // function returns true on error
 		bool FirstHVACIteration( true );  // simulate the first pass through HVAC simulation, use false for next iteration
@@ -1057,7 +1056,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, VRFTest_SysCurve_GetInputFailers ) {
+	TEST_F( EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers ) {
 		// Author: R. Raustad, FSEC
 		
 		bool ErrorsFound( false );        // function returns true on error
@@ -1666,7 +1665,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, VRFTest_SysCurve_WaterCooled ) {
+	TEST_F( EnergyPlusFixture, VRFTest_SysCurve_WaterCooled ) {
 
 		static std::string const RoutineName( "VRFTest_WaterCooled" );
 		bool ErrorsFound( false );        // function returns true on error
