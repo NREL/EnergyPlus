@@ -65,6 +65,9 @@ TEST_F( EnergyPlusFixture, CheckEMPDCalc )
 	DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
 	DataMoistureBalance::RhoVaporAirIn.allocate(1);
 	DataMoistureBalance::HMassConvInFD.allocate(1);
+	DataHeatBalFanSys::MAT.allocate(1);
+	DataHeatBalFanSys::MAT(1) = 20.0;
+	DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0061285406810457849;
 
 	// Construction
 	surface.Construction = 1;
@@ -79,7 +82,6 @@ TEST_F( EnergyPlusFixture, CheckEMPDCalc )
 	// Set up conditions
 	DataGlobals::TimeStepZone = 0.25;
 	DataEnvironment::OutBaroPress = 101325.;
-	DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0061285406810457849;
 	DataMoistureBalanceEMPD::RVSurface(1) = 0.007077173214149593;
 	DataMoistureBalanceEMPD::RVSurfaceOld(1) = DataMoistureBalanceEMPD::RVSurface(1);
 	DataMoistureBalance::HMassConvInFD(1) = 0.0016826898264131584;

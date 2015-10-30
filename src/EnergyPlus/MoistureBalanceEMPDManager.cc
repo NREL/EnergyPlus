@@ -313,9 +313,9 @@ namespace MoistureBalanceEMPDManager {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			ZoneNum = Surface( SurfNum ).Zone;
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
-			RVSurfaceOld(SurfNum) = ZoneAirHumRat(ZoneNum);
-			RVSurface(SurfNum) = ZoneAirHumRat(ZoneNum);
 			Real64 const rv_air_in_initval = min( PsyRhovFnTdbWPb_fast( MAT( ZoneNum ), max( ZoneAirHumRat( ZoneNum ), 1.0e-5 ), OutBaroPress ), PsyRhovFnTdbRh( MAT( ZoneNum ), 1.0, "InitMoistureBalanceEMPD" ) );
+			RVSurfaceOld(SurfNum) = rv_air_in_initval;
+			RVSurface(SurfNum) = rv_air_in_initval;
 			RVSurfLayer(SurfNum) = rv_air_in_initval;
 			RVSurfLayerOld(SurfNum) = rv_air_in_initval;
 			RVDeepLayer(SurfNum) = rv_air_in_initval;
