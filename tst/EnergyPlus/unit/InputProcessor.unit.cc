@@ -1485,6 +1485,23 @@ namespace EnergyPlus {
 			EXPECT_TRUE( RepObjects( 5 ).TransitionDefer );
 		}
 
+		TEST_F(InputProcessorFixture, MisleadingIDDWarningTest)
+		{
+			std::string const idd_objects = delimited_string({
+				"Version,8.4;",
+			});
+
+			bool errors_found = false;
+			ASSERT_FALSE(process_idd(idd_objects, errors_found));
+			ProcessInput();
+
+			std::string const expected_string = delimited_string({
+				"hello"
+			});
+
+			EXPECT_TRUE(compare_err_stream(expected_string, true));
+		}
+
 	}
 
 }

@@ -486,8 +486,10 @@ namespace InputProcessor {
 		}
 
 		if ( OverallErrorFlag ) {
-			ShowSevereError( "IP: Possible incorrect IDD File" );
-			ShowContinueError( "IDD Version:\"" + IDDVerString + "\"" );
+			if (IDDVerString.find(MatchVersion) == std::string::npos) {
+				ShowSevereError("IP: Possible incorrect IDD File");
+				ShowContinueError(IDDVerString + " not the same as expected =\"" + MatchVersion + "\"");
+			}
 			for ( Loop = 1; Loop <= NumIDFRecords; ++Loop ) {
 				if ( SameString( IDFRecords( Loop ).Name, "Version" ) ) {
 					std::string::size_type const lenVer( len( MatchVersion ) );
