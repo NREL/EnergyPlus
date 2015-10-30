@@ -137,12 +137,14 @@ namespace HeatBalFiniteDiffManager {
 		Array1D< Real64 > TDT;
 		Array1D< Real64 > TDTLast;
 		Array1D< Real64 > TDOld;
-		Array1D< Real64 > TDreport;
+		Array1D< Real64 > TDreport; // Node temperatures for reporting [C]
 		Array1D< Real64 > RH;
 		Array1D< Real64 > RHreport;
 		Array1D< Real64 > EnthOld; // Current node enthalpy
 		Array1D< Real64 > EnthNew; // Node enthalpy at new time
 		Array1D< Real64 > EnthLast;
+		Array1D< Real64 > QDreport; // Node to node heat flux for reporting [W/m2]
+		Array1D< Real64 > CpDelXRhoSDelt; // Current node Cp * DelX * RhoS / Delt 
 		int GSloopCounter; // count of inner loop iterations
 		int GSloopErrorCount; // recurring error counter
 		Real64 MaxNodeDelTemp; // largest change in node temps after calc
@@ -172,6 +174,8 @@ namespace HeatBalFiniteDiffManager {
 			Array1< Real64 > const & EnthOld, // Current node enthalpy
 			Array1< Real64 > const & EnthNew, // Node enthalpy at new time
 			Array1< Real64 > const & EnthLast,
+			Array1< Real64 > const & QDreport, // Node to node heat flux for reporting [W/m2]
+			Array1< Real64 > const & CpDelXRhoSDelt, // Current node Cp * DelX * RhoS / Delt 
 			int const GSloopCounter, // count of inner loop iterations
 			int const GSloopErrorCount, // recurring error counter
 			Real64 const MaxNodeDelTemp // largest change in node temps after calc
@@ -286,6 +290,12 @@ namespace HeatBalFiniteDiffManager {
 	void
 	ReportFiniteDiffInits();
 
+	void
+	CalcInterNodeHeatFlux(
+		int const Surf, // surface number
+		int const TotLayers // number of layers in surface
+	);
+		
 	// Utility Interpolation Function for the Module
 	//******************************************************************************
 
