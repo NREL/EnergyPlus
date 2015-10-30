@@ -3487,6 +3487,16 @@ namespace OutputReportTabular {
 						if ( OutputTableBinned( iInObj ).avgSum == isSum ) { // if it is a summed variable
 							curValue /= ( elapsedTime * SecInHour );
 						}
+						// round the value to the number of signficant digits used in the final output report
+						if ( curIntervalSize < 1 ) {
+							curValue = round( curValue * 10000.0 ) / 10000.0; // four significant digits
+						}
+						else if ( curIntervalSize >= 10 ) {
+							curValue = round( curValue ); // zero significant digits
+						}
+						else {
+							curValue = round( curValue * 100.0 ) / 100.0; // two significant digits
+						}
 						// check if the value is above the maximum or below the minimum value
 						// first before binning the value within the range.
 						if ( curValue < curIntervalStart ) {
