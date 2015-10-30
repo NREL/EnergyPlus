@@ -73,6 +73,7 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  SurfaceGeometry.unit.cc
   SwimmingPool.unit.cc
   VariableSpeedCoils.unit.cc
   Vectors.unit.cc
