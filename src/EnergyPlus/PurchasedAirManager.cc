@@ -2841,6 +2841,16 @@ namespace PurchasedAirManager {
 
 	}
 
+	// Clears the global data in Fans.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumPurchAir = 0;
+		PurchAir.deallocate();
+		PurchAirNumericFields.deallocate();
+	}
+
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
