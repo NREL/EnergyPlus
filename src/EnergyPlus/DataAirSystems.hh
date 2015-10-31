@@ -386,7 +386,7 @@ namespace DataAirSystems {
 			OutletBranchNum( 3, 0 ),
 			NumInletBranches( 0 ),
 			InletBranchNum( 3, 0 ),
-			CentralHeatCoilExists( false ),
+			CentralHeatCoilExists( true ),
 			OASysExists( false ),
 			OASysInletNodeNum( 0 ),
 			OASysOutletNodeNum( 0 ),

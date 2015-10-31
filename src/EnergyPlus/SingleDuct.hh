@@ -717,11 +717,6 @@ namespace SingleDuct {
 		int & ATMixerOutNode // air terminal mixer outlet air node number
 	);
 
-	Real64
-	GetReheatCoilInAirForSizing(
-		int const ParameterType // Return air temperature or humidity ratio
-	);
-
 	void
 	SetATMixerPriFlow(
 		int const ATMixerNum, // Air terminal mixer index

@@ -10,7 +10,6 @@
 #include <BranchNodeConnections.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataDefineEquip.hh>
@@ -86,8 +85,6 @@ namespace SingleDuct {
 	using DataHVACGlobals::DualSetPointWithDeadBand;
 	using DataHVACGlobals::ATMixer_InletSide;
 	using DataHVACGlobals::ATMixer_SupplySide;
-	using DataHVACGlobals::HeatingWaterDesAirInletTempSizing;
-	using DataHVACGlobals::HeatingWaterDesAirInletHumRatSizing;
 	using DataHeatBalFanSys::TempControlType;
 	using BranchNodeConnections::SetUpCompSets;
 	using BranchNodeConnections::TestCompSet;
@@ -2035,7 +2032,7 @@ namespace SingleDuct {
 							ErrorsFound = true;
 						}
 						if ( PltSizHeatNum > 0 ) {
-							CoilInTemp = GetReheatCoilInAirForSizing( HeatingWaterDesAirInletTempSizing );
+							CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
 							DesZoneHeatLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 							ZoneDesTemp = CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
@@ -2105,7 +2102,7 @@ namespace SingleDuct {
 							ErrorsFound = true;
 						}
 						if ( PltSizHeatNum > 0 ) {
-							CoilInTemp = GetReheatCoilInAirForSizing( HeatingWaterDesAirInletTempSizing );
+							CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
 							DesZoneHeatLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 							ZoneDesTemp = CalcFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
@@ -5028,111 +5025,6 @@ namespace SingleDuct {
 
 	}
 
-	Real64
-	GetReheatCoilInAirForSizing(
-		int const ParameterType // Return air temperature or humidity ratio
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl, Rongpeng Zhang
-		//       DATE WRITTEN   October 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine get the proper reheat coil inlet temperature/humidity ratio for sizing, depending on 
-		// the system configurations: 
-		// (1) Central heating coils exist
-		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
-		// (3) No central heating coils; No preheating coils or OA heat-exchangers
-		// Input parameter ParameterType:
-		// "HeatingWaterDesAirInletTempSizing" for temperature, "HeatingWaterDesAirInletHumRatSizing" for humidity
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataSizing;
-		using DataAirSystems::PrimaryAirSystem;
-		
-		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
-
-		// Locals
-		Real64 ReturnValue;
-		Real64 ReheatCoilInTempForSizing;
-		Real64 ReheatCoilInHumRatForSizing;
-		Real64 OutAirFrac;
-		
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
-		if( ParameterType == HeatingWaterDesAirInletTempSizing ) {
-						
-			if( PrimaryAirSystem( CurSysNum ).CentralHeatCoilExists ){
-			//Case: Central heating coils exist
-				
-				ReheatCoilInTempForSizing = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
-				
-			} else if(( PrimaryAirSystem( CurSysNum ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( CurSysNum ).NumOAHXs ) ){
-			//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
-
-				OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / FinalSysSizing( CurSysNum ).DesHeatVolFlow;
-				OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-
-				ReheatCoilInTempForSizing = OutAirFrac * FinalSysSizing( CurSysNum ).PreheatTemp + ( 1 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
-				
-			} else {
-			//Case: No central heating coils; No preheating coils or OA heat-exchangers
-				
-				ReheatCoilInTempForSizing = FinalSysSizing( CurSysNum ).HeatMixTemp;
-			
-			}
-
-			ReturnValue = ReheatCoilInTempForSizing;
-			
-		} else if ( ParameterType == HeatingWaterDesAirInletHumRatSizing ) {
-			
-			if( PrimaryAirSystem( CurSysNum ).CentralHeatCoilExists ){
-			//Case: Central heating coils exist
-				
-				ReheatCoilInHumRatForSizing = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU;
-			
-			} else if(( PrimaryAirSystem( CurSysNum ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( CurSysNum ).NumOAHXs ) ){
-			//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
-
-				OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / FinalSysSizing( CurSysNum ).DesHeatVolFlow;
-				OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-
-				ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( CurSysNum ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetHumRat;
-			
-			} else {
-			//Case: No central heating coils; No preheating coils or OA heat-exchangers
-			
-				ReheatCoilInHumRatForSizing = FinalSysSizing( CurSysNum ).HeatMixHumRat;
-			
-			}
-
-			ReturnValue = ReheatCoilInHumRatForSizing;
-		}
-
-		return ReturnValue;
-	}
-	
-	
 	//        End of Reporting subroutines for the Sys Module
 	// *****************************************************************************
 

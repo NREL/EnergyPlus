@@ -14,12 +14,14 @@ The current reheat coil sizing approach in EnergyPlus is designed assuming there
 
 ## E-mail and  Conference Call Conclusions ##
 
-None yet.
+* Mike Griffith: Can't we change the value of TermUnitFinalZoneSizing().DesHeatCoilInTempTU for different system configurations, instead of CoilInTemp in terminal unit sizing?
+
+Yes, it is a better solution to modify the value of TermUnitFinalZoneSizing().DesHeatCoilInTempTU which is at a root level. We didn't consider this solution in the original design because we thought this parameter may be used for other purposes in addition to the reheat coil sizing. But after a thorough check, we think it is fine to change its value.
 
 ## Overview ##
 
 
-The reheat coil is currently sized using the design zone heating load plus the reheat load. 
+The reheat coil is currently sized using the design zone heating load plus the reheat load.
 
         CoilInTemp = TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
          .........
@@ -50,9 +52,9 @@ If the system has no central heating coils, we have to further check the existan
 
 3. **Improve the calculation of reheat coil design load.**
 After checking the system configurations, we will need to alter the reheat coil design load calculation wherever it is calculated. It is calculated and used to set the design hot water flow rate in the sizing routines in the terminal unit modules, i.e., *SingleDuct* and *PoweredInductionUnit*. It may also be calculated and used in *RequestSizing* routine. In each case the calculation will need to select different inlet air temperature/humidity ratio depending on the sytem configurations. More specifically: 
-- (1) If the central heating coil exists, *DesHeatCoilInTempTU* and *DesHeatCoilInHumRatTU* within *TermUnitFinalZoneSizing* array will be used. 
-- (2) If there is no central heating coils but there is preheating coil or OA heat-exchanger, a mixed air temperature/humidity ratio will be used. They can be calculated using the information from *FinalSysSizing*, including *DesOutAirVolFlow*, *DesHeatVolFlow*, *PreheatHumRat*, *HeatRetHumRat*.  
-- (3) If there is no central heating coils, preheating coil, *HeatMixTemp* and *HeatMixHumRat* from *FinalSysSizing* will be used.
+- (1) If the central heating coil exists: *DesHeatCoilInTempTU* and *DesHeatCoilInHumRatTU* within *TermUnitFinalZoneSizing* array will be used. 
+- (2) If there is no central heating coils but there is preheating coil or OA heat-exchanger: a mixed air temperature/humidity ratio will be used. They can be calculated using the information from *FinalSysSizing*, including *DesOutAirVolFlow*, *DesHeatVolFlow*, *PreheatHumRat*, *HeatRetHumRat*.  
+- (3) If there is no central heating coils, preheating coil, or OA heat-exchanger: *HeatMixTemp* and *HeatMixHumRat* from *FinalSysSizing* will be used.
 
 4. **Improve the autosizing of reheat coil inlet air temperature and humidity ratio.**
 Inlet reheat coil air temperature and humidity ratio are autosized and we will need to alter these quantities as well. All cases of these calculation are now centralized in *RequestSizing*.
