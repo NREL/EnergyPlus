@@ -59011,7 +59011,7 @@ Pump:VariableSpeed,
        \ip-units W
   N4 , \field Motor Efficiency
        \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
-       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
        \maximum 1.0
@@ -59100,23 +59100,23 @@ Pump:VariableSpeed,
         \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
         \type choice
         \key PowerPerFlow
-        \note PowerPerFlow indicates that Design Power per Unit Flow Rate is used as scaling factor.
+        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
         \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
         \key PowerPerFlowPerPressure
-        \note PowerPerFlowPerPressure indicates that Design Power per Unit Flow Rate per Unit Head is used as scaling factor.
+        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
         \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
         \default PowerPerFlowPerPressure
-  N13,  \field Design Power per Unit Flow Rate
+  N13,  \field Design Electric Power per Unit Flow Rate
         \type real
         \note Used to size Design Power Consumption from design flow rate
         \default 348701.1
         \units W/(m3/s)
         \ip-units W/(gal/min)
         \minimum> 0
-  N14,  \field Design Power per Unit Flow Rate per Unit Head
+  N14,  \field Design Shaft Power per Unit Flow Rate per Unit Head
         \type real
         \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
-        \default 1.282051
+        \default 1.282051282
         \units W/((m3/s)-Pa)
         \ip-units W/((gal/min)-ftH20)
         \minimum> 0
@@ -59155,7 +59155,7 @@ Pump:ConstantSpeed,
        \ip-units W
   N4 , \field Motor Efficiency
        \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
-       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
        \maximum 1.0
@@ -59209,23 +59209,23 @@ Pump:ConstantSpeed,
        \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
        \type choice
        \key PowerPerFlow
-       \note PowerPerFlow indicates that Design Power per Unit Flow Rate is used as scaling factor.
+       \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
        \key PowerPerFlowPerPressure
-       \note PowerPerFlowPerPressure indicates that Design Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
        \default PowerPerFlowPerPressure
-  N9,  \field Design Power per Unit Flow Rate
+  N9,  \field Design Electric Power per Unit Flow Rate
        \type real
        \note Used to size Design Power Consumption from design flow rate
        \default 348701.1
        \units W/(m3/s)
        \ip-units W/(gal/min)
        \minimum> 0
-  N10; \field Design Power per Unit Flow Rate per Unit Head
+  N10; \field Design Shaft Power per Unit Flow Rate per Unit Head
        \type real
        \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
-       \default 1.282051
+       \default 1.282051282
        \units W/((m3/s)-Pa)
        \ip-units W/((gal/min)-ftH20)
        \minimum> 0
@@ -59259,7 +59259,7 @@ Pump:VariableSpeed:Condensate,
        \ip-units W
   N4 , \field Motor Efficiency
        \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
-       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
        \maximum 1.0
@@ -59292,11 +59292,29 @@ Pump:VariableSpeed:Condensate,
        \type real
        \minimum 0.0
        \maximum 1.0
-  N11; \field Rated Power per Unit Flow Rate per Unit Head
-       \note Used to size Design Power Consumption
-       \default 0.78
+  A6,  \field Design Power Sizing Method
+       \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+       \type choice
+       \key PowerPerFlow
+       \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \key PowerPerFlowPerPressure
+       \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+       \default PowerPerFlowPerPressure
+  N11, \field Design Electric Power per Unit Flow Rate
+       \type real
+       \note Used to size Design Power Consumption from design flow rate
+       \default 348701.1
+       \units W/(m3/s)
+       \ip-units W/(gal/min)
+       \minimum> 0
+  N12; \field Design Shaft Power per Unit Flow Rate per Unit Head
+       \type real
+       \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+       \default 1.282051282
        \units W/((m3/s)-Pa)
-       \ip-units W/(gpm-ftH20)
+       \ip-units W/((gal/min)-ftH20)
        \minimum> 0
 
 HeaderedPumps:ConstantSpeed,
@@ -59337,7 +59355,7 @@ HeaderedPumps:ConstantSpeed,
        \ip-units W
   N5 , \field Motor Efficiency
        \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
-       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
        \maximum 1.0
@@ -59371,23 +59389,23 @@ HeaderedPumps:ConstantSpeed,
        \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
        \type choice
        \key PowerPerFlow
-       \note PowerPerFlow indicates that Design Power per Unit Flow Rate is used as scaling factor.
+       \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
        \key PowerPerFlowPerPressure
-       \note PowerPerFlowPerPressure indicates that Design Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
        \default PowerPerFlowPerPressure
-  N8,  \field Design Power per Unit Flow Rate
+  N8,  \field Design Electric Power per Unit Flow Rate
        \type real
        \note Used to size Design Power Consumption from design flow rate
        \default 348701.1
        \units W/(m3/s)
        \ip-units W/(gal/min)
        \minimum> 0
-  N9; \field Design Power per Unit Flow Rate per Unit Head
+  N9; \field Design Shaft Power per Unit Flow Rate per Unit Head
        \type real
        \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
-       \default 1.282051
+       \default 1.282051282
        \units W/((m3/s)-Pa)
        \ip-units W/((gal/min)-ftH20)
        \minimum> 0
@@ -59430,7 +59448,7 @@ HeaderedPumps:VariableSpeed,
        \ip-units W
   N5 , \field Motor Efficiency
        \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
-       \note the Design Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
        \type real
        \minimum> 0.0
        \maximum 1.0
@@ -59477,23 +59495,23 @@ HeaderedPumps:VariableSpeed,
        \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
        \type choice
        \key PowerPerFlow
-       \note PowerPerFlow indicates that Design Power per Unit Flow Rate is used as scaling factor.
+       \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
        \key PowerPerFlowPerPressure
-       \note PowerPerFlowPerPressure indicates that Design Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
        \default PowerPerFlowPerPressure
-  N11, \field Design Power per Unit Flow Rate
+  N13, \field Design Electric Power per Unit Flow Rate
        \type real
        \note Used to size Design Power Consumption from design flow rate
        \default 348701.1
        \units W/(m3/s)
        \ip-units W/(gal/min)
        \minimum> 0
-  N12; \field Design Power per Unit Flow Rate per Unit Head
+  N14; \field Design Shaft Power per Unit Flow Rate per Unit Head
        \type real
        \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
-       \default 1.282051
+       \default 1.282051282
        \units W/((m3/s)-Pa)
        \ip-units W/((gal/min)-ftH20)
        \minimum> 0

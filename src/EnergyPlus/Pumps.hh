@@ -38,6 +38,12 @@ namespace Pumps {
 	extern int const PumpBank_ConSpeed;
 	extern Array1D_string const cPumpTypes;
 
+	enum powerSizingMethodEnum {
+		SizePowerPerFlow,
+		SizePowerPerFlowPerPressure
+	};
+
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -159,12 +165,16 @@ namespace Pumps {
 		Real64 NomSteamVolFlowRate; // For Steam Pump
 		bool NomSteamVolFlowRateWasAutoSized; // true if steam volume flow rate was autosize on input
 		Real64 MinVolFlowRate; // For a Variable Flow Pump this is the minimum capacity during operation.
+		bool minVolFlowRateWasAutosized; // true if minimum flow rate was autosize on input
 		Real64 MassFlowRateMin; // For a Variable Flow Pump this is the minimum capacity during operation.
 		Real64 NomPumpHead; // design nominal head pressure of Pump, [Pa]
 		bool EMSPressureOverrideOn; // if true, EMS is calling to override pump pressure
 		Real64 EMSPressureOverrideValue; // EMS value to use for pressure [Pa]
 		Real64 NomPowerUse; // design nominal capacity of Pump
 		bool NomPowerUseWasAutoSized; // true if power was autosize on input
+		powerSizingMethodEnum PowerSizingMethod; // which method is used for sizing nominal power use
+		Real64 PowerPerFlowScalingFactor; // design electric power per unit flow rate
+		Real64 PowerPerFlowPerPressureScalingFactor; // design shaft power per unit flow rate per unit head
 		Real64 MotorEffic; // efficiency of the motor
 		Real64 PumpEffic; // efficiency of the pump
 		Real64 FracMotorLossToFluid; // ?????
@@ -216,12 +226,16 @@ namespace Pumps {
 			NomSteamVolFlowRate( 0.0 ),
 			NomSteamVolFlowRateWasAutoSized( false ),
 			MinVolFlowRate( 0.0 ),
+			minVolFlowRateWasAutosized( false ),
 			MassFlowRateMin( 0.0 ),
 			NomPumpHead( 0.0 ),
 			EMSPressureOverrideOn( false ),
 			EMSPressureOverrideValue( 0.0 ),
 			NomPowerUse( 0.0 ),
 			NomPowerUseWasAutoSized( false ),
+			PowerSizingMethod( SizePowerPerFlowPerPressure ),
+			PowerPerFlowScalingFactor( 348701.1 ),
+			PowerPerFlowPerPressureScalingFactor( 1.282051282 ),
 			MotorEffic( 0.0 ),
 			PumpEffic( 0.0 ),
 			FracMotorLossToFluid( 0.0 ),
@@ -275,12 +289,16 @@ namespace Pumps {
 			Real64 const EMSMassFlowValue, // EMS value to use for mass flow rate [kg/s]
 			Real64 const NomSteamVolFlowRate, // For Steam Pump
 			Real64 const MinVolFlowRate, // For a Variable Flow Pump this is the minimum capacity during operation.
+			bool const minVolFlowRateWasAutosized, // true if minimum flow rate was autosize on input
 			Real64 const MassFlowRateMin, // For a Variable Flow Pump this is the minimum capacity during operation.
 			Real64 const NomPumpHead, // design nominal head pressure of Pump, [Pa]
 			bool const EMSPressureOverrideOn, // if true, EMS is calling to override pump pressure
 			Real64 const EMSPressureOverrideValue, // EMS value to use for pressure [Pa]
 			Real64 const NomPowerUse, // design nominal capacity of Pump
 			bool const NomPowerUseWasAutoSized, // true if previous is autosize on input
+			powerSizingMethodEnum const PowerSizingMethod, // which method is used for sizing nominal power use
+			Real64 const PowerPerFlowScalingFactor, // design electric power per unit flow rate
+			Real64 const PowerPerFlowPerPressureScalingFactor, // design shaft power per unit flow rate per unit head
 			Real64 const MotorEffic, // efficiency of the motor
 			Real64 const PumpEffic, // efficiency of the pump
 			Real64 const FracMotorLossToFluid, // ?????
@@ -332,12 +350,16 @@ namespace Pumps {
 			EMSMassFlowValue( EMSMassFlowValue ),
 			NomSteamVolFlowRate( NomSteamVolFlowRate ),
 			MinVolFlowRate( MinVolFlowRate ),
+			minVolFlowRateWasAutosized( minVolFlowRateWasAutosized ),
 			MassFlowRateMin( MassFlowRateMin ),
 			NomPumpHead( NomPumpHead ),
 			EMSPressureOverrideOn( EMSPressureOverrideOn ),
 			EMSPressureOverrideValue( EMSPressureOverrideValue ),
 			NomPowerUse( NomPowerUse ),
 			NomPowerUseWasAutoSized( NomPowerUseWasAutoSized ),
+			PowerSizingMethod( PowerSizingMethod ),
+			PowerPerFlowScalingFactor( PowerPerFlowScalingFactor ),
+			PowerPerFlowPerPressureScalingFactor( PowerPerFlowPerPressureScalingFactor ),
 			MotorEffic( MotorEffic ),
 			PumpEffic( PumpEffic ),
 			FracMotorLossToFluid( FracMotorLossToFluid ),

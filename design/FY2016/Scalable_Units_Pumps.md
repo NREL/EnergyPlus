@@ -30,13 +30,13 @@ Input/Output Reference changes have been made in the file 01d-InputOutputReferen
  
 #### Field: Design Power Sizing Method
 
-This field is optional.   There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
+This field is optional.  There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
 
-#### Field: Design Power per Unit Flow Rate
+#### Field: Design Electric Power per Unit Flow Rate
 
-This field is optional.   This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow.  It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m<sup>3</sup>/s) ( 22 W/gpm) will be used.
+This field is optional.  This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow.  It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m<sup>3</sup>/s) ( 22 W/gpm) will be used.
 
-#### Field: Design Power per Unit Flow Rate Per Unit Head
+#### Field: Design Shaft Power per Unit Flow Rate Per Unit Head
 
 This field is optional.  This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure.  It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m<sup>3</sup>/s)-Pa) will be used. 
 

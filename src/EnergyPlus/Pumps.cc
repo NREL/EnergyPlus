@@ -97,6 +97,7 @@ namespace Pumps {
 	int const PumpBank_ConSpeed( 105 );
 	Array1D_string const cPumpTypes( {101,105}, { cPump_VarSpeed, cPump_ConSpeed, cPump_Cond, cPumpBank_VarSpeed, cPumpBank_ConSpeed } );
 
+
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
 
@@ -399,7 +400,10 @@ namespace Pumps {
 			PumpEquip( PumpNum ).PartLoadCoef( 2 ) = rNumericArgs( 7 );
 			PumpEquip( PumpNum ).PartLoadCoef( 3 ) = rNumericArgs( 8 );
 			PumpEquip( PumpNum ).PartLoadCoef( 4 ) = rNumericArgs( 9 );
-			PumpEquip( PumpNum ).MinVolFlowRate = rNumericArgs( 10 );
+			PumpEquip( PumpNum ).MinVolFlowRate    = rNumericArgs( 10 );
+			if ( PumpEquip( PumpNum ).MinVolFlowRate == AutoSize  ) {
+				PumpEquip( PumpNum ).minVolFlowRateWasAutosized = true;
+			}
 			//Probably the following two lines will be used if the team agrees on changing the F10 value from min flow rate to
 			//minimum flow as a fraction of nominal flow.
 			//    PumpEquip(PumpNum)%MinVolFlowRateFrac  = rNumericArgs(10)
@@ -480,6 +484,29 @@ namespace Pumps {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 13 ) + "=\"" + cAlphaArgs( 13 ) + "\" not found." );
 					ErrorsFound = true;
 				}
+			}
+
+			if ( ! lAlphaFieldBlanks( 14 ) ) {
+				if ( cAlphaArgs( 14 ) == "POWERPERFLOW" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+				} else if ( cAlphaArgs( 14 ) == "POWERPERFLOWPERPRESSURE" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+				} else {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
+					ErrorsFound = true;
+				}
+			}
+
+			if ( ! lNumericFieldBlanks( 13 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 13 );
+			}
+
+			if ( ! lNumericFieldBlanks( 14 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 14 );
+			}
+
+			if ( ! lNumericFieldBlanks( 15 ) ) {
+				PumpEquip( PumpNum ).MinVolFlowRateFrac = rNumericArgs( 15 );
 			}
 
 			// Is this really necessary for each pump GetInput loop?
@@ -588,6 +615,25 @@ namespace Pumps {
 				}
 			}
 
+			if ( ! lAlphaFieldBlanks( 8 ) ) {
+				if ( cAlphaArgs( 8 ) == "POWERPERFLOW" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+				} else if ( cAlphaArgs( 8 ) == "POWERPERFLOWPERPRESSURE" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+				} else {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
+					ErrorsFound = true;
+				}
+			}
+
+			if ( ! lNumericFieldBlanks( 9 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 9 );
+			}
+
+			if ( ! lNumericFieldBlanks( 10 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 10 );
+			}
+
 		}
 
 		// pumps for steam system pumping condensate
@@ -665,6 +711,26 @@ namespace Pumps {
 				TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
 				PumpEquip( PumpNum ).NomVolFlowRate = ( PumpEquip( PumpNum ).NomSteamVolFlowRate * SteamDensity ) / TempWaterDensity;
 			}
+
+			if ( ! lAlphaFieldBlanks( 6 ) ) {
+				if ( cAlphaArgs( 6 ) == "POWERPERFLOW" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+				} else if ( cAlphaArgs( 6 ) == "POWERPERFLOWPERPRESSURE" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+				} else {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
+					ErrorsFound = true;
+				}
+			}
+
+			if ( ! lNumericFieldBlanks( 11 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 11 );
+			}
+
+			if ( ! lNumericFieldBlanks( 12 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 12 );
+			}
+
 		}
 
 		//LOAD Variable Speed Pump Bank ARRAYS WITH VARIABLE SPEED CURVE FIT PUMP DATA
@@ -751,6 +817,25 @@ namespace Pumps {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
 					ErrorsFound = true;
 				}
+			}
+
+			if ( ! lAlphaFieldBlanks( 8 ) ) {
+				if ( cAlphaArgs( 8 ) == "POWERPERFLOW" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+				} else if ( cAlphaArgs( 8 ) == "POWERPERFLOWPERPRESSURE" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+				} else {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
+					ErrorsFound = true;
+				}
+			}
+
+			if ( ! lNumericFieldBlanks( 13 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 13 );
+			}
+
+			if ( ! lNumericFieldBlanks( 14 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 14 );
 			}
 
 			PumpEquip( PumpNum ).Energy = 0.0;
@@ -841,7 +926,24 @@ namespace Pumps {
 					ErrorsFound = true;
 				}
 			}
+			if ( ! lAlphaFieldBlanks( 8 ) ) {
+				if ( cAlphaArgs( 8 ) == "POWERPERFLOW" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+				} else if ( cAlphaArgs( 8 ) == "POWERPERFLOWPERPRESSURE" ) {
+					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+				} else {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
+					ErrorsFound = true;
+				}
+			}
 
+			if ( ! lNumericFieldBlanks( 8 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 8 );
+			}
+
+			if ( ! lNumericFieldBlanks( 9 ) ) {
+				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 9 );
+			}
 			PumpEquip( PumpNum ).MinVolFlowRate = 0.0;
 			PumpEquip( PumpNum ).Energy = 0.0;
 			PumpEquip( PumpNum ).Power = 0.0;
@@ -1619,7 +1721,10 @@ namespace Pumps {
 		}
 
 		// note: we assume pump impeller efficiency is 78% for autosizing
-		TotalEffic = 0.78 * PumpEquip( PumpNum ).MotorEffic;
+		//TotalEffic = 0.78 * PumpEquip( PumpNum ).MotorEffic;
+
+
+
 		PlantSizNum = 0;
 		PumpSizFac = 1.0;
 		ErrorsFound = false;
@@ -1687,11 +1792,11 @@ namespace Pumps {
 				}
 				if (PlantFinalSizesOkayToReport) {
 					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
-						"Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
+						"Design Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
 				}
 				if (PlantFirstSizesOkayToReport) {
 					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
-						"Initial Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
+						"Initial Design Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
 				}
 			} else {
 				if (PlantFinalSizesOkayToReport) {
@@ -1707,17 +1812,31 @@ namespace Pumps {
 		//  auto sized or manually sized.  Thus, this must go after the flow sizing block above.
 		if ( PumpEquip( PumpNum ).NomPowerUseWasAutoSized ) {
 			if ( PumpEquip( PumpNum ).NomVolFlowRate >= SmallWaterVolFlow ) {
+				switch ( PumpEquip( PumpNum ).PowerSizingMethod ) 
+				{
+		
+				case SizePowerPerFlow: {
+					TotalEffic = PumpEquip( PumpNum ).NomPumpHead / PumpEquip( PumpNum ).PowerPerFlowScalingFactor;
+					break;
+					}
+
+				case SizePowerPerFlowPerPressure: {
+					TotalEffic = ( 1/PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor ) * PumpEquip( PumpNum ).MotorEffic;
+					break;
+					}
+				}
+
 				PumpEquip( PumpNum ).NomPowerUse = ( PumpEquip( PumpNum ).NomPumpHead * PumpEquip( PumpNum ).NomVolFlowRate ) / TotalEffic;
 			} else {
 				PumpEquip( PumpNum ).NomPowerUse = 0.0;
 			}
 			if ( PlantFinalSizesOkayToReport ) {
 				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
-					"Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
+					"Design Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
 			}
 			if ( PlantFirstSizesOkayToReport ) {
 				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
-					"Initial Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
+					"Initial Design Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
 			}
 		}
 
