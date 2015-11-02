@@ -57,7 +57,7 @@ namespace EnergyPlus {
 		Surface.deallocate( );
 	}
 
-	TEST_F( EnergyPlusFixture, TestZoneVetingSch ) {
+	TEST_F( EnergyPlusFixture, TestZoneVentingSch ) {
 
 		// Unit test for #5021
 
