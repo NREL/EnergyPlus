@@ -3069,6 +3069,7 @@
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched,   !- Pump Flow Rate Schedule Name
     ,                        !- Zone Name
+    ,                        !- Skin Loss Radiative Fraction
     PowerPerFlowPerPressure, !- Design Power Sizing Method
     ,                        !- Design Electric Power per Unit Flow Rate
     1.282051282;             !- Design Shaft Power per Unit Flow Rate per Unit Head
