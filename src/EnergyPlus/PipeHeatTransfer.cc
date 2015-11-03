@@ -56,8 +56,8 @@ namespace PipeHeatTransfer {
 	// region is solved with a detailed finite difference grid, this current model makes use of
 	// the Hanby model to simulate the actual pipe.
 
-	// Kusuda, T. & Achenbach, P. (1965), ‘Earth temperature and thermal diffusivity at
-	//     selected stations in the united states’, ASHRAE Transactions 71(1), 61-75.
+	// Kusuda, T. & Achenbach, P. (1965), 'Earth temperature and thermal diffusivity at
+	//     selected stations in the united states', ASHRAE Transactions 71(1), 61-75.
 	// Piechowski, M. (1996), A Ground Coupled Heat Pump System with Energy Storage,
 	//     PhD thesis, University of Melbourne.
 
@@ -1896,7 +1896,7 @@ namespace PipeHeatTransfer {
 		//Nusselt for natural convection for horizontal cylinder
 		//from: Correlations for Convective Heat Transfer
 		//      Dr. Bernhard Spang
-		//      Chemical Engineers’ Resource Page: http://www.cheresources.com/convection.pdf
+		//      Chemical Engineers' Resource Page: http://www.cheresources.com/convection.pdf
 		int const NumOfParamDivisions( 5 ); // intervals in property correlation
 		int const NumOfPropDivisions( 12 ); // intervals in property correlation
 

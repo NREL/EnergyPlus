@@ -4508,7 +4508,7 @@ namespace CondenserLoopTowers {
 		// "An Improved Cooling Tower Algorithm for the CoolToolsTM Simulation Model".
 		// ASHRAE Transactions 2002, V. 108, Pt. 1.
 		// York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
-		// Form 160.00-SG2 (0502). © 2002.
+		// Form 160.00-SG2 (0502). 2002.
 
 		// Using/Aliasing
 		using General::SolveRegulaFalsi;
@@ -4996,7 +4996,7 @@ namespace CondenserLoopTowers {
 		// "An Improved Cooling Tower Algorithm for the CoolToolsTM Simulation Model".
 		// ASHRAE Transactions 2002, V. 108, Pt. 1.
 		// York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
-		// Form 160.00-SG2 (0502). © 2002.
+		// Form 160.00-SG2 (0502). 2002.
 
 		// Using/Aliasing
 		using General::SolveRegulaFalsi;
@@ -5081,7 +5081,7 @@ namespace CondenserLoopTowers {
 		// "An Improved Cooling Tower Algorithm for the CoolToolsTM Simulation Model".
 		// ASHRAE Transactions 2002, V. 108, Pt. 1.
 		// York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
-		// Form 160.00-SG2 (0502). © 2002.
+		// Form 160.00-SG2 (0502). 2002.
 
 		// USE STATEMENTS:
 		// na

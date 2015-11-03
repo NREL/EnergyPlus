@@ -9476,7 +9476,7 @@ namespace ConvectionCoefficients {
 		// 1. Nusselt, W., W. Jurges. 1922. Die Kuhlung einer ebenen Wand durch einen Luftstrom
 		//     (The cooling of a plane wall by an air flow). Gesundheits Ingenieur 52, Heft, 45, Jargang.
 		// 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
-		//     envelope energy systems’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
+		//     envelope energy systems' modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
 		// USE STATEMENTS:
 		// na
@@ -9524,7 +9524,7 @@ namespace ConvectionCoefficients {
 		// REFERENCES:
 		// 1. McAdams, W.H., 1954. Heat Transmission, third ed., McGraw-Hill, New York.
 		// 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
-		//     envelope energy systems’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
+		//     envelope energy systems' modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
 		// USE STATEMENTS:
 		// na
@@ -9576,7 +9576,7 @@ namespace ConvectionCoefficients {
 		// REFERENCES:
 		// 1. Mitchell, J.W., 1976. Heat transfer from spheres and other animal forms. Biophy. J. 16 (1976) 561
 		// 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
-		//     envelope energy systems’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
+		//     envelope energy systems' modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
 		// USE STATEMENTS:
 		// na
@@ -9639,7 +9639,7 @@ namespace ConvectionCoefficients {
 		// Blocken, B., T. Defraeye, D. Derome, J. Carmeliet. 2009.
 		//  High-Resolution CFD Simulations for Forced Convection
 		//   Heat Transfer Coefficients at the Facade of a Low-Rise Building.
-		//   Building and Environment 44 (2009) 2396 – 2412.
+		//   Building and Environment 44 (2009) 2396 - 2412.
 
 		// USE STATEMENTS:
 		// na

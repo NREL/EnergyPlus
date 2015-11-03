@@ -61,7 +61,7 @@ namespace SwimmingPool {
 	// to the plant via a water loop.
 
 	// REFERENCES:
-	// 1. ASHRAE (2011). 2011 ASHRAE Handbook – HVAC Applications. Atlanta: American Society of Heating,
+	// 1. ASHRAE (2011). 2011 ASHRAE Handbook - HVAC Applications. Atlanta: American Society of Heating,
 	//    Refrigerating and Air-Conditioning Engineers, Inc., p.5.6-5.9.
 	// 2. Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd ed. Upper
 	//    Saddle River, NJ: Pearson Education, Inc., p.246.
@@ -771,7 +771,7 @@ namespace SwimmingPool {
 
 
 		// REFERENCES:
-		//  1. ASHRAE (2011). 2011 ASHRAE Handbook – HVAC Applications. Atlanta: American Society of Heating,
+		//  1. ASHRAE (2011). 2011 ASHRAE Handbook - HVAC Applications. Atlanta: American Society of Heating,
 		//     Refrigerating and Air-Conditioning Engineers, Inc., p.5.6-5.9.
 		//  2. Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd ed. Upper
 		//     Saddle River, NJ: Pearson Education, Inc., p.246.

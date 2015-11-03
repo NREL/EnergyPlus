@@ -343,7 +343,7 @@ namespace TARCOGMain {
 		Real64 const heightt, // Window height
 		Real64 const width, // Window width
 		Array1A< Real64 > const presure, // Vector of gas pressures in gaps [N/m2]
-		Array2A_int const iprop, // Matrix of gas codes – see mgas definition
+		Array2A_int const iprop, // Matrix of gas codes - see mgas definition
 		Array2A< Real64 > const frct, // Matrix of mass percentages in gap mixtures
 		Array2A< Real64 > const xgcon, // Matrix of constants for gas conductivity calc
 		Array2A< Real64 > const xgvis, // Matrix of constants for gas dynamic viscosity calc
@@ -369,17 +369,17 @@ namespace TARCOGMain {
 		Real64 & hout, // Outdoor combined film coefficient (if non-zero) [W/m2K]
 		Array1A< Real64 > hcgas, // Convective part of gap effective conductivity (including in and out)
 		Array1A< Real64 > hrgas, // Radiative part of gap effective conductivity (including in and out)
-		Real64 & shgc, // Solar heat gain coefficient – per ISO 15099
+		Real64 & shgc, // Solar heat gain coefficient - per ISO 15099
 		int & nperr, // Error code
 		std::string & ErrorMessage, // To store error message from tarcog execution
-		Real64 & shgct, // Solar heat gain coefficient – per old procedure
+		Real64 & shgct, // Solar heat gain coefficient - per old procedure
 		Real64 & tamb, // Outdoor environmental temperature [K]
 		Real64 & troom, // Indoor environmental temperature [K]
 		Array1A_int const ibc, // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor
-		Array1A< Real64 > const Atop, // Vector with areas of top openings – between SD layers and top of
-		Array1A< Real64 > const Abot, // Vector with areas of bottom openings – between SD layers and
-		Array1A< Real64 > const Al, // Vector with areas of left-hand side openings – between SD layers and
-		Array1A< Real64 > const Ar, // Vector of areas of right-hand side openings – between SD layers and
+		Array1A< Real64 > const Atop, // Vector with areas of top openings - between SD layers and top of
+		Array1A< Real64 > const Abot, // Vector with areas of bottom openings - between SD layers and
+		Array1A< Real64 > const Al, // Vector with areas of left-hand side openings - between SD layers and
+		Array1A< Real64 > const Ar, // Vector of areas of right-hand side openings - between SD layers and
 		Array1A< Real64 > const Ah, // Vector of total areas of holes for each SD [m2]
 		Array1A< Real64 > const SlatThick, // Thickness of the slat material [m]
 		Array1A< Real64 > const SlatWidth, // Slat width [m]
@@ -397,8 +397,8 @@ namespace TARCOGMain {
 		Array1A< Real64 > hg, // Gas conductance of the glazing cavity [W/m2 K]
 		Array1A< Real64 > hr, // Radiation conductance of the glazing cavity [W/m2 K]
 		Array1A< Real64 > hs, // Thermal conductance of the glazing cavity [W/m2 K]
-		Real64 & he, // External heat transfer coefficient [W/m2 K] – EN673 and ISO 10292 procedure
-		Real64 & hi, // Internal heat transfer coefficient [W/m2 K] – EN673 and ISO 10292 procedure
+		Real64 & he, // External heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
+		Real64 & hi, // Internal heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
 		Array1A< Real64 > Ra, // Vector of Rayleigh numbers, for each gap
 		Array1A< Real64 > Nu, // Vector of Nusselt numbers, for each gap
 		int const standard, // Calculation standard switch:
@@ -536,7 +536,7 @@ namespace TARCOGMain {
 		// for each gap, and for outdoor and indoor environment
 
 		/// Laminates:
-		// (0 – monolithic layer)
+		// (0 - monolithic layer)
 		// glazing layer [W/m2]
 
 		/// Gaps:
@@ -548,8 +548,8 @@ namespace TARCOGMain {
 		//   1 - have support pillar
 
 		// (used in conjunction with Thermal Model 2; otherwise, this value is ignored by TARCOG)
-		// – REAL(r64) value between 0 (SD contribution to convection is neglected) and
-		//  1 (SD treated as “closed” – as if it is a glass layer with thermal
+		// - REAL(r64) value between 0 (SD contribution to convection is neglected) and
+		//  1 (SD treated as "closed" - as if it is a glass layer with thermal
 		//  properties of SD slat material)
 
 		//Deflection
@@ -574,9 +574,9 @@ namespace TARCOGMain {
 		//                        surface)
 
 		/// Gaps:
-		//      – EN673 and ISO 10292 procedure
-		//      – EN673 and ISO 10292 procedure
-		//      – EN673 and ISO 10292 procedure
+		//      - EN673 and ISO 10292 procedure
+		//      - EN673 and ISO 10292 procedure
+		//      - EN673 and ISO 10292 procedure
 
 		/// Shading related:
 		//  SD layers [W/m.K]
