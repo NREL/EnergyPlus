@@ -1656,7 +1656,7 @@ namespace HVACUnitarySystem {
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of CalIFornia through Ernest OrlanDO Lawrence
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
@@ -1672,7 +1672,7 @@ namespace HVACUnitarySystem {
 	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
 	//     worldwide license in this data to reproduce, prepare derivative works,
 	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to DO so.
+        //     permit others to do so.
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 

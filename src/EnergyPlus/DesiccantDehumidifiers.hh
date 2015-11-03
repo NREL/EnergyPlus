@@ -557,7 +557,7 @@ namespace DesiccantDehumidifiers {
 
 	//                                 COPYRIGHT NOTICE
 
-	//     Portions Copyright © Gas Research Institute 2001.  All rights reserved.
+	//     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
 
 	//     GRI LEGAL NOTICE
 	//     Neither GRI, members of GRI nor any person or organization acting on behalf
