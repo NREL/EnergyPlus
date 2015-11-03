@@ -5372,7 +5372,7 @@ namespace MixedAir {
 	}
 
 	int
-	GetOASysNumHXs( int const OASysNumber ) // OA Sys Number
+	GetOASysNumHXs( int const OASysNumber ) 
 	{
 
 		// FUNCTION INFORMATION:

@@ -5967,8 +5967,8 @@ namespace SimAirServingZones {
 				for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 
-					FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum, CtrlZoneNum );
-					FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum, CtrlZoneNum );
+					FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum );
+					FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum );
 
 					TermUnitFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU;
 					TermUnitFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU;
@@ -6293,8 +6293,7 @@ namespace SimAirServingZones {
 
 	Real64
 	GetHeatingSATempForSizing(
-		int const IndexAirLoop, // air loop index 
-		int const IndexCtrlZone // zone index 
+		int const IndexAirLoop // air loop index 
 	)
 	{
 
@@ -6340,12 +6339,12 @@ namespace SimAirServingZones {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		
-		if( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ){
+		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ){
 		//Case: Central heating coils exist
 			
 			ReheatCoilInTempForSizing = CalcSysSizing( IndexAirLoop ).HeatSupTemp;
 			
-		} else if(( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ){
+		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
 		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
 
 			OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
@@ -6366,8 +6365,7 @@ namespace SimAirServingZones {
 
 	Real64
 	GetHeatingSATempHumRatForSizing(
-		int const IndexAirLoop, // air loop index 
-		int const IndexCtrlZone // zone index 
+		int const IndexAirLoop // air loop index 
 	)
 	{
 
@@ -6413,12 +6411,12 @@ namespace SimAirServingZones {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		
-		if( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ){
+		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ) {
 		//Case: Central heating coils exist
 			
 			ReheatCoilInHumRatForSizing = CalcSysSizing( IndexAirLoop ).HeatSupHumRat;
 		
-		} else if(( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ){
+		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
 		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
 
 			OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
@@ -6427,7 +6425,7 @@ namespace SimAirServingZones {
 			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
 		
 		} else {
-		//Case: No central heating coils; No preheating coils or OA heat-exchangers 
+		//Case: No central heating coils; No preheating coils or OA heat-exchangers
 		
 			ReheatCoilInHumRatForSizing = FinalSysSizing( IndexAirLoop ).HeatMixHumRat;
 		
