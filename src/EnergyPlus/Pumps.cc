@@ -488,9 +488,9 @@ namespace Pumps {
 
 			if ( ! lAlphaFieldBlanks( 14 ) ) {
 				if ( cAlphaArgs( 14 ) == "POWERPERFLOW" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlow;
 				} else if ( cAlphaArgs( 14 ) == "POWERPERFLOWPERPRESSURE" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlowPerPressure;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
 					ErrorsFound = true;
@@ -498,11 +498,11 @@ namespace Pumps {
 			}
 
 			if ( ! lNumericFieldBlanks( 13 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 13 );
+				PumpEquip( PumpNum ).powerPerFlowScalingFactor = rNumericArgs( 13 );
 			}
 
 			if ( ! lNumericFieldBlanks( 14 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 14 );
+				PumpEquip( PumpNum ).powerPerFlowPerPressureScalingFactor = rNumericArgs( 14 );
 			}
 
 			if ( ! lNumericFieldBlanks( 15 ) ) {
@@ -617,9 +617,9 @@ namespace Pumps {
 
 			if ( ! lAlphaFieldBlanks( 8 ) ) {
 				if ( cAlphaArgs( 8 ) == "POWERPERFLOW" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlow;
 				} else if ( cAlphaArgs( 8 ) == "POWERPERFLOWPERPRESSURE" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlowPerPressure;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
 					ErrorsFound = true;
@@ -627,11 +627,11 @@ namespace Pumps {
 			}
 
 			if ( ! lNumericFieldBlanks( 9 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 9 );
+				PumpEquip( PumpNum ).powerPerFlowScalingFactor = rNumericArgs( 9 );
 			}
 
 			if ( ! lNumericFieldBlanks( 10 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 10 );
+				PumpEquip( PumpNum ).powerPerFlowPerPressureScalingFactor = rNumericArgs( 10 );
 			}
 
 		}
@@ -714,9 +714,9 @@ namespace Pumps {
 
 			if ( ! lAlphaFieldBlanks( 6 ) ) {
 				if ( cAlphaArgs( 6 ) == "POWERPERFLOW" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlow;
 				} else if ( cAlphaArgs( 6 ) == "POWERPERFLOWPERPRESSURE" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlowPerPressure;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
 					ErrorsFound = true;
@@ -724,11 +724,11 @@ namespace Pumps {
 			}
 
 			if ( ! lNumericFieldBlanks( 11 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 11 );
+				PumpEquip( PumpNum ).powerPerFlowScalingFactor = rNumericArgs( 11 );
 			}
 
 			if ( ! lNumericFieldBlanks( 12 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 12 );
+				PumpEquip( PumpNum ).powerPerFlowPerPressureScalingFactor = rNumericArgs( 12 );
 			}
 
 		}
@@ -821,9 +821,9 @@ namespace Pumps {
 
 			if ( ! lAlphaFieldBlanks( 8 ) ) {
 				if ( cAlphaArgs( 8 ) == "POWERPERFLOW" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlow;
 				} else if ( cAlphaArgs( 8 ) == "POWERPERFLOWPERPRESSURE" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlowPerPressure;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
 					ErrorsFound = true;
@@ -831,11 +831,11 @@ namespace Pumps {
 			}
 
 			if ( ! lNumericFieldBlanks( 13 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 13 );
+				PumpEquip( PumpNum ).powerPerFlowScalingFactor = rNumericArgs( 13 );
 			}
 
 			if ( ! lNumericFieldBlanks( 14 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 14 );
+				PumpEquip( PumpNum ).powerPerFlowPerPressureScalingFactor = rNumericArgs( 14 );
 			}
 
 			PumpEquip( PumpNum ).Energy = 0.0;
@@ -928,9 +928,9 @@ namespace Pumps {
 			}
 			if ( ! lAlphaFieldBlanks( 8 ) ) {
 				if ( cAlphaArgs( 8 ) == "POWERPERFLOW" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlow;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlow;
 				} else if ( cAlphaArgs( 8 ) == "POWERPERFLOWPERPRESSURE" ) {
-					PumpEquip( PumpNum ).PowerSizingMethod = SizePowerPerFlowPerPressure;
+					PumpEquip( PumpNum ).powerSizingMethod = sizePowerPerFlowPerPressure;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", sizing method type entered is invalid.  Use one of the key choice entries." );
 					ErrorsFound = true;
@@ -938,11 +938,11 @@ namespace Pumps {
 			}
 
 			if ( ! lNumericFieldBlanks( 8 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowScalingFactor = rNumericArgs( 8 );
+				PumpEquip( PumpNum ).powerPerFlowScalingFactor = rNumericArgs( 8 );
 			}
 
 			if ( ! lNumericFieldBlanks( 9 ) ) {
-				PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor = rNumericArgs( 9 );
+				PumpEquip( PumpNum ).powerPerFlowPerPressureScalingFactor = rNumericArgs( 9 );
 			}
 			PumpEquip( PumpNum ).MinVolFlowRate = 0.0;
 			PumpEquip( PumpNum ).Energy = 0.0;
@@ -1812,16 +1812,16 @@ namespace Pumps {
 		//  auto sized or manually sized.  Thus, this must go after the flow sizing block above.
 		if ( PumpEquip( PumpNum ).NomPowerUseWasAutoSized ) {
 			if ( PumpEquip( PumpNum ).NomVolFlowRate >= SmallWaterVolFlow ) {
-				switch ( PumpEquip( PumpNum ).PowerSizingMethod ) 
+				switch ( PumpEquip( PumpNum ).powerSizingMethod ) 
 				{
 		
-				case SizePowerPerFlow: {
-					TotalEffic = PumpEquip( PumpNum ).NomPumpHead / PumpEquip( PumpNum ).PowerPerFlowScalingFactor;
+				case sizePowerPerFlow: {
+					TotalEffic = PumpEquip( PumpNum ).NomPumpHead / PumpEquip( PumpNum ).powerPerFlowScalingFactor;
 					break;
 					}
 
-				case SizePowerPerFlowPerPressure: {
-					TotalEffic = ( 1/PumpEquip( PumpNum ).PowerPerFlowPerPressureScalingFactor ) * PumpEquip( PumpNum ).MotorEffic;
+				case sizePowerPerFlowPerPressure: {
+					TotalEffic = ( 1/PumpEquip( PumpNum ).powerPerFlowPerPressureScalingFactor ) * PumpEquip( PumpNum ).MotorEffic;
 					break;
 					}
 				}
@@ -1838,6 +1838,18 @@ namespace Pumps {
 				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
 					"Initial Design Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
 			}
+		}
+
+		if ( PumpEquip( PumpNum ).minVolFlowRateWasAutosized ) {
+			PumpEquip( PumpNum ).MinVolFlowRate = PumpEquip( PumpNum ).NomVolFlowRate * PumpEquip( PumpNum ).MinVolFlowRateFrac;
+			if (PlantFinalSizesOkayToReport) {
+					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
+						"Design Minimum Flow Rate [m3/s]", PumpEquip( PumpNum ).MinVolFlowRate );
+				}
+				if (PlantFirstSizesOkayToReport) {
+					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name,
+						"Initial Design Minimum Flow Rate [m3/s]", PumpEquip( PumpNum ).MinVolFlowRate );
+				}
 		}
 
 		if (PlantFinalSizesOkayToReport) {

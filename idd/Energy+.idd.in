@@ -59029,9 +59029,10 @@ Pump:VariableSpeed,
   N9 , \field Coefficient 4 of the Part Load Performance Curve
        \default 0.0
   N10, \field Design Minimum Flow Rate
-        \note When autosized the scaling factor is the input field Design Minimum Flow Rate Sizing Factor
+        \note When autosized the scaling factor is the input field Design Minimum Flow Rate Fraction
         \units m3/s
         \autosizable
+        \default autosize
         \ip-units gal/min
   A4 , \field Pump Control Type
         \type choice
@@ -59120,7 +59121,7 @@ Pump:VariableSpeed,
         \units W/((m3/s)-Pa)
         \ip-units W/((gal/min)-ftH20)
         \minimum> 0
-  N15;  \field Design Minimum Flow Rate Sizing Factor
+  N15;  \field Design Minimum Flow Rate Fraction
         \type real
         \note Used to size Design Minimum Flow Rate
         \default 0.0

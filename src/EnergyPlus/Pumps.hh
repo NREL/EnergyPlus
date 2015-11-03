@@ -39,8 +39,8 @@ namespace Pumps {
 	extern Array1D_string const cPumpTypes;
 
 	enum powerSizingMethodEnum {
-		SizePowerPerFlow,
-		SizePowerPerFlowPerPressure
+		sizePowerPerFlow,
+		sizePowerPerFlowPerPressure
 	};
 
 
@@ -172,9 +172,9 @@ namespace Pumps {
 		Real64 EMSPressureOverrideValue; // EMS value to use for pressure [Pa]
 		Real64 NomPowerUse; // design nominal capacity of Pump
 		bool NomPowerUseWasAutoSized; // true if power was autosize on input
-		powerSizingMethodEnum PowerSizingMethod; // which method is used for sizing nominal power use
-		Real64 PowerPerFlowScalingFactor; // design electric power per unit flow rate
-		Real64 PowerPerFlowPerPressureScalingFactor; // design shaft power per unit flow rate per unit head
+		powerSizingMethodEnum powerSizingMethod; // which method is used for sizing nominal power use
+		Real64 powerPerFlowScalingFactor; // design electric power per unit flow rate
+		Real64 powerPerFlowPerPressureScalingFactor; // design shaft power per unit flow rate per unit head
 		Real64 MotorEffic; // efficiency of the motor
 		Real64 PumpEffic; // efficiency of the pump
 		Real64 FracMotorLossToFluid; // ?????
@@ -233,9 +233,9 @@ namespace Pumps {
 			EMSPressureOverrideValue( 0.0 ),
 			NomPowerUse( 0.0 ),
 			NomPowerUseWasAutoSized( false ),
-			PowerSizingMethod( SizePowerPerFlowPerPressure ),
-			PowerPerFlowScalingFactor( 348701.1 ),
-			PowerPerFlowPerPressureScalingFactor( 1.282051282 ),
+			powerSizingMethod( sizePowerPerFlowPerPressure ),
+			powerPerFlowScalingFactor( 348701.1 ), // 22 W/gpm
+			powerPerFlowPerPressureScalingFactor( 1/0.78 ), // legacy impeller efficiency
 			MotorEffic( 0.0 ),
 			PumpEffic( 0.0 ),
 			FracMotorLossToFluid( 0.0 ),
@@ -296,9 +296,9 @@ namespace Pumps {
 			Real64 const EMSPressureOverrideValue, // EMS value to use for pressure [Pa]
 			Real64 const NomPowerUse, // design nominal capacity of Pump
 			bool const NomPowerUseWasAutoSized, // true if previous is autosize on input
-			powerSizingMethodEnum const PowerSizingMethod, // which method is used for sizing nominal power use
-			Real64 const PowerPerFlowScalingFactor, // design electric power per unit flow rate
-			Real64 const PowerPerFlowPerPressureScalingFactor, // design shaft power per unit flow rate per unit head
+			powerSizingMethodEnum const powerSizingMethod, // which method is used for sizing nominal power use
+			Real64 const powerPerFlowScalingFactor, // design electric power per unit flow rate
+			Real64 const powerPerFlowPerPressureScalingFactor, // design shaft power per unit flow rate per unit head
 			Real64 const MotorEffic, // efficiency of the motor
 			Real64 const PumpEffic, // efficiency of the pump
 			Real64 const FracMotorLossToFluid, // ?????
@@ -357,9 +357,9 @@ namespace Pumps {
 			EMSPressureOverrideValue( EMSPressureOverrideValue ),
 			NomPowerUse( NomPowerUse ),
 			NomPowerUseWasAutoSized( NomPowerUseWasAutoSized ),
-			PowerSizingMethod( PowerSizingMethod ),
-			PowerPerFlowScalingFactor( PowerPerFlowScalingFactor ),
-			PowerPerFlowPerPressureScalingFactor( PowerPerFlowPerPressureScalingFactor ),
+			powerSizingMethod( powerSizingMethod ),
+			powerPerFlowScalingFactor( powerPerFlowScalingFactor ),
+			powerPerFlowPerPressureScalingFactor( powerPerFlowPerPressureScalingFactor ),
 			MotorEffic( MotorEffic ),
 			PumpEffic( PumpEffic ),
 			FracMotorLossToFluid( FracMotorLossToFluid ),
