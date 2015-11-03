@@ -21,7 +21,7 @@ Currently, the conduction finite difference algorithm (HeatBalanceAlgorithm,Cond
 
 ## Approach ##
 
-At the end of the conduction finite difference (CondFD) solution for each timestep, the surface inside face conduction heat flux and the node temperatures will be used to calculate the heat flux between nodes.  The figure below illustrates the conduction finite difference node layout (from the Engineering Reference).
+At the end of the conduction finite difference (CondFD) solution for each timestep, the surface inside face conduction heat flux and the node temperatures will be used to calculate the heat flux between nodes.  The heat flux "between nodes" is defined as the heat flux across the plane which is the interface between the control volumes of two nodes.  The figure below illustrates the conduction finite difference node layout (from the Engineering Reference).
 
 
 ![CondFD Nodes adapted from Engineering Reference](CondFDNodeFluxOutput-CondFDNodes-image176.png)
