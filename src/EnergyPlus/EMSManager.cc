@@ -678,6 +678,7 @@ namespace EMSManager {
 					} else {
 						VariableNum = NewEMSVariable( cAlphaArgs( 1 ), 0 );
 						Sensor( SensorNum ).VariableNum = VariableNum;
+						ErlVariable( VariableNum ).Value.initialized = true; 
 					}
 				}
 

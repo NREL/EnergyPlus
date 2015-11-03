@@ -15,6 +15,7 @@
 
 // EnergyPlus Headers
 #include <RuntimeLanguageProcessor.hh>
+#include <EMSManager.hh>
 #include <CurveManager.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
@@ -1980,6 +1981,7 @@ namespace RuntimeLanguageProcessor {
 		Real64 tmpRANDG; // local temporary for gaussian random number
 		Real64 UnitCircleTest; // local temporary for Box-Muller algo
 		Real64 TestValue; // local temporary
+		bool errorsFound;
 
 		// Object Data
 		Array1D< ErlValueType > Operand;
@@ -1987,6 +1989,7 @@ namespace RuntimeLanguageProcessor {
 		static std::string const EMSBuiltInFunction( "EMS Built-In Function" );
 
 		// FLOW:
+		errorsFound = false;
 		ReturnValue.Type = ValueNumber;
 		ReturnValue.Number = 0.0;
 
@@ -2004,9 +2007,19 @@ namespace RuntimeLanguageProcessor {
 					} else { // value has never been set
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "Variable " + ErlVariable( Operand( OperandNum ).Variable ).Name + " used in expression has not been initialized!" ;
+						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+
+							ShowSevereError( "Variable " + ErlVariable( Operand( OperandNum ).Variable ).Name + " used in expression has not been initialized!");
+							ShowContinueErrorTimeStamp( "" );
+							errorsFound = true;
+						}
 					}
 					
 				}
+				if ( errorsFound ) {
+					ShowFatalError("EvaluateExpression: Program terminated because of uninitialized variable in EMS Program. ");
+				}
+
 			}
 
 			if ( ReturnValue.Type != ValueError) {
@@ -2817,6 +2830,7 @@ namespace RuntimeLanguageProcessor {
 						// register the trend pointer in ErlVariable.
 						ErlVariable( VariableNum ).Value.TrendVariable = true;
 						ErlVariable( VariableNum ).Value.TrendVarPointer = TrendNum;
+						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this, 
 					}
 
 					NumTrendSteps = std::floor( rNumericArgs( 1 ) );
