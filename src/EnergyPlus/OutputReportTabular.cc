@@ -6475,11 +6475,11 @@ namespace OutputReportTabular {
 			columnWidth = 14; //array assignment - same for all columns
 			tableBody.allocate( curIntervalCount + 3, 39 );
 			tableBody = "";
-			columnHead = "-";
+			columnHead = "- [hr]";
 			tableBody( 1, 1 ) = "less than";
 			tableBody( 1, 2 ) = RealToStr( curIntervalStart, numIntervalDigits );
 			for ( nCol = 1; nCol <= curIntervalCount; ++nCol ) {
-				columnHead( nCol + 1 ) = IntToStr( nCol );
+				columnHead( nCol + 1 ) = IntToStr( nCol ) + " [hr]";
 				//beginning of interval
 				tableBody( nCol + 1, 1 ) = RealToStr( curIntervalStart + ( nCol - 1 ) * curIntervalSize, numIntervalDigits ) + "<=";
 				//end of interval
