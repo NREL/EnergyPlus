@@ -224,6 +224,7 @@ namespace OutputReportTabular {
 	bool displayAdaptiveComfort( false );
 	bool displaySourceEnergyEndUseSummary( false );
 	bool displayZoneComponentLoadSummary( false );
+	bool doAllocateLoadCompArrays( true );
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -424,6 +425,10 @@ namespace OutputReportTabular {
 	clear_state() {
 		GetInput = true;
 		firstTimeGatherHGReport = true;
+		doAllocateLoadCompArrays = true;
+		loadConvectedNormal.deallocate();
+		decayCurveCool.deallocate();
+		decayCurveHeat.deallocate();
 	}
 
 	void
@@ -9186,13 +9191,21 @@ namespace OutputReportTabular {
 		static std::string Wm2_unitName;
 
 		//zone summary total
-		static Array1D< Real64 > zstArea( 4, 0.0 );
-		static Array1D< Real64 > zstVolume( 4, 0.0 );
-		static Array1D< Real64 > zstWallArea( 4, 0.0 );
-		static Array1D< Real64 > zstWindowArea( 4, 0.0 );
-		static Array1D< Real64 > zstLight( 4, 0.0 );
-		static Array1D< Real64 > zstPeople( 4, 0.0 );
-		static Array1D< Real64 > zstPlug( 4, 0.0 );
+		static Array1D< Real64 > zstArea( 4 );
+		static Array1D< Real64 > zstVolume( 4 );
+		static Array1D< Real64 > zstWallArea( 4 );
+		static Array1D< Real64 > zstWindowArea( 4 );
+		static Array1D< Real64 > zstLight( 4 );
+		static Array1D< Real64 > zstPeople( 4 );
+		static Array1D< Real64 > zstPlug( 4 );
+
+		zstArea = 0.0;
+		zstVolume = 0.0;
+		zstWallArea = 0.0;
+		zstWindowArea = 0.0;
+		zstLight = 0.0;
+		zstPeople  = 0.0;
+		zstPlug = 0.0;
 
 		// misc
 		Real64 pdiff;
@@ -10532,9 +10545,8 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool DoAllocate( true );
 
-		if ( DoAllocate ) {
+		if ( doAllocateLoadCompArrays ) {
 			//For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
 			radiantPulseUsed.allocate( {0,TotDesDays + TotRunDesPersDays}, NumOfZones );
 			radiantPulseUsed = 0.0;
@@ -10626,7 +10638,7 @@ namespace OutputReportTabular {
 			feneSolarDelaySeq = 0.0;
 			surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			surfDelaySeq = 0.0;
-			DoAllocate = false;
+			doAllocateLoadCompArrays = false;
 		}
 	}
 
