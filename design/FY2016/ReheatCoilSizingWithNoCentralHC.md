@@ -14,7 +14,7 @@ The current reheat coil sizing approach in EnergyPlus is designed assuming there
 
 ## E-mail and  Conference Call Conclusions ##
 
-* Mike Griffith: Can't we change the value of TermUnitFinalZoneSizing().DesHeatCoilInTempTU for different system configurations, instead of CoilInTemp in terminal unit sizing?
+* Brent Griffith: Can't we change the value of TermUnitFinalZoneSizing().DesHeatCoilInTempTU for different system configurations, instead of CoilInTemp in terminal unit sizing?
 
 Yes, it is a better solution to modify the value of TermUnitFinalZoneSizing().DesHeatCoilInTempTU which is at a root level. We didn't consider this solution in the original design because we thought this parameter may be used for other purposes in addition to the reheat coil sizing. But after a thorough check, we think it is fine to change its value.
 
