@@ -156,51 +156,6 @@ namespace HeatBalFiniteDiffManager {
 			MaxNodeDelTemp( 0.0 )
 		{}
 
-		// Member Constructor
-		SurfaceDataFD(
-			Array1< Real64 > const & T,
-			Array1< Real64 > const & TOld,
-			Array1< Real64 > const & TT,
-			Array1< Real64 > const & Rhov,
-			Array1< Real64 > const & RhovOld,
-			Array1< Real64 > const & RhoT,
-			Array1< Real64 > const & TD,
-			Array1< Real64 > const & TDT,
-			Array1< Real64 > const & TDTLast,
-			Array1< Real64 > const & TDOld,
-			Array1< Real64 > const & TDreport,
-			Array1< Real64 > const & RH,
-			Array1< Real64 > const & RHreport,
-			Array1< Real64 > const & EnthOld, // Current node enthalpy
-			Array1< Real64 > const & EnthNew, // Node enthalpy at new time
-			Array1< Real64 > const & EnthLast,
-			Array1< Real64 > const & QDreport, // Node to node heat flux for reporting [W/m2]
-			Array1< Real64 > const & CpDelXRhoS, // Current node Cp * DelX * RhoS / Delt 
-			int const GSloopCounter, // count of inner loop iterations
-			int const GSloopErrorCount, // recurring error counter
-			Real64 const MaxNodeDelTemp // largest change in node temps after calc
-		) :
-			T( T ),
-			TOld( TOld ),
-			TT( TT ),
-			Rhov( Rhov ),
-			RhovOld( RhovOld ),
-			RhoT( RhoT ),
-			TD( TD ),
-			TDT( TDT ),
-			TDTLast( TDTLast ),
-			TDOld( TDOld ),
-			TDreport( TDreport ),
-			RH( RH ),
-			RHreport( RHreport ),
-			EnthOld( EnthOld ),
-			EnthNew( EnthNew ),
-			EnthLast( EnthLast ),
-			GSloopCounter( GSloopCounter ),
-			GSloopErrorCount( GSloopErrorCount ),
-			MaxNodeDelTemp( MaxNodeDelTemp )
-		{}
-
 		inline
 		void
 		UpdateMoistureBalance()
