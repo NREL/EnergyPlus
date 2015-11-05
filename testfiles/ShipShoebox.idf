@@ -296,11 +296,11 @@
 
   Output:VariableDictionary,IDF;
 
-  Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,hourly;
+!  Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,hourly;
 
-  Output:Variable,*,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient,hourly;
+!  Output:Variable,*,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient,hourly;
 
-  Output:Variable,*,Zone Air Temperature,hourly;
+!  Output:Variable,*,Zone Air Temperature,hourly;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
@@ -310,3 +310,8 @@
 
   Output:Diagnostics,
     DisplayUnusedSchedules;  !- Key 1
+
+Output:Variable,*,Site Solar Azimuth Angle,hourly; !- Zone Average [deg]
+Output:Variable,*,Site Solar Altitude Angle,hourly; !- Zone Average [deg]
+Output:Variable,*,Site Solar Hour Angle,hourly; !- Zone Average [deg]
+Output:Variable,*,Surface Outside Face Beam Solar Incident Angle Cosine Value,hourly; !- Zone Average []
