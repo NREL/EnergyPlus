@@ -51,6 +51,7 @@ set( test_src
   ManageElectricPower.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
+  Pumps.unit.cc
   PurchasedAirManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
