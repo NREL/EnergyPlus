@@ -20,6 +20,7 @@
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <EMSManager.hh>
 
 namespace EnergyPlus {
 
@@ -1129,13 +1130,13 @@ namespace NodeInputManager {
 				nodeFluidNames.push_back( GetGlycolNameByIndex( Node( iNode ).FluidIndex ) );
 				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
 					if ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || ReqRepVars( iReq ).Key.empty() ) {
-						if ( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
+						if ( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) || EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Wetbulb Temperature" ) ) {
 							NodeWetBulbRepReq( iNode ) = true;
 							NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) ) {
+						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) || EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Relative Humidity" ) ) {
 							NodeRelHumidityRepReq( iNode ) = true;
 							NodeRelHumiditySchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
+						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) || EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Dewpoint Temperature" ) ) {
 							NodeDewPointRepReq( iNode ) = true;
 							NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
 						}
