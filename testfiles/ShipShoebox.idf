@@ -27,8 +27,8 @@
     Annual Run,              !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    12,                      !- End Month
-    31,                      !- End Day of Month
+    2,                      !- End Month
+    28,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -296,11 +296,11 @@
 
   Output:VariableDictionary,IDF;
 
-!  Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,hourly;
+!  Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,hourly,ReportingSchedule;
 
-!  Output:Variable,*,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient,hourly;
+!  Output:Variable,*,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient,hourly,ReportingSchedule;
 
-!  Output:Variable,*,Zone Air Temperature,hourly;
+!  Output:Variable,*,Zone Air Temperature,hourly,ReportingSchedule;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
@@ -311,7 +311,46 @@
   Output:Diagnostics,
     DisplayUnusedSchedules;  !- Key 1
 
-Output:Variable,*,Site Solar Azimuth Angle,hourly; !- Zone Average [deg]
-Output:Variable,*,Site Solar Altitude Angle,hourly; !- Zone Average [deg]
-Output:Variable,*,Site Solar Hour Angle,hourly; !- Zone Average [deg]
-Output:Variable,*,Surface Outside Face Beam Solar Incident Angle Cosine Value,hourly; !- Zone Average []
+Output:Variable,*,Site Solar Azimuth Angle,hourly,ReportingSchedule; !- Zone Average [deg]
+Output:Variable,*,Site Solar Altitude Angle,hourly,ReportingSchedule; !- Zone Average [deg]
+Output:Variable,*,Site Solar Hour Angle,hourly,ReportingSchedule; !- Zone Average [deg]
+Output:Variable,*,Surface Outside Face Beam Solar Incident Angle Cosine Value,hourly,ReportingSchedule; !- Zone Average []
+
+! Reporting schedule, since our CMake forces a full annual
+Schedule:Compact,
+    ReportingSchedule,
+    Any Number,
+    Through: 02/28,
+    For: AllDays,
+    Until: 24:00,
+    1,
+    Through: 12/31,
+    For: AllDays,
+    Until: 24:00,
+    0;
+
+!**** MOVING SHIP! ****!
+! Currently a super-hack, but it will let us test it out before we spend a lot of time on the actual interface
+Schedule:Compact,
+    MPACTVARYINGLATITUDE,
+    Any Number,
+    Through: 01/31,
+    For: AllDays,
+    Until: 24:00,
+    25,
+    Through: 12/31,
+    For: AllDays,
+    Until: 24:00,
+    45;
+
+Schedule:Compact,
+    MPACTVARYINGLONGITUDE,
+    Any Number,
+    Through: 01/31,
+    For: AllDays,
+    Until: 24:00,
+    -95,
+    Through: 12/31,
+    For: AllDays,
+    Until: 24:00,
+    -102;

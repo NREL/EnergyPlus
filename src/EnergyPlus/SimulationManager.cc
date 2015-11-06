@@ -78,6 +78,7 @@ extern "C" {
 #include <PlantPipingSystemsManager.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
+#include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 #include <SizingManager.hh>
 #include <SolarShading.hh>
@@ -397,6 +398,8 @@ namespace SimulationManager {
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
+		int varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex("MPACTVARYINGLATITUDE");
+		int varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex("MPACTVARYINGLONGITUDE");
 
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if ( DoHVACSizingSimulation ) {
@@ -487,6 +490,14 @@ namespace SimulationManager {
 
 						if ( AnyUnderwaterBoundaries ) {
 						    WeatherManager::UpdateUnderwaterBoundaries();
+						}
+
+						if ( varyingLocationSchedIndexLat > 0 ) {
+							DataEnvironment::Latitude = ScheduleManager::GetCurrentScheduleValue( varyingLocationSchedIndexLat );
+						}
+
+						if ( varyingLocationSchedIndexLong > 0 ) {
+							DataEnvironment::Longitude = ScheduleManager::GetCurrentScheduleValue( varyingLocationSchedIndexLong );
 						}
 
 						BeginTimeStepFlag = true;
