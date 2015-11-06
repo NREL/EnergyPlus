@@ -6803,7 +6803,9 @@ namespace OutputReportTabular {
 
 			// get change in overall state of charge for electrical storage devices.
 			if ( NumElecStorageDevices > 0 ) {
-				OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored( ) ) - sum( ElecStorage.ThisTimeStepStateOfCharge( ) ) ) + gatherElecStorage;
+				// All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not necessary
+				// OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored( ) ) - sum( ElecStorage.ThisTimeStepStateOfCharge( ) ) ) + gatherElecStorage;
+				OverallNetEnergyFromStorage = gatherElecStorage;
 				OverallNetEnergyFromStorage /= largeConversionFactor;
 			} else {
 				OverallNetEnergyFromStorage = 0.0;
