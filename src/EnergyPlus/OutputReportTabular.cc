@@ -274,6 +274,8 @@ namespace OutputReportTabular {
 	Real64 gatherElecPurchased( 0.0 );
 	int meterNumElecSurplusSold( 0 );
 	Real64 gatherElecSurplusSold( 0.0 );
+	int meterNumElecStorage = ( 0 );
+	Real64 gatherElecStorage = ( 0.0 );
 	// for on site thermal source components on BEPS report
 	int meterNumWaterHeatRecovery( 0 );
 	Real64 gatherWaterHeatRecovery( 0.0 );
@@ -1883,6 +1885,7 @@ namespace OutputReportTabular {
 			meterNumPowerPV = GetMeterIndex( "Photovoltaic:ElectricityProduced" );
 			meterNumPowerWind = GetMeterIndex( "WindTurbine:ElectricityProduced" );
 			meterNumPowerHTGeothermal = GetMeterIndex( "HTGeothermal:ElectricityProduced" );
+			meterNumElecStorage = GetMeterIndex( "ElectricStorage:ElectricityProduced" );
 			meterNumElecProduced = GetMeterIndex( "ElectricityProduced:Facility" );
 			meterNumElecPurchased = GetMeterIndex( "ElectricityPurchased:Facility" );
 			meterNumElecSurplusSold = GetMeterIndex( "ElectricitySurplusSold:Facility" );
@@ -1901,6 +1904,7 @@ namespace OutputReportTabular {
 			gatherElecProduced = 0.0;
 			gatherElecPurchased = 0.0;
 			gatherElecSurplusSold = 0.0;
+			gatherElecStorage = 0.0;
 
 			// get meter numbers for onsite thermal components on BEPS report
 			meterNumWaterHeatRecovery = GetMeterIndex( "HeatRecovery:EnergyTransfer" );
@@ -3973,6 +3977,7 @@ namespace OutputReportTabular {
 			gatherElecProduced += GetCurrentMeterValue( meterNumElecProduced );
 			gatherElecPurchased += GetCurrentMeterValue( meterNumElecPurchased );
 			gatherElecSurplusSold += GetCurrentMeterValue( meterNumElecSurplusSold );
+			gatherElecStorage += GetCurrentMeterValue( meterNumElecStorage );
 			// gather the onsite thermal components
 			gatherWaterHeatRecovery += GetCurrentMeterValue( meterNumWaterHeatRecovery );
 			gatherAirHeatRecoveryCool += GetCurrentMeterValue( meterNumAirHeatRecoveryCool );
@@ -6798,7 +6803,7 @@ namespace OutputReportTabular {
 
 			// get change in overall state of charge for electrical storage devices.
 			if ( NumElecStorageDevices > 0 ) {
-				OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge() ) );
+				OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored( ) ) - sum( ElecStorage.ThisTimeStepStateOfCharge( ) ) ) + gatherElecStorage;
 				OverallNetEnergyFromStorage /= largeConversionFactor;
 			} else {
 				OverallNetEnergyFromStorage = 0.0;
@@ -13219,6 +13224,7 @@ namespace OutputReportTabular {
 		gatherElecProduced = 0.0;
 		gatherElecPurchased = 0.0;
 		gatherElecSurplusSold = 0.0;
+		gatherElecStorage = 0.0;
 		gatherWaterHeatRecovery = 0.0;
 		gatherAirHeatRecoveryCool = 0.0;
 		gatherAirHeatRecoveryHeat = 0.0;
