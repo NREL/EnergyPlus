@@ -101,6 +101,10 @@ namespace DataConvergParams {
 
 		// Default Constructor
 		HVACNodeConvergLogStruct() :
+			NodeNum( 0 ),
+			NotConvergedHumRate( false ),
+			NotConvergedMassFlow( false ),
+			NotConvergedTemp( false ),
 			HumidityRatio( ConvergLogStackDepth ),
 			MassFlowRate( ConvergLogStackDepth ),
 			Temperature( ConvergLogStackDepth )
