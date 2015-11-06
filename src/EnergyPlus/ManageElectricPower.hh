@@ -914,6 +914,7 @@ namespace ManageElectricPower {
 		Real64 TotalElectricDemand; // Current Total Electric Demand (W)
 		Real64 ElecProducedPVRate; // Current Rate of PV Produced from the Arrays (W)
 		Real64 ElecProducedWTRate; // Current Rate of Wind Turbine Produced (W)
+		Real64 ElecProducedStorageRate; // Current Rate of power to(-)/from(+) storage (W)
 
 		// Default Constructor
 		WholeBuildingElectricPowerSummary() :
@@ -930,7 +931,8 @@ namespace ManageElectricPower {
 			TotalHVACElecDemand( 0.0 ),
 			TotalElectricDemand( 0.0 ),
 			ElecProducedPVRate( 0.0 ),
-			ElecProducedWTRate( 0.0 )
+			ElecProducedWTRate( 0.0 ),
+			ElecProducedStorageRate( 0.0 )
 		{}
 
 		// Member Constructor
@@ -948,7 +950,8 @@ namespace ManageElectricPower {
 			Real64 const TotalHVACElecDemand, // Current Total HVAC Electric Demand (W)
 			Real64 const TotalElectricDemand, // Current Total Electric Demand (W)
 			Real64 const ElecProducedPVRate, // Current Rate of PV Produced from the Arrays (W)
-			Real64 const ElecProducedWTRate // Current Rate of Wind Turbine Produced (W)
+			Real64 const ElecProducedWTRate, // Current Rate of Wind Turbine Produced (W)
+			Real64 const ElecProducedStorageRate // Current Rate of power to(-)/from(+) storage (W)
 		) :
 			Name( Name ),
 			ElectricityProd( ElectricityProd ),
@@ -963,7 +966,8 @@ namespace ManageElectricPower {
 			TotalHVACElecDemand( TotalHVACElecDemand ),
 			TotalElectricDemand( TotalElectricDemand ),
 			ElecProducedPVRate( ElecProducedPVRate ),
-			ElecProducedWTRate( ElecProducedWTRate )
+			ElecProducedWTRate( ElecProducedWTRate ),
+			ElecProducedStorageRate( ElecProducedStorageRate )
 		{}
 
 	};

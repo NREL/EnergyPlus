@@ -130,6 +130,7 @@ namespace ManageElectricPower {
 	int ElecProducedCoGenIndex( 0 );
 	int ElecProducedPVIndex( 0 );
 	int ElecProducedWTIndex( 0 );
+	int ElecProducedStorageIndex( 0 );
 
 	int MaxRainflowArrayBounds( 100 );
 	int MaxRainflowArrayInc( 100 );
@@ -208,6 +209,7 @@ namespace ManageElectricPower {
 		static Real64 ElecFacilityHVAC( 0.0 );
 		static Real64 ElecProducedPV( 0.0 );
 		static Real64 ElecProducedWT( 0.0 );
+		static Real64 ElecProducedStorage( 0.0 );
 		static Real64 RemainingLoad( 0.0 ); // Remaining electric power load to be met by a load center
 		static Real64 WholeBldgRemainingLoad( 0.0 ); // Remaining electric power load for the building
 		static Real64 RemainingThermalLoad( 0.0 ); // Remaining thermal load to be met
@@ -236,6 +238,7 @@ namespace ManageElectricPower {
 			ElecProducedCoGenIndex = GetMeterIndex( "Cogeneration:ElectricityProduced" );
 			ElecProducedPVIndex = GetMeterIndex( "Photovoltaic:ElectricityProduced" );
 			ElecProducedWTIndex = GetMeterIndex( "WindTurbine:ElectricityProduced" );
+			ElecProducedStorageIndex = GetMeterIndex( "ElectricStorage:ElectricityProduced" );
 
 			for ( LoadCenterNum = 1; LoadCenterNum <= NumLoadCenters; ++LoadCenterNum ) {
 				ElecLoadCenter( LoadCenterNum ).DemandMeterPtr = GetMeterIndex( ElecLoadCenter( LoadCenterNum ).DemandMeterName );
@@ -276,6 +279,7 @@ namespace ManageElectricPower {
 			WholeBldgElectSummary.TotalElectricDemand = 0.0;
 			WholeBldgElectSummary.ElecProducedPVRate = 0.0;
 			WholeBldgElectSummary.ElecProducedWTRate = 0.0;
+			WholeBldgElectSummary.ElecProducedStorageRate = 0.0;
 
 			if ( NumLoadCenters > 0 ) {
 				ElecLoadCenter.DCElectricityProd() = 0.0;
@@ -334,12 +338,14 @@ namespace ManageElectricPower {
 		// deprecate this PV stuff?
 		ElecProducedPV = GetInstantMeterValue( ElecProducedPVIndex, 2 );
 		ElecProducedWT = GetInstantMeterValue( ElecProducedWTIndex, 2 );
+		ElecProducedStorage = GetInstantMeterValue( ElecProducedStorageIndex, 2 );
 
 		WholeBldgElectSummary.TotalBldgElecDemand = ElecFacilityBldg / TimeStepZoneSec;
 		WholeBldgElectSummary.TotalHVACElecDemand = ElecFacilityHVAC / ( TimeStepSys * SecInHour );
 		WholeBldgElectSummary.TotalElectricDemand = WholeBldgElectSummary.TotalBldgElecDemand + WholeBldgElectSummary.TotalHVACElecDemand;
 		WholeBldgElectSummary.ElecProducedPVRate = ElecProducedPV / ( TimeStepSys * SecInHour );
 		WholeBldgElectSummary.ElecProducedWTRate = ElecProducedWT / ( TimeStepSys * SecInHour );
+		WholeBldgElectSummary.ElecProducedStorageRate = ElecProducedStorage / ( TimeStepSys * SecInHour );;
 
 		WholeBldgRemainingLoad = WholeBldgElectSummary.TotalElectricDemand; //- WholeBldgElectSummary%ElecProducedPVRate
 
@@ -2457,7 +2463,7 @@ namespace ManageElectricPower {
 		// Flow
 
 		ElecProducedCoGen = GetInstantMeterValue( ElecProducedCoGenIndex, 2 ); //whole building
-		ElecProducedFacility = ElecProducedCoGen + WholeBldgElectSummary.ElecProducedPVRate * TimeStepSys * SecInHour + WholeBldgElectSummary.ElecProducedWTRate * TimeStepSys * SecInHour; //whole building
+		ElecProducedFacility = ElecProducedCoGen + ( WholeBldgElectSummary.ElecProducedPVRate + WholeBldgElectSummary.ElecProducedWTRate + WholeBldgElectSummary.ElecProducedStorageRate ) * TimeStepSys * SecInHour; //whole building
 
 		WholeBldgElectSummary.ElectricityProd = ElecProducedFacility; //whole building
 		WholeBldgElectSummary.ElectProdRate = ElecProducedFacility / ( TimeStepSys * SecInHour ); //whole building
