@@ -33,10 +33,8 @@ namespace Fans {
 	extern int NumFans; // The Number of Fans found in the Input
 	extern int NumNightVentPerf; // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
 	extern bool GetFanInputFlag; // Flag set to make sure you get input once
-	extern Array1D_bool CheckEquipName;
 	extern bool LocalTurnFansOn; // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-	extern bool LocalTurnFansOff; // If True, overrides fan schedule and LocalTurnFansOn and
-	// forces ZoneHVAC comp fans off
+	extern bool LocalTurnFansOff; // If True, overrides fan schedule and LocalTurnFansOn and forces ZoneHVAC comp fans off
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines

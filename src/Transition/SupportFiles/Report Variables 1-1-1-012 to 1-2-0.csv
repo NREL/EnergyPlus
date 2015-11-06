@@ -1,0 +1,51 @@
+1.1.1.012,1.2.0.xxx,
+48,48, This number should be the number of following lines
+"WaterHeater Tank Temp","Water Heater Tank Temperature",
+"WaterHeater Scheduled Flowrate","Water Heater Scheduled Flow Rate",
+"WaterHeater Burner Heating Demand","Water Heater Burner Heating Demand",
+"WaterHeater Burner Heating Demand Energy","Water Heater Burner Heating Demand Energy",
+"WaterHeater Burner Heating Rate","Water Heater Burner Heating Rate",
+"WaterHeater Burner Heating Energy","Water Heater Burner Heating Energy",
+"WaterHeater Tank Demand","Water Heater Tank Demand",
+"WaterHeater Tank Demand Energy","Water Heater Tank Demand Energy",
+"WaterHeater Loss Demand","Water Heater Loss Demand",
+"WaterHeater Loss Demand Energy","Water Heater Loss Demand Energy",
+"WaterHeater Scheduled Demand","Water Heater Scheduled Demand",
+"WaterHeater Scheduled Demand Energy","Water Heater Scheduled Demand Energy",
+"WaterHeater Use Side Demand","Water Heater Use Demand",
+"WaterHeater Use Side Demand Energy","Water Heater Use Demand Energy"
+"WaterHeater Total Demand","Water Heater Total Demand"
+"WaterHeater Total Demand Energy","Water Heater Total Demand Energy"
+"WaterHeater Heat Recovery Supply Rate","Water Heater Heat Recovery Supply Rate"
+"WaterHeater Heat Recovery Supply Energy","Water Heater Heat Recovery Supply Energy"
+"WaterHeater Source Side Inlet Temperature","Water Heater Source Inlet Temperature"
+"WaterHeater Source Side Outlet Temperature","Water Heater Source Outlet Temperature"
+"WaterHeater Use Side Inlet Temperature","Water Heater Use Inlet Temperature"
+"WaterHeater Use Side Outlet Temperature","Water Heater Use Outlet Temperature"
+"WaterHeater Heat Recovery Loss Rate","Water Heater Heat Recovery Loss Rate"
+"WaterHeater Heat Recovery Loss Energy","Water Heater Heat Recovery Loss Energy"
+"WaterHeater Heat Recovery Used Rate","Water Heater Heat Recovery Used Rate"
+"WaterHeater Heat Recovery Used Energy","Water Heater Heat Recovery Used Energy"
+"WaterHeater Water Consumption Rate","Water Heater Water Consumption Rate"
+"WaterHeater Water Consumption","Water Heater Water Consumption"
+"WaterHeater Electric Consumption Rate","Water Heater Electric Consumption Rate"
+"WaterHeater Electric Consumption","Water Heater Electric Consumption"
+"WaterHeater Gas Consumption Rate","Water Heater Gas Consumption Rate"
+"WaterHeater Gas Consumption","Water Heater Gas Consumption"
+"WaterHeater Diesel Consumption Rate","Water Heater Diesel Consumption Rate"
+"WaterHeater Diesel Consumption","Water Heater Diesel Consumption"
+"WaterHeater Gasoline Consumption Rate","Water Heater Gasoline Consumption Rate"
+"WaterHeater Gasoline Consumption","Water Heater Gasoline Consumption"
+"WaterHeater Coal Consumption Rate","Water Heater Coal Consumption Rate"
+"WaterHeater Coal Consumption","Water Heater Coal Consumption"
+"WaterHeater FuelOil#1 Consumption Rate","Water Heater FuelOil#1 Consumption Rate"
+"WaterHeater FuelOil#1 Consumption","Water Heater FuelOil#1 Consumption"
+"WaterHeater FuelOil#2 Consumption Rate","Water Heater FuelOil#2 Consumption Rate"
+"WaterHeater FuelOil#2 Consumption","Water Heater FuelOil#2 Consumption"
+"WaterHeater Propane Consumption Rate","Water Heater Propane Consumption Rate"
+"WaterHeater Propane Consumption","Water Heater Propane Consumption"
+"WaterHeater Steam Consumption Rate","Water Heater Steam Consumption Rate"
+"WaterHeater Steam Consumption","Water Heater Steam Consumption"
+"WaterHeater PurchasedHeating Consumption Rate","Water Heater PurchasedHeating Consumption Rate"
+"WaterHeater PurchasedHeating Consumption","Water Heater PurchasedHeating Consumption"
+"old variable name","new variable name -- put variable names in quotes and leave off units",

@@ -1381,6 +1381,77 @@ namespace HVACHXAssistedCoolingCoil {
 	}
 
 	std::string
+	GetHXDXCoilType(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad, FSEC
+		//       DATE WRITTEN   September 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up the given coil and returns the cooling coil type.  If
+		// incorrect coil type or name is given, ErrorsFound is returned as true and the name
+		// is returned as blank
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Return value
+		std::string DXCoilType; // returned type of cooling coil
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int WhichCoil;
+
+		// Obtains and allocates HXAssistedCoolingCoil related parameters from input file
+		if ( GetCoilsInputFlag ) { // First time subroutine has been called, get input data
+			// Get the HXAssistedCoolingCoil input
+			GetHXAssistedCoolingCoilInput();
+			GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+		}
+
+		if ( TotalNumHXAssistedCoils > 0 ) {
+			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+		} else {
+			WhichCoil = 0;
+		}
+
+		if ( WhichCoil != 0 ) {
+			DXCoilType = HXAssistedCoil( WhichCoil ).CoolingCoilType;
+		} else {
+			ShowSevereError( "Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
+			ErrorsFound = true;
+			DXCoilType = "";
+		}
+
+		return DXCoilType;
+
+	}
+
+	std::string
 	GetHXDXCoilName(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type

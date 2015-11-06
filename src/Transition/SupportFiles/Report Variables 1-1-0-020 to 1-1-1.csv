@@ -1,0 +1,20 @@
+1.1.0.020,1.1.1.xxx,
+17,17, This number should be the number of following lines
+"Sensible Heat Recovery Rate","Heat Exchanger Sensible Heating Rate",
+"Sensible Heat Recovery Rate","Heat Exchanger Sensible Cooling Rate",
+"Sensible Heat Recovery Energy","Heat Exchanger Sensible Heating Energy",
+"Sensible Heat Recovery Energy","Heat Exchanger Sensible Cooling Energy",
+"Latent Heat Recovery Rate","Heat Exchanger Latent Heating Rate",
+"Latent Heat Recovery Rate","Heat Exchanger Latent Cooling Rate",
+"Latent Heat Recovery Energy","Heat Exchanger Latent Heating Energy",
+"Latent Heat Recovery Energy","Heat Exchanger Latent Cooling Energy",
+"Total Heat Recovery Rate","Heat Exchanger Total Heating Rate",
+"Total Heat Recovery Rate","Heat Exchanger Total Cooling Rate",
+"Total Heat Recovery Energy","Heat Exchanger Total Heating Energy",
+"Total Heat Recovery Energy","Heat Exchanger Total Cooling Energy",
+"Ventilation-Heat Loss","Ventilation-Sensible Heat Loss",
+"Ventilation-Heat Gain","Ventilation-Sensible Heat Gain",
+"Infiltration-Heat Loss","Infiltration-Sensible Heat Loss"
+"Infiltration-Heat Gain","Infiltration-Sensible Heat Gain"
+"ZoneSource:Electricity","Cat00:Electricity"
+'old variable name','new variable name' -- put variable names in quotes and leave off units

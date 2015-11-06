@@ -13,6 +13,7 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -47,14 +48,19 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HVACUnitarySystem.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -68,6 +74,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -79,6 +86,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -102,16 +110,22 @@ namespace EnergyPlus {
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
+		DataGlobals::err_stream = this->err_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
 
 		m_cerr_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cerr = std::unique_ptr< RedirectCerr >( new RedirectCerr( m_cerr_buffer ) );
+
+		UtilityRoutines::outputErrorHeader = false;
+
+		Psychrometrics::InitializePsychRoutines();
 	}
 
 	void EnergyPlusFixture::TearDown() {
@@ -121,6 +135,7 @@ namespace EnergyPlus {
 		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
 		DataAirLoop::clear_state();
+		DataAirSystems::clear_state();
 		DataBranchNodeConnections::clear_state();
 		DataConvergParams::clear_state();
 		DataDefineEquip::clear_state();
@@ -151,15 +166,20 @@ namespace EnergyPlus {
 		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
 		HeatBalanceSurfaceManager::clear_state();
+		HeatingCoils::clear_state();
 		HeatPumpWaterToWaterSimple::clear_state();
+		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
 		HVACManager::clear_state();
+		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
 		MixedAir::clear_state();
+		MixerComponent::clear_state();
 		NodeInputManager::clear_state();
 		OutAirNodeManager::clear_state();
+		OutdoorAirUnit::clear_state();
 		OutputProcessor::clear_state();
 		OutputReportPredefined::clear_state();
 		OutputReportTabularAnnual::clear_state();
@@ -170,6 +190,7 @@ namespace EnergyPlus {
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
 		Pipes::clear_state();
+		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		ScheduleManager::clear_state();
 		VariableSpeedCoils::clear_state();
@@ -179,7 +200,9 @@ namespace EnergyPlus {
 		SizingManager::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
+		SurfaceGeometry::clear_state();
 		SystemAvailabilityManager::clear_state();
+		ThermalComfort::clear_state();
 		VariableSpeedCoils::clear_state();
 		WaterCoils::clear_state();
 		WaterThermalTanks::clear_state();
@@ -193,6 +216,7 @@ namespace EnergyPlus {
 			flags.DISPOSE( "DELETE" );
 			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
 			gio::close( DataGlobals::OutputFileStandard, flags );
+			gio::close( DataGlobals::OutputStandardError, flags );
 			gio::close( DataGlobals::OutputFileInits, flags );
 			gio::close( DataGlobals::OutputFileDebug, flags );
 			gio::close( DataGlobals::OutputFileZoneSizing, flags );
@@ -274,6 +298,14 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
+	bool EnergyPlusFixture::compare_err_stream( std::string const & expected_string, bool reset_stream ) {
+		auto const stream_str = this->err_stream->str();
+		EXPECT_EQ( expected_string, stream_str );
+		bool are_equal = ( expected_string == stream_str );
+		if ( reset_stream ) this->err_stream->str( std::string() );
+		return are_equal;
+	}
+
 	bool EnergyPlusFixture::compare_cout_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->m_cout_buffer->str();
 		EXPECT_EQ( expected_string, stream_str );
@@ -290,7 +322,11 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_idd_cache ) {
+	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
+		if ( idf_snippet.empty() ) {
+			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
+			return true;
+		}
 		using namespace InputProcessor;
 
 		// Parse idf snippet to look for Building and GlobalGeometryRules. If not present then this adds a default implementation
@@ -299,7 +335,7 @@ namespace EnergyPlus {
 		IdfParser parser;
 		bool success = false;
 		auto const parsed_idf = parser.decode( idf_snippet, success );
-		EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
+		if ( use_assertions ) EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
 		bool found_building = false;
 		bool found_global_geo = false;
 		if ( success ) {
@@ -315,7 +351,7 @@ namespace EnergyPlus {
 				}
 			}
 		}
-		std::string idf = idf_snippet;
+		std::string idf = parser.encode( parsed_idf );
 		if ( ! found_building ) {
 			idf += "Building,Bldg,0.0,Suburbs,.04,.4,FullExterior,25,6;" + DataStringGlobals::NL;
 		}
@@ -332,7 +368,17 @@ namespace EnergyPlus {
 			process_idd( idd, errors_found );
 		}
 
-		if ( errors_found ) return errors_found;
+		if ( errors_found ) {
+			if ( use_assertions ) {
+				compare_eso_stream( "" );
+				compare_mtr_stream( "" );
+				compare_echo_stream( "" );
+				compare_err_stream( "" );
+				compare_cout_stream( "" );
+				compare_cerr_stream( "" );
+			}
+			return errors_found;
+		}
 
 		auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf ) );
 		NumLines = 0;
@@ -384,10 +430,10 @@ namespace EnergyPlus {
 								"], No prior Objects." + DataStringGlobals::NL;
 			}
 		}
-		EXPECT_EQ( 0, count_err ) << error_string;
+		if ( use_assertions ) EXPECT_EQ( 0, count_err ) << error_string;
 
 		if ( NumIDFRecords == 0 ) {
-			EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
+			if ( use_assertions ) EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
 			++NumMiscErrorsFound;
 			errors_found = true;
 		}
@@ -395,33 +441,33 @@ namespace EnergyPlus {
 		for ( auto const obj_def : ObjectDef ) {
 			if ( ! obj_def.RequiredObject ) continue;
 			if ( obj_def.NumFound > 0 ) continue;
-			EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
+			if ( use_assertions ) EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
 			++NumMiscErrorsFound;
 			errors_found = true;
 		}
 
 		if ( TotalAuditErrors > 0 ) {
-			EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
+			if ( use_assertions ) EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
 			errors_found = true;
 		}
 
 		if ( NumOutOfRangeErrorsFound > 0 ) {
-			EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
+			if ( use_assertions ) EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
 			errors_found = true;
 		}
 
 		if ( NumBlankReqFieldFound > 0 ) {
-			EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
+			if ( use_assertions ) EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
 			errors_found = true;
 		}
 
 		if ( NumMiscErrorsFound > 0 ) {
-			EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
+			if ( use_assertions ) EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
 			errors_found = true;
 		}
 
 		if ( OverallErrorFlag ) {
-			EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
+			if ( use_assertions ) EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
 
 			// check if IDF version matches IDD version
 			// this really shouldn't be an issue but i'm keeping it just in case a unit test is written against a specific IDF version
@@ -437,17 +483,27 @@ namespace EnergyPlus {
 						bad_version = ( DataStringGlobals::MatchVersion == idf_record.Alphas( 1 ) );
 					}
 					found_version = true;
-					EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
+					if ( use_assertions ) EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
 					break;
 				}
 			}
-			EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
+			if ( use_assertions ) EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
 			errors_found = true;
+		}
+
+		if ( use_assertions ) {
+			compare_eso_stream( "" );
+			compare_mtr_stream( "" );
+			compare_echo_stream( "" );
+			compare_err_stream( "" );
+			compare_cout_stream( "" );
+			compare_cerr_stream( "" );
 		}
 
 		if ( errors_found ) return errors_found;
 
-		PreScanReportingVariables();
+		// This can fatal error within it, which will cause the unit test to fail and exit.
+		SimulationManager::PostIPProcessing();
 
 		return errors_found;
 	}

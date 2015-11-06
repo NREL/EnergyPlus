@@ -132,6 +132,24 @@ namespace Psychrometrics {
 	// Functions
 
 	void
+	clear_state()
+	{
+		String = "";
+		ReportErrors = true;
+		iPsyErrIndex = Array1D_int( NumPsychMonitors, 0 );
+#ifdef EP_psych_stats
+		NumTimesCalled = Array1D< Int64 >( NumPsychMonitors, 0 );
+		NumIterations = Array1D_int( NumPsychMonitors, 0 );
+#endif
+#ifdef EP_cache_PsyTwbFnTdbWPb
+		cached_Twb.deallocate();
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+		cached_Psat.deallocate();
+#endif
+	}
+
+	void
 	InitializePsychRoutines()
 	{
 
