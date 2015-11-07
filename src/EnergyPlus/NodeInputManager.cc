@@ -85,7 +85,9 @@ namespace NodeInputManager {
 
 	// Object Data
 	Array1D< NodeListDef > NodeLists; // Node Lists
-
+	namespace { 
+		bool CalcMoreNodeInfoMyOneTimeFlag( true ); // one time flag
+	}
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
@@ -96,6 +98,7 @@ namespace NodeInputManager {
 	void
 	clear_state()
 	{
+		CalcMoreNodeInfoMyOneTimeFlag = true;
 		NumOfNodeLists = 0;
 		NumOfUniqueNodeNames = 0;
 		GetNodeInputFlag = true;
@@ -1085,7 +1088,7 @@ namespace NodeInputManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iNode; // node loop index
 		int iReq; // requested report variables loop index
-		static bool MyOneTimeFlag( true ); // one time flag
+
 		static Real64 RhoAirStdInit;
 		static Real64 RhoWaterStdInit;
 		static Array1D_int NodeWetBulbSchedPtr;
@@ -1107,7 +1110,7 @@ namespace NodeInputManager {
 		Real64 Cp;
 		Real64 rhoStd;
 
-		if ( MyOneTimeFlag ) {
+		if ( CalcMoreNodeInfoMyOneTimeFlag ) {
 			RhoAirStdInit = StdRhoAir;
 			RhoWaterStdInit = RhoH2O( InitConvTemp );
 			NodeWetBulbRepReq.allocate( NumOfNodes );
@@ -1130,20 +1133,33 @@ namespace NodeInputManager {
 				nodeFluidNames.push_back( GetGlycolNameByIndex( Node( iNode ).FluidIndex ) );
 				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
 					if ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || ReqRepVars( iReq ).Key.empty() ) {
-						if ( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) || EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Wetbulb Temperature" ) ) {
+						if ( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
 							NodeWetBulbRepReq( iNode ) = true;
 							NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) || EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Relative Humidity" ) ) {
+						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) ) {
 							NodeRelHumidityRepReq( iNode ) = true;
 							NodeRelHumiditySchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) || EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Dewpoint Temperature" ) ) {
+						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
 							NodeDewPointRepReq( iNode ) = true;
 							NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
 						}
 					}
 				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Wetbulb Temperature" ) ) { 
+					NodeWetBulbRepReq( iNode ) = true;
+					NodeWetBulbSchedPtr( iNode ) = 0;
+				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Relative Humidity" ) ) {
+					NodeRelHumidityRepReq( iNode ) = true;
+					NodeRelHumiditySchedPtr( iNode ) = 0;
+				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Dewpoint Temperature" ) ) {
+					NodeDewPointRepReq( iNode ) = true;
+					NodeDewPointSchedPtr( iNode ) = 0;
+				}
+
 			}
-			MyOneTimeFlag = false;
+			CalcMoreNodeInfoMyOneTimeFlag = false;
 		}
 
 		for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
