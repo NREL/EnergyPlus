@@ -6324,11 +6324,15 @@ namespace SimAirServingZones {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataAirSystems::PrimaryAirSystem;
-		
+		using Psychrometrics::PsyHFnTdbW;
+		using Psychrometrics::PsyTdbFnHW;
+
 		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
 
 		// Locals
-		Real64 ReheatCoilInTempForSizing;
+		Real64 ReheatCoilInTempForSizing; // Dry bulb temperature of the reheat coil inlet air [C]
+		Real64 ReheatCoilInHumRatForSizing; // Humidity ratio of the reheat coil inlet air [kg/kg]
+		Real64 ReheatCoilInEnthalpyForSizing; // Enthalpy of the reheat coil inlet air [J/kg]
 		Real64 OutAirFrac;
 		
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6355,7 +6359,13 @@ namespace SimAirServingZones {
 			OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
 			OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
 
-			ReheatCoilInTempForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatTemp + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetTemp;
+			// Mixed air humidity ratio and enthalpy
+			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
+			ReheatCoilInEnthalpyForSizing = OutAirFrac * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).PreheatTemp, FinalSysSizing( IndexAirLoop ).PreheatHumRat ) 
+			                      + ( 1 - OutAirFrac ) * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).HeatRetTemp, FinalSysSizing( IndexAirLoop ).HeatRetHumRat );
+
+			// Mixed air dry bulb temperature
+			ReheatCoilInTempForSizing = PsyTdbFnHW( ReheatCoilInEnthalpyForSizing, ReheatCoilInHumRatForSizing );
 			
 		} else {
 		//Case: No central heating coils; No preheating coils or OA heat-exchangers

@@ -151,8 +151,8 @@ namespace EnergyPlus {
 		
 		// Check
 		EXPECT_EQ( 17.0, FinalZoneSizing( 1 ).DesHeatCoilInTempTU );
-		EXPECT_EQ( 14.5, FinalZoneSizing( 2 ).DesHeatCoilInTempTU );
-		EXPECT_EQ( 14.5, FinalZoneSizing( 3 ).DesHeatCoilInTempTU );
+		EXPECT_NEAR( 14.5, FinalZoneSizing( 2 ).DesHeatCoilInTempTU, 0.05 );
+		EXPECT_NEAR( 14.5, FinalZoneSizing( 3 ).DesHeatCoilInTempTU, 0.05 );
 		EXPECT_EQ( 10.0, FinalZoneSizing( 4 ).DesHeatCoilInTempTU );
 		EXPECT_EQ( 0.006, FinalZoneSizing( 1 ).DesHeatCoilInHumRatTU );
 		EXPECT_EQ( 0.0055, FinalZoneSizing( 2 ).DesHeatCoilInHumRatTU );
