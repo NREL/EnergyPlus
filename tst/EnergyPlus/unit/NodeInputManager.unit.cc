@@ -61,16 +61,11 @@ namespace EnergyPlus {
 
 		NodeInputManager::CalcMoreNodeInfo();
 
-
 		EXPECT_NEAR( DataLoopNode::MoreNodeInfo( 1 ).RelHumidity, 67.65, 0.01 );
 		EXPECT_NEAR( DataLoopNode::MoreNodeInfo( 1 ).AirDewPointTemp, 13.84, 0.01 );
-
 		EXPECT_NEAR( DataLoopNode::MoreNodeInfo( 1 ).WetBulbTemp, 16.11, 0.01 );
 
-
-	};
-
-
+	}
 
 
 TEST( CheckUniqueNodesTest, Test1 )
