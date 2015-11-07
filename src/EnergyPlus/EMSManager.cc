@@ -1452,8 +1452,8 @@ namespace EMSManager {
 			for ( LoopNode = 1; LoopNode <= NumOfNodes; ++LoopNode ) {
 				// setup the setpoint for each type of variable that can be controlled
 				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Setpoint", "[C]", lDummy, Node( LoopNode ).TempSetPoint );
-				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Minimum Setpoint", "[C]", lDummy, Node( LoopNode ).TempMin );
-				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Maximum Setpoint", "[C]", lDummy, Node( LoopNode ).TempMax );
+				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Minimum Setpoint", "[C]", lDummy, Node( LoopNode ).TempSetPointLo );
+				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Maximum Setpoint", "[C]", lDummy, Node( LoopNode ).TempSetPointHi );
 				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Humidity Ratio Setpoint", "[kgWater/kgDryAir]", lDummy, Node( LoopNode ).HumRatSetPoint );
 				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Humidity Ratio Maximum Setpoint", "[kgWater/kgDryAir]", lDummy, Node( LoopNode ).HumRatMax );
 				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Humidity Ratio Minimum Setpoint", "[kgWater/kgDryAir]", lDummy, Node( LoopNode ).HumRatMin );
