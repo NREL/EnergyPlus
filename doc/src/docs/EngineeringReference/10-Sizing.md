@@ -2097,27 +2097,26 @@ There are two methods available for calculating the design flow rate. The pump o
 The first, and original, method is selected by choosing PowerPerFlowPerPressure.  And the design power is calculated using 
 
 
-<div>$$\dot Q<sub>nom</sub> = H<sub>nom</sub> \cdot \dot V<sub>nom</sub> \cdot ScalingFactor /Eff<sub>mot</sub>$$</div>
+<div>$$\dot Q_{nom} = H_{nom} \cdot \dot V_{nom} \cdot ScalingFactor /Eff_{mot}$$</div>
 
 where,
 
-*Eff<sub>mot</sub>* is the motor efficiency, often the default value of 0.9.
+*Eff<sub>mot</sub>* is the motor efficiency, often the default value of 0.9. This is defined as the shaft power output in Watts divided by the electric power in Watts. 
 
 *V<sub>nom</sub>* is the design volume flow rate in m<sup>3</sup>/s.
 
-*ScalingFactor* is an input called Design Power per Unit Flow Rate per Unit Head, with a default of 1.282051 W/((m<sup>3</sup>/s)-Pa).  (This is the inverse of 0.78 for impeller efficiency that was used prior to version 8.5.)
+*ScalingFactor* is an input called Design Shaft Power per Unit Flow Rate per Unit Head, with a default of 1.282051 W/((m<sup>3</sup>/s)-Pa).  (This is the inverse of 0.78 for impeller efficiency that was used prior to version 8.5.)
 
 *H<sub>nom</sub>* the nominal head, or pressure rise across the pump, is an input in Pascals.
 
 
 The second method is selected by choosing PowerPerFlow.  Then the power is calculated more simply and does not use head pressure or motor efficiency  
 
-<div>$$\dot Q<sub>nom</sub> = \dot V<sub>nom</sub> \cdot ScalingFactor$$</div>
+<div>$$\dot Q_{nom} = \dot V_{nom} \cdot ScalingFactor$$</div>
 
 where 
 
-*ScalingFactor* is an input called Design Power per Unit Flow Rate, with a default of 348701.1 W/(m<sup>3</sup>/s) or 22 W/gpm. 
-
+*ScalingFactor* is an input called Design Electric Power per Unit Flow Rate, with a default of 348701.1 W/(m<sup>3</sup>/s) or 22 W/gpm.  The pump motor efficiency and head are still used to model the pump for its fluid heating.  This method essentially finds a pump impeller and drive efficiency that when combined with the head and motor efficiency results in the desired power consumption per flow rate.  
 
 
 ### Electric Chiller Sizing

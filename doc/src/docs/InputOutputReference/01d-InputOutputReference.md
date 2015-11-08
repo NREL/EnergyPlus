@@ -2598,13 +2598,13 @@ This field is optional.  If a Zone is named in the previous field and pump losse
 
 #### Field: Design Power Sizing Method
 
-This field is optional.   There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
+This field is optional.   There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Electric Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Shaft Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
 
-#### Field: Design Power per Unit Flow Rate
+#### Field: Design Electric Power per Unit Flow Rate
 
 This field is optional.   This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow.  It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m<sup>3</sup>/s) ( 22 W/gpm) will be used.
 
-#### Field: Design Power per Unit Flow Rate Per Unit Head
+#### Field: Design Shaft Power per Unit Flow Rate Per Unit Head
 
 This field is optional.  This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure.  It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m<sup>3</sup>/s)-Pa) will be used. 
 
@@ -2616,37 +2616,37 @@ Examples of this object in the IDF follow.
 
 ```idf
    Pump:VariableSpeed,
-       HW Circ Pump,                   !- Name
-       HW Supply Inlet Node,   !- Inlet Node Name
-       HW Pump Outlet Node,     !- Outlet Node Name
-       autosize,                           !- Rated Flow Rate {m3/s}
-       179352,                               !- Rated Pump Head {Pa}
-       autosize,                           !- Rated Power Consumption {W}
-       0.9,                                     !- Motor Efficiency
-       0.0,                                     !- Fraction of Motor Inefficiencies to Fluid Stream
-       0,                                         !- Coefficient 1 of the Part Load Performance Curve
-       1,                                         !- Coefficient 2 of the Part Load Performance Curve
-       0,                                         !- Coefficient 3 of the Part Load Performance Curve
-       0,                                         !- Coefficient 4 of the Part Load Performance Curve
-       0,                                         !- Minimum Flow Rate {m3/s}
-       Intermittent;                   !- Pump Control Type
+       HW Circ Pump,                          !- Name
+       HW Supply Inlet Node,                  !- Inlet Node Name
+       HW Pump Outlet Node,                   !- Outlet Node Name
+       autosize,                              !- Design Maximum Flow Rate {m3/s}
+       179352,                                !- Design Pump Head {Pa}
+       autosize,                              !- Design Power Consumption {W}
+       0.9,                                   !- Motor Efficiency
+       0.0,                                   !- Fraction of Motor Inefficiencies to Fluid Stream
+       0,                                     !- Coefficient 1 of the Part Load Performance Curve
+       1,                                     !- Coefficient 2 of the Part Load Performance Curve
+       0,                                     !- Coefficient 3 of the Part Load Performance Curve
+       0,                                     !- Coefficient 4 of the Part Load Performance Curve
+       0,                                     !- Minimum Flow Rate {m3/s}
+       Intermittent;                          !- Pump Control Type
 
 
    Pump:VariableSpeed,
-       Circ Pump,                         !- Name
-       CW Supply Inlet Node,   !- Inlet Node Name
-       CW Pump Outlet Node,     !- Outlet Node Name
-       .0011,                                 !- Rated Flow Rate {m3/s}
-       300000,                               !- Rated Pump Head {Pa}
-       500,                                     !- Rated Power Consumption {W}
-       .87,                                     !- Motor Efficiency
-       0.0,                                     !- Fraction of Motor Inefficiencies to Fluid Stream
-       0,                                         !- Coefficient 1 of the Part Load Performance Curve
-       1,                                         !- Coefficient 2 of the Part Load Performance Curve
-       0,                                         !- Coefficient 3 of the Part Load Performance Curve
-       0,                                         !- Coefficient 4 of the Part Load Performance Curve
-       0,                                         !- Minimum Flow Rate {m3/s}
-       Intermittent;                   !- Pump Control Type
+       Circ Pump,                             !- Name
+       CW Supply Inlet Node,                  !- Inlet Node Name
+       CW Pump Outlet Node,                   !- Outlet Node Name
+       .0011,                                 !- Design Maximum Flow Rate {m3/s}
+       300000,                                !- Design Pump Head {Pa}
+       500,                                   !- Design Power Consumption {W}
+       .87,                                   !- Motor Efficiency
+       0.0,                                   !- Fraction of Motor Inefficiencies to Fluid Stream
+       0,                                     !- Coefficient 1 of the Part Load Performance Curve
+       1,                                     !- Coefficient 2 of the Part Load Performance Curve
+       0,                                     !- Coefficient 3 of the Part Load Performance Curve
+       0,                                     !- Coefficient 4 of the Part Load Performance Curve
+       0,                                     !- Minimum Flow Rate {m3/s}
+       Intermittent;                          !- Pump Control Type
 ```
 
 
@@ -2804,7 +2804,7 @@ If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use 
 
 #### Field: Design Electrical Power per Unit Flow Rate
 
-This field is optional.   This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow.  It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m<sup>3</sup>/s) (22 W/gpm) will be used.  This method does not use the motor efficiency to size the the pump's electrical power consumption rate but does use the motor efficiency when calculating how the pump heating of the fluid.  In addition, the Design Pump Head will be overridden to be consistent with the power per flow scaling factor entered here. 
+This field is optional.   This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow.  It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m<sup>3</sup>/s) (22 W/gpm) will be used.  
 
 #### Field: Design Shaft Power per Unit Flow Rate Per Unit Head
 
@@ -2816,14 +2816,14 @@ An example of this object follows.
 ```idf
 Pump:ConstantSpeed,
              Circ Pump,                         !- Name
-             CW Supply Inlet Node,   !- Inlet Node Name
-             PumpChiller Node,           !- Outlet Node Name
-             0.0011,                               !- Rated Flow Rate
-             300000,                               !- Rated Pump Head
-             700,                                     !- Rated Power Consumption
-             0.87,                                   !- Motor Efficiency
-             0.0,                                     !- Fraction of Motor Inefficiencies to Fluid Stream
-             Intermittent;                   !- Pump Control Type
+             CW Supply Inlet Node,              !- Inlet Node Name
+             PumpChiller Node,                  !- Outlet Node Name
+             0.0011,                            !- Design Flow Rate
+             300000,                            !- Design Pump Head
+             700,                               !- Design Power Consumption
+             0.87,                              !- Motor Efficiency
+             0.0,                               !- Fraction of Motor Inefficiencies to Fluid Stream
+             Intermittent;                      !- Pump Control Type
 ```
 
 
@@ -2906,9 +2906,9 @@ This alpha field contains the identifying name for the pump inlet node.
 
 This alpha field contains the identifying name for the pump outlet node.
 
-#### Field: Design Flow Rate
+#### Field: Design Steam Volume Flow Rate
 
-This numeric field contains the pump's design volume flow rate in cubic meters per second. This field is autosizable.
+This numeric field contains the pump's design volume flow rate in cubic meters per second. This field is autosizable. This is the volume flow rate of steam in expanded stated.  The volume of condensate is calculated by the software from the steam density and is much lower. 
 
 #### Field: Design Pump Head
 
@@ -2960,13 +2960,13 @@ This field is optional.   If a Zone is named in the previous field and pump loss
 
 #### Field: Design Power Sizing Method
 
-This field is optional.   There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
+This field is optional.   There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Electric Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Shaft Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
 
-#### Field: Design Power per Unit Flow Rate
+#### Field: Design Electric Power per Unit Flow Rate
 
 This field is optional.   This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow.  It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m<sup>3</sup>/s) ( 22 W/gpm) will be used.
 
-#### Field: Design Power per Unit Flow Rate Per Unit Head
+#### Field: Design Shaft Power per Unit Flow Rate Per Unit Head
 
 This field is optional.  This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure.  It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m<sup>3</sup>/s)-Pa) will be used. 
 
@@ -2976,14 +2976,14 @@ Examples of this object in the IDF follow.
 
 ```idf
 Pump:VariableSpeed:Condensate,
-       Steam Boiler Plant Steam Circ Pump,                 !- Name
+       Steam Boiler Plant Steam Circ Pump,         !- Name
        Steam Boiler Plant Steam Supply Inlet Node, !- Inlet Node Name
-       Steam Boiler Plant Steam Pump Outlet Node,   !- Outlet Node Name
-       0.36,                               !- Rated Flow Rate {m3/s}
-       179352,                           !- Rated Pump Head {Pa}
-       400,                                 !- Rated Power Consumption {W}
-       0.9,                                 !- Motor Efficiency
-       0.0,                                 !- Fraction of Motor Inefficiencies to Fluid Stream
+       Steam Boiler Plant Steam Pump Outlet Node,  !- Outlet Node Name
+       0.36,                                  !- Design Steam Volume Flow Rate {m3/s}
+       179352,                                !- Design Pump Head {Pa}
+       400,                                   !- Design Power Consumption {W}
+       0.9,                                   !- Motor Efficiency
+       0.0,                                   !- Fraction of Motor Inefficiencies to Fluid Stream
        0,                                     !- Coefficient 1 of the Part Load Performance Curve
        1,                                     !- Coefficient 2 of the Part Load Performance Curve
        0,                                     !- Coefficient 3 of the Part Load Performance Curve
@@ -2991,14 +2991,14 @@ Pump:VariableSpeed:Condensate,
 
 
 Pump:VariableSpeed:Condensate,
-       Steam Boiler Plant Steam Circ Pump,                 !- Name
+       Steam Boiler Plant Steam Circ Pump,         !- Name
        Steam Boiler Plant Steam Supply Inlet Node, !- Inlet Node Name
-       Steam Boiler Plant Steam Pump Outlet Node,   !- Outlet Node Name
-       0.36,                               !- Rated Flow Rate {m3/s}
-       179352,                           !- Rated Pump Head {Pa}
-       autosize,                       !- Rated Power Consumption {W}
-       0.9,                                 !- Motor Efficiency
-       0.0,                                 !- Fraction of Motor Inefficiencies to Fluid Stream
+       Steam Boiler Plant Steam Pump Outlet Node,  !- Outlet Node Name
+       0.36,                                  !- Design Steam Volume Flow Rate {m3/s}
+       179352,                                !- Design Pump Head {Pa}
+       autosize,                              !- Design Power Consumption {W}
+       0.9,                                   !- Motor Efficiency
+       0.0,                                   !- Fraction of Motor Inefficiencies to Fluid Stream
        0,                                     !- Coefficient 1 of the Part Load Performance Curve
        1,                                     !- Coefficient 2 of the Part Load Performance Curve
        0,                                     !- Coefficient 3 of the Part Load Performance Curve
@@ -3133,13 +3133,13 @@ This field is optional.   If a Zone is named in the previous field and pump loss
 
 #### Field: Design Power Sizing Method
 
-This field is optional.   There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
+This field is optional.   There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Electric Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Shaft Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
 
-#### Field: Design Power per Unit Flow Rate
+#### Field: Design Electric Power per Unit Flow Rate
 
 This field is optional.   This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow.  It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m<sup>3</sup>/s) ( 22 W/gpm) will be used.
 
-#### Field: Design Power per Unit Flow Rate Per Unit Head
+#### Field: Design Shaft Power per Unit Flow Rate Per Unit Head
 
 This field is optional.  This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure.  It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m<sup>3</sup>/s)-Pa) will be used. 
 
@@ -3149,18 +3149,18 @@ An example for constant speed pump bank follows.
 
 ```idf
    HeaderedPumps:ConstantSpeed,
-       Chilled Water Headered Pumps,   !- Name
+       Chilled Water Headered Pumps,           !- Name
        CW Supply Inlet Node,                   !- Inlet Node Name
        CW Pumps Outlet Node,                   !- Outlet Node Name
-       autosize,                                           !- Total Rated Flow Rate
-       2,                                                         !- Number of Pumps in Bank
-       SEQUENTIAL,                                       !- Flow Sequencing Control Scheme
-       179352,                                               !- Rated Pump Head
-       autosize,                                           !- Rated Power Consumption
-       0.9,                                                     !- Motor Efficiency
-       0.0,                                                     !- Fraction of Motor Inefficiencies to Fluid Stream
-       INTERMITTENT,                                   !- Pump Control Type
-       CoolingPumpAvailSched;                 !- Pump Flow Rate Schedule Name
+       autosize,                               !- Total Design Flow Rate
+       2,                                      !- Number of Pumps in Bank
+       SEQUENTIAL,                             !- Flow Sequencing Control Scheme
+       179352,                                 !- Design Pump Head
+       autosize,                               !- Design Power Consumption
+       0.9,                                    !- Motor Efficiency
+       0.0,                                    !- Fraction of Motor Inefficiencies to Fluid Stream
+       INTERMITTENT,                           !- Pump Control Type
+       CoolingPumpAvailSched;                  !- Pump Flow Rate Schedule Name
 ```
 
 
@@ -3320,13 +3320,13 @@ This field is optional.   If a Zone is named in the previous field and pump loss
 
 #### Field: Design Power Sizing Method
 
-This field is optional.   There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
+This field is optional.   There are two choices PowerPerFlow and PowerPerFlowPerPressure.  If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Electric Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.  If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Shaft Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
 
-#### Field: Design Power per Unit Flow Rate
+#### Field: Design Electric Power per Unit Flow Rate
 
 This field is optional.   This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow.  It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m<sup>3</sup>/s) ( 22 W/gpm) will be used.
 
-#### Field: Design Power per Unit Flow Rate Per Unit Head
+#### Field: Design Shaft Power per Unit Flow Rate Per Unit Head
 
 This field is optional.  This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure.  It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m<sup>3</sup>/s)-Pa) will be used. 
 
@@ -3340,20 +3340,20 @@ An example of this object follows.
        Chilled Water Headered Pumps, !- Name
        CW Supply Inlet Node,       !- Inlet Node Name
        CW Pumps Outlet Node,       !- Outlet Node Name
-       autosize,                               !- Total Rated Flow Rate {m3/s}
-       2,                                             !- Number of Pumps in Bank
-       SEQUENTIAL,                           !- Flow Sequencing Control Scheme
-       179352,                                   !- Rated Pump Head {Pa}
-       autosize,                               !- Rated Power Consumption {W}
-       0.9,                                         !- Motor Efficiency
-       0.0,                                         !- Fraction of Motor Inefficiencies to Fluid Stream
-       0,                                             !- Coefficient 1 of the Part Load Performance Curve
-       1,                                             !- Coefficient 2 of the Part Load Performance Curve
-       0,                                             !- Coefficient 3 of the Part Load Performance Curve
-       0,                                             !- Coefficient 4 of the Part Load Performance Curve
-       0.1,                                         !- Minimum Flow Rate {m3/s}
-       INTERMITTENT,                       !- Pump Control Type
-       CoolingPumpAvailSched;     !- Pump Flow Rate Schedule Name
+       autosize,                   !- Total Design Flow Rate {m3/s}
+       2,                          !- Number of Pumps in Bank
+       SEQUENTIAL,                 !- Flow Sequencing Control Scheme
+       179352,                     !- Design Pump Head {Pa}
+       autosize,                   !- Design Power Consumption {W}
+       0.9,                        !- Motor Efficiency
+       0.0,                        !- Fraction of Motor Inefficiencies to Fluid Stream
+       0,                          !- Coefficient 1 of the Part Load Performance Curve
+       1,                          !- Coefficient 2 of the Part Load Performance Curve
+       0,                          !- Coefficient 3 of the Part Load Performance Curve
+       0,                          !- Coefficient 4 of the Part Load Performance Curve
+       0.1,                        !- Minimum Flow Rate {m3/s}
+       INTERMITTENT,               !- Pump Control Type
+       CoolingPumpAvailSched;      !- Pump Flow Rate Schedule Name
 ```
 
 

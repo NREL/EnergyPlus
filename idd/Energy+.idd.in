@@ -59243,7 +59243,8 @@ Pump:VariableSpeed:Condensate,
   A3 , \field Outlet Node Name
        \required-field
        \type node
-  N1 , \field Design Flow Rate
+  N1 , \field Design Steam Volume Flow Rate
+       \note this is the volume of steam before condensation, the volume of condensate is much lower and calculated from steam density
        \units m3/s
        \autosizable
        \ip-units gal/min
