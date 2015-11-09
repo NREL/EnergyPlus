@@ -730,6 +730,8 @@ namespace OutputReportTabular {
 	extern Array1D< UnitConvType > UnitConv;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	UpdateTabularReports( int const IndexTypeKey ); // What kind of data to update (Zone, HVAC)
