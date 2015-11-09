@@ -162,3 +162,4 @@ TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
 	EXPECT_EQ( PurchAir( 1 ).HumidCtrlType, ConstantSupplyHumidityRatio );
 
 }
+

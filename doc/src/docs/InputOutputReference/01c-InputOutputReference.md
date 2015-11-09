@@ -7337,6 +7337,22 @@ Hours when the Ideal Loads heat recovery was actively heating or cooling the out
 
 This is the availability status of the ideal loads object as set by the hybrid ventilation manager. Rules to determine the availability status are described in the section ‘Group – System Availability Managers’. The control status outputs are represented using integers 0 and 1. These integers represent NoAction (0) and ForceOff (1). When the availability status is ForceOff, the unit is turned off regardless of its availability schedule. The other status flag i.e. NoAction does not control the unit and the controls of the unit turn it back on. Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the “detailed” reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
+#### Zone Ideal Loads Outdoor Air Mass Flow Rate [kg/s]
+
+The mass flow rate of the outdoor air stream in kg/s.
+
+#### Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate [m3/s]
+
+The volume flow rate of the outdoor air stream in m3/s.
+
+#### Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]
+
+The mass flow rate of the supply air stream in kg/s.
+
+#### Zone Ideal Loads Supply Air Standard Density Volume Flow Rate [m3/s]
+
+The volume flow rate of the supply air stream in m3/s.
+
 ### ZoneHVAC:FourPipeFanCoil
 
 What is a fan coil unit? Like many HVAC terms, “fan coil unit” is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. The hydronic heating coil may be replaced with an electric heating coil. Typically these units are small (200 – 1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, *ZoneHVAC:UnitVentilator* should be used.
