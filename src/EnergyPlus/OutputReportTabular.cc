@@ -171,9 +171,9 @@ namespace OutputReportTabular {
 
 	// arrays for time binned results
 
-	int OutputTableBinnedCount;
-	int BinResultsTableCount;
-	int BinResultsIntervalCount;
+	int OutputTableBinnedCount( 0 );
+	int BinResultsTableCount( 0 );
+	int BinResultsIntervalCount( 0 );
 
 	int const numNamedMonthly( 62 );
 	// These reports are detailed/named in routine InitializePredefinedMonthlyTitles
@@ -189,7 +189,7 @@ namespace OutputReportTabular {
 	int TOCEntriesCount( 0 );
 	int TOCEntriesSize( 0 );
 
-	int UnitConvSize;
+	int UnitConvSize( 0 );
 
 	bool WriteTabularFiles( false );
 
@@ -416,7 +416,190 @@ namespace OutputReportTabular {
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
 
+	namespace {
+		bool GatherMonthlyResultsForTimestepRunOnce( true );
+		bool UpdateTabularReportsGetInput( true );
+		bool GatherHeatGainReportfirstTime( true );
+		bool AllocateLoadComponentArraysDoAllocate( true );
+	}
+
 	// Functions
+	void
+	clear_state(){
+		GatherMonthlyResultsForTimestepRunOnce =  true;
+		UpdateTabularReportsGetInput = true;
+		GatherHeatGainReportfirstTime = true;
+		AllocateLoadComponentArraysDoAllocate = true;
+		OutputTableBinnedCount = 0;
+		BinResultsTableCount = 0;
+		BinResultsIntervalCount = 0;
+		MonthlyInputCount = 0;
+		sizeMonthlyInput = 0;
+		MonthlyFieldSetInputCount = 0;
+		sizeMonthlyFieldSetInput = 0;
+		MonthlyTablesCount = 0;
+		MonthlyColumnsCount = 0;
+		IsMonthGathered = Array1D_bool ( 12, false );
+		TOCEntriesCount = 0;
+		TOCEntriesSize = 0;
+		UnitConvSize = 0;
+		WriteTabularFiles = false;
+		unitsStyle = 0;
+		numStyles = 0;
+		TabularOutputFile = Array1D< std::ofstream * > ( maxNumStyles, { &csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream } ); 
+		del = Array1D_string ( maxNumStyles );
+		TableStyle = Array1D_int ( maxNumStyles, 0 );
+		timeInYear = 0.0;
+		displayTabularBEPS = false;
+		displayLEEDSummary = false;
+		displayTabularCompCosts = false;
+		displayTabularVeriSum = false;
+		displayComponentSizing = false;
+		displaySurfaceShadowing = false;
+		displayDemandEndUse = false;
+		displayAdaptiveComfort = false;
+		displaySourceEnergyEndUseSummary = false;
+		displayZoneComponentLoadSummary = false;
+		meterNumTotalsBEPS = Array1D_int ( numResourceTypes, 0 );
+		meterNumTotalsSource = Array1D_int ( numSourceTypes, 0 );
+		fuelfactorsused = Array1D_bool ( numSourceTypes, false );
+		ffUsed = Array1D_bool ( numResourceTypes, false );
+		SourceFactors = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		ffSchedUsed = Array1D_bool ( numResourceTypes, false );
+		ffSchedIndex = Array1D_int ( numResourceTypes, 0 );
+		meterNumEndUseBEPS = Array2D_int ( numResourceTypes, NumEndUses, 0 );
+		meterNumEndUseSubBEPS.deallocate();
+//		resourceTypeNames.deallocate();
+//		sourceTypeNames.deallocate();
+//		endUseNames.deallocate();
+		gatherTotalsBEPS = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		gatherTotalsBySourceBEPS = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		gatherTotalsSource = Array1D< Real64 > ( numSourceTypes, 0.0 );
+		gatherTotalsBySource= Array1D< Real64 > ( numSourceTypes, 0.0 );
+		gatherEndUseBEPS = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
+		gatherEndUseBySourceBEPS = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
+		gatherEndUseSubBEPS.deallocate();
+		gatherDemandTotal = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		gatherDemandEndUse = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
+		gatherDemandEndUseSub.deallocate();
+		gatherDemandTimeStamp = Array1D_int ( numResourceTypes, 0 );
+		gatherElapsedTimeBEPS = 0.0;
+		buildingGrossFloorArea = 0.0;
+		buildingConditionedFloorArea = 0.0;
+		fuelFactorSchedulesUsed = false;
+		meterNumPowerFuelFireGen = 0;
+		gatherPowerFuelFireGen = 0.0;
+		meterNumPowerPV = 0;
+		gatherPowerPV = 0.0;
+		meterNumPowerWind = 0;
+		gatherPowerWind = 0.0;
+		OverallNetEnergyFromStorage = 0.0;
+		meterNumPowerHTGeothermal = 0;
+		gatherPowerHTGeothermal = 0.0;
+		meterNumElecProduced = 0;
+		gatherElecProduced = 0.0;
+		meterNumElecPurchased = 0;
+		gatherElecPurchased = 0.0;
+		meterNumElecSurplusSold = 0;
+		gatherElecSurplusSold = 0.0;
+		meterNumWaterHeatRecovery = 0;
+		gatherWaterHeatRecovery = 0.0;
+		meterNumAirHeatRecoveryCool = 0;
+		gatherAirHeatRecoveryCool = 0.0;
+		meterNumAirHeatRecoveryHeat = 0;
+		gatherAirHeatRecoveryHeat = 0.0;
+		meterNumHeatHTGeothermal = 0;
+		gatherHeatHTGeothermal = 0.0;
+		meterNumHeatSolarWater = 0;
+		gatherHeatSolarWater = 0.0;
+		meterNumHeatSolarAir = 0;
+		gatherHeatSolarAir = 0.0;
+		meterNumRainWater = 0;
+		gatherRainWater = 0.0;
+		meterNumCondensate = 0;
+		gatherCondensate = 0.0;
+		meterNumGroundwater = 0;
+		gatherWellwater = 0.0;
+		meterNumMains = 0;
+		gatherMains = 0.0;
+		meterNumWaterEndUseTotal = 0;
+		gatherWaterEndUseTotal = 0.0;
+		sourceFactorElectric = 0.0;
+		sourceFactorNaturalGas = 0.0;
+		efficiencyDistrictCooling = 0.0;
+		efficiencyDistrictHeating = 0.0;
+		sourceFactorSteam = 0.0;
+		sourceFactorGasoline = 0.0;
+		sourceFactorDiesel = 0.0;
+		sourceFactorCoal = 0.0;
+		sourceFactorFuelOil1 = 0.0;
+		sourceFactorFuelOil2 = 0.0;
+		sourceFactorPropane = 0.0;
+		sourceFactorOtherFuel1 = 0.0;
+		sourceFactorOtherFuel2 = 0.0;
+		DesignDayName.deallocate();
+		DesignDayCount = 0;
+		radiantPulseUsed.deallocate();
+		radiantPulseTimestep.deallocate();
+		radiantPulseReceived.deallocate();
+		loadConvectedNormal.deallocate();
+		loadConvectedWithPulse.deallocate();
+		netSurfRadSeq.deallocate();
+		decayCurveCool.deallocate();
+		decayCurveHeat.deallocate();
+		ITABSFseq.deallocate();
+		TMULTseq.deallocate();
+		peopleInstantSeq.deallocate();
+		peopleLatentSeq.deallocate();
+		peopleRadSeq.deallocate();
+		peopleDelaySeq.deallocate();
+		lightInstantSeq.deallocate();
+		lightRetAirSeq.deallocate();
+		lightLWRadSeq.deallocate();
+		lightSWRadSeq.deallocate();
+		lightDelaySeq.deallocate();
+		equipInstantSeq.deallocate();
+		equipLatentSeq.deallocate();
+		equipRadSeq.deallocate();
+		equipDelaySeq.deallocate();
+		refrigInstantSeq.deallocate();
+		refrigRetAirSeq.deallocate();
+		refrigLatentSeq.deallocate();
+		waterUseInstantSeq.deallocate();
+		waterUseLatentSeq.deallocate();
+		hvacLossInstantSeq.deallocate();
+		hvacLossRadSeq.deallocate();
+		hvacLossDelaySeq.deallocate();
+		powerGenInstantSeq.deallocate();
+		powerGenRadSeq.deallocate();
+		powerGenDelaySeq.deallocate();
+		infilInstantSeq.deallocate();
+		infilLatentSeq.deallocate();
+		zoneVentInstantSeq.deallocate();
+		zoneVentLatentSeq.deallocate();
+		interZoneMixInstantSeq.deallocate();
+		interZoneMixLatentSeq.deallocate();
+		feneCondInstantSeq.deallocate();
+		feneSolarRadSeq.deallocate();
+		feneSolarDelaySeq.deallocate();
+		surfDelaySeq.deallocate();
+		maxUniqueKeyCount = 0;
+		OutputTableBinned.deallocate();
+		BinResults.deallocate();
+		BinResultsBelow.deallocate();
+		BinResultsAbove.deallocate();
+		BinObjVarID.deallocate();
+		BinStatistics.deallocate();
+		namedMonthly.deallocate();
+		MonthlyFieldSetInput.deallocate();
+		MonthlyInput.deallocate();
+		MonthlyTables.deallocate();
+		MonthlyColumns.deallocate();
+		TOCEntries.deallocate();
+		UnitConv.deallocate();
+
+		OutputReportTabular::ResetTabularReports();
+	}
 
 	void
 	UpdateTabularReports( int const IndexTypeKey ) // What kind of data to update (Zone, HVAC)
@@ -453,13 +636,13 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
+
 
 		if ( IndexTypeKey != ZoneTSReporting && IndexTypeKey != HVACTSReporting ) {
 			ShowFatalError( "Invalid reporting requested -- UpdateTabularReports" );
 		}
 
-		if ( GetInput ) {
+		if ( UpdateTabularReportsGetInput ) {
 			GetInputTabularMonthly();
 			OutputReportTabularAnnual::GetInputTabularAnnual();
 			GetInputTabularTimeBins();
@@ -470,7 +653,7 @@ namespace OutputReportTabular {
 			GetInputFuelAndPollutionFactors();
 			SetupUnitConversions();
 			AddTOCZoneLoadComponentTable();
-			GetInput = false;
+			UpdateTabularReportsGetInput = false;
 			date_and_time( _, _, _, td );
 		}
 		if ( DoOutputReporting && WriteTabularFiles && ( KindOfSim == ksRunPeriodWeather ) ) {
@@ -3578,7 +3761,7 @@ namespace OutputReportTabular {
 		Real64 oldScanValue;
 		// local copies of some of the MonthlyColumns array references since
 		// profiling showed that they were slow.
-		static bool RunOnce( true );
+
 		static Array1D_int MonthlyColumnsTypeOfVar;
 		static Array1D_int MonthlyColumnsStepType;
 		static Array1D_int MonthlyColumnsAggType;
@@ -3589,7 +3772,7 @@ namespace OutputReportTabular {
 		if ( ! DoWeathSim ) return;
 
 		//create temporary arrays to speed processing of these arrays
-		if ( RunOnce ) {
+		if ( GatherMonthlyResultsForTimestepRunOnce ) {
 			//MonthlyColumns
 			MonthlyColumnsTypeOfVar = MonthlyColumns.typeOfVar();
 			MonthlyColumnsStepType = MonthlyColumns.stepType();
@@ -3599,7 +3782,7 @@ namespace OutputReportTabular {
 			MonthlyTablesNumColumns = MonthlyTables.numColumns();
 
 			//set flag so this block is only executed once
-			RunOnce = false;
+			GatherMonthlyResultsForTimestepRunOnce = false;
 		}
 
 		elapsedTime = TimeStepSys;
@@ -4360,7 +4543,7 @@ namespace OutputReportTabular {
 		static Real64 bldgHtPk( 0.0 );
 		static Real64 bldgClPk( 0.0 );
 		static Real64 timeStepRatio( 0.0 );
-		static bool firstTime( true );
+
 		Real64 mult; // zone list and group multipliers
 
 		int ActualTimeMin;
@@ -4371,12 +4554,12 @@ namespace OutputReportTabular {
 
 		if ( IndexTypeKey == stepTypeZone ) return; //only add values over the HVAC timestep basis
 
-		if ( firstTime ) {
+		if ( GatherHeatGainReportfirstTime ) {
 			radiantHeat.allocate( NumOfZones );
 			radiantCool.allocate( NumOfZones );
 			ATUHeat.allocate( NumOfZones );
 			ATUCool.allocate( NumOfZones );
-			firstTime = false;
+			GatherHeatGainReportfirstTime = false;
 		}
 		//clear the radiant surface accumulation variables
 		radiantHeat = 0.0;
@@ -10526,9 +10709,9 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool DoAllocate( true );
 
-		if ( DoAllocate ) {
+
+		if ( AllocateLoadComponentArraysDoAllocate ) {
 			//For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
 			radiantPulseUsed.allocate( {0,TotDesDays + TotRunDesPersDays}, NumOfZones );
 			radiantPulseUsed = 0.0;
@@ -10620,7 +10803,7 @@ namespace OutputReportTabular {
 			feneSolarDelaySeq = 0.0;
 			surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			surfDelaySeq = 0.0;
-			DoAllocate = false;
+			AllocateLoadComponentArraysDoAllocate = false;
 		}
 	}
 
