@@ -7343,7 +7343,7 @@ The mass flow rate of the outdoor air stream in kg/s.
 
 #### Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate [m3/s]
 
-The volume flow rate of the outdoor air stream in m3/s.
+The volume flow rate of the outdoor air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location’s elevation and a temperature of 20.0ºC. The standard density does not vary over time.
 
 #### Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]
 
@@ -7351,7 +7351,7 @@ The mass flow rate of the supply air stream in kg/s.
 
 #### Zone Ideal Loads Supply Air Standard Density Volume Flow Rate [m3/s]
 
-The volume flow rate of the supply air stream in m3/s.
+The volume flow rate of the supply air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location’s elevation and a temperature of 20.0ºC. The standard density does not vary over time.
 
 ### ZoneHVAC:FourPipeFanCoil
 
