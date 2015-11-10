@@ -3339,18 +3339,16 @@ namespace RefrigeratedCase {
 
 					// Get volumetric flow rate if applicable
 					if ( Condenser( CondNum ).FlowType == ConstantFlow ) {
-						Real64 tmpDesignWaterFlowRate = 0.0;
 						if ( ( !lNumericBlanks( 5 ) ) && ( Numbers( 5 ) > 0.0 ) ) {
 							Condenser( CondNum ).DesVolFlowRate = Numbers( 5 );
 							Condenser( CondNum ).VolFlowRate = Numbers( 5 );
-							tmpDesignWaterFlowRate = Condenser( CondNum ).DesVolFlowRate;
 						}
 						else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Condenser( CondNum ).Name + "\" " + cNumericFieldNames( 5 ) + " must be greater than zero." );
 							ShowContinueError( "Revise flow rates." );
 							ErrorsFound = true;
 						}
-						RegisterPlantCompDesignFlow( Condenser( CondNum ).InletNode, tmpDesignWaterFlowRate );
+						RegisterPlantCompDesignFlow( Condenser( CondNum ).InletNode, Condenser( CondNum ).DesVolFlowRate );
 					}
 
 

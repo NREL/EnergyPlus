@@ -72963,7 +72963,6 @@ Refrigeration:Condenser:WaterCooled,
         \units m3/s
         \note note required units must be converted from L/s as specified in ARI 450-2007
         \minimum> 0.0
-        \autosizable
         \note Applicable only when loop flow type is Constant Flow.
   N6 ,  \field Water Maximum Flow Rate
         \type real
