@@ -1022,7 +1022,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
 
 }
 
-TEST( OutputReportTabularTest, ConfirmResetBEPSGathering )
+TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 {
 
 	Real64 extLitUse;
