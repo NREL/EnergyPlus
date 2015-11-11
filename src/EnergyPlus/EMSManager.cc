@@ -1452,8 +1452,8 @@ namespace EMSManager {
 			for ( LoopNode = 1; LoopNode <= NumOfNodes; ++LoopNode ) {
 				// setup the setpoint for each type of variable that can be controlled
 				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Setpoint", "[C]", lDummy, Node( LoopNode ).TempSetPoint );
-				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Minimum Setpoint", "[C]", lDummy, Node( LoopNode ).TempMin );
-				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Maximum Setpoint", "[C]", lDummy, Node( LoopNode ).TempMax );
+				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Minimum Setpoint", "[C]", lDummy, Node( LoopNode ).TempSetPointLo );
+				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Temperature Maximum Setpoint", "[C]", lDummy, Node( LoopNode ).TempSetPointHi );
 				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Humidity Ratio Setpoint", "[kgWater/kgDryAir]", lDummy, Node( LoopNode ).HumRatSetPoint );
 				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Humidity Ratio Maximum Setpoint", "[kgWater/kgDryAir]", lDummy, Node( LoopNode ).HumRatMax );
 				SetupEMSActuator( "System Node Setpoint", NodeID( LoopNode ), "Humidity Ratio Minimum Setpoint", "[kgWater/kgDryAir]", lDummy, Node( LoopNode ).HumRatMin );
@@ -1617,6 +1617,23 @@ namespace EMSManager {
 
 		if ( ( ! ErrorFlag ) && ( ! FoundControl ) ) ErrorFlag = true;
 
+	}
+
+	bool
+	CheckIfNodeMoreInfoSensedByEMS( 
+		int const nodeNum, // index of node being checked.
+		std::string const & varName
+	) {
+	bool returnValue;
+
+	returnValue = false;
+	for (auto loop = 1; loop <= NumSensors; ++loop ) {
+		if ( Sensor( loop ).UniqueKeyName == DataLoopNode::NodeID( nodeNum ) && InputProcessor::SameString(Sensor( loop ).OutputVarName ,varName) ) {
+			returnValue = true;
+		}
+	}
+
+	return returnValue;
 	}
 
 	void

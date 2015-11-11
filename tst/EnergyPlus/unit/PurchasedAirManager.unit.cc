@@ -3,6 +3,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 
@@ -107,3 +110,56 @@ TEST( SizePurchasedAirTest, Test1 )
 	UnitarySysEqSizing.deallocate();
 
 }
+
+TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+		"ZoneHVAC:IdealLoadsAirSystem,",
+		"ZONE 1 Ideal Loads, !- Name",
+		", !- Availability Schedule Name",
+		"ZONE 1 INLETS, !- Zone Supply Air Node Name",
+		", !- Zone Exhaust Air Node Name",
+		"50, !- Maximum Heating Supply Air Temperature{ C }",
+		"13, !- Minimum Cooling Supply Air Temperature{ C }",
+		"0.015, !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+		"0.009, !- Minimum Cooling Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+		"NoLimit, !- Heating Limit",
+		"autosize, !- Maximum Heating Air Flow Rate{ m3 / s }",
+		", !- Maximum Sensible Heating Capacity{ W }",
+		"NoLimit, !- Cooling Limit",
+		"autosize, !- Maximum Cooling Air Flow Rate{ m3 / s }",
+		", !- Maximum Total Cooling Capacity{ W }",
+		", !- Heating Availability Schedule Name",
+		", !- Cooling Availability Schedule Name",
+		"ConstantSupplyHumidityRatio, !- Dehumidification Control Type",
+		", !- Cooling Sensible Heat Ratio{ dimensionless }",
+		"ConstantSupplyHumidityRatio, !- Humidification Control Type",
+		", !- Design Specification Outdoor Air Object Name",
+		", !- Outdoor Air Inlet Node Name",
+		", !- Demand Controlled Ventilation Type",
+		", !- Outdoor Air Economizer Type",
+		", !- Heat Recovery Type",
+		", !- Sensible Heat Recovery Effectiveness{ dimensionless }",
+		";                        !- Latent Heat Recovery Effectiveness{ dimensionless }",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::DoWeathSim = true;
+
+	GetPurchasedAir();
+
+	EXPECT_EQ( PurchasedAirManager::PurchAir.size(), 1u );
+	EXPECT_EQ( PurchAir( 1 ).Name, "ZONE 1 IDEAL LOADS" );
+	EXPECT_EQ( PurchAir( 1 ).MaxHeatSuppAirTemp, 50.0);
+	EXPECT_EQ( PurchAir( 1 ).MinCoolSuppAirTemp, 13.0 );
+	EXPECT_EQ( PurchAir( 1 ).MaxHeatSuppAirHumRat, 0.015 );
+	EXPECT_EQ( PurchAir( 1 ).MinCoolSuppAirHumRat, 0.009 );
+	EXPECT_EQ( PurchAir( 1 ).HeatingLimit, NoLimit );
+	EXPECT_EQ( PurchAir( 1 ).CoolingLimit, NoLimit );
+	EXPECT_EQ( PurchAir( 1 ).DehumidCtrlType, ConstantSupplyHumidityRatio );
+	EXPECT_EQ( PurchAir( 1 ).HumidCtrlType, ConstantSupplyHumidityRatio );
+
+}
+
