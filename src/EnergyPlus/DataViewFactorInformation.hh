@@ -33,6 +33,7 @@ namespace DataViewFactorInformation {
 		// Members
 		std::string Name; // Zone name
 		int NumOfSurfaces; // Number of surfaces in the zone
+		int NumOfSurfacesVec; // Number of surfaces rounded up to multiple of vector size (2 or 4)
 		Array2D< Real64 > F; // View Factors
 
 		// Amir Roth 2015-07-01: ScriptF is a hand-rolled
@@ -40,7 +41,8 @@ namespace DataViewFactorInformation {
 		// aligned addresss.  This can/Should be replaced
 		// with an Array2DPadded object in the future.
 
-		Real64 *ScriptF; // Hottel's ScriptF
+		Array2D< Real64 > ScriptF; // Hottel's ScriptF
+		Array1D< Real64 > ScriptFRecvSurfSum; // Sum of ScriptF [ *, Recv ] for each receiving surface
 		Array1D< Real64 > Area; // Surface area
 		Array1D< Real64 > Emissivity; // Surface emissivity
 		Array1D< Real64 > Azimuth; // Azimuth angle of the surface (in degrees)
@@ -51,31 +53,6 @@ namespace DataViewFactorInformation {
 		// Default Constructor
 		ZoneViewFactorInformation() :
 			NumOfSurfaces( 0 )
-		{}
-
-		// Member Constructor
-		ZoneViewFactorInformation(
-			std::string const & Name, // Zone name
-			int const NumOfSurfaces, // Number of surfaces in the zone
-			Array2< Real64 > const & F, // View Factors
-			Real64 * ScriptF,
-			Array1< Real64 > const & Area, // Surface area
-			Array1< Real64 > const & Emissivity, // Surface emissivity
-			Array1< Real64 > const & Azimuth, // Azimuth angle of the surface (in degrees)
-			Array1< Real64 > const & Tilt, // Tilt angle of the surface (in degrees)
-			Array1_int const & SurfacePtr, // Surface ALLOCATABLE (to Surface derived type)
-			Array1_string const & Class // Class of surface (Wall, Roof, etc.)
-		) :
-			Name( Name ),
-			NumOfSurfaces( NumOfSurfaces ),
-			F( F ),
-			ScriptF( ScriptF ),
-			Area( Area ),
-			Emissivity( Emissivity ),
-			Azimuth( Azimuth ),
-			Tilt( Tilt ),
-			SurfacePtr( SurfacePtr ),
-			Class( Class )
 		{}
 
 	};
