@@ -7396,7 +7396,7 @@ namespace WaterThermalTanks {
 			}
 			return;
 		}
-		TankTemp = GetHPWHSensedTankTemp( Tank );
+		TankTemp = Tank.SavedTankTemp;
 		HeatPump.Mode = HeatPump.SaveMode;
 
 		RhoWater = RhoH2O(TankTemp);//udpate water density using tank temp
@@ -8136,7 +8136,8 @@ namespace WaterThermalTanks {
 			*CoilTotalHeatingEnergyRatePtr = CoilTotalHeatingEnergyRateBackup;
 		}
 		Real64 const NewTankTemp = GetHPWHSensedTankTemp( Tank );
-		return Par(1) - NewTankTemp;
+		Real64 const PLRResidualHPWH = Par( 1 ) - NewTankTemp;
+		return PLRResidualHPWH;
 
 	}
 
