@@ -6798,7 +6798,6 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
-		using ManageElectricPower::ElecStorage;
 		using ManageElectricPower::NumElecStorageDevices;
 		using DataHVACGlobals::deviationFromSetPtThresholdHtg;
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
