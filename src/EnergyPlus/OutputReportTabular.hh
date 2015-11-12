@@ -177,6 +177,8 @@ namespace OutputReportTabular {
 	extern Real64 gatherElecPurchased;
 	extern int meterNumElecSurplusSold;
 	extern Real64 gatherElecSurplusSold;
+	extern int meterNumElecStorage;
+	extern Real64 gatherElecStorage;
 	// for on site thermal source components on BEPS report
 	extern int meterNumWaterHeatRecovery;
 	extern Real64 gatherWaterHeatRecovery;
