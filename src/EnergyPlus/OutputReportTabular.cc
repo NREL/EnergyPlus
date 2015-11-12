@@ -8469,7 +8469,6 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
-		using ManageElectricPower::ElecStorage;
 		using ManageElectricPower::NumElecStorageDevices;
 
 		// Locals
