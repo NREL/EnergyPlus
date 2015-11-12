@@ -218,8 +218,7 @@ namespace EnergyPlus {
 
 	// This is the equivalent hand-vectorized version.
 
-	__m128d pdZeroConst;
-	pdZeroConst = _mm_xor_pd( pdZeroConst, pdZeroConst ); // The fastest way to zero-out a register is to XOR it with itself
+	__m128d pdZeroConst = _mm_setzero_pd();
 	for ( int RecvZoneSurfNum = 0; RecvZoneSurfNum < zvfi.NumOfSurfacesVec; RecvZoneSurfNum += 2 ) {
 		_mm_store_pd( &vecZvfiScriptFRecvSurfSum[ RecvZoneSurfNum ], pdZeroConst );
 	} // for RecvZoneSurfNum
@@ -532,8 +531,7 @@ namespace HeatBalanceIntRadExchange {
 					} // for SendZoneSurfNum
 #else // ! EXPLICIT_VECTORIZATION
 
-					__m128d pdZeroConst;
-					pdZeroConst = _mm_xor_pd( pdZeroConst, pdZeroConst );
+					__m128d pdZeroConst = _mm_setzero_pd();
 					for ( int RecvZoneSurfNum = 0; RecvZoneSurfNum < zvfi.NumOfSurfacesVec; RecvZoneSurfNum += 2 ) {
 						_mm_store_pd( &vecZvfiScriptFRecvSurfSum[ RecvZoneSurfNum ], pdZeroConst );
 					} // for RecvZoneSurfNum
