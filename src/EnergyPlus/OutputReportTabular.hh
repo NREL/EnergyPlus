@@ -124,7 +124,6 @@ namespace OutputReportTabular {
 	extern bool displayAdaptiveComfort;
 	extern bool displaySourceEnergyEndUseSummary;
 	extern bool displayZoneComponentLoadSummary;
-	extern bool doAllocateLoadCompArrays;
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -731,9 +730,6 @@ namespace OutputReportTabular {
 	extern Array1D< UnitConvType > UnitConv;
 
 	// Functions
-	void
-	clear_state();
-
 	void
 	clear_state();
 

@@ -224,7 +224,6 @@ namespace OutputReportTabular {
 	bool displayAdaptiveComfort( false );
 	bool displaySourceEnergyEndUseSummary( false );
 	bool displayZoneComponentLoadSummary( false );
-	bool doAllocateLoadCompArrays( true );
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
