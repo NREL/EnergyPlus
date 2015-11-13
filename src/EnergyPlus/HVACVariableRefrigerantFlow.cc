@@ -4227,17 +4227,18 @@ namespace HVACVariableRefrigerantFlow {
 			NumCoolingLoads( VRFCond ) = 0;
 			NumHeatingLoads( VRFCond ) = 0;
 				
+			Real64 QZnReqCooling;
 			Real64 QZnReqHeating;
 			
 			if ( VRF( VRFCond ).ThermostatPriority == MasterThermostatPriority ) {
-				QZnReq = ZoneSysEnergyDemand( VRF( VRFCond ).MasterZonePtr ).OutputRequiredToCoolingSP;
+				QZnReqCooling = ZoneSysEnergyDemand( VRF( VRFCond ).MasterZonePtr ).OutputRequiredToCoolingSP;
 				QZnReqHeating = ZoneSysEnergyDemand( VRF( VRFCond ).MasterZonePtr ).OutputRequiredToHeatingSP;
 				
-				if ( ( QZnReq < 0.0 ) && ( QZnReqHeating < 0.0 ) ) {
+				if ( ( QZnReqCooling < 0.0 ) && ( QZnReqHeating < 0.0 ) ) {
 					CoolingLoad( VRFCond ) = true;
 					HeatingLoad( VRFCond ) = false;
 					CompOnMassFlow = VRFTU( VRFTUNum ).MaxCoolAirMassFlow;
-				} else if ( ( QZnReq > 0.0 ) && ( QZnReqHeating > 0.0 ) ) {
+				} else if ( ( QZnReqCooling > 0.0 ) && ( QZnReqHeating > 0.0 ) ) {
 					CoolingLoad( VRFCond ) = false;
 					HeatingLoad( VRFCond ) = true;
 					CompOnMassFlow = VRFTU( VRFTUNum ).MaxHeatAirMassFlow;
@@ -4252,11 +4253,11 @@ namespace HVACVariableRefrigerantFlow {
 				for ( int NumTULoop = 1; NumTULoop <= TerminalUnitList( TUListNum ).NumTUInList; NumTULoop++ ) {
 					TUIndex = TerminalUnitList( TUListNum ).ZoneTUPtr( NumTULoop );
 					int ThisZoneNum = VRFTU( TUIndex ).ZoneNum;
-					QZnReq = ZoneSysEnergyDemand( ThisZoneNum ).OutputRequiredToCoolingSP;
+					QZnReqCooling = ZoneSysEnergyDemand( ThisZoneNum ).OutputRequiredToCoolingSP;
 					QZnReqHeating = ZoneSysEnergyDemand( ThisZoneNum ).OutputRequiredToHeatingSP;
 					
-					if( QZnReq < 0.0 ) NumCoolingLoads( VRFCond ) = NumCoolingLoads( VRFCond ) + 1;
-					if ( QZnReqHeating > 0.0 ) NumHeatingLoads( VRFCond ) = NumHeatingLoads( VRFCond ) + 1;
+					if( QZnReqCooling < 0.0 ) NumCoolingLoads( VRFCond ) = NumCoolingLoads( VRFCond ) + 1;
+					if( QZnReqHeating > 0.0 ) NumHeatingLoads( VRFCond ) = NumHeatingLoads( VRFCond ) + 1;
 				}
 				
 				if ( NumCoolingLoads( VRFCond ) > NumHeatingLoads( VRFCond ) ) {
@@ -5303,8 +5304,9 @@ namespace HVACVariableRefrigerantFlow {
 		
 		if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) { 
 		// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-			//PartLoadRatio = 0.9;
+			//ControlVRF( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
 			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
+			//CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
 		} else {
 		// Algorithm Type: VRF model based on system curve
 			ControlVRF( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
@@ -8446,6 +8448,9 @@ namespace HVACVariableRefrigerantFlow {
 		EvapTemp = VRF(VRFCond).IUEvaporatingTemp;
 		CondTemp = VRF(VRFCond).IUCondensingTemp;
 
+		// Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
+		//SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
+		
 		AirMassFlow = Node( VRFTUInletNodeNum ).MassFlowRate;
 		if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
 
