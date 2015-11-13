@@ -1598,6 +1598,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowPerArea = rNumericArgs( 10 );
+						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowPerAreaUsInpFlg = true;
 					}
 					//  N11,\field Cooling Minimum Air Flow
 					//      \type real
@@ -1613,6 +1614,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlow = rNumericArgs( 11 );
+						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowUsInpFlg = true;
 					}
 					//  N12,\field Cooling Minimum Air Flow Fraction
 					//      \note fraction of the Cooling design Air Flow Rate
@@ -1629,6 +1631,7 @@ namespace SizingManager {
 						ErrorsFound = true;
 					} else {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFrac = rNumericArgs( 12 );
+						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = true;
 					}
 					//  N13,\field Heating Design Air Flow Rate
 					//      \type real
