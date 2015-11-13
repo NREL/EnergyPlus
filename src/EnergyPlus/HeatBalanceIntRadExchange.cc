@@ -238,8 +238,12 @@ namespace EnergyPlus {
 
 // Portable wrapper for compiler alignment hints
 
-#if defined( __clang__ ) && __has_builtin( __builtin_assume_aligned )
-#define __ep_assume_aligned(T, A, N) A = (T)__builtin_assume_aligned(A, N)
+#if defined( __clang__ )
+	#if __has_builtin( __builtin_assume_aligned )
+	#define __ep_assume_aligned(T, A, N) A = (T)__builtin_assume_aligned(A, N)
+	#else
+	#define __ep_assume_aligned(T, A, N)
+	#endif
 #elif defined( __INTEL_COMPILER )
 #define __ep_assume_aligned(T, A, N) __assume_aligned(A, N)
 #elif defined( __GNUC__ )
