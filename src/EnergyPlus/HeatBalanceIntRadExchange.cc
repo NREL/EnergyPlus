@@ -454,6 +454,10 @@ namespace HeatBalanceIntRadExchange {
 			ZoneData const & zone( Zone( ZoneNum ) );
 			ZoneViewFactorInformation & zvfi( ZoneInfo( ZoneNum ) );
 
+#ifndef EXPLICIT_VECTORIZATION
+			int zvfiNumOfSurfaces2 = __round_2( zvfi.NumOfSurfaces );
+#endif // ! EXPLICIT_VECTORIZATION
+
 			// Calculate ScriptF if first time step in environment and surface heat-balance iterations not yet started;
 			// recalculate ScriptF if status of window interior shades or blinds has changed from
 			// previous time step. This recalculation is required since ScriptF depends on the inside
@@ -653,10 +657,10 @@ namespace HeatBalanceIntRadExchange {
 				__ep_assume_aligned(Real64 *, vecZvfiScriptF, 16);
 
 				assert( ( zvfiNumOfSurfaces2 % 2 ) == 0 );
-				for ( ; RecZoneSurfNum < zvfiNumOfSurfaces2; ++RecZoneSurfNum ) {
+				for ( ; RecvZoneSurfNum < zvfiNumOfSurfaces2; ++RecvZoneSurfNum ) {
 					// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
 
-					vecIRfromParentZone_Temp[ RecZoneSurfNum ] += vecZvfiScriptF[ RecZoneSurfNum ] * vecSurfaceTempK4[ SendZoneSurfNum ];
+					vecIRfromParentZone_Temp[ RecvZoneSurfNum ] += vecZvfiScriptF[ RecvZoneSurfNum ] * vecSurfaceTempK4[ SendZoneSurfNum ];
 					// Per BG -- this should never happened.  (CR6346,CR6550 caused this to be put in.  Now removed. LKL 1/2013)
 					//          IF (SurfaceWindow(RecSurfNum)%IRfromParentZone < 0.0) THEN
 					//            CALL ShowRecurringWarningErrorAtEnd('CalcInteriorRadExchange: Window_IRFromParentZone negative, Window="'// &
@@ -667,7 +671,7 @@ namespace HeatBalanceIntRadExchange {
 					//            SurfaceWindow(RecSurfNum)%IRfromParentZone=0.0
 					//          ENDIF
 
-				} // for RecZoneSurfNum
+				} // for RecvZoneSurfNum
 
 
 
