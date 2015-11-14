@@ -245,6 +245,12 @@ namespace EnergyPlus {
 #define __ep_assume_aligned(T, A, N)
 #endif 
 
+#else // ! EXPLICIT_VECTORIZATION
+
+#if defined(__clang__)
+#include <emmintrin>
+#endif // defined(__clang__)
+
 #endif // ! EXPLICIT_VECTORIZATION
 
 namespace HeatBalanceIntRadExchange {
