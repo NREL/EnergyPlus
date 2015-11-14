@@ -1,6 +1,7 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include "emmintrin.h"
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -43,11 +44,11 @@ namespace EnergyPlus {
 	// syntax-coloring
 
 #ifdef VECTORIZATION_TUTORIAL
-	
+
 	// High level languages make it seem like all variables live
 	// in memory and that operations like:
 
-	int A, B, C; 
+	int A, B, C;
 	C = A + B;
 
 	// take place in memory.  In reality, most variables do live
@@ -83,7 +84,7 @@ namespace EnergyPlus {
 
 	// Look at the code above.  Prior to SSE, this code would
 	// compile into:
-	
+
 	reg1 = load(&A[0]);
 	reg2 = load(&B[0]);
 	reg3 = add(reg1,reg2);
@@ -96,7 +97,7 @@ namespace EnergyPlus {
 	// But with SSE, you could cut it in half:
 
 	SSEreg1 = load(&A[0]); // in parallel: SSEreg1[0] = load(&A[0]); SSEreg1[1] = load(&A[1]);
-	SSEreg2 = load(&B[0]); // in parallel: SSEreg2[0] = load(&B[0]); SSEreg2[1] = load(&B[1]); 
+	SSEreg2 = load(&B[0]); // in parallel: SSEreg2[0] = load(&B[0]); SSEreg2[1] = load(&B[1]);
 	SSEreg3 = add(SSEreg1, SSEreg2); // in parallel: SSEreg3[0] = add(SSEreg1[0], SSEreg2[0]); SSEreg3[1] = add(SSEreg1[1], SSEreg2[1]);
 	store(&C[1], SSEreg3); // in parallel: store(&C[0], SSEreg3[0]); store(&C[1], SSEreg3[1]);
 
@@ -127,7 +128,7 @@ namespace EnergyPlus {
 
 	// Some compilers have gotten better at generating vector
 	// instructions from conventional loop code, but to do so they
-	// usually need help.  
+	// usually need help.
 
 	// First, vector instructions can only operate on arrays of
 	// basic builtin data types like ints, floats, and doubles.
@@ -208,7 +209,7 @@ namespace EnergyPlus {
 	Real64 * __restrict vecZvfiScriptFRecvSurfSum( &zvfi.ScriptFRecvSurfSum[ 0 ] );
 
 #ifndef EXPLICIT_VECTORIZATION
-	
+
 	// This is the conventional version
 	for ( int RecvZoneSurfNum = 0; RecvZoneSurfNum < zvfi.NumOfSurfaces; ++RecvZoneSurfNum ) {
 		zvfi.ScriptFRecvSurfSum[ RecvZoneSurfNum ] = 0.0;
@@ -233,17 +234,23 @@ namespace EnergyPlus {
 #define __round_2(I) (((I + 1) >> 1) << 1)
 #define __round_4(I) (((I + 1) >> 2) << 2)
 
-#ifndef EXPLICIT_VECTORIZATION 
+#ifndef EXPLICIT_VECTORIZATION
 
 // Portable wrapper for compiler alignment hints
-	
-#if defined(__GNUC__) && !defined(__clang__)
-#define __ep_assume_aligned(T, A, N) A = (T)__builtin_assume_aligned(A, N)
-#elif defined(__INTEL_COMPILER) 
+
+#if defined( __clang__ )
+	#if __has_builtin( __builtin_assume_aligned )
+	#define __ep_assume_aligned(T, A, N) A = (T)__builtin_assume_aligned(A, N)
+	#else
+	#define __ep_assume_aligned(T, A, N)
+	#endif
+#elif defined( __INTEL_COMPILER )
 #define __ep_assume_aligned(T, A, N) __assume_aligned(A, N)
+#elif defined( __GNUC__ )
+#define __ep_assume_aligned(T, A, N) A = (T)__builtin_assume_aligned(A, N)
 #else
 #define __ep_assume_aligned(T, A, N)
-#endif 
+#endif
 
 #else // ! EXPLICIT_VECTORIZATION
 
@@ -457,6 +464,10 @@ namespace HeatBalanceIntRadExchange {
 			ZoneData const & zone( Zone( ZoneNum ) );
 			ZoneViewFactorInformation & zvfi( ZoneInfo( ZoneNum ) );
 
+#ifndef EXPLICIT_VECTORIZATION
+			int zvfiNumOfSurfaces2 = __round_2( zvfi.NumOfSurfaces );
+#endif // ! EXPLICIT_VECTORIZATION
+
 			// Calculate ScriptF if first time step in environment and surface heat-balance iterations not yet started;
 			// recalculate ScriptF if status of window interior shades or blinds has changed from
 			// previous time step. This recalculation is required since ScriptF depends on the inside
@@ -483,8 +494,8 @@ namespace HeatBalanceIntRadExchange {
 						if ( ! Construct( ConstrNum ).TypeIsWindow ) continue;
 						ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
 						ShadeFlagPrev = SurfaceWindow( SurfNum ).ExtIntShadePrevTS;
-						if ( ( ShadeFlagPrev != IntShadeOn && ShadeFlag == IntShadeOn ) ||  ( ShadeFlagPrev != IntBlindOn && ShadeFlag == IntBlindOn ) || 
-						     ( ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn ) || ( ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn ) ) 
+						if ( ( ShadeFlagPrev != IntShadeOn && ShadeFlag == IntShadeOn ) ||  ( ShadeFlagPrev != IntBlindOn && ShadeFlag == IntBlindOn ) ||
+						     ( ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn ) || ( ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn ) )
 							IntShadeOrBlindStatusChanged = true;
 					}
 				}
@@ -496,8 +507,8 @@ namespace HeatBalanceIntRadExchange {
 						zvfi.Emissivity( ZoneSurfNum ) = Construct( ConstrNum ).InsideAbsorpThermal;
 						auto const & surface_window( SurfaceWindow( SurfNum ) );
 						if ( Construct( ConstrNum ).TypeIsWindow && ( surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn ) ) {
-							zvfi.Emissivity( ZoneSurfNum ) = 
-								InterpSlatAng( surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss ) + 
+							zvfi.Emissivity( ZoneSurfNum ) =
+								InterpSlatAng( surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss ) +
 								InterpSlatAng( surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffGlassEmiss );
 						}
 					} // for ZoneSurfNum
@@ -506,7 +517,7 @@ namespace HeatBalanceIntRadExchange {
 
 					// multiply by StefanBoltzmannConstant
 					Real64 * __restrict vecZvfiScriptF ( &zvfi.ScriptF[ 0 ] );
-#ifndef EXPLICIT_VECTORIZATION 
+#ifndef EXPLICIT_VECTORIZATION
 					__ep_assume_aligned(Real64 *, vecZvfiScriptF, 16);
 					int zvfiNumOfSurfacesTimesNumOfSurfaces2 = zvfi.NumOfSurfaces * zvfiNumOfSurfaces2;
 					assert( (zvfiNumOfSurfacesTimesNumOfSurfaces2 % 2) == 0);
@@ -531,7 +542,7 @@ namespace HeatBalanceIntRadExchange {
 
 					for ( int SendZoneSurfNum = 0; SendZoneSurfNum < zvfi.NumOfSurfaces; ++SendZoneSurfNum ) {
 						for ( int RecvZoneSurfNum = 0; RecvZoneSurfNum < zvfi.NumOfSurfaces; ++RecvZoneSurfNum ) {
-							zvfi.ScriptFRecvSurfSum[ RecvZoneSurfNum ] += 
+							zvfi.ScriptFRecvSurfSum[ RecvZoneSurfNum ] +=
 								zvfi.ScriptF[ (zvfi.NumOfSurfacesVec * SendZoneSurfNum) + RecvZoneSurfNum ];
 						} // for RecvZoneSurfNum
 					} // for SendZoneSurfNum
@@ -551,9 +562,9 @@ namespace HeatBalanceIntRadExchange {
 						} // for RecvZoneSurfNum
 					} // for SendZoneSurfNum
 
-#endif // ! EXPLICIT_VECTORIZATION 
+#endif // ! EXPLICIT_VECTORIZATION
 
-				} // if IntShadOrBlindStatusChanged || BeginEnvrnFlag 
+				} // if IntShadOrBlindStatusChanged || BeginEnvrnFlag
 
 			} // End of check if SurfIterations = 0
 
@@ -577,9 +588,9 @@ namespace HeatBalanceIntRadExchange {
 						// For windows with an interior shade or blind an effective inside surface temp
 						// and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
 						SurfaceTempK4[ ZoneSurfNum ] = window.EffInsSurfTemp;
-						SurfaceEmiss[ ZoneSurfNum ] = 
-							InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffShBlindEmiss ) + 
-							InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffGlassEmiss );					
+						SurfaceEmiss[ ZoneSurfNum ] =
+							InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffShBlindEmiss ) +
+							InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffGlassEmiss );
 					} else {
 						SurfaceTempK4[ ZoneSurfNum ] = SurfaceTemp( SurfNum );
 						SurfaceEmiss[ ZoneSurfNum ] = construct.InsideAbsorpThermal;
@@ -593,7 +604,7 @@ namespace HeatBalanceIntRadExchange {
 			// Amir Roth 2015-07-01: Split off SurfaceTemp = pow4(SurfaceTemp) calculation so that it will vectorize.
 
 			Real64 * __restrict vecSurfaceTempK4( &SurfaceTempK4[ 0 ] );
-#ifndef EXPLICIT_VECTORIZATION			
+#ifndef EXPLICIT_VECTORIZATION
 
 			__ep_assume_aligned(Real64 *, vecSurfaceTempK4, 16);
 			assert( ( zvfiNumOfSurfaces2 % 2 ) == 0 );
@@ -602,7 +613,7 @@ namespace HeatBalanceIntRadExchange {
 			} // for ZoneSurfNum
 
 #else // ! EXPLICIT_VECTORIZATION
-			
+
 			__m128d pdKelvinConv = _mm_load1_pd( &KelvinConv );
 			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfacesVec; ZoneSurfNum += 2 ) {
 			    __m128d pdSurfaceTempK4 = _mm_load_pd( &vecSurfaceTempK4[ ZoneSurfNum ] );
@@ -627,8 +638,7 @@ namespace HeatBalanceIntRadExchange {
 
 #else // ! EXPLICIT_VECTORIZATION
 
-			__m128d pdZeroConst;
-			pdZeroConst = _mm_xor_pd( pdZeroConst, pdZeroConst );
+			__m128d pdZeroConst = _mm_setzero_pd();
 			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfacesVec; ZoneSurfNum += 2 ) {
 			    _mm_store_pd( &vecIRfromParentZone_Temp[ ZoneSurfNum ], pdZeroConst );
 			} // ZoneSurfNum
@@ -636,8 +646,8 @@ namespace HeatBalanceIntRadExchange {
 #endif // ! EXPLICIT_VECTORIZATION
 
 			// These are the money loops
-			
-			// Amir Roth 2015-07-01: vectorize the inner loop for performance.  Made SendZoneSurfNum the outer loop to enable 
+
+			// Amir Roth 2015-07-01: vectorize the inner loop for performance.  Made SendZoneSurfNum the outer loop to enable
 			// vectorization.
 			for ( int SendZoneSurfNum = 0; SendZoneSurfNum < zvfi.NumOfSurfaces; ++SendZoneSurfNum ) {
 
@@ -647,7 +657,7 @@ namespace HeatBalanceIntRadExchange {
 				Real64 * __restrict vecIRfromParentZone_Temp( &IRfromParentZone_Temp[ RecvZoneSurfNum ] );
 				Real64 * __restrict vecSurfaceTempK4( &SurfaceTempK4[ RecvZoneSurfNum ] );
 				Real64 * __restrict vecZvfiScriptF( &zvfi.ScriptF[ (SendZoneSurfNum * zvfi.NumOfSurfacesVec) + RecvZoneSurfNum ] );
-			
+
 				// Calculate net long-wave radiation for opaque surfaces and incident
 				// long-wave radiation for windows.
 
@@ -657,10 +667,10 @@ namespace HeatBalanceIntRadExchange {
 				__ep_assume_aligned(Real64 *, vecZvfiScriptF, 16);
 
 				assert( ( zvfiNumOfSurfaces2 % 2 ) == 0 );
-				for ( ; RecZoneSurfNum < zvfiNumOfSurfaces2; ++RecZoneSurfNum ) {
+				for ( ; RecvZoneSurfNum < zvfiNumOfSurfaces2; ++RecvZoneSurfNum ) {
 					// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
-					
-					vecIRfromParentZone_Temp[ RecZoneSurfNum ] += vecZvfiScriptF[ RecZoneSurfNum ] * vecSurfaceTempK4[ SendZoneSurfNum ];
+
+					vecIRfromParentZone_Temp[ RecvZoneSurfNum ] += vecZvfiScriptF[ RecvZoneSurfNum ] * vecSurfaceTempK4[ SendZoneSurfNum ];
 					// Per BG -- this should never happened.  (CR6346,CR6550 caused this to be put in.  Now removed. LKL 1/2013)
 					//          IF (SurfaceWindow(RecSurfNum)%IRfromParentZone < 0.0) THEN
 					//            CALL ShowRecurringWarningErrorAtEnd('CalcInteriorRadExchange: Window_IRFromParentZone negative, Window="'// &
@@ -670,8 +680,8 @@ namespace HeatBalanceIntRadExchange {
 					//                '", reset to 0.0 for remaining calculations.',SurfaceWindow(RecSurfNum)%IRErrCountC)
 					//            SurfaceWindow(RecSurfNum)%IRfromParentZone=0.0
 					//          ENDIF
-				
-				} // for RecZoneSurfNum
+
+				} // for RecvZoneSurfNum
 
 
 
@@ -692,14 +702,14 @@ namespace HeatBalanceIntRadExchange {
 			} // for SendZoneSurfNum
 
 
-			// Amir Roth 2015-07-01: because loops with conditionals will not vectorize and because "money" Send->Recv inner loop had a 
+			// Amir Roth 2015-07-01: because loops with conditionals will not vectorize and because "money" Send->Recv inner loop had a
 			// conditional, pulled that conditional out and implemented it here.
 			for ( int RecvZoneSurfNum = 0; RecvZoneSurfNum < zvfi.NumOfSurfaces; ++RecvZoneSurfNum ) {
 				int SurfNum = zvfi.SurfacePtr[ RecvZoneSurfNum ];
 				NetLWRadToSurf( SurfNum ) += IRfromParentZone_Temp[ RecvZoneSurfNum ];
 				NetLWRadToSurf( SurfNum ) -= zvfi.ScriptFRecvSurfSum[ RecvZoneSurfNum ] * SurfaceTempK4[ RecvZoneSurfNum ];
 
-				if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) 
+				if ( Construct( Surface( SurfNum ).Construction ).TypeIsWindow )
 					SurfaceWindow( SurfNum ).IRfromParentZone += IRfromParentZone_Temp[ RecvZoneSurfNum ] / SurfaceEmiss [ RecvZoneSurfNum ];
 			} // for RecvZoneSurfNum
 		} // for ZoneNum
@@ -1626,16 +1636,16 @@ namespace HeatBalanceIntRadExchange {
 		}
 		Excite.clear(); // Release memory ASAP
 
-		// Form ScriptF matrix 
+		// Form ScriptF matrix
 		// Amir Roth 2015-07-01: Npad is the size of a "padded" row
 		unsigned int Npad = __round_2( N );
 
-		for ( int i = 1; i <= N; ++i ) { 
+		for ( int i = 1; i <= N; ++i ) {
 			for ( int j = 1, lj = EMISS.index(j), ill = Cinverse.index(i, j), sll = (i-1)*Npad+(j-1); j <= N; ++j, ++lj, ++ill, ++sll ) {
 				// These need to be inside the inner loop so that the whole thing
 				// vectorizes.  If we try to pull these out then the inner loses unit stride.
 				Real64 const EMISS_j = EMISS[ lj ];
-				Real64 const EMISS_facj = EMISS_j / ( 1.0 - EMISS_j ); 
+				Real64 const EMISS_facj = EMISS_j / ( 1.0 - EMISS_j );
 
 				//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
 				ScriptF[ sll ] = EMISS_facj * Cinverse[ ill ]; // [ l ] == ( i, j )
