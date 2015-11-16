@@ -2,13 +2,13 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
 
-	TEST_F( HVACFixture, VariableSpeedCoils_mixedCoilTypesInput ) {
+	TEST_F( EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput ) {
 		std::string const idf_objects = delimited_string({
 		"  Coil:Cooling:DX:VariableSpeed,",
 		"    PSZ-AC_1:5_CoolC Standard 4-compressor IPAK,  !- Name",

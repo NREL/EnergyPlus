@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <DXCoils.hh>
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
@@ -15,6 +15,9 @@
 #include <DataHeatBalance.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>
+#include <Psychrometrics.hh>
+#include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -29,7 +32,7 @@ using namespace DataEnvironment;
 
 namespace EnergyPlus {
 
-	TEST_F( HVACFixture, DXCoils_Test1 ) {
+	TEST_F( EnergyPlusFixture, DXCoils_Test1 ) {
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
 		using CurveManager::NumCurves;
@@ -163,7 +166,7 @@ namespace EnergyPlus {
 		PerfCurve.deallocate();
 
 	}
-	TEST_F( HVACFixture, DXCoils_Test2 ) {
+	TEST_F( EnergyPlusFixture, DXCoils_Test2 ) {
 		using CurveManager::Quadratic;
 		using CurveManager::BiQuadratic;
 		using CurveManager::NumCurves;
@@ -281,7 +284,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, TestMultiSpeedDefrostCOP ) {
+	TEST_F( EnergyPlusFixture, TestMultiSpeedDefrostCOP ) {
 		// Test that the COP calculation is correct when the defrost is on. #4973
 
 		using CurveManager::Quadratic;
@@ -607,7 +610,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, TestSingleSpeedDefrostCOP ) {
+	TEST_F( EnergyPlusFixture, TestSingleSpeedDefrostCOP ) {
 		// Test that the COP calculation is correct when the defrost is on. #4973
 
 		using CurveManager::Quadratic;
@@ -780,7 +783,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, TestCalcCBF ) {
+	TEST_F( EnergyPlusFixture, TestCalcCBF ) {
 		using DataEnvironment::StdPressureSeaLevel;
 		const std::string CoilType( "Coil:WaterHeating:AirToWaterHeatPump:Wrapped" );
 		const std::string CoilName( "The Coil" );
@@ -803,7 +806,7 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( CBF_calculated, CBF_expected );
 	}
 
-	TEST_F( HVACFixture, DXCoilEvapCondPumpSizingTest ) {
+	TEST_F( EnergyPlusFixture, DXCoilEvapCondPumpSizingTest ) {
 		
 		// tests autosizing evaporatively cooled condenser pump #4802
 		
@@ -917,7 +920,7 @@ namespace EnergyPlus {
 		DXCoil.deallocate();
 	}
 	
-	TEST_F( HVACFixture, TestDXCoilIndoorOrOutdoor ) {
+	TEST_F( EnergyPlusFixture, TestDXCoilIndoorOrOutdoor ) {
 		
 		//Test whether the coil is placed indoor or outdoor, by checking the air inlet node location
 		
@@ -968,7 +971,7 @@ namespace EnergyPlus {
 		DXCoil.deallocate( ); 
 	}
 	
-	TEST_F( HVACFixture, TestMultiSpeedWasteHeat )
+	TEST_F( EnergyPlusFixture, TestMultiSpeedWasteHeat )
 	{
 		// Test the waste heat function #4536
 
