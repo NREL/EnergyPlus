@@ -1619,6 +1619,23 @@ namespace EMSManager {
 
 	}
 
+	bool
+	CheckIfNodeMoreInfoSensedByEMS( 
+		int const nodeNum, // index of node being checked.
+		std::string const & varName
+	) {
+	bool returnValue;
+
+	returnValue = false;
+	for (auto loop = 1; loop <= NumSensors; ++loop ) {
+		if ( Sensor( loop ).UniqueKeyName == DataLoopNode::NodeID( nodeNum ) && InputProcessor::SameString(Sensor( loop ).OutputVarName ,varName) ) {
+			returnValue = true;
+		}
+	}
+
+	return returnValue;
+	}
+
 	void
 	SetupPrimaryAirSystemAvailMgrAsActuators()
 	{

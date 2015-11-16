@@ -75,6 +75,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
@@ -192,6 +193,7 @@ namespace EnergyPlus {
 		Pipes::clear_state();
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
+		PurchasedAirManager::clear_state();
 		RuntimeLanguageProcessor::clear_state();
 		ScheduleManager::clear_state();
 		SetPointManager::clear_state();
