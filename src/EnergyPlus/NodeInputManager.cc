@@ -89,6 +89,7 @@
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <EMSManager.hh>
 
 namespace EnergyPlus {
 
@@ -153,7 +154,9 @@ namespace NodeInputManager {
 
 	// Object Data
 	Array1D< NodeListDef > NodeLists; // Node Lists
-
+	namespace { 
+		bool CalcMoreNodeInfoMyOneTimeFlag( true ); // one time flag
+	}
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
@@ -164,6 +167,7 @@ namespace NodeInputManager {
 	void
 	clear_state()
 	{
+		CalcMoreNodeInfoMyOneTimeFlag = true;
 		NumOfNodeLists = 0;
 		NumOfUniqueNodeNames = 0;
 		GetNodeInputFlag = true;
@@ -1153,7 +1157,7 @@ namespace NodeInputManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iNode; // node loop index
 		int iReq; // requested report variables loop index
-		static bool MyOneTimeFlag( true ); // one time flag
+
 		static Real64 RhoAirStdInit;
 		static Real64 RhoWaterStdInit;
 		static Array1D_int NodeWetBulbSchedPtr;
@@ -1175,7 +1179,7 @@ namespace NodeInputManager {
 		Real64 Cp;
 		Real64 rhoStd;
 
-		if ( MyOneTimeFlag ) {
+		if ( CalcMoreNodeInfoMyOneTimeFlag ) {
 			RhoAirStdInit = StdRhoAir;
 			RhoWaterStdInit = RhoH2O( InitConvTemp );
 			NodeWetBulbRepReq.allocate( NumOfNodes );
@@ -1210,8 +1214,21 @@ namespace NodeInputManager {
 						}
 					}
 				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Wetbulb Temperature" ) ) { 
+					NodeWetBulbRepReq( iNode ) = true;
+					NodeWetBulbSchedPtr( iNode ) = 0;
+				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Relative Humidity" ) ) {
+					NodeRelHumidityRepReq( iNode ) = true;
+					NodeRelHumiditySchedPtr( iNode ) = 0;
+				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Dewpoint Temperature" ) ) {
+					NodeDewPointRepReq( iNode ) = true;
+					NodeDewPointSchedPtr( iNode ) = 0;
+				}
+
 			}
-			MyOneTimeFlag = false;
+			CalcMoreNodeInfoMyOneTimeFlag = false;
 		}
 
 		for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {

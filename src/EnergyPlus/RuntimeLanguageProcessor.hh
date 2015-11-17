@@ -235,6 +235,8 @@ namespace RuntimeLanguageProcessor {
 	extern Array1D< RuntimeReportVarType > RuntimeReportVar;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	InitializeRuntimeLanguage();
