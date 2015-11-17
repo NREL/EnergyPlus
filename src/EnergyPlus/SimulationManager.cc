@@ -1537,6 +1537,9 @@ namespace SimulationManager {
 		using CostEstimateManager::SimCostEstimate;
 		using General::TrimSigDigits;
 		using namespace DataTimings;
+		using PlantPipingSystemsManager::InitAndSimGroundDomains;
+		using PlantPipingSystemsManager::CheckIfAnySlabs;
+		using PlantPipingSystemsManager::CheckIfAnyBasements;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1586,6 +1589,10 @@ namespace SimulationManager {
 			if ( DeveloperFlag ) DisplayString( "Initializing Simulation - timestep 1:" + EnvironmentName );
 
 			BeginTimeStepFlag = true;
+
+			if ( AnySlabsInModel || AnyBasementsInModel ) {
+				InitAndSimGroundDomains();
+			}
 
 			ManageWeather();
 

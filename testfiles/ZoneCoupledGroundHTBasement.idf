@@ -588,9 +588,13 @@ Material,
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
-! Output:VariableDictionary,
-! IDF; !- Key Field
+Output:VariableDictionary,
+IDF; !- Key Field
 
+Output:Variable,*,Wall Interface Heat Flux,hourly;
+Output:Variable,*,Wall Interface Temperature,hourly;
+Output:Variable,*,Floor Interface Heat Flux,hourly;
+Output:Variable,*,Floor Interface Temperature,hourly;
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:TABLE:SUMMARYREPORTS ===========
 

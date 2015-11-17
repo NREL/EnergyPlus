@@ -372,8 +372,8 @@ namespace PlantPipingSystemsManager {
 			// Reset the heat fluxs if domain update has been completed
 			if ( PipingSystemDomains( DomainNum ).ResetHeatFluxFlag ) {
 				PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0;
-					PipingSystemDomains( DomainNum ).AggregateWallHeatFlux = 0;
-					PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux = 0;
+				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux = 0;
+				PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux = 0;
 				PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
 				PipingSystemDomains( DomainNum ).ResetHeatFluxFlag = false;
 			}
