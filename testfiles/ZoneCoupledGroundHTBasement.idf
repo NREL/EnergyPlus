@@ -591,10 +591,10 @@ Material,
 Output:VariableDictionary,
 IDF; !- Key Field
 
-Output:Variable,*,GroundDomain:Basement Wall Interface Heat Flux,hourly;
-Output:Variable,*,GroundDomain:Basement Wall Interface Temperature,hourly;
-Output:Variable,*,GroundDomain:Basement Floor Interface Heat Flux,hourly;
-Output:Variable,*,GroundDomain:Basement Floor Interface Temperature,hourly;
+Output:Variable,*,Wall Interface Heat Flux,hourly;
+Output:Variable,*,Wall Interface Temperature,hourly;
+Output:Variable,*,Floor Interface Heat Flux,hourly;
+Output:Variable,*,Floor Interface Temperature,hourly;
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:TABLE:SUMMARYREPORTS ===========
 
