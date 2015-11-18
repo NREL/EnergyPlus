@@ -1558,6 +1558,13 @@ namespace DataPlantPipingSystems {
 	extern Array1D< PipeCircuitInfo > PipingSystemCircuits;
 	extern Array1D< PipeSegmentInfo > PipingSystemSegments;
 
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
+	void
+	clear_state();
+
 } // DataPlantPipingSystems
 
 } // EnergyPlus
