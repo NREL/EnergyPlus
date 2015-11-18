@@ -26,7 +26,7 @@
 
 using namespace EnergyPlus;
  
-TEST( SetPointManager, DefineReturnWaterChWSetPointManager )
+TEST_F( EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager )
 {
 
 	// Set up the required plant loop data
@@ -117,7 +117,7 @@ TEST( SetPointManager, DefineReturnWaterChWSetPointManager )
 
 }
 
-TEST( SetPointManager, DefineReturnWaterHWSetPointManager )
+TEST_F( EnergyPlusFixture, SetPointManager_DefineReturnWaterHWSetPointManager )
 {
 
 	// Set up the required plant loop data
@@ -365,7 +365,7 @@ TEST_F( EnergyPlusFixture, SetPointManagerDefineCondEntSetPointManager )
 
 }
 
-TEST( SetPointManager, setupSetPointAndFlags )
+TEST_F( EnergyPlusFixture, SetPointManager_setupSetPointAndFlags )
 {
 
 	Real64 totEnergy = 0.0;
@@ -629,7 +629,7 @@ TEST_F( EnergyPlusFixture, SZRHOAFractionImpact ) {
 
 }
 
-TEST(SetPointManager, CalcSetPointTest)
+TEST_F( EnergyPlusFixture, SetPointManager_CalcSetPointTest)
 {
 	Real64 SetPt1, SetPt2, SetPt3, SetPt4, SetPt5, SetPt6, SetPt7, SetPt8;
 	SetPointManager::DefineOutsideAirSetPointManager thisSPM;

@@ -21,6 +21,8 @@
 #include <DataLoopNode.hh>
 #include <Psychrometrics.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace DataHVACGlobals;
@@ -33,7 +35,7 @@ using Psychrometrics::InitializePsychRoutines;
 using DataHeatBalFanSys::ZoneAirHumRat;
 using DataHeatBalFanSys::ZT;
 
-TEST( SecondaryDXCoolingCoilSingleSpeed, Test1 ) {
+TEST_F( EnergyPlusFixture, SecondaryDXCoolingCoilSingleSpeed_Test1 ) {
 	// tests secondary DX coil calculation of single speed DX system or heat pump
 	int DXCoilNum;
 
@@ -52,7 +54,7 @@ TEST( SecondaryDXCoolingCoilSingleSpeed, Test1 ) {
 	// cleanup 
 	DXCoil.deallocate();
 }
-TEST( SecondaryDXCoolingCoilTwoSpeed, Test2 ) {
+TEST_F( EnergyPlusFixture, SecondaryDXCoolingCoilTwoSpeed_Test2 ) {
 
 	// tests secondary DX coil calculation of two speed DX cooling system
 	int DXCoilNum;
@@ -72,7 +74,7 @@ TEST( SecondaryDXCoolingCoilTwoSpeed, Test2 ) {
 	// cleanup 
 	DXCoil.deallocate();
 }
-TEST( SecondaryDXCoolingCoilMultiSpeed, Test3 ) {
+TEST_F( EnergyPlusFixture, SecondaryDXCoolingCoilMultiSpeed_Test3 ) {
 
 	// tests secondary DX coil calculation of multi speed heat pump
 	int DXCoilNum;
@@ -93,7 +95,7 @@ TEST( SecondaryDXCoolingCoilMultiSpeed, Test3 ) {
 	DXCoil.deallocate();
 	
 }
-TEST( SecondaryDXHeatingCoilSingleSpeed, Test4 ) {
+TEST_F( EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4 ) {
 	// tests secondary DX coil calculation of single speed heat pump
 	int DXCoilNum;
 
@@ -168,7 +170,7 @@ TEST( SecondaryDXHeatingCoilSingleSpeed, Test4 ) {
 	DXCoil.deallocate();
 	Node.deallocate();
 }
-TEST( SecondaryDXHeatingCoilMultiSpeed, Test5 ) {
+TEST_F( EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5 ) {
 
 	// tests secondary DX coil calculation of multi speed heat pump
 	int DXCoilNum;

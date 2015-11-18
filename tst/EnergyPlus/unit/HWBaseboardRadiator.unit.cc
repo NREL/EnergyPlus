@@ -13,6 +13,8 @@
 #include <FluidProperties.hh>
 #include <DataPlant.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace DataZoneEnergyDemands;
 using namespace ScheduleManager;
@@ -25,12 +27,10 @@ using namespace DataPlant;
 
 using namespace ObjexxFCL;
 
-TEST(HWBaseboardRadiator, CalcHWBaseboard)
+TEST_F( EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 {
 	Real64 LoadMet;
 	int BBNum;
-	ShowMessage( "Begin Test: HWBaseboardRadiator, CalcHWBaseboard - Issue4347" );
-	InitializePsychRoutines();
 	
 	Node.allocate( 1 );
 	HWBaseboard.allocate( 1 );

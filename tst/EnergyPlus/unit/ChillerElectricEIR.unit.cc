@@ -7,11 +7,13 @@
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::ChillerElectricEIR;
 using namespace EnergyPlus::DataLoopNode;
 
-TEST( ChillerElectricEIR, TestOutletNodeConditions )
+TEST_F( EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions )
 {
 
 	int Num = 1;

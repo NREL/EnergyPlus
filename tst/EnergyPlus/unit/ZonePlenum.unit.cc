@@ -7,23 +7,20 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <DataContaminantBalance.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace DataGlobals;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::Psychrometrics;
 using DataContaminantBalance::Contaminant;
 
 
-TEST( ZonePlenum, InitAirZoneReturnPlenumTest )
+TEST_F( EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest )
 {
-	ShowMessage( "Begin Test: ZonePlenum, InitAirZoneReturnPlenumTest" );
-
-	InitializePsychRoutines();
 	BeginEnvrnFlag = false;
 	Contaminant.CO2Simulation = true;
 	Contaminant.GenericContamSimulation = true;
