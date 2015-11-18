@@ -636,6 +636,11 @@ namespace PurchasedAirManager {
 				PurchAir( PurchAirNum ).HtRecLatCoolRate = 0.0;
 				PurchAir( PurchAirNum ).HtRecTotCoolRate = 0.0;
 
+				PurchAir( PurchAirNum ).OutdoorAirMassFlowRate = 0.0;
+				PurchAir( PurchAirNum ).OutdoorAirVolFlowRateStdRho = 0.0;
+				PurchAir( PurchAirNum ).SupplyAirMassFlowRate = 0.0;
+				PurchAir( PurchAirNum ).SupplyAirVolFlowRateStdRho = 0.0;
+
 			}
 			EndUniqueNodeCheck( cCurrentModuleObject );
 		}
@@ -699,6 +704,12 @@ namespace PurchasedAirManager {
 			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Active Time [hr]", PurchAir( PurchAirNum ).TimeHtRecActive, "System", "Sum", PurchAir( PurchAirNum ).Name );
 
 			SetupOutputVariable( "Zone Ideal Loads Hybrid Ventilation Available Status []", PurchAir( PurchAirNum ).AvailStatus, "System", "Average", PurchAir( PurchAirNum ).Name );
+
+			//air flows
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Mass Flow Rate [kg/s]", PurchAir( PurchAirNum ).OutdoorAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate [m3/s]", PurchAir( PurchAirNum ).OutdoorAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]", PurchAir( PurchAirNum ).SupplyAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate [m3/s]", PurchAir( PurchAirNum ).SupplyAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Ideal Loads Air System", PurchAir( PurchAirNum ).Name, "Air Mass Flow Rate", "[kg/s]", PurchAir( PurchAirNum ).EMSOverrideMdotOn, PurchAir( PurchAirNum ).EMSValueMassFlowRate );
@@ -2201,6 +2212,9 @@ namespace PurchasedAirManager {
 		}
 
 		PurchAir( PurchAirNum ).OutdoorAirMassFlowRate = OAMassFlowRate;
+		PurchAir( PurchAirNum ).OutdoorAirVolFlowRateStdRho = OAMassFlowRate / StdRhoAir;
+		PurchAir( PurchAirNum ).SupplyAirMassFlowRate = SupplyMassFlowRate;
+		PurchAir( PurchAirNum ).SupplyAirVolFlowRateStdRho = SupplyMassFlowRate / StdRhoAir;
 
 	}
 
@@ -2825,6 +2839,16 @@ namespace PurchasedAirManager {
 
 		return MixedAirHumRat;
 
+	}
+
+	// Clears the global data in Fans.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumPurchAir = 0;
+		PurchAir.deallocate();
+		PurchAirNumericFields.deallocate();
 	}
 
 	//     NOTICE

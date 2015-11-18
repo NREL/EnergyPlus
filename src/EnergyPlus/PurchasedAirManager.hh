@@ -115,6 +115,9 @@ namespace PurchasedAirManager {
 		Real64 EMSValueSupplyHumRat; // Value EMS is directing to use for supply humidity ratio [kg-H2O/kg-dryair]
 		Real64 MinOAMassFlowRate; // The minimum required outdoor air mass flow rate [kg/s]
 		Real64 OutdoorAirMassFlowRate; // The outdoor air mass flow rate [kg/s]
+		Real64 OutdoorAirVolFlowRateStdRho; //  The outdoor air volume flow rate using standard density  [m3/s]
+		Real64 SupplyAirMassFlowRate; // Supply air mass flow rate [kg/s]
+		Real64 SupplyAirVolFlowRateStdRho; // supply air volume flow using standard density [m3/s]
 		// Intermediate results
 		Real64 FinalMixedAirTemp; // Dry-bulb temperature of the mixed air, saved for system ventilation load reporting [C]
 		Real64 FinalMixedAirHumRat; // Humidity ratio of the mixed air, saved for system ventilation load reporting [kg-H2O/kg-dryair]
@@ -232,6 +235,9 @@ namespace PurchasedAirManager {
 			EMSValueSupplyHumRat( 0.0 ),
 			MinOAMassFlowRate( 0.0 ),
 			OutdoorAirMassFlowRate( 0.0 ),
+			OutdoorAirVolFlowRateStdRho( 0.0 ),
+			SupplyAirMassFlowRate( 0.0 ),
+			SupplyAirVolFlowRateStdRho( 0.0 ),
 			FinalMixedAirTemp( 0.0 ),
 			FinalMixedAirHumRat( 0.0 ),
 			HtRecSenOutput( 0.0 ),
@@ -352,6 +358,9 @@ namespace PurchasedAirManager {
 			Real64 const EMSValueSupplyHumRat, // Value EMS is directing to use for supply humidity ratio [kg-H2O/kg-dryair]
 			Real64 const MinOAMassFlowRate, // The minimum required outdoor air mass flow rate [kg/s]
 			Real64 const OutdoorAirMassFlowRate, // The outdoor air mass flow rate [kg/s]
+			Real64 const OutdoorAirVolFlowRateStdRho, //  The outdoor air volume flow rate using standard density  [m3/s]
+			Real64 const SupplyAirMassFlowRate, // Supply air mass flow rate [kg/s]
+			Real64 const SupplyAirVolFlowRateStdRho, // supply air volume flow using standard density [m3/s]
 			Real64 const FinalMixedAirTemp, // Dry-bulb temperature of the mixed air, saved for system ventilation load reporting [C]
 			Real64 const FinalMixedAirHumRat, // Humidity ratio of the mixed air, saved for system ventilation load reporting [kg-H2O/kg-dryair]
 			Real64 const HtRecSenOutput, // Sensible heating/cooling rate from heat recovery (<0 means cooling) [W]
@@ -469,6 +478,9 @@ namespace PurchasedAirManager {
 			EMSValueSupplyHumRat( EMSValueSupplyHumRat ),
 			MinOAMassFlowRate( MinOAMassFlowRate ),
 			OutdoorAirMassFlowRate( OutdoorAirMassFlowRate ),
+			OutdoorAirVolFlowRateStdRho( OutdoorAirVolFlowRateStdRho ),
+			SupplyAirMassFlowRate( SupplyAirMassFlowRate ),
+			SupplyAirVolFlowRateStdRho( SupplyAirVolFlowRateStdRho ),
 			FinalMixedAirTemp( FinalMixedAirTemp ),
 			FinalMixedAirHumRat( FinalMixedAirHumRat ),
 			HtRecSenOutput( HtRecSenOutput ),
@@ -639,6 +651,9 @@ namespace PurchasedAirManager {
 
 	Real64
 	GetPurchasedAirMixedAirHumRat( int const PurchAirNum );
+
+	void
+	clear_state();
 
 	//     NOTICE
 
