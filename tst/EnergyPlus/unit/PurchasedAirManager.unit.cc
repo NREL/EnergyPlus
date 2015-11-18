@@ -5,7 +5,6 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 
@@ -26,9 +25,8 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataSizing;
 
 
-TEST( SizePurchasedAirTest, Test1 )
+TEST_F( EnergyPlusFixture, SizePurchasedAirTest_Test1 )
 {
-	ShowMessage( "Begin Test: SizePurchasedAirTest, Test1" );
 
 	int PurchAirNum = 1;
 	int write_stat;

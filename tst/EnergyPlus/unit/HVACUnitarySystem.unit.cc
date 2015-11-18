@@ -232,7 +232,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 
 }
 
-TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
+TEST_F( EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTest )
 {
 	ShowMessage( "Begin Test: UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest" );
 
@@ -429,9 +429,8 @@ TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 	}
 
 }
-TEST( HVACUnitarySystem, CalcUnitaryHeatingSystem ) {
 
-	ShowMessage( "Begin Test: HVACUnitarySystem, CalcUnitaryHeatingSystem" );
+TEST_F( EnergyPlusFixture, HVACUnitarySystem_CalcUnitaryHeatingSystem ) {
 
 	int UnitarySysNum( 1 );
 	int AirLoopNum( 1 );
@@ -568,9 +567,7 @@ TEST( HVACUnitarySystem, CalcUnitaryHeatingSystem ) {
 
 }
 
-TEST( HVACUnitarySystem, CalcUnitaryCoolingSystem ) {
-
-	ShowMessage( "Begin Test: HVACUnitarySystem, CalcUnitaryCoolingSystem" );
+TEST_F( EnergyPlusFixture, HVACUnitarySystem_CalcUnitaryCoolingSystem ) {
 
 	int CompOn( 1 );
 	int UnitarySysNum( 1 );

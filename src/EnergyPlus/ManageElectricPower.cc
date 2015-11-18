@@ -121,6 +121,12 @@ namespace ManageElectricPower {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
+
+	namespace {
+		bool ManageElectricLoadCentersOneTimeFlag( true );
+		bool ManageElectricLoadCentersEnvrnFlag( true );
+	}
+
 	bool GetInput( true ); // When TRUE, calls subroutine to read input file.
 	int NumLoadCenters( 0 );
 	int NumInverters( 0 );
@@ -150,6 +156,29 @@ namespace ManageElectricPower {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		ManageElectricLoadCentersOneTimeFlag = true;
+		ManageElectricLoadCentersEnvrnFlag = true;
+		GetInput = true;
+		NumLoadCenters = 0;
+		NumInverters = 0;
+		NumElecStorageDevices = 0;
+		NumTransformers = 0;
+		ElecProducedCoGenIndex = 0;
+		ElecProducedPVIndex = 0;
+		ElecProducedWTIndex = 0;
+		ElecProducedStorageIndex = 0;
+		MaxRainflowArrayBounds = 100;
+		MaxRainflowArrayInc = 100;
+		ElecStorage.deallocate();
+		Inverter.deallocate();
+		ElecLoadCenter.deallocate();
+		Transformer.deallocate();
+		WholeBldgElectSummary = WholeBuildingElectricPowerSummary();
+	}
 
 	void
 	ManageElectricLoadCenters(
@@ -213,10 +242,11 @@ namespace ManageElectricPower {
 		static Real64 RemainingLoad( 0.0 ); // Remaining electric power load to be met by a load center
 		static Real64 WholeBldgRemainingLoad( 0.0 ); // Remaining electric power load for the building
 		static Real64 RemainingThermalLoad( 0.0 ); // Remaining thermal load to be met
-		static bool MyOneTimeFlag( true );
 		static Real64 CustomMeterDemand( 0.0 ); // local variable for Custom metered elec demand
-		static bool MyEnvrnFlag( true );
-
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeFlag( true );
+		// static bool MyEnvrnFlag( true );
+		////////////////////////////////////////////////////////////////////////////////////
 		static Real64 ElectricProdRate( 0.0 ); // Electric Power Production Rate of Generators
 		static Real64 ThermalProdRate( 0.0 ); // Thermal Power Production Rate of Generators
 		static Real64 ExcessThermalPowerRequest( 0.0 ); // Excess Thermal Power Request
@@ -233,7 +263,7 @@ namespace ManageElectricPower {
 		}
 
 		// Setting up the Internal Meters and getting their indexes is done only once
-		if ( MetersHaveBeenInitialized && MyOneTimeFlag ) {
+		if ( MetersHaveBeenInitialized && ManageElectricLoadCentersOneTimeFlag ) {
 			ElecFacilityIndex = GetMeterIndex( "Electricity:Facility" );
 			ElecProducedCoGenIndex = GetMeterIndex( "Cogeneration:ElectricityProduced" );
 			ElecProducedPVIndex = GetMeterIndex( "Photovoltaic:ElectricityProduced" );
@@ -261,11 +291,11 @@ namespace ManageElectricPower {
 				}
 			}
 
-			MyOneTimeFlag = false;
+			ManageElectricLoadCentersOneTimeFlag = false;
 
 		}
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
+		if ( BeginEnvrnFlag && ManageElectricLoadCentersEnvrnFlag ) {
 			WholeBldgElectSummary.ElectricityProd = 0.0;
 			WholeBldgElectSummary.ElectProdRate = 0.0;
 			WholeBldgElectSummary.ElectricityPurch = 0.0;
@@ -328,9 +358,9 @@ namespace ManageElectricPower {
 				ElecStorage.ThermLossRate() = 0.0;
 				ElecStorage.ThermLossEnergy() = 0.0;
 			}
-			MyEnvrnFlag = false;
+			ManageElectricLoadCentersEnvrnFlag = false;
 		}
-		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
+		if ( ! BeginEnvrnFlag ) ManageElectricLoadCentersEnvrnFlag = true;
 
 		// Determine the demand from the simulation for Demand Limit and Track Electrical and Reporting
 		ElecFacilityBldg = GetInstantMeterValue( ElecFacilityIndex, 1 );

@@ -65,6 +65,9 @@ namespace RoomAirModelAirflowNetwork {
 	extern Array1D< RAFNData > RAFN;
 
 	void
+	clear_state();
+
+	void
 	SimRoomAirModelAirflowNetwork( int const ZoneNum ); // index number for the specified zone
 
 	void

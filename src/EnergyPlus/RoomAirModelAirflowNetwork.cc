@@ -100,6 +100,12 @@ namespace RoomAirModelAirflowNetwork {
 	// Functions
 
 	void
+	clear_state()
+	{
+		RAFN.deallocate();
+	}
+
+	void
 	SimRoomAirModelAirflowNetwork( int const ZoneNum ) // index number for the specified zone
 	{
 

@@ -114,8 +114,8 @@ namespace EnergyPlus {
 		EXPECT_EQ( DXCoil( 1 ).SH, 3 );
 
 	}
-	
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
+
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CompResidual )
 	{
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
@@ -166,7 +166,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualCool )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_FanSpdResidualCool )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method FanSpdResidualCool.
@@ -186,7 +186,7 @@ namespace EnergyPlus {
 		NumPar = 6;
 		Par.allocate( 6 );
 
-		// Inputs: 
+		// Inputs:
 		FanSpdRto = 0.5;
 		ZnSenLoad = 2716.62;
 		Th2 = 17.41212;
@@ -208,7 +208,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualHeat )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_FanSpdResidualHeat )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method FanSpdResidualHeat.
@@ -228,7 +228,7 @@ namespace EnergyPlus {
 		NumPar = 6;
 		Par.allocate( 6 );
 
-		// Inputs: 
+		// Inputs:
 		FanSpdRto = 0.5;
 		ZnSenLoad = 4241.66;
 		Th2 = 41.221;
@@ -242,7 +242,7 @@ namespace EnergyPlus {
 		Par( 5 ) = BF;
 
 		// Run and Check
-		double FanSpdResidual = FanSpdResidualHeat( FanSpdRto, Par ); 
+		double FanSpdResidual = FanSpdResidualHeat( FanSpdRto, Par );
 		EXPECT_NEAR( -0.5459, FanSpdResidual, 0.0005 );
 
 		// Clean up
@@ -250,19 +250,19 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_ControlVRFIUCoil )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CalcVRFIUAirFlow )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method CalcVRFIUAirFlow, which analyzes the VRF Indoor Unit operations given zonal loads.
-		//   Calculated parameters includie: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions 
+		//   Calculated parameters includie: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions
 
 		using namespace DXCoils;
 		using namespace DataZoneEnergyDemands;
 		using namespace EnergyPlus::Psychrometrics;
 		using DataEnvironment::OutBaroPress;
 
-		int ZoneIndex;  // index to zone where the VRF Terminal Unit resides 
-		int CoolCoilIndex;  // index to VRFTU cooling coil 
+		int ZoneIndex;  // index to zone where the VRF Terminal Unit resides
+		int CoolCoilIndex;  // index to VRFTU cooling coil
 		int HeatCoilIndex;  // index to VRFTU heating coil
 		int Mode;       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
 		Real64 Temp;    // evaporating or condensing temperature
@@ -310,12 +310,12 @@ namespace EnergyPlus {
 		DXCoil( CoolCoilIndex ).InletAirTemp = 25.5553;
 		DXCoil( CoolCoilIndex ).InletAirHumRat = 8.4682e-3;
 		DXCoil( CoolCoilIndex ).InletAirEnthalpy = 47259.78;
-		
+
 		ControlVRFIUCoil( CoolCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, 25.5553, 8.4682e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
 		EXPECT_NEAR( Toutlet, 17.89, 0.01 );
 		EXPECT_NEAR( Houtlet, 39440, 1 );
 		EXPECT_NEAR( SHact, 3.00, 0.01 );
-		
+
 		// Run and Check for Heating Mode
 		Mode = 1;
 		Temp = 42;
@@ -338,10 +338,10 @@ namespace EnergyPlus {
 		ZoneSysEnergyDemand.deallocate( );
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUTeTc )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CalcVRFIUTeTc )
 	{
 		// PURPOSE OF THIS TEST:
-		//   Test the method CalcVRFIUTeTc_FluidTCtrl, which determines the VRF evaporating temperature at 
+		//   Test the method CalcVRFIUTeTc_FluidTCtrl, which determines the VRF evaporating temperature at
 		//   cooling mode and the condensing temperature at heating mode.
 
 		using namespace HVACVariableRefrigerantFlow;
@@ -363,7 +363,7 @@ namespace EnergyPlus {
 		VRF( IndexVRFCondenser ).EvapTempFixed = 3;
 		VRF( IndexVRFCondenser ).CondTempFixed = 5;
 
-		// Run and Check 
+		// Run and Check
 		CalcVRFIUTeTc_FluidTCtrl( IndexVRFCondenser );
 
 		EXPECT_EQ( VRF( IndexVRFCondenser ).IUEvaporatingTemp, 3 );
@@ -386,7 +386,7 @@ namespace EnergyPlus {
 		Real64 DefrostWatts( 0.0 );       // calculation of VRF defrost power [W]
 		Real64 SysOutputProvided( 0.0 );  // function returns sensible capacity [W]
 		Real64 LatOutputProvided( 0.0 );  // function returns latent capacity [W]
-		
+
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
 			" ",
@@ -975,7 +975,7 @@ namespace EnergyPlus {
 		ProcessScheduleInput(); // read schedules
 		GetCurveInput(); // read curves
 		GetZoneData( ErrorsFound ); // read zone data
-		EXPECT_FALSE( ErrorsFound ); 
+		EXPECT_FALSE( ErrorsFound );
 
 		DXCoils::GetCoilsInputFlag = true; // remove this when clear_state gets added to DXCoils
 		GlobalNames::NumCoils = 0; // remove this when clear_state gets added to GlobalNames
@@ -1016,7 +1016,7 @@ namespace EnergyPlus {
 		ASSERT_EQ( 1.0, VRF( VRFCond ).CoolingCombinationRatio );
 		ASSERT_EQ( 10749.071979211991, VRF( VRFCond ).CoolingCapacity );
 		ASSERT_EQ( 10749.071979211991, VRF( VRFCond ).HeatingCapacity );
-		EXPECT_EQ( 0.0, VRF( VRFCond ).DefrostPower ); 
+		EXPECT_EQ( 0.0, VRF( VRFCond ).DefrostPower );
 
 		// test defrost operation Issue #4950 - Reverse cycle with timed defrost = 0
 
@@ -1044,10 +1044,10 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers ) {
 		// Author: R. Raustad, FSEC
-		
+
 		bool ErrorsFound( false );        // function returns true on error
 		int VRFTUNum( 1 );                // index to VRF terminal unit
-		
+
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
 			" ",
@@ -1636,11 +1636,11 @@ namespace EnergyPlus {
 		ProcessScheduleInput(); // read schedules
 		GetCurveInput(); // read curves
 		GetZoneData( ErrorsFound ); // read zone data
-		EXPECT_FALSE( ErrorsFound ); 
+		EXPECT_FALSE( ErrorsFound );
 
 		GetZoneEquipmentData(); // read equipment list and connections
 		GetVRFInputData( ErrorsFound );
-		EXPECT_TRUE( ErrorsFound ); 
+		EXPECT_TRUE( ErrorsFound );
 		EXPECT_EQ( 0, VRFTU( VRFTUNum ).VRFSysNum );
 		EXPECT_EQ( 0, VRFTU( VRFTUNum ).ZoneNum );
 		EXPECT_EQ( 0, VRFTU( VRFTUNum ).TUListIndex );
@@ -2600,5 +2600,3 @@ namespace EnergyPlus {
 	}
 
 }
-
-

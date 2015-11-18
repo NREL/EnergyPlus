@@ -3,6 +3,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 // EnergyPlus Headers
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -13,12 +15,10 @@ using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::DataSizing;
 using namespace ObjexxFCL;
 
-TEST( GetOARequirementsTest, DSOA1 )
+TEST_F( EnergyPlusFixture, GetOARequirementsTest_DSOA1 )
 {
-	ShowMessage( "Begin Test: GetOARequirementsTest, DSOA1" );
-
-	static bool ErrorsFound( false ); // If errors detected in input
-	static int OAIndex( 0 ); // Zone number
+	bool ErrorsFound( false ); // If errors detected in input
+	int OAIndex( 0 ); // Zone number
 	int NumAlphas( 2 );
 	int NumNumbers( 4 );
 

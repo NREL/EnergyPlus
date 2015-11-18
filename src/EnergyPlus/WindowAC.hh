@@ -272,6 +272,9 @@ namespace WindowAC {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimWindowAC(
 		std::string const & CompName, // name of the window AC unit
 		int const ZoneNum, // number of zone being served

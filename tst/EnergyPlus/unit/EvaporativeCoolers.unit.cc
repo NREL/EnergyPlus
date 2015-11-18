@@ -371,10 +371,8 @@ namespace EnergyPlus {
 		FinalSysSizing.deallocate();
 	}
 
-	TEST( EvaporativeCoolers, CalcSecondaryAirOutletCondition )
+	TEST_F( EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition )
 	{
-
-		ShowMessage( "Begin Test: EvaporativeCoolers, CalcSecondaryAirOutletCondition" );
 
 		EvaporativeCoolers::EvapCond.allocate( 1 );
 		int const EvapCoolNum( 1 );
@@ -456,10 +454,8 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp )
+	TEST_F( EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp )
 	{
-
-		ShowMessage( "Begin Test: EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp" );
 
 		OutBaroPress = 101325.0;
 		EvaporativeCoolers::EvapCond.allocate( 1 );
@@ -505,7 +501,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( EvaporativeCoolers, IndEvapCoolerPower )
+	TEST_F( EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower )
 	{
 
 		ShowMessage( "Begin Test: EvaporativeCoolers, IndEvapCoolerPower" );
@@ -569,7 +565,7 @@ namespace EnergyPlus {
 		PerfCurve.deallocate();
 	}
 
-	TEST( EvaporativeCoolers, SizeEvapCooler )
+	TEST_F( EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler )
 	{
 
 		// one-time setup of evap cooler instance

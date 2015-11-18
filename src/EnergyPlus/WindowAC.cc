@@ -127,6 +127,19 @@ namespace WindowAC {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumWindAC = 0;
+		NumWindACCyc = 0;
+		GetWindowACInputFlag = true;
+		CoolingLoad = false;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		WindAC.deallocate();
+		WindACNumericFields.deallocate();
+	}
+
+	void
 	SimWindowAC(
 		std::string const & CompName, // name of the window AC unit
 		int const ZoneNum, // number of zone being served

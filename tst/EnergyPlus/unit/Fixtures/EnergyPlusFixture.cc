@@ -8,11 +8,13 @@
 #include "EnergyPlusFixture.hh"
 #include "../TestHelpers/IdfParser.hh"
 // A to Z order
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirflowNetwork.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
@@ -59,6 +61,7 @@
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/ManageElectricPower.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -79,6 +82,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
@@ -92,11 +96,14 @@
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <fstream>
@@ -157,10 +164,12 @@ namespace EnergyPlus {
 	void EnergyPlusFixture::clear_all_states()
 	{
 		// A to Z order
+		AirflowNetworkBalanceManager::clear_state();
 		BranchInputManager::clear_state();
 		ChillerIndirectAbsorption::clear_state();
 		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
+		DataAirflowNetwork::clear_state();
 		DataAirLoop::clear_state();
 		DataAirSystems::clear_state();
 		DataBranchNodeConnections::clear_state();
@@ -204,6 +213,7 @@ namespace EnergyPlus {
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
+		ManageElectricPower::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
 		NodeInputManager::clear_state();
@@ -223,6 +233,7 @@ namespace EnergyPlus {
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
+		RoomAirModelAirflowNetwork::clear_state();
 		RuntimeLanguageProcessor::clear_state();
 		ScheduleManager::clear_state();
 		SetPointManager::clear_state();
@@ -235,11 +246,14 @@ namespace EnergyPlus {
 		SystemAvailabilityManager::clear_state();
 		ThermalComfort::clear_state();
 		VariableSpeedCoils::clear_state();
+		VentilatedSlab::clear_state();
 		WaterCoils::clear_state();
 		WaterThermalTanks::clear_state();
 		WeatherManager::clear_state();
+		WindowAC::clear_state();
 		ZoneAirLoopEquipmentManager::clear_state();
 		ZoneEquipmentManager::clear_state();
+		ZonePlenum::clear_state();
 		ZoneTempPredictorCorrector::clear_state();
 	}
 
