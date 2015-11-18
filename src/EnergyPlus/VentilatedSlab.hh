@@ -695,6 +695,9 @@ namespace VentilatedSlab {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimVentilatedSlab(
 		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served

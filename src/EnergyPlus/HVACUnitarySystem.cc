@@ -13128,38 +13128,38 @@ namespace HVACUnitarySystem {
 	void
 	clear_state()
 	{
-	GetInputFlag = true;
-	MyOneTimeFlag = true;
-	EconomizerFlag = false;
-	HeatingLoad = false;
-	CoolingLoad = false;
-	MoistureLoad = 0.0;
-	SuppHeatingCoilFlag = false;
-	NumUnitarySystem = 0;
-	NumDesignSpecMultiSpeedHP = 0;
-	CompOnMassFlow = 0.0;
-	CompOffMassFlow = 0.0;
-	CompOnFlowRatio = 0.0;
-	CompOffFlowRatio = 0.0;
-	FanSpeedRatio = 0.0;
-	CoolHeatPLRRat = 1.0;
-	OnOffAirFlowRatioSave = 0.0;
-	QToCoolSetPt = 0.0;
-	QToHeatSetPt = 0.0;
-	TempSteamIn = 100.0;
+		GetInputFlag = true;
+		MyOneTimeFlag = true;
+		EconomizerFlag = false;
+		HeatingLoad = false;
+		CoolingLoad = false;
+		MoistureLoad = 0.0;
+		SuppHeatingCoilFlag = false;
+		NumUnitarySystem = 0;
+		NumDesignSpecMultiSpeedHP = 0;
+		CompOnMassFlow = 0.0;
+		CompOffMassFlow = 0.0;
+		CompOnFlowRatio = 0.0;
+		CompOffFlowRatio = 0.0;
+		FanSpeedRatio = 0.0;
+		CoolHeatPLRRat = 1.0;
+		OnOffAirFlowRatioSave = 0.0;
+		QToCoolSetPt = 0.0;
+		QToHeatSetPt = 0.0;
+		TempSteamIn = 100.0;
 
-	// Allocatable types
-	CheckEquipName.deallocate();
-	MyEnvrnFlag.deallocate();
-	MultiOrVarSpeedHeatCoil.deallocate();
-	MultiOrVarSpeedCoolCoil.deallocate();
-	DesignSpecMSHP.deallocate();
-	UnitarySystem.deallocate();
-	UnitarySystemNumericFields.deallocate();
-	MyPlantScanFlag.deallocate();
-	MySuppCoilPlantScanFlag.deallocate();
-	MySetPointCheckFlag.deallocate();
-	MySizingCheckFlag.deallocate();
+		// Allocatable types
+		CheckEquipName.deallocate();
+		MyEnvrnFlag.deallocate();
+		MultiOrVarSpeedHeatCoil.deallocate();
+		MultiOrVarSpeedCoolCoil.deallocate();
+		DesignSpecMSHP.deallocate();
+		UnitarySystem.deallocate();
+		UnitarySystemNumericFields.deallocate();
+		MyPlantScanFlag.deallocate();
+		MySuppCoilPlantScanFlag.deallocate();
+		MySetPointCheckFlag.deallocate();
+		MySizingCheckFlag.deallocate();
 	}
 } // HVACUnitarySystem
 

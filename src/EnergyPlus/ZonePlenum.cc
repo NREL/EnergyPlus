@@ -83,6 +83,18 @@ namespace ZonePlenum {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumZonePlenums = 0;
+		NumZoneReturnPlenums = 0;
+		NumZoneSupplyPlenums = 0;
+		CheckRetEquipName.deallocate();
+		CheckSupEquipName.deallocate();
+		ZoneRetPlenCond.deallocate();
+		ZoneSupPlenCond.deallocate();
+	}
+
+	void
 	SimAirZonePlenum(
 		std::string const & CompName,
 		int const iCompType,
