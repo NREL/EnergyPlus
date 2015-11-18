@@ -632,6 +632,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataSurfaces::HeatTransferModel_CondFD;
 		using DataHeatBalance::HighDiffusivityThreshold;
 		using DataHeatBalance::ThinMaterialLayerThreshold;
+		using DataGlobals::DisplayAdvancedReportVariables;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -989,8 +990,10 @@ namespace HeatBalFiniteDiffManager {
 			for ( Lay = 1; Lay <= TotNodes + 1; ++Lay ) { // include inside face node
 				SetupOutputVariable( "CondFD Surface Temperature Node " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 				SetupOutputVariable( "CondFD Surface Heat Flux Node " + TrimSigDigits( Lay ) + " [W/m2]", SurfaceFD( SurfNum ).QDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half-Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half-Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				if ( DisplayAdvancedReportVariables ) {
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				}
 			}
 
 		} // End of the Surface Loop for Report Variable Setup
@@ -2405,8 +2408,8 @@ namespace HeatBalFiniteDiffManager {
 
 		auto & surfaceFD( SurfaceFD( Surf ) );
 
-		// surfaceFD.QDreport( n ) is the flux at node n
-		// when this is called TDT( NodeNum ) is the new node temp and TDreport( NodeNum ) is still the previous node temp
+		// SurfaceFD.QDreport( n ) is the flux at node n
+		// When this is called TDT( NodeNum ) is the new node temp and TDreport( NodeNum ) is still the previous node temp
 		// For the TDT and TDReport arrays, Node 1 is the outside face, and Node TotNodes+1 is the inside face
 
 		// Last node is always the surface inside face.  Start calculations here because the outside face is not defined for all surfaces.
@@ -2414,7 +2417,6 @@ namespace HeatBalFiniteDiffManager {
 		// so the arrays are all allocated to Totodes+1
 
 		// Heat flux at the inside face node (TotNodes+1)
-		// OLD surfaceFD.QDreport( TotNodes ) = OpaqSurfInsFaceConductionFlux( Surf ) + surfaceFD.CpDelXRhoS( TotNodes + 1) * ( surfaceFD.TDT( TotNodes + 1) - surfaceFD.TDreport( TotNodes + 1 )) / TimeStepZoneSec;
 		surfaceFD.QDreport( TotNodes + 1 ) = OpaqSurfInsFaceConductionFlux( Surf );
 
 		// Heat flux for remaining nodes.

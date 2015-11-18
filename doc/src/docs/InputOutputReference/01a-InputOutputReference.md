@@ -4678,13 +4678,15 @@ This outputs the count of iterations on the inner solver loop of CondFD for each
 
 This will output temperatures for a node in the surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file
 
-#### CondFD Surface Heat Flux From Node &lt;X&gt; To Node &lt;X+1&gt; [W/m2]
+#### CondFD Surface Heat Flux Node &lt;X&gt; [W/m2]
 
-This will output heat flux from one node to the next in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file.
+This will output heat flux at each node in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file.
 
-#### CondFD Surface Heat Capacitance Node &lt;X&gt; [W/m2-K]
+#### CondFD Surface Heat Capacitance Outer Half Node &lt;X&gt; [W/m2-K]
+#### CondFD Surface Heat Capacitance Inner Half Node &lt;X&gt; [W/m2-K]
 
-This will output the node heat capacitance in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. For this output, the heat capacitance is defined as the product of specific heat, density, and node thickness.
+These will output the half-node heat capacitance in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. For this output, the heat capacitance is defined as the product of specific heat, density, and node thickness. Zero is reported for R-layer half-nodes and for undefined half-nodes.  There is no outer half-node for Node 1 which is the outside face of the surface, and there is no inner half-node for Node N which is the inside face of the surface. CondFD Surface Heat Capacitance is only available with Output:Diagnostics,DisplayAdvancedReportVariables.
+
 ### MaterialProperty:HeatAndMoistureTransfer:Settings
 
 **Advanced/Research Usage:** This object is used to describe two of the seven additional material properties needed for the CombinedHeatAndMoistureFiniteElement heat balance solution algorithm. The settings object is used when the solutions algorithm is set to CombinedHeatAndMoistureFiniteElement and the appropriate material properties are assigned to each material. This permits the simulation of the moisture dependant thermal properties of the material as well as the transfer of moisture through, into and out of the material into the zone or exterior.

@@ -114,8 +114,8 @@ Other fluxes should balance over time.
 
 This will output heat flux at each node in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file.
 
-#### CondFD Surface Heat Capacitance Outer Half-Node &lt;X&gt; [W/m2-K]
-#### CondFD Surface Heat Capacitance Inner Half-Node &lt;X&gt; [W/m2-K]
+#### CondFD Surface Heat Capacitance Outer Half Node &lt;X&gt; [W/m2-K]
+#### CondFD Surface Heat Capacitance Inner Half Node &lt;X&gt; [W/m2-K]
 
 These will output the half-node heat capacitance in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. For this output, the heat capacitance is defined as the product of specific heat, density, and node thickness. Zero is reported for R-layer half-nodes and for undefined half-nodes.  There is no outer half-node for Node 1 which is the outside face of the surface, and there is no inner half-node for Node N which is the inside face of the surface.
 
