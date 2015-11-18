@@ -1590,10 +1590,6 @@ namespace SimulationManager {
 
 			BeginTimeStepFlag = true;
 
-			if ( AnySlabsInModel || AnyBasementsInModel ) {
-				InitAndSimGroundDomains();
-			}
-
 			ManageWeather();
 
 			ManageExteriorEnergyUse();
@@ -1636,6 +1632,10 @@ namespace SimulationManager {
 			ManageHeatBalance();
 
 		} // ... End environment loop.
+
+		if ( AnySlabsInModel || AnyBasementsInModel ) {
+			InitAndSimGroundDomains();
+		}
 
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
 		if ( ErrorsFound ) ShowFatalError( "Previous Conditions cause program termination." );
