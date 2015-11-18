@@ -120,9 +120,9 @@ namespace DataPlantPipingSystems {
 	void
 	clear_state()
 	{
-		Array1D< FullDomainStructureInfo > PipingSystemDomains;
-		Array1D< PipeCircuitInfo > PipingSystemCircuits;
-		Array1D< PipeSegmentInfo > PipingSystemSegments;
+		PipingSystemDomains.deallocate();
+		PipingSystemCircuits.deallocate();
+		PipingSystemSegments.deallocate();
 	}
 
 	//     NOTICE

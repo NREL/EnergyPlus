@@ -914,7 +914,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).CircuitNames( CircuitCtr ) = cAlphaArgs( CircuitCtr + NumAlphasBeforePipeCircOne );
 			}
 
-			// Initialize ground temperature model set get pointer reference
+			// Initialize ground temperature model and set pointer reference
 			GetGroundTempModel( PipingSystemDomains( DomainNum ).Farfield.groundTempModel, cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
 
 		}
