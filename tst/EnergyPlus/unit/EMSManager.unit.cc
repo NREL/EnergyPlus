@@ -11,18 +11,14 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 
-
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
 using namespace EnergyPlus::DataRuntimeLanguage;
 using namespace ObjexxFCL;
 
-TEST( EMSManager, TestForUniqueEMSActuators )
+TEST_F( EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators )
 {
-
-	ShowMessage( "Begin Test: EMSManager, TestForUniqueEMSActuators" );
 	EMSActuatorAvailable.allocate(100);
-
 
 	std::string componentTypeName1( "Chiller1" );
 	std::string componentTypeName2( "Chiller2" );

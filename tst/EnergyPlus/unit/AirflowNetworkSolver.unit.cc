@@ -19,15 +19,15 @@
 #include <AirflowNetworkSolver.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace DataAirflowNetwork;
 using namespace AirflowNetworkSolver;
 
-TEST( AirflowNetworkSolverTest, HorizontalOpening )
+TEST_F( EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening )
 {
-
-	ShowMessage( "Begin Test: AirflowNetworkSolverTest, HorizontalOpening" );
 
 	int i = 1;
 	int j = 1;

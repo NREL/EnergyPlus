@@ -19,12 +19,14 @@
 #include <Fans.hh>
 #include <FaultsManager.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace FaultsManager;
 using namespace CurveManager;
 using namespace Fans;
 
-TEST( FaultsManager, FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve )
+TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve )
 {
 	// PURPOSE OF THIS SUBROUTINE:
 	// To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
@@ -83,7 +85,7 @@ TEST( FaultsManager, FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve )
 
 }
 
-TEST( FaultsManager, FaultFoulingAirFilters_CalFaultyFanAirFlowReduction )
+TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFlowReduction )
 {
 	// PURPOSE OF THIS SUBROUTINE:
 	// Calculate the decrease of the fan air flow rate, given the fan curve 

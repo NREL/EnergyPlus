@@ -11,9 +11,8 @@
 
 using namespace EnergyPlus;
 
-TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
+TEST_F( EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs )
 {
-	ShowMessage( "Begin Test: HeatPumpWaterHeaterTests, TestQsourceCalcs" );
 	Real64 DeltaT = 0.0;
 	Real64 const SourceInletTemp = 62.0;
 	Real64 const Cp = 4178.; // water, J/(kg * K)
@@ -69,10 +68,9 @@ TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 	
 }
 
-TEST( WaterThermalTankData, GetDeadBandTemp )
+TEST_F( EnergyPlusFixture, WaterThermalTankData_GetDeadBandTemp )
 {
 
-	ShowMessage( "Begin Test: WaterThermalTankData, GetDeadBandTemp" );
 	WaterThermalTanks::WaterThermalTankData thisTank;
 	thisTank.SetPointTemp = 10;
 	thisTank.DeadBandDeltaTemp = 1;

@@ -9,13 +9,13 @@
 #include <ConvectionCoefficients.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace ConvectionCoefficients;
 
-TEST( ConvectionCoefficientsTest, ConvectionCofficients )
+TEST_F( EnergyPlusFixture, ConvectionCoefficientsTest_ConvectionCofficients )
 {
-
-	ShowMessage( "Begin Test: ConvectionCoefficientsTest, ConvectionCofficients" );
 
 	Real64 DeltaTemp; // [C] temperature difference between surface and air
 	Real64 Height; // [m] characteristic size

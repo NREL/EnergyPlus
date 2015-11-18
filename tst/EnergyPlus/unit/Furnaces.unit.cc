@@ -14,6 +14,8 @@
 #include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::Furnaces;
 using namespace ObjexxFCL;
@@ -26,9 +28,8 @@ using namespace EnergyPlus::DataAirLoop;
 
 namespace EnergyPlus {
 
-	TEST( SetVSHPAirFlowTest, VSFurnaceFlowTest )
+	TEST_F( EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest )
 	{
-		ShowMessage( "Begin Test: SetVSHPAirFlowTest, VSFurnaceFlowTest" );
 
 		int FurnaceNum( 1 );
 		Real64 OnOffAirFlowRatio; // This is a return value
@@ -189,11 +190,9 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( FurnaceTest, PartLoadRatioTest )
+	TEST_F( EnergyPlusFixture, FurnaceTest_PartLoadRatioTest )
 	{
 		// Test passing variables between Furnace and AirflowNetwork #5134
-
-		ShowMessage( "Begin Test: FurnaceTest, PartLoadRatioTest" );
 
 		using DataAirLoop::LoopSystemOnMassFlowrate;
 		using DataAirLoop::LoopSystemOffMassFlowrate;

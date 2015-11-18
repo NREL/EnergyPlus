@@ -21,6 +21,8 @@
 #include <HeatBalanceIntRadExchange.hh>
 #include <UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace DataGlobals;
 using namespace DataSurfaces;
@@ -28,9 +30,9 @@ using namespace DataHeatBalance;
 using namespace DataViewFactorInformation;
 using namespace HeatBalanceIntRadExchange;
 
-TEST( HeatBalanceIntRadExchangeTest, 1ZoneUncontrolled )
+TEST_F( EnergyPlusFixture, HeatBalanceIntRadExchangeTest_1ZoneUncontrolled )
 {
-	ShowMessage( "Begin Test: HeatBalanceIntRadExchange, Shoebox, no windows" );
+	// HeatBalanceIntRadExchange, Shoebox, no windows
 
 	Array1D< Real64 > SurfaceTemp;
 	Array1D< Real64 > NetLWRadToSurf;
