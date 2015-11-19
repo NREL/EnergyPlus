@@ -6,6 +6,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -149,7 +150,7 @@ namespace WeatherManager {
 		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool GetBranchInputOneTimeFlag( true );
 		bool GetEnvironmentFirstCall( true );
-		bool PrntEnvHeaders( true ); 
+		bool PrntEnvHeaders( true );
 	}
 	Real64 WeatherFileLatitude( 0.0 );
 	Real64 WeatherFileLongitude( 0.0 );
@@ -314,11 +315,11 @@ namespace WeatherManager {
 		WeatherDataReport = 0 ; // Report number for the weather data
 		WeatherFileExists = false ; // Set to true if a weather file exists
 		LocationTitle = ""; // Location Title from input File
-		LocationGathered = false; // flag to show if Location exists on Input File (we assume one is 
+		LocationGathered = false; // flag to show if Location exists on Input File (we assume one is
 
 		GetBranchInputOneTimeFlag = true ;
 		GetEnvironmentFirstCall = true ;
-		PrntEnvHeaders = true ; 
+		PrntEnvHeaders = true ;
 		WeatherFileLatitude = 0.0 ;
 		WeatherFileLongitude = 0.0 ;
 		WeatherFileTimeZone = 0.0 ;
@@ -425,8 +426,8 @@ namespace WeatherManager {
 		SolarInterpolation.deallocate(); // Solar Interpolation values based on
 
 		ErrorInWeatherFile = false ; // Set to TRUE when there is a problem with dates
-		LeapYearAdd = 0 ; 
-		DatesShouldBeReset = false; 
+		LeapYearAdd = 0 ;
+		DatesShouldBeReset = false;
 		StartDatesCycleShouldBeReset = false; // True when start dates on repeat should be reset
 		Jan1DatesShouldBeReset = false; // True if Jan 1 should signal reset of dates
 
@@ -451,7 +452,7 @@ namespace WeatherManager {
 		TomorrowVariables.CosSolarDeclinAngle = 0.0 ;
 		TomorrowVariables.EquationOfTime = 0.0 ;
 
-		DesignDay.deallocate(); 
+		DesignDay.deallocate();
 
 		Missing.DryBulb = 0.0 ;
 		Missing.DewPoint = 0.0 ;
@@ -532,7 +533,7 @@ namespace WeatherManager {
 		WPSkyTemperature.deallocate();
 		SpecialDays.deallocate();
 		DataPeriods.deallocate();
-	
+
 	} //clear_state, for unit tests
 
 	void
@@ -689,7 +690,7 @@ namespace WeatherManager {
 		//////////// hoisted into namespace changed to GetBranchInputOneTimeFlag////////////
 		//	static bool GetInputFlag( true ); // Set to true before execution starts changed to GetEnvironmentInputOneTimeFlag
 		//	static bool FirstCall( true ); // changed to GetEnvironmentFirstCall
-		//static bool PrntEnvHeaders( true ); 
+		//static bool PrntEnvHeaders( true );
 		////////////////////////////////////////////////
 		int Loop;
 		std::string StDate;
@@ -7400,7 +7401,7 @@ Label9999: ;
 		// Initialize Site:GroundTemperature:FCFactorMethod object
 		siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "" );
 		if ( siteFCFactorMethodGroundTempsPtr ) {
-			ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound;	
+			ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound;
 		}
 
 		// Initialize Site:GroundTemperature:Shallow object
@@ -8644,7 +8645,7 @@ Label9999: ;
 					DataPeriods.allocate( NumDataPeriods );
 					NumHdArgs += 4 * NumDataPeriods;
 					if ( NumDataPeriods > 0 ) {
-						DataPeriods( {1,NumDataPeriods} ).NumDays() = 0;
+						for ( auto & e : DataPeriods ) e.NumDays = 0;
 					}
 					CurCount = 0;
 

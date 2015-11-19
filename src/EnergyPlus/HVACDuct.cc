@@ -1,6 +1,3 @@
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-
 // EnergyPlus Headers
 #include <HVACDuct.hh>
 #include <BranchNodeConnections.hh>

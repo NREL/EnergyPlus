@@ -938,6 +938,12 @@ namespace DataSurfaces {
 			GenericContam( GenericContam )
 		{}
 
+		void
+		SetOutBulbTempAt();
+
+		void
+		SetWindSpeedAt( Real64 const fac );
+
 	};
 
 	struct SurfaceWindowCalc // Calculated window-related values
@@ -2536,6 +2542,12 @@ namespace DataSurfaces {
 	// Needed for unit tests, should not be normally called.
 	void
 	clear_state();
+
+	void
+	SetSurfaceOutBulbTempAt();
+
+	void
+	SetSurfaceWindSpeedAt();
 
 	std::string
 	cSurfaceClass( int const ClassNo );

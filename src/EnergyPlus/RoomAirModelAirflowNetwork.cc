@@ -1,9 +1,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <RoomAirModelAirflowNetwork.hh>
@@ -63,7 +61,7 @@ namespace RoomAirModelAirflowNetwork {
 	// contains the RoomAir model portions of RoomAirflowNetwork modeling
 
 	// METHODOLOGY EMPLOYED:
-	// Interact with Surface HB, internal gain, HVAC system and Airflow Network Domains 
+	// Interact with Surface HB, internal gain, HVAC system and Airflow Network Domains
 	// Do heat and moisture balance calculations on roomair nodes.
 
 	// REFERENCES:
@@ -92,7 +90,7 @@ namespace RoomAirModelAirflowNetwork {
 	// MODULE VARIABLE DECLARATIONS:
 	// see DataRoomAir
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE 
+	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
 	Array1D< RAFNData > RAFN;
@@ -146,7 +144,7 @@ namespace RoomAirModelAirflowNetwork {
 
 		}
 
-		thisRAFN.UpdateRoomAirModelAirflowNetwork( );
+		thisRAFN.UpdateRoomAirModelAirflowNetwork();
 
 	}  //SimRoomAirModelAirflowNetwork
 
@@ -196,7 +194,7 @@ namespace RoomAirModelAirflowNetwork {
 
 	}  //LoadPredictionRoomAirModelAirflowNetwork
 
-	//**************************************************** 
+	//****************************************************
 
 	void
 	RAFNData::InitRoomAirModelAirflowNetwork( int const RoomAirNode ) // index number for the specified zone
@@ -418,7 +416,7 @@ namespace RoomAirModelAirflowNetwork {
 
 				}
 				MyOneTimeFlagConf = false;
-				if ( allocated( NodeFound ) ) NodeFound.deallocate( );
+				if ( allocated( NodeFound ) ) NodeFound.deallocate();
 				if ( ErrorsFound ) {
 					ShowFatalError( "GetRoomAirflowNetworkData: Errors found getting air model input.  Program terminates." );
 				}
@@ -588,7 +586,7 @@ namespace RoomAirModelAirflowNetwork {
 			NodeHumRatX1 = ThisRAFNNode.HumRatX1;
 			NodeHumRatX2 = ThisRAFNNode.HumRatX2;
 			NodeHumRatX3 = ThisRAFNNode.HumRatX3;
-		} 
+		}
 		else {  // use down - stepped history
 			NodeTempX1 = ThisRAFNNode.AirTempDSX1;
 			NodeTempX2 = ThisRAFNNode.AirTempDSX2;
@@ -652,7 +650,7 @@ namespace RoomAirModelAirflowNetwork {
 	} // CalcRoomAirModelAirflowNetwork
 
 	void
-	RAFNData::UpdateRoomAirModelAirflowNetwork(  )
+	RAFNData::UpdateRoomAirModelAirflowNetwork()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -693,7 +691,7 @@ namespace RoomAirModelAirflowNetwork {
 
 		if ( !ThisRAFNZone.IsUsed ) return;
 
-		if ( !ZoneSizingCalc ) SumSystemDepResponseForNode( );
+		if ( !ZoneSizingCalc ) SumSystemDepResponseForNode();
 
 		AirNodeNum = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
 
@@ -741,13 +739,13 @@ namespace RoomAirModelAirflowNetwork {
 		// previously done in various places throughout the program.
 		// The SumHAT portion of the code is reproduced in RadiantSystemHighTemp and
 		// RadiantSystemLowTemp and should be updated accordingly.
-		// 
+		//
 		// A reference temperature(Tref) is specified for use with the ceiling diffuser
 		// convection correlation.A bogus value of Tref = -999.9 defaults to using
 		// the zone air(i.e.outlet) temperature for the reference temperature.
 		// If Tref is applied to all surfaces, SumHA = 0, and SumHATref /= 0.
 		// If Tref is not used at all, SumHATref = 0, and SumHA /= 0.
-		// 
+		//
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -798,7 +796,7 @@ namespace RoomAirModelAirflowNetwork {
 		Real64 Area; //                   !Effective surface area
 		Real64 RefAirTemp; //             !Reference air temperature for surface convection calculations
 		Real64 ZoneMult;
-		int ADUListIndex; 
+		int ADUListIndex;
 		int ADUNum;
 		int ADUInNode;
 		int ADUOutNode;
@@ -814,7 +812,7 @@ namespace RoomAirModelAirflowNetwork {
 		Real64 SumSysMW; //               !Zone sum of air system MassFlowRate*W
 		int EquipLoop; //              !Index of equipment loop
 		int Loop; //                   !Index of RAFN node
-		bool  Found; // 
+		bool  Found; //
 		Real64 SumLinkM; //               !Zone sum of MassFlowRate from the AirflowNetwork model
 		Real64 SumLinkMW; //             !Zone sum of MassFlowRate*W from the AirflowNetwork model
 
@@ -1055,7 +1053,7 @@ namespace RoomAirModelAirflowNetwork {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B Griffith
-		//                      derived from P. Biddulph-- HAMT, L. Gu -- EPMD, 
+		//                      derived from P. Biddulph-- HAMT, L. Gu -- EPMD,
 		//       DATE WRITTEN   November 2009
 		//       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
 		//       RE-ENGINEERED  na

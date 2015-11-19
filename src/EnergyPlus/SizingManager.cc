@@ -3,7 +3,6 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -589,10 +588,10 @@ namespace SizingManager {
 						DOASHeatGainRateAtClPk = 0.0;
 						TStatSetPtAtPk = 0.0;
 					}
-					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Cooling", CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad, 
-						FinalZoneSizing( CtrlZoneNum ).DesCoolLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, 
-						FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).CoolDesDay, CoolPeakDateHrMin( CtrlZoneNum ), 
-						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, 
+					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Cooling", CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad,
+						FinalZoneSizing( CtrlZoneNum ).DesCoolLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow,
+						FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).CoolDesDay, CoolPeakDateHrMin( CtrlZoneNum ),
+						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants,
 						FinalZoneSizing( CtrlZoneNum ).MinOA, DOASHeatGainRateAtClPk );
 					curName = FinalZoneSizing( CtrlZoneNum ).ZoneName;
 					PreDefTableEntry( pdchZnClCalcDesLd, curName, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad );
@@ -626,10 +625,10 @@ namespace SizingManager {
 						DOASHeatGainRateAtHtPk = 0.0;
 						TStatSetPtAtPk = 0.0;
 					}
-					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Heating", CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad, 
-						FinalZoneSizing( CtrlZoneNum ).DesHeatLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, 
-						FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).HeatDesDay, HeatPeakDateHrMin( CtrlZoneNum ), 
-						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, 
+					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Heating", CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad,
+						FinalZoneSizing( CtrlZoneNum ).DesHeatLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow,
+						FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).HeatDesDay, HeatPeakDateHrMin( CtrlZoneNum ),
+						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants,
 						FinalZoneSizing( CtrlZoneNum ).MinOA, DOASHeatGainRateAtHtPk );
 					curName = FinalZoneSizing( CtrlZoneNum ).ZoneName;
 					PreDefTableEntry( pdchZnHtCalcDesLd, curName, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad );
@@ -1758,7 +1757,7 @@ namespace SizingManager {
 					if ( cAlphaArgs( 8 ) == "YES" ) {
 						ZoneSizingInput( ZoneSizIndex ).AccountForDOAS = true;
 					}
-					else { 
+					else {
 						ZoneSizingInput( ZoneSizIndex ).AccountForDOAS = false;
 					}
 					if ( ZoneSizingInput( ZoneSizIndex ).AccountForDOAS ) {
@@ -2444,11 +2443,13 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}
 			PlantSizData.allocate( NumPltSizInput );
-			PlantSizData.PlantLoopName() = "";
-			PlantSizData.ExitTemp() = 0.0;
-			PlantSizData.DeltaT() = 0.0;
-			PlantSizData.LoopType() = 0;
-			PlantSizData.DesVolFlowRate() = 0.0;
+			for ( auto & e : PlantSizData ) {
+				e.PlantLoopName.clear();
+				e.ExitTemp = 0.0;
+				e.DeltaT = 0.0;
+				e.LoopType = 0;
+				e.DesVolFlowRate = 0.0;
+			}
 			for ( int i=1; i<=NumPltSizInput; ++i ) {
 				PlantSizData(i).ConcurrenceOption = NonCoincident;
 				PlantSizData(i).NumTimeStepsInAvg = 1;

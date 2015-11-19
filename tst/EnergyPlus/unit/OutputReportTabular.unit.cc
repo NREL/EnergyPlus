@@ -1063,7 +1063,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 	UpdateMeterReporting();
 	UpdateDataandReport( 1 );
 	GatherBEPSResultsForTimestep( 1 );
-	EXPECT_EQ( extLitUse * 9, gatherEndUseBEPS( 1, endUseExteriorLights )  );
+	EXPECT_EQ( extLitUse * 9, gatherEndUseBEPS( 1, endUseExteriorLights ) );
 
 	ResetBEPSGathering();
 

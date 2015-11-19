@@ -1612,7 +1612,6 @@ namespace OutputProcessor {
 		cCurrentModuleObject = "Meter:Custom";
 		NumCustomMeters = GetNumObjectsFound( cCurrentModuleObject );
 
-		auto const EnergyMeters_Name( EnergyMeters.Name() ); // Member array
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
@@ -1620,7 +1619,7 @@ namespace OutputProcessor {
 			MeterCreated = false;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EnergyMeters_Name, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
+			VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -1772,7 +1771,7 @@ namespace OutputProcessor {
 			MeterCreated = false;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EnergyMeters_Name, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
+			VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -3227,7 +3226,7 @@ namespace OutputProcessor {
 		}
 
 		if ( NumEnergyMeters > 0 ) {
-			EnergyMeters.TSValue() = 0.0;
+			for ( auto & e : EnergyMeters ) e.TSValue = 0.0;
 		}
 
 	}
@@ -3519,9 +3518,11 @@ namespace OutputProcessor {
 		}
 
 		if ( NumEnergyMeters > 0 ) {
-			EnergyMeters.SMValue() = 0.0;
-			EnergyMeters.SMMinVal() = MinSetValue;
-			EnergyMeters.SMMaxVal() = MaxSetValue;
+			for ( auto & e : EnergyMeters ) {
+				e.SMValue = 0.0;
+				e.SMMinVal = MinSetValue;
+				e.SMMaxVal = MaxSetValue;
+			}
 		}
 
 	}
@@ -8136,7 +8137,7 @@ ProduceRDDMDD()
 	}
 
 	Array1D_string VariableNames( NumVariablesForOutput );
-	VariableNames = DDVariableTypes( {1,NumVariablesForOutput} ).VarNameOnly();
+	for ( int i = 1; i <= NumVariablesForOutput; ++i ) VariableNames( i ) = DDVariableTypes( i ).VarNameOnly;
 	Array1D_int iVariableNames( NumVariablesForOutput );
 
 	if ( SortByName ) {

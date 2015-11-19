@@ -1,4 +1,5 @@
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
@@ -8,7 +9,6 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -364,9 +364,9 @@ namespace HeatBalanceSurfaceManager {
 		// Initialize zone outdoor environmental variables
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the zone, modify the zone  Dry/Wet BulbTemps
-		SetOutBulbTempAt( NumOfZones, Zone( {1,NumOfZones} ).ma( &ZoneData::Centroid ).z(), Zone( {1,NumOfZones} ).OutDryBulbTemp(), Zone( {1,NumOfZones} ).OutWetBulbTemp(), "Zone" );
+		SetZoneOutBulbTempAt();
 
-		SetWindSpeedAt( NumOfZones, Zone( {1,NumOfZones} ).ma( &ZoneData::Centroid ).z(), Zone( {1,NumOfZones} ).WindSpeed(), "Zone" );
+		SetZoneWindSpeedAt();
 		//  DO ZoneNum = 1, NumOfZones
 		//    Zone(ZoneNum)%WindSpeed = WindSpeedAt(Zone(ZoneNum)%Centroid%z)
 		//  END DO
@@ -374,9 +374,9 @@ namespace HeatBalanceSurfaceManager {
 		// Initialize surface outdoor environmental variables
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the surface centroids, modify the surface Dry/Wet BulbTemps
-		SetOutBulbTempAt( TotSurfaces, Surface( {1,TotSurfaces} ).ma( &SurfaceData::Centroid ).z(), Surface( {1,TotSurfaces} ).OutDryBulbTemp(), Surface( {1,TotSurfaces} ).OutWetBulbTemp(), "Surface" );
+		SetSurfaceOutBulbTempAt();
 
-		SetWindSpeedAt( TotSurfaces, Surface( {1,TotSurfaces} ).ma( &SurfaceData::Centroid ).z(), Surface( {1,TotSurfaces} ).WindSpeed(), "Surface" );
+		SetSurfaceWindSpeedAt();
 		//  DO SurfNum = 1, TotSurfaces
 		//    IF (Surface(SurfNum)%ExtWind) Surface(SurfNum)%WindSpeed = WindSpeedAt(Surface(SurfNum)%Centroid%z)
 		//  END DO
@@ -398,7 +398,7 @@ namespace HeatBalanceSurfaceManager {
 		// Do the Begin Simulation initializations
 		if ( BeginSimFlag ) {
 			AllocateSurfaceHeatBalArrays(); // Allocate the Module Arrays before any inits take place
-			InterZoneWindow = any( Zone.HasInterZoneWindow() );
+			InterZoneWindow = std::any_of( Zone.begin(), Zone.end(), []( DataHeatBalance::ZoneData const & e ){ return e.HasInterZoneWindow; } );
 			IsZoneDV.dimension( NumOfZones, false );
 			IsZoneCV.dimension( NumOfZones, false );
 			IsZoneUI.dimension( NumOfZones, false );
@@ -1556,17 +1556,19 @@ namespace HeatBalanceSurfaceManager {
 		QsrcHist = 0.0;
 		QsrcHistM = 0.0;
 		CondFDRelaxFactor = CondFDRelaxFactorInput;
-		// Initialize window frame and divider temperatures
-		SurfaceWindow.FrameTempSurfIn() = 23.0;
-		SurfaceWindow.FrameTempSurfInOld() = 23.0;
-		SurfaceWindow.FrameTempSurfOut() = 23.0;
-		SurfaceWindow.DividerTempSurfIn() = 23.0;
-		SurfaceWindow.DividerTempSurfInOld() = 23.0;
-		SurfaceWindow.DividerTempSurfOut() = 23.0;
+		for ( auto & e : SurfaceWindow ) {
+			// Initialize window frame and divider temperatures
+			e.FrameTempSurfIn = 23.0;
+			e.FrameTempSurfInOld = 23.0;
+			e.FrameTempSurfOut = 23.0;
+			e.DividerTempSurfIn = 23.0;
+			e.DividerTempSurfInOld = 23.0;
+			e.DividerTempSurfOut = 23.0;
 
-		// Initialize previous-timestep shading indicators
-		SurfaceWindow.ExtIntShadePrevTS() = 0;
-		SurfaceWindow.ShadingFlag() = ShadeOff;
+			// Initialize previous-timestep shading indicators
+			e.ExtIntShadePrevTS = 0;
+			e.ShadingFlag = ShadeOff;
+		}
 
 		// Perform other initializations that depend on the surface characteristics
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -1881,8 +1883,10 @@ namespace HeatBalanceSurfaceManager {
 		WinSysSolReflectance = 0.0;
 		WinSysSolAbsorptance = 0.0;
 		if ( NumOfTDDPipes > 0 ) {
-			TDDPipe.HeatGain() = 0.0;
-			TDDPipe.HeatLoss() = 0.0;
+			for ( auto & e : TDDPipe ) {
+				e.HeatGain = 0.0;
+				e.HeatLoss = 0.0;
+			}
 		}
 		BmIncInsSurfIntensRep = 0.0;
 		BmIncInsSurfAmountRep = 0.0;
@@ -1936,11 +1940,13 @@ namespace HeatBalanceSurfaceManager {
 			WinDifSolarEnergy = 0.0;
 
 			if ( NumOfTDDPipes > 0 ) {
-				TDDPipe.TransSolBeam() = 0.0;
-				TDDPipe.TransSolDiff() = 0.0;
-				TDDPipe.TransVisBeam() = 0.0;
-				TDDPipe.TransVisDiff() = 0.0;
-				TDDPipe.TransmittedSolar() = 0.0;
+				for ( auto & e : TDDPipe ) {
+					e.TransSolBeam = 0.0;
+					e.TransSolDiff = 0.0;
+					e.TransVisBeam = 0.0;
+					e.TransVisDiff = 0.0;
+					e.TransmittedSolar = 0.0;
+				}
 			}
 
 			if ( CalcSolRefl ) {
@@ -3489,9 +3495,12 @@ namespace HeatBalanceSurfaceManager {
 		int OutsideMaterNum; // integer pointer for outside face's material layer
 
 		// first determine if anything needs to be done, once yes, then always init
-		if ( any( Material.AbsorpSolarEMSOverrideOn() ) ) SurfPropOverridesPresent = true;
-		if ( any( Material.AbsorpThermalEMSOverrideOn() ) ) SurfPropOverridesPresent = true;
-		if ( any( Material.AbsorpVisibleEMSOverrideOn() ) ) SurfPropOverridesPresent = true;
+		for ( auto const & mat : Material ) {
+			if ( ( mat.AbsorpSolarEMSOverrideOn ) || ( mat.AbsorpThermalEMSOverrideOn ) || ( mat.AbsorpVisibleEMSOverrideOn ) ) {
+				SurfPropOverridesPresent = true;
+				break;
+			}
+		}
 
 		if ( ! SurfPropOverridesPresent ) return; // quick return if nothing has ever needed to be done
 
@@ -3576,13 +3585,12 @@ namespace HeatBalanceSurfaceManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool SurfConstructOverridesPresent( false ); // detect if EMS ever used for this and inits need to execute
-		int SurfNum;
 
-		if ( any( Surface.EMSConstructionOverrideON() ) ) SurfConstructOverridesPresent = true;
+		if ( std::any_of( Surface.begin(), Surface.end(), []( DataSurfaces::SurfaceData const & e ){ return e.EMSConstructionOverrideON; } ) ) SurfConstructOverridesPresent = true;
 
 		if ( ! SurfConstructOverridesPresent ) return;
 
-		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+		for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 
 			if ( Surface( SurfNum ).EMSConstructionOverrideON && ( Surface( SurfNum ).EMSConstructionOverrideValue > 0 ) ) {
 
@@ -6154,16 +6162,16 @@ GatherComponentLoadsSurfAbsFact()
 // *****************************************************************************
 
 	//     NOTICE
-	
+
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
-	
+
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
 	//     list of contributors, see "Notice" located in main.cc.
-	
+
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.
@@ -6175,6 +6183,6 @@ GatherComponentLoadsSurfAbsFact()
 	//     permit others to do so.
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
-} // HeatBalanceSurfaceManager 
+} // HeatBalanceSurfaceManager
 
 } // EnergyPlus

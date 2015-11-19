@@ -259,7 +259,7 @@ namespace EnergyPlus {
 		bool ErrorsFound( false ); // If errors detected in input
 
 		// call to process input
-		ProcessScheduleInput( );
+		ProcessScheduleInput();
 		ErrorsFound = false;
 		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
 		EXPECT_FALSE( ErrorsFound );
@@ -274,11 +274,11 @@ namespace EnergyPlus {
 		ErrorsFound = false;
 		GetZoneData( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
-		AllocateHeatBalArrays( );
+		AllocateHeatBalArrays();
 		ErrorsFound = false;
 		GetSimpleAirModelInputs( ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
-		SetZoneMassConservationFlag( );
+		SetZoneMassConservationFlag();
 		// setup zone equipment configuration
 		ZoneEquipConfig.allocate( NumOfZones );
 
@@ -333,7 +333,7 @@ namespace EnergyPlus {
 		Mixing( 1 ).MixingMassFlowRate = 0.1;
 
 		// call zone air mass balance
-		CalcZoneMassBalance( );
+		CalcZoneMassBalance();
 		EXPECT_EQ( Node( 4 ).MassFlowRate, 0.0 ); // Zone 1 return node (max(0.0, 1-2)
 		EXPECT_EQ( Infiltration( 1 ).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
 		EXPECT_EQ( Mixing( 1 ).MixingMassFlowRate, 0.1 ); // Zone 1 to Zone 2 mixing flow rate (unchanged)

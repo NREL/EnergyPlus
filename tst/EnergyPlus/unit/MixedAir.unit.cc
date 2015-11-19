@@ -239,7 +239,7 @@ namespace EnergyPlus {
 		} );
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
-		GetOAControllerInputs( );
+		GetOAControllerInputs();
 		EXPECT_EQ( 2, OAController( 1 ).OANode );
 		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
 
@@ -426,7 +426,7 @@ namespace EnergyPlus {
 			"    CM DSZAD West Zone; !- Design Specification Zone Air Distribution Object Name 1",
 		} );
 
-		
+
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
 		AirLoopControlInfo.allocate( 1 );
@@ -450,7 +450,7 @@ namespace EnergyPlus {
 		AirLoopFlow( 1 ).OAFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
 		AirLoopFlow( 1 ).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
 
-		GetOAControllerInputs( );
+		GetOAControllerInputs();
 
 		EXPECT_EQ( 7, VentilationMechanical( 1 ).SystemOAMethod );
 		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
@@ -503,7 +503,7 @@ namespace EnergyPlus {
 	{
 
 		bool ErrorsFound( false );
-		
+
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
 

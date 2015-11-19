@@ -3,7 +3,6 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -3358,7 +3357,7 @@ namespace General {
 		std::string const & ZoneName, // Zone Name associated
 		std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
 		std::string const & ItemName, // Item name (People, Lights, etc object)
-		Array1S_string const ItemNames, // Item Names to check for duplication
+		Array1_string const & ItemNames, // Item Names to check for duplication
 		int const NumItems, // Number of items in ItemNames array
 		std::string & ResultName, // Resultant name
 		bool & errFlag // Error flag set to true if error found here.

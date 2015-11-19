@@ -3,7 +3,6 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -3884,7 +3883,7 @@ namespace PackagedThermalStorageCoil {
 		Real64 const DesiredOutletTemp,   // desired outlet temperature [C]
 		Real64 const DesiredOutletHumRat, // desired outlet humidity ratio [kg/kg]
 		Real64 & PartLoadFrac,            // value based on coil operation, if possible, as PLR required to meet T or w set point
-		int & TESOpMode,                  // value determined in InitTESCoil and passed back to parent for use in iteration routines 
+		int & TESOpMode,                  // value determined in InitTESCoil and passed back to parent for use in iteration routines
 		int & ControlType,                // parent object dehumidification control type (e.g., None, Multimode, CoolReheat)
 		int & SensPLRIter,                // iteration number of Sensible PLR Iteration warning message
 		int & SensPLRIterIndex,           // index to Sensible PLR Iteration warning message
@@ -4759,7 +4758,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil.Name(), NumTESCoils );
+			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4824,7 +4823,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil.Name(), NumTESCoils );
+			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4889,7 +4888,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil.Name(), NumTESCoils );
+			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4962,7 +4961,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil.Name(), NumTESCoils );
+			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}

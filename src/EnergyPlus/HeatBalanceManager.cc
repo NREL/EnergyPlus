@@ -1,4 +1,5 @@
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 #include <string>
 
@@ -7,7 +8,6 @@
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -477,7 +477,7 @@ namespace HeatBalanceManager {
 				Construct( CNum ).IsUsed = true;
 			}
 		}
-		Unused = TotConstructs - count( Construct.IsUsed() );
+		Unused = TotConstructs - std::count_if( Construct.begin(), Construct.end(), []( DataHeatBalance::ConstructionData const & e ){ return e.IsUsed; } );
 		if ( Unused > 0 ) {
 			if ( ! DisplayExtraWarnings ) {
 				ShowWarningError( "CheckUsedConstructions: There are " + RoundSigDigits( Unused ) + " nominally unused constructions in input." );
@@ -3648,19 +3648,22 @@ namespace HeatBalanceManager {
 		Construct.allocate( TotConstructs );
 		//Note: If TotWindow5Constructs > 0, additional constructions are created in
 		//subr. SearchWindow5DataFile corresponding to those found on the data file.
-		//Initialize CTF and History terms.
-		Construct.NumCTFTerms() = 0;
-		Construct.NumHistories() = 0;
+		for ( auto & e : Construct ) {
+			// Initialize CTF and History terms
+			e.NumCTFTerms = 0;
+			e.NumHistories = 0;
 
-		//Initialize some heat source/sink variables
-		Construct.SourceSinkPresent() = false; // "default" is no source or sink present
-		Construct.SolutionDimensions() = 1; // "default" is 1-D heat transfer
-		Construct.SourceAfterLayer() = 0; // this has no meaning if a source/sink is not present
-		Construct.TempAfterLayer() = 0; // this has no meaning if a source/sink is not present
-		Construct.ThicknessPerpend() = 0.0; // this has no meaning if a source/sink is not present
+			// Initialize some heat source/sink variables
+			e.SourceSinkPresent = false; // "default" is no source or sink present
+			e.SolutionDimensions = 1; // "default" is 1-D heat transfer
+			e.SourceAfterLayer = 0; // this has no meaning if a source/sink is not present
+			e.TempAfterLayer = 0; // this has no meaning if a source/sink is not present
+			e.ThicknessPerpend = 0.0; // this has no meaning if a source/sink is not present
 
-		Construct.W5FrameDivider() = 0;
-		Construct.FromWindow5DataFile() = false;
+			e.W5FrameDivider = 0;
+			e.FromWindow5DataFile = false;
+		}
+
 
 		ConstrNum = 0;
 
@@ -4502,8 +4505,10 @@ namespace HeatBalanceManager {
 			MaxLoadZoneRpt = 0.0;
 			CountWarmupDayPoints = 0;
 
-			SurfaceWindow.ThetaFace() = 296.15;
-			SurfaceWindow.EffInsSurfTemp() = 23.0;
+			for ( auto & e : SurfaceWindow ) {
+				e.ThetaFace = 296.15;
+				e.EffInsSurfTemp = 23.0;
+			}
 
 		}
 

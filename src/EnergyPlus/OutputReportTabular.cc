@@ -10,6 +10,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
@@ -448,7 +449,7 @@ namespace OutputReportTabular {
 		WriteTabularFiles = false;
 		unitsStyle = 0;
 		numStyles = 0;
-		TabularOutputFile = Array1D< std::ofstream * > ( maxNumStyles, { &csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream } ); 
+		TabularOutputFile = Array1D< std::ofstream * > ( maxNumStyles, { &csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream } );
 		del = Array1D_string ( maxNumStyles );
 		TableStyle = Array1D_int ( maxNumStyles, 0 );
 		timeInYear = 0.0;
@@ -1115,17 +1116,21 @@ namespace OutputReportTabular {
 		MonthlyTables.allocate( MonthlyTablesCount );
 		MonthlyColumns.allocate( MonthlyColumnsCount );
 		// Initialize tables and results
-		MonthlyTables.keyValue() = "";
-		MonthlyTables.firstColumn() = 0;
-		MonthlyTables.numColumns() = 0;
+		for ( auto & e : MonthlyTables ) {
+			e.keyValue.clear();
+			e.firstColumn = 0;
+			e.numColumns = 0;
+		}
 
-		MonthlyColumns.varName() = "";
-		MonthlyColumns.varNum() = 0;
-		MonthlyColumns.typeOfVar() = 0;
-		MonthlyColumns.avgSum() = 0;
-		MonthlyColumns.stepType() = 0;
-		MonthlyColumns.units() = "";
-		MonthlyColumns.aggType() = 0;
+		for ( auto & e : MonthlyColumns ) {
+			e.varName.clear();
+			e.varNum = 0;
+			e.typeOfVar = 0;
+			e.avgSum = 0;
+			e.stepType = 0;
+			e.units.clear();
+			e.aggType = 0;
+		}
 		for ( colNum = 1; colNum <= MonthlyColumnsCount; ++colNum ) {
 			MonthlyColumns( colNum ).reslt = 0.0;
 			MonthlyColumns( colNum ).timeStamp = 0;
@@ -1522,20 +1527,27 @@ namespace OutputReportTabular {
 			}
 		}
 		// clear the binning arrays to zeros
-		BinResults.mnth() = 0.0;
-		BinResultsBelow.mnth() = 0.0;
-		BinResultsAbove.mnth() = 0.0;
-		BinResults.hrly() = 0.0;
-		BinResultsBelow.hrly() = 0.0;
-		BinResultsAbove.hrly() = 0.0;
+		for ( auto & e : BinResults ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsBelow ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsAbove ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
 
 		// initialize statistics counters
-		BinStatistics.minimum() = huge( bigVal );
-		BinStatistics.maximum() = -huge( bigVal );
-		BinStatistics.n() = 0;
-		BinStatistics.sum() = 0.0;
-		BinStatistics.sum2() = 0.0;
-
+		for ( auto & e : BinStatistics ) {
+			e.minimum = huge( bigVal );
+			e.maximum = -huge( bigVal );
+			e.n = 0;
+			e.sum = 0.0;
+			e.sum2 = 0.0;
+		}
 	}
 
 	bool
@@ -3775,17 +3787,28 @@ namespace OutputReportTabular {
 
 		if ( ! DoWeathSim ) return;
 
-		//create temporary arrays to speed processing of these arrays
+		// create temporary arrays to speed processing of these arrays
 		if ( GatherMonthlyResultsForTimestepRunOnce ) {
-			//MonthlyColumns
-			MonthlyColumnsTypeOfVar = MonthlyColumns.typeOfVar();
-			MonthlyColumnsStepType = MonthlyColumns.stepType();
-			MonthlyColumnsAggType = MonthlyColumns.aggType();
-			MonthlyColumnsVarNum = MonthlyColumns.varNum();
-			//MonthlyTables
-			MonthlyTablesNumColumns = MonthlyTables.numColumns();
+			// MonthlyColumns
+			MonthlyColumnsTypeOfVar.allocate( MonthlyColumns.I() );
+			MonthlyColumnsStepType.allocate( MonthlyColumns.I() );
+			MonthlyColumnsAggType.allocate( MonthlyColumns.I() );
+			MonthlyColumnsVarNum.allocate( MonthlyColumns.I() );
+			for ( int i = MonthlyColumns.l(), e = MonthlyColumns.u(); i <= e; ++i ) {
+				auto const & col( MonthlyColumns( i ) );
+				MonthlyColumnsTypeOfVar( i ) = col.typeOfVar;
+				MonthlyColumnsStepType( i ) = col.stepType;
+				MonthlyColumnsAggType( i ) = col.aggType;
+				MonthlyColumnsVarNum( i ) = col.varNum;
+			}
 
-			//set flag so this block is only executed once
+			// MonthlyTables
+			MonthlyTablesNumColumns.allocate( MonthlyTables.I() );
+			for ( int i = MonthlyTables.l(), e = MonthlyTables.u(); i <= e; ++i ) {
+				MonthlyTablesNumColumns( i ) = MonthlyTables( i ).numColumns;
+			}
+
+			// set flag so this block is only executed once
 			GatherMonthlyResultsForTimestepRunOnce = false;
 		}
 
@@ -6798,6 +6821,7 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
+		using DataWater::StorageTankDataStruct;
 		using ManageElectricPower::NumElecStorageDevices;
 		using DataHVACGlobals::deviationFromSetPtThresholdHtg;
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
@@ -6986,7 +7010,7 @@ namespace OutputReportTabular {
 			// get change in overall state of charge for electrical storage devices.
 			if ( NumElecStorageDevices > 0 ) {
 				// All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not necessary
-				// OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored( ) ) - sum( ElecStorage.ThisTimeStepStateOfCharge( ) ) ) + gatherElecStorage;
+				// OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
 				OverallNetEnergyFromStorage = gatherElecStorage;
 				OverallNetEnergyFromStorage /= largeConversionFactor;
 			} else {
@@ -8059,8 +8083,8 @@ namespace OutputReportTabular {
 			tableBody( 1, 4 ) = RealToStr( totalOnsiteWater / waterConversionFactor, 2 );
 
 			if ( allocated( WaterStorage ) ) {
-				initialStorage = sum( WaterStorage.InitialVolume() );
-				finalStorage = sum( WaterStorage.ThisTimeStepVolume() );
+				initialStorage = sum( WaterStorage, &StorageTankDataStruct::InitialVolume );
+				finalStorage = sum( WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume );
 				StorageChange = initialStorage - finalStorage;
 			} else {
 				initialStorage = 0.0;
@@ -9239,6 +9263,7 @@ namespace OutputReportTabular {
 		using DataEnvironment::RunPeriodStartDayOfWeek;
 		using DataEnvironment::WeatherFileLocationTitle;
 		using DataHeatBalance::Zone;
+		using DataHeatBalance::ZoneData;
 		using DataHeatBalance::BuildingAzimuth;
 		using DataHeatBalance::TotLights;
 		using DataHeatBalance::Lights;
@@ -9751,8 +9776,10 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 			}
 
-			if ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) > 0.0 || sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) > 0.0 ) {
-				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
+			Real64 const totExtGrossWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossWallArea_Multiplied ) );
+			Real64 const totExtGrossGroundWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied ) );
+			if ( totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0 ) {
+				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied ) ) / ( totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied );
 				if ( pdiff > 0.019 ) {
 					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls" );
 					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100.0, 1 ) + "% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions." );
@@ -9762,8 +9789,8 @@ namespace OutputReportTabular {
 					//         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
 					ShowContinueError( "Check classes of surfaces and tilts for discrepancies." );
 					ShowContinueError( "Total wall area by ASHRAE 90.1 definition=" + stripped( RealToStr( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ), 3 ) ) + " m2." );
-					ShowContinueError( "Total exterior wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ), 3 ) ) + " m2." );
-					ShowContinueError( "Total ground contact wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ), 3 ) ) + " m2." );
+					ShowContinueError( "Total exterior wall area from user entered classes=" + stripped( RealToStr( totExtGrossWallArea_Multiplied, 3 ) ) + " m2." );
+					ShowContinueError( "Total ground contact wall area from user entered classes=" + stripped( RealToStr( totExtGrossGroundWallArea_Multiplied, 3 ) ) + " m2." );
 				}
 			}
 			//---- Space Summary Sub-Table
@@ -10356,7 +10383,7 @@ namespace OutputReportTabular {
 				}
 				if ( foundEntry == 0 ) break; //leave main loop - all items put into tables
 				//clear active items
-				CompSizeTableEntry.active() = false;
+				for ( auto & e : CompSizeTableEntry ) e.active = false;
 				//make an unwritten item that is of the same type active - these will be the
 				//entries for the particular subtable.
 				for ( iTableEntry = 1; iTableEntry <= numCompSizeTableEntry; ++iTableEntry ) {
@@ -13375,19 +13402,27 @@ namespace OutputReportTabular {
 		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
 		// clear the binning arrays to zeros
-		BinResults.mnth() = 0.0;
-		BinResultsBelow.mnth() = 0.0;
-		BinResultsAbove.mnth() = 0.0;
-		BinResults.hrly() = 0.0;
-		BinResultsBelow.hrly() = 0.0;
-		BinResultsAbove.hrly() = 0.0;
+		for ( auto & e : BinResults ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsBelow ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsAbove ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
 
 		// re-initialize statistics counters
-		BinStatistics.minimum() = huge( bigVal );
-		BinStatistics.maximum() = -huge( bigVal );
-		BinStatistics.n() = 0;
-		BinStatistics.sum() = 0.0;
-		BinStatistics.sum2() = 0.0;
+		for ( auto & e : BinStatistics ) {
+			e.minimum = huge( bigVal );
+			e.maximum = -huge( bigVal );
+			e.n = 0;
+			e.sum = 0.0;
+			e.sum2 = 0.0;
+		}
 	}
 
 	void

@@ -5,7 +5,6 @@
 #include <limits>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -1869,7 +1868,7 @@ namespace FluidProperties {
 
 		NumOfGlycols = NumOfGlyConcs; // Reset number of glycols to actual number
 		GlycolErrorTracking.allocate( NumOfGlycols );
-		GlycolErrorTracking.Name() = GlycolData.Name();
+		for ( std::size_t i = 0; i < GlycolErrorTracking.size(); ++i ) GlycolErrorTracking[ i ].Name = GlycolData[ i ].Name;
 
 		if ( ! ErrorsFound ) InitializeGlycolTempLimits( ErrorsFound ); // Initialize the Temp limits for the glycols
 

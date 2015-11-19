@@ -3,6 +3,7 @@
 
 // C++ Headers
 #include <functional>
+#include <type_traits>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1A.hh>
@@ -282,6 +283,25 @@ namespace General {
 		return FindNumberInList( WhichNumber, Array1D_int( ListOfItems ), NumItems );
 	}
 
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs isize() and operator(i) and value_type
+	inline
+	int
+	FindNumberInList(
+		int const WhichNumber,
+		Container const & ListOfItems,
+		int Container::value_type::*num_p
+	)
+	{
+		int FindNumberInList( 0 );
+		for ( int Count = 1, NumItems = ListOfItems.isize(); Count <= NumItems; ++Count ) {
+			if ( WhichNumber == ListOfItems( Count ).*num_p ) {
+				FindNumberInList = Count;
+				break;
+			}
+		}
+		return FindNumberInList;
+	}
+
 	void
 	DecodeMonDayHrMin(
 		int const Item, // word containing encoded month, day, hour, minute
@@ -359,13 +379,13 @@ namespace General {
 		std::string const & ZoneName, // Zone Name associated
 		std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
 		std::string const & ItemName, // Item name (People, Lights, etc object)
-		Array1S_string const ItemNames, // Item Names to check for duplication
+		Array1_string const & ItemNames, // Item Names to check for duplication
 		int const NumItems, // Number of items in ItemNames array
 		std::string & ResultName, // Resultant name
 		bool & errFlag // Error flag set to true if error found here.
 	);
 
-	template< typename A >
+	template< typename T, class = typename std::enable_if< ! std::is_same< T, std::string >::value >::type >
 	inline
 	void
 	CheckCreatedZoneItemName(
@@ -374,13 +394,15 @@ namespace General {
 		std::string const & ZoneName, // Zone Name associated
 		std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
 		std::string const & ItemName, // Item name (People, Lights, etc object)
-		MArray1< A, std::string > const & ItemNames, // Item Names to check for duplication
+		Array1< T > const & Items, // Items to check for duplication Names
 		int const NumItems, // Number of items in ItemNames array
 		std::string & ResultName, // Resultant name
 		bool & errFlag // Error flag set to true if error found here.
 	)
 	{
-		CheckCreatedZoneItemName( calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, Array1D_string( ItemNames ), NumItems, ResultName, errFlag );
+		Array1D_string ItemNames( Items.size() );
+		for ( std::size_t i = 0, e = Items.size(); i < e; ++i ) ItemNames[ i ] = Items[ i ].Name;
+		CheckCreatedZoneItemName( calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag );
 	}
 
 	//     NOTICE

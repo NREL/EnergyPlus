@@ -4,6 +4,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -214,10 +215,10 @@ namespace HeatBalanceIntRadExchange {
 		if ( PartialResimulate ) {
 			auto const & zone( Zone( ZoneToResimulate ) );
 			NetLWRadToSurf( {zone.SurfaceFirst,zone.SurfaceLast} ) = 0.0;
-			SurfaceWindow( {zone.SurfaceFirst,zone.SurfaceLast} ).IRfromParentZone() = 0.0;
+			for ( int i = zone.SurfaceFirst; i <= zone.SurfaceLast; ++i ) SurfaceWindow( i ).IRfromParentZone = 0.0;
 		} else {
 			NetLWRadToSurf = 0.0;
-			SurfaceWindow.IRfromParentZone() = 0.0;
+			for ( auto & e : SurfaceWindow ) e.IRfromParentZone = 0.0;
 		}
 
 		for ( int ZoneNum = ( PartialResimulate ? ZoneToResimulate() : 1 ), ZoneNum_end = ( PartialResimulate ? ZoneToResimulate() : NumOfZones ); ZoneNum <= ZoneNum_end; ++ZoneNum ) {

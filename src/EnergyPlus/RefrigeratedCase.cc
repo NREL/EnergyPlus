@@ -6539,7 +6539,7 @@ namespace RefrigeratedCase {
 			for ( int i = RefrigRack.l(), e = RefrigRack.u(); i <= e; ++i ) {
 				RefrigRack( i ).reset_init();
 			}
-			HeatReclaimRefrigeratedRack.AvailCapacity() = 0.0;
+			for ( auto & e : HeatReclaimRefrigeratedRack ) e.AvailCapacity = 0.0;
 			//Note don't reset basin heat to zero when no load because heater would remain on
 			//RefrigRack.BasinHeaterPower = 0.0;
 			//RefrigRack.BasinHeaterConsumption = 0.0;
@@ -6551,8 +6551,10 @@ namespace RefrigeratedCase {
 				Condenser( i ).reset_init();
 			}
 			//N don't reset basin heat to zero when no load because heater would remain on
-			HeatReclaimRefrigCondenser.AvailCapacity() = 0.0;
-			HeatReclaimRefrigCondenser.AvailTemperature() = 0.0;
+			for ( auto & e : HeatReclaimRefrigCondenser ) {
+				e.AvailCapacity = 0.0;
+				e.AvailTemperature = 0.0;
+			}
 		}
 
 		if ( NumSimulationGasCooler > 0 ) {
@@ -6600,37 +6602,49 @@ namespace RefrigeratedCase {
 				}
 			}
 			if ( NumRefrigSystems > 0 ) {
-				System.UnmetEnergy() = 0.0;
+				for ( auto & e : System ) e.UnmetEnergy = 0.0;
 			}
 			if ( NumSimulationWalkIns > 0 ) {
-				WalkIn.KgFrost() = 0.0;
-				WalkIn.StoredEnergy() = 0.0;
+				for ( auto & e : WalkIn ) {
+					e.KgFrost = 0.0;
+					e.StoredEnergy = 0.0;
+				}
 				for ( WalkInID = 1; WalkInID <= NumSimulationWalkIns; ++WalkInID ) {
 					WalkIn( WalkInID ).IceTemp = WalkIn( WalkInID ).TEvapDesign;
 				}
 			}
 			if ( NumSimulationRefrigAirChillers > 0 ) {
-				WarehouseCoil.KgFrost() = 0.0;
-				WarehouseCoil.KgFrostSaved() = 0.0;
+				for ( auto & e : WarehouseCoil ) {
+					e.KgFrost = 0.0;
+					e.KgFrostSaved = 0.0;
+				}
 				for ( CoilID = 1; CoilID <= NumSimulationRefrigAirChillers; ++CoilID ) {
 					WarehouseCoil( CoilID ).IceTemp = WarehouseCoil( CoilID ).TEvapDesign;
 					WarehouseCoil( CoilID ).IceTempSaved = WarehouseCoil( CoilID ).TEvapDesign;
 				}
 			}
 			if ( NumSimulationSecondarySystems > 0 ) {
-				Secondary.UnmetEnergy() = 0.0;
+				for ( auto & e : Secondary ) e.UnmetEnergy = 0.0;
 			}
 			if ( NumRefrigeratedRacks > 0 ) {
-				HeatReclaimRefrigeratedRack.UsedHVACCoil() = 0.0;
-				HeatReclaimRefrigeratedRack.UsedWaterHeater() = 0.0;
-				RefrigRack.LaggedUsedWaterHeater() = 0.0;
-				RefrigRack.LaggedUsedHVACCoil() = 0.0;
+				for ( auto & e : HeatReclaimRefrigeratedRack ) {
+					e.UsedHVACCoil = 0.0;
+					e.UsedWaterHeater = 0.0;
+				}
+				for ( auto & e : RefrigRack ) {
+					e.LaggedUsedWaterHeater = 0.0;
+					e.LaggedUsedHVACCoil = 0.0;
+				}
 			}
 			if ( NumRefrigCondensers > 0 ) {
-				HeatReclaimRefrigCondenser.UsedHVACCoil() = 0.0;
-				HeatReclaimRefrigCondenser.UsedWaterHeater() = 0.0;
-				Condenser.LaggedUsedWaterHeater() = 0.0;
-				Condenser.LaggedUsedHVACCoil() = 0.0;
+				for ( auto & e : HeatReclaimRefrigCondenser ) {
+					e.UsedHVACCoil = 0.0;
+					e.UsedWaterHeater = 0.0;
+				}
+				for ( auto & e : Condenser ) {
+					e.LaggedUsedWaterHeater = 0.0;
+					e.LaggedUsedHVACCoil = 0.0;
+				}
 			}
 			for ( SystemID = 1; SystemID <= NumRefrigSystems; ++SystemID ) {
 				if ( allocated( System( SystemID ).MechSCLoad ) ) System( SystemID ).MechSCLoad = 0.0;
@@ -12761,24 +12775,32 @@ namespace RefrigeratedCase {
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
 
 			if ( NumRefrigSystems > 0 ) {
-				System.PipeHeatLoad() = 0.0;
-				System.NetHeatRejectLoad() = 0.0;
+				for ( auto & e : System ) {
+					e.PipeHeatLoad = 0.0;
+					e.NetHeatRejectLoad = 0.0;
+				}
 			}
 
 			if ( NumTransRefrigSystems > 0 ) {
-				TransSystem.PipeHeatLoadMT() = 0.0;
-				TransSystem.PipeHeatLoadLT() = 0.0;
-				TransSystem.NetHeatRejectLoad() = 0.0;
+				for ( auto & e : TransSystem ) {
+					e.PipeHeatLoadMT = 0.0;
+					e.PipeHeatLoadLT = 0.0;
+					e.NetHeatRejectLoad = 0.0;
+				}
 			}
 
 			if ( NumRefrigeratedRacks > 0 ) {
-				RefrigRack.SensZoneCreditHeatRate() = 0.0;
-				RefrigRack.SensHVACCreditHeatRate() = 0.0;
+				for ( auto & e : RefrigRack ) {
+					e.SensZoneCreditHeatRate = 0.0;
+					e.SensHVACCreditHeatRate = 0.0;
+				}
 			}
 
 			if ( NumSimulationSecondarySystems > 0 ) {
-				Secondary.DistPipeZoneHeatGain() = 0.0;
-				Secondary.ReceiverZoneHeatGain() = 0.0;
+				for ( auto & e : Secondary ) {
+					e.DistPipeZoneHeatGain = 0.0;
+					e.ReceiverZoneHeatGain = 0.0;
+				}
 			}
 
 			if ( NumSimulationWalkIns > 0 ) {
@@ -12788,10 +12810,12 @@ namespace RefrigeratedCase {
 				}
 			}
 			if ( NumSimulationCases > 0 ) {
-				RefrigCase.SensZoneCreditRate() = 0.0;
-				RefrigCase.SensHVACCreditRate() = 0.0;
-				RefrigCase.LatZoneCreditRate() = 0.0;
-				RefrigCase.LatHVACCreditRate() = 0.0;
+				for ( auto & e : RefrigCase ) {
+					e.SensZoneCreditRate = 0.0;
+					e.SensHVACCreditRate = 0.0;
+					e.LatZoneCreditRate = 0.0;
+					e.LatHVACCreditRate = 0.0;
+				}
 			}
 			MyEnvrnFlag = false;
 		}

@@ -1151,10 +1151,12 @@ namespace EconomicTariff {
 		numComputation = GetNumObjectsFound( CurrentModuleObject );
 		computation.allocate( numTariff ); //not the number of Computations but the number of tariffs
 		//set default values for computation
-		computation.computeName() = "";
-		computation.firstStep() = 0;
-		computation.lastStep() = -1;
-		computation.isUserDef() = false;
+		for ( auto & e : computation ) {
+			e.computeName.clear();
+			e.firstStep = 0;
+			e.lastStep = -1;
+			e.isUserDef = false;
+		}
 		for ( iInObj = 1; iInObj <= numComputation; ++iInObj ) {
 			GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
@@ -4796,7 +4798,7 @@ namespace EconomicTariff {
 
 		if ( numTariff > 0 ) {
 			DisplayString( "Writing Tariff Reports" );
-			econVar.isReported() = false;
+			for ( auto & e : econVar ) e.isReported = false;
 			//CALL selectTariff moved to the end of computeTariff.
 			showWarningsBasedOnTotal();
 			//---------------------------------
@@ -4984,7 +4986,7 @@ namespace EconomicTariff {
 				columnWidth.deallocate();
 				tableBody.deallocate();
 				//---- Categories
-				econVar.activeNow() = false;
+				for ( auto & e : econVar ) e.activeNow = false;
 				econVar( tariff( iTariff ).ptEnergyCharges ).activeNow = true;
 				econVar( tariff( iTariff ).ptDemandCharges ).activeNow = true;
 				econVar( tariff( iTariff ).ptServiceCharges ).activeNow = true;
@@ -4996,7 +4998,7 @@ namespace EconomicTariff {
 				econVar( tariff( iTariff ).ptTotal ).activeNow = true;
 				ReportEconomicVariable( "Categories", false, true, tariff( iTariff ).tariffName );
 				//---- Charges
-				econVar.activeNow() = false;
+				for ( auto & e : econVar ) e.activeNow = false;
 				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 					if ( econVar( kVar ).tariffIndx == iTariff ) {
 						if ( ( econVar( kVar ).kindOfObj == kindChargeSimple ) || ( econVar( kVar ).kindOfObj == kindChargeBlock ) ) {
@@ -5006,7 +5008,7 @@ namespace EconomicTariff {
 				}
 				ReportEconomicVariable( "Charges", true, true, tariff( iTariff ).tariffName );
 				//---- Sources for Charges
-				econVar.activeNow() = false;
+				for ( auto & e : econVar ) e.activeNow = false;
 				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 					if ( econVar( kVar ).tariffIndx == iTariff ) {
 						indexInChg = econVar( kVar ).index;
@@ -5023,7 +5025,7 @@ namespace EconomicTariff {
 				}
 				ReportEconomicVariable( "Corresponding Sources for Charges", false, false, tariff( iTariff ).tariffName );
 				//---- Rachets
-				econVar.activeNow() = false;
+				for ( auto & e : econVar ) e.activeNow = false;
 				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 					if ( econVar( kVar ).tariffIndx == iTariff ) {
 						if ( econVar( kVar ).kindOfObj == kindRatchet ) {
@@ -5033,7 +5035,7 @@ namespace EconomicTariff {
 				}
 				ReportEconomicVariable( "Ratchets", false, false, tariff( iTariff ).tariffName );
 				//---- Qualifies
-				econVar.activeNow() = false;
+				for ( auto & e : econVar ) e.activeNow = false;
 				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 					if ( econVar( kVar ).tariffIndx == iTariff ) {
 						if ( econVar( kVar ).kindOfObj == kindQualify ) {
@@ -5043,13 +5045,13 @@ namespace EconomicTariff {
 				}
 				ReportEconomicVariable( "Qualifies", false, false, tariff( iTariff ).tariffName );
 				//---- Native Variables
-				econVar.activeNow() = false;
+				for ( auto & e : econVar ) e.activeNow = false;
 				for ( kVar = tariff( iTariff ).firstNative; kVar <= tariff( iTariff ).lastNative; ++kVar ) {
 					econVar( kVar ).activeNow = true;
 				}
 				ReportEconomicVariable( "Native Variables", false, false, tariff( iTariff ).tariffName );
 				//---- Other Variables
-				econVar.activeNow() = false;
+				for ( auto & e : econVar ) e.activeNow = false;
 				for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 					if ( econVar( kVar ).tariffIndx == iTariff ) {
 						if ( ! econVar( kVar ).isReported ) {

@@ -39,7 +39,7 @@ public:
 	Real64 const RhoWater = 1000.0; // For estimating the expected result
 
 	// constructor for test fixture class
-	LowTempRadiantSystemTest( )
+	LowTempRadiantSystemTest()
 	{
 		ElecRadSys.allocate( 1 );
 		HydrRadSys.allocate( 1 );
@@ -98,12 +98,12 @@ public:
 
 		int write_stat;
 		// Open the Initialization Output File (lifted from SimulationManager.cc)
-		OutputFileInits = GetNewUnitNumber( );
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
+		OutputFileInits = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 	}
 
-	//destructor
-	~LowTempRadiantSystemTest( )
+	// destructor
+	~LowTempRadiantSystemTest()
 	{
 
 		// Reset sizing flags to prevent interactions with other unit tests when run as a group
@@ -122,28 +122,28 @@ public:
 		DataSysScalableFlowSizingON = false; // boolean determines scalable system flow sizing is specified
 		DataSysScalableCapSizingON = false; // boolean determines scalable system capacity sizing is specified
 
-		ElecRadSys.deallocate( );
-		HydrRadSys( 1 ).NumCircuits.deallocate( );
-		HydrRadSys.deallocate( );
-		CFloRadSys.deallocate( );
-		ElecRadSysNumericFields( 1 ).FieldNames.deallocate( );
-		ElecRadSysNumericFields.deallocate( );
-		CalcFinalZoneSizing.deallocate( );
-		ZoneEqSizing( 1 ).SizingMethod.deallocate( );
-		ZoneEqSizing.deallocate( );
-		Zone.deallocate( );
-		HydronicRadiantSysNumericFields( 1 ).FieldNames.deallocate( );
-		HydronicRadiantSysNumericFields.deallocate( );
+		ElecRadSys.deallocate();
+		HydrRadSys( 1 ).NumCircuits.deallocate();
+		HydrRadSys.deallocate();
+		CFloRadSys.deallocate();
+		ElecRadSysNumericFields( 1 ).FieldNames.deallocate();
+		ElecRadSysNumericFields.deallocate();
+		CalcFinalZoneSizing.deallocate();
+		ZoneEqSizing( 1 ).SizingMethod.deallocate();
+		ZoneEqSizing.deallocate();
+		Zone.deallocate();
+		HydronicRadiantSysNumericFields( 1 ).FieldNames.deallocate();
+		HydronicRadiantSysNumericFields.deallocate();
 		for ( int loopindex = 1; loopindex <= TotNumLoops; ++loopindex ) {
 			auto & loopsidebranch( PlantLoop( loopindex ).LoopSide( 1 ).Branch( 1 ) );
-			loopsidebranch.Comp.deallocate( );
+			loopsidebranch.Comp.deallocate();
 			auto & loopside( PlantLoop( loopindex ).LoopSide( 1 ) );
-			loopside.Branch.deallocate( );
+			loopside.Branch.deallocate();
 			auto & loop( PlantLoop( loopindex ) );
-			loop.LoopSide.deallocate( );
+			loop.LoopSide.deallocate();
 		}
-		PlantLoop.deallocate( );
-		PlantSizData.deallocate( );
+		PlantLoop.deallocate();
+		PlantSizData.deallocate();
 
 		// Close and delete eio output file
 		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
@@ -368,11 +368,11 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow ) {
 	CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.2;
 	ExpectedResult1 = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 	ExpectedResult1 = ExpectedResult1 / ( PlantSizData( 1 ).DeltaT * RhoWater * CpWater );
-	
+
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult1, CFloRadSys( RadSysNum ).WaterVolFlowMax, 0.001 );
 
-	//Hydronic - cold water volume flow rate autosize 
+	//Hydronic - cold water volume flow rate autosize
 	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
 	CFloRadSys( RadSysNum ).HotWaterOutNode = 0;
 	CFloRadSys( RadSysNum ).ColdWaterInNode = 3;
@@ -386,14 +386,14 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow ) {
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult2, CFloRadSys( RadSysNum ).WaterVolFlowMax, 0.001 );
 
-	//Hydronic - maximum water volume flow rate autosize 
+	//Hydronic - maximum water volume flow rate autosize
 	CFloRadSys( RadSysNum ).WaterVolFlowMax = AutoSize;
 	CFloRadSys( RadSysNum ).HotWaterInNode = 1;
 	CFloRadSys( RadSysNum ).HotWaterOutNode = 2;
 	CFloRadSys( RadSysNum ).ColdWaterInNode = 3;
 	CFloRadSys( RadSysNum ).ColdWaterOutNode = 4;
 
-	//Hydronic - embeded tube length autosize 
+	//Hydronic - embeded tube length autosize
 	CFloRadSys( RadSysNum ).NumCircCalcMethod = 0;
 	CFloRadSys( RadSysNum ).NumOfSurfaces = 1;
 	CFloRadSys( RadSysNum ).TubeLength = AutoSize;

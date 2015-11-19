@@ -147,7 +147,7 @@ namespace HVACManager {
 	//Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
 	//Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
 	//Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
-	
+
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
 	// to facilitate easier unit testing of those functions.
@@ -679,22 +679,24 @@ namespace HVACManager {
 		FirstHVACIteration = true;
 
 		if ( AirLoopInputsFilled ) {
-			// Reset air loop control info for cooling coil active flag (used in TU's for reheat air flow control)
-			AirLoopControlInfo.CoolingActiveFlag() = false;
-			// Reset air loop control info for heating coil active flag (used in OA controller for HX control)
-			AirLoopControlInfo.HeatingActiveFlag() = false;
-			// reset outside air system HX to off first time through
-			AirLoopControlInfo.HeatRecoveryBypass() = true;
-			// set HX check status flag to check for custom control in MixedAir.cc
-			AirLoopControlInfo.CheckHeatRecoveryBypassStatus() = true;
-			// set OA comp simulated flag to false
-			AirLoopControlInfo.OASysComponentsSimulated() = false;
-			// set economizer flow locked flag to false, will reset if custom HX control is used
-			AirLoopControlInfo.EconomizerFlowLocked() = false;
-			// set air loop resim flags for when heat recovery is used and air loop needs another iteration
-			AirLoopControlInfo.HeatRecoveryResimFlag() = true;
-			AirLoopControlInfo.HeatRecoveryResimFlag2() = false;
-			AirLoopControlInfo.ResimAirLoopFlag() = false;
+			for ( auto & e : AirLoopControlInfo ) {
+				// Reset air loop control info for cooling coil active flag (used in TU's for reheat air flow control)
+				e.CoolingActiveFlag = false;
+				// Reset air loop control info for heating coil active flag (used in OA controller for HX control)
+				e.HeatingActiveFlag = false;
+				// reset outside air system HX to off first time through
+				e.HeatRecoveryBypass = true;
+				// set HX check status flag to check for custom control in MixedAir.cc
+				e.CheckHeatRecoveryBypassStatus = true;
+				// set OA comp simulated flag to false
+				e.OASysComponentsSimulated = false;
+				// set economizer flow locked flag to false, will reset if custom HX control is used
+				e.EconomizerFlowLocked = false;
+				// set air loop resim flags for when heat recovery is used and air loop needs another iteration
+				e.HeatRecoveryResimFlag = true;
+				e.HeatRecoveryResimFlag2 = false;
+				e.ResimAirLoopFlag = false;
+			}
 		}
 
 		// This setups the reports for the Iteration variable that limits how many times
@@ -1413,11 +1415,13 @@ namespace HVACManager {
 		if ( ! ZoneSizingCalc && ! SysSizingCalc ) {
 			if ( MySetPointInit ) {
 				if ( NumOfNodes > 0 ) {
-					Node.TempSetPoint() = SensedNodeFlagValue;
-					Node.HumRatSetPoint() = SensedNodeFlagValue;
-					Node.HumRatMin() = SensedNodeFlagValue;
-					Node.HumRatMax() = SensedNodeFlagValue;
-					Node.MassFlowRateSetPoint() = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
+					for ( auto & e : Node ) {
+						e.TempSetPoint = SensedNodeFlagValue;
+						e.HumRatSetPoint = SensedNodeFlagValue;
+						e.HumRatMin = SensedNodeFlagValue;
+						e.HumRatMax = SensedNodeFlagValue;
+						e.MassFlowRateSetPoint = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
+					}
 					DefaultNodeValues.TempSetPoint = SensedNodeFlagValue;
 					DefaultNodeValues.HumRatSetPoint = SensedNodeFlagValue;
 					DefaultNodeValues.HumRatMin = SensedNodeFlagValue;
@@ -1888,9 +1892,11 @@ namespace HVACManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( NumPrimaryAirSys == 0 ) return;
-		AirLoopControlInfo.NightVent() = false;
-		AirLoopControlInfo.LoopFlowRateSet() = false;
-		AirLoopFlow.ReqSupplyFrac() = 1.0;
+		for ( auto & e : AirLoopControlInfo ) {
+			e.NightVent = false;
+			e.LoopFlowRateSet = false;
+		}
+		for ( auto & e : AirLoopFlow ) e.ReqSupplyFrac = 1.0;
 
 	}
 
@@ -1932,33 +1938,37 @@ namespace HVACManager {
 		// na
 		if ( NumOfNodes <= 0 ) return;
 
-		Node.Temp() = DefaultNodeValues.Temp;
-		Node.TempMin() = DefaultNodeValues.TempMin;
-		Node.TempMax() = DefaultNodeValues.TempMax;
-		Node.TempSetPoint() = DefaultNodeValues.TempSetPoint;
-		Node.MassFlowRate() = DefaultNodeValues.MassFlowRate;
-		Node.MassFlowRateMin() = DefaultNodeValues.MassFlowRateMin;
-		Node.MassFlowRateMax() = DefaultNodeValues.MassFlowRateMax;
-		Node.MassFlowRateMinAvail() = DefaultNodeValues.MassFlowRateMinAvail;
-		Node.MassFlowRateMaxAvail() = DefaultNodeValues.MassFlowRateMaxAvail;
-		Node.MassFlowRateSetPoint() = DefaultNodeValues.MassFlowRateSetPoint;
-		Node.Quality() = DefaultNodeValues.Quality;
-		Node.Press() = DefaultNodeValues.Press;
-		Node.Enthalpy() = DefaultNodeValues.Enthalpy;
-		Node.HumRat() = DefaultNodeValues.HumRat;
-		Node.HumRatMin() = DefaultNodeValues.HumRatMin;
-		Node.HumRatMax() = DefaultNodeValues.HumRatMax;
-		Node.HumRatSetPoint() = DefaultNodeValues.HumRatSetPoint;
-		Node.TempSetPointHi() = DefaultNodeValues.TempSetPointHi;
-		Node.TempSetPointLo() = DefaultNodeValues.TempSetPointLo;
+		for ( auto & e : Node ) {
+			e.Temp = DefaultNodeValues.Temp;
+			e.TempMin = DefaultNodeValues.TempMin;
+			e.TempMax = DefaultNodeValues.TempMax;
+			e.TempSetPoint = DefaultNodeValues.TempSetPoint;
+			e.MassFlowRate = DefaultNodeValues.MassFlowRate;
+			e.MassFlowRateMin = DefaultNodeValues.MassFlowRateMin;
+			e.MassFlowRateMax = DefaultNodeValues.MassFlowRateMax;
+			e.MassFlowRateMinAvail = DefaultNodeValues.MassFlowRateMinAvail;
+			e.MassFlowRateMaxAvail = DefaultNodeValues.MassFlowRateMaxAvail;
+			e.MassFlowRateSetPoint = DefaultNodeValues.MassFlowRateSetPoint;
+			e.Quality = DefaultNodeValues.Quality;
+			e.Press = DefaultNodeValues.Press;
+			e.Enthalpy = DefaultNodeValues.Enthalpy;
+			e.HumRat = DefaultNodeValues.HumRat;
+			e.HumRatMin = DefaultNodeValues.HumRatMin;
+			e.HumRatMax = DefaultNodeValues.HumRatMax;
+			e.HumRatSetPoint = DefaultNodeValues.HumRatSetPoint;
+			e.TempSetPointHi = DefaultNodeValues.TempSetPointHi;
+			e.TempSetPointLo = DefaultNodeValues.TempSetPointLo;
+		}
 
 		if ( allocated( MoreNodeInfo ) ) {
-			MoreNodeInfo.WetBulbTemp() = DefaultNodeValues.Temp;
-			MoreNodeInfo.RelHumidity() = 0.0;
-			MoreNodeInfo.ReportEnthalpy() = DefaultNodeValues.Enthalpy;
-			MoreNodeInfo.VolFlowRateStdRho() = 0.0;
-			MoreNodeInfo.VolFlowRateCrntRho() = 0.0;
-			MoreNodeInfo.Density() = 0.0;
+			for ( auto & e : MoreNodeInfo ) {
+				e.WetBulbTemp = DefaultNodeValues.Temp;
+				e.RelHumidity = 0.0;
+				e.ReportEnthalpy = DefaultNodeValues.Enthalpy;
+				e.VolFlowRateStdRho = 0.0;
+				e.VolFlowRateCrntRho = 0.0;
+				e.Density = 0.0;
+			}
 		}
 
 	}

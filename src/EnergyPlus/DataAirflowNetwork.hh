@@ -399,7 +399,7 @@ namespace DataAirflowNetwork {
 		Real64 OpenElapsedTime; // Elapsed time during closing (min)
 		int ClosingProbStatus; // Closing probability status
 		int OpeningProbStatus; // Opening probability status
-		bool RAFNflag; // True if this surface is used in AirflowNetwork:IntraZone:Linkage 
+		bool RAFNflag; // True if this surface is used in AirflowNetwork:IntraZone:Linkage
 
 		// Default Constructor
 		MultizoneSurfaceProp() :
@@ -488,7 +488,7 @@ namespace DataAirflowNetwork {
 			Real64 const OpenElapsedTime, // Elapsed time during closing (min)
 			int const ClosingProbStatus, // Closing probability status
 			int const OpeningProbStatus, // Opening probability status
-			bool const RAFNflag // True if this surface is used in AirflowNetwork:IntraZone:Linkage 
+			bool const RAFNflag // True if this surface is used in AirflowNetwork:IntraZone:Linkage
 		) :
 			SurfName( SurfName ),
 			OpeningName( OpeningName ),
@@ -1042,7 +1042,7 @@ namespace DataAirflowNetwork {
 		int AFNZoneNum; // MultiZone number
 
 		// Default Constructor
-		IntraZoneNodeProp( ) :
+		IntraZoneNodeProp() :
 			Height( 0.0 ),
 			RAFNNodeNum( 0 ),
 			ZoneNum( 0 ),
@@ -1068,19 +1068,19 @@ namespace DataAirflowNetwork {
 
 	};
 
-	struct AirflowNetworkLinkage // AirflowNetwork linkage data base class 
+	struct AirflowNetworkLinkage // AirflowNetwork linkage data base class
  	{
- 		// Members 
- 		std::string Name; // Provide a unique linkage name 
- 		Array1D_string NodeNames; // Names of nodes (limited to 2) 
- 		Array1D< Real64 > NodeHeights; // Node heights 
- 		std::string CompName; // Name of element 
- 		int CompNum; // Element Number 
- 		Array1D_int NodeNums; // Node numbers 
- 		int LinkNum; // Linkage number 
+ 		// Members
+ 		std::string Name; // Provide a unique linkage name
+ 		Array1D_string NodeNames; // Names of nodes (limited to 2)
+ 		Array1D< Real64 > NodeHeights; // Node heights
+ 		std::string CompName; // Name of element
+ 		int CompNum; // Element Number
+ 		Array1D_int NodeNums; // Node numbers
+ 		int LinkNum; // Linkage number
 
- 		// Default Constructor 
- 		AirflowNetworkLinkage( ) :
+ 		// Default Constructor
+ 		AirflowNetworkLinkage() :
  			NodeNames( 2 ),
  			NodeHeights( 2, 0.0 ),
  			CompNum( 0 ),
@@ -1088,15 +1088,15 @@ namespace DataAirflowNetwork {
  			LinkNum( 0 )
  		{}
 
- 		// Member Constructor 
+ 		// Member Constructor
  		AirflowNetworkLinkage(
- 			std::string const & Name, // Provide a unique linkage name 
- 			Array1_string const & NodeNames, // Names of nodes (limited to 2) 
- 			Array1< Real64 > const & NodeHeights, // Node heights 
- 			std::string const & CompName, // Name of element 
- 			int const CompNum, // Element Number 
- 			Array1_int const & NodeNums, // Node numbers 
- 			int const LinkNum // Linkage number 
+ 			std::string const & Name, // Provide a unique linkage name
+ 			Array1_string const & NodeNames, // Names of nodes (limited to 2)
+ 			Array1< Real64 > const & NodeHeights, // Node heights
+ 			std::string const & CompName, // Name of element
+ 			int const CompNum, // Element Number
+ 			Array1_int const & NodeNums, // Node numbers
+ 			int const LinkNum // Linkage number
 			) :
  			Name( Name ),
  			NodeNames( 2, NodeNames ),
@@ -1115,8 +1115,8 @@ namespace DataAirflowNetwork {
 		std::string SurfaceName; // Connection Surface Name
 
 		// Default Constructor
-		IntraZoneLinkageProp( ) :
-			AirflowNetworkLinkage( )
+		IntraZoneLinkageProp() :
+			AirflowNetworkLinkage()
 		{}
 
 		// Member Constructor
@@ -1596,7 +1596,7 @@ namespace DataAirflowNetwork {
 
 		// Default Constructor
 		DisSysLinkageProp() :
-			AirflowNetworkLinkage( ),
+			AirflowNetworkLinkage(),
 			ZoneNum( 0 )
 		{}
 
@@ -1737,7 +1737,7 @@ namespace DataAirflowNetwork {
 
 		// Default Constructor
 		AirflowNetworkLinkageProp() :
-			AirflowNetworkLinkage( ),
+			AirflowNetworkLinkage(),
 			ZoneNum( 0 ),
 			DetOpenNum( 0 ),
 			ConnectionFlag( 0 ),

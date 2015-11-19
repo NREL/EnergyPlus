@@ -1633,7 +1633,7 @@ namespace BranchInputManager {
 			NumOfBranches = GetNumObjectsFound( CurrentModuleObject );
 			if ( NumOfBranches > 0 ) {
 				Branch.allocate( NumOfBranches );
-				Branch.AssignedLoopName() = "";
+				for ( auto & e : Branch ) e.AssignedLoopName.clear();
 				ErrFound = false;
 				GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
 				NodeNums.dimension( NumParams, 0 );
@@ -1849,8 +1849,10 @@ namespace BranchInputManager {
 		CurrentModuleObject = "BranchList";
 		NumOfBranchLists = GetNumObjectsFound( CurrentModuleObject );
 		BranchList.allocate( NumOfBranchLists );
-		BranchList.LoopName() = "";
-		BranchList.LoopType_s() = ""; //Autodesk LoopType is the name of both int and string member arrays so we use the _s to disambiguate
+		for ( auto & e : BranchList ) {
+			e.LoopName.clear();
+			e.LoopType.clear();
+		}
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );

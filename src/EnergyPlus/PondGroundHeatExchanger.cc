@@ -507,8 +507,9 @@ namespace PondGroundHeatExchanger {
 		if ( OneTimeFlag || WarmupFlag ) {
 			for ( PondNum = 1; PondNum <= NumOfPondGHEs; ++PondNum ) {
 				// initialize pond temps to mean of drybulb and ground temps.
-				PondGHE.BulkTemperature() = 0.5 * ( OutDryBulbTempAt( PondHeight ) + GroundTemp_Deep );
-				PondGHE.PastBulkTemperature() = 0.5 * ( OutDryBulbTempAt( PondHeight ) + GroundTemp_Deep );
+				for ( auto & e : PondGHE ) {
+					e.BulkTemperature = e.PastBulkTemperature = 0.5 * ( OutDryBulbTempAt( PondHeight ) + GroundTemp_Deep );
+				}
 				OneTimeFlag = false;
 			}
 		}

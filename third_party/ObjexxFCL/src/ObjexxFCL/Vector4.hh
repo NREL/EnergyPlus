@@ -70,7 +70,6 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	Vector4()
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
 	 :
@@ -82,7 +81,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	Vector4( Vector4 const & v ) :
 	 x( v.x ),
 	 y( v.y ),
@@ -92,7 +90,6 @@ public: // Creation
 
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Vector4( Vector4< U > const & v ) :
 	 x( v.x ),
 	 y( v.y ),
@@ -101,7 +98,6 @@ public: // Creation
 	{}
 
 	// Uniform Value Constructor
-	inline
 	explicit
 	Vector4( Tc t ) :
 	 x( t ),
@@ -111,7 +107,6 @@ public: // Creation
 	{}
 
 	// Value Constructor
-	inline
 	Vector4(
 	 Tc x_,
 	 Tc y_,
@@ -126,7 +121,6 @@ public: // Creation
 
 	// Initializer List Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Vector4( std::initializer_list< U > const l ) :
 	 x( *l.begin() ),
 	 y( *( l.begin() + 1 ) ),
@@ -138,7 +132,6 @@ public: // Creation
 
 	// Array Constructor Template
 	template< typename A, class = typename std::enable_if< std::is_constructible< T, typename A::value_type >::value >::type >
-	inline
 	Vector4( A const & a ) :
 	 x( a[ 0 ] ),
 	 y( a[ 1 ] ),
@@ -149,7 +142,6 @@ public: // Creation
 	}
 
 	// Default Vector Named Constructor
-	inline
 	static
 	Vector4
 	default_vector()
@@ -158,7 +150,6 @@ public: // Creation
 	}
 
 	// Zero Vector Named Constructor
-	inline
 	static
 	Vector4
 	zero_vector()
@@ -167,7 +158,6 @@ public: // Creation
 	}
 
 	// x Vector of Specified Length Named Constructor
-	inline
 	static
 	Vector4
 	x_vector( Tc tar_length = T( 1 ) )
@@ -176,7 +166,6 @@ public: // Creation
 	}
 
 	// y Vector of Specified Length Named Constructor
-	inline
 	static
 	Vector4
 	y_vector( Tc tar_length = T( 1 ) )
@@ -185,7 +174,6 @@ public: // Creation
 	}
 
 	// z Vector of Specified Length Named Constructor
-	inline
 	static
 	Vector4
 	z_vector( Tc tar_length = T( 1 ) )
@@ -194,7 +182,6 @@ public: // Creation
 	}
 
 	// W Vector of Specified Length Named Constructor
-	inline
 	static
 	Vector4
 	W_vector( Tc tar_length = T( 1 ) )
@@ -203,7 +190,6 @@ public: // Creation
 	}
 
 	// Uniform Vector of Specified Length Named Constructor
-	inline
 	static
 	Vector4
 	uniform_vector( Tc tar_length = T( 1 ) )
@@ -212,14 +198,12 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	~Vector4()
 	{}
 
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	Vector4 &
 	operator =( Vector4 const & v )
 	{
@@ -234,7 +218,6 @@ public: // Assignment
 
 	// Copy Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator =( Vector4< U > const & v )
 	{
@@ -247,7 +230,6 @@ public: // Assignment
 
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator =( std::initializer_list< U > const l )
 	{
@@ -262,7 +244,6 @@ public: // Assignment
 
 	// Array Assignment Template
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
-	inline
 	Vector4 &
 	operator =( A const & a )
 	{
@@ -276,7 +257,6 @@ public: // Assignment
 
 	// += Vector4
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator +=( Vector4< U > const & v )
 	{
@@ -289,7 +269,6 @@ public: // Assignment
 
 	// -= Vector4
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator -=( Vector4< U > const & v )
 	{
@@ -302,7 +281,6 @@ public: // Assignment
 
 	// *= Vector4
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator *=( Vector4< U > const & v )
 	{
@@ -315,7 +293,6 @@ public: // Assignment
 
 	// /= Vector4
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator /=( Vector4< U > const & v )
 	{
@@ -332,7 +309,6 @@ public: // Assignment
 
 	// += Initializer List
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator +=( std::initializer_list< U > const l )
 	{
@@ -347,7 +323,6 @@ public: // Assignment
 
 	// -= Initializer List
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator -=( std::initializer_list< U > const l )
 	{
@@ -362,7 +337,6 @@ public: // Assignment
 
 	// *= Initializer List
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator *=( std::initializer_list< U > const l )
 	{
@@ -377,7 +351,6 @@ public: // Assignment
 
 	// /= Initializer List
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	operator /=( std::initializer_list< U > const l )
 	{
@@ -396,7 +369,6 @@ public: // Assignment
 
 	// += Array
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
-	inline
 	Vector4 &
 	operator +=( A const & a )
 	{
@@ -410,7 +382,6 @@ public: // Assignment
 
 	// -= Array
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
-	inline
 	Vector4 &
 	operator -=( A const & a )
 	{
@@ -424,7 +395,6 @@ public: // Assignment
 
 	// *= Array
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
-	inline
 	Vector4 &
 	operator *=( A const & a )
 	{
@@ -438,7 +408,6 @@ public: // Assignment
 
 	// /= Array
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
-	inline
 	Vector4 &
 	operator /=( A const & a )
 	{
@@ -455,7 +424,6 @@ public: // Assignment
 	}
 
 	// = Value
-	inline
 	Vector4 &
 	operator =( Tc t )
 	{
@@ -464,7 +432,6 @@ public: // Assignment
 	}
 
 	// += Value
-	inline
 	Vector4 &
 	operator +=( Tc t )
 	{
@@ -476,7 +443,6 @@ public: // Assignment
 	}
 
 	// -= Value
-	inline
 	Vector4 &
 	operator -=( Tc t )
 	{
@@ -488,7 +454,6 @@ public: // Assignment
 	}
 
 	// *= Value
-	inline
 	Vector4 &
 	operator *=( Tc t )
 	{
@@ -501,7 +466,6 @@ public: // Assignment
 
 	// /= Value
 	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
-	inline
 	Vector4 &
 	operator /=( U const & u )
 	{
@@ -515,8 +479,7 @@ public: // Assignment
 	}
 
 	// /= Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void, typename = void >
-	inline
+	template< typename U, class = typename std::enable_if< ! std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void, typename = void >
 	Vector4 &
 	operator /=( U const & u )
 	{
@@ -529,7 +492,6 @@ public: // Assignment
 	}
 
 	// Value Assignment
-	inline
 	Vector4 &
 	assign(
 	 Tc x_,
@@ -549,7 +511,6 @@ public: // Assignment: Scaled
 
 	// Assign Value * Vector4
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	scaled_assign( Tc t, Vector4< U > const & v )
 	{
@@ -562,7 +523,6 @@ public: // Assignment: Scaled
 
 	// Add Value * Vector4
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	scaled_add( Tc t, Vector4< U > const & v )
 	{
@@ -575,7 +535,6 @@ public: // Assignment: Scaled
 
 	// Subtract Value * Vector4
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	scaled_sub( Tc t, Vector4< U > const & v )
 	{
@@ -588,7 +547,6 @@ public: // Assignment: Scaled
 
 	// Multiply by Value * Vector4
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	scaled_mul( Tc t, Vector4< U > const & v )
 	{
@@ -601,7 +559,6 @@ public: // Assignment: Scaled
 
 	// Divide by Value * Vector4
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Vector4 &
 	scaled_div( Tc t, Vector4< U > const & v )
 	{
@@ -620,7 +577,6 @@ public: // Assignment: Scaled
 public: // Subscript
 
 	// Vector4[ i ] const: 0-Based Index
-	inline
 	Tr
 	operator []( size_type const i ) const
 	{
@@ -629,7 +585,6 @@ public: // Subscript
 	}
 
 	// Vector4[ i ]: 0-Based Index
-	inline
 	T &
 	operator []( size_type const i )
 	{
@@ -638,7 +593,6 @@ public: // Subscript
 	}
 
 	// Vector4( i ) const: 1-Based Index
-	inline
 	Tr
 	operator ()( size_type const i ) const
 	{
@@ -647,7 +601,6 @@ public: // Subscript
 	}
 
 	// Vector4( i ): 1-Based Index
-	inline
 	T &
 	operator ()( size_type const i )
 	{
@@ -658,7 +611,6 @@ public: // Subscript
 public: // Properties: Predicates
 
 	// Is Zero Vector?
-	inline
 	bool
 	is_zero() const
 	{
@@ -667,7 +619,6 @@ public: // Properties: Predicates
 	}
 
 	// Is Unit Vector?
-	inline
 	bool
 	is_unit() const
 	{
@@ -677,7 +628,6 @@ public: // Properties: Predicates
 public: // Properties: General
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -685,7 +635,6 @@ public: // Properties: General
 	}
 
 	// Length
-	inline
 	T
 	length() const
 	{
@@ -693,7 +642,6 @@ public: // Properties: General
 	}
 
 	// Length Squared
-	inline
 	T
 	length_squared() const
 	{
@@ -701,7 +649,6 @@ public: // Properties: General
 	}
 
 	// Magnitude
-	inline
 	T
 	magnitude() const
 	{
@@ -709,7 +656,6 @@ public: // Properties: General
 	}
 
 	// Magnitude
-	inline
 	T
 	mag() const
 	{
@@ -717,7 +663,6 @@ public: // Properties: General
 	}
 
 	// Magnitude Squared
-	inline
 	T
 	magnitude_squared() const
 	{
@@ -725,7 +670,6 @@ public: // Properties: General
 	}
 
 	// Magnitude Squared
-	inline
 	T
 	mag_squared() const
 	{
@@ -733,7 +677,6 @@ public: // Properties: General
 	}
 
 	// L1 Norm
-	inline
 	T
 	norm_L1() const
 	{
@@ -741,7 +684,6 @@ public: // Properties: General
 	}
 
 	// L2 Norm
-	inline
 	T
 	norm_L2() const
 	{
@@ -749,7 +691,6 @@ public: // Properties: General
 	}
 
 	// L-infinity Norm
-	inline
 	T
 	norm_Linf() const
 	{
@@ -757,7 +698,6 @@ public: // Properties: General
 	}
 
 	// Distance to a Vector4
-	inline
 	T
 	distance( Vector4 const & v ) const
 	{
@@ -765,7 +705,6 @@ public: // Properties: General
 	}
 
 	// Distance Squared to a Vector4
-	inline
 	T
 	distance_squared( Vector4 const & v ) const
 	{
@@ -773,7 +712,6 @@ public: // Properties: General
 	}
 
 	// Dot Product with a Vector4
-	inline
 	T
 	dot( Vector4 const & v ) const
 	{
@@ -782,7 +720,6 @@ public: // Properties: General
 
 	// Dot Product with an Array
 	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
-	inline
 	T
 	dot( A const & a ) const
 	{
@@ -791,7 +728,6 @@ public: // Properties: General
 	}
 
 	// Alias for Element 1
-	inline
 	Tr
 	x1() const
 	{
@@ -799,7 +735,6 @@ public: // Properties: General
 	}
 
 	// Alias for Element 1
-	inline
 	T &
 	x1()
 	{
@@ -807,7 +742,6 @@ public: // Properties: General
 	}
 
 	// Alias for Element 2
-	inline
 	Tr
 	x2() const
 	{
@@ -815,7 +749,6 @@ public: // Properties: General
 	}
 
 	// Alias for Element 2
-	inline
 	T &
 	x2()
 	{
@@ -823,7 +756,6 @@ public: // Properties: General
 	}
 
 	// Alias for Element 3
-	inline
 	Tr
 	x3() const
 	{
@@ -831,7 +763,6 @@ public: // Properties: General
 	}
 
 	// Alias for Element 3
-	inline
 	T &
 	x3()
 	{
@@ -839,7 +770,6 @@ public: // Properties: General
 	}
 
 	// Alias for Element 4
-	inline
 	Tr
 	x4() const
 	{
@@ -847,7 +777,6 @@ public: // Properties: General
 	}
 
 	// Alias for Element 4
-	inline
 	T &
 	x4()
 	{
@@ -857,7 +786,6 @@ public: // Properties: General
 public: // Modifiers
 
 	// Zero
-	inline
 	Vector4 &
 	zero()
 	{
@@ -866,7 +794,6 @@ public: // Modifiers
 	}
 
 	// Negate
-	inline
 	Vector4 &
 	negate()
 	{
@@ -878,7 +805,6 @@ public: // Modifiers
 	}
 
 	// Normalize to a Length
-	inline
 	Vector4 &
 	normalize( Tc tar_length = T( 1 ) )
 	{
@@ -893,7 +819,6 @@ public: // Modifiers
 	}
 
 	// Normalize to a Length: Zero Vector4 if Length is Zero
-	inline
 	Vector4 &
 	normalize_zero( Tc tar_length = T( 1 ) )
 	{
@@ -911,7 +836,6 @@ public: // Modifiers
 	}
 
 	// Normalize to a Length: Uniform Vector4 if Length is Zero
-	inline
 	Vector4 &
 	normalize_uniform( Tc tar_length = T( 1 ) )
 	{
@@ -929,7 +853,6 @@ public: // Modifiers
 	}
 
 	// Normalize to a Length: x Vector4 if Length is Zero
-	inline
 	Vector4 &
 	normalize_x( Tc tar_length = T( 1 ) )
 	{
@@ -948,7 +871,6 @@ public: // Modifiers
 	}
 
 	// Normalize to a Length: y Vector4 if Length is Zero
-	inline
 	Vector4 &
 	normalize_y( Tc tar_length = T( 1 ) )
 	{
@@ -967,7 +889,6 @@ public: // Modifiers
 	}
 
 	// Normalize to a Length: z Vector4 if Length is Zero
-	inline
 	Vector4 &
 	normalize_z( Tc tar_length = T( 1 ) )
 	{
@@ -986,7 +907,6 @@ public: // Modifiers
 	}
 
 	// Normalize to a Length: w Vector4 if Length is Zero
-	inline
 	Vector4 &
 	normalize_w( Tc tar_length = T( 1 ) )
 	{
@@ -1005,7 +925,6 @@ public: // Modifiers
 	}
 
 	// Minimum Coordinates with a Vector4
-	inline
 	Vector4 &
 	min( Vector4 const & v )
 	{
@@ -1017,7 +936,6 @@ public: // Modifiers
 	}
 
 	// Maximum Coordinates with a Vector4
-	inline
 	Vector4 &
 	max( Vector4 const & v )
 	{
@@ -1029,7 +947,6 @@ public: // Modifiers
 	}
 
 	// Add a Vector4
-	inline
 	Vector4 &
 	add( Vector4 const & v )
 	{
@@ -1041,7 +958,6 @@ public: // Modifiers
 	}
 
 	// Sum a Vector4
-	inline
 	Vector4 &
 	sum( Vector4 const & v )
 	{
@@ -1053,7 +969,6 @@ public: // Modifiers
 	}
 
 	// Subtract a Vector4
-	inline
 	Vector4 &
 	sub( Vector4 const & v )
 	{
@@ -1065,7 +980,6 @@ public: // Modifiers
 	}
 
 	// Subtract a Vector4
-	inline
 	Vector4 &
 	subtract( Vector4 const & v )
 	{
@@ -1077,7 +991,6 @@ public: // Modifiers
 	}
 
 	// Project Normal to a Vector4
-	inline
 	Vector4 &
 	project_normal( Vector4 const & v )
 	{
@@ -1091,7 +1004,6 @@ public: // Modifiers
 	}
 
 	// Project onto a Vector4
-	inline
 	Vector4 &
 	project_parallel( Vector4 const & v )
 	{
@@ -1107,7 +1019,6 @@ public: // Modifiers
 public: // Generators
 
 	// -Vector4 (Negated)
-	inline
 	Vector4
 	operator -() const
 	{
@@ -1115,7 +1026,6 @@ public: // Generators
 	}
 
 	// Negated
-	inline
 	Vector4
 	negated() const
 	{
@@ -1123,7 +1033,6 @@ public: // Generators
 	}
 
 	// Normalized to a Length
-	inline
 	Vector4
 	normalized( Tc tar_length = T( 1 ) ) const
 	{
@@ -1139,7 +1048,6 @@ public: // Generators
 	}
 
 	// Normalized to a Length: Zero Vector4 if Length is Zero
-	inline
 	Vector4
 	normalized_zero( Tc tar_length = T( 1 ) ) const
 	{
@@ -1158,7 +1066,6 @@ public: // Generators
 	}
 
 	// Normalized to a Length: Uniform Vector4 if Length is Zero
-	inline
 	Vector4
 	normalized_uniform( Tc tar_length = T( 1 ) ) const
 	{
@@ -1177,7 +1084,6 @@ public: // Generators
 	}
 
 	// Normalized to a Length: x Vector4 if Length is Zero
-	inline
 	Vector4
 	normalized_x( Tc tar_length = T( 1 ) ) const
 	{
@@ -1196,7 +1102,6 @@ public: // Generators
 	}
 
 	// Normalized to a Length: y Vector4 if Length is Zero
-	inline
 	Vector4
 	normalized_y( Tc tar_length = T( 1 ) ) const
 	{
@@ -1215,7 +1120,6 @@ public: // Generators
 	}
 
 	// Normalized to a Length: z Vector4 if Length is Zero
-	inline
 	Vector4
 	normalized_z( Tc tar_length = T( 1 ) ) const
 	{
@@ -1234,7 +1138,6 @@ public: // Generators
 	}
 
 	// Normalized to a Length: w Vector4 if Length is Zero
-	inline
 	Vector4
 	normalized_w( Tc tar_length = T( 1 ) ) const
 	{
@@ -1253,7 +1156,6 @@ public: // Generators
 	}
 
 	// Projected Normal to a Vector4
-	inline
 	Vector4
 	projected_normal( Vector4 const & v ) const
 	{
@@ -1263,7 +1165,6 @@ public: // Generators
 	}
 
 	// Projected onto a Vector4
-	inline
 	Vector4
 	projected_parallel( Vector4 const & v ) const
 	{
@@ -1275,7 +1176,6 @@ public: // Generators
 public: // Static Methods
 
 	// Square of a value
-	inline
 	static
 	T
 	square( Tc t )
@@ -1284,7 +1184,6 @@ public: // Static Methods
 	}
 
 	// Value Clipped to [-1,1]
-	inline
 	static
 	T
 	sin_cos_range( Tc t )
@@ -1293,7 +1192,6 @@ public: // Static Methods
 	}
 
 	// Add 2*Pi to a Negative Value
-	inline
 	static
 	T
 	bump_up_angle( Tc t )
@@ -1716,7 +1614,7 @@ operator /( Vector4< T > const & v, U const & u )
 }
 
 // Vector4 / Value
-template< typename T, typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+template< typename T, typename U, class = typename std::enable_if< ! std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
 inline
 Vector4< T >
 operator /( Vector4< T > const & v, U const & u )

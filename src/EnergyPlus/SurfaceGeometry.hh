@@ -61,7 +61,7 @@ namespace SurfaceGeometry {
 	// Clears the global data in HeatBalanceManager.
 	// Needed for unit tests, should not be normally called.
 	void
-	clear_state( );
+	clear_state();
 
 	void
 	SetupZoneGeometry( bool & ErrorsFound );
@@ -320,7 +320,7 @@ namespace SurfaceGeometry {
 	isRectangle(
 		int const ThisSurf // Current surface number
 	);
-		
+
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

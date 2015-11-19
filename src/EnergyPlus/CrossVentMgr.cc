@@ -1,11 +1,10 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <CrossVentMgr.hh>
@@ -489,8 +488,11 @@ namespace CrossVentMgr {
 		CosPhi = std::cos( ( WindDir - SurfNorm ) * DegToRadians );
 		if ( CosPhi <= 0 ) {
 			AirModel( ZoneNum ).SimAirModel = false;
-			CVJetRecFlows( _, ZoneNum ).Ujet() = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Urec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = 0.0;
+			}
 			Urec( ZoneNum ) = 0.0;
 			Ujet( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
@@ -532,16 +534,25 @@ namespace CrossVentMgr {
 		// is a Window or Door it looks for the second base surface).
 		// Dstar is Droom corrected for wind angle
 		Wroom = Zone( ZoneNum ).Volume / Zone( ZoneNum ).FloorArea;
-		if ( ( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Sides == 3 ) || ( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Sides == 4 ) ) {
-			XX = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Centroid.x;
-			YY = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Centroid.y;
-			ZZ = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Centroid.z;
+		auto const & baseSurface( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ) );
+		if ( ( baseSurface.Sides == 3 ) || ( baseSurface.Sides == 4 ) ) {
+			XX = baseSurface.Centroid.x;
+			YY = baseSurface.Centroid.y;
+			ZZ = baseSurface.Centroid.z;
 		} else {
 			// If the surface has more than 4 vertex then average the vertex coordinates in X, Y and Z.
-			NSides = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Sides;
-			XX = sum( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Vertex( {1,NSides} ).x() ) / double( NSides );
-			YY = sum( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Vertex( {1,NSides} ).y() ) / double( NSides );
-			ZZ = sum( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Vertex( {1,NSides} ).z() ) / double( NSides );
+			NSides = baseSurface.Sides;
+			assert( NSides > 0 );
+			XX = YY = ZZ = 0.0;
+			for ( int i = 1; i <= NSides; ++i ) {
+				auto const & v( baseSurface.Vertex( i ) );
+				XX += v.x;
+				YY += v.y;
+				ZZ += v.z;
+			}
+			XX /= double( NSides );
+			YY /= double( NSides );
+			ZZ /= double( NSides );
 		}
 
 		Real64 const Wroom_2( pow_2( Wroom ) );
@@ -552,9 +563,17 @@ namespace CrossVentMgr {
 				ZZ_Wall = Surface( APos_Wall( Ctd ) ).Centroid.z;
 			} else {
 				NSides = Surface( APos_Wall( Ctd ) ).Sides;
-				XX_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).x() ) / double( NSides );
-				YY_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).y() ) / double( NSides );
-				ZZ_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).z() ) / double( NSides );
+				assert( NSides > 0 );
+				XX_Wall = YY_Wall = ZZ_Wall = 0.0;
+				for ( int i = 1; i <= NSides; ++i ) {
+					auto const & v( Surface( APos_Wall( Ctd ) ).Vertex( i ) );
+					XX_Wall += v.x;
+					YY_Wall += v.y;
+					ZZ_Wall += v.z;
+				}
+				XX_Wall /= double( NSides );
+				YY_Wall /= double( NSides );
+				ZZ_Wall /= double( NSides );
 			}
 			auto DroomTemp = std::sqrt( pow_2( XX - XX_Wall ) + pow_2( YY - YY_Wall ) + pow_2( ZZ - ZZ_Wall ) );
 			if ( DroomTemp > Droom( ZoneNum ) ) {
@@ -617,8 +636,11 @@ namespace CrossVentMgr {
 			Urec( ZoneNum ) = 0.0;
 			Ujet( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Ujet() = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Urec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = 0.0;
+			}
 			return;
 		}
 
@@ -637,8 +659,11 @@ namespace CrossVentMgr {
 			Ujet( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
 			RecInflowRatio( ZoneNum ) = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Ujet() = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Urec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = 0.0;
+			}
 			if ( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond > 0 ) {
 				Tin( ZoneNum ) = MAT( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond ).Zone );
 			} else if ( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond == ExternalEnvironment ) {
@@ -673,9 +698,11 @@ namespace CrossVentMgr {
 		Urec( ZoneNum ) = 0.0;
 		Qrec( ZoneNum ) = 0.0;
 		Qtot( ZoneNum ) = 0.0;
-		CVJetRecFlows( _, ZoneNum ).Ujet() = 0.0;
-		CVJetRecFlows( _, ZoneNum ).Urec() = 0.0;
-		CVJetRecFlows( _, ZoneNum ).Qrec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = e.Qrec = 0.0;
+			}
 		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
 			if ( CVJetRecFlows( Ctd, ZoneNum ).Uin != 0 ) {
 				CVJetRecFlows( Ctd, ZoneNum ).Vjet = CVJetRecFlows( Ctd, ZoneNum ).Uin * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) * 6.3 * std::log( Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) ) ) / Dstar( ZoneNum );
@@ -873,8 +900,10 @@ namespace CrossVentMgr {
 				Urec( ZoneNum ) = 0.0;
 				Qrec( ZoneNum ) = 0.0;
 				RecInflowRatio( ZoneNum ) = 0.0;
-				CVJetRecFlows.Ujet() = 0.0;
-				CVJetRecFlows.Urec() = 0.0;
+				for ( auto & e : CVJetRecFlows ) {
+					e.Ujet = 0.0;
+					e.Urec = 0.0;
+				}
 				for ( Ctd = 1; Ctd <= 3; ++Ctd ) {
 					ZTAveraged = MAT( ZoneNum );
 					RoomOutflowTemp( ZoneNum ) = ZTAveraged;
@@ -903,8 +932,10 @@ namespace CrossVentMgr {
 			Urec( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
 			RecInflowRatio( ZoneNum ) = 0.0;
-			CVJetRecFlows.Ujet() = 0.0;
-			CVJetRecFlows.Urec() = 0.0;
+			for ( auto & e : CVJetRecFlows ) {
+				e.Ujet = 0.0;
+				e.Urec = 0.0;
+			}
 			for ( Ctd = 1; Ctd <= 3; ++Ctd ) {
 				ZTAveraged = MAT( ZoneNum );
 				RoomOutflowTemp( ZoneNum ) = ZTAveraged;

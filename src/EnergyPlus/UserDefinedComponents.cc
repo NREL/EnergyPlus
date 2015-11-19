@@ -2,7 +2,6 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -2050,7 +2049,7 @@ namespace UserDefinedComponents {
 		}
 
 		if ( NumUserCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, UserCoil.Name(), NumUserCoils );
+			CoilIndex = FindItem( CoilName, UserCoil, NumUserCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -2112,7 +2111,7 @@ namespace UserDefinedComponents {
 		}
 
 		if ( NumUserCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, UserCoil.Name(), NumUserCoils );
+			CoilIndex = FindItem( CoilName, UserCoil, NumUserCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -2177,7 +2176,7 @@ namespace UserDefinedComponents {
 		}
 
 		if ( NumUserCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, UserCoil.Name(), NumUserCoils );
+			CoilIndex = FindItem( CoilName, UserCoil, NumUserCoils );
 		} else {
 			CoilIndex = 0;
 		}

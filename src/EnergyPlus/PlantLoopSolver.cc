@@ -6,7 +6,7 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <PlantLoopSolver.hh>
@@ -207,16 +207,21 @@ namespace PlantLoopSolver {
 		if ( allocated( PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
 
 			//~ Initialize pump values
-			PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps.CurrentMinAvail() = 0.0;
-			PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps.CurrentMaxAvail() = 0.0;
+			for ( auto & e : PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
+				e.CurrentMinAvail = 0.0;
+				e.CurrentMaxAvail = 0.0;
+			}
 			PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = FlowPumpQuery;
 
 			//~ Simulate pumps
 			SimulateAllLoopSidePumps( LoopNum, ThisSide );
 
 			//~ Calculate totals
-			TotalPumpMinAvailFlow = sum( PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps.CurrentMinAvail() );
-			TotalPumpMaxAvailFlow = sum( PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps.CurrentMaxAvail() );
+			TotalPumpMinAvailFlow = TotalPumpMaxAvailFlow = 0.0;
+			for ( auto const & e : PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
+				TotalPumpMinAvailFlow += e.CurrentMinAvail;
+				TotalPumpMaxAvailFlow += e.CurrentMaxAvail;
+			}
 
 			// Use the pump min/max avail to attempt to constrain the loop side flow
 			ThisLoopSideFlow = BoundValueToWithinTwoValues( ThisLoopSideFlow, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
@@ -1406,6 +1411,7 @@ namespace PlantLoopSolver {
 		// <description>
 
 		// Using/Aliasing
+		using DataPlant::LoopSidePumpInformation;
 		using DataPlant::PlantLoop;
 		using DataPlant::TotNumLoops;
 		using DataLoopNode::Node;
@@ -1430,7 +1436,7 @@ namespace PlantLoopSolver {
 		int PumpBranchNum;
 		int PumpCompNum;
 		int PumpOutletNode;
-		/////////// hoisted into namespace 
+		/////////// hoisted into namespace
 		//static bool EstablishedCompPumpIndeces( false );
 		//////////////////////////////
 		//~ One time sweep through all loops/loopsides/pumps, assigning indeces to the pl%ls%br%comp%indexinloopsidepumps variable
@@ -1498,7 +1504,7 @@ namespace PlantLoopSolver {
 
 		//~ Update the LoopSide pump heat totality here
 		if ( loop_side.TotalPumps > 0 ) {
-			loop_side.TotalPumpHeat = sum( loop_side.Pumps.PumpHeatToFluid() );
+			loop_side.TotalPumpHeat = sum( loop_side.Pumps, &LoopSidePumpInformation::PumpHeatToFluid );
 		}
 
 	}

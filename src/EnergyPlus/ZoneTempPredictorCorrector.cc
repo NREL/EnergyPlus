@@ -530,7 +530,7 @@ namespace ZoneTempPredictorCorrector {
 					if ( ! TStatObjects( Item ).ZoneListActive ) {
 						TempControlledZone( TempControlledZoneNum ).Name = cAlphaArgs( 1 );
 					} else {
-						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( TStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( TStatObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, TStatObjects( Item ).Name, TempControlledZone.Name(), TempControlledZoneNum - 1, TempControlledZone( TempControlledZoneNum ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( TStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( TStatObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, TStatObjects( Item ).Name, TempControlledZone, TempControlledZoneNum - 1, TempControlledZone( TempControlledZoneNum ).Name, errFlag );
 						if ( errFlag ) ErrorsFound = true;
 					}
 
@@ -1849,7 +1849,7 @@ namespace ZoneTempPredictorCorrector {
 					if ( ! StagedTStatObjects( Item ).ZoneListActive ) {
 						StageControlledZone( StageControlledZoneNum ).Name = cAlphaArgs( 1 );
 					} else {
-						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( StagedTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( StagedTStatObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, StagedTStatObjects( Item ).Name, StageControlledZone.Name(), StageControlledZoneNum - 1, StageControlledZone( StageControlledZoneNum ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( StagedTStatObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( StagedTStatObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, StagedTStatObjects( Item ).Name, StageControlledZone, StageControlledZoneNum - 1, StageControlledZone( StageControlledZoneNum ).Name, errFlag );
 						if ( errFlag ) ErrorsFound = true;
 					}
 
@@ -2184,10 +2184,14 @@ namespace ZoneTempPredictorCorrector {
 
 			LoadCorrectionFactor = 1.0; //PH 3/3/04
 			TempControlType = 0;
-			ZoneSysEnergyDemand( {1,NumOfZones} ).RemainingOutputRequired() = 0.0;
-			ZoneSysEnergyDemand( {1,NumOfZones} ).TotalOutputRequired() = 0.0;
-			ZoneSysMoistureDemand( {1,NumOfZones} ).RemainingOutputRequired() = 0.0;
-			ZoneSysMoistureDemand( {1,NumOfZones} ).TotalOutputRequired() = 0.0;
+			for ( auto & e : ZoneSysEnergyDemand ) {
+				e.RemainingOutputRequired = 0.0;
+				e.TotalOutputRequired = 0.0;
+			}
+			for ( auto & e : ZoneSysMoistureDemand ) {
+				e.RemainingOutputRequired = 0.0;
+				e.TotalOutputRequired = 0.0;
+			}
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = 0.0;
 				if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = 0.0;
@@ -2212,7 +2216,7 @@ namespace ZoneTempPredictorCorrector {
 			SysDepZoneLoads = 0.0;
 			SysDepZoneLoadsLagged = 0.0;
 			ZoneAirRelHum = 0.0;
-			Zone.NoHeatToReturnAir() = false;
+			for ( auto & e : Zone ) e.NoHeatToReturnAir = false;
 			ZoneT1 = 0.0;
 			ZoneW1 = OutHumRat;
 			ZoneWMX = OutHumRat;
@@ -3546,7 +3550,15 @@ namespace ZoneTempPredictorCorrector {
 			// are currently set to zero when the CTF only version is used.
 
 			// if no surface in the zone uses EMPD or HAMT then zero
-			if ( ( ! any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_EMPD ) ) && ( ! any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_HAMT ) ) ) {
+			bool no_ht_EMPD_or_HAMT( true );
+			for ( int i = Zone( ZoneNum ).SurfaceFirst, e = Zone( ZoneNum ).SurfaceLast; i <= e; ++i ) {
+				auto const & htAlgo( Surface( i ).HeatTransferAlgorithm );
+				if ( ( htAlgo == HeatTransferModel_EMPD ) || ( htAlgo == HeatTransferModel_HAMT ) ) {
+					no_ht_EMPD_or_HAMT = false;
+					break;
+				}
+			}
+			if ( no_ht_EMPD_or_HAMT ) {
 				SumHmARaW( ZoneNum ) = 0.0;
 				SumHmARa( ZoneNum ) = 0.0;
 			}
@@ -3890,7 +3902,7 @@ namespace ZoneTempPredictorCorrector {
 						LoadCorrectionFactor( ZoneNum ) = 1.0;
 					}
 				} else if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
-					//Zone node used in the RoomAirflowNetwork model				
+					//Zone node used in the RoomAirflowNetwork model
 					ZT( ZoneNum ) = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirflowNetworkZoneInfo( ZoneNum ).ControlAirNodeID ).AirTemp;
 					Node( ZoneNodeNum ).Temp = ZT( ZoneNum );
 					TempTstatAir( ZoneNum ) = ZT( ZoneNum );
@@ -4488,7 +4500,15 @@ namespace ZoneTempPredictorCorrector {
 		// operating and system shutdown.
 		// SumHmARaW and SumHmARa will be used with the moisture balance on the building elements and
 		// are currently set to zero to remind us where they need to be in the future
-		if ( ( ! any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_EMPD ) ) && ( ! any_eq( Surface( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast} ).HeatTransferAlgorithm(), HeatTransferModel_HAMT ) ) ) {
+		bool no_ht_EMPD_or_HAMT( true );
+		for ( int i = Zone( ZoneNum ).SurfaceFirst, e = Zone( ZoneNum ).SurfaceLast; i <= e; ++i ) {
+			auto const & htAlgo( Surface( i ).HeatTransferAlgorithm );
+			if ( ( htAlgo == HeatTransferModel_EMPD ) || ( htAlgo == HeatTransferModel_HAMT ) ) {
+				no_ht_EMPD_or_HAMT = false;
+				break;
+			}
+		}
+		if ( no_ht_EMPD_or_HAMT ) {
 			SumHmARaW( ZoneNum ) = 0.0;
 			SumHmARa( ZoneNum ) = 0.0;
 		}

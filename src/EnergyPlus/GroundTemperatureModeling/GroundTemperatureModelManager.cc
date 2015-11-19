@@ -2,9 +2,6 @@
 #include<memory>
 #include<vector>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
@@ -59,7 +56,7 @@ namespace GroundTemperatureManager {
 		int objectType( 0 );
 
 		std::string objectType_str_UPPERCase = MakeUPPERCase( objectType_str );
-	
+
 		// Set object type
 		if ( objectType_str_UPPERCase == MakeUPPERCase( CurrentModuleObjects( objectType_KusudaGroundTemp ) ) ) {
 			objectType = objectType_KusudaGroundTemp;
@@ -108,7 +105,7 @@ namespace GroundTemperatureManager {
 			return XingGroundTempsModel::XingGTMFactory( objectType, objectName );
 		} else {
 			// Error
-			return nullptr; 
+			return nullptr;
 		}
 	}
 

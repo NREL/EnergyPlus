@@ -1,4 +1,5 @@
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 
 // ObjexxFCL Headers
@@ -158,7 +159,7 @@ namespace PlantManager {
 		int HalfLoopNum;
 		int CurntMinPlantSubIterations;
 
-		if ( any_eq( PlantLoop.CommonPipeType(), CommonPipe_Single ) || any_eq( PlantLoop.CommonPipeType(), CommonPipe_TwoWay ) ) {
+		if ( std::any_of( PlantLoop.begin(), PlantLoop.end(), []( DataPlant::PlantLoopData const & e ){ return ( e.CommonPipeType == DataPlant::CommonPipe_Single ) || ( e.CommonPipeType == DataPlant::CommonPipe_TwoWay ); } ) ) {
 			CurntMinPlantSubIterations = max( 7, MinPlantSubIterations );
 		} else {
 			CurntMinPlantSubIterations = MinPlantSubIterations;
@@ -1914,15 +1915,17 @@ namespace PlantManager {
 
 		PlantReport.allocate( TotNumLoops );
 
-		PlantReport.CoolingDemand() = 0.0;
-		PlantReport.HeatingDemand() = 0.0;
-		PlantReport.DemandNotDispatched() = 0.0;
-		PlantReport.UnmetDemand() = 0.0;
-		PlantReport.InletNodeTemperature() = 0.0;
-		PlantReport.OutletNodeTemperature() = 0.0;
-		PlantReport.InletNodeFlowrate() = 0.0;
-		PlantReport.BypassFrac() = 0.0;
-		PlantReport.OutletNodeFlowrate() = 0.0;
+		for ( auto & e : PlantReport ) {
+			e.CoolingDemand = 0.0;
+			e.HeatingDemand = 0.0;
+			e.DemandNotDispatched = 0.0;
+			e.UnmetDemand = 0.0;
+			e.InletNodeTemperature = 0.0;
+			e.OutletNodeTemperature = 0.0;
+			e.InletNodeFlowrate = 0.0;
+			e.BypassFrac = 0.0;
+			e.OutletNodeFlowrate = 0.0;
+		}
 
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 			if ( LoopNum <= NumPlantLoops ) {
@@ -2437,7 +2440,7 @@ namespace PlantManager {
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).LastTempInterfaceTankOutlet = LoopSetPointTemp;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).LoopSideInlet_TankTemp = LoopSetPointTemp;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalPumpHeat = 0.0;
-					if ( allocated( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) ) PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps.PumpHeatToFluid() = 0.0;
+					if ( allocated( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) ) for ( auto & e : PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) e.PumpHeatToFluid = 0.0;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowRequest = 0.0;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TimeElapsed = 0.0;
 					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock = 0;
@@ -2527,15 +2530,17 @@ namespace PlantManager {
 					} //BRANCH LOOP
 				} //LOOPSIDE
 			} //PLANT LOOP
-			PlantReport.CoolingDemand() = 0.0;
-			PlantReport.HeatingDemand() = 0.0;
-			PlantReport.DemandNotDispatched() = 0.0;
-			PlantReport.UnmetDemand() = 0.0;
-			PlantReport.LastLoopSideSimulated() = 0;
-			PlantReport.InletNodeFlowrate() = 0.0;
-			PlantReport.InletNodeTemperature() = 0.0;
-			PlantReport.OutletNodeFlowrate() = 0.0;
-			PlantReport.OutletNodeTemperature() = 0.0;
+			for ( auto & e : PlantReport ) {
+				e.CoolingDemand = 0.0;
+				e.HeatingDemand = 0.0;
+				e.DemandNotDispatched = 0.0;
+				e.UnmetDemand = 0.0;
+				e.LastLoopSideSimulated = 0;
+				e.InletNodeFlowrate = 0.0;
+				e.InletNodeTemperature = 0.0;
+				e.OutletNodeFlowrate = 0.0;
+				e.OutletNodeTemperature = 0.0;
+			}
 
 			MyEnvrnFlag = false;
 			//*****************************************************************
@@ -2678,8 +2683,10 @@ namespace PlantManager {
 
 		// array assignment
 		if ( NumOfNodes > 0 ) {
-			Node.TempLastTimestep() = Node.Temp();
-			Node.EnthalpyLastTimestep() = Node.Enthalpy();
+			for ( auto & e : Node ) { //MA
+				e.TempLastTimestep = e.Temp;
+				e.EnthalpyLastTimestep = e.Enthalpy;
+			}
 		}
 
 	}
@@ -4361,7 +4368,7 @@ namespace PlantManager {
 								//  assume multiple active components in series means branch is SeriesActive
 								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).ControlType = ControlType_SeriesActive;
 								// assume all components on branch are to be SeriesActive as well
-								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp.FlowCtrl() = ControlType_SeriesActive;
+								for ( auto & e : PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Comp ) e.FlowCtrl = ControlType_SeriesActive;
 							} else {
 								PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).ControlType = ControlType_Active;
 							}

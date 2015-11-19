@@ -1,12 +1,11 @@
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -64,6 +63,7 @@ namespace ThermalComfort {
 	using namespace DataGlobals;
 	using DataHeatBalance::MRT;
 	using DataHeatBalance::People;
+	using DataHeatBalance::PeopleData;
 	using DataHeatBalance::Zone;
 	using DataHeatBalance::ZoneAveraged;
 	using DataHeatBalance::SurfaceWeighted;
@@ -265,8 +265,8 @@ namespace ThermalComfort {
 			InitThermalComfort(); // Mainly sets up output stuff
 			FirstTimeFlag = false;
 			if ( TotPeople > 0 ) {
-				if ( any( People.AdaptiveASH55() ) ) ASH55Flag = true;
-				if ( any( People.AdaptiveCEN15251() ) ) CEN15251Flag = true;
+				if ( std::any_of( People.begin(), People.end(), []( PeopleData const & e ){ return e.AdaptiveASH55; } ) ) ASH55Flag = true;
+				if ( std::any_of( People.begin(), People.end(), []( PeopleData const & e ){ return e.AdaptiveCEN15251; } ) ) CEN15251Flag = true;
 			}
 		}
 
@@ -1727,9 +1727,11 @@ namespace ThermalComfort {
 		cCurrentModuleObject = "ComfortViewFactorAngles";
 		NumOfAngleFactorLists = GetNumObjectsFound( cCurrentModuleObject );
 		AngleFactorList.allocate( NumOfAngleFactorLists );
-		AngleFactorList.Name() = "";
-		AngleFactorList.ZoneName() = "";
-		AngleFactorList.ZonePtr() = 0;
+		for ( auto & e : AngleFactorList ) {
+			e.Name.clear();
+			e.ZoneName.clear();
+			e.ZonePtr = 0;
+		}
 
 		for ( Item = 1; Item <= NumOfAngleFactorLists; ++Item ) {
 
@@ -2063,7 +2065,7 @@ namespace ThermalComfort {
 		AnyZoneTimeNotSimpleASH55Either = 0.0;
 
 		//assume the zone is unoccupied
-		ThermalComfortInASH55.ZoneIsOccupied() = false;
+		for ( auto & e : ThermalComfortInASH55 ) e.ZoneIsOccupied = false;
 		//loop through the people objects and determine if the zone is currently occupied
 		for ( iPeople = 1; iPeople <= TotPeople; ++iPeople ) {
 			ZoneNum = People( iPeople ).ZonePtr;

@@ -246,9 +246,11 @@ namespace MundtSimMgr {
 
 		// allocate and initialize zone data
 		ZoneData.allocate( NumOfZones );
-		ZoneData.SurfFirst() = 0;
-		ZoneData.NumOfSurfs() = 0;
-		ZoneData.MundtZoneIndex() = 0;
+		for ( auto & e : ZoneData ) {
+			e.SurfFirst = 0;
+			e.NumOfSurfs = 0;
+			e.MundtZoneIndex = 0;
+		}
 
 		// get zone data
 		NumOfMundtZones = 0;
@@ -281,14 +283,18 @@ namespace MundtSimMgr {
 		MundtAirSurf.allocate( MaxNumOfSurfs, NumOfMundtZones );
 		LineNode.allocate( MaxNumOfAirNodes, NumOfMundtZones );
 		for ( SurfNum = 1; SurfNum <= MaxNumOfSurfs; ++SurfNum ) ID1dSurf( SurfNum ) = SurfNum;
-		MundtAirSurf.Area() = 0.0;
-		MundtAirSurf.Temp() = 25.0;
-		MundtAirSurf.Hc() = 0.0;
-		MundtAirSurf.TMeanAir() = 25.0;
-		LineNode.AirNodeName() = "";
-		LineNode.ClassType() = -1;
-		LineNode.Height() = 0.0;
-		LineNode.Temp() = 25.0;
+		for ( auto & e : MundtAirSurf ) {
+			e.Area = 0.0;
+			e.Temp = 25.0;
+			e.Hc = 0.0;
+			e.TMeanAir = 25.0;
+		}
+		for ( auto & e : LineNode ) {
+			e.AirNodeName.clear();
+			e.ClassType = -1;
+			e.Height = 0.0;
+			e.Temp = 25.0;
+		}
 
 		// get constant data (unchanged over time) for surfaces and air nodes
 		for ( MundtZoneIndex = 1; MundtZoneIndex <= NumOfMundtZones; ++MundtZoneIndex ) {
@@ -585,9 +591,11 @@ namespace MundtSimMgr {
 			NumFloorSurfs = count( LineNode( MundtFootAirID, MundtZoneNum ).SurfMask );
 			FloorSurfSetIDs = pack( ID1dSurf, LineNode( MundtFootAirID, MundtZoneNum ).SurfMask );
 			// initialize floor surface data (a must since NumFloorSurfs is varied among zones)
-			FloorSurf.Temp() = 25.0;
-			FloorSurf.Hc() = 0.0;
-			FloorSurf.Area() = 0.0;
+			for ( auto & e : FloorSurf ) {
+				e.Temp = 25.0;
+				e.Hc = 0.0;
+				e.Area = 0.0;
+			}
 			// get floor surface data
 			for ( SurfNum = 1; SurfNum <= NumFloorSurfs; ++SurfNum ) {
 				FloorSurf( SurfNum ).Temp = MundtAirSurf( FloorSurfSetIDs( SurfNum ), MundtZoneNum ).Temp;
@@ -665,8 +673,12 @@ namespace MundtSimMgr {
 		// Begin computations for Mundt model
 
 		// do summations for floor surfaces of this zone
-		FloorSumHAT = sum( FloorSurf.Area() * FloorSurf.Hc() * FloorSurf.Temp() );
-		FloorSumHA = sum( FloorSurf.Area() * FloorSurf.Hc() );
+		FloorSumHAT = 0.0;
+		FloorSumHA = 0.0;
+		for ( auto const & s : FloorSurf ) {
+			FloorSumHAT += s.Area * s.Hc * s.Temp;
+			FloorSumHA += s.Area * s.Hc;
+		}
 
 		// Eq 2.2 in ASHRAE RP 1222 Final report
 		TAirFoot = ( ( ZoneAirDensity * CpAir * SupplyAirVolumeRate * SupplyAirTemp ) + ( FloorSumHAT ) + QequipConvFloor + QSensInfilFloor ) / ( ( ZoneAirDensity * CpAir * SupplyAirVolumeRate ) + ( FloorSumHA ) );

@@ -1,6 +1,3 @@
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-
 // EnergyPlus Headers
 #include <ExteriorEnergyUse.hh>
 #include <DataEnvironment.hh>
@@ -95,7 +92,7 @@ namespace ExteriorEnergyUse {
 		ExteriorLights.deallocate();
 		ExteriorEquipment.deallocate();
 	}
-	
+
 	void
 	ManageExteriorEnergyUse()
 	{

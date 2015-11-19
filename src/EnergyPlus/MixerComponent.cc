@@ -1,5 +1,4 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -262,7 +261,7 @@ namespace MixerComponent {
 			MixerCond( MixerNum ).OutletNode = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			MixerCond( MixerNum ).NumInletNodes = NumAlphas - 2;
 
-			MixerCond.InitFlag() = true;
+			for ( auto & e : MixerCond ) e.InitFlag = true;
 
 			MixerCond( MixerNum ).InletNode.allocate( MixerCond( MixerNum ).NumInletNodes );
 			MixerCond( MixerNum ).InletMassFlowRate.allocate( MixerCond( MixerNum ).NumInletNodes );

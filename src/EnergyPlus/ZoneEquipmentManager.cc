@@ -1,4 +1,5 @@
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 #include <string>
 
@@ -134,7 +135,7 @@ namespace ZoneEquipmentManager {
 	// These are purposefully not in the header file as an extern variable. No one outside of this should
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-		
+
 		bool InitZoneEquipmentOneTimeFlag( true );
 	}
 
@@ -804,11 +805,11 @@ namespace ZoneEquipmentManager {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// This function calculates supply conditions for the direct outside air system 
+		// This function calculates supply conditions for the direct outside air system
 		// (DOAS) sizing calculations
 
 		// METHODOLOGY EMPLOYED:
-		// the supply temperature and humidity ratio are set depending on the design control method 
+		// the supply temperature and humidity ratio are set depending on the design control method
 		// and the outside air temperature
 
 		// REFERENCES:
@@ -839,7 +840,7 @@ namespace ZoneEquipmentManager {
 		}
 
 		// neutral dehumidified supply air
-		else if ( DOASControl == 2 ) { // 
+		else if ( DOASControl == 2 ) { //
 			if ( OutDB < DOASLowTemp ) {
 				DOASSupTemp = DOASHighTemp;
 				DOASSupHR = OutHR;
@@ -948,7 +949,7 @@ namespace ZoneEquipmentManager {
 				ShowSevereError( "SetUpZoneSizingArrays: Sizing:Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\" references unknown zone" );
 				ErrorsFound = true;
 			}
-			if ( any( ZoneEquipConfig.IsControlled() ) ) {
+			if ( std::any_of( ZoneEquipConfig.begin(), ZoneEquipConfig.end(), []( EquipConfiguration const & e ){ return e.IsControlled; } ) ) {
 				ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( ZoneIndex == 0 ) {
 					if ( ! isPulseZoneSizing ) {
@@ -2487,67 +2488,75 @@ namespace ZoneEquipmentManager {
 
 			// Move data from Calc arrays to user modified arrays
 
-			ZoneSizing.CoolDesDay() = CalcZoneSizing.CoolDesDay();
-			ZoneSizing.HeatDesDay() = CalcZoneSizing.HeatDesDay();
-			ZoneSizing.DesHeatDens() = CalcZoneSizing.DesHeatDens();
-			ZoneSizing.DesCoolDens() = CalcZoneSizing.DesCoolDens();
-			ZoneSizing.HeatDDNum() = CalcZoneSizing.HeatDDNum();
-			ZoneSizing.CoolDDNum() = CalcZoneSizing.CoolDDNum();
+			for ( std::size_t i = 0; i < ZoneSizing.size(); ++i ) {
+				auto & z( ZoneSizing[ i ] );
+				auto & c( CalcZoneSizing[ i ] );
+				z.CoolDesDay = c.CoolDesDay;
+				z.HeatDesDay = c.HeatDesDay;
+				z.DesHeatDens = c.DesHeatDens;
+				z.DesCoolDens = c.DesCoolDens;
+				z.HeatDDNum = c.HeatDDNum;
+				z.CoolDDNum = c.CoolDDNum;
 
-			ZoneSizing.DesHeatLoad() = CalcZoneSizing.DesHeatLoad();
-			ZoneSizing.DesHeatMassFlow() = CalcZoneSizing.DesHeatMassFlow();
-			ZoneSizing.ZoneTempAtHeatPeak() = CalcZoneSizing.ZoneTempAtHeatPeak();
-			ZoneSizing.OutTempAtHeatPeak() = CalcZoneSizing.OutTempAtHeatPeak();
-			ZoneSizing.ZoneRetTempAtHeatPeak() = CalcZoneSizing.ZoneRetTempAtHeatPeak();
-			ZoneSizing.ZoneHumRatAtHeatPeak() = CalcZoneSizing.ZoneHumRatAtHeatPeak();
-			ZoneSizing.OutHumRatAtHeatPeak() = CalcZoneSizing.OutHumRatAtHeatPeak();
-			ZoneSizing.TimeStepNumAtHeatMax() = CalcZoneSizing.TimeStepNumAtHeatMax();
-			ZoneSizing.DesHeatVolFlow() = CalcZoneSizing.DesHeatVolFlow();
-			ZoneSizing.DesHeatCoilInTemp() = CalcZoneSizing.DesHeatCoilInTemp();
-			ZoneSizing.DesHeatCoilInHumRat() = CalcZoneSizing.DesHeatCoilInHumRat();
+				z.DesHeatLoad = c.DesHeatLoad;
+				z.DesHeatMassFlow = c.DesHeatMassFlow;
+				z.ZoneTempAtHeatPeak = c.ZoneTempAtHeatPeak;
+				z.OutTempAtHeatPeak = c.OutTempAtHeatPeak;
+				z.ZoneRetTempAtHeatPeak = c.ZoneRetTempAtHeatPeak;
+				z.ZoneHumRatAtHeatPeak = c.ZoneHumRatAtHeatPeak;
+				z.OutHumRatAtHeatPeak = c.OutHumRatAtHeatPeak;
+				z.TimeStepNumAtHeatMax = c.TimeStepNumAtHeatMax;
+				z.DesHeatVolFlow = c.DesHeatVolFlow;
+				z.DesHeatCoilInTemp = c.DesHeatCoilInTemp;
+				z.DesHeatCoilInHumRat = c.DesHeatCoilInHumRat;
 
-			ZoneSizing.DesCoolLoad() = CalcZoneSizing.DesCoolLoad();
-			ZoneSizing.DesCoolMassFlow() = CalcZoneSizing.DesCoolMassFlow();
-			ZoneSizing.ZoneTempAtCoolPeak() = CalcZoneSizing.ZoneTempAtCoolPeak();
-			ZoneSizing.OutTempAtCoolPeak() = CalcZoneSizing.OutTempAtCoolPeak();
-			ZoneSizing.ZoneRetTempAtCoolPeak() = CalcZoneSizing.ZoneRetTempAtCoolPeak();
-			ZoneSizing.ZoneHumRatAtCoolPeak() = CalcZoneSizing.ZoneHumRatAtCoolPeak();
-			ZoneSizing.OutHumRatAtCoolPeak() = CalcZoneSizing.OutHumRatAtCoolPeak();
-			ZoneSizing.TimeStepNumAtCoolMax() = CalcZoneSizing.TimeStepNumAtCoolMax();
-			ZoneSizing.DesCoolVolFlow() = CalcZoneSizing.DesCoolVolFlow();
-			ZoneSizing.DesCoolCoilInTemp() = CalcZoneSizing.DesCoolCoilInTemp();
-			ZoneSizing.DesCoolCoilInHumRat() = CalcZoneSizing.DesCoolCoilInHumRat();
+				z.DesCoolLoad = c.DesCoolLoad;
+				z.DesCoolMassFlow = c.DesCoolMassFlow;
+				z.ZoneTempAtCoolPeak = c.ZoneTempAtCoolPeak;
+				z.OutTempAtCoolPeak = c.OutTempAtCoolPeak;
+				z.ZoneRetTempAtCoolPeak = c.ZoneRetTempAtCoolPeak;
+				z.ZoneHumRatAtCoolPeak = c.ZoneHumRatAtCoolPeak;
+				z.OutHumRatAtCoolPeak = c.OutHumRatAtCoolPeak;
+				z.TimeStepNumAtCoolMax = c.TimeStepNumAtCoolMax;
+				z.DesCoolVolFlow = c.DesCoolVolFlow;
+				z.DesCoolCoilInTemp = c.DesCoolCoilInTemp;
+				z.DesCoolCoilInHumRat = c.DesCoolCoilInHumRat;
+			}
 
-			FinalZoneSizing.CoolDesDay() = CalcFinalZoneSizing.CoolDesDay();
-			FinalZoneSizing.HeatDesDay() = CalcFinalZoneSizing.HeatDesDay();
-			FinalZoneSizing.DesHeatDens() = CalcFinalZoneSizing.DesHeatDens();
-			FinalZoneSizing.DesCoolDens() = CalcFinalZoneSizing.DesCoolDens();
-			FinalZoneSizing.HeatDDNum() = CalcFinalZoneSizing.HeatDDNum();
-			FinalZoneSizing.CoolDDNum() = CalcFinalZoneSizing.CoolDDNum();
+			for ( std::size_t i = 0; i < FinalZoneSizing.size(); ++i ) {
+				auto & z( FinalZoneSizing[ i ] );
+				auto & c( CalcFinalZoneSizing[ i ] );
+				z.CoolDesDay = c.CoolDesDay;
+				z.HeatDesDay = c.HeatDesDay;
+				z.DesHeatDens = c.DesHeatDens;
+				z.DesCoolDens = c.DesCoolDens;
+				z.HeatDDNum = c.HeatDDNum;
+				z.CoolDDNum = c.CoolDDNum;
 
-			FinalZoneSizing.DesHeatLoad() = CalcFinalZoneSizing.DesHeatLoad();
-			FinalZoneSizing.DesHeatMassFlow() = CalcFinalZoneSizing.DesHeatMassFlow();
-			FinalZoneSizing.ZoneTempAtHeatPeak() = CalcFinalZoneSizing.ZoneTempAtHeatPeak();
-			FinalZoneSizing.OutTempAtHeatPeak() = CalcFinalZoneSizing.OutTempAtHeatPeak();
-			FinalZoneSizing.ZoneRetTempAtHeatPeak() = CalcFinalZoneSizing.ZoneRetTempAtHeatPeak();
-			FinalZoneSizing.ZoneHumRatAtHeatPeak() = CalcFinalZoneSizing.ZoneHumRatAtHeatPeak();
-			FinalZoneSizing.OutHumRatAtHeatPeak() = CalcFinalZoneSizing.OutHumRatAtHeatPeak();
-			FinalZoneSizing.TimeStepNumAtHeatMax() = CalcFinalZoneSizing.TimeStepNumAtHeatMax();
-			FinalZoneSizing.DesHeatVolFlow() = CalcFinalZoneSizing.DesHeatVolFlow();
-			FinalZoneSizing.DesHeatCoilInTemp() = CalcFinalZoneSizing.DesHeatCoilInTemp();
-			FinalZoneSizing.DesHeatCoilInHumRat() = CalcFinalZoneSizing.DesHeatCoilInHumRat();
+				z.DesHeatLoad = c.DesHeatLoad;
+				z.DesHeatMassFlow = c.DesHeatMassFlow;
+				z.ZoneTempAtHeatPeak = c.ZoneTempAtHeatPeak;
+				z.OutTempAtHeatPeak = c.OutTempAtHeatPeak;
+				z.ZoneRetTempAtHeatPeak = c.ZoneRetTempAtHeatPeak;
+				z.ZoneHumRatAtHeatPeak = c.ZoneHumRatAtHeatPeak;
+				z.OutHumRatAtHeatPeak = c.OutHumRatAtHeatPeak;
+				z.TimeStepNumAtHeatMax = c.TimeStepNumAtHeatMax;
+				z.DesHeatVolFlow = c.DesHeatVolFlow;
+				z.DesHeatCoilInTemp = c.DesHeatCoilInTemp;
+				z.DesHeatCoilInHumRat = c.DesHeatCoilInHumRat;
 
-			FinalZoneSizing.DesCoolLoad() = CalcFinalZoneSizing.DesCoolLoad();
-			FinalZoneSizing.DesCoolMassFlow() = CalcFinalZoneSizing.DesCoolMassFlow();
-			FinalZoneSizing.ZoneTempAtCoolPeak() = CalcFinalZoneSizing.ZoneTempAtCoolPeak();
-			FinalZoneSizing.OutTempAtCoolPeak() = CalcFinalZoneSizing.OutTempAtCoolPeak();
-			FinalZoneSizing.ZoneRetTempAtCoolPeak() = CalcFinalZoneSizing.ZoneRetTempAtCoolPeak();
-			FinalZoneSizing.ZoneHumRatAtCoolPeak() = CalcFinalZoneSizing.ZoneHumRatAtCoolPeak();
-			FinalZoneSizing.OutHumRatAtCoolPeak() = CalcFinalZoneSizing.OutHumRatAtCoolPeak();
-			FinalZoneSizing.TimeStepNumAtCoolMax() = CalcFinalZoneSizing.TimeStepNumAtCoolMax();
-			FinalZoneSizing.DesCoolVolFlow() = CalcFinalZoneSizing.DesCoolVolFlow();
-			FinalZoneSizing.DesCoolCoilInTemp() = CalcFinalZoneSizing.DesCoolCoilInTemp();
-			FinalZoneSizing.DesCoolCoilInHumRat() = CalcFinalZoneSizing.DesCoolCoilInHumRat();
+				z.DesCoolLoad = c.DesCoolLoad;
+				z.DesCoolMassFlow = c.DesCoolMassFlow;
+				z.ZoneTempAtCoolPeak = c.ZoneTempAtCoolPeak;
+				z.OutTempAtCoolPeak = c.OutTempAtCoolPeak;
+				z.ZoneRetTempAtCoolPeak = c.ZoneRetTempAtCoolPeak;
+				z.ZoneHumRatAtCoolPeak = c.ZoneHumRatAtCoolPeak;
+				z.OutHumRatAtCoolPeak = c.OutHumRatAtCoolPeak;
+				z.TimeStepNumAtCoolMax = c.TimeStepNumAtCoolMax;
+				z.DesCoolVolFlow = c.DesCoolVolFlow;
+				z.DesCoolCoilInTemp = c.DesCoolCoilInTemp;
+				z.DesCoolCoilInHumRat = c.DesCoolCoilInHumRat;
+			}
 
 			for ( DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum ) {
 				for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
@@ -4470,17 +4479,19 @@ namespace ZoneEquipmentManager {
 
 		// Process the scheduled Ventilation for air heat balance
 		if ( TotVentilation > 0 ) {
-			ZnAirRpt.VentilFanElec() = 0.0;
+			for ( auto & e : ZnAirRpt ) e.VentilFanElec = 0.0;
 		}
 
 		// Initialization of ZoneAirBalance
 		if ( TotZoneAirBalance > 0 ) {
-			ZoneAirBalance.BalMassFlowRate() = 0.0;
-			ZoneAirBalance.InfMassFlowRate() = 0.0;
-			ZoneAirBalance.NatMassFlowRate() = 0.0;
-			ZoneAirBalance.ExhMassFlowRate() = 0.0;
-			ZoneAirBalance.IntMassFlowRate() = 0.0;
-			ZoneAirBalance.ERVMassFlowRate() = 0.0;
+			for ( auto & e : ZoneAirBalance ) {
+				e.BalMassFlowRate = 0.0;
+				e.InfMassFlowRate = 0.0;
+				e.NatMassFlowRate = 0.0;
+				e.ExhMassFlowRate = 0.0;
+				e.IntMassFlowRate = 0.0;
+				e.ERVMassFlowRate = 0.0;
+			}
 		}
 
 		for ( j = 1; j <= TotVentilation; ++j ) {

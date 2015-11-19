@@ -156,8 +156,8 @@ namespace EnergyPlus {
 		EXPECT_TRUE( has_cerr_output() );
 
 		// fails on windows due to endline issue... this outputs /r/n on Windows but it is outputting /n on Windows for some reason...
-		// EXPECT_TRUE( compare_cerr_stream( delimited_string( { 
-		// 	"! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number", 
+		// EXPECT_TRUE( compare_cerr_stream( delimited_string( {
+		// 	"! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number",
 		// 	" DX Heating Coil Standard Rating Information, , DX Heating coil, 6414.3, 6414.3, 6.58, 4" } ) ) );
 
 		// Clean up
@@ -259,10 +259,10 @@ namespace EnergyPlus {
 
 		EXPECT_TRUE( has_cerr_output() );
 
-		// EXPECT_TRUE( compare_cerr_stream( delimited_string( { 
-		// 	"! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value", 
-		// 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Design Size  [W], 0.00000", 
-		// 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, User-Specified  [W], 5000.00000", 
+		// EXPECT_TRUE( compare_cerr_stream( delimited_string( {
+		// 	"! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value",
+		// 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Design Size  [W], 0.00000",
+		// 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, User-Specified  [W], 5000.00000",
 		// 	" DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, 0.0, 0.0, 3.51, 4"} ) ) );
 
 		// Output from CI, I don't know why it is different than above...
@@ -807,9 +807,9 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( EnergyPlusFixture, DXCoilEvapCondPumpSizingTest ) {
-		
+
 		// tests autosizing evaporatively cooled condenser pump #4802
-		
+
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
 			"	Schedule:Compact,",
@@ -911,7 +911,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( DataSizing::AutoSize, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
 
 		SetPredefinedTables();
-		
+
 		SizeDXCoil( 1 );
 		EXPECT_EQ( 25000.0, DXCoil( 1 ).RatedTotCap( 1 ) );
 		EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ) * 0.004266, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
@@ -919,26 +919,26 @@ namespace EnergyPlus {
 		// clear
 		DXCoil.deallocate();
 	}
-	
+
 	TEST_F( EnergyPlusFixture, TestDXCoilIndoorOrOutdoor ) {
-		
+
 		//Test whether the coil is placed indoor or outdoor, by checking the air inlet node location
-		
+
 		using namespace DXCoils;
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
 		// Common Inputs
-		int NumCoils; // total number of coils 
-		int DXCoilNum; // index to the current coil 
+		int NumCoils; // total number of coils
+		int DXCoilNum; // index to the current coil
 
 		// Allocate
 		NumCoils = 3;
 		DXCoil.allocate( NumCoils );
-			
+
 		// IDF snippets
 		std::string const idf_objects = delimited_string({
-			"Version,8.3;                                          ", 
+			"Version,8.3;                                          ",
 			"OutdoorAir:Node,                                      ",
 			"   Outside Air Inlet Node 1; !- Name                  ",
 			"OutdoorAir:NodeList,                                  ",
@@ -947,30 +947,30 @@ namespace EnergyPlus {
 			"   OutsideAirInletNodes,    !- Name                   ",
 			"   Outside Air Inlet Node 2;!- Node 1 Name            ",
 		});
-		
+
 		ASSERT_FALSE( process_idf( idf_objects ) );
-		
+
 		// Run
-		DXCoilNum = 1;  
+		DXCoilNum = 1;
 		DXCoil(DXCoilNum).AirInNode = 1; // "Outside Air Inlet Node 1"
 		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
-		
-		DXCoilNum = 2;  
+
+		DXCoilNum = 2;
 		DXCoil(DXCoilNum).AirInNode = 2; // "Outside Air Inlet Node 2"
 		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
-		
+
 		DXCoilNum = 3; // "Inside Air Inlet Node"
 		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
-		
+
 		// Check
 		EXPECT_FALSE( DXCoil( 1 ).IsDXCoilInZone );
 		EXPECT_FALSE( DXCoil( 2 ).IsDXCoilInZone );
 		EXPECT_TRUE( DXCoil( 3 ).IsDXCoilInZone );
 
 		// Clean up
-		DXCoil.deallocate( ); 
+		DXCoil.deallocate();
 	}
-	
+
 	TEST_F( EnergyPlusFixture, TestMultiSpeedWasteHeat )
 	{
 		// Test the waste heat function #4536
@@ -1145,7 +1145,7 @@ namespace EnergyPlus {
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
 		// Case 1 test
-		GetDXCoils( );
+		GetDXCoils();
 
 		EXPECT_EQ( FuelTypeElectricity, DXCoil( 1 ).FuelType );
 		EXPECT_EQ( 0, DXCoil( 1 ).MSWasteHeat( 2 ) );
@@ -1177,7 +1177,7 @@ namespace EnergyPlus {
 		DXCoil( 1 ).MSRatedCBF( 2 ) = 0.0408;
 
 		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1 );
-		
+
 		EXPECT_EQ( 0, MSHPWasteHeat );
 
 		// Case 3 heat recovery is true and no waste heat function cuvre
@@ -1190,7 +1190,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 1303.4304, MSHPWasteHeat, 0.001 );
 
 		// clear
-		DXCoil.deallocate( );
+		DXCoil.deallocate();
 
 	}
 }

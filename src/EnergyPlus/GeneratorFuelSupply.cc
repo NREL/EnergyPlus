@@ -193,7 +193,7 @@ namespace GeneratorFuelSupply {
 					ErrorsFound = true;
 				}
 
-				FuelSupply.CompPowerLossFactor() = NumArray( 1 );
+				for ( auto & e : FuelSupply ) e.CompPowerLossFactor = NumArray( 1 );
 
 				if ( SameString( AlphArray( 6 ), "GaseousConstituents" ) ) {
 					FuelSupply( FuelSupNum ).FuelTypeMode = fuelModeGaseousConstituents;

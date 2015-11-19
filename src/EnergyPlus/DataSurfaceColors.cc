@@ -1,6 +1,3 @@
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-
 // EnergyPlus Headers
 #include <DataSurfaceColors.hh>
 #include <DataGlobals.hh>

@@ -8,6 +8,7 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -907,6 +908,7 @@ CalcPassiveExteriorBaffleGap(
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using DataSurfaces::Surface;
+	using DataSurfaces::SurfaceData;
 	using DataHeatBalSurface::TH;
 	using DataHeatBalance::Material;
 	using DataHeatBalance::Construct;
@@ -980,11 +982,13 @@ CalcPassiveExteriorBaffleGap(
 	Real64 ICSULossbottom; // ICS solar collector bottom loss Conductance
 	static bool MyICSEnvrnFlag( true ); // Local environment flag for ICS
 
+	Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, SurfPtrARR ) );
+
 //	LocalOutDryBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutDryBulbTemp ) / sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-	LocalOutDryBulbTemp = sum_product_sub( Surface.Area(), Surface.OutDryBulbTemp(), SurfPtrARR ) / sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
+	LocalOutDryBulbTemp = sum_product_sub( Surface, &SurfaceData::Area, &SurfaceData::OutDryBulbTemp, SurfPtrARR ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 //	LocalWetBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutWetBulbTemp ) / sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-	LocalWetBulbTemp = sum_product_sub( Surface.Area(), Surface.OutWetBulbTemp(), SurfPtrARR ) / sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
+	LocalWetBulbTemp = sum_product_sub( Surface, &SurfaceData::Area, &SurfaceData::OutWetBulbTemp, SurfPtrARR ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 	LocalOutHumRat = PsyWFnTdbTwbPb( LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName );
 
@@ -996,7 +1000,7 @@ CalcPassiveExteriorBaffleGap(
 		Tamb = LocalWetBulbTemp;
 	}
 //	A = sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-	A = sum_sub( Surface.Area(), SurfPtrARR ); //Autodesk:F2C++ Functions handle array subscript usage
+	A = surfaceArea;
 	TmpTsBaf = TsBaffle;
 
 	//loop through underlying surfaces and collect needed data
@@ -1051,7 +1055,7 @@ CalcPassiveExteriorBaffleGap(
 	if ( A == 0.0 ) { // should have been caught earlier
 
 	}
-	auto Area( array_sub( Surface.Area(), SurfPtrARR ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
+	auto Area( array_sub( Surface, &SurfaceData::Area, SurfPtrARR ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
 	// now figure area-weighted averages from underlying surfaces.
 //	Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
 	Vwind = sum( LocalWindArr * Area ) / A;
@@ -1075,9 +1079,9 @@ CalcPassiveExteriorBaffleGap(
 	if ( IsRain ) HExt = 1000.0;
 
 //	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-	Tso = sum_product_sub( TH( 1, 1, _ ), Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
+	Tso = sum_product_sub( TH( 1, 1, _ ), Surface, &SurfaceData::Area, SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-	Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
+	Isc = sum_product_sub( QRadSWOutIncident, Surface, &SurfaceData::Area, SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 
 	TmeanK = 0.5 * ( TmpTsBaf + Tso ) + KelvinConv;
 

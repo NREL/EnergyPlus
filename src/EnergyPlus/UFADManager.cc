@@ -2,11 +2,9 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <UFADManager.hh>
@@ -681,8 +679,8 @@ namespace UFADManager {
 				SurfNum = APos_Wall( Ctd );
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
-				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
+				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
 				ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 				ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 
@@ -739,8 +737,8 @@ namespace UFADManager {
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
 				if ( Surface( SurfNum ).Tilt > 10.0 && Surface( SurfNum ).Tilt < 170.0 ) { // Window Wall
-					Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-					Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+					Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
+					Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
 					ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 					ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 
@@ -810,8 +808,8 @@ namespace UFADManager {
 				SurfNum = APos_Door( Ctd );
 				Surface( SurfNum ).TAirRef = AdjacentAirTemp;
 				if ( SurfNum == 0 ) continue;
-				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
+				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
 				ZSupSurf = Z2 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 				ZInfSurf = Z1 - ZoneCeilingHeight( ( ZoneNum - 1 ) * 2 + 1 );
 

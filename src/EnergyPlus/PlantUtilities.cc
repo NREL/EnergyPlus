@@ -48,7 +48,7 @@ namespace PlantUtilities {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 
-	namespace { 
+	namespace {
 		struct CriteriaData
 		{
 			// Members
@@ -1335,10 +1335,12 @@ namespace PlantUtilities {
 
 		// Flow:
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-			PlantLoop( LoopNum ).LoopSide.SimAirLoopsNeeded() = false;
-			PlantLoop( LoopNum ).LoopSide.SimZoneEquipNeeded() = false;
-			PlantLoop( LoopNum ).LoopSide.SimNonZoneEquipNeeded() = false;
-			PlantLoop( LoopNum ).LoopSide.SimElectLoadCentrNeeded() = false;
+			for ( auto & e : PlantLoop( LoopNum ).LoopSide ) {
+				e.SimAirLoopsNeeded = false;
+				e.SimZoneEquipNeeded = false;
+				e.SimNonZoneEquipNeeded = false;
+				e.SimElectLoadCentrNeeded = false;
+			}
 		}
 
 	}
@@ -2024,9 +2026,6 @@ namespace PlantUtilities {
 		bool Found;
 		int thisCallNodeIndex;
 
-		// Object Data
-		Array1D< CompDesWaterFlowData > CompDesWaterFlow0; // scratch array to store components'
-
 		NumPlantComps = SaveNumPlantComps;
 
 		if ( NumPlantComps == 0 ) { // first time in, fill and return
@@ -2051,31 +2050,11 @@ namespace PlantUtilities {
 
 		if ( ! Found ) { // grow structure and add new node at the end
 			++NumPlantComps; // increment the number of components that use water as a source of heat or coolth
-			// save the existing data in a scratch array
-			CompDesWaterFlow0.allocate( NumPlantComps - 1 );
-			CompDesWaterFlow0( {1,NumPlantComps - 1} ).SupNode() = CompDesWaterFlow( {1,NumPlantComps - 1} ).SupNode();
-			CompDesWaterFlow0( {1,NumPlantComps - 1} ).DesVolFlowRate() = CompDesWaterFlow( {1,NumPlantComps - 1} ).DesVolFlowRate();
-
-			// get rid of the old array
-			CompDesWaterFlow.deallocate();
-			// allocate a new array
-			CompDesWaterFlow.allocate( NumPlantComps );
-			// save the new data
-			CompDesWaterFlow( NumPlantComps ).SupNode = ComponentInletNodeNum;
-			CompDesWaterFlow( NumPlantComps ).DesVolFlowRate = DesPlantFlow;
-			// move the old data back from the scratch array
-
-			CompDesWaterFlow( {1,NumPlantComps - 1} ).SupNode() = CompDesWaterFlow0( {1,NumPlantComps - 1} ).SupNode();
-			CompDesWaterFlow( {1,NumPlantComps - 1} ).DesVolFlowRate() = CompDesWaterFlow0( {1,NumPlantComps - 1} ).DesVolFlowRate();
-
-			CompDesWaterFlow0.deallocate();
+			CompDesWaterFlow.emplace_back( ComponentInletNodeNum, DesPlantFlow ); // Append the new element
 			SaveNumPlantComps = NumPlantComps;
-
 		} else {
-
 			CompDesWaterFlow( thisCallNodeIndex ).SupNode = ComponentInletNodeNum;
 			CompDesWaterFlow( thisCallNodeIndex ).DesVolFlowRate = DesPlantFlow;
-
 		}
 
 	}

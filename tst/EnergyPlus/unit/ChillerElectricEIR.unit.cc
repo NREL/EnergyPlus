@@ -38,7 +38,7 @@ TEST( ChillerElectricEIR, TestOutletNodeConditions )
 	EXPECT_EQ( 18, ElectricEIRChillerReport( Num ).EvapOutletTemp );
 	EXPECT_EQ( 35, ElectricEIRChillerReport( Num ).CondOutletTemp );
 
-	Node.deallocate( );
-	ElectricEIRChiller.deallocate( );
-	ElectricEIRChillerReport.deallocate( );
+	Node.deallocate();
+	ElectricEIRChiller.deallocate();
+	ElectricEIRChillerReport.deallocate();
 }

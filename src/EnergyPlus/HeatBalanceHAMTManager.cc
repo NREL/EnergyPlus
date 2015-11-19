@@ -3,9 +3,9 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <HeatBalanceHAMTManager.hh>
@@ -765,8 +765,10 @@ namespace HeatBalanceHAMTManager {
 
 		// Make the cells and initialise
 		cells.allocate( TotCellsMax );
-		cells.adjs() = -1;
-		cells.adjsl() = -1;
+		for ( auto & e : cells ) {
+			e.adjs = -1;
+			e.adjsl = -1;
+		}
 
 		cid = 0;
 
@@ -1265,9 +1267,9 @@ namespace HeatBalanceHAMTManager {
 				cells( cid ).tempp1 = ( torsum + qvp + cells( cid ).Qadds + ( tcap * cells( cid ).temp / deltat ) ) / ( oorsum + ( tcap / deltat ) );
 			}
 
-			//Check for silly temperatures
-			tempmax = maxval( cells.tempp1() );
-			tempmin = minval( cells.tempp1() );
+			// Check for silly temperatures
+			tempmax = maxval( cells, &subcell::tempp1 );
+			tempmin = minval( cells, &subcell::tempp1 );
 			if ( tempmax > MaxSurfaceTempLimit ) {
 				if ( ! WarmupFlag ) {
 					if ( Surface( sid ).HighTempErrCount == 0 ) {

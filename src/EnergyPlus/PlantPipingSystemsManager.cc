@@ -1103,7 +1103,7 @@ namespace PlantPipingSystemsManager {
 				Domain( ZoneCoupledDomainCtr ).SoilDensity = rNumericArgs( 5 );
 				Domain( ZoneCoupledDomainCtr ).SoilSpecificHeat = rNumericArgs( 6 );
 				Domain( ZoneCoupledDomainCtr ).MoistureContent = rNumericArgs( 7 );
-				Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent = rNumericArgs( 8 );		
+				Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent = rNumericArgs( 8 );
 				Domain( ZoneCoupledDomainCtr ).EvapotranspirationCoeff = rNumericArgs( 9 );
 				Domain( ZoneCoupledDomainCtr ).HorizInsWidth = rNumericArgs( 10 );
 				Domain( ZoneCoupledDomainCtr ).VertInsDepth = rNumericArgs( 11 );
@@ -1121,7 +1121,7 @@ namespace PlantPipingSystemsManager {
 				// Get slab material properties
 				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ) {
 					Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 6 );
-					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material.Name(), TotMaterials );
+					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).SlabMaterialNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
 						ShowContinueError( "Found in " + PipingSystemDomains( DomainCtr ).Name );
@@ -1150,7 +1150,7 @@ namespace PlantPipingSystemsManager {
 				// Get horizontal insulation material properties
 				if ( PipingSystemDomains( DomainCtr ).HorizInsPresentFlag ) {
 					Domain( ZoneCoupledDomainCtr ).HorizInsMaterial = cAlphaArgs( 8 );
-					PipingSystemDomains( DomainCtr ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material.Name(), TotMaterials );
+					PipingSystemDomains( DomainCtr ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).HorizInsMaterialNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + "=" + cAlphaArgs( 8 ) );
 						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).HorizInsMaterial );
@@ -1189,7 +1189,7 @@ namespace PlantPipingSystemsManager {
 				// Get vertical insulation material properties
 				if ( PipingSystemDomains( DomainCtr ).VertInsPresentFlag ) {
 					Domain( ZoneCoupledDomainCtr ).VertInsMaterial = cAlphaArgs( 11 );
-					PipingSystemDomains( DomainCtr ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 11 ), Material.Name(), TotMaterials );
+					PipingSystemDomains( DomainCtr ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 11 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).VertInsMaterialNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 11 ) + "=" + cAlphaArgs( 11 ) );
 						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).VertInsMaterial );
@@ -1555,7 +1555,7 @@ namespace PlantPipingSystemsManager {
 			// Get horizontal insulation material properties
 			if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
 				Domain( BasementCtr ).HorizInsMaterial = cAlphaArgs( 6 );
-				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material.Name(), TotMaterials );
+				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).HorizInsMaterialNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
 					ShowContinueError( "Found in " + Domain( BasementCtr ).HorizInsMaterial );
@@ -1594,7 +1594,7 @@ namespace PlantPipingSystemsManager {
 			// Get vertical insulation material properties
 			if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ) {
 				Domain( BasementCtr ).VertInsMaterial = cAlphaArgs( 10 );
-				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 10 ), Material.Name(), TotMaterials );
+				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 10 ), Material, TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).VertInsMaterialNum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
 					ShowContinueError( "Found in " + Domain( BasementCtr ).VertInsMaterial );
@@ -3063,14 +3063,19 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Array1D_int ISWAP( 1 );
-		int ISWAP1;
 
 		using std::swap;
 
 		for ( int I = X.l1(), I_end = X.u1() - 1; I <= I_end; ++I ) {
-			ISWAP = minloc( X( {I,_} ).rDimension() );  //Do Slicing and minloc is expensive: Replace
-			ISWAP1 = ISWAP( 1 ) + I - 1;
+			int loc( 1 ), l( 1 );
+			Real64 r_min( std::numeric_limits< Real64 >::max() );
+			for ( int j = I; j <= I_end; ++j, ++l ) {
+				if ( X( j ).rDimension < r_min ) {
+					r_min = X( j ).rDimension;
+					loc = l;
+				}
+			}
+			int const ISWAP1( loc + I - 1 );
 			if ( ISWAP1 != I ) swap( X( I ), X( ISWAP1 ) );
 		}
 

@@ -637,7 +637,7 @@ namespace HVACControllers {
 
 					if ( ControllerProps( Num ).ControlVar == iHumidityRatio || ControllerProps( Num ).ControlVar == iTemperatureAndHumidityRatio ) {
 						ResetHumidityRatioCtrlVarType( ControllerProps( Num ).SensedNode );
-					}					
+					}
 					CheckForSensorAndSetPointNode( ControllerProps( Num ).SensedNode, ControllerProps( Num ).ControlVar, NodeNotFound );
 
 					if ( NodeNotFound ) {
@@ -1101,9 +1101,11 @@ namespace HVACControllers {
 			// Turn off scheme to reuse previous solution obtained at last SimAirLoop() call
 			ControllerProps( ControlNum ).ReusePreviousSolutionFlag = false;
 			// Reset solution trackers
-			ControllerProps( ControlNum ).SolutionTrackers.DefinedFlag() = false;
-			ControllerProps( ControlNum ).SolutionTrackers.Mode() = iModeNone;
-			ControllerProps( ControlNum ).SolutionTrackers.ActuatedValue() = 0.0;
+			for ( auto & e : ControllerProps( ControlNum ).SolutionTrackers ) {
+				e.DefinedFlag = false;
+				e.Mode = iModeNone;
+				e.ActuatedValue = 0.0;
+			}
 
 			MyEnvrnFlag( ControlNum ) = false;
 		}

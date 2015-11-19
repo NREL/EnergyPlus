@@ -186,7 +186,7 @@ namespace Photovoltaics {
 			CalcTRNSYSPV( PVnum, RunFlag );
 
 		} else if ( SELECT_CASE_var == iSandiaPVModel ) {
-			// 'PhotovoltaicPerformance:Sandia' (aka. King model, Sandia Nat. Labs.  )
+			// 'PhotovoltaicPerformance:Sandia' (aka. King model, Sandia Nat. Labs.)
 
 			CalcSandiaPV( PVnum, RunFlag );
 
@@ -700,7 +700,7 @@ namespace Photovoltaics {
 			}
 
 			if ( PVarray( PVnum ).CellIntegrationMode == iPVTSolarCollectorCellIntegration ) {
-				// Call GetPVTmodelIndex(  PVarray(PVNum)%SurfacePtr , PVarray(PVNum)%PVTPtr )
+				// Call GetPVTmodelIndex( PVarray(PVNum)%SurfacePtr , PVarray(PVNum)%PVTPtr )
 			}
 
 		}

@@ -1,9 +1,6 @@
 // C++ Headers
 #include <cmath>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-
 // EnergyPlus Headers
 #include <SplitterComponent.hh>
 #include <DataContaminantBalance.hh>
@@ -82,7 +79,7 @@ namespace SplitterComponent {
 	clear_state()
 	{
 		GetSplitterInputFlag = true ;
-		NumSplitters = 0; 
+		NumSplitters = 0;
 		CheckEquipName.deallocate();
 		SplitterCond.deallocate();
 	}

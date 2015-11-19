@@ -1,4 +1,5 @@
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <string>
@@ -7,7 +8,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/random.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Vector2.hh>
@@ -965,8 +966,8 @@ namespace DaylightingManager {
 
 		int WinEl; // Current window element
 
-		if ( refFirstTime && any_gt( ZoneDaylight.TotalDaylRefPoints(), 0 ) ) {
-			RefErrIndex.allocate( maxval( ZoneDaylight.TotalDaylRefPoints() ), TotSurfaces );
+		if ( refFirstTime && std::any_of( ZoneDaylight.begin(), ZoneDaylight.end(), []( ZoneDaylightCalc const & e ){ return e.TotalDaylRefPoints > 0; } ) ) {
+			RefErrIndex.allocate( maxval( ZoneDaylight, &ZoneDaylightCalc::TotalDaylRefPoints ), TotSurfaces );
 			RefErrIndex = 0;
 			refFirstTime = false;
 		}
@@ -5688,9 +5689,10 @@ namespace DaylightingManager {
 		// Three arrays to save original clear and dark (fully switched) states'
 		//  zone/window daylighting properties.
 		if ( firstTime ) {
-			tmpIllumFromWinAtRefPt.allocate( max( maxval( Zone.NumSubSurfaces() ), maxval( ZoneDaylight.NumOfDayltgExtWins() ) ), 2, 2 );
-			tmpBackLumFromWinAtRefPt.allocate( max( maxval( Zone.NumSubSurfaces() ), maxval( ZoneDaylight.NumOfDayltgExtWins() ) ), 2, 2 );
-			tmpSourceLumFromWinAtRefPt.allocate( max( maxval( Zone.NumSubSurfaces() ), maxval( ZoneDaylight.NumOfDayltgExtWins() ) ), 2, 2 );
+			int const d1( max( maxval( Zone, &ZoneData::NumSubSurfaces ), maxval( ZoneDaylight, &ZoneDaylightCalc::NumOfDayltgExtWins ) ) );
+			tmpIllumFromWinAtRefPt.allocate( d1, 2, 2 );
+			tmpBackLumFromWinAtRefPt.allocate( d1, 2, 2 );
+			tmpSourceLumFromWinAtRefPt.allocate( d1, 2, 2 );
 			firstTime = false;
 		}
 		tmpIllumFromWinAtRefPt = 0.0;
@@ -9056,9 +9058,11 @@ namespace DaylightingManager {
 
 				if ( sqlite ) {
 					if ( SQFirstTime ) {
-						XValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ) );
-						YValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
-						IllumValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ), maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
+						int const nX( maxval( IllumMap, &IllumMapData::Xnum ) );
+						int const nY( maxval( IllumMap, &IllumMapData::Ynum ) );
+						XValue.allocate( nX );
+						YValue.allocate( nY );
+						IllumValue.allocate( nX, nY );
 						SQFirstTime = false;
 					}
 

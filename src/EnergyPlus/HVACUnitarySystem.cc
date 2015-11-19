@@ -2524,25 +2524,25 @@ namespace HVACUnitarySystem {
 		//
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages GetInput processing and program termination
-		
+
 		// METHODOLOGY EMPLOYED:
 		// Calls "Get" routines to read in data.
-			
+
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetUnitarySystemInput: " ); // include trailing blank space
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-			
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-			
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorFlag( false ); // true if errors detected in GetUnitarySystemInputData
-		
+
 		// Flow
 		GetUnitarySystemInputData( ErrorFlag );
-		
+
 		if( ErrorFlag ) {
 			ShowFatalError( RoutineName + "Errors found in getting AirLoopHVAC:UnitarySystem input. Preceding condition(s) causes termination." );
 		}
@@ -5866,7 +5866,7 @@ namespace HVACUnitarySystem {
 				MultiOrVarSpeedCoolCoil( UnitarySysNum ) = true;
 			}
 
-			// set global variables for multi-stage chilled and hot water coils 
+			// set global variables for multi-stage chilled and hot water coils
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
 				Index = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
 				if ( Index > 0 ) {
@@ -10847,9 +10847,9 @@ namespace HVACUnitarySystem {
 		LoopOnOffFanPartLoadRatio = UnitarySystem( UnitarySysNum ).FanPartLoadRatio;
 		LoopCompCycRatio = UnitarySystem( UnitarySysNum ).CycRatio;
 
-		if (  UnitarySystem(UnitarySysNum).FirstPass ) {
+		if ( UnitarySystem(UnitarySysNum).FirstPass ) {
 
-			if (  ! SysSizingCalc ) {
+			if ( ! SysSizingCalc ) {
 
 				if ( CurOASysNum > 0 ) {
 					OASysEqSizing( CurOASysNum ).AirFlow = false;
@@ -13165,16 +13165,16 @@ namespace HVACUnitarySystem {
 
 // *****************************************************************************
 	//     NOTICE
-	
+
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of CalIFornia through Ernest OrlanDO Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
-	
+
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
 	//     list of contributors, see "Notice" located in main.cc.
-	
+
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

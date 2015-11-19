@@ -102,7 +102,7 @@ namespace RootFinder {
 	// IterationCount = 0
 	// IsDoneFlag = .FALSE.
 	// RF%XCandidate = 0.1d0 ! Sets X to initial value XInit
-	// DO WHILE ( .NOT.IsDoneFlag  )
+	// DO WHILE ( .NOT.IsDoneFlag )
 	//   IterationCount = IterationCount+1
 	//   IF ( IterationCount>50 ) THEN
 	//     WRITE(*,*) 'Error: Too many iterations..."
@@ -313,9 +313,10 @@ namespace RootFinder {
 
 		// Reset iterate history with last 3 best points
 		RootFinderData.NumHistory = 0;
-		RootFinderData.History( _ ).X() = 0.0;
-		RootFinderData.History( _ ).Y() = 0.0;
-		RootFinderData.History( _ ).DefinedFlag() = false;
+		for ( auto & e : RootFinderData.History ) {
+			e.X = e.Y = 0.0;
+			e.DefinedFlag = false;
+		}
 
 		// Reset increments over successive iterationes
 		RootFinderData.Increment.X = 0.0;
@@ -1745,9 +1746,10 @@ namespace RootFinder {
 		// Note that the history points are sorted so that
 		//   SIGN(History(1)%Y) = -SIGN(History(3)%Y)
 		// to ensure that the history points bracket the candidate root.
-		RootFinderData.History( _ ).DefinedFlag() = false;
-		RootFinderData.History( _ ).X() = 0.0;
-		RootFinderData.History( _ ).Y() = 0.0;
+		for ( auto & e : RootFinderData.History ) {
+			e.X = e.Y = 0.0;
+			e.DefinedFlag = false;
+		}
 
 		NumHistory = 0;
 		if ( RootFinderData.LowerPoint.DefinedFlag ) {

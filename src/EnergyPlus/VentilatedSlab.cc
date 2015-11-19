@@ -1234,10 +1234,12 @@ namespace VentilatedSlab {
 			LastSysTimeElapsed = 0.0;
 			LastTimeStepSys = 0.0;
 			if ( NumOfVentSlabs > 0 ) {
-				VentSlab.RadHeatingPower() = 0.0;
-				VentSlab.RadHeatingEnergy() = 0.0;
-				VentSlab.RadCoolingPower() = 0.0;
-				VentSlab.RadCoolingEnergy() = 0.0;
+				for ( auto & e : VentSlab ) {
+					e.RadHeatingPower = 0.0;
+					e.RadHeatingEnergy = 0.0;
+					e.RadCoolingPower = 0.0;
+					e.RadCoolingEnergy = 0.0;
+				}
 			}
 
 			// set the initial Temperature of Return Air

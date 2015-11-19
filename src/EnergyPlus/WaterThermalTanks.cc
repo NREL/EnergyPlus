@@ -9,6 +9,7 @@
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -701,10 +702,12 @@ namespace WaterThermalTanks {
 		}
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			WaterThermalTank.AmbientZoneGain() = 0.0;
-			WaterThermalTank.FuelEnergy() = 0.0;
-			WaterThermalTank.OffCycParaFuelEnergy() = 0.0;
-			WaterThermalTank.OnCycParaFuelEnergy() = 0.0;
+			for ( auto & e : WaterThermalTank ) {
+				e.AmbientZoneGain = 0.0;
+				e.FuelEnergy = 0.0;
+				e.OffCycParaFuelEnergy = 0.0;
+				e.OnCycParaFuelEnergy = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 
@@ -4843,16 +4846,18 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).SavedTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
 
 				if ( WaterThermalTank( WaterThermalTankNum ).Nodes > 0 ) {
-					WaterThermalTank( WaterThermalTankNum ).Node.Temp() = WaterThermalTank( WaterThermalTankNum ).TankTemp;
-					WaterThermalTank( WaterThermalTankNum ).Node.SavedTemp() = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+					for ( auto & e : WaterThermalTank( WaterThermalTankNum ).Node ) {
+						e.Temp = e.SavedTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+					}
 				}
 			} else {
 				WaterThermalTank( WaterThermalTankNum ).TankTemp = 20.0;
 				WaterThermalTank( WaterThermalTankNum ).SavedTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
 
 				if ( WaterThermalTank( WaterThermalTankNum ).Nodes > 0 ) {
-					WaterThermalTank( WaterThermalTankNum ).Node.Temp() = WaterThermalTank( WaterThermalTankNum ).TankTemp;
-					WaterThermalTank( WaterThermalTankNum ).Node.SavedTemp() = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+					for ( auto & e : WaterThermalTank( WaterThermalTankNum ).Node ) {
+						e.Temp = e.SavedTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+					}
 				}
 			}
 			WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp = WaterThermalTank( WaterThermalTankNum ).SavedTankTemp;
@@ -4909,16 +4914,18 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).SavedTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
 
 				if ( WaterThermalTank( WaterThermalTankNum ).Nodes > 0 ) {
-					WaterThermalTank( WaterThermalTankNum ).Node.Temp() = WaterThermalTank( WaterThermalTankNum ).TankTemp;
-					WaterThermalTank( WaterThermalTankNum ).Node.SavedTemp() = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+					for ( auto & e : WaterThermalTank( WaterThermalTankNum ).Node ) {
+						e.Temp = e.SavedTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+					}
 				}
 			} else {
 				WaterThermalTank( WaterThermalTankNum ).TankTemp = 20.0;
 				WaterThermalTank( WaterThermalTankNum ).SavedTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
 
 				if ( WaterThermalTank( WaterThermalTankNum ).Nodes > 0 ) {
-					WaterThermalTank( WaterThermalTankNum ).Node.Temp() = WaterThermalTank( WaterThermalTankNum ).TankTemp;
-					WaterThermalTank( WaterThermalTankNum ).Node.SavedTemp() = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+					for ( auto & e : WaterThermalTank( WaterThermalTankNum ).Node ) {
+						e.Temp = e.SavedTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+					}
 				}
 			}
 			WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp = WaterThermalTank( WaterThermalTankNum ).SavedTankTemp;
@@ -6242,7 +6249,7 @@ namespace WaterThermalTanks {
 		if ( Tank.TimeElapsed != TimeElapsed ) {
 			// The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
 			// timestep for use as the initial conditions of each iteration that does not advance the system timestep.
-			Tank.Node.SavedTemp() = Tank.Node.Temp();
+			for ( auto & e : Tank.Node ) e.SavedTemp = e.Temp;
 			Tank.SavedHeaterOn1 = Tank.HeaterOn1;
 			Tank.SavedHeaterOn2 = Tank.HeaterOn2;
 
@@ -6253,7 +6260,7 @@ namespace WaterThermalTanks {
 			Tank.TimeElapsed = TimeElapsed;
 		}
 
-		Tank.Node.Temp() = Tank.Node.SavedTemp();
+		for ( auto & e : Tank.Node ) e.Temp = e.SavedTemp;
 		Tank.HeaterOn1 = Tank.SavedHeaterOn1;
 		Tank.HeaterOn2 = Tank.SavedHeaterOn2;
 
@@ -6477,8 +6484,10 @@ namespace WaterThermalTanks {
 			}
 
 			// Update node temperatures
-			Tank.Node.Temp() = Tank.Node.NewTemp();
-			Tank.Node.TempSum() += Tank.Node.Temp() * dt;
+			for ( auto & e : Tank.Node ) {
+				e.Temp = e.NewTemp;
+				e.TempSum += e.Temp * dt;
+			}
 
 			TimeRemaining -= dt;
 
@@ -6511,12 +6520,14 @@ namespace WaterThermalTanks {
 		Qfuel = Efuel / SecInTimeStep;
 
 		// Calculate average node temperatures over the time step
-		Tank.Node.TempAvg() = Tank.Node.TempSum() / SecInTimeStep;
-		Tank.Node.TempSum() = 0.0; // Reset for next time step
+		for ( auto & e : Tank.Node ) {
+			e.TempAvg = e.TempSum / SecInTimeStep;
+			e.TempSum = 0.0; // Reset for next time step
+		}
 
 		// Calculate instantaneous and average tank temperature (all nodes have equal mass)
-		Tank.TankTemp = sum( Tank.Node.Temp() ) / NumNodes;
-		Tank.TankTempAvg = sum( Tank.Node.TempAvg() ) / NumNodes;
+		Tank.TankTemp = sum( Tank.Node, &StratifiedNodeData::Temp ) / NumNodes;
+		Tank.TankTempAvg = sum( Tank.Node, &StratifiedNodeData::TempAvg ) / NumNodes;
 
 		NodeNum = Tank.UseOutletStratNode;
 		if ( NodeNum > 0 ) Tank.UseOutletTemp = Tank.Node( NodeNum ).TempAvg;
@@ -6678,12 +6689,14 @@ namespace WaterThermalTanks {
 		UseMassFlowRate = Tank.UseMassFlowRate * Tank.UseEffectiveness;
 		SourceMassFlowRate = Tank.SourceMassFlowRate * Tank.SourceEffectiveness;
 
-		Tank.Node.UseMassFlowRate() = 0.0;
-		Tank.Node.SourceMassFlowRate() = 0.0;
-		Tank.Node.MassFlowFromUpper() = 0.0;
-		Tank.Node.MassFlowFromLower() = 0.0;
-		Tank.Node.MassFlowToUpper() = 0.0;
-		Tank.Node.MassFlowToLower() = 0.0;
+		for ( auto & e : Tank.Node ) {
+			e.UseMassFlowRate = 0.0;
+			e.SourceMassFlowRate = 0.0;
+			e.MassFlowFromUpper = 0.0;
+			e.MassFlowFromLower = 0.0;
+			e.MassFlowToUpper = 0.0;
+			e.MassFlowToLower = 0.0;
+		}
 
 		if ( InletMode == InletModeSeeking ) {
 			// 'Seek' the node with the temperature closest to the inlet temperature
@@ -9002,7 +9015,7 @@ namespace WaterThermalTanks {
 		} else if ( SELECT_CASE_var == SizePerPerson ) {
 			// how to get number of people?
 
-			SumPeopleAllZones = sum( Zone.TotOccupants() );
+			SumPeopleAllZones = sum( Zone, &DataHeatBalance::ZoneData::TotOccupants );
 			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerPerson * SumPeopleAllZones;
 			if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, ( ( Tfinish + Tstart ) / 2.0 ), PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
@@ -9037,7 +9050,7 @@ namespace WaterThermalTanks {
 			}
 		} else if ( SELECT_CASE_var == SizePerFloorArea ) {
 
-			SumFloorAreaAllZones = sum( Zone.FloorArea() );
+			SumFloorAreaAllZones = sum( Zone, &DataHeatBalance::ZoneData::FloorArea );
 			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
 			if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, ( ( Tfinish + Tstart ) / 2.0 ), PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
@@ -9753,7 +9766,7 @@ namespace WaterThermalTanks {
 			} else if ( SELECT_CASE_var == SizePerPerson ) {
 				// how to get number of people?
 
-				SumPeopleAllZones = sum( Zone.TotOccupants() );
+				SumPeopleAllZones = sum( Zone, &DataHeatBalance::ZoneData::TotOccupants );
 				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerPerson * SumPeopleAllZones;
 				}
@@ -9774,7 +9787,7 @@ namespace WaterThermalTanks {
 
 			} else if ( SELECT_CASE_var == SizePerFloorArea ) {
 
-				SumFloorAreaAllZones = sum( Zone.FloorArea() );
+				SumFloorAreaAllZones = sum( Zone, &DataHeatBalance::ZoneData::FloorArea );
 				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
 				}
@@ -10031,7 +10044,7 @@ namespace WaterThermalTanks {
 			WaterThermalTank( WaterThermalTankNum ).SetPointTemp = 57.2222; // 135 F
 			WaterThermalTank( WaterThermalTankNum ).SetPointTemp2 = 57.2222; // 135 F
 			WaterThermalTank( WaterThermalTankNum ).TankTemp = 57.2222; // Initialize tank temperature
-			if ( WaterThermalTank( WaterThermalTankNum ).Nodes > 0 ) WaterThermalTank( WaterThermalTankNum ).Node.Temp() = 57.2222;
+			if ( WaterThermalTank( WaterThermalTankNum ).Nodes > 0 ) for ( auto & e : WaterThermalTank( WaterThermalTankNum ).Node ) e.Temp = 57.2222;
 
 			TotalDrawMass = 0.243402 * RhoH2O( InitConvTemp ); // 64.3 gal * rho
 			DrawMass = TotalDrawMass / 6.0; // 6 equal draws
@@ -10055,7 +10068,7 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).SavedTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
 				WaterThermalTank( WaterThermalTankNum ).SavedMode = WaterThermalTank( WaterThermalTankNum ).Mode;
 				if ( WaterThermalTank( WaterThermalTankNum ).Nodes > 0 ) {
-					WaterThermalTank( WaterThermalTankNum ).Node.SavedTemp() = WaterThermalTank( WaterThermalTankNum ).Node.Temp();
+					for ( auto & e : WaterThermalTank( WaterThermalTankNum ).Node ) e.SavedTemp = e.Temp;
 					WaterThermalTank( WaterThermalTankNum ).SavedHeaterOn1 = WaterThermalTank( WaterThermalTankNum ).HeaterOn1;
 					WaterThermalTank( WaterThermalTankNum ).SavedHeaterOn2 = WaterThermalTank( WaterThermalTankNum ).HeaterOn2;
 				}

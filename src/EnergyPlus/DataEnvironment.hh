@@ -3,9 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
-#include <ObjexxFCL/MArray1.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -102,7 +99,7 @@ namespace DataEnvironment {
 	extern Real64 SkyBrightness; // Sky brightness (see subr. DayltgLuminousEfficacy)
 	extern Real64 StdBaroPress; // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
 	extern Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress at elevation
-	extern Real64 rhoAirSTP; // Standard density of dry air at 101325 Pa, 20.0C temperaure 
+	extern Real64 rhoAirSTP; // Standard density of dry air at 101325 Pa, 20.0C temperaure
 	extern Real64 TimeZoneNumber; // Time Zone Number of building location
 	extern Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
 	extern std::string EnvironmentName; // Current environment name (longer for weather file names)
@@ -175,90 +172,10 @@ namespace DataEnvironment {
 	OutBaroPressAt( Real64 const Z ); // Height above ground (m)
 
 	void
-	SetOutBulbTempAt(
-		int const NumItems,
-		Array1S< Real64 > const Heights,
-		Array1S< Real64 > DryBulb,
-		Array1S< Real64 > WetBulb,
-		std::string const & Settings
-	);
-
-	void
 	SetOutBulbTempAt_error(
 		std::string const & Settings,
 		Real64 const max_height
 	);
-
-	template< class H, class D, class W >
-	void
-	SetOutBulbTempAt(
-		int const NumItems,
-		H const & Heights,
-		D DryBulb,
-		W WetBulb,
-		Optional_string_const const & Settings = _
-	)
-	{
-		Real64 BaseDryTemp; // Base temperature at Z = 0 (C)
-		Real64 BaseWetTemp;
-		Real64 Z; // Centroid value
-
-		BaseDryTemp = OutDryBulbTemp + WeatherFileTempModCoeff;
-		BaseWetTemp = OutWetBulbTemp + WeatherFileTempModCoeff;
-
-		if ( SiteTempGradient == 0.0 ) {
-			DryBulb = OutDryBulbTemp;
-			WetBulb = OutWetBulbTemp;
-		} else {
-			for ( int i = 1; i <= NumItems; ++i ) {
-				Z = Heights( i );
-				if ( Z <= 0.0 ) {
-					DryBulb( i ) = BaseDryTemp;
-					WetBulb( i ) = BaseWetTemp;
-				} else {
-					DryBulb( i ) = BaseDryTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-					WetBulb( i ) = BaseWetTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-				}
-			}
-			if ( present( Settings ) ) {
-				if ( any_lt( DryBulb, -100.0 ) || any_lt( WetBulb, -100.0 ) ) {
-					SetOutBulbTempAt_error( Settings, maxval( Heights ) );
-				}
-			}
-		}
-	}
-
-	void
-	SetWindSpeedAt(
-		int const NumItems,
-		Array1S< Real64 > const Heights,
-		Array1S< Real64 > LocalWindSpeed,
-		std::string const & Settings
-	);
-
-	template< class H, class W > // Overload for member arrays
-	void
-	SetWindSpeedAt(
-		int const NumItems,
-		H const Heights,
-		W LocalWindSpeed,
-		std::string const & EP_UNUSED( Settings )
-	)
-	{
-		if ( SiteWindExp == 0.0 ) {
-			LocalWindSpeed = WindSpeed;
-		} else {
-			Real64 const fac( WindSpeed * WeatherFileWindModCoeff * std::pow( SiteWindBLHeight, -SiteWindExp ) );
-			for ( int i = 1; i <= NumItems; ++i ) {
-				Real64 const Z( Heights( i ) );
-				if ( Z <= 0.0 ) {
-					LocalWindSpeed( i ) = 0.0;
-				} else {
-					LocalWindSpeed( i ) = fac * std::pow( Z, SiteWindExp );
-				}
-			}
-		}
-	}
 
 	//     NOTICE
 

@@ -182,10 +182,10 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( 0.5, Node( Furnace( FurnaceNum ).FurnaceInletNodeNum ).MassFlowRate );
 
 		// Clean up
-		Node.deallocate( );
-		Furnace.deallocate( );
-		CurDeadBandOrSetback.deallocate( );
-		Schedule.deallocate( );
+		Node.deallocate();
+		Furnace.deallocate();
+		CurDeadBandOrSetback.deallocate();
+		Schedule.deallocate();
 
 	}
 
@@ -231,7 +231,7 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 1.0, LoopOnOffFanPartLoadRatio );
 
-		Furnace.deallocate( );
+		Furnace.deallocate();
 
 	}
 }

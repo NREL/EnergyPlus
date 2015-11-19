@@ -85,7 +85,7 @@ namespace NodeInputManager {
 
 	// Object Data
 	Array1D< NodeListDef > NodeLists; // Node Lists
-	namespace { 
+	namespace {
 		bool CalcMoreNodeInfoMyOneTimeFlag( true ); // one time flag
 	}
 	// MODULE SUBROUTINES:
@@ -523,9 +523,9 @@ namespace NodeInputManager {
 		rNumbers.allocate( NumNumbers );
 		NumOfNodeLists = GetNumObjectsFound( CurrentModuleObject );
 		NodeLists.allocate( NumOfNodeLists );
-		if ( NumOfNodeLists > 0 ) {
-			NodeLists( {1,NumOfNodeLists} ).Name() = "";
-			NodeLists( {1,NumOfNodeLists} ).NumOfNodesInList() = 0;
+		for ( int i = 1; i <= NumOfNodeLists; ++i ) {
+			NodeLists( i ).Name.clear();
+			NodeLists( i ).NumOfNodesInList = 0;
 		}
 
 		NCount = 0;
@@ -1145,7 +1145,7 @@ namespace NodeInputManager {
 						}
 					}
 				}
-				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Wetbulb Temperature" ) ) { 
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Wetbulb Temperature" ) ) {
 					NodeWetBulbRepReq( iNode ) = true;
 					NodeWetBulbSchedPtr( iNode ) = 0;
 				}

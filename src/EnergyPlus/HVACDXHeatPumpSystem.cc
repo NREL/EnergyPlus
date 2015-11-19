@@ -1,9 +1,6 @@
 // C++ Headers
 #include <cmath>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-
 // EnergyPlus Headers
 #include <HVACDXHeatPumpSystem.hh>
 #include <BranchNodeConnections.hh>

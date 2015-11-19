@@ -3945,7 +3945,7 @@ namespace FuelCellElectricGenerator {
 		if ( NumFuelCellGenerators == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			FuelSupply.QskinLoss() = 0.0;
+			for ( auto & e : FuelSupply ) e.QskinLoss = 0.0;
 			MyEnvrnFlag = false;
 			for ( int i = FuelCell.l(), e = FuelCell.u(); i <= e; ++i) {
 				auto & cell( FuelCell( i ) );
