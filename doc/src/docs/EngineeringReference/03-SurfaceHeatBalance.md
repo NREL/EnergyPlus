@@ -320,29 +320,30 @@ The Conduction Finite Difference algorithm can also invoke the source/sink layer
 
 ### Conduction Finite Difference Heat Flux Outputs
 
-The Conduction Finite Difference algorithm can output the heat flux across the interface between nodes and the heat capacitance of each node.  During the CondFD solution iterations, the heat capacitance of each node (CondFD Surface Heat Capacitance Node < n  >) is stored:
+The Conduction Finite Difference algorithm can output the heat flux at each node and the heat capacitance of each half-node.  During the CondFD solution iterations, the heat capacitance of each half node (CondFD Surface Heat Capacitance Node < n  >) is stored:
 
-<div>$${CpDelXRhoSCp_{i} = Cp_{i}*\Delta x_{i}*\rho_{i}}$$</div>
+<div>$${HeatCap_{i} = Cp_{i}*\Delta x_{i}*\rho_{i}}$$</div>
 
-For nodes which are at the interface of two materials the heat capacitance of the two parts are added together.
+For nodes which are at the inside or outside face of the surface, there is only one half-node.
 
-After the CondFD node temperatures have been solved for a given timestep, the heat fluxes (CondFD Surface Heat Flux From Node < i > To Node < i+1 >) are calculated beginning with the inside face of the surface.
+After the CondFD node temperatures have been solved for a given timestep, the heat fluxes (CondFD Surface Heat Flux Node < i > ) are calculated beginning with the inside face of the surface.
 
-<div>$${QDreport_{N-1} = Q_{inside}+CpDelXRhoSCp_{N}* \frac{\left(T_{N,new}-T_{N,old}\right)}{\Delta t}}$$</div>
+<div>$${QDreport_{N} = Q_{inside}}$$</div>
  
 for the remaining nodes
 
-<div>$${QDreport_{i} = QDreport_{i+1}+CpDelXRhoSCp_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old}\right)}{\Delta t}}$$</div>
+<div>$${QDreport_{i} = QDreport_{i+1}+HeatCap2_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old}\right)}{\Delta t}+HeatCap1_{i}* \frac{\left(T_{i,new}-T_{i,old}\right)}{\Delta t}}$$</div>
 
 Where:
 
-QDReport = CondFD Surface Heat Flux From Node < i > To Node < i+1 
+HeatCap1<sub>i</sub> = heat capacitance associated with a given outer half-node
+HeatCap2<sub>i</sub> = heat capacitance associated with a given inner half-node
+QDreport<sub>i</sub> = CondFD Surface Heat Flux Node < i >
 
 Q<sub>inside</sub> = Surface Inside Face Conduction Heat Transfer Rate per Area [W/m<sup>2</sup>]
 
-N = total number of nodes in a surface including the surface inside face node (Note that the variable *TotNodes* used in the source code is actually N-1. The surface inside face node is referenced as *TotNodes+1*.)
-
-
+N = total number of nodes in a surface including the surface inside face node.
+Note that the variable *TotNodes* used in the source code is actually N-1. The surface inside face node is referenced as *TotNodes+1*.
 
 ### References
 
