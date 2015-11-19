@@ -2031,6 +2031,8 @@ namespace HVACUnitarySystem {
 			EqSizing.DesCoolingLoad = max( EqSizing.DesCoolingLoad, EqSizing.DesHeatingLoad );
 			EqSizing.DesHeatingLoad = EqSizing.DesCoolingLoad;
 			DXCoolCap = EqSizing.DesCoolingLoad;
+		} else if( !UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+			DXCoolCap = EqSizing.DesHeatingLoad;
 		}
 
 
@@ -10830,7 +10832,6 @@ namespace HVACUnitarySystem {
 					ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = false;
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = false;
 				}
-
 				UnitarySystem( UnitarySysNum ).FirstPass = false;
 
 			}
