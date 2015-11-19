@@ -249,6 +249,14 @@ namespace SetPointManager {
 			Optional_bool_const InitFlag = _ // When Init Calls this routine, it passes True
 		);
 
+		Real64
+		CalcSetPoint(
+			Real64 OutLowTemp,
+			Real64 OutHighTemp,
+			Real64 OutDryBulbTemp,
+			Real64 SetTempAtOutLow,
+			Real64 SetTempAtOutHigh
+		);
 	};
 
 	struct DefineSZReheatSetPointManager // Derived type for the Single Zone Reheat Setpoint Manager data
@@ -1266,6 +1274,7 @@ namespace SetPointManager {
 								 int const CompOpType,
 								 int const ControlNodeNum
 								 );
+
 	
 	//     NOTICE
 

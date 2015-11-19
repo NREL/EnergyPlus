@@ -98,9 +98,6 @@ namespace EnergyPlus {
 	TEST_F( DataSetFixture, RefrigerationCasesDataSet ) {
 		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" ) ) ) );
 	}
-	TEST_F( DataSetFixture, RefrigerationCasesSetNumberOne ) {
-		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesSetNumberOne.idf" ) ) ) );
-	}
 	TEST_F( DataSetFixture, RefrigerationCompressorCurves ) {
 		ASSERT_FALSE( process_idf( delimited_string( getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" ) ) ) );
 	}

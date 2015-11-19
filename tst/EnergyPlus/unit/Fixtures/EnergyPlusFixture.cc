@@ -63,6 +63,8 @@
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
@@ -73,12 +75,9 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/OutputReportTabularAnnual.hh>
-
-#include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -86,7 +85,9 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
@@ -181,6 +182,7 @@ namespace EnergyPlus {
 		OutdoorAirUnit::clear_state();
 		OutputProcessor::clear_state();
 		OutputReportPredefined::clear_state();
+		OutputReportTabular::clear_state();
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
 		PlantCondLoopOperation::clear_state();
@@ -191,14 +193,16 @@ namespace EnergyPlus {
 		Pipes::clear_state();
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
+		PurchasedAirManager::clear_state();
+		RuntimeLanguageProcessor::clear_state();
 		ScheduleManager::clear_state();
-		VariableSpeedCoils::clear_state();
 		SetPointManager::clear_state();
 		SimAirServingZones::clear_state();
 		SimulationManager::clear_state();
 		SizingManager::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
+		SurfaceGeometry::clear_state();
 		SystemAvailabilityManager::clear_state();
 		ThermalComfort::clear_state();
 		VariableSpeedCoils::clear_state();

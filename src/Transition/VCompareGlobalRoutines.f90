@@ -839,7 +839,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,4,OutArgs,FieldNames,FieldUnits)
           IF (MakeUPPERCase(OutArgs(4)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-4)/3
-          ELSEIF (OutArgs(3) == '') THEN
+          ELSEIF (OutArgs(4) == '') THEN
             NVert=(CurArgs-4)/3
           ELSE
             READ(OutArgs(4),*) NVert
