@@ -64,8 +64,6 @@ namespace IceThermalStorage {
 	using DataGlobals::HourOfDay;
 	using DataGlobals::TimeStep;
 	using DataGlobals::ScheduleAlwaysOn;
-	using DataEnvironment::OutWetBulbTemp; // This value is used to model Cooling Tower.  Twb + 2[degF]
-	using DataEnvironment::OutDryBulbTemp;
 	using namespace DataHVACGlobals;
 	using General::TrimSigDigits;
 

@@ -944,7 +944,7 @@ namespace EvaporativeCoolers {
 		static int AirSysBranchLoop( 0 );
 		static int BranchComp( 0 );
 		bool HardSizeNoDesRun;			// Indicator to a hard-sized field with no design sizing data
-		bool IsAutoSize;				// Indicator to autosize 
+		bool IsAutoSize;				// Indicator to autosize
 		Real64 IndirectVolFlowRateDes;	// Autosized volume flow rate for reporting
 		Real64 IndirectVolFlowRateUser;	// Hardsized volume flow rate for reporting
 		bool SizingDesRunThisAirSys;	// true if a particular air system had a Sizing:System object and system sizing done
@@ -1070,7 +1070,7 @@ namespace EvaporativeCoolers {
 			} else {
 				if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 && IndirectVolFlowRateDes > 0.0 ) {
 					IndirectVolFlowRateUser = EvapCond( EvapCoolNum ).IndirectVolFlowRate;
-					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName,
 						"Design Size Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateDes,
 						"User-Specified Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateUser );
 					if ( DisplayExtraWarnings ) {
@@ -1100,7 +1100,7 @@ namespace EvaporativeCoolers {
 			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
-					//ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName, 
+					//ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName,
 						//"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
 				//}
 			} else {  // Autosize or hardsize with design data
@@ -1113,11 +1113,11 @@ namespace EvaporativeCoolers {
 			}
 		} else if ( CurZoneEqNum > 0 ) { //zone equipment
 			// zone equip evap coolers
-			
+
 			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
-				//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
+				//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName,
 				//"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
 				//}
 			} else {  // Autosize or hardsize with design data
@@ -1141,7 +1141,7 @@ namespace EvaporativeCoolers {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 && IndirectVolFlowRateDes > 0.0 ) {
 					//IndirectVolFlowRateUser = EvapCond( EvapCoolNum ).IndirectVolFlowRate;
-					//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName,
 						//"Design Size Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateDes,
 						//"User-Specified Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateUser );
 					//if ( DisplayExtraWarnings ) {
@@ -1201,7 +1201,7 @@ namespace EvaporativeCoolers {
 					IndirectVolFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
 					// Face air velocity of 3m/s is assumed
 					PadAreaDes = IndirectVolFlowRateDes / 3.0;
-				}				
+				}
 			} else {
 
 			}
@@ -1209,7 +1209,7 @@ namespace EvaporativeCoolers {
 			if ( !HardSizeNoDesRun ) {
 				if ( IsAutoSize ) {
 					EvapCond( EvapCoolNum ).PadArea = PadAreaDes;
-					ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
 						"Design Size Celdek Pad Area [m2]", PadAreaDes );
 				} else {
 					if ( EvapCond( EvapCoolNum ).PadArea > 0.0 && PadAreaDes > 0.0 ) {
@@ -1237,19 +1237,19 @@ namespace EvaporativeCoolers {
 			if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
 				HardSizeNoDesRun = true;
 			}
-			// The following regression equation is used to determine pad depth, 
-			// assuming saturation effectiveness of 70% and face air velocity of 3m/s: 
+			// The following regression equation is used to determine pad depth,
+			// assuming saturation effectiveness of 70% and face air velocity of 3m/s:
 			// Effectiveness = 0.792714 + 0.958569D - 0.25193V - 1.03215D^2 + 0.0262659V^2 + 0.914869DV -
 			// 1.48241VD^2 - 0.018992V^3D + 1.13137D^3V + 0.0327622V^3D^2 - 0.145384D^3V^2
 			PadDepthDes = 0.17382;
 			if ( IsAutoSize ) {
 				EvapCond( EvapCoolNum ).PadDepth = PadDepthDes;
-				ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName, 
+				ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
 					"Design Size Celdek Pad Depth [m]", PadDepthDes );
 			} else {
 				if ( EvapCond( EvapCoolNum ).PadDepth > 0.0 && PadDepthDes > 0.0 ) {
 					PadDepthUser = EvapCond( EvapCoolNum ).PadDepth;
-					ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
 						"Design Size Celdek Pad Depth [m]", PadDepthDes, "User-Specified Celdek Pad Depth [m]", PadDepthUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( PadDepthDes - PadDepthUser ) / PadDepthUser ) > AutoVsHardSizingThreshold ) {
@@ -1280,7 +1280,7 @@ namespace EvaporativeCoolers {
 				// search for this component in Air loop branches.
 				for ( AirSysBranchLoop = 1; AirSysBranchLoop <= PrimaryAirSystem( CurSysNum ).NumBranches; ++AirSysBranchLoop) {
 					for ( BranchComp = 1; BranchComp <= PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).TotalComponents; ++BranchComp ) {
-						if ( SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name, 
+						if ( SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name,
 							EvapCond( EvapCoolNum ).EvapCoolerName ) ) {
 							CoolerOnMainAirLoop = true;
 						}
@@ -1327,7 +1327,7 @@ namespace EvaporativeCoolers {
 			if ( !HardSizeNoDesRun ) {
 				if ( IsAutoSize ) {
 					EvapCond( EvapCoolNum ).IndirectPadArea = PadAreaDes;
-					ReportSizingOutput( "EvaporativeCooler:Indirect:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					ReportSizingOutput( "EvaporativeCooler:Indirect:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
 						"Design Size Celdek Pad Area [m2]", PadAreaDes );
 				} else {
 					if ( EvapCond( EvapCoolNum ).IndirectPadArea > 0.0 && PadAreaDes > 0.0 ) {
@@ -1352,8 +1352,8 @@ namespace EvaporativeCoolers {
 			if ( EvapCond( EvapCoolNum ).IndirectPadDepth == AutoSize ) {
 				IsAutoSize = true;
 			}
-			// The following regression equation is used to determine pad depth, 
-			// assuming saturation effectiveness of 70% and face air velocity of 3m/s: 
+			// The following regression equation is used to determine pad depth,
+			// assuming saturation effectiveness of 70% and face air velocity of 3m/s:
 			// Effectiveness = 0.792714 + 0.958569D - 0.25193V - 1.03215D^2 + 0.0262659V^2 + 0.914869DV -
 			// 1.48241VD^2 - 0.018992V^3D + 1.13137D^3V + 0.0327622V^3D^2 - 0.145384D^3V^2
 
@@ -1393,7 +1393,7 @@ namespace EvaporativeCoolers {
 				ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
 			}
 		}
-		
+
 		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
 			// recirculating water pump sizing: Primary Air Design flow Rate (m3/s) * Pump Sizing Factor (W/(m3/s)
 			if ( EvapCond( EvapCoolNum ).RecircPumpPower == AutoSize ) {
@@ -1401,7 +1401,7 @@ namespace EvaporativeCoolers {
 				ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).RecircPumpPower );
 			}
 		}
-		
+
 	}
 
 	// End Initialization Section of the Module
@@ -1952,7 +1952,6 @@ namespace EvaporativeCoolers {
 
 		// Using/Aliasing
 		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::OutBaroPress;
 		using CurveManager::CurveValue;
 
@@ -2205,7 +2204,6 @@ namespace EvaporativeCoolers {
 
 		// Using/Aliasing
 		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::OutBaroPress;
 		using CurveManager::CurveValue;
 		using General::SolveRegulaFalsi;

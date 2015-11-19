@@ -87,7 +87,6 @@ namespace HVACMultiSpeedHeatPump {
 	using DataEnvironment::StdRhoAir;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::OutDryBulbTemp;
-	using DataEnvironment::OutWetBulbTemp;
 	using DataEnvironment::OutHumRat;
 	using DataEnvironment::CurMnDy;
 	using DataEnvironment::EnvironmentName;

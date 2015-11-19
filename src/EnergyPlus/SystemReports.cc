@@ -2978,7 +2978,6 @@ namespace SystemReports {
 		using namespace DataZoneEnergyDemands;
 		using Psychrometrics::PsyHFnTdbW;
 		using namespace DataGlobalConstants;
-		using DataEnvironment::OutDryBulbTemp;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

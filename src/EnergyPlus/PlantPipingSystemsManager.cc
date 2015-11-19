@@ -3069,7 +3069,7 @@ namespace PlantPipingSystemsManager {
 		for ( int I = X.l1(), I_end = X.u1() - 1; I <= I_end; ++I ) {
 			int loc( 1 ), l( 1 );
 			Real64 r_min( std::numeric_limits< Real64 >::max() );
-			for ( int j = I; j <= I_end; ++j, ++l ) {
+			for ( int j = I, j_end = X.u1(); j <= j_end; ++j, ++l ) {
 				if ( X( j ).rDimension < r_min ) {
 					r_min = X( j ).rDimension;
 					loc = l;

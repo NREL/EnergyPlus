@@ -2347,8 +2347,6 @@ namespace PlantManager {
 		// na
 
 		// Using/Aliasing
-		using DataEnvironment::OutWetBulbTemp;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::StdBaroPress;
 		using HVACInterfaceManager::PlantCommonPipe;
 		using ScheduleManager::GetCurrentScheduleValue;

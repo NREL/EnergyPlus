@@ -1073,7 +1073,6 @@ namespace VentilatedSlab {
 
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
 		using DataGlobals::NumOfZones;
@@ -2858,11 +2857,11 @@ namespace VentilatedSlab {
 
 
 	void
-		CalcVentilatedSlabCoilOutput(
+	CalcVentilatedSlabCoilOutput(
 		int const Item, // system index in ventilated slab array
 		Real64 & PowerMet, // power supplied (W)
 		Real64 & LatOutputProvided // latent capacity supplied (kg/s)
-		)
+	)
 	{
 
 		// SUBROUTINE INFORMATION:

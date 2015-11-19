@@ -3360,7 +3360,6 @@ namespace HVACVariableRefrigerantFlow {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataEnvironment::StdRhoAir;
 		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using MixedAir::SimOAMixer;
 		using MixedAir::SimOAController;
 		using DataZoneEquipment::ZoneEquipList;
@@ -5345,7 +5344,6 @@ namespace HVACVariableRefrigerantFlow {
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using HeatingCoils::SimulateHeatingCoilComponents;
-		using DataEnvironment::OutDryBulbTemp;
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
@@ -5613,7 +5611,6 @@ namespace HVACVariableRefrigerantFlow {
 		using SteamCoils::SimulateSteamCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using InputProcessor::SameString;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataSizing::AutoSize;
 		//  USE WaterToAirHeatPumpSimple,  ONLY: SimWatertoAirHPSimple
 		using DataAirLoop::LoopDXCoilRTF;
@@ -8405,7 +8402,6 @@ namespace HVACVariableRefrigerantFlow {
 		using SteamCoils::SimulateSteamCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using InputProcessor::SameString;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataSizing::AutoSize;
 		//  USE WaterToAirHeatPumpSimple,  ONLY: SimWatertoAirHPSimple
 		using DataAirLoop::LoopDXCoilRTF;

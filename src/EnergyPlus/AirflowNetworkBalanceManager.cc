@@ -92,7 +92,6 @@ namespace AirflowNetworkBalanceManager {
 	using DataEnvironment::CurMnDy;
 	using DataEnvironment::EnvironmentName;
 	using DataEnvironment::OutAirDensity;
-	using DataEnvironment::WindSpeed;
 	using DataEnvironment::WindDir;
 	using DataEnvironment::OutEnthalpy;
 	using DataEnvironment::StdRhoAir;
