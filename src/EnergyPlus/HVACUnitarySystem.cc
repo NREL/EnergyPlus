@@ -2711,6 +2711,7 @@ namespace HVACUnitarySystem {
 		bool AirLoopFound; // used in error checking
 		bool OASysFound; // used in error checking
 		bool ZoneEquipmentFound; // TRUE if Unitary System found connected to zone exhaust node
+		bool ZoneInletNodeFound; // TRUE if Unitary System found node connection to zone inlet node
 		bool errFlag; // Mining function error flag
 		bool PrintMessage; // flag to print or not print message
 		bool InletNodeNotControlled; // True if using controller on water coil
@@ -4932,21 +4933,24 @@ namespace HVACUnitarySystem {
 								UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).HeatingPriority( EquipNum );
 							}
 						}
-						if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) {
+						UnitarySystem( UnitarySysNum ).ControlZoneNum = ControlledZoneNum;
+						break;
+					}
+					if ( ZoneEquipmentFound ) {
+						for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
+							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
+								ZoneInletNodeFound = true;
+							break;
+						}
+						if ( ! ZoneInletNodeFound ) {
 							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "Illegal " + cAlphaFields( iAirOutletNodeNameAlphaNum ) + " = " + Alphas( iAirOutletNodeNameAlphaNum ) );
 							ErrorsFound = true;
 						}
-						UnitarySystem( UnitarySysNum ).ControlZoneNum = ControlledZoneNum;
-						break;
-					}
-					for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
-						if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
-						if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) {
-							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-							ShowContinueError( "Illegal " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas( iAirInletNodeNameAlphaNum ) );
-							ErrorsFound = true;
-						}
+					} else {
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Illegal " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas( iAirInletNodeNameAlphaNum ) );
+						ErrorsFound = true;
 					}
 				}
 			}
