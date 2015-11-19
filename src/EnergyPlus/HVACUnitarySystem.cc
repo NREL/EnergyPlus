@@ -2031,7 +2031,7 @@ namespace HVACUnitarySystem {
 			EqSizing.DesCoolingLoad = max( EqSizing.DesCoolingLoad, EqSizing.DesHeatingLoad );
 			EqSizing.DesHeatingLoad = EqSizing.DesCoolingLoad;
 			DXCoolCap = EqSizing.DesCoolingLoad;
-		} else if( !UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+		} else if( ! UnitarySystem( UnitarySysNum ).CoolCoilExists && CurZoneEqNum > 0 ) {
 			DXCoolCap = EqSizing.DesHeatingLoad;
 		}
 
@@ -4869,6 +4869,7 @@ namespace HVACUnitarySystem {
 			AirLoopFound = false;
 			OASysFound = false;
 			ZoneEquipmentFound = false;
+			ZoneInletNodeFound = false;
 
 			// check if the UnitarySystem is connected to an air loop
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
@@ -4942,33 +4943,41 @@ namespace HVACUnitarySystem {
 								ZoneInletNodeFound = true;
 							break;
 						}
-						if ( ! ZoneInletNodeFound ) {
-							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-							ShowContinueError( "Illegal " + cAlphaFields( iAirOutletNodeNameAlphaNum ) + " = " + Alphas( iAirOutletNodeNameAlphaNum ) );
-							ErrorsFound = true;
+					}
+				}
+				if ( ! ZoneInletNodeFound ) {
+					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+						for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
+							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
+								ZoneInletNodeFound = true;
+								ZoneEquipmentFound = true;
+							break;
 						}
-					} else {
+					}
+					if ( ! ZoneInletNodeFound ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-						ShowContinueError( "Illegal " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas( iAirInletNodeNameAlphaNum ) );
+						ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirOutletNodeNameAlphaNum ) + " = " + Alphas( iAirOutletNodeNameAlphaNum ) );
+						ShowContinueError( "Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections object inputs." );
 						ErrorsFound = true;
 					}
+				}
+				if ( ! ZoneEquipmentFound ) {
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas( iAirInletNodeNameAlphaNum ) );
+					ShowContinueError( "Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections object inputs." );
+					ErrorsFound = true;
 				}
 			}
 
 			if ( AirLoopNumber == 0 && ! ZoneEquipmentFound && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( iNameAlphaNum ) );
-				ShowContinueError( "Did not find an AirLoopHVAC." );
+				ShowContinueError( "Did not find proper connection for AirLoopHVAC or ZoneHVAC system." );
 				ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
 				if ( ! AirNodeFound && ! ZoneEquipmentFound ) {
 					ShowSevereError( CurrentModuleObject + " = " + Alphas( iNameAlphaNum ) );
 					ShowContinueError( "Did not find air node (zone with thermostat)." );
 					ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
 					ShowContinueError( "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone." );
-				}
-				if ( ! AirLoopFound && ! ZoneEquipmentFound ) {
-					ShowSevereError( CurrentModuleObject + " = " + Alphas( iNameAlphaNum ) );
-					ShowSevereError( "Did not find correct AirLoopHVAC." );
-					ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
 				}
 				ErrorsFound = true;
 			}

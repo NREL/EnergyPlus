@@ -1041,6 +1041,9 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolAirMassFlow * UnitarySystem( 1 ).PartLoadFrac ); // cycling fan
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
 
+	// new tests for #5287, need to add an air loop to do this unit test justice
+	EXPECT_TRUE( UnitarySystem( 1 ).FanIndex > 0 ); // ZoneHVAC must contain a fan object to provide flow
+	EXPECT_EQ( UnitarySystem( 1 ).FanType_Num, DataHVACGlobals::FanType_SimpleOnOff ); // fan must be FanOnOff when used with cycling fan
 
 	// clean up non clear-state arrays
 	ZoneSysEnergyDemand.deallocate();
