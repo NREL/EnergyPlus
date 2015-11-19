@@ -721,6 +721,9 @@ namespace PurchasedAirManager {
 	Real64
 	GetPurchasedAirMixedAirHumRat( int const PurchAirNum );
 
+	void
+	clear_state();
+
 } // PurchasedAirManager
 
 } // EnergyPlus
