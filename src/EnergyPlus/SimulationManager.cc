@@ -249,7 +249,7 @@ namespace SimulationManager {
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
 		using FaultsManager::CheckAndReadFaults;
-		using PlantPipingSystemsManager::InitAndSimGroundDomains;
+		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
 		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
@@ -504,7 +504,7 @@ namespace SimulationManager {
 
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
 						if ( AnySlabsInModel || AnyBasementsInModel ) {
-							InitAndSimGroundDomains();
+							SimulateGroundDomains( false );
 						}
 
 						BeginTimeStepFlag = true;
@@ -1537,7 +1537,7 @@ namespace SimulationManager {
 		using CostEstimateManager::SimCostEstimate;
 		using General::TrimSigDigits;
 		using namespace DataTimings;
-		using PlantPipingSystemsManager::InitAndSimGroundDomains;
+		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
 
@@ -1634,7 +1634,7 @@ namespace SimulationManager {
 		} // ... End environment loop.
 
 		if ( AnySlabsInModel || AnyBasementsInModel ) {
-			InitAndSimGroundDomains();
+			SimulateGroundDomains( true );
 		}
 
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
