@@ -115,3 +115,4 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
 	CalcWaterMainsTemp();
 	EXPECT_NEAR(WaterMainsTemp, 19.3799, 0.0001);
 }
+
