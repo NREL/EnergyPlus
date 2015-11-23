@@ -19,7 +19,7 @@ The ASHRAE Handbook of Fundamentals describes their criteria in creating design 
 
 In EnergyPlus, the typical design day input includes a “high” and a “low” dry-bulb temperature for the day. As these two temperatures are insufficient to represent a full 24 hour period, the program uses a “range multiplier” profile to represent the full day’s temperatures:
 
-![](media/image563.svg.png)
+![](media/image563.png)
 
 Figure 36. Default Daily Temperature Range Profile
 

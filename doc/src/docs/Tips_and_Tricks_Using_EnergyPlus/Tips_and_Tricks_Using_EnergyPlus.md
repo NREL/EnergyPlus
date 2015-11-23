@@ -1,8 +1,7 @@
-![](media/ep.gif)
+![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
-<hr>
 <h1>Tips &amp; Tricks for Using EnergyPlus</h1>
 <h2>Insider secrets to Using EnergyPlus</h2>
 <br/>
@@ -1059,7 +1058,7 @@ The Other Side Coefficient (OSC) equation permits setting either the outside sur
 
 <div>\[ T = N_2 T_{zone} + N_3 T_{oadb} + N_4 N_5 + N_6 T_{grnd} + N_7 W_{spd} T_{oadb} \]</div>
 
-where: 
+where:
 
 * <span>\(T\)</span> = Outside Air Temperature when N1 (Combined convective/radiative film Coeff) &gt; 0
 

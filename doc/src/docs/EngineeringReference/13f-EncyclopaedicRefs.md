@@ -2176,7 +2176,7 @@ The input objects `WaterHeater:HeatPump:*` provide models for a heat pump water 
 
 There are two types of heat pump water heater models available:
 
-1. `WaterHeater:HeatPump:PumpedCondenser`: This model is used to represent a heat pump water heater where water is removed from the tank, pumped through a condenser, and returned to the tank at a higher temperature. 
+1. `WaterHeater:HeatPump:PumpedCondenser`: This model is used to represent a heat pump water heater where water is removed from the tank, pumped through a condenser, and returned to the tank at a higher temperature.
 2. `WaterHeater:HeatPump:WrappedCondenser`: This model is used for heat pump water heaters that are more typical in the residential building context where the heating coil is wrapped around or submerged in the tank.
 
 Each type of `WaterHeater:HeatPump:*` object is compatible with certain `Coil:WaterHeating:AirToWaterHeatPump:*` objects as shown in the following table:
@@ -3103,7 +3103,7 @@ In the case of no drainwater heat recovery, the subsystem wastewater temperature
 
 Finally, if plant-coupled, the return water temperature, <span>\({T_{return}}\)</span>, is passed on to the plant outlet node.  <span>\({T_{return}}\)</span> is taken from the cold water supply schedule or the water mains.  The return flow rate is equal to the hot water supply flow rate in order to preserve a closed plant loop:  <span>\({\dot M_{return}}\)</span> = <span>\({\dot M_{hot}}\)</span>.
 
-For "connected" water equipment, the heating rate and energy that is required to supply the hot water for individual water equipment is calculated by the following equations. 
+For "connected" water equipment, the heating rate and energy that is required to supply the hot water for individual water equipment is calculated by the following equations.
 
 <div>$$Q = {\dot m_{hot}}{c_p}\left( {{T_{hot}} - {T_{return}}} \right)$$</div>
 
@@ -5107,7 +5107,7 @@ The Cool Tower (object ZoneCoolTower:Shower) is available for modeling a cooltow
 
 The shower cooling tower shown in figure below is controlled by a schedule and the specification of maximum water flow rate and volume flow rate as well as minimum indoor temperature. The actual flow rate of water and air can be controlled as users specify the fractions of water loss and flow schedule. The required input fields include effective tower height and exit area to obtain the temperature and flow rate of the air exiting the tower. A schedule and rated power for the water pump are also required to determine the power consumed. The component typically has a stand-alone water system that is not added to the water consumption from mains. However, users are required to specify the water source through an optional field, the name of water supply storage tank, in case any water comes from a water main.
 
-![cooltower config](media/image7400.svg.png)
+![cooltower config](media/image7400.png)
 
 Figure 330. Typical Cooltower Configuration
 

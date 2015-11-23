@@ -87,16 +87,16 @@ The traditional method for calculating conduction transfer functions is describe
 The transformed equations are solved and then put in matrix form as shown below:
 
 <div>$$
-  \left[ 
+  \left[
     {\begin{array}{*{20}{c}}
       {{T_1}\left( s \right)} \\ {{q_1}\left( s \right)}
     \end{array}}
-  \right] = \left[ 
+  \right] = \left[
     {\begin{array}{*{20}{c}}
       {{A_1}\left( s \right)}&{{B_1}\left( s \right)} \\
       {{C_1}\left( s \right)}&{{D_1}\left( s \right)}
     \end{array}}
-  \right] \left[ 
+  \right] \left[
     {\begin{array}{*{20}{c}}
       {{T_2}\left( s \right)} \\
       {{q_2}\left( s \right)}
@@ -192,7 +192,7 @@ In matrix format:
 
 <div>$$\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\ {{{q''}_o}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}0&{ - h}\\h&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ {{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0&h\\ { - h}&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\ {{T_i}}\end{array}} \right]$$</div>
 
-![](media/image6008.svg.png)
+![](media/image6008.png)
 
 Figure 268. Two Node State Space Example
 
@@ -286,7 +286,7 @@ The nodal equations for the finite difference network shown in Figure 270 are:
 
 <div>$${q''_o} = h\left( {{T_1} - {T_o}} \right)$$</div>
 
-![](media/image6034.svg.png)
+![](media/image6034.png)
 
 Figure 270.  Two Node State Space Example with a Heat Source
 
@@ -1920,7 +1920,7 @@ The Air Volume Ratio is limited by a minimum value, which may be specified by th
 
 Four fan curves are built into the condenser fan model to represent four types of fan control, as shown in Figure 283. (Lawrence Berkeley Laboratory and Resource Dynamics, April 2003)
 
-![](media/image6291.svg.png)
+![](media/image6291.png)
 
 Figure 283. Condenser fan power curve options
 
@@ -1982,7 +1982,7 @@ C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub>, and C<sub>4</sub>     =    
 
 Figure 284 shows a comparison between this equation form, which produced an adjusted R<sup>2</sup> of 0.998 and a maximum residual of 0.7C, for one manufacturer of evaporative condensers. Data from two other manufacturers showed similar agreement with this parameterization.
 
-![](media/image6301.svg.png)
+![](media/image6301.png)
 
 Figure 284. Comparison of the condensing temperature predicted by four-factor equation to manufacturer's data
 
@@ -3134,7 +3134,7 @@ The object determines a “near-optimal” condenser water entering set point at
 
 The input objects:
 
-* SetpointManager:ReturnTemperature:ChilledWater, and 
+* SetpointManager:ReturnTemperature:ChilledWater, and
 
 * SetpointManager:ReturnTemperature:HotWater
 
@@ -3146,7 +3146,7 @@ The target return temperature can be specified by:
 
 * scheduling the value to vary through the simulation (which then allows custom EMS overriding of the scheduled value), or
 
-* using a separate setpoint manager to set the setpoint on the return node itself, which is then retrieved by this reset manager.  
+* using a separate setpoint manager to set the setpoint on the return node itself, which is then retrieved by this reset manager.
 
 #### Operation
 
@@ -3178,7 +3178,7 @@ This isn't necessarily a big problem.  However, some users may be especially int
 
 ![](media/SetPointManager-ResetForReturnControl2.png)
 
-With the smaller time step, the reporting frequency is higher.  But more importantly, with the smaller time step, the setpoint can be corrected much more often.  Because of this, the return temperature regains control much quicker than with the larger time step.  
+With the smaller time step, the reporting frequency is higher.  But more importantly, with the smaller time step, the setpoint can be corrected much more often.  Because of this, the return temperature regains control much quicker than with the larger time step.
 
 However, these examples are for a jagged demand profile full of discontinuous step changes in loop demand.  As a final example, this return water temperature control is applied to the large office reference building chilled water loop.  Here is the response:
 
@@ -4015,7 +4015,7 @@ where,
 
 The *plenum* is the volume of air located between the collector and the underlying heat transfer surface.  The plenum air is modeled as well-mixed.  The uniform temperature of the plenum air, <span>\({T_{a,plen}}\)</span>, is determined by formulating a heat balance on a control volume of air as diagrammed below.
 
-Note that we have formulated the control volumes with slight differences for the active and passive cases.  For the active case, the suction air situation and heat exchanger effectiveness formulations dictate that the collector surface control volume encompass part of the air adjacent to both the front and back surfaces of the collector.  However for the passive case, the collector surface control volume has no air in it and the plenum air control volume extends all the way to the surface of the collector. 
+Note that we have formulated the control volumes with slight differences for the active and passive cases.  For the active case, the suction air situation and heat exchanger effectiveness formulations dictate that the collector surface control volume encompass part of the air adjacent to both the front and back surfaces of the collector.  However for the passive case, the collector surface control volume has no air in it and the plenum air control volume extends all the way to the surface of the collector.
 
 
 
@@ -4543,7 +4543,7 @@ In practice most of the HVAC control manufacturers use a temperature gradient as
 
 #### Adaptive Temperature Gradient
 
-Adaptive control is used to modify the temperature gradient depending on the time required to meet the set-point on the prior days. The adaptive algorithm takes the arithmetic average of the actual temperature gradients calculated for the specified number of previous days. 
+Adaptive control is used to modify the temperature gradient depending on the time required to meet the set-point on the prior days. The adaptive algorithm takes the arithmetic average of the actual temperature gradients calculated for the specified number of previous days.
 
 #### Adaptive ASHRAE Algorithm
 

@@ -170,7 +170,7 @@ where,
 
 KiBaM views the battery as a voltage source in series with an electric resistance (Figure 338). The internal resistance is assumed to be constant and the open circuit voltage varies with current and state of charge.
 
-![](media/image7528.svg.png)
+![](media/image7528.png)
 
 Figure 338. Electrical equivalent model for KiBaM
 
@@ -642,7 +642,7 @@ This is a reasonable approximation for crystalline modules. The “four paramete
 
 The four-parameter equivalent circuit is shown in the following figure:
 
-![](media/image7592.svg.png)
+![](media/image7592.png)
 
 Figure 339. Equivalent circuit in the four parameter model
 
@@ -1403,7 +1403,7 @@ The Micro CHP model is a straightforward empirical model with the exception that
   \dot m_{fuel}^{t+\Delta t} = \left\{
     \begin{array}{cl}
       \dot m_{fuel,demand}^{t+\Delta t}       &\; if d\dot m_{fuel} / dt \le (d\dot m_{fuel}/dt)_{max} \\
-      \dot m_{fuel,demand}^t \pm (d\dot m_{fuel}/dt)_{max}      &\; if d\dot m_{fuel} / dt \gt (d\dot m_{fuel}/dt)_{max} 
+      \dot m_{fuel,demand}^t \pm (d\dot m_{fuel}/dt)_{max}      &\; if d\dot m_{fuel} / dt \gt (d\dot m_{fuel}/dt)_{max}
     \end{array}
   \right.
 $$</div>
@@ -1414,7 +1414,7 @@ $$</div>
   P_{net}^{t+\Delta t} = \left\{
     \begin{array}{cl}
       P_{net,ss}^{t+\Delta t}       &\; if dP_{net} / dt \le (dP_{net}/dt)_{max} \\
-      P_{net,ss}^t \pm (dP_{net}/dt)_{max}      &\; if dP_{net} / dt \gt (dP_{net}/dt)_{max} 
+      P_{net,ss}^t \pm (dP_{net}/dt)_{max}      &\; if dP_{net} / dt \gt (dP_{net}/dt)_{max}
     \end{array}
   \right.
 $$</div>

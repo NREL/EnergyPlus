@@ -1,8 +1,7 @@
-![](media/ep.gif)
+![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
-<hr>
 <h1>External Interface(s) Application Guide</h1>
 <h2>Guide for using EnergyPlus with External Interface(s)</h2>
 <br/>
@@ -232,7 +231,7 @@ The external interface can also read data from any Output:Variable and EnergyMan
 
   &lt;variable source="EnergyPlus"&gt;
 
-    &lt;EnergyPlus name="NAME" type="TYPE"/&gt; 
+    &lt;EnergyPlus name="NAME" type="TYPE"/&gt;
 
   &lt;/variable&gt;
 

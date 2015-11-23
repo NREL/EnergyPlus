@@ -1,8 +1,7 @@
-![](media/ep.gif)
+![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
-<hr>
 <h1>Output Details and Examples</h1>
 <h2>EnergyPlus Outputs, Example Inputs and Data Set Files</h2>
 <br/>
@@ -31,7 +30,7 @@ Following are the native file names that are output from EnergyPlus; native – 
 Table 1. EnergyPlus Basic Output  Files
 
 <table class="table table-striped">
-<tr> 
+<tr>
  <th>Output File Name</th>
  <th>Description</th>
  <th>EP-Launch File Name</th>
@@ -1133,7 +1132,7 @@ The site temperature modifier coefficient (TMC) is defined as:
 
 Then, the temperature at a height above ground is calculated as:
 
-<div>\[ \text{ActualTemperature} = \text{Temperature}_{met} + TMC - 
+<div>\[ \text{ActualTemperature} = \text{Temperature}_{met} + TMC -
     frac{ \text{TemperatureGradient}_{site} * \text{EarthRadius} * \text{Height}_{site/component} }
         { \text{EarthRadius} + \text{Height}_{site/component} } \]</div>
 
@@ -3581,7 +3580,7 @@ This contains the value of the field.
 
 ### Plant Coincident Sizing Algorithm
 
-A special report is issued to the eio file that provides details for the Coincident sizing option.  Coincident plant sizing adjustments using HVAC Sizing Simulations run a sizing algorithm at the end of each Sizing Pass.  The following report provides details on the calculations and observations from monitoring the previous Sizing Pass. 
+A special report is issued to the eio file that provides details for the Coincident sizing option.  Coincident plant sizing adjustments using HVAC Sizing Simulations run a sizing algorithm at the end of each Sizing Pass.  The following report provides details on the calculations and observations from monitoring the previous Sizing Pass.
 
     ! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor {},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}
     Plant Coincident Sizing Algorithm,HOT WATER LOOP,1,0.1062471,11942.67,0.2586269,Yes,7.324432E-004,2.586533E-004,Yes,1.0000,0.646862,4197.9300,999.8980
@@ -3589,7 +3588,7 @@ A special report is issued to the eio file that provides details for the Coincid
 
 #### Field: <Plant Coincident Sizing Algorithm>
 
-This field simply contains the words “Plant Sizing Coincident Flow Algorithm.” 
+This field simply contains the words “Plant Sizing Coincident Flow Algorithm.”
 
 #### Field: Plant Loop Name
 
@@ -3597,43 +3596,43 @@ This field shows the name of the plant loop being analyzed.
 
 #### Field: Sizing Pass #
 
-This field shows which sizing pass has just completed prior to running the sizing algorithm.  Each Sizing Pass is an iteration of a set of HVAC Sizing Simulations. 
+This field shows which sizing pass has just completed prior to running the sizing algorithm.  Each Sizing Pass is an iteration of a set of HVAC Sizing Simulations.
 
 #### Field: Measured Mass Flow {kg/s}
 
-This is the maximum coincident mass flow rate, in kg/s, found at the supply side inlet system node. This was recorded by a data logging system tracking node mass flow rate over all the sizing periods.  It will include any zone timestep averaging. 
+This is the maximum coincident mass flow rate, in kg/s, found at the supply side inlet system node. This was recorded by a data logging system tracking node mass flow rate over all the sizing periods.  It will include any zone timestep averaging.
 
 #### Field: Measured Demand {W}
 
-This is the maximum loop coincident demand, in W, on the supply side.  This was recorded by a data logging system tracking the report value for loop demand over all the sizing periods.  It will include and zone timestep averaging. 
+This is the maximum loop coincident demand, in W, on the supply side.  This was recorded by a data logging system tracking the report value for loop demand over all the sizing periods.  It will include and zone timestep averaging.
 
 #### Field: Demand Calculated Mass Flow {kg/s}
 
-This is the flow rate, in kg/s, that was calculated from measured demand, the temperature difference in the plant sizing object, and the fluid specific heat.   
+This is the flow rate, in kg/s, that was calculated from measured demand, the temperature difference in the plant sizing object, and the fluid specific heat.
 
 #### Field: Sizes Changed {Yes/No}
 
-This field indicates if the sizing algorithm resulted in a change of size.  If the flows did not change significantly, the sizes might not change. 
+This field indicates if the sizing algorithm resulted in a change of size.  If the flows did not change significantly, the sizes might not change.
 
 #### Field: Previous Volume Flow Rate {m3/s}
 
-This field is the prior size of the plant loop, in m3/s.  This is the size before the adjustment if the size changes. 
+This field is the prior size of the plant loop, in m3/s.  This is the size before the adjustment if the size changes.
 
 #### Field: New Volume Flow Rate {m3/s}
 
-This field is the result of the sizing algorithm, in m3/s.  If the size changes, this is the new value used for the plant loop maximum volume flow rate. 
+This field is the result of the sizing algorithm, in m3/s.  If the size changes, this is the new value used for the plant loop maximum volume flow rate.
 
 #### Field: Demand Check Applied {Yes/No}
 
-This field indicates if the algorithm produced a new mass flow rate from the measured demand or not.  If this field is “No,” then the algorithm used coincident mass flow.  If this field is “Yes,” then the mass flow derived from demand was larger than the measured mass flow and the demand drove the result. 
+This field indicates if the algorithm produced a new mass flow rate from the measured demand or not.  If this field is “No,” then the algorithm used coincident mass flow.  If this field is “Yes,” then the mass flow derived from demand was larger than the measured mass flow and the demand drove the result.
 
 #### Field: Sizing Factor { }
 
-This field is the value of the sizing factor applied to the measured or calculated coincident flows.  
+This field is the value of the sizing factor applied to the measured or calculated coincident flows.
 
 #### Field: Normalized Change { }
 
-This field is the normalized change used to determine if the new flow size is significantly different from the previous. 
+This field is the normalized change used to determine if the new flow size is significantly different from the previous.
 
 #### Field: Specific Heat {J/kg-K }
 
@@ -3771,7 +3770,7 @@ Component sizing is applicable to all manners of autosized components and equipm
  Component Sizing Information, Humidifier:Steam:Electric, HUMIDIFIER 1, Rated Power [W], 9826.56303
 
  Component Sizing Information, Humidifier:Steam:Gas, MAIN GAS HUMIDIFIER, Design Size Nominal Capacity Volume [m3/s], 1.05405E-002
- 
+
  Component Sizing Information, Humidifier:Steam:Gas, MAIN GAS HUMIDIFIER, Design Size Rated Power [W], 103710.42776
 
 #### Field: &lt;Component Sizing Information&gt;
@@ -4931,7 +4930,7 @@ Rated net cooling capacity of unit at Test condition D per Standard ASHRAE 127. 
 Rated total electric power input of the unit at Test condition D per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The total electric power includes the supply fan power as well. The total electric power input is reported for class I, II, III and IV test conditions.
 
 ```
-! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric Power Test D {W} 
+! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric Power Test D {W}
  DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 1, 126953.8, 35918.5, 135678.7, 30852.7, 141523.1, 24400.1, 141727.0, 13951.0
  DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 2, 133377.6, 37330.3, 140336.0, 31647.7, 141727.0, 24424.7, 141727.0, 13951.0
  DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 3, 139488.4, 38673.3, 141354.0, 31821.4, 141727.0, 24424.7, 141727.0, 13951.0
@@ -8411,8 +8410,8 @@ An overview of the TabularDataWithStrings SQL table is shown below.  This table
 An example of a SQL query to get a table out of the AnnualBuildingUtilityPerformanceSummary report is the following.
 
 ````
-select \* FROM TabularDataWithStrings WHERE 
-ReportName='AnnualBuildingUtilityPerformanceSummary' 
+select \* FROM TabularDataWithStrings WHERE
+ReportName='AnnualBuildingUtilityPerformanceSummary'
 and TableName='Site and Source Energy';
 ````
 
@@ -11848,7 +11847,7 @@ Interior Lighting
 
 ### HVAC Sizing Summary
 
-The HVAC Sizing Summary report provides information on the zone cooling and heating sizing and the peak load conditions as well as information about the system air flow sizing. The Design Load is the zone sensible load only and it does not include any system effects or ventilation loads. The user specified design load and airflow and the values calculated by the program are shown in the report along with the time of the peak load and the temperature and humidity ratio at the time of the peak during the sizing periods. This information is generated for both the Zone Sensible Cooling and Zone Sensible Heating tables. 
+The HVAC Sizing Summary report provides information on the zone cooling and heating sizing and the peak load conditions as well as information about the system air flow sizing. The Design Load is the zone sensible load only and it does not include any system effects or ventilation loads. The user specified design load and airflow and the values calculated by the program are shown in the report along with the time of the peak load and the temperature and humidity ratio at the time of the peak during the sizing periods. This information is generated for both the Zone Sensible Cooling and Zone Sensible Heating tables.
 
 Also included is the System Design Air Flow Rates which includes the calculated cooling air flow rate, the user specified air flow rate for cooling, the calculated heating air flow rate, and the user specified air flow rate for heating.
 
@@ -11856,7 +11855,7 @@ Also included is the System Design Air Flow Rates which includes the calculated 
 
 Directly following is an example of the report.
 
-The key used to obtain this report is HVACSizingSummary. 
+The key used to obtain this report is HVACSizingSummary.
 
 Report: **HVAC Sizing Summary**
 

@@ -1,8 +1,7 @@
-![](media/ep.gif)
+![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
-<hr>
 <h1>Application Guide for EMS</h1>
 <h2>Energy Management System User Guide</h2>
 <br/>
@@ -1219,13 +1218,13 @@ The internal variable called “Hydronic Low Temp Radiant Design Water Mass Flow
 
 #### Boiler Nominal Capacity
 
-The internal variable called “Boiler Nominal Capacity” provides information about the nominal heating capacity of boiler equipment. The units are Watts. 
+The internal variable called “Boiler Nominal Capacity” provides information about the nominal heating capacity of boiler equipment. The units are Watts.
 
 ### Chiller Nominal Ratings
 
 #### Chiller Nominal Capacity
 
-The internal variable called “Chiller Nominal Capacity” provides information about the nominal cooling capacity of chiller equipment. The units are Watts. 
+The internal variable called “Chiller Nominal Capacity” provides information about the nominal cooling capacity of chiller equipment. The units are Watts.
 
 
 On-Site Electricity Production
@@ -1501,7 +1500,7 @@ An actuator called “Window Air Conditioner” is available with a control type
 
 ### Low Temperature Radiant Hydronic
 
-Actuators called “Hydronic Low Temp Radiant” and “Constant Flow Low Temp Radiant” are available with the control type “Water Mass Flow Rate” (in kg/s). This allows you to override the flow of water through hydronic radiant systems. The unique identifier is the name of either the ZoneHVAC:LowTemperatureRadiant:VariableFlow or ZoneHVAC:LowTemperature  
+Actuators called “Hydronic Low Temp Radiant” and “Constant Flow Low Temp Radiant” are available with the control type “Water Mass Flow Rate” (in kg/s). This allows you to override the flow of water through hydronic radiant systems. The unique identifier is the name of either the ZoneHVAC:LowTemperatureRadiant:VariableFlow or ZoneHVAC:LowTemperature
  Radiant:ConstantFlow input objects.
 
 ### Variable Refrigerant Flow Heat Pump Air Conditioner
@@ -2652,7 +2651,7 @@ Because we do not know the exactly what the user had in mind, for this example w
   F_{open} = \begin{array}{ll}
     0.0 & RH &lt; 25\% \\
     \frac{RH-25}{60-25} & 25\% \leq RH \leq 60\% \\
-    1.0 & RH > 60\%  
+    1.0 & RH > 60\%
   \end{array}
 $$</div>
 

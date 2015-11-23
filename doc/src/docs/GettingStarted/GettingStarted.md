@@ -1,8 +1,7 @@
-![](media/ep.gif)
+![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
-<hr>
 <h1>Getting Started with EnergyPlus</h1>
 <h2>Basic Concepts Manual - Essential Information You Need about Running EnergyPlus</h2>
 <br/>
@@ -470,7 +469,7 @@ When installing EnergyPlus, you are given an option if you want IDF, IMF, and EP
 
 Two reset options are available here.
 
-The **Auto Find All File Viewers** button will autofind all the file viewers in one step. This is equivalent to pressing the Auto Find button for each viewer program. 
+The **Auto Find All File Viewers** button will autofind all the file viewers in one step. This is equivalent to pressing the Auto Find button for each viewer program.
 
 The **Reset All Options and Exit** button will clear all options and restore the default values used when first invoking EP-Launch for the first time. This also clears the list of recently used IDF and weather files.  This option will exit EP-Launch and you will have to start EP-Launch again.
 
@@ -890,7 +889,7 @@ Objective:  Learn how to add materials, constructions, and a surface using 3-D 
   - Using File -&gt; Open Dataset, open the window glass materials dataset file, WindowGlassMaterials.idf
 
   - Scroll down the Class list and select “**WindowMaterial:Glazing**”.
-    
+
     -Hint:  In IDF Editor, View -&gt; Show Classes with Objects Only (or ctl-L) will hide all empty object types from the class list.
 
   - Locate the object which defines the material properties for “CLEAR 6MM”.  Select this object (by clicking on the column heading).

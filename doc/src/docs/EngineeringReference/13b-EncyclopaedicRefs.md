@@ -219,7 +219,7 @@ Coils <a name="Coils"></a>
 
 The input object Coil:Cooling:Water is simpler than the detailed geometry model.  The simple model provides a good prediction of the air and water outlet conditions without requiring the detailed geometric input required for the detailed model.  A greatly simplified schematic of enthalpy and temperature conditions in a counter flow cooling/dehumidifying coil is shown in the schematic Figure 162.  The input required to model the coil includes only a set of thermodynamic design inputs, which require no specific manufacturer's data.  The coil simulation model is essentially a modification of one presented by Elmahdy and Mitalas (1977), TRNSYS, 1990 and Threlkeld, J.L. 1970.  The model calculates the UA values required for a Dry, Wet and Part Wet & Part Dry Coil and iterates between the Dry and Wet Coil to output the fraction wet.  There are two modes of flow operation for this model: Cross Flow, which is widely applicable in HVAC systems and the second being Counter flow mode. The default value in program is set up for Counter Flow.  In addition the coil has two modes of analysis: Simple Analysis and Detailed Analysis. The Simple analysis mode operates the coil as either wet or dry while the detailed mode simulates the coil as part wet part-dry. While the detailed mode provides more accurate results, it is significantly slower than the simple model. The simple mode gives good results for an annual simulation but will not be adequate for a time step performance analysis.
 
-![](media/image3304.svg.png)
+![](media/image3304.png)
 
 Figure 162.  Simplified Schematic of Cooling/Dehumidifying Coil
 
@@ -573,7 +573,7 @@ This problem is solved utilizing the fact that the Exit conditions from the Dry 
 
 n Iterate between the Dry Coil and the Wet Coil. First calculate Coil Completely Dry performance by estimating the wet dry interface water temperature using equation and inputting this variable as the water inlet temperature to dry Coil.
 
-<span>\(WetDryInterfac{e_{WaterTemp}} = {\rm{WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{ + Are}}{{\rm{a}}_{{\rm{WetFraction}}}}{\rm{*(WaterTem}}{{\rm{p}}_{{\rm{Outlet}}}}{\rm{ - WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{)}}\)</span>    
+<span>\(WetDryInterfac{e_{WaterTemp}} = {\rm{WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{ + Are}}{{\rm{a}}_{{\rm{WetFraction}}}}{\rm{*(WaterTem}}{{\rm{p}}_{{\rm{Outlet}}}}{\rm{ - WaterTem}}{{\rm{p}}_{{\rm{Inlet}}}}{\rm{)}}\)</span>   
 
 The value of Surface Area Wet fraction is estimated initially as follows
 
@@ -679,7 +679,7 @@ Elmahdy, A.H., and Mitalas, G.P. 1977. "A Simple Model for Cooling and Dehumidif
 
 The input object Coil:Cooling:Water:DetailedGeometry provides a coil model that predicts changes in air and water flow variables across the coil based on the coil geometry. A greatly simplified schematic of enthalpy and temperature conditions in a counterflow cooling/dehumidifying coil is shown in the following schematic figure. In addition, the variables required to model a cooling/dehumidifying coils and their definitions are extensively listed in “Table 55. Coil Geometry and Flow Variables for Coils”. The input required to model the coil includes a complete geometric description that, in most cases, should be derivable from specific manufacturer's data.  The coil simulation model is essentially the one presented by Elmahdy and Mitalas (1977) and implemented in HVACSIM+ (Clark 1985), a modular program also designed for energy analysis of building systems. The model solves the equations for the dry and wet sections of the coil using log mean temperature and log mean enthalpy differences between the liquid and the air streams.  Elmahdy and Mitalas state that crossflow counterflow coils with at four rows or more are approximated well by this model.  This does not constitute a major limitation since cooling and dehumidifying coils typically have more than four rows.
 
-![](media/image3352.svg.png)
+![](media/image3352.png)
 
 Figure 167.  Simplified Schematic of Cooling/Dehumidifying Coil
 
@@ -946,7 +946,7 @@ The implementation of detailed heating coil models in IBLAST was another importa
 In addition, it was concluded that, since much simpler and less computationally expensive heating coil simulations are possible, an option was provided in IBLAST for a heating coil design using only the UA value of the coil, the product of heat transfer coefficient and coil area.  This model was largely based on the TYPE10 subroutine implemented in MODSIM.  The equations used to model the performance of the TYPE10 heating coil are as follows:
 
 <div>$$
-  \begin{array}{rl} 
+  \begin{array}{rl}
     T_{a,out} &= T_{a,in} + \left( T_{w,in} - T_{ain} \right) \varepsilon \left( \frac{\min \left( C_{p,a} \dot m_a,C_{p,w}\dot m_w \right)} {C_{p,a}\dot m_a} \right) \\
     T_{w,out} &= T_{w,in} - \left( T_{a,out} - T_{ain} \right) \left( \frac{C_{p,a}\dot m_a}{C_{p,w}\dot m_w} \right)
   \end{array}
@@ -1507,7 +1507,7 @@ With the “effective” SHR for the coil at the current operating conditions, i
 Calculations are also made to estimate the electric power input to the DX coil basin heater. A schedule may be used to disable the basin heater during regular maintenance periods or other time periods (e.g., during summer). If a schedule is not provided, the basin heater is assumed to be available the entire simulation time period. The basin heater operates when it is scheduled on, the outdoor air dry-bulb temperature is below the basin heater setpoint temperature, and the DX coil is not active. The user is required to enter a basin heater capacity (watts per degree Kelvin) and a heater setpoint temperature (<sup>o</sup>C) if they want to model basin heater electric power.
 
 <div>$$
-  \mathop P\nolimits_{basinheater}  = MAX(0.0,{\rm{ }}\mathop {CAP}\nolimits_{basinheater} (\mathop T\nolimits_{setpoint,basin}  - \mathop T\nolimits_{db,outdoor} )(1 - RTF)) \\ 
+  \mathop P\nolimits_{basinheater}  = MAX(0.0,{\rm{ }}\mathop {CAP}\nolimits_{basinheater} (\mathop T\nolimits_{setpoint,basin}  - \mathop T\nolimits_{db,outdoor} )(1 - RTF)) \\
 $$</div>
 
 <div>$$
@@ -1664,7 +1664,7 @@ The calculations for *Q<sub>Total,Net,PartLoad</sub>* and *Power<sub>Total,PartL
 
 #### ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils
 
-For computer and data processing room unitary air conditioners single-speed direct expansion (DX) cooling coils, the standard ratings net total cooling capacity and total cooling electric power inputs are calculated according to ANSI/AHRI Standard 127 (ASHRAE 2012). These ratings apply to unitary air conditioners with air-cooled. If the single-speed DX cooling coil is specified with an evaporatively-cooled condenser, then no standard ratings are output from EnergyPlus at this time. These standard ratings are not direct inputs to the model. However, these standard ratings can be calculated using user-entered information for the Coil:Cooling:DX:SingleSpeed object.  These standard rating values are provided in the eplusout.eio output file and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). 
+For computer and data processing room unitary air conditioners single-speed direct expansion (DX) cooling coils, the standard ratings net total cooling capacity and total cooling electric power inputs are calculated according to ANSI/AHRI Standard 127 (ASHRAE 2012). These ratings apply to unitary air conditioners with air-cooled. If the single-speed DX cooling coil is specified with an evaporatively-cooled condenser, then no standard ratings are output from EnergyPlus at this time. These standard ratings are not direct inputs to the model. However, these standard ratings can be calculated using user-entered information for the Coil:Cooling:DX:SingleSpeed object.  These standard rating values are provided in the eplusout.eio output file and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary).
 
 **Note**: The standard ratings described in this section require that the DX cooling coil model be evaluated at sixteen different test conditions (i.e., specific wet-bulb temperatures for air entering the cooling coil and dry-bulb temperatures for air entering the air-cooled [outdoor] condenser) for each of the four standard tests and four application classes (ASHRAE – 2012).  The four test conditions: A, B, C and D are provided in the ANSI/ASHRAE Standard 127. And the test conditions are different for each application classes described in the standard.  In total sixteen performance data of net cooling capacity and total electric power inputs are reported.  The total cooling electric power includes the supply fan power.
 
@@ -3274,7 +3274,7 @@ The crankcase heater is assumed to operate when the heating coil’s compressor 
 
 <div>$${P_{crankcase}} = {Q_{cap,crankcase}}\left( {1 - RTF} \right)$$</div>
 
-<span>\({\rm{RTF  =  }}\left( {{\raise0.7ex\hbox{${{\rm{PLR}}}$} \!\mathord{\left/ {\vphantom {{{\rm{PLR}}} {{\rm{PartLoadFrac}}}}}\right.}\!\lower0.7ex\hbox{${{\rm{PartLoadFrac}}}$}}} \right)\,\,{\rm{ = }}\,\,runtime fraction of the heating coil\)</span>   
+<span>\({\rm{RTF  =  }}\left( {{\raise0.7ex\hbox{${{\rm{PLR}}}$} \!\mathord{\left/ {\vphantom {{{\rm{PLR}}} {{\rm{PartLoadFrac}}}}}\right.}\!\lower0.7ex\hbox{${{\rm{PartLoadFrac}}}$}}} \right)\,\,{\rm{ = }}\,\,runtime fraction of the heating coil\)</span>  
 
 where
 
@@ -3423,7 +3423,7 @@ Where,
 For a single speed heat pump with a fixed speed indoor fan installed, a constant-air-volume-rate indoor fan installed, or with no indoor fan installed, the minimum and maximum design heating requirements for each generalized climatic region can be calculated as follows:
 
 <div>$$
-  DH{R_{\min }} = \left\{ 
+  DH{R_{\min }} = \left\{
     \begin{array}{l}
       {\mathop Q\limits^ \cdot_h}(8.33) \cdot (1.8) \cdot \left[ {\frac{{18.33 - {T_{OD}}}}{{60.0}}} \right] , {\rm{ for regions I,II,III,IV, and VI}} \\
       {\mathop Q\limits^ \cdot_h}(8.33),{\rm{                     for regions V}}
@@ -3444,7 +3444,7 @@ The intermediate term used in the calculations of HSPF can be calculated using t
 Where,
 
 <div>$$
-  X({T_j}) = \left\{ 
+  X({T_j}) = \left\{
     \begin{array}{l}
       BL({T_J})/\mathop {{Q_h}}\limits^ \cdot  ({T_j}) \\
       {\rm{Or}} \\
@@ -3474,7 +3474,7 @@ Where,
 Low temperature cut-out factor <span>\(\delta ({T_j})\)</span>is determined as follows:
 
 <div>$$
-  \delta ({T_j}) = \left\{ 
+  \delta ({T_j}) = \left\{
     \begin{array}{l}
       {\rm{0, if }}{T_j} \le {T_{off}}{\rm{ or }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} &lt; 1 \\
       {\rm{1/2, if }}{T_{off}} &lt; {T_j} \le {T_{on}}{\rm{ and }}\frac{{\mathop {{Q_h}}\limits^ \cdot  ({T_j})}}{{\mathop {{E_h}}\limits^ \cdot  ({T_j})}} \ge 1 \\
@@ -3805,7 +3805,7 @@ Table 61. Standardized Design Heating Requirements (W)
     <td>23445.7</td>
     <td>38099.26</td>
   </tr>
-</table>    
+</table>
 
 ### Multi-Speed Electric Heat Pump DX Air Heating Coil
 
@@ -4074,7 +4074,7 @@ The building heating load is calculated as follows:
 The minimum and maximum design heating requirements for each generalized climate regions are given by:
 
 <div>$$
-  {\rm{DH}}{{\rm{R}}_{\min }}{\rm{ = }}\left\{ 
+  {\rm{DH}}{{\rm{R}}_{\min }}{\rm{ = }}\left\{
     \begin{array}{l}
       {\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33)}} \cdot \left[ {\frac{{{\rm{18}}{\rm{.33 - }}{{\rm{T}}_{{\rm{OD}}}}}}{{{\rm{33}}{\rm{.33}}}}} \right]{\rm{,}}\quad {\rm{for}}\,{\rm{regions}}\,{\rm{I,}}\,{\rm{II,}}\,{\rm{III,}}\,{\rm{IV,}}\,\,{\rm{VI}} \\
       {\rm{\dot Q}}_h^{k = 2}{\rm{(8}}{\rm{.33),}}\quad {\rm{for}}\,{\rm{region}}\,{\rm{V}}
@@ -4104,7 +4104,7 @@ DHR           =          the design heating requirement for ea
 The heating capacity delivered and electric power input of the heat pump when operating at minimum (low) compressor capacity and outdoor air temperature of *T<sub>j</sub>* is given by:
 
 <div>$$
-  {\rm{\dot Q}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{ 
+  {\rm{\dot Q}}_h^{k = 1}{\rm{(}}{{\rm{T}}_{\rm{j}}}{\rm{) = }}\left\{
     \begin{array}{l}
       {\rm{\dot Q}}_h^{k = 1}(8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(16}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{(8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} - 8.33} \right)}}{{\left( {16.67 - 8.33} \right)}}\,{\rm{if}}\,{{\rm{T}}_{\rm{j}}} \ge 4.44{\rm{^\circ C}} \\
       {\rm{\dot Q}}_h^{k = 1}( - 8.33) + \;\frac{{\left[ {{\rm{\dot Q}}_h^{k = 1}{\rm{(1}}{\rm{.67) - \dot Q}}_h^{k = 1}{\rm{( - 8}}{\rm{.33)}}} \right] \cdot \left( {{{\rm{T}}_{\rm{j}}} + 8.33} \right)}}{{\left( {1.67 + 8.33} \right)}}\,{\rm{if}}\, - 8.33{\rm{^\circ C}} \le {{\rm{T}}_{\rm{j}}} &lt; 4.44{\rm{^\circ C}} \\
@@ -4374,7 +4374,7 @@ At the lowest speed, there will be one additional performance curve to account f
 
 1) Total heating capacity modifier curve (function of temperature)
 
-The total heating capacity modifier as a function of temperature curve (CAP-FT) is a biquadratic curve with two independent variables: dry-bulb temperature of the air entering the heating coil and the air DB temperature entering the evaporator coil. The output of this curve is multiplied by the rated total heating capacity at the speed, to give the total heating capacity at the specific entering air temperatures at which the ASHP unit is operating (i.e., at temperatures different from the rating point temperatures). 
+The total heating capacity modifier as a function of temperature curve (CAP-FT) is a biquadratic curve with two independent variables: dry-bulb temperature of the air entering the heating coil and the air DB temperature entering the evaporator coil. The output of this curve is multiplied by the rated total heating capacity at the speed, to give the total heating capacity at the specific entering air temperatures at which the ASHP unit is operating (i.e., at temperatures different from the rating point temperatures).
 
 <div>$${\rm{TotCapTempModFac}} = {\rm{a}} + {\rm{b*D}}{{\rm{B}}_{\rm{i}}} + {\rm{c*DB}}_{\rm{i}}^2 + {\rm{d*D}}{{\rm{B}}_{\rm{o}}} + {\rm{e*D}}{{\rm{B}}_{\rm{o}}}^2 + {\rm{f*D}}{{\rm{B}}_{\rm{i}}}{\rm{*D}}{{\rm{B}}_{\rm{o}}}$$</div>
 
@@ -5476,7 +5476,7 @@ At the lowest speed, there will be one additional performance curve to account f
 
 1) Total heating capacity modifier curve (function of temperature)
 
-The total heating capacity modifier as a function of temperature curve (CAP-FT) is a biquadratic curve with two independent variables: dry-bulb temperature of the air entering the heating coil and the VS WSHP’s entering water temperature. The output of this curve is multiplied by the rated total heating capacity at the speed, to give the total heating capacity at the specific entering air and water temperatures at which the WSHP unit is operating (i.e., at temperatures different from the rating point temperatures). 
+The total heating capacity modifier as a function of temperature curve (CAP-FT) is a biquadratic curve with two independent variables: dry-bulb temperature of the air entering the heating coil and the VS WSHP’s entering water temperature. The output of this curve is multiplied by the rated total heating capacity at the speed, to give the total heating capacity at the specific entering air and water temperatures at which the WSHP unit is operating (i.e., at temperatures different from the rating point temperatures).
 
 <div>$$TotCapTempModFac = a + b*D{B_i} + c*DB_i^2 + d*EWT + e*EW{T^2} + f*D{B_i}*EWT$$</div>
 
@@ -5668,11 +5668,11 @@ TheDOE/ORNL Heat Pump Design Model(HPDM) is a steady-state vapor compression equ
 
 And then, we plotted the resultant A<sub>o</sub> as a function of indoor air flow rate and compressor speed, as below:
 
-![](media/image4240.svg.png)
+![](media/image4240.png)
 
 Figure 181. Effective Surface Area (Ao) Changing with Compressor Speed and Indoor SCFM
 
-![](media/image4241.svg.png)
+![](media/image4241.png)
 
 Figure 182. Bypass Factor (BF) Changing with Compressor Speed and Indoor SCFM
 
@@ -5686,7 +5686,7 @@ The Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit object is modeled i
 
 It shall be noted for the total cooling capacity and flow rate inputs, three fields are autosizable, which are Rated Total Cooling Capacity (Numeric Field 3) at Selected Nominal Speed Level, Rated Volumetric Air Flow Rate (Numeric Field 4)  and Rated Volumetric Water Flow Rate (Numeric Field 5). They are used to scale the performances of an actual unit and correlate with the actual loop flows. Except the three fields, all other total cooling capacity and flow rate inputs at individual speed levels should be directly obtained from Reference Unit catalog data, specific to an actual unit.
 
-The Rated Total Cooling Capacity at Selected Nominal Speed Level contains the rated total cooling capacity to match the building sensible or latent cooling load.  The rated cooling capacity is used to determine a capacity scaling factor, as compared to the Reference Unit catalog capacity at the nominal speed level. 
+The Rated Total Cooling Capacity at Selected Nominal Speed Level contains the rated total cooling capacity to match the building sensible or latent cooling load.  The rated cooling capacity is used to determine a capacity scaling factor, as compared to the Reference Unit catalog capacity at the nominal speed level.
 
 <div>$$CapacityScaleFactor = \frac{{RatedTotalCoolingCapacity}}{{ReferenceUnitTotalCoolingCapacity@NominalSpeedLevel}}$$</div>
 
@@ -5945,7 +5945,7 @@ Figure: Schematic of DX System in cooling operating mode
 Applications of this technology include: inter-zone heat pump in NTED (Dixon, 2010), and PTAC or PTHP serving Offices attached to a Warehouse, where the office partially or fully enclosed by the warehouse and the condenser is placed inside the Warehouse. The heat rejected or extracted by the secondary DX coil is estimated from the delivered capacity and electric power input of the primary DX coils. And the rejected or extracted heat is treated as internal gain of the secondary zone. Currently secondary DX coil are allowed in single speed, two speed and multi speed DX coil objects: _Coil:Cooling:DX:SingleSpeed_, _Coil:Heating:DX:SingleSpeed_, _Coil:Cooling:DX:TwoSpeed_, _Coil:Cooling:DX:MultiSpeed_, and _Coil:Heating:DX:MultiSpeed_.
 
 #### Model Description:
-The secondary coil performance calculation is invoked using inputs in the DX coil objects.  The input required for cooling and heating operation of the primary DX coils are different. In the DX cooling coils the only required input is the zone name where the secondary coil is installed. In heating DX coils six inputs are required for single speed coils and a minimum of 11 input fields are required for multispeed DX heating coils.  And five more inputs are required for every additional compressor speed. The extensible five input fields are used for splitting the total heat extraction rate into sensible and latent components. These five input fields are: rated sensible heat ratio, secondary air flow rates, scaling factor for auto-sizing secondary air flow rates, sensible heat ratio modifier curves as a function of temperature and sensible heat ratio modifier curves as a function of secondary air flow fraction. The secondary coil model assumes that liquid water from defrosting operation is drained to the outdoor and has no impact on the zone air heat balance. 
+The secondary coil performance calculation is invoked using inputs in the DX coil objects.  The input required for cooling and heating operation of the primary DX coils are different. In the DX cooling coils the only required input is the zone name where the secondary coil is installed. In heating DX coils six inputs are required for single speed coils and a minimum of 11 input fields are required for multispeed DX heating coils.  And five more inputs are required for every additional compressor speed. The extensible five input fields are used for splitting the total heat extraction rate into sensible and latent components. These five input fields are: rated sensible heat ratio, secondary air flow rates, scaling factor for auto-sizing secondary air flow rates, sensible heat ratio modifier curves as a function of temperature and sensible heat ratio modifier curves as a function of secondary air flow fraction. The secondary coil model assumes that liquid water from defrosting operation is drained to the outdoor and has no impact on the zone air heat balance.
 
 **Cooling Operating Mode:** the primary DX cooling coil of a DX system serving a primary zone is on and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects.  This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. The heat rejected by the secondary coil (condenser) of a DX system or heat pump operating in cooling mode is given by:
 
@@ -5953,7 +5953,7 @@ The secondary coil performance calculation is invoked using inputs in the DX coi
 
 where
 
-* \(Q_\rm{Evap}\) is the cooling load delivered by the primary DX cooling coil system, W 
+* \(Q_\rm{Evap}\) is the cooling load delivered by the primary DX cooling coil system, W
 * \(P_\rm{CompCondFan}\) is the compressor and evaporator fan electric power input of a heat pump in heating mode, W
 * \(Q_\rm{cond}\) is the heat rejected by the secondary coil (condenser) of a DX system or heat pump, W
 
@@ -5980,7 +5980,7 @@ The total energy extracted from a secondary zone may contain sensible and latent
 The SHR calculation method uses user specified SHR modifying curves for temperature and flow fraction.  The modifying curves correct the rated SHR value for a given secondary DX coil (evaporator) entering air temperatures and air mass flow fraction for a given speed. If these SHR modifying curves are not specified a constant SHR will be assumed.  These two curves are a biquadratic SHR modifier curve for temperature (SHRFT), and a quadratic SHR correction curve for flow fraction (SHRFFF). The SHR is given by:
 
 <div>$$SHR = SHR_\text{rated}\cdot SHRFT\left(T_\text{wb,secondaryZone},T_\text{db,primaryCoil}\right)\cdot SHRFFF(FF)$$</div>
- 
+
 where
 
 * \(SHRFT\) is the sensible heat ratio modifier normalized biquadratic curve as a function of secondary DX coil entering air wet-bulb and primary DX coil entering air dry-bulb temperatures, (-). The secondary DX coil (evaporator) entering air wet-bulb temperature is the secondary zone air wet-bulb temperature.
@@ -5990,7 +5990,7 @@ where
 For multispeed secondary DX coils when the system is cycling between two speeds of _n_ and _n_-1 the operating SHR is weighted using _SpeedRatio_ as follows:
 
 <div>$$SHR = SHR_n \cdot SpeedRatio +  SHR_{n-1} (1 - SpeedRatio)$$</div>
- 
+
 where
 
 * \(SHR_n\) is the sensible heat ratio at speed n determined from user specified rated SHR, and SHR modifier curves at speed _n_, (-)
@@ -6826,7 +6826,7 @@ In case that the user has manufacturer’s information regarding the rated capac
 
 where <span>\({c_{p,w}}\)</span> is the specific heat capacity of the water.
 
-The model then assumes the air mass flow rate is given by the following expression: 
+The model then assumes the air mass flow rate is given by the following expression:
 
 <div>$${\dot m_{a,std}} = {0.0062 + .0000275 \dot Q_{design}}$$<div>
 
