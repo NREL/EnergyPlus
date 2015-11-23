@@ -28,6 +28,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPlantPipingSystems.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -151,6 +152,7 @@ namespace EnergyPlus {
 		DataLoopNode::clear_state();
 		DataOutputs::clear_state();
 		DataPlant::clear_state();
+		DataPlantPipingSystems::clear_state();
 		DataRuntimeLanguage::clear_state();
 		DataSizing::clear_state();
 		DataSurfaces::clear_state();

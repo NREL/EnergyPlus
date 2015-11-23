@@ -3075,3 +3075,32 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 	EXPECT_EQ( extLitUse * 3, gatherEndUseBEPS( 1, endUseExteriorLights ) );
 
 }
+
+
+TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+		"Output:Table:TimeBins,",
+		"System1, !- Key Value",
+		"Some Temperature Variable, !- Variable Name",
+		"0.00, !- Interval Start",
+		"0.20, !- Interval Size",
+		"5,                       !- Interval Count",
+		"Always1; !- Schedule Name"
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::DoWeathSim = true;
+
+	GetInputTabularTimeBins();
+
+	EXPECT_EQ( OutputReportTabular::OutputTableBinned.size(), 1u );
+	EXPECT_EQ( OutputTableBinned( 1 ).keyValue, "SYSTEM1" );
+	EXPECT_EQ( OutputTableBinned( 1 ).varOrMeter, "SOME TEMPERATURE VARIABLE" );
+	EXPECT_EQ( OutputTableBinned( 1 ).intervalStart, 0.0 );
+	EXPECT_EQ( OutputTableBinned( 1 ).intervalSize, 0.20 );
+	EXPECT_EQ( OutputTableBinned( 1 ).intervalCount, 5 );
+	EXPECT_EQ( OutputTableBinned( 1 ).ScheduleName, "ALWAYS1" );
+}
