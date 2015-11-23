@@ -76,6 +76,7 @@ set( test_src
   SQLite.unit.cc
   SurfaceGeometry.unit.cc
   SwimmingPool.unit.cc
+  ThermalComfort.unit.cc
   VariableSpeedCoils.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
