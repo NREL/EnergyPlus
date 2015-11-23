@@ -7048,8 +7048,10 @@ namespace DXCoils {
 		NodeData & WaterOutletNode = Node( Coil.WaterOutNode );
 
 		// If heat pump water heater is OFF, set outlet to inlet and RETURN
+		// Also set the heating energy rate to zero
 		if ( PartLoadRatio == 0.0 ) {
 			WaterOutletNode = WaterInletNode;
+			Coil.TotalHeatingEnergyRate = 0.0;
 			return;
 		} else {
 			RatedHeatingCapacity = Coil.RatedTotCap2;
