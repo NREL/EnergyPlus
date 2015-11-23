@@ -213,6 +213,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 CompressorSizeRatio; // ratio of min compressor size to total capacity
 		int NumCompressors; // number of compressors in VRF condenser
 		Real64 MaxOATCCHeater; // maximum outdoor air dry-bulb temp for crankcase heater operation (C)
+		//begin variables used for Defrost 
 		int DefrostEIRPtr; // index to defrost EIR curve
 		Real64 DefrostFraction; // defrost time period fraction (hr)
 		int DefrostStrategy; // Type of defrost (reversecycle or resistive)
@@ -221,6 +222,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 DefrostPower; // power used during defrost (W)
 		Real64 DefrostConsumption; // energy used during defrost (J)
 		Real64 MaxOATDefrost; // maximum outdoor air dry-bulb temp for defrost operation (C)
+		//end variables used for Defrost 
 		int CondenserType; // condenser type, evap- or air-cooled
 		int CondenserNodeNum; // condenser inlet node number
 		bool SkipCondenserNodeNumCheck; // used to check for duplicate node names

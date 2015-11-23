@@ -1702,6 +1702,7 @@ namespace DXCoils {
 		int const CoilIndex,  // index to VRFTU coil 
 		bool SHSCModify,      // indicate whether SH/SC would be modified
 		Real64 & FanSpdRatio, // fan speed ratio
+		Real64 & FanOnOffRatio, // fan on off ratio
 		Real64 & Wout,    // outlet air humidity ratio
 		Real64 & Toutlet, // outlet air temperature
 		Real64 & Houtlet, // outlet air enthalpy

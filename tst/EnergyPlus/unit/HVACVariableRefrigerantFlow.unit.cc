@@ -275,6 +275,7 @@ namespace EnergyPlus {
 		bool SHSCModify = true; // indicate whether SH/SC is modified
 		Real64 Temp;    // evaporating or condensing temperature
 		Real64 FanSpdRatio; // fan speed ratio
+		Real64 FanOnOffRatio; // fan on/off ratio
 		Real64 Wout;    // outlet air humidity ratio
 		Real64 Toutlet; // outlet air temperature
 		Real64 Houtlet; // outlet air enthalpy
@@ -321,7 +322,7 @@ namespace EnergyPlus {
 		DXCoil( CoolCoilIndex ).InletAirHumRat = 8.4682e-3;
 		DXCoil( CoolCoilIndex ).InletAirEnthalpy = 47259.78;
 
-		CalcVRFIUAirFlow( ZoneIndex, Mode, Temp, CoolCoilIndex, HeatCoilIndex, SHSCModify, FanSpdRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
+		CalcVRFIUAirFlow( ZoneIndex, Mode, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, Temp, CoolCoilIndex, SHSCModify, FanSpdRatio, FanOnOffRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
 		EXPECT_NEAR( TcIn, 25.56, 0.01 );
 		EXPECT_NEAR( Toutlet, 17.89, 0.01 );
 		EXPECT_NEAR( Houtlet, 39440, 1 );
@@ -342,7 +343,7 @@ namespace EnergyPlus {
 		DXCoil( HeatCoilIndex ).InletAirHumRat = 4.1053e-3;
 		DXCoil( HeatCoilIndex ).InletAirEnthalpy = 30755.6253;
 
-		CalcVRFIUAirFlow( ZoneIndex, Mode, Temp, CoolCoilIndex, HeatCoilIndex, SHSCModify, FanSpdRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
+		CalcVRFIUAirFlow( ZoneIndex, Mode, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, Temp, HeatCoilIndex, SHSCModify, FanSpdRatio, FanOnOffRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
 		EXPECT_NEAR( TcIn, 20.24, 0.01 );
 		EXPECT_NEAR( Toutlet, 38.37, 0.01 );
 		EXPECT_NEAR( Houtlet, 49113, 1 );
