@@ -241,6 +241,7 @@ namespace DataLoopNode {
 		Real64 WetBulbTemp; // wetbulb temperature [C]
 		Real64 Density; // reported density at current temperature [kg/m3]
 		Real64 AirDewPointTemp; // reported system node dewpoint temperature [C]
+		Real64 SpecificHeat; // reported node specific heat [J/kg-C]
 
 		// Default Constructor
 		MoreNodeData() :
@@ -250,7 +251,8 @@ namespace DataLoopNode {
 			VolFlowRateCrntRho( 0.0 ),
 			WetBulbTemp( 0.0 ),
 			Density( 0.0 ),
-			AirDewPointTemp( 0.0 )
+			AirDewPointTemp( 0.0 ),
+			SpecificHeat( 0.0 )
 		{}
 
 		// Member Constructor
@@ -261,7 +263,8 @@ namespace DataLoopNode {
 			Real64 const VolFlowRateCrntRho, // volume flow rate at current density, only used for air nodes [m3/s]
 			Real64 const WetBulbTemp, // wetbulb temperature [C]
 			Real64 const Density, // reported density at current temperature [kg/m3]
-			Real64 const AirDewPointTemp // reported system node dewpoint temperature [C]
+			Real64 const AirDewPointTemp, // reported system node dewpoint temperature [C]
+			Real64 const SpecificHeat // reported node specific heat [J/kg-C]
 		) :
 			RelHumidity( RelHumidity ),
 			ReportEnthalpy( ReportEnthalpy ),
@@ -269,7 +272,8 @@ namespace DataLoopNode {
 			VolFlowRateCrntRho( VolFlowRateCrntRho ),
 			WetBulbTemp( WetBulbTemp ),
 			Density( Density ),
-			AirDewPointTemp( AirDewPointTemp )
+			AirDewPointTemp( AirDewPointTemp ),
+			SpecificHeat( SpecificHeat )
 		{}
 
 	};
