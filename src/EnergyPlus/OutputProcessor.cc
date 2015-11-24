@@ -2663,6 +2663,9 @@ namespace OutputProcessor {
 		} else if ( endUseMeter == "WINDTURBINES" || endUseMeter == "WT" || endUseMeter == "WINDTURBINE" ) {
 			EndUse = "WindTurbine";
 
+		} else if ( endUseMeter == "ELECTRICSTORAGE" ) {
+			EndUse = "ElectricStorage";
+
 		} else if ( endUseMeter == "HEAT RECOVERY FOR COOLING" || endUseMeter == "HEATRECOVERYFORCOOLING" || endUseMeter == "HEATRECOVERYCOOLING" ) {
 			EndUse = "HeatRecoveryForCooling";
 
