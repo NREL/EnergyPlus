@@ -113,6 +113,18 @@ namespace DataPlantPipingSystems {
 	Array1D< PipeCircuitInfo > PipingSystemCircuits;
 	Array1D< PipeSegmentInfo > PipingSystemSegments;
 
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
+	void
+	clear_state()
+	{
+		PipingSystemDomains.deallocate();
+		PipingSystemCircuits.deallocate();
+		PipingSystemSegments.deallocate();
+	}
+
 	//     NOTICE
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence

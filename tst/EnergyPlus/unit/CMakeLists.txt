@@ -68,6 +68,7 @@ set( test_src
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
   SiteFCFactorMethodGroundTemperatures.unit.cc
+  SiteGroundDomain.unit.cc
   SiteShallowGroundTemperatures.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
