@@ -1,4 +1,3 @@
-![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
@@ -10199,7 +10198,7 @@ Figure 38. Define Files to View
 
 When the "Define" button is pressed on the Sets tab of the View Results section of the main screen, the dialog box in the figure above is shown. This allows the files extensions to be selected that would be opened for each of the Set 1 to Set 8 buttons. One or many files can be selected for each of the Set buttons. This allows you to define exactly which files you want opened.
 
-The content of each file extension is listed below.  The contents (along with examples) are discussed in the [Output Details](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) document.
+The content of each file extension is listed below.  The contents (along with examples) are discussed in the Output Details document.
 
 By pressing the "Text Output Files" button, a text editor will open each of the text output files. Up to 29 files will open, if they exist. Selecting "Single File" from the 'View'  menu displays a menu of all available output files from which any file can be opened individually. Each file may also be opened with an associated function key. The output files and function key shortcuts are listed below:
 
@@ -10347,7 +10346,7 @@ EP-Launch will start a text editor when editing a IDF file or when viewing many 
 
 #### Drawing Viewer Options
 
-The default drawing viewer is the application associated with DXF files. This can be changed to your favorite drawing program by using the Select button then locating the executable file for your favorite drawing software capable of reading a DXF file. The Auto Find button will automatically find the program that is associated with the DXF file extension and use that program. A variety of programs (free of charge) can render DXF files for viewing.  The [Output Details](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) document lists some of these programs as well as displaying what a DXF rendered file looks like on the screen.
+The default drawing viewer is the application associated with DXF files. This can be changed to your favorite drawing program by using the Select button then locating the executable file for your favorite drawing software capable of reading a DXF file. The Auto Find button will automatically find the program that is associated with the DXF file extension and use that program. A variety of programs (free of charge) can render DXF files for viewing.  The Output Details document lists some of these programs as well as displaying what a DXF rendered file looks like on the screen.
 
 #### VRML Viewer Options
 
@@ -10545,7 +10544,7 @@ The *EnergyPlus weather* file is an ascii file containing the hourly or sub-hour
 
 ### Output Files
 
-More information (and more up-to-date) about output files is shown in the [Output Details and Examples](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) Document.
+More information (and more up-to-date) about output files is shown in the Output Details and Examples Document.
 
 #### err
 
@@ -10654,7 +10653,7 @@ in the IDF.
 
 ### Postprocessing Program/Files
 
-A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) under a section heading called "Using ReadVarsESO".
+A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the Input Output Reference under a section heading called "Using ReadVarsESO".
 
 RunEPlus batch file
 -------------------
@@ -10831,7 +10830,7 @@ The *EnergyPlus weather* file is an ascii file containing the hourly or sub-hour
 
 ### Output Files
 
-More information (and more up-to-date) about output files is shown in the [Output Details and Examples](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) Document.
+More information (and more up-to-date) about output files is shown in the Output Details and Examples Document.
 
 #### eplusout.err
 
@@ -10927,7 +10926,7 @@ in the IDF.
 
 ### Postprocessing Program/Files
 
-A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) as well as the [Output Details and Examples](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) documents.
+A postprocessing program *ReadVarsESO.exe* is available that will read an ESO or MTR file and produce a file that can be read by Excel™. It can use an input file or not. In batch mode it is run by the little batch file *RunReadESO.bat*:  Further information on this program is provided in the Input Output Reference as well as the [Output Details and Examples](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) documents.
 
 You can also used the CSVProc and convertESOMTR described earlier in this document as part of your post processing strategy.
 
