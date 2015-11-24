@@ -3755,7 +3755,7 @@ The Solar and Wind Energy Resource Assessment (SWERA) project, funded by the Uni
 
 Originally developed for use with Calener, a new program for building energy labelling in Spain, these weather files cover all 52 Spanish provincial capitals. Calener was developed by the Grupo de Termotecnia of the Escuela Superior de Ingeneiros in Seville for the Spanish Government. The weather files were synthetically generated using Climed (Portuguese software developed by Ricardo Aguiar) from mean monthly data coming from the Spanish Meteorological National Institute. These weather files were converted from the DOE-2 binary to EnergyPlus format and include constant wind speeds of 6.7 m/s.
 
-For more information on these weather files, contact: Profesor Luis Pérez-Lombard ([lpl@tmt.us.es](file:///E:\Docs4PDFs\lpl@tmt.us.es)) Escuela Superior de Ingenieros
+For more information on these weather files, contact: Profesor Luis Pérez-Lombard (Escuela Superior de Ingenieros)
 
 ### Italian Climatic data collection "Gianni De Giorgio" (IGDG)
 
@@ -3817,9 +3817,7 @@ Liley, J Ben, Hisako Shiona, James Sturman, David S Wratt. 2007. Typical Meteoro
 
 ### Chartered Institution of Building Services Engineers (CIBSE)
 
-The CIBSE, in association with the (UK) Met Office has produced 'Test Reference Years' and 'Design Summer Years' for 14 UK locations for use with building energy simulation software. The data sets are available in various formats, including EnergyPlus/ESP-r. These data are NOT available on the EnergyPlus web site. For further details, see:
-
-[www.cibse.org/index.cfm?go=publications.view&PubID=332&S1=y&L1=0&L2=0](file:///E:\Docs4PDFs\www.cibse.org\index.cfm%3fgo=publications.view&PubID=332&S1=y&L1=0&L2=0)
+The CIBSE, in association with the (UK) Met Office has produced 'Test Reference Years' and 'Design Summer Years' for 14 UK locations for use with building energy simulation software. The data sets are available in various formats, including EnergyPlus/ESP-r. These data are NOT available on the EnergyPlus web site.
 
 ### Meteonorm Data
 
@@ -4494,7 +4492,7 @@ Private Declare Sub SetupPWInternalDataPath Lib "EPlusWth" (ByVal strPath As Str
 And a call from a VB program:
 
 
-```basic
+```
 Call SetupPWInternalDataPath(AppPath, Len(AppPath))
 ```
 
@@ -4502,7 +4500,7 @@ Call SetupPWInternalDataPath(AppPath, Len(AppPath))
 Likewise for Fortran 90/95:
 
 
-```fortran
+```
   INTERFACE
     SUBROUTINE SetupPWInternalDataPath (Path)
     CHARACTER(len=\*), INTENT(IN) :: Path    ! Path where data files reside
@@ -4513,7 +4511,7 @@ Likewise for Fortran 90/95:
 And then calling it from Fortran:
 
 
-```fortran
+```
 Character(len=255) DataPath
 CALL SetupPWInternalDataPath(trim(DataPath))
 ```
@@ -4528,7 +4526,7 @@ Private Declare Sub SetFixOutOfRangeData Lib "EPlusWth" (ByVal strValue As Strin
 
 And calling it from VB:
 
-```basic
+```
     Global FixOutOfRangeData As String
     FixOutOfRangeData = "Yes"
     Call SetFixOutOfRangeData(FixOutOfRangeData, Len(FixOutOfRangeData))
@@ -4536,7 +4534,7 @@ And calling it from VB:
 
 For Fortran 90/95:
 
-```fortran
+```
   INTERFACE
     SUBROUTINE SetFixOutOfRangeData (YesNo)
     CHARACTER(len=\*),INTENT(IN) :: YesNo    ! 'yes' to set fixing option;
@@ -4547,7 +4545,7 @@ For Fortran 90/95:
 
 And then calling it:
 
-```fortran
+```
 CALL SetFixOutOfRangeData('no')
 ```
 
@@ -4594,13 +4592,13 @@ You can also choose to ignore the calculated trigger entirely. If you do not "ig
 
 VB Declaration Statement:
 
-```basic
+```
 Private Declare Sub SetDefaultChgLimit Lib "EPlusWth" (ByVal strValue As String, ByVal strValueLen As Long, ByVal strValue As String, ByVal strValueLen As Long)
 ```
 
 And a call from VB:
 
-```basic
+```
     Call SetDefaultChgLimit(TriggerLimit, Len(TriggerLimit), IgnoreCalcTrigger, Len(IgnoreCalcTrigger))
 ```
 
@@ -4610,13 +4608,13 @@ The "meat" of the processing is done by this routine. It gets passed the input f
 
 VB Declaration Statement:
 
-```basic
+```
 Private Declare Sub ProcessWeather Lib "EPlusWth" (ByVal strInType As String, ByVal InTypeLen As Long, ByVal strOutType As String, ByVal OutTypeLen As Long, ByVal strInFileName As String, ByVal InFileNameLen As Long, ByVal strOutFileName As String, ByVal OutFileNameLen As Long, ErrorFlag As Boolean, Optional ByVal strOutFileURL As String, Optional ByVal OutFileURLlen As Long)
 ```
 
 Calling it from VB:
 
-```basic
+```
 Call ProcessWeather(InputFileDataType, Len(InputFileDataType),
       OutputFileDataType, Len(OutputFileDataType),
       InputFileName, Len(InputFileName),
@@ -4720,7 +4718,7 @@ ErrorFlag will be returned as "true" if an error occurs during processing or "fa
 
 Fortran 90/95 Declaration:
 
-```fortran
+```
 INTERFACE
   SUBROUTINE ProcessWeather(InType,OutType,InFileName,OutFileName,ErrFlag)
     CHARACTER(len=\*), INTENT(IN) :: InType       ! InputFile Type
@@ -4736,7 +4734,7 @@ END INTERFACE
 
 And calling it from Fortran:
 
-```fortran
+```
 call processweather(trim(intype),trim(outtype),    &
                     trim(infilename),trim(outfilename),errflag)
 ```
@@ -7455,6 +7453,7 @@ The  **\#\#if**  series of commands is used to selectively accept or skip lines 
 ...
 
 **##endif**
+```
 
 Then the lines that will be included into the EnergyPlus input stream are:
 
