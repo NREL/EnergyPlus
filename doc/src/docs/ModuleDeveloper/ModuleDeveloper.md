@@ -33,7 +33,7 @@ A module is a Fortran 90/95 programming construct that can be used in various wa
 
 Each module contains source code for closely related data structures and procedures. For instance, the WeatherManager module contains all the weather handling routines in EnergyPlus. The module is contained in the file WeatherManager.f90.  Another example is PlantPumps. This module contains all the code to simulate pumps in EnergyPlus. It is contained in file PlantPumps.f90.
 
-Of course dividing a program into modules can be done in various ways. We have attempted to create modules that are as self-contained as possible. The philosophy that has been used in creating EnergyPlus is contained in the [Programming Standard](file:///E:\Docs4PDFs\ProgrammingStandards.pdf) reference document.  Logically, the modules in EnergyPlus form an inverted tree structure. At the top is EnergyPlus. Just below that are ProcessInput and ManageSimulation. At the bottom are the modules such as HVACDamperComponent that model the actual HVAC components.
+Of course dividing a program into modules can be done in various ways. We have attempted to create modules that are as self-contained as possible. The philosophy that has been used in creating EnergyPlus is contained in the Programming Standard reference document.  Logically, the modules in EnergyPlus form an inverted tree structure. At the top is EnergyPlus. Just below that are ProcessInput and ManageSimulation. At the bottom are the modules such as HVACDamperComponent that model the actual HVAC components.
 
 ### Data Only Modules
 
@@ -4124,7 +4124,7 @@ Code Readability vs. Speed of Execution
 
 Programmers throughout time have had to deal with speed of code execution and it’s an ongoing concern.  However, compilers are pretty smart these days and, often, can produce speedier code for the hardware platform than the programmer can when he or she uses “speed up” tips.  The EnergyPlus development team would rather the code be more “readable” to all than to try to outwit the compilers for every platform.  First and foremost, the code is the true document of what EnergyPlus does – other documents will try to explain algorithms and such but must really take a back seat to the code itself.
 
-However, many people may read the code – as developers, we should try to make it as readable at first glance as possible.  For a true example from the code and a general indication of preferred style, take the case of the zone temperature update equation.  In the [Engineering Reference](file:///E:\Docs4PDFs\EngineeringReference.pdf) document, the form is recognizable and usual:
+However, many people may read the code – as developers, we should try to make it as readable at first glance as possible.  For a true example from the code and a general indication of preferred style, take the case of the zone temperature update equation.  In the Engineering Reference document, the form is recognizable and usual:
 
 ![](media/image001.png)And, this equation appears in the code (ZoneTempPredictorCorrector Module), as:
 
@@ -6017,7 +6017,7 @@ IF (Sys(SysNum)%SchedPtr == 0) THEN
 
 ENDIF
 
-More information about standard error message formatting is contained in the [Output Details and Examples](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) document (for the user) and (for the developer) in this document section: Standard Message Format.
+More information about standard error message formatting is contained in the Output Details and Examples document (for the user) and (for the developer) in this document section: Standard Message Format.
 
 ### GetObjectDefMaxArgs
 
@@ -9666,7 +9666,7 @@ OutputFileDebug is initialized very early in the EnergyPlus execution and is ava
 
 OutputFileInits is intended for “one-time” outputs.  If the value is calculated or entered and should be echoed to output, this file is the place for it.  The structure is similar to the IDD/IDF structure in that there is a “definition” line followed by the data being reported. Since the data may be produced in several places during the simulation, the actual file looks a bit hodge-podge but can be easily imported into a spreadsheet program and grouped.
 
-OutputFileStandard is the reporting variable output file from EnergyPlus.  You can read more details from the [*Guide for Interface Developers*](file:///E:\Docs4PDFs\InterfaceDeveloper.pdf) document and in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) document.  OutputFileMeters is a similar file to contain meter (only) output.  Meter values also may appear in the OutputFileStandard file. Only values that change during the simulation should be output to these files.  They are automaticallly included by the SetupOutputVariable calls.
+OutputFileStandard is the reporting variable output file from EnergyPlus.  You can read more details from the Guide for Interface Developers document and in the Input Output Reference document.  OutputFileMeters is a similar file to contain meter (only) output.  Meter values also may appear in the OutputFileStandard file. Only values that change during the simulation should be output to these files.  They are automaticallly included by the SetupOutputVariable calls.
 
 How Do I Output My Variables?
 -----------------------------
