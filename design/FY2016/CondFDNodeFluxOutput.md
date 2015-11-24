@@ -89,8 +89,8 @@ CalcNodeHeatFlux - Calculate the heat flux at each node
 				// Start with inside face (above) and work outward, positive value is flowing towards the inside face
 				// CpDelXRhoS1 is outer half-node heat capacity, CpDelXRhoS2 is inner half node heat capacity
 			Real64 interNodeFlux; // heat flux at the plan between nodes
-			interNodeFlux = surfaceFD.QDreport( node + 1 ) + surfaceFD.CpDelXRhoS2( node + 1 )  * ( surfaceFD.TDT( node + 1 ) - surfaceFD.TDreport( node + 1 ) ) / TimeStepZoneSec;
-			surfaceFD.QDreport( node ) = interNodeFlux + surfaceFD.CpDelXRhoS1( node )  * ( surfaceFD.TDT( node ) - surfaceFD.TDreport( node ) ) / TimeStepZoneSec;
+			interNodeFlux = surfaceFD.QDreport( node + 1 ) + surfaceFD.CpDelXRhoS1( node + 1 )  * ( surfaceFD.TDT( node + 1 ) - surfaceFD.TDreport( node + 1 ) ) / TimeStepZoneSec;
+			surfaceFD.QDreport( node ) = interNodeFlux + surfaceFD.CpDelXRhoS2( node )  * ( surfaceFD.TDT( node ) - surfaceFD.TDreport( node ) ) / TimeStepZoneSec;
 		}
 ```
 

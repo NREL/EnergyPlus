@@ -322,7 +322,7 @@ The Conduction Finite Difference algorithm can also invoke the source/sink layer
 
 The Conduction Finite Difference algorithm can output the heat flux at each node and the heat capacitance of each half-node.  During the CondFD solution iterations, the heat capacitance of each half node (CondFD Surface Heat Capacitance Node < n  >) is stored:
 
-<div>$${HeatCap_{i} = Cp_{i}*\Delta x_{i}*\rho_{i}}$$</div>
+<div>$${HeatCap_{i} = Cp_{i}*\Delta x_{i}*\rho_{i}/2}$$</div>
 
 For nodes which are at the inside or outside face of the surface, there is only one half-node.
 
@@ -332,7 +332,7 @@ After the CondFD node temperatures have been solved for a given timestep, the he
  
 for the remaining nodes
 
-<div>$${QDreport_{i} = QDreport_{i+1}+HeatCap2_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old}\right)}{\Delta t}+HeatCap1_{i}* \frac{\left(T_{i,new}-T_{i,old}\right)}{\Delta t}}$$</div>
+<div>$${QDreport_{i} = QDreport_{i+1}+HeatCap1_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old}\right)}{\Delta t}+HeatCap2_{i}* \frac{\left(T_{i,new}-T_{i,old}\right)}{\Delta t}}$$</div>
 
 Where:
 

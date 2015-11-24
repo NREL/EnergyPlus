@@ -4680,7 +4680,7 @@ This will output temperatures for a node in the surfaces being simulated with Co
 
 #### CondFD Surface Heat Flux Node &lt;X&gt; [W/m2]
 
-This will output heat flux at each node in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file.
+This will output heat flux at each node in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. A positive value indicates heat flowing towards the inside face of the surface. The full listing will appear in the RDD file.
 
 #### CondFD Surface Heat Capacitance Outer Half Node &lt;X&gt; [W/m2-K]
 #### CondFD Surface Heat Capacitance Inner Half Node &lt;X&gt; [W/m2-K]

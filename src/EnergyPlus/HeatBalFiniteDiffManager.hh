@@ -146,6 +146,7 @@ namespace HeatBalFiniteDiffManager {
 		Array1D< Real64 > QDreport; // Node to node heat flux for reporting [W/m2]
 		Array1D< Real64 > CpDelXRhoS1; // Current outer half-node Cp * DelX * RhoS / Delt 
 		Array1D< Real64 > CpDelXRhoS2; // Current inner half-node Cp * DelX * RhoS / Delt 
+		Array1D< Real64 > TDpriortimestep; // Node temperatures from previous timestep
 		int GSloopCounter; // count of inner loop iterations
 		int GSloopErrorCount; // recurring error counter
 		Real64 MaxNodeDelTemp; // largest change in node temps after calc
