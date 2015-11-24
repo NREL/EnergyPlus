@@ -35,7 +35,7 @@ using namespace SimulationManager;
 using namespace ObjexxFCL;
 
 Real64 AirloopHVAC_ZoneSumTest_Zone1People( 0.0 );
-Real64 AirloopHVAC_ZoneSumTest_Zone1MechVentVolTotal( 0.0 );
+Real64 AirloopHVAC_ZoneSumTest_DesOutAirVolFlow( 0.0 );
 Real64 AirloopHVAC_ZoneSumTest_VbzByZone1( 0.0 );
 Real64 AirloopHVAC_ZoneSumTest_VbzByZone2( 0.0 );
 
@@ -1983,7 +1983,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 
 	// Save data to compare to next unit test
 	AirloopHVAC_ZoneSumTest_Zone1People = DataHeatBalance::ZnRpt( 1 ).PeopleNumOcc;
-	AirloopHVAC_ZoneSumTest_Zone1MechVentVolTotal = DataHeatBalance::ZonePreDefRep( 1 ).MechVentVolTotal;
+	AirloopHVAC_ZoneSumTest_DesOutAirVolFlow = DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow;
 	AirloopHVAC_ZoneSumTest_VbzByZone1 = SimAirServingZones::VbzByZone( 1 );
 	AirloopHVAC_ZoneSumTest_VbzByZone2 = SimAirServingZones::VbzByZone( 2 );
 
@@ -2965,6 +2965,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 	UpdateTabularReports( OutputReportTabular::stepTypeHVAC );
 
 	EXPECT_EQ( AirloopHVAC_ZoneSumTest_Zone1People, DataHeatBalance::ZnRpt( 1 ).PeopleNumOcc ); // compare previous unit test result to this unit test result
+	EXPECT_EQ( AirloopHVAC_ZoneSumTest_DesOutAirVolFlow, DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow );
 	EXPECT_EQ( AirloopHVAC_ZoneSumTest_VbzByZone1, SimAirServingZones::VbzByZone( 1 ) );
 	EXPECT_EQ( AirloopHVAC_ZoneSumTest_VbzByZone2, SimAirServingZones::VbzByZone( 2 ) );
 

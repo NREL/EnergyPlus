@@ -5695,7 +5695,7 @@ namespace SimAirServingZones {
 				// move the noncoincident results into the system sizing array
 				if ( CalcSysSizing( AirLoopNum ).SizingOption == NonCoincident ) {
 					// But first check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
-					if ( ! ( FinalSysSizing( AirLoopNum ).CoolOAOption == 1 && SysSensCoolCap <= 0.0 ) ) {
+					if ( ! ( FinalSysSizing( AirLoopNum ).CoolOAOption == 1 && SysSensCoolCap <= 0.0 ) ) { // CoolOAOption = Yes 100% OA
 						CalcSysSizing( AirLoopNum ).SensCoolCap = SysSensCoolCap;
 						CalcSysSizing( AirLoopNum ).TotCoolCap = SysTotCoolCap;
 						CalcSysSizing( AirLoopNum ).MixTempAtCoolPeak = SysCoolMixTemp;
@@ -5705,8 +5705,9 @@ namespace SimAirServingZones {
 						CalcSysSizing( AirLoopNum ).OutTempAtCoolPeak = SysCoolOutTemp;
 						CalcSysSizing( AirLoopNum ).OutHumRatAtCoolPeak = SysCoolOutHumRat;
 					}
-					// check to see is the noncoincident result is actually bigger than the coincident (for 100% outside air)
-					if ( ! ( FinalSysSizing( AirLoopNum ).HeatOAOption == 1 && SysHeatCap < 0.0 ) ) {
+					// check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
+					// why is this < 0.0 ? SysHeatCap cannot be < 0 ?? this code will always get executed
+					if ( ! ( FinalSysSizing( AirLoopNum ).HeatOAOption == 1 && SysHeatCap < 0.0 ) ) { // HeatOAOption = Yes 100% OA
 						CalcSysSizing( AirLoopNum ).HeatCap = SysHeatCap;
 						CalcSysSizing( AirLoopNum ).HeatMixTemp = SysHeatMixTemp;
 						CalcSysSizing( AirLoopNum ).HeatRetTemp = SysHeatRetTemp;
@@ -5801,13 +5802,15 @@ namespace SimAirServingZones {
 				if ( CalcSysSizing( AirLoopNum ).LoadSizeType == Ventilation && SysCoolSizingRat == 1.0 ) {
 					if ( CalcSysSizing( AirLoopNum ).DesCoolVolFlow > 0.0 ) {
 						SysCoolSizingRat = CalcSysSizing( AirLoopNum ).DesOutAirVolFlow / CalcSysSizing( AirLoopNum ).DesCoolVolFlow;
+						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow;
 					} else {
 						SysCoolSizingRat = 1.0;
 					}
 				}
-				if ( CalcSysSizing( AirLoopNum ).LoadSizeType == Ventilation && SysHeatSizingRat == 1.0 ) {
+				if( CalcSysSizing( AirLoopNum ).LoadSizeType == Ventilation && SysHeatSizingRat == 1.0 ) {
 					if ( CalcSysSizing( AirLoopNum ).DesHeatVolFlow > 0.0 ) {
 						SysHeatSizingRat = CalcSysSizing( AirLoopNum ).DesOutAirVolFlow / CalcSysSizing( AirLoopNum ).DesHeatVolFlow;
+						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow;
 					} else {
 						SysHeatSizingRat = 1.0;
 					}
@@ -6070,14 +6073,14 @@ namespace SimAirServingZones {
 					PreDefTableEntry( pdchS62svrHtEv, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysHeat( AirLoopNum ), 3 ); //Ev
 					PreDefTableEntry( pdchS62svrHtVot, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotHtgBySys( AirLoopNum ), 4 ); //Vot
 					if ( FinalSysSizing( AirLoopNum ).DesHeatVolFlow != 0.0 ) { // Move here from other routine
-						PreDefTableEntry( pdchS62svrHtPercOA, FinalSysSizing( AirLoopNum ).AirPriLoopName, 100.0 * VotHtgBySys( AirLoopNum ) / FinalSysSizing( AirLoopNum ).DesHeatVolFlow ); //%OA
+						PreDefTableEntry( pdchS62svrHtPercOA, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotHtgBySys( AirLoopNum ) / FinalSysSizing( AirLoopNum ).DesHeatVolFlow ); //%OA
 					}
 					//system ventilation calculations for cooling table
 					PreDefTableEntry( pdchS62scdVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, 3 ); //Vps
 					PreDefTableEntry( pdchS62scdEvz, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysCool( AirLoopNum ), 3 ); //Evz-min
 					PreDefTableEntry( pdchS62svrClVot, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotClgBySys( AirLoopNum ), 4 ); //Vot
 					if ( FinalSysSizing( AirLoopNum ).DesCoolVolFlow != 0.0 ) { // Move here
-						PreDefTableEntry( pdchS62svrClPercOA, FinalSysSizing( AirLoopNum ).AirPriLoopName, 100.0 * VotClgBySys( AirLoopNum ) / FinalSysSizing( AirLoopNum ).DesCoolVolFlow ); //%OA
+						PreDefTableEntry( pdchS62svrClPercOA, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotClgBySys( AirLoopNum ) / FinalSysSizing( AirLoopNum ).DesCoolVolFlow ); //%OA
 					}
 
 					//system ventilation calculations for heating table
