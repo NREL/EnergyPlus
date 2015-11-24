@@ -147,12 +147,16 @@ namespace HeatBalFiniteDiffManager {
 		Array1D< Real64 > CpDelXRhoS1; // Current outer half-node Cp * DelX * RhoS / Delt 
 		Array1D< Real64 > CpDelXRhoS2; // Current inner half-node Cp * DelX * RhoS / Delt 
 		Array1D< Real64 > TDpriortimestep; // Node temperatures from previous timestep
+		int SourceNodeNum; // Node number for internal source layer (zero if no source)
+		Real64 QSource; // Internal source flux [W/m2]
 		int GSloopCounter; // count of inner loop iterations
 		int GSloopErrorCount; // recurring error counter
 		Real64 MaxNodeDelTemp; // largest change in node temps after calc
 
 		// Default Constructor
 		SurfaceDataFD() :
+			SourceNodeNum( 0 ),
+			QSource( 0.0 ),
 			GSloopCounter( 0 ),
 			GSloopErrorCount( 0 ),
 			MaxNodeDelTemp( 0.0 )

@@ -1213,8 +1213,8 @@ namespace HeatBalFiniteDiffManager {
 
 		// For ground surfaces or when raining, outside face inner half-node heat capacity was unknown and set to -1 in ExteriorBCEqns
 		// Now check for the flag and set equal to the second node's outer half-node heat capacity if needed
-		if ( SurfaceFD( Surf ).CpDelXRhoS2( 1 ) == -1.0 ){
-			SurfaceFD( Surf ).CpDelXRhoS2( 1 ) = SurfaceFD( Surf ).CpDelXRhoS1( 2 ); // Set to node 2's outer half node heat capacity
+		if ( surfaceFD.CpDelXRhoS2( 1 ) == -1.0 ) {
+			surfaceFD.CpDelXRhoS2( 1 ) = surfaceFD.CpDelXRhoS1( 2 ); // Set to node 2's outer half node heat capacity
 		}
 		CalcNodeHeatFlux( Surf, TotNodes );
 
@@ -2102,6 +2102,8 @@ namespace HeatBalFiniteDiffManager {
 					if ( construct.SourceSinkPresent && ( Lay == construct.SourceAfterLayer ) ) {
 						TCondFDSourceNode( Surf ) = TDT_i; // Transfer node temp to Radiant System
 						TempSource( Surf ) = TDT_i; // Transfer node temp to DataHeatBalSurface module
+						SurfaceFD( Surf ).QSource = QSSFlux;
+						SurfaceFD( Surf ).SourceNodeNum = i;
 					}
 
 				} // End of R-layer and Regular check
@@ -2442,9 +2444,15 @@ namespace HeatBalFiniteDiffManager {
 		for ( node = TotNodes; node >= 1; --node ) {
 				// Start with inside face (above) and work outward, positive value is flowing towards the inside face
 				// CpDelXRhoS1 is outer half-node heat capacity, CpDelXRhoS2 is inner half node heat capacity
-			Real64 interNodeFlux; // heat flux at the plan between nodes
+			Real64 interNodeFlux; // heat flux at the plane between node and node+1 [W/m2]
+			Real64 sourceFlux; // Internal source flux [W/m2]
+			if ( surfaceFD.SourceNodeNum == node) {
+				sourceFlux = surfaceFD.QSource;
+			} else {
+				sourceFlux = 0.0;
+			}
 			interNodeFlux = surfaceFD.QDreport( node + 1 ) + surfaceFD.CpDelXRhoS1( node + 1 )  * ( surfaceFD.TDT( node + 1 ) - surfaceFD.TDpriortimestep( node + 1 ) ) / TimeStepZoneSec;
-			surfaceFD.QDreport( node ) = interNodeFlux + surfaceFD.CpDelXRhoS2( node )  * ( surfaceFD.TDT( node ) - surfaceFD.TDpriortimestep( node ) ) / TimeStepZoneSec;
+			surfaceFD.QDreport( node ) = interNodeFlux - sourceFlux + surfaceFD.CpDelXRhoS2( node )  * ( surfaceFD.TDT( node ) - surfaceFD.TDpriortimestep( node ) ) / TimeStepZoneSec;
 		}
 	}
 	// *****************************************************************************

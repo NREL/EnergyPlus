@@ -332,14 +332,14 @@ After the CondFD node temperatures have been solved for a given timestep, the he
  
 for the remaining nodes
 
-<div>$${QDreport_{i} = QDreport_{i+1}+HeatCap1_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old}\right)}{\Delta t}+HeatCap2_{i}* \frac{\left(T_{i,new}-T_{i,old}\right)}{\Delta t}}$$</div>
+<div>$${QDreport_{i} = QDreport_{i+1}+HeatCap1_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old}\right)}{\Delta t}-QSource_{i}+HeatCap2_{i}* \frac{\left(T_{i,new}-T_{i,old}\right)}{\Delta t}}$$</div>
 
 Where:
 
 HeatCap1<sub>i</sub> = heat capacitance associated with a given outer half-node
 HeatCap2<sub>i</sub> = heat capacitance associated with a given inner half-node
 QDreport<sub>i</sub> = CondFD Surface Heat Flux Node < i >
-
+QSource<sub>i</sub> = internal source heat flux at node i
 Q<sub>inside</sub> = Surface Inside Face Conduction Heat Transfer Rate per Area [W/m<sup>2</sup>]
 
 N = total number of nodes in a surface including the surface inside face node.

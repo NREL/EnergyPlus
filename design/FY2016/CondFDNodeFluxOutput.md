@@ -44,8 +44,6 @@ For every CondFD surface, the Surface Inside Face Conduction Heat Transfer Rate 
 *Existing*
 HeatBalFiniteDiffManager::SurfaceFD(surf).TDT(node) = new node temperature
 
-HeatBalFiniteDiffManager::SurfaceFD(surf).TDReport(node) = old node temperature from previous timestep (at the time it's used here, then it gets updated)
-
 DataHeatBalSurface::OpaqSurfInsFaceConductionFlux
 
 *New*
@@ -54,6 +52,8 @@ HeatBalFiniteDiffManager::SurfaceFD(surf).CpDelXRhoS1(n) = Heat capacitance of O
 HeatBalFiniteDiffManager::SurfaceFD(surf).CpDelXRhoS2(n) = Heat capacitance of Inner Half-Node n, Cp \* Rho \* delX (where delX is the thickness of the node)
 
 HeatBalFiniteDiffManager::SurfaceFD(surf).QDreport(n) = Heat flux at Node n
+
+HeatBalFiniteDiffManager::SurfaceFD(surf).TDpriortimestep(node) = old node temperature from previous timestep
 
 ### Relevant Functions ###
 HeatBalFiniteDiffManager::
@@ -72,25 +72,30 @@ CalcNodeHeatFlux - Calculate the heat flux at each node
 3. After the new temperatures have been solved, call CalcNodeHeatFlux to compute the heat fluxes for reporting.
 
 ```
-		// surfaceFD.QDreport( n ) is the flux at node n
-		// when this is called TDT( NodeNum ) is the new node temp and TDreport( NodeNum ) is still the previous node temp
-		// For the TDT and TDReport arrays, Node 1 is the outside face, and Node TotNodes+1 is the inside face
+		// SurfaceFD.QDreport( n ) is the flux at node n
+		// When this is called TDT( NodeNum ) is the new node temp and TDpriortimestep( NodeNum ) holds the previous node temp
+		// For the TDT and TDpriortimestep arrays, Node 1 is the outside face, and Node TotNodes+1 is the inside face
 
 		// Last node is always the surface inside face.  Start calculations here because the outside face is not defined for all surfaces.
 		// Note that TotNodes is the number of nodes in the surface including the outside face node, but not the inside face node
 		// so the arrays are all allocated to Totodes+1
 
 		// Heat flux at the inside face node (TotNodes+1)
-		// OLD surfaceFD.QDreport( TotNodes ) = OpaqSurfInsFaceConductionFlux( Surf ) + surfaceFD.CpDelXRhoS( TotNodes + 1) * ( surfaceFD.TDT( TotNodes + 1) - surfaceFD.TDreport( TotNodes + 1 )) / TimeStepZoneSec;
 		surfaceFD.QDreport( TotNodes + 1 ) = OpaqSurfInsFaceConductionFlux( Surf );
 
 		// Heat flux for remaining nodes.
 		for ( node = TotNodes; node >= 1; --node ) {
 				// Start with inside face (above) and work outward, positive value is flowing towards the inside face
 				// CpDelXRhoS1 is outer half-node heat capacity, CpDelXRhoS2 is inner half node heat capacity
-			Real64 interNodeFlux; // heat flux at the plan between nodes
-			interNodeFlux = surfaceFD.QDreport( node + 1 ) + surfaceFD.CpDelXRhoS1( node + 1 )  * ( surfaceFD.TDT( node + 1 ) - surfaceFD.TDreport( node + 1 ) ) / TimeStepZoneSec;
-			surfaceFD.QDreport( node ) = interNodeFlux + surfaceFD.CpDelXRhoS2( node )  * ( surfaceFD.TDT( node ) - surfaceFD.TDreport( node ) ) / TimeStepZoneSec;
+			Real64 interNodeFlux; // heat flux at the plane between node and node+1 [W/m2]
+			Real64 sourceFlux; // Internal source flux [W/m2]
+			if ( surfaceFD.SourceNodeNum == node) {
+				sourceFlux = surfaceFD.QSource;
+			} else {
+				sourceFlux = 0.0;
+			}
+			interNodeFlux = surfaceFD.QDreport( node + 1 ) + surfaceFD.CpDelXRhoS1( node + 1 )  * ( surfaceFD.TDT( node + 1 ) - surfaceFD.TDpriortimestep( node + 1 ) ) / TimeStepZoneSec;
+			surfaceFD.QDreport( node ) = interNodeFlux - sourceFlux + surfaceFD.CpDelXRhoS2( node )  * ( surfaceFD.TDT( node ) - surfaceFD.TDpriortimestep( node ) ) / TimeStepZoneSec;
 		}
 ```
 
