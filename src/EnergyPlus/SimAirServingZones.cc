@@ -4276,6 +4276,7 @@ namespace SimAirServingZones {
 
 		// write predefined standard 62.1 report data
 		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+//  This if block is commented out to allow Standard 62.1 Summary Report to output when ZoneSum is used
 //			if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) { // commented line allows ZoneSum method to report tables to the html file
 				NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 				//System Ventilation Requirements for Cooling
@@ -5807,7 +5808,7 @@ namespace SimAirServingZones {
 						SysCoolSizingRat = 1.0;
 					}
 				}
-				if( CalcSysSizing( AirLoopNum ).LoadSizeType == Ventilation && SysHeatSizingRat == 1.0 ) {
+				if ( CalcSysSizing( AirLoopNum ).LoadSizeType == Ventilation && SysHeatSizingRat == 1.0 ) {
 					if ( CalcSysSizing( AirLoopNum ).DesHeatVolFlow > 0.0 ) {
 						SysHeatSizingRat = CalcSysSizing( AirLoopNum ).DesOutAirVolFlow / CalcSysSizing( AirLoopNum ).DesHeatVolFlow;
 						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow;
@@ -6062,6 +6063,7 @@ namespace SimAirServingZones {
 
 			// write predefined standard 62.1 report data
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+//  This if block is commented out to allow Standard 62.1 Summary Report to output when ZoneSum is used
 //				if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {  // commented line allows ZoneSum method to report tables to the html file
 					//system ventilation requirements for cooling table
 					PreDefTableEntry( pdchS62svrClVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, 3 ); //Vps
