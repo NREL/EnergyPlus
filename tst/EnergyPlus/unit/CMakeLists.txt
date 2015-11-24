@@ -52,6 +52,7 @@ set( test_src
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
+  PlantUtilities.unit.cc
   PurchasedAirManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
@@ -67,6 +68,7 @@ set( test_src
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
   SiteFCFactorMethodGroundTemperatures.unit.cc
+  SiteGroundDomain.unit.cc
   SiteShallowGroundTemperatures.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc

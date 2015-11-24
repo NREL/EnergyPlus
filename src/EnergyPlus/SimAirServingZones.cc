@@ -4276,6 +4276,7 @@ namespace SimAirServingZones {
 
 		// write predefined standard 62.1 report data
 		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+//  This if block is commented out to allow Standard 62.1 Summary Report to output when ZoneSum is used
 //			if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) { // commented line allows ZoneSum method to report tables to the html file
 				NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 				//System Ventilation Requirements for Cooling
@@ -5695,7 +5696,7 @@ namespace SimAirServingZones {
 				// move the noncoincident results into the system sizing array
 				if ( CalcSysSizing( AirLoopNum ).SizingOption == NonCoincident ) {
 					// But first check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
-					if ( ! ( FinalSysSizing( AirLoopNum ).CoolOAOption == 1 && SysSensCoolCap <= 0.0 ) ) {
+					if ( ! ( FinalSysSizing( AirLoopNum ).CoolOAOption == 1 && SysSensCoolCap <= 0.0 ) ) { // CoolOAOption = Yes 100% OA
 						CalcSysSizing( AirLoopNum ).SensCoolCap = SysSensCoolCap;
 						CalcSysSizing( AirLoopNum ).TotCoolCap = SysTotCoolCap;
 						CalcSysSizing( AirLoopNum ).MixTempAtCoolPeak = SysCoolMixTemp;
@@ -5705,8 +5706,9 @@ namespace SimAirServingZones {
 						CalcSysSizing( AirLoopNum ).OutTempAtCoolPeak = SysCoolOutTemp;
 						CalcSysSizing( AirLoopNum ).OutHumRatAtCoolPeak = SysCoolOutHumRat;
 					}
-					// check to see is the noncoincident result is actually bigger than the coincident (for 100% outside air)
-					if ( ! ( FinalSysSizing( AirLoopNum ).HeatOAOption == 1 && SysHeatCap < 0.0 ) ) {
+					// check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
+					// why is this < 0.0 ? SysHeatCap cannot be < 0 ?? this code will always get executed
+					if ( ! ( FinalSysSizing( AirLoopNum ).HeatOAOption == 1 && SysHeatCap < 0.0 ) ) { // HeatOAOption = Yes 100% OA
 						CalcSysSizing( AirLoopNum ).HeatCap = SysHeatCap;
 						CalcSysSizing( AirLoopNum ).HeatMixTemp = SysHeatMixTemp;
 						CalcSysSizing( AirLoopNum ).HeatRetTemp = SysHeatRetTemp;
@@ -5801,6 +5803,7 @@ namespace SimAirServingZones {
 				if ( CalcSysSizing( AirLoopNum ).LoadSizeType == Ventilation && SysCoolSizingRat == 1.0 ) {
 					if ( CalcSysSizing( AirLoopNum ).DesCoolVolFlow > 0.0 ) {
 						SysCoolSizingRat = CalcSysSizing( AirLoopNum ).DesOutAirVolFlow / CalcSysSizing( AirLoopNum ).DesCoolVolFlow;
+						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow;
 					} else {
 						SysCoolSizingRat = 1.0;
 					}
@@ -5808,6 +5811,7 @@ namespace SimAirServingZones {
 				if ( CalcSysSizing( AirLoopNum ).LoadSizeType == Ventilation && SysHeatSizingRat == 1.0 ) {
 					if ( CalcSysSizing( AirLoopNum ).DesHeatVolFlow > 0.0 ) {
 						SysHeatSizingRat = CalcSysSizing( AirLoopNum ).DesOutAirVolFlow / CalcSysSizing( AirLoopNum ).DesHeatVolFlow;
+						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow;
 					} else {
 						SysHeatSizingRat = 1.0;
 					}
@@ -6059,6 +6063,7 @@ namespace SimAirServingZones {
 
 			// write predefined standard 62.1 report data
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+//  This if block is commented out to allow Standard 62.1 Summary Report to output when ZoneSum is used
 //				if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {  // commented line allows ZoneSum method to report tables to the html file
 					//system ventilation requirements for cooling table
 					PreDefTableEntry( pdchS62svrClVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).DesCoolVolFlow, 3 ); //Vps

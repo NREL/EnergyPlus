@@ -35,7 +35,7 @@ using namespace SimulationManager;
 using namespace ObjexxFCL;
 
 Real64 AirloopHVAC_ZoneSumTest_Zone1People( 0.0 );
-Real64 AirloopHVAC_ZoneSumTest_Zone1MechVentVolTotal( 0.0 );
+Real64 AirloopHVAC_ZoneSumTest_DesOutAirVolFlow( 0.0 );
 Real64 AirloopHVAC_ZoneSumTest_VbzByZone1( 0.0 );
 Real64 AirloopHVAC_ZoneSumTest_VbzByZone2( 0.0 );
 
@@ -1983,7 +1983,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 
 	// Save data to compare to next unit test
 	AirloopHVAC_ZoneSumTest_Zone1People = DataHeatBalance::ZnRpt( 1 ).PeopleNumOcc;
-	AirloopHVAC_ZoneSumTest_Zone1MechVentVolTotal = DataHeatBalance::ZonePreDefRep( 1 ).MechVentVolTotal;
+	AirloopHVAC_ZoneSumTest_DesOutAirVolFlow = DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow;
 	AirloopHVAC_ZoneSumTest_VbzByZone1 = SimAirServingZones::VbzByZone( 1 );
 	AirloopHVAC_ZoneSumTest_VbzByZone2 = SimAirServingZones::VbzByZone( 2 );
 
@@ -2965,6 +2965,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 	UpdateTabularReports( OutputReportTabular::stepTypeHVAC );
 
 	EXPECT_EQ( AirloopHVAC_ZoneSumTest_Zone1People, DataHeatBalance::ZnRpt( 1 ).PeopleNumOcc ); // compare previous unit test result to this unit test result
+	EXPECT_EQ( AirloopHVAC_ZoneSumTest_DesOutAirVolFlow, DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow );
 	EXPECT_EQ( AirloopHVAC_ZoneSumTest_VbzByZone1, SimAirServingZones::VbzByZone( 1 ) );
 	EXPECT_EQ( AirloopHVAC_ZoneSumTest_VbzByZone2, SimAirServingZones::VbzByZone( 2 ) );
 
@@ -3074,4 +3075,33 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 	GatherBEPSResultsForTimestep( 1 );
 	EXPECT_EQ( extLitUse * 3, gatherEndUseBEPS( 1, endUseExteriorLights ) );
 
+}
+
+
+TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+		"Output:Table:TimeBins,",
+		"System1, !- Key Value",
+		"Some Temperature Variable, !- Variable Name",
+		"0.00, !- Interval Start",
+		"0.20, !- Interval Size",
+		"5,                       !- Interval Count",
+		"Always1; !- Schedule Name"
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::DoWeathSim = true;
+
+	GetInputTabularTimeBins();
+
+	EXPECT_EQ( OutputReportTabular::OutputTableBinned.size(), 1u );
+	EXPECT_EQ( OutputTableBinned( 1 ).keyValue, "SYSTEM1" );
+	EXPECT_EQ( OutputTableBinned( 1 ).varOrMeter, "SOME TEMPERATURE VARIABLE" );
+	EXPECT_EQ( OutputTableBinned( 1 ).intervalStart, 0.0 );
+	EXPECT_EQ( OutputTableBinned( 1 ).intervalSize, 0.20 );
+	EXPECT_EQ( OutputTableBinned( 1 ).intervalCount, 5 );
+	EXPECT_EQ( OutputTableBinned( 1 ).ScheduleName, "ALWAYS1" );
 }
