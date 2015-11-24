@@ -5230,7 +5230,7 @@ Steps for running the program
 
 C:
 
-CD \\&lt;rootfolder&gt;\&lt;/span>
+CD EPlusRoot\
 
 3)   Change to the specific folder for the console application:
 
@@ -5962,7 +5962,7 @@ Steps for running the program
 
 C:
 
-CD \\&lt;rootfolder&gt;\&lt;/span>
+CD EPlusRoot\
 
 3)   Change to the specific folder for the console application:
 
@@ -8812,7 +8812,7 @@ You can also run both programs as console applications and, because they are sma
 
 C:
 
-CD \\&lt;rootfolder&gt;\&lt;/span>
+CD EPlusRoot
 
 3)   Change to the specific folder for the coefficient conversion applications:
 
@@ -8966,7 +8966,7 @@ This simple post processing utility may be useful when doing parametric analyses
 
 C:
 
-CD \\&lt;root folder&gt;\&lt;/span>
+CD EPlusRoot\
 
 3)   Change to the specific folder for the coefficient conversion applications:
 
@@ -9098,7 +9098,7 @@ You can also run the CalcSoilSurfTemp program as a console application with a ba
 
 C:
 
-CD \\&lt;root folder&gt;\&lt;/span>
+CD EPlusRoot\
 
 3)   Change to the calculate surface soil temperature folder:
 
@@ -10065,11 +10065,11 @@ Generally, the steps for executing a console application is:
 
 C:
 
-CD \\&lt;root folder&gt;\&lt;/span>
+CD EPlusRoot\
 
 3)   Change to the specific folder for the console application:
 
-CD &lt;folder&gt;
+CD folder\
 
 4)   Run the program:
 
