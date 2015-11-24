@@ -1213,7 +1213,7 @@ namespace HeatBalFiniteDiffManager {
 
 		// For ground surfaces or when raining, outside face inner half-node heat capacity was unknown and set to -1 in ExteriorBCEqns
 		// Now check for the flag and set equal to the second node's outer half-node heat capacity if needed
-		if ( SurfaceFD( Surf ).CpDelXRhoS2( 1 ) = -1.0 ){
+		if ( SurfaceFD( Surf ).CpDelXRhoS2( 1 ) == -1.0 ){
 			SurfaceFD( Surf ).CpDelXRhoS2( 1 ) = SurfaceFD( Surf ).CpDelXRhoS1( 2 ); // Set to node 2's outer half node heat capacity
 		}
 		CalcNodeHeatFlux( Surf, TotNodes );
