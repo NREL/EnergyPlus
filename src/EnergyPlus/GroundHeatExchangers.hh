@@ -122,8 +122,6 @@ namespace GroundHeatExchangers {
 			timeSS( 0.0 ),
 			timeSSFactor( 0.0 )
 		{}
-		void
-		clear_state();
 
 		virtual void
 		calcGFunctions()=0;
@@ -334,6 +332,9 @@ namespace GroundHeatExchangers {
 	// Object Data
 	extern Array1D< GLHEVert > verticalGLHE; // Vertical GLHEs
 	extern Array1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
+
+	void
+	clear_state();
 
 	void
 	SimGroundHeatExchangers(
