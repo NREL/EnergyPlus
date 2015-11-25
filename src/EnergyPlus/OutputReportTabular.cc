@@ -274,6 +274,8 @@ namespace OutputReportTabular {
 	Real64 gatherElecPurchased( 0.0 );
 	int meterNumElecSurplusSold( 0 );
 	Real64 gatherElecSurplusSold( 0.0 );
+	int meterNumElecStorage = ( 0 );
+	Real64 gatherElecStorage = ( 0.0 );
 	// for on site thermal source components on BEPS report
 	int meterNumWaterHeatRecovery( 0 );
 	Real64 gatherWaterHeatRecovery( 0.0 );
@@ -2066,6 +2068,7 @@ namespace OutputReportTabular {
 			meterNumPowerPV = GetMeterIndex( "Photovoltaic:ElectricityProduced" );
 			meterNumPowerWind = GetMeterIndex( "WindTurbine:ElectricityProduced" );
 			meterNumPowerHTGeothermal = GetMeterIndex( "HTGeothermal:ElectricityProduced" );
+			meterNumElecStorage = GetMeterIndex( "ElectricStorage:ElectricityProduced" );
 			meterNumElecProduced = GetMeterIndex( "ElectricityProduced:Facility" );
 			meterNumElecPurchased = GetMeterIndex( "ElectricityPurchased:Facility" );
 			meterNumElecSurplusSold = GetMeterIndex( "ElectricitySurplusSold:Facility" );
@@ -2084,6 +2087,7 @@ namespace OutputReportTabular {
 			gatherElecProduced = 0.0;
 			gatherElecPurchased = 0.0;
 			gatherElecSurplusSold = 0.0;
+			gatherElecStorage = 0.0;
 
 			// get meter numbers for onsite thermal components on BEPS report
 			meterNumWaterHeatRecovery = GetMeterIndex( "HeatRecovery:EnergyTransfer" );
@@ -3670,6 +3674,16 @@ namespace OutputReportTabular {
 						if ( OutputTableBinned( iInObj ).avgSum == isSum ) { // if it is a summed variable
 							curValue /= ( elapsedTime * SecInHour );
 						}
+						// round the value to the number of signficant digits used in the final output report
+						if ( curIntervalSize < 1 ) {
+							curValue = round( curValue * 10000.0 ) / 10000.0; // four significant digits
+						}
+						else if ( curIntervalSize >= 10 ) {
+							curValue = round( curValue ); // zero significant digits
+						}
+						else {
+							curValue = round( curValue * 100.0 ) / 100.0; // two significant digits
+						}
 						// check if the value is above the maximum or below the minimum value
 						// first before binning the value within the range.
 						if ( curValue < curIntervalStart ) {
@@ -4156,6 +4170,7 @@ namespace OutputReportTabular {
 			gatherElecProduced += GetCurrentMeterValue( meterNumElecProduced );
 			gatherElecPurchased += GetCurrentMeterValue( meterNumElecPurchased );
 			gatherElecSurplusSold += GetCurrentMeterValue( meterNumElecSurplusSold );
+			gatherElecStorage += GetCurrentMeterValue( meterNumElecStorage );
 			// gather the onsite thermal components
 			gatherWaterHeatRecovery += GetCurrentMeterValue( meterNumWaterHeatRecovery );
 			gatherAirHeatRecoveryCool += GetCurrentMeterValue( meterNumAirHeatRecoveryCool );
@@ -6648,11 +6663,11 @@ namespace OutputReportTabular {
 			columnWidth = 14; //array assignment - same for all columns
 			tableBody.allocate( curIntervalCount + 3, 39 );
 			tableBody = "";
-			columnHead = "-";
+			columnHead = "- [hr]";
 			tableBody( 1, 1 ) = "less than";
 			tableBody( 1, 2 ) = RealToStr( curIntervalStart, numIntervalDigits );
 			for ( nCol = 1; nCol <= curIntervalCount; ++nCol ) {
-				columnHead( nCol + 1 ) = IntToStr( nCol );
+				columnHead( nCol + 1 ) = IntToStr( nCol ) + " [hr]";
 				//beginning of interval
 				tableBody( nCol + 1, 1 ) = RealToStr( curIntervalStart + ( nCol - 1 ) * curIntervalSize, numIntervalDigits ) + "<=";
 				//end of interval
@@ -6793,7 +6808,6 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
-		using ManageElectricPower::ElecStorage;
 		using ManageElectricPower::NumElecStorageDevices;
 		using DataHVACGlobals::deviationFromSetPtThresholdHtg;
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
@@ -6981,7 +6995,9 @@ namespace OutputReportTabular {
 
 			// get change in overall state of charge for electrical storage devices.
 			if ( NumElecStorageDevices > 0 ) {
-				OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge() ) );
+				// All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not necessary
+				// OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored( ) ) - sum( ElecStorage.ThisTimeStepStateOfCharge( ) ) ) + gatherElecStorage;
+				OverallNetEnergyFromStorage = gatherElecStorage;
 				OverallNetEnergyFromStorage /= largeConversionFactor;
 			} else {
 				OverallNetEnergyFromStorage = 0.0;
@@ -8463,7 +8479,6 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
-		using ManageElectricPower::ElecStorage;
 		using ManageElectricPower::NumElecStorageDevices;
 
 		// Locals
@@ -13402,6 +13417,7 @@ namespace OutputReportTabular {
 		gatherElecProduced = 0.0;
 		gatherElecPurchased = 0.0;
 		gatherElecSurplusSold = 0.0;
+		gatherElecStorage = 0.0;
 		gatherWaterHeatRecovery = 0.0;
 		gatherAirHeatRecoveryCool = 0.0;
 		gatherAirHeatRecoveryHeat = 0.0;

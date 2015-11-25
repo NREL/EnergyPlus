@@ -1518,7 +1518,7 @@ namespace OutputReportPredefined {
 		pdchZnClCalcDesAirFlow = newPreDefColumn( pdstZoneClSize, "Calculated Design Air Flow [m3/s]" );
 		pdchZnClUserDesAirFlow = newPreDefColumn( pdstZoneClSize, "User Design Air Flow [m3/s]" );
 		pdchZnClDesDay = newPreDefColumn( pdstZoneClSize, "Design Day Name" );
-		pdchZnClPkTime = newPreDefColumn( pdstZoneClSize, "Date/Time Of Peak" );
+		pdchZnClPkTime = newPreDefColumn( pdstZoneClSize, "Date/Time Of Peak {TIMESTAMP}" );
 		pdchZnClPkTstatTemp = newPreDefColumn( pdstZoneClSize, "Thermostat Setpoint Temperature at Peak Load [C]" );
 		pdchZnClPkIndTemp = newPreDefColumn( pdstZoneClSize, "Indoor Temperature at Peak Load [C]" );
 		pdchZnClPkIndHum = newPreDefColumn( pdstZoneClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
@@ -1534,7 +1534,7 @@ namespace OutputReportPredefined {
 		pdchZnHtCalcDesAirFlow = newPreDefColumn( pdstZoneHtSize, "Calculated Design Air Flow [m3/s]" );
 		pdchZnHtUserDesAirFlow = newPreDefColumn( pdstZoneHtSize, "User Design Air Flow [m3/s]" );
 		pdchZnHtDesDay = newPreDefColumn( pdstZoneHtSize, "Design Day Name" );
-		pdchZnHtPkTime = newPreDefColumn( pdstZoneHtSize, "Date/Time Of Peak" );
+		pdchZnHtPkTime = newPreDefColumn( pdstZoneHtSize, "Date/Time Of Peak {TIMESTAMP}" );
 		pdchZnHtPkTstatTemp = newPreDefColumn( pdstZoneHtSize, "Thermostat Setpoint Temperature at Peak Load [C]" );
 		pdchZnHtPkIndTemp = newPreDefColumn( pdstZoneHtSize, "Indoor Temperature at Peak Load [C]" );
 		pdchZnHtPkIndHum = newPreDefColumn( pdstZoneHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
@@ -1556,9 +1556,9 @@ namespace OutputReportPredefined {
 		pdchPlantSizCalcVdot = newPreDefColumn( pdstPlantSize, "Coincident Design Volume Flow Rate [m3/s]" );
 		pdchPlantSizCoincYesNo = newPreDefColumn( pdstPlantSize, "Coincident Size Adjusted" );
 		pdchPlantSizDesDay = newPreDefColumn( pdstPlantSize, "Peak Sizing Period Name" );
-		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period" );
-		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day" );
-		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute" );
+		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period {TIMESTAMP}[day]" );
+		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day {TIMESTAMP}[hr]" );
+		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute {TIMESTAMP}[min]" );
 
 		// System Summary Report
 
@@ -1649,65 +1649,65 @@ namespace OutputReportPredefined {
 		pdstEMelecvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Electricity" );
 		pdchEMelecannual = newPreDefColumn( pdstEMelecvalues, "Electricity Annual Value [GJ]" );
 		pdchEMelecminvalue = newPreDefColumn( pdstEMelecvalues, "Electricity Minimum Value [W]" );
-		pdchEMelecminvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Minimum" );
+		pdchEMelecminvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMelecmaxvalue = newPreDefColumn( pdstEMelecvalues, "Electricity Maximum Value [W]" );
-		pdchEMelecmaxvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Maximum" );
+		pdchEMelecmaxvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Gas Sub Table
 		pdstEMgasvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Gas" );
 		pdchEMgasannual = newPreDefColumn( pdstEMgasvalues, "Gas Annual Value [GJ]" );
 		pdchEMgasminvalue = newPreDefColumn( pdstEMgasvalues, "Gas Minimum Value [W]" );
-		pdchEMgasminvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Minimum" );
+		pdchEMgasminvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMgasmaxvalue = newPreDefColumn( pdstEMgasvalues, "Gas Maximum Value [W]" );
-		pdchEMgasmaxvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Maximum" );
+		pdchEMgasmaxvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Cool SubTable
 		pdstEMcoolvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Cooling" );
 		pdchEMcoolannual = newPreDefColumn( pdstEMcoolvalues, "Cooling Annual Value [GJ]" );
 		pdchEMcoolminvalue = newPreDefColumn( pdstEMcoolvalues, "Cooling Minimum Value [W]" );
-		pdchEMcoolminvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Minimum" );
+		pdchEMcoolminvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMcoolmaxvalue = newPreDefColumn( pdstEMcoolvalues, "Cooling Maximum Value [W]" );
-		pdchEMcoolmaxvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Maximum" );
+		pdchEMcoolmaxvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Water SubTable
 		pdstEMwatervalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Water" );
 		pdchEMwaterannual = newPreDefColumn( pdstEMwatervalues, "Annual Value [m3]" );
 		pdchEMwaterminvalue = newPreDefColumn( pdstEMwatervalues, "Minimum Value [m3/s]" );
-		pdchEMwaterminvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Minimum" );
+		pdchEMwaterminvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMwatermaxvalue = newPreDefColumn( pdstEMwatervalues, "Maximum Value [m3/s]" );
-		pdchEMwatermaxvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Maximum" );
+		pdchEMwatermaxvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other KG SubTable
 		pdstEMotherKGvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other by Weight/Mass" );
 		pdchEMotherKGannual = newPreDefColumn( pdstEMotherKGvalues, "Annual Value [kg]" );
 		pdchEMotherKGminvalue = newPreDefColumn( pdstEMotherKGvalues, "Minimum Value [kg/s]" );
-		pdchEMotherKGminvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Minimum" );
+		pdchEMotherKGminvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherKGmaxvalue = newPreDefColumn( pdstEMotherKGvalues, "Maximum Value [kg/s]" );
-		pdchEMotherKGmaxvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Maximum" );
+		pdchEMotherKGmaxvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other M3 SubTable
 		pdstEMotherM3values = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other Volumetric" );
 		pdchEMotherM3annual = newPreDefColumn( pdstEMotherM3values, "Annual Value [m3]" );
 		pdchEMotherM3minvalue = newPreDefColumn( pdstEMotherM3values, "Minimum Value [m3/s]" );
-		pdchEMotherM3minvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Minimum" );
+		pdchEMotherM3minvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherM3maxvalue = newPreDefColumn( pdstEMotherM3values, "Maximum Value [m3/s]" );
-		pdchEMotherM3maxvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Maximum" );
+		pdchEMotherM3maxvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other M3 SubTable
 		pdstEMotherLvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other Liquid/Gas" );
 		pdchEMotherLannual = newPreDefColumn( pdstEMotherLvalues, "Annual Value [L]" );
 		pdchEMotherLminvalue = newPreDefColumn( pdstEMotherLvalues, "Minimum Value [L]" );
-		pdchEMotherLminvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Minimum" );
+		pdchEMotherLminvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherLmaxvalue = newPreDefColumn( pdstEMotherLvalues, "Maximum Value [L]" );
-		pdchEMotherLmaxvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Maximum" );
+		pdchEMotherLmaxvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other J SubTable
 		pdstEMotherJvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other" );
 		pdchEMotherJannual = newPreDefColumn( pdstEMotherJvalues, "Annual Value [GJ]" );
 		pdchEMotherJminvalue = newPreDefColumn( pdstEMotherJvalues, "Minimum Value [W]" );
-		pdchEMotherJminvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Minimum" );
+		pdchEMotherJminvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherJmaxvalue = newPreDefColumn( pdstEMotherJvalues, "Maximum Value [W]" );
-		pdchEMotherJmaxvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Maximum" );
+		pdchEMotherJmaxvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Sensible Heat Gain Component Report
 		pdrSensibleGain = newPreDefReport( "SensibleHeatGainSummary", "SHGS", "Sensible Heat Gain Summary" );
@@ -1735,7 +1735,7 @@ namespace OutputReportPredefined {
 
 		pdstSHGSpkCl = newPreDefSubTable( pdrSensibleGain, "Peak Cooling Sensible Heat Gain Components" );
 
-		pdchSHGSClTimePeak = newPreDefColumn( pdstSHGSpkCl, "Time of Peak" );
+		pdchSHGSClTimePeak = newPreDefColumn( pdstSHGSpkCl, "Time of Peak {TIMESTAMP}" );
 		pdchSHGSClHvacHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
 		pdchSHGSClHvacCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
 		pdchSHGSClHvacATUHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Terminal Unit Sensible Air Heating [W]" );
@@ -1757,7 +1757,7 @@ namespace OutputReportPredefined {
 
 		pdstSHGSpkHt = newPreDefSubTable( pdrSensibleGain, "Peak Heating Sensible Heat Gain Components" );
 
-		pdchSHGSHtTimePeak = newPreDefColumn( pdstSHGSpkHt, "Time of Peak" );
+		pdchSHGSHtTimePeak = newPreDefColumn( pdstSHGSpkHt, "Time of Peak {TIMESTAMP}" );
 		pdchSHGSHtHvacHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
 		pdchSHGSHtHvacCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
 		pdchSHGSHtHvacATUHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Terminal Unit Sensible Air Heating [W]" );
