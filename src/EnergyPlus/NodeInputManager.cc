@@ -393,6 +393,7 @@ namespace NodeInputManager {
 					if ( Node( NumNode ).FluidType == NodeType_Air || Node( NumNode ).FluidType == NodeType_Water ) { // setup volume flow rate report for actual/current density
 						SetupOutputVariable( "System Node Current Density Volume Flow Rate [m3/s]", MoreNodeInfo( NumNode ).VolFlowRateCrntRho, "System", "Average", NodeID( NumNode ) );
 						SetupOutputVariable( "System Node Current Density [kg/m3]", MoreNodeInfo( NumNode ).Density, "System", "Average", NodeID( NumNode ) );
+						SetupOutputVariable( "System Node Specific Heat [J/kg-K]", MoreNodeInfo( NumNode ).SpecificHeat, "System", "Average", NodeID( NumNode ) );
 					}
 
 					SetupOutputVariable( "System Node Enthalpy [J/kg]", MoreNodeInfo( NumNode ).ReportEnthalpy, "System", "Average", NodeID( NumNode ) );
@@ -1060,6 +1061,7 @@ namespace NodeInputManager {
 		using Psychrometrics::PsyTwbFnTdbWPb;
 		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyTdpFnWPb;
+		using Psychrometrics::PsyCpAirFnWTdb;
 		using DataGlobals::InitConvTemp;
 		using OutputProcessor::ReqReportVariables;
 		using OutputProcessor::ReqRepVars;
@@ -1097,11 +1099,14 @@ namespace NodeInputManager {
 		static Array1D_int NodeRelHumiditySchedPtr;
 		static Array1D_bool NodeDewPointRepReq;
 		static Array1D_int NodeDewPointSchedPtr;
+		static Array1D_bool NodeSpecificHeatRepReq;
+		static Array1D_int NodeSpecificHeatSchedPtr;
 		static std::vector<std::string> nodeReportingStrings;
 		static std::vector<std::string> nodeFluidNames;
 		bool ReportWetBulb;
 		bool ReportRelHumidity;
 		bool ReportDewPoint;
+		bool ReportSpecificHeat;
 		Real64 SteamDensity;
 		Real64 EnthSteamInDry;
 		Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
@@ -1120,6 +1125,8 @@ namespace NodeInputManager {
 			NodeRelHumiditySchedPtr.allocate( NumOfNodes );
 			NodeDewPointRepReq.allocate( NumOfNodes );
 			NodeDewPointSchedPtr.allocate( NumOfNodes );
+			NodeSpecificHeatRepReq.allocate( NumOfNodes );
+			NodeSpecificHeatSchedPtr.allocate( NumOfNodes );
 			nodeReportingStrings.reserve( NumOfNodes );
 			nodeFluidNames.reserve( NumOfNodes );
 			NodeWetBulbRepReq = false;
@@ -1128,6 +1135,8 @@ namespace NodeInputManager {
 			NodeRelHumiditySchedPtr = 0;
 			NodeDewPointRepReq = false;
 			NodeDewPointSchedPtr = 0;
+			NodeSpecificHeatRepReq = false;
+			NodeSpecificHeatSchedPtr = 0;
 
 			for ( iNode = 1; iNode <= NumOfNodes; ++iNode ) {
 				nodeReportingStrings.push_back( std::string( NodeReportingCalc + NodeID( iNode ) ) );
@@ -1143,6 +1152,9 @@ namespace NodeInputManager {
 						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
 							NodeDewPointRepReq( iNode ) = true;
 							NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
+						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Specific Heat" ) ) {
+							NodeSpecificHeatRepReq( iNode ) = true;
+							NodeSpecificHeatSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
 						}
 					}
 				}
@@ -1158,6 +1170,11 @@ namespace NodeInputManager {
 					NodeDewPointRepReq( iNode ) = true;
 					NodeDewPointSchedPtr( iNode ) = 0;
 				}
+				if ( EMSManager::CheckIfNodeMoreInfoSensedByEMS( iNode, "System Node Specific Heat" ) ) {
+					NodeSpecificHeatRepReq( iNode ) = true;
+					NodeSpecificHeatSchedPtr( iNode ) = 0;
+				}
+
 
 			}
 			CalcMoreNodeInfoMyOneTimeFlag = false;
@@ -1167,6 +1184,7 @@ namespace NodeInputManager {
 			ReportWetBulb = false;
 			ReportRelHumidity = false;
 			ReportDewPoint = false;
+			ReportSpecificHeat = false;
 			if ( NodeWetBulbRepReq( iNode ) && NodeWetBulbSchedPtr( iNode ) > 0 ) {
 				ReportWetBulb = ( GetCurrentScheduleValue( NodeWetBulbSchedPtr( iNode ) ) > 0.0 );
 			} else if ( NodeWetBulbRepReq( iNode ) && NodeWetBulbSchedPtr( iNode ) == 0 ) {
@@ -1183,6 +1201,11 @@ namespace NodeInputManager {
 				ReportDewPoint = ( GetCurrentScheduleValue( NodeDewPointSchedPtr( iNode ) ) > 0.0 );
 			} else if ( NodeDewPointRepReq( iNode ) && NodeDewPointSchedPtr( iNode ) == 0 ) {
 				ReportDewPoint = true;
+			}
+			if ( NodeSpecificHeatRepReq( iNode ) && NodeSpecificHeatSchedPtr( iNode ) > 0 ) {
+				ReportSpecificHeat = ( GetCurrentScheduleValue( NodeSpecificHeatSchedPtr( iNode ) ) > 0.0 );
+			} else if ( NodeSpecificHeatRepReq( iNode ) && NodeSpecificHeatSchedPtr( iNode ) == 0 ) {
+				ReportSpecificHeat = true;
 			}
 			// calculate the volume flow rate
 			if ( Node( iNode ).FluidType == NodeType_Air ) {
@@ -1214,6 +1237,11 @@ namespace NodeInputManager {
 				} else {
 					MoreNodeInfo( iNode ).RelHumidity = 0.0;
 				}
+				if ( ReportSpecificHeat ) { //only call psych routine if needed.
+					MoreNodeInfo( iNode ).SpecificHeat = PsyCpAirFnWTdb( Node( iNode ).HumRat,  Node( iNode ).Temp );
+				} else {
+					MoreNodeInfo( iNode ).SpecificHeat = 0.0;
+				}
 			} else if ( Node( iNode ).FluidType == NodeType_Water ) {
 
 				if ( ! ( ( Node( iNode ).FluidIndex > 0 ) && ( Node( iNode ).FluidIndex <= NumOfGlycols ) ) ) {
@@ -1230,6 +1258,7 @@ namespace NodeInputManager {
 				MoreNodeInfo( iNode ).VolFlowRateCrntRho = Node( iNode ).MassFlowRate / rho;
 				MoreNodeInfo( iNode ).Density = rho;
 				MoreNodeInfo( iNode ).ReportEnthalpy = Cp * Node( iNode ).Temp;
+				MoreNodeInfo( iNode ).SpecificHeat =  Cp; //always fill since cp already always being calculated anyway
 				MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 				MoreNodeInfo( iNode ).RelHumidity = 100.0;
 			} else if ( Node( iNode ).FluidType == NodeType_Steam ) {
@@ -1251,6 +1280,7 @@ namespace NodeInputManager {
 				MoreNodeInfo( iNode ).ReportEnthalpy = 0.0;
 				MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 				MoreNodeInfo( iNode ).RelHumidity = 0.0;
+				MoreNodeInfo( iNode ).SpecificHeat = 0.0;
 			} else {
 				MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / RhoAirStdInit;
 				if ( Node( iNode ).HumRat > 0.0 ) {
@@ -1260,9 +1290,15 @@ namespace NodeInputManager {
 					} else {
 						MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 					}
+					if ( ReportSpecificHeat ) {
+						MoreNodeInfo( iNode ).SpecificHeat = PsyCpAirFnWTdb( Node( iNode ).HumRat,  Node( iNode ).Temp );
+					} else {
+						MoreNodeInfo( iNode ).SpecificHeat = 0.0;
+					}
 				} else {
 					MoreNodeInfo( iNode ).ReportEnthalpy = CPCW( Node( iNode ).Temp ) * Node( iNode ).Temp;
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
+					MoreNodeInfo( iNode ).SpecificHeat = 0.0;
 				}
 			}
 		}
