@@ -52,6 +52,7 @@ set( test_src
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
+  PlantHeatExchangerFluidToFluid.unit.cc
   PlantUtilities.unit.cc
   PurchasedAirManager.unit.cc
   OutdoorAirUnit.unit.cc
