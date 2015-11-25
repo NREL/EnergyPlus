@@ -1233,7 +1233,8 @@ namespace PlantHeatExchangerFluidToFluid {
 				DeltaTHeating = FluidHX( CompNum ).DemandSideLoop.InletTemp - FluidHX( CompNum ).SupplySideLoop.InletTemp;
 				DeltaTHeatSetPointDemand = SetPointTempLo - FluidHX( CompNum ).DemandSideLoop.InletTemp;
 				DeltaTHeatSetPointSupply = SetPointTempLo - FluidHX( CompNum ).SupplySideLoop.InletTemp;
-				if ( ( DeltaTCooling > FluidHX( CompNum ).TempControlTol ) && ( DeltaTCoolSetPointSupply < ( -1.0 * FluidHX( CompNum ).TempControlTol ) ) && ( DeltaTCoolSetPointDemand > FluidHX( CompNum ).TempControlTol ) ) {
+				if ( ( DeltaTCooling > FluidHX( CompNum ).TempControlTol ) && ( SetPointTempHi < FluidHX( CompNum ).SupplySideLoop.InletTemp ) ) {
+
 					// can and want to cool
 					mdotSupSide = FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
@@ -1244,7 +1245,7 @@ namespace PlantHeatExchangerFluidToFluid {
 						mdotDmdSide = 0.0;
 						SetComponentFlowRate( mdotDmdSide, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
 					}
-				} else if ( ( DeltaTHeating > FluidHX( CompNum ).TempControlTol ) && ( DeltaTHeatSetPointDemand < ( -1.0 * FluidHX( CompNum ).TempControlTol ) ) && ( DeltaTHeatSetPointSupply > FluidHX( CompNum ).TempControlTol ) ) {
+				} else if ( ( DeltaTHeating > FluidHX( CompNum ).TempControlTol ) && ( SetPointTempLo > FluidHX( CompNum ).SupplySideLoop.InletTemp ) ) {
 					// can and want to heat
 					mdotSupSide = FluidHX( CompNum ).SupplySideLoop.MassFlowRateMax;
 					SetComponentFlowRate( mdotSupSide, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, FluidHX( CompNum ).SupplySideLoop.OutletNodeNum, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum );
