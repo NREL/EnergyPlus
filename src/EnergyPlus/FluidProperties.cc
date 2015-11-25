@@ -114,6 +114,30 @@ namespace FluidProperties {
 	Array1D< FluidPropsGlycolData > GlycolData;
 	Array1D< FluidPropsGlycolErrors > GlycolErrorTracking;
 
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		GetInput = true;
+		NumOfRefrigerants = 0;
+		NumOfGlycols = 0;
+		DebugReportGlycols = false;
+		DebugReportRefrigerants = false;
+		GlycolErrorLimitTest = 1;
+		RefrigerantErrorLimitTest = 1;
+		RefrigUsed.deallocate();
+		GlycolUsed.deallocate();
+		FluidIndex_Water = 0;
+		FluidIndex_EthyleneGlycol = 0;
+		FluidIndex_PropoleneGlycol = 0;
+
+		RefrigData.deallocate();
+		RefrigErrorTracking.deallocate();
+		GlyRawData.deallocate();
+		GlycolData.deallocate();
+		GlycolErrorTracking.deallocate();
+	}
+
 	// Data Initializer Forward Declarations
 	// See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
 

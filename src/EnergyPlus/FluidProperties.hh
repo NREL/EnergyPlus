@@ -279,6 +279,10 @@ namespace FluidProperties {
 
 	};
 
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	struct FluidPropsGlycolRawData
 	{
 		// Members
