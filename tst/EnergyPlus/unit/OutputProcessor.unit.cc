@@ -1018,7 +1018,7 @@ namespace EnergyPlus {
 		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_validateIndexType )
 		{
 			auto const calledFrom = "UnitTest";
-			EXPECT_DEATH( ValidateIndexType( "BAD INPUT", calledFrom ), "" );
+			EXPECT_ANY_THROW( ValidateIndexType( "BAD INPUT", calledFrom ) );
 
 		}
 
@@ -2150,9 +2150,9 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_getVariableUnitsString )
 		{
-			EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ), "" );
-			EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ), "" );
-			EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ), "" );
+			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ) );
+			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ) );
+			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ) );
 
 		}
 
