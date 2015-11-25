@@ -715,7 +715,7 @@ The Building North Axis is specified **relative to true North**. Buildings frequ
 
 The figure below shows how the building north axis can be rotated to correspond with one of the major axes of an actual building. The relevance of this field is described more completely under “GlobalGeometryRules”; in particular, the value of “North Axis” is *ignored* if a coordinate system other than “relative” is used.
 
-![](media/image001.svg)
+![](media/image001.png)
 
 Figure 1. Illustration of Building North Axis
 
@@ -794,7 +794,7 @@ If you use **FullInteriorAndExterior** the program will also calculate how much 
 
 
 
-![](media/image002.svg)
+![](media/image002.png)
 
 Figure 2. Illustration of Convex and Non-convex Zones
 
@@ -818,19 +818,19 @@ The building surfaces are assumed to be diffusely reflecting if they are opaque 
 
 
 
-![](media/image003.svg)
+![](media/image003.png)
 
 Figure 3.  Solar reflection from shadowing surfaces. Solid arrows are beam solar radiation; dashed arrows are diffuse solar radiation. (a) Diffuse reflection of beam solar radiation from the top of an overhang. (b) Diffuse reflection of sky solar radiation from the top of an overhang. (c) Beam-to-beam (specular) reflection from the façade of an adjacent highly-glazed building represented by a vertical shadowing surface.
 
 
 
-![](media/image004.svg)
+![](media/image004.png)
 
 Figure 4.  Solar reflection from building surfaces onto other building surfaces. In this example beam solar reflects from a vertical section of the building onto a roof section. The reflection from the window is specular. The reflection from the wall is diffuse.
 
 
 
-![](media/image005.svg)
+![](media/image005.png)
 
 Figure 5. Shadowing from building affects beam solar reflection from the ground. Beam-to-diffuse reflection from the ground onto the building occurs only for sunlit areas, A and C, not from shaded area, B.
 
@@ -1604,7 +1604,7 @@ This numeric field should contain the day’s maximum dry-bulb temperature in de
 
 A design day can have a “high” temperature and a “low” temperature (or can be a constant temperature for each hour of the day). If there is a difference between high and low temperatures, this field should contain the difference from the high to the low. EnergyPlus, by default, distributes this range over the 24 hours in the day as shown in the figure below:
 
-![](media/image010.svg)
+![](media/image010.png)
 
 Figure 6. Default Daily range Multiplier for Design Days
 
@@ -5167,7 +5167,7 @@ If, in the Building object, Solar Distribution = FullInteriorAndExterior, use of
 
 In a zone with Daylighting:Detailed, translucent glazing---which is often used in skylights---will provide a more uniform daylight illuminance over the zone and will avoid patches of sunlight on the floor.
 
-![](media/image025.svg)
+![](media/image025.png)
 
 Figure 10. Comparison between transmittance properties of transparent glass (Solar Diffusing = No) and translucent glass (Solar Diffusing = Yes).
 
@@ -6064,13 +6064,13 @@ Effective area for air flow at the right side of the shade divided by *sH*, the 
 
 The fraction of the shade surface that is open to air flow, i.e., the total area of openings (“holes”) in the shade surface divided by the shade area, *HW*. If air cannot pass through the shade material, Air-Flow Permeability = 0. For drapery fabric and screens the Air-Flow Permeability can be taken as the “openness” of the fabric (see 2001 ASHRAE Fundamentals, Chapter 30, Fig. 31), which is 0.0 to 0.07 for closed weave, 0.07 to 0.25 for semi-open weave, and 0.25 and higher for open weave.
 
-![](media/image033.svg)
+![](media/image033.png)
 
 Figure 12. Vertical section (a) and perspective view (b) of glass  and interior shade layers  showing variables used in the gap air flow analysis. In (b), the air-flow opening areas *A<sub>bot</sub>*, *A<sub>top</sub>*, *A<sub>l</sub>*, *A<sub>r</sub>* and *A<sub>h</sub>* are shown schematically. See *Engineering Manual* for definition of thermal variables.
 
 
 
-![](media/image034.svg)
+![](media/image034.png)
 
 Figure 13. Examples of air-flow openings for an interior shade covering glass of height *H* and width *W*. Not to scale. (a) Horizontal section through shade with openings on the left and right sides (top view). (b) Vertical section through shade with openings at the top and bottom (side view). In (a) Left-Side Opening Multiplier = *A<sub>l</sub> /sH* = min(*l/s*,1) and Right-Side Opening Multiplier = *A<sub>r</sub> /sH* = min(*r/s*,1). In (b) Top Opening Multiplier = *A<sub>top</sub> /sW* = *t/s* and Bottom Opening Multiplier = *A<sub>bot</sub> /sW = b/s.*
 
@@ -6296,7 +6296,7 @@ WindowMaterial:Blind,
 
 
 
-![](media/image035.svg)
+![](media/image035.png)
 
 Figure 14. (a) Side view of a window blind with horizontal slats  (or top view of blind with vertical slats) showing slat geometry. The front face of a slat is shown by a heavy line. The slat angle is defined as the angle between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat. (b) Slat orientations for representative slat angles. The slat angle varies from 0<sup>O</sup>, when the front of the slat is parallel to the glazing and faces toward the outdoors,  to 90<sup>O</sup>, when the slat is perpendicular to the glazing, to 180<sup>O</sup>, when the front of the slat is parallel to the glazing and faces toward the indoors. The minimum and maximum slat angles are determined by the slat thickness, width and separation.
 
@@ -6711,7 +6711,7 @@ Specifies the optical and thermal properties of equivalent layer window drape fa
 
 Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (infrared) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as showsn in Figure 21.For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure 21.  The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.  Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1%.
 
-![](media/image045.svg)
+![](media/image045.png)
 
 Figure 21. Geometry used for Pleated Drape Analysis
 
@@ -6794,13 +6794,13 @@ WindowMaterial:Drape:EquivalentLayer,
 
 ### WindowMaterial:Blind:EquivalentLayer
 
-This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The the model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crwon.  Slats are assumed to transmit and reflect diffusely.The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown ![](media/image046.svg)
+This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The the model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crwon.  Slats are assumed to transmit and reflect diffusely.The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown ![](media/image046.png)
 
 Figure 22. Geometry and Properties used for venetian blind analysis
 
 .  Likewise, effective longwave properties are obtained for the layer knowing longwave properties of the slats.
 
-![](media/image047.svg)
+![](media/image047.png)
 
 Figure 22. Geometry and Properties used for venetian blind analysis
 
@@ -6937,7 +6937,7 @@ WindowMaterial:Blind:EquivalentLayer,
 
 This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-difuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.  Insect screen geometry is shown in Figure 23.  The calculation of effective solar properties requires a set of properties measured at normal incidence.
 
-![](media/image048.svg)
+![](media/image048.png)
 
 Figure 23. Geometry used for insect screen analysis
 
@@ -7553,13 +7553,13 @@ MaterialProperty:GlazingSpectralData,
 
 For walls, roofs, floors, windows, and doors, constructions are “built” from the included materials. Each layer of the construction is a material name listed in order from “outside” to “inside”. Up to ten layers (eight for windows) may be specified (one of the few limitations in EnergyPlus!). “Outside” is the layer furthest away from the Zone air (not necessarily the outside environment). “Inside” is the layer next to the Zone air. In the example floor below, for example, the outside layer is the acoustic tile below the floor, the next layer is the air space above the tile, and the inside layer is the concrete floor deck.
 
-![](media/image050.svg)
+![](media/image050.png)
 
 Figure 24. Example Floor Construction illustration.
 
 Window constructions are similarly built up from items in the Window Materials set using similar layers.. See Figure 25. Illustration for material ordering in windows, which shows the case where an interior shading layer such as a blind is present. The gap between the inside glass layer (layer \#3) and the interior shading layer is not entered. Similarly, for an exterior shading layer, the gap between the outside glass layer and the shading layer is not entered.
 
-![](media/image051.svg)
+![](media/image051.png)
 
 Figure 25. Illustration for material ordering in windows.
 
@@ -7567,7 +7567,7 @@ However, for a between-glass shading device the gaps on either side of the shadi
 
 A maximum of four glass layers and one shading layer is allowed. A gas layer must always separate adjacent glass layers in a multi-pane glazing without a between-glass shading layer.
 
-![](media/image052.svg)
+![](media/image052.png)
 
 Figure 26. Window construction with and without a between-glass shading layer. Shown are gap widths *g*, *g<sub>1</sub>* and *g<sub>2</sub>*, and shading layer width, *w*. An error will result if *g<sub>1</sub>+g<sub>2</sub>+w* is not equal to *g*, where *w* is zero for a blind and greater than zero for a shade.
 
@@ -8339,7 +8339,7 @@ The Zone North Axis is specified **relative to the Building North Axis**. This v
 
 The X,Y,Z coordinates of a zone origin can be specified, for convenience in vertice entry. Depending on the values in “GlobalGeometryRules” (see description later in this section), these will be used to completely specify the building coordinates in “world coordinate” or not. Zone Origin coordinates are specified **relative to the Building Origin (which always 0,0,0)**. The following figure illustrates the use of Zone North Axis as well as Zone Origin values.
 
-![](media/image053.svg)
+![](media/image053.png)
 
 Figure 27. Illustration of Zone North Axis and Origins
 
@@ -8800,7 +8800,7 @@ Some flexibility is allowed in specifying surface vertices. This flexibility is 
 
 In order to perform shadowing calculations, the building surfaces must be specified. EnergyPlus uses a three dimensional (3D) Cartesian coordinate system for surface vertex specification. This Right Hand coordinate system has the X-axis pointing east, the Y-axis pointing north, and the Z-axis pointing up. See figure below.
 
-![](media/image054.svg)
+![](media/image054.png)
 
 Figure 28. EnergyPlus Coordinate System
 
@@ -9783,7 +9783,7 @@ use the same vertex input. The numeric parameters indicated below are taken from
 
 **Note that the resolution on the surface vertex input is 1 millimeter (.001 meter). Therefore, using vertices that are very close together (&lt;1 mm) may result in invalid dot product and fatal errors during shading calculations.**
 
-![](media/image055.svg)
+![](media/image055.png)
 
 Figure 29. Illustration for Surface Vertices
 
@@ -10563,7 +10563,7 @@ Any surface that would logically be described as an interior wall, floor or ceil
 
 When zoning an office building, five west-facing offices have been combined into one zone. All of the offices have interior walls made of the same materials. As shown in the figure below, this zone may be described with 5 exterior walls and 11 internal walls or 1 exterior wall and 1 internal mass. Note that fewer surfaces will speed up the EnergyPlus calculations.
 
-![](media/image056.svg)
+![](media/image056.png)
 
 Figure 30. Representing 11 internal walls as internal mass
 
@@ -11130,7 +11130,7 @@ Beam solar radiation from the exterior windows in a zone incident on the inside 
 
 Beam solar radiation from the interior (i.e., interzone) windows in a zone incident on the inside face of a surface in the zone. This value is calculated only if Solar Distribution in the BUILDING object is equal to FullInteriorExterior. However, the program does not track where this radiation falls. Instead, it is treated by the program as though it were diffuse radiation uniformly distributed over all of the zone surfaces. See **Figure 31**. Different versions of the report are available including the basic incident rate (W), a per unit area flux (W/m2), and an energy version (J).
 
-![](media/image057.svg)
+![](media/image057.png)
 
 Figure 31. Beam solar radiation entering a zone through an interior window is distributed inside the zone as though it were diffuse radiation.
 
@@ -11550,7 +11550,7 @@ If the sun is behind the window, the vertical profile angle is not defined and i
 
 Note that in most texts what we call “vertical profile angle” is called “horizontal profile angle.”
 
-![](media/image058.svg)
+![](media/image058.png)
 
 Figure 32. Vertical exterior window showing solar horizontal profile angle, solar vertical profile angle and solar incidence angle.
 
@@ -12195,7 +12195,7 @@ Note that shading devices only shade solar radiation when the sun is up, which i
 
 The number of sides in the surface (number of X,Y,Z vertex groups). For further information, see the discussion on “Surface Vertices” above. The example below shows the correct input for an overhang (to shade the appropriate portion of the base wall and window).
 
-![](media/image059.svg)
+![](media/image059.png)
 
 Figure 33. Illustration for Attached Shading Surface
 
@@ -12329,7 +12329,7 @@ NOTE: WindowProperty:ShadingControl does not work with complex fenestration syst
 
 As shown in Figure 34, a shading device can be inside the window (Shading Type = InteriorShade or InteriorBlind), outside the window (Shading Type = ExteriorShade or ExteriorBlind), or between panes of glass (Shading Type = BetweenGlassShade or BetweenGlassBlind). The exception is window screens which can only be outside the window (Shading Type = ExteriorScreen).
 
-![](media/image060.svg)
+![](media/image060.png)
 
 Figure 34. Allowed locations of a window shading device.
 
@@ -12674,7 +12674,7 @@ The best source of frame and divider characteristics is the WINDOW program, whic
 
 Note that a window’s frame and divider characteristics, along with other window information, can be read in from the Window Data File (see “Importing Windows from the WINDOW program” and “Construction:WindowDataFile object”). In this case the WindowProperty:FrameAndDivider referenced by the window is not applicable and should be blank unless you want to specify reveal surfaces for beam solar reflection.
 
-![](media/image061.svg)
+![](media/image061.png)
 
 Figure 35. A window with a frame and divider.
 
@@ -12698,7 +12698,7 @@ The amount by which the frame projects outward from the outside surface of the w
 
 The amount by which the frame projects inward from the inside surface of the window glazing. If the inner surface of the frame is flush with the glazing, Frame Inside Projection = 0.0. Used to calculate solar absorbed by frame, IR emitted and absorbed by frame, and convection from frame.
 
-![](media/image062.svg)
+![](media/image062.png)
 
 Figure 36. Illustration showing frame and divider dimensioning.
 
@@ -12730,7 +12730,7 @@ The type of divider (see figure below). Divider Type = Suspended is applicable o
 
 Divider Type = DividedLite means that the divider elements project out from the outside and inside surfaces of the glazing and divide the glazing into individual lites. For multi-pane glazing, this type of divider also has between-glass elements that separate the panes.
 
-![](media/image063.svg)
+![](media/image063.png)
 
 Figure 37. Illustration showing divider types.
 
@@ -12830,7 +12830,7 @@ The depth of the inside reveal surfaces other than the sill, measured from the i
 
 The solar absorptance of the inside reveal surfaces other than the sill.
 
-![](media/image064.svg)
+![](media/image064.png)
 
 Figure 38. (a) Vertical section through a window (with frame) showing outside and inside reveal surfaces and inside sill. (b) Perspective view looking from the outside of a window (without frame) showing reveal surfaces. Note that “Outside Reveal Depth” is not a user input; it is calculated by the program from the window and wall vertices.
 
@@ -12944,7 +12944,7 @@ The name of a schedule with values between 0.0 and 1.0. The timestep value of th
 
 
 
-![](media/image065.svg)
+![](media/image065.png)
 
 Figure 39. Gap airflow configurations for airflow windows. (a) **Air exhaust window**: Airflow Source = InsideAir, Airflow Destination = OutsideAir; (b) **Indoor air curtain window**: Airflow Source = InsideAir, Airflow Destination = InsideAir; (c) **Air supply window**: Airflow Source = OutsideAir, Airflow Destination = InsideAir; (d) **Outdoor air curtain window**: Airflow Source = OutsideAir, Airflow Destination = OutsideAir; (e) **Airflow to Return Air**: Airflow Source = InsideAir, Airflow Destination = ReturnAir. Based on “Active facades,” Version no. 1, Belgian Building Research Institute, June 2002.
 
@@ -12976,7 +12976,7 @@ This object allows you to assign a movable exterior glass layer (“storm window
 
 
 
-![](media/image066.svg)
+![](media/image066.png)
 
 Figure 40. Section through a single-glazed window without (left) and with (right) a storm glass layer. Not to scale.
 
@@ -13492,7 +13492,7 @@ Wspd  = Outdoor wind speed (m/sec)
 
 Tpast  = Other side temperature from previous zone timestep (°C)
 
-![](media/image069.svg)
+![](media/image069.png)
 
 Figure 41. Illustration for Other Side Coefficients
 
@@ -15957,7 +15957,7 @@ An example of a vertical temperature pattern is shown in the figure below. The p
 
 In addition to the vertical temperature pattern there are three other parameters included in the pattern that are important. The first two might affect how the air system conditioning the room is operated. The first describes the temperature difference between the mean air temperature and the point where the sensor of a drybulb thermostat is situated. The second describes the temperature difference between the mean and the point where system air is being extracted from the zone. This is considered important because the changes in temperature difference between supply and return can affect how an air system is controlled to meet the loads. The third parameter can affect the zone air heat balance by altering the temperature of the air leaving the zone through exhaust fans.
 
-![](media/image079.svg)
+![](media/image079.png)
 
 Figure 44. Example of a Vertical Air Temperature Pattern
 
@@ -16164,7 +16164,7 @@ This model is applicable to spaces that are served by a low velocity floor-level
 
 - An upper node representing the mixed-layer/outflow temperature (T<sub>MX</sub>) essential for overall energy budget calculations and for modeling comfort effects of the upper layer temperature.
 
-![](media/image080.svg)
+![](media/image080.png)
 
 Figure 45. Schematic representation of the three temperature points and temperature gradients
 
@@ -17906,7 +17906,7 @@ Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fracti
   </tr>
 </table>
 
-![](media/image086.svg)
+![](media/image086.png)
 
 Figure 51. Overhead fluorescent luminaire configurations.
 
@@ -17950,7 +17950,7 @@ The coefficient C<sub>1</sub> in the equation for (Return Air Fraction)<sub>calc
 
 The coefficient C<sub>2</sub>  in the equation for (Return Air Fraction)<sub>calculated</sub>. Its units are 1/<sup>O</sup>C.
 
-![](media/image087.svg)
+![](media/image087.png)
 
 Figure 52. Vertical section through a zone and its return air plenum showing recessed lighting (not to scale). The heat from lights is divided into four fractions, three of which—ReturnAirFraction, FractionRadiant and FractionConvected—depend on plenum air temperature.
 
