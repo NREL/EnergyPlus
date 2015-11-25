@@ -7,6 +7,7 @@ extern "C" {
 // C++ Headers
 #include <cstdlib>
 #include <iostream>
+#include <exception>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/char.functions.hh>
@@ -209,7 +210,6 @@ AbortEnergyPlus()
 	// indicating that E+ terminated with an error.
 	if ( NumExternalInterfaces > 0 ) CloseSocket( -1 );
 	std::cerr << "Program terminated: " << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
-	// throw "Program terminated: EnergyPlus Terminated--Error(s) Detected.";
 	std::exit( EXIT_FAILURE );
 
 }
@@ -817,8 +817,7 @@ ShowFatalError(
 	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
-	throw ErrorMessage;
-	// AbortEnergyPlus();
+	throw std::runtime_error( ErrorMessage );
 
 }
 
