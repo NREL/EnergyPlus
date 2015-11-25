@@ -636,6 +636,9 @@ namespace PollutionModule {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	CalculatePollution();
 
 	// Get Input Section of the Module

@@ -104,6 +104,11 @@ namespace PollutionModule {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state() {
+		GetInputFlagPollution = true;
+		PollutionReportSetup = false;
+	}
 
 	void
 	CalculatePollution()

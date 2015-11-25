@@ -34,11 +34,6 @@ using namespace EnergyPlus::OutputProcessor;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
-Real64 AirloopHVAC_ZoneSumTest_Zone1People( 0.0 );
-Real64 AirloopHVAC_ZoneSumTest_DesOutAirVolFlow( 0.0 );
-Real64 AirloopHVAC_ZoneSumTest_VbzByZone1( 0.0 );
-Real64 AirloopHVAC_ZoneSumTest_VbzByZone2( 0.0 );
-
 
 TEST( OutputReportTabularTest, ConfirmSetUnitsStyleFromString )
 {
@@ -1735,7 +1730,8 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		"  0.8,                     !- Gas Burner Efficiency",
 		"  autosize,                !- Nominal Capacity {W}",
 		"  DOAS Cooling Coil Outlet,  !- Air Inlet Node Name",
-		"  DOAS Heating Coil Outlet;  !- Air Outlet Node Name",
+		"  DOAS Heating Coil Outlet,  !- Air Outlet Node Name",
+		"  DOAS Heating Coil Outlet;  !- Temperature Setpoint Node Name",
 
 		"Fan:VariableVolume,",
 		"  DOAS Supply Fan,         !- Name",
@@ -1981,11 +1977,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 	DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
 	UpdateTabularReports( OutputReportTabular::stepTypeHVAC );
 
-	// Save data to compare to next unit test
-	AirloopHVAC_ZoneSumTest_Zone1People = DataHeatBalance::ZnRpt( 1 ).PeopleNumOcc;
-	AirloopHVAC_ZoneSumTest_DesOutAirVolFlow = DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow;
-	AirloopHVAC_ZoneSumTest_VbzByZone1 = SimAirServingZones::VbzByZone( 1 );
-	AirloopHVAC_ZoneSumTest_VbzByZone2 = SimAirServingZones::VbzByZone( 2 );
+	EXPECT_NEAR( 1.86168, DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow, 0.0001 );
 
 }
 
@@ -2718,7 +2710,8 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 		"  0.8,                     !- Gas Burner Efficiency",
 		"  autosize,                !- Nominal Capacity {W}",
 		"  DOAS Cooling Coil Outlet,  !- Air Inlet Node Name",
-		"  DOAS Heating Coil Outlet;  !- Air Outlet Node Name",
+		"  DOAS Heating Coil Outlet,  !- Air Outlet Node Name",
+		"  DOAS Heating Coil Outlet;  !- Temperature Setpoint Node Name",
 
 		"Fan:VariableVolume,",
 		"  DOAS Supply Fan,         !- Name",
@@ -2964,10 +2957,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
 	DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
 	UpdateTabularReports( OutputReportTabular::stepTypeHVAC );
 
-	EXPECT_EQ( AirloopHVAC_ZoneSumTest_Zone1People, DataHeatBalance::ZnRpt( 1 ).PeopleNumOcc ); // compare previous unit test result to this unit test result
-	EXPECT_EQ( AirloopHVAC_ZoneSumTest_DesOutAirVolFlow, DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow );
-	EXPECT_EQ( AirloopHVAC_ZoneSumTest_VbzByZone1, SimAirServingZones::VbzByZone( 1 ) );
-	EXPECT_EQ( AirloopHVAC_ZoneSumTest_VbzByZone2, SimAirServingZones::VbzByZone( 2 ) );
+	EXPECT_NEAR( 1.86168, DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow, 0.0001 );
 
 }
 
