@@ -74,6 +74,25 @@ namespace EnergyPlus {
 
 		}
 
+		TEST_F(InputProcessorFixture, MisleadingIDDWarningTest)
+		{
+			bool errors_found = false;
+			std::string const idd_contents = delimited_string({
+				"!IDD_Version,1.1.0",
+				"!IDD_BUILD 111111111",
+			});
+
+			ASSERT_FALSE(process_idd(idd_contents, errors_found));
+
+			std::string const idf_contents = delimited_string({
+				"Version,8.4;"
+			});
+
+			ASSERT_FALSE(process_idf(idf_contents, errors_found));
+
+			EXPECT_TRUE(compare_err_stream("   ** Severe  ** IP: Possible incorrect IDD File\r\n   **   ~~~   ** IDD_Version,1.1.0 not the same as expected =\"8.4\"\r\n", true));
+		}
+
 		TEST_F( InputProcessorFixture, processIDD_Full_IDD )
 		{
 			using namespace InputProcessor;
@@ -1483,23 +1502,6 @@ namespace EnergyPlus {
 			EXPECT_EQ( "various - depends on fields", RepObjects( 5 ).NewName );
 			EXPECT_TRUE( RepObjects( 5 ).Deleted );
 			EXPECT_TRUE( RepObjects( 5 ).TransitionDefer );
-		}
-
-		TEST_F(InputProcessorFixture, MisleadingIDDWarningTest)
-		{
-			std::string const idd_objects = delimited_string({
-				"Version,8.4;",
-			});
-
-			bool errors_found = false;
-			ASSERT_FALSE(process_idd(idd_objects, errors_found));
-			ProcessInput();
-
-			std::string const expected_string = delimited_string({
-				"hello"
-			});
-
-			EXPECT_TRUE(compare_err_stream(expected_string, true));
 		}
 
 	}
