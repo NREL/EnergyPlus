@@ -124,7 +124,7 @@ namespace EnergyPlus {
 			"	0.0;				!- Minimum Actuated Flow { m3 / s }",
 			" SetpointManager:Scheduled,",
 			"	HumRatSPManager,	!- Name",
-			"	HumidityRatio,		!- Control Variable",
+			"	MaximumHumidityRatio,  !- Control Variable",
 			"	HumRatioSched,		!- Schedule Name",
 			"	Air Outlet Node;	!- Setpoint Node or NodeList Name",
 			" Schedule:Compact,",
@@ -149,15 +149,15 @@ namespace EnergyPlus {
 
 		GetSetPointManagerInputs();
 		// check specified control variable type is "HumidityRatio"
-		ASSERT_EQ( iCtrlVarType_HumRat, AllSetPtMgr( 1 ).CtrlTypeMode );
+		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 1 ).CtrlTypeMode );
 
 		GetControllerInput();
 		// check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
 		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 1 ).CtrlTypeMode );
 
-		// ControllerProps always expects the control variable type to be "HumididtyRatio"
+		// ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
 		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
-		ASSERT_EQ( iCtrlVarType_HumRat, ControllerProps( 1 ).HumRatCntrlType );
+		ASSERT_EQ( iCtrlVarType_MaxHumRat, ControllerProps( 1 ).HumRatCntrlType );
 
 	}
 
