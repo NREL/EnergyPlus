@@ -128,6 +128,40 @@ namespace RuntimeLanguageProcessor {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state(){
+		GetInput =  true ;
+		InitializeOnce = true ;
+		MyEnvrnFlag = true ;
+
+		NullVariableNum = 0;
+		FalseVariableNum = 0;
+		TrueVariableNum = 0;
+		OffVariableNum = 0;
+		OnVariableNum = 0;
+		PiVariableNum = 0;
+		CurveIndexVariableNums.deallocate();
+		ConstructionIndexVariableNums.deallocate();
+		YearVariableNum = 0;
+		MonthVariableNum = 0;
+		DayOfMonthVariableNum = 0;
+		DayOfWeekVariableNum = 0;
+		DayOfYearVariableNum = 0;
+		HourVariableNum = 0;
+		MinuteVariableNum = 0;
+		HolidayVariableNum = 0;
+		DSTVariableNum = 0;
+		CurrentTimeVariableNum = 0;
+		SunIsUpVariableNum = 0;
+		IsRainingVariableNum = 0;
+		SystemTimeStepVariableNum = 0;
+		ZoneTimeStepVariableNum = 0;
+		CurrentEnvironmentPeriodNum = 0;
+		ActualDateAndTimeNum = 0;
+		ActualTimeNum = 0;
+		WarmUpFlagNum = 0;
+	
+	}
 
 	void
 	InitializeRuntimeLanguage()

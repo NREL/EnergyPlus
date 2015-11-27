@@ -914,6 +914,7 @@ namespace ManageElectricPower {
 		Real64 TotalElectricDemand; // Current Total Electric Demand (W)
 		Real64 ElecProducedPVRate; // Current Rate of PV Produced from the Arrays (W)
 		Real64 ElecProducedWTRate; // Current Rate of Wind Turbine Produced (W)
+		Real64 ElecProducedStorageRate; // Current Rate of power to(-)/from(+) storage (W)
 
 		// Default Constructor
 		WholeBuildingElectricPowerSummary() :
@@ -930,40 +931,8 @@ namespace ManageElectricPower {
 			TotalHVACElecDemand( 0.0 ),
 			TotalElectricDemand( 0.0 ),
 			ElecProducedPVRate( 0.0 ),
-			ElecProducedWTRate( 0.0 )
-		{}
-
-		// Member Constructor
-		WholeBuildingElectricPowerSummary(
-			std::string const & Name,
-			Real64 const ElectricityProd, // Current Electric Produced from Equipment (J)
-			Real64 const ElectProdRate, // Current Electric Production Rate from Equipment (W)
-			Real64 const ElectricityPurch, // Current Purchased Electric (J)
-			Real64 const ElectPurchRate, // Current Electric Purhcased Rate (W)
-			Real64 const ElectSurplusRate, // Current excess power (W)
-			Real64 const ElectricitySurplus, // Current excess energy (J)
-			Real64 const ElectricityNetRate, // Net elect rate, + is Purchased, - is Surplus (W)
-			Real64 const ElectricityNet, // Net energy, + is Purchased, - is Surplus (J)
-			Real64 const TotalBldgElecDemand, // Current Total Building Electric Demand (W)
-			Real64 const TotalHVACElecDemand, // Current Total HVAC Electric Demand (W)
-			Real64 const TotalElectricDemand, // Current Total Electric Demand (W)
-			Real64 const ElecProducedPVRate, // Current Rate of PV Produced from the Arrays (W)
-			Real64 const ElecProducedWTRate // Current Rate of Wind Turbine Produced (W)
-		) :
-			Name( Name ),
-			ElectricityProd( ElectricityProd ),
-			ElectProdRate( ElectProdRate ),
-			ElectricityPurch( ElectricityPurch ),
-			ElectPurchRate( ElectPurchRate ),
-			ElectSurplusRate( ElectSurplusRate ),
-			ElectricitySurplus( ElectricitySurplus ),
-			ElectricityNetRate( ElectricityNetRate ),
-			ElectricityNet( ElectricityNet ),
-			TotalBldgElecDemand( TotalBldgElecDemand ),
-			TotalHVACElecDemand( TotalHVACElecDemand ),
-			TotalElectricDemand( TotalElectricDemand ),
-			ElecProducedPVRate( ElecProducedPVRate ),
-			ElecProducedWTRate( ElecProducedWTRate )
+			ElecProducedWTRate( 0.0 ),
+			ElecProducedStorageRate( 0.0 )
 		{}
 
 	};

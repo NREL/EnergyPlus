@@ -90,6 +90,12 @@ namespace EMSManager {
 		bool & ErrorFlag
 	);
 
+	bool
+	CheckIfNodeMoreInfoSensedByEMS( 
+		int const nodeNum, // index of node being checked.
+		std::string const & varName
+	);
+
 	void
 	SetupPrimaryAirSystemAvailMgrAsActuators();
 
