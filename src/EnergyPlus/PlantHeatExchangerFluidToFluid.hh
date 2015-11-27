@@ -194,7 +194,8 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 const MyLoad,
 		Real64 & MaxCap,
 		Real64 & MinCap,
-		Real64 & OptCap
+		Real64 & OptCap,
+		bool const FirstHVACIteration
 	);
 
 	void
@@ -213,7 +214,8 @@ namespace PlantHeatExchangerFluidToFluid {
 	ControlFluidHeatExchanger(
 		int const CompNum,
 		int const LoopNum,
-		Real64 const MyLoad
+		Real64 const MyLoad,
+		bool const FirstHVACIteration
 	);
 
 	void
