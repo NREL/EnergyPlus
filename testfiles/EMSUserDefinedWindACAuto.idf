@@ -2330,6 +2330,7 @@
     Set A0 = (0.0 -1.0) * LogRatedCBF * AirSupMdotDesign,  !- <none>
     Set ADiff = (0.0 - 1.0) * (A0 / AirSupMdotDesign),  !- <none>
     Set CBF = @Exp ADiff,    !- <none>
+    Set dummy = 0.0,
     Set TotCapTempModFac = @CurveValue WindACCoolCapFT FanOut_Twb OA_Tdb dummy dummy dummy,  !- <none>
     Set TotCapFlowModFac = @CurveValue WindACCoolCapFFF 1.0 dummy dummy dummy dummy,  !- <none>
     Set TotCap = RatedCap * TotCapTempModFac * TotCapFlowModFac,  !- <none>

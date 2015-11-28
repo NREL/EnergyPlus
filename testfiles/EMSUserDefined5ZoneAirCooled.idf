@@ -4242,7 +4242,8 @@
     Space4ATU_DesignAirMdot, !- <none>
     Space5ATU_DesignAirMdot, !- <none>
     Zone_Tsp_Cool,           !- <none>
-    Zone_Tsp_Heat;           !- <none>
+    Zone_Tsp_Heat,           !- <none>
+    tot_heat_Power;
 
   EnergyManagementSystem:InternalVariable,
     Space1ATU_HeatAirMdot,   !- Name

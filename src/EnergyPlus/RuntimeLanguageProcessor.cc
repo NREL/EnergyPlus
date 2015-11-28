@@ -223,7 +223,7 @@ namespace RuntimeLanguageProcessor {
 			True = SetErlValueNumber( 1.0 );
 
 			// Create constant built-in variables
-			NullVariableNum = NewEMSVariable( "NULL", 0 );
+			NullVariableNum = NewEMSVariable( "NULL", 0, SetErlValueNumber( 0.0) );
 			ErlVariable( NullVariableNum ).Value.Type = ValueNull;
 			FalseVariableNum = NewEMSVariable( "FALSE", 0, False );
 			TrueVariableNum = NewEMSVariable( "TRUE", 0, True );
@@ -2043,7 +2043,7 @@ namespace RuntimeLanguageProcessor {
 						ReturnValue.Error = "Variable " + ErlVariable( Operand( OperandNum ).Variable ).Name + " used in expression has not been initialized!" ;
 						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
 
-							ShowSevereError( "Variable " + ErlVariable( Operand( OperandNum ).Variable ).Name + " used in expression has not been initialized!");
+							ShowSevereError( "EvaluateExpression: EMS Variable " + ErlVariable( Operand( OperandNum ).Variable ).Name + " used in expression has not been initialized!");
 							ShowContinueErrorTimeStamp( "" );
 							errorsFound = true;
 						}
@@ -2071,6 +2071,15 @@ namespace RuntimeLanguageProcessor {
 					if ( Operand( 2 ).Number == 0.0 ) {
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "Divide by zero!";
+						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+
+							ShowSevereError( "EvaluateExpression: Divide By Zero in EMS Program!");
+							ShowContinueErrorTimeStamp( "" );
+							ShowFatalError("EvaluateExpression: Program terminated because of divide by zero in EMS Program. ");
+							errorsFound = true;
+						}
+
+
 					} else {
 						ReturnValue = SetErlValueNumber( Operand( 1 ).Number / Operand( 2 ).Number );
 					}
@@ -2150,10 +2159,18 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == OperatorRaiseToPower ) {
 				if ( ( Operand( 1 ).Type == ValueNumber ) && ( Operand( 2 ).Type == ValueNumber ) ) {
 					TestValue = std::pow( Operand( 1 ).Number, Operand( 2 ).Number );
-					if ( std::isnan( TestValue ) ) { // Use IEEE_IS_NAN when GFortran supports it
+					if ( std::isnan( TestValue ) ) { 
 						// throw Error
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
+						if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+
+							ShowSevereError( "EvaluateExpression: Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 ) );
+							ShowContinueErrorTimeStamp( "" );
+							ShowFatalError("EvaluateExpression: Program terminated because of NAN in power operator in EMS program. ");
+							errorsFound = true;
+						}
+
 					} else {
 						ReturnValue = SetErlValueNumber( TestValue );
 					}
@@ -2198,6 +2215,13 @@ namespace RuntimeLanguageProcessor {
 					// throw Error
 					ReturnValue.Type = ValueError;
 					ReturnValue.Error = "Attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
+					if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+
+						ShowSevereError( "EvaluateExpression: attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 ) );
+						ShowContinueErrorTimeStamp( "" );
+							ShowFatalError("EvaluateExpression: Program terminated because of too large exponential in EMS program. ");
+						errorsFound = true;
+					}
 				}
 			} else if ( SELECT_CASE_var == FuncLn ) {
 				if ( Operand( 1 ).Number > 0.0 ) {
@@ -2206,6 +2230,13 @@ namespace RuntimeLanguageProcessor {
 					// throw error,
 					ReturnValue.Type = ValueError;
 					ReturnValue.Error = "Natural Log of zero or less!";
+					if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
+
+						ShowSevereError( "EvaluateExpression: Natural Log of zero or less" );
+						ShowContinueErrorTimeStamp( "" );
+							ShowFatalError("EvaluateExpression: Program terminated because of natural log of zero or negative in EMS program. ");
+						errorsFound = true;
+					}
 				}
 			} else if ( SELECT_CASE_var == FuncMax ) {
 				ReturnValue = SetErlValueNumber( max( Operand( 1 ).Number, Operand( 2 ).Number ) );
