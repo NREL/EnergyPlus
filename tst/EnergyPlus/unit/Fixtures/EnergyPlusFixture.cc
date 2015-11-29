@@ -82,6 +82,7 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
@@ -95,6 +96,7 @@
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <fstream>
@@ -201,6 +203,7 @@ namespace EnergyPlus {
 		SetPointManager::clear_state();
 		SimAirServingZones::clear_state();
 		SimulationManager::clear_state();
+		SingleDuct::clear_state();
 		SizingManager::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
@@ -213,6 +216,7 @@ namespace EnergyPlus {
 		WeatherManager::clear_state();
 		ZoneAirLoopEquipmentManager::clear_state();
 		ZoneEquipmentManager::clear_state();
+		ZonePlenum::clear_state();
 		ZoneTempPredictorCorrector::clear_state();
 
 		{

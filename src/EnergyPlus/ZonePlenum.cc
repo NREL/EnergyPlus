@@ -71,6 +71,9 @@ namespace ZonePlenum {
 	Array1D_bool CheckRetEquipName;
 	Array1D_bool CheckSupEquipName;
 
+	namespace {
+		bool GetInputFlag( true ); // Flag set to make sure you get input once
+	}
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
 
 	// Object Data
@@ -81,6 +84,19 @@ namespace ZonePlenum {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		GetInputFlag = true;
+		NumZonePlenums = 0;
+		NumZoneReturnPlenums = 0;
+		NumZoneSupplyPlenums = 0;
+//		CheckRetEquipName.deallocate();
+//		CheckSupEquipName.deallocate();
+		ZoneRetPlenCond.deallocate();
+		ZoneSupPlenCond.deallocate();
+	}
 
 	void
 	SimAirZonePlenum(
@@ -133,7 +149,6 @@ namespace ZonePlenum {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZonePlenumNum; // The ZonePlenum that you are currently loading input into
-		static bool GetInputFlag( true ); // Flag set to make sure you get input once
 
 		// FLOW:
 

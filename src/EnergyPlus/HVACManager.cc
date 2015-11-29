@@ -155,6 +155,7 @@ namespace HVACManager {
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool SimHVACIterSetup( false );
+		bool TriggerGetAFN( true );
 	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
@@ -168,6 +169,7 @@ namespace HVACManager {
 		HVACManageIteration = 0;
 		RepIterAir = 0;
 		SimHVACIterSetup = false;
+		TriggerGetAFN = true;
 	}
 
 
@@ -267,7 +269,6 @@ namespace HVACManager {
 		Real64 ZoneTempChange( 0.0 ); // change in zone air temperature from timestep t-1 to t
 		int NodeNum;
 		bool ReportDebug;
-		static bool TriggerGetAFN( true );
 		int ZoneNum;
 		static bool PrintedWarmup( false );
 
