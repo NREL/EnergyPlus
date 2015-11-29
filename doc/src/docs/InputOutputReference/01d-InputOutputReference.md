@@ -8,7 +8,7 @@ Zone Control objects are used to control zone conditions to a specific setpoint.
 **Humidistat** - The object is used to control a zone to a specified relative humidity.
 
 **Thermostat:ThermalComfort** - The object provides a method to control a zone to a dry-bulb temperature setpoint based on a thermal comfort model (e.g. Fanger) and a user-specified thermal comfort setpoint schedule.
-retur
+
 **Thermostat:OperativeTemperature** - The operative temperature control is formulated to reuse all of the traditional thermostat objects. One input object will be used for each thermal zone to indicate if that zone   s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. The user will still have to input all the traditional ZoneControl:Thermostat and setpoint objects.
 
 **Thermostat:TemperatureAndHumidity** - This thermostat control works together with the traditional ZoneControl:Thermostat object to modify temperature control based on zone air humidity conditions. Currently, this object resets the thermostat   s cooling setpoint temperature downward based on elevated zone air humidity levels, typically yielding additional cooling coil operation and associated dehumidification. A ZoneControl:Thermostat:TemperatureAndHumidity object should be specified to indicate if a zone   s traditional thermostat control mode should be overridden to provide enhanced dehumidification. The user must still input the traditional ZoneControl:Thermostat and setpoint objects.
@@ -1126,19 +1126,19 @@ Example inputs are shown below
 
 ```idf
   AirLoopHVAC:SupplyPath,
-       SupplyAirPath 1,                       !- Name
-       Zone Equip In Node,                 !- Supply Air Path Inlet Node Name
+       SupplyAirPath 1,              !- Name
+       Zone Equip In Node,           !- Supply Air Path Inlet Node Name
        AirLoopHVAC:SupplyPlenum,     !- Component 1 Object Type
-       Supply-Plenum-1,                       !- Component 1 Name
+       Supply-Plenum-1,              !- Component 1 Name
        AirLoopHVAC:ZoneSplitter,     !- Component 2 Object Type
-       Zone Supply Air Splitter 1; !- Component 2 Name
+       Zone Supply Air Splitter 1;   !- Component 2 Name
 
 
 AirLoopHVAC:ReturnPath,
-       ReturnAirPath1,                         !- Name
-       PLENUM-1 Out Node,                   !- Return Air Path Outlet Node Name
-       Zone Return Plenum,                 !- Component 1 Object Type
-       Return-Plenum-1;                       !- Component 1 Name
+       ReturnAirPath1,               !- Name
+       PLENUM-1 Out Node,            !- Return Air Path Outlet Node Name
+       Zone Return Plenum,           !- Component 1 Object Type
+       Return-Plenum-1;              !- Component 1 Name
 ```
 
 
@@ -1162,7 +1162,7 @@ The zone name specified in the heat balance portion of the input. This piece of 
 
 #### Field: Zone Node Name
 
-The name of the zone node. The zone node name connects the heat balance data structure to the system airflow data structure through this node. This node name must be unique otherwise a warning is reported. Do not use the Zone Air Node Name    specified in any ZoneHVAC:EquipmentConnections object, and since this zone is a plenum a ZoneHVAC:EquipmentConnections object is not required for the zone named in the previous field.
+The name of the zone node. The zone node name connects the heat balance data structure to the system airflow data structure through this node. This node name must be unique otherwise a warning is reported. Do not use the Zone Air Node Name specified in any ZoneHVAC:EquipmentConnections object, and since this zone is a plenum a ZoneHVAC:EquipmentConnections object is not required for the zone named in the previous field.
 
 #### Field: Outlet Node Name
 
