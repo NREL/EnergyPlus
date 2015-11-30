@@ -92,15 +92,13 @@ namespace DataConvergParams {
 	{
 		// Members
 		int NodeNum;
-		bool NotConvergedHumRate;
-		bool NotConvergedMassFlow;
-		bool NotConvergedTemp;
 		Array1D< Real64 > HumidityRatio;
 		Array1D< Real64 > MassFlowRate;
 		Array1D< Real64 > Temperature;
 
 		// Default Constructor
 		HVACNodeConvergLogStruct() :
+			NodeNum( 0 ),
 			HumidityRatio( ConvergLogStackDepth ),
 			MassFlowRate( ConvergLogStackDepth ),
 			Temperature( ConvergLogStackDepth )
@@ -109,17 +107,11 @@ namespace DataConvergParams {
 		// Member Constructor
 		HVACNodeConvergLogStruct(
 			int const NodeNum,
-			bool const NotConvergedHumRate,
-			bool const NotConvergedMassFlow,
-			bool const NotConvergedTemp,
 			Array1< Real64 > const & HumidityRatio,
 			Array1< Real64 > const & MassFlowRate,
 			Array1< Real64 > const & Temperature
 		) :
 			NodeNum( NodeNum ),
-			NotConvergedHumRate( NotConvergedHumRate ),
-			NotConvergedMassFlow( NotConvergedMassFlow ),
-			NotConvergedTemp( NotConvergedTemp ),
 			HumidityRatio( ConvergLogStackDepth, HumidityRatio ),
 			MassFlowRate( ConvergLogStackDepth, MassFlowRate ),
 			Temperature( ConvergLogStackDepth, Temperature )
