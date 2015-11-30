@@ -321,12 +321,13 @@ namespace EnergyPlus {
 		DXCoil( CoolCoilIndex ).InletAirTemp = 25.5553;
 		DXCoil( CoolCoilIndex ).InletAirHumRat = 8.4682e-3;
 		DXCoil( CoolCoilIndex ).InletAirEnthalpy = 47259.78;
-
-		CalcVRFIUAirFlow( ZoneIndex, Mode, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, Temp, CoolCoilIndex, SHSCModify, FanSpdRatio, FanOnOffRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
-		EXPECT_NEAR( TcIn, 25.56, 0.01 );
+		
+		CalcVRFIUAirFlow( CoolCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
+		//CalcVRFIUAirFlow( ZoneIndex, Mode, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, Temp, CoolCoilIndex, SHSCModify, FanSpdRatio, FanOnOffRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
+		//EXPECT_NEAR( TcIn, 25.56, 0.01 );
 		EXPECT_NEAR( Toutlet, 17.89, 0.01 );
 		EXPECT_NEAR( Houtlet, 39440, 1 );
-		EXPECT_NEAR( HcoilIn, 47259, 1 );
+		//EXPECT_NEAR( HcoilIn, 47259, 1 );
 		EXPECT_NEAR( SHact, 3.00, 0.01 );
 
 
@@ -343,11 +344,12 @@ namespace EnergyPlus {
 		DXCoil( HeatCoilIndex ).InletAirHumRat = 4.1053e-3;
 		DXCoil( HeatCoilIndex ).InletAirEnthalpy = 30755.6253;
 
-		CalcVRFIUAirFlow( ZoneIndex, Mode, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, Temp, HeatCoilIndex, SHSCModify, FanSpdRatio, FanOnOffRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
-		EXPECT_NEAR( TcIn, 20.24, 0.01 );
+		CalcVRFIUAirFlow( HeatCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
+		//CalcVRFIUAirFlow( ZoneIndex, Mode, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, Temp, HeatCoilIndex, SHSCModify, FanSpdRatio, FanOnOffRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
+		//EXPECT_NEAR( TcIn, 20.24, 0.01 );
 		EXPECT_NEAR( Toutlet, 38.37, 0.01 );
 		EXPECT_NEAR( Houtlet, 49113, 1 );
-		EXPECT_NEAR( HcoilIn, 30756, 1 );
+		//EXPECT_NEAR( HcoilIn, 30756, 1 );
 		EXPECT_NEAR( SCact, 5.00, 0.01 );
 
 		// Clean up

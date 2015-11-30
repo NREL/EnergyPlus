@@ -14308,12 +14308,12 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xiufeng Pang, LBNL
 		//       DATE WRITTEN   Jan 2013
-		//       MODIFIED       Jul 2015, RP Zhang, LBNL 
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL 
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// 		Calculates the air-side performance of a direct-expansion, air-cooled
-		// 		VRF terminal unit cooling coil, for the new VRF model.
+		// 		VRF terminal unit cooling coil, for the VRF_FluidTCtrl model.
 
 		// METHODOLOGY EMPLOYED:
 		// 		This subroutine is derived from CalcVRFCoolingCoil, and implements the new VRF model for FluidTCtrl.
@@ -14327,10 +14327,12 @@ Label50: ;
 		using DataHVACGlobals::HPWHCrankcaseDBTemp;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
+		using DataWater::WaterStorage;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using General::CreateSysTimeIntervalString;
-		using DataWater::WaterStorage;
+		using HVACVariableRefrigerantFlow::OACompOnMassFlow;
+		using HVACVariableRefrigerantFlow::OACompOffMassFlow;    
 		using namespace DataZoneEnergyDemands;
 		using namespace HVACVariableRefrigerantFlow;
 
@@ -14395,15 +14397,13 @@ Label50: ;
 		Real64 ADiff; // Used for exponential
 		
 		// Followings for VRF FluidTCtrl Only 
-		Real64 QZnReqSenCoolingLoad; // Zone required cooling load (W)   
-		Real64 FanSpdRatio; // Fan speed ratio            
-		Real64 FanOnOffRatio; // Fan On/Off ratio
-		Real64 TcoilIn; // Air temperature at the inlet of the coil (C)                
+		Real64 QZnReqSenCoolingLoad; // Zone required cooling load (W)
+		Real64 QCoilReq; // Coil load (W)
+		Real64 FanSpdRatio; // Fan speed ratio           
+		Real64 AirMassFlowMin; // Min air mass flow rate due to OA requirement [kg/s]   
 		Real64 HcoilIn; // Air enthalpy at the inlet of the coil (kJ/kg) 
 		Real64 ActualSH; // Super heating degrees (C)               
 		Real64 ActualSC; // Sub cooling degrees (C)                 
-		int OperatingMode; // Coil operation mode: 0 for cooling, 1 for heating, 2 for neither cooling nor heating  
-		int ZoneIndex;  // Index of the zone that the coil serves           
 
 		// If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
 		if ( present( PerfMode ) ) {
@@ -14534,14 +14534,18 @@ Label50: ;
 
 		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( PartLoadRatio > 0.0 ) && ( CompOp == On ) ) { // for cycling fan, reset mass flow to full on rate
 					
+			//@@ Double check the use of TotCap
 			TotCap = DXCoil( DXCoilNum ).RatedTotCap( Mode );
+			QCoilReq = -PartLoadRatio * TotCap;
+			if( PartLoadRatio == 0.0 ){
+				AirMassFlowMin = OACompOffMassFlow;
+			} else {
+				AirMassFlowMin = OACompOnMassFlow;
+			}
 			
 			// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-			OperatingMode = 0;
-			ZoneIndex = VRFTU( DXCoil( DXCoilNum ).VRFIUPtr ).ZoneNum;
-			CalcVRFIUAirFlow( ZoneIndex, OperatingMode, PartLoadRatio * TotCap, DXCoil( DXCoilNum ).EvaporatingTemp, DXCoilNum, true, FanSpdRatio, FanOnOffRatio, OutletAirHumRat, 
-							OutletAirTemp, OutletAirEnthalpy, HcoilIn, TcoilIn, ActualSH, ActualSC );
-			AirMassFlow = FanSpdRatio * FanOnOffRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
+			CalcVRFIUAirFlow( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).EvaporatingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
+			AirMassFlow = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
 			
 			// if ( FanOpMode == CycFanCycCoil ) {
 			// 	AirMassFlow /= PartLoadRatio;
@@ -14716,7 +14720,7 @@ Label50: ;
 			DXCoil( DXCoilNum ).TotalCoolingEnergyRate = AirMassFlow * ( InletAirEnthalpy - OutletAirEnthalpy );
 			
 			MinAirHumRat = min( InletAirHumRat, OutletAirHumRat );
-			DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * 1005.0 * ( TcoilIn - OutletAirTemp );
+			DXCoil( DXCoilNum ).SensCoolingEnergyRate = AirMassFlow * 1005.0 * ( InletAirDryBulbTemp - OutletAirTemp );
 			//  Don't let sensible capacity be greater than total capacity
 			if ( DXCoil( DXCoilNum ).SensCoolingEnergyRate > DXCoil( DXCoilNum ).TotalCoolingEnergyRate ) {
 				DXCoil( DXCoilNum ).SensCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate;
@@ -14780,7 +14784,7 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xiufeng Pang (XP), LBNL
 		//       DATE WRITTEN   Mar 2013
-		//       MODIFIED       Jul 2015, RP Zhang, LBNL
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 		
@@ -14797,6 +14801,8 @@ Label50: ;
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using General::RoundSigDigits;
+		using HVACVariableRefrigerantFlow::OACompOnMassFlow;
+		using HVACVariableRefrigerantFlow::OACompOffMassFlow;    
 		using namespace DataZoneEnergyDemands;
 		using namespace HVACVariableRefrigerantFlow;
 		
@@ -14854,16 +14860,16 @@ Label50: ;
 		Real64 OutletAirTemp; // Supply air temperature (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirHumRat; // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
 		Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
+		
 		// Followings for VRF FluidTCtrl Only
 		Real64 QZnHeating; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
+		Real64 QCoilReq; // Coil load (W)
+		Real64 FanSpdRatio; // Fan Speed Ratio
+		Real64 AirMassFlowMin; // Min air mass flow rate due to OA requirement [kg/s]
 		Real64 HcoilIn; // Enthalpy of the coil inlet
 		Real64 TcoilIn; // Temperature of the coil inlet
 		Real64 ActualSH; // Actual Super Heating 
 		Real64 ActualSC; // Actual Sub Cooling
-		Real64 FanSpdRatio; // Fan Speed Ratio
-		Real64 FanOnOffRatio; // Fan On/Off Ratio
-		int OperatingMode; // Operation Mode
-		int ZoneIndex; // Zone index
 		
 		if ( present( OnOffAirFlowRatio ) ) {
 			AirFlowRatio = OnOffAirFlowRatio;
@@ -14897,15 +14903,20 @@ Label50: ;
 			( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && 
 			( PartLoadRatio > 0.0 ) && ( OutdoorDryBulb > DXCoil( DXCoilNum ).MinOATCompressor ) ) {
 			
+			//@@ Double check the use of TotCap
 			TotCap = DXCoil( DXCoilNum ).RatedTotCap( Mode );
-			ZoneIndex = VRFTU( DXCoil( DXCoilNum ).VRFIUPtr ).ZoneNum;
-			OperatingMode = 1;
-			// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-			CalcVRFIUAirFlow( ZoneIndex, OperatingMode, PartLoadRatio * TotCap, DXCoil( DXCoilNum ).CondensingTemp,  
-							DXCoilNum, true, FanSpdRatio, FanOnOffRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, HcoilIn, TcoilIn, ActualSH, ActualSC );
-			AirMassFlow = FanSpdRatio * FanOnOffRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );
+			QCoilReq = PartLoadRatio * TotCap;
+			if( PartLoadRatio == 0.0 ){
+				AirMassFlowMin = OACompOffMassFlow;
+			} else {
+				AirMassFlowMin = OACompOnMassFlow;
+			}
 			
-			// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton)			
+			// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
+			CalcVRFIUAirFlow( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).CondensingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
+			AirMassFlow = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
+			
+			// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton)
 			AirVolumeFlowRate = AirMassFlow / PsyRhoAirFnPbTdbW( OutdoorPressure, InletAirDryBulbTemp, InletAirHumRat );
 			// Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 			VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -15091,7 +15102,7 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xiufeng Pang, LBNL
 		//       DATE WRITTEN   Feb 2014
-		//       MODIFIED       Jul 2015, RP Zhang, LBNL, Modify the bounds of the Te/Tc
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL, Modify the bounds of the Te/Tc
 		//       RE-ENGINEERED  na
 		
 		// PURPOSE OF THIS SUBROUTINE:
@@ -15252,19 +15263,14 @@ Label50: ;
 	
 	void
 	CalcVRFIUAirFlow (
-		int const ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
-		int const Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
-		Real64 const QZnReq,  // Zone load
-		Real64 const TeTc,    // evaporating or condensing temperature
 		int const CoilIndex,  // index to VRFTU coil 
-		bool SHSCModify,      // indicate whether SH/SC would be modified
-		Real64 & FanSpdRatio, // fan speed ratio
-		Real64 & FanOnOffRatio, // fan on/off ratio: time fan is on / total time
+		Real64 const QCoil,   // coil load
+		Real64 const TeTc,    // evaporating or condensing temperature
+		Real64 const OAMassFlow,  // mass flow rate of outdoor air 
+		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
 		Real64 & Wout,    // outlet air humidity ratio
-		Real64 & Toutlet, // outlet air temperature
-		Real64 & Houtlet, // outlet air enthalpy
-		Real64 & HcoilIn, // inlet air enthalpy
-		Real64 & TcIn,    // coil inlet temperature, after fan
+		Real64 & Tout, // outlet air temperature
+		Real64 & Hout, // outlet air enthalpy
 		Real64 & SHact,   // actual SH
 		Real64 & SCact    // actual SC
 	)
@@ -15272,13 +15278,13 @@ Label50: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xiufeng Pang, LBNL
 		//       DATE WRITTEN   Feb 2013
-		//       MODIFIED       Jul 2015, RP Zhang, LBNL
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL
 		//                               
 		//       RE-ENGINEERED  na
 		//
 		// PURPOSE OF THIS SUBROUTINE:
-		//       Analyze the VRF Indoor Unit operations given zonal loads.
-		//       Calculated parameters include: (1) Fan Speed Ratio, (2) SH/SC Degrees, and (3) Coil Inlet/Outlet conditions 
+		//       Analyze the VRF Indoor Unit operations given coil loads.
+		//       Calculated parameters include: (1) Fan Speed Ratio (2) SH/SC, (3) Coil Outlet conditions
 		//
 		// METHODOLOGY EMPLOYED:
 		//       A new physics based VRF model appliable for Fluid Temperature Control.
@@ -15313,8 +15319,9 @@ Label50: ;
 		Real64 C1Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
 		Real64 C2Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
 		Real64 C3Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
+		Real64 CoilOnOffRatio; // coil on/off ratio: time coil is on divided by total time
 		Real64 deltaT;  // Difference between evaporating/condensing temperature and coil surface temperature (C)
-		Real64 FanSpdRatioMin; // Min fan speed ratio (-)
+		Real64 FanSpdRatioMin; // Min fan speed ratio, below which the cycling will be activated (-)
 		Real64 Garate; // Nominal air mass flow rate (m3/s)
 		Real64 Hin;    // Air enthalpy at the coil inlet (kJ/kg)
 		Real64 MaxSH;  // Max super heating degrees (C)
@@ -15322,31 +15329,48 @@ Label50: ;
 		Real64 QinSenMin1; //Coil capacity at minimum fan speed, corresponding to real SH (W)
 		Real64 QinSenMin2; //Coil capacity at minimum fan speed, corresponding to corresponds maximum SH (W)
 		Real64 QinSenPerFlowRate; //Coil capacity per air mass flow rate(W-s/kg)
-		Real64 Qfan; // Heat released by fan (W)
-		Real64 QZnReqSenCoolingLoad; // Zone required sensible cooling load (W)
-		Real64 QZnReqSenHeatingLoad; // Zone required sensible heating load (W)
+		Real64 QCoilSenCoolingLoad; // Coil sensible cooling load (W)
+		Real64 QCoilSenHeatingLoad; // Coil sensible heating load (W)
 		Real64 Ratio1; // Fan speed ratio (-)
 		Real64 RHsat;  // Relative humidity of the air at saturated condition(-) 
 		Real64 SH; // Super heating degrees (C)
 		Real64 SC; // Subcooling degrees (C)
-		Real64 TairInlet; // Air temperature at indoor unit fan inlet (C)
-		Real64 TcoilIn; // Air temperature at indoor coil inlet (C)
-		Real64 Th21; // Air temperature at the coil surface, for temporary use (C)
-		Real64 Th22; // Air temperature at the coil surface, for temporary use (C)
-		Real64 Th2; // Air temperature at the coil surface (C)
+		Real64 Tin; // Air temperature at indoor coil inlet (C)
+		Real64 Ts_1; // Air temperature at the coil surface, corresponding to SH (C)
+		Real64 Ts_2; // Air temperature at the coil surface, corresponding to MaxSH (C)
+		Real64 To_1; // Air temperature at the coil outlet, corresponding to SH (C)
+		Real64 To_2; // Air temperature at the coil outlet, corresponding to MaxSH (C)
+		Real64 Ts; // Air temperature at the coil surface (C)
 		Real64 Win; // Air humidity ratio at the coil inlet (kg/kg)
-		Real64 Wh2; // Air temperature at the coil surface (C)
+		Real64 Ws; // Air humidity ratio at the coil surface (kg/kg)
 		
 		RHsat = 0.98; // Saturated RH
 		MaxSH = 15;
-		MaxSC = 20;
-		FanSpdRatioMin = 0.65; // max( min( FanSpdRatioMin, 1.0 ), 0.0);
+		MaxSC = 20; 
+		Garate = DXCoil( CoilIndex ).RatedAirMassFlowRate( 1 );
+		FanSpdRatioMin = min( max( OAMassFlow / Garate, 0.65 ), 1.0 ); // ensure that coil flow rate is higher than OA flow rate
 		
-		if( Mode == FlagCoolMode ) {
-		//COOLING: Mode 0
+		if( QCoil == 0 ) {
+		//No Heating or Cooling
+			
+			Tin = DXCoil( CoilIndex ).InletAirTemp;
+			Win = DXCoil( CoilIndex ).InletAirHumRat;
+			Hin = DXCoil( CoilIndex ).InletAirEnthalpy;
+			
+			FanSpdRatio = OAMassFlow / Garate;
+			CoilOnOffRatio = 0.0;
 		
-			// Obtain zonal cooling loads
-			QZnReqSenCoolingLoad = QZnReq; //- 1.0 * ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP;
+			SHact = 999.0;
+			SCact = 999.0;
+			Tout = Tin;
+			Hout = Hin;
+			Wout = Win;
+		
+		} else if( QCoil < 0 ) {
+		//Cooling Mode
+		
+			// Obtain coil cooling loads
+			QCoilSenCoolingLoad = -QCoil; 
 			
 			// Coefficients describing coil performance
 			SH = DXCoil( CoilIndex ).SH;
@@ -15354,114 +15378,103 @@ Label50: ;
 			C2Tevap = DXCoil( CoilIndex ).C2Te;
 			C3Tevap = DXCoil( CoilIndex ).C3Te;
 			
-			BF = 0.0592; 
-			Garate = DXCoil( CoilIndex ).RatedAirMassFlowRate( 1 );
-			TairInlet = DXCoil( CoilIndex ).InletAirTemp;
+			BF = 0.0592;
+			Tin = DXCoil( CoilIndex ).InletAirTemp;
 			Win = DXCoil( CoilIndex ).InletAirHumRat ;
 			Hin = DXCoil( CoilIndex ).InletAirEnthalpy;
 			
-			// Get heat released by fan
-			int SupplyFanIndex = DXCoil( CoilIndex ).SupplyFanIndex;
-			if ( SupplyFanIndex > 0) {
-				Qfan = Fan( SupplyFanIndex ).OutletAirEnthalpy - Fan( SupplyFanIndex ).InletAirEnthalpy;
-			} else {
-				Qfan = 0;
-			}
-			TcoilIn = TairInlet + Qfan * pow_2( FanSpdRatioMin ) / Garate / 1005.0; //when fan runs at minimu speed.
-			QZnReqSenCoolingLoad += Qfan * pow_2( FanSpdRatioMin ); // cooling coil has to deal with zone cooling load + heat released by fan.
-			
 			// Coil sensilbe heat transfer_minimum value
-			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, TcoilIn, TeTc, SH, BF, QinSenPerFlowRate, Th21 );
+			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, SH, BF, QinSenPerFlowRate, Ts_1 );
+			To_1 = Tin - QinSenPerFlowRate / 1005;
 			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
 			
-			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, TcoilIn, TeTc, MaxSH, BF, QinSenPerFlowRate, Th22 );
+			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, MaxSH, BF, QinSenPerFlowRate, Ts_2 );
+			To_2 = Tin - QinSenPerFlowRate / 1005;
 			QinSenMin2 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds maximum SH
 			
-			if( QZnReqSenCoolingLoad > QinSenMin1 ) { 
-			// Modulate fan speed to meet room sensible load; SH may or may not be updated
-				
-				Par( 1 ) = QZnReqSenCoolingLoad;
-				Par( 2 ) = Th21;
-				Par( 3 ) = TairInlet;
-				Par( 4 ) = Qfan;
-				Par( 5 ) = Garate;
-				Par( 6 ) = BF;
+			if( QCoilSenCoolingLoad > QinSenMin1 ) { 
+			// Increase fan speed to meet room sensible load; SH is not updated
+			
+				Par( 1 ) = QCoilSenCoolingLoad;
+				Par( 2 ) = Ts_1;
+				Par( 3 ) = Tin;
+				Par( 4 ) = Garate;
+				Par( 5 ) = BF;
 				
 				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, 0.5, 1.5, Par);
 				FanSpdRatio = Ratio1;
-				FanOnOffRatio = 1.0;
-				if( SHSCModify ) {
-				// No need to update SH (SHact = SH)
-					
-					TcIn = TairInlet + Qfan *  pow_2( FanSpdRatio ) / Garate / 1005; // FanSpdRatio is updated
-					Toutlet = TcIn - ( TcIn - Th21 ) * ( 1 - BF ); // Still use Th21 = f(deltaT1) = g(SH), since SH is not updated
-					Wh2 = PsyWFnTdbRhPb( Th21, RHsat, OutBaroPress, "CalcVRFIUAirFlow");
-					
-					if( Wh2 < Win ) {
-						Wout = Win - ( Win - Wh2) * ( 1 - BF );
-					} else {
-						Wout = Win;
-					}
-					
-					Houtlet = PsyHFnTdbW( Toutlet, Wout );
-					HcoilIn = PsyHFnTdbW( TcIn, Win );
-					SCact = 999.0;
-					SHact = SH;
-					
-				} 
+				CoilOnOffRatio = 1.0;
+				
+				Tout = To_1; // Since SH is not updated
+				Ws = PsyWFnTdbRhPb( Ts_1, RHsat, OutBaroPress, "CalcVRFIUAirFlow");
+				if( Ws < Win ) {
+					Wout = Win - ( Win - Ws) * ( 1 - BF );
+				} else {
+					Wout = Win;
+				}
+				Hout = PsyHFnTdbW( Tout, Wout );
+				
+				SCact = 999.0;
+				SHact = SH;
+				
 			} else {
-			// Need to update SH to further reduce QinSenMin1
-			// That is, SHact is updated (different from SH) while using FanSpdRatio = FanSpdRatioMin.
+			// Low load modificatin algorithm
+			// Need to increase SH to further reduce coil capacity
+			// May further implement coil cycling control if SC modification is not enough
 			
 				FanSpdRatio = FanSpdRatioMin;
 				
-				if( SHSCModify ){
-					FanOnOffRatio = 1.0;
+				CoilOnOffRatio = 1.0;
+				
+				Tout = Tin - QCoilSenCoolingLoad / 1005.0 / FanSpdRatioMin / Garate;
+				Ts = Tin - ( Tin - Tout ) / ( 1 - BF );
+				deltaT = Ts - TeTc;
+				
+				// Update SH
+				if( C3Tevap <= 0.0 ) {
+					if ( C2Tevap > 0.0)
+						SHact = ( deltaT - C1Tevap) / C2Tevap;
+					else 
+						SHact = 998.0;
+				} else {
+					SHact = ( - C2Tevap + sqrt( pow_2( C2Tevap ) - 4 * C3Tevap * ( C1Tevap-deltaT ) ) ) / 2 / C3Tevap;
+				}
+				
+				Ws = PsyWFnTdbRhPb( Ts, RHsat, OutBaroPress, "CalcVRFIUAirFlow");
+				if( Ws < Win ) {
+					Wout = Win - ( Win - Ws) * ( 1 - BF );
+				} else {
+					Wout = Win;
+				}
+				
+				if( SHact > MaxSH ) {
+				// Further implement On/Off Control
+					SHact = MaxSH;
+					CoilOnOffRatio = QCoilSenCoolingLoad / QinSenMin2; 
 					
-					TcIn = TcoilIn; // TcoilIn = f(FanSpdRatioMin)
-					Toutlet = TcoilIn - QZnReqSenCoolingLoad / 1005.0 / FanSpdRatioMin / Garate;
-					Th2 = TcoilIn - ( TcoilIn - Toutlet ) / ( 1 - BF );
-					deltaT = Th2 - TeTc;
-					
-					// Update SH
-					if( C3Tevap <= 0.0 ) {
-						if ( C2Tevap > 0.0)
-							SHact = ( deltaT - C1Tevap) / C2Tevap;
-						else 
-							SHact = 998.0;
-					} else {
-						SHact = ( - C2Tevap + sqrt( pow_2( C2Tevap ) - 4 * C3Tevap * ( C1Tevap-deltaT ) ) ) / 2 / C3Tevap;
-					}
-					
-					if( SHact > MaxSH ) {
-					// Implement On/Off Control
-						SHact = MaxSH;
-						Toutlet = TcoilIn - QinSenMin2 / 1005.0 / FanSpdRatioMin / Garate;
-						Th2 = Th22;
-						FanOnOffRatio = QZnReqSenCoolingLoad / QinSenMin2; 
-					}
-					
-					Wh2 = PsyWFnTdbRhPb( Th2, RHsat, OutBaroPress, "CalcVRFIUAirFlow");
-					
-					if( Wh2 < Win ) {
-						Wout = Win - ( Win - Wh2) * (1 - BF );
+					Ts = Ts_2;
+					Ws = PsyWFnTdbRhPb( Ts, RHsat, OutBaroPress, "CalcVRFIUAirFlow");
+					if( Ws < Win ) {
+						Wout = Win - ( Win - Ws) * ( 1 - BF );
 					} else {
 						Wout = Win;
 					}
 					
-					Houtlet = PsyHFnTdbW( Toutlet, Wout );
-					HcoilIn = PsyHFnTdbW( TcoilIn, Win ); 
-					SCact = 999.0;
-				} else {
-					FanOnOffRatio = QZnReqSenCoolingLoad / QinSenMin2;
+					//outlet air temperature and humidity ratio is time-weighted
+					Tout = CoilOnOffRatio * To_2 + ( 1 - CoilOnOffRatio ) * Tin;
+					Wout = CoilOnOffRatio * Wout + ( 1 - CoilOnOffRatio ) * Win;
 				}
+				
+				Hout = PsyHFnTdbW( Tout, Wout );
+				
+				SCact = 999.0;
 			}
 			
-		} else if( Mode == FlagHeatMode ) {
-		//HEATING: Mode 1 
+		} else if( QCoil > 0 ) {
+		//Heating Mode 
 			
 			// Obtain zonal heating loads
-			QZnReqSenHeatingLoad = QZnReq; //ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP; 
+			QCoilSenHeatingLoad = QCoil; 
 			
 			// Coefficients describing coil performance
 			SC = DXCoil( CoilIndex ).SC;
@@ -15470,116 +15483,78 @@ Label50: ;
 			C3Tcond = DXCoil( CoilIndex ).C3Tc;
 			
 			BF = 0.136; 
-			Garate = DXCoil( CoilIndex ).RatedAirMassFlowRate( 1 );
-			TairInlet = DXCoil( CoilIndex ).InletAirTemp;
+			Tin = DXCoil( CoilIndex ).InletAirTemp;
 			Win = DXCoil( CoilIndex ).InletAirHumRat;
 			Hin = DXCoil( CoilIndex ).InletAirEnthalpy;
 			
-			// Get heat released by fan
-			int SupplyFanIndex = DXCoil( CoilIndex ).SupplyFanIndex;
-			if ( SupplyFanIndex > 0) {
-				Qfan = Fan( SupplyFanIndex ).OutletAirEnthalpy - Fan( SupplyFanIndex ).InletAirEnthalpy;
-			} else {
-				Qfan = 0;
-			}
-			TcoilIn = TairInlet + Qfan *  pow_2( FanSpdRatioMin ) / Garate / 1005.0; //when fan runs at minimu speed 
-			QZnReqSenHeatingLoad -= Qfan * pow_2( FanSpdRatioMin ); // heating coil has to deal with zone heating load - heat released by fan.
-			
 			// Coil sensilbe heat transfer_minimum value
-			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, TairInlet, TeTc, SC, BF, QinSenPerFlowRate, Th21 );
+			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1 );
+			To_1 = QinSenPerFlowRate / 1005 + Tin;
 			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
 			
-			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, TairInlet, TeTc, MaxSC, BF, QinSenPerFlowRate, Th22 );
+			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, MaxSC, BF, QinSenPerFlowRate, Ts_2 );
+			To_2 = QinSenPerFlowRate / 1005 + Tin;
 			QinSenMin2 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds maximum SH
 			
-			if( QZnReqSenHeatingLoad > QinSenMin1  ) {
-			// Modulate fan speed to meet room sensible load; SH may or may not be updated
+			if( QCoilSenHeatingLoad > QinSenMin1  ) {
+			// Modulate fan speed to meet room sensible load; SC is not updated
 				
-				Par( 1 ) = QZnReqSenHeatingLoad;
-				Par( 2 ) = Th21;
-				Par( 3 ) = TairInlet;
-				Par( 4 ) = Qfan;
-				Par( 5 ) = Garate;
-				Par( 6 ) = BF;
+				Par( 1 ) = QCoilSenHeatingLoad;
+				Par( 2 ) = Ts_1;
+				Par( 3 ) = Tin;
+				Par( 4 ) = Garate;
+				Par( 5 ) = BF;
 				
 				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, 0.5, 1.5, Par);
 				FanSpdRatio = Ratio1;
-				FanOnOffRatio = 1.0;
-				if( SHSCModify ) {
-				// No need to update SC (SCact = SC )
+				CoilOnOffRatio = 1.0;
 				
-					TcIn = TairInlet + Qfan *  pow_2( FanSpdRatio ) / Garate / 1005.0;// FanSpdRatio is updated
-					Toutlet = TcIn +( Th21 - TcIn ) * ( 1 - BF );
-					Wout = Win;
-				
-					Houtlet = PsyHFnTdbW( Toutlet, Wout );
-					HcoilIn = PsyHFnTdbW( TcIn, Win );
-					SHact = 999.0;
-					SCact = SC;
-				}
+				Tout = Tin + ( Ts_1 - Tin ) * ( 1 - BF );
+				Wout = Win;
+				Hout = PsyHFnTdbW( Tout, Wout );
+			
+				SHact = 999.0;
+				SCact = SC;
 				
 			} else {
-			// Need to update SC to further reduce QinSenMin1
-			// That is, SCact is updated (different from SC ) while using FanSpdRatio = FanSpdRatioMin.
+			// Low load modificatin algorithm
+			// Need to increase SC to further reduce coil heating capacity
+			// May further implement coil cycling control if SC modification is not enough
 				
 				FanSpdRatio = FanSpdRatioMin;
+				CoilOnOffRatio = 1.0;
 				
-				if( SHSCModify ) {
-					FanOnOffRatio = 1.0;
-					TcIn = TcoilIn; // TcoilIn = f(FanSpdRatioMin)
-					Toutlet = TairInlet + QZnReqSenHeatingLoad / 1005.0 / FanSpdRatio / Garate;
-					Th2 = TcoilIn + ( Toutlet - TcoilIn ) / ( 1 - BF  );
-					deltaT = TeTc - Th2;
-					
-					// Update SC
-					if( C3Tcond <= 0.0  ) {
-						if ( C2Tcond > 0.0)
-							SCact = ( deltaT - C1Tcond  ) / C2Tcond;
-						else 
-							SCact = 998.0;
-					} else {
-						SCact = ( -C2Tcond + sqrt( pow_2( C2Tcond  ) -4  *  C3Tcond  *  ( C1Tcond-deltaT  ) ) ) / 2 / C3Tcond;
-					}
-					
-					if( SCact > MaxSC  ) {
-					// Implement On/Off Control
-						SCact = MaxSC;
-						Toutlet = TairInlet + QinSenMin2 / 1005.0 / FanSpdRatio / Garate;
-						Th2 = Th22;
-						FanOnOffRatio = QZnReqSenHeatingLoad / QinSenMin2; 
-					}
-					
-					Wout = Win; 
-					Houtlet = PsyHFnTdbW( Toutlet, Wout  );
-					HcoilIn = PsyHFnTdbW( TcoilIn, Win  );
-					SHact = 999.0;
+				Tout = Tin + QCoilSenHeatingLoad / 1005.0 / FanSpdRatio / Garate;
+				Ts = Tin + ( Tout - Tin ) / ( 1 - BF );
+				deltaT = TeTc - Ts;
+				
+				// Update SC
+				if( C3Tcond <= 0.0  ) {
+					if ( C2Tcond > 0.0)
+						SCact = ( deltaT - C1Tcond ) / C2Tcond;
+					else 
+						SCact = 998.0;
 				} else {
-					FanOnOffRatio = QZnReqSenHeatingLoad / QinSenMin2; 
+					SCact = ( -C2Tcond + sqrt( pow_2( C2Tcond  ) - 4 * C3Tcond * ( C1Tcond - deltaT ) ) ) / 2 / C3Tcond;
 				}
-			}
-		} else {
-		//NO HEATING/COOLING: Mode 2
-			
-			TairInlet = DXCoil( CoilIndex ).InletAirTemp;
-			Win = DXCoil( CoilIndex ).InletAirHumRat;
-			Hin = DXCoil( CoilIndex ).InletAirEnthalpy;
-			
-			FanSpdRatio = 0.0;
-			FanOnOffRatio = 0.0;
-			
-			if( SHSCModify ) { 
+				
+				if( SCact > MaxSC  ) {
+				// Implement On/Off Control
+					SCact = MaxSC;
+					CoilOnOffRatio = QCoilSenHeatingLoad / QinSenMin2; 
+					
+					//outlet air temperature is time-weighted
+					Tout = CoilOnOffRatio * To_2 + ( 1 - CoilOnOffRatio ) * Tin;
+				}
+				
+				Wout = Win; 
+				Hout = PsyHFnTdbW( Tout, Wout  );
+				
 				SHact = 999.0;
-				SCact = 999.0;
-				Toutlet = TairInlet;
-				TcIn = TairInlet;
-				Houtlet = Hin;
-				HcoilIn = Hin;
-				Wout = Win;
 			}
-		}
+		} 
 	
 		FanSpdRatio = max( min( FanSpdRatio, 1.0 ), 0.0);
-		FanOnOffRatio = max( min( FanOnOffRatio, 1.0 ), 0.0);
 	}
 	
 	void
@@ -15798,7 +15773,7 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Xiufeng Pang (XP)
 		//       DATE WRITTEN   Mar 2013
-		//       MODIFIED       Jul 2015, RP Zhang, LBNL
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL
 		//       RE-ENGINEERED
 		//
 		// PURPOSE OF THIS FUNCTION:
@@ -15815,25 +15790,23 @@ Label50: ;
 		// na
 		
 		//FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 ZnSenLoad;  // Zone sensible cooling load (W)
-		Real64 TairInlet; // Air temperature at indoor unit inlet (C)
-		Real64 QfanRate; // Heat released by fan (W)
-		Real64 TotCap; // Cooling capacity of the coil (W)
-		Real64 Garate; // Nominal air mass flow rate (m3/s)
-		Real64 Th2; // Air temperature at the coil surface (C)
-		Real64 Tout; // Air temperature at the indoor unit outlet (C)
 		Real64 BF; // Bypass factor (-)
-		Real64 TcoilIn; // Air temperature at indoor coil inlet (C)
 		Real64 FanSpdResidualCool; // Modified fan speed ratio to meet actual zone load (-)
+		Real64 Garate; // Nominal air mass flow rate (m3/s)
+		Real64 QfanRate; // Heat released by fan (W)
+		Real64 TcoilIn; // Air temperature at indoor coil inlet (C)
+		Real64 Th2; // Air temperature at the coil surface (C)
+		Real64 TotCap; // Cooling capacity of the coil (W)
+		Real64 Tout; // Air temperature at the indoor unit outlet (C)
+		Real64 ZnSenLoad;  // Zone sensible cooling load (W)
 		
 		ZnSenLoad = Par( 1 );
 		Th2 = Par( 2 );
-		TairInlet = Par( 3 ); 
-		QfanRate = Par( 4 );
-		Garate = Par( 5 );
-		BF = Par( 6 );
+		TcoilIn = Par( 3 ); 
+		Garate = Par( 4 );
+		BF = Par( 5 );
+		if ( std::abs( ZnSenLoad ) < 100.0 ) ZnSenLoad = sign( 100.0, ZnSenLoad );
 		
-		TcoilIn = TairInlet + QfanRate *  pow_2( FanSpdRto ) / Garate / 1005.0;
 		Tout = TcoilIn - ( TcoilIn - Th2 ) * ( 1 - BF );
 		TotCap = FanSpdRto * Garate * 1005.0 * ( TcoilIn - Tout );
 		FanSpdResidualCool = (TotCap - ZnSenLoad ) / ZnSenLoad;
@@ -15850,7 +15823,7 @@ Label50: ;
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Xiufeng Pang (XP)
 		//       DATE WRITTEN   Mar 2013
-		//       MODIFIED       Jul 2015, RP Zhang, LBNL
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL
 		//       RE-ENGINEERED
 		//
 		// PURPOSE OF THIS FUNCTION:
@@ -15866,27 +15839,25 @@ Label50: ;
 		// USE STATEMENTS:
 		// na
 		
-		Real64 ZnSenLoad; // Zone sensible heating load (W)
-		Real64 TairInlet; // Air temperature at indoor unit inlet (C)
-		Real64 QfanRate; // Heat released by fan (W)
-		Real64 TotCap; // Heating capacity of the coil (W)
-		Real64 Garate; // Nominal air mass flow rate (m3/s)
-		Real64 Th2; // Air temperature at the coil surface (C)
-		Real64 Tout; // Air temperature at the indoor unit outlet (C)
 		Real64 BF; // Bypass factor (-)
-		Real64 TcoilIn; // Air temperature at indoor coil inlet (C)
 		Real64 FanSpdResidualHeat; // Modified fan speed ratio to meet actual zone load (-)
+		Real64 Garate; // Nominal air mass flow rate (m3/s)
+		Real64 QfanRate; // Heat released by fan (W)
+		Real64 TcoilIn; // Air temperature at indoor coil inlet (C)
+		Real64 Th2; // Air temperature at the coil surface (C)
+		Real64 TotCap; // Heating capacity of the coil (W)
+		Real64 Tout; // Air temperature at the indoor unit outlet (C)
+		Real64 ZnSenLoad; // Zone sensible heating load (W)
 		
 		ZnSenLoad = Par( 1 );
 		Th2 = Par( 2 );
-		TairInlet = Par( 3 );
-		QfanRate = Par( 4 );
-		Garate = Par( 5 );
-		BF = Par( 6 );
+		TcoilIn = Par( 3 );
+		Garate = Par( 4 );
+		BF = Par( 5 );
+		if ( std::abs( ZnSenLoad ) < 100.0 ) ZnSenLoad = sign( 100.0, ZnSenLoad );
 		
-		TcoilIn = TairInlet + QfanRate  *  pow_2( FanSpdRto ) / Garate / 1005.0;
-		Tout = TcoilIn + ( Th2 - TcoilIn )  *  ( 1-BF );
-		TotCap = FanSpdRto  *  Garate  *  1005.0 * ( Tout - TairInlet );
+		Tout = TcoilIn + ( Th2 - TcoilIn )  *  ( 1 - BF );
+		TotCap = FanSpdRto  *  Garate  *  1005.0 * ( Tout - TcoilIn );
 		FanSpdResidualHeat = ( TotCap - ZnSenLoad ) / ZnSenLoad;
 		
 		return FanSpdResidualHeat;

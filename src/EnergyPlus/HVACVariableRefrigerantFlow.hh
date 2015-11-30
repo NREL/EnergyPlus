@@ -1551,6 +1551,15 @@ namespace HVACVariableRefrigerantFlow {
 	CalcVRFIUTeTc_FluidTCtrl(
 		int const IndexVRFCondenser // index to VRF Outdoor Unit
 	);
+		
+	void
+	ControlVRF_FluidTCtrl(
+		int const VRFTUNum, // Index to VRF terminal unit
+		Real64 const QZnReq, // Index to zone number
+		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+		Real64 & PartLoadRatio, // unit part load ratio
+		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
+	);
 	
 	void
 	CalcVRF_FluidTCtrl(
