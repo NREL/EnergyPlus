@@ -865,8 +865,6 @@ namespace DXCoils {
 		using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
 		using InputProcessor::FindItemInList;
 		using DataHeatBalance::Zone;
-		using DataZoneEquipment::ZoneEquipConfig;
-		using DataZoneEquipment::EquipConfiguration;
 
 
 		// Locals
