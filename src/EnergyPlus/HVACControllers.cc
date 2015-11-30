@@ -1161,7 +1161,7 @@ namespace HVACControllers {
 			//       - Node(SensedNode)%HumRatMax
 			//       - Node(SensedNode)%Temp
 			//       - Node(SensedNode)%HumRat
-			if ( Node( SensedNode ).HumRatMax > 0 ) {
+			if ( ( Node( SensedNode ).HumRatMax > 0 ) && ( Node( SensedNode ).HumRat > Node( SensedNode ).HumRatMax ) ) {
 				// Setpoint can only be computed when the sensed node temperature is evaluated at the max
 				// actuated value for the dual humidity ratio / temperature strategy.
 				// See routine CalcSimpleController() for the sequence of operations.
@@ -1185,7 +1185,7 @@ namespace HVACControllers {
 				ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
 			} else {
 				// Pure temperature setpoint control strategy
-				ControllerProps( ControlNum ).SetPointValue = Node( SensedNode ).TempSetPoint;
+				ControllerProps( ControlNum ).SetPointValue = ControllerProps( ControlNum ).SaveTempSetpointValue;
 				// Finally indicate thate the setpoint has been computed
 				ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
 			}
