@@ -16,7 +16,10 @@
 // C++ Headers
 #include <cassert>
 
-#if ( defined(__GNUC__) && ( ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 7 ) ) ) ) || ( defined(__clang__) && ( ( __clang_major__ > 3 || ( ( __clang_major__ == 3 ) && ( __clang_minor__ >= 6 ) ) ) ) )
+#ifndef __has_builtin
+#define __has_builtin(x) 0
+#endif
+#if ( defined(__GNUC__) && ( ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 7 ) ) ) ) || ( defined(__clang__) && __has_builtin(__builtin_assume_aligned) )
 #define ASSUME(b)
 #define ASSUME_ALIGNED(p,b) p=(decltype(p))__builtin_assume_aligned(p,b)
 #define RESTRICT __restrict__
