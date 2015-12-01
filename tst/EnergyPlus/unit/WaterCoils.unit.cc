@@ -291,10 +291,17 @@ TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 
 }
 
-TEST( WaterCoilsTest, TdbFnHRhPbTest )
+TEST_F( WaterCoilsTest, TdbFnHRhPbTest )
 {
 	ShowMessage( "Begin Test: WaterCoilsTest, TdbFnHRhPbTest" );
 
-	EXPECT_EQ( x, TdbFnHRhPb(x,x,x);
+    // using IP PsyCalc
+    //   http://linricsoftw.web701.discountasp.net/webpsycalc.aspx
+
+	EXPECT_NEAR( 25.0, TdbFnHRhPb( 45170., 0.40, 101312. ), 0.05 );
+	EXPECT_NEAR( 20.0, TdbFnHRhPb( 34760., 0.40, 101312. ), 0.05 );
+	EXPECT_NEAR( 25.0, TdbFnHRhPb( 50290., 0.50, 101312. ), 0.05 );
+	EXPECT_NEAR( 20.0, TdbFnHRhPb( 38490., 0.50, 101312. ), 0.05 );
+
 }
 
