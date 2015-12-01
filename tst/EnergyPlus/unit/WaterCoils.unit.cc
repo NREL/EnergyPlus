@@ -290,3 +290,11 @@ TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 }
+
+TEST( WaterCoilsTest, TdbFnHRhPbTest )
+{
+	ShowMessage( "Begin Test: WaterCoilsTest, TdbFnHRhPbTest" );
+
+	EXPECT_EQ( x, TdbFnHRhPb(x,x,x);
+}
+
