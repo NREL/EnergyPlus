@@ -134,8 +134,6 @@ derivative works thereof, in binary and source code form.
 #include "defines.h"
 
 extern FILE *f1;
-// FIX: Increase length of  
-// buffer for EnergyPlusToFMU 
 #define HEADER_LENGTH 21600 
 extern int REQUIRED_READ_LENGTH;
 extern int REQUIRED_WRITE_LENGTH;
