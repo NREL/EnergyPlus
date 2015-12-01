@@ -564,6 +564,10 @@ namespace HeatBalFiniteDiffManager {
 				SurfaceFD( SurfNum ).EnthOld = EnthInitValue;
 				SurfaceFD( SurfNum ).EnthNew = EnthInitValue;
 				SurfaceFD( SurfNum ).EnthLast = EnthInitValue;
+				SurfaceFD( SurfNum ).QDreport = 0.0;
+				SurfaceFD( SurfNum ).CpDelXRhoS1 = 0.0;
+				SurfaceFD( SurfNum ).CpDelXRhoS2 = 0.0;
+				SurfaceFD( SurfNum ).TDpriortimestep = 0.0;
 
 				TempOutsideAirFD( SurfNum ) = 0.0;
 				RhoVaporAirOut( SurfNum ) = 0.0;
@@ -599,6 +603,8 @@ namespace HeatBalFiniteDiffManager {
 			SurfaceFD( SurfNum ).EnthOld = SurfaceFD( SurfNum ).EnthOld;
 			SurfaceFD( SurfNum ).EnthNew = SurfaceFD( SurfNum ).EnthOld;
 			SurfaceFD( SurfNum ).EnthLast = SurfaceFD( SurfNum ).EnthOld;
+			SurfaceFD( SurfNum ).TDpriortimestep = SurfaceFD( SurfNum ).TDreport; // Save TD for heat flux calc
+
 		}
 
 	}
@@ -629,6 +635,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataSurfaces::HeatTransferModel_CondFD;
 		using DataHeatBalance::HighDiffusivityThreshold;
 		using DataHeatBalance::ThinMaterialLayerThreshold;
+		using DataGlobals::DisplayAdvancedReportVariables;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -940,6 +947,10 @@ namespace HeatBalFiniteDiffManager {
 			SurfaceFD( Surf ).EnthOld.allocate( TotNodes + 1 );
 			SurfaceFD( Surf ).EnthNew.allocate( TotNodes + 1 );
 			SurfaceFD( Surf ).EnthLast.allocate( TotNodes + 1 );
+			SurfaceFD( Surf ).QDreport.allocate( TotNodes + 1 );
+			SurfaceFD( Surf ).CpDelXRhoS1.allocate( TotNodes + 1 );
+			SurfaceFD( Surf ).CpDelXRhoS2.allocate( TotNodes + 1 );
+			SurfaceFD( Surf ).TDpriortimestep.allocate( TotNodes + 1 );
 
 			//Initialize the allocated arrays.
 			SurfaceFD( Surf ).T = TempInitValue;
@@ -958,6 +969,10 @@ namespace HeatBalFiniteDiffManager {
 			SurfaceFD( Surf ).EnthOld = EnthInitValue;
 			SurfaceFD( Surf ).EnthNew = EnthInitValue;
 			SurfaceFD( Surf ).EnthLast = EnthInitValue;
+			SurfaceFD( Surf ).QDreport = 0.0;
+			SurfaceFD( Surf ).CpDelXRhoS1 = 0.0;
+			SurfaceFD( Surf ).CpDelXRhoS2 = 0.0;
+			SurfaceFD( Surf ).TDpriortimestep = 0.0;
 		}
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -979,6 +994,11 @@ namespace HeatBalFiniteDiffManager {
 			TotNodes = ConstructFD( Surface( SurfNum ).Construction ).TotNodes; // Full size nodes, start with outside face.
 			for ( Lay = 1; Lay <= TotNodes + 1; ++Lay ) { // include inside face node
 				SetupOutputVariable( "CondFD Surface Temperature Node " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Surface Heat Flux Node " + TrimSigDigits( Lay ) + " [W/m2]", SurfaceFD( SurfNum ).QDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				if ( DisplayAdvancedReportVariables ) {
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				}
 			}
 
 		} // End of the Surface Loop for Report Variable Setup
@@ -1018,7 +1038,7 @@ namespace HeatBalFiniteDiffManager {
 
 	void
 	CalcHeatBalFiniteDiff(
-		int const Surf,
+		int const Surf, // Surface number
 		Real64 & TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Real64 & TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
 	)
@@ -1190,6 +1210,13 @@ namespace HeatBalFiniteDiffManager {
 		TempSurfOutTmp = TDT( 1 );
 		TempSurfInTmp = TDT( TotNodes + 1 );
 		RhoVaporSurfIn( Surf ) = 0.0;
+
+		// For ground surfaces or when raining, outside face inner half-node heat capacity was unknown and set to -1 in ExteriorBCEqns
+		// Now check for the flag and set equal to the second node's outer half-node heat capacity if needed
+		if ( surfaceFD.CpDelXRhoS2( 1 ) == -1.0 ) {
+			surfaceFD.CpDelXRhoS2( 1 ) = surfaceFD.CpDelXRhoS1( 2 ); // Set to node 2's outer half node heat capacity
+		}
+		CalcNodeHeatFlux( Surf, TotNodes );
 
 		// Determine largest change in node temps
 		MaxDelTemp = 0.0;
@@ -1470,6 +1497,8 @@ namespace HeatBalFiniteDiffManager {
 		if ( surface_ExtBoundCond == Ground || IsRain ) {
 			TDT( i ) = TT( i ) = TempOutsideAirFD( Surf );
 			RhoT( i ) = RhoVaporAirOut( Surf );
+			SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; // Outside face  does not have an outer half node
+			SurfaceFD( Surf ).CpDelXRhoS2( i ) = -1.0; // Set this to -1 as a flag, then set to node 2's outer half node heat capacity
 		} else if ( surface_ExtBoundCond > 0 ) {
 			// this is actually the inside face of another surface, or maybe this same surface if adiabatic
 			// switch around arguments for the other surf and call routines as for interior side BC from opposite face
@@ -1487,6 +1516,9 @@ namespace HeatBalFiniteDiffManager {
 				TT( i ) = surfaceFD.TT( TotNodesPlusOne );
 				RhoT( i ) = surfaceFD.RhoT( TotNodesPlusOne );
 
+				surfaceFD.CpDelXRhoS1( i ) = 0.0; // Outside face  does not have an outer half node
+				surfaceFD.CpDelXRhoS2( i ) = surfaceFD.CpDelXRhoS1( TotNodesPlusOne ); // Save this for computing node flux values
+
 			} else {
 
 				// potential-lkl-from old      CALL InteriorBCEqns(Delt,nodeIn,LayIn,Surf,SurfaceFD(Surface(Surf)%ExtBoundCond)%T, &
@@ -1496,6 +1528,9 @@ namespace HeatBalFiniteDiffManager {
 				TDT( i ) = surfaceFDEBC.TDT( TotNodesPlusOne );
 				TT( i ) = surfaceFDEBC.TT( TotNodesPlusOne );
 				RhoT( i ) = surfaceFDEBC.RhoT( TotNodesPlusOne );
+
+				SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; // Outside face  does not have an outer half node
+				SurfaceFD( Surf ).CpDelXRhoS2( i ) = surfaceFDEBC.CpDelXRhoS1( TotNodesPlusOne ); // Save this for computing node flux values
 
 			}
 			//    CALL InteriorBCEqns(Delt,nodeIn,Layin,Surface(Surf)%ExtBoundCond,SurfaceFD(Surf)%T, &
@@ -1589,6 +1624,9 @@ namespace HeatBalFiniteDiffManager {
 					Real64 const RhoS( mat.Density );
 					Real64 const DelX( ConstructFD( ConstrNum ).DelX( Lay ) );
 					Real64 const Delt_DelX( Delt * DelX );
+					SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; // Outside face  does not have an outer half node
+					SurfaceFD( Surf ).CpDelXRhoS2( i ) = ( Cp * DelX * RhoS ) / 2.0; // Save this for computing node flux values
+
 					if ( HMovInsul <= 0.0 ) { // Regular  case
 
 						if ( CondFDSchemeType == CrankNicholsonSecondOrder ) { // Second Order equation
@@ -1785,6 +1823,7 @@ namespace HeatBalFiniteDiffManager {
 		}
 
 		TDT( i ) = TDT_i;
+		SurfaceFD( Surf ).CpDelXRhoS1( i ) = SurfaceFD( Surf ).CpDelXRhoS2( i ) = ( Cp * DelX * RhoS ) / 2.0; // Save this for computing node flux values, half nodes are the same here
 	}
 
 	void
@@ -1960,6 +1999,8 @@ namespace HeatBalFiniteDiffManager {
 					} else if ( TDT_i > MaxSurfaceTempLimit ) {
 						TDT_i = MaxSurfaceTempLimit;
 					}
+					SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; //  - rlayer has no capacitance, so this is zero
+					SurfaceFD( Surf ).CpDelXRhoS2( i ) = ( Cp2 * Delx2 * RhoS2 ) / 2.0; // Save this for computing node flux values
 
 				} else if ( ! RLayerPresent && RLayer2Present ) { // R-layer second
 
@@ -1990,6 +2031,8 @@ namespace HeatBalFiniteDiffManager {
 					} else if ( TDT_i > MaxSurfaceTempLimit ) {
 						TDT_i = MaxSurfaceTempLimit;
 					}
+					SurfaceFD( Surf ).CpDelXRhoS1( i ) = ( Cp1 * Delx1 * RhoS1 ) / 2.0; // Save this for computing node flux values
+					SurfaceFD( Surf ).CpDelXRhoS2( i ) = 0.0; //  - rlayer has no capacitance, so this is zero
 
 				} else { // Regular or Phase Change on both sides of interface
 
@@ -2053,10 +2096,14 @@ namespace HeatBalFiniteDiffManager {
 					} else if ( TDT_i > MaxSurfaceTempLimit ) {
 						TDT_i = MaxSurfaceTempLimit;
 					}
+					SurfaceFD( Surf ).CpDelXRhoS1( i ) = ( Cp1 * Delx1 * RhoS1 ) / 2.0; // Save this for computing node flux values
+					SurfaceFD( Surf ).CpDelXRhoS2( i ) = ( Cp2 * Delx2 * RhoS2 ) / 2.0; // Save this for computing node flux values
 
 					if ( construct.SourceSinkPresent && ( Lay == construct.SourceAfterLayer ) ) {
 						TCondFDSourceNode( Surf ) = TDT_i; // Transfer node temp to Radiant System
 						TempSource( Surf ) = TDT_i; // Transfer node temp to DataHeatBalSurface module
+						SurfaceFD( Surf ).QSource = QSSFlux;
+						SurfaceFD( Surf ).SourceNodeNum = i;
 					}
 
 				} // End of R-layer and Regular check
@@ -2169,6 +2216,8 @@ namespace HeatBalFiniteDiffManager {
 				} else { // regular wall
 					TDT_i = ( TDT( i - 1 ) + ( QFac + hconvi * Tia + TDreport( i ) * IterDampConst ) * Rlayer ) / ( 1.0 + ( hconvi + IterDampConst ) * Rlayer );
 				}
+				SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; // Save this for computing node flux values - rlayer has no capacitance
+				SurfaceFD( Surf ).CpDelXRhoS2( i ) = 0.0; // Inside face  does not have an inner half node
 
 			} else { //  Regular or PCM
 				auto const TDT_m( TDT( i - 1 ) );
@@ -2222,6 +2271,8 @@ namespace HeatBalFiniteDiffManager {
 						TDT_i = ( Two_Delt_DelX * ( QFac + hconvi * Tia ) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_m ) / ( Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS );
 					}
 				}
+				SurfaceFD( Surf ).CpDelXRhoS1( i ) = ( Cp * DelX * RhoS ) / 2.0; // Save this for computing node flux values
+				SurfaceFD( Surf ).CpDelXRhoS2( i ) = 0.0; // Inside face  does not have an inner half node
 
 				//  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
 				//          OpaqSurfInsFaceConductionFlux(Surf)= (TDT(I-1)-TDT(I))*kt/Delx
@@ -2360,6 +2411,50 @@ namespace HeatBalFiniteDiffManager {
 
 	}
 
+	void
+	CalcNodeHeatFlux(
+		int const Surf, // surface number
+		int const TotNodes // number of nodes in surface
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   Sept-Nov 2015
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculate flux at each condFD node
+		using General::RoundSigDigits;
+
+		int node; // node counter
+
+		auto & surfaceFD( SurfaceFD( Surf ) );
+
+		// SurfaceFD.QDreport( n ) is the flux at node n
+		// When this is called TDT( NodeNum ) is the new node temp and TDpriortimestep( NodeNum ) holds the previous node temp
+		// For the TDT and TDpriortimestep arrays, Node 1 is the outside face, and Node TotNodes+1 is the inside face
+
+		// Last node is always the surface inside face.  Start calculations here because the outside face is not defined for all surfaces.
+		// Note that TotNodes is the number of nodes in the surface including the outside face node, but not the inside face node
+		// so the arrays are all allocated to Totodes+1
+
+		// Heat flux at the inside face node (TotNodes+1)
+		surfaceFD.QDreport( TotNodes + 1 ) = OpaqSurfInsFaceConductionFlux( Surf );
+
+		// Heat flux for remaining nodes.
+		for ( node = TotNodes; node >= 1; --node ) {
+				// Start with inside face (above) and work outward, positive value is flowing towards the inside face
+				// CpDelXRhoS1 is outer half-node heat capacity, CpDelXRhoS2 is inner half node heat capacity
+			Real64 interNodeFlux; // heat flux at the plane between node and node+1 [W/m2]
+			Real64 sourceFlux; // Internal source flux [W/m2]
+			if ( surfaceFD.SourceNodeNum == node) {
+				sourceFlux = surfaceFD.QSource;
+			} else {
+				sourceFlux = 0.0;
+			}
+			interNodeFlux = surfaceFD.QDreport( node + 1 ) + surfaceFD.CpDelXRhoS1( node + 1 )  * ( surfaceFD.TDT( node + 1 ) - surfaceFD.TDpriortimestep( node + 1 ) ) / TimeStepZoneSec;
+			surfaceFD.QDreport( node ) = interNodeFlux - sourceFlux + surfaceFD.CpDelXRhoS2( node )  * ( surfaceFD.TDT( node ) - surfaceFD.TDpriortimestep( node ) ) / TimeStepZoneSec;
+		}
+	}
 	// *****************************************************************************
 
 	//     NOTICE
