@@ -1055,6 +1055,15 @@ namespace SizingManager {
 					ZoneAirDistribution( ZADIndex ).ZoneSecondaryRecirculation = 0.0;
 				}
 
+				// Zone Ventilation Efficiency
+				if ( NumNumbers > 3 ) {
+					ZoneAirDistribution( ZADIndex ).ZoneVentilationEff = Numbers( 4 );
+				}
+				else {
+					// default value
+					ZoneAirDistribution( ZADIndex ).ZoneVentilationEff = 0.0;
+				}
+
 				if ( NumAlphas > 1 ) {
 					if ( ! lAlphaBlanks( 2 ) ) {
 						ZoneAirDistribution( ZADIndex ).ZoneADEffSchName = Alphas( 2 );
@@ -1710,7 +1719,7 @@ namespace SizingManager {
 						ZoneSizingInput( ZoneSizIndex ).DesHeatMaxAirFlowFrac = rNumericArgs( 16 );
 					}
 
-					//  A7, \field Zone Air Distribution Object Name
+					//  A7, \field Zone Air Distribution Object Name and add its inputs
 					if ( ! lAlphaFieldBlanks( 7 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName = cAlphaArgs( 7 );
 						ObjIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName, ZoneAirDistribution );
@@ -1719,6 +1728,7 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).ZoneADEffHeating = ZoneAirDistribution( ObjIndex ).ZoneADEffHeating;
 							ZoneSizingInput( ZoneSizIndex ).ZoneSecondaryRecirculation = ZoneAirDistribution( ObjIndex ).ZoneSecondaryRecirculation;
 							ZoneSizingInput( ZoneSizIndex ).ZoneAirDistributionIndex = ObjIndex;
+							ZoneSizingInput( ZoneSizIndex ).ZoneVentilationEff = ZoneAirDistribution( ObjIndex ).ZoneVentilationEff;
 						} else {
 							// generate a warning message
 							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );

@@ -189,6 +189,15 @@ namespace SimAirServingZones {
 	//        Utility Subroutines for the SimAir Module
 	// *****************************************************************************
 
+	void
+		LimitZoneVentEff(
+		Real64 Evz, // minimum zone ventilation efficiency
+		Real64 Xs,  // ratio of uncorected system outdoor air flow rate to the design system supply flow rate
+		Real64 Voz,  // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
+		Real64 & ZoneOAFrac, // ratio of Voz to available zone supply air flow
+		Real64 & AvailSAFlow // available zone supply air flow [m3/s]
+		);
+
 	//        End of Utility subroutines for the SimAir Module
 	// *****************************************************************************
 

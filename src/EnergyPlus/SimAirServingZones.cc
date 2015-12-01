@@ -4568,6 +4568,9 @@ namespace SimAirServingZones {
 		int MatchingCooledZoneNum; // temporary variable
 		Real64 termunitsizingtempfrac; // 1.0/(1.0+termunitsizing(ctrlzone)%inducrat)
 		Real64 termunitsizingtemp; // (1.0+termunitsizing(ctrlzone)%inducrat)
+		Real64 EvzMin( 0.0 ); // minimum ventilation efficiency
+		Real64 VozClg( 0.0 ); // corrected (for ventilation efficiency) zone outside air flaw rate [m3/s]
+		Real64 DesCoolVolFlowMin( 0.0 ); // minimum design flow rate for cooling supply air (zone) [m3/s]
 
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 		//  NumZonesCooled=0
@@ -4932,6 +4935,8 @@ namespace SimAirServingZones {
 								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
 								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
 								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
+								EvzMin = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
 									Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -4952,6 +4957,12 @@ namespace SimAirServingZones {
 								} else {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
+									if ( SysCoolingEv < EvzMin ) {
+										LimitZoneVentEff( EvzMin, Xs, VozClg, ZoneOAFrac, DesCoolVolFlowMin );
+										FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
+										FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = DesCoolVolFlowMin;
+										SysCoolingEv = EvzMin;
+									}
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum ); // Save previous EvzByZoneCool
@@ -5151,6 +5162,8 @@ namespace SimAirServingZones {
 								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
 								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
 								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
+								EvzMin = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
 									Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5170,6 +5183,12 @@ namespace SimAirServingZones {
 								} else {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
+									if ( SysCoolingEv < EvzMin ) {
+										LimitZoneVentEff( EvzMin, Xs, VozClg, ZoneOAFrac, DesCoolVolFlowMin );
+										FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
+										FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = DesCoolVolFlowMin;
+										SysCoolingEv = EvzMin;
+									}
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum );
@@ -6263,6 +6282,39 @@ namespace SimAirServingZones {
 
 	//        Utility Subroutines for the SimAir Module
 	// *****************************************************************************
+
+	void
+		LimitZoneVentEff(
+		Real64 Evz, // minimum zone ventilation efficiency
+		Real64 Xs,  // ratio of uncorected system outdoor air flow rate to the design system supply flow rate
+		Real64 Voz,  // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
+		Real64 & ZoneOAFrac, // ratio of Voz to available zone supply air flow
+		Real64 & AvailSAFlow // available zone supply air flow [m3/s]
+		)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   November 2015
+		//       MODIFIED
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Givene the minimum ventilation efficiency, calculate the available supply air flow rate
+
+		// METHODOLOGY EMPLOYED:
+		// Ventilation Rate Procedure for single pass system
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+		ZoneOAFrac = 1.0 + Xs - Evz;
+		AvailSAFlow = Voz/ZoneOAFrac;
+	}
+
 
 	//        End of Utility subroutines for the SimAir Module
 	// *****************************************************************************

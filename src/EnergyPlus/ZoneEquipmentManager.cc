@@ -1294,6 +1294,7 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling = ZoneSizingInput( ZoneSizNum ).ZoneADEffCooling;
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating = ZoneSizingInput( ZoneSizNum ).ZoneADEffHeating;
 				FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = ZoneSizingInput( ZoneSizNum ).ZoneSecondaryRecirculation;
+				FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = ZoneSizingInput( ZoneSizNum ).ZoneVentilationEff;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( ZoneSizNum ).CoolDesTemp;
@@ -1364,6 +1365,7 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling = ZoneSizingInput( 1 ).ZoneADEffCooling;
 				FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating = ZoneSizingInput( 1 ).ZoneADEffHeating;
 				FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = ZoneSizingInput( 1 ).ZoneSecondaryRecirculation;
+				FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = ZoneSizingInput( 1 ).ZoneVentilationEff;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( 1 ).ZnCoolDgnSAMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( 1 ).ZnHeatDgnSAMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).CoolDesTemp = ZoneSizingInput( 1 ).CoolDesTemp;

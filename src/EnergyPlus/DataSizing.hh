@@ -294,6 +294,7 @@ namespace DataSizing {
 		int ZoneAirDistributionIndex; // index to the zone air distribution object
 		int ZoneDesignSpecOAIndex; // index to the zone design spec OA object
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		Real64 ZoneVentilationEff; // zone ventilation efficiency
 		bool AccountForDOAS; // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
 		int DOASControlStrategy; // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
 		// 3=supply cold ventilation air
@@ -335,6 +336,7 @@ namespace DataSizing {
 			ZoneAirDistributionIndex( 0 ),
 			ZoneDesignSpecOAIndex( 0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
+			ZoneVentilationEff( 0.0 ),
 			AccountForDOAS( false ),
 			DOASControlStrategy( 0 ),
 			DOASLowSetpoint( 0.0 ),
@@ -492,6 +494,7 @@ namespace DataSizing {
 		Real64 ZoneADEffCooling; // the zone air distribution effectiveness in cooling mode
 		Real64 ZoneADEffHeating; // the zone air distribution effectiveness in heating mode
 		Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
+		Real64 ZoneVentilationEff; // zone ventilation efficiency
 		Real64 ZonePrimaryAirFraction; // the zone primary air fraction for cooling based calculations
 		Real64 ZonePrimaryAirFractionHtg; // the zone primary air fraction for heating based calculations
 		Real64 ZoneOAFracCooling; // OA fraction in cooling mode
@@ -626,6 +629,7 @@ namespace DataSizing {
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
+			ZoneVentilationEff( 0.0 ),
 			ZonePrimaryAirFraction( 0.0 ),
 			ZonePrimaryAirFractionHtg( 0.0 ),
 			ZoneOAFracCooling( 0.0 ),
@@ -1630,13 +1634,15 @@ namespace DataSizing {
 		Real64 ZoneADEffHeating; // - Zone air distribution effectiveness in heating mode
 		Real64 ZoneSecondaryRecirculation; // - Zone air secondary recirculation ratio
 		int ZoneADEffSchPtr; // - Zone air distribution effectiveness schedule index
+		Real64 ZoneVentilationEff; // Zone ventilation effectiveness
 
 		// Default Constructor
 		ZoneAirDistributionData() :
 			ZoneADEffCooling( 1.0 ),
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
-			ZoneADEffSchPtr( 0 )
+			ZoneADEffSchPtr( 0 ),
+			ZoneVentilationEff( 0 )
 		{}
 
 		// Member Constructor
@@ -1646,14 +1652,16 @@ namespace DataSizing {
 			Real64 const ZoneADEffCooling, // - Zone air distribution effectiveness in cooling mode
 			Real64 const ZoneADEffHeating, // - Zone air distribution effectiveness in heating mode
 			Real64 const ZoneSecondaryRecirculation, // - Zone air secondary recirculation ratio
-			int const ZoneADEffSchPtr // - Zone air distribution effectiveness schedule index
+			int const ZoneADEffSchPtr, // - Zone air distribution effectiveness schedule index
+			Real64 const ZoneVentilationEff // Zone ventilation effectiveness
 		) :
 			Name( Name ),
 			ZoneADEffSchName( ZoneADEffSchName ),
 			ZoneADEffCooling( ZoneADEffCooling ),
 			ZoneADEffHeating( ZoneADEffHeating ),
 			ZoneSecondaryRecirculation( ZoneSecondaryRecirculation ),
-			ZoneADEffSchPtr( ZoneADEffSchPtr )
+			ZoneADEffSchPtr( ZoneADEffSchPtr ),
+			ZoneVentilationEff( ZoneVentilationEff )
 		{}
 
 	};
