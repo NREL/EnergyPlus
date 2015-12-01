@@ -95,6 +95,7 @@ namespace SurfaceGeometry {
 		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool ProcessSurfaceVerticesOneTimeFlag( true );
+		int checkSubSurfAzTiltNormErrCount( 0 );
 		Array1D< Real64 > Xpsv;
 		Array1D< Real64 > Ypsv;
 		Array1D< Real64 > Zpsv;
@@ -131,6 +132,7 @@ namespace SurfaceGeometry {
 	clear_state( )
 	{
 		ProcessSurfaceVerticesOneTimeFlag = true;
+		checkSubSurfAzTiltNormErrCount = 0;
 		Xpsv.deallocate( );
 		Ypsv.deallocate( );
 		Zpsv.deallocate( );
@@ -1884,7 +1886,6 @@ namespace SurfaceGeometry {
 		bool baseSurfHoriz( false ); // True if base surface is near horizontal
 		Real64 const warningTolerance( 30.0 );
 		Real64 const errorTolerance( 90.0 );
-		static int ErrCount( 0 );
 
 		surfaceError = false;
 
@@ -1912,8 +1913,8 @@ namespace SurfaceGeometry {
 				ShowContinueError( "Subsurface=\"" + subSurface.Name + "\" Tilt = " + General::RoundSigDigits( subSurface.Tilt, 1 ) + "  Azimuth = " + General::RoundSigDigits( subSurface.Azimuth, 1 ) );
 				ShowContinueError( "Base surface=\"" + baseSurface.Name + "\" Tilt = " + General::RoundSigDigits( baseSurface.Tilt, 1 ) + "  Azimuth = " + General::RoundSigDigits( baseSurface.Azimuth, 1 ) );
 			} else if ( ( ( std::abs( baseSurface.Azimuth - subSurface.Azimuth ) > warningTolerance ) && !baseSurfHoriz ) || ( std::abs( baseSurface.Tilt - subSurface.Tilt ) > warningTolerance ) ) {
-				++ErrCount;
-				if ( ErrCount == 1 && !DisplayExtraWarnings ) {
+				++checkSubSurfAzTiltNormErrCount;
+				if ( checkSubSurfAzTiltNormErrCount == 1 && !DisplayExtraWarnings ) {
 					ShowWarningError( "checkSubSurfAzTiltNorm: Some Outward Facing angles of subsurfaces differ more than " + General::RoundSigDigits( warningTolerance, 1 ) + " degrees from base surface." );
 					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces." );
 				}
