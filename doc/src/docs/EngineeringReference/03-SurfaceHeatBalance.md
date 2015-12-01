@@ -318,6 +318,33 @@ The Conduction Finite Difference algorithm has also been given the capability to
 
 The Conduction Finite Difference algorithm can also invoke the source/sink layer capability by using the **Construction:InternalSource** object.
 
+### Conduction Finite Difference Heat Flux Outputs
+
+The Conduction Finite Difference algorithm can output the heat flux at each node and the heat capacitance of each half-node.  During the CondFD solution iterations, the heat capacitance of each half node (CondFD Surface Heat Capacitance Node < n  >) is stored:
+
+<div>$${HeatCap_{i} = Cp_{i}*\Delta x_{i}*\rho_{i}/2}$$</div>
+
+For nodes which are at the inside or outside face of the surface, there is only one half-node.
+
+After the CondFD node temperatures have been solved for a given timestep, the heat fluxes (CondFD Surface Heat Flux Node < i > ) are calculated beginning with the inside face of the surface.
+
+<div>$${QDreport_{N} = Q_{inside}}$$</div>
+ 
+for the remaining nodes
+
+<div>$${QDreport_{i} = QDreport_{i+1}+HeatCap1_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old}\right)}{\Delta t}-QSource_{i}+HeatCap2_{i}* \frac{\left(T_{i,new}-T_{i,old}\right)}{\Delta t}}$$</div>
+
+Where:
+
+HeatCap1<sub>i</sub> = heat capacitance associated with a given outer half-node
+HeatCap2<sub>i</sub> = heat capacitance associated with a given inner half-node
+QDreport<sub>i</sub> = CondFD Surface Heat Flux Node < i >
+QSource<sub>i</sub> = internal source heat flux at node i
+Q<sub>inside</sub> = Surface Inside Face Conduction Heat Transfer Rate per Area [W/m<sup>2</sup>]
+
+N = total number of nodes in a surface including the surface inside face node.
+Note that the variable *TotNodes* used in the source code is actually N-1. The surface inside face node is referenced as *TotNodes+1*.
+
 ### References
 
 Pedersen C.O., Enthalpy Formulation of conduction heat transfer problems involving latent heat, Simulation, Vol 18, No. 2, February 1972

@@ -7959,6 +7959,7 @@ In addition, properties of each node is available during the simulation:
 
 * HVAC,Average,System Node Height [m]
 
+* HVAC,Average,System Node Specific Heat [J/kg-K]
 
 **The following node variable is also available for system nodes that are for “air”:**
 
@@ -8071,6 +8072,10 @@ The current system node vapor fraction/percent {0.0-1.0}.
 #### System Node Height [m]
 
 The current system node height {m}. Only applicable to outdoor air nodes.
+
+#### System Node Specific Heat [J/kg-K]
+
+The current specific heat capacity of the fluid at the node in units of J/kg-K.  Not available for steam nodes. 
 
 **Additional Node Reporting for Air Nodes**
 
