@@ -1425,6 +1425,7 @@ public: // Modifier
 			swap( o );
 		} else {
 			I_.grow();
+			++size_;
 		}
 		operator ()( u() ) = t;
 		return *this;
@@ -1443,6 +1444,7 @@ public: // Modifier
 			swap( o );
 		} else {
 			I_.grow();
+			++size_;
 		}
 		operator ()( u() ) = std::move( t );
 		return *this;
@@ -1561,7 +1563,10 @@ public: // std::vector-like API
 	Array1D &
 	pop_back()
 	{
-		if ( size_ > 0u ) --size_;
+		if ( size_ > 0u ) {
+			I_.shrink();
+			--size_;
+		}
 		return *this;
 	}
 

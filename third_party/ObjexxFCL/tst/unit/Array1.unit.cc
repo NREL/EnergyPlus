@@ -855,6 +855,15 @@ TEST( Array1Test, Append )
 	EXPECT_EQ( 6u, A.capacity() );
 	EXPECT_EQ( 1, A( 1 ) );
 	EXPECT_EQ( 6, A( 6 ) );
+	A.reserve( 7 ); // So next append doesn't reallocate
+	A.append( 7 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 7, A.u() );
+	EXPECT_EQ( 7u, A.size() );
+	EXPECT_EQ( 7u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 7, A( 7 ) );
 }
 
 TEST( Array1Test, Front_And_Back )
