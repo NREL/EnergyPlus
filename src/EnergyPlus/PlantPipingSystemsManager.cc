@@ -293,7 +293,9 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 	void
-	InitAndSimGroundDomains()
+	SimulateGroundDomains(
+		bool initOnly
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -372,46 +374,49 @@ namespace PlantPipingSystemsManager {
 			// Reset the heat fluxs if domain update has been completed
 			if ( PipingSystemDomains( DomainNum ).ResetHeatFluxFlag ) {
 				PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0;
-					PipingSystemDomains( DomainNum ).AggregateWallHeatFlux = 0;
-					PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux = 0;
+				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux = 0;
+				PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux = 0;
 				PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
 				PipingSystemDomains( DomainNum ).ResetHeatFluxFlag = false;
 			}
 
-			// Aggregate the heat flux
-			// Zone-coupled slab
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
-				PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
-				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
-				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-			} else { // Coupled basement
-				// basement walls
-				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
-				// basement floor
-				PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
+			if ( !initOnly ) {
 
-				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
-				PipingSystemDomains( DomainNum ).WallHeatFlux = PipingSystemDomains( DomainNum ).AggregateWallHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-				PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-			}
+				// Aggregate the heat flux
+				// Zone-coupled slab
+				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+					PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
+					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+					PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+				} else { // Coupled basement
+					// basement walls
+					PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
+					// basement floor
+					PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
 
-			// Select run interval
-			if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
-				// Keep on going!
-				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZoneSec;
-			} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
-				// Passes by if not time to run
-				if ( TimeStep != 1 ) continue;
-					PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
-			}
+					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+					PipingSystemDomains( DomainNum ).WallHeatFlux = PipingSystemDomains( DomainNum ).AggregateWallHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+					PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+				}
 
-			// Shift history arrays only if necessary
-			if ( std::abs( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds - PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds ) > 1.0e-6 ) {
-				PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
-				ShiftTemperaturesForNewTimeStep( DomainNum );
-				PipingSystemDomains( DomainNum ).DomainNeedsSimulation = true;
+				// Select run interval
+				if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
+					// Keep on going!
+					PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZoneSec;
+				} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
+					// Passes by if not time to run
+					if ( TimeStep != 1 ) continue;
+						PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
+				}
+
+				// Shift history arrays only if necessary
+				if ( std::abs( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds - PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds ) > 1.0e-6 ) {
+					PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
+					ShiftTemperaturesForNewTimeStep( DomainNum );
+					PipingSystemDomains( DomainNum ).DomainNeedsSimulation = true;
+				}
+				PerformIterationLoop( DomainNum, _ );
 			}
-			PerformIterationLoop( DomainNum, _ );
 		}
 
 		if ( WriteEIOFlag ) {
