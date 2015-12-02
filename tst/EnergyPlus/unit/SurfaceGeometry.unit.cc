@@ -188,7 +188,7 @@ TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
 	SubSurface.NewellSurfaceNormalVector.z = 1.;
 	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
 	EXPECT_FALSE( surfaceError );
-	EXPECT_TRUE( compare_err_stream( "" , true ) );
+	EXPECT_FALSE( has_err_output() );
 
 	//Case 2 - Base surface and subsurface face the opposite way - should be error message and surfaceError=true
 	surfaceError = false;
@@ -199,7 +199,7 @@ TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
 	SubSurface.NewellSurfaceNormalVector.z = 0.;
 	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
 	EXPECT_TRUE( surfaceError );
-	//EXPECT_FALSE( compare_err_stream( "" , true ) );
+	EXPECT_TRUE( has_err_output() );
 
 	//Case 3 - Base surface is horizontal and subsurface is different by 45 degrees azimuth and tilt - should be no error message and surfaceError=false
 	surfaceError = false;
@@ -210,7 +210,7 @@ TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
 	SubSurface.NewellSurfaceNormalVector.z = 0.;
 	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
 	EXPECT_FALSE( surfaceError );
-	//EXPECT_TRUE( compare_err_stream( "" , true ) );
+	EXPECT_FALSE( has_err_output() );
 
 	//Case 4 - Base surface is not horizontal and subsurface is different by 45 degrees azimuth and tilt - should be warning error message but surfaceError=false
 	surfaceError = false;
@@ -227,6 +227,6 @@ TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
 	SubSurface.NewellSurfaceNormalVector.z = 1.;
 	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
 	EXPECT_FALSE( surfaceError );
-	//EXPECT_FALSE( compare_err_stream( "" , true ) );
+	EXPECT_TRUE( has_err_output() );
 
 }
