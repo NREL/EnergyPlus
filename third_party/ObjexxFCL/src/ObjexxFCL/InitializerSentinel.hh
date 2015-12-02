@@ -23,7 +23,6 @@ class InitializerSentinel
 public: // Creation
 
 	// Default Constructor
-	inline
 	InitializerSentinel()
 	{}
 

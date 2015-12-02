@@ -39,42 +39,36 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	Reference() :
 	 ptr_( nullptr ),
 	 own_( false )
 	{}
 
 	// Copy Constructor
-	inline
 	Reference( Reference const & ref ) :
 	 ptr_( ref.ptr_ ),
 	 own_( false )
 	{}
 
 	// Null Pointer Constructor
-	inline
 	Reference( std::nullptr_t ) :
 	 ptr_( nullptr ),
 	 own_( false )
 	{}
 
 	// Value Constructor
-	inline
 	Reference( T const & val ) :
 	 ptr_( const_cast< T * >( &val ) ), // Fortran compilers allow modifying INTENT(IN) args via POINTERs
 	 own_( false )
 	{}
 
 	// Destructor
-	inline
 	~Reference()
 	{}
 
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	Reference &
 	operator =( Reference const & ref )
 	{
@@ -84,7 +78,6 @@ public: // Assignment
 	}
 
 	// Value Assignment
-	inline
 	Reference &
 	operator =( T const & val )
 	{
@@ -95,7 +88,6 @@ public: // Assignment
 
 	// Value Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Reference &
 	operator =( U const & val )
 	{
@@ -107,7 +99,6 @@ public: // Assignment
 public: // Conversion
 
 	// Value Conversion
-	inline
 	operator Tr() const
 	{
 		assert( ptr_ != nullptr );
@@ -115,7 +106,6 @@ public: // Conversion
 	}
 
 	// Value Conversion
-	inline
 	operator T &()
 	{
 		assert( ptr_ != nullptr );
@@ -125,7 +115,6 @@ public: // Conversion
 public: // Operators
 
 	// Value
-	inline
 	Tr
 	operator ()() const
 	{
@@ -134,7 +123,6 @@ public: // Operators
 	}
 
 	// Value
-	inline
 	T &
 	operator ()()
 	{
@@ -143,7 +131,6 @@ public: // Operators
 	}
 
 	// Attach to Value
-	inline
 	void
 	operator >>=( T const & val )
 	{
@@ -152,7 +139,6 @@ public: // Operators
 	}
 
 	// Attach to Reference
-	inline
 	void
 	operator >>=( Reference & ref )
 	{
@@ -161,7 +147,6 @@ public: // Operators
 	}
 
 	// Attach to Null Pointer
-	inline
 	void
 	operator >>=( std::nullptr_t )
 	{
@@ -172,7 +157,6 @@ public: // Operators
 public: // Properties
 
 	// Associated?
-	inline
 	bool
 	associated() const
 	{
@@ -180,7 +164,6 @@ public: // Properties
 	}
 
 	// Associated with a Given Value?
-	inline
 	bool
 	associated( T const & val ) const
 	{
@@ -188,7 +171,6 @@ public: // Properties
 	}
 
 	// Associated with the same Target as Another Reference?
-	inline
 	bool
 	associated( Reference const & ref ) const
 	{
@@ -196,7 +178,6 @@ public: // Properties
 	}
 
 	// Attached?
-	inline
 	bool
 	attached() const
 	{
@@ -204,7 +185,6 @@ public: // Properties
 	}
 
 	// Attached to a Given Value?
-	inline
 	bool
 	attached( T const & val ) const
 	{
@@ -214,7 +194,6 @@ public: // Properties
 public: // Modifiers
 
 	// Attach to Value
-	inline
 	void
 	attach( T const & val )
 	{
@@ -223,7 +202,6 @@ public: // Modifiers
 	}
 
 	// Detach
-	inline
 	void
 	detach()
 	{
@@ -232,7 +210,6 @@ public: // Modifiers
 	}
 
 	// Nullify
-	inline
 	void
 	nullify()
 	{
@@ -241,7 +218,6 @@ public: // Modifiers
 	}
 
 	// Clear
-	inline
 	void
 	clear()
 	{
@@ -249,7 +225,6 @@ public: // Modifiers
 		own_ = false;
 	}
 
-	inline
 	void
 	allocate()
 	{
@@ -257,7 +232,6 @@ public: // Modifiers
 		own_ = true;
 	}
 
-	inline
 	void
 	allocate( IR const & I )
 	{
@@ -265,7 +239,6 @@ public: // Modifiers
 		own_ = true;
 	}
 
-	inline
 	void
 	allocate( IR const & I1, IR const & I2 )
 	{
@@ -273,7 +246,6 @@ public: // Modifiers
 		own_ = true;
 	}
 
-	inline
 	void
 	allocate( IR const & I1, IR const & I2, IR const & I3 )
 	{
@@ -281,7 +253,6 @@ public: // Modifiers
 		own_ = true;
 	}
 
-	inline
 	void
 	allocate( IR const & I1, IR const & I2, IR const & I3, IR const & I4 )
 	{
@@ -289,7 +260,6 @@ public: // Modifiers
 		own_ = true;
 	}
 
-	inline
 	void
 	allocate( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 )
 	{
@@ -297,7 +267,6 @@ public: // Modifiers
 		own_ = true;
 	}
 
-	inline
 	void
 	allocate( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 )
 	{
@@ -305,7 +274,6 @@ public: // Modifiers
 		own_ = true;
 	}
 
-	inline
 	void
 	deallocate()
 	{
@@ -318,7 +286,6 @@ public: // Comparison
 
 	// Reference == Reference
 	friend
-	inline
 	bool
 	operator ==( Reference const & a, Reference const & b )
 	{
@@ -328,7 +295,6 @@ public: // Comparison
 
 	// Reference != Reference
 	friend
-	inline
 	bool
 	operator !=( Reference const & a, Reference const & b )
 	{
@@ -338,7 +304,6 @@ public: // Comparison
 
 	// Reference == Value
 	friend
-	inline
 	bool
 	operator ==( Reference const & a, Tc b )
 	{
@@ -348,7 +313,6 @@ public: // Comparison
 
 	// Reference != Value
 	friend
-	inline
 	bool
 	operator !=( Reference const & a, Tc b )
 	{
@@ -358,7 +322,6 @@ public: // Comparison
 
 	// Value == Reference
 	friend
-	inline
 	bool
 	operator ==( Tc a, Reference const & b )
 	{
@@ -368,7 +331,6 @@ public: // Comparison
 
 	// Value != Reference
 	friend
-	inline
 	bool
 	operator !=( Tc a, Reference const & b )
 	{

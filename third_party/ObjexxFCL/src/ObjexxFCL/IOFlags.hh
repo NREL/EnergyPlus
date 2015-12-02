@@ -44,7 +44,6 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	IOFlags() :
 	 unit_( 0 ),
 	 exists_( false ),
@@ -69,7 +68,6 @@ public: // Creation
 	{}
 
 	// Handle Errors Named Constructor
-	inline
 	static
 	IOFlags
 	handler()
@@ -80,7 +78,6 @@ public: // Creation
 	}
 
 	// Handle Errors with Line Terminator Named Constructor
-	inline
 	static
 	IOFlags
 	handler( std::string const & ter )
@@ -94,7 +91,6 @@ public: // Creation
 public: // Unit
 
 	// Unit
-	inline
 	int
 	unit() const
 	{
@@ -102,7 +98,6 @@ public: // Unit
 	}
 
 	// Unit
-	inline
 	IOFlags &
 	unit( int const unit )
 	{
@@ -113,7 +108,6 @@ public: // Unit
 public: // Name
 
 	// Name
-	inline
 	Name const &
 	name() const
 	{
@@ -121,7 +115,6 @@ public: // Name
 	}
 
 	// Name Set
-	inline
 	IOFlags &
 	name( Name const & name )
 	{
@@ -130,7 +123,6 @@ public: // Name
 	}
 
 	// Named?
-	inline
 	bool
 	named() const
 	{
@@ -140,7 +132,6 @@ public: // Name
 public: // Exists
 
 	// Exists?
-	inline
 	bool
 	exists() const
 	{
@@ -148,7 +139,6 @@ public: // Exists
 	}
 
 	// Exists Set
-	inline
 	IOFlags &
 	exists( bool const exists )
 	{
@@ -157,7 +147,6 @@ public: // Exists
 	}
 
 	// Exists On
-	inline
 	IOFlags &
 	exists_on()
 	{
@@ -166,7 +155,6 @@ public: // Exists
 	}
 
 	// Exists?
-	inline
 	bool
 	exist() const
 	{
@@ -174,7 +162,6 @@ public: // Exists
 	}
 
 	// Exists Set
-	inline
 	IOFlags &
 	exist( bool const exists )
 	{
@@ -183,7 +170,6 @@ public: // Exists
 	}
 
 	// Exists On
-	inline
 	IOFlags &
 	exist_on()
 	{
@@ -194,7 +180,6 @@ public: // Exists
 public: // Open
 
 	// Open?
-	inline
 	bool
 	open() const
 	{
@@ -202,7 +187,6 @@ public: // Open
 	}
 
 	// Open Set
-	inline
 	IOFlags &
 	open( bool const open )
 	{
@@ -229,7 +213,6 @@ public: // Status
 	}
 
 	// Status String
-	inline
 	std::string
 	STATUS() const
 	{
@@ -255,7 +238,6 @@ public: // Status
 	STATUS( std::string const & status );
 
 	// Old?
-	inline
 	bool
 	old() const
 	{
@@ -263,7 +245,6 @@ public: // Status
 	}
 
 	// Old On
-	inline
 	IOFlags &
 	old_on()
 	{
@@ -272,7 +253,6 @@ public: // Status
 	}
 
 	// New?
-	inline
 	bool
 	New() const
 	{
@@ -280,7 +260,6 @@ public: // Status
 	}
 
 	// New?
-	inline
 	bool
 	new_status() const
 	{
@@ -288,7 +267,6 @@ public: // Status
 	}
 
 	// New On
-	inline
 	IOFlags &
 	new_on()
 	{
@@ -297,7 +275,6 @@ public: // Status
 	}
 
 	// Scratch?
-	inline
 	bool
 	scratch() const
 	{
@@ -305,7 +282,6 @@ public: // Status
 	}
 
 	// Scratch On
-	inline
 	IOFlags &
 	scratch_on()
 	{
@@ -314,7 +290,6 @@ public: // Status
 	}
 
 	// Replace?
-	inline
 	bool
 	replace() const
 	{
@@ -322,7 +297,6 @@ public: // Status
 	}
 
 	// Replace On
-	inline
 	IOFlags &
 	replace_on()
 	{
@@ -331,7 +305,6 @@ public: // Status
 	}
 
 	// Unknown?
-	inline
 	bool
 	unknown() const
 	{
@@ -339,7 +312,6 @@ public: // Status
 	}
 
 	// Unknown On
-	inline
 	IOFlags &
 	unknown_on()
 	{
@@ -366,7 +338,6 @@ public: // Access
 	}
 
 	// Access String
-	inline
 	std::string
 	ACCESS() const
 	{
@@ -388,7 +359,6 @@ public: // Access
 	ACCESS( std::string const & access );
 
 	// Sequential?
-	inline
 	bool
 	sequential() const
 	{
@@ -396,7 +366,6 @@ public: // Access
 	}
 
 	// Sequential On
-	inline
 	IOFlags &
 	sequential_on()
 	{
@@ -405,7 +374,6 @@ public: // Access
 	}
 
 	// Direct?
-	inline
 	bool
 	direct() const
 	{
@@ -413,7 +381,6 @@ public: // Access
 	}
 
 	// Direct On
-	inline
 	IOFlags &
 	direct_on()
 	{
@@ -422,7 +389,6 @@ public: // Access
 	}
 
 	// Stream?
-	inline
 	bool
 	stream() const
 	{
@@ -430,7 +396,6 @@ public: // Access
 	}
 
 	// Stream On
-	inline
 	IOFlags &
 	stream_on()
 	{
@@ -457,7 +422,6 @@ public: // Action
 	}
 
 	// Action String
-	inline
 	std::string
 	ACTION() const
 	{
@@ -479,7 +443,6 @@ public: // Action
 	ACTION( std::string const & action );
 
 	// Read?
-	inline
 	bool
 	read() const
 	{
@@ -487,7 +450,6 @@ public: // Action
 	}
 
 	// Read-Only?
-	inline
 	bool
 	readonly() const
 	{
@@ -495,7 +457,6 @@ public: // Action
 	}
 
 	// Read-Only?
-	inline
 	bool
 	read_only() const
 	{
@@ -503,7 +464,6 @@ public: // Action
 	}
 
 	// Read On
-	inline
 	IOFlags &
 	read_on()
 	{
@@ -512,7 +472,6 @@ public: // Action
 	}
 
 	// Read-Only On
-	inline
 	IOFlags &
 	readonly_on()
 	{
@@ -521,7 +480,6 @@ public: // Action
 	}
 
 	// Read-Only On
-	inline
 	IOFlags &
 	read_only_on()
 	{
@@ -530,7 +488,6 @@ public: // Action
 	}
 
 	// Readable?
-	inline
 	bool
 	readable() const
 	{
@@ -538,7 +495,6 @@ public: // Action
 	}
 
 	// Write?
-	inline
 	bool
 	write() const
 	{
@@ -546,7 +502,6 @@ public: // Action
 	}
 
 	// Write-Only?
-	inline
 	bool
 	writeonly() const
 	{
@@ -554,7 +509,6 @@ public: // Action
 	}
 
 	// Write-Only?
-	inline
 	bool
 	write_only() const
 	{
@@ -562,7 +516,6 @@ public: // Action
 	}
 
 	// Write On
-	inline
 	IOFlags &
 	write_on()
 	{
@@ -571,7 +524,6 @@ public: // Action
 	}
 
 	// Write-Only On
-	inline
 	IOFlags &
 	writeonly_on()
 	{
@@ -580,7 +532,6 @@ public: // Action
 	}
 
 	// Write-Only On
-	inline
 	IOFlags &
 	write_only_on()
 	{
@@ -589,7 +540,6 @@ public: // Action
 	}
 
 	// Writable?
-	inline
 	bool
 	writable() const
 	{
@@ -597,7 +547,6 @@ public: // Action
 	}
 
 	// Read-Write?
-	inline
 	bool
 	rw() const
 	{
@@ -605,7 +554,6 @@ public: // Action
 	}
 
 	// Read-Write?
-	inline
 	bool
 	readwrite() const
 	{
@@ -613,7 +561,6 @@ public: // Action
 	}
 
 	// Read-Write?
-	inline
 	bool
 	read_write() const
 	{
@@ -621,7 +568,6 @@ public: // Action
 	}
 
 	// Read-Write On
-	inline
 	IOFlags &
 	rW_on()
 	{
@@ -630,7 +576,6 @@ public: // Action
 	}
 
 	// Read-Write On
-	inline
 	IOFlags &
 	readwrite_on()
 	{
@@ -639,7 +584,6 @@ public: // Action
 	}
 
 	// Read-Write On
-	inline
 	IOFlags &
 	read_write_on()
 	{
@@ -666,7 +610,6 @@ public: // Form
 	}
 
 	// Form String
-	inline
 	std::string
 	FORM() const
 	{
@@ -688,7 +631,6 @@ public: // Form
 	FORM( std::string const & form );
 
 	// Formatted?
-	inline
 	bool
 	formatted() const
 	{
@@ -696,7 +638,6 @@ public: // Form
 	}
 
 	// Formatted On
-	inline
 	IOFlags &
 	formatted_on()
 	{
@@ -705,7 +646,6 @@ public: // Form
 	}
 
 	// Unformatted?
-	inline
 	bool
 	unformatted() const
 	{
@@ -713,7 +653,6 @@ public: // Form
 	}
 
 	// Unformatted On
-	inline
 	IOFlags &
 	unformatted_on()
 	{
@@ -722,7 +661,6 @@ public: // Form
 	}
 
 	// Binary?
-	inline
 	bool
 	binary() const
 	{
@@ -730,7 +668,6 @@ public: // Form
 	}
 
 	// Binary On
-	inline
 	IOFlags &
 	binary_on()
 	{
@@ -757,7 +694,6 @@ public: // Positioning
 	}
 
 	// Position String
-	inline
 	std::string
 	POSITION() const
 	{
@@ -779,7 +715,6 @@ public: // Positioning
 	POSITION( std::string const & position );
 
 	// AsIs?
-	inline
 	bool
 	asis() const
 	{
@@ -787,7 +722,6 @@ public: // Positioning
 	}
 
 	// AsIs On
-	inline
 	IOFlags &
 	asis_on()
 	{
@@ -796,7 +730,6 @@ public: // Positioning
 	}
 
 	// AsIs Compatible?
-	inline
 	bool
 	asis_compatible( IOFlags const & flags ) const
 	{
@@ -811,7 +744,6 @@ public: // Positioning
 	}
 
 	// Rewind?
-	inline
 	bool
 	rewind() const
 	{
@@ -819,7 +751,6 @@ public: // Positioning
 	}
 
 	// Rewind On
-	inline
 	IOFlags &
 	rewind_on()
 	{
@@ -828,7 +759,6 @@ public: // Positioning
 	}
 
 	// Append?
-	inline
 	bool
 	append() const
 	{
@@ -836,7 +766,6 @@ public: // Positioning
 	}
 
 	// Append On
-	inline
 	IOFlags &
 	append_on()
 	{
@@ -847,7 +776,6 @@ public: // Positioning
 public: // Truncate
 
 	// Truncate?
-	inline
 	bool
 	truncate() const
 	{
@@ -855,7 +783,6 @@ public: // Truncate
 	}
 
 	// Truncate Set
-	inline
 	IOFlags &
 	truncate( bool const truncate )
 	{
@@ -864,7 +791,6 @@ public: // Truncate
 	}
 
 	// Truncate On
-	inline
 	IOFlags &
 	truncate_on()
 	{
@@ -875,7 +801,6 @@ public: // Truncate
 public: // Blank
 
 	// Blank String
-	inline
 	std::string
 	BLANK() const
 	{
@@ -895,7 +820,6 @@ public: // Blank
 	BLANK( std::string const & blank );
 
 	// Treat Blanks in Numeric Inputs as Null?
-	inline
 	bool
 	bn() const
 	{
@@ -903,7 +827,6 @@ public: // Blank
 	}
 
 	// Treat Blanks in Numeric Inputs as Null?
-	inline
 	bool
 	blank_null() const
 	{
@@ -911,7 +834,6 @@ public: // Blank
 	}
 
 	// Blank Null On
-	inline
 	IOFlags &
 	bn_on()
 	{
@@ -920,7 +842,6 @@ public: // Blank
 	}
 
 	// Blank Null On
-	inline
 	IOFlags &
 	blank_null_on()
 	{
@@ -929,7 +850,6 @@ public: // Blank
 	}
 
 	// Treat Blanks in Numeric Inputs as Zero?
-	inline
 	bool
 	bz() const
 	{
@@ -937,7 +857,6 @@ public: // Blank
 	}
 
 	// Treat Blanks in Numeric Inputs as Zero?
-	inline
 	bool
 	blank_zero() const
 	{
@@ -945,7 +864,6 @@ public: // Blank
 	}
 
 	// Blank Zero On
-	inline
 	IOFlags &
 	bz_on()
 	{
@@ -954,7 +872,6 @@ public: // Blank
 	}
 
 	// Blank Zero On
-	inline
 	IOFlags &
 	blank_zero_on()
 	{
@@ -965,7 +882,6 @@ public: // Blank
 public: // Advancing I/O
 
 	// Advance String
-	inline
 	std::string
 	ADVANCE() const
 	{
@@ -985,7 +901,6 @@ public: // Advancing I/O
 	ADVANCE( std::string const & advance );
 
 	// Advancing I/O?
-	inline
 	bool
 	advance() const
 	{
@@ -993,7 +908,6 @@ public: // Advancing I/O
 	}
 
 	// Advancing I/O?
-	inline
 	bool
 	advancing() const
 	{
@@ -1001,7 +915,6 @@ public: // Advancing I/O
 	}
 
 	// Advancing I/O On
-	inline
 	IOFlags &
 	advancing_on()
 	{
@@ -1010,7 +923,6 @@ public: // Advancing I/O
 	}
 
 	// Non-Advancing I/O?
-	inline
 	bool
 	na() const
 	{
@@ -1018,7 +930,6 @@ public: // Advancing I/O
 	}
 
 	// Non-Advancing I/O?
-	inline
 	bool
 	non_advancing() const
 	{
@@ -1026,7 +937,6 @@ public: // Advancing I/O
 	}
 
 	// Non-Advancing I/O On
-	inline
 	IOFlags &
 	na_on()
 	{
@@ -1035,7 +945,6 @@ public: // Advancing I/O
 	}
 
 	// Non-Advancing I/O On
-	inline
 	IOFlags &
 	non_advancing_on()
 	{
@@ -1046,7 +955,6 @@ public: // Advancing I/O
 public: // Dispose
 
 	// Dispose String
-	inline
 	std::string
 	DISPOSE() const
 	{
@@ -1066,7 +974,6 @@ public: // Dispose
 	DISPOSE( std::string const & dispose );
 
 	// Keep?
-	inline
 	bool
 	keep() const
 	{
@@ -1074,7 +981,6 @@ public: // Dispose
 	}
 
 	// Keep On
-	inline
 	IOFlags &
 	keep_on()
 	{
@@ -1083,7 +989,6 @@ public: // Dispose
 	}
 
 	// Save?
-	inline
 	bool
 	save() const
 	{
@@ -1091,7 +996,6 @@ public: // Dispose
 	}
 
 	// Save On
-	inline
 	IOFlags &
 	save_on()
 	{
@@ -1100,7 +1004,6 @@ public: // Dispose
 	}
 
 	// Delete?
-	inline
 	bool
 	del() const
 	{
@@ -1108,7 +1011,6 @@ public: // Dispose
 	}
 
 	// Delete On
-	inline
 	IOFlags &
 	del_on()
 	{
@@ -1117,7 +1019,6 @@ public: // Dispose
 	}
 
 	// Delete On
-	inline
 	IOFlags &
 	delete_on()
 	{
@@ -1128,7 +1029,6 @@ public: // Dispose
 public: // Size
 
 	// Size
-	inline
 	Size
 	size() const
 	{
@@ -1136,7 +1036,6 @@ public: // Size
 	}
 
 	// Size Set
-	inline
 	IOFlags &
 	size( Size const size )
 	{
@@ -1147,7 +1046,6 @@ public: // Size
 public: // Position
 
 	// Position
-	inline
 	Pos
 	pos() const
 	{
@@ -1155,7 +1053,6 @@ public: // Position
 	}
 
 	// Position Set
-	inline
 	IOFlags &
 	pos( Pos const pos )
 	{
@@ -1166,7 +1063,6 @@ public: // Position
 public: // Line Terminator
 
 	// Terminator
-	inline
 	std::string const &
 	ter() const
 	{
@@ -1174,7 +1070,6 @@ public: // Line Terminator
 	}
 
 	// Terminator Set
-	inline
 	IOFlags &
 	ter( std::string const & ter )
 	{
@@ -1183,7 +1078,6 @@ public: // Line Terminator
 	}
 
 	// Linux Terminator Set
-	inline
 	IOFlags &
 	ter_linux()
 	{
@@ -1192,7 +1086,6 @@ public: // Line Terminator
 	}
 
 	// Linux Terminator Set
-	inline
 	IOFlags &
 	ter_Linux()
 	{
@@ -1201,7 +1094,6 @@ public: // Line Terminator
 	}
 
 	// OS X Terminator Set
-	inline
 	IOFlags &
 	ter_osx()
 	{
@@ -1210,7 +1102,6 @@ public: // Line Terminator
 	}
 
 	// OS X Terminator Set
-	inline
 	IOFlags &
 	ter_OSX()
 	{
@@ -1219,7 +1110,6 @@ public: // Line Terminator
 	}
 
 	// Windows Terminator Set
-	inline
 	IOFlags &
 	ter_windows()
 	{
@@ -1228,7 +1118,6 @@ public: // Line Terminator
 	}
 
 	// Windows Terminator Set
-	inline
 	IOFlags &
 	ter_Windows()
 	{
@@ -1237,7 +1126,6 @@ public: // Line Terminator
 	}
 
 	// DOS Terminator Set
-	inline
 	IOFlags &
 	ter_dos()
 	{
@@ -1246,7 +1134,6 @@ public: // Line Terminator
 	}
 
 	// DOS Terminator Set
-	inline
 	IOFlags &
 	ter_DOS()
 	{
@@ -1255,7 +1142,6 @@ public: // Line Terminator
 	}
 
 	// Linefeed Terminator Set
-	inline
 	IOFlags &
 	ter_lf()
 	{
@@ -1264,7 +1150,6 @@ public: // Line Terminator
 	}
 
 	// Carriage Return + Linefeed Terminator Set
-	inline
 	IOFlags &
 	ter_crlf()
 	{
@@ -1273,7 +1158,6 @@ public: // Line Terminator
 	}
 
 	// Native Terminator Set
-	inline
 	IOFlags &
 	ter_native()
 	{
@@ -1288,7 +1172,6 @@ public: // Line Terminator
 public: // Error Handling
 
 	// Error?
-	inline
 	bool
 	err() const
 	{
@@ -1296,7 +1179,6 @@ public: // Error Handling
 	}
 
 	// Error Set
-	inline
 	IOFlags &
 	err( bool const err )
 	{
@@ -1305,7 +1187,6 @@ public: // Error Handling
 	}
 
 	// Error On
-	inline
 	IOFlags &
 	err_on()
 	{
@@ -1314,7 +1195,6 @@ public: // Error Handling
 	}
 
 	// End of File?
-	inline
 	bool
 	end() const
 	{
@@ -1322,7 +1202,6 @@ public: // Error Handling
 	}
 
 	// End of File Set
-	inline
 	IOFlags &
 	end( bool const end )
 	{
@@ -1331,7 +1210,6 @@ public: // Error Handling
 	}
 
 	// End On
-	inline
 	IOFlags &
 	end_on()
 	{
@@ -1340,7 +1218,6 @@ public: // Error Handling
 	}
 
 	// End of Record?
-	inline
 	bool
 	eor() const
 	{
@@ -1348,7 +1225,6 @@ public: // Error Handling
 	}
 
 	// End of Record Set
-	inline
 	IOFlags &
 	eor( bool const eor )
 	{
@@ -1357,7 +1233,6 @@ public: // Error Handling
 	}
 
 	// End of Record On
-	inline
 	IOFlags &
 	eor_on()
 	{
@@ -1366,7 +1241,6 @@ public: // Error Handling
 	}
 
 	// Status Code
-	inline
 	int
 	ios() const
 	{
@@ -1374,7 +1248,6 @@ public: // Error Handling
 	}
 
 	// Status Code Set
-	inline
 	IOFlags &
 	ios( int const ios )
 	{
@@ -1383,7 +1256,6 @@ public: // Error Handling
 	}
 
 	// Status Message
-	inline
 	Msg const &
 	msg() const
 	{
@@ -1391,7 +1263,6 @@ public: // Error Handling
 	}
 
 	// Status Message Set
-	inline
 	IOFlags &
 	msg( Msg const & msg )
 	{
@@ -1400,7 +1271,6 @@ public: // Error Handling
 	}
 
 	// Handle Errors?
-	inline
 	bool
 	her() const
 	{
@@ -1408,7 +1278,6 @@ public: // Error Handling
 	}
 
 	// Handle Errors Set
-	inline
 	IOFlags &
 	her( bool const her )
 	{
@@ -1417,7 +1286,6 @@ public: // Error Handling
 	}
 
 	// Handle Errors On
-	inline
 	IOFlags &
 	her_on()
 	{
@@ -1428,7 +1296,6 @@ public: // Error Handling
 public: // Methods
 
 	// Clear State
-	inline
 	IOFlags &
 	clear()
 	{
@@ -1458,7 +1325,6 @@ public: // Methods
 	}
 
 	// Clear Status
-	inline
 	IOFlags &
 	clear_status()
 	{
@@ -1471,7 +1337,6 @@ public: // Methods
 	}
 
 	// Set Status Flags
-	inline
 	void
 	set_status( std::ios const & stream )
 	{
@@ -1490,7 +1355,6 @@ public: // Methods
 
 	// Error Handler
 #ifdef OBJEXXFCL_IO_ERROR_SUPPRESS
-	inline
 	void
 	error() const
 	{}
@@ -1500,7 +1364,6 @@ public: // Methods
 #endif
 
 	// AsIs Update
-	inline
 	void
 	asis_update( IOFlags const & flags )
 	{
@@ -1515,7 +1378,6 @@ public: // Methods
 public: // Static Methods
 
 	// Default Output Line Terminator
-	inline
 	static
 	std::string const &
 	default_ter()
@@ -1535,7 +1397,6 @@ public: // Static Methods
 	}
 
 	// Linefeed
-	inline
 	static
 	std::string const &
 	lf()
@@ -1545,7 +1406,6 @@ public: // Static Methods
 	}
 
 	// Linefeed
-	inline
 	static
 	std::string const &
 	crlf()
