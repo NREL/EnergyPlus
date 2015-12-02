@@ -7708,8 +7708,14 @@ Label9999: ;
 			Ratio = 0.4 + 0.01 * ( Tavg - 44.0 );
 			Lag = 35.0 - 1.0 * ( Tavg - 44.0 );
 			Offset = 6.0;
+			int latitude_sign;
+			if ( Latitude >= 0 ) {
+				latitude_sign = -1;
+			} else {
+				latitude_sign = 1;
+			}
 
-			WaterMainsTemp = Tavg + Offset + Ratio * ( Tdiff / 2.0 ) * std::sin( ( 0.986 * ( DayOfYear - 15.0 - Lag ) - 90.0 ) * DegToRadians );
+			WaterMainsTemp = Tavg + Offset + Ratio * ( Tdiff / 2.0 ) * latitude_sign * std::cos( ( 0.986 * ( DayOfYear - 15.0 - Lag ) ) * DegToRadians );
 
 			if ( WaterMainsTemp < 32.0 ) WaterMainsTemp = 32.0;
 

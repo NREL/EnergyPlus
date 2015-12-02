@@ -10,6 +10,7 @@
 #include <WeatherManager.hh>
 #include <ScheduleManager.hh>
 #include <DataGlobals.hh>
+#include <DataEnvironment.hh>
 
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -94,3 +95,24 @@ TEST_F(EnergyPlusFixture, SkyTempTest )
 	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 62, 6);
 	EXPECT_NEAR(3.02, TomorrowSkyTemp(1, 1), .001);
 }
+
+TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
+{
+	using DataEnvironment::WaterMainsTemp;
+	using DataEnvironment::Latitude;
+	using DataEnvironment::DayOfYear;
+
+	WaterMainsTempsMethod = WeatherManager::CorrelationMethod;
+	WaterMainsTempsAnnualAvgAirTemp = 9.69;
+	WaterMainsTempsMaxDiffAirTemp = 28.1;
+	DayOfYear = 50;
+
+	Latitude = 40.0;
+	CalcWaterMainsTemp();
+	EXPECT_NEAR(WaterMainsTemp, 6.6667, 0.0001);
+
+	Latitude = -40.0;
+	CalcWaterMainsTemp();
+	EXPECT_NEAR(WaterMainsTemp, 19.3799, 0.0001);
+}
+

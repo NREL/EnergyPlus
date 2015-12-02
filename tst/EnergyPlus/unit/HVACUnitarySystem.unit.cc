@@ -968,6 +968,16 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = 2000.0;
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = 1000.0;
 	ZoneSysMoistureDemand( ControlZoneNum ).OutputRequiredToDehumidifyingSP = 0.0;
+
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP.allocate( 1 );
+	ZoneSysMoistureDemand( ControlZoneNum ).SequencedOutputRequiredToDehumidSP.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+	ZoneSysMoistureDemand( ControlZoneNum ).SequencedOutputRequiredToDehumidSP( 1 ) = ZoneSysMoistureDemand( ControlZoneNum ).OutputRequiredToDehumidifyingSP;
+
 	TempControlType.allocate( 1 );
 	TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 	CurDeadBandOrSetback.allocate( 1 );
@@ -997,6 +1007,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -1000.0; // cooling load
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -1000.0;
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = -2000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+	ZoneSysMoistureDemand( ControlZoneNum ).SequencedOutputRequiredToDehumidSP( 1 ) = ZoneSysMoistureDemand( ControlZoneNum ).OutputRequiredToDehumidifyingSP;
 
 	// set zone temperature
 	Node( ControlZoneNum ).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
@@ -1024,6 +1038,9 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxCoolAirMassFlow * UnitarySystem( 1 ).PartLoadFrac ); // cycling fan
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
 
+	// new tests for #5287, need to add an air loop to do this unit test justice
+	EXPECT_TRUE( UnitarySystem( 1 ).FanIndex > 0 ); // ZoneHVAC must contain a fan object to provide flow
+	EXPECT_EQ( UnitarySystem( 1 ).FanType_Num, DataHVACGlobals::FanType_SimpleOnOff ); // fan must be FanOnOff when used with cycling fan
 
 	// clean up non clear-state arrays
 	ZoneSysEnergyDemand.deallocate();
@@ -1764,6 +1781,16 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = 2000.0;
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = 1000.0;
 	ZoneSysMoistureDemand( ControlZoneNum ).OutputRequiredToDehumidifyingSP = 0.0;
+
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP.allocate( 1 );
+	ZoneSysMoistureDemand( ControlZoneNum ).SequencedOutputRequiredToDehumidSP.allocate( 1 );
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
+	ZoneSysMoistureDemand( ControlZoneNum ).SequencedOutputRequiredToDehumidSP( 1 ) = ZoneSysMoistureDemand( ControlZoneNum ).OutputRequiredToDehumidifyingSP;
+
 	TempControlType.allocate( 1 );
 	TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 	CurDeadBandOrSetback.allocate( 1 );
@@ -1794,6 +1821,9 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -1000.0; // cooling load
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -1000.0;
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP = -2000.0;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP;
+	ZoneSysEnergyDemand( ControlZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToHeatingSP;
 
 	// set zone temperature
 	Node( ControlZoneNum ).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
