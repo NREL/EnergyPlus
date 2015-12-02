@@ -886,7 +886,6 @@ namespace SurfaceGeometry {
 		int ErrCount;
 		Real64 diffp;
 		//  LOGICAL :: Located
-		bool sameSurfNormal;
 		bool izConstDiff; // differences in construction for IZ surfaces
 		bool izConstDiffMsg; // display message about hb diffs only once.
 
