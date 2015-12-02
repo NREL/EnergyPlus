@@ -458,10 +458,6 @@ namespace HeatBalanceIntRadExchange {
 			ZoneData const & zone( Zone( ZoneNum ) );
 			ZoneViewFactorInformation & zvfi( ZoneInfo( ZoneNum ) );
 
-#ifndef EXPLICIT_VECTORIZATION
-			int zvfiNumOfSurfaces2 = __round_2( zvfi.NumOfSurfaces );
-#endif // ! EXPLICIT_VECTORIZATION
-
 			// Calculate ScriptF if first time step in environment and surface heat-balance iterations not yet started;
 			// recalculate ScriptF if status of window interior shades or blinds has changed from
 			// previous time step. This recalculation is required since ScriptF depends on the inside
@@ -513,9 +509,9 @@ namespace HeatBalanceIntRadExchange {
 					Real64 * __restrict vecZvfiScriptF ( &zvfi.ScriptF[ 0 ] );
 #ifndef EXPLICIT_VECTORIZATION
 					__ep_assume_aligned(Real64 *, vecZvfiScriptF, 16);
-					int zvfiNumOfSurfacesTimesNumOfSurfaces2 = zvfi.NumOfSurfaces * zvfiNumOfSurfaces2;
-					assert( (zvfiNumOfSurfacesTimesNumOfSurfaces2 % 2) == 0);
-					for (int i = 0; i < zvfiNumOfSurfacesTimesNumOfSurfaces2; ++i) {
+					int zvfiNumOfSurfacesTimesNumOfSurfacesVec = zvfi.NumOfSurfaces * zvfi.NumOfSurfacesVec;
+					assert( (zvfiNumOfSurfacesTimesNumOfSurfacesVec % 2) == 0);
+					for (int i = 0; i < zvfiNumOfSurfacesTimesNumOfSurfacesVec; ++i) {
 						vecZvfiScriptF[ i ] *= StefanBoltzmannConst;
 					} // for i
 #else // ! EXPLICIT_VECTORIZATION
@@ -595,14 +591,23 @@ namespace HeatBalanceIntRadExchange {
 				}
 			} // for ZoneSurfNum
 
+#ifdef DEBUG
+			// Set end-of-vector "pad" values to 0.0 to avoid SIGFPE issues on some debug builds
+			for ( ZoneSurfNum = zvfi.NumOfSurfaces; ZoneSurfNum < zvfi.NumOfSurfacesVec; ++ZoneSurfNum ) {
+				SurfaceTempK4[ ZoneSurfNum ] = 0.0;
+				SurfaceEmiss[ ZoneSurfNum ] = 0.0;
+			} // for ZoneSurfNum
+#endif // DEBUG			
+
+
 			// Amir Roth 2015-07-01: Split off SurfaceTemp = pow4(SurfaceTemp) calculation so that it will vectorize.
 
 			Real64 * __restrict vecSurfaceTempK4( &SurfaceTempK4[ 0 ] );
 #ifndef EXPLICIT_VECTORIZATION
 
 			__ep_assume_aligned(Real64 *, vecSurfaceTempK4, 16);
-			assert( ( zvfiNumOfSurfaces2 % 2 ) == 0 );
-			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfiNumOfSurfaces2; ++ZoneSurfNum ) {
+			assert( ( zvfi.NumOfSurfacesVec % 2 ) == 0 );
+			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfacesVec; ++ZoneSurfNum ) {
 				vecSurfaceTempK4[ ZoneSurfNum ] = pow_4( vecSurfaceTempK4 [ ZoneSurfNum ] + KelvinConv );
 			} // for ZoneSurfNum
 
@@ -614,7 +619,7 @@ namespace HeatBalanceIntRadExchange {
 			    pdSurfaceTempK4 = _mm_add_pd( pdSurfaceTempK4, pdKelvinConv );
 			    pdSurfaceTempK4 = _mm_mul_pd( pdSurfaceTempK4, pdSurfaceTempK4 );
 			    pdSurfaceTempK4 = _mm_mul_pd( pdSurfaceTempK4, pdSurfaceTempK4 );
-				_mm_store_pd( &vecSurfaceTempK4[ ZoneSurfNum ], pdSurfaceTempK4 );
+			    _mm_store_pd( &vecSurfaceTempK4[ ZoneSurfNum ], pdSurfaceTempK4 );
 			} // for ZoneSurfNum
 
 #endif // !EXPLICIT_VECTORIZATION
@@ -625,8 +630,8 @@ namespace HeatBalanceIntRadExchange {
 #ifndef EXPLICIT_VECTORIZATION
 
 			__ep_assume_aligned(Real64 *, vecIRfromParentZone_Temp, 16);
-			assert( ( zvfiNumOfSurfaces2 % 2 ) == 0 );
-			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfiNumOfSurfaces2; ++ZoneSurfNum ) {
+			assert( ( zvfi.NumOfSurfacesVec % 2 ) == 0 );
+			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfacesVec; ++ZoneSurfNum ) {
 				vecIRfromParentZone_Temp[ZoneSurfNum] = 0.0;
 			} // ZoneSurfNum
 
@@ -660,8 +665,8 @@ namespace HeatBalanceIntRadExchange {
 				__ep_assume_aligned(Real64 *, vecSurfaceTempK4, 16);
 				__ep_assume_aligned(Real64 *, vecZvfiScriptF, 16);
 
-				assert( ( zvfiNumOfSurfaces2 % 2 ) == 0 );
-				for ( ; RecvZoneSurfNum < zvfiNumOfSurfaces2; ++RecvZoneSurfNum ) {
+				assert( ( zvfi.NumOfSurfacesVec % 2 ) == 0 );
+				for ( ; RecvZoneSurfNum < zvfi.NumOfSurfacesVec; ++RecvZoneSurfNum ) {
 					// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
 
 					vecIRfromParentZone_Temp[ RecvZoneSurfNum ] += vecZvfiScriptF[ RecvZoneSurfNum ] * vecSurfaceTempK4[ SendZoneSurfNum ];
@@ -1644,6 +1649,14 @@ namespace HeatBalanceIntRadExchange {
 				//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
 				ScriptF[ sll ] = EMISS_facj * Cinverse[ ill ]; // [ l ] == ( i, j )
 			}
+
+#ifdef DEBUG
+			// Set end-of-vector "pad" values to 0.0 to avoid SIGFPE's on some builds
+			for ( int j = N, sll = (i-1)*Npad+(j-1); j <= Npad; ++sll ) {
+				scriptF[ sll ] = 0.0;
+			}
+#endif // DEBUG
+			
 			// pull out the (i == j) case so that inner loop above will vectorize
 			int iii = Cinverse.index(i, i);
 			int sii = (i-1)*Npad+(i-1);
