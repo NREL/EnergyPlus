@@ -201,13 +201,13 @@ TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
 	EXPECT_TRUE( surfaceError );
 	EXPECT_TRUE( has_err_output() );
 
-	//Case 3 - Base surface is horizontal and subsurface is different by 45 degrees azimuth and tilt - should be no error message and surfaceError=false
+	//Case 3 - Base surface is horizontal and subsurface is different by 45 degrees azimuth - should be no warning message and surfaceError=false
 	surfaceError = false;
 	SubSurface.Azimuth = 45.;
-	SubSurface.Tilt = 45.;
-	SubSurface.NewellSurfaceNormalVector.x = 1.;
-	SubSurface.NewellSurfaceNormalVector.y = 0.;
-	SubSurface.NewellSurfaceNormalVector.z = 0.;
+	SubSurface.Tilt = 0.;
+	SubSurface.NewellSurfaceNormalVector.x = 0.;
+	SubSurface.NewellSurfaceNormalVector.y = 1.; // This doesn't match the tilt and azimuth, but want it to be different so tilt and azimuth tests are executed
+	SubSurface.NewellSurfaceNormalVector.z = 1.;
 	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
 	EXPECT_FALSE( surfaceError );
 	EXPECT_FALSE( has_err_output() );
