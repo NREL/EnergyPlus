@@ -25,24 +25,20 @@ class BArray
 protected: // Creation
 
 	// Default Constructor
-	inline
 	BArray()
 	{}
 
 	// Copy Constructor
-	inline
 	BArray( BArray const & )
 	{}
 
 	// Move Constructor
-	inline
 	BArray( BArray && ) NOEXCEPT
 	{}
 
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~BArray()
 	{}
@@ -50,13 +46,11 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	void
 	operator =( BArray const & )
 	{}
 
 	// Move Assignment
-	inline
 	void
 	operator =( BArray && ) NOEXCEPT
 	{}
