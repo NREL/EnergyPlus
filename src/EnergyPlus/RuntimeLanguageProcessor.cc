@@ -87,6 +87,7 @@ namespace RuntimeLanguageProcessor {
 	bool GetInput( true );
 	bool InitializeOnce( true );
 	bool MyEnvrnFlag( true );
+	bool AlreadyDidOnce( false );
 
 	// index pointer references to dynamic built-in variables
 	int NullVariableNum( 0 );
@@ -132,6 +133,7 @@ namespace RuntimeLanguageProcessor {
 		GetInput =  true ;
 		InitializeOnce = true ;
 		MyEnvrnFlag = true ;
+		AlreadyDidOnce = false;
 
 		NullVariableNum = 0;
 		FalseVariableNum = 0;
@@ -1218,9 +1220,7 @@ namespace RuntimeLanguageProcessor {
 							++Pos;
 							LastED = false;
 						} else {
-//							if ( is_any_of( NextChar, "-" ) ) {
-//								MinusFound = true;
-//							}
+							// +/- will be processed on next pass, nothing needs to be done after a numeral
 							break;
 						}
 					} else if ( is_any_of( NextChar, " +-*/^=<>)" ) ) { // Any binary operator is okay
@@ -1281,11 +1281,13 @@ namespace RuntimeLanguageProcessor {
 			} else if ( is_any_of( NextChar, "+-*/^=<>@|&" ) ) {
 				// Parse an operator token
 				if( OperatorProcessing && ( NextChar == '-' ) ) {
+					// if operator was deterined last pass and this character is a -, then insert a 0 before the minus and treat as subtraction
+					// example: change "Var == -1" to "Var == 0-1" 
 					OperatorProcessing = false;
 					String.insert( Pos, "0" );
 					++LastPos;
 					StringToken = "0";
-				} else {
+				} else { // any other character process as operator
 					StringToken = NextChar;
 					Token( NumTokens ).Type = TokenOperator;
 				}
@@ -3726,7 +3728,6 @@ namespace RuntimeLanguageProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool AlreadyDidOnce( false );
 
 		if ( AlreadyDidOnce ) return;
 
