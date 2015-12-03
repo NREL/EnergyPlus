@@ -42,7 +42,6 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	IndexSlice() :
 	 l_init_( false ),
 	 u_init_( false ),
@@ -54,7 +53,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	IndexSlice( IndexSlice const & I ) :
 	 l_init_( I.l_init_ ),
 	 u_init_( I.u_init_ ),
@@ -68,7 +66,6 @@ public: // Creation
 	}
 
 	// Scalar Constructor
-	inline
 	IndexSlice( int const i ) :
 	 l_init_( true ),
 	 u_init_( true ),
@@ -80,7 +77,6 @@ public: // Creation
 	{}
 
 	// Index Slice Constructor
-	inline
 	IndexSlice( int const l, int const u, int const s = 1 ) :
 	 l_init_( true ),
 	 u_init_( true ),
@@ -95,7 +91,6 @@ public: // Creation
 
 	// Initializer List of Integer Constructor
 	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
-	inline
 	IndexSlice( std::initializer_list< U > const lus ) :
 	 l_init_( lus.size() > 0u ),
 	 u_init_( lus.size() > 1u ),
@@ -135,7 +130,6 @@ public: // Creation
 	}
 
 	// Initializer List of Index Constructor
-	inline
 	IndexSlice( std::initializer_list< Index > const lus ) :
 	 l_init_( ( lus.size() > 0u ) && ( lus.begin()->initialized() ) ),
 	 u_init_( ( lus.size() > 1u ) && ( ( lus.begin() + 1 )->initialized() ) ),
@@ -175,7 +169,6 @@ public: // Creation
 	}
 
 	// Omit Constructor
-	inline
 	IndexSlice( Omit ) :
 	 l_init_( false ),
 	 u_init_( false ),
@@ -189,7 +182,6 @@ public: // Creation
 	}
 
 	// Lower Index + Omit Constructor
-	inline
 	IndexSlice( int const l, Omit, int const s = 1 ) :
 	 l_init_( true ),
 	 u_init_( false ),
@@ -203,7 +195,6 @@ public: // Creation
 	}
 
 	// Omit + Upper Index Constructor
-	inline
 	IndexSlice( Omit, int const u, int const s = 1 ) :
 	 l_init_( false ),
 	 u_init_( true ),
@@ -217,7 +208,6 @@ public: // Creation
 	}
 
 	// Omit + Omit Constructor
-	inline
 	IndexSlice( Omit, Omit, int const s = 1 ) :
 	 l_init_( false ),
 	 u_init_( false ),
@@ -231,14 +221,12 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	~IndexSlice()
 	{}
 
 public: // Assignment
 
 	// Scalar Assignment
-	inline
 	IndexSlice &
 	operator =( int const i )
 	{
@@ -253,7 +241,6 @@ public: // Assignment
 	}
 
 	// Initializer List of int Assignment
-	inline
 	IndexSlice &
 	operator =( std::initializer_list< int > const lus )
 	{
@@ -291,7 +278,6 @@ public: // Assignment
 	}
 
 	// Initializer List of Index Assignment
-	inline
 	IndexSlice &
 	operator =( std::initializer_list< Index > const lus )
 	{
@@ -329,7 +315,6 @@ public: // Assignment
 	}
 
 	// Index Slice Assignment
-	inline
 	IndexSlice &
 	assign( int const l, int const u, int const s = 1 )
 	{
@@ -346,7 +331,6 @@ public: // Assignment
 public: // Subscript
 
 	// IndexSlice( i ) const: Internal Index for i
-	inline
 	int
 	operator ()( int const i ) const
 	{
@@ -357,7 +341,6 @@ public: // Subscript
 public: // Predicate
 
 	// Initialized?
-	inline
 	bool
 	initialized() const
 	{
@@ -365,7 +348,6 @@ public: // Predicate
 	}
 
 	// Lower Initialized?
-	inline
 	bool
 	l_initialized() const
 	{
@@ -373,7 +355,6 @@ public: // Predicate
 	}
 
 	// Upper Initialized?
-	inline
 	bool
 	u_initialized() const
 	{
@@ -381,7 +362,6 @@ public: // Predicate
 	}
 
 	// Scalar?
-	inline
 	bool
 	scalar() const
 	{
@@ -389,7 +369,6 @@ public: // Predicate
 	}
 
 	// Contains an Index?
-	inline
 	bool
 	contains( int const i ) const
 	{
@@ -400,7 +379,6 @@ public: // Predicate
 public: // Inspector
 
 	// Lower (Begin) Index
-	inline
 	int
 	l() const
 	{
@@ -409,7 +387,6 @@ public: // Inspector
 	}
 
 	// Upper (End) Index
-	inline
 	int
 	u() const
 	{
@@ -418,7 +395,6 @@ public: // Inspector
 	}
 
 	// Step
-	inline
 	int
 	s() const
 	{
@@ -426,7 +402,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -434,7 +409,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	int
 	isize() const
 	{
@@ -442,7 +416,6 @@ public: // Inspector
 	}
 
 	// Last Index
-	inline
 	int
 	last() const
 	{
@@ -452,7 +425,6 @@ public: // Inspector
 	}
 
 	// Next Index
-	inline
 	int
 	next( int const i ) const
 	{
@@ -462,7 +434,6 @@ public: // Inspector
 	}
 
 	// Min Index
-	inline
 	int
 	min() const
 	{
@@ -471,7 +442,6 @@ public: // Inspector
 	}
 
 	// Max Index
-	inline
 	int
 	max() const
 	{
@@ -480,7 +450,6 @@ public: // Inspector
 	}
 
 	// Empty or Undefined?
-	inline
 	bool
 	empty() const
 	{
@@ -488,7 +457,6 @@ public: // Inspector
 	}
 
 	// Non-Empty?
-	inline
 	bool
 	non_empty() const
 	{
@@ -498,7 +466,6 @@ public: // Inspector
 public: // Modifier
 
 	// Clear
-	inline
 	void
 	clear()
 	{
@@ -512,7 +479,6 @@ public: // Modifier
 	}
 
 	// Scalar Index Set
-	inline
 	IndexSlice &
 	i( int const i )
 	{
@@ -527,7 +493,6 @@ public: // Modifier
 	}
 
 	// Lower Index Set
-	inline
 	IndexSlice &
 	l( int const l )
 	{
@@ -539,7 +504,6 @@ public: // Modifier
 	}
 
 	// Upper Index Set
-	inline
 	IndexSlice &
 	u( int const u )
 	{
@@ -551,7 +515,6 @@ public: // Modifier
 	}
 
 	// Index Set if Uninitialized
-	inline
 	void
 	lud( int const l, int const u )
 	{
@@ -568,7 +531,6 @@ public: // Modifier
 	}
 
 	// Swap
-	inline
 	void
 	swap( IndexSlice & I )
 	{
@@ -587,7 +549,6 @@ public: // Friend
 
 	// Swap
 	friend
-	inline
 	void
 	swap( IndexSlice & a, IndexSlice & b )
 	{
@@ -598,7 +559,6 @@ public: // Comparison
 
 	// IndexSlice == IndexSlice
 	friend
-	inline
 	bool
 	operator ==( IndexSlice const & I, IndexSlice const & J )
 	{
@@ -607,7 +567,6 @@ public: // Comparison
 
 	// IndexSlice != IndexSlice
 	friend
-	inline
 	bool
 	operator !=( IndexSlice const & I, IndexSlice const & J )
 	{
@@ -629,7 +588,6 @@ public: // I/O
 private: // Inspector
 
 	// Computed Size
-	inline
 	size_type
 	computed_size() const
 	{

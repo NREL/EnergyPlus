@@ -97,6 +97,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPlantPipingSystems.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -174,6 +175,8 @@ std::unique_ptr<EnergyPlus::InputProcessorCache> EnergyPlus::EnergyPlusFixture::
 namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUp() {
+		clear_all_states();
+		
 		show_message();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -199,6 +202,27 @@ namespace EnergyPlus {
 
 	void EnergyPlusFixture::TearDown() {
 
+		clear_all_states();
+
+		{
+			IOFlags flags;
+			flags.DISPOSE( "DELETE" );
+			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
+			gio::close( DataGlobals::OutputFileStandard, flags );
+			gio::close( DataGlobals::OutputStandardError, flags );
+			gio::close( DataGlobals::OutputFileInits, flags );
+			gio::close( DataGlobals::OutputFileDebug, flags );
+			gio::close( DataGlobals::OutputFileZoneSizing, flags );
+			gio::close( DataGlobals::OutputFileSysSizing, flags );
+			gio::close( DataGlobals::OutputFileMeters, flags );
+			gio::close( DataGlobals::OutputFileBNDetails, flags );
+			gio::close( DataGlobals::OutputFileZonePulse, flags );
+
+		}
+	}
+
+	void EnergyPlusFixture::clear_all_states()
+	{
 		// A to Z order
 		BranchInputManager::clear_state();
 		CondenserLoopTowers::clear_state();
@@ -218,6 +242,7 @@ namespace EnergyPlus {
 		DataLoopNode::clear_state();
 		DataOutputs::clear_state();
 		DataPlant::clear_state();
+		DataPlantPipingSystems::clear_state();
 		DataRuntimeLanguage::clear_state();
 		DataSizing::clear_state();
 		DataSurfaces::clear_state();
@@ -281,22 +306,6 @@ namespace EnergyPlus {
 		ZoneAirLoopEquipmentManager::clear_state();
 		ZoneEquipmentManager::clear_state();
 		ZoneTempPredictorCorrector::clear_state();
-
-		{
-			IOFlags flags;
-			flags.DISPOSE( "DELETE" );
-			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
-			gio::close( DataGlobals::OutputFileStandard, flags );
-			gio::close( DataGlobals::OutputStandardError, flags );
-			gio::close( DataGlobals::OutputFileInits, flags );
-			gio::close( DataGlobals::OutputFileDebug, flags );
-			gio::close( DataGlobals::OutputFileZoneSizing, flags );
-			gio::close( DataGlobals::OutputFileSysSizing, flags );
-			gio::close( DataGlobals::OutputFileMeters, flags );
-			gio::close( DataGlobals::OutputFileBNDetails, flags );
-			gio::close( DataGlobals::OutputFileZonePulse, flags );
-
-		}
 	}
 
 	void EnergyPlusFixture::setup_cache()

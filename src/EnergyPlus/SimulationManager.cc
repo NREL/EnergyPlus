@@ -318,7 +318,7 @@ namespace SimulationManager {
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
 		using FaultsManager::CheckAndReadFaults;
-		using PlantPipingSystemsManager::InitAndSimGroundDomains;
+		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
 		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
@@ -573,7 +573,7 @@ namespace SimulationManager {
 
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
 						if ( AnySlabsInModel || AnyBasementsInModel ) {
-							InitAndSimGroundDomains();
+							SimulateGroundDomains( false );
 						}
 
 						BeginTimeStepFlag = true;
@@ -1606,6 +1606,9 @@ namespace SimulationManager {
 		using CostEstimateManager::SimCostEstimate;
 		using General::TrimSigDigits;
 		using namespace DataTimings;
+		using PlantPipingSystemsManager::SimulateGroundDomains;
+		using PlantPipingSystemsManager::CheckIfAnySlabs;
+		using PlantPipingSystemsManager::CheckIfAnyBasements;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1698,6 +1701,10 @@ namespace SimulationManager {
 			ManageHeatBalance();
 
 		} // ... End environment loop.
+
+		if ( AnySlabsInModel || AnyBasementsInModel ) {
+			SimulateGroundDomains( true );
+		}
 
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
 		if ( ErrorsFound ) ShowFatalError( "Previous Conditions cause program termination." );

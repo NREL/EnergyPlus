@@ -365,7 +365,7 @@ TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 )
 
 	EXPECT_TRUE( process_idf( idf_objects, false ) );
 
-	EXPECT_DEATH( GetGroundHeatExchangerInput(), "" );
+	EXPECT_ANY_THROW( GetGroundHeatExchangerInput() );
 
 }
 
@@ -429,6 +429,6 @@ TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_2 )
 
 	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
-	EXPECT_DEATH( GetGroundHeatExchangerInput(), "" );
+	EXPECT_ANY_THROW( GetGroundHeatExchangerInput() );
 
 }

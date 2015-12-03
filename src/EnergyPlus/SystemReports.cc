@@ -353,7 +353,7 @@ namespace SystemReports {
 		std::string CompName;
 		bool MatchFound;
 		static bool OneTimeFlag( true ); // Flag set to make sure you initialize reports one time
-		bool ConnectionFlag;
+		bool ConnectionFlag( false );
 
 		if ( ! VentReportStructureCreated ) return;
 
@@ -908,6 +908,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -926,6 +928,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -944,6 +948,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -961,6 +967,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -979,6 +987,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;
@@ -997,6 +1007,8 @@ namespace SystemReports {
 
 				if ( LoopType > 0 && LoopNum > 0 ) {
 					FindFirstLastPtr( LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag );
+				} else {
+					ConnectionFlag = false;
 				}
 
 				LastIndex = ArrayCount;

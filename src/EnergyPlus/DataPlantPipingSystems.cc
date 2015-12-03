@@ -182,6 +182,19 @@ namespace DataPlantPipingSystems {
 	Array1D< PipeCircuitInfo > PipingSystemCircuits;
 	Array1D< PipeSegmentInfo > PipingSystemSegments;
 
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
+	void
+	clear_state()
+	{
+		PipingSystemDomains.deallocate();
+		PipingSystemCircuits.deallocate();
+		PipingSystemSegments.deallocate();
+	}
+
+
 } // DataPlantPipingSystems
 
 } // EnergyPlus

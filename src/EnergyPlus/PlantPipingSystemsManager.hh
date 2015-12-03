@@ -170,7 +170,9 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	InitAndSimGroundDomains();
+	SimulateGroundDomains(
+		bool initOnly
+	);
 
 	//*********************************************************************************************!
 
@@ -1170,6 +1172,18 @@ namespace PlantPipingSystemsManager {
 		int const DomainNum,
 		CartesianCell const & cell
 	);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
+	void
+	GetGroundTempModel(
+		std::shared_ptr< BaseGroundTempsModel > &GTMPtrReference,
+		std::string objectType_str,
+		std::string objectName
+	);
+
 
 } // PlantPipingSystemsManager
 

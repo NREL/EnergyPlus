@@ -262,7 +262,7 @@ namespace EnergyPlus {
 		using DataEnvironment::TotalOverallSimDays;
 		using General::TrimSigDigits;
 		using EMSManager::ManageEMS;
-		using PlantPipingSystemsManager::InitAndSimGroundDomains;
+		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using ExteriorEnergyUse::ManageExteriorEnergyUse;
 		using DataSystemVariables::ReportDuringHVACSizingSimulation;
 		using DataErrorTracking::ExitDuringSimulations;
@@ -369,7 +369,7 @@ namespace EnergyPlus {
 
 						for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
 							if ( AnySlabsInModel || AnyBasementsInModel ) {
-								InitAndSimGroundDomains();
+								SimulateGroundDomains( false );
 							}
 
 							BeginTimeStepFlag = true;
