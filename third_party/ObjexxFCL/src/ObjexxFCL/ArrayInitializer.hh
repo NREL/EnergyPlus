@@ -48,7 +48,6 @@ private: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	ArrayInitializer() :
 	 state_( INACTIVE ),
 	 sticky_( false ),
@@ -56,7 +55,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	ArrayInitializer( ArrayInitializer const & a ) :
 	 state_( a.state_ ),
 	 sticky_( a.sticky_ ),
@@ -66,7 +64,6 @@ public: // Creation
 
 	// Copy Constructor Template
 	template< typename U, template< typename > class C >
-	inline
 	ArrayInitializer( ArrayInitializer< U, C > const & a ) :
 	 state_( a.state_ == ArrayInitializer< U, C >::FUNCTION ? INACTIVE : ( a.state_ == ArrayInitializer< U, C >::VALUE ? VALUE : INACTIVE ) ),
 	 sticky_( a.sticky_ ),
@@ -74,7 +71,6 @@ public: // Creation
 	{}
 
 	// Value Constructor
-	inline
 	explicit
 	ArrayInitializer( T const & value ) :
 	 state_( VALUE ),
@@ -83,7 +79,6 @@ public: // Creation
 	{}
 
 	// Sticky Value Constructor
-	inline
 	explicit
 	ArrayInitializer( Sticky< T > const & value ) :
 	 state_( VALUE ),
@@ -93,7 +88,6 @@ public: // Creation
 
 	// Value Constructor Template
 	template< typename U >
-	inline
 	explicit
 	ArrayInitializer( U const & value ) :
 	 state_( VALUE ),
@@ -103,7 +97,6 @@ public: // Creation
 
 	// Sticky Value Constructor Template
 	template< typename U >
-	inline
 	explicit
 	ArrayInitializer( Sticky< U > const & value ) :
 	 state_( VALUE ),
@@ -112,7 +105,6 @@ public: // Creation
 	{}
 
 	// Function Constructor
-	inline
 	explicit
 	ArrayInitializer( Function const & fxn ) :
 	 state_( fxn ? FUNCTION : INACTIVE ),
@@ -124,7 +116,6 @@ public: // Creation
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	ArrayInitializer &
 	operator =( ArrayInitializer const & a )
 	{
@@ -138,19 +129,17 @@ public: // Assignment
 	}
 
 	// Value Assignment
-	inline
 	ArrayInitializer &
 	operator =( T const & value )
 	{
 		state_ = VALUE;
-		// Don't alter stickyness
+		sticky_ = false;
 		value_ = value;
 		function_ = Function();
 		return *this;
 	}
 
 	// Sticky Value Assignment
-	inline
 	ArrayInitializer &
 	operator =( Sticky< T > const & value )
 	{
@@ -162,7 +151,6 @@ public: // Assignment
 	}
 
 	// Function Assignment
-	inline
 	ArrayInitializer &
 	operator =( Function const & fxn )
 	{
@@ -176,7 +164,6 @@ public: // Assignment
 public: // Inspector
 
 	// Active?
-	inline
 	bool
 	is_active() const
 	{
@@ -184,7 +171,6 @@ public: // Inspector
 	}
 
 	// Value?
-	inline
 	bool
 	is_value() const
 	{
@@ -192,7 +178,6 @@ public: // Inspector
 	}
 
 	// Sticky?
-	inline
 	bool
 	is_sticky() const
 	{
@@ -200,7 +185,6 @@ public: // Inspector
 	}
 
 	// Sticky?
-	inline
 	bool
 	sticky() const
 	{
@@ -208,7 +192,6 @@ public: // Inspector
 	}
 
 	// Function?
-	inline
 	bool
 	is_function() const
 	{
@@ -216,7 +199,6 @@ public: // Inspector
 	}
 
 	// Value
-	inline
 	T const &
 	value() const
 	{
@@ -225,7 +207,6 @@ public: // Inspector
 	}
 
 	// Function
-	inline
 	Function const &
 	function() const
 	{
@@ -236,7 +217,6 @@ public: // Inspector
 public: // Modifier
 
 	// Clear
-	inline
 	void
 	clear()
 	{
@@ -247,7 +227,6 @@ public: // Modifier
 	}
 
 	// Clear Non-Sticky
-	inline
 	void
 	clear_nonsticky()
 	{
@@ -259,7 +238,6 @@ public: // Modifier
 	}
 
 	// Swap
-	inline
 	void
 	swap( ArrayInitializer & o )
 	{
@@ -273,7 +251,7 @@ public: // Modifier
 private: // Data
 
 	State state_; // State
-	bool sticky_; // Sticky?
+	bool sticky_; // Sticky value?
 	T value_; // Value
 	Function function_; // Function
 

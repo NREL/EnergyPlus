@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.all.hh>
-#include <ObjexxFCL/Array.functions.hh>
 #include "ObjexxFCL.unit.hh"
 
 // C++ Headers

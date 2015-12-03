@@ -39,7 +39,6 @@ class ReadStream
 public: // Creation
 
 	// Default Constructor
-	inline
 	ReadStream() :
 	 sstream_( nullptr ),
 	 stream_( internal_stream_ ),
@@ -51,7 +50,6 @@ public: // Creation
 	{}
 
 	// Move Constructor
-	inline
 	ReadStream( ReadStream && r ) NOEXCEPT :
 	 sstream_( r.sstream_ ),
 	 stream_( r.stream_ ),
@@ -74,7 +72,6 @@ public: // Creation
 	}
 
 	// Flags Constructor
-	inline
 	explicit
 	ReadStream( IOFlags & flags ) :
 	 sstream_( nullptr ),
@@ -87,7 +84,6 @@ public: // Creation
 	{}
 
 	// Stream + Format Constructor
-	inline
 	ReadStream( std::istream & stream, std::string const & fmt, bool const beg = false ) :
 	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
 	 stream_( sstream_ ? *sstream_ : stream ),
@@ -105,7 +101,6 @@ public: // Creation
 	}
 
 	// Stream + Format Constructor
-	inline
 	ReadStream( std::istream & stream, gio::Fmt const & fmt, bool const beg = false ) :
 	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
 	 stream_( sstream_ ? *sstream_ : stream ),
@@ -123,7 +118,6 @@ public: // Creation
 	}
 
 	// Stream + Format Constructor
-	inline
 	ReadStream( std::istream & stream, gio::Fmt & fmt, bool const beg = false ) :
 	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
 	 stream_( sstream_ ? *sstream_ : stream ),
@@ -141,7 +135,6 @@ public: // Creation
 	}
 
 	// Stream + Format + Flags Constructor
-	inline
 	ReadStream( std::istream & stream, std::string const & fmt, IOFlags & flags, bool const beg = false ) :
 	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
 	 stream_( sstream_ ? *sstream_ : stream ),
@@ -163,7 +156,6 @@ public: // Creation
 	}
 
 	// Stream + Format + Flags Constructor
-	inline
 	ReadStream( std::istream & stream, gio::Fmt const & fmt, IOFlags & flags, bool const beg = false ) :
 	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
 	 stream_( sstream_ ? *sstream_ : stream ),
@@ -185,7 +177,6 @@ public: // Creation
 	}
 
 	// Stream + Format + Flags Constructor
-	inline
 	ReadStream( std::istream & stream, gio::Fmt & fmt, IOFlags & flags, bool const beg = false ) :
 	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
 	 stream_( sstream_ ? *sstream_ : stream ),
@@ -207,7 +198,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	~ReadStream()
 	{
 		if ( format_ ) {
@@ -237,7 +227,6 @@ private: // Assignment
 public: // Properties
 
 	// Stream
-	inline
 	std::istream const &
 	stream() const
 	{
@@ -245,7 +234,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::istream &
 	stream()
 	{
@@ -253,7 +241,6 @@ public: // Properties
 	}
 
 	// Format
-	inline
 	Format const *
 	format() const
 	{
@@ -261,7 +248,6 @@ public: // Properties
 	}
 
 	// Format
-	inline
 	Format *
 	format()
 	{
@@ -272,7 +258,6 @@ public: // Operators
 
 	// Stream >> T
 	template< typename T, class = typename std::enable_if< ! std::is_base_of< BArray, T >::value >::type >
-	inline
 	ReadStream &
 	operator >>( T & t )
 	{
@@ -298,7 +283,6 @@ public: // Operators
 
 	// Stream >> complex
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( std::complex< T > & t )
 	{
@@ -351,7 +335,6 @@ public: // Operators
 
 	// Stream >> Array
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array< T > & t )
 	{
@@ -367,7 +350,6 @@ public: // Operators
 
 	// Stream >> Array1S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array1S< T > & t )
 	{
@@ -383,7 +365,6 @@ public: // Operators
 
 	// Stream >> Array2S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array2S< T > & t )
 	{
@@ -401,7 +382,6 @@ public: // Operators
 
 	// Stream >> Array3S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array3S< T > & t )
 	{
@@ -421,7 +401,6 @@ public: // Operators
 
 	// Stream >> Array4S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array4S< T > & t )
 	{
@@ -443,7 +422,6 @@ public: // Operators
 
 	// Stream >> Array5S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array5S< T > & t )
 	{
@@ -467,7 +445,6 @@ public: // Operators
 
 	// Stream >> Array6S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array6S< T > & t )
 	{
@@ -493,7 +470,6 @@ public: // Operators
 
 	// Stream >> Array1S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array1S< T > && t )
 	{
@@ -509,7 +485,6 @@ public: // Operators
 
 	// Stream >> Array2S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array2S< T > && t )
 	{
@@ -527,7 +502,6 @@ public: // Operators
 
 	// Stream >> Array3S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array3S< T > && t )
 	{
@@ -547,7 +521,6 @@ public: // Operators
 
 	// Stream >> Array4S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array4S< T > && t )
 	{
@@ -569,7 +542,6 @@ public: // Operators
 
 	// Stream >> Array5S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array5S< T > && t )
 	{
@@ -593,7 +565,6 @@ public: // Operators
 
 	// Stream >> Array6S
 	template< typename T >
-	inline
 	ReadStream &
 	operator >>( Array6S< T > && t )
 	{
@@ -619,7 +590,6 @@ public: // Operators
 
 	// Stream >> MArray1
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray1< A, T > & t )
 	{
@@ -635,7 +605,6 @@ public: // Operators
 
 	// Stream >> MArray2
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray2< A, T > & t )
 	{
@@ -653,7 +622,6 @@ public: // Operators
 
 	// Stream >> MArray3
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray3< A, T > & t )
 	{
@@ -673,7 +641,6 @@ public: // Operators
 
 	// Stream >> MArray4
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray4< A, T > & t )
 	{
@@ -695,7 +662,6 @@ public: // Operators
 
 	// Stream >> MArray5
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray5< A, T > & t )
 	{
@@ -719,7 +685,6 @@ public: // Operators
 
 	// Stream >> MArray6
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray6< A, T > & t )
 	{
@@ -745,7 +710,6 @@ public: // Operators
 
 	// Stream >> MArray1
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray1< A, T > && t )
 	{
@@ -761,7 +725,6 @@ public: // Operators
 
 	// Stream >> MArray2
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray2< A, T > && t )
 	{
@@ -779,7 +742,6 @@ public: // Operators
 
 	// Stream >> MArray3
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray3< A, T > && t )
 	{
@@ -799,7 +761,6 @@ public: // Operators
 
 	// Stream >> MArray4
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray4< A, T > && t )
 	{
@@ -821,7 +782,6 @@ public: // Operators
 
 	// Stream >> MArray5
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray5< A, T > && t )
 	{
@@ -845,7 +805,6 @@ public: // Operators
 
 	// Stream >> MArray6
 	template< class A, typename T >
-	inline
 	ReadStream &
 	operator >>( MArray6< A, T > && t )
 	{
@@ -872,7 +831,6 @@ public: // Operators
 private: // Methods
 
 	// Status Flags Set
-	inline
 	void
 	set_status()
 	{
@@ -901,7 +859,6 @@ class ReadString
 public: // Creation
 
 	// Default Constructor
-	inline
 	ReadString() :
 	 format_( nullptr ),
 	 format_own_( false ),
@@ -910,7 +867,6 @@ public: // Creation
 	{}
 
 	// Move Constructor
-	inline
 	ReadString( ReadString && r ) NOEXCEPT :
 #if !defined(__GNUC__) || __GNUC__ >= 5 // GCC 5 adds move constructor
 	 stream_( std::move( r.stream_ ) ),
@@ -932,7 +888,6 @@ public: // Creation
 	}
 
 	// Flags Constructor
-	inline
 	explicit
 	ReadString( IOFlags & flags ) :
 	 format_( nullptr ),
@@ -942,7 +897,6 @@ public: // Creation
 	{}
 
 	// String + Format Constructor
-	inline
 	ReadString( std::string const & str, std::string const & fmt ) :
 	 stream_( str ),
 	 format_( FormatFactory::create( fmt ) ),
@@ -952,7 +906,6 @@ public: // Creation
 	{}
 
 	// String + Format Constructor
-	inline
 	ReadString( std::string const & str, gio::Fmt const & fmt ) :
 	 stream_( str ),
 	 format_( fmt.format_clone() ),
@@ -962,7 +915,6 @@ public: // Creation
 	{}
 
 	// String + Format Constructor
-	inline
 	ReadString( std::string const & str, gio::Fmt & fmt ) :
 	 stream_( str ),
 	 format_( fmt.format_reset() ),
@@ -972,7 +924,6 @@ public: // Creation
 	{}
 
 	// String + Format + Flags Constructor
-	inline
 	ReadString( std::string const & str, std::string const & fmt, IOFlags & flags ) :
 	 stream_( str ),
 	 format_( FormatFactory::create( fmt ) ),
@@ -984,7 +935,6 @@ public: // Creation
 	}
 
 	// String + Format + Flags Constructor
-	inline
 	ReadString( std::string const & str, gio::Fmt const & fmt, IOFlags & flags ) :
 	 stream_( str ),
 	 format_( fmt.format_clone() ),
@@ -996,7 +946,6 @@ public: // Creation
 	}
 
 	// String + Format + Flags Constructor
-	inline
 	ReadString( std::string const & str, gio::Fmt & fmt, IOFlags & flags ) :
 	 stream_( str ),
 	 format_( fmt.format_reset() ),
@@ -1008,7 +957,6 @@ public: // Creation
 	}
 
 	// C-String + Format Constructor
-	inline
 	ReadString( char const * str, std::string const & fmt ) :
 	 stream_( str ),
 	 format_( FormatFactory::create( fmt ) ),
@@ -1018,7 +966,6 @@ public: // Creation
 	{}
 
 	// C-String + Format Constructor
-	inline
 	ReadString( char const * str, gio::Fmt const & fmt ) :
 	 stream_( str ),
 	 format_( fmt.format_clone() ),
@@ -1028,7 +975,6 @@ public: // Creation
 	{}
 
 	// C-String + Format Constructor
-	inline
 	ReadString( char const * str, gio::Fmt & fmt ) :
 	 stream_( str ),
 	 format_( fmt.format_reset() ),
@@ -1038,7 +984,6 @@ public: // Creation
 	{}
 
 	// C-String + Format + Flags Constructor
-	inline
 	ReadString( char const * str, std::string const & fmt, IOFlags & flags ) :
 	 stream_( str ),
 	 format_( FormatFactory::create( fmt ) ),
@@ -1050,7 +995,6 @@ public: // Creation
 	}
 
 	// C-String + Format + Flags Constructor
-	inline
 	ReadString( char const * str, gio::Fmt const & fmt, IOFlags & flags ) :
 	 stream_( str ),
 	 format_( fmt.format_clone() ),
@@ -1062,7 +1006,6 @@ public: // Creation
 	}
 
 	// C-String + Format + Flags Constructor
-	inline
 	ReadString( char const * str, gio::Fmt & fmt, IOFlags & flags ) :
 	 stream_( str ),
 	 format_( fmt.format_reset() ),
@@ -1074,7 +1017,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	~ReadString()
 	{
 		if ( format_ && format_own_ ) delete format_;
@@ -1094,7 +1036,6 @@ private: // Assignment
 public: // Properties
 
 	// Stream
-	inline
 	std::istream const &
 	stream() const
 	{
@@ -1102,7 +1043,6 @@ public: // Properties
 	}
 
 	// Stream
-	inline
 	std::istream &
 	stream()
 	{
@@ -1110,7 +1050,6 @@ public: // Properties
 	}
 
 	// Format
-	inline
 	Format const *
 	format() const
 	{
@@ -1118,7 +1057,6 @@ public: // Properties
 	}
 
 	// Format
-	inline
 	Format *
 	format()
 	{
@@ -1129,7 +1067,6 @@ public: // Operators
 
 	// Stream >> T
 	template< typename T, class = typename std::enable_if< ! std::is_base_of< BArray, T >::value >::type >
-	inline
 	ReadString &
 	operator >>( T & t )
 	{
@@ -1155,7 +1092,6 @@ public: // Operators
 
 	// Stream >> complex
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( std::complex< T > & t )
 	{
@@ -1208,7 +1144,6 @@ public: // Operators
 
 	// Stream >> Array
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array< T > & t )
 	{
@@ -1224,7 +1159,6 @@ public: // Operators
 
 	// Stream >> Array1S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array1S< T > & t )
 	{
@@ -1240,7 +1174,6 @@ public: // Operators
 
 	// Stream >> Array2S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array2S< T > & t )
 	{
@@ -1258,7 +1191,6 @@ public: // Operators
 
 	// Stream >> Array3S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array3S< T > & t )
 	{
@@ -1278,7 +1210,6 @@ public: // Operators
 
 	// Stream >> Array4S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array4S< T > & t )
 	{
@@ -1300,7 +1231,6 @@ public: // Operators
 
 	// Stream >> Array5S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array5S< T > & t )
 	{
@@ -1324,7 +1254,6 @@ public: // Operators
 
 	// Stream >> Array6S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array6S< T > & t )
 	{
@@ -1350,7 +1279,6 @@ public: // Operators
 
 	// Stream >> Array1S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array1S< T > && t )
 	{
@@ -1366,7 +1294,6 @@ public: // Operators
 
 	// Stream >> Array2S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array2S< T > && t )
 	{
@@ -1384,7 +1311,6 @@ public: // Operators
 
 	// Stream >> Array3S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array3S< T > && t )
 	{
@@ -1404,7 +1330,6 @@ public: // Operators
 
 	// Stream >> Array4S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array4S< T > && t )
 	{
@@ -1426,7 +1351,6 @@ public: // Operators
 
 	// Stream >> Array5S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array5S< T > && t )
 	{
@@ -1450,7 +1374,6 @@ public: // Operators
 
 	// Stream >> Array6S
 	template< typename T >
-	inline
 	ReadString &
 	operator >>( Array6S< T > && t )
 	{
@@ -1476,7 +1399,6 @@ public: // Operators
 
 	// Stream >> MArray1
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray1< A, T > & t )
 	{
@@ -1492,7 +1414,6 @@ public: // Operators
 
 	// Stream >> MArray2
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray2< A, T > & t )
 	{
@@ -1510,7 +1431,6 @@ public: // Operators
 
 	// Stream >> MArray3
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray3< A, T > & t )
 	{
@@ -1530,7 +1450,6 @@ public: // Operators
 
 	// Stream >> MArray4
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray4< A, T > & t )
 	{
@@ -1552,7 +1471,6 @@ public: // Operators
 
 	// Stream >> MArray5
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray5< A, T > & t )
 	{
@@ -1576,7 +1494,6 @@ public: // Operators
 
 	// Stream >> MArray6
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray6< A, T > & t )
 	{
@@ -1602,7 +1519,6 @@ public: // Operators
 
 	// Stream >> MArray1
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray1< A, T > && t )
 	{
@@ -1618,7 +1534,6 @@ public: // Operators
 
 	// Stream >> MArray2
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray2< A, T > && t )
 	{
@@ -1636,7 +1551,6 @@ public: // Operators
 
 	// Stream >> MArray3
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray3< A, T > && t )
 	{
@@ -1656,7 +1570,6 @@ public: // Operators
 
 	// Stream >> MArray4
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray4< A, T > && t )
 	{
@@ -1678,7 +1591,6 @@ public: // Operators
 
 	// Stream >> MArray5
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray5< A, T > && t )
 	{
@@ -1702,7 +1614,6 @@ public: // Operators
 
 	// Stream >> MArray6
 	template< class A, typename T >
-	inline
 	ReadString &
 	operator >>( MArray6< A, T > && t )
 	{
@@ -1729,7 +1640,6 @@ public: // Operators
 private: // Methods
 
 	// Status Flags Set
-	inline
 	void
 	set_status()
 	{
