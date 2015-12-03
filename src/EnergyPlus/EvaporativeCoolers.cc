@@ -12,8 +12,8 @@
 // such, the U.S. Government has been granted for itself and others acting on
 // its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
 // Software to reproduce, distribute copies to the public, prepare derivative
-// works, and perform publicly and display publicly, and to permit other to do
-// so.
+// works, and perform publicly and display publicly, and to permit others to
+// do so.
 //
 // Redistribution and use in source and binary forms, with or without 
 // modification, are permitted provided that the following conditions are met:
