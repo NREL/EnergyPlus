@@ -1142,9 +1142,11 @@ namespace RuntimeLanguageProcessor {
 		} else if ( String[ 0 ] == '+' ) {
 			String = "0" + String;
 		}
-		std::string::size_type const LastPos( String.length() );
+		std::string::size_type LastPos( String.length() );
 		Pos = 0;
-		while ( Pos < LastPos ) {
+		OperatorProcessing = false; // true when an operator is found until terminated by non-operator
+		MinusFound = false;
+		while( Pos < LastPos ) {
 			++CountDoLooping;
 			if ( CountDoLooping > MaxDoLoopCounts ) {
 				ShowSevereError( "EMS ParseExpression: Entity=" + ErlStack( StackNum ).Name );
@@ -1164,16 +1166,16 @@ namespace RuntimeLanguageProcessor {
 			// Get the next token
 			StringToken = "";
 			PeriodFound = false;
-			MinusFound = false;
 			PlusFound = false;
-			OperatorProcessing = false; // true when an operator is found until terminated by non-operator
 			ErrorFlag = false;
 			LastED = false;
 			if ( is_any_of( NextChar, "0123456789." ) ) {
 				// Parse a number literal token
 				++Pos;
 				StringToken += NextChar;
-				if ( NextChar == '.' ) PeriodFound = true;
+				OperatorProcessing = false;
+
+				if( NextChar == '.' ) PeriodFound = true;
 
 				while ( Pos < LastPos ) {
 					NextChar = String[ Pos ];
@@ -1216,6 +1218,9 @@ namespace RuntimeLanguageProcessor {
 							++Pos;
 							LastED = false;
 						} else {
+//							if ( is_any_of( NextChar, "-" ) ) {
+//								MinusFound = true;
+//							}
 							break;
 						}
 					} else if ( is_any_of( NextChar, " +-*/^=<>)" ) ) { // Any binary operator is okay
@@ -1234,7 +1239,10 @@ namespace RuntimeLanguageProcessor {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "Number=\"" + StringToken + "\"";
 					Token( NumTokens ).Number = ProcessNumber( StringToken, ErrorFlag );
 					if ( DeveloperFlag && ErrorFlag ) gio::write( OutputFileDebug, fmtA ) << "Numeric error flagged";
-					if ( MinusFound ) Token( NumTokens ).Number = -Token( NumTokens ).Number;
+					if ( MinusFound ) {
+						Token( NumTokens ).Number = -Token( NumTokens ).Number;
+						MinusFound = false;
+					}
 					if ( ErrorFlag ) {
 						// Error: something wrong with this number!
 						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
@@ -1272,9 +1280,15 @@ namespace RuntimeLanguageProcessor {
 
 			} else if ( is_any_of( NextChar, "+-*/^=<>@|&" ) ) {
 				// Parse an operator token
-				StringToken = NextChar;
-
-				Token( NumTokens ).Type = TokenOperator;
+				if( OperatorProcessing && ( NextChar == '-' ) ) {
+					OperatorProcessing = false;
+					String.insert( Pos, "0" );
+					++LastPos;
+					StringToken = "0";
+				} else {
+					StringToken = NextChar;
+					Token( NumTokens ).Type = TokenOperator;
+				}
 
 				// First check for two character operators:  == <> <= >=
 				std::string const cc( String.substr( Pos, 2 ) );
@@ -1282,31 +1296,37 @@ namespace RuntimeLanguageProcessor {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "<>" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorNotEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "<=" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLessOrEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == ">=" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorGreaterOrEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "||" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatiorLogicalOR;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "&&" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLogicalAND;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 					// next check for builtin functions signaled by "@"
 				} else if ( String[ Pos ] == '@' ) {
@@ -1616,6 +1636,10 @@ namespace RuntimeLanguageProcessor {
 					} else if ( StringToken == "^" ) {
 						Token( NumTokens ).Operator = OperatorRaiseToPower;
 						OperatorProcessing = true;
+					} else if( StringToken == "0" && ( NextChar == '-' ) ) {
+						// process string insert = "0"
+						Token( NumTokens ).Type = TokenNumber;
+						Token( NumTokens ).String = StringToken;
 					} else {
 						// Uh OH, this should never happen! throw error
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR \"" + StringToken + "\"";
@@ -1633,7 +1657,10 @@ namespace RuntimeLanguageProcessor {
 				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "PAREN \"" + StringToken + "\"";
 				Token( NumTokens ).Type = TokenParenthesis;
 				Token( NumTokens ).String = StringToken;
-				if ( NextChar == '(' ) Token( NumTokens ).Parenthesis = ParenthesisLeft;
+				if ( NextChar == '(' ) {
+					Token( NumTokens ).Parenthesis = ParenthesisLeft;
+					OperatorProcessing = true;
+				}
 				if ( NextChar == ')' ) Token( NumTokens ).Parenthesis = ParenthesisRight;
 
 			} else if ( is_any_of( NextChar, "\"" ) ) {
