@@ -5,12 +5,12 @@
 #include <BaseboardRadiator.hh>
 #include <Boilers.hh>
 #include <BoilerSteam.hh>
-#include <ChillerAbsorption.hh>
-#include <ChillerElectricEIR.hh>
-#include <ChillerExhaustAbsorption.hh>
-#include <ChillerGasAbsorption.hh>
-#include <ChillerIndirectAbsorption.hh>
-#include <ChillerReformulatedEIR.hh>
+#include <PlantChillers/ChillerAbsorption.hh>
+#include <PlantChillers/ChillerElectricEIR.hh>
+#include <PlantChillers/ChillerExhaustAbsorption.hh>
+#include <PlantChillers/ChillerGasAbsorption.hh>
+#include <PlantChillers/ChillerIndirectAbsorption.hh>
+#include <PlantChillers/ChillerReformulatedEIR.hh>
 #include <CondenserLoopTowers.hh>
 #include <CTElectricGenerator.hh>
 #include <DataGlobals.hh>
@@ -32,10 +32,8 @@
 #include <MicroturbineElectricGenerator.hh>
 #include <OutsideEnergySources.hh>
 #include <PhotovoltaicThermalCollectors.hh>
-#include <PipeHeatTransfer.hh>
-#include <Pipes.hh>
 #include <PlantCentralGSHP.hh>
-#include <PlantChillers.hh>
+#include <PlantChillers/PlantChillers.hh>
 #include <PlantComponentTemperatureSources.hh>
 #include <PlantHeatExchangerFluidToFluid.hh>
 #include <PlantLoadProfile.hh>
@@ -68,24 +66,10 @@ namespace PlantLoopEquip {
 	// This module contains subroutine that calls the required component for simulation. The components are selected
 	// using a CASE statement.
 
-	// METHODOLOGY EMPLOYED:
-	// Needs description, as appropriate.
-
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataPlant;
 	using DataLoopNode::Node;
-
-	// Data
-	// SUBROUTINE SPECIFICATION
-
-	// MODULE SUBROUTINES
-
-	// Functions
 
 	void
 	SimPlantEquip(
@@ -141,9 +125,6 @@ namespace PlantLoopEquip {
 		// as a time reduction measure.  Specific ifs are set to catch those modules that don't.
 		// If you add a module or new equipment type, you must set up this structure.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using Boilers::SimBoiler;
@@ -159,8 +140,6 @@ namespace PlantLoopEquip {
 		using HeatPumpWaterToWaterCOOLING::SimHPWatertoWaterCOOLING;
 		using HeatPumpWaterToWaterSimple::SimHPWatertoWaterSimple;
 		using OutsideEnergySources::SimOutsideEnergy;
-		using Pipes::SimPipes;
-		using PipeHeatTransfer::SimPipesHeatTransfer;
 		using Pumps::SimPumps;
 
 		using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
@@ -195,24 +174,10 @@ namespace PlantLoopEquip {
 		using PlantComponentTemperatureSources::SimWaterSource;
 		using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EquipNum; // Plant side component list equipment number
 		int EquipTypeNum;
 		bool RunFlag; // TRUE if operating this iteration
-		// std::string EquipType; // local equipment type
-		// std::string EquipName; // local equipment name
 		int EquipFlowCtrl;
 		Real64 CurLoad;
 		Real64 MaxLoad;
@@ -227,43 +192,28 @@ namespace PlantLoopEquip {
 		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
 
 		GeneralEquipType = sim_component.GeneralEquipType;
-		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
-// no, no, can't do this, because all the plant components need to run their init and size routines, not just chillers, boilers and cooling towers.  Other things happen besides sizing fac.
-
-//		if ( GetCompSizFac && ( GeneralEquipType != GenEquipTypes_Chiller && GeneralEquipType != GenEquipTypes_Boiler ) && GeneralEquipType != GenEquipTypes_CoolingTower ) {
-//			sim_component.SizFac = 0.0;
-//			return;
-//		}
 
 		//set local variables
-		// EquipType = sim_component.TypeOf;
 		EquipTypeNum = sim_component.TypeOf_Num;
 		EquipFlowCtrl = sim_component.FlowCtrl;
 		GeneralEquipType = sim_component.GeneralEquipType;
-		// EquipName = sim_component.Name;
 		EquipNum = sim_component.CompNum;
 		RunFlag = sim_component.ON;
 		CurLoad = sim_component.MyLoad;
 
 		//select equipment and call equiment simulation
 		//PIPES
-		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				SimPipes( TypeOf_Pipe, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
-
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				SimPipes( TypeOf_PipeSteam, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
-
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeExterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
-
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeInterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
-
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				SimPipesHeatTransfer( TypeOf_PipeUnderground, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
-
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
@@ -302,7 +252,7 @@ namespace PlantLoopEquip {
 
 			//CHILLERS
 		} else if ( GeneralEquipType == GenEquipTypes_Chiller ) {
-			if ( ( EquipTypeNum == TypeOf_Chiller_EngineDriven ) || ( EquipTypeNum == TypeOf_Chiller_Electric ) || ( EquipTypeNum == TypeOf_Chiller_ConstCOP ) || ( EquipTypeNum == TypeOf_Chiller_CombTurbine ) ) {
+			if ( ( EquipTypeNum == TypeOf_Chiller_EngineDriven ) || ( EquipTypeNum == TypeOf_Chiller_Electric ) || ( EquipTypeNum == TypeOf_Chiller_CombTurbine ) ) {
 				SimChiller( LoopNum, LoopSideNum, EquipTypeNum, sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
@@ -315,6 +265,9 @@ namespace PlantLoopEquip {
 				if ( GetCompSizFac ) {
 					sim_component.SizFac = SizingFac;
 				}
+
+			} else if ( EquipTypeNum == TypeOf_Chiller_ConstCOP ) {
+				simulateSingleComponent( sim_component, FirstHVACIteration, InitLoopEquip );
 
 			} else if ( EquipTypeNum == TypeOf_Chiller_Absorption ) {
 				SimBLASTAbsorber( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
@@ -406,7 +359,7 @@ namespace PlantLoopEquip {
 				ShowFatalError( "Preceding condition causes termination." );
 			}
 
-			if ( InitLoopEquip && EquipNum == 0 ) {
+			if ( InitLoopEquip && EquipNum == 0 && (EquipTypeNum != TypeOf_Chiller_ConstCOP) ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Chiller=" + sim_component.TypeOf );
 				ShowContinueError( "..Chiller Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
 				ShowFatalError( "Previous condition causes termination." );
@@ -1131,6 +1084,29 @@ namespace PlantLoopEquip {
 			ShowFatalError( "Preceding condition causes termination." );
 		} // TypeOfEquip
 
+	}
+
+	void
+	simulateSingleComponent( DataPlant::CompData & sim_component, bool const & firstHVACiteration, bool const & initLoopEquip ) {
+		if ( sim_component.oneTimeInit ) {
+			sim_component.compPtr->performOneTimeInit( sim_component.thisCompLocation );
+			sim_component.oneTimeInit = false;
+		}
+		if ( DataGlobals::BeginEnvrnFlag && sim_component.myEnvrnFlag ) {
+			sim_component.compPtr->performBeginEnvrnInit( sim_component.thisCompLocation );
+			sim_component.myEnvrnFlag = false;
+		}
+		if ( !DataGlobals::BeginEnvrnFlag ) {
+			sim_component.myEnvrnFlag = true;
+		}
+		if ( initLoopEquip ) {
+			sim_component.compPtr->performInitLoopEquip( sim_component.thisCompLocation );
+		}
+		if ( firstHVACiteration ) {
+			sim_component.compPtr->performFirstHVACInit( sim_component.thisCompLocation );
+		}
+		sim_component.compPtr->performEveryTimeInit( sim_component.thisCompLocation );
+		sim_component.compPtr->simulate( sim_component.thisCompLocation, firstHVACiteration );
 	}
 
 	//     NOTICE

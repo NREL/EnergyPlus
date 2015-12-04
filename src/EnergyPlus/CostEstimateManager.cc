@@ -16,7 +16,7 @@
 #include <DXCoils.hh>
 #include <HeatingCoils.hh>
 #include <InputProcessor.hh>
-#include <PlantChillers.hh>
+#include <PlantChillers/PlantChillers.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {

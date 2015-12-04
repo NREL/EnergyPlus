@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/PlantChillers/ChillerElectricEIR.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 
 using namespace EnergyPlus;

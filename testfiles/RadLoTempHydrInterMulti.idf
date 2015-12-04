@@ -2311,3 +2311,16 @@
     For: Alldays,            !- Field 2
     Until: 24:00,24.00;      !- Field 3
 
+Output:Variable,*,Chiller Electric Power,timestep; ! [W]
+Output:Variable,*,Chiller Electric Energy,timestep; ! [J]
+Output:Variable,*,Chiller Evaporator Cooling Rate,timestep; ! [W]
+Output:Variable,*,Chiller Evaporator Cooling Energy,timestep; ! [J]
+Output:Variable,*,Chiller Evaporator Inlet Temperature,timestep; ! [C]
+Output:Variable,*,Chiller Evaporator Outlet Temperature,timestep; ! [C]
+Output:Variable,*,Chiller Evaporator Mass Flow Rate,timestep; ! [kg/s]
+Output:Variable,*,Chiller COP,timestep; ! [W/W]
+Output:Variable,*,Chiller Condenser Heat Transfer Rate,timestep; ! [W]
+Output:Variable,*,Chiller Condenser Heat Transfer Energy,timestep; ! [J]
+Output:Variable,*,Chiller Condenser Inlet Temperature,timestep; ! [C]
+Output:Variable,*,Chiller Condenser Outlet Temperature,timestep; ! [C]
+Output:Variable,*,Chiller Condenser Mass Flow Rate,timestep; ! [kg/s]

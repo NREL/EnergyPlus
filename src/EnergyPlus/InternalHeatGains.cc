@@ -34,7 +34,6 @@
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
-#include <PipeHeatTransfer.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
 #include <ScheduleManager.hh>
@@ -3215,7 +3214,6 @@ namespace InternalHeatGains {
 		using DataRoomAirModel::TCMF;
 		using DataRoomAirModel::IsZoneUI;
 		using WaterThermalTanks::CalcWaterThermalTankZoneGains;
-		using PipeHeatTransfer::CalcZonePipesHeatGain;
 		using WaterUse::CalcWaterUseZoneGains;
 		using FuelCellElectricGenerator::FigureFuelCellZoneGains;
 		using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
@@ -3572,7 +3570,7 @@ namespace InternalHeatGains {
 		if ( NumZoneITEqStatements > 0 ) CalcZoneITEq();
 
 		CalcWaterThermalTankZoneGains();
-		CalcZonePipesHeatGain();
+		//CalcZonePipesHeatGain();
 		CalcWaterUseZoneGains();
 		FigureFuelCellZoneGains();
 		FigureMicroCHPZoneGains();

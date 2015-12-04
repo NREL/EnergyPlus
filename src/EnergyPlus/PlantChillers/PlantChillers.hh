@@ -415,17 +415,6 @@ namespace PlantChillers {
 		{}
 	};
 
-	struct ConstCOPChillerSpecs
-	{
-		// Members
-		BaseChillerSpecs Base;
-
-		// Default Constructor
-		ConstCOPChillerSpecs()
-		{}
-
-	};
-
 	struct BaseReportVars
 	{
 		// Members
@@ -562,18 +551,6 @@ namespace PlantChillers {
 		{}
 	};
 
-	struct ConstCOPReportVars
-	{
-		// Members
-		BaseReportVars Base;
-		Real64 ActualCOP;
-
-		// Default Constructor
-		ConstCOPReportVars() :
-			ActualCOP( 0.0 )
-		{}
-	};
-
 	// Object Data
 	extern Array1D< ElectricChillerSpecs > ElectricChiller; // dimension to number of machines
 	extern Array1D< ElectricReportVars > ElectricChillerReport;
@@ -581,8 +558,6 @@ namespace PlantChillers {
 	extern Array1D< EngineDrivenReportVars > EngineDrivenChillerReport;
 	extern Array1D< GTChillerSpecs > GTChiller; // dimension to number of machines
 	extern Array1D< GasTurbineReportVars > GTChillerReport;
-	extern Array1D< ConstCOPChillerSpecs > ConstCOPChiller; // dimension to number of machines
-	extern Array1D< ConstCOPReportVars > ConstCOPChillerReport;
 
 	// Functions
 
@@ -617,9 +592,6 @@ namespace PlantChillers {
 	GetGTChillerInput();
 
 	void
-	GetConstCOPChillerInput();
-
-	void
 	InitElectricChiller(
 		int const ChillNum, // number of the current electric chiller being simulated
 		bool const RunFlag, // TRUE when chiller operating
@@ -641,13 +613,6 @@ namespace PlantChillers {
 	);
 
 	void
-	InitConstCOPChiller(
-		int const ChillNum, // number of the current electric chiller being simulated
-		bool const RunFlag, // TRUE when chiller operating
-		Real64 const MyLoad
-	);
-
-	void
 	SizeElectricChiller( int const ChillNum );
 
 	void
@@ -655,9 +620,6 @@ namespace PlantChillers {
 
 	void
 	SizeGTChiller( int const ChillNum );
-
-	void
-	SizeConstCOPChiller( int const ChillNum );
 
 	void
 	CalcElectricChillerModel(
@@ -684,14 +646,6 @@ namespace PlantChillers {
 	);
 
 	void
-	CalcConstCOPChillerModel(
-		int const ChillNum,
-		Real64 & MyLoad,
-		bool const RunFlag,
-		int const EquipFlowCtrl // Flow control mode for the equipment
-	);
-
-	void
 	CalcElectricChillerHeatRecovery(
 		int const ChillNum, // number of the current electric chiller being simulated
 		Real64 & QCond, // current condenser load
@@ -714,12 +668,6 @@ namespace PlantChillers {
 		int const Num // chiller number
 	);
 
-	// End of EngineDriven Chiller Module Utility Subroutines
-	// *****************************************************************************
-
-	// Beginning of Record Keeping subroutines for the EngineDriven Chiller Module
-	// *****************************************************************************
-
 	void
 	UpdateEngineDrivenChiller(
 		Real64 const MyLoad, // current load
@@ -733,16 +681,6 @@ namespace PlantChillers {
 		bool const RunFlag, // TRUE if chiller operating
 		int const Num // chiller number
 	);
-
-	void
-	UpdateConstCOPChillerRecords(
-		Real64 const MyLoad, // unused1208
-		bool const RunFlag, // unused1208
-		int const Num
-	);
-
-	// End of Record Keeping subroutines for the Const COP Chiller Module
-	// *****************************************************************************
 
 } // PlantChillers
 

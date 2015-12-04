@@ -3,15 +3,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <DataPlant.hh>
 
 namespace EnergyPlus {
 
 namespace PlantLoopEquip {
-
-	// Data
-	// SUBROUTINE SPECIFICATION
-
-	// Functions
 
 	void
 	SimPlantEquip(
@@ -23,6 +19,9 @@ namespace PlantLoopEquip {
 		bool & InitLoopEquip,
 		bool const GetCompSizFac // Tells component routine to return the component sizing fraction
 	);
+
+	void
+	simulateSingleComponent( EnergyPlus::DataPlant::CompData & sim_component, bool const & FirstHVACIteration, bool const & initLoopEquip );
 
 	//     NOTICE
 

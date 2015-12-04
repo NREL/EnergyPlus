@@ -21,17 +21,16 @@ struct PlantLocation
 
 	// Member Constructor
 	PlantLocation(
-		int const loopNum,
-		int const loopSideNum,
-		int const branchNum,
-		int const compNum
+		int iloopNum,
+		int iloopSideNum,
+		int ibranchNum,
+		int icompNum
 	) :
-		loopNum( loopNum ),
-		loopSideNum( loopSideNum ),
-		branchNum( branchNum ),
-		compNum( compNum )
+		loopNum( iloopNum ),
+		loopSideNum( iloopSideNum ),
+		branchNum( ibranchNum ),
+		compNum( icompNum )
 	{}
-
 };
 
 }

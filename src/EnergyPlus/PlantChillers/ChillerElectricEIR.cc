@@ -10,7 +10,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <ChillerElectricEIR.hh>
+#include <PlantChillers/ChillerElectricEIR.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DataBranchAirLoopPlant.hh>

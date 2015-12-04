@@ -7,7 +7,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <ChillerIndirectAbsorption.hh>
+#include <PlantChillers/ChillerIndirectAbsorption.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DataBranchAirLoopPlant.hh>

@@ -1,6 +1,9 @@
 #ifndef DataPlant_hh_INCLUDED
 #define DataPlant_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -10,6 +13,8 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
+#include <PlantComponent.hh>
+#include <PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -640,6 +645,10 @@ namespace DataPlant {
 		int IndexInLoopSidePumps; // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
 		Real64 TempDesCondIn;
 		Real64 TempDesEvapOut;
+		std::shared_ptr< PlantComponent > compPtr;
+		PlantLocation thisCompLocation; // stored here at the comp level for convenience later
+		bool myEnvrnFlag;
+		bool oneTimeInit;
 
 		// Default Constructor
 		CompData() :
@@ -672,82 +681,11 @@ namespace DataPlant {
 			FreeCoolCntrlNodeNum( 0 ),
 			IndexInLoopSidePumps( 0 ),
 			TempDesCondIn( 0.0 ),
-			TempDesEvapOut( 0.0 )
-		{}
-
-		// Member Constructor
-		CompData(
-			std::string const & TypeOf, // The 'keyWord' identifying  component type
-			int const TypeOf_Num, // Reference the "TypeOf" parameters in DataPlant
-			int const GeneralEquipType, // General Equipment Type (e.g. Chillers, Pumps, etc)
-			std::string const & Name, // Component name
-			int const CompNum, // Component ID number
-			int const FlowCtrl, // flow control for splitter/mixer (ACTIVE/PASSIVE/BYPASS)
-			int const FlowPriority, // status for overall loop flow determination
-			bool const ON, // TRUE = designated component or operation scheme available
-			bool const Available, // TRUE = designated component or operation scheme available
-			std::string const & NodeNameIn, // Component inlet node name
-			std::string const & NodeNameOut, // Component outlet node name
-			int const NodeNumIn, // Component inlet node number
-			int const NodeNumOut, // Component outlet node number
-			Real64 const MyLoad, // Distributed Load
-			Real64 const MaxLoad, // Maximum load
-			Real64 const MinLoad, // Minimum Load
-			Real64 const OptLoad, // Optimal Load
-			Real64 const SizFac, // Sizing Fraction
-			int const CurOpSchemeType, // updated pointer to
-			int const NumOpSchemes, // number of schemes held in the pointer array
-			int const CurCompLevelOpNum, // pointer to the OpScheme array defined next
-			Array1< OpSchemePtrData > const & OpScheme, // Pointers to component on lists
-			Real64 const EquipDemand, // Component load request based on inlet temp and outlet SP
-			bool const EMSLoadOverrideOn, // EMS is calling to override load dispatched to component
-			Real64 const EMSLoadOverrideValue, // EMS value to use for load when overridden [W] always positive.
-			int const HowLoadServed, // nature of component in terms of how it can meet load
-			Real64 const MinOutletTemp, // Component exit lower limit temperature
-			Real64 const MaxOutletTemp, // Component exit upper limit temperature
-			bool const FreeCoolCntrlShutDown, // true if component was shut down because of free cooling
-			Real64 const FreeCoolCntrlMinCntrlTemp, // current control temp value for free cooling controls
-			int const FreeCoolCntrlMode, // type of sensor used for free cooling controls
-			int const FreeCoolCntrlNodeNum, // chiller condenser inlet node number for free cooling controls
-			int const IndexInLoopSidePumps, // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
-			Real64 const TempDesCondIn,
-			Real64 const TempDesEvapOut
-		) :
-			TypeOf( TypeOf ),
-			TypeOf_Num( TypeOf_Num ),
-			GeneralEquipType( GeneralEquipType ),
-			Name( Name ),
-			CompNum( CompNum ),
-			FlowCtrl( FlowCtrl ),
-			FlowPriority( FlowPriority ),
-			ON( ON ),
-			Available( Available ),
-			NodeNameIn( NodeNameIn ),
-			NodeNameOut( NodeNameOut ),
-			NodeNumIn( NodeNumIn ),
-			NodeNumOut( NodeNumOut ),
-			MyLoad( MyLoad ),
-			MaxLoad( MaxLoad ),
-			MinLoad( MinLoad ),
-			OptLoad( OptLoad ),
-			SizFac( SizFac ),
-			CurOpSchemeType( CurOpSchemeType ),
-			NumOpSchemes( NumOpSchemes ),
-			CurCompLevelOpNum( CurCompLevelOpNum ),
-			OpScheme( OpScheme ),
-			EquipDemand( EquipDemand ),
-			EMSLoadOverrideOn( EMSLoadOverrideOn ),
-			EMSLoadOverrideValue( EMSLoadOverrideValue ),
-			HowLoadServed( HowLoadServed ),
-			MinOutletTemp( MinOutletTemp ),
-			MaxOutletTemp( MaxOutletTemp ),
-			FreeCoolCntrlShutDown( FreeCoolCntrlShutDown ),
-			FreeCoolCntrlMinCntrlTemp( FreeCoolCntrlMinCntrlTemp ),
-			FreeCoolCntrlMode( FreeCoolCntrlMode ),
-			FreeCoolCntrlNodeNum( FreeCoolCntrlNodeNum ),
-			IndexInLoopSidePumps( IndexInLoopSidePumps ),
-			TempDesCondIn( TempDesCondIn ),
-			TempDesEvapOut( TempDesEvapOut )
+			TempDesEvapOut( 0.0 ),
+			compPtr( nullptr ),
+			thisCompLocation( PlantLocation( 0, 0, 0, 0 ) ),
+			myEnvrnFlag( true ),
+			oneTimeInit( true )
 		{}
 
 	};
@@ -806,59 +744,6 @@ namespace DataPlant {
 			PressureEffectiveK( 0.0 )
 		{}
 
-		// Member Constructor
-		BranchData(
-			std::string const & Name, // Name of the branch
-			int const ControlType,
-			Real64 const MinVolFlowRate,
-			Real64 const MaxVolFlowRate,
-			Real64 const RequestedMassFlow,
-			bool const HasConstantSpeedBranchPump, // true if branch has a constant speed branch pump
-			Real64 const ConstantSpeedBranchMassFlow, // nominal flow rate if constant speed branch pump on
-			int const BranchLevel,
-			int const FlowErrCount, // For recurring error counting
-			int const FlowErrIndex, // For recurring error index
-			int const TotalComponents, // Total number of components on the branch
-			int const NodeNumIn, // Component inlet node number
-			int const NodeNumOut, // Component outlet node number
-			bool const IsBypass,
-			int const PumpIndex,
-			Real64 const PumpSizFac,
-			bool const EMSCtrlOverrideOn, // if true, EMS is calling to override branch operation avail
-			Real64 const EMSCtrlOverrideValue, // value set by EMS system for branch override controls
-			Array1< CompData > const & Comp, // Component type list
-			bool const HasPressureComponents,
-			Real64 const PressureDrop,
-			int const PressureCurveType, // Either none, pressure curve, or generic curve
-			int const PressureCurveIndex, // Curve: index for pressure drop calculations
-			Real64 const PressureEffectiveK
-		) :
-			Name( Name ),
-			ControlType( ControlType ),
-			MinVolFlowRate( MinVolFlowRate ),
-			MaxVolFlowRate( MaxVolFlowRate ),
-			RequestedMassFlow( RequestedMassFlow ),
-			HasConstantSpeedBranchPump( HasConstantSpeedBranchPump ),
-			ConstantSpeedBranchMassFlow( ConstantSpeedBranchMassFlow ),
-			BranchLevel( BranchLevel ),
-			FlowErrCount( FlowErrCount ),
-			FlowErrIndex( FlowErrIndex ),
-			TotalComponents( TotalComponents ),
-			NodeNumIn( NodeNumIn ),
-			NodeNumOut( NodeNumOut ),
-			IsBypass( IsBypass ),
-			PumpIndex( PumpIndex ),
-			PumpSizFac( PumpSizFac ),
-			EMSCtrlOverrideOn( EMSCtrlOverrideOn ),
-			EMSCtrlOverrideValue( EMSCtrlOverrideValue ),
-			Comp( Comp ),
-			HasPressureComponents( HasPressureComponents ),
-			PressureDrop( PressureDrop ),
-			PressureCurveType( PressureCurveType ),
-			PressureCurveIndex( PressureCurveIndex ),
-			PressureEffectiveK( PressureEffectiveK )
-		{}
-
 		// Max abs of Comp array MyLoad values //Autodesk:Tuned For replacement of any( abs( Comp.MyLoad() > SmallLoad ) usage
 		Real64
 		max_abs_Comp_MyLoad() const
@@ -900,43 +785,6 @@ namespace DataPlant {
 			EMSActuatorDispatchedLoadValue( 0.0 )
 		{}
 
-		// Member Constructor
-		EquipListCompData(
-			std::string const & Name, // The name of each item in the list
-			std::string const & TypeOf, // The name of each item in the list
-			int const TypeOf_Num,
-			std::string const & CtrlType, // CoolingOp, HeatingOp, DualOp
-			int const CtrlTypeNum, // CoolingOp, HeatingOp, DualOp
-			int const LoopNumPtr, // pointer to the comp location in the data structure
-			int const LoopSideNumPtr, // pointer to the comp location in the data structure
-			int const BranchNumPtr, // pointer to the comp location in the data structure
-			int const CompNumPtr, // pointer to the comp location in the data structure
-			Real64 const SetPointFlowRate, // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
-			std::string const & DemandNodeName, // COMP SETPOINT CTRL ONLY--The name of each item in the list
-			int const DemandNodeNum, // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
-			std::string const & SetPointNodeName, // COMP SETPOINT CTRL ONLY--The name of each item in the list
-			int const SetPointNodeNum, // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
-			Real64 const EMSIntVarRemainingLoadValue, // EMS internal variable remaining load, neg cooling [W]
-			Real64 const EMSActuatorDispatchedLoadValue // EMS actuator for dispatched load, neg= cooling [W]
-		) :
-			Name( Name ),
-			TypeOf( TypeOf ),
-			TypeOf_Num( TypeOf_Num ),
-			CtrlType( CtrlType ),
-			CtrlTypeNum( CtrlTypeNum ),
-			LoopNumPtr( LoopNumPtr ),
-			LoopSideNumPtr( LoopSideNumPtr ),
-			BranchNumPtr( BranchNumPtr ),
-			CompNumPtr( CompNumPtr ),
-			SetPointFlowRate( SetPointFlowRate ),
-			DemandNodeName( DemandNodeName ),
-			DemandNodeNum( DemandNodeNum ),
-			SetPointNodeName( SetPointNodeName ),
-			SetPointNodeNum( SetPointNodeNum ),
-			EMSIntVarRemainingLoadValue( EMSIntVarRemainingLoadValue ),
-			EMSActuatorDispatchedLoadValue( EMSActuatorDispatchedLoadValue )
-		{}
-
 	};
 
 	struct EquipOpList // DSU
@@ -953,21 +801,6 @@ namespace DataPlant {
 			RangeUpperLimit( 0.0 ),
 			RangeLowerLimit( 0.0 ),
 			NumComps( 0 )
-		{}
-
-		// Member Constructor
-		EquipOpList(
-			std::string const & Name, // The name of each item in the list
-			Real64 const RangeUpperLimit, // for range based controls
-			Real64 const RangeLowerLimit, // for range based controls
-			int const NumComps, // ALLOCATABLE to the schedule (for valid schedules)
-			Array1< EquipListCompData > const & Comp // Component type list
-		) :
-			Name( Name ),
-			RangeUpperLimit( RangeUpperLimit ),
-			RangeLowerLimit( RangeLowerLimit ),
-			NumComps( NumComps ),
-			Comp( Comp )
 		{}
 
 	};
@@ -1006,43 +839,6 @@ namespace DataPlant {
 			MyEnvrnFlag( true )
 		{}
 
-		// Member Constructor
-		OperationData(
-			std::string const & Name, // The name of each item in the list
-			std::string const & TypeOf, // The 'keyWord' identifying each item in the list
-			int const OpSchemeType, // Op scheme type (from keyword)
-			std::string const & Sched, // The name of the schedule associated with the list
-			int const SchedPtr, // ALLOCATABLE to the schedule (for valid schedules)
-			bool const Available, // TRUE = designated component or operation scheme available
-			int const NumEquipLists, // number of equipment lists
-			int const CurListPtr, // points to the current equipment list
-			Array1< EquipOpList > const & EquipList, // Component type list
-			int const EquipListNumForLastStage, // points to the equipment list with the highest upper limit
-			std::string const & ReferenceNodeName, // DELTA CTRL ONLY--for calculation of delta Temp
-			int const ReferenceNodeNumber, // DELTA CTRL ONLY--for calculation of delta Temp
-			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
-			int const ErlInitProgramMngr, // EMS:ProgramManager to run when this model is initialized and setup
-			Real64 const EMSIntVarLoopDemandRate, // EMS internal variable for loop-level demand rate, neg cooling [W]
-			bool const MyEnvrnFlag
-		) :
-			Name( Name ),
-			TypeOf( TypeOf ),
-			OpSchemeType( OpSchemeType ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			Available( Available ),
-			NumEquipLists( NumEquipLists ),
-			CurListPtr( CurListPtr ),
-			EquipList( EquipList ),
-			EquipListNumForLastStage( EquipListNumForLastStage ),
-			ReferenceNodeName( ReferenceNodeName ),
-			ReferenceNodeNumber( ReferenceNodeNumber ),
-			ErlSimProgramMngr( ErlSimProgramMngr ),
-			ErlInitProgramMngr( ErlInitProgramMngr ),
-			EMSIntVarLoopDemandRate( EMSIntVarLoopDemandRate ),
-			MyEnvrnFlag( MyEnvrnFlag )
-		{}
-
 	};
 
 	struct ConnectedLoopData // DSU
@@ -1059,46 +855,6 @@ namespace DataPlant {
 			LoopSideNum( 0 ),
 			ConnectorTypeOf_Num( 0 ),
 			LoopDemandsOnRemote( false )
-		{}
-
-		// Member Constructor
-		ConnectedLoopData(
-			int const LoopNum, // plant loop index pointer, for the other loop
-			int const LoopSideNum, // plant loop side number, for the other loop
-			int const ConnectorTypeOf_Num, // plant equipment type doing the connecting
-			bool const LoopDemandsOnRemote // true if this loop puts demand on connected loop
-		) :
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			ConnectorTypeOf_Num( ConnectorTypeOf_Num ),
-			LoopDemandsOnRemote( LoopDemandsOnRemote )
-		{}
-
-	};
-
-	struct PlantLocation
-	{
-		// Members
-		int LoopNum;
-		int LoopSideNum;
-		int BranchNum;
-		int CompNum;
-
-		// Default Constructor
-		PlantLocation()
-		{}
-
-		// Member Constructor
-		PlantLocation(
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
 		{}
 
 	};
@@ -1241,115 +997,6 @@ namespace DataPlant {
 			OutletNode( 0.0, 0.0 )
 		{}
 
-		// Member Constructor
-		HalfLoopData(
-			bool const SimLoopSideNeeded, // Determine whether or not to re-simulate this plant LoopSide
-			bool const SimZoneEquipNeeded, // Plant requests resimulate zone HVAC equipment
-			bool const SimAirLoopsNeeded, // Plant requests resimulate air loop HVAC equipment
-			bool const SimNonZoneEquipNeeded, // Plant requests resimulate non zone Equip
-			bool const SimElectLoadCentrNeeded, // Plant requests resimulate generators
-			bool const OncePerTimeStepOperations,
-			Real64 const TimeElapsed, // store time for dynamic updates for last time
-			Real64 const FlowRequest, // Flow request in the half loop
-			Real64 const FlowRequestTemperature, // Average Flow request outlet Temp in the half loop
-			Real64 const TempSetPoint, // Loop temperature setpoint
-			Real64 const TempSetPointHi, // High Loop temperature setpoint
-			Real64 const TempSetPointLo, // Low Loop temperature setpoint
-			Real64 const TempInterfaceTankOutlet, // Used by interface manager in common pipe simulation
-			Real64 const LastTempInterfaceTankOutlet,
-			std::string const & BranchList, // Branch list name for the half loop
-			std::string const & ConnectList, // Connector list name for the half loop
-			int const TotalBranches, // Total number of branches on the half loop
-			int const NodeNumIn, // Node number for the inlet to this loop
-			std::string const & NodeNameIn, // Node name for the inlet to this loop
-			int const NodeNumOut, // Node number for the outlet to this loop
-			std::string const & NodeNameOut, // Node name for the outlet to this loop
-			int const NumSplitters, // Number of splitters in the half loop
-			int const NumMixers, // Number of mixers in the half loop
-			bool const SplitterExists, // Logical Flag indication splitter exists in the half loop
-			bool const MixerExists, // Logical Flag indication mixer exists in the half loop
-			int const TotalPumps, // total number of pumps on the half loop
-			bool const BranchPumpsExist, // logical flag indication branch pumps exist on half loop
-			Array1< LoopSidePumpInformation > const & Pumps,
-			Real64 const TotalPumpHeat, // [W] total heat addition by the pumps to place in "tank"
-			bool const BypassExists,
-			bool const InletNodeSetPt,
-			bool const OutletNodeSetPt,
-			bool const EMSCtrl,
-			Real64 const EMSValue,
-			bool const FlowRestrictionFlag, // Max available flow at the outlet of the half loop
-			int const FlowLock, // DSU
-			int const TotalConnected, // total number of other loops connected to this loop side
-			Array1< ConnectedLoopData > const & Connected, // DSU Other loops connected to this Loop side
-			Array1< BranchData > const & Branch, // Branch data
-			Array1< SplitterData > const & Splitter, // Data for splitter on branch (if any)
-			Array1< MixerData > const & Mixer, // Data for splitter on branch (if any)
-			bool const HasPressureComponents,
-			bool const HasParallelPressComps,
-			Real64 const PressureDrop,
-			Real64 const PressureEffectiveK,
-			int const errCount_LoadWasntDist,
-			int const errIndex_LoadWasntDist,
-			int const errCount_LoadRemains,
-			int const errIndex_LoadRemains,
-			Real64 const LoopSideInlet_TankTemp,
-			PlantConvergencePoint const & InletNode,
-			PlantConvergencePoint const & OutletNode
-		) :
-			SimLoopSideNeeded( SimLoopSideNeeded ),
-			SimZoneEquipNeeded( SimZoneEquipNeeded ),
-			SimAirLoopsNeeded( SimAirLoopsNeeded ),
-			SimNonZoneEquipNeeded( SimNonZoneEquipNeeded ),
-			SimElectLoadCentrNeeded( SimElectLoadCentrNeeded ),
-			OncePerTimeStepOperations( OncePerTimeStepOperations ),
-			TimeElapsed( TimeElapsed ),
-			FlowRequest( FlowRequest ),
-			FlowRequestTemperature( FlowRequestTemperature ),
-			TempSetPoint( TempSetPoint ),
-			TempSetPointHi( TempSetPointHi ),
-			TempSetPointLo( TempSetPointLo ),
-			TempInterfaceTankOutlet( TempInterfaceTankOutlet ),
-			LastTempInterfaceTankOutlet( LastTempInterfaceTankOutlet ),
-			BranchList( BranchList ),
-			ConnectList( ConnectList ),
-			TotalBranches( TotalBranches ),
-			NodeNumIn( NodeNumIn ),
-			NodeNameIn( NodeNameIn ),
-			NodeNumOut( NodeNumOut ),
-			NodeNameOut( NodeNameOut ),
-			NumSplitters( NumSplitters ),
-			NumMixers( NumMixers ),
-			SplitterExists( SplitterExists ),
-			MixerExists( MixerExists ),
-			TotalPumps( TotalPumps ),
-			BranchPumpsExist( BranchPumpsExist ),
-			Pumps( Pumps ),
-			TotalPumpHeat( TotalPumpHeat ),
-			BypassExists( BypassExists ),
-			InletNodeSetPt( InletNodeSetPt ),
-			OutletNodeSetPt( OutletNodeSetPt ),
-			EMSCtrl( EMSCtrl ),
-			EMSValue( EMSValue ),
-			FlowRestrictionFlag( FlowRestrictionFlag ),
-			FlowLock( FlowLock ),
-			TotalConnected( TotalConnected ),
-			Connected( Connected ),
-			Branch( Branch ),
-			Splitter( Splitter ),
-			Mixer( Mixer ),
-			HasPressureComponents( HasPressureComponents ),
-			HasParallelPressComps( HasParallelPressComps ),
-			PressureDrop( PressureDrop ),
-			PressureEffectiveK( PressureEffectiveK ),
-			errCount_LoadWasntDist( errCount_LoadWasntDist ),
-			errIndex_LoadWasntDist( errIndex_LoadWasntDist ),
-			errCount_LoadRemains( errCount_LoadRemains ),
-			errIndex_LoadRemains( errIndex_LoadRemains ),
-			LoopSideInlet_TankTemp( LoopSideInlet_TankTemp ),
-			InletNode( InletNode ),
-			OutletNode( OutletNode )
-		{}
-
 	};
 
 	struct PlantLoopData
@@ -1390,8 +1037,6 @@ namespace DataPlant {
 		int LoopDemandCalcScheme; // Load distribution scheme 1 SingleSetPoint,
 		// 2 DualSetPointwithDeadBand
 		int CommonPipeType;
-		//  TYPE(TwoWayCommonPipeData), &
-		//       ALLOCATABLE                 :: TwoWayCommonPipe                ! two-way common pipe data, primary secondary loop model
 		std::string EconomizerHtExchanger; // DSU review, should move these out of here
 		std::string EconPlantSideSensedNodeName; // DSU review, should move these out of here
 		std::string EconCondSideSensedNodeName; // DSU review, should move these out of here
@@ -1450,105 +1095,6 @@ namespace DataPlant {
 			PressureDrop( 0.0 ),
 			UsePressureForPumpCalcs( false ),
 			PressureEffectiveK( 0.0 )
-		{}
-
-		// Member Constructor
-		PlantLoopData(
-			std::string const & Name, // Name of the component list
-			std::string const & FluidName, // Name of the fluid specified for this loop
-			int const FluidType, // Type of fluid in the loop
-			int const FluidIndex, // Index for Fluid in FluidProperties
-			int const MFErrIndex, // for recurring mass flow errors
-			int const MFErrIndex1, // for recurring mass flow errors
-			int const MFErrIndex2, // for recurring mass flow errors
-			int const TempSetPointNodeNum, // Node Number for Loop Temp SP associated with SP manager
-			int const MaxBranch, // Max branches in the loop
-			Real64 const MinTemp, // Minimum temperature allowed in the loop
-			Real64 const MaxTemp, // Maximum temperature allowed in the loop
-			int const MinTempErrIndex, // for recurring too cold errors
-			int const MaxTempErrIndex, // for recurring too hot errors
-			Real64 const MinVolFlowRate, // Minimum flow rate allowed in the loop
-			Real64 const MaxVolFlowRate, // Maximum flow rate allowed in the loop
-			bool const MaxVolFlowRateWasAutoSized, // true if previous was set to autosized in the input
-			Real64 const MinMassFlowRate, // Minimum flow rate allowed in the loop
-			Real64 const MaxMassFlowRate, // Maximum flow rate allowed in the loop
-			Real64 const Volume, // Volume of the fluid in the loop
-			bool const VolumeWasAutoSized, // true if previous was set to autocal
-			Real64 const Mass, // Mass of the fluid in the loop
-			bool const EMSCtrl,
-			Real64 const EMSValue,
-			Array1< HalfLoopData > const & LoopSide, // Half loop data (Demand side or Supply Side)
-			std::string const & OperationScheme, // Operation scheme name for the loop
-			int const NumOpSchemes, // Number of items in list identified by "OpScheme"
-			Array1< OperationData > const & OpScheme, // Operation scheme data
-			int const LoadDistribution, // Load distribution scheme 1 for optimal, 2 for overloading
-			int const PlantSizNum, // index to corresponding plant sizing data array
-			int const LoopDemandCalcScheme, // Load distribution scheme 1 SingleSetPoint,
-			int const CommonPipeType,
-			std::string const & EconomizerHtExchanger, // DSU review, should move these out of here
-			std::string const & EconPlantSideSensedNodeName, // DSU review, should move these out of here
-			std::string const & EconCondSideSensedNodeName, // DSU review, should move these out of here
-			int const EconPlantSideSensedNodeNum, // DSU review, should move these out of here
-			int const EconCondSideSensedNodeNum, // DSU review, should move these out of here
-			int const EconPlacement, // DSU review, should move these out of here
-			int const EconBranch, // DSU review, should move these out of here
-			int const EconComp, // DSU review, should move these out of here
-			Real64 const EconControlTempDiff, // DSU review, should move these out of here
-			bool const LoopHasConnectionComp,
-			int const TypeOfLoop,
-			int const PressureSimType,
-			bool const HasPressureComponents,
-			Real64 const PressureDrop,
-			bool const UsePressureForPumpCalcs,
-			Real64 const PressureEffectiveK
-		) :
-			Name( Name ),
-			FluidName( FluidName ),
-			FluidType( FluidType ),
-			FluidIndex( FluidIndex ),
-			MFErrIndex( MFErrIndex ),
-			MFErrIndex1( MFErrIndex1 ),
-			MFErrIndex2( MFErrIndex2 ),
-			TempSetPointNodeNum( TempSetPointNodeNum ),
-			MaxBranch( MaxBranch ),
-			MinTemp( MinTemp ),
-			MaxTemp( MaxTemp ),
-			MinTempErrIndex( MinTempErrIndex ),
-			MaxTempErrIndex( MaxTempErrIndex ),
-			MinVolFlowRate( MinVolFlowRate ),
-			MaxVolFlowRate( MaxVolFlowRate ),
-			MaxVolFlowRateWasAutoSized( MaxVolFlowRateWasAutoSized ),
-			MinMassFlowRate( MinMassFlowRate ),
-			MaxMassFlowRate( MaxMassFlowRate ),
-			Volume( Volume ),
-			VolumeWasAutoSized( VolumeWasAutoSized ),
-			Mass( Mass ),
-			EMSCtrl( EMSCtrl ),
-			EMSValue( EMSValue ),
-			LoopSide( LoopSide ),
-			OperationScheme( OperationScheme ),
-			NumOpSchemes( NumOpSchemes ),
-			OpScheme( OpScheme ),
-			LoadDistribution( LoadDistribution ),
-			PlantSizNum( PlantSizNum ),
-			LoopDemandCalcScheme( LoopDemandCalcScheme ),
-			CommonPipeType( CommonPipeType ),
-			EconomizerHtExchanger( EconomizerHtExchanger ),
-			EconPlantSideSensedNodeName( EconPlantSideSensedNodeName ),
-			EconCondSideSensedNodeName( EconCondSideSensedNodeName ),
-			EconPlantSideSensedNodeNum( EconPlantSideSensedNodeNum ),
-			EconCondSideSensedNodeNum( EconCondSideSensedNodeNum ),
-			EconPlacement( EconPlacement ),
-			EconBranch( EconBranch ),
-			EconComp( EconComp ),
-			EconControlTempDiff( EconControlTempDiff ),
-			LoopHasConnectionComp( LoopHasConnectionComp ),
-			TypeOfLoop( TypeOfLoop ),
-			PressureSimType( PressureSimType ),
-			HasPressureComponents( HasPressureComponents ),
-			PressureDrop( PressureDrop ),
-			UsePressureForPumpCalcs( UsePressureForPumpCalcs ),
-			PressureEffectiveK( PressureEffectiveK )
 		{}
 
 	};
@@ -1652,25 +1198,6 @@ namespace DataPlant {
 			StopTime( 0 )
 		{}
 
-		// Member Constructor
-		PlantAvailMgrData(
-			int const NumAvailManagers, // number of availability managers for this plant loop
-			int const AvailStatus, // system availability status
-			int const StartTime, // cycle on time (in SimTimeSteps)
-			int const StopTime, // cycle off time (in SimTimeSteps)
-			Array1_string const & AvailManagerName, // name of each availability manager
-			Array1_int const & AvailManagerType, // type of availability manager
-			Array1_int const & AvailManagerNum // index of availability manager
-		) :
-			NumAvailManagers( NumAvailManagers ),
-			AvailStatus( AvailStatus ),
-			StartTime( StartTime ),
-			StopTime( StopTime ),
-			AvailManagerName( AvailManagerName ),
-			AvailManagerType( AvailManagerType ),
-			AvailManagerNum( AvailManagerNum )
-		{}
-
 	};
 
 	struct LoopSideReportVars
@@ -1683,15 +1210,6 @@ namespace DataPlant {
 		LoopSideReportVars() :
 			LoopSetPtDemandAtInlet( 0.0 ),
 			ThisSideLoadAlterations( 0.0 )
-		{}
-
-		// Member Constructor
-		LoopSideReportVars(
-			Real64 const LoopSetPtDemandAtInlet,
-			Real64 const ThisSideLoadAlterations
-		) :
-			LoopSetPtDemandAtInlet( LoopSetPtDemandAtInlet ),
-			ThisSideLoadAlterations( ThisSideLoadAlterations )
 		{}
 
 	};
@@ -1726,33 +1244,6 @@ namespace DataPlant {
 			OutletNodeFlowrate( 0.0 ),
 			OutletNodeTemperature( 0.0 ),
 			LastLoopSideSimulated( 0 )
-		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const CoolingDemand, // Plant Loop Cooling Demand, W
-			Real64 const HeatingDemand, // Plant Loop Heating Demand[W]
-			Real64 const DemandNotDispatched, // Plant Loop Demand that was not distributed [W]
-			Real64 const UnmetDemand, // Plant Loop Unmet Demand [W]
-			Array1< LoopSideReportVars > const & LoopSide,
-			Real64 const BypassFrac, // Debug Variable
-			Real64 const InletNodeFlowrate, // Debug Variable
-			Real64 const InletNodeTemperature, // Debug Variable
-			Real64 const OutletNodeFlowrate, // Debug Variable
-			Real64 const OutletNodeTemperature, // Debug Variable
-			int const LastLoopSideSimulated
-		) :
-			CoolingDemand( CoolingDemand ),
-			HeatingDemand( HeatingDemand ),
-			DemandNotDispatched( DemandNotDispatched ),
-			UnmetDemand( UnmetDemand ),
-			LoopSide( 2, LoopSide ),
-			BypassFrac( BypassFrac ),
-			InletNodeFlowrate( InletNodeFlowrate ),
-			InletNodeTemperature( InletNodeTemperature ),
-			OutletNodeFlowrate( OutletNodeFlowrate ),
-			OutletNodeTemperature( OutletNodeTemperature ),
-			LastLoopSideSimulated( LastLoopSideSimulated )
 		{}
 
 	};
@@ -1810,31 +1301,6 @@ namespace DataPlant {
 			ReportVarIndexType( 0 ),
 			ReportVarType( 0 ),
 			CurMeterReading( 0.0 )
-		{}
-
-		// Member Constructor
-		MeterData(
-			std::string const & ReportVarName,
-			std::string const & ReportVarUnits,
-			int const ResourceType,
-			std::string const & EndUse,
-			int const EndUse_CompMode,
-			std::string const & Group,
-			int const ReportVarIndex,
-			int const ReportVarIndexType,
-			int const ReportVarType,
-			Real64 const CurMeterReading
-		) :
-			ReportVarName( ReportVarName ),
-			ReportVarUnits( ReportVarUnits ),
-			ResourceType( ResourceType ),
-			EndUse( EndUse ),
-			EndUse_CompMode( EndUse_CompMode ),
-			Group( Group ),
-			ReportVarIndex( ReportVarIndex ),
-			ReportVarIndexType( ReportVarIndexType ),
-			ReportVarType( ReportVarType ),
-			CurMeterReading( CurMeterReading )
 		{}
 
 	};
@@ -1896,67 +1362,6 @@ namespace DataPlant {
 			Efficiency( 0.0 ),
 			OpMode( 0 ),
 			AirSysToPlantPtr( 0 )
-		{}
-
-		// Member Constructor
-		SubSubcomponentData(
-			std::string const & TypeOf, // The 'keyWord' identifying  component type
-			std::string const & Name, // Component name
-			int const CompIndex, // Component Index in whatever is using this component
-			std::string const & NodeNameIn, // Component inlet node name
-			std::string const & NodeNameOut, // Component outlet node name
-			bool const ON, // TRUE = designated component or operation scheme available
-			int const NodeNumIn, // Component inlet node number
-			int const NodeNumOut, // Component outlet node number
-			bool const MeteredVarsFound,
-			int const NumMeteredVars,
-			int const EnergyTransComp, // 1=EnergyTransfer, 0=No EnergyTransfer - Reporting flag
-			Real64 const TotPlantSupplyElec,
-			Real64 const PlantSupplyElecEff,
-			Real64 const PeakPlantSupplyElecEff,
-			Real64 const TotPlantSupplyGas,
-			Real64 const PlantSupplyGasEff,
-			Real64 const PeakPlantSupplyGasEff,
-			Real64 const TotPlantSupplyPurch,
-			Real64 const PlantSupplyPurchEff,
-			Real64 const PeakPlantSupplyPurchEff,
-			Real64 const TotPlantSupplyOther,
-			Real64 const PlantSupplyOtherEff,
-			Real64 const PeakPlantSupplyOtherEff,
-			Real64 const Capacity,
-			Real64 const Efficiency,
-			int const OpMode,
-			Array1< MeterData > const & MeteredVar, // Index of energy output report data
-			int const AirSysToPlantPtr // 0=No plant connection, >0 = index to AirSysToPlant array
-		) :
-			TypeOf( TypeOf ),
-			Name( Name ),
-			CompIndex( CompIndex ),
-			NodeNameIn( NodeNameIn ),
-			NodeNameOut( NodeNameOut ),
-			ON( ON ),
-			NodeNumIn( NodeNumIn ),
-			NodeNumOut( NodeNumOut ),
-			MeteredVarsFound( MeteredVarsFound ),
-			NumMeteredVars( NumMeteredVars ),
-			EnergyTransComp( EnergyTransComp ),
-			TotPlantSupplyElec( TotPlantSupplyElec ),
-			PlantSupplyElecEff( PlantSupplyElecEff ),
-			PeakPlantSupplyElecEff( PeakPlantSupplyElecEff ),
-			TotPlantSupplyGas( TotPlantSupplyGas ),
-			PlantSupplyGasEff( PlantSupplyGasEff ),
-			PeakPlantSupplyGasEff( PeakPlantSupplyGasEff ),
-			TotPlantSupplyPurch( TotPlantSupplyPurch ),
-			PlantSupplyPurchEff( PlantSupplyPurchEff ),
-			PeakPlantSupplyPurchEff( PeakPlantSupplyPurchEff ),
-			TotPlantSupplyOther( TotPlantSupplyOther ),
-			PlantSupplyOtherEff( PlantSupplyOtherEff ),
-			PeakPlantSupplyOtherEff( PeakPlantSupplyOtherEff ),
-			Capacity( Capacity ),
-			Efficiency( Efficiency ),
-			OpMode( OpMode ),
-			MeteredVar( MeteredVar ),
-			AirSysToPlantPtr( AirSysToPlantPtr )
 		{}
 
 	};
@@ -2279,10 +1684,6 @@ namespace DataPlant {
 		// Members
 		int LoopIndex; // plant or condenser loop indexes in calling order
 		int LoopSide; // plant or condenser loop sides in calling order
-		//  INTEGER :: InterAct1LoopIndex     = 0 ! primary interaction dependency reference loop index
-		//  INTEGER :: InterAct1LoopSide      = 0 ! primary interaction dependency reference loop side
-		//  INTEGER :: InterAct2LoopIndex     = 0 ! secondary interaction dependency reference loop index
-		//  INTEGER :: InterAct2LoopSide      = 0 ! secondary interaction dependency reference loop side
 		int LoopPumpSimulationType; // type of pump topology on half loop
 
 		// Default Constructor
