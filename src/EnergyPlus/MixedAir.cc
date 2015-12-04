@@ -4508,8 +4508,8 @@ namespace MixedAir {
 		RecircPressure = OAMixer( OAMixerNum ).RetPressure;
 		RecircEnthalpy = OAMixer( OAMixerNum ).RetEnthalpy;
 		RecircHumRat = OAMixer( OAMixerNum ).RetHumRat;
-		// The recirculation air and the outside air are mixed to form the mixed air stream
-		OAMixer( OAMixerNum ).MixMassFlowRate = OAMixer( OAMixerNum ).OAMassFlowRate + RecircMassFlowRate;
+		// The recirculation air and the outside air are mixed to form the mixed air stream - use OAMassFlowRate and RelMassFlowRate for better precision
+		OAMixer( OAMixerNum ).MixMassFlowRate = OAMixer( OAMixerNum ).RetMassFlowRate + ( OAMixer( OAMixerNum ).OAMassFlowRate - OAMixer( OAMixerNum ).RelMassFlowRate );
 		// Check for zero flow
 		if ( OAMixer( OAMixerNum ).MixMassFlowRate <= VerySmallMassFlow ) {
 			OAMixer( OAMixerNum ).MixEnthalpy = OAMixer( OAMixerNum ).RetEnthalpy;
