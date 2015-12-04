@@ -591,13 +591,11 @@ namespace HeatBalanceIntRadExchange {
 				}
 			} // for ZoneSurfNum
 
-#ifdef DEBUG
 			// Set end-of-vector "pad" values to 0.0 to avoid SIGFPE issues on some debug builds
-			for ( ZoneSurfNum = zvfi.NumOfSurfaces; ZoneSurfNum < zvfi.NumOfSurfacesVec; ++ZoneSurfNum ) {
+			for ( int ZoneSurfNum = zvfi.NumOfSurfaces; ZoneSurfNum < zvfi.NumOfSurfacesVec; ++ZoneSurfNum ) {
 				SurfaceTempK4[ ZoneSurfNum ] = 0.0;
 				SurfaceEmiss[ ZoneSurfNum ] = 0.0;
 			} // for ZoneSurfNum
-#endif // DEBUG			
 
 
 			// Amir Roth 2015-07-01: Split off SurfaceTemp = pow4(SurfaceTemp) calculation so that it will vectorize.
@@ -1637,7 +1635,7 @@ namespace HeatBalanceIntRadExchange {
 
 		// Form ScriptF matrix
 		// Amir Roth 2015-07-01: Npad is the size of a "padded" row
-		unsigned int Npad = __round_2( N );
+		int Npad = __round_2( N );
 
 		for ( int i = 1; i <= N; ++i ) {
 			for ( int j = 1, lj = EMISS.index(j), ill = Cinverse.index(i, j), sll = (i-1)*Npad+(j-1); j <= N; ++j, ++lj, ++ill, ++sll ) {
@@ -1650,12 +1648,10 @@ namespace HeatBalanceIntRadExchange {
 				ScriptF[ sll ] = EMISS_facj * Cinverse[ ill ]; // [ l ] == ( i, j )
 			}
 
-#ifdef DEBUG
 			// Set end-of-vector "pad" values to 0.0 to avoid SIGFPE's on some builds
-			for ( int j = N, sll = (i-1)*Npad+(j-1); j <= Npad; ++sll ) {
-				scriptF[ sll ] = 0.0;
+			for ( int j = N + 1, sll = (i-1)*Npad+(j-1); j <= Npad; ++j, ++sll ) {
+				ScriptF[ sll ] = 0.0;
 			}
-#endif // DEBUG
 			
 			// pull out the (i == j) case so that inner loop above will vectorize
 			int iii = Cinverse.index(i, i);
