@@ -339,7 +339,7 @@ TEST_F( EnergyPlusFixture, Debug_EMSLogic ) {
 		"LogicTest1,",
 		"Set MyVar1 = ( -2 ),",
 		"Set MyVar2 = ( -2 ),",
-		"Set MyVar3 = MyVar1 / MyVar2,",
+		"Set TempSetpoint1 = MyVar1 / MyVar2;",
 
 //		"IF MyVar1 == 8,",
 //		"  Set TempSetpoint1 = 11.0,",
@@ -359,7 +359,6 @@ TEST_F( EnergyPlusFixture, Debug_EMSLogic ) {
 	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginNewEvironment );
 
 
-//	EXPECT_NEAR( DataLoopNode::Node( 1 ).TempSetPoint, 11.0, 0.0000001 );
-	EXPECT_NEAR( 1.0, MyVar3, 0.0000001 );
+	EXPECT_NEAR( DataLoopNode::Node( 1 ).TempSetPoint, 1.0, 0.0000001 );
 
 }

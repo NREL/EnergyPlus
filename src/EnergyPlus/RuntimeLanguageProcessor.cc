@@ -1288,23 +1288,23 @@ namespace RuntimeLanguageProcessor {
 
 			} else if ( is_any_of( NextChar, "+-*/^=<>@|&" ) ) {
 				// Parse an operator token
-				if( NextChar == '-' ) {
+				if ( NextChar == '-' ) {
 					StringToken = "-";
-					if( MultFound ) {
+					if ( MultFound ) {
 						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
 						ShowContinueError( "...Line = \"" + Line + "\"." );
 						ShowContinueError( "...Minus sign used on the right side of multiplication sign." );
 						ShowContinueError( "...Use parenthesis to wrap appropriate variables. For example, X * ( -Y )." );
 						++NumErrors;
 						MultFound = false;
-					} else if( DivFound ) {
+					} else if ( DivFound ) {
 						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
 						ShowContinueError( "...Line = \"" + Line + "\"." );
 						ShowContinueError( "...Minus sign used on the right side of division sign." );
 						ShowContinueError( "...Use parenthesis to wrap appropriate variables. For example, X / ( -Y )." );
 						++NumErrors;
 						DivFound = false;
-					} else if( OperatorProcessing && ( NextChar == '-' ) ) {
+					} else if ( OperatorProcessing && ( NextChar == '-' ) ) {
 						// if operator was deterined last pass and this character is a -, then insert a 0 before the minus and treat as subtraction
 						// example: change "Var == -1" to "Var == 0-1" 
 						OperatorProcessing = false;
@@ -1313,6 +1313,9 @@ namespace RuntimeLanguageProcessor {
 						StringToken = "0";
 						MultFound = false;
 						DivFound = false;
+					} else {
+						StringToken = NextChar;
+						Token( NumTokens ).Type = TokenOperator;
 					}
 				} else { // any other character process as operator
 					StringToken = NextChar;
