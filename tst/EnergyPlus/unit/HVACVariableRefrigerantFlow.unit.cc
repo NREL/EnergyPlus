@@ -112,7 +112,7 @@ namespace EnergyPlus {
 		PerfCurve( CurveNum ).Var2Max = 15; // Maximum Value of y
 
 		// Run and Check
-		double CompResidual = HVACVariableRefrigerantFlow::CompResidual( Te, Par );
+		double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl( Te, Par );
 		EXPECT_NEAR( 1.652, CompResidual, 0.005 );
 
 		// Clean up
@@ -322,8 +322,7 @@ namespace EnergyPlus {
 		DXCoil( CoolCoilIndex ).InletAirHumRat = 8.4682e-3;
 		DXCoil( CoolCoilIndex ).InletAirEnthalpy = 47259.78;
 		
-		CalcVRFIUAirFlow( CoolCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
-		//CalcVRFIUAirFlow( ZoneIndex, Mode, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, Temp, CoolCoilIndex, SHSCModify, FanSpdRatio, FanOnOffRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
+		CalcVRFIUAirFlow( CoolCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, 25.5553, 8.4682e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
 		//EXPECT_NEAR( TcIn, 25.56, 0.01 );
 		EXPECT_NEAR( Toutlet, 17.89, 0.01 );
 		EXPECT_NEAR( Houtlet, 39440, 1 );
@@ -344,8 +343,7 @@ namespace EnergyPlus {
 		DXCoil( HeatCoilIndex ).InletAirHumRat = 4.1053e-3;
 		DXCoil( HeatCoilIndex ).InletAirEnthalpy = 30755.6253;
 
-		CalcVRFIUAirFlow( HeatCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
-		//CalcVRFIUAirFlow( ZoneIndex, Mode, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, Temp, HeatCoilIndex, SHSCModify, FanSpdRatio, FanOnOffRatio, Wout, Toutlet, Houtlet, HcoilIn, TcIn, SHact, SCact );
+		CalcVRFIUAirFlow( HeatCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, 20.2362, 4.1053e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
 		//EXPECT_NEAR( TcIn, 20.24, 0.01 );
 		EXPECT_NEAR( Toutlet, 38.37, 0.01 );
 		EXPECT_NEAR( Houtlet, 49113, 1 );

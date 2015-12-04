@@ -1577,8 +1577,24 @@ namespace HVACVariableRefrigerantFlow {
 		bool const FirstHVACIteration // flag for first time through HVAC system simulation
 	);
 	
+	Real64
+	CalVRFTUAirFlow_FluidTCtrl(
+		bool FirstHVACIteration, // FirstHVACIteration flag
+		int VRFTUNum, // TU index
+		int DXCoilNum, // Compressor operating mode
+		Real64 QCoilReq, // zone load (W)
+		Real64 TeTc, // denominator representing zone load (W)
+		Real64 OACompOnMassFlow // delivered capacity of VRF terminal unit
+	);
+	
+	Real64
+	VRFTUAirFlowResidual_FluidTCtrl(
+		Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU 
+		Array1< Real64 > const & Par // par(1) = VRFTUNum
+	);
+	
 	Real64 
-	CompResidual( 
+	CompResidual_FluidTCtrl( 
 		Real64 const Te, // Outdoor unit evaporating temperature
 		Array1< Real64 > const & Par // Array of parameters
 	);

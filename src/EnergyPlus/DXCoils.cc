@@ -14544,7 +14544,7 @@ Label50: ;
 			}
 			
 			// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-			CalcVRFIUAirFlow( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).EvaporatingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
+			CalcVRFIUAirFlow( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).InletAirTemp, DXCoil( DXCoilNum ).InletAirHumRat, DXCoil( DXCoilNum ).EvaporatingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
 			AirMassFlow = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
 			
 			// if ( FanOpMode == CycFanCycCoil ) {
@@ -14913,7 +14913,7 @@ Label50: ;
 			}
 			
 			// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-			CalcVRFIUAirFlow( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).CondensingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
+			CalcVRFIUAirFlow( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).InletAirTemp, DXCoil( DXCoilNum ).InletAirHumRat, DXCoil( DXCoilNum ).CondensingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
 			AirMassFlow = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
 			
 			// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton)
@@ -15265,6 +15265,8 @@ Label50: ;
 	CalcVRFIUAirFlow (
 		int const CoilIndex,  // index to VRFTU coil 
 		Real64 const QCoil,   // coil load
+		Real64 const Tin, // inlet air temperature
+		Real64 const Win, // inlet air humidity ratio
 		Real64 const TeTc,    // evaporating or condensing temperature
 		Real64 const OAMassFlow,  // mass flow rate of outdoor air 
 		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
@@ -15294,8 +15296,9 @@ Label50: ;
 		//
 		// USE STATEMENTS:
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
 		using Fans::Fan;
+		using General::SolveRegulaFalsi;
+		using Psychrometrics::PsyHFnTdbW;
 		
 		
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -15322,8 +15325,8 @@ Label50: ;
 		Real64 CoilOnOffRatio; // coil on/off ratio: time coil is on divided by total time
 		Real64 deltaT;  // Difference between evaporating/condensing temperature and coil surface temperature (C)
 		Real64 FanSpdRatioMin; // Min fan speed ratio, below which the cycling will be activated (-)
+		Real64 FanSpdRatioMax; // Max fan speed ratio (-)
 		Real64 Garate; // Nominal air mass flow rate (m3/s)
-		Real64 Hin;    // Air enthalpy at the coil inlet (kJ/kg)
 		Real64 MaxSH;  // Max super heating degrees (C)
 		Real64 MaxSC;  // Max subcooling degrees (C)
 		Real64 QinSenMin1; //Coil capacity at minimum fan speed, corresponding to real SH (W)
@@ -15335,13 +15338,11 @@ Label50: ;
 		Real64 RHsat;  // Relative humidity of the air at saturated condition(-) 
 		Real64 SH; // Super heating degrees (C)
 		Real64 SC; // Subcooling degrees (C)
-		Real64 Tin; // Air temperature at indoor coil inlet (C)
 		Real64 Ts_1; // Air temperature at the coil surface, corresponding to SH (C)
 		Real64 Ts_2; // Air temperature at the coil surface, corresponding to MaxSH (C)
 		Real64 To_1; // Air temperature at the coil outlet, corresponding to SH (C)
 		Real64 To_2; // Air temperature at the coil outlet, corresponding to MaxSH (C)
 		Real64 Ts; // Air temperature at the coil surface (C)
-		Real64 Win; // Air humidity ratio at the coil inlet (kg/kg)
 		Real64 Ws; // Air humidity ratio at the coil surface (kg/kg)
 		
 		RHsat = 0.98; // Saturated RH
@@ -15352,18 +15353,13 @@ Label50: ;
 		
 		if( QCoil == 0 ) {
 		//No Heating or Cooling
-			
-			Tin = DXCoil( CoilIndex ).InletAirTemp;
-			Win = DXCoil( CoilIndex ).InletAirHumRat;
-			Hin = DXCoil( CoilIndex ).InletAirEnthalpy;
-			
 			FanSpdRatio = OAMassFlow / Garate;
 			CoilOnOffRatio = 0.0;
 		
 			SHact = 999.0;
 			SCact = 999.0;
 			Tout = Tin;
-			Hout = Hin;
+			Hout = PsyHFnTdbW( Tin, Win );
 			Wout = Win;
 		
 		} else if( QCoil < 0 ) {
@@ -15377,11 +15373,7 @@ Label50: ;
 			C1Tevap = DXCoil( CoilIndex ).C1Te;
 			C2Tevap = DXCoil( CoilIndex ).C2Te;
 			C3Tevap = DXCoil( CoilIndex ).C3Te;
-			
 			BF = 0.0592;
-			Tin = DXCoil( CoilIndex ).InletAirTemp;
-			Win = DXCoil( CoilIndex ).InletAirHumRat ;
-			Hin = DXCoil( CoilIndex ).InletAirEnthalpy;
 			
 			// Coil sensilbe heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, SH, BF, QinSenPerFlowRate, Ts_1 );
@@ -15400,8 +15392,10 @@ Label50: ;
 				Par( 3 ) = Tin;
 				Par( 4 ) = Garate;
 				Par( 5 ) = BF;
-				
-				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, 0.5, 1.5, Par);
+
+				FanSpdRatioMax = 3.0;
+				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
+				if( SolFla < 0 ) Ratio1 = FanSpdRatioMax; // over capacity @@
 				FanSpdRatio = Ratio1;
 				CoilOnOffRatio = 1.0;
 				
@@ -15483,9 +15477,6 @@ Label50: ;
 			C3Tcond = DXCoil( CoilIndex ).C3Tc;
 			
 			BF = 0.136; 
-			Tin = DXCoil( CoilIndex ).InletAirTemp;
-			Win = DXCoil( CoilIndex ).InletAirHumRat;
-			Hin = DXCoil( CoilIndex ).InletAirEnthalpy;
 			
 			// Coil sensilbe heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1 );
@@ -15505,7 +15496,9 @@ Label50: ;
 				Par( 4 ) = Garate;
 				Par( 5 ) = BF;
 				
-				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, 0.5, 1.5, Par);
+				FanSpdRatioMax = 1.0;
+				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
+				if( SolFla < 0 ) Ratio1 = FanSpdRatioMax; // over capacity
 				FanSpdRatio = Ratio1;
 				CoilOnOffRatio = 1.0;
 				
@@ -15554,7 +15547,7 @@ Label50: ;
 			}
 		} 
 	
-		FanSpdRatio = max( min( FanSpdRatio, 1.0 ), 0.0);
+		//FanSpdRatio = max( min( FanSpdRatio, 1.0 ), 0.0);
 	}
 	
 	void

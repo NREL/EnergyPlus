@@ -1697,6 +1697,8 @@ namespace DXCoils {
 	CalcVRFIUAirFlow (
 		int const CoilIndex,  // index to VRFTU coil 
 		Real64 const QCoil,   // coil load
+		Real64 const Tin,     // inlet air temperature
+		Real64 const Win,     // inlet air humidity ratio
 		Real64 const TeTc,    // evaporating or condensing temperature
 		Real64 const OAMassFlow,  // mass flow rate of outdoor air 
 		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
