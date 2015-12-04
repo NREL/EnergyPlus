@@ -88,7 +88,12 @@ namespace EnergyPlus {
 			std::string saveMatchVersion = DataStringGlobals::MatchVersion;
 			DataStringGlobals::MatchVersion = "2.0";
 			ASSERT_FALSE(process_idf(idf_contents, errors_found ));
-			EXPECT_TRUE( compare_err_stream( "   ** Severe  ** IP: Possible incorrect IDD File\r\n   **   ~~~   ** " + DataStringGlobals::IDDVerString +" not the same as expected =\"2.0\"\r\n", true ) );
+
+			std::string const error_string = delimited_string( {
+				"   ** Severe  ** IP: Possible incorrect IDD File",
+				"   **   ~~~   ** " + DataStringGlobals::IDDVerString + " not the same as expected =\"2.0\""
+			} );
+			EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
 			DataStringGlobals::MatchVersion = saveMatchVersion;
 		}

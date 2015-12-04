@@ -498,7 +498,7 @@ namespace InputProcessor {
 					} else {
 						Which = static_cast< int >( index( IDFRecords( Loop ).Alphas( 1 ), MatchVersion ) );
 					}
-					if ( Which != 1 ) {
+					if ( Which != 0 ) {
 						ShowContinueError( "Version in IDF=\"" + IDFRecords( Loop ).Alphas( 1 ) + "\" not the same as expected=\"" + MatchVersion + "\"" );
 					}
 					break;
