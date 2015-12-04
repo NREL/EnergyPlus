@@ -1116,6 +1116,8 @@ namespace RuntimeLanguageProcessor {
 		bool PeriodFound;
 		bool MinusFound;
 		bool PlusFound;
+		bool MultFound;
+		bool DivFound;
 		bool ErrorFlag;
 		bool OperatorProcessing;
 		int CountDoLooping;
@@ -1148,6 +1150,8 @@ namespace RuntimeLanguageProcessor {
 		Pos = 0;
 		OperatorProcessing = false; // true when an operator is found until terminated by non-operator
 		MinusFound = false;
+		MultFound = false;
+		DivFound = false;
 		while( Pos < LastPos ) {
 			++CountDoLooping;
 			if ( CountDoLooping > MaxDoLoopCounts ) {
@@ -1176,6 +1180,8 @@ namespace RuntimeLanguageProcessor {
 				++Pos;
 				StringToken += NextChar;
 				OperatorProcessing = false;
+				MultFound = false;
+				DivFound = false;
 
 				if( NextChar == '.' ) PeriodFound = true;
 
@@ -1258,6 +1264,8 @@ namespace RuntimeLanguageProcessor {
 				++Pos;
 				StringToken += NextChar;
 				OperatorProcessing = false;
+				MultFound = false;
+				DivFound = false;
 
 				while ( Pos < LastPos ) {
 					NextChar = String[ Pos ];
@@ -1280,13 +1288,32 @@ namespace RuntimeLanguageProcessor {
 
 			} else if ( is_any_of( NextChar, "+-*/^=<>@|&" ) ) {
 				// Parse an operator token
-				if( OperatorProcessing && ( NextChar == '-' ) ) {
-					// if operator was deterined last pass and this character is a -, then insert a 0 before the minus and treat as subtraction
-					// example: change "Var == -1" to "Var == 0-1" 
-					OperatorProcessing = false;
-					String.insert( Pos, "0" );
-					++LastPos;
-					StringToken = "0";
+				if( NextChar == '-' ) {
+					StringToken = "-";
+					if( MultFound ) {
+						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
+						ShowContinueError( "...Line = \"" + Line + "\"." );
+						ShowContinueError( "...Minus sign used on the right side of multiplication sign." );
+						ShowContinueError( "...Use parenthesis to wrap appropriate variables. For example, X * ( -Y )." );
+						++NumErrors;
+						MultFound = false;
+					} else if( DivFound ) {
+						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
+						ShowContinueError( "...Line = \"" + Line + "\"." );
+						ShowContinueError( "...Minus sign used on the right side of division sign." );
+						ShowContinueError( "...Use parenthesis to wrap appropriate variables. For example, X / ( -Y )." );
+						++NumErrors;
+						DivFound = false;
+					} else if( OperatorProcessing && ( NextChar == '-' ) ) {
+						// if operator was deterined last pass and this character is a -, then insert a 0 before the minus and treat as subtraction
+						// example: change "Var == -1" to "Var == 0-1" 
+						OperatorProcessing = false;
+						String.insert( Pos, "0" );
+						++LastPos;
+						StringToken = "0";
+						MultFound = false;
+						DivFound = false;
+					}
 				} else { // any other character process as operator
 					StringToken = NextChar;
 					Token( NumTokens ).Type = TokenOperator;
@@ -1605,7 +1632,10 @@ namespace RuntimeLanguageProcessor {
 				} else {
 					// Check for remaining single character operators
 					Token( NumTokens ).String = StringToken;
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + StringToken + "\"";
+					MultFound = false;
+					DivFound = false;
+
+					if( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + StringToken + "\"";
 
 					if ( StringToken == "+" ) {
 						if ( ! OperatorProcessing ) {
@@ -1625,9 +1655,11 @@ namespace RuntimeLanguageProcessor {
 						}
 					} else if ( StringToken == "*" ) {
 						Token( NumTokens ).Operator = OperatorMultiply;
+						MultFound = true;
 						OperatorProcessing = true;
 					} else if ( StringToken == "/" ) {
 						Token( NumTokens ).Operator = OperatorDivide;
+						DivFound = true;
 						OperatorProcessing = true;
 					} else if ( StringToken == "<" ) {
 						Token( NumTokens ).Operator = OperatorLessThan;
