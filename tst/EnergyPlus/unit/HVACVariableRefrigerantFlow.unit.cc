@@ -257,7 +257,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUAirFlow )
+	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_ControlVRFIUCoil )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method CalcVRFIUAirFlow, which analyzes the VRF Indoor Unit operations given zonal loads.
@@ -322,7 +322,7 @@ namespace EnergyPlus {
 		DXCoil( CoolCoilIndex ).InletAirHumRat = 8.4682e-3;
 		DXCoil( CoolCoilIndex ).InletAirEnthalpy = 47259.78;
 		
-		CalcVRFIUAirFlow( CoolCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, 25.5553, 8.4682e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
+		ControlVRFIUCoil( CoolCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, 25.5553, 8.4682e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
 		//EXPECT_NEAR( TcIn, 25.56, 0.01 );
 		EXPECT_NEAR( Toutlet, 17.89, 0.01 );
 		EXPECT_NEAR( Houtlet, 39440, 1 );
@@ -343,7 +343,7 @@ namespace EnergyPlus {
 		DXCoil( HeatCoilIndex ).InletAirHumRat = 4.1053e-3;
 		DXCoil( HeatCoilIndex ).InletAirEnthalpy = 30755.6253;
 
-		CalcVRFIUAirFlow( HeatCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, 20.2362, 4.1053e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
+		ControlVRFIUCoil( HeatCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, 20.2362, 4.1053e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
 		//EXPECT_NEAR( TcIn, 20.24, 0.01 );
 		EXPECT_NEAR( Toutlet, 38.37, 0.01 );
 		EXPECT_NEAR( Houtlet, 49113, 1 );

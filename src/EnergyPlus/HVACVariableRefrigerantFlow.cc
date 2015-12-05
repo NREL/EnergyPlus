@@ -5288,7 +5288,8 @@ namespace HVACVariableRefrigerantFlow {
 		
 		if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) { 
 		// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-			ControlVRF_FluidTCtrl( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
+			ControlVRF( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
+			//ControlVRF_FluidTCtrl( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
 			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
 			//CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
 		} else {
@@ -6079,8 +6080,14 @@ namespace HVACVariableRefrigerantFlow {
 		if ( std::abs( QZnReq ) < 100.0 ) QZnReqTemp = sign( 100.0, QZnReq );
 		OnOffAirFlowRatio = Par( 6 );
 
-		CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio );
-
+		if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) { 
+		// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio );
+		} else {
+		// Algorithm Type: VRF model based on system curve
+			CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio );
+		}
+		
 		PLRResidual = ( ActualOutput - QZnReq ) / QZnReqTemp;
 
 		return PLRResidual;
@@ -8407,10 +8414,17 @@ namespace HVACVariableRefrigerantFlow {
 		CondTemp = VRF(VRFCond).IUCondensingTemp;
 
 		// Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-		if( PartLoadRatio == 0 ) CompOnMassFlow = OACompOnMassFlow; //Only provide required OA
+		if( PartLoadRatio == 0 ) {
+			// only provide required OA when coil is off
+			CompOnMassFlow = OACompOnMassFlow; 
+		} else {
+			// identify the air flow rate corresponding to the coil load
+			CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl( VRFTUNum, PartLoadRatio, FirstHVACIteration );
+		}
 		SetAverageAirFlow( VRFTUNum, PartLoadRatio, OnOffAirFlowRatio );
-		
 		AirMassFlow = Node( VRFTUInletNodeNum ).MassFlowRate;
+		
+		// simulate OA Mixer
 		if ( VRFTU( VRFTUNum ).OAMixerUsed ) SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
 
 		// if blow through, simulate fan then coils
@@ -8452,7 +8466,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
 		MinHumRat = min( Node( VRFTUInletNodeNum ).HumRat, Node( VRFTUOutletNodeNum ).HumRat );
-		LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( VRFTUOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( VRFTUInletNodeNum ).Temp, MinHumRat ) );
+		LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( VRFTUOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( VRFTUInletNodeNum ).Temp, MinHumRat ) ); // sensible load met by TU
 
 		if ( present( LatOutputProvided ) ) {
 			//   CR9155 Remove specific humidity calculations
@@ -8462,192 +8476,12 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 	}
-			
-	void
-	ControlVRF_FluidTCtrl(
-		int const VRFTUNum, // Index to VRF terminal unit
-		Real64 const QZnReq, // Index to zone number
-		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
-		Real64 & PartLoadRatio, // unit part load ratio
-		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Rongpeng Zhang
-		//       DATE WRITTEN   Nov 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Determine the coil load and part load ratio, given the zone load
-		// Determine the air mass flow rate corresponding to the coil load of the heat pump for this time step
-
-		// METHODOLOGY EMPLOYED:
-		// Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using DataEnvironment::OutDryBulbTemp;
-		using DXCoils::DXCoil;
-		using General::SolveRegulaFalsi;
-		using General::RoundSigDigits;
-		using General::TrimSigDigits;
-		using HeatingCoils::SimulateHeatingCoilComponents;
-		using ScheduleManager::GetCurrentScheduleValue;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const Mode( 1 ); // Performance mode for MultiMode DX coil. Always 1 for other coil types
-		static gio::Fmt fmtLD( "*" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 FanSpdRatio; // ratio of required and rated air flow rate
-		Real64 FullOutput; // unit full output when compressor is operating [W]
-		Real64 NoCompOutput; // output when no active compressor [W]
-		Real64 QCoilReq; // required coil load [W]
-		Real64 temp = -1; // for temporary use
-		Real64 TeTc; // denominator representing zone load (W)
-		int DXCoilNum; // index to DX coil
-		int SolFla; // Flag of RegulaFalsi solver
-		int VRFCond; // index to VRF condenser
-		int IndexToTUInTUList; // index to TU in specific list for the VRF system
-		int TUListIndex; // index to TU list for this VRF system
-		bool ContinueIter; // used when convergence is an issue
-		bool VRFCoolingMode; // VRF operational mode
-		bool VRFHeatingMode; // VRF operational mode
-		bool HRCoolingMode;  // VRF operational mode
-		bool HRHeatingMode;  // VRF operational mode
-
-		PartLoadRatio = 0.0;
-		LoopDXCoolCoilRTF = 0.0;
-		LoopDXHeatCoilRTF = 0.0;
-		VRFCond = VRFTU( VRFTUNum ).VRFSysNum;
-		IndexToTUInTUList = VRFTU( VRFTUNum ).IndexToTUInTUList;
-		TUListIndex = VRF( VRFCond ).ZoneTUListPtr;
-		VRFCoolingMode = CoolingLoad( VRFCond );
-		VRFHeatingMode = HeatingLoad( VRFCond );
-		HRCoolingMode = TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList );
-		HRHeatingMode = TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList );
-
-		// The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with lastest PLR
-
-		// do nothing else if TU is scheduled off
-		if ( GetCurrentScheduleValue( VRFTU( VRFTUNum ).SchedPtr ) == 0.0 ) return;
-
-		// Block the following statement: QZnReq==0 doesn't mean QCoilReq==0 due to possible OA mixer operation. zrp_201511
-		// do nothing if TU has no load (TU will be modeled using PLR=0)
-		// if ( QZnReq == 0.0 ) return;
-
-		// Set EMS value for PLR and return
-		if ( VRFTU( VRFTUNum ).EMSOverridePartLoadFrac ) {
-			PartLoadRatio = VRFTU( VRFTUNum ).EMSValueForPartLoadFrac;
-			return;
-		}
-
-		// Get result when DX coil is off
-		PartLoadRatio = 0.0;
-		CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, NoCompOutput, OnOffAirFlowRatio );
-
-		if ( VRFCoolingMode && HRHeatingMode ) {
-			// IF the system is in cooling mode, but the terminal unit requests heating (heat recovery)
-			if ( NoCompOutput >= QZnReq ) return;
-		} else if ( VRFHeatingMode && HRCoolingMode ) {
-			// IF the system is in heating mode, but the terminal unit requests cooling (heat recovery)
-			if ( NoCompOutput <= QZnReq ) return;
-		} else if ( VRFCoolingMode || HRCoolingMode ) {
-			// IF the system is in cooling mode and/or the terminal unit requests cooling
-			if ( NoCompOutput <= QZnReq ) return;
-		} else if ( VRFHeatingMode || HRHeatingMode ) {
-			// IF the system is in heating mode and/or the terminal unit requests heating
-			if ( NoCompOutput >= QZnReq ) return;
-		}
-
-		// Otherwise the coil needs to turn on. Compare full TU capacity with QZnReq
-		
-		if ( ( VRFCoolingMode && ! VRF( VRFCond ).HeatRecoveryUsed ) || ( VRF( VRFCond ).HeatRecoveryUsed && HRCoolingMode ) ) {
-
-			PartLoadRatio = 1.0;
-			
-			// Decide the supply air mass flow rate corresponding to the full load
-			DXCoilNum = VRFTU( VRFTUNum ).CoolCoilIndex;
-			QCoilReq = -PartLoadRatio * DXCoil( DXCoilNum ).RatedTotCap( Mode ); // positive for heating; negative for cooling
-			TeTc = VRF( VRFCond ).IUEvaporatingTemp;
-			CompOnMassFlow = CalVRFTUAirFlow_FluidTCtrl( FirstHVACIteration, VRFTUNum, DXCoilNum, QCoilReq, TeTc, OACompOnMassFlow );
-			
-			//then calculate the full TU output using the updated air flow rate
-			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio );
-			
-			// Since we are cooling, we expect FullOutput < NoCompOutput
-			// If the QZnReq <= FullOutput the unit needs to run full out
-			if ( QZnReq <= FullOutput ) return;
-			
-			if ( FullOutput - NoCompOutput == 0.0 ) {
-				PartLoadRatio = 0.0;
-			} else {
-				PartLoadRatio = min( 1.0, std::abs( QZnReq - NoCompOutput ) / DXCoil( DXCoilNum ).RatedTotCap( Mode ) );
-			}
-		
-			// Decide the supply air mass flow rate corresponding to the coil load
-			QCoilReq = -PartLoadRatio * DXCoil( DXCoilNum ).RatedTotCap( Mode ); // positive for heating; negative for cooling
-			CompOnMassFlow = CalVRFTUAirFlow_FluidTCtrl( FirstHVACIteration, VRFTUNum, DXCoilNum, QCoilReq, TeTc, OACompOnMassFlow );
-			
-		} else if ( ( VRFHeatingMode && ! VRF( VRFCond ).HeatRecoveryUsed ) || ( VRF( VRFCond ).HeatRecoveryUsed && HRHeatingMode ) ) {
-
-			PartLoadRatio = 1.0;
-			
-			// Decide the supply air mass flow rate corresponding to the full load
-			DXCoilNum = VRFTU( VRFTUNum ).HeatCoilIndex;
-			QCoilReq = PartLoadRatio * DXCoil( DXCoilNum ).RatedTotCap( Mode ); // positive for heating; negative for cooling
-			TeTc = VRF( VRFCond ).IUCondensingTemp;
-			CompOnMassFlow = CalVRFTUAirFlow_FluidTCtrl( FirstHVACIteration, VRFTUNum, DXCoilNum, QCoilReq, TeTc, OACompOnMassFlow );
-			
-			//then calculate the full TU output using the updated air flow rate
-			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio );
-		
-			// Since we are heating, we expect FullOutput > NoCompOutput
-			// If the QZnReq >= FullOutput the unit needs to run full out
-			if ( QZnReq >= FullOutput ) return; 
-			
-			if ( FullOutput - NoCompOutput == 0.0 ) {
-				PartLoadRatio = 0.0;
-			} else {
-				PartLoadRatio = min( 1.0, std::abs( QZnReq - NoCompOutput ) / DXCoil( DXCoilNum ).RatedTotCap( Mode ) ); 
-				//@@ May need to design iterations to decide PLR
-				//Now NoCompOutput is Q_OA + Q_Fan at constant flow rate. But in reality Q_Fan is variant due to VAV
-			}
-			
-			// Decide the supply air mass flow rate corresponding to the coil load
-			QCoilReq = PartLoadRatio * DXCoil( DXCoilNum ).RatedTotCap( Mode ); // positive for heating; negative for cooling
-			CompOnMassFlow = CalVRFTUAirFlow_FluidTCtrl( FirstHVACIteration, VRFTUNum, DXCoilNum, QCoilReq, TeTc, OACompOnMassFlow );
-			
-		} else {
-			// VRF terminal unit is off, PLR already set to 0 above
-			// shouldn't actually get here
-			PartLoadRatio = 0.0;
-			return;
-		}
-
-	}
 
 	Real64
-	CalVRFTUAirFlow_FluidTCtrl(
-		bool FirstHVACIteration, // FirstHVACIteration flag
+	CalVRFTUAirFlowRate_FluidTCtrl(
 		int VRFTUNum, // TU index
-		int DXCoilNum, // Compressor operating mode
-		Real64 QCoilReq, // zone load (W)
-		Real64 TeTc, // denominator representing zone load (W)
-		Real64 OACompOnMassFlow // delivered capacity of VRF terminal unit
+		Real64 PartLoadRatio, // part load ratio of the coil
+		bool FirstHVACIteration // FirstHVACIteration flag
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -8690,14 +8524,45 @@ namespace HVACVariableRefrigerantFlow {
 		Array1D< Real64 > Par( 7 ); // Parameters passed to RegulaFalsi
 		int const Mode( 1 ); // Performance mode for MultiMode DX coil. Always 1 for other coil types
 		int const MaxIte( 500 ); // maximum number of iterations
+		int DXCoilNum; // index to DX Coil
+		int IndexToTUInTUList; // index to TU in specific list for the VRF system
 		int SolFla; // Flag of RegulaFalsi solver
+		int TUListIndex; // index to TU list for this VRF system
+		int VRFCond; // index to VRF condenser
 		Real64 const ErrorTol( 0.01 ); // tolerance for RegulaFalsi iterations
+		Real64 AirMassFlowRate; // air mass flow rate of the coil (kg/s)
 		Real64 FanSpdRatio; // ratio of required and rated air flow rate
 		Real64 FanSpdRatioMin; // min fan speed ratio
 		Real64 FanSpdRatioMax; // min fan speed ratio
-		Real64 PartLoadRatio; // ratio of compressor ON airflow to average airflow over timestep
+		Real64 QCoilReq; // required coil load (W)
+		Real64 QCoilAct; // actural coil load (W)
+		Real64 TeTc; // evaporating temperature or condensing temperature for VRF indoor unit(C)
 
-		PartLoadRatio = min( std::abs( QCoilReq ) / DXCoil( DXCoilNum ).RatedTotCap( Mode ), 1.0 );
+		
+		VRFCond = VRFTU( VRFTUNum ).VRFSysNum;
+		TUListIndex = VRF( VRFCond ).ZoneTUListPtr;
+		IndexToTUInTUList = VRFTU( VRFTUNum ).IndexToTUInTUList;
+		
+		if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && CoolingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
+			// VRF terminal unit is on cooling mode
+			DXCoilNum = VRFTU( VRFTUNum ).CoolCoilIndex;
+			QCoilReq = - PartLoadRatio * DXCoil( DXCoilNum ).RatedTotCap( Mode ); // positive for heating; negative for cooling
+			TeTc = VRF( VRFCond ).IUEvaporatingTemp;
+			
+		} else if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && HeatingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) ) {
+			// VRF terminal unit is on heating mode
+			DXCoilNum = VRFTU( VRFTUNum ).HeatCoilIndex;
+			QCoilReq = PartLoadRatio * DXCoil( DXCoilNum ).RatedTotCap( Mode ); // positive for heating; negative for cooling
+			TeTc = VRF( VRFCond ).IUCondensingTemp;
+			
+		} else {
+			// VRF terminal unit is off
+			QCoilAct = 0.0;
+			AirMassFlowRate = max( OACompOnMassFlow, 0.0 );
+			return AirMassFlowRate;
+		}
+		
+		// minimum airflow rate
 		FanSpdRatioMin = min( OACompOnMassFlow / DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ), 1.0 );
 		
 		if ( FirstHVACIteration ) {
@@ -8712,12 +8577,14 @@ namespace HVACVariableRefrigerantFlow {
 		Par( 6 ) = PartLoadRatio;
 		Par( 7 ) = OACompOnMassFlow;
 		
-		FanSpdRatioMax = 3.0;
+		FanSpdRatioMax = 1.5; //@@
 		SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par );
 		if( SolFla < 0) FanSpdRatio = FanSpdRatioMax; //over capacity
 		// @@ if SolFlag == -1 or -2
 		
-		return FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
+		AirMassFlowRate = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
+		
+		return AirMassFlowRate;
 		
 	}
 
@@ -8739,20 +8606,21 @@ namespace HVACVariableRefrigerantFlow {
 
 		// METHODOLOGY EMPLOYED:
 		// 		VRF-FluidTCtrl TU airflow rate is determined by the control logic of VRF-FluidTCtrl coil to match the 
-		// 		coil load. This is affected by the coil inlet conditions. Meanwhile, the airflow rate will affect the 
+		// 		coil load. This is affected by the coil inlet conditions. However, the airflow rate will affect the 
 		// 		OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
 
 		// REFERENCES:
 		// na
 
 		// Using/Aliasing
-		using DXCoils::CalcVRFIUAirFlow;
+		using DXCoils::ControlVRFIUCoil;
 		using DXCoils::DXCoil;
 		using Fans::Fan;
 		using Fans::SimulateFanComponents;
 		using InputProcessor::FindItemInList;
 		using MixedAir::SimOAMixer;
 		using MixedAir::OAMixer;
+		using Psychrometrics::PsyHFnTdbW;
 
 		// REFERENCES:
 		// na
@@ -8798,10 +8666,17 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 FanSpdRatioAct; // calculated FanSpdRatio for VRFTUAirFlowResidual
 		Real64 PartLoadRatio; //Part load ratio
 		Real64 QCoilReq; // required coil load [W]
+		Real64 QCoilAct; // actual coil load [W]
 		Real64 temp; // for temporary use
 		Real64 TeTc; //evaporating/condensing temperature [C]
-		Real64 Tin; // coil inlet temperature [C]
-		Real64 Win; // coil inlet humidity ratio [kg/kg]
+		Real64 Tin; // coil inlet air temperature [C]
+		Real64 Win; // coil inlet air humidity ratio [kg/kg]
+		Real64 Hin; // coil inlet air enthalpy
+		Real64 Wout; // coil outlet air humidity ratio
+		Real64 Tout; // coil outlet air temperature
+		Real64 Hout; // coil outlet air enthalpy
+		Real64 SHact;// coil actual SH
+		Real64 SCact;// coil actual SC
 
 		// FLOW
 
@@ -8817,8 +8692,8 @@ namespace HVACVariableRefrigerantFlow {
 		VRFCond = VRFTU( VRFTUNum ).VRFSysNum;
 		VRFInletNode = VRFTU( VRFTUNum ).VRFTUInletNodeNum;
 		
-		if ( std::abs( FanSpdRatio ) < 0.5 ) 
-			FanSpdRatioBase = sign( 0.5, FanSpdRatio );
+		if ( std::abs( FanSpdRatio ) < 0.01 ) 
+			FanSpdRatioBase = sign( 0.01, FanSpdRatio );
 		else 
 			FanSpdRatioBase = FanSpdRatio;
 
@@ -8848,9 +8723,12 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		// Call the coil control logic to determine the air flow rate to match the given coil load
-		CalcVRFIUAirFlow( CoilIndex, QCoilReq, Tin, Win, TeTc, OACompOnMassFlow, FanSpdRatioAct, temp, temp, temp, temp, temp );
+		ControlVRFIUCoil( CoilIndex, QCoilReq, Tin, Win, TeTc, OACompOnMassFlow, FanSpdRatioAct, Wout, Tout, Hout, SHact, SCact );
 		
-		AirFlowRateResidual = FanSpdRatioAct - FanSpdRatio; // @@ ( FanSpdRatioAct - FanSpdRatio ) / FanSpdRatioBase;
+		Hin = PsyHFnTdbW( Tin, Win );
+		QCoilAct = FanSpdRatioAct * DXCoil( CoilIndex ).RatedAirMassFlowRate( Mode ) * ( Hout - Hin ); // positive for heating, negative for cooling
+		
+		AirFlowRateResidual = ( FanSpdRatioAct - FanSpdRatio ); //@@ / FanSpdRatioBase;
 
 		return AirFlowRateResidual;
 		

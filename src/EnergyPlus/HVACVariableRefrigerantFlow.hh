@@ -1578,13 +1578,10 @@ namespace HVACVariableRefrigerantFlow {
 	);
 	
 	Real64
-	CalVRFTUAirFlow_FluidTCtrl(
-		bool FirstHVACIteration, // FirstHVACIteration flag
+	CalVRFTUAirFlowRate_FluidTCtrl(
 		int VRFTUNum, // TU index
-		int DXCoilNum, // Compressor operating mode
-		Real64 QCoilReq, // zone load (W)
-		Real64 TeTc, // denominator representing zone load (W)
-		Real64 OACompOnMassFlow // delivered capacity of VRF terminal unit
+		Real64 PartLoadRatio, // part load ratio of the coil 
+		bool FirstHVACIteration // FirstHVACIteration flag
 	);
 	
 	Real64

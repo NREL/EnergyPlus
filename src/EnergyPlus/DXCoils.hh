@@ -1694,7 +1694,7 @@ namespace DXCoils {
 	);
 	
 	void
-	CalcVRFIUAirFlow (
+	ControlVRFIUCoil (
 		int const CoilIndex,  // index to VRFTU coil 
 		Real64 const QCoil,   // coil load
 		Real64 const Tin,     // inlet air temperature

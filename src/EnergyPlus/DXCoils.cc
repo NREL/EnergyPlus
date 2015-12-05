@@ -14544,7 +14544,7 @@ Label50: ;
 			}
 			
 			// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-			CalcVRFIUAirFlow( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).InletAirTemp, DXCoil( DXCoilNum ).InletAirHumRat, DXCoil( DXCoilNum ).EvaporatingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
+			ControlVRFIUCoil( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).InletAirTemp, DXCoil( DXCoilNum ).InletAirHumRat, DXCoil( DXCoilNum ).EvaporatingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
 			AirMassFlow = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
 			
 			// if ( FanOpMode == CycFanCycCoil ) {
@@ -14913,7 +14913,7 @@ Label50: ;
 			}
 			
 			// The following function calculates: (1) FanSpdRatio, (2) coil inlet/outlet conditions, and (3) SH/SC
-			CalcVRFIUAirFlow( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).InletAirTemp, DXCoil( DXCoilNum ).InletAirHumRat, DXCoil( DXCoilNum ).CondensingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
+			ControlVRFIUCoil( DXCoilNum, QCoilReq, DXCoil( DXCoilNum ).InletAirTemp, DXCoil( DXCoilNum ).InletAirHumRat, DXCoil( DXCoilNum ).CondensingTemp, AirMassFlowMin, FanSpdRatio, OutletAirHumRat, OutletAirTemp, OutletAirEnthalpy, ActualSH, ActualSC );
 			AirMassFlow = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
 			
 			// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton)
@@ -15262,7 +15262,7 @@ Label50: ;
 	}
 	
 	void
-	CalcVRFIUAirFlow (
+	ControlVRFIUCoil (
 		int const CoilIndex,  // index to VRFTU coil 
 		Real64 const QCoil,   // coil load
 		Real64 const Tin, // inlet air temperature
@@ -15393,7 +15393,7 @@ Label50: ;
 				Par( 4 ) = Garate;
 				Par( 5 ) = BF;
 
-				FanSpdRatioMax = 3.0;
+				FanSpdRatioMax = 1.5; //@@
 				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
 				if( SolFla < 0 ) Ratio1 = FanSpdRatioMax; // over capacity @@
 				FanSpdRatio = Ratio1;
