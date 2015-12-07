@@ -166,3 +166,67 @@ TEST_F( EnergyPlusFixture, BaseSurfaceRectangularTest )
 	EXPECT_FALSE( ErrorsFound );
 	EXPECT_EQ( Polygonal, Surface( ThisSurf ).Shape );
 }
+
+TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
+{
+	SurfaceData BaseSurface;
+	SurfaceData SubSurface;
+	bool surfaceError;
+
+	//Case 1 - Base surface and subsurface face the same way - should be no error message and no surfaceError
+	surfaceError = false;
+	BaseSurface.Azimuth = 0.;
+	BaseSurface.Tilt = 0.;
+	BaseSurface.NewellSurfaceNormalVector.x = 0.;
+	BaseSurface.NewellSurfaceNormalVector.y = 0.;
+	BaseSurface.NewellSurfaceNormalVector.z = 1.;
+
+	SubSurface.Azimuth = 0.;
+	SubSurface.Tilt = 0.;
+	SubSurface.NewellSurfaceNormalVector.x = 0.;
+	SubSurface.NewellSurfaceNormalVector.y = 0.;
+	SubSurface.NewellSurfaceNormalVector.z = 1.;
+	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
+	EXPECT_FALSE( surfaceError );
+	EXPECT_FALSE( has_err_output() );
+
+	//Case 2 - Base surface and subsurface face the opposite way - should be error message and surfaceError=true
+	surfaceError = false;
+	SubSurface.Azimuth = 180.;
+	SubSurface.Tilt = 180.;
+	SubSurface.NewellSurfaceNormalVector.x = 1.;
+	SubSurface.NewellSurfaceNormalVector.y = 0.;
+	SubSurface.NewellSurfaceNormalVector.z = 0.;
+	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
+	EXPECT_TRUE( surfaceError );
+	EXPECT_TRUE( has_err_output() );
+
+	//Case 3 - Base surface is horizontal and subsurface is different by 45 degrees azimuth - should be no warning message and surfaceError=false
+	surfaceError = false;
+	SubSurface.Azimuth = 45.;
+	SubSurface.Tilt = 0.;
+	SubSurface.NewellSurfaceNormalVector.x = 0.;
+	SubSurface.NewellSurfaceNormalVector.y = 1.; // This doesn't match the tilt and azimuth, but want it to be different so tilt and azimuth tests are executed
+	SubSurface.NewellSurfaceNormalVector.z = 1.;
+	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
+	EXPECT_FALSE( surfaceError );
+	EXPECT_FALSE( has_err_output() );
+
+	//Case 4 - Base surface is not horizontal and subsurface is different by 45 degrees azimuth and tilt - should be warning error message but surfaceError=false
+	surfaceError = false;
+	BaseSurface.Azimuth = 90.;
+	BaseSurface.Tilt = 90.;
+	BaseSurface.NewellSurfaceNormalVector.x = 1.;
+	BaseSurface.NewellSurfaceNormalVector.y = 0.;
+	BaseSurface.NewellSurfaceNormalVector.z = 0.;
+
+	SubSurface.Azimuth = 45.;
+	SubSurface.Tilt = 45.;
+	SubSurface.NewellSurfaceNormalVector.x = 1.;
+	SubSurface.NewellSurfaceNormalVector.y = 1.;
+	SubSurface.NewellSurfaceNormalVector.z = 1.;
+	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
+	EXPECT_FALSE( surfaceError );
+	EXPECT_TRUE( has_err_output() );
+
+}

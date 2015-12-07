@@ -333,6 +333,48 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
+	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
+	{
+		auto const has_output = this->eso_stream->str().size() > 0;
+		if ( reset_stream ) this->eso_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_mtr_output( bool reset_stream )
+	{
+		auto const has_output = this->mtr_stream->str().size() > 0;
+		if ( reset_stream ) this->mtr_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_echo_output( bool reset_stream )
+	{
+		auto const has_output = this->echo_stream->str().size() > 0;
+		if ( reset_stream ) this->echo_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_err_output( bool reset_stream )
+	{
+		auto const has_output = this->err_stream->str().size() > 0;
+		if ( reset_stream ) this->err_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_cout_output( bool reset_stream )
+	{
+		auto const has_output = this->m_cout_buffer->str().size() > 0;
+		if ( reset_stream ) this->m_cout_buffer->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_cerr_output( bool reset_stream )
+	{
+		auto const has_output = this->m_cerr_buffer->str().size() > 0;
+		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
+		return has_output;
+	}
+
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
 		if ( idf_snippet.empty() ) {
 			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
