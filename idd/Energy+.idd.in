@@ -66878,8 +66878,8 @@ ThermalStorage:Ice:Detailed,
        \type node
   A5 , \field Discharging Curve Object Type
        \type choice
-       \key Curve:QuadraticLinear
-       \key Curve:CubicLinear
+       \key QuadraticLinear
+       \key CubicLinear
   A6 , \field Discharging Curve Name
        \type object-list
        \object-list QuadraticLinearCurves
@@ -66887,8 +66887,8 @@ ThermalStorage:Ice:Detailed,
        \object-list UniVariateTables
   A7 , \field Charging Curve Object Type
        \type choice
-       \key Curve:QuadraticLinear
-       \key Curve:CubicLinear
+       \key QuadraticLinear
+       \key CubicLinear
   A8 , \field Charging Curve Name
        \type object-list
        \object-list QuadraticLinearCurves
