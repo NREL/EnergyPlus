@@ -102,7 +102,6 @@ struct TypeTraits
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -111,7 +110,6 @@ struct TypeTraits
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -120,7 +118,6 @@ struct TypeTraits
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -148,7 +145,6 @@ struct TypeTraits< char >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -157,7 +153,6 @@ struct TypeTraits< char >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -166,7 +161,6 @@ struct TypeTraits< char >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -194,7 +188,6 @@ struct TypeTraits< signed char >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -203,7 +196,6 @@ struct TypeTraits< signed char >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -212,7 +204,6 @@ struct TypeTraits< signed char >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -240,7 +231,6 @@ struct TypeTraits< unsigned char >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -249,7 +239,6 @@ struct TypeTraits< unsigned char >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -258,7 +247,6 @@ struct TypeTraits< unsigned char >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -286,7 +274,6 @@ struct TypeTraits< bool >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -295,7 +282,6 @@ struct TypeTraits< bool >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -304,7 +290,6 @@ struct TypeTraits< bool >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -332,7 +317,6 @@ struct TypeTraits< byte >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -341,7 +325,6 @@ struct TypeTraits< byte >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -350,7 +333,6 @@ struct TypeTraits< byte >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -378,7 +360,6 @@ struct TypeTraits< ubyte >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -387,7 +368,6 @@ struct TypeTraits< ubyte >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -396,7 +376,6 @@ struct TypeTraits< ubyte >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -424,7 +403,6 @@ struct TypeTraits< short int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -433,7 +411,6 @@ struct TypeTraits< short int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -442,7 +419,6 @@ struct TypeTraits< short int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -470,7 +446,6 @@ struct TypeTraits< unsigned short int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -479,7 +454,6 @@ struct TypeTraits< unsigned short int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -488,7 +462,6 @@ struct TypeTraits< unsigned short int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -516,7 +489,6 @@ struct TypeTraits< int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -525,7 +497,6 @@ struct TypeTraits< int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -534,7 +505,6 @@ struct TypeTraits< int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -562,7 +532,6 @@ struct TypeTraits< unsigned int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -571,7 +540,6 @@ struct TypeTraits< unsigned int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -580,7 +548,6 @@ struct TypeTraits< unsigned int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -608,7 +575,6 @@ struct TypeTraits< long int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -617,7 +583,6 @@ struct TypeTraits< long int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -626,7 +591,6 @@ struct TypeTraits< long int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -654,7 +618,6 @@ struct TypeTraits< unsigned long int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -663,7 +626,6 @@ struct TypeTraits< unsigned long int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -672,7 +634,6 @@ struct TypeTraits< unsigned long int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -700,7 +661,6 @@ struct TypeTraits< long long int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -709,7 +669,6 @@ struct TypeTraits< long long int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -718,7 +677,6 @@ struct TypeTraits< long long int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -746,7 +704,6 @@ struct TypeTraits< unsigned long long int >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -755,7 +712,6 @@ struct TypeTraits< unsigned long long int >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -764,7 +720,6 @@ struct TypeTraits< unsigned long long int >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -792,7 +747,6 @@ struct TypeTraits< float >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -801,7 +755,6 @@ struct TypeTraits< float >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -810,7 +763,6 @@ struct TypeTraits< float >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -838,7 +790,6 @@ struct TypeTraits< double >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -847,7 +798,6 @@ struct TypeTraits< double >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -856,7 +806,6 @@ struct TypeTraits< double >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -884,7 +833,6 @@ struct TypeTraits< long double >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -893,7 +841,6 @@ struct TypeTraits< long double >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -902,7 +849,6 @@ struct TypeTraits< long double >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -931,7 +877,6 @@ struct TypeTraits< std::complex< float > >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -940,7 +885,6 @@ struct TypeTraits< std::complex< float > >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -949,7 +893,6 @@ struct TypeTraits< std::complex< float > >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -978,7 +921,6 @@ struct TypeTraits< std::complex< double > >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -987,7 +929,6 @@ struct TypeTraits< std::complex< double > >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -996,7 +937,6 @@ struct TypeTraits< std::complex< double > >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
@@ -1025,7 +965,6 @@ struct TypeTraits< std::complex< long double > >
 	typedef  std::size_t  Size;
 
 	// Initial Value
-	inline
 	static
 	traits_type
 	initial_value()
@@ -1034,7 +973,6 @@ struct TypeTraits< std::complex< long double > >
 	}
 
 	// Debug Value
-	inline
 	static
 	traits_type
 	debug_value()
@@ -1043,7 +981,6 @@ struct TypeTraits< std::complex< long double > >
 	}
 
 	// Initial Array Value
-	inline
 	static
 	traits_type
 	initial_array_value()
