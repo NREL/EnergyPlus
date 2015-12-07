@@ -755,7 +755,7 @@ Table 1. Values for "Terrain"
 
 #### Warmup Convergence
 
-The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisifed too early and you may not get the results you expect from the actual simulation.
+The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions: temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisifed too early and you may not get the results you expect from the actual simulation.
 
 #### Field: Loads Convergence Tolerance Value
 
