@@ -20684,7 +20684,7 @@ SwimmingPool:Indoor,
        \type alpha
   A2,  \field Surface Name
        \required-field
-       \note To be matched with a construction in this input file
+       \note Name of the floor surface where the pool is located.
        \type object-list
        \object-list FloorSurfaceNames
   N1,  \field Average Depth
@@ -28291,7 +28291,7 @@ HVACTemplate:System:UnitarySystem,
       \note CoolReheat = cool beyond the dry-bulb setpoint, reheat with reheat coil
       \note If no reheat coil specified, cold supply temps may occur.
       \note Multimode = activate enhanced dehumidification mode as needed and meet sensible load.
-      \note Valid only for Cooling Coil Type = TwoStageHumidityControlDX
+      \note Valid only for Cooling Coil Type = TwoStageHumidityControlDX or HeatExchangerAssistedDX
       \type choice
       \key None
       \key CoolReheat
@@ -30153,7 +30153,7 @@ HVACTemplate:System:DedicatedOutdoorAir,
       \note as required to meet the humidity setpoint, reheat with desuperheater coil.
       \note Valid only for Cooling Coil Type = TwoSpeedDX, TwoStageDX, TwoStageHumidityControlDX, or HeatExchangerAssistedDX.
       \note Multimode = activate enhanced dehumidification mode as needed and meet sensible load.
-      \note Valid only for Cooling Coil Type = TwoStageHumidityControlDX
+      \note Valid only for Cooling Coil Type = TwoStageHumidityControlDX or HeatExchangerAssistedDX
       \type choice
       \key None
       \key CoolReheatHeatingCoil
@@ -51713,8 +51713,8 @@ AirLoopHVAC:UnitarySystem,
        \note None = meet sensible load only
        \note Multimode = activate enhanced dehumidification mode
        \note as needed and meet sensible load.  Valid only with
-       \note cooling coil type CoilSystem:Cooling:DX:HeatExchangerAssisted.
-       \note This control mode allows the heat exchanger to be turned
+       \note cooling coil type Coil:Cooling:DX:TwoStageWithHumidityControlMode or CoilSystem:Cooling:DX:HeatExchangerAssisted.
+       \note This control mode either switches the coil mode or allows the heat exchanger to be turned
        \note on and off based on the zone dehumidification requirements.
        \note A ZoneControl:Humidistat object is also required.
        \note CoolReheat = cool beyond the dry-bulb setpoint.
