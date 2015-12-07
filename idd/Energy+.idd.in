@@ -31456,8 +31456,9 @@ Sizing:System,
       \object-list AirPrimaryLoops
   A2, \field Type of Load to Size On
       \note Specifies the basis for sizing the system supply air flow rate
-      \note Sensible and VentilationRequirement are the only available options
-      \note Sensible uses the zone design air flow rates
+      \note Sensible and Total use the zone design air flow rates to size the system supply air flow rate
+      \note The cooling coil will then be sized at either the peak Sensible or Total flow rate and conditions
+      \note The heating coil is always sized at the peak sensible heating load.
       \note VentilationRequirement uses the system ventilation requirement
       \type choice
       \key Sensible
