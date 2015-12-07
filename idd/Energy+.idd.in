@@ -21333,7 +21333,7 @@ Output:IlluminanceMap,
   N4 , \field Number of X Grid Points
        \note Maximum number of total grid points must be <= 2500 (X*Y)
        \type integer
-       \minimum> 0
+       \minimum 1
        \default 2
   N5 , \field Y Minimum Coordinate
        \units m
@@ -21346,7 +21346,7 @@ Output:IlluminanceMap,
   N7 ; \field Number of Y Grid Points
        \note Maximum number of total grid points must be <= 2500 (X*Y)
        \type integer
-       \minimum> 0
+       \minimum 1
        \default 2
 
 OutputControl:IlluminanceMap:Style,
@@ -60228,9 +60228,9 @@ Chiller:Electric:EIR,
        \note EIR = 1/COP
        \required-field
        \type object-list
-       \object-list QuadraticCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
-       \note quadratic curve = a + b*PLR + c*PLR**2
+       \note quadratic curve = a + b*PLR + c*PLR**2 is typical, other univariate curves may be used
        \note PLR = part load ratio (cooling load/steady state capacity)
   N7 , \field Minimum Part Load Ratio
        \type real
@@ -60309,6 +60309,7 @@ Chiller:Electric:EIR,
   N14, \field Design Heat Recovery Water Flow Rate
        \type real
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
+       \note Heat recovery is only available with Condenser Type = WaterCooled.
        \units m3/s
        \minimum 0.0
        \default 0.0
@@ -60644,6 +60645,7 @@ Chiller:Electric,
        \minimum 0.0
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
+       \note Heat recovery is only available with Condenser Type = WaterCooled.
        \ip-units gal/min
        \autosizable
   A8 , \field Heat Recovery Inlet Node Name

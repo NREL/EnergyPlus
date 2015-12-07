@@ -17307,7 +17307,7 @@ This field is the name of the schedule that approximates the amount of air movem
 
 #### Field: Thermal Comfort Model Type (up to 5 allowed)
 
-The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55,, and AdaptiveCEN15251, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, and the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251 results for this particular people statement. Note that since up to five models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all five models if desired. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. For descriptions of the thermal comfort calculations, see the Engineering Reference document.
+The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55,, and AdaptiveCEN15251, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, and the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251 results for this particular people statement. AdaptiveASH55 is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 33.5C.  AdaptiveCEN15251 is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 30.0C. Note that since up to five models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all five models if desired. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. For descriptions of the thermal comfort calculations, see the Engineering Reference document.
 
 The following IDF example allows for a maximum of 31 people with scheduled occupancy of “Office Occupancy”, 60% radiant using an Activity Schedule of “Activity Sch”. The example allows for thermal comfort reporting.
 
@@ -17599,11 +17599,11 @@ This field is the “thermal sensation vote” (TSV) calculated using the KSU tw
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model 90% Acceptability Status []
 
-This field is to report whether the operative temperature falls into the 90% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the 90% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status [ ]
 
-This field is to report whether the operative temperature falls into the 80% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the 80% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature [C]
 
@@ -17613,27 +17613,27 @@ If the .epw file is used, the field reports the simple running average of the da
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature [C]
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80% acceptability limits for indoor operative temperature are defined as no greater than 2.5 degrees C from the adaptive comfort temperature. The 90% acceptability limits are defined as no greater than 3.5 degrees C from the adaptive comfort temperature.
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80% acceptability limits for indoor operative temperature are defined as no greater than 2.5 degrees C from the adaptive comfort temperature. The 90% acceptability limits are defined as no greater than 3.5 degrees C from the adaptive comfort temperature. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status
 
-This field is to report whether the operative temperature falls into the Category I (90% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category I (90% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status
 
-This field is to report whether the operative temperature falls into the Category II (80% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category II (80% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status
 
-This field is to report whether the operative temperature falls into the Category III (65% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category III (65% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature
 
-This field reports the weighted average of the outdoor air temperature of the previous five days, an input parameter for the CEN-15251 adaptive comfort model.
+This field reports the weighted average of the outdoor air temperature of the previous seven days, an input parameter for the CEN-15251 adaptive comfort model.
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Temperature
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively.
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 ### Simplified ASHRAE 55-2004 Graph Related Outputs
 
