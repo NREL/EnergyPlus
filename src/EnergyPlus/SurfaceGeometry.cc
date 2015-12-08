@@ -95,6 +95,7 @@ namespace SurfaceGeometry {
 		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool ProcessSurfaceVerticesOneTimeFlag( true );
+		int checkSubSurfAzTiltNormErrCount( 0 );
 		Array1D< Real64 > Xpsv;
 		Array1D< Real64 > Ypsv;
 		Array1D< Real64 > Zpsv;
@@ -131,6 +132,7 @@ namespace SurfaceGeometry {
 	clear_state( )
 	{
 		ProcessSurfaceVerticesOneTimeFlag = true;
+		checkSubSurfAzTiltNormErrCount = 0;
 		Xpsv.deallocate( );
 		Ypsv.deallocate( );
 		Zpsv.deallocate( );
@@ -864,11 +866,11 @@ namespace SurfaceGeometry {
 		int MultSurfNum;
 		std::string MultString;
 		static bool WarningDisplayed( false );
-		static int ErrCount1( 0 );
 		static int ErrCount2( 0 );
 		static int ErrCount3( 0 );
 		static int ErrCount4( 0 ); // counts of interzone area mismatches.
 		bool SubSurfaceSevereDisplayed;
+		bool subSurfaceError( false );
 		// INTEGER :: Warning4Count=0  ! counts of nonmatched flat surface subsurface orientations
 		// INTEGER :: Warning5Count=0  ! counts of nonmatched flat surface subsurface orientations - could not be resolved
 		bool errFlag;
@@ -883,19 +885,7 @@ namespace SurfaceGeometry {
 		//unused  LOGICAL :: initmsg
 		int ErrCount;
 		Real64 diffp;
-		//  TYPE(Vector), ALLOCATABLE, DIMENSION(:) :: TestVertex
-		//  INTEGER :: Vrt
-		//  INTEGER :: testV
-		//  INTEGER :: testVsave
-		//  INTEGER :: countSides
-		//  INTEGER :: LLCVrt
-		//  REAL(r64) :: maxX
-		//  REAL(r64) :: maxY
-		//  REAL(r64) :: testX
-		//  REAL(r64) :: testY
-		Real64 surfAzimuth;
 		//  LOGICAL :: Located
-		bool sameSurfNormal;
 		bool izConstDiff; // differences in construction for IZ surfaces
 		bool izConstDiffMsg; // display message about hb diffs only once.
 
@@ -1140,114 +1130,6 @@ namespace SurfaceGeometry {
 		} // ...end of the Surface DO loop for finding BaseSurf
 		//**********************************************************************************
 
-		//**********************************************************************************
-		// orientation of flat subsurfaces (window/door/etc) need to match base surface
-		// CR8628
-		//  ALLOCATE(TestVertex(4)) ! subsurfaces we will look at have max of 4 vertices
-		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-			if ( ! SurfaceTmp( SurfNum ).HeatTransSurf ) continue;
-			// If flat surface
-			surfAzimuth = SurfaceTmp( SurfNum ).Azimuth;
-			SurfTilt = SurfaceTmp( SurfNum ).Tilt;
-			if ( std::abs( SurfTilt ) <= 1.0e-5 || std::abs( SurfTilt - 180.0 ) <= 1.0e-5 ) {
-				// see if there are any subsurfaces on roofs/floors
-				for ( iTmp1 = 1; iTmp1 <= TotSurfaces; ++iTmp1 ) {
-					if ( iTmp1 == SurfNum ) continue;
-					if ( SurfaceTmp( iTmp1 ).BaseSurf != SurfNum ) continue;
-					if ( ! SurfaceTmp( iTmp1 ).HeatTransSurf ) continue;
-					//          write(outputfiledebug,'(A)') 'roof/floor basesurface='//TRIM(SurfaceTmp(SurfNum)%Name)
-					//          write(outputfiledebug,'(A,3f7.2)') 'basesurface lc vectors=',SurfaceTmp(SurfNum)%lcsx
-					//          write(outputfiledebug,'(3f7.2)') SurfaceTmp(SurfNum)%lcsy
-					//          write(outputfiledebug,'(3f7.2)') SurfaceTmp(SurfNum)%lcsz
-					//          write(outputfiledebug,'(A,3f7.2)') 'basesurface surfnorm=',SurfaceTmp(SurfNum)%NewellSurfaceNormalVector
-					//          write(outputfiledebug,'(A)') 'subsurface='//TRIM(SurfaceTmp(itmp1)%Name)
-					//          write(outputfiledebug,'(A,3f7.2)') 'subsurface lc vectors=',SurfaceTmp(itmp1)%lcsx
-					//          write(outputfiledebug,'(3f7.2)') SurfaceTmp(itmp1)%lcsy
-					//          write(outputfiledebug,'(3f7.2)') SurfaceTmp(itmp1)%lcsz
-					//          write(outputfiledebug,'(A,3f7.2)') 'subsurface surfnorm=',SurfaceTmp(itmp1)%NewellSurfaceNormalVector
-					if ( std::abs( SurfaceTmp( iTmp1 ).Azimuth - surfAzimuth ) <= 10.0 ) continue;
-					CompareTwoVectors( SurfaceTmp( SurfNum ).NewellSurfaceNormalVector, SurfaceTmp( iTmp1 ).NewellSurfaceNormalVector, sameSurfNormal, 0.001 );
-					if ( sameSurfNormal ) { // copy lcs vectors
-						SurfaceTmp( iTmp1 ).lcsx = SurfaceTmp( SurfNum ).lcsx;
-						SurfaceTmp( iTmp1 ).lcsy = SurfaceTmp( SurfNum ).lcsy;
-						SurfaceTmp( iTmp1 ).lcsy = SurfaceTmp( SurfNum ).lcsy;
-						continue;
-					}
-					//        IF (ABS(SurfaceTmp(itmp1)%Azimuth-360.0d0) < .01d0) THEN
-					//          SurfaceTmp(itmp1)%Azimuth=360.0d0-SurfaceTmp(itmp1)%Azimuth
-					//        ENDIF
-					//        IF (ABS(surfAzimuth-360.0d0) < .01d0) THEN
-					//          surfAzimuth=360.0d0-surfAzimuth
-					//          SurfaceTmp(SurfNum)%Azimuth=surfAzimuth
-					//        ENDIF
-					//        IF (ABS(SurfaceTmp(itmp1)%Azimuth-surfAzimuth) <= 10.d0) CYCLE
-					// have subsurface of base surface
-					// warning error
-					//        Warning4Count=Warning4Count+1
-					//        IF (Warning4Count == 1 .and. .not. DisplayExtraWarnings) THEN
-					//          CALL ShowSevereError(RoutineName//'Some Outward Facing angles of subsurfaces differ '//  &
-					//                               'significantly from flat roof/floor base surface.')
-					//          CALL ShowContinueError('Fixes will be attempted to align subsurface with base surface.')
-					//          CALL ShowContinueError('...use Output:Diagnostics,DisplayExtraWarnings; '//  &
-					//                   'to show more details on individual surfaces.')
-					//        ENDIF
-					if ( DisplayExtraWarnings ) {
-						ShowSevereError( RoutineName + "Outward facing angle [" + RoundSigDigits( SurfaceTmp( iTmp1 ).Azimuth, 3 ) + "] of subsurface=\"" + SurfaceTmp( iTmp1 ).Name + "\" significantly different than" );
-						ShowContinueError( "..facing angle [" + RoundSigDigits( SurfaceTmp( SurfNum ).Azimuth, 3 ) + "] of base surface=" + SurfaceTmp( SurfNum ).Name );
-						ShowContinueError( "..surface class of base surface=" + cSurfaceClass( SurfaceTmp( SurfNum ).Class ) );
-						//          CALL ShowContinueError('Fixes will be attempted to align subsurface with base surface.')
-					}
-					//        Vrt=1
-					//        testV=2
-					//        testVsave=2
-					//        Located=.FALSE.
-					//        DO CountSides=1,SurfaceTmp(itmp1)%Sides
-					//          DO Vrt=1,SurfaceTmp(itmp1)%Sides
-					//            TestVertex(Vrt)=SurfaceTmp(itmp1)%Vertex(testV)
-					//            testV=testV+1
-					//            if (testV > SurfaceTmp(itmp1)%Sides) testV=1
-					//          ENDDO
-					//          CALL CreateNewellSurfaceNormalVector(TestVertex,SurfaceTmp(itmp1)%Sides,  &
-					//                SurfaceTmp(itmp1)%NewellSurfaceNormalVector)
-					//          CALL DetermineAzimuthAndTilt(TestVertex,SurfaceTmp(itmp1)%Sides,SurfWorldAz,SurfTilt,  &
-					//                                SurfaceTmp(itmp1)%lcsx,SurfaceTmp(itmp1)%lcsy,SurfaceTmp(itmp1)%lcsz,  &
-					//                                SurfaceTmp(itmp1)%GrossArea,SurfaceTmp(itmp1)%NewellSurfaceNormalVector)
-					//          IF (ABS(surfAzimuth-surfWorldAz) <= 1.d-5) THEN  ! found it
-					//            DO Vrt=1,SurfaceTmp(itmp1)%Sides
-					//              SurfaceTmp(itmp1)%Vertex(Vrt)=TestVertex(Vrt)
-					//            ENDDO
-					//            SurfaceTmp(itmp1)%Azimuth=SurfWorldAz
-					//            SurfaceTmp(itmp1)%Tilt=SurfTilt
-					//            Located=.TRUE.
-					//            EXIT
-					//          ENDIF
-					//          testV=testVsave+1
-					//          IF (testV > SurfaceTmp(itmp1)%Sides) EXIT
-					//        ENDDO
-					//        IF (.not. Located) THEN
-					//          Warning5Count=Warning5Count+1
-					//          ! another warning
-					//          IF (DisplayExtraWarnings) THEN
-					//            CALL ShowContinueError('Fix could not be accomplished.  Original orientation is retained.')
-					//          ENDIF
-					//          CALL CreateNewellSurfaceNormalVector(SurfaceTmp(itmp1)%Vertex,SurfaceTmp(itmp1)%Sides,  &
-					//                  SurfaceTmp(itmp1)%NewellSurfaceNormalVector)
-					//          CALL DetermineAzimuthAndTilt(SurfaceTmp(itmp1)%Vertex,SurfaceTmp(itmp1)%Sides,SurfWorldAz,SurfTilt,  &
-					//                                SurfaceTmp(itmp1)%lcsx,SurfaceTmp(itmp1)%lcsy,SurfaceTmp(itmp1)%lcsz,  &
-					//                                SurfaceTmp(itmp1)%GrossArea,SurfaceTmp(itmp1)%NewellSurfaceNormalVector)
-					//          SurfaceTmp(itmp1)%Azimuth=SurfWorldAz
-					//          SurfaceTmp(itmp1)%Tilt=SurfTilt
-					//        ENDIF
-				}
-			}
-		}
-		//  IF (Warning5Count > 0) THEN
-		//    CALL ShowMessage(RoutineName//'There were '//TRIM(RoundSigDigits(Warning5Count))//  &
-		//       ' subsurfaces whose orientation (azimuth) could not be fixed to align with the base surface.')
-		//    CALL ShowMessage('Shadowing calculations may be inaccurate. Use Output:Diagnostics,DisplayExtraWarnings; for details.')
-		//  ENDIF
-		//  DEALLOCATE(TestVertex)
-
 		// The surfaces need to be hierarchical.  Input is allowed to be in any order.  In
 		// this section it is reordered into:
 
@@ -1363,47 +1245,8 @@ namespace SurfaceGeometry {
 					if ( Surface( SubSurfNum ).BaseSurf != SurfNum ) continue;
 
 					// Check facing angle of Sub compared to base
-					// ignore problems of subsurfaces on roofs/ceilings/floors with azimuth
-					//          IF (Surface(SurfNum)%Class == SurfaceClass_Roof .or. Surface(SurfNum)%Class == SurfaceClass_Floor) CYCLE
-					//          write(outputfiledebug,'(A)') 'basesurface='//TRIM(surface(SurfNum)%Name)
-					//          write(outputfiledebug,'(A,3F7.2)') 'basesurface lc vectors=',Surface(SurfNum)%lcsx
-					//          write(outputfiledebug,'(3f7.2)') Surface(SurfNum)%lcsy
-					//          write(outputfiledebug,'(3f7.2)') Surface(SurfNum)%lcsz
-					//          write(outputfiledebug,'(A,3f7.2)') 'basesurface surfnorm=',Surface(SurfNum)%NewellSurfaceNormalVector
-					//          write(outputfiledebug,'(A)') 'subsurface='//TRIM(surface(SubSurfNum)%Name)
-					//          write(outputfiledebug,'(A,3F7.2)') 'subsurface lc vectors=',Surface(SubSurfNum)%lcsx
-					//          write(outputfiledebug,'(3f7.2)') Surface(SubSurfNum)%lcsy
-					//          write(outputfiledebug,'(3f7.2)') Surface(SubSurfNum)%lcsz
-					//          write(outputfiledebug,'(A,3f7.2)') 'subsurface surfnorm=',Surface(SubSurfNum)%NewellSurfaceNormalVector
-					if ( std::abs( Surface( SubSurfNum ).Azimuth - Surface( SurfNum ).Azimuth ) <= 30.0 ) continue;
-					CompareTwoVectors( Surface( SurfNum ).NewellSurfaceNormalVector, Surface( SubSurfNum ).NewellSurfaceNormalVector, sameSurfNormal, 0.001 );
-					if ( sameSurfNormal ) { // copy lcs vectors
-						Surface( SubSurfNum ).lcsx = Surface( SurfNum ).lcsx;
-						Surface( SubSurfNum ).lcsy = Surface( SurfNum ).lcsy;
-						Surface( SubSurfNum ).lcsy = Surface( SurfNum ).lcsy;
-						continue;
-					}
-					if ( std::abs( Surface( SubSurfNum ).Azimuth - 360.0 ) < 0.01 ) {
-						Surface( SubSurfNum ).Azimuth = 360.0 - Surface( SubSurfNum ).Azimuth;
-					}
-					if ( std::abs( Surface( SurfNum ).Azimuth - 360.0 ) < 0.01 ) {
-						Surface( SurfNum ).Azimuth = 360.0 - Surface( SurfNum ).Azimuth;
-					}
-					if ( std::abs( Surface( SubSurfNum ).Azimuth - Surface( SurfNum ).Azimuth ) > 30.0 ) {
-						if ( std::abs( Surface( SurfNum ).SinTilt ) > 0.17 ) {
-							++ErrCount1;
-							if ( ErrCount1 == 1 && ! DisplayExtraWarnings ) {
-								ShowSevereError( RoutineName + "Some Outward Facing angles of subsurfaces differ significantly from base surface." );
-								ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces." );
-							}
-							if ( DisplayExtraWarnings ) {
-								ShowSevereError( RoutineName + "Outward facing angle [" + RoundSigDigits( Surface( SubSurfNum ).Azimuth, 1 ) + "] of subsurface=\"" + Surface( SubSurfNum ).Name + "\" significantly different than" );
-								ShowContinueError( "..facing angle [" + RoundSigDigits( Surface( SurfNum ).Azimuth, 1 ) + "] of base surface=" + Surface( SurfNum ).Name + " Tilt=" + RoundSigDigits( Surface( SurfNum ).Tilt, 1 ) );
-								ShowContinueError( "..surface class of base surface=" + cSurfaceClass( Surface( SurfNum ).Class ) );
-							}
-						}
-						//            SurfError=.TRUE.
-					}
+					checkSubSurfAzTiltNorm( Surface( SurfNum ), Surface( SubSurfNum ), subSurfaceError );
+					if (subSurfaceError) SurfError= true;
 				}
 			}
 		}
@@ -2029,6 +1872,62 @@ namespace SurfaceGeometry {
 			ShowFatalError( RoutineName + "Errors discovered, program terminates." );
 		}
 
+	}
+
+	void
+	checkSubSurfAzTiltNorm(
+		SurfaceData & baseSurface, // Base surface data (in)
+		SurfaceData & subSurface, // Subsurface data (in)
+		bool & surfaceError // True if surface azimuths or tilts differ by more than error tolerance
+	)
+	{
+		bool sameSurfNormal( false ); // True if surface has the same surface normal within tolerance
+		bool baseSurfHoriz( false ); // True if base surface is near horizontal
+		Real64 const warningTolerance( 30.0 );
+		Real64 const errorTolerance( 90.0 );
+
+		surfaceError = false;
+
+		// Check if base surface and subsurface have the same normal
+		Vectors::CompareTwoVectors( baseSurface.NewellSurfaceNormalVector, subSurface.NewellSurfaceNormalVector, sameSurfNormal, 0.001 );
+		if ( sameSurfNormal ) { // copy lcs vectors
+			// Prior logic tested for azimuth difference < 30 and then skipped this - this caused large diffs in CmplxGlz_MeasuredDeflectionAndShading
+			// Restoring that check here but will require further investigation (MJW Dec 2015)
+			if ( std::abs( baseSurface.Azimuth - subSurface.Azimuth ) > warningTolerance ){
+				subSurface.lcsx = baseSurface.lcsx;
+				subSurface.lcsy = baseSurface.lcsy;
+				subSurface.lcsy = baseSurface.lcsy;
+			}
+		} else {
+			// Not sure what this does, but keeping for now (MJW Dec 2015)
+			if ( std::abs( subSurface.Azimuth - 360.0 ) < 0.01 ) {
+				subSurface.Azimuth = 360.0 - subSurface.Azimuth;
+			}
+			if ( std::abs( baseSurface.Azimuth - 360.0 ) < 0.01 ) {
+				baseSurface.Azimuth = 360.0 - baseSurface.Azimuth;
+			}
+
+			// Is base surface horizontal? If so, ignore azimuth differences
+			if ( std::abs( baseSurface.Tilt ) <= 1.0e-5 || std::abs( baseSurface.Tilt - 180.0 ) <= 1.0e-5 ) baseSurfHoriz = true;
+
+			if ( ( ( std::abs( baseSurface.Azimuth - subSurface.Azimuth ) > errorTolerance ) && ! baseSurfHoriz ) || ( std::abs( baseSurface.Tilt - subSurface.Tilt ) > errorTolerance ) ) {
+				surfaceError = true;
+				ShowSevereError( "checkSubSurfAzTiltNorm: Outward facing angle of subsurface differs more than " + General::RoundSigDigits( errorTolerance, 1 ) + " degrees from base surface." );
+				ShowContinueError( "Subsurface=\"" + subSurface.Name + "\" Tilt = " + General::RoundSigDigits( subSurface.Tilt, 1 ) + "  Azimuth = " + General::RoundSigDigits( subSurface.Azimuth, 1 ) );
+				ShowContinueError( "Base surface=\"" + baseSurface.Name + "\" Tilt = " + General::RoundSigDigits( baseSurface.Tilt, 1 ) + "  Azimuth = " + General::RoundSigDigits( baseSurface.Azimuth, 1 ) );
+			} else if ( ( ( std::abs( baseSurface.Azimuth - subSurface.Azimuth ) > warningTolerance ) && !baseSurfHoriz ) || ( std::abs( baseSurface.Tilt - subSurface.Tilt ) > warningTolerance ) ) {
+				++checkSubSurfAzTiltNormErrCount;
+				if ( checkSubSurfAzTiltNormErrCount == 1 && !DisplayExtraWarnings ) {
+					ShowWarningError( "checkSubSurfAzTiltNorm: Some Outward Facing angles of subsurfaces differ more than " + General::RoundSigDigits( warningTolerance, 1 ) + " degrees from base surface." );
+					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces." );
+				}
+				if ( DisplayExtraWarnings ) {
+					ShowWarningError( "checkSubSurfAzTiltNorm: Outward facing angle of subsurface differs more than " + General::RoundSigDigits( warningTolerance, 1 ) + " degrees from base surface." );
+					ShowContinueError( "Subsurface=\"" + subSurface.Name + "\" Tilt = " + General::RoundSigDigits( subSurface.Tilt, 1 ) + "  Azimuth = " + General::RoundSigDigits( subSurface.Azimuth, 1 ) );
+					ShowContinueError( "Base surface=\"" + baseSurface.Name + "\" Tilt = " + General::RoundSigDigits( baseSurface.Tilt, 1 ) + "  Azimuth = " + General::RoundSigDigits( baseSurface.Azimuth, 1 ) );
+				}
+			}
+		}
 	}
 
 	void
