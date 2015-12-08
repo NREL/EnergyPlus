@@ -5949,7 +5949,9 @@ namespace DXCoils {
 						DataFractionUsedForSizing = 0.0;
 					}
 				} else {
-					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+					PrintFlag = true;
+					FieldNum = 0;
+					if( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 						SizingMethod = CoolingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name + ":" + DXCoil( DXCoilNum ).CoilPerformanceName( Mode );
 						FieldNum = 4;
@@ -5974,15 +5976,22 @@ namespace DXCoils {
 					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) {
 						SizingMethod = HeatingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
-					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {
+					} else if( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {
 						SizingMethod = CoolingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
+					} else if( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
+						SizingMethod = CoolingAirflowSizing;
+						CompName = DXCoil( DXCoilNum ).Name;
+						PrintFlag = false;
+					} else if( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
+						SizingMethod = HeatingAirflowSizing;
+						CompName = DXCoil( DXCoilNum ).Name;
+						PrintFlag = false;
 					} else {
 						SizingMethod = CoolingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
 						FieldNum = 4;
 					}
-					PrintFlag = true;
 					TempSize = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode );
 					if( FieldNum > 0 ){
 						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
@@ -6066,16 +6075,18 @@ namespace DXCoils {
 				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
-					FieldNum = 1;
+					FieldNum = 6 + ( DXCoil( DXCoilNum ).NumOfSpeeds - 1 ) * 13;
 					DataTotCapCurveIndex = DXCoil ( DXCoilNum ).MSCCapFTemp ( Mode );
 					TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
+					PrintFlag = false;
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
 					SizingMethod = HeatingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
-					FieldNum = 1;
+					FieldNum = 10 + ( DXCoil( DXCoilNum ).NumOfSpeeds - 1 ) * 5;
 					DataTotCapCurveIndex = DXCoil ( DXCoilNum ).MSCCapFTemp ( Mode );
 					TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
+					PrintFlag = false;
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 				} else {
 					SizingMethod = CoolingCapacitySizing;
