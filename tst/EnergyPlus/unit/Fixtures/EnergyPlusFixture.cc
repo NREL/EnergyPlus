@@ -107,6 +107,8 @@ std::unique_ptr<EnergyPlus::InputProcessorCache> EnergyPlus::EnergyPlusFixture::
 namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUp() {
+		clear_all_states();
+		
 		show_message();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -132,6 +134,27 @@ namespace EnergyPlus {
 
 	void EnergyPlusFixture::TearDown() {
 
+		clear_all_states();
+
+		{
+			IOFlags flags;
+			flags.DISPOSE( "DELETE" );
+			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
+			gio::close( DataGlobals::OutputFileStandard, flags );
+			gio::close( DataGlobals::OutputStandardError, flags );
+			gio::close( DataGlobals::OutputFileInits, flags );
+			gio::close( DataGlobals::OutputFileDebug, flags );
+			gio::close( DataGlobals::OutputFileZoneSizing, flags );
+			gio::close( DataGlobals::OutputFileSysSizing, flags );
+			gio::close( DataGlobals::OutputFileMeters, flags );
+			gio::close( DataGlobals::OutputFileBNDetails, flags );
+			gio::close( DataGlobals::OutputFileZonePulse, flags );
+
+		}
+	}
+
+	void EnergyPlusFixture::clear_all_states()
+	{
 		// A to Z order
 		BranchInputManager::clear_state();
 		CondenserLoopTowers::clear_state();
@@ -216,22 +239,6 @@ namespace EnergyPlus {
 		ZoneAirLoopEquipmentManager::clear_state();
 		ZoneEquipmentManager::clear_state();
 		ZoneTempPredictorCorrector::clear_state();
-
-		{
-			IOFlags flags;
-			flags.DISPOSE( "DELETE" );
-			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
-			gio::close( DataGlobals::OutputFileStandard, flags );
-			gio::close( DataGlobals::OutputStandardError, flags );
-			gio::close( DataGlobals::OutputFileInits, flags );
-			gio::close( DataGlobals::OutputFileDebug, flags );
-			gio::close( DataGlobals::OutputFileZoneSizing, flags );
-			gio::close( DataGlobals::OutputFileSysSizing, flags );
-			gio::close( DataGlobals::OutputFileMeters, flags );
-			gio::close( DataGlobals::OutputFileBNDetails, flags );
-			gio::close( DataGlobals::OutputFileZonePulse, flags );
-
-		}
 	}
 
 	void EnergyPlusFixture::setup_cache()
@@ -326,6 +333,48 @@ namespace EnergyPlus {
 		bool are_equal = ( expected_string == stream_str );
 		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
 		return are_equal;
+	}
+
+	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
+	{
+		auto const has_output = this->eso_stream->str().size() > 0;
+		if ( reset_stream ) this->eso_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_mtr_output( bool reset_stream )
+	{
+		auto const has_output = this->mtr_stream->str().size() > 0;
+		if ( reset_stream ) this->mtr_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_echo_output( bool reset_stream )
+	{
+		auto const has_output = this->echo_stream->str().size() > 0;
+		if ( reset_stream ) this->echo_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_err_output( bool reset_stream )
+	{
+		auto const has_output = this->err_stream->str().size() > 0;
+		if ( reset_stream ) this->err_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_cout_output( bool reset_stream )
+	{
+		auto const has_output = this->m_cout_buffer->str().size() > 0;
+		if ( reset_stream ) this->m_cout_buffer->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_cerr_output( bool reset_stream )
+	{
+		auto const has_output = this->m_cerr_buffer->str().size() > 0;
+		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
+		return has_output;
 	}
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
@@ -471,18 +520,22 @@ namespace EnergyPlus {
 			if ( use_assertions ) EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
 			errors_found = true;
 		}
-
+		if (DataStringGlobals::IDDVerString.find(DataStringGlobals::MatchVersion) == std::string::npos) {
+			ShowSevereError("IP: Possible incorrect IDD File");
+			ShowContinueError(DataStringGlobals::IDDVerString + " not the same as expected =\"" + DataStringGlobals::MatchVersion + "\"");
+		}
 		if ( OverallErrorFlag ) {
 			if ( use_assertions ) EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
 
 			// check if IDF version matches IDD version
 			// this really shouldn't be an issue but i'm keeping it just in case a unit test is written against a specific IDF version
 			// This fixture will always use the most up to date version of the IDD regardless.
+
 			bool found_version = false;
 			for ( auto const idf_record : IDFRecords ) {
 				if ( "VERSION" == idf_record.Name ) {
 					bool bad_version = false;
-					auto const version_length( len( DataStringGlobals::MatchVersion ) );
+					auto const version_length( len(DataStringGlobals::MatchVersion ) );
 					if ( ( version_length > 0 ) && ( DataStringGlobals::MatchVersion[ version_length - 1 ] == '0' ) ) {
 						bad_version = ( DataStringGlobals::MatchVersion.substr( 0, version_length - 2 ) == idf_record.Alphas( 1 ).substr( 0, version_length - 2 ) );
 					} else {
