@@ -1551,6 +1551,13 @@ namespace HVACVariableRefrigerantFlow {
 	CalcVRFIUTeTc_FluidTCtrl(
 		int const IndexVRFCondenser // index to VRF Outdoor Unit
 	);
+	
+	void
+	CalcVRFIUVariableTeTc(
+		int const VRFTUNum, // the number of the VRF TU to be simulated
+		Real64 & EvapTemp, // evaporating temperature
+		Real64 & CondTemp  // condensing temperature 
+	);
 		
 	void
 	ControlVRF_FluidTCtrl(

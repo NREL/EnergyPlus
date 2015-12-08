@@ -6900,7 +6900,7 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xiufeng Pang, LBNL
 		//       DATE WRITTEN   Feb 2014
-		//       MODIFIED       Nov 2015, RP Zhang, LBNL, Modify the bounds of the Te/Tc
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL, Modify the bounds of the Te/Tc, take into account OA
 		//       RE-ENGINEERED  na
 		
 		// PURPOSE OF THIS SUBROUTINE:
@@ -6917,8 +6917,14 @@ namespace HVACVariableRefrigerantFlow {
 		using DataEnvironment::OutBaroPress;
 		using DXCoils::DXCoil;
 		using Fans::Fan;
+		using Fans::SimulateFanComponents;
+		using InputProcessor::FindItemInList;
+		using MixedAir::SimOAMixer;
+		using MixedAir::OAMixer;
 		using HVACVariableRefrigerantFlow::VRF;
 		using HVACVariableRefrigerantFlow::VRFTU;
+		using MixedAir::SimOAMixer;
+		using Psychrometrics::PsyHFnTdbW;
 		
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -6933,70 +6939,58 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 		
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 QZnReqSenCoolingLoad; // Zone required sensible cooling load (W) 
-		Real64 QZnReqSenHeatingLoad; // Zone required sensible heating load (W)
+		int const Mode( 1 ); // Performance mode for MultiMode DX coil. Always 1 for other coil types
+		int CoolCoilNum; // index to the VRF Cooling DX coil to be simulated
+		int FanOutletNode; // index to the outlet node of the fan
+		int HeatCoilNum; // index to the VRF Heating DX coil to be simulated
+		int OAMixerNum; //OA mixer index
+		int OAMixNode; // index to the mix node of OA mixer
+		int IndexToTUInTUList; // index to TU in specific list for the VRF system
+		int TUListIndex; // index to TU list for this VRF system
+		int VRFNum; // index to VRF that the VRF Terminal Unit serves
+		int VRFInletNode; // VRF inlet node number
+		int ZoneIndex; // index to zone where the VRF Terminal Unit resides
+		Real64 BFC; // Bypass factor at the cooling mode (-)
+		Real64 BFH; // Bypass factor at the heating mode (-)
 		Real64 C1Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-) 
 		Real64 C2Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
 		Real64 C3Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
 		Real64 C1Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
 		Real64 C2Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
 		Real64 C3Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
-		Real64 RatedCapCool; // Nominal cooling capacity (W)
-		Real64 RatedCapHeat; // Nominal heating capacity (W)
-		Real64 TairInlet; // Air temperature at the indoor unit inlet (C)
-		Real64 Tout; // Air temperature at the indoor unit outlet (C)
-		Real64 TcoilIn; // Temperature of the air at the coil inlet, after absorbing the heat released by fan (C)
-		Real64 Th2; // Air temperature at the coil surface (C)
-		Real64 Th2min; // Air temperature at the coil surface, correspond to the maximum cooling capacity (C)
-		Real64 Hin; // Air enthalpy at the coil inlet (kJ/kg)
-		Real64 Win; // Air humidity ratio at the coil inlet (kg/kg)
-		Real64 BFC; // Bypass factor at the cooling mode (-)
-		Real64 BFH; // Bypass factor at the heating mode (-)
-		Real64 SH; // Super heating degrees (C)
-		Real64 SC; // Subcooling degrees (C)
-		Real64 Qfan; // Heat released by fan (W)
-		Real64 Garate; // Nominal air mass flow rate
-		Real64 hADP; // Air enthalpy at the saturated condition when DBT is Th2min (kJ/kg)
-		Real64 wADP; // Air humidity ratio at the saturated condition when DBT is Th2min (kg/kg)
-		Real64 hTinwADP; // Air enthalpy when DBT is TairInlet and humidity ratio is wADP  (kJ/kg)
-		Real64 SHRini; // Initialized SHR (-)
-		Real64 DeltaT; // Difference between evaporating/condensing temperature and coil surface temperature (C)
-		Real64 RHsat; // Relative humidity of the air at saturated condition(-) 
-		Real64 EvapTempMax; // Max evaporating temperature (C)
-		Real64 EvapTempMin; // Min evaporating temperature, correspond to the maximum cooling capacity (C)
 		Real64 CondTempMin; // Min condensing temperature (C)
 		Real64 CondTempMax; // Max condensing temperature, correspond to the maximum heating capacity (C)
-		int CoolCoilNum; // index to the VRF Cooling DX coil to be simulated
-		int HeatCoilNum; // index to the VRF Heating DX coil to be simulated
-		int VRFNum; // index to VRF that the VRF Terminal Unit serves
-		int ZoneIndex; // index to zone where the VRF Terminal Unit resides
+		Real64 DeltaT; // Difference between evaporating/condensing temperature and coil surface temperature (C)
+		Real64 EvapTempMax; // Max evaporating temperature (C)
+		Real64 EvapTempMin; // Min evaporating temperature, correspond to the maximum cooling capacity (C)
+		Real64 Garate; // Nominal air mass flow rate
+		Real64 H_coil_in; // Air enthalpy at the coil inlet (kJ/kg)
+		Real64 QZnReqSenCoolingLoad; // Zone required sensible cooling load (W) 
+		Real64 QZnReqSenHeatingLoad; // Zone required sensible heating load (W)
+		Real64 RHsat; // Relative humidity of the air at saturated condition(-) 
+		Real64 SH; // Super heating degrees (C)
+		Real64 SC; // Subcooling degrees (C)
+		Real64 temp; // for temporary use
+		Real64 T_coil_in; // Temperature of the air at the coil inlet, after absorbing the heat released by fan (C)
+		Real64 T_TU_in; // Air temperature at the indoor unit inlet (C)
+		Real64 Tout; // Air temperature at the indoor unit outlet (C)
+		Real64 Th2; // Air temperature at the coil surface (C)
+		Real64 W_coil_in; // coil inlet air humidity ratio [kg/kg]
+		Real64 W_TU_in; // Air humidity ratio at the indoor unit inlet[kg/kg]
 		
 		// Get the equipment/zone index corresponding to the VRFTU
 		CoolCoilNum = VRFTU( VRFTUNum ).CoolCoilIndex;
 		HeatCoilNum = VRFTU( VRFTUNum ).HeatCoilIndex;
 		ZoneIndex = VRFTU( VRFTUNum ).ZoneNum;
 		VRFNum = VRFTU( VRFTUNum ).VRFSysNum;
+		TUListIndex = VRF( VRFNum ).ZoneTUListPtr;
+		IndexToTUInTUList = VRFTU( VRFTUNum ).IndexToTUInTUList;
 		
 		// Bounds of Te/Tc for VRF IU Control Algorithm: VariableTemp
 		EvapTempMin = VRF( VRFNum ).IUEvapTempLow;
 		EvapTempMax = VRF( VRFNum ).IUEvapTempHigh;
 		CondTempMin = VRF( VRFNum ).IUCondTempLow;
 		CondTempMax = VRF( VRFNum ).IUCondTempHigh;
-		
-		// Obtain zonal heating/cooling loads
-		QZnReqSenCoolingLoad = - 1.0 * ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP;
-		QZnReqSenHeatingLoad = ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP;
-		
-		TairInlet = DXCoil( CoolCoilNum ).InletAirTemp;
-		RatedCapCool = DXCoil( CoolCoilNum ).RatedTotCap( 1 ); // Rated total cooling capacity
-		RatedCapHeat = DXCoil( HeatCoilNum ).RatedTotCap( 1 ); // Rated heating capacity
-		Garate = DXCoil( CoolCoilNum ).RatedAirMassFlowRate( 1 ); 
-		Hin = DXCoil( CoolCoilNum ).InletAirEnthalpy;
-		Win = DXCoil( CoolCoilNum ).InletAirHumRat;
-		EvapTemp = EvapTempMin;
-		RHsat = 0.98;
-		BFC = 0.0592; 
-		BFH = 0.136;  
 		
 		// Coefficients describing coil performance
 		SH = DXCoil( CoolCoilNum ).SH;
@@ -7008,57 +7002,74 @@ namespace HVACVariableRefrigerantFlow {
 		C2Tcond = DXCoil( HeatCoilNum ).C2Tc;
 		C3Tcond = DXCoil( HeatCoilNum ).C3Tc;
 		
-		// Get heat released by fan
-		int SupplyFanIndex = DXCoil( CoolCoilNum ).SupplyFanIndex;
-		if ( SupplyFanIndex > 0) {
-			Qfan = Fan( SupplyFanIndex ).OutletAirEnthalpy - Fan( SupplyFanIndex ).InletAirEnthalpy;
-		} else {
-			Qfan = 0;
-		}
-	
-		//1. COOLING Mode
-		if ( QZnReqSenCoolingLoad <= 0 ){
-		//1.1) There is no cooling load
-			EvapTemp = DXCoil( CoolCoilNum ).InletAirTemp;
-	
-		} else {
-		//1.2) There is cooling load
+		// Rated air flow rate for the coil
+		if ( ( ! VRF( VRFNum ).HeatRecoveryUsed && CoolingLoad( VRFNum ) ) || ( VRF( VRFNum ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
+			// VRF terminal unit is on cooling mode
+			CompOnMassFlow = DXCoil( CoolCoilNum ).RatedAirMassFlowRate( Mode );
+		} else if ( ( ! VRF( VRFNum ).HeatRecoveryUsed && HeatingLoad( VRFNum ) ) || ( VRF( VRFNum ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) ) {
+			// VRF terminal unit is on heating mode
+			CompOnMassFlow = DXCoil( HeatCoilNum ).RatedAirMassFlowRate( Mode );
+		} 
 		
+		// Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
+		SetAverageAirFlow( VRFTUNum, 1.0, temp );
+		VRFInletNode = VRFTU( VRFTUNum ).VRFTUInletNodeNum;
+		T_TU_in = Node( VRFInletNode ).Temp;
+		W_TU_in = Node( VRFInletNode ).HumRat;
+		T_coil_in = T_TU_in;
+		W_coil_in = W_TU_in;
+		
+		// Simulation the OAMixer if there is any
+		if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
+			SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, false, VRFTU( VRFTUNum ).OAMixerIndex );
+			
+			OAMixerNum = FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );
+			OAMixNode = OAMixer( OAMixerNum ).MixNode;
+			T_coil_in = Node( OAMixNode ).Temp;
+			W_coil_in = Node( OAMixNode ).HumRat;
+		}
+
+		// Simulate the blow-through fan if there is any
+		if ( VRFTU( VRFTUNum ).FanPlace == BlowThru ) {
+			SimulateFanComponents( "", false, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			
+			FanOutletNode = Fan( VRFTU( VRFTUNum ).FanIndex ).OutletNodeNum;
+			T_coil_in = Node( FanOutletNode ).Temp;
+			W_coil_in = Node( FanOutletNode ).HumRat;
+		}
+		
+		Garate = CompOnMassFlow;
+		H_coil_in = PsyHFnTdbW( T_coil_in, W_coil_in );
+		RHsat = 0.98;
+		BFC = 0.0592; 
+		BFH = 0.136;  
+		
+		//1. COOLING Mode
+		if ( ( ! VRF( VRFNum ).HeatRecoveryUsed && CoolingLoad( VRFNum ) ) || ( VRF( VRFNum ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
+		//1.1) Cooling coil is running
+			QZnReqSenCoolingLoad = max( 0.0, - 1.0 * ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP );
+			Tout = T_TU_in - QZnReqSenCoolingLoad / Garate / 1005;   
+			Th2 = T_coil_in - ( T_coil_in - Tout ) / ( 1 - BFC );
 			DeltaT = C3Tevap * SH * SH + C2Tevap * SH + C1Tevap;
-			Th2min = EvapTempMin + DeltaT;  
-			hADP = PsyHFnTdbRhPb( Th2min, RHsat, OutBaroPress, "CalcVRFIUVariableTeTc" );
-			wADP = PsyWFnTdbH( Th2min, hADP, "CalcVRFIUVariableTeTc" );
-			hTinwADP = PsyHFnTdbW( TairInlet, wADP );
-			SHRini = min( ( hTinwADP - hADP ) / ( Hin-hADP ), 1.0 );
-	
-			if ( QZnReqSenCoolingLoad >= RatedCapCool * SHRini ) // Rated sensible cooling capacity
-			// correspond to the maximum cooling capacity
-				EvapTemp = EvapTempMin;
-			else {
-				TcoilIn = TairInlet + Qfan / Garate / 1005;
-				Tout = TcoilIn - QZnReqSenCoolingLoad / Garate / 1005;   
-				Th2 = TcoilIn - ( TcoilIn - Tout ) / ( 1 - BFC );
-				EvapTemp = max( min( (Th2 - DeltaT ), EvapTempMax ), EvapTempMin );
-			}     
+			EvapTemp = max( min( (Th2 - DeltaT ), EvapTempMax ), EvapTempMin );
+			
+		} else {
+		//1.2) Cooling coil is not running
+			EvapTemp = T_coil_in;
 		}
 		
 		//2. HEATING Mode
-		if ( QZnReqSenHeatingLoad <= 0 ) {
-		//2.1) There is no heating load
-			CondTemp = DXCoil( HeatCoilNum ).InletAirTemp;
+		if ( ( ! VRF( VRFNum ).HeatRecoveryUsed && HeatingLoad( VRFNum ) ) || ( VRF( VRFNum ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) ) {
+		//2.1) Heating coil is running
+			QZnReqSenHeatingLoad = max( 0.0, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP );
+			Tout = T_TU_in + QZnReqSenHeatingLoad / Garate / 1005;        
+			Th2 = T_coil_in + ( Tout - T_coil_in ) / ( 1 - BFH );
+			DeltaT = C3Tcond * SC * SC + C2Tcond * SC + C1Tcond;
+			CondTemp = max( min( ( Th2 + DeltaT ), CondTempMax ), CondTempMin);
 		} else {
-		//2.2) There is heating load
-			if ( QZnReqSenHeatingLoad >= RatedCapHeat ) {
-				// correspond to the maximum heating capacity
-				CondTemp = CondTempMax;
-			} else {
-				TcoilIn = TairInlet + Qfan / Garate / 1005;
-				Tout = TcoilIn + QZnReqSenHeatingLoad / Garate / 1005;        
-				Th2 = TcoilIn + ( Tout - TcoilIn ) / ( 1 - BFH );
-				DeltaT = C3Tcond * SC * SC + C2Tcond * SC + C1Tcond;
-				CondTemp = max( min( ( Th2 + DeltaT ), CondTempMax ), CondTempMin);
-			}
-		}
+		//2.2) Heating coil is not running
+			CondTemp = T_coil_in;
+		} 
 	}
 
 	void
