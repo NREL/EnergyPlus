@@ -5302,7 +5302,8 @@ namespace HVACVariableRefrigerantFlow {
 		VRFTU( VRFTUNum ).TerminalUnitLatentRate = LatOutputProvided;
 
 	}
-		void
+		
+	void
 	ControlVRF(
 		int const VRFTUNum, // Index to VRF terminal unit
 		Real64 const QZnReq, // Index to zone number
@@ -6852,7 +6853,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// Using/Aliasing
-		using DXCoils::CalcVRFIUEvapCondTemp;
+		// na
 		
 		// Followings for FluidTCtrl Only
 		Array1D< Real64 >  EvapTemp;
@@ -6872,7 +6873,7 @@ namespace HVACVariableRefrigerantFlow {
 			for ( int i = 1; i <= TerminalUnitList( TUListNum ).NumTUInList; i++ ) {
 				int VRFTUNumi = TerminalUnitList( TUListNum ).ZoneTUPtr( i );
 				// analyze the conditions of each IU 
-				CalcVRFIUEvapCondTemp( VRFTUNumi, EvapTemp( i ), CondTemp( i ) );
+				CalcVRFIUVariableTeTc( VRFTUNumi, EvapTemp( i ), CondTemp( i ) );
 
 				// select the Te/Tc that can satisfy all the zones
 				IUMinEvapTemp = min( IUMinEvapTemp, EvapTemp( i ), 15.0);
@@ -6890,6 +6891,176 @@ namespace HVACVariableRefrigerantFlow {
 	
 	}
 	
+	void
+	CalcVRFIUVariableTeTc(
+		int const VRFTUNum, // the number of the VRF TU to be simulated
+		Real64 & EvapTemp, // evaporating temperature
+		Real64 & CondTemp  // condensing temperature 
+	) {
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Xiufeng Pang, LBNL
+		//       DATE WRITTEN   Feb 2014
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL, Modify the bounds of the Te/Tc
+		//       RE-ENGINEERED  na
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		//       Calculate the VRF IU Te (cooling mode) and Tc (heating mode), given zonal loads.
+		
+		// METHODOLOGY EMPLOYED:
+		//       A new physics based VRF model appliable for Fluid Temperature Control.
+		
+		// REFERENCES:
+		// na
+		
+		// USE STATEMENTS:
+		using namespace DataZoneEnergyDemands;
+		using DataEnvironment::OutBaroPress;
+		using DXCoils::DXCoil;
+		using Fans::Fan;
+		using HVACVariableRefrigerantFlow::VRF;
+		using HVACVariableRefrigerantFlow::VRFTU;
+		
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+		
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+		
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+		
+		// DERIVED TYPE DEFINITIONS
+		// na
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 QZnReqSenCoolingLoad; // Zone required sensible cooling load (W) 
+		Real64 QZnReqSenHeatingLoad; // Zone required sensible heating load (W)
+		Real64 C1Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-) 
+		Real64 C2Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
+		Real64 C3Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
+		Real64 C1Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
+		Real64 C2Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
+		Real64 C3Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
+		Real64 RatedCapCool; // Nominal cooling capacity (W)
+		Real64 RatedCapHeat; // Nominal heating capacity (W)
+		Real64 TairInlet; // Air temperature at the indoor unit inlet (C)
+		Real64 Tout; // Air temperature at the indoor unit outlet (C)
+		Real64 TcoilIn; // Temperature of the air at the coil inlet, after absorbing the heat released by fan (C)
+		Real64 Th2; // Air temperature at the coil surface (C)
+		Real64 Th2min; // Air temperature at the coil surface, correspond to the maximum cooling capacity (C)
+		Real64 Hin; // Air enthalpy at the coil inlet (kJ/kg)
+		Real64 Win; // Air humidity ratio at the coil inlet (kg/kg)
+		Real64 BFC; // Bypass factor at the cooling mode (-)
+		Real64 BFH; // Bypass factor at the heating mode (-)
+		Real64 SH; // Super heating degrees (C)
+		Real64 SC; // Subcooling degrees (C)
+		Real64 Qfan; // Heat released by fan (W)
+		Real64 Garate; // Nominal air mass flow rate
+		Real64 hADP; // Air enthalpy at the saturated condition when DBT is Th2min (kJ/kg)
+		Real64 wADP; // Air humidity ratio at the saturated condition when DBT is Th2min (kg/kg)
+		Real64 hTinwADP; // Air enthalpy when DBT is TairInlet and humidity ratio is wADP  (kJ/kg)
+		Real64 SHRini; // Initialized SHR (-)
+		Real64 DeltaT; // Difference between evaporating/condensing temperature and coil surface temperature (C)
+		Real64 RHsat; // Relative humidity of the air at saturated condition(-) 
+		Real64 EvapTempMax; // Max evaporating temperature (C)
+		Real64 EvapTempMin; // Min evaporating temperature, correspond to the maximum cooling capacity (C)
+		Real64 CondTempMin; // Min condensing temperature (C)
+		Real64 CondTempMax; // Max condensing temperature, correspond to the maximum heating capacity (C)
+		int CoolCoilNum; // index to the VRF Cooling DX coil to be simulated
+		int HeatCoilNum; // index to the VRF Heating DX coil to be simulated
+		int VRFNum; // index to VRF that the VRF Terminal Unit serves
+		int ZoneIndex; // index to zone where the VRF Terminal Unit resides
+		
+		// Get the equipment/zone index corresponding to the VRFTU
+		CoolCoilNum = VRFTU( VRFTUNum ).CoolCoilIndex;
+		HeatCoilNum = VRFTU( VRFTUNum ).HeatCoilIndex;
+		ZoneIndex = VRFTU( VRFTUNum ).ZoneNum;
+		VRFNum = VRFTU( VRFTUNum ).VRFSysNum;
+		
+		// Bounds of Te/Tc for VRF IU Control Algorithm: VariableTemp
+		EvapTempMin = VRF( VRFNum ).IUEvapTempLow;
+		EvapTempMax = VRF( VRFNum ).IUEvapTempHigh;
+		CondTempMin = VRF( VRFNum ).IUCondTempLow;
+		CondTempMax = VRF( VRFNum ).IUCondTempHigh;
+		
+		// Obtain zonal heating/cooling loads
+		QZnReqSenCoolingLoad = - 1.0 * ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP;
+		QZnReqSenHeatingLoad = ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP;
+		
+		TairInlet = DXCoil( CoolCoilNum ).InletAirTemp;
+		RatedCapCool = DXCoil( CoolCoilNum ).RatedTotCap( 1 ); // Rated total cooling capacity
+		RatedCapHeat = DXCoil( HeatCoilNum ).RatedTotCap( 1 ); // Rated heating capacity
+		Garate = DXCoil( CoolCoilNum ).RatedAirMassFlowRate( 1 ); 
+		Hin = DXCoil( CoolCoilNum ).InletAirEnthalpy;
+		Win = DXCoil( CoolCoilNum ).InletAirHumRat;
+		EvapTemp = EvapTempMin;
+		RHsat = 0.98;
+		BFC = 0.0592; 
+		BFH = 0.136;  
+		
+		// Coefficients describing coil performance
+		SH = DXCoil( CoolCoilNum ).SH;
+		SC = DXCoil( HeatCoilNum ).SC; 
+		C1Tevap = DXCoil( CoolCoilNum ).C1Te;
+		C2Tevap = DXCoil( CoolCoilNum ).C2Te;
+		C3Tevap = DXCoil( CoolCoilNum ).C3Te;
+		C1Tcond = DXCoil( HeatCoilNum ).C1Tc;
+		C2Tcond = DXCoil( HeatCoilNum ).C2Tc;
+		C3Tcond = DXCoil( HeatCoilNum ).C3Tc;
+		
+		// Get heat released by fan
+		int SupplyFanIndex = DXCoil( CoolCoilNum ).SupplyFanIndex;
+		if ( SupplyFanIndex > 0) {
+			Qfan = Fan( SupplyFanIndex ).OutletAirEnthalpy - Fan( SupplyFanIndex ).InletAirEnthalpy;
+		} else {
+			Qfan = 0;
+		}
+	
+		//1. COOLING Mode
+		if ( QZnReqSenCoolingLoad <= 0 ){
+		//1.1) There is no cooling load
+			EvapTemp = DXCoil( CoolCoilNum ).InletAirTemp;
+	
+		} else {
+		//1.2) There is cooling load
+		
+			DeltaT = C3Tevap * SH * SH + C2Tevap * SH + C1Tevap;
+			Th2min = EvapTempMin + DeltaT;  
+			hADP = PsyHFnTdbRhPb( Th2min, RHsat, OutBaroPress, "CalcVRFIUVariableTeTc" );
+			wADP = PsyWFnTdbH( Th2min, hADP, "CalcVRFIUVariableTeTc" );
+			hTinwADP = PsyHFnTdbW( TairInlet, wADP );
+			SHRini = min( ( hTinwADP - hADP ) / ( Hin-hADP ), 1.0 );
+	
+			if ( QZnReqSenCoolingLoad >= RatedCapCool * SHRini ) // Rated sensible cooling capacity
+			// correspond to the maximum cooling capacity
+				EvapTemp = EvapTempMin;
+			else {
+				TcoilIn = TairInlet + Qfan / Garate / 1005;
+				Tout = TcoilIn - QZnReqSenCoolingLoad / Garate / 1005;   
+				Th2 = TcoilIn - ( TcoilIn - Tout ) / ( 1 - BFC );
+				EvapTemp = max( min( (Th2 - DeltaT ), EvapTempMax ), EvapTempMin );
+			}     
+		}
+		
+		//2. HEATING Mode
+		if ( QZnReqSenHeatingLoad <= 0 ) {
+		//2.1) There is no heating load
+			CondTemp = DXCoil( HeatCoilNum ).InletAirTemp;
+		} else {
+		//2.2) There is heating load
+			if ( QZnReqSenHeatingLoad >= RatedCapHeat ) {
+				// correspond to the maximum heating capacity
+				CondTemp = CondTempMax;
+			} else {
+				TcoilIn = TairInlet + Qfan / Garate / 1005;
+				Tout = TcoilIn + QZnReqSenHeatingLoad / Garate / 1005;        
+				Th2 = TcoilIn + ( Tout - TcoilIn ) / ( 1 - BFH );
+				DeltaT = C3Tcond * SC * SC + C2Tcond * SC + C1Tcond;
+				CondTemp = max( min( ( Th2 + DeltaT ), CondTempMax ), CondTempMin);
+			}
+		}
+	}
+
 	void
 	CalcVRFCondenser_FluidTCtrl(
 		int const VRFCond, // index to VRF condenser
@@ -8577,7 +8748,7 @@ namespace HVACVariableRefrigerantFlow {
 		Par( 6 ) = PartLoadRatio;
 		Par( 7 ) = OACompOnMassFlow;
 		
-		FanSpdRatioMax = 1.5; //@@
+		FanSpdRatioMax = 1.0; //@@
 		SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par );
 		if( SolFla < 0) FanSpdRatio = FanSpdRatioMax; //over capacity
 		// @@ if SolFlag == -1 or -2

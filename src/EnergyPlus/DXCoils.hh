@@ -1687,13 +1687,6 @@ namespace DXCoils {
 	);
 	
 	void
-	CalcVRFIUEvapCondTemp(
-		int const VRFTUNum, // the number of the VRF TU to be simulated
-		Real64 & EvapTemp, // evaporating temperature
-		Real64 & CondTemp  // condensing temperature 
-	);
-	
-	void
 	ControlVRFIUCoil (
 		int const CoilIndex,  // index to VRFTU coil 
 		Real64 const QCoil,   // coil load
