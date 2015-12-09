@@ -1164,24 +1164,24 @@ namespace HVACControllers {
 					// actuated value for the dual humidity ratio / temperature strategy.
 					// See routine CalcSimpleController() for the sequence of operations.
 					if ( ControllerProps( ControlNum ).NextActuatedValue == RootFinders( ControlNum ).MaxPoint.X ) {
-					// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-					ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress );
-					// Calculate the dew point temperature at the SA humidity ratio setpoint
-					DesiredDewPoint = PsyTdpFnWPb( Node( SensedNode ).HumRatMax, OutBaroPress );
-					// Adjust the calculated dew point temperature by the approach temp
-					HumidityControlTempSetPoint = DesiredDewPoint + ApproachTemp;
-					// NOTE: The next line introduces a potential discontinuity into the residual function
-					//       which could prevent the root finder from finding the root it if were done at each
-					//       controller iteration. For this reason we perform the setpoint calculation only
-					//       once when the air loop has been evaluated with the max actuated value.
-					//       See routine CalcSimpleController() for the sequence of operations.
+						// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
+						ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress );
+						// Calculate the dew point temperature at the SA humidity ratio setpoint
+						DesiredDewPoint = PsyTdpFnWPb( Node( SensedNode ).HumRatMax, OutBaroPress );
+						// Adjust the calculated dew point temperature by the approach temp
+						HumidityControlTempSetPoint = DesiredDewPoint + ApproachTemp;
+						// NOTE: The next line introduces a potential discontinuity into the residual function
+						//       which could prevent the root finder from finding the root it if were done at each
+						//       controller iteration. For this reason we perform the setpoint calculation only
+						//       once when the air loop has been evaluated with the max actuated value.
+						//       See routine CalcSimpleController() for the sequence of operations.
 						ControllerProps( ControlNum ).SetPointValue = min( Node( SensedNode ).TempSetPoint, HumidityControlTempSetPoint ); // Pure temperature setpoint | Temperature setpoint to achieve the humidity ratio setpoint
-					// Overwrite the "pure" temperature setpoint with the actual setpoint that takes into
-					// account the humidity ratio setpoint.
-					// NOTE: Check that this does not create side-effects somewhere else in the code.
-					Node( SensedNode ).TempSetPoint = ControllerProps( ControlNum ).SetPointValue;
-					// Finally indicate thate the setpoint has been computed
-					ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
+						// Overwrite the "pure" temperature setpoint with the actual setpoint that takes into
+						// account the humidity ratio setpoint.
+						// NOTE: Check that this does not create side-effects somewhere else in the code.
+						Node( SensedNode ).TempSetPoint = ControllerProps( ControlNum ).SetPointValue;
+						// Finally indicate thate the setpoint has been computed
+						ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
 					}
 				} else {
 					// Pure temperature setpoint control strategy
