@@ -516,15 +516,25 @@ namespace ChillerIndirectAbsorption {
 			IndirectAbsorber( AbsorberNum ).TempDesCondIn = rNumericArgs( 6 );
 			IndirectAbsorber( AbsorberNum ).MinCondInletTemp = rNumericArgs( 7 );
 			IndirectAbsorber( AbsorberNum ).TempLowLimitEvapOut = rNumericArgs( 8 );
-			IndirectAbsorber( AbsorberNum ).EvapVolFlowRate = rNumericArgs( 9 );
-			if ( IndirectAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
+			if ( rNumericArgs( 9 ) != 0.0 ){
+				IndirectAbsorber( AbsorberNum ).EvapVolFlowRate = rNumericArgs( 9 );
+				if ( IndirectAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
+					IndirectAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
+				}
+			} else {
+				IndirectAbsorber( AbsorberNum ).EvapVolFlowRate = AutoSize;
 				IndirectAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
 			}
-			IndirectAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 10 );
-			if ( IndirectAbsorber( AbsorberNum ).CondVolFlowRate == AutoSize ) {
+			if ( rNumericArgs( 10 ) != 0.0 ){
+				IndirectAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 10 );
+				if ( IndirectAbsorber( AbsorberNum ).CondVolFlowRate == AutoSize ) {
+					IndirectAbsorber( AbsorberNum ).CondVolFlowRateWasAutoSized = true;
+				}
+			}
+			else {
+				IndirectAbsorber( AbsorberNum ).CondVolFlowRate = AutoSize;
 				IndirectAbsorber( AbsorberNum ).CondVolFlowRateWasAutoSized = true;
 			}
-
 			if ( NumNums > 10 ) {
 				IndirectAbsorber( AbsorberNum ).GeneratorVolFlowRate = rNumericArgs( 11 );
 				if ( IndirectAbsorber( AbsorberNum ).GeneratorVolFlowRate == AutoSize ) {
