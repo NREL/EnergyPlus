@@ -9851,7 +9851,7 @@ Label50: ;
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//  Pressure will have to be pass into this subroutine to fix this one
 		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, BaroPress, RoutineName );
-		if ( OutletAirRH >= 1.0 ) {
+		if ( OutletAirRH >= 1.0 && PringFlag ) {
 			ShowSevereError( "For object = " + UnitType + ", name = \"" + UnitName + "\"" );
 			ShowContinueError( "Calculated outlet air relative humidity greater than 1. The combination of" );
 			ShowContinueError( "rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting" );
@@ -9962,7 +9962,7 @@ Label50: ;
 			InletAirEnthalpy = PsyHFnTdbW( InletAirTemp, InletAirHumRat );
 			OutletAirEnthalpy = PsyHFnTdbW( OutletAirTemp, OutletAirHumRat );
 			ADPEnthalpy = PsyHFnTdbW( ADPTemp, ADPHumRat );
-			CBF = ( OutletAirEnthalpy - ADPEnthalpy ) / ( InletAirEnthalpy - ADPEnthalpy );
+			CBF = min( 1.0, ( OutletAirEnthalpy - ADPEnthalpy ) / ( InletAirEnthalpy - ADPEnthalpy ) );
 			if ( Iter > IterMax && PringFlag ) {
 				ShowSevereError( UnitType + " \"" + UnitName + "\" -- coil bypass factor calculation did not converge after max iterations." );
 				ShowContinueError( "The RatedSHR of [" + RoundSigDigits( SHR, 3 ) + "], entered by the user or autosized (see *.eio file)," );
@@ -9990,6 +9990,110 @@ Label50: ;
 		}
 
 		return CBF;
+	}
+
+	Real64
+	ValidateADP(
+		std::string const & UnitType, // component name
+		std::string const & UnitName, // component type
+		Real64 const RatedInletAirTemp, // coil inlet air temperature [C]
+		Real64 const RatedInletAirHumRat, // coil inlet air humidity ratio [kg/kg]
+		Real64 const TotCap, // coil total capacity [W]
+		Real64 const AirMassFlow, // coil air mass flow rate [kg/s]
+		Real64 const InitialSHR, // coil sensible heat ratio []
+		std::string const CallingRoutine // function name calling this routine 
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//    AUTHOR         Richard Raustad, FSEC
+		//    DATE WRITTEN   December 2015
+		//    RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		//    Validates that the calcualted bypass factor represents valid SHR based on total capacity and air mass flow rate.
+
+		// METHODOLOGY EMPLOYED:
+		//    With model parameters autosized by the user, the SHR is selected based on an empirical model.
+		//    This can sometimes lead to an SHR that does not cross the saturation curve, or one that crosses excessively where
+		//    the coil outlet air conditions exceed the saturation curve (i.e., RH > 1).
+		//    This function checks to see if the ADP based on coil delta T and calculated bypass factor and the ADP based
+		//    on coil delta W and calculated bypass factor land on the saturation curve at the same place within a tolerance.
+		//    The result is passed back to the sizing routine as the new value for SHR.
+		//    If the SHR is not autosized, this routine will still adjust the design SHR appropriately, however, the hard-sized SHR will not change.
+		// REFERENCES:
+
+		// USE STATEMENTS:
+		//    na
+
+		// Return value
+		Real64 SHR( 0.0 ); // the result - the adjusted design SHR
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 CBF_calculated( 0.0 ); // coil bypass factor based on TotCap, AirFlow, SHR, and BaroPress
+		Real64 InletAirEnthalpy( 0.0 ); // Enthalpy of inlet air to evaporator at given conditions [J/kg]
+		Real64 DeltaH( 0.0 ); // Enthalpy drop across evaporator at given conditions [J/kg]
+		Real64 HTinHumRatOut( 0.0 ); // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
+		Real64 DeltaHumRat( 0.0 ); // Humidity ratio drop across evaporator at given conditions [kg/kg]
+		Real64 OutletAirTemp( 0.0 ); // Outlet dry-bulb temperature from evaporator at given conditions [C]
+		Real64 OutletAirEnthalpy( 0.0 ); // Enthalpy of outlet air at given conditions [J/kg]
+		Real64 OutletAirHumRat( 0.0 ); // Outlet humidity ratio from evaporator at given conditions [kg/kg]
+		Real64 OutletAirRH( 0.0 ); // relative humidity of the outlet air
+		Real64 CalcADPTemp( 0.0 ); // actual ADP temperature based on bypass factor [C]
+		Real64 CalcADPHumRat( 0.0 ); // actual ADP humidity ratio based on bypass factor [kg/kg]
+		Real64 CalcADPTempFnHR( 0.0 ); // actual ADP temperature as a function of humidity ratio based on bypass factor [C]
+		Real64 ADPerror( 0.0 ); // difference between ADP function of temperature and humidity ratio [deltaC]
+		bool bStillValidating( true ); // while loop flag
+		bool bNoReporting( false ); // don't report specific warnings in calcCBF while iterating on result
+		bool bReversePerturb( false ); // identifies when SHR is being lowered based on outlet air RH
+
+		SHR = InitialSHR;
+		while ( bStillValidating ) {
+			CBF_calculated = max( 0.0, CalcCBF( UnitType, UnitName, RatedInletAirTemp, RatedInletAirHumRat, TotCap, AirMassFlow, SHR, bNoReporting ) );
+			DeltaH = TotCap / AirMassFlow;
+			InletAirEnthalpy = PsyHFnTdbW( RatedInletAirTemp, RatedInletAirHumRat );
+			HTinHumRatOut = InletAirEnthalpy - ( 1.0 - SHR ) * DeltaH;
+			OutletAirHumRat = PsyWFnTdbH( RatedInletAirTemp, HTinHumRatOut, CallingRoutine );
+			DeltaHumRat = RatedInletAirHumRat - OutletAirHumRat;
+			OutletAirEnthalpy = InletAirEnthalpy - DeltaH;
+			OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
+			OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, StdBaroPress, CallingRoutine );
+			if ( CBF_calculated < 1 ) {
+				CalcADPTemp = RatedInletAirTemp - ( ( RatedInletAirTemp - OutletAirTemp ) / ( 1 - CBF_calculated ) );
+				CalcADPHumRat = RatedInletAirHumRat - ( ( DeltaHumRat ) / ( 1 - CBF_calculated ) );
+				CalcADPTempFnHR = PsyTdpFnWPb( CalcADPHumRat, StdBaroPress, CallingRoutine );
+				ADPerror = CalcADPTemp - CalcADPTempFnHR;
+			} else {
+				ADPerror = 0; // might be able to check for RH >= 1 and reduce SHR, need defect file for that since can't create one
+			}
+
+			if ( std::abs( ADPerror )  > 0.01 ) {
+				if ( OutletAirRH >= 1.0 ) { // if RH > 1, reduce SHR until it crosses the saturation curve
+					SHR -= 0.001;
+					bReversePerturb = true;
+					if( SHR < 0.5 ) bStillValidating = false; // have to stop somewhere, this is lower than the lower limit of SHR empirical model (see ReportSizingManager SizingType == CoolingSHRSizing)
+				} else {
+					if ( bReversePerturb ) {
+						bStillValidating = false; // stop iterating once SHR causes ADP to cross back under saturation curve, take what you get
+					} else {
+						SHR += 0.001; // increase SHR slowly until ADP temps are resolved
+					}
+				}
+				if ( SHR > 0.8 ) bStillValidating = false; // have to stop somewhere, this is the upper limit of SHR empirical model (see ReportSizingManager SizingType == CoolingSHRSizing)
+			} else {
+				bStillValidating = false; // ADP temps are close enough. Normal input files hit this on first pass
+			}
+
+		}
+	
+		return SHR;
+
 	}
 
 	Real64

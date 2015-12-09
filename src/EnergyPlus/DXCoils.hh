@@ -1417,6 +1417,18 @@ namespace DXCoils {
 	);
 
 	Real64
+	ValidateADP(
+		std::string const & UnitType, // component name
+		std::string const & UnitName, // component type
+		Real64 const RatedInletAirTemp, // coil inlet air temperature [C]
+		Real64 const RatedInletAirHumRat, // coil inlet air humidity ratio [kg/kg]
+		Real64 const TotCap, // coil total capacity [W]
+		Real64 const AirMassFlow, // coil air mass flow rate [kg/s]
+		Real64 const InitialSHR, // coil sensible heat ratio []
+		std::string const CallingRoutine // function name calling this routine 
+		);
+
+	Real64
 	CalcEffectiveSHR(
 		int const DXCoilNum, // Index number for cooling coil
 		Real64 const SHRss, // Steady-state sensible heat ratio
