@@ -1404,7 +1404,7 @@ namespace DXCoils {
 	);
 
 	Real64
-		CalcCBF(
+	CalcCBF(
 		std::string const & UnitType,
 		std::string const & UnitName,
 		Real64 const InletAirTemp, // inlet air temperature [C]

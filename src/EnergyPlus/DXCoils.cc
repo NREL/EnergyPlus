@@ -10073,7 +10073,7 @@ Label50: ;
 				ADPerror = 0; // might be able to check for RH >= 1 and reduce SHR, need defect file for that since can't create one
 			}
 
-			if ( std::abs( ADPerror )  > 0.01 ) {
+			if ( std::abs( ADPerror )  > 0.012 ) {
 				if ( OutletAirRH >= 1.0 ) { // if RH > 1, reduce SHR until it crosses the saturation curve
 					SHR -= 0.001;
 					bReversePerturb = true;
