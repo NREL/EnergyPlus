@@ -10,6 +10,7 @@
 // A to Z order
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -107,7 +108,7 @@ namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
-		
+
 		show_message();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -156,6 +157,7 @@ namespace EnergyPlus {
 	{
 		// A to Z order
 		BranchInputManager::clear_state();
+		ChillerIndirectAbsorption::clear_state();
 		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
 		DataAirLoop::clear_state();
