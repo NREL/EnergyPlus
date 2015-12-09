@@ -801,7 +801,7 @@ namespace EnergyPlus {
 		AirPressure = StdPressureSeaLevel;
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(InletDBTemp, InletWBTemp, AirPressure );
 		AirMassFlowRate = AirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW( AirPressure, InletDBTemp, InletAirHumRat );
-		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, AirPressure );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
 		CBF_expected = 0.17268167698750708;
 		EXPECT_DOUBLE_EQ( CBF_calculated, CBF_expected );
 	}

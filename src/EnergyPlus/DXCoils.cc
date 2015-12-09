@@ -5449,7 +5449,7 @@ namespace DXCoils {
 			}
 
 			Real64 const RatedAirMassFlowRateSeaLevel = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdPressureSeaLevel, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
-			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), RatedAirMassFlowRateSeaLevel, DXCoil( DXCoilNum ).RatedSHR( 1 ), StdPressureSeaLevel );
+			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), RatedAirMassFlowRateSeaLevel, DXCoil( DXCoilNum ).RatedSHR( 1 ), true, StdPressureSeaLevel );
 			MyEnvrnFlag( DXCoilNum ) = false;
 		}
 
@@ -9763,6 +9763,7 @@ Label50: ;
 		Real64 const TotCap, // total cooling  capacity [Watts]
 		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
+		bool const PringFlag, // flag used to print warnings if desired
 		Real64 const BaroPress // Barometric pressure [Pa], defaulted to StdBaroPress in header
 	)
 	{
@@ -9962,7 +9963,7 @@ Label50: ;
 			OutletAirEnthalpy = PsyHFnTdbW( OutletAirTemp, OutletAirHumRat );
 			ADPEnthalpy = PsyHFnTdbW( ADPTemp, ADPHumRat );
 			CBF = ( OutletAirEnthalpy - ADPEnthalpy ) / ( InletAirEnthalpy - ADPEnthalpy );
-			if ( Iter > IterMax ) {
+			if ( Iter > IterMax && PringFlag ) {
 				ShowSevereError( UnitType + " \"" + UnitName + "\" -- coil bypass factor calculation did not converge after max iterations." );
 				ShowContinueError( "The RatedSHR of [" + RoundSigDigits( SHR, 3 ) + "], entered by the user or autosized (see *.eio file)," );
 				ShowContinueError( "may be causing this. The line defined by the coil rated inlet air conditions" );
@@ -9976,7 +9977,7 @@ Label50: ;
 				ShowContinueErrorTimeStamp( "" );
 				CBFErrors = true; // Didn't converge within MaxIter iterations
 			}
-			if ( CBF < 0.0 ) {
+			if ( CBF < 0.0 && PringFlag ) {
 				ShowSevereError( UnitType + " \"" + UnitName + "\" -- negative coil bypass factor calculated." );
 				ShowContinueErrorTimeStamp( "" );
 				CBFErrors = true; // Negative CBF not valid

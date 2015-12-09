@@ -293,6 +293,7 @@ namespace ReportSizingManager {
 		using DataGlobals::InitConvTemp;;
 		using namespace DataSizing;
 		using namespace DataHVACGlobals;
+		using DXCoils::CalcCBF;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using General::SolveRegulaFalsi;
@@ -301,8 +302,10 @@ namespace ReportSizingManager {
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdpPb;
 		using Psychrometrics::PsyWFnTdbH;
+		using Psychrometrics::PsyTdbFnHW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using Psychrometrics::PsyWFnTdbRhPb;
+		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyTwbFnTdbWPb;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -375,6 +378,23 @@ namespace ReportSizingManager {
 		Array1D< Real64 > Par( 4 ); // array passed to RegulaFalsi
 		Real64 DesOAFlowFrac;   // design outdoor air flow volume fraction
 		std::string ScalableSM; // scalable sizing methods label for reporting
+		Real64 const RatedInletAirTemp( 26.6667 ); // 26.6667C or 80F
+		Real64 const RatedInletAirHumRat( 0.01125 ); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+		Real64 CBF_calculated( 0.0 ); // coil bypass factor based on TotCap, AirFlow, SHR, and BaroPress
+		Real64 RatedAirMassFlowRate( 0.0 ); // mass flow rate used for bypass factor calculation
+		Real64 InletAirEnthalpy; // Enthalpy of inlet air to evaporator at given conditions [J/kg]
+		Real64 DeltaH; // Enthalpy drop across evaporator at given conditions [J/kg]
+		Real64 HTinHumRatOut; // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
+		Real64 DeltaHumRat; // Humidity ratio drop across evaporator at given conditions [kg/kg]
+		Real64 OutletAirTemp; // Outlet dry-bulb temperature from evaporator at given conditions [C]
+		Real64 OutletAirEnthalpy; // Enthalpy of outlet air at given conditions [J/kg]
+		Real64 OutletAirHumRat; // Outlet humidity ratio from evaporator at given conditions [kg/kg]
+		Real64 OutletAirRH; // relative humidity of the outlet air
+		Real64 ADPTemp; // Apparatus dewpoint temperature used in CBF calculations [C]
+		Real64 CalcADPTemp; // actual ADP temperature based on bypass factor [C]
+		Real64 CalcADPHumRat; // actual ADP humidity ratio based on bypass factor [kg/kg]
+		Real64 CalcADPADP; // actual ADP ADP temperature based on bypass factor [C]
+		bool bStillTesting; // while loop flag
 
 		AutosizeDes = 0.0;
 		AutosizeUser = 0.0;
@@ -848,6 +868,28 @@ namespace ReportSizingManager {
 								AutosizeDes = 0.389 + 7684.0*MinRatedVolFlowPerRatedTotCap ( DXCT );
 							} else {
 								AutosizeDes = 0.389 + 7684.0*RatedVolFlowPerRatedTotCap;
+							}
+						}
+						RatedAirMassFlowRate = DataFlowUsedForSizing * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
+						bStillTesting = true;
+						while ( bStillTesting ) {
+							CBF_calculated = CalcCBF( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, RatedAirMassFlowRate, AutosizeDes, false );
+							DeltaH = DataCapacityUsedForSizing / RatedAirMassFlowRate;
+							InletAirEnthalpy = PsyHFnTdbW( RatedInletAirTemp, RatedInletAirHumRat );
+							HTinHumRatOut = InletAirEnthalpy - ( 1.0 - AutosizeDes ) * DeltaH;
+							OutletAirHumRat = PsyWFnTdbH( RatedInletAirTemp, HTinHumRatOut );
+							DeltaHumRat = RatedInletAirHumRat - OutletAirHumRat;
+							OutletAirEnthalpy = InletAirEnthalpy - DeltaH;
+							OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
+							ADPTemp = PsyTdpFnWPb( OutletAirHumRat, StdBaroPress );
+							OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, StdBaroPress, CallingRoutine );
+							CalcADPTemp = RatedInletAirTemp - ( ( RatedInletAirTemp - OutletAirTemp ) / ( 1 - CBF_calculated ) );
+							CalcADPHumRat = RatedInletAirHumRat - ( ( DeltaHumRat ) / ( 1 - CBF_calculated ) );
+							CalcADPADP = PsyTdpFnWPb( CalcADPHumRat, StdBaroPress );
+							if ( ( ( OutletAirTemp - ADPTemp ) < ( ADPTemp - CalcADPTemp ) ) && ( std::abs( OutletAirHumRat - CalcADPHumRat )  > 0.0005 ) ) {
+								AutosizeDes += 0.001;
+							} else {
+								bStillTesting = false;
 							}
 						}
 					} else {
