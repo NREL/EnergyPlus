@@ -2015,7 +2015,7 @@ namespace ThermalISO15099Calc {
 			} else if ( ( 90.0 < tilt ) && ( tilt <= 179.0 ) ) {
 				Gnui = 0.56 * root_4( RaL * std::sin( tiltr ) );
 			} else if ( ( 179.0 < tilt ) && ( tilt <= 180.0 ) ) {
-				Gnui = 0.58 * std::pow( RaL, 1 / 3.0 );
+				Gnui = 0.58 * std::pow( RaL, 1 / 5.0 );
 			} else {
 				assert( false );
 			} // end if no. 1
