@@ -54105,6 +54105,26 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
+  A8 , \field Master Thermostat Priority Control Type
+       \type choice
+       \key LoadPriority
+       \key ZonePriority
+       \key ThermostatOffsetPriority
+       \key MasterThermostatPriority
+       \key Scheduled
+       \default MasterThermostatPriority
+       \note Choose a thermostat control logic scheme. If these control types fail to control zone
+       \note temperature within a reasonable limit, consider using multiple VRF systems
+  A9 , \field Zone Name for Master Thermostat Location
+       \type object-list
+       \object-list ZoneNames
+       \note This field is required if Master Thermostat Priority Control Type is MasterThermostatPriority
+       \note Enter the name of the zone where the master thermostat is located
+  A10, \field Thermostat Priority Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note this field is required if Master Thermostat Priority Control Type is Scheduled
+       \note Schedule values of 0 denote cooling, 1 for heating, and all other values disable the system
   N17, \field Diameter of Main Pipe Connecting Outdoor Unit to Indoor Units
        \note used to calculate the piping loss
        \type real
@@ -54164,7 +54184,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \units C
        \default 5.0
        \note Enter the maximum outdoor temperature above which the crankcase heaters are disabled
-  A8 , \field Defrost Strategy
+  A11, \field Defrost Strategy
        \type choice
        \key ReverseCycle
        \key Resistive
@@ -54174,7 +54194,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \note cooling to melt frost formation on the condenser coil
        \note The resistive strategy uses a resistive heater
        \note to melt the frost.
-  A9 , \field Defrost Control
+  A12, \field Defrost Control
        \type choice
        \key Timed
        \key OnDemand
@@ -54182,7 +54202,7 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \note Choose a defrost control type
        \note Either use a fixed Timed defrost period or select
        \note OnDemand to defrost only when necessary
-  A10, \field Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
+  A13, \field Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
@@ -54227,12 +54247,12 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \note Minimum compressor speed 
        \units rev/min
        \minimum> 0
-  A11, \field Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
+  A14, \field Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A12, \field Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
+  A15, \field Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiQuadraticCurves
@@ -54241,12 +54261,12 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \units rev/min
        \minimum> 0
-  A13, \field Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
+  A16, \field Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A14, \field Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
+  A17, \field Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiQuadraticCurves
@@ -54255,11 +54275,11 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \units rev/min
        \minimum> 0
-  A15, \field Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
+  A18, \field Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A16, \field Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
+  A19, \field Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
@@ -54267,11 +54287,11 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \units rev/min
        \minimum> 0
-  A17, \field Loading Index 4 Evaporative Capacity Multiplier Function of Temperature Curve Name
+  A20, \field Loading Index 4 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A18, \field Loading Index 4 Compressor Power Multiplier Function of Temperature Curve Name
+  A21, \field Loading Index 4 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
@@ -54279,11 +54299,11 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \units rev/min
        \minimum> 0
-  A19, \field Loading Index 5 Evaporative Capacity Multiplier Function of Temperature Curve Name
+  A22, \field Loading Index 5 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A20, \field Loading Index 5 Compressor Power Multiplier Function of Temperature Curve Name
+  A23, \field Loading Index 5 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
@@ -54291,11 +54311,11 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \units rev/min
        \minimum> 0
-  A21, \field Loading Index 6 Evaporative Capacity Multiplier Function of Temperature Curve Name
+  A24, \field Loading Index 6 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A22, \field Loading Index 6 Compressor Power Multiplier Function of Temperature Curve Name
+  A25, \field Loading Index 6 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
@@ -54303,22 +54323,22 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \units rev/min
        \minimum> 0
-  A23, \field Loading Index 7 Evaporative Capacity Multiplier Function of Temperature Curve Name
+  A26, \field Loading Index 7 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A24, \field Loading Index 7 list
+  A27, \field Loading Index 7 list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
   N39, \field Compressor Speed at Loading Index 8
        \type real
        \units rev/min
        \minimum> 0
-  A25, \field Loading Index 8 Evaporative Capacity Multiplier Function of Temperature Curve Name
+  A28, \field Loading Index 8 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A26, \field Loading Index 8 Compressor Power Multiplier Function of Temperature Curve Name
+  A29, \field Loading Index 8 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
@@ -54326,11 +54346,11 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type real
        \units rev/min
        \minimum> 0
-  A27, \field Loading Index 9 Evaporative Capacity Multiplier Function of Temperature Curve Name
+  A30, \field Loading Index 9 Evaporative Capacity Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables
-  A28; \field Loading Index 9 Compressor Power Multiplier Function of Temperature Curve Name
+  A31; \field Loading Index 9 Compressor Power Multiplier Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
        \object-list BiVariateTables

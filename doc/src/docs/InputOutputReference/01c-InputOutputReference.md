@@ -14340,6 +14340,18 @@ This alpha field defines the name of a quadratic performance curve that paramete
 
 This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
 
+#### Field: Master Thermostat Priority Control Type
+
+This choice field determines the logic used to simulate the “master” thermostat when VRF operates at HP mode. Valid choices are LoadPriority, ZonePriority, ThermostatOffsetPriority, MasterThermostatPriority, and Scheduled. The default value is MasterThermostatPriority. When LoadPriority is selected, the total zone load is used to choose the operating mode as either cooling or heating. When ZonePriority is selected, the number of zones requiring cooling or heating determines the operating mode. When ThermostatOffsetPriority is selected, the zone farthest from the thermostat set point determines the operating mode. The MasterThermostatPriority choice operates the system according the zone load where the master thermostat is located. The heat pump can also be scheduled to operate in either cooling or heating mode. For scheduled operation, a schedule name is entered in the following field.
+
+#### Field: Zone Name for Master Thermostat Location
+
+This alpha field defines the name of the zone where the “master” thermostat is located. This field is required when the Master Thermostat Priority Control Type field is set to MasterThermostatPriority. When the heat pump is connected to multiple zone terminal units, one terminal unit must be selected as the master thermostat. The remaining thermostats are slaves and can operate only in the same mode as the master thermostat.
+
+#### Field: Thermostat Priority Schedule Name
+
+This alpha field identifies the schedule used when the Master Thermostat Priority Control Type field is set to Scheduled. Schedule values of 0 denote heating mode while values of 1 denote cooling mode. Any other values will force the system off.
+
 #### Field: Diameter of Main Pipe Connecting Outdoor Unit to Indoor Units
 
 This numeric field defines the diameter of main pipe connecting outdoor unit to indoor units. This value is used to calculate the piping loss of the refrigerant when going through the main pipe, including the heat loss and pressure drop. If this field is blank, the default value of 0.0254m is used.
@@ -14453,6 +14465,9 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     7.26E-5,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
     OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
     OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
+    LoadPriority,            !- Master Thermostat Priority Control Type
+    ,                        !- Zone Name for Master Thermostat Location
+    ,                        !- Thermostat Priority Schedule Name
     0.0508,                  !- Diameter of main pipe connecting outdoor unit to indoor units {m}
     30,                      !- Length of main pipe connecting outdoor unit to indoor units {m}
     36,                      !- Equivalent length of main pipe connecting outdoor unit to indoor units {m}
