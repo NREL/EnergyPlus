@@ -2883,7 +2883,7 @@ Site:GroundDomain:Slab,
     Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
 ```
 
-### Site:GroundDomain Outputs
+### Site:GroundDomain:Slab Outputs
 
 The following output variables are available.
 
@@ -2892,11 +2892,11 @@ The following output variables are available.
 
 #### Zone Coupled Surface Heat Flux [W/m2]
 
-This is the value of the heat flux provided to the GroundDomain as a boundary condition which is determined by taking the average of all surfaces coupled to the domains OtherSideBoudaryCondition model.
+This is the value of the heat flux provided to the GroundDomain as a boundary condition. This is calculated by taking the average heat flux of all surfaces coupled to the domain's SurfaceProperty:OtherSideConditionsModel model.
 
 #### Zone Coupled Surface Temperature [C]
 
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled surfaces as an outside boundary condition.
+This is the value of the SurfaceProperty:OtherSideConditionsModel surface temperature. This is the temperature provided to the ground coupled surfaces as an outside boundary condition.
 
 ### Site:GroundDomain:Basement
 
@@ -3030,7 +3030,7 @@ Alpha field indicating whether the domain will update temperatures at each zone 
 
 Integer field indicating the density of the finite difference ground domain cells between the basement and the far field boundaries. Default value is 4. Total number of ground domain cells, insulation cells, and ground surface cells are indicated as outputs to the eio file.
 
-Site:GroundDomain:Basement Output Variables
+### Site:GroundDomain:Basement Outputs
 
 The following output variables are available.
 
@@ -3048,7 +3048,7 @@ This is the value of the heat flux provided to ground domain as a boundary condi
 
 #### Wall Interface Temperature [C]
 
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the basement wall surfaces as an outside boundary condition.
+This is the value of the SurfaceProperty:OtherSideConditionsModel surface temperature. This is the temperature provided to the basement wall surfaces as an outside boundary condition.
 
 #### Floor Interface Heat Flux [W/m2]
 
@@ -3056,7 +3056,7 @@ This is the value of the heat flux provided to ground domain as a boundary condi
 
 #### Floor Interface Temperature [C]
 
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled floor surfaces as an outside boundary condition.
+This is the value of the SurfaceProperty:OtherSideConditionsModel surface temperature. This is the temperature provided to the ground coupled floor surfaces as an outside boundary condition.
 
 
 
@@ -4737,6 +4737,15 @@ This outputs the count of iterations on the inner solver loop of CondFD for each
 #### CondFD Surface Temperature Node &lt;X&gt; [C]
 
 This will output temperatures for a node in the surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file
+
+#### CondFD Surface Heat Flux Node &lt;X&gt; [W/m2]
+
+This will output heat flux at each node in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. A positive value indicates heat flowing towards the inside face of the surface. Note that this matches the sign convention for Surface Inside Face Conduction Heat Transfer Rate per Area and is opposite the sign of Surface OUtside Face Conduction Heat Transfer Rate per Area.
+
+#### CondFD Surface Heat Capacitance Outer Half Node &lt;X&gt; [W/m2-K]
+#### CondFD Surface Heat Capacitance Inner Half Node &lt;X&gt; [W/m2-K]
+
+These will output the half-node heat capacitance in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. For this output, the heat capacitance is defined as the product of specific heat, density, and node thickness. Zero is reported for R-layer half-nodes and for undefined half-nodes.  There is no outer half-node for Node 1 which is the outside face of the surface, and there is no inner half-node for Node N which is the inside face of the surface. CondFD Surface Heat Capacitance is only available with Output:Diagnostics,DisplayAdvancedReportVariables.
 
 ### MaterialProperty:HeatAndMoistureTransfer:Settings
 

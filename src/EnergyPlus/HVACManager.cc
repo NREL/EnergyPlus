@@ -147,7 +147,7 @@ namespace HVACManager {
 	//Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
 	//Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
 	//Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
-	
+
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
 	// to facilitate easier unit testing of those functions.
@@ -967,9 +967,6 @@ namespace HVACManager {
 					for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 						for ( NodeIndex = 1; NodeIndex <= ZoneInletConvergence( ZoneNum ).NumInletNodes; ++NodeIndex ) {
-							ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedHumRate = false;
-							ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedMassFlow = false;
-							ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedTemp = false;
 
 							// Check humidity ratio
 							FoundOscillationByDuplicate = false;
@@ -982,7 +979,6 @@ namespace HVACManager {
 								for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {
 									if ( std::abs( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio( 1 ) - ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio( StackDepth ) ) < HVACHumRatOscillationToler ) {
 										FoundOscillationByDuplicate = true;
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedHumRate = true;
 										ShowContinueError( "Node named " + NodeID( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NodeNum ) + " shows oscillating humidity ratio across iterations with a repeated value of " + RoundSigDigits( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio( 1 ), 6 ) );
 										break;
 									}
@@ -1038,7 +1034,6 @@ namespace HVACManager {
 								for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {
 									if ( std::abs( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate( 1 ) - ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate( StackDepth ) ) < HVACFlowRateOscillationToler ) {
 										FoundOscillationByDuplicate = true;
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedMassFlow = true;
 										ShowContinueError( "Node named " + NodeID( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NodeNum ) + " shows oscillating mass flow rate across iterations with a repeated value of " + RoundSigDigits( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate( 1 ), 6 ) );
 										break;
 									}
@@ -1046,7 +1041,6 @@ namespace HVACManager {
 								if ( ! FoundOscillationByDuplicate ) {
 									SlopeMdot = ( sum_ConvergLogStackARR * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) ) ) / ( square_sum_ConvergLogStackARR - double( ConvergLogStackDepth ) * sum_square_ConvergLogStackARR );
 									if ( std::abs( SlopeMdot ) > HVACFlowRateSlopeToler ) {
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedMassFlow = true;
 										if ( SlopeMdot < 0.0 ) { // check for monotic decrease
 											MonotonicDecreaseFound = true;
 											for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {
@@ -1094,7 +1088,6 @@ namespace HVACManager {
 								for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {
 									if ( std::abs( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature( 1 ) - ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature( StackDepth ) ) < HVACTemperatureOscillationToler ) {
 										FoundOscillationByDuplicate = true;
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedTemp = true;
 										ShowContinueError( "Node named " + NodeID( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NodeNum ) + " shows oscillating temperatures across iterations with a repeated value of " + RoundSigDigits( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature( 1 ), 6 ) );
 										break;
 									}
@@ -1102,7 +1095,6 @@ namespace HVACManager {
 								if ( ! FoundOscillationByDuplicate ) {
 									SlopeTemps = ( sum_ConvergLogStackARR * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) ) ) / ( square_sum_ConvergLogStackARR - double( ConvergLogStackDepth ) * sum_square_ConvergLogStackARR );
 									if ( std::abs( SlopeTemps ) > HVACTemperatureSlopeToler ) {
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedTemp = true;
 										if ( SlopeTemps < 0.0 ) { // check for monotic decrease
 											MonotonicDecreaseFound = true;
 											for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {

@@ -133,6 +133,8 @@ namespace EnergyPlus {
 		// This is run every unit test and makes sure to clear all state in global variables this fixture touches.
 		virtual void TearDown();
 
+		void clear_all_states();
+
 		// This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
 		// Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the
 		// unit test names change.
@@ -209,46 +211,22 @@ namespace EnergyPlus {
 		bool compare_cerr_stream( std::string const & expected_string, bool reset_stream = true );
 
 		// Check if ESO stream has any output. Useful to make sure there are or are not outputs to ESO.
-		inline
-		bool has_eso_output()
-		{
-			return this->eso_stream->str().size() > 0;
-		}
+		bool has_eso_output( bool reset_stream = true );
 
 		// Check if MTR stream has any output. Useful to make sure there are or are not outputs to MTR.
-		inline
-		bool has_mtr_output()
-		{
-			return this->mtr_stream->str().size() > 0;
-		}
+		bool has_mtr_output( bool reset_stream = true );
 
 		// Check if ECHO stream has any output. Useful to make sure there are or are not outputs to ECHO.
-		inline
-		bool has_echo_output()
-		{
-			return this->echo_stream->str().size() > 0;
-		}
+		bool has_echo_output( bool reset_stream = true );
 
 		// Check if ERR stream has any output. Useful to make sure there are or are not outputs to ERR.
-		inline
-		bool has_err_output()
-		{
-			return this->err_stream->str().size() > 0;
-		}
+		bool has_err_output( bool reset_stream = true );
 
 		// Check if COUT stream has any output. Useful to make sure there are or are not outputs to COUT.
-		inline
-		bool has_cout_output()
-		{
-			return this->m_cout_buffer->str().size() > 0;
-		}
+		bool has_cout_output( bool reset_stream = true );
 
 		// Check if CERR stream has any output. Useful to make sure there are or are not outputs to CERR.
-		inline
-		bool has_cerr_output()
-		{
-			return this->m_cerr_buffer->str().size() > 0;
-		}
+		bool has_cerr_output( bool reset_stream = true );
 
 		// This function processes an idf snippet and defaults to using the idd cache for the fixture.
 		// The cache should be used for nearly all calls to this function.

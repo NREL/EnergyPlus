@@ -375,7 +375,7 @@ namespace ExternalInterface {
 	InstantiateInitializeFMUImport();
 
 	void
-	TerminateResetFreeFMUImport();
+	TerminateResetFreeFMUImport(int fmiEndSimulation);
 
 	void
 	GetSetVariablesAndDoStepFMUImport();

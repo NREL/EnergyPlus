@@ -37,7 +37,6 @@ class Print
 public: // Creation
 
 	// Move Constructor
-	inline
 	Print( Print && p ) NOEXCEPT :
 #if !defined(__GNUC__) || __GNUC__ >= 5 // GCC 5 adds move constructor
 	 stream_( std::move( p.stream_ ) ),
@@ -59,7 +58,6 @@ public: // Creation
 	}
 
 	// Format String Constructor
-	inline
 	explicit
 	Print( std::string const & fmt = asterisk ) :
 	 pos_( 0 ),
@@ -69,7 +67,6 @@ public: // Creation
 	{}
 
 	// Format Wrapper Constructor
-	inline
 	explicit
 	Print( gio::Fmt const & fmt ) :
 	 pos_( 0 ),
@@ -79,7 +76,6 @@ public: // Creation
 	{}
 
 	// Format Wrapper Constructor
-	inline
 	explicit
 	Print( gio::Fmt & fmt ) :
 	 pos_( 0 ),
@@ -89,7 +85,6 @@ public: // Creation
 	{}
 
 	// Destructor
-	inline
 	~Print()
 	{
 		if ( format_ ) {
@@ -125,7 +120,6 @@ public: // Operators
 
 	// Stream << T
 	template< typename T >
-	inline
 	typename std::enable_if< ! std::is_base_of< BArray, T >::value, Print & >::type // Force array overload selection for array types
 	operator <<( T const & t )
 	{
@@ -149,7 +143,6 @@ public: // Operators
 
 	// Stream << complex
 	template< typename T >
-	inline
 	Print &
 	operator <<( std::complex< T > const & t )
 	{
@@ -168,7 +161,6 @@ public: // Operators
 
 	// Stream << Array
 	template< typename T >
-	inline
 	Print &
 	operator <<( Array< T > const & t )
 	{
@@ -184,7 +176,6 @@ public: // Operators
 
 	// Stream << Array1S
 	template< typename T >
-	inline
 	Print &
 	operator <<( Array1S< T > const & t )
 	{
@@ -200,7 +191,6 @@ public: // Operators
 
 	// Stream << Array2S
 	template< typename T >
-	inline
 	Print &
 	operator <<( Array2S< T > const & t )
 	{
@@ -218,7 +208,6 @@ public: // Operators
 
 	// Stream << Array3S
 	template< typename T >
-	inline
 	Print &
 	operator <<( Array3S< T > const & t )
 	{
@@ -238,7 +227,6 @@ public: // Operators
 
 	// Stream << Array4S
 	template< typename T >
-	inline
 	Print &
 	operator <<( Array4S< T > const & t )
 	{
@@ -260,7 +248,6 @@ public: // Operators
 
 	// Stream << Array5S
 	template< typename T >
-	inline
 	Print &
 	operator <<( Array5S< T > const & t )
 	{
@@ -284,7 +271,6 @@ public: // Operators
 
 	// Stream << Array6S
 	template< typename T >
-	inline
 	Print &
 	operator <<( Array6S< T > const & t )
 	{
@@ -310,7 +296,6 @@ public: // Operators
 
 	// Stream << MArray1
 	template< class A, typename T >
-	inline
 	Print &
 	operator <<( MArray1< A, T > const & t )
 	{
@@ -326,7 +311,6 @@ public: // Operators
 
 	// Stream << MArray2
 	template< class A, typename T >
-	inline
 	Print &
 	operator <<( MArray2< A, T > const & t )
 	{
@@ -344,7 +328,6 @@ public: // Operators
 
 	// Stream << MArray3
 	template< class A, typename T >
-	inline
 	Print &
 	operator <<( MArray3< A, T > const & t )
 	{
@@ -364,7 +347,6 @@ public: // Operators
 
 	// Stream << MArray4
 	template< class A, typename T >
-	inline
 	Print &
 	operator <<( MArray4< A, T > const & t )
 	{
@@ -386,7 +368,6 @@ public: // Operators
 
 	// Stream << MArray5
 	template< class A, typename T >
-	inline
 	Print &
 	operator <<( MArray5< A, T > const & t )
 	{
@@ -410,7 +391,6 @@ public: // Operators
 
 	// Stream << MArray6
 	template< class A, typename T >
-	inline
 	Print &
 	operator <<( MArray6< A, T > const & t )
 	{
@@ -435,7 +415,6 @@ public: // Operators
 	}
 
 	// Stream Manipulator Output
-	inline
 	Print &
 	operator <<( std::ostream & (*pf)( std::ostream & ) )
 	{
@@ -446,7 +425,6 @@ public: // Operators
 	}
 
 	// Stream Manipulator Output
-	inline
 	Print &
 	operator <<( std::basic_ios< char > & (*pf)( std::basic_ios< char > & ) )
 	{
@@ -459,7 +437,6 @@ public: // Operators
 private: // Methods
 
 	// Stream Status Check
-	inline
 	void
 	status_check() const
 	{

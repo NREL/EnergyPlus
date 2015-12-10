@@ -33,6 +33,7 @@ set( test_src
   Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
+  HeatBalFiniteDiffManager.unit.cc
   HeatPumpWaterToWaterSimple.unit.cc
   HeatRecovery.unit.cc
   Humidifiers.unit.cc
@@ -53,6 +54,8 @@ set( test_src
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
+  PlantHeatExchangerFluidToFluid.unit.cc
+  PlantUtilities.unit.cc
   PurchasedAirManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
@@ -68,6 +71,7 @@ set( test_src
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
   SiteFCFactorMethodGroundTemperatures.unit.cc
+  SiteGroundDomain.unit.cc
   SiteShallowGroundTemperatures.unit.cc
   SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
@@ -76,6 +80,7 @@ set( test_src
   SQLite.unit.cc
   SurfaceGeometry.unit.cc
   SwimmingPool.unit.cc
+  ThermalComfort.unit.cc
   VariableSpeedCoils.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
