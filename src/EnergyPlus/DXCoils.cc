@@ -9763,7 +9763,7 @@ Label50: ;
 		Real64 const TotCap, // total cooling  capacity [Watts]
 		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
-		bool const PringFlag, // flag used to print warnings if desired
+		bool const PrintFlag, // flag used to print warnings if desired
 		Real64 const BaroPress // Barometric pressure [Pa], defaulted to StdBaroPress in header
 	)
 	{
@@ -9851,7 +9851,7 @@ Label50: ;
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//  Pressure will have to be pass into this subroutine to fix this one
 		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, BaroPress, RoutineName );
-		if ( OutletAirRH >= 1.0 && PringFlag ) {
+		if ( OutletAirRH >= 1.0 && PrintFlag ) {
 			ShowSevereError( "For object = " + UnitType + ", name = \"" + UnitName + "\"" );
 			ShowContinueError( "Calculated outlet air relative humidity greater than 1. The combination of" );
 			ShowContinueError( "rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting" );
@@ -9963,7 +9963,7 @@ Label50: ;
 			OutletAirEnthalpy = PsyHFnTdbW( OutletAirTemp, OutletAirHumRat );
 			ADPEnthalpy = PsyHFnTdbW( ADPTemp, ADPHumRat );
 			CBF = min( 1.0, ( OutletAirEnthalpy - ADPEnthalpy ) / ( InletAirEnthalpy - ADPEnthalpy ) );
-			if ( Iter > IterMax && PringFlag ) {
+			if ( Iter > IterMax && PrintFlag ) {
 				ShowSevereError( UnitType + " \"" + UnitName + "\" -- coil bypass factor calculation did not converge after max iterations." );
 				ShowContinueError( "The RatedSHR of [" + RoundSigDigits( SHR, 3 ) + "], entered by the user or autosized (see *.eio file)," );
 				ShowContinueError( "may be causing this. The line defined by the coil rated inlet air conditions" );
@@ -9977,7 +9977,7 @@ Label50: ;
 				ShowContinueErrorTimeStamp( "" );
 				CBFErrors = true; // Didn't converge within MaxIter iterations
 			}
-			if ( CBF < 0.0 && PringFlag ) {
+			if ( CBF < 0.0 && PrintFlag ) {
 				ShowSevereError( UnitType + " \"" + UnitName + "\" -- negative coil bypass factor calculated." );
 				ShowContinueErrorTimeStamp( "" );
 				CBFErrors = true; // Negative CBF not valid
