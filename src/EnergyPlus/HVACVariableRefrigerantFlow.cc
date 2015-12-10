@@ -316,21 +316,6 @@ namespace HVACVariableRefrigerantFlow {
 		// Simulate terminal unit
 		SimVRF( VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq );
 		
-		if (!EnergyPlus::DataGlobals::WarmupFlag && VRFTUNum==1 ){
-				
-				auto temp1 = QZnReq;
-				auto temp2 = SysOutputProvided;
-				
-				auto temp11 = DataGlobals::DayOfSim;
-				auto temp12 = DataGlobals::HourOfDay;
-				auto temp13 = DataGlobals::TimeStep;
-
-				std::cout << "Month-" << EnergyPlus::DataEnvironment::Month <<"@ Day-" << temp11 << ", Hour-" << temp12 << ", ZoneTimeStep-" << temp13 << ":  ";
-				std::cout << temp1 << "\t" << temp2 << std::endl;
-
-			}
-
-
 		// mark this terminal unit as simulated
 		TerminalUnitList( TUListNum ).IsSimulated( IndexToTUInTUList ) = true;
 
@@ -3762,14 +3747,14 @@ namespace HVACVariableRefrigerantFlow {
 			// Determine operating mode prior to simulating any terminal units connected to a VRF condenser
 			// this should happen at the beginning of a time step where all TU's are polled to see what
 			// mode the heat pump condenser will operate in
-			
-			//@@ XP following codes are temperarily disabled.
-			//if ( VRF( VRFCond ).VRFAlgorithmTypeNum != AlgorithmTypeFluidTCtrl ) {
 			if ( ! any( TerminalUnitList( TUListIndex ).IsSimulated ) ) {
 				InitializeOperatingMode( FirstHVACIteration, VRFCond, TUListIndex, OnOffAirFlowRatio );
-			} // IF(.NOT. ANY(TerminalUnitList(TUListNum)%IsSimulated))THEN
-			//}
+			} 
 			//*** End of Operating Mode Initialization done at beginning of each iteration ***!
+			
+			//if ( ! any( TerminalUnitList( TUListIndex ).IsSimulated ) && VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
+			//	CalcVRFIUTeTc_FluidTCtrl( VRFCond ); // Get the VRF IU Te/Tc for the timestep
+			//}
 
 			// disable VRF system when outside limits of operation based on OAT
 			EnableSystem = false; // flag used to switch operating modes when OAT is outside operating limits
@@ -5288,8 +5273,7 @@ namespace HVACVariableRefrigerantFlow {
 		
 		if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) { 
 		// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
-			ControlVRF( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
-			//ControlVRF_FluidTCtrl( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
+			ControlVRF_FluidTCtrl( VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio );
 			CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
 			//CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, LatOutputProvided );
 		} else {
@@ -6900,7 +6884,8 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Xiufeng Pang, LBNL
 		//       DATE WRITTEN   Feb 2014
-		//       MODIFIED       Nov 2015, RP Zhang, LBNL, Modify the bounds of the Te/Tc, take into account OA
+		//       MODIFIED       Jul 2015, RP Zhang, LBNL, Modify the bounds of the Te/Tc
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL, take into account OA in Te/Tc determination
 		//       RE-ENGINEERED  na
 		
 		// PURPOSE OF THIS SUBROUTINE:
@@ -8519,6 +8504,220 @@ namespace HVACVariableRefrigerantFlow {
 	}
 	
 	void
+	ControlVRF_FluidTCtrl(
+		int const VRFTUNum, // Index to VRF terminal unit
+		Real64 const QZnReq, // Index to zone number
+		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+		Real64 & PartLoadRatio, // unit part load ratio
+		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rongpeng Zhang
+		//       DATE WRITTEN   Nov 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Determine the coil load and part load ratio, given the zone load
+		// Determine the air mass flow rate corresponding to the coil load of the heat pump for this time step
+
+		// METHODOLOGY EMPLOYED:
+		// Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using General::SolveRegulaFalsi;
+		using General::RoundSigDigits;
+		using General::TrimSigDigits;
+		using HeatingCoils::SimulateHeatingCoilComponents;
+		using DataEnvironment::OutDryBulbTemp;
+		using ScheduleManager::GetCurrentScheduleValue;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		int const MaxIte( 500 ); // maximum number of iterations
+		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
+		Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
+		static gio::Fmt fmtLD( "*" );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 FullOutput; // unit full output when compressor is operating [W]
+		Real64 TempOutput; // unit output when iteration limit exceeded [W]
+		Real64 NoCompOutput; // output when no active compressor [W]
+		int SolFla; // Flag of RegulaFalsi solver
+		Array1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
+		std::string IterNum; // Max number of iterations for warning message
+		Real64 TempMinPLR; // min PLR used in Regula Falsi call
+		Real64 TempMaxPLR; // max PLR used in Regula Falsi call
+		bool ContinueIter; // used when convergence is an issue
+		int VRFCond; // index to VRF condenser
+		int IndexToTUInTUList; // index to TU in specific list for the VRF system
+		int TUListIndex; // index to TU list for this VRF system
+		bool VRFCoolingMode;
+		bool VRFHeatingMode;
+		bool HRCoolingMode;
+		bool HRHeatingMode;
+
+		PartLoadRatio = 0.0;
+		LoopDXCoolCoilRTF = 0.0;
+		LoopDXHeatCoilRTF = 0.0;
+		VRFCond = VRFTU( VRFTUNum ).VRFSysNum;
+		IndexToTUInTUList = VRFTU( VRFTUNum ).IndexToTUInTUList;
+		TUListIndex = VRF( VRFCond ).ZoneTUListPtr;
+		VRFCoolingMode = CoolingLoad( VRFCond );
+		VRFHeatingMode = HeatingLoad( VRFCond );
+		HRCoolingMode = TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList );
+		HRHeatingMode = TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList );
+
+		// The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with lastest PLR
+
+		// do nothing else if TU is scheduled off
+		//!!LKL Discrepancy < 0
+		if ( GetCurrentScheduleValue( VRFTU( VRFTUNum ).SchedPtr ) == 0.0 ) return;
+
+		// Block the following statement: QZnReq==0 doesn't mean QCoilReq==0 due to possible OA mixer operation. zrp_201511
+		// do nothing if TU has no load (TU will be modeled using PLR=0)
+		// if ( QZnReq == 0.0 ) return;
+
+		// Set EMS value for PLR and return
+		if ( VRFTU( VRFTUNum ).EMSOverridePartLoadFrac ) {
+			PartLoadRatio = VRFTU( VRFTUNum ).EMSValueForPartLoadFrac;
+			return;
+		}
+
+		// Get result when DX coil is off
+		PartLoadRatio = 0.0;
+		
+		// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+		CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, 0.0, NoCompOutput, OnOffAirFlowRatio );
+
+		if ( VRFCoolingMode && HRHeatingMode ) {
+			// IF the system is in cooling mode, but the terminal unit requests heating (heat recovery)
+			if ( NoCompOutput >= QZnReq ) return;
+		} else if ( VRFHeatingMode && HRCoolingMode ) {
+			// IF the system is in heating mode, but the terminal unit requests cooling (heat recovery)
+			if ( NoCompOutput <= QZnReq ) return;
+		} else if ( VRFCoolingMode || HRCoolingMode ) {
+			// IF the system is in cooling mode and/or the terminal unit requests cooling
+			if ( NoCompOutput <= QZnReq ) return;
+		} else if ( VRFHeatingMode || HRHeatingMode ) {
+			// IF the system is in heating mode and/or the terminal unit requests heating
+			if ( NoCompOutput >= QZnReq ) return;
+		}
+
+		// Otherwise the coil needs to turn on. Get full load result
+		PartLoadRatio = 1.0;
+		CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, PartLoadRatio, FullOutput, OnOffAirFlowRatio );
+
+		PartLoadRatio = 0.0;
+
+		if ( ( VRFCoolingMode && ! VRF( VRFCond ).HeatRecoveryUsed ) || ( VRF( VRFCond ).HeatRecoveryUsed && HRCoolingMode ) ) {
+			// Since we are cooling, we expect FullOutput < NoCompOutput
+			// If the QZnReq <= FullOutput the unit needs to run full out
+			if ( QZnReq <= FullOutput ) {
+				// if no coil present in terminal unit, no need to reset PLR?
+				if ( VRFTU( VRFTUNum ).CoolingCoilPresent ) PartLoadRatio = 1.0;
+				return;
+			}
+		} else if ( ( VRFHeatingMode && ! VRF( VRFCond ).HeatRecoveryUsed ) || ( VRF( VRFCond ).HeatRecoveryUsed && HRHeatingMode ) ) {
+			// Since we are heating, we expect FullOutput > NoCompOutput
+			// If the QZnReq >= FullOutput the unit needs to run full out
+			if ( QZnReq >= FullOutput ) {
+				// if no coil present in terminal unit, no need reset PLR?
+				if ( VRFTU( VRFTUNum ).HeatingCoilPresent ) PartLoadRatio = 1.0;
+				return;
+			}
+		} else {
+			// VRF terminal unit is off, PLR already set to 0 above
+			// shouldn't actually get here
+			return;
+		}
+
+		// The coil will not operate at PLR=0 or PLR=1, calculate the operating part-load ratio
+
+		if ( ( VRFHeatingMode || HRHeatingMode ) || ( VRFCoolingMode || HRCoolingMode ) ) {
+
+			Par( 1 ) = VRFTUNum;
+			Par( 2 ) = 0.0;
+			Par( 4 ) = 0.0;
+			if ( FirstHVACIteration ) {
+				Par( 3 ) = 1.0;
+			} else {
+				Par( 3 ) = 0.0;
+			}
+			//    Par(4) = OpMode
+			Par( 5 ) = QZnReq;
+			Par( 6 ) = OnOffAirFlowRatio;
+			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par );
+			if ( SolFla == -1 ) {
+				//     Very low loads may not converge quickly. Tighten PLR boundary and try again.
+				TempMaxPLR = -0.1;
+				ContinueIter = true;
+				while ( ContinueIter && TempMaxPLR < 1.0 ) {
+					TempMaxPLR += 0.1;
+					
+					CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio );
+					
+					if ( VRFHeatingMode && TempOutput > QZnReq ) ContinueIter = false;
+					if ( VRFCoolingMode && TempOutput < QZnReq ) ContinueIter = false;
+				}
+				TempMinPLR = TempMaxPLR;
+				ContinueIter = true;
+				while ( ContinueIter && TempMinPLR > 0.0 ) {
+					TempMaxPLR = TempMinPLR;
+					TempMinPLR -= 0.01;
+					
+					CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, TempMaxPLR, TempOutput, OnOffAirFlowRatio );
+					
+					if ( VRFHeatingMode && TempOutput < QZnReq ) ContinueIter = false;
+					if ( VRFCoolingMode && TempOutput > QZnReq ) ContinueIter = false;
+				}
+				SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par );
+				if ( SolFla == -1 ) {
+					if ( ! FirstHVACIteration && ! WarmupFlag ) {
+						if ( VRFTU( VRFTUNum ).IterLimitExceeded == 0 ) {
+							gio::write( IterNum, fmtLD ) << MaxIte;
+							strip( IterNum );
+							ShowWarningMessage( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
+							ShowContinueError( " Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum );
+							ShowContinueErrorTimeStamp( " Part-load ratio returned = " + RoundSigDigits( PartLoadRatio, 3 ) );
+							
+							CalcVRF_FluidTCtrl( VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio );
+							
+							ShowContinueError( " Load requested = " + TrimSigDigits( QZnReq, 5 ) + ", Load delivered = " + TrimSigDigits( TempOutput, 5 ) );
+							ShowRecurringWarningErrorAtEnd( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + " \"" + VRFTU( VRFTUNum ).Name + "\" -- Terminal unit Iteration limit exceeded error continues...", VRFTU( VRFTUNum ).IterLimitExceeded );
+						} else {
+							ShowRecurringWarningErrorAtEnd( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + " \"" + VRFTU( VRFTUNum ).Name + "\" -- Terminal unit Iteration limit exceeded error continues...", VRFTU( VRFTUNum ).IterLimitExceeded );
+						}
+					}
+				} else if ( SolFla == -2 ) {
+					PartLoadRatio = max( MinPLF, std::abs( QZnReq - NoCompOutput ) / std::abs( FullOutput - NoCompOutput ) );
+				}
+			} else if ( SolFla == -2 ) {
+				if ( FullOutput - NoCompOutput == 0.0 ) {
+					PartLoadRatio = 0.0;
+				} else {
+					PartLoadRatio = min( 1.0, max( MinPLF, std::abs( QZnReq - NoCompOutput ) / std::abs( FullOutput - NoCompOutput ) ) );
+				}
+			}
+
+		}
+
+	}
+	
+	void
 	CalcVRF_FluidTCtrl(
 		int const VRFTUNum, // Unit index in VRF terminal unit array
 		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
@@ -8759,10 +8958,9 @@ namespace HVACVariableRefrigerantFlow {
 		Par( 6 ) = PartLoadRatio;
 		Par( 7 ) = OACompOnMassFlow;
 		
-		FanSpdRatioMax = 1.0; //@@
+		FanSpdRatioMax = 1.0; 
 		SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par );
 		if( SolFla < 0) FanSpdRatio = FanSpdRatioMax; //over capacity
-		// @@ if SolFlag == -1 or -2
 		
 		AirMassFlowRate = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
 		
