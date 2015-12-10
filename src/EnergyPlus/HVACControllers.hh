@@ -174,6 +174,8 @@ namespace HVACControllers {
 		// --------------------
 		int SensedNode; // The sensed node number from the grid
 		bool IsSetPointDefinedFlag; // If TRUE indicates that the setpoint has been defined and can
+		bool SaveTempSetpoint; // identifies when pure temperature set point is saved for use during following iterations
+		Real64 SaveTempSetpointValue; // saves pure temperature set point for use during following iterations
 		// be used to compute DeltaSensed
 		Real64 SetPointValue; // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
 		Real64 SensedValue; // The sensed control variable of any type
@@ -223,6 +225,8 @@ namespace HVACControllers {
 			ActuatedNodePlantLoopBranchNum( 0 ),
 			SensedNode( 0 ),
 			IsSetPointDefinedFlag( false ),
+			SaveTempSetpoint( true ),
+			SaveTempSetpointValue( 0.0 ),
 			SetPointValue( 0.0 ),
 			SensedValue( 0.0 ),
 			DeltaSensed( 0.0 ),
@@ -267,6 +271,8 @@ namespace HVACControllers {
 			int const ActuatedNodePlantLoopBranchNum, // the plant loop branch num for actuated node DSU3
 			int const SensedNode, // The sensed node number from the grid
 			bool const IsSetPointDefinedFlag, // If TRUE indicates that the setpoint has been defined and can
+			bool const SaveTempSetpoint, // saves pure temperature set point for use during following iterations
+			Real64 const SaveTempSetpointValue,
 			Real64 const SetPointValue, // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
 			Real64 const SensedValue, // The sensed control variable of any type
 			Real64 const DeltaSensed, // Difference of sensed to setpoint value for calculating proportional gain
@@ -309,6 +315,8 @@ namespace HVACControllers {
 			ActuatedNodePlantLoopBranchNum( ActuatedNodePlantLoopBranchNum ),
 			SensedNode( SensedNode ),
 			IsSetPointDefinedFlag( IsSetPointDefinedFlag ),
+			SaveTempSetpoint( SaveTempSetpoint ),
+			SaveTempSetpointValue( SaveTempSetpointValue ),
 			SetPointValue( SetPointValue ),
 			SensedValue( SensedValue ),
 			DeltaSensed( DeltaSensed ),
