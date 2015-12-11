@@ -8,34 +8,62 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
+#include "Fixtures/SQLiteFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::BranchNodeConnections;
+using namespace EnergyPlus::DataBranchNodeConnections;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::OutputReportTabular;
-using namespace EnergyPlus::OutputProcessor;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
+
+namespace EnergyPlus {
+
+	TEST_F(SQLiteFixture, BranchNodeErrorCheck11Test) {
+		bool errFlag = false; 
+		RegisterNodeConnection(1, "BadNode", "Type1", "Object1", "ZoneNode", 0, true, errFlag);
+		RegisterNodeConnection(2, "BadNode", "Type2", "Object3", "Actuator", 0, true, errFlag);
+		RegisterNodeConnection(3, "BadNode", "Type2", "Object3", "Inlet", 0, true , errFlag);
+		bool ErrorsFound = false;
+
+		sqlite_test->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+		EnergyPlus::sqlite = std::move(sqlite_test);
+		CheckNodeConnections(ErrorsFound);
+		sqlite_test = std::move(EnergyPlus::sqlite);
+
+		auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
+
+		ASSERT_EQ(3, errorData.size());
+		std::vector<std::string> errorData2{ "3", "1", "1", "Node Connection Error, Node Name=\"BadNode\", The same zone node appears more than once.  Reference Object=TYPE1, Object Name=Object1  Reference Object=TYPE2, Object Name=Object3", "1" };
+		EXPECT_EQ(errorData2, errorData[2]);
+
+	}
+}
 
 TEST_F( EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure )
 {
