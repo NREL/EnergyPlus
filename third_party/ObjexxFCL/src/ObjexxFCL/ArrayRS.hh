@@ -74,24 +74,20 @@ public: // Types
 protected: // Creation
 
 	// Default Constructor
-	inline
 	ArrayRS()
 	{}
 
 	// Copy Constructor
-	inline
 	ArrayRS( ArrayRS const & a ) :
 	 Super( a )
 	{}
 
 	// Data Constructor
-	inline
 	ArrayRS( T const * data, size_type const size ) :
 	 Super( data, size )
 	{}
 
 	// Non-Const Data Constructor
-	inline
 	ArrayRS( T * data, size_type const size ) :
 	 Super( data, size )
 	{}
@@ -99,7 +95,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~ArrayRS()
 	{}
@@ -108,7 +103,6 @@ public: // Predicate
 
 	// Conformable?
 	template< template< typename > class A, typename U >
-	inline
 	bool
 	conformable( A< U > const & a ) const
 	{
@@ -120,7 +114,6 @@ public: // Predicate
 public: // Inspector
 
 	// Rank
-	inline
 	int
 	rank() const
 	{

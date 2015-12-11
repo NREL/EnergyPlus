@@ -72,6 +72,14 @@ namespace SurfaceGeometry {
 	void
 	GetSurfaceData( bool & ErrorsFound ); // If errors found in input
 
+
+	void
+	checkSubSurfAzTiltNorm(
+		SurfaceData & baseSurface, // Base surface data (in)
+		SurfaceData & subSurface, // Subsurface data (in)
+		bool & surfaceError // True if there is subsurface error that requires a fatal
+	);
+
 	void
 	GetGeometryParameters( bool & ErrorsFound ); // set to true if errors found during input
 
@@ -320,7 +328,7 @@ namespace SurfaceGeometry {
 	isRectangle(
 		int const ThisSurf // Current surface number
 	);
-		
+
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
