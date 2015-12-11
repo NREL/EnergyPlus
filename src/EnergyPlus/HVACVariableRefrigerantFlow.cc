@@ -8888,7 +8888,7 @@ namespace HVACVariableRefrigerantFlow {
 		using General::SolveRegulaFalsi;
 
 		// Return value
-		Real64 PLRResidual;
+		Real64 AirMassFlowRate; // air mass flow rate of the coil (kg/s)
 
 		// Argument array dimensioning
 		
@@ -8911,7 +8911,6 @@ namespace HVACVariableRefrigerantFlow {
 		int TUListIndex; // index to TU list for this VRF system
 		int VRFCond; // index to VRF condenser
 		Real64 const ErrorTol( 0.01 ); // tolerance for RegulaFalsi iterations
-		Real64 AirMassFlowRate; // air mass flow rate of the coil (kg/s)
 		Real64 FanSpdRatio; // ratio of required and rated air flow rate
 		Real64 FanSpdRatioMin; // min fan speed ratio
 		Real64 FanSpdRatioMax; // min fan speed ratio

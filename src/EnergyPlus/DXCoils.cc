@@ -5774,6 +5774,7 @@ namespace DXCoils {
 		Real64 SupEnth;
 		Real64 OutTemp;
 		Real64 OutAirFrac;
+		Real64 CoilInTemp;
 		Real64 VolFlowRate;
 		Real64 CoolCapAtPeak;
 		Real64 TotCapTempModFac;
@@ -6061,7 +6062,8 @@ namespace DXCoils {
 					FieldNum = 1;
 					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
-					CalcVRFCoilCapModFac( 0, _, CompName, ZoneSizingRunDone ? FinalZoneSizing ( CurZoneEqNum ).DesCoolCoilInTemp : 26, _, _, _, DataTotCapCurveValue);
+					CoilInTemp = ZoneSizingRunDone ? FinalZoneSizing ( CurZoneEqNum ).DesCoolCoilInTemp : 26;
+					CalcVRFCoilCapModFac( 0, _, CompName, CoilInTemp, _, _, _, DataTotCapCurveValue);
 				} else {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
@@ -14292,7 +14294,7 @@ Label50: ;
 		}
 		return SHR;
 	}
-	
+
 	void
 	CalcVRFCoolingCoil_FluidTCtrl(
 		int const DXCoilNum, // the number of the DX coil to be simulated
@@ -14352,7 +14354,6 @@ Label50: ;
 		// (average flow if cycling fan, full flow if constant fan)
 		Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total cooling capacity [m3/s-W] (adjusted for bypass)
 		Real64 TotCap; // gross total cooling capacity at off-rated conditions [W]
-		// Real64 InletAirWetBulbC; // wetbulb temperature of inlet air [C]
 		Real64 InletAirDryBulbTemp; // inlet air dry bulb temperature [C]
 		Real64 InletAirEnthalpy; // inlet air enthalpy [J/kg]
 		Real64 InletAirHumRat; // inlet air humidity ratio [kg/kg]
@@ -14365,10 +14366,6 @@ Label50: ;
 		Real64 hDelta; // Change in air enthalpy across the cooling coil [J/kg]
 		Real64 hADP; // Apparatus dew point enthalpy [J/kg]
 		Real64 hTinwADP; // Enthalpy at inlet dry-bulb and wADP [J/kg]
-		Real64 hTinwout; // Enthalpy at inlet dry-bulb and outlet humidity ratio [J/kg]
-		Real64 FullLoadOutAirEnth; // outlet full load enthalpy [J/kg]
-		Real64 FullLoadOutAirHumRat; // outlet humidity ratio at full load
-		Real64 FullLoadOutAirTemp; // outlet air temperature at full load [C]
 		Real64 PLF; // Part load factor, accounts for thermal lag at compressor startup, used in power calculation
 		Real64 CondInletTemp; // Condenser inlet temperature (C). Outdoor dry-bulb temp for air-cooled condenser.
 		// Outdoor Wetbulb +(1 - effectiveness)*(outdoor drybulb - outdoor wetbulb) for evap condenser.
@@ -14397,11 +14394,9 @@ Label50: ;
 		Real64 ADiff; // Used for exponential
 		
 		// Followings for VRF FluidTCtrl Only 
-		Real64 QZnReqSenCoolingLoad; // Zone required cooling load (W)
 		Real64 QCoilReq; // Coil load (W)
 		Real64 FanSpdRatio; // Fan speed ratio           
 		Real64 AirMassFlowMin; // Min air mass flow rate due to OA requirement [kg/s]   
-		Real64 HcoilIn; // Air enthalpy at the inlet of the coil (kJ/kg) 
 		Real64 ActualSH; // Super heating degrees (C)               
 		Real64 ActualSC; // Sub cooling degrees (C)                 
 
@@ -14729,7 +14724,7 @@ Label50: ;
 		DXCoilCoolInletAirWBTemp( DXCoilNum ) = PsyTwbFnTdbWPb( InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure );
 
 	}
-		
+
 	void
 	CalcVRFHeatingCoil_FluidTCtrl(
 		int const CompOp, // compressor operation; 1=on, 0=off
@@ -14786,7 +14781,6 @@ Label50: ;
 		Real64 TotCap; // gross total cooling capacity at off-rated conditions [W]
 		Real64 TotCapAdj; // adjusted total cooling capacity at off-rated conditions [W]
 		// on the type of curve
-		Real64 TotCapModFac; // Total capacity modifier 
 		Real64 InletAirDryBulbTemp; // inlet air dry bulb temperature [C]
 		Real64 InletAirWetBulbC; // wetbulb temperature of inlet air [C]
 		Real64 InletAirEnthalpy; // inlet air enthalpy [J/kg]
@@ -14798,7 +14792,7 @@ Label50: ;
 		Real64 EIRTempModFac( 0.0 ); // EIR modifier (function of entering drybulb, outside drybulb) depending on the
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		// type of curve
-		Real64 DefrostEIRTempModFac; // EIR modifier for defrost (function of entering wetbulb, outside drybulb)
+		// Real64 DefrostEIRTempModFac; // EIR modifier for defrost (function of entering wetbulb, outside drybulb)
 		Real64 EIRFlowModFac; // EIR modifier (function of actual supply air flow vs rated flow)
 		Real64 EIR; // EIR at part load and off rated conditions
 		Real64 PLF; // Part load factor, accounts for thermal lag at compressor startup
@@ -14821,12 +14815,9 @@ Label50: ;
 		Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
 		
 		// Followings for VRF FluidTCtrl Only
-		Real64 QZnHeating; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
 		Real64 QCoilReq; // Coil load (W)
 		Real64 FanSpdRatio; // Fan Speed Ratio
 		Real64 AirMassFlowMin; // Min air mass flow rate due to OA requirement [kg/s]
-		Real64 HcoilIn; // Enthalpy of the coil inlet
-		Real64 TcoilIn; // Temperature of the coil inlet
 		Real64 ActualSH; // Actual Super Heating 
 		Real64 ActualSC; // Actual Sub Cooling
 		
@@ -15029,7 +15020,7 @@ Label50: ;
 			CalcSecondaryDXCoils( DXCoilNum );
 		}
 	}
-	
+
 	void
 	ControlVRFIUCoil (
 		int const CoilIndex,  // index to VRFTU coil 
@@ -15555,7 +15546,6 @@ Label50: ;
 		Real64 BF; // Bypass factor (-)
 		Real64 FanSpdResidualCool; // Modified fan speed ratio to meet actual zone load (-)
 		Real64 Garate; // Nominal air mass flow rate (m3/s)
-		Real64 QfanRate; // Heat released by fan (W)
 		Real64 TcoilIn; // Air temperature at indoor coil inlet (C)
 		Real64 Th2; // Air temperature at the coil surface (C)
 		Real64 TotCap; // Cooling capacity of the coil (W)
@@ -15604,7 +15594,6 @@ Label50: ;
 		Real64 BF; // Bypass factor (-)
 		Real64 FanSpdResidualHeat; // Modified fan speed ratio to meet actual zone load (-)
 		Real64 Garate; // Nominal air mass flow rate (m3/s)
-		Real64 QfanRate; // Heat released by fan (W)
 		Real64 TcoilIn; // Air temperature at indoor coil inlet (C)
 		Real64 Th2; // Air temperature at the coil surface (C)
 		Real64 TotCap; // Heating capacity of the coil (W)
