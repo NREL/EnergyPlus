@@ -74,6 +74,30 @@ namespace EnergyPlus {
 
 		}
 
+		TEST_F(InputProcessorFixture, MisleadingIDDWarningTest)
+		{
+			bool errors_found = false;
+
+			std::string const idf_contents = delimited_string({
+				"Timestep, 4;"
+			});
+
+			ASSERT_FALSE( process_idf( idf_contents, errors_found ) );
+			EXPECT_TRUE( compare_err_stream( "", true ) );
+
+			std::string saveMatchVersion = DataStringGlobals::MatchVersion;
+			DataStringGlobals::MatchVersion = "2.0";
+			ASSERT_FALSE(process_idf(idf_contents, errors_found ));
+
+			std::string const error_string = delimited_string( {
+				"   ** Severe  ** IP: Possible incorrect IDD File",
+				"   **   ~~~   ** " + DataStringGlobals::IDDVerString + " not the same as expected =\"2.0\""
+			} );
+			EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
+			DataStringGlobals::MatchVersion = saveMatchVersion;
+		}
+
 		TEST_F( InputProcessorFixture, processIDD_Full_IDD )
 		{
 			using namespace InputProcessor;
@@ -165,7 +189,7 @@ namespace EnergyPlus {
 				"SimulationControl, NO, NO, NO, YES, YES;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects, false ) );
+			ASSERT_FALSE( process_idf( idf_objects, true, false ) );
 
 			EXPECT_FALSE( OverallErrorFlag );
 

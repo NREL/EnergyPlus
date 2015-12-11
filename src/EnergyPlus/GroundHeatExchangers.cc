@@ -96,6 +96,7 @@ namespace GroundHeatExchangers {
 	int locDayOfSim( 0 );
 	namespace {
 		bool GetInput( true );
+		bool errorsFound( false );
 	}
 
 	Array1D< Real64 > prevTimeSteps; // This is used to store only the Last Few time step's time
@@ -123,6 +124,7 @@ namespace GroundHeatExchangers {
 		locHourOfDay = 0;
 		locDayOfSim = 0;
 		GetInput = true;
+		errorsFound = false;
 		prevTimeSteps.deallocate();
 		checkEquipName.deallocate();
 		verticalGLHE.deallocate();
@@ -1338,7 +1340,6 @@ namespace GroundHeatExchangers {
 		int numAlphas; // Number of elements in the alpha array
 		int numNums; // Number of elements in the numeric array. "numNums" :)
 		int IOStat; // IO Status when calling get input subroutine
-		static bool errorsFound( false );
 		bool isNotOK; // Flag to verify name
 		bool isBlank; // Flag for blank name
 		int indexNum;
@@ -1449,7 +1450,19 @@ namespace GroundHeatExchangers {
 				}
 
 				// Get Gfunction data
-				verticalGLHE( GLHENum ).NPairs = rNumericArgs( 15 );
+				indexNum = 15;
+				verticalGLHE( GLHENum ).NPairs = rNumericArgs( indexNum );
+
+				// Get Gfunc error handling
+				if ( verticalGLHE( GLHENum ).NPairs < 1 ) {
+					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
+					ShowContinueError( "..." + cNumericFieldNames( indexNum ) + " is less than 1." );
+					errorsFound = true;
+				} else if ( numNums != ( indexNum + ( verticalGLHE( GLHENum ).NPairs * 2 ) ) ) {
+					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid number of input fields." );
+					errorsFound = true;
+				}
+
 				verticalGLHE( GLHENum ).SubAGG = 15;
 				verticalGLHE( GLHENum ).AGG = 192;
 

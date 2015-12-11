@@ -8,6 +8,7 @@
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundHeatExchangers;
@@ -233,5 +234,132 @@ TEST( SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger )
 	thisGLHE.verticalConfig = true;
 	thisGLHE.calcGFunctions();
 	EXPECT_NEAR( 18.91819, thisGLHE.GFNC( 28 ), 0.0001 );
+
+}
+
+TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 ) 
+{
+	std::string const idf_objects = delimited_string({
+		"Version,8.4;",
+		"GroundHeatExchanger:Vertical,",
+		"Vertical GHE JL2015,     !- Name",
+		"GHEV Borehole Inlet Node,!- Inlet Node Name",
+		"GHEV Borehole Outlet Node,  !- Outlet Node Name",
+		"0.000303,                !- Design Flow Rate {m3/s}",
+		"1,                       !- Number of Bore Holes",
+		"160,                     !- Bore Hole Length {m}",
+		"0.05715,                 !- Bore Hole Radius {m}",
+		"2.493,                   !- Ground Thermal Conductivity {W/m-K}",
+		"2495700,                 !- Ground Thermal Heat Capacity {J/m3-K}",
+		"8,                       !- Ground Temperature {C}",
+		"0.744,                   !- Grout Thermal Conductivity {W/m-K}",
+		"0.389,                   !- Pipe Thermal Conductivity {W/m-K}",
+		"0.0267,                  !- Pipe Out Diameter {m}",
+		"0.0254,                  !- U-Tube Distance {m}",
+		"0.00243,                 !- Pipe Thickness {m}",
+		"0.01,                    !- Maximum Length of Simulation {years}",
+		"0.0005,                  !- G-Function Reference Ratio {dimensionless}",
+		"0.1,                     !- Number of Data Pairs of the G Function ---CANNOT BE LESS THAN 1",
+		"-4.5,                    !- G-Function Ln(T/Ts) Value 1",
+		"4.7,                     !- G-Function G Value 1",
+		"-4,                      !- G-Function Ln(T/Ts) Value 2",
+		"4.85,                    !- G-Function G Value 2",
+		"-3.5,                    !- G-Function Ln(T/Ts) Value 3",
+		"5.1,                     !- G-Function G Value 3",
+		"-3,                      !- G-Function Ln(T/Ts) Value 4",
+		"5.3,                     !- G-Function G Value 4",
+		"-2.5,                    !- G-Function Ln(T/Ts) Value 5",
+		"5.56,                    !- G-Function G Value 5",
+		"-2,                      !- G-Function Ln(T/Ts) Value 6",
+		"5.76,                    !- G-Function G Value 6",
+		"-1.5,                    !- G-Function Ln(T/Ts) Value 7",
+		"5.97,                    !- G-Function G Value 7",
+		"-1,                      !- G-Function Ln(T/Ts) Value 8",
+		"6.19,                    !- G-Function G Value 8",
+		"-.5,                     !- G-Function Ln(T/Ts) Value 9",
+		"6.31,                    !- G-Function G Value 9",
+		"0,                       !- G-Function Ln(T/Ts) Value 10",
+		"6.42,                    !- G-Function G Value 10",
+		"0.5,                     !- G-Function Ln(T/Ts) Value 11",
+		"6.56,                    !- G-Function G Value 11",
+		"1,                       !- G-Function Ln(T/Ts) Value 12",
+		"6.61,                    !- G-Function G Value 12",
+		"1.5,                     !- G-Function Ln(T/Ts) Value 13",
+		"6.66,                    !- G-Function G Value 13",
+		"2,                       !- G-Function Ln(T/Ts) Value 14",
+		"6.7,                     !- G-Function G Value 14",
+		"2.5,                     !- G-Function Ln(T/Ts) Value 15",
+		"6.72,                    !- G-Function G Value 15",
+		"3,                       !- G-Function Ln(T/Ts) Value 16",
+		"6.73;                    !- G-Function G Value 16",
+	});
+
+	EXPECT_TRUE( process_idf( idf_objects, false ) );
+
+	EXPECT_ANY_THROW( GetGroundHeatExchangerInput() );
+
+}
+
+TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_2 )
+{
+		std::string const idf_objects = delimited_string({
+		"Version,8.4;",
+		"GroundHeatExchanger:Vertical,",
+		"Vertical GHE JL2015,     !- Name",
+		"GHEV Borehole Inlet Node,!- Inlet Node Name",
+		"GHEV Borehole Outlet Node,  !- Outlet Node Name",
+		"0.000303,                !- Design Flow Rate {m3/s}",
+		"1,                       !- Number of Bore Holes",
+		"160,                     !- Bore Hole Length {m}",
+		"0.05715,                 !- Bore Hole Radius {m}",
+		"2.493,                   !- Ground Thermal Conductivity {W/m-K}",
+		"2495700,                 !- Ground Thermal Heat Capacity {J/m3-K}",
+		"8,                       !- Ground Temperature {C}",
+		"0.744,                   !- Grout Thermal Conductivity {W/m-K}",
+		"0.389,                   !- Pipe Thermal Conductivity {W/m-K}",
+		"0.0267,                  !- Pipe Out Diameter {m}",
+		"0.0254,                  !- U-Tube Distance {m}",
+		"0.00243,                 !- Pipe Thickness {m}",
+		"5,                       !- Maximum Length of Simulation {years}",
+		"0.0005,                  !- G-Function Reference Ratio {dimensionless}",
+		"16,                      !- Number of Data Pairs of the G Function",
+		"-4.5,                    !- G-Function Ln(T/Ts) Value 1",
+		"4.7,                     !- G-Function G Value 1",
+		"-4,                      !- G-Function Ln(T/Ts) Value 2",
+		"4.85,                    !- G-Function G Value 2",
+		"-3.5,                    !- G-Function Ln(T/Ts) Value 3",
+		"5.1,                     !- G-Function G Value 3",
+		"-3,                      !- G-Function Ln(T/Ts) Value 4",
+		"5.3,                     !- G-Function G Value 4",
+		"-2.5,                    !- G-Function Ln(T/Ts) Value 5",
+		"5.56,                    !- G-Function G Value 5",
+		"-2,                      !- G-Function Ln(T/Ts) Value 6",
+		"5.76,                    !- G-Function G Value 6",
+		"-1.5,                    !- G-Function Ln(T/Ts) Value 7",
+		"5.97,                    !- G-Function G Value 7",
+		"-1,                      !- G-Function Ln(T/Ts) Value 8",
+		"6.19,                    !- G-Function G Value 8",
+		"-.5,                     !- G-Function Ln(T/Ts) Value 9",
+		"6.31,                    !- G-Function G Value 9",
+		"0,                       !- G-Function Ln(T/Ts) Value 10",
+		"6.42,                    !- G-Function G Value 10",
+		"0.5,                     !- G-Function Ln(T/Ts) Value 11",
+		"6.56,                    !- G-Function G Value 11",
+		"1,                       !- G-Function Ln(T/Ts) Value 12",
+		"6.61,                    !- G-Function G Value 12",
+		"1.5,                     !- G-Function Ln(T/Ts) Value 13",
+		"6.66,                    !- G-Function G Value 13",
+		"2,                       !- G-Function Ln(T/Ts) Value 14",
+		"6.7,                     !- G-Function G Value 14",
+		"2.5,                     !- G-Function Ln(T/Ts) Value 15",
+		"6.72,                    !- G-Function G Value 15",
+		"3,                       !- G-Function Ln(T/Ts) Value 16",
+		"6.73,                    !- G-Function G Value 16",
+		"3.5;                     !- G-Function Ln(T/Ts) Value 17 ---EXTRA UNBALANCED FIELD---",
+	});
+
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
+
+	EXPECT_ANY_THROW( GetGroundHeatExchangerInput() );
 
 }

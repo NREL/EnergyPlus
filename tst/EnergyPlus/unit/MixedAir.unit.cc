@@ -17,8 +17,9 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/OutAirNodeManager.hh>
 
 using namespace EnergyPlus::MixedAir;
@@ -36,7 +37,7 @@ using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
 
-	TEST_F( HVACFixture, MixedAir_ProcessOAControllerTest )
+	TEST_F( EnergyPlusFixture, MixedAir_ProcessOAControllerTest )
 	{
 		std::string const idf_objects = delimited_string({
 			"Version,8.3;",
@@ -121,7 +122,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, MixedAir_HXBypassOptionTest )
+	TEST_F( EnergyPlusFixture, MixedAir_HXBypassOptionTest )
 	{
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
@@ -248,9 +249,9 @@ namespace EnergyPlus {
 		int OAControllerNum;
 		int AirLoopNum;
 
-		AirLoopControlInfo.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in HVACFixture
-		AirLoopFlow.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in HVACFixture
-		Node.allocate( 16 ); // will be deallocated by DataLoopNode::clear_state(); in HVACFixture
+		AirLoopControlInfo.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
+		AirLoopFlow.allocate( 4 ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
+		Node.allocate( 16 ); // will be deallocated by DataLoopNode::clear_state(); in EnergyPlusFixture
 
 		// Initialize common AirLoop data
 		for ( AirLoopNum = 1; AirLoopNum <=4; ++AirLoopNum ) {
@@ -368,7 +369,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, CO2ControlDesignOccupancyTest )
+	TEST_F( EnergyPlusFixture, CO2ControlDesignOccupancyTest )
 	{
 		Contaminant.CO2Simulation = true;
 		Contaminant.CO2OutdoorSchedPtr = 1;
@@ -498,7 +499,7 @@ namespace EnergyPlus {
 		ZoneCO2GainFromPeople.deallocate();
 	}
 
-	TEST_F( HVACFixture, MissingDesignOccupancyTest )
+	TEST_F( EnergyPlusFixture, MissingDesignOccupancyTest )
 	{
 
 		bool ErrorsFound( false );
@@ -626,4 +627,143 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAACH( 1 ) );
 
 	}
+
+	TEST_F( EnergyPlusFixture, MixedAir_TestHXinOASystem )
+	{
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+
+			"  OutdoorAir:Node,",
+			"    Outside Air Inlet Node;  !- Name",
+
+			"  Controller:OutdoorAir,",
+			"    OA Controller 1,         !- Name",
+			"    Relief Air Outlet Node,  !- Relief Air Outlet Node Name",
+			"    Air Loop Inlet Node,     !- Return Air Node Name",
+			"    Mixed Air Node,          !- Mixed Air Node Name",
+			"    Outside Air Inlet Node,  !- Actuator Node Name",
+			"    1.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    1.0,                     !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    NoEconomizer,            !- Economizer Control Type", // Economizer should open for this one, so OA flow should be > min OA
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+			"    NoLockout,               !- Lockout Type", // No lockout
+			"    ProportionalMinimum,     !- Minimum Limit Type",
+			"    ,                        !- Minimum Outdoor Air Schedule Name",
+			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Mechanical Ventilation Controller Name",
+			"    ,                        !- Time of Day Economizer Control Schedule Name",
+			"    No,                      !- High Humidity Control",
+			"    ,                        !- Humidistat Control Zone Name",
+			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+			"    No;                      !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+
+			"  HeatExchanger:AirToAir:FlatPlate,",
+			"    OA Heat Exchanger 1,     !- Name",
+			"    ,                        !- Availability Schedule Name",
+			"    ParallelFlow,            !- Flow Arrangement Type",
+			"    No,                      !- Economizer Lockout",
+			"    1,                       !- Ratio of Supply to Secondary hA Values",
+			"    1.0,                     !- Nominal Supply Air Flow Rate{ m3 / s }",
+			"    5,                       !- Nominal Supply Air Inlet Temperature{ C }",
+			"    10,                      !- Nominal Supply Air Outlet Temperature{ C }",
+			"    1.0,                     !- Nominal Secondary Air Flow Rate{ m3 / s }",
+			"    20,                      !- Nominal Secondary Air Inlet Temperature{ C }",
+			"    0,                       !- Nominal Electric Power{ W }",
+			"    Heat Exchanger Outlet Node2, !- Supply Air Inlet Node Name",
+			"    Heat Exchanger Outlet Node,  !- Supply Air Outlet Node Name",
+			"    Relief Air Outlet Node,      !- Secondary Air Inlet Node Name",
+			"    Heat Exchanger Secondary Outlet Node;  !- Secondary Air Outlet Node Name",
+
+			"  HeatExchanger:AirToAir:FlatPlate,",
+			"    OA Heat Exchanger 2,     !- Name",
+			"    ,                        !- Availability Schedule Name",
+			"    ParallelFlow,            !- Flow Arrangement Type",
+			"    No,                      !- Economizer Lockout",
+			"    1,                       !- Ratio of Supply to Secondary hA Values",
+			"    1.0,                     !- Nominal Supply Air Flow Rate{ m3 / s }",
+			"    5,                       !- Nominal Supply Air Inlet Temperature{ C }",
+			"    10,                      !- Nominal Supply Air Outlet Temperature{ C }",
+			"    1.0,                     !- Nominal Secondary Air Flow Rate{ m3 / s }",
+			"    20,                      !- Nominal Secondary Air Inlet Temperature{ C }",
+			"    0,                       !- Nominal Electric Power{ W }",
+			"    Outside Air Inlet Node,  !- Supply Air Inlet Node Name",
+			"    Heat Exchanger Outlet Node2,           !- Supply Air Outlet Node Name",
+			"    Heat Exchanger Secondary Outlet Node,  !- Secondary Air Inlet Node Name",
+			"    Heat Exchanger Secondary Outlet Node2; !- Secondary Air Outlet Node Name",
+
+			"  OutdoorAir:Mixer,",
+			"    OA Mixer,                !- Name",
+			"    Mixed Air Node,          !- Mixed Air Node Name",
+			"    Heat Exchanger Outlet Node, !- Outdoor Air Stream Node Name",
+			"    Relief Air Outlet Node,  !- Relief Air Stream Node Name",
+			"    Air Loop Inlet Node;     !- Return Air Stream Node Name",
+
+			" AirLoopHVAC:ControllerList,",
+			"    OA Sys 1 controller,     !- Name",
+			"    Controller:OutdoorAir,   !- Controller 1 Object Type",
+			"    OA Controller 1;         !- Controller 1 Name",
+
+			" AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+			"    OA Sys 1 Equipment list, !- Name",
+			"    HeatExchanger:AirToAir:FlatPlate, !- Component 1 Object Type",
+			"    OA Heat Exchanger 2,     !- Component 1 Name",
+			"    HeatExchanger:AirToAir:FlatPlate, !- Component 1 Object Type",
+			"    OA Heat Exchanger 1,     !- Component 1 Name",
+			"    OutdoorAir:Mixer,        !- Component 2 Object Type",
+			"    OA Mixer;                !- Component 2 Name",
+
+			" AirLoopHVAC:OutdoorAirSystem,",
+			"    OA Sys 1, !- Name",
+			"    OA Sys 1 controller,     !- Controller List Name",
+			"    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetOASysInputFlag = true;
+		DataGlobals::BeginEnvrnFlag = true;
+		int AirloopNum = 1;
+		int OASysNum = 1;
+		int OAControllerNum = 1;
+		AirLoopControlInfo.allocate( AirloopNum ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
+		AirLoopFlow.allocate( AirloopNum ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
+		AirLoopFlow( AirloopNum ).DesSupply = 1.0;
+		DataEnvironment::StdRhoAir = 1.2;
+		DataEnvironment::OutBaroPress = 101250.0;
+
+		// setup OA system and initialize nodes
+		ManageOutsideAirSystem( "OA Sys 1", true, AirloopNum, OASysNum );
+
+		// reset nodes to common property
+		for( int i = 1; i <= DataLoopNode::NumOfNodes; ++i ) {
+			Node( i ).Temp = 20.0;
+			Node( i ).HumRat = 0.01;
+			Node( i ).Enthalpy = 45478.0;
+			Node( i ).MassFlowRate = 1.0;
+			Node( i ).MassFlowRateMaxAvail = 1.0;
+			Node( i ).Press = 101250.0;
+		}
+
+		// simulate OA system, common node property is propogated
+		ManageOutsideAirSystem( "OA Sys 1", true, AirloopNum, OASysNum );
+
+		// change node property at OA inlet and mixer inlet
+		Node( 2 ).Temp = 18.0; // reset temps at HX
+		Node( 5 ).Temp = 24.0;
+
+		// simulate OA system
+		ManageOutsideAirSystem( "OA Sys 1", true, AirloopNum, OASysNum );
+
+		int mixedAirNode = OAController( OAControllerNum ).MixNode;
+		int mixerIntletNode = OAController( OAControllerNum ).InletNode;
+		EXPECT_EQ( Node( mixedAirNode ).Temp, Node( mixerIntletNode ).Temp );
+
+	}
+
 }

@@ -152,6 +152,15 @@ namespace SimulationManager {
 	bool RunPeriodsInInput( false );
 	bool RunControlInInput( false );
 
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of SimulationManager should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool PreP_Fatal( false );
+	}
+
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
 	// MODULE SUBROUTINES:
@@ -160,8 +169,9 @@ namespace SimulationManager {
 	void
 	clear_state()
 	{
-		RunPeriodsInInput = false ;
-		RunControlInInput = false ;
+		RunPeriodsInInput = false;
+		RunControlInInput = false;
+		PreP_Fatal = false;
 	}
 
 
@@ -203,6 +213,7 @@ namespace SimulationManager {
 		using OutputReportTabular::WriteTabularReports;
 		using OutputReportTabular::OpenOutputTabularFile;
 		using OutputReportTabular::CloseOutputTabularFile;
+		using OutputReportTabular::ResetTabularReports;
 		using DataErrorTracking::AskForConnectionsReport;
 		using DataErrorTracking::ExitDuringSimulations;
 		using OutputProcessor::SetupTimePointers;
@@ -239,11 +250,12 @@ namespace SimulationManager {
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
 		using FaultsManager::CheckAndReadFaults;
-		using PlantPipingSystemsManager::InitAndSimGroundDomains;
+		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
 		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
 		using WeatherManager::CheckIfAnyUnderwaterBoundaries;
+		using OutputProcessor::isFinalYear;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -445,6 +457,9 @@ namespace SimulationManager {
 			DayOfSim = 0;
 			DayOfSimChr = "0";
 			NumOfWarmupDays = 0;
+			if ( NumOfDayInEnvrn <= 365 ){
+				isFinalYear = true;
+			}
 
 			ManageEMS( emsCallFromBeginNewEvironment ); // calling point
 
@@ -477,6 +492,11 @@ namespace SimulationManager {
 					DisplayString( "Continuing Simulation at " + CurMnDy + " for " + EnvironmentName );
 					DisplayPerfSimulationFlag = false;
 				}
+				// for simulations that last longer than a week, identify when the last year of the simulation is started
+				if ( ( DayOfSim > 365 ) && ( (NumOfDayInEnvrn - DayOfSim) == 364 ) && !WarmupFlag ){
+					DisplayString( "Starting last  year of environment at:  " + DayOfSimChr );
+					ResetTabularReports();
+				}
 
 				for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
 
@@ -485,7 +505,7 @@ namespace SimulationManager {
 
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
 						if ( AnySlabsInModel || AnyBasementsInModel ) {
-							InitAndSimGroundDomains();
+							SimulateGroundDomains( false );
 						}
 
 						if ( AnyUnderwaterBoundaries ) {
@@ -1537,6 +1557,9 @@ namespace SimulationManager {
 		using CostEstimateManager::SimCostEstimate;
 		using General::TrimSigDigits;
 		using namespace DataTimings;
+		using PlantPipingSystemsManager::SimulateGroundDomains;
+		using PlantPipingSystemsManager::CheckIfAnySlabs;
+		using PlantPipingSystemsManager::CheckIfAnyBasements;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1629,6 +1652,10 @@ namespace SimulationManager {
 			ManageHeatBalance();
 
 		} // ... End environment loop.
+
+		if ( AnySlabsInModel || AnyBasementsInModel ) {
+			SimulateGroundDomains( true );
+		}
 
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
 		if ( ErrorsFound ) ShowFatalError( "Previous Conditions cause program termination." );
@@ -2409,7 +2436,9 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool PreP_Fatal( false ); // True if a preprocessor flags a fatal error
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool PreP_Fatal( false ); // True if a preprocessor flags a fatal error
+		////////////////////////////////////////////////////////////////////////////////////
 
 		DoingInputProcessing = false;
 

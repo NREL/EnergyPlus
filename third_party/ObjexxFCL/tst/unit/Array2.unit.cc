@@ -114,7 +114,7 @@ TEST( Array2Test, ConstructOtherData )
 	}
 
 	// No way to avoid dependency on value constructor
- 	Array2D_double const C1( 2, 3, 3.1459 );
+	Array2D_double const C1( 2, 3, 3.1459 );
 	Array2D_int const C2( C1 );
 	EXPECT_EQ( C1.size(), C2.size() );
 	EXPECT_EQ( C1.size1(), C2.size1() );
@@ -139,7 +139,7 @@ TEST( Array2Test, ConstructArgument )
 	Array2D_int A1( 2, 3, 31459 );
 	Array2A_int A2( A1 );
 	Array2D_int A3( A2 );
- 	EXPECT_EQ( A2.size(), A3.size() );
+	EXPECT_EQ( A2.size(), A3.size() );
 	EXPECT_EQ( A2.size1(), A3.size1() );
 	EXPECT_EQ( A2.size2(), A3.size2() );
 	EXPECT_EQ( A2.I1(), A3.I1() );
@@ -153,7 +153,7 @@ TEST( Array2Test, ConstructArgument )
 	EXPECT_TRUE( equal_dimensions( A1, A3 ) );
 	EXPECT_TRUE( eq( A2, A3 ) );
 
- 	Array2D_int const C1( 2, 3, 31459 );
+	Array2D_int const C1( 2, 3, 31459 );
 	Array2A_int const C2( C1 );
 	Array2D_int const C3( C2 );
 	EXPECT_EQ( C2.size(), C3.size() );
@@ -284,7 +284,7 @@ TEST( Array2Test, ConstructIndexRange )
 	EXPECT_FALSE( A11.initializer_active() );
 
 	// Explicit index range, negative bounds
- 	Array2D_int A12( IR( -5, -2 ), IR( -7, -3 ) );
+	Array2D_int A12( IR( -5, -2 ), IR( -7, -3 ) );
 	EXPECT_EQ( 20u, A12.size() );
 	EXPECT_EQ( 4u, A12.size1() );
 	EXPECT_EQ( 5u, A12.size2() );
@@ -684,7 +684,7 @@ TEST( Array2Test, ConstructIndexRangeInitializerFunction )
 
 TEST( Array2Test, ConstructIndexesInitializerList )
 {
- 	Array2D_int A1( 2, 3, { 11, 12, 13, 21, 22, 23 } );
+	Array2D_int A1( 2, 3, { 11, 12, 13, 21, 22, 23 } );
 	EXPECT_EQ( 6u, A1.size() );
 	EXPECT_EQ( 2u, A1.size1() );
 	EXPECT_EQ( 3u, A1.size2() );
@@ -1636,7 +1636,7 @@ TEST( Array2Test, Inspectors )
 	EXPECT_EQ( C1.l1(), C1.l( 1 ) );
 	EXPECT_EQ( 1, C1.l( 2 ) );
 	EXPECT_EQ( C1.l2(), C1.l( 2 ) );
- 	EXPECT_EQ( 0, C1.u( 1 ) );
+	EXPECT_EQ( 0, C1.u( 1 ) );
 	EXPECT_EQ( C1.u1(), C1.u( 1 ) );
 	EXPECT_EQ( 0, C1.u( 2 ) );
 	EXPECT_EQ( C1.u2(), C1.u( 2 ) );
@@ -1664,7 +1664,7 @@ TEST( Array2Test, Inspectors )
 	EXPECT_EQ( C2.l1(), C2.l( 1 ) );
 	EXPECT_EQ( 1, C2.l( 2 ) );
 	EXPECT_EQ( C2.l2(), C2.l( 2 ) );
- 	EXPECT_EQ( 2, C2.u( 1 ) );
+	EXPECT_EQ( 2, C2.u( 1 ) );
 	EXPECT_EQ( C2.u1(), C2.u( 1 ) );
 	EXPECT_EQ( 3, C2.u( 2 ) );
 	EXPECT_EQ( C2.u2(), C2.u( 2 ) );
@@ -1954,6 +1954,19 @@ TEST( Array2Test, DimensionIndexRange )
 	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
 		for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
 			EXPECT_EQ( 31459, A2( i1, i2 ) );
+		}
+	}
+	A2.dimension( { 2, 5 }, { 2, 5 }, 42 );
+	EXPECT_EQ( 16u, A2.size() );
+	EXPECT_EQ( 4u, A2.size1() );
+	EXPECT_EQ( 4u, A2.size2() );
+	EXPECT_EQ( 2, A2.l1() );
+	EXPECT_EQ( 5, A2.u1() );
+	EXPECT_EQ( 2, A2.l2() );
+	EXPECT_EQ( 5, A2.u2() );
+	for ( int i1 = A2.l1(); i1 <= A2.u1(); ++i1 ) {
+		for ( int i2 = A2.l2(); i2 <= A2.u2(); ++i2 ) {
+			EXPECT_EQ( 42, A2( i1, i2 ) );
 		}
 	}
 

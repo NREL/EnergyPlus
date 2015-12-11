@@ -58,6 +58,11 @@ namespace SurfaceGeometry {
 
 	// Functions
 
+	// Clears the global data in HeatBalanceManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state( );
+
 	void
 	SetupZoneGeometry( bool & ErrorsFound );
 
@@ -66,6 +71,14 @@ namespace SurfaceGeometry {
 
 	void
 	GetSurfaceData( bool & ErrorsFound ); // If errors found in input
+
+
+	void
+	checkSubSurfAzTiltNorm(
+		SurfaceData & baseSurface, // Base surface data (in)
+		SurfaceData & subSurface, // Subsurface data (in)
+		bool & surfaceError // True if there is subsurface error that requires a fatal
+	);
 
 	void
 	GetGeometryParameters( bool & ErrorsFound ); // set to true if errors found during input
@@ -309,6 +322,11 @@ namespace SurfaceGeometry {
 	CheckConvexity(
 		int const SurfNum, // Current surface number
 		int const NSides // Number of sides to figure
+	);
+
+	bool
+	isRectangle(
+		int const ThisSurf // Current surface number
 	);
 
 	//     NOTICE

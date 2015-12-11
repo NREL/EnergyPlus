@@ -4,6 +4,7 @@
 
 // C++ Headers
 #include <iostream>
+#include <exception>
 #ifndef NDEBUG
 #ifdef __unix__
 #include <cfenv>
@@ -377,86 +378,110 @@ EnergyPlusPgm( std::string const & filepath )
 		CommandLineInterface::ProcessArgs( dummy_argc, dummy_argv );
 	}
 
+	OutputStandardError = GetNewUnitNumber();
+	{
+		IOFlags flags;
+		flags.ACTION( "write" );
+		flags.STATUS( "UNKNOWN" );
+		gio::open( OutputStandardError, outputErrFileName, flags );
+		int write_stat = flags.ios();
+		if ( write_stat == 600 ) {
+			DisplayString( "ERROR: Could not open file " + outputErrFileName + " for output (write). Write permission denied in output directory." );
+			std::exit( EXIT_FAILURE );
+		}
+		else if ( write_stat != 0 ) {
+			DisplayString( "ERROR: Could not open file " + outputErrFileName + " for output (write)." );
+			std::exit( EXIT_FAILURE );
+		}
+	}
+	err_stream = gio::out_stream( OutputStandardError );
+
 	TestAllPaths = true;
 
 	DisplayString( "EnergyPlus Starting" );
 	DisplayString( VerString );
 
-	ProcessInput();
+	try {
 
-	ManageSimulation();
+		ProcessInput();
 
-	ShowMessage( "Simulation Error Summary *************" );
+		ManageSimulation();
 
-	GenOutputVariablesAuditReport();
+		ShowMessage( "Simulation Error Summary *************" );
 
-	ShowPsychrometricSummary();
+		GenOutputVariablesAuditReport();
 
-	ReportOrphanRecordObjects();
-	ReportOrphanFluids();
-	ReportOrphanSchedules();
+		ShowPsychrometricSummary();
 
-	if (runReadVars) {
-		std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
-		bool FileExists;
-		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
-		if (!FileExists) {
-			readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
+		ReportOrphanRecordObjects();
+		ReportOrphanFluids();
+		ReportOrphanSchedules();
+
+		if (runReadVars) {
+			std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
+			bool FileExists;
 			{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
 			if (!FileExists) {
-				DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
-				exit(EXIT_FAILURE);
+				readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
+				{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+				if (!FileExists) {
+					DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
+					exit(EXIT_FAILURE);
+				}
 			}
+
+			std::string const RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
+			std::string const MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
+
+			int fileUnitNumber;
+			int iostatus;
+			bool rviFileExists;
+			bool mviFileExists;
+
+			gio::Fmt readvarsFmt( "(A)" );
+
+			{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
+			if (!rviFileExists) {
+				fileUnitNumber = GetNewUnitNumber();
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
+				if ( iostatus != 0 ) {
+					ShowFatalError( "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write)." );
+				}
+				gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
+				gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
+				gio::close( fileUnitNumber );
+			}
+
+			{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
+			if (!mviFileExists) {
+				fileUnitNumber = GetNewUnitNumber();
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
+				if ( iostatus != 0 ) {
+					ShowFatalError( "EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write)." );
+				}
+				gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
+				gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;
+				gio::close( fileUnitNumber );
+			}
+
+			std::string const readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
+			std::string const readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
+
+			systemCall(readVarsRviCommand);
+			systemCall(readVarsMviCommand);
+
+			if (!rviFileExists)
+				removeFile(RVIfile.c_str());
+
+			if (!mviFileExists)
+				removeFile(MVIfile.c_str());
+
+			moveFile("readvars.audit", outputRvauditFileName);
 		}
 
-		std::string const RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
-		std::string const MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
-
-		int fileUnitNumber;
-		int iostatus;
-		bool rviFileExists;
-		bool mviFileExists;
-
-		gio::Fmt readvarsFmt( "(A)" );
-
-		{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
-		if (!rviFileExists) {
-			fileUnitNumber = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
-			if ( iostatus != 0 ) {
-				ShowFatalError( "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write)." );
-			}
-			gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
-			gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
-			gio::close( fileUnitNumber );
-		}
-
-		{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
-		if (!mviFileExists) {
-			fileUnitNumber = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
-			if ( iostatus != 0 ) {
-				ShowFatalError( "EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write)." );
-			}
-			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
-			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;
-			gio::close( fileUnitNumber );
-		}
-
-		std::string readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
-		std::string readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
-
-		systemCall(readVarsRviCommand);
-		systemCall(readVarsMviCommand);
-
-		if (!rviFileExists)
-			removeFile(RVIfile.c_str());
-
-		if (!mviFileExists)
-			removeFile(MVIfile.c_str());
-
-		moveFile("readvars.audit", outputRvauditFileName);
-
+	}
+	catch( const std::exception& e ) {
+		AbortEnergyPlus();
 	}
 
 	EndEnergyPlus();

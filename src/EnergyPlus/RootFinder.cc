@@ -2571,7 +2571,7 @@ namespace RootFinder {
 		//'History(1)%DefinedFlag', ',', &
 		//'History(2)%DefinedFlag', ',', &
 		//'History(3)%DefinedFlag', ',', &
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(20(A,A))", flags ) << "Status" << "Method" << "CurrentPoint%X" << "CurrentPoint%Y" << "XCandidate" << "ConvergenceRate" << "MinPoint%X" << "MinPoint%Y" << "LowerPoint%X" << "LowerPoint%Y" << "UpperPoint%X" << "UpperPoint%Y" << "MaxPoint%X" << "MaxPoint%Y" << "History(1)%X" << "History(1)%Y" << "History(2)%X" << "History(2)%Y" << "History(3)%X" << "History(3)%Y"; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(20(A,A))", flags ) << "Status" << ',' << "Method" << ',' << "CurrentPoint%X" << ',' << "CurrentPoint%Y" << ',' << "XCandidate" << ',' << "ConvergenceRate" << ',' << "MinPoint%X" << ',' << "MinPoint%Y" << ',' << "LowerPoint%X" << ',' << "LowerPoint%Y" << ',' << "UpperPoint%X" << ',' << "UpperPoint%Y" << ',' << "MaxPoint%X" << ',' << "MaxPoint%Y" << ',' << "History(1)%X" << ',' << "History(1)%Y" << ',' << "History(2)%X" << ',' << "History(2)%Y" << ',' << "History(3)%X" << ',' << "History(3)%Y" << ','; }
 
 	}
 
@@ -2617,12 +2617,12 @@ namespace RootFinder {
 
 		// FLOW:
 
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A))", flags ) << TrimSigDigits( RootFinderData.StatusFlag ) << TrimSigDigits( RootFinderData.CurrentMethodType ); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A))", flags ) << TrimSigDigits( RootFinderData.StatusFlag ) << ',' << TrimSigDigits( RootFinderData.CurrentMethodType ) << ','; }
 
 		// Only show current point if defined.
 		WritePoint( TraceFileUnit, RootFinderData.CurrentPoint, false );
 
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(F20.10,A))", flags ) << RootFinderData.XCandidate << RootFinderData.ConvergenceRate; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(F20.10,A))", flags ) << RootFinderData.XCandidate << ',' << RootFinderData.ConvergenceRate << ','; }
 
 		// Always show min and max points.
 		// Only show lower and upper points if defined.
@@ -2683,12 +2683,12 @@ namespace RootFinder {
 		// FLOW:
 
 		if ( PointData.DefinedFlag ) {
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(F20.10,A))", flags ) << PointData.X << PointData.Y; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(F20.10,A))", flags ) << PointData.X << ',' << PointData.Y << ','; }
 		} else {
 			if ( ShowXValue ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(1(F20.10,A),1(A,A))", flags ) << PointData.X << NoValue; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(1(F20.10,A),1(A,A))", flags ) << PointData.X << ',' << NoValue << ','; }
 			} else {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A))", flags ) << NoValue << NoValue; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A))", flags ) << NoValue << ',' << NoValue << ','; }
 			}
 		}
 

@@ -221,6 +221,7 @@ set(src
   src/ObjexxFCL/Vector3.hh
   src/ObjexxFCL/Vector4.fwd.hh
   src/ObjexxFCL/Vector4.hh
+  src/ObjexxFCL/vectorize.hh
   src/ObjexxFCL/Write.cc
   src/ObjexxFCL/Write.fwd.hh
   src/ObjexxFCL/Write.hh
