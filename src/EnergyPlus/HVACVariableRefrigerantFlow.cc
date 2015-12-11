@@ -2310,6 +2310,44 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 			
+			//Thermostat Priority Control Type
+			std::string ThermostatPriorityType = cAlphaArgs( 8 );
+			if ( SameString( ThermostatPriorityType, "LoadPriority" ) ) {
+				VRF( VRFNum ).ThermostatPriority = LoadPriority;
+			} else if ( SameString( ThermostatPriorityType, "ZonePriority" ) ) {
+				VRF( VRFNum ).ThermostatPriority = ZonePriority;
+			} else if ( SameString( ThermostatPriorityType, "ThermostatOffsetPriority" ) ) {
+				VRF( VRFNum ).ThermostatPriority = ThermostatOffsetPriority;
+			} else if ( SameString( ThermostatPriorityType, "Scheduled" ) ) {
+				VRF( VRFNum ).ThermostatPriority = ScheduledPriority;
+			} else if ( SameString( ThermostatPriorityType, "MasterThermostatPriority" ) ) {
+				VRF( VRFNum ).ThermostatPriority = MasterThermostatPriority;
+			} else {
+				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
+				ShowContinueError( "Illegal " + cAlphaFieldNames( 8 ) + " = " + cAlphaArgs( 8 ) );
+				ErrorsFound = true;
+			}
+
+			if ( VRF( VRFNum ).ThermostatPriority == MasterThermostatPriority ) {
+				std::string ThermostatMasterZone = cAlphaArgs( 9 );
+				VRF( VRFNum ).MasterZonePtr = FindItemInList( ThermostatMasterZone, Zone );
+				if ( VRF( VRFNum ).MasterZonePtr == 0 ) {
+					ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
+					ShowContinueError( cAlphaFieldNames( 9 ) + " must be entered when " + cAlphaFieldNames( 8 ) + " = " + cAlphaArgs( 8 ) );
+					ErrorsFound = true;
+				}
+			}
+			
+			if ( VRF( VRFNum ).ThermostatPriority == ScheduledPriority ) {
+				VRF( VRFNum ).SchedPriorityPtr = GetScheduleIndex( cAlphaArgs( 10 ) );
+				if ( VRF( VRFNum ).SchedPriorityPtr == 0 ) {
+					ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
+					ShowContinueError( "..." + cAlphaFieldNames( 10 ) + " = " + cAlphaArgs( 10 ) + " not found." );
+					ShowContinueError( "A schedule name is required when " + cAlphaFieldNames( 8 ) + " = " + cAlphaArgs( 8 ) );
+					ErrorsFound = true;
+				}
+			}
+			
 			// Pipe parameters
 			VRF( VRFNum ).RefPipDia      = rNumericArgs( 17 );
 			VRF( VRFNum ).RefPipLen      = rNumericArgs( 18 );
@@ -2338,48 +2376,48 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).MaxOATCCHeater = rNumericArgs( 26 );
 			
 			//Defrost
-			if ( ! lAlphaFieldBlanks( 8 ) ) {
-				if ( SameString( cAlphaArgs( 8 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
-				if ( SameString( cAlphaArgs( 8 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
+			if ( ! lAlphaFieldBlanks( 11 ) ) {
+				if ( SameString( cAlphaArgs( 11 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
+				if ( SameString( cAlphaArgs( 11 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
 				if ( VRF( VRFNum ).DefrostStrategy == 0 ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 8 ) + " not found: " + cAlphaArgs( 8 ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 11 ) + " not found: " + cAlphaArgs( 11 ) );
 					ErrorsFound = true;
 				}
 			} else {
 				VRF( VRFNum ).DefrostStrategy = ReverseCycle;
 			}
 
-			if ( ! lAlphaFieldBlanks( 9 ) ) {
-				if ( SameString( cAlphaArgs( 9 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
-				if ( SameString( cAlphaArgs( 9 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
+			if ( ! lAlphaFieldBlanks( 12 ) ) {
+				if ( SameString( cAlphaArgs( 12 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
+				if ( SameString( cAlphaArgs( 12 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
 				if ( VRF( VRFNum ).DefrostControl == 0 ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 9 ) + " not found: " + cAlphaArgs( 9 ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 12 ) + " not found: " + cAlphaArgs( 12 ) );
 					ErrorsFound = true;
 				}
 			} else {
 				VRF( VRFNum ).DefrostControl = Timed;
 			}
 
-			if ( ! lAlphaFieldBlanks( 10 ) ) {
-				VRF( VRFNum ).DefrostEIRPtr = GetCurveIndex( cAlphaArgs( 10 ) );
+			if ( ! lAlphaFieldBlanks( 13 ) ) {
+				VRF( VRFNum ).DefrostEIRPtr = GetCurveIndex( cAlphaArgs( 13 ) );
 				if ( VRF( VRFNum ).DefrostEIRPtr > 0 ) {
 					// Verify Curve Object, only legal type is linear, quadratic, or cubic
 					{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
 					if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 					} else {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 10 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
+						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 13 ) + " type for this object = " + GetCurveType( VRF( VRFNum ).DefrostEIRPtr ) );
 						ShowContinueError( "... curve type must be BiQuadratic." );
 						ErrorsFound = true;
 					}}
 				} else {
 					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
-						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 10 ) + " not found:" + cAlphaArgs( 10 ) );
+						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 13 ) + " not found:" + cAlphaArgs( 13 ) );
 						ErrorsFound = true;
 					}
 				}
 			} else {
 				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
-					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 10 ) + " not found:" + cAlphaArgs( 10 ) );
+					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 13 ) + " not found:" + cAlphaArgs( 13 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -2393,44 +2431,6 @@ namespace HVACVariableRefrigerantFlow {
 			
 			VRF( VRFNum ).CompMaxDeltaP  = rNumericArgs( 30 );
 			
-			//@@ The control type 
-			
-    		std::string ThermostatMasterZone = "SPACE1-1"; // cAlphaArgs( 24 ) 
-			VRF( VRFNum ).MasterZonePtr = FindItemInList( ThermostatMasterZone, Zone );
-
-    		std::string ThermostatPriorityType = "LoadPriority"; // cAlphaArgs( 25 ) 
-			if ( SameString( ThermostatPriorityType, "LoadPriority" ) ) {
-				VRF( VRFNum ).ThermostatPriority = LoadPriority;
-			} else if ( SameString( ThermostatPriorityType, "ZonePriority" ) ) {
-				VRF( VRFNum ).ThermostatPriority = ZonePriority;
-			} else if ( SameString( ThermostatPriorityType, "ThermostatOffsetPriority" ) ) {
-				VRF( VRFNum ).ThermostatPriority = ThermostatOffsetPriority;
-			} else if ( SameString( ThermostatPriorityType, "Scheduled" ) ) {
-				VRF( VRFNum ).ThermostatPriority = ScheduledPriority;
-			} else if ( SameString( ThermostatPriorityType, "MasterThermostatPriority" ) ) {
-				VRF( VRFNum ).ThermostatPriority = MasterThermostatPriority;
-				if ( VRF( VRFNum ).MasterZonePtr == 0 ) {
-					ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
-					//** ShowContinueError( cAlphaFieldNames( 24 ) + " must be entered when " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
-					ErrorsFound = true;
-				}
-			} else {
-				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-				// ShowContinueError( "Illegal " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
-				ErrorsFound = true;
-			}
-
-			// if ( VRF( VRFNum ).ThermostatPriority == ScheduledPriority ) {
-			// 	VRF( VRFNum ).SchedPriorityPtr = GetScheduleIndex( cAlphaArgs( 26 ) );
-			// 	if ( VRF( VRFNum ).SchedPriorityPtr == 0 ) {
-			// 		ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
-			// 		ShowContinueError( "..." + cAlphaFieldNames( 26 ) + " = " + cAlphaArgs( 26 ) + " not found." );
-			// 		ShowContinueError( "A schedule name is required when " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
-			// 		ErrorsFound = true;
-			// 	}
-			// }
-			
-			
 			// The new VRF model is Air cooled
 			VRF( VRFNum ).CondenserType = AirCooled; 
 			VRF( VRFNum ).CondenserNodeNum = 0; 
@@ -2441,7 +2441,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).OUCoolingCAPFT.dimension( NumOfCompSpd );
 			VRF( VRFNum ).OUCoolingPWRFT.dimension( NumOfCompSpd );
 			int Count1Index = 31; // the index of the last numeric field before compressor speed entries
-			int Count2Index = 9; // the index of the last alpha field before capacity/power curves
+			int Count2Index = 12; // the index of the last alpha field before capacity/power curves
 			for ( NumCompSpd = 1; NumCompSpd <= NumOfCompSpd; NumCompSpd++ ) {
 				VRF( VRFNum ).CompressorSpeed( NumCompSpd ) = rNumericArgs( Count1Index + NumCompSpd );
 
@@ -2501,7 +2501,7 @@ namespace HVACVariableRefrigerantFlow {
 				
 			}
 		}
-		 
+		
 		cCurrentModuleObject = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
 		for ( VRFNum = 1; VRFNum <= NumVRFTU; ++VRFNum ) {
 			VRFTUNum = VRFNum;
