@@ -53959,8 +53959,8 @@ AirConditioner:VariableRefrigerantFlow,
        \note from cooling only mode to heat recovery mode
 
 AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
-       \memo This is a key object in the new physics based VRF model applicable for Fluid 
-       \memo Temperature Control 
+       \memo This is a key object in the new physics based VRF model applicable for Fluid
+       \memo Temperature Control
        \memo It describes the Variable Refrigerant Flow system excluding the performance of indoor units
        \memo Indoor units are modeled separately, see ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \min-fields 9
@@ -53991,8 +53991,8 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 40000
        \note Enter the total evaporative capacity in watts at rated conditions
        \note This is the capacity corresponding to the max compressor speed at rated conditions
-       \note The actual evaporative capacity is obtained by multiplying the  
-       \note rated capacity with the modification factor calculated by Evaporative 
+       \note The actual evaporative capacity is obtained by multiplying the
+       \note rated capacity with the modification factor calculated by Evaporative
        \note Capacity Multiplier Function of Temperature Curve
   N2 , \field Rated Compressor Power Per Unit of Rated Evaporative Capacity
        \type real
@@ -54001,8 +54001,8 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 0.35
        \note Enter the rated compressor power per Watt of rated evaporative capacity [W/W]
        \note Rated compressor power corresponds to the max compressor speed at rated conditions
-       \note The actual compressor power is obtained by multiplying the  
-       \note rated power with the modification factor calculated by Compressor 
+       \note The actual compressor power is obtained by multiplying the
+       \note rated power with the modification factor calculated by Compressor
        \note Power Multiplier Function of Temperature Curve
   N3 , \field Minimum Outdoor Air Temperature in Cooling Mode
        \type real
@@ -54056,15 +54056,15 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \units C
        \default 44.0
   N11, \field Variable Evaporating Temperature Minimum for Indoor Unit
-       \note This field is used if Refrigerant Temperature Control Algorithm 
-       \note is VariableTemp 
+       \note This field is used if Refrigerant Temperature Control Algorithm
+       \note is VariableTemp
        \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
        \units C
        \default 4.0
   N12, \field Variable Evaporating Temperature Maximum for Indoor Unit
-       \note This field is used if Refrigerant Temperature Control Algorithm 
-       \note is VariableTemp 
+       \note This field is used if Refrigerant Temperature Control Algorithm
+       \note is VariableTemp
        \note Evaporating temperature is the refrigerant temperature, not air temperature
        \type real
        \units C
@@ -54125,8 +54125,8 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 36.0
   N20, \field Height Difference Between Outdoor Unit and Indoor Units
        \note Difference between outdoor unit height and indoor unit height
-       \note Positive means outdoor unit is higher than indoor unit 
-       \note Negative means outdoor unit is lower than indoor unit 
+       \note Positive means outdoor unit is higher than indoor unit
+       \note Negative means outdoor unit is lower than indoor unit
        \type real
        \units m
        \default 5.0
@@ -54169,8 +54169,8 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \key ReverseCycle
        \key Resistive
        \default Resistive
-       \note Select a defrost strategy. 
-       \note Reverse cycle reverses the operating mode from heating to 
+       \note Select a defrost strategy.
+       \note Reverse cycle reverses the operating mode from heating to
        \note cooling to melt frost formation on the condenser coil
        \note The resistive strategy uses a resistive heater
        \note to melt the frost.
@@ -54220,11 +54220,11 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \default 2
        \minimum 2
        \maximum 9
-       \note First index represents minimal capacity operation 
-       \note Last index represents full capacity operation 
-  N32, \field Compressor Speed at Loading Index 1 
+       \note First index represents minimal capacity operation
+       \note Last index represents full capacity operation
+  N32, \field Compressor Speed at Loading Index 1
        \type real
-       \note Minimum compressor speed 
+       \note Minimum compressor speed
        \units rev/min
        \minimum> 0
   A11, \field Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name

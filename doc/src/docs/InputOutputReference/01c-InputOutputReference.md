@@ -14478,9 +14478,6 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     7.26E-5,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
     OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
     OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
-    LoadPriority,            !- Master Thermostat Priority Control Type
-    ,                        !- Zone Name for Master Thermostat Location
-    ,                        !- Thermostat Priority Schedule Name
     0.0508,                  !- Diameter of main pipe connecting outdoor unit to indoor units {m}
     30,                      !- Length of main pipe connecting outdoor unit to indoor units {m}
     36,                      !- Equivalent length of main pipe connecting outdoor unit to indoor units {m}
