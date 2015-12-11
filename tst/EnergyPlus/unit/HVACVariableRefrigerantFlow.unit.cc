@@ -70,6 +70,52 @@ using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
 
+	TEST_F( EnergyPlusFixture, VRFFluidTCtrlGetCoilInput )
+	{
+		// PURPOSE OF THE TEST:
+		//   IDF Read in for the new coil type: Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
+
+		std::string const idf_objects = delimited_string( {
+			" Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  ",
+			" 	 TU1 VRF DX Cooling Coil, !- Name							   ",
+			" 	 VRFAvailSched,           !- Availability Schedule Name		   ",
+			" 	 TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node		   ",
+			" 	 TU1 VRF DX CCoil Outlet Node, !- Coil Air Outlet Node		   ",
+			" 	 2200,                    !- Rated Total Cooling Capacity {W}   ",
+			" 	 0.865,                   !- Rated Sensible Heat Ratio		   ",
+			" 	 3,                       !- Indoor Unit Reference Superheating ",
+			" 	 IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature",
+			" 	 ;                        !- Name of Water Storage Tank for Cond",
+			" Curve:Quadratic,												   ",
+			"     IUEvapTempCurve,         !- Name							   ",
+			"     0,                       !- Coefficient1 Const				   ",
+			"     0.80404,                 !- Coefficient2 x					   ",
+			"     0,                       !- Coefficient3 x**2				   ",
+			"     0,                       !- Minimum Value of x				   ",
+			"     15,                      !- Maximum Value of x				   ",
+			"     ,                        !- Minimum Curve Outp				   ",
+			"     ,                        !- Maximum Curve Outp				   ",
+			"     Dimensionless,           !- Input Unit Type fo				   ",
+			"     Dimensionless;           !- Output Unit Type				   "
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		// Run the method
+		GetDXCoils( );
+
+		// Check the results
+		ASSERT_EQ( 1, NumDXCoils );
+		EXPECT_EQ( DXCoil( 1 ).DXCoilType_Num, 33 );
+		EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ), 2200 );
+		EXPECT_EQ( DXCoil( 1 ).RatedSHR( 1 ), 0.865 );
+		EXPECT_EQ( DXCoil( 1 ).C1Te, 0 );
+		EXPECT_EQ( DXCoil( 1 ).C2Te, 0.80404 );
+		EXPECT_EQ( DXCoil( 1 ).C3Te, 0 );
+		EXPECT_EQ( DXCoil( 1 ).SH, 3 );
+
+	}
+	
 	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
 	{
 		// PURPOSE OF THIS SUBROUTINE:
@@ -121,52 +167,6 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( EnergyPlusFixture, VRFFluidTCtrlGetCoilInput )
-	{
-		// PURPOSE OF THE TEST:
-		//   IDF Read in for the new coil type: Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
-
-		std::string const idf_objects = delimited_string( {
-			" Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  ",
-			" 	 TU1 VRF DX Cooling Coil, !- Name							   ",
-			" 	 VRFAvailSched,           !- Availability Schedule Name		   ",
-			" 	 TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node		   ",
-			" 	 TU1 VRF DX CCoil Outlet Node, !- Coil Air Outlet Node		   ",
-			" 	 2200,                    !- Rated Total Cooling Capacity {W}   ",
-			" 	 0.865,                   !- Rated Sensible Heat Ratio		   ",
-			" 	 3,                       !- Indoor Unit Reference Superheating ",
-			" 	 IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature",
-			" 	 ;                        !- Name of Water Storage Tank for Cond",
-			" Curve:Quadratic,												   ",
-			"     IUEvapTempCurve,         !- Name							   ",
-			"     0,                       !- Coefficient1 Const				   ",
-			"     0.80404,                 !- Coefficient2 x					   ",
-			"     0,                       !- Coefficient3 x**2				   ",
-			"     0,                       !- Minimum Value of x				   ",
-			"     15,                      !- Maximum Value of x				   ",
-			"     ,                        !- Minimum Curve Outp				   ",
-			"     ,                        !- Maximum Curve Outp				   ",
-			"     Dimensionless,           !- Input Unit Type fo				   ",
-			"     Dimensionless;           !- Output Unit Type				   "
-		} );
-
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
-		// Run the method
-		GetDXCoils( );
-
-		// Check the results
-		ASSERT_EQ( 1, NumDXCoils );
-		EXPECT_EQ( DXCoil( 1 ).DXCoilType_Num, 33 );
-		EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ), 2200 );
-		EXPECT_EQ( DXCoil( 1 ).RatedSHR( 1 ), 0.865 );
-		EXPECT_EQ( DXCoil( 1 ).C1Te, 0 );
-		EXPECT_EQ( DXCoil( 1 ).C2Te, 0.80404 );
-		EXPECT_EQ( DXCoil( 1 ).C3Te, 0 );
-		EXPECT_EQ( DXCoil( 1 ).SH, 3 );
-
-	}
-
 	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualCool )
 	{
 		// PURPOSE OF THIS TEST:
@@ -193,19 +193,17 @@ namespace EnergyPlus {
 		ZnSenLoad = 2716.62;
 		Th2 = 17.41212;
 		TairInlet = 25.55534;
-		QfanRate = 37.8;
 		Garate = 0.20664;
 		BF = 0.0592;
 		Par( 1 ) = ZnSenLoad;
 		Par( 2 ) = Th2;
 		Par( 3 ) = TairInlet;
-		Par( 4 ) = QfanRate;
-		Par( 5 ) = Garate;
-		Par( 6 ) = BF;
+		Par( 4 ) = Garate;
+		Par( 5 ) = BF;
 
 		// Run and Check
 		double FanSpdResidual = FanSpdResidualCool( FanSpdRto, Par );
-		EXPECT_NEAR( -0.7055, FanSpdResidual, 0.0005 );
+		EXPECT_NEAR( -0.707, FanSpdResidual, 0.0005 );
 
 		// Clean up
 		Par.deallocate( );
@@ -224,7 +222,6 @@ namespace EnergyPlus {
 		double ZnSenLoad;
 		double Th2;
 		double TairInlet;
-		double QfanRate;
 		double Garate;
 		double BF;
 		Array1D< Real64 > Par;
@@ -238,15 +235,13 @@ namespace EnergyPlus {
 		ZnSenLoad = 4241.66;
 		Th2 = 41.221;
 		TairInlet = 20.236;
-		QfanRate = 37.8;
 		Garate = 0.21136;
 		BF = 0.1360;
 		Par( 1 ) = ZnSenLoad;
 		Par( 2 ) = Th2;
 		Par( 3 ) = TairInlet;
-		Par( 4 ) = QfanRate;
-		Par( 5 ) = Garate;
-		Par( 6 ) = BF;
+		Par( 4 ) = Garate;
+		Par( 5 ) = BF;
 
 		// Run and Check
 		double FanSpdResidual = FanSpdResidualHeat( FanSpdRto, Par );
@@ -323,13 +318,10 @@ namespace EnergyPlus {
 		DXCoil( CoolCoilIndex ).InletAirEnthalpy = 47259.78;
 		
 		ControlVRFIUCoil( CoolCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP, 25.5553, 8.4682e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
-		//EXPECT_NEAR( TcIn, 25.56, 0.01 );
 		EXPECT_NEAR( Toutlet, 17.89, 0.01 );
 		EXPECT_NEAR( Houtlet, 39440, 1 );
-		//EXPECT_NEAR( HcoilIn, 47259, 1 );
 		EXPECT_NEAR( SHact, 3.00, 0.01 );
-
-
+		
 		// Run and Check for Heating Mode
 		Mode = 1;
 		Temp = 42;
@@ -344,10 +336,8 @@ namespace EnergyPlus {
 		DXCoil( HeatCoilIndex ).InletAirEnthalpy = 30755.6253;
 
 		ControlVRFIUCoil( HeatCoilIndex, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP, 20.2362, 4.1053e-3, Temp, 0, FanSpdRatio, Wout, Toutlet, Houtlet, SHact, SCact );
-		//EXPECT_NEAR( TcIn, 20.24, 0.01 );
 		EXPECT_NEAR( Toutlet, 38.37, 0.01 );
 		EXPECT_NEAR( Houtlet, 49113, 1 );
-		//EXPECT_NEAR( HcoilIn, 30756, 1 );
 		EXPECT_NEAR( SCact, 5.00, 0.01 );
 
 		// Clean up
