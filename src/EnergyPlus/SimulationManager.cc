@@ -492,12 +492,14 @@ namespace SimulationManager {
 						    WeatherManager::UpdateUnderwaterBoundaries();
 						}
 
-						if ( varyingLocationSchedIndexLat > 0 ) {
-							DataEnvironment::Latitude = ScheduleManager::GetCurrentScheduleValue( varyingLocationSchedIndexLat );
-						}
-
-						if ( varyingLocationSchedIndexLong > 0 ) {
-							DataEnvironment::Longitude = ScheduleManager::GetCurrentScheduleValue( varyingLocationSchedIndexLong );
+						if ( varyingLocationSchedIndexLat > 0 || varyingLocationSchedIndexLong > 0 ) {
+							if ( varyingLocationSchedIndexLat > 0 ) {
+								DataEnvironment::Latitude = ScheduleManager::GetCurrentScheduleValue( varyingLocationSchedIndexLat );
+							}
+							if ( varyingLocationSchedIndexLong > 0 ) {
+								DataEnvironment::Longitude = ScheduleManager::GetCurrentScheduleValue( varyingLocationSchedIndexLong );
+							}
+							CheckLocationValidity();
 						}
 
 						BeginTimeStepFlag = true;

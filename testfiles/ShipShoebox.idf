@@ -43,6 +43,10 @@
     Yes,                     !- Run Simulation for Sizing Periods
     No;                      !- Run Simulation for Weather File Run Periods
 
+ShadowCalculation,
+  AverageOverDaysInFrequency, !- Calculation Method
+  1;                         !- Calculation Frequency
+
 !***********************************************************
 !****** LOCATION SPECIFIC OBJECTS **************************
 !***********************************************************
