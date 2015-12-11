@@ -85,7 +85,6 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	CArrayP() :
 	 size_( 0u ),
 	 data_( nullptr ),
@@ -93,7 +92,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	CArrayP( CArrayP const & a ) :
 	 size_( a.size_ ),
 	 data_( a.owner_ ? ( size_ > 0u ? new T[ size_ ] : nullptr ) : a.data_ ),
@@ -107,7 +105,6 @@ public: // Creation
 	}
 
 	// Move Constructor
-	inline
 	CArrayP( CArrayP && a ) NOEXCEPT :
 	 size_( a.size_ ),
 	 data_( a.data_ ),
@@ -120,7 +117,6 @@ public: // Creation
 
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	CArrayP( CArrayP< U > const & a ) :
 	 size_( a.size_ ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
@@ -132,7 +128,6 @@ public: // Creation
 	}
 
 	// Pointer + Size Constructor
-	inline
 	CArrayP(
 	 T const * const p,
 	 size_type const size
@@ -148,7 +143,6 @@ public: // Creation
 
 	// Pointer + Size Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	CArrayP(
 	 U const * const p,
 	 size_type const size
@@ -164,7 +158,6 @@ public: // Creation
 
 	// Iterator Range Constructor Template
 	template< typename InputIterator >
-	inline
 	CArrayP(
 	 InputIterator const beg,
 	 InputIterator const end
@@ -181,9 +174,7 @@ public: // Creation
 		}
 	}
 
-	// Size Constructor
-	//  Built-in value types are not initialized
-	inline
+	// Size Constructor: Built-in types are default, not zero, initialized for performance
 	explicit
 	CArrayP( size_type const size ) :
 	 size_( size ),
@@ -192,7 +183,6 @@ public: // Creation
 	{}
 
 	// Size + Uniform Value Constructor
-	inline
 	CArrayP(
 	 size_type const size,
 	 Tc t
@@ -208,7 +198,6 @@ public: // Creation
 
 	// Initializer List Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	CArrayP( std::initializer_list< U > const l ) :
 	 size_( l.size() ),
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
@@ -219,7 +208,6 @@ public: // Creation
 
 	// Proxy Copy Named Constructor
 	static
-	inline
 	CArrayP
 	Proxy( CArrayP const & a )
 	{
@@ -232,7 +220,6 @@ public: // Creation
 
 	// Proxy Copy + Size Named Constructor
 	static
-	inline
 	CArrayP
 	Proxy(
 	 CArrayP const & a,
@@ -248,7 +235,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	~CArrayP()
 	{
 		if ( owner_ ) delete[] data_;
@@ -257,21 +243,18 @@ public: // Creation
 public: // Conversion
 
 	// Active?
-	inline
 	operator bool() const
 	{
 		return ( data_ != nullptr );
 	}
 
 	// Data
-	inline
 	operator T const *() const
 	{
 		return data_;
 	}
 
 	// Data
-	inline
 	operator T *()
 	{
 		return data_;
@@ -280,7 +263,6 @@ public: // Conversion
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	CArrayP &
 	operator =( CArrayP const & a )
 	{
@@ -298,7 +280,6 @@ public: // Assignment
 	}
 
 	// Move Assignment
-	inline
 	CArrayP &
 	operator =( CArrayP && a ) NOEXCEPT
 	{
@@ -316,7 +297,6 @@ public: // Assignment
 
 	// Copy Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator =( CArrayP< U > const & a )
 	{
@@ -332,7 +312,6 @@ public: // Assignment
 	}
 
 	// Uniform Value Assignment
-	inline
 	CArrayP &
 	operator =( Tc t )
 	{
@@ -344,7 +323,6 @@ public: // Assignment
 
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator =( std::initializer_list< U > const l )
 	{
@@ -354,7 +332,6 @@ public: // Assignment
 	}
 
 	// Pointer + Size Assignment
-	inline
 	CArrayP &
 	assign(
 	 T const * const p,
@@ -374,7 +351,6 @@ public: // Assignment
 
 	// Pointer + Size Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	assign(
 	 U const * const p,
@@ -394,7 +370,6 @@ public: // Assignment
 
 	// Iterator Range Assignment Template
 	template< typename InputIterator >
-	inline
 	CArrayP &
 	assign(
 	 InputIterator const beg,
@@ -417,7 +392,6 @@ public: // Assignment
 	}
 
 	// Size + Value Assignment
-	inline
 	CArrayP &
 	assign(
 	 size_type const size,
@@ -435,7 +409,6 @@ public: // Assignment
 
 	// += CArrayP
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator +=( CArrayP< U > const & a )
 	{
@@ -448,7 +421,6 @@ public: // Assignment
 
 	// -= CArrayP
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator -=( CArrayP< U > const & a )
 	{
@@ -460,7 +432,6 @@ public: // Assignment
 	}
 
 	// += Value
-	inline
 	CArrayP &
 	operator +=( Tc t )
 	{
@@ -471,7 +442,6 @@ public: // Assignment
 	}
 
 	// -= Value
-	inline
 	CArrayP &
 	operator -=( Tc t )
 	{
@@ -482,7 +452,6 @@ public: // Assignment
 	}
 
 	// *= Value
-	inline
 	CArrayP &
 	operator *=( Tc t )
 	{
@@ -494,7 +463,6 @@ public: // Assignment
 
 	// /= Value
 	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
-	inline
 	CArrayP &
 	operator /=( U const & u )
 	{
@@ -507,8 +475,7 @@ public: // Assignment
 	}
 
 	// /= Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
-	inline
+	template< typename U, class = typename std::enable_if< ! std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
 	CArrayP &
 	operator /=( U const & u )
 	{
@@ -522,7 +489,6 @@ public: // Assignment
 public: // Predicate
 
 	// Active?
-	inline
 	bool
 	active() const
 	{
@@ -530,7 +496,6 @@ public: // Predicate
 	}
 
 	// Empty?
-	inline
 	bool
 	empty() const
 	{
@@ -538,7 +503,6 @@ public: // Predicate
 	}
 
 	// Owner?
-	inline
 	bool
 	owner() const
 	{
@@ -546,7 +510,6 @@ public: // Predicate
 	}
 
 	// Proxy?
-	inline
 	bool
 	proxy() const
 	{
@@ -556,7 +519,6 @@ public: // Predicate
 public: // Inspector
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -564,7 +526,6 @@ public: // Inspector
 	}
 
 	// Lower Index
-	inline
 	size_type
 	l() const
 	{
@@ -572,7 +533,6 @@ public: // Inspector
 	}
 
 	// Upper index
-	inline
 	size_type
 	u() const
 	{
@@ -580,7 +540,6 @@ public: // Inspector
 	}
 
 	// First Element
-	inline
 	Tr
 	front() const
 	{
@@ -589,7 +548,6 @@ public: // Inspector
 	}
 
 	// Last Element
-	inline
 	Tr
 	back() const
 	{
@@ -598,7 +556,6 @@ public: // Inspector
 	}
 
 	// Length
-	inline
 	T
 	length() const
 	{
@@ -611,7 +568,6 @@ public: // Inspector
 	}
 
 	// Length Squared
-	inline
 	T
 	length_squared() const
 	{
@@ -626,7 +582,6 @@ public: // Inspector
 public: // Modifier
 
 	// First Element
-	inline
 	T &
 	front()
 	{
@@ -635,7 +590,6 @@ public: // Modifier
 	}
 
 	// Last Element
-	inline
 	T &
 	back()
 	{
@@ -645,7 +599,6 @@ public: // Modifier
 
 	// Resize: Values not Preserved
 	// Built-in values are uninitialized if size changes
-	inline
 	CArrayP &
 	size( size_type const size )
 	{
@@ -657,7 +610,6 @@ public: // Modifier
 	}
 
 	// Resize to Size With Fill Value: Values Preserved
-	inline
 	CArrayP &
 	resize(
 	 size_type const size,
@@ -682,7 +634,6 @@ public: // Modifier
 	}
 
 	// Swap
-	inline
 	void
 	swap( CArrayP & a )
 	{
@@ -692,7 +643,6 @@ public: // Modifier
 	}
 
 	// Clear
-	inline
 	CArrayP &
 	clear()
 	{
@@ -703,7 +653,6 @@ public: // Modifier
 	}
 
 	// Normalize to Unit Length
-	inline
 	CArrayP &
 	normalize()
 	{
@@ -714,7 +663,6 @@ public: // Modifier
 	}
 
 	// Attach as Proxy to a const CArrayP
-	inline
 	CArrayP &
 	attach( CArrayP const & a )
 	{
@@ -725,7 +673,6 @@ public: // Modifier
 	}
 
 	// Attach as Proxy to a CArrayP
-	inline
 	CArrayP &
 	attach( CArrayP & a )
 	{
@@ -736,7 +683,6 @@ public: // Modifier
 	}
 
 	// Detach as Proxy to a CArrayP
-	inline
 	CArrayP &
 	detach()
 	{
@@ -747,7 +693,6 @@ public: // Modifier
 public: // Subscript
 
 	// CArrayP( i ) const: 1-Based Indexing
-	inline
 	Tr
 	operator ()( size_type const i ) const
 	{
@@ -756,7 +701,6 @@ public: // Subscript
 	}
 
 	// CArrayP( i ): 1-Based Indexing
-	inline
 	T &
 	operator ()( size_type const i )
 	{
@@ -767,7 +711,6 @@ public: // Subscript
 public: // Iterator
 
 	// Begin Iterator
-	inline
 	const_iterator
 	begin() const
 	{
@@ -775,7 +718,6 @@ public: // Iterator
 	}
 
 	// Begin Iterator
-	inline
 	iterator
 	begin()
 	{
@@ -783,7 +725,6 @@ public: // Iterator
 	}
 
 	// End Iterator
-	inline
 	const_iterator
 	end() const
 	{
@@ -791,7 +732,6 @@ public: // Iterator
 	}
 
 	// End Iterator
-	inline
 	iterator
 	end()
 	{
@@ -799,7 +739,6 @@ public: // Iterator
 	}
 
 	// Reverse Begin Iterator
-	inline
 	const_reverse_iterator
 	rbegin() const
 	{
@@ -807,7 +746,6 @@ public: // Iterator
 	}
 
 	// Reverse Begin Iterator
-	inline
 	reverse_iterator
 	rbegin()
 	{
@@ -815,7 +753,6 @@ public: // Iterator
 	}
 
 	// Reverse End Iterator
-	inline
 	const_reverse_iterator
 	rend() const
 	{
@@ -823,7 +760,6 @@ public: // Iterator
 	}
 
 	// Reverse End Iterator
-	inline
 	reverse_iterator
 	rend()
 	{
@@ -833,7 +769,6 @@ public: // Iterator
 public: // Array Accessor
 
 	// C Array const Accessor
-	inline
 	T const *
 	operator ()() const
 	{
@@ -841,7 +776,6 @@ public: // Array Accessor
 	}
 
 	// C Array Non-const Accessor
-	inline
 	T *
 	operator ()()
 	{

@@ -51,10 +51,6 @@
 #include <utility>
 #include <vector>
 
-//#ifndef OBJEXXFCL_ARRAY_ALIGN
-//#define OBJEXXFCL_ARRAY_ALIGN 128u
-//#endif
-
 namespace ObjexxFCL {
 
 // Array: Array Abstract Base Class
@@ -117,7 +113,6 @@ public: // Types
 protected: // Creation
 
 	// Default Constructor
-	inline
 	Array() :
 	 capacity_( 0u ),
 	 data_( nullptr ),
@@ -128,7 +123,6 @@ protected: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	Array( Array const & a ) :
 	 BArray( a ),
 	 capacity_( size_of( a.size_ ) ),
@@ -148,7 +142,6 @@ protected: // Creation
 	}
 
 	// Move Constructor
-	inline
 	Array( Array && a ) NOEXCEPT :
 	 BArray( std::move( a ) ),
 	 capacity_( a.capacity_ ),
@@ -167,7 +160,6 @@ protected: // Creation
 
 	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	explicit
 	Array( Array< U > const & a ) :
 	 capacity_( size_of( a.size() ) ),
@@ -188,7 +180,6 @@ protected: // Creation
 
 	// Slice Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	explicit
 	Array( ArrayS< U > const & a ) :
 	 capacity_( size_of( a.size() ) ),
@@ -205,7 +196,6 @@ protected: // Creation
 
 	// MArray Constructor Template
 	template< class A, typename M >
-	inline
 	explicit
 	Array( MArray< A, M > const & a ) :
 	 capacity_( size_of( a.size() ) ),
@@ -221,7 +211,6 @@ protected: // Creation
 	{}
 
 	// Size Constructor
-	inline
 	explicit
 	Array( size_type const size ) :
 	 capacity_( size_of( size ) ),
@@ -241,7 +230,6 @@ protected: // Creation
 	}
 
 	// Size + InitializerSentinel Constructor
-	inline
 	Array( size_type const size, InitializerSentinel const & ) :
 	 capacity_( size_of( size ) ),
 #ifndef OBJEXXFCL_ARRAY_ALIGN
@@ -257,7 +245,6 @@ protected: // Creation
 
 	// Initializer List Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array( std::initializer_list< U > const l ) :
 	 capacity_( l.size() ),
 #ifndef OBJEXXFCL_ARRAY_ALIGN
@@ -278,7 +265,6 @@ protected: // Creation
 
 	// std::array Constructor Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array( std::array< U, s > const & a ) :
 	 capacity_( s ),
 #ifndef OBJEXXFCL_ARRAY_ALIGN
@@ -299,7 +285,6 @@ protected: // Creation
 
 	// std::vector Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array( std::vector< U > const & v ) :
 	 capacity_( v.size() ),
 #ifndef OBJEXXFCL_ARRAY_ALIGN
@@ -320,7 +305,6 @@ protected: // Creation
 
 	// Vector2 Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array( Vector2< U > const & v ) :
 	 capacity_( 2 ),
 #ifndef OBJEXXFCL_ARRAY_ALIGN
@@ -339,7 +323,6 @@ protected: // Creation
 
 	// Vector3 Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array( Vector3< U > const & v ) :
 	 capacity_( 3 ),
 #ifndef OBJEXXFCL_ARRAY_ALIGN
@@ -359,7 +342,6 @@ protected: // Creation
 
 	// Vector4 Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Array( Vector4< U > const & v ) :
 	 capacity_( 4 ),
 #ifndef OBJEXXFCL_ARRAY_ALIGN
@@ -380,7 +362,6 @@ protected: // Creation
 
 	// Iterator Range Constructor Template
 	template< class Iterator, typename = decltype( *std::declval< Iterator & >(), void(), ++std::declval< Iterator & >(), void() ) >
-	inline
 	Array( Iterator const beg, Iterator const end ) :
 	 capacity_( end - beg ),
 #ifndef OBJEXXFCL_ARRAY_ALIGN
@@ -400,7 +381,6 @@ protected: // Creation
 	}
 
 	// Default Proxy Constructor
-	inline
 	Array( ProxySentinel const & ) :
 	 capacity_( 0u ),
 	 data_( nullptr ),
@@ -411,7 +391,6 @@ protected: // Creation
 	{}
 
 	// Array Proxy Constructor
-	inline
 	Array( Array const & a, ProxySentinel const & ) :
 	 capacity_( a.capacity_ ),
 	 data_( a.data_ ),
@@ -422,7 +401,6 @@ protected: // Creation
 	{}
 
 	// Slice Proxy Constructor
-	inline
 	Array( ArrayS< T > const & a, ProxySentinel const & ) :
 	 capacity_( a.size() ),
 	 data_( a.data_beg_ ),
@@ -435,7 +413,6 @@ protected: // Creation
 	}
 
 	// Tail Proxy Constructor
-	inline
 	Array( Tail const & s, ProxySentinel const & ) :
 	 capacity_( s.size() ),
 	 data_( s.data_ ),
@@ -446,7 +423,6 @@ protected: // Creation
 	{}
 
 	// Value Proxy Constructor
-	inline
 	Array( T const & t, ProxySentinel const & ) :
 	 capacity_( npos ), // Unknown
 	 data_( const_cast< T * >( &t ) ),
@@ -459,7 +435,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~Array()
 	{
@@ -473,7 +448,6 @@ public: // Creation
 protected: // Assignment: Array
 
 	// Copy Assignment
-	inline
 	void
 	operator =( Array const & a )
 	{
@@ -495,7 +469,6 @@ protected: // Assignment: Array
 	}
 
 	// Move Assignment
-	inline
 	void
 	operator =( Array && a ) NOEXCEPT
 	{
@@ -520,7 +493,6 @@ protected: // Assignment: Array
 
 	// Copy Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator =( Array< U > const & a )
 	{
@@ -533,7 +505,6 @@ protected: // Assignment: Array
 
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator =( std::initializer_list< U > const l )
 	{
@@ -543,7 +514,6 @@ protected: // Assignment: Array
 
 	// std::array Assignment Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator =( std::array< U, s > const & a )
 	{
@@ -553,7 +523,6 @@ protected: // Assignment: Array
 
 	// std::vector Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator =( std::vector< U > const & v )
 	{
@@ -563,7 +532,6 @@ protected: // Assignment: Array
 
 	// Vector2 Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator =( Vector2< U > const & v )
 	{
@@ -574,7 +542,6 @@ protected: // Assignment: Array
 
 	// Vector3 Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator =( Vector3< U > const & v )
 	{
@@ -586,7 +553,6 @@ protected: // Assignment: Array
 
 	// Vector4 Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator =( Vector4< U > const & v )
 	{
@@ -598,7 +564,6 @@ protected: // Assignment: Array
 	}
 
 	// += Array
-	inline
 	void
 	operator +=( Array const & a )
 	{
@@ -620,7 +585,6 @@ protected: // Assignment: Array
 	}
 
 	// -= Array
-	inline
 	void
 	operator -=( Array const & a )
 	{
@@ -642,7 +606,6 @@ protected: // Assignment: Array
 	}
 
 	// *= Array
-	inline
 	void
 	operator *=( Array const & a )
 	{
@@ -664,7 +627,6 @@ protected: // Assignment: Array
 	}
 
 	// /= Array
-	inline
 	void
 	operator /=( Array const & a )
 	{
@@ -689,7 +651,6 @@ protected: // Assignment: Array
 
 	// += Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator +=( Array< U > const & a )
 	{
@@ -702,7 +663,6 @@ protected: // Assignment: Array
 
 	// -= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator -=( Array< U > const & a )
 	{
@@ -715,7 +675,6 @@ protected: // Assignment: Array
 
 	// *= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator *=( Array< U > const & a )
 	{
@@ -728,7 +687,6 @@ protected: // Assignment: Array
 
 	// /= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator /=( Array< U > const & a )
 	{
@@ -742,7 +700,6 @@ protected: // Assignment: Array
 
 	// += Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator +=( std::initializer_list< U > const l )
 	{
@@ -755,7 +712,6 @@ protected: // Assignment: Array
 
 	// -= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator -=( std::initializer_list< U > const l )
 	{
@@ -768,7 +724,6 @@ protected: // Assignment: Array
 
 	// *= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator *=( std::initializer_list< U > const l )
 	{
@@ -781,7 +736,6 @@ protected: // Assignment: Array
 
 	// /= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator /=( std::initializer_list< U > const l )
 	{
@@ -795,7 +749,6 @@ protected: // Assignment: Array
 
 	// += std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator +=( std::array< U, s > const & a )
 	{
@@ -807,7 +760,6 @@ protected: // Assignment: Array
 
 	// -= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator -=( std::array< U, s > const & a )
 	{
@@ -819,7 +771,6 @@ protected: // Assignment: Array
 
 	// *= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator *=( std::array< U, s > const & a )
 	{
@@ -831,7 +782,6 @@ protected: // Assignment: Array
 
 	// /= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator /=( std::array< U, s > const & a )
 	{
@@ -844,7 +794,6 @@ protected: // Assignment: Array
 
 	// += std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator +=( std::vector< U > const & v )
 	{
@@ -856,7 +805,6 @@ protected: // Assignment: Array
 
 	// -= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator -=( std::vector< U > const & v )
 	{
@@ -868,7 +816,6 @@ protected: // Assignment: Array
 
 	// *= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator *=( std::vector< U > const & v )
 	{
@@ -880,7 +827,6 @@ protected: // Assignment: Array
 
 	// /= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator /=( std::vector< U > const & v )
 	{
@@ -893,7 +839,6 @@ protected: // Assignment: Array
 
 	// += Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator +=( Vector2< U > const & v )
 	{
@@ -904,7 +849,6 @@ protected: // Assignment: Array
 
 	// -= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator -=( Vector2< U > const & v )
 	{
@@ -915,7 +859,6 @@ protected: // Assignment: Array
 
 	// *= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator *=( Vector2< U > const & v )
 	{
@@ -926,7 +869,6 @@ protected: // Assignment: Array
 
 	// /= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator /=( Vector2< U > const & v )
 	{
@@ -939,7 +881,6 @@ protected: // Assignment: Array
 
 	// += Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator +=( Vector3< U > const & v )
 	{
@@ -951,7 +892,6 @@ protected: // Assignment: Array
 
 	// -= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator -=( Vector3< U > const & v )
 	{
@@ -963,7 +903,6 @@ protected: // Assignment: Array
 
 	// *= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator *=( Vector3< U > const & v )
 	{
@@ -975,7 +914,6 @@ protected: // Assignment: Array
 
 	// /= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator /=( Vector3< U > const & v )
 	{
@@ -990,7 +928,6 @@ protected: // Assignment: Array
 
 	// += Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator +=( Vector4< U > const & v )
 	{
@@ -1003,7 +940,6 @@ protected: // Assignment: Array
 
 	// -= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator -=( Vector4< U > const & v )
 	{
@@ -1016,7 +952,6 @@ protected: // Assignment: Array
 
 	// *= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator *=( Vector4< U > const & v )
 	{
@@ -1029,7 +964,6 @@ protected: // Assignment: Array
 
 	// /= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	operator /=( Vector4< U > const & v )
 	{
@@ -1047,7 +981,6 @@ protected: // Assignment: Array
 public: // Assignment: Value
 
 	// = Value
-	inline
 	Array &
 	operator =( T const & t )
 	{
@@ -1057,7 +990,6 @@ public: // Assignment: Value
 	}
 
 	// += Value
-	inline
 	Array &
 	operator +=( T const & t )
 	{
@@ -1069,7 +1001,6 @@ public: // Assignment: Value
 	}
 
 	// -= Value
-	inline
 	Array &
 	operator -=( T const & t )
 	{
@@ -1081,7 +1012,6 @@ public: // Assignment: Value
 	}
 
 	// *= Value
-	inline
 	Array &
 	operator *=( T const & t )
 	{
@@ -1094,7 +1024,6 @@ public: // Assignment: Value
 
 	// /= Value
 	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
-	inline
 	Array &
 	operator /=( U const & u )
 	{
@@ -1108,8 +1037,7 @@ public: // Assignment: Value
 	}
 
 	// /= Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
-	inline
+	template< typename U, class = typename std::enable_if< ! std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
 	Array &
 	operator /=( U const & u )
 	{
@@ -1124,7 +1052,6 @@ public: // Assignment: Value
 protected: // Assignment: Logical
 
 	// &&= Array
-	inline
 	void
 	and_equals( Array< T > const & a )
 	{
@@ -1146,7 +1073,6 @@ protected: // Assignment: Logical
 	}
 
 	// ||= Array
-	inline
 	void
 	or_equals( Array< T > const & a )
 	{
@@ -1169,7 +1095,6 @@ protected: // Assignment: Logical
 
 	// &&= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	and_equals( Array< U > const & a )
 	{
@@ -1182,7 +1107,6 @@ protected: // Assignment: Logical
 
 	// ||= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	or_equals( Array< U > const & a )
 	{
@@ -1195,7 +1119,6 @@ protected: // Assignment: Logical
 
 	// &&= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	and_equals( std::initializer_list< U > const l )
 	{
@@ -1208,7 +1131,6 @@ protected: // Assignment: Logical
 
 	// ||= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	or_equals( std::initializer_list< U > const l )
 	{
@@ -1221,7 +1143,6 @@ protected: // Assignment: Logical
 
 	// &&= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	and_equals( std::array< U, s > const & a )
 	{
@@ -1233,7 +1154,6 @@ protected: // Assignment: Logical
 
 	// ||= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	or_equals( std::array< U, s > const & a )
 	{
@@ -1245,7 +1165,6 @@ protected: // Assignment: Logical
 
 	// &&= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	and_equals( std::vector< U > const & v )
 	{
@@ -1257,7 +1176,6 @@ protected: // Assignment: Logical
 
 	// ||= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	or_equals( std::vector< U > const & v )
 	{
@@ -1269,7 +1187,6 @@ protected: // Assignment: Logical
 
 	// &&= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	and_equals( Vector2< U > const & v )
 	{
@@ -1280,7 +1197,6 @@ protected: // Assignment: Logical
 
 	// ||= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	or_equals( Vector2< U > const & v )
 	{
@@ -1291,7 +1207,6 @@ protected: // Assignment: Logical
 
 	// &&= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	and_equals( Vector3< U > const & v )
 	{
@@ -1303,7 +1218,6 @@ protected: // Assignment: Logical
 
 	// ||= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	or_equals( Vector3< U > const & v )
 	{
@@ -1315,7 +1229,6 @@ protected: // Assignment: Logical
 
 	// &&= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	and_equals( Vector4< U > const & v )
 	{
@@ -1328,7 +1241,6 @@ protected: // Assignment: Logical
 
 	// ||= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	void
 	or_equals( Vector4< U > const & v )
 	{
@@ -1342,7 +1254,6 @@ protected: // Assignment: Logical
 public: // Subscript
 
 	// array[ i ] const: Linear Subscript
-	inline
 	T const &
 	operator []( size_type const i ) const
 	{
@@ -1351,7 +1262,6 @@ public: // Subscript
 	}
 
 	// array[ i ]: Linear Subscript
-	inline
 	T &
 	operator []( size_type const i )
 	{
@@ -1367,7 +1277,6 @@ public: // Predicate
 	initializer_active() const = 0;
 
 	// Active?
-	inline
 	bool
 	active() const
 	{
@@ -1375,7 +1284,6 @@ public: // Predicate
 	}
 
 	// Allocated
-	inline
 	bool
 	allocated() const
 	{
@@ -1383,7 +1291,6 @@ public: // Predicate
 	}
 
 	// Contiguous?
-	inline
 	bool
 	contiguous() const
 	{
@@ -1391,7 +1298,6 @@ public: // Predicate
 	}
 
 	// Data Size Bounded?
-	inline
 	bool
 	capacity_bounded() const
 	{
@@ -1399,7 +1305,6 @@ public: // Predicate
 	}
 
 	// Data Size Unbounded?
-	inline
 	bool
 	capacity_unbounded() const
 	{
@@ -1407,7 +1312,6 @@ public: // Predicate
 	}
 
 	// Active Array Empty?
-	inline
 	bool
 	empty() const
 	{
@@ -1415,7 +1319,6 @@ public: // Predicate
 	}
 
 	// Active Array Size Bounded?
-	inline
 	bool
 	size_bounded() const
 	{
@@ -1423,7 +1326,6 @@ public: // Predicate
 	}
 
 	// Active Array Size Unbounded?
-	inline
 	bool
 	size_unbounded() const
 	{
@@ -1431,7 +1333,6 @@ public: // Predicate
 	}
 
 	// Owner?
-	inline
 	bool
 	owner() const
 	{
@@ -1439,7 +1340,6 @@ public: // Predicate
 	}
 
 	// Proxy?
-	inline
 	bool
 	proxy() const
 	{
@@ -1447,7 +1347,6 @@ public: // Predicate
 	}
 
 	// All Elements Default Valued?
-	inline
 	bool
 	is_default() const
 	{
@@ -1458,7 +1357,6 @@ public: // Predicate
 	}
 
 	// All Elements Zero?
-	inline
 	bool
 	is_zero() const
 	{
@@ -1469,7 +1367,6 @@ public: // Predicate
 	}
 
 	// Uniform Valued?
-	inline
 	bool
 	is_uniform() const
 	{
@@ -1482,7 +1379,6 @@ public: // Predicate
 	}
 
 	// Uniform Valued with Specified Value?
-	inline
 	bool
 	is_uniform( T const & t ) const
 	{
@@ -1511,7 +1407,6 @@ public: // Predicate
 
 	// Memory Can Overlap an Array?
 	template< template< typename > class A >
-	inline
 	bool
 	overlap( A< T > const & a ) const
 	{
@@ -1530,7 +1425,6 @@ public: // Inspector
 	rank() const = 0;
 
 	// Data Size
-	inline
 	size_type
 	capacity() const
 	{
@@ -1538,7 +1432,6 @@ public: // Inspector
 	}
 
 	// Active Array Size
-	inline
 	size_type
 	size() const
 	{
@@ -1546,7 +1439,6 @@ public: // Inspector
 	}
 
 	// Active Array Size
-	inline
 	int
 	isize() const
 	{
@@ -1580,7 +1472,6 @@ public: // Inspector
 	isize( int const d ) const = 0;
 
 	// Begin Iterator
-	inline
 	const_iterator
 	begin() const
 	{
@@ -1588,7 +1479,6 @@ public: // Inspector
 	}
 
 	// Begin Iterator
-	inline
 	iterator
 	begin()
 	{
@@ -1596,7 +1486,6 @@ public: // Inspector
 	}
 
 	// End Iterator
-	inline
 	const_iterator
 	end() const
 	{
@@ -1604,7 +1493,6 @@ public: // Inspector
 	}
 
 	// End Iterator
-	inline
 	iterator
 	end()
 	{
@@ -1612,7 +1500,6 @@ public: // Inspector
 	}
 
 	// Reverse Begin Iterator
-	inline
 	const_reverse_iterator
 	rbegin() const
 	{
@@ -1620,7 +1507,6 @@ public: // Inspector
 	}
 
 	// Reverse Begin Iterator
-	inline
 	reverse_iterator
 	rbegin()
 	{
@@ -1628,7 +1514,6 @@ public: // Inspector
 	}
 
 	// Reverse End Iterator
-	inline
 	const_reverse_iterator
 	rend() const
 	{
@@ -1636,7 +1521,6 @@ public: // Inspector
 	}
 
 	// Reverse End Iterator
-	inline
 	reverse_iterator
 	rend()
 	{
@@ -1644,7 +1528,6 @@ public: // Inspector
 	}
 
 	// Data Pointer
-	inline
 	T const *
 	data() const
 	{
@@ -1652,7 +1535,6 @@ public: // Inspector
 	}
 
 	// Data Pointer
-	inline
 	T *
 	data()
 	{
@@ -1660,7 +1542,6 @@ public: // Inspector
 	}
 
 	// Data Begin Pointer
-	inline
 	T const *
 	data_beg() const
 	{
@@ -1668,7 +1549,6 @@ public: // Inspector
 	}
 
 	// Data Begin Pointer
-	inline
 	T *
 	data_beg()
 	{
@@ -1676,7 +1556,6 @@ public: // Inspector
 	}
 
 	// Data End Pointer
-	inline
 	T const *
 	data_end() const
 	{
@@ -1684,7 +1563,6 @@ public: // Inspector
 	}
 
 	// Data End Pointer
-	inline
 	T *
 	data_end()
 	{
@@ -1694,7 +1572,6 @@ public: // Inspector
 public: // Modifier
 
 	// Clear
-	inline
 	virtual
 	Array &
 	clear()
@@ -1714,7 +1591,6 @@ public: // Modifier
 
 	// Assign Zero to all Elements
 	//  Can't be virtual (for covariant return) or will try to instantiate for all value types
-	inline
 	void
 	zero()
 	{
@@ -1723,7 +1599,6 @@ public: // Modifier
 
 	// Assign Zero to all Elements
 	//  Can't be virtual (for covariant return) or will try to instantiate for all value types
-	inline
 	void
 	to_zero()
 	{
@@ -1731,7 +1606,6 @@ public: // Modifier
 	}
 
 	// Invert (Elemental)
-	inline
 	void
 	invert()
 	{
@@ -1744,7 +1618,6 @@ public: // Modifier
 
 	// Copy Array Data from Source
 	template< typename U >
-	inline
 	void
 	data_copy_from( U const * source, size_type const size )
 	{
@@ -1752,7 +1625,6 @@ public: // Modifier
 	}
 
 	// Swap Data of Same Size Arrays
-	inline
 	void
 	data_swap( Array & v )
 	{
@@ -1770,7 +1642,6 @@ public: // Comparison: Predicate
 
 	// Array == Value
 	friend
-	inline
 	bool
 	eq( Array const & a, T const & t )
 	{
@@ -1784,7 +1655,6 @@ public: // Comparison: Predicate
 
 	// Value == Array
 	friend
-	inline
 	bool
 	eq( T const & t, Array const & a )
 	{
@@ -1793,7 +1663,6 @@ public: // Comparison: Predicate
 
 	// Array != Value
 	friend
-	inline
 	bool
 	ne( Array const & a, T const & t )
 	{
@@ -1802,7 +1671,6 @@ public: // Comparison: Predicate
 
 	// Value != Array
 	friend
-	inline
 	bool
 	ne( T const & t, Array const & a )
 	{
@@ -1811,7 +1679,6 @@ public: // Comparison: Predicate
 
 	// Array < Value
 	friend
-	inline
 	bool
 	lt( Array const & a, T const & t )
 	{
@@ -1825,7 +1692,6 @@ public: // Comparison: Predicate
 
 	// Value < Array
 	friend
-	inline
 	bool
 	lt( T const & t, Array const & a )
 	{
@@ -1839,7 +1705,6 @@ public: // Comparison: Predicate
 
 	// Array <= Value
 	friend
-	inline
 	bool
 	le( Array const & a, T const & t )
 	{
@@ -1853,7 +1718,6 @@ public: // Comparison: Predicate
 
 	// Value <= Array
 	friend
-	inline
 	bool
 	le( T const & t, Array const & a )
 	{
@@ -1867,7 +1731,6 @@ public: // Comparison: Predicate
 
 	// Array > Value
 	friend
-	inline
 	bool
 	gt( Array const & a, T const & t )
 	{
@@ -1876,7 +1739,6 @@ public: // Comparison: Predicate
 
 	// Value > Array
 	friend
-	inline
 	bool
 	gt( T const & t, Array const & a )
 	{
@@ -1885,7 +1747,6 @@ public: // Comparison: Predicate
 
 	// Array >= Value
 	friend
-	inline
 	bool
 	ge( Array const & a, T const & t )
 	{
@@ -1894,7 +1755,6 @@ public: // Comparison: Predicate
 
 	// Value >= Array
 	friend
-	inline
 	bool
 	ge( T const & t, Array const & a )
 	{
@@ -1905,7 +1765,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Array == Value
 	friend
-	inline
 	bool
 	any_eq( Array const & a, T const & t )
 	{
@@ -1919,7 +1778,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value == Array
 	friend
-	inline
 	bool
 	any_eq( T const & t, Array const & a )
 	{
@@ -1928,7 +1786,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Array != Value
 	friend
-	inline
 	bool
 	any_ne( Array const & a, T const & t )
 	{
@@ -1937,7 +1794,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value != Array
 	friend
-	inline
 	bool
 	any_ne( T const & t, Array const & a )
 	{
@@ -1946,7 +1802,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Array < Value
 	friend
-	inline
 	bool
 	any_lt( Array const & a, T const & t )
 	{
@@ -1960,7 +1815,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value < Array
 	friend
-	inline
 	bool
 	any_lt( T const & t, Array const & a )
 	{
@@ -1974,7 +1828,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Array <= Value
 	friend
-	inline
 	bool
 	any_le( Array const & a, T const & t )
 	{
@@ -1988,7 +1841,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value <= Array
 	friend
-	inline
 	bool
 	any_le( T const & t, Array const & a )
 	{
@@ -2002,7 +1854,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Array > Value
 	friend
-	inline
 	bool
 	any_gt( Array const & a, T const & t )
 	{
@@ -2011,7 +1862,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value > Array
 	friend
-	inline
 	bool
 	any_gt( T const & t, Array const & a )
 	{
@@ -2020,7 +1870,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Array >= Value
 	friend
-	inline
 	bool
 	any_ge( Array const & a, T const & t )
 	{
@@ -2029,7 +1878,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value >= Array
 	friend
-	inline
 	bool
 	any_ge( T const & t, Array const & a )
 	{
@@ -2040,7 +1888,6 @@ public: // Comparison: Predicate: All
 
 	// All Array == Value
 	friend
-	inline
 	bool
 	all_eq( Array const & a, T const & t )
 	{
@@ -2049,7 +1896,6 @@ public: // Comparison: Predicate: All
 
 	// All Value == Array
 	friend
-	inline
 	bool
 	all_eq( T const & t, Array const & a )
 	{
@@ -2058,7 +1904,6 @@ public: // Comparison: Predicate: All
 
 	// All Array != Value
 	friend
-	inline
 	bool
 	all_ne( Array const & a, T const & t )
 	{
@@ -2067,7 +1912,6 @@ public: // Comparison: Predicate: All
 
 	// All Value != Array
 	friend
-	inline
 	bool
 	all_ne( T const & t, Array const & a )
 	{
@@ -2076,7 +1920,6 @@ public: // Comparison: Predicate: All
 
 	// All Array < Value
 	friend
-	inline
 	bool
 	all_lt( Array const & a, T const & t )
 	{
@@ -2085,7 +1928,6 @@ public: // Comparison: Predicate: All
 
 	// All Value < Array
 	friend
-	inline
 	bool
 	all_lt( T const & t, Array const & a )
 	{
@@ -2094,7 +1936,6 @@ public: // Comparison: Predicate: All
 
 	// All Array <= Value
 	friend
-	inline
 	bool
 	all_le( Array const & a, T const & t )
 	{
@@ -2103,7 +1944,6 @@ public: // Comparison: Predicate: All
 
 	// All Value <= Array
 	friend
-	inline
 	bool
 	all_le( T const & t, Array const & a )
 	{
@@ -2112,7 +1952,6 @@ public: // Comparison: Predicate: All
 
 	// All Array > Value
 	friend
-	inline
 	bool
 	all_gt( Array const & a, T const & t )
 	{
@@ -2121,7 +1960,6 @@ public: // Comparison: Predicate: All
 
 	// All Value > Array
 	friend
-	inline
 	bool
 	all_gt( T const & t, Array const & a )
 	{
@@ -2130,7 +1968,6 @@ public: // Comparison: Predicate: All
 
 	// All Array >= Value
 	friend
-	inline
 	bool
 	all_ge( Array const & a, T const & t )
 	{
@@ -2139,7 +1976,6 @@ public: // Comparison: Predicate: All
 
 	// All Value >= Array
 	friend
-	inline
 	bool
 	all_ge( T const & t, Array const & a )
 	{
@@ -2150,13 +1986,12 @@ public: // Comparison: Count
 
 	// Count Array == Value
 	friend
-	inline
 	size_type
 	count_eq( Array const & a, T const & t )
 	{
 		assert( a.size_bounded() );
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] == t ) ++n;
 		}
@@ -2165,7 +2000,6 @@ public: // Comparison: Count
 
 	// Count Value == Array
 	friend
-	inline
 	size_type
 	count_eq( T const & t, Array const & a )
 	{
@@ -2174,13 +2008,12 @@ public: // Comparison: Count
 
 	// Count Array != Value
 	friend
-	inline
 	size_type
 	count_ne( Array const & a, T const & t )
 	{
 		assert( a.size_bounded() );
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] != t ) ++n;
 		}
@@ -2189,7 +2022,6 @@ public: // Comparison: Count
 
 	// Count Value != Array
 	friend
-	inline
 	size_type
 	count_ne( T const & t, Array const & a )
 	{
@@ -2198,13 +2030,12 @@ public: // Comparison: Count
 
 	// Count Array < Value
 	friend
-	inline
 	size_type
 	count_lt( Array const & a, T const & t )
 	{
 		assert( a.size_bounded() );
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] < t ) ++n;
 		}
@@ -2213,7 +2044,6 @@ public: // Comparison: Count
 
 	// Count Value < Array
 	friend
-	inline
 	size_type
 	count_lt( T const & t, Array const & a )
 	{
@@ -2222,13 +2052,12 @@ public: // Comparison: Count
 
 	// Count Array <= Value
 	friend
-	inline
 	size_type
 	count_le( Array const & a, T const & t )
 	{
 		assert( a.size_bounded() );
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] <= t ) ++n;
 		}
@@ -2237,7 +2066,6 @@ public: // Comparison: Count
 
 	// Count Value <= Array
 	friend
-	inline
 	size_type
 	count_le( T const & t, Array const & a )
 	{
@@ -2246,13 +2074,12 @@ public: // Comparison: Count
 
 	// Count Array > Value
 	friend
-	inline
 	size_type
 	count_gt( Array const & a, T const & t )
 	{
 		assert( a.size_bounded() );
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] > t ) ++n;
 		}
@@ -2261,7 +2088,6 @@ public: // Comparison: Count
 
 	// Count Value > Array
 	friend
-	inline
 	size_type
 	count_gt( T const & t, Array const & a )
 	{
@@ -2270,13 +2096,12 @@ public: // Comparison: Count
 
 	// Count Array >= Value
 	friend
-	inline
 	size_type
 	count_ge( Array const & a, T const & t )
 	{
 		assert( a.size_bounded() );
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] >= t ) ++n;
 		}
@@ -2285,7 +2110,6 @@ public: // Comparison: Count
 
 	// Count Value >= Array
 	friend
-	inline
 	size_type
 	count_ge( T const & t, Array const & a )
 	{
@@ -2296,7 +2120,6 @@ protected: // Comparison: Predicate
 
 	// Array == Array
 	friend
-	inline
 	bool
 	eq( Array const & a, Array const & b )
 	{
@@ -2311,7 +2134,6 @@ protected: // Comparison: Predicate
 
 	// Array != Array
 	friend
-	inline
 	bool
 	ne( Array const & a, Array const & b )
 	{
@@ -2320,7 +2142,6 @@ protected: // Comparison: Predicate
 
 	// Array < Array
 	friend
-	inline
 	bool
 	lt( Array const & a, Array const & b )
 	{
@@ -2335,7 +2156,6 @@ protected: // Comparison: Predicate
 
 	// Array <= Array
 	friend
-	inline
 	bool
 	le( Array const & a, Array const & b )
 	{
@@ -2350,7 +2170,6 @@ protected: // Comparison: Predicate
 
 	// Array > Array
 	friend
-	inline
 	bool
 	gt( Array const & a, Array const & b )
 	{
@@ -2359,7 +2178,6 @@ protected: // Comparison: Predicate
 
 	// Array >= Array
 	friend
-	inline
 	bool
 	ge( Array const & a, Array const & b )
 	{
@@ -2370,7 +2188,6 @@ protected: // Comparison: Predicate: Any
 
 	// Any Array == Array
 	friend
-	inline
 	bool
 	any_eq( Array const & a, Array const & b )
 	{
@@ -2386,7 +2203,6 @@ protected: // Comparison: Predicate: Any
 
 	// Any Array != Array
 	friend
-	inline
 	bool
 	any_ne( Array const & a, Array const & b )
 	{
@@ -2395,7 +2211,6 @@ protected: // Comparison: Predicate: Any
 
 	// Any Array < Array
 	friend
-	inline
 	bool
 	any_lt( Array const & a, Array const & b )
 	{
@@ -2411,7 +2226,6 @@ protected: // Comparison: Predicate: Any
 
 	// Any Array <= Array
 	friend
-	inline
 	bool
 	any_le( Array const & a, Array const & b )
 	{
@@ -2427,7 +2241,6 @@ protected: // Comparison: Predicate: Any
 
 	// Any Array > Array
 	friend
-	inline
 	bool
 	any_gt( Array const & a, Array const & b )
 	{
@@ -2436,7 +2249,6 @@ protected: // Comparison: Predicate: Any
 
 	// Any Array >= Array
 	friend
-	inline
 	bool
 	any_ge( Array const & a, Array const & b )
 	{
@@ -2447,7 +2259,6 @@ protected: // Comparison: Predicate: All
 
 	// All Array == Array
 	friend
-	inline
 	bool
 	all_eq( Array const & a, Array const & b )
 	{
@@ -2456,7 +2267,6 @@ protected: // Comparison: Predicate: All
 
 	// All Array != Array
 	friend
-	inline
 	bool
 	all_ne( Array const & a, Array const & b )
 	{
@@ -2465,7 +2275,6 @@ protected: // Comparison: Predicate: All
 
 	// All Array < Array
 	friend
-	inline
 	bool
 	all_lt( Array const & a, Array const & b )
 	{
@@ -2474,7 +2283,6 @@ protected: // Comparison: Predicate: All
 
 	// All Array <= Array
 	friend
-	inline
 	bool
 	all_le( Array const & a, Array const & b )
 	{
@@ -2483,7 +2291,6 @@ protected: // Comparison: Predicate: All
 
 	// All Array > Array
 	friend
-	inline
 	bool
 	all_gt( Array const & a, Array const & b )
 	{
@@ -2492,7 +2299,6 @@ protected: // Comparison: Predicate: All
 
 	// All Array >= Array
 	friend
-	inline
 	bool
 	all_ge( Array const & a, Array const & b )
 	{
@@ -2503,7 +2309,6 @@ protected: // Comparison: Count
 
 	// Count Array == Array
 	friend
-	inline
 	size_type
 	count_eq( Array const & a, Array const & b )
 	{
@@ -2511,7 +2316,7 @@ protected: // Comparison: Count
 		assert( a.size_ == b.size_ );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return a.size_;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] == b[ i ] ) ++n;
 		}
@@ -2520,7 +2325,6 @@ protected: // Comparison: Count
 
 	// Count Array != Array
 	friend
-	inline
 	size_type
 	count_ne( Array const & a, Array const & b )
 	{
@@ -2528,7 +2332,7 @@ protected: // Comparison: Count
 		assert( a.size_ == b.size_ );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] != b[ i ] ) ++n;
 		}
@@ -2537,7 +2341,6 @@ protected: // Comparison: Count
 
 	// Count Array < Array
 	friend
-	inline
 	size_type
 	count_lt( Array const & a, Array const & b )
 	{
@@ -2545,7 +2348,7 @@ protected: // Comparison: Count
 		assert( a.size_ == b.size_ );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] < b[ i ] ) ++n;
 		}
@@ -2554,7 +2357,6 @@ protected: // Comparison: Count
 
 	// Count Array <= Array
 	friend
-	inline
 	size_type
 	count_le( Array const & a, Array const & b )
 	{
@@ -2562,7 +2364,7 @@ protected: // Comparison: Count
 		assert( a.size_ == b.size_ );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return a.size_;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
 			if ( a[ i ] <= b[ i ] ) ++n;
 		}
@@ -2571,7 +2373,6 @@ protected: // Comparison: Count
 
 	// Count Array > Array
 	friend
-	inline
 	size_type
 	count_gt( Array const & a, Array const & b )
 	{
@@ -2580,7 +2381,6 @@ protected: // Comparison: Count
 
 	// Count Array >= Array
 	friend
-	inline
 	size_type
 	count_ge( Array const & a, Array const & b )
 	{
@@ -2591,7 +2391,6 @@ protected: // Comparison: Elemental
 
 	// Array == Array
 	friend
-	inline
 	void
 	eq_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2604,7 +2403,6 @@ protected: // Comparison: Elemental
 
 	// Array != Array
 	friend
-	inline
 	void
 	ne_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2617,7 +2415,6 @@ protected: // Comparison: Elemental
 
 	// Array < Array
 	friend
-	inline
 	void
 	lt_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2630,7 +2427,6 @@ protected: // Comparison: Elemental
 
 	// Array <= Array
 	friend
-	inline
 	void
 	le_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2643,7 +2439,6 @@ protected: // Comparison: Elemental
 
 	// Array > Array
 	friend
-	inline
 	void
 	gt_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2656,7 +2451,6 @@ protected: // Comparison: Elemental
 
 	// Array >= Array
 	friend
-	inline
 	void
 	ge_elemental( Array const & a, Array const & b, Array< bool > & r )
 	{
@@ -2669,7 +2463,6 @@ protected: // Comparison: Elemental
 
 	// Array == Value
 	friend
-	inline
 	void
 	eq_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2681,7 +2474,6 @@ protected: // Comparison: Elemental
 
 	// Array != Value
 	friend
-	inline
 	void
 	ne_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2693,7 +2485,6 @@ protected: // Comparison: Elemental
 
 	// Array < Value
 	friend
-	inline
 	void
 	lt_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2705,7 +2496,6 @@ protected: // Comparison: Elemental
 
 	// Array <= Value
 	friend
-	inline
 	void
 	le_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2717,7 +2507,6 @@ protected: // Comparison: Elemental
 
 	// Array > Value
 	friend
-	inline
 	void
 	gt_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2729,7 +2518,6 @@ protected: // Comparison: Elemental
 
 	// Array >= Value
 	friend
-	inline
 	void
 	ge_elemental( Array const & a, T const & t, Array< bool > & r )
 	{
@@ -2741,7 +2529,6 @@ protected: // Comparison: Elemental
 
 	// Value == Array
 	friend
-	inline
 	void
 	eq_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2753,7 +2540,6 @@ protected: // Comparison: Elemental
 
 	// Value != Array
 	friend
-	inline
 	void
 	ne_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2765,7 +2551,6 @@ protected: // Comparison: Elemental
 
 	// Value < Array
 	friend
-	inline
 	void
 	lt_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2777,7 +2562,6 @@ protected: // Comparison: Elemental
 
 	// Value <= Array
 	friend
-	inline
 	void
 	le_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2789,7 +2573,6 @@ protected: // Comparison: Elemental
 
 	// Value > Array
 	friend
-	inline
 	void
 	gt_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2801,7 +2584,6 @@ protected: // Comparison: Elemental
 
 	// Value >= Array
 	friend
-	inline
 	void
 	ge_elemental( T const & t, Array const & b, Array< bool > & r )
 	{
@@ -2814,7 +2596,6 @@ protected: // Comparison: Elemental
 protected: // Methods
 
 	// Shift Setup
-	inline
 	void
 	shift_set( difference_type const shift )
 	{
@@ -2823,7 +2604,6 @@ protected: // Methods
 	}
 
 	// Active Array Size Setup
-	inline
 	void
 	size_set( size_type const size )
 	{
@@ -2832,7 +2612,6 @@ protected: // Methods
 	}
 
 	// Resize a Real Array
-	inline
 	void
 	resize( size_type const size )
 	{
@@ -2857,7 +2636,6 @@ protected: // Methods
 	}
 
 	// Reserve Capacity in a Real Array
-	inline
 	void
 	reserve_capacity( size_type const n )
 	{
@@ -2882,18 +2660,15 @@ protected: // Methods
 	}
 
 	// Grow Capacity of a Real Array
-	inline
 	void
 	grow_capacity( size_type const n = 1u )
 	{
 		assert( owner_ );
 		assert( size_ < npos - n );
 		size_type const new_size( size_ + n );
+		assert( new_size <= max_size );
 		if ( capacity_ < new_size ) {
-			size_type const lim_size( std::min( new_size, npos >> 1 ) );
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			while( new_capacity < lim_size ) new_capacity <<= 1;
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -2913,7 +2688,6 @@ protected: // Methods
 	}
 
 	// Shrink Capacity to Size in a Real Array
-	inline
 	void
 	shrink_capacity()
 	{
@@ -2937,16 +2711,15 @@ protected: // Methods
 	}
 
 	// Append Value by Copy in a Real Array
-	inline
 	void
 	do_push_back_copy( T const & t )
 	{
 		assert( owner_ );
 		assert( size_ < npos - 1 );
 		size_type const new_size( size_ + 1 );
+		assert( new_size <= max_size );
 		if ( capacity_ < new_size ) {
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -2969,16 +2742,15 @@ protected: // Methods
 	}
 
 	// Append Value by Move in a Real Array
-	inline
 	void
 	do_push_back_move( T && t )
 	{
 		assert( owner_ );
 		assert( size_ < npos - 1 );
 		size_type const new_size( size_ + 1 );
+		assert( new_size <= max_size );
 		if ( capacity_ < new_size ) {
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -2995,13 +2767,12 @@ protected: // Methods
 			data_ = new_data;
 			sdata_ = data_ - shift_;
 		} else {
-			data_[ size_ ] = t;
+			data_[ size_ ] = std::move( t );
 		}
 		size_ = new_size;
 	}
 
 	// Insert Value by Copy in a Real Array
-	inline
 	iterator
 	do_insert_copy( const_iterator pos, T const & t )
 	{
@@ -3010,10 +2781,11 @@ protected: // Methods
 		assert( data_ <= pos );
 		assert( pos <= end() );
 		size_type const new_size( size_ + 1 );
+		assert( new_size <= max_size );
 		iterator const old_pos( data_ + ( pos - data_ ) );
+		iterator const old_end( end() );
 		if ( capacity_ < new_size ) {
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -3022,7 +2794,6 @@ protected: // Methods
 			iterator const new_pos( new_data + ( pos - data_ ) );
 			*new_pos = t;
 			if ( data_ < pos ) move_or_copy( data_, old_pos, new_data );
-			iterator const old_end( end() );
 			if ( pos < old_end ) move_or_copy( old_pos, old_end, new_pos + 1 );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			delete[] data_;
@@ -3035,16 +2806,19 @@ protected: // Methods
 			size_ = new_size;
 			return new_pos;
 		} else {
-			iterator const old_end( end() );
+			if ( pos == old_end ) {
+				*old_pos = t;
+			} else {
+				T const tt( t );
+				move_or_copy_backward( old_pos, old_end, old_end + 1 );
+				*old_pos = tt;
+			}
 			size_ = new_size;
-			if ( pos != old_end ) move_or_copy_backward( old_pos, old_end, old_end + 1 );
-			*old_pos = t;
 			return old_pos;
 		}
 	}
 
 	// Insert Value by Move in a Real Array
-	inline
 	iterator
 	do_insert_move( const_iterator pos, T && t )
 	{
@@ -3053,10 +2827,11 @@ protected: // Methods
 		assert( data_ <= pos );
 		assert( pos <= end() );
 		size_type const new_size( size_ + 1 );
+		assert( new_size <= max_size );
 		iterator const old_pos( data_ + ( pos - data_ ) );
+		iterator const old_end( end() );
 		if ( capacity_ < new_size ) {
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -3065,7 +2840,6 @@ protected: // Methods
 			iterator const new_pos( new_data + ( pos - data_ ) );
 			*new_pos = std::move( t );
 			if ( data_ < pos ) move_or_copy( data_, old_pos, new_data );
-			iterator const old_end( end() );
 			if ( pos < old_end ) move_or_copy( old_pos, old_end, new_pos + 1 );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			delete[] data_;
@@ -3078,30 +2852,27 @@ protected: // Methods
 			size_ = new_size;
 			return new_pos;
 		} else {
-			iterator const old_end( end() );
-			size_ = new_size;
 			if ( pos != old_end ) move_or_copy_backward( old_pos, old_end, old_end + 1 );
 			*old_pos = std::move( t );
+			size_ = new_size;
 			return old_pos;
 		}
 	}
 
 	// Insert Multiples of a Value by Copy in a Real Array
-	inline
 	iterator
-	do_insert_n_copy( const_iterator pos, size_type n, T const & t )
+	do_insert_n( const_iterator pos, size_type n, T const & t )
 	{
 		assert( owner_ );
 		assert( size_ < npos - n );
 		assert( data_ <= pos );
 		assert( pos <= end() );
 		size_type const new_size( size_ + n );
+		assert( new_size <= max_size );
 		iterator const old_pos( data_ + ( pos - data_ ) );
+		iterator const old_end( end() );
 		if ( capacity_ < new_size ) {
-			size_type const lim_size( std::min( new_size, npos >> 1 ) );
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			while( new_capacity < lim_size ) new_capacity <<= 1;
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -3110,7 +2881,6 @@ protected: // Methods
 			iterator const new_pos( new_data + ( pos - data_ ) );
 			std::fill_n( new_pos, n, t );
 			if ( data_ < pos ) move_or_copy( data_, old_pos, new_data );
-			iterator const old_end( end() );
 			if ( pos < old_end ) move_or_copy( old_pos, old_end, new_pos + n );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			delete[] data_;
@@ -3123,10 +2893,14 @@ protected: // Methods
 			size_ = new_size;
 			return new_pos;
 		} else {
-			iterator const old_end( end() );
+			if ( pos == old_end ) {
+				std::fill_n( old_pos, n, t );
+			} else {
+				T const tt( t );
+				move_or_copy_backward( old_pos, old_end, old_end + n );
+				std::fill_n( old_pos, n, tt );
+			}
 			size_ = new_size;
-			if ( pos != old_end ) move_or_copy_backward( old_pos, old_end, old_end + n );
-			std::fill_n( old_pos, n, t );
 			return old_pos;
 		}
 	}
@@ -3138,7 +2912,6 @@ protected: // Methods
 	 std::is_same< typename std::iterator_traits< Iterator >::iterator_category, std::bidirectional_iterator_tag >::value ||
 	 std::is_same< typename std::iterator_traits< Iterator >::iterator_category, std::random_access_iterator_tag >::value
 	 >::type >
-	inline
 	iterator
 	do_insert_iterator( const_iterator pos, Iterator first, Iterator last ) // Like std containers first and last can't be iterators to this Array
 	{
@@ -3148,12 +2921,11 @@ protected: // Methods
 		assert( data_ <= pos );
 		assert( pos <= end() );
 		size_type const new_size( size_ + n );
+		assert( new_size <= max_size );
 		iterator const old_pos( data_ + ( pos - data_ ) );
+		iterator const old_end( end() );
 		if ( capacity_ < new_size ) {
-			size_type const lim_size( std::min( new_size, npos >> 1 ) );
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			while( new_capacity < lim_size ) new_capacity <<= 1;
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -3162,7 +2934,6 @@ protected: // Methods
 			iterator const new_pos( new_data + ( pos - data_ ) );
 			std::copy( first, last, new_pos );
 			if ( data_ < pos ) move_or_copy( data_, old_pos, new_data );
-			iterator const old_end( end() );
 			if ( pos < old_end ) move_or_copy( old_pos, old_end, new_pos + n );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			delete[] data_;
@@ -3175,16 +2946,14 @@ protected: // Methods
 			size_ = new_size;
 			return new_pos;
 		} else {
-			iterator const old_end( end() );
-			size_ = new_size;
 			if ( pos != old_end ) move_or_copy_backward( old_pos, old_end, old_end + n );
 			std::copy( first, last, old_pos );
+			size_ = new_size;
 			return old_pos;
 		}
 	}
 
 	// Insert Initializer List in a Real Array
-	inline
 	iterator
 	do_insert_initializer_list( const_iterator pos, std::initializer_list< T > il )
 	{
@@ -3194,12 +2963,11 @@ protected: // Methods
 		assert( data_ <= pos );
 		assert( pos <= end() );
 		size_type const new_size( size_ + n );
+		assert( new_size <= max_size );
 		iterator const old_pos( data_ + ( pos - data_ ) );
+		iterator const old_end( end() );
 		if ( capacity_ < new_size ) {
-			size_type const lim_size( std::min( new_size, npos >> 1 ) );
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			while( new_capacity < lim_size ) new_capacity <<= 1;
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -3208,7 +2976,6 @@ protected: // Methods
 			iterator const new_pos( new_data + ( pos - data_ ) );
 			std::copy( il.begin(), il.end(), new_pos );
 			if ( data_ < pos ) move_or_copy( data_, old_pos, new_data );
-			iterator const old_end( end() );
 			if ( pos < old_end ) move_or_copy( old_pos, old_end, new_pos + n );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			delete[] data_;
@@ -3221,17 +2988,15 @@ protected: // Methods
 			size_ = new_size;
 			return new_pos;
 		} else {
-			iterator const old_end( end() );
-			size_ = new_size;
 			if ( pos != old_end ) move_or_copy_backward( old_pos, old_end, old_end + n );
 			std::copy( il.begin(), il.end(), old_pos );
+			size_ = new_size;
 			return old_pos;
 		}
 	}
 
 	// Insert Value Constructed in Place in a Real Array
 	template< typename... Args >
-	inline
 	iterator
 	do_emplace( const_iterator pos, Args &&... args )
 	{
@@ -3240,10 +3005,11 @@ protected: // Methods
 		assert( data_ <= pos );
 		assert( pos <= end() );
 		size_type const new_size( size_ + 1 );
+		assert( new_size <= max_size );
 		iterator const old_pos( data_ + ( pos - data_ ) );
+		iterator const old_end( end() );
 		if ( capacity_ < new_size ) {
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -3252,7 +3018,6 @@ protected: // Methods
 			iterator const new_pos( new_data + ( pos - data_ ) );
 			*new_pos = T( std::forward< Args >( args )... );
 			if ( data_ < pos ) move_or_copy( data_, old_pos, new_data );
-			iterator const old_end( end() );
 			if ( pos < old_end ) move_or_copy( old_pos, old_end, new_pos + 1 );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			delete[] data_;
@@ -3265,26 +3030,24 @@ protected: // Methods
 			size_ = new_size;
 			return new_pos;
 		} else {
-			iterator const old_end( end() );
-			size_ = new_size;
 			if ( pos != old_end ) move_or_copy_backward( old_pos, old_end, old_end + 1 );
 			*pos = T( std::forward< Args >( args )... );
+			size_ = new_size;
 			return old_pos;
 		}
 	}
 
 	// Append Value Constructed in Place in a Real Array
 	template< typename... Args >
-	inline
 	void
 	do_emplace_back( Args &&... args )
 	{
 		assert( owner_ );
 		assert( size_ < npos - 1 );
 		size_type const new_size( size_ + 1 );
+		assert( new_size <= max_size );
 		if ( capacity_ < new_size ) {
-			size_type new_capacity( std::max( capacity_ << 1, size_type( 1u ) ) );
-			if ( new_capacity < new_size ) new_capacity = max_size;
+			size_type const new_capacity( std::min( std::max( capacity_ << 1, new_size ), max_size ) );
 #ifndef OBJEXXFCL_ARRAY_ALIGN
 			T * new_data = new T[ new_capacity ];
 #else
@@ -3307,7 +3070,6 @@ protected: // Methods
 	}
 
 	// Erase Iterator in a Real Array
-	inline
 	iterator
 	do_erase( const_iterator pos )
 	{
@@ -3321,7 +3083,6 @@ protected: // Methods
 	}
 
 	// Erase Iterator Range in a Real Array
-	inline
 	iterator
 	do_erase_iterator( const_iterator first, const_iterator last )
 	{
@@ -3331,8 +3092,8 @@ protected: // Methods
 		assert( ( last <= end() ) || ( first == last ) );
 		size_type const n( std::distance( first, last ) );
 		iterator const start( data_ + ( first - data_ ) );
-		iterator const stop( data_ + ( last - data_ ) );
 		if ( n > 0u ) {
+			iterator const stop( data_ + ( last - data_ ) );
 			move_or_copy( stop, end(), start );
 			size_ -= n;
 		}
@@ -3340,7 +3101,6 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Const Array of Same Rank
-	inline
 	void
 	attach( Array const & a )
 	{
@@ -3353,7 +3113,6 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Array of Same Rank
-	inline
 	void
 	attach( Array & a )
 	{
@@ -3367,7 +3126,6 @@ protected: // Methods
 
 	// Attach Proxy/Argument Array to Const Array
 	template< int shift >
-	inline
 	void
 	attach( Array const & a )
 	{
@@ -3381,7 +3139,6 @@ protected: // Methods
 
 	// Attach Proxy/Argument Array to Array
 	template< int shift >
-	inline
 	void
 	attach( Array & a )
 	{
@@ -3395,7 +3152,6 @@ protected: // Methods
 
 	// Attach Proxy/Argument Array to Const Tail
 	template< int shift >
-	inline
 	void
 	attach( Tail const & s )
 	{
@@ -3409,7 +3165,6 @@ protected: // Methods
 
 	// Attach Proxy/Argument Array to Tail
 	template< int shift >
-	inline
 	void
 	attach( Tail & s )
 	{
@@ -3423,7 +3178,6 @@ protected: // Methods
 
 	// Attach Proxy/Argument Array to Const Value
 	template< int shift >
-	inline
 	void
 	attach( T const & t )
 	{
@@ -3437,7 +3191,6 @@ protected: // Methods
 
 	// Attach Proxy/Argument Array to Value
 	template< int shift >
-	inline
 	void
 	attach( T & t )
 	{
@@ -3450,7 +3203,6 @@ protected: // Methods
 	}
 
 	// Detach Proxy/Argument Array
-	inline
 	void
 	detach()
 	{
@@ -3463,7 +3215,6 @@ protected: // Methods
 	}
 
 	// Update Proxy Array Attachment to Const Array
-	inline
 	void
 	update_to( Array const & a )
 	{
@@ -3473,7 +3224,6 @@ protected: // Methods
 	}
 
 	// Update Proxy Array Attachment to Array
-	inline
 	void
 	update_to( Array & a )
 	{
@@ -3483,7 +3233,6 @@ protected: // Methods
 	}
 
 	// Swap
-	inline
 	void
 	swapB( Array & v )
 	{
@@ -3509,7 +3258,6 @@ protected: // Methods
 
 	// Initialize
 	template< typename U, class = typename std::enable_if< Has_reassign< U >::value >::type >
-	inline
 	void
 	initialize( U const & u )
 	{
@@ -3521,7 +3269,6 @@ protected: // Methods
 
 	// Initialize
 	template< typename U, class = typename std::enable_if< ! Has_reassign< U >::value >::type, typename = void >
-	inline
 	void
 	initialize( U const & u )
 	{
@@ -3530,7 +3277,6 @@ protected: // Methods
 
 	// Initialize an Element
 	template< typename U, class = typename std::enable_if< Has_reassign< U >::value >::type >
-	inline
 	void
 	initialize( size_type const i, U const & u )
 	{
@@ -3539,7 +3285,6 @@ protected: // Methods
 
 	// Initialize an Element
 	template< typename U, class = typename std::enable_if< ! Has_reassign< U >::value >::type, typename = void >
-	inline
 	void
 	initialize( size_type const i, U const & u )
 	{
@@ -3547,7 +3292,6 @@ protected: // Methods
 	}
 
 	// Switch to Size Construction
-	inline
 	void
 	reconstruct_by_size( size_type const size )
 	{
@@ -3567,7 +3311,6 @@ protected: // Methods
 	}
 
 	// Conformable Move
-	inline
 	void
 	conformable_move( Array & a )
 	{
@@ -3591,7 +3334,6 @@ protected: // Methods
 protected: // Static Methods
 
 	// Array Size Product of Specified Bounded Dimensional Sizes
-	inline
 	static
 	size_type
 	size_of( size_type const s1 )
@@ -3601,7 +3343,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded Dimensional Sizes
-	inline
 	static
 	size_type
 	size_of( size_type const s1, size_type const s2 )
@@ -3613,7 +3354,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded Dimensional Sizes
-	inline
 	static
 	size_type
 	size_of( size_type const s1, size_type const s2, size_type const s3 )
@@ -3622,7 +3362,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded Dimensional Sizes
-	inline
 	static
 	size_type
 	size_of( size_type const s1, size_type const s2, size_type const s3, size_type const s4 )
@@ -3631,7 +3370,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded Dimensional Sizes
-	inline
 	static
 	size_type
 	size_of( size_type const s1, size_type const s2, size_type const s3, size_type const s4, size_type const s5 )
@@ -3640,7 +3378,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded Dimensional Sizes
-	inline
 	static
 	size_type
 	size_of( size_type const s1, size_type const s2, size_type const s3, size_type const s4, size_type const s5, size_type const s6 )
@@ -3649,7 +3386,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded IndexRanges
-	inline
 	static
 	size_type
 	size_of( IR const & I1 )
@@ -3658,7 +3394,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded IndexRanges
-	inline
 	static
 	size_type
 	size_of( IR const & I1, IR const & I2 )
@@ -3667,7 +3402,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded IndexRanges
-	inline
 	static
 	size_type
 	size_of( IR const & I1, IR const & I2, IR const & I3 )
@@ -3676,7 +3410,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded IndexRanges
-	inline
 	static
 	size_type
 	size_of( IR const & I1, IR const & I2, IR const & I3, IR const & I4 )
@@ -3685,7 +3418,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded IndexRanges
-	inline
 	static
 	size_type
 	size_of( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 )
@@ -3694,7 +3426,6 @@ protected: // Static Methods
 	}
 
 	// Array Size Product of Specified Bounded IndexRanges
-	inline
 	static
 	size_type
 	size_of( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 )
@@ -3703,7 +3434,6 @@ protected: // Static Methods
 	}
 
 	// Slice Constant for a Scalar Index
-	inline
 	static
 	std::int64_t
 	slice_k( IR const & range, int const i, std::int64_t const multiplier = 1 )
@@ -3715,7 +3445,6 @@ protected: // Static Methods
 	}
 
 	// Slice Constant for a Scalar Index
-	inline
 	static
 	std::int64_t
 	slice_k( IR const & range, int const i, size_type const multiplier )
@@ -3727,7 +3456,6 @@ protected: // Static Methods
 	}
 
 	// Slice Constant for a Scalar Index
-	inline
 	static
 	std::int64_t
 	slice_k( int const u, int const i, std::int64_t const multiplier = 1 )
@@ -3739,7 +3467,6 @@ protected: // Static Methods
 	}
 
 	// Slice Constant for a Scalar Index
-	inline
 	static
 	std::int64_t
 	slice_k( int const u, int const i, size_type const multiplier )
@@ -3752,7 +3479,6 @@ protected: // Static Methods
 
 	// Move if Movable: Movable Overload
 	template< typename U, class = typename std::enable_if< std::is_move_assignable< U >::value >::type >
-	inline
 	static
 	U &&
 	move_if( U & u )
@@ -3761,8 +3487,7 @@ protected: // Static Methods
 	}
 
 	// Move if Movable: Non-Movable Overload
-	template< typename U, class = typename std::enable_if< !std::is_move_assignable< U >::value >::type, typename = void >
-	inline
+	template< typename U, class = typename std::enable_if< ! std::is_move_assignable< U >::value >::type, typename = void >
 	static
 	U &
 	move_if( U & u )
@@ -3772,7 +3497,6 @@ protected: // Static Methods
 
 	// Move or Copy: Move Overload
 	template< typename InputIterator, typename OutputIterator, typename U = T, class = typename std::enable_if< std::is_move_assignable< U >::value >::type >
-	inline
 	static
 	OutputIterator
 	move_or_copy( InputIterator beg, InputIterator end, OutputIterator out )
@@ -3781,8 +3505,7 @@ protected: // Static Methods
 	}
 
 	// Move or Copy: Copy Overload
-	template< typename InputIterator, typename OutputIterator, typename U = T, class = typename std::enable_if< !std::is_move_assignable< U >::value >::type, typename = void >
-	inline
+	template< typename InputIterator, typename OutputIterator, typename U = T, class = typename std::enable_if< ! std::is_move_assignable< U >::value >::type, typename = void >
 	static
 	OutputIterator
 	move_or_copy( InputIterator beg, InputIterator end, OutputIterator out )
@@ -3792,7 +3515,6 @@ protected: // Static Methods
 
 	// Move or Copy Backward: Move Overload
 	template< typename InputIterator, typename OutputIterator, typename U = T, class = typename std::enable_if< std::is_move_assignable< U >::value >::type >
-	inline
 	static
 	OutputIterator
 	move_or_copy_backward( InputIterator beg, InputIterator end, OutputIterator out )
@@ -3801,8 +3523,7 @@ protected: // Static Methods
 	}
 
 	// Move or Copy Backward: Copy Overload
-	template< typename InputIterator, typename OutputIterator, typename U = T, class = typename std::enable_if< !std::is_move_assignable< U >::value >::type, typename = void >
-	inline
+	template< typename InputIterator, typename OutputIterator, typename U = T, class = typename std::enable_if< ! std::is_move_assignable< U >::value >::type, typename = void >
 	static
 	OutputIterator
 	move_or_copy_backward( InputIterator beg, InputIterator end, OutputIterator out )
@@ -3814,7 +3535,6 @@ private: // Methods
 
 	// Array Heap Allocator for POD Types
 	template< typename U, class = typename std::enable_if< std::is_fundamental< U >::value >::type >
-	inline
 	T *
 	new_array()
 	{
@@ -3834,7 +3554,6 @@ private: // Methods
 
 	// Array Heap Allocator for Class Types
 	template< typename U, class = typename std::enable_if< ! std::is_fundamental< U >::value >::type, typename = void >
-	inline
 	T *
 	new_array()
 	{
@@ -3867,7 +3586,6 @@ private: // Methods
 
 	// Array Heap Allocator for POD Types
 	template< typename U, class = typename std::enable_if< std::is_fundamental< U >::value >::type >
-	inline
 	T *
 	new_array( size_type const n )
 	{
@@ -3887,7 +3605,6 @@ private: // Methods
 
 	// Array Heap Allocator for Class Types
 	template< typename U, class = typename std::enable_if< ! std::is_fundamental< U >::value >::type, typename = void >
-	inline
 	T *
 	new_array( size_type const n )
 	{
@@ -3919,7 +3636,6 @@ private: // Methods
 	}
 
 	// Array Heap Destructor
-	inline
 	void
 	del_array()
 	{
@@ -3941,7 +3657,7 @@ private: // Methods
 #endif
 	}
 
-public: // Data
+public: // Static Data
 
 	static size_type const npos; // Unbounded "size"
 	static size_type const max_size; // Max array size
@@ -3957,9 +3673,9 @@ protected: // Data
 
 }; // Array
 
-	// Static Data Member Template Definitions
-	template< typename T > typename Array< T >::size_type const Array< T >::npos = static_cast< size_type >( -1 );
-	template< typename T > typename Array< T >::size_type const Array< T >::max_size = npos - static_cast< size_type >( 1 );
+// Static Data Member Template Definitions
+template< typename T > typename Array< T >::size_type const Array< T >::npos = static_cast< size_type >( -1 );
+template< typename T > typename Array< T >::size_type const Array< T >::max_size = npos - static_cast< size_type >( 1 );
 
 // Stream >> Array
 template< typename T >

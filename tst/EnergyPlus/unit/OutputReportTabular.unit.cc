@@ -3,12 +3,13 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -21,9 +22,11 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
+using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputReportTabular;
+using namespace EnergyPlus::OutputProcessor;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
@@ -175,7 +178,7 @@ TEST( OutputReportTabularTest, GetUnitConversion )
 }
 
 
-TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
+TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {
 	// AUTHOR: R. Raustad, FSEC
 	// DATE WRITTEN: Sep 2015
@@ -895,7 +898,7 @@ TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 ); // ** HELP ** where the heck does this get allocated ??
- 
+
 	ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
 	EXPECT_EQ( 10.0, ( Zone( 2 ).Volume * Zone( 2 ).Multiplier * Zone( 2 ).ListMultiplier ) / ( Zone( 1 ).Volume * Zone( 1 ).Multiplier * Zone( 1 ).ListMultiplier ) );
@@ -964,4 +967,140 @@ TEST_F( HVACFixture, OutputReportTabular_ZoneMultiplierTest )
 	EXPECT_NEAR( 10.0, ( DataHeatBalance::ZonePreDefRep( 2 ).SHGSAnOtherRem / DataHeatBalance::ZonePreDefRep( 1 ).SHGSAnOtherRem ), 0.00001 );
 	EXPECT_NEAR( 10.0, ( DataHeatBalance::ZonePreDefRep( 2 ).clPeak / DataHeatBalance::ZonePreDefRep( 1 ).clPeak ), 0.00001 );
 
+}
+
+
+TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+		"Output:Table:Monthly,",
+		"Space Gains Annual Report, !- Name",
+		"2, !-  Digits After Decimal",
+		"Exterior Lights Electric Energy, !- Variable or Meter 1 Name",
+		"SumOrAverage, !- Aggregation Type for Variable or Meter 1",
+		"Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+		"Maximum, !- Aggregation Type for Variable or Meter 2",
+		"Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+		"Minimum; !- Aggregation Type for Variable or Meter 2",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	Real64 extLitUse;
+
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+
+	DataGlobals::DoWeathSim = true;
+	DataGlobals::TimeStepZone = 0.25;
+
+	GetInputTabularMonthly();
+	EXPECT_EQ( MonthlyInputCount, 1 );
+	InitializeTabularMonthly();
+
+	extLitUse = 1.01;
+
+	DataEnvironment::Month = 12;
+
+	GatherMonthlyResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 1, MonthlyColumns( 1 ).reslt( 12 ));
+
+	GatherMonthlyResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 2, MonthlyColumns( 1 ).reslt( 12 ) );
+
+	GatherMonthlyResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 3, MonthlyColumns( 1 ).reslt( 12 ) );
+
+	ResetMonthlyGathering();
+
+	EXPECT_EQ( 0., MonthlyColumns( 1 ).reslt( 12 ) );
+
+	GatherMonthlyResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 1, MonthlyColumns( 1 ).reslt( 12 ) );
+
+}
+
+TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
+{
+
+	Real64 extLitUse;
+
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+
+	DataGlobals::DoWeathSim = true;
+	DataGlobals::TimeStepZone = 1.0;
+	displayTabularBEPS = true;
+	TimeValue.allocate( 2 );
+
+	auto timeStep = 1.0;
+
+	SetupTimePointers( "Zone", timeStep );
+	SetupTimePointers( "HVAC", timeStep );
+
+	TimeValue( 1 ).TimeStep = 60;
+	TimeValue( 2 ).TimeStep = 60;
+
+	GetInputTabularPredefined();
+
+	extLitUse = 1.01;
+
+	DataEnvironment::Month = 12;
+
+	UpdateMeterReporting();
+	UpdateDataandReport( 1 );
+	GatherBEPSResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 3, gatherEndUseBEPS( 1, endUseExteriorLights ) );
+
+	UpdateMeterReporting();
+	UpdateDataandReport( 1 );
+	GatherBEPSResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 6, gatherEndUseBEPS( 1, endUseExteriorLights ) );
+
+	UpdateMeterReporting();
+	UpdateDataandReport( 1 );
+	GatherBEPSResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 9, gatherEndUseBEPS( 1, endUseExteriorLights )  );
+
+	ResetBEPSGathering();
+
+	EXPECT_EQ( 0., gatherEndUseBEPS( 1, endUseExteriorLights ) );
+
+	UpdateMeterReporting();
+	UpdateDataandReport( 1 );
+	GatherBEPSResultsForTimestep( 1 );
+	EXPECT_EQ( extLitUse * 3, gatherEndUseBEPS( 1, endUseExteriorLights ) );
+
+}
+
+
+TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+		"Output:Table:TimeBins,",
+		"System1, !- Key Value",
+		"Some Temperature Variable, !- Variable Name",
+		"0.00, !- Interval Start",
+		"0.20, !- Interval Size",
+		"5,                       !- Interval Count",
+		"Always1; !- Schedule Name"
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::DoWeathSim = true;
+
+	GetInputTabularTimeBins();
+
+	EXPECT_EQ( OutputReportTabular::OutputTableBinned.size(), 1u );
+	EXPECT_EQ( OutputTableBinned( 1 ).keyValue, "SYSTEM1" );
+	EXPECT_EQ( OutputTableBinned( 1 ).varOrMeter, "SOME TEMPERATURE VARIABLE" );
+	EXPECT_EQ( OutputTableBinned( 1 ).intervalStart, 0.0 );
+	EXPECT_EQ( OutputTableBinned( 1 ).intervalSize, 0.20 );
+	EXPECT_EQ( OutputTableBinned( 1 ).intervalCount, 5 );
+	EXPECT_EQ( OutputTableBinned( 1 ).ScheduleName, "ALWAYS1" );
 }

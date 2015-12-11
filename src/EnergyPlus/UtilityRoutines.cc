@@ -7,6 +7,7 @@ extern "C" {
 // C++ Headers
 #include <cstdlib>
 #include <iostream>
+#include <exception>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/char.functions.hh>
@@ -44,6 +45,10 @@ extern "C" {
 #include <Timer.h>
 
 namespace EnergyPlus {
+
+namespace UtilityRoutines {
+	bool outputErrorHeader( true );
+}
 
 void
 AbortEnergyPlus()
@@ -204,7 +209,8 @@ AbortEnergyPlus()
 	// Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
 	// indicating that E+ terminated with an error.
 	if ( NumExternalInterfaces > 0 ) CloseSocket( -1 );
-	std::cerr << "Program terminated: " << "EnergyPlus Terminated--Error(s) Detected." << std::endl; std::exit( EXIT_FAILURE );
+	std::cerr << "Program terminated: " << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
+	std::exit( EXIT_FAILURE );
 
 }
 
@@ -811,7 +817,7 @@ ShowFatalError(
 	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
-	AbortEnergyPlus();
+	throw std::runtime_error( ErrorMessage );
 
 }
 
@@ -1536,6 +1542,7 @@ ShowErrorMessage(
 	using DataStringGlobals::IDDVerString;
 	using DataGlobals::DoingInputProcessing;
 	using DataGlobals::CacheIPErrorFile;
+	using DataGlobals::err_stream;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1551,29 +1558,14 @@ ShowErrorMessage(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static int TotalErrors( 0 ); // used to determine when to open standard error output file.
-	static int StandardErrorOutput;
-	int write_stat;
-	static bool ErrFileOpened( false );
 
-	if ( TotalErrors == 0 && ! ErrFileOpened ) {
-		StandardErrorOutput = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags ); write_stat = flags.ios(); }
-		if ( write_stat != 0 ) {
-			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
-			if (write_stat == 600) {
-				DisplayString("ERROR: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write). Write permission denied in output directory.");
-				std::exit( EXIT_FAILURE );
-			}
-			ShowFatalError( "ShowErrorMessage: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write)." );
-		}
-		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
-		ErrFileOpened = true;
+	if ( UtilityRoutines::outputErrorHeader && err_stream ) {
+		*err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
+		UtilityRoutines::outputErrorHeader = false;
 	}
 
 	if ( ! DoingInputProcessing ) {
-		++TotalErrors;
-		gio::write( StandardErrorOutput, ErrorFormat ) << ErrorMessage;
+		if ( err_stream ) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
 	} else {
 		gio::write( CacheIPErrorFile, fmtA ) << ErrorMessage;
 	}

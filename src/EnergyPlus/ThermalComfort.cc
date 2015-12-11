@@ -2214,6 +2214,22 @@ namespace ThermalComfort {
 	}
 
 	void
+	ResetThermalComfortSimpleASH55(){
+		// Jason Glazer - October 2015
+		// Reset thermal comfort table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		int iZone;
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			ThermalComfortInASH55( iZone ).totalTimeNotWinter = 0.0;
+			ThermalComfortInASH55( iZone ).totalTimeNotSummer = 0.0;
+			ThermalComfortInASH55( iZone ).totalTimeNotEither = 0.0;
+		}
+		TotalAnyZoneTimeNotSimpleASH55Winter = 0.0;
+		TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;
+		TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
+	}
+
+	void
 	CalcIfSetPointMet()
 	{
 		// SUBROUTINE INFORMATION:
@@ -2368,6 +2384,7 @@ namespace ThermalComfort {
 			TotalAnyZoneNotMetCooling = 0.0;
 			TotalAnyZoneNotMetHeatingOccupied = 0.0;
 			TotalAnyZoneNotMetCoolingOccupied = 0.0;
+			TotalAnyZoneNotMetOccupied = 0.0;
 			// report how the aggregation is conducted
 			{ auto const SELECT_CASE_var( KindOfSim );
 			if ( SELECT_CASE_var == ksDesignDay ) {
@@ -2379,6 +2396,26 @@ namespace ThermalComfort {
 			}}
 		}
 	}
+
+	void
+	ResetSetPointMet(){
+		// Jason Glazer - October 2015
+		// Reset set point not met table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		int iZone;
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			ThermalComfortSetPoint( iZone ).totalNotMetHeating = 0.0;
+			ThermalComfortSetPoint( iZone ).totalNotMetCooling = 0.0;
+			ThermalComfortSetPoint( iZone ).totalNotMetHeatingOccupied = 0.0;
+			ThermalComfortSetPoint( iZone ).totalNotMetCoolingOccupied = 0.0;
+		}
+		TotalAnyZoneNotMetHeating = 0.0;
+		TotalAnyZoneNotMetCooling = 0.0;
+		TotalAnyZoneNotMetHeatingOccupied = 0.0;
+		TotalAnyZoneNotMetCoolingOccupied = 0.0;
+		TotalAnyZoneNotMetOccupied = 0.0;
+	}
+
 
 	void
 	CalcThermalComfortAdaptiveASH55(

@@ -25,7 +25,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -52,9 +52,7 @@ using MixedAir::OAMixer;
 using General::JulianDay;
 
 namespace EnergyPlus {
-	TEST_F( HVACFixture, MultiStage4PipeFanCoilHeatingTest ) {
-
-		ShowMessage( "Begin Test: HVACFixture, MultiStage4PipeFanCoilHeatingTest" );
+	TEST_F( EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest ) {
 
 		int FanCoilNum( 1 );
 		int ZoneNum( 1 );
@@ -362,9 +360,7 @@ namespace EnergyPlus {
 		Zone.deallocate();
 		CoilNames.deallocate();
 	}
-	TEST_F( HVACFixture, MultiStage4PipeFanCoilCoolingTest ) {
-
-		ShowMessage( "Begin Test: HVACFixture, MultiStage4PipeFanCoilCoolingTest" );
+	TEST_F( EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest ) {
 
 		int FanCoilNum( 1 );
 		int ZoneNum( 1 );

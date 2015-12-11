@@ -11,7 +11,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataGlobals.hh>
 
-#include "Fixtures/HVACFixture.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
@@ -58,7 +57,7 @@ namespace EnergyPlus {
 		Surface.deallocate( );
 	}
 
-	TEST_F( EnergyPlusFixture, TestZoneVetingSch ) {
+	TEST_F( EnergyPlusFixture, TestZoneVentingSch ) {
 
 		// Unit test for #5021
 

@@ -87,6 +87,7 @@ namespace RuntimeLanguageProcessor {
 	bool GetInput( true );
 	bool InitializeOnce( true );
 	bool MyEnvrnFlag( true );
+	bool AlreadyDidOnce( false );
 
 	// index pointer references to dynamic built-in variables
 	int NullVariableNum( 0 );
@@ -127,6 +128,41 @@ namespace RuntimeLanguageProcessor {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state(){
+		GetInput =  true ;
+		InitializeOnce = true ;
+		MyEnvrnFlag = true ;
+		AlreadyDidOnce = false;
+
+		NullVariableNum = 0;
+		FalseVariableNum = 0;
+		TrueVariableNum = 0;
+		OffVariableNum = 0;
+		OnVariableNum = 0;
+		PiVariableNum = 0;
+		CurveIndexVariableNums.deallocate();
+		ConstructionIndexVariableNums.deallocate();
+		YearVariableNum = 0;
+		MonthVariableNum = 0;
+		DayOfMonthVariableNum = 0;
+		DayOfWeekVariableNum = 0;
+		DayOfYearVariableNum = 0;
+		HourVariableNum = 0;
+		MinuteVariableNum = 0;
+		HolidayVariableNum = 0;
+		DSTVariableNum = 0;
+		CurrentTimeVariableNum = 0;
+		SunIsUpVariableNum = 0;
+		IsRainingVariableNum = 0;
+		SystemTimeStepVariableNum = 0;
+		ZoneTimeStepVariableNum = 0;
+		CurrentEnvironmentPeriodNum = 0;
+		ActualDateAndTimeNum = 0;
+		ActualTimeNum = 0;
+		WarmUpFlagNum = 0;
+	
+	}
 
 	void
 	InitializeRuntimeLanguage()
@@ -1080,6 +1116,8 @@ namespace RuntimeLanguageProcessor {
 		bool PeriodFound;
 		bool MinusFound;
 		bool PlusFound;
+		bool MultFound;
+		bool DivFound;
 		bool ErrorFlag;
 		bool OperatorProcessing;
 		int CountDoLooping;
@@ -1108,9 +1146,13 @@ namespace RuntimeLanguageProcessor {
 		} else if ( String[ 0 ] == '+' ) {
 			String = "0" + String;
 		}
-		std::string::size_type const LastPos( String.length() );
+		std::string::size_type LastPos( String.length() );
 		Pos = 0;
-		while ( Pos < LastPos ) {
+		OperatorProcessing = false; // true when an operator is found until terminated by non-operator
+		MinusFound = false;
+		MultFound = false;
+		DivFound = false;
+		while( Pos < LastPos ) {
 			++CountDoLooping;
 			if ( CountDoLooping > MaxDoLoopCounts ) {
 				ShowSevereError( "EMS ParseExpression: Entity=" + ErlStack( StackNum ).Name );
@@ -1130,16 +1172,18 @@ namespace RuntimeLanguageProcessor {
 			// Get the next token
 			StringToken = "";
 			PeriodFound = false;
-			MinusFound = false;
 			PlusFound = false;
-			OperatorProcessing = false; // true when an operator is found until terminated by non-operator
 			ErrorFlag = false;
 			LastED = false;
 			if ( is_any_of( NextChar, "0123456789." ) ) {
 				// Parse a number literal token
 				++Pos;
 				StringToken += NextChar;
-				if ( NextChar == '.' ) PeriodFound = true;
+				OperatorProcessing = false;
+				MultFound = false;
+				DivFound = false;
+
+				if( NextChar == '.' ) PeriodFound = true;
 
 				while ( Pos < LastPos ) {
 					NextChar = String[ Pos ];
@@ -1182,6 +1226,7 @@ namespace RuntimeLanguageProcessor {
 							++Pos;
 							LastED = false;
 						} else {
+							// +/- will be processed on next pass, nothing needs to be done after a numeral
 							break;
 						}
 					} else if ( is_any_of( NextChar, " +-*/^=<>)" ) ) { // Any binary operator is okay
@@ -1200,7 +1245,10 @@ namespace RuntimeLanguageProcessor {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "Number=\"" + StringToken + "\"";
 					Token( NumTokens ).Number = ProcessNumber( StringToken, ErrorFlag );
 					if ( DeveloperFlag && ErrorFlag ) gio::write( OutputFileDebug, fmtA ) << "Numeric error flagged";
-					if ( MinusFound ) Token( NumTokens ).Number = -Token( NumTokens ).Number;
+					if ( MinusFound ) {
+						Token( NumTokens ).Number = -Token( NumTokens ).Number;
+						MinusFound = false;
+					}
 					if ( ErrorFlag ) {
 						// Error: something wrong with this number!
 						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
@@ -1216,6 +1264,8 @@ namespace RuntimeLanguageProcessor {
 				++Pos;
 				StringToken += NextChar;
 				OperatorProcessing = false;
+				MultFound = false;
+				DivFound = false;
 
 				while ( Pos < LastPos ) {
 					NextChar = String[ Pos ];
@@ -1238,9 +1288,39 @@ namespace RuntimeLanguageProcessor {
 
 			} else if ( is_any_of( NextChar, "+-*/^=<>@|&" ) ) {
 				// Parse an operator token
-				StringToken = NextChar;
-
-				Token( NumTokens ).Type = TokenOperator;
+				if ( NextChar == '-' ) {
+					StringToken = "-";
+					if ( MultFound ) {
+						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
+						ShowContinueError( "...Line = \"" + Line + "\"." );
+						ShowContinueError( "...Minus sign used on the right side of multiplication sign." );
+						ShowContinueError( "...Use parenthesis to wrap appropriate variables. For example, X * ( -Y )." );
+						++NumErrors;
+						MultFound = false;
+					} else if ( DivFound ) {
+						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
+						ShowContinueError( "...Line = \"" + Line + "\"." );
+						ShowContinueError( "...Minus sign used on the right side of division sign." );
+						ShowContinueError( "...Use parenthesis to wrap appropriate variables. For example, X / ( -Y )." );
+						++NumErrors;
+						DivFound = false;
+					} else if ( OperatorProcessing && ( NextChar == '-' ) ) {
+						// if operator was deterined last pass and this character is a -, then insert a 0 before the minus and treat as subtraction
+						// example: change "Var == -1" to "Var == 0-1" 
+						OperatorProcessing = false;
+						String.insert( Pos, "0" );
+						++LastPos;
+						StringToken = "0";
+						MultFound = false;
+						DivFound = false;
+					} else {
+						StringToken = NextChar;
+						Token( NumTokens ).Type = TokenOperator;
+					}
+				} else { // any other character process as operator
+					StringToken = NextChar;
+					Token( NumTokens ).Type = TokenOperator;
+				}
 
 				// First check for two character operators:  == <> <= >=
 				std::string const cc( String.substr( Pos, 2 ) );
@@ -1248,31 +1328,37 @@ namespace RuntimeLanguageProcessor {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "<>" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorNotEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "<=" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLessOrEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == ">=" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorGreaterOrEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "||" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatiorLogicalOR;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "&&" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLogicalAND;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 					// next check for builtin functions signaled by "@"
 				} else if ( String[ Pos ] == '@' ) {
@@ -1549,7 +1635,10 @@ namespace RuntimeLanguageProcessor {
 				} else {
 					// Check for remaining single character operators
 					Token( NumTokens ).String = StringToken;
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + StringToken + "\"";
+					MultFound = false;
+					DivFound = false;
+
+					if( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + StringToken + "\"";
 
 					if ( StringToken == "+" ) {
 						if ( ! OperatorProcessing ) {
@@ -1569,9 +1658,11 @@ namespace RuntimeLanguageProcessor {
 						}
 					} else if ( StringToken == "*" ) {
 						Token( NumTokens ).Operator = OperatorMultiply;
+						MultFound = true;
 						OperatorProcessing = true;
 					} else if ( StringToken == "/" ) {
 						Token( NumTokens ).Operator = OperatorDivide;
+						DivFound = true;
 						OperatorProcessing = true;
 					} else if ( StringToken == "<" ) {
 						Token( NumTokens ).Operator = OperatorLessThan;
@@ -1582,6 +1673,10 @@ namespace RuntimeLanguageProcessor {
 					} else if ( StringToken == "^" ) {
 						Token( NumTokens ).Operator = OperatorRaiseToPower;
 						OperatorProcessing = true;
+					} else if( StringToken == "0" && ( NextChar == '-' ) ) {
+						// process string insert = "0"
+						Token( NumTokens ).Type = TokenNumber;
+						Token( NumTokens ).String = StringToken;
 					} else {
 						// Uh OH, this should never happen! throw error
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR \"" + StringToken + "\"";
@@ -1599,7 +1694,10 @@ namespace RuntimeLanguageProcessor {
 				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "PAREN \"" + StringToken + "\"";
 				Token( NumTokens ).Type = TokenParenthesis;
 				Token( NumTokens ).String = StringToken;
-				if ( NextChar == '(' ) Token( NumTokens ).Parenthesis = ParenthesisLeft;
+				if ( NextChar == '(' ) {
+					Token( NumTokens ).Parenthesis = ParenthesisLeft;
+					OperatorProcessing = true;
+				}
 				if ( NextChar == ')' ) Token( NumTokens ).Parenthesis = ParenthesisRight;
 
 			} else if ( is_any_of( NextChar, "\"" ) ) {
@@ -3665,7 +3763,6 @@ namespace RuntimeLanguageProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool AlreadyDidOnce( false );
 
 		if ( AlreadyDidOnce ) return;
 

@@ -7,11 +7,12 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
-#include "Fixtures/HVACFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::CurveManager;
@@ -24,9 +25,7 @@ using EnergyPlus::DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
 
 namespace EnergyPlus {
 
-	TEST_F( HVACFixture, EvapCoolers_SecondaryAirOutletCondition ) {
-
-		ShowMessage( "Begin Test: HVACFixture, EvapCoolers_SecondaryAirOutletCondition" );
+	TEST_F( EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition ) {
 
 		EvapCond.allocate( 1 );
 		int const EvapCoolNum( 1 );
@@ -107,9 +106,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, EvapCoolers_IndEvapCoolerOutletTemp ) {
-
-		ShowMessage( "Begin Test: HVACFixture, EvapCoolers_IndEvapCoolerOutletTemp" );
+	TEST_F( EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp ) {
 
 		int const EvapCoolNum( 1 );
 		EvapCond.allocate( EvapCoolNum );
@@ -156,9 +153,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( HVACFixture, EvapCoolers_IndEvapCoolerPower ) {
-
-		ShowMessage( "Begin Test: HVACFixture, EvapCoolers_IndEvapCoolerPower" );
+	TEST_F( EnergyPlusFixture, EvapCoolers_IndEvapCoolerPower ) {
 
 		//using CurveManager::Quadratic;
 		int const EvapCoolNum( 1 );
@@ -216,9 +211,7 @@ namespace EnergyPlus {
 		PerfCurve.deallocate();
 	}
 
-	TEST_F( HVACFixture, EvapCoolers_SizeIndEvapCoolerTest ) {
-
-		ShowMessage( "Begin Test: HVACFixture, EvapCoolers_SizeIndEvapCoolerTest" );
+	TEST_F( EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest ) {
 
 		int const EvapCoolNum( 1 );
 		Real64 PrimaryAirDesignFlow( 0.0 );
@@ -311,9 +304,7 @@ namespace EnergyPlus {
 		FinalSysSizing.deallocate();
 	}
 
-	TEST_F( HVACFixture, EvapCoolers_SizeDirEvapCoolerTest ) {
-
-		ShowMessage( "Begin Test: HVACFixture, EvapCoolers_SizeDirEvapCoolerTest" );
+	TEST_F( EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest ) {
 		
 		int const EvapCoolNum( 1 );
 		Real64 PrimaryAirDesignFlow( 0.0 );

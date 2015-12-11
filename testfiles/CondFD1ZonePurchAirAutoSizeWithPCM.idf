@@ -786,6 +786,39 @@
 
   Output:Variable,*,CondFD Surface Temperature Node 10,hourly;
 
+  Output:Variable,*,CondFD Surface Heat Flux Node 1,Hourly; !- Zone Average [W/m2]
+  Output:Variable,*,CondFD Surface Heat Flux Node 2,Hourly; !- Zone Average [W/m2]
+  Output:Variable,*,CondFD Surface Heat Flux Node 3,Hourly; !- Zone Average [W/m2]
+  Output:Variable,*,CondFD Surface Heat Flux Node 4,Hourly; !- Zone Average [W/m2]
+  Output:Variable,*,CondFD Surface Heat Flux Node 5,Hourly; !- Zone Average [W/m2]
+  Output:Variable,*,CondFD Surface Heat Flux Node 6,Hourly; !- Zone Average [W/m2]
+  Output:Variable,*,CondFD Surface Heat Flux Node 7,Hourly; !- Zone Average [W/m2]
+  Output:Variable,*,CondFD Surface Heat Flux Node 8,Hourly; !- Zone Average [W/m2]
+  Output:Variable,*,CondFD Surface Heat Flux Node 9,Hourly; !- Zone Average [W/m2]
+  Output:Variable,*,CondFD Surface Heat Flux Node 10,Hourly; !- Zone Average [W/m2]
+  
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 1,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 2,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 3,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 4,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 5,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 6,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 7,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 8,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 9,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Inner Half Node 10,Hourly; !- Zone Average [W/m2-K]
+  
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 1,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 2,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 3,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 4,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 5,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 6,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 7,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 8,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 9,Hourly; !- Zone Average [W/m2-K]
+  Output:Variable,*,CondFD Surface Heat Capacitance Outer Half Node 10,Hourly; !- Zone Average [W/m2-K]
+
   Output:Variable,*,Surface Outside Face Conduction Heat Transfer Rate per Area,Hourly;
 
   Output:Variable,*,Surface Inside Face Conduction Heat Transfer Rate per Area,Hourly;

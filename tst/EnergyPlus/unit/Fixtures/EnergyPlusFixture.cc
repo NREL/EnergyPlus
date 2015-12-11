@@ -28,6 +28,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPlantPipingSystems.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -63,6 +64,8 @@
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
@@ -73,12 +76,9 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/OutputReportTabularAnnual.hh>
-
-#include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -86,7 +86,9 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
@@ -104,25 +106,54 @@ std::unique_ptr<EnergyPlus::InputProcessorCache> EnergyPlus::EnergyPlusFixture::
 namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUp() {
+		clear_all_states();
+		
 		show_message();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
 		InputProcessor::echo_stream = this->echo_stream.get();
+		DataGlobals::err_stream = this->err_stream.get();
 
 		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
 
 		m_cerr_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		m_redirect_cerr = std::unique_ptr< RedirectCerr >( new RedirectCerr( m_cerr_buffer ) );
+
+		UtilityRoutines::outputErrorHeader = false;
+
+		Psychrometrics::InitializePsychRoutines();
 	}
 
 	void EnergyPlusFixture::TearDown() {
 
+		clear_all_states();
+
+		{
+			IOFlags flags;
+			flags.DISPOSE( "DELETE" );
+			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
+			gio::close( DataGlobals::OutputFileStandard, flags );
+			gio::close( DataGlobals::OutputStandardError, flags );
+			gio::close( DataGlobals::OutputFileInits, flags );
+			gio::close( DataGlobals::OutputFileDebug, flags );
+			gio::close( DataGlobals::OutputFileZoneSizing, flags );
+			gio::close( DataGlobals::OutputFileSysSizing, flags );
+			gio::close( DataGlobals::OutputFileMeters, flags );
+			gio::close( DataGlobals::OutputFileBNDetails, flags );
+			gio::close( DataGlobals::OutputFileZonePulse, flags );
+
+		}
+	}
+
+	void EnergyPlusFixture::clear_all_states()
+	{
 		// A to Z order
 		BranchInputManager::clear_state();
 		CondenserLoopTowers::clear_state();
@@ -142,6 +173,7 @@ namespace EnergyPlus {
 		DataLoopNode::clear_state();
 		DataOutputs::clear_state();
 		DataPlant::clear_state();
+		DataPlantPipingSystems::clear_state();
 		DataRuntimeLanguage::clear_state();
 		DataSizing::clear_state();
 		DataSurfaces::clear_state();
@@ -175,6 +207,7 @@ namespace EnergyPlus {
 		OutdoorAirUnit::clear_state();
 		OutputProcessor::clear_state();
 		OutputReportPredefined::clear_state();
+		OutputReportTabular::clear_state();
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
 		PlantCondLoopOperation::clear_state();
@@ -183,15 +216,18 @@ namespace EnergyPlus {
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
 		Pipes::clear_state();
+		Psychrometrics::clear_state();
 		Pumps::clear_state();
+		PurchasedAirManager::clear_state();
+		RuntimeLanguageProcessor::clear_state();
 		ScheduleManager::clear_state();
-		VariableSpeedCoils::clear_state();
 		SetPointManager::clear_state();
 		SimAirServingZones::clear_state();
 		SimulationManager::clear_state();
 		SizingManager::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
+		SurfaceGeometry::clear_state();
 		SystemAvailabilityManager::clear_state();
 		ThermalComfort::clear_state();
 		VariableSpeedCoils::clear_state();
@@ -201,21 +237,6 @@ namespace EnergyPlus {
 		ZoneAirLoopEquipmentManager::clear_state();
 		ZoneEquipmentManager::clear_state();
 		ZoneTempPredictorCorrector::clear_state();
-
-		{
-			IOFlags flags;
-			flags.DISPOSE( "DELETE" );
-			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
-			gio::close( DataGlobals::OutputFileStandard, flags );
-			gio::close( DataGlobals::OutputFileInits, flags );
-			gio::close( DataGlobals::OutputFileDebug, flags );
-			gio::close( DataGlobals::OutputFileZoneSizing, flags );
-			gio::close( DataGlobals::OutputFileSysSizing, flags );
-			gio::close( DataGlobals::OutputFileMeters, flags );
-			gio::close( DataGlobals::OutputFileBNDetails, flags );
-			gio::close( DataGlobals::OutputFileZonePulse, flags );
-
-		}
 	}
 
 	void EnergyPlusFixture::setup_cache()
@@ -288,6 +309,14 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
+	bool EnergyPlusFixture::compare_err_stream( std::string const & expected_string, bool reset_stream ) {
+		auto const stream_str = this->err_stream->str();
+		EXPECT_EQ( expected_string, stream_str );
+		bool are_equal = ( expected_string == stream_str );
+		if ( reset_stream ) this->err_stream->str( std::string() );
+		return are_equal;
+	}
+
 	bool EnergyPlusFixture::compare_cout_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->m_cout_buffer->str();
 		EXPECT_EQ( expected_string, stream_str );
@@ -304,7 +333,53 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_idd_cache ) {
+	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
+	{
+		auto const has_output = this->eso_stream->str().size() > 0;
+		if ( reset_stream ) this->eso_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_mtr_output( bool reset_stream )
+	{
+		auto const has_output = this->mtr_stream->str().size() > 0;
+		if ( reset_stream ) this->mtr_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_echo_output( bool reset_stream )
+	{
+		auto const has_output = this->echo_stream->str().size() > 0;
+		if ( reset_stream ) this->echo_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_err_output( bool reset_stream )
+	{
+		auto const has_output = this->err_stream->str().size() > 0;
+		if ( reset_stream ) this->err_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_cout_output( bool reset_stream )
+	{
+		auto const has_output = this->m_cout_buffer->str().size() > 0;
+		if ( reset_stream ) this->m_cout_buffer->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_cerr_output( bool reset_stream )
+	{
+		auto const has_output = this->m_cerr_buffer->str().size() > 0;
+		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
+		if ( idf_snippet.empty() ) {
+			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
+			return true;
+		}
 		using namespace InputProcessor;
 
 		// Parse idf snippet to look for Building and GlobalGeometryRules. If not present then this adds a default implementation
@@ -313,7 +388,7 @@ namespace EnergyPlus {
 		IdfParser parser;
 		bool success = false;
 		auto const parsed_idf = parser.decode( idf_snippet, success );
-		EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
+		if ( use_assertions ) EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
 		bool found_building = false;
 		bool found_global_geo = false;
 		if ( success ) {
@@ -329,7 +404,7 @@ namespace EnergyPlus {
 				}
 			}
 		}
-		std::string idf = idf_snippet;
+		std::string idf = parser.encode( parsed_idf );
 		if ( ! found_building ) {
 			idf += "Building,Bldg,0.0,Suburbs,.04,.4,FullExterior,25,6;" + DataStringGlobals::NL;
 		}
@@ -346,7 +421,17 @@ namespace EnergyPlus {
 			process_idd( idd, errors_found );
 		}
 
-		if ( errors_found ) return errors_found;
+		if ( errors_found ) {
+			if ( use_assertions ) {
+				compare_eso_stream( "" );
+				compare_mtr_stream( "" );
+				compare_echo_stream( "" );
+				compare_err_stream( "" );
+				compare_cout_stream( "" );
+				compare_cerr_stream( "" );
+			}
+			return errors_found;
+		}
 
 		auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf ) );
 		NumLines = 0;
@@ -398,10 +483,10 @@ namespace EnergyPlus {
 								"], No prior Objects." + DataStringGlobals::NL;
 			}
 		}
-		EXPECT_EQ( 0, count_err ) << error_string;
+		if ( use_assertions ) EXPECT_EQ( 0, count_err ) << error_string;
 
 		if ( NumIDFRecords == 0 ) {
-			EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
+			if ( use_assertions ) EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
 			++NumMiscErrorsFound;
 			errors_found = true;
 		}
@@ -409,59 +494,73 @@ namespace EnergyPlus {
 		for ( auto const obj_def : ObjectDef ) {
 			if ( ! obj_def.RequiredObject ) continue;
 			if ( obj_def.NumFound > 0 ) continue;
-			EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
+			if ( use_assertions ) EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
 			++NumMiscErrorsFound;
 			errors_found = true;
 		}
 
 		if ( TotalAuditErrors > 0 ) {
-			EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
+			if ( use_assertions ) EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
 			errors_found = true;
 		}
 
 		if ( NumOutOfRangeErrorsFound > 0 ) {
-			EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
+			if ( use_assertions ) EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
 			errors_found = true;
 		}
 
 		if ( NumBlankReqFieldFound > 0 ) {
-			EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
+			if ( use_assertions ) EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
 			errors_found = true;
 		}
 
 		if ( NumMiscErrorsFound > 0 ) {
-			EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
+			if ( use_assertions ) EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
 			errors_found = true;
 		}
-
+		if (DataStringGlobals::IDDVerString.find(DataStringGlobals::MatchVersion) == std::string::npos) {
+			ShowSevereError("IP: Possible incorrect IDD File");
+			ShowContinueError(DataStringGlobals::IDDVerString + " not the same as expected =\"" + DataStringGlobals::MatchVersion + "\"");
+		}
 		if ( OverallErrorFlag ) {
-			EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
+			if ( use_assertions ) EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
 
 			// check if IDF version matches IDD version
 			// this really shouldn't be an issue but i'm keeping it just in case a unit test is written against a specific IDF version
 			// This fixture will always use the most up to date version of the IDD regardless.
+
 			bool found_version = false;
 			for ( auto const idf_record : IDFRecords ) {
 				if ( "VERSION" == idf_record.Name ) {
 					bool bad_version = false;
-					auto const version_length( len( DataStringGlobals::MatchVersion ) );
+					auto const version_length( len(DataStringGlobals::MatchVersion ) );
 					if ( ( version_length > 0 ) && ( DataStringGlobals::MatchVersion[ version_length - 1 ] == '0' ) ) {
 						bad_version = ( DataStringGlobals::MatchVersion.substr( 0, version_length - 2 ) == idf_record.Alphas( 1 ).substr( 0, version_length - 2 ) );
 					} else {
 						bad_version = ( DataStringGlobals::MatchVersion == idf_record.Alphas( 1 ) );
 					}
 					found_version = true;
-					EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
+					if ( use_assertions ) EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
 					break;
 				}
 			}
-			EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
+			if ( use_assertions ) EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
 			errors_found = true;
+		}
+
+		if ( use_assertions ) {
+			compare_eso_stream( "" );
+			compare_mtr_stream( "" );
+			compare_echo_stream( "" );
+			compare_err_stream( "" );
+			compare_cout_stream( "" );
+			compare_cerr_stream( "" );
 		}
 
 		if ( errors_found ) return errors_found;
 
-		PreScanReportingVariables();
+		// This can fatal error within it, which will cause the unit test to fail and exit.
+		SimulationManager::PostIPProcessing();
 
 		return errors_found;
 	}

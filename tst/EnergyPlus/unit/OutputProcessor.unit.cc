@@ -1018,7 +1018,7 @@ namespace EnergyPlus {
 		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_validateIndexType )
 		{
 			auto const calledFrom = "UnitTest";
-			EXPECT_DEATH( ValidateIndexType( "BAD INPUT", calledFrom ), "" );
+			EXPECT_ANY_THROW( ValidateIndexType( "BAD INPUT", calledFrom ) );
 
 		}
 
@@ -1927,6 +1927,7 @@ namespace EnergyPlus {
 				{ "J", "ELEC", "WINDTURBINES", "endUseSub", "HVAC" },
 				{ "J", "ELEC", "WT", "endUseSub", "HVAC" },
 				{ "J", "ELEC", "WINDTURBINE", "endUseSub", "HVAC" },
+				{ "J", "ELEC", "ELECTRICSTORAGE", "endUseSub", "HVAC" },
 				{ "J", "ELEC", "HEAT RECOVERY FOR COOLING", "endUseSub", "HVAC" },
 				{ "J", "ELEC", "HEATRECOVERYFORCOOLING", "endUseSub", "HVAC" },
 				{ "J", "ELEC", "HEATRECOVERYCOOLING", "endUseSub", "HVAC" },
@@ -2016,6 +2017,8 @@ namespace EnergyPlus {
 				"endUseSub:Photovoltaic:Electricity",
 				"WindTurbine:Electricity",
 				"endUseSub:WindTurbine:Electricity",
+				"ElectricStorage:Electricity",
+				"endUseSub:ElectricStorage:Electricity",
 				"HeatRecoveryForCooling:Electricity",
 				"endUseSub:HeatRecoveryForCooling:Electricity",
 				"HeatRecoveryForHeating:Electricity",
@@ -2073,8 +2076,8 @@ namespace EnergyPlus {
 				EXPECT_FALSE( errorFound );
 			}
 
-			ASSERT_EQ( 100, NumEnergyMeters );
-			ASSERT_EQ( 100ul, EnergyMeters.size() );
+			ASSERT_EQ( 102, NumEnergyMeters );
+			ASSERT_EQ( 102ul, EnergyMeters.size() );
 
 			for (int i = 0; i < NumEnergyMeters; ++i)
 			{
@@ -2150,9 +2153,9 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_getVariableUnitsString )
 		{
-			EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ), "" );
-			EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ), "" );
-			EXPECT_DEATH( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ), "" );
+			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ) );
+			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ) );
+			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ) );
 
 		}
 

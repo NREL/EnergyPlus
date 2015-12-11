@@ -216,6 +216,14 @@ namespace FluidCoolers {
 	extern Array1D< ReportVars > SimpleFluidCoolerReport; // report variables
 
 	// Functions
+	bool
+	TestFluidCoolerSingleSpeedInputForDesign(
+		std::string const & cCurrentModuleObject,
+		Array1D<std::string> const &  AlphArray,
+		Array1D<std::string> const & cNumericFieldNames,
+		Array1D<std::string> const & cAlphaFieldNames,
+		int const &	FluidCoolerNum
+		);
 
 	bool
 	TestFluidCoolerTwoSpeedInputForDesign(
