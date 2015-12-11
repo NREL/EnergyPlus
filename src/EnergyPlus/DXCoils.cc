@@ -865,7 +865,6 @@ namespace DXCoils {
 		using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
 		using InputProcessor::FindItemInList;
 		using DataHeatBalance::Zone;
-		using DataLoopNode::NodeConnectionType_ZoneNode;
 
 
 		// Locals
@@ -1436,7 +1435,6 @@ namespace DXCoils {
 			}
 			// A18; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 18 ) && NumAlphas > 17 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 18 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 18 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 18 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:SingleSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilSingleSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
@@ -2262,7 +2260,6 @@ namespace DXCoils {
 
 			//A14, \field Zone Name for Evaporator Placement
 			if ( !lAlphaBlanks( 14 ) && NumAlphas > 13 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 14 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 14 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 14 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Heating:DX:SingleSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecHeatingDXCoilSingleSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate, _, _, DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate );
@@ -2797,7 +2794,6 @@ namespace DXCoils {
 			}
 			// A21; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 21 ) && NumAlphas > 20 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 21 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 21 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 21 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:TwoSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilTwoSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
@@ -4147,7 +4143,6 @@ namespace DXCoils {
 			}
 			//A37; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 37 ) && NumAlphas > 36 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 37 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 37 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 37 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:MultiSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilMultiSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
@@ -4632,7 +4627,6 @@ namespace DXCoils {
 			}
 			//A34; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 34 ) && NumAlphas > 33 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 34 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 34 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 34 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Heating:DX:MultiSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecHeatingDXCoilMultiSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate, _, _, DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate );
@@ -5407,7 +5401,6 @@ namespace DXCoils {
 		int Mode; // Performance mode for MultiMode DX coil; Always 1 for other coil types
 		int DXCoilNumTemp; // Counter for crankcase heater report variable DO loop
 		int AirInletNode; // Air inlet node number
-		int SecZoneAirNodeNum; // secondary DX coil inlet node number ( secondary zone air node)
 		int SpeedNum; // Speed number for multispeed coils
 
 		if ( MyOneTimeFlag ) {
@@ -5680,10 +5673,7 @@ namespace DXCoils {
 
 		if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				SecZoneAirNodeNum = DXCoil( DXCoilNum ).SecZoneAirNodeNum;
-				Node( SecZoneAirNodeNum ).Temp = ZT( DXCoil( DXCoilNum ).SecZonePtr );
-				Node( SecZoneAirNodeNum ).HumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
-				DXCoil( DXCoilNum ).EvapInletWetBulb = PsyTwbFnTdbWPb( Node( SecZoneAirNodeNum ).Temp, Node( SecZoneAirNodeNum ).HumRat, OutBaroPress, RoutineName );
+				DXCoil( DXCoilNum ).EvapInletWetBulb = PsyTwbFnTdbWPb( ZT( DXCoil( DXCoilNum ).SecZonePtr ), ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr ), OutBaroPress, RoutineName );
 			}
 		}
 
@@ -7345,6 +7335,8 @@ namespace DXCoils {
 		using General::CreateSysTimeIntervalString;
 		using DataWater::WaterStorage;
 		using DataHeatBalance::Zone;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7500,8 +7492,8 @@ namespace DXCoils {
 				OutdoorWetBulb = OutWetBulbTemp;
 			}
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
@@ -7519,10 +7511,10 @@ namespace DXCoils {
 			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
 			CompAmbTemp = OutdoorDryBulb;
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				CondInletTemp = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				CompAmbTemp = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				CondInletTemp = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				CompAmbTemp = CondInletTemp;
+				OutdoorDryBulb = CondInletTemp;
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
@@ -8805,6 +8797,8 @@ Label50: ;
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using General::RoundSigDigits;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8890,15 +8884,15 @@ Label50: ;
 					OutdoorWetBulb = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).OutAirWetBulb;
 				}
 				if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-					OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-					OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+					OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+					OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 					OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 					OutdoorPressure = OutBaroPress;
 				}
 			}
 		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-			OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+			OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 			OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 			OutdoorPressure = OutBaroPress;
 		} else {
@@ -9203,6 +9197,8 @@ Label50: ;
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataWater::WaterStorage;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 		//USE ScheduleManager, ONLY: GetCurrentScheduleValue
 
 		// Locals
@@ -9301,16 +9297,16 @@ Label50: ;
 				OutdoorWetBulb = PsyTwbFnTdbWPb( OutdoorDryBulb, OutdoorHumRat, OutdoorPressure );
 			}
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
 		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
-				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
-				OutdoorPressure = OutBaroPress;
+			OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+			OutdoorPressure = OutBaroPress;
 		} else {
 			OutdoorDryBulb = OutDryBulbTemp;
 			OutdoorHumRat = OutHumRat;
@@ -10433,6 +10429,8 @@ Label50: ;
 		using DataHVACGlobals::MSHPWasteHeat;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10541,14 +10539,14 @@ Label50: ;
 				OutdoorWetBulb = PsyTwbFnTdbWPb( OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, RoutineName );
 			}
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
 		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-			OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+			OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 			OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 			OutdoorPressure = OutBaroPress;
 		} else {
@@ -11126,6 +11124,8 @@ Label50: ;
 		using DataHVACGlobals::MSHPMassFlowRateLow;
 		using DataHVACGlobals::MSHPMassFlowRateHigh;
 		using DataHVACGlobals::MSHPWasteHeat;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -11249,14 +11249,14 @@ Label50: ;
 				OutdoorHumRat = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).HumRat;
 			}
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				//OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
 		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-			OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+			OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 			//OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 			OutdoorPressure = OutBaroPress;
 		} else {
@@ -14085,6 +14085,8 @@ Label50: ;
 		using CurveManager::CurveValue;
 		using DataHVACGlobals::TimeStepSys;
 		using DataLoopNode::Node;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -14149,8 +14151,8 @@ Label50: ;
 					return;
 				}
 				DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = -TotalHeatRemovalRate; // +DXCoil( DXCoilNum ).DefrostPower;
-				EvapInletDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				EvapInletHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				EvapInletDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				EvapInletHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, EvapInletDryBulb, EvapInletHumRat );
 				EvapAirMassFlow = RhoAir * DXCoil( DXCoilNum ).SecCoilAirFlow;;
 				PartLoadRatio = DXCoil( DXCoilNum ).CompressorPartLoadRatio;
@@ -14191,8 +14193,8 @@ Label50: ;
 				DXCoil( DXCoilNum ).SecCoilSHR = SHR;
 
 			} else if ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) {
-				EvapInletDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				EvapInletHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				EvapInletDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				EvapInletHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, EvapInletDryBulb, EvapInletHumRat );
 				MSSpeedRatio = DXCoil( DXCoilNum ).MSSpeedRatio;
 				MSCycRatio = DXCoil( DXCoilNum ).MSCycRatio;

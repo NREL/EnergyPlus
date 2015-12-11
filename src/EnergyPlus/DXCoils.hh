@@ -429,7 +429,6 @@ namespace DXCoils {
 		Real64 SecCoilAirFlowScalingFactor; // secondary coil air flow rate autosize scaling factor
 		Real64 SecCoilRatedSHR; // secondary coil nominal or rated sensible heat ratio
 		Real64 SecCoilSHR; // secondary coil current sensible heat ratio
-		int SecZoneAirNodeNum; // secondary zone air node number
 		Real64 EvapInletWetBulb; // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.)
 		Real64 SecCoilSensibleHeatGainRate; // secondary zone sensible heat gain rate [W]
 		Real64 SecCoilTotalHeatRemovalRate; // secondary zone total heat removal rate [W]
@@ -668,7 +667,6 @@ namespace DXCoils {
 			SecCoilAirFlowScalingFactor( 1.0 ),
 			SecCoilRatedSHR( 1.0 ),
 			SecCoilSHR( 1.0 ),
-			SecZoneAirNodeNum( 0 ),
 			EvapInletWetBulb( 0.0 ),
 			SecCoilSensibleHeatGainRate( 0.0 ),
 			SecCoilTotalHeatRemovalRate( 0.0 ),
@@ -945,7 +943,6 @@ namespace DXCoils {
 			Real64 const SecCoilAirFlowScalingFactor, // secondary coil air flow rate autosize scaling factor
 			Real64 const SecCoilRatedSHR, // secondary coil nominal or rated sensible heat ratio
 			Real64 const SecCoilSHR, // secondary coil current sensible heat ratio
-			int const SecZoneAirNodeNum, // secondary zone air node number
 			Real64 const EvapInletWetBulb, // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.)
 			Real64 const SecCoilSensibleHeatGainRate, // secondary zone sensible heat gain rate [W]
 			Real64 const SecCoilTotalHeatRemovalRate, // secondary zone total heat removal rate [W]
@@ -1219,7 +1216,6 @@ namespace DXCoils {
 			SecCoilAirFlowScalingFactor( SecCoilAirFlowScalingFactor ),
 			SecCoilRatedSHR( SecCoilRatedSHR ),
 			SecCoilSHR( SecCoilSHR ),
-			SecZoneAirNodeNum( SecZoneAirNodeNum ),
 			EvapInletWetBulb( EvapInletWetBulb ),
 			SecCoilSensibleHeatGainRate( SecCoilSensibleHeatGainRate ),
 			SecCoilTotalHeatRemovalRate( SecCoilTotalHeatRemovalRate ),
