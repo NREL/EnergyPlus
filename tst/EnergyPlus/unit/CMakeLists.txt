@@ -13,6 +13,7 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  BranchNodeConnections.unit.cc
   ChillerElectricEIR.unit.cc;
   CondenserLoopTowers.unit.cc;
   ConvectionCoefficients.unit.cc
