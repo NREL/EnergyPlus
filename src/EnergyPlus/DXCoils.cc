@@ -15165,7 +15165,6 @@ Label50: ;
 		//
 		// USE STATEMENTS:
 		using namespace DataZoneEnergyDemands;
-		using Fans::Fan;
 		using General::SolveRegulaFalsi;
 		using Psychrometrics::PsyHFnTdbW;
 		
