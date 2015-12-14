@@ -157,6 +157,9 @@ namespace FanCoilUnits {
 		Real64 SpeedRatio; // speed ratio when the fan is cycling between stages
 		int FanOpModeSchedPtr; // pointer to supply air fan operating mode schedule
 		int FanOpMode; // 1=cycling fan cycling coil; 2=constant fan cycling coil
+		Real64 QUnitOutNoHC; // unit output when no active heating or cooling [W]
+		Real64 QUnitOutMaxH; // unit output at maximum heating [W]
+		Real64 QUnitOutMaxC; // unit output at maximum cooling [W]
 
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
@@ -239,6 +242,9 @@ namespace FanCoilUnits {
 			SpeedRatio( 0.0 ),
 			FanOpModeSchedPtr( 0 ),
 			FanOpMode( 1 ),
+			QUnitOutNoHC( 0.0 ),
+			QUnitOutMaxH( 0.0 ),
+			QUnitOutMaxC( 0.0 ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			TotCoolPower( 0.0 ),
@@ -377,6 +383,18 @@ namespace FanCoilUnits {
 		Real64 const PartLoadRatio, // DX cooling coil part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	);
+
+	Real64
+	CalcFanCoilHWLoadResidual(
+		Real64 const HWFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+		CalcFanCoilCWLoadResidual(
+		Real64 const CWFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+		);
 
 	//     NOTICE
 
