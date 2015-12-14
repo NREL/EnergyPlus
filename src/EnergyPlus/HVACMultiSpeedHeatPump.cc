@@ -14,6 +14,7 @@
 #include <DataBranchNodeConnections.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
@@ -2716,6 +2717,7 @@ namespace HVACMultiSpeedHeatPump {
 		using DXCoils::SimDXCoilMultiSpeed;
 		using DXCoils::DXCoilPartLoadRatio;
 		using DXCoils::DXCoil;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2749,13 +2751,13 @@ namespace HVACMultiSpeedHeatPump {
 		InletNode = MSHeatPump( MSHeatPumpNum ).AirInletNodeNum;
 		if ( MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex > 0 ) {
 			if ( DXCoil( MSHeatPump( MSHeatPumpNum ).DXHeatCoilIndex ).IsSecondaryDXCoilInZone ) {
-				OutsideDryBulbTemp = Node( DXCoil( MSHeatPump( MSHeatPumpNum ).DXHeatCoilIndex ).SecZoneAirNodeNum ).Temp;
+				OutsideDryBulbTemp = ZT( DXCoil( MSHeatPump( MSHeatPumpNum ).DXHeatCoilIndex ).SecZonePtr );
 			} else {
 				OutsideDryBulbTemp = OutDryBulbTemp;
 			}
 		} else if ( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex > 0) {
 			if ( DXCoil( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex ).IsSecondaryDXCoilInZone ) {
-				OutsideDryBulbTemp = Node( DXCoil( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex ).SecZoneAirNodeNum ).Temp;
+				OutsideDryBulbTemp = ZT( DXCoil( MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex ).SecZonePtr );
 			} else {
 				OutsideDryBulbTemp = OutDryBulbTemp;
 			}
