@@ -1508,6 +1508,14 @@ namespace SetPointManager {
 
 			AllSetPtMgrNum = SetPtMgrNum + NumSchSetPtMgrs + NumDualSchSetPtMgrs + NumOutAirSetPtMgrs + NumSZRhSetPtMgrs + NumSZHtSetPtMgrs + NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs;
 
+			if ( NumAlphas > 7 ) {
+				MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilInNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+				MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilOutNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+				if ( NumNums == 1 ) {
+					MixedAirSetPtMgr( SetPtMgrNum ).MinCoolCoilOutTemp = rNumericArgs( 1 );
+				}
+			}
+
 			if ( ! NodeListError ) {
 				AllSetPtMgr( AllSetPtMgrNum ).CtrlNodes.allocate( NumNodesCtrld );
 				AllSetPtMgr( AllSetPtMgrNum ).CtrlNodes = MixedAirSetPtMgr( SetPtMgrNum ).CtrlNodes;
@@ -5223,10 +5231,19 @@ namespace SetPointManager {
 		int FanInNode; // supply fan inlet node number
 		int FanOutNode; // supply fan outlet node number
 		int RefNode; // setpoint reference node number
+		int CoolCoilInNode; // Cooling coil inlet node number
+		int CoolCoilOutNode; // Cooling coil outlet node number
+		Real64 MinTemp; // Minimum temperature at cooling coil outlet node
+		Real64 dtFan; // Temperature difference across a fan
+		Real64 dtCoolCoil; // Temperature difference across a coolig coil
 
 		FanInNode = this->FanInNode;
 		FanOutNode = this->FanOutNode;
 		RefNode = this->RefNode;
+		CoolCoilInNode = this->CoolCoilInNode;
+		CoolCoilOutNode = this->CoolCoilOutNode;
+		MinTemp = this->MinCoolCoilOutTemp;
+		this->FreezeCheckEnable = false;
 
 		if ( ! SysSizingCalc && this->MySetPointCheckFlag ) {
 
@@ -5252,7 +5269,24 @@ namespace SetPointManager {
 			this->MySetPointCheckFlag = false;
 		}
 
-		this->SetPt = Node( RefNode ).TempSetPoint - ( Node( FanOutNode ).Temp - Node( FanInNode ).Temp );
+		if ( CoolCoilInNode == 0 && CoolCoilOutNode == 0 ) {
+			this->SetPt = Node( RefNode ).TempSetPoint - ( Node( FanOutNode ).Temp - Node( FanInNode ).Temp );
+		} else {
+			dtFan = Node( FanOutNode ).Temp - Node( FanInNode ).Temp;
+			dtCoolCoil = Node( CoolCoilInNode ).Temp - Node( CoolCoilOutNode ).Temp;
+			if ( Node( RefNode ).Temp == Node( CoolCoilOutNode ).Temp ) { // blow through
+				this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) - dtFan + dtCoolCoil;
+			} else { // draw through
+				if ( RefNode != CoolCoilOutNode ) { // Ref node is outlet node
+					this->SetPt = max( Node( RefNode ).TempSetPoint - dtFan, MinTemp ) + dtCoolCoil;
+				} else {
+					this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) + dtCoolCoil;
+				}
+			}
+			if ( dtCoolCoil > 0.0 && MinTemp > OutDryBulbTemp ) {
+				this->FreezeCheckEnable = true;
+			}
+		}
 
 	}
 
@@ -8209,7 +8243,120 @@ namespace SetPointManager {
 		Node( NodeNum ).TempSetPoint = SchTESSetPtMgr( NumSchTESSetPtMgrs ).SetPt;
 		
 	}   // end of SetUpNewScheduledTESSetPtMgr
-	
+
+	bool
+	GetCoilFreezingCheckFlag( int const MixedAirSPMNum )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   Nov. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Get freezing check status
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Return value
+		bool FeezigCheckFlag;
+
+		// Locals
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int SetPtMgrNum;
+		int CtrldNodeNum;
+		int NodeNum;
+
+		if ( GetInputFlag ) {
+			GetSetPointManagerInputs( );
+			GetInputFlag = false;
+		}
+
+		FeezigCheckFlag = false;
+
+		for ( CtrldNodeNum = 1; CtrldNodeNum <= MixedAirSetPtMgr( MixedAirSPMNum ).NumCtrlNodes; ++CtrldNodeNum ) {
+			if ( MixedAirSetPtMgr( MixedAirSPMNum ).FreezeCheckEnable ) {
+				FeezigCheckFlag = true;
+				break;
+			}
+		}
+
+		return FeezigCheckFlag;
+	}  // End of GetCoilFreezingCheckFlag
+
+	int
+	GetMixedAirNumWithCoilFreezingCheck( int const MixedAirNode )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L. Gu
+		//       DATE WRITTEN   Nov. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE
+		// Loop over all the MixedAir setpoint Managers to find coil freezing check flag
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Return value
+		int MixedAirSPMNum;
+
+		// Locals
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int SetPtMgrNum;
+		int CtrldNodeNum;
+		int NodeNum;
+
+		if ( GetInputFlag ) {
+			GetSetPointManagerInputs( );
+			GetInputFlag = false;
+		}
+
+		MixedAirSPMNum = 0;
+
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMixedAirSetPtMgrs; ++SetPtMgrNum ) {
+
+			for ( CtrldNodeNum = 1; CtrldNodeNum <= MixedAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrldNodeNum ) {
+				if ( MixedAirSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrldNodeNum ) == MixedAirNode ) {
+					if ( MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilInNode > 0 && MixedAirSetPtMgr( SetPtMgrNum ).CoolCoilOutNode > 0 ) {
+						MixedAirSPMNum = CtrldNodeNum;
+						break;
+					}
+				}
+			}
+		}
+
+		return MixedAirSPMNum;
+	}  // End of GetMixedAirNumWithCoilFreezingCheck(
+
 	//     NOTICE
 
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois

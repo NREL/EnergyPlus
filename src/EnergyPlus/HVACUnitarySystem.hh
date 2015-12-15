@@ -117,11 +117,13 @@ namespace HVACUnitarySystem {
 		int NumOfSpeedHeating; // The number of speeds for heating
 		Array1D< Real64 > CoolingVolFlowRatio; // The ratio of flow to max for this speed
 		Array1D< Real64 > HeatingVolFlowRatio; // The ratio of flow to max for this speed
+		bool SingleModeFlag; // If yes, single mode operation
 
 		// Default Constructor
 		DesignSpecMSHPData() :
 			NumOfSpeedCooling( 0 ),
-			NumOfSpeedHeating( 0 )
+			NumOfSpeedHeating( 0 ),
+			SingleModeFlag( false )
 		{}
 
 		// Member Constructor
@@ -130,13 +132,15 @@ namespace HVACUnitarySystem {
 			int const NumOfSpeedCooling, // The number of speeds for cooling
 			int const NumOfSpeedHeating, // The number of speeds for heating
 			Array1< Real64 > const & CoolingVolFlowRatio, // The ratio of flow to max for this speed
-			Array1< Real64 > const & HeatingVolFlowRatio // The ratio of flow to max for this speed
+			Array1< Real64 > const & HeatingVolFlowRatio, // The ratio of flow to max for this speed
+			bool const SingleModeFlag // If yes, single mode operation
 		) :
 			Name( Name ),
 			NumOfSpeedCooling( NumOfSpeedCooling ),
 			NumOfSpeedHeating( NumOfSpeedHeating ),
 			CoolingVolFlowRatio( CoolingVolFlowRatio ),
-			HeatingVolFlowRatio( HeatingVolFlowRatio )
+			HeatingVolFlowRatio( HeatingVolFlowRatio ),
+			SingleModeFlag( SingleModeFlag ) // If yes, single mode operation
 		{}
 
 	};
@@ -421,6 +425,7 @@ namespace HVACUnitarySystem {
 		int HeatCountAvail; // Counter used to minimize the occurrence of output warnings
 		int HeatIndexAvail; // Index used to minimize the occurrence of output warnings
 		bool FirstPass; // used to determine when first call is made
+		int SingleMode; // Single mode operation Yes/No; 1=Yes, 0=No
 
 		// Default Constructor
 		UnitarySystemData() :
@@ -668,7 +673,8 @@ namespace HVACUnitarySystem {
 			CoolIndexAvail( 0 ),
 			HeatCountAvail( 0 ),
 			HeatIndexAvail( 0 ),
-			FirstPass( true )
+			FirstPass( true ),
+			SingleMode( 0 )
 		{}
 
 		// Member Constructor
@@ -930,7 +936,8 @@ namespace HVACUnitarySystem {
 			int const CoolIndexAvail, // Index used to minimize the occurrence of output warnings
 			int const HeatCountAvail, // Counter used to minimize the occurrence of output warnings
 			int const HeatIndexAvail, // Index used to minimize the occurrence of output warnings
-			bool const FirstPass // used to determine when first call is made
+			bool const FirstPass, // used to determine when first call is made
+			int const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 		) :
 			UnitarySystemType( UnitarySystemType ),
 			UnitarySystemType_Num( UnitarySystemType_Num ),
@@ -1189,7 +1196,8 @@ namespace HVACUnitarySystem {
 			CoolIndexAvail( CoolIndexAvail ),
 			HeatCountAvail( HeatCountAvail ),
 			HeatIndexAvail( HeatIndexAvail ),
-			FirstPass( FirstPass )
+			FirstPass( FirstPass ),
+			SingleMode( SingleMode )
 		{}
 
 	};
@@ -1359,7 +1367,8 @@ namespace HVACUnitarySystem {
 		Optional_bool HXUnitOn = _, // Flag to control HX for HXAssisted Cooling Coil
 		Optional< Real64 > HeatCoilLoad = _, // Adjusted load to heating coil when SAT exceeds max limit (W)
 		Optional< Real64 > SuppCoilLoad = _, // Adjusted load to supp heating coil when SAT exceeds max limit (W)
-		Optional_int_const CompOn = _ // Determines if compressor is on or off
+		Optional_int_const CompOn = _, // Determines if compressor is on or off
+		Optional_int_const SingleMode = _// Single mode operation Yes/No; 1=Yes, 0=No
 	);
 
 	void
@@ -1371,7 +1380,8 @@ namespace HVACUnitarySystem {
 		int const CompOn, // compressor control (0=off, 1=on)
 		Real64 const OnOffAirFlowRatio,
 		Real64 const CoilCoolHeatRat, // ratio of cooling to heating PLR for cycling fan RH control
-		Optional_bool HXUnitOn = _ // Flag to control HX for HXAssisted Cooling Coil
+		Optional_bool HXUnitOn = _, // Flag to control HX for HXAssisted Cooling Coil
+		Optional_int_const SingleMode = _// Single mode operation Yes/No; 1=Yes, 0=No
 	);
 
 	void

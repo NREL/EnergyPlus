@@ -52146,6 +52146,11 @@ UnitarySystemPerformance:Multispeed,
        \maximum 10
        \note Used only for Multi speed coils
        \note Enter the number of the following sets of data for air flow rates.
+  A2 , \field Single Mode Operation
+       \type choice
+       \key Yes
+       \key No
+       \default No
   N3 , \field Heating Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
@@ -71456,10 +71461,19 @@ SetpointManager:MixedAir,
   A5 , \field Fan Outlet Node Name
        \required-field
        \type node
-  A6 ; \field Setpoint Node or NodeList Name
+  A6 , \field Setpoint Node or NodeList Name
        \required-field
        \type node
        \note Node(s) at which the temperature will be set
+  A7 , \field Cooling Coil Inlet Node Name
+       \type node
+  A8 , \field Cooling coil Outlet Node Name
+       \type node
+  N1 ; \field Minimum Temperature at Cooling Coil Outlet Node
+       \type real
+       \units C
+       \minimum> 0.0
+       \default 7.2
 
 SetpointManager:OutdoorAirPretreat,
        \min-fields 11

@@ -47,6 +47,7 @@
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <SetPointManager.hh>
 #include <SteamCoils.hh>
 #include <TranspiredCollector.hh>
 #include <UserDefinedComponents.hh>
@@ -2320,6 +2321,8 @@ namespace MixedAir {
 		using DataContaminantBalance::Contaminant;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
+		using SetPointManager::GetMixedAirNumWithCoilFreezingCheck;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -2628,6 +2631,7 @@ namespace MixedAir {
 			ShowContinueError( "...The high humidity control option will be disabled and the simulation continues." );
 		}
 
+		OAController( OutAirNum ).MixedAirSPMNum = GetMixedAirNumWithCoilFreezingCheck( OAController( OutAirNum ).MixNode );
 
 	}
 
@@ -3190,6 +3194,10 @@ namespace MixedAir {
 
 					SetupOutputVariable( "Air System Mixed Air Mass Flow Rate [kg/s]", OAController( OAControllerLoop ).MixMassFlow, "System", "Average", airloopName );
 
+					if ( OAController( OAControllerLoop ).MixedAirSPMNum > 0 ) {
+						SetupOutputVariable( "Air System Outdoor Air Maximum Flow Fraction []", OAController( OAControllerLoop ).MaxOAFracBySetPoint, "System", "Average", airloopName );
+					}
+
 					if ( AnyEnergyManagementSystemInModel ) {
 						SetupEMSInternalVariable( "Outdoor Air Controller Maximum Mass Flow Rate", OAController( OAControllerLoop ).Name, "[kg/s]", OAController( OAControllerLoop ).MaxOAMassFlowRate );
 						SetupEMSInternalVariable( "Outdoor Air Controller Minimum Mass Flow Rate", OAController( OAControllerLoop ).Name, "[kg/s]", OAController( OAControllerLoop ).MinOAMassFlowRate );
@@ -3494,6 +3502,7 @@ namespace MixedAir {
 		using DataGlobals::DisplayExtraWarnings;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::DoingSizing;
+		using SetPointManager::GetCoilFreezingCheckFlag;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -3573,6 +3582,7 @@ namespace MixedAir {
 		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
 		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
 		Real64 CO2PeopleGeneration; // CO2 generation from people at design level
+		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
 
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
@@ -4086,8 +4096,20 @@ namespace MixedAir {
 		}
 
 		// Define an outside air signal
+		if ( OAController( OAControllerNum ).MixedAirSPMNum > 0 ) {
+			OAController( OAControllerNum ).CoolCoilFreezeCheck = GetCoilFreezingCheckFlag( OAController( OAControllerNum ).MixedAirSPMNum );
+		} else {
+			OAController( OAControllerNum ).CoolCoilFreezeCheck = false;
+		}
 		if ( std::abs( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp ) > SmallTempDiff ) {
 			OutAirSignal = ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).MixSetTemp ) / ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp );
+			if ( OAController( OAControllerNum ).CoolCoilFreezeCheck ) {
+				OAController( OAControllerNum ).MaxOAFracBySetPoint = 0.0;
+				MaxOAFracBySetPoint = OutAirSignal;
+				if ( MaxOAFracBySetPoint > 0 ) {
+					MaxOAFracBySetPoint = MaxOAFracBySetPoint;
+				}
+			}
 		} else {
 			if ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).MixSetTemp < 0.0 ) {
 				if ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp >= 0.0 ) {
@@ -4265,6 +4287,16 @@ namespace MixedAir {
 				}
 			}
 
+		}
+
+		if ( OAController( OAControllerNum ).CoolCoilFreezeCheck ) {
+			MaxOAFracBySetPoint = min( max( MaxOAFracBySetPoint, 0.0 ), 1.0 );
+			OAController( OAControllerNum ).MaxOAFracBySetPoint = MaxOAFracBySetPoint;
+			if ( MaxOAFracBySetPoint < OutAirMinFrac ) {
+				OutAirMinFrac = MaxOAFracBySetPoint;
+				if ( AirLoopNum > 0 ) AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * OAController( OAControllerNum ).MixMassFlow;
+			}
+			OASignal = min( MaxOAFracBySetPoint, OASignal );
 		}
 
 		OAController( OAControllerNum ).OAMassFlow = OASignal * OAController( OAControllerNum ).MixMassFlow;

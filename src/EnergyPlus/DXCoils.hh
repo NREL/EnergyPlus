@@ -1319,7 +1319,8 @@ namespace DXCoils {
 		int & CompIndex,
 		Optional_int_const SpeedNum = _, // Speed number for multispeed cooling coil onlyn
 		Optional_int_const FanOpMode = _, // Fan operation mode
-		Optional_int_const CompOp = _ // Compressor on/off; 1=on, 0=off
+		Optional_int_const CompOp = _, // Compressor on/off; 1=on, 0=off
+		Optional_int_const SingleMode = _ // Single mode operation Yes/No; 1=Yes, 0=No
 	);
 
 	void
@@ -1453,7 +1454,8 @@ namespace DXCoils {
 		Real64 const CycRatio, // cycling part load ratio
 		int const SpeedNum, // Speed number
 		int const FanOpMode, // Sets fan control to CycFanCycCoil or ContFanCycCoil
-		int const CompOp // Compressor on/off; 1=on, 0=off
+		int const CompOp, // Compressor on/off; 1=on, 0=off
+		int const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 	);
 
 	void
@@ -1462,7 +1464,8 @@ namespace DXCoils {
 		Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
 		Real64 const CycRatio, // cycling part load ratio
 		int const SpeedNum, // Speed number
-		int const FanOpMode // Fan operation mode
+		int const FanOpMode, // Fan operation mode
+		int const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
 	);
 
 	void
