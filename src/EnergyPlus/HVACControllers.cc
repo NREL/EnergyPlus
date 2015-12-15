@@ -1146,7 +1146,7 @@ namespace HVACControllers {
 
 		} else if ( SELECT_CASE_var == iTemperatureAndHumidityRatio ) { // 'TemperatureAndHumidityRatio'
 			ControllerProps( ControlNum ).SensedValue = Node( SensedNode ).Temp;
-			// Setpoint temp calculated each HVAC step to identify approach temp and whether or not humrat control is necessary
+			// Setpoint temp calculated once each HVAC time step to identify approach temp and whether or not humrat control is necessary
 			// WARNING: The scheme for computing the setpoint for the dual temperature and humidity ratio
 			//          control strategy breaks down whenever the sensed node temperature is modified by
 			//          a controller fired after the current one. Indeed the final sensed node temperature
@@ -1160,8 +1160,8 @@ namespace HVACControllers {
 				//       - Node(SensedNode)%Temp
 				//       - Node(SensedNode)%HumRat
 				if ( ( Node( SensedNode ).HumRatMax > 0 ) && ( Node( SensedNode ).HumRat > Node( SensedNode ).HumRatMax ) ) {
-					// Setpoint can only be computed when the sensed node temperature is evaluated at the max
-					// actuated value for the dual humidity ratio / temperature strategy.
+					// Setpoint can only be computed once per time step
+					// Check if outlet air humidity ratio is greater than the set point. If so, calculate new temperature based set point.
 					// See routine CalcSimpleController() for the sequence of operations.
 					// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
 					ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress );
@@ -1172,7 +1172,8 @@ namespace HVACControllers {
 					// NOTE: The next line introduces a potential discontinuity into the residual function
 					//       which could prevent the root finder from finding the root it if were done at each
 					//       controller iteration. For this reason we perform the setpoint calculation only
-					//       once when the air loop has been evaluated with the max actuated value.
+					//       once at the beginning of the controller and air loop simulation.
+					//       Use lower of temperature and humidity based set point.
 					//       See routine CalcSimpleController() for the sequence of operations.
 					ControllerProps( ControlNum ).SetPointValue = min( Node( SensedNode ).TempSetPoint, HumidityControlTempSetPoint ); // Pure temperature setpoint | Temperature setpoint to achieve the humidity ratio setpoint
 					// Don't allow set point temperature to be below the actuator node water temperature
