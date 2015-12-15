@@ -15,3 +15,7 @@ With Pull Request [#5295](https://github.com/NREL/EnergyPlus/pull/5295), some ta
 
 The general algorithm for choosing when an output variable is in various time bins was altered slightly with this change. Now rounding occurs to the same number of significant digits as shown in the headings of the TimeBin reports. For example, the value of 4.997 would have been put in the 4.00 to 5.00 to  bin previously since less than 5 but now would be put in the 5.00 to 5.99 bin since the rounded value would be 5.00.  This stabilizes the total hours in particular bins when comparing cases that vary slightly. See Pull Request [#5295](https://github.com/NREL/EnergyPlus/pull/5295) for the actual code change.
 
+### Add units and change output variable name for Availability Manager Optimum Start
+
+The output variable which was previously "Availability Manager Optimum Start Hours Before Occupancy []" has been canged to be more consistent with other length of time output variable names, and units have been added:
+"Availability Manager Optimum Start Time Before Occupancy [hr]".

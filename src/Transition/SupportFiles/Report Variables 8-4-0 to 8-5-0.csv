@@ -1,3 +1,4 @@
 8.4.0,8.5.0,Transition notes
 0,0,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+Availability Manager Optimum Start Hours Before Occupancy,Availability Manager Optimum Start Time Before Occupancy,
 old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete

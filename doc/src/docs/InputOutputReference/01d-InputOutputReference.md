@@ -15232,7 +15232,7 @@ AvailabilityManager:OptimumStart,
 
 The optimum start availability manager has one output variable.
 
-#### Availability Manager Optimum Start Hours Before Occupancy
+#### Availability Manager Optimum Start Time Before Occupancy
 
 The unit is in hour.
 
