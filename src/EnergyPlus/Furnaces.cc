@@ -5702,6 +5702,7 @@ namespace Furnaces {
 		using General::TrimSigDigits;
 		using DXCoils::DXCoilPartLoadRatio;
 		using DXCoils::DXCoil;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5771,11 +5772,11 @@ namespace Furnaces {
 
 		if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_AirToAir ) {
 			if ( DXCoil( Furnace( FurnaceNum ).HeatingCoilIndex ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulbTemp = Node( DXCoil( Furnace( FurnaceNum ).HeatingCoilIndex ).SecZoneAirNodeNum ).Temp;
-				Furnace( FurnaceNum ).CondenserNodeNum = DXCoil( Furnace( FurnaceNum ).HeatingCoilIndex ).SecZoneAirNodeNum;
+				OutdoorDryBulbTemp = ZT( DXCoil( Furnace( FurnaceNum ).HeatingCoilIndex ).SecZonePtr );
+				Furnace( FurnaceNum ).CondenserNodeNum = 0;
 			} else if ( DXCoil( Furnace( FurnaceNum ).CoolingCoilIndex ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulbTemp = Node( DXCoil( Furnace( FurnaceNum ).CoolingCoilIndex ).SecZoneAirNodeNum ).Temp;
-				Furnace( FurnaceNum ).CondenserNodeNum = DXCoil( Furnace( FurnaceNum ).CoolingCoilIndex ).SecZoneAirNodeNum;
+				OutdoorDryBulbTemp = ZT( DXCoil( Furnace( FurnaceNum ).CoolingCoilIndex ).SecZonePtr );
+				Furnace( FurnaceNum ).CondenserNodeNum = 0;
 			} else {
 				OutdoorDryBulbTemp = OutDryBulbTemp;
 			}

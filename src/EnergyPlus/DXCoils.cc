@@ -865,7 +865,6 @@ namespace DXCoils {
 		using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
 		using InputProcessor::FindItemInList;
 		using DataHeatBalance::Zone;
-		using DataLoopNode::NodeConnectionType_ZoneNode;
 
 
 		// Locals
@@ -1436,7 +1435,6 @@ namespace DXCoils {
 			}
 			// A18; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 18 ) && NumAlphas > 17 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 18 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 18 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 18 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:SingleSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilSingleSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
@@ -2262,7 +2260,6 @@ namespace DXCoils {
 
 			//A14, \field Zone Name for Evaporator Placement
 			if ( !lAlphaBlanks( 14 ) && NumAlphas > 13 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 14 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 14 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 14 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Heating:DX:SingleSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecHeatingDXCoilSingleSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate, _, _, DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate );
@@ -2797,7 +2794,6 @@ namespace DXCoils {
 			}
 			// A21; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 21 ) && NumAlphas > 20 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 21 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 21 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 21 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:TwoSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilTwoSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
@@ -4147,7 +4143,6 @@ namespace DXCoils {
 			}
 			//A37; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 37 ) && NumAlphas > 36 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 37 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 37 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 37 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Cooling:DX:MultiSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecCoolingDXCoilMultiSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
@@ -4632,7 +4627,6 @@ namespace DXCoils {
 			}
 			//A34; \field Zone Name for Condenser Placement
 			if ( !lAlphaBlanks( 34 ) && NumAlphas > 33 ) {
-				DXCoil( DXCoilNum ).SecZoneAirNodeNum = GetOnlySingleNode( Alphas( 34 ), ErrorsFound, CurrentModuleObject, cAlphaFields( 34 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
 				DXCoil( DXCoilNum ).SecZonePtr = FindItemInList( Alphas( 34 ), Zone );
 				if ( DXCoil( DXCoilNum ).SecZonePtr > 0 ) {
 					SetupZoneInternalGain( DXCoil( DXCoilNum ).SecZonePtr, "Coil:Heating:DX:MultiSpeed", DXCoil( DXCoilNum ).Name, IntGainTypeOf_SecHeatingDXCoilMultiSpeed, DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate, _, _, DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate );
@@ -5407,7 +5401,6 @@ namespace DXCoils {
 		int Mode; // Performance mode for MultiMode DX coil; Always 1 for other coil types
 		int DXCoilNumTemp; // Counter for crankcase heater report variable DO loop
 		int AirInletNode; // Air inlet node number
-		int SecZoneAirNodeNum; // secondary DX coil inlet node number ( secondary zone air node)
 		int SpeedNum; // Speed number for multispeed coils
 
 		if ( MyOneTimeFlag ) {
@@ -5449,7 +5442,7 @@ namespace DXCoils {
 			}
 
 			Real64 const RatedAirMassFlowRateSeaLevel = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdPressureSeaLevel, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, RoutineName );
-			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), RatedAirMassFlowRateSeaLevel, DXCoil( DXCoilNum ).RatedSHR( 1 ), StdPressureSeaLevel );
+			DXCoil( DXCoilNum ).RatedCBF( 1 ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).RatedInletDBTemp, HPInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( 1 ), RatedAirMassFlowRateSeaLevel, DXCoil( DXCoilNum ).RatedSHR( 1 ), true, StdPressureSeaLevel );
 			MyEnvrnFlag( DXCoilNum ) = false;
 		}
 
@@ -5680,10 +5673,7 @@ namespace DXCoils {
 
 		if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				SecZoneAirNodeNum = DXCoil( DXCoilNum ).SecZoneAirNodeNum;
-				Node( SecZoneAirNodeNum ).Temp = ZT( DXCoil( DXCoilNum ).SecZonePtr );
-				Node( SecZoneAirNodeNum ).HumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
-				DXCoil( DXCoilNum ).EvapInletWetBulb = PsyTwbFnTdbWPb( Node( SecZoneAirNodeNum ).Temp, Node( SecZoneAirNodeNum ).HumRat, OutBaroPress, RoutineName );
+				DXCoil( DXCoilNum ).EvapInletWetBulb = PsyTwbFnTdbWPb( ZT( DXCoil( DXCoilNum ).SecZonePtr ), ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr ), OutBaroPress, RoutineName );
 			}
 		}
 
@@ -7345,6 +7335,8 @@ namespace DXCoils {
 		using General::CreateSysTimeIntervalString;
 		using DataWater::WaterStorage;
 		using DataHeatBalance::Zone;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7500,8 +7492,8 @@ namespace DXCoils {
 				OutdoorWetBulb = OutWetBulbTemp;
 			}
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
@@ -7519,10 +7511,10 @@ namespace DXCoils {
 			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
 			CompAmbTemp = OutdoorDryBulb;
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				CondInletTemp = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				CompAmbTemp = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				CondInletTemp = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				CompAmbTemp = CondInletTemp;
+				OutdoorDryBulb = CondInletTemp;
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
@@ -8805,6 +8797,8 @@ Label50: ;
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using General::RoundSigDigits;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8890,15 +8884,15 @@ Label50: ;
 					OutdoorWetBulb = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).OutAirWetBulb;
 				}
 				if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-					OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-					OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+					OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+					OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 					OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 					OutdoorPressure = OutBaroPress;
 				}
 			}
 		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-			OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+			OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 			OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 			OutdoorPressure = OutBaroPress;
 		} else {
@@ -9203,6 +9197,8 @@ Label50: ;
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using DataWater::WaterStorage;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 		//USE ScheduleManager, ONLY: GetCurrentScheduleValue
 
 		// Locals
@@ -9301,16 +9297,16 @@ Label50: ;
 				OutdoorWetBulb = PsyTwbFnTdbWPb( OutdoorDryBulb, OutdoorHumRat, OutdoorPressure );
 			}
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
 		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
-				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
-				OutdoorPressure = OutBaroPress;
+			OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+			OutdoorPressure = OutBaroPress;
 		} else {
 			OutdoorDryBulb = OutDryBulbTemp;
 			OutdoorHumRat = OutHumRat;
@@ -9763,6 +9759,7 @@ Label50: ;
 		Real64 const TotCap, // total cooling  capacity [Watts]
 		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
+		bool const PrintFlag, // flag used to print warnings if desired
 		Real64 const BaroPress // Barometric pressure [Pa], defaulted to StdBaroPress in header
 	)
 	{
@@ -9850,7 +9847,7 @@ Label50: ;
 		//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 		//  Pressure will have to be pass into this subroutine to fix this one
 		OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, BaroPress, RoutineName );
-		if ( OutletAirRH >= 1.0 ) {
+		if ( OutletAirRH >= 1.0 && PrintFlag ) {
 			ShowSevereError( "For object = " + UnitType + ", name = \"" + UnitName + "\"" );
 			ShowContinueError( "Calculated outlet air relative humidity greater than 1. The combination of" );
 			ShowContinueError( "rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting" );
@@ -9961,8 +9958,8 @@ Label50: ;
 			InletAirEnthalpy = PsyHFnTdbW( InletAirTemp, InletAirHumRat );
 			OutletAirEnthalpy = PsyHFnTdbW( OutletAirTemp, OutletAirHumRat );
 			ADPEnthalpy = PsyHFnTdbW( ADPTemp, ADPHumRat );
-			CBF = ( OutletAirEnthalpy - ADPEnthalpy ) / ( InletAirEnthalpy - ADPEnthalpy );
-			if ( Iter > IterMax ) {
+			CBF = min( 1.0, ( OutletAirEnthalpy - ADPEnthalpy ) / ( InletAirEnthalpy - ADPEnthalpy ) );
+			if ( Iter > IterMax && PrintFlag ) {
 				ShowSevereError( UnitType + " \"" + UnitName + "\" -- coil bypass factor calculation did not converge after max iterations." );
 				ShowContinueError( "The RatedSHR of [" + RoundSigDigits( SHR, 3 ) + "], entered by the user or autosized (see *.eio file)," );
 				ShowContinueError( "may be causing this. The line defined by the coil rated inlet air conditions" );
@@ -9976,7 +9973,7 @@ Label50: ;
 				ShowContinueErrorTimeStamp( "" );
 				CBFErrors = true; // Didn't converge within MaxIter iterations
 			}
-			if ( CBF < 0.0 ) {
+			if ( CBF < 0.0 && PrintFlag ) {
 				ShowSevereError( UnitType + " \"" + UnitName + "\" -- negative coil bypass factor calculated." );
 				ShowContinueErrorTimeStamp( "" );
 				CBFErrors = true; // Negative CBF not valid
@@ -9989,6 +9986,110 @@ Label50: ;
 		}
 
 		return CBF;
+	}
+
+	Real64
+	ValidateADP(
+		std::string const & UnitType, // component name
+		std::string const & UnitName, // component type
+		Real64 const RatedInletAirTemp, // coil inlet air temperature [C]
+		Real64 const RatedInletAirHumRat, // coil inlet air humidity ratio [kg/kg]
+		Real64 const TotCap, // coil total capacity [W]
+		Real64 const AirMassFlow, // coil air mass flow rate [kg/s]
+		Real64 const InitialSHR, // coil sensible heat ratio []
+		std::string const CallingRoutine // function name calling this routine 
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//    AUTHOR         Richard Raustad, FSEC
+		//    DATE WRITTEN   December 2015
+		//    RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		//    Validates that the calcualted bypass factor represents valid SHR based on total capacity and air mass flow rate.
+
+		// METHODOLOGY EMPLOYED:
+		//    With model parameters autosized by the user, the SHR is selected based on an empirical model.
+		//    This can sometimes lead to an SHR that does not cross the saturation curve, or one that crosses excessively where
+		//    the coil outlet air conditions exceed the saturation curve (i.e., RH > 1).
+		//    This function checks to see if the ADP based on coil delta T and calculated bypass factor and the ADP based
+		//    on coil delta W and calculated bypass factor land on the saturation curve at the same place within a tolerance.
+		//    The result is passed back to the sizing routine as the new value for SHR.
+		//    If the SHR is not autosized, this routine will still adjust the design SHR appropriately, however, the hard-sized SHR will not change.
+		// REFERENCES:
+
+		// USE STATEMENTS:
+		//    na
+
+		// Return value
+		Real64 SHR( 0.0 ); // the result - the adjusted design SHR
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 CBF_calculated( 0.0 ); // coil bypass factor based on TotCap, AirFlow, SHR, and BaroPress
+		Real64 InletAirEnthalpy( 0.0 ); // Enthalpy of inlet air to evaporator at given conditions [J/kg]
+		Real64 DeltaH( 0.0 ); // Enthalpy drop across evaporator at given conditions [J/kg]
+		Real64 HTinHumRatOut( 0.0 ); // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
+		Real64 DeltaHumRat( 0.0 ); // Humidity ratio drop across evaporator at given conditions [kg/kg]
+		Real64 OutletAirTemp( 0.0 ); // Outlet dry-bulb temperature from evaporator at given conditions [C]
+		Real64 OutletAirEnthalpy( 0.0 ); // Enthalpy of outlet air at given conditions [J/kg]
+		Real64 OutletAirHumRat( 0.0 ); // Outlet humidity ratio from evaporator at given conditions [kg/kg]
+		Real64 OutletAirRH( 0.0 ); // relative humidity of the outlet air
+		Real64 CalcADPTemp( 0.0 ); // actual ADP temperature based on bypass factor [C]
+		Real64 CalcADPHumRat( 0.0 ); // actual ADP humidity ratio based on bypass factor [kg/kg]
+		Real64 CalcADPTempFnHR( 0.0 ); // actual ADP temperature as a function of humidity ratio based on bypass factor [C]
+		Real64 ADPerror( 0.0 ); // difference between ADP function of temperature and humidity ratio [deltaC]
+		bool bStillValidating( true ); // while loop flag
+		bool bNoReporting( false ); // don't report specific warnings in calcCBF while iterating on result
+		bool bReversePerturb( false ); // identifies when SHR is being lowered based on outlet air RH
+
+		SHR = InitialSHR;
+		while ( bStillValidating ) {
+			CBF_calculated = max( 0.0, CalcCBF( UnitType, UnitName, RatedInletAirTemp, RatedInletAirHumRat, TotCap, AirMassFlow, SHR, bNoReporting ) );
+			DeltaH = TotCap / AirMassFlow;
+			InletAirEnthalpy = PsyHFnTdbW( RatedInletAirTemp, RatedInletAirHumRat );
+			HTinHumRatOut = InletAirEnthalpy - ( 1.0 - SHR ) * DeltaH;
+			OutletAirHumRat = PsyWFnTdbH( RatedInletAirTemp, HTinHumRatOut, CallingRoutine );
+			DeltaHumRat = RatedInletAirHumRat - OutletAirHumRat;
+			OutletAirEnthalpy = InletAirEnthalpy - DeltaH;
+			OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
+			OutletAirRH = PsyRhFnTdbWPb( OutletAirTemp, OutletAirHumRat, StdBaroPress, CallingRoutine );
+			if ( CBF_calculated < 1 ) {
+				CalcADPTemp = RatedInletAirTemp - ( ( RatedInletAirTemp - OutletAirTemp ) / ( 1 - CBF_calculated ) );
+				CalcADPHumRat = RatedInletAirHumRat - ( ( DeltaHumRat ) / ( 1 - CBF_calculated ) );
+				CalcADPTempFnHR = PsyTdpFnWPb( CalcADPHumRat, StdBaroPress, CallingRoutine );
+				ADPerror = CalcADPTemp - CalcADPTempFnHR;
+			} else {
+				ADPerror = 0; // might be able to check for RH >= 1 and reduce SHR, need defect file for that since can't create one
+			}
+
+			if ( std::abs( ADPerror )  > 0.012 ) {
+				if ( OutletAirRH >= 1.0 ) { // if RH > 1, reduce SHR until it crosses the saturation curve
+					SHR -= 0.001;
+					bReversePerturb = true;
+					if( SHR < 0.5 ) bStillValidating = false; // have to stop somewhere, this is lower than the lower limit of SHR empirical model (see ReportSizingManager SizingType == CoolingSHRSizing)
+				} else {
+					if ( bReversePerturb ) {
+						bStillValidating = false; // stop iterating once SHR causes ADP to cross back under saturation curve, take what you get
+					} else {
+						SHR += 0.001; // increase SHR slowly until ADP temps are resolved
+					}
+				}
+				if ( SHR > 0.8 ) bStillValidating = false; // have to stop somewhere, this is the upper limit of SHR empirical model (see ReportSizingManager SizingType == CoolingSHRSizing)
+			} else {
+				bStillValidating = false; // ADP temps are close enough. Normal input files hit this on first pass
+			}
+
+		}
+	
+		return SHR;
+
 	}
 
 	Real64
@@ -10328,6 +10429,8 @@ Label50: ;
 		using DataHVACGlobals::MSHPWasteHeat;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10436,14 +10539,14 @@ Label50: ;
 				OutdoorWetBulb = PsyTwbFnTdbWPb( OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, RoutineName );
 			}
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
 		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-			OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+			OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 			OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 			OutdoorPressure = OutBaroPress;
 		} else {
@@ -11021,6 +11124,8 @@ Label50: ;
 		using DataHVACGlobals::MSHPMassFlowRateLow;
 		using DataHVACGlobals::MSHPMassFlowRateHigh;
 		using DataHVACGlobals::MSHPWasteHeat;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -11144,14 +11249,14 @@ Label50: ;
 				OutdoorHumRat = Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).HumRat;
 			}
 			if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-				OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				//OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 				OutdoorPressure = OutBaroPress;
 			}
 		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
-			OutdoorDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-			OutdoorHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+			OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+			OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 			//OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
 			OutdoorPressure = OutBaroPress;
 		} else {
@@ -13980,6 +14085,8 @@ Label50: ;
 		using CurveManager::CurveValue;
 		using DataHVACGlobals::TimeStepSys;
 		using DataLoopNode::Node;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalFanSys::ZT;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -14044,8 +14151,8 @@ Label50: ;
 					return;
 				}
 				DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate = -TotalHeatRemovalRate; // +DXCoil( DXCoilNum ).DefrostPower;
-				EvapInletDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				EvapInletHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				EvapInletDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				EvapInletHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, EvapInletDryBulb, EvapInletHumRat );
 				EvapAirMassFlow = RhoAir * DXCoil( DXCoilNum ).SecCoilAirFlow;;
 				PartLoadRatio = DXCoil( DXCoilNum ).CompressorPartLoadRatio;
@@ -14086,8 +14193,8 @@ Label50: ;
 				DXCoil( DXCoilNum ).SecCoilSHR = SHR;
 
 			} else if ( SELECT_CASE_var == CoilDX_MultiSpeedHeating ) {
-				EvapInletDryBulb = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp;
-				EvapInletHumRat = Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat;
+				EvapInletDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
+				EvapInletHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
 				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, EvapInletDryBulb, EvapInletHumRat );
 				MSSpeedRatio = DXCoil( DXCoilNum ).MSSpeedRatio;
 				MSCycRatio = DXCoil( DXCoilNum ).MSCycRatio;
