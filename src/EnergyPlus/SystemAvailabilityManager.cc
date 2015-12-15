@@ -792,7 +792,7 @@ namespace SystemAvailabilityManager {
 				SetupOutputVariable( "Availability Manager Optimum Start Control Status []", OptStartSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name );
 
 				// add
-				SetupOutputVariable( "Availability Manager Optimum Start Hours Before Occupancy [hr]", OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name, "Daily" );
+				SetupOutputVariable( "Availability Manager Optimum Start Hours Before Occupancy []", OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name, "Daily" );
 
 			}
 
