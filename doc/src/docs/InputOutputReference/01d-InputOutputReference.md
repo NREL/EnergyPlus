@@ -15230,11 +15230,14 @@ AvailabilityManager:OptimumStart,
 
 ### AvailabilityManager:OptimumStart Outputs
 
-The optimum start availability manager has one output variable.
+The optimum start availability manager has two output variables.
+
+#### Availability Manager Night Ventilation Control Status
+A value of 0 indicates the manager is signaling NoAction. A value of 2 means the manager is signaling CycleOn.
 
 #### Availability Manager Optimum Start Time Before Occupancy
 
-The unit is in hour.
+The current time before occupancy.  Occupancy is the first zone timestep after midnight when the Fan Schedule is > 0.0.  The units are hours.
 
 Group     Setpoint Managers
 -------------------------
@@ -27177,7 +27180,7 @@ Curve:ChillerPartLoadCustom,
 
 This curve is a function of two independent variables. Input consists of the curve name, the six coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the quadratic linear curve:
 
-<div>\[y = \left( {{C_1} + {C_2}*x + {C_3}*{x^2} + {C_4}*{x^3}} \right) + \left( {{C_4} + {C_5}*x + {C_6}*{x^2}} \right)*y\]</div>
+<div>\[z = \left( {{C_1} + {C_2}*x + {C_3}*{x^2}} \right) + \left( {{C_4} + {C_5}*x + {C_6}*{x^2}} \right)*y\]</div>
 
 #### Field: Name
 
