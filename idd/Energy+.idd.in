@@ -60764,12 +60764,14 @@ Chiller:Absorption:Indirect,
        \type real
        \units m3/s
        \minimum> 0
+       \default autosize
        \autosizable
        \ip-units gal/min
        \note For variable flow this is the max flow & for constant flow this is the flow.
   N10, \field Design Condenser Water Flow Rate
        \type real
        \units m3/s
+       \default autosize
        \autosizable
        \minimum> 0.0
        \ip-units gal/min
