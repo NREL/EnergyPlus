@@ -213,6 +213,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 CompressorSizeRatio; // ratio of min compressor size to total capacity
 		int NumCompressors; // number of compressors in VRF condenser
 		Real64 MaxOATCCHeater; // maximum outdoor air dry-bulb temp for crankcase heater operation (C)
+		//begin variables used for Defrost 
 		int DefrostEIRPtr; // index to defrost EIR curve
 		Real64 DefrostFraction; // defrost time period fraction (hr)
 		int DefrostStrategy; // Type of defrost (reversecycle or resistive)
@@ -221,6 +222,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 DefrostPower; // power used during defrost (W)
 		Real64 DefrostConsumption; // energy used during defrost (J)
 		Real64 MaxOATDefrost; // maximum outdoor air dry-bulb temp for defrost operation (C)
+		//end variables used for Defrost 
 		int CondenserType; // condenser type, evap- or air-cooled
 		int CondenserNodeNum; // condenser inlet node number
 		bool SkipCondenserNodeNumCheck; // used to check for duplicate node names
@@ -1551,6 +1553,22 @@ namespace HVACVariableRefrigerantFlow {
 	);
 	
 	void
+	CalcVRFIUVariableTeTc(
+		int const VRFTUNum, // the number of the VRF TU to be simulated
+		Real64 & EvapTemp, // evaporating temperature
+		Real64 & CondTemp  // condensing temperature 
+	);
+		
+	void
+	ControlVRF_FluidTCtrl(
+		int const VRFTUNum, // Index to VRF terminal unit
+		Real64 const QZnReq, // Index to zone number
+		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+		Real64 & PartLoadRatio, // unit part load ratio
+		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
+	);
+	
+	void
 	CalcVRF_FluidTCtrl(
 		int const VRFTUNum, // Unit index in VRF terminal unit array
 		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
@@ -1566,8 +1584,21 @@ namespace HVACVariableRefrigerantFlow {
 		bool const FirstHVACIteration // flag for first time through HVAC system simulation
 	);
 	
+	Real64
+	CalVRFTUAirFlowRate_FluidTCtrl(
+		int VRFTUNum, // TU index
+		Real64 PartLoadRatio, // part load ratio of the coil 
+		bool FirstHVACIteration // FirstHVACIteration flag
+	);
+	
+	Real64
+	VRFTUAirFlowResidual_FluidTCtrl(
+		Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU 
+		Array1< Real64 > const & Par // par(1) = VRFTUNum
+	);
+	
 	Real64 
-	CompResidual( 
+	CompResidual_FluidTCtrl( 
 		Real64 const Te, // Outdoor unit evaporating temperature
 		Array1< Real64 > const & Par // Array of parameters
 	);
