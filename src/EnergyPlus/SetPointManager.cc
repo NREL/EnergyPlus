@@ -8277,9 +8277,7 @@ namespace SetPointManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int SetPtMgrNum;
 		int CtrldNodeNum;
-		int NodeNum;
 
 		if ( GetInputFlag ) {
 			GetSetPointManagerInputs( );
@@ -8333,7 +8331,6 @@ namespace SetPointManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SetPtMgrNum;
 		int CtrldNodeNum;
-		int NodeNum;
 
 		if ( GetInputFlag ) {
 			GetSetPointManagerInputs( );

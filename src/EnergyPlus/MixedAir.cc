@@ -4106,9 +4106,6 @@ namespace MixedAir {
 			if ( OAController( OAControllerNum ).CoolCoilFreezeCheck ) {
 				OAController( OAControllerNum ).MaxOAFracBySetPoint = 0.0;
 				MaxOAFracBySetPoint = OutAirSignal;
-				if ( MaxOAFracBySetPoint > 0 ) {
-					MaxOAFracBySetPoint = MaxOAFracBySetPoint;
-				}
 			}
 		} else {
 			if ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).MixSetTemp < 0.0 ) {

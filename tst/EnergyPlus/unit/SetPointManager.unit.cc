@@ -666,9 +666,6 @@ TEST( SetPointManager, DefineMixedAirSetPointManager )
 	// Set up a cooling setpoint manager
 	SetPointManager::DefineMixedAirSetPointManager mySPM;
 
-	Real64 dtFan; // Temperature difference across a fan
-	Real64 dtCoolCoil; // Temperature difference across a coolig coil
-
 	mySPM.FanInNode = 1;
 	mySPM.FanOutNode = 2;
 	mySPM.CoolCoilInNode = 0;

@@ -1367,8 +1367,7 @@ namespace HVACUnitarySystem {
 		Optional_bool HXUnitOn = _, // Flag to control HX for HXAssisted Cooling Coil
 		Optional< Real64 > HeatCoilLoad = _, // Adjusted load to heating coil when SAT exceeds max limit (W)
 		Optional< Real64 > SuppCoilLoad = _, // Adjusted load to supp heating coil when SAT exceeds max limit (W)
-		Optional_int_const CompOn = _, // Determines if compressor is on or off
-		Optional_int_const SingleMode = _// Single mode operation Yes/No; 1=Yes, 0=No
+		Optional_int_const CompOn = _ // Determines if compressor is on or off
 	);
 
 	void
@@ -1380,8 +1379,7 @@ namespace HVACUnitarySystem {
 		int const CompOn, // compressor control (0=off, 1=on)
 		Real64 const OnOffAirFlowRatio,
 		Real64 const CoilCoolHeatRat, // ratio of cooling to heating PLR for cycling fan RH control
-		Optional_bool HXUnitOn = _, // Flag to control HX for HXAssisted Cooling Coil
-		Optional_int_const SingleMode = _// Single mode operation Yes/No; 1=Yes, 0=No
+		Optional_bool HXUnitOn = _ // Flag to control HX for HXAssisted Cooling Coil
 	);
 
 	void

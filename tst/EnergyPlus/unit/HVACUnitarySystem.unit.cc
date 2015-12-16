@@ -2048,10 +2048,6 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 
 	bool ErrorsFound( false );
 	bool FirstHVACIteration( false );
-	Real64 CpAir( 0.0 ); // specific heat of air
-	Real64 Qsens_sys( 0.0 ); // UnitarySystem delivered sensible capacity wrt zone
-	Real64 MinHumRatio( 0.0 ); // track minimum of outlet node or zone humidity ratio
-	Real64 ZoneTemp( 0.0 ); // control zone temperature
 	int InletNode( 0 ); // UnitarySystem inlet node number
 	int OutletNode( 0 ); // UnitarySystem outlet node number
 	int ControlZoneNum( 0 ); // index to control zone

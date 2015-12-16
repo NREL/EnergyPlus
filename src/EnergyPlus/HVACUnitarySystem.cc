@@ -6305,7 +6305,7 @@ namespace HVACUnitarySystem {
 		Real64 LatOutputOn; // latent output at PLR = 1 [W]
 		Real64 CoolPLR; // cooing part load ratio
 		Real64 HeatPLR; // heating part load ratio
-		Array1D< Real64 > Par( 12 ); // parameters passed to RegulaFalsi function
+		Array1D< Real64 > Par( 11 ); // parameters passed to RegulaFalsi function
 		int SolFlag; // return flag from RegulaFalsi for sensible load
 		int SolFlagLat; // return flag from RegulaFalsi for latent load
 		Real64 TempLoad; // represents either a sensible or latent load [W]
@@ -6620,7 +6620,7 @@ namespace HVACUnitarySystem {
 							} 
 						}
 
-						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutputOff, LatOutputOff, HXUnitOn, _, _, CompressorONFlag, UnitarySystem( UnitarySysNum ).SingleMode );
+						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutputOff, LatOutputOff, HXUnitOn, _, _, CompressorONFlag );
 						UnitarySystem( UnitarySysNum ).CoolingSpeedNum = SpeedNum;
 					}
 					if ( ZoneLoad >= SensOutputOn ) {
@@ -6714,7 +6714,6 @@ namespace HVACUnitarySystem {
 				Par( 9 ) = 0.0; // HXUnitOn is always false for HX
 				Par( 10 ) = UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac;
 				Par( 11 ) = double( AirLoopNum );
-				Par( 12 ) = UnitarySystem( UnitarySysNum ).SingleMode;
 
 				//     Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
 				SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadRatio, CalcUnitarySystemLoadResidual, 0.0, 1.0, Par );
@@ -7196,7 +7195,6 @@ namespace HVACUnitarySystem {
 		bool SensibleLoad; // sensible load
 		Real64 SensOutput; // sensible output of system
 		Real64 LatOutput; // latent output of system
-		int SingleMode;
 
 		// Convert parameters to usable variables
 		UnitarySysNum = int( Par( 1 ) );
@@ -7229,11 +7227,9 @@ namespace HVACUnitarySystem {
 
 		AirLoopNum = int( Par( 11 ) );
 
-		SingleMode = Par( 12 );
-
 		SetSpeedVariables( UnitarySysNum, SensibleLoad, PartLoadRatio );
 
-		CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutput, LatOutput, HXUnitOn, _, _, CompOp, SingleMode );
+		CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutput, LatOutput, HXUnitOn, _, _, CompOp );
 
 		// Calculate residual based on output calculation flag
 		if ( SensibleLoad ) {
@@ -7266,8 +7262,7 @@ namespace HVACUnitarySystem {
 		Optional_bool HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
 		Optional< Real64 > HeatCoilLoad, // Adjusted load to heating coil when SAT exceeds max limit (W)
 		Optional< Real64 > SuppCoilLoad, // Adjusted load to supp heating coil when SAT exceeds max limit (W)
-		Optional_int_const CompOn, // Determines if compressor is on or off
-		Optional_int_const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
+		Optional_int_const CompOn // Determines if compressor is on or off
 	)
 	{
 
@@ -7359,11 +7354,7 @@ namespace HVACUnitarySystem {
 		if ( UnitarySystem( UnitarySysNum ).CoolingCoilUpstream ) {
 
 			if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-				if ( present( SingleMode ) ) {
-					CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn, SingleMode );
-				} else {
-					CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
-				}
+				CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
 			}
 			if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 				// operate the heating coil without regard to coil outlet temperature
@@ -7385,11 +7376,7 @@ namespace HVACUnitarySystem {
 				SimulateFanComponents( BlankString, FirstHVACIteration, UnitarySystem( UnitarySysNum ).FanIndex, FanSpeedRatio );
 
 				if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-					if ( present( SingleMode ) ) {
-						CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn, SingleMode );
-					} else {
-						CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
-					}
+					CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
 				}
 				if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 					CalcUnitaryHeatingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad );
@@ -7420,11 +7407,7 @@ namespace HVACUnitarySystem {
 				}
 			}
 			if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-				if ( present( SingleMode ) ) {
-					CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn, SingleMode );
-				} else {
-					CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
-				}
+				CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
 			}
 
 			// If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
@@ -7444,11 +7427,7 @@ namespace HVACUnitarySystem {
 					}
 				}
 				if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-					if ( present( SingleMode ) ) {
-						CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn, SingleMode );
-					} else {
-						CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
-					}
+					CalcUnitaryCoolingSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, CoolingCompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn );
 				}
 			}
 
@@ -7506,8 +7485,7 @@ namespace HVACUnitarySystem {
 		int const CompOn, // compressor control (0=off, 1=on)
 		Real64 const OnOffAirFlowRatio,
 		Real64 const CoilCoolHeatRat, // ratio of cooling to heating PLR for cycling fan RH control
-		Optional_bool HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
-		Optional_int_const SingleMode // Single mode operation Yes/No; 1=Yes, 0=No
+		Optional_bool HXUnitOn // Flag to control HX for HXAssisted Cooling Coil
 	)
 	{
 
