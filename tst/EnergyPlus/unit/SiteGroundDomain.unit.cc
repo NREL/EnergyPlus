@@ -38,9 +38,9 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking )
 
 	PipingSystemDomains.allocate( 2 );
 
-	GetGroundTempModel( PipingSystemDomains( 1 ).Farfield.groundTempModel, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1" );
+	PipingSystemDomains( 1 ).Farfield.groundTempModel = GetGroundTempModelAndInit( "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1" );
 
-	GetGroundTempModel( PipingSystemDomains( 2 ).Farfield.groundTempModel, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2" );
+	PipingSystemDomains( 2 ).Farfield.groundTempModel = GetGroundTempModelAndInit( "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2" );
 
 	EXPECT_NE( PipingSystemDomains( 1 ).Farfield.groundTempModel, PipingSystemDomains( 2 ).Farfield.groundTempModel );
 
