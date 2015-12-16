@@ -10,6 +10,7 @@
 // A to Z order
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -53,6 +54,7 @@
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
@@ -109,7 +111,7 @@ namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
-		
+
 		show_message();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -158,6 +160,7 @@ namespace EnergyPlus {
 	{
 		// A to Z order
 		BranchInputManager::clear_state();
+		ChillerIndirectAbsorption::clear_state();
 		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
 		DataAirLoop::clear_state();
@@ -197,6 +200,7 @@ namespace EnergyPlus {
 		HeatPumpWaterToWaterSimple::clear_state();
 		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
+		HVACControllers::clear_state();
 		HVACManager::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
