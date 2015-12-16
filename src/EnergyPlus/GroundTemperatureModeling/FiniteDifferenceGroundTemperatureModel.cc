@@ -178,7 +178,8 @@ namespace EnergyPlus {
 
 		if ( !WeatherFileExists ){
 			ShowContinueError( "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file." );
-			ShowFatalError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw" );
+			ShowContinueError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+			ShowFatalError( "Simulation halted due to input error in ground temperaure model." );
 		}
 
 		++NumOfEnvrn;
