@@ -7525,9 +7525,9 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Four Pipe FanCoil zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
-#### Filed: Supply Air Fan Operating Mode Schedule Name
+#### Field: Supply Air Fan Operating Mode Schedule Name
 This input field is the name of a schedule that controls fan operation. Schedule Name values of 0
-denote cycling fan operation (fan cycles with cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiSpeedFan* capacity control method only.
+denote cycling fan operation (fan cycles with heating or cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiSpeedFan* capacity control method only.
 
 
 An example input for a fan coil unit, including its constituent components, is shown below.
