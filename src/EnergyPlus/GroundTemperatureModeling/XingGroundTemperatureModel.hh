@@ -43,6 +43,9 @@ namespace EnergyPlus {
 			int const monthOfSim
 		);
 
+		// Destructor
+		~XingGroundTempsModel(){}
+
 	};
 
 	//     NOTICE

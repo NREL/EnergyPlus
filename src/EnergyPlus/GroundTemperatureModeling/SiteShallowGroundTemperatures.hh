@@ -49,6 +49,9 @@ namespace EnergyPlus {
 			int const monthOfSim
 		);
 
+		// Destructor
+		~SiteShallowGroundTemps(){}
+
 	};
 
 	//     NOTICE

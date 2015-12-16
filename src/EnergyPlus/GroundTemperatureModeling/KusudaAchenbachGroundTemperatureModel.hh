@@ -44,6 +44,9 @@ namespace EnergyPlus{
 			int const monthOfSim
 		);
 
+		// Destructor
+		~KusudaGroundTempsModel(){}
+
 	};
 
 	//     NOTICE

@@ -16,6 +16,11 @@ namespace EnergyPlus{
 			std::string objectName;
 			bool errorsFound;
 
+			// Destructor
+			virtual
+			~BaseGroundTempsModel()
+			{}
+
 			// Default Constructor
 		BaseGroundTempsModel() :
 			objectType( 0 ),
