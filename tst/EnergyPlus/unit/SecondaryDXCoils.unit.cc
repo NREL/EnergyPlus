@@ -16,6 +16,7 @@
 // EnergyPlus Headers
 #include <DXCoils.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
 #include <Psychrometrics.hh>
@@ -29,6 +30,8 @@ using Psychrometrics::PsyRhoAirFnPbTdbW;
 using Psychrometrics::PsyTwbFnTdbWPb;
 using Psychrometrics::PsyHFnTdbW;
 using Psychrometrics::InitializePsychRoutines;
+using DataHeatBalFanSys::ZoneAirHumRat;
+using DataHeatBalFanSys::ZT;
 
 TEST( SecondaryDXCoolingCoilSingleSpeed, Test1 ) {
 	// tests secondary DX coil calculation of single speed DX system or heat pump
@@ -106,10 +109,12 @@ TEST( SecondaryDXHeatingCoilSingleSpeed, Test4 ) {
 	DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = 0.0;
 	DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
 
-	DXCoil( DXCoilNum ).SecZoneAirNodeNum = 1;
+	DXCoil( DXCoilNum ).SecZonePtr = 1;
 	Node.allocate( 2 );
-	Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp = 10.0;
-	Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat  = 0.003;
+	ZT.allocate( 1 );
+	ZoneAirHumRat.allocate( 1 );
+	ZT( 1 ) = 10.0;
+	ZoneAirHumRat( 1 ) = 0.003;
 	DXCoil( DXCoilNum ).SecCoilAirFlow = 1.0;
 	DXCoil( DXCoilNum ).CompressorPartLoadRatio = 1.0;
 	DXCoil( DXCoilNum ).SecCoilRatedSHR = 1.0;
@@ -186,10 +191,12 @@ TEST( SecondaryDXHeatingCoilMultiSpeed, Test5 ) {
 	DXCoil( DXCoilNum ).SecCoilSensibleHeatRemovalRate = 0.0;
 	DXCoil( DXCoilNum ).SecCoilLatentHeatRemovalRate = 0.0;
 
-	DXCoil( DXCoilNum ).SecZoneAirNodeNum = 1;
+	DXCoil( DXCoilNum ).SecZonePtr = 1;
 	Node.allocate( 2 );
-	Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).Temp = 10.0;
-	Node( DXCoil( DXCoilNum ).SecZoneAirNodeNum ).HumRat = 0.003;
+	ZT.allocate( 1 );
+	ZoneAirHumRat.allocate( 1 );
+	ZT( 1 ) = 10.0;
+	ZoneAirHumRat( 1 ) = 0.003;
 	DXCoil( DXCoilNum ).MSSecCoilAirFlow( 1 ) = 1.0;
 	DXCoil( DXCoilNum ).MSSecCoilAirFlow( 2 ) = 1.0;
 	DXCoil( DXCoilNum ).MSSecCoilSHRFT( 1 ) = 0;
