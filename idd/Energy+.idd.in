@@ -20684,7 +20684,7 @@ SwimmingPool:Indoor,
        \type alpha
   A2,  \field Surface Name
        \required-field
-       \note To be matched with a construction in this input file
+       \note Name of the floor surface where the pool is located.
        \type object-list
        \object-list FloorSurfaceNames
   N1,  \field Average Depth
@@ -21333,7 +21333,7 @@ Output:IlluminanceMap,
   N4 , \field Number of X Grid Points
        \note Maximum number of total grid points must be <= 2500 (X*Y)
        \type integer
-       \minimum> 0
+       \minimum 1
        \default 2
   N5 , \field Y Minimum Coordinate
        \units m
@@ -21346,7 +21346,7 @@ Output:IlluminanceMap,
   N7 ; \field Number of Y Grid Points
        \note Maximum number of total grid points must be <= 2500 (X*Y)
        \type integer
-       \minimum> 0
+       \minimum 1
        \default 2
 
 OutputControl:IlluminanceMap:Style,
@@ -28291,7 +28291,7 @@ HVACTemplate:System:UnitarySystem,
       \note CoolReheat = cool beyond the dry-bulb setpoint, reheat with reheat coil
       \note If no reheat coil specified, cold supply temps may occur.
       \note Multimode = activate enhanced dehumidification mode as needed and meet sensible load.
-      \note Valid only for Cooling Coil Type = TwoStageHumidityControlDX
+      \note Valid only for Cooling Coil Type = TwoStageHumidityControlDX or HeatExchangerAssistedDX
       \type choice
       \key None
       \key CoolReheat
@@ -30153,7 +30153,7 @@ HVACTemplate:System:DedicatedOutdoorAir,
       \note as required to meet the humidity setpoint, reheat with desuperheater coil.
       \note Valid only for Cooling Coil Type = TwoSpeedDX, TwoStageDX, TwoStageHumidityControlDX, or HeatExchangerAssistedDX.
       \note Multimode = activate enhanced dehumidification mode as needed and meet sensible load.
-      \note Valid only for Cooling Coil Type = TwoStageHumidityControlDX
+      \note Valid only for Cooling Coil Type = TwoStageHumidityControlDX or HeatExchangerAssistedDX
       \type choice
       \key None
       \key CoolReheatHeatingCoil
@@ -31456,8 +31456,9 @@ Sizing:System,
       \object-list AirPrimaryLoops
   A2, \field Type of Load to Size On
       \note Specifies the basis for sizing the system supply air flow rate
-      \note Sensible and VentilationRequirement are the only available options
-      \note Sensible uses the zone design air flow rates
+      \note Sensible and Total use the zone design air flow rates to size the system supply air flow rate
+      \note The cooling coil will then be sized at either the peak Sensible or Total flow rate and conditions
+      \note The heating coil is always sized at the peak sensible heating load.
       \note VentilationRequirement uses the system ventilation requirement
       \type choice
       \key Sensible
@@ -51713,8 +51714,8 @@ AirLoopHVAC:UnitarySystem,
        \note None = meet sensible load only
        \note Multimode = activate enhanced dehumidification mode
        \note as needed and meet sensible load.  Valid only with
-       \note cooling coil type CoilSystem:Cooling:DX:HeatExchangerAssisted.
-       \note This control mode allows the heat exchanger to be turned
+       \note cooling coil type Coil:Cooling:DX:TwoStageWithHumidityControlMode or CoilSystem:Cooling:DX:HeatExchangerAssisted.
+       \note This control mode either switches the coil mode or allows the heat exchanger to be turned
        \note on and off based on the zone dehumidification requirements.
        \note A ZoneControl:Humidistat object is also required.
        \note CoolReheat = cool beyond the dry-bulb setpoint.
@@ -60228,9 +60229,9 @@ Chiller:Electric:EIR,
        \note EIR = 1/COP
        \required-field
        \type object-list
-       \object-list QuadraticCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
-       \note quadratic curve = a + b*PLR + c*PLR**2
+       \note quadratic curve = a + b*PLR + c*PLR**2 is typical, other univariate curves may be used
        \note PLR = part load ratio (cooling load/steady state capacity)
   N7 , \field Minimum Part Load Ratio
        \type real
@@ -60309,6 +60310,7 @@ Chiller:Electric:EIR,
   N14, \field Design Heat Recovery Water Flow Rate
        \type real
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
+       \note Heat recovery is only available with Condenser Type = WaterCooled.
        \units m3/s
        \minimum 0.0
        \default 0.0
@@ -60644,6 +60646,7 @@ Chiller:Electric,
        \minimum 0.0
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
+       \note Heat recovery is only available with Condenser Type = WaterCooled.
        \ip-units gal/min
        \autosizable
   A8 , \field Heat Recovery Inlet Node Name
@@ -60761,12 +60764,14 @@ Chiller:Absorption:Indirect,
        \type real
        \units m3/s
        \minimum> 0
+       \default autosize
        \autosizable
        \ip-units gal/min
        \note For variable flow this is the max flow & for constant flow this is the flow.
   N10, \field Design Condenser Water Flow Rate
        \type real
        \units m3/s
+       \default autosize
        \autosizable
        \minimum> 0.0
        \ip-units gal/min
@@ -66878,8 +66883,8 @@ ThermalStorage:Ice:Detailed,
        \type node
   A5 , \field Discharging Curve Object Type
        \type choice
-       \key Curve:QuadraticLinear
-       \key Curve:CubicLinear
+       \key QuadraticLinear
+       \key CubicLinear
   A6 , \field Discharging Curve Name
        \type object-list
        \object-list QuadraticLinearCurves
@@ -66887,8 +66892,8 @@ ThermalStorage:Ice:Detailed,
        \object-list UniVariateTables
   A7 , \field Charging Curve Object Type
        \type choice
-       \key Curve:QuadraticLinear
-       \key Curve:CubicLinear
+       \key QuadraticLinear
+       \key CubicLinear
   A8 , \field Charging Curve Name
        \type object-list
        \object-list QuadraticLinearCurves

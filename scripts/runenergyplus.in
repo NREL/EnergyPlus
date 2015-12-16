@@ -116,7 +116,7 @@ esac
 
 HEADER="=============== EnergyPlus ================="
 # Name of executable
-PRG_N=EnergyPlus
+PRG_N=energyplus
 # Name of ExpandObjects executable
 PRG_X=ExpandObjects
 # Name of EPMacro executable

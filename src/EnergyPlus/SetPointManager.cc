@@ -5176,7 +5176,7 @@ namespace SetPointManager {
 
 			// This hum rat is currently used in Controller:Simple, control variable "TEMPandHUMRAT" (Jan 2004)
 			// Negative MoistureLoad means a dehumidification load
-			if ( MoistureLoad < 0.0 ) this->SetPt = SupplyAirHumRat;
+			this->SetPt = SupplyAirHumRat;
 
 		}
 
