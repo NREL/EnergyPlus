@@ -1370,7 +1370,7 @@ namespace WindowAC {
 		}
 
 		// If the QZnReq <= FullOutput and a HXAssisted coil is used, check the node setpoint for a maximum humidity ratio set piont
-		// HumRatMax will either equal -999 if no setpoint exists or could be 0 if no moisture load is present
+		// HumRatMax will be equal to -999 if no setpoint exists or some set point managers may still use 0 as a no moisture load indicator
 		if ( QZnReq <= FullOutput && WindAC( WindACNum ).DXCoilType_Num == CoilDX_CoolingHXAssisted && Node( WindAC( WindACNum ).CoilOutletNodeNum ).HumRatMax <= 0.0 ) {
 			PartLoadFrac = 1.0;
 			return;
@@ -1406,6 +1406,7 @@ namespace WindowAC {
 			ShowRecurringWarningErrorAtEnd( "ZoneHVAC:WindowAirConditioner=\"" + WindAC( WindACNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", WindAC( WindACNum ).MaxIterIndex1 );
 		}
 
+		// HX is off up until this point where the outlet air humidity ratio is tested to see if HX needs to be turned on
 		if ( WindAC( WindACNum ).DXCoilType_Num == CoilDX_CoolingHXAssisted && Node( WindAC( WindACNum ).CoilOutletNodeNum ).HumRatMax < Node( WindAC( WindACNum ).CoilOutletNodeNum ).HumRat && Node( WindAC( WindACNum ).CoilOutletNodeNum ).HumRatMax > 0.0 ) {
 
 			//   Run the HX to recovery energy and improve latent performance
@@ -1443,7 +1444,7 @@ namespace WindowAC {
 				ShowRecurringWarningErrorAtEnd( "ZoneHVAC:WindowAirConditioner=\"" + WindAC( WindACNum ).Name + "\"  -- Exceeded max iterations error (latent runtime) continues...", WindAC( WindACNum ).MaxIterIndex2 );
 			}
 
-		} // WindAC(WindACNum)%DXCoilType_Num == CoilDX_CoolingHXAssisted .AND. &
+		} // WindAC(WindACNum)%DXCoilType_Num == CoilDX_CoolingHXAssisted && *
 
 	}
 
