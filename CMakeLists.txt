@@ -8,7 +8,7 @@ set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 4 )
 set( CMAKE_VERSION_PATCH 0 )
 
-set( PREV_RELEASE_SHA "832e4bb" )
+set( PREV_RELEASE_SHA "6d97d07" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
 
@@ -140,7 +140,6 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/jsoncpp)
-INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source can #include <ConfiguredFunctions.hh>
 
 if( BUILD_TESTING )
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
@@ -149,7 +148,6 @@ if( BUILD_TESTING )
 endif()
 
 # E+ required libraries
-ADD_SUBDIRECTORY(idd)
 ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(third_party/BCVTB)
@@ -172,19 +170,12 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(tst/jsoncpp/unit)
 endif()
 
-configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
-configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
-configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
-
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
   cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
-  file( COPY "idd/V8-4-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V8-5-0-Energy+.idd" )
-  file( COPY "src/Transition/SupportFiles/Report Variables 8-4-0 to 8-5-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
@@ -192,6 +183,10 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/CalcSoilSurfTemp PROJECT CalcSoilSurfTemp NO_EXTERNAL_INSTALL )
 endif()
+
+configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
+configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
+configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
@@ -356,4 +351,3 @@ endif()
 if (BUILD_DOCS)
   add_subdirectory(doc/src)
 endif()
-
