@@ -8967,7 +8967,7 @@ namespace HVACVariableRefrigerantFlow {
 		if ( FirstHVACIteration ) {
 			Par( 1 ) = 1.0;
 		} else {
-			Par( 2 ) = 0.0;
+			Par( 1 ) = 0.0;
 		}
 		Par( 2 ) = VRFTUNum;
 		Par( 3 ) = DXCoilNum;
