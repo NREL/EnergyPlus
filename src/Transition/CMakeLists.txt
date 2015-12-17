@@ -52,7 +52,6 @@ list( APPEND VERSIONS 8_1_0 )
 list( APPEND VERSIONS 8_2_0 )
 list( APPEND VERSIONS 8_3_0 )
 list( APPEND VERSIONS 8_4_0 )
-list( APPEND VERSIONS 8_5_0 )
 
 if(APPLE)
   if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
@@ -119,7 +118,7 @@ FOREACH( i RANGE 1 ${end} )
   if( "${i}" GREATER "22" )
     install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
   endif()
-  
+
 ENDFOREACH()
 
 # then install all the support files
