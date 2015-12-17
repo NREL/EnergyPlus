@@ -2661,15 +2661,15 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ",
 		"Curve:Biquadratic,",
 		"  HPACCoolCapFT Speed 1, !- Name",
-		"  0.476428E+00, !- Coefficient1 Constant",
-		"  0.401147E-01, !- Coefficient2 x",
-		"  0.226411E-03, !- Coefficient3 x**2",
-		"  -0.827136E-03, !- Coefficient4 y",
-		"  -0.732240E-05, !- Coefficient5 y**2",
-		"  -0.446278E-03, !- Coefficient6 x*y",
-		"  12.77778, !- Minimum Value of x",
-		"  23.88889, !- Maximum Value of x",
-		"  23.88889, !- Minimum Value of y",
+		"  1, !- Coefficient1 Constant",
+		"  0, !- Coefficient2 x",
+		"  0 !- Coefficient3 x**2",
+		"  0, !- Coefficient4 y",
+		"  0, !- Coefficient5 y**2",
+		"  0, !- Coefficient6 x*y",
+		"  0, !- Minimum Value of x",
+		"  0, !- Maximum Value of x",
+		"  0, !- Minimum Value of y",
 		"  46.11111, !- Maximum Value of y",
 		"  , !- Minimum Curve Output",
 		"  , !- Maximum Curve Output",
@@ -2679,21 +2679,21 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ",
 		"Curve:Cubic,",
 		"  HPACCoolCapFF Speed 1, !- Name",
-		"  .47278589, !- Coefficient1 Constant",
-		"  1.2433415, !- Coefficient2 x",
-		"  -1.0387055, !- Coefficient3 x**2",
-		"  .32257813, !- Coefficient4 x**3",
+		"  1, !- Coefficient1 Constant",
+		"  0, !- Coefficient2 x",
+		"  0, !- Coefficient3 x**2",
+		"  0, !- Coefficient4 x**3",
 		"  0.5, !- Minimum Value of x",
 		"  1.5;                     !- Maximum Value of x",
 		"  ",
 		"Curve:Biquadratic,",
 		"  HPACCOOLEIRFT Speed 1, !- Name",
-		"  0.632475E+00, !- Coefficient1 Constant",
-		"  -0.121321E-01, !- Coefficient2 x",
-		"  0.507773E-03, !- Coefficient3 x**2",
-		"  0.155377E-01, !- Coefficient4 y",
-		"  0.272840E-03, !- Coefficient5 y**2",
-		"  -0.679201E-03, !- Coefficient6 x*y",
+		"  1, !- Coefficient1 Constant",
+		"  0, !- Coefficient2 x",
+		"  0, !- Coefficient3 x**2",
+		"  0, !- Coefficient4 y",
+		"  0, !- Coefficient5 y**2",
+		"  0, !- Coefficient6 x*y",
 		"  12.77778, !- Minimum Value of x",
 		"  23.88889, !- Maximum Value of x",
 		"  23.88889, !- Minimum Value of y",
@@ -2706,10 +2706,10 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ",
 		"Curve:Cubic,",
 		"  HPACCOOLEIRFF Speed 1, !- Name",
-		"  .47278589, !- Coefficient1 Constant",
-		"  1.2433415, !- Coefficient2 x",
-		"  -1.0387055, !- Coefficient3 x**2",
-		"  .32257813, !- Coefficient4 x**3",
+		"  1, !- Coefficient1 Constant",
+		"  0, !- Coefficient2 x",
+		"  0, !- Coefficient3 x**2",
+		"  0, !- Coefficient4 x**3",
 		"  0.5, !- Minimum Value of x",
 		"  1.5;                     !- Maximum Value of x",
 		"  ",
@@ -2826,7 +2826,6 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	DataEnvironment::OutWetBulbTemp = 30.0;
 
 	AirLoopControlInfo.allocate( 1 );
-//	DataGlobals::SysSizingCalc = false;
 	DataGlobals::SysSizingCalc = true;
 
 	UnitarySystem( 1 ).ZoneInletNode = 3;
@@ -2896,7 +2895,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), false, _, _, _, _ );
 
-	EXPECT_NEAR( 0.949519, UnitarySystem( UnitarySysNum ).CycRatio, 0.0001 ); // cycling ratio
+	EXPECT_NEAR( 0.953404, UnitarySystem( UnitarySysNum ).CycRatio, 0.0001 ); // cycling ratio
 	EXPECT_EQ( 2, UnitarySystem( UnitarySysNum ).CoolingSpeedNum );
 	EXPECT_EQ( 1.0, UnitarySystem( UnitarySysNum ).CoolingSpeedRatio );
 
