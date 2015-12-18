@@ -117,15 +117,15 @@
     R410A,                   !- Refrigerant Type
     41300,                   !- Rated Evaporative Capacity {W}
     0.344,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {W/W}
-    ,                        !- Minimum Outdoor Air Temperature in Cooling Mode {C}
-    ,                        !- Maximum Outdoor Air Temperature in Cooling Mode {C}
-    ,                        !- Minimum Outdoor Air Temperature in Heating Mode {C}
-    ,                        !- Maximum Outdoor Air Temperature in Heating Mode {C}
+    -5,                      !- Minimum Outdoor Air Temperature in Cooling Mode {C}
+    43,                      !- Maximum Outdoor Air Temperature in Cooling Mode {C}
+    -20,                     !- Minimum Outdoor Air Temperature in Heating Mode {C}
+    22,                      !- Maximum Outdoor Air Temperature in Heating Mode {C}
     3,                       !- Reference Outdoor Unit Superheating Degrees {C}
     3,                       !- Reference Outdoor Unit Subcooling Degrees {C}
-    VariableTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit
-    ,                        !- Reference Evaporating Temperature for Indoor Unit {C}
-    ,                        !- Reference Condensing Temperature for Indoor Unit {C}
+    ConstantTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit
+    6,                       !- Reference Evaporating Temperature for Indoor Unit {C}
+    44,                      !- Reference Condensing Temperature for Indoor Unit {C}
     6,                       !- Variable Evaporating Temperature Minimum for Indoor Unit {C}
     13,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
     42,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
@@ -480,7 +480,7 @@
     TU1 VRF Supply Fan,      !- Name
     VRFAvailSched,           !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
-    200,                     !- Pressure Rise {Pa}
+    600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
     0,                       !- Fan Power Minimum Flow Fraction
@@ -500,7 +500,7 @@
     TU2 VRF Supply Fan,      !- Name
     VRFAvailSched,           !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
-    200,                     !- Pressure Rise {Pa}
+    600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
     0,                       !- Fan Power Minimum Flow Fraction
@@ -520,7 +520,7 @@
     TU3 VRF Supply Fan,      !- Name
     VRFAvailSched,           !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
-    200,                     !- Pressure Rise {Pa}
+    600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
     0,                       !- Fan Power Minimum Flow Fraction
@@ -540,7 +540,7 @@
     TU4 VRF Supply Fan,      !- Name
     VRFAvailSched,           !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
-    200,                     !- Pressure Rise {Pa}
+    600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
     0,                       !- Fan Power Minimum Flow Fraction
@@ -560,7 +560,7 @@
     TU5 VRF Supply Fan,      !- Name
     VRFAvailSched,           !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
-    200,                     !- Pressure Rise {Pa}
+    600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
     0,                       !- Fan Power Minimum Flow Fraction
