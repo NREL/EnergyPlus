@@ -524,7 +524,6 @@ namespace ChillerIndirectAbsorption {
 			if ( IndirectAbsorber( AbsorberNum ).CondVolFlowRate == AutoSize ) {
 				IndirectAbsorber( AbsorberNum ).CondVolFlowRateWasAutoSized = true;
 			}
-
 			if ( NumNums > 10 ) {
 				IndirectAbsorber( AbsorberNum ).GeneratorVolFlowRate = rNumericArgs( 11 );
 				if ( IndirectAbsorber( AbsorberNum ).GeneratorVolFlowRate == AutoSize ) {
@@ -1956,6 +1955,32 @@ namespace ChillerIndirectAbsorption {
 
 	// End of Record Keeping subroutines for the Absorption Chiller Module
 	// *****************************************************************************
+
+	// Clears the global data. Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		NumIndirectAbsorbers =  0 ;
+		CondMassFlowRate = 0.0 ;
+		EvapMassFlowRate = 0.0 ;
+		GenMassFlowRate = 0.0 ;
+		CondOutletTemp = 0.0 ;
+		EvapOutletTemp = 0.0 ;
+		GenOutletTemp = 0.0 ;
+		SteamOutletEnthalpy = 0.0 ;
+		PumpingPower = 0.0 ;
+		PumpingEnergy = 0.0 ;
+		QGenerator = 0.0 ;
+		GeneratorEnergy = 0.0 ;
+		QEvaporator = 0.0 ;
+		EvaporatorEnergy = 0.0 ;
+		QCondenser = 0.0 ;
+		CondenserEnergy = 0.0 ;
+		EnergyLossToEnvironment = 0.0 ;
+		ChillerONOFFCyclingFrac = 0.0 ;
+		IndirectAbsorber.deallocate();
+		IndirectAbsorberReport.deallocate();
+	}
 
 } // ChillerIndirectAbsorption
 

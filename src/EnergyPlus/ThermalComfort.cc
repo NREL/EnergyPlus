@@ -2384,6 +2384,7 @@ namespace ThermalComfort {
 			TotalAnyZoneNotMetCooling = 0.0;
 			TotalAnyZoneNotMetHeatingOccupied = 0.0;
 			TotalAnyZoneNotMetCoolingOccupied = 0.0;
+			TotalAnyZoneNotMetOccupied = 0.0;
 			// report how the aggregation is conducted
 			{ auto const SELECT_CASE_var( KindOfSim );
 			if ( SELECT_CASE_var == ksDesignDay ) {

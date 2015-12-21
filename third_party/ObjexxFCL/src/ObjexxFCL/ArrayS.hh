@@ -78,7 +78,6 @@ public: // Types
 protected: // Creation
 
 	// Default Constructor
-	inline
 	ArrayS() :
 	 data_( nullptr ),
 	 data_beg_( nullptr ),
@@ -88,7 +87,6 @@ protected: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	ArrayS( ArrayS const & a ) :
 	 BArray( a ),
 	 data_( a.data_ ),
@@ -99,7 +97,6 @@ protected: // Creation
 	{}
 
 	// Data Constructor
-	inline
 	ArrayS( T const * data, size_type const size ) :
 	 data_( const_cast< T * >( data ) ),
 	 data_beg_( nullptr ),
@@ -109,7 +106,6 @@ protected: // Creation
 	{}
 
 	// Non-Const Data Constructor
-	inline
 	ArrayS( T * data, size_type const size ) :
 	 data_( data ),
 	 data_beg_( nullptr ),
@@ -121,7 +117,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~ArrayS()
 	{}
@@ -129,7 +124,6 @@ public: // Creation
 public: // Predicate
 
 	// Active Array Empty?
-	inline
 	bool
 	empty() const
 	{
@@ -137,7 +131,6 @@ public: // Predicate
 	}
 
 	// Active Array Size Bounded?
-	inline
 	bool
 	size_bounded() const
 	{
@@ -145,7 +138,6 @@ public: // Predicate
 	}
 
 	// Contiguous?
-	inline
 	bool
 	contiguous() const
 	{
@@ -154,7 +146,6 @@ public: // Predicate
 
 	// Conformable?
 	template< class A >
-	inline
 	bool
 	conformable( A const & a ) const
 	{
@@ -180,7 +171,6 @@ public: // Predicate
 
 	// Memory Can Overlap an Array?
 	template< template< typename > class A >
-	inline
 	bool
 	overlap( A< T > const & a ) const
 	{
@@ -199,7 +189,6 @@ public: // Inspector
 	rank() const = 0;
 
 	// Active Array Size
-	inline
 	size_type
 	size() const
 	{
@@ -207,7 +196,6 @@ public: // Inspector
 	}
 
 	// Active Array Size
-	inline
 	int
 	isize() const
 	{
@@ -215,7 +203,6 @@ public: // Inspector
 	}
 
 	// Lower Index of a Dimension
-	inline
 	int
 	l( int const d ) const
 	{
@@ -242,7 +229,6 @@ public: // Inspector
 	isize( int const d ) const = 0;
 
 	// Array Data Pointer
-	inline
 	T const *
 	data() const
 	{
@@ -250,7 +236,6 @@ public: // Inspector
 	}
 
 	// Array Data Pointer
-	inline
 	T *
 	data()
 	{
@@ -258,7 +243,6 @@ public: // Inspector
 	}
 
 	// Array Data Begin Pointer
-	inline
 	T const *
 	data_beg() const
 	{
@@ -266,7 +250,6 @@ public: // Inspector
 	}
 
 	// Array Data Begin Pointer
-	inline
 	T *
 	data_beg()
 	{
@@ -274,7 +257,6 @@ public: // Inspector
 	}
 
 	// Array Data End Pointer
-	inline
 	T const *
 	data_end() const
 	{
@@ -282,7 +264,6 @@ public: // Inspector
 	}
 
 	// Array Data End Pointer
-	inline
 	T *
 	data_end()
 	{
@@ -292,7 +273,6 @@ public: // Inspector
 protected: // Static Methods
 
 	// Is Last Index in [1,u] Range?
-	inline
 	static
 	bool
 	in_range( int const u, int const i )
@@ -302,7 +282,6 @@ protected: // Static Methods
 	}
 
 	// Are Last Two Indexes in [1,u] Range?
-	inline
 	static
 	bool
 	in_range( int const u, int const i, int const j )
@@ -312,7 +291,6 @@ protected: // Static Methods
 	}
 
 	// Slice Constant for a Scalar Index
-	inline
 	static
 	std::int64_t
 	slice_k( IR const & range, int const i, std::int64_t const multiplier = 1 )
@@ -324,7 +302,6 @@ protected: // Static Methods
 	}
 
 	// Slice Constant for a Scalar Index
-	inline
 	static
 	std::int64_t
 	slice_k( int const u, int const i, std::int64_t const multiplier = 1 )

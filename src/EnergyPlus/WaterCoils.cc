@@ -181,7 +181,7 @@ namespace WaterCoils {
 	void
 	clear_state()
 	{
-		NumWaterCoils = 0; 
+		NumWaterCoils = 0;
 		InitWaterCoilOneTimeFlag = true;
 		MySizeFlag.deallocate();
 		MyUAAndFlowCalcFlag.deallocate();
@@ -1990,8 +1990,9 @@ namespace WaterCoils {
 //					MaxWaterVolFlowRateDes = 0.0;
 					ShowWarningError( "The design coil load is zero for Coil:Heating:Water " + WaterCoil( CoilNum ).Name );
 					ShowContinueError( "The autosize value for maximum water flow rate is zero" );
-					ShowContinueError( "To change this, input a value for UA, change the heating design day, or lower" );
-					ShowContinueError( "  the system heating design supply air temperature" );
+					ShowContinueError( "To change this, input a value for UA, change the heating design day, or raise the" );
+					ShowContinueError( "  system heating design supply air temperature. Also check to make sure the Preheat" );
+					ShowContinueError( "  Design Temperature is not the same as the Central Heating Design Supply Air Temperature. " );
 				}
 
 				// initialize the water coil inlet conditions
