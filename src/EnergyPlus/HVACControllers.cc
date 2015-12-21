@@ -208,11 +208,27 @@ namespace HVACControllers {
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAA( "(A,A)" );
+	static gio::Fmt fmtAAA( "(A,A,A)" );
+	static gio::Fmt fmtAAAA( "(A,A,A,A)" );
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
 	// Functions
+
+	// Needed for unit tests, should not be normally called.
+	void
+		clear_state()
+	{
+		NumControllers = 0;
+		NumAirLoopStats = 0;
+		GetControllerInputFlag = true;
+
+		ControllerProps.deallocate();
+		RootFinders.deallocate();
+		AirLoopStats.deallocate();
+		CheckEquipName.deallocate();
+	}
 
 	void
 	ManageControllers(
@@ -637,7 +653,7 @@ namespace HVACControllers {
 
 					if ( ControllerProps( Num ).ControlVar == iHumidityRatio || ControllerProps( Num ).ControlVar == iTemperatureAndHumidityRatio ) {
 						ResetHumidityRatioCtrlVarType( ControllerProps( Num ).SensedNode );
-					}					
+					}
 					CheckForSensorAndSetPointNode( ControllerProps( Num ).SensedNode, ControllerProps( Num ).ControlVar, NodeNotFound );
 
 					if ( NodeNotFound ) {
@@ -1130,7 +1146,7 @@ namespace HVACControllers {
 
 		} else if ( SELECT_CASE_var == iTemperatureAndHumidityRatio ) { // 'TemperatureAndHumidityRatio'
 			ControllerProps( ControlNum ).SensedValue = Node( SensedNode ).Temp;
-			// Done once per HVAC step
+			// Setpoint temp calculated once each HVAC time step to identify approach temp and whether or not humrat control is necessary
 			// WARNING: The scheme for computing the setpoint for the dual temperature and humidity ratio
 			//          control strategy breaks down whenever the sensed node temperature is modified by
 			//          a controller fired after the current one. Indeed the final sensed node temperature
@@ -1143,30 +1159,31 @@ namespace HVACControllers {
 				//       - Node(SensedNode)%HumRatMax
 				//       - Node(SensedNode)%Temp
 				//       - Node(SensedNode)%HumRat
-				if ( Node( SensedNode ).HumRatMax > 0 ) {
-					// Setpoint can only be computed when the sensed node temperature is evaluated at the max
-					// actuated value for the dual humidity ratio / temperature strategy.
+				if ( ( Node( SensedNode ).HumRatMax > 0 ) && ( Node( SensedNode ).HumRat > Node( SensedNode ).HumRatMax ) ) {
+					// Setpoint can only be computed once per time step
+					// Check if outlet air humidity ratio is greater than the set point. If so, calculate new temperature based set point.
 					// See routine CalcSimpleController() for the sequence of operations.
-					if ( ControllerProps( ControlNum ).NextActuatedValue == RootFinders( ControlNum ).MaxPoint.X ) {
-						// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-						ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress );
-						// Calculate the dew point temperature at the SA humidity ratio setpoint
-						DesiredDewPoint = PsyTdpFnWPb( Node( SensedNode ).HumRatMax, OutBaroPress );
-						// Adjust the calculated dew point temperature by the approach temp
-						HumidityControlTempSetPoint = DesiredDewPoint + ApproachTemp;
-						// NOTE: The next line introduces a potential discontinuity into the residual function
-						//       which could prevent the root finder from finding the root it if were done at each
-						//       controller iteration. For this reason we perform the setpoint calculation only
-						//       once when the air loop has been evaluated with the max actuated value.
-						//       See routine CalcSimpleController() for the sequence of operations.
-						ControllerProps( ControlNum ).SetPointValue = min( Node( SensedNode ).TempSetPoint, HumidityControlTempSetPoint ); // Pure temperature setpoint | Temperature setpoint to achieve the humidity ratio setpoint
-						// Overwrite the "pure" temperature setpoint with the actual setpoint that takes into
-						// account the humidity ratio setpoint.
-						// NOTE: Check that this does not create side-effects somewhere else in the code.
-						Node( SensedNode ).TempSetPoint = ControllerProps( ControlNum ).SetPointValue;
-						// Finally indicate thate the setpoint has been computed
-						ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
-					}
+					// Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
+					ApproachTemp = Node( SensedNode ).Temp - PsyTdpFnWPb( Node( SensedNode ).HumRat, OutBaroPress );
+					// Calculate the dew point temperature at the SA humidity ratio setpoint
+					DesiredDewPoint = PsyTdpFnWPb( Node( SensedNode ).HumRatMax, OutBaroPress );
+					// Adjust the calculated dew point temperature by the approach temp. Should be within 0.3C of air temperature.
+					HumidityControlTempSetPoint = DesiredDewPoint + min( 0.3, ApproachTemp );
+					// NOTE: The next line introduces a potential discontinuity into the residual function
+					//       which could prevent the root finder from finding the root it if were done at each
+					//       controller iteration. For this reason we perform the setpoint calculation only
+					//       once at the beginning of the controller and air loop simulation.
+					//       Use lower of temperature and humidity based set point.
+					//       See routine CalcSimpleController() for the sequence of operations.
+					ControllerProps( ControlNum ).SetPointValue = min( Node( SensedNode ).TempSetPoint, HumidityControlTempSetPoint ); // Pure temperature setpoint | Temperature setpoint to achieve the humidity ratio setpoint
+					// Don't allow set point temperature to be below the actuator node water temperature
+					ControllerProps( ControlNum ).SetPointValue = max( ControllerProps( ControlNum ).SetPointValue, Node( ControllerProps( ControlNum ).ActuatedNode ).Temp );
+					// Overwrite the "pure" temperature setpoint with the actual setpoint that takes into
+					// account the humidity ratio setpoint.
+					// NOTE: Check that this does not create side-effects somewhere else in the code.
+					Node( SensedNode ).TempSetPoint = ControllerProps( ControlNum ).SetPointValue;
+					// Finally indicate thate the setpoint has been computed
+					ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
 				} else {
 					// Pure temperature setpoint control strategy
 					ControllerProps( ControlNum ).SetPointValue = Node( SensedNode ).TempSetPoint;
@@ -2585,11 +2602,11 @@ Label100: ;
 
 		// FLOW
 
-		gio::write( FileUnit, fmtA ) << ThisPrimaryAirSystem.Name;
+		gio::write( FileUnit, fmtAA ) << ThisPrimaryAirSystem.Name << ',';
 
 		// Number of calls to SimAirLoop() has been invoked over the course of the simulation
 		// to simulate the specified air loop
-		gio::write( FileUnit, fmtAA ) << "NumCalls" << TrimSigDigits( ThisAirLoopStats.NumCalls );
+		gio::write( FileUnit, fmtAAA ) << "NumCalls" << ',' << TrimSigDigits( ThisAirLoopStats.NumCalls );
 
 		// Warm restart success ratio
 		NumWarmRestarts = ThisAirLoopStats.NumSuccessfulWarmRestarts + ThisAirLoopStats.NumFailedWarmRestarts;
@@ -2599,22 +2616,22 @@ Label100: ;
 			WarmRestartSuccessRatio = double( ThisAirLoopStats.NumSuccessfulWarmRestarts ) / double( NumWarmRestarts );
 		}
 
-		gio::write( FileUnit, fmtAA ) << "NumWarmRestarts" << TrimSigDigits( NumWarmRestarts );
-		gio::write( FileUnit, fmtAA ) << "NumSuccessfulWarmRestarts" << TrimSigDigits( ThisAirLoopStats.NumSuccessfulWarmRestarts );
-		gio::write( FileUnit, fmtAA ) << "NumFailedWarmRestarts" << TrimSigDigits( ThisAirLoopStats.NumFailedWarmRestarts );
-		gio::write( FileUnit, fmtAA ) << "WarmRestartSuccessRatio" << TrimSigDigits( WarmRestartSuccessRatio, 10 );
+		gio::write( FileUnit, fmtAAA ) << "NumWarmRestarts" << ',' << TrimSigDigits( NumWarmRestarts );
+		gio::write( FileUnit, fmtAAA ) << "NumSuccessfulWarmRestarts" << ',' << TrimSigDigits( ThisAirLoopStats.NumSuccessfulWarmRestarts );
+		gio::write( FileUnit, fmtAAA ) << "NumFailedWarmRestarts" << ',' << TrimSigDigits( ThisAirLoopStats.NumFailedWarmRestarts );
+		gio::write( FileUnit, fmtAAA ) << "WarmRestartSuccessRatio" << ',' << TrimSigDigits( WarmRestartSuccessRatio, 10 );
 
 		// Total number of times SimAirLoopComponents() has been invoked over the course of the simulation
 		// to simulate the specified air loop
-		gio::write( FileUnit, fmtAA ) << "TotSimAirLoopComponents" << TrimSigDigits( ThisAirLoopStats.TotSimAirLoopComponents );
+		gio::write( FileUnit, fmtAAA ) << "TotSimAirLoopComponents" << ',' << TrimSigDigits( ThisAirLoopStats.TotSimAirLoopComponents );
 		// Maximum number of times SimAirLoopComponents() has been invoked over the course of the simulation
 		// to simulate the specified air loop
-		gio::write( FileUnit, fmtAA ) << "MaxSimAirLoopComponents" << TrimSigDigits( ThisAirLoopStats.MaxSimAirLoopComponents );
+		gio::write( FileUnit, fmtAAA ) << "MaxSimAirLoopComponents" << ',' << TrimSigDigits( ThisAirLoopStats.MaxSimAirLoopComponents );
 
 		// Aggregated number of iterations needed by all controllers to simulate the specified air loop
-		gio::write( FileUnit, fmtAA ) << "TotIterations" << TrimSigDigits( ThisAirLoopStats.TotIterations );
+		gio::write( FileUnit, fmtAAA ) << "TotIterations" << ',' << TrimSigDigits( ThisAirLoopStats.TotIterations );
 		// Maximum number of iterations needed by controllers to simulate the specified air loop
-		gio::write( FileUnit, fmtAA ) << "MaxIterations" << TrimSigDigits( ThisAirLoopStats.MaxIterations );
+		gio::write( FileUnit, fmtAAA ) << "MaxIterations" << ',' << TrimSigDigits( ThisAirLoopStats.MaxIterations );
 
 		// Average number of iterations needed by controllers to simulate the specified air loop
 		if ( ThisAirLoopStats.NumCalls == 0 ) {
@@ -2623,12 +2640,12 @@ Label100: ;
 			AvgIterations = double( ThisAirLoopStats.TotIterations ) / double( ThisAirLoopStats.NumCalls );
 		}
 
-		gio::write( FileUnit, fmtAA ) << "AvgIterations" << TrimSigDigits( AvgIterations, 10 );
+		gio::write( FileUnit, fmtAAA ) << "AvgIterations" << ',' << TrimSigDigits( AvgIterations, 10 );
 
 		// Dump statistics for each controller on this air loop
 		for ( AirLoopControlNum = 1; AirLoopControlNum <= ThisPrimaryAirSystem.NumControllers; ++AirLoopControlNum ) {
 
-			gio::write( FileUnit, fmtA ) << ThisPrimaryAirSystem.ControllerName( AirLoopControlNum );
+			gio::write( FileUnit, fmtAA ) << ThisPrimaryAirSystem.ControllerName( AirLoopControlNum ) << ',';
 
 			// Aggregate iteration trackers across all operating modes
 			NumCalls = 0;
@@ -2644,11 +2661,11 @@ Label100: ;
 			}
 
 			// Number of times this controller was simulated (should match air loop num calls)
-			gio::write( FileUnit, fmtAA ) << "NumCalls" << TrimSigDigits( NumCalls );
+			gio::write( FileUnit, fmtAAA ) << "NumCalls" << ',' << TrimSigDigits( NumCalls );
 			// Aggregated number of iterations needed by this controller
-			gio::write( FileUnit, fmtAA ) << "TotIterations" << TrimSigDigits( TotIterations );
+			gio::write( FileUnit, fmtAAA ) << "TotIterations" << ',' << TrimSigDigits( TotIterations );
 			// Aggregated number of iterations needed by this controller
-			gio::write( FileUnit, fmtAA ) << "MaxIterations" << TrimSigDigits( MaxIterations );
+			gio::write( FileUnit, fmtAAA ) << "MaxIterations" << ',' << TrimSigDigits( MaxIterations );
 
 			// Average number of iterations needed by controllers to simulate the specified air loop
 			if ( NumCalls == 0 ) {
@@ -2656,20 +2673,20 @@ Label100: ;
 			} else {
 				AvgIterations = double( TotIterations ) / double( NumCalls );
 			}
-			gio::write( FileUnit, fmtAA ) << "AvgIterations" << TrimSigDigits( AvgIterations, 10 );
+			gio::write( FileUnit, fmtAAA ) << "AvgIterations" << ',' << TrimSigDigits( AvgIterations, 10 );
 
 			// Dump iteration trackers for each operating mode
 			for ( iModeNum = iFirstMode; iModeNum <= iLastMode; ++iModeNum ) {
 
-				gio::write( FileUnit, fmtA ) << ControllerModeTypes( iModeNum );
+				gio::write( FileUnit, fmtAA ) << ControllerModeTypes( iModeNum ) << ',';
 
 				// Number of times this controller operated in this mode
-				gio::write( FileUnit, fmtAA ) << "NumCalls" << TrimSigDigits( ThisAirLoopStats.ControllerStats( AirLoopControlNum ).NumCalls( iModeNum ) );
+				gio::write( FileUnit, fmtAAA ) << "NumCalls" << ',' << TrimSigDigits( ThisAirLoopStats.ControllerStats( AirLoopControlNum ).NumCalls( iModeNum ) );
 
 				// Aggregated number of iterations needed by this controller
-				gio::write( FileUnit, fmtAA ) << "TotIterations" << TrimSigDigits( ThisAirLoopStats.ControllerStats( AirLoopControlNum ).TotIterations( iModeNum ) );
+				gio::write( FileUnit, fmtAAA ) << "TotIterations" << ',' << TrimSigDigits( ThisAirLoopStats.ControllerStats( AirLoopControlNum ).TotIterations( iModeNum ) );
 				// Aggregated number of iterations needed by this controller
-				gio::write( FileUnit, fmtAA ) << "MaxIterations" << TrimSigDigits( ThisAirLoopStats.ControllerStats( AirLoopControlNum ).MaxIterations( iModeNum ) );
+				gio::write( FileUnit, fmtAAA ) << "MaxIterations" << ',' << TrimSigDigits( ThisAirLoopStats.ControllerStats( AirLoopControlNum ).MaxIterations( iModeNum ) );
 
 				// Average number of iterations needed by controllers to simulate the specified air loop
 				if ( ThisAirLoopStats.ControllerStats( AirLoopControlNum ).NumCalls( iModeNum ) == 0 ) {
@@ -2677,7 +2694,7 @@ Label100: ;
 				} else {
 					AvgIterations = double( ThisAirLoopStats.ControllerStats( AirLoopControlNum ).TotIterations( iModeNum ) ) / double( ThisAirLoopStats.ControllerStats( AirLoopControlNum ).NumCalls( iModeNum ) );
 				}
-				gio::write( FileUnit, fmtAA ) << "AvgIterations" << TrimSigDigits( AvgIterations, 10 );
+				gio::write( FileUnit, fmtAAA ) << "AvgIterations" << ',' << TrimSigDigits( AvgIterations, 10 );
 
 			}
 
@@ -2746,10 +2763,10 @@ Label100: ;
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( TraceFileUnit, TraceFileName, flags ); if ( flags.err() ) goto Label100; }
 
 		// List all controllers and their corrresponding handles into main trace file
-		gio::write( TraceFileUnit, fmtAA ) << "Num" << "Name";
+		gio::write( TraceFileUnit, fmtAAAA ) << "Num" << ',' << "Name" << ',';
 
 		for ( ControllerNum = 1; ControllerNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++ControllerNum ) {
-			gio::write( TraceFileUnit, fmtAA ) << TrimSigDigits( ControllerNum ) << PrimaryAirSystem( AirLoopNum ).ControllerName( ControllerNum );
+			gio::write( TraceFileUnit, fmtAAAA ) << TrimSigDigits( ControllerNum ) << ',' << PrimaryAirSystem( AirLoopNum ).ControllerName( ControllerNum ) << ',';
 			// SAME AS ControllerProps(ControllerIndex)%ControllerName BUT NOT YET AVAILABLE
 		}
 
@@ -2759,7 +2776,7 @@ Label100: ;
 		gio::write( TraceFileUnit, fmtLD );
 
 		// Write column header in main contoller trace file
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(12(A,A))", flags ) << "ZoneSizingCalc" << "SysSizingCalc" << "EnvironmentNum" << "WarmupFlag" << "SysTimeStamp" << "SysTimeInterval" << "BeginTimeStepFlag" << "FirstTimeStepSysFlag" << "FirstHVACIteration" << "AirLoopPass" << "AirLoopNumCallsTot" << "AirLoopConverged"; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(12(A,A))", flags ) << "ZoneSizingCalc" << ',' << "SysSizingCalc" << ',' << "EnvironmentNum" << ',' << "WarmupFlag" << ',' << "SysTimeStamp" << ',' << "SysTimeInterval" << ',' << "BeginTimeStepFlag" << ',' << "FirstTimeStepSysFlag" << ',' << "FirstHVACIteration" << ',' << "AirLoopPass" << ',' << "AirLoopNumCallsTot" << ',' << "AirLoopConverged" << ','; }
 
 		// Write headers for final state
 		for ( ControllerNum = 1; ControllerNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++ControllerNum ) {
@@ -2910,7 +2927,7 @@ Label100: ;
 
 		// Write step stamp to air loop trace file after reset
 		// Note that we do not go to the next line
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(4(A,A),2(A,A),6(A,A))", flags ) << TrimSigDigits( LogicalToInteger( ZoneSizingCalc ) ) << TrimSigDigits( LogicalToInteger( SysSizingCalc ) ) << TrimSigDigits( CurEnvirNum ) << TrimSigDigits( LogicalToInteger( WarmupFlag ) ) << CreateHVACTimeString() << MakeHVACTimeIntervalString() << TrimSigDigits( LogicalToInteger( BeginTimeStepFlag ) ) << TrimSigDigits( LogicalToInteger( FirstTimeStepSysFlag ) ) << TrimSigDigits( LogicalToInteger( FirstHVACIteration ) ) << TrimSigDigits( AirLoopPass ) << TrimSigDigits( AirLoopNumCalls ) << TrimSigDigits( LogicalToInteger( AirLoopConverged ) ); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(4(A,A),2(A,A),6(A,A))", flags ) << TrimSigDigits( LogicalToInteger( ZoneSizingCalc ) ) << ',' << TrimSigDigits( LogicalToInteger( SysSizingCalc ) ) << ',' << TrimSigDigits( CurEnvirNum ) << ',' << TrimSigDigits( LogicalToInteger( WarmupFlag ) ) << ',' << CreateHVACTimeString() << ',' << MakeHVACTimeIntervalString() << ',' << TrimSigDigits( LogicalToInteger( BeginTimeStepFlag ) ) << ',' << TrimSigDigits( LogicalToInteger( FirstTimeStepSysFlag ) ) << ',' << TrimSigDigits( LogicalToInteger( FirstHVACIteration ) ) << ',' << TrimSigDigits( AirLoopPass ) << ',' << TrimSigDigits( AirLoopNumCalls ) << ',' << TrimSigDigits( LogicalToInteger( AirLoopConverged ) ) << ','; }
 
 	}
 
@@ -3112,7 +3129,7 @@ Label100: ;
 		SensedNode = ControllerProps( ControlNum ).SensedNode;
 
 		// Write iteration stamp
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A),2(A,A),4(A,A))", flags ) << TrimSigDigits( CurEnvirNum ) << TrimSigDigits( LogicalToInteger( WarmupFlag ) ) << CreateHVACTimeString() << MakeHVACTimeIntervalString() << TrimSigDigits( AirLoopPass ) << TrimSigDigits( LogicalToInteger( FirstHVACIteration ) ) << TrimSigDigits( Operation ) << TrimSigDigits( ControllerProps( ControlNum ).NumCalcCalls ); }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(2(A,A),2(A,A),4(A,A))", flags ) << TrimSigDigits( CurEnvirNum ) << ',' << TrimSigDigits( LogicalToInteger( WarmupFlag ) ) << ',' << CreateHVACTimeString() << ',' << MakeHVACTimeIntervalString() << ',' << TrimSigDigits( AirLoopPass ) << ',' << TrimSigDigits( LogicalToInteger( FirstHVACIteration ) ) << ',' << TrimSigDigits( Operation ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).NumCalcCalls ) << ','; }
 
 		// Write detailed diagnostic
 		{ auto const SELECT_CASE_var( Operation );
@@ -3120,7 +3137,7 @@ Label100: ;
 
 			// Masss flow rate
 			// Convergence analysis
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(3(A,A),3(A,A),2(A,A),2(A,A),1(A,A))", flags ) << TrimSigDigits( Node( SensedNode ).MassFlowRate, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).ActuatedValue, 10 ) << TrimSigDigits( Node( SensedNode ).Temp, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).SetPointValue, 10 ) << ' ' << ' ' << TrimSigDigits( ControllerProps( ControlNum ).Mode ) << TrimSigDigits( LogicalToInteger( IsConvergedFlag ) ) << TrimSigDigits( ControllerProps( ControlNum ).NextActuatedValue, 10 ); } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(3(A,A),3(A,A),2(A,A),2(A,A),1(A,A))", flags ) << TrimSigDigits( Node( SensedNode ).MassFlowRate, 10 ) << ',' << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 10 ) << ',' << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).ActuatedValue, 10 ) << ',' << TrimSigDigits( Node( SensedNode ).Temp, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).SetPointValue, 10 ) << ',' << ' ' << ',' << ' ' << ',' << TrimSigDigits( ControllerProps( ControlNum ).Mode ) << ',' << TrimSigDigits( LogicalToInteger( IsConvergedFlag ) ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).NextActuatedValue, 10 ) << ','; } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
 			// No trace available for root finder yet
 			// Skip call to WriteRootFinderTrace()
@@ -3131,7 +3148,7 @@ Label100: ;
 		} else if ( SELECT_CASE_var == iControllerOpIterate ) {
 			// Masss flow rate
 			// Convergence analysis
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(8(A,A),2(A,A),1(A,A))", flags ) << TrimSigDigits( Node( SensedNode ).MassFlowRate, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).ActuatedValue, 10 ) << TrimSigDigits( Node( SensedNode ).Temp, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).SetPointValue, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).DeltaSensed, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).Offset, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).Mode ) << TrimSigDigits( LogicalToInteger( IsConvergedFlag ) ) << TrimSigDigits( ControllerProps( ControlNum ).NextActuatedValue, 10 ); } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(8(A,A),2(A,A),1(A,A))", flags ) << TrimSigDigits( Node( SensedNode ).MassFlowRate, 10 ) << ',' << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 10 ) << ',' << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).ActuatedValue, 10 ) << ',' << TrimSigDigits( Node( SensedNode ).Temp, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).SetPointValue, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).DeltaSensed, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).Offset, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).Mode ) << ',' << TrimSigDigits( LogicalToInteger( IsConvergedFlag ) ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).NextActuatedValue, 10 ) << ','; } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
 			// Append trace for root finder
 			WriteRootFinderTrace( TraceFileUnit, RootFinders( ControlNum ) );
@@ -3142,7 +3159,7 @@ Label100: ;
 		} else if ( SELECT_CASE_var == iControllerOpEnd ) {
 			// Masss flow rate
 			// Convergence analysis
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(3(A,A),5(A,A),2(A,A),1(A,A))", flags ) << TrimSigDigits( Node( SensedNode ).MassFlowRate, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).ActuatedValue, 10 ) << TrimSigDigits( Node( SensedNode ).Temp, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).SetPointValue, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).DeltaSensed, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).Offset, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).Mode ) << TrimSigDigits( LogicalToInteger( IsConvergedFlag ) ) << TrimSigDigits( ControllerProps( ControlNum ).NextActuatedValue, 10 ); } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(3(A,A),5(A,A),2(A,A),1(A,A))", flags ) << TrimSigDigits( Node( SensedNode ).MassFlowRate, 10 ) << ',' << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 10 ) << ',' << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).ActuatedValue, 10 ) << ',' << TrimSigDigits( Node( SensedNode ).Temp, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).SetPointValue, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).DeltaSensed, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).Offset, 10 ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).Mode ) << ',' << TrimSigDigits( LogicalToInteger( IsConvergedFlag ) ) << ',' << TrimSigDigits( ControllerProps( ControlNum ).NextActuatedValue, 10 ) << ','; } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
 			// No trace available for root finder yet
 			// Skip call to WriteRootFinderTrace()

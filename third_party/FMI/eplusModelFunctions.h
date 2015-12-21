@@ -62,7 +62,7 @@ DllExport fmiStatus fmiEPlusSetReal(fmiComponent *fmuInstance, const fmiValueRef
 DllExport fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint, 
 	fmiReal *commStepSize, fmiInteger *newStep, fmiInteger *index);
 
-DllExport fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index);
+DllExport fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index, fmiInteger *fmiEndSimulation);
 
 fmiStatus fmiEPlusResetSlave(fmiComponent *fmuInstance, fmiInteger *index); 
 
@@ -72,13 +72,13 @@ DllExport fmiInteger fmiEPlusUnpack(char* fmuName, char* fmuOutputWorkingFolder,
 DllExport fmiInteger addLibPathCurrentWorkingFolder(char* trimfmuOutputWorkingFolder_wLiB, 
 	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder, fmiInteger *index);
 
-DllExport fmiInteger getValueReferenceByNameFMUInputVariables(char* variableName, 
+DllExport fmiValueReference getValueReferenceByNameFMUInputVariables(char* variableName, 
 	fmiInteger *sizeVariableName, fmiInteger *index);
 
-DllExport fmiInteger getValueReferenceByNameFMUOutputVariables(char* variableName, 
+DllExport fmiValueReference getValueReferenceByNameFMUOutputVariables(char* variableName,
 	fmiInteger *sizeVariableName, fmiInteger *index);
 
-DllExport fmiInteger model_ID_GUID(char* fmuWorkingFolder, 
+DllExport fmiInteger model_ID_GUID(char* fmuInstanceName, char* fmuWorkingFolder,
 	fmiInteger *sizefmuWorkingFolder, fmiInteger *numInputs, 
 	fmiInteger *numOutputs);
 

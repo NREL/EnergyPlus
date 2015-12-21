@@ -28,55 +28,47 @@ class byte
 public: // Creation
 
 	// Default Constructor
-	inline
 	byte() :
 	 b_( static_cast< signed char >( 0 ) )
 	{}
 
 	// short Constructor
-	inline
 	explicit
 	byte( short int const i ) :
 	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// int Constructor
-	inline
 	explicit
 	byte( int const i ) :
 	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// long Constructor
-	inline
 	explicit
 	byte( long int const i ) :
 	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// long long Constructor
-	inline
 	explicit
 	byte( long long int const i ) :
 	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// char Constructor
-	inline
 	explicit
 	byte( signed char const c ) :
 	 b_( c )
 	{}
 
 	// Destructor
-	inline
 	~byte()
 	{}
 
 public: // Conversion
 
 	// short Conversion
-	inline
 	operator short int() const
 	{
 		return static_cast< short int >( b_ );
@@ -85,7 +77,6 @@ public: // Conversion
 public: // Assignment
 
 	// = short
-	inline
 	byte &
 	operator =( short int const i )
 	{
@@ -94,7 +85,6 @@ public: // Assignment
 	}
 
 	// += short
-	inline
 	byte &
 	operator +=( short int const i )
 	{
@@ -103,7 +93,6 @@ public: // Assignment
 	}
 
 	// -= short
-	inline
 	byte &
 	operator -=( short int const i )
 	{
@@ -112,7 +101,6 @@ public: // Assignment
 	}
 
 	// *= short
-	inline
 	byte &
 	operator *=( short int const i )
 	{
@@ -121,7 +109,6 @@ public: // Assignment
 	}
 
 	// /= short
-	inline
 	byte &
 	operator /=( short int const i )
 	{
@@ -133,7 +120,6 @@ public: // Assignment
 public: // Incrememt/Decrement
 
 	// ++byte
-	inline
 	byte &
 	operator ++()
 	{
@@ -142,7 +128,6 @@ public: // Incrememt/Decrement
 	}
 
 	// byte++
-	inline
 	byte const
 	operator ++( int )
 	{
@@ -152,7 +137,6 @@ public: // Incrememt/Decrement
 	}
 
 	// --byte
-	inline
 	byte &
 	operator --()
 	{
@@ -161,7 +145,6 @@ public: // Incrememt/Decrement
 	}
 
 	// byte--
-	inline
 	byte const
 	operator --( int )
 	{
@@ -173,7 +156,6 @@ public: // Incrememt/Decrement
 public: // Math
 
 	// +byte
-	inline
 	byte
 	operator +() const
 	{
@@ -181,7 +163,6 @@ public: // Math
 	}
 
 	// -byte
-	inline
 	byte
 	operator -() const
 	{
@@ -190,7 +171,6 @@ public: // Math
 
 	// byte + byte
 	friend
-	inline
 	byte
 	operator +( byte const & i, byte const & j )
 	{
@@ -199,7 +179,6 @@ public: // Math
 
 	// byte - byte
 	friend
-	inline
 	byte
 	operator -( byte const & i, byte const & j )
 	{
@@ -208,7 +187,6 @@ public: // Math
 
 	// byte * byte
 	friend
-	inline
 	byte
 	operator *( byte const & i, byte const & j )
 	{
@@ -217,7 +195,6 @@ public: // Math
 
 	// byte / byte
 	friend
-	inline
 	byte
 	operator /( byte const & i, byte const & j )
 	{
@@ -228,7 +205,6 @@ public: // Math
 public: // Bitwise Logical
 
 	// ~byte
-	inline
 	byte
 	operator ~() const
 	{
@@ -236,7 +212,6 @@ public: // Bitwise Logical
 	}
 
 	// byte >> std::size_t
-	inline
 	byte
 	operator >>( std::size_t const n ) const
 	{
@@ -244,7 +219,6 @@ public: // Bitwise Logical
 	}
 
 	// byte >> byte
-	inline
 	byte
 	operator >>( byte const n ) const
 	{
@@ -252,7 +226,6 @@ public: // Bitwise Logical
 	}
 
 	// byte << std::size_t
-	inline
 	byte
 	operator <<( std::size_t const n ) const
 	{
@@ -260,7 +233,6 @@ public: // Bitwise Logical
 	}
 
 	// byte << byte
-	inline
 	byte
 	operator <<( byte const n ) const
 	{
@@ -268,7 +240,6 @@ public: // Bitwise Logical
 	}
 
 	// &= byte
-	inline
 	byte &
 	operator &=( byte const & i )
 	{
@@ -277,7 +248,6 @@ public: // Bitwise Logical
 	}
 
 	// |= byte
-	inline
 	byte &
 	operator |=( byte const & i )
 	{
@@ -286,7 +256,6 @@ public: // Bitwise Logical
 	}
 
 	// ^= byte
-	inline
 	byte &
 	operator ^=( byte const & i )
 	{
@@ -296,7 +265,6 @@ public: // Bitwise Logical
 
 	// byte & byte
 	friend
-	inline
 	byte
 	operator &( byte const & i, byte const & j )
 	{
@@ -305,7 +273,6 @@ public: // Bitwise Logical
 
 	// byte | byte
 	friend
-	inline
 	byte
 	operator |( byte const & i, byte const & j )
 	{
@@ -314,7 +281,6 @@ public: // Bitwise Logical
 
 	// byte ^ byte
 	friend
-	inline
 	byte
 	operator ^( byte const & i, byte const & j )
 	{
@@ -325,7 +291,6 @@ public: // Comparison
 
 	// byte == byte
 	friend
-	inline
 	bool
 	operator ==( byte const & i, byte const & j )
 	{
@@ -334,7 +299,6 @@ public: // Comparison
 
 	// byte != byte
 	friend
-	inline
 	bool
 	operator !=( byte const & i, byte const & j )
 	{
@@ -343,7 +307,6 @@ public: // Comparison
 
 	// byte < byte
 	friend
-	inline
 	bool
 	operator <( byte const & i, byte const & j )
 	{
@@ -352,7 +315,6 @@ public: // Comparison
 
 	// byte <= byte
 	friend
-	inline
 	bool
 	operator <=( byte const & i, byte const & j )
 	{
@@ -361,7 +323,6 @@ public: // Comparison
 
 	// byte > byte
 	friend
-	inline
 	bool
 	operator >( byte const & i, byte const & j )
 	{
@@ -370,7 +331,6 @@ public: // Comparison
 
 	// byte >= byte
 	friend
-	inline
 	bool
 	operator >=( byte const & i, byte const & j )
 	{
@@ -381,7 +341,6 @@ public: // I/O
 
 	// Stream >> byte
 	friend
-	inline
 	std::istream &
 	operator >>( std::istream & stream, byte & b )
 	{
@@ -395,7 +354,6 @@ public: // I/O
 
 	// Stream << byte
 	friend
-	inline
 	std::ostream &
 	operator <<( std::ostream & stream, byte const & b )
 	{
