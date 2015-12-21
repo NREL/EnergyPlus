@@ -486,8 +486,10 @@ namespace InputProcessor {
 		}
 
 		if ( OverallErrorFlag ) {
-			ShowSevereError( "IP: Possible incorrect IDD File" );
-			ShowContinueError( "IDD Version:\"" + IDDVerString + "\"" );
+			if (IDDVerString.find(MatchVersion) == std::string::npos) {
+				ShowSevereError("IP: Possible incorrect IDD File");
+				ShowContinueError(IDDVerString + " not the same as expected =\"" + MatchVersion + "\"");
+			}
 			for ( Loop = 1; Loop <= NumIDFRecords; ++Loop ) {
 				if ( SameString( IDFRecords( Loop ).Name, "Version" ) ) {
 					std::string::size_type const lenVer( len( MatchVersion ) );
@@ -496,7 +498,7 @@ namespace InputProcessor {
 					} else {
 						Which = static_cast< int >( index( IDFRecords( Loop ).Alphas( 1 ), MatchVersion ) );
 					}
-					if ( Which != 1 ) {
+					if ( Which != 0 ) {
 						ShowContinueError( "Version in IDF=\"" + IDFRecords( Loop ).Alphas( 1 ) + "\" not the same as expected=\"" + MatchVersion + "\"" );
 					}
 					break;

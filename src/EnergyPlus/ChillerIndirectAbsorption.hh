@@ -310,6 +310,10 @@ namespace ChillerIndirectAbsorption {
 	// End of Record Keeping subroutines for the Absorption Chiller Module
 	// *****************************************************************************
 
+	void
+	clear_state();
+
+
 } // ChillerIndirectAbsorption
 
 } // EnergyPlus

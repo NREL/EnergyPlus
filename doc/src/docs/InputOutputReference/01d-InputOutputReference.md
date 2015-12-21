@@ -15230,11 +15230,14 @@ AvailabilityManager:OptimumStart,
 
 ### AvailabilityManager:OptimumStart Outputs
 
-The optimum start availability manager has one output variable.
+The optimum start availability manager has two output variables.
+
+#### Availability Manager Night Ventilation Control Status
+A value of 0 indicates the manager is signaling NoAction. A value of 2 means the manager is signaling CycleOn.
 
 #### Availability Manager Optimum Start Hours Before Occupancy
 
-The unit is in hour.
+The current time before occupancy.  Occupancy is the first zone timestep after midnight when the Fan Schedule is > 0.0.  The units are hours.
 
 Group     Setpoint Managers
 -------------------------
@@ -16906,9 +16909,9 @@ A controller mimics the function of an actual physical controller in a somewhat 
 
 ### Controller:WaterCoil
 
-This controller is really a solution inverter. For a water coil the simulation cannot be inverted where the mass flow rate of the water through the coil can be solved directly given an air temperature. Thus, this    controller    will numerically step through all of the water flow possibilities by an interval-halving technique until the mass flow rate is determined to meet the specified outlet air temperature within a specified user tolerance.
+This controller is really a solution inverter. For a water coil the simulation cannot be inverted where the mass flow rate of the water through the coil can be solved directly given an air temperature. Thus, this controller will numerically step through all of the water flow possibilities by an interval-halving technique until the mass flow rate is determined to meet the specified outlet air temperature within a specified user tolerance.
 
-As the reader probably noted when reading the descriptions of the coil syntax shown earlier in this section, there were no controls attached directly to a particular component. This is because the input can be simplified somewhat by entering node names to be controlled. This avoids having to search through multiple lists of component types for the sake of simply controlling components. The Controller:WaterCoil shown below is a way of controlling variables at one node based on conditions at another node. After the identifying name for the controller, the user must define which control variable the controller is managing. These options include Temperature, Humidity Ratio, TemperatureAndHumidityRatio), or Flow.
+As the reader probably noted when reading the descriptions of the coil syntax shown earlier in this section, there were no controls attached directly to a particular component. This is because the input can be simplified somewhat by entering node names to be controlled. This avoids having to search through multiple lists of component types for the sake of simply controlling components. The Controller:WaterCoil shown below is a way of controlling variables at one node based on conditions at another node. After the identifying name for the controller, the user must define which control variable the controller is managing. These options include Temperature, Humidity Ratio, TemperatureAndHumidityRatio, or Flow.
 
 The next parameter in the input syntax is the Action of the control, which determines how the controlled variable (e.g., mass flow rate through a water coil) is changed based on the control signal. The following input parameter is the actuator variable, which is currently limited to mass flow through a water coil.
 
@@ -16920,11 +16923,11 @@ This is the unique name of the controller.
 
 #### Field: Control Variable
 
-This was setup to be generic but to date has only been used for temperature control, or temperature and humidity ratio control, of a water coil in the air loop simulation. The keyword Temperature is used for air temperature control and is normally specified for the coil   s outlet air node. The keyword TemperatureAndHumidityRatio is used for controlling both air temperature and high humidity levels, and is normally specified for a cooling coil   s outlet air node. The keyword HumidityRatio is used for humidity control and would normally be specified for a dehumidifier outlet node. These two keywords require a ZoneControl:Humidistat object and a maximum humidity setpoint manager object (   SetPointManager:SingleZone:Humidity:Maximum   ,    SetPointManager:MultiZone:MaximumHumidity:Average    or    SetPointManager:MultiZone:Humidity:Maximum   ). If the coil is located in the outdoor air stream, it may also be necessary to use SetpointManager:OutdoorAirPretreat.
+This was setup to be generic but to date has only been used for temperature control, or temperature and humidity ratio control, of a water coil in the air loop simulation. The keyword Temperature is used for air temperature control and is normally specified for the coils outlet air node. The keyword TemperatureAndHumidityRatio is used for controlling both air temperature and high humidity levels, and is normally specified for a cooling coils outlet air node. The keyword HumidityRatio is used for humidity control and would normally be specified for a dehumidifier outlet node. These two keywords require a ZoneControl:Humidistat object and a maximum humidity setpoint manager object (SetPointManager:SingleZone:Humidity:Maximum, SetPointManager:MultiZone:MaximumHumidity:Average or  SetPointManager:MultiZone:Humidity:Maximum). If the coil is located in the outdoor air stream, it may also be necessary to use SetpointManager:OutdoorAirPretreat.
 
 #### Field: Action
 
-The next input refers to the action of the control. This can be best described by an example. In a coil where water mass flow rate is to be controlled, a coil will increase the mass flow rate through the coil when more heating or cooling is requested. In a heating coil, this increases the value of heat transfer from the water to the air stream. As a result, this is considered a    Normal    action controller. In a cooling coil, an increase in water mass flow rate through the coil decreases the value of heat transfer from the water to the air stream (absolute value increases, but since cooling is traditionally described as a negative number, an increase in absolute value results in a decrease in the actual heat transfer value). Thus, the cooling coil controller has    Reverse    action since an increase in flow rate results in a decrease in heat transfer.
+The next input refers to the action of the control. This can be best described by an example. In a coil where water mass flow rate is to be controlled, a coil will increase the mass flow rate through the coil when more heating or cooling is requested. In a heating coil, this increases the value of heat transfer from the water to the air stream. As a result, this is considered a Normal action controller. In a cooling coil, an increase in water mass flow rate through the coil decreases the value of heat transfer from the water to the air stream (absolute value increases, but since cooling is traditionally described as a negative number, an increase in absolute value results in a decrease in the actual heat transfer value). Thus, the cooling coil controller has Reverse action since an increase in flow rate results in a decrease in heat transfer.
 
 #### Field: Actuator Variable
 
@@ -16956,30 +16959,30 @@ An example of this object in an IDF, along with appropriate setpoint managers, i
 
 ```idf
    Controller:WaterCoil,
-       Central Cooling Coil Contoller 1,         !- Name
-       TemperatureAndHumidityRatio,                   !- Control Variable
-       Reverse,                                                           !- Action
-       Flow,                                                                 !- Actuator Variable
-       VAV Sys 1 Outlet Node,                               !- Sensor Node Name
-       Main Cooling Coil 1 Water Inlet Node, !- Actuator Node Name
-       0.002,                                                               !- Controller Convergence Tolerance {deltaC}
-       0.025,                                                               !- Maximum Actuated Flow {m3/s}
-       0.0;                                                                   !- Minimum Actuated Flow {m3/s}
+     Central Cooling Coil Contoller 1,     !- Name
+     TemperatureAndHumidityRatio,          !- Control Variable
+     Reverse,                              !- Action
+     Flow,                                 !- Actuator Variable
+     VAV Sys 1 Outlet Node,                !- Sensor Node Name
+     Main Cooling Coil 1 Water Inlet Node, !- Actuator Node Name
+     0.002,                                !- Controller Convergence Tolerance {deltaC}
+     0.025,                                !- Maximum Actuated Flow {m3/s}
+     0.0;                                  !- Minimum Actuated Flow {m3/s}
 
 
    SetpointManager:SingleZone:Humidity:Maximum,
-       Zone Max Set Point Manager,                     !- Name
-       ,                                                                         !- Control Variable
-       ,                                                                         !- Schedule name
-       VAV Sys 1 Outlet Node,                               !- Setpoint Node or NodeList Name
-       Zone 2 Node;                                                   !- Control Zone Air Node Name
+     Zone Max Set Point Manager,           !- Name
+     ,                                     !- Control Variable
+     ,                                     !- Schedule name
+     VAV Sys 1 Outlet Node,                !- Setpoint Node or NodeList Name
+     Zone 2 Node;                          !- Control Zone Air Node Name
 
 
    SetpointManager:Scheduled,
-       Scheduled Set Point Manager 1,               !- Name
-       Temperature,                                                   !- Control Variable
-       Seasonal Reset Supply Air Temp Sch,     !- Schedule Name
-       VAV Sys 1 Outlet Node;                               !- Setpoint Node or NodeList Name
+     Scheduled Set Point Manager 1,        !- Name
+     Temperature,                          !- Control Variable
+     Seasonal Reset Supply Air Temp Sch,   !- Schedule Name
+     VAV Sys 1 Outlet Node;                !- Setpoint Node or NodeList Name
 ```
 
 
@@ -16989,9 +16992,9 @@ A mixed air box has its own controller type called Controller:OutdoorAir. The pu
 
 If all the limits are satisfied, the outdoor air controller does the following for continuous air flow systems: if the outdoor air temperature is greater than or equal to the mixed air temperature setpoint, the outdoor air flow rate is set to the maximum; if the outdoor air temperature is less than the mixed air temperature setpoint, the outdoor air controller will modulate the outdoor air flow so that the mixed air temperature will match the mixed air setpoint temperature.
 
-A time-of-day schedule may also be used to simulate an increase in outdoor air flow rate for    push-button    type economizer applications. When the schedule permits (i.e., schedule values are greater than 0), the outdoor air flow rate is increased to the user-specified maximum outdoor air flow rate.
+A time-of-day schedule may also be used to simulate an increase in outdoor air flow rate for push-button type economizer applications. When the schedule permits (i.e., schedule values are greater than 0), the outdoor air flow rate is increased to the user-specified maximum outdoor air flow rate.
 
-The outdoor air controller can also account for changes in the outdoor air flow rate during times when indoor humidity levels are high. A zone humidistat must be used with this control option. During high indoor humidity, the outdoor air flow rate is modified in response to a high indoor humidity condition. If high humidity control is based on the outdoor air humidity ratio and the outdoor humidity ratio is greater than the indoor humidity ratio, high humidity control is terminated. When the economizer is used in conjunction with the high humidity control option, high humidity control has priority and controls the change in air flow rates. The Night Ventilation Availability Manager has priority over high humidity control and will use the controller   s maximum outdoor air flow rate when this Availability Manager cycles the fan on (Ref. System Availability Managers     AvailabilityManager:NightVentilation)
+The outdoor air controller can also account for changes in the outdoor air flow rate during times when indoor humidity levels are high. A zone humidistat must be used with this control option. During high indoor humidity, the outdoor air flow rate is modified in response to a high indoor humidity condition. If high humidity control is based on the outdoor air humidity ratio and the outdoor humidity ratio is greater than the indoor humidity ratio, high humidity control is terminated. When the economizer is used in conjunction with the high humidity control option, high humidity control has priority and controls the change in air flow rates. The Night Ventilation Availability Manager has priority over high humidity control and will use the controllers maximum outdoor air flow rate when this Availability Manager cycles the fan on (Ref. System Availability Managers AvailabilityManager:NightVentilation)
 
 The mixed air box connections are defined separately in the **OutdoorAir:Mixer** object.
 
@@ -17073,25 +17076,25 @@ There are two choices for this Field: **MinimumFlowWithBypass** and **ModulateFl
 
 **ModulateFlow** means the outdoor air flow rate will be increased to meet the mixed air setpoint temperature, subject to the limits imposed via other inputs for this object (e.g., Economizer Maximum Limit Dry-Bulb Temperature, Maximum Outdoor Air Flow Rate, etc.).
 
-**MinimumFlowWithBypass** is used exclusively in conjunction with air-to-air heat exchanger:objects (Ref. HeatExchanger:\*) for providing free cooling operation in the absence of a conventional air-side economizer (i.e., when outdoor air flow rate is not increased during economizer mode). The MinimumFlowWithBypass choice forces the outdoor air flow rate to always remain at the minimum. However, when high humidity control is used, the outdoor air flow rate is set to the product of the maximum outdoor air flow rate multiplied by the high humidity outdoor air flow ratio. The heat exchanger uses the limit checking in the outdoor air controller to decide whether or not to bypass the outdoor air around the heat exchanger     or turn off the wheel motor in the case of a rotary heat exchanger. Heat exchange is also suspended when high humidity control is active.
+**MinimumFlowWithBypass** is used exclusively in conjunction with air-to-air heat exchanger:objects (Ref. HeatExchanger:\*) for providing free cooling operation in the absence of a conventional air-side economizer (i.e., when outdoor air flow rate is not increased during economizer mode). The MinimumFlowWithBypass choice forces the outdoor air flow rate to always remain at the minimum. However, when high humidity control is used, the outdoor air flow rate is set to the product of the maximum outdoor air flow rate multiplied by the high humidity outdoor air flow ratio. The heat exchanger uses the limit checking in the outdoor air controller to decide whether or not to bypass the outdoor air around the heat exchanger or turn off the wheel motor in the case of a rotary heat exchanger. Heat exchange is also suspended when high humidity control is active.
 
 The **ModulateFlow** option can also be used with the HeatExchanger:AirToAir:FlatPlate or HeatExchanger:AirToAir:SensibleAndLatent objects.
 
 #### Field: Economizer Maximum Limit Dry-Bulb Temperature
 
-Input for this field is the outdoor air temperature high limit ( &deg;C) for economizer operation. If the outdoor air temperature is above this limit, the outdoor airflow rate will be set to the minimum. This field is required if Economizer Control Type    FixedDryBulb    or    FixedDewPointAndDryBulb    has been specified.
+Input for this field is the outdoor air temperature high limit ( &deg;C) for economizer operation. If the outdoor air temperature is above this limit, the outdoor airflow rate will be set to the minimum. This field is required if Economizer Control Type    FixedDryBulb or FixedDewPointAndDryBulb has been specified.
 
 No input (blank) in this field means that there is no outdoor air temperature high limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Economizer Maximum Limit Enthalpy
 
-Input for this field is the outdoor air enthalpy limit (in J/kg) for economizer operation. If the outdoor air enthalpy is above this value, the outdoor airflow rate will be set to the minimum. This field is required if Economizer Control Type    FixedEnthalpy    has been specified.
+Input for this field is the outdoor air enthalpy limit (in J/kg) for economizer operation. If the outdoor air enthalpy is above this value, the outdoor airflow rate will be set to the minimum. This field is required if Economizer Control Type FixedEnthalpy has been specified.
 
 No input (blank) in this field means that there is no outdoor air enthalpy limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
 #### Field: Economizer Maximum Limit Dewpoint Temperature
 
-Input for this field is the outdoor air dewpoint limit ( &deg;C) for economizer operation. If the outdoor air dewpoint temperature is above this value, the outdoor airflow rate will be set to the minimum. This field is required if the Economizer Control Type FixedDewPointAndDryBulb has been specified.
+Input for this field is the outdoor air dewpoint limit (&deg;C) for economizer operation. If the outdoor air dewpoint temperature is above this value, the outdoor airflow rate will be set to the minimum. This field is required if the Economizer Control Type FixedDewPointAndDryBulb has been specified.
 
 No input (blank) in this field means that there is no outdoor air dewpoint limit control. This limit applies to the conditions at the Actuator Node regardless of whether or not there are any other components in the outdoor air path upstream of the mixer. If non-blank, this limit is applied regardless of the specified Economizer Control Type.
 
@@ -17119,11 +17122,11 @@ Choices for this field are FixedMinimum or ProportionalMinimum. FixedMinimum mea
 
 #### Field: Minimum Outdoor Air Schedule Name
 
-The name of a schedule which uses decimal values (0.0     1.0).   These values are multiplied by the minimum outdoor air flow rate. This schedule is useful for reducing the outdoor air flow rate to zero during unoccupied or start up hours. If this field is not entered, the minimum outdoor air flow rate either remains constant during the simulation period (Minimum Outdoor Air Control Type = FixedMinimum) or varies in proportion to the supply air flow rate (Minimum Outdoor Air Control Type = ProportionalMinimum).
+The name of a schedule which uses decimal values (e.g., 0.0 or 1.0).   These values are multiplied by the minimum outdoor air flow rate. This schedule is useful for reducing the outdoor air flow rate to zero during unoccupied or start up hours. If this field is not entered, the minimum outdoor air flow rate either remains constant during the simulation period (Minimum Outdoor Air Control Type = FixedMinimum) or varies in proportion to the supply air flow rate (Minimum Outdoor Air Control Type = ProportionalMinimum).
 
 #### Field: Minimum Fraction of Outdoor Air Schedule Name
 
-The name of a schedule which uses decimal values (0.0     1.0) These values are multiplied by the total (design) air flow rate.   This is an alternate method for specifying the minimum outdoor air amount.   (The other method is the ***Minimum Outdoor Air Schedule*** *described above.)   Note:   This field overrides **Minimum Outdoor Air Schedule** and **Minimum Outdoor Air Flowrate.***
+The name of a schedule which uses decimal values (0.0     1.0) These values are multiplied by the total (design) air flow rate.   This is an alternate method for specifying the minimum outdoor air amount. (The other method is the ***Minimum Outdoor Air Schedule*** *described above.)   Note: This field overrides **Minimum Outdoor Air Schedule** and **Minimum Outdoor Air Flowrate.***
 
 #### Field: Maximum Fraction of Outdoor Air Schedule Name
 
@@ -27177,7 +27180,7 @@ Curve:ChillerPartLoadCustom,
 
 This curve is a function of two independent variables. Input consists of the curve name, the six coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the quadratic linear curve:
 
-<div>\[y = \left( {{C_1} + {C_2}*x + {C_3}*{x^2} + {C_4}*{x^3}} \right) + \left( {{C_4} + {C_5}*x + {C_6}*{x^2}} \right)*y\]</div>
+<div>\[z = \left( {{C_1} + {C_2}*x + {C_3}*{x^2}} \right) + \left( {{C_4} + {C_5}*x + {C_6}*{x^2}} \right)*y\]</div>
 
 #### Field: Name
 

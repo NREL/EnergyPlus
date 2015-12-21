@@ -11983,9 +11983,9 @@ namespace OutputReportTabular {
 						if ( ZoneNum != iZone ) continue;
 						if ( ZoneNum == 0 ) continue;
 						if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
-						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Cooling," << Zone( iZone ).Name << Surface( kSurf ).Name; }
+						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Cooling," << Zone( iZone ).Name << ',' << Surface( kSurf ).Name; }
 						for ( jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
-							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << decayCurveCool( jTime, kSurf ); }
+							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << ',' << decayCurveCool( jTime, kSurf ); }
 						}
 						{ IOFlags flags; flags.ADVANCE( "YES" ); gio::write( OutputFileInits, "()", flags ); } //put a line feed at the end of the line
 					}
@@ -12464,9 +12464,9 @@ namespace OutputReportTabular {
 						if ( ZoneNum != iZone ) continue;
 						if ( ZoneNum == 0 ) continue;
 						if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
-						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Heating," << Zone( iZone ).Name << Surface( kSurf ).Name; }
+						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Heating," << Zone( iZone ).Name << ',' << Surface( kSurf ).Name; }
 						for ( jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
-							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << decayCurveHeat( jTime, kSurf ); }
+							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << ',' << decayCurveHeat( jTime, kSurf ); }
 						}
 						{ IOFlags flags; flags.ADVANCE( "YES" ); gio::write( OutputFileInits, "()", flags ); } //put a line feed at the end of the line
 					}
