@@ -5720,7 +5720,7 @@ namespace OutputReportTabular {
 
 		procIn = inString;
 		inLen = len( procIn );
-		startTab = std::string::npos;
+		startTab = 0;
 		endTab = index( procIn, tb );
 		if ( endTab != std::string::npos ) {
 			procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
@@ -5737,7 +5737,11 @@ namespace OutputReportTabular {
 			}
 		}
 		if ( startTab < endTab ) {
-			resultString = procIn.substr( startTab + 1, endTab - startTab - 1 ); // extract but leave tab characters out
+			if ( startTab > 0 ){
+				resultString = procIn.substr( startTab + 1, endTab - startTab - 1 ); // extract but leave tab characters out
+			} else {
+				resultString = procIn.substr( startTab, endTab - startTab ); // special case of first column
+			}
 		} else {
 			resultString = "";
 		}
