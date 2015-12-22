@@ -12144,12 +12144,12 @@ namespace OutputReportTabular {
 
 					//DOAS
 					tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
-					grandTotalRow( cSensDelay ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+					totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+					grandTotalRow( cSensDelay ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
 
 					tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
-					grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+					totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+					grandTotalRow( cLatent ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
 
 					//INFILTRATION
 					seqData = infilInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
