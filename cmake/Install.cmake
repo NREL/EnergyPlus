@@ -151,6 +151,10 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/release/${RULES_XLS}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" "PreProcess/HVACCurveFitTool/")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.4.0/release/Report%20Variables%208-3-0%20to%208-4-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-3-0 to 8-4-0.csv")
+install(FILES "${CMAKE_SOURCE_DIR}/idd/V7-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-0-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-3-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V8-4-0-Energy+.idd" )
 
