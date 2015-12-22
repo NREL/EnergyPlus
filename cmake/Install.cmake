@@ -139,6 +139,8 @@ INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
   PATTERN _* EXCLUDE
   PATTERN *.ddy EXCLUDE
   PATTERN CMakeLists.txt EXCLUDE
+  PATTERN performance EXCLUDE
+  PATTERN *.list EXCLUDE
 )
 
 # TODO Remove version from file name or generate
