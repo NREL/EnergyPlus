@@ -6,15 +6,18 @@
 # IDF_FILE
 # EPW_FILE
 # BUILD_FORTRAN
+# TEST_FILE_FOLDER
 # ENERGYPLUS_FLAGS
+# RUN_CALLGRIND
+# VALGRIND
 
 get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
 get_filename_component(IDF_EXT "${IDF_FILE}" EXT)
 get_filename_component(EXE_PATH "${ENERGYPLUS_EXE}" PATH)
 
 # Create path variables
-set (OUTPUT_DIR_PATH "${BINARY_DIR}/testfiles/${IDF_NAME}/")
-set (IDF_PATH "${SOURCE_DIR}/testfiles/${IDF_FILE}")
+set (OUTPUT_DIR_PATH "${BINARY_DIR}/${TEST_FILE_FOLDER}/${IDF_NAME}/")
+set (IDF_PATH "${SOURCE_DIR}/${TEST_FILE_FOLDER}/${IDF_FILE}")
 set (PRODUCT_PATH "${BINARY_DIR}/Products/")
 set (EXE_PATH "${EXE_PATH}/")
 set (EPW_PATH "${SOURCE_DIR}/weather/${EPW_FILE}")
@@ -38,7 +41,7 @@ list(FIND ENERGYPLUS_FLAGS_LIST -m EPMACRO_RESULT)
 
 if("${EPMACRO_RESULT}" GREATER -1)
   # first bring in all imf files into the run folder
-  file( GLOB SRC_IMF_FILES "${SOURCE_DIR}/testfiles/*.imf" )
+  file( GLOB SRC_IMF_FILES "${SOURCE_DIR}/${TEST_FILE_FOLDER}/*.imf" )
   foreach( IMF_FILE ${SRC_IMF_FILES} )
     file( COPY "${IMF_FILE}" DESTINATION "${OUTPUT_DIR_PATH}" )
   endforeach()
@@ -155,8 +158,16 @@ else()
   set(ECHO_CMD "echo")
 endif()
 
+
+if (RUN_CALLGRIND)
+  set(VALGRIND_COMMAND ${VALGRIND} --tool=callgrind --callgrind-out-file=callgrind.performance.${IDF_NAME} )
+else()
+  set(VALGRIND_COMMAND "")
+endif()
+
+
 execute_process(COMMAND ${ECHO_CMD}
-                COMMAND "${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}"
+                COMMAND ${VALGRIND_COMMAND} "${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}"
                 WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
                 RESULT_VARIABLE RESULT)
 

@@ -472,6 +472,10 @@ namespace HVACControllers {
 
 	// Functions
 
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	void
 	ManageControllers(
 		std::string const & ControllerName,

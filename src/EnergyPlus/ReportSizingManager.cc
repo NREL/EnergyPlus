@@ -351,6 +351,7 @@ namespace ReportSizingManager {
 		using DataGlobals::InitConvTemp;;
 		using namespace DataSizing;
 		using namespace DataHVACGlobals;
+		using DXCoils::ValidateADP;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using General::SolveRegulaFalsi;
@@ -359,8 +360,10 @@ namespace ReportSizingManager {
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdpPb;
 		using Psychrometrics::PsyWFnTdbH;
+		using Psychrometrics::PsyTdbFnHW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using Psychrometrics::PsyWFnTdbRhPb;
+		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyTwbFnTdbWPb;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -433,6 +436,8 @@ namespace ReportSizingManager {
 		Array1D< Real64 > Par( 4 ); // array passed to RegulaFalsi
 		Real64 DesOAFlowFrac;   // design outdoor air flow volume fraction
 		std::string ScalableSM; // scalable sizing methods label for reporting
+		Real64 const RatedInletAirTemp( 26.6667 ); // 26.6667C or 80F
+		Real64 const RatedInletAirHumRat( 0.01125 ); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
 		AutosizeDes = 0.0;
 		AutosizeUser = 0.0;
@@ -908,6 +913,11 @@ namespace ReportSizingManager {
 								AutosizeDes = 0.389 + 7684.0*RatedVolFlowPerRatedTotCap;
 							}
 						}
+
+						// check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
+						DesMassFlow = DataFlowUsedForSizing * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
+						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DesMassFlow, AutosizeDes, CallingRoutine );
+
 					} else {
 						AutosizeDes = 1.0;
 					}
@@ -1524,6 +1534,11 @@ namespace ReportSizingManager {
 								AutosizeDes = 0.389 + 7684.0*RatedVolFlowPerRatedTotCap;
 							}
 						}
+
+						// check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
+						DesMassFlow = DataFlowUsedForSizing * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
+						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DesMassFlow, AutosizeDes, CallingRoutine );
+
 					} else {
 						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName );
 						ShowContinueError( "... DataFlowUsedForSizing and DataCapacityUsedForSizing " + SizingString + " must both be greater than 0." );
