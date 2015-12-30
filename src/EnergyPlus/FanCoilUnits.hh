@@ -40,6 +40,7 @@ namespace FanCoilUnits {
 	extern int const CCM_VarFanVarFlow;
 	extern int const CCM_VarFanConsFlow;
 	extern int const CCM_MultiSpeedFan;
+	extern int const CCM_ASHRAE;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -169,6 +170,8 @@ namespace FanCoilUnits {
 		Real64 ElecEnergy; // unit electiric energy consumption in joules
 		Real64 DesCoolingLoad; // used for reporting in watts
 		Real64 DesHeatingLoad; // used for reporting in watts
+		Real64 DesZoneCoolingLoad; // used for reporting in watts
+		Real64 DesZoneHeatingLoad; // used for reporting in watts
 
 		// Default Constructor
 		FanCoilData() :
@@ -248,7 +251,9 @@ namespace FanCoilUnits {
 			ElecPower( 0.0 ),
 			ElecEnergy( 0.0 ),
 			DesCoolingLoad( 0.0 ),
-			DesHeatingLoad( 0.0 )
+			DesHeatingLoad( 0.0 ),
+			DesZoneCoolingLoad( 0.0 ),
+			DesZoneHeatingLoad( 0.0 )
 		{}
 
 	};
@@ -375,6 +380,18 @@ namespace FanCoilUnits {
 	Real64
 	CalcFanCoilLoadResidual(
 		Real64 const PartLoadRatio, // DX cooling coil part load ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilWaterFlowResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+	
+	Real64
+	CalcFanCoilAirAndWaterFlowResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
 	);
 
