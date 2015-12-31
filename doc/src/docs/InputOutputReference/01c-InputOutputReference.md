@@ -7389,9 +7389,11 @@ The name of the schedule (ref: Schedule) that denotes whether the fan coil unit 
 
 ***Field: Capacity Control  Method***
 
-This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiSpeedFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load.
+This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiSpeedFan***, or ***ASHRAE90.1***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. For *ASHRAE90.1*, the fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. The water coil water flow rate, or the electric heating coil part-load ratio, is modulated to meet the zone load. If the zone sensible load is greater than the zone sensible load multiplied by the low speed supply air flow ratio, then the air and water flow rate is increased to meet the load. If the zone load is greater than the design sensible load, the fan air flow rate is maintained at the maximum value while the water flow rate is further increased to the maximum available while electric heating coils are maintained at the maximum output.
 
-***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schdule type. The model selects at what fan speed to run depending on cooling or heating load.
+***Note: when ASHRAE90.1 is selected, the simulation must include zone sizing to calculate the zone design sensible cooling and heating load.***
+
+***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schedule type. The model selects at what fan speed to run depending on cooling or heating load.
 
 #### Field: Maximum Supply Air Flow Rate
 
@@ -7399,11 +7401,11 @@ The maximum volumetric airflow rate (m<sup>3</sup>/sec) through the fan coil uni
 
 #### Field: Low Speed Supply Air Flow Ratio
 
-This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. Its value should be less than *Medium Speed Supply Air Flow Ratio.* If left blank, the default value is 0.33. Leave it blank if the capacity control method selected is not *CyclingFan*.
+This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. This value should be less than the *Medium Speed Supply Air Flow Ratio.* If left blank, the default value is 0.33. Leave this field blank if the capacity control method selected is not *CyclingFan* or *ASHRAE90.1*. The suggested value is 0.5 when using the ASHRAE90.1 capacity control method.
 
 #### Field: Medium Speed Supply Air  Flow Ratio
 
-This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the *Low Speed Supply Air Flow Ratio* but less than 1.If left blank, the default value is 0.66.Leave it blank if the capacity control method selected is not *CyclingFan*.
+This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the *Low Speed Supply Air Flow Ratio* but less than 1. If left blank, the default value is 0.66. Leave this field blank if the capacity control method selected is not *CyclingFan*.
 
 #### Field: Maximum Outdoor Air Flow Rate
 
@@ -7443,9 +7445,10 @@ This field specifies the type of supply air fan object used by this fan coil. Th
 
 #### Field: Supply Air Fan Name
 
-The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. And for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*  should be chosen. The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
+The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. For *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume* should be chosen. And for *ASHRAE90.1*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen. 
 
-The fan’s outlet node should be the same as the cooling coil’s air inlet node.
+**The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.**<br>
+**The fan’s outlet node should be the same as the cooling coil’s air inlet node.**
 
 #### Field: Cooling Coil Object Type
 

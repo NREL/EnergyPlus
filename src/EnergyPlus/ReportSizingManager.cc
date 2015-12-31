@@ -1180,6 +1180,10 @@ namespace ReportSizingManager {
 					}
 				} else if (SizingType == MaxHeaterOutletTempSizing) {
 					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+				} else if( SizingType == ZoneCoolingLoadSizing ) {
+					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolLoad;
+				} else if( SizingType == ZoneHeatingLoadSizing ) {
+					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 				} else {
 					// should never happen
 				}

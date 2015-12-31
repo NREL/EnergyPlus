@@ -58,6 +58,8 @@ namespace DataHVACGlobals {
 	extern int const HeatingDefrostSizing; // request sizing for heating defrost capacity
 	extern int const MaxHeaterOutletTempSizing; // request sizing for heating coil maximum outlet temperature
 	extern int const AutoCalculateSizing; // identifies an autocalulate input
+	extern int const ZoneCoolingLoadSizing; // zone cooling sensible load (zsz file)
+	extern int const ZoneHeatingLoadSizing; // zome heating sensible load (zsz file)
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser

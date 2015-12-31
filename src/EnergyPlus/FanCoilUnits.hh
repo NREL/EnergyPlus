@@ -172,6 +172,7 @@ namespace FanCoilUnits {
 		Real64 DesHeatingLoad; // used for reporting in watts
 		Real64 DesZoneCoolingLoad; // used for reporting in watts
 		Real64 DesZoneHeatingLoad; // used for reporting in watts
+		int DSOAPtr; // design specification outdoor air object index
 
 		// Default Constructor
 		FanCoilData() :
@@ -253,7 +254,8 @@ namespace FanCoilUnits {
 			DesCoolingLoad( 0.0 ),
 			DesHeatingLoad( 0.0 ),
 			DesZoneCoolingLoad( 0.0 ),
-			DesZoneHeatingLoad( 0.0 )
+			DesZoneHeatingLoad( 0.0 ),
+			DSOAPtr( 0 )
 		{}
 
 	};
@@ -390,8 +392,26 @@ namespace FanCoilUnits {
 	);
 	
 	Real64
+	CalcFanCoilAirFlowResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
 	CalcFanCoilAirAndWaterFlowResidual(
 		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilBothFlowResidual(
+		Real64 const PLR, // air and water mass flow rate ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilElecHeatResidual(
+		Real64 const PLR, // electric heating coil part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	);
 
