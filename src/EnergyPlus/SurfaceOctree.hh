@@ -20,10 +20,10 @@ namespace DataSurfaces { struct SurfaceData; }
 
 // Package: Surface Octree System
 //
-// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-//
 // Purpose: Spatial sort of surfaces for fast, scalable identification of active surfaces
 // for some algorithms such as solar shading, solar reflection, and daylighting obstruction
+//
+// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
 //
 // See the .cc file for details
 

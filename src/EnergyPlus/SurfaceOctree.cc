@@ -14,10 +14,10 @@ namespace EnergyPlus {
 
 // Package: Surface Octree System
 //
-// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
-//
 // Purpose: Spatial sort of surfaces for fast, scalable identification of active surfaces
 // for some algorithms such as solar shading, solar reflection, and daylighting obstruction
+//
+// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
 //
 // History:
 //  Sep 2015: Initial experimental release
