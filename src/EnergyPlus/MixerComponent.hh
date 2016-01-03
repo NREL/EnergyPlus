@@ -24,7 +24,6 @@ namespace MixerComponent {
 	extern int NumMixers; // The Number of Mixers found in the Input
 	extern int LoopInletNode;
 	extern int LoopOutletNode;
-	extern bool GetInputFlag;
 	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers

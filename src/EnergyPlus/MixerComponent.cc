@@ -61,13 +61,17 @@ namespace MixerComponent {
 	int NumMixers( 0 ); // The Number of Mixers found in the Input
 	int LoopInletNode( 0 );
 	int LoopOutletNode( 0 );
-	bool GetInputFlag( true ); // Flag set to make sure you get input once
 	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
 
 	// Object Data
 	Array1D< MixerConditions > MixerCond;
+
+	namespace {
+		bool SimAirMixerInputFlag( true );
+		bool GetZoneMixerIndexInputFlag( true );
+	}
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -77,9 +81,13 @@ namespace MixerComponent {
 	void
 		clear_state()
 	{
-		NumMixers = 0; // The Number of Mixers found in the Input
-		GetInputFlag = true; // Flag set to make sure you get input once
+		NumMixers = 0;
+		LoopInletNode = 0;
+		LoopOutletNode = 0;
+		GetZoneMixerIndexInputFlag = true;
+		SimAirMixerInputFlag = true;
 		CheckEquipName.deallocate();
+		MixerCond.deallocate();
 	}
 
 	void
@@ -126,14 +134,16 @@ namespace MixerComponent {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int MixerNum; // The Mixer that you are currently loading input into
-		static bool GetInputFlag( true ); // Flag set to make sure you get input once
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool GetInputFlag( true ); // Flag set to make sure you get input once
+		////////////////////////////////////////////////////////////////////////////////////
 
 		// FLOW:
 
 		// Obtains and Allocates Mixer related parameters from input file
-		if ( GetInputFlag ) { //First time subroutine has been entered
+		if ( SimAirMixerInputFlag ) { //First time subroutine has been entered
 			GetMixerInput();
-			GetInputFlag = false;
+			SimAirMixerInputFlag = false;
 		}
 
 		// Find the correct MixerNumber
@@ -676,9 +686,9 @@ namespace MixerComponent {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-		if ( GetInputFlag ) { //First time subroutine has been entered
+		if ( GetZoneMixerIndexInputFlag ) { //First time subroutine has been entered
 			GetMixerInput();
-			GetInputFlag = false;
+			GetZoneMixerIndexInputFlag = false;
 		}
 
 		MixerIndex = FindItemInList( MixerName, MixerCond, &MixerConditions::MixerName );

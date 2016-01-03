@@ -52,6 +52,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -203,8 +204,8 @@ namespace EnergyPlus {
 		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
 		HeatBalanceSurfaceManager::clear_state();
-		HeatingCoils::clear_state();
 		HeatPumpWaterToWaterSimple::clear_state();
+		HeatRecovery::clear_state();
 		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
 		HVACControllers::clear_state();

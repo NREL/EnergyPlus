@@ -104,6 +104,10 @@ namespace HeatRecovery {
 
 	static std::string const BlankString;
 
+	namespace {
+		bool MyOneTimeAllocate( true );
+	}
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -141,6 +145,22 @@ namespace HeatRecovery {
 	Array1D< BalancedDesDehumPerfData > BalDesDehumPerfData;
 
 	// Functions
+
+	void clear_state() {
+		NumHeatExchangers = 0;
+		NumAirToAirPlateExchs = 0;
+		NumAirToAirGenericExchs = 0;
+		NumDesiccantBalancedExchs = 0;
+		NumDesBalExchsPerfDataType1 = 0;
+		FullLoadOutAirTemp = 0.0;
+		FullLoadOutAirHumRat = 0.0;
+		GetInputFlag = true;
+		CalledFromParentObject = true;
+		CheckEquipName.deallocate();
+		ExchCond.deallocate();
+		BalDesDehumPerfData.deallocate();
+		MyOneTimeAllocate = true;
+	}
 
 	void
 	SimHeatRecovery(
@@ -1068,7 +1088,9 @@ namespace HeatRecovery {
 		Real64 RhoAir; // air density at outside pressure & standard temperature and humidity
 		Real64 CpAir; // heat capacity of air
 		// of humidity ratio and temperature
-		static bool MyOneTimeAllocate( true );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeAllocate( true );
+		////////////////////////////////////////////////////////////////////////////////////
 		static Array1D_bool MySetPointTest;
 		static Array1D_bool MySizeFlag;
 		int ErrStat; // error status returned by CalculateNTUfromEpsAndZ
@@ -1101,9 +1123,9 @@ namespace HeatRecovery {
 			RhoAir = StdRhoAir;
 			//    RhoAir = PsyRhoAirFnPbTdbW(101325.0,20.0,0.0)  do we want standard air density at sea level for generic ERVs per ARI 1060?
 			CpAir = PsyCpAirFnWTdb( 0.0, 20.0 );
-			
+
 			ExIndex = ExchNum; // this replaces the loop that went over multiple at once
-			
+
 				{ auto const SELECT_CASE_var( ExchCond( ExIndex ).ExchTypeNum );
 
 				if ( SELECT_CASE_var == HX_AIRTOAIR_FLATPLATE ) {
@@ -1392,7 +1414,7 @@ namespace HeatRecovery {
 		if ( ExchCond( ExchNum ).NomSupAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
- 
+
 		if ( CurZoneEqNum > 0 ) {
 			if ( !IsAutoSize && !ZoneSizingRunDone ) {
 				if ( ExchCond( ExchNum ).NomSupAirVolFlow > 0.0 ) {
@@ -1412,7 +1434,7 @@ namespace HeatRecovery {
 					"User-Specified Nominal Supply Air Flow Rate [m3/s]", ExchCond( ExchNum ).NomSupAirVolFlow );
 				}
 			} else { // Sizing run done
- 
+
 				CheckSysSizing( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name );
 
 				if ( CurOASysNum > 0 ) {
@@ -1477,7 +1499,7 @@ namespace HeatRecovery {
 					if ( ( std::abs( NomSupAirVolFlowDes - NomSupAirVolFlowUser ) / NomSupAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
 						ShowMessage( "Size:" + cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) + ":Potential issue with equipment sizing for " +
 							ExchCond( ExchNum ).Name );
-						ShowContinueError( "User-Specified Nominal Supply Air Flow Rate of " + 
+						ShowContinueError( "User-Specified Nominal Supply Air Flow Rate of " +
 							RoundSigDigits( NomSupAirVolFlowUser, 5 ) + " [m3/s]" );
 						ShowContinueError( "differs from Design Size Nominal Supply Air Flow Rate of " +
 							RoundSigDigits( NomSupAirVolFlowDes, 5 ) + " [m3/s]" );
@@ -1495,7 +1517,7 @@ namespace HeatRecovery {
 				IsAutoSize = true;
 			}
 			NomSecAirVolFlowDes = ExchCond( ExchNum ).NomSupAirVolFlow;
- 
+
 			if ( IsAutoSize) {
 				ExchCond( ExchNum ).NomSecAirVolFlow = NomSecAirVolFlowDes;
 				ReportSizingOutput( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name,
@@ -1744,7 +1766,7 @@ namespace HeatRecovery {
 		int const FanOpMode, // Supply air fan operating mode (1=cycling, 2=constant)
 		Optional_bool_const EconomizerFlag, // economizer flag pass by air loop or OA sys
 		Optional_bool_const HighHumCtrlFlag, // high humidity control flag passed by airloop or OA sys
-		Optional < Real64 const > HXPartLoadRatio // 
+		Optional < Real64 const > HXPartLoadRatio //
 	)
 	{
 

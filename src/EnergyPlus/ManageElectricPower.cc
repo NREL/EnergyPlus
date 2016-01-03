@@ -125,6 +125,7 @@ namespace ManageElectricPower {
 	namespace {
 		bool ManageElectricLoadCentersOneTimeFlag( true );
 		bool ManageElectricLoadCentersEnvrnFlag( true );
+		int ElecFacilityIndex( 0 );
 	}
 
 	bool GetInput( true ); // When TRUE, calls subroutine to read input file.
@@ -167,6 +168,7 @@ namespace ManageElectricPower {
 		NumInverters = 0;
 		NumElecStorageDevices = 0;
 		NumTransformers = 0;
+		ElecFacilityIndex = 0;
 		ElecProducedCoGenIndex = 0;
 		ElecProducedPVIndex = 0;
 		ElecProducedWTIndex = 0;
@@ -228,33 +230,33 @@ namespace ManageElectricPower {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static int GenNum( 0 ); // Generator number counter
-		static int LoadCenterNum( 0 ); // Load center number counter
-		static int TransfNum( 0 ); // Transformer number counter
-		static int MeterNum( 0 ); // A transformer's meter number counter
-		static int MeterIndex( 0 ); // Meter index number from GetMeterIndex
-		static int ElecFacilityIndex( 0 );
-		static Real64 ElecFacilityBldg( 0.0 );
-		static Real64 ElecFacilityHVAC( 0.0 );
-		static Real64 ElecProducedPV( 0.0 );
-		static Real64 ElecProducedWT( 0.0 );
-		static Real64 ElecProducedStorage( 0.0 );
-		static Real64 RemainingLoad( 0.0 ); // Remaining electric power load to be met by a load center
-		static Real64 WholeBldgRemainingLoad( 0.0 ); // Remaining electric power load for the building
-		static Real64 RemainingThermalLoad( 0.0 ); // Remaining thermal load to be met
-		static Real64 CustomMeterDemand( 0.0 ); // local variable for Custom metered elec demand
+		int GenNum( 0 ); // Generator number counter
+		int LoadCenterNum( 0 ); // Load center number counter
+		int TransfNum( 0 ); // Transformer number counter
+		int MeterNum( 0 ); // A transformer's meter number counter
+		int MeterIndex( 0 ); // Meter index number from GetMeterIndex
+		Real64 ElecFacilityBldg( 0.0 );
+		Real64 ElecFacilityHVAC( 0.0 );
+		Real64 ElecProducedPV( 0.0 );
+		Real64 ElecProducedWT( 0.0 );
+		Real64 ElecProducedStorage( 0.0 );
+		Real64 RemainingLoad( 0.0 ); // Remaining electric power load to be met by a load center
+		Real64 WholeBldgRemainingLoad( 0.0 ); // Remaining electric power load for the building
+		Real64 RemainingThermalLoad( 0.0 ); // Remaining thermal load to be met
+		Real64 CustomMeterDemand( 0.0 ); // local variable for Custom metered elec demand
 		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static int ElecFacilityIndex( 0 );
 		// static bool MyOneTimeFlag( true );
 		// static bool MyEnvrnFlag( true );
 		////////////////////////////////////////////////////////////////////////////////////
-		static Real64 ElectricProdRate( 0.0 ); // Electric Power Production Rate of Generators
-		static Real64 ThermalProdRate( 0.0 ); // Thermal Power Production Rate of Generators
-		static Real64 ExcessThermalPowerRequest( 0.0 ); // Excess Thermal Power Request
+		Real64 ElectricProdRate( 0.0 ); // Electric Power Production Rate of Generators
+		Real64 ThermalProdRate( 0.0 ); // Thermal Power Production Rate of Generators
+		Real64 ExcessThermalPowerRequest( 0.0 ); // Excess Thermal Power Request
 
-		static Real64 LoadCenterElectricLoad( 0.0 ); // Load center electric load to be dispatched
-		static Real64 LoadCenterThermalLoad( 0.0 ); // Load center thermal load to be dispatched
-		static Real64 StorageDrawnPower( 0.0 ); // Electric Power Draw Rate from storage units
-		static Real64 StorageStoredPower( 0.0 ); // Electric Power Store Rate from storage units
+		Real64 LoadCenterElectricLoad( 0.0 ); // Load center electric load to be dispatched
+		Real64 LoadCenterThermalLoad( 0.0 ); // Load center thermal load to be dispatched
+		Real64 StorageDrawnPower( 0.0 ); // Electric Power Draw Rate from storage units
+		Real64 StorageStoredPower( 0.0 ); // Electric Power Store Rate from storage units
 
 		// Get Generator data from input file
 		if ( GetInput ) {

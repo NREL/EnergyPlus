@@ -431,6 +431,9 @@ namespace OutdoorAirUnit {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimOutdoorAirUnit(
 		std::string const & CompName, // name of the outdoor air unit
 		int const ZoneNum, // number of zone being served
@@ -506,11 +509,6 @@ namespace OutdoorAirUnit {
 
 	int
 	GetOutdoorAirUnitReturnAirNode( int const OAUnitNum );
-
-	// Clears the global data in OutdoorAirUnit.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
 
 	//*****************************************************************************************
 

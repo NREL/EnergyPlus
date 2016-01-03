@@ -134,8 +134,9 @@ namespace ZoneEquipmentManager {
 	// These are purposefully not in the header file as an extern variable. No one outside of this should
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-		
+
 		bool InitZoneEquipmentOneTimeFlag( true );
+		bool InitZoneEquipmentEnvrnFlag( true );
 	}
 
 	Array1D< Real64 > AvgData; // scratch array for storing averaged data
@@ -155,6 +156,7 @@ namespace ZoneEquipmentManager {
 	{
 		SizeZoneEquipmentOneTimeFlag = true;
 		InitZoneEquipmentOneTimeFlag =  true;
+		InitZoneEquipmentEnvrnFlag = true;
 		AvgData.deallocate(); // scratch array for storing averaged data
 		DefaultSimOrder.deallocate();
 		NumOfTimeStepInDay = 0; // number of zone time steps in a day
@@ -341,10 +343,10 @@ namespace ZoneEquipmentManager {
 		int ZoneExhNode;
 		int ControlledZoneNum;
 		int ZoneReturnAirNode;
-		/////////// hoisted into namespace InitZoneEquipmentOneTimeFlag////////////
-		//static bool MyOneTimeFlag( true );
+		/////////// hoisted into namespace ////////////
+		// static bool MyOneTimeFlag( true ); // InitZoneEquipmentOneTimeFlag
+		// static bool MyEnvrnFlag( true ); // InitZoneEquipmentEnvrnFlag
 		///////////////////////////
-		static bool MyEnvrnFlag( true );
 		int ZoneEquipType; // Type of zone equipment
 		int TotalNumComp; // Total number of zone components of ZoneEquipType
 		int ZoneCompNum; // Number/index of zone equipment component
@@ -374,7 +376,7 @@ namespace ZoneEquipmentManager {
 		}
 
 		// Do the Begin Environment initializations
-		if ( MyEnvrnFlag && BeginEnvrnFlag ) {
+		if ( InitZoneEquipmentEnvrnFlag && BeginEnvrnFlag ) {
 
 			ZoneEquipAvail = NoAction;
 
@@ -462,12 +464,12 @@ namespace ZoneEquipmentManager {
 
 			}
 
-			MyEnvrnFlag = false;
+			InitZoneEquipmentEnvrnFlag = false;
 
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag = true;
+			InitZoneEquipmentEnvrnFlag = true;
 		}
 
 		// do the  HVAC time step initializations
@@ -804,11 +806,11 @@ namespace ZoneEquipmentManager {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// This function calculates supply conditions for the direct outside air system 
+		// This function calculates supply conditions for the direct outside air system
 		// (DOAS) sizing calculations
 
 		// METHODOLOGY EMPLOYED:
-		// the supply temperature and humidity ratio are set depending on the design control method 
+		// the supply temperature and humidity ratio are set depending on the design control method
 		// and the outside air temperature
 
 		// REFERENCES:
@@ -839,7 +841,7 @@ namespace ZoneEquipmentManager {
 		}
 
 		// neutral dehumidified supply air
-		else if ( DOASControl == 2 ) { // 
+		else if ( DOASControl == 2 ) { //
 			if ( OutDB < DOASLowTemp ) {
 				DOASSupTemp = DOASHighTemp;
 				DOASSupHR = OutHR;
