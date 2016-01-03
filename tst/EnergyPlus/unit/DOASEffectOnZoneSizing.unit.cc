@@ -50,7 +50,7 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
 	DOASHighTemp = 23.9;
 	OutDB = 10.0;
 	OutHR = 0.005;
-	CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );  
+	CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );
 	EXPECT_DOUBLE_EQ( 21.1, DOASSupTemp );
 	EXPECT_DOUBLE_EQ( 0.005, DOASSupHR );
 	OutDB = 35.6;
@@ -130,7 +130,6 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	ZoneThermostatSetPointHi( 1 ) = 24.;
 	ZoneThermostatSetPointHi( 2 ) = 24.;
 	CurOverallSimDay = 1;
-	MyOneTimeFlag2 = false;
 	ZoneEquipConfig( 1 ).IsControlled = true;
 	ZoneEquipConfig( 2 ).IsControlled = true;
 	CalcZoneSizing( 1, 1 ).ActualZoneNum = 1;
