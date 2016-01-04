@@ -274,6 +274,9 @@ namespace ZoneDehumidifier {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimZoneDehumidifier(
 		std::string const & CompName, // Name of the zone dehumidifier
 		int const ZoneNum, // Number of zone being served

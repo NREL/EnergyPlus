@@ -115,6 +115,15 @@ namespace ZoneDehumidifier {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumDehumidifiers = 0;
+		GetInputFlag = true;
+		CheckEquipName.deallocate();
+		ZoneDehumid.deallocate();
+	}
+
+	void
 	SimZoneDehumidifier(
 		std::string const & CompName, // Name of the zone dehumidifier
 		int const ZoneNum, // Number of zone being served

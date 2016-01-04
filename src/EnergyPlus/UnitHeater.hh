@@ -271,6 +271,9 @@ namespace UnitHeater {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimUnitHeater(
 		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served

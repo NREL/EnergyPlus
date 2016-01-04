@@ -91,6 +91,7 @@
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
@@ -99,7 +100,9 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
+#include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
@@ -112,13 +115,21 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UnitHeater.hh>
+#include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -258,6 +269,7 @@ namespace EnergyPlus {
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
 		PlantCondLoopOperation::clear_state();
+		PlantChillers::clear_state();
 		PlantLoadProfile::clear_state();
 		PlantLoopSolver::clear_state();
 		PlantManager::clear_state();
@@ -267,7 +279,9 @@ namespace EnergyPlus {
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
+		ReturnAirPathManager::clear_state();
 		RoomAirModelAirflowNetwork::clear_state();
+		RoomAirModelManager::clear_state();
 		RuntimeLanguageProcessor::clear_state();
 		ScheduleManager::clear_state();
 		SetPointManager::clear_state();
@@ -279,13 +293,21 @@ namespace EnergyPlus {
 		SurfaceGeometry::clear_state();
 		SystemAvailabilityManager::clear_state();
 		ThermalComfort::clear_state();
+		UnitHeater::clear_state();
+		UnitVentilator::clear_state();
 		VariableSpeedCoils::clear_state();
 		VentilatedSlab::clear_state();
 		WaterCoils::clear_state();
 		WaterThermalTanks::clear_state();
+		WaterUse::clear_state();
 		WeatherManager::clear_state();
 		WindowAC::clear_state();
+		WindowComplexManager::clear_state();
+		WindowEquivalentLayer::clear_state();
+		WindowManager::clear_state();
 		ZoneAirLoopEquipmentManager::clear_state();
+		ZoneContaminantPredictorCorrector::clear_state();
+		ZoneDehumidifier::clear_state();
 		ZoneEquipmentManager::clear_state();
 		ZonePlenum::clear_state();
 		ZoneTempPredictorCorrector::clear_state();

@@ -85,6 +85,18 @@ namespace WaterUse {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumWaterEquipment = 0;
+		NumWaterConnections = 0;
+		GetWaterUseInputFlag = true;
+		CheckEquipName.deallocate();
+		CheckPlantLoop.deallocate();
+		WaterEquipment.deallocate();
+		WaterConnections.deallocate();
+	}
+
+	void
 	SimulateWaterUse( bool const FirstHVACIteration )
 	{
 

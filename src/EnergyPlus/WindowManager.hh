@@ -144,6 +144,9 @@ namespace WindowManager {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	InitGlassOpticalCalculations();
 
 	//*****************************************************************************************

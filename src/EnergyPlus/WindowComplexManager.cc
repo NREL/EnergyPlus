@@ -105,13 +105,6 @@ namespace WindowComplexManager {
 	// MODULE VARIABLE DECLARATIONS:
 
 	int NumComplexWind( 0 ); // Total number of complex windows
-	//Debug
-	Array2D_int DbgIBm( 60, 24 );
-	Array2D< Real64 > DbgTheta( 60, 24 );
-	Array2D< Real64 > DbgPhi( 60, 24 );
-	Real64 DdbgTheta;
-	Real64 DdbgPhi;
-	//EndDebug
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
 
@@ -121,6 +114,15 @@ namespace WindowComplexManager {
 	Array2D< WindowStateIndex > WindowStateList;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumComplexWind = 0;
+		BasisList.deallocate();
+		WindowList.deallocate();
+		WindowStateList.deallocate();
+	}
 
 	void
 	InitBSDFWindows()
@@ -3094,7 +3096,7 @@ namespace WindowComplexManager {
 		//                 1 - Scaled Cavity Width (SCW)
 		//                 2 - Convective Scalar Model (CSM)
 		static int Debug_mode( 0 ); // Switch for debug output files:
-		//                 0 - don’t create debug output files
+		//                 0 - donï¿½t create debug output files
 		//                 1 - append results to existing debug output file (where applicable)
 		//                 2 - store results in a new debug output file
 		static std::string Debug_dir; // Target directory for debug files (pointer to a character array)

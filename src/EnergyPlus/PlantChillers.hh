@@ -587,6 +587,9 @@ namespace PlantChillers {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimChiller(
 		int const LoopNum, // Flow control mode for the equipment
 		int const LoopSide, // chiller number pointer

@@ -23,6 +23,9 @@ namespace ReturnAirPathManager {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimReturnAirPath();
 
 	void

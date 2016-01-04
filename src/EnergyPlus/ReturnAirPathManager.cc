@@ -54,7 +54,11 @@ namespace ReturnAirPathManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	// na
+
+	namespace {
+		bool GetInputFlag( true );
+		bool ErrorsFound( false );
+	}
 
 	//DERIVED TYPE DEFINITIONS
 	// na
@@ -65,6 +69,13 @@ namespace ReturnAirPathManager {
 	//SUBROUTINE SPECIFICATIONS FOR MODULE ReturnAirPathManager
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		GetInputFlag = true;
+		ErrorsFound = false;
+	}
 
 	void
 	SimReturnAirPath()
@@ -84,7 +95,9 @@ namespace ReturnAirPathManager {
 
 		// Locals
 		int ReturnAirPathNum;
-		static bool GetInputFlag( true ); // Flag set to make sure you get input once
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool GetInputFlag( true ); // Flag set to make sure you get input once
+		////////////////////////////////////////////////////////////////////////////////////
 
 		// Obtains and Allocates Mixer related parameters from input file
 		if ( GetInputFlag ) { //First time subroutine has been entered
@@ -131,7 +144,9 @@ namespace ReturnAirPathManager {
 		int NumNums;
 		int IOStat;
 		int Counter;
-		static bool ErrorsFound( false );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool ErrorsFound( false );
+		////////////////////////////////////////////////////////////////////////////////////
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 

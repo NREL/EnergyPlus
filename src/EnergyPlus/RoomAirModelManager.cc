@@ -86,6 +86,13 @@ namespace RoomAirModelManager {
 	// Functions
 
 	void
+	clear_state()
+	{
+		GetUCSDDVDataFlag = true;
+		GetAirModelData = true;
+	}
+
+	void
 	ManageAirModel( int & ZoneNum )
 	{
 
@@ -2654,7 +2661,7 @@ namespace RoomAirModelManager {
 		std::string & SupplyNodeName, // Supply node name
 		std::string & ReturnNodeName, // Return node name
 		int TotNumEquip, // equipment type number
-		int TypeNum // Supply air node number 
+		int TypeNum // Supply air node number
 	)
 	{
 
@@ -2911,8 +2918,8 @@ namespace RoomAirModelManager {
 				ReturnNodeName = "";
 			}
 		} else if ( TypeNum == 37 ) {  // AirLoopHVACReturnAir
-			SupplyNodeName = Alphas( 4 ); // 
-			ReturnNodeName = ""; // 
+			SupplyNodeName = Alphas( 4 ); //
+			ReturnNodeName = ""; //
 		}
 
 		// Need to find a better to handle allocate and deallocate

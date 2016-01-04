@@ -32,6 +32,9 @@ namespace ZoneContaminantPredictorCorrector {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManageZoneContaminanUpdates(
 		int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
 		bool const ShortenTimeStepSys,

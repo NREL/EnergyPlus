@@ -171,6 +171,60 @@ namespace PlantChillers {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumElectricChillers = 0;
+		CondMassFlowRate = 0.0;
+		EvapMassFlowRate = 0.0;
+		CondOutletTemp = 0.0;
+		CondOutletHumRat = 0.0;
+		EvapOutletTemp = 0.0;
+		Power = 0.0;
+		QEvaporator = 0.0;
+		QCondenser = 0.0;
+		Energy = 0.0;
+		EvaporatorEnergy = 0.0;
+		CondenserEnergy = 0.0;
+		QHeatRecovered = 0.0;
+		HeatRecOutletTemp = 0.0;
+		AvgCondSinkTemp = 0.0;
+		ChillerCyclingRatio = 0.0;
+		BasinHeaterPower = 0.0;
+		NumEngineDrivenChillers = 0;
+		HeatRecInletTemp = 0.0;
+		HeatRecMdotActual = 0.0;
+		HeatRecMdotDesign = 0.0;
+		QTotalHeatRecovered = 0.0;
+		QJacketRecovered = 0.0;
+		QLubeOilRecovered = 0.0;
+		QExhaustRecovered = 0.0;
+		FuelEnergyUseRate = 0.0;
+		TotalHeatEnergyRec = 0.0;
+		JacketEnergyRec = 0.0;
+		LubeOilEnergyRec = 0.0;
+		ExhaustEnergyRec = 0.0;
+		FuelEnergy = 0.0;
+		FuelMdot = 0.0;
+		ExhaustStackTemp = 0.0;
+		NumGTChillers = 0;
+		NumConstCOPChillers = 0;
+		EvapInletTemp = 0.0;
+		CondInletTemp = 0.0;
+		GetEngineDrivenInput = true;
+		GetElectricInput = true;
+		GetGasTurbineInput = true;
+		GetConstCOPInput = true;
+		ElectricChiller.deallocate();
+		ElectricChillerReport.deallocate();
+		EngineDrivenChiller.deallocate();
+		EngineDrivenChillerReport.deallocate();
+		GTChiller.deallocate();
+		GTChillerReport.deallocate();
+		ConstCOPChiller.deallocate();
+		ConstCOPChillerReport.deallocate();
+	}
+
+	void
 	SimChiller(
 		int const LoopNum, // Flow control mode for the equipment
 		int const EP_UNUSED( LoopSide ), // chiller number pointer
@@ -7009,16 +7063,16 @@ namespace PlantChillers {
 } // PlantChillers
 
 	//     NOTICE
-	
+
 	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
-	
+
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
 	//     list of contributors, see "Notice" located in main.cc.
-	
+
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

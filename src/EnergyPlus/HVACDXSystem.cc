@@ -122,6 +122,7 @@ namespace HVACDXSystem {
 	{
 		NumDXSystem = 0;
 		EconomizerFlag = false;
+		GetInputFlag = true;
 		CheckEquipName.deallocate();
 		DXCoolingSystem.deallocate();
 	}

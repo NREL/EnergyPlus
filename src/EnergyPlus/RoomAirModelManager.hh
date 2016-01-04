@@ -25,6 +25,9 @@ namespace RoomAirModelManager {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManageAirModel( int & ZoneNum );
 
 	//*****************************************************************************************
