@@ -665,6 +665,9 @@ namespace Furnaces {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimFurnace(
 		std::string const & FurnaceName,
 		bool const FirstHVACIteration,

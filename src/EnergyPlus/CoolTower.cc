@@ -74,6 +74,13 @@ namespace CoolTower {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumCoolTowers = 0;
+		CoolTowerSys.deallocate();
+	}
+
+	void
 	ManageCoolTower()
 	{
 

@@ -223,6 +223,9 @@ namespace CoolTower {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManageCoolTower();
 
 	void

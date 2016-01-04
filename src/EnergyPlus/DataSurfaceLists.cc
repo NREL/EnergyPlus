@@ -63,6 +63,16 @@ namespace DataSurfaceLists {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumOfSurfaceLists = 0;
+		NumOfSurfListVentSlab = 0;
+		SurfaceListInputsFilled = false;
+		SurfList.deallocate();
+		SlabList.deallocate();
+	}
+
+	void
 	GetSurfaceListsInputs()
 	{
 

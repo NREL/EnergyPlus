@@ -109,6 +109,20 @@ namespace PlantManager {
 	// Functions
 
 	void
+	clear_state()
+	{
+		InitLoopEquip = true;
+		GetCompSizFac = true;
+		PlantSupplyLoopCase = 0;
+		PlantDemandLoopCase = 0;
+		SupplySideInletNode.deallocate();
+		SupplySideOutletNode.deallocate();
+		DemandSideInletNode.deallocate();
+		LoopPipe.deallocate();
+		TempLoop = TempLoopData();
+	}
+
+	void
 	ManagePlantLoops(
 		bool const FirstHVACIteration,
 		bool & SimAirLoops, // True when the air loops need to be (re)simulated

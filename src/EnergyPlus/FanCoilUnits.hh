@@ -277,6 +277,9 @@ namespace FanCoilUnits {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimFanCoilUnit(
 		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served

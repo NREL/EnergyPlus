@@ -96,6 +96,17 @@ namespace BaseboardRadiator {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumBaseboards = 0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		SetLoopIndexFlag.deallocate();
+		Baseboard.deallocate();
+		BaseboardParamsNumericFields.deallocate();
+	}
+
+	void
 	SimBaseboard(
 		std::string const & EquipName,
 		int const ActualZoneNum,

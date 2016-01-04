@@ -130,6 +130,9 @@ namespace PlantManager {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManagePlantLoops(
 		bool const FirstHVACIteration,
 		bool & SimAirLoops, // True when the air loops need to be (re)simulated

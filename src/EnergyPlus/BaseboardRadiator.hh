@@ -208,6 +208,9 @@ namespace BaseboardRadiator {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimBaseboard(
 		std::string const & EquipName,
 		int const ActualZoneNum,

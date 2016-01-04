@@ -72,6 +72,16 @@ namespace BaseboardElectric {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumBaseboards = 0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		Baseboard.deallocate();
+		BaseboardNumericFields.deallocate();
+	}
+
+	void
 	SimElectricBaseboard(
 		std::string const & EquipName,
 		int const ActualZoneNum,

@@ -92,6 +92,22 @@ namespace BoilerSteam {
 	// Functions
 
 	void
+	clear_state()
+	{
+		FuelUsed = 0.0;
+		BoilerLoad = 0.0;
+		BoilerMassFlowRate = 0.0;
+		BoilerOutletTemp = 0.0;
+		BoilerMaxPress = 0.0;
+		NumBoilers = 0;
+		BoilerMassFlowMaxAvail = 0.0;
+		BoilerMassFlowMinAvail = 0.0;
+		CheckEquipName.deallocate();
+		Boiler.deallocate();
+		BoilerReport.deallocate();
+	}
+
+	void
 	SimSteamBoiler(
 		std::string const & EP_UNUSED( BoilerType ), // boiler type (used in CASE statement)
 		std::string const & BoilerName, // boiler identifier

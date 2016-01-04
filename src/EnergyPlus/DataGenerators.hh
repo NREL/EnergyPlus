@@ -2382,6 +2382,9 @@ namespace DataGenerators {
 	extern Array1D< MicroCHPParamsNonNormalized > MicroCHPParamInput; // Used during get input then put into nested
 	extern Array1D< GeneratorDynamicsManagerStruct > GeneratorDynamics;
 
+	void
+	clear_state();
+
 } // DataGenerators
 
 } // EnergyPlus

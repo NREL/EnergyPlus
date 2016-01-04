@@ -118,6 +118,15 @@ namespace HVACDXSystem {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumDXSystem = 0;
+		EconomizerFlag = false;
+		CheckEquipName.deallocate();
+		DXCoolingSystem.deallocate();
+	}
+
+	void
 	SimDXCoolingSystem(
 		std::string const & DXCoolingSystemName, // Name of DXSystem:Airloop object
 		bool const FirstHVACIteration, // True when first HVAC iteration
@@ -1933,12 +1942,12 @@ namespace HVACDXSystem {
 
 				} else if ( SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling ) {
 
-					ControlTESIceStorageTankCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).DXCoolingSystemType, 
-						DXCoolingSystem( DXSystemNum ).FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac, 
-						DXCoolingSystem( DXSystemNum ).TESOpMode, DXCoolingSystem( DXSystemNum ).DehumidControlType, 
-						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIterIndex, 
-						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFailIndex, 
-						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIterIndex, 
+					ControlTESIceStorageTankCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).DXCoolingSystemType,
+						DXCoolingSystem( DXSystemNum ).FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac,
+						DXCoolingSystem( DXSystemNum ).TESOpMode, DXCoolingSystem( DXSystemNum ).DehumidControlType,
+						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIterIndex,
+						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFailIndex,
+						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIterIndex,
 						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFailIndex );
 
 				} else {

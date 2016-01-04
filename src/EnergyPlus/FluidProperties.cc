@@ -118,6 +118,28 @@ namespace FluidProperties {
 	// See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
 
 	void
+	clear_state()
+	{
+		GetInput = true;
+		NumOfRefrigerants = 0;
+		NumOfGlycols = 0;
+		DebugReportGlycols = false;
+		DebugReportRefrigerants = false;
+		GlycolErrorLimitTest = 1;
+		RefrigerantErrorLimitTest = 1;
+		RefrigUsed.deallocate();
+		GlycolUsed.deallocate();
+		FluidIndex_Water = 0;
+		FluidIndex_EthyleneGlycol = 0;
+		FluidIndex_PropoleneGlycol = 0;
+		RefrigData.deallocate();
+		RefrigErrorTracking.deallocate();
+		GlyRawData.deallocate();
+		GlycolData.deallocate();
+		GlycolErrorTracking.deallocate();
+	}
+
+	void
 	DefaultEthGlyCpData_initializer(
 		Array2D< Real64 > &,
 		Array1D< Real64 > const &

@@ -145,6 +145,9 @@ namespace HVACDXHeatPumpSystem {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimDXHeatPumpSystem(
 		std::string const & DXHeatPumpSystemName, // Name of DXSystem:Airloop object
 		bool const FirstHVACIteration, // True when first HVAC iteration
