@@ -104,13 +104,8 @@ namespace WindowEquivalentLayer {
 	// ASHRAE 1311-RP, Final Report, February 11, 2009.
 	// Edwards, D.K. 1977.  Solar absorption by each element in an absorber-coverglass
 	//  array,Technical Note, Solar Energy, Vol. 19, pp. 401-402.
-<<<<<<< HEAD
-	// Kotey, N. A., J. L. Wright, and M. R. Collins.  2008.  �Determining Longwave
-	//  RadiativeProperties of Flat Shading Materials,� 33rd Annual SESCI / 3rd CSBC
-=======
 	// Kotey, N. A., J. L. Wright, and M. R. Collins.  2008.  "Determining Longwave
 	//  RadiativeProperties of Flat Shading Materials," 33rd Annual SESCI / 3rd CSBC
->>>>>>> develop
 	//  Conference Proceedings, Fredericton, NB.
 	// Kotey, N.A., Wright, J.L., M. R. Collins. 2009a. "Determination of Angle-Dependent
 	//  SolarOptical Properties of Roller Blind Materials," drafted for submission to
