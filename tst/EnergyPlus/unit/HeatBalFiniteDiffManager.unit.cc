@@ -62,6 +62,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
@@ -70,7 +71,7 @@ using namespace EnergyPlus::HeatBalFiniteDiffManager;
 
 namespace EnergyPlus {
 
-	TEST( HeatBalFiniteDiffManager, CalcNodeHeatFluxTest)
+	TEST_F( EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
 	{
 
 		int const numNodes( 4 );
@@ -189,9 +190,6 @@ namespace EnergyPlus {
 		EXPECT_NEAR( SurfaceFD( SurfNum ).QDreport( 3 ), expectedResult3, 0.0001 );
 		EXPECT_NEAR( SurfaceFD( SurfNum ).QDreport( 4 ), expectedResult4, 0.0001 );
 		EXPECT_NEAR( SurfaceFD( SurfNum ).QDreport( 5 ), expectedResult5, 0.0001 );
-
-		SurfaceFD.deallocate( );
-		DataHeatBalSurface::OpaqSurfInsFaceConductionFlux.deallocate( );
 
 	}
 

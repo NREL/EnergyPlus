@@ -65,6 +65,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -74,11 +75,8 @@ using namespace EnergyPlus::PlantUtilities;
 using namespace ObjexxFCL;
 using namespace DataSizing;
 
-TEST( PlantUtilities, RegisterPlantCompDesignFlowTest1 )
+TEST_F( EnergyPlusFixture, PlantUtilities_RegisterPlantCompDesignFlowTest1 )
 {
-	ShowMessage( "Begin Test: PlantUtilities, RegisterPlantCompDesignFlowTest1" );
-
-
 	// first call just puts first value in array
 	int TestNodeNum1 = 123;
 	Real64 TestFlowRate1 = 45.6;
@@ -99,10 +97,4 @@ TEST( PlantUtilities, RegisterPlantCompDesignFlowTest1 )
 	RegisterPlantCompDesignFlow( TestNodeNum1, TestFlowRate3 );
 	EXPECT_EQ( TestFlowRate3, CompDesWaterFlow( 1 ).DesVolFlowRate );
 
-	// clean up
-	SaveNumPlantComps = 0;
-	CompDesWaterFlow.deallocate();
-
 }
-
-

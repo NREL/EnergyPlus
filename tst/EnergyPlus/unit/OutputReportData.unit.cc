@@ -63,6 +63,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/OutputReportData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -71,11 +72,8 @@ using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace OutputProcessor;
 
-TEST( OutputReportDataTest, AnnualFieldSetConstructor )
+TEST_F( EnergyPlusFixture, OutputReportData_AnnualFieldSetConstructor )
 {
-	ShowMessage( "Begin Test: OutputReportDataTest, AnnualFieldSetConstructor" );
-
-
 	std::string varNameTest = "TestReport";
 	AnnualFieldSet::AggregationKind kindOfAggregationTest = AnnualFieldSet::AggregationKind::sumOrAvg;
 	int numDigitsShownTest = 3;
@@ -85,11 +83,8 @@ TEST( OutputReportDataTest, AnnualFieldSetConstructor )
 	EXPECT_EQ( fldStTest.m_showDigits, numDigitsShownTest );
 }
 
-
-TEST( OutputReportDataTest, getVariableKeys )
+TEST_F( EnergyPlusFixture, OutputReportData_getVariableKeys )
 {
-	ShowMessage( "Begin Test: OutputReportDataTest, getVariableKeys" );
-
 	std::string varNameTest = "TestReport";
 	AnnualFieldSet::AggregationKind kindOfAggregationTest = AnnualFieldSet::AggregationKind::sumOrAvg;
 	int numDigitsShownTest = 3;
@@ -120,6 +115,4 @@ TEST( OutputReportDataTest, getVariableKeys )
 	EXPECT_EQ( fldStTest.m_namesOfKeys[0], "LITE1" );
 	EXPECT_EQ( fldStTest.m_namesOfKeys[1], "LITE2" );
 	EXPECT_EQ( fldStTest.m_namesOfKeys[2], "LITE3" );
-
-
 }

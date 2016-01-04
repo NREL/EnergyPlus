@@ -123,6 +123,7 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -136,6 +137,7 @@
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/ManageElectricPower.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
@@ -170,8 +172,10 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
@@ -303,6 +307,7 @@ namespace EnergyPlus {
 		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
 		HeatBalanceSurfaceManager::clear_state();
+		HeatBalFiniteDiffManager::clear_state();
 		HeatPumpWaterToWaterSimple::clear_state();
 		HeatRecovery::clear_state();
 		HeatingCoils::clear_state();
@@ -311,10 +316,12 @@ namespace EnergyPlus {
 		HVACDXHeatPumpSystem::clear_state();
 		HVACDXSystem::clear_state();
 		HVACManager::clear_state();
+		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
+		LowTempRadiantSystem::clear_state();
 		ManageElectricPower::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
@@ -350,6 +357,7 @@ namespace EnergyPlus {
 		SplitterComponent::clear_state();
 		SurfaceGeometry::clear_state();
 		SystemAvailabilityManager::clear_state();
+		SwimmingPool::clear_state();
 		ThermalComfort::clear_state();
 		UnitHeater::clear_state();
 		UnitVentilator::clear_state();

@@ -62,16 +62,16 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SwimmingPool;
 
-TEST( SwimmingPoolTest, MakeUpWaterVolFlow )
+TEST_F( EnergyPlusFixture, SwimmingPool_MakeUpWaterVolFlow )
 {
-	ShowMessage( "Begin Test: SwimmingPoolTest, MakeUpWaterVolFlow" );
-	
+
 	//Tests for MakeUpWaterVolFlowFunct
 	EXPECT_EQ( 500, MakeUpWaterVolFlowFunct(5, 100) );
 	EXPECT_NEAR( 0.0255, MakeUpWaterVolFlowFunct(0.001, 25.5), .0001 );

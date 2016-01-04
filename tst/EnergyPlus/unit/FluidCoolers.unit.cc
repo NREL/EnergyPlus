@@ -201,10 +201,8 @@ TEST_F( EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test2 ) {
 }
 
 
-TEST( SingleSpeedFluidCoolerInput, Test3 )
+TEST_F( EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3 )
 {
-	ShowMessage( "Begin Test: SingleSpeedFluidCoolerInput, Test3" );
-
 	using DataSizing::AutoSize;
 	int StringArraySize = 20;
 	Array1D_string cNumericFieldNames;
@@ -259,9 +257,4 @@ TEST( SingleSpeedFluidCoolerInput, Test3 )
 	testResult = TestFluidCoolerSingleSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
 	EXPECT_TRUE( testResult ); // error message triggered
 
-
-	SimpleFluidCooler.deallocate();
-	cNumericFieldNames.deallocate();
-	cAlphaFieldNames.deallocate();
-	AlphArray.deallocate();
 }

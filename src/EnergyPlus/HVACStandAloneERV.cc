@@ -175,6 +175,16 @@ namespace HVACStandAloneERV {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumStandAloneERVs = 0;
+		GetERVInputFlag = true;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		StandAloneERV.deallocate();
+	}
+
+	void
 	SimStandAloneERV(
 		std::string const & CompName, // name of the Stand Alone ERV unit
 		int const ZoneNum, // number of zone being served unused1208

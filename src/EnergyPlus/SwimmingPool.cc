@@ -162,6 +162,22 @@ namespace SwimmingPool {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumSwimmingPools = 0;
+		CheckEquipName.deallocate();
+		SurfaceToPoolIndex.deallocate();
+		QPoolSrcAvg.deallocate();
+		HeatTransCoefsAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQPoolSrc.deallocate();
+		LastHeatTransCoefs.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		Pool.deallocate();
+	}
+
+	void
 	SimSwimmingPool (
 		bool const FirstHVACIteration
 	)

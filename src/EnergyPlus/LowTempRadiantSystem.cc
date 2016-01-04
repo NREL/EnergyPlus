@@ -245,6 +245,37 @@ namespace LowTempRadiantSystem {
 	// Functions
 
 	void
+	clear_state()
+	{
+		LowTempHeating = -200.0;
+		HighTempCooling = 200.0;
+		NumOfHydrLowTempRadSys = 0;
+		NumOfCFloLowTempRadSys = 0;
+		NumOfElecLowTempRadSys = 0;
+		CFloCondIterNum = 0;
+		TotalNumOfRadSystems = 0;
+		OperatingMode = 0;
+		MaxCloNumOfSurfaces = 0;
+		VarOffCond = false;
+		LoopReqTemp = 0.0;
+		QRadSysSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQRadSysSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		MySizeFlagHydr.deallocate();
+		MySizeFlagCFlo.deallocate();
+		MySizeFlagElec.deallocate();
+		CheckEquipName.deallocate();
+		HydrRadSys.deallocate();
+		CFloRadSys.deallocate();
+		ElecRadSys.deallocate();
+		RadSysTypes.deallocate();
+		ElecRadSysNumericFields.deallocate();
+		HydronicRadiantSysNumericFields.deallocate();
+	}
+
+	void
 	SimLowTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep

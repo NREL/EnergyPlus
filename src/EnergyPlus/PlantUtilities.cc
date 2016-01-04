@@ -106,7 +106,7 @@ namespace PlantUtilities {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 
-	namespace { 
+	namespace {
 		struct CriteriaData
 		{
 			// Members
@@ -152,7 +152,8 @@ namespace PlantUtilities {
 
 	// Functions
 	void
-	clear_state(){
+	clear_state()
+	{
 		CriteriaChecks.deallocate();
 	}
 
