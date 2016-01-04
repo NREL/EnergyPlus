@@ -482,6 +482,12 @@ namespace MixedAir {
 				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
 				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
 			}
+			// now simulate again propogate current temps back through OA system
+			for( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
+				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
+			}
 		}
 
 		if ( MyOneTimeErrorFlag( OASysNum ) ) {

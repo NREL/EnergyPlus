@@ -801,7 +801,7 @@ namespace EnergyPlus {
 		AirPressure = StdPressureSeaLevel;
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(InletDBTemp, InletWBTemp, AirPressure );
 		AirMassFlowRate = AirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW( AirPressure, InletDBTemp, InletAirHumRat );
-		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, AirPressure );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
 		CBF_expected = 0.17268167698750708;
 		EXPECT_DOUBLE_EQ( CBF_calculated, CBF_expected );
 	}
@@ -1193,4 +1193,158 @@ namespace EnergyPlus {
 		DXCoil.deallocate( );
 
 	}
+
+	TEST_F( EnergyPlusFixture, DXCoil_ValidateADPFunction ) {
+
+		using Psychrometrics::PsyRhoAirFnPbTdbW;
+
+		// tests autosizing DX coil SHR #4853
+
+		std::string const idf_objects = delimited_string( {
+			"	Schedule:Compact,",
+			"	FanAndCoilAvailSched, !- Name",
+			"	Fraction,             !- Schedule Type Limits Name",
+			"	Through: 12/31,       !- Field 1",
+			"	For: AllDays,         !- Field 2",
+			"	Until: 24:00, 1.0;    !- Field 3",
+			"Curve:Biquadratic,",
+			"	WindACCoolCapFT, !- Name",
+			"	0.942587793,     !- Coefficient1 Constant",
+			"	0.009543347,     !- Coefficient2 x",
+			"	0.000683770,     !- Coefficient3 x**2",
+			"	-0.011042676,    !- Coefficient4 y",
+			"	0.000005249,     !- Coefficient5 y**2",
+			"	-0.000009720,    !- Coefficient6 x*y",
+			"	12.77778,        !- Minimum Value of x",
+			"	23.88889,        !- Maximum Value of x",
+			"	18.0,            !- Minimum Value of y",
+			"	46.11111,        !- Maximum Value of y",
+			"	,                !- Minimum Curve Output",
+			"	,                !- Maximum Curve Output",
+			"	Temperature,     !- Input Unit Type for X",
+			"	Temperature,     !- Input Unit Type for Y",
+			"	Dimensionless;   !- Output Unit Type",
+			"Curve:Biquadratic,",
+			"	WindACEIRFT,   !- Name",
+			"	0.342414409,   !- Coefficient1 Constant",
+			"	0.034885008,   !- Coefficient2 x",
+			"	-0.000623700,  !- Coefficient3 x**2",
+			"	0.004977216,   !- Coefficient4 y",
+			"	0.000437951,   !- Coefficient5 y**2",
+			"	-0.000728028,  !- Coefficient6 x*y",
+			"	12.77778,      !- Minimum Value of x",
+			"	23.88889,      !- Maximum Value of x",
+			"	18.0,          !- Minimum Value of y",
+			"	46.11111,      !- Maximum Value of y",
+			"	,              !- Minimum Curve Output",
+			"	,              !- Maximum Curve Output",
+			"	Temperature,   !- Input Unit Type for X",
+			"	Temperature,   !- Input Unit Type for Y",
+			"	Dimensionless; !- Output Unit Type",
+			"Curve:Quadratic,",
+			"	WindACCoolCapFFF, !- Name",
+			"	0.8,              !- Coefficient1 Constant",
+			"	0.2,              !- Coefficient2 x",
+			"	0.0,              !- Coefficient3 x**2",
+			"	0.5,              !- Minimum Value of x",
+			"	1.5;              !- Maximum Value of x",
+			"Curve:Quadratic,",
+			"	WindACEIRFFF, !- Name",
+			"	1.1552,       !- Coefficient1 Constant",
+			"  -0.1808,       !- Coefficient2 x",
+			"	0.0256,       !- Coefficient3 x**2",
+			"	0.5,          !- Minimum Value of x",
+			"	1.5;          !- Maximum Value of x",
+			"Curve:Quadratic,",
+			"	WindACPLFFPLR, !- Name",
+			"	0.85,          !- Coefficient1 Constant",
+			"	0.15,          !- Coefficient2 x",
+			"	0.0,           !- Coefficient3 x**2",
+			"	0.0,           !- Minimum Value of x",
+			"	1.0;           !- Maximum Value of x",
+			"Coil:Cooling:DX:SingleSpeed,",
+			"	Furnace ACDXCoil 1,   !- Name",
+			" 	FanAndCoilAvailSched, !- Availability Schedule Name",
+			"	25000.0,              !- Gross Rated Total Cooling Capacity { W }",
+			"	autosize,             !- Gross Rated Sensible Heat Ratio",
+			"	4.40,                 !- Gross Rated Cooling COP { W / W }",
+			"	1.30,                 !- Rated Air Flow Rate { m3 / s }",
+			"	,                     !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+			"	DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+			"	Heating Coil Air Inlet Node,    !- Air Outlet Node Name",
+			"	WindACCoolCapFT,      !- Total Cooling Capacity Function of Temperature Curve Name",
+			"	WindACCoolCapFFF,     !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+			"	WindACEIRFT,          !- Energy Input Ratio Function of Temperature Curve Name",
+			"	WindACEIRFFF,         !- Energy Input Ratio Function of Flow Fraction Curve Name",
+			"	WindACPLFFPLR,        !- Part Load Fraction Correlation Curve Name",
+			"	0.0,                  !- Nominal Time for Condensate Removal to Begin",
+			"	0.0,                  !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+			"	0.0,                  !- Maximum Cycling Rate",
+			"	0.0,                  !- Latent Capacity Time Constant",
+			"	Split TSW Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+			"	EvaporativelyCooled,  !- Condenser Type",
+			"	0.0,                  !- Evaporative Condenser Effectiveness",
+			"	,                     !- Evaporative Condenser Air Flow Rate",
+			"	autosize,             !- Evaporative Condenser Pump Rated Power Consumption",
+			"	0.0,                  !- Crankcase Heater Capacity",
+			"	10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		ProcessScheduleInput();
+		GetCurveInput();
+		GetDXCoils();
+		SetPredefinedTables();
+		CurZoneEqNum = 1;
+
+		// Need this to prevent crash in RequestSizing
+		FinalZoneSizing.allocate( 1 );
+		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.1;
+		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.1;
+		DataFlowUsedForSizing = 0.1;
+		ZoneEqSizing.allocate( 1 );
+		ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+		ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = DXCoil( 1 ).RatedTotCap( 1 );
+		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
+		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
+		ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::SystemAirflowSizing ) = DataSizing::SupplyAirFlowRate;
+		ZoneSizingInput.allocate( 1 );
+		ZoneSizingInput( 1 ).ZoneNum = 1;
+		DataSizing::NumZoneSizingInput = 1;
+		ZoneSizingRunDone = true;
+		StdBaroPress = 101325.0;
+
+		SizeDXCoil( 1 ); // normal sizing
+
+		Real64 const RatedInletAirTemp( 26.6667 ); // 26.6667C or 80F
+		Real64 const RatedInletAirHumRat( 0.01125 ); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+		std::string const CallingRoutine( "DXCoil_ValidateADPFunction" );
+
+		Real64 DesMassFlow = DXCoil( 1 ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
+		Real64 CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+
+		EXPECT_NEAR( 0.747472, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
+		EXPECT_NEAR( 0.1012203, CBF_calculated, 0.0000001 );
+
+		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // run right at the saturation curve
+		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
+
+		SizeDXCoil( 1 );
+		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+
+		EXPECT_NEAR( 0.67608322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
+		EXPECT_NEAR( 0.0003243, CBF_calculated, 0.0000001 );
+
+		DXCoil( 1 ).RatedTotCap( 1 ) = 40000.0; // reverse perturb SHR (i.e., decrease SHR), CalcCBF would have failed with RH >= 1.0
+		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
+
+		SizeDXCoil( 1 );
+		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+
+		EXPECT_NEAR( 0.64408322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
+		EXPECT_NEAR( 0.0028271, CBF_calculated, 0.0000001 );
+
+	}
+
 }
