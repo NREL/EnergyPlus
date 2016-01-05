@@ -4006,6 +4006,42 @@ SystemLoad 	= system load to be met by the fan coil unit, (W)
 
 {FullLoadOutput_{n}} 	= fully load fan coil unit output at fan speed level n, (W)
 
+##### ASHRAE 90.1
+
+The ASHRAE90.1 control method uses a simple technique to adjust fan speed based on zone design sensible load. The specific section of the Standard is described as:
+
+    Section 6.4.3.10 (“Single Zone Variable-Air-Volume Controls”) of ASHRAE Standard 90.1-2010.
+    HVAC systems shall have variable airflow controls as follows:
+    (a) Air-handling and fan-coil units with chilled-water cooling coils and supply fans with motors 
+        greater than or equal to 5 hp shall have their supply fans controlled by two-speed motors or
+        variable-speed drives. At cooling demands less than or equal to 50%, the supply fan controls
+        shall be able to reduce the airflow to no greater than the larger of the following:
+        • One-half of the full fan speed, or
+        • The volume of outdoor air required to meet the ventilation requirements of Standard 62.1.
+    (b) Effective January 1, 2012, all air-conditioning equipment and air-handling units with direct
+        expansion cooling and a cooling capacity at AHRI conditions greater than or equal to 110,000
+        Btu/h that serve single zones shall have their supply fans controlled by two-speed motors or
+        variable-speed drives. At cooling demands less than or equal to 50%, the supply fan controls
+        shall be able to reduce the airflow to no greater than the larger of the following:
+        • Two-thirds of the full fan speed, or
+        • The volume of outdoor air required to meet the ventilation requirements of Standard 62.1.
+
+This control method assumes that a simulation sizing run is performed to determine the zone design sensible cooling and heating load <span>\({\dot Q_{z,design}}\)</span>.
+
+For fan coil units, the limit used to determine if reduced zone loads are met with reduced fan speed is the fan coil's Low Speed Supply Air Flow Ratio input.
+
+<div>$${\dot Q_{reduced}} = {\dot Q_{z,design}} * {Ratio_{fan,low{\rm{ }}speed}}$$</div>
+
+If the zone load, <span>\({\dot Q_{z,req}}\)</span>, is less than <span>\({Q_{reduced}}\)</span> then the fan is maintained at the reduced speed while the water coils (or electric heating coil) are modulated to meet the zone load.
+
+If the zone load is greater than the design zone sensible load, <span>\({\dot Q_{z,design}}\)</span>, the fan will operate at the maximum supply air flow rate and the water or electric heating coils will modulate to meet the zone load.
+
+If the zone load is between these two extremes, the fan and coil will modulate to meet the zone load.
+
+An example of the ASHRAE 90.1 control method is provided in the following figure. In this figure, the X-axis represents the zone cooling (-) or heating (+) load.
+
+![](media/SZVAV_Fan_Control_FanCoil.jpg)<br>
+Single-Zone VAV Fan Control for Fan Coil Units
 
 #### References
 

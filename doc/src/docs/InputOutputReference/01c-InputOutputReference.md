@@ -7359,9 +7359,9 @@ What is a fan coil unit? Like many HVAC terms, “fan coil unit” is used rathe
 
 The heating or cooling output of the unit ventilator is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit.
 
-Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans ar typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
+Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans are typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
 
-EnergyPlus provides 5 capacity control methods for this unit:
+EnergyPlus provides 6 capacity control methods for this unit:
 
   1. multi-speed cycling fan with constant water flow rate
 
@@ -7373,9 +7373,11 @@ EnergyPlus provides 5 capacity control methods for this unit:
 
   5. multi-speed fan with cycling between speeds and  constant water flow.
 
+  6. fan speed control based on ASHRAE 90.1
+
 In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot (for hydronic heating coil only) and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop through its hot water coil or with no hot water loop when using an electric coil (demand side) and to a chilled water loop (demand side) through its cooling coil.
 
-Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, and for *MultiSpeedFan* a *Fan:OnOff* should be chosen.
+Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, for *MultiSpeedFan* a *Fan:OnOff* should be used, and for *ASHRA90.1*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen.
 
 Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. EnergyPlus models 4-pipe units, but the 4-pipe model can be used to model 2-pipe units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available. Fan coil units with hydronic heat can instead be modeled using an electric heating coil if desired (i.e., replace the hydronic heating coil with an electric heating coil).
 
@@ -7389,7 +7391,7 @@ The name of the schedule (ref: Schedule) that denotes whether the fan coil unit 
 
 ***Field: Capacity Control  Method***
 
-This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiSpeedFan***, or ***ASHRAE90.1***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. For *ASHRAE90.1*, the fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. The water coil water flow rate, or the electric heating coil part-load ratio, is modulated to meet the zone load. If the zone sensible load is greater than the zone sensible load multiplied by the low speed supply air flow ratio, then the air and water flow rate is increased to meet the load. If the zone load is greater than the design sensible load, the fan air flow rate is maintained at the maximum value while the water flow rate is further increased to the maximum available while electric heating coils are maintained at the maximum output.
+This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, ***MultiSpeedFan***, or ***ASHRAE90.1***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. For *ASHRAE90.1*, the fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. The water coil water flow rate, or the electric heating coil part-load ratio, is modulated to meet the zone load. If the zone sensible load is greater than the zone sensible load multiplied by the low speed supply air flow ratio, then the air and water flow rate is increased to meet the load. If the zone load is greater than the design sensible load, the fan air flow rate is maintained at the maximum value while the water flow rate is further increased to the maximum available while electric heating coils are maintained at the maximum output.
 
 ***Note: when ASHRAE90.1 is selected, the simulation must include zone sizing to calculate the zone design sensible cooling and heating load.***
 
@@ -7405,7 +7407,7 @@ This numerical field specifies the ratio of the low speed flow rate to the maxim
 
 #### Field: Medium Speed Supply Air  Flow Ratio
 
-This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the *Low Speed Supply Air Flow Ratio* but less than 1. If left blank, the default value is 0.66. Leave this field blank if the capacity control method selected is not *CyclingFan*.
+This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the *Low Speed Supply Air Flow Ratio* but less than 1. If left blank, the default value is 0.66. Leave this field blank if the capacity control method selected is not *CyclingFan* or *MultiSpeedFan*.
 
 #### Field: Maximum Outdoor Air Flow Rate
 
@@ -7445,10 +7447,10 @@ This field specifies the type of supply air fan object used by this fan coil. Th
 
 #### Field: Supply Air Fan Name
 
-The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. For *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume* should be chosen. And for *ASHRAE90.1*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen. 
+The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. For *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume* should be chosen. For *MultiSpeedFan* a *Fan:OnOff* should be used. And for *ASHRAE90.1*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen. 
 
-**The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.**<br>
-**The fan’s outlet node should be the same as the cooling coil’s air inlet node.**
+    The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
+    The fan’s outlet node should be the same as the cooling coil’s air inlet node.
 
 #### Field: Cooling Coil Object Type
 
