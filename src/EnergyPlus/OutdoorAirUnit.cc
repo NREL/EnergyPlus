@@ -869,7 +869,6 @@ namespace OutdoorAirUnit {
 
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
 		using DataGlobals::AnyPlantInModel;
@@ -1366,8 +1365,6 @@ namespace OutdoorAirUnit {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
 		using DataEnvironment::OutBaroPress;
@@ -1713,8 +1710,6 @@ namespace OutdoorAirUnit {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
 		using DataEnvironment::OutBaroPress;
@@ -2356,6 +2351,26 @@ namespace OutdoorAirUnit {
 
 	}
 
+<<<<<<< HEAD
+=======
+	// Clears the global data in OutdoorAirUnit.
+	// Needed for unit tests, should not be normally called.
+	void
+		clear_state()
+	{
+
+		NumOfOAUnits = 0;
+		OAMassFlowRate = 0.0;
+		GetOutdoorAirUnitInputFlag = true;
+
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		MyOneTimeErrorFlag.deallocate();
+		OutAirUnit.deallocate();
+
+	}
+
+>>>>>>> develop
 	//*****************************************************************************************
 
 } // OutdoorAirUnit

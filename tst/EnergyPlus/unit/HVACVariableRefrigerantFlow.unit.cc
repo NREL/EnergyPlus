@@ -67,7 +67,6 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -173,7 +172,11 @@ namespace EnergyPlus {
 
 	}
 
+<<<<<<< HEAD
 	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CompResidual )
+=======
+	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
+>>>>>>> develop
 	{
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
@@ -219,8 +222,8 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 1.652, CompResidual, 0.005 );
 
 		// Clean up
-		PerfCurve.deallocate( );
-		Par.deallocate( );
+		PerfCurve.deallocate();
+		Par.deallocate();
 
 	}
 
@@ -262,7 +265,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( -0.707, FanSpdResidual, 0.0005 );
 
 		// Clean up
-		Par.deallocate( );
+		Par.deallocate();
 
 	}
 
@@ -304,7 +307,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( -0.5459, FanSpdResidual, 0.0005 );
 
 		// Clean up
-		Par.deallocate( );
+		Par.deallocate();
 
 	}
 
@@ -343,7 +346,7 @@ namespace EnergyPlus {
 		FanSpdRatio = 0;
 		Wout = 1;
 		OutBaroPress = 101570;
-		InitializePsychRoutines( );
+		InitializePsychRoutines();
 
 		DXCoil( CoolCoilIndex ).C1Te = 0;
 		DXCoil( CoolCoilIndex ).C2Te = 0.804;
@@ -393,7 +396,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( SCact, 5.00, 0.01 );
 
 		// Clean up
-		ZoneSysEnergyDemand.deallocate( );
+		ZoneSysEnergyDemand.deallocate();
 	}
 
 	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CalcVRFIUTeTc )
@@ -428,8 +431,8 @@ namespace EnergyPlus {
 		EXPECT_EQ( VRF( IndexVRFCondenser ).IUCondensingTemp, 5 );
 
 		// Clean up
-		VRF.deallocate( );
-		TerminalUnitList.deallocate( );
+		VRF.deallocate();
+		TerminalUnitList.deallocate();
 	}
 
 	TEST_F( EnergyPlusFixture, VRFTest_SysCurve ) {

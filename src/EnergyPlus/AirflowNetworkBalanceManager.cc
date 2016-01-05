@@ -57,6 +57,7 @@
 // in binary and source code form.
 
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 #include <string>
 
@@ -149,7 +150,6 @@ namespace AirflowNetworkBalanceManager {
 	using DataEnvironment::CurMnDy;
 	using DataEnvironment::EnvironmentName;
 	using DataEnvironment::OutAirDensity;
-	using DataEnvironment::WindSpeed;
 	using DataEnvironment::WindDir;
 	using DataEnvironment::OutEnthalpy;
 	using DataEnvironment::StdRhoAir;
@@ -3420,7 +3420,7 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( DisSysNumOfLinks > 0 && SimulateAirflowNetwork > AirflowNetworkControlMultizone ) { // Distribution
 
-			AirflowNetworkLinkageData.ZoneNum() = 0;
+			for ( auto & e : AirflowNetworkLinkageData ) e.ZoneNum = 0;
 
 			for ( count = AirflowNetworkNumOfSurfaces + 1; count <= AirflowNetworkNumOfLinks; ++count ) {
 
@@ -3864,16 +3864,18 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		AirflowNetworkExchangeData.TotalSen() = 0.0;
-		AirflowNetworkExchangeData.TotalLat() = 0.0;
-		AirflowNetworkExchangeData.MultiZoneSen() = 0.0;
-		AirflowNetworkExchangeData.MultiZoneLat() = 0.0;
-		AirflowNetworkExchangeData.LeakSen() = 0.0;
-		AirflowNetworkExchangeData.LeakLat() = 0.0;
-		AirflowNetworkExchangeData.CondSen() = 0.0;
-		AirflowNetworkExchangeData.DiffLat() = 0.0;
-		if ( Contaminant.CO2Simulation ) AirflowNetworkExchangeData.TotalCO2() = 0.0;
-		if ( Contaminant.GenericContamSimulation ) AirflowNetworkExchangeData.TotalGC() = 0.0;
+		for ( auto & e : AirflowNetworkExchangeData ) {
+			e.TotalSen = 0.0;
+			e.TotalLat = 0.0;
+			e.MultiZoneSen = 0.0;
+			e.MultiZoneLat = 0.0;
+			e.LeakSen = 0.0;
+			e.LeakLat = 0.0;
+			e.CondSen = 0.0;
+			e.DiffLat = 0.0;
+		}
+		if ( Contaminant.CO2Simulation ) for ( auto & e : AirflowNetworkExchangeData ) e.TotalCO2 = 0.0;
+		if ( Contaminant.GenericContamSimulation ) for ( auto & e : AirflowNetworkExchangeData ) e.TotalGC = 0.0;
 
 		// Occupant ventilation control
 		CurrentEndTime = CurrentTime + SysTimeElapsed;
@@ -5704,47 +5706,48 @@ namespace AirflowNetworkBalanceManager {
 
 		ReportingConstant = TimeStepSys * SecInHour;
 
-		AirflowNetworkReportData.MultiZoneInfiSenGainW() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiSenGainJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiSenLossW() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiSenLossJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiLatGainW() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiLatGainJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiLatLossW() = 0.0;
-		AirflowNetworkReportData.MultiZoneInfiLatLossJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixSenGainW() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixSenGainJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixSenLossW() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixSenLossJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixLatGainW() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixLatGainJ() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixLatLossW() = 0.0;
-		AirflowNetworkReportData.MultiZoneMixLatLossJ() = 0.0;
-
-		AirflowNetworkReportData.LeakSenGainW() = 0.0;
-		AirflowNetworkReportData.LeakSenGainJ() = 0.0;
-		AirflowNetworkReportData.LeakSenLossW() = 0.0;
-		AirflowNetworkReportData.LeakSenLossJ() = 0.0;
-		AirflowNetworkReportData.LeakLatGainW() = 0.0;
-		AirflowNetworkReportData.LeakLatGainJ() = 0.0;
-		AirflowNetworkReportData.LeakLatLossW() = 0.0;
-		AirflowNetworkReportData.LeakLatLossJ() = 0.0;
-		AirflowNetworkReportData.CondSenGainW() = 0.0;
-		AirflowNetworkReportData.CondSenGainJ() = 0.0;
-		AirflowNetworkReportData.CondSenLossW() = 0.0;
-		AirflowNetworkReportData.CondSenLossJ() = 0.0;
-		AirflowNetworkReportData.DiffLatGainW() = 0.0;
-		AirflowNetworkReportData.DiffLatGainJ() = 0.0;
-		AirflowNetworkReportData.DiffLatLossW() = 0.0;
-		AirflowNetworkReportData.DiffLatLossJ() = 0.0;
-		AirflowNetworkReportData.TotalSenGainW() = 0.0;
-		AirflowNetworkReportData.TotalSenGainJ() = 0.0;
-		AirflowNetworkReportData.TotalSenLossW() = 0.0;
-		AirflowNetworkReportData.TotalSenLossJ() = 0.0;
-		AirflowNetworkReportData.TotalLatGainW() = 0.0;
-		AirflowNetworkReportData.TotalLatGainJ() = 0.0;
-		AirflowNetworkReportData.TotalLatLossW() = 0.0;
-		AirflowNetworkReportData.TotalLatLossJ() = 0.0;
+		for ( auto & e : AirflowNetworkReportData ) {
+			e.MultiZoneInfiSenGainW = 0.0;
+			e.MultiZoneInfiSenGainJ = 0.0;
+			e.MultiZoneInfiSenLossW = 0.0;
+			e.MultiZoneInfiSenLossJ = 0.0;
+			e.MultiZoneInfiLatGainW = 0.0;
+			e.MultiZoneInfiLatGainJ = 0.0;
+			e.MultiZoneInfiLatLossW = 0.0;
+			e.MultiZoneInfiLatLossJ = 0.0;
+			e.MultiZoneMixSenGainW = 0.0;
+			e.MultiZoneMixSenGainJ = 0.0;
+			e.MultiZoneMixSenLossW = 0.0;
+			e.MultiZoneMixSenLossJ = 0.0;
+			e.MultiZoneMixLatGainW = 0.0;
+			e.MultiZoneMixLatGainJ = 0.0;
+			e.MultiZoneMixLatLossW = 0.0;
+			e.MultiZoneMixLatLossJ = 0.0;
+			e.LeakSenGainW = 0.0;
+			e.LeakSenGainJ = 0.0;
+			e.LeakSenLossW = 0.0;
+			e.LeakSenLossJ = 0.0;
+			e.LeakLatGainW = 0.0;
+			e.LeakLatGainJ = 0.0;
+			e.LeakLatLossW = 0.0;
+			e.LeakLatLossJ = 0.0;
+			e.CondSenGainW = 0.0;
+			e.CondSenGainJ = 0.0;
+			e.CondSenLossW = 0.0;
+			e.CondSenLossJ = 0.0;
+			e.DiffLatGainW = 0.0;
+			e.DiffLatGainJ = 0.0;
+			e.DiffLatLossW = 0.0;
+			e.DiffLatLossJ = 0.0;
+			e.TotalSenGainW = 0.0;
+			e.TotalSenGainJ = 0.0;
+			e.TotalSenLossW = 0.0;
+			e.TotalSenLossJ = 0.0;
+			e.TotalLatGainW = 0.0;
+			e.TotalLatGainJ = 0.0;
+			e.TotalLatLossW = 0.0;
+			e.TotalLatLossJ = 0.0;
+		}
 
 		// Calculate sensible and latent loads in each zone from multizone airflows
 		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
@@ -5877,15 +5880,17 @@ namespace AirflowNetworkBalanceManager {
 
 		// Zone report
 
-		AirflowNetworkZnRpt.MeanAirTemp() = 0.0;
-		AirflowNetworkZnRpt.OperativeTemp() = 0.0;
-		AirflowNetworkZnRpt.InfilHeatGain() = 0.0;
-		AirflowNetworkZnRpt.InfilHeatLoss() = 0.0;
-		AirflowNetworkZnRpt.InfilVolume() = 0.0;
-		AirflowNetworkZnRpt.InfilMass() = 0.0;
-		AirflowNetworkZnRpt.InfilAirChangeRate() = 0.0;
-		AirflowNetworkZnRpt.MixVolume() = 0.0;
-		AirflowNetworkZnRpt.MixMass() = 0.0;
+		for ( auto & e : AirflowNetworkZnRpt ) {
+			e.MeanAirTemp = 0.0;
+			e.OperativeTemp = 0.0;
+			e.InfilHeatGain = 0.0;
+			e.InfilHeatLoss = 0.0;
+			e.InfilVolume = 0.0;
+			e.InfilMass = 0.0;
+			e.InfilAirChangeRate = 0.0;
+			e.MixVolume = 0.0;
+			e.MixMass = 0.0;
+		}
 
 		if ( SupplyFanType == FanType_SimpleOnOff && OnOffFanRunTimeFraction < 1.0 && OnOffFanRunTimeFraction > 0.0 ) {
 			// ON Cycle calculation
@@ -6115,21 +6120,27 @@ namespace AirflowNetworkBalanceManager {
 		static bool MyOneTimeFlag( true );
 		static bool MyOneTimeFlag1( true );
 
-		AirflowNetworkExchangeData.SumMCp() = 0.0;
-		AirflowNetworkExchangeData.SumMCpT() = 0.0;
-		AirflowNetworkExchangeData.SumMHr() = 0.0;
-		AirflowNetworkExchangeData.SumMHrW() = 0.0;
-		AirflowNetworkExchangeData.SumMMCp() = 0.0;
-		AirflowNetworkExchangeData.SumMMCpT() = 0.0;
-		AirflowNetworkExchangeData.SumMMHr() = 0.0;
-		AirflowNetworkExchangeData.SumMMHrW() = 0.0;
+		for ( auto & e : AirflowNetworkExchangeData ) {
+			e.SumMCp = 0.0;
+			e.SumMCpT = 0.0;
+			e.SumMHr = 0.0;
+			e.SumMHrW = 0.0;
+			e.SumMMCp = 0.0;
+			e.SumMMCpT = 0.0;
+			e.SumMMHr = 0.0;
+			e.SumMMHrW = 0.0;
+		}
 		if ( Contaminant.CO2Simulation ) {
-			AirflowNetworkExchangeData.SumMHrCO() = 0.0;
-			AirflowNetworkExchangeData.SumMMHrCO() = 0.0;
+			for ( auto & e : AirflowNetworkExchangeData ) {
+				e.SumMHrCO = 0.0;
+				e.SumMMHrCO = 0.0;
+			}
 		}
 		if ( Contaminant.GenericContamSimulation ) {
-			AirflowNetworkExchangeData.SumMHrGC() = 0.0;
-			AirflowNetworkExchangeData.SumMMHrGC() = 0.0;
+			for ( auto & e : AirflowNetworkExchangeData ) {
+				e.SumMHrGC = 0.0;
+				e.SumMMHrGC = 0.0;
+			}
 		}
 
 		// Calculate sensible and latent loads in each zone from multizone airflows
@@ -6199,12 +6210,14 @@ namespace AirflowNetworkBalanceManager {
 		// End of update of multizone airflow calculations
 
 		// Initialize these values
-		AirflowNetworkExchangeData.LeakSen() = 0.0;
-		AirflowNetworkExchangeData.CondSen() = 0.0;
-		AirflowNetworkExchangeData.LeakLat() = 0.0;
-		AirflowNetworkExchangeData.DiffLat() = 0.0;
-		AirflowNetworkExchangeData.MultiZoneSen() = 0.0;
-		AirflowNetworkExchangeData.MultiZoneLat() = 0.0;
+		for ( auto & e : AirflowNetworkExchangeData ) {
+			e.LeakSen = 0.0;
+			e.CondSen = 0.0;
+			e.LeakLat = 0.0;
+			e.DiffLat = 0.0;
+			e.MultiZoneSen = 0.0;
+			e.MultiZoneLat = 0.0;
+		}
 
 		// Rewrite AirflowNetwork airflow rate
 		for ( i = 1; i <= NumOfLinksMultiZone; ++i ) {
@@ -6214,10 +6227,14 @@ namespace AirflowNetworkBalanceManager {
 			AirflowNetworkLinkSimu( i ).VolFLOW2 = AirflowNetworkLinkSimu( i ).FLOW2 / AirDensity;
 		}
 
-		AirflowNetworkLinkReport.FLOW() = AirflowNetworkLinkSimu.FLOW();
-		AirflowNetworkLinkReport.FLOW2() = AirflowNetworkLinkSimu.FLOW2();
-		AirflowNetworkLinkReport.VolFLOW() = AirflowNetworkLinkSimu.VolFLOW();
-		AirflowNetworkLinkReport.VolFLOW2() = AirflowNetworkLinkSimu.VolFLOW2();
+		for ( std::size_t i = 0; i < AirflowNetworkLinkReport.size(); ++i ) {
+			auto & r( AirflowNetworkLinkReport[ i ] );
+			auto & s( AirflowNetworkLinkSimu[ i ] );
+			r.FLOW = s.FLOW;
+			r.FLOW2 = s.FLOW2;
+			r.VolFLOW = s.VolFLOW;
+			r.VolFLOW2 = s.VolFLOW2;
+		}
 
 		// Save zone loads from multizone calculation for later summation
 		if ( present( FirstHVACIteration ) ) {
@@ -6303,10 +6320,14 @@ namespace AirflowNetworkBalanceManager {
 		LoopHeatingCoilMaxRTF = 0.0;
 
 		if ( SupplyFanType == FanType_SimpleOnOff && PartLoadRatio < 1.0 ) {
-			AirflowNetworkLinkReport.FLOW() = AirflowNetworkLinkSimu.FLOW() * PartLoadRatio;
-			AirflowNetworkLinkReport.FLOW2() = AirflowNetworkLinkSimu.FLOW2() * PartLoadRatio;
-			AirflowNetworkLinkReport.VolFLOW() = AirflowNetworkLinkSimu.VolFLOW() * PartLoadRatio;
-			AirflowNetworkLinkReport.VolFLOW2() = AirflowNetworkLinkSimu.VolFLOW2() * PartLoadRatio;
+			for ( std::size_t i = 0; i < AirflowNetworkLinkReport.size(); ++i ) {
+				auto & r( AirflowNetworkLinkReport[ i ] );
+				auto & s( AirflowNetworkLinkSimu[ i ] );
+				r.FLOW = s.FLOW * PartLoadRatio;
+				r.FLOW2 = s.FLOW2 * PartLoadRatio;
+				r.VolFLOW = s.VolFLOW * PartLoadRatio;
+				r.VolFLOW2 = s.VolFLOW2 * PartLoadRatio;
+			}
 		}
 
 		// One time warning
@@ -7318,7 +7339,7 @@ namespace AirflowNetworkBalanceManager {
 		// Validate supply and return connections
 		if ( OneTimeFlag ) {
 			CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
-			if ( any( ZoneEquipConfig.IsControlled() ) ) {
+			if ( std::any_of( ZoneEquipConfig.begin(), ZoneEquipConfig.end(), []( DataZoneEquipment::EquipConfiguration const & e ){ return e.IsControlled; } ) ) {
 				AirflowNetworkZoneExhaustFan.dimension( NumOfZones, false );
 			}
 			// Ensure the number of exhaust fan defined in the AirflowNetwork model matches the number of Zone Exhaust Fan objects
@@ -7459,10 +7480,12 @@ namespace AirflowNetworkBalanceManager {
 		static int HybridGlobalErrIndex( 0 );
 		static int HybridGlobalErrCount( 0 );
 
-		MultizoneSurfaceData.HybridVentClose() = false;
-		MultizoneSurfaceData.HybridCtrlGlobal() = false;
-		MultizoneSurfaceData.HybridCtrlMaster() = false;
-		MultizoneSurfaceData.WindModifier() = 1.0;
+		for ( auto & e : MultizoneSurfaceData ) {
+			e.HybridVentClose = false;
+			e.HybridCtrlGlobal = false;
+			e.HybridCtrlMaster = false;
+			e.WindModifier = 1.0;
+		}
 		ControlType = IndividualCtrlType;
 
 		for ( SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum ) {

@@ -56,9 +56,13 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+// C++ Headers
+#include <cmath>
+
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
+#include <DataEnvironment.hh>
 #include <DataSurfaces.hh>
 #include <DataPrecisionGlobals.hh>
 
@@ -602,6 +606,102 @@ namespace DataSurfaces {
 		ExtVentedCavity.deallocate();
 		SurfIncSolSSG.deallocate();
 		FenLayAbsSSG.deallocate();
+	}
+
+	void
+	SurfaceData::SetOutBulbTempAt()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Noel Keen (LBL)/Linda Lawrie
+		//       DATE WRITTEN   August 2010
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Routine provides facility for doing bulk Set Temperature at Height.
+
+		// Using/Aliasing
+		using DataEnvironment::EarthRadius;
+		using DataEnvironment::SiteTempGradient;
+		using DataEnvironment::WeatherFileTempModCoeff;
+
+		if ( SiteTempGradient == 0.0 ) {
+			OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+			OutWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+		} else {
+			// Base temperatures at Z = 0 (C)
+			Real64 const BaseDryTemp( DataEnvironment::OutDryBulbTemp + WeatherFileTempModCoeff );
+			Real64 const BaseWetTemp( DataEnvironment::OutWetBulbTemp + WeatherFileTempModCoeff );
+
+			Real64 const Z( Centroid.z ); // Centroid value
+			if ( Z <= 0.0 ) {
+				OutDryBulbTemp = BaseDryTemp;
+				OutWetBulbTemp = BaseWetTemp;
+			} else {
+				OutDryBulbTemp = BaseDryTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
+				OutWetBulbTemp = BaseWetTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
+			}
+		}
+	}
+
+	void
+	SurfaceData::SetWindSpeedAt( Real64 const fac )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   June 2013
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Routine provides facility for doing bulk Set Windspeed at Height.
+
+		// Using/Aliasing
+		using DataEnvironment::SiteWindExp;
+
+		if ( SiteWindExp == 0.0 ) {
+			WindSpeed = DataEnvironment::WindSpeed;
+		} else {
+			Real64 const Z( Centroid.z ); // Centroid value
+			if ( Z <= 0.0 ) {
+				WindSpeed = 0.0;
+			} else {
+				//  [Met] - at meterological Station, Height of measurement is usually 10m above ground
+				//  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
+				//                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
+				WindSpeed = fac * std::pow( Z, SiteWindExp );
+			}
+		}
+	}
+
+	void
+	SetSurfaceOutBulbTempAt()
+	{
+		// Using/Aliasing
+		using DataEnvironment::SetOutBulbTempAt_error;
+
+		Real64 maxZ( 0.0 );
+		Real64 minBulb( 0.0 );
+		for ( auto & surface : Surface ) {
+			surface.SetOutBulbTempAt();
+			minBulb = min( minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp );
+			maxZ = max( maxZ, surface.Centroid.z );
+		}
+		if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Surface", maxZ );
+	}
+
+	void
+	SetSurfaceWindSpeedAt()
+	{
+		// Using/Aliasing
+		using DataEnvironment::SiteWindBLHeight;
+		using DataEnvironment::SiteWindExp;
+		using DataEnvironment::WeatherFileWindModCoeff;
+
+		Real64 const fac( DataEnvironment::WindSpeed * WeatherFileWindModCoeff * std::pow( SiteWindBLHeight, -SiteWindExp ) );
+		for ( auto & surface : Surface ) {
+			surface.SetWindSpeedAt( fac );
+		}
 	}
 
 	std::string

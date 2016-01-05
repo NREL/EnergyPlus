@@ -57,6 +57,7 @@
 // in binary and source code form.
 
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <string>
@@ -7308,9 +7309,9 @@ namespace WindowManager {
 		//    EXIT
 		//  ENDDO
 
-		if ( any( Construct.TypeIsWindow() ) ) HasWindows = true;
-		if ( any( Construct.WindowTypeBSDF() ) ) HasComplexWindows = true; // Yes, this is a bit different than actually using them.
-		if ( any( Construct.WindowTypeEQL() ) ) HasEQLWindows = true; // for reporting purpose only
+		if ( std::any_of( Construct.begin(), Construct.end(), []( ConstructionData const & e ){ return e.TypeIsWindow; } ) ) HasWindows = true;
+		if ( std::any_of( Construct.begin(), Construct.end(), []( ConstructionData const & e ){ return e.WindowTypeBSDF; } ) ) HasComplexWindows = true; // Yes, this is a bit different than actually using them.
+		if ( std::any_of( Construct.begin(), Construct.end(), []( ConstructionData const & e ){ return e.WindowTypeEQL; } ) ) HasEQLWindows = true; // for reporting purpose only
 
 		//  DO ThisNum=1,TotSurfaces
 		//    SurfConstr = Surface(ThisNum)%Construction

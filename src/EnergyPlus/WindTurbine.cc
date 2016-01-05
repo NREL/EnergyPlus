@@ -798,7 +798,6 @@ namespace WindTurbine {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using Psychrometrics::PsyWFnTdbTwbPb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using DataEnvironment::WindSpeed;
 		using DataEnvironment::WindSpeedAt;
 		using DataEnvironment::OutDryBulbTempAt;
 		using DataEnvironment::OutWetBulbTempAt;

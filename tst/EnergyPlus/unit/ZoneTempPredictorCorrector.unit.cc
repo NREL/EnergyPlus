@@ -296,7 +296,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MDotOA.deallocate();
 	ZoneAirHumRatTemp.deallocate();
 	ZoneW1.deallocate();
-	AirModel.deallocate( );
+	AirModel.deallocate();
 
 }
 
@@ -522,7 +522,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		LoadCorrectionFactor( CoolZoneNum ) = 1.0;
 		LoadCorrectionFactor( CoolHeatZoneNum ) = 1.0;
 		LoadCorrectionFactor( DualZoneNum ) = 1.0;
-		
+
 		// The following parameters describe the setpoint types in TempControlType(ActualZoneNum)
 		//	extern int const SingleHeatingSetPoint; = 1
 		//	extern int const SingleCoolingSetPoint; = 2

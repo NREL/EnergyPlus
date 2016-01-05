@@ -687,10 +687,12 @@ namespace DesiccantDehumidifiers {
 			} else {
 				// If DEFAULT performance model, set operating limits curves.  Unit is off outside this range
 				DesicDehum( DesicDehumNum ).PerformanceModel_Num = PM_Default;
-				DesicDehum.MinProcAirInTemp() = 1.67; //  35 F
-				DesicDehum.MaxProcAirInTemp() = 48.89; // 120 F
-				DesicDehum.MinProcAirInHumRat() = 0.002857; //  20 gr/lb
-				DesicDehum.MaxProcAirInHumRat() = 0.02857; // 200 gr/lb
+				for ( auto & e : DesicDehum ) {
+					e.MinProcAirInTemp = 1.67; //  35 F
+					e.MaxProcAirInTemp = 48.89; // 120 F
+					e.MinProcAirInHumRat = 0.002857; //  20 gr/lb
+					e.MaxProcAirInHumRat = 0.02857; // 200 gr/lb
+				}
 				//  If DEFAULT performance model, warn if curve names and nominal regen temp have values
 				if ( ( ! lAlphaBlanks( 13 ) ) || ( ! lAlphaBlanks( 14 ) ) || ( ! lAlphaBlanks( 15 ) ) || ( ! lAlphaBlanks( 16 ) ) || ( ! lAlphaBlanks( 17 ) ) || ( ! lAlphaBlanks( 18 ) ) || ( ! lAlphaBlanks( 19 ) ) || ( ! lAlphaBlanks( 20 ) ) ) {
 					ShowWarningError( CurrentModuleObject + " = " + Alphas( 1 ) );

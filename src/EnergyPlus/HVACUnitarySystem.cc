@@ -10895,9 +10895,9 @@ namespace HVACUnitarySystem {
 		LoopOnOffFanPartLoadRatio = UnitarySystem( UnitarySysNum ).FanPartLoadRatio;
 		LoopCompCycRatio = UnitarySystem( UnitarySysNum ).CycRatio;
 
-		if (  UnitarySystem(UnitarySysNum).FirstPass ) {
+		if ( UnitarySystem(UnitarySysNum).FirstPass ) {
 
-			if (  ! SysSizingCalc ) {
+			if ( ! SysSizingCalc ) {
 
 				if ( CurOASysNum > 0 ) {
 					OASysEqSizing( CurOASysNum ).AirFlow = false;

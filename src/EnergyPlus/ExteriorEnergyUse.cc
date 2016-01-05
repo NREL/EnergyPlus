@@ -56,9 +56,6 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-
 // EnergyPlus Headers
 #include <ExteriorEnergyUse.hh>
 #include <DataEnvironment.hh>
@@ -153,7 +150,7 @@ namespace ExteriorEnergyUse {
 		ExteriorLights.deallocate();
 		ExteriorEquipment.deallocate();
 	}
-	
+
 	void
 	ManageExteriorEnergyUse()
 	{

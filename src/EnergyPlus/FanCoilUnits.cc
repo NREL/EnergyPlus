@@ -138,7 +138,6 @@ namespace FanCoilUnits {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataEnvironment::OutBaroPress;
-	using DataEnvironment::OutDryBulbTemp;
 	using DataEnvironment::OutRelHum;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;
@@ -3487,7 +3486,7 @@ namespace FanCoilUnits {
 		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PartLoadRatio ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 
 		// Calculate residual based on output magnitude
-		if ( std::abs(  QZnReq ) <= 100.0 ) {
+		if ( std::abs( QZnReq ) <= 100.0 ) {
 			Residuum = ( QUnitOut - QZnReq ) / 100.0;
 		} else {
 			Residuum = ( QUnitOut - QZnReq ) / QZnReq;

@@ -57,13 +57,13 @@
 // in binary and source code form.
 
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <SystemAvailabilityManager.hh>
@@ -1633,21 +1633,21 @@ namespace SystemAvailabilityManager {
 		} // end 1 time initializations
 
 		// initialize individual availability managers to no action (CR 8376 reporting issue)
-		if ( allocated( SchedSysAvailMgrData ) ) SchedSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( SchedOnSysAvailMgrData ) ) SchedOnSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( SchedOffSysAvailMgrData ) ) SchedOffSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( NCycSysAvailMgrData ) ) NCycSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( NVentSysAvailMgrData ) ) NVentSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( DiffTSysAvailMgrData ) ) DiffTSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( HiTurnOffSysAvailMgrData ) ) HiTurnOffSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( HiTurnOnSysAvailMgrData ) ) HiTurnOnSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( LoTurnOffSysAvailMgrData ) ) LoTurnOffSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( LoTurnOnSysAvailMgrData ) ) LoTurnOnSysAvailMgrData.AvailStatus() = NoAction;
-		if ( allocated( OptStartSysAvailMgrData ) ) OptStartSysAvailMgrData.AvailStatus() = NoAction;
+		if ( allocated( SchedSysAvailMgrData ) ) for ( auto & e : SchedSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( SchedOnSysAvailMgrData ) ) for ( auto & e : SchedOnSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( SchedOffSysAvailMgrData ) ) for ( auto & e : SchedOffSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( NCycSysAvailMgrData ) ) for ( auto & e : NCycSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( NVentSysAvailMgrData ) ) for ( auto & e : NVentSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( DiffTSysAvailMgrData ) ) for ( auto & e : DiffTSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( HiTurnOffSysAvailMgrData ) ) for ( auto & e : HiTurnOffSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( HiTurnOnSysAvailMgrData ) ) for ( auto & e : HiTurnOnSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( LoTurnOffSysAvailMgrData ) ) for ( auto & e : LoTurnOffSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( LoTurnOnSysAvailMgrData ) ) for ( auto & e : LoTurnOnSysAvailMgrData ) e.AvailStatus = NoAction;
+		if ( allocated( OptStartSysAvailMgrData ) ) for ( auto & e : OptStartSysAvailMgrData ) e.AvailStatus = NoAction;
 		//  HybridVentSysAvailMgrData%AvailStatus= NoAction
 		for ( ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType ) { // loop over the zone equipment types
 			if ( allocated( ZoneComp ) ) {
-				if ( ZoneComp( ZoneEquipType ).TotalNumComp > 0 ) ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs.AvailStatus() = NoAction;
+				if ( ZoneComp( ZoneEquipType ).TotalNumComp > 0 ) for ( auto & e : ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs ) e.AvailStatus = NoAction;
 			}
 		}
 
@@ -4394,7 +4394,7 @@ namespace SystemAvailabilityManager {
 							break;
 						}
 					}
-					if ( any( HybridVentSysAvailMgrData.HybridVentMgrConnectedToAirLoop() ) ) {
+					if ( std::any_of( HybridVentSysAvailMgrData.begin(), HybridVentSysAvailMgrData.end(), []( SystemAvailabilityManager::DefineHybridVentSysAvailManager const & e ){ return e.HybridVentMgrConnectedToAirLoop; } ) ) {
 						if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum && HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum > 0 ) {
 							for ( HybridVentNum = 1; HybridVentNum <= NumHybridVentSysAvailMgrs; ++HybridVentNum ) {
 								if ( ! HybridVentSysAvailMgrData( HybridVentNum ).HybridVentMgrConnectedToAirLoop && ( HybridVentNum != SysAvailNum ) ) {
@@ -4409,7 +4409,7 @@ namespace SystemAvailabilityManager {
 							}
 						}
 					} else {
-						HybridVentSysAvailMgrData.SimHybridVentSysAvailMgr() = true;
+						for ( auto & e : HybridVentSysAvailMgrData ) e.SimHybridVentSysAvailMgr = true;
 					}
 				}
 
@@ -4452,11 +4452,11 @@ namespace SystemAvailabilityManager {
 			HybridVentSysAvailWindModifier( SysAvailNum ) = -1.0;
 		}
 
-		if ( allocated( HybridVentSysAvailMgrData ) ) HybridVentSysAvailMgrData.AvailStatus() = NoAction;
+		if ( allocated( HybridVentSysAvailMgrData ) ) for ( auto & e : HybridVentSysAvailMgrData ) e.AvailStatus = NoAction;
 
 		for ( ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType ) { // loop over the zone equipment types
 			if ( allocated( ZoneComp ) ) {
-				if ( ZoneComp( ZoneEquipType ).TotalNumComp > 0 ) ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs.AvailStatus() = NoAction;
+				if ( ZoneComp( ZoneEquipType ).TotalNumComp > 0 ) for ( auto & e : ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs ) e.AvailStatus = NoAction;
 			}
 		}
 

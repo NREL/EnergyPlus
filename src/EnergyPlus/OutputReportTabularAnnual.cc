@@ -168,7 +168,7 @@ namespace EnergyPlus {
 		// This method is used along with the constructor to convert the GetInput for REPORT:TABLE:ANNUAL
 		// into the class data.
 		{
-			m_annualFields.push_back(AnnualFieldSet(varName,aggKind, dgts)  );
+			m_annualFields.push_back( AnnualFieldSet( varName, aggKind, dgts ) );
 			m_annualFields.back().m_colHead = varName; // use the variable name for the column heading
 		}
 

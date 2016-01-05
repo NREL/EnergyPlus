@@ -60,7 +60,6 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -772,13 +771,15 @@ namespace Fans {
 
 		if ( NumNightVentPerf > 0 ) {
 			NightVentPerf.allocate( NumNightVentPerf );
-			NightVentPerf.FanName() = "";
-			NightVentPerf.FanEff() = 0.0;
-			NightVentPerf.DeltaPress() = 0.0;
-			NightVentPerf.MaxAirFlowRate() = 0.0;
-			NightVentPerf.MotEff() = 0.0;
-			NightVentPerf.MotInAirFrac() = 0.0;
-			NightVentPerf.MaxAirMassFlowRate() = 0.0;
+			for ( auto & e : NightVentPerf ) {
+				e.FanName.clear();
+				e.FanEff = 0.0;
+				e.DeltaPress = 0.0;
+				e.MaxAirFlowRate = 0.0;
+				e.MotEff = 0.0;
+				e.MotInAirFrac = 0.0;
+				e.MaxAirMassFlowRate = 0.0;
+			}
 		}
 		// input the night ventilation performance objects
 		for ( NVPerfNum = 1; NVPerfNum <= NumNightVentPerf; ++NVPerfNum ) {

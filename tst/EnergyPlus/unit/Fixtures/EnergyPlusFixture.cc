@@ -579,7 +579,7 @@ namespace EnergyPlus {
 		ProcessInputDataFile( *idf_stream );
 
 		ListOfSections.allocate( NumSectionDefs );
-		ListOfSections = SectionDef( { 1, NumSectionDefs } ).Name();
+		for ( int i = 1; i <= NumSectionDefs; ++i ) ListOfSections( i ) = SectionDef( i ).Name;
 
 		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
 		DataIPShortCuts::cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
@@ -744,7 +744,7 @@ namespace EnergyPlus {
 
 		if( !errors_found ) {
 			ListOfObjects.allocate( NumObjectDefs );
-			ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
+			for ( int i = 1; i <= NumObjectDefs; ++i ) ListOfObjects( i ) = ObjectDef( i ).Name;
 			if ( DataSystemVariables::SortedIDD ) {
 				iListOfObjects.allocate( NumObjectDefs );
 				SortAndStringUtilities::SetupAndSort( ListOfObjects, iListOfObjects );

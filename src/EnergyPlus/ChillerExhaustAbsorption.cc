@@ -1639,7 +1639,6 @@ namespace ChillerExhaustAbsorption {
 		// 2.  CoolTools GasMod work
 
 		// Using/Aliasing
-		using DataEnvironment::OutDryBulbTemp;
 		using CurveManager::CurveValue;
 		using DataPlant::PlantLoop;
 		using DataPlant::SingleSetPoint;

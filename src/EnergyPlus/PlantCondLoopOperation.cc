@@ -57,6 +57,7 @@
 // in binary and source code form.
 
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <vector>
@@ -243,8 +244,8 @@ namespace PlantCondLoopOperation {
 			return;
 		}
 
-		//Return if there are no loop operation schemes available
-		if ( ! any( PlantLoop( LoopNum ).OpScheme.Available() ) ) return;
+		// Return if there are no loop operation schemes available
+		if ( ! std::any_of( PlantLoop( LoopNum ).OpScheme.begin(), PlantLoop( LoopNum ).OpScheme.end(), []( DataPlant::OperationData const & e ){ return e.Available; } ) ) return;
 
 		// set up references
 		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
@@ -811,13 +812,13 @@ namespace PlantCondLoopOperation {
 				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" ) { //* Temp Based Control
 					CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
 					FindCompSPInput( CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound );
-					
+
 				} else { // invalid op scheme type for plant loop
 					// DSU?  Seems like the alpha args below is incorrect....
 					ShowSevereError( "Invalid operation scheme type = \"" + cAlphaArgs( Num * 3 - 1 ) + "\", entered in " + CurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				}}
-				
+
 				// At this point, switch the thermal energy storage controls to setpoint based controls as all of the
 				// internally generated setpoints and schedules have been generated and this can now be handled like
 				// the long form setpoint based control.
@@ -1431,7 +1432,7 @@ namespace PlantCondLoopOperation {
 				PlantLoop( LoopNum ).OpScheme( SchemeNum ).NumEquipLists = 1;
 				PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList.allocate( 1 );
 				PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps = ( NumAlphas - 1 ) / 5;
-				
+
 				if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
 					// Read all of the additional parameters for ice storage control scheme and error check various parameters
 					OnPeakSchedName = cAlphaArgs ( 2 );
@@ -1449,7 +1450,7 @@ namespace PlantCondLoopOperation {
 					NonChargCHWTemp = rNumericArgs ( 1 );
 					OffPeakCHWTemp  = rNumericArgs ( 2 );
 				}
-				
+
 				if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps > 0 ) {
 					PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp.allocate( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps );
 					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps; ++CompNum ) {
@@ -1498,7 +1499,7 @@ namespace PlantCondLoopOperation {
 						if ( ( cAlphaArgs( CompNumA + 1 ) != "COOLING" ) && ( cAlphaArgs( CompNumA + 1 ) != "HEATING" ) && ( cAlphaArgs( CompNumA + 1 ) != "DUAL" ) ) {
 							ShowSevereError( "Equipment Operation Mode should be either HEATING or COOLING or DUAL mode, for " + CurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						}
-						
+
 						if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
 							// for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
 							// detailed input that is necessary to get thermal energy storage to work from the simpler input.
@@ -1507,7 +1508,7 @@ namespace PlantCondLoopOperation {
 							SetUpNewScheduledTESSetPtMgr( OnPeakSchedPtr, ChargeSchedPtr, NonChargCHWTemp, OffPeakCHWTemp, CompOpType, PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeNum );
 						}
 
-						
+
 						//check that setpoint node has valid setpoint managers or EMS
 						{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 						if ( SELECT_CASE_var == SingleSetPoint ) {

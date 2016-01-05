@@ -77,7 +77,7 @@ namespace RoomAirModelAirflowNetwork {
 		int RoomAirNode;
 
 		// constructor
-		RAFNData( ):
+		RAFNData():
 			ZoneNum( 0 ),
 			RoomAirNode( 0 )
 		{}
@@ -94,7 +94,7 @@ namespace RoomAirModelAirflowNetwork {
 
 		//*****************************************************************************************
 		void
-		UpdateRoomAirModelAirflowNetwork(  ); // index number for the specified zone
+		UpdateRoomAirModelAirflowNetwork(); // index number for the specified zone
 
 		//*****************************************************************************************
 		void
@@ -105,7 +105,7 @@ namespace RoomAirModelAirflowNetwork {
 		SumNonAirSystemResponseForNode( int const RoomAirNode ); // index number for the specified zone and room air node
 		//*****************************************************************************************
 		void
-		SumSystemDepResponseForNode(  ); // index number for the specified zone and room air node
+		SumSystemDepResponseForNode(); // index number for the specified zone and room air node
 
 		//*****************************************************************************************
 

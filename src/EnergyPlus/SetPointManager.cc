@@ -6564,7 +6564,6 @@ namespace SetPointManager {
 
 		// Using/Aliasing
 		using DataEnvironment::CurMnDy;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutWetBulbTemp;
 		using CurveManager::CurveValue;
 		using ScheduleManager::GetCurrentScheduleValue;

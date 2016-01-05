@@ -58,10 +58,8 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <RoomAirModelAirflowNetwork.hh>
@@ -221,7 +219,7 @@ namespace RoomAirModelAirflowNetwork {
 
 		}
 
-		thisRAFN.UpdateRoomAirModelAirflowNetwork( );
+		thisRAFN.UpdateRoomAirModelAirflowNetwork();
 
 	}  //SimRoomAirModelAirflowNetwork
 
@@ -496,8 +494,13 @@ namespace RoomAirModelAirflowNetwork {
 					}
 
 				}
+<<<<<<< HEAD
 				InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
 				if ( allocated( NodeFound ) ) NodeFound.deallocate( );
+=======
+				MyOneTimeFlagConf = false;
+				if ( allocated( NodeFound ) ) NodeFound.deallocate();
+>>>>>>> develop
 				if ( ErrorsFound ) {
 					ShowFatalError( "GetRoomAirflowNetworkData: Errors found getting air model input.  Program terminates." );
 				}
@@ -731,7 +734,7 @@ namespace RoomAirModelAirflowNetwork {
 	} // CalcRoomAirModelAirflowNetwork
 
 	void
-	RAFNData::UpdateRoomAirModelAirflowNetwork(  )
+	RAFNData::UpdateRoomAirModelAirflowNetwork()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -772,7 +775,7 @@ namespace RoomAirModelAirflowNetwork {
 
 		if ( !ThisRAFNZone.IsUsed ) return;
 
-		if ( !ZoneSizingCalc ) SumSystemDepResponseForNode( );
+		if ( !ZoneSizingCalc ) SumSystemDepResponseForNode();
 
 		AirNodeNum = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
 

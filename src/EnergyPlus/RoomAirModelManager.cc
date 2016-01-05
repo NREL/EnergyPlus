@@ -57,14 +57,14 @@
 // in binary and source code form.
 
 // C++ Headers
+#include <algorithm>
 #include <cmath>
+#include <limits>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -1524,7 +1524,7 @@ namespace RoomAirModelManager {
 
 		for ( Loop = 1; Loop <= NumOfRoomAirflowNetControl; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name( ), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone, NumOfZones );
 			if ( ZoneNum == 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 2 ) );
@@ -1559,7 +1559,7 @@ namespace RoomAirModelManager {
 				RoomAirflowNetworkZoneInfo( ZoneNum ).Node( thisAirNodeinZone ).Name = cAlphaArgs( AlphaArgNum );
 			}
 			// control point node
-			AirCntrlNodeNum = FindItemInList( cAlphaArgs( 3 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node.Name( ), RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+			AirCntrlNodeNum = FindItemInList( cAlphaArgs( 3 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
 			if ( AirCntrlNodeNum == 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -1578,7 +1578,7 @@ namespace RoomAirModelManager {
 		for ( Loop = 1; Loop <= TotNumOfRoomAFNNodes; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _,
 				lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name( ), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone, NumOfZones );
 			if ( ZoneNum == 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -1587,7 +1587,7 @@ namespace RoomAirModelManager {
 				continue;
 			}
 
-			RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node.Name( ), RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+			RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
 			if ( RAFNNodeNum == 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -2037,8 +2037,13 @@ namespace RoomAirModelManager {
 				for ( SurfNum = Zone( ZNum ).SurfaceFirst; SurfNum <= Zone( ZNum ).SurfaceLast; ++SurfNum ) {
 					if ( Surface( SurfNum ).Class != SurfaceClass_IntMass ) {
 						// Recalculate lowest and highest height for the zone
-						Z1Zone = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-						Z2Zone = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+						Z1Zone = std::numeric_limits< Real64 >::max();
+						Z2Zone = std::numeric_limits< Real64 >::lowest();
+						for ( int i = 1, u = Surface( SurfNum ).Sides; i <= u; ++i ) {
+							Real64 const z_i( Surface( SurfNum ).Vertex( i ).z );
+							Z1Zone = std::min( Z1Zone, z_i );
+							Z2Zone = std::max( Z2Zone, z_i );
+						}
 					}
 
 					if ( SetZoneAux ) {
@@ -2149,6 +2154,7 @@ namespace RoomAirModelManager {
 				// the 0 component of the array has the number of relevant AirflowNetwork surfaces for the zone
 				AirflowNetworkSurfaceUCSDCV( 0, Loop ) = AuxSurf( Loop );
 				if ( AuxSurf( Loop ) != 0 ) {
+					Real64 const ceilingHeight( ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 ) );
 					SurfNum = 1;
 					for ( Loop2 = 1; Loop2 <= NumOfLinksMultiZone; ++Loop2 ) {
 						if ( Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Zone == Loop ) {
@@ -2195,13 +2201,25 @@ namespace RoomAirModelManager {
 							if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_DOP ) {
 								AirflowNetworkSurfPtr = MultizoneSurfaceData( Loop2 ).SurfNum;
 								NSides = Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Sides;
-								SurfParametersCVDV( Loop2 ).Zmin = minval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
-								SurfParametersCVDV( Loop2 ).Zmax = maxval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
+								Real64 z_min( std::numeric_limits< Real64 >::max() ), z_max( std::numeric_limits< Real64 >::lowest() );
+								for ( int i = 1; i <= NSides; ++i ) {
+									Real64 const z_i( Surface( AirflowNetworkSurfPtr ).Vertex( i ).z );
+									z_min = std::min( z_min, z_i );
+									z_max = std::max( z_max, z_i );
+								}
+								SurfParametersCVDV( Loop2 ).Zmin = z_min - ceilingHeight;
+								SurfParametersCVDV( Loop2 ).Zmax = z_max - ceilingHeight;
 							} else if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_SCR ) { // surface type = CRACK
 								AirflowNetworkSurfPtr = MultizoneSurfaceData( Loop2 ).SurfNum;
 								NSides = Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Sides;
-								SurfParametersCVDV( Loop2 ).Zmin = minval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
-								SurfParametersCVDV( Loop2 ).Zmax = maxval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
+								Real64 z_min( std::numeric_limits< Real64 >::max() ), z_max( std::numeric_limits< Real64 >::lowest() );
+								for ( int i = 1; i <= NSides; ++i ) {
+									Real64 const z_i( Surface( AirflowNetworkSurfPtr ).Vertex( i ).z );
+									z_min = std::min( z_min, z_i );
+									z_max = std::max( z_max, z_i );
+								}
+								SurfParametersCVDV( Loop2 ).Zmin = z_min - ceilingHeight;
+								SurfParametersCVDV( Loop2 ).Zmax = z_max - ceilingHeight;
 							}
 
 							++SurfNum;
@@ -2688,7 +2706,7 @@ namespace RoomAirModelManager {
 
 		//Obtains and Allocates RoomAirSettings : AirflowNetwork
 		if ( GetAirModelData ) {
-			GetAirModelDatas( );
+			GetAirModelDatas();
 			GetAirModelData = false;
 		}
 
@@ -2696,7 +2714,7 @@ namespace RoomAirModelManager {
 		RAFNNodeNum = 0;
 		for ( I = 1; I <= NumOfZones; ++I ) {
 			if ( RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes > 0 ) {
-				RAFNNodeNum = FindItemInList( RAFNNodeName, RoomAirflowNetworkZoneInfo( I ).Node.Name( ), RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes );
+				RAFNNodeNum = FindItemInList( RAFNNodeName, RoomAirflowNetworkZoneInfo( I ).Node, RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes );
 				if ( RAFNNodeNum > 0 ) {
 					ZoneNum = I;
 					break;
@@ -2982,10 +3000,10 @@ namespace RoomAirModelManager {
 
 		// Need to find a better to handle allocate and deallocate
 		if ( MaxAlphas > NumAlphas ) {
-			Alphas.deallocate( );
+			Alphas.deallocate();
 		}
 		if ( MaxNums > NumNumbers ) {
-			Numbers.deallocate( );
+			Numbers.deallocate();
 		}
 
 		return EquipFind;

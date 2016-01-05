@@ -63,7 +63,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -372,51 +372,59 @@ namespace ManageElectricPower {
 			WholeBldgElectSummary.ElecProducedStorageRate = 0.0;
 
 			if ( NumLoadCenters > 0 ) {
-				ElecLoadCenter.DCElectricityProd() = 0.0;
-				ElecLoadCenter.DCElectProdRate() = 0.0;
-				ElecLoadCenter.DCpowerConditionLosses() = 0.0;
-				ElecLoadCenter.ElectricityProd() = 0.0;
-				ElecLoadCenter.ElectProdRate() = 0.0;
-				ElecLoadCenter.ThermalProd() = 0.0;
-				ElecLoadCenter.ThermalProdRate() = 0.0;
-				ElecLoadCenter.TotalPowerRequest() = 0.0;
-				ElecLoadCenter.TotalThermalPowerRequest() = 0.0;
-				ElecLoadCenter.ElectDemand() = 0.0;
+				for ( auto & e : ElecLoadCenter ) {
+					e.DCElectricityProd = 0.0;
+					e.DCElectProdRate = 0.0;
+					e.DCpowerConditionLosses = 0.0;
+					e.ElectricityProd = 0.0;
+					e.ElectProdRate = 0.0;
+					e.ThermalProd = 0.0;
+					e.ThermalProdRate = 0.0;
+					e.TotalPowerRequest = 0.0;
+					e.TotalThermalPowerRequest = 0.0;
+					e.ElectDemand = 0.0;
+				}
 			}
 
 			for ( LoadCenterNum = 1; LoadCenterNum <= NumLoadCenters; ++LoadCenterNum ) {
 				if ( ElecLoadCenter( LoadCenterNum ).NumGenerators == 0 ) continue;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ONThisTimestep() = false;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectricityProd() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectProdRate() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ElectricityProd() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ElectProdRate() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ThermalProd() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ThermalProdRate() = 0.0;
+				for ( auto & e : ElecLoadCenter( LoadCenterNum ).ElecGen ) {
+					e.ONThisTimestep = false;
+					e.DCElectricityProd = 0.0;
+					e.DCElectProdRate = 0.0;
+					e.ElectricityProd = 0.0;
+					e.ElectProdRate = 0.0;
+					e.ThermalProd = 0.0;
+					e.ThermalProdRate = 0.0;
+				}
 			}
 
 			if ( NumInverters > 0 ) {
-				Inverter.AncillACuseRate() = 0.0;
-				Inverter.AncillACuseEnergy() = 0.0;
-				Inverter.QdotConvZone() = 0.0;
-				Inverter.QdotRadZone() = 0.0;
+				for ( auto & e : Inverter ) {
+					e.AncillACuseRate = 0.0;
+					e.AncillACuseEnergy = 0.0;
+					e.QdotConvZone = 0.0;
+					e.QdotRadZone = 0.0;
+				}
 			}
 
 			if ( NumElecStorageDevices > 0 ) {
-				ElecStorage.PelNeedFromStorage() = 0.0;
-				ElecStorage.PelFromStorage() = 0.0;
-				ElecStorage.PelIntoStorage() = 0.0;
-				ElecStorage.QdotConvZone() = 0.0;
-				ElecStorage.QdotRadZone() = 0.0;
-				ElecStorage.TimeElapsed() = 0.0;
-				ElecStorage.ElectEnergyinStorage() = 0.0;
-				ElecStorage.StoredPower() = 0.0;
-				ElecStorage.StoredEnergy() = 0.0;
-				ElecStorage.DecrementedEnergyStored() = 0.0;
-				ElecStorage.DrawnPower() = 0.0;
-				ElecStorage.DrawnEnergy() = 0.0;
-				ElecStorage.ThermLossRate() = 0.0;
-				ElecStorage.ThermLossEnergy() = 0.0;
+				for ( auto & e : ElecStorage ) {
+					e.PelNeedFromStorage = 0.0;
+					e.PelFromStorage = 0.0;
+					e.PelIntoStorage = 0.0;
+					e.QdotConvZone = 0.0;
+					e.QdotRadZone = 0.0;
+					e.TimeElapsed = 0.0;
+					e.ElectEnergyinStorage = 0.0;
+					e.StoredPower = 0.0;
+					e.StoredEnergy = 0.0;
+					e.DecrementedEnergyStored = 0.0;
+					e.DrawnPower = 0.0;
+					e.DrawnEnergy = 0.0;
+					e.ThermLossRate = 0.0;
+					e.ThermLossEnergy = 0.0;
+				}
 			}
 			ManageElectricLoadCentersEnvrnFlag = false;
 		}
@@ -2331,14 +2339,13 @@ namespace ManageElectricPower {
 		{ auto const SELECT_CASE_var( ElecLoadCenter( LoadCenterNum ).BussType );
 
 		if ( ( SELECT_CASE_var == DCBussInverter ) || ( SELECT_CASE_var == DCBussInverterACStorage ) ) {
-			ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectProdRate() );
+			ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::DCElectProdRate );
 			Inverter( InvertNum ).DCPowerIn = ElecLoadCenter( LoadCenterNum ).DCElectProdRate;
 			Inverter( InvertNum ).DCEnergyIn = Inverter( InvertNum ).DCPowerIn * ( TimeStepSys * SecInHour );
 		} else if ( SELECT_CASE_var == DCBussInverterDCStorage ) {
 			StorNum = ElecLoadCenter( LoadCenterNum ).StorageModelNum;
 			if ( StorNum > 0 ) {
-				ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectProdRate() );
-
+				ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::DCElectProdRate );
 				Inverter( InvertNum ).DCPowerIn = ElecLoadCenter( LoadCenterNum ).DCElectProdRate;
 				Inverter( InvertNum ).DCEnergyIn = Inverter( InvertNum ).DCPowerIn * ( TimeStepSys * SecInHour );
 			} else { // throw error
@@ -2481,24 +2488,20 @@ namespace ManageElectricPower {
 		{ auto const SELECT_CASE_var( ElecLoadCenter( LoadCenterNum ).BussType );
 
 		if ( SELECT_CASE_var == ACBuss ) {
-			ElecLoadCenter( LoadCenterNum ).ElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectProdRate() );
-			ElecLoadCenter( LoadCenterNum ).ElectricityProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectricityProd() );
-
+			ElecLoadCenter( LoadCenterNum ).ElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectProdRate );
+			ElecLoadCenter( LoadCenterNum ).ElectricityProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectricityProd );
 		} else if ( SELECT_CASE_var == ACBussStorage ) {
 			StorNum = ElecLoadCenter( LoadCenterNum ).StorageModelNum;
 			if ( StorNum > 0 ) {
-				ElecLoadCenter( LoadCenterNum ).ElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectProdRate() ) + ElecStorage( StorNum ).DrawnPower - ElecStorage( StorNum ).StoredPower;
-
-				ElecLoadCenter( LoadCenterNum ).ElectricityProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectricityProd() ) + ElecStorage( StorNum ).DrawnEnergy - ElecStorage( StorNum ).StoredEnergy;
+				ElecLoadCenter( LoadCenterNum ).ElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectProdRate ) + ElecStorage( StorNum ).DrawnPower - ElecStorage( StorNum ).StoredPower;
+				ElecLoadCenter( LoadCenterNum ).ElectricityProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectricityProd ) + ElecStorage( StorNum ).DrawnEnergy - ElecStorage( StorNum ).StoredEnergy;
 			}
-
 		} else if ( ( SELECT_CASE_var == DCBussInverter ) || ( SELECT_CASE_var == DCBussInverterDCStorage ) ) {
 			InvertNum = ElecLoadCenter( LoadCenterNum ).InverterModelNum;
 			if ( InvertNum > 0 ) {
 				ElecLoadCenter( LoadCenterNum ).ElectProdRate = Inverter( InvertNum ).ACPowerOut;
 				ElecLoadCenter( LoadCenterNum ).ElectricityProd = Inverter( InvertNum ).ACEnergyOut;
 			}
-
 		} else if ( SELECT_CASE_var == DCBussInverterACStorage ) {
 			StorNum = ElecLoadCenter( LoadCenterNum ).StorageModelNum;
 			InvertNum = ElecLoadCenter( LoadCenterNum ).InverterModelNum;
@@ -2508,8 +2511,8 @@ namespace ManageElectricPower {
 			}
 		}}
 
-		ElecLoadCenter( LoadCenterNum ).ThermalProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ThermalProdRate() );
-		ElecLoadCenter( LoadCenterNum ).ThermalProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ThermalProd() );
+		ElecLoadCenter( LoadCenterNum ).ThermalProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ThermalProdRate );
+		ElecLoadCenter( LoadCenterNum ).ThermalProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ThermalProd );
 
 	}
 
@@ -2624,8 +2627,10 @@ namespace ManageElectricPower {
 		if ( NumInverters == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			Inverter.QdotConvZone() = 0.0;
-			Inverter.QdotRadZone() = 0.0;
+			for ( auto & e : Inverter ) {
+				e.QdotConvZone = 0.0;
+				e.QdotRadZone = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
@@ -2895,12 +2900,10 @@ namespace ManageElectricPower {
 		{ auto const SELECT_CASE_var( ElecLoadCenter( LoadCenterNum ).BussType );
 
 		if ( SELECT_CASE_var == ACBussStorage ) {
-			Pgensupply = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectProdRate() );
+			Pgensupply = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectProdRate );
 		} else if ( SELECT_CASE_var == DCBussInverterDCStorage ) {
-			ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectProdRate() );
-			Pgensupply = ElecLoadCenter( LoadCenterNum ).DCElectProdRate;
+			Pgensupply = ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::DCElectProdRate );
 		} else if ( SELECT_CASE_var == DCBussInverterACStorage ) {
-
 			Pgensupply = Inverter( ElecLoadCenter( LoadCenterNum ).InverterModelNum ).ACPowerOut;
 		}}
 		// End determine available generation
@@ -3368,8 +3371,10 @@ namespace ManageElectricPower {
 		if ( NumElecStorageDevices == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			ElecStorage.QdotConvZone() = 0.0;
-			ElecStorage.QdotRadZone() = 0.0;
+			for ( auto & e : ElecStorage ) {
+				e.QdotConvZone = 0.0;
+				e.QdotRadZone = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
@@ -3652,8 +3657,10 @@ namespace ManageElectricPower {
 		if ( NumTransformers == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			Transformer.QdotConvZone() = 0.0;
-			Transformer.QdotRadZone() = 0.0;
+			for ( auto & e : Transformer ) {
+				e.QdotConvZone = 0.0;
+				e.QdotRadZone = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 

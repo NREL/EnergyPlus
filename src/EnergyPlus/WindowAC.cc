@@ -131,7 +131,6 @@ namespace WindowAC {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataEnvironment::OutBaroPress;
-	using DataEnvironment::OutDryBulbTemp;
 	using DataEnvironment::OutRelHum;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;

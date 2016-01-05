@@ -59,9 +59,6 @@
 // C++ Headers
 #include <cmath>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-
 // EnergyPlus Headers
 #include <HeatPumpWaterToWaterSimple.hh>
 #include <BranchNodeConnections.hh>

@@ -418,7 +418,7 @@ namespace InputProcessor {
 		idd_stream.close();
 
 		ListOfObjects.allocate( NumObjectDefs );
-		ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
+		for ( int i = 1; i <= NumObjectDefs; ++i ) ListOfObjects( i ) = ObjectDef( i ).Name;
 		if ( SortedIDD ) {
 			iListOfObjects.allocate( NumObjectDefs );
 			SetupAndSort( ListOfObjects, iListOfObjects );
@@ -463,7 +463,7 @@ namespace InputProcessor {
 		idf_stream.close();
 
 		ListOfSections.allocate( NumSectionDefs );
-		ListOfSections = SectionDef( {1,NumSectionDefs} ).Name();
+		for ( int i = 1; i <= NumSectionDefs; ++i ) ListOfSections( i ) = SectionDef( i ).Name;
 
 		cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
 		cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
@@ -2139,7 +2139,7 @@ namespace InputProcessor {
 			ShowWarningError( "More in list than allowed in passed array - (GetListofSectionsinInput)" );
 		}
 		NuminList = MaxAllowedOut;
-		SectionList( {1,MaxAllowedOut} ) = SectionsOnFile( {1,MaxAllowedOut} ).Name();
+		for ( int i = 1; i <= MaxAllowedOut; ++i ) SectionList( i ) = SectionsOnFile( i ).Name;
 
 	}
 
@@ -2410,7 +2410,7 @@ namespace InputProcessor {
 						AlphaFieldNames()( {1,ObjectDef( Found ).NumAlpha} ) = ObjectDef( Found ).AlphFieldChks( {1,ObjectDef( Found ).NumAlpha} );
 					}
 					if ( present( NumericFieldNames ) ) {
-						NumericFieldNames()( {1,ObjectDef( Found ).NumNumeric} ) = ObjectDef( Found ).NumRangeChks( {1,ObjectDef( Found ).NumNumeric} ).FieldName();
+						for ( int i = 1, e = ObjectDef( Found ).NumNumeric; i <= e; ++i ) NumericFieldNames()( i ) = ObjectDef( Found ).NumRangeChks( i ).FieldName;
 					}
 					Status = 1;
 					break;
@@ -3480,7 +3480,7 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
-		Array1D_string const & ListOfItems,
+		Array1_string const & ListOfItems,
 		int const NumItems
 	)
 	{
@@ -4364,7 +4364,7 @@ namespace InputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		ObjectNames( {1,NumObjectDefs} ) = ObjectDef( {1,NumObjectDefs} ).Name();
+		for ( int i = 1; i <= NumObjectDefs; ++i ) ObjectNames( i ) = ObjectDef( i ).Name;
 		Number = NumObjectDefs;
 
 	}

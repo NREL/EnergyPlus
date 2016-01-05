@@ -1069,7 +1069,7 @@ namespace DataRoomAirModel {
 		Real64 HumRatIn; // humidity ratio of air into control volume
 
 		// Default Constructor
-		AirflowLinkagesInfoNestedStruct( ) :
+		AirflowLinkagesInfoNestedStruct() :
 			AirflowNetworkLinkSimuID( 0 ),
 			AirflowNetworkLinkageDataID( 0 ),
 			AirflowNetworkLinkReportID( 0 ),
@@ -1107,7 +1107,7 @@ namespace DataRoomAirModel {
 		bool FractionCheck; // TRUE if a fraction of internal gain for each object is checked
 
 		// Default Constructor
-		RoomAirflowNetworkNodeInternalGainsStruct( ) :
+		RoomAirflowNetworkNodeInternalGainsStruct() :
 			TypeOfNum( 0 ),
 			UseRoomAirModelTempForGains( false ),
 			FractionCheck( false )
@@ -1145,7 +1145,7 @@ namespace DataRoomAirModel {
 		int CompIndex; // Component index
 
 		// Default Constructor
-		RoomAirflowNetworkHVACStruct( ) :
+		RoomAirflowNetworkHVACStruct() :
 			TypeOfNum( 0 ), // HVAC type num
 			SupplyFraction( 0 ), // Supply flow fraction
 			ReturnFraction( 0 ), // Return flow fraction
@@ -1263,7 +1263,7 @@ namespace DataRoomAirModel {
 		Real64 SumLinkMW; // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model
 
 		// Default Constructor
-		RoomAirflowNetworkAirNodeNestedStruct( ) :
+		RoomAirflowNetworkAirNodeNestedStruct() :
 			ZoneVolumeFraction( 0.0 ),
 			HasSurfacesAssigned( false ),
 			HasIntGainsAssigned( false ),
@@ -1501,7 +1501,7 @@ namespace DataRoomAirModel {
 		int RAFNNum; // RAFN number
 
 		// Default Constructor
-		RoomAirflowNetworkInfoByZoneStruct( ) :
+		RoomAirflowNetworkInfoByZoneStruct() :
 			IsUsed( false ), // true. if RoomAirflowNetwork model used in zone
 			ZoneID( 0 ), // Index of Zone in Heat Balance
 			ActualZoneID( 0 ), // Index of controlled zones in ZoneCOnfigure
@@ -1576,9 +1576,12 @@ namespace DataRoomAirModel {
 	extern Array1D< TemperaturePatternStruct > RoomAirPattern; // user defined patterns ,various types
 	extern Array1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
 	extern Array1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info
+<<<<<<< HEAD
 
 	void
 	clear_state();
+=======
+>>>>>>> develop
 
 } // DataRoomAirModel
 
