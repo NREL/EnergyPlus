@@ -571,7 +571,7 @@ namespace HVACUnitarySystem {
 		Real64 mdot( 0.0 ); // local temporary for mass flow rate (kg/s)
 		Real64 SteamDensity( 0.0 ); // density of steam at 100C, used for steam heating coils [kg/m3]
 		Real64 CoilMaxVolFlowRate( 0.0 ); // coil fluid maximum volume flow rate [m3/s]
-		Real64 QActual( 0.0 ); // coil actual capacity [W]
+		static Real64 QActual( 0.0 ); // coil actual capacity [W]
 		Real64 rho( 0.0 ); // local fluid density [kg/m3]
 		Real64 mdotHR( 0.0 ); // heat recovery mass flow rate [kg/s]
 		//  REAL(r64)           :: SaveMassFlow            = 0.0d0     ! saves node flow rate when checking heat coil capacity [m3/s]
@@ -1307,7 +1307,7 @@ namespace HVACUnitarySystem {
 		int NumAirLoopZones( 0 ); // number of zone inlet nodes in an air loop
 		int ZoneInletNodeNum( 0 ); // zone inlet nodes node number
 		Real64 SumOfMassFlowRateMax( 0.0 ); // the sum of zone inlet mass flow rates
-		Real64 CntrlZoneTerminalUnitMassFlowRateMax( 0.0 ); // Maximum mass flow rate through controlled zone
+		static Real64 CntrlZoneTerminalUnitMassFlowRateMax( 0.0 ); // Maximum mass flow rate through controlled zone
 		Real64 rho;
 		Real64 QZnReq;
 		Real64 QActual;
@@ -9564,7 +9564,7 @@ namespace HVACUnitarySystem {
 		using UserDefinedComponents::SimCoilUserDefined;
 
 		// Locals
-		bool SuppHeatingCoilFlag( true );
+		static bool SuppHeatingCoilFlag( true );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 

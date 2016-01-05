@@ -184,6 +184,7 @@ namespace ManageElectricPower {
 		bool ManageElectricLoadCentersOneTimeFlag( true );
 		bool ManageElectricLoadCentersEnvrnFlag( true );
 		int ElecFacilityIndex( 0 );
+		bool CalcLoadCenterThermalLoadOneTimeSetupFlag( true );
 	}
 
 	bool GetInput( true ); // When TRUE, calls subroutine to read input file.
@@ -221,6 +222,7 @@ namespace ManageElectricPower {
 	{
 		ManageElectricLoadCentersOneTimeFlag = true;
 		ManageElectricLoadCentersEnvrnFlag = true;
+		CalcLoadCenterThermalLoadOneTimeSetupFlag = true;
 		GetInput = true;
 		NumLoadCenters = 0;
 		NumInverters = 0;
@@ -307,14 +309,14 @@ namespace ManageElectricPower {
 		// static bool MyOneTimeFlag( true );
 		// static bool MyEnvrnFlag( true );
 		////////////////////////////////////////////////////////////////////////////////////
-		Real64 ElectricProdRate( 0.0 ); // Electric Power Production Rate of Generators
-		Real64 ThermalProdRate( 0.0 ); // Thermal Power Production Rate of Generators
+		static Real64 ElectricProdRate( 0.0 ); // Electric Power Production Rate of Generators
+		static Real64 ThermalProdRate( 0.0 ); // Thermal Power Production Rate of Generators
 		Real64 ExcessThermalPowerRequest( 0.0 ); // Excess Thermal Power Request
 
-		Real64 LoadCenterElectricLoad( 0.0 ); // Load center electric load to be dispatched
+		static Real64 LoadCenterElectricLoad( 0.0 ); // Load center electric load to be dispatched
 		Real64 LoadCenterThermalLoad( 0.0 ); // Load center thermal load to be dispatched
-		Real64 StorageDrawnPower( 0.0 ); // Electric Power Draw Rate from storage units
-		Real64 StorageStoredPower( 0.0 ); // Electric Power Store Rate from storage units
+		static Real64 StorageDrawnPower( 0.0 ); // Electric Power Draw Rate from storage units
+		static Real64 StorageStoredPower( 0.0 ); // Electric Power Store Rate from storage units
 
 		// Get Generator data from input file
 		if ( GetInput ) {
@@ -812,6 +814,7 @@ namespace ManageElectricPower {
 			} else if ( SELECT_CASE_var == iOpSchemeThermalFollowLimitElectrical ) {
 				//  Turn a thermal load into an electrical load for cogenerators controlled to follow heat loads.
 				//  Add intitialization of RemainingThermalLoad as in the ThermalFollow operating scheme above.
+				RemainingThermalLoad = 0.0;
 				CalcLoadCenterThermalLoad( FirstHVACIteration, LoadCenterNum, RemainingThermalLoad );
 				// Total current electrical demand for the building is a secondary limit.
 				RemainingLoad = WholeBldgRemainingLoad;
@@ -2161,7 +2164,9 @@ namespace ManageElectricPower {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeSetupFlag( true );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeSetupFlag( true ); // CalcLoadCenterThermalLoadOneTimeSetupFlag
+		////////////////////////////////////////////////////////////////////////////////////
 		static Array1D_bool MyCoGenSetupFlag;
 		int FoundCount;
 		int i;
@@ -2181,10 +2186,10 @@ namespace ManageElectricPower {
 		//unused    CHARACTER*5 :: strFirstHVACIteration
 
 		// need to do initial setups
-		if ( MyOneTimeSetupFlag ) {
+		if ( CalcLoadCenterThermalLoadOneTimeSetupFlag ) {
 			MyCoGenSetupFlag.dimension( NumLoadCenters, true );
 			ThermalLoad = 0.0;
-			MyOneTimeSetupFlag = false;
+			CalcLoadCenterThermalLoadOneTimeSetupFlag = false;
 			return;
 		}
 

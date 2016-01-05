@@ -6583,30 +6583,30 @@ namespace SetPointManager {
 
 		Real64 NormDsnCondFlow( 0.0 ); // Normalized design condenser flow for cooling towers, m3/s per watt
 		Real64 Twr_DesignWB( 0.0 ); // The cooling tower design inlet air wet bulb temperature, C
-		Real64 Dsn_EntCondTemp( 0.0 ); // The chiller design entering condenser temp, C; e.g. 29.44C {85F}
+		static Real64 Dsn_EntCondTemp( 0.0 ); // The chiller design entering condenser temp, C; e.g. 29.44C {85F}
 		Real64 Dsn_CondMinThisChiller( 0.0 ); // Design Minimum Condenser Entering for current chillers this timestep
-		Real64 Dsn_MinCondSetpt( 0.0 ); // The design minimum condenser water temp, C; e.g. 18.33C {65 F}
-		Real64 Cur_MinLiftTD( 0.0 ); // Minimum lift (TCond entering - Tevap leaving) TD this timestep
+		static Real64 Dsn_MinCondSetpt( 0.0 ); // The design minimum condenser water temp, C; e.g. 18.33C {65 F}
+		static Real64 Cur_MinLiftTD( 0.0 ); // Minimum lift (TCond entering - Tevap leaving) TD this timestep
 		Real64 temp_MinLiftTD( 0.0 ); // Intermeidate variable associated with lift (TCond entering - Tevap leaving) TD
 		Real64 Des_Load( 0.0 ); // array of chiller design loads
 		Real64 Act_Load( 0.0 ); // array of chiller actual loads
 		Real64 ALW( 0.0 ); // Actual load weighting of each chiller, W
 		Real64 DLW( 0.0 ); // Design capacity of each chiller, W
-		Real64 Design_Load_Sum( 0.0 ); // the design load of the chillers, W
-		Real64 Actual_Load_Sum( 0.0 ); // the actual load of the chillers, W
-		Real64 Weighted_Actual_Load_Sum( 0.0 ); // Intermediate weighted value of actual load on plant, W
-		Real64 Weighted_Design_Load_Sum( 0.0 ); // Intermediate weighted value of design load on plant, W
-		Real64 Weighted_Ratio( 0.0 ); // Weighted part load ratio of chillers
-		Real64 Min_DesignWB( 0.0 ); // Minimum design twr wet bulb allowed, C
-		Real64 Min_ActualWb( 0.0 ); // Minimum actual oa wet bulb allowed, C
+		static Real64 Design_Load_Sum( 0.0 ); // the design load of the chillers, W
+		static Real64 Actual_Load_Sum( 0.0 ); // the actual load of the chillers, W
+		static Real64 Weighted_Actual_Load_Sum( 0.0 ); // Intermediate weighted value of actual load on plant, W
+		static Real64 Weighted_Design_Load_Sum( 0.0 ); // Intermediate weighted value of design load on plant, W
+		static Real64 Weighted_Ratio( 0.0 ); // Weighted part load ratio of chillers
+		static Real64 Min_DesignWB( 0.0 ); // Minimum design twr wet bulb allowed, C
+		static Real64 Min_ActualWb( 0.0 ); // Minimum actual oa wet bulb allowed, C
 		Real64 SetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
-		Real64 Opt_CondEntTemp( 0.0 ); // Optimized Condenser entering water temperature setpoint this timestep, C
+		static Real64 Opt_CondEntTemp( 0.0 ); // Optimized Condenser entering water temperature setpoint this timestep, C
 		Real64 CondWaterSetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
-		Real64 DesignClgCapacity_Watts( 0.0 );
-		Real64 CurrentLoad_Watts( 0.0 );
-		Real64 CondInletTemp( 0.0 ); // Condenser water inlet temperature (C)
+		static Real64 DesignClgCapacity_Watts( 0.0 );
+		static Real64 CurrentLoad_Watts( 0.0 );
+		static Real64 CondInletTemp( 0.0 ); // Condenser water inlet temperature (C)
 		Real64 TempDesCondIn( 0.0 ); // Design condenser inlet temp. C , or 25.d0
-		Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C)
+		static Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C)
 		Real64 TempEvapOutDesign( 0.0 ); // design evaporator outlet temperature, water side
 		Real64 CurLoad( 0.0 );
 		int ChillerIndexPlantSide( 0 );
