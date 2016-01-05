@@ -67,11 +67,16 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatRecovery.hh>
-#include <Psychrometrics.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReturnAirPathManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <ObjexxFCL/gio.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
@@ -79,9 +84,13 @@ using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatRecovery;
 using namespace EnergyPlus::Psychrometrics;
+using namespace EnergyPlus::SimAirServingZones;
+using namespace EnergyPlus::ReturnAirPathManager;
+
 
 class HeatRecoveryTest : public testing::Test
 {
@@ -296,5 +305,213 @@ TEST_F( HeatRecoveryTest, HRTest)
 
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+
+}
+
+
+TEST_F( EnergyPlusFixture, RotaryHROnManinBranchTest ) {
+		int write_stat;
+		OutputFileInits = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+
+		CurZoneEqNum = 0;
+		CurSysNum = 0;
+		CurOASysNum = 0;
+
+		std::string const idf_objects = delimited_string( {
+			" Version,8.4;",
+			" Coil:Cooling:Water,",
+			"	AHU cooling coil,	!- Name",
+			"	AvailSched,			!- Availability Schedule Name",
+			"	autosize,			!- Design Water Flow Rate { m3 / s }",
+			"	autosize,			!- Design Air Flow Rate { m3 / s }",
+			"	autosize,			!- Design Inlet Water Temperature { C }",
+			"	autosize,			!- Design Inlet Air Temperature { C }",
+			"	autosize,			!- Design Outlet Air Temperature { C }",
+			"	autosize,			!- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+			"	autosize,			!- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+			"	Water Inlet Node,	!- Water Inlet Node Name",
+			"	Water Outlet Node,  !- Water Outlet Node Name",
+			"	AHU mixed air outlet,		!- Air Inlet Node Name",
+			"	AHU cooling coil outlet,	!- Air Outlet Node Name",
+			"	SimpleAnalysis,		!- Type of Analysis",
+			"	CrossFlow;          !- Heat Exchanger Configuration",
+			" Coil:Heating:Water,",
+			"	AHU Heating coil, !- Name",
+			"	AvailSched,       !- Availability Schedule Name",
+			"	autosize, !- U - Factor Times Area Value { W / K }",
+			"	autosize, !- Maximum Water Flow Rate { m3 / s }",
+			"	AHU Heating COil HW Inlet, !- Water Inlet Node Name",
+			"	AHU Heating COil HW Outlet, !- Water Outlet Node Name",
+			"	AHU cooling coil outlet, !- Air Inlet Node Name",
+			"	AHU Heating Coil Outlet, !- Air Outlet Node Name",
+			"	UFactorTimesAreaAndDesignWaterFlowRate, !- Performance Input Method",
+			"	autosize, !- Rated Capacity { W }",
+			"	82.2, !- Rated Inlet Water Temperature { C }",
+			"	16.6, !- Rated Inlet Air Temperature { C }",
+			"	71.1, !- Rated Outlet Water Temperature { C }",
+			"	48.8888888888889, !- Rated Outlet Air Temperature { C }",
+			"	1;          !- Rated Ratio for Air and Water Convection",
+			" Controller:WaterCoil,",
+			"	AHU cooling coil controller, !- Name",
+			"	TemperatureAndHumidityRatio,		!- Control Variable",
+			"	Reverse,			!- Action",
+			"	FLOW,				!- Actuator Variable",
+			"	AHU cooling coil outlet,	!- Sensor Node Name",
+			"	Water Inlet Node,	!- Actuator Node Name",
+			"	autosize,			!- Controller Convergence Tolerance { deltaC }",
+			"	autosize,			!- Maximum Actuated Flow { m3 / s }",
+			"	0.0;				!- Minimum Actuated Flow { m3 / s }",
+			" Controller:WaterCoil,",
+			"	AHU Heating coil, !- Name",
+			"	Temperature,      !- Control Variable",
+			"	Normal, !- Action",
+			"	Flow,   !- Actuator Variable",
+			"	AHU Heating Coil Outlet,   !- Sensor Node Name",
+			"	AHU Heating COil HW Inlet, !- Actuator Node Name",
+			"	autosize, !- Controller Convergence Tolerance { deltaC }",
+			"	autosize, !- Maximum Actuated Flow { m3 / s }",
+			"	0;        !- Minimum Actuated Flow { m3 / s }",
+			" Schedule:Compact,",
+			"   AvailSched,			!- Name",
+			"	Fraction,			!- Schedule Type Limits Name",
+			"	Through: 12/31,		!- Field 1",
+			"	For: AllDays,		!- Field 2",
+			"	Until: 24:00, 1.0;  !- Field 3",
+			" AirLoopHVAC:ControllerList,",
+			"	AHU controllers,    !- Name",
+			" Controller:WaterCoil, !- Controller 1 Object Type",
+			"	AHU cooling coil controller, !- Controller 1 Name",
+			" Controller:WaterCoil, !- Controller 2 Object Type",
+			"	AHU Heating coil;   !- Controller 2 Name",
+			" HeatExchanger:AirToAir:SensibleAndLatent,",
+			"   enthalpy HX,      !- Name",
+			"   AvailSched,       !- Availability Schedule Name",
+			"   4.71947443200001, !- Nominal Supply Air Flow Rate { m3 / s }",
+			"   0,   !- Sensible Effectiveness at 100 % Heating Air Flow { dimensionless }",
+			"   0.5, !- Latent Effectiveness at 100 % Heating Air Flow { dimensionless }",
+			"   0,   !- Sensible Effectiveness at 75 % Heating Air Flow { dimensionless }",
+			"   0.5, !- Latent Effectiveness at 75 % Heating Air Flow { dimensionless }",
+			"   0,   !- Sensible Effectiveness at 100 % Cooling Air Flow { dimensionless }",
+			"   0.5, !- Latent Effectiveness at 100 % Cooling Air Flow { dimensionless }",
+			"   0,   !- Sensible Effectiveness at 75 % Cooling Air Flow { dimensionless }",
+			"   0.5, !- Latent Effectiveness at 75 % Cooling Air Flow { dimensionless }",
+			"   AHU Heating Coil Outlet, !- Supply Air Inlet Node Name",
+			"   AHU Supply fan Inlet,    !- Supply Air Outlet Node Name",
+			"   AHU relief air outlet,   !- Exhaust Air Inlet Node Name",
+			"   AHU relief air outlet of ENTHALPY HX, !- Exhaust Air Outlet Node Name",
+			"   0,      !- Nominal Electric Power { W }",
+			"   No,     !- Supply Air Outlet Temperature Control",
+			"   Rotary, !- Heat Exchanger Type",
+			"   None,   !- Frost Control Type",
+			"  -17.7777777777778, !- Threshold Temperature { C }",
+			"   0.083,  !- Initial Defrost Time Fraction { dimensionless }",
+			"   0.012,  !- Rate of Defrost Time Fraction Increase { 1 / K }",
+			"   Yes;    !- Economizer Lockout",
+			" Fan:VariableVolume,",
+			"   AHU supply fan, !- Name",
+			"   AvailSched,     !- Availability Schedule Name",
+			"   0.7,            !- Fan Total Efficiency",
+			"   996.355828557053, !- Pressure Rise { Pa }",
+			"   autosize, !- Maximum Flow Rate { m3 / s }",
+			"   Fraction, !- Fan Power Minimum Flow Rate Input Method",
+			"   0,        !- Fan Power Minimum Flow Fraction",
+			"   0,        !- Fan Power Minimum Air Flow Rate { m3 / s }",
+			"   0.95,     !- Motor Efficiency",
+			"   1,        !- Motor In Airstream Fraction",
+			"   0.35071223, !- Fan Power Coefficient 1",
+			"   0.30850535, !- Fan Power Coefficient 2",
+			"  -0.54137364, !- Fan Power Coefficient 3",
+			"   0.87198823, !- Fan Power Coefficient 4",
+			"   0,          !- Fan Power Coefficient 5",
+			"   AHU Supply fan Inlet,  !- Air Inlet Node Name",
+			"   AHU Supply fan Outlet, !- Air Outlet Node Name",
+			"   General;               !- End - Use Subcategory",
+			" Branch,",
+			"   AHU Main Branch, !- Name",
+			" 	autosize, !- Maximum Flow Rate {m3/s}",
+			"	,         !- Pressure Drop Curve Name",
+			"   AirLoopHVAC:OutdoorAirSystem, !- Component 1 Object Type",
+			"   AHU OA system,           !- Component 1 Name",
+			"   AHU air loop inlet,      !- Component 1 Inlet Node Name",
+			"   AHU mixed air outlet,    !- Component 1 Outlet Node Name",
+			"   Passive,                 !- Component 1 Branch Control Type",
+			" Coil:Cooling:water,        !- Component 2 Object Type",
+			"   AHU cooling coil,        !- Component 2 Name",
+			"   AHU mixed air outlet,    !- Component 2 Inlet Node Name",
+			"   AHU cooling coil outlet, !- Component 2 Outlet Node Name",
+			"   Passive,                 !- Component 2 Branch Control Type",
+			" Coil:Heating:Water,        !- Component 3 Object Type",
+			"   AHU Heating coil,        !- Component 3 Name",
+			"   AHU cooling coil outlet, !- Component 3 Inlet Node Name",
+			"   AHU Heating Coil Outlet, !- Component 3 Outlet Node Name",
+			"   Passive,                 !- Component 3 Branch Control Type",
+			" HeatExchanger:AirToAir:SensibleAndLatent, !- Component 4 Object Type",
+			"   enthalpy HX,             !- Component 4 Name",
+			"   AHU Heating Coil Outlet, !- Component 4 Inlet Node Name",
+			"   AHU Supply fan Inlet,    !- Component 4 Outlet Node Name",
+			"   Passive,                 !- Component 4 Branch Control Type",
+			" Fan:VariableVolume,        !- Component 5 Object Type",
+			"   AHU Supply Fan,          !- Component 5 Name",
+			"   AHU Supply fan Inlet,    !- Component 5 Inlet Node Name",
+			"   AHU Supply fan Outlet,   !- Component 5 Outlet Node Name",
+			"   Active;                  !- Component 5 Branch Control Type",		
+			" AirLoopHVAC,",
+			"   AHU,                   !- Name",
+			"   AHU controllers,       !- Controller List Name",
+			"   ,                      !- Availability Manager List Name",
+			"   autosize,              !- Design Supply Air Flow Rate { m3 / s }",
+			"   AHU Branches,          !- Branch List Name",
+			"   ,                      !- Connector List Name",
+			"   AHU air loop inlet,    !- Supply Side Inlet Node Name",
+			"   AHU return air outlet, !- Demand Side Outlet Node Name",
+			"   AHU Supply Path Inlet, !- Demand Side Inlet Node Names",
+			"   AHU Supply fan Outlet; !- Supply Side Outlet Node Names",
+			" BranchList,",
+			"   AHU Branches,          !- Name",
+			"   AHU Main Branch;       !- Branch 1 Name",
+			" AirLoopHVAC:ReturnPath,",
+			"   AHU return path,       !- Name",
+			"   AHU return air outlet, !- Return Air Path Outlet Node Name",
+			" AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+			"   AHU zone mixer;        !- Component 1 Name",
+			" AirLoopHVAC:ZoneMixer,",
+			"   AHU zone mixer,        !- Name",
+			"   AHU return air outlet, !- Outlet Node Name",
+			"   Main FL1 Return Outlet,!- Inlet 1 Node Name",
+			" ZoneHVAC:EquipmentConnections,",
+			"   Main FL1,              !- Zone Name",
+			"   Main FL1 Equipment,    !- Zone Conditioning Equipment List Name",
+			"   Main FL1 Supply inlet, !- Zone Air Inlet Node or NodeList Name",
+			"   ,                      !- Zone Air Exhaust Node or NodeList Name",
+			"   Main FL1 Zone Air node,!- Zone Air Node Name",
+			"   Main FL1 Return Outlet;!- Zone Return Air Node Name",
+			" AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+			"   AHU System equipment,  !- Name",
+			" OutdoorAir:Mixer,        !- Component 1 Object Type",
+			"   AHU OA Mixing Box;     !- Component 1 Name",
+			" AirLoopHVAC:OutdoorAirSystem,",
+			"   AHU OA System,             !- Name",
+			"   AHU OA system controllers, !- Controller List Name",
+			"   AHU System equipment;      !- Outdoor Air Equipment List Name",
+			" OutdoorAir:Mixer,",
+			"   AHU OA Mixing Box,         !- Name",
+			"   AHU mixed air outlet,      !- Mixed Air Node Name",
+			"   AHU Outside Air HX Outlet, !- Outdoor Air Stream Node Name",
+			"   AHU relief air outlet,     !- Relief Air Stream Node Name",
+			"   AHU air loop inlet;        !- Return Air Stream Node Name",
+			" AirLoopHVAC:ControllerList,",
+			"   AHU OA system controllers, !- Name",
+			" Controller:OutdoorAir,       !- Controller 1 Object Type",
+			"   AHU OA Controller;         !- Controller 1 Name",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetReturnAirPathInput();
+		GetAirPathData();		
+		ASSERT_EQ( SimAirServingZones::HeatXchngr, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 4 ).CompType_Num );
+		// Close and delete eio output file
+		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 }
