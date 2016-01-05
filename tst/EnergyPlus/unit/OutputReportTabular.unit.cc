@@ -255,7 +255,7 @@ TEST( OutputReportTabularTest, GetColumnUsingTabs )
 	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString3, 1 ) );
 	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString3, 2 ) );
 	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString3, 3 ) );
-	EXPECT_EQ( "", GetColumnUsingTabs( inString3, 4 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString3, 4 )  );
 }
 
 
