@@ -185,6 +185,11 @@ namespace ManageElectricPower {
 		bool ManageElectricLoadCentersEnvrnFlag( true );
 		int ElecFacilityIndex( 0 );
 		bool CalcLoadCenterThermalLoadOneTimeSetupFlag( true );
+		Real64 ManageElectricLoadCentersElectricProdRate( 0.0 );
+		Real64 ManageElectricLoadCentersThermalProdRate( 0.0 );
+		Real64 ManageElectricLoadCentersLoadCenterElectricLoad( 0.0 );
+		Real64 ManageElectricLoadCentersStorageDrawnPower( 0.0 );
+		Real64 ManageElectricLoadCentersStorageStoredPower( 0.0 );
 	}
 
 	bool GetInput( true ); // When TRUE, calls subroutine to read input file.
@@ -223,6 +228,11 @@ namespace ManageElectricPower {
 		ManageElectricLoadCentersOneTimeFlag = true;
 		ManageElectricLoadCentersEnvrnFlag = true;
 		CalcLoadCenterThermalLoadOneTimeSetupFlag = true;
+		ManageElectricLoadCentersElectricProdRate = 0.0;
+		ManageElectricLoadCentersThermalProdRate = 0.0;
+		ManageElectricLoadCentersLoadCenterElectricLoad = 0.0;
+		ManageElectricLoadCentersStorageDrawnPower = 0.0;
+		ManageElectricLoadCentersStorageStoredPower = 0.0;
 		GetInput = true;
 		NumLoadCenters = 0;
 		NumInverters = 0;
@@ -308,15 +318,14 @@ namespace ManageElectricPower {
 		// static int ElecFacilityIndex( 0 );
 		// static bool MyOneTimeFlag( true );
 		// static bool MyEnvrnFlag( true );
+		// static Real64 ElectricProdRate( 0.0 ); // Electric Power Production Rate of Generators // ManageElectricLoadCentersElectricProdRate
+		// static Real64 ThermalProdRate( 0.0 ); // Thermal Power Production Rate of Generators // ManageElectricLoadCentersThermalProdRate
+		// static Real64 LoadCenterElectricLoad( 0.0 ); // Load center electric load to be dispatched // ManageElectricLoadCentersLoadCenterElectricLoad
+		// static Real64 StorageDrawnPower( 0.0 ); // Electric Power Draw Rate from storage units // ManageElectricLoadCentersStorageDrawnPower
+		// static Real64 StorageStoredPower( 0.0 ); // Electric Power Store Rate from storage units // ManageElectricLoadCentersStorageStoredPower
 		////////////////////////////////////////////////////////////////////////////////////
-		static Real64 ElectricProdRate( 0.0 ); // Electric Power Production Rate of Generators
-		static Real64 ThermalProdRate( 0.0 ); // Thermal Power Production Rate of Generators
 		Real64 ExcessThermalPowerRequest( 0.0 ); // Excess Thermal Power Request
-
-		static Real64 LoadCenterElectricLoad( 0.0 ); // Load center electric load to be dispatched
 		Real64 LoadCenterThermalLoad( 0.0 ); // Load center thermal load to be dispatched
-		static Real64 StorageDrawnPower( 0.0 ); // Electric Power Draw Rate from storage units
-		static Real64 StorageStoredPower( 0.0 ); // Electric Power Store Rate from storage units
 
 		// Get Generator data from input file
 		if ( GetInput ) {
@@ -477,7 +486,7 @@ namespace ManageElectricPower {
 
 			if ( SELECT_CASE_var == iOpSchemeBaseLoad ) { // 'BASELOAD'
 
-				LoadCenterElectricLoad = WholeBldgRemainingLoad;
+				ManageElectricLoadCentersLoadCenterElectricLoad = WholeBldgRemainingLoad;
 
 				for ( GenNum = 1; GenNum <= ElecLoadCenter( LoadCenterNum ).NumGenerators; ++GenNum ) {
 
@@ -502,18 +511,18 @@ namespace ManageElectricPower {
 					}
 
 					// Get generator's actual electrical and thermal power outputs
-					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ElectricProdRate, ThermalProdRate );
+					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ManageElectricLoadCentersElectricProdRate, ManageElectricLoadCentersThermalProdRate );
 
 					ElecLoadCenter( LoadCenterNum ).TotalPowerRequest += ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).PowerRequestThisTimestep;
 
-					WholeBldgRemainingLoad -= ElectricProdRate; // Update whole building remaining load
+					WholeBldgRemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update whole building remaining load
 				}
 
 			} else if ( SELECT_CASE_var == iOpSchemeDemandLimit ) { // 'DEMAND LIMIT'
 				// The Demand Limit scheme tries to have the generators meet all of the demand above the purchased Electric
 				//  limit set by the user.
 				RemainingLoad = WholeBldgRemainingLoad - ElecLoadCenter( LoadCenterNum ).DemandLimit;
-				LoadCenterElectricLoad = RemainingLoad;
+				ManageElectricLoadCentersLoadCenterElectricLoad = RemainingLoad;
 
 				for ( GenNum = 1; GenNum <= ElecLoadCenter( LoadCenterNum ).NumGenerators; ++GenNum ) {
 
@@ -550,25 +559,25 @@ namespace ManageElectricPower {
 					}
 
 					// Get generator's actual electrical and thermal power outputs
-					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ElectricProdRate, ThermalProdRate );
+					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ManageElectricLoadCentersElectricProdRate, ManageElectricLoadCentersThermalProdRate );
 
 					if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSRequestOn ) {
 						ElecLoadCenter( LoadCenterNum ).TotalPowerRequest += max( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSPowerRequest, 0.0 );
 					} else {
 						if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).PowerRequestThisTimestep > 0.0 ) {
 							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest += ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).MaxPowerOut;
-							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( LoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
+							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( ManageElectricLoadCentersLoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
 						}
 					}
-					RemainingLoad -= ElectricProdRate; // Update remaining load to be met by this load center
-					WholeBldgRemainingLoad -= ElectricProdRate; // Update whole building remaining load
+					RemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update remaining load to be met by this load center
+					WholeBldgRemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update whole building remaining load
 
 				}
 
 			} else if ( SELECT_CASE_var == iOpSchemeTrackElectrical ) { // 'TRACK ELECTRICAL'
 				//The Track Electrical scheme tries to have the generators meet all of the electrical demand for the building.
 				RemainingLoad = WholeBldgRemainingLoad;
-				LoadCenterElectricLoad = RemainingLoad;
+				ManageElectricLoadCentersLoadCenterElectricLoad = RemainingLoad;
 
 				for ( GenNum = 1; GenNum <= ElecLoadCenter( LoadCenterNum ).NumGenerators; ++GenNum ) {
 
@@ -605,18 +614,18 @@ namespace ManageElectricPower {
 					}
 
 					// Get generator's actual electrical and thermal power outputs
-					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ElectricProdRate, ThermalProdRate );
+					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ManageElectricLoadCentersElectricProdRate, ManageElectricLoadCentersThermalProdRate );
 
 					if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSRequestOn ) {
 						ElecLoadCenter( LoadCenterNum ).TotalPowerRequest += max( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSPowerRequest, 0.0 );
 					} else {
 						if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).PowerRequestThisTimestep > 0.0 ) {
 							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest += ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).MaxPowerOut;
-							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( LoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
+							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( ManageElectricLoadCentersLoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
 						}
 					}
-					RemainingLoad -= ElectricProdRate; // Update remaining load to be met by this load center
-					WholeBldgRemainingLoad -= ElectricProdRate; // Update whole building remaining load
+					RemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update remaining load to be met by this load center
+					WholeBldgRemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update whole building remaining load
 
 				}
 
@@ -625,7 +634,7 @@ namespace ManageElectricPower {
 				//  Code is very similar to 'Track Electrical' except for initial RemainingLoad is replaced by SchedElecDemand
 				//  and PV production is ignored.
 				RemainingLoad = GetCurrentScheduleValue( ElecLoadCenter( LoadCenterNum ).TrackSchedPtr );
-				LoadCenterElectricLoad = RemainingLoad;
+				ManageElectricLoadCentersLoadCenterElectricLoad = RemainingLoad;
 
 				for ( GenNum = 1; GenNum <= ElecLoadCenter( LoadCenterNum ).NumGenerators; ++GenNum ) {
 
@@ -661,18 +670,18 @@ namespace ManageElectricPower {
 					}
 
 					// Get generator's actual electrical and thermal power outputs
-					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ElectricProdRate, ThermalProdRate );
+					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ManageElectricLoadCentersElectricProdRate, ManageElectricLoadCentersThermalProdRate );
 
 					if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSRequestOn ) {
 						ElecLoadCenter( LoadCenterNum ).TotalPowerRequest += max( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSPowerRequest, 0.0 );
 					} else {
 						if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).PowerRequestThisTimestep > 0.0 ) {
 							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest += ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).MaxPowerOut;
-							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( LoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
+							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( ManageElectricLoadCentersLoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
 						}
 					}
-					RemainingLoad -= ElectricProdRate; // Update remaining load to be met by this load center
-					WholeBldgRemainingLoad -= ElectricProdRate; // Update whole building remaining load
+					RemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update remaining load to be met by this load center
+					WholeBldgRemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update whole building remaining load
 
 				}
 
@@ -683,7 +692,7 @@ namespace ManageElectricPower {
 				CustomMeterDemand = GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 1 ) / TimeStepZoneSec + GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 2 ) / ( TimeStepSys * SecInHour );
 
 				RemainingLoad = CustomMeterDemand;
-				LoadCenterElectricLoad = RemainingLoad;
+				ManageElectricLoadCentersLoadCenterElectricLoad = RemainingLoad;
 
 				for ( GenNum = 1; GenNum <= ElecLoadCenter( LoadCenterNum ).NumGenerators; ++GenNum ) {
 
@@ -719,18 +728,18 @@ namespace ManageElectricPower {
 					}
 
 					// Get generator's actual electrical and thermal power outputs
-					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ElectricProdRate, ThermalProdRate );
+					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ManageElectricLoadCentersElectricProdRate, ManageElectricLoadCentersThermalProdRate );
 
 					if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSRequestOn ) {
 						ElecLoadCenter( LoadCenterNum ).TotalPowerRequest += max( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSPowerRequest, 0.0 );
 					} else {
 						if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).PowerRequestThisTimestep > 0.0 ) {
 							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest += ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).MaxPowerOut;
-							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( LoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
+							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( ManageElectricLoadCentersLoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
 						}
 					}
-					RemainingLoad -= ElectricProdRate; // Update remaining load to be met by this load center
-					WholeBldgRemainingLoad -= ElectricProdRate; // Update whole building remaining load
+					RemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update remaining load to be met by this load center
+					WholeBldgRemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update whole building remaining load
 
 				}
 
@@ -779,7 +788,7 @@ namespace ManageElectricPower {
 					}
 
 					// Get generator's actual electrical and thermal power outputs
-					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ElectricProdRate, ThermalProdRate );
+					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ManageElectricLoadCentersElectricProdRate, ManageElectricLoadCentersThermalProdRate );
 
 					if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSRequestOn ) {
 
@@ -805,9 +814,9 @@ namespace ManageElectricPower {
 
 					}
 
-					RemainingThermalLoad -= ThermalProdRate; // Update remaining load to be met
+					RemainingThermalLoad -= ManageElectricLoadCentersThermalProdRate; // Update remaining load to be met
 					// by this load center
-					WholeBldgRemainingLoad -= ElectricProdRate; // Update whole building remaining load
+					WholeBldgRemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update whole building remaining load
 
 				}
 
@@ -818,7 +827,7 @@ namespace ManageElectricPower {
 				CalcLoadCenterThermalLoad( FirstHVACIteration, LoadCenterNum, RemainingThermalLoad );
 				// Total current electrical demand for the building is a secondary limit.
 				RemainingLoad = WholeBldgRemainingLoad;
-				LoadCenterElectricLoad = WholeBldgRemainingLoad;
+				ManageElectricLoadCentersLoadCenterElectricLoad = WholeBldgRemainingLoad;
 				LoadCenterThermalLoad = RemainingThermalLoad;
 
 				for ( GenNum = 1; GenNum <= ElecLoadCenter( LoadCenterNum ).NumGenerators; ++GenNum ) {
@@ -861,7 +870,7 @@ namespace ManageElectricPower {
 					}
 
 					// Get generator's actual electrical and thermal power outputs
-					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ElectricProdRate, ThermalProdRate );
+					GeneratorPowerOutput( LoadCenterNum, GenNum, FirstHVACIteration, ManageElectricLoadCentersElectricProdRate, ManageElectricLoadCentersThermalProdRate );
 
 					if ( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).EMSRequestOn ) {
 
@@ -883,16 +892,16 @@ namespace ManageElectricPower {
 								}
 							}
 
-							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( LoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
+							ElecLoadCenter( LoadCenterNum ).TotalPowerRequest = min( ManageElectricLoadCentersLoadCenterElectricLoad, ElecLoadCenter( LoadCenterNum ).TotalPowerRequest );
 
 						}
 
 					}
 
-					RemainingThermalLoad -= ThermalProdRate; // Update remaining thermal load to
+					RemainingThermalLoad -= ManageElectricLoadCentersThermalProdRate; // Update remaining thermal load to
 					// be met by this load center
 
-					WholeBldgRemainingLoad -= ElectricProdRate; // Update whole building remaining
+					WholeBldgRemainingLoad -= ManageElectricLoadCentersElectricProdRate; // Update whole building remaining
 					// electric load
 				}
 
@@ -903,18 +912,18 @@ namespace ManageElectricPower {
 
 			}} // TypeOfEquip
 
-			ElecLoadCenter( LoadCenterNum ).ElectDemand = LoadCenterElectricLoad; //To obtain the load for transformer
+			ElecLoadCenter( LoadCenterNum ).ElectDemand = ManageElectricLoadCentersLoadCenterElectricLoad; //To obtain the load for transformer
 
 			if ( ( ElecLoadCenter( LoadCenterNum ).StoragePresent ) && ( ElecLoadCenter( LoadCenterNum ).BussType == DCBussInverterDCStorage ) ) {
-				ManageElectCenterStorageInteractions( LoadCenterNum, StorageDrawnPower, StorageStoredPower );
+				ManageElectCenterStorageInteractions( LoadCenterNum, ManageElectricLoadCentersStorageDrawnPower, ManageElectricLoadCentersStorageStoredPower );
 				//     Adjust whole building electric demand based on storage inputs and outputs
-				WholeBldgRemainingLoad = WholeBldgRemainingLoad - StorageDrawnPower + StorageStoredPower;
+				WholeBldgRemainingLoad = WholeBldgRemainingLoad - ManageElectricLoadCentersStorageDrawnPower + ManageElectricLoadCentersStorageStoredPower;
 			}
 
 			if ( ElecLoadCenter( LoadCenterNum ).InverterPresent ) ManageInverter( LoadCenterNum );
 			if ( ( ElecLoadCenter( LoadCenterNum ).StoragePresent ) && ( ( ElecLoadCenter( LoadCenterNum ).BussType == DCBussInverterACStorage ) || ( ElecLoadCenter( LoadCenterNum ).BussType == ACBussStorage ) ) ) {
-				ManageElectCenterStorageInteractions( LoadCenterNum, StorageDrawnPower, StorageStoredPower );
-				WholeBldgRemainingLoad = WholeBldgRemainingLoad - StorageDrawnPower + StorageStoredPower;
+				ManageElectCenterStorageInteractions( LoadCenterNum, ManageElectricLoadCentersStorageDrawnPower, ManageElectricLoadCentersStorageStoredPower );
+				WholeBldgRemainingLoad = WholeBldgRemainingLoad - ManageElectricLoadCentersStorageDrawnPower + ManageElectricLoadCentersStorageStoredPower;
 			}
 
 			UpdateLoadCenterRecords( LoadCenterNum );

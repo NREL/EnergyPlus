@@ -261,7 +261,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_DefineReturnWaterHWSetPointManager )
 
 }
 
-TEST_F( EnergyPlusFixture, SetPointManagerDefineCondEntSetPointManager )
+TEST_F( EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager )
 {
 	// Set up the curves using the idf parser
 	std::string const idf_objects = delimited_string({
