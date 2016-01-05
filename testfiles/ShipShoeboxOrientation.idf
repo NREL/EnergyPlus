@@ -16,7 +16,7 @@
     35,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
-  Timestep,4;
+  Timestep,60;
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
@@ -27,8 +27,8 @@
     Annual Run,              !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    2,                      !- End Month
-    28,                      !- End Day of Month
+    7,                      !- End Month
+    31,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -141,8 +141,8 @@ ShadowCalculation,
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    15,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    15,0,3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    10,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    10,0,3.1,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
@@ -157,9 +157,9 @@ ShadowCalculation,
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     0,10,0,  !- X,Y,Z ==> Vertex 1 {m}
-    15,10,0,  !- X,Y,Z ==> Vertex 2 {m}
-    15,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,10,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0,10,3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    10,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    10,10,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Wall 3,       !- Name
@@ -172,10 +172,10 @@ ShadowCalculation,
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    15,10,0,  !- X,Y,Z ==> Vertex 2 {m}
-    15,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    15,0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    10,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    10,10,0,  !- X,Y,Z ==> Vertex 2 {m}
+    10,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    10,0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Wall 4,       !- Name
@@ -315,10 +315,11 @@ ShadowCalculation,
   Output:Diagnostics,
     DisplayUnusedSchedules;  !- Key 1
 
-Output:Variable,*,Site Solar Azimuth Angle,hourly,ReportingSchedule; !- Zone Average [deg]
-Output:Variable,*,Site Solar Altitude Angle,hourly,ReportingSchedule; !- Zone Average [deg]
-Output:Variable,*,Site Solar Hour Angle,hourly,ReportingSchedule; !- Zone Average [deg]
-Output:Variable,*,Surface Outside Face Beam Solar Incident Angle Cosine Value,hourly,ReportingSchedule; !- Zone Average []
+Output:Variable,*,Site Solar Azimuth Angle,timestep,ReportingSchedule; !- Zone Average [deg]
+Output:Variable,*,Site Solar Altitude Angle,timestep,ReportingSchedule; !- Zone Average [deg]
+Output:Variable,*,Site Solar Hour Angle,timestep,ReportingSchedule; !- Zone Average [deg]
+Output:Variable,*,Surface Outside Face Beam Solar Incident Angle Cosine Value,timestep,ReportingSchedule; !- Zone Average []
+Output:Variable,*,Surface Outside Normal Azimuth Angle,timestep,ReportingSchedule;
 
 ! Reporting schedule, since our CMake forces a full annual
 Schedule:Compact,

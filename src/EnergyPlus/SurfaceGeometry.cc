@@ -2940,6 +2940,7 @@ namespace SurfaceGeometry {
 					}
 				}
 				SurfaceTmp( SurfNum ).Vertex.allocate( SurfaceTmp( SurfNum ).Sides );
+                SurfaceTmp( SurfNum ).NewVertex.allocate( SurfaceTmp( SurfNum ).Sides );
 				GetVertices( SurfNum, SurfaceTmp( SurfNum ).Sides, rNumericArgs( {3,_} ) );
 				if ( SurfaceTmp( SurfNum ).Area <= 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Surface Area <= 0.0; Entered Area=" + TrimSigDigits( SurfaceTmp( SurfNum ).Area, 2 ) );
@@ -8391,7 +8392,7 @@ namespace SurfaceGeometry {
 				} else {
 					Surface( ThisSurf ).Shape = Quadrilateral;
 				}
-			} else { // Surface( ThisSurf ).Sides > 4 
+			} else { // Surface( ThisSurf ).Sides > 4
 				Surface( ThisSurf ).Shape = Polygonal;
 				if ( std::abs( ThisHeight * ThisWidth - Surface( ThisSurf ).GrossArea ) > 0.001 ) {
 					Surface( ThisSurf ).Width = std::sqrt( Surface( ThisSurf ).GrossArea );
@@ -10559,7 +10560,7 @@ namespace SurfaceGeometry {
 			Vect32 = VecNormalize( Surface( ThisSurf ).Vertex( 3 ) - Surface( ThisSurf ).Vertex( 2 ) );
 			Vect21 = VecNormalize( Surface( ThisSurf ).Vertex( 2 ) - Surface( ThisSurf ).Vertex( 1 ) );
 			DotProd = dot( Vect32, Vect21 );
-			if ( abs( DotProd ) <= cos89deg ) { 
+			if ( abs( DotProd ) <= cos89deg ) {
 				return true;
 			} else {
 				return false;

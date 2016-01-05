@@ -503,7 +503,8 @@ namespace DataSurfaces {
 		int SchedMovInsulInt; // Schedule for interior movable insulation
 		// Vertices
 		Array1D< Vector > Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
-		Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
+        Array1D< Vector > NewVertex;
+        Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
 		Vector lcsx;
 		Vector lcsy;
 		Vector lcsz;
