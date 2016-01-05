@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DXCoils_hh_INCLUDED
 #define DXCoils_hh_INCLUDED
 
@@ -429,7 +487,6 @@ namespace DXCoils {
 		Real64 SecCoilAirFlowScalingFactor; // secondary coil air flow rate autosize scaling factor
 		Real64 SecCoilRatedSHR; // secondary coil nominal or rated sensible heat ratio
 		Real64 SecCoilSHR; // secondary coil current sensible heat ratio
-		int SecZoneAirNodeNum; // secondary zone air node number
 		Real64 EvapInletWetBulb; // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.)
 		Real64 SecCoilSensibleHeatGainRate; // secondary zone sensible heat gain rate [W]
 		Real64 SecCoilTotalHeatRemovalRate; // secondary zone total heat removal rate [W]
@@ -668,7 +725,6 @@ namespace DXCoils {
 			SecCoilAirFlowScalingFactor( 1.0 ),
 			SecCoilRatedSHR( 1.0 ),
 			SecCoilSHR( 1.0 ),
-			SecZoneAirNodeNum( 0 ),
 			EvapInletWetBulb( 0.0 ),
 			SecCoilSensibleHeatGainRate( 0.0 ),
 			SecCoilTotalHeatRemovalRate( 0.0 ),
@@ -945,7 +1001,6 @@ namespace DXCoils {
 			Real64 const SecCoilAirFlowScalingFactor, // secondary coil air flow rate autosize scaling factor
 			Real64 const SecCoilRatedSHR, // secondary coil nominal or rated sensible heat ratio
 			Real64 const SecCoilSHR, // secondary coil current sensible heat ratio
-			int const SecZoneAirNodeNum, // secondary zone air node number
 			Real64 const EvapInletWetBulb, // secondary DX coil inlet wet bulb temperature (zone air node wet bulb temp.)
 			Real64 const SecCoilSensibleHeatGainRate, // secondary zone sensible heat gain rate [W]
 			Real64 const SecCoilTotalHeatRemovalRate, // secondary zone total heat removal rate [W]
@@ -1219,7 +1274,6 @@ namespace DXCoils {
 			SecCoilAirFlowScalingFactor( SecCoilAirFlowScalingFactor ),
 			SecCoilRatedSHR( SecCoilRatedSHR ),
 			SecCoilSHR( SecCoilSHR ),
-			SecZoneAirNodeNum( SecZoneAirNodeNum ),
 			EvapInletWetBulb( EvapInletWetBulb ),
 			SecCoilSensibleHeatGainRate( SecCoilSensibleHeatGainRate ),
 			SecCoilTotalHeatRemovalRate( SecCoilTotalHeatRemovalRate ),
@@ -1412,8 +1466,21 @@ namespace DXCoils {
 		Real64 const TotCap, // total cooling  capacity [Watts]
 		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
+		bool const PrintFlag = true, // flag used to print warnings if desired
 		Real64 const BaroPress=StdBaroPress // Barometric pressure [Pa]
 	);
+
+	Real64
+	ValidateADP(
+		std::string const & UnitType, // component name
+		std::string const & UnitName, // component type
+		Real64 const RatedInletAirTemp, // coil inlet air temperature [C]
+		Real64 const RatedInletAirHumRat, // coil inlet air humidity ratio [kg/kg]
+		Real64 const TotCap, // coil total capacity [W]
+		Real64 const AirMassFlow, // coil air mass flow rate [kg/s]
+		Real64 const InitialSHR, // coil sensible heat ratio []
+		std::string const CallingRoutine // function name calling this routine 
+		);
 
 	Real64
 	CalcEffectiveSHR(
@@ -1687,26 +1754,17 @@ namespace DXCoils {
 	);
 	
 	void
-	CalcVRFIUEvapCondTemp(
-		int const VRFTUNum, // the number of the VRF TU to be simulated
-		Real64 & EvapTemp, // evaporating temperature
-		Real64 & CondTemp  // condensing temperature 
-	);
-	
-	void
-	CalcVRFIUAirFlow (
-		int const ZoneIndex,  // index to zone where the VRF Terminal Unit resides 
-		int const Mode,       // mode 0 for cooling, 1 for heating, 2 for neither cooling nor heating
-		Real64 const Temp,    // evaporating or condensing temperature
-		int const CoolCoil,   // index to VRFTU cooling coil 
-		int const HeatCoil,   // index to VRFTU heating coil
-		bool SHSCModify,      // indicate whether SH/SC would be modified
-		Real64 & FanSpdRatio, // fan speed ratio
+	ControlVRFIUCoil (
+		int const CoilIndex,  // index to VRFTU coil 
+		Real64 const QCoil,   // coil load
+		Real64 const Tin,     // inlet air temperature
+		Real64 const Win,     // inlet air humidity ratio
+		Real64 const TeTc,    // evaporating or condensing temperature
+		Real64 const OAMassFlow,  // mass flow rate of outdoor air 
+		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
 		Real64 & Wout,    // outlet air humidity ratio
-		Real64 & Toutlet, // outlet air temperature
-		Real64 & Houtlet, // outlet air enthalpy
-		Real64 & HcoilIn, // inlet air enthalpy
-		Real64 & TcoilIn, // coil inlet temperature
+		Real64 & Tout, // outlet air temperature
+		Real64 & Hout, // outlet air enthalpy
 		Real64 & SHact,   // actual SH
 		Real64 & SCact    // actual SC
 	);
@@ -1756,30 +1814,6 @@ namespace DXCoils {
 	// Needed for unit tests, should not be normally called.
 	void
 	clear_state();
-
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DXCoils
 

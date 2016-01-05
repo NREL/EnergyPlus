@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -2031,6 +2089,8 @@ namespace HVACUnitarySystem {
 			EqSizing.DesCoolingLoad = max( EqSizing.DesCoolingLoad, EqSizing.DesHeatingLoad );
 			EqSizing.DesHeatingLoad = EqSizing.DesCoolingLoad;
 			DXCoolCap = EqSizing.DesCoolingLoad;
+		} else if( ! UnitarySystem( UnitarySysNum ).CoolCoilExists && CurZoneEqNum > 0 ) {
+			DXCoolCap = EqSizing.DesHeatingLoad;
 		}
 
 
@@ -2524,25 +2584,25 @@ namespace HVACUnitarySystem {
 		//
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages GetInput processing and program termination
-		
+
 		// METHODOLOGY EMPLOYED:
 		// Calls "Get" routines to read in data.
-			
+
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetUnitarySystemInput: " ); // include trailing blank space
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-			
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-			
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorFlag( false ); // true if errors detected in GetUnitarySystemInputData
-		
+
 		// Flow
 		GetUnitarySystemInputData( ErrorFlag );
-		
+
 		if( ErrorFlag ) {
 			ShowFatalError( RoutineName + "Errors found in getting AirLoopHVAC:UnitarySystem input. Preceding condition(s) causes termination." );
 		}
@@ -2707,6 +2767,9 @@ namespace HVACUnitarySystem {
 		bool IsBlank; // Flag for blank name
 		bool AirNodeFound; // used in error checking
 		bool AirLoopFound; // used in error checking
+		bool OASysFound; // used in error checking
+		bool ZoneEquipmentFound; // TRUE if Unitary System found connected to zone exhaust node
+		bool ZoneInletNodeFound; // TRUE if Unitary System found node connection to zone inlet node
 		bool errFlag; // Mining function error flag
 		bool PrintMessage; // flag to print or not print message
 		bool InletNodeNotControlled; // True if using controller on water coil
@@ -2726,7 +2789,6 @@ namespace HVACUnitarySystem {
 		int SupHeatCoilInletNode; // Used for node checking warning messages
 		int SupHeatCoilOutletNode; // Used for node checking warning messages
 		int TotalZonesOnAirLoop; // number of zones connected to air loop
-		bool ZoneEquipmentFound; // TRUE if Unitary System found connected to zone exhaust node
 		int ActualCoolCoilType; // Coil type number for HX assisted coils
 		int ControlledZoneNum; // loop counter
 		int ZoneExhNum; // loop counter
@@ -4861,166 +4923,121 @@ namespace HVACUnitarySystem {
 			TotalFloorAreaOnAirLoop = 0.0;
 			AirLoopNumber = 0;
 
-			//***... only need to do this for load based control?
-			// Get the node number for the zone with the thermostat ! what if ControlZoneNum does = 0 if it's an OA sys?
-			if ( UnitarySystem( UnitarySysNum ).ControlZoneNum > 0 ) {
-				AirNodeFound = false;
-				AirLoopFound = false;
-				for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-					if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
-					//             Find the controlled zone number for the specified thermostat location
-					UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
-					//             Determine if system is on air loop served by the thermostat location specified
-					AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-					if ( AirLoopNumber > 0 ) {
-						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( iNameAlphaNum ) ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-								AirLoopFound = true;
-								break;
-							}
-							if ( AirLoopFound ) break;
-						}
-						for ( TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum ) {
-							if ( TempControlledZone( TstatZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
-							AirNodeFound = true;
-						}
-						for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
-							if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
-							AirNodeFound = true;
-						}
-					}
-					break;
-				}
-				if ( AirLoopNumber > 0 ) {
-					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-						if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == AirLoopNumber ) {
-							++TotalZonesOnAirLoop;
-							TotalFloorAreaOnAirLoop += Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
-						}
-					}
-				} else {
-					if ( CurOASysNum > 0 ) {
-						//            IF(ALLOCATED(OutsideAirSys))THEN
-						for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
-							for ( OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum ) {
-								if ( ! SameString( OutsideAirSys( OASysNum ).ComponentName( OACompNum ), Alphas( iNameAlphaNum ) ) || ! SameString( OutsideAirSys( OASysNum ).ComponentType( OACompNum ), CurrentModuleObject ) ) continue;
-								AirLoopFound = true;
-								AirLoopNumber = OASysNum;
-								UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
-								break;
-							}
-							if ( AirLoopFound ) break;
-						}
-					}
-				}
-			} else { // this works IF it's zone equipment, but what IF it's air loop equipment?
-				for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-					for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
-						for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-							if ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( iNameAlphaNum ) ) || SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) {
-								AirLoopNumber = AirLoopNum;
-								AirLoopFound = true;
-							} else if ( PrimaryAirSystem( AirLoopNum ).OASysExists ) {
-								if ( allocated( OutsideAirSys ) ) {
-									for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
-										if ( ! SameString( OutsideAirSys( OASysNum ).Name, PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name ) || ! SameString( "AirloopHVAC:OutdoorAirSystem", PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf ) ) continue;
-										for ( OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum ) {
-											if ( ! SameString( OutsideAirSys( OASysNum ).ComponentName( OACompNum ), Alphas( iNameAlphaNum ) ) || ! SameString( OutsideAirSys( OASysNum ).ComponentType( OACompNum ), CurrentModuleObject ) ) continue;
-											AirLoopFound = true;
-											AirLoopNumber = AirLoopNum;
-											UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
-											break;
-										}
-										//                      IF(AirLoopFound)EXIT OASysScan  WHY aren't these working? I get a break here in the debugger
-									}
+			AirNodeFound = false;
+			AirLoopFound = false;
+			OASysFound = false;
+			ZoneEquipmentFound = false;
+			ZoneInletNodeFound = false;
+
+			// check if the UnitarySystem is connected to an air loop
+			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+				for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
+					for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+						if ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( iNameAlphaNum ) ) && SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) {
+							AirLoopNumber = AirLoopNum;
+							AirLoopFound = true;
+							for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+								if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
+								//             Find the controlled zone number for the specified thermostat location
+								UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
+								UnitarySystem( UnitarySysNum ).ControlZoneNum = ControlledZoneNum;
+								//             Determine if system is on air loop served by the thermostat location specified
+								if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == AirLoopNumber ) {
+									++TotalZonesOnAirLoop;
+									TotalFloorAreaOnAirLoop += Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
 								}
-							}
-							//                IF(AirLoopFound)EXIT CompScan
-						}
-						//              IF(AirLoopFound)EXIT BranchScan
-					}
-					//            IF(AirLoopFound)EXIT AirLoopScan
-				}
-				if ( ! AirLoopFound ) {
-					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-						for ( ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
-							if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) continue;
-							//               Find the controlled zone number for the specified thermostat location
-							UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
-							UnitarySystem( UnitarySysNum ).ControlZoneNum = ControlledZoneNum;
-							TotalFloorAreaOnAirLoop = Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
-							UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
-							UnitarySystem( UnitarySysNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum );
-							if ( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex > 0 ) {
-								for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
-									if ( ( ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipType_Num( EquipNum ) != ZoneUnitarySystem_Num ) || ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipName( EquipNum ) != UnitarySystem( UnitarySysNum ).Name ) continue;
-									UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum = ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).CoolingPriority( EquipNum );
-									UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).HeatingPriority( EquipNum );
+								for ( TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum ) {
+									if ( TempControlledZone( TstatZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
+									AirNodeFound = true;
 								}
-							}
+								for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
+									if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
+									AirNodeFound = true;
+								}
 							break;
+							}
 						}
+					}
+				}
+			}
+
+			// check if the UnitarySystem is connected to an outside air system
+			if ( !AirLoopFound && CurOASysNum > 0 ) {
+				for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
+					for ( OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum ) {
+						if ( ! SameString( OutsideAirSys( OASysNum ).ComponentName( OACompNum ), Alphas( iNameAlphaNum ) ) || ! SameString( OutsideAirSys( OASysNum ).ComponentType( OACompNum ), CurrentModuleObject ) ) continue;
+						AirLoopNumber = OASysNum;
+						OASysFound = true;
+						break;
+					}
+				}
+			}
+
+			// check if the UnitarySystem is connected as zone equipment
+			if ( !AirLoopFound && !OASysFound) {
+				for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+					for ( ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
+						if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) continue;
+						ZoneEquipmentFound = true;
+						//               Find the controlled zone number for the specified thermostat location
+						UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
+						++TotalZonesOnAirLoop;
+						TotalFloorAreaOnAirLoop = Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
+						UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
+						UnitarySystem( UnitarySysNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum );
+						if ( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex > 0 ) {
+							for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
+								if ( ( ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipType_Num( EquipNum ) != ZoneUnitarySystem_Num ) || ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipName( EquipNum ) != UnitarySystem( UnitarySysNum ).Name ) continue;
+								UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum = ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).CoolingPriority( EquipNum );
+								UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).HeatingPriority( EquipNum );
+							}
+						}
+						UnitarySystem( UnitarySysNum ).ControlZoneNum = ControlledZoneNum;
+						break;
+					}
+					if ( ZoneEquipmentFound ) {
 						for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
 							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
-							UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
+								ZoneInletNodeFound = true;
 							break;
 						}
 					}
-				} else {
-					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-						if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == AirLoopNumber ) {
-							++TotalZonesOnAirLoop;
-							TotalFloorAreaOnAirLoop += Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
-						}
-					}
 				}
-			}
-
-			if ( UnitarySystem( UnitarySysNum ).ControlZoneNum == 0 && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
-				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-				ShowContinueError( "Illegal " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
-				ErrorsFound = true;
-			}
-
-			// if a user connects the Unitary System as zone equipment, try to find the connection
-			ZoneEquipmentFound = false;
-			if ( UnitarySystem( UnitarySysNum ).AirLoopEquipment && ! AirLoopFound ) {
-				if ( UnitarySystem( UnitarySysNum ).ControlZoneNum > 0 ) {
+				if ( ! ZoneInletNodeFound ) {
 					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-						for ( ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
-							if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) continue;
-							if ( UnitarySystem( UnitarySysNum ).ControlZoneNum != ControlledZoneNum ) {
-								ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-								ShowContinueError( "Did not find Air Node (Zone with Thermostat)." );
-								ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
-								ErrorsFound = true;
-							}
-							if ( UnitarySystem( UnitarySysNum ).ControlZoneNum == ControlledZoneNum ) {
+						for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
+							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
+								ZoneInletNodeFound = true;
 								ZoneEquipmentFound = true;
-								UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
-								UnitarySystem( UnitarySysNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum );
-							}
+							break;
 						}
 					}
+					if ( ! ZoneInletNodeFound ) {
+						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirOutletNodeNameAlphaNum ) + " = " + Alphas( iAirOutletNodeNameAlphaNum ) );
+						ShowContinueError( "Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections object inputs." );
+						ErrorsFound = true;
+					}
 				}
-				if ( AirLoopNumber == 0 && ! ZoneEquipmentFound && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
-					ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
-					ShowContinueError( "Did not find an AirLoopHVAC." );
+				if ( ! ZoneEquipmentFound ) {
+					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas( iAirInletNodeNameAlphaNum ) );
+					ShowContinueError( "Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections object inputs." );
+					ErrorsFound = true;
+				}
+			}
+
+			if ( AirLoopNumber == 0 && ! ZoneEquipmentFound && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
+				ShowSevereError( CurrentModuleObject + " = " + Alphas( iNameAlphaNum ) );
+				ShowContinueError( "Did not find proper connection for AirLoopHVAC or ZoneHVAC system." );
+				ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
+				if ( ! AirNodeFound && ! ZoneEquipmentFound ) {
+					ShowSevereError( CurrentModuleObject + " = " + Alphas( iNameAlphaNum ) );
+					ShowContinueError( "Did not find air node (zone with thermostat)." );
 					ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
-					if ( ! AirNodeFound && ! ZoneEquipmentFound && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
-						ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
-						ShowContinueError( "Did not find air node (zone with thermostat)." );
-						ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
-						ShowContinueError( "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone." );
-					}
-					if ( ! AirLoopFound && ! ZoneEquipmentFound && UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) {
-						ShowSevereError( CurrentModuleObject + " = " + Alphas( 1 ) );
-						ShowSevereError( "Did not find correct AirLoopHVAC." );
-						ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
-					}
-					if ( UnitarySystem( UnitarySysNum ).ControlType == LoadBased ) ErrorsFound = true;
+					ShowContinueError( "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone." );
 				}
+				ErrorsFound = true;
 			}
 
 			if ( ! ZoneEquipmentFound ) TestCompSet( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iAirInletNodeNameAlphaNum ), Alphas( iAirOutletNodeNameAlphaNum ), "Air Nodes" );
@@ -5460,6 +5477,13 @@ namespace HVACUnitarySystem {
 				if ( HeatingCoilOutletNode == CoolingCoilInletNode && UnitarySystem( UnitarySysNum ).DehumidControlType_Num != DehumidControl_CoolReheat ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilUpstream = false;
 				}
+				if ( ZoneEquipmentFound ) {
+					ShowSevereError( CurrentModuleObject + " = " + Alphas( iNameAlphaNum ) );
+					ShowContinueError( "ZoneHVAC equipment must contain a fan object." );
+					ShowContinueError( "specified " + cAlphaFields( iFanTypeAlphaNum ) + " = " + Alphas( iFanTypeAlphaNum ) );
+					ShowContinueError( "specified " + cAlphaFields( iFanNameAlphaNum ) + " = " + Alphas( iFanNameAlphaNum ) );
+					ErrorsFound = true;
+				}
 			}
 
 			// check node connections
@@ -5717,7 +5741,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CondenserNodeNum = GetDXCoilCondenserInletNode( "Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName( CoolingCoilType, CoolingCoilName, errFlag ), errFlag );
 			} else {
 				if ( ! lAlphaBlanks( iCondenserNodeAlphaNum ) ) {
-					UnitarySystem( UnitarySysNum ).CondenserNodeNum = GetOnlySingleNode( Alphas( iCondenserNodeAlphaNum ), errFlag, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+					UnitarySystem( UnitarySysNum ).CondenserNodeNum = GetOnlySingleNode( Alphas( iCondenserNodeAlphaNum ), errFlag, CurrentModuleObject, Alphas( iNameAlphaNum ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 				} else {
 					// do nothing?
 				}
@@ -5866,7 +5890,7 @@ namespace HVACUnitarySystem {
 				MultiOrVarSpeedCoolCoil( UnitarySysNum ) = true;
 			}
 
-			// set global variables for multi-stage chilled and hot water coils 
+			// set global variables for multi-stage chilled and hot water coils
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
 				Index = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
 				if ( Index > 0 ) {
@@ -10619,7 +10643,12 @@ namespace HVACUnitarySystem {
 		}
 		if ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) > 0.0 && ( ( FanOn || TurnFansOn ) && ! TurnFansOff ) ) {
 			if ( UnitarySystem( UnitarySysNum ).ControlType == SetPointBased ) {
-				// set point based equipment should use VAV terminal units to set the flow. How do we know it's a VAV terminal?
+				// set point based equipment should use VAV terminal units to set the flow.
+				// zone equipment needs to set flow since no other device regulates flow (ZoneHVAC /= AirLoopEquipment)
+				if ( !UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
+					Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
+					Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
+				}
 				if ( AverageUnitMassFlow > 0.0 ) {
 					OnOffAirFlowRatio = 1.0;
 				} else {
@@ -10847,9 +10876,9 @@ namespace HVACUnitarySystem {
 		LoopOnOffFanPartLoadRatio = UnitarySystem( UnitarySysNum ).FanPartLoadRatio;
 		LoopCompCycRatio = UnitarySystem( UnitarySysNum ).CycRatio;
 
-		if (  UnitarySystem(UnitarySysNum).FirstPass ) {
+		if ( UnitarySystem(UnitarySysNum).FirstPass ) {
 
-			if (  ! SysSizingCalc ) {
+			if ( ! SysSizingCalc ) {
 
 				if ( CurOASysNum > 0 ) {
 					OASysEqSizing( CurOASysNum ).AirFlow = false;
@@ -10874,7 +10903,6 @@ namespace HVACUnitarySystem {
 					ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = false;
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = false;
 				}
-
 				UnitarySystem( UnitarySysNum ).FirstPass = false;
 
 			}
@@ -13162,29 +13190,5 @@ namespace HVACUnitarySystem {
 	MySizingCheckFlag.deallocate();
 	}
 } // HVACUnitarySystem
-
-// *****************************************************************************
-	//     NOTICE
-	
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of CalIFornia through Ernest OrlanDO Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-	
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-	
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to DO so.
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
 
 } // EnergyPlus

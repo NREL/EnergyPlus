@@ -134,14 +134,17 @@ endmacro()
 # DESIGN_DAY_ONLY force design day simulation
 # ANNUAL_SIMULATION force annual simulation
 # EXPECT_FATAL Expect simulation to fail
+# PERFORMANCE Tag test as performance analysis
 # COST <integer> Cost of this simulation relative to other simulations.
 #                Higher cost simulations run earlier in an attempt to enhance
 #                test parallelization and reduce overall test run time.
+
 function( ADD_SIMULATION_TEST )
-  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL)
+  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL PERFORMANCE)
   set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs ENERGYPLUS_FLAGS)
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
 
   if( DESIGN_DAY_ONLY )
     set(ANNUAL_SIMULATION false)
@@ -164,7 +167,21 @@ function( ADD_SIMULATION_TEST )
     set(ANNUAL_SIMULATION true)
   endif()
 
-  add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
+  if (ADD_SIM_TEST_PERFORMANCE)
+    set(TEST_CATEGORY "performance")
+    set(TEST_FILE_FOLDER "performance_tests")
+  else()
+    set(TEST_CATEGORY "integration")
+    set(TEST_FILE_FOLDER "testfiles")
+  endif()
+
+  if (ADD_SIM_TEST_PERFORMANCE AND VALGRIND_ANALYZE_PERFORMANCE_TESTS)
+    set(RUN_CALLGRIND TRUE)
+  else()
+    set(RUN_CALLGRIND FALSE)
+  endif()
+
+  add_test(NAME "${TEST_CATEGORY}.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
     -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
     -DBINARY_DIR=${CMAKE_BINARY_DIR}
     -DENERGYPLUS_EXE=$<TARGET_FILE:energyplus>
@@ -172,6 +189,9 @@ function( ADD_SIMULATION_TEST )
     -DEPW_FILE=${ADD_SIM_TEST_EPW_FILE}
     -DENERGYPLUS_FLAGS=${ENERGYPLUS_FLAGS}
     -DBUILD_FORTRAN=${BUILD_FORTRAN}
+    -DTEST_FILE_FOLDER=${TEST_FILE_FOLDER}
+    -DRUN_CALLGRIND:BOOL=${RUN_CALLGRIND}
+    -DVALGRIND=${VALGRIND}
     -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
   )  
 
@@ -180,21 +200,22 @@ function( ADD_SIMULATION_TEST )
     #set_tests_properties("integration.${IDF_NAME}" PROPERTIES RUN_SERIAL true)
   #endif()
 
+
   if (ADD_SIM_TEST_COST AND NOT ADD_SIM_TEST_COST STREQUAL "" )
-    set_tests_properties("integration.${IDF_NAME}" PROPERTIES COST ${ADD_SIM_TEST_COST})
+    set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES COST ${ADD_SIM_TEST_COST})
   endif()
 
   # Added the expect_fatal here to detect files that are expected to fatal error properly
   if( ADD_SIM_TEST_EXPECT_FATAL )
-    set_tests_properties("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Failed")
-    set_tests_properties("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Passed")
+    set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Failed")
+    set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Passed")
   else()
-    set_tests_properties("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
-    set_tests_properties("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+    set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+    set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
 
   if ( PROFILE_GENERATE AND ANNUAL_SIMULATION )
-    set_tests_properties("integration.${IDF_NAME}" PROPERTIES TIMEOUT 4500)
+    set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES TIMEOUT 4500)
   endif()
 
 
@@ -212,7 +233,7 @@ function( ADD_SIMULATION_TEST )
       )
     # Note, CMake / CTest doesn't seem to validate if this dependent name actually exists,
     # but it does seem to honor the requirement
-    set_tests_properties("regression.${IDF_NAME}" PROPERTIES DEPENDS "integration.${IDF_NAME}")
+    set_tests_properties("regression.${IDF_NAME}" PROPERTIES DEPENDS "${TEST_CATEGORY}.${IDF_NAME}")
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success")
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()

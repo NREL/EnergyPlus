@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -5,7 +63,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -130,6 +188,7 @@ namespace ManageElectricPower {
 	int ElecProducedCoGenIndex( 0 );
 	int ElecProducedPVIndex( 0 );
 	int ElecProducedWTIndex( 0 );
+	int ElecProducedStorageIndex( 0 );
 
 	int MaxRainflowArrayBounds( 100 );
 	int MaxRainflowArrayInc( 100 );
@@ -208,6 +267,7 @@ namespace ManageElectricPower {
 		static Real64 ElecFacilityHVAC( 0.0 );
 		static Real64 ElecProducedPV( 0.0 );
 		static Real64 ElecProducedWT( 0.0 );
+		static Real64 ElecProducedStorage( 0.0 );
 		static Real64 RemainingLoad( 0.0 ); // Remaining electric power load to be met by a load center
 		static Real64 WholeBldgRemainingLoad( 0.0 ); // Remaining electric power load for the building
 		static Real64 RemainingThermalLoad( 0.0 ); // Remaining thermal load to be met
@@ -236,6 +296,7 @@ namespace ManageElectricPower {
 			ElecProducedCoGenIndex = GetMeterIndex( "Cogeneration:ElectricityProduced" );
 			ElecProducedPVIndex = GetMeterIndex( "Photovoltaic:ElectricityProduced" );
 			ElecProducedWTIndex = GetMeterIndex( "WindTurbine:ElectricityProduced" );
+			ElecProducedStorageIndex = GetMeterIndex( "ElectricStorage:ElectricityProduced" );
 
 			for ( LoadCenterNum = 1; LoadCenterNum <= NumLoadCenters; ++LoadCenterNum ) {
 				ElecLoadCenter( LoadCenterNum ).DemandMeterPtr = GetMeterIndex( ElecLoadCenter( LoadCenterNum ).DemandMeterName );
@@ -276,53 +337,62 @@ namespace ManageElectricPower {
 			WholeBldgElectSummary.TotalElectricDemand = 0.0;
 			WholeBldgElectSummary.ElecProducedPVRate = 0.0;
 			WholeBldgElectSummary.ElecProducedWTRate = 0.0;
+			WholeBldgElectSummary.ElecProducedStorageRate = 0.0;
 
 			if ( NumLoadCenters > 0 ) {
-				ElecLoadCenter.DCElectricityProd() = 0.0;
-				ElecLoadCenter.DCElectProdRate() = 0.0;
-				ElecLoadCenter.DCpowerConditionLosses() = 0.0;
-				ElecLoadCenter.ElectricityProd() = 0.0;
-				ElecLoadCenter.ElectProdRate() = 0.0;
-				ElecLoadCenter.ThermalProd() = 0.0;
-				ElecLoadCenter.ThermalProdRate() = 0.0;
-				ElecLoadCenter.TotalPowerRequest() = 0.0;
-				ElecLoadCenter.TotalThermalPowerRequest() = 0.0;
-				ElecLoadCenter.ElectDemand() = 0.0;
+				for ( auto & e : ElecLoadCenter ) {
+					e.DCElectricityProd = 0.0;
+					e.DCElectProdRate = 0.0;
+					e.DCpowerConditionLosses = 0.0;
+					e.ElectricityProd = 0.0;
+					e.ElectProdRate = 0.0;
+					e.ThermalProd = 0.0;
+					e.ThermalProdRate = 0.0;
+					e.TotalPowerRequest = 0.0;
+					e.TotalThermalPowerRequest = 0.0;
+					e.ElectDemand = 0.0;
+				}
 			}
 
 			for ( LoadCenterNum = 1; LoadCenterNum <= NumLoadCenters; ++LoadCenterNum ) {
 				if ( ElecLoadCenter( LoadCenterNum ).NumGenerators == 0 ) continue;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ONThisTimestep() = false;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectricityProd() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectProdRate() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ElectricityProd() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ElectProdRate() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ThermalProd() = 0.0;
-				ElecLoadCenter( LoadCenterNum ).ElecGen.ThermalProdRate() = 0.0;
+				for ( auto & e : ElecLoadCenter( LoadCenterNum ).ElecGen ) {
+					e.ONThisTimestep = false;
+					e.DCElectricityProd = 0.0;
+					e.DCElectProdRate = 0.0;
+					e.ElectricityProd = 0.0;
+					e.ElectProdRate = 0.0;
+					e.ThermalProd = 0.0;
+					e.ThermalProdRate = 0.0;
+				}
 			}
 
 			if ( NumInverters > 0 ) {
-				Inverter.AncillACuseRate() = 0.0;
-				Inverter.AncillACuseEnergy() = 0.0;
-				Inverter.QdotConvZone() = 0.0;
-				Inverter.QdotRadZone() = 0.0;
+				for ( auto & e : Inverter ) {
+					e.AncillACuseRate = 0.0;
+					e.AncillACuseEnergy = 0.0;
+					e.QdotConvZone = 0.0;
+					e.QdotRadZone = 0.0;
+				}
 			}
 
 			if ( NumElecStorageDevices > 0 ) {
-				ElecStorage.PelNeedFromStorage() = 0.0;
-				ElecStorage.PelFromStorage() = 0.0;
-				ElecStorage.PelIntoStorage() = 0.0;
-				ElecStorage.QdotConvZone() = 0.0;
-				ElecStorage.QdotRadZone() = 0.0;
-				ElecStorage.TimeElapsed() = 0.0;
-				ElecStorage.ElectEnergyinStorage() = 0.0;
-				ElecStorage.StoredPower() = 0.0;
-				ElecStorage.StoredEnergy() = 0.0;
-				ElecStorage.DecrementedEnergyStored() = 0.0;
-				ElecStorage.DrawnPower() = 0.0;
-				ElecStorage.DrawnEnergy() = 0.0;
-				ElecStorage.ThermLossRate() = 0.0;
-				ElecStorage.ThermLossEnergy() = 0.0;
+				for ( auto & e : ElecStorage ) {
+					e.PelNeedFromStorage = 0.0;
+					e.PelFromStorage = 0.0;
+					e.PelIntoStorage = 0.0;
+					e.QdotConvZone = 0.0;
+					e.QdotRadZone = 0.0;
+					e.TimeElapsed = 0.0;
+					e.ElectEnergyinStorage = 0.0;
+					e.StoredPower = 0.0;
+					e.StoredEnergy = 0.0;
+					e.DecrementedEnergyStored = 0.0;
+					e.DrawnPower = 0.0;
+					e.DrawnEnergy = 0.0;
+					e.ThermLossRate = 0.0;
+					e.ThermLossEnergy = 0.0;
+				}
 			}
 			MyEnvrnFlag = false;
 		}
@@ -334,12 +404,14 @@ namespace ManageElectricPower {
 		// deprecate this PV stuff?
 		ElecProducedPV = GetInstantMeterValue( ElecProducedPVIndex, 2 );
 		ElecProducedWT = GetInstantMeterValue( ElecProducedWTIndex, 2 );
+		ElecProducedStorage = GetInstantMeterValue( ElecProducedStorageIndex, 2 );
 
 		WholeBldgElectSummary.TotalBldgElecDemand = ElecFacilityBldg / TimeStepZoneSec;
 		WholeBldgElectSummary.TotalHVACElecDemand = ElecFacilityHVAC / ( TimeStepSys * SecInHour );
 		WholeBldgElectSummary.TotalElectricDemand = WholeBldgElectSummary.TotalBldgElecDemand + WholeBldgElectSummary.TotalHVACElecDemand;
 		WholeBldgElectSummary.ElecProducedPVRate = ElecProducedPV / ( TimeStepSys * SecInHour );
 		WholeBldgElectSummary.ElecProducedWTRate = ElecProducedWT / ( TimeStepSys * SecInHour );
+		WholeBldgElectSummary.ElecProducedStorageRate = ElecProducedStorage / ( TimeStepSys * SecInHour );;
 
 		WholeBldgRemainingLoad = WholeBldgElectSummary.TotalElectricDemand; //- WholeBldgElectSummary%ElecProducedPVRate
 
@@ -1340,9 +1412,9 @@ namespace ManageElectricPower {
 			for ( StorNum = 1; StorNum <= NumofSimpleElecStorage + NumofKiBaMElecStorage; ++StorNum ) {
 				SetupOutputVariable( "Electric Storage Charge Power [W]", ElecStorage( StorNum ).StoredPower, "System", "Average", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Charge Energy [J]", ElecStorage( StorNum ).StoredEnergy, "System", "Sum", ElecStorage( StorNum ).Name );
-				SetupOutputVariable( "Electric Storage Production Decrement Energy [J]", ElecStorage( StorNum ).DecrementedEnergyStored, "System", "Sum", ElecStorage( StorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Electric Storage Production Decrement Energy [J]", ElecStorage( StorNum ).DecrementedEnergyStored, "System", "Sum", ElecStorage( StorNum ).Name, _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
 				SetupOutputVariable( "Electric Storage Discharge Power [W]", ElecStorage( StorNum ).DrawnPower, "System", "Average", ElecStorage( StorNum ).Name );
-				SetupOutputVariable( "Electric Storage Discharge Energy [J]", ElecStorage( StorNum ).DrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Electric Storage Discharge Energy [J]", ElecStorage( StorNum ).DrawnEnergy, "System", "Sum", ElecStorage( StorNum ).Name, _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
 				SetupOutputVariable( "Electric Storage Thermal Loss Rate [W]", ElecStorage( StorNum ).ThermLossRate, "System", "Average", ElecStorage( StorNum ).Name );
 				SetupOutputVariable( "Electric Storage Thermal Loss Energy [J]", ElecStorage( StorNum ).ThermLossEnergy, "System", "Sum", ElecStorage( StorNum ).Name );
 				if ( AnyEnergyManagementSystemInModel ) {
@@ -2235,14 +2307,13 @@ namespace ManageElectricPower {
 		{ auto const SELECT_CASE_var( ElecLoadCenter( LoadCenterNum ).BussType );
 
 		if ( ( SELECT_CASE_var == DCBussInverter ) || ( SELECT_CASE_var == DCBussInverterACStorage ) ) {
-			ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectProdRate() );
+			ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::DCElectProdRate );
 			Inverter( InvertNum ).DCPowerIn = ElecLoadCenter( LoadCenterNum ).DCElectProdRate;
 			Inverter( InvertNum ).DCEnergyIn = Inverter( InvertNum ).DCPowerIn * ( TimeStepSys * SecInHour );
 		} else if ( SELECT_CASE_var == DCBussInverterDCStorage ) {
 			StorNum = ElecLoadCenter( LoadCenterNum ).StorageModelNum;
 			if ( StorNum > 0 ) {
-				ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectProdRate() );
-
+				ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::DCElectProdRate );
 				Inverter( InvertNum ).DCPowerIn = ElecLoadCenter( LoadCenterNum ).DCElectProdRate;
 				Inverter( InvertNum ).DCEnergyIn = Inverter( InvertNum ).DCPowerIn * ( TimeStepSys * SecInHour );
 			} else { // throw error
@@ -2385,24 +2456,20 @@ namespace ManageElectricPower {
 		{ auto const SELECT_CASE_var( ElecLoadCenter( LoadCenterNum ).BussType );
 
 		if ( SELECT_CASE_var == ACBuss ) {
-			ElecLoadCenter( LoadCenterNum ).ElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectProdRate() );
-			ElecLoadCenter( LoadCenterNum ).ElectricityProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectricityProd() );
-
+			ElecLoadCenter( LoadCenterNum ).ElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectProdRate );
+			ElecLoadCenter( LoadCenterNum ).ElectricityProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectricityProd );
 		} else if ( SELECT_CASE_var == ACBussStorage ) {
 			StorNum = ElecLoadCenter( LoadCenterNum ).StorageModelNum;
 			if ( StorNum > 0 ) {
-				ElecLoadCenter( LoadCenterNum ).ElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectProdRate() ) + ElecStorage( StorNum ).DrawnPower - ElecStorage( StorNum ).StoredPower;
-
-				ElecLoadCenter( LoadCenterNum ).ElectricityProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectricityProd() ) + ElecStorage( StorNum ).DrawnEnergy - ElecStorage( StorNum ).StoredEnergy;
+				ElecLoadCenter( LoadCenterNum ).ElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectProdRate ) + ElecStorage( StorNum ).DrawnPower - ElecStorage( StorNum ).StoredPower;
+				ElecLoadCenter( LoadCenterNum ).ElectricityProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectricityProd ) + ElecStorage( StorNum ).DrawnEnergy - ElecStorage( StorNum ).StoredEnergy;
 			}
-
 		} else if ( ( SELECT_CASE_var == DCBussInverter ) || ( SELECT_CASE_var == DCBussInverterDCStorage ) ) {
 			InvertNum = ElecLoadCenter( LoadCenterNum ).InverterModelNum;
 			if ( InvertNum > 0 ) {
 				ElecLoadCenter( LoadCenterNum ).ElectProdRate = Inverter( InvertNum ).ACPowerOut;
 				ElecLoadCenter( LoadCenterNum ).ElectricityProd = Inverter( InvertNum ).ACEnergyOut;
 			}
-
 		} else if ( SELECT_CASE_var == DCBussInverterACStorage ) {
 			StorNum = ElecLoadCenter( LoadCenterNum ).StorageModelNum;
 			InvertNum = ElecLoadCenter( LoadCenterNum ).InverterModelNum;
@@ -2412,8 +2479,8 @@ namespace ManageElectricPower {
 			}
 		}}
 
-		ElecLoadCenter( LoadCenterNum ).ThermalProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ThermalProdRate() );
-		ElecLoadCenter( LoadCenterNum ).ThermalProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ThermalProd() );
+		ElecLoadCenter( LoadCenterNum ).ThermalProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ThermalProdRate );
+		ElecLoadCenter( LoadCenterNum ).ThermalProd = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ThermalProd );
 
 	}
 
@@ -2457,7 +2524,7 @@ namespace ManageElectricPower {
 		// Flow
 
 		ElecProducedCoGen = GetInstantMeterValue( ElecProducedCoGenIndex, 2 ); //whole building
-		ElecProducedFacility = ElecProducedCoGen + WholeBldgElectSummary.ElecProducedPVRate * TimeStepSys * SecInHour + WholeBldgElectSummary.ElecProducedWTRate * TimeStepSys * SecInHour; //whole building
+		ElecProducedFacility = ElecProducedCoGen + ( WholeBldgElectSummary.ElecProducedPVRate + WholeBldgElectSummary.ElecProducedWTRate + WholeBldgElectSummary.ElecProducedStorageRate ) * TimeStepSys * SecInHour; //whole building
 
 		WholeBldgElectSummary.ElectricityProd = ElecProducedFacility; //whole building
 		WholeBldgElectSummary.ElectProdRate = ElecProducedFacility / ( TimeStepSys * SecInHour ); //whole building
@@ -2528,8 +2595,10 @@ namespace ManageElectricPower {
 		if ( NumInverters == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			Inverter.QdotConvZone() = 0.0;
-			Inverter.QdotRadZone() = 0.0;
+			for ( auto & e : Inverter ) {
+				e.QdotConvZone = 0.0;
+				e.QdotRadZone = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
@@ -2799,12 +2868,10 @@ namespace ManageElectricPower {
 		{ auto const SELECT_CASE_var( ElecLoadCenter( LoadCenterNum ).BussType );
 
 		if ( SELECT_CASE_var == ACBussStorage ) {
-			Pgensupply = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.ElectProdRate() );
+			Pgensupply = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::ElectProdRate );
 		} else if ( SELECT_CASE_var == DCBussInverterDCStorage ) {
-			ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen.DCElectProdRate() );
-			Pgensupply = ElecLoadCenter( LoadCenterNum ).DCElectProdRate;
+			Pgensupply = ElecLoadCenter( LoadCenterNum ).DCElectProdRate = sum( ElecLoadCenter( LoadCenterNum ).ElecGen, &GenData::DCElectProdRate );
 		} else if ( SELECT_CASE_var == DCBussInverterACStorage ) {
-
 			Pgensupply = Inverter( ElecLoadCenter( LoadCenterNum ).InverterModelNum ).ACPowerOut;
 		}}
 		// End determine available generation
@@ -3272,8 +3339,10 @@ namespace ManageElectricPower {
 		if ( NumElecStorageDevices == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			ElecStorage.QdotConvZone() = 0.0;
-			ElecStorage.QdotRadZone() = 0.0;
+			for ( auto & e : ElecStorage ) {
+				e.QdotConvZone = 0.0;
+				e.QdotRadZone = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
@@ -3556,8 +3625,10 @@ namespace ManageElectricPower {
 		if ( NumTransformers == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			Transformer.QdotConvZone() = 0.0;
-			Transformer.QdotRadZone() = 0.0;
+			for ( auto & e : Transformer ) {
+				e.QdotConvZone = 0.0;
+				e.QdotRadZone = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 
@@ -3741,29 +3812,6 @@ namespace ManageElectricPower {
 
 	//******************************************************************************************************
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ManageElectricPower
 

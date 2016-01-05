@@ -211,7 +211,7 @@ This is the average temperature of the working fluid inside the heat exchanger.
 
 The GroundHeatExchanger:Slinky use the g-functions to calculate the GHX temperature response, similar to the GroundHeatExchanger:Vertical model, however for this model g-functions are automatically calculated by EnergyPlus without the need of external software or data.
 
-Horizontal slinky-loop ground heat exchangers (GHXs) consist of coiled tubing, with the individual rings spread out along the direction of the trench either horizontally or vertically, as shown in [Figure](#SlinkyIOFig1). A schematic of a slinky GHX can be seen in [Figure](#SlinkyIOFig2). Compared to conventional straight tube horizontal GHXs, slinky loops have a higher tube density; hence, with the same cooling/heating loads, slinky-loop GHXs require less land area and excavation work than straight tube HGHXs. 
+Horizontal slinky-loop ground heat exchangers (GHXs) consist of coiled tubing, with the individual rings spread out along the direction of the trench either horizontally or vertically, as shown in [Figure](#SlinkyIOFig1). A schematic of a slinky GHX can be seen in [Figure](#SlinkyIOFig2). Compared to conventional straight tube horizontal GHXs, slinky loops have a higher tube density; hence, with the same cooling/heating loads, slinky-loop GHXs require less land area and excavation work than straight tube HGHXs.
 
 ![slinky heat exchanger](media/image901.png)
 
@@ -272,11 +272,11 @@ This numeric field is the thermal conductivity of the soil, in W/m-K.
 
 #### Field: Soil Density
 
-This numeric field is the density of the soil, in kg/m3. 
+This numeric field is the density of the soil, in kg/m3.
 
 #### Field: Soil Specific Heat
 
-This numeric field is the specific heat of the soil, in J/kg-K. 
+This numeric field is the specific heat of the soil, in J/kg-K.
 
 #### Field: Pipe Thermal Conductivity
 
@@ -292,7 +292,7 @@ This numeric field is the specific heat of the heat exchanger pipe, in J/kg-K.
 
 #### Field: Pipe Outside Diameter
 
-This numeric field is the outside pipe diameter, in meters. 
+This numeric field is the outside pipe diameter, in meters.
 
 #### Field: Pipe Wall Thickness
 
@@ -304,7 +304,7 @@ This alpha field is heat exchanger configuration, either Vertical or Horizontal.
 
 #### Field: Coil Diameter
 
-This numeric is the diameter of the slinky coil, in meters. 
+This numeric is the diameter of the slinky coil, in meters.
 
 #### Field: Coil Pitch
 
@@ -342,15 +342,15 @@ This numeric field contains the maximum number of years of simulation to be carr
 
 The following output variables are available.
 
-* HVAC,Average,Ground Heat Exchanger Average Borehole Temperature [C] 
+* HVAC,Average,Ground Heat Exchanger Average Borehole Temperature [C]
 
-* HVAC,Average,Ground Heat Exchanger Heat Transfer Rate [W] 
+* HVAC,Average,Ground Heat Exchanger Heat Transfer Rate [W]
 
-* HVAC,Average,Ground Heat Exchanger Inlet Temperature [C] 
+* HVAC,Average,Ground Heat Exchanger Inlet Temperature [C]
 
-* HVAC,Average,Ground Heat Exchanger Outlet Temperature [C] 
+* HVAC,Average,Ground Heat Exchanger Outlet Temperature [C]
 
-* HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s] 
+* HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s]
 
 * HVAC,Average,Ground Heat Exchanger Average Fluid Temperature [C]
 
@@ -1782,7 +1782,7 @@ The impact of using outside air/mechanical ventilation is described in the secti
 
 ### AirLoopHVAC:OutdoorAirSystem:EquipmentList
 
-Used to specify the components in the outdoor air system. The components will be simulated in the order in which they occur in the list. 
+Used to specify the components in the outdoor air system. The components will be simulated in the order in which they occur in the list.
 
 The following HVAC equipment types are allowed as outdoor air system equipment. The component matrix shows which coils and fans are allowed with which equipment models.
 
@@ -2585,7 +2585,7 @@ If Ventilation Control Mode = NoVent, this schedule has no effect.
 **Note:** In order to establish an airflow network, each AirflowNetwork:Multizone:Zone object must have at least two surfaces defined with AirflowNetwork:Multizone:Surface objects, so that air can flow from one zone into other zones (or to outdoors) through the network (air mass flow conserved). In addition, for all AirflowNetwork:Multizone:Surface objects facing the same Zone Name (ref. BuildingSurface:Detailed), at least two different environments must be defined for the other side of these surfaces (e.g., an external node and an adjacent zone, two adjacent zones, or two external nodes).
 
 #### Field: Occupant Ventilation Control Name
-The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the Ventilation Control defined in the Ventilation Control Mode field will be overridden. 
+The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the Ventilation Control defined in the Ventilation Control Mode field will be overridden.
 
 
 IDF examples are provided below:
@@ -3179,16 +3179,16 @@ AirflowNetwork:MultiZone:WindPressureCoefficientValues,
 
 ###AirflowNetwork:OccupantVentilationControl
 
-The AirflowNetwork:OccupantVentilationControl object provides control options with minimum opening and closing time checks and opening and closing probability values. In general, the probability values could be a constant or a specific function. Due to lack of real data, two schedules are selected to represent probability values. If real data are available, this object may be modified to adopt new data. 
+The AirflowNetwork:OccupantVentilationControl object provides control options with minimum opening and closing time checks and opening and closing probability values. In general, the probability values could be a constant or a specific function. Due to lack of real data, two schedules are selected to represent probability values. If real data are available, this object may be modified to adopt new data.
 
 #### Field: Name
 This is the name of the object.
 
 #### Field: Minimum Opening Time
-The field represents the minimum time that windows will remain open. If a window has been open for a time less than this value, the window will remain open. 
+The field represents the minimum time that windows will remain open. If a window has been open for a time less than this value, the window will remain open.
 
 #### Field: Minimum Closing Time
-The field represents the minimum time that windows will remain closed. If a window has been closed for a time less than this value, the window will remain closed. 
+The field represents the minimum time that windows will remain closed. If a window has been closed for a time less than this value, the window will remain closed.
 
 #### Field: Thermal Comfort Low Temperature Curve Name
 This alpha field defines the name of a curve to be used for thermal comfort temperature calculation at low outdoor dry-bulb temperature. This curve is a linear or quadratic equation using outdoor dry-bulb temperatures as an independent variable. This performance curve can be used to describe the thermal comfort temperature at low outdoor dry-bulb temperature. It allows maximum two curves to describe the thermal comfort temperature in two different outdoor dry-bulb temperature regions. If a single curve is used, blanks are entered in the following two fields.
@@ -3200,7 +3200,7 @@ When there are two piecewise curves to represent thermal comfort temperature cal
 This alpha field defines the name of a curve to be used for thermal comfort temperature calculation at high outdoor dry-bulb temperature. This curve is a linear or quadratic equation using outdoor dry-bulb temperatures as an independent variable. This performance curve can be used to describe the thermal comfort temperature at high outdoor dry-bulb temperature. It allows maximum two curves to describe the thermal comfort temperature in two different outdoor dry-bulb temperature regions. If a single curve is used, blanks are entered in this field.
 
 #### Field: Maximum Threshold for Persons Dissatisfied PPD
-This field is used to calculate the comfort band as a function of predicted percentage of dissatisfied (PPD). The default value is 10%. The equation is based on curve fit and is valid between 0% and 35%.  
+This field is used to calculate the comfort band as a function of predicted percentage of dissatisfied (PPD). The default value is 10%. The equation is based on curve fit and is valid between 0% and 35%.
 
 <div>\[\Theta = -0.0028 (100-PPD)^2 + 0.3419 (100-PPD) - 6.6275\]</div>
 
@@ -3213,7 +3213,7 @@ where
 Input is Yes or No. The default is No. If Yes, an occupancy check is performed used in the opening probability check. If No, the occupancy check is bypassed.
 
 #### Field: Opening Probability Schedule Name
-The name of a schedule of opening probability that controls the opening of windows and doors in the thermal zone to provide natural ventilation. If the probability value is greater a random number, windows are allowed to open. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied. 
+The name of a schedule of opening probability that controls the opening of windows and doors in the thermal zone to provide natural ventilation. If the probability value is greater a random number, windows are allowed to open. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied.
 
 #### Field: Closing Probability Schedule Name
 The name of a schedule of closing probability that controls the closing of windows and doors in the thermal zone to reduce natural ventilation. If the probability value is greater a random number, windows are allowed to be closed. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied.
@@ -3238,7 +3238,7 @@ The next two objects of AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazo
 
 Recent advancements have been made to AirflowNetwork to model large horizontal openings.  This new development makes AirflowNetwork useful for not only modeling air movement between zones (and outdoors), but also within individual thermal zones.
 
-The possible combination will allow the EnergyPlus to simulate a thermal zone using a network approach by assuming internal nodes connected by user-defined patterns of temperatures and airflows. 
+The possible combination will allow the EnergyPlus to simulate a thermal zone using a network approach by assuming internal nodes connected by user-defined patterns of temperatures and airflows.
 It should be pointed out that the new model works when the MultizoneWithoutDistribution is selected in the field of AirflowNetwork Control of the AirflowNetwork:SimulationCOntrol object. The model cannot work with other choices.
 
 ### AirflowNetwork:Intrazone:Node
@@ -3258,7 +3258,7 @@ The name of a zone object, which is also defined in a AirflowNetwork:MultiZone:Z
 
 #### Field: Node Height
 
-This field requires input of node height in meters. 
+This field requires input of node height in meters.
 
 An IDF example is provided below:
 
@@ -3266,7 +3266,7 @@ An IDF example is provided below:
 
 ```idf
 AirflowNetwork:IntraZone:Node,
- LeftUpper,               !- Name 
+ LeftUpper,               !- Name
  LeftUpper,               !- RoomAir:Node:AirflowNetwork Name
  NORTH_ZONE,              !- Zone Name
  4.572;                   !- Node Height {m}
@@ -3282,14 +3282,14 @@ The name identifies the linkage for later reference and in the output listing. E
 
 #### Field: Node 1 Name
 
-The input designates a node name where airflow starts. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object. 
+The input designates a node name where airflow starts. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object.
 
 #### Field: Node 2 Name
 
-The input designates a node name where airflow ends. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object. 
+The input designates a node name where airflow ends. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object.
 
 Note: One of Node 1 and Node 2 should be defined as an AirflowNetwork:Intrazone:Node object. In other words, both nodes cannot be defined as AirflowNetwork:MultiZone:Zone object. This type of connection should be defined as an AirflowNetwork:MultiZone:Surface object.
-  
+
 #### Field: Component Name
 
 The input designates an AirflowNetwork component name associated with the two nodes. The component name should be one of the AirflowNetwork:Multizone:Component object names. The component is used for intrazone node connection only. If the next field is specified, the input of this field could be a blank.
@@ -3303,14 +3303,14 @@ It should be pointed out that an AirflowNetwork:Multizone:Surface object allows 
 - AirflowNetwork:MultiZone:Component:HorizontalOpening
 
 However, an AirflowNetwork:Intrazone:Linkage object without a surface connection has connection with two intrazone nodes in the same zone and allows two AirflowNetwork:Multizone:Component objects due to lack of geometry inputs.
- 
+
 - AirflowNetwork:MultiZone:Surface:Crack,
 - AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
 
 
 #### Field: Connection Surface
 
-The input specifies an AirflowNetwork:Multizone:Surface object name, when the nodes defined above are not located in the same zone. The surface linkage will be connected by the above two nodes, instead of zone nodes in normal definition. In other words, the connection defined in an AirflowNetwork:Multizone:Surface is removed. Instead, this new connection replaces the the connection specified before. A warning message is issued to let users be aware of the changes. Since each AirflowNetwork:Multizone:Surface object has its own component defined in the Leakage Component Name field, the input of the Component Name field in this object will be ignored.  
+The input specifies an AirflowNetwork:Multizone:Surface object name, when the nodes defined above are not located in the same zone. The surface linkage will be connected by the above two nodes, instead of zone nodes in normal definition. In other words, the connection defined in an AirflowNetwork:Multizone:Surface is removed. Instead, this new connection replaces the the connection specified before. A warning message is issued to let users be aware of the changes. Since each AirflowNetwork:Multizone:Surface object has its own component defined in the Leakage Component Name field, the input of the Component Name field in this object will be ignored.
 
 An IDF example is provided below:
 
@@ -4568,11 +4568,11 @@ The value of the venting opening factor for a particular window or door at the p
 
 #### AFN Surface Opening Elapsed Time [min]
 
-This output is the opening elapsed time in the units of minutes since the window opened. 
+This output is the opening elapsed time in the units of minutes since the window opened.
 
 #### AFN Surface Closing Elapsed Time [min]
 
-This output is the opening elapsed time in the units of minutes since the windows closed. 
+This output is the opening elapsed time in the units of minutes since the windows closed.
 
 #### AFN Surface Opening Status at Previous Time Step []
 
@@ -4584,20 +4584,20 @@ This is the window or door opening factor control status at the current time ste
 
 #### AFN Surface Opening Probability Status []
 
-This is the opening probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no opening probability control action. A value of 1 indicates that a window or door is forced to open when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept. 
+This is the opening probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no opening probability control action. A value of 1 indicates that a window or door is forced to open when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept.
 
 #### AFN Surface Closing Probability Status []
 
-This is the closing probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no closing probability control action. A value of 1 indicates that a window or door is forced to close when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept. 
+This is the closing probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no closing probability control action. A value of 1 indicates that a window or door is forced to close when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept.
 
 #### RoomAirflowNetwork Node Temperature [C]
 
 This is the RoomAirflowNetwork node temperature output in degrees C.
- 
+
 #### RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]
 
 This is the RoomAirflowNetwork node humidity ratio output in kgWater/kgDryAir.
- 
+
 #### RoomAirflowNetwork Node Total Pressure [Pa]
 
 This is the RoomAirflowNetwork node total pressure in Pa with respect to outdoor barometric pressure. The total pressure is the sum of static pressure, dynamic pressure, and elevation impact at the node’s relative height.
@@ -6149,15 +6149,15 @@ There are no specific outputs for the four pipe induction terminal units.
 ### AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
 
 The four-pipe beam air terminal system is a mixed air-hydronic system. A central, single-duct forced-air system that supplies conditioned air to the zones. Chilled water circulates through ceiling-mounted fin-tube convector units to provide sensible cooling. Hot water circulates through the same convectors to provide heating.  Water flow rate through the beam unit is varied to meet the zone sensible cooling or heating load. Any dehumidification is done by the central forced-air system. Thermodynamically, the cooled beam system resembles the four-pipe induction unit (**AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction**).
- 
+
 To model a typical four-pipe beam system the user will need to define a conventional central constant volume forced air system in order to deliver primary air to the beam. This central system (usually) provides outside air for ventilation.  Primary air is normally delivered at a fixed temperature but could be reset by a schedule or using an outdoor air reset setpoint manager. On the supply side of this air loop there will be the usual central conditioning equipment: outside air mixer, fan, heating and cooling coil. On the zone equipment (demand) side of the loop, the four-pipe beams will be represented as air terminal units. Because the four-pipe beam can provide heating the system can avoid over-cooling zones during times of low load with cool primary air temperatures, similar to the action of a reheat coil in a VAV terminal.  Therefore it is not necessary to have additional zone equipment (such as baseboard heaters) to handle heating (or reheating) loads.
 
-Although the four-pipe beam equipment in a zone is treated by the program as a single terminal unit, the actual installation will often have multiple beam units in each zone. In this model, it is only the total length of all the beams and the total air flow of all the units that are described, not the number of individual beam units. 
+Although the four-pipe beam equipment in a zone is treated by the program as a single terminal unit, the actual installation will often have multiple beam units in each zone. In this model, it is only the total length of all the beams and the total air flow of all the units that are described, not the number of individual beam units.
 
-If needed, the program (in its sizing calculation for the system) determines the total length of beams and primary supply air flow that is needed to meet the zone design loads. The four pipe beam air terminal sizing differs from other air terminals in that the primary supply air flow rate is sized using the entire performance model and the flow rate is not the direct result from the Sizing:Zone and Sizing:System calculations. The flow rates will be somewhere between what an air terminal would size out using *VentilationRequirement* or *Sensible* in the Sizing:System object (either setting can be used). 
+If needed, the program (in its sizing calculation for the system) determines the total length of beams and primary supply air flow that is needed to meet the zone design loads. The four pipe beam air terminal sizing differs from other air terminals in that the primary supply air flow rate is sized using the entire performance model and the flow rate is not the direct result from the Sizing:Zone and Sizing:System calculations. The flow rates will be somewhere between what an air terminal would size out using *VentilationRequirement* or *Sensible* in the Sizing:System object (either setting can be used).
 
-The model includes two different types of inputs for flow rates, “design” and “rated … per-meter.”  The design values are the actual sizes of the flow rates as viewed from the zone and central air handler (but before zone multipliers).  The design values include all the individual beam units and their lengths.  The rated per-meter values are used to characterize product performance at nominal rating conditions in such a way that it can be scaled to match the size of a zone.  The performance characteristics at the rating point are not fixed in the program and can be entered by the user when they differ from default values.  The rated per meter values are normalized by the linear dimensions of the beam and are generally obtained from product catalog data by dividing by the length of the beam.  The rated primary air flow rate is assumed to be for sea level conditions while the design primary air flow rate is modeled for the location elevation above sea level. 
- 
+The model includes two different types of inputs for flow rates, “design” and “rated … per-meter.”  The design values are the actual sizes of the flow rates as viewed from the zone and central air handler (but before zone multipliers).  The design values include all the individual beam units and their lengths.  The rated per-meter values are used to characterize product performance at nominal rating conditions in such a way that it can be scaled to match the size of a zone.  The performance characteristics at the rating point are not fixed in the program and can be entered by the user when they differ from default values.  The rated per meter values are normalized by the linear dimensions of the beam and are generally obtained from product catalog data by dividing by the length of the beam.  The rated primary air flow rate is assumed to be for sea level conditions while the design primary air flow rate is modeled for the location elevation above sea level.
+
 #### Field: Name
 A unique user-assigned name for a particular beam unit. Any reference to this unit by another object will use this name.
 
@@ -6166,19 +6166,19 @@ The name of the schedule that denotes whether the terminal unit is operating to 
 
 #### Field: Cooling Availability Schedule Name
 The name of the schedule that denotes whether the terminal unit is operating to provide cooling during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and available for beam cooling during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods. The primary air availability schedule named in the previous input field must have a value that is “on” during times that cooling is available.
- 
+
 #### Field: Heating Availability Schedule Name
 The name of the schedule that denotes whether the terminal unit can operate to provide heating during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and available for beam heating during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods. The primary air availability schedule named in the input field above must have a value that is “on” during times that heating is available.
- 
+
 #### Field: Primary Air Inlet Node Name
 The name of the HVAC system air node from which the unit draws its primary air.
- 
+
 #### Field: Primary Air Outlet Node Name
 The name of the HVAC system air node that connects this terminal unit to the zone. The will be the same as one of the zone inlet nodes.
- 
+
 #### Field: Chilled Water Inlet Node Name
 The name of the chilled water inlet node.  If desired, the chilled water node connections can be omitted and the model will assume the intent is to model a two-pipe heating only beam.
- 
+
 #### Field: Chilled Water Outlet Node Name
 The name of the chilled water outlet node.
 
@@ -6190,7 +6190,7 @@ The name of the hot water outlet node.
 
 #### Field: Design Primary Air Volume Flow Rate
 This is the air flow rate (m3/s) of the primary air entering the air terminal unit from the central air handling unit. This input can be autosized.
-  
+
 #### Field: Design Chilled Water Volume Flow Rate
 The maximum chilled water flow rate (m3/s) for the unit(s) serving the entire zone. This input can be autosized based on the zone design load.
 
@@ -6208,7 +6208,7 @@ This is the beam cooling capacity at rating conditions divided by the length of 
 
 #### Field: Beam Rated Cooling Room Air Chilled Water Temperature Difference (Delta C)
 This input defines the value of the temperature difference between the room air and entering chilled water at the rating point, in delta Celsius.  This "catalog" input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Cooling Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 10.0 delta C.
- 
+
 #### Field: Beam Rated Chilled Water Volume Flow Rate per Beam Length (m3/s-m)
 This input defines the value of the chilled water flow rate per meter length of beam at the rating point, in m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Cooling Capacity Chilled Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
 
@@ -6217,7 +6217,7 @@ This field is the name of a curve or table object that describes how the beam co
 
 #### Field: Beam Cooling Capacity Air Flow Modification Factor Curve Name
 This field is the name of a curve or table object that describes how the beam convector's cooling capacity varies as a function of the primary air flow rate.  The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.  The factor is useful to adjust for a range of primary air flow rates that a given product can accommodate.  However since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
- 
+
 #### Field: Beam Cooling Capacity Chilled Water Flow Modification Factor Curve Name
 This field is the name of a curve or table object that describes how the beam convector’s cooling capacity varies as a function of the water flow rate.  The single independent variable is the ratio of the current fluid flow rate to the fluid flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.  The model will adjust the chilled water flow rate to vary cooling power to meet the zone load, so for control purposes, the range of the independent variable must include all the way down to zero flow, with zero capacity at zero flow.
 
@@ -6226,7 +6226,7 @@ This is the beam heating capacity at rating conditions divided by the length of 
 
 #### Field: Beam Rated Heating Room Air Hot Water Temperature Difference (Delta C)
 This input defines the value of the temperature difference between the entering hot water and the room air at the rating point, in delta Celsius.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 27.8 delta C.
- 
+
 #### Field: Beam Rated Hot Water Volume Flow Rate per Beam Length (m3/s-m)
 This input defines the value of the hot water flow rate per meter length of beam at the rating point, in m3/s/m, or more strictly m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter.   It is used to normalize the independent variable in the input field called Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
 
@@ -6270,7 +6270,7 @@ An example input follows:
         CapModFuncOfTempDiff, !- Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name
         HeatCapModFuncOfSAFlow, !- Beam Heating Capacity Air Flow Modification Factor Curve or Table Name
         CapModFuncOfWaterFlow; !- Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name
-    
+
       Curve:Linear,  ! y = x
         CapModFuncOfTempDiff, !-Name
         0, !_ Coef Const
@@ -6279,7 +6279,7 @@ An example input follows:
         1.5, !- max x
         0.0 , !- min y
         1.5; ! max y
-    
+
       Table:OneIndependentVariable,
         CoolCapModFuncOfSAFlow, !- Name
         quadratic,!- Curve Type
@@ -6289,12 +6289,12 @@ An example input follows:
         0.8234,!- min y
         1.1256,!- max y
         dimensionless, !-
-        dimensionless, !- 
+        dimensionless, !-
         , !- normalization ref
         0.714286, 0.823403,
         1.0,      1.0,
         1.2857,   1.1256;
-    
+
       Table:OneIndependentVariable,
         CapModFuncOfWaterFlow, !- Name
         quadratic,!- Curve Type
@@ -6304,7 +6304,7 @@ An example input follows:
         0.0,!- min y
         1.04,!- max y
         dimensionless, !-
-        dimensionless, !- 
+        dimensionless, !-
          , !- normalization ref
         0.0,      0.0,
         0.05,     0.001,
@@ -6314,7 +6314,7 @@ An example input follows:
         0.833333, 0.97,
         1.0,      1.0,
         1.333333, 1.04;
-       
+
       Table:OneIndependentVariable,
         HeatCapModFuncOfSAFlow, !- Name
         quadratic,!- Curve Type
@@ -6324,11 +6324,11 @@ An example input follows:
         0.8554,!- min y
         1.0778,!- max y
         dimensionless, !-
-        dimensionless, !- 
+        dimensionless, !-
         , !- normalization ref
         0.714286, 0.8554,
         1.0,      1.0,
-        1.2857,   1.0778; 
+        1.2857,   1.0778;
 
 
 ### AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam Outputs
@@ -6354,7 +6354,7 @@ Heating by the primary air to the zone, exclusive of any cooling or heating done
 Heating by the primary air to the zone, exclusive of any cooling or heating done by the beams.
 
 #### Zone Air Terminal Primary Air Flow Rate [m3/s]
-Air flow rate from the central air handler into the zone in m3/s.  Note that this does not include any of the secondary air flow that is induced by the convector and nozzle action (the model does not resolve secondary air flow rate and the result are not available).  
+Air flow rate from the central air handler into the zone in m3/s.  Note that this does not include any of the secondary air flow that is induced by the convector and nozzle action (the model does not resolve secondary air flow rate and the result are not available).
 
 
 ### AirTerminal:SingleDuct:ConstantVolume:CooledBeam
@@ -7152,6 +7152,15 @@ An example of this object in an IDF is:
 
 * HVAC,Average,Zone Ideal Loads Hybrid Ventilation Available Status []
 
+* HVAC,Average,Zone Ideal Loads Outdoor Air Mass Flow Rate [kg/s]
+
+* HVAC,Average,Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate [m3/s]
+
+* HVAC,Average,Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]
+
+* HVAC,Average,Zone Ideal Loads Supply Air Standard Density Volume Flow Rate [m3/s]
+
+
 
 #### Ideal Loads Output Variable Overview
 
@@ -7328,6 +7337,22 @@ Hours when the Ideal Loads heat recovery was actively heating or cooling the out
 
 This is the availability status of the ideal loads object as set by the hybrid ventilation manager. Rules to determine the availability status are described in the section ‘Group – System Availability Managers’. The control status outputs are represented using integers 0 and 1. These integers represent NoAction (0) and ForceOff (1). When the availability status is ForceOff, the unit is turned off regardless of its availability schedule. The other status flag i.e. NoAction does not control the unit and the controls of the unit turn it back on. Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the “detailed” reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
+#### Zone Ideal Loads Outdoor Air Mass Flow Rate [kg/s]
+
+The mass flow rate of the outdoor air stream in kg/s.
+
+#### Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate [m3/s]
+
+The volume flow rate of the outdoor air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location’s elevation and a temperature of 20.0ºC. The standard density does not vary over time.
+
+#### Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]
+
+The mass flow rate of the supply air stream in kg/s.
+
+#### Zone Ideal Loads Supply Air Standard Density Volume Flow Rate [m3/s]
+
+The volume flow rate of the supply air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location’s elevation and a temperature of 20.0ºC. The standard density does not vary over time.
+
 ### ZoneHVAC:FourPipeFanCoil
 
 What is a fan coil unit? Like many HVAC terms, “fan coil unit” is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. The hydronic heating coil may be replaced with an electric heating coil. Typically these units are small (200 – 1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, *ZoneHVAC:UnitVentilator* should be used.
@@ -7364,9 +7389,9 @@ The name of the schedule (ref: Schedule) that denotes whether the fan coil unit 
 
 ***Field: Capacity Control  Method***
 
-This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiSpeedFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. 
+This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiSpeedFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load.
 
-***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schdule type. The model selects at what fan speed to run depending on cooling or heating load. 
+***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schdule type. The model selects at what fan speed to run depending on cooling or heating load.
 
 #### Field: Maximum Supply Air Flow Rate
 
@@ -7500,9 +7525,9 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Four Pipe FanCoil zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
-#### Filed: Supply Air Fan Operating Mode Schedule Name
+#### Field: Supply Air Fan Operating Mode Schedule Name
 This input field is the name of a schedule that controls fan operation. Schedule Name values of 0
-denote cycling fan operation (fan cycles with cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiSpeedFan* capacity control method only.
+denote cycling fan operation (fan cycles with heating or cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiSpeedFan* capacity control method only.
 
 
 An example input for a fan coil unit, including its constituent components, is shown below.
@@ -7682,7 +7707,7 @@ This field is indicates the speed chosen for the fan in the *CyclingFan* and *Mu
 
 #### Fan Coil Part Load Ratio []
 
-When the capacity control method is *VariableFanVariableFlow* or *VariableFanConstantFlow,* this output variable reports the unit part load ratio (ratio of unit heating / cooling output to the maximum heating / cooling output). This variable is defined only for *VariableFanVariableFlow*, *VariableFanConstantFlow* or *MultiSpeedFan* capacity control methods. The unit part load ratio is applicable to *MultiSpeedFan* only when the fan speed level selected is the minimum (Speed 1).  
+When the capacity control method is *VariableFanVariableFlow* or *VariableFanConstantFlow,* this output variable reports the unit part load ratio (ratio of unit heating / cooling output to the maximum heating / cooling output). This variable is defined only for *VariableFanVariableFlow*, *VariableFanConstantFlow* or *MultiSpeedFan* capacity control methods. The unit part load ratio is applicable to *MultiSpeedFan* only when the fan speed level selected is the minimum (Speed 1).
 
 #### Fan Coil Availability Status []
 
@@ -11330,7 +11355,7 @@ This output variable is the sensible heating requested from the zone thermostat 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed fan chilled water or hot water coil for the entire system timestep. The value is between 0.0 and 1.0 when the AHU is cycling on and off its lowest speed (fan speed 1) and 1.0 when the multispeed fan chilled water or hot water AHU operates at speed levels above 1.
 
 #### Unitary System Water Coil Speed Ratio []
-This output variable is the ratio of time in a system timestep that the AHU fan is at rated speed between two consecutive speed levels ( [System Load – Capacity at Fan Speed i-1] / [Capacity at Fan Speed i – Capacity at Fan Speed i-1]). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation. AHU speed ratio depends on the system load and the supply air fan speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep. 
+This output variable is the ratio of time in a system timestep that the AHU fan is at rated speed between two consecutive speed levels ( [System Load – Capacity at Fan Speed i-1] / [Capacity at Fan Speed i – Capacity at Fan Speed i-1]). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation. AHU speed ratio depends on the system load and the supply air fan speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep.
 
 #### Unitary System Water Coil Speed Level []
 This output variable reports the maximum speed needed when the system operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the AHU operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed level is above the minimum (speed =1), the system operation is determined by the speed ratio. For example, when the speed ratio is 0.4 and the speed lever is 3, then the supply air fan and water coil operate at Speed 3 for 40% of a system timestep and at Speed 2 for 60% of a system timestep.
@@ -11970,7 +11995,7 @@ This alpha input field contains the type of dehumidification control. The follow
 
 The default is **None**. For the other dehumidification control modes, the maximum humidity setpoint is required. This must be set using a **ZoneControl:Humidistat** object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in AirToAir HeatPumps. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to extra dehumidification required to meet the high relative humidity setpoint.
 
-Note: the air-to-air heat pump’s fan, cooling coil, heating coil and supplementary heating coil must be connected in the air loop according to the configuration shown above (Figure 118) for the blow-through fan configuration. The only other valid configuration is with a draw-through fan placement, where the fan is located between the DX heating coil and the supplementary heating coil. 
+Note: the air-to-air heat pump’s fan, cooling coil, heating coil and supplementary heating coil must be connected in the air loop according to the configuration shown above (Figure 118) for the blow-through fan configuration. The only other valid configuration is with a draw-through fan placement, where the fan is located between the DX heating coil and the supplementary heating coil.
 
 #### AirLoopHVAC:UnitaryHeatPump:AirToAir Example Specification
 
@@ -12292,14 +12317,14 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
     0.2,                     !- Supply air volumetric flow rate when no cooling or heating is needed
     4,                       !- Number of speeds for heating
     4,                       !- Number of speeds for cooling
-    0.4,                     !- Heating Speed 1 Supply Air Flow Rate 
-    0.8,                     !- Heating Speed 2 Supply Air Flow Rate 
-    1.2,                     !- Heating Speed 3 Supply Air Flow Rate 
-    1.7,                     !- Heating Speed 4 Supply Air Flow Rate 
-    0.4,                     !- Cooling Speed 1 Supply Air Flow Rate 
-    0.8,                     !- Cooling Speed 2 Supply Air Flow Rate 
-    1.2,                     !- Cooling Speed 3 Supply Air Flow Rate 
-    1.7;                     !- Cooling Speed 4 Supply Air Flow Rate 
+    0.4,                     !- Heating Speed 1 Supply Air Flow Rate
+    0.8,                     !- Heating Speed 2 Supply Air Flow Rate
+    1.2,                     !- Heating Speed 3 Supply Air Flow Rate
+    1.7,                     !- Heating Speed 4 Supply Air Flow Rate
+    0.4,                     !- Cooling Speed 1 Supply Air Flow Rate
+    0.8,                     !- Cooling Speed 2 Supply Air Flow Rate
+    1.2,                     !- Cooling Speed 3 Supply Air Flow Rate
+    1.7;                     !- Cooling Speed 4 Supply Air Flow Rate
 
 Coil:Heating:DX:MultiSpeed,
     Heat Pump DX Heating Coil 1,  !- Name of heat pump heating coil
@@ -13764,32 +13789,32 @@ This output field is the dry-bulb set point temperature in degrees Celsius. This
 Group – Variable Refrigerant Flow Equipment
 -------------------------------------------
 
-This group of EnergyPlus input objects describes the configurations of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems. 
+This group of EnergyPlus input objects describes the configurations of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems.
 
 A VRF system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
 
-There are two alternative VRF models in EnergyPlus: 
+There are two alternative VRF models in EnergyPlus:
 
  1. **System curve based model (VRF-SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. This model corresponds to the *AirConditioner:VariableRefrigerantFlow* object.
- 
+
  2. **Physics based model (VRF-FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
- 
+
 ( Please refer to the engineering reference for more technical details of the two models).
 
-In the VRF system model, direct-expansion cooling and/or heating coils are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a *ZoneTerminalUnitList* object, the name of which is entered as an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object. 
+In the VRF system model, direct-expansion cooling and/or heating coils are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a *ZoneTerminalUnitList* object, the name of which is entered as an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
 
 The Energyplus connection methodology is shown as dashed and greyed arrows in the figure below according to the following rules:
 
   * The zone inlet and zone exhaust node names are defined in a *ZoneHVAC:EquipmentConnections* object (bottom of figure).
-  
+
   * A *ZoneHVAC:TerminalUnit:VariableRefrigerantFlow* object will identify these zone exhaust and zone inlet node names as the terminal unit’s air inlet and air outlet nodes, respectively.
-  
+
   * All zone terminal units that are connected to the same *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object are listed in a *ZoneTerminalUnitList* object.
-  
+
   * The name of the *ZoneTerminalUnitList* object is an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
-  
+
   * The *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* or *AirConditioner:VariableRefrigerantFlow* object is not listed in an AirloopHVAC object, and therefore, can only be simulated if the terminal units are connected to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object using the ZoneTerminalUnitList.
-  
+
   * Secondary ZoneHVAC equipment objects may be used in the same zones as the terminal units for other purposes (e.g., code compliance)
 
 The following schematic demonstrates these connection rules.
@@ -14248,7 +14273,7 @@ AirConditioner:VariableRefrigerantFlow,
 
 ### AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
 
-#### Field: Heat Pump Name 
+#### Field: Heat Pump Name
 
 This alpha field defines a unique user-assigned name for an instance of a variable refrigerant flow heat pump. Any reference to this heat pump will use this name. Since this object is not listed in an AirloopHVAC object, the most likely use of this name would be for reporting purposes.
 
@@ -14262,12 +14287,12 @@ This alpha field defines the name of the zone terminal unit list. The name speci
 
 #### Field: Refrigerant Type
 
-This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid FluidProperties:Name object. 
+This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid FluidProperties:Name object.
 
 ####Field: Rated Evaporative Capacity
 
 This numeric field defines the total evaporative capacity in watts at rated conditions. This is the capacity corresponding to the max compressor speed at rated conditions. The actual evaporative capacity is obtained by multiplying the rated capacity with the modification factor calculated by Evaporative Capacity Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 40,000 W is assumed.
-	   
+
 ####Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity
 
 This numeric field defines the rated compressor power per Watt of rated evaporative capacity. Rated compressor power corresponds to the max compressor speed at rated conditions. The actual compressor power is obtained by multiplying the rated power with the modification factor calculated by Compressor Power Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 0.35 W/W is assumed.
@@ -14288,23 +14313,23 @@ This numeric field defines the minimum outdoor temperature allowed for heating o
 
 This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
 
-#### Field: Outdoor Unit Reference Superheating 
+#### Field: Outdoor Unit Reference Superheating
 
-This numeric field defines the reference superheating degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used. 
+This numeric field defines the reference superheating degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used.
 
-#### Field: Outdoor Unit Reference Subcooling 
+#### Field: Outdoor Unit Reference Subcooling
 
-This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used. 
+This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used.
 
 #### Field: Refrigerant Temperature Control Algorithm for Indoor Unit
 
 This alpha field specifies the algorithm for the refrigerant temperature control. Two choices are available: ConstantTemp or VariableTemp. The indoor unit evaporating temperature at cooling mode or condensing temperature at heating are fixed in the ConstantTemp algorithm, while in VariableTemp algorithm they can be varied.
 
-#### Field: Reference Evaporating Temperature for Indoor Unit 
+#### Field: Reference Evaporating Temperature for Indoor Unit
 
 This numeric field defines the reference evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 6.0ºC is used.
 
-#### Field: Reference Condensing Temperature for Indoor Unit 
+#### Field: Reference Condensing Temperature for Indoor Unit
 
 This numeric field defines the reference condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 44.0ºC is used.
 
@@ -14325,18 +14350,18 @@ This numeric field defines the minimum condensing temperature for the indoor uni
 This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0ºC is used.
 
 #### Field: Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity
- 
+
 This numeric field defines the outdoor unit fan power per watt of rated evaporative capacity. If this field is blank, the default value of 4.25E-3 W/W is used.
-	   
+
 #### Field: Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity
- 
+
 This numeric field defines the outdoor unit fan volumetric flow rate per watt of rated evaporative capacity. If this field is blank, the default value of 7.50E-5 m<sup>3</sup>/s-W is used.
 
-#### Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
+#### Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
 
 This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit evaporating temperature as a function of superheating degrees. The output of this curve is the temperature difference between the coil surface air temperature and the evaporating temperature.
 
-#### Field: Outdoor Unit Condensing Temperature Function of Subcooling Curve Name    
+#### Field: Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
 
 This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
 
@@ -14412,7 +14437,7 @@ This numeric field defines the maximum pressure increase that the compressor can
 
 This numeric field defines the number of compressor loading index entries. Loading index specifies the VRF operational modes at various load conditions. In a single compressor system, loading index reflects the compressor speed. The model requires at least two loading indices. The first index represents the minimal capacity operation, while the last index represents full capacity operation.
 
-#### Field: Compressor Speed at Loading Index i 
+#### Field: Compressor Speed at Loading Index i
 
 This numeric field defines the compressor speed at the i-th loading index. The value must be greater than 0.
 
@@ -14486,8 +14511,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     0,                       !- Coefficient1 Constant
     6.05E-1,                 !- Coefficient2 x
     2.50E-2,                 !- Coefficient3 x**2
-    0,                       !- Minimum Value of x    
-    15,                      !- Maximum Value of x    
+    0,                       !- Minimum Value of x
+    15,                      !- Maximum Value of x
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
     Temperature,             !- Input Unit Type for X
@@ -14498,13 +14523,13 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     0,                       !- Coefficient1 Constant
     -2.91,                   !- Coefficient2 x
     1.180,                   !- Coefficient3 x**2
-    0,                       !- Minimum Value of x    
-    20,                      !- Maximum Value of x    
+    0,                       !- Minimum Value of x
+    20,                      !- Maximum Value of x
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
     Temperature,             !- Input Unit Type for X
     Temperature;             !- Output Unit Type
-	
+
   Curve:Biquadratic,
     MinSpdCooling,           !- Name
     3.19E-01,                !- Coefficient1 Constant
@@ -14540,7 +14565,7 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
-	
+
   Curve:Biquadratic,
     Spd1Cooling,             !- Name
     8.12E-01 ,               !- Coefficient1 Constant
@@ -14612,7 +14637,7 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
-	
+
 ```
 
 
