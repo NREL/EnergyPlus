@@ -59,10 +59,6 @@
 // C++ Headers
 #include <cmath>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/ArrayS.functions.hh>
-
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
@@ -187,7 +183,7 @@ namespace DataEnvironment {
 	Real64 SkyBrightness; // Sky brightness (see subr. DayltgLuminousEfficacy)
 	Real64 StdBaroPress( StdPressureSeaLevel ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
 	Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress
-	Real64 rhoAirSTP; // Standard density of dry air at 101325 Pa, 20.0C temperaure 
+	Real64 rhoAirSTP; // Standard density of dry air at 101325 Pa, 20.0C temperaure
 	Real64 TimeZoneNumber; // Time Zone Number of building location
 	Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
 	std::string EnvironmentName; // Current environment name (longer for weather file names)
@@ -594,78 +590,6 @@ namespace DataEnvironment {
 		}
 
 		return LocalAirPressure;
-
-	}
-
-	void
-	SetOutBulbTempAt(
-		int const NumItems,
-		Array1S< Real64 > const Heights,
-		Array1S< Real64 > DryBulb,
-		Array1S< Real64 > WetBulb,
-		std::string const & Settings
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Noel Keen (LBL)/Linda Lawrie
-		//       DATE WRITTEN   August 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Routine provides facility for doing bulk Set Temperature at Height.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using General::RoundSigDigits;
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i; // Loop Control
-		Real64 BaseDryTemp; // Base temperature at Z = 0 (C)
-		Real64 BaseWetTemp;
-		Real64 Z; // Centroid value
-
-		BaseDryTemp = OutDryBulbTemp + WeatherFileTempModCoeff;
-		BaseWetTemp = OutWetBulbTemp + WeatherFileTempModCoeff;
-
-		if ( SiteTempGradient == 0.0 ) {
-			DryBulb = OutDryBulbTemp;
-			WetBulb = OutWetBulbTemp;
-		} else {
-			for ( i = 1; i <= NumItems; ++i ) {
-				Z = Heights( i );
-				if ( Z <= 0.0 ) {
-					DryBulb( i ) = BaseDryTemp;
-					WetBulb( i ) = BaseWetTemp;
-				} else {
-					DryBulb( i ) = BaseDryTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-					WetBulb( i ) = BaseWetTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-				}
-			}
-			if ( any_lt( DryBulb, -100.0 ) || any_lt( WetBulb, -100.0 ) ) {
-				SetOutBulbTempAt_error( Settings, maxval( Heights ) );
-			}
-		}
 
 	}
 

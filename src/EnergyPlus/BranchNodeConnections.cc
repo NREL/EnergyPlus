@@ -59,7 +59,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -616,7 +616,7 @@ namespace BranchNodeConnections {
 		// Check 10 -- fluid streams cannot have multiple inlet/outlet nodes on same component
 		//  can have multiple inlets with one outlet or vice versa but cannot have multiple both inlet and outlet
 		if ( NumOfNodeConnections > 0 ) {
-			MaxFluidStream = maxval( NodeConnections.FluidStream() );
+			MaxFluidStream = maxval( NodeConnections, &NodeConnectionDef::FluidStream );
 			FluidStreamInletCount.allocate( MaxFluidStream );
 			FluidStreamOutletCount.allocate( MaxFluidStream );
 			FluidStreamCounts.allocate( MaxFluidStream );
@@ -1951,7 +1951,7 @@ namespace BranchNodeConnections {
 
 		if ( allocated( NodeConnectType ) ) NodeConnectType.deallocate();
 
-		FindAllNumbersInList( NodeNumber, NodeConnections.NodeNumber(), NumOfNodeConnections, NumInList, ListArray );
+		FindAllNodeNumbersInList( NodeNumber, NodeConnections, NumOfNodeConnections, NumInList, ListArray );
 
 		NodeConnectType.allocate( NumInList );
 
@@ -1971,9 +1971,9 @@ namespace BranchNodeConnections {
 	}
 
 	void
-	FindAllNumbersInList(
+	FindAllNodeNumbersInList(
 		int const WhichNumber,
-		Array1A_int const ListOfItems,
+		Array1< DataBranchNodeConnections::NodeConnectionDef > const & NodeConnections,
 		int const NumItems,
 		int & CountOfItems, // Number of items found
 		Array1D_int & AllNumbersInList // Index array to all numbers found
@@ -2000,9 +2000,6 @@ namespace BranchNodeConnections {
 		// USE STATEMENTS:
 		// na
 
-		// Argument array dimensioning
-		ListOfItems.dim( _ );
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2023,7 +2020,7 @@ namespace BranchNodeConnections {
 		if ( allocated( AllNumbersInList ) ) AllNumbersInList.deallocate();
 
 		for ( Count = 1; Count <= NumItems; ++Count ) {
-			if ( WhichNumber == ListOfItems( Count ) ) {
+			if ( WhichNumber == NodeConnections( Count ).NodeNumber ) {
 				++CountOfItems;
 			}
 		}
@@ -2034,7 +2031,7 @@ namespace BranchNodeConnections {
 			CountOfItems = 0;
 
 			for ( Count = 1; Count <= NumItems; ++Count ) {
-				if ( WhichNumber == ListOfItems( Count ) ) {
+				if ( WhichNumber == NodeConnections( Count ).NodeNumber ) {
 					++CountOfItems;
 					AllNumbersInList( CountOfItems ) = Count;
 				}

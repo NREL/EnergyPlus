@@ -138,7 +138,6 @@ namespace FanCoilUnits {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::DisplayExtraWarnings;
 	using DataEnvironment::OutBaroPress;
-	using DataEnvironment::OutDryBulbTemp;
 	using DataEnvironment::OutRelHum;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;
@@ -1579,7 +1578,7 @@ namespace FanCoilUnits {
 										DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
 										RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 										ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = TempSize;
-										ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;									
+										ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 									}
 									TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 									DataScalableCapSizingON = true;
@@ -2389,7 +2388,7 @@ namespace FanCoilUnits {
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet // Sensible power supplied (W)
-	) 
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2590,7 +2589,7 @@ namespace FanCoilUnits {
 			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
 			mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
 			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
-			// select fan speed 
+			// select fan speed
 			FanCoil( FanCoilNum ).SpeedFanSel = 1;
 			FanCoil( FanCoilNum ).SpeedFanRatSel = FanCoil( FanCoilNum ).LowSpeedRatio;
 			FanFlowRatio = FanCoil( FanCoilNum ).SpeedFanRatSel;
@@ -2629,7 +2628,7 @@ namespace FanCoilUnits {
 			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
 			mdot = FanCoil( FanCoilNum ).MaxHotWaterFlow;
 			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
-			// select fan speed 
+			// select fan speed
 			FanCoil( FanCoilNum ).SpeedFanSel = 1;
 			FanCoil( FanCoilNum ).SpeedFanRatSel = FanCoil( FanCoilNum ).LowSpeedRatio;
 			FanFlowRatio = FanCoil( FanCoilNum ).SpeedFanRatSel;
@@ -2719,14 +2718,14 @@ namespace FanCoilUnits {
 
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Simulate a multi-stage fan 4 pipe fan coil unit; adjust its output to 
+		// Simulate a multi-stage fan 4 pipe fan coil unit; adjust its output to
 		// match the remaining zone load.
 
 		// METHODOLOGY EMPLOYED:
 		// If this unit is on, calculated the speed ratio when cycling between
 		// consecutive fan speeds. The hot or chilled water flows either at
 		// maximum or zero.  The water flow rate is set to zero if there is no
-		// load. 
+		// load.
 
 		// REFERENCES:
 		// na
@@ -2759,8 +2758,8 @@ namespace FanCoilUnits {
 		Real64 ControlOffset; // tolerance for output control
 		Real64 QUnitOutMaxHS; // higher fan speed output
 		Real64 QUnitOutMaxLS; // lower fan speed output
-		Real64 HighSpeedRatio; // fan flow ratio at low speed 
-		Real64 LowSpeedRatio; // fan flow ratio at low speed 
+		Real64 HighSpeedRatio; // fan flow ratio at low speed
+		Real64 LowSpeedRatio; // fan flow ratio at low speed
 		Real64 AirMassFlowAvg; // supply air flow rate weighted by speed ratio
 		Real64 AirMassFlowLow; // supply air flow rate at lower speed
 		Real64 AirMassFlowHigh; // supply air flow rate at higher speed
@@ -2810,7 +2809,7 @@ namespace FanCoilUnits {
 						Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut );
 					} else {
 						Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR );
-					}					
+					}
 					Error = ( QZnReq - QUnitOut ) / QZnReq;
 					AbsError = QZnReq - QUnitOut;
 					DelPLR = ( QZnReq - QUnitOut ) / QUnitOutMax;
@@ -3472,7 +3471,7 @@ namespace FanCoilUnits {
 		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PartLoadRatio ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 
 		// Calculate residual based on output magnitude
-		if ( std::abs(  QZnReq ) <= 100.0 ) {
+		if ( std::abs( QZnReq ) <= 100.0 ) {
 			Residuum = ( QUnitOut - QZnReq ) / 100.0;
 		} else {
 			Residuum = ( QUnitOut - QZnReq ) / QZnReq;

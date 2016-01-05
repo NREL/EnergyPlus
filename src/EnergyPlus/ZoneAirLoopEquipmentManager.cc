@@ -57,7 +57,6 @@
 // in binary and source code form.
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
@@ -723,7 +722,7 @@ namespace ZoneAirLoopEquipmentManager {
 				SimCoolBeam( AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompNum ), FirstHVACIteration, ActualZoneNum, ZoneEquipConfig( ControlledZoneNum ).ZoneNode, AirDistUnit( AirDistUnitNum ).EquipIndex( AirDistCompNum ), NonAirSysOutput );
 
 			} else if ( SELECT_CASE_var == SingleDuctConstVolFourPipeBeam ) {
-				AirDistUnit( AirDistUnitNum ).airTerminalPtr->simulate(FirstHVACIteration,  NonAirSysOutput  );
+				AirDistUnit( AirDistUnitNum ).airTerminalPtr->simulate(FirstHVACIteration,  NonAirSysOutput );
 
 			} else if ( SELECT_CASE_var == SingleDuctUserDefined ) {
 				SimAirTerminalUserDefined( AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompNum ), FirstHVACIteration, ActualZoneNum, ZoneEquipConfig( ControlledZoneNum ).ZoneNode, AirDistUnit( AirDistUnitNum ).EquipIndex( AirDistCompNum ) );
@@ -822,8 +821,8 @@ namespace ZoneAirLoopEquipmentManager {
 	}
 
 	// void
-		// ReportZoneAirLoopEquipment( 
-		// int const AirDistUnitNum 
+		// ReportZoneAirLoopEquipment(
+		// int const AirDistUnitNum
 		// )
 	// {
 		// SUBROUTINE INFORMATION:

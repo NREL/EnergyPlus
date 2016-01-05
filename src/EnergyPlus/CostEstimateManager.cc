@@ -59,7 +59,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <CostEstimateManager.hh>
@@ -686,8 +686,13 @@ namespace CostEstimateManager {
 
 					}
 				}
-				//determine which surfaces have the construction type  and if any are duplicates..
-				CostLineItem( Item ).Qty = sum( Surface.Area() * SurfMultipleARR, ( uniqueSurfMask && ( Surface.Construction() == ThisConstructID ) ) );
+				// determine which surfaces have the construction type  and if any are duplicates..
+				Real64 Qty( 0.0 );
+				for ( int i = 1; i <= TotSurfaces; ++i ) {
+					auto const & s( Surface( i ) );
+					if ( uniqueSurfMask( i ) && ( s.Construction == ThisConstructID ) ) Qty += s.Area * SurfMultipleARR( i );
+				}
+				CostLineItem( Item ).Qty = Qty;
 				CostLineItem( Item ).Units = "m2";
 				CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerSquareMeter;
 				CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -707,7 +712,8 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
 					if ( WildcardObjNames ) {
-						CostLineItem( Item ).Qty = sum_col( DXCoil.RatedTotCap(), 1 ) / 1000.0;
+						Real64 Qty( 0.0 ); for ( auto const & e : DXCoil ) Qty += e.RatedTotCap( 1 );
+						CostLineItem( Item ).Qty = Qty / 1000.0;
 						CostLineItem( Item ).Units = "kW (tot cool cap.)";
 						CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKiloWattCap;
 						CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -730,7 +736,8 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) {
 					if ( WildcardObjNames ) {
-						CostLineItem( Item ).Qty = sum_product_col( DXCoil.RatedCOP(), DXCoil.RatedTotCap(), 1 ) / 1000.0; //Autodesk:F2C++ Was sum( DXCoil.RatedCOP( 1 ) * DXCoil.RatedTotCap( 1 ) ) / 1000.0;
+						Real64 Qty( 0.0 ); for ( auto const & e : DXCoil ) Qty += e.RatedCOP( 1 ) * e.RatedTotCap( 1 );
+						CostLineItem( Item ).Qty = Qty / 1000.0;
 						CostLineItem( Item ).Units = "kW*COP (total, rated) ";
 						CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKWCapPerCOP;
 						CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -755,8 +762,8 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) {
 					if ( WildcardObjNames ) {
-
-						CostLineItem( Item ).Qty = sum( HeatingCoil.NominalCapacity(), ( HeatingCoil.HCoilType_Num() == 1 ) ) / 1000.0;
+						Real64 Qty( 0.0 ); for ( auto const & e : HeatingCoil ) if ( e.HCoilType_Num == 1 ) Qty += e.NominalCapacity;
+						CostLineItem( Item ).Qty = Qty / 1000.0;
 						CostLineItem( Item ).Units = "kW (tot heat cap.)";
 						CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKiloWattCap;
 						CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -779,7 +786,8 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) {
 					if ( WildcardObjNames ) {
-						CostLineItem( Item ).Qty = sum( HeatingCoil.Efficiency() * HeatingCoil.NominalCapacity(), ( HeatingCoil.HCoilType_Num() == 1 ) ) / 1000.0;
+						Real64 Qty( 0.0 ); for ( auto const & e : HeatingCoil ) if ( e.HCoilType_Num == 1 ) Qty += e.Efficiency * e.NominalCapacity;
+						CostLineItem( Item ).Qty = Qty / 1000.0;
 						CostLineItem( Item ).Units = "kW*Eff (total, rated) ";
 						CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKWCapPerCOP;
 						CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -818,7 +826,7 @@ namespace CostEstimateManager {
 
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
 					WildcardObjNames = true;
-					CostLineItem( Item ).Qty = sum( ZoneDaylight.TotalDaylRefPoints() );
+					CostLineItem( Item ).Qty = sum( ZoneDaylight, &ZoneDaylightCalc::TotalDaylRefPoints );
 				} else if ( CostLineItem( Item ).ParentObjName != "" ) {
 					ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
 					if ( ThisZoneID > 0 ) {
@@ -857,7 +865,8 @@ namespace CostEstimateManager {
 					if ( CostLineItem( Item ).ParentObjName != "" ) {
 						ThisZoneID = FindItem( CostLineItem( Item ).ParentObjName, Zone );
 						if ( ThisZoneID > 0 ) {
-							CostLineItem( Item ).Qty = ( Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier / 1000.0 ) * sum( Lights.DesignLevel(), Lights.ZonePtr() == ThisZoneID ); //this handles more than one light object per zone.
+							Real64 Qty( 0.0 ); for ( auto const & e : Lights ) if ( e.ZonePtr == ThisZoneID ) Qty += e.DesignLevel;
+							CostLineItem( Item ).Qty = ( Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier / 1000.0 ) * Qty; // this handles more than one light object per zone.
 							CostLineItem( Item ).Units = "kW";
 							CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKiloWattCap;
 							CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
@@ -894,7 +903,7 @@ namespace CostEstimateManager {
 
 		//now sum up the line items, result for the current building
 
-		CurntBldg.LineItemTot = sum( CostLineItem.LineSubTotal() );
+		CurntBldg.LineItemTot = sum( CostLineItem, &CostLineItemStruct::LineSubTotal );
 
 	}
 

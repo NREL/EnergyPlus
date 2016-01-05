@@ -501,25 +501,25 @@ namespace LowTempRadiantSystem {
 		HydrRadSys.allocate( NumOfHydrLowTempRadSys );
 		if ( NumOfHydrLowTempRadSys > 0 ) {
 			GlycolIndex = FindGlycol( fluidNameWater );
-			HydrRadSys.GlycolIndex() = GlycolIndex;
+			for ( auto & e : HydrRadSys ) e.GlycolIndex = GlycolIndex;
 			if ( GlycolIndex == 0 ) {
 				ShowSevereError( "Hydronic radiant systems: no water property data found in input" );
 				ErrorsFound = true;
 			}
 		} else {
-			HydrRadSys.GlycolIndex() = 0;
+			for ( auto & e : HydrRadSys ) e.GlycolIndex = 0;
 		}
 
 		CFloRadSys.allocate( NumOfCFloLowTempRadSys );
 		if ( NumOfCFloLowTempRadSys > 0 ) {
 			GlycolIndex = FindGlycol( fluidNameWater );
-			CFloRadSys.GlycolIndex() = GlycolIndex;
+			for ( auto & e : CFloRadSys ) e.GlycolIndex = GlycolIndex;
 			if ( GlycolIndex == 0 ) {
 				ShowSevereError( "Constant flow radiant systems: no water property data found in input" );
 				ErrorsFound = true;
 			}
 		} else {
-			CFloRadSys.GlycolIndex() = 0;
+			for ( auto & e : CFloRadSys ) e.GlycolIndex = 0;
 		}
 
 		ElecRadSys.allocate( NumOfElecLowTempRadSys );

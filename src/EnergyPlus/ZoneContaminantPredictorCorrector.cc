@@ -1324,7 +1324,7 @@ namespace ZoneContaminantPredictorCorrector {
 				for ( Loop = 1; Loop <= TotGCBLDiff; ++Loop ) {
 					Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).GenericContam = OutdoorGC;
 				}
-				if ( TotGCGenDecay > 0 ) ZoneContamGenericDecay.GCTime() = 0.0;
+				if ( TotGCGenDecay > 0 ) for ( auto & e : ZoneContamGenericDecay ) e.GCTime = 0.0;
 			}
 			MyEnvrnFlag = false;
 		}

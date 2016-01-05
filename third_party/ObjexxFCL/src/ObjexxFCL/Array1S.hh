@@ -1354,8 +1354,6 @@ public: // MArray Generators
 		return MArray1< Array1S, M >( *this, pmem );
 	}
 
-#include <ObjexxFCL/Array1S.Project.MArray.hh> // Inject project-specific MArray generators
-
 public: // Comparison: Predicate
 
 	// Slice == Slice

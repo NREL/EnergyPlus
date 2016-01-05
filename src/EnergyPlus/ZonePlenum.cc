@@ -57,12 +57,11 @@
 // in binary and source code form.
 
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <ZonePlenum.hh>
@@ -468,7 +467,7 @@ namespace ZonePlenum {
 
 			ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes = NumAlphas - 5;
 
-			ZoneRetPlenCond.InitFlag() = true;
+			for ( auto & e : ZoneRetPlenCond ) e.InitFlag = true;
 
 			ZoneRetPlenCond( ZonePlenumNum ).InletNode.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes );
 			ZoneRetPlenCond( ZonePlenumNum ).InletMassFlowRate.allocate( ZoneRetPlenCond( ZonePlenumNum ).NumInletNodes );
@@ -552,7 +551,7 @@ namespace ZonePlenum {
 				continue;
 			}
 			//  Check if this zone is used as a controlled zone
-			if ( any( ZoneEquipConfig.IsControlled() ) ) {
+			if ( std::any_of( ZoneEquipConfig.begin(), ZoneEquipConfig.end(), []( EquipConfiguration const & e ){ return e.IsControlled; } ) ) {
 				ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( ZoneEquipConfigLoop != 0 ) {
 					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
@@ -582,7 +581,7 @@ namespace ZonePlenum {
 
 			ZoneSupPlenCond( ZonePlenumNum ).NumOutletNodes = NumAlphas - 4;
 
-			ZoneSupPlenCond.InitFlag() = true;
+			for ( auto & e : ZoneSupPlenCond ) e.InitFlag = true;
 
 			ZoneSupPlenCond( ZonePlenumNum ).OutletNode.allocate( ZoneSupPlenCond( ZonePlenumNum ).NumOutletNodes );
 			ZoneSupPlenCond( ZonePlenumNum ).OutletMassFlowRate.allocate( ZoneSupPlenCond( ZonePlenumNum ).NumOutletNodes );

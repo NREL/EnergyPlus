@@ -63,7 +63,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <TranspiredCollector.hh>
@@ -557,10 +557,11 @@ namespace TranspiredCollector {
 			// now that we should have all the surfaces, do some preperations and checks.
 
 			// are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
+			Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( Item ).SurfPtrs ) );
 //			AvgAzimuth = sum( Surface( UTSC( Item ).SurfPtrs ).Azimuth * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			AvgAzimuth = sum_product_sub( Surface.Azimuth(), Surface.Area(), UTSC( Item ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			AvgAzimuth = sum_product_sub( Surface, &SurfaceData::Azimuth, &SurfaceData::Area, UTSC( Item ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 //			AvgTilt = sum( Surface( UTSC( Item ).SurfPtrs ).Tilt * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			AvgTilt = sum_product_sub( Surface.Tilt(), Surface.Area(), UTSC( Item ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			AvgTilt = sum_product_sub( Surface, &SurfaceData::Tilt, &SurfaceData::Area, UTSC( Item ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
 				SurfID = UTSC( Item ).SurfPtrs( ThisSurf );
 				if ( std::abs( Surface( SurfID ).Azimuth - AvgAzimuth ) > 15.0 ) {
@@ -586,7 +587,7 @@ namespace TranspiredCollector {
 			//    UTSC(Item)%Centroid%y = SUM(Surface(UTSC(Item)%SurfPtrs)%Centroid%y*Surface(UTSC(Item)%SurfPtrs)%Area) &
 			//                            /SUM(Surface(UTSC(Item)%SurfPtrs)%Area)
 //			UTSC( Item ).Centroid.z = sum( Surface( UTSC( Item ).SurfPtrs ).Centroid.z * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			UTSC( Item ).Centroid.z = sum_product_sub( Surface.ma( &SurfaceData::Centroid ).z(), Surface.Area(), UTSC( Item ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			UTSC( Item ).Centroid.z = sum_product_sub( Surface, &SurfaceData::Centroid, &Vector::z, Surface, &SurfaceData::Area, UTSC( Item ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 			//now handle numbers from input object
 			UTSC( Item ).HoleDia = Numbers( 1 );
@@ -608,7 +609,7 @@ namespace TranspiredCollector {
 			// Fill out data we now know
 			// sum areas of HT surface areas
 //			UTSC( Item ).ProjArea = sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			UTSC( Item ).ProjArea = sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			UTSC( Item ).ProjArea = surfaceArea;
 			if ( UTSC( Item ).ProjArea == 0 ) {
 				ShowSevereError( "Gross area of underlying surfaces is zero in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				continue;
@@ -770,7 +771,7 @@ namespace TranspiredCollector {
 
 		//inits for each iteration
 //		UTSC( UTSCNum ).InletMDot = sum( Node( UTSC( UTSCNum ).InletNode ).MassFlowRate ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-		UTSC( UTSCNum ).InletMDot = sum_sub( Node.MassFlowRate(), UTSC( UTSCNum ).InletNode ); //Autodesk:F2C++ Functions handle array subscript usage
+		UTSC( UTSCNum ).InletMDot = sum_sub( Node, &DataLoopNode::NodeData::MassFlowRate, UTSC( UTSCNum ).InletNode ); //Autodesk:F2C++ Functions handle array subscript usage
 		UTSC( UTSCNum ).IsOn = false; // intialize then turn on if appropriate
 		UTSC( UTSCNum ).Tplen = 0.0;
 		UTSC( UTSCNum ).Tcoll = 0.0;
@@ -812,6 +813,7 @@ namespace TranspiredCollector {
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyHFnTdbW;
 		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceData;
 		using DataHeatBalSurface::TH;
 		using DataHVACGlobals::TimeStepSys;
 		using ConvectionCoefficients::InitExteriorConvectionCoeff;
@@ -902,13 +904,14 @@ namespace TranspiredCollector {
 
 		//Active UTSC calculation
 		// first do common things for both correlations
+		Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) );
 		if ( ! IsRain ) {
 //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			Tamb = sum_product_sub( Surface.OutDryBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 
 		} else { // when raining we use wet bulb not drybulb
 //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-			Tamb = sum_product_sub( Surface.OutWetBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 		}
 
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat );
@@ -985,7 +988,7 @@ namespace TranspiredCollector {
 			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( pow_4( TscollK ) - pow_4( TsoK ) ) / ( TscollK - TsoK );
 		}
 //		AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-		auto Area( array_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
+		auto Area( array_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
 		AreaSum = sum( Area );
 		// now figure area-weighted averages from underlying surfaces.
 //		Vwind = sum( LocalWindArr * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
@@ -1005,9 +1008,9 @@ namespace TranspiredCollector {
 		HPlenARR.deallocate();
 
 //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
+		Isc = sum_product_sub( QRadSWOutIncident, Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
 //		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Tso = sum_product_sub( TH( 1, 1, _ ), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
+		Tso = sum_product_sub( TH( 1, 1, _ ), Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
 
 		if ( Vwind > 5.0 ) {
 			HcWind = 5.62 + 3.9 * ( Vwind - 5.0 ); //McAdams forced convection correlation
@@ -1128,6 +1131,7 @@ namespace TranspiredCollector {
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyWFnTdbTwbPb;
 		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceData;
 		using DataHVACGlobals::TimeStepSys;
 		using ConvectionCoefficients::InitExteriorConvectionCoeff;
 
@@ -1157,10 +1161,11 @@ namespace TranspiredCollector {
 		Real64 Twbamb;
 		Real64 OutHumRatAmb;
 
+		Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) );
 //		Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Tamb = sum_product_sub( Surface.OutDryBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+		Tamb = sum_product_sub( Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 //		Twbamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Twbamb = sum_product_sub( Surface.OutWetBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
+		Twbamb = sum_product_sub( Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea; //Autodesk:F2C++ Functions handle array subscript usage
 		OutHumRatAmb = PsyWFnTdbTwbPb( Tamb, Twbamb, OutBaroPress );
 
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRatAmb );

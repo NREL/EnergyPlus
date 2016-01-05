@@ -57,6 +57,7 @@
 // in binary and source code form.
 
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -302,7 +303,7 @@ namespace SimAirServingZones {
 
 		// This flag could be used to resimulate only the air loops that needed additional iterations.
 		// This flag would have to be moved inside SimAirLoops to gain this flexibility.
-		SimAir = any( AirLoopControlInfo.ResimAirLoopFlag() );
+		SimAir = std::any_of( AirLoopControlInfo.begin(), AirLoopControlInfo.end(), []( DataAirLoop::AirLoopControlData const & e ){ return e.ResimAirLoopFlag; } );
 
 	}
 
@@ -477,7 +478,7 @@ namespace SimAirServingZones {
 		static bool SplitterExists( false ); // TRUE if there is a slitter in a primary air system
 		static bool MixerExists( false ); // TRUE if there is a mixer in a primary air system
 		bool errFlag;
-		/////////// hoisted into namespace 
+		/////////// hoisted into namespace
 		//static int TestUniqueNodesNum( 0 );
 		///////////////////////////
 		int NumOASysSimpControllers; // number of simple controllers in the OA Sys of an air primary system
@@ -1934,9 +1935,11 @@ namespace SimAirServingZones {
 		if ( BeginEnvrnFlag && FirstHVACIteration && MyEnvrnFlag ) {
 
 			if ( NumPrimaryAirSys > 0 ) {
-				PriAirSysAvailMgr.AvailStatus() = NoAction;
-				PriAirSysAvailMgr.StartTime() = 0;
-				PriAirSysAvailMgr.StopTime() = 0;
+				for ( auto & e : PriAirSysAvailMgr ) {
+					e.AvailStatus = NoAction;
+					e.StartTime = 0;
+					e.StopTime = 0;
+				}
 			}
 
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) { // Start looping through all of the air loops...
@@ -2053,7 +2056,7 @@ namespace SimAirServingZones {
 			if ( FirstHVACIteration ) {
 				// At each new HVAC iteration reset air loop converged flag to avoid attempting a warm restart
 				// in SimAirLoop
-				AirLoopControlInfo.ConvergedFlag() = false;
+				for ( auto & e : AirLoopControlInfo ) e.ConvergedFlag = false;
 
 				for ( InNum = 1; InNum <= PrimaryAirSystem( AirLoopNum ).NumInletBranches; ++InNum ) {
 					InBranchNum = PrimaryAirSystem( AirLoopNum ).InletBranchNum( InNum );
@@ -5732,32 +5735,36 @@ namespace SimAirServingZones {
 			}
 
 			// Move final system design data (calculated from zone data) to user design array
-			FinalSysSizing.CoolDesDay() = CalcSysSizing.CoolDesDay();
-			FinalSysSizing.HeatDesDay() = CalcSysSizing.HeatDesDay();
-			FinalSysSizing.CoinCoolMassFlow() = CalcSysSizing.CoinCoolMassFlow();
-			FinalSysSizing.CoinHeatMassFlow() = CalcSysSizing.CoinHeatMassFlow();
-			FinalSysSizing.NonCoinCoolMassFlow() = CalcSysSizing.NonCoinCoolMassFlow();
-			FinalSysSizing.NonCoinHeatMassFlow() = CalcSysSizing.NonCoinHeatMassFlow();
-			FinalSysSizing.DesMainVolFlow() = CalcSysSizing.DesMainVolFlow();
-			FinalSysSizing.DesHeatVolFlow() = CalcSysSizing.DesHeatVolFlow();
-			FinalSysSizing.DesCoolVolFlow() = CalcSysSizing.DesCoolVolFlow();
-			FinalSysSizing.MassFlowAtCoolPeak() = CalcSysSizing.MassFlowAtCoolPeak();
-			FinalSysSizing.SensCoolCap() = CalcSysSizing.SensCoolCap();
-			FinalSysSizing.TotCoolCap() = CalcSysSizing.TotCoolCap();
-			FinalSysSizing.HeatCap() = CalcSysSizing.HeatCap();
-			FinalSysSizing.PreheatCap() = CalcSysSizing.PreheatCap();
-			FinalSysSizing.MixTempAtCoolPeak() = CalcSysSizing.MixTempAtCoolPeak();
-			FinalSysSizing.MixHumRatAtCoolPeak() = CalcSysSizing.MixHumRatAtCoolPeak();
-			FinalSysSizing.RetTempAtCoolPeak() = CalcSysSizing.RetTempAtCoolPeak();
-			FinalSysSizing.RetHumRatAtCoolPeak() = CalcSysSizing.RetHumRatAtCoolPeak();
-			FinalSysSizing.OutTempAtCoolPeak() = CalcSysSizing.OutTempAtCoolPeak();
-			FinalSysSizing.OutHumRatAtCoolPeak() = CalcSysSizing.OutHumRatAtCoolPeak();
-			FinalSysSizing.HeatMixTemp() = CalcSysSizing.HeatMixTemp();
-			FinalSysSizing.HeatMixHumRat() = CalcSysSizing.HeatMixHumRat();
-			FinalSysSizing.HeatRetTemp() = CalcSysSizing.HeatRetTemp();
-			FinalSysSizing.HeatRetHumRat() = CalcSysSizing.HeatRetHumRat();
-			FinalSysSizing.HeatOutTemp() = CalcSysSizing.HeatOutTemp();
-			FinalSysSizing.HeatOutHumRat() = CalcSysSizing.HeatOutHumRat();
+			for ( std::size_t i = 0; i < FinalSysSizing.size(); ++i ) {
+				auto & z( FinalSysSizing[ i ] );
+				auto & c( CalcSysSizing[ i ] );
+				z.CoolDesDay = c.CoolDesDay;
+				z.HeatDesDay = c.HeatDesDay;
+				z.CoinCoolMassFlow = c.CoinCoolMassFlow;
+				z.CoinHeatMassFlow = c.CoinHeatMassFlow;
+				z.NonCoinCoolMassFlow = c.NonCoinCoolMassFlow;
+				z.NonCoinHeatMassFlow = c.NonCoinHeatMassFlow;
+				z.DesMainVolFlow = c.DesMainVolFlow;
+				z.DesHeatVolFlow = c.DesHeatVolFlow;
+				z.DesCoolVolFlow = c.DesCoolVolFlow;
+				z.MassFlowAtCoolPeak = c.MassFlowAtCoolPeak;
+				z.SensCoolCap = c.SensCoolCap;
+				z.TotCoolCap = c.TotCoolCap;
+				z.HeatCap = c.HeatCap;
+				z.PreheatCap = c.PreheatCap;
+				z.MixTempAtCoolPeak = c.MixTempAtCoolPeak;
+				z.MixHumRatAtCoolPeak = c.MixHumRatAtCoolPeak;
+				z.RetTempAtCoolPeak = c.RetTempAtCoolPeak;
+				z.RetHumRatAtCoolPeak = c.RetHumRatAtCoolPeak;
+				z.OutTempAtCoolPeak = c.OutTempAtCoolPeak;
+				z.OutHumRatAtCoolPeak = c.OutHumRatAtCoolPeak;
+				z.HeatMixTemp = c.HeatMixTemp;
+				z.HeatMixHumRat = c.HeatMixHumRat;
+				z.HeatRetTemp = c.HeatRetTemp;
+				z.HeatRetHumRat = c.HeatRetHumRat;
+				z.HeatOutTemp = c.HeatOutTemp;
+				z.HeatOutHumRat = c.HeatOutHumRat;
+			}
 
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {

@@ -60,7 +60,6 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -1991,12 +1990,12 @@ namespace HVACDXSystem {
 
 				} else if ( SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling ) {
 
-					ControlTESIceStorageTankCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).DXCoolingSystemType, 
-						DXCoolingSystem( DXSystemNum ).FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac, 
-						DXCoolingSystem( DXSystemNum ).TESOpMode, DXCoolingSystem( DXSystemNum ).DehumidControlType, 
-						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIterIndex, 
-						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFailIndex, 
-						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIterIndex, 
+					ControlTESIceStorageTankCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).DXCoolingSystemType,
+						DXCoolingSystem( DXSystemNum ).FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac,
+						DXCoolingSystem( DXSystemNum ).TESOpMode, DXCoolingSystem( DXSystemNum ).DehumidControlType,
+						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIterIndex,
+						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFailIndex,
+						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIterIndex,
 						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFailIndex );
 
 				} else {

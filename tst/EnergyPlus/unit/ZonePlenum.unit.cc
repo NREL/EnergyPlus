@@ -163,18 +163,18 @@ TEST( ZonePlenum, InitAirZoneReturnPlenumTest )
 	}
 
 	// Deallocate everything
-	ZoneRetPlenCond( ZonePlenumNum ).InletNode.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedNode.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRate.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedTemp.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedPressure.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedCO2.deallocate( );
-	ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam.deallocate( );
-	ZoneRetPlenCond.deallocate( );
+	ZoneRetPlenCond( ZonePlenumNum ).InletNode.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedNode.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRate.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMaxAvail.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedMassFlowRateMinAvail.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedTemp.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedHumRat.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedEnthalpy.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedPressure.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedCO2.deallocate();
+	ZoneRetPlenCond( ZonePlenumNum ).InducedGenContam.deallocate();
+	ZoneRetPlenCond.deallocate();
 	Node.deallocate();
 
 }

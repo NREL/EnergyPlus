@@ -2150,6 +2150,12 @@ namespace DataHeatBalance {
 			ZoneContamControllerSchedIndex( ZoneContamControllerSchedIndex )
 		{}
 
+		void
+		SetOutBulbTempAt();
+
+		void
+		SetWindSpeedAt( Real64 const fac );
+
 	};
 
 	struct ZoneListData
@@ -5263,6 +5269,12 @@ namespace DataHeatBalance {
 	// Needed for unit tests, should not be normally called.
 	void
 	clear_state();
+
+	void
+	SetZoneOutBulbTempAt();
+
+	void
+	SetZoneWindSpeedAt();
 
 	void
 	CheckAndSetConstructionProperties(

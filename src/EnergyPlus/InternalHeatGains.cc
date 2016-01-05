@@ -465,7 +465,7 @@ namespace InternalHeatGains {
 						People( Loop ).Name = AlphaName( 1 );
 						People( Loop ).ZonePtr = PeopleObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, PeopleObjects( Item ).Name, People.Name(), Loop - 1, People( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, PeopleObjects( Item ).Name, People, Loop - 1, People( Loop ).Name, errFlag );
 						People( Loop ).ZonePtr = ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1013,7 +1013,7 @@ namespace InternalHeatGains {
 						Lights( Loop ).Name = AlphaName( 1 );
 						Lights( Loop ).ZonePtr = LightsObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, LightsObjects( Item ).Name, Lights.Name(), Loop - 1, Lights( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, LightsObjects( Item ).Name, Lights, Loop - 1, Lights( Loop ).Name, errFlag );
 						Lights( Loop ).ZonePtr = ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1280,7 +1280,7 @@ namespace InternalHeatGains {
 						ZoneElectric( Loop ).Name = AlphaName( 1 );
 						ZoneElectric( Loop ).ZonePtr = ZoneElectricObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneElectricObjects( Item ).Name, ZoneElectric.Name(), Loop - 1, ZoneElectric( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneElectricObjects( Item ).Name, ZoneElectric, Loop - 1, ZoneElectric( Loop ).Name, errFlag );
 						ZoneElectric( Loop ).ZonePtr = ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1490,7 +1490,7 @@ namespace InternalHeatGains {
 						ZoneGas( Loop ).Name = AlphaName( 1 );
 						ZoneGas( Loop ).ZonePtr = ZoneGasObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneGasObjects( Item ).Name, ZoneGas.Name(), Loop - 1, ZoneGas( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneGasObjects( Item ).Name, ZoneGas, Loop - 1, ZoneGas( Loop ).Name, errFlag );
 						ZoneGas( Loop ).ZonePtr = ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1721,7 +1721,7 @@ namespace InternalHeatGains {
 						ZoneHWEq( Loop ).Name = AlphaName( 1 );
 						ZoneHWEq( Loop ).ZonePtr = HotWaterEqObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, HotWaterEqObjects( Item ).Name, ZoneHWEq.Name(), Loop - 1, ZoneHWEq( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, HotWaterEqObjects( Item ).Name, ZoneHWEq, Loop - 1, ZoneHWEq( Loop ).Name, errFlag );
 						ZoneHWEq( Loop ).ZonePtr = ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1931,7 +1931,7 @@ namespace InternalHeatGains {
 						ZoneSteamEq( Loop ).Name = AlphaName( 1 );
 						ZoneSteamEq( Loop ).ZonePtr = SteamEqObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, SteamEqObjects( Item ).Name, ZoneSteamEq.Name(), Loop - 1, ZoneSteamEq( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, SteamEqObjects( Item ).Name, ZoneSteamEq, Loop - 1, ZoneSteamEq( Loop ).Name, errFlag );
 						ZoneSteamEq( Loop ).ZonePtr = ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -2141,7 +2141,7 @@ namespace InternalHeatGains {
 						ZoneOtherEq( Loop ).Name = AlphaName( 1 );
 						ZoneOtherEq( Loop ).ZonePtr = OtherEqObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, OtherEqObjects( Item ).Name, ZoneOtherEq.Name(), Loop - 1, ZoneOtherEq( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, OtherEqObjects( Item ).Name, ZoneOtherEq, Loop - 1, ZoneOtherEq( Loop ).Name, errFlag );
 						ZoneOtherEq( Loop ).ZonePtr = ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -3326,49 +3326,53 @@ namespace InternalHeatGains {
 		//  IF (.NOT. ALLOCATED(QSA)) ALLOCATE(QSA(NumOfZones))
 
 		//  Zero out time step variables
-		ZoneIntGain.NOFOCC() = 0.0;
-		ZoneIntGain.QOCTOT() = 0.0;
-		ZoneIntGain.QOCSEN() = 0.0;
-		ZoneIntGain.QOCLAT() = 0.0;
-		ZoneIntGain.QOCRAD() = 0.0;
-		ZoneIntGain.QOCCON() = 0.0;
-		ZoneIntGain.QLTSW() = 0.0;
-		ZoneIntGain.QLTCRA() = 0.0;
-		ZoneIntGain.QLTRAD() = 0.0;
-		ZoneIntGain.QLTCON() = 0.0;
-		ZoneIntGain.QLTTOT() = 0.0;
+		for ( auto & e : ZoneIntGain ) {
+			e.NOFOCC = 0.0;
+			e.QOCTOT = 0.0;
+			e.QOCSEN = 0.0;
+			e.QOCLAT = 0.0;
+			e.QOCRAD = 0.0;
+			e.QOCCON = 0.0;
+			e.QLTSW = 0.0;
+			e.QLTCRA = 0.0;
+			e.QLTRAD = 0.0;
+			e.QLTCON = 0.0;
+			e.QLTTOT = 0.0;
 
-		ZoneIntGain.QEELAT() = 0.0;
-		ZoneIntGain.QEERAD() = 0.0;
-		ZoneIntGain.QEECON() = 0.0;
-		ZoneIntGain.QEELost() = 0.0;
-		ZoneIntGain.QGELAT() = 0.0;
-		ZoneIntGain.QGERAD() = 0.0;
-		ZoneIntGain.QGECON() = 0.0;
-		ZoneIntGain.QGELost() = 0.0;
-		ZoneIntGain.QBBRAD() = 0.0;
-		ZoneIntGain.QBBCON() = 0.0;
-		ZoneIntGain.QOELAT() = 0.0;
-		ZoneIntGain.QOERAD() = 0.0;
-		ZoneIntGain.QOECON() = 0.0;
-		ZoneIntGain.QOELost() = 0.0;
-		ZoneIntGain.QHWLAT() = 0.0;
-		ZoneIntGain.QHWRAD() = 0.0;
-		ZoneIntGain.QHWCON() = 0.0;
-		ZoneIntGain.QHWLost() = 0.0;
-		ZoneIntGain.QSELAT() = 0.0;
-		ZoneIntGain.QSERAD() = 0.0;
-		ZoneIntGain.QSECON() = 0.0;
-		ZoneIntGain.QSELost() = 0.0;
+			e.QEELAT = 0.0;
+			e.QEERAD = 0.0;
+			e.QEECON = 0.0;
+			e.QEELost = 0.0;
+			e.QGELAT = 0.0;
+			e.QGERAD = 0.0;
+			e.QGECON = 0.0;
+			e.QGELost = 0.0;
+			e.QBBRAD = 0.0;
+			e.QBBCON = 0.0;
+			e.QOELAT = 0.0;
+			e.QOERAD = 0.0;
+			e.QOECON = 0.0;
+			e.QOELost = 0.0;
+			e.QHWLAT = 0.0;
+			e.QHWRAD = 0.0;
+			e.QHWCON = 0.0;
+			e.QHWLost = 0.0;
+			e.QSELAT = 0.0;
+			e.QSERAD = 0.0;
+			e.QSECON = 0.0;
+			e.QSELost = 0.0;
+		}
 
 		ZoneIntEEuse = zeroZoneCatEUse; // Set all member arrays to zeros
 
-		ZnRpt.LtsPower() = 0.0;
-		ZnRpt.ElecPower() = 0.0;
-		ZnRpt.GasPower() = 0.0;
-		ZnRpt.HWPower() = 0.0;
-		ZnRpt.SteamPower() = 0.0;
-		ZnRpt.BaseHeatPower() = 0.0;
+		for ( auto & e : ZnRpt ) {
+			e.LtsPower = 0.0;
+			e.ElecPower = 0.0;
+			e.GasPower = 0.0;
+			e.HWPower = 0.0;
+			e.SteamPower = 0.0;
+			e.BaseHeatPower = 0.0;
+		}
 
 		//  QSA = 0.0
 

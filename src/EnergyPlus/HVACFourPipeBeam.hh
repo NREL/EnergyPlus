@@ -68,7 +68,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <GlobalNames.hh>
-#include <PlantLocation.hh> 
+#include <PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -89,7 +89,7 @@ private: // Creation
 		totBeamLengthWasAutosized( false ),
 		vDotNormRatedPrimAir( 0.0 ),
 		mDotNormRatedPrimAir( 0.0 ),
-		beamCoolingPresent(  false ),
+		beamCoolingPresent( false ),
 		vDotDesignCW( 0.0 ),
 		vDotDesignCWWasAutosized( false ),
 		mDotDesignCW( 0.0 ),
@@ -155,7 +155,7 @@ private: // Creation
 		qDotZoneToCoolSetPt( 0.0 )
 	{}
 
-public: 
+public:
 	// Destructor
 	virtual
 	~HVACFourPipeBeam()
@@ -284,7 +284,7 @@ private: // data
 	Real64 tDBZoneAirTemp; // current drybulb temperature of zone air, C
 	Real64 tDBSystemAir; // current drybulb temperature of primary supply air, C
 	Real64 mDotSystemAir; // current mass flow of primary supply air,kg/s
-	Real64 cpZoneAir; // current specific heat of zone air 
+	Real64 cpZoneAir; // current specific heat of zone air
 	Real64 cpSystemAir; // current specific heat of primary supply air
 	Real64 qDotSystemAir; // current heat transfer rate of primary supply air wrt zone, W
 	Real64 qDotBeamCoolingMax; // current beam cooling rate at maximum chilled water flow rate, W
