@@ -64,7 +64,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Vector3.hh>
 
@@ -899,22 +899,26 @@ namespace SolarShading {
 		//  IntDifIncInsSurfAmountRepEnergy=0.0
 		QRadSWwinAbsTotEnergy.dimension( TotSurfaces, 0.0 );
 		WinShadingAbsorbedSolarEnergy.dimension( TotSurfaces, 0.0 );
-		SurfaceWindow.BmSolAbsdOutsReveal() = 0.0;
-		SurfaceWindow.BmSolRefldOutsRevealReport() = 0.0;
-		SurfaceWindow.BmSolAbsdInsReveal() = 0.0;
-		SurfaceWindow.BmSolRefldInsReveal() = 0.0;
-		SurfaceWindow.BmSolRefldInsRevealReport() = 0.0;
-		SurfaceWindow.OutsRevealDiffOntoGlazing() = 0.0;
-		SurfaceWindow.InsRevealDiffOntoGlazing() = 0.0;
-		SurfaceWindow.InsRevealDiffIntoZone() = 0.0;
-		SurfaceWindow.OutsRevealDiffOntoFrame() = 0.0;
-		SurfaceWindow.InsRevealDiffOntoFrame() = 0.0;
+		for ( auto & e : SurfaceWindow ) {
+			e.BmSolAbsdOutsReveal = 0.0;
+			e.BmSolRefldOutsRevealReport = 0.0;
+			e.BmSolAbsdInsReveal = 0.0;
+			e.BmSolRefldInsReveal = 0.0;
+			e.BmSolRefldInsRevealReport = 0.0;
+			e.OutsRevealDiffOntoGlazing = 0.0;
+			e.InsRevealDiffOntoGlazing = 0.0;
+			e.InsRevealDiffIntoZone = 0.0;
+			e.OutsRevealDiffOntoFrame = 0.0;
+			e.InsRevealDiffOntoFrame = 0.0;
+		}
 
 		// Added report variables for inside reveal to debug CR 7596. TH 5/26/2009
-		SurfaceWindow.InsRevealDiffOntoGlazingReport() = 0.0;
-		SurfaceWindow.InsRevealDiffIntoZoneReport() = 0.0;
-		SurfaceWindow.InsRevealDiffOntoFrameReport() = 0.0;
-		SurfaceWindow.BmSolAbsdInsRevealReport() = 0.0;
+		for ( auto & e : SurfaceWindow ) {
+			e.InsRevealDiffOntoGlazingReport = 0.0;
+			e.InsRevealDiffIntoZoneReport = 0.0;
+			e.InsRevealDiffOntoFrameReport = 0.0;
+			e.BmSolAbsdInsRevealReport = 0.0;
+		}
 
 		DisplayString( "Initializing Zone Report Variables" );
 		// CurrentModuleObject='Zone'
@@ -1915,18 +1919,24 @@ namespace SolarShading {
 
 		inside = false;
 		if ( ignorex ) {
-			polygon.x() = polygon_3d.y();
-			polygon.y() = polygon_3d.z();
+			for ( int i = 1; i <= nsides; ++i ) {
+				polygon( i ).x = polygon_3d( i ).y;
+				polygon( i ).y = polygon_3d( i ).z;
+			}
 			point.x = point_3d.y;
 			point.y = point_3d.z;
 		} else if ( ignorey ) {
-			polygon.x() = polygon_3d.x();
-			polygon.y() = polygon_3d.z();
+			for ( int i = 1; i <= nsides; ++i ) {
+				polygon( i ).x = polygon_3d( i ).x;
+				polygon( i ).y = polygon_3d( i ).z;
+			}
 			point.x = point_3d.x;
 			point.y = point_3d.z;
 		} else if ( ignorez ) {
-			polygon.x() = polygon_3d.x();
-			polygon.y() = polygon_3d.y();
+			for ( int i = 1; i <= nsides; ++i ) {
+				polygon( i ).x = polygon_3d( i ).x;
+				polygon( i ).y = polygon_3d( i ).y;
+			}
 			point.x = point_3d.x;
 			point.y = point_3d.y;
 		} else { // Illegal
@@ -3467,8 +3477,10 @@ namespace SolarShading {
 			AOSurf = 0.0;
 			BackSurfaces = 0;
 			OverlapAreas = 0.0;
-			SurfaceWindow.OutProjSLFracMult() = 1.0;
-			SurfaceWindow.InOutProjSLFracMult() = 1.0;
+			for ( auto & e : SurfaceWindow ) {
+				e.OutProjSLFracMult = 1.0;
+				e.InOutProjSLFracMult = 1.0;
+			}
 		} else {
 			SunlitFracHR( HourOfDay, {1,TotSurfaces} ) = 0.0;
 			SunlitFrac( TimeStep, HourOfDay, {1,TotSurfaces} ) = 0.0;
@@ -3831,7 +3843,7 @@ namespace SolarShading {
 			if ( ! ShadowingSurf && Surface( GRSNR ).BaseSurf != GRSNR ) continue; // Skip subsurfaces (SBS)
 
 			// Get the lowest point of receiving surface
-			ZMIN = minval( Surface( GRSNR ).Vertex.z() );
+			ZMIN = minval( Surface( GRSNR ).Vertex, &Vector::z );
 
 			// Check every surface as a possible shadow casting surface ("SS" = shadow sending)
 			NGSS = 0;

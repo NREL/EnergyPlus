@@ -392,7 +392,6 @@ namespace EvaporativeFluidCoolers {
 		using FluidProperties::CheckFluidPropertyName;
 		using FluidProperties::FindGlycol;
 		using FluidProperties::GetGlycolNameByIndex;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutRelHumValue;
 

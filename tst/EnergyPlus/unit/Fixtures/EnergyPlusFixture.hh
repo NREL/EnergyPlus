@@ -76,11 +76,11 @@ namespace EnergyPlus {
 	// everything is cleaned up properly
 	struct RedirectCout
 	{
-		RedirectCout( std::unique_ptr<std::ostringstream> const & m_buffer ) 
+		RedirectCout( std::unique_ptr<std::ostringstream> const & m_buffer )
 		: m_old_buffer( std::cout.rdbuf( m_buffer->rdbuf() ) )
 		{ }
 
-		~RedirectCout( )
+		~RedirectCout()
 		{
 			std::cout.rdbuf( m_old_buffer.release() );
 		}
@@ -93,11 +93,11 @@ namespace EnergyPlus {
 	// everything is cleaned up properly
 	struct RedirectCerr
 	{
-		RedirectCerr( std::unique_ptr<std::ostringstream> const & m_buffer ) 
+		RedirectCerr( std::unique_ptr<std::ostringstream> const & m_buffer )
 		: m_old_buffer( std::cerr.rdbuf( m_buffer->rdbuf() ) )
 		{ }
 
-		~RedirectCerr( )
+		~RedirectCerr()
 		{
 			std::cerr.rdbuf( m_old_buffer.release() );
 		}
@@ -211,18 +211,18 @@ namespace EnergyPlus {
 		static void use_cached_idd();
 
 		// This will compare either a STL container or ObjexxFCL container
-		// Pass a container you want to compare against an expected container. You can pass in an existing 
+		// Pass a container you want to compare against an expected container. You can pass in an existing
 		// container or use an initializer list like below.
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return true if containers are equal and false if they are not.
-		// Example Usage: 
+		// Example Usage:
 		// 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
 		// 		EXPECT_TRUE( compare_containers( Array1D_bool( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
 		template < class T, class T2 >
 		bool compare_containers( T const & expected_container, T2 const & actual_container );
 
-		// This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any 
+		// This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
 		// delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
 		std::string delimited_string( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL );
 
@@ -300,14 +300,14 @@ namespace EnergyPlus {
 		// Will return true if data structures match and false if they do not.
 		// Usage (assuming "Version,8.3;" was parsed as an idf snippet):
 		// 		EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
-		bool compare_idf( 
-			std::string const & name, 
-			int const num_alphas, 
-			int const num_numbers, 
-			std::vector< std::string > const & alphas, 
-			std::vector< bool > const & alphas_blank, 
-			std::vector< Real64 > const & numbers, 
-			std::vector< bool > const & numbers_blank 
+		bool compare_idf(
+			std::string const & name,
+			int const num_alphas,
+			int const num_numbers,
+			std::vector< std::string > const & alphas,
+			std::vector< bool > const & alphas_blank,
+			std::vector< Real64 > const & numbers,
+			std::vector< bool > const & numbers_blank
 		);
 
 	private:

@@ -1137,7 +1137,7 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F(  SQLiteFixture, OutputProcessor_determineMeterIPUnits )
+		TEST_F( SQLiteFixture, OutputProcessor_determineMeterIPUnits )
 		{
 			int ipUnits = -999999;
 			bool errorFound = false;
@@ -3340,7 +3340,7 @@ namespace EnergyPlus {
 			} ) );
 
 
-			ResetAccumulationWhenWarmupComplete( );
+			ResetAccumulationWhenWarmupComplete();
 
 			PurchAir( 1 ).TotHeatEnergy = 100.0;
 			UpdateMeterReporting();

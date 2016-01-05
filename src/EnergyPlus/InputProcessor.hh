@@ -61,6 +61,7 @@
 
 // C++ Headers
 #include <iosfwd>
+#include <type_traits>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -636,7 +637,7 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
-		Array1D_string const & ListOfItems,
+		Array1_string const & ListOfItems,
 		int const NumItems
 	);
 
@@ -644,7 +645,7 @@ namespace InputProcessor {
 	int
 	FindItemInList(
 		std::string const & String,
-		Array1D_string const & ListOfItems
+		Array1_string const & ListOfItems
 	)
 	{
 		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
@@ -693,7 +694,7 @@ namespace InputProcessor {
 		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs and operator[i] and elements need Name
 	inline
 	int
 	FindItemInList(
@@ -708,7 +709,7 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs isize() and operator[i] and elements need Name
 	inline
 	int
 	FindItemInList(
@@ -719,7 +720,7 @@ namespace InputProcessor {
 		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs operator[i] and value_type
 	inline
 	int
 	FindItemInList(
@@ -735,7 +736,7 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs isize() and operator[i] and value_type
 	inline
 	int
 	FindItemInList(
@@ -866,7 +867,7 @@ namespace InputProcessor {
 		return FindItem( String, ListOfItems, ListOfItems.isize() );
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
 	inline
 	int
 	FindItem(
@@ -883,7 +884,7 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
 	inline
 	int
 	FindItem(
@@ -894,7 +895,7 @@ namespace InputProcessor {
 		return FindItem( String, ListOfItems, ListOfItems.isize() );
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
 	inline
 	int
 	FindItem(
@@ -912,7 +913,7 @@ namespace InputProcessor {
 		return 0; // Not found
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
 	inline
 	int
 	FindItem(
@@ -1015,7 +1016,7 @@ namespace InputProcessor {
 		}
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and elements need Name
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and elements need Name
 	inline
 	void
 	VerifyName(
@@ -1045,7 +1046,7 @@ namespace InputProcessor {
 		}
 	}
 
-	template< typename Container > // Container needs size() and operator[i] and value_type
+	template< typename Container, class = typename std::enable_if< ! std::is_same< typename Container::value_type, std::string >::value >::type > // Container needs size() and operator[i] and value_type
 	inline
 	void
 	VerifyName(

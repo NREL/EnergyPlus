@@ -110,7 +110,7 @@ class RoomAirflowNetworkTest : public testing::Test
 
 public:
 
-	RoomAirflowNetworkTest( ) // Setup global state
+	RoomAirflowNetworkTest() // Setup global state
 	{
 		CurZoneEqNum = 0;
 		CurSysNum = 0;
@@ -143,32 +143,32 @@ public:
 
 	}
 
-	~RoomAirflowNetworkTest( ) // Reset global state
+	~RoomAirflowNetworkTest() // Reset global state
 	{
 		NumOfZones = 0;
 		NumOfNodes = 0;
 		BeginEnvrnFlag = false;
-		RoomAirflowNetworkZoneInfo.clear( );
-		ZoneEquipConfig.clear( );
-		ZoneEquipList.clear( );
-		Zone.clear( );
-		ZoneIntGain.clear( );
-		NodeID.clear( );
-		Node.clear( );
-		Surface.clear( );
-		HConvIn.clear( );
-		TempSurfInTmp.clear( );
-		MoistEMPDNew.clear( );
-		MoistEMPDOld.clear( );
-		RhoVaporSurfIn.clear( );
-		RhoVaporAirIn.clear( );
-		HMassConvInFD.clear( );
-		MAT.clear( );
-		ZoneAirHumRat.clear( );
-		AirflowNetworkLinkageData.clear( );
-		AirflowNetworkNodeSimu.clear( );
-		AirflowNetworkLinkSimu.clear( );
-		RAFN.clear( );
+		RoomAirflowNetworkZoneInfo.clear();
+		ZoneEquipConfig.clear();
+		ZoneEquipList.clear();
+		Zone.clear();
+		ZoneIntGain.clear();
+		NodeID.clear();
+		Node.clear();
+		Surface.clear();
+		HConvIn.clear();
+		TempSurfInTmp.clear();
+		MoistEMPDNew.clear();
+		MoistEMPDOld.clear();
+		RhoVaporSurfIn.clear();
+		RhoVaporAirIn.clear();
+		HMassConvInFD.clear();
+		MAT.clear();
+		ZoneAirHumRat.clear();
+		AirflowNetworkLinkageData.clear();
+		AirflowNetworkNodeSimu.clear();
+		AirflowNetworkLinkSimu.clear();
+		RAFN.clear();
 	}
 
 };
@@ -185,7 +185,7 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	OutBaroPress = 101325.0;
 	ZoneVolCapMultpSens = 1;
 
-	InitializePsychRoutines( );
+	InitializePsychRoutines();
 
 	RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed = true;
 	RoomAirflowNetworkZoneInfo( ZoneNum ).ActualZoneID = ZoneNum;
@@ -384,12 +384,12 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	EXPECT_NEAR( 0.0028697086, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).HumRat, 0.00001 );
 	EXPECT_NEAR( 15.53486185, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).RelHumidity, 0.00001 );
 
-	thisRAFN.UpdateRoomAirModelAirflowNetwork( );
+	thisRAFN.UpdateRoomAirModelAirflowNetwork();
 
 	EXPECT_NEAR( 24.397538, Node( 2 ).Temp, 0.00001 );
 	EXPECT_NEAR( 0.0024802305, Node( 2 ).HumRat, 0.000001 );
 
-	cached_Twb.deallocate( );
-	cached_Psat.deallocate( );
+	cached_Twb.deallocate();
+	cached_Psat.deallocate();
 
 }

@@ -57,7 +57,7 @@
 // in binary and source code form.
 
 // EnergyPlus::DXCoils unit tests
-// Secondary DX cooling and heating coil heat rejection and removal rate 
+// Secondary DX cooling and heating coil heat rejection and removal rate
 // from a secondary zone and SHR calculation
 
 // Google test headers
@@ -67,9 +67,6 @@
 #include <cassert>
 #include <cmath>
 #include <string>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <DXCoils.hh>
@@ -107,7 +104,7 @@ TEST( SecondaryDXCoolingCoilSingleSpeed, Test1 ) {
 	CalcSecondaryDXCoils( DXCoilNum );
 	EXPECT_DOUBLE_EQ( 5500.0, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
 
-	// cleanup 
+	// cleanup
 	DXCoil.deallocate();
 }
 TEST( SecondaryDXCoolingCoilTwoSpeed, Test2 ) {
@@ -127,7 +124,7 @@ TEST( SecondaryDXCoolingCoilTwoSpeed, Test2 ) {
 	CalcSecondaryDXCoils( DXCoilNum );
 	EXPECT_DOUBLE_EQ( 5500.0, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
 
-	// cleanup 
+	// cleanup
 	DXCoil.deallocate();
 }
 TEST( SecondaryDXCoolingCoilMultiSpeed, Test3 ) {
@@ -146,10 +143,10 @@ TEST( SecondaryDXCoolingCoilMultiSpeed, Test3 ) {
 
 	CalcSecondaryDXCoils( DXCoilNum );
 	EXPECT_DOUBLE_EQ( 5500.0, DXCoil( DXCoilNum ).SecCoilSensibleHeatGainRate );
-	
-	// cleanup 
+
+	// cleanup
 	DXCoil.deallocate();
-	
+
 }
 TEST( SecondaryDXHeatingCoilSingleSpeed, Test4 ) {
 	// tests secondary DX coil calculation of single speed heat pump
@@ -200,29 +197,29 @@ TEST( SecondaryDXHeatingCoilSingleSpeed, Test4 ) {
 	Real64 const SecCoilFlowFraction = 1.0;
 	int const SecCoilSHRFT = 0;
 	int const SecCoilSHRFF = 0;
-	
+
 	// output variable
 	Real64 SHRTest;
-	
+
 	// make the call
-	SHRTest = CalcSecondaryDXCoilsSHR( 
-	DXCoilNum, 
-	EvapAirMassFlow, 
-	TotalHeatRemovalRate, 
-	PartLoadRatio, 
-	SecCoilRatedSHR, 
-	EvapInletDryBulb, 
-	EvapInletHumRat, 
-	EvapInletWetBulb, 
-	EvapInletEnthalpy, 
-	CondInletDryBulb, 
-	SecCoilFlowFraction, 
-	SecCoilSHRFT, 
+	SHRTest = CalcSecondaryDXCoilsSHR(
+	DXCoilNum,
+	EvapAirMassFlow,
+	TotalHeatRemovalRate,
+	PartLoadRatio,
+	SecCoilRatedSHR,
+	EvapInletDryBulb,
+	EvapInletHumRat,
+	EvapInletWetBulb,
+	EvapInletEnthalpy,
+	CondInletDryBulb,
+	SecCoilFlowFraction,
+	SecCoilSHRFT,
 	SecCoilSHRFF );
 
 	EXPECT_DOUBLE_EQ( 1.0, SHRTest );
 
-	// cleanup 
+	// cleanup
 	DXCoil.deallocate();
 	Node.deallocate();
 }
@@ -278,7 +275,7 @@ TEST( SecondaryDXHeatingCoilMultiSpeed, Test5 ) {
 	EXPECT_DOUBLE_EQ( -5000.0, DXCoil( DXCoilNum ).SecCoilTotalHeatRemovalRate );
 	EXPECT_DOUBLE_EQ( 1.0, DXCoil( DXCoilNum ).SecCoilSHR );
 
-	// cleanup 
+	// cleanup
 	DXCoil( DXCoilNum ).MSSecCoilAirFlow.deallocate();
 	DXCoil( DXCoilNum ).MSSecCoilRatedSHR.deallocate();
 	DXCoil( DXCoilNum ).MSSecCoilSHRFT.deallocate();

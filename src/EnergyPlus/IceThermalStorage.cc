@@ -61,7 +61,6 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -123,8 +122,6 @@ namespace IceThermalStorage {
 	using DataGlobals::HourOfDay;
 	using DataGlobals::TimeStep;
 	using DataGlobals::ScheduleAlwaysOn;
-	using DataEnvironment::OutWetBulbTemp; // This value is used to model Cooling Tower.  Twb + 2[degF]
-	using DataEnvironment::OutDryBulbTemp;
 	using namespace DataHVACGlobals;
 	using General::TrimSigDigits;
 
@@ -801,7 +798,7 @@ namespace IceThermalStorage {
 					} // ...loop iterating for the ice storage outlet temperature
 
 					// Keep track of times that the iterations got excessive
-					if ( IterNum >= MaxIterNum && ( !WarmupFlag )  ) {
+					if ( IterNum >= MaxIterNum && ( !WarmupFlag ) ) {
 						++DetIceStor( IceNum ).DischargeIterErrors;
 						if ( DetIceStor( IceNum ).DischargeIterErrors <= 25 ) {
 							ShowWarningError( "Detailed Ice Storage model exceeded its internal discharging maximum iteration limit" );

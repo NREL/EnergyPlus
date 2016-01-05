@@ -184,17 +184,19 @@ namespace WaterUse {
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
 			MaxIterationsErrorCount = 0;
 			if ( NumWaterEquipment > 0 ) {
-				WaterEquipment.SensibleRate() = 0.0;
-				WaterEquipment.SensibleEnergy() = 0.0;
-				WaterEquipment.LatentRate() = 0.0;
-				WaterEquipment.LatentEnergy() = 0.0;
-				WaterEquipment.MixedTemp() = 0.0;
-				WaterEquipment.TotalMassFlowRate() = 0.0;
-				WaterEquipment.DrainTemp() = 0.0;
+				for ( auto & e : WaterEquipment ) {
+					e.SensibleRate = 0.0;
+					e.SensibleEnergy = 0.0;
+					e.LatentRate = 0.0;
+					e.LatentEnergy = 0.0;
+					e.MixedTemp = 0.0;
+					e.TotalMassFlowRate = 0.0;
+					e.DrainTemp = 0.0;
+				}
 			}
 
 			if ( NumWaterConnections > 0 ) {
-				WaterConnections.TotalMassFlowRate() = 0.0;
+				for ( auto & e : WaterConnections ) e.TotalMassFlowRate = 0.0;
 			}
 
 			MyEnvrnFlag = false;
@@ -330,7 +332,7 @@ namespace WaterUse {
 			}
 
 			if ( NumWaterConnections > 0 ) {
-				WaterConnections.TotalMassFlowRate() = 0.0;
+				for ( auto & e : WaterConnections ) e.TotalMassFlowRate = 0.0;
 			}
 
 			MyEnvrnFlag = false;
@@ -1555,20 +1557,22 @@ namespace WaterUse {
 		if ( NumWaterEquipment == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			WaterEquipment.SensibleRate() = 0.0;
-			WaterEquipment.SensibleEnergy() = 0.0;
-			WaterEquipment.SensibleRateNoMultiplier() = 0.0;
-			WaterEquipment.LatentRate() = 0.0;
-			WaterEquipment.LatentEnergy() = 0.0;
-			WaterEquipment.LatentRateNoMultiplier() = 0.0;
-			WaterEquipment.MixedTemp() = 0.0;
-			WaterEquipment.TotalMassFlowRate() = 0.0;
-			WaterEquipment.DrainTemp() = 0.0;
-			WaterEquipment.ColdVolFlowRate() = 0.0;
-			WaterEquipment.HotVolFlowRate() = 0.0;
-			WaterEquipment.TotalVolFlowRate() = 0.0;
-			WaterEquipment.ColdMassFlowRate() = 0.0;
-			WaterEquipment.HotMassFlowRate() = 0.0;
+			for ( auto & e : WaterEquipment ) {
+				e.SensibleRate = 0.0;
+				e.SensibleEnergy = 0.0;
+				e.SensibleRateNoMultiplier = 0.0;
+				e.LatentRate = 0.0;
+				e.LatentEnergy = 0.0;
+				e.LatentRateNoMultiplier = 0.0;
+				e.MixedTemp = 0.0;
+				e.TotalMassFlowRate = 0.0;
+				e.DrainTemp = 0.0;
+				e.ColdVolFlowRate = 0.0;
+				e.HotVolFlowRate = 0.0;
+				e.TotalVolFlowRate = 0.0;
+				e.ColdMassFlowRate = 0.0;
+				e.HotMassFlowRate = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 

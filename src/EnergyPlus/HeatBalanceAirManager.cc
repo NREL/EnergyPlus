@@ -736,7 +736,7 @@ namespace HeatBalanceAirManager {
 						Infiltration( Loop ).Name = cAlphaArgs( 1 );
 						Infiltration( Loop ).ZonePtr = InfiltrationObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, InfiltrationObjects( Item ).Name, Infiltration.Name(), Loop - 1, Infiltration( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, InfiltrationObjects( Item ).Name, Infiltration, Loop - 1, Infiltration( Loop ).Name, errFlag );
 						Infiltration( Loop ).ZonePtr = ZoneList( InfiltrationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1087,7 +1087,7 @@ namespace HeatBalanceAirManager {
 						Ventilation( Loop ).Name = cAlphaArgs( 1 );
 						Ventilation( Loop ).ZonePtr = VentilationObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, VentilationObjects( Item ).Name, Ventilation.Name(), Loop - 1, Ventilation( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, cCurrentModuleObject, Zone( ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, VentilationObjects( Item ).Name, Ventilation, Loop - 1, Ventilation( Loop ).Name, errFlag );
 						Ventilation( Loop ).ZonePtr = ZoneList( VentilationObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -2341,7 +2341,7 @@ namespace HeatBalanceAirManager {
 		TotRefDoorMixing = GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotRefDoorMixing > 0 ) {
 			RefDoorMixing.allocate( NumOfZones );
-			RefDoorMixing.NumRefDoorConnections() = 0;
+			for ( auto & e : RefDoorMixing ) e.NumRefDoorConnections = 0;
 
 			for ( Loop = 1; Loop <= TotRefDoorMixing; ++Loop ) {
 

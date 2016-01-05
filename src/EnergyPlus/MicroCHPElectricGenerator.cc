@@ -1417,10 +1417,12 @@ namespace MicroCHPElectricGenerator {
 		if ( NumMicroCHPs == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			FuelSupply.QskinLoss() = 0.0;
-			MicroCHP.ma( &MicroCHPDataStruct::A42Model ).QdotSkin() = 0.0;
-			MicroCHP.ma( &MicroCHPDataStruct::Report ).SkinLossConvect() = 0.0;
-			MicroCHP.ma( &MicroCHPDataStruct::Report ).SkinLossRadiat() = 0.0;
+			for ( auto & e : FuelSupply ) e.QskinLoss = 0.0;
+			for ( auto & e : MicroCHP ) {
+				e.A42Model.QdotSkin = 0.0;
+				e.Report.SkinLossConvect = 0.0;
+				e.Report.SkinLossRadiat = 0.0;
+			}
 			MyEnvrnFlag = false;
 		}
 

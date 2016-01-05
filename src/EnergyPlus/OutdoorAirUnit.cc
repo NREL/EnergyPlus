@@ -850,7 +850,6 @@ namespace OutdoorAirUnit {
 
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
 		using DataGlobals::AnyPlantInModel;
@@ -1302,7 +1301,7 @@ namespace OutdoorAirUnit {
 				}
 			}
 		}
-			
+
 		if( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
@@ -1345,8 +1344,6 @@ namespace OutdoorAirUnit {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
 		using DataEnvironment::OutBaroPress;
@@ -1692,8 +1689,6 @@ namespace OutdoorAirUnit {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
 		using DataEnvironment::OutBaroPress;
@@ -2351,7 +2346,7 @@ namespace OutdoorAirUnit {
 		OutAirUnit.deallocate();
 
 	}
-		
+
 	//*****************************************************************************************
 
 } // OutdoorAirUnit

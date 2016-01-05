@@ -1016,7 +1016,7 @@ namespace PlantLoopEquip {
 				//            PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(Num)%CompNum =  EquipNum
 				//          ENDIF
 			} else if ( EquipTypeNum == TypeOf_CoilSteamAirHeating ) {
-				//CALL UpdateSteamToAirCoilPlantConnection(  )
+				//CALL UpdateSteamToAirCoilPlantConnection()
 
 			} else if ( EquipTypeNum == TypeOf_CoilWAHPHeatingEquationFit ) {
 

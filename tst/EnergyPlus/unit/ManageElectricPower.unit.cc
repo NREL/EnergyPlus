@@ -207,6 +207,6 @@ TEST( ManageElectricPowerTest, UpdateLoadCenterRecords )
 	EXPECT_NEAR( ElecLoadCenter( LoadCenterNum ).ThermalProdRate, 1250.0, 0.1 );
 	EXPECT_NEAR( ElecLoadCenter( LoadCenterNum ).ThermalProd, 1250.0*3600.0, 0.1 );
 
-	ElecStorage.deallocate( );
-	ElecLoadCenter.deallocate( );
+	ElecStorage.deallocate();
+	ElecLoadCenter.deallocate();
 }

@@ -1228,8 +1228,10 @@ namespace SystemReports {
 
 			OneTimeFlag = false;
 		}
-		LoopStack.LoopNum() = 0;
-		LoopStack.LoopType() = 0;
+		for ( auto & e : LoopStack ) {
+			e.LoopNum = 0;
+			e.LoopType = 0;
+		}
 
 		ConnectionFlag = false;
 		//    countloop=0
@@ -1381,14 +1383,16 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			ZoneCompToPlant.allocate( ArrayLimit );
-			ZoneCompToPlant.ZoneEqListNum() = 0;
-			ZoneCompToPlant.ZoneEqCompNum() = 0;
-			ZoneCompToPlant.PlantLoopType() = 0;
-			ZoneCompToPlant.PlantLoopNum() = 0;
-			ZoneCompToPlant.PlantLoopBranch() = 0;
-			ZoneCompToPlant.PlantLoopComp() = 0;
-			ZoneCompToPlant.FirstDemandSidePtr() = 0;
-			ZoneCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : ZoneCompToPlant ) {
+				e.ZoneEqListNum = 0;
+				e.ZoneEqCompNum = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1464,15 +1468,17 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			ZoneSubCompToPlant.allocate( ArrayLimit );
-			ZoneSubCompToPlant.ZoneEqListNum() = 0;
-			ZoneSubCompToPlant.ZoneEqCompNum() = 0;
-			ZoneSubCompToPlant.ZoneEqSubCompNum() = 0;
-			ZoneSubCompToPlant.PlantLoopType() = 0;
-			ZoneSubCompToPlant.PlantLoopNum() = 0;
-			ZoneSubCompToPlant.PlantLoopBranch() = 0;
-			ZoneSubCompToPlant.PlantLoopComp() = 0;
-			ZoneSubCompToPlant.FirstDemandSidePtr() = 0;
-			ZoneSubCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : ZoneSubCompToPlant ) {
+				e.ZoneEqListNum = 0;
+				e.ZoneEqCompNum = 0;
+				e.ZoneEqSubCompNum = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1551,16 +1557,18 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			ZoneSubSubCompToPlant.allocate( ArrayLimit );
-			ZoneSubSubCompToPlant.ZoneEqListNum() = 0;
-			ZoneSubSubCompToPlant.ZoneEqCompNum() = 0;
-			ZoneSubSubCompToPlant.ZoneEqSubCompNum() = 0;
-			ZoneSubSubCompToPlant.ZoneEqSubSubCompNum() = 0;
-			ZoneSubSubCompToPlant.PlantLoopType() = 0;
-			ZoneSubSubCompToPlant.PlantLoopNum() = 0;
-			ZoneSubSubCompToPlant.PlantLoopBranch() = 0;
-			ZoneSubSubCompToPlant.PlantLoopComp() = 0;
-			ZoneSubSubCompToPlant.FirstDemandSidePtr() = 0;
-			ZoneSubSubCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : ZoneSubSubCompToPlant ) {
+				e.ZoneEqListNum = 0;
+				e.ZoneEqCompNum = 0;
+				e.ZoneEqSubCompNum = 0;
+				e.ZoneEqSubSubCompNum = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1640,15 +1648,17 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			AirSysCompToPlant.allocate( ArrayLimit );
-			AirSysCompToPlant.AirLoopNum() = 0;
-			AirSysCompToPlant.AirLoopBranch() = 0;
-			AirSysCompToPlant.AirLoopComp() = 0;
-			AirSysCompToPlant.PlantLoopType() = 0;
-			AirSysCompToPlant.PlantLoopNum() = 0;
-			AirSysCompToPlant.PlantLoopBranch() = 0;
-			AirSysCompToPlant.PlantLoopComp() = 0;
-			AirSysCompToPlant.FirstDemandSidePtr() = 0;
-			AirSysCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : AirSysCompToPlant ) {
+				e.AirLoopNum = 0;
+				e.AirLoopBranch = 0;
+				e.AirLoopComp = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1727,16 +1737,18 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			AirSysSubCompToPlant.allocate( ArrayLimit );
-			AirSysSubCompToPlant.AirLoopNum() = 0;
-			AirSysSubCompToPlant.AirLoopBranch() = 0;
-			AirSysSubCompToPlant.AirLoopComp() = 0;
-			AirSysSubCompToPlant.AirLoopSubComp() = 0;
-			AirSysSubCompToPlant.PlantLoopType() = 0;
-			AirSysSubCompToPlant.PlantLoopNum() = 0;
-			AirSysSubCompToPlant.PlantLoopBranch() = 0;
-			AirSysSubCompToPlant.PlantLoopComp() = 0;
-			AirSysSubCompToPlant.FirstDemandSidePtr() = 0;
-			AirSysSubCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : AirSysSubCompToPlant ) {
+				e.AirLoopNum = 0;
+				e.AirLoopBranch = 0;
+				e.AirLoopComp = 0;
+				e.AirLoopSubComp = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -1818,17 +1830,19 @@ namespace SystemReports {
 
 		if ( OneTimeFlag ) {
 			AirSysSubSubCompToPlant.allocate( ArrayLimit );
-			AirSysSubSubCompToPlant.AirLoopNum() = 0;
-			AirSysSubSubCompToPlant.AirLoopBranch() = 0;
-			AirSysSubSubCompToPlant.AirLoopComp() = 0;
-			AirSysSubSubCompToPlant.AirLoopSubComp() = 0;
-			AirSysSubSubCompToPlant.AirLoopSubSubComp() = 0;
-			AirSysSubSubCompToPlant.PlantLoopType() = 0;
-			AirSysSubSubCompToPlant.PlantLoopNum() = 0;
-			AirSysSubSubCompToPlant.PlantLoopBranch() = 0;
-			AirSysSubSubCompToPlant.PlantLoopComp() = 0;
-			AirSysSubSubCompToPlant.FirstDemandSidePtr() = 0;
-			AirSysSubSubCompToPlant.LastDemandSidePtr() = 0;
+			for ( auto & e : AirSysSubSubCompToPlant ) {
+				e.AirLoopNum = 0;
+				e.AirLoopBranch = 0;
+				e.AirLoopComp = 0;
+				e.AirLoopSubComp = 0;
+				e.AirLoopSubSubComp = 0;
+				e.PlantLoopType = 0;
+				e.PlantLoopNum = 0;
+				e.PlantLoopBranch = 0;
+				e.PlantLoopComp = 0;
+				e.FirstDemandSidePtr = 0;
+				e.LastDemandSidePtr = 0;
+			}
 
 			OneTimeFlag = false;
 		}
@@ -3034,7 +3048,6 @@ namespace SystemReports {
 		using namespace DataZoneEnergyDemands;
 		using Psychrometrics::PsyHFnTdbW;
 		using namespace DataGlobalConstants;
-		using DataEnvironment::OutDryBulbTemp;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

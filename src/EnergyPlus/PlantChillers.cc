@@ -7066,5 +7066,4 @@ namespace PlantChillers {
 
 } // PlantChillers
 
-
 } // EnergyPlus

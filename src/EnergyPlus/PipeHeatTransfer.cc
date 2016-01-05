@@ -1780,7 +1780,7 @@ namespace PipeHeatTransfer {
 		if ( NumOfPipeHT == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			PipeHT.ZoneHeatGainRate() = 0.0;
+			for ( auto & e : PipeHT ) e.ZoneHeatGainRate = 0.0;
 			MyEnvrnFlag = false;
 		}
 

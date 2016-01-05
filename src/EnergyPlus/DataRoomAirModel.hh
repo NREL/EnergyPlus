@@ -1069,7 +1069,7 @@ namespace DataRoomAirModel {
 		Real64 HumRatIn; // humidity ratio of air into control volume
 
 		// Default Constructor
-		AirflowLinkagesInfoNestedStruct( ) :
+		AirflowLinkagesInfoNestedStruct() :
 			AirflowNetworkLinkSimuID( 0 ),
 			AirflowNetworkLinkageDataID( 0 ),
 			AirflowNetworkLinkReportID( 0 ),
@@ -1107,7 +1107,7 @@ namespace DataRoomAirModel {
 		bool FractionCheck; // TRUE if a fraction of internal gain for each object is checked
 
 		// Default Constructor
-		RoomAirflowNetworkNodeInternalGainsStruct( ) :
+		RoomAirflowNetworkNodeInternalGainsStruct() :
 			TypeOfNum( 0 ),
 			UseRoomAirModelTempForGains( false ),
 			FractionCheck( false )
@@ -1145,7 +1145,7 @@ namespace DataRoomAirModel {
 		int CompIndex; // Component index
 
 		// Default Constructor
-		RoomAirflowNetworkHVACStruct( ) :
+		RoomAirflowNetworkHVACStruct() :
 			TypeOfNum( 0 ), // HVAC type num
 			SupplyFraction( 0 ), // Supply flow fraction
 			ReturnFraction( 0 ), // Return flow fraction
@@ -1243,13 +1243,13 @@ namespace DataRoomAirModel {
 		Real64 SumHA; // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
 		Real64 SumHATsurf; // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
 		Real64 SumHATref; // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
-		Real64 SumLinkMCp; // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model  
-		Real64 SumLinkMCpT; // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model 
-		Real64 SumSysMCp; // sum of mdor*Cp for incoming supply airflows for this node 
-		Real64 SumSysMCpT; // sum of mdor*Cp*T for incoming supply airflows and temperature for this node 
-		Real64 SumSysM; // sum of mdot for incoming supply airflows for this node 
-		Real64 SumSysMW; // sum of mdot*W for incoming supply airflows and temperature for this node 
-		Real64 NonAirSystemResponse; // sum of convective system load 
+		Real64 SumLinkMCp; // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model
+		Real64 SumLinkMCpT; // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model
+		Real64 SumSysMCp; // sum of mdor*Cp for incoming supply airflows for this node
+		Real64 SumSysMCpT; // sum of mdor*Cp*T for incoming supply airflows and temperature for this node
+		Real64 SumSysM; // sum of mdot for incoming supply airflows for this node
+		Real64 SumSysMW; // sum of mdot*W for incoming supply airflows and temperature for this node
+		Real64 NonAirSystemResponse; // sum of convective system load
 		Real64 SysDepZoneLoadsLagged; // sum of system lagged load
 		Real64 SysDepZoneLoadsLaggedOld; // sum of system lagged load
 		Real64 AirCap; // Air storage term for energy balalce at each node
@@ -1260,10 +1260,10 @@ namespace DataRoomAirModel {
 		Real64 SumHmARa; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
 		Real64 SumHmARaW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
 		Real64 SumLinkM; // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
-		Real64 SumLinkMW; // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
+		Real64 SumLinkMW; // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model
 
 		// Default Constructor
-		RoomAirflowNetworkAirNodeNestedStruct( ) :
+		RoomAirflowNetworkAirNodeNestedStruct() :
 			ZoneVolumeFraction( 0.0 ),
 			HasSurfacesAssigned( false ),
 			HasIntGainsAssigned( false ),
@@ -1380,13 +1380,13 @@ namespace DataRoomAirModel {
 			Real64 const SumHA, // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
 			Real64 const SumHATsurf, // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
 			Real64 const SumHATref, // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
-			Real64 const SumLinkMCp, // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model  
-			Real64 const SumLinkMCpT, // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model 
-			Real64 const SumSysMCp, // sum of mdor*Cp for incoming supply airflows for this node 
-			Real64 const SumSysMCpT, // sum of mdor*Cp for incoming supply airflows and temperature for this node 
-			Real64 const SumSysM, // sum of mdot for incoming supply airflows for this node 
-			Real64 const SumSysMW, // sum of mdot*W for incoming supply airflows and temperature for this node 
-			Real64 const NonAirSystemResponse, // sum of convective system load 
+			Real64 const SumLinkMCp, // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model
+			Real64 const SumLinkMCpT, // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model
+			Real64 const SumSysMCp, // sum of mdor*Cp for incoming supply airflows for this node
+			Real64 const SumSysMCpT, // sum of mdor*Cp for incoming supply airflows and temperature for this node
+			Real64 const SumSysM, // sum of mdot for incoming supply airflows for this node
+			Real64 const SumSysMW, // sum of mdot*W for incoming supply airflows and temperature for this node
+			Real64 const NonAirSystemResponse, // sum of convective system load
 			Real64 const SysDepZoneLoadsLagged, // sum of system lagged load
 			Real64 const SysDepZoneLoadsLaggedOld, // sum of system lagged load
 			Real64 const AirCap, // Air storage term for energy balalce at each node
@@ -1397,7 +1397,7 @@ namespace DataRoomAirModel {
 			Real64 const SumHmARa, // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
 			Real64 const SumHmARaW, // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
 			Real64 const SumLinkM, // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
-			Real64 const SumLinkMW // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
+			Real64 const SumLinkMW // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model
 			) :
 		Name( Name ), // name of the node itself
 			ZoneVolumeFraction( ZoneVolumeFraction ), // Zone volume fraction applied to this specific node
@@ -1453,13 +1453,13 @@ namespace DataRoomAirModel {
 			SumHA( SumHA ), // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
 			SumHATsurf( SumHATsurf ), // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
 			SumHATref( SumHATref ), // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
-			SumLinkMCp( SumLinkMCp ), // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model  
-			SumLinkMCpT( SumLinkMCpT ), // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model 
-			SumSysMCp( SumSysMCp ), // sum of mdor*Cp for incoming supply airflows for this node 
-			SumSysMCpT( SumSysMCpT ), // sum of mdor*Cp for incoming supply airflows and temperature for this node 
-			SumSysM( SumSysM ), // sum of mdot for incoming supply airflows for this node 
-			SumSysMW( SumSysMW ), // sum of mdot*W for incoming supply airflows and temperature for this node 
-			NonAirSystemResponse( NonAirSystemResponse ), // sum of convective system load 
+			SumLinkMCp( SumLinkMCp ), // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model
+			SumLinkMCpT( SumLinkMCpT ), // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model
+			SumSysMCp( SumSysMCp ), // sum of mdor*Cp for incoming supply airflows for this node
+			SumSysMCpT( SumSysMCpT ), // sum of mdor*Cp for incoming supply airflows and temperature for this node
+			SumSysM( SumSysM ), // sum of mdot for incoming supply airflows for this node
+			SumSysMW( SumSysMW ), // sum of mdot*W for incoming supply airflows and temperature for this node
+			NonAirSystemResponse( NonAirSystemResponse ), // sum of convective system load
 			SysDepZoneLoadsLagged( SysDepZoneLoadsLagged ), // sum of system lagged load
 			SysDepZoneLoadsLaggedOld( SysDepZoneLoadsLaggedOld ), // sum of system lagged load
 			AirCap( AirCap ), // Air storage term for energy balalce at each node
@@ -1470,7 +1470,7 @@ namespace DataRoomAirModel {
 			SumHmARa( SumHmARa ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
 			SumHmARaW( SumHmARaW ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
 			SumLinkM( SumLinkM ), // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
-			SumLinkMW( SumLinkMW ) // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
+			SumLinkMW( SumLinkMW ) // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model
 
 		{}
 
@@ -1501,7 +1501,7 @@ namespace DataRoomAirModel {
 		int RAFNNum; // RAFN number
 
 		// Default Constructor
-		RoomAirflowNetworkInfoByZoneStruct( ) :
+		RoomAirflowNetworkInfoByZoneStruct() :
 			IsUsed( false ), // true. if RoomAirflowNetwork model used in zone
 			ZoneID( 0 ), // Index of Zone in Heat Balance
 			ActualZoneID( 0 ), // Index of controlled zones in ZoneCOnfigure
@@ -1575,7 +1575,7 @@ namespace DataRoomAirModel {
 	extern Array1D< CVDVParameters > SurfParametersCVDV; // Surface parameters
 	extern Array1D< TemperaturePatternStruct > RoomAirPattern; // user defined patterns ,various types
 	extern Array1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
-	extern Array1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info 
+	extern Array1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info
 
 } // DataRoomAirModel
 

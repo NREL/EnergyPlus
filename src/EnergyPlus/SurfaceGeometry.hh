@@ -119,7 +119,7 @@ namespace SurfaceGeometry {
 	// Clears the global data in HeatBalanceManager.
 	// Needed for unit tests, should not be normally called.
 	void
-	clear_state( );
+	clear_state();
 
 	void
 	SetupZoneGeometry( bool & ErrorsFound );

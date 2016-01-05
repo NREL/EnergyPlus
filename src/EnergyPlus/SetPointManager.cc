@@ -236,34 +236,34 @@ namespace SetPointManager {
 	int const iSPMType_TESScheduled( 30 );
 
 	int const NumValidSPMTypes( 30 );
-	Array1D_string const cValidSPMTypes( 
-		NumValidSPMTypes, { 
-			"SetpointManager:Scheduled", 
-			"SetpointManager:Scheduled:DualSetpoint", 
-			"SetpointManager:OutdoorAirReset", 
-			"SetpointManager:SingleZone:Reheat", 
-			"SetpointManager:SingleZone:Heating", 
-			"SetpointManager:SingleZone:Cooling", 
-			"SetpointManager:SingleZone:Humidity:Minimum", 
-			"SetpointManager:SingleZone:Humidity:Maximum", 
-			"SetpointManager:MixedAir", 
-			"SetpointManager:OutdoorAirPretreat", 
-			"SetpointManager:Warmest", 
-			"SetpointManager:Coldest", 
-			"SetpointManager:WarmestTemperatureFlow", 
-			"SetpointManager:ReturnAirBypassFlow", 
-			"SetpointManager:MultiZone:Cooling:Average", 
-			"SetpointManager:MultiZone:Heating:Average", 
-			"SetpointManager:MultiZone:MinimumHumidity:Average", 
-			"SetpointManager:MultiZone:MaximumHumidity:Average", 
-			"SetpointManager:MultiZone:Humidity:Minimum", 
-			"SetpointManager:MultiZone:Humidity:Maximum", 
-			"SetpointManager:FollowOutdoorAirTemperature", 
-			"SetpointManager:FollowSystemNodeTemperature", 
-			"SetpointManager:FollowGroundTemperature", 
-			"SetpointManager:CondenserEnteringReset", 
-			"SetpointManager:CondenserEnteringReset:Ideal", 
-			"SetpointManager:SingleZone:OneStageCooling", 
+	Array1D_string const cValidSPMTypes(
+		NumValidSPMTypes, {
+			"SetpointManager:Scheduled",
+			"SetpointManager:Scheduled:DualSetpoint",
+			"SetpointManager:OutdoorAirReset",
+			"SetpointManager:SingleZone:Reheat",
+			"SetpointManager:SingleZone:Heating",
+			"SetpointManager:SingleZone:Cooling",
+			"SetpointManager:SingleZone:Humidity:Minimum",
+			"SetpointManager:SingleZone:Humidity:Maximum",
+			"SetpointManager:MixedAir",
+			"SetpointManager:OutdoorAirPretreat",
+			"SetpointManager:Warmest",
+			"SetpointManager:Coldest",
+			"SetpointManager:WarmestTemperatureFlow",
+			"SetpointManager:ReturnAirBypassFlow",
+			"SetpointManager:MultiZone:Cooling:Average",
+			"SetpointManager:MultiZone:Heating:Average",
+			"SetpointManager:MultiZone:MinimumHumidity:Average",
+			"SetpointManager:MultiZone:MaximumHumidity:Average",
+			"SetpointManager:MultiZone:Humidity:Minimum",
+			"SetpointManager:MultiZone:Humidity:Maximum",
+			"SetpointManager:FollowOutdoorAirTemperature",
+			"SetpointManager:FollowSystemNodeTemperature",
+			"SetpointManager:FollowGroundTemperature",
+			"SetpointManager:CondenserEnteringReset",
+			"SetpointManager:CondenserEnteringReset:Ideal",
+			"SetpointManager:SingleZone:OneStageCooling",
 			"SetpointManager:SingleZone:OneStageHeating",
 			"SetpointManager:ReturnTemperature:ChilledWater",
 			"SetpointManager:ReturnTemperature:HotWater",
@@ -366,7 +366,7 @@ namespace SetPointManager {
 	void
 	clear_state()
 	{
-	
+
 		NumAllSetPtMgrs = 0 ; // Number of all Setpoint Managers found in input
 		NumSchSetPtMgrs = 0 ; // Number of Scheduled Setpoint Managers found in input
 		NumDualSchSetPtMgrs = 0 ; // Number of Scheduled Dual Setpoint Managers found in input
@@ -4590,10 +4590,10 @@ namespace SetPointManager {
 		//       DATE WRITTEN   Aug 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// Set the setpoint using a simple schedule, then modify the value based on TES simple controls logic
-		
+
 		// METHODOLOGY EMPLOYED:
 		// Modified schedule setpoint manager logic
 
@@ -4603,10 +4603,10 @@ namespace SetPointManager {
 		Real64 const OnVal( 0.5 );
 		int const CoolOpComp ( 1 ); // a component that cools only (chillers)
 		int const DualOpComp ( 2 ); // a component that heats or cools (ice storage tank)
-		
+
 		CurSchValOnPeak  = GetCurrentScheduleValue( this->SchedPtr );
 		CurSchValCharge = GetCurrentScheduleValue( this->SchedPtrCharge );
-		
+
 		if ( this->CompOpType == CoolOpComp ) { //this is some sort of chiller
 			if ( CurSchValOnPeak >= OnVal ) {
 				this->SetPt = this->NonChargeCHWTemp;
@@ -4618,7 +4618,7 @@ namespace SetPointManager {
 		} else if ( this->CompOpType == DualOpComp ) { // this is some sort of ice storage system
 			this->SetPt = this->NonChargeCHWTemp;
 		}
-		
+
 	}
 
 	void
@@ -4709,15 +4709,15 @@ namespace SetPointManager {
 
 	Real64
 	DefineOutsideAirSetPointManager::CalcSetPoint(
-		Real64 OutLowTemp, 
-		Real64 OutHighTemp, 
-		Real64 OutDryBulbTemp, 
-		Real64 SetTempAtOutLow, 
+		Real64 OutLowTemp,
+		Real64 OutHighTemp,
+		Real64 OutDryBulbTemp,
+		Real64 SetTempAtOutLow,
 		Real64 SetTempAtOutHigh
 	)
 	{
 		Real64 SetPt;
-		if ( OutLowTemp < OutHighTemp) { // && SetTempAtOutLow > SetTempAtOutHigh 
+		if ( OutLowTemp < OutHighTemp) { // && SetTempAtOutLow > SetTempAtOutHigh
 			if ( OutDryBulbTemp <= OutLowTemp ) {
 				SetPt = SetTempAtOutLow;
 			} else if ( OutDryBulbTemp >= OutHighTemp ) {
@@ -4733,7 +4733,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineSZReheatSetPointManager::calculate() 
+	DefineSZReheatSetPointManager::calculate()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4885,7 +4885,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineSZHeatingSetPointManager::calculate() 
+	DefineSZHeatingSetPointManager::calculate()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4951,7 +4951,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineSZCoolingSetPointManager::calculate() 
+	DefineSZCoolingSetPointManager::calculate()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6564,7 +6564,6 @@ namespace SetPointManager {
 
 		// Using/Aliasing
 		using DataEnvironment::CurMnDy;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutWetBulbTemp;
 		using CurveManager::CurveValue;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -6822,10 +6821,10 @@ namespace SetPointManager {
 	void
 	DefineIdealCondEntSetPointManager::setupSetPointAndFlags(
 		Real64 & TotEnergy,
-		Real64 & TotEnergyPre, 
-		Real64 & CondWaterSetPoint, 
-		Real64 & CondTempLimit, 
-		bool & RunOptCondEntTemp, 
+		Real64 & TotEnergyPre,
+		Real64 & CondWaterSetPoint,
+		Real64 & CondTempLimit,
+		bool & RunOptCondEntTemp,
 		bool & RunSubOptCondEntTemp,
 		bool & RunFinalOptCondEntTemp
 	) {
@@ -7147,7 +7146,7 @@ namespace SetPointManager {
 		int ChillerNum( this->ChillerIndexPlantSide ); // Chiller number
 		int ChilledPumpBranchNum( this->ChilledPumpBranchNum ); // Chilled water pump branch number
 		int ChilledPumpNum( this->ChilledPumpNum ); // Chilled water pump number
-		
+
 		// Tower and CW pump location, assumes supply side, and tower branch/comp nums are used directly instead of local variable copies
 		int TowerLoopNum( this->CondLoopNum ); // Tower loop number
 		int CondPumpBranchNum( this->CondPumpBranchNum ); // Condenser water pump branch number
@@ -7326,15 +7325,15 @@ namespace SetPointManager {
 		} // setpoint manger:scheduled
 
 		// Loop over all the Scheduled TES Setpoint Managers
-		
+
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchTESSetPtMgrs; ++SetPtMgrNum ) {
-			
+
 			// only one setpoint for each scheduled TES setpoint manager and its a temperature setpoint
 			NodeNum = SchTESSetPtMgr( SetPtMgrNum ).CtrlNodeNum; // Get the node number
 			Node( NodeNum ).TempSetPoint = SchTESSetPtMgr( SetPtMgrNum ).SetPt;
-			
+
 		} // setpoint manger:scheduledTES
-		
+
 		// Loop over all the Scheduled Dual Setpoint Managers
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum ) {
@@ -7930,7 +7929,7 @@ namespace SetPointManager {
 	void
 	ResetHumidityRatioCtrlVarType(
 		int const NodeNum
-	) 
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -7941,10 +7940,10 @@ namespace SetPointManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Resets setpoint control variable type to "Maximum Humidty Ratio" if control variable type
-		// is "Humidity Ratio". 
+		// is "Humidity Ratio".
 
 		// METHODOLOGY EMPLOYED:
-		// Cycle through all setpoint managers and find if the node has a "Humidity Ratio" control 
+		// Cycle through all setpoint managers and find if the node has a "Humidity Ratio" control
 		// variable type. This routine is called from "GetControllerInput" routine.  This reset is
 		// just to stop false warning message due to control variable type mismatch.
 
@@ -7970,7 +7969,7 @@ namespace SetPointManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SetPtMgrNum; // loop counter for each set point manager
 		int NumNode; // loop counter for each node and specific control type
-		int SetPtMgrNumPtr; // setpoint manager 
+		int SetPtMgrNumPtr; // setpoint manager
 		bool ResetCntrlVarType; // if true reset Hum Rat control var type to maxhumidity ratio
 
 		// First time called, get the input for all the setpoint managers
@@ -7978,7 +7977,7 @@ namespace SetPointManager {
 			GetSetPointManagerInputs();
 			GetInputFlag = false;
 		}
-		
+
 		ResetCntrlVarType = false;
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum ) {
@@ -7993,7 +7992,7 @@ namespace SetPointManager {
 				}
 			}
 		}
-	
+
 		SPMLoop_exit:;
 
 		if ( ResetCntrlVarType ) {
@@ -8195,36 +8194,36 @@ namespace SetPointManager {
 		//       DATE WRITTEN   August 2014
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
-		
+
 		// PURPOSE OF THIS SUBROUTINE
 		// Set up new scheduled TES setpoint managers based on plant control Simple TES
-		
+
 		// METHODOLOGY EMPLOYED:
 		// Set up internally created scheduled setpoint managers to control the setpoints
 		// of various ice storage equipment with the user having to do this manually.  The
 		// point is to provide a simpler input description and take care of logic internally.
-		
+
 		// REFERENCES:
 		// na
-		
+
 		// USE STATEMENTS:
-		
+
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-		
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorsFoundinTESSchSetup( false );
 		int NodeNum;
-		
+
 		NumSchTESSetPtMgrs += 1;
 		NumAllSetPtMgrs    += 1;
-		
+
 		// allocate/redimension structures for new item
 		if ( NumSchTESSetPtMgrs == 1 ) { // first time through--main structure not allocated yet
 			SchTESSetPtMgr.allocate( 1 );
@@ -8232,7 +8231,7 @@ namespace SetPointManager {
 			SchTESSetPtMgr.redimension( NumSchTESSetPtMgrs );
 		}
 		AllSetPtMgr.redimension( NumAllSetPtMgrs );
-		
+
 		// Set up the scheduled TES setpoint manager information
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).SchedPtr = SchedPtr;
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).SchedPtrCharge = SchedPtrCharge;
@@ -8240,7 +8239,7 @@ namespace SetPointManager {
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).ChargeCHWTemp = ChargeCHWTemp;
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).CompOpType = CompOpType;
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).CtrlNodeNum = ControlNodeNum;
-		
+
 		// Set up the all setpoint manager information for "verification" that no other setpoint manager controls the node that this new ones does
 		AllSetPtMgr( NumAllSetPtMgrs ).CtrlNodes.allocate( 1 );
 		AllSetPtMgr( NumAllSetPtMgrs ).CtrlNodes( 1 ) = SchTESSetPtMgr( NumSchTESSetPtMgrs ).CtrlNodeNum;
@@ -8248,7 +8247,7 @@ namespace SetPointManager {
 		AllSetPtMgr( NumAllSetPtMgrs ).SPMType = iSPMType_TESScheduled;
 		AllSetPtMgr( NumAllSetPtMgrs ).CtrlTypeMode = iCtrlVarType_Temp;
 		AllSetPtMgr( NumAllSetPtMgrs ).NumCtrlNodes = 1;
-		
+
 		// Now verify that there is no overlap (no other SPM uses the node of the new setpoint manager)
 		ErrorsFoundinTESSchSetup = false;
 		VerifySetPointManagers( ErrorsFoundinTESSchSetup );
@@ -8258,14 +8257,14 @@ namespace SetPointManager {
 		// Since all of the other setpoint managers not only been read and verified but also initialized, simulated, and updated,
 		// we must now also initialize, simulate, and update the current SchTESStPtMgr that was just added.  But the init and simulate
 		// steps are the same so we can call the simulate first.
-		
+
 		SchTESSetPtMgr( NumSchTESSetPtMgrs ).calculate();
-		
+
 		// Now update reusing code from Update routine specialized to only doing the current (new) setpoint manager and then we are done
-		
+
 		NodeNum = SchTESSetPtMgr( NumSchTESSetPtMgrs ).CtrlNodeNum; // Get the node number
 		Node( NodeNum ).TempSetPoint = SchTESSetPtMgr( NumSchTESSetPtMgrs ).SetPt;
-		
+
 	}   // end of SetUpNewScheduledTESSetPtMgr
 
 } // SetPointManager

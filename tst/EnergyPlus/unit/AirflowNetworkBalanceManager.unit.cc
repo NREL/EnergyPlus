@@ -104,15 +104,15 @@ namespace EnergyPlus {
 		MultizoneSurfaceData( 1 ).SurfNum = 1;
 		MultizoneSurfaceData( 2 ).SurfNum = 2;
 
-		CalcWindPressureCoeffs( );
+		CalcWindPressureCoeffs();
 		EXPECT_EQ( 1, MultizoneSurfaceData( 1 ).NodeNums( 2 ) );
 		EXPECT_EQ( 2, MultizoneSurfaceData( 2 ).NodeNums( 2 ) );
 		EXPECT_EQ( 1, MultizoneExternalNodeData( 1 ).CPVNum );
 		EXPECT_EQ( 3, MultizoneExternalNodeData( 2 ).CPVNum );
 
-		MultizoneSurfaceData.deallocate( );
-		MultizoneExternalNodeData.deallocate( );
-		Surface.deallocate( );
+		MultizoneSurfaceData.deallocate();
+		MultizoneExternalNodeData.deallocate();
+		Surface.deallocate();
 	}
 
 	TEST_F( EnergyPlusFixture, TestZoneVentingSch ) {
@@ -209,13 +209,13 @@ namespace EnergyPlus {
 
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
-		GetAirflowNetworkInput( );
+		GetAirflowNetworkInput();
 
 		EXPECT_EQ( 2, MultizoneZoneData( 1 ).VentingSchNum );
 
-		Zone.deallocate( );
-		Surface.deallocate( );
-		SurfaceWindow.deallocate( );
+		Zone.deallocate();
+		Surface.deallocate();
+		SurfaceWindow.deallocate();
 
 	}
 }

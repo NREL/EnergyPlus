@@ -145,7 +145,7 @@ TEST( VentilatedSlab, CalcVentilatedSlabCoilOutputTest )
 	EXPECT_TRUE( PowerMet < 0.0 );
 
 	// Deallocate everything
-	VentSlab.deallocate( );
-	Node.deallocate( );
+	VentSlab.deallocate();
+	Node.deallocate();
 
 }

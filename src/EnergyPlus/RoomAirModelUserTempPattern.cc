@@ -61,7 +61,7 @@
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <RoomAirModelUserTempPattern.hh>
@@ -311,7 +311,7 @@ namespace RoomAirModelUserTempPattern {
 		AirPatternZoneInfo( ZoneNum ).Tstat = MAT( ZoneNum );
 		AirPatternZoneInfo( ZoneNum ).Tleaving = MAT( ZoneNum );
 		AirPatternZoneInfo( ZoneNum ).Texhaust = MAT( ZoneNum );
-		AirPatternZoneInfo( ZoneNum ).Surf.TadjacentAir() = MAT( ZoneNum );
+		for ( auto & e : AirPatternZoneInfo( ZoneNum ).Surf ) e.TadjacentAir = MAT( ZoneNum );
 
 		// the only input this method needs is the zone MAT or ZT or ZTAV  ?  (original was ZT)
 		AirPatternZoneInfo( ZoneNum ).TairMean = MAT( ZoneNum ); // this is lagged from previous corrector result
@@ -381,7 +381,7 @@ namespace RoomAirModelUserTempPattern {
 			AirPatternZoneInfo( ZoneNum ).Tstat = AirPatternZoneInfo( ZoneNum ).TairMean;
 			AirPatternZoneInfo( ZoneNum ).Tleaving = AirPatternZoneInfo( ZoneNum ).TairMean;
 			AirPatternZoneInfo( ZoneNum ).Texhaust = AirPatternZoneInfo( ZoneNum ).TairMean;
-			AirPatternZoneInfo( ZoneNum ).Surf.TadjacentAir() = AirPatternZoneInfo( ZoneNum ).TairMean;
+			for ( auto & e : AirPatternZoneInfo( ZoneNum ).Surf ) e.TadjacentAir = AirPatternZoneInfo( ZoneNum ).TairMean;
 
 			return;
 
@@ -389,7 +389,7 @@ namespace RoomAirModelUserTempPattern {
 
 			CurntPatternKey = GetCurrentScheduleValue( AirPatternZoneInfo( ZoneNum ).PatternSchedID );
 
-			CurPatrnID = FindNumberInList( CurntPatternKey, RoomAirPattern.PatrnID(), NumAirTempPatterns );
+			CurPatrnID = FindNumberInList( CurntPatternKey, RoomAirPattern, &TemperaturePatternStruct::PatrnID );
 
 			if ( CurPatrnID == 0 ) {
 				// throw error here ? way to test schedules before getting to this point?
@@ -872,6 +872,7 @@ namespace RoomAirModelUserTempPattern {
 		using DataSurfaces::SurfaceClass_Floor;
 		using DataSurfaces::SurfaceClass_Wall;
 		using DataHeatBalance::Zone;
+		using DataVectorTypes::Vector;
 		using General::RoundSigDigits;
 		using DataErrorTracking::TotalRoomAirPatternTooLow;
 		using DataErrorTracking::TotalRoomAirPatternTooHigh;
@@ -923,8 +924,8 @@ namespace RoomAirModelUserTempPattern {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Floor ) {
 				// Use Average Z for surface, more important for roofs than floors...
 				++FloorCount;
-				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+				Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
+				Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z );
 				ZFlrAvg += ( Z1 + Z2 ) / 2.0;
 			}
 			if ( Surface( SurfNum ).Class == SurfaceClass_Wall ) {
@@ -934,8 +935,8 @@ namespace RoomAirModelUserTempPattern {
 					ZMax = Surface( SurfNum ).Vertex( 1 ).z;
 					ZMin = ZMax;
 				}
-				ZMax = max( ZMax, maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() ) );
-				ZMin = min( ZMin, minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() ) );
+				ZMax = max( ZMax, maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z ) );
+				ZMin = min( ZMin, minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ), &Vector::z ) );
 			}
 		}
 		if ( FloorCount > 0.0 ) {
@@ -946,10 +947,10 @@ namespace RoomAirModelUserTempPattern {
 		ZoneZorig = ZFlrAvg; // Z floor  [M]
 		ZoneCeilHeight = Zone( thisZone ).CeilingHeight;
 
-		//first check if some basic things are reasonable
+		// first check if some basic things are reasonable
 
-		SurfMinZ = minval( Surface( thisHBsurf ).Vertex.z() );
-		SurfMaxZ = maxval( Surface( thisHBsurf ).Vertex.z() );
+		SurfMinZ = minval( Surface( thisHBsurf ).Vertex, &Vector::z );
+		SurfMaxZ = maxval( Surface( thisHBsurf ).Vertex, &Vector::z );
 
 		if ( SurfMinZ < ( ZoneZorig - TolValue ) ) {
 			if ( DisplayExtraWarnings ) {
@@ -1204,11 +1205,15 @@ namespace RoomAirModelUserTempPattern {
 		// set thermostat reading for air system .
 		TempTstatAir( ZoneNum ) = AirPatternZoneInfo( ZoneNum ).Tstat;
 
-		// set results for all surface (note array assignments instead of looping)
-		TempEffBulkAir( {SurfFirst,SurfLast} ) = AirPatternZoneInfo( ZoneNum ).Surf.TadjacentAir();
+		// set results for all surface
+		for ( int i = SurfFirst, j = 1; i <= SurfLast; ++i, ++j ) {
+			TempEffBulkAir( i ) = AirPatternZoneInfo( ZoneNum ).Surf( j ).TadjacentAir;
+		}
 
 		// set flag for reference air temperature mode
-		Surface( {SurfFirst,SurfLast} ).TAirRef() = AdjacentAirTemp;
+		for ( int i = SurfFirst; i <= SurfLast; ++i ) {
+			Surface( i ).TAirRef = AdjacentAirTemp;
+		}
 
 	}
 

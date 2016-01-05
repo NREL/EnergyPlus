@@ -57,7 +57,6 @@
 // in binary and source code form.
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -224,10 +223,12 @@ namespace DemandManager {
 					} // ListNum
 
 					// Clear demand manager variables
-					DemandMgr.Active() = false;
-					DemandMgr.ElapsedTime() = 0;
-					DemandMgr.ElapsedRotationTime() = 0;
-					DemandMgr.RotatedLoadNum() = 0;
+					for ( auto & e : DemandMgr ) {
+						e.Active = false;
+						e.ElapsedTime = 0;
+						e.ElapsedRotationTime = 0;
+						e.RotatedLoadNum = 0;
+					}
 				}
 				ClearHistory = false;
 			}
@@ -1218,7 +1219,7 @@ namespace DemandManager {
 
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr.Name(), MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";

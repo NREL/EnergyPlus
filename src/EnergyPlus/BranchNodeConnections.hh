@@ -69,6 +69,11 @@
 
 namespace EnergyPlus {
 
+// Forward
+namespace DataBranchNodeConnections {
+	struct NodeConnectionDef;
+}
+
 namespace BranchNodeConnections {
 
 	// Data
@@ -215,27 +220,13 @@ namespace BranchNodeConnections {
 	);
 
 	void
-	FindAllNumbersInList(
+	FindAllNodeNumbersInList(
 		int const WhichNumber,
-		Array1A_int const ListOfItems,
+		Array1< DataBranchNodeConnections::NodeConnectionDef > const & NodeConnections,
 		int const NumItems,
 		int & CountOfItems, // Number of items found
 		Array1D_int & AllNumbersInList // Index array to all numbers found
 	);
-
-	template< typename A >
-	inline
-	void
-	FindAllNumbersInList(
-		int const WhichNumber,
-		MArray1< A, int > const & ListOfItems,
-		int const NumItems,
-		int & CountOfItems, // Number of items found
-		Array1D_int & AllNumbersInList // Index array to all numbers found
-	)
-	{
-		FindAllNumbersInList( WhichNumber, Array1D_int( ListOfItems ), NumItems, CountOfItems, AllNumbersInList );
-	}
 
 } // BranchNodeConnections
 

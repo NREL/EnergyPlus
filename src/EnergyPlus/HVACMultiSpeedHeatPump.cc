@@ -146,7 +146,6 @@ namespace HVACMultiSpeedHeatPump {
 	using DataEnvironment::StdRhoAir;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::OutDryBulbTemp;
-	using DataEnvironment::OutWetBulbTemp;
 	using DataEnvironment::OutHumRat;
 	using DataEnvironment::CurMnDy;
 	using DataEnvironment::EnvironmentName;
@@ -2165,12 +2164,14 @@ namespace HVACMultiSpeedHeatPump {
 		CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, On, 1, 0.0, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 
 		// If unit is scheduled OFF, setpoint is equal to inlet node temperature.
-		MSHeatPump.TotHeatEnergyRate() = 0.0;
-		MSHeatPump.SensHeatEnergyRate() = 0.0;
-		MSHeatPump.LatHeatEnergyRate() = 0.0;
-		MSHeatPump.TotCoolEnergyRate() = 0.0;
-		MSHeatPump.SensCoolEnergyRate() = 0.0;
-		MSHeatPump.LatCoolEnergyRate() = 0.0;
+		for ( auto & e : MSHeatPump ) {
+			e.TotHeatEnergyRate = 0.0;
+			e.SensHeatEnergyRate = 0.0;
+			e.LatHeatEnergyRate = 0.0;
+			e.TotCoolEnergyRate = 0.0;
+			e.SensCoolEnergyRate = 0.0;
+			e.LatCoolEnergyRate = 0.0;
+		}
 
 		//!!LKL Discrepancy with < 0
 		if ( GetCurrentScheduleValue( MSHeatPump( MSHeatPumpNum ).AvaiSchedPtr ) == 0.0 ) {

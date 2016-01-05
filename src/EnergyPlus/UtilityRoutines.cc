@@ -69,7 +69,6 @@ extern "C" {
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/char.functions.hh>
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>

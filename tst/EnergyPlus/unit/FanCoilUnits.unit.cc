@@ -103,7 +103,6 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::WaterCoils;
 
-using DataEnvironment::OutDryBulbTemp;
 using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 using General::TrimSigDigits;
 using MixedAir::OAMixer;
@@ -281,7 +280,7 @@ namespace EnergyPlus {
 		// heating load only
 		ColdWaterMassFlowRate = 0.0;
 		HotWaterMassFlowRate = 1.0;
-		
+
 		Node( OAMixer( 1 ).RetNode ).MassFlowRate = AirMassFlow;
 		Node( OAMixer( 1 ).RetNode ).MassFlowRateMax = MaxAirMassFlow;
 
@@ -588,7 +587,7 @@ namespace EnergyPlus {
 
 		AirMassFlow = 0.60;
 		MaxAirMassFlow = 0.60;
-		
+
 		// cooling load only
 		HotWaterMassFlowRate = 0.0;
 		ColdWaterMassFlowRate = 1.0;
