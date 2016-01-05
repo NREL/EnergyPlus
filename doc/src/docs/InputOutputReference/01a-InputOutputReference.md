@@ -755,7 +755,7 @@ Table 1. Values for "Terrain"
 
 #### Warmup Convergence
 
-The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisifed too early and you may not get the results you expect from the actual simulation.
+The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions: temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisifed too early and you may not get the results you expect from the actual simulation.
 
 #### Field: Loads Convergence Tolerance Value
 
@@ -8722,7 +8722,9 @@ EnergyPlus allows for several surface types:
 
 - **Shading:Zone:Detailed**
 
-Each of the preceding surfaces has “correct” geometry specifications. BuildingSurface and Fenestration surfaces (heat transfer surfaces) are used to describe the important elements of the building (walls, roofs, floors, windows, doors) that will determine the interactions of the building surfaces with the outside environment parameters and the internal space requirements. These surfaces are also used to represent “interzone” heat transfer. During specification of surfaces, several “outside” environments may be chosen:
+Each of the preceding surfaces has “correct” geometry specifications. BuildingSurface and Fenestration surfaces (heat transfer surfaces) are used to describe the important elements of the building (walls, roofs, floors, windows, doors) that will determine the interactions of the building surfaces with the outside environment parameters and the internal space requirements. These surfaces are also used to represent “interzone” heat transfer. All surfaces are modeled as a thin plane (with no thickness) except that material thicknesses are taken into account for heat transfer calculations. 
+
+During specification of surfaces, several “outside” environments may be chosen:
 
 - **Ground** – when the surface is in touch with the ground (e.g. slab floors)
 
@@ -8754,7 +8756,7 @@ Each of the preceding surfaces has “correct” geometry specifications. Buildi
 
 - The zone that contains the other surface that is adjactent to this surface but is not entered in input.
 
-Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coeffients neither inside nor outside are used in the description – these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction.
+Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coeffients neither inside nor outside are used in the description – these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction. When a surface is connected as the outside boundary condition for another surface, the two surfaces may be in the same plane, or they may be separated to imply thickness.
 
 **Shading** surfaces are used to describe aspects of the site which do not directly impact the physical interactions of the environmental parameters but may significantly shade the building during specific hours of the day or time so the year (e.g. trees, bushes, mountains, nearby buildings which aren’t being simulated as part of this facility, etc.)
 
@@ -17305,7 +17307,7 @@ This field is the name of the schedule that approximates the amount of air movem
 
 #### Field: Thermal Comfort Model Type (up to 5 allowed)
 
-The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55,, and AdaptiveCEN15251, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, and the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251 results for this particular people statement. Note that since up to five models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all five models if desired. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. For descriptions of the thermal comfort calculations, see the Engineering Reference document.
+The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55,, and AdaptiveCEN15251, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, and the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251 results for this particular people statement. AdaptiveASH55 is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 33.5C.  AdaptiveCEN15251 is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 30.0C. Note that since up to five models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all five models if desired. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. For descriptions of the thermal comfort calculations, see the Engineering Reference document.
 
 The following IDF example allows for a maximum of 31 people with scheduled occupancy of “Office Occupancy”, 60% radiant using an Activity Schedule of “Activity Sch”. The example allows for thermal comfort reporting.
 
@@ -17597,11 +17599,11 @@ This field is the “thermal sensation vote” (TSV) calculated using the KSU tw
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model 90% Acceptability Status []
 
-This field is to report whether the operative temperature falls into the 90% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the 90% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status [ ]
 
-This field is to report whether the operative temperature falls into the 80% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the 80% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature [C]
 
@@ -17611,27 +17613,27 @@ If the .epw file is used, the field reports the simple running average of the da
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature [C]
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80% acceptability limits for indoor operative temperature are defined as no greater than 2.5 degrees C from the adaptive comfort temperature. The 90% acceptability limits are defined as no greater than 3.5 degrees C from the adaptive comfort temperature.
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80% acceptability limits for indoor operative temperature are defined as no greater than 3.5 degrees C from the adaptive comfort temperature. The 90% acceptability limits are defined as no greater than 2.5 degrees C from the adaptive comfort temperature. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status
 
-This field is to report whether the operative temperature falls into the Category I (90% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category I (90% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status
 
-This field is to report whether the operative temperature falls into the Category II (80% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category II (80% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status
 
-This field is to report whether the operative temperature falls into the Category III (65% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category III (65% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature
 
-This field reports the weighted average of the outdoor air temperature of the previous five days, an input parameter for the CEN-15251 adaptive comfort model.
+This field reports the weighted average of the outdoor air temperature of the previous seven days, an input parameter for the CEN-15251 adaptive comfort model.
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Temperature
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively.
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 ### Simplified ASHRAE 55-2004 Graph Related Outputs
 

@@ -170,6 +170,20 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
   ADD_SUBDIRECTORY(tst/jsoncpp/unit)
+
+  option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
+
+  if (BUILD_PERFORMANCE_TESTS)
+
+    if (UNIX AND NOT APPLE)
+      option( VALGRIND_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via valgrind / callgrind" OFF )
+
+      if (VALGRIND_ANALYZE_PERFORMANCE_TESTS)
+        find_program(VALGRIND NAMES valgrind PATH /usr/bin /usr/local/bin)
+      endif()
+    endif()
+    ADD_SUBDIRECTORY(performance_tests)
+  endif()
 endif()
 
 configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )

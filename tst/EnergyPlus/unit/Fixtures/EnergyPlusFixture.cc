@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -10,6 +68,7 @@
 // A to Z order
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -53,6 +112,7 @@
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
@@ -107,7 +167,7 @@ namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUp() {
 		clear_all_states();
-		
+
 		show_message();
 
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
@@ -156,6 +216,7 @@ namespace EnergyPlus {
 	{
 		// A to Z order
 		BranchInputManager::clear_state();
+		ChillerIndirectAbsorption::clear_state();
 		CondenserLoopTowers::clear_state();
 		CurveManager::clear_state();
 		DataAirLoop::clear_state();
@@ -195,6 +256,7 @@ namespace EnergyPlus {
 		HeatPumpWaterToWaterSimple::clear_state();
 		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
+		HVACControllers::clear_state();
 		HVACManager::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
@@ -333,6 +395,48 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
+	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
+	{
+		auto const has_output = this->eso_stream->str().size() > 0;
+		if ( reset_stream ) this->eso_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_mtr_output( bool reset_stream )
+	{
+		auto const has_output = this->mtr_stream->str().size() > 0;
+		if ( reset_stream ) this->mtr_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_echo_output( bool reset_stream )
+	{
+		auto const has_output = this->echo_stream->str().size() > 0;
+		if ( reset_stream ) this->echo_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_err_output( bool reset_stream )
+	{
+		auto const has_output = this->err_stream->str().size() > 0;
+		if ( reset_stream ) this->err_stream->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_cout_output( bool reset_stream )
+	{
+		auto const has_output = this->m_cout_buffer->str().size() > 0;
+		if ( reset_stream ) this->m_cout_buffer->str( std::string() );
+		return has_output;
+	}
+
+	bool EnergyPlusFixture::has_cerr_output( bool reset_stream )
+	{
+		auto const has_output = this->m_cerr_buffer->str().size() > 0;
+		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
+		return has_output;
+	}
+
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
 		if ( idf_snippet.empty() ) {
 			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
@@ -397,7 +501,7 @@ namespace EnergyPlus {
 		ProcessInputDataFile( *idf_stream );
 
 		ListOfSections.allocate( NumSectionDefs );
-		ListOfSections = SectionDef( { 1, NumSectionDefs } ).Name();
+		for ( int i = 1; i <= NumSectionDefs; ++i ) ListOfSections( i ) = SectionDef( i ).Name;
 
 		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
 		DataIPShortCuts::cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
@@ -562,7 +666,7 @@ namespace EnergyPlus {
 
 		if( !errors_found ) {
 			ListOfObjects.allocate( NumObjectDefs );
-			ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
+			for ( int i = 1; i <= NumObjectDefs; ++i ) ListOfObjects( i ) = ObjectDef( i ).Name;
 			if ( DataSystemVariables::SortedIDD ) {
 				iListOfObjects.allocate( NumObjectDefs );
 				SortAndStringUtilities::SetupAndSort( ListOfObjects, iListOfObjects );
