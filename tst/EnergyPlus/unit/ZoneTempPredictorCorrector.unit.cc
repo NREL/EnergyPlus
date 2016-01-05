@@ -105,11 +105,8 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataRoomAirModel;
 
-TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
+TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 {
-	ShowMessage( "Begin Test: ZoneTempPredictorCorrector, CorrectZoneHumRatTest" );
-
-	InitializePsychRoutines();
 
 	TimeStepSys = 15.0 / 60.0; // System timestep in hours
 

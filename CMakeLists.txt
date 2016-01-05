@@ -59,6 +59,7 @@ endif()
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
+option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
 option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
@@ -370,4 +371,3 @@ endif()
 if (BUILD_DOCS)
   add_subdirectory(doc/src)
 endif()
-

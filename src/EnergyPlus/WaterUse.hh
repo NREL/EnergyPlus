@@ -521,6 +521,9 @@ namespace WaterUse {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimulateWaterUse( bool const FirstHVACIteration );
 
 	void

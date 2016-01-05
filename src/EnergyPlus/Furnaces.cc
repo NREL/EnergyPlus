@@ -278,6 +278,32 @@ namespace Furnaces {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumFurnaces = 0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		ModifiedHeatCoilLoad = 0.0;
+		OnOffAirFlowRatioSave = 0.0;
+		OnOffFanPartLoadFractionSave = 0.0;
+		CompOnMassFlow = 0.0;
+		CompOffMassFlow = 0.0;
+		CompOnFlowRatio = 0.0;
+		CompOffFlowRatio = 0.0;
+		FanSpeedRatio = 0.0;
+		CoolHeatPLRRat = 1.0;
+		HeatingLoad = false;
+		CoolingLoad = false;
+		EconomizerFlag = false;
+		AirLoopPass = 0;
+		HPDehumidificationLoadFlag = false;
+		TempSteamIn = 100.0;
+		SaveCompressorPLR = 0.0;
+		CurrentModuleObject = "";
+		Furnace.deallocate();
+	}
+
+	void
 	SimFurnace(
 		std::string const & FurnaceName,
 		bool const FirstHVACIteration,

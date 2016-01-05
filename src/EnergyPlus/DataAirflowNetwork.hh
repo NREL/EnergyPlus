@@ -2290,6 +2290,9 @@ namespace DataAirflowNetwork {
 	extern Array1D< DisSysCompCPDProp > DisSysCompCPDData;
 	extern Array1D< AiflowNetworkReportProp > AirflowNetworkReportData;
 
+	void
+	clear_state();
+
 } // DataAirflowNetwork
 
 } // EnergyPlus

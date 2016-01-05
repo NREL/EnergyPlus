@@ -69,12 +69,14 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/InputProcessor.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::SortAndStringUtilities;
 using namespace EnergyPlus::InputProcessor;
 using namespace ObjexxFCL;
 
-TEST( SortAndStringUtilitiesTest, Basic )
+TEST_F( EnergyPlusFixture, SortAndStringUtilitiesTest_Basic )
 {
 	ShowMessage( "Begin Test: SortAndStringUtilitiesTest, Basic" );
 
@@ -84,7 +86,7 @@ TEST( SortAndStringUtilitiesTest, Basic )
 	EXPECT_TRUE( eq( Array1D_int( { 4, 5, 2, 3, 1 } ), iAlphas ) );
 }
 
-TEST( SortAndStringUtilitiesTest, findItemInSortedListUnderscoreTest)
+TEST_F( EnergyPlusFixture, SortAndStringUtilitiesTest_findItemInSortedListUnderscoreTest)
 {
 	static Array1D_string ListOfObjects; // stored variable names
 	static Array1D_int iListOfObjects;

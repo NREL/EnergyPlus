@@ -65,21 +65,19 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Psychrometrics.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace DataGlobals;
 using namespace EnergyPlus::VentilatedSlab;
 using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::Psychrometrics;
 
 
-TEST( VentilatedSlab, CalcVentilatedSlabCoilOutputTest )
+TEST_F( EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest )
 {
-	ShowMessage( "Begin Test: VentilatedSlab, CalcVentilatedSlabCoilOutputTest" );
 
-	InitializePsychRoutines();
 	BeginEnvrnFlag = false;
 	Real64 PowerMet = 0.0;
 	Real64 LatOutputProvided = 0.0;

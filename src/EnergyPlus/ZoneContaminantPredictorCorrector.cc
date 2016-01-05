@@ -158,6 +158,19 @@ namespace ZoneContaminantPredictorCorrector {
 	// Functions
 
 	void
+	clear_state()
+	{
+		GetZoneAirContamInputFlag = true;
+		TotGCGenConstant = 0;
+		TotGCGenPDriven = 0;
+		TotGCGenCutoff = 0;
+		TotGCGenDecay = 0;
+		TotGCBLDiff = 0;
+		TotGCDVS = 0;
+		TotGCDRS = 0;
+	}
+
+	void
 	ManageZoneContaminanUpdates(
 		int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
 		bool const ShortenTimeStepSys,

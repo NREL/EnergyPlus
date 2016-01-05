@@ -168,6 +168,9 @@ namespace DataBranchAirLoopPlant {
 	// Object Data
 	extern Array1D< PlantPressureCurveData > PressureCurve;
 
+	void
+	clear_state();
+
 } // DataBranchAirLoopPlant
 
 } // EnergyPlus

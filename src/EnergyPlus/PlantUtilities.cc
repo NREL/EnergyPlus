@@ -152,7 +152,8 @@ namespace PlantUtilities {
 
 	// Functions
 	void
-	clear_state(){
+	clear_state()
+	{
 		CriteriaChecks.deallocate();
 	}
 

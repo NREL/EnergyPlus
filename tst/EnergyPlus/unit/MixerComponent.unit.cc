@@ -62,15 +62,15 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::MixerComponent;
 
-TEST(MixerComponent, GetZoneMixerIndex)
+TEST_F( EnergyPlusFixture, GetZoneMixerIndex )
 {
-	ShowMessage( "Begin Test: MixerComponent, GetZoneMixerIndex" );
 	// locals
 	std::string CurrentModuleObject;
 	std::string LINE;
@@ -79,7 +79,6 @@ TEST(MixerComponent, GetZoneMixerIndex)
 	// set some variables
 	CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
 	NumMixers = 3;
-	GetInputFlag = false;
 	errFlag = false;
 	// allocate needed arrays
 	MixerCond.allocate( NumMixers );

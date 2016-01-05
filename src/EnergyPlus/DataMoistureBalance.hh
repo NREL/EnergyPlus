@@ -117,6 +117,9 @@ namespace DataMoistureBalance {
 	extern Array1D< Real64 > HGrndFD; // Ground Convection Coefficient
 	extern Array1D< Real64 > HAirFD; // Air Convection Coefficient
 
+	void
+	clear_state();
+
 } // DataMoistureBalance
 
 } // EnergyPlus

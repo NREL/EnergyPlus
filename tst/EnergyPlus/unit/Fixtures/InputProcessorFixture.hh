@@ -72,12 +72,12 @@ namespace EnergyPlus {
 	protected:
 		static void SetUpTestCase() { }
 		static void TearDownTestCase() { }
-		
+
 		virtual void SetUp() {
 			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
 		}
 
-		virtual void TearDown() {			
+		virtual void TearDown() {
 			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 		}
 

@@ -114,6 +114,9 @@ namespace WindowEquivalentLayer {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	InitEquivalentLayerWindowCalculations();
 
 	void

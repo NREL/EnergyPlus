@@ -212,6 +212,21 @@ namespace FanCoilUnits {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumFanCoils = 0;
+		Num4PipeFanCoils = 0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		GetFanCoilInputFlag = true;
+		FanFlowRatio = 0.0;
+		HeatingLoad = false;
+		CoolingLoad = false;
+		FanCoil.deallocate();
+		FanCoilNumericFields.deallocate();
+	}
+
+	void
 	SimFanCoilUnit(
 		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served

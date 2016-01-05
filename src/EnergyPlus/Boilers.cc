@@ -180,6 +180,21 @@ namespace Boilers {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumBoilers = 0;
+		FuelUsed = 0.0;
+		ParasiticElecPower = 0.0;
+		BoilerLoad = 0.0;
+		BoilerMassFlowRate = 0.0;
+		BoilerOutletTemp = 0.0;
+		BoilerPLR = 0.0;
+		CheckEquipName.deallocate();
+		Boiler.deallocate();
+		BoilerReport.deallocate();
+	}
+
+	void
 	SimBoiler(
 		std::string const & EP_UNUSED( BoilerType ), // boiler type (used in CASE statement)
 		std::string const & BoilerName, // boiler identifier

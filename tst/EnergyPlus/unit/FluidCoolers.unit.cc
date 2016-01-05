@@ -61,6 +61,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 // EnergyPlus Headers
 #include <EnergyPlus/FluidCoolers.hh>
 #include <DataSizing.hh>
@@ -73,9 +75,8 @@ using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace ObjexxFCL;
 
-TEST( TwoSpeedFluidCoolerInput, Test1 )
+TEST_F( EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1 )
 {
-	ShowMessage( "Begin Test: TwoSpeedFluidCoolerInput, Test1" );
 
 	using DataSizing::AutoSize;
 	int StringArraySize = 20;
@@ -140,8 +141,8 @@ TEST( TwoSpeedFluidCoolerInput, Test1 )
 
 	SimpleFluidCooler.deallocate();
 }
-TEST( TwoSpeedFluidCoolerInput, Test2 ) {
-	ShowMessage( "Begin Test: TwoSpeedFluidCoolerInput, Test2" );
+
+TEST_F( EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test2 ) {
 
 	using DataSizing::AutoSize;
 	int StringArraySize = 20;
@@ -200,10 +201,8 @@ TEST( TwoSpeedFluidCoolerInput, Test2 ) {
 }
 
 
-TEST( SingleSpeedFluidCoolerInput, Test3 )
+TEST_F( EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3 )
 {
-	ShowMessage( "Begin Test: SingleSpeedFluidCoolerInput, Test3" );
-
 	using DataSizing::AutoSize;
 	int StringArraySize = 20;
 	Array1D_string cNumericFieldNames;
@@ -258,9 +257,4 @@ TEST( SingleSpeedFluidCoolerInput, Test3 )
 	testResult = TestFluidCoolerSingleSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
 	EXPECT_TRUE( testResult ); // error message triggered
 
-
-	SimpleFluidCooler.deallocate();
-	cNumericFieldNames.deallocate();
-	cAlphaFieldNames.deallocate();
-	AlphArray.deallocate();
 }

@@ -140,6 +140,9 @@ namespace DirectAirManager {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimDirectAir(
 		std::string const & EquipName,
 		int const ControlledZoneNum,

@@ -134,6 +134,14 @@ namespace DirectAirManager {
 	// Object Data
 	Array1D< DirectAirProps > DirectAir;
 
+	void
+	clear_state()
+	{
+		NumDirectAir = 0;
+		CheckEquipName.deallocate();
+		DirectAir.deallocate();
+	}
+
 	// Functions
 
 	void

@@ -163,13 +163,6 @@ namespace WindowComplexManager {
 	// MODULE VARIABLE DECLARATIONS:
 
 	int NumComplexWind( 0 ); // Total number of complex windows
-	//Debug
-	Array2D_int DbgIBm( 60, 24 );
-	Array2D< Real64 > DbgTheta( 60, 24 );
-	Array2D< Real64 > DbgPhi( 60, 24 );
-	Real64 DdbgTheta;
-	Real64 DdbgPhi;
-	//EndDebug
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
 
@@ -179,6 +172,15 @@ namespace WindowComplexManager {
 	Array2D< WindowStateIndex > WindowStateList;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumComplexWind = 0;
+		BasisList.deallocate();
+		WindowList.deallocate();
+		WindowStateList.deallocate();
+	}
 
 	void
 	InitBSDFWindows()

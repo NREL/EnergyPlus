@@ -100,7 +100,7 @@ TEST( OutputReportTabularTest, ConfirmSetUnitsStyleFromString )
 	EXPECT_EQ( unitsStyleNotFound, SetUnitsStyleFromString( "qqq" ) );
 }
 
-TEST( OutputReportTabularTest, Basic )
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_Basic )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, Basic" );
 
@@ -173,7 +173,7 @@ TEST(OutputReportTabularTest, ConfirmWaterConversion)
 
 }
 
-TEST( OutputReportTabularTest, GetUnitConversion )
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, GetUnitConversion" );
 

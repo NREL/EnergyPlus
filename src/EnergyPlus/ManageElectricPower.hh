@@ -1005,6 +1005,9 @@ namespace ManageElectricPower {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManageElectricLoadCenters(
 		bool const FirstHVACIteration,
 		bool & SimElecCircuits, // simulation convergence flag

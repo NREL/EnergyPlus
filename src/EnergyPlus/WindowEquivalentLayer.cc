@@ -181,6 +181,13 @@ namespace WindowEquivalentLayer {
 	// Functions
 
 	void
+	clear_state()
+	{
+		CFSDiffAbsTrans.deallocate();
+		EQLDiffPropFlag.deallocate();
+	}
+
+	void
 	InitEquivalentLayerWindowCalculations()
 	{
 
