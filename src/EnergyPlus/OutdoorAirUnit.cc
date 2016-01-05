@@ -2351,26 +2351,6 @@ namespace OutdoorAirUnit {
 
 	}
 
-<<<<<<< HEAD
-=======
-	// Clears the global data in OutdoorAirUnit.
-	// Needed for unit tests, should not be normally called.
-	void
-		clear_state()
-	{
-
-		NumOfOAUnits = 0;
-		OAMassFlowRate = 0.0;
-		GetOutdoorAirUnitInputFlag = true;
-
-		MySizeFlag.deallocate();
-		CheckEquipName.deallocate();
-		MyOneTimeErrorFlag.deallocate();
-		OutAirUnit.deallocate();
-
-	}
-
->>>>>>> develop
 	//*****************************************************************************************
 
 } // OutdoorAirUnit

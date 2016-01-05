@@ -113,13 +113,6 @@ protected:
 	virtual void SetUp() {
 		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
 
-<<<<<<< HEAD
-=======
-public:
-
-	RoomAirflowNetworkTest() // Setup global state
-	{
->>>>>>> develop
 		CurZoneEqNum = 0;
 		CurSysNum = 0;
 		CurOASysNum = 0;
@@ -150,37 +143,8 @@ public:
 		RAFN.allocate( NumOfZones );
 	}
 
-<<<<<<< HEAD
 	virtual void TearDown() {
 		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
-=======
-	~RoomAirflowNetworkTest() // Reset global state
-	{
-		NumOfZones = 0;
-		NumOfNodes = 0;
-		BeginEnvrnFlag = false;
-		RoomAirflowNetworkZoneInfo.clear();
-		ZoneEquipConfig.clear();
-		ZoneEquipList.clear();
-		Zone.clear();
-		ZoneIntGain.clear();
-		NodeID.clear();
-		Node.clear();
-		Surface.clear();
-		HConvIn.clear();
-		TempSurfInTmp.clear();
-		MoistEMPDNew.clear();
-		MoistEMPDOld.clear();
-		RhoVaporSurfIn.clear();
-		RhoVaporAirIn.clear();
-		HMassConvInFD.clear();
-		MAT.clear();
-		ZoneAirHumRat.clear();
-		AirflowNetworkLinkageData.clear();
-		AirflowNetworkNodeSimu.clear();
-		AirflowNetworkLinkSimu.clear();
-		RAFN.clear();
->>>>>>> develop
 	}
 };
 
@@ -193,11 +157,6 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	OutBaroPress = 101325.0;
 	ZoneVolCapMultpSens = 1;
 
-<<<<<<< HEAD
-=======
-	InitializePsychRoutines();
-
->>>>>>> develop
 	RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed = true;
 	RoomAirflowNetworkZoneInfo( ZoneNum ).ActualZoneID = ZoneNum;
 	RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes = NumOfAirNodes;
@@ -400,10 +359,4 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	EXPECT_NEAR( 24.397538, Node( 2 ).Temp, 0.00001 );
 	EXPECT_NEAR( 0.0024802305, Node( 2 ).HumRat, 0.000001 );
 
-<<<<<<< HEAD
-=======
-	cached_Twb.deallocate();
-	cached_Psat.deallocate();
-
->>>>>>> develop
 }

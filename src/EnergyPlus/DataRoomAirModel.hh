@@ -1576,12 +1576,9 @@ namespace DataRoomAirModel {
 	extern Array1D< TemperaturePatternStruct > RoomAirPattern; // user defined patterns ,various types
 	extern Array1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
 	extern Array1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info
-<<<<<<< HEAD
 
 	void
 	clear_state();
-=======
->>>>>>> develop
 
 } // DataRoomAirModel
 

@@ -494,13 +494,8 @@ namespace RoomAirModelAirflowNetwork {
 					}
 
 				}
-<<<<<<< HEAD
 				InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
 				if ( allocated( NodeFound ) ) NodeFound.deallocate( );
-=======
-				MyOneTimeFlagConf = false;
-				if ( allocated( NodeFound ) ) NodeFound.deallocate();
->>>>>>> develop
 				if ( ErrorsFound ) {
 					ShowFatalError( "GetRoomAirflowNetworkData: Errors found getting air model input.  Program terminates." );
 				}

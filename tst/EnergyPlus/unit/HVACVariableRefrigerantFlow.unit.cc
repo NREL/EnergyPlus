@@ -172,11 +172,7 @@ namespace EnergyPlus {
 
 	}
 
-<<<<<<< HEAD
 	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CompResidual )
-=======
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
->>>>>>> develop
 	{
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
