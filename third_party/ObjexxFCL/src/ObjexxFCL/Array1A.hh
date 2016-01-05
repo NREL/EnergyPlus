@@ -5,7 +5,7 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
@@ -943,11 +943,12 @@ public: // Modifier
 protected: // Functions
 
 	// Dimension by IndexRange
-	void
+	bool
 	dimension_assign( IR const & I )
 	{
 		I_.assign( I );
 		dimension_argument();
+		return false;
 	}
 
 private: // Functions

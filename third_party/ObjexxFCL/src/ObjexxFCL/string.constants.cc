@@ -2,7 +2,7 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
@@ -15,7 +15,7 @@
 
 namespace ObjexxFCL {
 
-std::string const VERSION( "4.0.0" );
+std::string const VERSION( "4.1.0" );
 std::string const WHITESPACE( " \t\0", 3 );
 
 } // ObjexxFCL

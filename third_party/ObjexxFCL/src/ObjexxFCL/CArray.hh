@@ -5,7 +5,7 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
@@ -491,8 +491,7 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			T const data_i( data_[ i ] );
-			length_sq += data_i * data_i;
+			length_sq += data_[ i ] * data_[ i ];
 		}
 		return std::sqrt( length_sq );
 	}
@@ -503,8 +502,7 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			T const data_i( data_[ i ] );
-			length_sq += data_i * data_i;
+			length_sq += data_[ i ] * data_[ i ];
 		}
 		return length_sq;
 	}
@@ -589,6 +587,22 @@ public: // Modifier
 	}
 
 public: // Subscript
+
+	// CArray[ i ] const: 0-Based Indexing
+	Tr
+	operator []( size_type const i ) const
+	{
+		assert( i < size_ );
+		return data_[ i ];
+	}
+
+	// CArray[ i ]: 0-Based Indexing
+	T &
+	operator []( size_type const i )
+	{
+		assert( i < size_ );
+		return data_[ i ];
+	}
 
 	// CArray( i ) const: 1-Based Indexing
 	Tr
@@ -697,8 +711,7 @@ magnitude( CArray< T > const & a )
 {
 	T mag_sq( T( 0 ) );
 	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		T const a_i( a[ i ] );
-		mag_sq += a_i * a_i;
+		mag_sq += a[ i ] * a[ i ];
 	}
 	return std::sqrt( mag_sq );
 }
@@ -711,8 +724,7 @@ magnitude_squared( CArray< T > const & a )
 {
 	T mag_sq( T( 0 ) );
 	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		T const a_i( a[ i ] );
-		mag_sq += a_i * a_i;
+		mag_sq += a[ i ] * a[ i ];
 	}
 	return mag_sq;
 }
