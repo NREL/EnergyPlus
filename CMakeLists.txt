@@ -46,7 +46,6 @@ option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
 option( BUILD_DOCS "Build markdown based documentation" OFF )
-option( BUILD_PYTHON_TESTS "Build Python-based tests -- requires Python 2.7+" OFF )
 
 if (BUILD_DOCS)
   option( BUILD_MONOLITHIC_ENGINEERINGREFERENCE  "Build all-in-one EngineeringReference (has caveats)" ON )
@@ -63,10 +62,11 @@ option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
 option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-# we are making python a required dependency, so find it here.
+# we are making python a required dependency, so find it here...starting off by requiring at least 2.7
 find_package(PythonInterp 2.7 REQUIRED)
 
-if ( BUILD_PYTHON_TESTS )
+# then we can add python-based tests for it
+if ( BUILD_TESTING )
   add_test( NAME VerifyIDFsInCMakeFolder COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/scripts/dev/VerifyIDFsInCMake.py" "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" )
 endif()
 
