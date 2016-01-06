@@ -63,13 +63,8 @@ option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
 option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-# we don't need all devs to have Python installed.  There are 2 cases where we do want it
-# 1. Doing regression testing; which would be: BUILD_TESTING AND ENABLE_REGRESSION_TESTING
-# 2. Doing package building, since Python is going to be our tool for some things; thus: BUILD_PACKAGE
-
-if( ( BUILD_TESTING AND ENABLE_REGRESSION_TESTING ) OR ( BUILD_PACKAGE ) OR ( BUILD_PYTHON_TESTS ) )
-  find_package(PythonInterp 2.7 REQUIRED)
-endif()
+# we are making python a required dependency, so find it here.
+find_package(PythonInterp 2.7 REQUIRED)
 
 if ( BUILD_PYTHON_TESTS )
   add_test( NAME VerifyIDFsInCMakeFolder COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/scripts/dev/VerifyIDFsInCMake.py" "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" )
