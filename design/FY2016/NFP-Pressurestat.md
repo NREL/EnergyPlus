@@ -5,10 +5,11 @@ Pressure Control Through PressureStat
 
 **Florida Solar Energy Center**
 
-**First draft**
+**First revision**
+1/6/16
 
+**Initial draft**
  - 12/23/15
- - None
  
 
 ## Justification for New Feature ##
@@ -20,7 +21,25 @@ One piece missing from the Airflow Network capabilities is the ability to contro
 
 ## E-mail and  Conference Call Conclusions ##
 
-None
+Tianzhen comments from E-mail on 12/23/15
+
+Three quick questions:
+
+1. Does it require or allow each zone to have its own exhaust fan? its own pressure setpoint? Or this only applies to a control zone for an air loop? I saw more common for office buildings is to use a central relief fan to control air pressure in the building.
+
+2. Would the naming AirflowNetwork:ZoneControl:PressureStat make more sense? As this only applies to AFN.
+
+3. For leaky buildings, sometimes the only way to control pressure is to increase OA flow rate. 
+
+Gu's reply on 12/28/15
+
+1A: The proposal proposes an exhaust fan in a controlled zone for pressure control in an AirLoop. It is similar to temperature control to use a thermostat in a controlled zone. The pressure control only happens in the controlled zone. 
+
+It is true that a central relief fan is also used to control building pressure. The existing EnergyPlus does not have an object for a central relief fan. In turn, the AirflowNetwork model does not also have the same object. That is why an exhaust fan is proposed.   
+
+2A: The new object is applied to AFN only as proposed. I don’t have any strong opinions for the name of a new object. My intent is that the object may not be restricted to AFN. It is possible that E+ may also calculate zone pressure in other models in the future.  We can discuss it.
+
+3A: It is also true to adjust OA for zone pressure control. If we allow to adjust both OA and exhaust flow rates, there is no unique solution. Therefore, exhaust flow rate is proposed. If pressure control can not be reached in leaky buildings, users can increase OA. I will add it in a warning message.  
 
 ## Overview ##
 
@@ -36,13 +55,19 @@ Figure 1.  Simplified Schematic of an Airloop with an OA mixer and an exhaust f
 
 ## Approach ##
 
-The proposed approach requires a new object to provide pressure setpoint, and enhances outdoor air handling and exhaust fan handling in the AirflowNetwork model.
+The proposed approach adds two new objects and enhances outdoor air handling and exhaust fan handling in the AirflowNetwork model. One of new objects is to provide pressure setpoint, and the other is to specify the outdoor air flow rate based on the Controller:OutdoorAir object.
 
-###A new object
+###A new object of PressureStat
 
 A new object of ZoneControl:PressureStat will be proposed to allow a user to input pressure setpoint and a controlling component with adjustable airflow rate to meet the setpoint. The proposed component is the Fan:ZoneExhaust object only (for the time being).
 
 Since the Fan:ZoneExhaust has the maximum flow rate field, there is no need to revise the existing object.
+
+###A new object of AirflowNetwork:Distribution:Component:OutdoorAirFlow
+
+A new object of AirflowNetwork:Distribution:Component:OutdoorAirFlow will be proposed to allow a user to specify the outdoor air flow rate based on the Controller:OutdoorAir object. When the outdoor air flow rate is zero, the model treats this component as a crack using a power law to specify relationship between pressure difference and mass flow rate.
+
+It should be pointed out that the object does not have information on Controller:OutdoorAir object, because the AirflowNetwork model allows a single Controller:OutdoorAir object based on restriction of a single AirLoop. When multiple Airloops are allowed, the required optional inputs of Controller:OutdoorAir objects will be added.  
 
 ### Outdoor air handling
 
@@ -50,7 +75,7 @@ There are two ways to treat an OA mixer in the existing AirflowNetwork model. Th
 
 The second way is to add a link between the outdoor air node and the OA mixer. However, the outdoor air flow rate is calculated based on linkage resistance and pressure difference across the link. In other words, the OA flow rate is not controlled precisely compared to the OA controller specification, and varies with time, since outdoor pressure changes with time.
 
-The proposed approach is to have a link between the outdoor air node and the OA mixer and an associated flow component, assumed to be a constant fan internally, so that the flow rate can be the same as specification provided by the Controller:OutdoorAir object. This can be achieved by an internal fan component triggered by a new choice of OAMixerStreamNodeWithFlowRate in the AirflowNetwork:Distribution:Node object. The return flow rate at the entrance of the OA mixer is equal to the flow rate difference between the outlet node and OA inlet node. 
+The proposed approach is to have a link between the outdoor air node and the OA mixer and an associated new flow component. The new component will be a constant fan when the outdoor air flow from the Controller:OutdoorAir object is greater than zero, and a crack with zero outdoor flow rate.   
 
 ### Exhaust fan handling
 
@@ -73,7 +98,7 @@ The simulation results will be compared to spread sheet results.
 
 ## Input Output Reference Documentation ##
 
-This section describes inputs of a new object as ZoneControl:Pressurestat and a modified object as AirflowNetwork:Distribution:Node. The revision of AirflowNetwork:Distribution:Node is to add a choice in the Component Object Type or Node Type field. 
+This section describes inputs of two new object as ZoneControl:Pressurestat and AirflowNetwork:Distribution:Component:OutdoorAirFlow. 
 
 ### ZoneControl:Pressurestat
 
@@ -118,82 +143,58 @@ An IDF example is provided below:
        PressureSetpointSchedule;       !- Pressure Setpoint Schedule Name
 ```
 
-### AirflowNetwork:Distribution:Node
+###AirflowNetwork:Distribution:Component:OutdoorAirFlow
 
-The AirflowNetwork:Distribution:Node object is used to represent air distribution system nodes for the AirflowNetwork model. The EnergyPlus nodes defined in an AirLoopHVAC are a subset of the nodes used to simulate the distribution system using the AirflowNetwork model. For example, the inlet node of a fan and the outlet node of a coil defined in an AirLoopHVAC must be defined as nodes using the AirflowNetwork:Distribution:Node object. A set of EnergyPlus Zone Equipment nodes is also a subset of the AirflowNetwork:Distribution:Nodes. For example, zone inlet and outlet nodes must be defined as nodes using the AirflowNetwork:Distribution: Node object. In addition, although mixers and splitters are defined as objects with inlet and outlet nodes within EnergyPlus, the AirflowNetwork:Distribution:Node object treats mixers and splitters as single nodes. The node objects are referenced by AirflowNetwork:Distribution:Linkage objects.
+The AirflowNetwork:Distribution:Component:OutdoorAirFlow object is used to specify the amount of outdoor air flow rate. When the outdoor air mass flow rate is greater than zero. The airflow network model treats this object as a constant volume fan and the flow rate is provided by the Controller:OutdoorAir object. When there is not outdoor air flow rate, the model treats this object as a crack and a power law is assumed. 
 
-In summary, all nodes used to define an AirLoopHVAC (except splitters, mixers, and outdoor air systems which are treated as single nodes) and its connections to a thermal zone must be specified as AirflowNetwork:Distribution:Nodes. If distribution system air leaks are to be modeled, additional AirflowNetwork:Distribution:Nodes may be defined along with AirflowNetwork:Distribution:Components (e.g., leak or leak ratio) to define the air leakage characteristics.
+####Field: Name
 
-Note: Supply and return leaks are not allowed in an AirLoopHVAC. They can only be modeled in the Zone Equipment Loop (i.e., return leaks may be modeled between the zone return node and the zone mixer inlet or the zone mixer outlet and the zone equipment loop outlet; and supply leaks may be modeled between the zone equipment loop inlet and the AirLoopHVAC:ZoneSplitter inlet node or the AirLoopHVAC:ZoneSplitter outlet node and the zone supply node).
+This is the name for this instance of the AirflowNetwork:Distribution:Component:OutdoorAirFlow object.
 
-#### Field: Name
+####Field: Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
 
-The name of an air distribution system node. This node name is referenced by an AirflowNetwork:Distribution:Linkage and in the output listing. Each node should have a unique name within the AirflowNetwork:Distribution:Node objects (however, the node name may be used elsewhere as regular EnergyPlus node names such as the fan inlet node or coil outlet node).
+The value of the air mass flow coefficient,({C_Q}), in the crack air flow equation. It has units of kg/s at 1Pa. This value must be greater than zero. The value is used when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
 
-#### Field:Component Name or Node Name
+####Field: Air Mass Flow Exponent When No Outdoor Air Flow
 
-Designates node names defined in another EnergyPlus object, so that the AirflowNetwork:Distribution:Node object is able to get input parameters and node conditions from the associated EnergyPlus node or object. The actual node name is entered here and represents a node already defined in an AirLoopHVAC or zone equipment loop. This field is left blank if the EnergyPlus Node Type field below is entered as Mixer, Splitter, Outdoor air System, or Other.
+The value of the exponent,* n*, in the crack air flow equation. The valid range is 0.5 to 1.0, with the default value being 0.65. The value is used when the fan is off. The value is used when the outdoor mass flow rate is zero from the Controller:OutdoorAir object.
 
-#### Field: Component Object Type or Node Type
+####Field: Reference Crack Conditions
 
-This choice field distinguishes the node type for the EnergyPlus node or object name defined above. Five node types are available:
-
-- **AirLoopHVAC:ZoneMixer**: Represents an AirLoopHVAC:ZoneMixer object defined in EnergyPlus
-
-- **AirLoopHVAC:ZoneSplitter**: Represents an AirLoopHVAC:ZoneSplitter object defined in EnergyPlus
-
-- **AirLoopHVAC:OutdoorAirSystem**: Represents an AirLoopHVAC:OutdoorAirSystem object used in EnergyPlus
-
-- **OAMixerOutdoorAirStreamNode**: Represents an external node name specified as an Outdoor Air Stream Node Name in the OutdoorAir:Mixer object when the AirLoopHVAC:OutdoorAirSystem object is used.
-
-- **OAMixerStreamNodeWithFlowRate**:Represents an external node used in the OutdoorAir:Mixer with specified flow rate. This choice allows the outdoor air flow rate is the same rate specified by the Controller:OutdoorAir object.
-
-- **OutdoorAir:NodeList**: Represents an external node name defined in the OutdoorAir:NodeList object when the AirLoopHVAC:OutdoorAirSystem object and an exhaust energy recovery system (air-to-air heat exchanger) are used.
-
-- **OutdoorAir**: Represents an external node name defined in the OutdoorAir:Node object when the AirLoopHVAC:OutdoorAirSystem and an exhaust energy recovery system (air-to-air heat exchanger) are used.
-
-- **Other**: Represents a type not already defined above.
-
-Note: Both the OutdoorAir:NodeList and OutdoorAir:Node node types represent a node to outdoor air conditions. Either one of these node types can be used to represent an external node when an air-to-air heat exchanger is used to recover energy from the exhaust air stream as part of an AirLoopHVAC:OutdoorAirSystem object. Node type OAMixerOutdoorAirStreamNode does not represent an external node when an OutdoorAir:NodeList or OutdoorAir:Node object is specified. If no exhaust heat recovery system (i.e., air-to-air heat exchanger) is specified in the AirLoopHVAC:OutdoorAirSystem, the node type OAMixerOutdoorAirStreamNode represents an external node.
-
-#### Field: Node Height
-
-Designates the reference height in meters used to calculate relative pressure. The default value is 0 meters.
+The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which specifies the conditions under which the air mass flow coefficient was measured. If the user omits this field and only one AirflowNetwork:MultiZone:ReferenceCrackConditions object is defined in the input data file, then those reference crack conditions will be used. If the user omits this field and either zero or more than one AirflowNetwork:MultiZone:ReferenceCrackConditions objects are defined in the input data file, then the default conditions for the AirflowNetwork:Multizone: Reference Crack Conditions object will be used.
 
 IDF examples are provided below:
 
 ```idf
-AirflowNetwork:Distribution:Node,
-    EquipmentInletNode,      !- Name
-    Zone Equipment Inlet Node,  !- Component Name or Node Name
-    Other,                   !- Component Object Type or Node Type
-    3.0;                     !- Node Height {m}
 
+  AirflowNetwork:MultiZone:Component:OutdoorAirFlow,
+    OAFlow,                  !- Name
+    0.01,                    !- Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions {kg/s}
+    0.667;                   !- Air Mass Flow Exponent When No Outdoor Air Flow {dimensionless}
 
-AirflowNetwork:Distribution:Node,
-    SupplyMainNode,          !- Name
-    ,                        !- Component Name or Node Name
-    Other,                   !- Component Object Type or Node Type
-    3.0;                     !- Node Height {m}
+  AirflowNetwork:Distribution:Node,
+    OA System Node,          !- Name
+    ,                        !- Component Name or Node Name
+    AirLoopHVAC:OutdoorAirSystem,  !- Component Object Type or Node Type
+    3.0;                     !- Node Height {m}
 
+  AirflowNetwork:Distribution:Node,
+    OA Inlet Node,           !- Name
+    Outside Air Inlet Node,  !- Component Name or Node Name
+    OAMixerOutdoorAirStreamNode,  !- Component Object Type or Node Type
+    1.5;                     !- Node Height {m}
 
-AirflowNetwork:Distribution:Node,
-    MainSplitterNode,        !- Name
-    ,                        !- Component Name or Node Name
-    AirLoopHVAC:ZoneSplitter,  !- Component Object Type or Node Type
-    3.0;                     !- Node Height {m}
+  AirflowNetwork:Distribution:Linkage,
+    OASystemFanLink,       !- Name
+    OA Inlet Node,           !- Node 1 Name
+    OA System Node,          !- Node 2 Name
+    OAFlow;      !- Component Name
 
-
-AirflowNetwork:Distribution:Node,
-    MainSplitterNode,        !- Name of Node
-    ,                        !- Name of Associated EnergyPlus Node or Object
-    AirLoopHVAC:ZoneSplitter,  !- EnergyPlus Object or Node Type
-    3.0;                     !- Node Height {m}
 ```
 
 ## Input Description ##
 
-This section presents a new object of ZoneControl:Pressurestat and a revised object of AirflowNetwork:Distribution:Node by adding a new choice of OAMixerStreamNodeWithFlowRate in the "Component Object Type or Node Type" field.  
+This section describes inputs of two new object as ZoneControl:Pressurestat and AirflowNetwork:Distribution:Component:OutdoorAirFlow. 
 
 ### New objects
 
@@ -232,54 +233,39 @@ ZoneControl:Pressurestat
       \object-list ScheduleNames
 
 
-### Existing objects ###
+AirflowNetwork:Distribution:Component:OutdoorAirFlow
 
-Revisions to the IDD are noted as **<span style="color:red;">bold red</span>** non-blocked insertions at the appropriate location throughout the input data dictionary description. 
-
-	AirflowNetwork:Distribution:Node,
-      \min-fields 4
-      \memo This object represents an air distribution node in the AirflowNetwork model.
+	AirflowNetwork:Distribution:Component:OutdoorAirFlow
+      \min-fields 3
+      \memo This object specifies properties of outdoor air flow based on Controller:OutdoorAir object
  	A1 , \field Name
+       \required-field
+       \reference AFNOutdoorAirFlowNames
+ 	N1 , \field Air Mass Flow Coefficient When No Outdoor Air Flow at Reference Conditions
       \required-field
-      \type alpha
-      \reference AirflowNetworkNodeAndZoneNames
-      \note Enter a unique name for this object.
- 	A2 , \field Component Name or Node Name
-      \type alpha
-      \note Designates node names defined in another object. The node name may occur in air branches.
-      \note Enter a node name to represent a node already defined in an air loop.
-      \note Leave this field blank if the Node or Object Type field below is entered as
-      \note AirLoopHVAC:ZoneMixer, AirLoopHVAC:ZoneSplitter, AirLoopHVAC:OutdoorAirSystem, or Other.
- 	A3 , \field Component Object Type or Node Type
-      \type choice
-      \key AirLoopHVAC:ZoneMixer
-      \key AirLoopHVAC:ZoneSplitter
-      \key AirLoopHVAC:OutdoorAirSystem
-      \key OAMixerOutdoorAirStreamNode
-**<span style="color:red;">      \key OAMixerStreamNodeWithFlowRate </span>**
-
-      \key OutdoorAir:NodeList
-      \key OutdoorAir:Node
-      \key Other
-      \default Other
-      \note Designates Node type for the Node or Component Name defined in the field above.
-      \note AirLoopHVAC:ZoneMixer -- Represents a AirLoopHVAC:ZoneMixer object.
-      \note AirLoopHVAC:ZoneSplitter -- Represents a AirLoopHVAC:ZoneSplitter object.
-      \note AirLoopHVAC:OutdoorAirSystem -- Represents an AirLoopHVAC:OutdoorAirSystem object.
-      \note OAMixerOutdoorAirStreamNode -- Represents an external node used in the OutdoorAir:Mixer
-**<span style="color:red;">      \note OAMixerStreamNodeWithFlowRate -- Represents an external node used in the OutdoorAir:Mixer with specified flow rate</span>**
-
-      \note OutdoorAir:NodeList -- Represents an external node when a heat exchanger is used before
-      \note the OutdoorAir:Mixer
-      \note OutdoorAir:Node -- Represents an external node when a heat exchanger is used before
-      \note the OutdoorAir:Mixer
-      \note Other -- none of the above, the Node name already defined in the previous field is part
-      \note of an air loop.
- 	N1 ; \field Node Height
       \type real
-      \units m
-      \default 0.0
-      \note Enter the reference height used to calculate the relative pressure.
+      \units kg/s
+      \minimum> 0
+      \note Enter the air mass flow coefficient at the conditions defined
+      \note in the Reference Crack Conditions object.
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
+      \note equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor iar flow rate.
+ 	N2 , \field Air Mass Flow Exponent When No Outdoor Air Flow
+      \units dimensionless
+      \type real
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when no outdoor iar flow rate.
+ 	A2 ; \field Reference Crack Conditions
+      \type object-list
+      \object-list ReferenceCrackConditions
+      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
+      \note the air mass flow coefficient entered above.
 
 ## Outputs Description ##
 
@@ -325,6 +311,8 @@ The pressure control is achieved by varying zone exhaust fan flow rate. It requi
 ## Example File and Transition Changes ##
 
 A new example file will be created to demonstrate pressure control.
+
+No transition is needed.
 
 
 ## References ##
