@@ -14,73 +14,17 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <SimAirServingZones.hh>
-#include <BranchInputManager.hh>
-#include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataConvergParams.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataHVACControllers.hh>
-#include <DataHVACGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
-#include <DataSystemVariables.hh>
-#include <DataZoneEquipment.hh>
-#include <DesiccantDehumidifiers.hh>
-#include <EMSManager.hh>
-#include <EvaporativeCoolers.hh>
-#include <Fans.hh>
-#include <Furnaces.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <HeatingCoils.hh>
-#include <HeatRecovery.hh>
-#include <Humidifiers.hh>
-#include <HVACControllers.hh>
-#include <HVACDuct.hh>
-#include <HVACDXHeatPumpSystem.hh>
-#include <HVACDXSystem.hh>
-#include <HVACHXAssistedCoolingCoil.hh>
-#include <HVACInterfaceManager.hh>
-#include <HVACMultiSpeedHeatPump.hh>
-#include <HVACUnitaryBypassVAV.hh>
-#include <HVACUnitarySystem.hh>
-#include <InputProcessor.hh>
-#include <MixedAir.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
 #include <SimAirServingZones.hh>
-#include <SplitterComponent.hh>
-#include <SteamCoils.hh>
-#include <SystemAvailabilityManager.hh>
-#include <UserDefinedComponents.hh>
+#include <MixedAir.hh>
 #include <UtilityRoutines.hh>
-#include <WaterCoils.hh>
-#include <ZonePlenum.hh>
 
 using namespace EnergyPlus;
-using namespace DataPrecisionGlobals;
-using namespace DataLoopNode;
-using namespace DataAirLoop;
-using namespace DataGlobals;
-using namespace DataHVACGlobals;
-using namespace DataSizing;
-using namespace DataZoneEquipment;
 using namespace DataAirSystems;
+using namespace DataSizing;
+using namespace ObjexxFCL;
 using namespace SimAirServingZones;
-using DataEnvironment::TotDesDays;
-using DataEnvironment::CurEnvirNum;
-using DataEnvironment::EnvironmentName;
-using DataEnvironment::CurMnDy;
-using DataEnvironment::TotRunDesPersDays;
 
 namespace EnergyPlus {
 

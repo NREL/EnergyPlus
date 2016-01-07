@@ -1905,25 +1905,16 @@ namespace SimAirServingZones {
 
 			// Check whether there are Central Heating Coils in the Primary Air System
 			for( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-
 				FoundCentralHeatCoil = false;
-
-				for( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
-
-					for( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-
+				for( BranchNum = 1; ! FoundCentralHeatCoil && BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
+					for( CompNum = 1; ! FoundCentralHeatCoil && CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 						CompTypeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num;
-
 						if( CompTypeNum == WaterCoil_SimpleHeat || CompTypeNum == Coil_ElectricHeat || CompTypeNum == Coil_GasHeat ) {
 							FoundCentralHeatCoil = true;
 						}
-
 					} // end of component loop
-
-				} // end of Branch loop
-			
+				} // end of Branch loop			
 				PrimaryAirSystem( AirLoopNum ).CentralHeatCoilExists = FoundCentralHeatCoil;
-
 			} // end of AirLoop loop
 
 		} // one time flag
@@ -6421,8 +6412,12 @@ namespace SimAirServingZones {
 		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
 		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
 
-			OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
-			OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+			if( FinalSysSizing( IndexAirLoop ).DesHeatVolFlow > 0 ){
+				OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
+				OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+			} else {
+				OutAirFrac = 0.0;
+			}
 
 			// Mixed air humidity ratio and enthalpy
 			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
@@ -6499,8 +6494,12 @@ namespace SimAirServingZones {
 		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
 		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
 
-			OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
-			OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+			if( FinalSysSizing( IndexAirLoop ).DesHeatVolFlow > 0 ){
+				OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
+				OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+			} else {
+				OutAirFrac = 0.0;
+			}
 
 			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
 		
