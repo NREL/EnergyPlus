@@ -53,28 +53,24 @@ public: // Types
 public: // Creation
 
 	// Copy Constructor
-	inline
 	ArrayTail( ArrayTail const & s ) :
 	 data_( s.data_ ),
 	 size_( s.size_ )
 	{}
 
 	// Pointer + Size Constructor
-	inline
 	ArrayTail( T const * a, size_type const size ) :
 	 data_( const_cast< T * >( a ) ),
 	 size_( size )
 	{}
 
 	// Destructor
-	inline
 	~ArrayTail()
 	{}
 
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	ArrayTail &
 	operator =( ArrayTail const & s )
 	{
@@ -88,7 +84,6 @@ public: // Assignment
 public: // Inspector
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -96,7 +91,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	int
 	isize() const
 	{
