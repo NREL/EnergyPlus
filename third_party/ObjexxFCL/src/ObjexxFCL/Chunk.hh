@@ -546,8 +546,8 @@ private: // Data
 
 }; // Chunk
 
-// Static Data Member Template Definitions
-template< typename T > typename Chunk< T >::size_type const Chunk< T >::max_size = static_cast< size_type >( -1 );
+	// Static Data Member Template Definitions
+	template< typename T > typename Chunk< T >::size_type const Chunk< T >::max_size = static_cast< size_type >( -1 );
 
 // Swap
 template< typename T >

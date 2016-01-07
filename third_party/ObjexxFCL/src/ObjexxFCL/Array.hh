@@ -3509,9 +3509,9 @@ protected: // Data
 
 }; // Array
 
-// Static Data Member Template Definitions
-template< typename T > typename Array< T >::size_type const Array< T >::npos = static_cast< size_type >( -1 );
-template< typename T > typename Array< T >::size_type const Array< T >::max_size = npos - static_cast< size_type >( 1 );
+	// Static Data Member Template Definitions
+	template< typename T > typename Array< T >::size_type const Array< T >::npos = static_cast< size_type >( -1 );
+	template< typename T > typename Array< T >::size_type const Array< T >::max_size = npos - static_cast< size_type >( 1 );
 
 // Stream >> Array
 template< typename T >
