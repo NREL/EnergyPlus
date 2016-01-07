@@ -241,6 +241,7 @@ set( test_src
   tst/unit/bit.unit.cc
   tst/unit/byte.unit.cc
   tst/unit/CArray.unit.cc
+  tst/unit/CArrayA.unit.cc
   tst/unit/CArrayP.unit.cc
   tst/unit/char.functions.unit.cc
   tst/unit/Chunk.unit.cc

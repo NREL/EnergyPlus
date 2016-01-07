@@ -212,7 +212,7 @@ public: // Creation
 	}
 
 	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
-	template< typename S, typename U, class = typename std::enable_if< std::is_constructible< T, S >::value >::type, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
 	Array3D( IR const & I1, IR const & I2, IR const & I3, Sticky< S > const & s, U const & u ) :
 	 Super( I1, I2, I3, InitializerSentinel() ),
 	 initializer_( s )
@@ -249,7 +249,7 @@ public: // Creation
 	}
 
 	// IndexRange + Sticky Initializer Value + Initializer List Constructor Template
-	template< typename S, typename U, class = typename std::enable_if< std::is_constructible< T, S >::value >::type, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
 	Array3D( IR const & I1, IR const & I2, IR const & I3, Sticky< S > const & s, std::initializer_list< U > const l ) :
 	 Super( I1, I2, I3, InitializerSentinel() ),
 	 initializer_( s )
@@ -271,7 +271,7 @@ public: // Creation
 	}
 
 	// IndexRange + Sticky Initializer Value + Super Constructor Template
-	template< typename S, typename U, class = typename std::enable_if< std::is_constructible< T, S >::value >::type, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
 	Array3D( IR const & I1, IR const & I2, IR const & I3, Sticky< S > const & s, Array3< U > const & a ) :
 	 Super( I1, I2, I3, InitializerSentinel() ),
 	 initializer_( s )

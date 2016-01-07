@@ -646,34 +646,74 @@ public: // Modifier
 public: // Subscript
 
 	// CArrayA[ i ] const: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value && std::is_const< T >::value >::type >
 	Tr
-	operator []( size_type const i ) const
+	operator []( I const i ) const
+	{
+		assert( i < size_ );
+		return data_[ i ];
+	}
+
+	// CArrayA[ i ] const: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value && std::is_const< T >::value >::type, typename = void >
+	Tr
+	operator []( I const i ) const
+	{
+		assert( ( i >= 0 ) && ( static_cast< size_type >( i ) < size_ ) );
+		return data_[ i ];
+	}
+
+	// CArrayA[ i ]: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value >::type >
+	T &
+	operator []( I const i )
 	{
 		assert( i < size_ );
 		return data_[ i ];
 	}
 
 	// CArrayA[ i ]: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value >::type, typename = void >
 	T &
-	operator []( size_type const i )
+	operator []( I const i )
 	{
-		assert( i < size_ );
+		assert( ( i >= 0 ) && ( static_cast< size_type >( i ) < size_ ) );
 		return data_[ i ];
 	}
 
 	// CArrayA( i ) const: 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value && std::is_const< T >::value >::type >
 	Tr
-	operator ()( size_type const i ) const
+	operator ()( I const i ) const
+	{
+		assert( ( i > 0u ) && ( i <= size_ ) );
+		return data_[ i - 1 ];
+	}
+
+	// CArrayA( i ) const: 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value && std::is_const< T >::value >::type, typename = void >
+	Tr
+	operator ()( I const i ) const
+	{
+		assert( ( i > 0 ) && ( static_cast< size_type >( i ) <= size_ ) );
+		return data_[ i - 1 ];
+	}
+
+	// CArrayA( i ): 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value >::type >
+	T &
+	operator ()( I const i )
 	{
 		assert( ( i > 0u ) && ( i <= size_ ) );
 		return data_[ i - 1 ];
 	}
 
 	// CArrayA( i ): 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value >::type, typename = void >
 	T &
-	operator ()( size_type const i )
+	operator ()( I const i )
 	{
-		assert( ( i > 0u ) && ( i <= size_ ) );
+		assert( ( i > 0 ) && ( static_cast< size_type >( i ) <= size_ ) );
 		return data_[ i - 1 ];
 	}
 
