@@ -978,7 +978,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Initialize ground temperature model and set pointer reference
-			GetGroundTempModel( PipingSystemDomains( DomainNum ).Farfield.groundTempModel, cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
 
 		}
 
@@ -1351,7 +1351,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent / 100.0;
 
 				// Farfield model
-				GetGroundTempModel( PipingSystemDomains( DomainCtr ).Farfield.groundTempModel, cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+				PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 				// Other parameters
 				PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -1680,7 +1680,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Farfield ground temperature model
-			GetGroundTempModel( PipingSystemDomains( DomainNum ).Farfield.groundTempModel, cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 			// Domain perimeter offset
 			PipingSystemDomains( DomainNum ).PerimeterOffset = Domain( BasementCtr ).PerimeterOffset;
@@ -2179,7 +2179,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = HGHX( HorizontalGHXCtr ).SaturationMoistureContent / 100.0;
 
 			// Farfield model parameters
-			GetGroundTempModel( PipingSystemDomains( DomainCtr ).Farfield.groundTempModel, cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
+			PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
 
 			// Other parameters
 			PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -9492,20 +9492,6 @@ namespace PlantPipingSystemsManager {
 			NeighborBoundaryCells( BoundaryCellCtr ) = Direction_NegativeZ;
 		}
 
-	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	GetGroundTempModel(
-		std::shared_ptr< BaseGroundTempsModel > &GTMPtrReference,
-		std::string objectType_str,
-		std::string objectName
-	)
-	{
-		GTMPtrReference = GetGroundTempModelAndInit( objectType_str, objectName );
 	}
 
 } // PlantPipingSystemsManager
