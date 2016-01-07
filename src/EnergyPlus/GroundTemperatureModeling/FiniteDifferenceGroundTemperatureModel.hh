@@ -227,6 +227,9 @@ namespace EnergyPlus {
 			surfaceCoverType_longGrass = 3
 		};
 
+		// Destructor
+		~FiniteDiffGroundTempsModel(){}
+
 	};
 
 }
