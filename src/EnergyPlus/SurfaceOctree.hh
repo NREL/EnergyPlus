@@ -104,13 +104,28 @@ public: // Creation
 
 	// Default Constructor
 	SurfaceOctreeCube() :
-	 cubes_()
-	{}
+	 d_( 0u ),
+	 n_( 0u ),
+	 l_( Vertex( 0.0 ) ),
+	 u_( Vertex( 0.0 ) ),
+	 c_( Vertex( 0.0 ) ),
+	 w_( 0.0 ),
+	 r_( 0.0 )
+	{
+		for ( std::uint8_t i = 0; i < 8; ++i ) cubes_[ i ] = nullptr; // VC++ 2013 compatible initialization
+	}
 
 	// Surfaces Outer Cube Constructor
 	SurfaceOctreeCube( ObjexxFCL::Array1< Surface > & surfaces ) :
-	 cubes_()
+	 d_( 0u ),
+	 n_( 0u ),
+	 l_( Vertex( 0.0 ) ),
+	 u_( Vertex( 0.0 ) ),
+	 c_( Vertex( 0.0 ) ),
+	 w_( 0.0 ),
+	 r_( 0.0 )
 	{
+		for ( std::uint8_t i = 0; i < 8; ++i ) cubes_[ i ] = nullptr; // VC++ 2013 compatible initialization
 		init( surfaces );
 	}
 
@@ -122,22 +137,22 @@ public: // Creation
 	 Real const w
 	) :
 	 d_( d ),
+	 n_( 0u ),
 	 l_( l ),
 	 u_( u ),
 	 c_( cen( l, u ) ),
 	 w_( w ),
-	 r_( 0.75 * ( w * w ) ),
-	 cubes_()
+	 r_( 0.75 * ( w * w ) )
 	{
+		for ( std::uint8_t i = 0; i < 8; ++i ) cubes_[ i ] = nullptr; // VC++ 2013 compatible initialization
 		assert( valid() );
 	}
+
 
 	// Destructor
 	~SurfaceOctreeCube()
 	{
-		for ( std::uint8_t i = 0; i < n_; ++i ) {
-			delete cubes_[ i ];
-		}
+		for ( std::uint8_t i = 0; i < n_; ++i ) delete cubes_[ i ];
 	}
 
 public: // Properties
@@ -705,18 +720,18 @@ private: // Static Methods
 
 private: // Static Data
 
-	static std::uint8_t const maxDepth_ = 255u; // Max tree depth
-	static size_type const maxSurfaces_ = 10u; // Max surfaces in a cube before subdividing
+	static std::uint8_t const maxDepth_; // Max tree depth
+	static size_type const maxSurfaces_; // Max surfaces in a cube before subdividing
 
 private: // Data
 
-	std::uint8_t d_ = 0u; // Depth in tree
-	std::uint8_t n_ = 0u; // Number of active sub-cubes ([0,8])
-	Vertex l_ = Vertex( 0.0 ); // Lower corner
-	Vertex u_ = Vertex( 0.0 ); // Upper corner
-	Vertex c_ = Vertex( 0.0 ); // Center point
-	Real w_ = 0.0; // Side width
-	Real r_ = 0.0; // Enclosing sphere radius
+	std::uint8_t d_; // Depth in tree
+	std::uint8_t n_; // Number of active sub-cubes ([0,8])
+	Vertex l_; // Lower corner
+	Vertex u_; // Upper corner
+	Vertex c_; // Center point
+	Real w_; // Side width
+	Real r_; // Enclosing sphere radius
 	SurfaceOctreeCube * cubes_[ 8 ]; // Sub-cubes
 	Surfaces surfaces_; // Surfaces in this cube
 

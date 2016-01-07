@@ -218,7 +218,7 @@ namespace EnergyPlus {
 		std::uint8_t const i( ctr.x <= c_.x ? 0 : 1 );
 		std::uint8_t const j( ctr.y <= c_.y ? 0 : 1 );
 		std::uint8_t const k( ctr.z <= c_.z ? 0 : 1 );
-		SurfaceOctreeCube * & cube( cubes_[ ( i << 2 ) + ( j << 1 ) + k ] );
+		SurfaceOctreeCube * & cube = cubes_[ ( i << 2 ) + ( j << 1 ) + k ];
 		if ( cube != nullptr ) { // Candidate cube exists
 			if ( le( cube->l_, sl ) && le( su, cube->u_ ) ) { // Surface is contained in sub-cube
 				cube->add( surface );
@@ -254,6 +254,10 @@ namespace EnergyPlus {
 		}
 		return true;
 	}
+
+	// Static Data Member Definitions
+	std::uint8_t const SurfaceOctreeCube::maxDepth_ = 255u; // Max tree depth
+	SurfaceOctreeCube::size_type const SurfaceOctreeCube::maxSurfaces_ = 10u; // Max surfaces in a cube before subdividing
 
 // Globals
 SurfaceOctreeCube surfaceOctree;
