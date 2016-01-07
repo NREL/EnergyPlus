@@ -3001,7 +3001,7 @@ namespace DaylightingManager {
 				SkyGndUnObs += IncAngSolidAngFac;
 				// Does this ground ray hit an obstruction?
 				hitObs = false;
-				if ( TotSurfaces < 20 ) { // Linear search through surfaces
+				if ( TotSurfaces < 100 ) { // Linear search through surfaces
 
 					for ( int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
 						if ( Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) {
@@ -5421,7 +5421,7 @@ namespace DaylightingManager {
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
 		// Building elements are assumed to be opaque
 		// A shadowing surface is opaque unless its transmittance schedule value is non-zero
-		if ( TotSurfaces < 20 ) { // Linear search through surfaces
+		if ( TotSurfaces < 100 ) { // Linear search through surfaces
 
 			for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 				auto const & surface( Surface( ISurf ) );
@@ -5525,7 +5525,7 @@ namespace DaylightingManager {
 		auto const window_base_iExtBoundCond( window_base.ExtBoundCond );
 
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
-		if ( TotSurfaces < 20 ) { // Linear search through surfaces
+		if ( TotSurfaces < 100 ) { // Linear search through surfaces
 
 			for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 				auto const & surface( Surface( ISurf ) );
@@ -5615,7 +5615,7 @@ namespace DaylightingManager {
 //		assert( window1.Zone == window2_Zone ); //? This is violated in PurchAirWithDoubleFacadeDaylighting so then why the asymmetry of only checking for wall/roof/floor for window2 zone below?
 
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
-		if ( TotSurfaces < 20 ) { // Linear search through surfaces
+		if ( TotSurfaces < 100 ) { // Linear search through surfaces
 
 			for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 				auto const & surface( Surface( ISurf ) );
@@ -8493,7 +8493,7 @@ namespace DaylightingManager {
 		NearestHitSurfNum = 0;
 		Real64 NearestHitDistance_sq( std::numeric_limits< Real64 >::max() ); // Distance squared from receiving point to nearest hit point for a ray (m^2)
 		NearestHitPt = 0.0;
-		if ( TotSurfaces < 20 ) { // Linear search through surfaces
+		if ( TotSurfaces < 100 ) { // Linear search through surfaces
 
 			for ( int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
 				if ( Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) {
