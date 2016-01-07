@@ -1,9 +1,64 @@
+// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // EnergyPlus Headers
 #include <EnergyPlus/SurfaceOctree.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fmath.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -14,28 +69,25 @@ namespace EnergyPlus {
 
 // Package: Surface Octree System
 //
-// Purpose: Spatial sort of surfaces for fast, scalable identification of active surfaces
-// for some algorithms such as solar shading, solar reflection, and daylighting obstruction
+// Purpose: Spatial sort of surfaces for fast, scalable identification of active surfaces for algorithms
+//  making spatial queries such as solar shading, solar reflection, and daylighting obstruction
 //
 // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
 //
 // History:
-//  Sep 2015: Initial experimental release
+//  Sep 2015: Experimental code
+//  Jan 2016: Initial release
 //
 // Notes:
-//  This code is experimental at this time
-//  Initial octree is for use in daylighting
+//  Initial octree is for use in daylighting but should be adaptable to other use cases:
 //   Surfaces without vertices are omitted
 //   Transparent surfaces are omitted (can't obstruct light)
-//  Parameters to support variants for different purposes is anticipated
-//  The use of multiple octrees for faster lookups of surface type subsets may be beneficial (avoid post-lookup conditional filtering)
-//  Variations and parameter tuning are planned to improve performance
-//  Initial simple design uses "tight" cubes (no overlap) and surfaces filtering down to deepest cube they fit in completely
-//  Alt: Use "loose" cubes oversied by x2 or some other factor to allow surfaces to filter down further: This requires more cubes to be processed for a given operation
-//  Alt: Filter all surfaces down to leaf cubes placing a surface in any cube it intersects: More specificity but redundant surfaces in each operation so must collect them in a set
-//  Implement copy and move ctors/assignment later if needed
-//  Could cache cube index triple rel to parent for exact center calc? Or do this only OTF during fill/construction?
-//  Could round bounding box width to a power of 2 for exact halving (prob. not needed for E+)
+//  Copy and move ctors/assignment omitted for now since not needed
+//  The use of multiple octrees for faster lookups of surface type subsets may be worthwhile for performance in some uses
+//  Octree variations and parameter tuning can give better performance for specific applications
+//  This design uses "tight" cubes (no overlap) and surfaces filtering down to deepest cube they fit in completely
+//  Alternative: Use "loose" cubes oversied by x2 or some other factor to allow surfaces to filter down further: This requires more cubes to be processed for a given operation
+//  Alternative: Filter all surfaces down to leaf cubes placing a surface in any cube it intersects: More specificity but redundant surfaces in each operation so must collect them in a set
 
 	// Surface in Cube?
 	bool
@@ -48,192 +100,13 @@ namespace EnergyPlus {
 		return true;
 	}
 
-	// Line Segment Intersects Enclosing Sphere?
-	bool
-	SurfaceOctreeCube::
-	segmentIntersectsSphere( Vertex const & a, Vertex const & b ) const
-	{
-		Vertex const ab( b - a );
-		Real const ab_mag_squared( ab.mag_squared() );
-		if ( ab_mag_squared == 0.0 ) { // Segment is a point
-			return ObjexxFCL::distance_squared( a, c_ ) <= r_;
-		} else { //Do Test if it is worth it to check a or b in sphere first (depends how often that is true)
-			Vertex const ac( c_ - a );
-			Real const projection_fac( dot( ac, ab ) / ab_mag_squared );
-			if ( ( 0.0 <= projection_fac ) && ( projection_fac <= 1.0 ) ) { // Projected (closest) point is on ab segment
-				return ObjexxFCL::distance_squared( ac, projection_fac * ab ) <= r_;
-			} else { // Projection (closest) point is outside of ab segment: Intersects iff a or b are in sphere
-				return ( ObjexxFCL::distance_squared( a, c_ ) <= r_ ) || ( ObjexxFCL::distance_squared( b, c_ ) <= r_ );
-			}
-		}
-	}
-
-	// Ray Intersects Enclosing Sphere?
-	bool
-	SurfaceOctreeCube::
-	rayIntersectsSphere( Vertex const & a, Vertex const & dir ) const // Ray is from a with direction of unit vector dir
-	{
-		assert( std::abs( dir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
-		//Do Test if it is worth it to check a in sphere first (depends how often that is true)
-		Vertex const ac( c_ - a );
-		Real const projection_fac( dot( ac, dir ) );
-		if ( 0.0 <= projection_fac ) { // Projected (closest) point is on ray
-			return ObjexxFCL::distance_squared( ac, projection_fac * dir ) <= r_;
-		} else { // Projection (closest) point is outside of ray: Intersects iff a is in sphere
-			return ObjexxFCL::distance_squared( a, c_ ) <= r_;
-		}
-	}
-
-	// Line Intersects Enclosing Sphere?
-	bool
-	SurfaceOctreeCube::
-	lineIntersectsSphere( Vertex const & a, Vertex const & dir ) const
-	{
-		assert( std::abs( dir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
-		Vertex const ac( c_ - a );
-		return ac.mag_squared() - ObjexxFCL::square( ObjexxFCL::dot( ac, dir ) ) <= r_;
-	}
-
-	// Line Segment Intersects Cube?
-	bool
-	SurfaceOctreeCube::
-	segmentIntersectsCube( Vertex const & a, Vertex const & b ) const
-	{
-		// Check if a or b in cube: This is optional but can be a fast short-circuit if this happens often enough //Do Test if this improves performance in practice
-		if ( contains( a ) || contains( b ) ) return true;
-
-		// Use separating axis theorem (faster variants exist)
-		Vertex const m( mid( a, b ) - c_ ); // Mid-point relative to cube center
-		Vertex const mb( b - c_ - m ); // ab mid-point to b half segment vector
-		Vertex const e( std::abs( mb.x ), std::abs( mb.y ), std::abs( mb.z ) ); // Extent of half ab segment
-		Real const h( 0.5 * w_ ); // Half-width
-		// Check if x,y,z axes are separating
-		if ( std::abs( m.x ) > h + e.x ) return false;
-		if ( std::abs( m.y ) > h + e.y ) return false;
-		if ( std::abs( m.z ) > h + e.z ) return false;
-		// Check if cross product axes are separating
-		if ( std::abs( m.y * mb.z - m.z * mb.y ) > h * ( e.z + e.y ) ) return false;
-		if ( std::abs( m.x * mb.z - m.z * mb.x ) > h * ( e.z + e.x ) ) return false;
-		if ( std::abs( m.x * mb.y - m.y * mb.x ) > h * ( e.y + e.x ) ) return false;
-		return true;
-	}
-
-	// Ray Intersects Cube?
-	bool
-	SurfaceOctreeCube::
-	rayIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv ) const
-	{
-		// Note: dir_inv coordinates corresponding to a zero dir coordinate are not used and can be set to zero
-		//Do Try 0 <= tmax <= seg_length for segmentIntersectsCube: Faster?
-
-		assert( std::abs( dir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
-		assert( ( dir.x == 0.0 ) || ( std::abs( dir_inv.x - ( 1.0 / dir.x ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.x ) ) );
-		assert( ( dir.y == 0.0 ) || ( std::abs( dir_inv.y - ( 1.0 / dir.y ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.y ) ) );
-		assert( ( dir.z == 0.0 ) || ( std::abs( dir_inv.z - ( 1.0 / dir.z ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.z ) ) );
-
-		// Check if ray origin (a) is in cube
-		if ( contains( a ) ) return true;
-
-		// Smits' method: Largest distance to 3 visible cube faces along ray is the candidate entry point
-		Real tx, ty, tz; // Ray position parameter for intersections with box face planes
-		if ( dir.x != 0.0 ) {
-			tx = ( ( dir.x > 0.0 ? l_.x : u_.x ) - a.x ) * dir_inv.x;
-		} else { // dir.x == 0
-			tx = std::numeric_limits< Real >::lowest();
-		}
-		if ( dir.y != 0.0 ) {
-			ty = ( ( dir.y > 0.0 ? l_.y : u_.y ) - a.y ) * dir_inv.y;
-		} else { // dir.y == 0
-			ty = std::numeric_limits< Real >::lowest();
-		}
-		if ( dir.z != 0.0 ) {
-			tz = ( ( dir.z > 0.0 ? l_.z : u_.z ) - a.z ) * dir_inv.z;
-		} else { // dir.z == 0
-			tz = std::numeric_limits< Real >::lowest();
-		}
-
-		Real const tmax( ObjexxFCL::max( tx, ty, tz ) );
-		if ( tmax >= 0.0 ) { // Intersection is on ray: See if it is within cube extent
-			if ( tx == tmax ) {
-				Real const y( a.y +( tmax * dir.y ) );
-				if ( ( y < l_.y ) || ( y > u_.y ) ) return false;
-				Real const z( a.z +( tmax * dir.z ) );
-				if ( ( z < l_.z ) || ( z > u_.z ) ) return false;
-			} else if ( ty == tmax ) {
-				Real const x( a.x +( tmax * dir.x ) );
-				if ( ( x < l_.x ) || ( x > u_.x ) ) return false;
-				Real const z( a.z +( tmax * dir.z ) );
-				if ( ( z < l_.z ) || ( z > u_.z ) ) return false;
-			} else { // tz == tmax
-				Real const x( a.x +( tmax * dir.x ) );
-				if ( ( x < l_.x ) || ( x > u_.x ) ) return false;
-				Real const y( a.y +( tmax * dir.y ) );
-				if ( ( y < l_.y ) || ( y > u_.y ) ) return false;
-			}
-			return true;
-		} else { // Intersection is on backwards projection of ray
-			return false;
-		}
-	}
-
-	// Line Intersects Cube?
-	bool
-	SurfaceOctreeCube::
-	lineIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv ) const
-	{
-		// Note: dir_inv coordinates corresponding to a zero dir coordinate are not used and can be set to zero
-
-		assert( std::abs( dir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real >::epsilon() ); // Check unit vector
-		assert( ( dir.x == 0.0 ) || ( std::abs( dir_inv.x - ( 1.0 / dir.x ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.x ) ) );
-		assert( ( dir.y == 0.0 ) || ( std::abs( dir_inv.y - ( 1.0 / dir.y ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.y ) ) );
-		assert( ( dir.z == 0.0 ) || ( std::abs( dir_inv.z - ( 1.0 / dir.z ) ) < 2 * std::numeric_limits< Real >::epsilon() * std::abs( dir_inv.z ) ) );
-
-		// Smits' method: Largest distance to 3 visible cube faces along ray is the candidate entry point
-		Real txmin, txmax, tymin, tymax, tzmin, tzmax; // Ray position parameter for intersections with box face planes
-		if ( dir.x > 0.0 ) {
-			txmin = ( l_.x - a.x ) * dir_inv.x;
-			txmax = ( u_.x - a.x ) * dir_inv.x;
-		} else if ( dir.x < 0.0 ) {
-			txmin = ( u_.x - a.x ) * dir_inv.x;
-			txmax = ( l_.x - a.x ) * dir_inv.x;
-		} else { // dir.x == 0
-			txmin = std::numeric_limits< Real >::lowest();
-			txmax = std::numeric_limits< Real >::max();
-		}
-		if ( dir.y > 0.0 ) {
-			tymin = ( l_.y - a.y ) * dir_inv.y;
-			tymax = ( u_.y - a.y ) * dir_inv.y;
-		} else if ( dir.y < 0.0 ) {
-			tymin = ( u_.y - a.y ) * dir_inv.y;
-			tymax = ( l_.y - a.y ) * dir_inv.y;
-		} else { // dir.y == 0
-			tymin= std::numeric_limits< Real >::lowest();
-			tymax= std::numeric_limits< Real >::max();
-		}
-		if ( ( txmin > tymax ) || ( tymin > txmax ) ) return false;
-		if ( dir.z > 0.0 ) {
-			tzmin = ( l_.z - a.z ) * dir_inv.z;
-			tzmax = ( u_.z - a.z ) * dir_inv.z;
-		} else if ( dir.z < 0.0 ) {
-			tzmin = ( u_.z - a.z ) * dir_inv.z;
-			tzmax = ( l_.z - a.z ) * dir_inv.z;
-		} else { // dir.z == 0
-			tzmin= std::numeric_limits< Real >::lowest();
-			tzmax= std::numeric_limits< Real >::max();
-		}
-		Real const tmin( ObjexxFCL::max( txmin, tymin, tzmin ) );
-		if ( tmin > tzmax ) return false;
-		Real const tmax( ObjexxFCL::min( txmax, tymax, tzmax ) );
-		if ( tzmin > tmax ) return false;
-		return true;
-	}
-
 	// Surfaces Outer Cube Initilization
 	void
 	SurfaceOctreeCube::
 	init( ObjexxFCL::Array1< Surface > & surfaces )
 	{
 		assert( d_ == 0u );
+		assert( n_ == 0u );
 		surfaces_.clear();
 		surfaces_.reserve( surfaces.size() );
 		for( Surface & surface : surfaces ) {
@@ -272,114 +145,11 @@ namespace EnergyPlus {
 		Real const h( 0.5 * w_ ); // Half-width
 		l_ = c_ - h;
 		u_ = c_ + h;
-		//std::cout << "SurfaceOctree bounding box: \n" << l_ << '\n' << c_ << '\n' << u_ << std::endl; //Debug/////
 
 		assert( valid() );
 
 		// Branch sub-tree
 		branch();
-	}
-
-	// Surfaces that Line Segment Intersects Cube's Enclosing Sphere
-	void
-	SurfaceOctreeCube::
-	surfacesSegmentIntersectsSphere( Vertex const & a, Vertex const & b, Surfaces & surfaces )
-	{
-		if ( segmentIntersectsSphere( a, b ) ) {
-			// Add this cube's surfaces
-			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
-
-			// Recurse
-			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) {
-				if ( p[ i ] ) p[ i ]->surfacesSegmentIntersectsSphere( a, b, surfaces );
-			}
-		}
-	}
-
-	// Surfaces that Ray Intersects Cube's Enclosing Sphere
-	void
-	SurfaceOctreeCube::
-	surfacesRayIntersectsSphere( Vertex const & a, Vertex const & dir, Surfaces & surfaces )
-	{
-		if ( rayIntersectsSphere( a, dir ) ) {
-			// Add this cube's surfaces
-			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
-
-			// Recurse
-			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) {
-				if ( p[ i ] ) p[ i ]->surfacesRayIntersectsSphere( a, dir, surfaces );
-			}
-		}
-	}
-
-	// Surfaces that Line Intersects Cube's Enclosing Sphere
-	void
-	SurfaceOctreeCube::
-	surfacesLineIntersectsSphere( Vertex const & a, Vertex const & dir, Surfaces & surfaces )
-	{
-		if ( lineIntersectsSphere( a, dir ) ) {
-			// Add this cube's surfaces
-			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
-
-			// Recurse
-			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) {
-				if ( p[ i ] ) p[ i ]->surfacesLineIntersectsSphere( a, dir, surfaces );
-			}
-		}
-	}
-
-	// Surfaces that Line Segment Intersects Cube
-	void
-	SurfaceOctreeCube::
-	surfacesSegmentIntersectsCube( Vertex const & a, Vertex const & b, Surfaces & surfaces )
-	{
-		if ( segmentIntersectsCube( a, b ) ) {
-			// Add this cube's surfaces
-			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
-
-			// Recurse
-			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) {
-				if ( p[ i ] ) p[ i ]->surfacesSegmentIntersectsCube( a, b, surfaces );
-			}
-		}
-	}
-
-	// Surfaces that Ray Intersects Cube
-	void
-	SurfaceOctreeCube::
-	surfacesRayIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv, Surfaces & surfaces )
-	{
-		if ( rayIntersectsCube( a, dir, dir_inv ) ) {
-			// Add this cube's surfaces
-			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
-
-			// Recurse
-			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) {
-				if ( p[ i ] ) p[ i ]->surfacesRayIntersectsCube( a, dir, dir_inv, surfaces );
-			}
-		}
-	}
-
-	// Surfaces that Line Intersects Cube
-	void
-	SurfaceOctreeCube::
-	surfacesLineIntersectsCube( Vertex const & a, Vertex const & dir, Vertex const & dir_inv, Surfaces & surfaces )
-	{
-		if ( lineIntersectsCube( a, dir, dir_inv ) ) {
-			// Add this cube's surfaces
-			if ( ! surfaces_.empty() ) surfaces.insert( surfaces.end(), surfaces_.begin(), surfaces_.end() );
-
-			// Recurse
-			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) {
-				if ( p[ i ] ) p[ i ]->surfacesLineIntersectsCube( a, dir, dir_inv, surfaces );
-			}
-		}
 	}
 
 	// Valid?
@@ -392,7 +162,7 @@ namespace EnergyPlus {
 			if ( ObjexxFCL::distance_squared( c_, cen( l_, u_ ) ) <= tol2 ) {
 				Real const tol( std::max( std::sqrt( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) ) * ( 4 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
 				Vertex const d( u_ - l_ ); // Diagonal
-				return ( std::abs( d.x - w_ ) <= tol ) && ( std::abs( d.x - d.y ) <= tol ) && ( std::abs( d.x - d.z ) <= tol ); // Uniform side witdths?
+				return ( std::abs( d.x - w_ ) <= tol ) && ( std::abs( d.x - d.y ) <= tol ) && ( std::abs( d.x - d.z ) <= tol ); // Uniform side widths?
 			}
 		}
 		return false;
@@ -403,18 +173,30 @@ namespace EnergyPlus {
 	SurfaceOctreeCube::
 	branch()
 	{
-		if ( ( surfaces_.size() > 8u ) && ( d_ < 255u ) ) { //Do Tune max surfaces and max depth parameters
-			// Assign Surfaces to cubes containing them //Do Try loose cubes
+		if ( ( surfaces_.size() > maxSurfaces_ ) && ( d_ < maxDepth_ ) ) {
+			// Assign Surfaces to cubes containing them
 			Surfaces surfaces_all;
 			surfaces_all.swap( surfaces_ );
 			for ( auto * surface_p : surfaces_all ) { // Surfaces
 				surfaceBranch( *surface_p );
 			}
 
+			// Compact occupied cube array
+			n_ = 0u;
+			for ( std::uint8_t i = 0; i < 8; ++i ) {
+				SurfaceOctreeCube * & cube = cubes_[ i ];
+				if ( cube != nullptr ) {
+					if ( n_ < i ) {
+						cubes_[ n_ ] = cube;
+						cube = nullptr;
+					}
+					++n_;
+				}
+			}
+
 			// Branch sub-tree recursively
-			SurfaceOctreeCube * * p = &cubes_[ 0 ][ 0 ][ 0 ];
-			for ( int i = 0; i < 8; ++i ) {
-				if ( p[ i ] ) p[ i ]->branch();
+			for ( std::uint8_t i = 0; i < n_; ++i ) {
+				cubes_[ i ]->branch();
 			}
 		}
 	}
@@ -433,20 +215,28 @@ namespace EnergyPlus {
 			su.max( vertex );
 		}
 		Vertex const ctr( cen( sl, su ) );
-		int const i( ctr.x <= c_.x ? 0 : 1 );
-		int const j( ctr.y <= c_.y ? 0 : 1 );
-		int const k( ctr.z <= c_.z ? 0 : 1 );
-		Real const x( i * h );
-		Real const y( j * h );
-		Real const z( k * h );
-		Vertex const l( l_.x + x, l_.y + y, l_.z + z );
-		Vertex const u( c_.x + x, c_.y + y, c_.z + z );
-		if ( le( l, sl ) && ge( u, su ) ) { // Surface is contained in sub-cube
-			SurfaceOctreeCube * & cube = cubes_[ i ][ j ][ k ]; // Visual C++ 2013 bug prevents constructor notation
-			if ( ! cube ) cube = new SurfaceOctreeCube( d_ + 1, l, u, h );
-			cube->add( surface );
-		} else { // Surface is in this cube
-			surfaces_.push_back( &surface );
+		std::uint8_t const i( ctr.x <= c_.x ? 0 : 1 );
+		std::uint8_t const j( ctr.y <= c_.y ? 0 : 1 );
+		std::uint8_t const k( ctr.z <= c_.z ? 0 : 1 );
+		SurfaceOctreeCube * & cube( cubes_[ ( i << 2 ) + ( j << 1 ) + k ] );
+		if ( cube != nullptr ) { // Candidate cube exists
+			if ( le( cube->l_, sl ) && le( su, cube->u_ ) ) { // Surface is contained in sub-cube
+				cube->add( surface );
+			} else { // Surface stays in this cube
+				surfaces_.push_back( &surface );
+			}
+		} else { // Create cube if surface contained
+			Real const x( i * h );
+			Real const y( j * h );
+			Real const z( k * h );
+			Vertex const l( l_.x + x, l_.y + y, l_.z + z );
+			Vertex const u( c_.x + x, c_.y + y, c_.z + z );
+			if ( le( l, sl ) && le( su, u ) ) { // Surface is contained in sub-cube
+				cube = new SurfaceOctreeCube( d_ + 1, l, u, h );
+				cube->add( surface );
+			} else { // Surface stays in this cube
+				surfaces_.push_back( &surface );
+			}
 		}
 	}
 
@@ -469,28 +259,3 @@ namespace EnergyPlus {
 SurfaceOctreeCube surfaceOctree;
 
 } // EnergyPlus
-
-//=================================================================================
-// NOTICE
-//
-// Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-// and The Regents of the University of California through Ernest Orlando Lawrence
-// Berkeley National Laboratory. All rights reserved.
-//
-// Portions of the EnergyPlus software package have been developed and copyrighted
-// by other individuals, companies and institutions. These portions have been
-// incorporated into the EnergyPlus software package under license. For a complete
-// list of contributors, see "Notice" located in main.cc.
-//
-// NOTICE: The U.S. Government is granted for itself and others acting on its
-// behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-// reproduce, prepare derivative works, and perform publicly and display publicly.
-// Beginning five (5) years after permission to assert copyright is granted,
-// subject to two possible five year renewals, the U.S. Government is granted for
-// itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-// worldwide license in this data to reproduce, prepare derivative works,
-// distribute copies to the public, perform publicly and display publicly, and to
-// permit others to do so.
-//
-// TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-//=================================================================================

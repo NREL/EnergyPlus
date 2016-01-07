@@ -10,6 +10,7 @@
 *.o
 *.o-*
 *.obj
+*.optrpt
 *.orig
 *.pdb
 *.res
@@ -43,4 +44,4 @@ Builds
 .project
 .cproject
 .idea
-
+.se

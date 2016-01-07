@@ -498,6 +498,215 @@ namespace DataSurfaces {
 	Array1D< SurfaceSolarIncident > SurfIncSolSSG;
 	Array1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
 
+	// Class Methods
+
+		// Constructor
+		Surface2D::
+		Surface2D( ShapeCat const shapeCat, int const axis, Vertices const & v, Vector2D const & vl, Vector2D const & vu ) :
+			axis( axis ),
+			vertices( v ),
+			vl( vl ),
+			vu( vu )
+		{
+			assert( vertices.size() >= 3 );
+
+			// Reverse vertices order if clockwise
+			// If sorting by y for slab method can detect clockwise faster by just comparing edges at bottom or top-most vertex
+			Real64 area( 0.0 ); // Actually 2x the signed area
+			for ( Vertices::size_type i = 0, n = vertices.size(); i < n; ++i ) {
+				Vector2D const & v( vertices[ i ] );
+				Vector2D const & w( vertices[ ( i + 1 ) % n ] );
+				area += ( v.x * w.y ) - ( w.x * v.y );
+			}
+			if ( area < 0.0 ) std::reverse( vertices.begin() + 1, vertices.end() ); // Vertices in clockwise order: Reverse all but first
+
+			// Set up edge vectors for ray--surface intersection tests
+			edges.reserve( vertices.size() );
+			for ( Vertices::size_type i = 0, n = vertices.size(); i < n; ++i ) {
+				edges.push_back( vertices[ ( i + 1 ) % n ] - vertices[ i ] );
+			}
+			if ( shapeCat == ShapeCat::Rectangular ) { // Set side length squared for ray--surface intersection tests
+				assert( vertices.size() == 4u );
+				s1 = edges[ 0 ].magnitude_squared();
+				s3 = edges[ 3 ].magnitude_squared();
+			}
+		}
+
+		// Set Precomputed Parameters
+		void
+		SurfaceData::
+		set_computed_geometry()
+		{
+			shapeCat = computed_shapeCat();
+			plane = computed_plane();
+			surface2d = computed_surface2d();
+		}
+
+		void
+		SurfaceData::
+		SetOutBulbTempAt()
+		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Noel Keen (LBL)/Linda Lawrie
+			//       DATE WRITTEN   August 2010
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Routine provides facility for doing bulk Set Temperature at Height.
+
+			// Using/Aliasing
+			using DataEnvironment::EarthRadius;
+			using DataEnvironment::SiteTempGradient;
+			using DataEnvironment::WeatherFileTempModCoeff;
+
+			if ( SiteTempGradient == 0.0 ) {
+				OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+				OutWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+			} else {
+				// Base temperatures at Z = 0 (C)
+				Real64 const BaseDryTemp( DataEnvironment::OutDryBulbTemp + WeatherFileTempModCoeff );
+				Real64 const BaseWetTemp( DataEnvironment::OutWetBulbTemp + WeatherFileTempModCoeff );
+
+				Real64 const Z( Centroid.z ); // Centroid value
+				if ( Z <= 0.0 ) {
+					OutDryBulbTemp = BaseDryTemp;
+					OutWetBulbTemp = BaseWetTemp;
+				} else {
+					OutDryBulbTemp = BaseDryTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
+					OutWetBulbTemp = BaseWetTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
+				}
+			}
+		}
+
+		void
+		SurfaceData::
+		SetWindSpeedAt( Real64 const fac )
+		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Linda Lawrie
+			//       DATE WRITTEN   June 2013
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Routine provides facility for doing bulk Set Windspeed at Height.
+
+			// Using/Aliasing
+			using DataEnvironment::SiteWindExp;
+
+			if ( SiteWindExp == 0.0 ) {
+				WindSpeed = DataEnvironment::WindSpeed;
+			} else {
+				Real64 const Z( Centroid.z ); // Centroid value
+				if ( Z <= 0.0 ) {
+					WindSpeed = 0.0;
+				} else {
+					//  [Met] - at meterological Station, Height of measurement is usually 10m above ground
+					//  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
+					//                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
+					WindSpeed = fac * std::pow( Z, SiteWindExp );
+				}
+			}
+		}
+
+		// Computed Shape Category
+		ShapeCat
+		SurfaceData::
+		computed_shapeCat() const
+		{
+			if ( Shape == Triangle ) {
+				return ShapeCat::Triangular;
+			} else if ( Shape == TriangularWindow ) {
+				return ShapeCat::Triangular;
+			} else if ( Shape == TriangularDoor ) {
+				return ShapeCat::Triangular;
+			} else if ( Shape == Rectangle ) {
+				return ShapeCat::Rectangular;
+			} else if ( Shape == RectangularDoorWindow ) {
+				return ShapeCat::Rectangular;
+			} else if ( Shape == RectangularOverhang ) {
+				return ShapeCat::Rectangular;
+			} else if ( Shape == RectangularLeftFin ) {
+				return ShapeCat::Rectangular;
+			} else if ( Shape == RectangularRightFin ) {
+				return ShapeCat::Rectangular;
+			} else if ( IsConvex ) {
+				return ShapeCat::Convex;
+			} else {
+				return ShapeCat::Nonconvex;
+			}
+		}
+
+		// Computed Plane
+		SurfaceData::Plane
+		SurfaceData::
+		computed_plane() const
+		{
+			Vertices::size_type const n( Vertex.size() );
+			assert( n >= 3 );
+			Vector center( 0.0 ); // Center (vertex average) point (not mass centroid)
+			Real64 a( 0.0 ), b( 0.0 ), c( 0.0 ), d( 0.0 ); // Plane coefficients
+			for ( Vertices::size_type i = 0; i < n; ++i ) { // Newell's method for robustness (not speed)
+				Vector const & v( Vertex[ i ] );
+				Vector const & w( Vertex[ ( i + 1 ) % n ] );
+				a += ( v.y - w.y ) * ( v.z + w.z );
+				b += ( v.z - w.z ) * ( v.x + w.x );
+				c += ( v.x - w.x ) * ( v.y + w.y );
+				center += v;
+			}
+			d = -( dot( center, Vector( a, b, c ) ) / n ); // center/n is the center point
+			return Plane( a, b, c, d ); // a*x + b*y + c*z + d = 0
+		}
+
+		// Computed axis-projected 2D surface
+		Surface2D
+		SurfaceData::
+		computed_surface2d() const
+		{
+			// Project along axis of min surface range for 2D intersection use
+			assert( Vertex.size() >= 3 );
+			using Vertex2D = ObjexxFCL::Vector2< Real64 >;
+			using Vertices2D = ObjexxFCL::Array1D< Vertex2D >;
+			Vector const & v0( Vertex[ 0 ] );
+			Real64 xl( v0.x ), xu( v0.x ); // x coordinate ranges
+			Real64 yl( v0.y ), yu( v0.y ); // y coordinate ranges
+			Real64 zl( v0.z ), zu( v0.z ); // z coordinate ranges
+			for ( Vertices::size_type i = 1, n = Vertex.size(); i < n; ++i ) {
+				Vector const & v( Vertex[ i ] );
+				xl = std::min( xl, v.x );
+				yl = std::min( yl, v.y );
+				zl = std::min( zl, v.z );
+				xu = std::max( xu, v.x );
+				yu = std::max( yu, v.y );
+				zu = std::max( zu, v.z );
+			}
+			Real64 const xd( xu - xl );
+			Real64 const yd( yu - yl );
+			Real64 const zd( zu - zl );
+			Real64 const d_min( ObjexxFCL::min( xd, yd, zd ) );
+			Vertices2D v2d( Vertex.isize() );
+			if ( d_min == xd ) { // Use y,z for 2D surface
+				for ( Vertices::size_type i = 0, n = Vertex.size(); i < n; ++i ) {
+					Vector const & v( Vertex[ i ] );
+					v2d[ i ] = Vertex2D( v.y, v.z );
+				}
+				return Surface2D( shapeCat, 0, v2d, Vertex2D( yl, zl ), Vertex2D( yu, zu ) );
+			} else if ( d_min == yd ) { // Use x,z for 2D surface
+				for ( Vertices::size_type i = 0, n = Vertex.size(); i < n; ++i ) {
+					Vector const & v( Vertex[ i ] );
+					v2d[ i ] = Vertex2D( v.x, v.z );
+				}
+				return Surface2D( shapeCat, 1, v2d, Vertex2D( xl, zl ), Vertex2D( xu, zu ) );
+			} else { // Use x,y for 2D surface
+				for ( Vertices::size_type i = 0, n = Vertex.size(); i < n; ++i ) {
+					Vector const & v( Vertex[ i ] );
+					v2d[ i ] = Vertex2D( v.x, v.y );
+				}
+				return Surface2D( shapeCat, 2, v2d, Vertex2D( xl, yl ), Vertex2D( xu, yu ) );
+			}
+		}
+
 	// Functions
 
 	// Clears the global data in DataSurfaces.
@@ -606,72 +815,6 @@ namespace DataSurfaces {
 		ExtVentedCavity.deallocate();
 		SurfIncSolSSG.deallocate();
 		FenLayAbsSSG.deallocate();
-	}
-
-	void
-	SurfaceData::SetOutBulbTempAt()
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Noel Keen (LBL)/Linda Lawrie
-		//       DATE WRITTEN   August 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Routine provides facility for doing bulk Set Temperature at Height.
-
-		// Using/Aliasing
-		using DataEnvironment::EarthRadius;
-		using DataEnvironment::SiteTempGradient;
-		using DataEnvironment::WeatherFileTempModCoeff;
-
-		if ( SiteTempGradient == 0.0 ) {
-			OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-			OutWetBulbTemp = DataEnvironment::OutWetBulbTemp;
-		} else {
-			// Base temperatures at Z = 0 (C)
-			Real64 const BaseDryTemp( DataEnvironment::OutDryBulbTemp + WeatherFileTempModCoeff );
-			Real64 const BaseWetTemp( DataEnvironment::OutWetBulbTemp + WeatherFileTempModCoeff );
-
-			Real64 const Z( Centroid.z ); // Centroid value
-			if ( Z <= 0.0 ) {
-				OutDryBulbTemp = BaseDryTemp;
-				OutWetBulbTemp = BaseWetTemp;
-			} else {
-				OutDryBulbTemp = BaseDryTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-				OutWetBulbTemp = BaseWetTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-			}
-		}
-	}
-
-	void
-	SurfaceData::SetWindSpeedAt( Real64 const fac )
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   June 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Routine provides facility for doing bulk Set Windspeed at Height.
-
-		// Using/Aliasing
-		using DataEnvironment::SiteWindExp;
-
-		if ( SiteWindExp == 0.0 ) {
-			WindSpeed = DataEnvironment::WindSpeed;
-		} else {
-			Real64 const Z( Centroid.z ); // Centroid value
-			if ( Z <= 0.0 ) {
-				WindSpeed = 0.0;
-			} else {
-				//  [Met] - at meterological Station, Height of measurement is usually 10m above ground
-				//  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
-				//                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-				WindSpeed = fac * std::pow( Z, SiteWindExp );
-			}
-		}
 	}
 
 	void

@@ -59,15 +59,30 @@
 #ifndef DataSurfaces_hh_INCLUDED
 #define DataSurfaces_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array2D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataBSDFWindow.hh>
 #include <DataGlobals.hh>
 #include <DataVectorTypes.hh>
+#include <Shape.hh>
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Fmath.hh>
+#include <ObjexxFCL/TypeTraits.hh>
+#include <ObjexxFCL/Vector3.hh>
+#include <ObjexxFCL/Vector4.hh>
+
+// C++ Headers
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <type_traits>
+#include <utility>
 
 namespace EnergyPlus {
 
@@ -465,8 +480,69 @@ namespace DataSurfaces {
 
 	// Types
 
+	// Projected 2D Surface Representation for Fast Computational Geometry Operations
+	struct Surface2D
+	{
+
+	public: // Types
+
+		using Vector2D = Vector2< Real64 >;
+		using Vertices = Array1D< Vector2D >;
+		using Vectors = Array1D< Vector2D >;
+
+	public: // Creation
+
+		// Default constructor
+		Surface2D()
+		{}
+
+		// Constructor
+		Surface2D( ShapeCat const shapeCat, int const axis, Vertices const & v, Vector2D const & vl, Vector2D const & vu );
+
+	public: // Predicates
+
+		// Bounding box contains a point?
+		bool
+		bb_contains( Vector2D const & v ) const
+		{
+			return ( vl.x <= v.x ) && ( v.x <= vu.x ) && ( vl.y <= v.y ) && ( v.y <= vu.y );
+		}
+
+	public: // Comparison
+
+		// Equality
+		friend
+		bool
+		operator ==( Surface2D const & a, Surface2D const & b )
+		{
+			return eq( a.vertices, b.vertices );
+		}
+
+		// Inequality
+		friend
+		bool
+		operator !=( Surface2D const & a, Surface2D const & b )
+		{
+			 return !( a == b );
+		}
+
+	public: // Data
+
+		int axis = 0; // Axis of projection (0=x, 1=y, 2=z)
+		Vertices vertices; // Vertices
+		Vector2D vl = Vector2D( 0.0 ), vu = Vector2D( 0.0 ); // Bounding box lower and upper corner vertices
+		Vectors edges; // Edge vectors around the vertices
+		Real64 s1 = 0.0, s3 = 0.0; // Rectangle side widths squared
+
+	}; // Surface2D
+
 	struct SurfaceData
 	{
+
+		// Types
+		using Vertices = Array1D< Vector >;
+		using Plane = Vector4< Real64 >;
+
 		// Members
 		std::string Name; // User supplied name of the surface (must be unique)
 		int Construction; // Pointer to the construction in the Construct derived type
@@ -560,7 +636,7 @@ namespace DataSurfaces {
 		int SchedMovInsulExt; // Schedule for exterior movable insulation
 		int SchedMovInsulInt; // Schedule for interior movable insulation
 		// Vertices
-		Array1D< Vector > Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
+		Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
 		Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
 		Vector lcsx;
 		Vector lcsy;
@@ -574,6 +650,10 @@ namespace DataSurfaces {
 		Real64 CosTilt; // Cosine of surface tilt angle
 		bool IsConvex; // true if the surface is convex.
 		bool IsDegenerate; // true if the surface is degenerate.
+		// Precomputed parameters for PierceSurface performance
+		ShapeCat shapeCat; // Shape category
+		Plane plane; // Plane
+		Surface2D surface2d; // 2D projected surface for efficient intersection testing
 		// Window Parameters (when surface is Window)
 		int WindowShadingControlPtr; // Pointer to shading control (windows only)
 		int ShadedConstruction; // Shaded construction (windows only)
@@ -704,6 +784,8 @@ namespace DataSurfaces {
 			CosTilt( 0.0 ),
 			IsConvex( true ),
 			IsDegenerate( false ),
+			shapeCat( ShapeCat::Unknown ),
+			plane( 0.0, 0.0, 0.0, 0.0 ),
 			WindowShadingControlPtr( 0 ),
 			ShadedConstruction( 0 ),
 			StormWinConstruction( 0 ),
@@ -753,254 +835,31 @@ namespace DataSurfaces {
 			GenericContam( 0.0 )
 		{}
 
-		// Member Constructor
-		SurfaceData(
-			std::string const & Name, // User supplied name of the surface (must be unique)
-			int const Construction, // Pointer to the construction in the Construct derived type
-			bool const EMSConstructionOverrideON, // if true, EMS is calling to override the construction value
-			int const EMSConstructionOverrideValue, // pointer value to use for Construction when overridden
-			int const ConstructionStoredInputValue, // holds the original value for Construction per surface input
-			int const Class,
-			int const Shape, // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
-			int const Sides, // Number of side/vertices for this surface (based on Shape)
-			Real64 const Area, // Surface area of the surface (less any subsurfaces) {m2}
-			Real64 const GrossArea, // Surface area of the surface (including subsurfaces) {m2}
-			Real64 const NetAreaShadowCalc, // Area of a wall/floor/ceiling less subsurfaces assuming
-			Real64 const Perimeter, // Perimeter length of the surface {m}
-			Real64 const Azimuth, // Direction the surface outward normal faces (degrees) or FACING
-			Real64 const Height, // Height of the surface (m)
-			Real64 const Reveal, // Depth of the window reveal (m) if this surface is a window
-			Real64 const Tilt, // Angle (deg) between the ground outward normal and the surface outward normal
-			Real64 const Width, // Width of the surface (m)
-			bool const HeatTransSurf, // True if surface is a heat transfer surface,
-			int const HeatTransferAlgorithm, // used for surface-specific heat transfer algorithm.
-			std::string const & BaseSurfName, // Name of BaseSurf
-			int const BaseSurf, // "Base surface" for this surface.  Applies mainly to subsurfaces
-			int const NumSubSurfaces, // Number of subsurfaces this surface has (doors/windows)
-			std::string const & ZoneName, // User supplied name of the Zone
-			int const Zone, // Interior environment or zone the surface is a part of
-			std::string const & ExtBoundCondName, // Name for the Outside Environment Object
-			int const ExtBoundCond, // For an "interzone" surface, this is the adjacent surface number.
-			int const LowTempErrCount,
-			int const HighTempErrCount,
-			bool const ExtSolar, // True if the "outside" of the surface is exposed to solar
-			bool const ExtWind, // True if the "outside" of the surface is exposed to wind
-			int const IntConvCoeff, // Interior Convection Coefficient pointer (different data structure)
-			bool const EMSOverrideIntConvCoef, // if true, EMS is calling to override interior convection coefficeint
-			Real64 const EMSValueForIntConvCoef, // Value EMS is calling to use for interior convection coefficient [W/m2-K]
-			int const ExtConvCoeff, // Exterior Convection Coefficient pointer (different data structure)
-			bool const EMSOverrideExtConvCoef, // if true, EMS is calling to override exterior convection coefficeint
-			Real64 const EMSValueForExtConvCoef, // Value EMS is calling to use for exterior convection coefficient [W/m2-K]
-			Real64 const ViewFactorGround, // View factor to the ground from the exterior of the surface
-			Real64 const ViewFactorSky, // View factor to the sky from the exterior of the surface
-			Real64 const ViewFactorGroundIR, // View factor to the ground and shadowing surfaces from the
-			Real64 const ViewFactorSkyIR, // View factor to the sky from the exterior of the surface for IR radiation
-			int const OSCPtr, // Pointer to OSC data structure
-			int const OSCMPtr, // "Pointer" to OSCM data structure (other side conditions from a model)
-			int const SchedShadowSurfIndex, // Schedule for a shadowing (sub)surface
-			bool const ShadowSurfSchedVaries, // true if the scheduling (transmittance) on a shading surface varies.
-			bool const ShadowingSurf, // True if a surface is a shadowing surface
-			bool const IsTransparent, // True if the schedule values are always 1.0 (or the minimum is 1.0)
-			Real64 const SchedMinValue, // Schedule minimum value.
-			Real64 const ShadowSurfDiffuseSolRefl, // Diffuse solar reflectance of opaque portion
-			Real64 const ShadowSurfDiffuseVisRefl, // Diffuse visible reflectance of opaque portion
-			Real64 const ShadowSurfGlazingFrac, // Glazing fraction
-			int const ShadowSurfGlazingConstruct, // Glazing construction number
-			bool const ShadowSurfPossibleObstruction, // True if a surface can be an exterior obstruction
-			bool const ShadowSurfPossibleReflector, // True if a surface can be an exterior reflector, not used!
-			int const ShadowSurfRecSurfNum, // Receiving surface number
-			int const MaterialMovInsulExt, // Pointer to the material used for exterior movable insulation
-			int const MaterialMovInsulInt, // Pointer to the material used for interior movable insulation
-			int const SchedMovInsulExt, // Schedule for exterior movable insulation
-			int const SchedMovInsulInt, // Schedule for interior movable insulation
-			Array1< Vector > const & Vertex, // Surface Vertices are represented by Number of Sides and Vector (type)
-			Vector const & Centroid, // computed centroid (also known as center of mass or surface balance point)
-			Vector const & lcsx,
-			Vector const & lcsy,
-			Vector const & lcsz,
-			Vector const & NewellAreaVector,
-			Vector const & NewellSurfaceNormalVector, // same as OutNormVec in vector notation
-			Array1< Real64 > const & OutNormVec, // Direction cosines (outward normal vector) for surface
-			Real64 const SinAzim, // Sine of surface azimuth angle
-			Real64 const CosAzim, // Cosine of surface azimuth angle
-			Real64 const SinTilt, // Sine of surface tilt angle
-			Real64 const CosTilt, // Cosine of surface tilt angle
-			bool const IsConvex, // true if the surface is convex.
-			bool const IsDegenerate, // true if the surface is degenerate.
-			int const WindowShadingControlPtr, // Pointer to shading control (windows only)
-			int const ShadedConstruction, // Shaded construction (windows only)
-			int const StormWinConstruction, // Construction with storm window (windows only)
-			int const StormWinShadedConstruction, // Shaded construction with storm window (windows only)
-			int const FrameDivider, // Pointer to frame and divider information (windows only)
-			Real64 const Multiplier, // Multiplies glazed area, frame area and divider area (windows only)
-			int const Shelf, // Pointer to daylighting shelf
-			int const TAirRef, // Flag for reference air temperature
-			Real64 const OutDryBulbTemp, // Surface outside dry bulb air temperature, for surface heat balance (C)
-			bool const OutDryBulbTempEMSOverrideOn, // if true, EMS is calling to override the surface's outdoor air temp
-			Real64 const OutDryBulbTempEMSOverrideValue, // value to use for EMS override of outdoor air drybulb temp (C)
-			Real64 const OutWetBulbTemp, // Surface outside wet bulb air temperature, for surface heat balance (C)
-			bool const OutWetBulbTempEMSOverrideOn, // if true, EMS is calling to override the surface's outdoor wetbulb
-			Real64 const OutWetBulbTempEMSOverrideValue, // value to use for EMS override of outdoor air wetbulb temp (C)
-			Real64 const WindSpeed, // Surface outside wind speed, for surface heat balance (m/s)
-			bool const WindSpeedEMSOverrideOn,
-			Real64 const WindSpeedEMSOverrideValue,
-			std::string const & UNomWOFilm, // Nominal U Value without films stored as string
-			std::string const & UNomFilm, // Nominal U Value with films stored as string
-			bool const ExtEcoRoof, // True if the top outside construction material is of type Eco Roof
-			bool const ExtCavityPresent, // true if there is an exterior vented cavity on surface
-			int const ExtCavNum, // index for this surface in ExtVentedCavity structure (if any)
-			bool const IsPV, // true if this is a photovoltaic surface (dxf output)
-			bool const IsICS, // true if this is an ICS collector
-			bool const IsPool, // true if this is a pool
-			int const ICSPtr, // Index to ICS collector
-			bool const MirroredSurf, // Ture if it is a mirrored surface
-			int const IntConvClassification, // current classification for inside face air flow regime and surface orientation
-			int const IntConvHcModelEq, // current convection model for inside face
-			int const IntConvHcUserCurveIndex, // current index to user convection model if used
-			int const OutConvClassification, // current classification for outside face wind regime and convection orientation
-			int const OutConvHfModelEq, // current convection model for forced convection at outside face
-			int const OutConvHfUserCurveIndex, // current index to user forced convection model if used
-			int const OutConvHnModelEq, // current Convection model for natural convection at outside face
-			int const OutConvHnUserCurveIndex, // current index to user natural convection model if used
-			Real64 const OutConvFaceArea, // area of larger building envelope facade that surface is a part of
-			Real64 const OutConvFacePerimeter, // perimeter of larger building envelope facade that surface is a part of
-			Real64 const OutConvFaceHeight, // height of larger building envelope facade that surface is a part of
-			Real64 const IntConvZoneWallHeight, // [m] height of larger inside building wall element that surface is a part of
-			Real64 const IntConvZonePerimLength, // [m] length of perimeter zone's exterior wall
-			Real64 const IntConvZoneHorizHydrDiam, // [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter
-			Real64 const IntConvWindowWallRatio, // [-] area of windows over area of exterior wall for zone
-			int const IntConvWindowLocation, // relative location of window in zone for interior Hc models
-			bool const IntConvSurfGetsRadiantHeat,
-			bool const IntConvSurfHasActiveInIt,
-			bool const PartOfVentSlabOrRadiantSurface, // surface cannot be part of both a radiant surface & ventilated slab group
-			Real64 const GenericContam // [ppm] Surface generic contaminant as a storage term for
-		) :
-			Name( Name ),
-			Construction( Construction ),
-			EMSConstructionOverrideON( EMSConstructionOverrideON ),
-			EMSConstructionOverrideValue( EMSConstructionOverrideValue ),
-			ConstructionStoredInputValue( ConstructionStoredInputValue ),
-			Class( Class ),
-			Shape( Shape ),
-			Sides( Sides ),
-			Area( Area ),
-			GrossArea( GrossArea ),
-			NetAreaShadowCalc( NetAreaShadowCalc ),
-			Perimeter( Perimeter ),
-			Azimuth( Azimuth ),
-			Height( Height ),
-			Reveal( Reveal ),
-			Tilt( Tilt ),
-			Width( Width ),
-			HeatTransSurf( HeatTransSurf ),
-			HeatTransferAlgorithm( HeatTransferAlgorithm ),
-			BaseSurfName( BaseSurfName ),
-			BaseSurf( BaseSurf ),
-			NumSubSurfaces( NumSubSurfaces ),
-			ZoneName( ZoneName ),
-			Zone( Zone ),
-			ExtBoundCondName( ExtBoundCondName ),
-			ExtBoundCond( ExtBoundCond ),
-			LowTempErrCount( LowTempErrCount ),
-			HighTempErrCount( HighTempErrCount ),
-			ExtSolar( ExtSolar ),
-			ExtWind( ExtWind ),
-			IntConvCoeff( IntConvCoeff ),
-			EMSOverrideIntConvCoef( EMSOverrideIntConvCoef ),
-			EMSValueForIntConvCoef( EMSValueForIntConvCoef ),
-			ExtConvCoeff( ExtConvCoeff ),
-			EMSOverrideExtConvCoef( EMSOverrideExtConvCoef ),
-			EMSValueForExtConvCoef( EMSValueForExtConvCoef ),
-			ViewFactorGround( ViewFactorGround ),
-			ViewFactorSky( ViewFactorSky ),
-			ViewFactorGroundIR( ViewFactorGroundIR ),
-			ViewFactorSkyIR( ViewFactorSkyIR ),
-			OSCPtr( OSCPtr ),
-			OSCMPtr( OSCMPtr ),
-			SchedShadowSurfIndex( SchedShadowSurfIndex ),
-			ShadowSurfSchedVaries( ShadowSurfSchedVaries ),
-			ShadowingSurf( ShadowingSurf ),
-			IsTransparent( IsTransparent ),
-			SchedMinValue( SchedMinValue ),
-			ShadowSurfDiffuseSolRefl( ShadowSurfDiffuseSolRefl ),
-			ShadowSurfDiffuseVisRefl( ShadowSurfDiffuseVisRefl ),
-			ShadowSurfGlazingFrac( ShadowSurfGlazingFrac ),
-			ShadowSurfGlazingConstruct( ShadowSurfGlazingConstruct ),
-			ShadowSurfPossibleObstruction( ShadowSurfPossibleObstruction ),
-			ShadowSurfPossibleReflector( ShadowSurfPossibleReflector ),
-			ShadowSurfRecSurfNum( ShadowSurfRecSurfNum ),
-			MaterialMovInsulExt( MaterialMovInsulExt ),
-			MaterialMovInsulInt( MaterialMovInsulInt ),
-			SchedMovInsulExt( SchedMovInsulExt ),
-			SchedMovInsulInt( SchedMovInsulInt ),
-			Vertex( Vertex ),
-			Centroid( Centroid ),
-			lcsx( lcsx ),
-			lcsy( lcsy ),
-			lcsz( lcsz ),
-			NewellAreaVector( NewellAreaVector ),
-			NewellSurfaceNormalVector( NewellSurfaceNormalVector ),
-			OutNormVec( 3, OutNormVec ),
-			SinAzim( SinAzim ),
-			CosAzim( CosAzim ),
-			SinTilt( SinTilt ),
-			CosTilt( CosTilt ),
-			IsConvex( IsConvex ),
-			IsDegenerate( IsDegenerate ),
-			WindowShadingControlPtr( WindowShadingControlPtr ),
-			ShadedConstruction( ShadedConstruction ),
-			StormWinConstruction( StormWinConstruction ),
-			StormWinShadedConstruction( StormWinShadedConstruction ),
-			FrameDivider( FrameDivider ),
-			Multiplier( Multiplier ),
-			Shelf( Shelf ),
-			TAirRef( TAirRef ),
-			OutDryBulbTemp( OutDryBulbTemp ),
-			OutDryBulbTempEMSOverrideOn( OutDryBulbTempEMSOverrideOn ),
-			OutDryBulbTempEMSOverrideValue( OutDryBulbTempEMSOverrideValue ),
-			OutWetBulbTemp( OutWetBulbTemp ),
-			OutWetBulbTempEMSOverrideOn( OutWetBulbTempEMSOverrideOn ),
-			OutWetBulbTempEMSOverrideValue( OutWetBulbTempEMSOverrideValue ),
-			WindSpeed( WindSpeed ),
-			WindSpeedEMSOverrideOn( WindSpeedEMSOverrideOn ),
-			WindSpeedEMSOverrideValue( WindSpeedEMSOverrideValue ),
-			UNomWOFilm( UNomWOFilm ),
-			UNomFilm( UNomFilm ),
-			ExtEcoRoof( ExtEcoRoof ),
-			ExtCavityPresent( ExtCavityPresent ),
-			ExtCavNum( ExtCavNum ),
-			IsPV( IsPV ),
-			IsICS( IsICS ),
-			IsPool( IsPool ),
-			ICSPtr( ICSPtr ),
-			MirroredSurf( MirroredSurf ),
-			IntConvClassification( IntConvClassification ),
-			IntConvHcModelEq( IntConvHcModelEq ),
-			IntConvHcUserCurveIndex( IntConvHcUserCurveIndex ),
-			OutConvClassification( OutConvClassification ),
-			OutConvHfModelEq( OutConvHfModelEq ),
-			OutConvHfUserCurveIndex( OutConvHfUserCurveIndex ),
-			OutConvHnModelEq( OutConvHnModelEq ),
-			OutConvHnUserCurveIndex( OutConvHnUserCurveIndex ),
-			OutConvFaceArea( OutConvFaceArea ),
-			OutConvFacePerimeter( OutConvFacePerimeter ),
-			OutConvFaceHeight( OutConvFaceHeight ),
-			IntConvZoneWallHeight( IntConvZoneWallHeight ),
-			IntConvZonePerimLength( IntConvZonePerimLength ),
-			IntConvZoneHorizHydrDiam( IntConvZoneHorizHydrDiam ),
-			IntConvWindowWallRatio( IntConvWindowWallRatio ),
-			IntConvWindowLocation( IntConvWindowLocation ),
-			IntConvSurfGetsRadiantHeat( IntConvSurfGetsRadiantHeat ),
-			IntConvSurfHasActiveInIt( IntConvSurfHasActiveInIt ),
-			PartOfVentSlabOrRadiantSurface( PartOfVentSlabOrRadiantSurface ),
-			GenericContam( GenericContam )
-		{}
+	public: // Methods
+
+		// Set Precomputed Parameters
+		void
+		set_computed_geometry();
 
 		void
 		SetOutBulbTempAt();
 
 		void
 		SetWindSpeedAt( Real64 const fac );
+
+	private: // Methods
+
+		// Computed Shape Category
+		ShapeCat
+		computed_shapeCat() const;
+
+		// Computed Plane
+		Plane
+		computed_plane() const;
+
+		// Computed axis-projected 2D surface
+		Surface2D
+		computed_surface2d() const;
 
 	};
 

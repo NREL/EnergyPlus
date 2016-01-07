@@ -120,13 +120,13 @@ namespace EnergyPlus {
 
 			EXPECT_TRUE( compare_idf( "SITE:LOCATION", 1, 4, { "USA IL-CHICAGO-OHARE" }, { false }, { 41.77, -87.75, -6.0, 190 }, { false, false, false, false } ) );
 
-			EXPECT_TRUE( compare_idf( 
-				"BUILDINGSURFACE:DETAILED", 
-				8, 
-				14, 
-				{ "ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" }, 
-				{ false, false, false, false, false, true, false, false }, 
-				{ 0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572 }, 
+			EXPECT_TRUE( compare_idf(
+				"BUILDINGSURFACE:DETAILED",
+				8,
+				14,
+				{ "ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" },
+				{ false, false, false, false, false, true, false, false },
+				{ 0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572 },
 				{ false, false, false, false, false, false, false, false, false, false, false, false, false, false }
 			) );
 
@@ -590,7 +590,7 @@ namespace EnergyPlus {
 
 		TEST_F( InputProcessorFixture, addObjectDefandParse )
 		{
-			std::string const idd_objects = 
+			std::string const idd_objects =
 				"Output:SQLite,\n"
 				"       \\memo Output from EnergyPlus can be written to an SQLite format file.\n"
 				"       \\unique-object\n"

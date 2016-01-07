@@ -16,6 +16,7 @@ SET( SRC
   AirflowNetworkSolver.cc
   AirflowNetworkSolver.hh
   AirTerminalUnit.hh
+  ALWAYS_INLINE.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -372,7 +373,6 @@ SET( SRC
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
   Photovoltaics.hh
-  PierceSurface.cc
   PierceSurface.hh
   PipeHeatTransfer.cc
   PipeHeatTransfer.hh
@@ -439,6 +439,7 @@ SET( SRC
   ScheduleManager.hh
   SetPointManager.cc
   SetPointManager.hh
+  Shape.hh
   SimAirServingZones.cc
   SimAirServingZones.hh
   SimulationManager.cc
@@ -469,10 +470,10 @@ SET( SRC
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc
   SurfaceGroundHeatExchanger.hh
-  SwimmingPool.cc
-  SwimmingPool.hh
   SurfaceOctree.cc
   SurfaceOctree.hh
+  SwimmingPool.cc
+  SwimmingPool.hh
   SystemAvailabilityManager.cc
   SystemAvailabilityManager.hh
   SystemReports.cc

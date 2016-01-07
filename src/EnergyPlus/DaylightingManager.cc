@@ -1017,8 +1017,8 @@ namespace DaylightingManager {
 		static bool refFirstTime( true );
 		int BRef;
 		int ILB;
-		int IHitIntObs; // = 1 if interior obstruction hit, = 0 otherwise
-		int IHitExtObs; // 1 if ray from ref pt to ext win hits an exterior obstruction
+		bool hitIntObs; // True iff interior obstruction hit
+		bool hitExtObs; // True iff ray from ref pt to ext win hits an exterior obstruction
 		Real64 TVISIntWin; // Visible transmittance of int win at COSBIntWin for light from ext win
 		Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
 		static bool MySunIsUpFlag( false );
@@ -1100,7 +1100,7 @@ namespace DaylightingManager {
 
 						++WinEl;
 
-						FigureDayltgCoeffsAtPointsForWindowElements( ZoneNum, IL, loopwin, CalledForRefPoint, WinEl, IWin, IWin2, IX, IY, SkyObstructionMult, W2, W21, W23, RREF, NWYlim, VIEWVC2, DWX, DWY, DAXY, U2, U23, U21, RWIN, RWIN2, Ray, PHRAY, LSHCAL, COSB, ObTrans, TVISB, DOMEGA, THRAY, IHitIntObs, IHitExtObs, WNORM2, ExtWinType, IConst, RREF2, is_Triangle, TVISIntWin, TVISIntWinDisk );
+						FigureDayltgCoeffsAtPointsForWindowElements( ZoneNum, IL, loopwin, CalledForRefPoint, WinEl, IWin, IWin2, IX, IY, SkyObstructionMult, W2, W21, W23, RREF, NWYlim, VIEWVC2, DWX, DWY, DAXY, U2, U23, U21, RWIN, RWIN2, Ray, PHRAY, LSHCAL, COSB, ObTrans, TVISB, DOMEGA, THRAY, hitIntObs, hitExtObs, WNORM2, ExtWinType, IConst, RREF2, is_Triangle, TVISIntWin, TVISIntWinDisk );
 
 						//           -------------------
 						// ---------- SUN POSITION LOOP ----------
@@ -1113,7 +1113,7 @@ namespace DaylightingManager {
 							ISunPos = 0;
 							for ( IHR = 1; IHR <= 24; ++IHR ) {
 
-								FigureDayltgCoeffsAtPointsForSunPosition( ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, IHR, ISunPos, SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2, IHitIntObs, IHitExtObs, CalledForRefPoint, TVISIntWin, TVISIntWinDisk );
+								FigureDayltgCoeffsAtPointsForSunPosition( ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, IHR, ISunPos, SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2, hitIntObs, hitExtObs, CalledForRefPoint, TVISIntWin, TVISIntWinDisk );
 
 							} // End of hourly sun position loop, IHR
 						} else { //timestep integrated
@@ -1129,7 +1129,7 @@ namespace DaylightingManager {
 								ISunPos = -1;
 							}
 
-							FigureDayltgCoeffsAtPointsForSunPosition( ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, HourOfDay, ISunPos, SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2, IHitIntObs, IHitExtObs, CalledForRefPoint, TVISIntWin, TVISIntWinDisk );
+							FigureDayltgCoeffsAtPointsForSunPosition( ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, HourOfDay, ISunPos, SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2, hitIntObs, hitExtObs, CalledForRefPoint, TVISIntWin, TVISIntWinDisk );
 						}
 
 					} // End of window Y-element loop, IY
@@ -1269,8 +1269,8 @@ namespace DaylightingManager {
 		int ExtWinType; // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
 		int ILB;
 		int MapNum; // Loop for map number
-		int IHitIntObs; // = 1 if interior obstruction hit, = 0 otherwise
-		int IHitExtObs; // 1 if ray from ref pt to ext win hits an exterior obstruction
+		bool hitIntObs; // True iff interior obstruction hit
+		bool hitExtObs; // True iff ray from ref pt to ext win hits an exterior obstruction
 		Real64 TVISIntWin; // Visible transmittance of int win at COSBIntWin for light from ext win
 		Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
 //		Array2D< Real64 > MapWindowSolidAngAtRefPt; //Inactive Only allocated and assigning to: Also only 1 value used at a time
@@ -1363,7 +1363,7 @@ namespace DaylightingManager {
 
 							++WinEl;
 
-							FigureDayltgCoeffsAtPointsForWindowElements( ZoneNum, IL, loopwin, CalledForMapPoint, WinEl, IWin, IWin2, IX, IY, SkyObstructionMult, W2, W21, W23, RREF, NWYlim, VIEWVC2, DWX, DWY, DAXY, U2, U23, U21, RWIN, RWIN2, Ray, PHRAY, LSHCAL, COSB, ObTrans, TVISB, DOMEGA, THRAY, IHitIntObs, IHitExtObs, WNORM2, ExtWinType, IConst, RREF2, is_Triangle, TVISIntWin, TVISIntWinDisk, MapNum, MapWindowSolidAngAtRefPtWtd ); // Inactive MapWindowSolidAngAtRefPt arg removed
+							FigureDayltgCoeffsAtPointsForWindowElements( ZoneNum, IL, loopwin, CalledForMapPoint, WinEl, IWin, IWin2, IX, IY, SkyObstructionMult, W2, W21, W23, RREF, NWYlim, VIEWVC2, DWX, DWY, DAXY, U2, U23, U21, RWIN, RWIN2, Ray, PHRAY, LSHCAL, COSB, ObTrans, TVISB, DOMEGA, THRAY, hitIntObs, hitExtObs, WNORM2, ExtWinType, IConst, RREF2, is_Triangle, TVISIntWin, TVISIntWinDisk, MapNum, MapWindowSolidAngAtRefPtWtd ); // Inactive MapWindowSolidAngAtRefPt arg removed
 							//           -------------------
 							// ---------- SUN POSITION LOOP ----------
 							//           -------------------
@@ -1373,7 +1373,7 @@ namespace DaylightingManager {
 							if ( ! DetailedSolarTimestepIntegration ) {
 								ISunPos = 0;
 								for ( IHR = 1; IHR <= 24; ++IHR ) {
-									FigureDayltgCoeffsAtPointsForSunPosition( ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, IHR, ISunPos, SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2, IHitIntObs, IHitExtObs, CalledForMapPoint, TVISIntWin, TVISIntWinDisk, MapNum, MapWindowSolidAngAtRefPtWtd );
+									FigureDayltgCoeffsAtPointsForSunPosition( ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, IHR, ISunPos, SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2, hitIntObs, hitExtObs, CalledForMapPoint, TVISIntWin, TVISIntWinDisk, MapNum, MapWindowSolidAngAtRefPtWtd );
 								} // End of hourly sun position loop, IHR
 							} else {
 								if ( SunIsUp && ! MySunIsUpFlag ) {
@@ -1387,7 +1387,7 @@ namespace DaylightingManager {
 								} else if ( ! SunIsUp && ! MySunIsUpFlag ) {
 									ISunPos = -1;
 								}
-								FigureDayltgCoeffsAtPointsForSunPosition( ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, HourOfDay, ISunPos, SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2, IHitIntObs, IHitExtObs, CalledForMapPoint, TVISIntWin, TVISIntWinDisk, MapNum, MapWindowSolidAngAtRefPtWtd );
+								FigureDayltgCoeffsAtPointsForSunPosition( ZoneNum, IL, IX, NWX, IY, NWYlim, WinEl, IWin, IWin2, HourOfDay, ISunPos, SkyObstructionMult, RWIN2, Ray, PHRAY, LSHCAL, InShelfSurf, COSB, ObTrans, TVISB, DOMEGA, ICtrl, ShType, BlNum, THRAY, WNORM2, ExtWinType, IConst, AZVIEW, RREF2, hitIntObs, hitExtObs, CalledForMapPoint, TVISIntWin, TVISIntWinDisk, MapNum, MapWindowSolidAngAtRefPtWtd );
 
 							}
 						} // End of window Y-element loop, IY
@@ -1889,8 +1889,8 @@ namespace DaylightingManager {
 		Real64 & TVISB, // Visible transmittance of window for COSB angle of incidence (times light well
 		Real64 & DOMEGA, // Solid angle subtended by window element wrt reference point (steradians)
 		Real64 & THRAY, // Azimuth of ray from reference point to window element (radians)
-		int & IHitIntObs, // = 1 if interior obstruction hit, = 0 otherwise
-		int & IHitExtObs, // 1 if ray from ref pt to ext win hits an exterior obstruction
+		bool & hitIntObs, // True iff interior obstruction hit
+		bool & hitExtObs, // True iff ray from ref pt to ext win hits an exterior obstruction
 		Vector3< Real64 > const & WNORM2, // Unit vector normal to window
 		int const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
 		int const IConst, // Construction counter
@@ -1951,7 +1951,7 @@ namespace DaylightingManager {
 		Real64 YR; // Vertical displacement ratio
 
 		int IntWinHitNum; // Surface number of interior window that is intersected
-		int IHitIntWin; // Ray from ref pt passes through interior window
+		bool hitIntWin; // Ray from ref pt passes through interior window
 		int PipeNum; // TDD pipe object number
 		int IntWin; // Interior window surface index
 		static Vector3< Real64 > HitPtIntWin; // Intersection point on an interior window for ray from ref pt to ext win (m)
@@ -2029,9 +2029,9 @@ namespace DaylightingManager {
 				POSFAC = DayltgGlarePositionFactor( XR, YR );
 			}
 
-			IHitIntObs = 0;
+			hitIntObs = false;
 			IntWinHitNum = 0;
-			IHitIntWin = 0;
+			hitIntWin = false;
 			TVISIntWinDisk = 0.0; // Init Value
 			TVISIntWin = 0.0;
 
@@ -2052,17 +2052,16 @@ namespace DaylightingManager {
 					TVISB = 0.0;
 				}
 				if ( ExtWinType == AdjZoneExtWin ) {
-					IHitIntWin = 0;
 					// Does ray pass through an interior window in zone (ZoneNum) containing the ref point?
 					for ( IntWin = Zone( ZoneNum ).SurfaceFirst; IntWin <= Zone( ZoneNum ).SurfaceLast; ++IntWin ) {
 						if ( Surface( IntWin ).Class == SurfaceClass_Window && Surface( IntWin ).ExtBoundCond >= 1 ) {
 							if ( Surface( Surface( IntWin ).ExtBoundCond ).Zone == Surface( IWin ).Zone ) {
-								PierceSurface( IntWin, RREF, Ray, IHitIntWin, HitPtIntWin );
-								if ( IHitIntWin > 0 ) {
+								PierceSurface( IntWin, RREF, Ray, HitPtIntWin, hitIntWin );
+								if ( hitIntWin ) {
 									IntWinHitNum = IntWin;
 									COSBIntWin = dot( Surface( IntWin ).OutNormVec, Ray );
 									if ( COSBIntWin <= 0.0 ) {
-										IHitIntWin = 0;
+										hitIntWin = false;
 										IntWinHitNum = 0;
 										continue;
 									}
@@ -2074,34 +2073,34 @@ namespace DaylightingManager {
 						}
 					} // End of loop over surfaces in zone ZoneNum
 
-					if ( IHitIntWin == 0 ) {
+					if ( !hitIntWin ) {
 						// Ray does not pass through an int win in ZoneNum. Therefore, it hits the opaque part
 						// of a surface between ref point in ZoneNum and ext win element in adjacent zone.
-						IHitIntObs = 1;
+						hitIntObs = true;
 					}
 				} // End of check if this is an ext win in an adjacent zone
 			} // End of check if TDD:Diffuser or regular exterior window or complex fenestration
 
 			// Check for interior obstructions
-			if ( ExtWinType == InZoneExtWin && IHitIntObs == 0 ) {
+			if ( ExtWinType == InZoneExtWin && !hitIntObs ) {
 				// Check for obstruction between reference point and window element
-				// Returns IHitIntObs = 1 if obstruction is hit, IHitIntObs = 0 otherwise.
+				// Returns hitIntObs = true iff obstruction is hit
 				// (Example of interior obstruction is a wall in an L-shaped room that lies
 				// between reference point and window.)
-				DayltgHitInteriorObstruction( IWin, RREF, RWIN, IHitIntObs );
+				DayltgHitInteriorObstruction( IWin, RREF, RWIN, hitIntObs );
 			}
 
-			if ( ExtWinType == AdjZoneExtWin && IntWinHitNum > 0 && IHitIntObs == 0 ) {
+			if ( ExtWinType == AdjZoneExtWin && IntWinHitNum > 0 && !hitIntObs ) {
 				// Check for obstruction between ref point and interior window through which ray passes
-				DayltgHitInteriorObstruction( IntWinHitNum, RREF, HitPtIntWin, IHitIntObs );
-				if ( IHitIntObs == 0 ) {
+				DayltgHitInteriorObstruction( IntWinHitNum, RREF, HitPtIntWin, hitIntObs );
+				if ( !hitIntObs ) {
 					// Check for obstruction between intersection point on int window and ext win element
-					DayltgHitBetWinObstruction( IntWinHitNum, IWin, HitPtIntWin, RWIN, IHitIntObs );
+					DayltgHitBetWinObstruction( IntWinHitNum, IWin, HitPtIntWin, RWIN, hitIntObs );
 				}
 			}
 			if ( CalledFrom == CalledForRefPoint ) {
-				if ( IHitIntObs == 0 ) {
-					if ( ExtWinType == InZoneExtWin || ( ExtWinType == AdjZoneExtWin && IHitIntWin > 0 ) ) {
+				if ( !hitIntObs ) {
+					if ( ExtWinType == InZoneExtWin || ( ExtWinType == AdjZoneExtWin && hitIntWin ) ) {
 						// Increment solid angle subtended by portion of window above ref pt
 						SurfaceWindow( IWin ).SolidAngAtRefPt( iRefPoint ) += DOMEGA;
 						ZoneDaylight( ZoneNum ).SolidAngAtRefPt( loopwin, iRefPoint ) += DOMEGA;
@@ -2111,8 +2110,8 @@ namespace DaylightingManager {
 					}
 				}
 			} else if ( CalledFrom == CalledForMapPoint ) {
-				if ( IHitIntObs == 0 ) {
-					if ( ExtWinType == InZoneExtWin || ( ExtWinType == AdjZoneExtWin && IHitIntWin > 0 ) ) {
+				if ( !hitIntObs ) {
+					if ( ExtWinType == InZoneExtWin || ( ExtWinType == AdjZoneExtWin && hitIntWin ) ) {
 //						if ( MapWindowSolidAngAtRefPt.present() ) MapWindowSolidAngAtRefPt += DOMEGA; //Inactive
 						IllumMapCalc( MapNum ).SolidAngAtMapPt( loopwin, iRefPoint ) += DOMEGA;
 						MapWindowSolidAngAtRefPtWtd += DOMEGA * POSFAC;
@@ -2120,10 +2119,10 @@ namespace DaylightingManager {
 					}
 				}
 			}
-			if ( IHitIntObs == 1 ) ObTrans = 0.0;
+			if ( hitIntObs ) ObTrans = 0.0;
 
-			IHitExtObs = 0;
-			if ( IHitIntObs == 0 ) {
+			hitExtObs = false;
+			if ( !hitIntObs ) {
 				// No interior obstruction was hit.
 				// Check for exterior obstructions between window element and sky/ground.
 				// Get product of transmittances of obstructions hit by ray.
@@ -2134,7 +2133,7 @@ namespace DaylightingManager {
 					// the hour is used to query schedule for transmission , not sure what to do
 					// it will work for detailed and never did work correctly before.
 					DayltgHitObstruction( HourOfDay, IWin2, RWIN2, Ray, ObTrans );
-					if ( ObTrans < 1.0 ) IHitExtObs = 1;
+					if ( ObTrans < 1.0 ) hitExtObs = true;
 				} else {
 					// Transmittance from exterior obstruction surfaces is calculated here. This needs to be done for each timestep
 					// in order to account for changes in exterior surface transmittances
@@ -2401,7 +2400,7 @@ namespace DaylightingManager {
 		// SUBROUTINE LOCAL VARIABLES
 		int curWinEl;
 		int IRay;
-		int iHit;
+		bool hit;
 		int TotHits;
 		int JSurf;
 		Real64 DotProd; // Temporary variable for manipulating dot product .dot.
@@ -2481,7 +2480,7 @@ namespace DaylightingManager {
 				// Calculation of potential surface obstruction for each incoming direction
 				for ( IRay = 1; IRay <= NBasis; ++IRay ) {
 
-					iHit = 0;
+					hit = false;
 					TotHits = 0;
 					for ( JSurf = 1; JSurf <= TotSurfaces; ++JSurf ) {
 						// the following test will cycle on anything except exterior surfaces and shading surfaces
@@ -2491,9 +2490,8 @@ namespace DaylightingManager {
 						//  skip surfaces that face away from the window
 						DotProd = dot( ComplexWind( iWin ).Geom( CurFenState ).sInc( IRay ), Surface( JSurf ).NewellSurfaceNormalVector );
 						if ( DotProd >= 0 ) continue;
-						PierceSurface( JSurf, Centroid, ComplexWind( iWin ).Geom( CurFenState ).sInc( IRay ), iHit, HitPt );
-						if ( iHit <= 0 ) continue;
-						iHit = 0; // A hit, clear the hit flag for the next cycle
+						PierceSurface( JSurf, Centroid, ComplexWind( iWin ).Geom( CurFenState ).sInc( IRay ), HitPt, hit );
+						if ( !hit ) continue; // Miss: Try next surface
 						if ( TotHits == 0 ) {
 							// First hit for this ray
 							TotHits = 1;
@@ -2878,25 +2876,21 @@ namespace DaylightingManager {
 		Real64 XR;
 		Real64 YR;
 		static Vector3< Real64 > V;
-		int iPierc;
+		bool hit;
 		static Vector3< Real64 > InterPoint;
 
 		// Object Data
-		Vector Vec;
 		BSDFDaylghtPosition elPos; // altitude and azimuth of intersection element
 
 		auto const & sTrn( ComplexWind( iWin ).Geom( CurFenState ).sTrn );
 		for ( iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay ) {
-			Vec = sTrn( iTrnRay );
-			Vec.x = - Vec.x;
-			Vec.y = - Vec.y;
-			Vec.z = - Vec.z;
-			V = Vec;
-			PierceSurface( iWin, RefPoint, V, iPierc, InterPoint );
-			if ( iPierc == 1 ) {
+			V = sTrn( iTrnRay );
+			V.negate();
+			PierceSurface( iWin, RefPoint, V, InterPoint, hit );
+			if ( hit ) {
 				RefPointMap.RefPointIntersection( iTrnRay ) = true;
 
-				elPos = DaylghtAltAndAzimuth( Vec );
+				elPos = DaylghtAltAndAzimuth( V );
 
 				XR = std::tan( std::abs( PiOvr2 - AZVIEW - elPos.Azimuth ) + 0.001 );
 				YR = std::tan( elPos.Altitude + 0.001 );
@@ -2936,7 +2930,7 @@ namespace DaylightingManager {
 		using DataSurfaces::AzimAngStepsForSolReflCalc;
 
 		// Return value
-		Real64 CalcObstrMultiplier;
+		Real64 ObstrMultiplier;
 
 		// Locals
 		static Vector3< Real64 > URay; // Unit vector in (Phi,Theta) direction
@@ -2953,7 +2947,7 @@ namespace DaylightingManager {
 		Real64 CosIncAngURay; // Cosine of incidence angle of URay on ground plane
 		Real64 dOmegaGnd; // Solid angle element of ray from ground point (steradians)
 		Real64 IncAngSolidAngFac; // CosIncAngURay*dOmegaGnd/Pi
-		int IHitObs; // 1 if obstruction is hit; 0 otherwise
+		bool hitObs; // True iff obstruction is hit
 		static Vector3< Real64 > ObsHitPt; // Coordinates of hit point on an obstruction (m)
 		static int AltSteps_last( 0 );
 		static Array1D< Real64 > cos_Phi( AltAngStepsForSolReflCalc / 2 ); // cos( Phi ) table
@@ -3006,13 +3000,35 @@ namespace DaylightingManager {
 				URay( 2 ) = CPhi * sin_Theta( ITheta );
 				SkyGndUnObs += IncAngSolidAngFac;
 				// Does this ground ray hit an obstruction?
-				IHitObs = 0;
-				for ( int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
-					if ( ! Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) continue;
-					PierceSurface( ObsSurfNum, GroundHitPt, URay, IHitObs, ObsHitPt );
-					if ( IHitObs > 0 ) break;
+				hitObs = false;
+				if ( TotSurfaces < 20 ) { // Linear search through surfaces
+
+					for ( int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
+						if ( Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) {
+							PierceSurface( ObsSurfNum, GroundHitPt, URay, ObsHitPt, hitObs ); // Check if ray pierces surface
+							if ( hitObs ) break;
+						}
+					}
+
+				} else { // Surface octree search
+
+					// Lambda function for the octree to test for surface hit
+					auto surfaceHit = [&GroundHitPt,&hitObs]( SurfaceData const & surface ) -> bool {
+						if ( surface.ShadowSurfPossibleObstruction ) {
+							PierceSurface( surface, GroundHitPt, URay, ObsHitPt, hitObs ); // Check if ray pierces surface
+							return hitObs; // Ray pierces surface
+						} else {
+							return false;
+						}
+					};
+
+					// Check octree surface candidates until a hit is found, if any
+					Vector3< Real64 > const URay_inv( SurfaceOctreeCube::safe_inverse( URay ) );
+					surfaceOctree.hasSurfaceRayIntersectsCube( GroundHitPt, URay, URay_inv, surfaceHit );
+
 				}
-				if ( IHitObs > 0 ) continue; // Obstruction hit
+
+				if ( hitObs ) continue; // Obstruction hit
 				// Sky is hit
 				SkyGndObs += IncAngSolidAngFac;
 			} // End of azimuth loop
@@ -3020,13 +3036,13 @@ namespace DaylightingManager {
 
 		// in case ground point is surrounded by obstructions (SkyGndUnObs == 0), then multiplier will be equal to zero
 		// This should not happen anyway because in that case ray would not be able to reach ground point
-		CalcObstrMultiplier = 0.0;
+		ObstrMultiplier = 0.0;
 
 		if ( SkyGndUnObs != 0.0 ) {
-			CalcObstrMultiplier = SkyGndObs / SkyGndUnObs;
+			ObstrMultiplier = SkyGndObs / SkyGndUnObs;
 		}
 
-		return CalcObstrMultiplier;
+		return ObstrMultiplier;
 	}
 
 	void
@@ -3061,8 +3077,8 @@ namespace DaylightingManager {
 		int const IConst, // Construction counter
 		Real64 const AZVIEW, // Azimuth of view vector in absolute coord system for glare calculation (radians)
 		Vector3< Real64 > const & RREF2, // Location of virtual reference point in absolute coordinate system
-		int const IHitIntObs, // = 1 if interior obstruction hit, = 0 otherwise
-		int const IHitExtObs, // 1 if ray from ref pt to ext win hits an exterior obstruction
+		bool const hitIntObs, // True iff interior obstruction hit
+		bool const hitExtObs, // True iff ray from ref pt to ext win hits an exterior obstruction
 		int const CalledFrom, // indicate  which type of routine called this routine
 		Real64 & TVISIntWin, // Visible transmittance of int win at COSBIntWin for light from ext win
 		Real64 & TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
@@ -3104,6 +3120,8 @@ namespace DaylightingManager {
 		// DERIVED TYPE DEFINITIONS:
 		// na
 
+		if ( SUNCOSHR( iHour, 3 ) < SunIsUpValue ) return;
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Vector3< Real64 > const RREF( 0.0 ); // Location of a reference point in absolute coordinate system //Autodesk Was used uninitialized: Never set here // Made static for performance and const for now until issue addressed
 		static Vector4< Real64 > XEDIRSK; // Illuminance contribution from luminance element, sky-related
@@ -3117,8 +3135,7 @@ namespace DaylightingManager {
 		Real64 POSFAC; // Position factor for a window element / ref point / view vector combination
 		Real64 XR; // Horizontal displacement ratio
 		Real64 YR; // Vertical displacement ratio
-		int IHit; // Hit flag; =1 if ray from ref point thru window element hits
-		//  an obstruction, =0 otherwise.
+		bool hit; // True iff ray from ref point thru window element hits an obstruction
 
 		Real64 ObTransDisk; // Product of solar transmittances of exterior obstructions hit by ray
 		// from reference point to sun
@@ -3130,14 +3147,12 @@ namespace DaylightingManager {
 		Real64 ELUM; // Sky or ground luminance (cd/m2)
 		Real64 DEDIR; // Illuminance contribution at reference point from window element (lux)
 		Real64 COSI; // Cosine of angle between direct sun and window outward normal
-		int IP; // IP=1 if ray passes thru window, =0 if not
+		bool hitWin; // True iff ray passes thru window
 		Real64 TVISS; // Direct solar visible transmittance of window at given angle of incidence
 		//  (times light well efficiency, if appropriate)
 		Real64 XAVWL; // XAVWL*TVISS is contribution of window luminance from solar disk (cd/m2)
 
 		Real64 SlatAng; // Blind slat angle (rad)
-		int loop; // DO loop indices
-		int loop2;
 		int NearestHitSurfNum; // Surface number of nearest obstruction
 		int NearestHitSurfNumX; // Surface number to use when obstruction is a shadowing surface
 		static Vector3< Real64 > NearestHitPt; // Hit point of ray on nearest obstruction
@@ -3145,9 +3160,8 @@ namespace DaylightingManager {
 		Real64 Alfa; // Intermediate variables
 //		Real64 Beta; //Unused
 		static Vector3< Real64 > GroundHitPt; // Coordinates of point that ray hits ground (m)
-		int IHitObs; // 1 if obstruction is hit; 0 otherwise
+		bool hitObs; // True iff obstruction is hit
 		static Vector3< Real64 > ObsHitPt; // Coordinates of hit point on an obstruction (m)
-		int ObsSurfNum; // Surface number of obstruction
 		int ObsConstrNum; // Construction number of obstruction
 		Real64 ObsVisRefl; // Visible reflectance of obstruction
 		Real64 SkyReflVisLum; // Reflected sky luminance at hit point divided by
@@ -3159,10 +3173,11 @@ namespace DaylightingManager {
 		Real64 CosIncAngRefl; // Cos of angle of incidence of beam on reflecting surface
 		static Vector3< Real64 > SunVecMir; // Sun ray mirrored in reflecting surface
 		Real64 CosIncAngRec; // Cos of angle of incidence of reflected beam on receiving window
-		int IHitRefl; // 1 if ray hits reflecting surface; 0 otherwise
+		bool hitRefl; // True iff ray hits reflecting surface
 		static Vector3< Real64 > HitPtRefl; // Point that ray hits reflecting surface
 		Real64 ReflDistanceSq; // Distance squared between ref pt and hit point on reflecting surf (m)
-		int IHitObsRefl; // > 0 if obstruction hit between ref pt and reflection point
+		Real64 ReflDistance; // Distance between ref pt and hit point on reflecting surf (m)
+		bool hitObsRefl; // True iff obstruction hit between ref pt and reflection point
 		static Vector3< Real64 > HitPtObs; // Hit point on obstruction
 		int ReflSurfRecNum; // Receiving surface number for a reflecting window
 		Real64 SpecReflectance; // Specular reflectance of a reflecting surface
@@ -3172,11 +3187,10 @@ namespace DaylightingManager {
 		Real64 PHSUNrefl; // Altitude angle of reflected sun (radians)
 		Real64 THSUNrefl; // Azimuth anggle of reflected sun (radians)
 
-		int IHitIntWinDisk; // 1 if ray from ref pt to sun passes thru an int window; 0 otherwise
-		int IHitIntObsDisk; // 1 if ray from ref pt to sun hits an interior obstruction; 0 otherwise
-//		int IHitExtObsDisk; // 1 if ray from ref pt to sun hits an exterior obstruction; 0 otherwise //Unused Set but never used
+		bool hitIntWinDisk; // True iff ray from ref pt to sun passes thru an int window
+		bool hitIntObsDisk; // True iff ray from ref pt to sun hits an interior obstruction
+//		bool hitExtObsDisk; // True iff ray from ref pt to sun hits an exterior obstruction //Unused Set but never used
 
-		int IntWinDisk; // Surface loop index for finding int windows betw ref pt and sun
 		static Vector3< Real64 > HitPtIntWinDisk; // Intersection point on an interior window for ray from ref pt to sun (m)
 		int IntWinDiskHitNum; // Surface number of int window intersected by ray betw ref pt and sun
 		Real64 COSBIntWin; // Cos of angle between int win outward normal and ray betw ref pt and
@@ -3184,8 +3198,6 @@ namespace DaylightingManager {
 		Real64 TVisIntWinMult; // Interior window vis trans multiplier for ext win in adjacent zone
 		Real64 TVisIntWinDiskMult; // Interior window vis trans solar disk multiplier for ext win in adj zone
 		Real64 WindowSolidAngleDaylightPoint;
-
-		if ( SUNCOSHR( iHour, 3 ) < SunIsUpValue ) return;
 
 		++ISunPos;
 
@@ -3242,9 +3254,9 @@ namespace DaylightingManager {
 		// ----- CASE I -- BARE WINDOW (no shading device)
 
 		// Beam solar and sky solar reflected from nearest obstruction.
-		// In the following IHitIntObs == 0  ==> no interior obstructions hit, and
-		//                  IHitExtObs == 1  ==> one or more exterior obstructions hit.
-		if ( CalcSolRefl && IHitIntObs == 0 && IHitExtObs == 1 ) {
+		// In the following hitIntObs == false  ==> no interior obstructions hit, and
+		//                  hitExtObs == true  ==> one or more exterior obstructions hit.
+		if ( CalcSolRefl && !hitIntObs && hitExtObs ) {
 			// One or more exterior obstructions was hit; get contribution of reflection
 			// from nearest obstruction.
 			// Find obstruction whose hit point is closest to this ray's window element
@@ -3372,14 +3384,14 @@ namespace DaylightingManager {
 							//SunObstructionMult = 1.0; //Tuned
 							if ( CalcSolRefl ) { // Coordinates of ground point hit by the ray
 								// Sun reaches ground point if vector from this point to the sun is unobstructed
-								IHitObs = 0;
-								for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
+								hitObs = false;
+								for ( int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
 									if ( ! Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) continue;
-									PierceSurface( ObsSurfNum, GroundHitPt, SUNCOS_iHour, IHitObs, ObsHitPt );
-									if ( IHitObs > 0 ) break;
+									PierceSurface( ObsSurfNum, GroundHitPt, SUNCOS_iHour, ObsHitPt, hitObs );
+									if ( hitObs ) break;
 								}
-								//if ( IHitObs > 0 ) SunObstructionMult = 0.0;
-								if ( IHitObs == 0 ) AVWLSU( iHour, 1 ) += AVWLSU_add;
+								//if ( hitObs ) SunObstructionMult = 0.0;
+								if ( !hitObs ) AVWLSU( iHour, 1 ) += AVWLSU_add;
 							} else {
 								AVWLSU( iHour, 1 ) += AVWLSU_add;
 							}
@@ -3405,28 +3417,29 @@ namespace DaylightingManager {
 			if ( COSI > 0.0 ) {
 
 				// Does RAYCOS pass thru exterior window? HP is point that RAYCOS intersects window plane.
-				PierceSurface( IWin2, RREF2, RAYCOS, IP, HP );
-				IHitIntObsDisk = 0;
-				if ( IP > 0 ) {
+				PierceSurface( IWin2, RREF2, RAYCOS, HP, hitWin );
+				hitIntObsDisk = false;
+				if ( hitWin ) {
 					if ( ExtWinType == InZoneExtWin ) {
 						// Check for interior obstructions between reference point and HP.
-						DayltgHitInteriorObstruction( IWin2, RREF2, HP, IHitIntObsDisk );
+						DayltgHitInteriorObstruction( IWin2, RREF2, HP, hitIntObsDisk );
 					}
 					ObTransDisk = 0.0; // Init value
 					// Init flag for vector from RP to sun passing through interior window
-					IHitIntWinDisk = 0;
+					hitIntWinDisk = false;
 					if ( ExtWinType == AdjZoneExtWin ) { // This block is for RPs in zones with interior windows
 						// adjacent to zones with exterior windows
 						// Does RAYCOS pass through interior window in zone containing RP?
-						for ( IntWinDisk = Zone( ZoneNum ).SurfaceFirst; IntWinDisk <= Zone( ZoneNum ).SurfaceLast; ++IntWinDisk ) {
+						// Loop over zone surfaces looking for interior windows between reference point and sun
+						for ( int IntWinDisk = Zone( ZoneNum ).SurfaceFirst, IntWinDisk_end = Zone( ZoneNum ).SurfaceLast; IntWinDisk <= IntWinDisk_end; ++IntWinDisk ) {
 							if ( Surface( IntWinDisk ).Class == SurfaceClass_Window && Surface( IntWinDisk ).ExtBoundCond >= 1 ) {
 								if ( Surface( Surface( IntWinDisk ).ExtBoundCond ).Zone == Surface( IWin2 ).Zone ) {
-									PierceSurface( IntWinDisk, RREF, RAYCOS, IHitIntWinDisk, HitPtIntWinDisk );
-									if ( IHitIntWinDisk > 0 ) {
+									PierceSurface( IntWinDisk, RREF, RAYCOS, HitPtIntWinDisk, hitIntWinDisk );
+									if ( hitIntWinDisk ) {
 										IntWinDiskHitNum = IntWinDisk;
 										COSBIntWin = dot( Surface( IntWinDisk ).OutNormVec, RAYCOS );
 										if ( COSBIntWin <= 0.0 ) {
-											IHitIntWinDisk = 0;
+											hitIntWinDisk = false;
 											IntWinDiskHitNum = 0;
 											continue;
 										}
@@ -3437,39 +3450,39 @@ namespace DaylightingManager {
 							}
 						}
 
-						if ( IHitIntWinDisk == 0 ) { // Vector from RP to sun does not pass through interior window
+						if ( !hitIntWinDisk ) { // Vector from RP to sun does not pass through interior window
 							ObTransDisk = 0.0;
-							IHit = 1; //!fcw Is this needed?
+							hit = true; //!fcw Is this needed?
 						}
 
 						// Check for interior obstructions between ref point and interior window
-						IHitIntObsDisk = 0;
-						if ( IHitIntWinDisk > 0 ) {
-							DayltgHitInteriorObstruction( IntWinDiskHitNum, RREF, HitPtIntWinDisk, IHitIntObsDisk );
+						hitIntObsDisk = false;
+						if ( hitIntWinDisk ) {
+							DayltgHitInteriorObstruction( IntWinDiskHitNum, RREF, HitPtIntWinDisk, hitIntObsDisk );
 							// If no obstruction between RP and hit int win, check for obstruction
 							// between int win and ext win
-							if ( IHitIntObsDisk == 0 ) {
-								DayltgHitBetWinObstruction( IntWinDiskHitNum, IWin2, HitPtIntWinDisk, HP, IHitIntObsDisk );
+							if ( !hitIntObsDisk ) {
+								DayltgHitBetWinObstruction( IntWinDiskHitNum, IWin2, HitPtIntWinDisk, HP, hitIntObsDisk );
 							}
 						}
-						if ( IHitIntObsDisk == 1 ) ObTransDisk = 0.0;
+						if ( hitIntObsDisk ) ObTransDisk = 0.0;
 					} // case where RP is in zone with interior window adjacent to zone with exterior window
 
-//					IHitExtObsDisk = 0; //Unused Set but never used
-					// RJH 08-25-07 IHitIntWinDisk should not be reset to 0 here, and should be tested below.
+//					hitExtObsDisk = false; //Unused Set but never used
+					// RJH 08-25-07 hitIntWinDisk should not be reset to false here, and should be tested below.
 					// This is to correct logic flaw causing direct solar to reach adjacent zone refpt
 					// when vector to sun does not pass through interior window
-					// IHitIntWinDisk = 0
-					if ( IHitIntObsDisk == 0 ) { // No interior obstruction was hit
+					// hitIntWinDisk = false
+					if ( !hitIntObsDisk ) { // No interior obstruction was hit
 						// Net transmittance of exterior obstructions encountered by RAYCOS
 						// ObTransDisk = 1.0 will be returned if no exterior obstructions are hit.
 						DayltgHitObstruction( iHour, IWin2, RREF2, RAYCOS, ObTransDisk );
-//						if ( ObTransDisk < 1.0 ) IHitExtObsDisk = 1; //Unused Set but never used
+//						if ( ObTransDisk < 1.0 ) hitExtObsDisk = true; //Unused Set but never used
 						// RJH 08-26-07 However, if this is a case of interior window
 						// and vector to sun does not pass through interior window
 						// then reset ObTransDisk to 0.0 since it is the key test for adding
 						// contribution of sun to RP below.
-						if ( ( ExtWinType == AdjZoneExtWin ) && ( IHitIntWinDisk == 0 ) ) {
+						if ( ( ExtWinType == AdjZoneExtWin ) && ( !hitIntWinDisk ) ) {
 							ObTransDisk = 0.0;
 						}
 					}
@@ -3489,7 +3502,7 @@ namespace DaylightingManager {
 						} else {
 							// Beam transmittance for bare window and all types of blinds
 							TVISS = POLYF( COSI, Construct( IConst ).TransVisBeamCoef ) * SurfaceWindow( IWin ).GlazedFrac * SurfaceWindow( IWin ).LightWellEff;
-							if ( ExtWinType == AdjZoneExtWin && IHitIntWinDisk == 1 ) TVISS *= TVISIntWinDisk;
+							if ( ExtWinType == AdjZoneExtWin && hitIntWinDisk ) TVISS *= TVISIntWinDisk;
 						}
 
 						EDIRSUdisk( iHour, 1 ) = RAYCOS( 3 ) * TVISS * ObTransDisk; // Bare window
@@ -3569,7 +3582,7 @@ namespace DaylightingManager {
 				if ( RecSurfNum > 0 ) { // interior windows do not apply
 					if ( SolReflRecSurf( RecSurfNum ).NumPossibleObs > 0 ) {
 						// This window has associated obstructions that could reflect beam onto the window
-						for ( loop = 1; loop <= SolReflRecSurf( RecSurfNum ).NumPossibleObs; ++loop ) {
+						for ( int loop = 1, loop_end = SolReflRecSurf( RecSurfNum ).NumPossibleObs; loop <= loop_end; ++loop ) {
 							ReflSurfNum = SolReflRecSurf( RecSurfNum ).PossibleObsSurfNums( loop );
 							ReflSurfNumX = ReflSurfNum;
 							// Each shadowing surface has a "mirror" duplicate surface facing in the opposite direction.
@@ -3591,55 +3604,56 @@ namespace DaylightingManager {
 								CosIncAngRec = dot( Surface( IWin2 ).OutNormVec, SunVecMir );
 								if ( CosIncAngRec <= 0.0 ) continue;
 								// Does ray from ref. pt. along SunVecMir pass through window?
-								PierceSurface( IWin2, RREF2, SunVecMir, IP, HP );
-								if ( IP == 0 ) continue; // Ray did not pass through window
+								PierceSurface( IWin2, RREF2, SunVecMir, HP, hitWin );
+								if ( !hitWin ) continue; // Ray did not pass through window
 								// Check if this ray hits interior obstructions
-								DayltgHitInteriorObstruction( IWin2, RREF2, HP, IHit );
-								if ( IHit > 0 ) continue; // Interior obstruction was hit
+								DayltgHitInteriorObstruction( IWin2, RREF2, HP, hit );
+								if ( hit ) continue; // Interior obstruction was hit
 								// Does ray hit this reflecting surface?
-								PierceSurface( ReflSurfNum, RREF2, SunVecMir, IHitRefl, HitPtRefl );
-								if ( IHitRefl == 0 ) continue; // Ray did not hit this reflecting surface
+								PierceSurface( ReflSurfNum, RREF2, SunVecMir, HitPtRefl, hitRefl );
+								if ( !hitRefl ) continue; // Ray did not hit this reflecting surface
 								ReflDistanceSq = distance_squared( HitPtRefl, RREF2 );
+								ReflDistance = std::sqrt( ReflDistanceSq );
 								// Is ray from ref. pt. to reflection point (HitPtRefl) obstructed?
-								IHitObsRefl = 0;
-								for ( loop2 = 1; loop2 <= SolReflRecSurf( RecSurfNum ).NumPossibleObs; ++loop2 ) {
-									ObsSurfNum = SolReflRecSurf( RecSurfNum ).PossibleObsSurfNums( loop2 );
+								hitObsRefl = false;
+								for ( int loop2 = 1, loop2_end = SolReflRecSurf( RecSurfNum ).NumPossibleObs; loop2 <= loop2_end; ++loop2 ) {
+									int const ObsSurfNum = SolReflRecSurf( RecSurfNum ).PossibleObsSurfNums( loop2 );
 									if ( ObsSurfNum == ReflSurfNum || ObsSurfNum == Surface( ReflSurfNum ).BaseSurf ) continue;
-									PierceSurface( ObsSurfNum, RREF2, SunVecMir, IHitObs, HitPtObs );
-									if ( IHitObs > 0 ) {
+									PierceSurface( ObsSurfNum, RREF2, SunVecMir, ReflDistance, HitPtObs, hitObs ); // ReflDistance cutoff added
+									if ( hitObs ) { // => Could skip distance check (unless < vs <= ReflDistance really matters)
 										if ( distance_squared( HitPtObs, RREF2 ) < ReflDistanceSq ) { // Distance squared from ref pt to reflection point
-											IHitObsRefl = 1;
+											hitObsRefl = true;
 											break;
 										}
 									}
 								}
-								if ( IHitObsRefl > 0 ) continue; // Obstruct'n closer than reflect'n pt. was hit; go to next obstruction
+								if ( hitObsRefl ) continue; // Obstruction closer than reflection pt. was hit; go to next obstruction
 								// There is no obstruction for this ray between ref pt and hit pt on reflecting surface.
 								// See if ray from hit pt on reflecting surface to original (unmirrored) sun position is obstructed
-								IHitObs = 0;
+								hitObs = false;
 								if ( Surface( ReflSurfNum ).Class == SurfaceClass_Window ) {
 									// Reflecting surface is a window.
 									// Receiving surface number for this reflecting window.
 									ReflSurfRecNum = Surface( ReflSurfNum ).ShadowSurfRecSurfNum;
 									if ( ReflSurfRecNum > 0 ) {
 										// Loop over possible obstructions for this reflecting window
-										for ( loop2 = 1; loop2 <= SolReflRecSurf( ReflSurfRecNum ).NumPossibleObs; ++loop2 ) {
-											ObsSurfNum = SolReflRecSurf( ReflSurfRecNum ).PossibleObsSurfNums( loop2 );
-											PierceSurface( ObsSurfNum, HitPtRefl, RAYCOS, IHitObs, HitPtObs );
-											if ( IHitObs > 0 ) break;
+										for ( int loop2 = 1, loop2_end = SolReflRecSurf( ReflSurfRecNum ).NumPossibleObs; loop2 <= loop2_end; ++loop2 ) {
+											int const ObsSurfNum = SolReflRecSurf( ReflSurfRecNum ).PossibleObsSurfNums( loop2 );
+											PierceSurface( ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs, hitObs );
+											if ( hitObs ) break;
 										}
 									}
 								} else {
 									// Reflecting surface is a building shade
-									for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
+									for ( int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
 										if ( ! Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) continue;
 										if ( ObsSurfNum == ReflSurfNum ) continue;
-										PierceSurface( ObsSurfNum, HitPtRefl, RAYCOS, IHitObs, HitPtObs );
-										if ( IHitObs > 0 ) break;
+										PierceSurface( ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs, hitObs );
+										if ( hitObs ) break;
 									}
 								} // End of check if reflector is a window or shadowing surface
 
-								if ( IHitObs > 0 ) continue; // Obstruct'n hit between reflect'n hit point and sun; go to next obstruction
+								if ( hitObs ) continue; // Obstruction hit between reflection hit point and sun; go to next obstruction
 
 								// No obstructions. Calculate reflected beam illuminance at ref. pt. from this reflecting surface.
 								SpecReflectance = 0.0;
@@ -5397,33 +5411,31 @@ namespace DaylightingManager {
 		// Local declarations
 		int IType; // Surface type/class:  mirror surfaces of shading surfaces
 		static Vector3< Real64 > HP; // Hit coordinates, if ray hits an obstruction
-		int Pierce; // 1 if a particular obstruction is hit, 0 otherwise
+		bool hit; // True iff a particular obstruction is hit
 
 		ObTrans = 1.0;
 
 		auto const & window( Surface( IWin ) );
 		auto const window_iBaseSurf( window.BaseSurf );
-		auto const & window_base( window_iBaseSurf > 0 ? Surface( window_iBaseSurf ) : window );
-		auto const window_base_p( &window_base );
 
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
 		// Building elements are assumed to be opaque
 		// A shadowing surface is opaque unless its transmittance schedule value is non-zero
-		if ( TotSurfaces < 100 ) { // Do simple linear search through surfaces //Do Tune this crossover heuristic
+		if ( TotSurfaces < 20 ) { // Linear search through surfaces
 
 			for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 				auto const & surface( Surface( ISurf ) );
 				if ( ! surface.ShadowSurfPossibleObstruction ) continue;
 				IType = surface.Class;
 				if ( ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && ( ISurf != window_iBaseSurf ) ) {
-					PierceSurface( ISurf, R1, RN, Pierce, HP );
-					if ( Pierce > 0 ) { // Building element is hit (assumed opaque)
+					PierceSurface( ISurf, R1, RN, HP, hit );
+					if ( hit ) { // Building element is hit (assumed opaque)
 						ObTrans = 0.0;
 						break;
 					}
 				} else if ( surface.ShadowingSurf ) {
-					PierceSurface( ISurf, R1, RN, Pierce, HP );
-					if ( Pierce > 0 ) { // Shading surface is hit
+					PierceSurface( ISurf, R1, RN, HP, hit );
+					if ( hit ) { // Shading surface is hit
 						// Get solar transmittance of the shading surface
 						Real64 const Trans( surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue( surface.SchedShadowSurfIndex, IHOUR, 1 ) : 0.0 );
 						if ( Trans < 1.e-6 ) {
@@ -5436,21 +5448,24 @@ namespace DaylightingManager {
 				}
 			}
 
-		} else { // Use surface octree to find candidate surfaces efficiently
+		} else { // Surface octree search
 
-			// Lambda to test for surface hit and update transmittance if hit
-			auto solarTransmittance = [=,&R1,&ObTrans,&Pierce]( SurfaceData const & surface ) -> bool {
+			auto const & window_base( window_iBaseSurf > 0 ? Surface( window_iBaseSurf ) : window );
+			auto const window_base_p( &window_base );
+
+			// Lambda function for the octree to test for surface hit and update transmittance if hit
+			auto solarTransmittance = [=,&R1,&RN,&hit,&ObTrans]( SurfaceData const & surface ) -> bool {
 				if ( ! surface.ShadowSurfPossibleObstruction ) return false; //Do Consider separate octree without filtered surfaces
 				auto const sClass( surface.Class );
 				if ( ( sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor ) && ( &surface != window_base_p ) ) {
-					PierceSurface( surface, R1, RN, Pierce, HP );
-					if ( Pierce > 0 ) { // Building element is hit (assumed opaque)
+					PierceSurface( surface, R1, RN, HP, hit );
+					if ( hit ) { // Building element is hit (assumed opaque)
 						ObTrans = 0.0;
 						return true;
 					}
 				} else if ( surface.ShadowingSurf ) {
-					PierceSurface( surface, R1, RN, Pierce, HP );
-					if ( Pierce > 0 ) { // Shading surface is hit
+					PierceSurface( surface, R1, RN, HP, hit );
+					if ( hit ) { // Shading surface is hit
 						// Get solar transmittance of the shading surface
 						Real64 const Trans( surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue( surface.SchedShadowSurfIndex, IHOUR, 1 ) : 0.0 );
 						if ( Trans < 1.e-6 ) {
@@ -5466,8 +5481,8 @@ namespace DaylightingManager {
 			};
 
 			// Check octree surface candidates for hits: short circuits if zero transmittance reached
-			Vector3< Real64 > const RN_inv( octree_inverse( RN ) );
-			surfaceOctree.transmittanceSurfacesRayIntersectsCube( R1, RN, RN_inv, solarTransmittance );
+			Vector3< Real64 > const RN_inv( SurfaceOctreeCube::safe_inverse( RN ) );
+			surfaceOctree.processSomeSurfaceRayIntersectsCube( R1, RN, RN_inv, solarTransmittance );
 
 		}
 
@@ -5478,7 +5493,7 @@ namespace DaylightingManager {
 		int const IWin, // Window index
 		Vector3< Real64 > const & R1, // Origin of ray (m)
 		Vector3< Real64 > const & R2, // Destination of ray (m)
-		int & IHit // Hit flag: 1 = ray hits an obstruction, 0 = does not
+		bool & hit // True iff ray hits an obstruction
 	)
 	{
 
@@ -5499,7 +5514,7 @@ namespace DaylightingManager {
 		static Vector3< Real64 > HP; // Hit coordinates, if ray hits an obstruction
 		static Vector3< Real64 > RN; // Unit vector along ray
 
-		IHit = 0;
+		hit = false;
 		RN = ( R2 - R1 ).normalize(); // Make unit vector
 		Real64 const d12( distance( R1, R2 ) ); // Distance between R1 and R2
 
@@ -5507,41 +5522,40 @@ namespace DaylightingManager {
 		auto const window_Zone( window.Zone );
 		auto const window_iBaseSurf( window.BaseSurf );
 		auto const & window_base( window_iBaseSurf > 0 ? Surface( window_iBaseSurf ) : window );
-		auto const window_base_p( &window_base );
 		auto const window_base_iExtBoundCond( window_base.ExtBoundCond );
-		auto const & window_base_adjacent( window_base_iExtBoundCond > 0 ? Surface( window_base_iExtBoundCond ) : window_base );
-		auto const window_base_adjacent_p( &window_base_adjacent );
 
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
-		if ( TotSurfaces < 100 ) { // Do simple linear search through surfaces //Do Tune this crossover heuristic
+		if ( TotSurfaces < 20 ) { // Linear search through surfaces
 
 			for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 				auto const & surface( Surface( ISurf ) );
 				IType = surface.Class;
-				if ( (
-				 ( surface.Zone == window.Zone ) && // Wall/ceiling/floor is in same zone as window
+				if ( ( surface.ShadowingSurf ) || // Shadowing surface
+				 ( ( surface.Zone == window_Zone ) && // Wall/ceiling/floor is in same zone as window
 				 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) &&
-				 ( ISurf != window_iBaseSurf ) && ( ISurf != window_base_iExtBoundCond ) ) || // Exclude window's base or base-adjacent surfaces
-				 ( surface.ShadowingSurf ) ) // Shadowing surface
+				 ( ISurf != window_iBaseSurf ) && ( ISurf != window_base_iExtBoundCond ) ) ) // Exclude window's base or base-adjacent surfaces
 				{
-					PierceSurface( ISurf, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
-					if ( IHit > 0 ) break; // Segment pierces surface: Don't check the rest
+					PierceSurface( ISurf, R1, RN, d12, HP, hit ); // Check if R2-R1 segment pierces surface
+					if ( hit ) break; // Segment pierces surface: Don't check the rest
 				}
 			}
 
-		} else { // Use surface octree to find candidate surfaces efficiently
+		} else { // Surface octree search
 
-			// Lambda to test for surface hit
-			auto surfaceHit = [=,&R1,&IHit]( SurfaceData const & surface ) -> bool {
+			auto const window_base_p( &window_base );
+			auto const & window_base_adjacent( window_base_iExtBoundCond > 0 ? Surface( window_base_iExtBoundCond ) : window_base );
+			auto const window_base_adjacent_p( &window_base_adjacent );
+
+			// Lambda function for the octree to test for surface hit
+			auto surfaceHit = [=,&R1,&hit]( SurfaceData const & surface ) -> bool {
 				auto const sClass( surface.Class );
-				if ( (
-				 ( surface.Zone == window_Zone ) && // Surface is in same zone as window
+				if ( ( surface.ShadowingSurf ) || // Shadowing surface
+				 ( ( surface.Zone == window_Zone ) && // Surface is in same zone as window
 				 ( sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
-				 ( &surface != window_base_p ) && ( &surface != window_base_adjacent_p ) ) || // Exclude window's base or base-adjacent surfaces
-				 ( surface.ShadowingSurf ) ) // Shadowing surface
+				 ( &surface != window_base_p ) && ( &surface != window_base_adjacent_p ) ) ) // Exclude window's base or base-adjacent surfaces
 				{
-					PierceSurface( surface, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
-					return IHit > 0; // Segment pierces surface
+					PierceSurface( surface, R1, RN, d12, HP, hit ); // Check if R2-R1 segment pierces surface
+					return hit;
 				} else {
 					return false;
 				}
@@ -5560,7 +5574,7 @@ namespace DaylightingManager {
 		int const IWin2, // Surface number of destination window
 		Vector3< Real64 > const & R1, // Origin of ray (on IWin1) (m)
 		Vector3< Real64 > const & R2, // Destination of ray (on IWin2) (m)
-		int & IHit // Hit flag: 1 = ray hits an obstruction, 0 = does not
+		bool & hit // True iff ray hits an obstruction
 	)
 	{
 
@@ -5582,62 +5596,62 @@ namespace DaylightingManager {
 		static Vector3< Real64 > HP; // Hit coordinates, if ray hits an obstruction surface (m)
 		static Vector3< Real64 > RN; // Unit vector along ray from R1 to R2
 
-		IHit = 0;
+		hit = false;
 		RN = ( R2 - R1 ).normalize(); // Unit vector
 		Real64 const d12( distance( R1, R2 ) ); // Distance squared between R1 and R2 (m)
 
 		auto const & window1( Surface( IWin1 ) );
 		auto const window1_iBaseSurf( window1.BaseSurf );
 		auto const & window1_base( window1_iBaseSurf > 0 ? Surface( window1_iBaseSurf ) : window1 );
-		auto const window1_base_p( &window1_base );
 		auto const window1_base_iExtBoundCond( window1_base.ExtBoundCond );
-		auto const & window1_base_adjacent( window1_base_iExtBoundCond > 0 ? Surface( window1_base_iExtBoundCond ) : window1_base );
-		auto const window1_base_adjacent_p( &window1_base_adjacent );
 
 		auto const & window2( Surface( IWin2 ) );
 		auto const window2_Zone( window2.Zone );
 		auto const window2_iBaseSurf( window2.BaseSurf );
 		auto const & window2_base( window2_iBaseSurf > 0 ? Surface( window2_iBaseSurf ) : window2 );
-		auto const window2_base_p( &window2_base );
 		auto const window2_base_iExtBoundCond( window2_base.ExtBoundCond );
-		auto const & window2_base_adjacent( window2_base_iExtBoundCond > 0 ? Surface( window2_base_iExtBoundCond ) : window2_base );
-		auto const window2_base_adjacent_p( &window2_base_adjacent );
 
 		// Preconditions
 //		assert( window1.Zone == window2_Zone ); //? This is violated in PurchAirWithDoubleFacadeDaylighting so then why the asymmetry of only checking for wall/roof/floor for window2 zone below?
 
 		// Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
-		if ( TotSurfaces < 100 ) { // Do simple linear search through surfaces //Do Tune this crossover heuristic
+		if ( TotSurfaces < 20 ) { // Linear search through surfaces
 
 			for ( int ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 				auto const & surface( Surface( ISurf ) );
 				IType = surface.Class;
-				if ( (
-				 ( surface.Zone == window2_Zone ) && // Wall/ceiling/floor is in same zone as windows
+				if ( ( surface.ShadowingSurf ) || // Shadowing surface
+				 ( ( surface.Zone == window2_Zone ) && // Wall/ceiling/floor is in same zone as windows
 				 ( IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
 				 ( ISurf != window1_iBaseSurf ) && ( ISurf != window2_iBaseSurf ) && // Exclude windows' base surfaces
-				 ( ISurf != window1_base_iExtBoundCond ) && ( ISurf != window2_base_iExtBoundCond ) ) || // Exclude windows' base-adjacent surfaces
-				 ( surface.ShadowingSurf ) ) // Shadowing surface
+				 ( ISurf != window1_base_iExtBoundCond ) && ( ISurf != window2_base_iExtBoundCond ) ) ) // Exclude windows' base-adjacent surfaces
 				{
-					PierceSurface( ISurf, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
-					if ( IHit > 0 ) break; // Segment pierces surface: Don't check the rest
+					PierceSurface( ISurf, R1, RN, d12, HP, hit ); // Check if R2-R1 segment pierces surface
+					if ( hit ) break; // Segment pierces surface: Don't check the rest
 				}
 			}
 
-		} else { // Use surface octree to find candidate surfaces efficiently
+		} else { // Surface octree search
 
-			// Lambda to test for surface hit
-			auto surfaceHit = [=,&R1,&IHit]( SurfaceData const & surface ) -> bool {
+			auto const window1_base_p( &window1_base );
+			auto const & window1_base_adjacent( window1_base_iExtBoundCond > 0 ? Surface( window1_base_iExtBoundCond ) : window1_base );
+			auto const window1_base_adjacent_p( &window1_base_adjacent );
+
+			auto const window2_base_p( &window2_base );
+			auto const & window2_base_adjacent( window2_base_iExtBoundCond > 0 ? Surface( window2_base_iExtBoundCond ) : window2_base );
+			auto const window2_base_adjacent_p( &window2_base_adjacent );
+
+			// Lambda function for the octree to test for surface hit
+			auto surfaceHit = [=,&R1,&hit]( SurfaceData const & surface ) -> bool {
 				auto const sClass( surface.Class );
-				if ( (
-				 ( surface.Zone == window2_Zone ) && // Surface is in same zone as window
+				if ( ( surface.ShadowingSurf ) || // Shadowing surface
+				 ( ( surface.Zone == window2_Zone ) && // Surface is in same zone as window
 				 ( sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor ) && // Wall, ceiling/roof, or floor
 				 ( &surface != window1_base_p ) && ( &surface != window2_base_p ) && // Exclude windows' base surfaces
-				 ( &surface != window1_base_adjacent_p ) && ( &surface != window2_base_adjacent_p ) ) || // Exclude windows' base-adjacent surfaces
-				 ( surface.ShadowingSurf ) ) // Shadowing surface
+				 ( &surface != window1_base_adjacent_p ) && ( &surface != window2_base_adjacent_p ) ) ) // Exclude windows' base-adjacent surfaces
 				{
-					PierceSurface( surface, R1, RN, d12, IHit, HP ); // Check if R2-R1 segment pierces surface
-					return IHit > 0; // Segment pierces surface
+					PierceSurface( surface, R1, RN, d12, HP, hit ); // Check if R2-R1 segment pierces surface
+					return hit;
 				} else {
 					return false;
 				}
@@ -6927,7 +6941,7 @@ namespace DaylightingManager {
 		Real64 HorDis; // Distance between ground hit point and proj'n of window center onto ground (m)
 		static Vector3< Real64 > GroundHitPt; // Coordinates of point that ray from window center hits the ground (m)
 		int ObsSurfNum; // Obstruction surface number
-		int IHitObs; // = 1 if obstruction is hit, = 0 otherwise
+		bool hitObs; // True iff obstruction is hit
 		static Vector3< Real64 > ObsHitPt; // Coordinates of hit point on an obstruction (m)
 		int ObsConstrNum; // Construction number of obstruction
 		Real64 ObsVisRefl; // Visible reflectance of obstruction
@@ -7110,13 +7124,13 @@ namespace DaylightingManager {
 					SunObstructionMult = 1.0;
 					if ( CalcSolRefl && ObTransM( IPH, ITH ) > 1.e-6 ) {
 						// Sun reaches ground point if vector from this point to the sun is unobstructed
-						IHitObs = 0;
+						hitObs = false;
 						for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
 							if ( ! Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) continue;
-							PierceSurface( ObsSurfNum, GroundHitPt, SUNCOS_IHR, IHitObs, ObsHitPt );
-							if ( IHitObs > 0 ) break;
+							PierceSurface( ObsSurfNum, GroundHitPt, SUNCOS_IHR, ObsHitPt, hitObs );
+							if ( hitObs ) break;
 						}
-						if ( IHitObs > 0 ) SunObstructionMult = 0.0;
+						if ( hitObs ) SunObstructionMult = 0.0;
 					}
 					ZSU = ( GILSU( IHR ) * GndReflectanceForDayltg / Pi ) * COSB * DA * ObTransM( IPH, ITH ) * SunObstructionMult;
 				}
@@ -7228,18 +7242,18 @@ namespace DaylightingManager {
 						if ( ExtWinType == AdjZoneExtWin ) {
 							// modify TVISBR by second window transmission
 							// first determine if ray from point passes thru any interior window
-							IHitObs = 0;
+							hitObs = false;
 							for ( IntWinLoop = 1; IntWinLoop <= ZoneDaylight( ZoneNum ).IntWinAdjZoneExtWin( IntWinAdjZoneExtWinNum ).NumOfIntWindows; ++IntWinLoop ) {
 								IntWinNum = ZoneDaylight( ZoneNum ).IntWinAdjZoneExtWin( IntWinAdjZoneExtWinNum ).IntWinNum( IntWinLoop );
-								PierceSurface( IntWinNum, SurfaceWindow( IntWinNum ).WinCenter, SUNCOS_IHR, IHitObs, ObsHitPt );
-								if ( IHitObs == 1 ) { // disk passes thru
+								PierceSurface( IntWinNum, SurfaceWindow( IntWinNum ).WinCenter, SUNCOS_IHR, ObsHitPt, hitObs );
+								if ( hitObs ) { // disk passes thru
 									// cosine of incidence angle of light from sky or ground element for
 									COSBintWin = SPH * std::sin( SurfaceWindow( IntWinNum ).Phi ) + CPH * std::cos( SurfaceWindow( IntWinNum ).Phi ) * std::cos( TH - SurfaceWindow( IntWinNum ).Theta );
 									TVISBR *= POLYF( COSBintWin, Construct( Surface( IntWinNum ).Construction ).TransVisBeamCoef );
 									break;
 								}
 							}
-							if ( IHitObs == 0 ) { // blocked by opaque parts, beam does not actually pass thru interior window to reach zone
+							if ( !hitObs ) { // blocked by opaque parts, beam does not actually pass thru interior window to reach zone
 								TVISBR = 0.0;
 							}
 						}
@@ -7706,7 +7720,7 @@ namespace DaylightingManager {
 
 		Real64 BeamObstrMultiplier; // beam obstruction multiplier in case incoming beam is from the ground
 		int ObsSurfNum; // Obstruction surface number
-		int iHitObs; // = 1 if obstruction is hit, = 0 otherwise
+		bool hitObs; // True iff obstruction is hit
 		static Vector3< Real64 > ObsHitPt; // Coordinates of hit point on an obstruction (m)
 		static Vector3< Real64 > GroundHitPt; // Coordinates of point that ray from window center hits the ground (m)
 
@@ -7803,7 +7817,7 @@ namespace DaylightingManager {
 			SunObstrMultiplier = 1.0;
 			if ( CalcSolRefl ) {
 				// Sun reaches ground point if vector from this point to the sun is unobstructed
-				iHitObs = 0;
+				hitObs = false;
 				for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
 					if ( ! Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) continue;
 					if ( CalledFrom == CalledForRefPoint ) {
@@ -7816,10 +7830,10 @@ namespace DaylightingManager {
 						GroundHitPt( 3 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).GndPt( iGndElem, WinEl ).z;
 					}
 
-					PierceSurface( ObsSurfNum, GroundHitPt, SUNCOS_IHR, iHitObs, ObsHitPt );
-					if ( iHitObs > 0 ) break;
+					PierceSurface( ObsSurfNum, GroundHitPt, SUNCOS_IHR, ObsHitPt, hitObs );
+					if ( hitObs ) break;
 				}
-				if ( iHitObs > 0 ) SunObstrMultiplier = 0.0;
+				if ( hitObs ) SunObstrMultiplier = 0.0;
 			}
 			ElementLuminanceSun( iGndElemIndex ) *= SunObstrMultiplier;
 		}
@@ -8472,47 +8486,80 @@ namespace DaylightingManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 		static Vector3< Real64 > HitPt; // Hit point on an obstruction (m)
-		int IHit; // > 0 if obstruction is hit, 0 otherwise
-		int ObsSurfNum; // Obstruction surface number
-
-		int TotObstructionsHit; // Number of obstructions hit by a ray
-		int ObsSurfNumToSkip; // Surface number of obstruction to be ignored
+		bool hit; // True iff obstruction is hit
 
 		// FLOW:
 
-		TotObstructionsHit = 0;
 		NearestHitSurfNum = 0;
-		Real64 NearestHitDistance_sq = 1.0e+16; // Distance squared from receiving point to nearest hit point for a ray (m^2)
-		Real64 HitDistance_sq; // Distance squared from receiving point to hit point for a ray (m^2)
+		Real64 NearestHitDistance_sq( std::numeric_limits< Real64 >::max() ); // Distance squared from receiving point to nearest hit point for a ray (m^2)
 		NearestHitPt = 0.0;
-		ObsSurfNumToSkip = 0;
-		for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
-			if ( ! Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) continue;
-			// If a window was hit previously (see below), ObsSurfNumToSkip was set to the window's base surface in order
-			// to remove that surface from consideration as a hit surface for this ray
-			if ( ObsSurfNum == ObsSurfNumToSkip ) continue;
-			// Determine if this ray hits ObsSurfNum (in which case IHit > 0) and, if so, get the
-			// distance from the receiving point to the hit
-			PierceSurface( ObsSurfNum, RecPt, RayVec, IHit, HitPt );
-			if ( IHit > 0 ) {
-				// If obstruction is a window and its base surface is the nearest obstruction hit so far,
-				// set NearestHitSurfNum to this window. Note that in this case NearestHitDistance has already
-				// been calculated, so does not have to be recalculated.
-				if ( Surface( ObsSurfNum ).Class == SurfaceClass_Window && Surface( ObsSurfNum ).BaseSurf == NearestHitSurfNum ) {
-					NearestHitSurfNum = ObsSurfNum;
-				} else {
-					++TotObstructionsHit;
-					// Distance squared from receiving point to hit point
-					HitDistance_sq = distance_squared( HitPt, RecPt );
-					// Reset NearestHitSurfNum and NearestHitDistance if this hit point is closer than previous closest
-					if ( HitDistance_sq < NearestHitDistance_sq ) {
-						NearestHitDistance_sq = HitDistance_sq;
-						NearestHitSurfNum = ObsSurfNum;
-						NearestHitPt = HitPt;
+		if ( TotSurfaces < 20 ) { // Linear search through surfaces
+
+			for ( int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
+				if ( Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) {
+					// Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
+					PierceSurface( ObsSurfNum, RecPt, RayVec, HitPt, hit );
+					if ( hit ) { // Ray pierces surface
+						// If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
+						// Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
+						if ( ( Surface( ObsSurfNum ).Class == SurfaceClass_Window ) && ( Surface( ObsSurfNum ).BaseSurf == NearestHitSurfNum ) ) {
+							NearestHitSurfNum = ObsSurfNum;
+						} else {
+							// Distance squared from receiving point to hit point
+							Real64 const HitDistance_sq( distance_squared( HitPt, RecPt ) );
+							// Reset NearestHitSurfNum and NearestHitDistance_sq if this hit point is closer than previous closest
+							if ( HitDistance_sq < NearestHitDistance_sq ) {
+								NearestHitDistance_sq = HitDistance_sq;
+								NearestHitSurfNum = ObsSurfNum;
+								NearestHitPt = HitPt;
+							}
+						}
+					} // End of check if obstruction was hit
+				}
+			} // End of loop over possible obstructions for this ray
+
+		} else { // Surface octree search
+
+			SurfaceData const * nearestHitSurface( nullptr );
+
+			// Lambda function for the octree to test for surface hit
+			auto surfaceHit = [=,&RecPt,&RayVec,&hit,&NearestHitDistance_sq,&nearestHitSurface,&NearestHitPt]( SurfaceData const & surface ) {
+				if ( surface.ShadowSurfPossibleObstruction ) {
+					// Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
+					PierceSurface( surface, RecPt, RayVec, HitPt, hit ); // Check if ray pierces surface
+					if ( hit ) { // Ray pierces surface
+						// If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
+						// Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
+						if ( ( surface.Class == SurfaceClass_Window ) && ( surface.BaseSurf > 0 ) && ( &Surface( surface.BaseSurf ) == nearestHitSurface ) ) {
+							nearestHitSurface = &surface;
+						} else {
+							// Distance squared from receiving point to hit point
+							Real64 const HitDistance_sq( distance_squared( HitPt, RecPt ) );
+							// Reset nearestHitSurface and NearestHitDistance_sq if this hit point is closer than previous closest
+							if ( HitDistance_sq < NearestHitDistance_sq ) {
+								NearestHitDistance_sq = HitDistance_sq;
+								nearestHitSurface = &surface;
+								NearestHitPt = HitPt;
+							}
+						}
+					} // End of check if obstruction was hit
+				}
+			};
+
+			// Process octree surface candidates
+			Vector3< Real64 > const RayVec_inv( SurfaceOctreeCube::safe_inverse( RayVec ) );
+			surfaceOctree.processSurfaceRayIntersectsCube( RecPt, RayVec, RayVec_inv, surfaceHit );
+			if ( nearestHitSurface != nullptr ) { // Find surface number: This is inefficient: Improve when surfaces know their own number
+				for ( int i = 1; i <= TotSurfaces; ++i ) {
+					if ( &Surface( i ) == nearestHitSurface ) {
+						NearestHitSurfNum = i;
+						break;
 					}
 				}
-			} // End of check if obstruction was hit
-		} // End of loop over possible obstructions for this ray
+				assert( NearestHitSurfNum != 0 );
+			}
+
+		}
 
 	}
 
@@ -8557,7 +8604,7 @@ namespace DaylightingManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Vector3< Real64 > ReflNorm; // Unit normal to reflecting surface (m)
 		int ObsSurfNum; // Obstruction surface number
-		int IHitObs; // > 0 if obstruction is hit
+		bool hitObs; // True iff obstruction is hit
 		static Vector3< Real64 > ObsHitPt; // Hit point on obstruction (m)
 		Real64 CosIncAngAtHitPt; // Cosine of angle of incidence of sun at HitPt
 		Real64 DiffVisRefl; // Diffuse visible reflectance of ReflSurfNum
@@ -8580,15 +8627,15 @@ namespace DaylightingManager {
 		// Require that the sun be in front of this surface relative to window element
 		if ( CosIncAngAtHitPt <= 0.0 ) return; // Sun is in back of reflecting surface
 		// Sun reaches ReflHitPt if vector from ReflHitPt to sun is unobstructed
-		IHitObs = 0;
+		hitObs = false;
 		for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
 			if ( ! Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) continue;
 			// Exclude as a possible obstructor ReflSurfNum and its base surface (if it has one)
 			if ( ObsSurfNum == ReflSurfNum || ObsSurfNum == Surface( ReflSurfNum ).BaseSurf ) continue;
-			PierceSurface( ObsSurfNum, ReflHitPt, SUNCOS_IHR, IHitObs, ObsHitPt );
-			if ( IHitObs > 0 ) break;
+			PierceSurface( ObsSurfNum, ReflHitPt, SUNCOS_IHR, ObsHitPt, hitObs );
+			if ( hitObs ) break;
 		}
-		if ( IHitObs > 0 ) return; // Obstruction was hit, blocking sun
+		if ( hitObs ) return; // Obstruction was hit, blocking sun
 		// Obstruction was not hit; sun reaches ReflHitPt.
 		// Calculate luminance at ReflHitPt due to beam solar reflection (for unit beam normal illuminance)
 		if ( Surface( ReflSurfNum ).ShadowingSurf ) {

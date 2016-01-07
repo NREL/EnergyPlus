@@ -341,6 +341,7 @@ namespace HeatBalanceManager {
 		if ( ManageHeatBalanceGetInputFlag ) {
 			GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
 			surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
+			for ( auto & surface : DataSurfaces::Surface ) surface.set_computed_geometry(); // Set up geometric info for PierceSurface
 			ManageHeatBalanceGetInputFlag = false;
 		}
 
