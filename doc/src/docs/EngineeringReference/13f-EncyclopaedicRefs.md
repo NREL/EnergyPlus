@@ -5245,182 +5245,170 @@ Relative humidity, *r<sub>a</sub>*, is also calculated from EnergyPlus weather d
 
 The soil thermal diffusivity (m<sup>2</sup>/s), *α<sub>s</sub>*, and conductivity (W/m°C), *k<sub>s</sub>*, varies with the density and moisture content. From Table 3.3, pg. 26 of ASHRAE's Ground Source Heat Pumpss--Design of Geothermal Systems for Commercial and Institutional Buildings, 1997, the following values are recommended under different conditions.
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg .tg-yw4l{vertical-align:top}
-</style>
-<table class="tg">
+<table>
   <tr>
-    <th class="tg-yw4l"></th>
-    <th class="tg-yw4l">Moisture Content</th>
-    <th class="tg-yw4l">5%</th>
-    <th class="tg-yw4l">5%</th>
-    <th class="tg-yw4l">10%</th>
-    <th class="tg-yw4l">10%</th>
-    <th class="tg-yw4l">15%</th>
-    <th class="tg-yw4l">15%</th>
-    <th class="tg-yw4l">20%</th>
-    <th class="tg-yw4l">20%</th>
+    <th></th>
+    <th>Moisture Content</th>
+    <th>5%</th>
+    <th>5%</th>
+    <th>10%</th>
+    <th>10%</th>
+    <th>15%</th>
+    <th>15%</th>
+    <th>20%</th>
+    <th>20%</th>
   </tr>
   <tr>
-    <td class="tg-yw4l">Soil Type</td>
-    <td class="tg-yw4l">Dry Density<br>[kg/m3]</td>
-    <td class="tg-yw4l">k<br>[W/m-k]</td>
-    <td class="tg-yw4l">*α<sub>s</sub>*<br>[m2/s]</td>
-    <td class="tg-yw4l">k<br>[W/m-k]</td>
-    <td class="tg-yw4l">*α<sub>s</sub>*<br>[m2/s]</td>
-    <td class="tg-yw4l">k<br>[W/m-k]</td>
-    <td class="tg-yw4l">*α<sub>s</sub>*<br>[m2/s]</td>
-    <td class="tg-yw4l">k<br>[W/m-k]</td>
-    <td class="tg-yw4l">*α<sub>s</sub>*<br>[m2/s]</td>
+    <td>Soil <br>Type</td>
+    <td>Dry Density<br>[kg/m3]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
   </tr>
   <tr>
-    <td class="tg-yw4l">Coarse<br>  100% Sand</td>
-    <td class="tg-yw4l">1922</td>
-    <td class="tg-yw4l">2.77</td>
-    <td class="tg-yw4l">1.34E-06</td>
-    <td class="tg-yw4l">2.94</td>
-    <td class="tg-yw4l">1.24E-06</td>
-    <td class="tg-yw4l">3.29</td>
-    <td class="tg-yw4l">1.18E-06</td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
+    <td>Coarse 100%<br>Sand</td>
+    <td>1922</td>
+    <td>2.77</td>
+    <td>1.34E-06</td>
+    <td>2.94</td>
+    <td>1.24E-06</td>
+    <td>3.29</td>
+    <td>1.18E-06</td>
+    <td></td>
+    <td></td>
   </tr>
   <tr>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">1602</td>
-    <td class="tg-yw4l">1.90</td>
-    <td class="tg-yw4l">1.18E-06</td>
-    <td class="tg-yw4l">2.34</td>
-    <td class="tg-yw4l">1.18E-06</td>
-    <td class="tg-yw4l">2.51</td>
-    <td class="tg-yw4l">1.08E-06</td>
-    <td class="tg-yw4l">2.68</td>
-    <td class="tg-yw4l">8.82E-07</td>
+    <td></td>
+    <td>1602</td>
+    <td>1.90</td>
+    <td>1.18E-06</td>
+    <td>2.34</td>
+    <td>1.18E-06</td>
+    <td>2.51</td>
+    <td>1.08E-06</td>
+    <td>2.68</td>
+    <td>8.82E-07</td>
   </tr>
   <tr>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">1281</td>
-    <td class="tg-yw4l">1.38</td>
-    <td class="tg-yw4l">1.18E-06</td>
-    <td class="tg-yw4l">1.56</td>
-    <td class="tg-yw4l">9.14E-07</td>
-    <td class="tg-yw4l">1.56</td>
-    <td class="tg-yw4l">8.06E-07</td>
-    <td class="tg-yw4l">1.47</td>
-    <td class="tg-yw4l">6.99E-07</td>
+    <td></td>
+    <td>1281</td>
+    <td>1.38</td>
+    <td>1.18E-06</td>
+    <td>1.56</td>
+    <td>9.14E-07</td>
+    <td>1.56</td>
+    <td>8.06E-07</td>
+    <td>1.47</td>
+    <td>6.99E-07</td>
   </tr>
   <tr>
-    <td class="tg-yw4l">Fine Grain<br>  100% Clay</td>
-    <td class="tg-yw4l">1922</td>
-    <td class="tg-yw4l">1.21</td>
-    <td class="tg-yw4l">5.91E-07</td>
-    <td class="tg-yw4l">1.21</td>
-    <td class="tg-yw4l">4.84E-07</td>
-    <td class="tg-yw4l">1.64</td>
-    <td class="tg-yw4l">5.70E-07</td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
+    <td>Fine Grain<br>100% Clay</td>
+    <td>1922</td>
+    <td>1.21</td>
+    <td>5.91E-07</td>
+    <td>1.21</td>
+    <td>4.84E-07</td>
+    <td>1.64</td>
+    <td>5.70E-07</td>
+    <td></td>
+    <td></td>
   </tr>
   <tr>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">1602</td>
-    <td class="tg-yw4l">0.95</td>
-    <td class="tg-yw4l">5.70E-07</td>
-    <td class="tg-yw4l">0.95</td>
-    <td class="tg-yw4l">4.73E-07</td>
-    <td class="tg-yw4l">1.12</td>
-    <td class="tg-yw4l">4.73E-07</td>
-    <td class="tg-yw4l">1.21</td>
-    <td class="tg-yw4l">5.16E-07</td>
+    <td></td>
+    <td>1602</td>
+    <td>0.95</td>
+    <td>5.70E-07</td>
+    <td>0.95</td>
+    <td>4.73E-07</td>
+    <td>1.12</td>
+    <td>4.73E-07</td>
+    <td>1.21</td>
+    <td>5.16E-07</td>
   </tr>
   <tr>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">1281</td>
-    <td class="tg-yw4l">0.69</td>
-    <td class="tg-yw4l">4.84E-07</td>
-    <td class="tg-yw4l">0.74</td>
-    <td class="tg-yw4l">4.62E-07</td>
-    <td class="tg-yw4l">0.81</td>
-    <td class="tg-yw4l">4.73E-07</td>
-    <td class="tg-yw4l">0.87</td>
-    <td class="tg-yw4l">4.09E-07</td>
+    <td></td>
+    <td>1281</td>
+    <td>0.69</td>
+    <td>4.84E-07</td>
+    <td>0.74</td>
+    <td>4.62E-07</td>
+    <td>0.81</td>
+    <td>4.73E-07</td>
+    <td>0.87</td>
+    <td>4.09E-07</td>
   </tr>
 </table>
 
 The following information is also available for reference from Table 4, pg. 34.6 of the ASHRAE Applications Handbook, 2015.
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg .tg-yw4l{vertical-align:top}
-</style>
-<table class="tg">
+<table>
   <tr>
-    <th class="tg-yw4l">Soils</th>
-    <th class="tg-yw4l">Moisture<br>Content</th>
-    <th class="tg-yw4l">Density<br>[kg/m3]</th>
-    <th class="tg-yw4l">k<br>[W/m-K]</th>
-    <th class="tg-yw4l">*α<sub>s</sub>*<br>[m^2/s]</th>
+    <th>Soils</th>
+    <th>Moisture<br>Content</th>
+    <th>Density<br>[kg/m3]</th>
+    <th>k<br>[W/m-K]</th>
+    <th>α<sub>s</sub><br>[m^2/s]</th>
   </tr>
   <tr>
-    <td class="tg-yw4l">Heavy clay</td>
-    <td class="tg-yw4l">15% water</td>
-    <td class="tg-yw4l">1922</td>
-    <td class="tg-yw4l">1.558</td>
-    <td class="tg-yw4l">5.914E-07</td>
+    <td>Heavy clay</td>
+    <td>15% water</td>
+    <td>1922</td>
+    <td>1.558</td>
+    <td>5.914E-07</td>
   </tr>
   <tr>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">5% water</td>
-    <td class="tg-yw4l">1922</td>
-    <td class="tg-yw4l">1.212</td>
-    <td class="tg-yw4l">6.452E-07</td>
+    <td></td>
+    <td>5% water</td>
+    <td>1922</td>
+    <td>1.212</td>
+    <td>6.452E-07</td>
   </tr>
   <tr>
-    <td class="tg-yw4l">Light clay</td>
-    <td class="tg-yw4l">15% water</td>
-    <td class="tg-yw4l">1281</td>
-    <td class="tg-yw4l">0.865</td>
-    <td class="tg-yw4l">4.624E-07</td>
+    <td>Light clay</td>
+    <td>15% water</td>
+    <td>1281</td>
+    <td>0.865</td>
+    <td>4.624E-07</td>
   </tr>
   <tr>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">5% water</td>
-    <td class="tg-yw4l">1281</td>
-    <td class="tg-yw4l">0.692</td>
-    <td class="tg-yw4l">4.839E-07</td>
+    <td></td>
+    <td>5% water</td>
+    <td>1281</td>
+    <td>0.692</td>
+    <td>4.839E-07</td>
   </tr>
   <tr>
-    <td class="tg-yw4l">Heavy sand</td>
-    <td class="tg-yw4l">15% water</td>
-    <td class="tg-yw4l">1922</td>
-    <td class="tg-yw4l">3.115</td>
-    <td class="tg-yw4l">1.129E-07</td>
+    <td>Heavy sand</td>
+    <td>15% water</td>
+    <td>1922</td>
+    <td>3.115</td>
+    <td>1.129E-07</td>
   </tr>
   <tr>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">5% water</td>
-    <td class="tg-yw4l">1922</td>
-    <td class="tg-yw4l">2.596</td>
-    <td class="tg-yw4l">1.344E-06</td>
+    <td></td>
+    <td>5% water</td>
+    <td>1922</td>
+    <td>2.596</td>
+    <td>1.344E-06</td>
   </tr>
   <tr>
-    <td class="tg-yw4l">Light sand</td>
-    <td class="tg-yw4l">15% water</td>
-    <td class="tg-yw4l">1281</td>
-    <td class="tg-yw4l">1.558</td>
-    <td class="tg-yw4l">8.065E-07</td>
+    <td>Light sand</td>
+    <td>15% water</td>
+    <td>1281</td>
+    <td>1.558</td>
+    <td>8.065E-07</td>
   </tr>
   <tr>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">5% water</td>
-    <td class="tg-yw4l">1281</td>
-    <td class="tg-yw4l">1.385</td>
-    <td class="tg-yw4l">9.677E-07</td>
+    <td></td>
+    <td>5% water</td>
+    <td>1281</td>
+    <td>1.385</td>
+    <td>9.677E-07</td>
   </tr>
 </table>
 
