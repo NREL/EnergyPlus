@@ -5473,7 +5473,8 @@ namespace MixedAir {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
+		int CompNum;
+		int CompNum_end;
 
 		if( GetOASysInputFlag ) {
 			GetOutsideAirSysInputs();
@@ -5483,10 +5484,10 @@ namespace MixedAir {
 		NumHX = 0;
 
 		auto const & componentType_Num = OutsideAirSys( OASysNumber ).ComponentType_Num;
-		for( int CompNum = 1, int CompNum_end = OutsideAirSys( OASysNumber ).NumComponents; CompNum <= CompNum_end; ++CompNum ) {
+		for( CompNum = 1, CompNum_end = OutsideAirSys( OASysNumber ).NumComponents; CompNum <= CompNum_end; ++CompNum ) {
 			int const componentTypeNum = componentType_Num( CompNum );
 			if ( HeatXchngr == componentTypeNum || Desiccant == componentTypeNum ) {
-				+NumHX;
+				++NumHX;
 			}
 		}
 
