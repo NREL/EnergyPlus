@@ -108,7 +108,7 @@ Timestep,
 
 
 !- =========== ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
- 
+
  ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
  ! Coldest Month=DEC
  ! Denver Centennial  Golden   N_CO_USA Annual Heating 99.6%, MaxDB=-18.8°C
@@ -139,7 +139,7 @@ Timestep,
            ,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
            ,      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
        0.00;      !- Clearness {0.0 to 1.1}
- 
+
 
  ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
  ! Hottest Month=JUL
@@ -311,7 +311,7 @@ RunPeriod,
   SurfaceProperty:OtherSideConditionsModel,
     BasementFloorOSCM,       !- Name
     UndergroundPipingSystemSurface;  !- Type of Modeling
-    
+
 !***********************************************************
 !****** ABOVE GROUND ZONE SPECIFICATION ********************
 !***********************************************************
@@ -410,7 +410,7 @@ Zone,
     0.0,0.0,3.1,           !- X,Y,Z ==> Vertex 2 {m}
     10.0,0.0,3.1,            !- X,Y,Z ==> Vertex 3 {m}
     10.0,10.0,3.1;             !- X,Y,Z ==> Vertex 4 {m}
-    
+
 !- =========== ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
 !***********************************************************
@@ -474,7 +474,7 @@ Zone,
     0.9,                     !- Thermal Absorptance
     0.65,                    !- Solar Absorptance
     0.65;                    !- Visible Absorptance
-    
+
 Material,
     Basement Wall Material,  !- Name
     MediumRough,             !- Roughness
@@ -493,7 +493,7 @@ Material,
   Construction,
     Basement Wall Construction,  !- Name
     Basement Wall Material;  !- Outside Layer
-    
+
  Material,
     Basement Insulation, !- Name
     Smooth, !- Roughness
@@ -504,14 +504,14 @@ Material,
     0.9, !- Thermal Absorptance
     0.65, !- Solar Absorptance
     0.65; !- Visible Absorptance
-    
+
 !***********************************************************
 !****** ROOF MATERIALS/CONSTRUCTIONS ***********************
 !***********************************************************
   Construction,
     Roof Construction, !- Name
     Roof Layer 1; !- Outside Layer
-    
+
   Material:NoMass,
     Roof Layer 1,            !- Name
     Rough,                   !- Roughness
@@ -519,7 +519,7 @@ Material,
     0.9000000,               !- Thermal Absorptance
     0.7500000,               !- Solar Absorptance
     0.7500000;               !- Visible Absorptance
-    
+
 !***********************************************************
 !****** BASEMENT CEILING MATLS/CONSTRUCTIONS ***************
 !***********************************************************
@@ -576,7 +576,7 @@ Material,
     Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
     2.3,                     !- Vertical insulation depth from surface (m)
     timestep;                !- Domain Update interval. (Timestep, Hourly);
-    
+
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,                 !- Name of object
     1.8,                     !- Soil Thermal Conductivity {W/m-K}
@@ -591,10 +591,10 @@ Material,
 Output:VariableDictionary,
 IDF; !- Key Field
 
-Output:Variable,*,Wall Interface Heat Flux,hourly;
-Output:Variable,*,Wall Interface Temperature,hourly;
-Output:Variable,*,Floor Interface Heat Flux,hourly;
-Output:Variable,*,Floor Interface Temperature,hourly;
+Output:Variable,*,GroundDomain Basement Wall Interface Heat Flux,hourly;
+Output:Variable,*,GroundDomain Basement Wall Interface Temperature,hourly;
+Output:Variable,*,GroundDomain Basement Floor Interface Heat Flux,hourly;
+Output:Variable,*,GroundDomain Basement Floor Interface Temperature,hourly;
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:TABLE:SUMMARYREPORTS ===========
 
@@ -615,7 +615,7 @@ Output:Variable,
     Surface Other Side Conditions Modeled Convection Air Temperature, !- Variable Name
     hourly; !- Reporting Frequency
 
-    
+
 Output:Variable,
     *, !- Key Value
     Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient, !- Variable Name
