@@ -304,6 +304,62 @@ namespace AirflowNetworkBalanceManager {
 	// Functions
 
 	void
+	clear_state()
+	{
+		PZ.deallocate();
+		MA.deallocate();
+		MV.deallocate();
+		IVEC.deallocate();
+		SplitterNodeNumbers.deallocate();
+		AirflowNetworkGetInputFlag = true;
+		VentilationCtrl = 0;
+		NumOfExhaustFans = 0;
+		NumAirflowNetwork = 0;
+		AirflowNetworkNumOfDetOpenings = 0;
+		AirflowNetworkNumOfSimOpenings = 0;
+		AirflowNetworkNumOfHorOpenings = 0;
+		AirflowNetworkNumOfStdCndns = 0;
+		AirflowNetworkNumOfSurCracks = 0;
+		AirflowNetworkNumOfSurELA = 0;
+		AirflowNetworkNumOfExtNode = 0;
+		AirflowNetworkNumOfCPArray = 0;
+		AirflowNetworkNumOfCPValue = 0;
+		AirflowNetworkNumOfSingleSideZones = 0; // added default value
+		AirflowNetworkNumofWindDir = 0; // added default value
+		DisSysNumOfNodes = 0;
+		DisSysNumOfLeaks = 0;
+		DisSysNumOfELRs = 0;
+		DisSysNumOfDucts = 0;
+		DisSysNumOfDampers = 0;
+		DisSysNumOfCVFs = 0;
+		DisSysNumOfDetFans = 0;
+		DisSysNumOfCoils = 0;
+		DisSysNumOfHXs = 0;
+		DisSysNumOfCPDs = 0;
+		DisSysNumOfTermUnits = 0;
+		DisSysNumOfLinks = 0;
+		NumOfExtNodes = 0;
+		AirflowNetworkNumOfExtSurfaces = 0;
+		IncAng = 0.0;
+		FacadeAng = Array1D< Real64 >( 5 );
+		WindDirNum = 0; // added default value
+		WindAng = 0; // added default value
+		SupplyFanInletNode = 0;
+		SupplyFanOutletNode = 0;
+		SupplyFanType = 0;
+		OnOffFanRunTimeFraction = 0.0;
+		CurrentEndTime = 0.0;
+		CurrentEndTimeLast = 0.0;
+		TimeStepSysLast = 0.0;
+		AirflowNetworkNumOfOccuVentCtrls = 0;
+		IntraZoneNumOfNodes = 0;
+		IntraZoneNumOfLinks = 0;
+		IntraZoneNumOfZones = 0;
+		AirflowNetworkZnRpt.deallocate();
+		OccupantVentilationControl.deallocate();
+	}
+
+	void
 	ManageAirflowNetworkBalance(
 		Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
 		Optional_int_const Iter, // Iteration number

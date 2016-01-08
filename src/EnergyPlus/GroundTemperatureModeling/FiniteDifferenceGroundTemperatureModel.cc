@@ -234,6 +234,12 @@ namespace EnergyPlus {
 		bool BeginHourFlag_reset = BeginHourFlag;
 		bool EndHourFlag_reset = EndHourFlag;
 
+		if ( !WeatherFileExists ){
+			ShowContinueError( "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file." );
+			ShowContinueError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+			ShowFatalError( "Simulation halted due to input error in ground temperaure model." );
+		}
+
 		++NumOfEnvrn;
 		++TotRunPers;
 		Environment.redimension( NumOfEnvrn );

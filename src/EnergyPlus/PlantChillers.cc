@@ -229,6 +229,60 @@ namespace PlantChillers {
 	// Functions
 
 	void
+	clear_state()
+	{
+		NumElectricChillers = 0;
+		CondMassFlowRate = 0.0;
+		EvapMassFlowRate = 0.0;
+		CondOutletTemp = 0.0;
+		CondOutletHumRat = 0.0;
+		EvapOutletTemp = 0.0;
+		Power = 0.0;
+		QEvaporator = 0.0;
+		QCondenser = 0.0;
+		Energy = 0.0;
+		EvaporatorEnergy = 0.0;
+		CondenserEnergy = 0.0;
+		QHeatRecovered = 0.0;
+		HeatRecOutletTemp = 0.0;
+		AvgCondSinkTemp = 0.0;
+		ChillerCyclingRatio = 0.0;
+		BasinHeaterPower = 0.0;
+		NumEngineDrivenChillers = 0;
+		HeatRecInletTemp = 0.0;
+		HeatRecMdotActual = 0.0;
+		HeatRecMdotDesign = 0.0;
+		QTotalHeatRecovered = 0.0;
+		QJacketRecovered = 0.0;
+		QLubeOilRecovered = 0.0;
+		QExhaustRecovered = 0.0;
+		FuelEnergyUseRate = 0.0;
+		TotalHeatEnergyRec = 0.0;
+		JacketEnergyRec = 0.0;
+		LubeOilEnergyRec = 0.0;
+		ExhaustEnergyRec = 0.0;
+		FuelEnergy = 0.0;
+		FuelMdot = 0.0;
+		ExhaustStackTemp = 0.0;
+		NumGTChillers = 0;
+		NumConstCOPChillers = 0;
+		EvapInletTemp = 0.0;
+		CondInletTemp = 0.0;
+		GetEngineDrivenInput = true;
+		GetElectricInput = true;
+		GetGasTurbineInput = true;
+		GetConstCOPInput = true;
+		ElectricChiller.deallocate();
+		ElectricChillerReport.deallocate();
+		EngineDrivenChiller.deallocate();
+		EngineDrivenChillerReport.deallocate();
+		GTChiller.deallocate();
+		GTChillerReport.deallocate();
+		ConstCOPChiller.deallocate();
+		ConstCOPChillerReport.deallocate();
+	}
+
+	void
 	SimChiller(
 		int const LoopNum, // Flow control mode for the equipment
 		int const EP_UNUSED( LoopSide ), // chiller number pointer

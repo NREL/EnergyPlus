@@ -135,7 +135,6 @@ namespace DataZoneEquipment {
 	extern int NumReturnAirPaths;
 	extern bool ZoneEquipInputsFilled;
 	extern bool ZoneEquipSimulatedOnce;
-	extern bool MyOneTimeFlag2;
 	extern int NumOfZoneEquipLists; // The Number of Zone Equipment List objects
 	extern Array1D_int ZoneEquipAvail;
 

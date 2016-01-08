@@ -144,6 +144,13 @@ namespace RoomAirModelManager {
 	// Functions
 
 	void
+	clear_state()
+	{
+		GetUCSDDVDataFlag = true;
+		GetAirModelData = true;
+	}
+
+	void
 	ManageAirModel( int & ZoneNum )
 	{
 

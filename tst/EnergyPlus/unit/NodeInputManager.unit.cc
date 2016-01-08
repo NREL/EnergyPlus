@@ -131,7 +131,7 @@ namespace EnergyPlus {
 	}
 
 
-TEST( CheckUniqueNodesTest, Test1 )
+TEST_F( EnergyPlusFixture, CheckUniqueNodesTest_Test1 )
 {
 	bool UniqueNodeError( false ); 
 

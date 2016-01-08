@@ -353,6 +353,9 @@ namespace SwimmingPool {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimSwimmingPool(
 		bool const FirstHVACIteration
 	);
@@ -387,7 +390,7 @@ namespace SwimmingPool {
 
 	Real64
 	MakeUpWaterVolFlowFunct( Real64 MakeUpWaterMassFlowRate, Real64 Density );
-	
+
 	Real64
 	MakeUpWaterVolFunct( Real64 MakeUpWaterMass, Real64 Density );
 

@@ -401,6 +401,9 @@ namespace HVACDXSystem {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimDXCoolingSystem(
 		std::string const & DXCoolingSystemName, // Name of DXSystem:Airloop object
 		bool const FirstHVACIteration, // True when first HVAC iteration

@@ -212,7 +212,26 @@ namespace OutdoorAirUnit {
 	// Object Data
 	Array1D< OAUnitData > OutAirUnit;
 
+	namespace {
+		bool MyOneTimeFlag( true );
+		bool ZoneEquipmentListChecked( false );
+	}
+
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumOfOAUnits = 0;
+		OAMassFlowRate = 0.0;
+		GetOutdoorAirUnitInputFlag = true;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		MyOneTimeErrorFlag.deallocate();
+		OutAirUnit.deallocate();
+		MyOneTimeFlag = true;
+		ZoneEquipmentListChecked = false;
+	}
 
 	void
 	SimOutdoorAirUnit(
@@ -892,8 +911,10 @@ namespace OutdoorAirUnit {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
-		static bool MyOneTimeFlag( true );
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeFlag( true );
+		// static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		////////////////////////////////////////////////////////////////////////////////////
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyPlantScanFlag;
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -2327,23 +2348,6 @@ namespace OutdoorAirUnit {
 		}
 
 		return GetOutdoorAirUnitReturnAirNode;
-
-	}
-
-	// Clears the global data in OutdoorAirUnit.
-	// Needed for unit tests, should not be normally called.
-	void
-		clear_state()
-	{
-
-		NumOfOAUnits = 0;
-		OAMassFlowRate = 0.0;
-		GetOutdoorAirUnitInputFlag = true;
-
-		MySizeFlag.deallocate();
-		CheckEquipName.deallocate();
-		MyOneTimeErrorFlag.deallocate();
-		OutAirUnit.deallocate();
 
 	}
 

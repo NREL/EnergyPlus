@@ -65,14 +65,14 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace ObjexxFCL;
 
-TEST( DataZoneEquipment, TestGetSystemNodeNumberForZone )
+TEST_F( EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone )
 {
-
-	ShowMessage( "Begin Test: DataZoneEquipment, TestGetSystemNodeNumberForZone" );
 
 	NumOfZones = 2;
 	ZoneEquipConfig.allocate( NumOfZones ); 

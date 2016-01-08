@@ -80,10 +80,8 @@ using namespace DataGlobals;
 
 namespace EnergyPlus {
 
-	TEST( AirflowNetworkBalanceManagerTest, TestOtherSideCoefficients )
+	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManagerTest_TestOtherSideCoefficients )
 	{
-
-		ShowMessage( "Begin Test: AirflowNetworkBalanceManagerTest, TestOtherSideCoefficients" );
 
 		int i = 2;
 

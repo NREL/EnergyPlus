@@ -82,7 +82,7 @@ using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;
 
-class SizingAnalysisObjectsTest : public :: testing::Test
+class SizingAnalysisObjectsTest : public testing::Test
 {
 
 public:
