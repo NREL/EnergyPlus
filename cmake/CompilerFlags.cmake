@@ -104,9 +104,12 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
       ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
       ADD_CXX_DEBUG_DEFINITIONS("-D_GLIBCXX_DEBUG") # Standard container debug mode (bounds checking, ...)
+      ADD_CXX_RELEASE_DEFINITIONS("-finline-limit=2000") # More aggressive inlining
     endif()
 
   ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
+  ADD_CXX_RELEASE_DEFINITIONS("-fno-stack-protector")
+  # ADD_CXX_RELEASE_DEFINITIONS("-Ofast") # -Ofast (or -ffast-math) needed to auto-vectorize floating point loops
 
 ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
@@ -139,10 +142,12 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     #  /xHost
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    # ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables better optimization via strict aliasing rules
-    # ADD_CXX_RELEASE_DEFINITIONS("/fp:fast") # Enables more aggressive optimizations on floating-point data
-    # ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # Faster division
+    ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables better optimization via strict aliasing rules
+    ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # Faster division
     ADD_CXX_RELEASE_DEFINITIONS("/Qip") # Enables inter-procedural optimnization within a single file
+    ADD_CXX_RELEASE_DEFINITIONS("/Qinline-factor:225") # Enables more aggressive inlining
+    # ADD_CXX_RELEASE_DEFINITIONS("/O3") # Enables agressive optimization
+    # ADD_CXX_RELEASE_DEFINITIONS("/fp:fast=2") # Enables more aggressive optimizations on floating-point data
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     ADD_CXX_DEBUG_DEFINITIONS("/fp:source") # Use source-specified floating point precision

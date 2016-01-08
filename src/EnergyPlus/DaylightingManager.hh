@@ -80,7 +80,8 @@ namespace DaylightingManager {
 	using DataBSDFWindow::BSDFRefPointsGeomDescr;
 
 	// Data
-	// MODULE PARAMETER DEFINITIONS: na
+	// MODULE PARAMETER DEFINITIONS:
+	extern int const octreeCrossover; // Surface count crossover for switching to octree algorithm
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int TotWindowsWithDayl; // Total number of exterior windows in all daylit zones
