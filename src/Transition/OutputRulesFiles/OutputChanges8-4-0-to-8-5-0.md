@@ -17,5 +17,5 @@ The general algorithm for choosing when an output variable is in various time bi
 
 ### Add units and change output variable name for Availability Manager Optimum Start
 
-The output variable which was previously "Availability Manager Optimum Start Hours Before Occupancy []" has been canged to be more consistent with other length of time output variable names, and units have been added:
+The output variable which was previously "Availability Manager Optimum Start Hours Before Occupancy []" has been changed to be more consistent with other length of time output variable names, and units have been added:
 "Availability Manager Optimum Start Time Before Occupancy [hr]".
