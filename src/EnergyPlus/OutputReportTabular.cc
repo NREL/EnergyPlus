@@ -5797,6 +5797,7 @@ namespace OutputReportTabular {
 		auto endPos = inString.find_first_of( tb );
 		if ( colNum == 1 ) {
 			if ( endPos == std::string::npos ) return inString;
+			return inString.substr( startPos, endPos - startPos );
 		}
 		if ( endPos == std::string::npos ) return "";
 
