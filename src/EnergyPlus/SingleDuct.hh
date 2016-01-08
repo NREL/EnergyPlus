@@ -582,6 +582,8 @@ namespace SingleDuct {
 	extern Array1D< AirTerminalMixerData > SysATMixer;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimulateSingleDuct(
