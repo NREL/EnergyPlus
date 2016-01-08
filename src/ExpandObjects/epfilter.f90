@@ -9364,11 +9364,9 @@ DO iZone = 1, numCompactZoneFPVAV
     IF (reheatCoilType .EQ. ctHotWater) THEN
       CALL AddToObjStr('Max Reheat Water Flow {m3/s}','autosize')
       CALL AddToObjStr('Min Reheat Water Flow {m3/s}','0')
-      CALL AddToObjFld('Reheat Water Sensor Node Name', base + fpvzNameOff,' Reheat Coil HW Inlet')
     ELSE
       CALL AddToObjStr('Max Reheat Water Flow {m3/s}  ','')
       CALL AddToObjStr('Min Reheat Water Flow {m3/s}  ','')
-      CALL AddToObjStr('Reheat Water Sensor Node Name','')
     END IF
     CALL AddToObjStr('Convergence Tolerance','0.001',.TRUE.)
   ELSE
@@ -9404,11 +9402,9 @@ DO iZone = 1, numCompactZoneFPVAV
     IF (reheatCoilType .EQ. ctHotWater) THEN
       CALL AddToObjStr('Max Reheat Water Flow {m3/s}  ','autosize')
       CALL AddToObjStr('Min Reheat Water Flow {m3/s}  ','0')
-      CALL AddToObjFld('Reheat Water Sensor Node Name', base + fpvzNameOff,' Reheat Coil HW Inlet')
     ELSE
       CALL AddToObjStr('Max Reheat Water Flow {m3/s}  ','')
       CALL AddToObjStr('Min Reheat Water Flow {m3/s}  ','')
-      CALL AddToObjStr('Reheat Water Sensor Node Name','')
     END IF
     CALL AddToObjStr('Convergence Tolerance         ','0.001',.TRUE.)
   END IF

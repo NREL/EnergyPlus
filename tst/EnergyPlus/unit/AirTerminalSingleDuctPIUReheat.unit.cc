@@ -106,7 +106,6 @@ namespace EnergyPlus {
 			"    SPACE1-1 Zone Coil,      !- Reheat Coil Name",
 			"    autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
-			"    SPACE1-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name",
 			"    0.0001;                  !- Convergence Tolerance",
 			
 			"  Coil:Heating:Water,",
