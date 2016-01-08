@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -148,6 +148,22 @@ namespace BoilerSteam {
 	// Beginning of Boiler Module Driver Subroutines
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		FuelUsed = 0.0;
+		BoilerLoad = 0.0;
+		BoilerMassFlowRate = 0.0;
+		BoilerOutletTemp = 0.0;
+		BoilerMaxPress = 0.0;
+		NumBoilers = 0;
+		BoilerMassFlowMaxAvail = 0.0;
+		BoilerMassFlowMinAvail = 0.0;
+		CheckEquipName.deallocate();
+		Boiler.deallocate();
+		BoilerReport.deallocate();
+	}
 
 	void
 	SimSteamBoiler(

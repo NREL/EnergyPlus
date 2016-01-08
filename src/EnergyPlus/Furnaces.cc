@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -276,6 +276,32 @@ namespace Furnaces {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumFurnaces = 0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		ModifiedHeatCoilLoad = 0.0;
+		OnOffAirFlowRatioSave = 0.0;
+		OnOffFanPartLoadFractionSave = 0.0;
+		CompOnMassFlow = 0.0;
+		CompOffMassFlow = 0.0;
+		CompOnFlowRatio = 0.0;
+		CompOffFlowRatio = 0.0;
+		FanSpeedRatio = 0.0;
+		CoolHeatPLRRat = 1.0;
+		HeatingLoad = false;
+		CoolingLoad = false;
+		EconomizerFlag = false;
+		AirLoopPass = 0;
+		HPDehumidificationLoadFlag = false;
+		TempSteamIn = 100.0;
+		SaveCompressorPLR = 0.0;
+		CurrentModuleObject = "";
+		Furnace.deallocate();
+	}
 
 	void
 	SimFurnace(

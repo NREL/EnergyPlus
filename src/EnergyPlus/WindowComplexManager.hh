@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -106,13 +106,6 @@ namespace WindowComplexManager {
 	// MODULE VARIABLE DECLARATIONS:
 
 	extern int NumComplexWind; // Total number of complex windows
-	//Debug
-	extern Array2D_int DbgIBm;
-	extern Array2D< Real64 > DbgTheta;
-	extern Array2D< Real64 > DbgPhi;
-	extern Real64 DdbgTheta;
-	extern Real64 DdbgPhi;
-	//EndDebug
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
 
@@ -185,6 +178,9 @@ namespace WindowComplexManager {
 	extern Array2D< WindowStateIndex > WindowStateList;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	InitBSDFWindows();

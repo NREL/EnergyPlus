@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -64,6 +64,8 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -88,7 +90,7 @@ using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ReportSizingManager;
 
-TEST( ReportSizingManager, GetCoilDesFlowT )
+TEST_F( EnergyPlusFixture, ReportSizingManager_GetCoilDesFlowT )
 {
 	ShowMessage( "Begin Test: ReportSizingManager, GetCoilDesFlowT" );
 
@@ -200,8 +202,7 @@ TEST( ReportSizingManager, GetCoilDesFlowT )
 	DataSizing::CalcSysSizing.deallocate();
 
 }
-TEST( ReportSizingManager, RequestSizingSystem ) {
-	ShowMessage( "Begin Test: ReportSizingManager, RequestSizingSystem" );
+TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingSystem ) {
 
 	int write_stat;
 	// Open the Initialization Output File
@@ -285,7 +286,7 @@ TEST( ReportSizingManager, RequestSizingSystem ) {
 	OASysEqSizing.deallocate();
 }
 
-TEST( ReportSizingManager, RequestSizingZone ) {
+TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingZone ) {
 	ShowMessage( "Begin Test: ReportSizingManager, RequestSizingZone" );
 
 	int write_stat;

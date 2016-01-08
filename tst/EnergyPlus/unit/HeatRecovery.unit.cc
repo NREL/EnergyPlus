@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -62,6 +62,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -83,44 +84,15 @@ using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatRecovery;
 using namespace EnergyPlus::Psychrometrics;
 
-class HeatRecoveryTest : public testing::Test
+TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 {
-
-public:
-
-	HeatRecoveryTest() // Setup global state
-	{
-		CurZoneEqNum = 0;
-		CurSysNum = 0;
-		CurOASysNum = 0;
-		NumHeatExchangers = 1;
-		ExchCond.allocate( NumHeatExchangers );
-		Node.allocate( 4 );
-		InitializePsychRoutines();
-		OutBaroPress = 101325.0;
-	}
-
-	~HeatRecoveryTest() // Reset global state
-	{
-		CurZoneEqNum = 0;
-		CurSysNum = 0;
-		CurOASysNum = 0;
-		NumHeatExchangers = 0;
-		ExchCond.clear();
-		Node.clear();
-		cached_Twb.clear();
-		cached_Psat.clear();
-		OutBaroPress = 0.0;
-	}
-
-};
-
-TEST_F( HeatRecoveryTest, HRTest)
-{
-	int write_stat;
-	// Open the Initialization Output File (lifted from SimulationManager.cc)
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+	CurZoneEqNum = 0;
+	CurSysNum = 0;
+	CurOASysNum = 0;
+	NumHeatExchangers = 1;
+	ExchCond.allocate( NumHeatExchangers );
+	Node.allocate( 4 );
+	OutBaroPress = 101325.0;
 
 	int ExchNum = 1;
 	int CompanionCoilNum = 0;
@@ -293,8 +265,5 @@ TEST_F( HeatRecoveryTest, HRTest)
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
-
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 }

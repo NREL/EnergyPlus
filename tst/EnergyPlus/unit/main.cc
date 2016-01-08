@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -68,6 +68,9 @@ main( int argc, char **argv )
 #ifdef ENABLE_GTEST_DEBUG_MODE
 	::testing::GTEST_FLAG(break_on_failure) = true;
 	::testing::GTEST_FLAG(catch_exceptions) = false;
+#endif
+#ifdef ENABLE_GTEST_SHUFFLE
+	::testing::GTEST_FLAG(shuffle) = true;
 #endif
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -84,6 +84,8 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <ObjexxFCL/gio.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace DataAirflowNetwork;
 using namespace DataEnvironment;
@@ -105,13 +107,12 @@ using namespace EnergyPlus::Psychrometrics;
 using DataZoneEquipment::ZoneEquipConfig;
 using DataZoneEquipment::ZoneEquipList;
 
-class RoomAirflowNetworkTest : public testing::Test
+class RoomAirflowNetworkTest : public EnergyPlusFixture
 {
+protected:
+	virtual void SetUp() {
+		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
 
-public:
-
-	RoomAirflowNetworkTest() // Setup global state
-	{
 		CurZoneEqNum = 0;
 		CurSysNum = 0;
 		CurOASysNum = 0;
@@ -140,52 +141,21 @@ public:
 		AirflowNetworkNodeSimu.allocate( 6 );
 		AirflowNetworkLinkSimu.allocate( 5 );
 		RAFN.allocate( NumOfZones );
-
 	}
 
-	~RoomAirflowNetworkTest() // Reset global state
-	{
-		NumOfZones = 0;
-		NumOfNodes = 0;
-		BeginEnvrnFlag = false;
-		RoomAirflowNetworkZoneInfo.clear();
-		ZoneEquipConfig.clear();
-		ZoneEquipList.clear();
-		Zone.clear();
-		ZoneIntGain.clear();
-		NodeID.clear();
-		Node.clear();
-		Surface.clear();
-		HConvIn.clear();
-		TempSurfInTmp.clear();
-		MoistEMPDNew.clear();
-		MoistEMPDOld.clear();
-		RhoVaporSurfIn.clear();
-		RhoVaporAirIn.clear();
-		HMassConvInFD.clear();
-		MAT.clear();
-		ZoneAirHumRat.clear();
-		AirflowNetworkLinkageData.clear();
-		AirflowNetworkNodeSimu.clear();
-		AirflowNetworkLinkSimu.clear();
-		RAFN.clear();
+	virtual void TearDown() {
+		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 	}
-
 };
 
 TEST_F( RoomAirflowNetworkTest, RAFNTest )
 {
-
-	ShowMessage( "Begin Test: RoomAirflowNetworkTest, RAFNTest" );
-
 	int NumOfAirNodes = 2;
 	int ZoneNum = 1;
 	int RoomAirNode;
 	TimeStepSys = 15.0 / 60.0;
 	OutBaroPress = 101325.0;
 	ZoneVolCapMultpSens = 1;
-
-	InitializePsychRoutines();
 
 	RoomAirflowNetworkZoneInfo( ZoneNum ).IsUsed = true;
 	RoomAirflowNetworkZoneInfo( ZoneNum ).ActualZoneID = ZoneNum;
@@ -388,8 +358,5 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 
 	EXPECT_NEAR( 24.397538, Node( 2 ).Temp, 0.00001 );
 	EXPECT_NEAR( 0.0024802305, Node( 2 ).HumRat, 0.000001 );
-
-	cached_Twb.deallocate();
-	cached_Psat.deallocate();
 
 }

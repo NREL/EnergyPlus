@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -59,9 +59,6 @@
 #ifndef GroundHeatExchangers_hh_INCLUDED
 #define GroundHeatExchangers_hh_INCLUDED
 
-// C++ Headers
-#include <memory>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -92,6 +89,11 @@ namespace GroundHeatExchangers {
 
 	struct GLHEBase
 	{
+		// Destructor
+		virtual 
+		~GLHEBase()
+		{}
+
 		// Members
 		bool available; // need an array of logicals--load identifiers of available equipment
 		bool on; // simulate the machine at it's operating part load ratio
@@ -212,6 +214,9 @@ namespace GroundHeatExchangers {
 
 	struct GLHEVert:GLHEBase
 	{
+		// Destructor
+		~GLHEVert(){}
+
 		// Members
 		Real64 maxFlowRate; // design nominal capacity of Pump
 		int maxSimYears; // maximum length of simulation (years)
@@ -255,6 +260,10 @@ namespace GroundHeatExchangers {
 
 	struct GLHESlinky:GLHEBase
 	{
+
+		// Destructor
+		~GLHESlinky(){}
+
 		// Members
 		bool verticalConfig;	// HX Configuration Flag
 		Real64 coilDiameter;	// Diameter of the slinky coils [m]

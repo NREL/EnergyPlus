@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -233,6 +233,12 @@ namespace EnergyPlus {
 		bool EndDayFlag_reset = EndDayFlag;
 		bool BeginHourFlag_reset = BeginHourFlag;
 		bool EndHourFlag_reset = EndHourFlag;
+
+		if ( !WeatherFileExists ){
+			ShowContinueError( "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file." );
+			ShowContinueError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+			ShowFatalError( "Simulation halted due to input error in ground temperaure model." );
+		}
 
 		++NumOfEnvrn;
 		++TotRunPers;
