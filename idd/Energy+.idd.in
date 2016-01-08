@@ -39092,9 +39092,6 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A11, \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
   N6;  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -39176,9 +39173,6 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A11, \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
   N7;  \field Convergence Tolerance
        \type real
        \minimum> 0.0
