@@ -168,6 +168,7 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
@@ -352,6 +353,7 @@ namespace EnergyPlus {
 		SetPointManager::clear_state();
 		SimAirServingZones::clear_state();
 		SimulationManager::clear_state();
+		SingleDuct::clear_state();
 		SizingManager::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();

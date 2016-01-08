@@ -226,6 +226,13 @@ namespace SingleDuct {
 	// Functions
 
 	void
+	clear_state()
+	{
+		GetInputFlag = true;
+		GetATMixerFlag = true;
+	}
+
+	void
 	SimulateSingleDuct(
 		std::string const & CompName,
 		bool const FirstHVACIteration,
