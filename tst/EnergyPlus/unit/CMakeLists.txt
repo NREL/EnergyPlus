@@ -57,6 +57,7 @@ set( test_src
   NodeInputManager.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantUtilities.unit.cc
+  Pumps.unit.cc
   PurchasedAirManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc
