@@ -239,23 +239,76 @@ TEST( OutputReportTabularTest, GetColumnUsingTabs )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, GetColumnUsingTabs" );
 
-	std::string inString1 = " Col1 \t Col2 \t Col3 ";
-	EXPECT_EQ( " Col1 ", GetColumnUsingTabs( inString1, 1 ) );
-	EXPECT_EQ( " Col2 ", GetColumnUsingTabs( inString1, 2 ) );
-	EXPECT_EQ( " Col3 ", GetColumnUsingTabs( inString1, 3 ) );
-	EXPECT_EQ( "", GetColumnUsingTabs( inString1, 4 ) );
+{
+	std::string inString = " Col1 \t Col2 \t Col3 ";
+	EXPECT_EQ( " Col1 ", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( " Col2 ", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( " Col3 ", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 4 ) );
+}
 
-	std::string inString2 = "Col1\tCol2\tCol3";
-	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString2, 1 ) );
-	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString2, 2 ) );
-	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString2, 3 ) );
-	EXPECT_EQ( "", GetColumnUsingTabs( inString2, 4 ) );
+{
+	std::string inString = "Col1\tCol2\tCol3";
+	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 4 ) );
+}
 
-	std::string inString3 = "Col1\tCol2\tCol3\t";
-	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString3, 1 ) );
-	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString3, 2 ) );
-	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString3, 3 ) );
-	EXPECT_EQ( "", GetColumnUsingTabs( inString3, 4 )  );
+{
+	std::string inString = "Col1\tCol2\tCol3\t";
+	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 4 )  );
+}
+
+{
+	std::string inString = "";
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 2 ) );
+}
+
+{
+	std::string inString = " ";
+	EXPECT_EQ( " ", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 2 ) );
+}
+
+{
+	std::string inString = "\t";
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 3 ) );
+}
+
+{
+	std::string inString = " \t ";
+	EXPECT_EQ( " ", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( " ", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 3 ) );
+}
+
+{
+	std::string inString = "\tCol1\tCol2\tCol3\t";
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString, 4 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 5 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 6 ) );
+}
+
+{
+	std::string inString = "Col1\t\tCol2\tCol3\t";
+	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString, 4 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 5 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 6 ) );
+}
+
 }
 
 

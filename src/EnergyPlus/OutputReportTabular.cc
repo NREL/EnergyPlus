@@ -5778,7 +5778,6 @@ namespace OutputReportTabular {
 		//   na
 
 		// Return value
-		std::string resultString; // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5793,40 +5792,24 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string::size_type startPos = 0;
 
-		std::string procIn; // processed input string
-		std::string::size_type startTab;
-		std::string::size_type endTab;
-		std::string::size_type inLen;
+		auto endPos = inString.find_first_of( tb );
+		if ( colNum == 1 ) {
+			if ( endPos == std::string::npos ) return inString;
+		}
+		if ( endPos == std::string::npos ) return "";
 
-		procIn = inString;
-		inLen = len( procIn );
-		startTab = 0;
-		endTab = index( procIn, tb );
-		if ( endTab != std::string::npos ) {
-			procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-		} else {
-			endTab = inLen; // one character past the end of string since substract one when extracting
+		int numCols = 1;
+		while ( numCols < colNum ) {
+			startPos = endPos + 1;
+			endPos = inString.find_first_of( tb, startPos );
+			++numCols;
+			if ( endPos == std::string::npos ) break;
 		}
-		for ( int i = 2; i <= colNum; ++i ) { // already have first column identified so do loop only if for column 2 or greater.
-			startTab = endTab;
-			endTab = index( procIn, tb );
-			if ( endTab != std::string::npos ) {
-				procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-			} else {
-				endTab = inLen; // one character past the end of string since substract one when extracting
-			}
-		}
-		if ( startTab < endTab ) {
-			if ( startTab > 0 ){
-				resultString = procIn.substr( startTab + 1, endTab - startTab - 1 ); // extract but leave tab characters out
-			} else {
-				resultString = procIn.substr( startTab, endTab - startTab ); // special case of first column
-			}
-		} else {
-			resultString = "";
-		}
-		return resultString;
+		if ( colNum > numCols ) return "";
+		if ( endPos == std::string::npos ) endPos = inString.size();
+		return inString.substr( startPos, endPos - startPos );
 	}
 
 	void
