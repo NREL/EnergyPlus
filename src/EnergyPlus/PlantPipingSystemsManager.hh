@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1161,18 +1161,6 @@ namespace PlantPipingSystemsManager {
 		int const DomainNum,
 		CartesianCell const & cell
 	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	GetGroundTempModel(
-		std::shared_ptr< BaseGroundTempsModel > &GTMPtrReference,
-		std::string objectType_str,
-		std::string objectName
-	);
-
 
 } // PlantPipingSystemsManager
 

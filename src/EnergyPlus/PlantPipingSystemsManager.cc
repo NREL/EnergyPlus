@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -978,7 +978,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Initialize ground temperature model and set pointer reference
-			GetGroundTempModel( PipingSystemDomains( DomainNum ).Farfield.groundTempModel, cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
 
 		}
 
@@ -1351,7 +1351,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent / 100.0;
 
 				// Farfield model
-				GetGroundTempModel( PipingSystemDomains( DomainCtr ).Farfield.groundTempModel, cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+				PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 				// Other parameters
 				PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -1680,7 +1680,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Farfield ground temperature model
-			GetGroundTempModel( PipingSystemDomains( DomainNum ).Farfield.groundTempModel, cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 			// Domain perimeter offset
 			PipingSystemDomains( DomainNum ).PerimeterOffset = Domain( BasementCtr ).PerimeterOffset;
@@ -2179,7 +2179,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = HGHX( HorizontalGHXCtr ).SaturationMoistureContent / 100.0;
 
 			// Farfield model parameters
-			GetGroundTempModel( PipingSystemDomains( DomainCtr ).Farfield.groundTempModel, cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
+			PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
 
 			// Other parameters
 			PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -2392,15 +2392,15 @@ namespace PlantPipingSystemsManager {
 
 		if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
 			// Zone-coupled slab outputs
-			SetupOutputVariable( "Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		} else if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
 			// Zone-coupled basement wall outputs
-			SetupOutputVariable( "Wall Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "Wall Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Wall Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Wall Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 			// Zone-coupled basement floor outputs
-			SetupOutputVariable( "Floor Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).FloorHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "Floor Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Floor Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).FloorHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Floor Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		}
 
 	}
@@ -9492,20 +9492,6 @@ namespace PlantPipingSystemsManager {
 			NeighborBoundaryCells( BoundaryCellCtr ) = Direction_NegativeZ;
 		}
 
-	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	GetGroundTempModel(
-		std::shared_ptr< BaseGroundTempsModel > &GTMPtrReference,
-		std::string objectType_str,
-		std::string objectName
-	)
-	{
-		GTMPtrReference = GetGroundTempModelAndInit( objectType_str, objectName );
 	}
 
 } // PlantPipingSystemsManager

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -61,6 +61,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 // EnergyPlus Headers
 #include <ZoneEquipmentManager.hh>
 #include <InputProcessor.hh>
@@ -90,9 +92,8 @@ using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
 
 using namespace ObjexxFCL;
 
-TEST(DOASEffectOnZoneSizing, CalcDOASSupCondsForSizing)
+TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
 {
-	ShowMessage( "Begin Test: DOASEffectOnZoneSizing, CalcDOASSupCondsForSizing" );
 	// locals
 	Real64 OutDB; // outside air temperature [C]
 	Real64 OutHR; // outside humidity ratio [kg Water / kg Dry Air]
@@ -101,59 +102,57 @@ TEST(DOASEffectOnZoneSizing, CalcDOASSupCondsForSizing)
 	Real64 DOASHighTemp; // DOAS high setpoint [C]
 	Real64 DOASSupTemp;  // DOAS supply temperature [C]
 	Real64 DOASSupHR; // DOAS supply humidity ratio [kg H2O / kg dry air]
-  // neutral supply air
-  DOASControl = 1;
-  DOASLowTemp = 21.1;
-  DOASHighTemp = 23.9;
-  OutDB = 10.0;
-  OutHR = 0.005;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );  
-  EXPECT_DOUBLE_EQ( 21.1, DOASSupTemp );
-  EXPECT_DOUBLE_EQ( 0.005, DOASSupHR );
-  OutDB = 35.6;
-  OutHR = 0.0185;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );
-  EXPECT_DOUBLE_EQ( 23.9, DOASSupTemp );
-  EXPECT_DOUBLE_EQ( 0.016, DOASSupHR );
-  OutDB = 22.3;
-  OutHR = 0.0085;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );
-  EXPECT_DOUBLE_EQ( 22.3, DOASSupTemp );
-  EXPECT_DOUBLE_EQ( 0.0085, DOASSupHR );
-  // neutral dehumidified supply air
-  DOASControl = 2;
-  DOASLowTemp = 14.4;
-  DOASHighTemp = 22.2;
-  OutDB = 11;
-  OutHR = 0.004;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0153, 0.0092, DOASSupTemp, DOASSupHR );
-  EXPECT_DOUBLE_EQ( 22.2, DOASSupTemp );
-  EXPECT_DOUBLE_EQ( 0.004, DOASSupHR );
-  OutDB = 35.6;
-  OutHR = 0.0185;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0153, 0.0092, DOASSupTemp, DOASSupHR );
-  EXPECT_DOUBLE_EQ( 22.2, DOASSupTemp );
-  EXPECT_DOUBLE_EQ( 0.0092, DOASSupHR );
-  // cold supply air
-  DOASControl = 3;
-  DOASLowTemp = 12.2;
-  DOASHighTemp = 14.4;
-  OutDB = 11;
-  OutHR = 0.005;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0092, 0.008, DOASSupTemp, DOASSupHR );
-  EXPECT_DOUBLE_EQ( 14.4, DOASSupTemp );
-  EXPECT_DOUBLE_EQ( 0.005, DOASSupHR );
-  OutDB = 35.6;
-  OutHR = 0.0185;
-  CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0092, 0.008, DOASSupTemp, DOASSupHR );
-  EXPECT_DOUBLE_EQ( 12.2, DOASSupTemp );
-  EXPECT_DOUBLE_EQ( 0.008, DOASSupHR );
+	// neutral supply air
+	DOASControl = 1;
+	DOASLowTemp = 21.1;
+	DOASHighTemp = 23.9;
+	OutDB = 10.0;
+	OutHR = 0.005;
+	CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );
+	EXPECT_DOUBLE_EQ( 21.1, DOASSupTemp );
+	EXPECT_DOUBLE_EQ( 0.005, DOASSupHR );
+	OutDB = 35.6;
+	OutHR = 0.0185;
+	CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );
+	EXPECT_DOUBLE_EQ( 23.9, DOASSupTemp );
+	EXPECT_DOUBLE_EQ( 0.016, DOASSupHR );
+	OutDB = 22.3;
+	OutHR = 0.0085;
+	CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.016, 0.0143, DOASSupTemp, DOASSupHR );
+	EXPECT_DOUBLE_EQ( 22.3, DOASSupTemp );
+	EXPECT_DOUBLE_EQ( 0.0085, DOASSupHR );
+	// neutral dehumidified supply air
+	DOASControl = 2;
+	DOASLowTemp = 14.4;
+	DOASHighTemp = 22.2;
+	OutDB = 11;
+	OutHR = 0.004;
+	CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0153, 0.0092, DOASSupTemp, DOASSupHR );
+	EXPECT_DOUBLE_EQ( 22.2, DOASSupTemp );
+	EXPECT_DOUBLE_EQ( 0.004, DOASSupHR );
+	OutDB = 35.6;
+	OutHR = 0.0185;
+	CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0153, 0.0092, DOASSupTemp, DOASSupHR );
+	EXPECT_DOUBLE_EQ( 22.2, DOASSupTemp );
+	EXPECT_DOUBLE_EQ( 0.0092, DOASSupHR );
+	// cold supply air
+	DOASControl = 3;
+	DOASLowTemp = 12.2;
+	DOASHighTemp = 14.4;
+	OutDB = 11;
+	OutHR = 0.005;
+	CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0092, 0.008, DOASSupTemp, DOASSupHR );
+	EXPECT_DOUBLE_EQ( 14.4, DOASSupTemp );
+	EXPECT_DOUBLE_EQ( 0.005, DOASSupHR );
+	OutDB = 35.6;
+	OutHR = 0.0185;
+	CalcDOASSupCondsForSizing( OutDB, OutHR, DOASControl, DOASLowTemp, DOASHighTemp, 0.0092, 0.008, DOASSupTemp, DOASSupHR );
+	EXPECT_DOUBLE_EQ( 12.2, DOASSupTemp );
+	EXPECT_DOUBLE_EQ( 0.008, DOASSupHR );
 }
 
-TEST( DOASEffectOnZoneSizing, SizeZoneEquipment )
+TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 {
-	ShowMessage( "Begin Test: DOASEffectOnZoneSizing, SizeZoneEquipment" );
-	InitializePsychRoutines();
 
 	Node.allocate( 10 );
 	ZoneEqSizing.allocate( 2 );
@@ -189,7 +188,6 @@ TEST( DOASEffectOnZoneSizing, SizeZoneEquipment )
 	ZoneThermostatSetPointHi( 1 ) = 24.;
 	ZoneThermostatSetPointHi( 2 ) = 24.;
 	CurOverallSimDay = 1;
-	MyOneTimeFlag2 = false;
 	ZoneEquipConfig( 1 ).IsControlled = true;
 	ZoneEquipConfig( 2 ).IsControlled = true;
 	CalcZoneSizing( 1, 1 ).ActualZoneNum = 1;

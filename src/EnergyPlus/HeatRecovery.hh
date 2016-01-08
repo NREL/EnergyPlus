@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -225,7 +225,7 @@ namespace HeatRecovery {
 		int UnBalancedErrCount; // Counter for recurring warning message
 		int UnBalancedErrIndex; // Index to recurring warning message
 		bool myEnvrnFlag; // one-time-init flag
-		
+
 		// Default Constructor
 		HeatExchCond() :
 			ExchTypeNum( 0 ),
@@ -1056,6 +1056,9 @@ namespace HeatRecovery {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimHeatRecovery(
 		std::string const & CompName, // name of the heat exchanger unit
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -1097,7 +1100,7 @@ namespace HeatRecovery {
 		int const FanOpMode, // Supply air fan operating mode (1=cycling, 2=constant)
 		Optional_bool_const EconomizerFlag = _, // economizer flag pass by air loop or OA sys
 		Optional_bool_const HighHumCtrlFlag = _, // high humidity control flag passed by airloop or OA sys
-		Optional< Real64 const > HXPartLoadRatio = _ // 
+		Optional< Real64 const > HXPartLoadRatio = _ //
 		);
 
 	void

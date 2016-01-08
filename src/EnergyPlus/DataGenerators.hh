@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -2439,6 +2439,9 @@ namespace DataGenerators {
 	extern Array1D< MicroCHPDataStruct > MicroCHP;
 	extern Array1D< MicroCHPParamsNonNormalized > MicroCHPParamInput; // Used during get input then put into nested
 	extern Array1D< GeneratorDynamicsManagerStruct > GeneratorDynamics;
+
+	void
+	clear_state();
 
 } // DataGenerators
 

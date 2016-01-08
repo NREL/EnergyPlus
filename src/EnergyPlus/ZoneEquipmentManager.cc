@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -195,6 +195,7 @@ namespace ZoneEquipmentManager {
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 
 		bool InitZoneEquipmentOneTimeFlag( true );
+		bool InitZoneEquipmentEnvrnFlag( true );
 	}
 
 	Array1D< Real64 > AvgData; // scratch array for storing averaged data
@@ -214,6 +215,7 @@ namespace ZoneEquipmentManager {
 	{
 		SizeZoneEquipmentOneTimeFlag = true;
 		InitZoneEquipmentOneTimeFlag =  true;
+		InitZoneEquipmentEnvrnFlag = true;
 		AvgData.deallocate(); // scratch array for storing averaged data
 		DefaultSimOrder.deallocate();
 		NumOfTimeStepInDay = 0; // number of zone time steps in a day
@@ -400,10 +402,10 @@ namespace ZoneEquipmentManager {
 		int ZoneExhNode;
 		int ControlledZoneNum;
 		int ZoneReturnAirNode;
-		/////////// hoisted into namespace InitZoneEquipmentOneTimeFlag////////////
-		//static bool MyOneTimeFlag( true );
+		/////////// hoisted into namespace ////////////
+		// static bool MyOneTimeFlag( true ); // InitZoneEquipmentOneTimeFlag
+		// static bool MyEnvrnFlag( true ); // InitZoneEquipmentEnvrnFlag
 		///////////////////////////
-		static bool MyEnvrnFlag( true );
 		int ZoneEquipType; // Type of zone equipment
 		int TotalNumComp; // Total number of zone components of ZoneEquipType
 		int ZoneCompNum; // Number/index of zone equipment component
@@ -433,7 +435,7 @@ namespace ZoneEquipmentManager {
 		}
 
 		// Do the Begin Environment initializations
-		if ( MyEnvrnFlag && BeginEnvrnFlag ) {
+		if ( InitZoneEquipmentEnvrnFlag && BeginEnvrnFlag ) {
 
 			ZoneEquipAvail = NoAction;
 
@@ -521,12 +523,12 @@ namespace ZoneEquipmentManager {
 
 			}
 
-			MyEnvrnFlag = false;
+			InitZoneEquipmentEnvrnFlag = false;
 
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag = true;
+			InitZoneEquipmentEnvrnFlag = true;
 		}
 
 		// do the  HVAC time step initializations

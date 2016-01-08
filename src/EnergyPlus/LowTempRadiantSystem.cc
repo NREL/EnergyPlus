@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -243,6 +243,37 @@ namespace LowTempRadiantSystem {
 	Array1D< HydronicRadiantSysNumericFieldData > HydronicRadiantSysNumericFields;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		LowTempHeating = -200.0;
+		HighTempCooling = 200.0;
+		NumOfHydrLowTempRadSys = 0;
+		NumOfCFloLowTempRadSys = 0;
+		NumOfElecLowTempRadSys = 0;
+		CFloCondIterNum = 0;
+		TotalNumOfRadSystems = 0;
+		OperatingMode = 0;
+		MaxCloNumOfSurfaces = 0;
+		VarOffCond = false;
+		LoopReqTemp = 0.0;
+		QRadSysSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQRadSysSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		MySizeFlagHydr.deallocate();
+		MySizeFlagCFlo.deallocate();
+		MySizeFlagElec.deallocate();
+		CheckEquipName.deallocate();
+		HydrRadSys.deallocate();
+		CFloRadSys.deallocate();
+		ElecRadSys.deallocate();
+		RadSysTypes.deallocate();
+		ElecRadSysNumericFields.deallocate();
+		HydronicRadiantSysNumericFields.deallocate();
+	}
 
 	void
 	SimLowTempRadiantSystem(

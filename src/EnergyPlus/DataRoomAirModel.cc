@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -310,7 +310,137 @@ namespace DataRoomAirModel {
 	Array1D< CVDVParameters > SurfParametersCVDV; // Surface parameters
 	Array1D< TemperaturePatternStruct > RoomAirPattern; // user defined patterns ,various types
 	Array1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
-	Array1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info 
+	Array1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info
+
+	void
+	clear_state()
+	{
+		TotNumOfAirNodes = 0;
+		TotNumOfRoomAFNNodes = 0;
+		TotNumOfZoneAirNodes.deallocate();
+		ConvectiveFloorSplit.deallocate();
+		InfiltratFloorSplit.deallocate();
+		DVHcIn.deallocate();
+		TotUCSDDV = 0;
+		IsZoneDV.deallocate();
+		ZTOC.deallocate();
+		AvgTempGrad.deallocate();
+		ZTMX.deallocate();
+		MaxTempGrad.deallocate();
+		HVACAirTemp.deallocate();
+		HVACMassFlow.deallocate();
+		ZTFloor.deallocate();
+		HeightTransition.deallocate();
+		FracMinFlow.deallocate();
+		ZoneDVMixedFlag.deallocate();
+		ZoneDVMixedFlagRep.deallocate();
+		ZoneAirSystemON.deallocate();
+		TCMF.deallocate();
+		ZoneCeilingHeight.deallocate();
+		MATFloor.deallocate();
+		XMATFloor.deallocate();
+		XM2TFloor.deallocate();
+		XM3TFloor.deallocate();
+		XM4TFloor.deallocate();
+		DSXMATFloor.deallocate();
+		DSXM2TFloor.deallocate();
+		DSXM3TFloor.deallocate();
+		DSXM4TFloor.deallocate();
+		MATOC.deallocate();
+		XMATOC.deallocate();
+		XM2TOC.deallocate();
+		XM3TOC.deallocate();
+		XM4TOC.deallocate();
+		DSXMATOC.deallocate();
+		DSXM2TOC.deallocate();
+		DSXM3TOC.deallocate();
+		DSXM4TOC.deallocate();
+		MATMX.deallocate();
+		XMATMX.deallocate();
+		XM2TMX.deallocate();
+		XM3TMX.deallocate();
+		XM4TMX.deallocate();
+		DSXMATMX.deallocate();
+		DSXM2TMX.deallocate();
+		DSXM3TMX.deallocate();
+		DSXM4TMX.deallocate();
+		ZTM1Floor.deallocate();
+		ZTM2Floor.deallocate();
+		ZTM3Floor.deallocate();
+		ZTM1OC.deallocate();
+		ZTM2OC.deallocate();
+		ZTM3OC.deallocate();
+		ZTM1MX.deallocate();
+		ZTM2MX.deallocate();
+		ZTM3MX.deallocate();
+		AIRRATFloor.deallocate();
+		AIRRATOC.deallocate();
+		AIRRATMX.deallocate();
+		Zone1Floor.deallocate();
+		ZoneMXFloor.deallocate();
+		ZoneM2Floor.deallocate();
+		Zone1OC.deallocate();
+		ZoneMXOC.deallocate();
+		ZoneM2OC.deallocate();
+		Zone1MX.deallocate();
+		ZoneMXMX.deallocate();
+		ZoneM2MX.deallocate();
+		CVHcIn.deallocate();
+		TotUCSDCV = 0;
+		IsZoneCV.deallocate();
+		ZoneCVisMixing.deallocate();
+		ZTJET.deallocate();
+		ZTREC.deallocate();
+		RoomOutflowTemp.deallocate();
+		JetRecAreaRatio.deallocate();
+		Urec.deallocate();
+		Ujet.deallocate();
+		Qrec.deallocate();
+		Qtot.deallocate();
+		RecInflowRatio.deallocate();
+		Uhc.deallocate();
+		Ain.deallocate();
+		Droom.deallocate();
+		Dstar.deallocate();
+		Tin.deallocate();
+		TotArea.deallocate();
+		AirflowNetworkSurfaceUCSDCV.deallocate();
+		CVNumAirflowNetworkSurfaces = 0;
+		Rfr.deallocate();
+		ZoneCVhasREC.deallocate();
+		UCSDModelUsed = false;
+		MundtModelUsed = false;
+		TotUCSDUI = 0;
+		TotUCSDUE = 0;
+		IsZoneUI.deallocate();
+		ZoneUFPtr.deallocate();
+		UFHcIn.deallocate();
+		ZoneUFMixedFlag.deallocate();
+		ZoneUFMixedFlagRep.deallocate();
+		ZoneUFGamma.deallocate();
+		ZoneUFPowInPlumes.deallocate();
+		ZoneUFPowInPlumesfromWindows.deallocate();
+		Phi.deallocate();
+		numTempDistContrldZones = 0;
+		NumAirTempPatterns = 0;
+		NumConstantGradient = 0;
+		NumTwoGradientInterp = 0;
+		NumNonDimensionalHeight = 0;
+		NumSurfaceMapping = 0;
+		UserDefinedUsed = false;
+		NumOfRoomAirflowNetControl = 0;
+		AirModel.deallocate();
+		AirNode.deallocate();
+		ZoneUCSDDV.deallocate();
+		ZoneUCSDCV.deallocate();
+		ZoneUCSDUI.deallocate();
+		ZoneUCSDUE.deallocate();
+		CVJetRecFlows.deallocate();
+		SurfParametersCVDV.deallocate();
+		RoomAirPattern.deallocate();
+		AirPatternZoneInfo.deallocate();
+		RoomAirflowNetworkZoneInfo.deallocate();
+	}
 
 	//**********************************************************************************************
 

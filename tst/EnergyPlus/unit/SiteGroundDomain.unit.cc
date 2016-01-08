@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -96,9 +96,9 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking )
 
 	PipingSystemDomains.allocate( 2 );
 
-	GetGroundTempModel( PipingSystemDomains( 1 ).Farfield.groundTempModel, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1" );
+	PipingSystemDomains( 1 ).Farfield.groundTempModel = GetGroundTempModelAndInit( "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1" );
 
-	GetGroundTempModel( PipingSystemDomains( 2 ).Farfield.groundTempModel, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2" );
+	PipingSystemDomains( 2 ).Farfield.groundTempModel = GetGroundTempModelAndInit( "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2" );
 
 	EXPECT_NE( PipingSystemDomains( 1 ).Farfield.groundTempModel, PipingSystemDomains( 2 ).Farfield.groundTempModel );
 
