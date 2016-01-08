@@ -69,20 +69,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/TypeTraits.hh>
-#include <ObjexxFCL/Vector3.hh>
 #include <ObjexxFCL/Vector4.hh>
-
-// C++ Headers
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <type_traits>
-#include <utility>
 
 namespace EnergyPlus {
 

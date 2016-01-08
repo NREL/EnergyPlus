@@ -109,9 +109,9 @@ namespace EnergyPlus {
 		assert( n_ == 0u );
 		surfaces_.clear();
 		surfaces_.reserve( surfaces.size() );
-		for( Surface & surface : surfaces ) {
+		for ( Surface & surface : surfaces ) {
 			if (
-			 ( ! surface.Vertex.empty() ) && // Skip no-vertex "surfaces"
+			 ( surface.Vertex.size() >= 3 ) && // Skip no-vertex "surfaces"
 			 ( ! surface.IsTransparent ) // Skip transparent surfaces
 			) {
 				surfaces_.push_back( &surface );

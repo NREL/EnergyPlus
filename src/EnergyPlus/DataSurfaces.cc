@@ -56,15 +56,15 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// C++ Headers
-#include <cmath>
-
-// ObjexxFCL Headers
-
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
 #include <DataSurfaces.hh>
 #include <DataPrecisionGlobals.hh>
+
+// C++ Headers
+#include <algorithm>
+#include <cassert>
+#include <cmath>
 
 namespace EnergyPlus {
 
@@ -537,9 +537,11 @@ namespace DataSurfaces {
 		SurfaceData::
 		set_computed_geometry()
 		{
-			shapeCat = computed_shapeCat();
-			plane = computed_plane();
-			surface2d = computed_surface2d();
+			if ( Vertex.size() >= 3 ) { // Skip no-vertex "surfaces"
+				shapeCat = computed_shapeCat();
+				plane = computed_plane();
+				surface2d = computed_surface2d();
+			}
 		}
 
 		void
@@ -665,14 +667,15 @@ namespace DataSurfaces {
 		computed_surface2d() const
 		{
 			// Project along axis of min surface range for 2D intersection use
-			assert( Vertex.size() >= 3 );
+			Vertices::size_type const n( Vertex.size() );
+			assert( n >= 3 );
 			using Vertex2D = ObjexxFCL::Vector2< Real64 >;
 			using Vertices2D = ObjexxFCL::Array1D< Vertex2D >;
 			Vector const & v0( Vertex[ 0 ] );
 			Real64 xl( v0.x ), xu( v0.x ); // x coordinate ranges
 			Real64 yl( v0.y ), yu( v0.y ); // y coordinate ranges
 			Real64 zl( v0.z ), zu( v0.z ); // z coordinate ranges
-			for ( Vertices::size_type i = 1, n = Vertex.size(); i < n; ++i ) {
+			for ( Vertices::size_type i = 1; i < n; ++i ) {
 				Vector const & v( Vertex[ i ] );
 				xl = std::min( xl, v.x );
 				yl = std::min( yl, v.y );
@@ -687,19 +690,19 @@ namespace DataSurfaces {
 			Real64 const d_min( ObjexxFCL::min( xd, yd, zd ) );
 			Vertices2D v2d( Vertex.isize() );
 			if ( d_min == xd ) { // Use y,z for 2D surface
-				for ( Vertices::size_type i = 0, n = Vertex.size(); i < n; ++i ) {
+				for ( Vertices::size_type i = 0; i < n; ++i ) {
 					Vector const & v( Vertex[ i ] );
 					v2d[ i ] = Vertex2D( v.y, v.z );
 				}
 				return Surface2D( shapeCat, 0, v2d, Vertex2D( yl, zl ), Vertex2D( yu, zu ) );
 			} else if ( d_min == yd ) { // Use x,z for 2D surface
-				for ( Vertices::size_type i = 0, n = Vertex.size(); i < n; ++i ) {
+				for ( Vertices::size_type i = 0; i < n; ++i ) {
 					Vector const & v( Vertex[ i ] );
 					v2d[ i ] = Vertex2D( v.x, v.z );
 				}
 				return Surface2D( shapeCat, 1, v2d, Vertex2D( xl, zl ), Vertex2D( xu, zu ) );
 			} else { // Use x,y for 2D surface
-				for ( Vertices::size_type i = 0, n = Vertex.size(); i < n; ++i ) {
+				for ( Vertices::size_type i = 0; i < n; ++i ) {
 					Vector const & v( Vertex[ i ] );
 					v2d[ i ] = Vertex2D( v.x, v.y );
 				}
