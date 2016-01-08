@@ -681,18 +681,18 @@ namespace BranchNodeConnections {
 		}
 
 		//Check 11 - zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
-		for (Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1) {
-			if (NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_ZoneNode)) continue;
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_ZoneNode ) ) continue;
 			IsValid = true;
-			for (Loop2 = Loop1; Loop2 <= NumOfNodeConnections; ++Loop2) {
-				if (Loop1 == Loop2) continue;
-				if (NodeConnections(Loop1).NodeName == NodeConnections(Loop2).NodeName) {
-					if (NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
-					if (NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_Actuator)) continue;
-					if (NodeConnections(Loop2).ConnectionType == ValidConnectionTypes(NodeConnectionType_SetPoint)) continue;
-					ShowSevereError("Node Connection Error, Node Name=\"" + NodeConnections(Loop1).NodeName + "\", The same zone node appears more than once.");
-					ShowContinueError("Reference Object=" + NodeConnections(Loop1).ObjectType + ", Object Name=" + NodeConnections(Loop1).ObjectName);
-					ShowContinueError("Reference Object=" + NodeConnections(Loop2).ObjectType + ", Object Name=" + NodeConnections(Loop2).ObjectName);
+			for ( Loop2 = Loop1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeName == NodeConnections( Loop2 ).NodeName ) {
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Sensor ) ) continue;
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Actuator ) ) continue;
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_SetPoint ) ) continue;
+					ShowSevereError( "Node Connection Error, Node Name=\"" + NodeConnections( Loop1 ).NodeName + "\", The same zone node appears more than once." );
+					ShowContinueError( "Reference Object=" + NodeConnections( Loop1 ).ObjectType + ", Object Name=" + NodeConnections( Loop1 ).ObjectName );
+					ShowContinueError( "Reference Object=" + NodeConnections( Loop2 ).ObjectType + ", Object Name=" + NodeConnections( Loop2 ).ObjectName );
 					++ErrorCounter;
 					ErrorsFound = true;
 				}
