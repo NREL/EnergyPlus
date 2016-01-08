@@ -327,6 +327,10 @@ namespace BranchNodeConnections {
 		//        same node name appears as an INLET to an AirLoopHVAC, CondenserLoop, or PlantLoop.
 		// 6.  Any given node can only be an inlet once in the list of Non-Parent Node Connections
 		// 7.  Any given node can only be an outlet once in the list of Non-Parent Node Connections
+		// 8.  non-parent outlet nodes -- must never be an outlet more than once
+		// 9.  nodes of type OutsideAirReference must be registered as NodeConnectionType_OutsideAir
+		// 10. fluid streams cannot have multiple inlet/outlet nodes on same component
+		// 11. zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
 
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
@@ -674,6 +678,25 @@ namespace BranchNodeConnections {
 			FluidStreamOutletCount.deallocate();
 			FluidStreamCounts.deallocate();
 			NodeObjects.deallocate();
+		}
+
+		//Check 11 - zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_ZoneNode ) ) continue;
+			IsValid = true;
+			for ( Loop2 = Loop1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeName == NodeConnections( Loop2 ).NodeName ) {
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Sensor ) ) continue;
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Actuator ) ) continue;
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_SetPoint ) ) continue;
+					ShowSevereError( "Node Connection Error, Node Name=\"" + NodeConnections( Loop1 ).NodeName + "\", The same zone node appears more than once." );
+					ShowContinueError( "Reference Object=" + NodeConnections( Loop1 ).ObjectType + ", Object Name=" + NodeConnections( Loop1 ).ObjectName );
+					ShowContinueError( "Reference Object=" + NodeConnections( Loop2 ).ObjectType + ", Object Name=" + NodeConnections( Loop2 ).ObjectName );
+					++ErrorCounter;
+					ErrorsFound = true;
+				}
+			}
 		}
 
 		NumNodeConnectionErrors += ErrorCounter;

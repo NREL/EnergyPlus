@@ -1126,19 +1126,19 @@ Example inputs are shown below
 
 ```idf
   AirLoopHVAC:SupplyPath,
-       SupplyAirPath 1,                       !- Name
-       Zone Equip In Node,                 !- Supply Air Path Inlet Node Name
+       SupplyAirPath 1,              !- Name
+       Zone Equip In Node,           !- Supply Air Path Inlet Node Name
        AirLoopHVAC:SupplyPlenum,     !- Component 1 Object Type
-       Supply-Plenum-1,                       !- Component 1 Name
+       Supply-Plenum-1,              !- Component 1 Name
        AirLoopHVAC:ZoneSplitter,     !- Component 2 Object Type
-       Zone Supply Air Splitter 1; !- Component 2 Name
+       Zone Supply Air Splitter 1;   !- Component 2 Name
 
 
 AirLoopHVAC:ReturnPath,
-       ReturnAirPath1,                         !- Name
-       PLENUM-1 Out Node,                   !- Return Air Path Outlet Node Name
-       Zone Return Plenum,                 !- Component 1 Object Type
-       Return-Plenum-1;                       !- Component 1 Name
+       ReturnAirPath1,               !- Name
+       PLENUM-1 Out Node,            !- Return Air Path Outlet Node Name
+       Zone Return Plenum,           !- Component 1 Object Type
+       Return-Plenum-1;              !- Component 1 Name
 ```
 
 
@@ -1150,11 +1150,11 @@ The simple building shown in the figure below consists of a controlled zone and 
 
 Figure 130. Illustration of Zone Return Plenum
 
-After all the building zone attributes are specified, the AirLoopHVAC:ReturnPlenumobject is specified and included as one of the named components in an AirLoopHVAC:ReturnPath.
+After all the building zone attributes are specified, the AirLoopHVAC:ReturnPlenum object is specified and included as one of the named components in an AirLoopHVAC:ReturnPath.
 
 #### Field: Name
 
-A unique identifying name identifying the AirLoopHVAC:ReturnPlenumsystem component.
+A unique identifying name identifying the AirLoopHVAC:ReturnPlenum system component.
 
 #### Field: Zone Name
 
@@ -1162,7 +1162,7 @@ The zone name specified in the heat balance portion of the input. This piece of 
 
 #### Field: Zone Node Name
 
-The name of the zone node. The zone node name connects the heat balance data structure to the system airflow data structure through this node.   This node name is defined by the user in the field    Zone Air Node Name    in the ZoneHVAC:EquipmentConnections object for the zone named in the previous field.
+The name of the zone node. The zone node name connects the heat balance data structure to the system airflow data structure through this node. This node name must be unique otherwise a warning is reported. Do not use the Zone Air Node Name specified in any ZoneHVAC:EquipmentConnections object, and since this zone is a plenum a ZoneHVAC:EquipmentConnections object is not required for the zone named in the previous field.
 
 #### Field: Outlet Node Name
 
@@ -1182,24 +1182,24 @@ An IDF example of a zone return plenum component specification:
 
 ```idf
    AirLoopHVAC:ReturnPlenum,
-       Return-Plenum-1,                       !- Name
-       PLENUM-1,                                     !- Zone Name
-       PLENUM-1 Node,                           !- Zone Node Name
-       PLENUM-1 Out Node,                   !- Outlet Node Name
+       Return-Plenum-1,            !- Name
+       PLENUM-1,                   !- Zone Name
+       PLENUM-1 Node,              !- Zone Node Name
+       PLENUM-1 Out Node,          !- Outlet Node Name
        PLENUM-1 Induced Air Nodes, !- Induced Air Outlet Node or NodeList Name
-       SPACE1-1 Out Node,                   !- Inlet 1 Node Name
-       SPACE2-1 Out Node,                   !- Inlet 2 Node Name
-       SPACE3-1 Out Node,                   !- Inlet 3 Node Name
-       SPACE4-1 Out Node,                   !- Inlet 4 Node Name
-       SPACE5-1 Out Node;                   !- Inlet 5 Node Name
+       SPACE1-1 Out Node,          !- Inlet 1 Node Name
+       SPACE2-1 Out Node,          !- Inlet 2 Node Name
+       SPACE3-1 Out Node,          !- Inlet 3 Node Name
+       SPACE4-1 Out Node,          !- Inlet 4 Node Name
+       SPACE5-1 Out Node;          !- Inlet 5 Node Name
 
 
    NodeList,
-       PLENUM-1 Induced Air Nodes,       !- Name
-       SPACE1-1 ATU Sec Node,                 !- Node 1 Name
-       SPACE2-1 ATU Sec Node,                 !- Node 2 Name
-       SPACE3-1 ATU Sec Node,                 !- Node 3 Name
-       SPACE4-1 ATU Sec Node;                 !- Node 4 Name
+       PLENUM-1 Induced Air Nodes, !- Name
+       SPACE1-1 ATU Sec Node,      !- Node 1 Name
+       SPACE2-1 ATU Sec Node,      !- Node 2 Name
+       SPACE3-1 ATU Sec Node,      !- Node 3 Name
+       SPACE4-1 ATU Sec Node;      !- Node 4 Name
 ```
 
 
@@ -1207,10 +1207,10 @@ Below is an example of the AirLoopHVAC:ReturnPath for the simple case shown abov
 
 ```idf
    AirLoopHVAC:ReturnPath,
-       ReturnAirPath1,                   !- Name
-       PLENUM-1 Out Node,             !- Return Air Path Outlet Node Name
-       AirLoopHVAC:ReturnPlenum,!- Component 1 Object Type
-       Return-Plenum-1;                 !- Component 1 Name
+       ReturnAirPath1,              !- Name
+       PLENUM-1 Out Node,           !- Return Air Path Outlet Node Name
+       AirLoopHVAC:ReturnPlenum,    !- Component 1 Object Type
+       Return-Plenum-1;             !- Component 1 Name
 ```
 
 
