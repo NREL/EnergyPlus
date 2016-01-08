@@ -2469,16 +2469,10 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 	GetZoneEquipmentData(); // read zone equipment
 
-	ZoneEqSizing.allocate( 1 );
-	ZoneEquipList( 1 ).EquipIndex.allocate( 1 );
-	ZoneEquipList( 1 ).EquipIndex( 1 ) = 1; // initialize equipment index for ZoneHVAC
-
 	GetUnitarySystemInput(); // get input
-	HVACUnitarySystem::GetInputFlag = false;
 
 	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
 	EXPECT_EQ( UnitarySystem( 1 ).UnitarySystemType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
-	DataGlobals::SysSizingCalc = true; // disable sizing
 
 	InletNode = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
 	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
@@ -2488,23 +2482,27 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 	HeatingLoad = false;
 	CoolingLoad = false;
 
-	// zone predicted load is heating
+	// zone predicted load is assume to be heating and the unitary system zone equipment
+	// inlet and outlet air conditions were set for heating 
 	HeatingLoad = true;
 	// set up zone equipment inlet node condtions
-	Node( InletNode ).Temp = 17.57; // 
-	Node( InletNode ).HumRat = 0.007; //
+	Node( InletNode ).Temp = 17.57; 
+	Node( InletNode ).HumRat = 0.007;
 	Node( InletNode ).Enthalpy = PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat );
 	Node( InletNode ).MassFlowRate = 0.25;
 	// set  zone equipment outlet node conditions
-	Node( OutletNode ).Temp = 21.1; // 
-	Node( OutletNode ).HumRat = 0.007; //
+	Node( OutletNode ).Temp = 21.1;
+	Node( OutletNode ).HumRat = 0.007;
 	Node( OutletNode ).Enthalpy = PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat );
 	Node( OutletNode ).MassFlowRate = 0.25;
 	// set zone conditions
-	Node( ControlZoneNum ).Temp = 23.0; // set zone temperature to heating season
-	Node( ControlZoneNum ).HumRat = 0.0070; //
+	Node( ControlZoneNum ).Temp = 23.0; 
+	Node( ControlZoneNum ).HumRat = 0.0070; 
 	Node( ControlZoneNum ).Enthalpy = PsyHFnTdbW( Node( ControlZoneNum ).Temp, Node( ControlZoneNum ).HumRat );
+
+	// calculate the "Unitary System Total Cooling/Heating Rate" report variables
 	ReportUnitarySystem( UnitarySysNum, AirLoopNum );
 	EXPECT_NEAR( 483.5, UnitarySystem( UnitarySysNum ).TotCoolEnergyRate, 1.0 );
+	EXPECT_EQ( 0.0, UnitarySystem( UnitarySysNum ).TotHeatEnergyRate );
 
 }
