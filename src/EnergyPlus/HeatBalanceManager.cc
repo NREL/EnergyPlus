@@ -340,8 +340,13 @@ namespace HeatBalanceManager {
 		// Get the heat balance input at the beginning of the simulation only
 		if ( ManageHeatBalanceGetInputFlag ) {
 			GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+
+			// Surface octree setup
+			//  The surface octree holds live references to surfaces so it must be updated
+			//   if in the future surfaces are altered after this point
 			surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
-			for ( auto & surface : DataSurfaces::Surface ) surface.set_computed_geometry(); // Set up geometric info for PierceSurface
+			for ( auto & surface : DataSurfaces::Surface ) surface.set_computed_geometry(); // Set up extra surface geometry info for PierceSurface
+
 			ManageHeatBalanceGetInputFlag = false;
 		}
 

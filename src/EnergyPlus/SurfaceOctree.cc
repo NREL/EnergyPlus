@@ -82,12 +82,14 @@ namespace EnergyPlus {
 //  Initial octree is for use in daylighting but should be adaptable to other use cases:
 //   Surfaces without vertices are omitted
 //   Transparent surfaces are omitted (can't obstruct light)
+//  The octree holds live references to surfaces so it must be updated if surfaces change after its construction (this doens't occur in EnergyPlus currently)
 //  Copy and move ctors/assignment omitted for now since not needed
 //  The use of multiple octrees for faster lookups of surface type subsets may be worthwhile for performance in some uses
 //  Octree variations and parameter tuning can give better performance for specific applications
 //  This design uses "tight" cubes (no overlap) and surfaces filtering down to deepest cube they fit in completely
-//  Alternative: Use "loose" cubes oversied by x2 or some other factor to allow surfaces to filter down further: This requires more cubes to be processed for a given operation
-//  Alternative: Filter all surfaces down to leaf cubes placing a surface in any cube it intersects: More specificity but redundant surfaces in each operation so must collect them in a set
+//  Alternative designs that might offer somewhat better or worse performance:
+//   Loose cubes oversied by x2 or some other factor to allow surfaces to filter down further: This requires more cubes to be processed for a given operation
+//   Filter all surfaces down to leaf cubes placing a surface in any cube it intersects: More specificity but redundant surfaces in each operation so must collect them in a set
 
 	// Surface in Cube?
 	bool
