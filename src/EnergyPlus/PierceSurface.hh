@@ -70,6 +70,7 @@
 // Notes:
 //  This is filling the role of the former PierceSurface function authored by Fred Winkelmann and based on
 //   DOE-2.1E subroutine DPIERC and some aspects of this version are analogous
+//  To match the former behavior ray's with origin exactly on the surface are treated as not hitting
 //  These functions are VERY performance critical for daylighting and solar reflection
 //   This high-performance implementation was built to complement the octree system for scalability of those systems
 //  This has been carefully designed for speed but is probably not be optimal yet
@@ -238,9 +239,9 @@ PierceSurface(
 		return;
 	} else { // Ray intersects plane
 		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) ); // float gives faster division
-		if ( num * den < 0.0 ) { // Ray points away from surface: This looks odd but is fast way to check for different signs
+		if ( num * den <= 0.0 ) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
 			return;
-		} else { // Ray points toward surface or ray origin lies in surface (num==0): Compute hit point
+		} else { // Ray points toward surface: Compute hit point
 			Real64 const t( num / den ); // Ray parameter at plane intersection: hitPt = RayOri + t * rayDir
 			hitPt.x = rayOri.x + ( t * rayDir.x ); // Compute by coordinate to avoid Vertex temporaries
 			hitPt.y = rayOri.y + ( t * rayDir.y );
@@ -305,9 +306,9 @@ PierceSurface(
 		return;
 	} else { // Ray intersects plane
 		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) ); // float gives faster division
-		if ( num * den < 0.0 ) { // Ray points away from surface: This looks odd but is fast way to check for different signs
+		if ( num * den <= 0.0 ) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
 			return;
-		} else { // Ray points toward surface or ray origin lies in surface (num==0): Compute hit point
+		} else { // Ray points toward surface: Compute hit point
 			Real64 const t( num / den ); // Ray parameter at plane intersection: hitPt = RayOri + t * rayDir
 			if ( t > dMax ) return; // Hit point exceeds distance from rayOri limit
 			hitPt.x = rayOri.x + ( t * rayDir.x ); // Compute by coordinate to avoid Vertex temporaries
