@@ -321,7 +321,6 @@ PierceSurface(
 	PierceSurface_polygon( surface, hitPt, hit );
 }
 
-
 ALWAYS_INLINE
 void
 PierceSurface(

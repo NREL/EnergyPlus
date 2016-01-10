@@ -171,8 +171,20 @@ namespace DaylightingManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	int const octreeCrossover( 100 ); // Surface count crossover for switching to octree algorithm
 	static std::string const BlankString;
+
+	// Surface count crossover for using octree algorithm
+	// The octree gives lower computational complexity for much higher performance
+	//  as the surface count increases but has some overhead such that the direct
+	//  algorithm can be more efficient at small surface counts.
+	// Testing to date shows that the octree performance is close to that of the
+	//  direct algorithm even with small surface counts and that there is no single
+	//  crossover that is ideal for all models: some cases with 10-30 surfaces were
+	//  faster with the octree but another with 80 surfaces was faster with the
+	//  direct algorithm.
+	// A reasonable, conservative crossover is selected but may be refined as more
+	//  experience is gained.
+	int const octreeCrossover( 100 ); // Octree surface count crossover
 
 	// MODULE VARIABLE DECLARATIONS:
 	int TotWindowsWithDayl( 0 ); // Total number of exterior windows in all daylit zones
