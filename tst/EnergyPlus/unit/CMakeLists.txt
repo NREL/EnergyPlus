@@ -33,6 +33,7 @@ set( test_src
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
+  General.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
