@@ -101,17 +101,6 @@ namespace HVACDuct {
 			OutletNodeNum( 0 )
 		{}
 
-		// Member Constructor
-		DuctData(
-			std::string const & Name, // duct unique name
-			int const InletNodeNum, // inlet node number
-			int const OutletNodeNum // outlet node number
-		) :
-			Name( Name ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum )
-		{}
-
 	};
 
 	// Object Data

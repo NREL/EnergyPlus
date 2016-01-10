@@ -158,65 +158,6 @@ namespace DataDaylightingDevices {
 			TransSolDiff( 0.0 )
 		{}
 
-		// Member Constructor
-		TDDPipeData(
-			std::string const & Name, // Name of TDD pipe
-			int const Dome, // Pointer to the dome object
-			int const Diffuser, // Pointer to the diffuser object
-			int const Construction, // Pointer to the construction object
-			Real64 const Diameter, // Pipe diameter
-			Real64 const TotLength, // Total length of pipe, including exterior
-			Real64 const Reff, // Effective R value between TDD:DOME and TDD:DIFFUSER
-			int const NumOfTZones, // Number of transition zone
-			Array1_int const & TZone, // Pointers to transition zones
-			Array1< Real64 > const & TZoneLength, // Length of pipe in each transition zone
-			Real64 const AspectRatio, // Aspect ratio, length / diameter
-			Real64 const ReflectVis, // Visible reflectance of surface
-			Real64 const ReflectSol, // Solar reflectance of surface
-			Array1< Real64 > const & PipeTransVisBeam, // Table of beam visible transmittance vs. cosine angle
-			Array1< Real64 > const & PipeTransSolBeam, // Table of beam solar transmittance vs. cosine angle
-			Real64 const TransSolIso, // Diffuse isotropic solar transmittance (constant)
-			Real64 const TransSolHorizon, // Diffuse horizon solar transmittance (constant)
-			Real64 const ExtLength, // Exterior exposed length of pipe
-			Array1< Real64 > const & TZoneHeatGain, // convection gain to transition zones
-			Real64 const TransmittedSolar, // Solar transmitted by the TDD [W]
-			Real64 const PipeAbsorbedSolar, // Solar absorbed in the walls of the pipe [W]
-			Real64 const HeatGain, // Solar heat gain [W]
-			Real64 const HeatLoss, // Solar heat loss [W]
-			Real64 const TransVisBeam, // TDD visible transmittance
-			Real64 const TransSolBeam, // TDD beam solar transmittance
-			Real64 const TransVisDiff, // TDD diffuse visible transmittance
-			Real64 const TransSolDiff // TDD diffuse solar transmittance
-		) :
-			Name( Name ),
-			Dome( Dome ),
-			Diffuser( Diffuser ),
-			Construction( Construction ),
-			Diameter( Diameter ),
-			TotLength( TotLength ),
-			Reff( Reff ),
-			NumOfTZones( NumOfTZones ),
-			TZone( TZone ),
-			TZoneLength( TZoneLength ),
-			AspectRatio( AspectRatio ),
-			ReflectVis( ReflectVis ),
-			ReflectSol( ReflectSol ),
-			PipeTransVisBeam( NumOfAngles, PipeTransVisBeam ),
-			PipeTransSolBeam( NumOfAngles, PipeTransSolBeam ),
-			TransSolIso( TransSolIso ),
-			TransSolHorizon( TransSolHorizon ),
-			ExtLength( ExtLength ),
-			TZoneHeatGain( TZoneHeatGain ),
-			TransmittedSolar( TransmittedSolar ),
-			PipeAbsorbedSolar( PipeAbsorbedSolar ),
-			HeatGain( HeatGain ),
-			HeatLoss( HeatLoss ),
-			TransVisBeam( TransVisBeam ),
-			TransSolBeam( TransSolBeam ),
-			TransVisDiff( TransVisDiff ),
-			TransSolDiff( TransSolDiff )
-		{}
-
 	};
 
 	struct ShelfData
@@ -243,27 +184,6 @@ namespace DataDaylightingDevices {
 			OutReflectVis( 0.0 ),
 			OutReflectSol( 0.0 ),
 			ViewFactor( 0.0 )
-		{}
-
-		// Member Constructor
-		ShelfData(
-			std::string const & Name, // Name of daylighting shelf
-			int const Window, // Pointer to the window object
-			int const InSurf, // Pointer to the inside shelf heat transfer surface
-			int const OutSurf, // Pointer to the outside shelf attached shading surface
-			int const Construction, // Pointer to the outside shelf construction object
-			Real64 const OutReflectVis, // Outside shelf visible reflectance
-			Real64 const OutReflectSol, // Outside shelf solar reflectance
-			Real64 const ViewFactor // Outside shelf view factor to window
-		) :
-			Name( Name ),
-			Window( Window ),
-			InSurf( InSurf ),
-			OutSurf( OutSurf ),
-			Construction( Construction ),
-			OutReflectVis( OutReflectVis ),
-			OutReflectSol( OutReflectSol ),
-			ViewFactor( ViewFactor )
 		{}
 
 	};

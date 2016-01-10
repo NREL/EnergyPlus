@@ -2639,39 +2639,6 @@ namespace WeatherManager {
 				LiquidPrecip( 24, 0.0 )
 			{}
 
-			// Member Constructor
-			HourlyWeatherData(
-				Array1_bool const & IsRain, // Rain indicator, true=rain
-				Array1_bool const & IsSnow, // Snow indicator, true=snow
-				Array1< Real64 > const & OutDryBulbTemp, // Hourly dry bulb temperature of outside air
-				Array1< Real64 > const & OutDewPointTemp, // Hourly Dew Point Temperature of outside air
-				Array1< Real64 > const & OutBaroPress, // Hourly barometric pressure of outside air
-				Array1< Real64 > const & OutRelHum, // Hourly relative humidity
-				Array1< Real64 > const & WindSpeed, // Hourly wind speed of outside air
-				Array1< Real64 > const & WindDir, // Hourly wind direction of outside air
-				Array1< Real64 > const & SkyTemp, // Hourly sky temperature
-				Array1< Real64 > const & HorizIRSky, // Hourly Horizontal Infrared Radiation Intensity
-				Array1< Real64 > const & BeamSolarRad, // Hourly direct normal solar irradiance
-				Array1< Real64 > const & DifSolarRad, // Hourly sky diffuse horizontal solar irradiance
-				Array1< Real64 > const & Albedo, // Albedo
-				Array1< Real64 > const & LiquidPrecip // Liquid Precipitation
-			) :
-				IsRain( 24, IsRain ),
-				IsSnow( 24, IsSnow ),
-				OutDryBulbTemp( 24, OutDryBulbTemp ),
-				OutDewPointTemp( 24, OutDewPointTemp ),
-				OutBaroPress( 24, OutBaroPress ),
-				OutRelHum( 24, OutRelHum ),
-				WindSpeed( 24, WindSpeed ),
-				WindDir( 24, WindDir ),
-				SkyTemp( 24, SkyTemp ),
-				HorizIRSky( 24, HorizIRSky ),
-				BeamSolarRad( 24, BeamSolarRad ),
-				DifSolarRad( 24, DifSolarRad ),
-				Albedo( 24, Albedo ),
-				LiquidPrecip( 24, LiquidPrecip )
-			{}
-
 		};
 
 		// Object Data
@@ -3726,15 +3693,6 @@ Label902: ;
 			HourlyWeatherData() :
 				BeamSolarRad( 24, 0.0 ),
 				DifSolarRad( 24, 0.0 )
-			{}
-
-			// Member Constructor
-			HourlyWeatherData(
-				Array1< Real64 > const & BeamSolarRad, // Hourly direct normal solar irradiance
-				Array1< Real64 > const & DifSolarRad // Hourly sky diffuse horizontal solar irradiance
-			) :
-				BeamSolarRad( 24, BeamSolarRad ),
-				DifSolarRad( 24, DifSolarRad )
 			{}
 
 		};

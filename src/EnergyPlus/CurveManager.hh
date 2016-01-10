@@ -221,65 +221,6 @@ namespace CurveManager {
 			CoeffA26( 0.0 )
 		{}
 
-		// Member Constructor
-		TriQuadraticCurveDataStruct(
-			Real64 const CoeffA0,
-			Real64 const CoeffA1,
-			Real64 const CoeffA2,
-			Real64 const CoeffA3,
-			Real64 const CoeffA4,
-			Real64 const CoeffA5,
-			Real64 const CoeffA6,
-			Real64 const CoeffA7,
-			Real64 const CoeffA8,
-			Real64 const CoeffA9,
-			Real64 const CoeffA10,
-			Real64 const CoeffA11,
-			Real64 const CoeffA12,
-			Real64 const CoeffA13,
-			Real64 const CoeffA14,
-			Real64 const CoeffA15,
-			Real64 const CoeffA16,
-			Real64 const CoeffA17,
-			Real64 const CoeffA18,
-			Real64 const CoeffA19,
-			Real64 const CoeffA20,
-			Real64 const CoeffA21,
-			Real64 const CoeffA22,
-			Real64 const CoeffA23,
-			Real64 const CoeffA24,
-			Real64 const CoeffA25,
-			Real64 const CoeffA26
-		) :
-			CoeffA0( CoeffA0 ),
-			CoeffA1( CoeffA1 ),
-			CoeffA2( CoeffA2 ),
-			CoeffA3( CoeffA3 ),
-			CoeffA4( CoeffA4 ),
-			CoeffA5( CoeffA5 ),
-			CoeffA6( CoeffA6 ),
-			CoeffA7( CoeffA7 ),
-			CoeffA8( CoeffA8 ),
-			CoeffA9( CoeffA9 ),
-			CoeffA10( CoeffA10 ),
-			CoeffA11( CoeffA11 ),
-			CoeffA12( CoeffA12 ),
-			CoeffA13( CoeffA13 ),
-			CoeffA14( CoeffA14 ),
-			CoeffA15( CoeffA15 ),
-			CoeffA16( CoeffA16 ),
-			CoeffA17( CoeffA17 ),
-			CoeffA18( CoeffA18 ),
-			CoeffA19( CoeffA19 ),
-			CoeffA20( CoeffA20 ),
-			CoeffA21( CoeffA21 ),
-			CoeffA22( CoeffA22 ),
-			CoeffA23( CoeffA23 ),
-			CoeffA24( CoeffA24 ),
-			CoeffA25( CoeffA25 ),
-			CoeffA26( CoeffA26 )
-		{}
-
 	};
 
 	struct TableDataStruct
@@ -295,19 +236,6 @@ namespace CurveManager {
 			NormalPoint( 1.0 )
 		{}
 
-		// Member Constructor
-		TableDataStruct(
-			Real64 const NormalPoint,
-			Array1< Real64 > const & X1,
-			Array1< Real64 > const & X2,
-			Array1< Real64 > const & Y
-		) :
-			NormalPoint( NormalPoint ),
-			X1( X1 ),
-			X2( X2 ),
-			Y( Y )
-		{}
-
 	};
 
 	struct PerfCurveTableDataStruct
@@ -319,17 +247,6 @@ namespace CurveManager {
 
 		// Default Constructor
 		PerfCurveTableDataStruct()
-		{}
-
-		// Member Constructor
-		PerfCurveTableDataStruct(
-			Array1< Real64 > const & X1,
-			Array1< Real64 > const & X2,
-			Array2< Real64 > const & Y
-		) :
-			X1( X1 ),
-			X2( X2 ),
-			Y( Y )
 		{}
 
 	};
@@ -433,103 +350,6 @@ namespace CurveManager {
 			CurveInput5( 0.0 )
 		{}
 
-		// Member Constructor
-		PerfomanceCurveData(
-			std::string const & Name, // Curve Name
-			int const ObjectType, // Curve object type (e.g., integer for Curve:Linear above)
-			int const CurveType, // Curve type (see parameter definitions above)
-			int const InterpolationType, // table interpolation method
-			int const DataFormat, // format of tabular data
-			int const TableIndex, // Index to tablular data (0 if a standard curve object)
-			int const TableVariables, // Number of independent variables (0 if a standard curve object)
-			int const NumIVLowErrorIndex, // Index to table object error message for too few IV's
-			int const NumIVHighErrorIndex, // Index to table object error message for too many IV's
-			int const X1SortOrder, // sort order for table data for X1
-			int const X2SortOrder, // sort order for table data for X2
-			Real64 const Coeff1, // constant coefficient
-			Real64 const Coeff2, // linear coeff (1st independent variable)
-			Real64 const Coeff3, // quadratic coeff (1st independent variable)
-			Real64 const Coeff4, // linear coeff (2nd ind var) or cubic coeff
-			Real64 const Coeff5, // quadratic coeff (2nd independent variable)
-			Real64 const Coeff6, // cross coeff (1st & 2nd ind var)
-			Real64 const Coeff7, // cubic coeff for bicubic (1st ind var)
-			Real64 const Coeff8, // cubic coeff for bicubic (2nd ind var)
-			Real64 const Coeff9, // cross coeff for bicubic (1st quadratic & 2nd linear)
-			Real64 const Coeff10, // cross coeff for bicubic (1st linear & 2nd quadratic)
-			Real64 const Coeff11, // cross coeff
-			Real64 const Coeff12, // cross coeff
-			Real64 const Var1Max, // maximum of 1st independent variable
-			Real64 const Var1Min, // minimum of 1st independent variable
-			Real64 const Var2Max, // maximum of 2nd independent variable
-			Real64 const Var2Min, // minimum of 2nd independent variable
-			Real64 const Var3Max, // maximum of 3rd independent variable
-			Real64 const Var3Min, // minimum of 3rd independent variable
-			Real64 const Var4Max, // maximum of 4th independent variable
-			Real64 const Var4Min, // minimum of 4th independent variable
-			Real64 const Var5Max, // maximum of 5th independent variable
-			Real64 const Var5Min, // minimum of 5th independent variable
-			Real64 const CurveMin, // minimum value of curve output
-			Real64 const CurveMax, // maximum value of curve output
-			bool const CurveMinPresent, // If TRUE, then cap minimum curve output
-			bool const CurveMaxPresent, // if TRUE, then cap maximum curve output
-			Array1< TriQuadraticCurveDataStruct > const & Tri2ndOrder, // structure for triquadratic curve data
-			bool const EMSOverrideOn, // if TRUE, then EMS is calling to override curve value
-			Real64 const EMSOverrideCurveValue, // Value of curve result EMS is directing to use
-			Real64 const CurveOutput, // curve output or result
-			Real64 const CurveInput1, // curve input #1 (e.g., x or X1 variable)
-			Real64 const CurveInput2, // curve input #1 (e.g., y or X2 variable)
-			Real64 const CurveInput3, // curve input #1 (e.g., z or X3 variable)
-			Real64 const CurveInput4, // curve input #1 (e.g., X4 variable)
-			Real64 const CurveInput5 // curve input #1 (e.g., X5 variable)
-		) :
-			Name( Name ),
-			ObjectType( ObjectType ),
-			CurveType( CurveType ),
-			InterpolationType( InterpolationType ),
-			DataFormat( DataFormat ),
-			TableIndex( TableIndex ),
-			TableVariables( TableVariables ),
-			NumIVLowErrorIndex( NumIVLowErrorIndex ),
-			NumIVHighErrorIndex( NumIVHighErrorIndex ),
-			X1SortOrder( X1SortOrder ),
-			X2SortOrder( X2SortOrder ),
-			Coeff1( Coeff1 ),
-			Coeff2( Coeff2 ),
-			Coeff3( Coeff3 ),
-			Coeff4( Coeff4 ),
-			Coeff5( Coeff5 ),
-			Coeff6( Coeff6 ),
-			Coeff7( Coeff7 ),
-			Coeff8( Coeff8 ),
-			Coeff9( Coeff9 ),
-			Coeff10( Coeff10 ),
-			Coeff11( Coeff11 ),
-			Coeff12( Coeff12 ),
-			Var1Max( Var1Max ),
-			Var1Min( Var1Min ),
-			Var2Max( Var2Max ),
-			Var2Min( Var2Min ),
-			Var3Max( Var3Max ),
-			Var3Min( Var3Min ),
-			Var4Max( Var4Max ),
-			Var4Min( Var4Min ),
-			Var5Max( Var5Max ),
-			Var5Min( Var5Min ),
-			CurveMin( CurveMin ),
-			CurveMax( CurveMax ),
-			CurveMinPresent( CurveMinPresent ),
-			CurveMaxPresent( CurveMaxPresent ),
-			Tri2ndOrder( Tri2ndOrder ),
-			EMSOverrideOn( EMSOverrideOn ),
-			EMSOverrideCurveValue( EMSOverrideCurveValue ),
-			CurveOutput( CurveOutput ),
-			CurveInput1( CurveInput1 ),
-			CurveInput2( CurveInput2 ),
-			CurveInput3( CurveInput3 ),
-			CurveInput4( CurveInput4 ),
-			CurveInput5( CurveInput5 )
-		{}
-
 	};
 
 	struct TableLookupData
@@ -558,37 +378,6 @@ namespace CurveManager {
 			NumX3Vars( 0 ),
 			NumX4Vars( 0 ),
 			NumX5Vars( 0 )
-		{}
-
-		// Member Constructor
-		TableLookupData(
-			int const NumIndependentVars, // Curve type (see parameter definitions above)
-			int const InterpolationOrder, // number of points to interpolate (table data only)
-			int const NumX1Vars, // Number of variables for independent variable #1
-			Array1< Real64 > const & X1Var,
-			int const NumX2Vars, // Number of variables for independent variable #2
-			Array1< Real64 > const & X2Var,
-			int const NumX3Vars, // Number of variables for independent variable #3
-			Array1< Real64 > const & X3Var,
-			int const NumX4Vars, // Number of variables for independent variable #4
-			Array1< Real64 > const & X4Var,
-			int const NumX5Vars, // Number of variables for independent variable #5
-			Array1< Real64 > const & X5Var,
-			Array5< Real64 > const & TableLookupZData
-		) :
-			NumIndependentVars( NumIndependentVars ),
-			InterpolationOrder( InterpolationOrder ),
-			NumX1Vars( NumX1Vars ),
-			X1Var( X1Var ),
-			NumX2Vars( NumX2Vars ),
-			X2Var( X2Var ),
-			NumX3Vars( NumX3Vars ),
-			X3Var( X3Var ),
-			NumX4Vars( NumX4Vars ),
-			X4Var( X4Var ),
-			NumX5Vars( NumX5Vars ),
-			X5Var( X5Var ),
-			TableLookupZData( TableLookupZData )
 		{}
 
 	};

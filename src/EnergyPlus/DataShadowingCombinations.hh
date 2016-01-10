@@ -98,25 +98,6 @@ namespace DataShadowingCombinations {
 			NumSubSurf( 0 )
 		{}
 
-		// Member Constructor
-		ShadowingCombinations(
-			bool const UseThisSurf, // True when this surface should be used in calculations
-			int const NumGenSurf, // Number of General surfaces for this surf
-			Array1_int const & GenSurf, // Array of General Surface Numbers
-			int const NumBackSurf, // Number of Back (Interior) surfaces for this surf
-			Array1_int const & BackSurf, // Array of Back (Interior) surface numbers
-			int const NumSubSurf, // Number of SubSurfaces for this surf
-			Array1_int const & SubSurf // Array of SubSurface surface Numbers
-		) :
-			UseThisSurf( UseThisSurf ),
-			NumGenSurf( NumGenSurf ),
-			GenSurf( GenSurf ),
-			NumBackSurf( NumBackSurf ),
-			BackSurf( BackSurf ),
-			NumSubSurf( NumSubSurf ),
-			SubSurf( SubSurf )
-		{}
-
 	};
 
 	// Object Data

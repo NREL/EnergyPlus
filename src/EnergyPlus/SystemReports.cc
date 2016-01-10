@@ -1206,15 +1206,6 @@ namespace SystemReports {
 				LoopType( 0 )
 			{}
 
-			// Member Constructor
-			IdentifyLoop(
-				int const LoopNum,
-				int const LoopType
-			) :
-				LoopNum( LoopNum ),
-				LoopType( LoopType )
-			{}
-
 		};
 
 		// Object Data
@@ -3569,15 +3560,6 @@ namespace SystemReports {
 			// Default Constructor
 			CompTypeError() :
 				CompErrIndex( 0 )
-			{}
-
-			// Member Constructor
-			CompTypeError(
-				std::string const & CompType,
-				int const CompErrIndex
-			) :
-				CompType( CompType ),
-				CompErrIndex( CompErrIndex )
 			{}
 
 		};

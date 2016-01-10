@@ -113,17 +113,6 @@ namespace MatrixDataManager {
 			MatrixType( 0 )
 		{}
 
-		// Member Constructor
-		MatrixDataStruct(
-			std::string const & Name, // Matrix Name
-			int const MatrixType,
-			Array2< Real64 > const & Mat2D // hold data if two dimensional
-		) :
-			Name( Name ),
-			MatrixType( MatrixType ),
-			Mat2D( Mat2D )
-		{}
-
 	};
 
 	// Object Data

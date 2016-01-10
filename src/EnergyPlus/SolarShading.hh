@@ -195,17 +195,6 @@ namespace SolarShading {
 			MiscIndex( 0 )
 		{}
 
-		// Member Constructor
-		SurfaceErrorTracking(
-			int const SurfIndex1, // Tracking for main error message
-			int const SurfIndex2, // Tracking for Overlapping Figure Name or Surface # 1
-			int const MiscIndex // Used for other pertinent information to be stored
-		) :
-			SurfIndex1( SurfIndex1 ),
-			SurfIndex2( SurfIndex2 ),
-			MiscIndex( MiscIndex )
-		{}
-
 	};
 
 	// Object Data

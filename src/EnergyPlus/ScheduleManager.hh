@@ -131,23 +131,6 @@ namespace ScheduleManager {
 			UnitType( 0 )
 		{}
 
-		// Member Constructor
-		ScheduleTypeData(
-			std::string const & Name, // Schedule Type Name
-			bool const Limited, // True if this Schedule Type has limits
-			Real64 const Minimum, // Minimum for limited schedule
-			Real64 const Maximum, // Maximum for limited schedule
-			bool const IsReal, // True if this is a "real" schedule, false if integer
-			int const UnitType // reference ScheduleTypeLimit table
-		) :
-			Name( Name ),
-			Limited( Limited ),
-			Minimum( Minimum ),
-			Maximum( Maximum ),
-			IsReal( IsReal ),
-			UnitType( UnitType )
-		{}
-
 	};
 
 	struct DayScheduleData
@@ -170,25 +153,6 @@ namespace ScheduleManager {
 			TSValMin( 0.0 )
 		{}
 
-		// Member Constructor
-		DayScheduleData(
-			std::string const & Name, // Day Schedule Name
-			int const ScheduleTypePtr, // Index of Schedule Type
-			bool const IntervalInterpolated, // Indicator for interval interpolation. If not "interpolated", False.  Else True
-			bool const Used, // Indicator for this schedule being "used".
-			Array2< Real64 > const & TSValue, // Value array by simulation timestep
-			Real64 const TSValMax, // maximum of all TSValue's
-			Real64 const TSValMin // minimum of all TSValue's
-		) :
-			Name( Name ),
-			ScheduleTypePtr( ScheduleTypePtr ),
-			IntervalInterpolated( IntervalInterpolated ),
-			Used( Used ),
-			TSValue( TSValue ),
-			TSValMax( TSValMax ),
-			TSValMin( TSValMin )
-		{}
-
 	};
 
 	struct WeekScheduleData
@@ -202,17 +166,6 @@ namespace ScheduleManager {
 		WeekScheduleData() :
 			Used( false ),
 			DaySchedulePointer( MaxDayTypes, 0 )
-		{}
-
-		// Member Constructor
-		WeekScheduleData(
-			std::string const & Name, // Week Schedule Name
-			bool const Used, // Indicator for this schedule being "used".
-			Array1_int const & DaySchedulePointer // Index of Day Schedule
-		) :
-			Name( Name ),
-			Used( Used ),
-			DaySchedulePointer( MaxDayTypes, DaySchedulePointer )
 		{}
 
 	};
@@ -244,33 +197,6 @@ namespace ScheduleManager {
 			CurrentValue( 0.0 ),
 			EMSActuatedOn( false ),
 			EMSValue( 0.0 )
-		{}
-
-		// Member Constructor
-		ScheduleData(
-			std::string const & Name, // Schedule Name
-			int const ScheduleTypePtr, // Index of Schedule Type
-			Array1_int const & WeekSchedulePointer, // one created for each day of possible simulation
-			int const SchType, // what kind of object has been input.
-			bool const Used, // Indicator for this schedule being "used".
-			bool const MaxMinSet, // Max/min values have been stored for this schedule
-			Real64 const MaxValue, // Maximum value for this schedule
-			Real64 const MinValue, // Minimum value for this schedule
-			Real64 const CurrentValue, // For Reporting
-			bool const EMSActuatedOn, // indicates if EMS computed
-			Real64 const EMSValue
-		) :
-			Name( Name ),
-			ScheduleTypePtr( ScheduleTypePtr ),
-			WeekSchedulePointer( 366, WeekSchedulePointer ),
-			SchType( SchType ),
-			Used( Used ),
-			MaxMinSet( MaxMinSet ),
-			MaxValue( MaxValue ),
-			MinValue( MinValue ),
-			CurrentValue( CurrentValue ),
-			EMSActuatedOn( EMSActuatedOn ),
-			EMSValue( EMSValue )
 		{}
 
 	};

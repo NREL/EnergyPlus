@@ -176,25 +176,6 @@ namespace ZoneTempPredictorCorrector {
 			CoolTempSchedIndex( 0 )
 		{}
 
-		// Member Constructor
-		ZoneTempControlType(
-			std::string const & Name, // Name of the zone
-			std::string const & TempSchedName, // Name of the schedule which determines the zone temp setpoint
-			int const TempSchedIndex,
-			std::string const & HeatTempSetptSchedName,
-			int const HeatTempSchedIndex,
-			std::string const & CoolTempSetptSchedName,
-			int const CoolTempSchedIndex
-		) :
-			Name( Name ),
-			TempSchedName( TempSchedName ),
-			TempSchedIndex( TempSchedIndex ),
-			HeatTempSetptSchedName( HeatTempSetptSchedName ),
-			HeatTempSchedIndex( HeatTempSchedIndex ),
-			CoolTempSetptSchedName( CoolTempSetptSchedName ),
-			CoolTempSchedIndex( CoolTempSchedIndex )
-		{}
-
 	};
 
 	struct ZoneComfortFangerControlType
@@ -213,25 +194,6 @@ namespace ZoneTempPredictorCorrector {
 			PMVSchedIndex( 0 ),
 			HeatPMVSchedIndex( 0 ),
 			CoolPMVSchedIndex( 0 )
-		{}
-
-		// Member Constructor
-		ZoneComfortFangerControlType(
-			std::string const & Name, // Name of the zone
-			std::string const & PMVSchedName, // Name of the schedule which determines the zone temp setpoint
-			int const PMVSchedIndex, // Index to PMV dual set point schedule
-			std::string const & HeatPMVSetptSchedName, // Name of PMV heating set point schedule
-			int const HeatPMVSchedIndex, // Index to PMV heating set point schedule
-			std::string const & CoolPMVSetptSchedName, // Name of PMV cooling set point schedule
-			int const CoolPMVSchedIndex // INdex to PMV cooling set point schedule
-		) :
-			Name( Name ),
-			PMVSchedName( PMVSchedName ),
-			PMVSchedIndex( PMVSchedIndex ),
-			HeatPMVSetptSchedName( HeatPMVSetptSchedName ),
-			HeatPMVSchedIndex( HeatPMVSchedIndex ),
-			CoolPMVSetptSchedName( CoolPMVSetptSchedName ),
-			CoolPMVSchedIndex( CoolPMVSchedIndex )
 		{}
 
 	};

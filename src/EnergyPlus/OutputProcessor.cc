@@ -8129,21 +8129,6 @@ ProduceRDDMDD()
 			StoreType( 0 )
 		{}
 
-		// Member Constructor
-		VariableTypes(
-			int const RealIntegerType, // Real= 1, Integer=2
-			int const VarPtr, // pointer to real/integer VariableTypes structures
-			int const IndexType,
-			int const StoreType,
-			std::string const & UnitsString
-		) :
-			RealIntegerType( RealIntegerType ),
-			VarPtr( VarPtr ),
-			IndexType( IndexType ),
-			StoreType( StoreType ),
-			UnitsString( UnitsString )
-		{}
-
 	};
 
 	//  See if Report Variables should be turned on

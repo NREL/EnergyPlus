@@ -163,57 +163,6 @@ namespace PondGroundHeatExchanger {
 			CompNum( 0 )
 		{}
 
-		// Member Constructor
-		PondGroundHeatExchangerData(
-			std::string const & Name, // name of pond GHE
-			std::string const & InletNode, // pond inlet fluid node
-			std::string const & OutletNode, // pond outlet fluid node
-			Real64 const DesignMassFlowRate, // design flow rate of circulating fluid
-			Real64 const DesignCapacity, // design cooling capacity of pond at
-			Real64 const Depth, // depth of pond
-			Real64 const Area, // area of pond
-			Real64 const TubeInDiameter, // hydronic tube inside diameter
-			Real64 const TubeOutDiameter, // hydronic tube outside diameter
-			Real64 const TubeConductivity, // hydronic tube thermal conductivity
-			Real64 const GrndConductivity, // ground thermal conductivity
-			Real64 const CircuitLength, // length of each circuit
-			Real64 const BulkTemperature, // current pond bulk temperature
-			Real64 const PastBulkTemperature, // past pond bulk temperature
-			int const NumCircuits, // number of circuits in total
-			int const InletNodeNum, // inlet node number
-			int const OutletNodeNum, // oulet node number
-			int const FrozenErrIndex, // for recurring warnings
-			int const ConsecutiveFrozen, // count of time steps consecutive frozen
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			Name( Name ),
-			InletNode( InletNode ),
-			OutletNode( OutletNode ),
-			DesignMassFlowRate( DesignMassFlowRate ),
-			DesignCapacity( DesignCapacity ),
-			Depth( Depth ),
-			Area( Area ),
-			TubeInDiameter( TubeInDiameter ),
-			TubeOutDiameter( TubeOutDiameter ),
-			TubeConductivity( TubeConductivity ),
-			GrndConductivity( GrndConductivity ),
-			CircuitLength( CircuitLength ),
-			BulkTemperature( BulkTemperature ),
-			PastBulkTemperature( PastBulkTemperature ),
-			NumCircuits( NumCircuits ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			FrozenErrIndex( FrozenErrIndex ),
-			ConsecutiveFrozen( ConsecutiveFrozen ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
-		{}
-
 	};
 
 	struct PondGroundHeatExchangerReport
@@ -229,23 +178,6 @@ namespace PondGroundHeatExchanger {
 
 		// Default Constructor
 		PondGroundHeatExchangerReport()
-		{}
-
-		// Member Constructor
-		PondGroundHeatExchangerReport(
-			Real64 const InletTemp, // fluid inlet temperature
-			Real64 const OutletTemp, // fluid outlet temperature
-			Real64 const MassFlowRate, // fluid mass flow rate
-			Real64 const PondTemp, // pond bulk temperature
-			Real64 const HeatTransferRate, // total fluid heat transfer rate, Watts
-			Real64 const Energy // cumulative energy, Joules
-		) :
-			InletTemp( InletTemp ),
-			OutletTemp( OutletTemp ),
-			MassFlowRate( MassFlowRate ),
-			PondTemp( PondTemp ),
-			HeatTransferRate( HeatTransferRate ),
-			Energy( Energy )
 		{}
 
 	};

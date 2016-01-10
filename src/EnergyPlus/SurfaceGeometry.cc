@@ -9323,12 +9323,6 @@ namespace SurfaceGeometry {
 				Vertex( 4 )
 			{}
 
-			// Member Constructor
-			explicit
-			rectangularwindow( Array1< Vector > const & Vertex ) :
-				Vertex( 4, Vertex )
-			{}
-
 		};
 
 		// Object Data
@@ -9504,12 +9498,6 @@ namespace SurfaceGeometry {
 			// Default Constructor
 			rectangularwindow() :
 				Vertex( 4 )
-			{}
-
-			// Member Constructor
-			explicit
-			rectangularwindow( Array1< Vector > const & Vertex ) :
-				Vertex( 4, Vertex )
 			{}
 
 		};

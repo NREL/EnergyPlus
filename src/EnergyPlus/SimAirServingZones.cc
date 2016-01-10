@@ -505,19 +505,6 @@ namespace SimAirServingZones {
 				NodeNameUsed( false )
 			{}
 
-			// Member Constructor
-			AirUniqueNodes(
-				std::string const & NodeName,
-				std::string const & AirLoopName,
-				std::string const & FieldName,
-				bool const NodeNameUsed
-			) :
-				NodeName( NodeName ),
-				AirLoopName( AirLoopName ),
-				FieldName( FieldName ),
-				NodeNameUsed( NodeNameUsed )
-			{}
-
 		};
 
 		// Object Data

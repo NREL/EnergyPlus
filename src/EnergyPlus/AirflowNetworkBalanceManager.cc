@@ -7650,39 +7650,6 @@ namespace AirflowNetworkBalanceManager {
 				DischCoeff( 0.0 )
 			{}
 
-			// Member Constructor
-			AFNExtSurfacesProp(
-				int const SurfNum, // row index of the external opening in the Surface array
-				std::string const & SurfName, // Surface name
-				int const MSDNum, // row index of the external opening in the MultizoneSurfaceData array
-				int const ZoneNum, // EnergyPlus zone number
-				int const MZDZoneNum, // row index of the zone in the MultizoneZoneData array
-				int const ExtNodeNum, // External node number; = row index in MultizoneExternalNodeData array + AirflowNetworkNumOfZones
-				std::string const & ZoneName, // EnergyPlus zone name
-				int const CPVNum, // row index in MultizoneCPValueData
-				int const CompTypeNum, // Opening type (detailed, simple, etc.)
-				Real64 const NodeHeight, // Elevation of the opening node
-				Real64 const OpeningArea, // Opening area (=Height*Width)
-				Real64 const Height, // Opening height = MultizoneSurfaceData()%Height
-				Real64 const Width, // Opening width  = MultizoneSurfaceData()%Width
-				Real64 const DischCoeff // Opening discharge coefficient
-			) :
-				SurfNum( SurfNum ),
-				SurfName( SurfName ),
-				MSDNum( MSDNum ),
-				ZoneNum( ZoneNum ),
-				MZDZoneNum( MZDZoneNum ),
-				ExtNodeNum( ExtNodeNum ),
-				ZoneName( ZoneName ),
-				CPVNum( CPVNum ),
-				CompTypeNum( CompTypeNum ),
-				NodeHeight( NodeHeight ),
-				OpeningArea( OpeningArea ),
-				Height( Height ),
-				Width( Width ),
-				DischCoeff( DischCoeff )
-			{}
-
 		};
 
 		// Object Data

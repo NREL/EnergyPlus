@@ -228,121 +228,6 @@ namespace DataWater {
 			SkinLossRadiat( 0.0 )
 		{}
 
-		// Member Constructor
-		StorageTankDataStruct(
-			std::string const & Name, // name of this Storage Tank
-			std::string const & QualitySubCategoryName, // name of water subcategory
-			Real64 const MaxCapacity, // tank capacity Limit [m3]
-			int const OverflowMode,
-			std::string const & OverflowTankName,
-			int const OverflowTankID,
-			int const OverflowTankSupplyARRID,
-			Real64 const ValveOnCapacity, // tank capacity at lower control range [m3]
-			Real64 const ValveOffCapacity, // tank capacity at upper control range [m3]
-			int const ControlSupplyType, // mode for tank controlled resupply
-			int const GroundWellID, // index "pointer" to well if present
-			std::string const & SupplyTankName,
-			int const SupplyTankID,
-			int const SupplyTankDemandARRID,
-			Real64 const BackupMainsCapacity,
-			Real64 const InitialVolume, // water in tank at start of simulation period [m3]
-			Real64 const MaxInFlowRate, // limit on rate of inlet [m3/s]
-			Real64 const MaxOutFlowRate, // limit on rate of outlet [m3/s]
-			int const ThermalMode,
-			Real64 const InitialTankTemp, // initial tank temperature [C]
-			int const TempSchedID, // index "pointer" to schedule
-			int const AmbientTempIndicator, // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
-			int const AmbientTempSchedule, // Schedule index pointer
-			int const ZoneID, // index "pointer" to zone where tank is
-			Real64 const UValue, // U-value for tank [W/m2-k]
-			Real64 const SurfArea, // surface are of tank on Zone side... [m2]
-			int const InternalMassID, // index "pointer" to internal mass object for thermal coupling
-			std::string const & SurfMaterialName, // surface properties
-			Real64 const ThisTimeStepVolume,
-			Real64 const LastTimeStepVolume,
-			Real64 const LastTimeStepTemp, // previous temperature of tank water
-			int const NumWaterSupplies,
-			Array1< Real64 > const & VdotAvailSupply, // Each supply component has its own term
-			Array1< Real64 > const & TwaterSupply, // Each supply component has its own term
-			Array1_string const & SupplyCompNames,
-			Array1_string const & SupplyCompTypes,
-			int const NumWaterDemands,
-			Array1< Real64 > const & VdotRequestDemand, // each demand componennt has a slot
-			Array1< Real64 > const & VdotAvailDemand, // each demand componennt has a slot
-			Array1_string const & DemandCompNames,
-			Array1_string const & DemandCompTypes,
-			Real64 const VdotFromTank,
-			Real64 const VdotToTank,
-			Real64 const VdotOverflow,
-			Real64 const VolOverflow,
-			Real64 const NetVdot,
-			Real64 const Twater,
-			Real64 const TouterSkin,
-			Real64 const TwaterOverflow,
-			Real64 const MainsDrawVdot,
-			Real64 const MainsDrawVol,
-			Real64 const SkinLossPower, // heat loss to surrounding zone [W]
-			Real64 const SkinLossEnergy, // heat loss to surround zone [J]
-			Real64 const SkinLossConvect, // convective heat loss to zone [W]
-			Real64 const SkinLossRadiat // radiative heat loss to zone [W}
-		) :
-			Name( Name ),
-			QualitySubCategoryName( QualitySubCategoryName ),
-			MaxCapacity( MaxCapacity ),
-			OverflowMode( OverflowMode ),
-			OverflowTankName( OverflowTankName ),
-			OverflowTankID( OverflowTankID ),
-			OverflowTankSupplyARRID( OverflowTankSupplyARRID ),
-			ValveOnCapacity( ValveOnCapacity ),
-			ValveOffCapacity( ValveOffCapacity ),
-			ControlSupplyType( ControlSupplyType ),
-			GroundWellID( GroundWellID ),
-			SupplyTankName( SupplyTankName ),
-			SupplyTankID( SupplyTankID ),
-			SupplyTankDemandARRID( SupplyTankDemandARRID ),
-			BackupMainsCapacity( BackupMainsCapacity ),
-			InitialVolume( InitialVolume ),
-			MaxInFlowRate( MaxInFlowRate ),
-			MaxOutFlowRate( MaxOutFlowRate ),
-			ThermalMode( ThermalMode ),
-			InitialTankTemp( InitialTankTemp ),
-			TempSchedID( TempSchedID ),
-			AmbientTempIndicator( AmbientTempIndicator ),
-			AmbientTempSchedule( AmbientTempSchedule ),
-			ZoneID( ZoneID ),
-			UValue( UValue ),
-			SurfArea( SurfArea ),
-			InternalMassID( InternalMassID ),
-			SurfMaterialName( SurfMaterialName ),
-			ThisTimeStepVolume( ThisTimeStepVolume ),
-			LastTimeStepVolume( LastTimeStepVolume ),
-			LastTimeStepTemp( LastTimeStepTemp ),
-			NumWaterSupplies( NumWaterSupplies ),
-			VdotAvailSupply( VdotAvailSupply ),
-			TwaterSupply( TwaterSupply ),
-			SupplyCompNames( SupplyCompNames ),
-			SupplyCompTypes( SupplyCompTypes ),
-			NumWaterDemands( NumWaterDemands ),
-			VdotRequestDemand( VdotRequestDemand ),
-			VdotAvailDemand( VdotAvailDemand ),
-			DemandCompNames( DemandCompNames ),
-			DemandCompTypes( DemandCompTypes ),
-			VdotFromTank( VdotFromTank ),
-			VdotToTank( VdotToTank ),
-			VdotOverflow( VdotOverflow ),
-			VolOverflow( VolOverflow ),
-			NetVdot( NetVdot ),
-			Twater( Twater ),
-			TouterSkin( TouterSkin ),
-			TwaterOverflow( TwaterOverflow ),
-			MainsDrawVdot( MainsDrawVdot ),
-			MainsDrawVol( MainsDrawVol ),
-			SkinLossPower( SkinLossPower ),
-			SkinLossEnergy( SkinLossEnergy ),
-			SkinLossConvect( SkinLossConvect ),
-			SkinLossRadiat( SkinLossRadiat )
-		{}
-
 	};
 
 	struct RainfallCollectorDataStruct
@@ -379,41 +264,6 @@ namespace DataWater {
 			VdotAvail( 0.0 ),
 			VolCollected( 0.0 ),
 			MeanHeight( 0.0 )
-		{}
-
-		// Member Constructor
-		RainfallCollectorDataStruct(
-			std::string const & Name, // name of this rain collector
-			std::string const & StorageTankName,
-			int const StorageTankID, // index "pointer" to storage tank array
-			int const StorageTankSupplyARRID,
-			int const LossFactorMode, // control how loss factor(s) are entered
-			Real64 const LossFactor, // loss factor when constant
-			int const LossFactorSchedID, // index "pointer" to schedule
-			Real64 const MaxCollectRate,
-			int const NumCollectSurfs, // number of surfaces used in the collector
-			Array1_string const & SurfName,
-			Array1_int const & SurfID,
-			Real64 const HorizArea, // area of surfaces in the vertical normal direction
-			Real64 const VdotAvail,
-			Real64 const VolCollected,
-			Real64 const MeanHeight
-		) :
-			Name( Name ),
-			StorageTankName( StorageTankName ),
-			StorageTankID( StorageTankID ),
-			StorageTankSupplyARRID( StorageTankSupplyARRID ),
-			LossFactorMode( LossFactorMode ),
-			LossFactor( LossFactor ),
-			LossFactorSchedID( LossFactorSchedID ),
-			MaxCollectRate( MaxCollectRate ),
-			NumCollectSurfs( NumCollectSurfs ),
-			SurfName( SurfName ),
-			SurfID( SurfID ),
-			HorizArea( HorizArea ),
-			VdotAvail( VdotAvail ),
-			VolCollected( VolCollected ),
-			MeanHeight( MeanHeight )
 		{}
 
 	};
@@ -464,49 +314,6 @@ namespace DataWater {
 			PumpEnergy( 0.0 )
 		{}
 
-		// Member Constructor
-		GroundwaterWellDataStruct(
-			std::string const & Name, // name of this
-			std::string const & StorageTankName,
-			int const StorageTankID, // index "pointer" to water storage tank
-			int const StorageTankSupplyARRID, // index "pointer" to storage supply arrays
-			Real64 const PumpDepth, // depth of pump  [m]
-			Real64 const PumpNomVolFlowRate, // nominal flow rate of pump [m3/s]
-			Real64 const PumpNomHead, // design nominal capacity of pump
-			Real64 const PumpNomPowerUse, // design nominal power of pump at nom capacity
-			Real64 const PumpEfficiency,
-			Real64 const WellRecoveryRate, // rate at which groundwater can enter well [m3/s]
-			Real64 const NomWellStorageVol, // water storage in well at average water table depth [m3]
-			int const GroundwaterTableMode, // method of determining water table depth
-			Real64 const WaterTableDepth,
-			int const WaterTableDepthSchedID,
-			Real64 const VdotRequest, // rate of flow over timestep requested by tank
-			Real64 const VdotDelivered, // rate of flow provided [m3/s]
-			Real64 const VolDelivered, // water provided [m3]
-			Real64 const PumpPower,
-			Real64 const PumpEnergy
-		) :
-			Name( Name ),
-			StorageTankName( StorageTankName ),
-			StorageTankID( StorageTankID ),
-			StorageTankSupplyARRID( StorageTankSupplyARRID ),
-			PumpDepth( PumpDepth ),
-			PumpNomVolFlowRate( PumpNomVolFlowRate ),
-			PumpNomHead( PumpNomHead ),
-			PumpNomPowerUse( PumpNomPowerUse ),
-			PumpEfficiency( PumpEfficiency ),
-			WellRecoveryRate( WellRecoveryRate ),
-			NomWellStorageVol( NomWellStorageVol ),
-			GroundwaterTableMode( GroundwaterTableMode ),
-			WaterTableDepth( WaterTableDepth ),
-			WaterTableDepthSchedID( WaterTableDepthSchedID ),
-			VdotRequest( VdotRequest ),
-			VdotDelivered( VdotDelivered ),
-			VolDelivered( VolDelivered ),
-			PumpPower( PumpPower ),
-			PumpEnergy( PumpEnergy )
-		{}
-
 	};
 
 	struct SiteRainFallDataStruct
@@ -530,23 +337,6 @@ namespace DataWater {
 			CurrentAmount( 0.0 )
 		{}
 
-		// Member Constructor
-		SiteRainFallDataStruct(
-			int const ModeID, // type of rainfall modeling
-			Real64 const DesignAnnualRain,
-			int const RainSchedID,
-			Real64 const NomAnnualRain,
-			Real64 const CurrentRate,
-			Real64 const CurrentAmount
-		) :
-			ModeID( ModeID ),
-			DesignAnnualRain( DesignAnnualRain ),
-			RainSchedID( RainSchedID ),
-			NomAnnualRain( NomAnnualRain ),
-			CurrentRate( CurrentRate ),
-			CurrentAmount( CurrentAmount )
-		{}
-
 	};
 
 	struct IrrigationDataStruct
@@ -565,21 +355,6 @@ namespace DataWater {
 			ScheduledAmount( 0.0 ),
 			ActualAmount( 0.0 ),
 			IrrigationThreshold( 0.4 )
-		{}
-
-		// Member Constructor
-		IrrigationDataStruct(
-			int const ModeID, // type of irrigation modeling
-			int const IrrSchedID,
-			Real64 const ScheduledAmount,
-			Real64 const ActualAmount,
-			Real64 const IrrigationThreshold // percent at which no irrigation happens (smart schedule)
-		) :
-			ModeID( ModeID ),
-			IrrSchedID( IrrSchedID ),
-			ScheduledAmount( ScheduledAmount ),
-			ActualAmount( ActualAmount ),
-			IrrigationThreshold( IrrigationThreshold )
 		{}
 
 	};

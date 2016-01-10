@@ -130,43 +130,6 @@ namespace DataAirLoop {
 			NumZonesHeated( 0 )
 		{}
 
-		// Member Constructor
-		AirLoopZoneEquipConnectData(
-			std::string const & AirLoopName, // Name of Primary Air System
-			int const NumReturnNodes, // Number of return nodes connected to system
-			int const NumSupplyNodes, // number of supply nodes exiting primary air system
-			int const NumZonesCooled, // number of zones cooled by this primary air system
-			int const NumZonesHeated, // number of zones heated by this primary air system
-			Array1_int const & ZoneEquipReturnNodeNum, // Zone Equip side return air node numbers
-			Array1_int const & ZoneEquipSupplyNodeNum, // Zone equip side supply air node numbers
-			Array1_int const & AirLoopReturnNodeNum, // Air loop side return air node numbers
-			Array1_int const & AirLoopSupplyNodeNum, // Air loop side supply air node numbers
-			Array1_int const & CoolCtrlZoneNums, // Controlled zone numbers of zones cooled by this air loop
-			Array1_int const & HeatCtrlZoneNums, // Controlled zone numbers of zones heated by this air loop
-			Array1_int const & CoolZoneInletNodes, // Zone inlet node numbers of zones cooled by this air loop
-			Array1_int const & HeatZoneInletNodes, // Zone inlet node numbers of zones heated by this air loop
-			Array1_int const & TermUnitCoolInletNodes, // Air terminal unit cooling inlet node numbers for this air loop
-			Array1_int const & TermUnitHeatInletNodes, // Air terminal unit heating inlet node numbers for this air loop
-			Array1_int const & SupplyDuctType // 1=main, 2=cooling, 3=heating, 4=other
-		) :
-			AirLoopName( AirLoopName ),
-			NumReturnNodes( NumReturnNodes ),
-			NumSupplyNodes( NumSupplyNodes ),
-			NumZonesCooled( NumZonesCooled ),
-			NumZonesHeated( NumZonesHeated ),
-			ZoneEquipReturnNodeNum( ZoneEquipReturnNodeNum ),
-			ZoneEquipSupplyNodeNum( ZoneEquipSupplyNodeNum ),
-			AirLoopReturnNodeNum( AirLoopReturnNodeNum ),
-			AirLoopSupplyNodeNum( AirLoopSupplyNodeNum ),
-			CoolCtrlZoneNums( CoolCtrlZoneNums ),
-			HeatCtrlZoneNums( HeatCtrlZoneNums ),
-			CoolZoneInletNodes( CoolZoneInletNodes ),
-			HeatZoneInletNodes( HeatZoneInletNodes ),
-			TermUnitCoolInletNodes( TermUnitCoolInletNodes ),
-			TermUnitHeatInletNodes( TermUnitHeatInletNodes ),
-			SupplyDuctType( SupplyDuctType )
-		{}
-
 	};
 
 	struct AirLoopOutsideAirConnectData
@@ -181,17 +144,6 @@ namespace DataAirLoop {
 			OASysExists( false ),
 			OASysInletNodeNum( 0 ),
 			OASysOutletNodeNum( 0 )
-		{}
-
-		// Member Constructor
-		AirLoopOutsideAirConnectData(
-			bool const OASysExists, // true if there is an Outside Air Sys
-			int const OASysInletNodeNum, // node number of return air inlet to OA sys
-			int const OASysOutletNodeNum // node number of mixed air outlet of OA sys
-		) :
-			OASysExists( OASysExists ),
-			OASysInletNodeNum( OASysInletNodeNum ),
-			OASysOutletNodeNum( OASysOutletNodeNum )
 		{}
 
 	};
@@ -217,27 +169,6 @@ namespace DataAirLoop {
 			ReqSupplyFrac( 0.0 )
 		{}
 
-		// Member Constructor
-		DefinePriAirSysAvailMgrs(
-			int const NumAvailManagers, // number of availability managers for this system
-			int const AvailStatus, // system availability status
-			int const StartTime, // cycle on time (in SimTimeSteps)
-			int const StopTime, // cycle off time (in SimTimeSteps)
-			Real64 const ReqSupplyFrac, // required system flow rate (as a fraction)
-			Array1_string const & AvailManagerName, // name of each availability manager
-			Array1_int const & AvailManagerType, // type of availability manager
-			Array1_int const & AvailManagerNum // index for availability manager
-		) :
-			NumAvailManagers( NumAvailManagers ),
-			AvailStatus( AvailStatus ),
-			StartTime( StartTime ),
-			StopTime( StopTime ),
-			ReqSupplyFrac( ReqSupplyFrac ),
-			AvailManagerName( AvailManagerName ),
-			AvailManagerType( AvailManagerType ),
-			AvailManagerNum( AvailManagerNum )
-		{}
-
 	};
 
 	struct AirLooptoZoneData // Derived type for air loop connection to zones on air loop
@@ -250,17 +181,6 @@ namespace DataAirLoop {
 		// Default Constructor
 		AirLooptoZoneData() :
 			NumZones( 0 )
-		{}
-
-		// Member Constructor
-		AirLooptoZoneData(
-			int const NumZones,
-			Array1_int const & Zone,
-			Array1_int const & ActualZoneNumber
-		) :
-			NumZones( NumZones ),
-			Zone( Zone ),
-			ActualZoneNumber( ActualZoneNumber )
 		{}
 
 	};
@@ -337,75 +257,6 @@ namespace DataAirLoop {
 			AirLoopDCVFlag( true )
 		{}
 
-		// Member Constructor
-		AirLoopControlData(
-			std::string const & OACtrlName, // name of OA controller
-			int const OACtrlNum, // index of OA controller
-			bool const CyclingFan, // TRUE if currently the air loop supply fan is cycling
-			bool const AnyContFan, // TRUE if at any time supply fan is continuous
-			int const CycFanSchedPtr, // index of schedule indicating whether fan is cycling or continuous in a unitary system
-			int const FanOpMode, // 1=cycling fan cycling compressor; 2=constant fan cycling comptressor
-			bool const UnitarySys, // TRUE if a unitary system
-			bool const UnitarySysSimulating, // set FALSE for AirloopUnitarySystem after simulating to downstream coils can size independently
-			bool const Simple, // TRUE if system has 1 branch and 1 component
-			bool const CanNotLockoutEcono, // user input says econo lockout not allowed
-			bool const CanLockoutEconoWithHeating, // user input says econo lockout with heating is allowed
-			bool const CanLockoutEconoWithCompressor, // user input says econo lockout with compressor is allowed
-			bool const ReqstEconoLockoutWithHeating, // there is a request to lockout the economizer due to heating
-			bool const ReqstEconoLockoutWithCompressor, // there is a request to lockout the economizer due to compressor operation
-			bool const EconoActive, // if true economizer is active
-			bool const HeatRecoveryBypass, // if true heat recovery is bypassed (not active)
-			bool const ResimAirLoopFlag, // Same as SimAir, will trigger re-sim of air loops
-			bool const HeatRecoveryResimFlag, // Used to trigger new air loop sim when HX is used in OA system
-			bool const HeatRecoveryResimFlag2, // Used to trigger new air loop sim when HX is used in OA system
-			bool const CheckHeatRecoveryBypassStatus, // determines when heat recovery bypass is set
-			bool const EconomizerFlowLocked, // locks economizer flow for custon ERV operation
-			bool const HighHumCtrlActive, // if true high humidity control is active
-			bool const EconoLockout, // if true the economizer will be locked out (OA flow set to minimum)
-			bool const LoopFlowRateSet, // if true then the air loop flow rate should be set using ReqSupplyFrac
-			bool const NightVent, // if true then air loop is in night ventilation mode
-			bool const AllowWarmRestartFlag, // if true then speculative warm restart is attempted after first HVAC iteration
-			bool const NewFlowRateFlag, // true whenever the air mass flow rates have changed since last air loop sim
-			bool const ConvergedFlag, // true whenever the air loop sim was converged overall
-			bool const CoolingActiveFlag, // true whenever the air loop cooling coil is operating
-			bool const HeatingActiveFlag, // true whenever the air loop heating coil is operating
-			bool const OASysComponentsSimulated, // - true after OA components have been simulated
-			bool const AirLoopDCVFlag // TRUE if the air loop has OA Controller specifying a Mechanical controller with DCV
-		) :
-			OACtrlName( OACtrlName ),
-			OACtrlNum( OACtrlNum ),
-			CyclingFan( CyclingFan ),
-			AnyContFan( AnyContFan ),
-			CycFanSchedPtr( CycFanSchedPtr ),
-			FanOpMode( FanOpMode ),
-			UnitarySys( UnitarySys ),
-			UnitarySysSimulating( UnitarySysSimulating ),
-			Simple( Simple ),
-			CanNotLockoutEcono( CanNotLockoutEcono ),
-			CanLockoutEconoWithHeating( CanLockoutEconoWithHeating ),
-			CanLockoutEconoWithCompressor( CanLockoutEconoWithCompressor ),
-			ReqstEconoLockoutWithHeating( ReqstEconoLockoutWithHeating ),
-			ReqstEconoLockoutWithCompressor( ReqstEconoLockoutWithCompressor ),
-			EconoActive( EconoActive ),
-			HeatRecoveryBypass( HeatRecoveryBypass ),
-			ResimAirLoopFlag( ResimAirLoopFlag ),
-			HeatRecoveryResimFlag( HeatRecoveryResimFlag ),
-			HeatRecoveryResimFlag2( HeatRecoveryResimFlag2 ),
-			CheckHeatRecoveryBypassStatus( CheckHeatRecoveryBypassStatus ),
-			EconomizerFlowLocked( EconomizerFlowLocked ),
-			HighHumCtrlActive( HighHumCtrlActive ),
-			EconoLockout( EconoLockout ),
-			LoopFlowRateSet( LoopFlowRateSet ),
-			NightVent( NightVent ),
-			AllowWarmRestartFlag( AllowWarmRestartFlag ),
-			NewFlowRateFlag( NewFlowRateFlag ),
-			ConvergedFlag( ConvergedFlag ),
-			CoolingActiveFlag( CoolingActiveFlag ),
-			HeatingActiveFlag( HeatingActiveFlag ),
-			OASysComponentsSimulated( OASysComponentsSimulated ),
-			AirLoopDCVFlag( AirLoopDCVFlag )
-		{}
-
 	};
 
 	struct AirLoopFlowData // Derived type for air loop flow information
@@ -466,15 +317,6 @@ namespace DataAirLoop {
 			HighHumCtrlActive( false )
 		{}
 
-		// Member Constructor
-		OAControllerData(
-			bool const EconoActive, // if true economizer is active
-			bool const HighHumCtrlActive // if true high humidity control is active
-		) :
-			EconoActive( EconoActive ),
-			HighHumCtrlActive( HighHumCtrlActive )
-		{}
-
 	};
 
 	struct OutsideAirSysProps
@@ -502,39 +344,6 @@ namespace DataAirLoop {
 			NumComponents( 0 ),
 			NumControllers( 0 ),
 			NumSimpleControllers( 0 )
-		{}
-
-		// Member Constructor
-		OutsideAirSysProps(
-			std::string const & Name,
-			std::string const & ControllerListName,
-			std::string const & ComponentListName,
-			int const ControllerListNum, // index of the Controller List
-			int const NumComponents,
-			int const NumControllers,
-			int const NumSimpleControllers, // number of CONTROLLER:SIMPLE objects in OA Sys controller list
-			Array1_string const & ComponentName,
-			Array1_string const & ComponentType,
-			Array1_int const & ComponentType_Num, // Parameterized (see above) Component Types this
-			Array1_int const & ComponentIndex, // Which one in list -- updated by routines called from here
-			Array1_string const & ControllerName,
-			Array1_string const & ControllerType,
-			Array1_int const & ControllerIndex // Which one in list -- updated by routines called from here
-		) :
-			Name( Name ),
-			ControllerListName( ControllerListName ),
-			ComponentListName( ComponentListName ),
-			ControllerListNum( ControllerListNum ),
-			NumComponents( NumComponents ),
-			NumControllers( NumControllers ),
-			NumSimpleControllers( NumSimpleControllers ),
-			ComponentName( ComponentName ),
-			ComponentType( ComponentType ),
-			ComponentType_Num( ComponentType_Num ),
-			ComponentIndex( ComponentIndex ),
-			ControllerName( ControllerName ),
-			ControllerType( ControllerType ),
-			ControllerIndex( ControllerIndex )
 		{}
 
 	};

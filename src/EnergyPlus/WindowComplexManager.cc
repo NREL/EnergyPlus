@@ -250,15 +250,6 @@ namespace WindowComplexManager {
 			TempBasisIdx()
 			{}
 
-			// Member Constructor
-			TempBasisIdx(
-				int const Basis, // Basis no in basis table
-				int const State // State in which basis first occurs
-			) :
-				Basis( Basis ),
-				State( State )
-			{}
-
 		};
 
 		// Object Data
@@ -1675,19 +1666,6 @@ namespace WindowComplexManager {
 
 			// Default Constructor
 			BackHitList()
-			{}
-
-			// Member Constructor
-			BackHitList(
-				int const KBkSurf, // Back surface index of the hit surface
-				int const HitSurf, // Surface number of the hit surface
-				Vector const & HitPt, // coords of hit pt (world syst)
-				Real64 const HitDsq // Squared distance to the current hit pt
-			) :
-				KBkSurf( KBkSurf ),
-				HitSurf( HitSurf ),
-				HitPt( HitPt ),
-				HitDsq( HitDsq )
 			{}
 
 		};
