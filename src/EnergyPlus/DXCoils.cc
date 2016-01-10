@@ -10057,7 +10057,7 @@ Label50: ;
 		Real64 const TotCap, // coil total capacity [W]
 		Real64 const AirMassFlow, // coil air mass flow rate [kg/s]
 		Real64 const InitialSHR, // coil sensible heat ratio []
-		std::string const CallingRoutine // function name calling this routine
+		std::string const & CallingRoutine // function name calling this routine
 	)
 	{
 

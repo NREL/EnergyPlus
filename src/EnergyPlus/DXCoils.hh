@@ -147,7 +147,7 @@ namespace DXCoils {
 	extern Array1D< Real64 > DXCoilCoolInletAirWBTemp; // DX cooling coil inlet air wet-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirDBTemp; // DX heating coil inlet air dry-bulb temp [C]
 	extern Array1D< Real64 > DXCoilHeatInletAirWBTemp; // DX heating coil inlet air wet-bulb temp [C]
-	
+
 	extern int CurDXCoilNum;
 
 	extern int NumDXCoils; // Total number of DX coils
@@ -504,7 +504,7 @@ namespace DXCoils {
 		int MSSpeedNumHS; // current high speed number of multspeed HP
 		Real64 MSSpeedRatio; // current speed ratio of multspeed HP
 		Real64 MSCycRatio; // current cycling ratio of multspeed HP
-		
+
 		//The following members are for VRF Coils (FluidTCtrl Model)
 		int VRFIUPtr; // index to the VRF Indoor Unit where the coil is placed
 		int VRFOUPtr; // index to the VRF Outdoor Unit that the coil serves
@@ -744,18 +744,18 @@ namespace DXCoils {
 			MSCycRatio( 0.0 ),
 			VRFIUPtr( 0 ),
 			VRFOUPtr( 0 ),
-			EvaporatingTemp( 4.0 ),  
-			CondensingTemp( 40.0 ), 
-			C1Te( 0.0 ),	                
-			C2Te( 0.0 ),                 
-			C3Te( 0.0 ),                 
-			C1Tc( 0.0 ),	                
-			C2Tc( 0.0 ),                 
-			C3Tc( 0.0 ),                 
-			SH( 0.0 ),                   
-			SC( 0.0 ),                   
-			ActualSH( 0.0 ),             
-			ActualSC( 0.0 ) 
+			EvaporatingTemp( 4.0 ),
+			CondensingTemp( 40.0 ),
+			C1Te( 0.0 ),
+			C2Te( 0.0 ),
+			C3Te( 0.0 ),
+			C1Tc( 0.0 ),
+			C2Tc( 0.0 ),
+			C3Tc( 0.0 ),
+			SH( 0.0 ),
+			SC( 0.0 ),
+			ActualSH( 0.0 ),
+			ActualSC( 0.0 )
 		{}
 
 		// Member Constructor
@@ -1300,7 +1300,7 @@ namespace DXCoils {
 			C3Te( C3Te ),
 			C1Tc( C1Tc ),
 			C2Tc( C2Tc ),
-			C3Tc( C3Tc ),   
+			C3Tc( C3Tc ),
 			SH( SH ),
 			SC( SC ),
 			ActualSH( ActualSH ),
@@ -1479,7 +1479,7 @@ namespace DXCoils {
 		Real64 const TotCap, // coil total capacity [W]
 		Real64 const AirMassFlow, // coil air mass flow rate [kg/s]
 		Real64 const InitialSHR, // coil sensible heat ratio []
-		std::string const CallingRoutine // function name calling this routine 
+		std::string const & CallingRoutine // function name calling this routine
 		);
 
 	Real64
@@ -1742,7 +1742,7 @@ namespace DXCoils {
 		Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
 		Optional< Real64 const > OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
 	);
-	
+
 	void
 	CalcVRFHeatingCoil_FluidTCtrl(
 		int const CompOp, // compressor operation; 1=on, 0=off
@@ -1752,15 +1752,15 @@ namespace DXCoils {
 		Optional< Real64 const > OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
 		Optional< Real64 const > MaxHeatCap // maximum allowed heating capacity
 	);
-	
+
 	void
 	ControlVRFIUCoil (
-		int const CoilIndex,  // index to VRFTU coil 
+		int const CoilIndex,  // index to VRFTU coil
 		Real64 const QCoil,   // coil load
 		Real64 const Tin,     // inlet air temperature
 		Real64 const Win,     // inlet air humidity ratio
 		Real64 const TeTc,    // evaporating or condensing temperature
-		Real64 const OAMassFlow,  // mass flow rate of outdoor air 
+		Real64 const OAMassFlow,  // mass flow rate of outdoor air
 		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
 		Real64 & Wout,    // outlet air humidity ratio
 		Real64 & Tout, // outlet air temperature
@@ -1768,11 +1768,11 @@ namespace DXCoils {
 		Real64 & SHact,   // actual SH
 		Real64 & SCact    // actual SC
 	);
-	
+
 	void
 	CalcVRFCoilSenCap(
 		int const OperationMode, // mode 0 for cooling, 1 for heating
-		int const CoilNum,  // index to VRFTU cooling or heating coil 
+		int const CoilNum,  // index to VRFTU cooling or heating coil
 		Real64 const Tinlet,// dry bulb temperature of air entering the coil
 		Real64 const TeTc,  // evaporating or condensing temperature
 		Real64 const SHSC,  // SH at cooling /SC at heating
@@ -1780,7 +1780,7 @@ namespace DXCoils {
 		Real64 & Q_sen,     // VRF coil sensible capacity per air mass flow rate
 		Real64 & T_coil_surf// Air temperature at coil surface
 	);
-	
+
 	void
 	CalcVRFCoilCapModFac(
 		int const OperationMode, // mode 0 for cooling, 1 for heating
@@ -1792,16 +1792,16 @@ namespace DXCoils {
 		Optional< Real64 const > BF,    // Bypass factor
 		Real64 & CapModFac // Coil capacity modification factor
 	);
-	
-	Real64 
-	FanSpdResidualCool( 
-		Real64 const FanSpdRto, // indoor unit fan speed ratio  
+
+	Real64
+	FanSpdResidualCool(
+		Real64 const FanSpdRto, // indoor unit fan speed ratio
 		Array1< Real64 > const & Par // array of parameters
 	);
-	
-	Real64 
-	FanSpdResidualHeat( 
-		Real64 FanSpdRto, // indoor unit fan speed ratio  
+
+	Real64
+	FanSpdResidualHeat(
+		Real64 FanSpdRto, // indoor unit fan speed ratio
 		Array1< Real64 > const & Par // array of parameters
 	);
 	// End of Methods for New VRF Model: Fluid Temperature Control

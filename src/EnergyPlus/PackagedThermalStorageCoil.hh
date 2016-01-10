@@ -1035,7 +1035,7 @@ namespace PackagedThermalStorageCoil {
 
 	void
 	ControlTESIceStorageTankCoil(
-		std::string const CoilName,
+		std::string const & CoilName,
 		int CoilIndex,
 		std::string SystemType,
 		int const FanOpMode,
@@ -1092,7 +1092,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		int & CoilAirInletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 	void
@@ -1100,7 +1100,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		int & CoilAirOutletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 	void
@@ -1108,7 +1108,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		Real64 & CoilCoolCapacity,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 	void
@@ -1116,7 +1116,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		Real64 & CoilCoolAirFlow,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 } // PackagedThermalStorageCoil

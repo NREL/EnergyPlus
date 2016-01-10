@@ -2062,7 +2062,7 @@ namespace UserDefinedComponents {
 		std::string const & CoilName,
 		int & CoilIndex,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 
@@ -2124,7 +2124,7 @@ namespace UserDefinedComponents {
 		std::string const & CoilName,
 		int & CoilAirInletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 
@@ -2189,7 +2189,7 @@ namespace UserDefinedComponents {
 		std::string const & CoilName,
 		int & CoilAirOutletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 

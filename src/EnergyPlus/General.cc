@@ -1572,7 +1572,6 @@ namespace General {
 		int TokenDay;
 		int TokenMonth;
 		int TokenWeekday;
-		int TokenYear; // what should this be initialized to?
 
 		FstNum = int( ProcessNumber( String, errFlag ) );
 		DateType = -1;
@@ -1594,6 +1593,7 @@ namespace General {
 			if ( ! present( PYear ) ) {
 				DetermineDateTokens( String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound );
 			} else {
+				int TokenYear = 0;
 				DetermineDateTokens( String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear );
 				PYear = TokenYear;
 			}
