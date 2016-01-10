@@ -2582,7 +2582,6 @@ namespace HVACControllers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string StatisticsFileName;
 		int FileUnit;
 		int AirLoopNum;
 
@@ -2593,9 +2592,7 @@ namespace HVACControllers {
 			return;
 		}
 
-		StatisticsFileName = "";
-		StatisticsFileName = "statistics.HVACControllers.csv";
-		strip( StatisticsFileName );
+		std::string StatisticsFileName = "statistics.HVACControllers.csv";
 
 		FileUnit = GetNewUnitNumber();
 
@@ -2815,7 +2812,6 @@ Label100: ;
 		int ControllerNum;
 
 		// Open main controller trace file for each air loop
-		TraceFileName = "";
 		TraceFileName = "controller." + PrimaryAirSystem( AirLoopNum ).Name + ".csv";
 		strip( TraceFileName );
 
@@ -3085,7 +3081,6 @@ Label100: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string TraceFileName;
 		static int TraceFileUnit( 0 );
 
 		// Open and write column header in trace file for each individual controller
@@ -3096,8 +3091,7 @@ Label100: ;
 			return;
 		}
 
-		TraceFileName = "";
-		TraceFileName = "controller." + ControllerProps( ControlNum ).ControllerName + ".csv";
+		std::string TraceFileName = "controller." + ControllerProps( ControlNum ).ControllerName + ".csv";
 		strip( TraceFileName );
 
 		//WRITE(*,*) 'Trace file name="', TRIM(TraceFileName) , '"'

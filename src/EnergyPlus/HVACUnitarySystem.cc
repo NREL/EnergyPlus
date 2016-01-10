@@ -11750,7 +11750,6 @@ namespace HVACUnitarySystem {
 			LatLoad = 0.0;
 			OnOffAirFlowRatio = 1.0;
 
-			SensLoad = -1.0;
 			SimVariableSpeedCoils( "", CoilIndex, FanOpMode, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, CompOp, CycRatio, SpeedNum, SpeedRatio, SensLoad, LatLoad, OnOffAirFlowRatio );
 
 			OutletAirHumRat = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).HumRat;

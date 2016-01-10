@@ -8231,7 +8231,6 @@ namespace PlantPipingSystemsManager {
 
 			Numerator = 0.0;
 			Denominator = 0.0;
-			Resistance = 0.0;
 
 			//'convenience variables
 			ThisRadialCellOuterRadius = ThisCell.PipeCellData.Soil( rCtr ).OuterRadius;

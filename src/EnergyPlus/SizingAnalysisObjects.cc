@@ -181,11 +181,8 @@ namespace EnergyPlus {
 	// this method finds a zone timestep for the system timestep update to use
 	// system timesteps are substeps inside a zone timestep, but are updated
 	// before the zone step has been called.
-		int lastZnStepIndex( 0 );
-		int znStepIndex( -1 );
-
-		lastZnStepIndex =  GetZtStepIndex( tmpztStepStamp );
-		znStepIndex = lastZnStepIndex + 1;
+		int lastZnStepIndex =  GetZtStepIndex( tmpztStepStamp );
+		int znStepIndex = lastZnStepIndex + 1;
 
 		std::map< int, int >:: iterator end = envrnStartZtStepIndexMap.end();
 		for (std::map< int, int >:: iterator itr = envrnStartZtStepIndexMap.begin(); itr != end; ++itr) {
@@ -277,8 +274,7 @@ namespace EnergyPlus {
 	void SizingLog::ProcessRunningAverage ()
 	{
 		Real64 RunningSum = 0.0;
-		Real64 divisor = 0.0;
-		divisor = double( timeStepsInAverage );
+		Real64 divisor = double( timeStepsInAverage );
 
 		std::map< int, int >:: iterator end = ztStepCountByEnvrnMap.end();
 		for (std::map< int, int >:: iterator itr = ztStepCountByEnvrnMap.begin(); itr != end; ++itr) {

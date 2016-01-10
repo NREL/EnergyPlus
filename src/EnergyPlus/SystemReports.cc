@@ -4038,7 +4038,6 @@ namespace SystemReports {
 			ZFAUOutAirFlow = 0.0;
 			OutAirFlow = 0.0;
 			ZoneFlowFrac = 0.0;
-			ZoneVolume = 0.0;
 
 			//retrieve the zone load for each zone
 			ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;

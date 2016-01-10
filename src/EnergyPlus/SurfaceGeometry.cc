@@ -6137,7 +6137,6 @@ namespace SurfaceGeometry {
 				ErrorsFoundByConstruct = true;
 			}}
 
-			Found = 0;
 			Found = FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );

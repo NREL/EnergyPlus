@@ -488,74 +488,12 @@ namespace WeatherManager {
 		DatesShouldBeReset = false;
 		StartDatesCycleShouldBeReset = false; // True when start dates on repeat should be reset
 		Jan1DatesShouldBeReset = false; // True if Jan 1 should signal reset of dates
-
-		TodayVariables.DayOfYear = 0 ;
-		TodayVariables.Year = 0 ;
-		TodayVariables.Month = 0 ;
-		TodayVariables.DayOfMonth = 0 ;
-		TodayVariables.DayOfWeek = 0 ;
-		TodayVariables.DaylightSavingIndex = 0 ;
-		TodayVariables.HolidayIndex = 0 ;
-		TodayVariables.SinSolarDeclinAngle = 0.0 ;
-		TodayVariables.CosSolarDeclinAngle = 0.0 ;
-		TodayVariables.EquationOfTime = 0.0 ;
-		TomorrowVariables.DayOfYear = 0 ;
-		TomorrowVariables.Year = 0 ;
-		TomorrowVariables.Month = 0 ;
-		TomorrowVariables.DayOfMonth = 0 ;
-		TomorrowVariables.DayOfWeek = 0 ;
-		TomorrowVariables.DaylightSavingIndex = 0 ;
-		TomorrowVariables.HolidayIndex = 0 ;
-		TomorrowVariables.SinSolarDeclinAngle = 0.0 ;
-		TomorrowVariables.CosSolarDeclinAngle = 0.0 ;
-		TomorrowVariables.EquationOfTime = 0.0 ;
-
+		TodayVariables = DayWeatherVariables();
+		TomorrowVariables = DayWeatherVariables();
 		DesignDay.deallocate();
-
-		Missing.DryBulb = 0.0 ;
-		Missing.DewPoint = 0.0 ;
-		Missing.RelHumid = 0 ;
-		Missing.StnPres = 0.0 ;
-		Missing.WindDir = 0 ;
-		Missing.WindSpd = 0.0 ;
-		Missing.TotSkyCvr = 0 ;
-		Missing.OpaqSkyCvr = 0 ;
-		Missing.Visibility = 0.0 ;
-		Missing.Ceiling = 0 ;
-		Missing.PrecipWater = 0 ;
-		Missing.AerOptDepth = 0.0 ;
-		Missing.SnowDepth = 0 ;
-		Missing.DaysLastSnow = 0 ;
-		Missing.Albedo = 0.0 ;
-		Missing.LiquidPrecip = 0.0 ;
-		Missed.DryBulb = 0 ;
-		Missed.DewPoint = 0 ;
-		Missed.RelHumid = 0 ;
-		Missed.StnPres = 0 ;
-		Missed.WindDir = 0 ;
-		Missed.WindSpd = 0 ;
-		Missed.DirectRad = 0 ;
-		Missed.DiffuseRad = 0 ;
-		Missed.TotSkyCvr = 0 ;
-		Missed.OpaqSkyCvr = 0 ;
-		Missed.Visibility = 0 ;
-		Missed.Ceiling = 0 ;
-		Missed.PrecipWater = 0 ;
-		Missed.AerOptDepth = 0 ;
-		Missed.SnowDepth = 0 ;
-		Missed.DaysLastSnow = 0 ;
-		Missed.WeathCodes = 0 ;
-		Missed.Albedo = 0 ;
-		Missed.LiquidPrecip = 0 ;
-		OutOfRange.DryBulb = 0 ;
-		OutOfRange.DewPoint = 0 ;
-		OutOfRange.RelHumid = 0 ;
-		OutOfRange.StnPres = 0 ;
-		OutOfRange.WindDir = 0 ;
-		OutOfRange.WindSpd = 0 ;
-		OutOfRange.DirectRad = 0 ;
-		OutOfRange.DiffuseRad = 0 ;
-
+		Missing = MissingData();
+		Missed = MissingDataCounts();
+		OutOfRange = RangeDataCounts();
 		DesDayInput.deallocate(); // Design day Input Data
 		Environment.deallocate(); // Environment data
 		RunPeriodInput.deallocate();
@@ -3084,7 +3022,6 @@ namespace WeatherManager {
 					if ( LiquidPrecip >= 999.0 ) {
 						LiquidPrecip = Missing.LiquidPrecip;
 						++Missed.LiquidPrecip;
-						LiquidPrecip = 0.0;
 					}
 
 					//        IF (DaysSinceLastSnow >= 99) THEN
