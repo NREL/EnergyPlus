@@ -78,6 +78,10 @@
 #include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
+#if defined( _WIN32 ) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
+
 namespace EnergyPlus {
 
 namespace General {
@@ -2906,11 +2910,7 @@ namespace General {
 		// clear for formatting and faster. If formatted string changes, make sure to
 		// add more to buffer.
 		char buffer[ 11 ];
-#if defined( _WIN32 ) && _MSC_VER < 1900
-		int cx = _snprintf_s( buffer, sizeof( buffer ) 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds );
-#else
 		int cx = snprintf( buffer, 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds );
-#endif
 
 		// Make sure output string is only between 0 and 10 characters so string is
 		// not out of bounds of the buffer.
