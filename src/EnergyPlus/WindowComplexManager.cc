@@ -3342,15 +3342,12 @@ namespace WindowComplexManager {
 		Tini = WindowThermalModel( ThermalModelNum ).InitialTemperature - KelvinConv;
 		Pini = WindowThermalModel( ThermalModelNum ).InitialPressure;
 
-		if ( CalcCondition == noCondition ) {
-			ZoneNum = Surface( SurfNum ).Zone;
-		}
-
 		nlayer = Construct( ConstrNum ).TotSolidLayers;
 		isky = 3; // IR radiation is provided from external source
 		iwd = 0; // assume windward for now.  TODO compare surface normal with wind direction
 
 		if ( CalcCondition == noCondition ) {
+			ZoneNum = Surface( SurfNum ).Zone;
 
 			// determine reference air temperature for this surface
 			{ auto const SELECT_CASE_var( Surface( SurfNum ).TAirRef );

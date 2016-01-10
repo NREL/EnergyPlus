@@ -504,12 +504,12 @@ namespace MixedAir {
 		static std::string CompType; //Tuned Made static
 		static std::string CompName; //Tuned Made static
 		static std::string CtrlName; //Tuned Made static
-		bool FatalErrorFlag;
-		bool Sim;
-		bool OAHeatCoil;
-		bool OACoolCoil;
-		bool OAHX;
-		bool ReSim;
+		bool FatalErrorFlag( false );
+		bool Sim( true );
+		bool OAHeatCoil( false );
+		bool OACoolCoil( false );
+		bool OAHX( false );
+		bool ReSim( false );
 
 		// SimOutsideAirSys can handle only 1 controller right now.  This must be
 		// an Outside Air Controller.  This is because of the lack of iteration
@@ -518,11 +518,8 @@ namespace MixedAir {
 		//    CtrlName = OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
 		//    CALL SimOAController(CtrlName,FirstHVACIteration)
 		//  END DO
-		FatalErrorFlag = false;
 		CtrlName = OutsideAirSys( OASysNum ).ControllerName( 1 );
 		CurOASysNum = OASysNum;
-		Sim = true;
-		ReSim = false;
 		SimOAController( CtrlName, OutsideAirSys( OASysNum ).ControllerIndex( 1 ), FirstHVACIteration, AirLoopNum );
 
 		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
@@ -2803,7 +2800,7 @@ namespace MixedAir {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		/////////// hoisted into namespace 
+		/////////// hoisted into namespace
 		//static bool MyOneTimeFlag( true ); // One-time initialization flag
 		//static bool MySetPointCheckFlag( true ); // One-time initialization flag
 		//static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
@@ -5405,22 +5402,19 @@ namespace MixedAir {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string CompType;
 		std::string CompName;
-		bool Sim;
-		bool FirstHVACIteration;
-		bool OAHeatingCoil;
-		bool OACoolingCoil;
+		bool Sim( false );
+		bool FirstHVACIteration( false );
+		bool OAHeatingCoil( false );
+		bool OACoolingCoil( false );
 		int CompNum;
-		int AirLoopNum;
-		bool OAHX;
+		int AirLoopNum( 0 );
+		bool OAHX( false );
 
 		if ( GetOASysInputFlag ) {
 			GetOutsideAirSysInputs();
 			GetOASysInputFlag = false;
 		}
 
-		Sim = false;
-		FirstHVACIteration = false;
-		AirLoopNum = 0;
 		NumHeatingCoils = 0;
 		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNumber ).NumComponents; ++CompNum ) {
 			CompType = OutsideAirSys( OASysNumber ).ComponentType( CompNum );
@@ -5475,22 +5469,19 @@ namespace MixedAir {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string CompType;
 		std::string CompName;
-		bool Sim;
-		bool FirstHVACIteration;
-		bool OAHeatingCoil;
-		bool OACoolingCoil;
+		bool Sim( false );
+		bool FirstHVACIteration( false );
+		bool OAHeatingCoil( false );
+		bool OACoolingCoil( false );
 		int CompNum;
-		int AirLoopNum;
-		bool OAHX;
+		int AirLoopNum( 0 );
+		bool OAHX( false );
 
 		if ( GetOASysInputFlag ) {
 			GetOutsideAirSysInputs();
 			GetOASysInputFlag = false;
 		}
 
-		Sim = false;
-		FirstHVACIteration = false;
-		AirLoopNum = 0;
 		NumCoolingCoils = 0;
 		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNumber ).NumComponents; ++CompNum ) {
 			CompType = OutsideAirSys( OASysNumber ).ComponentType( CompNum );

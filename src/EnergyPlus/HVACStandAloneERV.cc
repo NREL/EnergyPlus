@@ -1824,7 +1824,7 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 
 		// Return value
-		int AirInletNode; // returned air inlet node number of the ERV unit
+		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1895,7 +1895,7 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 
 		// Return value
-		int AirInletNode; // returned air inlet node number of the ERV unit
+		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:

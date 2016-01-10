@@ -672,7 +672,7 @@ namespace PlantLoopSolver {
 		Real64 OutletBranchRequestNeedIfOn;
 		bool ThisSideHasPumps;
 		bool OtherSideHasPumps;
-		bool ThisLoopHasCommonPipe;
+		bool ThisLoopHasCommonPipe( false );
 
 		//Tuned Made static: Set before use
 		static Array1D_bool ThisLoopHasConstantSpeedBranchPumps( 2 );
