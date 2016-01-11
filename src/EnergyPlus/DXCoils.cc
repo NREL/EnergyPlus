@@ -5271,7 +5271,7 @@ namespace DXCoils {
 						SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", Coil.BasinHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "COOLING", _, "System" );
 					}
 				}
-				if (Coil.IsSecondaryDXCoilInZone) {
+				if ( Coil.IsSecondaryDXCoilInZone ) {
 					SetupOutputVariable("Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name);
 				}
 
@@ -5302,7 +5302,7 @@ namespace DXCoils {
 				SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", Coil.CrankcaseHeaterConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
 				SetupOutputVariable( "Heating Coil Runtime Fraction []", Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
 
-				if (Coil.IsSecondaryDXCoilInZone) {
+				if ( Coil.IsSecondaryDXCoilInZone ) {
 					SetupOutputVariable("Secondary Coil Total Heat Removal Rate [W]", Coil.SecCoilTotalHeatRemovalRate, "System", "Average", Coil.Name);
 					SetupOutputVariable("Secondary Coil Sensible Heat Removal Rate [W]", Coil.SecCoilSensibleHeatRemovalRate, "System", "Average", Coil.Name);
 					SetupOutputVariable("Secondary Coil Latent Heat Removal Rate [W]", Coil.SecCoilLatentHeatRemovalRate, "System", "Average", Coil.Name);
@@ -6026,11 +6026,11 @@ namespace DXCoils {
 					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling ) {
 						SizingMethod = CoolingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
-					} else if( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
+					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
 						SizingMethod = CoolingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
 						PrintFlag = false;
-					} else if( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
+					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
 						SizingMethod = HeatingAirflowSizing;
 						CompName = DXCoil( DXCoilNum ).Name;
 						PrintFlag = false;
@@ -9395,8 +9395,8 @@ Label50: ;
 		} else if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
 			OutdoorDryBulb = ZT( DXCoil( DXCoilNum ).SecZonePtr );
 			OutdoorHumRat = ZoneAirHumRat( DXCoil( DXCoilNum ).SecZonePtr );
-				OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
-				OutdoorPressure = OutBaroPress;
+			OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
+			OutdoorPressure = OutBaroPress;
 		} else {
 			OutdoorDryBulb = OutDryBulbTemp;
 			OutdoorHumRat = OutHumRat;
@@ -11564,7 +11564,7 @@ Label50: ;
 				}
 
 				// Waste heat calculation
-				if (  DXCoil( DXCoilNum ).MSHPHeatRecActive ) {
+				if ( DXCoil( DXCoilNum ).MSHPHeatRecActive ) {
 					if ( DXCoil( DXCoilNum ).MSWasteHeat( SpeedNumLS ) == 0 ) {
 						WasteHeatLS = DXCoil( DXCoilNum ).MSWasteHeatFrac( SpeedNumLS );
 					} else {
@@ -15084,7 +15084,7 @@ Label50: ;
 			// MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
 			if ( present( MaxHeatCap ) ) {
 				TotCapAdj = min( MaxHeatCap, TotCap * HeatingCapacityMultiplier );
-			   	TotCap = min( MaxHeatCap, TotCap );
+				TotCap = min( MaxHeatCap, TotCap );
 			} else {
 				TotCapAdj = TotCap * HeatingCapacityMultiplier;
 			}
@@ -15245,7 +15245,7 @@ Label50: ;
 		//       A new physics based VRF model applicable for Fluid Temperature Control.
 		//
 		// REFERENCES:
-		//        na
+		//       na
 		//
 		// USE STATEMENTS:
 		using namespace DataZoneEnergyDemands;
@@ -15477,7 +15477,7 @@ Label50: ;
 						SCact = ( deltaT - C1Tcond ) / C2Tcond;
 					} else {
 						SCact = 998.0;
-                       }
+					}
 				} else {
 					SCact = ( -C2Tcond + sqrt( pow_2( C2Tcond  ) - 4 * C3Tcond * ( C1Tcond - deltaT ) ) ) / 2 / C3Tcond;
 				}
@@ -15798,7 +15798,7 @@ Label50: ;
 		// +-100 W minimum zone load?
 		if ( std::abs( ZnSenLoad ) < 100.0 ) ZnSenLoad = sign( 100.0, ZnSenLoad );
 
-		Tout = TcoilIn + ( Th2 - TcoilIn )  *  ( 1-BF );
+		Tout = TcoilIn + ( Th2 - TcoilIn )  *  ( 1 - BF );
 		TotCap = FanSpdRto  *  Garate  *  1005.0 * ( Tout - TcoilIn );
 		FanSpdResidualHeat = ( TotCap - ZnSenLoad ) / ZnSenLoad;
 
