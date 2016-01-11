@@ -1854,7 +1854,6 @@ namespace HVACUnitarySystem {
 		bool ErrFound; // logical error flag
 		std::string FanType; // fan type
 		std::string FanName; // fan name
-		std::string CoolCoilName; // name of DX cooling coil
 		Real64 CoolCapAtPeak; // cooling capacity at peak [W]
 		Real64 HeatCapAtPeak; // heating capacity at peak [W]
 		std::string SystemType; // type of air loop equipment

@@ -1686,7 +1686,6 @@ namespace ChillerExhaustAbsorption {
 		Real64 CpAir;
 		Real64 rhoHW; // local fluid density for hot water
 		int lExhaustAirInletNodeNum; // Combustion Air Inlet Node number
-		std::string GeneratorName;
 
 		// set node values to data structure values for nodes
 

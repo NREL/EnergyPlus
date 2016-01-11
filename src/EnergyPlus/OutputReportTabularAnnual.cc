@@ -104,7 +104,6 @@ namespace EnergyPlus {
 
 			static std::string const currentModuleObject( "Output:Table:Annual" );
 
-			std::string curAggString; // Current aggregation sting
 			int jAlpha;
 			int numParams; // Number of elements combined
 			int numAlphas; // Number of elements in the alpha array
@@ -553,7 +552,6 @@ namespace EnergyPlus {
 		AnnualTable::resetGathering()
 		{
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			std::vector<AnnualFieldSet>::iterator fldStRemainIt;
 			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 					if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum || fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximumDuringHoursShown ){

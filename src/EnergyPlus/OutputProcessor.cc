@@ -4706,7 +4706,6 @@ namespace OutputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string NumberOut; // Character for producing "number out"
 
 		if ( UpdateDataDuringWarmupExternalInterface && ! ReportDuringWarmup ) return;
 

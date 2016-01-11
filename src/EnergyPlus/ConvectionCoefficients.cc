@@ -1194,7 +1194,6 @@ namespace ConvectionCoefficients {
 		int Ptr;
 		int Pass;
 		int FieldNo;
-		std::string CFieldNo;
 		int NumField;
 		std::string CurrentModuleObject;
 		int PotentialAssignedValue;

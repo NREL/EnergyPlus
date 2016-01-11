@@ -731,7 +731,6 @@ namespace HeatBalFiniteDiffManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Lay;
 		int SurfNum;
-		std::string LayChar;
 
 		Real64 dxn; // Intermediate calculation of nodal spacing. This is the full dx. There is
 		// a half dxn thick node at each surface. dxn is the "capacitor" spacing.

@@ -2617,7 +2617,6 @@ namespace ThermalComfort {
 		std::string lineIn;
 		std::string lineAvg;
 		std::string epwLine;
-		std::string ioerrmsg;
 		static Real64 avgDryBulbASH( 0.0 );
 		Real64 dryBulb;
 		static Real64 runningAverageASH( 0.0 );

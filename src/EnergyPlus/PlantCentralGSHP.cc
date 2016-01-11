@@ -648,16 +648,6 @@ namespace PlantCentralGSHP {
 
 		// LOCAL VARIABLES
 		static std::string CompName; // component name
-		std::string EvapInletNodeName; // virtual evaporator inlet node name for chiller heater
-		std::string EvapOutletNodeName; // virtual evaporator outlet node name for chiller heater
-		std::string CondInletNodeName; // virtual condenser inlet node name for chiller heater
-		std::string CondOutletNodeName; // virtual condenser outlet node name for chiller heater
-		std::string LoadsideInletNodeName; // virtual load inlet node name for heat pump
-		std::string LoadsideOutletNodeName; // virtual load outlet node name for heat pump
-		std::string SourcesideInletNodeName; // virtual source inlet node name for heat pump
-		std::string SourcesideOutletNodeName; // virtual source outlet node name for heat pump
-		std::string DummyInletNodeName; // virtual dummy inlet node name
-		std::string DummyOutletNodeName; // virtual dummy inlet node name
 		static bool ErrorsFound( false ); // True when input errors are found
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -956,10 +946,6 @@ namespace PlantCentralGSHP {
 		// na
 
 		// LOCAL VARIABLES
-		std::string EvapInletNodeName; // Evaporator inlet node name
-		std::string EvapOutletNodeName; // Evaporator outlet node name
-		std::string CondInletNodeName; // Condenser inlet node name
-		std::string CondOutletNodeName; // Condenser outlet node name
 		std::string StringVar; // Used for EIRFPLR warning messages
 		static bool CHErrorsFound( false ); // True when input errors are found
 		bool IsNotOK; // Flag to verify name
