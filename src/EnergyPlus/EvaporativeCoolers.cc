@@ -721,11 +721,7 @@ namespace EvaporativeCoolers {
 
 			EvapCond( EvapCoolNum ).VolFlowRate = rNumericArgs( 2 );
 			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 3 );
-			if ( lNumericFieldBlanks( 4 ) ) {
-				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = 0.0;
-			} else {
-				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 4 );
-			}
+			EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 4 );
 			if ( lNumericFieldBlanks( 5 ) ) {
 				EvapCond( EvapCoolNum ).DriftFraction = 0.0;
 			} else {

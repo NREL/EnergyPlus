@@ -50522,6 +50522,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note This is the nominal design pump power of water recirculation and spray for evaporation at design air flow
        \note rates and cooler design effectiveness
        \autosizable
+       \default autosize 
   N4 , \field Water Pump Power Sizing Factor
        \type real
        \units W/(m3/s)
@@ -50530,7 +50531,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power
        \note sizing factor was estimated from pump power and secondary air design flow rates inputs from energyplus example
        \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Secondary Air Design Flow Rate). The factor ranges from
-       \note 55.0 to 150.0 [W/(m3/s)] were noted.
+       \note 55.0 to 150.0 [W/(m3/s)] were noted. The pump power can be sized to zero by setting this factor to zero. 
   A5 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
        \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Air
@@ -50547,6 +50548,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
+       \default autosize   
   N6 , \field Secondary Air Flow Scaling Factor
        \type real
        \units dimensionless
@@ -50558,6 +50560,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units W
        \note This is the fan design power at Secondary Design Air Flow Rate. This is the nominal design power at full speed.
        \autosizable
+       \default autosize   
   N8 , \field Secondary Air Fan Sizing Specific Power
        \type real
        \units W/(m3/s)
@@ -50587,6 +50590,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
+       \default autosize 
   N10, \field Dewpoint Effectiveness Factor
        \type real
        \minimum 0.0
@@ -50690,6 +50694,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
+       \default autosize
   N3 , \field Recirculating Water Pump Design Power
        \units W
        \ip-units W
@@ -50697,6 +50702,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note This is the design water pump or spray for evaporation at the primary air design air flow rates
        \note and cooler design effectiveness
        \autosizable
+       \default autosize
   N4 , \field Water Pump Power Sizing Factor
        \type real
        \units W/(m3/s)
@@ -50705,7 +50711,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power
        \note sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example
        \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Primary Air Design Flow Rate). The factor ranges from
-       \note 55.0 to 150.0 [W/(m3/s)].
+       \note 55.0 to 150.0 [W/(m3/s)]. The pump power can be sized to zero by setting this factor to zero. 
   A4 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
        \note x = ff = flow fraction on the primary air. The flow fraction is the secondary air flow rate during current operation divided
