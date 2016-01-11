@@ -200,6 +200,7 @@ namespace OutputReportPredefined {
 	extern int pdchOpUfactFilm;
 	extern int pdchOpUfactNoFilm;
 	extern int pdchOpGrArea;
+	extern int pdchOpNetArea;
 	extern int pdchOpAzimuth;
 	extern int pdchOpTilt;
 	extern int pdchOpDir;

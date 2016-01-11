@@ -209,6 +209,7 @@ namespace OutputReportPredefined {
 	int pdchOpUfactFilm;
 	int pdchOpUfactNoFilm;
 	int pdchOpGrArea;
+	int pdchOpNetArea;
 	int pdchOpAzimuth;
 	int pdchOpTilt;
 	int pdchOpDir;
@@ -833,6 +834,7 @@ namespace OutputReportPredefined {
 		pdchOpUfactFilm = 0;
 		pdchOpUfactNoFilm = 0;
 		pdchOpGrArea = 0;
+		pdchOpNetArea = 0;
 		pdchOpAzimuth = 0;
 		pdchOpTilt = 0;
 		pdchOpDir = 0;
@@ -1339,6 +1341,7 @@ namespace OutputReportPredefined {
 		pdchOpUfactFilm = newPreDefColumn( pdstOpaque, "U-Factor with Film [W/m2-K]" );
 		pdchOpUfactNoFilm = newPreDefColumn( pdstOpaque, "U-Factor no Film [W/m2-K]" );
 		pdchOpGrArea = newPreDefColumn( pdstOpaque, "Gross Area [m2]" );
+		pdchOpNetArea = newPreDefColumn( pdstOpaque, "Net Area [m2]" );
 		pdchOpAzimuth = newPreDefColumn( pdstOpaque, "Azimuth [deg]" );
 		pdchOpTilt = newPreDefColumn( pdstOpaque, "Tilt [deg]" );
 		pdchOpDir = newPreDefColumn( pdstOpaque, "Cardinal Direction" );
