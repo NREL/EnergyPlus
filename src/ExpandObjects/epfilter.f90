@@ -9876,7 +9876,6 @@ DO iZone = 1, numCompactZoneHCVAV
     !CALL AddToObjFld('Maximum air flow rate {m3/s}', base + hcvzSupplyMaxRateOff,' ')
     CALL AddToObjStr('Maximum Air Flow Rate {m3/s}','autosize')
     CALL AddToObjFld('Zone Minimum Air Flow Fraction', base + hcvzConstantMinFracOff,' ')
-    CALL AddToObjStr('Hot Water or Steam Inlet Node Name','')
     CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Electric')
     CALL AddToObjFld('Reheat Coil Name', base + hcvzNameOff,' Reheat Coil')
     CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
@@ -9906,7 +9905,6 @@ DO iZone = 1, numCompactZoneHCVAV
     !CR8001
     CALL AddToObjStr('Maximum Air Flow Rate {m3/s}','autosize')
     CALL AddToObjFld('Zone Minimum Air Flow Fraction', base + hcvzConstantMinFracOff,' ')
-    CALL AddToObjStr('Hot Water or Steam Inlet Node Name','')
     CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Gas')
     CALL AddToObjFld('Reheat Coil Name', base + hcvzNameOff,' Reheat Coil')
     CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
