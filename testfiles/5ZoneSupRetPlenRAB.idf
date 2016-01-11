@@ -3330,10 +3330,6 @@
     autosize,                !- Maximum Cooling Air Flow Rate {m3/s}
     autosize,                !- Maximum Heating Air Flow Rate {m3/s}
     0.05,                    !- Zone Minimum Air Flow Fraction
-    SPACE1-1 ATU In Node,    !- Air Inlet Node Name
-    SPACE1-1 In Node,        !- Air Outlet Node Name
-    SPACE1-1 Zone Coil Air In Node,  !- Heating Coil Air Inlet Node Name
-    SPACE1-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Fan:VariableVolume,      !- Fan Object Type
     SPACE1-1 Zone Fan,       !- Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
@@ -3348,10 +3344,6 @@
     autosize,                !- Maximum Cooling Air Flow Rate {m3/s}
     autosize,                !- Maximum Heating Air Flow Rate {m3/s}
     0.05,                    !- Zone Minimum Air Flow Fraction
-    SPACE2-1 ATU In Node,    !- Air Inlet Node Name
-    SPACE2-1 In Node,        !- Air Outlet Node Name
-    SPACE2-1 Zone Coil Air In Node,  !- Heating Coil Air Inlet Node Name
-    SPACE2-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Fan:VariableVolume,      !- Fan Object Type
     SPACE2-1 Zone Fan,       !- Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
@@ -3366,10 +3358,6 @@
     autosize,                !- Maximum Cooling Air Flow Rate {m3/s}
     autosize,                !- Maximum Heating Air Flow Rate {m3/s}
     0.05,                    !- Zone Minimum Air Flow Fraction
-    SPACE3-1 ATU In Node,    !- Air Inlet Node Name
-    SPACE3-1 In Node,        !- Air Outlet Node Name
-    SPACE3-1 Zone Coil Air In Node,  !- Heating Coil Air Inlet Node Name
-    SPACE3-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Fan:VariableVolume,      !- Fan Object Type
     SPACE3-1 Zone Fan,       !- Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
@@ -3384,10 +3372,6 @@
     autosize,                !- Maximum Cooling Air Flow Rate {m3/s}
     autosize,                !- Maximum Heating Air Flow Rate {m3/s}
     0.05,                    !- Zone Minimum Air Flow Fraction
-    SPACE4-1 ATU In Node,    !- Air Inlet Node Name
-    SPACE4-1 In Node,        !- Air Outlet Node Name
-    SPACE4-1 Zone Coil Air In Node,  !- Heating Coil Air Inlet Node Name
-    SPACE4-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Fan:VariableVolume,      !- Fan Object Type
     SPACE4-1 Zone Fan,       !- Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type

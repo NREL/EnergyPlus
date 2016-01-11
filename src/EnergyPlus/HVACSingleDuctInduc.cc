@@ -392,12 +392,12 @@ namespace HVACSingleDuctInduc {
 			IndUnit( IUNum ).SecAirInNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent, cAlphaFields( 4 ) );
 			IndUnit( IUNum ).OutAirNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields( 5 ) );
 
-			IndUnit( IUNum ).HCoilType = Alphas( 8 ); // type (key) of heating coil
+			IndUnit( IUNum ).HCoilType = Alphas( 6 ); // type (key) of heating coil
 			if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
 				IndUnit( IUNum ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
 			}
 
-			IndUnit( IUNum ).HCoil = Alphas( 9 ); // name of heating coil object
+			IndUnit( IUNum ).HCoil = Alphas( 7 ); // name of heating coil object
 			IsNotOK = false;
 			IndUnit( IUNum ).HWControlNode = GetCoilWaterInletNode( IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, IsNotOK );
 			if ( IsNotOK ) {
@@ -411,7 +411,7 @@ namespace HVACSingleDuctInduc {
 			IndUnit( IUNum ).MinVolHotWaterFlow = Numbers( 4 );
 			IndUnit( IUNum ).HotControlOffset = Numbers( 5 );
 
-			IndUnit( IUNum ).CCoilType = Alphas( 10 ); // type (key) of cooling coil
+			IndUnit( IUNum ).CCoilType = Alphas( 8 ); // type (key) of cooling coil
 
 			if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water" ) ) {
 				IndUnit( IUNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
@@ -419,7 +419,7 @@ namespace HVACSingleDuctInduc {
 				IndUnit( IUNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 			}
 
-			IndUnit( IUNum ).CCoil = Alphas( 11 ); // name of cooling coil object
+			IndUnit( IUNum ).CCoil = Alphas( 9 ); // name of cooling coil object
 			IsNotOK = false;
 			IndUnit( IUNum ).CWControlNode = GetCoilWaterInletNode( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, IsNotOK );
 			if ( IsNotOK ) {
@@ -435,7 +435,7 @@ namespace HVACSingleDuctInduc {
 
 			// Get the Zone Mixer name and check that it is OK
 			errFlag = false;
-			IndUnit( IUNum ).MixerName = Alphas( 12 );
+			IndUnit( IUNum ).MixerName = Alphas( 10 );
 			GetZoneMixerIndex( IndUnit( IUNum ).MixerName, IndUnit( IUNum ).Mixer_Num, errFlag, CurrentModuleObject );
 			if ( errFlag ) {
 				ShowContinueError( "...specified in " + CurrentModuleObject + " = " + IndUnit( IUNum ).Name );

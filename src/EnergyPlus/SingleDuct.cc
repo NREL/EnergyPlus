@@ -710,7 +710,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysName = Alphas( 1 );
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctCBVAVReheat;
-			Sys( SysNum ).ReheatComp = Alphas( 6 );
+			Sys( SysNum ).ReheatComp = Alphas( 5 );
 			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
@@ -722,11 +722,11 @@ namespace SingleDuct {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else if ( Sys( SysNum ).ReheatComp != "" ) {
-				ShowSevereError( "Illegal " + cAlphaFields( 6 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).ReheatName = Alphas( 7 );
+			Sys( SysNum ).ReheatName = Alphas( 6 );
 			ValidateComponent( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -795,7 +795,7 @@ namespace SingleDuct {
 				}
 				//  END IF
 			}
-			Sys( SysNum ).ReheatAirOutletNode = GetOnlySingleNode( Alphas( 8 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields( 8 ) );
+			Sys( SysNum ).ReheatAirOutletNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent, cAlphaFields( 7 ) );
 			if ( Sys( SysNum ).ReheatComp_Num == HCoilType_SteamAirHeating ) {
 				Sys( SysNum ).MaxReheatSteamVolFlow = Numbers( 3 );
 				Sys( SysNum ).MinReheatSteamVolFlow = Numbers( 4 );
@@ -842,14 +842,14 @@ namespace SingleDuct {
 				Sys( SysNum ).MaxReheatTempSetByUser = false;
 			}
 
-			ValidateComponent( Alphas( 6 ), Alphas( 7 ), IsNotOK, Sys( SysNum ).SysType );
+			ValidateComponent( Alphas( 5 ), Alphas( 6 ), IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
 			// Add reheat coil to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 6 ), Alphas( 7 ), Alphas( 3 ), Alphas( 8 ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), Alphas( 3 ), Alphas( 7 ) );
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
@@ -873,7 +873,7 @@ namespace SingleDuct {
 			Sys( SysNum ).SysName = Alphas( 1 );
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctConstVolReheat;
-			Sys( SysNum ).ReheatComp = Alphas( 6 );
+			Sys( SysNum ).ReheatComp = Alphas( 5 );
 			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
 			} else if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Electric" ) ) {
@@ -885,11 +885,11 @@ namespace SingleDuct {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else {
-				ShowSevereError( "Illegal " + cAlphaFields( 6 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).ReheatName = Alphas( 7 );
+			Sys( SysNum ).ReheatName = Alphas( 6 );
 			ValidateComponent( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -989,14 +989,14 @@ namespace SingleDuct {
 				}
 			}
 
-			ValidateComponent( Alphas( 6 ), Alphas( 7 ), IsNotOK, Sys( SysNum ).SysType );
+			ValidateComponent( Alphas( 5 ), Alphas( 6 ), IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
 
 			// Add reheat coil to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 6 ), Alphas( 7 ), Alphas( 4 ), Alphas( 3 ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), Alphas( 4 ), Alphas( 3 ) );
 
 			//Setup the Average damper Position output variable
 			// BG removed 9-10-2009 during work on CR 7770, constant volume has no damper
@@ -1231,8 +1231,8 @@ namespace SingleDuct {
 			Sys( SysNum ).SysName = Alphas( 1 );
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctVAVReheatVSFan;
-			Sys( SysNum ).ReheatComp = Alphas( 9 );
-			Sys( SysNum ).ReheatName = Alphas( 10 );
+			Sys( SysNum ).ReheatComp = Alphas( 5 );
+			Sys( SysNum ).ReheatName = Alphas( 6 );
 			IsNotOK = false;
 			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
@@ -1251,7 +1251,7 @@ namespace SingleDuct {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else if ( Sys( SysNum ).ReheatComp != "" ) {
-				ShowSevereError( "Illegal " + cAlphaFields( 9 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
@@ -1260,15 +1260,15 @@ namespace SingleDuct {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).FanType = Alphas( 7 );
+			Sys( SysNum ).FanType = Alphas( 3 );
 			if ( SameString( Sys( SysNum ).FanType, "Fan:VariableVolume" ) ) {
 				Sys( SysNum ).Fan_Num = FanType_VS;
 			} else if ( Sys( SysNum ).FanType != "" ) {
-				ShowSevereError( "Illegal " + cAlphaFields( 7 ) + " = " + Sys( SysNum ).FanType + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 3 ) + " = " + Sys( SysNum ).FanType + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).FanName = Alphas( 8 );
+			Sys( SysNum ).FanName = Alphas( 4 );
 			ValidateComponent( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -1421,9 +1421,9 @@ namespace SingleDuct {
 			}
 
 			// Add reheat coil to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 9 ), Alphas( 10 ), Alphas( 5 ), Alphas( 4 ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), NodeID( Sys( SysNum ).OutletNodeNum ), NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
 			// Add fan to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 7 ), Alphas( 8 ), Alphas( 3 ), Alphas( 5 ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 3 ), Alphas( 4 ), NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).OutletNodeNum ) );
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );
