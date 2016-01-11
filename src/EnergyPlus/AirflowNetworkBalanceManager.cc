@@ -3559,8 +3559,9 @@ namespace AirflowNetworkBalanceManager {
 			if ( !NodeFound ) {
 				if ( count <= AirflowNetworkNumOfSurfaces ) {
 					ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:MULTIZONE:SURFACE = " + AirflowNetworkLinkageData( count ).Name + " is not found" );
-				} else if ( count <= AirflowNetworkNumOfSurfaces ) {
-					ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:INTRAZONE:LINKAGE = " + AirflowNetworkLinkageData( count ).Name + " is not found" );
+				// MBA: Always false due to same boolean check but I don't know what the correct logic should be. 01/10/2016
+				// } else if ( count <= AirflowNetworkNumOfSurfaces ) {
+				// 	ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:INTRAZONE:LINKAGE = " + AirflowNetworkLinkageData( count ).Name + " is not found" );
 				} else {
 					ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:DISTRIBUTION:LINKAGE = " + AirflowNetworkLinkageData( count ).Name + " is not found in AIRFLOWNETWORK:DISTRIBUTION:NODE objects." );
 				}

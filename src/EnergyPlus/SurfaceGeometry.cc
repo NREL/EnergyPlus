@@ -7035,7 +7035,7 @@ namespace SurfaceGeometry {
 					ShowContinueError( cAlphaFieldNames( 8 ) + " in error=\"" + Material( IShadingDevice ).Name + "\"." );
 					ErrorsFound = true;
 				}
-				if ( ShTyp == WSC_ST_BetweenGlassBlind || ShTyp == WSC_ST_BetweenGlassBlind ) {
+				if ( ShTyp == WSC_ST_BetweenGlassShade || ShTyp == WSC_ST_BetweenGlassBlind ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + WindowShadingControl( ControlNum ).Name + "\" has " + cAlphaArgs( 2 ) + "= BetweenGlassShade or BetweenGlassBlind and" );
 					ShowContinueError( cAlphaFieldNames( 8 ) + " is specified. This is illegal. Specify shaded construction instead." );
 					ErrorsFound = true;

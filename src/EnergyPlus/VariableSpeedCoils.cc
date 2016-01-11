@@ -3724,7 +3724,7 @@ namespace VariableSpeedCoils {
 				//ENDIF
 			} else {
 				// sensible capacity does not have an input field
-				if ( RatedCapCoolSensDes > 0.0 && RatedCapCoolSensDes > 0.0 ) {
+				if ( RatedCapCoolSensDes > 0.0 ) {
 					VarSpeedCoil( DXCoilNum ).RatedCapCoolSens = RatedCapCoolSensDes;
 					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Sensible Cooling Capacity [W]", RatedCapCoolSensDes ); //, &
 					//                            'User-Specified Rated Sensible Cooling Capacity [W]', &
