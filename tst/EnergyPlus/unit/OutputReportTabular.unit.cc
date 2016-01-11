@@ -311,6 +311,20 @@ TEST( OutputReportTabularTest, GetColumnUsingTabs )
 
 }
 
+TEST( OutputReportTabularTest, ConfirmConvertToEscaped )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, ConfirmConvertToEscaped" );
+
+	EXPECT_EQ( "String with &gt; in it", ConvertToEscaped( "String with > in it" ) );
+	EXPECT_EQ( "String with &lt; in it", ConvertToEscaped( "String with < in it" ) );
+	EXPECT_EQ( "String with &amp; in it", ConvertToEscaped( "String with & in it" ) );
+	EXPECT_EQ( "String with &quot; in it", ConvertToEscaped( "String with \" in it" ) );
+	EXPECT_EQ( "String with &apos; in it", ConvertToEscaped( "String with ' in it" ) );
+//	EXPECT_EQ( "String with * in it", ConvertToEscaped( "String with ° in it" ) );    //degree symbol - does not work since C++ wants to substitute \ code
+//	EXPECT_EQ( "String with * in it", ConvertToEscaped( "String with \260 in it" ) ); //degree symbol - does not work since C++ wants to substitute \ code
+//	EXPECT_EQ( "String with * in it", ConvertToEscaped( "String with \xB0 in it" ) ); //degree symbol - does not work since C++ wants to substitute \ code
+}
+
 
 TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {
