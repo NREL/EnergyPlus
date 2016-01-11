@@ -4256,8 +4256,7 @@ namespace FanCoilUnits {
 		int ControlledZoneNum; // zone index
 		Real64 QZnReq; // Sensible load to be met [W]
 		Real64 QUnitOut; // delivered capacity [W]
-		Real64 MinAirFlow;
-		Real64 MaxAirFlow;
+		Real64 MaxAirFlow; // maximum fan coil fan flow rate [kg/s]
 
 		// Convert parameters to usable variables
 		FanCoilNum = int( Par( 1 ) );
