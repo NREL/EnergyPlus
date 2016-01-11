@@ -6576,30 +6576,28 @@ namespace HVACUnitarySystem {
 				if ( HeatingLoad && SensOutputOn < ZoneLoad ) {
 					UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac = 1.0;
 					UnitarySystem( UnitarySysNum ).WSHPRuntimeFrac = 1.0;
-					if ( MoistureLoad >= 0.0 || ( MoistureLoad < 0.0 && MoistureLoad < LatOutputOn ) ) return;
+					if ( MoistureLoad >= 0.0 || MoistureLoad < LatOutputOn ) return;
 				}
-				if ( ! HeatingLoad && ( MoistureLoad >= 0.0 || ( MoistureLoad < 0.0 && MoistureLoad < LatOutputOn ) ) ) return;
+				if ( ! HeatingLoad && ( MoistureLoad >= 0.0 || MoistureLoad < LatOutputOn ) ) return;
 			} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
 				if ( CoolingLoad && SensOutputOn > ZoneLoad ) {
 					UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = 1.0;
 					UnitarySystem( UnitarySysNum ).WSHPRuntimeFrac = 1.0;
-					if ( MoistureLoad >= 0.0 || ( MoistureLoad < 0.0 && MoistureLoad < LatOutputOn ) ) return;
+					if ( MoistureLoad >= 0.0 || MoistureLoad < LatOutputOn ) return;
 				}
-				if ( ! CoolingLoad && ( MoistureLoad >= 0.0 || ( MoistureLoad < 0.0 && MoistureLoad < LatOutputOn ) ) ) return;
+				if ( ! CoolingLoad && ( MoistureLoad >= 0.0 || MoistureLoad < LatOutputOn ) ) return;
 			} else if ( ( SELECT_CASE_var == SingleHeatCoolSetPoint ) || ( SELECT_CASE_var == DualSetPointWithDeadBand ) ) {
 				if ( HeatingLoad && SensOutputOn < ZoneLoad ) {
 					UnitarySystem( UnitarySysNum ).HeatingPartLoadFrac = 1.0;
 					UnitarySystem( UnitarySysNum ).WSHPRuntimeFrac = 1.0;
-					if ( MoistureLoad >= 0.0 || ( MoistureLoad < 0.0 && MoistureLoad > LatOutputOn ) ) {
-						return;
-					}
+					if ( MoistureLoad >= 0.0 || MoistureLoad > LatOutputOn ) return;
 				}
 				if ( CoolingLoad && SensOutputOn > ZoneLoad ) {
 					UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = 1.0;
 					UnitarySystem( UnitarySysNum ).WSHPRuntimeFrac = 1.0;
 					return;
 				}
-				if ( ! HeatingLoad && ! CoolingLoad && ( MoistureLoad >= 0.0 || ( MoistureLoad < 0.0 && MoistureLoad < LatOutputOn ) ) ) {
+				if ( ! HeatingLoad && ! CoolingLoad && ( MoistureLoad >= 0.0 || MoistureLoad < LatOutputOn ) ) {
 					return;
 				}
 			} else {
@@ -6886,7 +6884,7 @@ namespace HVACUnitarySystem {
 		FullSensibleOutput = TempSensOutput;
 
 		// RETURN if the moisture load is met
-		if ( MoistureLoad >= 0.0 || ( MoistureLoad < 0.0 && MoistureLoad >= TempLatOutput ) ) return;
+		if ( MoistureLoad >= 0.0 || MoistureLoad >= TempLatOutput ) return;
 		// Multimode does not meet the latent load, only the sensible load with or without HX active
 		if ( ! CoolingLoad && UnitarySystem( UnitarySysNum ).DehumidControlType_Num == DehumidControl_Multimode ) return;
 		//  IF(HeatingLoad .AND. UnitarySystem(UnitarySysNum)%DehumidControlType_Num .EQ. DehumidControl_CoolReheat)RETURN

@@ -5034,7 +5034,7 @@ namespace PlantPipingSystemsManager {
 					LeftRegionExtent = ThesePartitionRegions( Index - 1 ).Max;
 				}
 				// Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ). Do not add a mesh region to the left of ThesePartitionRegions( 1 ).-SA
-				if ( !PipingSystemDomains( DomainNum ).HasCoupledBasement || ( PipingSystemDomains( DomainNum ).HasCoupledBasement && ( Index == 0 || Index == 2 ) ) ) {
+				if ( ! PipingSystemDomains( DomainNum ).HasCoupledBasement || ( Index == 0 || Index == 2 ) ) {
 					//'add a mesh region to the "left" of the partition
 					++PreviousUbound;
 					TempRegions( PreviousUbound ) = TempGridRegionData( LeftRegionExtent, ThisRegion.Min, DirDirection );
