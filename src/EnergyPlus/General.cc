@@ -2909,7 +2909,7 @@ namespace General {
 		// string but in this case the output string is a fixed size so this is more
 		// clear for formatting and faster. If formatted string changes, make sure to
 		// add more to buffer.
-		char buffer[ 11 ];
+		static char buffer[ 11 ];
 		int cx = snprintf( buffer, 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds );
 
 		// Make sure output string is only between 0 and 10 characters so string is

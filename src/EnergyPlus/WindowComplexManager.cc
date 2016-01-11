@@ -247,7 +247,9 @@ namespace WindowComplexManager {
 			int State; // State in which basis first occurs
 
 			// Default Constructor
-			TempBasisIdx()
+			TempBasisIdx() :
+			Basis( 0 ),
+			State( 0 )
 			{}
 
 		};
@@ -1665,7 +1667,10 @@ namespace WindowComplexManager {
 			Real64 HitDsq; // Squared distance to the current hit pt
 
 			// Default Constructor
-			BackHitList()
+			BackHitList() :
+			KBkSurf( 0 ),
+			HitSurf( 0 ),
+			HitDsq( 0.0 )
 			{}
 
 		};
