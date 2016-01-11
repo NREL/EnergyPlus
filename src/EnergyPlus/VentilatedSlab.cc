@@ -911,6 +911,7 @@ namespace VentilatedSlab {
 					} else {
 						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 27 ) + "=\"" + cAlphaArgs( 27 ) + "\"." );
 						ErrorsFound = true;
+						errFlag = true;
 					}}
 					if ( ! errFlag ) {
 						VentSlab( Item ).HCoilName = cAlphaArgs( 28 );

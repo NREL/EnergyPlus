@@ -4378,10 +4378,6 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
-						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgVertical ) { // = 91
-							this_component.FlowCtrl = ControlType_Active;
-							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );
 
