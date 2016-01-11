@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -87,6 +145,7 @@ namespace RuntimeLanguageProcessor {
 	bool GetInput( true );
 	bool InitializeOnce( true );
 	bool MyEnvrnFlag( true );
+	bool AlreadyDidOnce( false );
 
 	// index pointer references to dynamic built-in variables
 	int NullVariableNum( 0 );
@@ -132,6 +191,7 @@ namespace RuntimeLanguageProcessor {
 		GetInput =  true ;
 		InitializeOnce = true ;
 		MyEnvrnFlag = true ;
+		AlreadyDidOnce = false;
 
 		NullVariableNum = 0;
 		FalseVariableNum = 0;
@@ -1114,6 +1174,8 @@ namespace RuntimeLanguageProcessor {
 		bool PeriodFound;
 		bool MinusFound;
 		bool PlusFound;
+		bool MultFound;
+		bool DivFound;
 		bool ErrorFlag;
 		bool OperatorProcessing;
 		int CountDoLooping;
@@ -1142,9 +1204,13 @@ namespace RuntimeLanguageProcessor {
 		} else if ( String[ 0 ] == '+' ) {
 			String = "0" + String;
 		}
-		std::string::size_type const LastPos( String.length() );
+		std::string::size_type LastPos( String.length() );
 		Pos = 0;
-		while ( Pos < LastPos ) {
+		OperatorProcessing = false; // true when an operator is found until terminated by non-operator
+		MinusFound = false;
+		MultFound = false;
+		DivFound = false;
+		while( Pos < LastPos ) {
 			++CountDoLooping;
 			if ( CountDoLooping > MaxDoLoopCounts ) {
 				ShowSevereError( "EMS ParseExpression: Entity=" + ErlStack( StackNum ).Name );
@@ -1164,16 +1230,18 @@ namespace RuntimeLanguageProcessor {
 			// Get the next token
 			StringToken = "";
 			PeriodFound = false;
-			MinusFound = false;
 			PlusFound = false;
-			OperatorProcessing = false; // true when an operator is found until terminated by non-operator
 			ErrorFlag = false;
 			LastED = false;
 			if ( is_any_of( NextChar, "0123456789." ) ) {
 				// Parse a number literal token
 				++Pos;
 				StringToken += NextChar;
-				if ( NextChar == '.' ) PeriodFound = true;
+				OperatorProcessing = false;
+				MultFound = false;
+				DivFound = false;
+
+				if( NextChar == '.' ) PeriodFound = true;
 
 				while ( Pos < LastPos ) {
 					NextChar = String[ Pos ];
@@ -1216,6 +1284,7 @@ namespace RuntimeLanguageProcessor {
 							++Pos;
 							LastED = false;
 						} else {
+							// +/- will be processed on next pass, nothing needs to be done after a numeral
 							break;
 						}
 					} else if ( is_any_of( NextChar, " +-*/^=<>)" ) ) { // Any binary operator is okay
@@ -1234,7 +1303,10 @@ namespace RuntimeLanguageProcessor {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "Number=\"" + StringToken + "\"";
 					Token( NumTokens ).Number = ProcessNumber( StringToken, ErrorFlag );
 					if ( DeveloperFlag && ErrorFlag ) gio::write( OutputFileDebug, fmtA ) << "Numeric error flagged";
-					if ( MinusFound ) Token( NumTokens ).Number = -Token( NumTokens ).Number;
+					if ( MinusFound ) {
+						Token( NumTokens ).Number = -Token( NumTokens ).Number;
+						MinusFound = false;
+					}
 					if ( ErrorFlag ) {
 						// Error: something wrong with this number!
 						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
@@ -1250,6 +1322,8 @@ namespace RuntimeLanguageProcessor {
 				++Pos;
 				StringToken += NextChar;
 				OperatorProcessing = false;
+				MultFound = false;
+				DivFound = false;
 
 				while ( Pos < LastPos ) {
 					NextChar = String[ Pos ];
@@ -1272,9 +1346,39 @@ namespace RuntimeLanguageProcessor {
 
 			} else if ( is_any_of( NextChar, "+-*/^=<>@|&" ) ) {
 				// Parse an operator token
-				StringToken = NextChar;
-
-				Token( NumTokens ).Type = TokenOperator;
+				if ( NextChar == '-' ) {
+					StringToken = "-";
+					if ( MultFound ) {
+						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
+						ShowContinueError( "...Line = \"" + Line + "\"." );
+						ShowContinueError( "...Minus sign used on the right side of multiplication sign." );
+						ShowContinueError( "...Use parenthesis to wrap appropriate variables. For example, X * ( -Y )." );
+						++NumErrors;
+						MultFound = false;
+					} else if ( DivFound ) {
+						ShowSevereError( "EMS Parse Expression, for \"" + ErlStack( StackNum ).Name + "\"." );
+						ShowContinueError( "...Line = \"" + Line + "\"." );
+						ShowContinueError( "...Minus sign used on the right side of division sign." );
+						ShowContinueError( "...Use parenthesis to wrap appropriate variables. For example, X / ( -Y )." );
+						++NumErrors;
+						DivFound = false;
+					} else if ( OperatorProcessing && ( NextChar == '-' ) ) {
+						// if operator was deterined last pass and this character is a -, then insert a 0 before the minus and treat as subtraction
+						// example: change "Var == -1" to "Var == 0-1" 
+						OperatorProcessing = false;
+						String.insert( Pos, "0" );
+						++LastPos;
+						StringToken = "0";
+						MultFound = false;
+						DivFound = false;
+					} else {
+						StringToken = NextChar;
+						Token( NumTokens ).Type = TokenOperator;
+					}
+				} else { // any other character process as operator
+					StringToken = NextChar;
+					Token( NumTokens ).Type = TokenOperator;
+				}
 
 				// First check for two character operators:  == <> <= >=
 				std::string const cc( String.substr( Pos, 2 ) );
@@ -1282,31 +1386,37 @@ namespace RuntimeLanguageProcessor {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "<>" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorNotEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "<=" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLessOrEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == ">=" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorGreaterOrEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "||" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatiorLogicalOR;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 				} else if ( cc == "&&" ) {
 					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLogicalAND;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
+					OperatorProcessing = true;
 					++Pos;
 					// next check for builtin functions signaled by "@"
 				} else if ( String[ Pos ] == '@' ) {
@@ -1583,7 +1693,10 @@ namespace RuntimeLanguageProcessor {
 				} else {
 					// Check for remaining single character operators
 					Token( NumTokens ).String = StringToken;
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + StringToken + "\"";
+					MultFound = false;
+					DivFound = false;
+
+					if( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + StringToken + "\"";
 
 					if ( StringToken == "+" ) {
 						if ( ! OperatorProcessing ) {
@@ -1603,9 +1716,11 @@ namespace RuntimeLanguageProcessor {
 						}
 					} else if ( StringToken == "*" ) {
 						Token( NumTokens ).Operator = OperatorMultiply;
+						MultFound = true;
 						OperatorProcessing = true;
 					} else if ( StringToken == "/" ) {
 						Token( NumTokens ).Operator = OperatorDivide;
+						DivFound = true;
 						OperatorProcessing = true;
 					} else if ( StringToken == "<" ) {
 						Token( NumTokens ).Operator = OperatorLessThan;
@@ -1616,6 +1731,10 @@ namespace RuntimeLanguageProcessor {
 					} else if ( StringToken == "^" ) {
 						Token( NumTokens ).Operator = OperatorRaiseToPower;
 						OperatorProcessing = true;
+					} else if( StringToken == "0" && ( NextChar == '-' ) ) {
+						// process string insert = "0"
+						Token( NumTokens ).Type = TokenNumber;
+						Token( NumTokens ).String = StringToken;
 					} else {
 						// Uh OH, this should never happen! throw error
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR \"" + StringToken + "\"";
@@ -1633,7 +1752,10 @@ namespace RuntimeLanguageProcessor {
 				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "PAREN \"" + StringToken + "\"";
 				Token( NumTokens ).Type = TokenParenthesis;
 				Token( NumTokens ).String = StringToken;
-				if ( NextChar == '(' ) Token( NumTokens ).Parenthesis = ParenthesisLeft;
+				if ( NextChar == '(' ) {
+					Token( NumTokens ).Parenthesis = ParenthesisLeft;
+					OperatorProcessing = true;
+				}
 				if ( NextChar == ')' ) Token( NumTokens ).Parenthesis = ParenthesisRight;
 
 			} else if ( is_any_of( NextChar, "\"" ) ) {
@@ -3699,7 +3821,6 @@ namespace RuntimeLanguageProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool AlreadyDidOnce( false );
 
 		if ( AlreadyDidOnce ) return;
 
@@ -4079,29 +4200,6 @@ namespace RuntimeLanguageProcessor {
 		return isExternalInterfaceVar;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // RuntimeLanguageProcessor
 

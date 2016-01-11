@@ -13,8 +13,10 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
-  ChillerElectricEIR.unit.cc;
-  CondenserLoopTowers.unit.cc;
+  BranchNodeConnections.unit.cc
+  ChillerElectricEIR.unit.cc
+  ChillerIndirectAbsorption.unit.cc
+  CondenserLoopTowers.unit.cc
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
@@ -55,6 +57,7 @@ set( test_src
   NodeInputManager.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantUtilities.unit.cc
+  Pumps.unit.cc
   PurchasedAirManager.unit.cc
   OutdoorAirUnit.unit.cc
   OutputProcessor.unit.cc

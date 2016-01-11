@@ -1,4 +1,63 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <string>
@@ -210,6 +269,101 @@ namespace WindowManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		wle = Array1D< Real64 >( nume, { 0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800, 0.3900, 0.4000, 0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200, 0.5300, 0.5400, 0.5500, 0.5700, 0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400, 0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000, 0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150, 0.9250, 0.9300, 0.9370, 0.9480, 0.9650, 0.9800, 0.9935, 1.0400, 1.0700, 1.1000, 1.1200, 1.1300, 1.1370, 1.1610, 1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770, 1.4970, 1.5200, 1.5390, 1.5580, 1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850, 2.0050, 2.0350, 2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370 } );
+		e = Array1D< Real64 >( nume, { 0.0, 9.5, 42.3, 107.8, 181.0, 246.0, 395.3, 390.1, 435.3, 438.9, 483.7, 520.3, 666.2, 712.5, 720.7, 1013.1, 1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9, 1572.4, 1550.7, 1561.5, 1501.5, 1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2, 1193.9, 1175.5, 643.1, 1030.7, 1131.1, 1081.6, 849.2, 785.0, 916.4, 959.9, 978.9, 933.2, 748.5, 667.5, 690.3, 403.6, 258.3, 313.6, 526.8, 646.4, 746.8, 690.5, 637.5, 412.6, 108.9, 189.1, 132.2, 339.0, 460.0, 423.6, 480.5, 413.1, 250.2, 32.5, 1.6, 55.7, 105.1, 105.5, 182.1, 262.2, 274.2, 275.0, 244.6, 247.4, 228.7, 244.5, 234.8, 220.5, 171.5, 30.7, 2.0, 1.2, 21.2, 91.1, 26.8, 99.5, 60.4, 89.1, 82.2, 71.5, 70.2, 62.0, 21.2, 18.5, 3.2 } );
+		wlt3 = Array1D< Real64 >( numt3, { 0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445, 0.450, 0.455, 0.460, 0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515, 0.520, 0.525, 0.530, 0.535, 0.540, 0.545, 0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585, 0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630, 0.635, 0.640, 0.645, 0.650, 0.655, 0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715, 0.720, 0.725, 0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780 } );
+		y30 = Array1D< Real64 >( numt3, { 0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298, 0.0380, 0.0480, 0.0600, 0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082, 0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803, 0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163, 0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650, 0.2170, 0.1750, 0.1382, 0.1070, 0.0816, 0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015, 0.0010, 0.0007, 0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000 } );
+		ngllayer = 0;
+		nglface = 0;
+		nglfacep = 0;
+		tout = 0.0;
+		tin = 0.0;
+		tilt = 0.0;
+		tiltr = 0.0;
+		hcin = 0.0;
+		hcout = 0.0;
+		Ebout = 0.0;
+		Outir = 0.0;
+		Rmir = 0.0;
+		Rtot = 0.0;
+		gcon = Array3D< Real64 >( 3, 5, 5, 0.0 );
+		gvis = Array3D< Real64 >( 3, 5, 5, 0.0 );
+		gcp = Array3D< Real64 >( 3, 5, 5, 0.0 );
+		gwght = Array2D< Real64 >( 5, 5, 0.0 );
+		gfract = Array2D< Real64 >( 5, 5, 0.0 );
+		gnmix = Array1D_int( 5, 0 );
+		gap = Array1D< Real64 >( 5, 0.0 );
+		thick = Array1D< Real64 >( 5, 0.0 );
+		scon = Array1D< Real64 >( 5, 0.0 );
+		tir = Array1D< Real64 >( 10, 0.0 );
+		emis = Array1D< Real64 >( 10, 0.0 );
+		rir = Array1D< Real64 >( 10, 0.0 );
+		AbsRadGlassFace = Array1D< Real64 >( 10, 0.0 );
+		thetas = Array1D< Real64 >( 10, 0.0 );
+		thetasPrev = Array1D< Real64 >( 10, 0.0 );
+		fvec = Array1D< Real64 >( 10, 0.0 );
+		fjac = Array2D< Real64 >( 10, 10, 0.0 );
+		dtheta = Array1D< Real64 >( 5, 0.0 );
+		zir = Array2D< Real64 >( 10, 10, 0.0 );
+		ziri = Array2D< Real64 >( 10, 10, 0.0 );
+		ddeldt = Array2D< Real64 >( 10, 10, 0.0 );
+		dtddel = Array2D< Real64 >( 10, 10, 0.0 );
+		qf = Array1D< Real64 >( 10, 0.0 );
+		hf = Array1D< Real64 >( 10, 0.0 );
+		der = Array2D< Real64 >( 5, 10, 0.0 );
+		dhf = Array2D< Real64 >( 5, 10, 0.0 );
+		sour = Array1D< Real64 >( 10, 0.0 );
+		delta = Array1D< Real64 >( 5, 0.0 );
+		hcgap = Array1D< Real64 >( 5, 0.0 );
+		hrgap = Array1D< Real64 >( 5, 0.0 );
+		rgap = Array1D< Real64 >( 6, 0.0 );
+		rs = Array1D< Real64 >( 6, 0.0 );
+		arhs = Array1D< Real64 >( 6, 0.0 );
+		A23P = 0.0;
+		A32P = 0.0;
+		A45P = 0.0;
+		A54P = 0.0;
+		A67P = 0.0;
+		A76P = 0.0;
+		A23 = 0.0;
+		A45 = 0.0;
+		A67 = 0.0;
+		wlt = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		t = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		rff = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		rbb = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		tPhi = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		rfPhi = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		rbPhi = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		tadjPhi = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		rfadjPhi = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		rbadjPhi = Array2D< Real64 >( 5, MaxSpectralDataElements, 0.0 );
+		numpt = Array1D_int( 5, 0 );
+		stPhi = Array1D< Real64 >( nume, 0.0 );
+		srfPhi = Array1D< Real64 >( nume, 0.0 );
+		srbPhi = Array1D< Real64 >( nume, 0.0 );
+		saPhi = Array2D< Real64 >( 5, nume, 0.0 );
+		top = Array2D< Real64 >( 5, 5, 0.0 );
+		rfop = Array2D< Real64 >( 5, 5, 0.0 );
+		rbop = Array2D< Real64 >( 5, 5, 0.0 );
+		IndepVarCurveFit = Array1D< Real64 >( 10, 0.0 );
+		DepVarCurveFit = Array1D< Real64 >( 10, 0.0 );
+		CoeffsCurveFit = Array1D< Real64 >( 6, 0.0 );
+		tsolPhi = Array1D< Real64 >( 10, 0.0 );
+		rfsolPhi = Array1D< Real64 >( 10, 0.0 );
+		rbsolPhi = Array1D< Real64 >( 10, 0.0 );
+		solabsPhi = Array2D< Real64 >( 5, 10, 0.0 );
+		solabsBackPhi = Array2D< Real64 >( 5, 10, 0.0 );
+		solabsShadePhi = Array1D< Real64 >( 10, 0.0 );
+		tvisPhi = Array1D< Real64 >( 10, 0.0 );
+		rfvisPhi = Array1D< Real64 >( 10, 0.0 );
+		rbvisPhi = Array1D< Real64 >( 10, 0.0 );
+		CosPhiIndepVar = Array1D< Real64 >( 10, 0.0 );
+	}
 
 	void
 	InitGlassOpticalCalculations()
@@ -7155,9 +7309,9 @@ namespace WindowManager {
 		//    EXIT
 		//  ENDDO
 
-		if ( any( Construct.TypeIsWindow() ) ) HasWindows = true;
-		if ( any( Construct.WindowTypeBSDF() ) ) HasComplexWindows = true; // Yes, this is a bit different than actually using them.
-		if ( any( Construct.WindowTypeEQL() ) ) HasEQLWindows = true; // for reporting purpose only
+		if ( std::any_of( Construct.begin(), Construct.end(), []( ConstructionData const & e ){ return e.TypeIsWindow; } ) ) HasWindows = true;
+		if ( std::any_of( Construct.begin(), Construct.end(), []( ConstructionData const & e ){ return e.WindowTypeBSDF; } ) ) HasComplexWindows = true; // Yes, this is a bit different than actually using them.
+		if ( std::any_of( Construct.begin(), Construct.end(), []( ConstructionData const & e ){ return e.WindowTypeEQL; } ) ) HasEQLWindows = true; // for reporting purpose only
 
 		//  DO ThisNum=1,TotSurfaces
 		//    SurfConstr = Surface(ThisNum)%Construction
@@ -8863,29 +9017,6 @@ Label99999: ;
 	}
 
 	//*****************************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // WindowManager
 
