@@ -148,7 +148,6 @@ public: // Creation
 		assert( valid() );
 	}
 
-
 	// Destructor
 	~SurfaceOctreeCube()
 	{

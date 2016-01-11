@@ -65,6 +65,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <limits>
+#include <tuple>
 
 namespace EnergyPlus {
 
@@ -331,6 +333,9 @@ namespace DataSurfaces {
 	int const WindowBSDFModel( 101 ); // indicates complex fenestration window 6 implementation
 	int const WindowEQLModel( 102 ); // indicates equivalent layer winodw model implementation
 
+	// Parameters for PierceSurface
+	std::size_t const nVerticesBig( 20 ); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// Definitions used for scheduled surface gains
@@ -508,12 +513,13 @@ namespace DataSurfaces {
 			vl( vl ),
 			vu( vu )
 		{
-			assert( vertices.size() >= 3 );
+			size_type const n( vertices.size() );
+			assert( n >= 3 );
 
 			// Reverse vertices order if clockwise
 			// If sorting by y for slab method can detect clockwise faster by just comparing edges at bottom or top-most vertex
 			Real64 area( 0.0 ); // Actually 2x the signed area
-			for ( Vertices::size_type i = 0, n = vertices.size(); i < n; ++i ) {
+			for ( Vertices::size_type i = 0; i < n; ++i ) {
 				Vector2D const & v( vertices[ i ] );
 				Vector2D const & w( vertices[ ( i + 1 ) % n ] );
 				area += ( v.x * w.y ) - ( w.x * v.y );
@@ -521,14 +527,82 @@ namespace DataSurfaces {
 			if ( area < 0.0 ) std::reverse( vertices.begin() + 1, vertices.end() ); // Vertices in clockwise order: Reverse all but first
 
 			// Set up edge vectors for ray--surface intersection tests
-			edges.reserve( vertices.size() );
-			for ( Vertices::size_type i = 0, n = vertices.size(); i < n; ++i ) {
+			edges.reserve( n );
+			for ( Vertices::size_type i = 0; i < n; ++i ) {
 				edges.push_back( vertices[ ( i + 1 ) % n ] - vertices[ i ] );
 			}
 			if ( shapeCat == ShapeCat::Rectangular ) { // Set side length squared for ray--surface intersection tests
-				assert( vertices.size() == 4u );
+				assert( n == 4u );
 				s1 = edges[ 0 ].magnitude_squared();
 				s3 = edges[ 3 ].magnitude_squared();
+			} else if ( ( shapeCat == ShapeCat::Nonconvex ) || ( n >= nVerticesBig ) ) { // Set up slabs
+				assert( n >= 4u );
+				slabYs.reserve( n );
+				for ( size_type i = 0; i < n; ++i ) slabYs.push_back( vertices[ i ].y );
+				std::sort( slabYs.begin(), slabYs.end() ); // Sort the vertex y coordinates
+				auto const iClip( std::unique( slabYs.begin(), slabYs.end() ) ); // Remove duplicate y-coordinate elements
+				slabYs.erase( iClip, slabYs.end() );
+				slabYs.shrink_to_fit();
+				for ( size_type iSlab = 0, iSlab_end = slabYs.size() - 1; iSlab < iSlab_end; ++iSlab ) { // Create slabs
+					Real64 xl( std::numeric_limits< Real64 >::max() );
+					Real64 xu( std::numeric_limits< Real64 >::lowest() );
+					Real64 const yl( slabYs[ iSlab ] );
+					Real64 const yu( slabYs[ iSlab + 1 ] );
+					slabs.push_back( Slab( yl, yu ) );
+					Slab & slab( slabs.back() );
+					using CrossEdge = std::tuple< Real64, Real64, size_type >;
+					using CrossEdges = std::vector< CrossEdge >;
+					CrossEdges crossEdges;
+					for ( size_type i = 0; i < n; ++i ) { // Find edges crossing slab
+						Vector2D const & v( vertices[ i ] );
+						Vector2D const & w( vertices[ ( i + 1 ) % n ] );
+						if (
+						 ( ( v.y <= yl ) && ( yu <= w.y ) ) || // Crosses upward
+						 ( ( yu <= v.y ) && ( w.y <= yl ) ) ) // Crosses downward
+						{
+							Edge const & e( edges[ i ] );
+							assert( e.y != 0.0 );
+							Real64 const exy( e.x / e.y );
+							Real64 const xb( v.x + ( yl - v.y ) * exy ); // x_bot coordinate where edge intersects yl
+							Real64 const xt( v.x + ( yu - v.y ) * exy ); // x_top coordinate where edge intersects yu
+							xl = std::min( xl, std::min( xb, xt ) );
+							xu = std::max( xu, std::max( xb, xt ) );
+							crossEdges.push_back( std::make_tuple( xb, xt, i ) );
+						}
+					}
+					slab.xl = xl;
+					slab.xu = xu;
+					assert( crossEdges.size() >= 2u );
+					std::sort( crossEdges.begin(), crossEdges.end(),
+					 []( CrossEdge const & e1, CrossEdge const & e2 ) -> bool // Lambda to sort by x_mid
+						{
+							return std::get< 0 >( e1 ) + std::get< 1 >( e1 ) < std::get< 0 >( e2 ) + std::get< 1 >( e2 ); // Sort edges by x_mid: x_bot or x_top could have repeats with shared vertex
+						}
+					);
+#ifndef NDEBUG // Check x_bot and x_top are also sorted
+					Real64 xb( std::get< 0 >( crossEdges[ 0 ] ) );
+					Real64 xt( std::get< 1 >( crossEdges[ 0 ] ) );
+					Real64 const tol( 1.0e-9 * std::max( std::abs( xl ), std::abs( xu ) ) ); // EnergyPlus vertex precision is not tight so tolerance isn't either
+					for ( auto const & edge: crossEdges ) { // Detect non-simple polygon with crossing edges
+						Real64 const xbe( std::get< 0 >( edge ) );
+						Real64 const xte( std::get< 1 >( edge ) );
+						assert( xb <= xbe + tol );
+						assert( xt <= xte + tol );
+						xb = xbe;
+						xt = xte;
+					}
+#endif
+					assert( ( shapeCat == ShapeCat::Nonconvex ) || ( crossEdges.size() == 2 ) );
+					for ( auto const & edge: crossEdges ) {
+						size_type const iEdge( std::get< 2 >( edge ) );
+						slab.edges.push_back( iEdge ); // Add edge to slab
+						Vector2D const & e( edges[ iEdge ] );
+						assert( e.y != 0.0 ); // Constant y edge can't be a crossing edge
+						slab.edgesXY.push_back( e.y != 0.0 ? e.x / e.y : 0.0 ); // Edge inverse slope
+					}
+					assert( slab.edges.size() %2 == 0u );
+					assert( slab.edges.size() == slab.edgesXY.size() );
+				}
 			}
 		}
 

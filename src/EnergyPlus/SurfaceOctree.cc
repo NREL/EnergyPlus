@@ -209,8 +209,7 @@ namespace EnergyPlus {
 	surfaceBranch( Surface & surface )
 	{
 		Real const h( 0.5 * w_ ); // Half-width
-		Vertex sl( 0.0 ), su( 0.0 ); // Surface bounding box corners
-		sl = su = surface.Vertex[ 0 ]; // Initialize corners to first vertex of first surface
+		Vertex sl( surface.Vertex[ 0 ] ), su( surface.Vertex[ 0 ] ); // Surface bounding box corners
 		auto const & vertices( surface.Vertex ); // Surface vertices
 		for ( auto const & vertex : vertices ) { // Expand bounding box to hold surface vertices
 			sl.min( vertex );

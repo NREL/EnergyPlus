@@ -70,7 +70,7 @@
 // Notes:
 //  This is filling the role of the former PierceSurface function authored by Fred Winkelmann and based on
 //   DOE-2.1E subroutine DPIERC and some aspects of this version are analogous
-//  To match the former behavior ray's with origin exactly on the surface are treated as not hitting
+//  To match the former behavior rays with origin exactly on the surface are treated as not hitting
 //  These functions are VERY performance critical for daylighting and solar reflection
 //   This high-performance implementation was built to complement the octree system for scalability of those systems
 //  This has been carefully designed for speed but is probably not be optimal yet
@@ -90,6 +90,7 @@
 #include <ObjexxFCL/Vector4.hh>
 
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <limits>
 
@@ -139,6 +140,7 @@ PierceSurface_Convex(
 	//
 	// Notes:
 	//  Pulled this rare case out into separate function to facilitate inlining
+	//  This is O( n ) complexity so it is isn't used for many-vertex surfaces
 
 	using DataSurfaces::Surface2D;
 	Surface2D::Vertices const & vs( s2d.vertices ); // 2D surface vertices
@@ -171,6 +173,100 @@ PierceSurface_Convex(
 	}
 }
 
+inline
+void
+PierceSurface_Nonconvex(
+	DataSurfaces::Surface2D const & s2d, // 2D surface
+	Vector2< Real64 > const & h2d, // 2D hit point
+	bool & hit // Ray intersects surface?
+)
+{
+	// Purpose: Check if a 2D hit point is in a 2D possibly nonconvex surface
+	//
+	// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+	//
+	// History:
+	//  Jan 2016: Initial release
+	//
+	// Notes:
+	//  Pulled this rare case out into separate function to facilitate inlining
+	//  This works for nonconvex "simple" (no edge crossings) polygons
+	//  This is also a fast O( log n ) algorithm for many-vertex convex surfaces
+
+	using DataSurfaces::Surface2D;
+	using size_type = Surface2D::Vertices::size_type;
+	using Slab = DataSurfaces::Surface2DSlab;
+	using Vertex2D = Vector2< Real64 >;
+	assert( s2d.vertices.size() >= 3u );
+	Surface2D::Slabs const & slabs( s2d.slabs ); // 2D surface y slice slabs
+	Surface2D::SlabYs const & slabYs( s2d.slabYs ); // 2D surface slab y coordinates
+	assert( slabYs.size() > 0u );
+	Real64 const yHit( h2d.y ); // Hit point y coordinate
+
+	// Find slab with y range containing hit point
+	auto const iHit( std::lower_bound( slabYs.begin(), slabYs.end(), yHit ) );
+	assert( ( yHit >= slabYs.front() ) && ( yHit <= slabYs.back() ) ); // Passed bounding box check so hit point in slabs y range
+	assert( iHit != slabYs.end() ); // Hit point can't be above all slabs: passed bounding box check
+	size_type const iSlab( std::min( static_cast< size_type >( iHit - 1 - slabYs.begin() ), slabs.size() ) ); // Hit slab index
+	Slab const & slab( slabs[ iSlab ] );
+
+	// Check hit point within slab bounding box x range
+	Real64 const xHit( h2d.x ); // Hit point x coordinate
+	if ( ( xHit < slab.xl ) || ( xHit > slab.xu ) ) return; // Hit point outside slab bounding box
+
+	// Find edge pair surrounding hit point
+	Slab::Edges const & slabEdges( slab.edges );
+	Slab::EdgesXY const & slabEdgesXY( slab.edgesXY );
+	size_type const nEdges( slabEdges.size() );
+	assert( nEdges >= 2u );
+	if ( nEdges == 2 ) { // 2 edges
+		Slab::Edge const se0( slabEdges[ 0 ] );
+		Slab::EdgeXY const eXY0( slabEdgesXY[ 0 ] );
+		Vertex2D v0( s2d.vertices[ se0 ] );
+		Surface2D::Edge e0( s2d.edges[ se0 ] );
+		Real64 const x0( v0.x + ( yHit - v0.y ) * eXY0 );
+		if ( xHit < x0 ) return; // Hit point x is left of left edge
+		Slab::Edge const se1( slabEdges[ 1 ] );
+		Slab::EdgeXY const eXY1( slabEdgesXY[ 1 ] );
+		Vertex2D v1( s2d.vertices[ se1 ] );
+		Surface2D::Edge e1( s2d.edges[ se1 ] );
+		Real64 const x1( v1.x + ( yHit - v1.y ) * eXY1 );
+		if ( x1 < xHit ) return; // Hit point is right of right edge
+	} else { // 4+ edges: Binary search for edges surrounding hit point
+		assert( nEdges >= 4u );
+		assert( nEdges % 2 == 0u );
+		size_type l( 0u ), u( nEdges - 1 );
+		Slab::Edge const il( slabEdges[ l ] );
+		Slab::EdgeXY const eXYl( slabEdgesXY[ l ] );
+		Vertex2D const & vl( s2d.vertices[ il ] );
+		Surface2D::Edge const el( s2d.edges[ il ] );
+		Real64 const xl( vl.x + ( yHit - vl.y ) * eXYl );
+		if ( xHit < xl ) return; // Hit point x is left of leftmost edge
+		Slab::Edge const iu( slabEdges[ u ] );
+		Slab::EdgeXY const eXYu( slabEdgesXY[ u ] );
+		Vertex2D const & vu( s2d.vertices[ iu ] );
+		Surface2D::Edge const eu( s2d.edges[ iu ] );
+		Real64 const xu( vu.x + ( yHit - vu.y ) * eXYu );
+		if ( xu < xHit ) return; // Hit point is right of rightmost edge
+		while ( u - l > 1u ) {
+			size_type const m( ( l + u ) / 2 );
+			Slab::Edge const im( slabEdges[ m ] );
+			Slab::EdgeXY const eXYm( slabEdgesXY[ m ] );
+			Vertex2D const & vm( s2d.vertices[ im ] );
+			Surface2D::Edge const em( s2d.edges[ im ] );
+			Real64 xm( vm.x + ( yHit - vm.y ) * eXYm );
+			if ( xHit <= xm ) {
+				u = m;
+			} else {
+				l = m;
+			}
+		}
+		assert( u - l == 1u );
+		if ( u % 2 == 0u ) return; // Outside of nonconvex surface polygon
+	}
+	hit = true;
+}
+
 ALWAYS_INLINE
 void
 PierceSurface_polygon(
@@ -187,7 +283,8 @@ PierceSurface_polygon(
 	//  Jan 2016: Initial release
 
 	using DataSurfaces::Surface2D;
-	using Vertex2D = ObjexxFCL::Vector2< Real64 >;
+	using DataSurfaces::nVerticesBig;
+	using Vertex2D = Vector2< Real64 >;
 	Surface2D const & s2d( surface.surface2d );
 	int const axis( s2d.axis );
 	Vertex2D const h2d( axis == 0 ? hitPt.y : hitPt.x, axis == 2 ? hitPt.y : hitPt.z ); // Hit point in 2D surface's plane
@@ -202,10 +299,10 @@ PierceSurface_polygon(
 		hit = true;
 	} else if ( shapeCat == ShapeCat::Triangular ) { // Cross products all nonnegative <=> Hit point in triangle
 		PierceSurface_Triangular( s2d, h2d, hit );
-	} else if ( shapeCat == ShapeCat::Convex ) { // This is O( n ): For sufficiently large n should use O( log n ) slab or fan algorithm: Does this occur in EnergyPlus?
+	} else if ( ( shapeCat == ShapeCat::Nonconvex ) || ( s2d.vertices.size() >= nVerticesBig ) ) { // O( log n ) algorithm for nonconvex and many-vertex convex surfaces
+		PierceSurface_Nonconvex( s2d, h2d, hit );
+	} else if ( shapeCat == ShapeCat::Convex ) { // O( n ) algorithm for convex surface without too many vertices
 		PierceSurface_Convex( s2d, h2d, hit );
-	} else if ( shapeCat == ShapeCat::Nonconvex ) {
-		PierceSurface_Convex( s2d, h2d, hit ); //Do Implement proper nonconvex algorithm or add one-time warning if this is hit
 	}
 }
 

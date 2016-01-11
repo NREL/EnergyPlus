@@ -198,7 +198,70 @@ TEST( PierceSurfaceTest, Triangular )
 	}
 }
 
-TEST( PierceSurfaceTest, Convex )
+TEST( PierceSurfaceTest, ConvexOctagonal )
+{
+	int const N( 8 ); // Number of vertices and edges
+	Real64 const TwoPi( 8.0 * std::atan( 1.0 ) );
+	Real64 const wedge( TwoPi / N );
+	DataSurfaces::SurfaceData floor;
+	floor.Vertex.reserve( N );
+	for ( int i = 0; i < N; ++i ) {
+		Real64 const angle( i * wedge );
+		floor.Vertex.push_back( Vector( std::cos( angle ), std::sin( angle ), 0.0 ) );
+	}
+	floor.IsConvex = true;
+	floor.set_computed_geometry();
+	DataSurfaces::Surface2D const & floor2d( floor.surface2d );
+	EXPECT_EQ( ShapeCat::Convex, floor.shapeCat );
+	EXPECT_EQ( 2, floor2d.axis );
+
+	{ // Ray straight down into center of floor
+		Vector const rayOri( 0.0, 0.0, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+	}
+
+	{ // Ray straight up away from floor
+		Vector const rayOri( 0.0, 0.0, 1.0 );
+		Vector const rayDir( 0.0, 0.0, 1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit ); // No plane intersection so hitPt is undefined
+	}
+
+	{ // Ray down steep into floor
+		Vector const rayOri( 0.0, 0.0, 1.0 );
+		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ).normalize() );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+	}
+
+	{ // Ray down shallow to floor's plane
+		Vector const rayOri( 0.0, 0.0, 1.0 );
+		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ).normalize() );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit ); // Misses surface but intersects plane
+	}
+
+	{ // Ray straight down into point on floor
+		Vector const rayOri( -0.05, -0.8, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+	}
+}
+
+TEST( PierceSurfaceTest, Convex8Sides )
 {
 	DataSurfaces::SurfaceData floor;
 	floor.Vertex.dimension( 8 );
@@ -257,16 +320,81 @@ TEST( PierceSurfaceTest, Convex )
 	}
 }
 
-TEST( PierceSurfaceTest, Nonconvex )
+TEST( PierceSurfaceTest, ConvexNGon )
+{
+	int const N( 32 ); // Number of vertices and edges
+	Real64 const TwoPi( 8.0 * std::atan( 1.0 ) );
+	Real64 const wedge( TwoPi / N );
+	DataSurfaces::SurfaceData floor;
+	floor.Vertex.reserve( N );
+	for ( int i = 0; i < N; ++i ) {
+		Real64 const angle( i * wedge );
+		floor.Vertex.push_back( Vector( std::cos( angle ), std::sin( angle ), 0.0 ) );
+	}
+	floor.IsConvex = true;
+	floor.set_computed_geometry();
+	DataSurfaces::Surface2D const & floor2d( floor.surface2d );
+	EXPECT_EQ( ShapeCat::Convex, floor.shapeCat );
+	EXPECT_EQ( 2, floor2d.axis );
+	EXPECT_EQ( Vector2D(-1.0,-1.0), floor2d.vl );
+	EXPECT_EQ( Vector2D(1.0,1.0), floor2d.vu );
+
+	{ // Ray straight down into center of floor
+		Vector const rayOri( 0.0, 0.0, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight up away from floor
+		Vector const rayOri( 0.0, 0.0, 1.0 );
+		Vector const rayDir( 0.0, 0.0, 1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit ); // No plane intersection so hitPt is undefined
+	}
+
+	{ // Ray down steep into floor
+		Vector const rayOri( 0.0, 0.0, 1.0 );
+		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ).normalize() );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 0.25, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray down shallow to floor's plane
+		Vector const rayOri( 0.0, 0.0, 1.0 );
+		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ).normalize() );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit ); // Misses surface but intersects plane
+		EXPECT_DOUBLE_EQ( 2.0, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+}
+
+TEST( PierceSurfaceTest, NonconvexBoomerang )
 {
 	DataSurfaces::SurfaceData boomerang;
 	boomerang.Vertex.dimension( 4 );
 	boomerang.Vertex = { Vector(0,0,0), Vector(1,0,0), Vector(0.2,0.2,0), Vector(0,1,0) }; // Nonconvex "pointy boomerang"
 	boomerang.IsConvex = false;
 	boomerang.set_computed_geometry();
-	DataSurfaces::Surface2D const & floor2d( boomerang.surface2d );
+	DataSurfaces::Surface2D const & boomerang2d( boomerang.surface2d );
 	EXPECT_EQ( ShapeCat::Nonconvex, boomerang.shapeCat );
-	EXPECT_EQ( 2, floor2d.axis );
+	EXPECT_EQ( 2, boomerang2d.axis );
 
 	{ // Ray straight down into a "wing" of boomerang
 		Vector const rayOri( 0.3, 0.1, 1.0 );
@@ -274,9 +402,213 @@ TEST( PierceSurfaceTest, Nonconvex )
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( boomerang, rayOri, rayDir, hitPt, hit );
-		EXPECT_FALSE( hit ); // Should be true with correct nonconvex algorithm
+		EXPECT_TRUE( hit );
 		EXPECT_DOUBLE_EQ( 0.3, hitPt.x );
 		EXPECT_DOUBLE_EQ( 0.1, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down into V notch near boomerang
+		Vector const rayOri( 0.21, 0.21, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( boomerang, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit );
+		EXPECT_DOUBLE_EQ( 0.21, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.21, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+}
+
+TEST( PierceSurfaceTest, NonconvexUShape )
+{
+	DataSurfaces::SurfaceData ushape;
+	ushape.Vertex.dimension( 8 );
+	ushape.Vertex = { Vector(0,0,0), Vector(3,0,0), Vector(3,2,0), Vector(2,2,0), Vector(2,1,0), Vector(1,1,0), Vector(1,2,0), Vector(0,2,0) };
+	ushape.IsConvex = false;
+	ushape.set_computed_geometry();
+	DataSurfaces::Surface2D const & ushape2d( ushape.surface2d );
+	EXPECT_EQ( ShapeCat::Nonconvex, ushape.shapeCat );
+	EXPECT_EQ( 2, ushape2d.axis );
+
+	{ // Ray straight down into middle of base
+		Vector const rayOri( 1.5, 0.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( ushape, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 1.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down below base
+		Vector const rayOri( 1.5, -0.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( ushape, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit );
+		EXPECT_DOUBLE_EQ( 1.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( -0.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down into left vertical
+		Vector const rayOri( 0.5, 1.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( ushape, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 1.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down into right vertical
+		Vector const rayOri( 2.5, 1.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( ushape, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 2.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 1.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down into notch area outside of ushape
+		Vector const rayOri( 1.5, 1.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( ushape, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit );
+		EXPECT_DOUBLE_EQ( 1.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 1.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+}
+
+TEST( PierceSurfaceTest, NonconvexStar4 )
+{
+	DataSurfaces::SurfaceData star;
+	star.Vertex.dimension( 8 );
+	star.Vertex = { Vector(0,0,0), Vector(2,1,0), Vector(4,0,0), Vector(3,2,0), Vector(4,4,0), Vector(2,3,0), Vector(0,4,0), Vector(1,2,0) }; // 4-pointed star resting on 2 vertices
+	star.IsConvex = false;
+	star.set_computed_geometry();
+	DataSurfaces::Surface2D const & star2d( star.surface2d );
+	EXPECT_EQ( ShapeCat::Nonconvex, star.shapeCat );
+	EXPECT_EQ( 2, star2d.axis );
+
+	{ // Ray straight down into middle of star
+		Vector const rayOri( 2.0, 2.0, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( star, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 2.0, hitPt.x );
+		EXPECT_DOUBLE_EQ( 2.0, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down below middle and outside star
+		Vector const rayOri( 2.0, 0.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( star, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit );
+		EXPECT_DOUBLE_EQ( 2.0, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down above middle and outside star
+		Vector const rayOri( 2.0, 3.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( star, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit );
+		EXPECT_DOUBLE_EQ( 2.0, hitPt.x );
+		EXPECT_DOUBLE_EQ( 3.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down left of middle and outside star
+		Vector const rayOri( 0.5, 2.0, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( star, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 2.0, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down right of middle and outside star
+		Vector const rayOri( 3.5, 2.0, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( star, rayOri, rayDir, hitPt, hit );
+		EXPECT_FALSE( hit );
+		EXPECT_DOUBLE_EQ( 3.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 2.0, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down into left lower point
+		Vector const rayOri( 0.5, 0.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( star, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down into right lower point
+		Vector const rayOri( 3.5, 0.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( star, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 3.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down into left upper point
+		Vector const rayOri( 0.5, 3.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( star, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 3.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+	}
+
+	{ // Ray straight down into right upper point
+		Vector const rayOri( 3.5, 3.5, 1.0 );
+		Vector const rayDir( 0.0, 0.0, -1.0 );
+		bool hit( false );
+		Vector hitPt( 0.0 );
+		PierceSurface( star, rayOri, rayDir, hitPt, hit );
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 3.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 3.5, hitPt.y );
 		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
 	}
 }

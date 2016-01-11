@@ -71,6 +71,10 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Vector4.hh>
 
+// C++ Headers
+#include <cstddef>
+#include <vector>
+
 namespace EnergyPlus {
 
 namespace DataSurfaces {
@@ -313,6 +317,9 @@ namespace DataSurfaces {
 	extern int const WindowBSDFModel; // indicates complex fenestration window 6 implementation
 	extern int const WindowEQLModel; // indicates equivalent layer winodw model implementation
 
+	// Parameters for PierceSurface
+	extern std::size_t const nVerticesBig; // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// Definitions used for scheduled surface gains
@@ -467,6 +474,38 @@ namespace DataSurfaces {
 
 	// Types
 
+	// Y Slab for Surface2D for PierceSurface support of Nonconvex and Many-Vertex Surfaces
+	struct Surface2DSlab
+	{
+
+	public: // Types
+
+		using Vertex = ObjexxFCL::Vector2< Real64 >;
+		using Vertices = ObjexxFCL::Array1D< Vertex >;
+		using Edge = Vertices::size_type; // The Surface2D vertex and edge index
+		using EdgeXY = Real64; // The edge x/y inverse slope
+		using Edges = std::vector< Edge >;
+		using EdgesXY = std::vector< EdgeXY >;
+
+	public: // Creation
+
+		// Constructor
+		Surface2DSlab( Real64 const yl, Real64 const yu ) :
+			xl( 0.0 ),
+			xu( 0.0 ),
+			yl( yl ),
+			yu( yu )
+		{}
+
+	public: // Data
+
+		Real64 xl, xu; // Lower and upper x coordinates of slab bounding box
+		Real64 yl, yu; // Lower and upper y coordinates of slab
+		Edges edges; // Left-to-right ordered edges crossing the slab
+		EdgesXY edgesXY; // Edge x/y inverse slopes
+
+	}; // Surface2DSlab
+
 	// Projected 2D Surface Representation for Fast Computational Geometry Operations
 	struct Surface2D
 	{
@@ -474,8 +513,14 @@ namespace DataSurfaces {
 	public: // Types
 
 		using Vector2D = Vector2< Real64 >;
+		using Edge = Vector2D;
 		using Vertices = Array1D< Vector2D >;
 		using Vectors = Array1D< Vector2D >;
+		using Edges = Vectors;
+		using Slab = Surface2DSlab;
+		using Slabs = std::vector< Surface2DSlab >;
+		using SlabYs = std::vector< Real64 >;
+		using size_type = Vertices::size_type;
 
 	public: // Creation
 
@@ -520,6 +565,8 @@ namespace DataSurfaces {
 		Vector2D vl = Vector2D( 0.0 ), vu = Vector2D( 0.0 ); // Bounding box lower and upper corner vertices
 		Vectors edges; // Edge vectors around the vertices
 		Real64 s1 = 0.0, s3 = 0.0; // Rectangle side widths squared
+		SlabYs slabYs; // Y coordinates of slabs
+		Slabs slabs; // Y slice slabs for fast nonconvex and many vertex intersections
 
 	}; // Surface2D
 
