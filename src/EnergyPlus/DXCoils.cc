@@ -14493,291 +14493,6 @@ Label50: ;
 	}
 
 	void
-		ControlVRFIUCoil(
-		int const CoilIndex,  // index to VRFTU coil
-		Real64 const QCoil,   // coil load
-		Real64 const Tin, // inlet air temperature
-		Real64 const Win, // inlet air humidity ratio
-		Real64 const TeTc,    // evaporating or condensing temperature
-		Real64 const OAMassFlow,  // mass flow rate of outdoor air
-		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
-		Real64 & Wout,    // outlet air humidity ratio
-		Real64 & Tout, // outlet air temperature
-		Real64 & Hout, // outlet air enthalpy
-		Real64 & SHact,   // actual SH
-		Real64 & SCact    // actual SC
-		)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Xiufeng Pang, LBNL
-		//       DATE WRITTEN   Feb 2013
-		//       MODIFIED       Nov 2015, RP Zhang, LBNL
-		//
-		//       RE-ENGINEERED  na
-		//
-		// PURPOSE OF THIS SUBROUTINE:
-		//       Analyze the VRF Indoor Unit operations given coil loads.
-		//       Calculated parameters include: (1) Fan Speed Ratio (2) SH/SC, (3) Coil Outlet conditions
-		//
-		// METHODOLOGY EMPLOYED:
-		//       A new physics based VRF model applicable for Fluid Temperature Control.
-		//
-		// REFERENCES:
-		//       na
-		//
-		// USE STATEMENTS:
-		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
-		using Psychrometrics::PsyHFnTdbW;
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		//
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		//
-		// DERIVED TYPE DEFINITIONS
-		// na
-		//
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Array1D< Real64 > Par( 11 ); // Parameter array for SolveRegulaFalsi
-		int MaxIter( 500 ); // Max iteration numbers (-)
-		int SolFla; // Solving flag for SolveRegulaFalsi (-)
-		int const FlagCoolMode( 0 ); // Flag for cooling mode
-		int const FlagHeatMode( 1 ); // Flag for heating mode
-		Real64 BF; // Bypass factor (-)
-		Real64 C1Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
-		Real64 C2Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
-		Real64 C3Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
-		Real64 C1Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
-		Real64 C2Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
-		Real64 C3Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
-		Real64 CoilOnOffRatio; // coil on/off ratio: time coil is on divided by total time
-		Real64 deltaT; // Difference between evaporating/condensing temperature and coil surface temperature (C)
-		Real64 FanSpdRatioMin; // Min fan speed ratio, below which the cycling will be activated (-)
-		Real64 FanSpdRatioMax; // Max fan speed ratio (-)
-		Real64 Garate; // Nominal air mass flow rate (m3/s)
-		Real64 MaxSH; // Max super heating degrees (C)
-		Real64 MaxSC; // Max subcooling degrees (C)
-		Real64 QinSenMin1; //Coil capacity at minimum fan speed, corresponding to real SH (W)
-		Real64 QinSenMin2; //Coil capacity at minimum fan speed, corresponding to corresponds maximum SH (W)
-		Real64 QinSenPerFlowRate; //Coil capacity per air mass flow rate(W-s/kg)
-		Real64 QCoilSenCoolingLoad; // Coil sensible cooling load (W)
-		Real64 QCoilSenHeatingLoad; // Coil sensible heating load (W)
-		Real64 Ratio1; // Fan speed ratio (-)
-		Real64 RHsat; // Relative humidity of the air at saturated condition(-)
-		Real64 SH; // Super heating degrees (C)
-		Real64 SC; // Subcooling degrees (C)
-		Real64 Ts_1; // Air temperature at the coil surface, corresponding to SH (C)
-		Real64 Ts_2; // Air temperature at the coil surface, corresponding to MaxSH (C)
-		Real64 To_1; // Air temperature at the coil outlet, corresponding to SH (C)
-		Real64 To_2; // Air temperature at the coil outlet, corresponding to MaxSH (C)
-		Real64 Ts; // Air temperature at the coil surface (C)
-		Real64 Ws; // Air humidity ratio at the coil surface (kg/kg)
-
-		RHsat = 0.98; // Saturated RH
-		MaxSH = 15;
-		MaxSC = 20;
-		Garate = DXCoil( CoilIndex ).RatedAirMassFlowRate( 1 );
-		FanSpdRatioMin = min( max( OAMassFlow / Garate, 0.65 ), 1.0 ); // ensure that coil flow rate is higher than OA flow rate
-
-		if( QCoil == 0 ) {
-			//No Heating or Cooling
-			FanSpdRatio = OAMassFlow / Garate;
-			CoilOnOffRatio = 0.0;
-
-			SHact = 999.0;
-			SCact = 999.0;
-			Tout = Tin;
-			Hout = PsyHFnTdbW( Tin, Win );
-			Wout = Win;
-
-		} else if( QCoil < 0 ) {
-			//Cooling Mode
-
-			// Obtain coil cooling loads
-			QCoilSenCoolingLoad = -QCoil;
-
-			// Coefficients describing coil performance
-			SH = DXCoil( CoilIndex ).SH;
-			C1Tevap = DXCoil( CoilIndex ).C1Te;
-			C2Tevap = DXCoil( CoilIndex ).C2Te;
-			C3Tevap = DXCoil( CoilIndex ).C3Te;
-			BF = 0.0592;
-
-			// Coil sensible heat transfer minimum value
-			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, SH, BF, QinSenPerFlowRate, Ts_1 );
-			To_1 = Tin - QinSenPerFlowRate / 1005;
-			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
-
-			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, MaxSH, BF, QinSenPerFlowRate, Ts_2 );
-			To_2 = Tin - QinSenPerFlowRate / 1005;
-			QinSenMin2 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds maximum SH
-
-			if( QCoilSenCoolingLoad > QinSenMin1 ) {
-				// Increase fan speed to meet room sensible load; SH is not updated
-
-				Par( 1 ) = QCoilSenCoolingLoad;
-				Par( 2 ) = Ts_1;
-				Par( 3 ) = Tin;
-				Par( 4 ) = Garate;
-				Par( 5 ) = BF;
-
-				FanSpdRatioMax = 1.0;
-				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par );
-				if( SolFla < 0 ) Ratio1 = FanSpdRatioMax; // over capacity
-				FanSpdRatio = Ratio1;
-				CoilOnOffRatio = 1.0;
-
-				Tout = To_1; // Since SH is not updated
-				Ws = PsyWFnTdbRhPb( Ts_1, RHsat, OutBaroPress, "CalcVRFIUAirFlow" );
-				if( Ws < Win ) {
-					Wout = Win - ( Win - Ws ) * ( 1 - BF );
-				} else {
-					Wout = Win;
-				}
-				Hout = PsyHFnTdbW( Tout, Wout );
-				SCact = 999.0;
-				SHact = SH;
-
-			} else {
-				// Low load modification algorithm
-				// Need to increase SH to further reduce coil capacity
-				// May further implement coil cycling control if SC modification is not enough
-
-				FanSpdRatio = FanSpdRatioMin;
-
-				CoilOnOffRatio = 1.0;
-
-				Tout = Tin - QCoilSenCoolingLoad / 1005.0 / FanSpdRatioMin / Garate;
-				Ts = Tin - ( Tin - Tout ) / ( 1 - BF );
-				deltaT = Ts - TeTc;
-
-				// Update SH
-				if( C3Tevap <= 0.0 ) {
-					if( C2Tevap > 0.0 ) {
-						SHact = ( deltaT - C1Tevap ) / C2Tevap;
-					} else {
-						SHact = 998.0;
-					}
-				} else {
-					SHact = ( -C2Tevap + sqrt( pow_2( C2Tevap ) - 4 * C3Tevap * ( C1Tevap - deltaT ) ) ) / 2 / C3Tevap;
-				}
-
-				Ws = PsyWFnTdbRhPb( Ts, RHsat, OutBaroPress, "CalcVRFIUAirFlow" );
-				if( Ws < Win ) {
-					Wout = Win - ( Win - Ws ) * ( 1 - BF );
-				} else {
-					Wout = Win;
-				}
-
-				if( SHact > MaxSH ) {
-					// Further implement On/Off Control
-					SHact = MaxSH;
-					CoilOnOffRatio = QCoilSenCoolingLoad / QinSenMin2;
-
-					Ts = Ts_2;
-					Ws = PsyWFnTdbRhPb( Ts, RHsat, OutBaroPress, "CalcVRFIUAirFlow" );
-					if( Ws < Win ) {
-						Wout = Win - ( Win - Ws ) * ( 1 - BF );
-					} else {
-						Wout = Win;
-					}
-
-					//outlet air temperature and humidity ratio is time-weighted
-					Tout = CoilOnOffRatio * To_2 + ( 1 - CoilOnOffRatio ) * Tin;
-					Wout = CoilOnOffRatio * Wout + ( 1 - CoilOnOffRatio ) * Win;
-				}
-
-				Hout = PsyHFnTdbW( Tout, Wout );
-				SCact = 999.0;
-			}
-
-		} else if( QCoil > 0 ) {
-			//Heating Mode
-
-			// Obtain zonal heating loads
-			QCoilSenHeatingLoad = QCoil;
-
-			// Coefficients describing coil performance
-			SC = DXCoil( CoilIndex ).SC;
-			C1Tcond = DXCoil( CoilIndex ).C1Tc;
-			C2Tcond = DXCoil( CoilIndex ).C2Tc;
-			C3Tcond = DXCoil( CoilIndex ).C3Tc;
-
-			BF = 0.136;
-
-			// Coil sensible heat transfer minimum value
-			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1 );
-			To_1 = QinSenPerFlowRate / 1005 + Tin;
-			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
-
-			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, MaxSC, BF, QinSenPerFlowRate, Ts_2 );
-			To_2 = QinSenPerFlowRate / 1005 + Tin;
-			QinSenMin2 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds maximum SH
-
-			if( QCoilSenHeatingLoad > QinSenMin1 ) {
-				// Modulate fan speed to meet room sensible load; SC is not updated
-
-				Par( 1 ) = QCoilSenHeatingLoad;
-				Par( 2 ) = Ts_1;
-				Par( 3 ) = Tin;
-				Par( 4 ) = Garate;
-				Par( 5 ) = BF;
-
-				FanSpdRatioMax = 1.0;
-				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par );
-				// this will likely cause problems eventually, -1 and -2 mean different things
-				if( SolFla < 0 ) Ratio1 = FanSpdRatioMax; // over capacity
-				FanSpdRatio = Ratio1;
-				CoilOnOffRatio = 1.0;
-
-				Tout = Tin + ( Ts_1 - Tin ) * ( 1 - BF );
-				Wout = Win;
-				Hout = PsyHFnTdbW( Tout, Wout );
-				SHact = 999.0;
-				SCact = SC;
-
-			} else {
-				// Low load modification algorithm
-				// Need to increase SC to further reduce coil heating capacity
-				// May further implement coil cycling control if SC modification is not enough
-
-				FanSpdRatio = FanSpdRatioMin;
-				CoilOnOffRatio = 1.0;
-
-				Tout = Tin + QCoilSenHeatingLoad / 1005.0 / FanSpdRatio / Garate;
-				Ts = Tin + ( Tout - Tin ) / ( 1 - BF );
-				deltaT = TeTc - Ts;
-
-				// Update SC
-				if( C3Tcond <= 0.0 ) {
-					if( C2Tcond > 0.0 ) {
-						SCact = ( deltaT - C1Tcond ) / C2Tcond;
-					} else {
-						SCact = 998.0;
-					}
-				} else {
-					SCact = ( -C2Tcond + sqrt( pow_2( C2Tcond ) - 4 * C3Tcond * ( C1Tcond - deltaT ) ) ) / 2 / C3Tcond;
-				}
-
-				if( SCact > MaxSC ) {
-					// Implement On/Off Control
-					SCact = MaxSC;
-					CoilOnOffRatio = QCoilSenHeatingLoad / QinSenMin2;
-					//outlet air temperature is time-weighted
-					Tout = CoilOnOffRatio * To_2 + ( 1 - CoilOnOffRatio ) * Tin;
-				}
-
-				Wout = Win;
-				Hout = PsyHFnTdbW( Tout, Wout );
-				SHact = 999.0;
-			}
-		}
-
-		//FanSpdRatio = max( min( FanSpdRatio, 1.0 ), 0.0);
-	}
-
-	void
 	CalcVRFCoolingCoil_FluidTCtrl(
 		int const DXCoilNum, // the number of the DX coil to be simulated
 		int const CompOp, // compressor operation; 1=on, 0=off
@@ -15497,6 +15212,291 @@ Label50: ;
 		if ( DXCoil( DXCoilNum ).IsSecondaryDXCoilInZone ) {
 			CalcSecondaryDXCoils( DXCoilNum );
 		}
+	}
+
+	void
+	ControlVRFIUCoil(
+		int const CoilIndex,  // index to VRFTU coil
+		Real64 const QCoil,   // coil load
+		Real64 const Tin, // inlet air temperature
+		Real64 const Win, // inlet air humidity ratio
+		Real64 const TeTc,    // evaporating or condensing temperature
+		Real64 const OAMassFlow,  // mass flow rate of outdoor air
+		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
+		Real64 & Wout,    // outlet air humidity ratio
+		Real64 & Tout, // outlet air temperature
+		Real64 & Hout, // outlet air enthalpy
+		Real64 & SHact,   // actual SH
+		Real64 & SCact    // actual SC
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Xiufeng Pang, LBNL
+		//       DATE WRITTEN   Feb 2013
+		//       MODIFIED       Nov 2015, RP Zhang, LBNL
+		//
+		//       RE-ENGINEERED  na
+		//
+		// PURPOSE OF THIS SUBROUTINE:
+		//       Analyze the VRF Indoor Unit operations given coil loads.
+		//       Calculated parameters include: (1) Fan Speed Ratio (2) SH/SC, (3) Coil Outlet conditions
+		//
+		// METHODOLOGY EMPLOYED:
+		//       A new physics based VRF model applicable for Fluid Temperature Control.
+		//
+		// REFERENCES:
+		//       na
+		//
+		// USE STATEMENTS:
+		using namespace DataZoneEnergyDemands;
+		using General::SolveRegulaFalsi;
+		using Psychrometrics::PsyHFnTdbW;
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		//
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+		//
+		// DERIVED TYPE DEFINITIONS
+		// na
+		//
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Array1D< Real64 > Par( 11 ); // Parameter array for SolveRegulaFalsi
+		int MaxIter( 500 ); // Max iteration numbers (-)
+		int SolFla; // Solving flag for SolveRegulaFalsi (-)
+		int const FlagCoolMode( 0 ); // Flag for cooling mode
+		int const FlagHeatMode( 1 ); // Flag for heating mode
+		Real64 BF; // Bypass factor (-)
+		Real64 C1Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
+		Real64 C2Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
+		Real64 C3Tevap; // Coefficient for indoor unit coil evaporating temperature curve (-)
+		Real64 C1Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
+		Real64 C2Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
+		Real64 C3Tcond; // Coefficient for indoor unit coil condensing temperature curve (-)
+		Real64 CoilOnOffRatio; // coil on/off ratio: time coil is on divided by total time
+		Real64 deltaT; // Difference between evaporating/condensing temperature and coil surface temperature (C)
+		Real64 FanSpdRatioMin; // Min fan speed ratio, below which the cycling will be activated (-)
+		Real64 FanSpdRatioMax; // Max fan speed ratio (-)
+		Real64 Garate; // Nominal air mass flow rate (m3/s)
+		Real64 MaxSH; // Max super heating degrees (C)
+		Real64 MaxSC; // Max subcooling degrees (C)
+		Real64 QinSenMin1; //Coil capacity at minimum fan speed, corresponding to real SH (W)
+		Real64 QinSenMin2; //Coil capacity at minimum fan speed, corresponding to corresponds maximum SH (W)
+		Real64 QinSenPerFlowRate; //Coil capacity per air mass flow rate(W-s/kg)
+		Real64 QCoilSenCoolingLoad; // Coil sensible cooling load (W)
+		Real64 QCoilSenHeatingLoad; // Coil sensible heating load (W)
+		Real64 Ratio1; // Fan speed ratio (-)
+		Real64 RHsat; // Relative humidity of the air at saturated condition(-)
+		Real64 SH; // Super heating degrees (C)
+		Real64 SC; // Subcooling degrees (C)
+		Real64 Ts_1; // Air temperature at the coil surface, corresponding to SH (C)
+		Real64 Ts_2; // Air temperature at the coil surface, corresponding to MaxSH (C)
+		Real64 To_1; // Air temperature at the coil outlet, corresponding to SH (C)
+		Real64 To_2; // Air temperature at the coil outlet, corresponding to MaxSH (C)
+		Real64 Ts; // Air temperature at the coil surface (C)
+		Real64 Ws; // Air humidity ratio at the coil surface (kg/kg)
+
+		RHsat = 0.98; // Saturated RH
+		MaxSH = 15;
+		MaxSC = 20;
+		Garate = DXCoil( CoilIndex ).RatedAirMassFlowRate( 1 );
+		FanSpdRatioMin = min( max( OAMassFlow / Garate, 0.65 ), 1.0 ); // ensure that coil flow rate is higher than OA flow rate
+
+		if ( QCoil == 0 ) {
+			//No Heating or Cooling
+			FanSpdRatio = OAMassFlow / Garate;
+			CoilOnOffRatio = 0.0;
+
+			SHact = 999.0;
+			SCact = 999.0;
+			Tout = Tin;
+			Hout = PsyHFnTdbW( Tin, Win );
+			Wout = Win;
+
+		} else if ( QCoil < 0 ) {
+			//Cooling Mode
+
+			// Obtain coil cooling loads
+			QCoilSenCoolingLoad = -QCoil;
+
+			// Coefficients describing coil performance
+			SH = DXCoil( CoilIndex ).SH;
+			C1Tevap = DXCoil( CoilIndex ).C1Te;
+			C2Tevap = DXCoil( CoilIndex ).C2Te;
+			C3Tevap = DXCoil( CoilIndex ).C3Te;
+			BF = 0.0592;
+
+			// Coil sensible heat transfer minimum value
+			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, SH, BF, QinSenPerFlowRate, Ts_1 );
+			To_1 = Tin - QinSenPerFlowRate / 1005;
+			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
+
+			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, MaxSH, BF, QinSenPerFlowRate, Ts_2 );
+			To_2 = Tin - QinSenPerFlowRate / 1005;
+			QinSenMin2 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds maximum SH
+
+			if ( QCoilSenCoolingLoad > QinSenMin1 ) {
+				// Increase fan speed to meet room sensible load; SH is not updated
+
+				Par( 1 ) = QCoilSenCoolingLoad;
+				Par( 2 ) = Ts_1;
+				Par( 3 ) = Tin;
+				Par( 4 ) = Garate;
+				Par( 5 ) = BF;
+
+				FanSpdRatioMax = 1.0;
+				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par );
+				if ( SolFla < 0 ) Ratio1 = FanSpdRatioMax; // over capacity
+				FanSpdRatio = Ratio1;
+				CoilOnOffRatio = 1.0;
+
+				Tout = To_1; // Since SH is not updated
+				Ws = PsyWFnTdbRhPb( Ts_1, RHsat, OutBaroPress, "ControlVRFIUCoil" );
+				if ( Ws < Win ) {
+					Wout = Win - ( Win - Ws ) * ( 1 - BF );
+				} else {
+					Wout = Win;
+				}
+				Hout = PsyHFnTdbW( Tout, Wout );
+				SCact = 999.0;
+				SHact = SH;
+
+			} else {
+				// Low load modification algorithm
+				// Need to increase SH to further reduce coil capacity
+				// May further implement coil cycling control if SC modification is not enough
+
+				FanSpdRatio = FanSpdRatioMin;
+
+				CoilOnOffRatio = 1.0;
+
+				Tout = Tin - QCoilSenCoolingLoad / 1005.0 / FanSpdRatioMin / Garate;
+				Ts = Tin - ( Tin - Tout ) / ( 1 - BF );
+				deltaT = Ts - TeTc;
+
+				// Update SH
+				if ( C3Tevap <= 0.0 ) {
+					if ( C2Tevap > 0.0 ) {
+						SHact = ( deltaT - C1Tevap ) / C2Tevap;
+					} else {
+						SHact = 998.0;
+					}
+				} else {
+					SHact = ( -C2Tevap + sqrt( pow_2( C2Tevap ) - 4 * C3Tevap * ( C1Tevap - deltaT ) ) ) / 2 / C3Tevap;
+				}
+
+				Ws = PsyWFnTdbRhPb( Ts, RHsat, OutBaroPress, "ControlVRFIUCoil" );
+				if ( Ws < Win ) {
+					Wout = Win - ( Win - Ws ) * ( 1 - BF );
+				} else {
+					Wout = Win;
+				}
+
+				if ( SHact > MaxSH ) {
+					// Further implement On/Off Control
+					SHact = MaxSH;
+					CoilOnOffRatio = QCoilSenCoolingLoad / QinSenMin2;
+
+					Ts = Ts_2;
+					Ws = PsyWFnTdbRhPb( Ts, RHsat, OutBaroPress, "ControlVRFIUCoil" );
+					if ( Ws < Win ) {
+						Wout = Win - ( Win - Ws ) * ( 1 - BF );
+					} else {
+						Wout = Win;
+					}
+
+					//outlet air temperature and humidity ratio is time-weighted
+					Tout = CoilOnOffRatio * To_2 + ( 1 - CoilOnOffRatio ) * Tin;
+					Wout = CoilOnOffRatio * Wout + ( 1 - CoilOnOffRatio ) * Win;
+				}
+
+				Hout = PsyHFnTdbW( Tout, Wout );
+				SCact = 999.0;
+			}
+
+		} else if ( QCoil > 0 ) {
+			//Heating Mode
+
+			// Obtain zonal heating loads
+			QCoilSenHeatingLoad = QCoil;
+
+			// Coefficients describing coil performance
+			SC = DXCoil( CoilIndex ).SC;
+			C1Tcond = DXCoil( CoilIndex ).C1Tc;
+			C2Tcond = DXCoil( CoilIndex ).C2Tc;
+			C3Tcond = DXCoil( CoilIndex ).C3Tc;
+
+			BF = 0.136;
+
+			// Coil sensible heat transfer minimum value
+			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1 );
+			To_1 = QinSenPerFlowRate / 1005 + Tin;
+			QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
+
+			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, MaxSC, BF, QinSenPerFlowRate, Ts_2 );
+			To_2 = QinSenPerFlowRate / 1005 + Tin;
+			QinSenMin2 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds maximum SH
+
+			if ( QCoilSenHeatingLoad > QinSenMin1 ) {
+				// Modulate fan speed to meet room sensible load; SC is not updated
+
+				Par( 1 ) = QCoilSenHeatingLoad;
+				Par( 2 ) = Ts_1;
+				Par( 3 ) = Tin;
+				Par( 4 ) = Garate;
+				Par( 5 ) = BF;
+
+				FanSpdRatioMax = 1.0;
+				SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par );
+				// this will likely cause problems eventually, -1 and -2 mean different things
+				if ( SolFla < 0 ) Ratio1 = FanSpdRatioMax; // over capacity
+				FanSpdRatio = Ratio1;
+				CoilOnOffRatio = 1.0;
+
+				Tout = Tin + ( Ts_1 - Tin ) * ( 1 - BF );
+				Wout = Win;
+				Hout = PsyHFnTdbW( Tout, Wout );
+				SHact = 999.0;
+				SCact = SC;
+
+			} else {
+				// Low load modification algorithm
+				// Need to increase SC to further reduce coil heating capacity
+				// May further implement coil cycling control if SC modification is not enough
+
+				FanSpdRatio = FanSpdRatioMin;
+				CoilOnOffRatio = 1.0;
+
+				Tout = Tin + QCoilSenHeatingLoad / 1005.0 / FanSpdRatio / Garate;
+				Ts = Tin + ( Tout - Tin ) / ( 1 - BF );
+				deltaT = TeTc - Ts;
+
+				// Update SC
+				if ( C3Tcond <= 0.0 ) {
+					if ( C2Tcond > 0.0 ) {
+						SCact = ( deltaT - C1Tcond ) / C2Tcond;
+					} else {
+						SCact = 998.0;
+					}
+				} else {
+					SCact = ( -C2Tcond + sqrt( pow_2( C2Tcond ) - 4 * C3Tcond * ( C1Tcond - deltaT ) ) ) / 2 / C3Tcond;
+				}
+
+				if ( SCact > MaxSC ) {
+					// Implement On/Off Control
+					SCact = MaxSC;
+					CoilOnOffRatio = QCoilSenHeatingLoad / QinSenMin2;
+					//outlet air temperature is time-weighted
+					Tout = CoilOnOffRatio * To_2 + ( 1 - CoilOnOffRatio ) * Tin;
+				}
+
+				Wout = Win;
+				Hout = PsyHFnTdbW( Tout, Wout );
+				SHact = 999.0;
+			}
+
+		}
+
 	}
 
 	void
