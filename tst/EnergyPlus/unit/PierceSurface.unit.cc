@@ -78,6 +78,8 @@ using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 using Vector2D = DataSurfaces::Surface2D::Vector2D;
 
+// Note: PierceSurface rayDir argument does not need to be a unit vector and in some tests here it isn't
+
 TEST( PierceSurfaceTest, Rectangular )
 {
 	DataSurfaces::SurfaceData floor;
@@ -116,7 +118,7 @@ TEST( PierceSurfaceTest, Rectangular )
 
 	{ // Ray down steep into floor
 		Vector const rayOri( 0.5, 0.5, 1.0 );
-		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
@@ -128,7 +130,7 @@ TEST( PierceSurfaceTest, Rectangular )
 
 	{ // Ray down shallow to floor's plane
 		Vector const rayOri( 0.5, 0.5, 1.0 );
-		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
@@ -175,7 +177,7 @@ TEST( PierceSurfaceTest, Triangular )
 
 	{ // Ray down steep into floor
 		Vector const rayOri( 0.9, 0.1, 1.0 );
-		Vector const rayDir( Vector( -0.25, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( -0.25, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
@@ -187,7 +189,7 @@ TEST( PierceSurfaceTest, Triangular )
 
 	{ // Ray down shallow to floor's plane
 		Vector const rayOri( 0.9, 0.1, 1.0 );
-		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
@@ -235,7 +237,7 @@ TEST( PierceSurfaceTest, ConvexOctagonal )
 
 	{ // Ray down steep into floor
 		Vector const rayOri( 0.0, 0.0, 1.0 );
-		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
@@ -244,7 +246,7 @@ TEST( PierceSurfaceTest, ConvexOctagonal )
 
 	{ // Ray down shallow to floor's plane
 		Vector const rayOri( 0.0, 0.0, 1.0 );
-		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
@@ -297,7 +299,7 @@ TEST( PierceSurfaceTest, Convex8Sides )
 
 	{ // Ray down steep into floor
 		Vector const rayOri( 0.5, 0.5, 1.0 );
-		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
@@ -309,7 +311,7 @@ TEST( PierceSurfaceTest, Convex8Sides )
 
 	{ // Ray down shallow to floor's plane
 		Vector const rayOri( 0.5, 0.5, 1.0 );
-		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
@@ -362,7 +364,7 @@ TEST( PierceSurfaceTest, ConvexNGon )
 
 	{ // Ray down steep into floor
 		Vector const rayOri( 0.0, 0.0, 1.0 );
-		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( 0.25, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );
@@ -374,7 +376,7 @@ TEST( PierceSurfaceTest, ConvexNGon )
 
 	{ // Ray down shallow to floor's plane
 		Vector const rayOri( 0.0, 0.0, 1.0 );
-		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ).normalize() );
+		Vector const rayDir( Vector( 2.0, 0.0, -1.0 ) );
 		bool hit( false );
 		Vector hitPt( 0.0 );
 		PierceSurface( floor, rayOri, rayDir, hitPt, hit );

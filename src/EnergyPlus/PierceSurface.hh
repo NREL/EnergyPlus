@@ -311,7 +311,7 @@ void
 PierceSurface(
 	DataSurfaces::SurfaceData const & surface, // Surface
 	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction unit vector
+	Vector3< Real64 > const & rayDir, // Ray direction vector
 	Vector3< Real64 > & hitPt, // Ray-plane intersection point
 	bool & hit // Ray intersects surface?
 )
@@ -325,21 +325,18 @@ PierceSurface(
 	// History:
 	//  Jan 2016: Initial release
 
-	// Input checks
-	assert( std::abs( rayDir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real64 >::epsilon() ); // Check unit vector
-
 	// Find ray intersection with surface plane
 	hit = false;
 	DataSurfaces::SurfaceData::Plane const & plane( surface.plane );
-	Real64 const den( ( plane.x * rayDir.x ) + ( plane.y * rayDir.y ) + ( plane.z * rayDir.z ) ); // float gives faster division
+	Real64 const den( ( plane.x * rayDir.x ) + ( plane.y * rayDir.y ) + ( plane.z * rayDir.z ) );
 	if ( den == 0.0 ) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
 		return;
 	} else { // Ray intersects plane
-		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) ); // float gives faster division
+		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) );
 		if ( num * den <= 0.0 ) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
 			return;
 		} else { // Ray points toward surface: Compute hit point
-			Real64 const t( num / den ); // Ray parameter at plane intersection: hitPt = RayOri + t * rayDir
+			Real64 const t( num / den ); // Ray parameter at plane intersection: hitPt = rayOri + t * rayDir
 			hitPt.x = rayOri.x + ( t * rayDir.x ); // Compute by coordinate to avoid Vertex temporaries
 			hitPt.y = rayOri.y + ( t * rayDir.y );
 			hitPt.z = rayOri.z + ( t * rayDir.z );
@@ -355,7 +352,7 @@ void
 PierceSurface(
 	int const iSurf, // Surface index
 	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction unit vector
+	Vector3< Real64 > const & rayDir, // Ray direction vector
 	Vector3< Real64 > & hitPt, // Ray-plane intersection point
 	bool & hit // Ray intersects surface?
 )
@@ -375,7 +372,7 @@ void
 PierceSurface(
 	DataSurfaces::SurfaceData const & surface, // Surface
 	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction unit vector
+	Vector3< Real64 > const & rayDir, // Ray direction vector
 	Real64 const dMax, // Max distance from rayOri to hit point
 	Vector3< Real64 > & hitPt, // Ray-plane intersection point
 	bool & hit // Ray intersects surface?
@@ -392,21 +389,20 @@ PierceSurface(
 	//  Jan 2016: Initial release
 
 	// Input checks
-	assert( std::abs( rayDir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real64 >::epsilon() ); // Check unit vector
 	assert( dMax >= 0.0 ); // Distance must be nonnegative
 
 	// Find ray intersection with surface plane
 	hit = false;
 	DataSurfaces::SurfaceData::Plane const & plane( surface.plane );
-	Real64 const den( ( plane.x * rayDir.x ) + ( plane.y * rayDir.y ) + ( plane.z * rayDir.z ) ); // float gives faster division
+	Real64 const den( ( plane.x * rayDir.x ) + ( plane.y * rayDir.y ) + ( plane.z * rayDir.z ) );
 	if ( den == 0.0 ) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
 		return;
 	} else { // Ray intersects plane
-		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) ); // float gives faster division
+		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) );
 		if ( num * den <= 0.0 ) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
 			return;
 		} else { // Ray points toward surface: Compute hit point
-			Real64 const t( num / den ); // Ray parameter at plane intersection: hitPt = RayOri + t * rayDir
+			Real64 const t( num / den ); // Ray parameter at plane intersection: hitPt = rayOri + t * rayDir
 			if ( t > dMax ) return; // Hit point exceeds distance from rayOri limit
 			hitPt.x = rayOri.x + ( t * rayDir.x ); // Compute by coordinate to avoid Vertex temporaries
 			hitPt.y = rayOri.y + ( t * rayDir.y );
@@ -423,7 +419,7 @@ void
 PierceSurface(
 	int const iSurf, // Surface index
 	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction unit vector
+	Vector3< Real64 > const & rayDir, // Ray direction vector
 	Real64 const dMax, // Max distance from rayOri to hit point
 	Vector3< Real64 > & hitPt, // Ray-plane intersection point
 	bool & hit // Ray intersects surface?
