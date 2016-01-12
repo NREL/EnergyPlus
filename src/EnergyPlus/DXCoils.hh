@@ -1732,6 +1732,22 @@ namespace DXCoils {
 	// Begin of Methods for New VRF Model: Fluid Temperature Control
 	//******************************************************************************
 	void
+		ControlVRFIUCoil(
+		int const CoilIndex,  // index to VRFTU coil 
+		Real64 const QCoil,   // coil load
+		Real64 const Tin,     // inlet air temperature
+		Real64 const Win,     // inlet air humidity ratio
+		Real64 const TeTc,    // evaporating or condensing temperature
+		Real64 const OAMassFlow,  // mass flow rate of outdoor air 
+		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
+		Real64 & Wout,    // outlet air humidity ratio
+		Real64 & Tout, // outlet air temperature
+		Real64 & Hout, // outlet air enthalpy
+		Real64 & SHact,   // actual SH
+		Real64 & SCact    // actual SC
+		);
+
+	void
 	CalcVRFCoolingCoil_FluidTCtrl(
 		int const DXCoilNum, // the number of the DX coil to be simulated
 		int const CompOp, // compressor operation; 1=on, 0=off
@@ -1751,22 +1767,6 @@ namespace DXCoils {
 		int const FanOpMode, // Allows parent object to control fan mode
 		Optional< Real64 const > OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
 		Optional< Real64 const > MaxHeatCap // maximum allowed heating capacity
-	);
-	
-	void
-	ControlVRFIUCoil (
-		int const CoilIndex,  // index to VRFTU coil 
-		Real64 const QCoil,   // coil load
-		Real64 const Tin,     // inlet air temperature
-		Real64 const Win,     // inlet air humidity ratio
-		Real64 const TeTc,    // evaporating or condensing temperature
-		Real64 const OAMassFlow,  // mass flow rate of outdoor air 
-		Real64 & FanSpdRatio, // fan speed ratio: actual flow rate / rated flow rate
-		Real64 & Wout,    // outlet air humidity ratio
-		Real64 & Tout, // outlet air temperature
-		Real64 & Hout, // outlet air enthalpy
-		Real64 & SHact,   // actual SH
-		Real64 & SCact    // actual SC
 	);
 	
 	void
