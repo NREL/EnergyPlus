@@ -12999,17 +12999,196 @@ HVAC
 
 ### Component Cost Economics Summary
 
-The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object.
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. Directly following is an example of this report.
+
+Report: Component Cost Economics Summary
+
+For: Entire Facility
+
+Timestamp: 2016-01-12 15:47:39
+
+Construction Cost Estimate Summary
+
+<table class="table table-striped">
+  <tr>
+    <th></th>
+    <th>Reference Bldg.</th>
+    <th>Current Bldg. Model</th>
+    <th>Difference</th>
+  </tr>
+  <tr>
+    <td>Line Item SubTotal ($)</td>
+    <td>665082.04</td>
+    <td>719946.72</td>
+    <td>54864.68</td>
+  </tr>
+  <tr>
+    <td>Misc. Costs ($)</td>
+    <td>928979.09</td>
+    <td>928979.09</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>Regional Adjustment ($)</td>
+    <td>216792.31</td>
+    <td>224253.91</td>
+    <td>7461.6</td>
+  </tr>
+  <tr>
+    <td>Design Fee ($)</td>
+    <td>108651.21</td>
+    <td>149854.38</td>
+    <td>41203.17</td>
+  </tr>
+  <tr>
+    <td>Contractor Fee ($)</td>
+    <td>126759.74</td>
+    <td>131122.58</td>
+    <td>4362.84</td>
+  </tr>
+  <tr>
+    <td>Contingency ($)</td>
+    <td>181085.34</td>
+    <td>187317.97</td>
+    <td>6232.63</td>
+  </tr>
+  <tr>
+    <td>Permits, Bonds, Insurance ($)</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>Commissioning ($)</td>
+    <td>9054.27</td>
+    <td>18731.8</td>
+    <td>9677.53</td>
+  </tr>
+  <tr>
+    <td>Cost Estimate Total ($)</td>
+    <td>2236404</td>
+    <td>2360206.45</td>
+    <td>123802.44</td>
+  </tr>
+  <tr>
+    <td>Cost Per Conditioned Building Area ($/m2)</td>
+    <td>1203.69</td>
+    <td>1270.32</td>
+    <td>66.63</td>
+  </tr>
+</table>
+
+
+
+Cost Line Item Details
+
+<table class="table table-striped">
+  <tr>
+    <th></th>
+    <th>Line No.</th>
+    <th>Item Name</th>
+    <th>Quantity.</th>
+    <th>Units</th>
+    <th>$ per Qty.</th>
+    <th>SubTotal $</th>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>1</td>
+    <td>EXTERIOR WALLS</td>
+    <td>627.57</td>
+    <td>m2</td>
+    <td>168.64</td>
+    <td>105832.65</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>2</td>
+    <td>INTERIOR WALLS</td>
+    <td>854.18</td>
+    <td>m2</td>
+    <td>31.16</td>
+    <td>26616.23</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>3</td>
+    <td>ROOF</td>
+    <td>1857.96</td>
+    <td>m2</td>
+    <td>104.69</td>
+    <td>194509.64</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>4</td>
+    <td>GROUND FLR SLAB</td>
+    <td>1857.96</td>
+    <td>m2</td>
+    <td>56.06</td>
+    <td>104157.14</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>5</td>
+    <td>ACOUSTICAL DROP CEILINGS</td>
+    <td>1857.96</td>
+    <td>m2</td>
+    <td>23.79</td>
+    <td>44200.83</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>6</td>
+    <td>QUAD HIGH SHGC SUPERWINDOWS</td>
+    <td>226.22</td>
+    <td>m2</td>
+    <td>687.84</td>
+    <td>155604.96</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>7</td>
+    <td>QUAD LOW SHGC SUPERWINDOWS</td>
+    <td>42.68</td>
+    <td>m2</td>
+    <td>687.84</td>
+    <td>29359.55</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>8</td>
+    <td>CENTRAL CHILLER</td>
+    <td>150.49</td>
+    <td>kW (tot cool cap.)</td>
+    <td>340</td>
+    <td>51165.73</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>9</td>
+    <td>CONTINUOUS AIR BARRIER</td>
+    <td>1</td>
+    <td>Ea.</td>
+    <td>8500</td>
+    <td>8500</td>
+  </tr>
+  <tr>
+    <td>Line Item SubTotal</td>
+    <td>--</td>
+    <td>--</td>
+    <td>--</td>
+    <td>--</td>
+    <td>--</td>
+    <td>719946.72</td>
+  </tr>
+</table>
 
 
 
 ###LEED Summary
 
-
-
 The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System™. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
-
-
 
 Report: LEED Summary
 

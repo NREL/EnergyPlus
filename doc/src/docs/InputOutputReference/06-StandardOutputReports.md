@@ -520,7 +520,7 @@ The Object Count Summary provides the count on the number of specific objects in
 
 #### Component Cost Economics Summary
 
-The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object.
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. The key used to obtain this report is ComponentCostEconomicsSummary.
 
 ### Predefined Monthly Summary Reports
 
