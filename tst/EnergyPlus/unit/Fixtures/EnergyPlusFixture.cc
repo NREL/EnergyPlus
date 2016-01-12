@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -8,17 +66,26 @@
 #include "EnergyPlusFixture.hh"
 #include "../TestHelpers/IdfParser.hh"
 // A to Z order
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirflowNetwork.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -27,19 +94,26 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataPlantPipingSystems.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
@@ -49,8 +123,12 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
+#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -59,6 +137,8 @@
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/ManageElectricPower.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -71,6 +151,7 @@
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
@@ -79,24 +160,41 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/ReturnAirPathManager.hh>
+#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
+#include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UnitHeater.hh>
+#include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <fstream>
@@ -157,16 +255,25 @@ namespace EnergyPlus {
 	void EnergyPlusFixture::clear_all_states()
 	{
 		// A to Z order
+		AirflowNetworkBalanceManager::clear_state();
+		BaseboardElectric::clear_state();
+		BaseboardRadiator::clear_state();
+		Boilers::clear_state();
+		BoilerSteam::clear_state();
 		BranchInputManager::clear_state();
 		ChillerIndirectAbsorption::clear_state();
 		CondenserLoopTowers::clear_state();
+		CoolTower::clear_state();
 		CurveManager::clear_state();
+		DataAirflowNetwork::clear_state();
 		DataAirLoop::clear_state();
+		DataBranchAirLoopPlant::clear_state();
 		DataAirSystems::clear_state();
 		DataBranchNodeConnections::clear_state();
 		DataConvergParams::clear_state();
 		DataDefineEquip::clear_state();
 		DataEnvironment::clear_state();
+		DataGenerators::clear_state();
 		DataGlobals::clear_state();
 		DataHeatBalance::clear_state();
 		DataHeatBalFanSys::clear_state();
@@ -174,19 +281,26 @@ namespace EnergyPlus {
 		DataHVACGlobals::clear_state();
 		DataIPShortCuts::clear_state();
 		DataLoopNode::clear_state();
+		DataMoistureBalance::clear_state();
 		DataOutputs::clear_state();
 		DataPlant::clear_state();
 		DataPlantPipingSystems::clear_state();
+		DataRoomAirModel::clear_state();
 		DataRuntimeLanguage::clear_state();
 		DataSizing::clear_state();
+		DataSurfaceLists::clear_state();
 		DataSurfaces::clear_state();
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DirectAirManager::clear_state();
 		DXCoils::clear_state();
 		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
+		FluidProperties::clear_state();
+		FanCoilUnits::clear_state();
 		Fans::clear_state();
+		Furnaces::clear_state();
 		GlobalNames::clear_state();
 		GroundHeatExchangers::clear_state();
 		GroundTemperatureManager::clear_state();
@@ -194,16 +308,22 @@ namespace EnergyPlus {
 		HeatBalanceIntRadExchange::clear_state();
 		HeatBalanceManager::clear_state();
 		HeatBalanceSurfaceManager::clear_state();
-		HeatingCoils::clear_state();
+		HeatBalFiniteDiffManager::clear_state();
 		HeatPumpWaterToWaterSimple::clear_state();
+		HeatRecovery::clear_state();
 		HeatingCoils::clear_state();
 		Humidifiers::clear_state();
 		HVACControllers::clear_state();
+		HVACDXHeatPumpSystem::clear_state();
+		HVACDXSystem::clear_state();
 		HVACManager::clear_state();
+		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
+		LowTempRadiantSystem::clear_state();
+		ManageElectricPower::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
 		NodeInputManager::clear_state();
@@ -215,31 +335,49 @@ namespace EnergyPlus {
 		OutputReportTabularAnnual::clear_state();
 		OutsideEnergySources::clear_state();
 		PlantCondLoopOperation::clear_state();
+		PlantChillers::clear_state();
 		PlantLoadProfile::clear_state();
 		PlantLoopSolver::clear_state();
+		PlantManager::clear_state();
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
 		Pipes::clear_state();
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
+		ReturnAirPathManager::clear_state();
+		RoomAirModelAirflowNetwork::clear_state();
+		RoomAirModelManager::clear_state();
 		RuntimeLanguageProcessor::clear_state();
 		ScheduleManager::clear_state();
 		SetPointManager::clear_state();
 		SimAirServingZones::clear_state();
 		SimulationManager::clear_state();
+		SingleDuct::clear_state();
 		SizingManager::clear_state();
 		SolarShading::clear_state();
 		SplitterComponent::clear_state();
 		SurfaceGeometry::clear_state();
 		SystemAvailabilityManager::clear_state();
+		SwimmingPool::clear_state();
 		ThermalComfort::clear_state();
+		UnitHeater::clear_state();
+		UnitVentilator::clear_state();
 		VariableSpeedCoils::clear_state();
+		VentilatedSlab::clear_state();
 		WaterCoils::clear_state();
 		WaterThermalTanks::clear_state();
+		WaterUse::clear_state();
 		WeatherManager::clear_state();
+		WindowAC::clear_state();
+		WindowComplexManager::clear_state();
+		WindowEquivalentLayer::clear_state();
+		WindowManager::clear_state();
 		ZoneAirLoopEquipmentManager::clear_state();
+		ZoneContaminantPredictorCorrector::clear_state();
+		ZoneDehumidifier::clear_state();
 		ZoneEquipmentManager::clear_state();
+		ZonePlenum::clear_state();
 		ZoneTempPredictorCorrector::clear_state();
 	}
 
@@ -443,7 +581,7 @@ namespace EnergyPlus {
 		ProcessInputDataFile( *idf_stream );
 
 		ListOfSections.allocate( NumSectionDefs );
-		ListOfSections = SectionDef( { 1, NumSectionDefs } ).Name();
+		for ( int i = 1; i <= NumSectionDefs; ++i ) ListOfSections( i ) = SectionDef( i ).Name;
 
 		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
 		DataIPShortCuts::cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
@@ -608,7 +746,7 @@ namespace EnergyPlus {
 
 		if( !errors_found ) {
 			ListOfObjects.allocate( NumObjectDefs );
-			ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
+			for ( int i = 1; i <= NumObjectDefs; ++i ) ListOfObjects( i ) = ObjectDef( i ).Name;
 			if ( DataSystemVariables::SortedIDD ) {
 				iListOfObjects.allocate( NumObjectDefs );
 				SortAndStringUtilities::SetupAndSort( ListOfObjects, iListOfObjects );

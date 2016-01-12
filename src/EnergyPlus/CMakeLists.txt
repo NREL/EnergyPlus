@@ -306,10 +306,6 @@ SET( SRC
   Humidifiers.hh
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
-)
- 
-SET( SRC_2
-  Timer.h
   GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
   GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
   GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
@@ -505,6 +501,7 @@ SET( SRC_2
   ThermalEN673Calc.hh
   ThermalISO15099Calc.cc
   ThermalISO15099Calc.hh
+  Timer.h
   TranspiredCollector.cc
   TranspiredCollector.hh
   UFADManager.cc
@@ -577,17 +574,9 @@ if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
 endif()
 
-add_library( energypluslib2 STATIC ${SRC_2} )
-target_link_libraries( energypluslib2 )
-if(UNIX AND NOT APPLE)
-  target_link_libraries( energypluslib2 dl )
-endif()
-
-
 # second we will create the shared library that is actually packaged with EnergyPlus
 add_library( energyplusapi SHARED  CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
-target_link_libraries( energyplusapi energypluslib energypluslib2 )
-
+target_link_libraries( energyplusapi energypluslib )
 
 set_target_properties(
   energyplusapi
@@ -600,15 +589,11 @@ install( TARGETS energyplusapi
 )
 
 if (MINGW)
-  target_link_libraries( energypluslib2 energypluslib )
-  target_link_libraries( energypluslib energypluslib2 )
   add_executable( energyplus main.cc  )
   target_link_libraries( energyplus energyplusapi )
 elseif (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
-  target_link_libraries( energypluslib2 energypluslib )
-  target_link_libraries( energypluslib energypluslib2 )
   add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-  target_link_libraries( energyplus energypluslib energypluslib2 )
+  target_link_libraries( energyplus energypluslib )
 else()
   add_executable( energyplus main.cc  )
   target_link_libraries( energyplus energyplusapi )
