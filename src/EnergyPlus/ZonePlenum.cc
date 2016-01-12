@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -128,6 +128,9 @@ namespace ZonePlenum {
 	Array1D_bool CheckRetEquipName;
 	Array1D_bool CheckSupEquipName;
 
+	namespace {
+		bool GetInputFlag( true ); // Flag set to make sure you get input once
+	}
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
 
 	// Object Data
@@ -142,11 +145,10 @@ namespace ZonePlenum {
 	void
 	clear_state()
 	{
+		GetInputFlag = true;
 		NumZonePlenums = 0;
 		NumZoneReturnPlenums = 0;
 		NumZoneSupplyPlenums = 0;
-		CheckRetEquipName.deallocate();
-		CheckSupEquipName.deallocate();
 		ZoneRetPlenCond.deallocate();
 		ZoneSupPlenCond.deallocate();
 	}
@@ -202,7 +204,6 @@ namespace ZonePlenum {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZonePlenumNum; // The ZonePlenum that you are currently loading input into
-		static bool GetInputFlag( true ); // Flag set to make sure you get input once
 
 		// FLOW:
 
