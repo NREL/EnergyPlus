@@ -1021,6 +1021,9 @@ namespace OutputReportTabular {
 	ConvertToElementTag( std::string const & inString ); // Input String
 
 	std::string
+	ConvertUnicodeToUTF8( unsigned long const codepoint );
+
+	std::string
 	ConvertToEscaped( std::string const & inString ); // Input String
 
 	void
