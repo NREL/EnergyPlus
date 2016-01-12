@@ -226,6 +226,25 @@ namespace VentilatedSlab {
 	// Functions
 
 	void
+	clear_state()
+	{
+		HCoilOn = false;
+		NumOfVentSlabs = 0;
+		OAMassFlowRate = 0.0;
+		MaxCloNumOfSurfaces = 0;
+		QZnReq = 0.0;
+		QRadSysSrcAvg.deallocate();
+		ZeroSourceSumHATsurf.deallocate();
+		LastQRadSysSrc.deallocate();
+		LastSysTimeElapsed.deallocate();
+		LastTimeStepSys.deallocate();
+		CheckEquipName.deallocate();
+		MySizeFlag.deallocate();
+		VentSlab.deallocate();
+		VentSlabNumericFields.deallocate();
+	}
+
+	void
 	SimVentilatedSlab(
 		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served

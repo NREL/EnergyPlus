@@ -263,6 +263,11 @@ namespace HVACControllers {
 	Array1D< RootFinderDataType > RootFinders;
 	Array1D< AirLoopStatsType > AirLoopStats; // Statistics array to analyze computational profile for
 
+	namespace {
+		bool InitControllerOneTimeFlag( true );
+		bool InitControllerSetPointCheckFlag( true );
+	}
+
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAA( "(A,A)" );
@@ -276,11 +281,13 @@ namespace HVACControllers {
 
 	// Needed for unit tests, should not be normally called.
 	void
-		clear_state()
+	clear_state()
 	{
 		NumControllers = 0;
 		NumAirLoopStats = 0;
 		GetControllerInputFlag = true;
+		InitControllerOneTimeFlag = true;
+		InitControllerSetPointCheckFlag = true;
 
 		ControllerProps.deallocate();
 		RootFinders.deallocate();
@@ -990,20 +997,22 @@ namespace HVACControllers {
 		int ActuatedNode;
 		int SensedNode;
 		int ControllerIndex;
-		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MySizeFlag;
 		static Array1D_bool MyPlantIndexsFlag;
-		static bool MySetPointCheckFlag( true );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeFlag( true ); // InitControllerOneTimeFlag
+		// static bool MySetPointCheckFlag( true ); // InitControllerSetPointCheckFlag
+		////////////////////////////////////////////////////////////////////////////////////
 		// Supply Air Temp Setpoint when 'TemperatureAndHumidityRatio' control is used
-		static Real64 HumidityControlTempSetPoint;
+		Real64 HumidityControlTempSetPoint;
 		// Difference between SA dry-bulb and dew-point temperatures
 		Real64 ApproachTemp;
 		// Desired dew point temperature setpoint for 'TemperatureAndHumidityRatio' control
 		Real64 DesiredDewPoint;
 		Real64 rho; // local fluid density
 
-		if ( MyOneTimeFlag ) {
+		if ( InitControllerOneTimeFlag ) {
 
 			MyEnvrnFlag.allocate( NumControllers );
 			MySizeFlag.allocate( NumControllers );
@@ -1011,10 +1020,10 @@ namespace HVACControllers {
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyPlantIndexsFlag = true;
-			MyOneTimeFlag = false;
+			InitControllerOneTimeFlag = false;
 		}
 
-		if ( ! SysSizingCalc && MySetPointCheckFlag && DoSetPointTest ) {
+		if ( ! SysSizingCalc && InitControllerSetPointCheckFlag && DoSetPointTest ) {
 			// check for missing setpoints
 			for ( ControllerIndex = 1; ControllerIndex <= NumControllers; ++ControllerIndex ) {
 				SensedNode = ControllerProps( ControllerIndex ).SensedNode;
@@ -1126,7 +1135,7 @@ namespace HVACControllers {
 				}}
 			}
 
-			MySetPointCheckFlag = false;
+			InitControllerSetPointCheckFlag = false;
 		}
 
 		if ( allocated( PlantLoop ) && MyPlantIndexsFlag( ControlNum ) ) {

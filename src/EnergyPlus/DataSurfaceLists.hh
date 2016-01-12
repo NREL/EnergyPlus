@@ -181,6 +181,9 @@ namespace DataSurfaceLists {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	GetSurfaceListsInputs();
 
 	int

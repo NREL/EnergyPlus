@@ -352,6 +352,9 @@ namespace ZonePlenum {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimAirZonePlenum(
 		std::string const & CompName,
 		int const iCompType,

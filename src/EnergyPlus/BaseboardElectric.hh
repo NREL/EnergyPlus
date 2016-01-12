@@ -188,6 +188,9 @@ namespace BaseboardElectric {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimElectricBaseboard(
 		std::string const & EquipName,
 		int const ActualZoneNum,

@@ -118,6 +118,13 @@ namespace DataBranchAirLoopPlant {
 	// Object Data
 	Array1D< PlantPressureCurveData > PressureCurve;
 
+	void
+	clear_state()
+	{
+		NumPressureCurves = 0;
+		PressureCurve.deallocate();
+	}
+
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	//=================================================================================================!

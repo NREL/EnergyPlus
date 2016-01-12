@@ -245,6 +245,26 @@ namespace HeatBalFiniteDiffManager {
 	// Functions
 
 	void
+	clear_state()
+	{
+		SigmaR.deallocate();
+		SigmaC.deallocate();
+		QHeatInFlux.deallocate();
+		QHeatOutFlux.deallocate();
+		CondFDSchemeType = FullyImplicitFirstOrder;
+		SpaceDescritConstant = 3.0;
+		MinTempLimit = -100.0;
+		MaxTempLimit = 100.0;
+		MaxGSiter = 30;
+		fracTimeStepZone_Hour = 0.0;
+		GetHBFiniteDiffInputFlag = true;
+		WarmupSurfTemp = 0;
+		ConstructFD.deallocate();
+		SurfaceFD.deallocate();
+		MaterialFD.deallocate();
+	}
+
+	void
 	ManageHeatBalFiniteDiff(
 		int const SurfNum,
 		Real64 & TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
@@ -2515,7 +2535,7 @@ namespace HeatBalFiniteDiffManager {
 	}
 	// *****************************************************************************
 
-	
+
 } // HeatBalFiniteDiffManager
 
 } // EnergyPlus

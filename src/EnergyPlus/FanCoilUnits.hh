@@ -341,6 +341,9 @@ namespace FanCoilUnits {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimFanCoilUnit(
 		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
@@ -453,7 +456,6 @@ namespace FanCoilUnits {
 		Real64 const CWFlow, // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
 		);
-
 } // FanCoilUnits
 
 } // EnergyPlus

@@ -196,6 +196,20 @@ namespace UnitVentilator {
 	// Functions
 
 	void
+	clear_state()
+	{
+		HCoilOn = false;
+		NumOfUnitVents = 0;
+		OAMassFlowRate = 0.0;
+		QZnReq = 0.0;
+		GetUnitVentilatorInputFlag = true;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		UnitVent.deallocate();
+		UnitVentNumericFields.deallocate();
+	}
+
+	void
 	SimUnitVentilator(
 		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served

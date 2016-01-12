@@ -1162,18 +1162,6 @@ namespace PlantPipingSystemsManager {
 		CartesianCell const & cell
 	);
 
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	GetGroundTempModel(
-		std::shared_ptr< BaseGroundTempsModel > &GTMPtrReference,
-		std::string objectType_str,
-		std::string objectName
-	);
-
-
 } // PlantPipingSystemsManager
 
 } // EnergyPlus

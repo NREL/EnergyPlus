@@ -161,6 +161,10 @@ namespace HeatRecovery {
 
 	static std::string const BlankString;
 
+	namespace {
+		bool MyOneTimeAllocate( true );
+	}
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -198,6 +202,22 @@ namespace HeatRecovery {
 	Array1D< BalancedDesDehumPerfData > BalDesDehumPerfData;
 
 	// Functions
+
+	void clear_state() {
+		NumHeatExchangers = 0;
+		NumAirToAirPlateExchs = 0;
+		NumAirToAirGenericExchs = 0;
+		NumDesiccantBalancedExchs = 0;
+		NumDesBalExchsPerfDataType1 = 0;
+		FullLoadOutAirTemp = 0.0;
+		FullLoadOutAirHumRat = 0.0;
+		GetInputFlag = true;
+		CalledFromParentObject = true;
+		CheckEquipName.deallocate();
+		ExchCond.deallocate();
+		BalDesDehumPerfData.deallocate();
+		MyOneTimeAllocate = true;
+	}
 
 	void
 	SimHeatRecovery(
@@ -1125,7 +1145,9 @@ namespace HeatRecovery {
 		Real64 RhoAir; // air density at outside pressure & standard temperature and humidity
 		Real64 CpAir; // heat capacity of air
 		// of humidity ratio and temperature
-		static bool MyOneTimeAllocate( true );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeAllocate( true );
+		////////////////////////////////////////////////////////////////////////////////////
 		static Array1D_bool MySetPointTest;
 		static Array1D_bool MySizeFlag;
 		int ErrStat; // error status returned by CalculateNTUfromEpsAndZ

@@ -1577,6 +1577,9 @@ namespace DataRoomAirModel {
 	extern Array1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
 	extern Array1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info
 
+	void
+	clear_state();
+
 } // DataRoomAirModel
 
 } // EnergyPlus

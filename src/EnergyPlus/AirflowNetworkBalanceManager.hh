@@ -221,6 +221,9 @@ namespace AirflowNetworkBalanceManager {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManageAirflowNetworkBalance(
 		Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
 		Optional_int_const Iter = _, // Iteration number

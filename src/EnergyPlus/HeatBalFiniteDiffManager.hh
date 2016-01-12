@@ -202,8 +202,8 @@ namespace HeatBalFiniteDiffManager {
 		Array1D< Real64 > EnthNew; // Node enthalpy at new time
 		Array1D< Real64 > EnthLast;
 		Array1D< Real64 > QDreport; // Node heat flux for reporting [W/m2] postive is flow towards inside face of surface
-		Array1D< Real64 > CpDelXRhoS1; // Current outer half-node Cp * DelX * RhoS / Delt 
-		Array1D< Real64 > CpDelXRhoS2; // Current inner half-node Cp * DelX * RhoS / Delt 
+		Array1D< Real64 > CpDelXRhoS1; // Current outer half-node Cp * DelX * RhoS / Delt
+		Array1D< Real64 > CpDelXRhoS2; // Current inner half-node Cp * DelX * RhoS / Delt
 		Array1D< Real64 > TDpriortimestep; // Node temperatures from previous timestep
 		int SourceNodeNum; // Node number for internal source layer (zero if no source)
 		Real64 QSource; // Internal source flux [W/m2]
@@ -278,6 +278,9 @@ namespace HeatBalFiniteDiffManager {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	ManageHeatBalFiniteDiff(
 		int const SurfNum,
 		Real64 & TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
@@ -314,7 +317,7 @@ namespace HeatBalFiniteDiffManager {
 		int const Surf, // surface number
 		int const TotNodes // number of nodes in surface
 	);
-		
+
 	// Utility Interpolation Function for the Module
 	//******************************************************************************
 

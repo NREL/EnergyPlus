@@ -122,6 +122,32 @@ namespace DataMoistureBalance {
 	Array1D< Real64 > HGrndFD; // Ground Convection Coefficient
 	Array1D< Real64 > HAirFD; // Air Convection Coefficient
 
+	void
+	clear_state()
+	{
+		FluxH.deallocate();
+		IcoefH.deallocate();
+		Icoef.deallocate();
+		DiffC.deallocate();
+		mtinc.deallocate();
+		S1.deallocate();
+		R2.deallocate();
+		TempOutsideAirFD.deallocate();
+		mhstry.deallocate();
+		CMTF.deallocate();
+		Nmrf.deallocate();
+		RhoVaporAirOut.deallocate();
+		RhoVaporAirIn.deallocate();
+		HConvExtFD.deallocate();
+		HMassConvExtFD.deallocate();
+		HConvInFD.deallocate();
+		HMassConvInFD.deallocate();
+		RhoVaporSurfIn.deallocate();
+		HSkyFD.deallocate();
+		HGrndFD.deallocate();
+		HAirFD.deallocate();
+	}
+
 } // DataMoistureBalance
 
 } // EnergyPlus

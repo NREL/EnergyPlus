@@ -796,6 +796,9 @@ namespace FluidProperties {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	GetFluidPropertiesData();
 
 	//*****************************************************************************

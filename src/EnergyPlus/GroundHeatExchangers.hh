@@ -59,9 +59,6 @@
 #ifndef GroundHeatExchangers_hh_INCLUDED
 #define GroundHeatExchangers_hh_INCLUDED
 
-// C++ Headers
-#include <memory>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -92,6 +89,11 @@ namespace GroundHeatExchangers {
 
 	struct GLHEBase
 	{
+		// Destructor
+		virtual 
+		~GLHEBase()
+		{}
+
 		// Members
 		bool available; // need an array of logicals--load identifiers of available equipment
 		bool on; // simulate the machine at it's operating part load ratio
@@ -212,6 +214,9 @@ namespace GroundHeatExchangers {
 
 	struct GLHEVert:GLHEBase
 	{
+		// Destructor
+		~GLHEVert(){}
+
 		// Members
 		Real64 maxFlowRate; // design nominal capacity of Pump
 		int maxSimYears; // maximum length of simulation (years)
@@ -255,6 +260,10 @@ namespace GroundHeatExchangers {
 
 	struct GLHESlinky:GLHEBase
 	{
+
+		// Destructor
+		~GLHESlinky(){}
+
 		// Members
 		bool verticalConfig;	// HX Configuration Flag
 		Real64 coilDiameter;	// Diameter of the slinky coils [m]

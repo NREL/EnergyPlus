@@ -194,6 +194,9 @@ namespace BoilerSteam {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimSteamBoiler(
 		std::string const & BoilerType, // boiler type (used in CASE statement)
 		std::string const & BoilerName, // boiler identifier

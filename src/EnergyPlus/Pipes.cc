@@ -55,6 +55,7 @@
 // perpetual license to install, use, modify, prepare derivative works, incorporate into other
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
+
 // EnergyPlus Headers
 #include <Pipes.hh>
 #include <BranchNodeConnections.hh>

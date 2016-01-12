@@ -179,6 +179,18 @@ namespace UnitHeater {
 	// Functions
 
 	void
+	clear_state()
+	{
+		HCoilOn = false;
+		NumOfUnitHeats = 0;
+		QZnReq = 0.0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		UnitHeat.deallocate();
+		UnitHeatNumericFields.deallocate();
+	}
+
+	void
 	SimUnitHeater(
 		std::string const & CompName, // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
