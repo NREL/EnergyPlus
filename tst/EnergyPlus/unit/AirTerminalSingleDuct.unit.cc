@@ -57,6 +57,10 @@
 // in binary and source code form.
 
 // EnergyPlus::AirTerminal SingleDuct Unit Tests
+// AirTerminal:SingleDuct:ConstantVolume:Reheat
+// AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
+// AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
+// AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -72,7 +76,6 @@
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
-#include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 // EnergyPlus Headers
@@ -82,7 +85,6 @@ using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACSingleDuctInduc;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SingleDuct;
-using namespace EnergyPlus::WaterCoils;
 using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
 
 namespace EnergyPlus {
