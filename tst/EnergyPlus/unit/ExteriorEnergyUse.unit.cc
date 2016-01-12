@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -66,16 +66,16 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::ExteriorEnergyUse;
 using namespace ObjexxFCL;
 using namespace DataGlobals;
 using namespace EnergyPlus::ScheduleManager;
 
-TEST( ExteriorEquipmentTest, Test1 )
+TEST_F( EnergyPlusFixture, ExteriorEquipmentTest_Test1 )
 {
-
-	ShowMessage( "Begin Test: ExteriorEquipmentTest, Test1" );
 
 	NumExteriorLights = 0;
 	NumExteriorEqs = 2;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -173,6 +173,23 @@ namespace DataGenerators {
 	Array1D< MicroCHPDataStruct > MicroCHP;
 	Array1D< MicroCHPParamsNonNormalized > MicroCHPParamInput; // Used during get input then put into nested
 	Array1D< GeneratorDynamicsManagerStruct > GeneratorDynamics;
+
+	void
+	clear_state()
+	{
+		NumFuelConstit = 0;
+		NumGeneratorFuelSups = 0;
+		NumFuelCellGenerators = 0;
+		NumMicroCHPs = 0;
+		NumMicroCHPParams = 0;
+		NumGensWDynamics = 0;
+		FuelCell.deallocate();
+		GasPhaseThermoChemistryData.deallocate();
+		FuelSupply.deallocate();
+		MicroCHP.deallocate();
+		MicroCHPParamInput.deallocate();
+		GeneratorDynamics.deallocate();
+	}
 
 } // DataGenerators
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -156,6 +156,19 @@ namespace ZoneContaminantPredictorCorrector {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		GetZoneAirContamInputFlag = true;
+		TotGCGenConstant = 0;
+		TotGCGenPDriven = 0;
+		TotGCGenCutoff = 0;
+		TotGCGenDecay = 0;
+		TotGCBLDiff = 0;
+		TotGCDVS = 0;
+		TotGCDRS = 0;
+	}
 
 	void
 	ManageZoneContaminanUpdates(

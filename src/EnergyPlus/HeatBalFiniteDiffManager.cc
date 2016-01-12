@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -243,6 +243,26 @@ namespace HeatBalFiniteDiffManager {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		SigmaR.deallocate();
+		SigmaC.deallocate();
+		QHeatInFlux.deallocate();
+		QHeatOutFlux.deallocate();
+		CondFDSchemeType = FullyImplicitFirstOrder;
+		SpaceDescritConstant = 3.0;
+		MinTempLimit = -100.0;
+		MaxTempLimit = 100.0;
+		MaxGSiter = 30;
+		fracTimeStepZone_Hour = 0.0;
+		GetHBFiniteDiffInputFlag = true;
+		WarmupSurfTemp = 0;
+		ConstructFD.deallocate();
+		SurfaceFD.deallocate();
+		MaterialFD.deallocate();
+	}
 
 	void
 	ManageHeatBalFiniteDiff(
@@ -2515,7 +2535,7 @@ namespace HeatBalFiniteDiffManager {
 	}
 	// *****************************************************************************
 
-	
+
 } // HeatBalFiniteDiffManager
 
 } // EnergyPlus

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -71,6 +71,8 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::SolarShading;
 using namespace EnergyPlus::DataSurfaces;
@@ -81,10 +83,8 @@ using namespace EnergyPlus::DataBSDFWindow;
 using namespace EnergyPlus::DataVectorTypes;
 using namespace ObjexxFCL;
 
-TEST( SolarShadingTest, CalcPerSolarBeamTest )
+TEST_F( EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest )
 {
-	ShowMessage( "Begin Test: SolarShadingTest, CalcPerSolarBeamTest" );
-
 // Test inits for integrated and non-integrated shading calcs
 
 //	static bool ErrorsFound( false ); // If errors detected in input
@@ -166,9 +166,8 @@ TEST( SolarShadingTest, CalcPerSolarBeamTest )
 	OverlapAreas.deallocate();
 }
 
-TEST( SolarShadingTest, SurfaceScheduledSolarInc )
+TEST_F( EnergyPlusFixture, SolarShadingTest_SurfaceScheduledSolarInc )
 {
-	ShowMessage("Begin Test: SolarShadingTest, SurfaceScheduledSolarInc");
 	int SurfSolIncPtr;
 	TotSurfIncSolSSG = 4;
 	SurfIncSolSSG.allocate( TotSurfIncSolSSG );
@@ -206,10 +205,8 @@ TEST( SolarShadingTest, SurfaceScheduledSolarInc )
 	SurfIncSolSSG.deallocate();
 }
 
-TEST( SolarShadingTest, polygon_contains_point )
+TEST_F( EnergyPlusFixture, SolarShadingTest_polygon_contains_point )
 {
-	ShowMessage( "Begin Test: SolarShadingTest, polygon_contains_point" );
-
 	unsigned int numSides = 4;
 	Array1D< Vector > Rectangle3d;
 

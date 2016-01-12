@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -173,6 +173,28 @@ namespace FluidProperties {
 
 	// Data Initializer Forward Declarations
 	// See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
+
+	void
+	clear_state()
+	{
+		GetInput = true;
+		NumOfRefrigerants = 0;
+		NumOfGlycols = 0;
+		DebugReportGlycols = false;
+		DebugReportRefrigerants = false;
+		GlycolErrorLimitTest = 1;
+		RefrigerantErrorLimitTest = 1;
+		RefrigUsed.deallocate();
+		GlycolUsed.deallocate();
+		FluidIndex_Water = 0;
+		FluidIndex_EthyleneGlycol = 0;
+		FluidIndex_PropoleneGlycol = 0;
+		RefrigData.deallocate();
+		RefrigErrorTracking.deallocate();
+		GlyRawData.deallocate();
+		GlycolData.deallocate();
+		GlycolErrorTracking.deallocate();
+	}
 
 	void
 	DefaultEthGlyCpData_initializer(

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -230,6 +230,78 @@ namespace DataAirflowNetwork {
 	Array1D< DisSysCompTermUnitProp > DisSysCompTermUnitData;
 	Array1D< DisSysCompCPDProp > DisSysCompCPDData;
 	Array1D< AiflowNetworkReportProp > AirflowNetworkReportData;
+
+	void
+	clear_state()
+	{
+		SimulateAirflowNetwork = 1;
+		AirflowNetworkZoneFlag.deallocate();
+		NumOfNodesMultiZone = 0;
+		NumOfNodesDistribution = 0;
+		NumOfLinksMultiZone = 0;
+		NumOfLinksDistribution = 0;
+		NumOfNodesIntraZone = 0;
+		NumOfLinksIntraZone = 0;
+		AirflowNetworkNumOfNodes = 0;
+		AirflowNetworkNumOfComps = 0;
+		AirflowNetworkNumOfLinks = 0;
+		AirflowNetworkNumOfSurfaces = 0;
+		AirflowNetworkNumOfZones = 0;
+		RollBackFlag = false;
+		ANZT.deallocate();
+		ANZW.deallocate();
+		ANCO.deallocate();
+		ANGC.deallocate();
+		AirflowNetworkNumOfExhFan = 0;
+		AirflowNetworkZoneExhaustFan.deallocate();
+		AirflowNetworkFanActivated = false;
+		AirflowNetworkUnitarySystem = false;
+		MultiSpeedHPIndicator = 0;
+		VAVTerminalRatio = 0.0;
+		VAVSystem = false;
+		AirflowNetworkNodeSimu.deallocate();
+		AirflowNetworkLinkSimu.deallocate();
+		AirflowNetworkExchangeData.deallocate();
+		AirflowNetworkMultiExchangeData.deallocate();
+		AirflowNetworkLinkReport.deallocate();
+		AirflowNetworkNodeReport.deallocate();
+		AirflowNetworkLinkReport1.deallocate();
+		AirflowNetworkSimu = AirflowNetworkSimuProp( "", "NoMultizoneOrDistribution", "Input", 0, "", "", "", 500, 0, 1.0e-5, 1.0e-5, -0.5, 500.0, 0.0, 1.0, 0, 1.0e-4, 0, 0, 0, 0, "ZeroNodePressures", false );
+		AirflowNetworkNodeData.deallocate();
+		AirflowNetworkCompData.deallocate();
+		AirflowNetworkLinkageData.deallocate();
+		MultizoneZoneData.deallocate();
+		MultizoneSurfaceData.deallocate();
+		MultizoneCompDetOpeningData.deallocate();
+		MultizoneCompSimpleOpeningData.deallocate();
+		MultizoneCompHorOpeningData.deallocate();
+		MultizoneSurfaceStdConditionsCrackData.deallocate();
+		MultizoneSurfaceCrackData.deallocate();
+		MultizoneSurfaceELAData.deallocate();
+		MultizoneExternalNodeData.deallocate();
+		MultizoneCPArrayData.deallocate();
+		MultizoneCPArrayDataSingleSided.deallocate();
+		MultizoneCPValueData.deallocate();
+		MultizoneCPValueDataTemp.deallocate();
+		MultizoneCPValueDataTempUnMod.deallocate();
+		DeltaCp.deallocate();
+		EPDeltaCP.deallocate();
+		MultizoneCompExhaustFanData.deallocate();
+		IntraZoneNodeData.deallocate();
+		IntraZoneLinkageData.deallocate();
+		DisSysNodeData.deallocate();
+		DisSysCompLeakData.deallocate();
+		DisSysCompELRData.deallocate();
+		DisSysCompDuctData.deallocate();
+		DisSysCompDamperData.deallocate();
+		DisSysCompCVFData.deallocate();
+		DisSysCompDetFanData.deallocate();
+		DisSysCompCoilData.deallocate();
+		DisSysCompHXData.deallocate();
+		DisSysCompTermUnitData.deallocate();
+		DisSysCompCPDData.deallocate();
+		AirflowNetworkReportData.deallocate();
+	}
 
 } // DataAirflowNetwork
 

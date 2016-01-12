@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -489,6 +489,9 @@ namespace OutdoorAirUnit {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimOutdoorAirUnit(
 		std::string const & CompName, // name of the outdoor air unit
 		int const ZoneNum, // number of zone being served
@@ -564,11 +567,6 @@ namespace OutdoorAirUnit {
 
 	int
 	GetOutdoorAirUnitReturnAirNode( int const OAUnitNum );
-
-	// Clears the global data in OutdoorAirUnit.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
 
 	//*****************************************************************************************
 
