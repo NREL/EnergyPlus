@@ -287,10 +287,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-		CurZoneEqNum = 0;
-		CurSysNum = 0;
-		CurOASysNum = 0;
-
 		std::string const idf_objects = delimited_string( {
 			" Version,8.4;",
 
@@ -509,12 +505,13 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 
 TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	int write_stat;
+	Real64 Qhr_HeatingRateTot( 0.0 );
+	int InletNode( 0 ); // Heat Recovery primary air inlet node number
+	int OutletNode( 0 ); // Heat Recovery primary air outlet node number
+
 	OutputFileInits = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
-	CurZoneEqNum = 0;
-	CurSysNum = 0;
-	CurOASysNum = 0;
 
 	std::string const idf_objects = delimited_string( {
 
@@ -605,12 +602,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 		"    0.0;                     !- Sky Clearness",
 
-		"!-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:BUILDINGSURFACE ===========",
-
 		"Site:GroundTemperature:BuildingSurface,21.5,21.4,21.5,21.5,22.0,22.9,23.0,23.1,23.1,22.2,21.7,21.6;",
-
-		"!-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPELIMITS ===========",
-
 
 		"ScheduleTypeLimits,",
 		"    Any Number;              !- Name",
@@ -802,7 +794,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    For: AllDays,            !- Field 2",
 		"    Until: 24:00, 12.2;      !- Field 4",
 
-		"!   Site:GroundTemperature:BuildingSurface,21.5,21.4,21.5,21.5,22.0,22.9,23.0,23.1,23.1,22.2,21.7,21.6;",
 		"Material,",
 		"    WD10,                    !- Name",
 		"    MediumSmooth,            !- Roughness",
@@ -1015,9 +1006,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    ARGON 13MM,              !- Name",
 		"    Argon,                   !- Gas Type",
 		"    0.0127;                  !- Thickness {m}",
-
-
-		"!-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========",
 
 		"Construction,",
 		"    ROOF-1,                  !- Name",
@@ -2879,9 +2867,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    DetailedAnalysis,        !- Type of Analysis",
 		"    CrossFlow;               !- Heat Exchanger Configuration",
 
-
-		"!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:WATER ===========",
-
 		"Coil:Heating:Water,",
 		"    SPACE1-1 Heating Coil,   !- Name",
 		"    HVACTemplate-Always 1,   !- Availability Schedule Name",
@@ -3446,9 +3431,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    Chilled Water Loop ChW Demand Outlet,  !- Component 1 Outlet Node Name",
 		"    Passive;                 !- Component 1 Branch Control Type",
 
-
-		"!-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========",
-
 		"BranchList,",
 		"    DOAS Branches,           !- Name",
 		"    DOAS Main Branch;        !- Branch 1 Name",
@@ -3891,15 +3873,20 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	ManageSimulation(); // run the design day
 
 	ASSERT_EQ( "DOAS HEAT RECOVERY", ExchCond( 1 ).Name );  // Name of Heat Recovery Exchange On Main Air Loop
-	ASSERT_EQ( ExchCond( 1 ).Name, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 2 ).Name );  // Heat Recovery Exchange On Main Air Loop
-	ASSERT_NEAR( 12398.17, ExchCond( 1 ).TotHeatingRate, 0.01 ); // Name of Heat Recovery Exchange On Main Air Loop
+	ASSERT_EQ( ExchCond( 1 ).Name, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 2 ).Name );  // Heat Recovery Exchange On Main Air Loop	
 
-	ASSERT_NEAR( -17.300, ExchCond( 1 ).SupInTemp, 0.001 ); // Heat Recovery Exchange Primary Air Inlet Temp
-	ASSERT_NEAR( 4.0146, ExchCond( 1 ).SupOutTemp, 0.001 ); // Heat Recovery Exchange Primary Air Outlet Temp
-	ASSERT_NEAR( 23.000, ExchCond( 1 ).SecInTemp, 0.001 ); // Heat Recovery Exchange Secondary Air Inlet Temp
-	ASSERT_NEAR( 1.686, ExchCond( 1 ).SecOutTemp, 0.001 ); // Heat Recovery Exchange Secondary Air Outlet Temp
+	ASSERT_NEAR( -17.300, ExchCond( 1 ).SupInTemp, 0.001 ); // Heat Recovery Exchanger Primary Air Inlet Temp
+	ASSERT_GT( ExchCond( 1 ).SupOutTemp, ExchCond( 1 ).SupInTemp ); // Heat Recovery Exchanger is On in heating mode
+	ASSERT_NEAR( 23.000, ExchCond( 1 ).SecInTemp, 0.001 ); // Heat Recovery Exchanger Secondary Air Inlet Temp
+	ASSERT_LT( ExchCond( 1 ).SecOutTemp, ExchCond( 1 ).SecInTemp ); // Heat Recovery Exchanger is On in heating mode
+
+	InletNode = ExchCond( 1 ).SupInletNode;
+	OutletNode = ExchCond( 1 ).SupOutletNode;
+	Qhr_HeatingRateTot = ExchCond( 1 ).SupInMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
+	ASSERT_NEAR( Qhr_HeatingRateTot, ExchCond( 1 ).TotHeatingRate, 0.01 ); // Name of Heat Recovery Exchange On Main Air Loop
 
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileSysSizing, flags ); }
 
 }
