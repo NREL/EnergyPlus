@@ -23,7 +23,6 @@ class ProxySentinel
 public: // Creation
 
 	// Default Constructor
-	inline
 	ProxySentinel()
 	{}
 
