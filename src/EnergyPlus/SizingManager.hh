@@ -98,17 +98,6 @@ namespace SizingManager {
 			NumOfZones( 0 )
 		{}
 
-		// Member Constructor
-		ZoneListData(
-			std::string const & Name,
-			int const NumOfZones,
-			Array1_int const & Zones
-		) :
-			Name( Name ),
-			NumOfZones( NumOfZones ),
-			Zones( Zones )
-		{}
-
 	};
 
 	// Functions

@@ -145,21 +145,6 @@ namespace HeatBalanceManager {
 			TestMaxCoolLoadValue( 0.0 )
 		{}
 
-		// Member Constructor
-		WarmupConvergence(
-			Array1_int const & PassFlag, // one flag (1=Fail), (2=Pass) for each of the 4 conditions of convergence from
-			Real64 const TestMaxTempValue, // Max Temperature convergence value=ABS(MaxTempPrevDay(ZoneNum)-MaxTempZone(ZoneNum))
-			Real64 const TestMinTempValue, // Min Temperature convergence value=ABS(MinTempPrevDay(ZoneNum)-MinTempZone(ZoneNum))
-			Real64 const TestMaxHeatLoadValue, // Max Heat Load convergence value=
-			Real64 const TestMaxCoolLoadValue // Max Cool Load convergence value=
-		) :
-			PassFlag( 4, PassFlag ),
-			TestMaxTempValue( TestMaxTempValue ),
-			TestMinTempValue( TestMinTempValue ),
-			TestMaxHeatLoadValue( TestMaxHeatLoadValue ),
-			TestMaxCoolLoadValue( TestMaxCoolLoadValue )
-		{}
-
 	};
 
 	// Object Data

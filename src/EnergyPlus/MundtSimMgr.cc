@@ -949,7 +949,7 @@ namespace MundtSimMgr {
 		int NumOfSurfs; // number of surfaces in the zone
 		int ZoneNodeNum; // index number of the zone node
 		Real64 DeltaTemp; // dummy variable for temperature difference
-		Real64 TRoomAverage; // dummy variable for mean air temperature
+		// Real64 TRoomAverage; // dummy variable for mean air temperature
 		// FLOW:
 
 		// get surface info
@@ -968,7 +968,7 @@ namespace MundtSimMgr {
 				}
 				// b) Average zone air temperature -> ZT(ZoneNum)
 				// For Mundt model, average room air is the weighted value of floor and ceiling air temps
-				TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
+				// TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
 				//ZT(ZoneNum) = TRoomAverage
 				// c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
 				ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
@@ -986,8 +986,8 @@ namespace MundtSimMgr {
 				}
 				// b) Average zone air temperature -> ZT(ZoneNum)
 				// For Mundt model, average room air is the weighted value of floor and ceiling air temps
-				TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
-				DeltaTemp = TRoomAverage - LineNode( TstatNodeID, MundtZoneNum ).Temp;
+				// TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
+				// DeltaTemp = TRoomAverage - LineNode( TstatNodeID, MundtZoneNum ).Temp;
 				// ZT(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp
 				// c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
 				ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;

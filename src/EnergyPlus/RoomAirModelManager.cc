@@ -412,7 +412,6 @@ namespace RoomAirModelManager {
 
 			GetObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//first get zone ID
-			ZoneNum = 0;
 			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum == 0 ) { //throw error
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );

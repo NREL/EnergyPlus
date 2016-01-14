@@ -357,17 +357,6 @@ namespace DataZoneEquipment {
 				OnListNum( 0 )
 			{}
 
-			// Member Constructor
-			EquipListAudit(
-				std::string const & ObjectType,
-				std::string const & ObjectName,
-				int const OnListNum
-			) :
-				ObjectType( ObjectType ),
-				ObjectName( ObjectName ),
-				OnListNum( OnListNum )
-			{}
-
 		};
 
 		// Object Data

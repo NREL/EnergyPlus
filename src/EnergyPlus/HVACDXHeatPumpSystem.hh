@@ -148,53 +148,6 @@ namespace HVACDXHeatPumpSystem {
 			SpeedNum( 0 )
 		{}
 
-		// Member Constructor
-		DXHeatPumpSystemStruct(
-			std::string const & DXHeatPumpSystemType, // Type of DXHeatingSystem
-			std::string const & Name, // Name of the DXHeatingSystem
-			int const SchedPtr,
-			std::string const & HeatPumpCoilType,
-			int const HeatPumpCoilType_Num,
-			std::string const & HeatPumpCoilName,
-			int const HeatPumpCoilIndex,
-			int const DXHeatPumpCoilInletNodeNum,
-			int const DXHeatPumpCoilOutletNodeNum,
-			int const DXSystemControlNodeNum, // the node number of the node with the set point
-			Real64 const DesiredOutletTemp, // the temperature at the unit outlet node needed
-			Real64 const PartLoadFrac, // part load fraction for current time step (single speed)
-			Real64 const SpeedRatio, // current compressor speed ratio (variable speed)
-			Real64 const CycRatio, // cycling part load ratio (variable speed)
-			int const FanOpMode, // Fan operating mode (see parameter above)
-			int const DXCoilSensPLRIter, // used in DXCoil calculations
-			int const DXCoilSensPLRIterIndex, // used in DXCoil calculations
-			int const DXCoilSensPLRFail, // used in DXCoil calculations
-			int const DXCoilSensPLRFailIndex, // used in DXCoil calculations
-			Real64 const OAUnitSetTemp, // set
-			int const SpeedNum // select speed number for variable-speed coil
-		) :
-			DXHeatPumpSystemType( DXHeatPumpSystemType ),
-			Name( Name ),
-			SchedPtr( SchedPtr ),
-			HeatPumpCoilType( HeatPumpCoilType ),
-			HeatPumpCoilType_Num( HeatPumpCoilType_Num ),
-			HeatPumpCoilName( HeatPumpCoilName ),
-			HeatPumpCoilIndex( HeatPumpCoilIndex ),
-			DXHeatPumpCoilInletNodeNum( DXHeatPumpCoilInletNodeNum ),
-			DXHeatPumpCoilOutletNodeNum( DXHeatPumpCoilOutletNodeNum ),
-			DXSystemControlNodeNum( DXSystemControlNodeNum ),
-			DesiredOutletTemp( DesiredOutletTemp ),
-			PartLoadFrac( PartLoadFrac ),
-			SpeedRatio( SpeedRatio ),
-			CycRatio( CycRatio ),
-			FanOpMode( FanOpMode ),
-			DXCoilSensPLRIter( DXCoilSensPLRIter ),
-			DXCoilSensPLRIterIndex( DXCoilSensPLRIterIndex ),
-			DXCoilSensPLRFail( DXCoilSensPLRFail ),
-			DXCoilSensPLRFailIndex( DXCoilSensPLRFailIndex ),
-			OAUnitSetTemp( OAUnitSetTemp ),
-			SpeedNum( SpeedNum )
-		{}
-
 	};
 
 	// Object Data

@@ -1190,8 +1190,6 @@ namespace OutdoorAirUnit {
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
 		bool ErrorsFound;
 		Real64 RhoAir;
-		std::string CoolingCoilName;
-		std::string CoolingCoilType;
 		int CompNum;
 		bool IsAutoSize; // Indicator to autosize
 		Real64 OutAirVolFlowDes; // Autosized outdoor air flow for reporting
@@ -1392,9 +1390,6 @@ namespace OutdoorAirUnit {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const CurrentModuleObject( "ZoneHVAC:OutdoorAirUnit" );
-		std::string EquipType;
-		std::string EquipName;
-		std::string CtrlName;
 		Real64 DesOATemp; // Design OA Temp degree C
 		Real64 AirMassFlow; // air mass flow rate [kg/s]
 		int ControlNode; // the hot water or cold water inlet node

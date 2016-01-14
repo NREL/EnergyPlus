@@ -633,7 +633,6 @@ namespace SwimmingPool {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // Flag for one-time initializations
 		static bool MyEnvrnFlagGeneral( true );
-		std::string Errout; // Message for errors
 		static Array1D_bool MyPlantScanFlagPool;
 		bool errFlag;
 		Real64 mdot;

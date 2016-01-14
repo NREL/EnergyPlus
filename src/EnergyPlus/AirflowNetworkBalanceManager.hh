@@ -178,41 +178,6 @@ namespace AirflowNetworkBalanceManager {
 			MixMass( 0.0 )
 		{}
 
-		// Member Constructor
-		AirflowNetworkReportVars(
-			Real64 const MeanAirTemp, // Mean Air Temperature {C}
-			Real64 const OperativeTemp, // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
-			Real64 const InfilHeatGain, // Heat Gain {W} due to infiltration
-			Real64 const InfilHeatLoss, // Heat Loss {W} due to infiltration
-			Real64 const InfilVolume, // Volume of Air {m3} due to infiltration
-			Real64 const InfilMass, // Mass of Air {kg} due to infiltration
-			Real64 const InfilAirChangeRate, // Infiltration air change rate {ach}
-			Real64 const VentilHeatLoss, // Heat Gain {W} due to ventilation
-			Real64 const VentilHeatGain, // Heat Loss {W} due to ventilation
-			Real64 const VentilVolume, // Volume of Air {m3} due to ventilation
-			Real64 const VentilMass, // Mass of Air {kg} due to ventilation
-			Real64 const VentilFanElec, // Fan Electricity {W} due to ventilation
-			Real64 const VentilAirTemp, // Air Temp {C} of ventilation
-			Real64 const MixVolume, // Mixing volume of Air {m3}
-			Real64 const MixMass // Mixing mass of air {kg}
-		) :
-			MeanAirTemp( MeanAirTemp ),
-			OperativeTemp( OperativeTemp ),
-			InfilHeatGain( InfilHeatGain ),
-			InfilHeatLoss( InfilHeatLoss ),
-			InfilVolume( InfilVolume ),
-			InfilMass( InfilMass ),
-			InfilAirChangeRate( InfilAirChangeRate ),
-			VentilHeatLoss( VentilHeatLoss ),
-			VentilHeatGain( VentilHeatGain ),
-			VentilVolume( VentilVolume ),
-			VentilMass( VentilMass ),
-			VentilFanElec( VentilFanElec ),
-			VentilAirTemp( VentilAirTemp ),
-			MixVolume( MixVolume ),
-			MixMass( MixMass )
-		{}
-
 	};
 
 	// Object Data

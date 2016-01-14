@@ -219,8 +219,8 @@ namespace CostEstimateManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
-		int NumCostAdjust;
-		int NumRefAdjust;
+		int NumCostAdjust( 0 );
+		int NumRefAdjust( 0 );
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
@@ -267,9 +267,6 @@ namespace CostEstimateManager {
 		}
 
 		//most input error checking to be performed later within Case construct in Calc routine.
-		// do inits that aren't in a derived type
-		NumCostAdjust = 0;
-		NumRefAdjust = 0;
 
 		cCurrentModuleObject = "ComponentCost:Adjustments";
 		NumCostAdjust = GetNumObjectsFound( cCurrentModuleObject );

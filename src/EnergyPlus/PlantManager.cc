@@ -3061,9 +3061,8 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PlantSizNum; // index of Plant Sizing data for this loop
+		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
 
-		PlantSizNum = 0;
 		if ( PlantLoop( LoopNum ).PlantSizNum == 0 ) {
 			if ( NumPltSizInput > 0 ) {
 				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
@@ -3107,7 +3106,7 @@ namespace PlantManager {
 		using ReportSizingManager::ReportSizingOutput;
 
 		// Locals
-		bool InitLoopEquip;
+		bool InitLoopEquip( true );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3121,37 +3120,23 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PlantSizNum; // index of Plant Sizing data for this loop
+		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
 		int BranchNum; // DO loop counter for cycling through branches on a demand side loop
 		int CompNum; // DO loop counter for cycling through components on a demand side loop
 		int SupNodeNum; // component inlet water node number
 		int WaterCompNum; // DO loop counter for cycling through all the components that demand water
-		bool ErrorsFound; // If errors detected in input
-		bool SimNestedLoop;
-		bool ReSize;
-		bool AllSizFac;
-		Real64 LoopSizFac;
+		bool ErrorsFound( false ); // If errors detected in input
+		// bool SimNestedLoop( false );
+		bool ReSize( false );
+		bool AllSizFac( true );
+		Real64 LoopSizFac( 0.0 );
 		Real64 AvLoopSizFac;
-		Real64 PlantSizFac;
-		Real64 MaxSizFac;
+		Real64 PlantSizFac( 1.0 );
+		Real64 MaxSizFac( 0.0 );
 		Real64 BranchSizFac;
-		Real64 NumBrSizFac;
+		Real64 NumBrSizFac( 0.0 );
 		Real64 FluidDensity( 0.0 ); // local value from glycol routine
-		bool Finalize;
-
-		Finalize = OkayToFinish;
-		PlantSizNum = 0;
-		ErrorsFound = false;
-		LoopSizFac = 0.0;
-		// InitLoopEquip = .FALSE.
-		InitLoopEquip = true;
-		SimNestedLoop = false;
-
-		AllSizFac = true;
-		MaxSizFac = 0.0;
-		PlantSizFac = 1.0;
-		NumBrSizFac = 0.0;
-		ReSize = false;
+		bool Finalize( OkayToFinish );
 
 		if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) {
 			ReSize = true;
@@ -3361,7 +3346,7 @@ namespace PlantManager {
 		using DataPlant::PlantLoop;
 
 		// Locals
-		bool InitLoopEquip;
+		// bool InitLoopEquip( true );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3375,23 +3360,17 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PlantSizNum; // index of Plant Sizing data for this loop
+		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
 		int BranchNum; // DO loop counter for cycling through branches on a demand side loop
 		int CompNum; // DO loop counter for cycling through components on a demand side loop
 		int SupNodeNum; // component inlet water node number
 		int WaterCompNum; // DO loop counter for cycling through all the components that demand water
-		bool ErrorsFound; // If errors detected in input
-		bool SimNestedLoop;
+		bool ErrorsFound( false ); // If errors detected in input
+		// bool SimNestedLoop( false );
 		bool ReSize;
 
 		Real64 FluidDensity( 0.0 ); // local value from glycol routine
 
-		PlantSizNum = 0;
-		ErrorsFound = false;
-
-		// InitLoopEquip = .FALSE.
-		InitLoopEquip = true;
-		SimNestedLoop = false;
 		Real64 PlantSizeFac;
 
 
@@ -4399,10 +4378,6 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
-						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgVertical ) { // = 91
-							this_component.FlowCtrl = ControlType_Active;
-							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );
 

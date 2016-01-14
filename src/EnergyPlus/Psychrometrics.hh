@@ -167,19 +167,6 @@ namespace Psychrometrics {
 			Twb( 0.0 )
 		{}
 
-		// Member Constructor
-		cached_twb_t(
-			Int64 const iTdb,
-			Int64 const iW,
-			Int64 const iPb,
-			Real64 const Twb
-		) :
-			iTdb( iTdb ),
-			iW( iW ),
-			iPb( iPb ),
-			Twb( Twb )
-		{}
-
 	};
 #endif
 
@@ -194,15 +181,6 @@ namespace Psychrometrics {
 		cached_psat_t() :
 			iTdb( -1000 ),
 			Psat( 0.0 )
-		{}
-
-		// Member Constructor
-		cached_psat_t(
-			Int64 const iTdb,
-			Real64 const Psat
-		) :
-			iTdb( iTdb ),
-			Psat( Psat )
 		{}
 
 	};

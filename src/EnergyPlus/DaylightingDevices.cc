@@ -277,17 +277,6 @@ namespace DaylightingDevices {
 				TransBeam( NumOfAngles, 0.0 )
 			{}
 
-			// Member Constructor
-			TDDPipeStoredData(
-				Real64 const AspectRatio, // Aspect ratio, length / diameter
-				Real64 const Reflectance, // Reflectance of surface
-				Array1< Real64 > const & TransBeam // Table of beam transmittance vs. cosine angle
-			) :
-				AspectRatio( AspectRatio ),
-				Reflectance( Reflectance ),
-				TransBeam( NumOfAngles, TransBeam )
-			{}
-
 		};
 
 		// Object Data

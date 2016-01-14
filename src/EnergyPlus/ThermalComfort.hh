@@ -229,51 +229,6 @@ namespace ThermalComfort {
 			CEN15251RunningMeanOutdoorTemp( 0.0 )
 		{}
 
-		// Member Constructor
-		ThermalComfortDataType(
-			Real64 const FangerPMV,
-			Real64 const FangerPPD,
-			Real64 const CloSurfTemp, // clothing surface temp from iteration in FANGER calcs
-			Real64 const PiercePMVET,
-			Real64 const PiercePMVSET,
-			Real64 const PierceDISC,
-			Real64 const PierceTSENS,
-			Real64 const KsuTSV,
-			Real64 const ThermalComfortMRT,
-			Real64 const ThermalComfortOpTemp,
-			Real64 const ClothingValue,
-			int const ThermalComfortAdaptiveASH5590,
-			int const ThermalComfortAdaptiveASH5580,
-			int const ThermalComfortAdaptiveCEN15251CatI,
-			int const ThermalComfortAdaptiveCEN15251CatII,
-			int const ThermalComfortAdaptiveCEN15251CatIII,
-			Real64 const TComfASH55,
-			Real64 const TComfCEN15251,
-			Real64 const ASHRAE55RunningMeanOutdoorTemp,
-			Real64 const CEN15251RunningMeanOutdoorTemp
-		) :
-			FangerPMV( FangerPMV ),
-			FangerPPD( FangerPPD ),
-			CloSurfTemp( CloSurfTemp ),
-			PiercePMVET( PiercePMVET ),
-			PiercePMVSET( PiercePMVSET ),
-			PierceDISC( PierceDISC ),
-			PierceTSENS( PierceTSENS ),
-			KsuTSV( KsuTSV ),
-			ThermalComfortMRT( ThermalComfortMRT ),
-			ThermalComfortOpTemp( ThermalComfortOpTemp ),
-			ClothingValue( ClothingValue ),
-			ThermalComfortAdaptiveASH5590( ThermalComfortAdaptiveASH5590 ),
-			ThermalComfortAdaptiveASH5580( ThermalComfortAdaptiveASH5580 ),
-			ThermalComfortAdaptiveCEN15251CatI( ThermalComfortAdaptiveCEN15251CatI ),
-			ThermalComfortAdaptiveCEN15251CatII( ThermalComfortAdaptiveCEN15251CatII ),
-			ThermalComfortAdaptiveCEN15251CatIII( ThermalComfortAdaptiveCEN15251CatIII ),
-			TComfASH55( TComfASH55 ),
-			TComfCEN15251( TComfCEN15251 ),
-			ASHRAE55RunningMeanOutdoorTemp( ASHRAE55RunningMeanOutdoorTemp ),
-			CEN15251RunningMeanOutdoorTemp( CEN15251RunningMeanOutdoorTemp )
-		{}
-
 	};
 
 	struct ThermalComfortInASH55Type
@@ -309,31 +264,6 @@ namespace ThermalComfort {
 			Enable55Warning( false )
 		{}
 
-		// Member Constructor
-		ThermalComfortInASH55Type(
-			Real64 const timeNotSummer, // time when not in summer comfort range based on ASHRAE 55 simplified
-			Real64 const timeNotWinter, // time when not in winter comfort range based on ASHRAE 55 simplified
-			Real64 const timeNotEither, // time when  not in summer or winter comfort range based on ASHRAE 55 simplified
-			Real64 const totalTimeNotSummer, // sum for simulation for summer
-			Real64 const totalTimeNotWinter, // sum for simulation for winter
-			Real64 const totalTimeNotEither, // sum for simulation for either
-			bool const ZoneIsOccupied, // flag if zone has people
-			int const warningIndex, // variable to store pointer to the recurring warning
-			int const warningIndex2, // variable to store pointer to the recurring warning
-			bool const Enable55Warning // flag if the warning should be able to be shown if appropriate
-		) :
-			timeNotSummer( timeNotSummer ),
-			timeNotWinter( timeNotWinter ),
-			timeNotEither( timeNotEither ),
-			totalTimeNotSummer( totalTimeNotSummer ),
-			totalTimeNotWinter( totalTimeNotWinter ),
-			totalTimeNotEither( totalTimeNotEither ),
-			ZoneIsOccupied( ZoneIsOccupied ),
-			warningIndex( warningIndex ),
-			warningIndex2( warningIndex2 ),
-			Enable55Warning( Enable55Warning )
-		{}
-
 	};
 
 	struct ThermalComfortSetPointType
@@ -360,27 +290,6 @@ namespace ThermalComfort {
 			totalNotMetCoolingOccupied( 0.0 )
 		{}
 
-		// Member Constructor
-		ThermalComfortSetPointType(
-			Real64 const notMetHeating,
-			Real64 const notMetCooling,
-			Real64 const notMetHeatingOccupied,
-			Real64 const notMetCoolingOccupied,
-			Real64 const totalNotMetHeating,
-			Real64 const totalNotMetCooling,
-			Real64 const totalNotMetHeatingOccupied,
-			Real64 const totalNotMetCoolingOccupied
-		) :
-			notMetHeating( notMetHeating ),
-			notMetCooling( notMetCooling ),
-			notMetHeatingOccupied( notMetHeatingOccupied ),
-			notMetCoolingOccupied( notMetCoolingOccupied ),
-			totalNotMetHeating( totalNotMetHeating ),
-			totalNotMetCooling( totalNotMetCooling ),
-			totalNotMetHeatingOccupied( totalNotMetHeatingOccupied ),
-			totalNotMetCoolingOccupied( totalNotMetCoolingOccupied )
-		{}
-
 	};
 
 	struct AngleFactorData
@@ -398,25 +307,6 @@ namespace ThermalComfort {
 		AngleFactorData() :
 			TotAngleFacSurfaces( 0 ),
 			ZonePtr( 0 )
-		{}
-
-		// Member Constructor
-		AngleFactorData(
-			Array1< Real64 > const & AngleFactor, // Angle factor of each surface
-			std::string const & Name, // Angle factor list name
-			Array1_string const & SurfaceName, // Names of the Surfces
-			Array1_int const & SurfacePtr, // ALLOCATABLE to the names of the Surfces
-			int const TotAngleFacSurfaces, // Total number of surfaces
-			std::string const & ZoneName, // Name of zone the system is serving
-			int const ZonePtr // Point to this zone in the Zone derived type
-		) :
-			AngleFactor( AngleFactor ),
-			Name( Name ),
-			SurfaceName( SurfaceName ),
-			SurfacePtr( SurfacePtr ),
-			TotAngleFacSurfaces( TotAngleFacSurfaces ),
-			ZoneName( ZoneName ),
-			ZonePtr( ZonePtr )
 		{}
 
 	};

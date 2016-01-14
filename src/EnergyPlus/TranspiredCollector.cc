@@ -338,7 +338,7 @@ namespace TranspiredCollector {
 		int SurfID; // local surface "pointer"
 		Real64 TiltRads; // average tilt of collector in radians
 		Real64 tempHdeltaNPL; // temporary variable for bouyancy length scale
-		int NumUTSCSplitter;
+		int NumUTSCSplitter( 0 );
 		Array1D_string AlphasSplit; // Alpha items for extensible
 		// Solar Collectors:Unglazed Transpired object
 		int ItemSplit; // Item to be "gotten"
@@ -366,7 +366,6 @@ namespace TranspiredCollector {
 		Alphas = "";
 
 		NumUTSC = GetNumObjectsFound( CurrentModuleObject );
-		NumUTSCSplitter = 0; //init
 		CurrentModuleMultiObject = "SolarCollector:UnglazedTranspired:Multisystem";
 		NumUTSCSplitter = GetNumObjectsFound( CurrentModuleMultiObject );
 

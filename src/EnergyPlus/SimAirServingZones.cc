@@ -505,19 +505,6 @@ namespace SimAirServingZones {
 				NodeNameUsed( false )
 			{}
 
-			// Member Constructor
-			AirUniqueNodes(
-				std::string const & NodeName,
-				std::string const & AirLoopName,
-				std::string const & FieldName,
-				bool const NodeNameUsed
-			) :
-				NodeName( NodeName ),
-				AirLoopName( AirLoopName ),
-				FieldName( FieldName ),
-				NodeNameUsed( NodeNameUsed )
-			{}
-
 		};
 
 		// Object Data
@@ -6184,9 +6171,6 @@ namespace SimAirServingZones {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string CompName; // component name
-		std::string CompType; // component type
-		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		Real64 TempSize; // autosized value
 		Real64 CoilInTemp; // entering coil air temperature [C]
 		Real64 CoilInHumRat; // entering coil air humidity ratio [kg/kg]

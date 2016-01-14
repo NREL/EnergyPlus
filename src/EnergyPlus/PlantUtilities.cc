@@ -125,21 +125,6 @@ namespace PlantUtilities {
 				ThisCriteriaCheckValue( 0.0 )
 			{}
 
-			// Member Constructor
-			CriteriaData(
-				int const CallingCompLoopNum, // for debug error handling
-				int const CallingCompLoopSideNum, // for debug error handling
-				int const CallingCompBranchNum, // for debug error handling
-				int const CallingCompCompNum, // for debug error handling
-				Real64 const ThisCriteriaCheckValue // the previous value, to check the current against
-			) :
-				CallingCompLoopNum( CallingCompLoopNum ),
-				CallingCompLoopSideNum( CallingCompLoopSideNum ),
-				CallingCompBranchNum( CallingCompBranchNum ),
-				CallingCompCompNum( CallingCompCompNum ),
-				ThisCriteriaCheckValue( ThisCriteriaCheckValue )
-			{}
-
 		};
 
 		// Object Data

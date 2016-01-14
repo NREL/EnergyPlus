@@ -679,8 +679,8 @@ namespace FourPipeBeam {
 
 			CheckZoneSizing( this->unitType, this->name );
 			//minimum flow rate is from air flow rate on the terminal unit final zone size ( typically ventilation minimum and may be too low)
-			Real64 minFlow = 0.0;
-			Real64 maxFlowCool = 0.0;
+			Real64 minFlow( 0.0 );
+			Real64 maxFlowCool( 0.0 );
 			minFlow = std::min( DataEnvironment::StdRhoAir * originalTermUnitSizeMaxVDot, FinalZoneSizing( CurZoneEqNum ).DesOAFlow * DataEnvironment::StdRhoAir );
 			minFlow = std::max( 0.0, minFlow );
 			//max flow is as if the air supply was sufficient to provide all the conditioning

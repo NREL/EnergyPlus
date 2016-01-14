@@ -507,12 +507,10 @@ namespace ExternalInterface {
 		std::string xmlStrOut; // xml values in string, separated by ';'
 		std::string xmlStrOutTyp; // xml values in string, separated by ';'
 		std::string xmlStrIn; // xml values in string, separated by ';'
-		std::string xmlStrInTyp; // xml values in string, separated by ';'
 		static int nOutVal; // Number of output values (E+ -> ExternalInterface)
 		static int nInpVar; // Number of input values (ExternalInterface -> E+)
 		int retVal; // Return value of function call, used for error handling
 		int mainVersion; // The version number
-		std::string validateErrMsg; // error returned when xml Schema validate failed
 		bool socFileExist; // Set to true if socket configuration
 		// file exists
 		bool simFileExist; // Set to true if simulation configuration
@@ -1052,7 +1050,6 @@ namespace ExternalInterface {
 		int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
 		int IOStatus( 0 ); // Used in GetObjectItem
 		int NumFMUInputVariables( 0 ); // Number of FMU input variables
-		std::string varUnit; // Units sting, may be blank
 		std::string Name_NEW; // Units sting, may be blank
 		std::string Name_OLD; // Units sting, may be blank
 
@@ -1756,11 +1753,6 @@ namespace ExternalInterface {
 		static int fmiEndSimulation(0); // Flag to indicate end of simulation
 
 		Array1D_string Alphas( 5 );
-
-		std::string validateErrMsg; // error returned when xml Schema validate failed
-		std::string varUnits; // Units sting, may be blank
-		std::string tempChar; // Units sting, may be blank
-
 		Array1D_int keyIndexes( 1 ); // Array index for
 		Array1D_string NamesOfKeys( 1 ); // Specific key name
 
