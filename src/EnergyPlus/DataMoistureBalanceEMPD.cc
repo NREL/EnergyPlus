@@ -102,6 +102,19 @@ namespace DataMoistureBalanceEMPD {
 	Array1D< Real64 > RVDeepLayer;
 	Array1D< Real64 > RVwall;
 
+	void
+	clear_state()
+	{
+		RVSurfaceOld.deallocate();
+		RVSurface.deallocate();
+		HeatFluxLatent.deallocate();
+		RVSurfLayerOld.deallocate();
+		RVdeepOld.deallocate();
+		RVSurfLayer.deallocate();
+		RVDeepLayer.deallocate();
+		RVwall.deallocate();
+	}
+
 } // DataMoistureBalanceEMPD
 
 } // EnergyPlus

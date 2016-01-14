@@ -94,6 +94,9 @@ namespace DataMoistureBalanceEMPD {
 	extern Array1D< Real64 > RVDeepLayer;
 	extern Array1D< Real64 > RVwall;
 
+	void
+	clear_state();
+
 } // DataMoistureBalanceEMPD
 
 } // EnergyPlus

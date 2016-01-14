@@ -95,7 +95,7 @@ TEST_F( EnergyPlusFixture, CheckEMPDCalc )
 	Real64 Tsat(0.0);
 	MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD( 1, 19.907302679986064, 19.901185713164697, Tsat );
 
-	auto const & report_vars = MoistureBalanceEMPDManager::EMPDREportVars(1);
+	auto const & report_vars = MoistureBalanceEMPDManager::EMPDReportVars(1);
 	EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
 	EXPECT_DOUBLE_EQ(0.0071762141417078054, DataMoistureBalanceEMPD::RVSurface(1));
 	EXPECT_DOUBLE_EQ(0.00000076900234067835945, report_vars.mass_flux_deep);

@@ -97,7 +97,7 @@ namespace MoistureBalanceEMPDManager {
 		{}
 	};
 
-	extern Array1D< EMPDReportVarsData > EMPDREportVars; // Array of structs that hold the empd report vars data, one for each surface.
+	extern Array1D< EMPDReportVarsData > EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 

@@ -136,12 +136,18 @@ namespace MoistureBalanceEMPDManager {
 
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
-	Array1D< EMPDReportVarsData > EMPDREportVars; // Array of structs that hold the empd report vars data, one for each surface.
+	Array1D< EMPDReportVarsData > EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 	//******************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		EMPDReportVars.deallocate();
+	}
 
 	void
 	GetMoistureBalanceEMPDInput()
@@ -359,7 +365,7 @@ namespace MoistureBalanceEMPDManager {
 			RVSurfaceOld.allocate( TotSurfaces );
 			RVSurface.allocate( TotSurfaces );
 			HeatFluxLatent.allocate( TotSurfaces );
-			EMPDREportVars.allocate( TotSurfaces );
+			EMPDReportVars.allocate( TotSurfaces );
 			RVSurfLayer.allocate( TotSurfaces );
 			RVSurfLayerOld.allocate( TotSurfaces );
 			RVDeepLayer.allocate( TotSurfaces );
@@ -387,7 +393,7 @@ namespace MoistureBalanceEMPDManager {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) continue;
-			EMPDReportVarsData & rvd = EMPDREportVars( SurfNum );
+			EMPDReportVarsData & rvd = EMPDReportVars( SurfNum );
 			const std::string surf_name = Surface( SurfNum ).Name;
 			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density [kg/m^3]", rvd.rv_surface, "Zone", "State", surf_name );
 			SetupOutputVariable( "EMPD Surface Layer Moisture Content [kg/m^3]", rvd.u_surface_layer, "Zone", "State", surf_name );
@@ -474,7 +480,7 @@ namespace MoistureBalanceEMPDManager {
 		Real64 Rcoating;
 		Real64 RH_surf_layer;
 		Real64 RH_deep_layer;
-		
+
 		if ( BeginEnvrnFlag && OneTimeFlag ) {
 			InitMoistureBalanceEMPD();
 			OneTimeFlag = false;
@@ -498,7 +504,7 @@ namespace MoistureBalanceEMPDManager {
 		auto & heat_flux_latent( HeatFluxLatent( SurfNum ) ); // output
 		auto const & rv_deep_old( RVdeepOld( SurfNum ) ); // input
 		auto const & rv_surf_layer_old( RVSurfLayerOld( SurfNum ) ); // input
-		
+
 		heat_flux_latent = 0.0;
 		Flag = 1;
 		NOFITR = 0;
@@ -523,24 +529,24 @@ namespace MoistureBalanceEMPDManager {
 		PVsat = PsyPsatFnTemp(Taver, RoutineName);
 		PVsurf = RHaver * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
 		TempSat = 4111.0 / (23.7093 - std::log(PVsurf)) + 35.45 - KelvinConv;
-		
-		// Convert vapor resistance factor (user input) to diffusivity. Evaluate at local surface temperature. 
+
+		// Convert vapor resistance factor (user input) to diffusivity. Evaluate at local surface temperature.
 		// 2e-7*T^0.81/P = vapor diffusivity in air. [kg/m-s-Pa]
 		// 461.52 = universal gas constant for water [J/kg-K]
 		// EMPDdiffusivity = [m^2/s]
 		EMPDdiffusivity = (2.0e-7 * pow(Taver + KelvinConv, 0.81) / OutBaroPress) / material.EMPDmu * 461.52 * (Taver+KelvinConv);
-		
+
 		// Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
 		dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow( RHaver, material.MoistBCoeff - 1 ) + material.MoistCCoeff * material.MoistCCoeff * material.MoistDCoeff * pow( RHaver, material.MoistDCoeff - 1 );
-		
-		// If coating vapor resistance factor equals 0, coating resistance is zero (avoid divide by zero). 
+
+		// If coating vapor resistance factor equals 0, coating resistance is zero (avoid divide by zero).
 		// Otherwise, calculate coating resistance with coating vapor resistance factor and thickness. [s/m]
 		if (material.EMPDmuCoating <= 0.0) {
 			Rcoating = 0;
 		} else {
 			Rcoating = material.EMPDCoatingThickness * material.EMPDmuCoating * OutBaroPress / (2.0e-7 * pow(Taver + KelvinConv, 0.81) * 461.52 * (Taver + KelvinConv));
 		}
-		
+
 		// Calculate mass-transfer coefficient between zone air and center of surface layer. [m/s]
 		hm_surf_layer = 1.0 / ( 0.5 * material.EMPDSurfaceDepth / EMPDdiffusivity + 1.0 / h_mass_conv_in_fd + Rcoating );
 		// Calculate mass-transfer coefficient between center of surface layer and center of deep layer. [m/s]
@@ -558,11 +564,11 @@ namespace MoistureBalanceEMPDManager {
 		mass_flux_surf_layer = hm_surf_layer * ( rv_surf_layer - rho_vapor_air_in ) + hm_deep_layer * ( rv_surf_layer - rv_deep_layer );
 		mass_flux_deep_layer = hm_deep_layer * ( rv_surf_layer - rv_deep_layer );
 		mass_flux_zone = hm_surf_layer * ( rv_surf_layer - rho_vapor_air_in );
-		
+
 		// Convert stored vapor density from previous timestep to RH.
 		RH_deep_layer_old = PsyRhFnTdbRhov( Taver, rv_deep_old );
 		RH_surf_layer_old = PsyRhFnTdbRhov( Taver, rv_surf_layer_old );
-		
+
 		// Calculate new surface layer RH using mass balance on surface layer
 		RH_surf_layer = RH_surf_layer_old + TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
 		// Calculate new deep layer RH using mass balance on deep layer (unless depth <= 0).
@@ -588,7 +594,7 @@ namespace MoistureBalanceEMPDManager {
 		// Put results in the reporting variables
 		// Will add RH and W of deep layer as outputs
 		// Need to also add moisture content (kg/kg) of surface and deep layers, and moisture flow from each surface (kg/s), per Rongpeng's suggestion
-		EMPDReportVarsData & rvd = EMPDREportVars( SurfNum );
+		EMPDReportVarsData & rvd = EMPDReportVars( SurfNum );
 		rvd.rv_surface = rv_surface;
 		rvd.RH_surface_layer = RH_surf_layer * 100.0;
 		rvd.RH_deep_layer = RH_deep_layer * 100.0;
@@ -598,33 +604,6 @@ namespace MoistureBalanceEMPDManager {
 		rvd.mass_flux_deep = mass_flux_deep_layer;
 		rvd.u_surface_layer = material.MoistACoeff * pow( RH_surf_layer, material.MoistBCoeff ) + material.MoistCCoeff * pow( RH_surf_layer, material.MoistDCoeff );
 		rvd.u_deep_layer = material.MoistACoeff * pow( RH_deep_layer, material.MoistBCoeff ) + material.MoistCCoeff * pow( RH_deep_layer, material.MoistDCoeff );
-
-	}
-
-	void
-	clear_state()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//   Authors:        Muthusamy Swami and Lixing Gu
-		//   Date writtenn:  August, 1999
-		//   Modified:       na
-		//   Re-engineered:  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Deallocate dynamic arrays for surface moisture calculation
-
-		// METHODOLOGY EMPLOYED:
-
-		// USE STATEMENTS:
-
-		RVSurfaceOld.deallocate();
-		RVSurface.deallocate();
-		HeatFluxLatent.deallocate();
-		RVSurfLayer.deallocate();
-		RVSurfLayerOld.deallocate();
-		RVDeepLayer.deallocate();
-		RVdeepOld.deallocate();
 
 	}
 
