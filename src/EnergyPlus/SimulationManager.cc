@@ -2674,7 +2674,6 @@ namespace SimulationManager {
 		int TotRectIZWindows;
 		int TotRectIZDoors;
 		int TotRectIZGlazedDoors;
-		int iIDFsetThreadsInput;
 		int NumAlphas;
 		int NumNumbers;
 
@@ -2756,7 +2755,7 @@ namespace SimulationManager {
 		cCurrentModuleObject = "ProgramControl";
 		if ( GetNumObjectsFound( cCurrentModuleObject ) > 0 ) {
 			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, ios, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			iIDFsetThreadsInput = int( rNumericArgs( 1 ) );
+			int iIDFsetThreadsInput = int( rNumericArgs( 1 ) );
 			if ( iIDFSetThreads > 1 ) {
 				ShowWarningError( "CheckThreading: " + cCurrentModuleObject + " is not available in this version." );
 				ShowContinueError( "...user requested [" + RoundSigDigits( iIDFsetThreadsInput ) + "] threads." );

@@ -130,6 +130,8 @@ namespace ZonePlenum {
 
 	namespace {
 		bool GetInputFlag( true ); // Flag set to make sure you get input once
+		bool InitAirZoneReturnPlenumEnvrnFlag( true );
+		bool InitAirZoneReturnPlenumOneTimeFlag( true );
 	}
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
 
@@ -146,6 +148,8 @@ namespace ZonePlenum {
 	clear_state()
 	{
 		GetInputFlag = true;
+		InitAirZoneReturnPlenumEnvrnFlag = true;
+		InitAirZoneReturnPlenumOneTimeFlag = true;
 		NumZonePlenums = 0;
 		NumZoneReturnPlenums = 0;
 		NumZoneSupplyPlenums = 0;
@@ -691,7 +695,7 @@ namespace ZonePlenum {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode;
-		static int InducedNode( 0 );
+		int InducedNode( 0 );
 		int InletNodeLoop;
 		int ZoneNodeNum;
 		int NodeNum;
@@ -702,12 +706,14 @@ namespace ZonePlenum {
 		int NumADUsToPlen; // number of ADUs that might leak to this plenum
 		int ADUsToPlenIndex; // index of an ADU that might leak to this plenum in the plenum ADU list
 
-		static bool MyEnvrnFlag( true );
-		static bool MyOneTimeFlag( true );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyEnvrnFlag( true ); // InitAirZoneReturnPlenumEnvrnFlag
+		// static bool MyOneTimeFlag( true ); // InitAirZoneReturnPlenumOneTimeFlag
+		////////////////////////////////////////////////////////////////////////////////////
 		// FLOW:
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitAirZoneReturnPlenumOneTimeFlag ) {
 
 			// For each zone with a return air plenum put the ZoneRetPlenCond number for the return air plenum
 			// in the ZoneEquipConfig array for the zone. This allows direct access of the zone's return air
@@ -751,12 +757,12 @@ namespace ZonePlenum {
 				}
 			}
 
-			MyOneTimeFlag = false;
+			InitAirZoneReturnPlenumOneTimeFlag = false;
 
 		}
 
 		// Do the Begin Environment initializations
-		if ( MyEnvrnFlag && BeginEnvrnFlag ) {
+		if ( InitAirZoneReturnPlenumEnvrnFlag && BeginEnvrnFlag ) {
 
 			for ( PlenumZoneNum = 1; PlenumZoneNum <= NumZoneReturnPlenums; ++PlenumZoneNum ) {
 
@@ -770,12 +776,12 @@ namespace ZonePlenum {
 
 			}
 
-			MyEnvrnFlag = false;
+			InitAirZoneReturnPlenumEnvrnFlag = false;
 
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag = true;
+			InitAirZoneReturnPlenumEnvrnFlag = true;
 		}
 
 		//Transfer the node data to ZoneRetPlenCond data structure
@@ -1004,11 +1010,11 @@ namespace ZonePlenum {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static int InletNodeNum( 0 ); // inlet node number
-		static int IndNum( 0 ); // induced air index
-		static int ADUNum( 0 ); // air distribution unit number
-		static int ADUListIndex( 0 ); // air distribution unit index in zone return plenum data structure
-		static Real64 TotIndMassFlowRate( 0.0 ); // total induced air mass flow rate [kg/s]
+		int InletNodeNum( 0 ); // inlet node number
+		int IndNum( 0 ); // induced air index
+		int ADUNum( 0 ); // air distribution unit number
+		int ADUListIndex( 0 ); // air distribution unit index in zone return plenum data structure
+		Real64 TotIndMassFlowRate( 0.0 ); // total induced air mass flow rate [kg/s]
 
 		// Reset the totals to zero before they are summed.
 		ZoneRetPlenCond( ZonePlenumNum ).OutletMassFlowRate = 0.0;

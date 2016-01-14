@@ -9866,36 +9866,26 @@ Label50: ;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 InletAirEnthalpy; // Enthalpy of inlet air to evaporator at given conditions [J/kg]
-		Real64 DeltaH; // Enthalpy drop across evaporator at given conditions [J/kg]
-		Real64 DeltaT; // Temperature drop across evaporator at given conditions [C]
-		Real64 DeltaHumRat; // Humidity ratio drop across evaporator at given conditions [kg/kg]
-		Real64 OutletAirTemp; // Outlet dry-bulb temperature from evaporator at given conditions [C]
+		Real64 DeltaH( 0.0 ); // Enthalpy drop across evaporator at given conditions [J/kg]
+		Real64 DeltaT( 0.0 ); // Temperature drop across evaporator at given conditions [C]
+		Real64 DeltaHumRat( 0.0 ); // Humidity ratio drop across evaporator at given conditions [kg/kg]
+		Real64 OutletAirTemp( InletAirTemp ); // Outlet dry-bulb temperature from evaporator at given conditions [C]
 		Real64 OutletAirEnthalpy; // Enthalpy of outlet air at given conditions [J/kg]
-		Real64 OutletAirHumRat; // Outlet humidity ratio from evaporator at given conditions [kg/kg]
+		Real64 OutletAirHumRat( InletAirHumRat ); // Outlet humidity ratio from evaporator at given conditions [kg/kg]
 		Real64 OutletAirRH; // relative humidity of the outlet air
 		Real64 Error; // Error term used in given coil bypass factor (CBF) calculations
 		Real64 ErrorLast; // Error term, from previous iteration
 		int Iter; // Iteration loop counter in CBF calculations
-		int IterMax; // Maximum number of iterations in CBF calculations
+		int IterMax( 50 ); // Maximum number of iterations in CBF calculations
 		Real64 ADPTemp; // Apparatus dewpoint temperature used in CBF calculations [C]
 		Real64 ADPHumRat; // Apparatus dewpoint humidity used in CBF calculations [kg/kg]
 		Real64 ADPEnthalpy; // Air enthalpy at apparatus dew point [J/kg]
 		Real64 DeltaADPTemp; // Change in Apparatus Dew Point used in CBF calculations [C]
-		Real64 SlopeAtConds; // Slope (DeltaHumRat/DeltaT) at given conditions
-		Real64 Slope; // Calculated Slope used while hunting for Tadp
+		Real64 SlopeAtConds( 0.0 ); // Slope (DeltaHumRat/DeltaT) at given conditions
+		Real64 Slope( 0.0 ); // Calculated Slope used while hunting for Tadp
 		Real64 Tolerance; // Convergence tolerance for CBF calculations
 		Real64 HTinHumRatOut; // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
 		static bool CBFErrors( false ); // Set to true if errors in CBF calculation, fatal at end of routine
-
-		DeltaH = 0.0;
-		DeltaT = 0.0;
-		DeltaHumRat = 0.0;
-		OutletAirTemp = InletAirTemp;
-		OutletAirHumRat = InletAirHumRat;
-		SlopeAtConds = 0.0;
-		Slope = 0.0;
-		IterMax = 50;
-		CBFErrors = false;
 
 		DeltaH = TotCap / AirMassFlowRate;
 		InletAirEnthalpy = PsyHFnTdbW( InletAirTemp, InletAirHumRat );
@@ -10057,7 +10047,7 @@ Label50: ;
 		Real64 const TotCap, // coil total capacity [W]
 		Real64 const AirMassFlow, // coil air mass flow rate [kg/s]
 		Real64 const InitialSHR, // coil sensible heat ratio []
-		std::string const CallingRoutine // function name calling this routine
+		std::string const & CallingRoutine // function name calling this routine
 	)
 	{
 

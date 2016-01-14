@@ -235,6 +235,16 @@ namespace SimAirServingZones {
 	void
 	UpdateSysSizingForScalableInputs( int const AirLoopNum );
 
+	Real64
+	GetHeatingSATempForSizing(
+		int const IndexAirLoop // air loop index 
+	);
+
+	Real64
+	GetHeatingSATempHumRatForSizing(
+		int const IndexAirLoop // air loop index 
+	);
+
 	// End Algorithm Section of the Module
 	// *****************************************************************************
 

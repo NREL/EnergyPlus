@@ -126,47 +126,6 @@ namespace SolarReflectionManager {
 			NumPossibleObs( 0 )
 		{}
 
-		// Member Constructor
-		SolReflRecSurfData(
-			int const SurfNum, // Number of heat transfer surface
-			std::string const & SurfName, // Name of heat transfer surface
-			int const NumRecPts, // Number of receiving points
-			Array1< Vector3< Real64 > > const & RecPt, // Coordinates of receiving point on receiving surface in global CS (m)
-			Vector3< Real64 > const & NormVec, // Unit outward normal to receiving surface
-			Real64 const ThetaNormVec, // Azimuth of surface normal (radians)
-			Real64 const PhiNormVec, // Altitude of surface normal (radians)
-			int const NumReflRays, // Number of rays from this receiving surface
-			Array1< Vector3< Real64 > > const & RayVec, // Unit vector in direction of ray from receiving surface
-			Array1< Real64 > const & CosIncAngRay, // Cosine of angle between ray and receiving surface outward normal
-			Array1< Real64 > const & dOmegaRay, // Delta solid angle associated with ray
-			Array2< Vector3< Real64 > > const & HitPt, // For each receiving point and ray, coords of hit point on obstruction
-			Array2_int const & HitPtSurfNum, // Number of surface containing the hit point for a ray, except:
-			Array2< Real64 > const & HitPtSolRefl, // Beam-to-diffuse solar reflectance at hit point
-			Array2< Real64 > const & RecPtHitPtDis, // Distance from receiving point to hit point (m)
-			Array2< Vector3< Real64 > > const & HitPtNormVec, // Hit point's surface normal unit vector pointing into hemisphere
-			Array1_int const & PossibleObsSurfNums, // Surface numbers of possible obstructions for a receiving surf
-			int const NumPossibleObs // Number of possible obstructions for a receiving surface
-		) :
-			SurfNum( SurfNum ),
-			SurfName( SurfName ),
-			NumRecPts( NumRecPts ),
-			RecPt( RecPt ),
-			NormVec( NormVec ),
-			ThetaNormVec( ThetaNormVec ),
-			PhiNormVec( PhiNormVec ),
-			NumReflRays( NumReflRays ),
-			RayVec( RayVec ),
-			CosIncAngRay( CosIncAngRay ),
-			dOmegaRay( dOmegaRay ),
-			HitPt( HitPt ),
-			HitPtSurfNum( HitPtSurfNum ),
-			HitPtSolRefl( HitPtSolRefl ),
-			RecPtHitPtDis( RecPtHitPtDis ),
-			HitPtNormVec( HitPtNormVec ),
-			PossibleObsSurfNums( PossibleObsSurfNums ),
-			NumPossibleObs( NumPossibleObs )
-		{}
-
 	};
 
 	// Object Data

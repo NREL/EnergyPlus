@@ -56,158 +56,117 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#ifndef DataComplexFenestration_hh_INCLUDED
-#define DataComplexFenestration_hh_INCLUDED
+// EnergyPlus::SimAirServingZones Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
+
+// C++ Headers
+#include <cassert>
+#include <cmath>
+#include <string>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
+#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <DataGlobals.hh>
+#include <DataAirSystems.hh>
+#include <DataSizing.hh>
+#include <SimAirServingZones.hh>
+#include <MixedAir.hh>
+#include <UtilityRoutines.hh>
+
+using namespace EnergyPlus;
+using namespace DataAirSystems;
+using namespace DataSizing;
+using namespace ObjexxFCL;
+using namespace SimAirServingZones;
 
 namespace EnergyPlus {
 
-namespace DataComplexFenestration {
-
-	// Using/Aliasing
-
-	// Data
-	// Parameters for complex shade
-	extern int const csVenetian;
-	extern int const csWoven;
-	extern int const csPerforated;
-	extern int const csOtherShadingType;
-	extern int const csBSDF;
-
-	// Parameters for gas definitions
-	extern int const GasCoeffsCustom;
-	extern int const GasCoeffsAir;
-	extern int const GasCoeffsArgon;
-	extern int const GasCoeffsKrypton;
-	extern int const GasCoeffsXenon;
-
-	// Parameters for Thermal Algorithm
-	//INTEGER, PARAMETER :: taTarcog = 0
-	//INTEGER, PARAMETER :: taWinkelmann = 1
-
-	// Parameters for calculation standard
-	extern int const csISO15099;
-	extern int const csEN673Declared;
-	extern int const csEN673Design;
-
-	// Parameters for thermal model
-	extern int const tmISO15099;
-	extern int const tmScaledCavityWidth;
-	extern int const tmConvectiveScalarModel_NoSDThickness;
-	extern int const tmConvectiveScalarModel_WithSDThickness;
-
-	// Parameters for deflection model
-	extern int const dmNoDeflection;
-	extern int const dmTemperatureAndPressureInput;
-	extern int const dmMeasuredDeflection;
-
-	// Types
-
-	struct GapSupportPillar
+	TEST( SimAirServingZones, ReheatCoilSizing )
 	{
-		// Members
-		std::string Name; // Name of support pillar
-		Real64 Spacing; // Spacing between centers of support pillars (m)
-		Real64 Radius; // Support pillar radius (m)
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine test the GetHeatingSATempForSizing & GetHeatingSATempHumRatForSizing methods, 
+		// which are designed to get the proper reheat coil inlet temperature/humidity ratio for sizing
+		// depending on the system configurations
+	
+		ShowMessage( "Begin Test: SimAirServingZones, ReheatCoilSizing" );
+				
+		int NumPrimaryAirSys = 4; // total number of air loops
+		int AirLoopNum; // index of air loops
+		int CtrlZoneNum; // index of zones
+		
+		// Allocate
+		CalcSysSizing.allocate( NumPrimaryAirSys );
+		FinalSysSizing.allocate( NumPrimaryAirSys );
+		FinalZoneSizing.allocate( NumPrimaryAirSys );
+		PrimaryAirSystem.allocate( NumPrimaryAirSys );
+		
+		// Inputs: system configurations: 
+		// 	(1) Central heating coils exist
+		// 	(2) No central heating coils, but preheating coils exist
+		// 	(3) No central heating coils, but OA heat-exchangers exist
+		// 	(4) No central heating coils; No preheating coils or OA heat-exchangers
 
-		// Default Constructor
-		GapSupportPillar() :
-			Spacing( 0.0 ),
-			Radius( 0.0 )
-		{}
+		PrimaryAirSystem( 1 ).CentralHeatCoilExists = true;
+		PrimaryAirSystem( 2 ).CentralHeatCoilExists = false;
+		PrimaryAirSystem( 3 ).CentralHeatCoilExists = false;
+		PrimaryAirSystem( 4 ).CentralHeatCoilExists = false;
+		
+		PrimaryAirSystem( 1 ).NumOAHeatCoils = 0;
+		PrimaryAirSystem( 2 ).NumOAHeatCoils = 1;
+		PrimaryAirSystem( 3 ).NumOAHeatCoils = 0;
+		PrimaryAirSystem( 4 ).NumOAHeatCoils = 0;
+		
+		PrimaryAirSystem( 1 ).NumOAHXs = 0;
+		PrimaryAirSystem( 2 ).NumOAHXs = 0;
+		PrimaryAirSystem( 3 ).NumOAHXs = 1;
+		PrimaryAirSystem( 4 ).NumOAHXs = 0;
+		
+		// Inputs: sizing parameters
+		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+			FinalSysSizing( AirLoopNum ).DesOutAirVolFlow = 0.25;
+			FinalSysSizing( AirLoopNum ).DesHeatVolFlow = 0.50; 
+			
+			FinalSysSizing( AirLoopNum ).PreheatTemp = 7;
+			FinalSysSizing( AirLoopNum ).HeatRetTemp = 22; 
+			FinalSysSizing( AirLoopNum ).HeatMixTemp = 10;
+			CalcSysSizing( AirLoopNum ).HeatSupTemp = 17;
+			
+			FinalSysSizing( AirLoopNum ).PreheatHumRat = 0.003;
+			FinalSysSizing( AirLoopNum ).HeatRetHumRat = 0.008; 
+			FinalSysSizing( AirLoopNum ).HeatMixHumRat = 0.004;
+			CalcSysSizing( AirLoopNum ).HeatSupHumRat = 0.006;
 
-	};
+		}
+		
+		// Run 
+		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+			CtrlZoneNum = AirLoopNum;
 
-	struct GapDeflectionState
-	{
-		// Members
-		std::string Name; // Name of deflection state
-		Real64 DeflectedThickness;
+			FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum );
+			FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum );
+		}
+		
+		// Check
+		EXPECT_EQ( 17.0, FinalZoneSizing( 1 ).DesHeatCoilInTempTU );
+		EXPECT_NEAR( 14.5, FinalZoneSizing( 2 ).DesHeatCoilInTempTU, 0.05 );
+		EXPECT_NEAR( 14.5, FinalZoneSizing( 3 ).DesHeatCoilInTempTU, 0.05 );
+		EXPECT_EQ( 10.0, FinalZoneSizing( 4 ).DesHeatCoilInTempTU );
+		EXPECT_EQ( 0.006, FinalZoneSizing( 1 ).DesHeatCoilInHumRatTU );
+		EXPECT_EQ( 0.0055, FinalZoneSizing( 2 ).DesHeatCoilInHumRatTU );
+		EXPECT_EQ( 0.0055, FinalZoneSizing( 3 ).DesHeatCoilInHumRatTU );
+		EXPECT_EQ( 0.004, FinalZoneSizing( 4 ).DesHeatCoilInHumRatTU );
+		
+		// Clean up
+		CalcSysSizing.deallocate( );
+		FinalSysSizing.deallocate( );
+		FinalZoneSizing.deallocate( );
+		PrimaryAirSystem.deallocate( ); 
 
-		// Default Constructor
-		GapDeflectionState() :
-			DeflectedThickness( 0.0 )
-		{}
+	}
 
-	};
-
-	struct WindowComplexShade
-	{
-		// Members
-		std::string Name; // Name for complex shade
-		int LayerType; // Layer type (OtherShadingType, Venetian, Woven, Perforated)
-		Real64 Thickness; // Layer thickness (m)
-		Real64 Conductivity; // Layer conductivity (W/m2K)
-		Real64 IRTransmittance; // IR Transmittance
-		Real64 FrontEmissivity; // Emissivity of front suraface
-		Real64 BackEmissivity; // Emissivity of back surface
-		Real64 TopOpeningMultiplier; // Coverage percent for top opening (%)
-		Real64 BottomOpeningMultiplier; // Coverage percent for bottom opening (%)
-		Real64 LeftOpeningMultiplier; // Coverage percent for left opening (%)
-		Real64 RightOpeningMultiplier; // Coverage percent for right opening (%)
-		Real64 FrontOpeningMultiplier; // Coverage percent for front opening (%)
-		Real64 SlatWidth; // Slat width (m)
-		Real64 SlatSpacing; // Slat spacing (m)
-		Real64 SlatThickness; // Slat thickness (m)
-		Real64 SlatAngle; // Slat angle (deg)
-		Real64 SlatConductivity; // Slat conductivity (W/m2K)
-		Real64 SlatCurve; // Curvature radius of slat (if =0 then flat) (m)
-
-		// Default Constructor
-		WindowComplexShade() :
-			LayerType( -1 ),
-			Thickness( 0.0 ),
-			Conductivity( 0.0 ),
-			IRTransmittance( 0.0 ),
-			FrontEmissivity( 0.0 ),
-			BackEmissivity( 0.0 ),
-			TopOpeningMultiplier( 0.0 ),
-			BottomOpeningMultiplier( 0.0 ),
-			LeftOpeningMultiplier( 0.0 ),
-			RightOpeningMultiplier( 0.0 ),
-			FrontOpeningMultiplier( 0.0 ),
-			SlatWidth( 0.0 ),
-			SlatSpacing( 0.0 ),
-			SlatThickness( 0.0 ),
-			SlatAngle( 0.0 ),
-			SlatConductivity( 0.0 ),
-			SlatCurve( 0.0 )
-		{}
-
-	};
-
-	struct WindowThermalModelParams
-	{
-		// Members
-		std::string Name; // Window thermal model name
-		int CalculationStandard; // Tarcog calculation standard
-		int ThermalModel; // Tarcog thermal model
-		Real64 SDScalar; // SDScalar coefficient
-		int DeflectionModel; // Deflection model
-		Real64 VacuumPressureLimit; // Pressure limit at which it will be considered vacuum gas state
-		Real64 InitialTemperature; // Window(s) temperature in time of fabrication
-		Real64 InitialPressure; // Window(s) pressure in time of fabrication
-
-		// Default Constructor
-		WindowThermalModelParams() :
-			CalculationStandard( -1 ),
-			ThermalModel( -1 ),
-			SDScalar( 0.0 ),
-			DeflectionModel( -1 ),
-			VacuumPressureLimit( 0.0 ),
-			InitialTemperature( 0.0 ),
-			InitialPressure( 0.0 )
-		{}
-
-	};
-
-} // DataComplexFenestration
-
-} // EnergyPlus
-
-#endif
+}
