@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -214,35 +214,6 @@ namespace EconomicLifeCycleCost {
 			annualEscalationRate( 0.0 )
 		{}
 
-		// Member Constructor
-		RecurringCostsType(
-			std::string const & name, // Name
-			std::string const & lineItem, // Line Item
-			int const category, // Category
-			Real64 const cost, // Cost
-			int const startOfCosts, // Start of Costs
-			int const yearsFromStart, // Years from Start 0 - 100
-			int const monthsFromStart, // Months from Start 0 - 11
-			int const totalMonthsFromStart, // Total months (12 x years) + months
-			int const repeatPeriodYears, // Repeat Period Years 1 - 100
-			int const repeatPeriodMonths, // Repeat Period Months 0 - 11
-			int const totalRepeatPeriodMonths, // Total months (12 x years) + months
-			Real64 const annualEscalationRate // Annual escalation rate
-		) :
-			name( name ),
-			lineItem( lineItem ),
-			category( category ),
-			cost( cost ),
-			startOfCosts( startOfCosts ),
-			yearsFromStart( yearsFromStart ),
-			monthsFromStart( monthsFromStart ),
-			totalMonthsFromStart( totalMonthsFromStart ),
-			repeatPeriodYears( repeatPeriodYears ),
-			repeatPeriodMonths( repeatPeriodMonths ),
-			totalRepeatPeriodMonths( totalRepeatPeriodMonths ),
-			annualEscalationRate( annualEscalationRate )
-		{}
-
 	};
 
 	struct NonrecurringCostType
@@ -266,27 +237,6 @@ namespace EconomicLifeCycleCost {
 			totalMonthsFromStart( 0 )
 		{}
 
-		// Member Constructor
-		NonrecurringCostType(
-			std::string const & name, // Name
-			std::string const & lineItem, // Line Item
-			int const category, // Category
-			Real64 const cost, // Cost
-			int const startOfCosts, // Start of Costs
-			int const yearsFromStart, // Years from Start 0 - 100
-			int const monthsFromStart, // Months from Start 0 - 11
-			int const totalMonthsFromStart // Total months (12 x years) + months
-		) :
-			name( name ),
-			lineItem( lineItem ),
-			category( category ),
-			cost( cost ),
-			startOfCosts( startOfCosts ),
-			yearsFromStart( yearsFromStart ),
-			monthsFromStart( monthsFromStart ),
-			totalMonthsFromStart( totalMonthsFromStart )
-		{}
-
 	};
 
 	struct UsePriceEscalationType
@@ -305,21 +255,6 @@ namespace EconomicLifeCycleCost {
 			escalationStartMonth( 0 )
 		{}
 
-		// Member Constructor
-		UsePriceEscalationType(
-			std::string const & name, // Name
-			int const resource, // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-			int const escalationStartYear, // Escalation Start Year 1900-2100
-			int const escalationStartMonth, // Escalation Start Month 1 to 12
-			Array1< Real64 > const & Escalation // Escalation by year, first year is baseDateYear
-		) :
-			name( name ),
-			resource( resource ),
-			escalationStartYear( escalationStartYear ),
-			escalationStartMonth( escalationStartMonth ),
-			Escalation( Escalation )
-		{}
-
 	};
 
 	struct UseAdjustmentType
@@ -332,17 +267,6 @@ namespace EconomicLifeCycleCost {
 
 		// Default Constructor
 		UseAdjustmentType()
-		{}
-
-		// Member Constructor
-		UseAdjustmentType(
-			std::string const & name, // Name
-			int const resource, // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-			Array1< Real64 > const & Adjustment // Adjustment by year, first year is baseDateYear
-		) :
-			name( name ),
-			resource( resource ),
-			Adjustment( Adjustment )
 		{}
 
 	};
@@ -365,31 +289,6 @@ namespace EconomicLifeCycleCost {
 		// Default Constructor
 		CashFlowType() :
 			pvKind( 0 )
-		{}
-
-		// Member Constructor
-		CashFlowType(
-			std::string const & name, // Name - just for labeling output - use Category for aggregation
-			int const SourceKind, // 1=recurring, 2=nonrecurring, 3=resource
-			int const Resource, // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-			int const Category, // uses "costCat" constants above
-			Array1< Real64 > const & mnAmount, // cashflow dollar amount by month, first year is baseDateYear
-			Array1< Real64 > const & yrAmount, // cashflow dollar amount by year, first year is baseDateYear
-			int const pvKind, // kind of present value 1=energy, 2=non-energy,3=not computed but summed
-			Real64 const presentValue, // total present value for cashflow
-			Real64 const orginalCost, // original cost from recurring, non-recurring or energy cost
-			Array1< Real64 > const & yrPresVal // present value by year, first year is baseDateYear
-		) :
-			name( name ),
-			SourceKind( SourceKind ),
-			Resource( Resource ),
-			Category( Category ),
-			mnAmount( mnAmount ),
-			yrAmount( yrAmount ),
-			pvKind( pvKind ),
-			presentValue( presentValue ),
-			orginalCost( orginalCost ),
-			yrPresVal( yrPresVal )
 		{}
 
 	};

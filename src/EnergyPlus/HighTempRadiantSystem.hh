@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -175,68 +175,6 @@ namespace HighTempRadiantSystem {
 			ScaledHeatingCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		HighTempRadiantSystemData(
-			std::string const & Name, // name of hydronic radiant system
-			std::string const & SchedName, // availability schedule
-			int const SchedPtr, // index to schedule
-			std::string const & ZoneName, // Name of zone the system is serving
-			int const ZonePtr, // Point to this zone in the Zone derived type
-			int const HeaterType, // Type of heater (gas or electric)
-			Real64 const MaxPowerCapac, // Maximum capacity of the radiant heater in Watts
-			Real64 const CombustionEffic, // Combustion efficiency (only valid for a gas heater)
-			Real64 const FracRadiant, // Fraction of heater power that is given off as radiant heat
-			Real64 const FracLatent, // Fraction of heater power that is given off as latent heat
-			Real64 const FracLost, // Fraction of heater power that is lost to the outside environment
-			Real64 const FracConvect, // Fraction of heater power that is given off as convective heat
-			int const ControlType, // Control type for the system (MAT, MRT, or op temp)
-			Real64 const ThrottlRange, // Throttling range for heating [C]
-			std::string const & SetptSched, // Schedule name for the zone setpoint temperature
-			int const SetptSchedPtr, // Schedule index for the zone setpoint temperature
-			Real64 const FracDistribPerson, // Fraction of fraction radiant incident on a "person" in the space
-			int const TotSurfToDistrib, // Total number of surfaces the heater sends radiation to
-			Array1_string const & SurfaceName, // Surface name in the list of surfaces heater sends radiation to
-			Array1_int const & SurfacePtr, // Surface number in the list of surfaces heater sends radiation to
-			Array1< Real64 > const & FracDistribToSurf, // Fraction of fraction radiant incident on the surface
-			Real64 const ElecPower, // system electric consumption in Watts
-			Real64 const ElecEnergy, // system electric consumption in Joules
-			Real64 const GasPower, // system gas consumption in Watts
-			Real64 const GasEnergy, // system gas consumption in Joules
-			Real64 const HeatPower, // actual heating sent to zone (convective and radiative) in Watts
-			Real64 const HeatEnergy, // actual heating sent to zone (convective and radiative) in Joules
-			int const HeatingCapMethod, // - Method for High Temperature Radiant heating capacity scalable sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-			Real64 const ScaledHeatingCapacity // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
-		) :
-			Name( Name ),
-			SchedName( SchedName ),
-			SchedPtr( SchedPtr ),
-			ZoneName( ZoneName ),
-			ZonePtr( ZonePtr ),
-			HeaterType( HeaterType ),
-			MaxPowerCapac( MaxPowerCapac ),
-			CombustionEffic( CombustionEffic ),
-			FracRadiant( FracRadiant ),
-			FracLatent( FracLatent ),
-			FracLost( FracLost ),
-			FracConvect( FracConvect ),
-			ControlType( ControlType ),
-			ThrottlRange( ThrottlRange ),
-			SetptSched( SetptSched ),
-			SetptSchedPtr( SetptSchedPtr ),
-			FracDistribPerson( FracDistribPerson ),
-			TotSurfToDistrib( TotSurfToDistrib ),
-			SurfaceName( SurfaceName ),
-			SurfacePtr( SurfacePtr ),
-			FracDistribToSurf( FracDistribToSurf ),
-			ElecPower( ElecPower ),
-			ElecEnergy( ElecEnergy ),
-			GasPower( GasPower ),
-			GasEnergy( GasEnergy ),
-			HeatPower( HeatPower ),
-			HeatEnergy( HeatEnergy ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity )
-		{}
 	};
 
 	struct HighTempRadSysNumericFieldData
@@ -248,12 +186,6 @@ namespace HighTempRadiantSystem {
 		HighTempRadSysNumericFieldData()
 		{}
 
-		// Member Constructor
-		HighTempRadSysNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data

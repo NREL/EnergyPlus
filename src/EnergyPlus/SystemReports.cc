@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1204,15 +1204,6 @@ namespace SystemReports {
 			IdentifyLoop() :
 				LoopNum( 0 ),
 				LoopType( 0 )
-			{}
-
-			// Member Constructor
-			IdentifyLoop(
-				int const LoopNum,
-				int const LoopType
-			) :
-				LoopNum( LoopNum ),
-				LoopType( LoopType )
 			{}
 
 		};
@@ -3571,15 +3562,6 @@ namespace SystemReports {
 				CompErrIndex( 0 )
 			{}
 
-			// Member Constructor
-			CompTypeError(
-				std::string const & CompType,
-				int const CompErrIndex
-			) :
-				CompType( CompType ),
-				CompErrIndex( CompErrIndex )
-			{}
-
 		};
 
 		// Object Data
@@ -4038,7 +4020,6 @@ namespace SystemReports {
 			ZFAUOutAirFlow = 0.0;
 			OutAirFlow = 0.0;
 			ZoneFlowFrac = 0.0;
-			ZoneVolume = 0.0;
 
 			//retrieve the zone load for each zone
 			ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;

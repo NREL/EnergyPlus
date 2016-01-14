@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1454,8 +1454,8 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Umin; // Min Urate  [fraction]
-		Real64 Uact; // Acting between Umax and Umin [fraction]
+		Real64 Umin( 0.0 ); // Min Urate  [fraction]
+		Real64 Uact( 0.0 ); // Acting between Umax and Umin [fraction]
 		Real64 ITSCoolingRateMax;
 		Real64 ITSCoolingRateOpt;
 		Real64 ITSCoolingRateMin;
@@ -1475,10 +1475,6 @@ namespace IceThermalStorage {
 			MaxCap = 0.0;
 			MinCap = 0.0;
 			OptCap = 0.0;
-
-			// Initialize processed Usys values
-			Umin = 0.0;
-			Uact = 0.0;
 
 			// XCurIceFrac is reset to 1.0 when first hour of day.
 			// Starting full is assumed, because most ice systems are fully charged overnight
@@ -1620,9 +1616,9 @@ namespace IceThermalStorage {
 		// FLOW
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Umax; // Max Urate adjusted Urate based on Error protection (I) [fraction]
-		Real64 Umin; // Min Urate adjusted Urate based on Error protection (I) [fraction]
-		Real64 Uact; // Acting between Usys and UsysLow Urate adjusted Urate based on Error protection (I) [fraction]
+		Real64 Umax( 0.0 ); // Max Urate adjusted Urate based on Error protection (I) [fraction]
+		Real64 Umin( 0.0 ); // Min Urate adjusted Urate based on Error protection (I) [fraction]
+		Real64 Uact( 0.0 ); // Acting between Usys and UsysLow Urate adjusted Urate based on Error protection (I) [fraction]
 		Real64 QiceMax; // [W]
 		Real64 QiceMaxByChiller; // [W]
 		Real64 QiceMaxByITS; // [W]
@@ -1653,9 +1649,6 @@ namespace IceThermalStorage {
 			ITSCoolingEnergy = 0.0; //[J]
 
 			// Initialize processed U values
-			Umax = 0.0;
-			Umin = 0.0;
-			Uact = 0.0;
 			Urate = 0.0;
 
 			// Calculate QiceMax which is REAL(r64) ITS capacity.

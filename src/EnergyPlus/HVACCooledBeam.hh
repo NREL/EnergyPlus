@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -192,107 +192,6 @@ namespace HVACCooledBeam {
 			CBLoadReSimIndex( 0 ),
 			CBMassFlowReSimIndex( 0 ),
 			CBWaterOutletTempReSimIndex( 0 )
-		{}
-
-		// Member Constructor
-		CoolBeamData(
-			std::string const & Name, // name of unit
-			std::string const & UnitType, // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
-			int const UnitType_Num, // index to type of unit = 1 (there's only 1 type so far)
-			std::string const & CBType, // type of cooled beam: active | passive
-			int const CBType_Num, // index to type of cooled beam: passive=1; active=2
-			std::string const & Sched, // availability schedule
-			int const SchedPtr, // index to schedule
-			Real64 const MaxAirVolFlow, // m3/s (autosizable)
-			Real64 const MaxAirMassFlow, // kg/s
-			Real64 const MaxCoolWaterVolFlow, // m3/s
-			Real64 const MaxCoolWaterMassFlow, // kg/s
-			int const AirInNode, // unit air inlet node number
-			int const AirOutNode, // unit air outlet node number
-			int const CWInNode, // chilled water inlet node
-			int const CWOutNode, // chilled water outlet node
-			int const ADUNum, // index of corresponding air distribution unit
-			Real64 const NumBeams, // number of beams in the zone
-			Real64 const BeamLength, // length of individual beam [m]
-			Real64 const DesInletWaterTemp, // design inlet water temperature [C]
-			Real64 const DesOutletWaterTemp, // design outlet water Temperature [c]
-			Real64 const CoilArea, // coil surface area per coil length [m2/m]
-			Real64 const a, // model parameter a
-			Real64 const n1, // model parameter n0
-			Real64 const n2, // model parameter n1
-			Real64 const n3, // model parameter n2
-			Real64 const a0, // model parameter a0
-			Real64 const K1, // model parameter K1
-			Real64 const n, // model parameter n
-			Real64 const Kin, // Coefficient of Induction Kin
-			Real64 const InDiam, // Leaving Pipe Inside Diameter
-			Real64 const TWIn, // current inlet water temperature [C]
-			Real64 const TWOut, // current outlet water temperature [C]
-			Real64 const EnthWaterOut, // current outlet water enthalpy [J/kg]
-			Real64 const BeamFlow, // supply air flow per beam [m3/s]
-			Real64 const CoolWaterMassFlow, // chilled water mass flow rate [kg/s]
-			Real64 const BeamCoolingEnergy, // Cooled beam cooling energy of all beams in the zone [J]
-			Real64 const BeamCoolingRate, // Cooled beam cooling rate of all beams in the zone [W]
-			Real64 const SupAirCoolingEnergy, // Total cooling energy from supply air [J]
-			Real64 const SupAirCoolingRate, // Total cooling rate from supply air [W]
-			Real64 const SupAirHeatingEnergy, // Total cooling energy from supply air [J]
-			Real64 const SupAirHeatingRate, // Total cooling rate from supply air [W]
-			int const CWLoopNum, // cooling water plant loop index number
-			int const CWLoopSideNum, // cooling water plant loop side index
-			int const CWBranchNum, // cooling water plant loop branch index
-			int const CWCompNum, // cooling water plant loop component index
-			int const CBLoadReSimIndex,
-			int const CBMassFlowReSimIndex,
-			int const CBWaterOutletTempReSimIndex
-		) :
-			Name( Name ),
-			UnitType( UnitType ),
-			UnitType_Num( UnitType_Num ),
-			CBType( CBType ),
-			CBType_Num( CBType_Num ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			MaxAirVolFlow( MaxAirVolFlow ),
-			MaxAirMassFlow( MaxAirMassFlow ),
-			MaxCoolWaterVolFlow( MaxCoolWaterVolFlow ),
-			MaxCoolWaterMassFlow( MaxCoolWaterMassFlow ),
-			AirInNode( AirInNode ),
-			AirOutNode( AirOutNode ),
-			CWInNode( CWInNode ),
-			CWOutNode( CWOutNode ),
-			ADUNum( ADUNum ),
-			NumBeams( NumBeams ),
-			BeamLength( BeamLength ),
-			DesInletWaterTemp( DesInletWaterTemp ),
-			DesOutletWaterTemp( DesOutletWaterTemp ),
-			CoilArea( CoilArea ),
-			a( a ),
-			n1( n1 ),
-			n2( n2 ),
-			n3( n3 ),
-			a0( a0 ),
-			K1( K1 ),
-			n( n ),
-			Kin( Kin ),
-			InDiam( InDiam ),
-			TWIn( TWIn ),
-			TWOut( TWOut ),
-			EnthWaterOut( EnthWaterOut ),
-			BeamFlow( BeamFlow ),
-			CoolWaterMassFlow( CoolWaterMassFlow ),
-			BeamCoolingEnergy( BeamCoolingEnergy ),
-			BeamCoolingRate( BeamCoolingRate ),
-			SupAirCoolingEnergy( SupAirCoolingEnergy ),
-			SupAirCoolingRate( SupAirCoolingRate ),
-			SupAirHeatingEnergy( SupAirHeatingEnergy ),
-			SupAirHeatingRate( SupAirHeatingRate ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			CBLoadReSimIndex( CBLoadReSimIndex ),
-			CBMassFlowReSimIndex( CBMassFlowReSimIndex ),
-			CBWaterOutletTempReSimIndex( CBWaterOutletTempReSimIndex )
 		{}
 
 	};

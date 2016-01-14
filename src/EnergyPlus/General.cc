@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -59,6 +59,7 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
@@ -76,6 +77,10 @@
 #include <DataSurfaces.hh>
 #include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
+
+#if defined( _WIN32 ) && _MSC_VER < 1900
+#define snprintf _snprintf
+#endif
 
 namespace EnergyPlus {
 
@@ -1572,7 +1577,6 @@ namespace General {
 		int TokenDay;
 		int TokenMonth;
 		int TokenWeekday;
-		int TokenYear; // what should this be initialized to?
 
 		FstNum = int( ProcessNumber( String, errFlag ) );
 		DateType = -1;
@@ -1594,6 +1598,7 @@ namespace General {
 			if ( ! present( PYear ) ) {
 				DetermineDateTokens( String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound );
 			} else {
+				int TokenYear = 0;
 				DetermineDateTokens( String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear );
 				PYear = TokenYear;
 			}
@@ -2878,13 +2883,11 @@ namespace General {
 		// na
 
 		// Return value
-		std::string OutputString; // Contains time stamp
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt TStampFmt( "(I2.2,':',I2.2,':',F4.1)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2893,36 +2896,29 @@ namespace General {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		std::string TimeStamp; // Character representation of time using hh:mm:ss.ssss format
 		int Hours; // Number of hours <= 24
 		int Minutes; // Remaining minutes < 60
 		Real64 Seconds; // Remaining seconds < 60
 
 		ParseTime( Time, Hours, Minutes, Seconds );
 
-		TimeStamp = "";
 		// TimeStamp written with formatting
 		// "hh:mm:ss.s"
-		// "1234567890"
-		gio::write( TimeStamp, TStampFmt ) << Hours << Minutes << Seconds;
-		if ( TimeStamp[ 3 ] == ' ' ) TimeStamp[ 3 ] = '0';
-		if ( TimeStamp[ 6 ] == ' ' ) TimeStamp[ 6 ] = '0';
-		if ( TimeStamp[ 9 ] == ' ' ) TimeStamp[ 9 ] = '0';
-		strip( TimeStamp );
+		// 10 chars + null terminator = 11
+		// This approach should not normally be used due to the fixed width c-style
+		// string but in this case the output string is a fixed size so this is more
+		// clear for formatting and faster. If formatted string changes, make sure to
+		// add more to buffer.
+		static char buffer[ 11 ];
+		int cx = snprintf( buffer, 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds );
 
-		OutputString = TimeStamp;
+		// Make sure output string is only between 0 and 10 characters so string is
+		// not out of bounds of the buffer.
+		assert( cx >= 0 && cx < 11 );
+		// Only done to quiet release compiler warning for unused variable.
+		(void) cx;
 
-		// For debugging only
-		//WRITE(*,'(A)') '  UtilityRoutines::CreateTimeString()'
-		//WRITE(*,'(A,F15.10)') '    Time    = ', Time
-		//WRITE(*,*) '    Hours   = ', Hours
-		//WRITE(*,*) '    Minutes = ', Minutes
-		//WRITE(*,*) '    Seconds = ', Seconds
-		//WRITE(*,*) '    TimeStamp    = ', TimeStamp
-		//WRITE(*,*) '    OutputString = ', OutputString
-
-		return OutputString;
-
+		return std::string( buffer );
 	}
 
 	std::string
@@ -2953,7 +2949,6 @@ namespace General {
 		// na
 
 		// Return value
-		std::string OutputString; // Contains time stamp
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -2972,14 +2967,9 @@ namespace General {
 		std::string TimeStmpE; // Character representation of end of interval
 
 		TimeStmpS = CreateTimeString( StartTime );
-		strip( TimeStmpS );
-
 		TimeStmpE = CreateTimeString( EndTime );
-		strip( TimeStmpE );
 
-		OutputString = TimeStmpS + " - " + TimeStmpE;
-
-		return OutputString;
+		return TimeStmpS + " - " + TimeStmpE;
 
 	}
 
@@ -3016,8 +3006,6 @@ namespace General {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const MinToSec( 60.0 );
-		Real64 const HourToSec( MinToSec * 60.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3026,33 +3014,22 @@ namespace General {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Real64 Remainder( 0.0 );
+		int const MinToSec( 60 );
+		int const HourToSec( MinToSec * 60 );
+		Real64 Remainder( 0.0 );
 
 		// Get number of hours
 		// This might undershoot the actual number of hours. See DO WHILE loop.
-		Hours = int( Time / HourToSec );
+		Hours = int( Time ) / HourToSec;
 
 		// Compute remainder in seconds
-		Remainder = ( Time - Hours * 3600.0 );
-
-		// Correct number of hours whenever Remainder >= 60 to fix round-off errors
-		// E.g., Time = 2.0 would return Hours=1 and Minutes=60 instead of Hours=2!
-		while ( nint64( Remainder / MinToSec ) >= 60.0 ) {
-			++Hours;
-			Remainder = ( Time - Hours * 3600.0 );
-		}
+		Remainder = ( Time - Hours * HourToSec );
 
 		// Compute minutes
-		Minutes = int( Remainder / MinToSec );
+		Minutes = int( Remainder ) / MinToSec;
 
 		// Compute remainder in seconds
-		Remainder = ( Time - Hours * 3600.0 - Minutes * 60.0 );
-
-		// Correct number of minutes whenever Remainder >= 60 to fix round-off errors
-		while ( nint64( Remainder ) >= 60.0 ) {
-			++Minutes;
-			Remainder = ( Time - Hours * 3600.0 - Minutes * 60.0 );
-		}
+		Remainder -= Minutes * MinToSec;
 
 		// Compute seconds
 		Seconds = Remainder;

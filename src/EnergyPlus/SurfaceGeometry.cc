@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -6137,7 +6137,6 @@ namespace SurfaceGeometry {
 				ErrorsFoundByConstruct = true;
 			}}
 
-			Found = 0;
 			Found = FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
@@ -7036,7 +7035,7 @@ namespace SurfaceGeometry {
 					ShowContinueError( cAlphaFieldNames( 8 ) + " in error=\"" + Material( IShadingDevice ).Name + "\"." );
 					ErrorsFound = true;
 				}
-				if ( ShTyp == WSC_ST_BetweenGlassBlind || ShTyp == WSC_ST_BetweenGlassBlind ) {
+				if ( ShTyp == WSC_ST_BetweenGlassShade || ShTyp == WSC_ST_BetweenGlassBlind ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + WindowShadingControl( ControlNum ).Name + "\" has " + cAlphaArgs( 2 ) + "= BetweenGlassShade or BetweenGlassBlind and" );
 					ShowContinueError( cAlphaFieldNames( 8 ) + " is specified. This is illegal. Specify shaded construction instead." );
 					ErrorsFound = true;
@@ -9324,12 +9323,6 @@ namespace SurfaceGeometry {
 				Vertex( 4 )
 			{}
 
-			// Member Constructor
-			explicit
-			rectangularwindow( Array1< Vector > const & Vertex ) :
-				Vertex( 4, Vertex )
-			{}
-
 		};
 
 		// Object Data
@@ -9505,12 +9498,6 @@ namespace SurfaceGeometry {
 			// Default Constructor
 			rectangularwindow() :
 				Vertex( 4 )
-			{}
-
-			// Member Constructor
-			explicit
-			rectangularwindow( Array1< Vector > const & Vertex ) :
-				Vertex( 4, Vertex )
 			{}
 
 		};

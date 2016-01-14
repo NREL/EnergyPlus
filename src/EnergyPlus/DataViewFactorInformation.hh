@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -100,31 +100,6 @@ namespace DataViewFactorInformation {
 		// Default Constructor
 		ZoneViewFactorInformation() :
 			NumOfSurfaces( 0 )
-		{}
-
-		// Member Constructor
-		ZoneViewFactorInformation(
-			std::string const & Name, // Zone name
-			int const NumOfSurfaces, // Number of surfaces in the zone
-			Array2< Real64 > const & F, // View Factors
-			Array2< Real64 > const & ScriptF, // Hottel's Script F //Tuned Transposed
-			Array1< Real64 > const & Area, // Surface area
-			Array1< Real64 > const & Emissivity, // Surface emissivity
-			Array1< Real64 > const & Azimuth, // Azimuth angle of the surface (in degrees)
-			Array1< Real64 > const & Tilt, // Tilt angle of the surface (in degrees)
-			Array1_int const & SurfacePtr, // Surface ALLOCATABLE (to Surface derived type)
-			Array1_string const & Class // Class of surface (Wall, Roof, etc.)
-		) :
-			Name( Name ),
-			NumOfSurfaces( NumOfSurfaces ),
-			F( F ),
-			ScriptF( ScriptF ),
-			Area( Area ),
-			Emissivity( Emissivity ),
-			Azimuth( Azimuth ),
-			Tilt( Tilt ),
-			SurfacePtr( SurfacePtr ),
-			Class( Class )
 		{}
 
 	};

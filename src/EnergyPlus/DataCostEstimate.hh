@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -142,47 +142,6 @@ namespace DataCostEstimate {
 			LineSubTotal( 0.0 )
 		{}
 
-		// Member Constructor
-		CostLineItemStruct(
-			std::string const & LineName, // object name (needed ?)
-			std::string const & LineType, // Case statement driver?
-			std::string const & ParentObjType, // parent reference to IDD object type
-			std::string const & ParentObjName, // parent instance in IDF
-			std::string const & ParentObjKey, // end use key for parent object
-			int const ParentObjIDinList,
-			Real64 const PerSquareMeter, // cost per square meter
-			Real64 const PerEach, // cost per each
-			Real64 const PerKiloWattCap, // cost per kW of nominal capacity
-			Real64 const PerKWCapPerCOP, // cost per kW of nominal capacity per COP
-			Real64 const PerCubicMeter, // cost per cubic meter
-			Real64 const PerCubMeterPerSec, // cost per cubic meter per second
-			Real64 const PerUAinWattperDelK, // cost per (UA) in Watt/deltaK
-			int const LineNumber, // number of line item in detail list
-			Real64 const Qty, // quantity in calculations (can be input)
-			std::string const & Units, // Reported units
-			Real64 const ValuePer, // Cost used in final calculation
-			Real64 const LineSubTotal // line item total  Qty * ValuePer
-		) :
-			LineName( LineName ),
-			LineType( LineType ),
-			ParentObjType( ParentObjType ),
-			ParentObjName( ParentObjName ),
-			ParentObjKey( ParentObjKey ),
-			ParentObjIDinList( ParentObjIDinList ),
-			PerSquareMeter( PerSquareMeter ),
-			PerEach( PerEach ),
-			PerKiloWattCap( PerKiloWattCap ),
-			PerKWCapPerCOP( PerKWCapPerCOP ),
-			PerCubicMeter( PerCubicMeter ),
-			PerCubMeterPerSec( PerCubMeterPerSec ),
-			PerUAinWattperDelK( PerUAinWattperDelK ),
-			LineNumber( LineNumber ),
-			Qty( Qty ),
-			Units( Units ),
-			ValuePer( ValuePer ),
-			LineSubTotal( LineSubTotal )
-		{}
-
 	};
 
 	struct CostAdjustmentStruct
@@ -236,17 +195,6 @@ namespace DataCostEstimate {
 
 		// Default Constructor
 		monetaryUnitType()
-		{}
-
-		// Member Constructor
-		monetaryUnitType(
-			std::string const & code, // ISO code for currency such as USD or EUR
-			std::string const & txt, // text representation of the currency
-			std::string const & html // representation for HTML file - contains unicode references
-		) :
-			code( code ),
-			txt( txt ),
-			html( html )
 		{}
 
 	};

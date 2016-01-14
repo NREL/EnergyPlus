@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -196,106 +196,6 @@ namespace SteamBaseboardRadiator {
 			ScaledHeatingCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		SteamBaseboardParams(
-			std::string const & EquipID,
-			int const EquipType,
-			std::string const & Schedule,
-			Array1_string const & SurfaceName,
-			Array1_int const & SurfacePtr,
-			int const ZonePtr,
-			int const SchedPtr, // Pointer to the correct schedule
-			int const SteamInletNode, // Inlet steam baseboard node
-			int const SteamOutletNode, // Outlet steam baseboard node
-			int const TotSurfToDistrib, // Total numbers of the surfaces that the radiant heat gets distributed
-			int const FluidIndex, // Fluid index for FluidProperties (Steam)
-			int const ControlCompTypeNum,
-			int const CompErrIndex,
-			Real64 const DegOfSubcooling, // Temperature differences due to subcooling of the condensate [C]
-			Real64 const Offset, // Control accuracy
-			Real64 const SteamMassFlowRate, // Mass flow rate of steam passing through the heater [kg/s]
-			Real64 const SteamMassFlowRateMax, // Maximum mass flow rate of steam [kg/s]
-			Real64 const SteamVolFlowRateMax, // Maximum volumetric flow rate of steam [m3/s]
-			Real64 const SteamOutletTemp, // Outlet steam temperature from the heater [C]
-			Real64 const SteamInletTemp, // Inlet steam temperature [C]
-			Real64 const SteamInletEnthalpy, // Enthalpy of the steam delivered from the boiler [J/kg]
-			Real64 const SteamOutletEnthalpy, // Enthalpy of the steam leaving the heater [J/kg]
-			Real64 const SteamInletPress, // Pressure of steam at the inlet of the heater [Pa]
-			Real64 const SteamOutletPress, // Pressure of steam at the outlet of the heater [Pa]
-			Real64 const SteamInletQuality, // Quality of steam at the inlet of the heater [Pa]
-			Real64 const SteamOutletQuality, // Quality of steam at the outlet of the heater [Pa]
-			Real64 const FracRadiant, // User defined fraction for radiant heat addition
-			Real64 const FracConvect, // Fraction for convective heat addition
-			Real64 const FracDistribPerson, // Fraction for radiant heat incident on people
-			Array1< Real64 > const & FracDistribToSurf,
-			Real64 const TotPower, // Convective system impact rate that the heater actually meets [W]
-			Real64 const Power, // Maximum heating rate [W]
-			Real64 const ConvPower, // Convective heating rate [W]
-			Real64 const RadPower, // Radiant heating rate [W]
-			Real64 const TotEnergy, // Convective system impact energy [J]
-			Real64 const Energy, // Maximum heating energy [J]
-			Real64 const ConvEnergy, // Convective heating energy [J]
-			Real64 const RadEnergy, // Radiant heating energy [J]
-			int const LoopNum, // plant loop index
-			int const LoopSideNum, // plant loop side index
-			int const BranchNum, // plant loop branch index
-			int const CompNum, // plant loop component index
-			int const BBLoadReSimIndex,
-			int const BBMassFlowReSimIndex,
-			int const BBInletTempFlowReSimIndex,
-			int const HeatingCapMethod,   // - Method for steam baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-			Real64 const ScaledHeatingCapacity   // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-
-		) :
-			EquipID( EquipID ),
-			EquipType( EquipType ),
-			Schedule( Schedule ),
-			SurfaceName( SurfaceName ),
-			SurfacePtr( SurfacePtr ),
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			SteamInletNode( SteamInletNode ),
-			SteamOutletNode( SteamOutletNode ),
-			TotSurfToDistrib( TotSurfToDistrib ),
-			FluidIndex( FluidIndex ),
-			ControlCompTypeNum( ControlCompTypeNum ),
-			CompErrIndex( CompErrIndex ),
-			DegOfSubcooling( DegOfSubcooling ),
-			Offset( Offset ),
-			SteamMassFlowRate( SteamMassFlowRate ),
-			SteamMassFlowRateMax( SteamMassFlowRateMax ),
-			SteamVolFlowRateMax( SteamVolFlowRateMax ),
-			SteamOutletTemp( SteamOutletTemp ),
-			SteamInletTemp( SteamInletTemp ),
-			SteamInletEnthalpy( SteamInletEnthalpy ),
-			SteamOutletEnthalpy( SteamOutletEnthalpy ),
-			SteamInletPress( SteamInletPress ),
-			SteamOutletPress( SteamOutletPress ),
-			SteamInletQuality( SteamInletQuality ),
-			SteamOutletQuality( SteamOutletQuality ),
-			FracRadiant( FracRadiant ),
-			FracConvect( FracConvect ),
-			FracDistribPerson( FracDistribPerson ),
-			FracDistribToSurf( FracDistribToSurf ),
-			TotPower( TotPower ),
-			Power( Power ),
-			ConvPower( ConvPower ),
-			RadPower( RadPower ),
-			TotEnergy( TotEnergy ),
-			Energy( Energy ),
-			ConvEnergy( ConvEnergy ),
-			RadEnergy( RadEnergy ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			BBLoadReSimIndex( BBLoadReSimIndex ),
-			BBMassFlowReSimIndex( BBMassFlowReSimIndex ),
-			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity )
-		{}
-
 	};
 
 	struct SteamBaseboardNumericFieldData
@@ -307,12 +207,6 @@ namespace SteamBaseboardRadiator {
 		SteamBaseboardNumericFieldData()
 		{}
 
-		// Member Constructor
-		SteamBaseboardNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data

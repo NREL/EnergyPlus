@@ -2876,9 +2876,8 @@ For the parallel PIU, this is set to the minimum primary air flow fraction.
 
 The coil load and max hot water flow rate are then:
 
-<sub><span>\(\dot Qcoil,des = cp,air\cdot \rho air\cdot \dot Vair,coil,heating\cdot (Tout,coil - Tin,coil)\)</span></sub>
-
-<div>$$\dot Vmax,hw = \dot Qcoil,des/(cp,w\cdot \rho w\cdot \Delta Tloop,des)$$</div>
+<div>$$ \dot Q_{coil,des} = c_{p,air}\cdot \rho_{air}\cdot \dot V_{air,coil,heating}\cdot (T_{out,coil} - T_{in,coil}) $$</div>
+<div>$$ \dot V_{max,hw} = \dot Q_{coil,des}/(c_{p,w}\cdot \rho_{w}\cdot \Delta T_{loop,des}) $$</div>
 
 where
 

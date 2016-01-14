@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -758,23 +758,18 @@ namespace Boilers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		bool ErrorsFound( false ); // If errors detected in input
 		std::string equipName; // Name of boiler object
 		Real64 rho;
 		Real64 Cp;
 		Real64 tmpNomCap; // local nominal capacity cooling power
 		Real64 tmpBoilerVolFlowRate; // local boiler design volume flow rate
-		Real64 NomCapUser; // Hardsized nominal capacity for reporting
-		Real64 VolFlowRateUser; // Hardsized volume flow for reporting
-
-		PltSizNum = 0;
-		ErrorsFound = false;
+		Real64 NomCapUser( 0.0 ); // Hardsized nominal capacity for reporting
+		Real64 VolFlowRateUser( 0.0 ); // Hardsized volume flow for reporting
 
 		tmpNomCap = Boiler( BoilerNum ).NomCap;
-		NomCapUser = 0.0;
 		tmpBoilerVolFlowRate = Boiler( BoilerNum ).VolFlowRate;
-		VolFlowRateUser = 0.0;
 
 		PltSizNum = PlantLoop( Boiler( BoilerNum ).LoopNum ).PlantSizNum;
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -435,27 +435,6 @@ namespace DataHVACGlobals {
 			OpType( 0 )
 		{}
 
-		// Member Constructor
-		ComponentSetPtData(
-			std::string const & EquipmentType,
-			std::string const & EquipmentName,
-			int const NodeNumIn,
-			int const NodeNumOut,
-			Real64 const EquipDemand,
-			Real64 const DesignFlowRate,
-			std::string const & HeatOrCool,
-			int const OpType
-		) :
-			EquipmentType( EquipmentType ),
-			EquipmentName( EquipmentName ),
-			NodeNumIn( NodeNumIn ),
-			NodeNumOut( NodeNumOut ),
-			EquipDemand( EquipDemand ),
-			DesignFlowRate( DesignFlowRate ),
-			HeatOrCool( HeatOrCool ),
-			OpType( OpType )
-		{}
-
 	};
 
 	struct DefineZoneCompAvailMgrs
@@ -484,33 +463,6 @@ namespace DataHVACGlobals {
 			Count ( 0 )
 		{}
 
-		// Member Constructor
-		DefineZoneCompAvailMgrs(
-			int const NumAvailManagers, // number of availability managers for this system
-			int const AvailStatus, // system availability status
-			int const StartTime, // cycle on time (in SimTimeSteps)
-			int const StopTime, // cycle off time (in SimTimeSteps)
-			std::string const & AvailManagerListName, // name of each availability manager
-			Array1_string const & AvailManagerName, // name of each availability manager
-			Array1_int const & AvailManagerType, // type of availability manager
-			Array1_int const & AvailManagerNum, // index for availability manager
-			int const ZoneNum, // cycle off time (in SimTimeSteps)
-			bool const Input,
-			int const Count
-		) :
-			NumAvailManagers( NumAvailManagers ),
-			AvailStatus( AvailStatus ),
-			StartTime( StartTime ),
-			StopTime( StopTime ),
-			AvailManagerListName( AvailManagerListName ),
-			AvailManagerName( AvailManagerName ),
-			AvailManagerType( AvailManagerType ),
-			AvailManagerNum( AvailManagerNum ),
-			ZoneNum( ZoneNum ),
-			Input( Input ),
-			Count ( Count )
-		{}
-
 	};
 
 	struct ZoneCompTypeData
@@ -524,15 +476,6 @@ namespace DataHVACGlobals {
 			TotalNumComp( 0 )
 		{}
 
-		// Member Constructor
-		ZoneCompTypeData(
-			Array1< DefineZoneCompAvailMgrs > const & ZoneCompAvailMgrs,
-			int const TotalNumComp // total number of components of a zone equip type
-		) :
-			ZoneCompAvailMgrs( ZoneCompAvailMgrs ),
-			TotalNumComp( TotalNumComp )
-		{}
-
 	};
 
 	struct OptStartDataType
@@ -544,17 +487,6 @@ namespace DataHVACGlobals {
 
 		// Default Constructor
 		OptStartDataType()
-		{}
-
-		// Member Constructor
-		OptStartDataType(
-			Array1_int const & ActualZoneNum,
-			Array1< Real64 > const & OccStartTime,
-			Array1_bool const & OptStartFlag
-		) :
-			ActualZoneNum( ActualZoneNum ),
-			OccStartTime( OccStartTime ),
-			OptStartFlag( OptStartFlag )
 		{}
 
 	};

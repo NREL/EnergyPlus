@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -99,17 +99,6 @@ namespace HVACDuct {
 		DuctData() :
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 )
-		{}
-
-		// Member Constructor
-		DuctData(
-			std::string const & Name, // duct unique name
-			int const InletNodeNum, // inlet node number
-			int const OutletNodeNum // outlet node number
-		) :
-			Name( Name ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum )
 		{}
 
 	};

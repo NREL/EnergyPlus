@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -201,21 +201,6 @@ namespace SystemReports {
 			Other( 0.0 )
 		{}
 
-		// Member Constructor
-		Energy(
-			Real64 const TotDemand,
-			Real64 const Elec,
-			Real64 const Gas,
-			Real64 const Purch,
-			Real64 const Other
-		) :
-			TotDemand( TotDemand ),
-			Elec( Elec ),
-			Gas( Gas ),
-			Purch( Purch ),
-			Other( Other )
-		{}
-
 	};
 
 	struct CoilType
@@ -232,23 +217,6 @@ namespace SystemReports {
 		CoilType()
 		{}
 
-		// Member Constructor
-		CoilType(
-			Energy const & DecreasedCC, // LoadMetByVent
-			Energy const & DecreasedHC, // LoadMetByVent
-			Energy const & IncreasedCC, // LoadIncreasedVent
-			Energy const & IncreasedHC, // LoadAddedByVent
-			Energy const & ReducedByCC, // LoadAddedByVent
-			Energy const & ReducedByHC // LoadAddedByVent
-		) :
-			DecreasedCC( DecreasedCC ),
-			DecreasedHC( DecreasedHC ),
-			IncreasedCC( IncreasedCC ),
-			IncreasedHC( IncreasedHC ),
-			ReducedByCC( ReducedByCC ),
-			ReducedByHC( ReducedByHC )
-		{}
-
 	};
 
 	struct SummarizeLoads
@@ -262,21 +230,6 @@ namespace SystemReports {
 
 		// Default Constructor
 		SummarizeLoads()
-		{}
-
-		// Member Constructor
-		SummarizeLoads(
-			CoilType const & Load, // LoadMetByVent
-			CoilType const & NoLoad, // LoadMetByVentNoLoad
-			CoilType const & ExcessLoad, // LoadAddedByVentOvercool
-			CoilType const & PotentialSavings, // LoadAddedByVentCoolLost
-			CoilType const & PotentialCost // LoadAddedByVentHeatLost
-		) :
-			Load( Load ),
-			NoLoad( NoLoad ),
-			ExcessLoad( ExcessLoad ),
-			PotentialSavings( PotentialSavings ),
-			PotentialCost( PotentialCost )
 		{}
 
 	};

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -160,51 +160,6 @@ namespace DemandManager {
 			OverLimitDuration( 0.0 )
 		{}
 
-		// Member Constructor
-		DemandManagerListData(
-			std::string const & Name, // Name of DEMAND MANAGER LIST
-			int const Meter, // Index to meter to demand limit
-			int const LimitSchedule, // Schedule index for demand limit
-			Real64 const SafetyFraction, // Multiplier applied to demand limit schedule
-			int const BillingSchedule, // Schedule index for billing month periods
-			Real64 const BillingPeriod, // Current billing period value
-			int const PeakSchedule, // Schedule index for billing month periods
-			int const AveragingWindow, // Number of timesteps for averaging demand window
-			Array1< Real64 > const & History, // Demand window history
-			int const ManagerPriority, // Indicator for priority (SEQUENTIAL, OPTIMAL, ALL)
-			int const NumOfManager, // Number of DEMAND MANAGERs
-			Array1_int const & Manager, // Indexes for DEMAND MANAGERs
-			Real64 const MeterDemand, // Meter demand at this timestep
-			Real64 const AverageDemand, // Current demand over the demand window
-			Real64 const PeakDemand, // Peak demand in the billing month so far
-			Real64 const ScheduledLimit, // Scheduled demand limit
-			Real64 const DemandLimit, // Scheduled demand limit * Safety Fraction
-			Real64 const AvoidedDemand, // Demand avoided by active DEMAND MANAGERs
-			Real64 const OverLimit, // Amount that demand limit is exceeded
-			Real64 const OverLimitDuration // Number of hours that demand limit is exceeded
-		) :
-			Name( Name ),
-			Meter( Meter ),
-			LimitSchedule( LimitSchedule ),
-			SafetyFraction( SafetyFraction ),
-			BillingSchedule( BillingSchedule ),
-			BillingPeriod( BillingPeriod ),
-			PeakSchedule( PeakSchedule ),
-			AveragingWindow( AveragingWindow ),
-			History( History ),
-			ManagerPriority( ManagerPriority ),
-			NumOfManager( NumOfManager ),
-			Manager( Manager ),
-			MeterDemand( MeterDemand ),
-			AverageDemand( AverageDemand ),
-			PeakDemand( PeakDemand ),
-			ScheduledLimit( ScheduledLimit ),
-			DemandLimit( DemandLimit ),
-			AvoidedDemand( AvoidedDemand ),
-			OverLimit( OverLimit ),
-			OverLimitDuration( OverLimitDuration )
-		{}
-
 	};
 
 	struct DemandManagerData
@@ -257,53 +212,6 @@ namespace DemandManager {
 			NumOfLoads( 0 ),
 			FixedRate( 0.0 ),
 			ReductionRatio( 0.0 )
-		{}
-
-		// Member Constructor
-		DemandManagerData(
-			std::string const & Name, // Name of DEMAND MANAGER
-			int const Type, // Type of DEMAND MANAGER (:LIGHTS, :ELECTRICEQUIPMENT, etc.)
-			int const DemandManagerList, // Reference to parent DEMAND MANAGER LIST for error checking
-			bool const CanReduceDemand, // Flag to indicate whether manager can reduce demand
-			int const AvailSchedule, // Schedule index pointer for Availability Schedule
-			bool const Available, // Availability flag
-			bool const Activate, // Flag to activate the manager
-			bool const Active, // Flag to indicate that the manager is active
-			int const LimitControl,
-			int const SelectionControl,
-			int const LimitDuration, // Minimum duration of demand manager activity (min)
-			int const ElapsedTime, // Elapsed time for the demand manager activity (min)
-			int const RotationDuration, // Rotation duration (min)
-			int const ElapsedRotationTime, // Elapsed time for the current rotation (min)
-			int const RotatedLoadNum, // Index for rotated load
-			Real64 const LowerLimit, // Lowest demand limit as fraction of design level
-			Real64 const UpperLimit, // Not used for demand limit
-			int const NumOfLoads, // Number of load objects
-			Array1_int const & Load, // Pointers to load objects
-			Real64 const FixedRate, // fixed rate for ventilation strategy
-			Real64 const ReductionRatio // reduction rate for ventilation strategy
-		) :
-			Name( Name ),
-			Type( Type ),
-			DemandManagerList( DemandManagerList ),
-			CanReduceDemand( CanReduceDemand ),
-			AvailSchedule( AvailSchedule ),
-			Available( Available ),
-			Activate( Activate ),
-			Active( Active ),
-			LimitControl( LimitControl ),
-			SelectionControl( SelectionControl ),
-			LimitDuration( LimitDuration ),
-			ElapsedTime( ElapsedTime ),
-			RotationDuration( RotationDuration ),
-			ElapsedRotationTime( ElapsedRotationTime ),
-			RotatedLoadNum( RotatedLoadNum ),
-			LowerLimit( LowerLimit ),
-			UpperLimit( UpperLimit ),
-			NumOfLoads( NumOfLoads ),
-			Load( Load ),
-			FixedRate( FixedRate ),
-			ReductionRatio( ReductionRatio )
 		{}
 
 	};

@@ -7625,7 +7625,7 @@ The design supply air temperature for cooling in degrees Celsius. This should be
 
 #### Field: Central Heating Design Supply Air Temperature
 
-The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil.
+The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system.
 
 #### Field: Type of Zone Sum to Use
 
@@ -7641,11 +7641,11 @@ Entering *Yes* means the system will be sized for heating using 100% outdoor air
 
 #### Field: Central Cooling Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Central Heating Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Cooling Supply Air Flow Rate Method
 

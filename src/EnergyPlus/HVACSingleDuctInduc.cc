@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -875,6 +875,8 @@ namespace HVACSingleDuctInduc {
 					if ( IsAutoSize ) {
 						IndUnit( IUNum ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
 						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Maximum Hot Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes );
+						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
+						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );
 					} else {
 						if ( IndUnit( IUNum ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
 							MaxVolHotWaterFlowUser = IndUnit( IUNum ).MaxVolHotWaterFlow;

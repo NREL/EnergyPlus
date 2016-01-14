@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -115,35 +115,6 @@ namespace DataZoneEnergyDemands {
 			StageNum( 0 )
 		{}
 
-		// Member Constructor
-		ZoneSystemDemandData(
-			Real64 const RemainingOutputRequired,
-			Real64 const TotalOutputRequired,
-			Real64 const OutputRequiredToHeatingSP, // Load required to meet heating setpoint (>0 is a heating load)
-			Real64 const OutputRequiredToCoolingSP, // Load required to meet cooling setpoint (<0 is a cooling load)
-			Real64 const RemainingOutputReqToHeatSP, // Remaining load required to meet heating setpoint (>0 is a heating load)
-			Real64 const RemainingOutputReqToCoolSP, // Remaining load required to meet cooling setpoint (<0 is a cooling load)
-			int const NumZoneEquipment, // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-			Array1< Real64 > const & SequencedOutputRequired,
-			Array1< Real64 > const & SequencedOutputRequiredToHeatingSP, // load required to meet heating setpoint by sequence
-			Array1< Real64 > const & SequencedOutputRequiredToCoolingSP, // load required to meet cooling setpoint by sequence
-			Real64 const SupplyAirAdjustFactor, // supply air adjustment factor due to the cap of
-			int const StageNum // The stage number when staged thermostate is used:
-		) :
-			RemainingOutputRequired( RemainingOutputRequired ),
-			TotalOutputRequired( TotalOutputRequired ),
-			OutputRequiredToHeatingSP( OutputRequiredToHeatingSP ),
-			OutputRequiredToCoolingSP( OutputRequiredToCoolingSP ),
-			RemainingOutputReqToHeatSP( RemainingOutputReqToHeatSP ),
-			RemainingOutputReqToCoolSP( RemainingOutputReqToCoolSP ),
-			NumZoneEquipment( NumZoneEquipment ),
-			SequencedOutputRequired( SequencedOutputRequired ),
-			SequencedOutputRequiredToHeatingSP( SequencedOutputRequiredToHeatingSP ),
-			SequencedOutputRequiredToCoolingSP( SequencedOutputRequiredToCoolingSP ),
-			SupplyAirAdjustFactor( SupplyAirAdjustFactor ),
-			StageNum( StageNum )
-		{}
-
 	};
 
 	struct ZoneSystemMoistureDemand // Humidification/dehumidification loads to be met (kg water per second)
@@ -171,31 +142,6 @@ namespace DataZoneEnergyDemands {
 			RemainingOutputReqToHumidSP( 0.0 ),
 			RemainingOutputReqToDehumidSP( 0.0 ),
 			NumZoneEquipment( 0 )
-		{}
-
-		// Member Constructor
-		ZoneSystemMoistureDemand(
-			Real64 const RemainingOutputRequired,
-			Real64 const TotalOutputRequired,
-			Real64 const OutputRequiredToHumidifyingSP, // Load required to meet humidifying setpoint (>0 = a humidify load)
-			Real64 const OutputRequiredToDehumidifyingSP, // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)
-			Real64 const RemainingOutputReqToHumidSP, // Remaining load required to meet humidifying setpoint
-			Real64 const RemainingOutputReqToDehumidSP, // Remaining load required to meet dehumidifying setpoint
-			int const NumZoneEquipment, // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-			Array1< Real64 > const & SequencedOutputRequired,
-			Array1< Real64 > const & SequencedOutputRequiredToHumidSP, // load required to meet humidify setpoint by sequence
-			Array1< Real64 > const & SequencedOutputRequiredToDehumidSP // load required to meet dehumidify setpoint by sequenc
-		) :
-			RemainingOutputRequired( RemainingOutputRequired ),
-			TotalOutputRequired( TotalOutputRequired ),
-			OutputRequiredToHumidifyingSP( OutputRequiredToHumidifyingSP ),
-			OutputRequiredToDehumidifyingSP( OutputRequiredToDehumidifyingSP ),
-			RemainingOutputReqToHumidSP( RemainingOutputReqToHumidSP ),
-			RemainingOutputReqToDehumidSP( RemainingOutputReqToDehumidSP ),
-			NumZoneEquipment( NumZoneEquipment ),
-			SequencedOutputRequired( SequencedOutputRequired ),
-			SequencedOutputRequiredToHumidSP( SequencedOutputRequiredToHumidSP ),
-			SequencedOutputRequiredToDehumidSP( SequencedOutputRequiredToDehumidSP )
 		{}
 
 	};

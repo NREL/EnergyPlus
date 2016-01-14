@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1333,21 +1333,6 @@ namespace SizingManager {
 				ZoneListActive( false )
 			{}
 
-			// Member Constructor
-			GlobalMiscObject(
-				std::string const & Name,
-				int const ZoneOrZoneListPtr,
-				int const NumOfZones,
-				int const StartPtr,
-				bool const ZoneListActive
-			) :
-				Name( Name ),
-				ZoneOrZoneListPtr( ZoneOrZoneListPtr ),
-				NumOfZones( NumOfZones ),
-				StartPtr( StartPtr ),
-				ZoneListActive( ZoneListActive )
-			{}
-
 		};
 
 		// Object Data
@@ -2189,7 +2174,7 @@ namespace SizingManager {
 			SysSizInput( SysSizIndex ).CoolSupTemp = rNumericArgs( iCentralCoolDesignSATempNumericNum );
 			SysSizInput( SysSizIndex ).HeatSupTemp = rNumericArgs( iCentralHeatDesignSATempNumericNum );
 			SysSizInput( SysSizIndex ).CoolSupHumRat = rNumericArgs( iCentralCoolDesignSAHumRatNumericNum );
-			SysSizInput( SysSizIndex).HeatSupHumRat = rNumericArgs( iCentralHeatDesignSAHumRatNumericNum );
+			SysSizInput( SysSizIndex ).HeatSupHumRat = rNumericArgs( iCentralHeatDesignSAHumRatNumericNum );
 			//  N11, \field Cooling Design Air Flow Rate
 			//      \note This input is used if Cooling Design Air Flow Method is Flow/System
 			//      \note This value will *not* be multiplied by any sizing factor or by zone multipliers.

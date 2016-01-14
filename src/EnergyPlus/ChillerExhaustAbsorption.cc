@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1236,36 +1236,36 @@ namespace ChillerExhaustAbsorption {
 		Real64 lCHWLowLimitTemp; // Chilled Water Lower Limit Temperature
 		int lExhaustAirInletNodeNum; // Combustion Air Inlet Node number
 		// Local copies of ExhaustAbsorberReportVars Type
-		Real64 lCoolingLoad; // cooling load on the chiller (previously called QEvap)
-		Real64 lCoolingEnergy; // variable to track total cooling load for period (was EvapEnergy)
-		Real64 lTowerLoad; // load on the cooling tower/condenser (previously called QCond)
-		Real64 lTowerEnergy; // variable to track total tower load for a period (was CondEnergy)
-		Real64 lThermalEnergyUseRate; // instantaneous use of exhaust for period
-		Real64 lThermalEnergy; // variable to track total ThermalEnergy used for a period
-		Real64 lCoolThermalEnergyUseRate; // instantaneous use of exhaust for period for cooling
-		Real64 lCoolThermalEnergy; // variable to track total ThermalEnergy used for a period for cooling
-		Real64 lHeatThermalEnergyUseRate; // instantaneous use of exhaust for period for heating
-		Real64 lElectricPower; // parasitic electric power used (was PumpingPower)
-		Real64 lElectricEnergy; // track the total electricity used for a period (was PumpingEnergy)
-		Real64 lCoolElectricPower; // parasitic electric power used  for cooling
-		Real64 lCoolElectricEnergy; // track the total electricity used for a period for cooling
-		Real64 lHeatElectricPower; // parasitic electric power used  for heating
-		Real64 lChillReturnTemp; // reporting: evaporator inlet temperature (was EvapInletTemp)
-		Real64 lChillSupplyTemp; // reporting: evaporator outlet temperature (was EvapOutletTemp)
-		Real64 lChillWaterMassFlowRate; // reporting: evaporator mass flow rate (was Evapmdot)
-		Real64 lCondReturnTemp; // reporting: condenser inlet temperature (was CondInletTemp)
-		Real64 lCondSupplyTemp; // reporting: condenser outlet temperature (was CondOutletTemp)
-		Real64 lCondWaterMassFlowRate; // reporting: condenser mass flow rate (was Condmdot)
-		Real64 lCoolPartLoadRatio; // operating part load ratio (load/capacity for cooling)
-		Real64 lHeatPartLoadRatio; // operating part load ratio (load/capacity for heating)
-		Real64 lAvailableCoolingCapacity; // current capacity after temperature adjustment
-		Real64 lFractionOfPeriodRunning;
-		Real64 PartLoadRat; // actual operating part load ratio of unit (ranges from minplr to 1)
-		Real64 lChillWaterMassflowratemax; // Maximum flow rate through the evaporator
-		Real64 lExhaustInTemp; // Exhaust inlet temperature
-		Real64 lExhaustInFlow; // Exhaust inlet flow rate
-		Real64 lExhHeatRecPotentialCool; // Exhaust heat recovery potential during cooling
-		Real64 lExhaustAirHumRat;
+		Real64 lCoolingLoad( 0.0 ); // cooling load on the chiller (previously called QEvap)
+		// Real64 lCoolingEnergy( 0.0 ); // variable to track total cooling load for period (was EvapEnergy)
+		Real64 lTowerLoad( 0.0 ); // load on the cooling tower/condenser (previously called QCond)
+		// Real64 lTowerEnergy( 0.0 ); // variable to track total tower load for a period (was CondEnergy)
+		// Real64 lThermalEnergyUseRate( 0.0 ); // instantaneous use of exhaust for period
+		// Real64 lThermalEnergy( 0.0 ); // variable to track total ThermalEnergy used for a period
+		Real64 lCoolThermalEnergyUseRate( 0.0 ); // instantaneous use of exhaust for period for cooling
+		// Real64 lCoolThermalEnergy( 0.0 ); // variable to track total ThermalEnergy used for a period for cooling
+		Real64 lHeatThermalEnergyUseRate( 0.0 ); // instantaneous use of exhaust for period for heating
+		// Real64 lElectricPower( 0.0 ); // parasitic electric power used (was PumpingPower)
+		// Real64 lElectricEnergy( 0.0 ); // track the total electricity used for a period (was PumpingEnergy)
+		Real64 lCoolElectricPower( 0.0 ); // parasitic electric power used  for cooling
+		// Real64 lCoolElectricEnergy( 0.0 ); // track the total electricity used for a period for cooling
+		Real64 lHeatElectricPower( 0.0 ); // parasitic electric power used  for heating
+		Real64 lChillReturnTemp( 0.0 ); // reporting: evaporator inlet temperature (was EvapInletTemp)
+		Real64 lChillSupplyTemp( 0.0 ); // reporting: evaporator outlet temperature (was EvapOutletTemp)
+		Real64 lChillWaterMassFlowRate( 0.0 ); // reporting: evaporator mass flow rate (was Evapmdot)
+		Real64 lCondReturnTemp( 0.0 ); // reporting: condenser inlet temperature (was CondInletTemp)
+		Real64 lCondSupplyTemp( 0.0 ); // reporting: condenser outlet temperature (was CondOutletTemp)
+		Real64 lCondWaterMassFlowRate( 0.0 ); // reporting: condenser mass flow rate (was Condmdot)
+		Real64 lCoolPartLoadRatio( 0.0 ); // operating part load ratio (load/capacity for cooling)
+		Real64 lHeatPartLoadRatio( 0.0 ); // operating part load ratio (load/capacity for heating)
+		Real64 lAvailableCoolingCapacity( 0.0 ); // current capacity after temperature adjustment
+		Real64 lFractionOfPeriodRunning( 0.0 );
+		Real64 PartLoadRat( 0.0 ); // actual operating part load ratio of unit (ranges from minplr to 1)
+		Real64 lChillWaterMassflowratemax( 0.0 ); // Maximum flow rate through the evaporator
+		Real64 lExhaustInTemp( 0.0 ); // Exhaust inlet temperature
+		Real64 lExhaustInFlow( 0.0 ); // Exhaust inlet flow rate
+		Real64 lExhHeatRecPotentialCool( 0.0 ); // Exhaust heat recovery potential during cooling
+		Real64 lExhaustAirHumRat( 0.0 );
 		// other local variables
 		Real64 ChillDeltaTemp; // chilled water temperature difference
 		Real64 ChillSupplySetPointTemp( 0.0 );
@@ -1283,36 +1283,6 @@ namespace ChillerExhaustAbsorption {
 		Real64 Cp_CD; // local fluid specific heat for condenser water
 		Real64 CpAir; // specific heat of exhaust air
 
-		//initialize all output variables to zero
-		lCoolingLoad = 0.0;
-		lCoolingEnergy = 0.0;
-		lTowerLoad = 0.0;
-		lTowerEnergy = 0.0;
-		lThermalEnergyUseRate = 0.0;
-		lThermalEnergy = 0.0;
-		lCoolThermalEnergyUseRate = 0.0;
-		lCoolThermalEnergy = 0.0;
-		lHeatThermalEnergyUseRate = 0.0;
-		lElectricPower = 0.0;
-		lElectricEnergy = 0.0;
-		lCoolElectricPower = 0.0;
-		lCoolElectricEnergy = 0.0;
-		lHeatElectricPower = 0.0;
-		lChillReturnTemp = 0.0;
-		lChillSupplyTemp = 0.0;
-		lChillWaterMassFlowRate = 0.0;
-		lCondReturnTemp = 0.0;
-		lCondSupplyTemp = 0.0;
-		lCondWaterMassFlowRate = 0.0;
-		lCoolPartLoadRatio = 0.0;
-		lHeatPartLoadRatio = 0.0;
-		lAvailableCoolingCapacity = 0.0;
-		lFractionOfPeriodRunning = 0.0;
-		PartLoadRat = 0.0;
-		lExhaustInTemp = 0.0;
-		lExhaustInFlow = 0.0;
-		lExhHeatRecPotentialCool = 0.0;
-		lExhaustAirHumRat = 0.0;
 		// define constant values
 
 		// set node values to data structure values for nodes
@@ -1683,32 +1653,32 @@ namespace ChillerExhaustAbsorption {
 		int lHeatCapFCoolCurve; // Heating Capacity Function of Cooling Capacity Curve
 		int lThermalEnergyHeatFHPLRCurve; // ThermalEnergy Input to heat output ratio during heating only function
 		// Local copies of ExhaustAbsorberReportVars Type
-		Real64 lHeatingLoad; // heating load on the chiller
-		Real64 lHeatingEnergy; // heating energy
-		Real64 lThermalEnergyUseRate; // instantaneous use of Thermal Energy for period
-		Real64 lThermalEnergy; // variable to track total Thermal Energy used for a period (reference only)
-		Real64 lCoolThermalEnergyUseRate; // instantaneous use of thermal energy for period for cooling
-		Real64 lHeatThermalEnergyUseRate; // instantaneous use of thermal energy for period for heating
-		Real64 lHeatThermalEnergy; // variable to track total ThermalEnergy used for a period for heating
-		Real64 lElectricPower; // parasitic electric power used (was PumpingPower)
-		Real64 lElectricEnergy; // track the total electricity used for a period (was PumpingEnergy)
-		Real64 lCoolElectricPower; // parasitic electric power used  for cooling
-		Real64 lHeatElectricPower; // parasitic electric power used  for heating
-		Real64 lHeatElectricEnergy; // track the total electricity used for a period for heating
-		Real64 lHotWaterReturnTemp; // reporting: hot water return (inlet) temperature
-		Real64 lHotWaterSupplyTemp; // reporting: hot water supply (outlet) temperature
-		Real64 lHotWaterMassFlowRate; // reporting: hot water mass flow rate
-		Real64 lCoolPartLoadRatio; // operating part load ratio (load/capacity for cooling)
-		Real64 lHeatPartLoadRatio; // operating part load ratio (load/capacity for heating)
-		Real64 lAvailableHeatingCapacity; // current heating capacity
-		Real64 lFractionOfPeriodRunning;
-		Real64 lHotWaterMassFlowRateMax; // Maximum flow rate through the evaporator
-		Real64 lExhaustInTemp; // Exhaust inlet temperature
-		Real64 lExhaustInFlow; // Exhaust inlet flow rate
-		Real64 lExhHeatRecPotentialHeat; // Exhaust heat recovery potential
-		Real64 lExhaustAirHumRat;
+		Real64 lHeatingLoad( 0.0 ); // heating load on the chiller
+		// Real64 lHeatingEnergy( 0.0 ); // heating energy
+		// Real64 lThermalEnergyUseRate( 0.0 ); // instantaneous use of Thermal Energy for period
+		// Real64 lThermalEnergy( 0.0 ); // variable to track total Thermal Energy used for a period (reference only)
+		Real64 lCoolThermalEnergyUseRate( 0.0 ); // instantaneous use of thermal energy for period for cooling
+		Real64 lHeatThermalEnergyUseRate( 0.0 ); // instantaneous use of thermal energy for period for heating
+		// Real64 lHeatThermalEnergy( 0.0 ); // variable to track total ThermalEnergy used for a period for heating
+		// Real64 lElectricPower( 0.0 ); // parasitic electric power used (was PumpingPower)
+		// Real64 lElectricEnergy( 0.0 ); // track the total electricity used for a period (was PumpingEnergy)
+		Real64 lCoolElectricPower( 0.0 ); // parasitic electric power used  for cooling
+		Real64 lHeatElectricPower( 0.0 ); // parasitic electric power used  for heating
+		// Real64 lHeatElectricEnergy( 0.0 ); // track the total electricity used for a period for heating
+		Real64 lHotWaterReturnTemp( 0.0 ); // reporting: hot water return (inlet) temperature
+		Real64 lHotWaterSupplyTemp( 0.0 ); // reporting: hot water supply (outlet) temperature
+		Real64 lHotWaterMassFlowRate( 0.0 ); // reporting: hot water mass flow rate
+		Real64 lCoolPartLoadRatio( 0.0 ); // operating part load ratio (load/capacity for cooling)
+		Real64 lHeatPartLoadRatio( 0.0 ); // operating part load ratio (load/capacity for heating)
+		Real64 lAvailableHeatingCapacity( 0.0 ); // current heating capacity
+		Real64 lFractionOfPeriodRunning( 0.0 );
+		Real64 lHotWaterMassFlowRateMax( 0.0 ); // Maximum flow rate through the evaporator
+		Real64 lExhaustInTemp( 0.0 ); // Exhaust inlet temperature
+		Real64 lExhaustInFlow( 0.0 ); // Exhaust inlet flow rate
+		Real64 lExhHeatRecPotentialHeat( 0.0 ); // Exhaust heat recovery potential
+		Real64 lExhaustAirHumRat( 0.0 );
 		// other local variables
-		Real64 HeatDeltaTemp; // hot water temperature difference
+		Real64 HeatDeltaTemp( 0.0 ); // hot water temperature difference
 		Real64 HeatSupplySetPointTemp( 0.0 );
 		int LoopNum;
 		int LoopSideNum;
@@ -1716,35 +1686,7 @@ namespace ChillerExhaustAbsorption {
 		Real64 CpAir;
 		Real64 rhoHW; // local fluid density for hot water
 		int lExhaustAirInletNodeNum; // Combustion Air Inlet Node number
-		std::string GeneratorName;
 
-		//  INTEGER      :: lExhaustAirOutletNodeNum      ! Combustion Air Outlet (Exhaust) Node number
-
-		//initialize all output variables to zero
-
-		lHeatingLoad = 0.0;
-		lHeatingEnergy = 0.0;
-		lThermalEnergyUseRate = 0.0;
-		lThermalEnergy = 0.0;
-		lCoolThermalEnergyUseRate = 0.0;
-		lHeatThermalEnergyUseRate = 0.0;
-		lHeatThermalEnergy = 0.0;
-		lElectricPower = 0.0;
-		lElectricEnergy = 0.0;
-		lCoolElectricPower = 0.0;
-		lHeatElectricPower = 0.0;
-		lHeatElectricEnergy = 0.0;
-		lHotWaterReturnTemp = 0.0;
-		lHotWaterSupplyTemp = 0.0;
-		lHotWaterMassFlowRate = 0.0;
-		lCoolPartLoadRatio = 0.0;
-		lHeatPartLoadRatio = 0.0;
-		lAvailableHeatingCapacity = 0.0;
-		lFractionOfPeriodRunning = 0.0;
-		lExhaustInTemp = 0.0;
-		lExhaustInFlow = 0.0;
-		lExhHeatRecPotentialHeat = 0.0;
-		lExhaustAirHumRat = 0.0;
 		// set node values to data structure values for nodes
 
 		lHeatReturnNodeNum = ExhaustAbsorber( ChillNum ).HeatReturnNodeNum;

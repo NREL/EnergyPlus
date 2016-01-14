@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -743,7 +743,7 @@ namespace WaterManager {
 				if ( ( RainFall.RainSchedID == 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
 					ShowSevereError( "Schedule not found for " + cCurrentModuleObject + " object" );
 					ErrorsFound = true;
-				} else if ( ( RainFall.RainSchedID == 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
+				} else if ( ( RainFall.RainSchedID != 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
 					if ( ! CheckScheduleValueMinMax( RainFall.RainSchedID, ">=", 0.0 ) ) {
 						ShowSevereError( "Schedule=" + cAlphaArgs( 2 ) + " for " + cCurrentModuleObject + " object has values < 0." );
 						ErrorsFound = true;

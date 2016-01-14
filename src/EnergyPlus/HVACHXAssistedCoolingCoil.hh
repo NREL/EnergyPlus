@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -147,45 +147,6 @@ namespace HVACHXAssistedCoolingCoil {
 			MassFlowRate( 0.0 ),
 			MaxIterCounter( 0 ),
 			MaxIterIndex( 0 )
-		{}
-
-		// Member Constructor
-		HXAssistedCoilParameters(
-			std::string const & HXAssistedCoilType, // Type of HXAssistedCoolingCoil
-			int const HXAssistedCoilType_Num, // Numeric equivalent for hx assisted coil
-			std::string const & Name, // Name of the HXAssistedCoolingCoil
-			std::string const & CoolingCoilType, // Cooling coil type must be DetailedFlatCooling
-			int const CoolingCoilType_Num, // Numeric Equivalent for cooling coil
-			std::string const & CoolingCoilName, // Cooling coil name
-			int const CoolingCoilIndex,
-			std::string const & HeatExchangerType, // Heat Exchanger type must be HeatExchanger:AirToAir:FlatPlate,
-			int const HeatExchangerType_Num, // Numeric Equivalent for heat exchanger
-			std::string const & HeatExchangerName, // Heat Exchanger name
-			int const HeatExchangerIndex, // Heat Exchanger index
-			int const HXAssistedCoilInletNodeNum, // Inlet node to HXAssistedCoolingCoil compound object
-			int const HXAssistedCoilOutletNodeNum, // Outlet node to HXAssistedCoolingCoil compound object
-			int const HXExhaustAirInletNodeNum, // Inlet node number for air-to-air heat exchanger
-			Real64 const MassFlowRate, // Mass flow rate through HXAssistedCoolingCoil compound object
-			int const MaxIterCounter, // used in warning messages
-			int const MaxIterIndex // used in warning messages
-		) :
-			HXAssistedCoilType( HXAssistedCoilType ),
-			HXAssistedCoilType_Num( HXAssistedCoilType_Num ),
-			Name( Name ),
-			CoolingCoilType( CoolingCoilType ),
-			CoolingCoilType_Num( CoolingCoilType_Num ),
-			CoolingCoilName( CoolingCoilName ),
-			CoolingCoilIndex( CoolingCoilIndex ),
-			HeatExchangerType( HeatExchangerType ),
-			HeatExchangerType_Num( HeatExchangerType_Num ),
-			HeatExchangerName( HeatExchangerName ),
-			HeatExchangerIndex( HeatExchangerIndex ),
-			HXAssistedCoilInletNodeNum( HXAssistedCoilInletNodeNum ),
-			HXAssistedCoilOutletNodeNum( HXAssistedCoilOutletNodeNum ),
-			HXExhaustAirInletNodeNum( HXExhaustAirInletNodeNum ),
-			MassFlowRate( MassFlowRate ),
-			MaxIterCounter( MaxIterCounter ),
-			MaxIterIndex( MaxIterIndex )
 		{}
 
 	};

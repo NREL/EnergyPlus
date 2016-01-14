@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -5778,7 +5778,6 @@ namespace OutputReportTabular {
 		//   na
 
 		// Return value
-		std::string resultString; // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5793,36 +5792,25 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string::size_type startPos = 0;
 
-		std::string procIn; // processed input string
-		std::string::size_type startTab;
-		std::string::size_type endTab;
-		std::string::size_type inLen;
+		auto endPos = inString.find_first_of( tb );
+		if ( colNum == 1 ) {
+			if ( endPos == std::string::npos ) return inString;
+			return inString.substr( startPos, endPos - startPos );
+		}
+		if ( endPos == std::string::npos ) return "";
 
-		procIn = inString;
-		inLen = len( procIn );
-		startTab = std::string::npos;
-		endTab = index( procIn, tb );
-		if ( endTab != std::string::npos ) {
-			procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-		} else {
-			endTab = inLen; // one character past the end of string since substract one when extracting
+		int numCols = 1;
+		while ( numCols < colNum ) {
+			startPos = endPos + 1;
+			endPos = inString.find_first_of( tb, startPos );
+			++numCols;
+			if ( endPos == std::string::npos ) break;
 		}
-		for ( int i = 2; i <= colNum; ++i ) { // already have first column identified so do loop only if for column 2 or greater.
-			startTab = endTab;
-			endTab = index( procIn, tb );
-			if ( endTab != std::string::npos ) {
-				procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-			} else {
-				endTab = inLen; // one character past the end of string since substract one when extracting
-			}
-		}
-		if ( startTab < endTab ) {
-			resultString = procIn.substr( startTab + 1, endTab - startTab - 1 ); // extract but leave tab characters out
-		} else {
-			resultString = "";
-		}
-		return resultString;
+		if ( colNum > numCols ) return "";
+		if ( endPos == std::string::npos ) endPos = inString.size();
+		return inString.substr( startPos, endPos - startPos );
 	}
 
 	void
@@ -6959,7 +6947,6 @@ namespace OutputReportTabular {
 		std::string curNameWithSIUnits;
 		std::string curNameAndUnits;
 		int indexUnitConv;
-		std::string tableString;
 		Real64 processFraction;
 		Real64 processElecCost;
 		Real64 processGasCost;
@@ -8334,8 +8321,6 @@ namespace OutputReportTabular {
 		Real64 largeConversionFactor;
 		Real64 areaConversionFactor;
 		Real64 convBldgCondFloorArea;
-		std::string curNameWithSIUnits;
-		std::string curNameAndUnits;
 
 		if ( displaySourceEnergyEndUseSummary ) {
 			// show the headers of the report
@@ -11525,7 +11510,6 @@ namespace OutputReportTabular {
 		Real64 totalGrandTotal;
 		Real64 powerConversion;
 		int tempConvIndx; // temperature conversion index
-		std::string stringWithTemp;
 		int curExtBoundCond;
 		Real64 mult; // zone multiplier
 
@@ -12229,12 +12213,12 @@ namespace OutputReportTabular {
 
 					//DOAS
 					tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
-					grandTotalRow( cSensDelay ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+					totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+					grandTotalRow( cSensDelay ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
 
 					tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
-					grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+					totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+					grandTotalRow( cLatent ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
 
 					//INFILTRATION
 					seqData = infilInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;

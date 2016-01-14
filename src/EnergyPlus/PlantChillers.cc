@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -3112,33 +3112,25 @@ namespace PlantChillers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		int PltSizCondNum; // Plant Sizing index for condenser loop
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
+		bool ErrorsFound( false ); // If errors detected in input
 		std::string equipName;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		Real64 tmpNomCap; // local nominal capacity cooling power
 		Real64 tmpEvapVolFlowRate; // local evaporator design volume flow rate
 		Real64 tmpCondVolFlowRate; // local condenser design volume flow rate
-		Real64 tmpHeatRecVolFlowRate; // local heat recovery design volume flow rate
-		Real64 EvapVolFlowRateUser; // Hardsized evaporator flow rate for reporting
-		Real64 NomCapUser; // Hardsized reference capacity for reporting
-		Real64 CondVolFlowRateUser; // Hardsized condenser flow rate for reporting
-		Real64 DesignHeatRecVolFlowRateUser; // Hardsized heat recovery flow rate for reporting
+		Real64 tmpHeatRecVolFlowRate( 0.0 ); // local heat recovery design volume flow rate
+		Real64 EvapVolFlowRateUser( 0.0 ); // Hardsized evaporator flow rate for reporting
+		Real64 NomCapUser( 0.0 ); // Hardsized reference capacity for reporting
+		Real64 CondVolFlowRateUser( 0.0 ); // Hardsized condenser flow rate for reporting
+		Real64 DesignHeatRecVolFlowRateUser( 0.0 ); // Hardsized heat recovery flow rate for reporting
 
-		PltSizNum = 0;
-		PltSizCondNum = 0;
-		ErrorsFound = false;
 		// init local temporary version in case of partial/mixed autosizing
 		tmpEvapVolFlowRate = ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
 		tmpNomCap = ElectricChiller( ChillNum ).Base.NomCap;
 		tmpCondVolFlowRate = ElectricChiller( ChillNum ).Base.CondVolFlowRate;
-		tmpHeatRecVolFlowRate = 0.0;
-		EvapVolFlowRateUser = 0.0;
-		NomCapUser = 0.0;
-		CondVolFlowRateUser = 0.0;
-		DesignHeatRecVolFlowRateUser = 0.0;
 
 		if ( ElectricChiller( ChillNum ).Base.CondenserType == WaterCooled ) {
 			PltSizCondNum = PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).PlantSizNum;
@@ -3315,8 +3307,6 @@ namespace PlantChillers {
 		}
 
 		if ( ElectricChiller( ChillNum ).HeatRecActive ) {
-			tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
-
 			tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).Base.CondVolFlowRate * ElectricChiller( ChillNum ).HeatRecCapacityFraction;
 			if ( ! ElectricChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
 			if ( PlantFirstSizesOkayToFinalize ) {

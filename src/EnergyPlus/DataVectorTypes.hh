@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -112,16 +112,6 @@ namespace DataVectorTypes {
 //		Vector()
 //		{}
 //
-//		// Member Constructor
-//		Vector(
-//			Real64 const x,
-//			Real64 const y,
-//			Real64 const z
-//		) :
-//			x( x ),
-//			y( y ),
-//			z( z )
-//		{}
 //
 //		// Uniform Real64 Constructor
 //		Vector( Real64 const v ) :
@@ -570,19 +560,6 @@ namespace DataVectorTypes {
 		PlaneEq()
 		{}
 
-		// Member Constructor
-		PlaneEq(
-			Real64 const x,
-			Real64 const y,
-			Real64 const z,
-			Real64 const w
-		) :
-			x( x ),
-			y( y ),
-			z( z ),
-			w( w )
-		{}
-
 	};
 
 	struct Face // Used to specify the face of a polyhedron
@@ -598,19 +575,6 @@ namespace DataVectorTypes {
 			NSides( 0 )
 		{}
 
-		// Member Constructor
-		Face(
-			int const NSides, // Number of Sides for this Face
-			int const SurfNum, // ALLOCATABLE to actual surface number
-			Array1< Vector > const & FacePoints,
-			Vector const & NewellAreaVector
-		) :
-			NSides( NSides ),
-			SurfNum( SurfNum ),
-			FacePoints( FacePoints ),
-			NewellAreaVector( NewellAreaVector )
-		{}
-
 	};
 
 	struct Polyhedron // This is used to specify a polyhedron based on the vectors that comprise it (a zone).
@@ -622,15 +586,6 @@ namespace DataVectorTypes {
 		// Default Constructor
 		Polyhedron() :
 			NumSurfaceFaces( 0 )
-		{}
-
-		// Member Constructor
-		Polyhedron(
-			int const NumSurfaceFaces,
-			Array1< Face > const & SurfaceFace
-		) :
-			NumSurfaceFaces( NumSurfaceFaces ),
-			SurfaceFace( SurfaceFace )
 		{}
 
 	};
@@ -645,14 +600,6 @@ namespace DataVectorTypes {
 //		Vector_2d()
 //		{}
 //
-//		// Member Constructor
-//		Vector_2d(
-//			Real64 const x,
-//			Real64 const y
-//		) :
-//			x( x ),
-//			y( y )
-//		{}
 //
 //		// Dot Product
 //		inline
@@ -683,17 +630,6 @@ namespace DataVectorTypes {
 
 		// Default Constructor
 		dTriangle()
-		{}
-
-		// Member Constructor
-		dTriangle(
-			int const vv0,
-			int const vv1,
-			int const vv2
-		) :
-			vv0( vv0 ),
-			vv1( vv1 ),
-			vv2( vv2 )
 		{}
 
 	};

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -155,69 +155,6 @@ namespace EarthTube {
 			VelocitySQTermCoef( 0.0 )
 		{}
 
-		// Member Constructor
-		EarthTubeData(
-			int const ZonePtr,
-			int const SchedPtr,
-			std::string const & SchedName,
-			Real64 const DesignLevel,
-			Real64 const MinTemperature,
-			Real64 const MaxTemperature,
-			Real64 const DelTemperature,
-			int const FanType,
-			Real64 const FanPressure,
-			Real64 const FanEfficiency,
-			Real64 const FanPower,
-			Real64 const GroundTempz1z2t, // ground temp between z1 and z2 at time t
-			Real64 const InsideAirTemp,
-			Real64 const AirTemp,
-			Real64 const r1, // Inner Pipe Radius (m)
-			Real64 const r2, // Pipe Thickness (m)
-			Real64 const r3, // Distance between Pipe Outer Surface and Undistubed Soil (m)
-			Real64 const PipeLength, // Entire Pipe Length
-			Real64 const PipeThermCond, // Pipe Thermal Conductivity
-			Real64 const z, // Depth under the Ground Surface (m)
-			Real64 const SoilThermDiff, // Soil Thermal Diffusivity
-			Real64 const SoilThermCond, // Soil Thermal Conductivity
-			Real64 const AverSoilSurTemp, // Average Soil Surface Temperature
-			Real64 const ApmlSoilSurTemp, // Amplitude of Soil Surface Temperature
-			int const SoilSurPhaseConst, // Phase constant of Soil Surface
-			Real64 const ConstantTermCoef,
-			Real64 const TemperatureTermCoef,
-			Real64 const VelocityTermCoef,
-			Real64 const VelocitySQTermCoef
-		) :
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			SchedName( SchedName ),
-			DesignLevel( DesignLevel ),
-			MinTemperature( MinTemperature ),
-			MaxTemperature( MaxTemperature ),
-			DelTemperature( DelTemperature ),
-			FanType( FanType ),
-			FanPressure( FanPressure ),
-			FanEfficiency( FanEfficiency ),
-			FanPower( FanPower ),
-			GroundTempz1z2t( GroundTempz1z2t ),
-			InsideAirTemp( InsideAirTemp ),
-			AirTemp( AirTemp ),
-			r1( r1 ),
-			r2( r2 ),
-			r3( r3 ),
-			PipeLength( PipeLength ),
-			PipeThermCond( PipeThermCond ),
-			z( z ),
-			SoilThermDiff( SoilThermDiff ),
-			SoilThermCond( SoilThermCond ),
-			AverSoilSurTemp( AverSoilSurTemp ),
-			ApmlSoilSurTemp( ApmlSoilSurTemp ),
-			SoilSurPhaseConst( SoilSurPhaseConst ),
-			ConstantTermCoef( ConstantTermCoef ),
-			TemperatureTermCoef( TemperatureTermCoef ),
-			VelocityTermCoef( VelocityTermCoef ),
-			VelocitySQTermCoef( VelocitySQTermCoef )
-		{}
-
 	};
 
 	struct EarthTubeZoneReportVars
@@ -252,37 +189,6 @@ namespace EarthTube {
 			EarthTubeFanElec( 0.0 ),
 			EarthTubeFanElecPower( 0.0 ),
 			EarthTubeAirTemp( 0.0 )
-		{}
-
-		// Member Constructor
-		EarthTubeZoneReportVars(
-			Real64 const EarthTubeHeatLoss, // [J] Heat loss or cooling to zone from air delivered by earth tube
-			Real64 const EarthTubeHeatLossRate, // [W] Heat loss or cooling rate to zone from air delivered by earth tube
-			Real64 const EarthTubeHeatGain, // [J] Heat Gain to zone from air delivered by earth tube
-			Real64 const EarthTubeHeatGainRate, // [W] Heat Gain rate to zone from air delivered by earth tube
-			Real64 const EarthTubeOATreatmentPower, // [W] rate of heat transfer to/from air.  positive is heating OA to higher temp
-			Real64 const EarthTubeVolume, // Volume of Air {m3} due to EarthTube
-			Real64 const EarthTubeVolFlowRate, // Volume flow rate of air (m3/s) due to EarthTube
-			Real64 const EarthTubeVolFlowRateStd, // Volume flow rate of air (m3/s) due to EarthTube at standard air conditions
-			Real64 const EarthTubeMass, // Mass of Air {kg} due to EarthTube
-			Real64 const EarthTubeMassFlowRate, // Mass flow rate of air (kg/s) due to EarthTube
-			Real64 const EarthTubeFanElec, // [J] Fan Electricity consumed by EarthTube
-			Real64 const EarthTubeFanElecPower, // [W] Fan Electric power for EarthTube
-			Real64 const EarthTubeAirTemp // Air Temp {C} of EarthTube, air leaving tube and entering zone
-		) :
-			EarthTubeHeatLoss( EarthTubeHeatLoss ),
-			EarthTubeHeatLossRate( EarthTubeHeatLossRate ),
-			EarthTubeHeatGain( EarthTubeHeatGain ),
-			EarthTubeHeatGainRate( EarthTubeHeatGainRate ),
-			EarthTubeOATreatmentPower( EarthTubeOATreatmentPower ),
-			EarthTubeVolume( EarthTubeVolume ),
-			EarthTubeVolFlowRate( EarthTubeVolFlowRate ),
-			EarthTubeVolFlowRateStd( EarthTubeVolFlowRateStd ),
-			EarthTubeMass( EarthTubeMass ),
-			EarthTubeMassFlowRate( EarthTubeMassFlowRate ),
-			EarthTubeFanElec( EarthTubeFanElec ),
-			EarthTubeFanElecPower( EarthTubeFanElecPower ),
-			EarthTubeAirTemp( EarthTubeAirTemp )
 		{}
 
 	};

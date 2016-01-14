@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -123,21 +123,6 @@ namespace PlantUtilities {
 				CallingCompBranchNum( 0 ),
 				CallingCompCompNum( 0 ),
 				ThisCriteriaCheckValue( 0.0 )
-			{}
-
-			// Member Constructor
-			CriteriaData(
-				int const CallingCompLoopNum, // for debug error handling
-				int const CallingCompLoopSideNum, // for debug error handling
-				int const CallingCompBranchNum, // for debug error handling
-				int const CallingCompCompNum, // for debug error handling
-				Real64 const ThisCriteriaCheckValue // the previous value, to check the current against
-			) :
-				CallingCompLoopNum( CallingCompLoopNum ),
-				CallingCompLoopSideNum( CallingCompLoopSideNum ),
-				CallingCompBranchNum( CallingCompBranchNum ),
-				CallingCompCompNum( CallingCompCompNum ),
-				ThisCriteriaCheckValue( ThisCriteriaCheckValue )
 			{}
 
 		};

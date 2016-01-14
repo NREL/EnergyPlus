@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -107,23 +107,6 @@ namespace ZoneEquipmentManager {
 			EquipPtr( 0 ),
 			CoolingPriority( 0 ),
 			HeatingPriority( 0 )
-		{}
-
-		// Member Constructor
-		SimulationOrder(
-			std::string const & EquipType,
-			int const EquipType_Num,
-			std::string const & EquipName,
-			int const EquipPtr,
-			int const CoolingPriority,
-			int const HeatingPriority
-		) :
-			EquipType( EquipType ),
-			EquipType_Num( EquipType_Num ),
-			EquipName( EquipName ),
-			EquipPtr( EquipPtr ),
-			CoolingPriority( CoolingPriority ),
-			HeatingPriority( HeatingPriority )
 		{}
 
 	};

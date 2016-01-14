@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1057,9 +1057,9 @@ namespace FluidCoolers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizCondNum; // Plant Sizing index for condenser loop
+		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
 		int SolFla; // Flag of solver
-		Real64 DesFluidCoolerLoad; // Design fluid cooler load [W]
+		Real64 DesFluidCoolerLoad( 0.0 ); // Design fluid cooler load [W]
 		Real64 UA0; // Lower bound for UA [W/C]
 		Real64 UA1; // Upper bound for UA [W/C]
 		Real64 UA; // Calculated UA value
@@ -1075,8 +1075,6 @@ namespace FluidCoolers {
 		Real64 tmpHighSpeedEvapFluidCoolerUA; // local temporary for high speed cooler UA
 		bool ErrorsFound;
 
-		PltSizCondNum = 0;
-		DesFluidCoolerLoad = 0.0;
 		tmpDesignWaterFlowRate = SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate;
 		tmpHighSpeedFanPower = SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower;
 		tmpHighSpeedAirFlowRate = SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate;

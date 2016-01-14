@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -313,27 +313,6 @@ namespace DataLoopNode {
 			SpecificHeat( 0.0 )
 		{}
 
-		// Member Constructor
-		MoreNodeData(
-			Real64 const RelHumidity, // {%}
-			Real64 const ReportEnthalpy, // specific enthalpy calculated at the HVAC timestep [J/kg]
-			Real64 const VolFlowRateStdRho, // volume flow rate at standard density [m3/s]
-			Real64 const VolFlowRateCrntRho, // volume flow rate at current density, only used for air nodes [m3/s]
-			Real64 const WetBulbTemp, // wetbulb temperature [C]
-			Real64 const Density, // reported density at current temperature [kg/m3]
-			Real64 const AirDewPointTemp, // reported system node dewpoint temperature [C]
-			Real64 const SpecificHeat // reported node specific heat [J/kg-C]
-		) :
-			RelHumidity( RelHumidity ),
-			ReportEnthalpy( ReportEnthalpy ),
-			VolFlowRateStdRho( VolFlowRateStdRho ),
-			VolFlowRateCrntRho( VolFlowRateCrntRho ),
-			WetBulbTemp( WetBulbTemp ),
-			Density( Density ),
-			AirDewPointTemp( AirDewPointTemp ),
-			SpecificHeat( SpecificHeat )
-		{}
-
 	};
 
 	struct MarkedNodeData
@@ -347,19 +326,6 @@ namespace DataLoopNode {
 		// Default Constructor
 		MarkedNodeData() :
 			IsMarked( false )
-		{}
-
-		// Member Constructor
-		MarkedNodeData(
-			bool const IsMarked, // true if this is a marked node
-			std::string const & ObjectType, // Object Type that needs it "marked"
-			std::string const & ObjectName, // Object Name that needs it "marked"
-			std::string const & FieldName // FieldName that needs it "marked"
-		) :
-			IsMarked( IsMarked ),
-			ObjectType( ObjectType ),
-			ObjectName( ObjectName ),
-			FieldName( FieldName )
 		{}
 
 	};

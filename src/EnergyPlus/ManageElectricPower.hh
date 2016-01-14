@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -179,57 +179,6 @@ namespace ManageElectricPower {
 			ThermalProdRate( 0.0 )
 		{}
 
-		// Member Constructor
-		GenData(
-			std::string const & Name, // user identifier
-			std::string const & TypeOf, // equipment type
-			int const CompType_Num, // Numeric designator for CompType (TypeOf)
-			int const GeneratorIndex,
-			Real64 const MaxPowerOut, // Maximum Power Output (W)
-			std::string const & AvailSched, // Operation Schedule.
-			int const AvailSchedPtr, // pointer to operation schedule
-			Real64 const PowerRequestThisTimestep, // Current Demand on Equipment (W)
-			bool const ONThisTimestep, // Indicator whether Generator on
-			Real64 const EMSPowerRequest, // EMS actuator for current demand on equipment (W)
-			bool const EMSRequestOn, // EMS actuating On if true.
-			bool const PlantInfoFound,
-			int const PlantLoopNum, // Cogen: pointer to plant loop data structure
-			int const LoopSideNum, // Cogen: pointer to plant loop data structure
-			int const BranchNum, // Cogen: pointer to plant loop data structure
-			int const CompNum, // Cogen: pointer to plant loop data structure
-			Real64 const NominalThermElectRatio, // Cogen: nominal ratio of thermal to elect production
-			Real64 const DCElectricityProd, // Current DC Electric Produced from Equipment (J)
-			Real64 const DCElectProdRate, // Current DC Electric Production Rate from Equipment (W)
-			Real64 const ElectricityProd, // Current AC Electric Produced from Equipment (J)
-			Real64 const ElectProdRate, // Current AC Electric Production Rate from Equipment (W)
-			Real64 const ThermalProd, // Current Thermal energy Produced from Equipment (J)
-			Real64 const ThermalProdRate // Current Thermal energy Production Rate from Equipment (W)
-		) :
-			Name( Name ),
-			TypeOf( TypeOf ),
-			CompType_Num( CompType_Num ),
-			GeneratorIndex( GeneratorIndex ),
-			MaxPowerOut( MaxPowerOut ),
-			AvailSched( AvailSched ),
-			AvailSchedPtr( AvailSchedPtr ),
-			PowerRequestThisTimestep( PowerRequestThisTimestep ),
-			ONThisTimestep( ONThisTimestep ),
-			EMSPowerRequest( EMSPowerRequest ),
-			EMSRequestOn( EMSRequestOn ),
-			PlantInfoFound( PlantInfoFound ),
-			PlantLoopNum( PlantLoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			NominalThermElectRatio( NominalThermElectRatio ),
-			DCElectricityProd( DCElectricityProd ),
-			DCElectProdRate( DCElectProdRate ),
-			ElectricityProd( ElectricityProd ),
-			ElectProdRate( ElectProdRate ),
-			ThermalProd( ThermalProd ),
-			ThermalProdRate( ThermalProdRate )
-		{}
-
 	};
 
 	struct ElectricPowerLoadCenter
@@ -292,71 +241,6 @@ namespace ManageElectricPower {
 			ElectDemand( 0.0 )
 		{}
 
-		// Member Constructor
-		ElectricPowerLoadCenter(
-			std::string const & Name, // user identifier
-			std::string const & GeneratorList, // List name of available generators
-			int const OperationScheme, // Name of Operation Scheme
-			std::string const & DemandMeterName, // Name of Demand Energy Meter for "on demand" operation
-			int const DemandMeterPtr, // "pointer" to Meter for electrical Demand to meet
-			std::string const & GenerationMeterName, // Name of Generated Energy Meter for "on demand" operation
-			int const NumGenerators, // Number of Generators
-			Array1< GenData > const & ElecGen, // pointer to generator
-			Real64 const DemandLimit, // Demand Limit in Watts(W) which the generator will operate above
-			int const TrackSchedPtr, // "pointer" to schedule for electrical demand to meet.
-			int const BussType, // is this load center powered by AC or DC generators
-			bool const InverterPresent,
-			std::string const & InverterName, // hold name for verificaton and error messages
-			int const InverterModelNum, // simulation model parameter type
-			Real64 const DCElectricityProd, // Current DC Elect produced (J) (if buss type DCbussInverter)
-			Real64 const DCElectProdRate, // Current DC Elect power produced (W) (if buss type DCbussInverter)
-			Real64 const DCpowerConditionLosses, // current DC to AC inverter losses (W) (if DCbussInverter)
-			bool const StoragePresent,
-			std::string const & StorageName, // hold name for verificaton and error messages
-			int const StorageModelNum, // simulation model parameter type
-			bool const TransformerPresent,
-			std::string const & TransformerName, // hold name for verificaton and error messages
-			int const TransformerModelNum, // simulation model parameter type
-			Real64 const ElectricityProd, // Current AC Electric Produced from Equipment (J)
-			Real64 const ElectProdRate, // Current Electric Production Rate from Equipment (W)
-			Real64 const ThermalProd, // Current Thermal energy Produced from Equipment (J)
-			Real64 const ThermalProdRate, // Current Thermal energy Production Rate from Equipment (W)
-			Real64 const TotalPowerRequest, // Total electric power request from the load center (W)
-			Real64 const TotalThermalPowerRequest, // Total thermal power request from the load center (W)
-			Real64 const ElectDemand // Current electric power demand on the load center (W)
-		) :
-			Name( Name ),
-			GeneratorList( GeneratorList ),
-			OperationScheme( OperationScheme ),
-			DemandMeterName( DemandMeterName ),
-			DemandMeterPtr( DemandMeterPtr ),
-			GenerationMeterName( GenerationMeterName ),
-			NumGenerators( NumGenerators ),
-			ElecGen( ElecGen ),
-			DemandLimit( DemandLimit ),
-			TrackSchedPtr( TrackSchedPtr ),
-			BussType( BussType ),
-			InverterPresent( InverterPresent ),
-			InverterName( InverterName ),
-			InverterModelNum( InverterModelNum ),
-			DCElectricityProd( DCElectricityProd ),
-			DCElectProdRate( DCElectProdRate ),
-			DCpowerConditionLosses( DCpowerConditionLosses ),
-			StoragePresent( StoragePresent ),
-			StorageName( StorageName ),
-			StorageModelNum( StorageModelNum ),
-			TransformerPresent( TransformerPresent ),
-			TransformerName( TransformerName ),
-			TransformerModelNum( TransformerModelNum ),
-			ElectricityProd( ElectricityProd ),
-			ElectProdRate( ElectProdRate ),
-			ThermalProd( ThermalProd ),
-			ThermalProdRate( ThermalProdRate ),
-			TotalPowerRequest( TotalPowerRequest ),
-			TotalThermalPowerRequest( TotalThermalPowerRequest ),
-			ElectDemand( ElectDemand )
-		{}
-
 	};
 
 	struct CECInverterLookUpTableData
@@ -371,17 +255,6 @@ namespace ManageElectricPower {
 			NightTareLossPower( 0.0 ),
 			NominalVoltage( 0.0 ),
 			NomVoltEfficiencyARR( 6, 0.0 )
-		{}
-
-		// Member Constructor
-		CECInverterLookUpTableData(
-			Real64 const NightTareLossPower,
-			Real64 const NominalVoltage,
-			Array1< Real64 > const & NomVoltEfficiencyARR // eff at 10, 20, 30, 50, 75, & 100% power and Nominal voltage
-		) :
-			NightTareLossPower( NightTareLossPower ),
-			NominalVoltage( NominalVoltage ),
-			NomVoltEfficiencyARR( 6, NomVoltEfficiencyARR )
 		{}
 
 	};
@@ -441,61 +314,6 @@ namespace ManageElectricPower {
 			QdotRadZone( 0.0 ),
 			AncillACuseRate( 0.0 ),
 			AncillACuseEnergy( 0.0 )
-		{}
-
-		// Member Constructor
-		DCtoACInverterStruct(
-			std::string const & Name, // user identifier
-			int const ModelType, // type of inverter model used
-			int const AvailSchedPtr, // number for availability schedule.
-			int const HeatLossesDestination,
-			int const ZoneNum, // destination zone for heat losses from inverter.
-			Real64 const ZoneRadFract, // radiative fraction for thermal losses to zone
-			CECInverterLookUpTableData const & LUTable,
-			int const CurveNum, // curve index for eff as func of power
-			Real64 const RatedPower, // rated, max continuous power output level for inverter
-			Real64 const MinPower,
-			Real64 const MaxPower,
-			Real64 const MinEfficiency,
-			Real64 const MaxEfficiency,
-			Real64 const StandbyPower,
-			Real64 const Efficiency,
-			Real64 const DCPowerIn,
-			Real64 const ACPowerOut,
-			Real64 const DCEnergyIn,
-			Real64 const ACEnergyOut,
-			Real64 const ThermLossRate,
-			Real64 const ThermLossEnergy,
-			Real64 const QdotConvZone,
-			Real64 const QdotRadZone,
-			Real64 const AncillACuseRate,
-			Real64 const AncillACuseEnergy
-		) :
-			Name( Name ),
-			ModelType( ModelType ),
-			AvailSchedPtr( AvailSchedPtr ),
-			HeatLossesDestination( HeatLossesDestination ),
-			ZoneNum( ZoneNum ),
-			ZoneRadFract( ZoneRadFract ),
-			LUTable( LUTable ),
-			CurveNum( CurveNum ),
-			RatedPower( RatedPower ),
-			MinPower( MinPower ),
-			MaxPower( MaxPower ),
-			MinEfficiency( MinEfficiency ),
-			MaxEfficiency( MaxEfficiency ),
-			StandbyPower( StandbyPower ),
-			Efficiency( Efficiency ),
-			DCPowerIn( DCPowerIn ),
-			ACPowerOut( ACPowerOut ),
-			DCEnergyIn( DCEnergyIn ),
-			ACEnergyOut( ACEnergyOut ),
-			ThermLossRate( ThermLossRate ),
-			ThermLossEnergy( ThermLossEnergy ),
-			QdotConvZone( QdotConvZone ),
-			QdotRadZone( QdotRadZone ),
-			AncillACuseRate( AncillACuseRate ),
-			AncillACuseEnergy( AncillACuseEnergy )
 		{}
 
 	};
@@ -639,143 +457,6 @@ namespace ManageElectricPower {
 			BatteryDamage( 0.0 )
 		{}
 
-		// Member Constructor
-		ElecStorageDataStruct(
-			std::string const & Name, // name of this electrical storage module
-			int const StorageModelMode, // type of model parameter, SimpleBucketStorage
-			int const AvailSchedPtr, // availability schedule index.
-			int const HeatLossesDestination, // mode for where thermal losses go
-			int const ZoneNum, // destination zone for heat losses from inverter.
-			Real64 const ZoneRadFract, // radiative fraction for thermal losses to zone
-			Real64 const StartingEnergyStored, // [J] joules inside at beginning of environment period
-			Real64 const EnergeticEfficCharge, // [ ] efficiency of charging
-			Real64 const EnergeticEfficDischarge, // [ ] efficiency of discharging
-			Real64 const MaxPowerDraw, // [W] max rate of discharge
-			Real64 const MaxPowerStore, // [W] max rate of charge
-			Real64 const MaxEnergyCapacity, // [J] max storage capacity
-			int const ParallelNum, // [ ] number of battery modules in parallel
-			int const SeriesNum, // [ ] number of battery modules in series
-			int const ChargeCurveNum, // [ ] voltage change curve index number for charging
-			int const DischargeCurveNum, // [ ] voltage change curve index number for discharging
-			int const CycleBinNum, // [ ] number of cycle bins
-			Real64 const StartingSOC, // [ ] initial fractional state of charge
-			Real64 const MaxAhCapacity, // [Ah]maximum capacity
-			Real64 const AvailableFrac, // [ ] fraction of available charge capacity
-			Real64 const ChargeConversionRate, // [1/h]change rate from bound charge energy to available charge
-			Real64 const ChargedOCV, // [V] fully charged oppen circuit voltage
-			Real64 const DischargedOCV, // [V] fully discharged open circuit voltage
-			Real64 const InternalR, // [ohm]internal electric resistance
-			Real64 const MaxDischargeI, // [A] maximum discharging current
-			Real64 const CutoffV, // [V] cut-off voltage
-			Real64 const MaxChargeRate, // [1/h]charge rate limit
-			int const LifeCalculation, // [ ]battery life calculation: Yes or No
-			int const LifeCurveNum, // [ ]battery life curve name index number
-			Real64 const ThisTimeStepStateOfCharge, // [J]
-			Real64 const LastTimeStepStateOfCharge, // [J]
-			Real64 const PelNeedFromStorage, // [W]
-			Real64 const PelFromStorage, // [W]
-			bool const EMSOverridePelFromStorage, // if true, EMS calling for override
-			Real64 const EMSValuePelFromStorage, // value EMS is directing to use, power from storage [W]
-			Real64 const PelIntoStorage, // [W]
-			bool const EMSOverridePelIntoStorage, // if true, EMS calling for override
-			Real64 const EMSValuePelIntoStorage, // value EMS is directing to use, power into storage [W]
-			Real64 const QdotConvZone, // [W]
-			Real64 const QdotRadZone, // [W]
-			Real64 const TimeElapsed, // [h]
-			Real64 const ThisTimeStepAvailable, // [Ah] available charge at the current timestep
-			Real64 const ThisTimeStepBound, // [Ah] bound charge at the current timestep
-			Real64 const LastTimeStepAvailable, // [Ah] available charge at the previous timestep
-			Real64 const LastTimeStepBound, // [Ah] bound charge at the previous timestep
-			Real64 const LastTwoTimeStepAvailable, // [Ah] available charge at the previous two timesteps
-			Real64 const LastTwoTimeStepBound, // [Ah] bound charge at the previous two timesteps
-			int const count0,
-			Array1< Real64 > const & B10,
-			Array1< Real64 > const & X0,
-			Array1< Real64 > const & Nmb0,
-			Array1< Real64 > const & OneNmb0,
-			Real64 const ElectEnergyinStorage, // [J] state of charge
-			Real64 const StoredPower, // [W]
-			Real64 const StoredEnergy, // [J]
-			Real64 const DecrementedEnergyStored, // [J] this is the negative of StoredEnergy
-			Real64 const DrawnPower, // [W]
-			Real64 const DrawnEnergy, // [J]
-			Real64 const ThermLossRate, // [W]
-			Real64 const ThermLossEnergy, // [J]
-			int const StorageMode, // [ ] mode of operation 0 for idle, 1 for discharging, 2 for charging
-			Real64 const AbsoluteSOC, // [Ah] total state of charge
-			Real64 const FractionSOC, // [ ] fractional state of charge
-			Real64 const BatteryCurrent, // [A] total current
-			Real64 const BatteryVoltage, // [V] total voltage
-			Real64 const BatteryDamage // [ ] fractional battery damage
-		) :
-			Name( Name ),
-			StorageModelMode( StorageModelMode ),
-			AvailSchedPtr( AvailSchedPtr ),
-			HeatLossesDestination( HeatLossesDestination ),
-			ZoneNum( ZoneNum ),
-			ZoneRadFract( ZoneRadFract ),
-			StartingEnergyStored( StartingEnergyStored ),
-			EnergeticEfficCharge( EnergeticEfficCharge ),
-			EnergeticEfficDischarge( EnergeticEfficDischarge ),
-			MaxPowerDraw( MaxPowerDraw ),
-			MaxPowerStore( MaxPowerStore ),
-			MaxEnergyCapacity( MaxEnergyCapacity ),
-			ParallelNum( ParallelNum ),
-			SeriesNum( SeriesNum ),
-			ChargeCurveNum( ChargeCurveNum ),
-			DischargeCurveNum( DischargeCurveNum ),
-			CycleBinNum( CycleBinNum ),
-			StartingSOC( StartingSOC ),
-			MaxAhCapacity( MaxAhCapacity ),
-			AvailableFrac( AvailableFrac ),
-			ChargeConversionRate( ChargeConversionRate ),
-			ChargedOCV( ChargedOCV ),
-			DischargedOCV( DischargedOCV ),
-			InternalR( InternalR ),
-			MaxDischargeI( MaxDischargeI ),
-			CutoffV( CutoffV ),
-			MaxChargeRate( MaxChargeRate ),
-			LifeCalculation( LifeCalculation ),
-			LifeCurveNum( LifeCurveNum ),
-			ThisTimeStepStateOfCharge( ThisTimeStepStateOfCharge ),
-			LastTimeStepStateOfCharge( LastTimeStepStateOfCharge ),
-			PelNeedFromStorage( PelNeedFromStorage ),
-			PelFromStorage( PelFromStorage ),
-			EMSOverridePelFromStorage( EMSOverridePelFromStorage ),
-			EMSValuePelFromStorage( EMSValuePelFromStorage ),
-			PelIntoStorage( PelIntoStorage ),
-			EMSOverridePelIntoStorage( EMSOverridePelIntoStorage ),
-			EMSValuePelIntoStorage( EMSValuePelIntoStorage ),
-			QdotConvZone( QdotConvZone ),
-			QdotRadZone( QdotRadZone ),
-			TimeElapsed( TimeElapsed ),
-			ThisTimeStepAvailable( ThisTimeStepAvailable ),
-			ThisTimeStepBound( ThisTimeStepBound ),
-			LastTimeStepAvailable( LastTimeStepAvailable ),
-			LastTimeStepBound( LastTimeStepBound ),
-			LastTwoTimeStepAvailable( LastTwoTimeStepAvailable ),
-			LastTwoTimeStepBound( LastTwoTimeStepBound ),
-			count0( count0 ),
-			B10( B10 ),
-			X0( X0 ),
-			Nmb0( Nmb0 ),
-			OneNmb0( OneNmb0 ),
-			ElectEnergyinStorage( ElectEnergyinStorage ),
-			StoredPower( StoredPower ),
-			StoredEnergy( StoredEnergy ),
-			DecrementedEnergyStored( DecrementedEnergyStored ),
-			DrawnPower( DrawnPower ),
-			DrawnEnergy( DrawnEnergy ),
-			ThermLossRate( ThermLossRate ),
-			ThermLossEnergy( ThermLossEnergy ),
-			StorageMode( StorageMode ),
-			AbsoluteSOC( AbsoluteSOC ),
-			FractionSOC( FractionSOC ),
-			BatteryCurrent( BatteryCurrent ),
-			BatteryVoltage( BatteryVoltage ),
-			BatteryDamage( BatteryDamage )
-		{}
-
 	};
 
 	struct ElectricTransformer
@@ -866,91 +547,6 @@ namespace ManageElectricPower {
 			ElecProducedCoGen( 0.0 ),
 			QdotConvZone( 0.0 ),
 			QdotRadZone( 0.0 )
-		{}
-
-		// Member Constructor
-		ElectricTransformer(
-			std::string const & Name, // user identifier
-			int const AvailSchedPtr, // availability schedule index.
-			int const UsageMode, // mode for transformer usage
-			int const HeatLossesDestination, // mode for where thermal losses go
-			int const ZoneNum, // destination zone for heat losses from inverter.
-			Real64 const ZoneRadFrac, // radiative fraction for thermal losses to zone
-			Real64 const RatedCapacity, // rated capacity [VA]
-			int const Phase, // phase
-			Real64 const FactorTempCoeff, // thermal coefficient of resistance for winding material
-			Real64 const TempRise, // full load temperature rise [C]
-			Real64 const EddyFrac, // fraction of eddy current losses []
-			int const PerformanceInputMode, // performance input method
-			Real64 const RatedEfficiency, // nameplate efficiency []
-			Real64 const RatedPUL, // per unit load for nameplate efficiency []
-			Real64 const RatedTemp, // reference temperature for nameplate efficiency [C]
-			Real64 const MaxPUL, // per unit load for maximum efficiency []
-			bool const ConsiderLosses, // if true, consider transformer lossses in metering
-			Array1_string const & WiredMeterNames, // names of the meters wired to transformer
-			Array1_int const & WiredMeterPtrs, // array of "pointers" to meters wired to transformer
-			Array1_bool const & SpecialMeter, // indicates whether a meter needs special consideration
-			Real64 const RatedNL, // rated no load losses, user input or calculated [W]
-			Real64 const RatedLL, // rated load losses, user input or calculated [W]
-			int const LoadCenterNum, // number of load centers served by the transformer
-			Array1_int const & LoadCenterIndexes, // index array of load centers served by the transformer
-			int const OverloadErrorIndex, // used for warning message when transformer is overloaded
-			Real64 const Efficiency, // transformer efficiency
-			Real64 const PowerIn, // [W]
-			Real64 const EnergyIn, // [J]
-			Real64 const PowerOut, // [W]
-			Real64 const EnergyOut, // [J]
-			Real64 const NoLoadLossRate, // [W]
-			Real64 const NoLoadLossEnergy, // [J]
-			Real64 const LoadLossRate, // [W]
-			Real64 const LoadLossEnergy, // [J]
-			Real64 const ThermalLossRate, // [W]
-			Real64 const ThermalLossEnergy, // [J]
-			Real64 const ElecUseUtility, // [J] Energy consumption for a utility transformer (power in)
-			Real64 const ElecProducedCoGen, // [J] Energy consumption for a cogeneration transformer (power out)
-			Real64 const QdotConvZone, // [W]
-			Real64 const QdotRadZone // [W]
-		) :
-			Name( Name ),
-			AvailSchedPtr( AvailSchedPtr ),
-			UsageMode( UsageMode ),
-			HeatLossesDestination( HeatLossesDestination ),
-			ZoneNum( ZoneNum ),
-			ZoneRadFrac( ZoneRadFrac ),
-			RatedCapacity( RatedCapacity ),
-			Phase( Phase ),
-			FactorTempCoeff( FactorTempCoeff ),
-			TempRise( TempRise ),
-			EddyFrac( EddyFrac ),
-			PerformanceInputMode( PerformanceInputMode ),
-			RatedEfficiency( RatedEfficiency ),
-			RatedPUL( RatedPUL ),
-			RatedTemp( RatedTemp ),
-			MaxPUL( MaxPUL ),
-			ConsiderLosses( ConsiderLosses ),
-			WiredMeterNames( WiredMeterNames ),
-			WiredMeterPtrs( WiredMeterPtrs ),
-			SpecialMeter( SpecialMeter ),
-			RatedNL( RatedNL ),
-			RatedLL( RatedLL ),
-			LoadCenterNum( LoadCenterNum ),
-			LoadCenterIndexes( LoadCenterIndexes ),
-			OverloadErrorIndex( OverloadErrorIndex ),
-			Efficiency( Efficiency ),
-			PowerIn( PowerIn ),
-			EnergyIn( EnergyIn ),
-			PowerOut( PowerOut ),
-			EnergyOut( EnergyOut ),
-			NoLoadLossRate( NoLoadLossRate ),
-			NoLoadLossEnergy( NoLoadLossEnergy ),
-			LoadLossRate( LoadLossRate ),
-			LoadLossEnergy( LoadLossEnergy ),
-			ThermalLossRate( ThermalLossRate ),
-			ThermalLossEnergy( ThermalLossEnergy ),
-			ElecUseUtility( ElecUseUtility ),
-			ElecProducedCoGen( ElecProducedCoGen ),
-			QdotConvZone( QdotConvZone ),
-			QdotRadZone( QdotRadZone )
 		{}
 
 	};

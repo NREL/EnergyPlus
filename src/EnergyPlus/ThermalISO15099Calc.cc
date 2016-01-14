@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -2257,8 +2257,6 @@ namespace ThermalISO15099Calc {
 		static Real64 aveGlassConductivity( 0.0 );
 		static int i( 0 );
 		static int k( 0 );
-		std::string a;
-		std::string b;
 
 		for ( i = 1; i <= nlayer - 1; ++i ) {
 			k = 2 * i + 1;

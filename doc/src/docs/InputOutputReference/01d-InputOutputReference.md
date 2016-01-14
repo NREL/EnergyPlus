@@ -15303,7 +15303,7 @@ The optimum start availability manager has two output variables.
 #### Availability Manager Night Ventilation Control Status
 A value of 0 indicates the manager is signaling NoAction. A value of 2 means the manager is signaling CycleOn.
 
-#### Availability Manager Optimum Start Hours Before Occupancy
+#### Availability Manager Optimum Start Time Before Occupancy
 
 The current time before occupancy.  Occupancy is the first zone timestep after midnight when the Fan Schedule is > 0.0.  The units are hours.
 

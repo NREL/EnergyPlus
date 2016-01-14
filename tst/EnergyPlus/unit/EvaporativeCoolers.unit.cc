@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -702,6 +702,163 @@ namespace EnergyPlus {
 		DataAirSystems::PrimaryAirSystem.deallocate();
 		DataSizing::SysSizInput.deallocate();
 
+	}
+
+	TEST_F( EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest ) {
+
+		int const EvapCoolNum( 1 );
+		Real64 PrimaryAirDesignFlow( 0.0 );
+		Real64 SecondaryAirDesignFlow( 0.0 );
+		Real64 SecondaryFanPower( 0.0 );
+		Real64 RecirculatingWaterPumpPower( 0.0 );
+
+		DataSizing::SysSizingRunDone = true;
+		DataSizing::NumSysSizInput = 1;
+		DataSizing::SysSizInput.allocate( 1 );
+		DataSizing::SysSizInput( 1 ).AirLoopNum = 1;
+
+		// allocate
+		DataSizing::CurSysNum = 1;
+		FinalSysSizing.allocate( CurSysNum );
+		DataSizing::FinalSysSizing( 1 ).DesMainVolFlow = 1.0;
+		DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow = 0.4;
+		PrimaryAirSystem.allocate( CurSysNum );
+		PrimaryAirSystem( CurSysNum ).Branch.allocate( 1 );
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "INDRDD EVAP COOLER";
+
+		// Set Primary Air Data
+		PrimaryAirSystem( CurSysNum ).NumBranches = 1;
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).TotalComponents = 1;
+		
+		std::string const idf_objects = delimited_string( {
+			"	Version,8.4;",
+			"	EvaporativeCooler:Indirect:ResearchSpecial,",
+			"	IndRDD Evap Cooler,  !- Name",
+			"	ALWAYS_ON,			 !- Availability Schedule Name",
+			"	0.750,				 !- Cooler Wetbulb Design Effectiveness",
+			"	,					 !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name",
+			"	,					 !- Cooler Drybulb Design Effectiveness",
+			"	,					 !- Drybulb Effectiveness Flow Ratio Modifier Curve Name",
+			"	,   				 !- Recirculating Water Pump Design Power { W }",
+			"	,					 !- Water Pump Power Sizing Factor",
+			"	,					 !- Water Pump Power Modifier Curve Name",
+			"	,        			 !- Secondary Air Design Flow Rate { m3 / s }",
+			"	1.2,				 !- Secondary Air Flow Sizing Factor",
+			"	,        			 !- Secondary Air Fan Design Power",
+			"	207.6,				 !- Secondary Air Fan Sizing Specific Power",
+			"	,					 !- Secondary Fan Power Modifier Curve Name",
+			"	PriAir Inlet Node,	 !- Primary Air Inlet Node Name",
+			"	PriAir Outlet Node,	 !- Primary Air Outlet Node Name",
+			"	,       			 !- Primary Air Design Air Flow Rate",
+			"	0.90,				 !- Dewpoint Effectiveness Factor",
+			"	SecAir Inlet Node,   !- Secondary Air Inlet Node Name",
+			"	SecAir Outlet Node,  !- Secondary Air Outlet Node Name",
+			"	PriAir Outlet Node,	 !- Sensor Node Name",
+			"	,					 !- Relief Air Inlet Node Name",
+			"	,					 !- Water Supply Storage Tank Name",
+			"	0.0,				 !- Drift Loss Fraction",
+			"	3;                   !- Blowdown Concentration Ratio",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetEvapInput();
+
+		// check blank autosizable input fields default to autosize
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).IndirectFanPower );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
+
+		// Set Parameters for Evap Cooler on Main Air Loop System
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp( 1 ).Name = EvapCond( EvapCoolNum ).EvapCoolerName;
+		FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
+		FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.2;
+		PrimaryAirDesignFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+		SecondaryAirDesignFlow = PrimaryAirDesignFlow * EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
+
+		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop 
+		SizeEvapCooler( EvapCoolNum );
+		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( SecondaryAirDesignFlow, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+		// Test Secondary Fan Power and reciculating water pump power
+		SecondaryFanPower = SecondaryAirDesignFlow * EvapCond( EvapCoolNum ).FanSizingSpecificPower;
+		RecirculatingWaterPumpPower = SecondaryAirDesignFlow * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
+
+		//SizeEvapCooler( EvapCoolNum );
+		EXPECT_EQ( SecondaryFanPower, EvapCond( EvapCoolNum ).IndirectFanPower );
+		EXPECT_EQ( RecirculatingWaterPumpPower, EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
+
+		EvapCond.deallocate();
+		PrimaryAirSystem.deallocate();
+		FinalSysSizing.deallocate();
+	}
+
+	TEST_F( EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest ) {
+
+		int const EvapCoolNum( 1 );
+		Real64 PrimaryAirDesignFlow( 0.0 );
+		Real64 RecirWaterPumpDesignPower( 0.0 );
+
+		DataSizing::SysSizingRunDone = true;
+		DataSizing::NumSysSizInput = 1;
+		DataSizing::SysSizInput.allocate( 1 );
+		DataSizing::SysSizInput( 1 ).AirLoopNum = 1;
+
+		DataSizing::CurSysNum = 1;
+		FinalSysSizing.allocate( CurSysNum );
+		DataSizing::FinalSysSizing( 1 ).DesMainVolFlow = 1.0;
+		DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow = 0.4;
+		PrimaryAirSystem.allocate( CurSysNum );
+		PrimaryAirSystem( CurSysNum ).Branch.allocate( 1 );
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "DIRECTEVAPCOOLER";
+
+		// Set Primary Air Data
+		PrimaryAirSystem( CurSysNum ).NumBranches = 1;
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).TotalComponents = 1;
+
+		std::string const idf_objects = delimited_string( {
+			"	Version,8.4;",
+			"	EvaporativeCooler:Direct:ResearchSpecial,",
+			"	DirectEvapCooler,    !- Name",
+			"	ALWAYS_ON,			 !- Availability Schedule Name",
+			"	0.7,				 !- Cooler Design Effectiveness",
+			"	,					 !- Effectiveness Flow Ratio Modifier Curve Name",
+			"	,          			 !- Primary Air Design Flow Rate",
+			"	,               	 !- Recirculating Water Pump Power Consumption { W }",
+			"	55.0,				 !- Water Pump Power Sizing Factor",
+			"	,					 !- Water Pump Power Modifier Curve Name",
+			"	Fan Outlet Node,     !- Air Inlet Node Name",
+			"	Zone Inlet Node,	 !- Air Outlet Node Name",
+			"	Zone Inlet Node,	 !- Sensor Node Name",
+			"	,					 !- Water Supply Storage Tank Name",
+			"	0.0,				 !- Drift Loss Fraction",
+			"	3;                   !- Blowdown Concentration Ratio",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetEvapInput();
+		// check blank autosizable input fields default to autosize
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).RecircPumpPower );
+
+		// do local sizing calculations
+		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp( 1 ).Name = EvapCond( EvapCoolNum ).EvapCoolerName;
+		FinalSysSizing( CurSysNum ).DesMainVolFlow = 0.50;
+		PrimaryAirDesignFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+		RecirWaterPumpDesignPower = PrimaryAirDesignFlow * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
+
+		// Test Direct Evaporative Cooler Primary Air Design Flow Rate sizing
+		SizeEvapCooler( 1 );
+		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( RecirWaterPumpDesignPower, EvapCond( EvapCoolNum ).RecircPumpPower );
+
+		EvapCond.deallocate();
+		PrimaryAirSystem.deallocate();
+		FinalSysSizing.deallocate();
 	}
 
 }

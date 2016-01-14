@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -171,27 +171,6 @@ namespace RuntimeLanguageProcessor {
 			Expression( 0 )
 		{}
 
-		// Member Constructor
-		TokenType(
-			int const Type, // token type, eg. TokenNumber
-			Real64 const Number, // May want to store all literals as a variable?
-			std::string const & String, // Serves double duty, also saves string version of token for easy debugging
-			int const Operator, // indentifies operator or function 1..64
-			int const Variable, // points to a variable in ErlVariable structure
-			int const Parenthesis, // identifes if token is left or right parenthesis
-			int const Expression, // points to an expression in ErlExpression structure
-			std::string const & Error // holds token processing error message content
-		) :
-			Type( Type ),
-			Number( Number ),
-			String( String ),
-			Operator( Operator ),
-			Variable( Variable ),
-			Parenthesis( Parenthesis ),
-			Expression( Expression ),
-			Error( Error )
-		{}
-
 	};
 
 	struct RuntimeReportVarType
@@ -205,17 +184,6 @@ namespace RuntimeLanguageProcessor {
 		RuntimeReportVarType() :
 			VariableNum( 0 ),
 			Value( 0.0 )
-		{}
-
-		// Member Constructor
-		RuntimeReportVarType(
-			std::string const & Name, // name of custom Erl report variable
-			int const VariableNum, // pointer to Erl variable associated with custom report variable
-			Real64 const Value // Value registered with output processor for report variable
-		) :
-			Name( Name ),
-			VariableNum( VariableNum ),
-			Value( Value )
 		{}
 
 	};

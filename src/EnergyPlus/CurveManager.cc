@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -477,7 +477,7 @@ namespace CurveManager {
 		int VarIndex;
 		int TempVarIndex;
 		int TempVarIndex1;
-		Real64 MinTableData;
+		Real64 MinTableData( 999999.0 );
 		Real64 MaxTableDataValue;
 		int NextXVar;
 		bool FoundNewData;
@@ -1944,7 +1944,6 @@ namespace CurveManager {
 			TempTableData = TableData;
 			while ( NumXVar <= MaxTableNums ) {
 
-				MinTableData = 999999.0;
 				MinTableData = minval( TempTableData( TableNum ).X1 );
 				for ( VarIndex = 1; VarIndex <= MaxTableNums; ++VarIndex ) {
 					if ( TempTableData( TableNum ).X1( VarIndex ) == MinTableData ) {
@@ -2133,7 +2132,6 @@ namespace CurveManager {
 			Temp2TableData = TableData;
 			while ( NumXVar <= MaxTableNums ) {
 
-				MinTableData = 999999.0;
 				MinTableData = minval( TempTableData( TableNum ).X1 );
 				for ( VarIndex = 1; VarIndex <= MaxTableNums; ++VarIndex ) {
 					if ( TempTableData( TableNum ).X1( VarIndex ) == MinTableData ) {

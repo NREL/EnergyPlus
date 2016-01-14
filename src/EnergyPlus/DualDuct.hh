@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -186,73 +186,6 @@ namespace DualDuct {
 			AirLoopNum( 0 )
 		{}
 
-		// Member Constructor
-		DamperDesignParams(
-			std::string const & DamperName, // Name of the Damper
-			int const DamperType, // Type of Damper ie. VAV, Mixing, Inducing, etc.
-			std::string const & Schedule, // Damper Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			Real64 const MaxAirVolFlowRate, // Max Specified Volume Flow Rate of Damper [m3/sec]
-			Real64 const MaxAirMassFlowRate, // Max Specified MAss Flow Rate of Damper [kg/s]
-			int const InletNodeNum,
-			int const HotAirInletNodeNum,
-			int const ColdAirInletNodeNum,
-			int const OutletNodeNum,
-			Real64 const ZoneMinAirFrac,
-			Real64 const ColdAirDamperPosition,
-			Real64 const HotAirDamperPosition,
-			int const OAInletNodeNum, // Alternate Node for VAV:OutdoorAir for Outdoor Air
-			int const RecircAirInletNodeNum, // Alternate Node for VAV:OutdoorAir for Recirc Air
-			bool const RecircIsUsed, // if true. then not using recirc duct, which is okay
-			Real64 const DesignOAFlowRate, // Terminal Outdoor Air Design Flow Rate for VAV:OutdoorAir, m3/s
-			Real64 const DesignRecircFlowRate, // Terminal Recirc Air Design Flow Rate for VAV:OutdoorAir, m3/s
-			int const OAControlMode, // Choice of scheduled, constant, or dynamic for VAV:OutdoorAir
-			Real64 const RecircAirDamperPosition, // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
-			Real64 const OADamperPosition, // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
-			Real64 const OAFraction, // Outdoor Air Fraction for VAV:OutdoorAir
-			int const ADUNum, // index of corresponding air distribution unit
-			int const CtrlZoneNum, // Pointer to CtrlZone data structure
-			int const ActualZoneNum, // Pointer to Zone data Structure
-			Real64 const OutdoorAirFlowRate, // report variable for TU outdoor air flow rate
-			bool const NoOAFlowInputFromUser, // avoids OA calculation if no input specified by user
-			int const OARequirementsPtr, // - Index to DesignSpecification:OutdoorAir object
-			int const OAPerPersonMode, // mode for how per person rates are determined, DCV or design.
-			Real64 const OAPerPersonByDesignLevel, // store sum of people and per person rate, constant, m3/s
-			int const AirLoopNum
-		) :
-			DamperName( DamperName ),
-			DamperType( DamperType ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			MaxAirVolFlowRate( MaxAirVolFlowRate ),
-			MaxAirMassFlowRate( MaxAirMassFlowRate ),
-			InletNodeNum( InletNodeNum ),
-			HotAirInletNodeNum( HotAirInletNodeNum ),
-			ColdAirInletNodeNum( ColdAirInletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			ZoneMinAirFrac( ZoneMinAirFrac ),
-			ColdAirDamperPosition( ColdAirDamperPosition ),
-			HotAirDamperPosition( HotAirDamperPosition ),
-			OAInletNodeNum( OAInletNodeNum ),
-			RecircAirInletNodeNum( RecircAirInletNodeNum ),
-			RecircIsUsed( RecircIsUsed ),
-			DesignOAFlowRate( DesignOAFlowRate ),
-			DesignRecircFlowRate( DesignRecircFlowRate ),
-			OAControlMode( OAControlMode ),
-			RecircAirDamperPosition( RecircAirDamperPosition ),
-			OADamperPosition( OADamperPosition ),
-			OAFraction( OAFraction ),
-			ADUNum( ADUNum ),
-			CtrlZoneNum( CtrlZoneNum ),
-			ActualZoneNum( ActualZoneNum ),
-			OutdoorAirFlowRate( OutdoorAirFlowRate ),
-			NoOAFlowInputFromUser( NoOAFlowInputFromUser ),
-			OARequirementsPtr( OARequirementsPtr ),
-			OAPerPersonMode( OAPerPersonMode ),
-			OAPerPersonByDesignLevel( OAPerPersonByDesignLevel ),
-			AirLoopNum( AirLoopNum )
-		{}
-
 	};
 
 	struct DamperFlowConditions
@@ -283,33 +216,6 @@ namespace DualDuct {
 			AirMassFlowRateHist2( 0.0 ),
 			AirMassFlowRateHist3( 0.0 ),
 			AirMassFlowDiffMag( 0.0 )
-		{}
-
-		// Member Constructor
-		DamperFlowConditions(
-			Real64 const AirMassFlowRate, // MassFlow through the Damper being Simulated [kg/Sec]
-			Real64 const AirMassFlowRateMaxAvail, // MassFlow through the Damper being Simulated [kg/Sec]
-			Real64 const AirMassFlowRateMinAvail, // MassFlow through the Damper being Simulated [kg/Sec]
-			Real64 const AirMassFlowRateMax, // Max Mass Flow Rate or the Design Mass Flow Rate
-			Real64 const AirTemp,
-			Real64 const AirHumRat,
-			Real64 const AirEnthalpy,
-			Real64 const AirMassFlowRateHist1, // flow history back 1 iteration kg/s
-			Real64 const AirMassFlowRateHist2, // flow history back 2 iteration kg/s
-			Real64 const AirMassFlowRateHist3, // flow history back 3 iteration kg/s
-			Real64 const AirMassFlowDiffMag // flow difference scale, kg/s
-		) :
-			AirMassFlowRate( AirMassFlowRate ),
-			AirMassFlowRateMaxAvail( AirMassFlowRateMaxAvail ),
-			AirMassFlowRateMinAvail( AirMassFlowRateMinAvail ),
-			AirMassFlowRateMax( AirMassFlowRateMax ),
-			AirTemp( AirTemp ),
-			AirHumRat( AirHumRat ),
-			AirEnthalpy( AirEnthalpy ),
-			AirMassFlowRateHist1( AirMassFlowRateHist1 ),
-			AirMassFlowRateHist2( AirMassFlowRateHist2 ),
-			AirMassFlowRateHist3( AirMassFlowRateHist3 ),
-			AirMassFlowDiffMag( AirMassFlowDiffMag )
 		{}
 
 	};

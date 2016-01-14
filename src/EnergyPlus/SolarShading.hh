@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -193,17 +193,6 @@ namespace SolarShading {
 			SurfIndex1( 0 ),
 			SurfIndex2( 0 ),
 			MiscIndex( 0 )
-		{}
-
-		// Member Constructor
-		SurfaceErrorTracking(
-			int const SurfIndex1, // Tracking for main error message
-			int const SurfIndex2, // Tracking for Overlapping Figure Name or Surface # 1
-			int const MiscIndex // Used for other pertinent information to be stored
-		) :
-			SurfIndex1( SurfIndex1 ),
-			SurfIndex2( SurfIndex2 ),
-			MiscIndex( MiscIndex )
 		{}
 
 	};

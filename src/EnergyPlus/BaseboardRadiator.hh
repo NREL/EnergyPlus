@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -166,80 +166,6 @@ namespace BaseboardRadiator {
 			ScaledHeatingCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		BaseboardParams(
-			std::string const & EquipID,
-			std::string const & Schedule,
-			int const SchedPtr,
-			int const EquipType,
-			int const ZonePtr,
-			int const WaterInletNode,
-			int const WaterOutletNode,
-			int const ControlCompTypeNum,
-			int const CompErrIndex,
-			Real64 const UA,
-			Real64 const WaterMassFlowRate,
-			Real64 const WaterVolFlowRateMax, // m3/s
-			Real64 const WaterMassFlowRateMax, // kg/s
-			Real64 const Offset,
-			Real64 const AirMassFlowRate, // kg/s
-			Real64 const DesAirMassFlowRate, // kg/s
-			Real64 const WaterInletTemp,
-			Real64 const WaterOutletTemp,
-			Real64 const WaterInletEnthalpy,
-			Real64 const WaterOutletEnthalpy,
-			Real64 const AirInletTemp,
-			Real64 const AirInletHumRat,
-			Real64 const AirOutletTemp,
-			Real64 const Power,
-			Real64 const Energy,
-			int const LoopNum, // plant loop index
-			int const LoopSideNum, // plant loop side index
-			int const BranchNum, // plant loop branch index
-			int const CompNum, // plant loop component index
-			int const BBLoadReSimIndex,
-			int const BBMassFlowReSimIndex,
-			int const BBInletTempFlowReSimIndex,
-			int const HeatingCapMethod, // - Method for steam baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-			Real64 const ScaledHeatingCapacity // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-
-		) :
-			EquipID( EquipID ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			EquipType( EquipType ),
-			ZonePtr( ZonePtr ),
-			WaterInletNode( WaterInletNode ),
-			WaterOutletNode( WaterOutletNode ),
-			ControlCompTypeNum( ControlCompTypeNum ),
-			CompErrIndex( CompErrIndex ),
-			UA( UA ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			WaterVolFlowRateMax( WaterVolFlowRateMax ),
-			WaterMassFlowRateMax( WaterMassFlowRateMax ),
-			Offset( Offset ),
-			AirMassFlowRate( AirMassFlowRate ),
-			DesAirMassFlowRate( DesAirMassFlowRate ),
-			WaterInletTemp( WaterInletTemp ),
-			WaterOutletTemp( WaterOutletTemp ),
-			WaterInletEnthalpy( WaterInletEnthalpy ),
-			WaterOutletEnthalpy( WaterOutletEnthalpy ),
-			AirInletTemp( AirInletTemp ),
-			AirInletHumRat( AirInletHumRat ),
-			AirOutletTemp( AirOutletTemp ),
-			Power( Power ),
-			Energy( Energy ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			BBLoadReSimIndex( BBLoadReSimIndex ),
-			BBMassFlowReSimIndex( BBMassFlowReSimIndex ),
-			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity )
-		{}
-
 	};
 
 	struct BaseboardParamsNumericFieldData
@@ -251,12 +177,6 @@ namespace BaseboardRadiator {
 		BaseboardParamsNumericFieldData()
 		{}
 
-		// Member Constructor
-		BaseboardParamsNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 	// Object Data
 	extern Array1D< BaseboardParams > Baseboard;

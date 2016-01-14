@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -125,43 +125,6 @@ namespace BaseboardElectric {
 			ScaledHeatingCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		BaseboardParams(
-			std::string const & EquipName,
-			std::string const & EquipType,
-			std::string const & Schedule,
-			int const SchedPtr,
-			Real64 const NominalCapacity,
-			Real64 const BaseboardEfficiency,
-			Real64 const AirInletTemp,
-			Real64 const AirInletHumRat,
-			Real64 const AirOutletTemp,
-			Real64 const Power,
-			Real64 const Energy,
-			Real64 const ElecUseLoad,
-			Real64 const ElecUseRate,
-			int const ZonePtr, // point to teh zone where the electric baseboard is located
-			int const HeatingCapMethod, // - Method for electric baseboard heating capacity scalable sizing calculation
-			Real64 const ScaledHeatingCapacity // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
-		) :
-			EquipName( EquipName ),
-			EquipType( EquipType ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			NominalCapacity( NominalCapacity ),
-			BaseboardEfficiency( BaseboardEfficiency ),
-			AirInletTemp( AirInletTemp ),
-			AirInletHumRat( AirInletHumRat ),
-			AirOutletTemp( AirOutletTemp ),
-			Power( Power ),
-			Energy( Energy ),
-			ElecUseLoad( ElecUseLoad ),
-			ElecUseRate( ElecUseRate ),
-			ZonePtr( ZonePtr ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity )
-		{}
-
 	};
 
 	struct BaseboardNumericFieldData
@@ -173,12 +136,6 @@ namespace BaseboardElectric {
 		BaseboardNumericFieldData()
 		{}
 
-		// Member Constructor
-		BaseboardNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data

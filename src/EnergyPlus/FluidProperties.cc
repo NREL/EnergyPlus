@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -421,17 +421,6 @@ namespace FluidProperties {
 				NumOfTemps( 0 )
 			{}
 
-			// Member Constructor
-			FluidTempData(
-				std::string const & Name, // Name of the temperature list
-				int const NumOfTemps, // Number of temperatures in a particular arry
-				Array1< Real64 > const & Temps // Temperature values (degrees C)
-			) :
-				Name( Name ),
-				NumOfTemps( NumOfTemps ),
-				Temps( Temps )
-			{}
-
 		};
 
 		struct PressureSequence
@@ -446,15 +435,6 @@ namespace FluidProperties {
 				InPtr( 0 )
 			{}
 
-			// Member Constructor
-			PressureSequence(
-				Real64 const Pressure,
-				int const InPtr
-			) :
-				Pressure( Pressure ),
-				InPtr( InPtr )
-			{}
-
 		};
 
 		struct FluidData
@@ -466,15 +446,6 @@ namespace FluidProperties {
 			// Default Constructor
 			FluidData() :
 				IsGlycol( false )
-			{}
-
-			// Member Constructor
-			FluidData(
-				std::string const & Name,
-				bool const IsGlycol
-			) :
-				Name( Name ),
-				IsGlycol( IsGlycol )
 			{}
 
 		};

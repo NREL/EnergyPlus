@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -275,17 +275,6 @@ namespace DaylightingDevices {
 				AspectRatio( 0.0 ),
 				Reflectance( 0.0 ),
 				TransBeam( NumOfAngles, 0.0 )
-			{}
-
-			// Member Constructor
-			TDDPipeStoredData(
-				Real64 const AspectRatio, // Aspect ratio, length / diameter
-				Real64 const Reflectance, // Reflectance of surface
-				Array1< Real64 > const & TransBeam // Table of beam transmittance vs. cosine angle
-			) :
-				AspectRatio( AspectRatio ),
-				Reflectance( Reflectance ),
-				TransBeam( NumOfAngles, TransBeam )
 			{}
 
 		};

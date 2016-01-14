@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -102,19 +102,6 @@ namespace PlantLoopSolver {
 			CompNum( 0 )
 		{}
 
-		// Member Constructor
-		Location(
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
-		{}
-
 	};
 
 	struct m_FlowControlValidator
@@ -127,17 +114,6 @@ namespace PlantLoopSolver {
 		// Default Constructor
 		m_FlowControlValidator() :
 			Valid( true )
-		{}
-
-		// Member Constructor
-		m_FlowControlValidator(
-			bool const Valid, // Assume true
-			Location const & ErrorPoint, // Branch where the error was thrown
-			std::string const & Reason // Brief description of error
-		) :
-			Valid( Valid ),
-			ErrorPoint( ErrorPoint ),
-			Reason( Reason )
 		{}
 
 	};

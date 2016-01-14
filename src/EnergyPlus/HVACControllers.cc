@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -2582,7 +2582,6 @@ namespace HVACControllers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string StatisticsFileName;
 		int FileUnit;
 		int AirLoopNum;
 
@@ -2593,9 +2592,7 @@ namespace HVACControllers {
 			return;
 		}
 
-		StatisticsFileName = "";
-		StatisticsFileName = "statistics.HVACControllers.csv";
-		strip( StatisticsFileName );
+		std::string StatisticsFileName = "statistics.HVACControllers.csv";
 
 		FileUnit = GetNewUnitNumber();
 
@@ -2815,7 +2812,6 @@ Label100: ;
 		int ControllerNum;
 
 		// Open main controller trace file for each air loop
-		TraceFileName = "";
 		TraceFileName = "controller." + PrimaryAirSystem( AirLoopNum ).Name + ".csv";
 		strip( TraceFileName );
 
@@ -3085,7 +3081,6 @@ Label100: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string TraceFileName;
 		static int TraceFileUnit( 0 );
 
 		// Open and write column header in trace file for each individual controller
@@ -3096,8 +3091,7 @@ Label100: ;
 			return;
 		}
 
-		TraceFileName = "";
-		TraceFileName = "controller." + ControllerProps( ControlNum ).ControllerName + ".csv";
+		std::string TraceFileName = "controller." + ControllerProps( ControlNum ).ControllerName + ".csv";
 		strip( TraceFileName );
 
 		//WRITE(*,*) 'Trace file name="', TRIM(TraceFileName) , '"'
