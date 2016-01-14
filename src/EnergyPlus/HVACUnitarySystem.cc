@@ -2605,25 +2605,25 @@ namespace HVACUnitarySystem {
 		//
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages GetInput processing and program termination
-		
+
 		// METHODOLOGY EMPLOYED:
 		// Calls "Get" routines to read in data.
-			
+
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetUnitarySystemInput: " ); // include trailing blank space
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-			
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-			
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorFlag( false ); // true if errors detected in GetUnitarySystemInputData
-		
+
 		// Flow
 		GetUnitarySystemInputData( ErrorFlag );
-		
+
 		if( ErrorFlag ) {
 			ShowFatalError( RoutineName + "Errors found in getting AirLoopHVAC:UnitarySystem input. Preceding condition(s) causes termination." );
 		}
@@ -5911,7 +5911,7 @@ namespace HVACUnitarySystem {
 				MultiOrVarSpeedCoolCoil( UnitarySysNum ) = true;
 			}
 
-			// set global variables for multi-stage chilled and hot water coils 
+			// set global variables for multi-stage chilled and hot water coils
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
 				Index = UnitarySystem( UnitarySysNum ).DesignSpecMSHPIndex;
 				if ( Index > 0 ) {

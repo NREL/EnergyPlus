@@ -5272,7 +5272,7 @@ namespace DXCoils {
 					}
 				}
 				if ( Coil.IsSecondaryDXCoilInZone ) {
-					SetupOutputVariable("Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name);
+					SetupOutputVariable( "Secondary Coil Heat Rejection Rate [W]", Coil.SecCoilSensibleHeatGainRate, "System", "Average", Coil.Name );
 				}
 
 			}
@@ -5303,10 +5303,10 @@ namespace DXCoils {
 				SetupOutputVariable( "Heating Coil Runtime Fraction []", Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
 
 				if ( Coil.IsSecondaryDXCoilInZone ) {
-					SetupOutputVariable("Secondary Coil Total Heat Removal Rate [W]", Coil.SecCoilTotalHeatRemovalRate, "System", "Average", Coil.Name);
-					SetupOutputVariable("Secondary Coil Sensible Heat Removal Rate [W]", Coil.SecCoilSensibleHeatRemovalRate, "System", "Average", Coil.Name);
-					SetupOutputVariable("Secondary Coil Latent Heat Removal Rate [W]", Coil.SecCoilLatentHeatRemovalRate, "System", "Average", Coil.Name);
-					SetupOutputVariable("Secondary Coil Sensible Heat Ratio []", Coil.SecCoilSHR, "System", "Average", Coil.Name);
+					SetupOutputVariable( "Secondary Coil Total Heat Removal Rate [W]", Coil.SecCoilTotalHeatRemovalRate, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Sensible Heat Removal Rate [W]", Coil.SecCoilSensibleHeatRemovalRate, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Latent Heat Removal Rate [W]", Coil.SecCoilLatentHeatRemovalRate, "System", "Average", Coil.Name );
+					SetupOutputVariable( "Secondary Coil Sensible Heat Ratio []", Coil.SecCoilSHR, "System", "Average", Coil.Name );
 				}
 			}
 
