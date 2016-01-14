@@ -278,20 +278,6 @@ namespace HVACControllers {
 	//*************************************************************************
 
 	// Functions
-	void 
-	clear_state()
-	{
-
-	NumControllers = 0;
-	NumAirLoopStats = 0;
-	GetControllerInputFlag = true;
-
-	CheckEquipName.deallocate();
-	ControllerProps.deallocate();
-	RootFinders.deallocate();
-	AirLoopStats.deallocate();
-
-	}
 
 	// Needed for unit tests, should not be normally called.
 	void

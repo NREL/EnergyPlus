@@ -471,8 +471,6 @@ namespace HVACControllers {
 	extern Array1D< AirLoopStatsType > AirLoopStats; // Statistics array to analyze computational profile for
 
 	// Functions
-	void
-	clear_state();
 
 	// Needed for unit tests, should not be normally called.
 	void
