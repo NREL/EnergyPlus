@@ -458,8 +458,6 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTe
 	// surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 	EXPECT_EQ( surfDelaySeq.size(), 3360u );
 
-	DeallocateLoadComponentArrays();
-
 }
 
 TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
