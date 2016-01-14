@@ -492,9 +492,9 @@ namespace CrossVentMgr {
 		Real64 Uin; // Inflow air velocity [m/s]
 		Real64 CosPhi; // Angle (in degrees) between the wind and the outward normal of the dominant surface
 		Real64 SurfNorm; // Outward normal of surface
-		Real64 SumToZone; // Sum of velocities through
-		Real64 MaxFlux;
-		int MaxSurf;
+		Real64 SumToZone( 0.0 ); // Sum of velocities through
+		Real64 MaxFlux( 0.0 );
+		int MaxSurf( 0 );
 		Real64 XX;
 		Real64 YY;
 		Real64 ZZ;
@@ -508,9 +508,6 @@ namespace CrossVentMgr {
 		static int NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
 		static int NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
 
-		MaxSurf = 0;
-		SumToZone = 0.0;
-		MaxFlux = 0.0;
 		RecInflowRatio( ZoneNum ) = 0.0;
 
 		// Identify the dominant aperture:

@@ -139,19 +139,6 @@ namespace DataTimings {
 			calls( 0 )
 		{}
 
-		// Member Constructor
-		timings(
-			std::string const & Element,
-			Real64 const rstartTime,
-			Real64 const currentTimeSum,
-			int const calls
-		) :
-			Element( Element ),
-			rstartTime( rstartTime ),
-			currentTimeSum( currentTimeSum ),
-			calls( calls )
-		{}
-
 	};
 
 	// Object Data

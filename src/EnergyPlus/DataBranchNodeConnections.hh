@@ -109,27 +109,6 @@ namespace DataBranchNodeConnections {
 			InfoFilled( false )
 		{}
 
-		// Member Constructor
-		ComponentListData(
-			std::string const & ParentCType, // Parent Object Type (Cannot be SPLITTER or MIXER)
-			std::string const & ParentCName, // Parent Object Name
-			std::string const & CType, // Component Type (Cannot be SPLITTER or MIXER)
-			std::string const & CName, // Component Name
-			std::string const & InletNodeName, // Inlet Node ID
-			std::string const & OutletNodeName, // Outlet Node ID
-			std::string const & Description, // Description of Component List Type
-			bool const InfoFilled // true when all information has been filled
-		) :
-			ParentCType( ParentCType ),
-			ParentCName( ParentCName ),
-			CType( CType ),
-			CName( CName ),
-			InletNodeName( InletNodeName ),
-			OutletNodeName( OutletNodeName ),
-			Description( Description ),
-			InfoFilled( InfoFilled )
-		{}
-
 	};
 
 	struct NodeConnectionDef
@@ -150,25 +129,6 @@ namespace DataBranchNodeConnections {
 			ObjectIsParent( false )
 		{}
 
-		// Member Constructor
-		NodeConnectionDef(
-			int const NodeNumber, // Node number of this node connection
-			std::string const & NodeName, // Node Name of this node connection
-			std::string const & ObjectType, // Object/Component Type of this node connection
-			std::string const & ObjectName, // Name of the Object/Component Type of this node connection
-			std::string const & ConnectionType, // Connection Type (must be valid) for this node connection
-			int const FluidStream, // Fluid Stream for this node connection
-			bool const ObjectIsParent // Indicator whether the object is a parent or not
-		) :
-			NodeNumber( NodeNumber ),
-			NodeName( NodeName ),
-			ObjectType( ObjectType ),
-			ObjectName( ObjectName ),
-			ConnectionType( ConnectionType ),
-			FluidStream( FluidStream ),
-			ObjectIsParent( ObjectIsParent )
-		{}
-
 	};
 
 	struct ParentListData
@@ -186,23 +146,6 @@ namespace DataBranchNodeConnections {
 			InfoFilled( false )
 		{}
 
-		// Member Constructor
-		ParentListData(
-			std::string const & CType, // Component Type (Cannot be SPLITTER or MIXER)
-			std::string const & CName, // Component Name
-			std::string const & InletNodeName, // Inlet Node ID
-			std::string const & OutletNodeName, // Outlet Node ID
-			std::string const & Description, // Description of Component List Type
-			bool const InfoFilled // true when all information has been filled
-		) :
-			CType( CType ),
-			CName( CName ),
-			InletNodeName( InletNodeName ),
-			OutletNodeName( OutletNodeName ),
-			Description( Description ),
-			InfoFilled( InfoFilled )
-		{}
-
 	};
 
 	struct EqNodeConnectionDef
@@ -216,21 +159,6 @@ namespace DataBranchNodeConnections {
 
 		// Default Constructor
 		EqNodeConnectionDef()
-		{}
-
-		// Member Constructor
-		EqNodeConnectionDef(
-			std::string const & NodeName, // Node Name of this node connection
-			std::string const & ObjectType, // Object/Component Type of this node connection
-			std::string const & ObjectName, // Name of the Object/Component Type of this node connection
-			std::string const & InputFieldName, // Input Field Name for this connection
-			std::string const & ConnectionType // Connection Type (must be valid) for this node connection
-		) :
-			NodeName( NodeName ),
-			ObjectType( ObjectType ),
-			ObjectName( ObjectName ),
-			InputFieldName( InputFieldName ),
-			ConnectionType( ConnectionType )
 		{}
 
 	};

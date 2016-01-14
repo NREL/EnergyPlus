@@ -284,7 +284,7 @@ namespace PlantLoopEquip {
 		// set up a reference for this component
 		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
 
-		GeneralEquipType = sim_component.GeneralEquipType;
+		// GeneralEquipType = sim_component.GeneralEquipType;
 		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
 // no, no, can't do this, because all the plant components need to run their init and size routines, not just chillers, boilers and cooling towers.  Other things happen besides sizing fac.
 

@@ -1206,15 +1206,6 @@ namespace SystemReports {
 				LoopType( 0 )
 			{}
 
-			// Member Constructor
-			IdentifyLoop(
-				int const LoopNum,
-				int const LoopType
-			) :
-				LoopNum( LoopNum ),
-				LoopType( LoopType )
-			{}
-
 		};
 
 		// Object Data
@@ -3571,15 +3562,6 @@ namespace SystemReports {
 				CompErrIndex( 0 )
 			{}
 
-			// Member Constructor
-			CompTypeError(
-				std::string const & CompType,
-				int const CompErrIndex
-			) :
-				CompType( CompType ),
-				CompErrIndex( CompErrIndex )
-			{}
-
 		};
 
 		// Object Data
@@ -4038,7 +4020,6 @@ namespace SystemReports {
 			ZFAUOutAirFlow = 0.0;
 			OutAirFlow = 0.0;
 			ZoneFlowFrac = 0.0;
-			ZoneVolume = 0.0;
 
 			//retrieve the zone load for each zone
 			ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
