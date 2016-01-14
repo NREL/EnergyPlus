@@ -1186,6 +1186,8 @@ namespace PoweredInductionUnits {
 					if ( IsAutoSize ) {
 						PIU( PIUNum ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
 						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes );
+						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
+						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );
 					} else { // Hardsize with sizing data
 						if ( PIU( PIUNum ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
 							MaxVolHotWaterFlowUser = PIU( PIUNum ).MaxVolHotWaterFlow;
