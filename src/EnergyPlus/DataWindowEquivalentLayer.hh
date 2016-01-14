@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataWindowEquivalentLayer_hh_INCLUDED
 #define DataWindowEquivalentLayer_hh_INCLUDED
 
@@ -57,17 +115,6 @@ namespace DataWindowEquivalentLayer {
 			TAUL( 0.0 )
 		{}
 
-		// Member Constructor
-		CFSLWP(
-			Real64 const EPSLF, // thermal emittance, front (outside) side
-			Real64 const EPSLB, // thermal emittance, back (inside) side
-			Real64 const TAUL // thermal transmittance (same value for front or back)
-		) :
-			EPSLF( EPSLF ),
-			EPSLB( EPSLB ),
-			TAUL( TAUL )
-		{}
-
 	};
 
 	struct CFSSWP
@@ -104,33 +151,6 @@ namespace DataWindowEquivalentLayer {
 			RHOSFDD( 0.0 ),
 			RHOSBDD( 0.0 ),
 			TAUS_DD( 0.0 )
-		{}
-
-		// Member Constructor
-		CFSSWP(
-			Real64 const RHOSFBB, // Solar reflectance, BEAM-BEAM, front (outside) side (any angle of incidence)
-			Real64 const RHOSBBB, // Solar reflectance, BEAM-BEAM, back (inside) side (any angle of incidence)
-			Real64 const TAUSFBB, // Solar transmittance, BEAM-BEAM, any angle of incidence
-			Real64 const TAUSBBB, // Solar transmittance, BEAM-BEAM, any angle of incidence
-			Real64 const RHOSFBD, // Solar reflectance, BEAM-DIFFUSE, front (outside) side
-			Real64 const RHOSBBD, // Solar reflectance, BEAM-DIFFUSE, back (inside) side
-			Real64 const TAUSFBD, // Solar transmittance, BEAM-DIFFUSE, front (outside) side
-			Real64 const TAUSBBD, // Solar transmittance, BEAM-DIFFUSE, any angle of incidence
-			Real64 const RHOSFDD, // Solar reflectance, DIFFUSE-DIFFUSE, front (outside) side
-			Real64 const RHOSBDD, // Solar reflectance, DIFFUSE-DIFFUSE, back (inside) side
-			Real64 const TAUS_DD // Solar transmittance, DIFFUSE-DIFFUSE
-		) :
-			RHOSFBB( RHOSFBB ),
-			RHOSBBB( RHOSBBB ),
-			TAUSFBB( TAUSFBB ),
-			TAUSBBB( TAUSBBB ),
-			RHOSFBD( RHOSFBD ),
-			RHOSBBD( RHOSBBD ),
-			TAUSFBD( TAUSFBD ),
-			TAUSBBD( TAUSBBD ),
-			RHOSFDD( RHOSFDD ),
-			RHOSBDD( RHOSBDD ),
-			TAUS_DD( TAUS_DD )
 		{}
 
 	};
@@ -193,35 +213,6 @@ namespace DataWindowEquivalentLayer {
 			CNTRL( 0 )
 		{}
 
-		// Member Constructor
-		CFSLAYER(
-			std::string const & Name, // ID of layer
-			int const LTYPE, // layer type (see ltyXXX above)
-			int const iGZS, // re spectral glazing
-			CFSSWP const & SWP_MAT, // ltyGZS: derived from GSZ file data
-			CFSLWP const & LWP_MAT, // ltyVBxxx = slat properties (diffuse only)
-			CFSSWP const & SWP_EL, // ltyGLAZE, ltyGZS, ltyROLLB: same as _MAT
-			CFSLWP const & LWP_EL, // ltyVBxxx: see VB_xxx()
-			Real64 const S, // spacing
-			Real64 const W, // width
-			Real64 const C, // crown
-			Real64 const PHI_DEG, // Angle
-			int const CNTRL // VB: lscNONE:   PHI_DEG not changed
-		) :
-			Name( Name ),
-			LTYPE( LTYPE ),
-			iGZS( iGZS ),
-			SWP_MAT( SWP_MAT ),
-			LWP_MAT( LWP_MAT ),
-			SWP_EL( SWP_EL ),
-			LWP_EL( LWP_EL ),
-			S( S ),
-			W( W ),
-			C( C ),
-			PHI_DEG( PHI_DEG ),
-			CNTRL( CNTRL )
-		{}
-
 	};
 
 	struct CFSFILLGAS
@@ -256,33 +247,6 @@ namespace DataWindowEquivalentLayer {
 			MHAT( 0.0 )
 		{}
 
-		// Member Constructor
-		CFSFILLGAS(
-			std::string const & Name, // Gas Type (AIR, ARGON, XENON, KRYPTON, CUSTOM)
-			Real64 const AK, // conductivity coeff constant term,  (W/m-K)
-			Real64 const BK, // conductivity coeff of T term, (W/m-K2)
-			Real64 const CK, // conductivity coeff of T^2 term, (W/m-K^3)
-			Real64 const ACP, // specific heat constant term, (J/kg-K)
-			Real64 const BCP, // specific heat coeff of T term, (J/kg-K^2)
-			Real64 const CCP, // specific heat coeff of T^2 term, (J/kg-K^3)
-			Real64 const AVISC, // viscosity constant term, (N-sec/m2)
-			Real64 const BVISC, // viscosity coeff of T term, (N-sec/m2-K)
-			Real64 const CVISC, // viscosity coeff of T^2 term, (N-sec/m2-K^2)
-			Real64 const MHAT // apparent molecular weight of gas
-		) :
-			Name( Name ),
-			AK( AK ),
-			BK( BK ),
-			CK( CK ),
-			ACP( ACP ),
-			BCP( BCP ),
-			CCP( CCP ),
-			AVISC( AVISC ),
-			BVISC( BVISC ),
-			CVISC( CVISC ),
-			MHAT( MHAT )
-		{}
-
 	};
 
 	struct CFSGAP
@@ -307,23 +271,6 @@ namespace DataWindowEquivalentLayer {
 			RHOGAS( 0.0 )
 		{}
 
-		// Member Constructor
-		CFSGAP(
-			std::string const & Name, // Gap layer name
-			int const GTYPE, // gap type (gtyXXX above)
-			Real64 const TAS, // actual surface-surface gap thickness, mm (always > 0)
-			Real64 const TAS_EFF, // effective gap thickness, mm (always > 0)
-			CFSFILLGAS const & FG, // fill gas properties (see above)
-			Real64 const RHOGAS // fill gas density (kg/m3)
-		) :
-			Name( Name ),
-			GTYPE( GTYPE ),
-			TAS( TAS ),
-			TAS_EFF( TAS_EFF ),
-			FG( FG ),
-			RHOGAS( RHOGAS )
-		{}
-
 	};
 
 	struct CFSTY
@@ -341,21 +288,6 @@ namespace DataWindowEquivalentLayer {
 			L( CFSMAXNL ),
 			G( CFSMAXNL-1 ),
 			ISControlled( false )
-		{}
-
-		// Member Constructor
-		CFSTY(
-			std::string const & Name, // ID (Fenestration Name)
-			int const NL, // number of layers
-			Array1< CFSLAYER > const & L, // layer array, L(1) is outside layer
-			Array1< CFSGAP > const & G, // gap array, G(1) is outside-most, betw L(1) and L(2)
-			bool const ISControlled // CFS is not controlled, or has no controlled VB layer
-		) :
-			Name( Name ),
-			NL( NL ),
-			L( CFSMAXNL, L ),
-			G( CFSMAXNL-1, G ),
-			ISControlled( ISControlled )
 		{}
 
 	};

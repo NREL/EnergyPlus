@@ -1061,8 +1061,6 @@ public: // MArray Generators
 		return MArray1< MArray1, M >( *this, pmem );
 	}
 
-#include <ObjexxFCL/MArray1.Project.MArray.hh> // Inject project-specific MArray generators
-
 public: // Comparison: Predicate
 
 	// MArray1 == MArray1
