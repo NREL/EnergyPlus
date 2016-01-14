@@ -140,7 +140,6 @@ namespace NodeInputManager {
 	int MaxCheckNodes( 0 ); // Current "max" unique nodes in check
 	bool NodeVarsSetup( false ); // Setup indicator of node vars for reporting (also that all nodes have been entered)
 	Array1D_bool NodeWetBulbRepReq;
-	bool MyOneTimeFlag( true ); // one time flag
 
 	// Object Data
 	Array1D< NodeListDef > NodeLists; // Node Lists
@@ -169,7 +168,6 @@ namespace NodeInputManager {
 		MaxCheckNodes = 0;
 		NodeVarsSetup = false;
 		NodeLists.deallocate();
-		MyOneTimeFlag = true;
 	}
 
 	void

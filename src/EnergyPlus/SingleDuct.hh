@@ -586,9 +586,6 @@ namespace SingleDuct {
 	clear_state();
 
 	void
-	clear_state();
-
-	void
 	SimulateSingleDuct(
 		std::string const & CompName,
 		bool const FirstHVACIteration,
