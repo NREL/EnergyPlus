@@ -153,7 +153,6 @@ namespace OutputReportTabular {
 	extern int UnitConvSize;
 
 	extern bool WriteTabularFiles;
-	extern bool AllocateLoadComponentArraysDoAllocate;
 
 	// Allow up to five output files to be created
 	extern int const maxNumStyles;

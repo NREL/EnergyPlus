@@ -69,6 +69,8 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -81,7 +83,9 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
+using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputReportTabular;
 using namespace EnergyPlus::OutputProcessor;
@@ -309,11 +313,11 @@ TEST( OutputReportTabularTest, GetColumnUsingTabs )
 }
 
 }
-TEST( OutputReportTabularTest, AllocateLoadComponentArraysTest )
-{
-	ShowMessage( "Begin Test: OutputReportTabularTest, AllocateLoadComponentArraysTest" );
 
-	AllocateLoadComponentArraysDoAllocate = true;
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest )
+{
+	ShowMessage( "Begin Test: EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest" );
+
 	TotDesDays = 2;
 	TotRunDesPersDays = 3;
 	NumOfZones = 4;
@@ -457,10 +461,6 @@ TEST( OutputReportTabularTest, AllocateLoadComponentArraysTest )
 	DeallocateLoadComponentArrays();
 
 }
-
-
-
-
 
 TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {

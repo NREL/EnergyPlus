@@ -251,7 +251,6 @@ namespace OutputReportTabular {
 	int UnitConvSize( 0 );
 
 	bool WriteTabularFiles( false );
-	bool AllocateLoadComponentArraysDoAllocate( true );
 
 	// Allow up to five output files to be created
 	int const maxNumStyles( 5 );
@@ -482,6 +481,7 @@ namespace OutputReportTabular {
 		bool GatherMonthlyResultsForTimestepRunOnce( true );
 		bool UpdateTabularReportsGetInput( true );
 		bool GatherHeatGainReportfirstTime( true );
+		bool AllocateLoadComponentArraysDoAllocate( true );
 	}
 
 	// Functions
