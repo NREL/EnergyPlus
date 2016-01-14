@@ -118,7 +118,7 @@ namespace MoistureBalanceEMPDManager {
 	);
 
 	void
-	CloseMoistureBalanceEMPD();
+	clear_state();
 
 	void
 	UpdateMoistureBalanceEMPD( int const SurfNum ); // Surface number

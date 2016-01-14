@@ -196,6 +196,7 @@
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 
 #include <fstream>
 #include <algorithm>
@@ -326,6 +327,7 @@ namespace EnergyPlus {
 		ManageElectricPower::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
+		MoistureBalanceEMPDManager::clear_state();
 		NodeInputManager::clear_state();
 		OutAirNodeManager::clear_state();
 		OutdoorAirUnit::clear_state();

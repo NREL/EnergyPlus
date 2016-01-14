@@ -602,7 +602,7 @@ namespace MoistureBalanceEMPDManager {
 	}
 
 	void
-	CloseMoistureBalanceEMPD()
+	clear_state()
 	{
 
 		// SUBROUTINE INFORMATION:

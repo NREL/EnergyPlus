@@ -107,5 +107,4 @@ TEST_F( EnergyPlusFixture, CheckEMPDCalc )
 	// Clean up
 	DataHeatBalFanSys::ZoneAirHumRat.deallocate();
 	DataMoistureBalance::RhoVaporAirIn.deallocate();
-	MoistureBalanceEMPDManager::CloseMoistureBalanceEMPD();
 }
