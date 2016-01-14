@@ -118,7 +118,6 @@ namespace MixerComponent {
 	int NumMixers( 0 ); // The Number of Mixers found in the Input
 	int LoopInletNode( 0 );
 	int LoopOutletNode( 0 );
-	bool GetZoneMixerInputFlag( true ); // Flag set to make sure you get input once
 	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
@@ -144,7 +143,6 @@ namespace MixerComponent {
 		LoopOutletNode = 0;
 		GetZoneMixerIndexInputFlag = true;
 		SimAirMixerInputFlag = true;
-		GetZoneMixerInputFlag = true; // Flag set to make sure you get input once
 		CheckEquipName.deallocate();
 		MixerCond.deallocate();
 	}
