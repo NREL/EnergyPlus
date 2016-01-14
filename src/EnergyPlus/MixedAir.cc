@@ -5430,6 +5430,66 @@ namespace MixedAir {
 	}
 
 	int
+	GetOASysNumHXs( int const OASysNumber ) 
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl, Rongpeng Zhang
+		//       DATE WRITTEN   Oct. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// After making sure get input is done, the number of heat recovery exchangers in the
+		// OA System is returned.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Return value
+		int NumHX; // number of heat exchangers in this OA System
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int CompNum;
+		int CompNum_end;
+
+		if( GetOASysInputFlag ) {
+			GetOutsideAirSysInputs();
+			GetOASysInputFlag = false;
+		}
+
+		NumHX = 0;
+
+		auto const & componentType_Num = OutsideAirSys( OASysNumber ).ComponentType_Num;
+		for( CompNum = 1, CompNum_end = OutsideAirSys( OASysNumber ).NumComponents; CompNum <= CompNum_end; ++CompNum ) {
+			int const componentTypeNum = componentType_Num( CompNum );
+			if ( HeatXchngr == componentTypeNum || Desiccant == componentTypeNum ) {
+				++NumHX;
+			}
+		}
+
+		return NumHX;
+
+	}
+
+	int
 	GetOASysNumCoolingCoils( int const OASysNumber ) // OA Sys Number
 	{
 

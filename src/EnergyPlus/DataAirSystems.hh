@@ -265,6 +265,7 @@ namespace DataAirSystems {
 		Array1D_int OutletBranchNum; // branch numbers of system outlets
 		int NumInletBranches;
 		Array1D_int InletBranchNum; // branch number of system inlets
+		bool CentralHeatCoilExists; // true if there are central heating coils
 		bool OASysExists; // true if there is an Outside Air Sys
 		int OASysInletNodeNum; // node number of return air inlet to OA sys
 		int OASysOutletNodeNum; // node number of mixed air outlet of OA sys
@@ -278,6 +279,7 @@ namespace DataAirSystems {
 		int OtherSplitOutNode; // node num of nonRAB splitter outlet
 		int NumOACoolCoils; // number of cooling coils in the outside air system
 		int NumOAHeatCoils; // number of heating coils in the outside air system
+		int NumOAHXs; // number of heat exchangers in the outside air system
 		bool SizeAirloopCoil; // simulates air loop coils before calling controllers
 		int SupFanNum; // index of the supply fan in the Fan data structure
 		int RetFanNum; // index of the return fan in the Fan data structure
@@ -292,6 +294,7 @@ namespace DataAirSystems {
 			OutletBranchNum( 3, 0 ),
 			NumInletBranches( 0 ),
 			InletBranchNum( 3, 0 ),
+			CentralHeatCoilExists( true ),
 			OASysExists( false ),
 			OASysInletNodeNum( 0 ),
 			OASysOutletNodeNum( 0 ),
@@ -304,6 +307,7 @@ namespace DataAirSystems {
 			OtherSplitOutNode( 0 ),
 			NumOACoolCoils( 0 ),
 			NumOAHeatCoils( 0 ),
+			NumOAHXs( 0 ),
 			SizeAirloopCoil( true ),
 			SupFanNum( 0 ),
 			RetFanNum( 0 ),
