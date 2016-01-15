@@ -1,8 +1,7 @@
-![](media/ep.gif)
+![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
-<hr>
 <h1>Using EnergyPlus for Compliance</h1>
 <h2>Hints on using EnergyPlus for Compliance with Standards and Rating Systems</h2>
 <br/>

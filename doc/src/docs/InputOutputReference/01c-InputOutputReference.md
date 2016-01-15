@@ -15,7 +15,7 @@ Further details of the implementation of this model can be found in:
 
 Murugappan, A. *Implementing Ground Source Heat Pump and Ground Loop Heat Exchanger Models in the EnergyPlus Simulation Environment*. M.S. Thesis, Oklahoma State University, December 2002.
 
-![](media/image202.svg)
+![](media/image202.png)
 
 Figure 83. Schematic of EnergyPlus Ground Loop Heat Exchanger
 
@@ -386,11 +386,11 @@ The pond heat exchanger model represents a shallow pond with submerged hydronic 
 
 This type of heat exchanger is intended to be connected to the supply side of a condenser loop, and can be used with any type of plant loop. The pond may be specified as the only heat exchanger on the condenser loop (as shown in Figure 84) or it may be connected in parallel with other condenser loop heat exchangers (such as cooling towers, ground surface heat exchangers) as shown in the second figure below.
 
-![pond heat exchanger](media/image203.svg)
+![pond heat exchanger](media/image203.png)
 
 Figure 84. Example of Pond Ground Heat Exchanger as only heat exchanger on condenser loop
 
-![pond surface heat exchangers](media/image204.svg)
+![pond surface heat exchangers](media/image204.png)
 
 Figure 85. Pond Ground Heat Exchanger with other heat exchangers on condenser loop
 
@@ -496,13 +496,13 @@ The surface heat exchanger model is to simulate hydronic surface ground heat exc
 
 The heat exchanger may be ground coupled or not. In the latter case the bottom surface is exposed to the wind but not solar gains. This type of heat exchanger is intended to be connected to the supply side of a condenser loop, and can be used with any type of plant loop. The surface heat exchanger may be specified as the only heat exchanger on the condenser loop (as shown in the first figure below) or it may be connected in parallel with other condenser loop heat exchangers (such as cooling towers, ground surface heat exchangers) as shown in the second figure below.
 
-![surface heat exchanger](media/image205.svg)
+![surface heat exchanger](media/image205.png)
 
 Figure 86. Example of Surface Ground Heat Exchanger as only heat exchanger on condenser loop
 
 
 
-![tower surface heat exchangers](media/image206.svg)
+![tower surface heat exchangers](media/image206.png)
 
 Figure 87. Surface Ground Heat Exchanger with other heat exchangers on condenser loop
 
@@ -1404,7 +1404,7 @@ Or, as is shown by example here, perhaps a more readable form is to generate the
 
 
 
-![system](media/image213.svg)
+![system](media/image213.png)
 
 Figure 91. View of System Level Reporting
 
@@ -1630,7 +1630,7 @@ The Standard reports file includes these variables reporting in the Tabular repo
 
 A map for Air Loop input syntax is shown in the following diagram.
 
-![](media/image214.svg)
+![](media/image214.png)
 
 Figure 92. Air Loop Input Syntax Map
 
@@ -2049,7 +2049,7 @@ One possible air flow pattern is shown in this figure. The actual air flow patte
 
 
 
-![](media/image216.svg)
+![](media/image216.png)
 
 Figure 94. Plan view of a simple air flow network showing a possible air flow pattern in which all of the windows and doors are open.
 
@@ -2233,7 +2233,7 @@ This is the aspect ratio of a rectangular footprint. It is given by the width of
 
 
 
-![](media/image221.svg)
+![](media/image221.png)
 
 Figure 95. Footprint of a rectangular building showing variables used by the program to calculate surface-average wind pressure coefficients. The angle a is the “Azimuth Angle of Long Axis of Building.”  *w<sub>short</sub>*/*w<sub>long</sub>* is the “Ratio of Building Width Along Short Axis to Width Along Long Axis.”
 
@@ -2384,13 +2384,13 @@ The name of an AirlowNetwork:OccupantVentilationControl object. The object is us
 
 **Note:** The Occupant Ventilation Control object can be assigned to a zone (AirflowNetwork:MultiZone:Zone) or a surface (AirflowNetwork:MultiZone:Surface). When the object is assigned to a zone, the Occupant Ventilation Control is assigned to the surfaces belonging to the zone automatically. The surface objects must have an associated AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:HorizontalOpening, or  AirflowNetwork:MultiZone:Component:SimpleOpening component specified in the field of Leakage Component Name. All output variables will be shown under surface names only, and not under zone names.
 
-![](media/image222.svg)
+![](media/image222.png)
 
 Figure 96. Modulation of venting area according to inside-outside temperature difference.
 
 
 
-![](media/image223.svg)
+![](media/image223.png)
 
 Figure 97. Modulation of venting area according to inside-outside enthalpy difference.
 
@@ -2852,7 +2852,7 @@ The Start Height Factor of the window or door for Opening Factor 1. The Start He
 
 
 
-![](media/image236.svg)
+![](media/image236.png)
 
 Figure 98. Window (or door) showing geometrical factors associated with an opening through which air flows.
 
@@ -4649,13 +4649,13 @@ High Temp Radiant System</td>
 
 Figure 99. Zone Equipment Input Syntax Map
 
-![](media/image262.svg)
+![](media/image262.png)
 
 Figure 100. Representative Zone Equipment
 
 The following figure (Air Loop/Zone Equipment Node Diagram) illustrates the connection between the zone equipment and the air loop systems.
 
-![](media/image263.svg)
+![](media/image263.png)
 
 Figure 101. Air Loop/Zone Equipment Node Diagram
 
@@ -5178,7 +5178,7 @@ During heating operation, there are two control options for the damper controlli
 
 With **Normal** (the default) action, the damper will remain at the minimum air flow rate during heating operation. As the heating load increases, the water flow rate in the reheat coil will be increased to maintain temperature in the zone until the maximum water flow rate is reached or the user-specified maximum reheat air temperature is reached..  This is sometimes called the single maximum control logic as illustrated below.
 
-![](media/image264.svg)
+![](media/image264.png)
 
 Figure 102. The Single Maximum Control Logic
 
@@ -5186,7 +5186,7 @@ With **Reverse** action, as the heating load increases, the unit starts at minim
 
 The dual-max control currently applies to the AirTerminal:SingleDuct:VAV:Reheat objects with reverse acting dampers and hot-water coils.
 
-![](media/image265.svg)
+![](media/image265.png)
 
 Figure 103.  The Dual Maximum Control Logic
 
@@ -6555,7 +6555,7 @@ The inlet side mixer air terminal unit provides a means of supplying central sys
 
 The AirTerminal:SingleDuct:InletSideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is recirculated air from the zone. The outlet air stream of the inlet side mixer is then the inlet to the zone AC unit.
 
-![](media/image275.svg)
+![](media/image275.png)
 
 Figure 108. Inlet Side Mixer Air Terminal Unit with Fan Coil
 
@@ -6601,7 +6601,7 @@ The supply side mixer air terminal unit provides a means of supplying central sy
 
 The AirTerminal:SingleDuct:SupplySideMixer simply mixes two inlet air streams into a single outlet stream. One inlet - designated the primary air stream - is from the DOAS. The other inlet - designated the secondary air stream - is outlet air from the zone AC unit. The outlet air stream from the supply side mixer is then the inlet to the conditioned zone.
 
-![](media/image276.svg)
+![](media/image276.png)
 
 Figure 109. Supply Side Mixer Air Terminal Unit with Fan Coil
 
@@ -9698,19 +9698,19 @@ This alpha field contains the identifying name given to the WaterToAirHeatPump c
 
 This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50% run time fraction. Suggested values are shown below (Henderson et al. 1999):
 
-![](media/image289.svg)
+![](media/image289.png)
 
 #### Field: Heat Pump Time Constant
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
-![](media/image290.svg)
+![](media/image290.png)
 
 #### Field: Fraction of On-Cycle Power Use
 
 This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
 
-![](media/image291.svg)
+![](media/image291.png)
 
 #### Field: Heat Pump Fan Delay Time
 
@@ -11057,19 +11057,19 @@ This alpha field specifies the name of the outdoor node which controls the opera
 
 This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50% run time fraction. Suggested values are shown below (Henderson et al. 1999):
 
-![](media/image295.svg)
+![](media/image295.png)
 
 #### Field: Heat Pump Time Constant
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
-![](media/image296.svg)
+![](media/image296.png)
 
 #### Field: Fraction of On-Cycle Power Use
 
 This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
 
-![](media/image297.svg)
+![](media/image297.png)
 
 #### Field: Heat Pump Fan Delay Time
 
@@ -12649,7 +12649,7 @@ For multispeed heat pumps with heat recovery, these outputs are the recoverable 
 
 The EnergyPlus furnace is a “virtual” component that consists of a fan component  (OnOff or ConstantVolume) and a Gas or Electric heating coil component. The blow through furnace configuration is shown in the Figure below.
 
-![](media/image302.svg)
+![](media/image302.png)
 
 Figure 120. Schematic of Blow Through Furnace Model
 
@@ -12813,7 +12813,7 @@ This output variable is the ratio of actual air mass flow rate through the furna
 
 The AirLoopHVAC:UnitaryHeatOnly is identical to the AirLoopHVAC:Unitary:Furnace:HeatOnly model. The heat-only unitary system is a “virtual” component that consists of a fan component (OnOff or ConstantVolume) and a Gas or Electric heating coil component. The blow through unitary system configuraion is shown in the Figure below.
 
-![](media/image303.svg)
+![](media/image303.png)
 
 Figure 121. Schematic of Blow Through Heat-Only Unitary System
 
@@ -13068,19 +13068,19 @@ This numeric value allows the user to determine how close the air side has to be
 
 This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50% run time fraction. Suggested values are shown below (Henderson et al. 1999):
 
-![](media/image305.svg)
+![](media/image305.png)
 
 #### Field: Heat Pump Time Constant
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
-![](media/image306.svg)
+![](media/image306.png)
 
 #### Field: Fraction of On-Cycle Power Use
 
 This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
 
-![](media/image307.svg)
+![](media/image307.png)
 
 #### Field: Heat Pump Fan Delay Time
 

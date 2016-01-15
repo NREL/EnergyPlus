@@ -298,7 +298,7 @@ The X, Y, and Z coordinates, in the same coordinate system, of the second daylig
 
 
 
-![](media/image095.svg)
+![](media/image095.png)
 
 Figure 53. Example showing location of daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters.
 
@@ -436,7 +436,7 @@ Table 19. Recommended Values -- Discomfort Glare Index
 
 For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
 
-![](media/image096.svg)
+![](media/image096.png)
 
 Figure 54. Illustration of continuous dimming relationship
 
@@ -450,7 +450,7 @@ For Lighting Control Type = 1 (continuous), the lowest lighting output the light
 
 The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be &gt;0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
 
-![](media/image097.svg)
+![](media/image097.png)
 
 Figure 55. Stepped lighting control with Number of Steps = 3.
 
@@ -506,13 +506,13 @@ To correctly calculate both direct and inter-reflected daylight illuminance you 
 
 Interior walls IW-1, IW-2 and IW-3 should be treated as adiabatic, i.e., they should have Outside Boundary Condition = Surface and Outside Boundary Condition Object = IW-1, IW-2, or IW-3, respectively (ref: BuildingSurface:Detailed). Similarly, if the ceiling and floor of Room-1 are interior surfaces, they should be treated as adiabatic.
 
-![](media/image098.svg)
+![](media/image098.png)
 
 Figure 56. For daylighting purposes the thermal zone enclosed by the dashed boundary line should be modeled as a typical zone (Room-1) with a zone multiplier of 4.
 
 Sometimes a representative room cannot be found. Figure 57 shows a section of a building with four rooms having different daylighting characteristics because of different floor area, orientation and/or window size. In this case lumping the rooms into a single thermal zone would give nonsensical daylighting illuminance values because of the presence of the interior walls, which EnergyPlus ignores when calculating illuminance reaching a reference point directly from a window (i.e., without reflection). The solution in this case is to describe each room as a separate thermal zone with its own daylighting reference points, and input the interior walls because these will participate in the calculation of inter-reflected illuminance.
 
-![](media/image099.svg)
+![](media/image099.png)
 
 Figure 57. Rooms A, B, C and D have different daylighting characteristics. If lumped into a single thermal zone the daylighting calculation will be less accurate because the blockage of direct light by the interior walls between these rooms is modeled with some simplifications (see Interior Obstructions below). To get a good daylighting calculation each room should be input as a separate thermal zone.
 
@@ -520,7 +520,7 @@ Figure 57. Rooms A, B, C and D have different daylighting characteristics. If lu
 
 The detailed daylighting calculation allows a thermal zone to be divided into two independently-controlled lighting zones. (See the fields: Fraction of Zone Controlled by First Reference Point, Fraction of Zone Controlled by Second Reference Point, Illuminance SetPoint at First Reference Point, and Illuminance SetPoint at Second Reference Point.) An example is shown in Figure 58, where a relatively deep thermal zone has two lighting zones of equal area.
 
-![](media/image100.svg)
+![](media/image100.png)
 
 Figure 58. Two independently-controlled lighting zones, each with 50% of the area of the thermal zone.
 
@@ -556,7 +556,7 @@ An example of an interior obstruction that is a wall in an L-shaped room is show
 
 
 
-![](media/image101.svg)
+![](media/image101.png)
 
 Figure 59. Wall A (or Wall B) is an interior obstruction that prevents light from directly reaching the daylighting reference point from the window.
 
@@ -576,7 +576,7 @@ PurchAirWithDoubleFacadeDaylighting.idf is an input example of daylighting throu
 
 
 
-![](media/image102.svg)
+![](media/image102.png)
 
 Figure 60. Vertical section through a double-façade building showing daylighting through interior windows. The dashed lines show that (1) reference point RP1 receives direct light from exterior window EW1 via interior window IW1; (2) RP2 receives direct light from EW1 and EW2 via IW2; and (3) RP3 receives direct light from EW2 via IW3.
 
@@ -584,7 +584,7 @@ Figure 60. Vertical section through a double-façade building showing daylightin
 
 Figure 61 shows schematically the general configuration of daylighting through interior windows that can be calculated with EnergyPlus. Here, daylit zone ZD has one or more interior windows that are adjacent to other zones, each of which has one or more exterior windows. ZD itself may or may not have exterior windows. If it does, than the daylight illuminance from its exterior and interior windows will be additive. The zones adjacent to ZD may or may not be daylit and may or may not have other interior windows that are not adjacent to ZD. (The program does not consider the illuminance in ZD from electric lighting in adjacent zones.)
 
-![](media/image103.svg)
+![](media/image103.png)
 
 Figure 61. General configuration of daylighting through interior windows that can be calculated with EnergyPlus. IW = interior window, EW = exterior window.
 
@@ -594,7 +594,7 @@ Figure 62 shows schematically a configuration of daylighting through interior wi
 
 
 
-![](media/image104.svg)
+![](media/image104.png)
 
 Figure 62. Configuration in which daylighting of zone Z through its interior window  cannot be calculated with EnergyPlus. IW = interior window, EW = exterior window.
 
@@ -670,7 +670,7 @@ Lighting Control Type = 3 (continuous/off) is the same as Lighting Control Type 
 
 For Lighting Control Type = 1 (continuous), the lowest power the lighting system can dim down to, expressed as a fraction of maximum input power (see figure, below). For Lighting Control Type = 3 (continuous/off) this is the power fraction reached just before the lights switch off completely.
 
-![](media/image105.svg)
+![](media/image105.png)
 
 Figure 63. Illustration of continuous dimming relationship
 
@@ -684,7 +684,7 @@ For Lighting Control Type = 1 (continuous), the lowest lighting output the light
 
 The number of steps, excluding off, in a stepped lighting control system (see figure, below). Required and must be &gt;0 if Lighting Control Type = 2. The steps are assumed to be equally spaced.
 
-![](media/image106.svg)
+![](media/image106.png)
 
 Figure 64. Stepped lighting control with Number of Steps = 3.
 
@@ -733,7 +733,7 @@ These three fields are the X, Y and Z values of the Reference point in the coord
 
 
 
-![](media/image107.svg)
+![](media/image107.png)
 
 Figure 65. Example showing location of two daylighting reference points in the zone coordinate system (relative) of a rectangular zone with three windows. (a) Perspective view, (b) plan view, (c) elevation view. All dimensions are in meters.
 
@@ -1422,7 +1422,7 @@ This object is used to model the impacts on daylighting of a “light well” th
 
 The input object describes the light well using basic characteristics of the geometry along with the visible reflectance of the well’s side walls.  The following figure diagrams how the geometry is characterized.
 
-![](media/image112.svg)
+![](media/image112.png)
 
 Figure 70. Skylight with light well: (a) perspective view, (b) vertical section.
  If the bottom of the light well is a rectangle of side lengths c and d, as shown in (a), then the perimeter of the bottom of the well = 2(c+d) and the area = cd (see description of field names for the Light Well object).
@@ -7052,7 +7052,7 @@ The positive numeric input for this field is the zone air distribution effective
 
 The positive numeric input for this field is the zone air distribution effectiveness when the zone is in heating mode. Default value of this field is 1.0. ASHRAE Standard 62.1-2010 provides typical values as follows:
 
-![](media/image133.svg)
+![](media/image133.png)
 
 Figure 71. Zone Air Distribution Effectiveness (Source: ASHRAE Standard 62.1-2010)
 
@@ -7857,7 +7857,7 @@ Components are linked together to form various loops within the simulation. Thus
 
 Loop nodes are a key defining feature in EnergyPlus. As a result, it is recommended that one of the first steps taken in defining an HVAC system in EnergyPlus be the definition of a node diagram or map. This is helpful for visualization of the entire system. Such a map could be created electronically within an interface or could be kept in the background out of the sight of the user.
 
-![](media/image134.svg)
+![](media/image134.png)
 
 Figure 72. Example Node Diagram
 
@@ -14148,7 +14148,7 @@ Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simul
 
 The Supply side of the heat pump is usually connected to a Ground Heat Exchanger. The figure below shows the layout and piping diagram of the water-to-water heat pump.
 
-![](media/image184.svg)
+![](media/image184.png)
 
 Figure 75. Schematic of EnergyPlus Ground Loop Heat Exchanger
 
@@ -20160,7 +20160,7 @@ The evaporative fluid cooler seeks to maintain the temperature of the water exit
 
 Evaporative fluid coolers consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the fluid coolers. For this purpose, the last seven input fields can either be provided in the input or if nothing is specified then the default values for these fields will be used. These fields provide the methods of controlling details of the water consumption calculations. The user can specify connections to the rest of the building’s water system by providing the name of a water storage tanks (i.e. WaterUse:Storage objects). The schematic of the system is shown below:
 
-![EvaporativeFluidCooler](media/image201.svg)
+![EvaporativeFluidCooler](media/image201.png)
 
 Figure 82. Schematic diagram for evaporative fluid cooler
 

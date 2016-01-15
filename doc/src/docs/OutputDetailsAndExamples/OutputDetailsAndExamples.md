@@ -1,8 +1,7 @@
-![](media/ep.gif)
+![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
-<hr>
 <h1>Output Details and Examples</h1>
 <h2>EnergyPlus Outputs, Example Inputs and Data Set Files</h2>
 <br/>
@@ -18,7 +17,7 @@ Introduction
 
 This document is intended to give an in-depth look at the various output files produced by EnergyPlus. Some of these may be referenced in various other parts of the documentation but are presented here with more details.
 
-The scripts that assist in running EnergyPlus will usually rename the standard names used in the program. The two scripts that are distributed with EnergyPlus are: **EPL-Run.bat** (which is used by the EP-Launch program) and **RunEPlus.bat**  (which can be used from the command line). The RunEPlus batch file can also be used to string together several runs such as usually termed “batch processing”. In renaming the files created by the program or its post-processing program(s), usually the file extension will be retained. The following table will illustrate the native EnergyPlus file name, a description of its contents and the EP-Launch “version” of the file. In this table, &lt;filename&gt; refers to the source/original file name (without extension) selected. Files are presented in alphabetic order. For output purposes, the most important files to understand are the eplusout.eso, eplusout.mtr and eplusout.err files. The first two are manipulated with the ReadVarsESO post processing program. The latter will contain any critical errors that were encountered during the run.
+The scripts that assist in running EnergyPlus will usually rename the standard names used in the program. The two scripts that are distributed with EnergyPlus are: **EPL-Run.bat** (which is used by the EP-Launch program) and **RunEPlus.bat**  (which can be used from the command line). The RunEPlus batch file can also be used to string together several runs such as usually termed “batch processing”. In renaming the files created by the program or its post-processing program(s), usually the file extension will be retained. The following table will illustrate the native EnergyPlus file name, a description of its contents and the EP-Launch “version” of the file. In this table, &lt;filename&gt; refers to the source/original file name (without extension) selected. Files are presented in alphabetic order. For output purposes, the most important files to understand are the eplusout.eso, eplusout.mtr and eplusout.err files. The first two are manipulated with the ReadVarsESO post processing program. The latter will contain any critical errors that were encountered during the run.
 
 Output Files
 ============
@@ -28,10 +27,10 @@ Output File List
 
 Following are the native file names that are output from EnergyPlus; native – directly out of EnergyPlus. Usually you will not see these file names as batch files and interfaces will change them to be &lt;file name&gt;.&lt;ext&gt; or in some instances &lt;file name&gt;&lt;qualifier&gt;.&lt;ext&gt;. Usually the extension is the important piece and is described in the following table.
 
-Table 1. EnergyPlus Basic Output  Files
+Table 1. EnergyPlus Basic Output  Files
 
 <table class="table table-striped">
-<tr> 
+<tr>
  <th>Output File Name</th>
  <th>Description</th>
  <th>EP-Launch File Name</th>
@@ -203,7 +202,7 @@ Table 2. "Hybrid" EnergyPlus Output Files
 </tr>
 <tr>
 <td>eplusout.&lt;ext&gt;
- </td>
+ </td>
 <td>“spreadsheet” ready file that contains either all the report variables requested (default: up to limit of 255) from the input file or specific ones specified by the user. Different extensions (csv, tab, and txt denote different “separators” in the file.</td>
 <td>&lt;filename&gt;.csv
 or
@@ -213,7 +212,7 @@ or
 </tr>
 <tr>
 <td>eplusmtr.&lt;ext&gt;
- </td>
+ </td>
 <td>“spreadsheet” ready file that contains either all the report meter requests (default: up to 255) from the input file or specific ones specified by the user. Different extensions (csv, tab, and txt denote different “separators” in the file.</td>
 <td>&lt;filename&gt;Meter.csv
 or
@@ -240,48 +239,48 @@ An excerpt of the file follows. Lines in green are notes produced from EnergyPlu
 In all the examples, the actual version of the EnergyPlus exe would appear. In the examples these will be shown as: &lt;version&gt;.
 
 ```
-  Processing Data Dictionary (Energy+.idd) File -- Start
-     1 !IDD_Version <version>
-     2 ! **************************************************************************
-     3 !
+  Processing Data Dictionary (Energy+.idd) File -- Start
+     1 !IDD_Version <version>
+     2 ! **************************************************************************
+     3 !
 <reduced for brevity>
- 13000        \key DETAILS
- 13001        \key Vertices
- 13002        \key DetailsWithVertices
-  Processing Data Dictionary (Energy+.idd) File -- Complete
-  Maximum number of Alpha Args=        4500
-  Maximum number of Numeric Args=        1800
-  Number of Object Definitions=         473
-  Number of Section Definitions=           2
-  Processing Input Data File (in.idf) -- Start
-     1 ! Basic file description: Basic illustration of using Purchased Air as a system
-     2 ! Run:      2 design days.
-     3 !           2 annual run periods, 2 summer days and 3 winter days.
+ 13000        \key DETAILS
+ 13001        \key Vertices
+ 13002        \key DetailsWithVertices
+  Processing Data Dictionary (Energy+.idd) File -- Complete
+  Maximum number of Alpha Args=        4500
+  Maximum number of Numeric Args=        1800
+  Number of Object Definitions=         473
+  Number of Section Definitions=           2
+  Processing Input Data File (in.idf) -- Start
+     1 ! Basic file description: Basic illustration of using Purchased Air as a system
+     2 ! Run:      2 design days.
+     3 !           2 annual run periods, 2 summer days and 3 winter days.
 <reduced for brevity>
-    63     RunPeriod,          ! 3 day winter simuluation
-    64               1,                1,  ! Start Month ,Day
-    65               1,                3;  ! End Month ,Day
-   ** Warning ** Object=RUNPERIOD, entered with less than minimum number of fields.
-   **   ~~~   ** Attempting fill to minimum.
-    66  MATERIAL:Regular,A1 - 1 IN STUCCO,  !- Material Name
+    63     RunPeriod,          ! 3 day winter simuluation
+    64               1,                1,  ! Start Month ,Day
+    65               1,                3;  ! End Month ,Day
+   ** Warning ** Object=RUNPERIOD, entered with less than minimum number of fields.
+   **   ~~~   ** Attempting fill to minimum.
+    66  MATERIAL:Regular,A1 - 1 IN STUCCO,  !- Material Name
 <reduced for brevity>
-   784 End Simulation Data;
-  Processing Input Data File (in.idf) -- Complete
-  Number of IDF "Lines"=         359
-  Maximum number of Alpha IDF Args=          29
-  Maximum number of Numeric IDF Args=          20
- Getting object=VERSION
- Getting object=TIMESTEP
- Getting object=SIMULATIONCONTROL
- Getting object=SIZING:PARAMETERS
- Getting object=SIZING:ZONE
- Getting object=SIZING:SYSTEM
- Getting object=SIZING:PLANT
+   784 End Simulation Data;
+  Processing Input Data File (in.idf) -- Complete
+  Number of IDF "Lines"=         359
+  Maximum number of Alpha IDF Args=          29
+  Maximum number of Numeric IDF Args=          20
+ Getting object=VERSION
+ Getting object=TIMESTEP
+ Getting object=SIMULATIONCONTROL
+ Getting object=SIZING:PARAMETERS
+ Getting object=SIZING:ZONE
+ Getting object=SIZING:SYSTEM
+ Getting object=SIZING:PLANT
 <etc>
-MaxRVariable=        5000
-MaxIVariable=         100
-NumEnergyMeters=         108
-NumVarMeterArrays=         106
+MaxRVariable=        5000
+MaxIVariable=         100
+NumEnergyMeters=         108
+NumVarMeterArrays=         106
 ```
 
 eplusout.bnd
@@ -315,47 +314,47 @@ Program Version,EnergyPlus, &lt;version&gt;
 
 ! \#Nodes,&lt;Number of Unique Nodes&gt;
 
- \#Nodes,11
+ \#Nodes,11
 
 **List of all nodes follows. \# references may be an indication of faulty node spec (or not)**
 
 ! &lt;Node&gt;,&lt;NodeNumber&gt;,&lt;Node Name&gt;,&lt;Node Fluid Type&gt;,&lt;\# Times Node Referenced After Definition&gt;
 
- Node,1,SUPPLY INLET NODE,Air,3
+ Node,1,SUPPLY INLET NODE,Air,3
 
- Node,2,FAN INLET NODE,Air,4
+ Node,2,FAN INLET NODE,Air,4
 
 &lt;reduced for brevity&gt;
 
 Node,10,ZONE EQUIPMENT OUTLET NODE,Air,2
 
- Node,11,RELIEF AIR OUTLET NODE,Air,1
+ Node,11,RELIEF AIR OUTLET NODE,Air,1
 
 ! ===============================================================
 
 ! Suspicious nodes have 0 references. It is normal for some nodes, however.
 
-! Suspicious nodes have 0 references.  It is normal for some nodes, however.
+! Suspicious nodes have 0 references.  It is normal for some nodes, however.
 
 ! Listing nodes with 0 references (culled from previous list):
 
 ! &lt;Suspicious Node&gt;,&lt;NodeNumber&gt;,&lt;Node Name&gt;,&lt;Node Fluid Type&gt;,&lt;\# Times Node Referenced After Definition&gt;
 
- Suspicious Node,7,MAIN ZONE NODE,Air,0
+ Suspicious Node,7,MAIN ZONE NODE,Air,0
 
 **List of branches follow.**
 
 ! &lt;\#Branch Lists&gt;,&lt;Number of Branch Lists&gt;
 
- \#Branch Lists,1
+ \#Branch Lists,1
 
 ! &lt;Branch List&gt;,&lt;Branch List Count&gt;,&lt;Branch List Name&gt;,&lt;Loop Name&gt;,&lt;Loop Type&gt;,&lt;Number of Branches&gt;
 
 ! &lt;Branch&gt;,&lt;Branch Count&gt;,&lt;Branch Name&gt;,&lt;Loop Name&gt;,&lt;Loop Type&gt;,&lt;Branch Inlet Node Name&gt;,&lt;Branch Outlet Node Name&gt;
 
- Branch List,1,AIR LOOP BRANCHES,EVAP COOLER SYSTEM,Air,1
+ Branch List,1,AIR LOOP BRANCHES,EVAP COOLER SYSTEM,Air,1
 
-   Branch,1,AIR LOOP MAIN BRANCH,EVAP COOLER SYSTEM,Air,SUPPLY INLET NODE,SUPPLY OUTLET NODE
+   Branch,1,AIR LOOP MAIN BRANCH,EVAP COOLER SYSTEM,Air,SUPPLY INLET NODE,SUPPLY OUTLET NODE
 
 ! ===============================================================
 
@@ -363,7 +362,7 @@ Node,10,ZONE EQUIPMENT OUTLET NODE,Air,2
 
 ! &lt;\#Supply Air Paths&gt;,&lt;Number of Supply Air Paths&gt;
 
- \#Supply Air Paths,1
+ \#Supply Air Paths,1
 
 ! &lt;Supply Air Path&gt;,&lt;Supply Air Path Count&gt;,&lt;Supply Air Path Name&gt;,&lt;AirLoopHVAC Name&gt;
 
@@ -375,15 +374,15 @@ Node,10,ZONE EQUIPMENT OUTLET NODE,Air,2
 
 ! &lt;Supply Air Path Component Nodes&gt;,&lt;Node Count&gt;,&lt;Component Type&gt;,&lt;Component Name&gt;,&lt;Inlet Node Name&gt;,&lt;Outlet Node Name&gt;,&lt;AirLoopHVAC Name&gt;
 
- Supply Air Path,1,ZONE SUPPLY AIR PATH,EVAP COOLER SYSTEM
+ Supply Air Path,1,ZONE SUPPLY AIR PATH,EVAP COOLER SYSTEM
 
-   \#Components on Supply Air Path,1
+   \#Components on Supply Air Path,1
 
-   Supply Air Path Component,1,AIRLOOPHVAC:ZONESPLITTER,ZONE SUPPLY AIR SPLITTER,EVAP COOLER SYSTEM
+   Supply Air Path Component,1,AIRLOOPHVAC:ZONESPLITTER,ZONE SUPPLY AIR SPLITTER,EVAP COOLER SYSTEM
 
-     \#Outlet Nodes on Supply Air Path Component,1
+     \#Outlet Nodes on Supply Air Path Component,1
 
-     Supply Air Path Component Nodes,1,AIRLOOPHVAC:ZONESPLITTER,ZONE SUPPLY AIR SPLITTER,ZONE EQUIPMENT INLET NODE,MAIN ZONE INLET NODE,EVAP COOLER SYSTEM
+     Supply Air Path Component Nodes,1,AIRLOOPHVAC:ZONESPLITTER,ZONE SUPPLY AIR SPLITTER,ZONE EQUIPMENT INLET NODE,MAIN ZONE INLET NODE,EVAP COOLER SYSTEM
 
 ! &lt;\#Nodes on Supply Air Path&gt;,&lt;Number of Nodes&gt;
 
@@ -391,9 +390,9 @@ Node,10,ZONE EQUIPMENT OUTLET NODE,Air,2
 
 \#Nodes on Supply Air Path,2
 
-   Supply Air Path Node,Inlet Node,1,ZONE EQUIPMENT INLET NODE,EVAP COOLER SYSTEM
+   Supply Air Path Node,Inlet Node,1,ZONE EQUIPMENT INLET NODE,EVAP COOLER SYSTEM
 
-   Supply Air Path Node,Outlet Node,2,MAIN ZONE INLET NODE,EVAP COOLER SYSTEM
+   Supply Air Path Node,Outlet Node,2,MAIN ZONE INLET NODE,EVAP COOLER SYSTEM
 
 ! ===============================================================
 
@@ -401,7 +400,7 @@ Node,10,ZONE EQUIPMENT OUTLET NODE,Air,2
 
 ! &lt;\#Return Air Paths&gt;,&lt;Number of Return Air Paths&gt;
 
- \#Return Air Paths,1
+ \#Return Air Paths,1
 
 ! &lt;Return Air Path&gt;,&lt;Return Air Path Count&gt;,&lt;Return Air Path Name&gt;,&lt;AirLoopHVAC Name&gt;
 
@@ -413,25 +412,25 @@ Node,10,ZONE EQUIPMENT OUTLET NODE,Air,2
 
 ! &lt;Return Air Path Component Nodes&gt;,&lt;Node Count&gt;,&lt;Component Type&gt;,&lt;Component Name&gt;,&lt;Inlet Node Name&gt;,&lt;Outlet Node Name&gt;,&lt;AirLoopHVAC Name&gt;
 
- Return Air Path,1,ZONE RETURN AIR PATH,EVAP COOLER SYSTEM
+ Return Air Path,1,ZONE RETURN AIR PATH,EVAP COOLER SYSTEM
 
-   \#Components on Return Air Path,1
+   \#Components on Return Air Path,1
 
-   Return Air Path Component,1,AIRLOOPHVAC:ZONEMIXER,ZONE RETURN AIR MIXER,EVAP COOLER SYSTEM
+   Return Air Path Component,1,AIRLOOPHVAC:ZONEMIXER,ZONE RETURN AIR MIXER,EVAP COOLER SYSTEM
 
-     \#Inlet Nodes on Return Air Path Component,1
+     \#Inlet Nodes on Return Air Path Component,1
 
-     Return Air Path Component Nodes,1,AIRLOOPHVAC:ZONEMIXER,ZONE RETURN AIR MIXER,MAIN ZONE OUTLET NODE,ZONE EQUIPMENT OUTLET NODE,EVAP COOLER SYSTEM
+     Return Air Path Component Nodes,1,AIRLOOPHVAC:ZONEMIXER,ZONE RETURN AIR MIXER,MAIN ZONE OUTLET NODE,ZONE EQUIPMENT OUTLET NODE,EVAP COOLER SYSTEM
 
 ! &lt;\#Nodes on Return Air Path&gt;,&lt;Number of Nodes&gt;
 
 ! &lt;Return Air Path Node&gt;,&lt;Node Type&gt;,&lt;Node Count&gt;,&lt;Node Name&gt;,&lt;AirLoopHVAC Name&gt;
 
-   \#Nodes on Return Air Path,2
+   \#Nodes on Return Air Path,2
 
-   Return Air Path Node,Outlet Node,1,ZONE EQUIPMENT OUTLET NODE,EVAP COOLER SYSTEM
+   Return Air Path Node,Outlet Node,1,ZONE EQUIPMENT OUTLET NODE,EVAP COOLER SYSTEM
 
-   Return Air Path Node,Inlet Node,2,MAIN ZONE OUTLET NODE,EVAP COOLER SYSTEM
+   Return Air Path Node,Inlet Node,2,MAIN ZONE OUTLET NODE,EVAP COOLER SYSTEM
 
 ! ===============================================================
 
@@ -439,11 +438,11 @@ Node,10,ZONE EQUIPMENT OUTLET NODE,Air,2
 
 ! \#Outdoor Air Nodes,&lt;Number of Outdoor Air Nodes&gt;
 
- \#Outdoor Air Nodes,1
+ \#Outdoor Air Nodes,1
 
 ! &lt;Outdoor Air Node&gt;,&lt;NodeNumber&gt;,&lt;Node Name&gt;
 
- Outdoor Air Node,5,OUTSIDE AIR INLET NODE
+ Outdoor Air Node,5,OUTSIDE AIR INLET NODE
 
 ! ===============================================================
 
@@ -451,17 +450,17 @@ Node,10,ZONE EQUIPMENT OUTLET NODE,Air,2
 
 ! &lt;\#Component Sets&gt;,&lt;Number of Component Sets&gt;
 
- \#Component Sets,4
+ \#Component Sets,4
 
 ! &lt;Component Set&gt;,&lt;Component Set Count&gt;,&lt;Parent Object Type&gt;,&lt;Parent Object Name&gt;,&lt;Component Type&gt;,&lt;Component Name&gt;,&lt;Inlet Node ID&gt;,&lt;Outlet Node ID&gt;,&lt;Description&gt;
 
- Component Set,1,BRANCH,AIR LOOP MAIN BRANCH,AIRLOOPHVAC:OUTDOORAIRSYSTEM,OUTSIDE AIR SYSTEM,SUPPLY INLET NODE,FAN INLET NODE,Air Nodes
+ Component Set,1,BRANCH,AIR LOOP MAIN BRANCH,AIRLOOPHVAC:OUTDOORAIRSYSTEM,OUTSIDE AIR SYSTEM,SUPPLY INLET NODE,FAN INLET NODE,Air Nodes
 
- Component Set,2,BRANCH,AIR LOOP MAIN BRANCH,FAN:CONSTANTVOLUME,SUPPLY FAN,FAN INLET NODE,EVAP COOLER INLET NODE,Air Nodes
+ Component Set,2,BRANCH,AIR LOOP MAIN BRANCH,FAN:CONSTANTVOLUME,SUPPLY FAN,FAN INLET NODE,EVAP COOLER INLET NODE,Air Nodes
 
- Component Set,3,BRANCH,AIR LOOP MAIN BRANCH,EVAPORATIVECOOLER:DIRECT:CELDEKPAD,EVAPORATIVE COOLER,EVAP COOLER INLET NODE,SUPPLY OUTLET NODE,Evap Air Nodes
+ Component Set,3,BRANCH,AIR LOOP MAIN BRANCH,EVAPORATIVECOOLER:DIRECT:CELDEKPAD,EVAPORATIVE COOLER,EVAP COOLER INLET NODE,SUPPLY OUTLET NODE,Evap Air Nodes
 
- Component Set,4,AIRLOOPHVAC:OUTDOORAIRSYSTEM,OUTSIDE AIR SYSTEM,OUTDOORAIR:MIXER,OUTSIDE AIR MIXING BOX,OUTSIDE AIR INLET NODE,FAN INLET NODE,Air Nodes
+ Component Set,4,AIRLOOPHVAC:OUTDOORAIRSYSTEM,OUTSIDE AIR SYSTEM,OUTDOORAIR:MIXER,OUTSIDE AIR MIXING BOX,OUTSIDE AIR INLET NODE,FAN INLET NODE,Air Nodes
 
 **Similar details for Plant Loops, Condenser Loops, Controlled Zones, etc.**
 
@@ -472,39 +471,39 @@ eplusout.dbg
 
 Developers use this file during debugging and can be “turned on” by the DEBUG OUTPUT object in the input file. The only reason a user might specify this flag would be to send a file to the support group.
 
-**Output:DebuggingData, 1, 0;    ! standard debug output, during simulation days**
+**Output:DebuggingData, 1, 0;    ! standard debug output, during simulation days**
 
 The standard debug output appears like this:
 
-Day of Sim     Hour of Day    Time
+Day of Sim     Hour of Day    Time
 
-           1           1  0.166666666666667
+           1           1  0.166666666666667
 
-node \#   Temp      MassMinAv  MassMaxAv TempSP   MassFlow   MassMin    MassMax    MassSP      Press        Enthal     HumRat    Fluid Type
+node \#   Temp      MassMinAv  MassMaxAv TempSP   MassFlow   MassMin    MassMax    MassSP      Press        Enthal     HumRat    Fluid Type
 
-   1    -12.500     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000   100344.00     -9363.63    0.00129  Air
+   1    -12.500     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000   100344.00     -9363.63    0.00129  Air
 
-   2    -12.500     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000   100344.00     -9363.63    0.00129  Air
+   2    -12.500     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000   100344.00     -9363.63    0.00129  Air
 
-   3    -12.500     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000   100344.00     -9363.63    0.00129  Air
+   3    -12.500     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000   100344.00     -9363.63    0.00129  Air
 
-   4    -12.500     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000   100344.00     -9363.63    0.00129  Air
+   4    -12.500     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000   100344.00     -9363.63    0.00129  Air
 
-   5     50.000     0.000     0.000     0.000     0.0320     0.0000     0.0000     0.0000   100344.00     60617.55    0.00400  Air
+   5     50.000     0.000     0.000     0.000     0.0320     0.0000     0.0000     0.0000   100344.00     60617.55    0.00400  Air
 
-   6     50.000     0.000     0.000     0.000     0.0326     0.0000     0.0000     0.0000   100344.00     60617.55    0.00400  Air
+   6     50.000     0.000     0.000     0.000     0.0326     0.0000     0.0000     0.0000   100344.00     60617.55    0.00400  Air
 
-   7     50.000     0.000     0.000     0.000     0.1636     0.0000     0.0000     0.0000   100344.00     60617.55    0.00400  Air
+   7     50.000     0.000     0.000     0.000     0.1636     0.0000     0.0000     0.0000   100344.00     60617.55    0.00400  Air
 
-   8     50.000     0.000     0.000     0.000     0.1648     0.0000     0.0000     0.0000   100344.00     60617.55    0.00400  Air
+   8     50.000     0.000     0.000     0.000     0.1648     0.0000     0.0000     0.0000   100344.00     60617.55    0.00400  Air
 
-   9      0.000     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000        0.00         0.00    0.00000  blank
+   9      0.000     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000        0.00         0.00    0.00000  blank
 
-  10      0.000     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000        0.00         0.00    0.00000  blank
+  10      0.000     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000        0.00         0.00    0.00000  blank
 
-  11      0.000     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000        0.00         0.00    0.00000  blank
+  11      0.000     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000        0.00         0.00    0.00000  blank
 
-  12      0.000     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000        0.00         0.00    0.00000  blank
+  12      0.000     0.000     0.000     0.000     0.0000     0.0000     0.0000     0.0000        0.00         0.00    0.00000  blank
 
 eplusout.dxf
 ------------
@@ -535,29 +534,29 @@ The DXF file of itself is an ASCII file, with a specific structure as specified 
 
 ```
 SECTION
-  2
+  2
 ENTITIES
-  0
+  0
 TEXT
-  8
+  8
 1
-  6
+  6
 CONTINUOUS
- 62
-  3
- 10
-      -11.00000
- 20
-        3.00000
- 30
-        0.10000
- 40
- .25
-  1
+ 62
+  3
+ 10
+      -11.00000
+ 20
+        3.00000
+ 30
+        0.10000
+ 40
+ .25
+  1
 True North
- 41
- 0.0
-  7
+ 41
+ 0.0
+  7
 MONOTXT
 210
 0.0
@@ -565,41 +564,41 @@ MONOTXT
 0.0
 230
 1.0
-  0
+  0
 <reduced for brevity>
 
 3DFACE
-  8
+  8
 1
- 62
-  3
- 10
-      -10.00000
- 20
-        3.00000
- 30
-        0.10000
- 11
-      -10.00000
- 21
-        3.00000
- 31
-        0.00000
- 12
-      -10.00000
- 22
-        0.00000
- 32
-        0.00000
- 13
-      -10.00000
- 23
-        0.00000
- 33
-        0.10000
-  0
+ 62
+  3
+ 10
+      -10.00000
+ 20
+        3.00000
+ 30
+        0.10000
+ 11
+      -10.00000
+ 21
+        3.00000
+ 31
+        0.00000
+ 12
+      -10.00000
+ 22
+        0.00000
+ 32
+        0.00000
+ 13
+      -10.00000
+ 23
+        0.00000
+ 33
+        0.10000
+  0
 ENDSEC
-  0
+  0
 EOF
 999
 DXF created from EnergyPlus
@@ -612,7 +611,7 @@ eplusout.edd
 
 This file is invoked by including an Output:EnergyManagementSystem input object. The EDD file contains three different types of information related to the Energy Management System (EMS) including: (1) listing of available actuators, (2) listing of available internal variables, and (3) a record of the execution of user’s programs for the EnergyPlus Runtime Language (Erl).
 
-The EMS feature in EnergyPlus uses “Actuators” to do control operations. The actuators available in a given model depend on the non-EMS-related content of the input file. Similar to how EnergyPlus reports the available output variables to the RDD file, a list of available actuators can be written to the EDD file. There are three settings in the Output:EnergyManagementSystem input object that control how actuators are listed. Selecting “None” directs the program to not list the available actuators. Selecting “NotByUniqueKeyNames” directs the program to provide a concise listing of the available actuators that does not include their enumeration by unique name. Selecting “Verbose” directs the program to provide a complete listing of the available actuators including the unique identifying names. An example listing of actuators using the  “NotByUniqueKeyNames”  option follows.
+The EMS feature in EnergyPlus uses “Actuators” to do control operations. The actuators available in a given model depend on the non-EMS-related content of the input file. Similar to how EnergyPlus reports the available output variables to the RDD file, a list of available actuators can be written to the EDD file. There are three settings in the Output:EnergyManagementSystem input object that control how actuators are listed. Selecting “None” directs the program to not list the available actuators. Selecting “NotByUniqueKeyNames” directs the program to provide a concise listing of the available actuators that does not include their enumeration by unique name. Selecting “Verbose” directs the program to provide a complete listing of the available actuators including the unique identifying names. An example listing of actuators using the  “NotByUniqueKeyNames”  option follows.
 
 ! &lt;EnergyManagementSystem:Actuator Available&gt;, \*, Component Type, 'Control Type, Units
 
@@ -638,7 +637,7 @@ EnergyManagementSystem:Actuator Available, \*,Ideal Loads Air System,Air Mass Fl
 
 
 
-The EMS feature in EnergyPlus uses “Internal Variables” to obtain input data for use in scaling the results of control calculations. The internal variables available in a give model depend on the non-EMS-related content of the input file. Similar to how EnergyPlus reports the available output variables to the RDD file, a list of available internal variables can be written to the EDD file. There are three settings in the Output:EnergyManagementSystem input object that control how internal variables are listed. Selecting “None” directs the program to not list the available internal variables. Selecting “NotByUniqueKeyNames” directs the program to provide a concise listing of the available internal variables that does not include their enumeration by unique name. Selecting “Verbose” directs the program to provide a complete listing of the available internal variables including the unique identifying names. An example listing of actuators using the  “NotByUniqueKeyNames”  option follows.
+The EMS feature in EnergyPlus uses “Internal Variables” to obtain input data for use in scaling the results of control calculations. The internal variables available in a give model depend on the non-EMS-related content of the input file. Similar to how EnergyPlus reports the available output variables to the RDD file, a list of available internal variables can be written to the EDD file. There are three settings in the Output:EnergyManagementSystem input object that control how internal variables are listed. Selecting “None” directs the program to not list the available internal variables. Selecting “NotByUniqueKeyNames” directs the program to provide a concise listing of the available internal variables that does not include their enumeration by unique name. Selecting “Verbose” directs the program to provide a complete listing of the available internal variables including the unique identifying names. An example listing of actuators using the  “NotByUniqueKeyNames”  option follows.
 
 ! &lt;EnergyManagementSystem:InternalVariable Available&gt;, \*, Internal Data Type
 
@@ -662,12 +661,12 @@ EnergyManagementSystem:InternalVariable Available, \*,Zone List Multiplier,[ ]
 
 The EMS uses the EnergyPlus Runtime Language, or Erl, to do custom controlling. When Erl programs are being developed, the EDD becomes a primary source of information for debugging. When a line of Erl code is executed, the program can output records called “line traces” that are useful for debugging because they show the outcome of each line of code. There are three settings in the Output:EnergyManagementSystem input object that control how line traces are reported. Selecting “None” directs the program to not write out any line traces. Selecting “ErrorsOnly” directs the program to only write line traces when computation errors are encountered (such as divide by zero). Selecting “Verbose” directs the program to write out line traces for each and every line of Erl program code that is executed.
 
-It is very important to be careful with the EDD file. The Verbose option should be used with care because a full line-by-line trace of Erl program execution for an annual run can easily create an enormous computer file that is too large for most computer systems.  It is possible for EnergyPlus to generate an EDD file that cannot be opened in traditional text editors.
+It is very important to be careful with the EDD file. The Verbose option should be used with care because a full line-by-line trace of Erl program execution for an annual run can easily create an enormous computer file that is too large for most computer systems.  It is possible for EnergyPlus to generate an EDD file that cannot be opened in traditional text editors.
 
 eplusout.eio
 ------------
 
-This file contains some standard and some optional “reports”. It is intended to be a somewhat intelligent report of input conditions when they don’t fit well in other places or when they aren’t substantial enough for their own “file”. (e.g. **eplusout.bnd**)  Contents of the file are somewhat documented in various places in the [Input Output Reference document](file:///E:\Docs4PDFs\InputOutputReference.pdf) – as results of objects. This file or portions of it can be easily imported into spreadsheet programs and more analysis done there. Contents of this file include construction details, location information, “environment” information, number of “warmup” days required in each environment.
+This file contains some standard and some optional “reports”. It is intended to be a somewhat intelligent report of input conditions when they don’t fit well in other places or when they aren’t substantial enough for their own “file”. (e.g. **eplusout.bnd**)  Contents of the file are somewhat documented in various places in the Input Output Reference document – as results of objects. This file or portions of it can be easily imported into spreadsheet programs and more analysis done there. Contents of this file include construction details, location information, “environment” information, number of “warmup” days required in each environment.
 
 The form of the file is a data dictionary line followed by the data. In this case, the data dictionary line precedes the first “data” line though there may be several defining “dictionary lines”. Each dictionary line will show the field as &lt;field name&gt; followed by other fields that will be in the data lines. Data will be displayed similarly. Each field of dictionary or data will be separated from the next by a comma “,” – and produce a comma delimited file. However, the lines for data will not be contiguous – some follow a stream of consciousness of the EnergyPlus execution.
 
@@ -679,51 +678,51 @@ Note that the lines in the eplusout.eio file can be extremely long (current limi
 
 ! &lt;Version&gt;, Version ID
 
- Version, &lt;version&gt;
+ Version, &lt;version&gt;
 
 ! &lt;Timesteps per Hour&gt;, \#TimeSteps, Minutes per TimeStep
 
- Timesteps Per Hour,  4, 15
+ Timesteps Per Hour,  4, 15
 
 ! &lt;Run Control&gt;, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation
 
- Run Control, Yes, Yes, No, No, Yes
+ Run Control, Yes, Yes, No, No, Yes
 
 ! &lt;GroundTemperatures&gt;, Months From Jan to Dec {Deg C}
 
- GroundTemperatures,  20.03,  20.03,  20.13,  20.30,  20.43,  20.52,  20.62,  20.77,  20.78,  20.55,  20.44,  20.20
+ GroundTemperatures,  20.03,  20.03,  20.13,  20.30,  20.43,  20.52,  20.62,  20.77,  20.78,  20.55,  20.44,  20.20
 
 ! &lt;GroundTemperatures:Surface&gt;, Months From Jan to Dec {Deg C}
 
- GroundTemperatures:Surface,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00
+ GroundTemperatures:Surface,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00,  18.00
 
 ! &lt;GroundTemperatures:Deep&gt;, Months From Jan to Dec {Deg C}
 
- GroundTemperatures:Deep,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00
+ GroundTemperatures:Deep,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00
 
 ! &lt;GroundReflectances&gt;, Months From Jan to Dec {dimensionless}
 
- GroundReflectances,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
+ GroundReflectances,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
 
 ! &lt;Snow Ground Reflectance Modifiers&gt;, Normal, Daylighting {dimensionless}
 
- Snow Ground Reflectance Modifiers,   1.000,   1.000
+ Snow Ground Reflectance Modifiers,   1.000,   1.000
 
 ! &lt;Snow GroundReflectances&gt;, Months From Jan to Dec {dimensionless}
 
- Snow GroundReflectances,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
+ Snow GroundReflectances,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
 
 ! &lt;Snow GroundReflectances For Daylighting&gt;, Months From Jan to Dec {dimensionless}
 
- Snow GroundReflectances For Daylighting,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
+ Snow GroundReflectances For Daylighting,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
 
-! &lt;Location&gt;, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number {GMT+/-}, Elevation {m},  Standard Pressure at Elevation {Pa}
+! &lt;Location&gt;, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number {GMT+/-}, Elevation {m},  Standard Pressure at Elevation {Pa}
 
 Location,CHICAGO IL USA TMY2-94846 WMO\#=725300,41.78,-87.75,-6.00,190.00,99063.
 
-! &lt;Building Information&gt;, Building Name,North Axis {deg},Terrain,  Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days,Minimum Number of Warmup Days
+! &lt;Building Information&gt;, Building Name,North Axis {deg},Terrain,  Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days,Minimum Number of Warmup Days
 
- Building, BUILDING,  30.000,City,   0.04000,   0.40000,FullExterior,25,6
+ Building, BUILDING,  30.000,City,   0.04000,   0.40000,FullExterior,25,6
 
 ! Inside Convection Algorithm, Value {Simple | Detailed | CeilingDiffuser}
 
@@ -747,19 +746,19 @@ Environment:Site Atmospheric Variation,0.330,460.000,6.500000E-003
 
 ! &lt; Input Surface Geometry Information&gt;,Starting Corner,Vertex Input Direction,Coordinate System
 
- SurfaceGeometry,UpperLeftCorner,CounterClockwise,RelativeCoordinateSystem
+ SurfaceGeometry,UpperLeftCorner,CounterClockwise,RelativeCoordinateSystem
 
 ! &lt;Program Control Information:Threads/Parallel Sims&gt;, Threading Supported,Maximum Number of Threads, Env Set Threads (OMP\_NUM\_THREADS), EP Env Set Threads (EP\_OMP\_NUM\_THREADS). IDF Set Threads, Number of Threads Used (Interior Radiant Exchange), Number NominalSurface, Number Parallel Sims
 
 Program Control:Threads/Parallel Sims, Yes,2, Not Set, Not Set, Not Set, 2, 60, N/A
 
-The simulation parameters output is the simplest form of reporting in the **eplusout.eio** file. Each of the “header” records (lines starting with an “!”) are followed immediately by the one and only data line. By and large, these data lines are all merely echoes of the entries in the IDF (or defaulted for blank fields). For most of these descriptions, you can look at the object fields (of same name) in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) document.
+The simulation parameters output is the simplest form of reporting in the **eplusout.eio** file. Each of the “header” records (lines starting with an “!”) are followed immediately by the one and only data line. By and large, these data lines are all merely echoes of the entries in the IDF (or defaulted for blank fields). For most of these descriptions, you can look at the object fields (of same name) in the Input Output Reference document.
 
 ### Version
 
 ! &lt;Version&gt;, Version ID
 
- Version, &lt;version&gt;
+ Version, &lt;version&gt;
 
 This is the version of the IDF as entered in the IDF file. If it does not match the current EnergyPlus Version, a warning will be issued and show in the **eplusout.err** file.
 
@@ -767,7 +766,7 @@ This is the version of the IDF as entered in the IDF file. If it does not match 
 
 ! &lt;Timesteps per Hour&gt;, \#TimeSteps, Minutes per TimeStep
 
- Timesteps Per Hour,  4, 15
+ Timesteps Per Hour,  4, 15
 
 This is the number of timesteps in hour as entered in the IDF file as well as showing how many minutes will encompass each timestep (i.e. 4 timesteps in hour = 15 minutes per timestep).
 
@@ -775,15 +774,15 @@ This is the number of timesteps in hour as entered in the IDF file as well as sh
 
 ! &lt;Run Control&gt;, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation, Do HVAC Sizing Simulation
 
- Run Control, Yes, Yes, Yes, No, Yes, No
+ Run Control, Yes, Yes, Yes, No, Yes, No
 
 This shows how the sizing and running (design days vs. weather file) will be accomplished. Design days are required for sizing but do not necessarily need to be “run” after sizing has completed. Thus, the user can choose to do sizing, not do a “normal” calculation with the design day definitions but then go ahead and run the full simulation year.  Some advanced sizing methods require also running HVAC Sizing Simulations.
 
 ### Building
 
-! &lt;Building Information&gt;, Building Name,North Axis {deg},Terrain,  Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days
+! &lt;Building Information&gt;, Building Name,North Axis {deg},Terrain,  Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days
 
- Building Information, BUILDING,  30.000,City,   0.04000,   0.40000,FullExterior,25
+ Building Information, BUILDING,  30.000,City,   0.04000,   0.40000,FullExterior,25
 
 This shows the values put in for the Building Object in the IDF.
 
@@ -869,7 +868,7 @@ AirflowNetwork Model:Wind Pressure Coefficients, SFACADE\_WPCVALUE, -0.37,-0.42,
 
 AirflowNetwork Model:Wind Pressure Coefficients, WFACADE\_WPCVALUE, -0.56,-0.56,-0.42,-0.37,-0.42,-0.56,-0.56,4.00E-002,0.48,0.60,0.48,4.00E-002
 
-#### Field:  &lt; AirflowNetwork Model: Wind Pressure Coefficients&gt;
+#### Field:  &lt; AirflowNetwork Model: Wind Pressure Coefficients&gt;
 
 This field contains the constant “AirflowNetwork Model: Wind Pressure Coefficients” for each line.
 
@@ -885,7 +884,7 @@ These values are the wind pressure coefficient for the building façade. These w
 
 ! &lt;Zone Volume Capacitance Multiplier&gt;, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier
 
-Zone Volume Capacitance Multiplier,   1.000, 1.000, 1.000, 1.000
+Zone Volume Capacitance Multiplier,   1.000, 1.000, 1.000, 1.000
 
 This shows the zone volume capacitance multipliers selected by the IDF value or defaulted. The object for this item is ZoneCapacitanceMultiplier:ResearchSpecial.
 
@@ -951,7 +950,7 @@ This describes the threading that may be active for the simulation. The ProgramC
 
 #### Field: Threading Supported
 
-The compile of the program has to support threading (OpenMP for now). If it is compiled thus, this field will be **Yes**.  Otherwise it will be **No**.
+The compile of the program has to support threading (OpenMP for now). If it is compiled thus, this field will be **Yes**.  Otherwise it will be **No**.
 
 #### Field: Maximum Number of Threads
 
@@ -959,15 +958,15 @@ Regardless of whether the compile has supported threading, the system is queried
 
 #### Field: Env Set Threads (OMP\_NUM\_THREADS)
 
-The Environment Variable OMP\_NUM\_THREADS can be manually inserted to set the number of system threads to be used. This would be reported here if set.  If not set, **Not Set** will be shown. This is a system variable, but suggest that you use the following environment variable if you want to manually control the number of threads.
+The Environment Variable OMP\_NUM\_THREADS can be manually inserted to set the number of system threads to be used. This would be reported here if set.  If not set, **Not Set** will be shown. This is a system variable, but suggest that you use the following environment variable if you want to manually control the number of threads.
 
 #### Field: EP Env Set Threads (EP\_OMP\_NUM\_THREADS)
 
-The Environment Variable EP\_OMP\_NUM\_THREADS can be manually inserted to set the number of system threads to be used. This would be reported here if set.  If not set, **Not Set** will be shown.
+The Environment Variable EP\_OMP\_NUM\_THREADS can be manually inserted to set the number of system threads to be used. This would be reported here if set.  If not set, **Not Set** will be shown.
 
 #### Field: IDF Set Threads
 
-If you use the ProgramControl object in your IDF, you can again manually control the number of threads to be used. This would be reported here if set.  If not set, **Not Set** will be shown.
+If you use the ProgramControl object in your IDF, you can again manually control the number of threads to be used. This would be reported here if set.  If not set, **Not Set** will be shown.
 
 #### Field: Number of Threads Used (Interior Radiant Exchange)
 
@@ -993,17 +992,17 @@ Environment:Weather Station,10.000,0.140,270.000,1.500,1.586,9.750E-003
 
 ! &lt;Environment:Site Atmospheric Variation&gt;,Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}
 
-Environment:Site Atmospheric Variation,   0.220, 370.000, 0.006500
+Environment:Site Atmospheric Variation,   0.220, 370.000, 0.006500
 
 ! &lt;Location&gt;, Location Name, Latitude, Longitude, Time Zone Number, Elevation {m}
 
- Location, DENVER COLORADO,   39.75, -104.87,   -7.00,      1610.26
+ Location, DENVER COLORADO,   39.75, -104.87,   -7.00,      1610.26
 
 
 
 In addition for each “environment” simulated, information about the environment is shown:
 
-! &lt;Environment&gt;,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {\#days}, Source:Start DayOfWeek,  Use Daylight Savings, Use Holidays, Apply Weekend Holiday Rule
+! &lt;Environment&gt;,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {\#days}, Source:Start DayOfWeek,  Use Daylight Savings, Use Holidays, Apply Weekend Holiday Rule
 
 ! &lt;Environment:Special Days&gt;, Special Day Name, Special Day Type, Source, Start Date, Duration {\#days}
 
@@ -1015,7 +1014,7 @@ In addition for each “environment” simulated, information about the environm
 
 For example, a DesignDay:
 
-Environment,PHOENIX ARIZONA WINTER,DesignDay, 1/21, 1/21,MONDAY,  1,N/A,N/A,N/A,N/A
+Environment,PHOENIX ARIZONA WINTER,DesignDay, 1/21, 1/21,MONDAY,  1,N/A,N/A,N/A,N/A
 
 Environment:Daylight Saving,No,DesignDay
 
@@ -1023,11 +1022,11 @@ Environment:Design\_Day\_Misc, 21,1228.9,0.1414,5.7310E-002,1.0,-11.14,-20.0
 
 A Design RunPeriod:
 
-Environment,EXTREME SUMMER WEATHER PERIOD FOR DESIGN,User Selected WeatherFile Typical/Extreme Period (Design)=Summer Extreme,07/13,07/19,SummerDesignDay,  7,Use RunPeriod Specified Day,No ,No ,No ,No ,No
+Environment,EXTREME SUMMER WEATHER PERIOD FOR DESIGN,User Selected WeatherFile Typical/Extreme Period (Design)=Summer Extreme,07/13,07/19,SummerDesignDay,  7,Use RunPeriod Specified Day,No ,No ,No ,No ,No
 
 Environment:Daylight Saving,No,RunPeriod Object
 
-Environment:WarmupDays,  3
+Environment:WarmupDays,  3
 
 Or a RunPeriod (Name listed in the RunPeriod output is dependent on user input for the RunPeriod object – when a blank is input, the name of the weather file location is used):
 
@@ -1035,19 +1034,19 @@ Environment,CHICAGO IL TMY2-94846 WMO\#=725300,WeatherRunPeriod, 1/ 1,12/31,SUND
 
 Environment:Daylight Saving,No,
 
-Environment:Special Days,NEW YEARS DAY,Holiday,WeatherFile, 1/ 1,  1
+Environment:Special Days,NEW YEARS DAY,Holiday,WeatherFile, 1/ 1,  1
 
-Environment:Special Days,MEMORIAL DAY,Holiday,WeatherFile, 5/31,  1
+Environment:Special Days,MEMORIAL DAY,Holiday,WeatherFile, 5/31,  1
 
-Environment:Special Days,INDEPENDENCE DAY,Holiday,WeatherFile, 7/ 5,  1
+Environment:Special Days,INDEPENDENCE DAY,Holiday,WeatherFile, 7/ 5,  1
 
-Environment:Special Days,LABOR DAY,Holiday,WeatherFile, 9/ 6,  1
+Environment:Special Days,LABOR DAY,Holiday,WeatherFile, 9/ 6,  1
 
-Environment:Special Days,THANKSGIVING,Holiday,WeatherFile,11/25,  1
+Environment:Special Days,THANKSGIVING,Holiday,WeatherFile,11/25,  1
 
-Environment:Special Days,CHRISTMAS,Holiday,WeatherFile,12/25,  1
+Environment:Special Days,CHRISTMAS,Holiday,WeatherFile,12/25,  1
 
-Environment:WarmupDays,  4
+Environment:WarmupDays,  4
 
 Note that in this display, using “weekend rule” and specific date holidays, the actual observed dates are shown in the output display – in the example above, Independence Day (July 4) is actually observed on July 5.
 
@@ -1133,7 +1132,7 @@ The site temperature modifier coefficient (TMC) is defined as:
 
 Then, the temperature at a height above ground is calculated as:
 
-<div>\[ \text{ActualTemperature} = \text{Temperature}_{met} + TMC - 
+<div>\[ \text{ActualTemperature} = \text{Temperature}_{met} + TMC -
     frac{ \text{TemperatureGradient}_{site} * \text{EarthRadius} * \text{Height}_{site/component} }
         { \text{EarthRadius} + \text{Height}_{site/component} } \]</div>
 
@@ -1160,35 +1159,35 @@ The air temperature gradient coefficient [K/m] is a research option that allows 
 
 ! &lt;Site:GroundTemperature:BuildingSurface&gt;, Months From Jan to Dec {Deg C}
 
- Site:GroundTemperature:BuildingSurface,  20.03,  20.03,  20.13,  20.30,  20.43,  20.52,  20.62,  20.77,  20.78,  20.55,  20.44,  20.20
+ Site:GroundTemperature:BuildingSurface,  20.03,  20.03,  20.13,  20.30,  20.43,  20.52,  20.62,  20.77,  20.78,  20.55,  20.44,  20.20
 
 ! &lt;Site:GroundTemperature:FCfactorMethod&gt;, Months From Jan to Dec {Deg C}
 
- Site:GroundTemperature:FCfactorMethod,  -1.89,  -3.06,  -0.99,   2.23,  10.68,  17.20,  21.60,  22.94,  20.66,  15.60,   8.83,   2.56
+ Site:GroundTemperature:FCfactorMethod,  -1.89,  -3.06,  -0.99,   2.23,  10.68,  17.20,  21.60,  22.94,  20.66,  15.60,   8.83,   2.56
 
 ! &lt;Site:GroundTemperature:Shallow&gt;, Months From Jan to Dec {Deg C}
 
- Site:GroundTemperature:Shallow,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00
+ Site:GroundTemperature:Shallow,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00,  13.00
 
 ! &lt;Site:GroundTemperature:Deep&gt;, Months From Jan to Dec {Deg C}
 
- Site:GroundTemperature:Deep,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00
+ Site:GroundTemperature:Deep,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00,  16.00
 
 ! &lt;Site:GroundReflectance&gt;, Months From Jan to Dec {dimensionless}
 
- Site:GroundReflectance,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
+ Site:GroundReflectance,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
 
 ! &lt;Site:GroundReflectance:SnowModifier&gt;, Normal, Daylighting {dimensionless}
 
- Site:GroundReflectance:SnowModifier,   1.000,   1.000
+ Site:GroundReflectance:SnowModifier,   1.000,   1.000
 
 ! &lt;Site:GroundReflectance:Snow&gt;, Months From Jan to Dec {dimensionless}
 
- Site:GroundReflectance:Snow,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
+ Site:GroundReflectance:Snow,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
 
 ! &lt;Site:GroundReflectance:Snow:Daylighting&gt;, Months From Jan to Dec {dimensionless}
 
- Site:GroundReflectance:Snow:Daylighting,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
+ Site:GroundReflectance:Snow:Daylighting,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20,  0.20
 
 ### Ground Temperatures
 
@@ -1214,7 +1213,7 @@ There will be a set of 12 numbers – the ground reflectances by month: January,
 
 It is generally accepted that snow resident on the ground increases the basic ground reflectance. EnergyPlus allows the user control over the snow ground reflectance for both “normal ground reflected solar” calculations (see above) and snow ground reflected solar modified for daylighting. This is the display of the user entered or defaulted values.
 
-#### Field: &lt;Snow Ground Reflectance  Modifiers&gt;
+#### Field: &lt;Snow Ground Reflectance  Modifiers&gt;
 
 This data field will contain the constant “Snow Ground Reflectance Modifiers”.
 
@@ -1258,7 +1257,7 @@ There will be a set of 12 numbers – the ground reflectances by month: January,
 
 For each “environment” simulated, a set of outputs is produced. The header group is only produced once. (The Design Day Misc header is produced only when there is a design day.)
 
-! &lt;Environment&gt;,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {\#days}, Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule
+! &lt;Environment&gt;,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {\#days}, Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule
 
 ! &lt;Environment:Special Days&gt;, Special Day Name, Special Day Type, Source, Start Date, Duration {\#days}
 
@@ -1408,7 +1407,7 @@ An overall zone summary is shown:
 
 ! &lt;Zone Summary&gt;, Number of Zones, Number of Surfaces, Number of SubSurfaces
 
- Zone Summary,19,158,12
+ Zone Summary,19,158,12
 
 As indicated:
 
@@ -1432,19 +1431,19 @@ This field will contain the total number of subsurfaces in the simulation.
 
 Each zone is summarized in a simple set of statements as shown below:
 
-! &lt;Zone Information&gt;,Zone Name,North Axis {deg},Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST}, Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2}, Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces,  Part of Total Building Area
+! &lt;Zone Information&gt;,Zone Name,North Axis {deg},Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST}, Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2}, Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces,  Part of Total Building Area
 
- Zone Information, PSI FOYER,0.0,0.00,0.00,0.00,8.56,-1.80,2.27,1,1,1,0.00,16.34,-9.51,4.88,0.00,6.10,3.81,368.12,Detailed,DOE-2,96.62,70.61,70.61,106.84,6,1,0,Yes
+ Zone Information, PSI FOYER,0.0,0.00,0.00,0.00,8.56,-1.80,2.27,1,1,1,0.00,16.34,-9.51,4.88,0.00,6.10,3.81,368.12,Detailed,DOE-2,96.62,70.61,70.61,106.84,6,1,0,Yes
 
- Zone Information, DORM ROOMS AND COMMON AREAS,0.0,0.00,6.10,0.00,18.35,11.26,3.05,1,1,1,3.57,31.70,-4.75,25.36,0.00,6.10,6.10,2723.33,Detailed,DOE-2,445.93,312.15,267.56,52.59,10,22,0,Yes
+ Zone Information, DORM ROOMS AND COMMON AREAS,0.0,0.00,6.10,0.00,18.35,11.26,3.05,1,1,1,3.57,31.70,-4.75,25.36,0.00,6.10,6.10,2723.33,Detailed,DOE-2,445.93,312.15,267.56,52.59,10,22,0,Yes
 
- Zone Information, LEFT FORK,-36.9,0.00,31.70,0.00,22.07,31.46,3.05,1,1,1,19.02,25.12,25.36,37.55,0.00,6.10,6.10,453.07,Detailed,DOE-2,74.32,185.81,135.64,50.17,6,10,0,Yes
+ Zone Information, LEFT FORK,-36.9,0.00,31.70,0.00,22.07,31.46,3.05,1,1,1,19.02,25.12,25.36,37.55,0.00,6.10,6.10,453.07,Detailed,DOE-2,74.32,185.81,135.64,50.17,6,10,0,Yes
 
- Zone Information, MIDDLE FORK,0.0,4.88,35.36,0.00,31.21,28.41,3.05,1,1,1,25.12,37.31,21.70,35.11,0.00,6.10,6.10,453.07,Detailed,DOE-2,74.32,185.81,155.71,30.10,6,1,0,Yes
+ Zone Information, MIDDLE FORK,0.0,4.88,35.36,0.00,31.21,28.41,3.05,1,1,1,25.12,37.31,21.70,35.11,0.00,6.10,6.10,453.07,Detailed,DOE-2,74.32,185.81,155.71,30.10,6,1,0,Yes
 
- Zone Information, RIGHT FORK,36.9,10.97,35.36,0.00,36.70,20.48,3.05,1,1,1,29.99,43.40,15.85,25.12,0.00,6.10,6.10,453.07,Detailed,DOE-2,74.32,185.81,135.64,50.17,6,10,0,Yes
+ Zone Information, RIGHT FORK,36.9,10.97,35.36,0.00,36.70,20.48,3.05,1,1,1,29.99,43.40,15.85,25.12,0.00,6.10,6.10,453.07,Detailed,DOE-2,74.32,185.81,135.64,50.17,6,10,0,Yes
 
-#### Field:  &lt;Zone Information&gt;
+#### Field:  &lt;Zone Information&gt;
 
 This field contains the constant “Zone Information” for each line.
 
@@ -1476,7 +1475,7 @@ Like the ceiling height, this user can also enter this value in the IDF. Volume 
 
 The interior convection algorithm shown earlier (entire building) can be overridden for each zone by an entry in the individual Zone object. This field will show which method is operational for the zone.
 
-#### Field:  Floor Area {m2}
+#### Field:  Floor Area {m2}
 
 This field is calculated from the floor surfaces entered for the zone. Units are m<sup>2</sup>.
 
@@ -1516,19 +1515,19 @@ Nominal Zone Internal Gains (people, lights, electric equipment, etc.) are summa
 
 ! &lt;Zone Internal Gains/Equipment Information - Nominal&gt;,Zone Name, Floor Area {m2},\# Occupants,Area per Occupant {m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},Electric Load {W/m2},Gas Load {W/m2},Other Load {W/m2},Hot Water Eq {W/m2},Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard Heat
 
- Zone Internal Gains, PLENUM-1,463.60,0.0,N/A,0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,No
+ Zone Internal Gains, PLENUM-1,463.60,0.0,N/A,0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,No
 
- Zone Internal Gains, SPACE1-1,99.16,11.0,9.015,0.111,15.974,10.649,0.000,0.000,0.000,0.000,26.624,No
+ Zone Internal Gains, SPACE1-1,99.16,11.0,9.015,0.111,15.974,10.649,0.000,0.000,0.000,0.000,26.624,No
 
- Zone Internal Gains, SPACE2-1,42.74,5.0,8.547,0.117,16.006,10.670,0.000,0.000,0.000,0.000,26.676,No
+ Zone Internal Gains, SPACE2-1,42.74,5.0,8.547,0.117,16.006,10.670,0.000,0.000,0.000,0.000,26.676,No
 
- Zone Internal Gains, SPACE3-1,96.48,11.0,8.771,0.114,16.418,10.945,0.000,0.000,0.000,0.000,27.363,No
+ Zone Internal Gains, SPACE3-1,96.48,11.0,8.771,0.114,16.418,10.945,0.000,0.000,0.000,0.000,27.363,No
 
- Zone Internal Gains, SPACE4-1,42.74,5.0,8.547,0.117,16.006,10.670,0.000,0.000,0.000,0.000,26.676,No
+ Zone Internal Gains, SPACE4-1,42.74,5.0,8.547,0.117,16.006,10.670,0.000,0.000,0.000,0.000,26.676,No
 
- Zone Internal Gains, SPACE5-1,182.49,20.0,9.125,0.110,16.242,10.828,0.000,0.000,0.000,0.000,27.070,No
+ Zone Internal Gains, SPACE5-1,182.49,20.0,9.125,0.110,16.242,10.828,0.000,0.000,0.000,0.000,27.070,No
 
-#### Field:  &lt;Zone Internal Gains/Equipment Information - Nominal&gt;
+#### Field:  &lt;Zone Internal Gains/Equipment Information - Nominal&gt;
 
 This field contains the constant “Zone Internal Gains” for each line.
 
@@ -1588,15 +1587,15 @@ This field is “yes” if there is outdoor controlled baseboard heat in a Zone.
 
 ! &lt;People Internal Gains - Nominal&gt;,Name,Schedule Name,Zone Name,Zone Floor Area {m2},\# Zone Occupants,Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum Number of People,Nominal Maximum Number of People
 
-People Internal Gains,  SPACE1-1 PEOPLE 1, OCCUPY-1, SPACE1-1, 99.16, 11.0, 11.0, 0.111, 9.015, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
+People Internal Gains,  SPACE1-1 PEOPLE 1, OCCUPY-1, SPACE1-1, 99.16, 11.0, 11.0, 0.111, 9.015, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
 
- People Internal Gains,  SPACE2-1 PEOPLE 1, OCCUPY-1, SPACE2-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
+ People Internal Gains,  SPACE2-1 PEOPLE 1, OCCUPY-1, SPACE2-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
 
- People Internal Gains,  SPACE3-1 PEOPLE 1, OCCUPY-1, SPACE3-1, 96.48, 11.0, 11.0, 0.114, 8.771, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
+ People Internal Gains,  SPACE3-1 PEOPLE 1, OCCUPY-1, SPACE3-1, 96.48, 11.0, 11.0, 0.114, 8.771, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
 
- People Internal Gains,  SPACE4-1 PEOPLE 1, OCCUPY-1, SPACE4-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
+ People Internal Gains,  SPACE4-1 PEOPLE 1, OCCUPY-1, SPACE4-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
 
- People Internal Gains,  SPACE5-1 PEOPLE 1, OCCUPY-1, SPACE5-1, 182.49, 20.0, 20.0, 0.110, 9.125, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 20
+ People Internal Gains,  SPACE5-1 PEOPLE 1, OCCUPY-1, SPACE5-1, 182.49, 20.0, 20.0, 0.110, 9.125, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 20
 
 #### Field: &lt;People Internal Gains - Nominal&gt;
 
@@ -1704,15 +1703,15 @@ This numeric field is the calculated maximum number of people based on the numbe
 
 ! &lt;Lights Internal Gains - Nominal&gt;, Name, Schedule Name, Zone Name, Zone Floor Area {m2}, \# Zone Occupants, Lighting Level {W}, Lights/Floor Area {W/m2}, Lights per person {W/person}, Fraction Return Air, Fraction Radiant, Fraction Short Wave, Fraction Convected, Fraction Replaceable, End-Use Category, Nominal Minimum Lighting Level {W}, Nominal Maximum Lighting Level {W}
 
-Lights Internal Gains,  SPACE1-1 LIGHTS 1, LIGHTS-1, SPACE1-1, 99.16, 11.0, 1584.000, 15.974, 144.000, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 79.200, 1584.000
+Lights Internal Gains,  SPACE1-1 LIGHTS 1, LIGHTS-1, SPACE1-1, 99.16, 11.0, 1584.000, 15.974, 144.000, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 79.200, 1584.000
 
- Lights Internal Gains,  SPACE2-1 LIGHTS 1, LIGHTS-1, SPACE2-1, 42.74, 5.0, 684.000, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 34.200, 684.000
+ Lights Internal Gains,  SPACE2-1 LIGHTS 1, LIGHTS-1, SPACE2-1, 42.74, 5.0, 684.000, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 34.200, 684.000
 
- Lights Internal Gains,  SPACE3-1 LIGHTS 1, LIGHTS-1, SPACE3-1, 96.48, 11.0, 1584.000, 16.418, 144.000, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 79.200, 1584.000
+ Lights Internal Gains,  SPACE3-1 LIGHTS 1, LIGHTS-1, SPACE3-1, 96.48, 11.0, 1584.000, 16.418, 144.000, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 79.200, 1584.000
 
- Lights Internal Gains,  SPACE4-1 LIGHTS 1, LIGHTS-1, SPACE4-1, 42.74, 5.0, 684.000, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 34.200, 684.000
+ Lights Internal Gains,  SPACE4-1 LIGHTS 1, LIGHTS-1, SPACE4-1, 42.74, 5.0, 684.000, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 34.200, 684.000
 
- Lights Internal Gains,  SPACE5-1 LIGHTS 1, LIGHTS-1, SPACE5-1, 182.49, 20.0, 2964.000, 16.242, 148.200, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 148.200, 2964.000
+ Lights Internal Gains,  SPACE5-1 LIGHTS 1, LIGHTS-1, SPACE5-1, 182.49, 20.0, 2964.000, 16.242, 148.200, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 148.200, 2964.000
 
 #### Field: &lt;Lights Internal Gains - Nominal&gt;
 
@@ -1788,15 +1787,15 @@ These equipments are all reported similarly. Electric Equipment is used in the e
 
 ! &lt;ElectricEquipment Internal Gains - Nominal&gt;, Name, Schedule Name, Zone Name, Zone Floor Area {m2}, \# Zone Occupants, Equipment Level {W}, Equipment/Floor Area {W/m2}, Equipment per person {W/person}, Fraction Latent, Fraction Radiant, Fraction Lost, Fraction Convected, End-Use SubCategory, Nominal Minimum Equipment Level {W}, Nominal Maximum Equipment Level {W}
 
-ElectricEquipment Internal Gains,  SPACE1-1 ELECEQ 1, EQUIP-1, SPACE1-1, 99.16, 11.0, 1056.000, 10.649, 96.000, 0.000, 0.300, 0.000, 0.700, General, 21.120, 950.400
+ElectricEquipment Internal Gains,  SPACE1-1 ELECEQ 1, EQUIP-1, SPACE1-1, 99.16, 11.0, 1056.000, 10.649, 96.000, 0.000, 0.300, 0.000, 0.700, General, 21.120, 950.400
 
- ElectricEquipment Internal Gains,  SPACE2-1 ELECEQ 1, EQUIP-1, SPACE2-1, 42.74, 5.0, 456.000, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, General, 9.120, 410.400
+ ElectricEquipment Internal Gains,  SPACE2-1 ELECEQ 1, EQUIP-1, SPACE2-1, 42.74, 5.0, 456.000, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, General, 9.120, 410.400
 
- ElectricEquipment Internal Gains,  SPACE3-1 ELECEQ 1, EQUIP-1, SPACE3-1, 96.48, 11.0, 1056.000, 10.945, 96.000, 0.000, 0.300, 0.000, 0.700, General, 21.120, 950.400
+ ElectricEquipment Internal Gains,  SPACE3-1 ELECEQ 1, EQUIP-1, SPACE3-1, 96.48, 11.0, 1056.000, 10.945, 96.000, 0.000, 0.300, 0.000, 0.700, General, 21.120, 950.400
 
- ElectricEquipment Internal Gains,  SPACE4-1 ELECEQ 1, EQUIP-1, SPACE4-1, 42.74, 5.0, 456.000, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, General, 9.120, 410.400
+ ElectricEquipment Internal Gains,  SPACE4-1 ELECEQ 1, EQUIP-1, SPACE4-1, 42.74, 5.0, 456.000, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, General, 9.120, 410.400
 
- ElectricEquipment Internal Gains,  SPACE5-1 ELECEQ 1, EQUIP-1, SPACE5-1, 182.49, 20.0, 1976.000, 10.828, 98.800, 0.000, 0.300, 0.000, 0.700, General, 39.520, 1778.400
+ ElectricEquipment Internal Gains,  SPACE5-1 ELECEQ 1, EQUIP-1, SPACE5-1, 182.49, 20.0, 1976.000, 10.828, 98.800, 0.000, 0.300, 0.000, 0.700, General, 39.520, 1778.400
 
 #### Field: &lt;[Specific] Equipment Internal Gains - Nominal&gt;
 
@@ -1868,9 +1867,9 @@ Other equipment report is shown below (does not have an end-use category – is 
 
 ! &lt;OtherEquipment Internal Gains - Nominal&gt;, Name, Schedule Name, Zone Name, Zone Floor Area {m2}, \# Zone Occupants, Equipment Level {W}, Equipment/Floor Area {W/m2}, Equipment per person {W/person}, Fraction Latent, Fraction Radiant, Fraction Lost, Fraction Convected, Nominal Minimum Equipment Level {W}, Nominal Maximum Equipment Level {W}
 
-OtherEquipment Internal Gains,  TEST 352A, ALWAYSON, ZONE ONE, 232.26, 0.0, 352.000, 1.516, N/A, 0.000, 0.000, 0.000, 1.000, 352.000, 352.000
+OtherEquipment Internal Gains,  TEST 352A, ALWAYSON, ZONE ONE, 232.26, 0.0, 352.000, 1.516, N/A, 0.000, 0.000, 0.000, 1.000, 352.000, 352.000
 
- OtherEquipment Internal Gains,  TEST 352 MINUS, ALWAYSON, ZONE ONE, 232.26, 0.0, -352.000, -1.516, N/A, 0.000, 0.000, 0.000, 1.000, -352.000, -352.000
+ OtherEquipment Internal Gains,  TEST 352 MINUS, ALWAYSON, ZONE ONE, 232.26, 0.0, -352.000, -1.516, N/A, 0.000, 0.000, 0.000, 1.000, -352.000, -352.000
 
 #### Field: &lt;Other Equipment Internal Gains - Nominal&gt;
 
@@ -1936,7 +1935,7 @@ This numeric field is the calculated maximum amount of the equipment in Watts ba
 
 ! &lt;Outdoor Controlled Baseboard Heat Internal Gains - Nominal&gt;,Name,Schedule Name,Zone Name,Zone Floor Area {m2},\# Zone Occupants,Capacity at Low Temperature {W},Low Temperature {C},Capacity at High Temperature {W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory
 
- Outdoor Controlled Baseboard Heat Internal Gains, SPACE4-1 BBHEAT 1,EQUIP-1,SPACE4-1,42.74,5.0,1500.000,0.000,500.000,10.000,0.500,0.500,Baseboard Heat
+ Outdoor Controlled Baseboard Heat Internal Gains, SPACE4-1 BBHEAT 1,EQUIP-1,SPACE4-1,42.74,5.0,1500.000,0.000,500.000,10.000,0.500,0.500,Baseboard Heat
 
 #### Field: &lt;Outdoor Controlled Baseboard Heat Internal Gains - Nominal&gt;
 
@@ -2002,13 +2001,13 @@ Infiltration, Ventilation, Mixing, Cross Mixing are only specified when the Airf
 
 ZoneInfiltration Airflow Stats, SPACE1-1 INFIL 1,INFIL-SCH,SPACE1-1,99.16,11.0,3.200E-002,3.227E-004,4.372E-004,0.482,0.000,0.000,0.224,0.000
 
- ZoneInfiltration Airflow Stats, SPACE2-1 INFIL 1,INFIL-SCH,SPACE2-1,42.74,5.0,1.400E-002,3.276E-004,3.838E-004,0.488,0.000,0.000,0.224,0.000
+ ZoneInfiltration Airflow Stats, SPACE2-1 INFIL 1,INFIL-SCH,SPACE2-1,42.74,5.0,1.400E-002,3.276E-004,3.838E-004,0.488,0.000,0.000,0.224,0.000
 
- ZoneInfiltration Airflow Stats, SPACE3-1 INFIL 1,INFIL-SCH,SPACE3-1,96.48,11.0,3.200E-002,3.317E-004,4.372E-004,0.482,0.000,0.000,0.224,0.000
+ ZoneInfiltration Airflow Stats, SPACE3-1 INFIL 1,INFIL-SCH,SPACE3-1,96.48,11.0,3.200E-002,3.317E-004,4.372E-004,0.482,0.000,0.000,0.224,0.000
 
- ZoneInfiltration Airflow Stats, SPACE4-1 INFIL 1,INFIL-SCH,SPACE4-1,42.74,5.0,1.400E-002,3.276E-004,3.838E-004,0.488,0.000,0.000,0.224,0.000
+ ZoneInfiltration Airflow Stats, SPACE4-1 INFIL 1,INFIL-SCH,SPACE4-1,42.74,5.0,1.400E-002,3.276E-004,3.838E-004,0.488,0.000,0.000,0.224,0.000
 
- ZoneInfiltration Airflow Stats, SPACE5-1 INFIL 1,INFIL-SCH,SPACE5-1,182.49,20.0,6.200E-002,3.397E-004,N/A,0.499,0.000,0.000,0.224,0.000
+ ZoneInfiltration Airflow Stats, SPACE5-1 INFIL 1,INFIL-SCH,SPACE5-1,182.49,20.0,6.200E-002,3.397E-004,N/A,0.499,0.000,0.000,0.224,0.000
 
 #### Field: &lt;Infiltration Airflow Stats - Nominal&gt;
 
@@ -2066,7 +2065,7 @@ This field value is the B coefficient in the above equation.
 
 This field value is the C coefficient in the above equation.
 
-#### Field:  Equation D - Velocity Squared Term Coefficient {s2/m2}
+#### Field:  Equation D - Velocity Squared Term Coefficient {s2/m2}
 
 This field value is the D coefficient in the above equation.
 
@@ -2074,17 +2073,17 @@ This field value is the D coefficient in the above equation.
 
 ! &lt;Ventilation Airflow Stats - Nominal&gt;,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, \# Zone Occupants,Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person},ACH - Air Changes per Hour,Fan Type {Exhaust;Intake;Natural/None},Fan Pressure Rise {?},Fan Efficiency {},Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2},Minimum Indoor Temperature/Schedule,Maximum Indoor Temperature/Schedule,Delta Temperature/Schedule,Minimum Outdoor Temperature/Schedule,Maximum Outdoor Temperature/Schedule,Maximum WindSpeed
 
- Ventilation Airflow Stats, SPACE1-1 VENTL 1,NIGHTVENTSCHED,SPACE1-1,99.16,11.0,5.295E-002,5.340E-004,4.814E-003,0.797,Intake,67.000,0.7,1.000,0.000,0.000,0.000,MININDOORTEMP,MAXINDOORTEMP,DELTATEMP,MINOUTDOORTEMP,MAXOUTDOORTEMP,40.00
+ Ventilation Airflow Stats, SPACE1-1 VENTL 1,NIGHTVENTSCHED,SPACE1-1,99.16,11.0,5.295E-002,5.340E-004,4.814E-003,0.797,Intake,67.000,0.7,1.000,0.000,0.000,0.000,MININDOORTEMP,MAXINDOORTEMP,DELTATEMP,MINOUTDOORTEMP,MAXOUTDOORTEMP,40.00
 
- Ventilation Airflow Stats, SPACE1-1 VENTL 2,NIGHTVENTSCHED,SPACE1-1,99.16,11.0,5.295E-002,5.340E-004,4.814E-003,0.797,Intake,67.000,0.7,1.000,0.000,0.000,0.000,MININDOORTEMP,MAXINDOORTEMP,DELTATEMP,MINOUTDOORTEMP,MAXOUTDOORTEMP,40.00
+ Ventilation Airflow Stats, SPACE1-1 VENTL 2,NIGHTVENTSCHED,SPACE1-1,99.16,11.0,5.295E-002,5.340E-004,4.814E-003,0.797,Intake,67.000,0.7,1.000,0.000,0.000,0.000,MININDOORTEMP,MAXINDOORTEMP,DELTATEMP,MINOUTDOORTEMP,MAXOUTDOORTEMP,40.00
 
- Ventilation Airflow Stats, SPACE2-1 VENTL 1,NIGHTVENTSCHED,SPACE2-1,42.74,5.0,7.030E-002,1.645E-003,1.406E-002,2.450,Intake,67.000,0.7,1.000,0.000,0.000,0.000,18.00,100.00,2.00,-100.00,100.00,40.00
+ Ventilation Airflow Stats, SPACE2-1 VENTL 1,NIGHTVENTSCHED,SPACE2-1,42.74,5.0,7.030E-002,1.645E-003,1.406E-002,2.450,Intake,67.000,0.7,1.000,0.000,0.000,0.000,18.00,100.00,2.00,-100.00,100.00,40.00
 
 Ventilation Airflow Stats, RESISTIVE ZONE VENTL 1,INF-SCHED,RESISTIVE ZONE,37.16,3.0,2.000E-002,5.382E-004,6.667E-003,0.636,Natural,0.000,1.0,0.606,2.020E-002,5.980E-004,0.000,18.00,100.00,1.00,-100.00,100.00,40.00
 
- Ventilation Airflow Stats, EAST ZONE VENTL 1,INF-SCHED,EAST ZONE,37.16,3.0,2.000E-002,5.382E-004,6.667E-003,0.636,Natural,0.000,1.0,0.606,2.020E-002,5.980E-004,0.000,18.00,100.00,1.00,-100.00,100.00,40.00
+ Ventilation Airflow Stats, EAST ZONE VENTL 1,INF-SCHED,EAST ZONE,37.16,3.0,2.000E-002,5.382E-004,6.667E-003,0.636,Natural,0.000,1.0,0.606,2.020E-002,5.980E-004,0.000,18.00,100.00,1.00,-100.00,100.00,40.00
 
- Ventilation Airflow Stats, NORTH ZONE VENTL 1,INF-SCHED,NORTH ZONE,55.74,4.0,2.000E-002,3.588E-004,5.000E-003,0.424,Natural,0.000,1.0,0.606,2.020E-002,5.980E-004,0.000,18.00,100.00,1.00,-100.00,100.00,40.00
+ Ventilation Airflow Stats, NORTH ZONE VENTL 1,INF-SCHED,NORTH ZONE,55.74,4.0,2.000E-002,3.588E-004,5.000E-003,0.424,Natural,0.000,1.0,0.606,2.020E-002,5.980E-004,0.000,18.00,100.00,1.00,-100.00,100.00,40.00
 
 #### Field: &lt;Ventilation Airflow Stats - Nominal&gt;
 
@@ -2154,7 +2153,7 @@ This field value is the B coefficient in the above equation.
 
 This field value is the C coefficient in the above equation.
 
-#### Field:  Equation D - Velocity Squared Term Coefficient {s2/m2}
+#### Field:  Equation D - Velocity Squared Term Coefficient {s2/m2}
 
 This field value is the D coefficient in the above equation.
 
@@ -2186,7 +2185,7 @@ This is the wind speed (m/s) above which ventilation is shut off.
 
 ! &lt;Mixing Airflow Stats - Nominal&gt;,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, \# Zone Occupants,Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person},ACH - Air Changes per Hour,From/Source Zone,Delta Temperature {C}
 
- Mixing Airflow Stats, RESISTIVE ZONE MIXNG 1,ZONE MIXING,RESISTIVE ZONE,37.16,3.0,5.000E-002,1.345E-003,1.667E-002,1.589,EAST ZONE,0.00
+ Mixing Airflow Stats, RESISTIVE ZONE MIXNG 1,ZONE MIXING,RESISTIVE ZONE,37.16,3.0,5.000E-002,1.345E-003,1.667E-002,1.589,EAST ZONE,0.00
 
 #### Field: &lt;Mixing Airflow Stats - Nominal&gt;
 
@@ -2240,9 +2239,9 @@ This number controls when mixing air from the source zone is sent to the receivi
 
 ! &lt;CrossMixing Airflow Stats - Nominal&gt;,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, \# Zone Occupants,Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person},ACH - Air Changes per Hour,From/Source Zone,Delta Temperature {C}
 
- CrossMixing Airflow Stats, EAST ZONE XMIXNG 1,ZONE MIXING,EAST ZONE,37.16,3.0,0.100,2.691E-003,3.333E-002,3.178,NORTH ZONE,1.00
+ CrossMixing Airflow Stats, EAST ZONE XMIXNG 1,ZONE MIXING,EAST ZONE,37.16,3.0,0.100,2.691E-003,3.333E-002,3.178,NORTH ZONE,1.00
 
- CrossMixing Airflow Stats, NORTH ZONE XMIXNG 1,ZONE MIXING,NORTH ZONE,55.74,4.0,0.100,1.794E-003,2.500E-002,2.119,EAST ZONE,1.00
+ CrossMixing Airflow Stats, NORTH ZONE XMIXNG 1,ZONE MIXING,NORTH ZONE,55.74,4.0,0.100,1.794E-003,2.500E-002,2.119,EAST ZONE,1.00
 
 #### Field: &lt;CrossMixing Airflow Stats - Nominal&gt;
 
@@ -2294,11 +2293,11 @@ This number controls when mixing air from the source zone is sent to the receivi
 
 ### RefrigerationDoor Mixing
 
-! &lt;RefrigerationDoorMixing  Airflow Stats - Nominal&gt;, Name, Zone 1 Name, Zone 2 Name, Door Opening Schedule Name, Door Height {m},Door Area {m2},Door Protection Type
+! &lt;RefrigerationDoorMixing  Airflow Stats - Nominal&gt;, Name, Zone 1 Name, Zone 2 Name, Door Opening Schedule Name, Door Height {m},Door Area {m2},Door Protection Type
 
- RefrigerationDoorMixing Airflow Stats, FREEZER1\_SUBFREEZER1, FREEZER\_1, SUBFREEZER, FREEZER1DOORSCHEDA, 1.800, 2.300, StripCurtain
+ RefrigerationDoorMixing Airflow Stats, FREEZER1\_SUBFREEZER1, FREEZER\_1, SUBFREEZER, FREEZER1DOORSCHEDA, 1.800, 2.300, StripCurtain
 
- RefrigerationDoorMixing Airflow Stats, FREEZER5\_COOLER2, COOLER\_2, FREEZER\_5, FREEZER5DOORSCHEDA, 1.800, 2.300, AirCurtain
+ RefrigerationDoorMixing Airflow Stats, FREEZER5\_COOLER2, COOLER\_2, FREEZER\_5, FREEZER5DOORSCHEDA, 1.800, 2.300, AirCurtain
 
 #### Field: &lt;RefrigerationDoorMixing Airflow Stats - Nominal&gt;
 
@@ -2338,7 +2337,7 @@ Similar to the Zone Summary, the Shading Summary:
 
 ! &lt;Shading Summary&gt;, Number of Fixed Detached Shades, Number of Building Detached Shades, Number of Attached Shades
 
- Shading Summary,0,6,14
+ Shading Summary,0,6,14
 
 #### Field: &lt;Shading Summary&gt;
 
@@ -2366,7 +2365,7 @@ A good example of this is the surface details report(s) (**Output:Surfaces:List,
 
 **Line 3:** ! &lt;Units&gt;,,,,,{W/m2-K},{W/m2-K},{m2},{m2},{m2},{deg},{deg},{m},{m},{m},,,,,,,,,,X {m},Y {m},Z {m},X {m},Y {m},Z {m},X {m},Y {m},Z {m},X {m},Y {m},Z {m}
 
-**Ex Line 1:** Shading\_Surfaces,Number of Shading Surfaces,   10
+**Ex Line 1:** Shading\_Surfaces,Number of Shading Surfaces,   10
 
 **Ex Line 2:** Shading\_Surface,WEST SIDE BUSHES,Detached Shading:Building,,,,, 180.0, 180.0, 180.0, 90.0, 90.0, 60.00, 3.00,,,,,,,,,,, 4, -5.00, 0.00, 3.00, -5.00, 0.00, 0.00, -5.00, 60.00, 0.00, -5.00, 60.00, 3.00
 
@@ -2374,15 +2373,15 @@ A good example of this is the surface details report(s) (**Output:Surfaces:List,
 
 **Ex Line 2:** Shading\_Surface,EAST SIDE TREE2,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 0.0, 90.0, 20.00, 50.99,,,,,,,,,,, 3, 70.00, 30.00, 50.00, 80.00, 30.00, 0.00, 60.00, 30.00, 0.00
 
-**Ex Line 1:** Zone\_Surfaces,HEARTLAND AREA,   35
+**Ex Line 1:** Zone\_Surfaces,HEARTLAND AREA,   35
 
-**Ex Line 2:** HeatTransfer\_Surface,ZN001:WALL001,Wall,,EXTERIOR,0.644, 0.588, 136.0, 200.0, 136.0, 180.0, 90.0, 20.0, 10.0, 0.00,ExternalEnvironment,ASHRAEDetailed,ASHRAEDetailed,SunExposed,WindExposed, 0.50, 0.50, 0.67,  0.33, 4, 20.00, 10.00, 10.00, 20.00, 10.00, 0.00, 40.00, 10.00, 0.00, 40.00, 10.00, 10.00
+**Ex Line 2:** HeatTransfer\_Surface,ZN001:WALL001,Wall,,EXTERIOR,0.644, 0.588, 136.0, 200.0, 136.0, 180.0, 90.0, 20.0, 10.0, 0.00,ExternalEnvironment,ASHRAEDetailed,ASHRAEDetailed,SunExposed,WindExposed, 0.50, 0.50, 0.67,  0.33, 4, 20.00, 10.00, 10.00, 20.00, 10.00, 0.00, 40.00, 10.00, 0.00, 40.00, 10.00, 10.00
 
-**Ex Line 2:** HeatTransfer\_Surface,ZN001:WALL001:WIN001,Window,ZN001:WALL001,SINGLE PANE HW WINDOW,N/A,6.121, 64.00000, 64.00000, 64.00000,180.0, 90.0, 8.00, 8.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,  0.50,  0.50,  0.71,  0.29, 4, 26.00, 10.00, 8.10, 26.00, 10.00, 0.10, 34.00, 10.00, 0.10, 34.00, 10.00, 8.10
+**Ex Line 2:** HeatTransfer\_Surface,ZN001:WALL001:WIN001,Window,ZN001:WALL001,SINGLE PANE HW WINDOW,N/A,6.121, 64.00000, 64.00000, 64.00000,180.0, 90.0, 8.00, 8.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,  0.50,  0.50,  0.71,  0.29, 4, 26.00, 10.00, 8.10, 26.00, 10.00, 0.10, 34.00, 10.00, 0.10, 34.00, 10.00, 8.10
 
-**Ex Line 2:** HeatTransfer\_Surface,ZN001:WALL002,Wall,,EXTERIOR,0.644,0.588, 155.0, 200.0, 155.0, 90.0, 90.0, 20.00, 10.00, 0.00,ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50,  0.50,  0.73,  0.27, 4, 50.00, 20.00, 10.00, 50.00, 20.00, 0.00, 50.00, 40.00, 0.00, 50.00, 40.00, 10.00
+**Ex Line 2:** HeatTransfer\_Surface,ZN001:WALL002,Wall,,EXTERIOR,0.644,0.588, 155.0, 200.0, 155.0, 90.0, 90.0, 20.00, 10.00, 0.00,ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50,  0.50,  0.73,  0.27, 4, 50.00, 20.00, 10.00, 50.00, 20.00, 0.00, 50.00, 40.00, 0.00, 50.00, 40.00, 10.00
 
-**Ex Line 2:** HeatTransfer\_Surface,ZN001:WALL002:WIN001,Window,ZN001:WALL002,SINGLE PANE HW WINDOW,N/A,6.121, 15.0, 15.0, 15.0, 90.0, 90.0, 3.00, 5.00,  0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,  0.50,  0.50,  0.76,  0.24, 4, 50.00, 22.20, 7.30, 50.00, 22.20, 2.30, 50.00, 25.20, 2.30, 50.00, 25.20, 7.30
+**Ex Line 2:** HeatTransfer\_Surface,ZN001:WALL002:WIN001,Window,ZN001:WALL002,SINGLE PANE HW WINDOW,N/A,6.121, 15.0, 15.0, 15.0, 90.0, 90.0, 3.00, 5.00,  0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,  0.50,  0.50,  0.76,  0.24, 4, 50.00, 22.20, 7.30, 50.00, 22.20, 2.30, 50.00, 25.20, 2.30, 50.00, 25.20, 7.30
 
 
 
@@ -2394,7 +2393,7 @@ A good example of this is the surface details report(s) (**Output:Surfaces:List,
 
 
 
-**Ex Line 1:** Zone\_Surfaces,MAINE WING,   12
+**Ex Line 1:** Zone\_Surfaces,MAINE WING,   12
 
 **Ex Line 2:** HeatTransfer\_Surface, ZN005:WALL001, Wall, , EXTERIOR, 0.644, 0.588, 100.00, 100.00, 100.00, 180.00, 90.00, 10.00, 10.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.74, 0.26, 4, 50.00, 40.00, 10.00, 50.00, 40.00, 0.00, 60.00, 40.00, 0.00, 60.00, 40.00, 10.00
 
@@ -2424,11 +2423,11 @@ This field, then, specifies the number of surfaces of the type (zone or shading)
 
 The example lines illustrate:
 
-Shading\_Surfaces,Number of Shading Surfaces,   10
+Shading\_Surfaces,Number of Shading Surfaces,   10
 
-Zone\_Surfaces,HEARTLAND AREA,   35
+Zone\_Surfaces,HEARTLAND AREA,   35
 
-Zone\_Surfaces,MAINE WING,   12
+Zone\_Surfaces,MAINE WING,   12
 
 
 
@@ -2472,7 +2471,7 @@ For windows, no value is reported because the film coefficients cannot be remove
 
 A nominal thermal conductance for the surface is calculated for the surface, including film coefficients. Units for this field are W/m<sup>2</sup>-K.
 
-For opaque surfaces, interior and exterior film coefficients are added to the surface construction based on the prescribed R-values for interior and exterior film coefficients as found in ASHRAE 90.1-2004, Appendix A, and shown below:  The SI values are the exact values used inside EnergyPlus.
+For opaque surfaces, interior and exterior film coefficients are added to the surface construction based on the prescribed R-values for interior and exterior film coefficients as found in ASHRAE 90.1-2004, Appendix A, and shown below:  The SI values are the exact values used inside EnergyPlus.
 
 <table class="table table-striped">
   <tr>
@@ -2511,7 +2510,7 @@ For opaque surfaces, interior and exterior film coefficients are added to the su
 </table>
 
 
-NOTE:  The resulting "Nominal U with film coefs" is only for comparison purposes with the ASHRAE 90.1 requirements. Actual film coefficients are calculated during the simulation and are dependent on several factors that may change during the simulation time period.
+NOTE:  The resulting "Nominal U with film coefs" is only for comparison purposes with the ASHRAE 90.1 requirements. Actual film coefficients are calculated during the simulation and are dependent on several factors that may change during the simulation time period.
 
 For windows, the "Nominal U with film coefs" is calculated using the following assumptions from the WINDOW 5 program (also NFRC winter conditions):
 
@@ -2519,7 +2518,7 @@ For windows, the "Nominal U with film coefs" is calculated using the following a
 
 - Outdoor air temperature = -18 C (-.4 F)
 
-- Exterior film coefficient =  26 W/m<sup>2</sup> (4.58 ft<sup>2</sup>-F-hr/BTU)
+- Exterior film coefficient =  26 W/m<sup>2</sup> (4.58 ft<sup>2</sup>-F-hr/BTU)
 
 - Interior film coefficient = Calculated by EnergyPlus convection algorithm
 
@@ -2613,7 +2612,7 @@ Figure 3. Surface Details with Window/Wall % calculated
 
 ### Surface Convection Parameters
 
-When detailed surface reports are requested, extra information on the surfaces related to how convection coefficients are calculated are also output to the EIO file.  The first block of data relates to overall geometry parameters assigned to each surface and has the following header
+When detailed surface reports are requested, extra information on the surfaces related to how convection coefficients are calculated are also output to the EIO file.  The first block of data relates to overall geometry parameters assigned to each surface and has the following header
 
 ! &lt;Surface Convection Parameters&gt;, Surface Name, Outside Model Assignment , Outside Area [m2], Outside Perimeter [m], Outside Height [m], Inside Model Assignment, Inside Height [cm], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio [ ],Window Location [ ], Near Radiant [T/F], Has Active HVAC [T/F]
 
@@ -2672,47 +2671,47 @@ This is an integer code for the type of model assigned to the outside face, if a
 
 #### Field: Outside Area
 
-This is the area used for convection calculations for the outside face.  It is intended to be a model of the area of the larger group of surfaces that this surfaces is a part of. [m<sup>2</sup>]
+This is the area used for convection calculations for the outside face.  It is intended to be a model of the area of the larger group of surfaces that this surfaces is a part of. [m<sup>2</sup>]
 
 #### Field Outside Perimeter
 
-This is the length of edge used for convection calculations for the outside face.  It is intended to be a model of the perimeter for a larger group of surfaces that surface is a part of.  [m]
+This is the length of edge used for convection calculations for the outside face.  It is intended to be a model of the perimeter for a larger group of surfaces that surface is a part of.  [m]
 
 #### Field: Outside Height
 
-This is the height scale used for convection calculations for the outside face.  It is intended to be a model of the overall height of a larger group of surfaces that this surface is a part of. [m]
+This is the height scale used for convection calculations for the outside face.  It is intended to be a model of the overall height of a larger group of surfaces that this surface is a part of. [m]
 
 #### Field: Inside Model Assignment
 
- This is an integer code for the type of model assigned to the inside face, if a specific model has been assigned. Surface(SurfLoop)%IntConvCoeff
+ This is an integer code for the type of model assigned to the inside face, if a specific model has been assigned. Surface(SurfLoop)%IntConvCoeff
 
 #### Field: Inside Height
 
-This is the height scale used for convection calculations for the inside face.  It is intended to be for the entire zone. [m]
+This is the height scale used for convection calculations for the inside face.  It is intended to be for the entire zone. [m]
 
 #### Field: Inside Perimeter Envelope
 
-This is the length scale for the zone for the amount of exterior envelope with glazing.  It is the length of wall that has glazed exterior.[m]
+This is the length scale for the zone for the amount of exterior envelope with glazing.  It is the length of wall that has glazed exterior.[m]
 
 #### Field: Inside Hydraulic Diameter
 
-This is the length scale for horizontal surfaces in the zone.   It is calculated using 4 \* area/ perimeter and is used for natural convection on the floor or ceiling. [m]
+This is the length scale for horizontal surfaces in the zone.   It is calculated using 4 \* area/ perimeter and is used for natural convection on the floor or ceiling. [m]
 
 #### Field: Window to Wall Ratio
 
-This is the ratio of exterior window area to exterior wall area.  It is for the zone. [non dimensional]
+This is the ratio of exterior window area to exterior wall area.  It is for the zone. [non dimensional]
 
 #### Field: Window Location
 
-This is an integer code for relative window positioning.  It is used for some inside face correlations.
+This is an integer code for relative window positioning.  It is used for some inside face correlations.
 
 #### Field: Near Radiant
 
-This is a true or false flag indicating if this surfaces is near a radiant HVAC unit. If “T” then surface is is modeled as near a radiant HVAC device.  If  “F” then surface is normal.
+This is a true or false flag indicating if this surfaces is near a radiant HVAC unit. If “T” then surface is is modeled as near a radiant HVAC device.  If  “F” then surface is normal.
 
 #### Field: Has Active HVAC
 
-This is a true or false flag indicating if this surface has active HVAC elements inside it.  If “T” then surface is modeled has having HVAC pipes or element inside it making it active for heating or cooling.  If  “F” then surface is normal.
+This is a true or false flag indicating if this surface has active HVAC elements inside it.  If “T” then surface is modeled has having HVAC pipes or element inside it making it active for heating or cooling.  If  “F” then surface is normal.
 
 ### OtherSideCoefficient Outputs
 
@@ -2734,10 +2733,10 @@ where:
 
 * T = Outdoor air Temperature when Combined convective/radiative film Coeff &gt; 0
 * T = Exterior Surface Temperatre when Combined convective/radiative film Coeff &lt;= 0
-* Tzone  = Temperature of the zone being simulated (°C)
-* Toadb  = Dry-bulb temperature of the outdoor air (°C)
-* Tgrnd  = Temperature of the ground (°C)
-* Wspd  = Outdoor wind speed (m/sec)
+* Tzone  = Temperature of the zone being simulated (°C)
+* Toadb  = Dry-bulb temperature of the outdoor air (°C)
+* Tgrnd  = Temperature of the ground (°C)
+* Wspd  = Outdoor wind speed (m/sec)
 
 #### Field: Name
 
@@ -2793,37 +2792,37 @@ The report is invoked by including the following in the IDF:
 
 **Line 4:**! &lt;CTF&gt;,Time,Outside,Cross,Inside,Flux (except final one)
 
-**Ex Line 1:** Construction,EXTWALL09, 4,10, 0.250,2.545    ,   0.900,   0.900,   0.930,   0.920,Rough
+**Ex Line 1:** Construction,EXTWALL09, 4,10, 0.250,2.545    ,   0.900,   0.900,   0.930,   0.920,Rough
 
-**Ex Line 2:** Material,A2 - 4 IN DENSE FACE BRICK,  0.1015, 1.245, 2082.400, 920.480,  0.8151E-01
+**Ex Line 2:** Material,A2 - 4 IN DENSE FACE BRICK,  0.1015, 1.245, 2082.400, 920.480,  0.8151E-01
 
-**Ex Line 2:** Material:Air,B1 - AIRSPACE RESISTANCE,  0.1604
+**Ex Line 2:** Material:Air,B1 - AIRSPACE RESISTANCE,  0.1604
 
-**Ex Line 2:** Material,C3 - 4 IN HW CONCRETE BLOCK,  0.1015, 0.813,  977.126,  836.800,  0.1249
+**Ex Line 2:** Material,C3 - 4 IN HW CONCRETE BLOCK,  0.1015, 0.813,  977.126,  836.800,  0.1249
 
-**Ex Line 2:** Material,E1 - 3 / 4 IN PLASTER OR GYP BOARD,0.0191,0.726, 1601.846,  836.800,  0.2622E-01
+**Ex Line 2:** Material,E1 - 3 / 4 IN PLASTER OR GYP BOARD,0.0191,0.726, 1601.846,  836.800,  0.2622E-01
 
-**Ex Line 3:** CTF,  10,      0.13890138E-11,      0.95367648E-14,      0.62566281E-10,     -0.39500133E-14
+**Ex Line 3:** CTF,  10,      0.13890138E-11,      0.95367648E-14,      0.62566281E-10,     -0.39500133E-14
 
-**Ex Line 3:** CTF,   9,     -0.32803336E-08,      0.29933755E-10,     -0.60855613E-07,      0.10196216E-10
+**Ex Line 3:** CTF,   9,     -0.32803336E-08,      0.29933755E-10,     -0.60855613E-07,      0.10196216E-10
 
-**Ex Line 3:** CTF,   8,      0.23798948E-05,      0.21201413E-07,      0.21649376E-04,     -0.88463084E-08
+**Ex Line 3:** CTF,   8,      0.23798948E-05,      0.21201413E-07,      0.21649376E-04,     -0.88463084E-08
 
-**Ex Line 3:** CTF,   7,     -0.58681847E-03,      0.38118098E-05,     -0.26539198E-02,      0.25879187E-05
+**Ex Line 3:** CTF,   7,     -0.58681847E-03,      0.38118098E-05,     -0.26539198E-02,      0.25879187E-05
 
-**Ex Line 3:** CTF,   6,      0.46201324E-01,      0.18871269E-03,      0.12095720    ,     -0.26290432E-03
+**Ex Line 3:** CTF,   6,      0.46201324E-01,      0.18871269E-03,      0.12095720    ,     -0.26290432E-03
 
-**Ex Line 3:** CTF,   5,      -1.2828328    ,      0.27337395E-02,      -2.1646103    ,      0.91268499E-02
+**Ex Line 3:** CTF,   5,      -1.2828328    ,      0.27337395E-02,      -2.1646103    ,      0.91268499E-02
 
-**Ex Line 3:** CTF,   4,       13.603723    ,      0.11920108E-01,       17.065325    ,     -0.12663354
+**Ex Line 3:** CTF,   4,       13.603723    ,      0.11920108E-01,       17.065325    ,     -0.12663354
 
-**Ex Line 3:** CTF,   3,      -62.546625    ,      0.15112689E-01,      -64.276824    ,      0.73877389
+**Ex Line 3:** CTF,   3,      -62.546625    ,      0.15112689E-01,      -64.276824    ,      0.73877389
 
-**Ex Line 3:** CTF,   2,       133.27916    ,      0.47414487E-02,       120.00640    ,      -1.9706501
+**Ex Line 3:** CTF,   2,       133.27916    ,      0.47414487E-02,       120.00640    ,      -1.9706501
 
-**Ex Line 3:** CTF,   1,      -130.02410    ,      0.22383019E-03,      -106.88260    ,       2.3359193
+**Ex Line 3:** CTF,   1,      -130.02410    ,      0.22383019E-03,      -106.88260    ,       2.3359193
 
-**Ex Line 3:** CTF,   0,       46.959981    ,      0.53137072E-06,       36.168919   
+**Ex Line 3:** CTF,   0,       46.959981    ,      0.53137072E-06,       36.168919
 
 ### Opaque Constructions
 
@@ -2831,7 +2830,7 @@ The report is invoked by including the following in the IDF:
 
 The Opaque Construction report has 3 parts for each construction.
 
-Part 1 is the construction name along with some derived values for the entire construction (i.e. Thermal Conductance) as well as noting other details about the surface (\# CTFs, \#  Layers).
+Part 1 is the construction name along with some derived values for the entire construction (i.e. Thermal Conductance) as well as noting other details about the surface (\# CTFs, \#  Layers).
 
 Part 2 shows the material layers for the construction. This is essentially just an echo of the entered properties of the materials from the IDF.
 
@@ -2857,7 +2856,7 @@ This is the calculated number of CTFs (Conduction Transfer Functions). The condu
 
 #### Field: Time Step
 
-The "timestep" in the construction line is the timestep at which the CTFs are valid. Because CTFs for certain constructions might not be stable at the user specified timestep (might be too "heavy" from a thermal mass standpoint), this may be different from the zone timestep (specified in “TimeStep in Hour”). In all cases though, this will be greater than or equal to the zone timestep. If the timestep for the construction is greater than the zone timestep, E+ will use interpolated histories to solve for the surface heat balances for this surface (see discussion on interpolated histories in the [Engineering Reference](file:///E:\Docs4PDFs\EngineeringDoc.pdf) document).
+The "timestep" in the construction line is the timestep at which the CTFs are valid. Because CTFs for certain constructions might not be stable at the user specified timestep (might be too "heavy" from a thermal mass standpoint), this may be different from the zone timestep (specified in “TimeStep in Hour”). In all cases though, this will be greater than or equal to the zone timestep. If the timestep for the construction is greater than the zone timestep, E+ will use interpolated histories to solve for the surface heat balances for this surface (see discussion on interpolated histories in the Engineering Reference document).
 
 #### Field: Thermal Conductance
 
@@ -2947,31 +2946,31 @@ Conduction heat transfer flux at the outside face of a particular surface is a f
 
 Current Outside Conductive Flux = (Outside Term 0) \* (Current Outside Face Temperature)
 
-                                 +(Outside Term 1) \* (Previous Outside Face Temperature)
+                                 +(Outside Term 1) \* (Previous Outside Face Temperature)
 
-                                 +(Outside Term 2) \* (Outside Face Temperature 2 Time Steps Ago)
+                                 +(Outside Term 2) \* (Outside Face Temperature 2 Time Steps Ago)
 
-                                 +(Outside Term 3) \* (Outside Face Temperature 3 Time Steps Ago)
+                                 +(Outside Term 3) \* (Outside Face Temperature 3 Time Steps Ago)
 
-                                 + ...
+                                 + ...
 
-                                 +(Cross Term 0) \* (Current Inside Face Temperature)
+                                 +(Cross Term 0) \* (Current Inside Face Temperature)
 
-                                 +(Cross Term 1) \* (Previous Inside Face Temperature)
+                                 +(Cross Term 1) \* (Previous Inside Face Temperature)
 
-                                 +(Cross Term 2) \* (Inside Face Temperature 2 Time Steps Ago)
+                                 +(Cross Term 2) \* (Inside Face Temperature 2 Time Steps Ago)
 
-                                 +(Cross Term 3) \* (Inside Face Temperature 3 Time Steps Ago)
+                                 +(Cross Term 3) \* (Inside Face Temperature 3 Time Steps Ago)
 
-                                 + ...
+                                 + ...
 
-                                 +(Flux Term 1) \* (Previous Outside Face Flux)
+                                 +(Flux Term 1) \* (Previous Outside Face Flux)
 
-                                 +(Flux Term 2) \* (Outside Face Flux 2 Time Steps Ago)
+                                 +(Flux Term 2) \* (Outside Face Flux 2 Time Steps Ago)
 
-                                 +(Flux Term 3) \* (Outside Face Flux 3 Time Steps Ago)
+                                 +(Flux Term 3) \* (Outside Face Flux 3 Time Steps Ago)
 
-                                 + ...
+                                 + ...
 
 
 
@@ -3013,35 +3012,35 @@ A separate report is available for windows (note that both nominal conductance a
 
 **Line 6:** ! &lt;WindowMaterial:Blind&gt;,Material Name,SlatWidth {m},SlatSeparation {m},SlatThickness {m},SlatAngle {deg},SlatBeamSolarTransmittance,SlatBeamSolarFrontReflectance,BlindToGlassDistance {m}
 
-WindowConstruction,DOUBLE PANE WITH SCREEN,   4,MediumRough,   2.514,   0.555,   0.511,   0.589
+WindowConstruction,DOUBLE PANE WITH SCREEN,   4,MediumRough,   2.514,   0.555,   0.511,   0.589
 
- WindowMaterial:Screen,BRIGHT ALUMINUM SCREEN 1, 0.00025,  2.210E+02,  0.272,  0.697,  0.166,  0.166,  0.195,  0.195,  0.165,  0.025
+ WindowMaterial:Screen,BRIGHT ALUMINUM SCREEN 1, 0.00025,  2.210E+02,  0.272,  0.697,  0.166,  0.166,  0.195,  0.195,  0.165,  0.025
 
- WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,  0.00300,  0.83700,  0.07500,  0.07500,  0.89800,  0.08100,  0.08100,  0.00000,  0.84000,  0.84000,  0.90000,  1.00000,No
+ WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,  0.00300,  0.83700,  0.07500,  0.07500,  0.89800,  0.08100,  0.08100,  0.00000,  0.84000,  0.84000,  0.90000,  1.00000,No
 
- WindowMaterial:Gas,WINAIRB1 - AIRSPACE RESISTANCE,Air,  1.300E-02,
+ WindowMaterial:Gas,WINAIRB1 - AIRSPACE RESISTANCE,Air,  1.300E-02,
 
- WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,  0.00300,  0.83700,  0.07500,  0.07500,  0.89800,  0.08100,  0.08100,  0.00000,  0.84000,  0.84000,  0.90000,  1.00000,No
+ WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,  0.00300,  0.83700,  0.07500,  0.07500,  0.89800,  0.08100,  0.08100,  0.00000,  0.84000,  0.84000,  0.90000,  1.00000,No
 
-WindowConstruction,DOUBLE PANE WITH SHADE,   4,VerySmooth,   2.716,   0.482,   0.039,   0.050
+WindowConstruction,DOUBLE PANE WITH SHADE,   4,VerySmooth,   2.716,   0.482,   0.039,   0.050
 
- WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,  0.00300,  0.83700,  0.07500,  0.07500,  0.89800,  0.08100,  0.08100,  0.00000,  0.84000,  0.84000,  0.90000,  1.00000,No
+ WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,  0.00300,  0.83700,  0.07500,  0.07500,  0.89800,  0.08100,  0.08100,  0.00000,  0.84000,  0.84000,  0.90000,  1.00000,No
 
- WindowMaterial:Gas,WINAIRB1 - AIRSPACE RESISTANCE,Air,  1.300E-02,
+ WindowMaterial:Gas,WINAIRB1 - AIRSPACE RESISTANCE,Air,  1.300E-02,
 
- WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,  0.00300,  0.83700,  0.07500,  0.07500,  0.89800,  0.08100,  0.08100,  0.00000,  0.84000,  0.84000,  0.90000,  1.00000,No
+ WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,  0.00300,  0.83700,  0.07500,  0.07500,  0.89800,  0.08100,  0.08100,  0.00000,  0.84000,  0.84000,  0.90000,  1.00000,No
 
- WindowMaterial:Shade,SHADE ROLL - LIGHT OPAQUE,  0.003,  1.000E-01,  0.900,  0.050,  0.050,  0.500
+ WindowMaterial:Shade,SHADE ROLL - LIGHT OPAQUE,  0.003,  1.000E-01,  0.900,  0.050,  0.050,  0.500
 
-WindowConstruction,DOUBLE PANE WITH BLIND,   4,VerySmooth,   2.761,   0.714,   0.395,   0.456
+WindowConstruction,DOUBLE PANE WITH BLIND,   4,VerySmooth,   2.761,   0.714,   0.395,   0.456
 
- WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,  0.003,  0.900,  0.837,  0.898,  0.840,  0.840,  0.075,  0.075,  0.081,  0.081,  1.000,NO
+ WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,  0.003,  0.900,  0.837,  0.898,  0.840,  0.840,  0.075,  0.075,  0.081,  0.081,  1.000,NO
 
- WindowMaterial:Gas,WINAIRB1 - AIRSPACE RESISTANCE,Air,  1.300E-02,
+ WindowMaterial:Gas,WINAIRB1 - AIRSPACE RESISTANCE,Air,  1.300E-02,
 
- WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,  0.003,  0.900,  0.837,  0.898,  0.840,  0.840,  0.075,  0.075,  0.081,  0.081,  1.000,NO
+ WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,  0.003,  0.900,  0.837,  0.898,  0.840,  0.840,  0.075,  0.075,  0.081,  0.081,  1.000,NO
 
- WindowMaterial:Blind,INTERIOR BLIND, 0.0010, 0.0022, 0.0010,  0.000,  0.000,  0.200,  0.025
+ WindowMaterial:Blind,INTERIOR BLIND, 0.0010, 0.0022, 0.0010,  0.000,  0.000,  0.200,  0.025
 
 #### Fields in Part 1 – Window Construction Report
 
@@ -3097,7 +3096,7 @@ Part 2 of the Window Construction Report encompasses several “lines”.
 
 ### Material**:**WindowGlass
 
-#### Field:  &lt;Material:WindowGlass&gt;
+#### Field:  &lt;Material:WindowGlass&gt;
 
 This will be filled with the constant “Material:WindowGlass” for each material of this type in the construction.
 
@@ -3155,7 +3154,7 @@ Solar Diffusing value – Yes if solar diffusing glass, No if not.
 
 #### Material:WindowGas
 
-#### Field:  &lt;Material:WindowGas&gt;
+#### Field:  &lt;Material:WindowGas&gt;
 
 This will be filled with the constant “Material:WindowGas” for each material of this type in the construction.
 
@@ -3165,7 +3164,7 @@ Name of the gas layer.
 
 #### Field: GasType
 
-Type of the gas layer. Possibilities are Air, Argon, Krypton,  Xenon, and Custom.
+Type of the gas layer. Possibilities are Air, Argon, Krypton,  Xenon, and Custom.
 
 #### Field: Thickness {m}
 
@@ -3173,7 +3172,7 @@ Thickness of the gas layer.
 
 #### Material:WindowShade
 
-#### Field:  &lt;Material:WindowShade&gt;
+#### Field:  &lt;Material:WindowShade&gt;
 
 This will be filled with the constant “Material:WindowShade” for each material of this type in the construction.
 
@@ -3245,7 +3244,7 @@ Distance from the mid-plane of the blind to the adjacent glass (m).
 
 #### Material:WindowScreen
 
-#### Field:  &lt;Material:WindowScreen&gt;
+#### Field:  &lt;Material:WindowScreen&gt;
 
 This will be filled with the constant “Material:WindowScreen” for each material of this type in the construction.
 
@@ -3297,73 +3296,73 @@ Distance from the mid-plane of the screen to the adjacent glass (m).
 
 Windows with Thermochromic constructions are reported similarly to other window constructions. First, you see the window as entered in the IDF:
 
-WindowConstruction,TCWINDOW,   5,VerySmooth,   1.666,   0.429,   0.242,   0.520
+WindowConstruction,TCWINDOW,   5,VerySmooth,   1.666,   0.429,   0.242,   0.520
 
- WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  1.00000,  1.00000,No
+ WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  1.00000,  1.00000,No
 
- WindowMaterial:Gas,AIR 3MM,Air,  3.000E-03,
+ WindowMaterial:Gas,AIR 3MM,Air,  3.000E-03,
 
- WindowMaterial:Glazing,WO18RT25,Spectral,WO18RT25SP,  0.00750,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  0.60000,  1.00000,No
+ WindowMaterial:Glazing,WO18RT25,Spectral,WO18RT25SP,  0.00750,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  0.60000,  1.00000,No
 
- WindowMaterial:Gas,AIR 8MM,Air,  8.000E-03,
+ WindowMaterial:Gas,AIR 8MM,Air,  8.000E-03,
 
- WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.03500,  0.84000,  1.00000,  1.00000,No
+ WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.03500,  0.84000,  1.00000,  1.00000,No
 
 Then, there will be a list of window constructions reported with each one corresponding to a particular temperature of the thermochromic glazing layer. For example, the following excerpt shows a list of window constructions for the thermochromic window TCWINDOW at different temperature of the thermochromic layer - TCWINDOW\_TC\_25 at 25°C, TCWINDOW\_TC\_27 at 27°C, and TCWINDOW\_TC\_29 at 29°C. Detailed properties of the thermochromic glazing layer are also listed for each temperature - WO18RT25 **at** 25°C, WO18RT27 **at** 27°C, and WO18RT29 **at** 29°C.
 
-WindowConstruction,TCWINDOW\_TC\_25,   5,VerySmooth,   1.666,   0.429,   0.242,   0.520
+WindowConstruction,TCWINDOW\_TC\_25,   5,VerySmooth,   1.666,   0.429,   0.242,   0.520
 
- WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  1.00000,  1.00000,No
+ WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  1.00000,  1.00000,No
 
- WindowMaterial:Gas,AIR 3MM,Air,  3.000E-03,
+ WindowMaterial:Gas,AIR 3MM,Air,  3.000E-03,
 
- WindowMaterial:Glazing,WO18RT25,Spectral,WO18RT25SP,  0.00750,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  0.60000,  1.00000,No
+ WindowMaterial:Glazing,WO18RT25,Spectral,WO18RT25SP,  0.00750,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  0.60000,  1.00000,No
 
- WindowMaterial:Gas,AIR 8MM,Air,  8.000E-03,
+ WindowMaterial:Gas,AIR 8MM,Air,  8.000E-03,
 
- WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.03500,  0.84000,  1.00000,  1.00000,No
-
-
-
- WindowConstruction,TCWINDOW\_TC\_27,   5,VerySmooth,   1.666,   0.424,   0.236,   0.504
-
- WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  1.00000,  1.00000,No
-
- WindowMaterial:Gas,AIR 3MM,Air,  3.000E-03,
-
- WindowMaterial:Glazing,WO18RT27,Spectral,WO18RT27SP,  0.00750,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  0.60000,  1.00000,No
-
- WindowMaterial:Gas,AIR 8MM,Air,  8.000E-03,
-
- WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.03500,  0.84000,  1.00000,  1.00000,No
+ WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.03500,  0.84000,  1.00000,  1.00000,No
 
 
 
- WindowConstruction,TCWINDOW\_TC\_29,   5,VerySmooth,   1.666,   0.419,   0.230,   0.490
+ WindowConstruction,TCWINDOW\_TC\_27,   5,VerySmooth,   1.666,   0.424,   0.236,   0.504
 
- WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  1.00000,  1.00000,No
+ WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  1.00000,  1.00000,No
 
- WindowMaterial:Gas,AIR 3MM,Air,  3.000E-03,
+ WindowMaterial:Gas,AIR 3MM,Air,  3.000E-03,
 
- WindowMaterial:Glazing,WO18RT29,Spectral,WO18RT29SP,  0.00750,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  0.60000,  1.00000,No
+ WindowMaterial:Glazing,WO18RT27,Spectral,WO18RT27SP,  0.00750,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  0.60000,  1.00000,No
 
- WindowMaterial:Gas,AIR 8MM,Air,  8.000E-03,
+ WindowMaterial:Gas,AIR 8MM,Air,  8.000E-03,
 
- WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.03500,  0.84000,  1.00000,  1.00000,No
+ WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.03500,  0.84000,  1.00000,  1.00000,No
+
+
+
+ WindowConstruction,TCWINDOW\_TC\_29,   5,VerySmooth,   1.666,   0.419,   0.230,   0.490
+
+ WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  1.00000,  1.00000,No
+
+ WindowMaterial:Gas,AIR 3MM,Air,  3.000E-03,
+
+ WindowMaterial:Glazing,WO18RT29,Spectral,WO18RT29SP,  0.00750,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.84000,  0.84000,  0.60000,  1.00000,No
+
+ WindowMaterial:Gas,AIR 8MM,Air,  8.000E-03,
+
+ WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,  0.00328,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.00000,  0.03500,  0.84000,  1.00000,  1.00000,No
 
 ### Complex Fenestration
 
-Complex fenestration is reported in a similar manner as other windows.  The first line is the header, followed by details about each fenestration object (window).
+Complex fenestration is reported in a similar manner as other windows.  The first line is the header, followed by details about each fenestration object (window).
 
- ! &lt;WindowConstruction:Complex&gt;,Construction Name,Index,\#Layers,U-factor {W/m2-K},SHGC
+ ! &lt;WindowConstruction:Complex&gt;,Construction Name,Index,\#Layers,U-factor {W/m2-K},SHGC
 
- WindowConstruction:Complex,CFS\_GLZ\_813,6,4,0.544,9.104E-002
+ WindowConstruction:Complex,CFS\_GLZ\_813,6,4,0.544,9.104E-002
 
- WindowConstruction:Complex,CFS\_GLZ\_2015,7,3,1.777,9.205E-002
+ WindowConstruction:Complex,CFS\_GLZ\_2015,7,3,1.777,9.205E-002
 
- WindowConstruction:Complex,CFS\_GLZ\_2046,8,3,2.418,9.273E-002
+ WindowConstruction:Complex,CFS\_GLZ\_2046,8,3,2.418,9.273E-002
 
- WindowConstruction:Complex,CFS\_GLZ\_2001,9,3,1.989,9.253E-002
+ WindowConstruction:Complex,CFS\_GLZ\_2001,9,3,1.989,9.253E-002
 
 #### Field: Construction Name
 
@@ -3375,7 +3374,7 @@ Index number in construction data.
 
 #### Field: \#Layers
 
-Number of solid layers in the complex fenestration construction.  This number accounts for glass and shading layers.
+Number of solid layers in the complex fenestration construction.  This number accounts for glass and shading layers.
 
 #### Field: U-factor
 
@@ -3405,9 +3404,9 @@ HAMT origins,SOUTH WALL,EXTERIOR WALL, 0.0000000, 0.0005729,
 
 HAMT cells, SOUTH WALL,EXTERIOR
 
-WALL,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,
+WALL,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,
 
-13,  14,  15,  16,  17,  18,  19,  20,  21,  22
+13,  14,  15,  16,  17,  18,  19,  20,  21,  22
 
 #### Field: Surface Name
 
@@ -3433,7 +3432,7 @@ The sizing information in the .eio file reflects the inputs and results for the 
 
 **! &lt;Load Timesteps in Zone Design Calculation Averaging Window&gt;, Value**
 
- Load Timesteps in Zone Design Calculation Averaging Window,    1
+ Load Timesteps in Zone Design Calculation Averaging Window,    1
 
 #### Field: Load Timesteps in Zone Design Calculation Averaging Window
 
@@ -3447,17 +3446,17 @@ For example, if the load calculation timestep is 15 minutes and the user specifi
 
 **! &lt;Sizing Factor Information&gt;, Sizing Factor ID, Value**
 
-Sizing Factor Information, Global,   1.3000
+Sizing Factor Information, Global,   1.3000
 
- Sizing Factor Information, Zone SPACE1-1,   1.3000
+ Sizing Factor Information, Zone SPACE1-1,   1.3000
 
- Sizing Factor Information, Zone SPACE2-1,   1.3000
+ Sizing Factor Information, Zone SPACE2-1,   1.3000
 
- Sizing Factor Information, Zone SPACE3-1,   1.3000
+ Sizing Factor Information, Zone SPACE3-1,   1.3000
 
- Sizing Factor Information, Zone SPACE4-1,   1.3000
+ Sizing Factor Information, Zone SPACE4-1,   1.3000
 
- Sizing Factor Information, Zone SPACE5-1,   1.3000
+ Sizing Factor Information, Zone SPACE5-1,   1.3000
 
 #### Field: Sizing Factor ID
 
@@ -3473,25 +3472,25 @@ This is the sizing factor ratio to be applied as described previously.
 
 ! &lt;Zone Sizing Information&gt;, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, Humidity Ratio at Peak {kgWater/kgAir}, Floor Area {m2}, \# Occupants, Calc Outdoor Air Flow Rate {m3/s}
 
- Zone Sizing Information, SPACE1-1, Cooling, 2502.43786, 3253.16922, 0.21023, 0.27329, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 16:00:00, 30.85800, 1.45947E-002, 99.16000, 11.00000, 0.10384
+ Zone Sizing Information, SPACE1-1, Cooling, 2502.43786, 3253.16922, 0.21023, 0.27329, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 16:00:00, 30.85800, 1.45947E-002, 99.16000, 11.00000, 0.10384
 
- Zone Sizing Information, SPACE1-1, Heating, 2606.90880, 3388.98144, 7.56806E-002, 0.10384, CHICAGO ANN HTG 99% CONDNS DB, 1/21 23:45:00, -17.30000, 8.38927E-004, 99.16000, 11.00000, 0.10384
+ Zone Sizing Information, SPACE1-1, Heating, 2606.90880, 3388.98144, 7.56806E-002, 0.10384, CHICAGO ANN HTG 99% CONDNS DB, 1/21 23:45:00, -17.30000, 8.38927E-004, 99.16000, 11.00000, 0.10384
 
- Zone Sizing Information, SPACE2-1, Cooling, 2038.79983, 2650.43978, 0.17125, 0.22263, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 10:15:00, 27.83525, 1.45947E-002, 42.73500, 5.00000, 4.72000E-002
+ Zone Sizing Information, SPACE2-1, Cooling, 2038.79983, 2650.43978, 0.17125, 0.22263, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 10:15:00, 27.83525, 1.45947E-002, 42.73500, 5.00000, 4.72000E-002
 
- Zone Sizing Information, SPACE2-1, Heating, 1149.09174, 1493.81926, 3.33591E-002, 4.72000E-002, CHICAGO ANN HTG 99% CONDNS DB, 1/21 24:00:00, -17.30000, 8.38927E-004, 42.73500, 5.00000, 4.72000E-002
+ Zone Sizing Information, SPACE2-1, Heating, 1149.09174, 1493.81926, 3.33591E-002, 4.72000E-002, CHICAGO ANN HTG 99% CONDNS DB, 1/21 24:00:00, -17.30000, 8.38927E-004, 42.73500, 5.00000, 4.72000E-002
 
- Zone Sizing Information, SPACE3-1, Cooling, 2318.10750, 3013.53976, 0.19473, 0.25315, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 15:00:00, 31.50000, 1.45947E-002, 96.48000, 11.00000, 0.10384
+ Zone Sizing Information, SPACE3-1, Cooling, 2318.10750, 3013.53976, 0.19473, 0.25315, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 15:00:00, 31.50000, 1.45947E-002, 96.48000, 11.00000, 0.10384
 
- Zone Sizing Information, SPACE3-1, Heating, 2589.95436, 3366.94067, 7.51884E-002, 0.10384, CHICAGO ANN HTG 99% CONDNS DB, 1/21 23:30:00, -17.30000, 8.38927E-004, 96.48000, 11.00000, 0.10384
+ Zone Sizing Information, SPACE3-1, Heating, 2589.95436, 3366.94067, 7.51884E-002, 0.10384, CHICAGO ANN HTG 99% CONDNS DB, 1/21 23:30:00, -17.30000, 8.38927E-004, 96.48000, 11.00000, 0.10384
 
- Zone Sizing Information, SPACE4-1, Cooling, 2325.33534, 3022.93594, 0.19534, 0.25394, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 17:30:00, 29.46700, 1.45947E-002, 42.73500, 5.00000, 4.72000E-002
+ Zone Sizing Information, SPACE4-1, Cooling, 2325.33534, 3022.93594, 0.19534, 0.25394, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 17:30:00, 29.46700, 1.45947E-002, 42.73500, 5.00000, 4.72000E-002
 
- Zone Sizing Information, SPACE4-1, Heating, 1143.87745, 1487.04068, 3.32077E-002, 4.72000E-002, CHICAGO ANN HTG 99% CONDNS DB, 1/21 23:30:00, -17.30000, 8.38927E-004, 42.73500, 5.00000, 4.72000E-002
+ Zone Sizing Information, SPACE4-1, Heating, 1143.87745, 1487.04068, 3.32077E-002, 4.72000E-002, CHICAGO ANN HTG 99% CONDNS DB, 1/21 23:30:00, -17.30000, 8.38927E-004, 42.73500, 5.00000, 4.72000E-002
 
- Zone Sizing Information, SPACE5-1, Cooling, 2589.39474, 3366.21317, 0.21753, 0.28279, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 15:00:00, 31.50000, 1.45947E-002, 182.49000, 20.00000, 0.18880
+ Zone Sizing Information, SPACE5-1, Cooling, 2589.39474, 3366.21317, 0.21753, 0.28279, CHICAGO ANN CLG 1% CONDNS DB=&gt;MWB, 7/21 15:00:00, 31.50000, 1.45947E-002, 182.49000, 20.00000, 0.18880
 
- Zone Sizing Information, SPACE5-1, Heating, 1706.17191, 2218.02348, 4.95314E-002, 0.18880, CHICAGO ANN HTG 99% CONDNS DB, 1/21 23:45:00, -17.30000, 8.38927E-004, 182.49000, 20.00000, 0.18880
+ Zone Sizing Information, SPACE5-1, Heating, 1706.17191, 2218.02348, 4.95314E-002, 0.18880, CHICAGO ANN HTG 99% CONDNS DB, 1/21 23:45:00, -17.30000, 8.38927E-004, 182.49000, 20.00000, 0.18880
 
 #### Field: &lt;Zone Sizing Information&gt;
 
@@ -3553,13 +3552,13 @@ This is the calculated outdoor air flow rate.
 
 **! &lt;System Sizing Information&gt;, System Name, Field Description, Value**
 
- System Sizing Information, VAV SYS 1, Calculated Cooling Design Air Flow Rate [m3/s], 1.05725
+ System Sizing Information, VAV SYS 1, Calculated Cooling Design Air Flow Rate [m3/s], 1.05725
 
- System Sizing Information, VAV SYS 1, User Cooling Design Air Flow Rate [m3/s], 1.05725
+ System Sizing Information, VAV SYS 1, User Cooling Design Air Flow Rate [m3/s], 1.05725
 
- System Sizing Information, VAV SYS 1, Calculated Heating Design Air Flow Rate [m3/s], 0.43343
+ System Sizing Information, VAV SYS 1, Calculated Heating Design Air Flow Rate [m3/s], 0.43343
 
- System Sizing Information, VAV SYS 1, User Heating Design Air Flow Rate [m3/s], 0.43343
+ System Sizing Information, VAV SYS 1, User Heating Design Air Flow Rate [m3/s], 0.43343
 
 #### Field: &lt;System Sizing Information&gt;
 
@@ -3581,15 +3580,17 @@ This contains the value of the field.
 
 ### Plant Coincident Sizing Algorithm
 
-A special report is issued to the eio file that provides details for the Coincident sizing option.  Coincident plant sizing adjustments using HVAC Sizing Simulations run a sizing algorithm at the end of each Sizing Pass.  The following report provides details on the calculations and observations from monitoring the previous Sizing Pass. 
+A special report is issued to the eio file that provides details for the Coincident sizing option.  Coincident plant sizing adjustments using HVAC Sizing Simulations run a sizing algorithm at the end of each Sizing Pass.  The following report provides details on the calculations and observations from monitoring the previous Sizing Pass.
 
+```
     ! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor {},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}
     Plant Coincident Sizing Algorithm,HOT WATER LOOP,1,0.1062471,11942.67,0.2586269,Yes,7.324432E-004,2.586533E-004,Yes,1.0000,0.646862,4197.9300,999.8980
     Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290764,Yes,1.197307E-003,1.122396E-003,No,1.0000,6.256652E-002,4197.9300,999.8980
+```
 
-#### Field: <Plant Coincident Sizing Algorithm>
+#### Field: &lt;Plant Coincident Sizing Algorithm&gt;
 
-This field simply contains the words “Plant Sizing Coincident Flow Algorithm.” 
+This field simply contains the words “Plant Sizing Coincident Flow Algorithm.”
 
 #### Field: Plant Loop Name
 
@@ -3597,43 +3598,43 @@ This field shows the name of the plant loop being analyzed.
 
 #### Field: Sizing Pass #
 
-This field shows which sizing pass has just completed prior to running the sizing algorithm.  Each Sizing Pass is an iteration of a set of HVAC Sizing Simulations. 
+This field shows which sizing pass has just completed prior to running the sizing algorithm.  Each Sizing Pass is an iteration of a set of HVAC Sizing Simulations.
 
 #### Field: Measured Mass Flow {kg/s}
 
-This is the maximum coincident mass flow rate, in kg/s, found at the supply side inlet system node. This was recorded by a data logging system tracking node mass flow rate over all the sizing periods.  It will include any zone timestep averaging. 
+This is the maximum coincident mass flow rate, in kg/s, found at the supply side inlet system node. This was recorded by a data logging system tracking node mass flow rate over all the sizing periods.  It will include any zone timestep averaging.
 
 #### Field: Measured Demand {W}
 
-This is the maximum loop coincident demand, in W, on the supply side.  This was recorded by a data logging system tracking the report value for loop demand over all the sizing periods.  It will include and zone timestep averaging. 
+This is the maximum loop coincident demand, in W, on the supply side.  This was recorded by a data logging system tracking the report value for loop demand over all the sizing periods.  It will include and zone timestep averaging.
 
 #### Field: Demand Calculated Mass Flow {kg/s}
 
-This is the flow rate, in kg/s, that was calculated from measured demand, the temperature difference in the plant sizing object, and the fluid specific heat.   
+This is the flow rate, in kg/s, that was calculated from measured demand, the temperature difference in the plant sizing object, and the fluid specific heat.
 
 #### Field: Sizes Changed {Yes/No}
 
-This field indicates if the sizing algorithm resulted in a change of size.  If the flows did not change significantly, the sizes might not change. 
+This field indicates if the sizing algorithm resulted in a change of size.  If the flows did not change significantly, the sizes might not change.
 
 #### Field: Previous Volume Flow Rate {m3/s}
 
-This field is the prior size of the plant loop, in m3/s.  This is the size before the adjustment if the size changes. 
+This field is the prior size of the plant loop, in m3/s.  This is the size before the adjustment if the size changes.
 
 #### Field: New Volume Flow Rate {m3/s}
 
-This field is the result of the sizing algorithm, in m3/s.  If the size changes, this is the new value used for the plant loop maximum volume flow rate. 
+This field is the result of the sizing algorithm, in m3/s.  If the size changes, this is the new value used for the plant loop maximum volume flow rate.
 
 #### Field: Demand Check Applied {Yes/No}
 
-This field indicates if the algorithm produced a new mass flow rate from the measured demand or not.  If this field is “No,” then the algorithm used coincident mass flow.  If this field is “Yes,” then the mass flow derived from demand was larger than the measured mass flow and the demand drove the result. 
+This field indicates if the algorithm produced a new mass flow rate from the measured demand or not.  If this field is “No,” then the algorithm used coincident mass flow.  If this field is “Yes,” then the mass flow derived from demand was larger than the measured mass flow and the demand drove the result.
 
 #### Field: Sizing Factor { }
 
-This field is the value of the sizing factor applied to the measured or calculated coincident flows.  
+This field is the value of the sizing factor applied to the measured or calculated coincident flows.
 
 #### Field: Normalized Change { }
 
-This field is the normalized change used to determine if the new flow size is significantly different from the previous. 
+This field is the normalized change used to determine if the new flow size is significantly different from the previous.
 
 #### Field: Specific Heat {J/kg-K }
 
@@ -3652,145 +3653,145 @@ Component sizing is applicable to all manners of autosized components and equipm
 
  Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE1-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.22672
 
- Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE1-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.87104E-005
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE1-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.87104E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE1-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 5.87104E-005
+ Component Sizing Information, Coil:Heating:Water, SPACE1-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 5.87104E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE1-1 ZONE COIL, Design Coil Load [W], 2699.50304
+ Component Sizing Information, Coil:Heating:Water, SPACE1-1 ZONE COIL, Design Coil Load [W], 2699.50304
 
- Component Sizing Information, Coil:Heating:Water, SPACE1-1 ZONE COIL, U-Factor Times Area Value [W/K], 66.15122
+ Component Sizing Information, Coil:Heating:Water, SPACE1-1 ZONE COIL, U-Factor Times Area Value [W/K], 66.15122
 
- Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE2-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.17666
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE2-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.17666
 
- Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE2-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 4.57480E-005
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE2-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 4.57480E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE2-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 4.57480E-005
+ Component Sizing Information, Coil:Heating:Water, SPACE2-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 4.57480E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE2-1 ZONE COIL, Design Coil Load [W], 2103.49527
+ Component Sizing Information, Coil:Heating:Water, SPACE2-1 ZONE COIL, Design Coil Load [W], 2103.49527
 
- Component Sizing Information, Coil:Heating:Water, SPACE2-1 ZONE COIL, U-Factor Times Area Value [W/K], 51.54607
+ Component Sizing Information, Coil:Heating:Water, SPACE2-1 ZONE COIL, U-Factor Times Area Value [W/K], 51.54607
 
- Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE3-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.20944
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE3-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.20944
 
- Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE3-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.42362E-005
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE3-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.42362E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE3-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 5.42362E-005
+ Component Sizing Information, Coil:Heating:Water, SPACE3-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 5.42362E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE3-1 ZONE COIL, Design Coil Load [W], 2493.78307
+ Component Sizing Information, Coil:Heating:Water, SPACE3-1 ZONE COIL, Design Coil Load [W], 2493.78307
 
- Component Sizing Information, Coil:Heating:Water, SPACE3-1 ZONE COIL, U-Factor Times Area Value [W/K], 61.11006
+ Component Sizing Information, Coil:Heating:Water, SPACE3-1 ZONE COIL, U-Factor Times Area Value [W/K], 61.11006
 
- Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE4-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.22257
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE4-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.22257
 
- Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE4-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.76351E-005
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE4-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.76351E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE4-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 5.76351E-005
+ Component Sizing Information, Coil:Heating:Water, SPACE4-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 5.76351E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE4-1 ZONE COIL, Design Coil Load [W], 2650.06093
+ Component Sizing Information, Coil:Heating:Water, SPACE4-1 ZONE COIL, Design Coil Load [W], 2650.06093
 
- Component Sizing Information, Coil:Heating:Water, SPACE4-1 ZONE COIL, U-Factor Times Area Value [W/K], 64.93964
+ Component Sizing Information, Coil:Heating:Water, SPACE4-1 ZONE COIL, U-Factor Times Area Value [W/K], 64.93964
 
- Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE5-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.22187
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE5-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.22187
 
- Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE5-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.74541E-005
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE5-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.74541E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE5-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 5.74541E-005
+ Component Sizing Information, Coil:Heating:Water, SPACE5-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 5.74541E-005
 
- Component Sizing Information, Coil:Heating:Water, SPACE5-1 ZONE COIL, Design Coil Load [W], 2641.74210
+ Component Sizing Information, Coil:Heating:Water, SPACE5-1 ZONE COIL, Design Coil Load [W], 2641.74210
 
- Component Sizing Information, Coil:Heating:Water, SPACE5-1 ZONE COIL, U-Factor Times Area Value [W/K], 64.73579
+ Component Sizing Information, Coil:Heating:Water, SPACE5-1 ZONE COIL, U-Factor Times Area Value [W/K], 64.73579
 
- Component Sizing Information, Branch, VAV SYS 1 MAIN BRANCH, Maximum Flow Rate [m3/s], 1.05725
+ Component Sizing Information, Branch, VAV SYS 1 MAIN BRANCH, Maximum Flow Rate [m3/s], 1.05725
 
- Component Sizing Information, AirLoopHVAC, VAV SYS 1, Design Supply Air Flow Rate [m3/s], 1.05725
+ Component Sizing Information, AirLoopHVAC, VAV SYS 1, Design Supply Air Flow Rate [m3/s], 1.05725
 
- Component Sizing Information, Controller:OutdoorAir, OA CONTROLLER 1, Maximum Outdoor Air Flow Rate [m3/s], 1.05725
+ Component Sizing Information, Controller:OutdoorAir, OA CONTROLLER 1, Maximum Outdoor Air Flow Rate [m3/s], 1.05725
 
- Component Sizing Information, Controller:OutdoorAir, OA CONTROLLER 1, Minimum Outdoor Air Flow Rate [m3/s], 0.26412
+ Component Sizing Information, Controller:OutdoorAir, OA CONTROLLER 1, Minimum Outdoor Air Flow Rate [m3/s], 0.26412
 
- Component Sizing Information, Coil:Heating:Water, OA HEATING COIL 1, Maximum Water Flow Rate [m3/s], 1.48158E-004
+ Component Sizing Information, Coil:Heating:Water, OA HEATING COIL 1, Maximum Water Flow Rate [m3/s], 1.48158E-004
 
- Component Sizing Information, Coil:Heating:Water, OA HEATING COIL 1, Design Coil Load [W], 6812.28921
+ Component Sizing Information, Coil:Heating:Water, OA HEATING COIL 1, Design Coil Load [W], 6812.28921
 
- Component Sizing Information, Coil:Heating:Water, OA HEATING COIL 1, U-Factor Times Area Value [W/K], 84.72044
+ Component Sizing Information, Coil:Heating:Water, OA HEATING COIL 1, U-Factor Times Area Value [W/K], 84.72044
 
- Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Water Flow Rate [m3/s], 1.14523E-003
+ Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Water Flow Rate [m3/s], 1.14523E-003
 
- Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Air Flow Rate [m3/s], 0.26412
+ Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Air Flow Rate [m3/s], 0.26412
 
- Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Inlet Air Temperature [C], 30.01375
+ Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Inlet Air Temperature [C], 30.01375
 
  Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Outlet Air Humidity Ratio, 8.00000E-003
 
  Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design Inlet Air Humidity Ratio, 9.33031E-003
 
- Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design Outlet Air Humidity Ratio, 8.00000E-003
+ Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design Outlet Air Humidity Ratio, 8.00000E-003
 
- Component Sizing Information, Coil:Heating:Water, MAIN HEATING COIL 1, Maximum Water Flow Rate [m3/s], 7.51969E-005
+ Component Sizing Information, Coil:Heating:Water, MAIN HEATING COIL 1, Maximum Water Flow Rate [m3/s], 7.51969E-005
 
- Component Sizing Information, Coil:Heating:Water, MAIN HEATING COIL 1, Design Coil Load [W], 3457.55329
+ Component Sizing Information, Coil:Heating:Water, MAIN HEATING COIL 1, Design Coil Load [W], 3457.55329
 
- Component Sizing Information, Coil:Heating:Water, MAIN HEATING COIL 1, U-Factor Times Area Value [W/K], 55.78870
+ Component Sizing Information, Coil:Heating:Water, MAIN HEATING COIL 1, U-Factor Times Area Value [W/K], 55.78870
 
- Component Sizing Information, Fan:VariableVolume, SUPPLY FAN 1, Maximum Flow Rate [m3/s], 1.05725
+ Component Sizing Information, Fan:VariableVolume, SUPPLY FAN 1, Maximum Flow Rate [m3/s], 1.05725
 
- Component Sizing Information, Fan:VariableVolume, SUPPLY FAN 1, Minimum Flow Rate [m3/s], 0.35326
+ Component Sizing Information, Fan:VariableVolume, SUPPLY FAN 1, Minimum Flow Rate [m3/s], 0.35326
 
- Component Sizing Information, Controller:WaterCoil, OA CC CONTROLLER 1, Maximum Actuated Flow [m3/s], 1.14523E-003
+ Component Sizing Information, Controller:WaterCoil, OA CC CONTROLLER 1, Maximum Actuated Flow [m3/s], 1.14523E-003
 
- Component Sizing Information, Controller:WaterCoil, OA HC CONTROLLER 1, Maximum Actuated Flow [m3/s], 1.48158E-004
+ Component Sizing Information, Controller:WaterCoil, OA HC CONTROLLER 1, Maximum Actuated Flow [m3/s], 1.48158E-004
 
- Component Sizing Information, Controller:WaterCoil, CENTRAL COOLING COIL CONTROLLER 1, Maximum Actuated Flow [m3/s], 9.16309E-004
+ Component Sizing Information, Controller:WaterCoil, CENTRAL COOLING COIL CONTROLLER 1, Maximum Actuated Flow [m3/s], 9.16309E-004
 
- Component Sizing Information, Controller:WaterCoil, CENTRAL HEATING COIL CONTROLLER 1, Maximum Actuated Flow [m3/s], 7.51969E-005
+ Component Sizing Information, Controller:WaterCoil, CENTRAL HEATING COIL CONTROLLER 1, Maximum Actuated Flow [m3/s], 7.51969E-005
 
- Component Sizing Information, PlantLoop, HOT WATER LOOP, Maximum Loop Flow Rate [m3/s], 4.97138E-004
+ Component Sizing Information, PlantLoop, HOT WATER LOOP, Maximum Loop Flow Rate [m3/s], 4.97138E-004
 
- Component Sizing Information, PlantLoop, HOT WATER LOOP, Plant Loop Volume [m3], 0.55928
+ Component Sizing Information, PlantLoop, HOT WATER LOOP, Plant Loop Volume [m3], 0.55928
 
- Component Sizing Information, PlantLoop, CHILLED WATER LOOP, Maximum Loop Flow Rate [m3/s], 2.06154E-003
+ Component Sizing Information, PlantLoop, CHILLED WATER LOOP, Maximum Loop Flow Rate [m3/s], 2.06154E-003
 
- Component Sizing Information, PlantLoop, CHILLED WATER LOOP, Plant Loop Volume [m3], 2.31923
+ Component Sizing Information, PlantLoop, CHILLED WATER LOOP, Plant Loop Volume [m3], 2.31923
 
- Component Sizing Information, Chiller:Electric, CENTRAL CHILLER, Nominal Capacity [W], 34468.93699
+ Component Sizing Information, Chiller:Electric, CENTRAL CHILLER, Nominal Capacity [W], 34468.93699
 
- Component Sizing Information, Chiller:Electric, CENTRAL CHILLER, Design Chilled Water Flow Rate [m3/s], 2.06154E-003
+ Component Sizing Information, Chiller:Electric, CENTRAL CHILLER, Design Chilled Water Flow Rate [m3/s], 2.06154E-003
 
- Component Sizing Information, Boiler:HotWater, CENTRAL BOILER, Nominal Capacity [W], 22858.42690
+ Component Sizing Information, Boiler:HotWater, CENTRAL BOILER, Nominal Capacity [W], 22858.42690
 
- Component Sizing Information, Boiler:HotWater, CENTRAL BOILER, Design Water Flow Rate [m3/s], 4.97138E-004
+ Component Sizing Information, Boiler:HotWater, CENTRAL BOILER, Design Water Flow Rate [m3/s], 4.97138E-004
 
- Component Sizing Information, Pump:VariableSpeed, HW CIRC PUMP, Rated Flow Rate [m3/s], 4.97138E-004
+ Component Sizing Information, Pump:VariableSpeed, HW CIRC PUMP, Rated Flow Rate [m3/s], 4.97138E-004
 
- Component Sizing Information, Pump:VariableSpeed, HW CIRC PUMP, Rated Power Consumption [W], 127.01247
+ Component Sizing Information, Pump:VariableSpeed, HW CIRC PUMP, Rated Power Consumption [W], 127.01247
 
- Component Sizing Information, Pump:VariableSpeed, CW CIRC PUMP, Rated Flow Rate [m3/s], 2.06154E-003
+ Component Sizing Information, Pump:VariableSpeed, CW CIRC PUMP, Rated Flow Rate [m3/s], 2.06154E-003
 
- Component Sizing Information, Pump:VariableSpeed, CW CIRC PUMP, Rated Power Consumption [W], 526.69672
+ Component Sizing Information, Pump:VariableSpeed, CW CIRC PUMP, Rated Power Consumption [W], 526.69672
 
- Component Sizing Information, Humidifier:Steam:Electric, HUMIDIFIER 1, Rated Power [W], 9826.56303
+ Component Sizing Information, Humidifier:Steam:Electric, HUMIDIFIER 1, Rated Power [W], 9826.56303
 
  Component Sizing Information, Humidifier:Steam:Gas, MAIN GAS HUMIDIFIER, Design Size Nominal Capacity Volume [m3/s], 1.05405E-002
- 
+
  Component Sizing Information, Humidifier:Steam:Gas, MAIN GAS HUMIDIFIER, Design Size Rated Power [W], 103710.42776
 
 #### Field: &lt;Component Sizing Information&gt;
 
 This field simply contains the words “Component Sizing”.
 
-#### Field:  Component Type
+#### Field:  Component Type
 
 This field shows the component type (e.g. Pump:Variable Speed, Plant Loop, Fan:Simple:VariableVolume) being sized.
 
-#### Field:  Component Name
+#### Field:  Component Name
 
 This field shows the name of the component.
 
-#### Field:  Input Field Description
+#### Field:  Input Field Description
 
 This field shows the field description/variable with units.  When using HVAC Sizing Simulation for advanced sizing methods, there are two versions of the report for each component that might be affected.  With HVAC Sizing Simulation, there is a first size value reported, which is the result of the Ideal Loads Sizing Simulation, and there is the final value after all the Sizing Passes have completed.  This input field description will have “Initial” prepended to the description to indicate that this is the first size, the same report without “Initial” is the final size. Note that with HVAC Sizing Simulation, these reports will occur much later in the simulation and hence appear further down in the .eio file.
 
-#### Field:  Value
+#### Field:  Value
 
 This field shows the value of the sized component.
 
@@ -3872,9 +3873,9 @@ Refrigeration related variables appear in the eio file according to the refriger
 
 ! &lt;Detailed Refrigeration System&gt;,Refrigeration System Name,Refrigerant Used, \# Refrigerated Cases Connected, \# WalkInCoolers Connected, \#Air Chillers Connected, \# Secondary Loops Served, \# Cascade Condensers Served, \# Mechanical Subcoolers Served, \# Compressors Connected, \# Compression Stages, Intercooler Type, Intercooler Effectiveness, \# Subcoolers Connected, Minimum Condensing Temperature (C)
 
-!  &lt;\#Detailed Transcritical Refrigeration Systems&gt;,Number of Detailed Transcritical Refrigeration Systems
+!  &lt;\#Detailed Transcritical Refrigeration Systems&gt;,Number of Detailed Transcritical Refrigeration Systems
 
-!  &lt;Detailed Transcritical Refrigeration System&gt;,Transcritical Refrigeration System Name, Refrigerant Used, \# Medium Temperature Refrigerated Cases Connected, \# Low Temperature Refrigerated Cases Connected, \# Medium Temperature WalkInCoolers Connected, \# Low Temperature WalkInCoolers Connected, \# High Pressure Compressors Connected, \# Low Pressure Compressors Connected, Minimum Condensing Temperature (C)
+!  &lt;Detailed Transcritical Refrigeration System&gt;,Transcritical Refrigeration System Name, Refrigerant Used, \# Medium Temperature Refrigerated Cases Connected, \# Low Temperature Refrigerated Cases Connected, \# Medium Temperature WalkInCoolers Connected, \# Low Temperature WalkInCoolers Connected, \# High Pressure Compressors Connected, \# Low Pressure Compressors Connected, Minimum Condensing Temperature (C)
 
 ! &lt;\#Secondary Refrigeration Systems&gt;,Number of Secondary Refrigeration Systems
 
@@ -3882,33 +3883,33 @@ Refrigeration related variables appear in the eio file according to the refriger
 
 ! &lt;Secondary Refrigeration System: Liquid Overfeed&gt;, Secondary Number, Secondary Name, \# Refrigerated Cases Connected, \# WalkIn Coolers Connected, Fluid Name, Capacity (W),Evap Temperature in Secondary Evaporator (C), Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)
 
-!  &lt;Refrigeration Case&gt;,Refrigeration Case Number, Refrigeration Case Name,Zone Name,Zone Node \#,Zone Node Name,Capacity (W/m),LHR,Temperature (C),Length (m),Fan (W/m),Installed Lighting (W/m),Anti-Sweat (W/m),Defrost (W/m)
+!  &lt;Refrigeration Case&gt;,Refrigeration Case Number, Refrigeration Case Name,Zone Name,Zone Node \#,Zone Node Name,Capacity (W/m),LHR,Temperature (C),Length (m),Fan (W/m),Installed Lighting (W/m),Anti-Sweat (W/m),Defrost (W/m)
 
-!  &lt;Refrigeration Walk In Cooler&gt;, Walk In Number, Walk In Name,Capacity (W),Temperature (C),Coil Fan (W), Circulating Fan (W), Lighting (W),Heaters (W),Defrost (W), \# Zones
+!  &lt;Refrigeration Walk In Cooler&gt;, Walk In Number, Walk In Name,Capacity (W),Temperature (C),Coil Fan (W), Circulating Fan (W), Lighting (W),Heaters (W),Defrost (W), \# Zones
 
-!      &lt;Walk-In Surfaces Facing Zone&gt;, ZoneName, Wall/Ceiling Area (m2), UValue (W/m2-C), AreaStockDoors (m2), HeightStockDoors, UValueStockDoors (W/m2-C), AreaGlassDoors (m2), HeightGlassDoors (m),  UValueGlassDoors (W/m2-C)
+!      &lt;Walk-In Surfaces Facing Zone&gt;, ZoneName, Wall/Ceiling Area (m2), UValue (W/m2-C), AreaStockDoors (m2), HeightStockDoors, UValueStockDoors (W/m2-C), AreaGlassDoors (m2), HeightGlassDoors (m),  UValueGlassDoors (W/m2-C)
 
-!  &lt;Refrigeration Compressor&gt;,Compressor Number,Compressor Name,Nominal Capacity (W)
+!  &lt;Refrigeration Compressor&gt;,Compressor Number,Compressor Name,Nominal Capacity (W)
 
-!  &lt;Refrigeration Condenser:Air-Cooled&gt;,Condenser Number,Condenser Name,Rated Condensing Temperature (C),Rated Capacity (W), Rated Fan Power (W)
+!  &lt;Refrigeration Condenser:Air-Cooled&gt;,Condenser Number,Condenser Name,Rated Condensing Temperature (C),Rated Capacity (W), Rated Fan Power (W)
 
-!  &lt;Refrigeration Condenser:Evaporative-Cooled&gt;,Condenser Number,Condenser Name,Rated Capacity (W), Rated Fan Power (W)
+!  &lt;Refrigeration Condenser:Evaporative-Cooled&gt;,Condenser Number,Condenser Name,Rated Capacity (W), Rated Fan Power (W)
 
-!  &lt;Refrigeration Condenser:Water-Cooled&gt;,Condenser Number,Condenser Name,Rated Condensing Temperature (C),Rated Capacity (W), Rated Water Inlet Temperature (C), Rated Water Flow Rate (m3/s)
+!  &lt;Refrigeration Condenser:Water-Cooled&gt;,Condenser Number,Condenser Name,Rated Condensing Temperature (C),Rated Capacity (W), Rated Water Inlet Temperature (C), Rated Water Flow Rate (m3/s)
 
-!  &lt;Refrigeration Condenser:Cascade&gt;, Condenser Number, Condenser Name, Condensing Temperature Control Type, Rated Condensing Temperature (C), Capacity (W), Approach Temperature Difference (DeltaC)
+!  &lt;Refrigeration Condenser:Cascade&gt;, Condenser Number, Condenser Name, Condensing Temperature Control Type, Rated Condensing Temperature (C), Capacity (W), Approach Temperature Difference (DeltaC)
 
-!  &lt;Refrigeration GasCooler:Air-Cooled&gt;,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure (Pa), Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)
+!  &lt;Refrigeration GasCooler:Air-Cooled&gt;,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure (Pa), Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)
 
-!  &lt;Secondary Load&gt;, Secondary System Served Name, Secondary Number
+!  &lt;Secondary Load&gt;, Secondary System Served Name, Secondary Number
 
-!  &lt;Cascade Load&gt;, System Name Connected, Condenser Number, Condenser Name
+!  &lt;Cascade Load&gt;, System Name Connected, Condenser Number, Condenser Name
 
-!  &lt;Mechanical Subcooler Load&gt;, Subcooler Number, Subcooler Name
+!  &lt;Mechanical Subcooler Load&gt;, Subcooler Number, Subcooler Name
 
-!  &lt;Refrigeration Mechanical Subcooler&gt;, Subcooler Number, Subcooler Name, Name of System Providing Cooling, Design Outlet Temperature (C)
+!  &lt;Refrigeration Mechanical Subcooler&gt;, Subcooler Number, Subcooler Name, Name of System Providing Cooling, Design Outlet Temperature (C)
 
-!  &lt;Refrigeration Liquid Suction Subcooler&gt;, Subcooler Number, Subcooler Name, Design Subcooling (DeltaC),Design liquid inlet temperature (C), Design vapor inlet temperature (C)
+!  &lt;Refrigeration Liquid Suction Subcooler&gt;, Subcooler Number, Subcooler Name, Design Subcooling (DeltaC),Design liquid inlet temperature (C), Design vapor inlet temperature (C)
 
 
 
@@ -3916,139 +3917,139 @@ For example, a supermarket refrigeration system including models for a compresso
 
 \#Refrigeration Compressor Racks: 1
 
- Refrigeration Compressor Rack,RACKA,4,0,Outdoors,Air-Cooled,  2.500
+ Refrigeration Compressor Rack,RACKA,4,0,Outdoors,Air-Cooled,  2.500
 
-   Refrigeration Case,1,DELI\_CASE:1\_ MULTIDECKDAIRYANDDELICASE,DELI,76,DELI AIR NODE,  1442.2,   0.30,    2.2,    3.0,   87.6,   38.7,   65.6,    0.0
+   Refrigeration Case,1,DELI\_CASE:1\_ MULTIDECKDAIRYANDDELICASE,DELI,76,DELI AIR NODE,  1442.2,   0.30,    2.2,    3.0,   87.6,   38.7,   65.6,    0.0
 
-   Refrigeration Case,3,SALES\_CASE:1\_MEATDISPLAYCASE,SALES,78,SALES AIR NODE,  1442.2,   0.10,    2.2,   33.6,   87.6,   38.7,   65.6,  443.0
+   Refrigeration Case,3,SALES\_CASE:1\_MEATDISPLAYCASE,SALES,78,SALES AIR NODE,  1442.2,   0.10,    2.2,   33.6,   87.6,   38.7,   65.6,  443.0
 
-   Refrigeration Case,4,SALES\_CASE:2\_ MULTIDECKDIARYANDDELICASE,SALES,78,SALES AIR NODE,  1442.2,   0.30,    2.2,   49.2,   41.0,   60.0,    0.0,    0.0
+   Refrigeration Case,4,SALES\_CASE:2\_ MULTIDECKDIARYANDDELICASE,SALES,78,SALES AIR NODE,  1442.2,   0.30,    2.2,   49.2,   41.0,   60.0,    0.0,    0.0
 
-   Refrigeration Case,10,PRODUCE\_CASE:1\_ MULTIDECKDIARYANDDELICASE,PRODUCE,80,PRODUCE AIR NODE,  1442.2,   0.30,    2.2,   30.0,   41.0,   60.0,    0.0,    0.0
+   Refrigeration Case,10,PRODUCE\_CASE:1\_ MULTIDECKDIARYANDDELICASE,PRODUCE,80,PRODUCE AIR NODE,  1442.2,   0.30,    2.2,   30.0,   41.0,   60.0,    0.0,    0.0
 
 \#Detailed Refrigeration Systems,4
 
- Detailed Refrigeration System,MEDIUMTEMPSYSTEM,R22,3,0,0,0,1,3,0,    25.0
+ Detailed Refrigeration System,MEDIUMTEMPSYSTEM,R22,3,0,0,0,1,3,0,    25.0
 
-   Refrigeration Case,2,FISHDISPLAYCASE,SALESFLOOR,9,SALESFLOOR NODE,   288.4,   0.10,    1.1,   15.0,    0.0,   41.6,    0.0,    0.0
+   Refrigeration Case,2,FISHDISPLAYCASE,SALESFLOOR,9,SALESFLOOR NODE,   288.4,   0.10,    1.1,   15.0,    0.0,   41.6,    0.0,    0.0
 
-   Refrigeration Case,5,MEATDISPLAYCASE,SALESFLOOR,9,SALESFLOOR NODE,   456.6,   0.10,   -4.4,   26.0,   47.2,   86.8,   13.2,  585.8
+   Refrigeration Case,5,MEATDISPLAYCASE,SALESFLOOR,9,SALESFLOOR NODE,   456.6,   0.10,   -4.4,   26.0,   47.2,   86.8,   13.2,  585.8
 
-   Refrigeration Case,6,MULTIDECKDAIRYANDDELICASE,SALESFLOOR,9,SALESFLOOR NODE,  1890.0,   0.30,   -1.1,   12.0,   78.7,  307.3,    0.0,    0.0
+   Refrigeration Case,6,MULTIDECKDAIRYANDDELICASE,SALESFLOOR,9,SALESFLOOR NODE,  1890.0,   0.30,   -1.1,   12.0,   78.7,  307.3,    0.0,    0.0
 
-   Mechanical Subcooler Load, 2,SampleMSC
+   Mechanical Subcooler Load, 2,SampleMSC
 
-   Refrigeration Compressor,1,MEDTEMP001CARLYLE\_R-22\_MED\_06DR820,           15535.
+   Refrigeration Compressor,1,MEDTEMP001CARLYLE\_R-22\_MED\_06DR820,           15535.
 
-   Refrigeration Compressor,2,MEDTEMP002CARLYLE\_R-22\_MED\_06DR820,           15535.
+   Refrigeration Compressor,2,MEDTEMP002CARLYLE\_R-22\_MED\_06DR820,           15535.
 
-   Refrigeration Compressor,3,MEDTEMP003CARLYLE\_R-22\_MED\_06DR820,           15535.
+   Refrigeration Compressor,3,MEDTEMP003CARLYLE\_R-22\_MED\_06DR820,           15535.
 
-   Refrigeration Condenser:Air-Cooled,1,MEDIUMTEMPCONDENSER  ,         51.7,      52563.5,       4000.0
+   Refrigeration Condenser:Air-Cooled,1,MEDIUMTEMPCONDENSER  ,         51.7,      52563.5,       4000.0
 
-Detailed Refrigeration System,LOWTEMPSYSTEM,R22,3,0,0,0,0,3,1,0,0.80,2,    25.0
+Detailed Refrigeration System,LOWTEMPSYSTEM,R22,3,0,0,0,0,3,1,0,0.80,2,    25.0
 
-   Refrigeration Case,7,OPENWELLICECREAMDISPLAYCASE,SALESFLOOR,9,SALESFLOOR NODE,   441.6,   0.08,  -34.4,   14.6,   28.7,   42.7,   70.0,   76.5
+   Refrigeration Case,7,OPENWELLICECREAMDISPLAYCASE,SALESFLOOR,9,SALESFLOOR NODE,   441.6,   0.08,  -34.4,   14.6,   28.7,   42.7,   70.0,   76.5
 
-   Refrigeration Case,8,GLASSDOORFROZENFOOD,SALESFLOOR,9,SALESFLOOR NODE,   615.8,   0.13,  -23.3,   11.7,   57.9,   99.8,  218.7, 1106.5
+   Refrigeration Case,8,GLASSDOORFROZENFOOD,SALESFLOOR,9,SALESFLOOR NODE,   615.8,   0.13,  -23.3,   11.7,   57.9,   99.8,  218.7, 1106.5
 
-   Refrigeration Case,9,WALKINFREEZER,BACKROOM,11,BACKROOM NODE,  1098.0,   0.10,   -2.2,    4.3,  172.2,   28.1,    0.0, 1291.7
+   Refrigeration Case,9,WALKINFREEZER,BACKROOM,11,BACKROOM NODE,  1098.0,   0.10,   -2.2,    4.3,  172.2,   28.1,    0.0, 1291.7
 
-   Refrigeration Compressor,4,LOWTEMP001CARLYLE\_R-22\_LOW\_06CC665,           15952.
+   Refrigeration Compressor,4,LOWTEMP001CARLYLE\_R-22\_LOW\_06CC665,           15952.
 
-   Refrigeration Compressor,5,LOWTEMP002CARLYLE\_R-22\_LOW\_06DR718,            2940.
+   Refrigeration Compressor,5,LOWTEMP002CARLYLE\_R-22\_LOW\_06DR718,            2940.
 
-   Refrigeration Compressor,6,LOWTEMP003CARLYLE\_R-22\_LOW\_06DR718,            2940.
+   Refrigeration Compressor,6,LOWTEMP003CARLYLE\_R-22\_LOW\_06DR718,            2940.
 
-   Refrigeration Condenser:Air-Cooled,2,LOWTEMPCONDENSER  ,         51.7,      34875.5,       2600.0
+   Refrigeration Condenser:Air-Cooled,2,LOWTEMPCONDENSER  ,         51.7,      34875.5,       2600.0
 
-   Refrigeration Mechanical Subcooler,2,SAMPLEMSC,MEDIUMTEMPSYSTEM,    10.0
+   Refrigeration Mechanical Subcooler,2,SAMPLEMSC,MEDIUMTEMPSYSTEM,    10.0
 
-   Refrigeration Liquid Suction Subcooler,1,SAMPLELSHX,     6.0,    16.0,     0.0
+   Refrigeration Liquid Suction Subcooler,1,SAMPLELSHX,     6.0,    16.0,     0.0
 
- Detailed Refrigeration System,MEDIUMTEMPSYSTEM2,R22,0,0,1,0,0,3,1,0,0.80,0,    25.0
+ Detailed Refrigeration System,MEDIUMTEMPSYSTEM2,R22,0,0,1,0,0,3,1,0,0.80,0,    25.0
 
-  Secondary Load,SECONDARY,1
+  Secondary Load,SECONDARY,1
 
-   Refrigeration Compressor,7,MEDTEMP004CARLYLE\_R-22\_MED\_06DR820,           15535.
+   Refrigeration Compressor,7,MEDTEMP004CARLYLE\_R-22\_MED\_06DR820,           15535.
 
-   Refrigeration Compressor,8,MEDTEMP005CARLYLE\_R-22\_MED\_06DR820,           15535.
+   Refrigeration Compressor,8,MEDTEMP005CARLYLE\_R-22\_MED\_06DR820,           15535.
 
-   Refrigeration Compressor,9,MEDTEMP006CARLYLE\_R-22\_MED\_06DR820,           15535.
+   Refrigeration Compressor,9,MEDTEMP006CARLYLE\_R-22\_MED\_06DR820,           15535.
 
-   Refrigeration Condenser:Evaporative-Cooled,1,MEDIUMTEMPEVAPCOOLEDCONDENSER1  ,      64800.0,        746.0
+   Refrigeration Condenser:Evaporative-Cooled,1,MEDIUMTEMPEVAPCOOLEDCONDENSER1  ,      64800.0,        746.0
 
 
 
- Detailed Refrigeration System,LOWTEMPSYSTEM2,R22,4,1,0,0,0,3,1,0,0.80,0,    25.0
+ Detailed Refrigeration System,LOWTEMPSYSTEM2,R22,4,1,0,0,0,3,1,0,0.80,0,    25.0
 
-   Refrigeration Case,11,OPENWELLICECREAMDISPLAYCASE2,SALESFLOOR,9,SALESFLOOR NODE,   441.6,   0.08,  -34.4,   14.6,   28.7,   42.7,   70.0,   76.5
+   Refrigeration Case,11,OPENWELLICECREAMDISPLAYCASE2,SALESFLOOR,9,SALESFLOOR NODE,   441.6,   0.08,  -34.4,   14.6,   28.7,   42.7,   70.0,   76.5
 
-   Refrigeration Case,12,GLASSDOORFROZENFOODA,SALESFLOOR,9,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
+   Refrigeration Case,12,GLASSDOORFROZENFOODA,SALESFLOOR,9,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
 
-   Refrigeration Case,13,GLASSDOORFROZENFOODB,SALESFLOOR,9,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
+   Refrigeration Case,13,GLASSDOORFROZENFOODB,SALESFLOOR,9,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
 
-   Refrigeration Case,14,GLASSDOORFROZENFOODC,SALESFLOOR,9,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
+   Refrigeration Case,14,GLASSDOORFROZENFOODC,SALESFLOOR,9,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
 
-   Refrigeration Walk In Cooler,  1,  WALKINFREEZER2,   4690.0,     -2.2,    735.0,      0.0,    120.0,      0.0,   5512.0,      0.0,   1
+   Refrigeration Walk In Cooler,  1,  WALKINFREEZER2,   4690.0,     -2.2,    735.0,      0.0,    120.0,      0.0,   5512.0,      0.0,   1
 
-       Walk-In Surfaces Facing Zone,BACKROOM,     43.4,   0.2350 ,    2.00,     2.00,   0.3785 ,    1.00,     2.00,   1.2050
+       Walk-In Surfaces Facing Zone,BACKROOM,     43.4,   0.2350 ,    2.00,     2.00,   0.3785 ,    1.00,     2.00,   1.2050
 
-   Refrigeration Compressor,10,LOWTEMP004CARLYLE\_R-22\_LOW\_06CC665,           15952.
+   Refrigeration Compressor,10,LOWTEMP004CARLYLE\_R-22\_LOW\_06CC665,           15952.
 
-   Refrigeration Compressor,11,LOWTEMP005CARLYLE\_R-22\_LOW\_06DR718,            2940.
+   Refrigeration Compressor,11,LOWTEMP005CARLYLE\_R-22\_LOW\_06DR718,            2940.
 
-   Refrigeration Compressor,12,LOWTEMP006CARLYLE\_R-22\_LOW\_06DR718,            2940.
+   Refrigeration Compressor,12,LOWTEMP006CARLYLE\_R-22\_LOW\_06DR718,            2940.
 
-   Refrigeration Condenser:Water-Cooled,2,LOWTEMPCONDENSERWATER  ,         29.4,      58000.0,          0.0,          0.0
+   Refrigeration Condenser:Water-Cooled,2,LOWTEMPCONDENSERWATER  ,         29.4,      58000.0,          0.0,          0.0
 
 \#Secondary Refrigeration Systems,1
 
- Secondary Refrigeration System: Fluid Always Liquid,1,SECONDARY,3,0,PROGLY30PERCENT, 35000.0, -12.60,    2.7,    4.0,  725.0,
+ Secondary Refrigeration System: Fluid Always Liquid,1,SECONDARY,3,0,PROGLY30PERCENT, 35000.0, -12.60,    2.7,    4.0,  725.0,
 
-  Refrigeration Case,15,FISHDISPLAYCASE2,SALESFLOOR,9,SALESFLOOR NODE,   288.4,   0.10,    1.1,   15.0,    0.0,   41.6,    0.0,    0.0
+  Refrigeration Case,15,FISHDISPLAYCASE2,SALESFLOOR,9,SALESFLOOR NODE,   288.4,   0.10,    1.1,   15.0,    0.0,   41.6,    0.0,    0.0
 
-  Refrigeration Case,16,MEATDISPLAYCASE2,SALESFLOOR,9,SALESFLOOR NODE,   456.6,   0.10,   -4.4,   26.0,   47.2,   86.8,   13.2,  585.8
+  Refrigeration Case,16,MEATDISPLAYCASE2,SALESFLOOR,9,SALESFLOOR NODE,   456.6,   0.10,   -4.4,   26.0,   47.2,   86.8,   13.2,  585.8
 
-  Refrigeration Case,17,MULTIDECKDAIRYANDDELICASE2,SALESFLOOR,9,SALESFLOOR NODE,  1890.0,   0.30,   -1.1,   12.0,   78.7,  307.3,    0.0,    0.0
+  Refrigeration Case,17,MULTIDECKDAIRYANDDELICASE2,SALESFLOOR,9,SALESFLOOR NODE,  1890.0,   0.30,   -1.1,   12.0,   78.7,  307.3,    0.0,    0.0
 
 For a supermarket system including a model for a cascade condenser arrangement, the eio would show:
 
-Detailed Refrigeration System,CASCADELOWTEMPSYSTEM,R22,4,1,0,0,0,3,1,0,0.80,0,    -4.0
+Detailed Refrigeration System,CASCADELOWTEMPSYSTEM,R22,4,1,0,0,0,3,1,0,0.80,0,    -4.0
 
-   Refrigeration Case,5,OPENWELLICECREAMDISPLAYCASE,SALESFLOOR,10,SALESFLOOR NODE,   441.6,   0.08,  -34.4,   14.6,   28.7,   42.7,   70.0,   76.5
+   Refrigeration Case,5,OPENWELLICECREAMDISPLAYCASE,SALESFLOOR,10,SALESFLOOR NODE,   441.6,   0.08,  -34.4,   14.6,   28.7,   42.7,   70.0,   76.5
 
-   Refrigeration Case,6,GLASSDOORFROZENFOODA,SALESFLOOR,10,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
+   Refrigeration Case,6,GLASSDOORFROZENFOODA,SALESFLOOR,10,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
 
-   Refrigeration Case,7,GLASSDOORFROZENFOODB,SALESFLOOR,10,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
+   Refrigeration Case,7,GLASSDOORFROZENFOODB,SALESFLOOR,10,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
 
-   Refrigeration Case,8,GLASSDOORFROZENFOODC,SALESFLOOR,10,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
+   Refrigeration Case,8,GLASSDOORFROZENFOODC,SALESFLOOR,10,SALESFLOOR NODE,   615.8,   0.13,  -23.3,    4.0,   57.9,   99.8,  218.7, 1106.5
 
-   Refrigeration Walk In Cooler,  1,  WALKINFREEZER,   4690.0,     -2.2,    735.0,      0.0,    120.0,      0.0,   5512.0,      0.0,   1
+   Refrigeration Walk In Cooler,  1,  WALKINFREEZER,   4690.0,     -2.2,    735.0,      0.0,    120.0,      0.0,   5512.0,      0.0,   1
 
-       Walk-In Surfaces Facing Zone,BACKROOM,     43.4,   0.2350 ,    2.00,     2.00,   0.3785 ,    2.00,     2.00,   1.2050
+       Walk-In Surfaces Facing Zone,BACKROOM,     43.4,   0.2350 ,    2.00,     2.00,   0.3785 ,    2.00,     2.00,   1.2050
 
-   Refrigeration Compressor,4,LOWTEMP001CARLYLE\_R-22\_LOW\_06CC665,           16680.
+   Refrigeration Compressor,4,LOWTEMP001CARLYLE\_R-22\_LOW\_06CC665,           16680.
 
-   Refrigeration Compressor,5,LOWTEMP002CARLYLE\_R-22\_LOW\_06DR718,            5523.
+   Refrigeration Compressor,5,LOWTEMP002CARLYLE\_R-22\_LOW\_06DR718,            5523.
 
-   Refrigeration Compressor,6,LOWTEMP003CARLYLE\_R-22\_LOW\_06DR718,            5523.
+   Refrigeration Compressor,6,LOWTEMP003CARLYLE\_R-22\_LOW\_06DR718,            5523.
 
-   Refrigeration Condenser:Cascade,4,CASCADECONDENSER1,Fixed  ,         -4.0,      20000.0,          3.0
+   Refrigeration Condenser:Cascade,4,CASCADECONDENSER1,Fixed  ,         -4.0,      20000.0,          3.0
 
- Detailed Refrigeration System,CASCADEHIGHTEMPSYSTEM,R22,0,0,0,1,0,4,1,0,0.80,0,    25.0
+ Detailed Refrigeration System,CASCADEHIGHTEMPSYSTEM,R22,0,0,0,1,0,4,1,0,0.80,0,    25.0
 
-   Cascade Load,CASCADELOWTEMPSYSTEM,4,CASCADECONDENSER1
+   Cascade Load,CASCADELOWTEMPSYSTEM,4,CASCADECONDENSER1
 
-   Refrigeration Compressor,7,MEDTEMP005CARLYLE\_R-22\_MED\_06DR820,           17190.
+   Refrigeration Compressor,7,MEDTEMP005CARLYLE\_R-22\_MED\_06DR820,           17190.
 
-   Refrigeration Compressor,8,MEDTEMP006CARLYLE\_R-22\_MED\_06DR820,           17190.
+   Refrigeration Compressor,8,MEDTEMP006CARLYLE\_R-22\_MED\_06DR820,           17190.
 
-   Refrigeration Compressor,9,MEDTEMP007CARLYLE\_R-22\_MED\_06DR820,           17190.
+   Refrigeration Compressor,9,MEDTEMP007CARLYLE\_R-22\_MED\_06DR820,           17190.
 
-   Refrigeration Compressor,10,MEDTEMP008CARLYLE\_R-22\_MED\_06DR820,           17190.
+   Refrigeration Compressor,10,MEDTEMP008CARLYLE\_R-22\_MED\_06DR820,           17190.
 
-   Refrigeration Condenser:Air-Cooled,3,CASCADETOPSYSTEMCONDENSER  ,         51.7,      52563.5,       4000.0
+   Refrigeration Condenser:Air-Cooled,3,CASCADETOPSYSTEMCONDENSER  ,         51.7,      52563.5,       4000.0
 
 The refrigeration output in the **eplusout.eio** file shows the number of refrigeration compressor racks, detailed refrigeration systems, detailed transcritical refrigeration systems, and secondary refrigeration systems found in the input data file (IDF). Additional information is shown for each compressor rack and the refrigerated case(s) and walk-in(s) connected to each compressor rack. For the detailed systems, additional information is shown for each refrigerated case(s), walk-in(s), cascade loads, secondary loads, mechanical subcooler loads, compressors, condenser, and mechanical and liquid suction heat exchanger subcoolers connected to the system. For the detailed transcritical refrigeration systems, additional information is shown for each refrigerated case(s), walk-in(s), compressor and gas cooler connected to the system. For secondary refrigeration systems, additional information is shown for each refrigerated case(s) and walk-in(s) connected to the system. For walk-ins, additional information is shown for each zone exchanging energy with that walk-in.
 
@@ -4096,7 +4097,7 @@ The Coefficient of Performance (W/W) of the compressor rack. Echoes the field De
 
 The number of the refrigerated case, assigned sequentially according to the order in which these objects are defined in the IDF.
 
-#### Field: Refrigeration  Case Name
+#### Field: Refrigeration  Case Name
 
 The name of the refrigerated case simulated. Echoes the field Name in object Refrigeration:Case from the IDF.
 
@@ -4230,7 +4231,7 @@ The thermal conductance of the glass doors facing this zone adjacent to the walk
 
 The total number of detailed refrigeration systems found in the IDF.
 
-#### Header Record:  Detailed Refrigeration System
+#### Header Record:  Detailed Refrigeration System
 
 #### Field: Refrigeration System Name
 
@@ -4244,7 +4245,7 @@ The name of the refrigerant used in the system. Echoes the field Working Fluid I
 
 The total number of refrigerated cases connected to the refrigeration system. These are assigned to the refrigeration system through the field Refrigerated Case or Walkin or CaseAndWalkInList Name in object Refrigeration:System from the IDF.
 
-#### Field: \# WalkInCoolers  Connected
+#### Field: \# WalkInCoolers  Connected
 
 The total number of walk-ins connected to the refrigeration system. These are assigned to the refrigeration system through the field Refrigerated Case or Walkin or CaseAndWalkInList Name in object Refrigeration:System from the IDF.
 
@@ -4270,7 +4271,7 @@ The number of compressor stages for the refrigeration system. The value is eithe
 
 #### Field: Intercooler Type
 
-The intercooler type (either “1” for Flash Intercooler or “2” for Shell-and-Coil Intercooler) for two-stage compression systems.  A value of “0” indicates no intercooler (single-stage compression systems only).
+The intercooler type (either “1” for Flash Intercooler or “2” for Shell-and-Coil Intercooler) for two-stage compression systems.  A value of “0” indicates no intercooler (single-stage compression systems only).
 
 #### Field: Intercooler Effectiveness
 
@@ -4290,7 +4291,7 @@ The minimum condensing temperature allowed for the refrigeration system. Echoes 
 
 The total number of detailed transcritical CO<sub>2</sub> refrigeration systems found in the IDF.
 
-#### Header Record:  Detailed Transcritical Refrigeration System
+#### Header Record:  Detailed Transcritical Refrigeration System
 
 #### Field: Transcritical Refrigeration System Name
 
@@ -4308,11 +4309,11 @@ The total number of medium temperature refrigerated cases connected to the trans
 
 The total number of low temperature refrigerated cases connected to the transcritical refrigeration system. These are assigned to the refrigeration system through the field Refrigerated Case or Walkin or CaseAndWalkInList Name in object Refrigeration:TranscriticalSystem from the IDF.
 
-#### Field: \# Medium Temperature WalkInCoolers  Connected
+#### Field: \# Medium Temperature WalkInCoolers  Connected
 
 The total number of medium temperature walk-ins connected to the transcritical refrigeration system. These are assigned to the refrigeration system through the field Refrigerated Case or Walkin or CaseAndWalkInList Name in object Refrigeration:TranscriticalSystem from the IDF.
 
-#### Field: \# Low Temperature WalkInCoolers  Connected
+#### Field: \# Low Temperature WalkInCoolers  Connected
 
 The total number of low temperature walk-ins connected to the transcritical refrigeration system. These are assigned to the refrigeration system through the field Refrigerated Case or Walkin or CaseAndWalkInList Name in object Refrigeration:TranscriticalSystem from the IDF.
 
@@ -4362,7 +4363,7 @@ The number of the mechanical subcooler cooled by this detailed system, assigned 
 
 The name of the secondary system cooled by this detailed system. These are assigned to the refrigeration system through the field Capacity-Providing System in object Refrigeration:Subcooler from the IDF. The name corresponds to an entry in the field Name in the object Refrigeration:Subcooler.
 
-#### Header Record:  Refrigeration Compressor
+#### Header Record:  Refrigeration Compressor
 
 #### Field: Compressor Number
 
@@ -4376,11 +4377,11 @@ The name of the compressor simulated. Echoes the field Name of Compressor in obj
 
 The nominal capacity of the compressor based on the capacity curve (identified by the field Unique Name of Capacity Curve in the object Refrigeration:Compressor in the IDF) evaluated at the lowest design evaporating temperature of all the cases attached to the system and at the design condensing temperature of the condenser attached to the system.
 
-#### Header Record:  Refrigeration Condenser, Air-Cooled
+#### Header Record:  Refrigeration Condenser, Air-Cooled
 
-#### Field: Condenser  Number
+#### Field: Condenser  Number
 
-The number of the refrigeration condenser, assigned sequentially according to the order in which all the Refrigeration:Condenser:\*  objects are defined in the IDF.
+The number of the refrigeration condenser, assigned sequentially according to the order in which all the Refrigeration:Condenser:\*  objects are defined in the IDF.
 
 #### Field: Condenser Name
 
@@ -4398,9 +4399,9 @@ The rated capacity of the condenser. This value is taken from the capacity curve
 
 The rated fan power of the condenser. Echoes the field Rated Fan Power in object Refrigeration:Condenser:AirCooled from the IDF.
 
-#### Header Record:  Refrigeration Condenser, Water-Cooled
+#### Header Record:  Refrigeration Condenser, Water-Cooled
 
-#### Field: Condenser  Number
+#### Field: Condenser  Number
 
 The number of the refrigeration condenser, assigned sequentially according to the order in which all the Refrigeration: Condenser:\* objects are defined in the IDF.
 
@@ -4424,9 +4425,9 @@ The rated water inlet temperature of the condenser. Echos the field Rated Water 
 
 The rated water flow rate of the condenser. Echos the field Water Design Flow Rate in the object Refrigeration:Condenser:WaterCooled in the IDF.
 
-#### Header Record:  Refrigeration Condenser, Evaporative-Cooled
+#### Header Record:  Refrigeration Condenser, Evaporative-Cooled
 
-#### Field: Condenser  Number
+#### Field: Condenser  Number
 
 The number of the refrigeration condenser, assigned sequentially according to the order in which all the Refrigeration: Condenser:\* objects are defined in the IDF.
 
@@ -4440,13 +4441,13 @@ The rated capacity of the condenser. Echos the field Rated Total Heat Rejection 
 
 #### Field: Rated Fan Power, W
 
-The rated fan power of the condenser. Echoes the field Rated Fan Power in object  Refrigeration:Condenser: EvaporativeCooled in the IDF.
+The rated fan power of the condenser. Echoes the field Rated Fan Power in object  Refrigeration:Condenser: EvaporativeCooled in the IDF.
 
-#### Header Record:  Refrigeration Condenser, Cascade
+#### Header Record:  Refrigeration Condenser, Cascade
 
-#### Field: Condenser  Number
+#### Field: Condenser  Number
 
-The number of the refrigeration condenser, assigned sequentially according to the order in which all the Refrigeration: Condenser \*  objects are defined in the IDF.
+The number of the refrigeration condenser, assigned sequentially according to the order in which all the Refrigeration: Condenser \*  objects are defined in the IDF.
 
 #### Field: Condenser Name
 
@@ -4468,7 +4469,7 @@ The rated capacity of the condenser, echoes the field Rated Effective Total Heat
 
 The approach temperature difference of the condenser, echoes the field Rated Approach Temperature Difference in object Refrigeration:Condenser:Cascade from the IDF.
 
-#### Header Record:  Refrigeration GasCooler:Air-Cooled
+#### Header Record:  Refrigeration GasCooler:Air-Cooled
 
 #### Field: Gas Cooler Number
 
@@ -4498,11 +4499,11 @@ The rated capacity of the gas cooler. This value is taken from the capacity curv
 
 The rated fan power of the gas cooler. Echoes the field Rated Fan Power in object Refrigeration:GasCooler:AirCooled from the IDF.
 
-#### Header Record: Refrigeration  Mechanical Subcooler
+#### Header Record: Refrigeration  Mechanical Subcooler
 
 #### Field: Subcooler Number
 
-The number of the mechanical subcooler, assigned sequentially according to the order in which all the Refrigeration:Subcooler  objects are defined in the IDF.
+The number of the mechanical subcooler, assigned sequentially according to the order in which all the Refrigeration:Subcooler  objects are defined in the IDF.
 
 #### Field: Subcooler Name
 
@@ -4516,11 +4517,11 @@ The name of the detailed system that absorbs heat from the subcooler. These are 
 
 The controlled outlet temperature of the subcooler, echoes the field Outlet Control Temperature in object Refrigeration: Subcooler.
 
-#### Header Record:  Refrigeration Liquid Suction Subcooler
+#### Header Record:  Refrigeration Liquid Suction Subcooler
 
 #### Field: Subcooler Number
 
-The number of the liquid suction subcooler, assigned sequentially according to the order in which all the Refrigeration:Subcooler  objects are defined in the IDF.
+The number of the liquid suction subcooler, assigned sequentially according to the order in which all the Refrigeration:Subcooler  objects are defined in the IDF.
 
 #### Field: Subcooler Name
 
@@ -4544,11 +4545,11 @@ The design cold vapor inlet temperature of the liquid suction subcooler, echoes 
 
 The total number of secondary refrigeration systems found in the IDF.
 
-#### Header Record:  Secondary Refrigeration System: Fluid Always Liquid
+#### Header Record:  Secondary Refrigeration System: Fluid Always Liquid
 
 #### Field: Secondary Number
 
-The number of the secondary refrigeration system, assigned sequentially according to the order in which all the Refrigeration:SecondarySystem  objects are defined in the IDF.
+The number of the secondary refrigeration system, assigned sequentially according to the order in which all the Refrigeration:SecondarySystem  objects are defined in the IDF.
 
 #### Field: Secondary Name
 
@@ -4558,7 +4559,7 @@ The name of the secondary refrigeration system simulated. Echoes the field Name 
 
 The total number of refrigerated cases connected to the secondary refrigeration system. These are assigned to the secondary refrigeration system through the field Refrigerated Case or Walkin or CaseAndWalkInList Name in object Refrigeration:SecondarySystem from the IDF.
 
-#### Field: \# WalkInCoolers  Connected
+#### Field: \# WalkInCoolers  Connected
 
 The total number of walk-ins connected to the secondary refrigeration system. These are assigned to the secondary refrigeration system through the field Refrigerated Case or Walkin or CaseAndWalkInList Name in object Refrigeration:System from the IDF.
 
@@ -4586,11 +4587,11 @@ The temperature range of the heat exchanger, echoes the field Design Range Tempe
 
 The rated total pump power of the secondary loop, echoes the field Design Total Pump Power in object Refrigeration:SecondarySystem.
 
-#### Header Record:  Secondary Refrigeration System: Liquid Overfeed
+#### Header Record:  Secondary Refrigeration System: Liquid Overfeed
 
 #### Field: Secondary Number
 
-The number of the secondary refrigeration system, assigned sequentially according to the order in which all the Refrigeration:SecondarySystem  objects are defined in the IDF.
+The number of the secondary refrigeration system, assigned sequentially according to the order in which all the Refrigeration:SecondarySystem  objects are defined in the IDF.
 
 #### Field: Secondary Name
 
@@ -4600,7 +4601,7 @@ The name of the secondary refrigeration system simulated. Echoes the field Name 
 
 The total number of refrigerated cases connected to the secondary refrigeration system. These are assigned to the secondary refrigeration system through the field Refrigerated Case or Walkin or CaseAndWalkInList Name in object Refrigeration:SecondarySystem from the IDF.
 
-#### Field: \# WalkInCoolers  Connected
+#### Field: \# WalkInCoolers  Connected
 
 The total number of walk-ins connected to the secondary refrigeration system. These are assigned to the secondary refrigeration system through the field Refrigerated Case or Walkin or CaseAndWalkInList Name in object Refrigeration:System from the IDF.
 
@@ -4692,7 +4693,7 @@ A message stating “NOTE: These Compressors were not simulated...”.
 
 #### Header Record: Orphaned Refrigeration Compressor
 
-#### Field:Compressor  Number
+#### Field:Compressor  Number
 
 The number of the orphaned Compressor found in the IDF. The Compressor numbers are assigned sequentially according to the order in which these objects are defined in the IDF.
 
@@ -4712,7 +4713,7 @@ A message stating “NOTE: These Secondary Loops were not simulated...”.
 
 #### Header Record: Orphaned Refrigeration Secondary Loop
 
-#### Field:Secondary  Number
+#### Field:Secondary  Number
 
 The number of the orphaned Secondary System found in the IDF. The Secondary System numbers are assigned sequentially according to the order in which these objects are defined in the IDF.
 
@@ -4830,7 +4831,7 @@ This line provides the zone name and the number of surfaces (heat transfer) in t
 
 #### Surface View Factor – Surface Information
 
-These lines provide the surface information for each surface in the zone. This includes the name, class, area, azimuth (outward facing normal angle), the tilt angle, the thermal emissivity, the number of sides to the surface and the vertices.  Again, this information may be redundant with other reports in the eio file. It is included here to assist users who wish to use the auxiliary view factor program to generate view factors.
+These lines provide the surface information for each surface in the zone. This includes the name, class, area, azimuth (outward facing normal angle), the tilt angle, the thermal emissivity, the number of sides to the surface and the vertices.  Again, this information may be redundant with other reports in the eio file. It is included here to assist users who wish to use the auxiliary view factor program to generate view factors.
 
 #### Approximate or User Input View Factors
 
@@ -4852,7 +4853,7 @@ Outputs are provided for air-cooled, single-speed direct expansion (DX) cooling 
 
     ! &lt;DX Cooling Coil Standard Rating Information&gt;, Component Type, Component Name, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}
 
-    DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_1:1\_COOLC DXCOIL, 29299.3, 3.04, 10.38, 10.47, 10.67
+    DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_1:1\_COOLC DXCOIL, 29299.3, 3.04, 10.38, 10.47, 10.67
 
     DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_2:2\_COOLC DXCOIL, 17427.1, 3.21, 10.95, 11.04, 11.20
 
@@ -4931,7 +4932,7 @@ Rated net cooling capacity of unit at Test condition D per Standard ASHRAE 127. 
 Rated total electric power input of the unit at Test condition D per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The total electric power includes the supply fan power as well. The total electric power input is reported for class I, II, III and IV test conditions.
 
 ```
-! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric Power Test D {W} 
+! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric Power Test D {W}
  DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 1, 126953.8, 35918.5, 135678.7, 30852.7, 141523.1, 24400.1, 141727.0, 13951.0
  DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 2, 133377.6, 37330.3, 140336.0, 31647.7, 141727.0, 24424.7, 141727.0, 13951.0
  DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 3, 139488.4, 38673.3, 141354.0, 31821.4, 141727.0, 24424.7, 141727.0, 13951.0
@@ -5007,20 +5008,20 @@ Outputs are provided for lookup tables in two forms. The first being the outputs
 ! <CREATING NEW CURVE OBJECT>
 CREATING NEW CURVE OBJECT
 ! Input as Table:OneIndependentVariable "HPACCOOLCAPFFF"
-! RSquared       = 1.0000000000
+! RSquared       = 1.0000000000
 ! Standard Error = 0.0000000000
-! Sample Size    = 3
+! Sample Size    = 3
 Curve:Quadratic,
-FromTable_HPACCOOLCAPFFF,  !- Name
-  0.8000000000,  !- Coefficient1 Constant
-  0.2000000000,  !- Coefficient2 x
-  -3.1086244690E-015,  !- Coefficient3 x**2
-  0.0000000000,  !- Minimum Value of x
-  1.5000000000,  !- Maximum Value of x
-  0.8000000000,  !- Minimum Curve Output
-  1.5000000000;  !- Maximum Curve Output
+FromTable_HPACCOOLCAPFFF,  !- Name
+  0.8000000000,  !- Coefficient1 Constant
+  0.2000000000,  !- Coefficient2 x
+  -3.1086244690E-015,  !- Coefficient3 x**2
+  0.0000000000,  !- Minimum Value of x
+  1.5000000000,  !- Maximum Value of x
+  0.8000000000,  !- Minimum Curve Output
+  1.5000000000;  !- Maximum Curve Output
 END CREATING NEW CURVE OBJECT
-``
+```
 
 A second output form is provided to echo the reading of tabular data. The tabular data is echoed for each multi-variable lookup table object (ref. Table:MultiVariableLookup). The data is echoed using an increasing order sort format regardless of the format specified by the user. In addition, the tabular data is echoed when the data is included in the table object, or when read from an external file. This output form is provided as a verification step when reading tabular data. The normalization point is not included in the raw data varification.
 
@@ -5028,9 +5029,9 @@ A second output form is provided to echo the reading of tabular data. The tabula
 ! <READING LOOKUP TABLE DATA&>
 READING LOOKUP TABLE DATA
 ! Reading tabular data for Table:MultiVariableLookup "HPACCOOLCAPFFF2"
-  1   3
-  0.000000000000000E+000   1.00000000000000        1.50000000000000
-  0.800000000000000        1.00000000000000        1.10000000000000
+  1   3
+  0.000000000000000E+000   1.00000000000000        1.50000000000000
+  0.800000000000000        1.00000000000000        1.10000000000000
 END READING LOOKUP TABLE DATA
 ```
 
@@ -5040,7 +5041,7 @@ As described elsewhere, EnergyPlus simulates the first day of each simulation pe
 
 ! &lt;Environment:WarmupDays&gt;, NumberofWarmupDays
 
-Environment:WarmupDays,  6
+Environment:WarmupDays,  6
 
 #### Field: &lt;Environment:WarmupDays&gt;
 
@@ -5052,7 +5053,7 @@ This field will show the number of days required to reach the convergence state 
 
 ### Warmup Convergence Outputs
 
-Warmup is performed for each environment being simulated. When a file passes convergence, no warnings are shown.  However, when it doesn’t a warning appears in the eplusout.err file, for example:
+Warmup is performed for each environment being simulated. When a file passes convergence, no warnings are shown.  However, when it doesn’t a warning appears in the eplusout.err file, for example:
 
 CheckWarmupConvergence: Loads Initialization, Zone="BACKROOM" did not converge after 25 warmup days.
 
@@ -5080,15 +5081,15 @@ Summary (warmup convergance information is not reported during sizing and only a
 
 Warmup Convergence Information,PLENUM-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1459548118,7.6866834879E-002,Pass,Pass,6.4148162842E-002,0.1344412193,Pass,Pass
 
- Warmup Convergence Information,SPACE1-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1205887641,0.2962564087,Pass,Pass,0.6840608138,3.7598304674,Pass,Pass
+ Warmup Convergence Information,SPACE1-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1205887641,0.2962564087,Pass,Pass,0.6840608138,3.7598304674,Pass,Pass
 
- Warmup Convergence Information,SPACE2-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1494584750,0.4540146507,Pass,Pass,0.7552649309,3.0925096445,Pass,Pass
+ Warmup Convergence Information,SPACE2-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1494584750,0.4540146507,Pass,Pass,0.7552649309,3.0925096445,Pass,Pass
 
- Warmup Convergence Information,SPACE3-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1150550710,0.2873890950,Pass,Pass,7.0443709912,61.6558566585,Pass,Pass
+ Warmup Convergence Information,SPACE3-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1150550710,0.2873890950,Pass,Pass,7.0443709912,61.6558566585,Pass,Pass
 
- Warmup Convergence Information,SPACE4-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1153798692,0.4838241280,Pass,Pass,2.4744275587,18.1154149427,Pass,Pass
+ Warmup Convergence Information,SPACE4-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1153798692,0.4838241280,Pass,Pass,2.4744275587,18.1154149427,Pass,Pass
 
- Warmup Convergence Information,SPACE5-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1208173250,0.2114200039,Pass,Pass,0.4984428726,2.8997025264,Pass,Pass
+ Warmup Convergence Information,SPACE5-1,RunPeriod: Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300,0.1208173250,0.2114200039,Pass,Pass,0.4984428726,2.8997025264,Pass,Pass
 
 #### Field: Zone Name
 
@@ -5136,17 +5137,17 @@ Detailed warmup convergence information is reported if you add an Output:Diagnos
 
 ! &lt;Warmup Convergence Information&gt;, Zone Name,Time Step,Hour of Day, Warmup Temperature Difference {deltaC}, Warmup Load Difference {W}
 
- Warmup Convergence Information, PLENUM-1,1,1,7.2649997289E-005,0.3830511891
+ Warmup Convergence Information, PLENUM-1,1,1,7.2649997289E-005,0.3830511891
 
- Warmup Convergence Information, SPACE1-1,1,1,1.9871863274E-004,1.6099213169E-002
+ Warmup Convergence Information, SPACE1-1,1,1,1.9871863274E-004,1.6099213169E-002
 
- Warmup Convergence Information, SPACE2-1,1,1,4.2767539998E-003,3.1481614518
+ Warmup Convergence Information, SPACE2-1,1,1,4.2767539998E-003,3.1481614518
 
- Warmup Convergence Information, SPACE3-1,1,1,1.2388614949E-003,5.9934952313
+ Warmup Convergence Information, SPACE3-1,1,1,1.2388614949E-003,5.9934952313
 
- Warmup Convergence Information, SPACE4-1,1,1,2.7512443391E-003,3.9192729035
+ Warmup Convergence Information, SPACE4-1,1,1,2.7512443391E-003,3.9192729035
 
- Warmup Convergence Information, SPACE5-1,1,1,1.7415692658E-003,5.3879887714
+ Warmup Convergence Information, SPACE5-1,1,1,1.7415692658E-003,5.3879887714
 
 #### Field: Zone Name
 
@@ -5162,7 +5163,7 @@ This field will show the value of hour of the day.
 
 #### Field: Warmup Temperature Difference
 
-This field will provide a mean air temperature comparison between the second to last and the last warmup day for the simulation.  In other words, it will provide a DT between, for example, 9:10AM on the second to last warmup day and 9:10AM on the last warmup day. The value will be on a zone-by-zone basis for each time step in the simulation.
+This field will provide a mean air temperature comparison between the second to last and the last warmup day for the simulation.  In other words, it will provide a DT between, for example, 9:10AM on the second to last warmup day and 9:10AM on the last warmup day. The value will be on a zone-by-zone basis for each time step in the simulation.
 
 #### Field: Warmup Load Difference
 
@@ -5219,31 +5220,31 @@ Table 3. EnergyPlus Errors
 
 The previous table illustrates the three levels of errors that occur in the eplusout.err file. Several other message lines may be shown as well. For example:
 
-\*\* Warning \*\* World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.
+\*\* Warning \*\* World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.
 
-\*\*   ~~~   \*\* These may be used in daylighting reference point coordinate calculations  but not in normal geometry inputs.
+\*\*   ~~~   \*\* These may be used in daylighting reference point coordinate calculations  but not in normal geometry inputs.
 
 The line that includes the “~~~” is a “continue” error line. It continues from the previous line to help describe the context of the error.
 
 Some common errors, their consequences, and what to do about them follows:
 
-\*\* Severe  \*\* IP: Possible incorrect IDD File
+\*\* Severe  \*\* IP: Possible incorrect IDD File
 
-\*\* Severe  \*\* IP: Possible Invalid Numerics
+\*\* Severe  \*\* IP: Possible Invalid Numerics
 
-\*\*  Fatal  \*\* IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination.
+\*\*  Fatal  \*\* IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination.
 
 The previous errors cause program termination. The most likely cause is that you have an “old” IDF and have not converted it to work with the current version of the program. In this case, you will likely has some other hints such as alphas in numeric fields or too many fields in an object. Energyplus also has built in range checking:
 
-\*\* Severe  \*\* Out of range value Numeric Field\#7 (Sky Clearness), value=100.00000, range={&gt;=0.0 and &lt;=1.2}, in SIZINGPERIOD:DESIGNDAY=CHICAGO ANN CLG .4% CONDNS WB=&gt;MDB
+\*\* Severe  \*\* Out of range value Numeric Field\#7 (Sky Clearness), value=100.00000, range={&gt;=0.0 and &lt;=1.2}, in SIZINGPERIOD:DESIGNDAY=CHICAGO ANN CLG .4% CONDNS WB=&gt;MDB
 
 If these occur during the initial processing of the IDF, you will see a termination clause:
 
-\*\* Severe  \*\* IP: Out of "range" values found in input
+\*\* Severe  \*\* IP: Out of "range" values found in input
 
-\*\* Severe  \*\* IP: Out of "range" values and/or blank required fields found in input
+\*\* Severe  \*\* IP: Out of "range" values and/or blank required fields found in input
 
-\*\*  Fatal  \*\* IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination.
+\*\*  Fatal  \*\* IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination.
 
 The error message should supply you with enough information to find the line with the error. More details on error message formatting and some standard error messages are described in the Tips & Tricks document.
 
@@ -5278,15 +5279,15 @@ Six standard items appear at the start of every EnergyPlus Standard Output File 
 
 Program Version,EnergyPlus &lt;version number indicated&gt;
 
-  1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+  1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
 
-  2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+  2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
 
-  3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables Requested
+  3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables Requested
 
-  4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Report Variables Requested
+  4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Report Variables Requested
 
-  5,1,Cumulative Days of Simulation[] ! When Run Period Report Variables Requested
+  5,1,Cumulative Days of Simulation[] ! When Run Period Report Variables Requested
 
 Item 0 is the program version statement.
 
@@ -5314,19 +5315,9 @@ This example illustrates the non-consecutive nature of the “report codes”. I
 
 The data is produced when the actual simulation is performed (after the warmup days unless the Output:Diagnostics requesting ReportDuringWarmup is used). Data output is simpler in format than the data dictionary lines. From the dictionary above:
 
-     1,DENVER COLORADO WINTER,  39.75,-104.87,  -7.00,1610.26
+     1,DENVER COLORADO WINTER,  39.75,-104.87,  -7.00,1610.26
 
-     2,  1, 1,21, 0, 1, 0.00,60.00,Monday
-
-6,-17.22222
-
-21,-17.22219
-
-22,0.0000000E+00
-
-26,0.0000000E+00
-
-     2,  1, 1,21, 0, 2, 0.00,60.00,Monday
+     2,  1, 1,21, 0, 1, 0.00,60.00,Monday
 
 6,-17.22222
 
@@ -5336,7 +5327,17 @@ The data is produced when the actual simulation is performed (after the warmup d
 
 26,0.0000000E+00
 
-     2,  1, 1,21, 0, 3, 0.00,60.00,Monday
+     2,  1, 1,21, 0, 2, 0.00,60.00,Monday
+
+6,-17.22222
+
+21,-17.22219
+
+22,0.0000000E+00
+
+26,0.0000000E+00
+
+     2,  1, 1,21, 0, 3, 0.00,60.00,Monday
 
 6,-17.22222
 
@@ -5358,15 +5359,15 @@ Figure 4. Example Chart from Standard Output File
 
 Program Version,EnergyPlus, &lt;version&gt;
 
-     1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+     1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
 
-     2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+     2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
 
-     3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables Requested
+     3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables Requested
 
-     4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Report Variables Requested
+     4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Report Variables Requested
 
-     5,1,Cumulative Days of Simulation[] ! When Run Period Report Variables Requested
+     5,1,Cumulative Days of Simulation[] ! When Run Period Report Variables Requested
 
 6,2,Environment, Site Outdoor Air Drybulb Temperature [C] !Hourly
 
@@ -5398,9 +5399,9 @@ Program Version,EnergyPlus, &lt;version&gt;
 
 End of Data Dictionary
 
-  1,CHANUTE AFB ILLINOIS SUMMER,  40.30, -88.13,  -6.00, 229.51
+  1,CHANUTE AFB ILLINOIS SUMMER,  40.30, -88.13,  -6.00, 229.51
 
-  2,   1, 7,21, 0, 1, 0.00,60.00,Monday
+  2,   1, 7,21, 0, 1, 0.00,60.00,Monday
 
 6,21.2884261500000
 
@@ -5456,7 +5457,7 @@ And the following would appear in the standard output file:
 
 Item \# 6 will be listed following the TimeStep timestamp for each timestep. Item \#7 will be listed following an hourly timestamp. And item \#8 will be listed following a monthly timestamp and has additional fields (because it is an “average” variable) that show the minimum and maximum values with identifying times for those minimum and maximum. An excerpt will illustrate:
 
-     2,  1, 7,21, 0, 1, 0.00,15.00,Monday** – timestep timestamp**
+     2,  1, 7,21, 0, 1, 0.00,15.00,Monday** – timestep timestamp**
 
 6,17.08889
 
@@ -5468,11 +5469,11 @@ Item \# 6 will be listed following the TimeStep timestamp for each timestep. Ite
 
 60,21.87214
 
-     2,  1, 7,21, 0, 1, 0.00,60.00,Monday** – hourly timestamp**
+     2,  1, 7,21, 0, 1, 0.00,60.00,Monday** – hourly timestamp**
 
 7,16.75555
 
-     4,  1, 7** – monthly timestamp**
+     4,  1, 7** – monthly timestamp**
 
 8,22.77037,15.00000,21, 4,60,32.77778,21,14,60
 
@@ -5484,54 +5485,54 @@ eplusout.log
 When EnergyPlus is running, it is usually running from a “command” window (unless inside another interface program) and some items may appear in the command window. These messages are preserved in the “log” output file. For example:
 
 ```
- EnergyPlus Starting
- EnergyPlus, Version <version>
- Processing Data Dictionary
- Processing Input File
- Warming up
- Initializing Response Factors
- Calculating CTFs for "ROOF-1", Construction #1
- Calculating CTFs for "WALL-1", Construction #2
- Calculating CTFs for "FLOOR-SLAB-1", Construction #6
- Calculating CTFs for "INT-WALL-1", Construction #7
- Initializing Window Optical Properties
- Initializing Solar Calculations
- Initializing HVAC
- Warming up
- Warming up
- Performing Zone Sizing Simulation
- Warming up
- Warming up
- Performing Zone Sizing Simulation
- Calculating System sizing
- Calculating System sizing
- Initializing New Environment Parameters
- Warming up {1}
- Warming up {2}
- Warming up {3}
- Starting Simulation at 01/01 for CHICAGO IL USA TMY2-94846 WMO#=725300
- Updating Shadowing Calculations, Start Date=01/21
- Continuing Simulation at 01/21 for CHICAGO IL USA TMY2-94846 WMO#=725300
- Updating Shadowing Calculations, Start Date=02/10
- Continuing Simulation at 02/10 for CHICAGO IL USA TMY2-94846 WMO#=725300
- Updating Shadowing Calculations, Start Date=03/02
- Continuing Simulation at 03/02 for CHICAGO IL USA TMY2-94846 WMO#=725300
- Updating Shadowing Calculations, Start Date=03/22
- Continuing Simulation at 03/22 for CHICAGO IL USA TMY2-94846 WMO#=725300
+ EnergyPlus Starting
+ EnergyPlus, Version <version>
+ Processing Data Dictionary
+ Processing Input File
+ Warming up
+ Initializing Response Factors
+ Calculating CTFs for "ROOF-1", Construction #1
+ Calculating CTFs for "WALL-1", Construction #2
+ Calculating CTFs for "FLOOR-SLAB-1", Construction #6
+ Calculating CTFs for "INT-WALL-1", Construction #7
+ Initializing Window Optical Properties
+ Initializing Solar Calculations
+ Initializing HVAC
+ Warming up
+ Warming up
+ Performing Zone Sizing Simulation
+ Warming up
+ Warming up
+ Performing Zone Sizing Simulation
+ Calculating System sizing
+ Calculating System sizing
+ Initializing New Environment Parameters
+ Warming up {1}
+ Warming up {2}
+ Warming up {3}
+ Starting Simulation at 01/01 for CHICAGO IL USA TMY2-94846 WMO#=725300
+ Updating Shadowing Calculations, Start Date=01/21
+ Continuing Simulation at 01/21 for CHICAGO IL USA TMY2-94846 WMO#=725300
+ Updating Shadowing Calculations, Start Date=02/10
+ Continuing Simulation at 02/10 for CHICAGO IL USA TMY2-94846 WMO#=725300
+ Updating Shadowing Calculations, Start Date=03/02
+ Continuing Simulation at 03/02 for CHICAGO IL USA TMY2-94846 WMO#=725300
+ Updating Shadowing Calculations, Start Date=03/22
+ Continuing Simulation at 03/22 for CHICAGO IL USA TMY2-94846 WMO#=725300
 <reduced>
 Updating Shadowing Calculations, Start Date=12/07
- Continuing Simulation at 12/07 for CHICAGO IL USA TMY2-94846 WMO#=725300
- Updating Shadowing Calculations, Start Date=12/27
- Continuing Simulation at 12/27 for CHICAGO IL USA TMY2-94846 WMO#=725300
- EnergyPlus Run Time=00hr 00min 46.00sec
+ Continuing Simulation at 12/07 for CHICAGO IL USA TMY2-94846 WMO#=725300
+ Updating Shadowing Calculations, Start Date=12/27
+ Continuing Simulation at 12/27 for CHICAGO IL USA TMY2-94846 WMO#=725300
+ EnergyPlus Run Time=00hr 00min 46.00sec
 ReadVarsESO program starting.
-ReadVars Run Time=00hr 00min  1.11sec
+ReadVars Run Time=00hr 00min  1.11sec
 ReadVarsESO program completed successfully.
 ReadVarsESO program starting.
-ReadVars Run Time=00hr 00min  0.00sec
+ReadVars Run Time=00hr 00min  0.00sec
 ReadVarsESO program completed successfully.
-  Started HVAC Diagram
-  Complete
+  Started HVAC Diagram
+  Complete
 ```
 
 eplusout.mtd
@@ -5541,43 +5542,43 @@ This file contains the “meter details” for the run. This shows what report v
 
 The meter details file consists of two parts:
 
-- For report variables that are on meters, it shows all the meters that the report variable is on.  In the following example, “Meters for “ &lt;report variable \#&gt;, &lt;report variable name&gt; is shown and then the meters that accumulate the value of that variable as a “meter”.
+- For report variables that are on meters, it shows all the meters that the report variable is on.  In the following example, “Meters for “ &lt;report variable \#&gt;, &lt;report variable name&gt; is shown and then the meters that accumulate the value of that variable as a “meter”.
 
- Meters for 1240,SPACE1-1:Lights-Electric Energy [J]
+ Meters for 1240,SPACE1-1:Lights-Electric Energy [J]
 
-  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Facility [J]
 
-  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Building [J]
 
-  OnMeter=Electricity:Zone:SPACE1-1 [J]
+  OnMeter=Electricity:Zone:SPACE1-1 [J]
 
-  OnMeter=InteriorLights:Electricity [J]
+  OnMeter=InteriorLights:Electricity [J]
 
-  OnMeter=InteriorLights:Electricity:Zone:SPACE1-1 [J]
-
-
-
- Meters for 1460,SPACE1-1:Zone Air System Sensible Heating Energy [J]
-
-  OnMeter=EnergyTransfer:Facility [J]
-
-  OnMeter=EnergyTransfer:Building [J]
-
-  OnMeter=EnergyTransfer:Zone:SPACE1-1 [J]
-
-  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=InteriorLights:Electricity:Zone:SPACE1-1 [J]
 
 
 
+ Meters for 1460,SPACE1-1:Zone Air System Sensible Heating Energy [J]
+
+  OnMeter=EnergyTransfer:Facility [J]
+
+  OnMeter=EnergyTransfer:Building [J]
+
+  OnMeter=EnergyTransfer:Zone:SPACE1-1 [J]
+
+  OnMeter=Heating:EnergyTransfer [J]
 
 
- Meters for 1557,SPACE1-1 ZONE COIL:Heating Coil Heating Energy [J]
 
-  OnMeter=EnergyTransfer:Facility [J]
 
-  OnMeter=EnergyTransfer:HVAC [J]
 
-  OnMeter=HeatingCoils:EnergyTransfer [J]
+ Meters for 1557,SPACE1-1 ZONE COIL:Heating Coil Heating Energy [J]
+
+  OnMeter=EnergyTransfer:Facility [J]
+
+  OnMeter=EnergyTransfer:HVAC [J]
+
+  OnMeter=HeatingCoils:EnergyTransfer [J]
 
 
 
@@ -5585,79 +5586,79 @@ The meter details file consists of two parts:
 
 For Meter=Electricity:Facility [J], contents are:
 
-  SPACE1-1 LIGHTS 1:Lights Electric Energy
+  SPACE1-1 LIGHTS 1:Lights Electric Energy
 
-  SPACE2-1 LIGHTS 1:Lights Electric Energy
+  SPACE2-1 LIGHTS 1:Lights Electric Energy
 
-  SPACE3-1 LIGHTS 1:Lights Electric Energy
+  SPACE3-1 LIGHTS 1:Lights Electric Energy
 
-  SPACE4-1 LIGHTS 1:Lights Electric Energy
+  SPACE4-1 LIGHTS 1:Lights Electric Energy
 
-  SPACE5-1 LIGHTS 1:Lights Electric Energy
+  SPACE5-1 LIGHTS 1:Lights Electric Energy
 
-  SPACE1-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE1-1 ELECEQ 1:Electric Equipment Electric Energy
 
-  SPACE2-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE2-1 ELECEQ 1:Electric Equipment Electric Energy
 
-  SPACE3-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE3-1 ELECEQ 1:Electric Equipment Electric Energy
 
-  SPACE4-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE4-1 ELECEQ 1:Electric Equipment Electric Energy
 
-  SPACE5-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE5-1 ELECEQ 1:Electric Equipment Electric Energy
 
-  SUPPLY FAN 1:Fan Electric Energy
+  SUPPLY FAN 1:Fan Electric Energy
 
-  CENTRAL CHILLER:Chiller Electric Energy
+  CENTRAL CHILLER:Chiller Electric Energy
 
-  HW CIRC PUMP:Pump Electric Energy
+  HW CIRC PUMP:Pump Electric Energy
 
-  CW CIRC PUMP:Pump Electric Energy
-
-
-
- For Meter=Electricity:Building [J], contents are:
-
-  SPACE1-1 LIGHTS 1:Lights Electric Energy
-
-  SPACE2-1 LIGHTS 1:Lights Electric Energy
-
-  SPACE3-1 LIGHTS 1:Lights Electric Energy
-
-  SPACE4-1 LIGHTS 1:Lights Electric Energy
-
-  SPACE5-1 LIGHTS 1:Lights Electric Energy
-
-  SPACE1-1 ELECEQ 1:Electric Equipment Electric Energy
-
-  SPACE2-1 ELECEQ 1:Electric Equipment Electric Energy
-
-  SPACE3-1 ELECEQ 1:Electric Equipment Electric Energy
-
-  SPACE4-1 ELECEQ 1:Electric Equipment Electric Energy
-
-  SPACE5-1 ELECEQ 1:Electric Equipment Electric Energy
+  CW CIRC PUMP:Pump Electric Energy
 
 
 
- For Meter=Electricity:Zone:SPACE1-1 [J], contents are:
+ For Meter=Electricity:Building [J], contents are:
 
-  SPACE1-1 LIGHTS:Lights Electric Energy
+  SPACE1-1 LIGHTS 1:Lights Electric Energy
 
-  SPACE1-1 ELECEQ:Electric Equipment Electric Energy
+  SPACE2-1 LIGHTS 1:Lights Electric Energy
+
+  SPACE3-1 LIGHTS 1:Lights Electric Energy
+
+  SPACE4-1 LIGHTS 1:Lights Electric Energy
+
+  SPACE5-1 LIGHTS 1:Lights Electric Energy
+
+  SPACE1-1 ELECEQ 1:Electric Equipment Electric Energy
+
+  SPACE2-1 ELECEQ 1:Electric Equipment Electric Energy
+
+  SPACE3-1 ELECEQ 1:Electric Equipment Electric Energy
+
+  SPACE4-1 ELECEQ 1:Electric Equipment Electric Energy
+
+  SPACE5-1 ELECEQ 1:Electric Equipment Electric Energy
 
 
 
- For Meter=InteriorLights:Electricity [J], contents are:
+ For Meter=Electricity:Zone:SPACE1-1 [J], contents are:
 
-  SPACE1-1 LIGHTS:Lights Electric Energy
+  SPACE1-1 LIGHTS:Lights Electric Energy
 
-  SPACE2-1 LIGHTS:Lights Electric Energy
+  SPACE1-1 ELECEQ:Electric Equipment Electric Energy
 
-  SPACE3-1 LIGHTS:Lights Electric Energy
 
-  SPACE4-1 LIGHTS:Lights Electric Energy
 
-  SPACE5-1 LIGHTS:Lights Electric Energy
+ For Meter=InteriorLights:Electricity [J], contents are:
+
+  SPACE1-1 LIGHTS:Lights Electric Energy
+
+  SPACE2-1 LIGHTS:Lights Electric Energy
+
+  SPACE3-1 LIGHTS:Lights Electric Energy
+
+  SPACE4-1 LIGHTS:Lights Electric Energy
+
+  SPACE5-1 LIGHTS:Lights Electric Energy
 
 
 
@@ -5665,51 +5666,51 @@ For Meter=Electricity:Facility [J], contents are:
 
 For Meter=Gas:Facility [J], contents are:
 
-  CENTRAL BOILER:Boiler Gas Energy
+  CENTRAL BOILER:Boiler Gas Energy
 
 
 
- For Meter=Gas:Plant [J], contents are:
+ For Meter=Gas:Plant [J], contents are:
 
-  CENTRAL BOILER:Boiler Gas Energy
-
-
-
- For Meter=Heating:Gas [J], contents are:
-
-  CENTRAL BOILER:Boiler Gas Energy
+  CENTRAL BOILER:Boiler Gas Energy
 
 
 
- For Meter=Electricity:Plant [J], contents are:
+ For Meter=Heating:Gas [J], contents are:
 
-  CENTRAL CHILLER:Chiller Electric Energy
-
-  HW CIRC PUMP:Pump Electric Energy
-
-  CW CIRC PUMP:Pump Electric Energy
+  CENTRAL BOILER:Boiler Gas Energy
 
 
 
- For Meter=Cooling:Electricity [J], contents are:
+ For Meter=Electricity:Plant [J], contents are:
 
-  CENTRAL CHILLER:Chiller Electric Energy
+  CENTRAL CHILLER:Chiller Electric Energy
+
+  HW CIRC PUMP:Pump Electric Energy
+
+  CW CIRC PUMP:Pump Electric Energy
 
 
 
- For Meter=Cooling:EnergyTransfer [J], contents are:
+ For Meter=Cooling:Electricity [J], contents are:
 
-  PLENUM-1:Zone Air System Sensible Cooling Energy
+  CENTRAL CHILLER:Chiller Electric Energy
 
-  SPACE1-1:Zone Air System Sensible Cooling Energy
 
-  SPACE2-1:Zone Air System Sensible Cooling Energy
 
-  SPACE3-1:Zone Air System Sensible Cooling Energy
+ For Meter=Cooling:EnergyTransfer [J], contents are:
 
-  SPACE4-1:Zone Air System Sensible Cooling Energy
+  PLENUM-1:Zone Air System Sensible Cooling Energy
 
-  SPACE5-1:Zone Air System Sensible Cooling Energy
+  SPACE1-1:Zone Air System Sensible Cooling Energy
+
+  SPACE2-1:Zone Air System Sensible Cooling Energy
+
+  SPACE3-1:Zone Air System Sensible Cooling Energy
+
+  SPACE4-1:Zone Air System Sensible Cooling Energy
+
+  SPACE5-1:Zone Air System Sensible Cooling Energy
 
 
 
@@ -5721,45 +5722,45 @@ As further illustration, an abbreviated example shows:
 
 Meters for 6,EAST ZONE LIGHTS 1:Lights Electric Energy [J]
 
-  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Facility [J]
 
-  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Building [J]
 
-  OnMeter=Electricity:Zone:EAST ZONE [J]
+  OnMeter=Electricity:Zone:EAST ZONE [J]
 
-  OnMeter=InteriorLights:Electricity [J]
+  OnMeter=InteriorLights:Electricity [J]
 
-  OnMeter=InteriorLights:Electricity:Zone:EAST ZONE [J]
+  OnMeter=InteriorLights:Electricity:Zone:EAST ZONE [J]
 
-  OnMeter=GeneralLights:InteriorLights:Electricity [J]
+  OnMeter=GeneralLights:InteriorLights:Electricity [J]
 
 
 
 For Meter=Electricity:Facility [J], ResourceType=Electricity, contents are:
 
-  EAST ZONE LIGHTS 1:Lights Electric Energy
+  EAST ZONE LIGHTS 1:Lights Electric Energy
 
-  NORTH ZONE LIGHTS 1:Lights Electric Energy
+  NORTH ZONE LIGHTS 1:Lights Electric Energy
 
-  WEST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  WEST ZONE ELECEQ 1:Electric Equipment Electric Energy
 
-  EAST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  EAST ZONE ELECEQ 1:Electric Equipment Electric Energy
 
-  NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy
+  NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy
 
-  SUPPLY FAN 1:Fan Electric Energy
+  SUPPLY FAN 1:Fan Electric Energy
 
-  LITTLE CHILLER:Chiller Electric Energy
+  LITTLE CHILLER:Chiller Electric Energy
 
-  BIG CHILLER:Chiller Electric Energy
+  BIG CHILLER:Chiller Electric Energy
 
-  BIG TOWER:Cooling Tower Fan Electric Energy
+  BIG TOWER:Cooling Tower Fan Electric Energy
 
-  CIRC PUMP:Pump Electric Energy
+  CIRC PUMP:Pump Electric Energy
 
-  COND CIRC PUMP:Pump Electric Energy
+  COND CIRC PUMP:Pump Electric Energy
 
-  HW CIRC PUMP:Pump Electric Energy
+  HW CIRC PUMP:Pump Electric Energy
 
 This shows the meters on which the Zone: Lights Electric Energy appear as well as the contents of the Electricity:Facility meter.
 
@@ -6068,7 +6069,7 @@ From a three zone file that had no HVAC electricity (i.e., had only electric equ
 
 Current resource types are shown in the table below:
 
-Table 4. Table of Metered Resource  Types
+Table 4. Table of Metered Resource  Types
 
 <table class="table table-striped">
 <tr>
@@ -6181,17 +6182,17 @@ Custom Meters, (review Input Output Reference, objects: **Meter:Custom** and **M
 For example, one might put the Building Infiltration Heat Loss & Heat Gain on a set of custom meters:
 
 ```
-  Meter:Custom,
-    Building Infiltration Heat Loss,  !- Name
-    Generic,             !- Fuel Type
-    *,                       !- Key Name 1
-    Zone Infiltration Total Heat Loss Energy;  !- Output Variable Name 1
+  Meter:Custom,
+    Building Infiltration Heat Loss,  !- Name
+    Generic,             !- Fuel Type
+    *,                       !- Key Name 1
+    Zone Infiltration Total Heat Loss Energy;  !- Output Variable Name 1
 
-  Meter:Custom,
-    Building Infiltration Heat Gain,  !- Name
-    Generic,             !- Fuel Type
-    *,                       !- Key Name 1
-    Zone Infiltration Total Heat Gain Energy;  !- Output Variable Name 1
+  Meter:Custom,
+    Building Infiltration Heat Gain,  !- Name
+    Generic,             !- Fuel Type
+    *,                       !- Key Name 1
+    Zone Infiltration Total Heat Gain Energy;  !- Output Variable Name 1
 ```
 
 One can then report these values the same way one reports other standard meters.
@@ -6201,7 +6202,7 @@ One can then report these values the same way one reports other standard meters.
 eplusout.shd
 ------------
 
-This file contains details of the shadow casting, back and receiving surfaces for the building. The [Engineering Reference](file:///E:\Docs4PDFs\EngineeringReference.pdf) explains the shadowing calculations in more detail; this report file merely shows the level of interactions that the calculations will use. The report shows the Solar Distribution algorithm (in the example Full Interior and Exterior) and then proceeds to illustrate which surfaces shade (possibly) which other surfaces.
+This file contains details of the shadow casting, back and receiving surfaces for the building. The Engineering Reference explains the shadowing calculations in more detail; this report file merely shows the level of interactions that the calculations will use. The report shows the Solar Distribution algorithm (in the example Full Interior and Exterior) and then proceeds to illustrate which surfaces shade (possibly) which other surfaces.
 
 Note, a casting surface -- a shadow casting surface or general casting surface (so called in the file) -- is one that casts a shadow on other surfaces. A receiving surface - a shadow receiving surface -- is one that receives shadows from other surfaces (i.e. casting surfaces). A back surface -- an inside surface -- is one that may be partially sunlit/receive solar transmission for interior solar distribution.
 
@@ -6211,89 +6212,89 @@ Shadowing Combinations
 
 ..Solar Distribution=FullInteriorAndExterior
 
- ==================================
+ ==================================
 
- Surface=ZN001:WALL001 is used as Receiving Surface in calculations.
+ Surface=ZN001:WALL001 is used as Receiving Surface in calculations.
 
- Number of general casting surfaces=           0
+ Number of general casting surfaces=           0
 
- Number of back surfaces=           5
+ Number of back surfaces=           5
 
- ...Surface=ZN001:WALL002
+ ...Surface=ZN001:WALL002
 
- ...Surface=ZN001:WALL003
+ ...Surface=ZN001:WALL003
 
- ...Surface=ZN001:WALL004
+ ...Surface=ZN001:WALL004
 
- ...Surface=ZN001:FLR001
+ ...Surface=ZN001:FLR001
 
- ...Surface=ZN001:ROOF001
+ ...Surface=ZN001:ROOF001
 
- Number of receiving sub surfaces=           1
+ Number of receiving sub surfaces=           1
 
- ....Surface=ZN001:WALL001:WIN001
+ ....Surface=ZN001:WALL001:WIN001
 
- ==================================
+ ==================================
 
- Surface=ZN001:WALL001:WIN001 is not used as Receiving Surface in calculations.
+ Surface=ZN001:WALL001:WIN001 is not used as Receiving Surface in calculations.
 
- Number of general casting surfaces=           0
+ Number of general casting surfaces=           0
 
- Number of back surfaces=           0
+ Number of back surfaces=           0
 
- Number of receiving sub surfaces=           0
+ Number of receiving sub surfaces=           0
 
 
 
- ==================================
+ ==================================
 
- Surface=ZN001:WALL002 is used as Receiving Surface in calculations.
+ Surface=ZN001:WALL002 is used as Receiving Surface in calculations.
 
- Number of general casting surfaces=           0
+ Number of general casting surfaces=           0
 
- Number of back surfaces=           0
+ Number of back surfaces=           0
 
- Number of receiving sub surfaces=           0
+ Number of receiving sub surfaces=           0
 
- ==================================
+ ==================================
 
- Surface=ZN001:WALL003 is not used as Receiving Surface in calculations.
+ Surface=ZN001:WALL003 is not used as Receiving Surface in calculations.
 
- Number of general casting surfaces=           0
+ Number of general casting surfaces=           0
 
- Number of back surfaces=           0
+ Number of back surfaces=           0
 
- Number of receiving sub surfaces=           0
+ Number of receiving sub surfaces=           0
 
- ==================================
+ ==================================
 
- Surface=ZN001:WALL004 is not used as Receiving Surface in calculations.
+ Surface=ZN001:WALL004 is not used as Receiving Surface in calculations.
 
- Number of general casting surfaces=           0
+ Number of general casting surfaces=           0
 
- Number of back surfaces=           0
+ Number of back surfaces=           0
 
- Number of receiving sub surfaces=           0
+ Number of receiving sub surfaces=           0
 
- ==================================
+ ==================================
 
- Surface=ZN001:FLR001 is not used as Receiving Surface in calculations.
+ Surface=ZN001:FLR001 is not used as Receiving Surface in calculations.
 
- Number of general casting surfaces=           0
+ Number of general casting surfaces=           0
 
- Number of back surfaces=           0
+ Number of back surfaces=           0
 
- Number of receiving sub surfaces=           0
+ Number of receiving sub surfaces=           0
 
- ==================================
+ ==================================
 
- Surface=ZN001:ROOF001 is used as Receiving Surface in calculations.
+ Surface=ZN001:ROOF001 is used as Receiving Surface in calculations.
 
- Number of general casting surfaces=           0
+ Number of general casting surfaces=           0
 
- Number of back surfaces=           0
+ Number of back surfaces=           0
 
- Number of receiving sub surfaces=           0
+ Number of receiving sub surfaces=           0
 
 eplusout.sln
 ------------
@@ -6302,13 +6303,13 @@ The following shows an excerpt of “lines” report (**eplusout.sln**) for a si
 
 SPACE1-1:MAIN SOUTH OVERHANG
 
-     -0.65,     -1.13,      2.20,      0.00,      0.00,      2.20
+     -0.65,     -1.13,      2.20,      0.00,      0.00,      2.20
 
-      0.00,      0.00,      2.20,     17.15,     -9.90,      2.20
+      0.00,      0.00,      2.20,     17.15,     -9.90,      2.20
 
-     17.15,     -9.90,      2.20,     16.50,    -11.03,      2.20
+     17.15,     -9.90,      2.20,     16.50,    -11.03,      2.20
 
-     16.50,    -11.03,      2.20,     -0.65,     -1.13,      2.20
+     16.50,    -11.03,      2.20,     -0.65,     -1.13,      2.20
 
 The following shows an excerpt of “lines, IDF” report (**eplusout.sln**) for a single surface. It gives the coordinates in the “standard” EnergyPlus fashion (that is, UpperLeftCorner first and proceeding around, in this case, the four vertices in the surface. Note that this is NOT a complete description of the surface but enough to change your IDF file, if you want to.
 
@@ -6316,53 +6317,53 @@ Building North Axis = 0
 
 GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;
 
- Surface=SHADING, Name=ROOMSOUTH SURF6-VFIN1-6
+ Surface=SHADING, Name=ROOMSOUTH SURF6-VFIN1-6
 
-  4,  !- Number of (X,Y,Z) groups in this surface
+  4,  !- Number of (X,Y,Z) groups in this surface
 
-      -23.34,    -14.85,      2.41,  !- X,Y,Z ==&gt; Vertex 1
+      -23.34,    -14.85,      2.41,  !- X,Y,Z ==&gt; Vertex 1
 
-      -23.34,    -14.76,      2.49,  !- X,Y,Z ==&gt; Vertex 2
+      -23.34,    -14.76,      2.49,  !- X,Y,Z ==&gt; Vertex 2
 
-      -18.13,    -14.76,      2.49,  !- X,Y,Z ==&gt; Vertex 3
+      -18.13,    -14.76,      2.49,  !- X,Y,Z ==&gt; Vertex 3
 
-      -18.13,    -14.85,      2.41;  !- X,Y,Z ==&gt; Vertex 4
+      -18.13,    -14.85,      2.41;  !- X,Y,Z ==&gt; Vertex 4
 
- Surface=WALL, Name=ROOMNORTH SURF3-1
+ Surface=WALL, Name=ROOMNORTH SURF3-1
 
-  4,  !- Number of (X,Y,Z) groups in this surface
+  4,  !- Number of (X,Y,Z) groups in this surface
 
-      -15.94,     -5.34,      3.00,  !- X,Y,Z ==&gt; Vertex 1
+      -15.94,     -5.34,      3.00,  !- X,Y,Z ==&gt; Vertex 1
 
-      -15.94,     -5.34,      0.00,  !- X,Y,Z ==&gt; Vertex 2
+      -15.94,     -5.34,      0.00,  !- X,Y,Z ==&gt; Vertex 2
 
-      -18.91,     -5.34,      0.00,  !- X,Y,Z ==&gt; Vertex 3
+      -18.91,     -5.34,      0.00,  !- X,Y,Z ==&gt; Vertex 3
 
-      -18.91,     -5.34,      3.00;  !- X,Y,Z ==&gt; Vertex 4
+      -18.91,     -5.34,      3.00;  !- X,Y,Z ==&gt; Vertex 4
 
- Surface=WALL, Name=ROOMNORTH SURF4-1
+ Surface=WALL, Name=ROOMNORTH SURF4-1
 
-  4,  !- Number of (X,Y,Z) groups in this surface
+  4,  !- Number of (X,Y,Z) groups in this surface
 
-      -18.91,     -5.34,      3.00,  !- X,Y,Z ==&gt; Vertex 1
+      -18.91,     -5.34,      3.00,  !- X,Y,Z ==&gt; Vertex 1
 
-      -18.91,     -5.34,      0.00,  !- X,Y,Z ==&gt; Vertex 2
+      -18.91,     -5.34,      0.00,  !- X,Y,Z ==&gt; Vertex 2
 
-      -22.65,     -5.34,      0.00,  !- X,Y,Z ==&gt; Vertex 3
+      -22.65,     -5.34,      0.00,  !- X,Y,Z ==&gt; Vertex 3
 
-      -22.65,     -5.34,      3.00;  !- X,Y,Z ==&gt; Vertex 4
+      -22.65,     -5.34,      3.00;  !- X,Y,Z ==&gt; Vertex 4
 
- Surface=WINDOW, Name=ROOMNORTH SURF5-1-NOSHADE
+ Surface=WINDOW, Name=ROOMNORTH SURF5-1-NOSHADE
 
-  4,  !- Number of (X,Y,Z) groups in this surface
+  4,  !- Number of (X,Y,Z) groups in this surface
 
-      -19.02,     -5.34,      2.59,  !- X,Y,Z ==&gt; Vertex 1
+      -19.02,     -5.34,      2.59,  !- X,Y,Z ==&gt; Vertex 1
 
-      -19.02,     -5.34,      0.41,  !- X,Y,Z ==&gt; Vertex 2
+      -19.02,     -5.34,      0.41,  !- X,Y,Z ==&gt; Vertex 2
 
-      -22.54,     -5.34,      0.41,  !- X,Y,Z ==&gt; Vertex 3
+      -22.54,     -5.34,      0.41,  !- X,Y,Z ==&gt; Vertex 3
 
-      -22.54,     -5.34,      2.59;  !- X,Y,Z ==&gt; Vertex 4
+      -22.54,     -5.34,      2.59;  !- X,Y,Z ==&gt; Vertex 4
 
 
 
@@ -6431,17 +6432,17 @@ This initial release of the SQL database output option includes a variety of dat
 
 - ZoneInfoLists Table
 
-- [Simulations](#_Simulations_Table_1)Table
+- Simulations Table
 
-- [EnvironmentPeriods](#_EnvironmentPeriods_Table)Table
+- EnvironmentPeriods Table
 
 - TabularData Table
 
-- [Strings](#_Strings_Table)Table
+- Strings Table
 
-- [StringTypes](#_StringTypes_Table)Table
+- StringTypes Table
 
-- [TabularDataWithStrings](#_TabularDataWithStrings_Table)Table
+- TabularDataWithStrings Table
 
 - Errors Table
 
@@ -6469,7 +6470,7 @@ The ReportDataDictionary table provides the equivalent of the dictionary portion
 <td>ReportDataDictionaryIndex</td>
 <td>INTEGER PRIMARY KEY</td>
 <td>The ReportDataDictionaryIndex links the dictionary data to the variable data (see ReportData table)</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>IsMeter</td>
@@ -6487,7 +6488,7 @@ The ReportDataDictionary table provides the equivalent of the dictionary portion
 <td>IndexGroup</td>
 <td>TEXT</td>
 <td>The reporting group (e.g., Zone, Plant, etc.)</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>TimestepType</td>
@@ -6500,31 +6501,31 @@ The ReportDataDictionary table provides the equivalent of the dictionary portion
 <td>KeyValue</td>
 <td>TEXT</td>
 <td>The identifying “key name” for the data</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Name</td>
 <td>TEXT</td>
 <td>The actual report data name</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>ReportingFrequency</td>
 <td>TEXT</td>
 <td>The reporting frequency of the variable, e.g.</td>
-<td>“HVAC System Timestep”,  “Zone Timestep”,  “Hourly”, “Daily”, “Monthly”, “Run Period”.</td>
+<td>“HVAC System Timestep”,  “Zone Timestep”,  “Hourly”, “Daily”, “Monthly”, “Run Period”.</td>
 </tr>
 <tr>
 <td>ScheduleName</td>
 <td>TEXT</td>
 <td>The name of the schedule that controls reporting frequency</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Units</td>
 <td>TEXT</td>
 <td>The data units</td>
-<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -6704,7 +6705,7 @@ The Time table provides the time information for both the “report variable” 
 <tr>
 <td>SimulationDays</td>
 <td>INTEGER</td>
-<td>Day of simulation.  This number resets after warmup and at the beginning of an environment period</td>
+<td>Day of simulation.  This number resets after warmup and at the beginning of an environment period</td>
 </tr>
 <tr>
 <td>DayType</td>
@@ -8196,7 +8197,7 @@ Please see the Group-Schedules section of the Input-Output Reference for more in
 
 #### Simulations Table
 
-An overview of the Simulations SQL table is shown below.  Currently there will only be one record in the table, because the SQLite database is relevant to only one simulation.  In the future this might change if multiple simulations are aggregated into a larger database.
+An overview of the Simulations SQL table is shown below.  Currently there will only be one record in the table, because the SQLite database is relevant to only one simulation.  In the future this might change if multiple simulations are aggregated into a larger database.
 
 
 
@@ -8225,7 +8226,7 @@ An overview of the Simulations SQL table is shown below.  Currently there will 
 <tr>
 <td>NumTimestepsPerHour</td>
 <td>INTEGER</td>
-<td>The number of timesteps per hour used for the simulation.  See the Timestep object for more information.</td>
+<td>The number of timesteps per hour used for the simulation.  See the Timestep object for more information.</td>
 </tr>
 <tr>
 <td>Completed</td>
@@ -8270,13 +8271,13 @@ An overview of the EnvironmentPeriods SQL table is shown below.
 <tr>
 <td>EnvironmentType</td>
 <td>INTEGER</td>
-<td>An enumeration of the environment type.  (1 = Design Day, 2 =  Design Run Period, 3 = Weather Run Period)  See the various SizingPeriod objects and the RunPeriod object for details.</td>
+<td>An enumeration of the environment type.  (1 = Design Day, 2 =  Design Run Period, 3 = Weather Run Period)  See the various SizingPeriod objects and the RunPeriod object for details.</td>
 </tr>
 </table>
 
 #### TabularData Table
 
-An overview of the TabularData SQL table is shown below.   The TabularData table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The TabularData table contains all of the tabular report information that is typically output to one of the formats controlled by the OutputControl:Table:Style object.  This is a generic way of dumping all of the existing tabular reports to the SQLite database.  This table has many references to the companion Strings table.  The Strings table simply associates strings to an integer value for space efficiency of the database.  Tabular data is easier to query from the TabularDataWithStrings table, which is implemented as a database view that joins this table with the Strings table.
+An overview of the TabularData SQL table is shown below.   The TabularData table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The TabularData table contains all of the tabular report information that is typically output to one of the formats controlled by the OutputControl:Table:Style object.  This is a generic way of dumping all of the existing tabular reports to the SQLite database.  This table has many references to the companion Strings table.  The Strings table simply associates strings to an integer value for space efficiency of the database.  Tabular data is easier to query from the TabularDataWithStrings table, which is implemented as a database view that joins this table with the Strings table.
 
 
 
@@ -8300,12 +8301,12 @@ An overview of the TabularData SQL table is shown below.   The TabularData tab
 <tr>
 <td>ReportForStringIndex</td>
 <td>INTEGER</td>
-<td>A foreign key to an entry in the Strings table, which indicates the “For” text that is associated with the record.  An example is the Space Loads report where the “For” text identifies which zone the record pertains to.</td>
+<td>A foreign key to an entry in the Strings table, which indicates the “For” text that is associated with the record.  An example is the Space Loads report where the “For” text identifies which zone the record pertains to.</td>
 </tr>
 <tr>
 <td>TableNameIndex</td>
 <td>INTEGER</td>
-<td>A foreign key to an entry in the Strings table, which indicates the name of the table the record belongs to.  This is typically the text that immediately precedes the tables in html format.</td>
+<td>A foreign key to an entry in the Strings table, which indicates the name of the table the record belongs to.  This is typically the text that immediately precedes the tables in html format.</td>
 </tr>
 <tr>
 <td>SimulationIndex</td>
@@ -8335,23 +8336,23 @@ An overview of the TabularData SQL table is shown below.   The TabularData tab
 <tr>
 <td>RowId</td>
 <td>INTEGER</td>
-<td>The index of the row associated with the record.  Data in the first row of a tabular report would have the Id 1.</td>
+<td>The index of the row associated with the record.  Data in the first row of a tabular report would have the Id 1.</td>
 </tr>
 <tr>
 <td>ColumnId</td>
 <td>INTEGER</td>
-<td>The index of the column associated with the record.  Data in the first column of a tabular report would have the Id 1.</td>
+<td>The index of the column associated with the record.  Data in the first column of a tabular report would have the Id 1.</td>
 </tr>
 <tr>
 <td>Value</td>
 <td>REAL</td>
-<td>The value of the record.  Most data is numeric, thus the type for this column is REAL.  The SQLite engine will first try to store the value as a REAL, however if this fails the value will be stored as text.</td>
+<td>The value of the record.  Most data is numeric, thus the type for this column is REAL.  The SQLite engine will first try to store the value as a REAL, however if this fails the value will be stored as text.</td>
 </tr>
 </table>
 
 #### Strings Table
 
-An overview of the Strings SQL table is shown below. The Strings table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The Strings table simply associates strings with integers to save space in the database.
+An overview of the Strings SQL table is shown below. The Strings table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The Strings table simply associates strings with integers to save space in the database.
 
 
 
@@ -8400,19 +8401,19 @@ An overview of the StringTypes SQL table is shown below. The StringTypes table i
 <tr>
 <td>Value</td>
 <td>TEXT</td>
-<td>The record’s string value.  Currently there are 6 possible values; ReportName, ReportForString, TableName, RowName, ColumnName, and Units.  That is, entries in the Strings table are one of these types.</td>
+<td>The record’s string value.  Currently there are 6 possible values; ReportName, ReportForString, TableName, RowName, ColumnName, and Units.  That is, entries in the Strings table are one of these types.</td>
 </tr>
 </table>
 
 #### TabularDataWithStrings Table
 
-An overview of the TabularDataWithStrings SQL table is shown below.  This table is implemented as a view of other tables and is not actually a table in the database.  This view is similar to the TabularData table except text strings are directly available in place of foreign keys to the Strings table.   The TabularDataWithStrings view is only created when the “SimpleAndTabular” choice is made in the Output:SQLite object.
+An overview of the TabularDataWithStrings SQL table is shown below.  This table is implemented as a view of other tables and is not actually a table in the database.  This view is similar to the TabularData table except text strings are directly available in place of foreign keys to the Strings table.   The TabularDataWithStrings view is only created when the “SimpleAndTabular” choice is made in the Output:SQLite object.
 
 An example of a SQL query to get a table out of the AnnualBuildingUtilityPerformanceSummary report is the following.
 
 ````
-select \* FROM TabularDataWithStrings WHERE 
-ReportName='AnnualBuildingUtilityPerformanceSummary' 
+select \* FROM TabularDataWithStrings WHERE
+ReportName='AnnualBuildingUtilityPerformanceSummary'
 and TableName='Site and Source Energy';
 ````
 
@@ -8469,7 +8470,7 @@ and TableName='Site and Source Energy';
 
 #### Errors Table
 
-The Errors SQL table reports errors and warnings for the simulation.  The content of this table includes most of the content of the error file.  However, it does not contain purely informational messages (e.g. not warnings or errors) and some of the error summary statistics which may be readily computed. Users should be aware that errors experienced while processing input cause EnergyPlus to exit before the SQLite output database has been initialized.  This is because the Output:SQLite object must be parsed from the input to request the database.  Therefore, failures in input processing are indicated by the absence of a SQLite output file.  The regular error or audit files must be used to identify the erroneous input objects in this case.  Because each error or warning message is expected to be unique these messages are stored directly in the Errors table and not in the Strings table.
+The Errors SQL table reports errors and warnings for the simulation.  The content of this table includes most of the content of the error file.  However, it does not contain purely informational messages (e.g. not warnings or errors) and some of the error summary statistics which may be readily computed. Users should be aware that errors experienced while processing input cause EnergyPlus to exit before the SQLite output database has been initialized.  This is because the Output:SQLite object must be parsed from the input to request the database.  Therefore, failures in input processing are indicated by the absence of a SQLite output file.  The regular error or audit files must be used to identify the erroneous input objects in this case.  Because each error or warning message is expected to be unique these messages are stored directly in the Errors table and not in the Strings table.
 
 
 
@@ -8503,7 +8504,7 @@ The Errors SQL table reports errors and warnings for the simulation.  The conte
 <tr>
 <td>Count</td>
 <td>INTEGER</td>
-<td>Number of times that the error was repeated.  This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated.</td>
+<td>Number of times that the error was repeated.  This will be 1 for normal warnings or errors, 0 for warning and error messages, and the number of times the error or warning is repeated.</td>
 </tr>
 </table>
 
@@ -8529,7 +8530,7 @@ The sqlite3 command line tool comes preinstalled on a number of more recent Linu
 
 #### Macintosh OS X
 
-The sqlite3 program comes standard on MacOS X 10.5. From the command line, type “sqlite3 --version” to see which version of sqlite3 is installed.  In order to access the database created by EnergyPlus, version 3 or later is required.
+The sqlite3 program comes standard on MacOS X 10.5. From the command line, type “sqlite3 --version” to see which version of sqlite3 is installed.  In order to access the database created by EnergyPlus, version 3 or later is required.
 
 #### Accessing the Data from the Command Line
 
@@ -8619,7 +8620,7 @@ Time,:Des Heat Mass Flow [kg/s],:Des Cool Mass Flow [kg/s],:Des Heat Cap [W],:De
 
 
 
-Coinc Peak   ,1.063943E+00,1.378986E+00,5.944199E+03,2.165922E+04,
+Coinc Peak   ,1.063943E+00,1.378986E+00,5.944199E+03,2.165922E+04,
 
 NonCoinc Peak,1.063943E+00,1.553319E+00,5.944199E+03,2.165922E+04,
 
@@ -8664,45 +8665,7 @@ epluszsz.&lt;ext&gt;
 
 This file is a result of the zone sizing calculation. Zone Sizing (see Sizing:Zone object) performs a special calculation, using a theoretical ideal zonal system, and determines the zone design heating and cooling flow rates and loads, saving the results in the zone sizing arrays. The file has a similar format to the eplusssz.&lt;ext&gt; file.
 
-An excerpt (this is a direct copy of the CSV data, so you can copy it to a spreadsheet to view it easier):
-
-Time,SPACE1-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE1-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE1-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE1-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s],SPACE2-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE2-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE2-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE2-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s],SPACE3-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE3-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE3-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE3-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s],SPACE4-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE4-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE4-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE4-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s],SPACE5-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Load [W],SPACE5-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Sens Cool Load [W],SPACE5-1:CHICAGO\_IL\_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB:Des Heat Mass Flow [kg/s],SPACE5-1:CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB:Des Cool Mass Flow [kg/s]
-
-00:15:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-00:30:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-00:45:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-01:00:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-01:15:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-01:30:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-01:45:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-02:00:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-02:15:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-02:30:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
-02:45:00,3.860764E+03,0.000000E+00,1.371872E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,3.753069E+03,0.000000E+00,1.333603E-01,0.000000E+00,1.625149E+03,0.000000E+00,5.774764E-02,0.000000E+00,2.981568E+03,0.000000E+00,1.059457E-01,0.000000E+00
-
- === reduced for brevity ===
-
-
-
-
-
-Peak,3.860764E+03,2.647331E+03,1.371872E-01,2.618408E-01,1.625149E+03,2.234379E+03,5.774764E-02,2.209833E-01,3.753069E+03,2.506339E+03,1.333603E-01,2.478849E-01,1.625149E+03,2.464720E+03,5.774764E-02,2.437670E-01,2.981568E+03,2.628694E+03,1.059457E-01,2.599981E-01
-
-
-
-Peak Vol Flow (m3/s),,,1.166672E-01,2.226756E-01,,,4.910995E-02,1.879294E-01,,,1.134128E-01,2.108072E-01,,,4.910995E-02,2.073052E-01,,,9.009871E-02,2.211085E-01
-
-The columns are:
+The file has too many columns to display properly here, but a typical run will include the following columns, with a peak row following the time series data rows:
 
 #### Field: Time
 
@@ -8710,7 +8673,7 @@ Calculation time – this will show the time steps used by the simulation and by
 
 #### Sizing Calculation Fields
 
-Each of the Zone Sizing output fields has the Zone Name, the Environment Name for the peak prepended to the item that has been calculated.  The four fields calculated are:
+Each of the Zone Sizing output fields has the Zone Name, the Environment Name for the peak prepended to the item that has been calculated.  The four fields calculated are:
 
 - Des Heat Load
 
@@ -8722,15 +8685,15 @@ Each of the Zone Sizing output fields has the Zone Name, the Environment Name fo
 
 These are repeated for the number of zones in the sizing calculation.
 
-#### Field:  Des Heat Load [W]
+#### Field:  Des Heat Load [W]
 
 This is the calculated design/required heating load at the time step.
 
-#### Field:  Des Sens Cool Load [W]
+#### Field:  Des Sens Cool Load [W]
 
 This is the calculated design/required cooling load at the time step.
 
-#### Field:  Des Heat Mass Flow [kg/s]
+#### Field:  Des Heat Mass Flow [kg/s]
 
 This is the calculated design/required heating mass flow rate at the time step.
 
@@ -8771,18 +8734,18 @@ The eplusmap.csv (or txt or tab extension) is a file that is generated by the Ou
 
 ```
 Output:IlluminanceMap,
-    Daylit Map,              !- Map Name
-    Daylit Zone,             !- Zone Name
-    0.8,                     !- Z height {m}
-    0.1,                     !- X minimum coordinate {m}
-    4.9,                     !- X maximum coordinate {m}
-    10,                      !- Number of X grid points
-    0.1,                     !- Y minimum coordinate {m}
-    9.9,                     !- Y maximum coordinate {m}
-    10;                      !- Number of Y grid points
+    Daylit Map,              !- Map Name
+    Daylit Zone,             !- Zone Name
+    0.8,                     !- Z height {m}
+    0.1,                     !- X minimum coordinate {m}
+    4.9,                     !- X maximum coordinate {m}
+    10,                      !- Number of X grid points
+    0.1,                     !- Y minimum coordinate {m}
+    9.9,                     !- Y maximum coordinate {m}
+    10;                      !- Number of Y grid points
 ```
 
-generates the following output in csv format when viewed with Microsoft Excel.  **Note that if the point is outside the zone a “\*” will be shown.**
+generates the following output in csv format when viewed with Microsoft Excel.  **Note that if the point is outside the zone a “\*” will be shown.**
 
 ![](media/image019.png)
 
@@ -9160,7 +9123,7 @@ Site and Source Energy
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Total Energy (GJ)</th>
 <th>Energy Per Total Building Area (MJ/m2)</th>
 <th>Energy Per Conditioned Building Area (MJ/m2)</th>
@@ -9199,7 +9162,7 @@ Source to Site Energy Converstion Factors
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Source=&gt;Site Conversion Factor</th>
 </tr>
 <tr>
@@ -9256,7 +9219,7 @@ Building Area
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Area (m2)</th>
 </tr>
 <tr>
@@ -9281,7 +9244,7 @@ End Uses
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Electricity (GJ)</th>
 <th>Natural Gas (GJ)</th>
 <th>Other Fuel (GJ)</th>
@@ -9416,13 +9379,13 @@ End Uses
 <td>0.00</td>
 </tr>
 <tr>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Total End Uses</td>
@@ -9443,7 +9406,7 @@ End Uses By Subcategory
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Subcategory</th>
 <th>Electricity (GJ)</th>
 <th>Natural Gas (GJ)</th>
@@ -9606,7 +9569,7 @@ Utility Use Per Conditioned Floor Area
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Electricity Intensity (MJ/m2)</th>
 <th>Natural Gas Intensity (MJ/m2)</th>
 <th>Other Fuel Intensity (MJ/m2)</th>
@@ -9660,7 +9623,7 @@ Utility Use Per Total Floor Area
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Electricity Intensity (MJ/m2)</th>
 <th>Natural Gas Intensity (MJ/m2)</th>
 <th>Other Fuel Intensity (MJ/m2)</th>
@@ -9714,7 +9677,7 @@ Electric Loads Satisfied
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Electricity (GJ)</th>
 <th>Percent Electricity (%)</th>
 </tr>
@@ -9749,9 +9712,9 @@ Electric Loads Satisfied
 <td>0.00</td>
 </tr>
 <tr>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Electricity Coming From Utility</td>
@@ -9769,9 +9732,9 @@ Electric Loads Satisfied
 <td>100.00</td>
 </tr>
 <tr>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Total On-Site and Utility Electric Sources</td>
@@ -9791,44 +9754,44 @@ Electric Loads Satisfied
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Heat (GJ)</th>
 <th>Percent Heat (%)</th>
 </tr>
 <tr>
 <td>Water-Side Heat Recovery</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Air to Air Heat Recovery for Cooling</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Air to Air Heat Recovery for Heating</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>High-Temperature Geothermal*</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Solar Water Thermal</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Solar Air Thermal</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Total On-Site Thermal Sources</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -9840,7 +9803,7 @@ Water Source Summary
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Water (m3)</th>
 <th>Percent Water (%)</th>
 </tr>
@@ -9919,7 +9882,7 @@ Comfort and Setpoint Not Met Summary
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Facility (Hours)</th>
 </tr>
 <tr>
@@ -9956,7 +9919,7 @@ General
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Value</th>
 </tr>
 <tr>
@@ -10005,7 +9968,7 @@ Window-Wall Ratio
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Total</th>
 <th>North (315 to 45 deg)</th>
 <th>East (45 to 135 deg)</th>
@@ -10046,7 +10009,7 @@ Skylight-Roof Ratio
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Total</th>
 </tr>
 <tr>
@@ -10075,7 +10038,7 @@ Zone Summary
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Area (m2)</th>
 <th>Conditioned (Y/N)</th>
 <th>Volume (m3)</th>
@@ -10095,7 +10058,7 @@ Zone Summary
 <td>54.84</td>
 <td>0.00</td>
 <td>0.0000</td>
-<td> </td>
+<td> </td>
 <td>0.0000</td>
 </tr>
 <tr>
@@ -10161,9 +10124,9 @@ Zone Summary
 <tr>
 <td>Total</td>
 <td>927.20</td>
-<td> </td>
+<td> </td>
 <td>1416.00</td>
-<td> </td>
+<td> </td>
 <td>274.20</td>
 <td>61.65</td>
 <td>8.0889</td>
@@ -10173,9 +10136,9 @@ Zone Summary
 <tr>
 <td>Conditioned Total</td>
 <td>927.20</td>
-<td> </td>
+<td> </td>
 <td>1416.00</td>
-<td> </td>
+<td> </td>
 <td>274.20</td>
 <td>61.65</td>
 <td>8.0889</td>
@@ -10185,14 +10148,14 @@ Zone Summary
 <tr>
 <td>Unconditioned Total</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -10212,7 +10175,7 @@ End Uses
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Electricity (W)</th>
 <th>Natural Gas (W)</th>
 <th>Propane (W)</th>
@@ -10356,13 +10319,13 @@ End Uses
 <td>0.00</td>
 </tr>
 <tr>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Total End Uses</td>
@@ -10383,7 +10346,7 @@ End Uses By Subcategory
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Subcategory</th>
 <th>Electricity (W)</th>
 <th>Natural Gas (W)</th>
@@ -10993,16 +10956,16 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<td> </td>
+<td> </td>
 <th>Type</th>
 <th>Nominal Capacity (W)</th>
 <th>Nominal Efficiency (W/W)</th>
 </tr>
 <tr>
 <td>None</td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -11012,7 +10975,7 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Type</th>
 <th>Nominal Total Capacity (W)</th>
 <th>Nominal Sensible Capacity (W)</th>
@@ -11037,7 +11000,7 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Type</th>
 <th>Nominal Total Capacity (W)</th>
 <th>Nominal Efficiency (W/W)</th>
@@ -11086,7 +11049,7 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Type</th>
 <th>Total Efficiency (W/W)</th>
 <th>Delta Pressure (pa)</th>
@@ -11113,7 +11076,7 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Type</th>
 <th>Control</th>
 <th>Head (pa)</th>
@@ -11122,11 +11085,11 @@ Central Plant
 </tr>
 <tr>
 <td>None</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -11136,7 +11099,7 @@ Central Plant
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Type</th>
 <th>Storage Volume (m3)</th>
 <th>Input(W)</th>
@@ -11146,12 +11109,12 @@ Central Plant
 </tr>
 <tr>
 <td>None</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -11171,7 +11134,7 @@ Opaque Exterior
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Construction</th>
 <th>Reflectance</th>
 <th>U-Factor with Film (W/m2-K)</th>
@@ -11234,7 +11197,7 @@ Opaque Exterior
 <td>463.60</td>
 <td>210.00</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>FRONT-1</td>
@@ -11256,7 +11219,7 @@ Opaque Exterior
 <td>99.16</td>
 <td>30.00</td>
 <td>180.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>RIGHT-1</td>
@@ -11278,7 +11241,7 @@ Opaque Exterior
 <td>42.73</td>
 <td>300.00</td>
 <td>180.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>BACK-1</td>
@@ -11300,7 +11263,7 @@ Opaque Exterior
 <td>96.48</td>
 <td>74.22</td>
 <td>180.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>LEFT-1</td>
@@ -11322,7 +11285,7 @@ Opaque Exterior
 <td>42.73</td>
 <td>120.00</td>
 <td>180.00</td>
-<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>F5-1</td>
@@ -11333,7 +11296,7 @@ Opaque Exterior
 <td>182.49</td>
 <td>30.00</td>
 <td>180.00</td>
-<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -11343,7 +11306,7 @@ Opaque Exterior
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Construction</th>
 <th>Area of One Opening (m2)</th>
 <th>Area of Openings (m2)</th>
@@ -11435,42 +11398,42 @@ Opaque Exterior
 </tr>
 <tr>
 <td>Total or Average</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>61.65</td>
 <td>3.26</td>
 <td>0.753</td>
 <td>0.778</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>North Total or Average</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>20.85</td>
 <td>3.39</td>
 <td>0.751</td>
 <td>0.769</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Non-North Total or Average</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>40.80</td>
 <td>3.19</td>
 <td>0.755</td>
 <td>0.782</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -11488,7 +11451,7 @@ Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Possible Shadow Casters</th>
 </tr>
 <tr>
@@ -11515,7 +11478,7 @@ Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Possible Shadow Casters</th>
 </tr>
 <tr>
@@ -11558,7 +11521,7 @@ Sunlit Fraction
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>March 21 9am</th>
 <th>March 21 noon</th>
 <th>March 21 3pm</th>
@@ -11649,7 +11612,7 @@ Sunlit Fraction
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Name</th>
 <th>Type</th>
 <th>Shaded Construction</th>
@@ -11658,11 +11621,11 @@ Sunlit Fraction
 </tr>
 <tr>
 <td>none</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -11777,17 +11740,17 @@ Interior Lighting
 </tr>
 <tr>
 <td>Interior Lighting Total</td>
-<td> </td>
+<td> </td>
 <td>16.1777</td>
 <td>463.60</td>
 <td>7500.00</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 <td>106.70</td>
 </tr>
 </table>
@@ -11808,12 +11771,12 @@ Interior Lighting
 </tr>
 <tr>
 <td>None</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -11835,11 +11798,11 @@ Interior Lighting
 <tr>
 <td>Exterior Lighting Total</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 </tr>
 </table>
@@ -11848,7 +11811,7 @@ Interior Lighting
 
 ### HVAC Sizing Summary
 
-The HVAC Sizing Summary report provides information on the zone cooling and heating sizing and the peak load conditions as well as information about the system air flow sizing. The Design Load is the zone sensible load only and it does not include any system effects or ventilation loads. The user specified design load and airflow and the values calculated by the program are shown in the report along with the time of the peak load and the temperature and humidity ratio at the time of the peak during the sizing periods. This information is generated for both the Zone Sensible Cooling and Zone Sensible Heating tables. 
+The HVAC Sizing Summary report provides information on the zone cooling and heating sizing and the peak load conditions as well as information about the system air flow sizing. The Design Load is the zone sensible load only and it does not include any system effects or ventilation loads. The user specified design load and airflow and the values calculated by the program are shown in the report along with the time of the peak load and the temperature and humidity ratio at the time of the peak during the sizing periods. This information is generated for both the Zone Sensible Cooling and Zone Sensible Heating tables.
 
 Also included is the System Design Air Flow Rates which includes the calculated cooling air flow rate, the user specified air flow rate for cooling, the calculated heating air flow rate, and the user specified air flow rate for heating.
 
@@ -11856,7 +11819,7 @@ Also included is the System Design Air Flow Rates which includes the calculated 
 
 Directly following is an example of the report.
 
-The key used to obtain this report is HVACSizingSummary. 
+The key used to obtain this report is HVACSizingSummary.
 
 Report: **HVAC Sizing Summary**
 
@@ -12087,7 +12050,7 @@ Economizer
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>High Limit Shutoff Control</th>
 <th>Minimum Outside Air (m3/s)</th>
 <th>Maximum Outside Air (m3/s)</th>
@@ -12098,13 +12061,13 @@ Economizer
 </tr>
 <tr>
 <td>none</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -12114,16 +12077,16 @@ Economizer
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Ventilation:Mechanical Name</th>
 <th>Outside Air Per Person(m3/s-person)</th>
 <th>Outside Air Per Area (m3/s-m2)</th>
 </tr>
 <tr>
 <td>none</td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -12133,7 +12096,7 @@ Economizer
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Winter Clothes (hr)</th>
 <th>Summer Clothes (hr)</th>
 <th>Summer or Winter Clothes (hr)</th>
@@ -12188,7 +12151,7 @@ Economizer
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>During Heating (hr)</th>
 <th>During Cooling (hr)</th>
 <th>During Occupied Heating (hr)</th>
@@ -12259,7 +12222,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Maximum air flow rate [m3/s]</th>
 <th>Max Reheat Water Flow [m3/s]</th>
 </tr>
@@ -12296,7 +12259,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Max Water Flow Rate of Coil [m3/s]</th>
 <th>Design Coil Load [W]</th>
 <th>UA of the Coil [W/delK]</th>
@@ -12351,7 +12314,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Maximum Branch Flow Rate [m3/s]</th>
 </tr>
 <tr>
@@ -12366,7 +12329,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Primary air design volumetric flow rate [m3/s]</th>
 </tr>
 <tr>
@@ -12381,7 +12344,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>maximum outside air flow rate [m3/s]</th>
 <th>minimum outside air flow rate [m3/s]</th>
 </tr>
@@ -12398,7 +12361,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Max Water Flow Rate of Coil [m3/s]</th>
 <th>Max Air Flow Rate of Coil [m3/s]</th>
 <th>Design Air Inlet Temperature [C]</th>
@@ -12435,7 +12398,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Max Flow Rate [m3/s]</th>
 <th>Min Flow Rate [m3/s]</th>
 </tr>
@@ -12452,7 +12415,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Max Actuated Flow [m3/s]</th>
 </tr>
 <tr>
@@ -12479,7 +12442,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Maximum Loop Volumetric Flow Rate [m3/s]</th>
 <th>Volume of the plant loop [m3]</th>
 </tr>
@@ -12501,7 +12464,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Nominal Capacity [W]</th>
 <th>Design Boiler Water Flow Rate [m3/s]</th>
 </tr>
@@ -12518,7 +12481,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Nominal Capacity [W]</th>
 <th>Design Evaporator Volumetric Water Flow Rate [m3/s]</th>
 </tr>
@@ -12535,7 +12498,7 @@ SINGLE DUCT:VAV:REHEAT
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Rated Volumetric Flow Rate [m3/s]</th>
 <th>Rated Power Consumption [W]</th>
 </tr>
@@ -12569,7 +12532,7 @@ Average Outside Air During Occupied Hours
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Average Number of Occupants</th>
 <th>Nominal Number of Occupants</th>
 <th>Zone Volume (m3)</th>
@@ -12630,7 +12593,7 @@ Average Outside Air During Occupied Hours
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Average Number of Occupants</th>
 <th>Nominal Number of Occupants</th>
 <th>Zone Volume (m3)</th>
@@ -12701,7 +12664,7 @@ SizingPeriod:DesignDay
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Maximum Dry Bulb (C)</th>
 <th>Daily Temperature Range (C)</th>
 <th>Humidity Value</th>
@@ -12735,7 +12698,7 @@ SizingPeriod:DesignDay
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Value</th>
 </tr>
 <tr>
@@ -12876,7 +12839,7 @@ Surfaces by Class
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Total</th>
 <th>Outdoors</th>
 </tr>
@@ -12968,7 +12931,7 @@ HVAC
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Count</th>
 </tr>
 <tr>
@@ -13447,11 +13410,11 @@ Annual and Peak Values - Electricity
 </tr>
 <tr>
 <td>None</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -13501,11 +13464,11 @@ Annual and Peak Values - Electricity
 </tr>
 <tr>
 <td>None</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -13524,11 +13487,11 @@ Annual and Peak Values - Electricity
 </tr>
 <tr>
 <td>None</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -14412,8 +14375,8 @@ System Ventilation Requirements for Cooling
 <td>0.0562</td>
 <td>0.900</td>
 <td>0.0624</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>SPACE2-1</td>
@@ -14425,8 +14388,8 @@ System Ventilation Requirements for Cooling
 <td>0.0248</td>
 <td>0.900</td>
 <td>0.0276</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>SPACE3-1</td>
@@ -14438,8 +14401,8 @@ System Ventilation Requirements for Cooling
 <td>0.0554</td>
 <td>1.000</td>
 <td>0.0554</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>SPACE4-1</td>
@@ -14451,8 +14414,8 @@ System Ventilation Requirements for Cooling
 <td>0.0248</td>
 <td>1.000</td>
 <td>0.0248</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>SPACE5-1</td>
@@ -14464,8 +14427,8 @@ System Ventilation Requirements for Cooling
 <td>0.1029</td>
 <td>1.000</td>
 <td>0.1029</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -14647,19 +14610,19 @@ System Ventilation Requirements for Cooling
 </tr>
 <tr>
 <td>None</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -14692,7 +14655,7 @@ System Ventilation Requirements for Cooling
 
 ### Zone Component Loads Summary
 
-The Zone Component Loads Summary provides an estimate of the heating and cooling peak loads for each zone broken down into various components. This report may help determine which components of the load have the largest impact for the heating and cooling peak design conditions. When specified, the Zone Component Loads Summary report is created for each zone that is conditioned. The Sensible-Delayed column of the summary is only an estimate based on a procedure described in the Engineering Reference documentation. An intermediate calculation in this procedure is the decay curves that are shown in the the EIO file when Output:Surfaces:List is set to show DecayCurvesFromZoneComponentLoads. The difference between the peak design sensible load and the estimated instant + delayed sensible load (as shown in the *Peak Conditions* subtable) is an indication of how consistent the overall total estimate may be to the computed total peak loads for the zone. When the report is called the zone sizing calculations are repeated twice so this may result in longer simulation times.  The key used to obtain this report is ZoneComponentLoadSummary.
+The Zone Component Loads Summary provides an estimate of the heating and cooling peak loads for each zone broken down into various components. This report may help determine which components of the load have the largest impact for the heating and cooling peak design conditions. When specified, the Zone Component Loads Summary report is created for each zone that is conditioned. The Sensible-Delayed column of the summary is only an estimate based on a procedure described in the Engineering Reference documentation. An intermediate calculation in this procedure is the decay curves that are shown in the the EIO file when Output:Surfaces:List is set to show DecayCurvesFromZoneComponentLoads. The difference between the peak design sensible load and the estimated instant + delayed sensible load (as shown in the *Peak Conditions* subtable) is an indication of how consistent the overall total estimate may be to the computed total peak loads for the zone. When the report is called the zone sizing calculations are repeated twice so this may result in longer simulation times.  The key used to obtain this report is ZoneComponentLoadSummary.
 
 
 
@@ -14718,7 +14681,7 @@ Estimated Cooling Peak Load Components
 <td>People</td>
 <td>533.03</td>
 <td>272.38</td>
-<td> </td>
+<td> </td>
 <td>528.17</td>
 <td>1333.58</td>
 <td>30.78</td>
@@ -14728,7 +14691,7 @@ Estimated Cooling Peak Load Components
 <td>15.84</td>
 <td>1424.81</td>
 <td>316.80</td>
-<td> </td>
+<td> </td>
 <td>1757.45</td>
 <td>40.57</td>
 </tr>
@@ -14736,7 +14699,7 @@ Estimated Cooling Peak Load Components
 <td>Equipment</td>
 <td>517.44</td>
 <td>318.36</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>835.80</td>
 <td>19.29</td>
@@ -14744,7 +14707,7 @@ Estimated Cooling Peak Load Components
 <tr>
 <td>Refrigeration</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 <td>0.00</td>
@@ -14753,9 +14716,9 @@ Estimated Cooling Peak Load Components
 <tr>
 <td>Water Use Equipment</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
@@ -14763,8 +14726,8 @@ Estimated Cooling Peak Load Components
 <td>HVAC Equipment Losses</td>
 <td>0.00</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
@@ -14772,16 +14735,16 @@ Estimated Cooling Peak Load Components
 <td>Power Generation Equipment</td>
 <td>0.00</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Infiltration</td>
 <td>34.65</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>69.37</td>
 <td>104.03</td>
 <td>2.40</td>
@@ -14789,8 +14752,8 @@ Estimated Cooling Peak Load Components
 <tr>
 <td>Zone Ventilation</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 <td>0.00</td>
@@ -14798,117 +14761,117 @@ Estimated Cooling Peak Load Components
 <tr>
 <td>Interzone Mixing</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Roof</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Interzone Ceiling</td>
-<td> </td>
+<td> </td>
 <td>132.59</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>132.59</td>
 <td>3.06</td>
 </tr>
 <tr>
 <td>Other Roof</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Exterior Wall</td>
-<td> </td>
+<td> </td>
 <td>451.39</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>451.39</td>
 <td>10.42</td>
 </tr>
 <tr>
 <td>Interzone Wall</td>
-<td> </td>
+<td> </td>
 <td>-511.9</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>-511.9</td>
 <td>-11.8</td>
 </tr>
 <tr>
 <td>Ground Contact Wall</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Other Wall</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Exterior Floor</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Interzone Floor</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Ground Contact Floor</td>
-<td> </td>
+<td> </td>
 <td>-1745.4</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>-1745.4</td>
 <td>-40.3</td>
 </tr>
 <tr>
 <td>Other Floor</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Fenestration Conduction</td>
 <td>655.17</td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 <td>655.17</td>
 <td>15.12</td>
 </tr>
@@ -14916,17 +14879,17 @@ Estimated Cooling Peak Load Components
 <td>Fenestration Solar</td>
 <td>-</td>
 <td>1319.55</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>1319.55</td>
 <td>30.46</td>
 </tr>
 <tr>
 <td>Opaque Door</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
@@ -14937,7 +14900,7 @@ Estimated Cooling Peak Load Components
 <td>316.80</td>
 <td>597.54</td>
 <td>4332.24</td>
-<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -15011,7 +14974,7 @@ Estimated Cooling Peak Load Components
 <td>People</td>
 <td>0.00</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 <td>0.00</td>
@@ -15021,7 +14984,7 @@ Estimated Cooling Peak Load Components
 <td>0.79</td>
 <td>85.74</td>
 <td>15.84</td>
-<td> </td>
+<td> </td>
 <td>102.37</td>
 <td>-3.3</td>
 </tr>
@@ -15029,7 +14992,7 @@ Estimated Cooling Peak Load Components
 <td>Equipment</td>
 <td>14.78</td>
 <td>9.37</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>24.15</td>
 <td>-0.8</td>
@@ -15037,7 +15000,7 @@ Estimated Cooling Peak Load Components
 <tr>
 <td>Refrigeration</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 <td>0.00</td>
@@ -15046,9 +15009,9 @@ Estimated Cooling Peak Load Components
 <tr>
 <td>Water Use Equipment</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
@@ -15056,8 +15019,8 @@ Estimated Cooling Peak Load Components
 <td>HVAC Equipment Losses</td>
 <td>0.00</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
@@ -15065,16 +15028,16 @@ Estimated Cooling Peak Load Components
 <td>Power Generation Equipment</td>
 <td>0.00</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Infiltration</td>
 <td>-222.8</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>-93.8</td>
 <td>-316.6</td>
 <td>10.07</td>
@@ -15082,8 +15045,8 @@ Estimated Cooling Peak Load Components
 <tr>
 <td>Zone Ventilation</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 <td>0.00</td>
@@ -15091,117 +15054,117 @@ Estimated Cooling Peak Load Components
 <tr>
 <td>Interzone Mixing</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Roof</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Interzone Ceiling</td>
-<td> </td>
+<td> </td>
 <td>-1027.9</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>-1027.9</td>
 <td>32.70</td>
 </tr>
 <tr>
 <td>Other Roof</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Exterior Wall</td>
-<td> </td>
+<td> </td>
 <td>-762.5</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>-762.5</td>
 <td>24.26</td>
 </tr>
 <tr>
 <td>Interzone Wall</td>
-<td> </td>
+<td> </td>
 <td>102.80</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>102.80</td>
 <td>-3.3</td>
 </tr>
 <tr>
 <td>Ground Contact Wall</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Other Wall</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Exterior Floor</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Interzone Floor</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Ground Contact Floor</td>
-<td> </td>
+<td> </td>
 <td>889.07</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>889.07</td>
 <td>-28.3</td>
 </tr>
 <tr>
 <td>Other Floor</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Fenestration Conduction</td>
 <td>-2155.0</td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 <td>-2155.0</td>
 <td>68.55</td>
 </tr>
@@ -15209,17 +15172,17 @@ Estimated Cooling Peak Load Components
 <td>Fenestration Solar</td>
 <td>-</td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
 <tr>
 <td>Opaque Door</td>
-<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
 <td>0.00</td>
 </tr>
@@ -15230,7 +15193,7 @@ Estimated Cooling Peak Load Components
 <td>15.84</td>
 <td>-93.8</td>
 <td>-3143.5</td>
-<td> </td>
+<td> </td>
 </tr>
 </table>
 
@@ -15299,8 +15262,8 @@ Values in table are in hours.
 
 <table class="table table-striped">
 <tr>
-<th> </th>
-<th> </th>
+<th> </th>
+<th> </th>
 <th>1</th>
 <th>2</th>
 <th>3</th>
@@ -15311,8 +15274,8 @@ Values in table are in hours.
 <th>8</th>
 <th>9</th>
 <th>10</th>
-<th> </th>
-<th> </th>
+<th> </th>
+<th> </th>
 </tr>
 <tr>
 <td>Interval Start</td>
@@ -15945,7 +15908,7 @@ Values in table are in hours.
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Statistic</th>
 </tr>
 <tr>
@@ -15996,7 +15959,7 @@ Monthly reports are not predefined. Instead each column is defined when using th
 
 - Energy Consumption - Diesel & Fuel Oil
 
-- Energy Consumption  - Purchased Heating & Cooling
+- Energy Consumption  - Purchased Heating & Cooling
 
 - Energy Consumption - Coal & Gasoline
 
@@ -16104,7 +16067,7 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>ZONE/SYS SENSIBLE COOLING ENERGY [J]</th>
 <th>ZONE/SYS SENSIBLE COOLING RATE {MAXIMUM}[W]</th>
 <th>ZONE/SYS SENSIBLE COOLING RATE {TIMESTAMP}</th>
@@ -16273,41 +16236,41 @@ Timestamp: 2006-08-29 07:21:57
 <td>-0.11</td>
 </tr>
 <tr>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Annual Sum or Average</td>
 <td>0.848444E+10</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 <td>0.00</td>
-<td> </td>
-<td> </td>
-<td> </td>
-<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td>Minimum of Months</td>
 <td>246930448.00</td>
 <td>1306.75</td>
-<td> </td>
+<td> </td>
 <td>3.90</td>
 <td>-0.20</td>
 <td>0.00</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 <td>-4.32</td>
 <td>-5.53</td>
 </tr>
@@ -16315,12 +16278,12 @@ Timestamp: 2006-08-29 07:21:57
 <td>Maximum of Months</td>
 <td>0.120671E+10</td>
 <td>2453.23</td>
-<td> </td>
+<td> </td>
 <td>31.70</td>
 <td>23.35</td>
 <td>0.00</td>
 <td>0.00</td>
-<td> </td>
+<td> </td>
 <td>17.30</td>
 <td>15.70</td>
 </tr>
@@ -16330,7 +16293,7 @@ Timestamp: 2006-08-29 07:21:57
 
 ### UtilityCost:Tariff
 
-The use of UtilityCost:Tariff objects automatically generates two reports related to the calculation of annual utility costs. The first report is a summary across multiple tariffs and is called the Economics Results Summary report and is shown directly below. After that example is an example of the Tariff report which is created for each of the UtilityCost:Tariff Objects defined in the IDF file  (some columns may be truncated due to page size).
+The use of UtilityCost:Tariff objects automatically generates two reports related to the calculation of annual utility costs. The first report is a summary across multiple tariffs and is called the Economics Results Summary report and is shown directly below. After that example is an example of the Tariff report which is created for each of the UtilityCost:Tariff Objects defined in the IDF file  (some columns may be truncated due to page size).
 
 Report: Economics Results Summary Report
 
@@ -16342,7 +16305,7 @@ Annual Cost
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Facility:Electric</th>
 <th>Facility:Gas</th>
 <th>Other</th>
@@ -16376,7 +16339,7 @@ Annual Cost
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Selected</th>
 <th>Qualified</th>
 <th>Meter</th>
@@ -16485,7 +16448,7 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Parameter</th>
 </tr>
 <tr>
@@ -16523,7 +16486,7 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Jan</th>
 <th>Feb</th>
 <th>Mar</th>
@@ -16699,7 +16662,7 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Jan</th>
 <th>Feb</th>
 <th>Mar</th>
@@ -16741,7 +16704,7 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Jan</th>
 <th>Feb</th>
 <th>Mar</th>
@@ -16764,7 +16727,7 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Jan</th>
 <th>Feb</th>
 <th>Mar</th>
@@ -16787,7 +16750,7 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Jan</th>
 <th>Feb</th>
 <th>Mar</th>
@@ -17354,7 +17317,7 @@ Timestamp: 2006-08-29 07:21:57
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Jan</th>
 <th>Feb</th>
 <th>Mar</th>
@@ -17405,7 +17368,7 @@ Construction Cost Estimate Summary
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Reference Bldg.</th>
 <th>Current Bldg. Model</th>
 <th>Difference</th>
@@ -17478,7 +17441,7 @@ Construction Cost Estimate Summary
 
 <table class="table table-striped">
 <tr>
-<th> </th>
+<th> </th>
 <th>Line No.</th>
 <th>Item Name</th>
 <th>Quantity.</th>
@@ -17588,29 +17551,29 @@ The tables discussed in this section can also be output in an XML format that ma
 
 &lt;EnergyPlusTabularReports&gt;
 
-  &lt;BuildingName&gt;NONE&lt;/BuildingName&gt;
+  &lt;BuildingName&gt;NONE&lt;/BuildingName&gt;
 
-  &lt;EnvironmentName&gt;Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300&lt;/EnvironmentName&gt;
+  &lt;EnvironmentName&gt;Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300&lt;/EnvironmentName&gt;
 
-  &lt;WeatherFileLocationTitle&gt;Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300&lt;/WeatherFileLocationTitle&gt;
+  &lt;WeatherFileLocationTitle&gt;Chicago Ohare Intl Ap IL USA TMY3 WMO\#=725300&lt;/WeatherFileLocationTitle&gt;
 
-  &lt;ProgramVersion&gt;EnergyPlus, Version 8.0, YMD=2013.02.18 15:50&lt;/ProgramVersion&gt;
+  &lt;ProgramVersion&gt;EnergyPlus, Version 8.0, YMD=2013.02.18 15:50&lt;/ProgramVersion&gt;
 
-  &lt;SimulationTimestamp&gt;
+  &lt;SimulationTimestamp&gt;
 
-    &lt;Date&gt;
+    &lt;Date&gt;
 
-      2013-02-18
+      2013-02-18
 
-    &lt;/Date&gt;
+    &lt;/Date&gt;
 
-    &lt;Time&gt;
+    &lt;Time&gt;
 
-      15:50:33
+      15:50:33
 
-    &lt;/Time&gt;
+    &lt;/Time&gt;
 
-  &lt;/SimulationTimestamp&gt;
+  &lt;/SimulationTimestamp&gt;
 
 
 
@@ -17618,55 +17581,55 @@ The tables discussed in this section can also be output in an XML format that ma
 
 &lt;AnnualBuildingUtilityPerformanceSummary&gt;
 
-  &lt;for&gt;Entire Facility&lt;/for&gt;
+  &lt;for&gt;Entire Facility&lt;/for&gt;
 
-  &lt;SiteAndSourceEnergy&gt;
+  &lt;SiteAndSourceEnergy&gt;
 
-    &lt;name&gt;TotalSiteEnergy&lt;/name&gt;
+    &lt;name&gt;TotalSiteEnergy&lt;/name&gt;
 
-    &lt;TotalEnergy units="kBtu"&gt;200671.97&lt;/TotalEnergy&gt;
+    &lt;TotalEnergy units="kBtu"&gt;200671.97&lt;/TotalEnergy&gt;
 
-    &lt;EnergyPerTotalBuildingArea units="kBtu/ft2"&gt;143.32&lt;/EnergyPerTotalBuildingArea&gt;
+    &lt;EnergyPerTotalBuildingArea units="kBtu/ft2"&gt;143.32&lt;/EnergyPerTotalBuildingArea&gt;
 
-    &lt;EnergyPerConditionedBuildingArea units="kBtu/ft2"&gt;143.32&lt;/EnergyPerConditionedBuildingArea&gt;
+    &lt;EnergyPerConditionedBuildingArea units="kBtu/ft2"&gt;143.32&lt;/EnergyPerConditionedBuildingArea&gt;
 
-  &lt;/SiteAndSourceEnergy&gt;
+  &lt;/SiteAndSourceEnergy&gt;
 
-  &lt;SiteAndSourceEnergy&gt;
+  &lt;SiteAndSourceEnergy&gt;
 
-    &lt;name&gt;NetSiteEnergy&lt;/name&gt;
+    &lt;name&gt;NetSiteEnergy&lt;/name&gt;
 
-    &lt;TotalEnergy units="kBtu"&gt;200671.97&lt;/TotalEnergy&gt;
+    &lt;TotalEnergy units="kBtu"&gt;200671.97&lt;/TotalEnergy&gt;
 
-    &lt;EnergyPerTotalBuildingArea units="kBtu/ft2"&gt;143.32&lt;/EnergyPerTotalBuildingArea&gt;
+    &lt;EnergyPerTotalBuildingArea units="kBtu/ft2"&gt;143.32&lt;/EnergyPerTotalBuildingArea&gt;
 
-    &lt;EnergyPerConditionedBuildingArea units="kBtu/ft2"&gt;143.32&lt;/EnergyPerConditionedBuildingArea&gt;
+    &lt;EnergyPerConditionedBuildingArea units="kBtu/ft2"&gt;143.32&lt;/EnergyPerConditionedBuildingArea&gt;
 
-  &lt;/SiteAndSourceEnergy&gt;
+  &lt;/SiteAndSourceEnergy&gt;
 
-  &lt;SiteAndSourceEnergy&gt;
+  &lt;SiteAndSourceEnergy&gt;
 
-    &lt;name&gt;TotalSourceEnergy&lt;/name&gt;
+    &lt;name&gt;TotalSourceEnergy&lt;/name&gt;
 
-    &lt;TotalEnergy units="kBtu"&gt;442504.19&lt;/TotalEnergy&gt;
+    &lt;TotalEnergy units="kBtu"&gt;442504.19&lt;/TotalEnergy&gt;
 
-    &lt;EnergyPerTotalBuildingArea units="kBtu/ft2"&gt;316.04&lt;/EnergyPerTotalBuildingArea&gt;
+    &lt;EnergyPerTotalBuildingArea units="kBtu/ft2"&gt;316.04&lt;/EnergyPerTotalBuildingArea&gt;
 
-    &lt;EnergyPerConditionedBuildingArea units="kBtu/ft2"&gt;316.04&lt;/EnergyPerConditionedBuildingArea&gt;
+    &lt;EnergyPerConditionedBuildingArea units="kBtu/ft2"&gt;316.04&lt;/EnergyPerConditionedBuildingArea&gt;
 
-  &lt;/SiteAndSourceEnergy&gt;
+  &lt;/SiteAndSourceEnergy&gt;
 
-  &lt;SiteAndSourceEnergy&gt;
+  &lt;SiteAndSourceEnergy&gt;
 
-    &lt;name&gt;NetSourceEnergy&lt;/name&gt;
+    &lt;name&gt;NetSourceEnergy&lt;/name&gt;
 
-    &lt;TotalEnergy units="kBtu"&gt;397810.98&lt;/TotalEnergy&gt;
+    &lt;TotalEnergy units="kBtu"&gt;397810.98&lt;/TotalEnergy&gt;
 
-    &lt;EnergyPerTotalBuildingArea units="kBtu/ft2"&gt;284.12&lt;/EnergyPerTotalBuildingArea&gt;
+    &lt;EnergyPerTotalBuildingArea units="kBtu/ft2"&gt;284.12&lt;/EnergyPerTotalBuildingArea&gt;
 
-    &lt;EnergyPerConditionedBuildingArea units="kBtu/ft2"&gt;284.12&lt;/EnergyPerConditionedBuildingArea&gt;
+    &lt;EnergyPerConditionedBuildingArea units="kBtu/ft2"&gt;284.12&lt;/EnergyPerConditionedBuildingArea&gt;
 
-  &lt;/SiteAndSourceEnergy&gt;
+  &lt;/SiteAndSourceEnergy&gt;
 
 
 
@@ -17679,77 +17642,77 @@ This file is available from standard EnergyPlus runs (batch file, EP-Launch, etc
 
 Mon 04/02/2007 19:34:17.09 ReadVars
 
- ReadVarsESO
+ ReadVarsESO
 
- processing:eplusout.inp
+ processing:eplusout.inp
 
- input file:eplusout.eso
+ input file:eplusout.eso
 
- output file:eplusout.csv
+ output file:eplusout.csv
 
- found/finding:
+ found/finding:
 
-     1 Outdoor Dry Bulb
+     1 Outdoor Dry Bulb
 
-     6 Zone/Sys Air Temperature
+     6 Zone/Sys Air Temperature
 
-     6 Zone/Sys Sensible Cooling Rate
+     6 Zone/Sys Sensible Cooling Rate
 
-     6 Zone/Sys Sensible Heating Rate
+     6 Zone/Sys Sensible Heating Rate
 
-     6 Total Water Heating Coil Rate
+     6 Total Water Heating Coil Rate
 
-     1 Total Water Cooling Coil Rate
+     1 Total Water Cooling Coil Rate
 
-     1 Sensible Water Cooling Coil Rate
+     1 Sensible Water Cooling Coil Rate
 
-     2 Plant Loop Cooling Demand
+     2 Plant Loop Cooling Demand
 
-     2 Plant Loop Heating Demand
+     2 Plant Loop Heating Demand
 
-     1 Boiler Gas Consumption Rate
+     1 Boiler Gas Consumption Rate
 
-     1 Boiler Heating Output Rate
+     1 Boiler Heating Output Rate
 
-     1 Chiller Electric Power
+     1 Chiller Electric Power
 
-     1 Chiller Evap Heat Trans Rate
+     1 Chiller Evap Heat Trans Rate
 
-     1 Chiller Evap Water Inlet Temp
+     1 Chiller Evap Water Inlet Temp
 
-     1 Chiller Evap Water Outlet Temp
+     1 Chiller Evap Water Outlet Temp
 
-     1 Chiller Evap Water Mass Flow Rate
+     1 Chiller Evap Water Mass Flow Rate
 
-     1 Chiller Cond Heat Trans Rate
+     1 Chiller Cond Heat Trans Rate
 
-     0 Chiller Cond Water Inlet Temp
+     0 Chiller Cond Water Inlet Temp
 
-     0 Chiller Cond Water Outlet Temp
+     0 Chiller Cond Water Outlet Temp
 
-     0 Chiller Cond Water Mass Flow Rate
+     0 Chiller Cond Water Mass Flow Rate
 
-     2 Pump Mass Flow Rate
+     2 Pump Mass Flow Rate
 
-     2 Pump Outlet Temp
+     2 Pump Outlet Temp
 
- ReadVars Run Time=00hr 00min  1.78sec
+ ReadVars Run Time=00hr 00min  1.78sec
 
- ReadVarsESO program completed successfully.
+ ReadVarsESO program completed successfully.
 
- ReadVarsESO
+ ReadVarsESO
 
- processing:test.mvi
+ processing:test.mvi
 
- input file:eplusout.mtr
+ input file:eplusout.mtr
 
- output file:eplusmtr.csv
+ output file:eplusmtr.csv
 
- getting all vars from:eplusout.mtr
+ getting all vars from:eplusout.mtr
 
- ReadVars Run Time=00hr 00min  0.00sec
+ ReadVars Run Time=00hr 00min  0.00sec
 
- ReadVarsESO program completed successfully.
+ ReadVarsESO program completed successfully.
 
 eplusout.svg
 ------------
@@ -17784,87 +17747,87 @@ The SVG file format is an XML based format so it is text based. The diagram show
 
 &lt;!DOCTYPE svg&gt;
 
-&lt;svg width="250mm" height="200mm" viewBox="0 0   3200    1500" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" zoomAndPan="magnify"&gt;
+&lt;svg width="250mm" height="200mm" viewBox="0 0   3200    1500" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" zoomAndPan="magnify"&gt;
 
 &lt;g font-family="Verdana" font-size="8"&gt;
 
-  &lt;line x1="  2400" y1="   470" x2="  2100" y2="    30" style="stroke:linen ;"/&gt;
+  &lt;line x1="  2400" y1="   470" x2="  2100" y2="    30" style="stroke:linen ;"/&gt;
 
-  &lt;line x1="  2400" y1="   510" x2="  2100" y2="    70" style="stroke:linen ;"/&gt;
+  &lt;line x1="  2400" y1="   510" x2="  2100" y2="    70" style="stroke:linen ;"/&gt;
 
-  &lt;line x1="  2400" y1="   550" x2="  2100" y2="   110" style="stroke:linen ;"/&gt;
+  &lt;line x1="  2400" y1="   550" x2="  2100" y2="   110" style="stroke:linen ;"/&gt;
 
-  &lt;line x1="  2400" y1="   590" x2="  2100" y2="   150" style="stroke:linen ;"/&gt;
+  &lt;line x1="  2400" y1="   590" x2="  2100" y2="   150" style="stroke:linen ;"/&gt;
 
-  &lt;line x1="  2400" y1="   630" x2="  2100" y2="   190" style="stroke:linen ;"/&gt;
+  &lt;line x1="  2400" y1="   630" x2="  2100" y2="   190" style="stroke:linen ;"/&gt;
 
-  &lt;line x1="  2400" y1="   670" x2="   900" y2="    30" style="stroke:linen ;"/&gt;
+  &lt;line x1="  2400" y1="   670" x2="   900" y2="    30" style="stroke:linen ;"/&gt;
 
-  &lt;line x1="  2050" y1="   830" x2="   600" y2="    30" style="stroke:linen ;"/&gt;
+  &lt;line x1="  2050" y1="   830" x2="   600" y2="    30" style="stroke:linen ;"/&gt;
 
-  &lt;line x1="   300" y1="    30" x2="   550" y2="   950" style="stroke:linen ;"/&gt;
+  &lt;line x1="   300" y1="    30" x2="   550" y2="   950" style="stroke:linen ;"/&gt;
 
-  &lt;line x1="   800" y1="   790" x2="  2050" y2="   310" style="stroke:linen ;"/&gt;
+  &lt;line x1="   800" y1="   790" x2="  2050" y2="   310" style="stroke:linen ;"/&gt;
 
-  &lt;rect x="   200" y="   940" width="   200" height="    20" style="fill:snow; stroke: Black;"/&gt;     1
+  &lt;rect x="   200" y="   940" width="   200" height="    20" style="fill:snow; stroke: Black;"/&gt;     1
 
-  &lt;text x="   202" y="   953" startOffset="0"&gt;OUTSIDE AIR INLET NODE LIST&lt;/text&gt;
+  &lt;text x="   202" y="   953" startOffset="0"&gt;OUTSIDE AIR INLET NODE LIST&lt;/text&gt;
 
-  &lt;rect x="  2300" y="    20" width="   200" height="    20" style="fill:chartreuse; stroke: Black;"/&gt;     2
+  &lt;rect x="  2300" y="    20" width="   200" height="    20" style="fill:chartreuse; stroke: Black;"/&gt;     2
 
-  &lt;text x="  2302" y="    33" startOffset="0"&gt;ZN1\_S\_SPACE\_1&lt;/text&gt;
+  &lt;text x="  2302" y="    33" startOffset="0"&gt;ZN1\_S\_SPACE\_1&lt;/text&gt;
 
-  &lt;rect x="  1400" y="    20" width="   200" height="    20" style="fill:wheat; stroke: Black;"/&gt;     7
+  &lt;rect x="  1400" y="    20" width="   200" height="    20" style="fill:wheat; stroke: Black;"/&gt;     7
 
-  &lt;text x="  1402" y="    33" startOffset="0"&gt;VAV SYS 1 ZONE SPLITTER&lt;/text&gt;
+  &lt;text x="  1402" y="    33" startOffset="0"&gt;VAV SYS 1 ZONE SPLITTER&lt;/text&gt;
 
-  &lt;rect x="  1700" y="    20" width="   200" height="    20" style="fill:wheat; stroke: Black;"/&gt;     8
+  &lt;rect x="  1700" y="    20" width="   200" height="    20" style="fill:wheat; stroke: Black;"/&gt;     8
 
-  &lt;text x="  1702" y="    33" startOffset="0"&gt;ZN1\_S\_SPACE\_1 VAV REHEAT&lt;/text&gt;
-
-&lt;reduced&gt;
-
-  &lt;line x1="  1600" y1="    30" x2="  1700" y2="    30" style="stroke: Black;"/&gt;
-
-  &lt;line x1="  1600" y1="    30" x2="  1700" y2="    70" style="stroke: Black;"/&gt;
-
-  &lt;line x1="  1600" y1="    30" x2="  1700" y2="   110" style="stroke: Black;"/&gt;
-
-  &lt;line x1="  1600" y1="    30" x2="  1700" y2="   150" style="stroke: Black;"/&gt;
-
-  &lt;line x1="  1600" y1="    30" x2="  1700" y2="   190" style="stroke: Black;"/&gt;
-
-  &lt;line x1="  1900" y1="    30" x2="  2000" y2="    30" style="stroke: Black;"/&gt;
-
-  &lt;line x1="  1900" y1="    70" x2="  2000" y2="    70" style="stroke: Black;"/&gt;
-
-  &lt;line x1="  1900" y1="   110" x2="  2000" y2="   110" style="stroke: Black;"/&gt;
+  &lt;text x="  1702" y="    33" startOffset="0"&gt;ZN1\_S\_SPACE\_1 VAV REHEAT&lt;/text&gt;
 
 &lt;reduced&gt;
 
-  &lt;text x="   200" y="  1000" startOffset="0"&gt;Unused Non-Parent Objects:&lt;/text&gt;
+  &lt;line x1="  1600" y1="    30" x2="  1700" y2="    30" style="stroke: Black;"/&gt;
 
-  &lt;text x="   220" y="  1020" startOffset="0"&gt;VAV SYS 1 SUPPLY AIR TEMP MANAGER&lt;/text&gt;
+  &lt;line x1="  1600" y1="    30" x2="  1700" y2="    70" style="stroke: Black;"/&gt;
 
-  &lt;text x="   220" y="  1040" startOffset="0"&gt;VAV SYS 1 HEATING COIL AIR TEMP MANAGER&lt;/text&gt;
+  &lt;line x1="  1600" y1="    30" x2="  1700" y2="   110" style="stroke: Black;"/&gt;
 
-  &lt;text x="   220" y="  1060" startOffset="0"&gt;CHILLER PLANT CHW TEMP MANAGER&lt;/text&gt;
+  &lt;line x1="  1600" y1="    30" x2="  1700" y2="   150" style="stroke: Black;"/&gt;
 
-  &lt;text x="   220" y="  1080" startOffset="0"&gt;BOILER PLANT HW TEMP MANAGER&lt;/text&gt;
+  &lt;line x1="  1600" y1="    30" x2="  1700" y2="   190" style="stroke: Black;"/&gt;
 
-  &lt;text x="   220" y="  1100" startOffset="0"&gt;VAV SYS 1 COOLING COIL AIR TEMP MANAGER&lt;/text&gt;
+  &lt;line x1="  1900" y1="    30" x2="  2000" y2="    30" style="stroke: Black;"/&gt;
 
-  &lt;text x="   220" y="  1120" startOffset="0"&gt;VAV SYS 1 MIXED AIR TEMP MANAGER&lt;/text&gt;
+  &lt;line x1="  1900" y1="    70" x2="  2000" y2="    70" style="stroke: Black;"/&gt;
 
-  &lt;text x="   220" y="  1140" startOffset="0"&gt;VAV SYS 1 COOLING COIL CONTROLLER&lt;/text&gt;
+  &lt;line x1="  1900" y1="   110" x2="  2000" y2="   110" style="stroke: Black;"/&gt;
 
-  &lt;text x="   220" y="  1160" startOffset="0"&gt;VAV SYS 1 HEATING COIL CONTROLLER&lt;/text&gt;
+&lt;reduced&gt;
 
-  &lt;text x="   220" y="  1180" startOffset="0"&gt;VAV SYS 1 OA CONTROLLER&lt;/text&gt;
+  &lt;text x="   200" y="  1000" startOffset="0"&gt;Unused Non-Parent Objects:&lt;/text&gt;
 
-  &lt;text x="   200" y="  1220" startOffset="0"&gt;
+  &lt;text x="   220" y="  1020" startOffset="0"&gt;VAV SYS 1 SUPPLY AIR TEMP MANAGER&lt;/text&gt;
 
-The following are not supported:  objects related to controls, DIRECT AIR, or  PURCHASED AIR&lt;/text&gt;
+  &lt;text x="   220" y="  1040" startOffset="0"&gt;VAV SYS 1 HEATING COIL AIR TEMP MANAGER&lt;/text&gt;
+
+  &lt;text x="   220" y="  1060" startOffset="0"&gt;CHILLER PLANT CHW TEMP MANAGER&lt;/text&gt;
+
+  &lt;text x="   220" y="  1080" startOffset="0"&gt;BOILER PLANT HW TEMP MANAGER&lt;/text&gt;
+
+  &lt;text x="   220" y="  1100" startOffset="0"&gt;VAV SYS 1 COOLING COIL AIR TEMP MANAGER&lt;/text&gt;
+
+  &lt;text x="   220" y="  1120" startOffset="0"&gt;VAV SYS 1 MIXED AIR TEMP MANAGER&lt;/text&gt;
+
+  &lt;text x="   220" y="  1140" startOffset="0"&gt;VAV SYS 1 COOLING COIL CONTROLLER&lt;/text&gt;
+
+  &lt;text x="   220" y="  1160" startOffset="0"&gt;VAV SYS 1 HEATING COIL CONTROLLER&lt;/text&gt;
+
+  &lt;text x="   220" y="  1180" startOffset="0"&gt;VAV SYS 1 OA CONTROLLER&lt;/text&gt;
+
+  &lt;text x="   200" y="  1220" startOffset="0"&gt;
+
+The following are not supported:  objects related to controls, DIRECT AIR, or  PURCHASED AIR&lt;/text&gt;
 
 &lt;/g&gt;
 
@@ -17952,8 +17915,8 @@ The actual file produced is a text file. EnergyPlus adds some comments, such as 
 ```
 #VRML V2.0 utf8
 WorldInfo {
-   title "Building - Building"
-   info ["EnergyPlus Program Version EnergyPlus <version>, 9/14/2006 1:31 PM"]
+   title "Building - Building"
+   info ["EnergyPlus Program Version EnergyPlus <version>, 9/14/2006 1:31 PM"]
 }
 # Zone Names
 # Zone=1:PLENUM-1
@@ -17977,14 +17940,14 @@ geometry IndexedFaceSet {
 solid TRUE
 coord DEF Surf5 Coordinate {
 point [
-        0.00000         0.00000         3.00000,
-        0.00000         0.00000         2.40000,
-       26.41377       -15.25000         2.40000,
-       26.41377       -15.25000         3.00000,
+        0.00000         0.00000         3.00000,
+        0.00000         0.00000         2.40000,
+       26.41377       -15.25000         2.40000,
+       26.41377       -15.25000         3.00000,
 ]
 }
 coordIndex [
- 0 1 2 3 -1
+ 0 1 2 3 -1
 ]
 ccw TRUE
 solid TRUE
@@ -18000,14 +17963,14 @@ geometry IndexedFaceSet {
 solid TRUE
 coord DEF Surf6 Coordinate {
 point [
-       26.41377       -15.25000         3.00000,
-       26.41377       -15.25000         2.40000,
-       34.01377        -2.08641         2.40000,
-       34.01377        -2.08641         3.00000,
+       26.41377       -15.25000         3.00000,
+       26.41377       -15.25000         2.40000,
+       34.01377        -2.08641         2.40000,
+       34.01377        -2.08641         3.00000,
 ]
 }
 coordIndex [
- 0 1 2 3 -1
+ 0 1 2 3 -1
 ]
 ccw TRUE
 solid TRUE
@@ -18063,104 +18026,104 @@ For example, the file titled “5ZoneAirCooled.idf” has:
 
 ```idf
 ! 5ZoneAirCooled.idf
-! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
+! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
-!                          outside air stream controlled to preheat and precool setpoints.
+! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
+!                          outside air stream controlled to preheat and precool setpoints.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
-!                          Run Control executes the run periods using the weather file
+!                          Run Control executes the run periods using the weather file
 !
-! Location:                Chicago, IL
+! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
-! Run Control:             Zone and System sizing with weather file run control (no design days run)
+! Run Control:             Zone and System sizing with weather file run control (no design days run)
 !
 ! Building: Single floor rectangular building 100 ft x 50 ft. 5 zones - 4 exterior, 1 interior, zone height 8 feet.
-!           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
-!           10 feet. There are windows on all 4 facades; the south and north facades have glass doors.
-!           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
-!           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
-!           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap. The window to wall ratio is approxomately 0.29.
-!           The south wall and door have overhangs.
+!           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
+!           10 feet. There are windows on all 4 facades; the south and north facades have glass doors.
+!           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
+!           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
+!           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
+!           13mm argon or air gap. The window to wall ratio is approxomately 0.29.
+!           The south wall and door have overhangs.
 !
-!           The building is oriented 30 degrees east of north.
+!           The building is oriented 30 degrees east of north.
 !
 
 
-! Floor Area:        463.6 m2 (5000 ft2)
+! Floor Area:        463.6 m2 (5000 ft2)
 ! Number of Stories: 1
 !
 ! Zone Description Details:
 !
-!      (0,15.2,0)                      (30.5,15.2,0)
-!           _____   ________                ____
-!         |\     ***        ****************   /|
-!         | \                                 / |
-!         |  \                 (26.8,11.6,0) /  |
-!         *   \_____________________________/   *
-!         *    |(3.7,11.6,0)               |    *
-!         *    |                           |    *
-!         *    |                           |    *
-!         *    |               (26.8,3.7,0)|    *
-!         *    |___________________________|    *
-!         *   / (3.7,3.7,0)                 \   *
-!         |  /                               \  |
-!         | /                                 \ |
-!         |/___******************___***________\|
-!          |       Overhang        |   |
-!          |_______________________|   |   window/door = *
-!                                  |___|
+!      (0,15.2,0)                      (30.5,15.2,0)
+!           _____   ________                ____
+!         |\     ***        ****************   /|
+!         | \                                 / |
+!         |  \                 (26.8,11.6,0) /  |
+!         *   \_____________________________/   *
+!         *    |(3.7,11.6,0)               |    *
+!         *    |                           |    *
+!         *    |                           |    *
+!         *    |               (26.8,3.7,0)|    *
+!         *    |___________________________|    *
+!         *   / (3.7,3.7,0)                 \   *
+!         |  /                               \  |
+!         | /                                 \ |
+!         |/___******************___***________\|
+!          |       Overhang        |   |
+!          |_______________________|   |   window/door = *
+!                                  |___|
 !
-!      (0,0,0)                            (30.5,0,0)
+!      (0,0,0)                            (30.5,0,0)
 !
-! Internal gains description:     lighting is 1.5 watts/ft2, office equip is 1.0 watts/ft2. There is 1 occupant
-!                                 per 100 ft2 of floor area. The infiltration is 0.25 air changes per hour.
+! Internal gains description:     lighting is 1.5 watts/ft2, office equip is 1.0 watts/ft2. There is 1 occupant
+!                                 per 100 ft2 of floor area. The infiltration is 0.25 air changes per hour.
 !
-! Interzone Surfaces:             6 interzone surfaces (see diagram)
-! Internal Mass:                  None
-! People:                         50
-! Lights:                         7500 W
-! Windows:                        4 ea.: 1) Double pane clear, 3mm glass, 13mm air gap
-!                                        2) Double pane clear, 3mm glass, 13mm argon gap
-!                                        3) Double pane clear, 6mm glass, 6mm air gap
-!                                        4) Double pane lowE,  6mm lowE glass outside, 6mm air gap, 6mm clear glass
+! Interzone Surfaces:             6 interzone surfaces (see diagram)
+! Internal Mass:                  None
+! People:                         50
+! Lights:                         7500 W
+! Windows:                        4 ea.: 1) Double pane clear, 3mm glass, 13mm air gap
+!                                        2) Double pane clear, 3mm glass, 13mm argon gap
+!                                        3) Double pane clear, 6mm glass, 6mm air gap
+!                                        4) Double pane lowE,  6mm lowE glass outside, 6mm air gap, 6mm clear glass
 !
-! Doors:                          2 ea.:    Single pane grey,  3mm glass
+! Doors:                          2 ea.:    Single pane grey,  3mm glass
 !
-! Detached Shading:               None
-! Daylight:                       None
-! Natural Ventilation:            None
-! Compact Schedules:              Yes
+! Detached Shading:               None
+! Daylight:                       None
+! Natural Ventilation:            None
+! Compact Schedules:              Yes
 !
-! HVAC:                           Standard VAV system with outside air, hot water reheat coils,
-!                                 central chilled water cooling coil. Central Plant is single hot water
-!                                 boiler, electric compression chiller with air cooled condenser.
-!                                 All equipment is autosized. HW and ChW coils are used in the outside air
-!                                 stream to precondition the outside air.
+! HVAC:                           Standard VAV system with outside air, hot water reheat coils,
+!                                 central chilled water cooling coil. Central Plant is single hot water
+!                                 boiler, electric compression chiller with air cooled condenser.
+!                                 All equipment is autosized. HW and ChW coils are used in the outside air
+!                                 stream to precondition the outside air.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:VAV:Reheat
+! Zonal Equipment:                AirTerminal:SingleDuct:VAV:Reheat
 ! Central Air Handling Equipment: Yes
-! System Equipment Autosize:      Yes
-! Purchased Cooling:              None
-! Purchased Heating:              None
-! Coils:                          Coil:Cooling:Water, Coil:Heating:Water
-! Pumps:                          Pump:VariableSpeed
-! Boilers:                        Boiler:HotWater
-! Chillers:                       Chiller:Electric
+! System Equipment Autosize:      Yes
+! Purchased Cooling:              None
+! Purchased Heating:              None
+! Coils:                          Coil:Cooling:Water, Coil:Heating:Water
+! Pumps:                          Pump:VariableSpeed
+! Boilers:                        Boiler:HotWater
+! Chillers:                       Chiller:Electric
 !
 ! Results:
-! Standard Reports:               None
-! Timestep or Hourly Variables:   Hourly
-! Time bins Report:               None
-! HTML Report:                    None
-! Environmental Emissions:        None
-! Utility Tariffs:                None
+! Standard Reports:               None
+! Timestep or Hourly Variables:   Hourly
+! Time bins Report:               None
+! HTML Report:                    None
+! Environmental Emissions:        None
+! Utility Tariffs:                None
 ```
 
 
@@ -18191,13 +18154,13 @@ This dataset includes performance curves for air cooled electric EIR chiller (ob
 ! The nomenclature used for the chiller is as follows:
 ! ElectricEIRChiller - Manufacturer's Name - Model - Reference Capacity in kW - Reference COP
 !
-!                                                      Compressor   Reference    Reference
-! Chiller Name                                            Type       Capacity      COP
-!                                                                    kW (tons)
-! ElectricEIRChiller McQuay AGZ010BS 34.5kW/2.67COP      Scroll     34.5 (9.8)      2.67
-! ElectricEIRChiller McQuay AGZ013BS 47.1kW/2.67COP      Scroll     47.1 (13.4)     2.67
-! ElectricEIRChiller York YCAL0019EE 54.2kW/2.9COP       Scroll     54.2 (15.4)     2.9
-! ElectricEIRChiller McQuay AGZ017BS 54.5kW/2.67COP      Scroll     54.5 (15.5)     2.67
+!                                                      Compressor   Reference    Reference
+! Chiller Name                                            Type       Capacity      COP
+!                                                                    kW (tons)
+! ElectricEIRChiller McQuay AGZ010BS 34.5kW/2.67COP      Scroll     34.5 (9.8)      2.67
+! ElectricEIRChiller McQuay AGZ013BS 47.1kW/2.67COP      Scroll     47.1 (13.4)     2.67
+! ElectricEIRChiller York YCAL0019EE 54.2kW/2.9COP       Scroll     54.2 (15.4)     2.9
+! ElectricEIRChiller McQuay AGZ017BS 54.5kW/2.67COP      Scroll     54.5 (15.5)     2.67
 
 ```
 
@@ -18231,14 +18194,14 @@ Knowing the type of chiller that you want to simulate, you can find it and the a
 !
 ! Performance curves developed from information collected over a 10-year period from 1991 to 2001.
 !
-!                                                      Compressor   Reference  Reference Unloading
-! Chiller Name                                            Type       Capacity    COP     Mechanism
-!                                                                    kW (tons)
+!                                                      Compressor   Reference  Reference Unloading
+! Chiller Name                                            Type       Capacity    COP     Mechanism
+!                                                                    kW (tons)
 !-------------------------------------------------------------------------------------------------
-! ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes    Centrifugal   471 (134)   5.89   Inlet Vanes
-! ElectricEIRChiller York YT 563kW/10.61COP/Vanes      Centrifugal   563 (160)   10.61  Inlet Vanes
-! ElectricEIRChiller McQuay PEH 703kW/7.03COP/Vanes    Centrifugal   703 (200)   7.03   Inlet Vanes
-! ElectricEIRChiller Carrier 23XL 724kW/6.04COP/Vanes  Centrifugal   724 (206)   6.04   Inlet Vanes
+! ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes    Centrifugal   471 (134)   5.89   Inlet Vanes
+! ElectricEIRChiller York YT 563kW/10.61COP/Vanes      Centrifugal   563 (160)   10.61  Inlet Vanes
+! ElectricEIRChiller McQuay PEH 703kW/7.03COP/Vanes    Centrifugal   703 (200)   7.03   Inlet Vanes
+! ElectricEIRChiller Carrier 23XL 724kW/6.04COP/Vanes  Centrifugal   724 (206)   6.04   Inlet Vanes
 ```
 
 
@@ -18257,36 +18220,36 @@ CONSTRUCTION,Composite 2x4 Steel Stud R11,
 ! Area-average R-Value = 8.796 ft2-F-h/Btu (1.548 m2-K/W).
 ! Total wall thickness = 5.00in (0.127m)
 ! Material layer names follow:
-  Composite 2x4 Steel Stud R11 \#3,
-  Composite 2x4 Steel Stud R11 \#2,
-  Composite 2x4 Steel Stud R11 \#1;
+  Composite 2x4 Steel Stud R11 \#3,
+  Composite 2x4 Steel Stud R11 \#2,
+  Composite 2x4 Steel Stud R11 \#1;
 MATERIAL,Composite 2x4 Steel Stud R11 \#1,
-  Smooth,  !- Roughness
-  0.013,   !- Thickness (m)
-  0.720,   !- Conductivity (W/m-K)
-  640.0,   !- Density (kg/m3)
-  1048,    !- Specific Heat (J/kg-K)
-  0.9,     !- Absorptance:Thermal
-  0.7,     !- Absorptance:Solar
-  0.7;     !- Absorptance:Visible
+  Smooth,  !- Roughness
+  0.013,   !- Thickness (m)
+  0.720,   !- Conductivity (W/m-K)
+  640.0,   !- Density (kg/m3)
+  1048,    !- Specific Heat (J/kg-K)
+  0.9,     !- Absorptance:Thermal
+  0.7,     !- Absorptance:Solar
+  0.7;     !- Absorptance:Visible
 MATERIAL,Composite 2x4 Steel Stud R11 \#2,
-  Smooth,  !- Roughness
-  0.089,   !- Thickness (m)
-  0.060,   !- Conductivity (W/m-K)
-  118.223, !- Density (kg/m3)
-  1048,    !- Specific Heat (J/kg-K)
-  0.9,     !- Absorptance:Thermal
-  0.7,     !- Absorptance:Solar
-  0.7;     !- Absorptance:Visible
+  Smooth,  !- Roughness
+  0.089,   !- Thickness (m)
+  0.060,   !- Conductivity (W/m-K)
+  118.223, !- Density (kg/m3)
+  1048,    !- Specific Heat (J/kg-K)
+  0.9,     !- Absorptance:Thermal
+  0.7,     !- Absorptance:Solar
+  0.7;     !- Absorptance:Visible
 MATERIAL,Composite 2x4 Steel Stud R11 \#3,
-  Smooth,  !- Roughness
-  0.025,   !- Thickness (m)
-  0.452,   !- Conductivity (W/m-K)
-  413.782, !- Density (kg/m3)
-  1048,    !- Specific Heat (J/kg-K)
-  0.9,     !- Absorptance:Thermal
-  0.7,     !- Absorptance:Solar
-  0.7;     !- Absorptance:Visible
+  Smooth,  !- Roughness
+  0.025,   !- Thickness (m)
+  0.452,   !- Conductivity (W/m-K)
+  413.782, !- Density (kg/m3)
+  1048,    !- Specific Heat (J/kg-K)
+  0.9,     !- Absorptance:Thermal
+  0.7,     !- Absorptance:Solar
+  0.7;     !- Absorptance:Visible
 ```
 
 
@@ -18342,10 +18305,10 @@ CONSTRUCTION,Composite 2x4 Steel Stud R11,
 CONSTRUCTION,Composite Brick Foam 2x4 Steel Stud R11,
 ! ASHRAE 1145-RP Wall Assembly 15
 ! Brick veneer, polystyrene, 2"x4" steel studs at 24" on center with
-!  between-stud R11 fibreglass insulation.
+!  between-stud R11 fibreglass insulation.
 ! Studs are 3.5", 16 gauge, 15 flange.
 ! Layers are 3.25" brick,1" polystyrene insulation, 1/2" plywood, 2x4 steel studs and R11 insulation,
-!  1/2" gypsum board.
+!  1/2" gypsum board.
 ! Area-average R-Value = 12.792 ft2-F-h/Btu (2.251 m2-K/W).
 
 CONSTRUCTION,Composite 2x6 Steel Stud R19,
@@ -18360,16 +18323,16 @@ CONSTRUCTION,Composite Foam 2x6 Steel Stud R19,
 ! Polystyrene, 2"x6" steel studs at 24" on center with between-stud R19 fibreglass insulation.
 ! Studs are 5.5", 16 gauge, 15 flange.
 ! Layers are 3/4" concrete stucco,1" polystyrene insulation, 1/2" plywood, 2x6 steel studs and R19 insulation,
-!  1/2" gypsum board.
+!  1/2" gypsum board.
 ! Area-average R-Value = 15.157 ft2-F-h/Btu (2.668 m2-K/W).
 
 CONSTRUCTION,Composite Brick Foam 2x6 Steel Stud R19,
 ! ASHRAE 1145-RP Wall Assembly 18
 ! Brick veneer, polystyrene, 2"x6" steel studs at 24" on center with
-!  between-stud R19 fibreglass insulation.
+!  between-stud R19 fibreglass insulation.
 ! Studs are 5.5", 16 gauge, 15 flange.
 ! Layers are 3.25" brick,1" polystyrene insulation, 1/2" plywood, 2x6 steel studs and R19 insulation,
-!  1/2" gypsum board.
+!  1/2" gypsum board.
 ! Area-average R-Value = 15.465 ft2-F-h/Btu (2.722 m2-K/W).
 
 CONSTRUCTION,Composite 2-Core Filled Concrete Block Uninsulated,
@@ -18381,7 +18344,7 @@ CONSTRUCTION,Composite 2-Core Filled Concrete Block Uninsulated,
 CONSTRUCTION,Composite 2-Core Filled Concrete Block Insulated,
 ! ASHRAE 1145-RP Wall Assembly 20
 ! Wall system is made of 12" 2-core concrete blocks with 1.875"-thick
-!  foam inserts in the block cores.
+!  foam inserts in the block cores.
 ! The remaining core area is filled with poured concrete.
 ! Area-average R-Value = 2.291 ft2-F-h/Btu (0.403 m2-K/W).
 ```
@@ -18406,106 +18369,106 @@ Here is a synopsis of the DXCoolingCoil.idf:
 ! below, input fields 'Availability Schedule Name', 'Air Inlet Node Name' and 'Air Outlet Node
 ! Name' need to be defined by the user.
 !
-!------------------------------------------------------------------------------------------------!                             Compressor  Nominal    Reference      Reference   Refrig  Expansion
-!                                                                                         Valve
-! Name                           Type     Capacity   Capacity          COP       Type      Type
-!                                         (tons)     kW (tons)
-!------------------------------------------------------------------------------------------------! Carrier Centurion 50PG06      Scroll      5        18.28(5.2)        4.15     R-410A    TXV
-! Carrier Centurion 50PG12      Scroll      10       36.79(10.47)      4.05     R-410A    TXV
-! Carrier Centurion 50PG24      Scroll      20       73.81(21)         3.95     R-410A    TXV
+!------------------------------------------------------------------------------------------------!                             Compressor  Nominal    Reference      Reference   Refrig  Expansion
+!                                                                                         Valve
+! Name                           Type     Capacity   Capacity          COP       Type      Type
+!                                         (tons)     kW (tons)
+!------------------------------------------------------------------------------------------------! Carrier Centurion 50PG06      Scroll      5        18.28(5.2)        4.15     R-410A    TXV
+! Carrier Centurion 50PG12      Scroll      10       36.79(10.47)      4.05     R-410A    TXV
+! Carrier Centurion 50PG24      Scroll      20       73.81(21)         3.95     R-410A    TXV
 
-  Coil:Cooling:DX:SingleSpeed,
-    Carrier Centurion 50PG06,     !- Name
-    CoolingCoilAvailSched,        !- Availability Schedule Name
-    18276.96,                     !- Rated Total Cooling Capacity {W}
-    0.74,                         !- Rated Sensible Heat Ratio
-    4.15,                         !- Rated COP
-    0.944,                        !- Rated Air Flow Rate {m3/s}
-    ,                             !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    DXCoilAirInletNode,           !- Air Inlet Node Name
-    DXCoilAirOutletNode,          !- Air Outlet Node Name
-    CarrierCenturion50PG06CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    CarrierCenturion50PG06CapFFF, !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    CarrierCenturion50PG06EIRFT,       !- Energy Input Ratio Function of Temperature Curve Name
-    CarrierCenturion50PG06EIRFFF,      !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Carrier Centurion 50PG06 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+  Coil:Cooling:DX:SingleSpeed,
+    Carrier Centurion 50PG06,     !- Name
+    CoolingCoilAvailSched,        !- Availability Schedule Name
+    18276.96,                     !- Rated Total Cooling Capacity {W}
+    0.74,                         !- Rated Sensible Heat Ratio
+    4.15,                         !- Rated COP
+    0.944,                        !- Rated Air Flow Rate {m3/s}
+    ,                             !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,           !- Air Inlet Node Name
+    DXCoilAirOutletNode,          !- Air Outlet Node Name
+    CarrierCenturion50PG06CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    CarrierCenturion50PG06CapFFF, !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    CarrierCenturion50PG06EIRFT,       !- Energy Input Ratio Function of Temperature Curve Name
+    CarrierCenturion50PG06EIRFFF,      !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Carrier Centurion 50PG06 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
 ! Curve set (5 Curves):
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
 
-  Curve:Biquadratic,
-    CarrierCenturion50PG06CapFT,  !- Name
-    0.9953455,               !- Coefficient1 Constant
-    -0.0118418,              !- Coefficient2 x
-    0.0012277,               !- Coefficient3 x**2
-    0.0030246,               !- Coefficient4 y
-    -0.0000702,              !- Coefficient5 y**2
-    -0.0003685,              !- Coefficient6 x*y
-    12.22,                   !- Minimum Value of x
-    26.67,                   !- Maximum Value of x
-    15.56,                   !- Minimum Value of y
-    51.67,                   !- Maximum Value of y
-    ,                        !- Minimum Curve Output
-    ,                        !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for X
-    Temperature,             !- Input Unit Type for Y
-    Dimensionless;           !- Output Unit Type
+  Curve:Biquadratic,
+    CarrierCenturion50PG06CapFT,  !- Name
+    0.9953455,               !- Coefficient1 Constant
+    -0.0118418,              !- Coefficient2 x
+    0.0012277,               !- Coefficient3 x**2
+    0.0030246,               !- Coefficient4 y
+    -0.0000702,              !- Coefficient5 y**2
+    -0.0003685,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
 
-  Curve:Biquadratic,
-    CarrierCenturion50PG06EIRFT,  !- Name
-    0.3802131,               !- Coefficient1 Constant
-    0.0199468,               !- Coefficient2 x
-    -0.0006682,              !- Coefficient3 x**2
-    0.0058933,               !- Coefficient4 y
-    0.0004646,               !- Coefficient5 y**2
-    -0.0004072,              !- Coefficient6 x*y
-    12.22,                   !- Minimum Value of x
-    26.67,                   !- Maximum Value of x
-    15.56,                   !- Minimum Value of y
-    51.67,                   !- Maximum Value of y
-    ,                        !- Minimum Curve Output
-    ,                        !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for X
-    Temperature,             !- Input Unit Type for Y
-    Dimensionless;           !- Output Unit Type
+  Curve:Biquadratic,
+    CarrierCenturion50PG06EIRFT,  !- Name
+    0.3802131,               !- Coefficient1 Constant
+    0.0199468,               !- Coefficient2 x
+    -0.0006682,              !- Coefficient3 x**2
+    0.0058933,               !- Coefficient4 y
+    0.0004646,               !- Coefficient5 y**2
+    -0.0004072,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
 ! Cooling Capacity Function of Flow Fraction Curve
 ! x = Flow Fraction
 
-  Curve:Quadratic,
-    CarrierCenturion50PG06CapFFF,  !- Name
-    0.7705358,               !- Coefficient1 Constant
-    0.2848007,               !- Coefficient2 x
-    -0.0580891,              !- Coefficient3 x**2
-    0.75,                    !- Minimum Value of x
-    1.25;                    !- Maximum Value of x
+  Curve:Quadratic,
+    CarrierCenturion50PG06CapFFF,  !- Name
+    0.7705358,               !- Coefficient1 Constant
+    0.2848007,               !- Coefficient2 x
+    -0.0580891,              !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
 
 ! EIR Function of Flow Fraction Curve
 ! x = Flow Fraction
 
-  Curve:Quadratic,
-    CarrierCenturion50PG06EIRFFF,   !- Name
-    1.3439758,               !- Coefficient1 Constant
-    -0.5111244,              !- Coefficient2 x
-    0.1732549,               !- Coefficient3 x**2
-    0.75,                    !- Minimum Value of x
-    1.25;                    !- Maximum Value of x
+  Curve:Quadratic,
+    CarrierCenturion50PG06EIRFFF,   !- Name
+    1.3439758,               !- Coefficient1 Constant
+    -0.5111244,              !- Coefficient2 x
+    0.1732549,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
 
 ! Part Load Fraction Function of Part Load Ratio Curve
 ! x = Part Load Ratio
 
-  Curve:Quadratic,
-    CarrierCenturion50PG06PLFFPLR,   !- Name
-    0.85,                    !- Coefficient1 Constant
-    0.15,                    !- Coefficient2 x
-    0.0,                     !- Coefficient3 x**2
-    0.0,                     !- Minimum Value of x
-    1.0;                     !- Maximum Value of x
+  Curve:Quadratic,
+    CarrierCenturion50PG06PLFFPLR,   !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
 ```
 
 
@@ -18513,7 +18476,7 @@ Here is a synopsis of the DXCoolingCoil.idf:
 
 This dataset includes inputs for the GENERATOR:MICROTURBINE object and associated performance curves. The performance curves were developed from manufacturer data collected in Summer 2007.
 
-Includes data for generators: Capstone C65, Elliott TA100,  Ingersoll Rand MT70, Ingersoll Rand MT250.
+Includes data for generators: Capstone C65, Elliott TA100,  Ingersoll Rand MT70, Ingersoll Rand MT250.
 
 Further documentation is contained in the dataset file.
 
@@ -18545,12 +18508,12 @@ The electronic enthalpy curve equation represents a unique curve and is a functi
 
 where:
 
-* K  = Constant value to represent specific curve
-* T  = Outdoor Dry-Bulb Temperature (C)
+* K  = Constant value to represent specific curve
+* T  = Outdoor Dry-Bulb Temperature (C)
 * RH = Outdoor Relative Humidity (%)
 
 
-NOTE:  modifying the RH multiplier (-0.144599) tends to "wag" the curvature at the upper relative humidities. Decreasing the multiplier "wags" the upper portion of the curve downward, increasing "wags" it upwards. Modifying the constant (K) moves the intersection of the curve with the Dry-Bulb Temperature  axis. Increasing the constant moves the intersection to the left as shown in the figure, decreasing moves to the right. The minimum and/or maximum x boundaries in the curve objects may have to be adjusted when modifying the equation.
+NOTE:  modifying the RH multiplier (-0.144599) tends to "wag" the curvature at the upper relative humidities. Decreasing the multiplier "wags" the upper portion of the curve downward, increasing "wags" it upwards. Modifying the constant (K) moves the intersection of the curve with the Dry-Bulb Temperature  axis. Increasing the constant moves the intersection to the left as shown in the figure, decreasing moves to the right. The minimum and/or maximum x boundaries in the curve objects may have to be adjusted when modifying the equation.
 
 Table 43. Electronic Enthalpy Curve Constants and approximate control point at 50% RH
 
@@ -18657,13 +18620,13 @@ The method described here was used to create each of the four "cubic" curve obje
 </tr>
 </table>
 
-** **
+** **
 
 **Step 3:** Use multiple linear regression to solve one of the following equations:
 
-*Quadratic  Curve*: Humidity Ratio = A0 + A1\*Temperature + A2\*Temperature<sup>2</sup>
+*Quadratic  Curve*: Humidity Ratio = A0 + A1\*Temperature + A2\*Temperature<sup>2</sup>
 
-*Cubic  Curve*: Humidity Ratio = A0 + A1\*Temperature + A2\*Temperature<sup>2</sup> + A3\*Temperature<sup>3</sup>
+*Cubic  Curve*: Humidity Ratio = A0 + A1\*Temperature + A2\*Temperature<sup>2</sup> + A3\*Temperature<sup>3</sup>
 
 **Step 4:** Use the coefficients calculated in the multiple linear regression to create a cubic (or quadratic) curve object.
 
@@ -18671,11 +18634,11 @@ The method described here was used to create each of the four "cubic" curve obje
 
 This dataset includes the curves for exhaust fired absorption chiller.
 
-1)   Cooling Capacity Function of Temperature Curve
+1)   Cooling Capacity Function of Temperature Curve
 
-2)   Thermal Energy Input to Cooling Output Ratio Function of Temperature Curve
+2)   Thermal Energy Input to Cooling Output Ratio Function of Temperature Curve
 
-3)   Thermal Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve
+3)   Thermal Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve
 
 ### Fossil Fuel Environmental Impact Factors.idf
 
@@ -18749,7 +18712,7 @@ To use the data, copy the appropriate data for the glycol you desire into your i
 
 ### GHLERefData.idf
 
-This file contains sample input for the ground loop heat exchanger model. The response of the borehole/ground is found from the 'G-function' that is  defined in the input as series of 'n' pairs of values (LNTTSn, GNFCn). It is important to note that the G-functions have to be calculated for specific GHE configurations and borehole resitance, length and borehole/ length ratio. That is, the parameters for the units vary with each design. The data in this file are intended as examples/samples and may not represent actual designs.
+This file contains sample input for the ground loop heat exchanger model. The response of the borehole/ground is found from the 'G-function' that is  defined in the input as series of 'n' pairs of values (LNTTSn, GNFCn). It is important to note that the G-functions have to be calculated for specific GHE configurations and borehole resitance, length and borehole/ length ratio. That is, the parameters for the units vary with each design. The data in this file are intended as examples/samples and may not represent actual designs.
 
 The sample data has been calculated for a number of configurations:
 
@@ -18757,7 +18720,7 @@ The sample data has been calculated for a number of configurations:
 * 4 x 4 boreholes
 * 8 x 8 boreholes
 
-Data is given for both 'standard' grout (k=0.744 W/m.K) and 'thermally enhanced' grout (k= 1.471 W/m.K). The flow rate per borehole is .1514 kg/s. The pipe given is 0.75in. Dia. SDR11 HDPE. The fluid is water. The borehole/length ratio is 0.06  (76.2m/4.572m [300ft/15ft])
+Data is given for both 'standard' grout (k=0.744 W/m.K) and 'thermally enhanced' grout (k= 1.471 W/m.K). The flow rate per borehole is .1514 kg/s. The pipe given is 0.75in. Dia. SDR11 HDPE. The fluid is water. The borehole/length ratio is 0.06  (76.2m/4.572m [300ft/15ft])
 
 ### MoistureMaterials.idf
 
@@ -18767,7 +18730,7 @@ This data set includes the special moisture materials that can be used with the 
 
 This file contains performance curves for various EnergyPlus equipment objects.
 
-- Variable speed DX cooling:  These curves are appropriate for small DX cooling units with variable speed compressors. These curves would be referenced by the EnergyPlus object Coil:Cooling:DX:TwoSpeed. See the example input file 5ZoneAutoDXVAV for an example of their use.
+- Variable speed DX cooling:  These curves are appropriate for small DX cooling units with variable speed compressors. These curves would be referenced by the EnergyPlus object Coil:Cooling:DX:TwoSpeed. See the example input file 5ZoneAutoDXVAV for an example of their use.
 
 - Variable Speed Cooling Tower: These model coefficient objects are appropriate for use with the variable speed cooling tower object and represent the coefficients used in the YorkCalc and CoolTools empirical models. These model coefficient objects would be referenced by the EnergyPlus object Cooling Tower:Variable Speed. See the example input file CoolingTower\_VariableSpeed.idf for an example of where these curves could be used (these model coefficient objects are not specifically used in this idf but could be used by the Cooling Tower:Variable Speed object). Additional information on variable speed cooling tower model coefficients can be found in the Input Output Reference and Engineering Reference documents.
 
@@ -18779,7 +18742,7 @@ This file contains schedules (for an entire year) of precipitation for use with 
 
 ### RefrigerationCasesDataSet.idf
 
-All the refrigerated cases included in this database are listed in the following list. Comments before each refrigeration:case object include the manufacturer's model number and assumptions about the fan, lights, defrost etc. The user must ensure that the case names used in the idf file are UNIQUE and must supply the correct zone name.  The user must also supply any required correction curves or schedules. The defrost and drip-down schedule names included here indicate the frequency and duration required. The user must ensure that schedules are provided that meet these needs and that are diversified so that all the cases don't start their defrost cycles at the same time. Please see the example cases for supermarkets to see how these case objects are included with the rest of a supermarket refrigeration system.
+All the refrigerated cases included in this database are listed in the following list. Comments before each refrigeration:case object include the manufacturer's model number and assumptions about the fan, lights, defrost etc. The user must ensure that the case names used in the idf file are UNIQUE and must supply the correct zone name.  The user must also supply any required correction curves or schedules. The defrost and drip-down schedule names included here indicate the frequency and duration required. The user must ensure that schedules are provided that meet these needs and that are diversified so that all the cases don't start their defrost cycles at the same time. Please see the example cases for supermarkets to see how these case objects are included with the rest of a supermarket refrigeration system.
 
 * Multi-Deck Dairy/Deli Merchandiser with Synergy-E
 
@@ -18907,7 +18870,7 @@ All the refrigerated cases included in this database are listed in the following
 
 * Multi-Deck Deli/Meat Merchandiser
 
-* High Multi-Deck  Merchandiser with Synergy-E
+* High Multi-Deck  Merchandiser with Synergy-E
 
 * Multi-Deck Rear Load Deli/Meat Merchandiser
 
@@ -19101,7 +19064,7 @@ All the refrigerated cases included in this database are listed in the following
 
 * Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
 
-* Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
+* Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
 
 * High Narrow Glass Door Reach-in Back-to-Back Frozen Food/Ice Cream: Frozen food
 
@@ -19239,7 +19202,7 @@ All the refrigerated cases included in this database are listed in the following
 
 * Narrow Glass Door Reach in Frozen Food/Ice Cream Merchandiser: Frozen food
 
-* Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
+* Narrow Glass Door Reach in  Back-toBack Frozen Food/Ice Cream Merchandiser: Ice Cream
 
 * High Glass Door Reach-in Frozen Food/Ice Cream Merchandiser
 
@@ -19455,11 +19418,11 @@ All the refrigerated cases included in this database are listed in the following
 
 * D6X-ULEP Ultra Low Front Dairy Merchandiser
 
-* F Single Deck Wall Model Merchandiser  with solid front for Frozen Food
+* F Single Deck Wall Model Merchandiser  with solid front for Frozen Food
 
-* F Single Deck Wall Model Merchandiser  with solid front for Ice Cream
+* F Single Deck Wall Model Merchandiser  with solid front for Ice Cream
 
-* F Single Deck Wall Model Merchandiser  with solid front for Medium Temp Products
+* F Single Deck Wall Model Merchandiser  with solid front for Medium Temp Products
 
 * FI Intermediate Island Merchandiser with solid walls for Frozen Food
 
@@ -19502,56 +19465,56 @@ All the refrigerated cases included in this database are listed in the following
 
 This dataset includes object types for specific (by manufacturer and type) Refrigeration:Compressor and associated performance curves. Knowing the nominal refrigerating capacity, power, and refrigerant for the compressor(s) that you want to simulate, you can find it and the associated performance curves in the dataset file. By example, here is part of the RefrigerationCompressorCurves.idf file:
 
-! Capacity Curve for Carlyle\_R-22\_Low\_06CC016,   !nominal MBtu/h = 18561.0
+! Capacity Curve for Carlyle\_R-22\_Low\_06CC016,   !nominal MBtu/h = 18561.0
 
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
+! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
 ```idf
 Curve:Bicubic,
-    06CC016_R-22_Low_qcurv,  !- Name
-    2.350e+004,              !- Coefficient1 Constant
-    816.7,                   !- Coefficient2 x
-    10.70,                   !- Coefficient3 x**2
-    -28.24,                  !- Coefficient4 y
-    0.1131,                  !- Coefficient5 y**2
-    -0.4553,                 !- Coefficient6 x*y
-    0.05604,                 !- Coefficient7 x**3
-    -0.004120,               !- Coefficient8 y**3
-    -0.006728,               !- Coefficient9 x**2*y
-    0.006782,                !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
+    06CC016_R-22_Low_qcurv,  !- Name
+    2.350e+004,              !- Coefficient1 Constant
+    816.7,                   !- Coefficient2 x
+    10.70,                   !- Coefficient3 x**2
+    -28.24,                  !- Coefficient4 y
+    0.1131,                  !- Coefficient5 y**2
+    -0.4553,                 !- Coefficient6 x*y
+    0.05604,                 !- Coefficient7 x**3
+    -0.004120,               !- Coefficient8 y**3
+    -0.006728,               !- Coefficient9 x**2*y
+    0.006782,                !- Coefficient10 x*y**2
+    -40.0,                   !- Minimum Value of x
+    -17.8,                   !- Maximum Value of x
+    10.0,                    !- Minimum Value of y
+    48.9;                    !- Maximum Value of y
 
-! Power Curve for Carlyle_R-22_Low_06CC016,   !nominal kW = 3.1
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
+! Power Curve for Carlyle_R-22_Low_06CC016,   !nominal kW = 3.1
+! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 Curve:Bicubic,
-    06CC016_R-22_Low_pwrcurv,!- Name
-    4018.,                   !- Coefficient1 Constant
-    95.00,                   !- Coefficient2 x
-    1.507,                   !- Coefficient3 x**2
-    5.705,                   !- Coefficient4 y
-    1.247,                   !- Coefficient5 y**2
-    -1.381,                  !- Coefficient6 x*y
-    0.01277,                 !- Coefficient7 x**3
-    -0.007518,               !- Coefficient8 y**3
-    -0.02424,                !- Coefficient9 x**2*y
-    0.02917,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
+    06CC016_R-22_Low_pwrcurv,!- Name
+    4018.,                   !- Coefficient1 Constant
+    95.00,                   !- Coefficient2 x
+    1.507,                   !- Coefficient3 x**2
+    5.705,                   !- Coefficient4 y
+    1.247,                   !- Coefficient5 y**2
+    -1.381,                  !- Coefficient6 x*y
+    0.01277,                 !- Coefficient7 x**3
+    -0.007518,               !- Coefficient8 y**3
+    -0.02424,                !- Coefficient9 x**2*y
+    0.02917,                 !- Coefficient10 x*y**2
+    -40.0,                   !- Minimum Value of x
+    -17.8,                   !- Maximum Value of x
+    10.0,                    !- Minimum Value of y
+    48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Carlyle_R-22_Low_06CC016,   !nominal MBtu/h = 18561.0, !nominal kW = 3.1
+!Detailed Compressor: Carlyle_R-22_Low_06CC016,   !nominal MBtu/h = 18561.0, !nominal kW = 3.1
 Refrigeration:Compressor,
-    Carlyle_R-22_Low_06CC016,!- Name
-    06CC016_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
-    06CC016_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Compressor Rated Suction Temperature {C}
-    4.4,                     !- Rated Liquid Temperature {C}
-    ;                        !- Compressor Rated Subcooling {C}
+    Carlyle_R-22_Low_06CC016,!- Name
+    06CC016_R-22_Low_pwrcurv,!- Refrigeration Compressor Power Curve Name
+    06CC016_R-22_Low_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    ,                        !- Rated Superheat {deltaC}
+    18.3,                    !- Compressor Rated Suction Temperature {C}
+    4.4,                     !- Rated Liquid Temperature {C}
+    ;                        !- Compressor Rated Subcooling {C}
 ```
 
 
@@ -19571,7 +19534,7 @@ This data set contains the schedule information for various common (e.g. Office 
 
 Use these SOLAR COLLECTOR PARAMETERS objects for implementing solar collector modules in an EnergyPlus input file.
 
-Data has been reproduced with permission from: "Directory of SRCC Certified Solar Collector Ratings"  Copyright (c) 2004 by the Solar Rating and Certification Corporation. For more information, contact: Solar Rating and Certification Corporation, c/o FSEC, 1679 Clearlake Road, Cocoa, FL 32922-5703 USA  Tel: (321) 638-1537  Fax: (321) 638-1010  ,   www.solar-rating.org
+Data has been reproduced with permission from: "Directory of SRCC Certified Solar Collector Ratings"  Copyright (c) 2004 by the Solar Rating and Certification Corporation. For more information, contact: Solar Rating and Certification Corporation, c/o FSEC, 1679 Clearlake Road, Cocoa, FL 32922-5703 USA  Tel: (321) 638-1537  Fax: (321) 638-1010  ,   www.solar-rating.org
 
 ### StandardReports.idf
 
@@ -19628,7 +19591,7 @@ Use these PV statements for implementing PV modules in an EnergyPlus input file 
 
 Use these SOLAR COLLECTOR PARAMETERS objects for implementing solar collector modules in an EnergyPlus input file.
 
-Data has been reproduced with permission from: "Directory of SRCC Certified Solar Collector Ratings" Copyright (c) 2004 by the Solar Rating and Certification Corporation. For more information, contact: Solar Rating and Certification Corporation, c/o FSEC, 1679 Clearlake Road, Cocoa, FL 32922-5703 USA  Tel: (321) 638-1537  Fax: (321) 638-1010  ,   www.solar-rating.org
+Data has been reproduced with permission from: "Directory of SRCC Certified Solar Collector Ratings" Copyright (c) 2004 by the Solar Rating and Certification Corporation. For more information, contact: Solar Rating and Certification Corporation, c/o FSEC, 1679 Clearlake Road, Cocoa, FL 32922-5703 USA  Tel: (321) 638-1537  Fax: (321) 638-1010  ,   www.solar-rating.org
 
 ### UtilityTariffObjects.imf
 

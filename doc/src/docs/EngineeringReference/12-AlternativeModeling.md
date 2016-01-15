@@ -56,7 +56,7 @@ Table 43. Summary of room air models available in EnergyPlus
 <tr>
 <td>RoomAirflowNetwork</td>
 <td>Room air model using AirflowNetwork</td>
-<td>‘RoomAirModelType’, 
+<td>‘RoomAirModelType’,
 ‘RoomAirSettings:AirflowNetwork’
 ‘RoomAirflowNetwork:Node’,
 ‘RoomAirflowNetwork:Node:AdjacentSurfaceList’,
@@ -194,7 +194,7 @@ where <span>\({\dot Q_{sys}}\)</span> is the air system heat load with negative
 
 where *H<sub>return</sub>* is the distance between the air system return and the floor air node assumed to be 0.1 m from the floor and *z* is the vertical distance.
 
-![](media/image2341.svg.png)
+![](media/image2341.png)
 
 Figure 132.  Height versus temperature schematic for Mundt model
 
@@ -1715,7 +1715,7 @@ An accurate representation of system behavior must consider both the local heat 
   \begin{array}{rl}
     \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} &= \frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
-    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right)
   \end{array}
 $$</div>
 
@@ -1779,7 +1779,7 @@ In this case, the following system of equations must be solved:
   \begin{array}{rl}
     \rho C_p F R \frac{\partial T_W \left(r\right)}{\partial r} &= -\frac{A_S h_S}{L} \left(T_S - T_W \left(r\right)\right) - \frac{G_R}{L_R} \\
     \rho C_p F R \frac{\partial T_R \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) \\
-    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right) 
+    \rho C_p F \frac{\partial T_J \left(x\right)}{\partial x} &= \frac{A_{SL} h_{SL}}{L} \left(T_J\left(x\right) - T_R \left(x\right)\right)
   \end{array}
 $$</div>
 
@@ -2014,9 +2014,9 @@ where:
 
 F<sub>i</sub>	= Fraction of zone air volume for the ith node, defined in the Fraction of Zone Air Volume field of the RoomAir:Node:Airflownetwork
 
-C<sub>z,i</sub> 	= Volumetric heat capacity for the ith node: ρ<sub>air,i</sub>V C<sub>p</sub>C<sub>T</sub> 
+C<sub>z,i</sub> 	= Volumetric heat capacity for the ith node: ρ<sub>air,i</sub>V C<sub>p</sub>C<sub>T</sub>
 
-ρ<sub>air,i</sub> = Dry air density at the ith zone node 
+ρ<sub>air,i</sub> = Dry air density at the ith zone node
 
 C<sub>p</sub> = zone dry air specific heat
 
@@ -2031,7 +2031,7 @@ N<sub>i,g</sub> 	= The number of internal gains for the ith node, defined in the
 F<sub>gain,j</sub> 	= Fraction of internal gain from jth internal gain object defined in the RoomAir:Node:Airflownetwork:InternalGains object
 
 ${\dot Q}_{i,j}$ 	= The amount of internal sensible gain at the jth internal gain object and ith node.
- 
+
 ${\sum\limits_{j = 1}^{N_{i,g}} F_{gain,j}{\dot Q}_{i,j}}$ = The total amount of internal sensible gains assigned to the ith node
 
 N<sub>i,sur</sub> 	= The number of adjacent surface with convective heat transfer for the ith node, defined in the RoomAir:Node:Airflownetwork:AdjacentSurfaceList object
@@ -2072,9 +2072,9 @@ Fi	= Fraction of zone air volume for the ith node, defined in the Fraction of Zo
 
 M<sub>z,i</sub> 	= Mass for the ith node: ρ<sub>air,i</sub>V<sub>Cp</sub>C<sub>T</sub>
 
-ρ<sub>air,i</sub> = Dry air density at the ith zone RoomAir node 
+ρ<sub>air,i</sub> = Dry air density at the ith zone RoomAir node
 
-V	= Zone air volume 
+V	= Zone air volume
 
 W<sub>z,i</sub> 	= Air humidity ratio at the ith zone RoomAir node
 
@@ -2082,9 +2082,9 @@ N<sub>i,g</sub> 	= The number of internal gains for the ith node, defined in the
 
 F<sub>gain,j</sub> = Fraction of internal gain from jth internal gain object defined in the RoomAir:Node:Airflownetwork:InternalGains object
 
-${\dot Q}_{i,j}$  	= The amount of internal latent gain at the jth internal gain object and ith node. 
+${\dot Q}_{i,j}$  	= The amount of internal latent gain at the jth internal gain object and ith node.
 
-${\sum\limits_{j = 1}^{N_{i,g}} F_{gain,j}{\dot Q}_{i,j}}$  = The total amount of internal latent gains attached to the ith node 
+${\sum\limits_{j = 1}^{N_{i,g}} F_{gain,j}{\dot Q}_{i,j}}$  = The total amount of internal latent gains attached to the ith node
 
 N<sub>i,sur</sub> 	= The number of adjacent surface with convective heat transfer for the ith node, defined in the RoomAir:Node:Airflownetwork:AdjacentSurfaceList object
 
@@ -2210,7 +2210,7 @@ where
 
 The Input Output Reference provides the relationship between airflow and pressure for the most of the components (Ref.AirflowNetwork Model). The relationship between airflow and pressure for the AirflowNetwork:Multizone:Component:DetailedOpening, AirflowNetwork:Multizone:Component:SimpleOpening, and AirflowNetwork:Multizone:Component:HorizontalOpening objects are provided in detail in this reference.
 
-![](media/image2691.svg.png)
+![](media/image2691.png)
 
 Figure 147. The general problem of gravitational flow through a vertical opening
 
@@ -2290,7 +2290,7 @@ It should be pointed out that the discharge coefficient is modulated based on op
 
 The schematic drawing of air flow patterns through a simple vertical opening (AirflowNetwork:Multizone:Component:SimpleOpening) is shown in Figure 149. The equations used below are available from Walton (1989).
 
-![](media/image2708.svg.png)
+![](media/image2708.png)
 
 Figure 149. Schematic of large opening and associated three flow patterns
 
@@ -2546,7 +2546,7 @@ Table 49.  Legend Description
 
 </table>
 
-![](media/image2743.svg.png)
+![](media/image2743.png)
 
 Figure 152. Flow rates at different pressure differences
 
@@ -2880,9 +2880,9 @@ R    = The ratio of the maximum fan flow rate given in the inputs to the requ
 
 <span>\({\dot m_{i,terminal,final}}\)</span>           = The final flow rate at each terminal adjusted by the ratio
 
-### Airflow Calculation Procedure using inputs of Intrazone nodes and linkages 
+### Airflow Calculation Procedure using inputs of Intrazone nodes and linkages
 
-The inputs of both AirflowNetwork:IntraZone:Node and AirflowNetwork:IntraZone:Linkage objects are treated as normal model nodes and linkages. Therefore, the calculation procedures are the same as above. 
+The inputs of both AirflowNetwork:IntraZone:Node and AirflowNetwork:IntraZone:Linkage objects are treated as normal model nodes and linkages. Therefore, the calculation procedures are the same as above.
 
 
 ### Integration of the AirflowNetwork Model
@@ -2911,43 +2911,43 @@ The AirflowNetwork:OccupantVentilationControl object enhances the AirflowNetwork
 
 #### Procedures of occupant ventilation control
 
-It should be pointed that the open elapsed time and closed elapsed time are not independent. In other words, when one of the elapsed times value is greater than 0, then other elapsed time value must be equal to 0. The model is either tracking a window as open, in which case the open elapsed time grows, or as closed, in which case the closed elapsed time grows. 
+It should be pointed that the open elapsed time and closed elapsed time are not independent. In other words, when one of the elapsed times value is greater than 0, then other elapsed time value must be equal to 0. The model is either tracking a window as open, in which case the open elapsed time grows, or as closed, in which case the closed elapsed time grows.
 
 The calculation procedures are presented in the following steps:
 
-Step 1: Open elapsed time check 
+Step 1: Open elapsed time check
 
-The model checks the open elapsed time first. When the open elapsed time is greater than 0 and less than the minimum opening time, a window will remain open. Otherwise, the model goes to Step 2.  
+The model checks the open elapsed time first. When the open elapsed time is greater than 0 and less than the minimum opening time, a window will remain open. Otherwise, the model goes to Step 2.
 
     Open elapsed time > minimum open time
 
-Step 2: Closed elapsed time check 
+Step 2: Closed elapsed time check
 
-This step checks the closed elapsed time. When the closed elapsed time is greater than 0 and less than the minimum closed time, a window will remain closed. Otherwise, the model goes to Step 3. 
+This step checks the closed elapsed time. When the closed elapsed time is greater than 0 and less than the minimum closed time, a window will remain closed. Otherwise, the model goes to Step 3.
 
     Closed elapsed time > minimum closed time
 
-Step 3: Elapsed time only? 
+Step 3: Elapsed time only?
 
-When either the open elapsed time or the closed elapsed time is long enough (greater than the minimum time) and no other checks are needed, the model returns to the other ventilation control defined in the Ventilation Control Mode field in AirflowNetwork:MultiZone:Zone or AirflowNetwork:MultiZone:Surface. If other checks are needed, the following steps will be performed. 
+When either the open elapsed time or the closed elapsed time is long enough (greater than the minimum time) and no other checks are needed, the model returns to the other ventilation control defined in the Ventilation Control Mode field in AirflowNetwork:MultiZone:Zone or AirflowNetwork:MultiZone:Surface. If other checks are needed, the following steps will be performed.
 
-Step 4: Thermal comfort temperature calculation 
+Step 4: Thermal comfort temperature calculation
 
-The thermal comfort check requires the thermal comfort temperature and the comfort band. The comfort temperature of Tcomf is calculated as a function of the outdoor dry-bulb temperature Tout. The comfort temperature calculation may be based on two curves and a boundary temperature point. 
+The thermal comfort check requires the thermal comfort temperature and the comfort band. The comfort temperature of Tcomf is calculated as a function of the outdoor dry-bulb temperature Tout. The comfort temperature calculation may be based on two curves and a boundary temperature point.
 
 <div>$$
   T_{comf} = \left\{ \begin{array}{ll} \rm{Low Temp Curve,} & \min T_{out} &lt; x \leq \rm{Boundary Point} \\ \rm{High Temp Curve,} & \rm{Boundary Point} \leq x &lt; \max T_{out}  \end{array}\right.
 $$</div>
 
-Step 5: Thermal band calculation 
+Step 5: Thermal band calculation
 
-The comfort band is calculated as a function of the design personal dissatisfaction PPD. 
+The comfort band is calculated as a function of the design personal dissatisfaction PPD.
 
 <div>$$\theta = -0.0028 \left(100-\rm{PPD}\right)^2 + 0.3419 \left(100-\rm{PPD}\right) – 6.6275 $$</div>
 
 This equation is valid for PPD 0% to 35%
 
-Step 6: Upper boundary check of thermal comfort 
+Step 6: Upper boundary check of thermal comfort
 
 After calculation of the comfort temperature and band, the thermal comfort check will be performed using the zone air operative temperature Tg. The check consists of upper and lower boundary checks.
 
@@ -2955,7 +2955,7 @@ The upper boundary check checks window opening status and uses the following log
 
 <div>$$T_g > \left(T_{comf} + \theta\right)$$</div>
 
-If the above logic check is true, the opening probability check will be performed. The detailed description is given in the opening probability section. 
+If the above logic check is true, the opening probability check will be performed. The detailed description is given in the opening probability section.
 
 If the above logic check is false, no action is needed.
 
@@ -2963,13 +2963,13 @@ If the opening probability check is true and upper boundary check is satisfied, 
 
 <div>$$T_g > \left(T_{comf} + \theta\right) \&\& \rm{OpeningProbability}$$</div>
 
-Step 7: Lower boundary check of thermal comfort 
+Step 7: Lower boundary check of thermal comfort
 
 The lower boundary check will follow the upper boundary check to check the window closing status, using the following logic.
 
 <div>$$T_g &lt; \left(T_{comf} - \theta\right)$$</div>
 
-If the above logic check is true, the closing probability check will be performed. The detailed description is given in the closing probability section. 
+If the above logic check is true, the closing probability check will be performed. The detailed description is given in the closing probability section.
 
 If the above logic check is false, no action is needed.
 
@@ -2979,27 +2979,27 @@ If the closing probability check is true and lower boundary check is satisfied, 
 
 The output variables from the model are open status, opening probability status, and closing probability status. The detailed description of opening status is given in the Airflow Network Outputs section in the Input Output Reference.
 
-Note: The upper and lower boundary checks are not independent. In other words, when one of boundary check is satisfied, the other check will be dissatisfied.  
- 
+Note: The upper and lower boundary checks are not independent. In other words, when one of boundary check is satisfied, the other check will be dissatisfied.
+
 #### Procedures of opening probability control
 
 Opening probability control provides an optional random number check. The control logic of opening probability is described in the following steps.
 
-Step 1: Closed elapsed time check 
+Step 1: Closed elapsed time check
 
-This check requires that closed elapsed time is longer than the minimum closing time. 
+This check requires that closed elapsed time is longer than the minimum closing time.
 
 Closed time > minimum closed time
 
-If the time duration is not long enough, the output is false so that a window remains closed. 
+If the time duration is not long enough, the output is false so that a window remains closed.
 
 If the time duration is long enough, an occupancy check is performed.
 
-Step 2: Occupancy check 
+Step 2: Occupancy check
 
-If a zone is not occupied and the occupancy check is requested, the output is false. If the zone is occupied, the next step is to check the setpoints using zone air temperature at the previous time step as a reference. 
+If a zone is not occupied and the occupancy check is requested, the output is false. If the zone is occupied, the next step is to check the setpoints using zone air temperature at the previous time step as a reference.
 
-Step 3: Setpoint check 
+Step 3: Setpoint check
 
 There are 5 temperature control types. The following types are available:
 
@@ -3013,45 +3013,45 @@ There are 5 temperature control types. The following types are available:
 
 * Dual heating and setpoints: If heating setpoint &lt; Tzon &lt; Cooling setpoint, go to next step. Otherwise, return false.
 
-Step 4: Select bypass or opening probability check 
+Step 4: Select bypass or opening probability check
 
-A choice is provided at this stage so that the opening probability check may be performed or bypassed. If bypassed, the output will be true to open a window. If performed, probability will be determined from a schedule. 
+A choice is provided at this stage so that the opening probability check may be performed or bypassed. If bypassed, the output will be true to open a window. If performed, probability will be determined from a schedule.
 
-Step 5: Perform opening probability check 
+Step 5: Perform opening probability check
 
 The opening probability (OP) value is determined from a schedule.
 
 OP = Schedule value or specific function
 
-If the probability value is greater than a random number, the output is true. 
+If the probability value is greater than a random number, the output is true.
 
 OP > random number (random number is between 0 and 1)
 
-Otherwise, the result will be false.    
+Otherwise, the result will be false.
 
 #### Procedures of closing probability control
 
-The control logic of closing probability is described as follows. 
+The control logic of closing probability is described as follows.
 
-Step 1: Open elapsed time check 
+Step 1: Open elapsed time check
 
 This check requires that open elapsed time is longer than the minimum opening time.
- 
+
 Open time > minimum open time
 
 If the time duration is not long enough, the output is false and the window remains open. Otherwise, Step 2 will be performed.
 
-Step 2: Select by-pass or closing probability check 
+Step 2: Select by-pass or closing probability check
 
 A choice is provided at this step so that the closing probability check may be performed or bypassed. If bypassed, the output will be true to close a window. If performed, the closing probability will be calculated. The closing probability (CP) value is given from a schedule.
 
 CP = Schedule value or specific function
 
-If the closing probability check is performed and the closing probability is greater than a random number, the output is true. 
+If the closing probability check is performed and the closing probability is greater than a random number, the output is true.
 
 CP > random number (random number is between 0 and 1)
 
-Otherwise, the result will be false.    
+Otherwise, the result will be false.
 
 
 ### References
@@ -3070,7 +3070,7 @@ Dols, W. S. & G. N. Walton. 2002. “CONTAMW 2.0 User Manual,” NISTIR 6921, Na
 
 Holmes, J. D. 1986. Wind Loads on low-rise buildings: The structural and environmental effects of wind on buildings and structures, Chapter 12, Faculty of Engineering, Monash University, Melbourne, Australia
 
-Marais, J. M. & C. Teichmann, “Window Simulation Methods Required for Manual Window Ventilated Buildings,” Fifth German-Austrian IBPSA Conference, September 22-24, 2014, RWTH Aachen University, Germany 
+Marais, J. M. & C. Teichmann, “Window Simulation Methods Required for Manual Window Ventilated Buildings,” Fifth German-Austrian IBPSA Conference, September 22-24, 2014, RWTH Aachen University, Germany
 
 Swami, M. V. and S. Chandra. 1988. Correlations for pressure distribution on buildings and calculation of natural-ventilation airflow, ASHRAE Transactions 94(1988) (Pt 1), pp. 243-266.
 

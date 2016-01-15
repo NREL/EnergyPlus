@@ -138,7 +138,7 @@ Prior to implementing the new heat balance method (3rdOrderBackwardDifference) i
 
 This is Equation without the term due to the air system. In addition, Tz is now the *desired* zone temperature as defined by the control system setpoints that must be specified for each zone. An assumption was made that if the air system has sufficient capacity (based on the desired zone air temperature) to meet the zone conditioning requirements (i.e. Qsys=Qload) at the desired zone air temperature then those requirements will be met. On the other hand, if the air system cannot provide enough conditioning to the zone to maintain the desired temperature, then the air system provides its maximum output to the zone and the zone air temperature is allowed to "float."  Equation was used to calculate the air system output required to maintain the desired zone air temperature; the actual zone temperature update was accomplished using Equation . This method was called *predictive system energy balance*. It has many characteristics of a predictor-corrector method since the air system response is first approximated based on a predicted zone temperature and then the actual change in zone temperature is determined from that air system response. The predictive air system energy balance method required that the system controls on air mass flow rate, supply air temperature, etc., be formulated as a function of the zone air temperature. However, this was not a serious drawback. The first example considered was a single zone draw through air system. Typically, such systems have a cooling coil and heating coil in series, and constant air volume flow rate. Single zone draw through systems run at maximum capacity when turned on; so the only way to regulate net air system output and keep the zone air temperature within the desired range is to turn the air system on and off. A simplified schematic of this system type is shown in Figure 5. Simplified Single Zone Draw Through Air System.
 
-![](media/image31.svg.png)
+![](media/image31.png)
 
 Figure 5. Simplified Single Zone Draw Through Air System
 
@@ -150,13 +150,13 @@ where h is the fraction of the time step that the air system is turned on and va
 
 A far more complex, though again simplified, air system is the variable air volume (VAV) system, shown in Figure 6. Simplified Variable Volume Air System. In VAV systems, the supply air temperature, as well as the supply air volume, are continuous functions of zone air temperature. As shown in Figure 7. Idealized Variable Volume System Operation., when the zone air temperature is between Tcl and Tcu, cooling is required and the air system varies the supply air flow rate while maintaining a constant supply air temperature. When the zone air temperature is between Thl and Thu, heating is required and air is supplied at a constant minimum flow rate while the supply air temperature is varied.
 
-![](media/image33.svg.png)
+![](media/image33.png)
 
 Figure 6. Simplified Variable Volume Air System.
 
 The next figure (Idealized variable volume system operation) shows idealized behavior of a VAV system; in practice, the air flow rate and temperature are not exact linear functions of zone air temperature.
 
-![](media/image34.svg.png)
+![](media/image34.png)
 
 Figure 7. Idealized Variable Volume System Operation.
 
@@ -588,16 +588,16 @@ Zone Air Mass Flow Conservation
 ####Overiew
 The zone air mass flow conservation object, ZoneAirMassFlowConservation, activates zone air mass flow balance calculations.  This feature is available only for controlled zones (ZoneVAC:EquipmentConnections) which also have either a zone mixing or infiltration object.  The user may specify that zone mixing, infiltration, or both can be overridden to balance the zone air mass flows. The following rules apply:
 
- - If there are no zone mixing flows to adjacent zones, then the zone air mass flow is balanced by setting the Zone Mixing objects mass flow rate to zero. 
- - If there are no zone exhaust fans defined and there are no zone mixing objects specified, then a zone in an air loop is always balanced.  
- - Infiltration mass flow is included in the zone air mass flow balance depending upon one of three options:  none (all infiltration is assumed to be self-balanced), all zones, or only zones that serve as a source zone for zone mixing objects. 
+ - If there are no zone mixing flows to adjacent zones, then the zone air mass flow is balanced by setting the Zone Mixing objects mass flow rate to zero.
+ - If there are no zone exhaust fans defined and there are no zone mixing objects specified, then a zone in an air loop is always balanced.
+ - Infiltration mass flow is included in the zone air mass flow balance depending upon one of three options:  none (all infiltration is assumed to be self-balanced), all zones, or only zones that serve as a source zone for zone mixing objects.
  - The base infiltration mass flow rate (calculated based on user inputs) may be controlled one of two ways for zone air mass flow balance purposes: adjust the base infiltration up or down as needed to balance the zone air mass flow, or assume the base infiltration rate is self-balanced and add infiltration if needed to balance the zone air mass flow.
  - Optional user inputs can override the default return air flow rate.
 
-The zone air mass flow conservation equation always includes: supply air flow rates, return air flow rates, and zone exhaust fan flow rates. Zone mixing and infiltration object flow rates may be included depending upon the selected options. A particular zone can be a source zone, receiving zone, or both depending on the number of ZoneMixing objects specified for that zone. 
+The zone air mass flow conservation equation always includes: supply air flow rates, return air flow rates, and zone exhaust fan flow rates. Zone mixing and infiltration object flow rates may be included depending upon the selected options. A particular zone can be a source zone, receiving zone, or both depending on the number of ZoneMixing objects specified for that zone.
 
 #### Return Air Flow Rate Calculations
-The return air flow rate is calculated one of two ways.  
+The return air flow rate is calculated one of two ways.
 
 The default calculation is:
 
@@ -630,7 +630,7 @@ Figure 8 illustrates the zone mass flow components for an air loop system provid
 
 
 
-![](media/image134.svg.png)
+![](media/image134.png)
 
 
 

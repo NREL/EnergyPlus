@@ -1,8 +1,7 @@
-![](media/ep.gif)
+![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
-<hr>
 <h1>Tips &amp; Tricks for Using EnergyPlus</h1>
 <h2>Insider secrets to Using EnergyPlus</h2>
 <br/>
@@ -54,7 +53,7 @@ What EnergyPlus Is
 
 The primary website for EnergyPlus is http://www.energyplus.gov
 
-EnergyPlus is an energy analysis and thermal load simulation program. Based on a user’s description of a building from the perspective of the building’s physical make-up, associated mechanical systems, etc., EnergyPlus will calculate the heating and cooling loads necessary to maintain thermal control set points, conditions throughout a secondary HVAC system and coil loads, and the energy consumption of primary plant equipment as well as many other simulation details that are necessary to verify that the simulation is performing as the actual building would. More details on what EnergyPlus is can be found in the [GettingStarted Document](file:///E:\Docs4PDFs\GettingStarted.pdf).
+EnergyPlus is an energy analysis and thermal load simulation program. Based on a user’s description of a building from the perspective of the building’s physical make-up, associated mechanical systems, etc., EnergyPlus will calculate the heating and cooling loads necessary to maintain thermal control set points, conditions throughout a secondary HVAC system and coil loads, and the energy consumption of primary plant equipment as well as many other simulation details that are necessary to verify that the simulation is performing as the actual building would. More details on what EnergyPlus is can be found in the GettingStarted Document.
 
 No program is able to handle every simulation situation. However, it is the intent of EnergyPlus to handle as many building and HVAC design options either directly or indirectly through links to other programs in order to calculate thermal loads and/or energy consumption on for a design day or an extended period of time (up to, including, and beyond a year).
 
@@ -103,9 +102,9 @@ Datasets aka Libraries
 
 EnergyPlus uses the term DataSets for what many would call libraries. These files are included, for the most part, in the instalation package but may be available from other sites (such as the helpdesk or Yahoo Groups).
 
-There are two flavors of DataSets: **simple** and **Macro**. Some sets have files in both camps (for example, Solar Collectors). Both flavors contain IDF objects ready to be put into EnergyPlus input files. With the simple datasets, you may need to use a text editor or the IDF Editor to search the file for the one you want to use.  With the macro datsets and a simply structured imf (input macro file), you can name the item you want to include. (The macro program is described in the [Auxiliary Programs document](file:///E:\Docs4PDFs\AuxiliaryPrograms.pdf)).
+There are two flavors of DataSets: **simple** and **Macro**. Some sets have files in both camps (for example, Solar Collectors). Both flavors contain IDF objects ready to be put into EnergyPlus input files. With the simple datasets, you may need to use a text editor or the IDF Editor to search the file for the one you want to use.  With the macro datsets and a simply structured imf (input macro file), you can name the item you want to include. (The macro program is described in the Auxiliary Programs document).
 
-Primary documentation for each dataset is found in the [Output Details and Examples document](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf). Highlights of some datasets are given here.
+Primary documentation for each dataset is found in the Output Details and Examples document. Highlights of some datasets are given here.
 
 Locations-DesignDays
 --------------------
@@ -153,7 +152,7 @@ The Weather Converter program accesses this file when it processes (even for sta
 EPW Weather Files
 -----------------
 
-The WeatherConverter converts from other source formats to EPW and EnergyPlus CSV formats. The WeatherConverter also produces a statistics file that provides a quick synopsis of the converted data and is used by the tabular reports (ref: Climatic Data Summary report). For Ecotect users, the Weather Converter can also save as .wea format. We do not support conversion of EPWs to other formats, including to TMY2. The Weather Converter is described in detail in the [Auxiliary Programs document](file:///E:\Docs4PDFs\AuxiliaryPrograms.pdf).
+The WeatherConverter converts from other source formats to EPW and EnergyPlus CSV formats. The WeatherConverter also produces a statistics file that provides a quick synopsis of the converted data and is used by the tabular reports (ref: Climatic Data Summary report). For Ecotect users, the Weather Converter can also save as .wea format. We do not support conversion of EPWs to other formats, including to TMY2. The Weather Converter is described in detail in the Auxiliary Programs document.
 
 Meteonorm Weather Files
 -----------------------
@@ -247,9 +246,9 @@ Using Macros and Editing Inputs in IDF Editor
 
 *(Using or ignoring macros in the IDF editor is a potential Enhancement List item.)*
 
-1)   Separate files into "IDF editable" and "macro" (actually, the AbsorptionChiller\_Macro.imf example file shows a little of this but it doesn't really use macros). For the pieces you think you'd like to manipulate in the IDF editor, call them with extension IDF. For the others, they would be IMF and the master file would be IMF with "includes" of your IDF pieces.
+1)   Separate files into "IDF editable" and "macro" (actually, the AbsorptionChiller\_Macro.imf example file shows a little of this but it doesn't really use macros). For the pieces you think you'd like to manipulate in the IDF editor, call them with extension IDF. For the others, they would be IMF and the master file would be IMF with "includes" of your IDF pieces.
 
-2)   Use the expanded IDF (extension epmidf) file for your IDF editor changes and then run it from there.
+2)   Use the expanded IDF (extension epmidf) file for your IDF editor changes and then run it from there.
 
 Getting data from WINDOW program
 --------------------------------
@@ -272,13 +271,13 @@ The other “older” option for creating data for EnergyPlus is to use the “E
 
 Please note that there is a bug in WINDOW 5 that causes two of the lines in the EnergyPlus data file to be joined. This bug is fixed in versions of Window 5.02 (and above). To be sure, you can check the data file for a line that looks like:
 
-GLAZING SYSTEM OPTICAL DATAAngle     0    10    20    30    40    50    60    70    80    90 Hemis
+GLAZING SYSTEM OPTICAL DATAAngle     0    10    20    30    40    50    60    70    80    90 Hemis
 
 The fixed version of the program will not show the above line; rather, there will be two lines such as shown below. If you have the above condition, with an editor you would break this into two lines:
 
 GLAZING SYSTEM OPTICAL DATA
 
-Angle     0    10    20    30    40    50    60    70    80    90 Hemis
+Angle     0    10    20    30    40    50    60    70    80    90 Hemis
 
 In EnergyPlus, the Window data file is searched for each “Construction:WindowDataFile” object in the EnergyPlus input. This object has a very simple form:
 
@@ -294,11 +293,11 @@ If there is a window called ConstructionName on the Window data file, the data f
 
 - **WindowMaterial:Gas** or **WindowMaterial:GasMixture** for each of the gap layers. They will be named **W5:ConstructionName:GAP1**, **W5:ConstructionName:GAP2** , etc.
 
-- **WindowProperty:FrameAndDivider** (if the window on the Window5 data file has a frame and/or divider). It will be named **W5:ConstructionName**. This WindowProperty:FrameAndDivider will be assigned to any window on the input file that has a construction called “ConstructionName” *even if that window has  referenced another WindowProperty:FrameAndDivider (i.e., if WindowProperty:FrameAndDivider Name for that window is specified).* In this case a warning will result.
+- **WindowProperty:FrameAndDivider** (if the window on the Window5 data file has a frame and/or divider). It will be named **W5:ConstructionName**. This WindowProperty:FrameAndDivider will be assigned to any window on the input file that has a construction called “ConstructionName” *even if that window has  referenced another WindowProperty:FrameAndDivider (i.e., if WindowProperty:FrameAndDivider Name for that window is specified).* In this case a warning will result.
 
 Note that:
 
-An entry on the WINDOW data file usually has just one glazing system. It is also possible to have an entry with two glazing systems separated by a horizontal or vertical mullion. In this case, the two glazing systems can have different dimensions and different properties. For example, one of the two glazing systems could be single glazed and the other could be double glazed. An example  of the two glazing system case is given in the sample WINDOW data file shown below (although in this case the properties of the two glazing systems are the same).
+An entry on the WINDOW data file usually has just one glazing system. It is also possible to have an entry with two glazing systems separated by a horizontal or vertical mullion. In this case, the two glazing systems can have different dimensions and different properties. For example, one of the two glazing systems could be single glazed and the other could be double glazed. An example  of the two glazing system case is given in the sample WINDOW data file shown below (although in this case the properties of the two glazing systems are the same).
 
 EnergyPlus handles the “one glazing system” and “two glazing systems” cases differently. If there is one glazing system, the glazing system height and width from the Window5 data file are not used. Instead, the window dimensions are obtained from the window vertices that have been specified on the IDF file. However, a warning message will result if the height or width calculated from the window’s vertex inputs differs from the corresponding Window5 data file values by more than 10%. This warning is given since the effective frame and edge-of-glass conductances on the WINDOW data file can depend on the window dimensions if the frame is non-uniform, i.e., consists of sections with different values of width, projection, or thermal properties.
 
@@ -322,87 +321,87 @@ Window5 Data File for EnergyPlus
 
 &lt;WINDOW program version&gt;
 
-Date             : Tue Nov 13 17:07:40 2001
+Date             : Tue Nov 13 17:07:40 2001
 
-Window name      : **DoubleLowE**
+Window name      : **DoubleLowE**
 
-Description      : Horizontal Slider, AA
+Description      : Horizontal Slider, AA
 
 \# Glazing Systems: **2**
 
 GLAZING SYSTEM DATA: Height Width nPanes Uval-center SC-center SHGC-center Tvis-center
 
- System1         :   1032   669      2      1.660      0.538      0.467       0.696
+ System1         :   1032   669      2      1.660      0.538      0.467       0.696
 
- System2         :   1033   669      2      1.660      0.538      0.467       0.696
+ System2         :   1033   669      2      1.660      0.538      0.467       0.696
 
-FRAME/MULLION DATA: Width OutsideProj InsideProj Cond EdgeCondRatio SolAbs VisAbs Emiss  Orient'n (mull)
+FRAME/MULLION DATA: Width OutsideProj InsideProj Cond EdgeCondRatio SolAbs VisAbs Emiss  Orient'n (mull)
 
-    L Sill       :   97.3     25.4       25.4   500.000    1.467     0.500  0.500  0.90
+    L Sill       :   97.3     25.4       25.4   500.000    1.467     0.500  0.500  0.90
 
-    R Sill       :   97.3     25.4       25.4   500.000    1.467     0.500  0.500  0.90
+    R Sill       :   97.3     25.4       25.4   500.000    1.467     0.500  0.500  0.90
 
-    L Head       :   70.2     25.4       25.4   18.822     1.490     0.500  0.500  0.90
+    L Head       :   70.2     25.4       25.4   18.822     1.490     0.500  0.500  0.90
 
-    R Head       :   70.2     25.4       25.4   18.822     1.490     0.500  0.500  0.90
+    R Head       :   70.2     25.4       25.4   18.822     1.490     0.500  0.500  0.90
 
-    Top L Jamb   :   54.3     25.4       25.4   31.141     1.503     0.500  0.500  0.90
+    Top L Jamb   :   54.3     25.4       25.4   31.141     1.503     0.500  0.500  0.90
 
-    Bot L Jamb   :   54.3     25.4       25.4   500.000    1.494     0.500  0.500  0.90
+    Bot L Jamb   :   54.3     25.4       25.4   500.000    1.494     0.500  0.500  0.90
 
-    Top R Jamb   :   70.2     25.4       25.4   500.000    1.518     0.500  0.500  0.90
+    Top R Jamb   :   70.2     25.4       25.4   500.000    1.518     0.500  0.500  0.90
 
-    Bot R Jamb   :   97.6     25.4       25.4   264.673    1.547     0.500  0.500  0.90
+    Bot R Jamb   :   97.6     25.4       25.4   264.673    1.547     0.500  0.500  0.90
 
-    Mullion      :   53.5     25.4       25.4   500.000    1.361     0.500  0.500  0.90 **Horizontal**
+    Mullion      :   53.5     25.4       25.4   500.000    1.361     0.500  0.500  0.90 **Horizontal**
 
-    Average frame:   **75.5     25.4       25.4   326.149    1.464     0.500  0.500  0.90**
+    Average frame:   **75.5     25.4       25.4   326.149    1.464     0.500  0.500  0.90**
 
-DIVIDER DATA     : Width OutsideProj InsideProj Cond EdgeCondRatio SolAbs VisAbs Emiss Type            \#Hor \#Vert
+DIVIDER DATA     : Width OutsideProj InsideProj Cond EdgeCondRatio SolAbs VisAbs Emiss Type            \#Hor \#Vert
 
- System1         :  **25.4    25.4       25.4    3.068      1.191     0.500  0.500 0.900 DividedLite       2    3**
+ System1         :  **25.4    25.4       25.4    3.068      1.191     0.500  0.500 0.900 DividedLite       2    3**
 
- System2         :  **25.4    25.4       25.4    3.068      1.191     0.500  0.500 0.900 DividedLite       2    3**
+ System2         :  **25.4    25.4       25.4    3.068      1.191     0.500  0.500 0.900 DividedLite       2    3**
 
-GLASS DATA       : Layer\#  Thickness  Cond Tsol Rfsol Rbsol Tvis Rfvis Rbvis  Tir  EmissF  EmissB  SpectralDataFile
+GLASS DATA       : Layer\#  Thickness  Cond Tsol Rfsol Rbsol Tvis Rfvis Rbvis  Tir  EmissF  EmissB  SpectralDataFile
 
- System1         :   1      **3.00     0.900** 0.50  0.33  0.39 0.78  0.16  0.13 **0.00   0.16    0.13**   CMFTIR\_3.AFG
+ System1         :   1      **3.00     0.900** 0.50  0.33  0.39 0.78  0.16  0.13 **0.00   0.16    0.13**   CMFTIR\_3.AFG
 
-                     2      **6.00     0.900** 0.77  0.07  0.07 0.88  0.08  0.08 **0.00   0.84    0.84**   CLEAR\_6.DAT
+                     2      **6.00     0.900** 0.77  0.07  0.07 0.88  0.08  0.08 **0.00   0.84    0.84**   CLEAR\_6.DAT
 
- System2         :   1      **3.00     0.900** 0.50  0.33  0.39 0.78  0.16  0.13 **0.00   0.16    0.13**   CMFTIR\_3.AFG
+ System2         :   1      **3.00     0.900** 0.50  0.33  0.39 0.78  0.16  0.13 **0.00   0.16    0.13**   CMFTIR\_3.AFG
 
-                     2      **6.00     0.900** 0.77  0.07  0.07 0.88  0.08  0.08 **0.00   0.84    0.84**   CLEAR\_6.DAT
+                     2      **6.00     0.900** 0.77  0.07  0.07 0.88  0.08  0.08 **0.00   0.84    0.84**   CLEAR\_6.DAT
 
-GAP DATA         : Gap\# Thick nGasses
+GAP DATA         : Gap\# Thick nGasses
 
- System1         :   1  **12.70    1**
+ System1         :   1  **12.70    1**
 
- System2         :   1  **12.70    1**
+ System2         :   1  **12.70    1**
 
-GAS DATA         : GasName Fraction MolWeight ACond   BCond  CCond AVisc   BVisc   CVisc ASpHeat  BSpHeat CSpHeat
+GAS DATA         : GasName Fraction MolWeight ACond   BCond  CCond AVisc   BVisc   CVisc ASpHeat  BSpHeat CSpHeat
 
- System1 Gap1    : Air     **1.0000   28.97    0.002873 7.76e-5 0.0 3.723e-6 4.94e-8 0.0   1002.737 0.012324 0.0**
+ System1 Gap1    : Air     **1.0000   28.97    0.002873 7.76e-5 0.0 3.723e-6 4.94e-8 0.0   1002.737 0.012324 0.0**
 
- System2 Gap1    : Air     **1.0000   28.97    0.002873 7.76e-5 0.0 3.723e-6 4.94e-8 0.0   1002.737 0.012324 0.0**
+ System2 Gap1    : Air     **1.0000   28.97    0.002873 7.76e-5 0.0 3.723e-6 4.94e-8 0.0   1002.737 0.012324 0.0**
 
 GLAZING SYSTEM OPTICAL DATA
 
-Angle     0    10    20    30    40    50    60    70    80    90 Hemis
+Angle     0    10    20    30    40    50    60    70    80    90 Hemis
 
 System1
 
-Tsol  **0.408 0.410 0.404 0.395 0.383 0.362 0.316 0.230 0.106 0.000 0.338**
+Tsol  **0.408 0.410 0.404 0.395 0.383 0.362 0.316 0.230 0.106 0.000 0.338**
 
-Abs1  **0.177 0.180 0.188 0.193 0.195 0.201 0.218 0.239 0.210 0.001 0.201**
+Abs1  **0.177 0.180 0.188 0.193 0.195 0.201 0.218 0.239 0.210 0.001 0.201**
 
-Abs2  **0.060 0.060 0.061 0.061 0.063 0.063 0.061 0.053 0.038 0.000 0.059**
+Abs2  **0.060 0.060 0.061 0.061 0.063 0.063 0.061 0.053 0.038 0.000 0.059**
 
 Rfsol **0.355 0.350 0.348 0.350 0.359 0.374 0.405 0.478 0.646 0.999 0.392**
 
 Rbsol **0.289 0.285 0.283 0.282 0.285 0.296 0.328 0.411 0.594 1.000 0.322**
 
-Tvis  **0.696 0.700 0.690 0.677 0.660 0.625 0.548 0.399 0.187 0.000 0.581**
+Tvis  **0.696 0.700 0.690 0.677 0.660 0.625 0.548 0.399 0.187 0.000 0.581**
 
 Rfvis **0.207 0.201 0.198 0.201 0.212 0.234 0.278 0.374 0.582 0.999 0.260**
 
@@ -410,17 +409,17 @@ Rbvis **0.180 0.174 0.173 0.176 0.189 0.215 0.271 0.401 0.648 1.000 0.251**
 
 System2
 
-Tsol  **0.408 0.410 0.404 0.395 0.383 0.362 0.316 0.230 0.106 0.000 0.338**
+Tsol  **0.408 0.410 0.404 0.395 0.383 0.362 0.316 0.230 0.106 0.000 0.338**
 
-Abs1  **0.177 0.180 0.188 0.193 0.195 0.201 0.218 0.239 0.210 0.001 0.201**
+Abs1  **0.177 0.180 0.188 0.193 0.195 0.201 0.218 0.239 0.210 0.001 0.201**
 
-Abs2  **0.060 0.060 0.061 0.061 0.063 0.063 0.061 0.053 0.038 0.000 0.059**
+Abs2  **0.060 0.060 0.061 0.061 0.063 0.063 0.061 0.053 0.038 0.000 0.059**
 
 Rfsol **0.355 0.350 0.348 0.350 0.359 0.374 0.405 0.478 0.646 0.999 0.392**
 
 Rbsol **0.289 0.285 0.283 0.282 0.285 0.296 0.328 0.411 0.594 1.000 0.322**
 
-Tvis  **0.696 0.700 0.690 0.677 0.660 0.625 0.548 0.399 0.187 0.000 0.581**
+Tvis  **0.696 0.700 0.690 0.677 0.660 0.625 0.548 0.399 0.187 0.000 0.581**
 
 Rfvis **0.207 0.201 0.198 0.201 0.212 0.234 0.278 0.374 0.582 0.999 0.260**
 
@@ -454,11 +453,11 @@ GLAZING SYSTEM DATA
 
 ***Height***, \****width*** = height and width of glazed portion (i.e., excluding frame; and, if mullion present, excluding mullion).
 
-***nPanes***     = number of glass layers
+***nPanes***     = number of glass layers
 
-*Uval-center* = center-of-glass U-value (including air films) under standard winter conditions\*  (W/m2)
+*Uval-center* = center-of-glass U-value (including air films) under standard winter conditions\*  (W/m2)
 
-*SC-center*  = center-of-glass shading coefficient under standard summer conditions\*.
+*SC-center*  = center-of-glass shading coefficient under standard summer conditions\*.
 
 *SHCG-center* = center-of-glass solar heat gain coefficient under standard summer conditions\*.
 
@@ -468,9 +467,9 @@ GLAZING SYSTEM DATA
 
 FRAME/MULLION DATA
 
-*L,R Sill*   = left, right sill of frame
+*L,R Sill*   = left, right sill of frame
 
-*L,R Head*   = left, right header of frame
+*L,R Head*   = left, right header of frame
 
 *Top L, Bot L jamb* = top-left, bottom-left jamb of frame
 
@@ -478,7 +477,7 @@ FRAME/MULLION DATA
 
 ***Average frame*** = average characteristics of frame for use in EnergyPlus calculation. If mullion is present, original window is divided into two separate windows with the same average frame (with the mullion being split lengthwise and included in the average frame).
 
-***Width***     = width (m)
+***Width***     = width (m)
 
 ***OutsideProj*** = amount of projection from outside glass (m)
 
@@ -488,11 +487,11 @@ FRAME/MULLION DATA
 
 ***EdgeCondRatio*** = ratio of surface-to-surface edge-of-glass conductance to surface-to-surface center-of-glass conductance (from THERM calculation)
 
-***SolAbs***    = solar absorptance
+***SolAbs***    = solar absorptance
 
-***VisAbs***    = visible absorptance
+***VisAbs***    = visible absorptance
 
-***Emiss***     = hemispherical thermal emissivity
+***Emiss***     = hemispherical thermal emissivity
 
 ***Orientation*** = Horizontal or Vertical (mullion only); = None if no mullion.
 
@@ -502,11 +501,11 @@ DIVIDER DATA
 
 ***Width*** through ***Emiss*** are the same as for FRAME/MULLION DATA
 
-***\#Hor***     = number of horizontal dividers
+***\#Hor***     = number of horizontal dividers
 
-***\#Vert***     = number of vertical dividers
+***\#Vert***     = number of vertical dividers
 
-***Type***      = DividedLite or Suspended
+***Type***      = DividedLite or Suspended
 
 
 
@@ -514,25 +513,25 @@ GLASS DATA
 
 *System1, System2*: separate characteristics are given if window has a mullion.
 
-***Cond***       = conductivity (W/m-K)
+***Cond***       = conductivity (W/m-K)
 
-*Tsol*       = spectral-average solar transmittance at normal incidence
+*Tsol*       = spectral-average solar transmittance at normal incidence
 
-*Rfsol*      = spectral-average front solar reflectance at normal incidence
+*Rfsol*      = spectral-average front solar reflectance at normal incidence
 
-*Rbsol*      = spectral-average back solar reflectance at normal incidence
+*Rbsol*      = spectral-average back solar reflectance at normal incidence
 
-*Tvis*       = spectral-average visible transmittance at normal incidence
+*Tvis*       = spectral-average visible transmittance at normal incidence
 
-*Rfvis*      = spectral-average front visible reflectance at normal incidence
+*Rfvis*      = spectral-average front visible reflectance at normal incidence
 
-*Rbvis*      = spectral-average back visible reflectance at normal incidence
+*Rbvis*      = spectral-average back visible reflectance at normal incidence
 
-***Tir***       = hemispherical IR transmittance
+***Tir***       = hemispherical IR transmittance
 
-***EmissF***    = hemispherical front emissivity
+***EmissF***    = hemispherical front emissivity
 
-***EmissB***    = hemispherical back emissivity
+***EmissB***    = hemispherical back emissivity
 
 SpectralDataFile = name of spectral data file with wavelength-dependent transmission and reflection data used by WINDOW 5 to calculate the glazing system optical data. “None” will appear here if spectral-average data for this glass layer were used by WINDOW 5.
 
@@ -542,13 +541,13 @@ GAP DATA
 
 System1, System2: separate characteristics are given if the window has a mullion.
 
-***Thick***    = thickness (m)
+***Thick***    = thickness (m)
 
-***nGasses***  = number of gasses (1, 2 or 3)
+***nGasses***  = number of gasses (1, 2 or 3)
 
-GasName   = name of the gas
+GasName   = name of the gas
 
-***Fraction***  = fraction of the gas
+***Fraction***  = fraction of the gas
 
 ***MolecWeight*** = molecular weight of the Nth gas
 
@@ -556,23 +555,23 @@ GasName   = name of the gas
 
 of temperature, T (deg K), are expressed as A + B\*T + C\*T^2)
 
-***ACond***     = A coeff of conductivity (W/m-K)
+***ACond***     = A coeff of conductivity (W/m-K)
 
-***BCond***     = B coeff of conductivity (W/m-K^2)
+***BCond***     = B coeff of conductivity (W/m-K^2)
 
-***CCond***     = C coeff of conductivity (W/m-K^3)
+***CCond***     = C coeff of conductivity (W/m-K^3)
 
-***AVisc***     = A coeff of viscosity (g/m-s)
+***AVisc***     = A coeff of viscosity (g/m-s)
 
-***BVisc***     = B coeff of viscosity (g/m-s-K)
+***BVisc***     = B coeff of viscosity (g/m-s-K)
 
-***CVisc***     = C coeff of viscosity (g/m-s-K^2)
+***CVisc***     = C coeff of viscosity (g/m-s-K^2)
 
-***ASpHeat***   = A coeff of specific heat (J/kg-K)
+***ASpHeat***   = A coeff of specific heat (J/kg-K)
 
-***BSpHeat***   = B coeff of specific heat (J/kg-K^2)
+***BSpHeat***   = B coeff of specific heat (J/kg-K^2)
 
-***CSpHeat***   = C coeff of specific heat (J/kg-K^3)
+***CSpHeat***   = C coeff of specific heat (J/kg-K^3)
 
 
 
@@ -580,47 +579,47 @@ GLAZING SYSTEM OPTICAL DATA
 
 System1, System2: separate characteristics are given if the window has a mullion.
 
-***Hemisph***   = hemispherical (i.e., diffuse)
+***Hemisph***   = hemispherical (i.e., diffuse)
 
-***Tsol***      = solar transmittance vs. angle of incidence
+***Tsol***      = solar transmittance vs. angle of incidence
 
-***AbsN***      = solar absorptance of Nth layer vs. angle of incidence
+***AbsN***      = solar absorptance of Nth layer vs. angle of incidence
 
-***Rfsol***     = front solar reflectance vs. angle of incidence
+***Rfsol***     = front solar reflectance vs. angle of incidence
 
-***Rbsol***     = back solar reflectance vs. angle of incidence
+***Rbsol***     = back solar reflectance vs. angle of incidence
 
-***Tvis***      = visible transmittance vs. angle of incidence
+***Tvis***      = visible transmittance vs. angle of incidence
 
-***Rfvis***     = front visible reflectance vs. angle of incidence
+***Rfvis***     = front visible reflectance vs. angle of incidence
 
-***Rbvis***     = back visible reflectance vs. angle of incidence
+***Rbvis***     = back visible reflectance vs. angle of incidence
 
 ---------------------------------------------------------
 
 \*Standard conditions are
 
-  Winter:
+  Winter:
 
-  Indoor air temperature = 21.1C (70F)
+  Indoor air temperature = 21.1C (70F)
 
-  Outdoor air temperature = -17.8C (0F)
+  Outdoor air temperature = -17.8C (0F)
 
-  Wind speed = 6.71 m/s (15 mph)
+  Wind speed = 6.71 m/s (15 mph)
 
-  No solar radiation
+  No solar radiation
 
 
 
-  Summer:
+  Summer:
 
-  Indoor air temperature = 23.9C (75F)
+  Indoor air temperature = 23.9C (75F)
 
-  Outdoor air temperature = 31.7C (89F)
+  Outdoor air temperature = 31.7C (89F)
 
-  Wind speed = 3.35 m/s (7.5 mph)
+  Wind speed = 3.35 m/s (7.5 mph)
 
-  783 W/m2 (248 Btu/h-ft2) incident beam solar radiation normal to glazing
+  783 W/m2 (248 Btu/h-ft2) incident beam solar radiation normal to glazing
 
 
 
@@ -676,15 +675,15 @@ Air wall, Open air connection between zones
 
 It is extremely difficult to model the interactions between thermal zones which are connected by a large opening. If the zones are controlled to the same conditions, then there is little to be gained by making them interact, so you could neglect any connections between the zones. In fact, if this is the case, you might consider combining the spaces into a single thermal zone. If you expect the zones to have significantly different temperatures and/or humidities, then use one of the following options. If they are modeled as separate zones, EnergyPlus models only what is explicitly described in the input file, so simply leaving a void (no surfaces) between two zones will accomplish nothing - the two zones will not be connected. The main interactions which occur across the dividing line between two zones which are fully open to each other are:
 
-1)   Convection or airflow, which will transfer both sensible heat and moisture. Some modelers use MIXING (one-way flow) or CROSS MIXING (two-way flow) to move air between the zones, but the user must specify airflow rates and schedules for this flow, and it cannot be automatically linked to HVAC system operation. Other modelers use AirFlowNetwork with large vertical openings between the zones as well as other openings and cracks in the exterior envelope to provide the driving forces. It can also be connected with the HVAC system (for limited system types). This requires a much higher level of detailed input and should be used only if the detailed specification data is available. If the two zones are controlled to similar conditions, this effect could be safely neglected.
+1)   Convection or airflow, which will transfer both sensible heat and moisture. Some modelers use MIXING (one-way flow) or CROSS MIXING (two-way flow) to move air between the zones, but the user must specify airflow rates and schedules for this flow, and it cannot be automatically linked to HVAC system operation. Other modelers use AirFlowNetwork with large vertical openings between the zones as well as other openings and cracks in the exterior envelope to provide the driving forces. It can also be connected with the HVAC system (for limited system types). This requires a much higher level of detailed input and should be used only if the detailed specification data is available. If the two zones are controlled to similar conditions, this effect could be safely neglected.
 
-2)   Solar gains and daylighting. The only way to pass solar and daylight from one zone to the next is through a window or glass door described as a subsurface on an interzone wall surface. Note that all solar is diffuse after passing through an interior window.
+2)   Solar gains and daylighting. The only way to pass solar and daylight from one zone to the next is through a window or glass door described as a subsurface on an interzone wall surface. Note that all solar is diffuse after passing through an interior window.
 
-3)   Radiant (long-wave thermal) transfer. There is currently no direct radiant exchange between surfaces in different thermal zones. Windows in EnergyPlus are opaque to direct radiant exchange, so an interzone window will not behave any differently than an opaque interzone surface for this aspect. However, a large interzone surface (opaque or window) would result in some indirect radiant exchange since the interzone surface will exchange directly with surfaces in zone A and in zone B. The surface thermal resistance should be low in order to most closely approximate this effect.
+3)   Radiant (long-wave thermal) transfer. There is currently no direct radiant exchange between surfaces in different thermal zones. Windows in EnergyPlus are opaque to direct radiant exchange, so an interzone window will not behave any differently than an opaque interzone surface for this aspect. However, a large interzone surface (opaque or window) would result in some indirect radiant exchange since the interzone surface will exchange directly with surfaces in zone A and in zone B. The surface thermal resistance should be low in order to most closely approximate this effect.
 
-4)   Conduction. If an interzone surface is placed between the two zones, it will conduct sensible heat between the two zones. Using a low thermal resistance helps to move radiant exchange between the zones.
+4)   Conduction. If an interzone surface is placed between the two zones, it will conduct sensible heat between the two zones. Using a low thermal resistance helps to move radiant exchange between the zones.
 
-5)    Visible and thermal radiant output from internal gains. These gains will not cross zone boundaries. But again, they will impact any interzone surfaces, so some of the energy may move across to the next zone."
+5)    Visible and thermal radiant output from internal gains. These gains will not cross zone boundaries. But again, they will impact any interzone surfaces, so some of the energy may move across to the next zone."
 
 Daylight Modeling
 -----------------
@@ -747,7 +746,7 @@ Here, the radiant barrier would reduce the radiant transfer across the air gap. 
 Cavity Algorithm Model
 ----------------------
 
-*Reading the documentation, I'm wondering if the Cavity algorithm is usable for other double facade types or only Trombe wall?  In other words, does Cavity implicitly presume that the inner wall is highly solar absorbent and so generate specific convection?*
+*Reading the documentation, I'm wondering if the Cavity algorithm is usable for other double facade types or only Trombe wall?  In other words, does Cavity implicitly presume that the inner wall is highly solar absorbent and so generate specific convection?*
 
 The Trombe wall convection algorithm is applicable to just about any vertical cavity with a high aspect ratio and relatively narrow width. I'm not sure if a double facade cavity would meet the aspect ratio requirement. But I do know the Trombe wall algorithm is not picky about whether the inner wall is highly absorbant, or about any particular properties of the walls. Actually the same basic algorithm is used by the window model to calculate the convection between the two panes of a window. The full reference is ISO 15099.
 
@@ -766,46 +765,46 @@ To illustrate the benefits (and comparison of results), the MultiStory.idf examp
 
 Figure 7. Original Multistory IDF
 
-In the figure above, each “middle” zone represents 4 zones.  The middle “floor” represents 8 floors. Additionally, each of the windows has a multiplier of 4 – so each window represents 4 windows of the same size. For the Multistory file, the Zone object for the center zones has the multiplier of 4. And for the center floors, the ZoneList and ZoneGroup objects to collect the zones and apply multipliers. The top floor then uses the Zone object multiplier for the center zones. Specifically:
+In the figure above, each “middle” zone represents 4 zones.  The middle “floor” represents 8 floors. Additionally, each of the windows has a multiplier of 4 – so each window represents 4 windows of the same size. For the Multistory file, the Zone object for the center zones has the multiplier of 4. And for the center floors, the ZoneList and ZoneGroup objects to collect the zones and apply multipliers. The top floor then uses the Zone object multiplier for the center zones. Specifically:
 
 
 ```idf
 <snip>
-  Zone,
-    Gnd Center Zone,         !- Name
-    0.0,                     !- Direction of Relative North {deg}
-    8.0, 0.0, 0.0,           !- Origin [X,Y,Z] {m}
-    1,                       !- Type
-    4,                       !- Multiplier
-    autocalculate,           !- Ceiling Height {m}
-    autocalculate;           !- Volume {m3}
+  Zone,
+    Gnd Center Zone,         !- Name
+    0.0,                     !- Direction of Relative North {deg}
+    8.0, 0.0, 0.0,           !- Origin [X,Y,Z] {m}
+    1,                       !- Type
+    4,                       !- Multiplier
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 <snip>
 
-  ZoneGroup,
-    Mid Floor,               !- Zone Group Name
-    Mid Floor List,          !- Zone List Name
-    8;                       !- Zone List Multiplier
+  ZoneGroup,
+    Mid Floor,               !- Zone Group Name
+    Mid Floor List,          !- Zone List Name
+    8;                       !- Zone List Multiplier
 
 
-  ZoneList,
-    Mid Floor List,          !- Zone List Name
-    Mid West Zone,           !- Zone 1 Name
-    Mid Center Zone,         !- Zone 2 Name
-    Mid East Zone;           !- Zone 3 Name
+  ZoneList,
+    Mid Floor List,          !- Zone List Name
+    Mid West Zone,           !- Zone 1 Name
+    Mid Center Zone,         !- Zone 2 Name
+    Mid East Zone;           !- Zone 3 Name
 
 <snip>
 
-  Zone,
-    Top Center Zone,         !- Name
-    0.0,                     !- Direction of Relative North {deg}
-    8.0,                     !- X Origin {m}
-    0.0,                     !- Y Origin {m}
-    22.5,                    !- Z Origin {m}
-    1,                       !- Type
-    4,                       !- Multiplier
-    autocalculate,           !- Ceiling Height {m}
-    autocalculate;           !- Volume {m3}
+  Zone,
+    Top Center Zone,         !- Name
+    0.0,                     !- Direction of Relative North {deg}
+    8.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    22.5,                    !- Z Origin {m}
+    1,                       !- Type
+    4,                       !- Multiplier
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 ```
 
 
@@ -878,20 +877,20 @@ Table 1. Multistory vs Multistory 2 and Multistory 3
 
 \* Big Diffs maximum occur in monthly values whereas the runperiod values are much smaller.
 
-To try to pare down the discrepancies shown here, the effects of height that are used in the calculations were removed (i.e., the Site:WeatherStation and Site:HeightVariation objects were entered as below to negate the effects of height on the environmental variables such as wind and temperature).  In addition the height effect was removed from the OutdoorAir:Node object.
+To try to pare down the discrepancies shown here, the effects of height that are used in the calculations were removed (i.e., the Site:WeatherStation and Site:HeightVariation objects were entered as below to negate the effects of height on the environmental variables such as wind and temperature).  In addition the height effect was removed from the OutdoorAir:Node object.
 
 ```idf
-  Site:WeatherStation,
-    ,          !- Wind Sensor Height Above Ground {m}
-    ,          !- Wind Speed Profile Exponent
-    ,          !- Wind Speed Profile Boundary Layer Thickness {m}
-    0;         !- Air Temperature Sensor Height Above Ground {m}
+  Site:WeatherStation,
+    ,          !- Wind Sensor Height Above Ground {m}
+    ,          !- Wind Speed Profile Exponent
+    ,          !- Wind Speed Profile Boundary Layer Thickness {m}
+    0;         !- Air Temperature Sensor Height Above Ground {m}
 
 
-  Site:HeightVariation,
-    0,         !- Wind Speed Profile Exponent
-    ,          !- Wind Speed Profile Boundary Layer Thickness {m}
-    0;         !- Air Temperature Gradient Coefficient {K/m}
+  Site:HeightVariation,
+    0,         !- Wind Speed Profile Exponent
+    ,          !- Wind Speed Profile Boundary Layer Thickness {m}
+    0;         !- Air Temperature Gradient Coefficient {K/m}
 ```
 
 
@@ -946,7 +945,7 @@ Table 2. Multiplier Results with negated height variation.
 </tr>
 </table>
 
-To investigate if other systems might have different results, the Ideal Loads System was used as the system.  Similar results were found for the multipliers vs cloned results. However, it may also be noted that the results between the original systems (baseboard and window ac) vs the ideal loads were very similar.
+To investigate if other systems might have different results, the Ideal Loads System was used as the system.  Similar results were found for the multipliers vs cloned results. However, it may also be noted that the results between the original systems (baseboard and window ac) vs the ideal loads were very similar.
 
 The biggest difference really comes in calculation time. As shown in the following table,
 
@@ -956,7 +955,7 @@ Table 3. Runtimes for Multistory files (baseboard/window ac)
 <tr>
 <th>Location</th>
 <th>Multi-story 1 (9 zones) (mm:ss)</th>
-<th>Multi-story 2  (18 zones) (MM:SS)</th>
+<th>Multi-story 2  (18 zones) (MM:SS)</th>
 <th>Multi-story 3 (60 zones) (MM:SS)</th>
 </tr>
 <tr>
@@ -1059,7 +1058,7 @@ The Other Side Coefficient (OSC) equation permits setting either the outside sur
 
 <div>\[ T = N_2 T_{zone} + N_3 T_{oadb} + N_4 N_5 + N_6 T_{grnd} + N_7 W_{spd} T_{oadb} \]</div>
 
-where: 
+where:
 
 * <span>\(T\)</span> = Outside Air Temperature when N1 (Combined convective/radiative film Coeff) &gt; 0
 
@@ -1071,7 +1070,7 @@ where:
 
 * <span>\(T_{grnd}\)</span> = Temperature of the ground (°C) Wspd = Outdoor wind speed (m/sec)
 
-The coefficients N<sub>2</sub>, N<sub>3</sub>, N<sub>4</sub>, N<sub>6</sub>, and N<sub>7</sub> scale the contribution of the various terms that follow them.  In the case of N<sub>4</sub>, it is followed by another term N<sub>5</sub>.  This is a constant temperature that can also be overridden by a scheduled value. Note that in some EnergyPlus documentation, the N’s are given as C’s.
+The coefficients N<sub>2</sub>, N<sub>3</sub>, N<sub>4</sub>, N<sub>6</sub>, and N<sub>7</sub> scale the contribution of the various terms that follow them.  In the case of N<sub>4</sub>, it is followed by another term N<sub>5</sub>.  This is a constant temperature that can also be overridden by a scheduled value. Note that in some EnergyPlus documentation, the N’s are given as C’s.
 
 This object has been changed to permit the outside temperature, T, to be controlled to a set point temperature that is specified as N<sub>5</sub> or comes from the schedule A2.
 
@@ -1081,98 +1080,98 @@ An Example input file object is shown below.
 
 ```idf
 SurfaceProperty:OtherSideCoefficients,
-   Zn001:Roof001:OSC, !- Name
-   0,   ! (N1) Combined Convective/Radiative Film Coefficient {W/m2-K}
-   0,   ! (N5) Constant Temperature {C}
-   0.95,!(N4) Constant Temperature Coefficient
-   ,    ! (N3)External Dry-Bulb Temperature Coefficient
-   ,    ! (N6)Ground Temperature Coefficient
-   ,    ! (N7)Wind Speed Coefficient
-   -.95,! (N2) Zone Air Temperature Coefficient
-   ConstantCooling,     ! (A2) Constant Temperature Schedule Name
-   No,  ! (A3)Sinusoidal Variation of Constant Temperature Coefficient
-   24,  ! (N8)Period of Sinusoidal Variation {hr}
-   1.,  ! (N9)Previous Other Side Temperature Coefficient
-   5.,  !(N10) Minimum Other Side Temperature Limit
-   25.; ! (N11) Maximum Other Side Temperature Limit
+   Zn001:Roof001:OSC, !- Name
+   0,   ! (N1) Combined Convective/Radiative Film Coefficient {W/m2-K}
+   0,   ! (N5) Constant Temperature {C}
+   0.95,!(N4) Constant Temperature Coefficient
+   ,    ! (N3)External Dry-Bulb Temperature Coefficient
+   ,    ! (N6)Ground Temperature Coefficient
+   ,    ! (N7)Wind Speed Coefficient
+   -.95,! (N2) Zone Air Temperature Coefficient
+   ConstantCooling,     ! (A2) Constant Temperature Schedule Name
+   No,  ! (A3)Sinusoidal Variation of Constant Temperature Coefficient
+   24,  ! (N8)Period of Sinusoidal Variation {hr}
+   1.,  ! (N9)Previous Other Side Temperature Coefficient
+   5.,  !(N10) Minimum Other Side Temperature Limit
+   25.; ! (N11) Maximum Other Side Temperature Limit
 ```
 
 
 This object results in the following equation for T:
 
-T = 1.0\*Tlast +0.95\*(Tsetpoint – TzoneAir)   (with limits)
+T = 1.0\*Tlast +0.95\*(Tsetpoint – TzoneAir)   (with limits)
 
 The result of this is that the surface temperature, T, will be changed to the temperature that will force the zone air temperature to the setpoint providing the temperature limits are not reached. When the zone air temperature is at the setpoint, T remains at the value it had in the prior time step.
 
 A complete example with all pertinent objects:
 
 ```idf
-  Construction,
-    PanelConst,              !- Name
-    Std Steel_Brown_Regular; !- Outside Layer
+  Construction,
+    PanelConst,              !- Name
+    Std Steel_Brown_Regular; !- Outside Layer
 
 
-  Material,
-    Std Steel_Brown_Regular, !- Name
-    Smooth,                  !- Roughness
-    1.5000000E-03,           !- Thickness {m}
-    44.96960,                !- Conductivity {W/m-K}
-    7689.000,                !- Density {kg/m3}
-    418.0000,                !- Specific Heat {J/kg-K}
-    0.9000000,               !- Thermal Absorptance
-    0.9200000,               !- Solar Absorptance
-    0.92000000;              !- Visible Absorptance
+  Material,
+    Std Steel_Brown_Regular, !- Name
+    Smooth,                  !- Roughness
+    1.5000000E-03,           !- Thickness {m}
+    44.96960,                !- Conductivity {W/m-K}
+    7689.000,                !- Density {kg/m3}
+    418.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.92000000;              !- Visible Absorptance
 
 
-  BuildingSurface:Detailed,
-    Zn001:Roof001,           !- Name
-    Roof,                    !- Surface Type
-    ROOF31,                  !- Construction Name
-    ZONE ONE,                !- Zone Name
-    OtherSideCoefficients,   !- Outside Boundary Condition
-    Zn001:Roof001:OSC,       !- Outside Boundary Condition Object
-    NoSun,                   !- Sun Exposure
-    NoWind,                  !- Wind Exposure
-    0,                       !- View Factor to Ground
-    4,                       !- Number of Vertices
-    0.000000,15.24000,4.572,  !- X,Y,Z ==&gt; Vertex 1 {m}
-    0.000000,0.000000,4.572,  !- X,Y,Z ==&gt; Vertex 2 {m}
-    15.24000,0.000000,4.572,  !- X,Y,Z ==&gt; Vertex 3 {m}
-    15.24000,15.24000,4.572;  !- X,Y,Z ==&gt; Vertex 4 {m}
+  BuildingSurface:Detailed,
+    Zn001:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    ZONE ONE,                !- Zone Name
+    OtherSideCoefficients,   !- Outside Boundary Condition
+    Zn001:Roof001:OSC,       !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.000000,15.24000,4.572,  !- X,Y,Z ==&gt; Vertex 1 {m}
+    0.000000,0.000000,4.572,  !- X,Y,Z ==&gt; Vertex 2 {m}
+    15.24000,0.000000,4.572,  !- X,Y,Z ==&gt; Vertex 3 {m}
+    15.24000,15.24000,4.572;  !- X,Y,Z ==&gt; Vertex 4 {m}
 
 
-  FenestrationSurface:Detailed,
-    panel002,                !- Name
-    Door,                    !- Surface Type
-    PanelConst,              !- Construction Name
-    Zn001:Roof001,           !- Building Surface Name
-    ,                        !- Outside Boundary Condition Object
-    autocalculate,           !- View Factor to Ground
-    ,                        !- Shading Control Name
-    ,                        !- Frame and Divider Name
-    1,                       !- Multiplier
-    4,                       !- Number of Vertices
-    3,2,4.572,  !- X,Y,Z ==&gt; Vertex 1 {m}
-    3,3,4.572,  !- X,Y,Z ==&gt; Vertex 2 {m}
-    4,3,4.572,  !- X,Y,Z ==&gt; Vertex 3 {m}
-    4,2,4.572;  !- X,Y,Z ==&gt; Vertex 4 {m}
+  FenestrationSurface:Detailed,
+    panel002,                !- Name
+    Door,                    !- Surface Type
+    PanelConst,              !- Construction Name
+    Zn001:Roof001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    autocalculate,           !- View Factor to Ground
+    ,                        !- Shading Control Name
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    4,                       !- Number of Vertices
+    3,2,4.572,  !- X,Y,Z ==&gt; Vertex 1 {m}
+    3,3,4.572,  !- X,Y,Z ==&gt; Vertex 2 {m}
+    4,3,4.572,  !- X,Y,Z ==&gt; Vertex 3 {m}
+    4,2,4.572;  !- X,Y,Z ==&gt; Vertex 4 {m}
 
 
-  SurfaceProperty:OtherSideCoefficients,
-    Zn001:Roof001:OSC,       !- Name
-    0,            !- Combined Convective/Radiative Film Coefficient {W/m2-K}
-    0,                       !- Constant Temperature {C}
-    0.95,                    !- Constant Temperature Coefficient
-    ,                        !- External Dry-Bulb Temperature Coefficient
-    ,                        !- Ground Temperature Coefficient
-    ,                        !- Wind Speed Coefficient
-    -.95,                    !- Zone Air Temperature Coefficient
-    ConstantTwentyTwo,       !- Constant Temperature Schedule Name
-    No,           !- Sinusoidal Variation of Constant Temperature Coefficient
-    24,                      !- Period of Sinusoidal Variation {hr}
-    1.,                      !- Previous Other Side Temperature Coefficient
-    5.,                      !- Minimum Other Side Temperature Limit {C}
-    25.;                     !- Maximum Other Side Temperature Limit {C}
+  SurfaceProperty:OtherSideCoefficients,
+    Zn001:Roof001:OSC,       !- Name
+    0,            !- Combined Convective/Radiative Film Coefficient {W/m2-K}
+    0,                       !- Constant Temperature {C}
+    0.95,                    !- Constant Temperature Coefficient
+    ,                        !- External Dry-Bulb Temperature Coefficient
+    ,                        !- Ground Temperature Coefficient
+    ,                        !- Wind Speed Coefficient
+    -.95,                    !- Zone Air Temperature Coefficient
+    ConstantTwentyTwo,       !- Constant Temperature Schedule Name
+    No,           !- Sinusoidal Variation of Constant Temperature Coefficient
+    24,                      !- Period of Sinusoidal Variation {hr}
+    1.,                      !- Previous Other Side Temperature Coefficient
+    5.,                      !- Minimum Other Side Temperature Limit {C}
+    25.;                     !- Maximum Other Side Temperature Limit {C}
 
 
 Schedule:Constant,ConstantTwentyTwo,PanelControl,22;
@@ -1187,7 +1186,7 @@ AirflowNetwork and EarthTube
 
 *When I use an Earthtube with an AirFlowNetwork, I get a "Orphan Object" warning.*
 
-Currently, Earthtube and AirFlowNetworks do not work together.  If both objects co-exist, the AirflowNetwork mode supersedes the Earthtube mode at two control choices. Since this causes the Earthtube objects to not be used, the "orphan" warning appears.
+Currently, Earthtube and AirFlowNetworks do not work together.  If both objects co-exist, the AirflowNetwork mode supersedes the Earthtube mode at two control choices. Since this causes the Earthtube objects to not be used, the "orphan" warning appears.
 
 There are four control choices in the second field of the AirflowNetwork Simulation object (spaces included for readability)
 
@@ -1199,7 +1198,7 @@ There are four control choices in the second field of the AirflowNetwork Simulat
 
 - NO MULTIZONE OR DISTRIBUTION
 
-When the first two choices are selected, the AirflowNetwork model takes over airflow calculation. The earthtube objects are not used in the airflow calculation, causing the "orphan" warning. The example file, AirflowNetwork\_Multizone\_SmallOffice.idf, uses the first choice.  When the second choice is used, the AirflowNetwork model is only used during HVAC operation time. During system off time, the earthtube model is used to calculate airflows.  Thus, no "orphan" warning will be given, but the earthtube may be being used less than expected.  The example file, AirflowNetwork\_Simple\_House.idf, uses the third choice.
+When the first two choices are selected, the AirflowNetwork model takes over airflow calculation. The earthtube objects are not used in the airflow calculation, causing the "orphan" warning. The example file, AirflowNetwork\_Multizone\_SmallOffice.idf, uses the first choice.  When the second choice is used, the AirflowNetwork model is only used during HVAC operation time. During system off time, the earthtube model is used to calculate airflows.  Thus, no "orphan" warning will be given, but the earthtube may be being used less than expected.  The example file, AirflowNetwork\_Simple\_House.idf, uses the third choice.
 
 HVAC, Sizing, Equipment Simulation and Controls
 ===============================================
@@ -1222,7 +1221,7 @@ For more information, read the Input Output Reference section on “Input for De
 Variable Refrigerant Flow Air Conditioner
 -----------------------------------------
 
-***The EnergyPlus v7.0 release (October 2011) includes an initial model for VRF systems.  See AirConditioner:VariableRefrigerantFlow and related objects.***
+***The EnergyPlus v7.0 release (October 2011) includes an initial model for VRF systems.  See AirConditioner:VariableRefrigerantFlow and related objects.***
 
 *Can I model a VRV or VRF system in EnergyPlus?*
 
@@ -1241,9 +1240,9 @@ Modeling Desiccant DeHumidifiers
 
 It depends on which specific EnergyPlus object you are trying to use.
 
-The Dehumidifier:Desiccant:NoFans object has default performance curves within the model itself that you can use.  Set field A12, "Performance Model," to DEFAULT.  Alternatively, you could also obtain manufacturer's data and develop your own curve fits, then set "Performance Model" to User Curves.   See the Input Output Reference for more details.
+The Dehumidifier:Desiccant:NoFans object has default performance curves within the model itself that you can use.  Set field A12, "Performance Model," to DEFAULT.  Alternatively, you could also obtain manufacturer's data and develop your own curve fits, then set "Performance Model" to User Curves.   See the Input Output Reference for more details.
 
-If you want to use the Dehumidifier:Desiccant:System object, then some data set inputs for the required HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1 object are contained in the file "PerfCurves.idf" in the DataSets folder.  You could also obtain manufacturer's data and develop your own inputs for the HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1 object.
+If you want to use the Dehumidifier:Desiccant:System object, then some data set inputs for the required HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1 object are contained in the file "PerfCurves.idf" in the DataSets folder.  You could also obtain manufacturer's data and develop your own inputs for the HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1 object.
 
 Boiler Control Schedule
 -----------------------
@@ -1259,9 +1258,9 @@ Report temperatures and flow rates at selected points on the hot water loop to s
 Difference between EIR and Reformulated EIR Chillers
 ----------------------------------------------------
 
-*What is the difference between the EIR and ReformulatedEIR models of Electric Chillers?  I am getting strange results.*
+*What is the difference between the EIR and ReformulatedEIR models of Electric Chillers?  I am getting strange results.*
 
-The COP of a chiller is a function of part load ratio. It is mainly determined by the Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve.  When the EIR model is used for an electric chiller, the curve has an independent variable: part load ratio.  For the ReformulatedEIR model, the curve requires two independent variables: leaving condenser water temperature and part load ratio.  Each independent variable has its min and max values. If a variable is outside the allowed range, the nearest allowed value is used, possibly resulting in an unexpected result.
+The COP of a chiller is a function of part load ratio. It is mainly determined by the Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve.  When the EIR model is used for an electric chiller, the curve has an independent variable: part load ratio.  For the ReformulatedEIR model, the curve requires two independent variables: leaving condenser water temperature and part load ratio.  Each independent variable has its min and max values. If a variable is outside the allowed range, the nearest allowed value is used, possibly resulting in an unexpected result.
 
 If you would like to compare COP values for two types of chillers, you may need to ensure that the same conditions are applied. For simplicity, you may want to use a spreadsheet to calculate the curve values.
 
@@ -1287,7 +1286,7 @@ The night cycle option is set to Cycle On Any in the HVACTemplate:System:Unitary
 Fan Types
 ---------
 
-*I am confused about the differences between the different fan types.  Can you explain?*
+*I am confused about the differences between the different fan types.  Can you explain?*
 
 In short:
 
@@ -1297,7 +1296,7 @@ Fan:OnOff is similar to the one above, but it cycles itself on and off as requir
 
 Fan:VariableVolume runs continuously during the Schedule period, but varies its volume to meet the heating or cooling demand.
 
-Consult the [Input Output Reference document](file:///E:\Docs4PDFs\InputOutputReference.pdf) (group Fans) for additional information.
+Consult the Input Output Reference document (group Fans) for additional information.
 
 Use of Set Point Managers
 -------------------------
@@ -1314,20 +1313,20 @@ See if the coils are fully on when the SP is not met. If they are the coils are 
 
 SetpointManager objects place a setpoint on a node, for example, one might place a setpoint of 12C on the node named "Main Cooling Coil Air Outlet Node".
 
-In the case of Controler:WaterCoil which controls a hot water or chilled water coil, the controller reads the setpoint and tries to adjust the water flow so that the air temperature at the controlled node matches the current setpoint.  Continuing the example above:
+In the case of Controler:WaterCoil which controls a hot water or chilled water coil, the controller reads the setpoint and tries to adjust the water flow so that the air temperature at the controlled node matches the current setpoint.  Continuing the example above:
 
 ```idf
-  Controller:WaterCoil,
-    Main Cooling Coil Controller,  !- Name
-    Temperature,                   !- Control variable
-    Reverse,                       !- Action
-    Flow,                          !- Actuator variable
-    Main Cooling Coil Air Outlet Node,   !- Control_Node
-    Main Cooling Coil Water Inlet Node,  !- Actuator_Node
-    0.002,                         !- Controller Convergence Tolerance:
-                                   !- delta temp from setpoint temp {deltaC}
-    autosize,                      !- Max Actuated Flow {m3/s}
-    0.0;                           !- Min Actuated Flow {m3/s}
+  Controller:WaterCoil,
+    Main Cooling Coil Controller,  !- Name
+    Temperature,                   !- Control variable
+    Reverse,                       !- Action
+    Flow,                          !- Actuator variable
+    Main Cooling Coil Air Outlet Node,   !- Control_Node
+    Main Cooling Coil Water Inlet Node,  !- Actuator_Node
+    0.002,                         !- Controller Convergence Tolerance:
+                                   !- delta temp from setpoint temp {deltaC}
+    autosize,                      !- Max Actuated Flow {m3/s}
+    0.0;                           !- Min Actuated Flow {m3/s}
 ```
 
 
@@ -1587,7 +1586,7 @@ Plant-Condenser Loops
 Separating Ventilation Loads v. Zone Loads
 ------------------------------------------
 
-*Can I determine the ventilation load for PAU in PAU  + FCUs system? If can, how to split the total cooling load into room load and ventilation load for PAU sizing in energyplus?*
+*Can I determine the ventilation load for PAU in PAU  + FCUs system? If can, how to split the total cooling load into room load and ventilation load for PAU sizing in energyplus?*
 
 *In the HTML report, "Nominal total capacity [W]" (EquipmentSummary) and "Design Load [W]" (HVACSizingSummary) can be found. Are they equal to "Total cooling load" and "Room load"? (i.e. Ventilation load = "nominal total capacity" - "Design Load")*
 
@@ -1597,11 +1596,11 @@ FCU – Fan Coil Unit
 
 There are several ways to split the total cooling load into room load and ventilation load for PAU sizing in EnergyPlus:
 
-1)   In the eio output, section, the heating and cooling loads reported there are the peak \*sensible\* loads for each zone, without any ventilation load. These are the same values reported as "Design Load" in the HVACSizingSummary table report.
+1)   In the eio output, section, the heating and cooling loads reported there are the peak \*sensible\* loads for each zone, without any ventilation load. These are the same values reported as "Design Load" in the HVACSizingSummary table report.
 
-2)   In the EquipmentSummary table report, the component capacities reported there are the total (cooling, sensible for heating) output capacities include any ventilation load if it impacts that component.
+2)   In the EquipmentSummary table report, the component capacities reported there are the total (cooling, sensible for heating) output capacities include any ventilation load if it impacts that component.
 
-3)   If you have a central air loop that serves only the ventilation load, and zone equipment that serves only the zone load, there is an autosizing option in Sizing:System that should autosize the central system appropriately.
+3)   If you have a central air loop that serves only the ventilation load, and zone equipment that serves only the zone load, there is an autosizing option in Sizing:System that should autosize the central system appropriately.
 
 From example file 5ZoneCoolBeam.idf:
 
@@ -1633,15 +1632,15 @@ It is much easier to use HVACTemplate objects to set up your system. All require
 
 ```idf
 AirLoopHVAC:ControllerList,
-    AHU1SystemController,    !- Name
-    Controller:WaterCoil,       !- Controller Type 1
-    AHU1CCController;        !- Controller Name 1
+    AHU1SystemController,    !- Name
+    Controller:WaterCoil,       !- Controller Type 1
+    AHU1CCController;        !- Controller Name 1
 
 
 AirLoopHVAC:ControllerList,
-    AHU2SystemController,    !- Name
-    Controller:WaterCoil,       !- Controller Type 1
-    AHU1CCController;        !- Controller Name 1
+    AHU2SystemController,    !- Name
+    Controller:WaterCoil,       !- Controller Type 1
+    AHU1CCController;        !- Controller Name 1
 ```
 
 
@@ -1678,7 +1677,7 @@ Output:VariableDictionary,
 
 When the object above is included in an input file, the rdd file is available for review AFTER the simulation has completed. If this object is not included in the input file, the user may still use report variables, but must select them based on the objects included in the simulation. The Input Output Reference document describes all report variables available for each EnergyPlus object.
 
-There are two flavors to output variables: ZONE or HVAC.  ZONE does not mean that it is a zone variable – rather, it is produced at the Zone Time Step (the same timestep that you specify in the Timestep object. HVAC type variables, likewise, are produced at the HVAC timestep (which can differ from the zone timestep frequency based on the ConvergenceLimits object).
+There are two flavors to output variables: ZONE or HVAC.  ZONE does not mean that it is a zone variable – rather, it is produced at the Zone Time Step (the same timestep that you specify in the Timestep object. HVAC type variables, likewise, are produced at the HVAC timestep (which can differ from the zone timestep frequency based on the ConvergenceLimits object).
 
 There are several choices on format with this object. You can specify "Regular" as the key field and the rdd will show all report variables along with the variable description as shown below.
 
@@ -1809,8 +1808,8 @@ Read more about obtaining custom output files (.CSV) using .RVI (Report Variable
 Simply said, an .RVI is a text file with a list of report variables that you want reported in a .CSV. You can easily develop multiple .RVI files which create different types of .CSV files. For example, separate .CSVs for only the exterior environment data or for only equipment energy consumption. MVI files are the equivalent kind of files for meter only output files (the .mtr files). Both .RVI and .MVI files follow this structure:
 
 ```
-eplusout.eso   ! name of input eso file
-eplusout.csv   ! name of target csv file (or .tab)
+eplusout.eso   ! name of input eso file
+eplusout.csv   ! name of target csv file (or .tab)
 <variable name 1>
 <variable name 2>
 ...
@@ -1820,9 +1819,9 @@ eplusout.csv   ! name of target csv file (or .tab)
 
 The first two lines are the default output file .ESO and the default .CSV filename. This is followed by a list of report variables, with the last line containing a 0.
 
-1    Run the ExerciseOutput1.IDF file.
+1    Run the ExerciseOutput1.IDF file.
 
-2    Open ExerciseOutput1.RDD and select at least 10 loads-related variables. *Note in ExerciseOutput1.IDF, the object “Output:VariableDictionary, idf;” writes the RDD output file as complete objects which can be pasted directly into the IDF file and then edit the reporting frequency.*
+2    Open ExerciseOutput1.RDD and select at least 10 loads-related variables. *Note in ExerciseOutput1.IDF, the object “Output:VariableDictionary, idf;” writes the RDD output file as complete objects which can be pasted directly into the IDF file and then edit the reporting frequency.*
 
 Edit ExerciseOutput1.IDF using the text editor, and save as ExerciseOutput1A.IDF. Paste output:variable objects for each of your loads-related variables requesting hourly data. Then copy each object and paste in 4 copies for a total of 5. Then edit the frequency parameter on each, changing “hourly” to timestep, daily, monthly, and annual, retaining hourly for one of them. There are already system related output variables with multiple reporting frequencies in the .idf file that you can use as a model. For example, Zone Window Heat Gain and Zone Window Heat Loss, insert these objects in your IDF to get data at each of these time steps:
 
@@ -1908,7 +1907,7 @@ Use of Comma and Point in Numeric Output
 
 All EnergyPlus numeric output is written using the U.S. convention of a period or point “.” as the decimal separator. No thousands separator is used. For example, the numeric output for “one thousand two hundred and one half” would be 1200.5 in output files. The same conventions apply for EnergyPlus input files (idf), Exponent format (1.2005E+03) is also valid on input but is not used in output files.
 
-Commas are used to separate values or fields in EnergyPlus input and output. They should not be used as part of any numeric value, not as a decimal separator and not as a thousands separator. This can cause problems for users in regions of the world which normally use comma as the decimal separator. This is especially important when viewing EnergyPlusvariables (\*.csv) and meters (\*Meter.csv) output files. Typically csv output files are viewed in a spreadsheet program, such as Excel. “csv” stands for “comma separated values”, so the spreadsheet software needs to recognize comma as a list separator, not a decimal or thousands separator. If the values from a csv file appear to be nonsense when displayed in a spreadsheet program, this may be the source of the problem. Change the decimal separator to be “.”  in your system settings or in the spreadsheet program settings.
+Commas are used to separate values or fields in EnergyPlus input and output. They should not be used as part of any numeric value, not as a decimal separator and not as a thousands separator. This can cause problems for users in regions of the world which normally use comma as the decimal separator. This is especially important when viewing EnergyPlusvariables (\*.csv) and meters (\*Meter.csv) output files. Typically csv output files are viewed in a spreadsheet program, such as Excel. “csv” stands for “comma separated values”, so the spreadsheet software needs to recognize comma as a list separator, not a decimal or thousands separator. If the values from a csv file appear to be nonsense when displayed in a spreadsheet program, this may be the source of the problem. Change the decimal separator to be “.”  in your system settings or in the spreadsheet program settings.
 
 Utilities
 =========
@@ -1924,7 +1923,7 @@ Errors and Warnings
 Max iterations exceeded
 -----------------------
 
-*I get the "Max Iteration" warning often, in varying quantities. I'd like to understand better what they mean. *
+*I get the "Max Iteration" warning often, in varying quantities. I'd like to understand better what they mean. *
 
 *1) If these are a concern, at what frequency? (e.g., "whenever it occurs more than 100? 500? 1000? times in a full year run.")*
 
@@ -1932,13 +1931,13 @@ Max iterations exceeded
 
 *3) Any tips about how to avoid it?*
 
-This is a good question, but it is difficult to answer.  It is something to be concerned about, but in many cases there does not seem to be a way to completely eliminate them and they aren't necessarily a cause for alarm.
+This is a good question, but it is difficult to answer.  It is something to be concerned about, but in many cases there does not seem to be a way to completely eliminate them and they aren't necessarily a cause for alarm.
 
-1) The total count is a difficult measure to use because it varies with number of zones, number and type of air systems, and length of run period.  A 1,000 might not be a problem for a big model with an annual run, but it could be way too many for a single zone design day run.  The errors are more common with VAV than CV. The frequency is key though.  I look at the timing of the errors. If they happen every time step during some period, then it usually means there is something wrong with HVAC.  If they happen only sometimes, and those times are when things are changing quickly (like recovery from setback), then I don't worry much.
+1) The total count is a difficult measure to use because it varies with number of zones, number and type of air systems, and length of run period.  A 1,000 might not be a problem for a big model with an annual run, but it could be way too many for a single zone design day run.  The errors are more common with VAV than CV. The frequency is key though.  I look at the timing of the errors. If they happen every time step during some period, then it usually means there is something wrong with HVAC.  If they happen only sometimes, and those times are when things are changing quickly (like recovery from setback), then I don't worry much.
 
-2) It depends if the system is succeeding at controlling the zone conditions.  If the systems are controlling well, and the errors are intermittent, then the results are probably not affected significantly.  If the systems are not controlling zone conditions, then the errors are probably very significant.  Check the comfort conditions and zone air temperatures to see.
+2) It depends if the system is succeeding at controlling the zone conditions.  If the systems are controlling well, and the errors are intermittent, then the results are probably not affected significantly.  If the systems are not controlling zone conditions, then the errors are probably very significant.  Check the comfort conditions and zone air temperatures to see.
 
-3) When the errors are significant, they usually indicate something is wrong with HVAC input that EnergyPlus isn't able to trap in some other way.  Possibilities include all sorts of things that can go wrong such as:  systems connected wrong (node connections usually), sized wrong (mixing hard and auto sizes), controlled wrong (check operation of set point managers by reporting node set point values).
+3) When the errors are significant, they usually indicate something is wrong with HVAC input that EnergyPlus isn't able to trap in some other way.  Possibilities include all sorts of things that can go wrong such as:  systems connected wrong (node connections usually), sized wrong (mixing hard and auto sizes), controlled wrong (check operation of set point managers by reporting node set point values).
 
 Error Messages (Details)
 ========================
@@ -1950,7 +1949,7 @@ It is easy to separate the Sizing and Warmup errors from the rest. A summary is 
 ```
 ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
 ************* EnergyPlus Sizing Error Summary. During Sizing: 0 Warning; 0 Severe Errors.
-************* EnergyPlus Completed Successfully-- 1 Warning; 0 Severe Errors; Elapsed Time=00hr 00min  6.58sec
+************* EnergyPlus Completed Successfully-- 1 Warning; 0 Severe Errors; Elapsed Time=00hr 00min  6.58sec
 ```
 
 Standard Error Message Format
@@ -1968,9 +1967,9 @@ As noted elsewhere, errors come in several flavors with typical user responses r
 
 In the examples for this section, the severity (Warning/Severe/Fatal) will be left off the message unless necessary for the rest of the example. For example:
 
-**GetPlantLoopData/GetPlantAvailabilityManager:** AvailabilityManagerAssignmentList=ALWAYS\_ON not found in lists.  No availability will be used.
+**GetPlantLoopData/GetPlantAvailabilityManager:** AvailabilityManagerAssignmentList=ALWAYS\_ON not found in lists.  No availability will be used.
 
-Here the routine GetPlantLoopData/GetPlantAvailabilityManager for object AvailabilityManagerAssignmentList with name Always\_On is not found. And then the result is shown.  (This is a warning level error, by the way).
+Here the routine GetPlantLoopData/GetPlantAvailabilityManager for object AvailabilityManagerAssignmentList with name Always\_On is not found. And then the result is shown.  (This is a warning level error, by the way).
 
 The development team is working to standardize the error format, as time allows. So, sometimes you will likely see something like:
 
@@ -1981,7 +1980,7 @@ Here, at least you know which pump (Heat Recovery Circ Pump) has the power or mo
 Example Error Messages for Preprocessors
 ----------------------------------------
 
-All of the preprocessing programs (e.g., EP-Macro, ExpandObjects) produce Output:PreprocessorMessage objects for the errors they detect. Any preprocessor can produce these objects.  You may need to consult with actual preprocessor program documentation to understand these errors. The output preprocessor messages appear first in the .err file. The format for the messages are: &lt;objectname&gt; (i.e. Output:Preprocessormessage) followed by the program name (e.g. EPMacro) in quotes and then the strings for the message, whether Warning, Severe or Fatal.  If Fatal, EnergyPlus will fatal out after producing all the error messages.
+All of the preprocessing programs (e.g., EP-Macro, ExpandObjects) produce Output:PreprocessorMessage objects for the errors they detect. Any preprocessor can produce these objects.  You may need to consult with actual preprocessor program documentation to understand these errors. The output preprocessor messages appear first in the .err file. The format for the messages are: &lt;objectname&gt; (i.e. Output:Preprocessormessage) followed by the program name (e.g. EPMacro) in quotes and then the strings for the message, whether Warning, Severe or Fatal.  If Fatal, EnergyPlus will fatal out after producing all the error messages.
 
 Here are some examples:
 
@@ -1989,26 +1988,26 @@ Here are some examples:
 
 ```
 Output:PreprocessorMessage="EPXMLPreProc2" has the following Warning conditions:
-   **   ~~~   ** Problem with the width for requested floor area and
-   **   ~~~   ** perimeter depth.  Reduced perimeter depth from 4.57
-   **   ~~~   ** to 3.656 to accommodate perimeter and core layout
+   **   ~~~   ** Problem with the width for requested floor area and
+   **   ~~~   ** perimeter depth.  Reduced perimeter depth from 4.57
+   **   ~~~   ** to 3.656 to accommodate perimeter and core layout
 ```
 
 ### Severe
 
 ```
 Output:PreprocessorMessage="EPMacro" has the following Severe conditions:
-   **   ~~~   ** at approximately input line number=200: column=11
-   **   ~~~   ** cannot find/read include file
-   **   ~~~   ** symbol=HVAC3ZoneMat-Const.imf
-   **   ~~~   ** refer to <file>.epmdet for details.
+   **   ~~~   ** at approximately input line number=200: column=11
+   **   ~~~   ** cannot find/read include file
+   **   ~~~   ** symbol=HVAC3ZoneMat-Const.imf
+   **   ~~~   ** refer to <file>.epmdet for details.
 ```
 
-Some preprocessor utility programs will give more details than others.  Here, you see at input file line number 200, about column 11, that the program cannot find (or read) the include file and that there will be more details after the end of EnergyPlus processing in the file with epmdet for extension.
+Some preprocessor utility programs will give more details than others.  Here, you see at input file line number 200, about column 11, that the program cannot find (or read) the include file and that there will be more details after the end of EnergyPlus processing in the file with epmdet for extension.
 
 ```
 Output:PreprocessorMessage="GroundTempCalc - Slab" has the following Fatal condition:
-   **   ~~~   ** No in.epw file found
+   **   ~~~   ** No in.epw file found
 ```
 
 This message is coming from the Slab preprocessor program after the ExpandObjects program has processed the input file and triggered the Slab program to be executed. There is no weather file and the Slab program cannot run.
@@ -2040,20 +2039,20 @@ This message notes that you have some objects where the “min-fields” for the
 IP: IDF line~345 Did not find "UNTIL: 22:00" in list of Objects
 ```
 
-You may have entered a semi-colon character (;) at the end of one of the lines in a [Schedule:Compact](http://www.designbuilder.co.uk/programhelp/schedules_-_energyplus_compact_schedules.htm) when you meant to enter a comma (,). Note that the approximate line number in your file (345) is given to help you locate it in a text editor. Look in the prior line – it probably needs to end in a comma.
+You may have entered a semi-colon character (;) at the end of one of the lines in a Schedule:Compact when you meant to enter a comma (,). Note that the approximate line number in your file (345) is given to help you locate it in a text editor. Look in the prior line – it probably needs to end in a comma.
 
 ```
 IP: IDF line~xxx Did not find "xxxxxx" in list of Objects
 ```
 
-Same basic description as the previous error message.  The line number in your file is given to help you locate it.  Look in the prior line (ignoring any comment lines) – it probably needs to end with a comma.
+Same basic description as the previous error message.  The line number in your file is given to help you locate it.  Look in the prior line (ignoring any comment lines) – it probably needs to end with a comma.
 
 ```
 IP: No items found for Required Object=BUILDING
 IP: Required Object="BUILDING" not found in IDF.
 ```
 
-The Building object is required for all inputs.  It was not found in this input file.
+The Building object is required for all inputs.  It was not found in this input file.
 
 ```
 IP: No items found for Required Object=GLOBALGEOMETRYRULES
@@ -2087,7 +2086,7 @@ As the simulation starts, each module gets called and gets the values from the i
 
 ```
 Site:GroundTemperature:BuildingSurface: Some values fall outside the range of 15-25C.
-These values may be inappropriate.  Please consult the Input Output Reference for more details.
+These values may be inappropriate.  Please consult the Input Output Reference for more details.
 ```
 
 Ground temperatures can have a significant influence on buildings. Values outside the range indicated may give you inaccurate simulation temperatures. Consult the Input Output Reference for more details.
@@ -2120,23 +2119,23 @@ You have requested reporting for Carbon Equivalent Pollution (output variables) 
 
 ```
 BuildingSurface:Detailed="SURF:xyz", Sun Exposure="SUNEXPOSED".
- ..This surface is not exposed to External Environment.  Sun exposure has no effect.
+ ..This surface is not exposed to External Environment.  Sun exposure has no effect.
 ```
 
 The surface has been entered with SunExposed but it is not an exterior/outdoor surface.
 
 ```
 GetSurfaceData: InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:
-   Area=1.4E-002 in Surface=319767, Zone=2PAV_CONDIC_LOJA_D
-   Area=67.0 in Surface=6C0708, Zone=3PAV_CONDIC_TEATRO_G
+   Area=1.4E-002 in Surface=319767, Zone=2PAV_CONDIC_LOJA_D
+   Area=67.0 in Surface=6C0708, Zone=3PAV_CONDIC_TEATRO_G
 ```
 
 Interzone surface areas usually should be matching between the two zones.
 
 ```
 GetSurfaceData: InterZone Surface Azimuths do not match as expected.
-   Azimuth=270.0, Tilt=90.0, in Surface=319767, Zone=2PAV_CONDIC_LOJA_D
-   Azimuth=180.0, Tilt=90.0, in Surface=6C0708, Zone=3PAV_CONDIC_TEATRO_G
+   Azimuth=270.0, Tilt=90.0, in Surface=319767, Zone=2PAV_CONDIC_LOJA_D
+   Azimuth=180.0, Tilt=90.0, in Surface=6C0708, Zone=3PAV_CONDIC_TEATRO_G
 ..surface class of base surface=Wall
 ```
 
@@ -2190,7 +2189,7 @@ GetSurfaceData: Outward facing angle [95.5] of subsurface="WL2-1" significantly 
 ..surface class of base surface=Wall
 ```
 
-These are two versions of the same message.  The first is shown when DisplayExtraWarnings is not activated. The second is shown for details on each subsurface that has the error.  The error is usually that the subsurface vertices have been entered in opposite order (i.e. clockwise vs counter-clockwise) from the base surface.
+These are two versions of the same message.  The first is shown when DisplayExtraWarnings is not activated. The second is shown for details on each subsurface that has the error.  The error is usually that the subsurface vertices have been entered in opposite order (i.e. clockwise vs counter-clockwise) from the base surface.
 
 ```
 This building has no thermal mass which can cause an unstable solution.
@@ -2239,7 +2238,7 @@ Calculated design heating load for zone=B1AE\_FCU02\_AN is zero.
 Check Sizing:Zone and ZoneControl:Thermostat inputs.
 ```
 
-Two flavors of the same message showing up during Sizing. Read about Day Types in the Sizing:\* objects.  Schedules may affect how the program looks at loads during sizing. Another suggestion is:
+Two flavors of the same message showing up during Sizing. Read about Day Types in the Sizing:\* objects.  Schedules may affect how the program looks at loads during sizing. Another suggestion is:
 
 Plot the zone temperature and check against the zone thermostat set point temperature.
 
@@ -2281,12 +2280,12 @@ Recurring Errors
 The recurring error category is employed during the actual simulation periods. Usually, a heading message will appear:
 
 ```
-   ** Warning ** Coil:Cooling:DX:SingleSpeed "DXCOOLINGCOIL_SOUTHZONE_2NDFLOOR" - Full load outlet air dry-bulb temperature < 2C. This indicates the possibility of coil frost/freeze. Outlet temperature = -4.60 C.
-   **   ~~~   **  ...Occurrence info = Washington Dc Dulles IntL Ar VA USA TMY3 WMO#=724030, 01/02 06:01 - 06:02
-   **   ~~~   ** ... Possible reasons for low outlet air dry-bulb temperatures are: This DX coil
-   **   ~~~   **    1) may have a low inlet air dry-bulb temperature. Inlet air temperature = 9.778 C.
-   **   ~~~   **    2) may have a low air flow rate per watt of cooling capacity. Check inputs.
-   **   ~~~   **    3) is used as part of a HX assisted cooling coil which uses a high sensible effectiveness. Check inputs.
+   ** Warning ** Coil:Cooling:DX:SingleSpeed "DXCOOLINGCOIL_SOUTHZONE_2NDFLOOR" - Full load outlet air dry-bulb temperature < 2C. This indicates the possibility of coil frost/freeze. Outlet temperature = -4.60 C.
+   **   ~~~   **  ...Occurrence info = Washington Dc Dulles IntL Ar VA USA TMY3 WMO#=724030, 01/02 06:01 - 06:02
+   **   ~~~   ** ... Possible reasons for low outlet air dry-bulb temperatures are: This DX coil
+   **   ~~~   **    1) may have a low inlet air dry-bulb temperature. Inlet air temperature = 9.778 C.
+   **   ~~~   **    2) may have a low air flow rate per watt of cooling capacity. Check inputs.
+   **   ~~~   **    3) is used as part of a HX assisted cooling coil which uses a high sensible effectiveness. Check inputs.
 ```
 
 This message contains quite a bit of information: the basic object and name of the object, the context of the error, the time of the error as well as some reasons why this might have occurred.
@@ -2294,11 +2293,11 @@ This message contains quite a bit of information: the basic object and name of t
 At the end of the simulation, the summary appears:
 
 ```
-   *************  ** Warning ** Coil:Cooling:DX:SingleSpeed "DXCOOLINGCOIL_SOUTHZONE_2NDFLOOR" - Full load outlet temperature indicates a possibility of frost/freeze error continues. Outlet air temperature statistics follow:
-   *************  **   ~~~   **   This error occurred 1240 total times;
-   *************  **   ~~~   **   during Warmup 0 times;
-   *************  **   ~~~   **   during Sizing 0 times.
-   *************  **   ~~~   **   Max=1.995912  Min=-4.60024
+   *************  ** Warning ** Coil:Cooling:DX:SingleSpeed "DXCOOLINGCOIL_SOUTHZONE_2NDFLOOR" - Full load outlet temperature indicates a possibility of frost/freeze error continues. Outlet air temperature statistics follow:
+   *************  **   ~~~   **   This error occurred 1240 total times;
+   *************  **   ~~~   **   during Warmup 0 times;
+   *************  **   ~~~   **   during Sizing 0 times.
+   *************  **   ~~~   **   Max=1.995912  Min=-4.60024
 ```
 
 Here you see a summary of how many times the error occurred (1240) as well as how many times during Warmup (0) and how many times during Sizing (0). Plus a minimum (-4.6) and maximum (1.99) for the terms of the message.
@@ -2315,17 +2314,17 @@ Max Temp Comparison=9.15E-002 vs Temperature Convergence Tolerance=4.00E-003 - F
 Min Temp Comparison=1.75E-003 vs Temperature Convergence Tolerance=4.00E-003 - Pass Convergence
 Max Cool Load Comparison=2.9010E-002 vs Loads Convergence Tolerance=4.00E-002 - Pass Convergence
 Then, at the end of the simulation, you will see:
-******** The following error categories occurred.  Consider correcting or noting.
+******** The following error categories occurred.  Consider correcting or noting.
 ******** Loads Initialization did not Converge
 ******** ..1) very high thermal mass such as very thick concrete (solution: increase max number of warmup
-******** ..   days in the BUILDING object);
+******** ..   days in the BUILDING object);
 ******** ..2) moderate mass and inadequate space conditioning such that the building keeps getting warmer
-******** ..   and warmer on successive days (solution: add HVAC, check building thermal properties,
-******** ..   check if infiltration is included, make sure HVAC properly controlled);
+******** ..   and warmer on successive days (solution: add HVAC, check building thermal properties,
+******** ..   check if infiltration is included, make sure HVAC properly controlled);
 ******** ..3) a soil layer modeled below the concrete slab - (solution remove this layer and read about
-******** ..   ground temperatures in the Auxiliary Programs document).
+******** ..   ground temperatures in the Auxiliary Programs document).
 ******** ..4) unreasonable (too small) limits in the BUILDING object for temperature (.4 default) or
-******** ..   loads tolerances (.04 default)
+******** ..   loads tolerances (.04 default)
 ```
 
 Psychrometric Errors
@@ -2334,13 +2333,13 @@ Psychrometric Errors
 EnergyPlus has built-in psychrometric routines that perform various calculations for the simulation modules. They typically fall into the recurring error category but may warrant some view:
 
 ```
-   ** Warning ** Calculated Relative Humidity out of range (PsyRhFnTdbWPb)
+   ** Warning ** Calculated Relative Humidity out of range (PsyRhFnTdbWPb)
 
-   **   ~~~   **  Routine=NodeReportingCalc:NODE_1, Environment=CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB, at Simulation time=07/21 00:00 - 00:10
+   **   ~~~   **  Routine=NodeReportingCalc:NODE_1, Environment=CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB, at Simulation time=07/21 00:00 - 00:10
 
-   **   ~~~   **  Dry-Bulb= 13.00 Humidity Ratio= 1.000E-002 Calculated Relative Humidity [%]= 104.65
+   **   ~~~   **  Dry-Bulb= 13.00 Humidity Ratio= 1.000E-002 Calculated Relative Humidity [%]= 104.65
 
-   **   ~~~   ** Relative Humidity being reset to 100.0%
+   **   ~~~   ** Relative Humidity being reset to 100.0%
 ```
 
 This warning notes that the calculated relative humidity is out of rage (routine name: PsyRhFnTdbWPb). It happened during routine NodeReportingCalc for NODE\_1 at the environment “CHICAGO\_IL\_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB” during the time interval 00:00 – 00:10 on July 21. The dry bulb temperature was 13 C, the humidity ratio was .001 for a calculated relative humidity of 104.65%. It is reset to 100%.
@@ -2348,15 +2347,15 @@ This warning notes that the calculated relative humidity is out of rage (routine
 Then, at the end of the run, you will see a summary of how many times that occur and the min/max extent:
 
 ```
-   *************  ** Warning ** Calculated Relative Humidity out of range (PsyRhFnTdbWPb)
+   *************  ** Warning ** Calculated Relative Humidity out of range (PsyRhFnTdbWPb)
 
-   *************  **   ~~~   **   This error occurred 645 total times;
+   *************  **   ~~~   **   This error occurred 645 total times;
 
-   *************  **   ~~~   **   during Warmup 0 times;
+   *************  **   ~~~   **   during Warmup 0 times;
 
-   *************  **   ~~~   **   during Sizing 0 times.
+   *************  **   ~~~   **   during Sizing 0 times.
 
-   *************  **   ~~~   **   Max=104.652877 %  Min=104.652877 %
+   *************  **   ~~~   **   Max=104.652877 %  Min=104.652877 %
 ```
 
 Error Summary

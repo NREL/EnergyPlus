@@ -1406,19 +1406,19 @@ Enter autosize to allow the sizing algorithm to determine the proper capacity re
 
 This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50% run time fraction. Suggested values are shown below (Henderson et al. 1999):
 
-![](media/image605.svg)
+![](media/image605.png)
 
 #### Field: Heat Pump Time Constant
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
-![](media/image606.svg)
+![](media/image606.png)
 
 #### Field: Fraction of On-Cycle Power Use
 
 This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
 
-![](media/image607.svg)
+![](media/image607.png)
 
 #### Field: Heat Pump Fan Delay Time
 
@@ -4584,7 +4584,7 @@ Select the set of generic pre-defined coefficients to use for the supply fan par
 
 The default is *InletVaneDampers*. The resulting power curves are shown in Figure 158. VAV Supply Fan Part-Load Power Coefficient Options below. The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table. The *VariableSpeedMotorPressureReset* option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: *Design Guidelines: Advanced Variable Air Volume (VAV) Systems* (EDR\_DesignGuidelines\_VAV.pdf).
 
-![](media/image611.svg)
+![](media/image611.png)
 
 Figure 158. VAV Supply Fan Part-Load Power Coefficient Options
 
@@ -5016,7 +5016,7 @@ Select the set of generic pre-defined coefficients to use for the supply fan par
 
 The default is *InletVaneDampers*. The resulting power curves are shown in Figure 159 below. The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table.  The *VariableSpeedMotorPressureReset* option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: *Design Guidelines: Advanced Variable Air Volume (VAV) Systems* (EDR\_DesignGuidelines\_VAV.pdf).
 
-![](media/image612.svg)
+![](media/image612.png)
 
 Figure 159. VAV Supply Fan Part-Load Power Coefficient Options
 
@@ -5766,7 +5766,7 @@ Select the set of generic pre-defined coefficients to use for the supply fan par
 
 The default is *InletVaneDampers*. The resulting power curves are shown in Figure 158. VAV Supply Fan Part-Load Power Coefficient Options below. The ASHRAE 90.1-2004 Appendix G coefficients are from TABLE G3.1.3.15, Method 2. The other sets of coefficients are from the EnergyPlus Input Output Reference, Fan Coefficient Values table. The *VariableSpeedMotorPressureReset* option is based on Good Static Pressure Reset VSD Fan from Energy Design Resources’: *Design Guidelines: Advanced Variable Air Volume (VAV) Systems* (EDR\_DesignGuidelines\_VAV.pdf).
 
-![](media/image613.svg)
+![](media/image613.png)
 
 Figure 160. VAV Supply Fan Part-Load Power Coefficient Options
 

@@ -150,7 +150,7 @@ IF (GetInputFlag) THEN  !First time subroutine has been entered
     a. at the beginning of the simulation (one time initializations);
 
     b. at the start of each environment (design day or simulation run period);
- 
+
     c.  before each air loop simulation.
 
 3. If automatic sizing of the loop flow rates is called for, do it.
@@ -539,7 +539,7 @@ There are two main types of loops within the HVAC simulation in EnergyPlus: an a
 
 Plant loops are further divided into “half-loops” or “semi-loops” for organizational clarity and simulation logistics (see Figure “Connections between the Main HVAC Simulation Loops and Half-Loops”). These sub-loops, or half-loop sides, are matched pairs that consist of half of a main plant loop. Plant loops are broken into supply and demand sides. The plant demand side half-loop contains equipment that places a load on the primary equipment. This might include coils, baseboards, radiant systems, etc. The load is met by primary equipment such as chillers or boilers on the supply side half-loop. Each supply side half-loop must be connected to a demand side half-loop and vice versa. A similar breakdown is present on condenser loops where the demand side includes the water side of chiller’s condensers while the supply side includes condenser equipment such as cooling towers.
 
-![](media/image1957.svg.png)
+![](media/image1957.png)
 
 Figure 120. Connections between the Main HVAC Simulation Loops and Half-Loops.
 
@@ -551,7 +551,7 @@ Each half-loop may only have one splitter and one mixer. Thus, equipment may be 
 
 In addition, to avoid the need for overly complex solver routines, there are some restrictions on the placement of pumps within a particular half-loop. There are two general types of pumps, loop pumps and branch pumps. A pump that is the first component on the first branch (between A and B) is termed a “loop pump” while any pump in the parallel section (between Ci and Di) is termed a “branch pump”.   The simplest and most common arrangement is to have one loop pump on the supply side inlet.  In plant demand half-loops pumps can be placed only in the inlet branch. This will allow simulation of primary-secondary systems. For more information on pumps and pump placement rules, see the section on PipingSystem:Underground Simulation Pumps in this document.
 
-![](media/image1958.svg.png)
+![](media/image1958.png)
 
 Figure 121. Branch Layout for Individual Plant Half-Loops
 
@@ -881,7 +881,7 @@ Figure 126 shows a schematic of the Two-Way Common Pipe. There are two common pi
 
 * When the Two Way Common Pipe is controlling conditions at the secondary-side, or demand side, inlet node, then the loop capacitance model usually used for the conditions at the demand inlet is not used as it would interfere with control.
 
-![](media/image1976.svg.png)
+![](media/image1976.png)
 
 Figure 126. Schematic of a Two-Way Common Pipe used in Primary-Secondary System.
 

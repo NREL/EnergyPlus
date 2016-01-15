@@ -607,7 +607,7 @@ where
     \theta_{sky}(i) = (i - 1/2) \Delta \theta_{sky} \\
     \phi_{sky}(j) = (j - 1/2) \Delta \phi_{sky} \\
     \Delta \theta_{sky} = 2 \pi / N_{\theta} \\
-    \Delta \phi_{sky} = \pi / 2N_{\phi} 
+    \Delta \phi_{sky} = \pi / 2N_{\phi}
   \end{array}
 $$</div>
 
@@ -745,7 +745,7 @@ Thus
 <div>$$
   \begin{array}{l}
     \theta_{min} &=  - \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| \\
-    \theta_{max} &= \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right| 
+    \theta_{max} &= \left| \cos^{-1}(-\tan\phi\tan\phi_w) \right|
   \end{array}
 $$</div>
 
@@ -1795,7 +1795,7 @@ The inward flowing portion of solar absorbed in the dome and diffuser glazing is
 
 <div>$${Q_{abs,glazing}} = \frac{{{{q''}_{abs,dome}}{A_{dome}}}}{2} + \frac{{{{q''}_{abs,diffuser}}{A_{diffuser}}}}{2}$$</div>
 
-All absorbed solar radiation in the TDD is distributed among the transition zones that the pipe passes through between dome and diffuser.  The transition zone heat gain is proportional to the length of the zone.  Any exterior length of pipe also receives a proportional amount of heat, but this is lost to the outside. 
+All absorbed solar radiation in the TDD is distributed among the transition zones that the pipe passes through between dome and diffuser.  The transition zone heat gain is proportional to the length of the zone.  Any exterior length of pipe also receives a proportional amount of heat, but this is lost to the outside.
 
 #### References
 
@@ -2859,7 +2859,7 @@ The value of the switching factor in a particular time step depends on what type
 
 Thermochromic (TC) materials have active, reversible optical properties that vary with temperature. Thermochromic windows are adaptive window systems for incorporation into building envelopes. Thermochromic windows respond by absorbing sunlight and turning the sunlight energy into heat. As the thermochromic film warms it changes its light transmission level from less absorbing to more absorbing. The more sunlight it absorbs the lower the light level going through it. Figure 78 shows the variations of window properties with the temperature of the thermochromic glazing layer. By using the suns own energy the window adapts based solely on the directness and amount of sunlight. Thermochromic materials will normally reduce optical transparency by absorption and/or reflection, and are specular (maintaining vision).
 
-![](media/image1015.svg.png)
+![](media/image1015.png)
 
 Figure 78. Variations of Window Properties with the Temperature of the Thermochromic Glazing Layer
 
@@ -3003,8 +3003,8 @@ where *X* is a 4x4 matrix and
    J_4 \\
    J_5 \\
    J_6 \end{array} \right]
-$$</div>  
-  
+$$</div>
+
 <div>$$
   Q' = \left[ \begin{array}
     Q_3 \\
@@ -3048,14 +3048,14 @@ The sources for the direct-to-diffuse transmittance calculation are:
 <div>$${Q_1} = {Q_2} = {Q_5} = {Q_6} = 0 \;  (and therefore) {J_1} = {J_2} = 0$$</div>
 
 <div>$$
-  \left. 
+  \left.
     \begin{array}{l}
       Q_3 = \tau_{dir,dif} \\
-      Q_4 = \rho_{dir,dif}^f 
-    \end{array} 
-  \right\} 
+      Q_4 = \rho_{dir,dif}^f
+    \end{array}
+  \right\}
   \;
-  \varphi_b \le \varphi_s + \frac{\pi }{2} 
+  \varphi_b \le \varphi_s + \frac{\pi }{2}
   \;
   \rm{ (beam hits front of slats)}
 $$</div>
@@ -3082,11 +3082,11 @@ where
 <div>$$
   \begin{array}{l}
     G_2 = \sum_{j=3}^6 J_j F_{j2} \\
-    G_1 = \sum_{j=3}^6 J_j F_{j1} 
+    G_1 = \sum_{j=3}^6 J_j F_{j1}
   \end{array}
 $$</div>
 
-and <span>\({J_3}\)</span>to <span>\({J_6}\)</span>are given by Eq. .  
+and <span>\({J_3}\)</span>to <span>\({J_6}\)</span>are given by Eq. . 
 
 The front direct absorptance of the blind is then
 
@@ -3621,8 +3621,8 @@ The system properties when an exterior blind is in place are the following:
 <div>$$T_{f,sys}^{dir,all}(\phi ,{\phi_s}) = \tau_{bl,f}^{dir,dir}({\phi_s})\left( {T_{gl}^{dir}(\phi ) + \frac{{T_{gl}^{dif}R_{gl,f}^{dir}\rho_{bl,b}^{dir,dif}}}{{1 - R_{gl,f}^{dif}\rho_{bl,b}^{dif}}}} \right) + \frac{{\tau_{bl}^{dir,dif}({\phi_s})T_{gl}^{dif}}}{{1 - R_{gl,f}^{dif}\rho_{bl,b}^{dif}}}$$</div>
 
 <div>$$
-  A_{gl,j,f}^{dir,sys}(\phi ,\phi_s) = 
-     \tau_{bl,f}^{dir,dir}(\phi_s) A_{gl,j,f}^{dir}(\phi ) + 
+  A_{gl,j,f}^{dir,sys}(\phi ,\phi_s) =
+     \tau_{bl,f}^{dir,dir}(\phi_s) A_{gl,j,f}^{dir}(\phi ) +
      \frac{
        \left(
          \tau_{bl,f}^{dir,dir}(\phi_s) R_{gl}^{dir}(\phi) \rho_{bl,b}^{dir}(\phi_s)+ \tau_{bl,f}^{dir,dif}(\phi_s)
@@ -3633,16 +3633,16 @@ The system properties when an exterior blind is in place are the following:
 $$</div>
 
 <div>$$
-  \alpha_{bl,f}^{dir,sys}(\phi ,\phi_s) = 
-     \alpha_{bl,f}^{dir}(\phi_s) + 
-     \alpha_{bl,b}^{dir}(\phi_s) R_{gl,f}^{dir}(\phi) \tau_{bl,f}^{dir,dir}(\phi_s) + 
+  \alpha_{bl,f}^{dir,sys}(\phi ,\phi_s) =
+     \alpha_{bl,f}^{dir}(\phi_s) +
+     \alpha_{bl,b}^{dir}(\phi_s) R_{gl,f}^{dir}(\phi) \tau_{bl,f}^{dir,dir}(\phi_s) +
      \frac{
        \alpha_{bl,b}^{dif}R_{gl,f}^{dif}
      }{
        1 - \rho_{bl,b}^{dif} R_{gl,f}^{dif}
      }
      \left(
-       R_{gl,f}^{dir}(\phi) \tau_{bl,f}^{dir,dir}(\phi_s) \rho_{bl,b}^{dir}(\phi_s) + \tau_{bl,f}^{dir,dif}(\phi_s) 
+       R_{gl,f}^{dir}(\phi) \tau_{bl,f}^{dir,dir}(\phi_s) \rho_{bl,b}^{dir}(\phi_s) + \tau_{bl,f}^{dir,dif}(\phi_s)
      \right)
 $$</div>
 
@@ -3858,9 +3858,9 @@ The second component of the window screen transmittance model is an empirical al
 
 <div>$$
   \begin{array}{rl}
-    IF \left( \delta \gt \delta_{max} \right) \; T_{scatt} \left( \alpha ',\varphi ' \right) &= 
+    IF \left( \delta \gt \delta_{max} \right) \; T_{scatt} \left( \alpha ',\varphi ' \right) &=
       0.2 \rho_{sc} T_{scattmax} \left( 1 - \gamma \right) \left( 1 + \left( Peak_{ratio} - 1 \right) e^{\frac{- \left| \delta - \delta_{max} \right|^{2.5}}{600}} \right) - 0.2 \rho_{sc} T_{scattmax} \left( 1 - \gamma \right) \left( \max \left( 0.0, \frac{\delta  - \delta_{max}}{90. - {delta_{max}}} \right) \right) \\
-    IF \left( \delta \gt \delta_{max} \right) \; T_{scatt}^{vis} \left( \alpha ',\varphi ' \right) &= 
+    IF \left( \delta \gt \delta_{max} \right) \; T_{scatt}^{vis} \left( \alpha ',\varphi ' \right) &=
       0.2 \rho_{sc}^{vis} T_{scattmax}^{vis} \left( 1 - \gamma \right) \left( 1 + \left( Peak_{ratio}^{vis} - 1 \right) e^{\frac{- \left| \delta - \delta_{max} \right|^{2.5}}{600}} \right) - 0.2 \rho_{sc}^{vis} T_{scattmax}^{vis} \left( 1 - \gamma \right) \left( \max \left( 0.0, \frac{\delta  - \delta_{max}}{90. - {delta_{max}}} \right) \right) \\
   \end{array}
 $$</div>
@@ -4162,8 +4162,8 @@ and since, as can readily be seen from Figure 91, <span>\(\left( {d{{\bf{A}}^{{\
 Substituting equation for *S*<sup>(T)</sup>(***p***<sup>(T)</sup>, we obtain a propagation equation for outside radiation passing through the window and arriving at surface element 2:
 
 <div>$$
-    E^{(2)}(\bf{p}^{(T)}) = \int_{\Omega^{(I)}} 
-      \rm T (\bf{p}^{(T)},\bf{p}^{(I)}) 
+    E^{(2)}(\bf{p}^{(T)}) = \int_{\Omega^{(I)}}
+      \rm T (\bf{p}^{(T)},\bf{p}^{(I)})
       S^{(I)}(\bf{p}^{(I)})(-\bf{p}^{(I)}\cdot\bf{n}^{(I)})
       d\Omega^{(I)}(-\bf{p}^{(T)}\cdot\bf{n}^{(2)})d\Omega^{(T)}
 $$</div>
@@ -4231,7 +4231,7 @@ Equations (without the delta distribution in ***x***) and are then considered to
 Considering the radiance in the various basis directions to be the components of a vector,
 
 <div>$$
-  \bf{S} = \left( 
+  \bf{S} = \left(
     \begin{array}
       S_1 \\ ... \\ S_j \\ ...
     \end{array}
@@ -4239,7 +4239,7 @@ Considering the radiance in the various basis directions to be the components of
   \text{where}
   S_j = S(\bf{p}_j)
 $$</div>
-  
+
 equation becomes
 
 <div>$$\begin{array}{*{20}{c}}{{S^{{\rm{(T)}}}}_j = \sum\limits_i {{T_{ji}}} \sum\limits_k {{\Lambda_{ik}}} {S_k}}&{{\rm{where}}}&{{T_{ji}} = {\mathop{\rm T}\nolimits} ({{\bf{p}}_j}^{{\rm{(T)}}},{{\bf{p}}_i}^{{\rm{(I)}}})}\end{array}$$</div>
@@ -4251,7 +4251,7 @@ which has the obvious character of a series of matrix multiplications.  (Note t
 The method then identifies the infinitesimal directional irradiances in equation with the components of an irradiance vector,
 
 <div>$$
-  E = \left( 
+  E = \left(
     \begin{array}
       E_1 \\ ... \\ E_i \\ ...
     \end{array}
@@ -4483,7 +4483,7 @@ The quantity <span>\(S^{(Refl,n)} (\bf{p}_i^{(I)},t)\)</span> is in fact the re
 If we then define normalized irradiance factors *U* by <span>\(E_i^n = U_i^{(Sky,n)}{I^{(Sky)}}(t) + U_{i{\rm{ }}Sun(tsh)}^{(D,n)}{I^{(D)}}(t)\)</span> and <span>\(E_{i{\rm{ }}r(t)}^{(D,n)} = U_{i{\rm{ }}r(t)}^{(D,n)}{I^{(D)}}(t)\)</span>, where <span>\(U_{i{\rm{ }}Sun(tsh)}^{(D,n)}\)</span> denotes the fraction of the beam solar that irradiates the surface for a given sun direction.  It is evaluated during the shading calculation, as indicated by the notation *Sun(tsh)*.  With these definitions we can rewrite the equation as
 
 <div>$$
-  S^{(Refl,n)}(\bf{p}_i^{(I)},t) = 
+  S^{(Refl,n)}(\bf{p}_i^{(I)},t) =
   I^{(D)}(t) U_{i r(t)}^{(D,n)} \rho^{(sp,n)} +
   I^{(D)}(t) U_{i Sun(tsh)}^{(D,n)} \rho^{(n)} +
   I^{(sky)}(t) U_i^{(Sky,n)} \rho^{(n)}
@@ -4521,7 +4521,7 @@ The transmitted radiance from direct beam radiation is
 
 <div>$${S_j}^{{\rm{(T, Sun)}}} = {T_{j{\rm{ s}}(t)}}\cos {\theta ^{{\rm{(Sun)}}}}{I^{{\rm{(D)}}}}(t)V_{i{\rm{ s(}}t{\rm{)}}}^{{\rm{(D)}}}$$</div>
 
-This introduces yet one more geometric view factor: 
+This introduces yet one more geometric view factor:
 
 <div>$$
   V_{i s(t)}^(D)}
@@ -4811,11 +4811,11 @@ Direct Solar Radiation Transmitted by Complex Fenestration
 Direct solar (beam) transmitted through exterior window is using same overlap calculations (see Figure 49) for each outgoing basis direction.  For certain sun position, algorithm calculatates equivalent incoming beam number.  The inside beam solar irradiance is calculated in similar manner as described in the section titled Interior Beam Radiation.
 
 <div>$$
-  AISurf\left(SurfNum\right) = 
+  AISurf\left(SurfNum\right) =
     \frac{AbsIntSurf\left(SurfNum\right)}
          {A\left(SurfNum\right)} \cdot
-    \sum_{i=1}^{N_{extwin}} \left( 
-       \sum_{j=1}^{N_{out}} 
+    \sum_{i=1}^{N_{extwin}} \left(
+       \sum_{j=1}^{N_{out}}
           TB{m_{k,j}} \cdot \Lambda_{k,j} \cdot \text{Aoverlap}_{k,j} \left( SurfNum \right)
        \right) \cdot \text{CosInc}_i
 $$</div>
@@ -4849,12 +4849,12 @@ Diffuse Radiation from Sky and Ground
 Energy absorbed in the layers and which originates from diffuse radiation from sky and ground is represented by following equation:
 
 <div>$$
-  \text{QRadSWwinAbs}(Surf, Lay) = 
+  \text{QRadSWwinAbs}(Surf, Lay) =
   \sum_{i=1}^{N_{layers}} \left(
     \text{WinSkyFtAbs}(Surf, Lay) \cdot \text{SkySolarInc} + \text{WinSkyGndAbs}(Surf, Lay) \cdot \text{GndSolarInc}
   \right)
 $$</div>
-  
+
 where,
 
 *WinSkyFtAbs(Lay)* = front absorptance averaged over sky for layer (Lay) and window belonging to Surf
@@ -6149,20 +6149,20 @@ The quantities *h<sub>cv</sub>* and *T<sub>gap</sub>* depend on the airflow velo
 The heat balance equation for the shading layer surface facing the gap is
 
 <div>$$
-  \frac{E_i \tau_{sh} \rho_4 \varepsilon_{sh}} {1 - \rho_4 \rho_{sh}} + 
+  \frac{E_i \tau_{sh} \rho_4 \varepsilon_{sh}} {1 - \rho_4 \rho_{sh}} +
   \frac{\sigma \varepsilon_{sh}} {1 - \rho_4 \rho_{sh}} \left[
     \varepsilon_4 \theta_4^4 - \theta_5^4 (
-      1 - \rho_4( 
+      1 - \rho_4(
         \varepsilon_{sh} + \rho_{sh}
       )
     )
-  \right] + 
+  \right] +
   k_{sh} \left(
     \theta_6 - \theta_5
-  \right) + 
+  \right) +
   h_{cv} \left(
     T_{gap} - \theta_5
-  \right) + 
+  \right) +
   S_{sh,1} = 0
 $$</div>
 
@@ -6256,7 +6256,7 @@ If  T<sub>gap</sub> &gt; T<sub>gap,in</sub>
 <div>$$
   \begin{array}{rl}
     A_{eq,in}  &= A_{bot} + \frac{A_{top}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) \\
-    A_{eq,out} &= A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) 
+    A_{eq,out} &= A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right)
   \end{array}
 $$</div>
 
@@ -6264,7 +6264,7 @@ If  T<sub>gap</sub> ≤ T<sub>gap,in</sub>
 
 <div>$$
   \begin{array}{rl}
-    A_{eq,in}  &= A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) 
+    A_{eq,in}  &= A_{top} + \frac{A_{bot}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right)
     A_{eq,out} &= A_{bot} + \frac{A_{top}}{2(A_{bot}+A_{top}} \left( A_l + A_r + A_h \right) \\
   \end{array}
 $$</div>
@@ -7115,7 +7115,7 @@ The section describes the equivalent layer fenestration optical and thermal mode
 
 The equivalent layer windows system is treated as a series of parallel layers separated by gaps as shown in Figure 113. This multi-layer structure has been used in several computer programs and the underlying theory has been documented (ASHRAE 1311-RP).
 
-![](media/image1827.svg.png)
+![](media/image1827.png)
 
 Figure 113. Multi-layer fenestration analysis structure (ASHRAE 1311-RP)
 
@@ -7125,11 +7125,11 @@ Equivalent layer fenestration model uses two-step analysis. First, the flux of a
 
 The multilayer optical model is based on an algorithm originally developed by Edwards (1977) and extended by Wright and Kotey (2006). The algorithm models the interaction of incident solar radiation with a glazing system composed of any number of parallel, planar, specular glazing layers. The shading layers scatter portion of the incident solar radiation diffusely, and the model tracks the beam and diffuse components of solar radiation as they interact with a multi-layer system of glazing and shading layers. The conceptual arrangement for tracking beam and diffuse solar flux components is illustrated in Figure 114.
 
-![](media/image1828.svg.png)
+![](media/image1828.png)
 
 Analysis yields beam-beam, beam-diffuse and diffuse-diffuse fluxes, providing full detail concerning the quantities of reflected, transmitted and absorbed radiation.
 
-![](media/image1829.svg.png)
+![](media/image1829.png)
 
 Figure 114. Solar analysis of the multi-layer glazing/shading system showing beam and diffuse fluxes (ASHRAE 1311-RP)
 
@@ -7175,7 +7175,7 @@ Superscripts
 
 *w*    =          represents an apparent wire property
 
-![](media/image1830.svg.png)
+![](media/image1830.png)
 
 Figure 115. Twelve solar properties assigned at each layer (ASHRAE 1311-RP)
 
@@ -7185,7 +7185,7 @@ Each glazing or shading layer, in general, require eleven set of solar propertie
 
 A surface energy balance is applied at each layer and the resulting set of equation is solved for layer temperatures and heat transfer fluxes. A schematic drawing of the multi-layer illustration and variables designation is shown in Figure 116. The net radiation formulation based on the radiosities, Jf,i and Jb,i the radiant flux leaving the front and back surfaces of the i<sup>th</sup> layer, respectively, is the used as a solution technique. The net radiant heat flux across a gap can be expressed as the difference between the radiosities of the bounding surfaces. The net radiation model analysis yields the layer temperatures and corresponding heat transfer coefficients that are used to determine U-factor and SHGC. The thermal analysis is done in “ASHWAT\_Thermal” routine.
 
-![](media/image1831.svg.png)
+![](media/image1831.png)
 
 Figure 116. Radiosity model used in thermal analysis of the multi-layer glazing/shading system (ASHRAE 1311-RP)
 
@@ -7241,7 +7241,7 @@ The above set of equations for drapery fabrics apply to the full range of A<sub>
 
 The optical and thermal properties determined using the above same sets of equations are equally valid for pleated drape shades (Kotey, et. al., 2009a). For pleated drape, the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle, and interaction with a fabric pleated rectangular geometry shown in Figure 117. The solar optical properties of the two different pleat planes are evaluated on the basis of the local solar incidence angle. Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, W<sub>H</sub>, but also by incidence angle (ASHRAE 1311-RP).
 
-![](media/image1844.svg.png)
+![](media/image1844.png)
 
 Figure 117. Geometry used for Pleated Drape Analysis
 
@@ -7251,11 +7251,11 @@ The solar diffuse-diffuse and long-wave effective properties of the pleated drap
 
 The effective shortwave optical and longwave optical properties of venetian blind layer is estimated using analytical models (Yahoda and Wright 2004, 2005; Kotey et al. 2008). The model requires properties of venetian blind slats and geometry of the slats shown in Figure 1118.
 
-![](media/image1845.svg.png)
+![](media/image1845.png)
 
 Figure 1118. Likewise, the effective longwave properties are obtained for the layer knowing longwave properties of the slats.
 
-![](media/image1846.svg.png)
+![](media/image1846.png)
 
 Figure 118. Geometry and properties used for venetian blind analysis
 
@@ -7274,7 +7274,7 @@ The off-normal properties of roller-blind are determined from solar properties o
 <div>$${\rm{\tau }}_{{\rm{bt}}}^{}\left( {\rm{\theta }} \right) = {\rm{\tau }}_{{\rm{bt}}}^{}{\rm{(\theta }} = {\rm{0)}} \cdot {\rm{co}}{{\rm{s}}^{\rm{b}}}{\kern 1pt} \left( {\rm{\theta }} \right)$$</div>
 
 <div>$$
-  b = \left\{ 
+  b = \left\{
     \begin{array}{lc}
       0.133 \cdot \left( \rm{\tau}^{str} + 0.003 \right)^{-0.467} &\text{if} \left( 0 \le \rm{\tau}^{str} \le 0.33 \right) \\
       0.33 \cdot \left( 1 - \rm{\tau}^{str} \right)               &\text{if} \left( 0.33 &lt; \rm{\tau}^{str} \le 1 \right)
@@ -7300,7 +7300,7 @@ The diffuse-diffuse transmittance and reflectance are obtained by Rhomberg numer
 
 The empirical correlations formulated to obtain the effective off-normal solar and longwave properties of insect screens were based on measurements (Kotey et al. (2009a). Insect screen geometry is shown in Figure 119. The calculation of effective solar properties requires a set of properties measured at normal incidence: *t*<sub>bb</sub> (q=0), *t*<sub>bd</sub> (q=0) and *r*<sub>bt</sub> (q=0).
 
-![](media/image1857.svg.png)
+![](media/image1857.png)
 
 Figure 119. Geometry used for insect screen analysis
 

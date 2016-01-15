@@ -1,8 +1,7 @@
-![](media/ep.gif)
+![](media/ep.png)
 
 <br/>
 <p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
-<hr>
 <h1>Guide for Module Developers</h1>
 <h2>Everything You Need to Know about Developing Modules and Modifying EnergyPlus</h2>
 <br/>
@@ -34,7 +33,7 @@ A module is a Fortran 90/95 programming construct that can be used in various wa
 
 Each module contains source code for closely related data structures and procedures. For instance, the WeatherManager module contains all the weather handling routines in EnergyPlus. The module is contained in the file WeatherManager.f90.  Another example is PlantPumps. This module contains all the code to simulate pumps in EnergyPlus. It is contained in file PlantPumps.f90.
 
-Of course dividing a program into modules can be done in various ways. We have attempted to create modules that are as self-contained as possible. The philosophy that has been used in creating EnergyPlus is contained in the [Programming Standard](file:///E:\Docs4PDFs\ProgrammingStandards.pdf) reference document.  Logically, the modules in EnergyPlus form an inverted tree structure. At the top is EnergyPlus. Just below that are ProcessInput and ManageSimulation. At the bottom are the modules such as HVACDamperComponent that model the actual HVAC components.
+Of course dividing a program into modules can be done in various ways. We have attempted to create modules that are as self-contained as possible. The philosophy that has been used in creating EnergyPlus is contained in the Programming Standard reference document.  Logically, the modules in EnergyPlus form an inverted tree structure. At the top is EnergyPlus. Just below that are ProcessInput and ManageSimulation. At the bottom are the modules such as HVACDamperComponent that model the actual HVAC components.
 
 ### Data Only Modules
 
@@ -4125,7 +4124,7 @@ Code Readability vs. Speed of Execution
 
 Programmers throughout time have had to deal with speed of code execution and it’s an ongoing concern.  However, compilers are pretty smart these days and, often, can produce speedier code for the hardware platform than the programmer can when he or she uses “speed up” tips.  The EnergyPlus development team would rather the code be more “readable” to all than to try to outwit the compilers for every platform.  First and foremost, the code is the true document of what EnergyPlus does – other documents will try to explain algorithms and such but must really take a back seat to the code itself.
 
-However, many people may read the code – as developers, we should try to make it as readable at first glance as possible.  For a true example from the code and a general indication of preferred style, take the case of the zone temperature update equation.  In the [Engineering Reference](file:///E:\Docs4PDFs\EngineeringReference.pdf) document, the form is recognizable and usual:
+However, many people may read the code – as developers, we should try to make it as readable at first glance as possible.  For a true example from the code and a general indication of preferred style, take the case of the zone temperature update equation.  In the Engineering Reference document, the form is recognizable and usual:
 
 ![](media/image001.png)And, this equation appears in the code (ZoneTempPredictorCorrector Module), as:
 
@@ -5518,19 +5517,19 @@ Component models need to interact with centralized routines that relate to sizes
 
 The following variables are used to help control plant sizing:
 
-- PlantFirstSizesOkayToFinalizePlantSizeNotComplete  This public logical boolean flag is declared in DataPlant.  It starts out FALSE TRUEfalse and is set to TRUE FALSEtrue only after all some intial plant sizing actions iterations have been completed and the first set of sizes can be finalized.   Component models should delay first filling autosized values until this flag is true. The -9999 values that indicate an autosized variable are not filled until this is TRUE.  
+- PlantFirstSizesOkayToFinalizePlantSizeNotComplete  This public logical boolean flag is declared in DataPlant.  It starts out FALSE TRUEfalse and is set to TRUE FALSEtrue only after all some intial plant sizing actions iterations have been completed and the first set of sizes can be finalized.   Component models should delay first filling autosized values until this flag is true. The -9999 values that indicate an autosized variable are not filled until this is TRUE.
 
-- PlantFirstSizesOkayToReportPlantSizesOkayToFinalize  This public logical boolean flag is declared in DataPlant.  It starts out false FALSE and is set to TRUE true after the main iterative phase of sizing is completed but before the final finishing passes are made.  This flag is only used for advanced sizing methods based on HVAC Sizing Simulations, where the program should report both the “Initial” sizes and the final sizes.  Component models should delay final reporting first sizes and filling of autosized values until this is set to TRUEtrue.  The -9999 values that indicate an autosized variable are not filled until this is TRUE.  The first, or intial, cCalls to report the outcome of sizing are not made until this is TRUEtrue.  
+- PlantFirstSizesOkayToReportPlantSizesOkayToFinalize  This public logical boolean flag is declared in DataPlant.  It starts out false FALSE and is set to TRUE true after the main iterative phase of sizing is completed but before the final finishing passes are made.  This flag is only used for advanced sizing methods based on HVAC Sizing Simulations, where the program should report both the “Initial” sizes and the final sizes.  Component models should delay final reporting first sizes and filling of autosized values until this is set to TRUEtrue.  The -9999 values that indicate an autosized variable are not filled until this is TRUE.  The first, or intial, cCalls to report the outcome of sizing are not made until this is TRUEtrue.
 
-- PlantFinalSizesOkayToReport  This public boolean flag is declared in DataPlant.  It starts out false and is set to true when all the sizing is done and it is okay to report the final size values. Component models should delay reporting final sizes until this is set to true.  
+- PlantFinalSizesOkayToReport  This public boolean flag is declared in DataPlant.  It starts out false and is set to true when all the sizing is done and it is okay to report the final size values. Component models should delay reporting final sizes until this is set to true.
 
-- InitLoopEquip  This logical flag is passed as an argument with SimPlantEquip and carries through to the main simulation calls for component models.  This argument is set to TRUE when the plant sizing is being conducted.  The component model needs to handle this argument such that when TRUE the get input, initialization and sizing routines are run, but the calculation routine does not.  When TRUE  most supply side component models need to return values for the minimum, maximum, and optimal capacities (in terms of loop loads that the device can meet).  For plant components with more than one connection to a plant loop, a leading loop connection must be determined and the component sizing routine called with InitLoopEquip is called for only that plant loop. For a example, a chiller only calls its sizing routine when called from a the chilled water loop and does not call it sizing routine when called from the condenser loop. 
+- InitLoopEquip  This logical flag is passed as an argument with SimPlantEquip and carries through to the main simulation calls for component models.  This argument is set to TRUE when the plant sizing is being conducted.  The component model needs to handle this argument such that when TRUE the get input, initialization and sizing routines are run, but the calculation routine does not.  When TRUE  most supply side component models need to return values for the minimum, maximum, and optimal capacities (in terms of loop loads that the device can meet).  For plant components with more than one connection to a plant loop, a leading loop connection must be determined and the component sizing routine called with InitLoopEquip is called for only that plant loop. For a example, a chiller only calls its sizing routine when called from a the chilled water loop and does not call it sizing routine when called from the condenser loop.
 
 - GetSizingFactor  This logical flag is passed as an argument with SimPlantEquip and carries through to the main simulation calls for component models.  This is arguementargument set TRUE during some portions of the plant sizing calls and signals the intent to obtain the value of a component-level sizing factor.  When this argument is TRUE, InitLoopEquip will also be TRUE.  It can be ignored if the component model has no component-level sizing factor as part of its input.  If the component does offer a sizing factor, then the implementation needs to handle this argument such that when TRUE the model returns the value of the SizingFactor as an argument to the simulation routine that is called from SimPlantEquip.
 
-- CurLoopNum  This public integer variable is declared in DataSizing. It is used to communicate to the component models which of the plant loops is actively being sized at the moment. 
+- CurLoopNum  This public integer variable is declared in DataSizing. It is used to communicate to the component models which of the plant loops is actively being sized at the moment.
 
-- LoopNum and LoopSide These arguments are optional to the main simulation routine     
+- LoopNum and LoopSide These arguments are optional to the main simulation routine
 
 Plant sizing routines use the approach outlined in the following steps.  These steps occur at a point during the program’s procedural flow when:  zone and system sizing is completed, much of the plant loop input has been read in and processed but the main plant manager is being called for the first time, none of the pure plant component’s simulation routines have yet been called (but components on the air side may have been), and an initial attempt at determining loop calling order has been made in SetupInitialPlantCallingOrder.
 
@@ -5548,7 +5547,7 @@ Plant sizing routines use the approach outlined in the following steps.  These 
 
 6.    Sizing finished and PlantSizeNotCompleteset FALSE
 
-In earlier versions, component sizing routines were only called once and one had to take care not call them repeatedly (or else their flow request would get doubled each time). However, now plant component models should be designed for multiple executions of their component-level sizing routine.  This allows for an iterative approach to plant sizing that is used to solve complex problems raised by inter-connected loops and the interdependence of sizing information.  As of version 8.3, the addition of HVAC Sizing Simulation method makes it very explicit that not only do sizing routines need to be able to rerun, the autosized values need to be set to useable values and then changed.  It is therefore now necessary to store whether or not the original input was set to autosize and so autosizable input now needs to add a boolean “*WasAutoSized” version of the variable to keep track of the user input. 
+In earlier versions, component sizing routines were only called once and one had to take care not call them repeatedly (or else their flow request would get doubled each time). However, now plant component models should be designed for multiple executions of their component-level sizing routine.  This allows for an iterative approach to plant sizing that is used to solve complex problems raised by inter-connected loops and the interdependence of sizing information.  As of version 8.3, the addition of HVAC Sizing Simulation method makes it very explicit that not only do sizing routines need to be able to rerun, the autosized values need to be set to useable values and then changed.  It is therefore now necessary to store whether or not the original input was set to autosize and so autosizable input now needs to add a boolean “*WasAutoSized” version of the variable to keep track of the user input.
 
 After the component model has determined a design value for the flow rate, this flow rate needs to be registered with the larger plant routines by calling RegisterPlantCompDesignFlow. This is a volume flow rate in m<sup>3</sup>/s.  The flow rate is associated with the inlet node.  This call can be repeated and the design flow will be updated with the latest request.
 
@@ -6018,7 +6017,7 @@ IF (Sys(SysNum)%SchedPtr == 0) THEN
 
 ENDIF
 
-More information about standard error message formatting is contained in the [Output Details and Examples](file:///E:\Docs4PDFs\OutputDetailsAndExamples.pdf) document (for the user) and (for the developer) in this document section: Standard Message Format.
+More information about standard error message formatting is contained in the Output Details and Examples document (for the user) and (for the developer) in this document section: Standard Message Format.
 
 ### GetObjectDefMaxArgs
 
@@ -9667,7 +9666,7 @@ OutputFileDebug is initialized very early in the EnergyPlus execution and is ava
 
 OutputFileInits is intended for “one-time” outputs.  If the value is calculated or entered and should be echoed to output, this file is the place for it.  The structure is similar to the IDD/IDF structure in that there is a “definition” line followed by the data being reported. Since the data may be produced in several places during the simulation, the actual file looks a bit hodge-podge but can be easily imported into a spreadsheet program and grouped.
 
-OutputFileStandard is the reporting variable output file from EnergyPlus.  You can read more details from the [*Guide for Interface Developers*](file:///E:\Docs4PDFs\InterfaceDeveloper.pdf) document and in the [Input Output Reference](file:///E:\Docs4PDFs\InputOutputReference.pdf) document.  OutputFileMeters is a similar file to contain meter (only) output.  Meter values also may appear in the OutputFileStandard file. Only values that change during the simulation should be output to these files.  They are automaticallly included by the SetupOutputVariable calls.
+OutputFileStandard is the reporting variable output file from EnergyPlus.  You can read more details from the Guide for Interface Developers document and in the Input Output Reference document.  OutputFileMeters is a similar file to contain meter (only) output.  Meter values also may appear in the OutputFileStandard file. Only values that change during the simulation should be output to these files.  They are automaticallly included by the SetupOutputVariable calls.
 
 How Do I Output My Variables?
 -----------------------------

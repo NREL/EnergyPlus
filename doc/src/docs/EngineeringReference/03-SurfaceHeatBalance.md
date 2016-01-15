@@ -87,18 +87,18 @@ A is the area of the surface exposed to the environmental temperatures.
 In matrix format:
 
 <div>$$
-  \left[\begin{array}{c}\frac{dT_1}{dt} \\ \frac{dT_2}{dt}\end{array}\right] = 
-     \left[\begin{array}{cc}-\frac{1}{RC}-\frac{hA}{C} & \frac{1}{RC} \\ \frac{1}{RC} & -\frac{1}{RC}-\frac{hA}{C}\end{array}\right]\left[\begin{array}{c}T_1 \\ T_2\end{array}\right] + 
+  \left[\begin{array}{c}\frac{dT_1}{dt} \\ \frac{dT_2}{dt}\end{array}\right] =
+     \left[\begin{array}{cc}-\frac{1}{RC}-\frac{hA}{C} & \frac{1}{RC} \\ \frac{1}{RC} & -\frac{1}{RC}-\frac{hA}{C}\end{array}\right]\left[\begin{array}{c}T_1 \\ T_2\end{array}\right] +
      \left[\begin{array}{cc}\frac{hA}{C} & 0 \\ 0 & \frac{hA}{C}\end{array}\right]\left[\begin{array}{c}T_o \\ T_i\end{array}\right]
 $$</div>
 
 <div>$$
-  \left[\begin{array}{c}{q''}_o \\ {q''}_i\end{array}\right] = 
+  \left[\begin{array}{c}{q''}_o \\ {q''}_i\end{array}\right] =
     \left[\begin{array}{cc}0 & -h \\ h & 0\end{array}\right] \left[\begin{array}{c}T_1 \\ T_2\end{array}\right] +
     \left[\begin{array}{cc}0 & h \\ -h & 0\end{array}\right] \left[\begin{array}{c}T_o \\ T_i\end{array}\right]
 $$</div>
 
-![](media/image168.svg.png)
+![](media/image168.png)
 
 Figure 10.  Two Node State Space Example.
 
@@ -122,19 +122,19 @@ Even though CTF methods require that values of the surface temperatures and flux
 
 The method shown in the Figure 11 maintains two sets of histories out of phase with each other.  The figure shows how this would work for two sets of histories out of phase by one half of a time step.  More sets of temperature and flux histories could be used, allowing the simulation time step to take on values: 1/3, 1/4, 1/5, etc., of the minimum time step allowed for the CTF calculations.  The time step between inputs to the CTF series would be the smallest convenient interval at which the CTF series is stable.  This scenario is illustrated in this figure for two separate sets of temperature and flux histories.  Cycling through each history, in order, allowed calculations of the zone energy balance to be performed with updated surface information at a shorter time step than one CTF history series would otherwise allow.  This method required no interpolation between the series once each set of histories was initialized.  However, if the smallest time step for a stable CTF series was large compared to the zone temperature update time step, significant memory was required to store all the sets of histories.
 
-![](media/image169.svg.png)
+![](media/image169.png)
 
 Figure 11. Multiple, staggered time history scheme
 
 Another method is shown in Figure 12. Sequential interpolation of new histories that uses successive interpolations to determine the next set of temperature and flux histories.  The current history is interpolated directly from the previous history set using the required time phase shift between the two.  This method required permanent storage for only one set of temperature and flux histories at a time, but smoothed out temperature and flux data as more interpolations were performed.  As a result, at concurrent simulation times current values of history terms were different form previous "in phase" history terms.  This was unacceptable from, a physical point of view, because it allowed current information to change data from a previous time.
 
-![](media/image170.svg.png)
+![](media/image170.png)
 
 Figure 12. Sequential interpolation of new histories
 
 A final method, shown in Figure 13. Master history with interpolation, was something of a hybrid of the previous two methods.  One "master" history set was maintained and updated for all time; this solved the problem of current events propagating information backwards in time.  When surface fluxes needed to be calculated at times out of phase with this master history a new, temporary history was interpolated from the master values.  This method proved to be the best of the three options described because it eliminated propagation of information backwards in time and only required concurrent storage of two sets of temperature and flux histories. This method was subsequently incorporated into the IBLAST program in conjunction with Seem's procedure for calculating the coefficients of the CTF series.
 
-![](media/image171.svg.png)
+![](media/image171.png)
 
 Figure 13. Master history with interpolation
 
@@ -201,9 +201,9 @@ EnergyPlus includes two different options for the specific scheme or formulation
 The Crank-Nicholson scheme is semi-implicit and based on an Adams-Moulton solution approach. It is considered second-order in time.  The algorithm uses an implicit finite difference scheme coupled with an enthalpy-temperature function to account for phase change energy accurately. The implicit formulation for an internal node is shown in the equation below.
 
 <div>$$
-  C_p \rho \Delta x \frac{T_i^{j+1}-T_i^j}{\Delta t} = 
+  C_p \rho \Delta x \frac{T_i^{j+1}-T_i^j}{\Delta t} =
      \frac{1}{2}\left(k_W\frac{T_{i+1}^{j+1}-T_{i}^{j+1}}{\Delta x} +
-                      k_E\frac{T_{i-1}^{j+1}-T_{i}^{j+1}}{\Delta x} + 
+                      k_E\frac{T_{i-1}^{j+1}-T_{i}^{j+1}}{\Delta x} +
                       k_W\frac{T_{i+1}^{j}-T_{i}^{j}}{\Delta x} +
                       k_E\frac{T_{i-1}^{j}-T_{i}^{j}}{\Delta x}\right)
 $$</div>
@@ -721,7 +721,7 @@ where
 
 Figure 17 gives the EMPD values to be used for various vapor diffusivities evaluated at different ambient excitations.
 
-![](media/image241.svg.png)
+![](media/image241.png)
 
 Figure 17. Limit of Effective Penetration Depth Values for Various Vapor Diffusivities at Different Ambient Excitations.
 
@@ -1593,7 +1593,7 @@ Table 11.  Nomenclature List of Variables.
 
 </table>
 
-##### 
+#####
 
 The DOE-2 convection model is a combination of the MoWiTT and BLAST Detailed convection models (LBL 1994). The convection coefficient for very smooth surfaces (e.g. glass) is calculated as:
 
@@ -2499,11 +2499,11 @@ Beausoleil-Morrison (2000) used blending techniques to combine correlations orig
 
 <div>
 $$
-h = \left( 
+h = \left(
 \left\{
 \left[1.5\left(\frac{\left|\Delta T\right|}{H}\right)^{1/4}\right]^6 +
 \left[1.23\left|\Delta T\right|^2\right]^{1/6}
-\right\}^{1/2} + 
+\right\}^{1/2} +
 \left\{
 \left[\frac{T_{surf}-T_{SAT}}{\left|\Delta T\right|}\right]
 \left[-0.199+0.190\cdot ACH^{0.8}\right]
@@ -4127,7 +4127,7 @@ This model uses a 1D implicit finite difference heat transfer model to determine
 Surface heat balance boundary conditions are similar what is described in Herb et al., 2008. Evapotranspiration is considered as described by Allen et al., 1998. Soil freezing given the assumed stagnant soil moisture content is also considered.
 
 #### Limitations
-The model does not consider the effects of vegitative canopy layers, snow cover, ground water flow, ground moisture transport, or surface runoff. 
+The model does not consider the effects of vegitative canopy layers, snow cover, ground water flow, ground moisture transport, or surface runoff.
 
 #### References
 
@@ -4165,7 +4165,7 @@ Undisturbed Ground Temperature Model: Xing
 ------------------------------------------
 
 #### Approach
-This model uses the correlation developed by Xing, 2014 to predict undisturbed ground temperature. The correlation parameters for 4000+ international locations can be found in Xing, 2014. The parameters were first determined by creating and validating a finite difference numerical model which used local weather data for boundary conditions. From the numerical model, the correlation parameters were determined to provide for this simplified design model. 
+This model uses the correlation developed by Xing, 2014 to predict undisturbed ground temperature. The correlation parameters for 4000+ international locations can be found in Xing, 2014. The parameters were first determined by creating and validating a finite difference numerical model which used local weather data for boundary conditions. From the numerical model, the correlation parameters were determined to provide for this simplified design model.
 
 <div>$$ T(z,t)=\bar{T}_{s} - \sum_{n=1}^{2} \Delta\bar{T}_{s,n} \cdot e^{-z \cdot \sqrt{\frac{n\pi}{\alpha\tau}}} \cdot cos\left[ \frac{2 \pi n}{\tau} \left(t - \theta_{n} \right) - z \sqrt{\frac{n \pi}{\alpha \tau}} \right]$$</div>
 

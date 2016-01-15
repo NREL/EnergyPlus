@@ -1146,7 +1146,7 @@ AirLoopHVAC:ReturnPath,
 
 The simple building shown in the figure below consists of a controlled zone and a return plenum zone that is used for the return air. This simple configuration contains a ground floor controlled zone with a window and a return plenum zone which handles the roof load. The return air plenum is a special type of component since there is both a heat balance connection and building description and a system airflow connection that transfers the airflow directly from the controlled zone to the return plenum zone in the system air simulation. The input described in this section is mainly just for the system airflow connections in the HVAC algorithms. In addition the return plenum zone must be fully input as a zone object for the heat balance calculation. The zone description needs to contain the wall descriptions - the interzone ceiling and floor, and for this simple case the roof. All the other attributes of a zone that can be specified in the building description can be used with a return plenum zone if necessary: scheduled loads, windows, etc.
 
-![](media/image337.svg)
+![](media/image337.png)
 
 Figure 130. Illustration of Zone Return Plenum
 
@@ -7993,7 +7993,7 @@ The CoilSystem:Cooling:DX object is a virtual container component that consists 
 
 This component may be used as a cooling coil in constant volume or variable volume systems, as blow through or draw through, with or without humidity controls. Unlike AirLoopHVAC:Unitary system types, this component controls only the DX coil, not the supply fan.   CoilSystem:Cooling:DX is added to a system by placing it in an air loop branch (see Branch object) or in an AirLoopHVAC:OutdoorAirSystem:EquipmentList or in a ZoneHVAC:OutdoorAirUnit:EquipmentList . It requires one or more setpoint manager (see SetpointManager:\*) objects to specify temperature and/or humidity setpoints (unless it is used in a ZoneHVAC:OutdoorAirUnit which has its own temperature setpoints).   This object is the one that is listed in the Branch or equipment list object rather than the coil itself.   A constant volume or variable volume fan is modeled separately from this cooling system. These are the only fan types allowed for this system type (ref. Fan:ConstantVolume and Fan:VariableVolume).   Cycling fan operation is not available with this model. The CoilSystem:Cooling:DX object can also be placed on dedicated outdoor air system (DOAS) airloop branches or in arloop branches where the air flow to capacity ratio range is between 100     300 cfm/ton. 100% DOAS DX cooling coils operate in lower flow to capacity ratio range compared to regular DX cooling coils. The CoilSystem:Cooling:DX is selected to operate in DOAS application or in low flow to capacity ratio range by specifying    YES    to the input field    Use Outdoor Air DX Cooling Coil   . If this optional input field is left blank or specified as    NO   , then the coil is modeled as regular DX cooling coil. If the CoilSystem:Cooling:DX object is in an AirLoopHVAC:OutdoorAirSystem:EquipmentList or in a ZoneHVAC:OutdoorAirUnit:EquipmentList then it is treated as 100% DOAS DX cooling coil only if the choice input field    Use Outdoor Air DX Cooling Coil    is set too    YES   . All the control options of the regular DX cooling coils are available to DOAS DX coils as well. Heating DX coils in DOAS airloop operate at the same flow to capacity ratio limits as the DOAS DX cooling coils.
 
-![DXAirLoop](media/image368.svg)
+![DXAirLoop](media/image368.png)
 
 Figure 138. Schematic of CoilSystem:Cooling:DX Object in an Air Loop for a Blow Through Application
 
@@ -17437,7 +17437,7 @@ This controller object is used exclusively by the stand alone energy recovery ve
 
 In addition, the outdoor air flow rate may be modified and heat exchange suspended in response to high indoor relative humidities. When the indoor relative humidity exceeds the zone humidistat   s relative humidity set point, high humidity control is activated. When activated, if high humidity control is based on the outdoor air humidity ratio and the outdoor humidity ratio is greater than the indoor humidity ratio, high humidity control is terminated.
 
-![Schematic\_StandAloneERV](media/image414.svg)
+![Schematic\_StandAloneERV](media/image414.png)
 
 Figure 143. Schematic of the ZoneHVAC:EnergyRecoveryVentilator compound object
 
@@ -17531,13 +17531,13 @@ This group of objects describes the properties and configuration for the evapora
 
 The direct stage, shown in the figure below, consists of a rigid media evaporative pad, with water recirculated from a reservoir.   The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media.   The evaporative pad provides the area for the adiabatic saturation of the air.   While the process provides a lower dry-bulb temperature, the moisture content of the leaving air is higher than the entering condition.   The direct stage is used for comfort cooling in a building where adding humidity to the air can be tolerated.
 
-![](media/image415.svg)
+![](media/image415.png)
 
 Figure 144.   Direct Stage Evaporative Cooler
 
 The thermodynamic process is a simultaneous heat and mass transfer, or adiabatic cooling, and follows a constant enthalpy line on the psychrometric chart, it is shown in the figure below as a process from A to B.   Since the deviation of the constant wet-bulb line and the constant enthalpy line is small, it is assumed that the wet-bulb temperature is constant across the direct evaporative stage.
 
-![](media/image416.svg)
+![](media/image416.png)
 
 Figure 145.   Psychrometric Chart -- Constant Enthalpy
 
@@ -17797,13 +17797,13 @@ This is the source (mains) of water consumed by the evaporative cooler that coul
 
 The dry coil indirect evaporative cooler, shown in the figure below, has a rigid media pad, similar to the direct evaporative stage, where the adiabatic cooling takes place. The secondary air leaves the rigid media pad and enters an air to air heat exchanger where it cools the supply air flowing through the heat exchanger tubes. The moist secondary air is then exhausted to the environment. The secondary air stream has its own fan and consists of a rigid media evaporative pad, with water recirculated from a reservoir. The water is pumped from the reservoir to a water distribution header, for water feed by gravity from above the media. The evaporative pad provides the area for the adiabatic saturation of the air.
 
-![](media/image419.svg)
+![](media/image419.png)
 
 Figure 146. Evaporative Cooler -- Indirect Dry Coil
 
 The process that the secondary air goes through, A to C to D, is shown by the dashed lines in   the following figure. Process A to C is adiabatic cooling in the rigid media pad. Then the air enters the shell side of the heat exchanger and is sensibly heated from C to D by the warm supply air passing through the tube side. The secondary air inlet is modeled as a separate stream of outdoor air and the user has the option of defining the name of an outdoor air node.
 
-![](media/image420.svg)
+![](media/image420.png)
 
 Figure 147. Secondary Air Process -- Indirect Dry Coil Evap Cooler
 
@@ -17945,13 +17945,13 @@ This is the source (mains) of water consumed by the evaporative cooler that coul
 
 The wetted coil evaporative cooler shown in the figure below, has water sprayed directly on the tubes of the heat exchanger where latent cooling takes place. The vaporization of the water on the outside of the heat exchanger tubes allows the simultaneous heat and mass transfer which removes heat from the supply air on the tube side. Then the moist secondary air is exhausted. The secondary air stream has its own fan.
 
-![](media/image421.svg)
+![](media/image421.png)
 
 Figure 148. Evaporative Cooler     Indirect Wet Coil
 
 The process that the secondary air goes through, A to C on the following figure, is a path of simultaneous heat and mass transfer, but it does not follow a line of constant enthalpy as in the direct stage. The process is not adiabatic due to the heat gain from the supply air flowing through the tubes of the heat exchanger.
 
-![](media/image422.svg)
+![](media/image422.png)
 
 Figure 149. Secondary Air Process     Indirect Wet Coil Evap Cooler
 
@@ -18483,7 +18483,7 @@ This output is the electric consumption of the unit in Joules for the timestep b
 
 ### HeatExchanger:AirToAir:SensibleAndLatent
 
-![](media/image423.svg)
+![](media/image423.png)
 
 The sensible and latent air-to-air heat exchanger is an HVAC component typically used for exhaust or relief air heat recovery (Figure 150). Heat exchanger performance can be specified to transfer sensible energy, latent energy or both between the supply and exhaust air streams. The input requires no geometric data. Performance is defined by specifying sensible and/or latent effectiveness at 75% and 100% of the nominal (rated) supply air flow rate at two operating conditions as shown in Table 30.
 
