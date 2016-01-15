@@ -824,4 +824,28 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, MixedAir_CalcOAMixerTest )
+	{
+		OAMixer.allocate( 1 );
+		int OAMixerNum = 1;
+		OAMixer( OAMixerNum ).RetMassFlowRate = 0.028291853138915236;
+		OAMixer( OAMixerNum ).RelMassFlowRate = 0.0014043375033302805;
+		OAMixer( OAMixerNum ).OAMassFlowRate = 0.0014043375033302805;
+		OAMixer( OAMixerNum ).RetTemp = 15.599911232287798;
+		OAMixer( OAMixerNum ).RetHumRat = 0.00042803233751948758;
+		OAMixer( OAMixerNum ).RetEnthalpy = 16758.310701352191;
+		OAMixer( OAMixerNum ).RetPressure = 102200.00000000000;
+		OAMixer( OAMixerNum ).OATemp = -9.8370967741935509;
+		OAMixer( OAMixerNum ).OAHumRat = 0.00015330609239581458;
+		OAMixer( OAMixerNum ).OAEnthalpy = -9504.1024419456153;
+		OAMixer( OAMixerNum ).OAPressure = 102200.00000000000;
+		CalcOAMixer( OAMixerNum );
+		Real64 RetMassFlow = 0.0;
+		Real64 MixMassFlow = 0.0;
+		RetMassFlow = OAMixer( OAMixerNum ).RetMassFlowRate;
+		MixMassFlow = OAMixer( OAMixerNum ).MixMassFlowRate;
+		EXPECT_DOUBLE_EQ( RetMassFlow, MixMassFlow );
+		// EXPECT_FALSE( RetMassFlow > MixMassFlow );
+		EXPECT_FALSE( RetMassFlow < MixMassFlow );
+	}
 }
