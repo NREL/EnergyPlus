@@ -61,7 +61,7 @@ A central relief control is added. It addresses one of Tianzhen's concerns.
 
 The first review meeting was held on 1/12/16. Michael Witte, Jason DeGraw, Tianzhen Hong and Lixing Gu attended the meeting.
 
-The main concern is the object name of the PressureStat. The consensus conclusion is a new object name: AirflowNetwork:ZoneContrl:PressureController to replace ZoneControl:PressureStat.
+The main concern is the object name of the PressureStat. The consensus conclusion is a new object name: AirflowNetwork:ZoneControl:PressureController to replace ZoneControl:PressureStat.
 
 Another concern is to prevent circulation of OA flow and zone exhaust fan flow rate. The current practice is that when exhaust fan flow rate is greater than OA flow rate, the OA flow rate will increase to match exhaust fan flow rate. This concern will be considered during coding to avoid possible circulation of both airflow rates.  
 
@@ -83,7 +83,7 @@ The proposed approach adds three new objects and enhances outdoor air, relief ai
 
 ###A new object of PressureController
 
-A new object of AirflowNetwork:ZoneContrl:PressureController will be proposed to allow a user to input pressure setpoint and a controlling component with adjustable airflow rate to meet the setpoint. The proposed component is either the Fan:ZoneExhaust object or the OutdoorAir:Mixer. A single choice is allowed. In other words, both Fan:ZoneExhaust and OutdoorAir:Mixer objects can not used together to perform pressure control.
+A new object of AirflowNetwork:ZoneControl:PressureController will be proposed to allow a user to input pressure setpoint and a controlling component with adjustable airflow rate to meet the setpoint. The proposed component is either the Fan:ZoneExhaust object or the OutdoorAir:Mixer. A single choice is allowed. In other words, both Fan:ZoneExhaust and OutdoorAir:Mixer objects can not used together to perform pressure control.
 
 Since the Fan:ZoneExhaust has the maximum flow rate field, there is no need to revise the existing object. 
 
@@ -135,11 +135,11 @@ The simulation results will be compared to spread sheet results.
 
 ## Input Output Reference Documentation ##
 
-This section describes inputs of three new object as AirflowNetwork:ZoneContrl:PressureController, AirflowNetwork:Distribution:Component:OutdoorAirFlow and AirflowNetwork:Distribution:Component:ReliefAirFlow. 
+This section describes inputs of three new object as AirflowNetwork:ZoneControl:PressureController, AirflowNetwork:Distribution:Component:OutdoorAirFlow and AirflowNetwork:Distribution:Component:ReliefAirFlow. 
 
-### AirflowNetwork:ZoneContrl:PressureController
+### AirflowNetwork:ZoneControl:PressureController
 
-The AirflowNetwork:ZoneContrl:PressureController object is used to control a zone to a specified indoor level of pressure using the AirflowNetwork model. The specified pressure setpoint is used to calculate the required zone exhaust fan flow rate in a controlled zone or relief air flow rate in an AirLoop.
+The AirflowNetwork:ZoneControl:PressureController object is used to control a zone to a specified indoor level of pressure using the AirflowNetwork model. The specified pressure setpoint is used to calculate the required zone exhaust fan flow rate in a controlled zone or relief air flow rate in an AirLoop.
 
 The object has the same performance as ZoneControl:Thermostat. When an AirLoop serves multiple zones, the controlled zone will reach the specific setpoint, while other zones will not be controlled precisely.
 
@@ -162,7 +162,7 @@ The corresponding control type name.
 
 #### Field:Pressure Control Availability Schedule Name
 
-This field contains the name of a schedule that determines whether or not the AirflowNetwork:ZoneContrl:PressureController is available. When the schedule value is zero, the AirflowNetwork:ZoneContrl:PressureController is bypassed (not available to operate). When the schedule value is greater than zero, the AirflowNetwork:ZoneContrl:PressureController is available and will be used to calculate the required zone exhaust fan airflow rate to reach the pressure setpoint when an exhaust fan is used to preform pressure control. When an OutdoorAir:Mixer is entered, the required airflow is the central relief flow rate. If this field is left blank, the schedule has a value of 1 for all time periods. Schedule values must be between 0 and 1.
+This field contains the name of a schedule that determines whether or not the AirflowNetwork:ZoneControl:PressureController is available. When the schedule value is zero, the AirflowNetwork:ZoneControl:PressureController is bypassed (not available to operate). When the schedule value is greater than zero, the AirflowNetwork:ZoneControl:PressureController is available and will be used to calculate the required zone exhaust fan airflow rate to reach the pressure setpoint when an exhaust fan is used to preform pressure control. When an OutdoorAir:Mixer is entered, the required airflow is the central relief flow rate. If this field is left blank, the schedule has a value of 1 for all time periods. Schedule values must be between 0 and 1.
 
 #### Field:Pressure Setpoint Schedule Name
 
@@ -171,7 +171,7 @@ This field contains the name of a schedule that contains the zone air pressure s
 An IDF example is provided below:
 
 ```idf
-   AirflowNetwork:ZoneContrl:PressureController,
+   AirflowNetwork:ZoneControl:PressureController,
        Pressure Controller1,           !- Name
        EAST ZONE,                      !- Controlled Zone Name
 	   Fan:ZoneExhaust,                !- Control Object type
@@ -251,7 +251,7 @@ The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object which s
 IDF examples are provided below:
 
 ```idf
-   AirflowNetwork:ZoneContrl:PressureController,
+   AirflowNetwork:ZoneControl:PressureController,
      Pressure Controller1,           !- Name
      EAST ZONE,                      !- Controlled Zone Name
 	 OutdoorAir:Mixer,               !- Control Object type
@@ -286,19 +286,19 @@ IDF examples are provided below:
 
 ## Input Description ##
 
-This section describes inputs of three new object as AirflowNetwork:ZoneContrl:PressureController,  AirflowNetwork:Distribution:Component:OutdoorAirFlow, and AirflowNetwork:Distribution:Component:ReliefAirFlow. 
+This section describes inputs of three new object as AirflowNetwork:ZoneControl:PressureController,  AirflowNetwork:Distribution:Component:OutdoorAirFlow, and AirflowNetwork:Distribution:Component:ReliefAirFlow. 
 
 ### New objects
 
-AirflowNetwork:ZoneContrl:PressureController
+AirflowNetwork:ZoneControl:PressureController
 
-	AirflowNetwork:ZoneContrl:PressureController,
+	AirflowNetwork:ZoneControl:PressureController,
    		\memo Define the Pressures control settings for a zone or list of zones.
    		\memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
    		\memo to all the zones in the ZoneList.
   	A1 , \field Name
        \required-field
-       \reference AirflowNetworkZoneContrlPressureControllerNames
+       \reference AirflowNetworkZoneControlPressureControllerNames
  	A2 , \field Zone Name
        \required-field
        \type object-list
@@ -393,11 +393,11 @@ AirflowNetwork:Distribution:Component:ReliefAirFlow
 
 ## Outputs Description ##
 
-This section presents outputs from a new object of AirflowNetwork:ZoneContrl:PressureController.
+This section presents outputs from a new object of AirflowNetwork:ZoneControl:PressureController.
 
-### AirflowNetwork:ZoneContrl:PressureController Outputs
+### AirflowNetwork:ZoneControl:PressureController Outputs
 
-The following output variables are available when the AirflowNetwork:ZoneContrl:PressureController object is specified.
+The following output variables are available when the AirflowNetwork:ZoneControl:PressureController object is specified.
 
 * HVAC,Average,Zone Air Pressure Setpoint [Pa]
 
