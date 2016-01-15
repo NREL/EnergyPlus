@@ -3950,7 +3950,7 @@ namespace ZoneEquipmentManager {
 				}
 				//
 
-				TotSupplyAirMassFlowRate = TotInletAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) - ZoneEquipConfig(ZoneNum).PlenumMassFlow;
+				TotSupplyAirMassFlowRate = max( 0.0 , ( TotInletAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) - ZoneEquipConfig(ZoneNum).PlenumMassFlow ) );
 
 				if ( AirLoopNum > 0 ) {
 					AirLoopFlow(AirLoopNum).ZoneExhaust += ZoneEquipConfig(ZoneNum).ZoneExh;
