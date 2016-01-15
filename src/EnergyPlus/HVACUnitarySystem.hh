@@ -735,6 +735,9 @@ namespace HVACUnitarySystem {
 	// Functions
 
 	void
+	clear_state();
+
+	void
 	SimUnitarySystem(
 		std::string const & UnitarySystemName, // Name of Unitary System object
 		bool const FirstHVACIteration, // True when first HVAC iteration
