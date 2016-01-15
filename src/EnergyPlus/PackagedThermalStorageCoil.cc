@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -3934,7 +3934,7 @@ namespace PackagedThermalStorageCoil {
 
     void
 	ControlTESIceStorageTankCoil (
-		std::string const CoilName,       // child object coil name
+		std::string const & CoilName,       // child object coil name
 		int CoilIndex,                    // child object coil index
 		std::string SystemType,           // parent object system type
 		int const FanOpMode,              // parent object fan operating mode
@@ -4771,7 +4771,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		int & CoilAirInletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 
@@ -4836,7 +4836,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		int & CoilAirOutletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 
@@ -4901,7 +4901,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		Real64 & CoilCoolCapacity,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 
@@ -4974,7 +4974,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		Real64 & CoilCoolAirFlow,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 

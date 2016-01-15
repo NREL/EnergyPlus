@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -65,43 +65,27 @@
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataPlant;
 using namespace ObjexxFCL;
 
-class DataPlantTest : public testing::Test
+TEST_F( EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim )
 {
-
-public:
-
-	DataPlantTest() // Setup global state
-	{
-		TotNumLoops = 3;
-		PlantLoop.allocate( TotNumLoops );
-		for ( int l = 1; l <= TotNumLoops; ++l ) {
-			auto & loop( PlantLoop( l ) );
-			loop.LoopSide.allocate( 2 );
-		}
+	TotNumLoops = 3;
+	PlantLoop.allocate( TotNumLoops );
+	for ( int l = 1; l <= TotNumLoops; ++l ) {
+		auto & loop( PlantLoop( l ) );
+		loop.LoopSide.allocate( 2 );
 	}
-
-	~DataPlantTest() // Reset global state
-	{
-		TotNumLoops = 0;
-		PlantLoop.clear();
-	}
-
-};
-
-TEST_F( DataPlantTest, AnyPlantLoopSidesNeedSim )
-{
-	ShowMessage( "Begin Test: DataPlantTest, AnyPlantLoopSidesNeedSim" );
 
 	EXPECT_TRUE( AnyPlantLoopSidesNeedSim() ); // SimLoopSideNeeded is set to true in default ctor
 	SetAllPlantSimFlagsToValue( false ); // Set all SimLoopSideNeeded to false
 	EXPECT_FALSE( AnyPlantLoopSidesNeedSim() );
 }
 
-TEST( DataPlant, verifyTwoNodeNumsOnSamePlantLoop )
+TEST_F( EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop )
 {
 
 	// not using the DataPlantTest base class because of how specific this one is and that one is very general

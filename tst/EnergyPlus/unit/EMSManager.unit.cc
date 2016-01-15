@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -69,18 +69,14 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 
-
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
 using namespace EnergyPlus::DataRuntimeLanguage;
 using namespace ObjexxFCL;
 
-TEST( EMSManager, TestForUniqueEMSActuators )
+TEST_F( EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators )
 {
-
-	ShowMessage( "Begin Test: EMSManager, TestForUniqueEMSActuators" );
 	EMSActuatorAvailable.allocate(100);
-
 
 	std::string componentTypeName1( "Chiller1" );
 	std::string componentTypeName2( "Chiller2" );

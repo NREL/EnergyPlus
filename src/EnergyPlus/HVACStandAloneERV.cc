@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -173,6 +173,16 @@ namespace HVACStandAloneERV {
 	Array1D< StandAloneERVData > StandAloneERV;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumStandAloneERVs = 0;
+		GetERVInputFlag = true;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		StandAloneERV.deallocate();
+	}
 
 	void
 	SimStandAloneERV(
@@ -430,7 +440,6 @@ namespace HVACStandAloneERV {
 			}
 
 			errFlag = false;
-			HXSupAirFlowRate = 0.0;
 			HXSupAirFlowRate = GetGenericSupplyAirFlowRate( StandAloneERV( StandAloneERVNum ).HeatExchangerName, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "... occurs in " + CurrentModuleObject + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\"" );
@@ -464,7 +473,6 @@ namespace HVACStandAloneERV {
 			//Set the SA Design Fan Volume Flow Rate
 			// get from fan module
 			errFlag = false;
-			SAFanVolFlowRate = 0.0;
 			SAFanVolFlowRate = GetFanDesignVolumeFlowRate( cFanTypes( SAFanTypeNum ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "... occurs in " + CurrentModuleObject + " =" + StandAloneERV( StandAloneERVNum ).Name );
@@ -492,7 +500,6 @@ namespace HVACStandAloneERV {
 			//Set the EA Design Fan Volume Flow Rate
 			// get from fan module
 			errFlag = false;
-			EAFanVolFlowRate = 0.0;
 			EAFanVolFlowRate = GetFanDesignVolumeFlowRate( cFanTypes( EAFanTypeNum ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "... occurs in " + CurrentModuleObject + " =" + StandAloneERV( StandAloneERVNum ).Name );
@@ -1814,7 +1821,7 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 
 		// Return value
-		int AirInletNode; // returned air inlet node number of the ERV unit
+		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1885,7 +1892,7 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 
 		// Return value
-		int AirInletNode; // returned air inlet node number of the ERV unit
+		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:

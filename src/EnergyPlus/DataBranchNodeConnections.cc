@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -109,6 +109,7 @@ namespace DataBranchNodeConnections {
 	Array1D< ParentListData > ParentNodeList;
 	Array1D< NodeConnectionDef > NodeConnections;
 	Array1D< EqNodeConnectionDef > AirTerminalNodeConnections;
+	Array1D_bool NonConnectedNodes;
 
 	// Clears the global data in DataBranchNodeConnections.
 	// Needed for unit tests, should not be normally called.
@@ -127,6 +128,7 @@ namespace DataBranchNodeConnections {
 		CompSets.deallocate();
 		ParentNodeList.deallocate();
 		NodeConnections.deallocate();
+		NonConnectedNodes.deallocate();
 		AirTerminalNodeConnections.deallocate();
 	}
 

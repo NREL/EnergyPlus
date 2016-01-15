@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -143,21 +143,6 @@ namespace HeatBalanceManager {
 			TestMinTempValue( 0.0 ),
 			TestMaxHeatLoadValue( 0.0 ),
 			TestMaxCoolLoadValue( 0.0 )
-		{}
-
-		// Member Constructor
-		WarmupConvergence(
-			Array1_int const & PassFlag, // one flag (1=Fail), (2=Pass) for each of the 4 conditions of convergence from
-			Real64 const TestMaxTempValue, // Max Temperature convergence value=ABS(MaxTempPrevDay(ZoneNum)-MaxTempZone(ZoneNum))
-			Real64 const TestMinTempValue, // Min Temperature convergence value=ABS(MinTempPrevDay(ZoneNum)-MinTempZone(ZoneNum))
-			Real64 const TestMaxHeatLoadValue, // Max Heat Load convergence value=
-			Real64 const TestMaxCoolLoadValue // Max Cool Load convergence value=
-		) :
-			PassFlag( 4, PassFlag ),
-			TestMaxTempValue( TestMaxTempValue ),
-			TestMinTempValue( TestMinTempValue ),
-			TestMaxHeatLoadValue( TestMaxHeatLoadValue ),
-			TestMaxCoolLoadValue( TestMaxCoolLoadValue )
 		{}
 
 	};

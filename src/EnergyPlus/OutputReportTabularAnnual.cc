@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -104,7 +104,6 @@ namespace EnergyPlus {
 
 			static std::string const currentModuleObject( "Output:Table:Annual" );
 
-			std::string curAggString; // Current aggregation sting
 			int jAlpha;
 			int numParams; // Number of elements combined
 			int numAlphas; // Number of elements in the alpha array
@@ -202,7 +201,7 @@ namespace EnergyPlus {
 			bool useFilter = (m_filter.size() != 0);
 
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				keyCount = fldStIt->getVariableKeyCountandTypeFromFldSt( typeVar, avgSumVar, stepTypeVar, unitsVar );
 				fldStIt->getVariableKeysFromFldSt( typeVar, keyCount, fldStIt->m_namesOfKeys, fldStIt->m_indexesForKeyVar );
 				for ( std::string nm : fldStIt->m_namesOfKeys ){
@@ -222,15 +221,15 @@ namespace EnergyPlus {
 			allKeys.unique(); // will now just have a list of the unique keys that is sorted
 			std::copy( allKeys.begin(), allKeys.end(), back_inserter( m_objectNames) );  // copy list to the object names
 			// size all columns list of cells to be the size of the
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ )
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt )
 			{
 				fldStIt->m_cell.resize( m_objectNames.size() );
 			}
 			// for each column (field set) set the rows cell to the output variable index (for variables)
 			int foundKeyIndex;
 			int tableRowIndex = 0;
-			for ( std::vector<std::string>::iterator objNmIt = m_objectNames.begin(); objNmIt != m_objectNames.end(); objNmIt++ ){
-				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( std::vector<std::string>::iterator objNmIt = m_objectNames.begin(); objNmIt != m_objectNames.end(); ++objNmIt ){
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 					foundKeyIndex = -1;
 					for ( std::string::size_type i = 0; i < fldStIt->m_namesOfKeys.size(); i++ ){
 						if ( fldStIt->m_namesOfKeys[i] == *objNmIt ){
@@ -267,7 +266,7 @@ namespace EnergyPlus {
 			// This function is not part of the class but acts as an interface between procedural code and the class by
 			// gathering data for each of the AnnualTable objects
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->gatherForTimestep( kindOfTimeStep );
 			}
 		}
@@ -295,7 +294,7 @@ namespace EnergyPlus {
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			std::vector<AnnualFieldSet>::iterator fldStRemainIt;
 			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
-				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 					int curTypeOfVar = fldStIt->m_typeOfVar;
 					int curStepType = fldStIt->m_varStepType;
 					if ( curStepType == kindOfTimeStep )  // this is a much simpler conditional than the code in monthly gathering
@@ -458,7 +457,7 @@ namespace EnergyPlus {
 							// if another minimum or maximum column is found then end
 							// the scan (it will be taken care of when that column is done)
 							if ( activeMinMax ) {
-								for ( fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); fldStRemainIt++ ) {
+								for ( fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); ++fldStRemainIt ) {
 									if ( fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum || fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum ){
 										// end scanning since these might reset
 										break; // for fldStRemainIt
@@ -484,7 +483,7 @@ namespace EnergyPlus {
 							// If the hours variable is active then scan through the rest of the variables
 							// and accumulate
 							if ( activeHoursShown ) {
-								for ( fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); fldStRemainIt++ ) {
+								for ( fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); ++fldStRemainIt ) {
 									int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
 									//int scanStepType = fldStRemainIt->m_varStepType;
 									int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
@@ -544,7 +543,7 @@ namespace EnergyPlus {
 			// This function is not part of the class but acts as an interface between procedural code and the class by
 			// reseting data for each of the AnnualTable objects
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->resetGathering();
 			}
 		}
@@ -553,9 +552,8 @@ namespace EnergyPlus {
 		AnnualTable::resetGathering()
 		{
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			std::vector<AnnualFieldSet>::iterator fldStRemainIt;
 			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
-				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 					if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum || fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximumDuringHoursShown ){
 						fldStIt->m_cell[row].result = -9.9e99;
 					} else if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum || fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimumDuringHoursShown ){
@@ -605,7 +603,7 @@ namespace EnergyPlus {
 			// This function is not part of the class but acts as an interface between procedural code and the class by
 			// invoking the writeTable member function for each of the AnnualTable objects
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->writeTable( OutputReportTabular::unitsStyle );
 			}
 		}
@@ -652,7 +650,7 @@ namespace EnergyPlus {
 			// and the timestamp).
 			int columnCount = 0;
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				columnCount += columnCountForAggregation( fldStIt->m_aggregate );
 			}
 			columnHead.allocate( columnCount );
@@ -674,7 +672,7 @@ namespace EnergyPlus {
 			tableBody.allocate( columnCount, rowCount );
 			tableBody = ""; //set entire table to blank as default
 			int columnRecount = 0;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				std::string curAggString = aggString[ (int) fldStIt->m_aggregate ];
 				if ( curAggString.size() > 0 ) {
 					curAggString = " {" + trim( curAggString ) + '}';
@@ -929,7 +927,7 @@ namespace EnergyPlus {
 				rowHeadRange( 1 ) = ">=";
 				rowHeadRange( 2 ) = "<";
 				tableBodyRange.allocate( 10, 2 );
-				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 					int curAgg = fldStIt->m_aggregate;
 					if (( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax ) ||
 						( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax ) ||
@@ -1181,7 +1179,7 @@ namespace EnergyPlus {
 			// This function is not part of the class but acts as an interface between procedural code and the class by
 			// invoking the writeTable member function for each of the AnnualTable objects
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->addTableOfContents( nameOfStream );
 			}
 		}
@@ -1197,7 +1195,7 @@ namespace EnergyPlus {
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			Real64 const veryLarge = 1.0E280;
 			Real64 const verySmall = -1.0E280;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				int curAgg = fldStIt->m_aggregate;
 				// for columns with binning aggregation types compute the statistics
 				if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax ||
@@ -1342,7 +1340,7 @@ namespace EnergyPlus {
 			std::vector<Real64>::iterator elapsedTimeIt;
 			elapsedTimeIt = corrElapsedTime.begin();
 			std::vector<Real64>::iterator valueIt;
-			for ( valueIt = valuesToBin.begin(); valueIt != valuesToBin.end(); valueIt++ ){
+			for ( valueIt = valuesToBin.begin(); valueIt != valuesToBin.end(); ++valueIt ){
 				if ( *valueIt < bottomOfBins ) {
 					timeBelowBottomBin += *elapsedTimeIt;
 				}
@@ -1354,7 +1352,7 @@ namespace EnergyPlus {
 					binNum = int( ( *valueIt - bottomOfBins ) / intervalSize );
 					returnBins[binNum] += *elapsedTimeIt;
 				}
-				elapsedTimeIt++;
+				++elapsedTimeIt;
 			}
 			return returnBins;
 		}
@@ -1362,7 +1360,7 @@ namespace EnergyPlus {
 		void
 		AnnualTable::columnHeadersToTitleCase(){
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				if ( fldStIt->m_variMeter == fldStIt->m_colHead ){
 					if ( fldStIt->m_indexesForKeyVar.size() > 0 ){
 						int varNum = fldStIt->m_indexesForKeyVar[0];
@@ -1375,7 +1373,7 @@ namespace EnergyPlus {
 		void
 		clear_state(){ // for unit tests
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->clearTable();
 			}
 			annualTables.clear();
@@ -1440,5 +1438,3 @@ namespace EnergyPlus {
 	} //OutputReportTabularAnnual
 
 } // EnergyPlus
-
-

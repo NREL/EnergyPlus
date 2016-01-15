@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -62,6 +62,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataPlant.hh>
@@ -83,11 +84,9 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::FluidProperties;
 
 
-class LowTempRadiantSystemTest : public ::testing::Test
+class LowTempRadiantSystemTest : public EnergyPlusFixture
 {
-
 public:
-
 	int RadSysNum;
 	int SystemType;
 	Real64 ExpectedResult1;
@@ -96,9 +95,10 @@ public:
 	Real64 const CpWater = 4180.0; // For estimating the expected result
 	Real64 const RhoWater = 1000.0; // For estimating the expected result
 
-	// constructor for test fixture class
-	LowTempRadiantSystemTest()
-	{
+protected:
+	virtual void SetUp() {
+		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+
 		ElecRadSys.allocate( 1 );
 		HydrRadSys.allocate( 1 );
 		CFloRadSys.allocate( 1 );
@@ -153,66 +153,15 @@ public:
 		ExpectedResult1 = 0.0;
 		ExpectedResult2 = 0.0;
 		ExpectedResult3 = 0.0;
-
-		int write_stat;
-		// Open the Initialization Output File (lifted from SimulationManager.cc)
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 	}
 
-	// destructor
-	~LowTempRadiantSystemTest()
-	{
-
-		// Reset sizing flags to prevent interactions with other unit tests when run as a group
-		DataFracOfAutosizedCoolingAirflow = 1.0; // fraction of design cooling supply air flow rate
-		DataFracOfAutosizedHeatingAirflow = 1.0; // fraction of design heating supply air flow rate
-		DataFlowPerCoolingCapacity = 0.0; // cooling supply air flow per unit cooling capacity
-		DataFlowPerHeatingCapacity = 0.0; // heating supply air flow per unit heating capacity
-		DataFracOfAutosizedCoolingCapacity = 1.0; // fraction of autosized cooling capacity
-		DataFracOfAutosizedHeatingCapacity = 1.0; // fraction of autosized heating capacit
-		DataAutosizedCoolingCapacity = 0.0; // Autosized cooling capacity used for multiplying flow per capacity to get flow rate
-		DataAutosizedHeatingCapacity = 0.0; // Autosized heating capacit used for multiplying flow per capacity to get flow rate
-		DataConstantUsedForSizing = 0.0; // base value used for sizing inputs that are ratios of other inputs
-		DataFractionUsedForSizing = 0.0; // fractional value of base value used for sizing inputs that are ratios of other inputs
-		DataScalableSizingON = false; // boolean determines scalable flow sizing is specified
-		DataScalableCapSizingON = false; // boolean determines scalable capacity sizing is specified
-		DataSysScalableFlowSizingON = false; // boolean determines scalable system flow sizing is specified
-		DataSysScalableCapSizingON = false; // boolean determines scalable system capacity sizing is specified
-
-		ElecRadSys.deallocate();
-		HydrRadSys( 1 ).NumCircuits.deallocate();
-		HydrRadSys.deallocate();
-		CFloRadSys.deallocate();
-		ElecRadSysNumericFields( 1 ).FieldNames.deallocate();
-		ElecRadSysNumericFields.deallocate();
-		CalcFinalZoneSizing.deallocate();
-		ZoneEqSizing( 1 ).SizingMethod.deallocate();
-		ZoneEqSizing.deallocate();
-		Zone.deallocate();
-		HydronicRadiantSysNumericFields( 1 ).FieldNames.deallocate();
-		HydronicRadiantSysNumericFields.deallocate();
-		for ( int loopindex = 1; loopindex <= TotNumLoops; ++loopindex ) {
-			auto & loopsidebranch( PlantLoop( loopindex ).LoopSide( 1 ).Branch( 1 ) );
-			loopsidebranch.Comp.deallocate();
-			auto & loopside( PlantLoop( loopindex ).LoopSide( 1 ) );
-			loopside.Branch.deallocate();
-			auto & loop( PlantLoop( loopindex ) );
-			loop.LoopSide.deallocate();
-		}
-		PlantLoop.deallocate();
-		PlantSizData.deallocate();
-
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+	virtual void TearDown() {
+		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 	}
-
 };
 
 TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantElectric )
 {
-	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeLowTempRadiantElectric" );
-
 	SystemType = ElectricSystem;
 	ElecRadSys( RadSysNum ).Name = "LowTempElectric 1";
 	ElecRadSys( RadSysNum ).ZonePtr = 1;
@@ -247,8 +196,6 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantElectric )
 
 TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow )
 {
-	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow" );
-
 	SystemType = HydronicSystem;
 	HydrRadSys( RadSysNum ).Name = "LowTempVarFlow 1";
 	HydrRadSys( RadSysNum ).ZonePtr = 1;
@@ -332,9 +279,9 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow )
 	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat, 0.1 );
 	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).WaterVolFlowMaxCool, 0.1 );
 }
-TEST_F( LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow ) {
-	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow" );
 
+TEST_F( LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow )
+{
 	SystemType = HydronicSystem;
 	HydrRadSys( RadSysNum ).Name = "LowTempVarFlow 1";
 	HydrRadSys( RadSysNum ).ZonePtr = 1;
@@ -399,9 +346,9 @@ TEST_F( LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow ) {
 	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).ScaledHeatingCapacity, 0.1 );
 	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).ScaledCoolingCapacity, 0.1 );
 }
-TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow ) {
-	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow" );
 
+TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow )
+{
 	SystemType = ConstantFlowSystem;
 	CFloRadSys( RadSysNum ).Name = "LowTempConstantFlow 1";
 	CFloRadSys( RadSysNum ).ZonePtr = 1;

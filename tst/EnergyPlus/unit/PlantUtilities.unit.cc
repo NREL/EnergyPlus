@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -65,6 +65,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -74,11 +75,8 @@ using namespace EnergyPlus::PlantUtilities;
 using namespace ObjexxFCL;
 using namespace DataSizing;
 
-TEST( PlantUtilities, RegisterPlantCompDesignFlowTest1 )
+TEST_F( EnergyPlusFixture, PlantUtilities_RegisterPlantCompDesignFlowTest1 )
 {
-	ShowMessage( "Begin Test: PlantUtilities, RegisterPlantCompDesignFlowTest1" );
-
-
 	// first call just puts first value in array
 	int TestNodeNum1 = 123;
 	Real64 TestFlowRate1 = 45.6;
@@ -99,10 +97,4 @@ TEST( PlantUtilities, RegisterPlantCompDesignFlowTest1 )
 	RegisterPlantCompDesignFlow( TestNodeNum1, TestFlowRate3 );
 	EXPECT_EQ( TestFlowRate3, CompDesWaterFlow( 1 ).DesVolFlowRate );
 
-	// clean up
-	SaveNumPlantComps = 0;
-	CompDesWaterFlow.deallocate();
-
 }
-
-

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -71,6 +71,8 @@
 #include <FluidProperties.hh>
 #include <DataPlant.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace DataZoneEnergyDemands;
 using namespace ScheduleManager;
@@ -83,12 +85,10 @@ using namespace DataPlant;
 
 using namespace ObjexxFCL;
 
-TEST(HWBaseboardRadiator, CalcHWBaseboard)
+TEST_F( EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 {
 	Real64 LoadMet;
 	int BBNum;
-	ShowMessage( "Begin Test: HWBaseboardRadiator, CalcHWBaseboard - Issue4347" );
-	InitializePsychRoutines();
 	
 	Node.allocate( 1 );
 	HWBaseboard.allocate( 1 );

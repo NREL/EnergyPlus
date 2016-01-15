@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -112,7 +112,11 @@ namespace ReturnAirPathManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	// na
+
+	namespace {
+		bool GetInputFlag( true );
+		bool ErrorsFound( false );
+	}
 
 	//DERIVED TYPE DEFINITIONS
 	// na
@@ -123,6 +127,13 @@ namespace ReturnAirPathManager {
 	//SUBROUTINE SPECIFICATIONS FOR MODULE ReturnAirPathManager
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		GetInputFlag = true;
+		ErrorsFound = false;
+	}
 
 	void
 	SimReturnAirPath()
@@ -142,7 +153,9 @@ namespace ReturnAirPathManager {
 
 		// Locals
 		int ReturnAirPathNum;
-		static bool GetInputFlag( true ); // Flag set to make sure you get input once
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool GetInputFlag( true ); // Flag set to make sure you get input once
+		////////////////////////////////////////////////////////////////////////////////////
 
 		// Obtains and Allocates Mixer related parameters from input file
 		if ( GetInputFlag ) { //First time subroutine has been entered
@@ -189,7 +202,9 @@ namespace ReturnAirPathManager {
 		int NumNums;
 		int IOStat;
 		int Counter;
-		static bool ErrorsFound( false );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool ErrorsFound( false );
+		////////////////////////////////////////////////////////////////////////////////////
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 

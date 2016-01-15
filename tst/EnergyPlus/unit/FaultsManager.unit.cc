@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -76,12 +76,14 @@
 #include <Fans.hh>
 #include <FaultsManager.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace FaultsManager;
 using namespace CurveManager;
 using namespace Fans;
 
-TEST( FaultsManager, FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve )
+TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve )
 {
 	// PURPOSE OF THIS SUBROUTINE:
 	// To check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
@@ -140,7 +142,7 @@ TEST( FaultsManager, FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve )
 
 }
 
-TEST( FaultsManager, FaultFoulingAirFilters_CalFaultyFanAirFlowReduction )
+TEST_F( EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFlowReduction )
 {
 	// PURPOSE OF THIS SUBROUTINE:
 	// Calculate the decrease of the fan air flow rate, given the fan curve

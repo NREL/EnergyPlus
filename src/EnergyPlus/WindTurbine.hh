@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -189,103 +189,6 @@ namespace WindTurbine {
 			NorForce( 0.0 ),
 			TotTorque( 0.0 ),
 			AzimuthAng( 0.0 )
-		{}
-
-		// Member Constructor
-		WindTurbineParams(
-			std::string const & Name, // The component name
-			std::string const & Schedule, // Available schedule
-			int const RotorType, // Rotor type (HAWT or VAWT)
-			int const ControlType, // Control type
-			int const SchedPtr, // Schedule
-			int const NumOfBlade, // Blade number
-			Real64 const RatedRotorSpeed, // Rated rotor speed in m/s
-			Real64 const RotorDiameter, // Diameter of rotor in m
-			Real64 const RotorHeight, // Overall height of the rotor in m
-			Real64 const RatedPower, // Nominal average power outpout at the rated wind speed in Watts
-			Real64 const RatedWindSpeed, // Rated wind speed showing maximum power output in Watts
-			Real64 const CutInSpeed, // Minimum wind speed for system operation in m/s
-			Real64 const CutOutSpeed, // Maximum wind speed for system operation in m/s
-			Real64 const SysEfficiency, // Overall system efficiency including subsystems and losses
-			Real64 const MaxTipSpeedRatio, // Maximum tip speed ratio
-			Real64 const MaxPowerCoeff, // Maximum power coefficient
-			Real64 const LocalAnnualAvgWS, // Annual average wind speed locally measured in m/s
-			Real64 const AnnualTMYWS, // Annual average wind speed from stat file in m/s
-			Real64 const HeightForLocalWS, // Height of the local station in m
-			Real64 const ChordArea, // Chord area of a single blade for VAWTs in m2
-			Real64 const DragCoeff, // Empirical blade drag coefficient for VAWTs
-			Real64 const LiftCoeff, // Empirical blade lift coefficient for VAWTs
-			Real64 const PowerCoeffC1, // Empirical power coefficient 1 for analytical calculation
-			Real64 const PowerCoeffC2, // Empirical power coefficient 2 for analytical calculation
-			Real64 const PowerCoeffC3, // Empirical power coefficient 3 for analytical calculation
-			Real64 const PowerCoeffC4, // Empirical power coefficient 4 for analytical calculation
-			Real64 const PowerCoeffC5, // Empirical power coefficient 5 for analytical calculation
-			Real64 const PowerCoeffC6, // Empirical power coefficient 6 for analytical calculation
-			Real64 const TotPower, // Maximum power produced from the wind in Watts
-			Real64 const Power, // Actual power wind turbine supplies to the building in Watts
-			Real64 const TotEnergy, // Maximum energy produced from the wind in Joules
-			Real64 const Energy, // Actual energy wind turbine supplies to the building in Joules
-			Real64 const LocalWindSpeed, // Local wind speed estimated at the particular height in m/s
-			Real64 const LocalAirDensity, // Local air density estimated at the particular height kg/m3
-			Real64 const PowerCoeff, // Power coefficient determined
-			Real64 const ChordalVel, // Chordal velocity for VAWTs in m/s
-			Real64 const NormalVel, // Normal velocity for VAWTs in m/s
-			Real64 const RelFlowVel, // Relative flow velocity for VAWTs in m/s
-			Real64 const TipSpeedRatio, // Relative flow velocity for VAWTs in m/s
-			Real64 const WSFactor, // Relative flow velocity for VAWTs in m/s
-			Real64 const AngOfAttack, // Angle of attack in degree
-			Real64 const IntRelFlowVel, // Integral of relative flow velocity
-			Real64 const TanForce, // Tnagential force
-			Real64 const NorForce, // Normal force in N.m
-			Real64 const TotTorque, // Total torque in N.m
-			Real64 const AzimuthAng // Azimuth angle between blades
-		) :
-			Name( Name ),
-			Schedule( Schedule ),
-			RotorType( RotorType ),
-			ControlType( ControlType ),
-			SchedPtr( SchedPtr ),
-			NumOfBlade( NumOfBlade ),
-			RatedRotorSpeed( RatedRotorSpeed ),
-			RotorDiameter( RotorDiameter ),
-			RotorHeight( RotorHeight ),
-			RatedPower( RatedPower ),
-			RatedWindSpeed( RatedWindSpeed ),
-			CutInSpeed( CutInSpeed ),
-			CutOutSpeed( CutOutSpeed ),
-			SysEfficiency( SysEfficiency ),
-			MaxTipSpeedRatio( MaxTipSpeedRatio ),
-			MaxPowerCoeff( MaxPowerCoeff ),
-			LocalAnnualAvgWS( LocalAnnualAvgWS ),
-			AnnualTMYWS( AnnualTMYWS ),
-			HeightForLocalWS( HeightForLocalWS ),
-			ChordArea( ChordArea ),
-			DragCoeff( DragCoeff ),
-			LiftCoeff( LiftCoeff ),
-			PowerCoeffC1( PowerCoeffC1 ),
-			PowerCoeffC2( PowerCoeffC2 ),
-			PowerCoeffC3( PowerCoeffC3 ),
-			PowerCoeffC4( PowerCoeffC4 ),
-			PowerCoeffC5( PowerCoeffC5 ),
-			PowerCoeffC6( PowerCoeffC6 ),
-			TotPower( TotPower ),
-			Power( Power ),
-			TotEnergy( TotEnergy ),
-			Energy( Energy ),
-			LocalWindSpeed( LocalWindSpeed ),
-			LocalAirDensity( LocalAirDensity ),
-			PowerCoeff( PowerCoeff ),
-			ChordalVel( ChordalVel ),
-			NormalVel( NormalVel ),
-			RelFlowVel( RelFlowVel ),
-			TipSpeedRatio( TipSpeedRatio ),
-			WSFactor( WSFactor ),
-			AngOfAttack( AngOfAttack ),
-			IntRelFlowVel( IntRelFlowVel ),
-			TanForce( TanForce ),
-			NorForce( NorForce ),
-			TotTorque( TotTorque ),
-			AzimuthAng( AzimuthAng )
 		{}
 
 	};

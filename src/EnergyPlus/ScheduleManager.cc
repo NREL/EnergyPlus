@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -3469,8 +3469,8 @@ namespace ScheduleManager {
 		int WkSch; // Pointer for WeekSchedule value
 		Real64 MinValue( 0.0 ); // For total minimum
 		Real64 MaxValue( 0.0 ); // For total maximum
-		bool MinValueOk;
-		bool MaxValueOk;
+		bool MinValueOk( true );
+		bool MaxValueOk( true );
 
 		if ( ScheduleIndex == -1 ) {
 			MinValue = 1.0;
@@ -3505,8 +3505,6 @@ namespace ScheduleManager {
 		}
 
 		//  Min/max for schedule has been set.  Test.
-		MinValueOk = true;
-		MaxValueOk = true;
 		MinValueOk = ( Schedule( ScheduleIndex ).MinValue >= Minimum );
 		if ( MinString == ">" ) {
 			MinValueOk = ( Schedule( ScheduleIndex ).MinValue > Minimum );
@@ -3572,8 +3570,8 @@ namespace ScheduleManager {
 		int WkSch; // Pointer for WeekSchedule value
 		Real64 MinValue( 0.0 ); // For total minimum
 		Real64 MaxValue( 0.0 ); // For total maximum
-		bool MinValueOk;
-		bool MaxValueOk;
+		bool MinValueOk( true );
+		bool MaxValueOk( true );
 		/////////// hoisted into namespace CheckScheduleValueMinMaxRunOnceOnly////////////
 		//static bool RunOnceOnly( true );
 		/////////////////////////////////////////////////
@@ -3619,8 +3617,6 @@ namespace ScheduleManager {
 		}
 
 		//  Min/max for schedule has been set.  Test.
-		MinValueOk = true;
-		MaxValueOk = true;
 		if ( MinString == ">" ) {
 			MinValueOk = ( Schedule( ScheduleIndex ).MinValue > Minimum );
 		} else {
@@ -3690,8 +3686,8 @@ namespace ScheduleManager {
 		int WkSch; // Pointer for WeekSchedule value
 		Real64 MinValue( 0.0 ); // For total minimum
 		Real64 MaxValue( 0.0 ); // For total maximum
-		bool MinValueOk;
-		bool MaxValueOk;
+		bool MinValueOk( true );
+		bool MaxValueOk( true );
 
 		if ( ScheduleIndex == -1 ) {
 			MinValue = 1.0;
@@ -3726,8 +3722,6 @@ namespace ScheduleManager {
 		}
 
 		//  Min/max for schedule has been set.  Test.
-		MinValueOk = true;
-		MaxValueOk = true;
 		MinValueOk = ( Schedule( ScheduleIndex ).MinValue >= Minimum );
 		if ( MinString == ">" ) {
 			MinValueOk = ( Schedule( ScheduleIndex ).MinValue > Minimum );

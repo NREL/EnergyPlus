@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -263,6 +263,11 @@ namespace HVACControllers {
 	Array1D< RootFinderDataType > RootFinders;
 	Array1D< AirLoopStatsType > AirLoopStats; // Statistics array to analyze computational profile for
 
+	namespace {
+		bool InitControllerOneTimeFlag( true );
+		bool InitControllerSetPointCheckFlag( true );
+	}
+
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAA( "(A,A)" );
@@ -276,11 +281,13 @@ namespace HVACControllers {
 
 	// Needed for unit tests, should not be normally called.
 	void
-		clear_state()
+	clear_state()
 	{
 		NumControllers = 0;
 		NumAirLoopStats = 0;
 		GetControllerInputFlag = true;
+		InitControllerOneTimeFlag = true;
+		InitControllerSetPointCheckFlag = true;
 
 		ControllerProps.deallocate();
 		RootFinders.deallocate();
@@ -990,20 +997,22 @@ namespace HVACControllers {
 		int ActuatedNode;
 		int SensedNode;
 		int ControllerIndex;
-		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MySizeFlag;
 		static Array1D_bool MyPlantIndexsFlag;
-		static bool MySetPointCheckFlag( true );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeFlag( true ); // InitControllerOneTimeFlag
+		// static bool MySetPointCheckFlag( true ); // InitControllerSetPointCheckFlag
+		////////////////////////////////////////////////////////////////////////////////////
 		// Supply Air Temp Setpoint when 'TemperatureAndHumidityRatio' control is used
-		static Real64 HumidityControlTempSetPoint;
+		Real64 HumidityControlTempSetPoint;
 		// Difference between SA dry-bulb and dew-point temperatures
 		Real64 ApproachTemp;
 		// Desired dew point temperature setpoint for 'TemperatureAndHumidityRatio' control
 		Real64 DesiredDewPoint;
 		Real64 rho; // local fluid density
 
-		if ( MyOneTimeFlag ) {
+		if ( InitControllerOneTimeFlag ) {
 
 			MyEnvrnFlag.allocate( NumControllers );
 			MySizeFlag.allocate( NumControllers );
@@ -1011,10 +1020,10 @@ namespace HVACControllers {
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyPlantIndexsFlag = true;
-			MyOneTimeFlag = false;
+			InitControllerOneTimeFlag = false;
 		}
 
-		if ( ! SysSizingCalc && MySetPointCheckFlag && DoSetPointTest ) {
+		if ( ! SysSizingCalc && InitControllerSetPointCheckFlag && DoSetPointTest ) {
 			// check for missing setpoints
 			for ( ControllerIndex = 1; ControllerIndex <= NumControllers; ++ControllerIndex ) {
 				SensedNode = ControllerProps( ControllerIndex ).SensedNode;
@@ -1126,7 +1135,7 @@ namespace HVACControllers {
 				}}
 			}
 
-			MySetPointCheckFlag = false;
+			InitControllerSetPointCheckFlag = false;
 		}
 
 		if ( allocated( PlantLoop ) && MyPlantIndexsFlag( ControlNum ) ) {
@@ -2573,7 +2582,6 @@ namespace HVACControllers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string StatisticsFileName;
 		int FileUnit;
 		int AirLoopNum;
 
@@ -2584,9 +2592,7 @@ namespace HVACControllers {
 			return;
 		}
 
-		StatisticsFileName = "";
-		StatisticsFileName = "statistics.HVACControllers.csv";
-		strip( StatisticsFileName );
+		std::string StatisticsFileName = "statistics.HVACControllers.csv";
 
 		FileUnit = GetNewUnitNumber();
 
@@ -2806,7 +2812,6 @@ Label100: ;
 		int ControllerNum;
 
 		// Open main controller trace file for each air loop
-		TraceFileName = "";
 		TraceFileName = "controller." + PrimaryAirSystem( AirLoopNum ).Name + ".csv";
 		strip( TraceFileName );
 
@@ -3076,7 +3081,6 @@ Label100: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string TraceFileName;
 		static int TraceFileUnit( 0 );
 
 		// Open and write column header in trace file for each individual controller
@@ -3087,8 +3091,7 @@ Label100: ;
 			return;
 		}
 
-		TraceFileName = "";
-		TraceFileName = "controller." + ControllerProps( ControlNum ).ControllerName + ".csv";
+		std::string TraceFileName = "controller." + ControllerProps( ControlNum ).ControllerName + ".csv";
 		strip( TraceFileName );
 
 		//WRITE(*,*) 'Trace file name="', TRIM(TraceFileName) , '"'

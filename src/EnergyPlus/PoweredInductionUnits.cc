@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1186,6 +1186,8 @@ namespace PoweredInductionUnits {
 					if ( IsAutoSize ) {
 						PIU( PIUNum ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
 						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes );
+						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
+						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );
 					} else { // Hardsize with sizing data
 						if ( PIU( PIUNum ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
 							MaxVolHotWaterFlowUser = PIU( PIUNum ).MaxVolHotWaterFlow;
@@ -1350,10 +1352,10 @@ namespace PoweredInductionUnits {
 		Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
 		Real64 QActualHeating; // the heating load seen by the reheat coil [W]
 		Real64 PowerMet; // power supplied
-		bool UnitOn; // TRUE if unit is on
-		bool PriOn; // TRUE if primary air available
-		bool HCoilOn; // TRUE if heating coil is on
-		int ControlNode; // the hot water or cold water inlet node
+		bool UnitOn( true ); // TRUE if unit is on
+		bool PriOn( true ); // TRUE if primary air available
+		bool HCoilOn( true ); // TRUE if heating coil is on
+		int ControlNode( 0 ); // the hot water or cold water inlet node
 		Real64 ControlOffset; // tolerance for output control
 		Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
 		Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/s]
@@ -1367,9 +1369,9 @@ namespace PoweredInductionUnits {
 		Real64 PriAirMassFlowMin; // min primary air mass flow rate [kg/s]
 		Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
 		Real64 CpAirZn; // zone air specific heat [J/kg-C]
-		Real64 FanDeltaTemp; // fan temperature rise [C]
-		Real64 OutletTempNeeded; // unit outlet temperature needed to meet cooling load
-		Real64 MixTempNeeded; // mixer outlet temperature needed to meet cooling load
+		Real64 FanDeltaTemp( 0.0 ); // fan temperature rise [C]
+		Real64 OutletTempNeeded( 0.0 ); // unit outlet temperature needed to meet cooling load
+		Real64 MixTempNeeded( 0.0 ); // mixer outlet temperature needed to meet cooling load
 		Real64 MinSteamFlow;
 		Real64 MaxSteamFlow;
 		Real64 mdot; // local plant fluid flow rate kg/s
@@ -1378,13 +1380,6 @@ namespace PoweredInductionUnits {
 
 		FanElecPower = 0.0;
 		// initialize local variables
-		FanDeltaTemp = 0.0;
-		OutletTempNeeded = 0.0;
-		MixTempNeeded = 0.0;
-		UnitOn = true;
-		PriOn = true;
-		HCoilOn = true;
-		ControlNode = 0;
 		ControlOffset = PIU( PIUNum ).HotControlOffset;
 		OutletNode = PIU( PIUNum ).OutAirNode;
 		PriNode = PIU( PIUNum ).PriAirInNode;
@@ -1594,10 +1589,10 @@ namespace PoweredInductionUnits {
 		Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
 		Real64 QActualHeating; // the heating load seen by the reheat coil [W]
 		Real64 PowerMet; // power supplied
-		bool UnitOn; // TRUE if unit is on
-		bool PriOn; // TRUE if primary air available
-		bool HCoilOn; // TRUE if heating coil is on
-		int ControlNode; // the hot water or cold water inlet node
+		bool UnitOn( true ); // TRUE if unit is on
+		bool PriOn( true ); // TRUE if primary air available
+		bool HCoilOn( true ); // TRUE if heating coil is on
+		int ControlNode( 0 ); // the hot water or cold water inlet node
 		Real64 ControlOffset; // tolerance for output control
 		Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
 		Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/s]
@@ -1611,7 +1606,7 @@ namespace PoweredInductionUnits {
 		Real64 PriAirMassFlowMin; // min primary air mass flow rate [kg/s]
 		Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
 		Real64 CpAirZn; // zone air specific heat [J/kg-C]
-		Real64 FanDeltaTemp; // fan temperature rise [C]
+		Real64 FanDeltaTemp( 0.0 ); // fan temperature rise [C]
 		//unusedREAL(r64)    :: MaxSteamFlow
 		//unusedREAL(r64)    :: MinSteamFlow
 		Real64 mdot; // local fluid flow rate kg/s
@@ -1620,11 +1615,6 @@ namespace PoweredInductionUnits {
 
 		FanElecPower = 0.0;
 		// initialize local variables
-		FanDeltaTemp = 0.0;
-		UnitOn = true;
-		PriOn = true;
-		HCoilOn = true;
-		ControlNode = 0;
 		ControlOffset = PIU( PIUNum ).HotControlOffset;
 		OutletNode = PIU( PIUNum ).OutAirNode;
 		PriNode = PIU( PIUNum ).PriAirInNode;

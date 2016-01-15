@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -62,6 +62,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -79,15 +80,8 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataSizing;
 
 
-TEST( SizeStandAloneERVTest, Test1 )
+TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test1 )
 {
-	ShowMessage( "Begin Test: SizeStandAloneERVTest, Test1" );
-
-	int write_stat;
-	// Open the Initialization Output File (lifted from SimulationManager.cc)
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
-
 	ZoneEquipConfig.allocate( 1 );
 	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
@@ -136,16 +130,5 @@ TEST( SizeStandAloneERVTest, Test1 )
 	Zone( 1 ).Multiplier = 5.0;
 	SizeStandAloneERV( 1 );
 	EXPECT_EQ( 20000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
-
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-
-	// Clean up
-	ZoneEquipConfig.deallocate();
-	Zone.deallocate();
-	ZoneEqSizing.deallocate();
-	People.deallocate();
-	StandAloneERV.deallocate();
-
 
 }

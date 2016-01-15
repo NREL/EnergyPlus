@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -302,6 +302,62 @@ namespace AirflowNetworkBalanceManager {
 
 	Array1D< OccupantVentilationControlProp > OccupantVentilationControl;
 	// Functions
+
+	void
+	clear_state()
+	{
+		PZ.deallocate();
+		MA.deallocate();
+		MV.deallocate();
+		IVEC.deallocate();
+		SplitterNodeNumbers.deallocate();
+		AirflowNetworkGetInputFlag = true;
+		VentilationCtrl = 0;
+		NumOfExhaustFans = 0;
+		NumAirflowNetwork = 0;
+		AirflowNetworkNumOfDetOpenings = 0;
+		AirflowNetworkNumOfSimOpenings = 0;
+		AirflowNetworkNumOfHorOpenings = 0;
+		AirflowNetworkNumOfStdCndns = 0;
+		AirflowNetworkNumOfSurCracks = 0;
+		AirflowNetworkNumOfSurELA = 0;
+		AirflowNetworkNumOfExtNode = 0;
+		AirflowNetworkNumOfCPArray = 0;
+		AirflowNetworkNumOfCPValue = 0;
+		AirflowNetworkNumOfSingleSideZones = 0; // added default value
+		AirflowNetworkNumofWindDir = 0; // added default value
+		DisSysNumOfNodes = 0;
+		DisSysNumOfLeaks = 0;
+		DisSysNumOfELRs = 0;
+		DisSysNumOfDucts = 0;
+		DisSysNumOfDampers = 0;
+		DisSysNumOfCVFs = 0;
+		DisSysNumOfDetFans = 0;
+		DisSysNumOfCoils = 0;
+		DisSysNumOfHXs = 0;
+		DisSysNumOfCPDs = 0;
+		DisSysNumOfTermUnits = 0;
+		DisSysNumOfLinks = 0;
+		NumOfExtNodes = 0;
+		AirflowNetworkNumOfExtSurfaces = 0;
+		IncAng = 0.0;
+		FacadeAng = Array1D< Real64 >( 5 );
+		WindDirNum = 0; // added default value
+		WindAng = 0; // added default value
+		SupplyFanInletNode = 0;
+		SupplyFanOutletNode = 0;
+		SupplyFanType = 0;
+		OnOffFanRunTimeFraction = 0.0;
+		CurrentEndTime = 0.0;
+		CurrentEndTimeLast = 0.0;
+		TimeStepSysLast = 0.0;
+		AirflowNetworkNumOfOccuVentCtrls = 0;
+		IntraZoneNumOfNodes = 0;
+		IntraZoneNumOfLinks = 0;
+		IntraZoneNumOfZones = 0;
+		AirflowNetworkZnRpt.deallocate();
+		OccupantVentilationControl.deallocate();
+	}
 
 	void
 	ManageAirflowNetworkBalance(
@@ -3503,8 +3559,9 @@ namespace AirflowNetworkBalanceManager {
 			if ( !NodeFound ) {
 				if ( count <= AirflowNetworkNumOfSurfaces ) {
 					ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:MULTIZONE:SURFACE = " + AirflowNetworkLinkageData( count ).Name + " is not found" );
-				} else if ( count <= AirflowNetworkNumOfSurfaces ) {
-					ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:INTRAZONE:LINKAGE = " + AirflowNetworkLinkageData( count ).Name + " is not found" );
+				// MBA: Always false due to same boolean check but I don't know what the correct logic should be. 01/10/2016
+				// } else if ( count <= AirflowNetworkNumOfSurfaces ) {
+				// 	ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:INTRAZONE:LINKAGE = " + AirflowNetworkLinkageData( count ).Name + " is not found" );
 				} else {
 					ShowSevereError( RoutineName + AirflowNetworkLinkageData( count ).NodeNames( 1 ) + " in AIRFLOWNETWORK:DISTRIBUTION:LINKAGE = " + AirflowNetworkLinkageData( count ).Name + " is not found in AIRFLOWNETWORK:DISTRIBUTION:NODE objects." );
 				}
@@ -7592,39 +7649,6 @@ namespace AirflowNetworkBalanceManager {
 				Height( 0.0 ),
 				Width( 0.0 ),
 				DischCoeff( 0.0 )
-			{}
-
-			// Member Constructor
-			AFNExtSurfacesProp(
-				int const SurfNum, // row index of the external opening in the Surface array
-				std::string const & SurfName, // Surface name
-				int const MSDNum, // row index of the external opening in the MultizoneSurfaceData array
-				int const ZoneNum, // EnergyPlus zone number
-				int const MZDZoneNum, // row index of the zone in the MultizoneZoneData array
-				int const ExtNodeNum, // External node number; = row index in MultizoneExternalNodeData array + AirflowNetworkNumOfZones
-				std::string const & ZoneName, // EnergyPlus zone name
-				int const CPVNum, // row index in MultizoneCPValueData
-				int const CompTypeNum, // Opening type (detailed, simple, etc.)
-				Real64 const NodeHeight, // Elevation of the opening node
-				Real64 const OpeningArea, // Opening area (=Height*Width)
-				Real64 const Height, // Opening height = MultizoneSurfaceData()%Height
-				Real64 const Width, // Opening width  = MultizoneSurfaceData()%Width
-				Real64 const DischCoeff // Opening discharge coefficient
-			) :
-				SurfNum( SurfNum ),
-				SurfName( SurfName ),
-				MSDNum( MSDNum ),
-				ZoneNum( ZoneNum ),
-				MZDZoneNum( MZDZoneNum ),
-				ExtNodeNum( ExtNodeNum ),
-				ZoneName( ZoneName ),
-				CPVNum( CPVNum ),
-				CompTypeNum( CompTypeNum ),
-				NodeHeight( NodeHeight ),
-				OpeningArea( OpeningArea ),
-				Height( Height ),
-				Width( Width ),
-				DischCoeff( DischCoeff )
 			{}
 
 		};

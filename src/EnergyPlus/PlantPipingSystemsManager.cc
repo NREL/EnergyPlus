@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -978,7 +978,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Initialize ground temperature model and set pointer reference
-			GetGroundTempModel( PipingSystemDomains( DomainNum ).Farfield.groundTempModel, cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
 
 		}
 
@@ -1080,49 +1080,6 @@ namespace PlantPipingSystemsManager {
 					VertInsDepth( 0.0 ),
 					OSCMIndex( 0 )
 				{}
-				// Member Constructor
-				GroundDomainData(
-					std::string const & ObjName,
-					Real64 const Depth,
-					Real64 const AspectRatio,
-					Real64 const PerimeterOffset,
-					Real64 const SoilConductivity,
-					Real64 const SoilDensity,
-					Real64 const SoilSpecificHeat,
-					Real64 const MoistureContent,
-					Real64 const SaturationMoistureContent,
-					Real64 const EvapotranspirationCoeff,
-					Real64 const MinSurfTemp,
-					int const MonthOfMinSurfTemp,
-					Real64 const HorizInsWidth,
-					Real64 const VertInsDepth,
-					int const OSCMIndex,
-					std::string const & OSCMName,
-					std::string const & SlabMaterial,
-					std::string const & HorizInsMaterial,
-					std::string const & VertInsMaterial
-					) :
-				ObjName( ObjName ),
-					Depth( Depth ),
-					AspectRatio( AspectRatio ),
-					PerimeterOffset( PerimeterOffset ),
-					SoilConductivity( SoilConductivity ),
-					SoilDensity( SoilDensity ),
-					SoilSpecificHeat( SoilSpecificHeat ),
-					MoistureContent( MoistureContent ),
-					SaturationMoistureContent( SaturationMoistureContent ),
-					EvapotranspirationCoeff( EvapotranspirationCoeff ),
-					MinSurfTemp( MinSurfTemp ),
-					MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
-					HorizInsWidth( HorizInsWidth ),
-					VertInsDepth( VertInsDepth ),
-					OSCMIndex( OSCMIndex ),
-					OSCMName( OSCMName ),
-					SlabMaterial( SlabMaterial ),
-					HorizInsMaterial( HorizInsMaterial ),
-					VertInsMaterial( VertInsMaterial )
-				{}
-
 			};
 
 			// Object Data
@@ -1351,7 +1308,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent / 100.0;
 
 				// Farfield model
-				GetGroundTempModel( PipingSystemDomains( DomainCtr ).Farfield.groundTempModel, cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+				PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 				// Other parameters
 				PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -1448,31 +1405,6 @@ namespace PlantPipingSystemsManager {
 				MonthOfMinSurfTemp( 0 ),
 				HorizInsWidth( 0.0 ),
 				VertInsDepth( 0.0 )
-			{}
-
-			// Member Constructor
-			GroundDomainData(
-				std::string const & ObjName,
-				Real64 const Depth,
-				Real64 const AspectRatio,
-				Real64 const PerimeterOffset,
-				Real64 const MinSurfTemp,
-				int const MonthOfMinSurfTemp,
-				Real64 const HorizInsWidth,
-				Real64 const VertInsDepth,
-				std::string const & HorizInsMaterial,
-				std::string const & VertInsMaterial
-			) :
-				ObjName( ObjName ),
-				Depth( Depth ),
-				AspectRatio( AspectRatio ),
-				PerimeterOffset( PerimeterOffset ),
-				MinSurfTemp( MinSurfTemp ),
-				MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
-				HorizInsWidth( HorizInsWidth ),
-				VertInsDepth( VertInsDepth ),
-				HorizInsMaterial( HorizInsMaterial ),
-				VertInsMaterial( VertInsMaterial )
 			{}
 
 		};
@@ -1680,7 +1612,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Farfield ground temperature model
-			GetGroundTempModel( PipingSystemDomains( DomainNum ).Farfield.groundTempModel, cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 			// Domain perimeter offset
 			PipingSystemDomains( DomainNum ).PerimeterOffset = Domain( BasementCtr ).PerimeterOffset;
@@ -2049,53 +1981,6 @@ namespace PlantPipingSystemsManager {
 				MonthOfMinSurfTemp( 0 )
 			{}
 
-			// Member Constructor
-			HorizontalTrenchData(
-				std::string const & ObjName,
-				std::string const & InletNodeName,
-				std::string const & OutletNodeName,
-				Real64 const AxialLength,
-				Real64 const PipeID,
-				Real64 const PipeOD,
-				int const NumPipes,
-				Real64 const BurialDepth,
-				Real64 const DesignFlowRate,
-				Real64 const SoilConductivity,
-				Real64 const SoilDensity,
-				Real64 const SoilSpecificHeat,
-				Real64 const PipeConductivity,
-				Real64 const PipeDensity,
-				Real64 const PipeSpecificHeat,
-				Real64 const InterPipeSpacing,
-				Real64 const MoistureContent,
-				Real64 const SaturationMoistureContent,
-				Real64 const EvapotranspirationCoeff,
-				Real64 const MinSurfTemp,
-				int const MonthOfMinSurfTemp
-			) :
-				ObjName( ObjName ),
-				InletNodeName( InletNodeName ),
-				OutletNodeName( OutletNodeName ),
-				AxialLength( AxialLength ),
-				PipeID( PipeID ),
-				PipeOD( PipeOD ),
-				NumPipes( NumPipes ),
-				BurialDepth( BurialDepth ),
-				DesignFlowRate( DesignFlowRate ),
-				SoilConductivity( SoilConductivity ),
-				SoilDensity( SoilDensity ),
-				SoilSpecificHeat( SoilSpecificHeat ),
-				PipeConductivity( PipeConductivity ),
-				PipeDensity( PipeDensity ),
-				PipeSpecificHeat( PipeSpecificHeat ),
-				InterPipeSpacing( InterPipeSpacing ),
-				MoistureContent( MoistureContent ),
-				SaturationMoistureContent( SaturationMoistureContent ),
-				EvapotranspirationCoeff( EvapotranspirationCoeff ),
-				MinSurfTemp( MinSurfTemp ),
-				MonthOfMinSurfTemp( MonthOfMinSurfTemp )
-			{}
-
 		};
 
 		// Object Data
@@ -2179,7 +2064,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = HGHX( HorizontalGHXCtr ).SaturationMoistureContent / 100.0;
 
 			// Farfield model parameters
-			GetGroundTempModel( PipingSystemDomains( DomainCtr ).Farfield.groundTempModel, cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
+			PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
 
 			// Other parameters
 			PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -2392,15 +2277,15 @@ namespace PlantPipingSystemsManager {
 
 		if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
 			// Zone-coupled slab outputs
-			SetupOutputVariable( "Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		} else if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
 			// Zone-coupled basement wall outputs
-			SetupOutputVariable( "Wall Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "Wall Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Wall Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Wall Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 			// Zone-coupled basement floor outputs
-			SetupOutputVariable( "Floor Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).FloorHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "Floor Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Floor Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).FloorHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Floor Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		}
 
 	}
@@ -5149,7 +5034,7 @@ namespace PlantPipingSystemsManager {
 					LeftRegionExtent = ThesePartitionRegions( Index - 1 ).Max;
 				}
 				// Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ). Do not add a mesh region to the left of ThesePartitionRegions( 1 ).-SA
-				if ( !PipingSystemDomains( DomainNum ).HasCoupledBasement || ( PipingSystemDomains( DomainNum ).HasCoupledBasement && ( Index == 0 || Index == 2 ) ) ) {
+				if ( ! PipingSystemDomains( DomainNum ).HasCoupledBasement || ( Index == 0 || Index == 2 ) ) {
 					//'add a mesh region to the "left" of the partition
 					++PreviousUbound;
 					TempRegions( PreviousUbound ) = TempGridRegionData( LeftRegionExtent, ThisRegion.Min, DirDirection );
@@ -8231,7 +8116,6 @@ namespace PlantPipingSystemsManager {
 
 			Numerator = 0.0;
 			Denominator = 0.0;
-			Resistance = 0.0;
 
 			//'convenience variables
 			ThisRadialCellOuterRadius = ThisCell.PipeCellData.Soil( rCtr ).OuterRadius;
@@ -9492,20 +9376,6 @@ namespace PlantPipingSystemsManager {
 			NeighborBoundaryCells( BoundaryCellCtr ) = Direction_NegativeZ;
 		}
 
-	}
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-	GetGroundTempModel(
-		std::shared_ptr< BaseGroundTempsModel > &GTMPtrReference,
-		std::string objectType_str,
-		std::string objectName
-	)
-	{
-		GTMPtrReference = GetGroundTempModelAndInit( objectType_str, objectName );
 	}
 
 } // PlantPipingSystemsManager

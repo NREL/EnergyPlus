@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -219,8 +219,8 @@ namespace CostEstimateManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
-		int NumCostAdjust;
-		int NumRefAdjust;
+		int NumCostAdjust( 0 );
+		int NumRefAdjust( 0 );
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
@@ -267,9 +267,6 @@ namespace CostEstimateManager {
 		}
 
 		//most input error checking to be performed later within Case construct in Calc routine.
-		// do inits that aren't in a derived type
-		NumCostAdjust = 0;
-		NumRefAdjust = 0;
 
 		cCurrentModuleObject = "ComponentCost:Adjustments";
 		NumCostAdjust = GetNumObjectsFound( cCurrentModuleObject );

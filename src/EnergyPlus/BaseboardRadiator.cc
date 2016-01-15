@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -152,6 +152,17 @@ namespace BaseboardRadiator {
 	Array1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumBaseboards = 0;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		SetLoopIndexFlag.deallocate();
+		Baseboard.deallocate();
+		BaseboardParamsNumericFields.deallocate();
+	}
 
 	void
 	SimBaseboard(
@@ -648,23 +659,22 @@ namespace BaseboardRadiator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WaterInletNode;
-		int PltSizNum; // do loop index for plant sizing
-		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
-		Real64 DesCoilLoad;
+		int PltSizHeatNum( 0 ); // index of plant sizing object for 1st heating loop
+		Real64 DesCoilLoad( 0.0 );
 		int SolFla; // Flag of solver
 		Real64 UA0; // lower bound for UA
 		Real64 UA1; // upper bound for UA
 		Real64 UA;
 		Array1D< Real64 > Par( 2 );
-		bool ErrorsFound; // If errors detected in input
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
-		bool FlowAutoSize; // Indicator to autosizing water volume flow
-		bool UAAutoSize; // Indicator to autosizing UA
-		Real64 WaterVolFlowRateMaxDes; // Design water volume flow for reproting
-		Real64 WaterVolFlowRateMaxUser; // User hard-sized volume flow for reporting
-		Real64 UADes; // Design UA value for reproting
-		Real64 UAUser; // User hard-sized value for reporting
+		bool FlowAutoSize( false ); // Indicator to autosizing water volume flow
+		bool UAAutoSize( false ); // Indicator to autosizing UA
+		Real64 WaterVolFlowRateMaxDes( 0.0 ); // Design water volume flow for reproting
+		Real64 WaterVolFlowRateMaxUser( 0.0 ); // User hard-sized volume flow for reporting
+		Real64 UADes( 0.0 ); // Design UA value for reproting
+		Real64 UAUser( 0.0 ); // User hard-sized value for reporting
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -673,17 +683,6 @@ namespace BaseboardRadiator {
 		int SizingMethod; // Integer representation of sizing method name (HeatingCapacitySizing)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
-
-		PltSizHeatNum = 0;
-		PltSizNum = 0;
-		DesCoilLoad = 0.0;
-		ErrorsFound = false;
-		FlowAutoSize = false;
-		UAAutoSize = false;
-		WaterVolFlowRateMaxDes = 0.0;
-		WaterVolFlowRateMaxUser = 0.0;
-		UADes = 0.0;
-		UAUser = 0.0;
 
 		// find the appropriate heating Plant Sizing object
 		PltSizHeatNum = PlantLoop( Baseboard( BaseboardNum ).LoopNum ).PlantSizNum;

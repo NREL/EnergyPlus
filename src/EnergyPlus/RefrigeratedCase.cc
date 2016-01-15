@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1304,7 +1304,7 @@ namespace RefrigeratedCase {
 						ErrorsFound = true;
 					}
 					//   disregard defrost power for Off-Cycle or None defrost types
-					if ( ( DefType == DefOffCycle || DefType == DefOffCycle ) && ( RefrigCase( CaseNum ).DefrostPower > 0.0 ) ) {
+					if ( ( DefType == DefOffCycle || DefType == DefNone ) && ( RefrigCase( CaseNum ).DefrostPower > 0.0 ) ) {
 						RefrigCase( CaseNum ).DefrostPower = 0.0;
 						ShowWarningError( CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", " + cNumericFieldNames( NumNum ) + " for " + cAlphaFieldNames( 8 ) + " None or Off-Cycle will be set to 0 and simulation continues." );
 					}

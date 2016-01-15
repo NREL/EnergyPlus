@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -62,6 +62,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
@@ -70,7 +71,7 @@ using namespace EnergyPlus::HeatBalFiniteDiffManager;
 
 namespace EnergyPlus {
 
-	TEST( HeatBalFiniteDiffManager, CalcNodeHeatFluxTest)
+	TEST_F( EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
 	{
 
 		int const numNodes( 4 );
@@ -189,9 +190,6 @@ namespace EnergyPlus {
 		EXPECT_NEAR( SurfaceFD( SurfNum ).QDreport( 3 ), expectedResult3, 0.0001 );
 		EXPECT_NEAR( SurfaceFD( SurfNum ).QDreport( 4 ), expectedResult4, 0.0001 );
 		EXPECT_NEAR( SurfaceFD( SurfNum ).QDreport( 5 ), expectedResult5, 0.0001 );
-
-		SurfaceFD.deallocate( );
-		DataHeatBalSurface::OpaqSurfInsFaceConductionFlux.deallocate( );
 
 	}
 

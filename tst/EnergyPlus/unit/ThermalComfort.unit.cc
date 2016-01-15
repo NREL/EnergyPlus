@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -65,6 +65,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -72,7 +73,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ThermalComfort;
@@ -89,10 +89,8 @@ using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 using DataHeatBalFanSys::ZoneThermostatSetPointHi;
 
 
-TEST( ThermalComfort, CalcIfSetPointMetTest1 )
+TEST_F( EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1 )
 {
-	ShowMessage( "Begin Test: ThermalComfort, CalcIfSetPointMetTest1" );
-
 	NumOfZones = 1;
 	ZoneSysEnergyDemand.allocate( NumOfZones );
 	ThermalComfortSetPoint.allocate( NumOfZones );
@@ -201,20 +199,4 @@ TEST( ThermalComfort, CalcIfSetPointMetTest1 )
 	EXPECT_EQ( 0, ThermalComfortSetPoint( 1 ).notMetHeatingOccupied );
 	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCooling );
 	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
-
-	//// clean up
-	NumOfZones = 0;
-	ZoneSysEnergyDemand.deallocate( );
-	ThermalComfortSetPoint.deallocate( );
-	TempControlType.deallocate( );
-	AirModel.deallocate( );
-	ZTAV.deallocate( );
-	ZoneThermostatSetPointLo.deallocate( );
-	ZoneThermostatSetPointHi.deallocate( );
-	TimeStepZone = 0.;
-	ThermalComfortInASH55.deallocate( );
 }
-
-
-
-

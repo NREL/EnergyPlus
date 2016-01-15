@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -70,6 +70,8 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataAirflowNetwork;
 using namespace EnergyPlus::AirflowNetworkBalanceManager;
@@ -84,10 +86,8 @@ using DataHeatBalFanSys::TempControlType;
 using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 using DataHeatBalFanSys::ZoneThermostatSetPointHi;
 
-TEST( AdvancedAFNTest, Test1 )
+TEST_F( EnergyPlusFixture, AdvancedAFNTest_Test1 )
 {
-
-	ShowMessage( "Begin Test: AdvancedAFNTest, Test1" );
 
 	int AirflowNetworkNumOfOccuVentCtrls;
 	Real64 TimeOpenElapsed; 

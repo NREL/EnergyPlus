@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -163,13 +163,6 @@ namespace WindowComplexManager {
 	// MODULE VARIABLE DECLARATIONS:
 
 	int NumComplexWind( 0 ); // Total number of complex windows
-	//Debug
-	Array2D_int DbgIBm( 60, 24 );
-	Array2D< Real64 > DbgTheta( 60, 24 );
-	Array2D< Real64 > DbgPhi( 60, 24 );
-	Real64 DdbgTheta;
-	Real64 DdbgPhi;
-	//EndDebug
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
 
@@ -179,6 +172,15 @@ namespace WindowComplexManager {
 	Array2D< WindowStateIndex > WindowStateList;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumComplexWind = 0;
+		BasisList.deallocate();
+		WindowList.deallocate();
+		WindowStateList.deallocate();
+	}
 
 	void
 	InitBSDFWindows()
@@ -245,16 +247,9 @@ namespace WindowComplexManager {
 			int State; // State in which basis first occurs
 
 			// Default Constructor
-			TempBasisIdx()
-			{}
-
-			// Member Constructor
-			TempBasisIdx(
-				int const Basis, // Basis no in basis table
-				int const State // State in which basis first occurs
-			) :
-				Basis( Basis ),
-				State( State )
+			TempBasisIdx() :
+			Basis( 0 ),
+			State( 0 )
 			{}
 
 		};
@@ -1672,20 +1667,10 @@ namespace WindowComplexManager {
 			Real64 HitDsq; // Squared distance to the current hit pt
 
 			// Default Constructor
-			BackHitList()
-			{}
-
-			// Member Constructor
-			BackHitList(
-				int const KBkSurf, // Back surface index of the hit surface
-				int const HitSurf, // Surface number of the hit surface
-				Vector const & HitPt, // coords of hit pt (world syst)
-				Real64 const HitDsq // Squared distance to the current hit pt
-			) :
-				KBkSurf( KBkSurf ),
-				HitSurf( HitSurf ),
-				HitPt( HitPt ),
-				HitDsq( HitDsq )
+			BackHitList() :
+			KBkSurf( 0 ),
+			HitSurf( 0 ),
+			HitDsq( 0.0 )
 			{}
 
 		};
@@ -3340,15 +3325,12 @@ namespace WindowComplexManager {
 		Tini = WindowThermalModel( ThermalModelNum ).InitialTemperature - KelvinConv;
 		Pini = WindowThermalModel( ThermalModelNum ).InitialPressure;
 
-		if ( CalcCondition == noCondition ) {
-			ZoneNum = Surface( SurfNum ).Zone;
-		}
-
 		nlayer = Construct( ConstrNum ).TotSolidLayers;
 		isky = 3; // IR radiation is provided from external source
 		iwd = 0; // assume windward for now.  TODO compare surface normal with wind direction
 
 		if ( CalcCondition == noCondition ) {
+			ZoneNum = Surface( SurfNum ).Zone;
 
 			// determine reference air temperature for this surface
 			{ auto const SELECT_CASE_var( Surface( SurfNum ).TAirRef );

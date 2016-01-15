@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -492,9 +492,9 @@ namespace CrossVentMgr {
 		Real64 Uin; // Inflow air velocity [m/s]
 		Real64 CosPhi; // Angle (in degrees) between the wind and the outward normal of the dominant surface
 		Real64 SurfNorm; // Outward normal of surface
-		Real64 SumToZone; // Sum of velocities through
-		Real64 MaxFlux;
-		int MaxSurf;
+		Real64 SumToZone( 0.0 ); // Sum of velocities through
+		Real64 MaxFlux( 0.0 );
+		int MaxSurf( 0 );
 		Real64 XX;
 		Real64 YY;
 		Real64 ZZ;
@@ -508,9 +508,6 @@ namespace CrossVentMgr {
 		static int NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
 		static int NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
 
-		MaxSurf = 0;
-		SumToZone = 0.0;
-		MaxFlux = 0.0;
 		RecInflowRatio( ZoneNum ) = 0.0;
 
 		// Identify the dominant aperture:

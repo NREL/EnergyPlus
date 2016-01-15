@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -139,35 +139,6 @@ namespace ExteriorEnergyUse {
 			SumTimeNotZeroCons( 0.0 )
 		{}
 
-		// Member Constructor
-		ExteriorLightUsage(
-			std::string const & Name, // Descriptive name -- will show on reporting
-			int const SchedPtr, // Can be scheduled
-			Real64 const DesignLevel, // Consumption in Watts
-			Real64 const Power, // Power = DesignLevel * ScheduleValue
-			Real64 const CurrentUse, // Use for this time step
-			int const ControlMode, // Control mode Schedule Only or Astronomical Clock plus schedule
-			bool const ManageDemand, // Flag to indicate whether to use demand limiting
-			Real64 const DemandLimit, // Demand limit set by demand manager [W]
-			bool const PowerActuatorOn, // EMS flag
-			Real64 const PowerActuatorValue, // EMS value
-			Real64 const SumConsumption, // sum of electric consumption [J] for reporting
-			Real64 const SumTimeNotZeroCons // sum of time of positive electric consumption [hr]
-		) :
-			Name( Name ),
-			SchedPtr( SchedPtr ),
-			DesignLevel( DesignLevel ),
-			Power( Power ),
-			CurrentUse( CurrentUse ),
-			ControlMode( ControlMode ),
-			ManageDemand( ManageDemand ),
-			DemandLimit( DemandLimit ),
-			PowerActuatorOn( PowerActuatorOn ),
-			PowerActuatorValue( PowerActuatorValue ),
-			SumConsumption( SumConsumption ),
-			SumTimeNotZeroCons( SumTimeNotZeroCons )
-		{}
-
 	};
 
 	struct ExteriorEquipmentUsage
@@ -191,27 +162,6 @@ namespace ExteriorEnergyUse {
 			CurrentUse( 0.0 ),
 			ManageDemand( false ),
 			DemandLimit( 0.0 )
-		{}
-
-		// Member Constructor
-		ExteriorEquipmentUsage(
-			std::string const & Name, // Descriptive name -- will show on reporting
-			int const FuelType,
-			int const SchedPtr, // Can be scheduled
-			Real64 const DesignLevel, // Design Consumption (Watts, except for Water Equipment)
-			Real64 const Power, // Power = DesignLevel * ScheduleValue
-			Real64 const CurrentUse, // Use for this time step
-			bool const ManageDemand, // Flag to indicate whether to use demand limiting
-			Real64 const DemandLimit // Demand limit set by demand manager [W]
-		) :
-			Name( Name ),
-			FuelType( FuelType ),
-			SchedPtr( SchedPtr ),
-			DesignLevel( DesignLevel ),
-			Power( Power ),
-			CurrentUse( CurrentUse ),
-			ManageDemand( ManageDemand ),
-			DemandLimit( DemandLimit )
 		{}
 
 	};

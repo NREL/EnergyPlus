@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -82,7 +82,6 @@ namespace MixerComponent {
 	extern int NumMixers; // The Number of Mixers found in the Input
 	extern int LoopInletNode;
 	extern int LoopOutletNode;
-	extern bool GetInputFlag;
 	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
@@ -124,49 +123,6 @@ namespace MixerComponent {
 			OutletMassFlowRateMinAvail( 0.0 ),
 			InitFlag( false ),
 			NumInletNodes( 0 )
-		{}
-
-		// Member Constructor
-		MixerConditions(
-			std::string const & MixerName, // Name of the Mixer
-			Real64 const OutletTemp,
-			Real64 const OutletHumRat,
-			Real64 const OutletEnthalpy,
-			Real64 const OutletPressure,
-			int const OutletNode,
-			Real64 const OutletMassFlowRate, // MassFlow through the Mixer being Simulated [kg/Sec]
-			Real64 const OutletMassFlowRateMaxAvail, // [kg/Sec]
-			Real64 const OutletMassFlowRateMinAvail, // [kg/Sec]
-			bool const InitFlag,
-			int const NumInletNodes,
-			Array1_int const & InletNode,
-			Array1< Real64 > const & InletMassFlowRate,
-			Array1< Real64 > const & InletMassFlowRateMaxAvail,
-			Array1< Real64 > const & InletMassFlowRateMinAvail,
-			Array1< Real64 > const & InletTemp,
-			Array1< Real64 > const & InletHumRat,
-			Array1< Real64 > const & InletEnthalpy,
-			Array1< Real64 > const & InletPressure
-		) :
-			MixerName( MixerName ),
-			OutletTemp( OutletTemp ),
-			OutletHumRat( OutletHumRat ),
-			OutletEnthalpy( OutletEnthalpy ),
-			OutletPressure( OutletPressure ),
-			OutletNode( OutletNode ),
-			OutletMassFlowRate( OutletMassFlowRate ),
-			OutletMassFlowRateMaxAvail( OutletMassFlowRateMaxAvail ),
-			OutletMassFlowRateMinAvail( OutletMassFlowRateMinAvail ),
-			InitFlag( InitFlag ),
-			NumInletNodes( NumInletNodes ),
-			InletNode( InletNode ),
-			InletMassFlowRate( InletMassFlowRate ),
-			InletMassFlowRateMaxAvail( InletMassFlowRateMaxAvail ),
-			InletMassFlowRateMinAvail( InletMassFlowRateMinAvail ),
-			InletTemp( InletTemp ),
-			InletHumRat( InletHumRat ),
-			InletEnthalpy( InletEnthalpy ),
-			InletPressure( InletPressure )
 		{}
 
 	};

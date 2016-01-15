@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -551,105 +551,6 @@ namespace CondenserLoopTowers {
 			TaLast( 0.0 ),
 			WaterFlowRateRatioLast( 0.0 ),
 			LGLast( 0.0 )
-		{}
-
-		// Member Constructor
-		VSTowerData(
-			Array1< Real64 > const & Coeff, // - model coefficients
-			bool const FoundModelCoeff, // - TRUE if model is calibratable
-			Real64 const MinInletAirWBTemp, // - model limit for min inlet air WB temp
-			Real64 const MaxInletAirWBTemp, // - model limit for max inlet air WB temp
-			Real64 const MinRangeTemp, // - model limit for min range temp
-			Real64 const MaxRangeTemp, // - model limit for max range temp
-			Real64 const MinApproachTemp, // - model limit for min approach temp
-			Real64 const MaxApproachTemp, // - model limit for max approach temp
-			Real64 const MinWaterFlowRatio, // - model limit for min water flow rate ratio
-			Real64 const MaxWaterFlowRatio, // - model limit for max water flow rate ratio
-			Real64 const MaxLiquidToGasRatio, // - model limit for max liquid to gas ratio
-			int const VSErrorCountFlowFrac, // - counter if water flow rate ratio limits are exceeded
-			int const VSErrorCountWFRR, // - counter if water flow rate ratio limits are exceeded
-			int const VSErrorCountIAWB, // - counter if inlet air wet-bulb temperature limits are exceeded
-			int const VSErrorCountTR, // - counter if tower range temperature limits are exceeded
-			int const VSErrorCountTA, // - counter if tower approach temperature limits are exceeded
-			int const ErrIndexFlowFrac, // - index to recurring error structure for liquid to gas ratio
-			int const ErrIndexWFRR, // - index to recurring error structure for water flow rate ratio
-			int const ErrIndexIAWB, // - index to recurring error structure for inlet air WB
-			int const ErrIndexTR, // - index to recurring error structure for tower range
-			int const ErrIndexTA, // - index to recurring error structure for tower approach
-			int const ErrIndexLG, // - index to recurring error structure for tower liquid/gas ratio
-			std::string const & TrBuffer1, // - buffer to print Tr warning messages on following time step
-			std::string const & TrBuffer2, // - buffer to print Tr warning messages on following time step
-			std::string const & TrBuffer3, // - buffer to print Tr warning messages on following time step
-			std::string const & TwbBuffer1, // - buffer to print Twb warning messages on following time step
-			std::string const & TwbBuffer2, // - buffer to print Twb warning messages on following time step
-			std::string const & TwbBuffer3, // - buffer to print Twb warning messages on following time step
-			std::string const & TaBuffer1, // - buffer to print Ta warning messages on following time step
-			std::string const & TaBuffer2, // - buffer to print Ta warning messages on following time step
-			std::string const & TaBuffer3, // - buffer to print Ta warning messages on following time step
-			std::string const & WFRRBuffer1, // - buffer to print WFRR warning messages on following time step
-			std::string const & WFRRBuffer2, // - buffer to print WFRR warning messages on following time step
-			std::string const & WFRRBuffer3, // - buffer to print WFRR warning messages on following time step
-			std::string const & LGBuffer1, // - buffer to print LG warning messages on following time step
-			std::string const & LGBuffer2, // - buffer to print LG warning messages on following time step
-			std::string const & LGBuffer3, // - buffer to print LG warning messages on following time step
-			bool const PrintTrMessage, // - flag to print Tr error message
-			bool const PrintTwbMessage, // - flag to print Twb error message
-			bool const PrintTaMessage, // - flag to print Ta error message
-			bool const PrintWFRRMessage, // - flag to print WFRR error message
-			bool const PrintLGMessage, // - flag to print liquid-gas ratio error message
-			Real64 const TrLast, // value of Tr when warning occurred (passed to Recurring Warning)
-			Real64 const TwbLast, // value of Twb when warning occurred (passed to Recurring Warning)
-			Real64 const TaLast, // value of Ta when warning occurred (passed to Recurring Warning)
-			Real64 const WaterFlowRateRatioLast, // value of WFRR when warning occurred (passed to Recurring Warn)
-			Real64 const LGLast // value of LG when warning occurred (passed to Recurring Warn)
-		) :
-			Coeff( Coeff ),
-			FoundModelCoeff( FoundModelCoeff ),
-			MinInletAirWBTemp( MinInletAirWBTemp ),
-			MaxInletAirWBTemp( MaxInletAirWBTemp ),
-			MinRangeTemp( MinRangeTemp ),
-			MaxRangeTemp( MaxRangeTemp ),
-			MinApproachTemp( MinApproachTemp ),
-			MaxApproachTemp( MaxApproachTemp ),
-			MinWaterFlowRatio( MinWaterFlowRatio ),
-			MaxWaterFlowRatio( MaxWaterFlowRatio ),
-			MaxLiquidToGasRatio( MaxLiquidToGasRatio ),
-			VSErrorCountFlowFrac( VSErrorCountFlowFrac ),
-			VSErrorCountWFRR( VSErrorCountWFRR ),
-			VSErrorCountIAWB( VSErrorCountIAWB ),
-			VSErrorCountTR( VSErrorCountTR ),
-			VSErrorCountTA( VSErrorCountTA ),
-			ErrIndexFlowFrac( ErrIndexFlowFrac ),
-			ErrIndexWFRR( ErrIndexWFRR ),
-			ErrIndexIAWB( ErrIndexIAWB ),
-			ErrIndexTR( ErrIndexTR ),
-			ErrIndexTA( ErrIndexTA ),
-			ErrIndexLG( ErrIndexLG ),
-			TrBuffer1( TrBuffer1 ),
-			TrBuffer2( TrBuffer2 ),
-			TrBuffer3( TrBuffer3 ),
-			TwbBuffer1( TwbBuffer1 ),
-			TwbBuffer2( TwbBuffer2 ),
-			TwbBuffer3( TwbBuffer3 ),
-			TaBuffer1( TaBuffer1 ),
-			TaBuffer2( TaBuffer2 ),
-			TaBuffer3( TaBuffer3 ),
-			WFRRBuffer1( WFRRBuffer1 ),
-			WFRRBuffer2( WFRRBuffer2 ),
-			WFRRBuffer3( WFRRBuffer3 ),
-			LGBuffer1( LGBuffer1 ),
-			LGBuffer2( LGBuffer2 ),
-			LGBuffer3( LGBuffer3 ),
-			PrintTrMessage( PrintTrMessage ),
-			PrintTwbMessage( PrintTwbMessage ),
-			PrintTaMessage( PrintTaMessage ),
-			PrintWFRRMessage( PrintWFRRMessage ),
-			PrintLGMessage( PrintLGMessage ),
-			TrLast( TrLast ),
-			TwbLast( TwbLast ),
-			TaLast( TaLast ),
-			WaterFlowRateRatioLast( WaterFlowRateRatioLast ),
-			LGLast( LGLast )
 		{}
 
 	};

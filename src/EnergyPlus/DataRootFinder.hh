@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -146,21 +146,6 @@ namespace DataRootFinder {
 			ATolY( 1.0e-3 )
 		{}
 
-		// Member Constructor
-		ControlsType(
-			int const SlopeType, // Set to any of the iSlope<...> codes
-			int const MethodType, // Desired solution method.
-			Real64 const TolX, // Relative tolerance for variable X
-			Real64 const ATolX, // Absolute tolerance for variable X
-			Real64 const ATolY // Absolute tolerance for variable Y
-		) :
-			SlopeType( SlopeType ),
-			MethodType( MethodType ),
-			TolX( TolX ),
-			ATolX( ATolX ),
-			ATolY( ATolY )
-		{}
-
 	};
 
 	struct PointType
@@ -175,17 +160,6 @@ namespace DataRootFinder {
 			DefinedFlag( false ),
 			X( 0.0 ),
 			Y( 0.0 )
-		{}
-
-		// Member Constructor
-		PointType(
-			bool const DefinedFlag, // Set to true if point has been set; false otherwise
-			Real64 const X, // X value
-			Real64 const Y // Y value = F(X)
-		) :
-			DefinedFlag( DefinedFlag ),
-			X( X ),
-			Y( Y )
 		{}
 
 	};
@@ -216,37 +190,6 @@ namespace DataRootFinder {
 			ConvergenceRate( 0.0 ),
 			NumHistory( 0 ),
 			History( 3 )
-		{}
-
-		// Member Constructor
-		RootFinderDataType(
-			ControlsType const & Controls,
-			int const StatusFlag, // Current status of root finder
-			int const CurrentMethodType, // Solution method used to perform current step
-			Real64 const XCandidate, // Candidate X value to use next when evaluating F(X)
-			Real64 const ConvergenceRate, // Convergence rate achieved over the last 2 successive iterations
-			PointType const & Increment, // Increment between last 2 iterations
-			PointType const & MinPoint, // Point { XMin, F(XMin) }
-			PointType const & MaxPoint, // Point { XMax, F(XMax) }
-			PointType const & LowerPoint, // Point { XLower, F(XLower) } so that XLower <= XRoot
-			PointType const & UpperPoint, // Point { XUpper, F(XUpper) } so that XRoot <= YUpper
-			PointType const & CurrentPoint, // Last evaluated point { X, F(X) }
-			int const NumHistory, // Number of points stored in History
-			Array1< PointType > const & History // Vector containing last 3 best iterates
-		) :
-			Controls( Controls ),
-			StatusFlag( StatusFlag ),
-			CurrentMethodType( CurrentMethodType ),
-			XCandidate( XCandidate ),
-			ConvergenceRate( ConvergenceRate ),
-			Increment( Increment ),
-			MinPoint( MinPoint ),
-			MaxPoint( MaxPoint ),
-			LowerPoint( LowerPoint ),
-			UpperPoint( UpperPoint ),
-			CurrentPoint( CurrentPoint ),
-			NumHistory( NumHistory ),
-			History( 3, History )
 		{}
 
 	};

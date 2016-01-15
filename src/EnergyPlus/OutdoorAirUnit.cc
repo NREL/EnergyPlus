@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -212,7 +212,26 @@ namespace OutdoorAirUnit {
 	// Object Data
 	Array1D< OAUnitData > OutAirUnit;
 
+	namespace {
+		bool MyOneTimeFlag( true );
+		bool ZoneEquipmentListChecked( false );
+	}
+
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumOfOAUnits = 0;
+		OAMassFlowRate = 0.0;
+		GetOutdoorAirUnitInputFlag = true;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		MyOneTimeErrorFlag.deallocate();
+		OutAirUnit.deallocate();
+		MyOneTimeFlag = true;
+		ZoneEquipmentListChecked = false;
+	}
 
 	void
 	SimOutdoorAirUnit(
@@ -892,8 +911,10 @@ namespace OutdoorAirUnit {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
-		static bool MyOneTimeFlag( true );
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeFlag( true );
+		// static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		////////////////////////////////////////////////////////////////////////////////////
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyPlantScanFlag;
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -1169,8 +1190,6 @@ namespace OutdoorAirUnit {
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
 		bool ErrorsFound;
 		Real64 RhoAir;
-		std::string CoolingCoilName;
-		std::string CoolingCoilType;
 		int CompNum;
 		bool IsAutoSize; // Indicator to autosize
 		Real64 OutAirVolFlowDes; // Autosized outdoor air flow for reporting
@@ -1371,9 +1390,6 @@ namespace OutdoorAirUnit {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const CurrentModuleObject( "ZoneHVAC:OutdoorAirUnit" );
-		std::string EquipType;
-		std::string EquipName;
-		std::string CtrlName;
 		Real64 DesOATemp; // Design OA Temp degree C
 		Real64 AirMassFlow; // air mass flow rate [kg/s]
 		int ControlNode; // the hot water or cold water inlet node
@@ -2327,23 +2343,6 @@ namespace OutdoorAirUnit {
 		}
 
 		return GetOutdoorAirUnitReturnAirNode;
-
-	}
-
-	// Clears the global data in OutdoorAirUnit.
-	// Needed for unit tests, should not be normally called.
-	void
-		clear_state()
-	{
-
-		NumOfOAUnits = 0;
-		OAMassFlowRate = 0.0;
-		GetOutdoorAirUnitInputFlag = true;
-
-		MySizeFlag.deallocate();
-		CheckEquipName.deallocate();
-		MyOneTimeErrorFlag.deallocate();
-		OutAirUnit.deallocate();
 
 	}
 

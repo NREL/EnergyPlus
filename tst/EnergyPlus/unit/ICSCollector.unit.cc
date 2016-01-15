@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -74,6 +74,8 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::ConvectionCoefficients;
@@ -84,9 +86,7 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataEnvironment;
 using DataGlobals::BeginEnvrnFlag;
 
-TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
-	ShowMessage( "Begin Test: ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest" );
-
+TEST_F( EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest ) {
 	// ICS collector un-allocated collector data bug fix test.  This unit test
 	// does not test ICS collector performance but it does test a bug fix for
 	// issue #4723 (crash) occured due to unallocated ICS collector data.

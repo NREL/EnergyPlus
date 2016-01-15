@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -213,6 +213,7 @@ namespace HVACManager {
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool SimHVACIterSetup( false );
+		bool TriggerGetAFN( true );
 	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
@@ -226,6 +227,7 @@ namespace HVACManager {
 		HVACManageIteration = 0;
 		RepIterAir = 0;
 		SimHVACIterSetup = false;
+		TriggerGetAFN = true;
 	}
 
 
@@ -325,7 +327,6 @@ namespace HVACManager {
 		Real64 ZoneTempChange( 0.0 ); // change in zone air temperature from timestep t-1 to t
 		int NodeNum;
 		bool ReportDebug;
-		static bool TriggerGetAFN( true );
 		int ZoneNum;
 		static bool PrintedWarmup( false );
 
@@ -716,7 +717,6 @@ namespace HVACManager {
 
 		int AirSysNum;
 		int StackDepth;
-		std::string HistoryStack;
 		std::string HistoryTrace;
 		Real64 SlopeHumRat;
 		Real64 SlopeMdot;

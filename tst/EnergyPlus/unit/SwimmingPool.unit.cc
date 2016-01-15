@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -62,16 +62,16 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SwimmingPool;
 
-TEST( SwimmingPoolTest, MakeUpWaterVolFlow )
+TEST_F( EnergyPlusFixture, SwimmingPool_MakeUpWaterVolFlow )
 {
-	ShowMessage( "Begin Test: SwimmingPoolTest, MakeUpWaterVolFlow" );
-	
+
 	//Tests for MakeUpWaterVolFlowFunct
 	EXPECT_EQ( 500, MakeUpWaterVolFlowFunct(5, 100) );
 	EXPECT_NEAR( 0.0255, MakeUpWaterVolFlowFunct(0.001, 25.5), .0001 );

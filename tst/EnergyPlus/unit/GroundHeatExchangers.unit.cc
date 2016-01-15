@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -75,9 +75,8 @@ using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataLoopNode;
 
 
-TEST( GroundHeatExchangerTest, Interpolate )
+TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Interpolate )
 {
-	ShowMessage( "Begin Test: GroundHeatExchangerTest, Interpolate" );
 
 	// Initialization
 	GLHESlinky thisGLHE;
@@ -110,10 +109,8 @@ TEST( GroundHeatExchangerTest, Interpolate )
 	EXPECT_DOUBLE_EQ( 2.5, thisGFunc );
 }
 
-TEST( SlinkyGroundHeatExchangerTest, GetGFunc )
+TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_GetGFunc )
 {
-
-	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, GetGFunc" );
 
 	// Initialization
 	GLHESlinky thisGLHE;
@@ -137,7 +134,7 @@ TEST( SlinkyGroundHeatExchangerTest, GetGFunc )
 	EXPECT_EQ( 2.5, thisGFunc );
 }
 
-TEST( VerticalGroundHeatExchangerTest, GetGFunc )
+TEST_F( EnergyPlusFixture, VerticalGroundHeatExchangerTest_GetGFunc )
 {
 
 	// Initialization
@@ -172,10 +169,8 @@ TEST( VerticalGroundHeatExchangerTest, GetGFunc )
 
 }
 
-TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
+TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_CalcHXResistance )
 {
-	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, CalcHXResistance" );
-
 	// Initializations
 	GLHESlinky thisGLHE;
 
@@ -212,9 +207,8 @@ TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 	EXPECT_NEAR( 0.07094, thisGLHE.HXResistance, 0.0001 );
 }
 
-TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
+TEST_F( EnergyPlusFixture, VerticalGroundHeatExchangerTest_CalcHXResistance )
 {
-	ShowMessage( "Begin Test: VerticalGroundHeatExchangerTest, CalcHXResistance" );
 
 	// Initializations
 	GLHEVert thisGLHE;
@@ -265,9 +259,8 @@ TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 	EXPECT_NEAR( 0.16903, thisGLHE.HXResistance, 0.0001 );
 }
 
-TEST( SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger )
+TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_CalcGroundHeatExchanger )
 {
-	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger" );
 
 	// Initializations
 	GLHESlinky thisGLHE;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -168,6 +168,11 @@ namespace WindowAC {
 
 	// MODULE VARIABLE DECLARATIONS:
 
+	namespace {
+		bool MyOneTimeFlag( true );
+		bool ZoneEquipmentListChecked( false );
+	}
+
 	int NumWindAC( 0 );
 	int NumWindACCyc( 0 );
 	Array1D_bool MySizeFlag;
@@ -182,6 +187,21 @@ namespace WindowAC {
 	Array1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumWindAC = 0;
+		NumWindACCyc = 0;
+		GetWindowACInputFlag = true;
+		CoolingLoad = false;
+		MyOneTimeFlag = true;
+		ZoneEquipmentListChecked = false;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		WindAC.deallocate();
+		WindACNumericFields.deallocate();
+	}
 
 	void
 	SimWindowAC(
@@ -732,8 +752,10 @@ namespace WindowAC {
 		int OutsideAirNode; // outside air node number in window AC loop
 		int AirRelNode; // relief air node number in window AC loop
 		Real64 RhoAir; // air density at InNode
-		static bool MyOneTimeFlag( true );
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeFlag( true );
+		// static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		////////////////////////////////////////////////////////////////////////////////////
 		int Loop; // loop counter
 		static Array1D_bool MyEnvrnFlag; // one time initialization flag
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers

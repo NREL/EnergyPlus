@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -157,29 +157,6 @@ namespace HeatBalFiniteDiffManager {
 			DeltaTime( 0 )
 		{}
 
-		// Member Constructor
-		ConstructionDataFD(
-			Array1_string const & Name, // Name of construction
-			Array1< Real64 > const & DelX,
-			Array1< Real64 > const & TempStability,
-			Array1< Real64 > const & MoistStability,
-			Array1_int const & NodeNumPoint,
-			Array1< Real64 > const & Thickness,
-			Array1< Real64 > const & NodeXlocation, // sized to TotNode, contains X distance in m from outside face
-			int const TotNodes,
-			int const DeltaTime
-		) :
-			Name( Name ),
-			DelX( DelX ),
-			TempStability( TempStability ),
-			MoistStability( MoistStability ),
-			NodeNumPoint( NodeNumPoint ),
-			Thickness( Thickness ),
-			NodeXlocation( NodeXlocation ),
-			TotNodes( TotNodes ),
-			DeltaTime( DeltaTime )
-		{}
-
 	};
 
 	struct SurfaceDataFD
@@ -202,8 +179,8 @@ namespace HeatBalFiniteDiffManager {
 		Array1D< Real64 > EnthNew; // Node enthalpy at new time
 		Array1D< Real64 > EnthLast;
 		Array1D< Real64 > QDreport; // Node heat flux for reporting [W/m2] postive is flow towards inside face of surface
-		Array1D< Real64 > CpDelXRhoS1; // Current outer half-node Cp * DelX * RhoS / Delt 
-		Array1D< Real64 > CpDelXRhoS2; // Current inner half-node Cp * DelX * RhoS / Delt 
+		Array1D< Real64 > CpDelXRhoS1; // Current outer half-node Cp * DelX * RhoS / Delt
+		Array1D< Real64 > CpDelXRhoS2; // Current inner half-node Cp * DelX * RhoS / Delt
 		Array1D< Real64 > TDpriortimestep; // Node temperatures from previous timestep
 		int SourceNodeNum; // Node number for internal source layer (zero if no source)
 		Real64 QSource; // Internal source flux [W/m2]
@@ -253,21 +230,6 @@ namespace HeatBalFiniteDiffManager {
 			numTempCond( 0 )
 		{}
 
-		// Member Constructor
-		MaterialDataFD(
-			Real64 const tk1, // Temperature coefficient for thermal conductivity
-			int const numTempEnth, // number of Temperature/Enthalpy pairs
-			int const numTempCond, // number of Temperature/Conductivity pairs
-			Array2< Real64 > const & TempEnth, // Temperature enthalpy Function Pairs,
-			Array2< Real64 > const & TempCond // Temperature thermal conductivity Function Pairs,
-		) :
-			tk1( tk1 ),
-			numTempEnth( numTempEnth ),
-			numTempCond( numTempCond ),
-			TempEnth( TempEnth ),
-			TempCond( TempCond )
-		{}
-
 	};
 
 	// Object Data
@@ -276,6 +238,9 @@ namespace HeatBalFiniteDiffManager {
 	extern Array1D< MaterialDataFD > MaterialFD;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	ManageHeatBalFiniteDiff(
@@ -314,7 +279,7 @@ namespace HeatBalFiniteDiffManager {
 		int const Surf, // surface number
 		int const TotNodes // number of nodes in surface
 	);
-		
+
 	// Utility Interpolation Function for the Module
 	//******************************************************************************
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -191,111 +191,6 @@ namespace HVACSingleDuctInduc {
 			ADUNum( 0 ),
 			DesCoolingLoad( 0.0 ),
 			DesHeatingLoad( 0.0 )
-		{}
-
-		// Member Constructor
-		IndUnitData(
-			std::string const & Name, // name of unit
-			std::string const & UnitType, // type of unit
-			int const UnitType_Num, // index to type of unit
-			std::string const & Sched, // availability schedule
-			int const SchedPtr, // index to schedule
-			Real64 const MaxTotAirVolFlow, // m3/s (autosizable)
-			Real64 const MaxTotAirMassFlow, // kg/s
-			Real64 const InducRatio, // ratio of induced air flow to primary air flow
-			int const PriAirInNode, // unit primary air inlet node number
-			int const SecAirInNode, // unit induced air inlet node number
-			int const OutAirNode, // unit air outlet node number
-			int const HWControlNode, // hot water control node
-			int const CWControlNode, // cold water control node
-			std::string const & HCoilType, // type of heating coil component
-			std::string const & HCoil, // name of heating coil component
-			int const HCoil_Num, // index to this coil
-			int const HCoil_PlantTypeNum,
-			Real64 const MaxVolHotWaterFlow, // m3/s (autosizable)
-			Real64 const MaxHotWaterFlow, // kg/s
-			Real64 const MinVolHotWaterFlow, // m3/s
-			Real64 const MinHotWaterFlow, // kg/s
-			Real64 const HotControlOffset, // control tolerance
-			int const HWLoopNum, // index for plant loop with hot water coil
-			int const HWLoopSide, // index for plant loop side for hot water coil
-			int const HWBranchNum, // index for plant branch for hot water coil
-			int const HWCompNum, // index for plant component for hot water coil
-			int const HWCoilFailNum1, // index for errors
-			int const HWCoilFailNum2, // index for errors
-			std::string const & CCoilType, // type of cooling coil component
-			std::string const & CCoil, // name of cooling coil component
-			int const CCoil_Num, // index to this coil
-			int const CCoil_PlantTypeNum,
-			Real64 const MaxVolColdWaterFlow, // m3/s (autosizable)
-			Real64 const MaxColdWaterFlow, // kg/s
-			Real64 const MinVolColdWaterFlow, // m3/s
-			Real64 const MinColdWaterFlow, // kg/s
-			Real64 const ColdControlOffset, // control tolerance
-			int const CWLoopNum, // index for plant loop with chilled water coil
-			int const CWLoopSide, // index for plant loop side for chilled water coil
-			int const CWBranchNum, // index for plant branch for chilled water coil
-			int const CWCompNum, // index for plant component for chilled water coil
-			int const CWCoilFailNum1, // index for errors
-			int const CWCoilFailNum2, // index for errors
-			std::string const & MixerName, // name of air mixer component
-			int const Mixer_Num, // index to this mixer
-			Real64 const MaxPriAirMassFlow, // kg/s
-			Real64 const MaxSecAirMassFlow, // kg/s
-			int const ADUNum, // index of corresponding air distribution unit
-			Real64 const DesCoolingLoad, // used for reporting during coil sizing
-			Real64 const DesHeatingLoad // used for reporting during coil sizing
-		) :
-			Name( Name ),
-			UnitType( UnitType ),
-			UnitType_Num( UnitType_Num ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			MaxTotAirVolFlow( MaxTotAirVolFlow ),
-			MaxTotAirMassFlow( MaxTotAirMassFlow ),
-			InducRatio( InducRatio ),
-			PriAirInNode( PriAirInNode ),
-			SecAirInNode( SecAirInNode ),
-			OutAirNode( OutAirNode ),
-			HWControlNode( HWControlNode ),
-			CWControlNode( CWControlNode ),
-			HCoilType( HCoilType ),
-			HCoil( HCoil ),
-			HCoil_Num( HCoil_Num ),
-			HCoil_PlantTypeNum( HCoil_PlantTypeNum ),
-			MaxVolHotWaterFlow( MaxVolHotWaterFlow ),
-			MaxHotWaterFlow( MaxHotWaterFlow ),
-			MinVolHotWaterFlow( MinVolHotWaterFlow ),
-			MinHotWaterFlow( MinHotWaterFlow ),
-			HotControlOffset( HotControlOffset ),
-			HWLoopNum( HWLoopNum ),
-			HWLoopSide( HWLoopSide ),
-			HWBranchNum( HWBranchNum ),
-			HWCompNum( HWCompNum ),
-			HWCoilFailNum1( HWCoilFailNum1 ),
-			HWCoilFailNum2( HWCoilFailNum2 ),
-			CCoilType( CCoilType ),
-			CCoil( CCoil ),
-			CCoil_Num( CCoil_Num ),
-			CCoil_PlantTypeNum( CCoil_PlantTypeNum ),
-			MaxVolColdWaterFlow( MaxVolColdWaterFlow ),
-			MaxColdWaterFlow( MaxColdWaterFlow ),
-			MinVolColdWaterFlow( MinVolColdWaterFlow ),
-			MinColdWaterFlow( MinColdWaterFlow ),
-			ColdControlOffset( ColdControlOffset ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSide( CWLoopSide ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			CWCoilFailNum1( CWCoilFailNum1 ),
-			CWCoilFailNum2( CWCoilFailNum2 ),
-			MixerName( MixerName ),
-			Mixer_Num( Mixer_Num ),
-			MaxPriAirMassFlow( MaxPriAirMassFlow ),
-			MaxSecAirMassFlow( MaxSecAirMassFlow ),
-			ADUNum( ADUNum ),
-			DesCoolingLoad( DesCoolingLoad ),
-			DesHeatingLoad( DesHeatingLoad )
 		{}
 
 	};

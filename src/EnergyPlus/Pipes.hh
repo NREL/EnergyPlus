@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -114,33 +114,6 @@ namespace Pipes {
 			OneTimeInit( true ),
 			CheckEquipName( true ),
 			EnvrnFlag( true )
-		{}
-
-		// Member Constructor
-		LocalPipeData(
-			std::string const & Name, // main plant (cooling) loop ID
-			int const TypeOf, // type of pipe
-			int const InletNodeNum, // Node number on the inlet side of the plant
-			int const OutletNodeNum, // Node number on the inlet side of the plant
-			int const LoopNum, // Index of plant loop where this pipe resides
-			int const LoopSide, // Index of plant loop side where this pipe resides
-			int const BranchIndex, // Index of plant Branch index where this pipe resides
-			int const CompIndex, // Index of plant Comp index where this pipe resides
-			bool const OneTimeInit,
-			bool const CheckEquipName,
-			bool const EnvrnFlag
-		) :
-			Name( Name ),
-			TypeOf( TypeOf ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			LoopNum( LoopNum ),
-			LoopSide( LoopSide ),
-			BranchIndex( BranchIndex ),
-			CompIndex( CompIndex ),
-			OneTimeInit( OneTimeInit ),
-			CheckEquipName( CheckEquipName ),
-			EnvrnFlag( EnvrnFlag )
 		{}
 
 	};

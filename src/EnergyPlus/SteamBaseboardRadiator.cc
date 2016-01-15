@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -841,18 +841,18 @@ namespace SteamBaseboardRadiator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizSteamNum; // Index of plant sizing object for 1st steam loop
-		Real64 DesCoilLoad; // Design heating load in the zone
+		int PltSizSteamNum( 0 ); // Index of plant sizing object for 1st steam loop
+		Real64 DesCoilLoad( 0.0 ); // Design heating load in the zone
 		Real64 SteamInletTemp; // Inlet steam temperature in C
 		Real64 EnthSteamInDry; // Enthalpy of dry steam
 		Real64 EnthSteamOutWet; // Enthalpy of wet steam
 		Real64 LatentHeatSteam; // latent heat of steam
 		Real64 SteamDensity; // Density of steam
 		Real64 Cp; // local fluid specific heat
-		bool ErrorsFound; // If errors detected in input
-		bool IsAutoSize; // Indicator to autosizing steam flow
-		Real64 SteamVolFlowRateMaxDes; // Design maximum steam volume flow for reporting
-		Real64 SteamVolFlowRateMaxUser; // User hard-sized maximum steam volume flow for reporting
+		bool ErrorsFound( false ); // If errors detected in input
+		bool IsAutoSize( false ); // Indicator to autosizing steam flow
+		Real64 SteamVolFlowRateMaxDes( 0.0 ); // Design maximum steam volume flow for reporting
+		Real64 SteamVolFlowRateMaxUser( 0.0 ); // User hard-sized maximum steam volume flow for reporting
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -861,14 +861,6 @@ namespace SteamBaseboardRadiator {
 		int SizingMethod; // Integer representation of sizing method name (HeatingCapacitySizing)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
-
-
-		PltSizSteamNum = 0;
-		DesCoilLoad = 0.0;
-		ErrorsFound = false;
-		IsAutoSize = false;
-		SteamVolFlowRateMaxDes = 0.0;
-		SteamVolFlowRateMaxUser = 0.0;
 
 		// Find the appropriate steam plant sizing object
 		PltSizSteamNum = PlantLoop( SteamBaseboard( BaseboardNum ).LoopNum ).PlantSizNum;

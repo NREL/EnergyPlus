@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -106,13 +106,6 @@ namespace WindowComplexManager {
 	// MODULE VARIABLE DECLARATIONS:
 
 	extern int NumComplexWind; // Total number of complex windows
-	//Debug
-	extern Array2D_int DbgIBm;
-	extern Array2D< Real64 > DbgTheta;
-	extern Array2D< Real64 > DbgPhi;
-	extern Real64 DdbgTheta;
-	extern Real64 DdbgPhi;
-	//EndDebug
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
 
@@ -129,15 +122,6 @@ namespace WindowComplexManager {
 		// Default Constructor
 		WindowIndex() :
 			NumStates( 0 )
-		{}
-
-		// Member Constructor
-		WindowIndex(
-			int const NumStates, // No States for this window
-			int const SurfNo // Surface number of window
-		) :
-			NumStates( NumStates ),
-			SurfNo( SurfNo )
 		{}
 
 	};
@@ -158,25 +142,6 @@ namespace WindowComplexManager {
 		WindowStateIndex()
 		{}
 
-		// Member Constructor
-		WindowStateIndex(
-			int const InitInc, // Flag indicating initialization needed on Incoming basis
-			int const IncBasisIndx, // Index of basis list entry for Incoming basis
-			int const CopyIncState, // Pointer to state from which geometry can be copied (Incident)
-			int const InitTrn, // Flag indicating initialization needed on Outgoing basis
-			int const TrnBasisIndx, // Index of basis list entry for Outgoing basis
-			int const CopyTrnState, // Pointer to state from which geometry can be copied (Outgoing)
-			int const Konst // Index of state descript in Construct array
-		) :
-			InitInc( InitInc ),
-			IncBasisIndx( IncBasisIndx ),
-			CopyIncState( CopyIncState ),
-			InitTrn( InitTrn ),
-			TrnBasisIndx( TrnBasisIndx ),
-			CopyTrnState( CopyTrnState ),
-			Konst( Konst )
-		{}
-
 	};
 
 	// Object Data
@@ -185,6 +150,9 @@ namespace WindowComplexManager {
 	extern Array2D< WindowStateIndex > WindowStateList;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	InitBSDFWindows();

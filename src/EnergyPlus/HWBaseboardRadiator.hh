@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -208,118 +208,6 @@ namespace HWBaseboardRadiator {
 			ScaledHeatingCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		HWBaseboardParams(
-			std::string const & EquipID,
-			int const EquipType,
-			std::string const & Schedule,
-			Array1_string const & SurfaceName,
-			Array1_int const & SurfacePtr,
-			int const ZonePtr,
-			int const SchedPtr,
-			int const WaterInletNode,
-			int const WaterOutletNode,
-			int const TotSurfToDistrib,
-			int const ControlCompTypeNum,
-			int const CompErrIndex,
-			Real64 const AirMassFlowRate,
-			Real64 const AirMassFlowRateStd,
-			Real64 const WaterTempAvg,
-			Real64 const RatedCapacity,
-			Real64 const UA,
-			Real64 const Offset,
-			Real64 const WaterMassFlowRate,
-			Real64 const WaterMassFlowRateMax,
-			Real64 const WaterMassFlowRateStd,
-			Real64 const WaterVolFlowRateMax,
-			Real64 const WaterInletTempStd,
-			Real64 const WaterInletTemp,
-			Real64 const WaterInletEnthalpy,
-			Real64 const WaterOutletTempStd,
-			Real64 const WaterOutletTemp,
-			Real64 const WaterOutletEnthalpy,
-			Real64 const AirInletTempStd,
-			Real64 const AirInletTemp,
-			Real64 const AirOutletTemp,
-			Real64 const AirInletHumRat,
-			Real64 const AirOutletTempStd,
-			Real64 const FracRadiant,
-			Real64 const FracConvect,
-			Real64 const FracDistribPerson,
-			Array1< Real64 > const & FracDistribToSurf,
-			Real64 const TotPower,
-			Real64 const Power,
-			Real64 const ConvPower,
-			Real64 const RadPower,
-			Real64 const TotEnergy,
-			Real64 const Energy,
-			Real64 const ConvEnergy,
-			Real64 const RadEnergy,
-			int const LoopNum, // plant loop index
-			int const LoopSideNum, // plant loop side index
-			int const BranchNum, // plant loop branch index
-			int const CompNum, // plant loop component index
-			int const BBLoadReSimIndex,
-			int const BBMassFlowReSimIndex,
-			int const BBInletTempFlowReSimIndex,
-			int const HeatingCapMethod, // - Method for HW baseboard heating capacity scalable sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-			Real64 const ScaledHeatingCapacity // - HW baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
-		) :
-			EquipID( EquipID ),
-			EquipType( EquipType ),
-			Schedule( Schedule ),
-			SurfaceName( SurfaceName ),
-			SurfacePtr( SurfacePtr ),
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			WaterInletNode( WaterInletNode ),
-			WaterOutletNode( WaterOutletNode ),
-			TotSurfToDistrib( TotSurfToDistrib ),
-			ControlCompTypeNum( ControlCompTypeNum ),
-			CompErrIndex( CompErrIndex ),
-			AirMassFlowRate( AirMassFlowRate ),
-			AirMassFlowRateStd( AirMassFlowRateStd ),
-			WaterTempAvg( WaterTempAvg ),
-			RatedCapacity( RatedCapacity ),
-			UA( UA ),
-			Offset( Offset ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			WaterMassFlowRateMax( WaterMassFlowRateMax ),
-			WaterMassFlowRateStd( WaterMassFlowRateStd ),
-			WaterVolFlowRateMax( WaterVolFlowRateMax ),
-			WaterInletTempStd( WaterInletTempStd ),
-			WaterInletTemp( WaterInletTemp ),
-			WaterInletEnthalpy( WaterInletEnthalpy ),
-			WaterOutletTempStd( WaterOutletTempStd ),
-			WaterOutletTemp( WaterOutletTemp ),
-			WaterOutletEnthalpy( WaterOutletEnthalpy ),
-			AirInletTempStd( AirInletTempStd ),
-			AirInletTemp( AirInletTemp ),
-			AirOutletTemp( AirOutletTemp ),
-			AirInletHumRat( AirInletHumRat ),
-			AirOutletTempStd( AirOutletTempStd ),
-			FracRadiant( FracRadiant ),
-			FracConvect( FracConvect ),
-			FracDistribPerson( FracDistribPerson ),
-			FracDistribToSurf( FracDistribToSurf ),
-			TotPower( TotPower ),
-			Power( Power ),
-			ConvPower( ConvPower ),
-			RadPower( RadPower ),
-			TotEnergy( TotEnergy ),
-			Energy( Energy ),
-			ConvEnergy( ConvEnergy ),
-			RadEnergy( RadEnergy ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			BBLoadReSimIndex( BBLoadReSimIndex ),
-			BBMassFlowReSimIndex( BBMassFlowReSimIndex ),
-			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity )
-		{}
 	};
 
 	struct HWBaseboardNumericFieldData
@@ -331,12 +219,6 @@ namespace HWBaseboardRadiator {
 		HWBaseboardNumericFieldData()
 		{}
 
-		// Member Constructor
-		HWBaseboardNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data

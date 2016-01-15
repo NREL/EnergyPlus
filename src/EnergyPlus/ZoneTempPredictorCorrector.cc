@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -468,15 +468,6 @@ namespace ZoneTempPredictorCorrector {
 				DidHave( 4, false )
 			{}
 
-			// Member Constructor
-			NeededControlTypes(
-				Array1_bool const & MustHave, // 4= the four control types
-				Array1_bool const & DidHave
-			) :
-				MustHave( 4, MustHave ),
-				DidHave( 4, DidHave )
-			{}
-
 		};
 
 		struct NeededComfortControlTypes
@@ -489,15 +480,6 @@ namespace ZoneTempPredictorCorrector {
 			NeededComfortControlTypes() :
 				MustHave( 12, false ),
 				DidHave( 12, false )
-			{}
-
-			// Member Constructor
-			NeededComfortControlTypes(
-				Array1_bool const & MustHave, // 4= the four control types
-				Array1_bool const & DidHave
-			) :
-				MustHave( 12, MustHave ),
-				DidHave( 12, DidHave )
 			{}
 
 		};

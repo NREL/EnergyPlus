@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -254,21 +254,6 @@ namespace DataHeatBalFanSys {
 			HighPMV( 0.0 ),
 			DualPMVErrCount( 0 ),
 			DualPMVErrIndex( 0 )
-		{}
-
-		// Member Constructor
-		ZoneComfortControlsFangerData(
-			int const FangerType, // Index for Fanger type
-			Real64 const LowPMV, // Low PMV value
-			Real64 const HighPMV, // High PMV Value
-			int const DualPMVErrCount, // Dual PMV setpoint error count
-			int const DualPMVErrIndex // Dual PMV setpoint error index
-		) :
-			FangerType( FangerType ),
-			LowPMV( LowPMV ),
-			HighPMV( HighPMV ),
-			DualPMVErrCount( DualPMVErrCount ),
-			DualPMVErrIndex( DualPMVErrIndex )
 		{}
 
 	};

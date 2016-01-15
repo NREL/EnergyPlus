@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -73,9 +73,8 @@
 
 using namespace EnergyPlus;
 
-TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
+TEST_F( EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs )
 {
-	ShowMessage( "Begin Test: HeatPumpWaterHeaterTests, TestQsourceCalcs" );
 	Real64 DeltaT = 0.0;
 	Real64 const SourceInletTemp = 62.0;
 	Real64 const Cp = 4178.; // water, J/(kg * K)
@@ -108,10 +107,9 @@ TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 	
 }
 
-TEST( WaterThermalTankData, GetDeadBandTemp )
+TEST_F( EnergyPlusFixture, WaterThermalTankData_GetDeadBandTemp )
 {
 
-	ShowMessage( "Begin Test: WaterThermalTankData, GetDeadBandTemp" );
 	WaterThermalTanks::WaterThermalTankData thisTank;
 	thisTank.SetPointTemp = 10;
 	thisTank.DeadBandDeltaTemp = 1;

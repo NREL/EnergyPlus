@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -115,17 +115,6 @@ namespace DataWindowEquivalentLayer {
 			TAUL( 0.0 )
 		{}
 
-		// Member Constructor
-		CFSLWP(
-			Real64 const EPSLF, // thermal emittance, front (outside) side
-			Real64 const EPSLB, // thermal emittance, back (inside) side
-			Real64 const TAUL // thermal transmittance (same value for front or back)
-		) :
-			EPSLF( EPSLF ),
-			EPSLB( EPSLB ),
-			TAUL( TAUL )
-		{}
-
 	};
 
 	struct CFSSWP
@@ -162,33 +151,6 @@ namespace DataWindowEquivalentLayer {
 			RHOSFDD( 0.0 ),
 			RHOSBDD( 0.0 ),
 			TAUS_DD( 0.0 )
-		{}
-
-		// Member Constructor
-		CFSSWP(
-			Real64 const RHOSFBB, // Solar reflectance, BEAM-BEAM, front (outside) side (any angle of incidence)
-			Real64 const RHOSBBB, // Solar reflectance, BEAM-BEAM, back (inside) side (any angle of incidence)
-			Real64 const TAUSFBB, // Solar transmittance, BEAM-BEAM, any angle of incidence
-			Real64 const TAUSBBB, // Solar transmittance, BEAM-BEAM, any angle of incidence
-			Real64 const RHOSFBD, // Solar reflectance, BEAM-DIFFUSE, front (outside) side
-			Real64 const RHOSBBD, // Solar reflectance, BEAM-DIFFUSE, back (inside) side
-			Real64 const TAUSFBD, // Solar transmittance, BEAM-DIFFUSE, front (outside) side
-			Real64 const TAUSBBD, // Solar transmittance, BEAM-DIFFUSE, any angle of incidence
-			Real64 const RHOSFDD, // Solar reflectance, DIFFUSE-DIFFUSE, front (outside) side
-			Real64 const RHOSBDD, // Solar reflectance, DIFFUSE-DIFFUSE, back (inside) side
-			Real64 const TAUS_DD // Solar transmittance, DIFFUSE-DIFFUSE
-		) :
-			RHOSFBB( RHOSFBB ),
-			RHOSBBB( RHOSBBB ),
-			TAUSFBB( TAUSFBB ),
-			TAUSBBB( TAUSBBB ),
-			RHOSFBD( RHOSFBD ),
-			RHOSBBD( RHOSBBD ),
-			TAUSFBD( TAUSFBD ),
-			TAUSBBD( TAUSBBD ),
-			RHOSFDD( RHOSFDD ),
-			RHOSBDD( RHOSBDD ),
-			TAUS_DD( TAUS_DD )
 		{}
 
 	};
@@ -251,35 +213,6 @@ namespace DataWindowEquivalentLayer {
 			CNTRL( 0 )
 		{}
 
-		// Member Constructor
-		CFSLAYER(
-			std::string const & Name, // ID of layer
-			int const LTYPE, // layer type (see ltyXXX above)
-			int const iGZS, // re spectral glazing
-			CFSSWP const & SWP_MAT, // ltyGZS: derived from GSZ file data
-			CFSLWP const & LWP_MAT, // ltyVBxxx = slat properties (diffuse only)
-			CFSSWP const & SWP_EL, // ltyGLAZE, ltyGZS, ltyROLLB: same as _MAT
-			CFSLWP const & LWP_EL, // ltyVBxxx: see VB_xxx()
-			Real64 const S, // spacing
-			Real64 const W, // width
-			Real64 const C, // crown
-			Real64 const PHI_DEG, // Angle
-			int const CNTRL // VB: lscNONE:   PHI_DEG not changed
-		) :
-			Name( Name ),
-			LTYPE( LTYPE ),
-			iGZS( iGZS ),
-			SWP_MAT( SWP_MAT ),
-			LWP_MAT( LWP_MAT ),
-			SWP_EL( SWP_EL ),
-			LWP_EL( LWP_EL ),
-			S( S ),
-			W( W ),
-			C( C ),
-			PHI_DEG( PHI_DEG ),
-			CNTRL( CNTRL )
-		{}
-
 	};
 
 	struct CFSFILLGAS
@@ -314,33 +247,6 @@ namespace DataWindowEquivalentLayer {
 			MHAT( 0.0 )
 		{}
 
-		// Member Constructor
-		CFSFILLGAS(
-			std::string const & Name, // Gas Type (AIR, ARGON, XENON, KRYPTON, CUSTOM)
-			Real64 const AK, // conductivity coeff constant term,  (W/m-K)
-			Real64 const BK, // conductivity coeff of T term, (W/m-K2)
-			Real64 const CK, // conductivity coeff of T^2 term, (W/m-K^3)
-			Real64 const ACP, // specific heat constant term, (J/kg-K)
-			Real64 const BCP, // specific heat coeff of T term, (J/kg-K^2)
-			Real64 const CCP, // specific heat coeff of T^2 term, (J/kg-K^3)
-			Real64 const AVISC, // viscosity constant term, (N-sec/m2)
-			Real64 const BVISC, // viscosity coeff of T term, (N-sec/m2-K)
-			Real64 const CVISC, // viscosity coeff of T^2 term, (N-sec/m2-K^2)
-			Real64 const MHAT // apparent molecular weight of gas
-		) :
-			Name( Name ),
-			AK( AK ),
-			BK( BK ),
-			CK( CK ),
-			ACP( ACP ),
-			BCP( BCP ),
-			CCP( CCP ),
-			AVISC( AVISC ),
-			BVISC( BVISC ),
-			CVISC( CVISC ),
-			MHAT( MHAT )
-		{}
-
 	};
 
 	struct CFSGAP
@@ -365,23 +271,6 @@ namespace DataWindowEquivalentLayer {
 			RHOGAS( 0.0 )
 		{}
 
-		// Member Constructor
-		CFSGAP(
-			std::string const & Name, // Gap layer name
-			int const GTYPE, // gap type (gtyXXX above)
-			Real64 const TAS, // actual surface-surface gap thickness, mm (always > 0)
-			Real64 const TAS_EFF, // effective gap thickness, mm (always > 0)
-			CFSFILLGAS const & FG, // fill gas properties (see above)
-			Real64 const RHOGAS // fill gas density (kg/m3)
-		) :
-			Name( Name ),
-			GTYPE( GTYPE ),
-			TAS( TAS ),
-			TAS_EFF( TAS_EFF ),
-			FG( FG ),
-			RHOGAS( RHOGAS )
-		{}
-
 	};
 
 	struct CFSTY
@@ -399,21 +288,6 @@ namespace DataWindowEquivalentLayer {
 			L( CFSMAXNL ),
 			G( CFSMAXNL-1 ),
 			ISControlled( false )
-		{}
-
-		// Member Constructor
-		CFSTY(
-			std::string const & Name, // ID (Fenestration Name)
-			int const NL, // number of layers
-			Array1< CFSLAYER > const & L, // layer array, L(1) is outside layer
-			Array1< CFSGAP > const & G, // gap array, G(1) is outside-most, betw L(1) and L(2)
-			bool const ISControlled // CFS is not controlled, or has no controlled VB layer
-		) :
-			Name( Name ),
-			NL( NL ),
-			L( CFSMAXNL, L ),
-			G( CFSMAXNL-1, G ),
-			ISControlled( ISControlled )
 		{}
 
 	};

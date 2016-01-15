@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -148,6 +148,22 @@ namespace BoilerSteam {
 	// Beginning of Boiler Module Driver Subroutines
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		FuelUsed = 0.0;
+		BoilerLoad = 0.0;
+		BoilerMassFlowRate = 0.0;
+		BoilerOutletTemp = 0.0;
+		BoilerMaxPress = 0.0;
+		NumBoilers = 0;
+		BoilerMassFlowMaxAvail = 0.0;
+		BoilerMassFlowMinAvail = 0.0;
+		CheckEquipName.deallocate();
+		Boiler.deallocate();
+		BoilerReport.deallocate();
+	}
 
 	void
 	SimSteamBoiler(
@@ -656,8 +672,8 @@ namespace BoilerSteam {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 SteamDensity;
 		Real64 EnthSteamOutWet;
 		Real64 EnthSteamOutDry;
@@ -666,12 +682,9 @@ namespace BoilerSteam {
 		Real64 CpWater; // Heat capacity of condensed steam
 		std::string equipName;
 		Real64 tmpNomCap; // local nominal capacity cooling power
-		Real64 NomCapUser; // Hardsized nominal capacity for reporting
+		Real64 NomCapUser( 0.0 ); // Hardsized nominal capacity for reporting
 
-		PltSizNum = 0;
-		ErrorsFound = false;
 		tmpNomCap = Boiler( BoilerNum ).NomCap;
-		NomCapUser = 0.0;
 
 		// Find the appropriate Plant Sizing object
 		PltSizNum = PlantLoop( Boiler( BoilerNum ).LoopNum ).PlantSizNum;

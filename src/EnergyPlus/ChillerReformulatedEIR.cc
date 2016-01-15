@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -1001,9 +1001,9 @@ namespace ChillerReformulatedEIR {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		int PltSizCondNum; // Plant Sizing index for condenser loop
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 SizingEvapOutletTemp; // Plant Sizing outlet temperature for CurLoopNum [C]
 		Real64 SizingCondOutletTemp; // Plant Sizing outlet temperature for condenser loop [C]
 		Real64 RefCapFT; // Capacity as a function of temperature curve output used for sizing
@@ -1030,10 +1030,10 @@ namespace ChillerReformulatedEIR {
 		Real64 tmpHeatRecVolFlowRate; // local heat recovery design volume flow rate
 		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyFlag; // TRUE in order to calculate IPLV
-		Real64 EvapVolFlowRateUser; // Hardsized evaporator flow for reporting
-		Real64 RefCapUser; // Hardsized reference capacity for reporting
-		Real64 CondVolFlowRateUser; // Hardsized condenser flow for reporting
-		Real64 DesignHeatRecVolFlowRateUser; // Hardsized design heat recovery flow for reporting
+		Real64 EvapVolFlowRateUser( 0.0 ); // Hardsized evaporator flow for reporting
+		Real64 RefCapUser( 0.0 ); // Hardsized reference capacity for reporting
+		Real64 CondVolFlowRateUser( 0.0 ); // Hardsized condenser flow for reporting
+		Real64 DesignHeatRecVolFlowRateUser( 0.0 ); // Hardsized design heat recovery flow for reporting
 
 		// Formats
 		static gio::Fmt Format_530( "('Cond Temp (C) = ',11(F7.2))" );
@@ -1044,17 +1044,9 @@ namespace ChillerReformulatedEIR {
 			MyOneTimeFlag = false;
 		}
 
-		PltSizNum = 0;
-		PltSizCondNum = 0;
-		ErrorsFound = false;
 		tmpNomCap = ElecReformEIRChiller( EIRChillNum ).RefCap;
 		tmpEvapVolFlowRate = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate;
 		tmpCondVolFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
-		EvapVolFlowRateUser = 0.0;
-		RefCapUser = 0.0;
-		CondVolFlowRateUser = 0.0;
-		DesignHeatRecVolFlowRateUser = 0.0;
-
 		PltSizCondNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
 
 		// find the appropriate Plant Sizing object
@@ -1242,8 +1234,6 @@ namespace ChillerReformulatedEIR {
 		RegisterPlantCompDesignFlow( ElecReformEIRChiller( EIRChillNum ).CondInletNodeNum, tmpCondVolFlowRate );
 
 		if ( ElecReformEIRChiller( EIRChillNum ).HeatRecActive ) {
-			tmpHeatRecVolFlowRate = ElecReformEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
-
 			tmpHeatRecVolFlowRate = tmpCondVolFlowRate * ElecReformEIRChiller( EIRChillNum ).HeatRecCapacityFraction;
 			if ( ! ElecReformEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tmpHeatRecVolFlowRate = ElecReformEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
 			if ( PlantFirstSizesOkayToFinalize ) {

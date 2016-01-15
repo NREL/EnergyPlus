@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -172,7 +172,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CompResidual )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CompResidual )
 	{
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
@@ -223,7 +223,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualCool )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_FanSpdResidualCool )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method FanSpdResidualCool.
@@ -265,7 +265,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_FanSpdResidualHeat )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_FanSpdResidualHeat )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method FanSpdResidualHeat.
@@ -307,7 +307,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_ControlVRFIUCoil )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CalcVRFIUAirFlow )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method CalcVRFIUAirFlow, which analyzes the VRF Indoor Unit operations given zonal loads.
@@ -395,7 +395,7 @@ namespace EnergyPlus {
 		ZoneSysEnergyDemand.deallocate();
 	}
 
-	TEST( HVACVariableRefrigerantFlow, VRF_FluidTCtrl_CalcVRFIUTeTc )
+	TEST_F( EnergyPlusFixture, HVACVariableRefrigerantFlow_VRF_FluidTCtrl_CalcVRFIUTeTc )
 	{
 		// PURPOSE OF THIS TEST:
 		//   Test the method CalcVRFIUTeTc_FluidTCtrl, which determines the VRF evaporating temperature at
@@ -2657,5 +2657,3 @@ namespace EnergyPlus {
 	}
 
 }
-
-

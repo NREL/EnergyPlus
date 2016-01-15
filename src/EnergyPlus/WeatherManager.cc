@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -488,74 +488,12 @@ namespace WeatherManager {
 		DatesShouldBeReset = false;
 		StartDatesCycleShouldBeReset = false; // True when start dates on repeat should be reset
 		Jan1DatesShouldBeReset = false; // True if Jan 1 should signal reset of dates
-
-		TodayVariables.DayOfYear = 0 ;
-		TodayVariables.Year = 0 ;
-		TodayVariables.Month = 0 ;
-		TodayVariables.DayOfMonth = 0 ;
-		TodayVariables.DayOfWeek = 0 ;
-		TodayVariables.DaylightSavingIndex = 0 ;
-		TodayVariables.HolidayIndex = 0 ;
-		TodayVariables.SinSolarDeclinAngle = 0.0 ;
-		TodayVariables.CosSolarDeclinAngle = 0.0 ;
-		TodayVariables.EquationOfTime = 0.0 ;
-		TomorrowVariables.DayOfYear = 0 ;
-		TomorrowVariables.Year = 0 ;
-		TomorrowVariables.Month = 0 ;
-		TomorrowVariables.DayOfMonth = 0 ;
-		TomorrowVariables.DayOfWeek = 0 ;
-		TomorrowVariables.DaylightSavingIndex = 0 ;
-		TomorrowVariables.HolidayIndex = 0 ;
-		TomorrowVariables.SinSolarDeclinAngle = 0.0 ;
-		TomorrowVariables.CosSolarDeclinAngle = 0.0 ;
-		TomorrowVariables.EquationOfTime = 0.0 ;
-
+		TodayVariables = DayWeatherVariables();
+		TomorrowVariables = DayWeatherVariables();
 		DesignDay.deallocate();
-
-		Missing.DryBulb = 0.0 ;
-		Missing.DewPoint = 0.0 ;
-		Missing.RelHumid = 0 ;
-		Missing.StnPres = 0.0 ;
-		Missing.WindDir = 0 ;
-		Missing.WindSpd = 0.0 ;
-		Missing.TotSkyCvr = 0 ;
-		Missing.OpaqSkyCvr = 0 ;
-		Missing.Visibility = 0.0 ;
-		Missing.Ceiling = 0 ;
-		Missing.PrecipWater = 0 ;
-		Missing.AerOptDepth = 0.0 ;
-		Missing.SnowDepth = 0 ;
-		Missing.DaysLastSnow = 0 ;
-		Missing.Albedo = 0.0 ;
-		Missing.LiquidPrecip = 0.0 ;
-		Missed.DryBulb = 0 ;
-		Missed.DewPoint = 0 ;
-		Missed.RelHumid = 0 ;
-		Missed.StnPres = 0 ;
-		Missed.WindDir = 0 ;
-		Missed.WindSpd = 0 ;
-		Missed.DirectRad = 0 ;
-		Missed.DiffuseRad = 0 ;
-		Missed.TotSkyCvr = 0 ;
-		Missed.OpaqSkyCvr = 0 ;
-		Missed.Visibility = 0 ;
-		Missed.Ceiling = 0 ;
-		Missed.PrecipWater = 0 ;
-		Missed.AerOptDepth = 0 ;
-		Missed.SnowDepth = 0 ;
-		Missed.DaysLastSnow = 0 ;
-		Missed.WeathCodes = 0 ;
-		Missed.Albedo = 0 ;
-		Missed.LiquidPrecip = 0 ;
-		OutOfRange.DryBulb = 0 ;
-		OutOfRange.DewPoint = 0 ;
-		OutOfRange.RelHumid = 0 ;
-		OutOfRange.StnPres = 0 ;
-		OutOfRange.WindDir = 0 ;
-		OutOfRange.WindSpd = 0 ;
-		OutOfRange.DirectRad = 0 ;
-		OutOfRange.DiffuseRad = 0 ;
-
+		Missing = MissingData();
+		Missed = MissingDataCounts();
+		OutOfRange = RangeDataCounts();
 		DesDayInput.deallocate(); // Design day Input Data
 		Environment.deallocate(); // Environment data
 		RunPeriodInput.deallocate();
@@ -2701,39 +2639,6 @@ namespace WeatherManager {
 				LiquidPrecip( 24, 0.0 )
 			{}
 
-			// Member Constructor
-			HourlyWeatherData(
-				Array1_bool const & IsRain, // Rain indicator, true=rain
-				Array1_bool const & IsSnow, // Snow indicator, true=snow
-				Array1< Real64 > const & OutDryBulbTemp, // Hourly dry bulb temperature of outside air
-				Array1< Real64 > const & OutDewPointTemp, // Hourly Dew Point Temperature of outside air
-				Array1< Real64 > const & OutBaroPress, // Hourly barometric pressure of outside air
-				Array1< Real64 > const & OutRelHum, // Hourly relative humidity
-				Array1< Real64 > const & WindSpeed, // Hourly wind speed of outside air
-				Array1< Real64 > const & WindDir, // Hourly wind direction of outside air
-				Array1< Real64 > const & SkyTemp, // Hourly sky temperature
-				Array1< Real64 > const & HorizIRSky, // Hourly Horizontal Infrared Radiation Intensity
-				Array1< Real64 > const & BeamSolarRad, // Hourly direct normal solar irradiance
-				Array1< Real64 > const & DifSolarRad, // Hourly sky diffuse horizontal solar irradiance
-				Array1< Real64 > const & Albedo, // Albedo
-				Array1< Real64 > const & LiquidPrecip // Liquid Precipitation
-			) :
-				IsRain( 24, IsRain ),
-				IsSnow( 24, IsSnow ),
-				OutDryBulbTemp( 24, OutDryBulbTemp ),
-				OutDewPointTemp( 24, OutDewPointTemp ),
-				OutBaroPress( 24, OutBaroPress ),
-				OutRelHum( 24, OutRelHum ),
-				WindSpeed( 24, WindSpeed ),
-				WindDir( 24, WindDir ),
-				SkyTemp( 24, SkyTemp ),
-				HorizIRSky( 24, HorizIRSky ),
-				BeamSolarRad( 24, BeamSolarRad ),
-				DifSolarRad( 24, DifSolarRad ),
-				Albedo( 24, Albedo ),
-				LiquidPrecip( 24, LiquidPrecip )
-			{}
-
 		};
 
 		// Object Data
@@ -3084,7 +2989,6 @@ namespace WeatherManager {
 					if ( LiquidPrecip >= 999.0 ) {
 						LiquidPrecip = Missing.LiquidPrecip;
 						++Missed.LiquidPrecip;
-						LiquidPrecip = 0.0;
 					}
 
 					//        IF (DaysSinceLastSnow >= 99) THEN
@@ -3789,15 +3693,6 @@ Label902: ;
 			HourlyWeatherData() :
 				BeamSolarRad( 24, 0.0 ),
 				DifSolarRad( 24, 0.0 )
-			{}
-
-			// Member Constructor
-			HourlyWeatherData(
-				Array1< Real64 > const & BeamSolarRad, // Hourly direct normal solar irradiance
-				Array1< Real64 > const & DifSolarRad // Hourly sky diffuse horizontal solar irradiance
-			) :
-				BeamSolarRad( 24, BeamSolarRad ),
-				DifSolarRad( 24, DifSolarRad )
 			{}
 
 		};

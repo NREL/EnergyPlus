@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -65,23 +65,20 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <DataContaminantBalance.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace DataGlobals;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::Psychrometrics;
 using DataContaminantBalance::Contaminant;
 
 
-TEST( ZonePlenum, InitAirZoneReturnPlenumTest )
+TEST_F( EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest )
 {
-	ShowMessage( "Begin Test: ZonePlenum, InitAirZoneReturnPlenumTest" );
-
-	InitializePsychRoutines();
 	BeginEnvrnFlag = false;
 	Contaminant.CO2Simulation = true;
 	Contaminant.GenericContamSimulation = true;

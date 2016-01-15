@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -227,6 +227,60 @@ namespace PlantChillers {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumElectricChillers = 0;
+		CondMassFlowRate = 0.0;
+		EvapMassFlowRate = 0.0;
+		CondOutletTemp = 0.0;
+		CondOutletHumRat = 0.0;
+		EvapOutletTemp = 0.0;
+		Power = 0.0;
+		QEvaporator = 0.0;
+		QCondenser = 0.0;
+		Energy = 0.0;
+		EvaporatorEnergy = 0.0;
+		CondenserEnergy = 0.0;
+		QHeatRecovered = 0.0;
+		HeatRecOutletTemp = 0.0;
+		AvgCondSinkTemp = 0.0;
+		ChillerCyclingRatio = 0.0;
+		BasinHeaterPower = 0.0;
+		NumEngineDrivenChillers = 0;
+		HeatRecInletTemp = 0.0;
+		HeatRecMdotActual = 0.0;
+		HeatRecMdotDesign = 0.0;
+		QTotalHeatRecovered = 0.0;
+		QJacketRecovered = 0.0;
+		QLubeOilRecovered = 0.0;
+		QExhaustRecovered = 0.0;
+		FuelEnergyUseRate = 0.0;
+		TotalHeatEnergyRec = 0.0;
+		JacketEnergyRec = 0.0;
+		LubeOilEnergyRec = 0.0;
+		ExhaustEnergyRec = 0.0;
+		FuelEnergy = 0.0;
+		FuelMdot = 0.0;
+		ExhaustStackTemp = 0.0;
+		NumGTChillers = 0;
+		NumConstCOPChillers = 0;
+		EvapInletTemp = 0.0;
+		CondInletTemp = 0.0;
+		GetEngineDrivenInput = true;
+		GetElectricInput = true;
+		GetGasTurbineInput = true;
+		GetConstCOPInput = true;
+		ElectricChiller.deallocate();
+		ElectricChillerReport.deallocate();
+		EngineDrivenChiller.deallocate();
+		EngineDrivenChillerReport.deallocate();
+		GTChiller.deallocate();
+		GTChillerReport.deallocate();
+		ConstCOPChiller.deallocate();
+		ConstCOPChillerReport.deallocate();
+	}
 
 	void
 	SimChiller(
@@ -3058,33 +3112,25 @@ namespace PlantChillers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  INTEGER             :: PltSizIndex   ! Plant Sizing Do loop index
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		int PltSizCondNum; // Plant Sizing index for condenser loop
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
+		bool ErrorsFound( false ); // If errors detected in input
 		std::string equipName;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		Real64 tmpNomCap; // local nominal capacity cooling power
 		Real64 tmpEvapVolFlowRate; // local evaporator design volume flow rate
 		Real64 tmpCondVolFlowRate; // local condenser design volume flow rate
-		Real64 tmpHeatRecVolFlowRate; // local heat recovery design volume flow rate
-		Real64 EvapVolFlowRateUser; // Hardsized evaporator flow rate for reporting
-		Real64 NomCapUser; // Hardsized reference capacity for reporting
-		Real64 CondVolFlowRateUser; // Hardsized condenser flow rate for reporting
-		Real64 DesignHeatRecVolFlowRateUser; // Hardsized heat recovery flow rate for reporting
+		Real64 tmpHeatRecVolFlowRate( 0.0 ); // local heat recovery design volume flow rate
+		Real64 EvapVolFlowRateUser( 0.0 ); // Hardsized evaporator flow rate for reporting
+		Real64 NomCapUser( 0.0 ); // Hardsized reference capacity for reporting
+		Real64 CondVolFlowRateUser( 0.0 ); // Hardsized condenser flow rate for reporting
+		Real64 DesignHeatRecVolFlowRateUser( 0.0 ); // Hardsized heat recovery flow rate for reporting
 
-		PltSizNum = 0;
-		PltSizCondNum = 0;
-		ErrorsFound = false;
 		// init local temporary version in case of partial/mixed autosizing
 		tmpEvapVolFlowRate = ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
 		tmpNomCap = ElectricChiller( ChillNum ).Base.NomCap;
 		tmpCondVolFlowRate = ElectricChiller( ChillNum ).Base.CondVolFlowRate;
-		tmpHeatRecVolFlowRate = 0.0;
-		EvapVolFlowRateUser = 0.0;
-		NomCapUser = 0.0;
-		CondVolFlowRateUser = 0.0;
-		DesignHeatRecVolFlowRateUser = 0.0;
 
 		if ( ElectricChiller( ChillNum ).Base.CondenserType == WaterCooled ) {
 			PltSizCondNum = PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).PlantSizNum;
@@ -3261,8 +3307,6 @@ namespace PlantChillers {
 		}
 
 		if ( ElectricChiller( ChillNum ).HeatRecActive ) {
-			tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
-
 			tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).Base.CondVolFlowRate * ElectricChiller( ChillNum ).HeatRecCapacityFraction;
 			if ( ! ElectricChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
 			if ( PlantFirstSizesOkayToFinalize ) {

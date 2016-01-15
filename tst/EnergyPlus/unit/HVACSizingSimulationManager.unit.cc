@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -62,6 +62,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
@@ -83,13 +84,12 @@ using namespace DataLoopNode;
 using namespace OutputProcessor;
 using namespace DataHVACGlobals;
 
-class HVACSizingSimulationManagerTest : public :: testing::Test
+class HVACSizingSimulationManagerTest : public EnergyPlusFixture
 {
-public:
+protected:
+	virtual void SetUp() {
+		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
 
-	// constructor for test fixture class
-	HVACSizingSimulationManagerTest()
-	{
 		// setup weather manager state needed
 		NumOfEnvrn = 2;
 		Environment.allocate( NumOfEnvrn );
@@ -146,31 +146,15 @@ public:
 		TimeValue( 1 ).CurMinute = 0; // init
 		TimeValue( 2 ).TimeStep >>= TimeStepSys;
 		TimeValue( 2 ).CurMinute = 0;
-
-		int write_stat;
-		// Open the Initialization Output File (lifted from SimulationManager.cc)
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 	}
 
-	//destructor
-	~HVACSizingSimulationManagerTest()
-	{
-		TotNumLoops = 0;
-		PlantLoop( 1 ).LoopSide.deallocate();
-		PlantLoop.deallocate();
-		PlantReport.deallocate();
-		TimeValue.deallocate();
-		Environment.deallocate();
-		Node.deallocate();
-			// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+	virtual void TearDown() {
+		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 	}
 };
 
 TEST_F( HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 {
-	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, WeatherFileDaysTest3" );
 
 // this test emulates two design days and two sizing weather file days periods
 // calls code related to coincident plant sizing with HVAC sizing simulation
@@ -383,8 +367,6 @@ TEST_F( HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 
 TEST_F( HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 {
-	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, TopDownTestSysTimestep3" );
-
 // this test emulates two design days and calls nearly all the OO code related
 // to coincident plant sizing with HVAC sizing simulation
 // this test runs 3 system timesteps for each zone timestep
@@ -513,8 +495,6 @@ TEST_F( HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 
 TEST_F( HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 {
-	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, TopDownTestSysTimestep1" );
-
 // this test emulates two design days and calls nearly all the OO code related
 // to coincident plant sizing with HVAC sizing simulation
 // this test runs 1 system timestep for each zone timestep
@@ -599,8 +579,6 @@ TEST_F( HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 
 TEST_F( HVACSizingSimulationManagerTest, VarySysTimesteps )
 {
-	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, VarySysTimesteps" );
-
 // this test emulates two design days and calls nearly all the OO code related
 // to coincident plant sizing with HVAC sizing simulation
 // this test run varies the system timestep some to test irregular

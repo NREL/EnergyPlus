@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -154,7 +154,7 @@ namespace ThermalComfort {
 
 	namespace {
 		// clear_state variables
-		static bool FirstTimeFlag( true ); // Flag set to make sure you get input once
+		bool FirstTimeFlag( true ); // Flag set to make sure you get input once
 	}
 
 	// Data
@@ -276,6 +276,94 @@ namespace ThermalComfort {
 	clear_state()
 	{
 		FirstTimeFlag = true;
+		AbsAirTemp = 0.0;
+		AbsCloSurfTemp = 0.0;
+		AbsRadTemp = 0.0;
+		AcclPattern = 0.0;
+		ActLevel = 0.0;
+		AirVel = 0.0;
+		AirTemp = 0.0;
+		CloBodyRat = 0.0;
+		CloInsul = 0.0;
+		CloPermeatEff = 0.0;
+		CloSurfTemp = 0.0;
+		CloThermEff = 0.0;
+		CloUnit = 0.0;
+		ConvHeatLoss = 0.0;
+		CoreTempChange = 0.0;
+		CoreTemp = 0.0;
+		CoreTempNeut = 0.0;
+		CoreThermCap = 0.0;
+		DryHeatLoss = 0.0;
+		DryRespHeatLoss = 0.0;
+		EvapHeatLoss = 0.0;
+		EvapHeatLossDiff = 0.0;
+		EvapHeatLossMax = 0.0;
+		EvapHeatLossRegComf = 0.0;
+		EvapHeatLossRegSweat = 0.0;
+		EvapHeatLossSweat = 0.0;
+		EvapHeatLossSweatPrev = 0.0;
+		H = 0.0;
+		Hc = 0.0;
+		HcFor = 0.0;
+		HcNat = 0.0;
+		HeatFlow = 0.0;
+		Hr = 0.0;
+		IntHeatProd = 0.0;
+		IterNum = 0;
+		LatRespHeatLoss = 0.0;
+		MaxZoneNum = 0;
+		MRTCalcType = 0;
+		OpTemp = 0.0;
+		PeopleNum = 0;
+		RadHeatLoss = 0.0;
+		RadTemp = 0.0;
+		RelHum = 0.0;
+		RespHeatLoss = 0.0;
+		SatSkinVapPress = 0.0;
+		ShivResponse = 0.0;
+		SkinComfTemp = 0.0;
+		SkinComfVPress = 0.0;
+		SkinTemp = 0.0;
+		SkinTempChange = 0.0;
+		SkinTempNeut = 0.0;
+		SkinThermCap = 0.0;
+		SkinWetDiff = 0.0;
+		SkinWetSweat = 0.0;
+		SkinWetTot = 0.0;
+		SkinVapPress = 0.0;
+		SurfaceTemp = 0.0;
+		ThermCndct = 0.0;
+		ThermSensTransCoef = 0.0;
+		Time = 0.0;
+		TimeChange = 0.0;
+		VapPress = 0.0;
+		VasoconstrictFac = 0.0;
+		VasodilationFac = 0.0;
+		WorkEff = 0.0;
+		ZoneNum = 0;
+		TemporarySixAMTemperature = 0.0;
+		AnyZoneTimeNotSimpleASH55Summer = 0.0;
+		AnyZoneTimeNotSimpleASH55Winter = 0.0;
+		AnyZoneTimeNotSimpleASH55Either = 0.0;
+		AnyZoneNotMetHeating = 0.0;
+		AnyZoneNotMetCooling = 0.0;
+		AnyZoneNotMetHeatingOccupied = 0.0;
+		AnyZoneNotMetCoolingOccupied = 0.0;
+		AnyZoneNotMetOccupied = 0.0;
+		TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;
+		TotalAnyZoneTimeNotSimpleASH55Winter = 0.0;
+		TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
+		TotalAnyZoneNotMetHeating = 0.0;
+		TotalAnyZoneNotMetCooling = 0.0;
+		TotalAnyZoneNotMetHeatingOccupied = 0.0;
+		TotalAnyZoneNotMetCoolingOccupied = 0.0;
+		TotalAnyZoneNotMetOccupied = 0.0;
+		ZoneOccHrs.deallocate();
+		ThermalComfortInASH55.deallocate();
+		ThermalComfortSetPoint.deallocate();
+		ThermalComfortData.deallocate();
+		AngleFactorList.deallocate();
 	}
 
 	void
@@ -2529,7 +2617,6 @@ namespace ThermalComfort {
 		std::string lineIn;
 		std::string lineAvg;
 		std::string epwLine;
-		std::string ioerrmsg;
 		static Real64 avgDryBulbASH( 0.0 );
 		Real64 dryBulb;
 		static Real64 runningAverageASH( 0.0 );

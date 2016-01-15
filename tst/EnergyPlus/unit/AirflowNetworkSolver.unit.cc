@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -67,15 +67,15 @@
 #include <AirflowNetworkSolver.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace DataAirflowNetwork;
 using namespace AirflowNetworkSolver;
 
-TEST( AirflowNetworkSolverTest, HorizontalOpening )
+TEST_F( EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening )
 {
-
-	ShowMessage( "Begin Test: AirflowNetworkSolverTest, HorizontalOpening" );
 
 	int i = 1;
 	int j = 1;

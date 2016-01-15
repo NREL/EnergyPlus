@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -853,10 +853,10 @@ namespace ChillerAbsorption {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizIndex; // Plant Sizing Do loop index
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		int PltSizCondNum; // Plant Sizing index for condenser loop
-		int PltSizSteamNum; // Plant Sizing index for steam heating loop
-		int PltSizHeatingNum; // Plant Sizing index for how water heating loop
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
+		int PltSizSteamNum( 0 ); // Plant Sizing index for steam heating loop
+		int PltSizHeatingNum( 0 ); // Plant Sizing index for how water heating loop
 		Real64 SteamInputRatNom; // nominal energy input ratio (steam or hot water)
 		Real64 SteamDensity; // density of generator steam (when connected to a steam loop)
 		Real64 EnthSteamOutDry; // dry enthalpy of steam (quality = 1)
@@ -866,7 +866,7 @@ namespace ChillerAbsorption {
 		Real64 CpWater; // specific heat of generator fluid (when connected to a hot water loop)
 		Real64 RhoWater; // density of water
 		Real64 GeneratorOutletTemp; // outlet temperature of generator
-		bool ErrorsFound; // If errors detected in input
+		bool ErrorsFound( false ); // If errors detected in input
 		bool LoopErrorsFound;
 		std::string equipName;
 		Real64 rho; // local fluid density
@@ -878,17 +878,12 @@ namespace ChillerAbsorption {
 		Real64 tmpGeneratorVolFlowRate; // local generator design volume flow rate
 		static int DummWaterIndex( 1 );
 
-		Real64 NomCapUser; // Hardsized nominal capacity for reporting
-		Real64 NomPumpPowerUser; // Hardsized nominal pump power for reporting
-		Real64 EvapVolFlowRateUser; // Hardsized evaporator volume flow rate for reporting
-		Real64 CondVolFlowRateUser; // Hardsized condenser flow rate for reporting
-		Real64 GeneratorVolFlowRateUser; // Hardsized generator flow rate for reporting
+		Real64 NomCapUser( 0.0 ); // Hardsized nominal capacity for reporting
+		Real64 NomPumpPowerUser( 0.0 ); // Hardsized nominal pump power for reporting
+		Real64 EvapVolFlowRateUser( 0.0 ); // Hardsized evaporator volume flow rate for reporting
+		Real64 CondVolFlowRateUser( 0.0 ); // Hardsized condenser flow rate for reporting
+		Real64 GeneratorVolFlowRateUser( 0.0 ); // Hardsized generator flow rate for reporting
 
-		PltSizNum = 0;
-		PltSizCondNum = 0;
-		PltSizHeatingNum = 0;
-		PltSizSteamNum = 0;
-		ErrorsFound = false;
 		SteamInputRatNom = BLASTAbsorber( ChillNum ).SteamLoadCoef( 1 ) + BLASTAbsorber( ChillNum ).SteamLoadCoef( 2 ) + BLASTAbsorber( ChillNum ).SteamLoadCoef( 3 );
 		// init local temporary version in case of partial/mixed autosizing
 		tmpNomCap = BLASTAbsorber( ChillNum ).NomCap;
@@ -896,12 +891,6 @@ namespace ChillerAbsorption {
 		tmpEvapVolFlowRate = BLASTAbsorber( ChillNum ).EvapVolFlowRate;
 		tmpCondVolFlowRate = BLASTAbsorber( ChillNum ).CondVolFlowRate;
 		tmpGeneratorVolFlowRate = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
-
-		NomCapUser = 0.0;
-		NomPumpPowerUser = 0.0;
-		EvapVolFlowRateUser = 0.0;
-		CondVolFlowRateUser = 0.0;
-		GeneratorVolFlowRateUser = 0.0;
 
 		// find the appropriate Plant Sizing object
 		PltSizNum = PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).PlantSizNum;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -159,37 +159,6 @@ namespace DataErrorTracking {
 			ReportMax( false ),
 			ReportMin( false ),
 			ReportSum( false )
-		{}
-
-		// Member Constructor
-		RecurringErrorData(
-			std::string const & Message, // Message to be written to "error file" at end of simulation
-			int const Count, // Count of total times this recurring error message has been called
-			int const WarmupCount, // Count of times this recurring error message has been called during warmup
-			int const SizingCount, // Count of times this recurring error message has been called during sizing
-			Real64 const MaxValue, // Max of the values passed for this recurring error message
-			Real64 const MinValue, // Min of the values passed for this recurring error message
-			Real64 const SumValue, // Sum of the values passed for this recurring error message
-			std::string const & MaxUnits, // units for Max values
-			std::string const & MinUnits, // units for Min values
-			std::string const & SumUnits, // units for Sum values
-			bool const ReportMax, // Flag to report max value
-			bool const ReportMin, // Flag to report min value
-			bool const ReportSum // Flag to report sum value
-		) :
-			Message( Message ),
-			Count( Count ),
-			WarmupCount( WarmupCount ),
-			SizingCount( SizingCount ),
-			MaxValue( MaxValue ),
-			MinValue( MinValue ),
-			SumValue( SumValue ),
-			MaxUnits( MaxUnits ),
-			MinUnits( MinUnits ),
-			SumUnits( SumUnits ),
-			ReportMax( ReportMax ),
-			ReportMin( ReportMin ),
-			ReportSum( ReportSum )
 		{}
 
 	};

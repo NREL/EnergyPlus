@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -108,21 +108,6 @@ namespace DataSurfaceLists {
 			NumOfSurfaces( 0 )
 		{}
 
-		// Member Constructor
-		SurfaceListData(
-			std::string const & Name, // Name of the surface list
-			int const NumOfSurfaces, // Number of surfaces in the list
-			Array1_string const & SurfName, // Surfaces named in the list
-			Array1_int const & SurfPtr, // Location of surfaces in Surface derived type
-			Array1< Real64 > const & SurfFlowFrac // Fraction of mass flow/length for a surface
-		) :
-			Name( Name ),
-			NumOfSurfaces( NumOfSurfaces ),
-			SurfName( SurfName ),
-			SurfPtr( SurfPtr ),
-			SurfFlowFrac( SurfFlowFrac )
-		{}
-
 	};
 
 	struct SlabListData
@@ -145,33 +130,6 @@ namespace DataSurfaceLists {
 			NumOfSurfaces( 0 )
 		{}
 
-		// Member Constructor
-		SlabListData(
-			std::string const & Name, // Name of the surface list
-			int const NumOfSurfaces, // Number of surfaces in the list
-			Array1_string const & SurfName, // Surfaces named in the list
-			Array1_int const & SurfPtr, // Location of surfaces in Surface derived type
-			Array1_string const & ZoneName, // Zone named in the list
-			Array1_int const & ZonePtr, // Location of Zone in Surface derived type
-			Array1< Real64 > const & CoreDiameter, // Fraction of mass flow/length for a surface
-			Array1< Real64 > const & CoreLength, // Fraction of mass flow/length for a surface
-			Array1< Real64 > const & CoreNumbers, // Fraction of mass flow/length for a surface
-			Array1_string const & SlabInNodeName, // Zone named in the list
-			Array1_string const & SlabOutNodeName // Zone named in the list
-		) :
-			Name( Name ),
-			NumOfSurfaces( NumOfSurfaces ),
-			SurfName( SurfName ),
-			SurfPtr( SurfPtr ),
-			ZoneName( ZoneName ),
-			ZonePtr( ZonePtr ),
-			CoreDiameter( CoreDiameter ),
-			CoreLength( CoreLength ),
-			CoreNumbers( CoreNumbers ),
-			SlabInNodeName( SlabInNodeName ),
-			SlabOutNodeName( SlabOutNodeName )
-		{}
-
 	};
 
 	// Object Data
@@ -179,6 +137,9 @@ namespace DataSurfaceLists {
 	extern Array1D< SlabListData > SlabList;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	GetSurfaceListsInputs();

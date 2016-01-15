@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -113,19 +113,6 @@ namespace NodeInputManager {
 		// Default Constructor
 		NodeListDef() :
 			NumOfNodesInList( 0 )
-		{}
-
-		// Member Constructor
-		NodeListDef(
-			std::string const & Name, // Name of this Node List
-			int const NumOfNodesInList, // Number of Nodes in this Node List
-			Array1_string const & NodeNames, // List of Names in this Node List
-			Array1_int const & NodeNumbers // Number of each Node (ref NodeNames) in this Node List
-		) :
-			Name( Name ),
-			NumOfNodesInList( NumOfNodesInList ),
-			NodeNames( NodeNames ),
-			NodeNumbers( NodeNumbers )
 		{}
 
 	};

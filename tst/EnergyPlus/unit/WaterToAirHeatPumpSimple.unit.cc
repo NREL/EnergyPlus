@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -61,6 +61,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 // EnergyPlus Headers
 #include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -79,14 +81,12 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::WaterToAirHeatPumpSimple;
 using General::RoundSigDigits;
 
-TEST( WaterToAirHeatPumpSimpleTest, SizeHVACWaterToAir )
+TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir )
 {
 	// This unit test is intended to check if supply air Humidity ratio used in the cooling sizing calculation is 
 	// reset to the minimum of entering mixed air humidity ratio and the user specified supply air design Humidity  
 	// ratio such that the total cooling capacity is always greater than or equal to the sensible cooling capacity.
 	// This test was added to test bug issue #4893 fix, a defect that resulted in SHR greater than 1.0.
-
-	ShowMessage( "Begin Test: WaterToAirHeatPumpSimpleTest, SizeHVACWaterToAir" );
 
 	int HPNum( 1 );
 
@@ -138,7 +138,6 @@ TEST( WaterToAirHeatPumpSimpleTest, SizeHVACWaterToAir )
 	StdBaroPress = 101325.0;
 	ZoneEqDXCoil = true;
 
-	InitializePsychRoutines();
 	WaterToAirHeatPumpSimple::SizeHVACWaterToAir( HPNum );
 
 	// check that the design oulet air humidity ratio did not change

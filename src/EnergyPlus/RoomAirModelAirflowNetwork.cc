@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -153,7 +153,24 @@ namespace RoomAirModelAirflowNetwork {
 	// Object Data
 	Array1D< RAFNData > RAFN;
 
+	namespace {
+		bool InitRoomAirModelAirflowNetworkOneTimeFlag( true );
+		bool InitRoomAirModelAirflowNetworkOneTimeFlagConf( true );
+		bool InitRoomAirModelAirflowNetworkEnvrnFlag( true );
+		bool LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag( true );
+	}
+
 	// Functions
+
+	void
+	clear_state()
+	{
+		InitRoomAirModelAirflowNetworkOneTimeFlag = true;
+		InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
+		InitRoomAirModelAirflowNetworkEnvrnFlag = true;
+		LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = true;
+		RAFN.deallocate();
+	}
 
 	void
 	SimRoomAirModelAirflowNetwork( int const ZoneNum ) // index number for the specified zone
@@ -231,13 +248,15 @@ namespace RoomAirModelAirflowNetwork {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool OneTimeFlag( true );  // one time setup flag
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool OneTimeFlag( true );  // one time setup flag // LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag
+		////////////////////////////////////////////////////////////////////////////////////
 		int RAFNNum;
 
 		// FLOW:
-		if ( OneTimeFlag ) {
+		if ( LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag ) {
 			RAFN.allocate( NumOfRoomAirflowNetControl );
-			OneTimeFlag = false;
+			LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = false;
 		}
 
 		RAFNNum = RoomAirflowNetworkZoneInfo( ZoneNum ).RAFNNum;
@@ -296,9 +315,11 @@ namespace RoomAirModelAirflowNetwork {
 		using General::RoundSigDigits;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );  // one time setup flag
-		static bool MyOneTimeFlagConf( true ); // one time setup flag for zone configuration
-		static bool MyEnvrnFlag( true ); // one time setup flag for zone configuration
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeFlag( true );  // one time setup flag // InitRoomAirModelAirflowNetworkOneTimeFlag
+		// static bool MyOneTimeFlagConf( true ); // one time setup flag for zone configuration // InitRoomAirModelAirflowNetworkOneTimeFlagConf
+		// static bool MyEnvrnFlag( true ); // one time setup flag for zone configuration // InitRoomAirModelAirflowNetworkEnvrnFlag
+		////////////////////////////////////////////////////////////////////////////////////
 		Real64 SumLinkMCp;
 		Real64 SumLinkMCpT;
 		int linkNum;
@@ -327,7 +348,7 @@ namespace RoomAirModelAirflowNetwork {
 		Array1D< Real64 > SupplyFrac;
 		Array1D< Real64 > ReturnFrac;
 
-		if ( MyOneTimeFlag ) {  // then do one - time setup inits
+		if ( InitRoomAirModelAirflowNetworkOneTimeFlag ) {  // then do one - time setup inits
 
 			// loop over all zones with RoomAirflowNetwork model
 			for ( LoopZone = 1; LoopZone <= NumOfZones; ++LoopZone ) {
@@ -343,10 +364,10 @@ namespace RoomAirModelAirflowNetwork {
 					SetupOutputVariable( "RoomAirflowNetwork Node SumIntLatentGain [W]", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).SumIntLatentGain, "HVAC", "Average", RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).Name );
 				}
 			}
-			MyOneTimeFlag = false;
+			InitRoomAirModelAirflowNetworkOneTimeFlag = false;
 		}
 
-		if ( MyOneTimeFlagConf ) { //then do one - time setup inits
+		if ( InitRoomAirModelAirflowNetworkOneTimeFlagConf ) { //then do one - time setup inits
 			if ( allocated( ZoneEquipConfig ) && allocated( ZoneEquipList ) ) {
 				MaxNodeNum = 0;
 				MaxEquipNum = 0;
@@ -473,15 +494,15 @@ namespace RoomAirModelAirflowNetwork {
 					}
 
 				}
-				MyOneTimeFlagConf = false;
-				if ( allocated( NodeFound ) ) NodeFound.deallocate();
+				InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
+				if ( allocated( NodeFound ) ) NodeFound.deallocate( );
 				if ( ErrorsFound ) {
 					ShowFatalError( "GetRoomAirflowNetworkData: Errors found getting air model input.  Program terminates." );
 				}
 			}
-		} //End of MyOneTimeFlagConf
+		} //End of InitRoomAirModelAirflowNetworkOneTimeFlagConf
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
+		if ( BeginEnvrnFlag && InitRoomAirModelAirflowNetworkEnvrnFlag ) {
 			for ( LoopZone = 1; LoopZone <= NumOfZones; ++LoopZone ) {
 				if ( !RoomAirflowNetworkZoneInfo( LoopZone ).IsUsed ) continue;
 				for ( LoopAirNode = 1; LoopAirNode <= RoomAirflowNetworkZoneInfo( LoopZone ).NumOfAirNodes; ++LoopAirNode ) {  // loop over all the modeled room air nodes
@@ -515,10 +536,10 @@ namespace RoomAirModelAirflowNetwork {
 					RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).SysDepZoneLoadsLaggedOld = 0.0;
 				}
 			}
-			MyEnvrnFlag = false;
+			InitRoomAirModelAirflowNetworkEnvrnFlag = false;
 		}
 		if ( !BeginEnvrnFlag ) {
-			MyEnvrnFlag = true;
+			InitRoomAirModelAirflowNetworkEnvrnFlag = true;
 		}
 
 		// reuse code in ZoneTempPredictorCorrector for sensible components.

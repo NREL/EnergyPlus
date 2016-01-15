@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -179,6 +179,13 @@ namespace WindowEquivalentLayer {
 	// MODULE SUBROUTINES:
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		CFSDiffAbsTrans.deallocate();
+		EQLDiffPropFlag.deallocate();
+	}
 
 	void
 	InitEquivalentLayerWindowCalculations()
@@ -4994,7 +5001,7 @@ namespace WindowEquivalentLayer {
 		int IB; // Counter begin and end limits
 		int IE;
 		int IDV; // Integer dummy variable, general utility
-		int IM_ON; // Turns on calculation of Indices of Merit if IM_ON=1
+		int IM_ON( 1 ); // Turns on calculation of Indices of Merit if IM_ON=1
 		Array1D< Real64 > QOCF_F( FS.NL ); // heat flux to outdoor-facing surface of layer i, from gap i-1,
 		//   due to open channel flow, W/m2
 		Array1D< Real64 > QOCF_B( FS.NL ); // heat flux to indoor-facing surface of layer i, from gap i,
@@ -5051,8 +5058,6 @@ namespace WindowEquivalentLayer {
 		if ( NL < 1 ) return ASHWAT_Thermal;
 
 		HCOCFout = HCOUT; // outdoor side
-
-		IM_ON = 1;
 
 		HHAT = 0.0;
 		HC = 0.0;

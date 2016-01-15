@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -62,6 +62,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -75,40 +76,15 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::Fans;
 
-class FansTest : public testing::Test
+TEST_F( EnergyPlusFixture, Fans_FanSizing )
 {
-
-public:
-
-	FansTest() // Setup global state
-	{
-		CurZoneEqNum = 0;
-		CurSysNum = 0;
-		CurOASysNum = 0;
-		NumFans = 1;
-		Fan.allocate( NumFans );
-		FanNumericFields.allocate( NumFans );
-		FanNumericFields( NumFans ).FieldNames.allocate( 3 );
-	}
-
-	~FansTest() // Reset global state
-	{
-		NumFans = 0;
-		Fan.clear();
-		FanNumericFields.clear();
-	}
-
-};
-
-TEST_F( FansTest, FanSizing )
-{
-
-	ShowMessage( "Begin Test: FansTest, FanSizing" );
-
-	int write_stat;
-	// Open the Initialization Output File (lifted from SimulationManager.cc)
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+	CurZoneEqNum = 0;
+	CurSysNum = 0;
+	CurOASysNum = 0;
+	NumFans = 1;
+	Fan.allocate( NumFans );
+	FanNumericFields.allocate( NumFans );
+	FanNumericFields( NumFans ).FieldNames.allocate( 3 );
 
 	int FanNum = 1;
 	Fan( FanNum ).FanName = "Test Fan";
@@ -128,8 +104,4 @@ TEST_F( FansTest, FanSizing )
 	SizeFan( FanNum );
 	EXPECT_DOUBLE_EQ( 1.00635, Fan( FanNum ).MaxAirFlowRate );
 	DataNonZoneNonAirloopValue = 0.0;
-
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-
 }

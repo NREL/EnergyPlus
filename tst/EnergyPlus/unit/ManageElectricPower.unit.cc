@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -67,15 +67,16 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::ManageElectricPower;
 using namespace EnergyPlus::CurveManager;
 using namespace ObjexxFCL;
 using namespace DataGlobals;
 
-TEST( ManageElectricPowerTest, BatteryDischargeTest )
+TEST_F( EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest )
 {
-	ShowMessage( "Begin Test: ManageElectricPowerTest, BatteryDischargeTest" );
 
 	NumCurves = 1;
 	PerfCurve.allocate( NumCurves );
@@ -110,7 +111,7 @@ TEST( ManageElectricPowerTest, BatteryDischargeTest )
 	PerfCurve.deallocate();
 }
 
-TEST( ManageElectricPowerTest, UpdateLoadCenterRecords )
+TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords )
 {
 	ShowMessage( "Begin Test: ManageElectricPowerTest, UpdateLoadCenterRecords" );
 

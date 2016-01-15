@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -192,87 +192,6 @@ namespace HeatPumpWaterToWaterCOOLING {
 			CondMassFlowIndex( 0 ) 
 		{}
 
-		// Member Constructor
-		GshpSpecs(
-			std::string const & Name, // user identifier
-			int const WWHPPlantTypeOfNum,
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // simulate the machine at it's operating part load ratio
-			Real64 const COP, // Coefficeint of Performance of the machine
-			Real64 const NomCap, // Nomial Capcity of the HeatPump
-			Real64 const MinPartLoadRat, // Minimum operating Part Load Ratio
-			Real64 const MaxPartLoadRat, // Maximum operating Part Load Ratio
-			Real64 const OptPartLoadRat, // Optimal operating Part Load Ratio
-			Real64 const LoadSideVolFlowRate, // Design Flow Rate on the Load side
-			Real64 const LoadSideDesignMassFlow, // Design flow rate (kg/s)
-			Real64 const SourceSideVolFlowRate, // Design Flow Rate on th Source Side
-			Real64 const SourceSideDesignMassFlow, // Design flow rate (kg/s)
-			int const SourceSideInletNodeNum, // Node number on the inlet side of the plant
-			int const SourceSideOutletNodeNum, // Node number on the outlet side of the plant
-			int const LoadSideInletNodeNum, // Node number on the inlet side of the Load Side
-			int const LoadSideOutletNodeNum, // Node number on the outlet side of the Load Side
-			Real64 const SourceSideUACoeff, // Source Side heat transfer coeff
-			Real64 const LoadSideUACoeff, // Load Side heat transfer coeff
-			Real64 const CompPistonDisp, // compressor piston displacement
-			Real64 const CompClearanceFactor, // compressor clearance factor
-			Real64 const CompSucPressDrop, // deltap ,  compressor suction and discharge pressure drop
-			Real64 const SuperheatTemp, // deltatsh , super heating
-			Real64 const PowerLosses, // constant part of electro mechanical power losses
-			Real64 const LossFactor, // loss factor used ot define the electro mechanical loss
-			Real64 const HighPressCutoff, // Maximum Design Pressure on the Load Side
-			Real64 const LowPressCutoff, // Minimum Design Pressure on the Source Side
-			bool const IsOn,
-			bool const MustRun,
-			int const SourceLoopNum, // source side plant loop index number
-			int const SourceLoopSideNum, // source side plant loop side index
-			int const SourceBranchNum, // source side plant loop branch index
-			int const SourceCompNum, // source side plant loop component index
-			int const LoadLoopNum, // load side plant loop index number
-			int const LoadLoopSideNum, // load side plant loop side index
-			int const LoadBranchNum, // load side plant loop branch index
-			int const LoadCompNum , // load side plant loop component index
-			int const CondMassFlowIndex
-		) :
-			Name( Name ),
-			WWHPPlantTypeOfNum( WWHPPlantTypeOfNum ),
-			Available( Available ),
-			ON( ON ),
-			COP( COP ),
-			NomCap( NomCap ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			LoadSideVolFlowRate( LoadSideVolFlowRate ),
-			LoadSideDesignMassFlow( LoadSideDesignMassFlow ),
-			SourceSideVolFlowRate( SourceSideVolFlowRate ),
-			SourceSideDesignMassFlow( SourceSideDesignMassFlow ),
-			SourceSideInletNodeNum( SourceSideInletNodeNum ),
-			SourceSideOutletNodeNum( SourceSideOutletNodeNum ),
-			LoadSideInletNodeNum( LoadSideInletNodeNum ),
-			LoadSideOutletNodeNum( LoadSideOutletNodeNum ),
-			SourceSideUACoeff( SourceSideUACoeff ),
-			LoadSideUACoeff( LoadSideUACoeff ),
-			CompPistonDisp( CompPistonDisp ),
-			CompClearanceFactor( CompClearanceFactor ),
-			CompSucPressDrop( CompSucPressDrop ),
-			SuperheatTemp( SuperheatTemp ),
-			PowerLosses( PowerLosses ),
-			LossFactor( LossFactor ),
-			HighPressCutoff( HighPressCutoff ),
-			LowPressCutoff( LowPressCutoff ),
-			IsOn( IsOn ),
-			MustRun( MustRun ),
-			SourceLoopNum( SourceLoopNum ),
-			SourceLoopSideNum( SourceLoopSideNum ),
-			SourceBranchNum( SourceBranchNum ),
-			SourceCompNum( SourceCompNum ),
-			LoadLoopNum( LoadLoopNum ),
-			LoadLoopSideNum( LoadLoopSideNum ),
-			LoadBranchNum( LoadBranchNum ),
-			LoadCompNum( LoadCompNum ),
-			CondMassFlowIndex( CondMassFlowIndex )
-		{}
-
 	};
 
 	struct ReportVars
@@ -307,37 +226,6 @@ namespace HeatPumpWaterToWaterCOOLING {
 			LoadSidemdot( 0.0 ),
 			SourceSidemdot( 0.0 ),
 			Running( 0 )
-		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const Power, // Power Consumption Watts
-			Real64 const Energy, // Energy Consumption Joules
-			Real64 const QLoad, // Load Side heat transfer rate Watts
-			Real64 const QLoadEnergy, // Load Side heat transfer Joules
-			Real64 const QSource, // Source Side heat transfer rate Watts
-			Real64 const QSourceEnergy, // Source Side heat transfer Joules
-			Real64 const LoadSideWaterInletTemp, // Load Side outlet temperature °C
-			Real64 const SourceSideWaterInletTemp, // Source Side outlet temperature °C
-			Real64 const LoadSideWaterOutletTemp, // Load Side outlet temperature °C
-			Real64 const SourceSideWaterOutletTemp, // Source Side outlet temperature °C
-			Real64 const LoadSidemdot, // Mass flow rate of the cooling water in Load Side kg/s
-			Real64 const SourceSidemdot, // Mass flow rate of chilled water in Eavporator kg/s
-			int const Running // On reporting Flag
-		) :
-			Power( Power ),
-			Energy( Energy ),
-			QLoad( QLoad ),
-			QLoadEnergy( QLoadEnergy ),
-			QSource( QSource ),
-			QSourceEnergy( QSourceEnergy ),
-			LoadSideWaterInletTemp( LoadSideWaterInletTemp ),
-			SourceSideWaterInletTemp( SourceSideWaterInletTemp ),
-			LoadSideWaterOutletTemp( LoadSideWaterOutletTemp ),
-			SourceSideWaterOutletTemp( SourceSideWaterOutletTemp ),
-			LoadSidemdot( LoadSidemdot ),
-			SourceSidemdot( SourceSidemdot ),
-			Running( Running )
 		{}
 
 	};

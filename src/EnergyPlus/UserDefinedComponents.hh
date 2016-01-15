@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -156,61 +156,6 @@ namespace UserDefinedComponents {
 			OutletTemp( 0.0 )
 		{}
 
-		// Member Constructor
-		PlantConnectionStruct(
-			int const ErlInitProgramMngr, // points to an EMS:ProgramManager to run for setup and sizing
-			int const ErlSimProgramMngr, // points to an EMS:ProgramManager to run only when this connection is called
-			int const LoopNum, // plant loop connection index
-			int const LoopSideNum, // plant loop side connection index
-			int const BranchNum, // plant loop branch connection index
-			int const CompNum, // plant loop component connection index
-			int const InletNodeNum, // plant loop inlet node index
-			int const OutletNodeNum, // plant loop outlet node index
-			int const FlowPriority, // how component affects overall loop flow determination
-			int const HowLoadServed, // nature of component wrt to plant loop's loads
-			Real64 const LowOutTempLimit, // low limit for outlet temp if MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT
-			Real64 const HiOutTempLimit, // hi limit for outlet temp if MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT
-			Real64 const MassFlowRateRequest, // request filled by actuator, might not be satisfied if plant constrained [kg/s]
-			Real64 const MassFlowRateMin, // filled by actuator, reports minimum (hardware) flow rate for component [kg/s]
-			Real64 const MassFlowRateMax, // filled by actuator, reports maximum (hardware) flow rate for component [kg/s]
-			Real64 const DesignVolumeFlowRate, // filled by actuator,
-			Real64 const MyLoad, // fills internal variable for user's model to know current load request of supply equip [W]
-			Real64 const MinLoad, // filled by actuator, reports back size for load dispatch routines [W]
-			Real64 const MaxLoad, // filled by actuator, reports back size for load dispatch [W]
-			Real64 const OptLoad, // filled by actuator, reports back size for load dispatch [W]
-			Real64 const InletRho, // fills internal variable, current density for fluid type and inlet temperature [kg/m3]
-			Real64 const InletCp, // fills internal Varaible, current specific heat for fluid type and inlet temperature [J/kg-C]
-			Real64 const InletTemp, // fills internal variable, current inlet fluid temperature [C]
-			Real64 const InletMassFlowRate, // fills internal variable, current inlet mass flow rate [kg/s]
-			Real64 const OutletTemp // filled by actuator, componenent outlet temperature [C]
-		) :
-			ErlInitProgramMngr( ErlInitProgramMngr ),
-			ErlSimProgramMngr( ErlSimProgramMngr ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			FlowPriority( FlowPriority ),
-			HowLoadServed( HowLoadServed ),
-			LowOutTempLimit( LowOutTempLimit ),
-			HiOutTempLimit( HiOutTempLimit ),
-			MassFlowRateRequest( MassFlowRateRequest ),
-			MassFlowRateMin( MassFlowRateMin ),
-			MassFlowRateMax( MassFlowRateMax ),
-			DesignVolumeFlowRate( DesignVolumeFlowRate ),
-			MyLoad( MyLoad ),
-			MinLoad( MinLoad ),
-			MaxLoad( MaxLoad ),
-			OptLoad( OptLoad ),
-			InletRho( InletRho ),
-			InletCp( InletCp ),
-			InletTemp( InletTemp ),
-			InletMassFlowRate( InletMassFlowRate ),
-			OutletTemp( OutletTemp )
-		{}
-
 	};
 
 	struct AirConnectionStruct
@@ -241,31 +186,6 @@ namespace UserDefinedComponents {
 			OutletMassFlowRate( 0.0 )
 		{}
 
-		// Member Constructor
-		AirConnectionStruct(
-			int const InletNodeNum, // air inlet node index
-			int const OutletNodeNum, // air outlet node index
-			Real64 const InletRho, // fills internal variable, current inlet air density [kg/m3]
-			Real64 const InletCp, // fills internal variable, current inlet air specific heat [J/kg-c]
-			Real64 const InletTemp, // fills internal variable, current inlet air temperature [C]
-			Real64 const InletHumRat, // fills internal variable, current inlet air humidity ratio [kg/kg]
-			Real64 const InletMassFlowRate, // fills internal variable, current inlet air mass flow rate [kg/s]
-			Real64 const OutletTemp, // filled by actuator, component outlet temperature [C]
-			Real64 const OutletHumRat, // filled by actuator, component outlet humidity ratio [kg/kg]
-			Real64 const OutletMassFlowRate // filled by actuator, component outlet mass flow rate [kg/s]
-		) :
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			InletRho( InletRho ),
-			InletCp( InletCp ),
-			InletTemp( InletTemp ),
-			InletHumRat( InletHumRat ),
-			InletMassFlowRate( InletMassFlowRate ),
-			OutletTemp( OutletTemp ),
-			OutletHumRat( OutletHumRat ),
-			OutletMassFlowRate( OutletMassFlowRate )
-		{}
-
 	};
 
 	struct WaterUseTankConnectionStruct // data for interacting with water use storage system
@@ -290,27 +210,6 @@ namespace UserDefinedComponents {
 			CollectionTankID( 0 ),
 			CollectionTankSupplyARRID( 0 ),
 			CollectedVdot( 0.0 )
-		{}
-
-		// Member Constructor
-		WaterUseTankConnectionStruct(
-			bool const SuppliedByWaterSystem,
-			int const SupplyTankID, // index "pointer" to WaterStorage structure
-			int const SupplyTankDemandARRID, // index "pointer" to demand array inside WaterStorage structure
-			Real64 const SupplyVdotRequest,
-			bool const CollectsToWaterSystem,
-			int const CollectionTankID, // index "pointer" to Storage TAnk array WaterStorage
-			int const CollectionTankSupplyARRID, // index pointe to supply Vdot array in WaterStorage
-			Real64 const CollectedVdot
-		) :
-			SuppliedByWaterSystem( SuppliedByWaterSystem ),
-			SupplyTankID( SupplyTankID ),
-			SupplyTankDemandARRID( SupplyTankDemandARRID ),
-			SupplyVdotRequest( SupplyVdotRequest ),
-			CollectsToWaterSystem( CollectsToWaterSystem ),
-			CollectionTankID( CollectionTankID ),
-			CollectionTankSupplyARRID( CollectionTankSupplyARRID ),
-			CollectedVdot( CollectedVdot )
 		{}
 
 	};
@@ -341,29 +240,6 @@ namespace UserDefinedComponents {
 			GenericContamGainRate( 0.0 )
 		{}
 
-		// Member Constructor
-		ZoneInternalGainsStruct(
-			bool const DeviceHasInternalGains,
-			int const ZoneNum,
-			Real64 const ConvectionGainRate,
-			Real64 const ReturnAirConvectionGainRate,
-			Real64 const ThermalRadiationGainRate,
-			Real64 const LatentGainRate,
-			Real64 const ReturnAirLatentGainRate,
-			Real64 const CarbonDioxideGainRate,
-			Real64 const GenericContamGainRate
-		) :
-			DeviceHasInternalGains( DeviceHasInternalGains ),
-			ZoneNum( ZoneNum ),
-			ConvectionGainRate( ConvectionGainRate ),
-			ReturnAirConvectionGainRate( ReturnAirConvectionGainRate ),
-			ThermalRadiationGainRate( ThermalRadiationGainRate ),
-			LatentGainRate( LatentGainRate ),
-			ReturnAirLatentGainRate( ReturnAirLatentGainRate ),
-			CarbonDioxideGainRate( CarbonDioxideGainRate ),
-			GenericContamGainRate( GenericContamGainRate )
-		{}
-
 	};
 
 	struct UserPlantComponentStruct
@@ -381,25 +257,6 @@ namespace UserDefinedComponents {
 		UserPlantComponentStruct() :
 			ErlSimProgramMngr( 0 ),
 			NumPlantConnections( 0 )
-		{}
-
-		// Member Constructor
-		UserPlantComponentStruct(
-			std::string const & Name, // user identifier
-			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
-			int const NumPlantConnections, // count of how many plant loop connections there are
-			Array1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
-			AirConnectionStruct const & Air,
-			WaterUseTankConnectionStruct const & Water,
-			ZoneInternalGainsStruct const & Zone
-		) :
-			Name( Name ),
-			ErlSimProgramMngr( ErlSimProgramMngr ),
-			NumPlantConnections( NumPlantConnections ),
-			Loop( Loop ),
-			Air( Air ),
-			Water( Water ),
-			Zone( Zone )
 		{}
 
 	};
@@ -423,29 +280,6 @@ namespace UserDefinedComponents {
 			ErlInitProgramMngr( 0 ),
 			NumAirConnections( 0 ),
 			PlantIsConnected( false )
-		{}
-
-		// Member Constructor
-		UserCoilComponentStruct(
-			std::string const & Name, // user identifier
-			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
-			int const ErlInitProgramMngr, // EMS:ProgramManager to  run when this model is initialized and setup
-			int const NumAirConnections, // count of how many air connectiosn there are
-			bool const PlantIsConnected,
-			Array1< AirConnectionStruct > const & Air,
-			PlantConnectionStruct const & Loop,
-			WaterUseTankConnectionStruct const & Water,
-			ZoneInternalGainsStruct const & Zone
-		) :
-			Name( Name ),
-			ErlSimProgramMngr( ErlSimProgramMngr ),
-			ErlInitProgramMngr( ErlInitProgramMngr ),
-			NumAirConnections( NumAirConnections ),
-			PlantIsConnected( PlantIsConnected ),
-			Air( Air ),
-			Loop( Loop ),
-			Water( Water ),
-			Zone( Zone )
 		{}
 
 	};
@@ -478,37 +312,6 @@ namespace UserDefinedComponents {
 			RemainingOutputReqToDehumidSP( 0.0 )
 		{}
 
-		// Member Constructor
-		UserZoneHVACForcedAirComponentStruct(
-			std::string const & Name, // user identifier
-			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
-			int const ErlInitProgramMngr, // EMS:ProgramManager to  run when this model is initialized and setup
-			AirConnectionStruct const & ZoneAir,
-			AirConnectionStruct const & SourceAir,
-			int const NumPlantConnections, // count of how many plant loop (demand) connections there are
-			Array1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
-			WaterUseTankConnectionStruct const & Water,
-			ZoneInternalGainsStruct const & Zone, // for skin losses
-			Real64 const RemainingOutputToHeatingSP, // sensible load remaining for device, to heating setpoint [W]
-			Real64 const RemainingOutputToCoolingSP, // sensible load remaining for device, negative means cooling [W]
-			Real64 const RemainingOutputReqToHumidSP, // latent load remaining for device, to humidification setpoint [kg/s]
-			Real64 const RemainingOutputReqToDehumidSP // latent load remaining for device, Negative means dehumidify [kg/s]
-		) :
-			Name( Name ),
-			ErlSimProgramMngr( ErlSimProgramMngr ),
-			ErlInitProgramMngr( ErlInitProgramMngr ),
-			ZoneAir( ZoneAir ),
-			SourceAir( SourceAir ),
-			NumPlantConnections( NumPlantConnections ),
-			Loop( Loop ),
-			Water( Water ),
-			Zone( Zone ),
-			RemainingOutputToHeatingSP( RemainingOutputToHeatingSP ),
-			RemainingOutputToCoolingSP( RemainingOutputToCoolingSP ),
-			RemainingOutputReqToHumidSP( RemainingOutputReqToHumidSP ),
-			RemainingOutputReqToDehumidSP( RemainingOutputReqToDehumidSP )
-		{}
-
 	};
 
 	struct UserAirTerminalComponentStruct
@@ -539,39 +342,6 @@ namespace UserDefinedComponents {
 			RemainingOutputToCoolingSP( 0.0 ),
 			RemainingOutputReqToHumidSP( 0.0 ),
 			RemainingOutputReqToDehumidSP( 0.0 )
-		{}
-
-		// Member Constructor
-		UserAirTerminalComponentStruct(
-			std::string const & Name, // user identifier
-			int const ActualCtrlZoneNum,
-			int const ErlSimProgramMngr, // EMS:ProgramManager to always run when this model is called
-			int const ErlInitProgramMngr, // EMS:ProgramManager to  run when this model is initialized and setup
-			AirConnectionStruct const & AirLoop,
-			AirConnectionStruct const & SourceAir,
-			int const NumPlantConnections, // count of how many plant loop (demand) connections there are
-			Array1< PlantConnectionStruct > const & Loop, // collect data for each plant loop connection
-			WaterUseTankConnectionStruct const & Water,
-			ZoneInternalGainsStruct const & Zone, // for skin losses
-			Real64 const RemainingOutputToHeatingSP, // sensible load remaining for device, to heating setpoint [W]
-			Real64 const RemainingOutputToCoolingSP, // sensible load remaining for device, negative means cooling [W]
-			Real64 const RemainingOutputReqToHumidSP, // latent load remaining for device, to humidification setpoint [kg/s]
-			Real64 const RemainingOutputReqToDehumidSP // latent load remaining for device, Negative means dehumidify [kg/s]
-		) :
-			Name( Name ),
-			ActualCtrlZoneNum( ActualCtrlZoneNum ),
-			ErlSimProgramMngr( ErlSimProgramMngr ),
-			ErlInitProgramMngr( ErlInitProgramMngr ),
-			AirLoop( AirLoop ),
-			SourceAir( SourceAir ),
-			NumPlantConnections( NumPlantConnections ),
-			Loop( Loop ),
-			Water( Water ),
-			Zone( Zone ),
-			RemainingOutputToHeatingSP( RemainingOutputToHeatingSP ),
-			RemainingOutputToCoolingSP( RemainingOutputToCoolingSP ),
-			RemainingOutputReqToHumidSP( RemainingOutputReqToHumidSP ),
-			RemainingOutputReqToDehumidSP( RemainingOutputReqToDehumidSP )
 		{}
 
 	};
@@ -670,7 +440,7 @@ namespace UserDefinedComponents {
 		std::string const & CoilName,
 		int & CoilIndex,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 	void
@@ -678,7 +448,7 @@ namespace UserDefinedComponents {
 		std::string const & CoilName,
 		int & CoilAirInletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 	void
@@ -686,7 +456,7 @@ namespace UserDefinedComponents {
 		std::string const & CoilName,
 		int & CoilAirOutletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 } // UserDefinedComponents

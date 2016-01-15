@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -134,47 +134,6 @@ namespace SplitterComponent {
 			InletMassFlowRateMaxAvail( 0.0 ),
 			InletMassFlowRateMinAvail( 0.0 ),
 			NumOutletNodes( 0 )
-		{}
-
-		// Member Constructor
-		SplitterConditions(
-			std::string const & SplitterName, // Name of the Splitter
-			Real64 const InletTemp,
-			Real64 const InletHumRat,
-			Real64 const InletEnthalpy,
-			Real64 const InletPressure,
-			int const InletNode,
-			Real64 const InletMassFlowRate, // MassFlow through the Splitter being Simulated [kg/Sec]
-			Real64 const InletMassFlowRateMaxAvail, // Max Avail MassFlow through the Splitter being Simulated [kg/Sec]
-			Real64 const InletMassFlowRateMinAvail, // Min Avail MassFlow through the Splitter being Simulated [kg/Sec]
-			int const NumOutletNodes,
-			Array1_int const & OutletNode,
-			Array1< Real64 > const & OutletMassFlowRate,
-			Array1< Real64 > const & OutletMassFlowRateMaxAvail,
-			Array1< Real64 > const & OutletMassFlowRateMinAvail,
-			Array1< Real64 > const & OutletTemp,
-			Array1< Real64 > const & OutletHumRat,
-			Array1< Real64 > const & OutletEnthalpy,
-			Array1< Real64 > const & OutletPressure
-		) :
-			SplitterName( SplitterName ),
-			InletTemp( InletTemp ),
-			InletHumRat( InletHumRat ),
-			InletEnthalpy( InletEnthalpy ),
-			InletPressure( InletPressure ),
-			InletNode( InletNode ),
-			InletMassFlowRate( InletMassFlowRate ),
-			InletMassFlowRateMaxAvail( InletMassFlowRateMaxAvail ),
-			InletMassFlowRateMinAvail( InletMassFlowRateMinAvail ),
-			NumOutletNodes( NumOutletNodes ),
-			OutletNode( OutletNode ),
-			OutletMassFlowRate( OutletMassFlowRate ),
-			OutletMassFlowRateMaxAvail( OutletMassFlowRateMaxAvail ),
-			OutletMassFlowRateMinAvail( OutletMassFlowRateMinAvail ),
-			OutletTemp( OutletTemp ),
-			OutletHumRat( OutletHumRat ),
-			OutletEnthalpy( OutletEnthalpy ),
-			OutletPressure( OutletPressure )
 		{}
 
 	};

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -104,19 +104,6 @@ namespace DataOutputs {
 		OutputReportingVariables() :
 			Previous( 0 ),
 			Next( 0 )
-		{}
-
-		// Member Constructor
-		OutputReportingVariables(
-			std::string const & Key, // could be a key or "*"  (upper case)
-			std::string const & VarName, // variable name (upper case)
-			int const Previous, // Pointer to Previous of same variable name
-			int const Next // Pointer to Next of same variable name
-		) :
-			Key( Key ),
-			VarName( VarName ),
-			Previous( Previous ),
-			Next( Next )
 		{}
 
 	};

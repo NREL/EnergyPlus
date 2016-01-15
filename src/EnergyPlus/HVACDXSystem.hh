@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -260,145 +260,15 @@ namespace HVACDXSystem {
 			TESOpMode( 0 )
 		{}
 
-		// Member Constructor
-		DXCoolingConditions(
-			std::string const & DXCoolingSystemType, // Type of DXCoolingSystem
-			std::string const & Name, // Name of the DXCoolingSystem
-			int const SchedPtr,
-			std::string const & CoolingCoilType,
-			int const CoolingCoilType_Num,
-			std::string const & CoolingCoilName,
-			int const CoolingCoilIndex,
-			int const DXCoolingCoilInletNodeNum,
-			int const DXCoolingCoilOutletNodeNum,
-			int const DXSystemControlNodeNum, // the node number of the node with the setpoint
-			Real64 const DesiredOutletTemp, // the temperature at the unit outlet node needed
-			Real64 const DesiredOutletHumRat, // the humidity ratio at the unit outlet node needed
-			Real64 const PartLoadFrac, // part load fraction for current time step (single speed)
-			Real64 const SpeedRatio, // current compressor speed ratio (variable speed)
-			Real64 const CycRatio, // cycling part load ratio (variable speed)
-			bool const RunOnSensibleLoad, // logical determines if this system will run to
-			bool const RunOnLatentLoad, // logical determines if this system will run to
-			int const DehumidControlType, // Dehumidification control type (currently only for multimode coil)
-			int const DehumidificationMode, // Dehumidification mode for multimode coil,
-			int const FanOpMode, // Fan operating mode (see parameter above)
-			int const HXAssistedSensPLRIter, // used in HX Assisted calculations
-			int const HXAssistedSensPLRIterIndex, // used in HX Assisted calculations
-			int const HXAssistedSensPLRFail, // used in HX Assisted calculations
-			int const HXAssistedSensPLRFailIndex, // used in HX Assisted calculations
-			int const HXAssistedSensPLRFail2, // used in HX Assisted calculations
-			int const HXAssistedSensPLRFailIndex2, // used in HX Assisted calculations
-			int const HXAssistedLatPLRIter, // used in HX Assisted calculations
-			int const HXAssistedLatPLRIterIndex, // used in HX Assisted calculations
-			int const HXAssistedLatPLRFail, // used in HX Assisted calculations
-			int const HXAssistedLatPLRFailIndex, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRIter, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRIterIndex, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRFail, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRFailIndex, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRFail2, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRFailIndex2, // used in HX Assisted calculations
-			int const DXCoilSensPLRIter, // used in DXCoil calculations
-			int const DXCoilSensPLRIterIndex, // used in DXCoil calculations
-			int const DXCoilSensPLRFail, // used in DXCoil calculations
-			int const DXCoilSensPLRFailIndex, // used in DXCoil calculations
-			int const DXCoilLatPLRIter, // used in DXCoil calculations
-			int const DXCoilLatPLRIterIndex, // used in DXCoil calculations
-			int const DXCoilLatPLRFail, // used in DXCoil calculations
-			int const DXCoilLatPLRFailIndex, // used in DXCoil calculations
-			int const MSpdSensPLRIter, // used in MultiSpeed calculations
-			int const MSpdSensPLRIterIndex, // used in MultiSpeed calculations
-			int const MSpdCycSensPLRIter, // used in MultiSpeed calculations
-			int const MSpdCycSensPLRIterIndex, // used in MultiSpeed calculations
-			int const MSpdLatPLRIter, // used in MultiSpeed calculations
-			int const MSpdLatPLRIterIndex, // used in MultiSpeed calculations
-			int const MSpdCycLatPLRIter, // used in MultiSpeed calculations
-			int const MSpdCycLatPLRIterIndex, // used in MultiSpeed calculations
-			int const MModeSensPLRIter, // used in MultiMode calculations
-			int const MModeSensPLRIterIndex, // used in MultiMode calculations
-			int const MModeLatPLRIter, // used in MultiMode calculations
-			int const MModeLatPLRIterIndex, // used in MultiMode calculations
-			int const MModeLatPLRIter2, // used in MultiMode calculations
-			int const MModeLatPLRIterIndex2, // used in MultiMode calculations
-			Real64 const OAUnitSetTemp, // set
-			bool const ISHundredPercentDOASDXCoil, // logical determines if this system will run as 100% DOAS
-			Real64 const DOASDXCoolingCoilMinTout, // DOAS DX Cooling coil outlet air minimum temperature
-			int const FrostControlStatus, // DOAS coil system frost control status
-			int const SpeedNum, // select speed number for variable-speed coil
-			int const TESOpMode
-		) :
-			DXCoolingSystemType( DXCoolingSystemType ),
-			Name( Name ),
-			SchedPtr( SchedPtr ),
-			CoolingCoilType( CoolingCoilType ),
-			CoolingCoilType_Num( CoolingCoilType_Num ),
-			CoolingCoilName( CoolingCoilName ),
-			CoolingCoilIndex( CoolingCoilIndex ),
-			DXCoolingCoilInletNodeNum( DXCoolingCoilInletNodeNum ),
-			DXCoolingCoilOutletNodeNum( DXCoolingCoilOutletNodeNum ),
-			DXSystemControlNodeNum( DXSystemControlNodeNum ),
-			DesiredOutletTemp( DesiredOutletTemp ),
-			DesiredOutletHumRat( DesiredOutletHumRat ),
-			PartLoadFrac( PartLoadFrac ),
-			SpeedRatio( SpeedRatio ),
-			CycRatio( CycRatio ),
-			RunOnSensibleLoad( RunOnSensibleLoad ),
-			RunOnLatentLoad( RunOnLatentLoad ),
-			DehumidControlType( DehumidControlType ),
-			DehumidificationMode( DehumidificationMode ),
-			FanOpMode( FanOpMode ),
-			HXAssistedSensPLRIter( HXAssistedSensPLRIter ),
-			HXAssistedSensPLRIterIndex( HXAssistedSensPLRIterIndex ),
-			HXAssistedSensPLRFail( HXAssistedSensPLRFail ),
-			HXAssistedSensPLRFailIndex( HXAssistedSensPLRFailIndex ),
-			HXAssistedSensPLRFail2( HXAssistedSensPLRFail2 ),
-			HXAssistedSensPLRFailIndex2( HXAssistedSensPLRFailIndex2 ),
-			HXAssistedLatPLRIter( HXAssistedLatPLRIter ),
-			HXAssistedLatPLRIterIndex( HXAssistedLatPLRIterIndex ),
-			HXAssistedLatPLRFail( HXAssistedLatPLRFail ),
-			HXAssistedLatPLRFailIndex( HXAssistedLatPLRFailIndex ),
-			HXAssistedCRLatPLRIter( HXAssistedCRLatPLRIter ),
-			HXAssistedCRLatPLRIterIndex( HXAssistedCRLatPLRIterIndex ),
-			HXAssistedCRLatPLRFail( HXAssistedCRLatPLRFail ),
-			HXAssistedCRLatPLRFailIndex( HXAssistedCRLatPLRFailIndex ),
-			HXAssistedCRLatPLRFail2( HXAssistedCRLatPLRFail2 ),
-			HXAssistedCRLatPLRFailIndex2( HXAssistedCRLatPLRFailIndex2 ),
-			DXCoilSensPLRIter( DXCoilSensPLRIter ),
-			DXCoilSensPLRIterIndex( DXCoilSensPLRIterIndex ),
-			DXCoilSensPLRFail( DXCoilSensPLRFail ),
-			DXCoilSensPLRFailIndex( DXCoilSensPLRFailIndex ),
-			DXCoilLatPLRIter( DXCoilLatPLRIter ),
-			DXCoilLatPLRIterIndex( DXCoilLatPLRIterIndex ),
-			DXCoilLatPLRFail( DXCoilLatPLRFail ),
-			DXCoilLatPLRFailIndex( DXCoilLatPLRFailIndex ),
-			MSpdSensPLRIter( MSpdSensPLRIter ),
-			MSpdSensPLRIterIndex( MSpdSensPLRIterIndex ),
-			MSpdCycSensPLRIter( MSpdCycSensPLRIter ),
-			MSpdCycSensPLRIterIndex( MSpdCycSensPLRIterIndex ),
-			MSpdLatPLRIter( MSpdLatPLRIter ),
-			MSpdLatPLRIterIndex( MSpdLatPLRIterIndex ),
-			MSpdCycLatPLRIter( MSpdCycLatPLRIter ),
-			MSpdCycLatPLRIterIndex( MSpdCycLatPLRIterIndex ),
-			MModeSensPLRIter( MModeSensPLRIter ),
-			MModeSensPLRIterIndex( MModeSensPLRIterIndex ),
-			MModeLatPLRIter( MModeLatPLRIter ),
-			MModeLatPLRIterIndex( MModeLatPLRIterIndex ),
-			MModeLatPLRIter2( MModeLatPLRIter2 ),
-			MModeLatPLRIterIndex2( MModeLatPLRIterIndex2 ),
-			OAUnitSetTemp( OAUnitSetTemp ),
-			ISHundredPercentDOASDXCoil( ISHundredPercentDOASDXCoil ),
-			DOASDXCoolingCoilMinTout( DOASDXCoolingCoilMinTout ),
-			FrostControlStatus( FrostControlStatus ),
-			SpeedNum( SpeedNum ),
-			TESOpMode( TESOpMode )
-		{}
-
 	};
 
 	// Object Data
 	extern Array1D< DXCoolingConditions > DXCoolingSystem;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimDXCoolingSystem(

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -72,9 +72,8 @@ using namespace ObjexxFCL;
 
 
 
-TEST( ScheduleManagerTest, isMinuteMultipleOfTimestep )
+TEST_F( EnergyPlusFixture, ScheduleManager_isMinuteMultipleOfTimestep )
 {
-	ShowMessage( "Begin Test: ScheduleManagerTest, isMinuteMultipleOfTimestep" );
 	// EnergyPlus can accept 1,  2, 3,   4,  5,  6, 10, 12, 15, 20, 30, 60 timesteps per hour which correspond to
 	//                      60, 30, 20, 15, 12, 10,  5,  5,  4,  3,  2,  1 minutes per timestep
 	EXPECT_TRUE( isMinuteMultipleOfTimestep( 0, 15 ) );

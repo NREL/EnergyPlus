@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -224,31 +224,6 @@ namespace Boilers {
 			BoilerPLR( 0.0 )
 		{}
 
-		// Member Constructor
-		ReportVars(
-			Real64 const BoilerLoad, // W - Boiler operating load
-			Real64 const BoilerEnergy, // J - Boiler energy integrated over time
-			Real64 const FuelUsed, // W - Boiler fuel used
-			Real64 const FuelConsumed, // J - Boiler Fuel consumed integrated over time
-			Real64 const BoilerInletTemp, // C - Boiler inlet temperature
-			Real64 const BoilerOutletTemp, // C - Boiler outlet temperature
-			Real64 const Mdot, // kg/s - Boiler mass flow rate
-			Real64 const ParasiticElecPower, // W - Parasitic Electrical Power (e.g. forced draft fan)
-			Real64 const ParasiticElecConsumption, // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-			Real64 const BoilerPLR // Boiler operating part-load ratio
-		) :
-			BoilerLoad( BoilerLoad ),
-			BoilerEnergy( BoilerEnergy ),
-			FuelUsed( FuelUsed ),
-			FuelConsumed( FuelConsumed ),
-			BoilerInletTemp( BoilerInletTemp ),
-			BoilerOutletTemp( BoilerOutletTemp ),
-			Mdot( Mdot ),
-			ParasiticElecPower( ParasiticElecPower ),
-			ParasiticElecConsumption( ParasiticElecConsumption ),
-			BoilerPLR( BoilerPLR )
-		{}
-
 	};
 
 	// Object Data
@@ -256,6 +231,9 @@ namespace Boilers {
 	extern Array1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimBoiler(

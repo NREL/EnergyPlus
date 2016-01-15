@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -132,21 +132,6 @@ namespace MundtSimMgr {
 			Temp( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineLinearModelNode(
-			std::string const & AirNodeName, // Name of air nodes
-			int const ClassType, // Type of air nodes
-			Real64 const Height, // Z coordinates [m] node's Control Vol. center
-			Real64 const Temp, // Surface temperature BC
-			Array1_bool const & SurfMask // Limit of 60 surfaces at current sizing
-		) :
-			AirNodeName( AirNodeName ),
-			ClassType( ClassType ),
-			Height( Height ),
-			Temp( Temp ),
-			SurfMask( SurfMask )
-		{}
-
 	};
 
 	struct DefineSurfaceSettings
@@ -165,19 +150,6 @@ namespace MundtSimMgr {
 			TMeanAir( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineSurfaceSettings(
-			Real64 const Area, // m2
-			Real64 const Temp, // surface temperature BC
-			Real64 const Hc, // convective film coeff BC
-			Real64 const TMeanAir // effective near-surface air temp from air model solution
-		) :
-			Area( Area ),
-			Temp( Temp ),
-			Hc( Hc ),
-			TMeanAir( TMeanAir )
-		{}
-
 	};
 
 	struct DefineZoneData
@@ -192,17 +164,6 @@ namespace MundtSimMgr {
 			SurfFirst( 0 ),
 			NumOfSurfs( 0 ),
 			MundtZoneIndex( 0 )
-		{}
-
-		// Member Constructor
-		DefineZoneData(
-			int const SurfFirst, // index for first surface of the zone
-			int const NumOfSurfs, // number of surfaces in the zone
-			int const MundtZoneIndex // index for zones using Mundt model
-		) :
-			SurfFirst( SurfFirst ),
-			NumOfSurfs( NumOfSurfs ),
-			MundtZoneIndex( MundtZoneIndex )
 		{}
 
 	};

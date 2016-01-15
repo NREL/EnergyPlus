@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -4706,7 +4706,6 @@ namespace OutputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string NumberOut; // Character for producing "number out"
 
 		if ( UpdateDataDuringWarmupExternalInterface && ! ReportDuringWarmup ) return;
 
@@ -8127,21 +8126,6 @@ ProduceRDDMDD()
 			VarPtr( 0 ),
 			IndexType( 0 ),
 			StoreType( 0 )
-		{}
-
-		// Member Constructor
-		VariableTypes(
-			int const RealIntegerType, // Real= 1, Integer=2
-			int const VarPtr, // pointer to real/integer VariableTypes structures
-			int const IndexType,
-			int const StoreType,
-			std::string const & UnitsString
-		) :
-			RealIntegerType( RealIntegerType ),
-			VarPtr( VarPtr ),
-			IndexType( IndexType ),
-			StoreType( StoreType ),
-			UnitsString( UnitsString )
 		{}
 
 	};

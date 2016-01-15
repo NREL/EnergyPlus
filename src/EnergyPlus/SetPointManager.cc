@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -315,6 +315,21 @@ namespace SetPointManager {
 	namespace {
 		bool InitSetPointManagersOneTimeFlag( true );
 		bool InitSetPointManagersOneTimeFlag2( true );
+		Real64 DCESPMDsn_EntCondTemp( 0.0 );
+		Real64 DCESPMDsn_MinCondSetpt( 0.0 );
+		Real64 DCESPMCur_MinLiftTD( 0.0 );
+		Real64 DCESPMDesign_Load_Sum( 0.0 );
+		Real64 DCESPMActual_Load_Sum( 0.0 );
+		Real64 DCESPMWeighted_Actual_Load_Sum( 0.0 );
+		Real64 DCESPMWeighted_Design_Load_Sum( 0.0 );
+		Real64 DCESPMWeighted_Ratio( 0.0 );
+		Real64 DCESPMMin_DesignWB( 0.0 );
+		Real64 DCESPMMin_ActualWb( 0.0 );
+		Real64 DCESPMOpt_CondEntTemp( 0.0 );
+		Real64 DCESPMDesignClgCapacity_Watts( 0.0 );
+		Real64 DCESPMCurrentLoad_Watts( 0.0 );
+		Real64 DCESPMCondInletTemp( 0.0 );
+		Real64 DCESPMEvapOutletTemp( 0.0 );
 	}
 	// temperature-based flow control manager
 	// Average Cooling Set Pt Mgr
@@ -397,6 +412,22 @@ namespace SetPointManager {
 		NumSZOneStageHeatingSetPtMgrs = 0 ; // number of singel zone one stage heating setpoint managers
 		NumReturnWaterResetChWSetPtMgrs = 0 ; // number of return water reset setpoint managers
 		NumReturnWaterResetHWSetPtMgrs = 0 ; // number of hot-water return water reset setpoint managers
+
+		DCESPMDsn_EntCondTemp = 0.0;
+		DCESPMDsn_MinCondSetpt = 0.0;
+		DCESPMCur_MinLiftTD = 0.0;
+		DCESPMDesign_Load_Sum = 0.0;
+		DCESPMActual_Load_Sum = 0.0;
+		DCESPMWeighted_Actual_Load_Sum = 0.0;
+		DCESPMWeighted_Design_Load_Sum = 0.0;
+		DCESPMWeighted_Ratio = 0.0;
+		DCESPMMin_DesignWB = 0.0;
+		DCESPMMin_ActualWb = 0.0;
+		DCESPMOpt_CondEntTemp = 0.0;
+		DCESPMDesignClgCapacity_Watts = 0.0;
+		DCESPMCurrentLoad_Watts = 0.0;
+		DCESPMCondInletTemp = 0.0;
+		DCESPMEvapOutletTemp = 0.0;
 
 		ManagerOn = false ;
 		GetInputFlag = true ; // First time, input is "gotten"
@@ -6580,42 +6611,43 @@ namespace SetPointManager {
 		// DERIVED TYPE DEFINITIONS
 		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		static Real64 NormDsnCondFlow( 0.0 ); // Normalized design condenser flow for cooling towers, m3/s per watt
-		static Real64 Twr_DesignWB( 0.0 ); // The cooling tower design inlet air wet bulb temperature, C
-		static Real64 Dsn_EntCondTemp( 0.0 ); // The chiller design entering condenser temp, C; e.g. 29.44C {85F}
-		static Real64 Dsn_CondMinThisChiller( 0.0 ); // Design Minimum Condenser Entering for current chillers this timestep
-		static Real64 Dsn_MinCondSetpt( 0.0 ); // The design minimum condenser water temp, C; e.g. 18.33C {65 F}
-		static Real64 Cur_MinLiftTD( 0.0 ); // Minimum lift (TCond entering - Tevap leaving) TD this timestep
-		static Real64 temp_MinLiftTD( 0.0 ); // Intermeidate variable associated with lift (TCond entering - Tevap leaving) TD
-		static Real64 Des_Load( 0.0 ); // array of chiller design loads
-		static Real64 Act_Load( 0.0 ); // array of chiller actual loads
-		static Real64 ALW( 0.0 ); // Actual load weighting of each chiller, W
-		static Real64 DLW( 0.0 ); // Design capacity of each chiller, W
-		static Real64 Design_Load_Sum( 0.0 ); // the design load of the chillers, W
-		static Real64 Actual_Load_Sum( 0.0 ); // the actual load of the chillers, W
-		static Real64 Weighted_Actual_Load_Sum( 0.0 ); // Intermediate weighted value of actual load on plant, W
-		static Real64 Weighted_Design_Load_Sum( 0.0 ); // Intermediate weighted value of design load on plant, W
-		static Real64 Weighted_Ratio( 0.0 ); // Weighted part load ratio of chillers
-		static Real64 Min_DesignWB( 0.0 ); // Minimum design twr wet bulb allowed, C
-		static Real64 Min_ActualWb( 0.0 ); // Minimum actual oa wet bulb allowed, C
-		static Real64 SetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
-		static Real64 Opt_CondEntTemp( 0.0 ); // Optimized Condenser entering water temperature setpoint this timestep, C
-		static Real64 CondWaterSetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
-		static Real64 DesignClgCapacity_Watts( 0.0 );
-		static Real64 CurrentLoad_Watts( 0.0 );
-		static Real64 CondInletTemp( 0.0 ); // Condenser water inlet temperature (C)
-		static Real64 TempDesCondIn( 0.0 ); // Design condenser inlet temp. C , or 25.d0
-		static Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C)
-		static Real64 TempEvapOutDesign( 0.0 ); // design evaporator outlet temperature, water side
-		static Real64 CurLoad( 0.0 );
-		static int ChillerIndexPlantSide( 0 );
-		static int ChillerIndexDemandSide( 0 );
-		static int BranchIndexPlantSide( 0 );
-		static int BranchIndexDemandSide( 0 );
-		static int LoopIndexPlantSide( 0 );
-		static int LoopIndexDemandSide( 0 );
-		static int TypeNum( 0 );
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static Real64 Dsn_EntCondTemp( 0.0 ); // The chiller design entering condenser temp, C; e.g. 29.44C {85F} // DCESPMDsn_EntCondTemp
+		// static Real64 Dsn_MinCondSetpt( 0.0 ); // The design minimum condenser water temp, C; e.g. 18.33C {65 F} // DCESPMDsn_MinCondSetpt
+		// static Real64 Cur_MinLiftTD( 0.0 ); // Minimum lift (TCond entering - Tevap leaving) TD this timestep // DCESPMCur_MinLiftTD
+		// static Real64 Design_Load_Sum( 0.0 ); // the design load of the chillers, W // DCESPMDesign_Load_Sum
+		// static Real64 Actual_Load_Sum( 0.0 ); // the actual load of the chillers, W // DCESPMActual_Load_Sum
+		// static Real64 Weighted_Actual_Load_Sum( 0.0 ); // Intermediate weighted value of actual load on plant, W // DCESPMWeighted_Actual_Load_Sum
+		// static Real64 Weighted_Design_Load_Sum( 0.0 ); // Intermediate weighted value of design load on plant, W // DCESPMWeighted_Design_Load_Sum
+		// static Real64 Weighted_Ratio( 0.0 ); // Weighted part load ratio of chillers // DCESPMWeighted_Ratio
+		// static Real64 Min_DesignWB( 0.0 ); // Minimum design twr wet bulb allowed, C // DCESPMMin_DesignWB
+		// static Real64 Min_ActualWb( 0.0 ); // Minimum actual oa wet bulb allowed, C // DCESPMMin_ActualWb
+		// static Real64 Opt_CondEntTemp( 0.0 ); // Optimized Condenser entering water temperature setpoint this timestep, C // DCESPMOpt_CondEntTemp
+		// static Real64 DesignClgCapacity_Watts( 0.0 ); // DCESPMDesignClgCapacity_Watts
+		// static Real64 CurrentLoad_Watts( 0.0 ); // DCESPMCurrentLoad_Watts
+		// static Real64 CondInletTemp( 0.0 ); // Condenser water inlet temperature (C) // DCESPMCondInletTemp
+		// static Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C) // DCESPMEvapOutletTemp
+		////////////////////////////////////////////////////////////////////////////////////
+		Real64 NormDsnCondFlow( 0.0 ); // Normalized design condenser flow for cooling towers, m3/s per watt
+		Real64 Twr_DesignWB( 0.0 ); // The cooling tower design inlet air wet bulb temperature, C
+		Real64 Dsn_CondMinThisChiller( 0.0 ); // Design Minimum Condenser Entering for current chillers this timestep
+		Real64 temp_MinLiftTD( 0.0 ); // Intermeidate variable associated with lift (TCond entering - Tevap leaving) TD
+		Real64 Des_Load( 0.0 ); // array of chiller design loads
+		Real64 Act_Load( 0.0 ); // array of chiller actual loads
+		Real64 ALW( 0.0 ); // Actual load weighting of each chiller, W
+		Real64 DLW( 0.0 ); // Design capacity of each chiller, W
+		Real64 SetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
+		Real64 CondWaterSetPoint( 0.0 ); // Condenser entering water temperature setpoint this timestep, C
+		Real64 TempDesCondIn( 0.0 ); // Design condenser inlet temp. C , or 25.d0
+		Real64 TempEvapOutDesign( 0.0 ); // design evaporator outlet temperature, water side
+		Real64 CurLoad( 0.0 );
+		int ChillerIndexPlantSide( 0 );
+		int ChillerIndexDemandSide( 0 );
+		int BranchIndexPlantSide( 0 );
+		int BranchIndexDemandSide( 0 );
+		int LoopIndexPlantSide( 0 );
+		int LoopIndexDemandSide( 0 );
+		int TypeNum( 0 );
 
 		// Get from tower design values
 		NormDsnCondFlow = 5.38e-8; //m3/s per watt (typically 3 gpm/ton)=(Volume of condenser fluid)/(ton of heat rejection)
@@ -6638,11 +6670,11 @@ namespace SetPointManager {
 		if ( CurLoad > 0 ) {
 			if ( TypeNum == TypeOf_Chiller_Absorption || TypeNum == TypeOf_Chiller_CombTurbine || TypeNum == TypeOf_Chiller_Electric || TypeNum == TypeOf_Chiller_ElectricReformEIR || TypeNum == TypeOf_Chiller_EngineDriven ) {
 				TempDesCondIn = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).TempDesCondIn;
-				CondInletTemp = Node( PlantLoop( LoopIndexDemandSide ).LoopSide( DemandSide ).Branch( BranchIndexDemandSide ).Comp( ChillerIndexDemandSide ).NodeNumIn ).Temp;
-				EvapOutletTemp = Node( PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).NodeNumOut ).Temp;
+				DCESPMCondInletTemp = Node( PlantLoop( LoopIndexDemandSide ).LoopSide( DemandSide ).Branch( BranchIndexDemandSide ).Comp( ChillerIndexDemandSide ).NodeNumIn ).Temp;
+				DCESPMEvapOutletTemp = Node( PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).NodeNumOut ).Temp;
 				TempEvapOutDesign = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).TempDesEvapOut;
-				DesignClgCapacity_Watts = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).MaxLoad;
-				CurrentLoad_Watts = PlantReport( LoopIndexPlantSide ).CoolingDemand;
+				DCESPMDesignClgCapacity_Watts = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).MaxLoad;
+				DCESPMCurrentLoad_Watts = PlantReport( LoopIndexPlantSide ).CoolingDemand;
 			} else if ( TypeNum == TypeOf_Chiller_Indirect_Absorption || TypeNum == TypeOf_Chiller_DFAbsorption ) {
 				TempDesCondIn = PlantLoop( LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( BranchIndexPlantSide ).Comp( ChillerIndexPlantSide ).TempDesCondIn;
 				TempEvapOutDesign = 6.666;
@@ -6652,31 +6684,31 @@ namespace SetPointManager {
 			}
 
 			// for attached chillers (that are running this timestep) find their Dsn_MinCondSetpt and Dsn_EntCondTemp
-			Dsn_MinCondSetpt = 999.0;
-			Dsn_EntCondTemp = 0.0;
+			DCESPMDsn_MinCondSetpt = 999.0;
+			DCESPMDsn_EntCondTemp = 0.0;
 
 			// Design Minimum Condenser Entering as a function of the minimum lift and TEvapLvg
 			// for chillers operating on current cond loop this timestep
 			Dsn_CondMinThisChiller = TempEvapOutDesign + ( this->MinimumLiftTD );
-			Dsn_MinCondSetpt = min( Dsn_MinCondSetpt, Dsn_CondMinThisChiller );
+			DCESPMDsn_MinCondSetpt = min( DCESPMDsn_MinCondSetpt, Dsn_CondMinThisChiller );
 
 			// Design entering condenser water temperature for chillers operating
 			// on current cond loop this timestep
-			Dsn_EntCondTemp = max( Dsn_EntCondTemp, TempDesCondIn );
+			DCESPMDsn_EntCondTemp = max( DCESPMDsn_EntCondTemp, TempDesCondIn );
 
 			// Load this array with the design capacity and actual load of each chiller this timestep
-			Des_Load = DesignClgCapacity_Watts;
-			Act_Load = CurrentLoad_Watts;
+			Des_Load = DCESPMDesignClgCapacity_Watts;
+			Act_Load = DCESPMCurrentLoad_Watts;
 
 			// ***** Load Calculations *****
 			// In this section the sum of the actual load (watts) and design load (watts)
 			// of the chillers that are on is calculated.
-			Actual_Load_Sum += Act_Load;
-			Design_Load_Sum += Des_Load;
+			DCESPMActual_Load_Sum += Act_Load;
+			DCESPMDesign_Load_Sum += Des_Load;
 
 			// Exit if the chillers are all off this hour
-			if ( Actual_Load_Sum <= 0 ) {
-				CondWaterSetPoint = Dsn_EntCondTemp;
+			if ( DCESPMActual_Load_Sum <= 0 ) {
+				CondWaterSetPoint = DCESPMDsn_EntCondTemp;
 				return;
 			}
 
@@ -6684,48 +6716,48 @@ namespace SetPointManager {
 			// This section first calculates the actual (ALW) and design (DLW) individual
 			// weights. Then the weighted actual and design loads are computed. Finally
 			// the Weighted Ratio is found.
-			if ( Actual_Load_Sum != 0 && Design_Load_Sum != 0 ) {
-				ALW = ( ( Act_Load / Actual_Load_Sum ) * Act_Load );
-				DLW = ( ( Des_Load / Design_Load_Sum ) * Des_Load );
+			if ( DCESPMActual_Load_Sum != 0 && DCESPMDesign_Load_Sum != 0 ) {
+				ALW = ( ( Act_Load / DCESPMActual_Load_Sum ) * Act_Load );
+				DLW = ( ( Des_Load / DCESPMDesign_Load_Sum ) * Des_Load );
 			} else {
 				ALW = 0.0;
 				DLW = 0.0;
 			}
-			Weighted_Actual_Load_Sum += ALW;
-			Weighted_Design_Load_Sum += DLW;
-			Weighted_Ratio = Weighted_Actual_Load_Sum / Weighted_Design_Load_Sum;
+			DCESPMWeighted_Actual_Load_Sum += ALW;
+			DCESPMWeighted_Design_Load_Sum += DLW;
+			DCESPMWeighted_Ratio = DCESPMWeighted_Actual_Load_Sum / DCESPMWeighted_Design_Load_Sum;
 
 			// ***** Optimal Temperature Calculation *****
 			// In this section the optimal temperature is computed along with the minimum
 			// design wet bulb temp and the mimimum actual wet bulb temp.
 			// Min_DesignWB = ACoef1 + ACoef2*OaWb + ACoef3*WPLR + ACoef4*TwrDsnWB + ACoef5*NF
-			Min_DesignWB = CurveValue( this->MinTwrWbCurve, OutWetBulbTemp, Weighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
+			DCESPMMin_DesignWB = CurveValue( this->MinTwrWbCurve, OutWetBulbTemp, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
 
 			// Min_ActualWb = BCoef1 + BCoef2*MinDsnWB + BCoef3*WPLR + BCoef4*TwrDsnWB + BCoef5*NF
-			Min_ActualWb = CurveValue( this->MinOaWbCurve, Min_DesignWB, Weighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
+			DCESPMMin_ActualWb = CurveValue( this->MinOaWbCurve, DCESPMMin_DesignWB, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
 
 			// Opt_CondEntTemp = CCoef1 + CCoef2*OaWb + CCoef3*WPLR + CCoef4*TwrDsnWB + CCoef5*NF
-			Opt_CondEntTemp = CurveValue( this->OptCondEntCurve, OutWetBulbTemp, Weighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
+			DCESPMOpt_CondEntTemp = CurveValue( this->OptCondEntCurve, OutWetBulbTemp, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
 
 			// ***** Calculate (Cond ent - Evap lvg) Section *****
 			// In this section we find the worst case of (Cond ent - Evap lvg) for the
 			// chillers that are running.
-			Cur_MinLiftTD = 9999.0;
-			temp_MinLiftTD = 20.0 / 1.8;
-			temp_MinLiftTD = CondInletTemp - EvapOutletTemp;
-			Cur_MinLiftTD = min( Cur_MinLiftTD, temp_MinLiftTD );
+			DCESPMCur_MinLiftTD = 9999.0;
+			// temp_MinLiftTD = 20.0 / 1.8;
+			temp_MinLiftTD = DCESPMCondInletTemp - DCESPMEvapOutletTemp;
+			DCESPMCur_MinLiftTD = min( DCESPMCur_MinLiftTD, temp_MinLiftTD );
 		}
 
 		// ***** Limit conditions Section *****
 		// Check for limit conditions and control to the proper value.
-		if ( ( Weighted_Ratio >= 0.90 ) && ( Opt_CondEntTemp >= ( Dsn_EntCondTemp + 1.0 ) ) ) {
+		if ( ( DCESPMWeighted_Ratio >= 0.90 ) && ( DCESPMOpt_CondEntTemp >= ( DCESPMDsn_EntCondTemp + 1.0 ) ) ) {
 			// Optimized value exceeds the design condenser entering condition or chillers
 			// near full load condition; reset condenser entering setpoint to its design value
-			SetPoint = Dsn_EntCondTemp + 1.0;
+			SetPoint = DCESPMDsn_EntCondTemp + 1.0;
 		} else {
-			if ( ( OutWetBulbTemp >= Min_ActualWb ) && ( Twr_DesignWB >= Min_DesignWB ) && ( Cur_MinLiftTD > this->MinimumLiftTD ) ) {
+			if ( ( OutWetBulbTemp >= DCESPMMin_ActualWb ) && ( Twr_DesignWB >= DCESPMMin_DesignWB ) && ( DCESPMCur_MinLiftTD > this->MinimumLiftTD ) ) {
 				// Boundaries are satified; use optimized condenser entering water temp
-				SetPoint = Opt_CondEntTemp;
+				SetPoint = DCESPMOpt_CondEntTemp;
 			} else {
 				//Boundaries violated; Reset to scheduled value of condenser water entering setpoint
 				SetPoint = CondWaterSetPoint;
@@ -6733,7 +6765,7 @@ namespace SetPointManager {
 		}
 		// Do not allow new setpoint to be less than the design condenser minimum entering condition,
 		// i.e., TCondWaterEnt not allowed to be less than DsnEvapWaterLvg + MinimumLiftTD
-		CondWaterSetPoint = max( SetPoint, Dsn_MinCondSetpt );
+		CondWaterSetPoint = max( SetPoint, DCESPMDsn_MinCondSetpt );
 		this->SetPt = CondWaterSetPoint;
 
 	}

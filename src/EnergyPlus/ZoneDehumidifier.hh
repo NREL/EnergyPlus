@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -217,119 +217,15 @@ namespace ZoneDehumidifier {
 			OffCycleParasiticElecCons( 0.0 )
 		{}
 
-		// Member Constructor
-		ZoneDehumidifierData(
-			std::string const & Name, // Name of unit
-			std::string const & UnitType, // Type of unit
-			int const UnitType_Num, // Parameter equivalent to type of unit
-			int const SchedPtr, // Index number to availability schedule
-			Real64 const RatedWaterRemoval, // Rated water removal [liters/day]
-			Real64 const RatedEnergyFactor, // Rated energy factor [liters/kWh]
-			Real64 const RatedAirVolFlow, // Rated air flow rate through the dehumidifier [m3/s]
-			Real64 const RatedAirMassFlow, // Rated air mass flow rate through the dehumidifier [kg/s]
-			Real64 const MinInletAirTemp, // Minimum dry-bulb temperature for dehumidifier operation [C]
-			Real64 const MaxInletAirTemp, // Maximum dry-bulb temperature for dehumidifier operation [C]
-			Real64 const InletAirMassFlow, // Inlet air mass flow rate for the time step being simulated [kg/s]
-			Real64 const OutletAirEnthalpy, // Dehumidifier outlet air enthalpy [J/kg]
-			Real64 const OutletAirHumRat, // Dehumidifier outlet air humidity ratio [kg/kg]
-			Real64 const OffCycleParasiticLoad, // Off Cycle Parasitic Load, user input [W]
-			int const AirInletNodeNum, // Inlet air node number
-			int const AirOutletNodeNum, // Outlet air node number
-			int const WaterRemovalCurveIndex, // Index for water removal curve
-			int const WaterRemovalCurveType, // Water removal curve type. 2 = biquadratic
-			int const WaterRemovalCurveErrorCount, // Count number of times water removal curve returns a negative value
-			int const WaterRemovalCurveErrorIndex, // Index for negative value water removal factor recurring messages
-			int const EnergyFactorCurveIndex, // Index for energy factor curve
-			int const EnergyFactorCurveType, // Energy factor curve type. 2 = biquadratic
-			int const EnergyFactorCurveErrorCount, // Count number of times energy factor curve returns negative value
-			int const EnergyFactorCurveErrorIndex, // Index for negative value energy factor recurring messages
-			int const PartLoadCurveIndex, // Index for part load curve
-			int const PartLoadCurveType, // Part load curve type. 1 = quadratic, cubic = 3
-			int const LowPLFErrorCount, // Count number of times PLF < 0.7
-			int const LowPLFErrorIndex, // Index for PLF < 0.7 recurring warning messages
-			int const HighPLFErrorCount, // Count number of times PLF > 1.0
-			int const HighPLFErrorIndex, // Index for PLF > 1.0 recurring warning messages
-			int const HighRTFErrorCount, // Count number of times RTF > 1.0
-			int const HighRTFErrorIndex, // Index for RTF > 1.0 recurring warning messages
-			int const PLFPLRErrorCount, // Count number of times PLF < PLR
-			int const PLFPLRErrorIndex, // Index for PLF < PLR recurring warning messages
-			int const CondensateCollectMode, // Where does water come from
-			std::string const & CondensateCollectName, // Name of water storage (collection) tank
-			int const CondensateTankID, // Condensate collection tank ID number
-			int const CondensateTankSupplyARRID, // Condensate collection tank supply ID number
-			Real64 const SensHeatingRate, // Zone Dehumidifier Sensible Heating Rate [W]
-			Real64 const SensHeatingEnergy, // Zone Dehumidifier Sensible Heating Energy [J]
-			Real64 const WaterRemovalRate, // Zone Dehumidifier Water Removal Rate [kg/s]
-			Real64 const WaterRemoved, // Zone Dehumidifier Water Removed [kg]
-			Real64 const ElecPower, // Zone Dehumidifier Electric Power [W]
-			Real64 const ElecConsumption, // Zone Dehumidifier Electric Consumption [J]
-			Real64 const DehumidPLR, // Zone Dehumidifier Part-Load Ratio [-]
-			Real64 const DehumidRTF, // Zone Dehumidifier Runtime Fraction [-]
-			Real64 const DehumidCondVolFlowRate, // Zone Dehumidifier Condensate Volumetric Flow Rate [m3/s]
-			Real64 const DehumidCondVol, // Zone Dehumidifier Condensate Volume [m3]
-			Real64 const OutletAirTemp, // Zone Dehumidifier Outlet Air Temperature [C]
-			Real64 const OffCycleParasiticElecPower, // Zone Dehumidifier Off-Cycle Parasitic Electric Power [W]
-			Real64 const OffCycleParasiticElecCons // Zone Dehumidifier Off-Cycle Parasitic Electric Consumption [J]
-		) :
-			Name( Name ),
-			UnitType( UnitType ),
-			UnitType_Num( UnitType_Num ),
-			SchedPtr( SchedPtr ),
-			RatedWaterRemoval( RatedWaterRemoval ),
-			RatedEnergyFactor( RatedEnergyFactor ),
-			RatedAirVolFlow( RatedAirVolFlow ),
-			RatedAirMassFlow( RatedAirMassFlow ),
-			MinInletAirTemp( MinInletAirTemp ),
-			MaxInletAirTemp( MaxInletAirTemp ),
-			InletAirMassFlow( InletAirMassFlow ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			OutletAirHumRat( OutletAirHumRat ),
-			OffCycleParasiticLoad( OffCycleParasiticLoad ),
-			AirInletNodeNum( AirInletNodeNum ),
-			AirOutletNodeNum( AirOutletNodeNum ),
-			WaterRemovalCurveIndex( WaterRemovalCurveIndex ),
-			WaterRemovalCurveType( WaterRemovalCurveType ),
-			WaterRemovalCurveErrorCount( WaterRemovalCurveErrorCount ),
-			WaterRemovalCurveErrorIndex( WaterRemovalCurveErrorIndex ),
-			EnergyFactorCurveIndex( EnergyFactorCurveIndex ),
-			EnergyFactorCurveType( EnergyFactorCurveType ),
-			EnergyFactorCurveErrorCount( EnergyFactorCurveErrorCount ),
-			EnergyFactorCurveErrorIndex( EnergyFactorCurveErrorIndex ),
-			PartLoadCurveIndex( PartLoadCurveIndex ),
-			PartLoadCurveType( PartLoadCurveType ),
-			LowPLFErrorCount( LowPLFErrorCount ),
-			LowPLFErrorIndex( LowPLFErrorIndex ),
-			HighPLFErrorCount( HighPLFErrorCount ),
-			HighPLFErrorIndex( HighPLFErrorIndex ),
-			HighRTFErrorCount( HighRTFErrorCount ),
-			HighRTFErrorIndex( HighRTFErrorIndex ),
-			PLFPLRErrorCount( PLFPLRErrorCount ),
-			PLFPLRErrorIndex( PLFPLRErrorIndex ),
-			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( CondensateCollectName ),
-			CondensateTankID( CondensateTankID ),
-			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
-			SensHeatingRate( SensHeatingRate ),
-			SensHeatingEnergy( SensHeatingEnergy ),
-			WaterRemovalRate( WaterRemovalRate ),
-			WaterRemoved( WaterRemoved ),
-			ElecPower( ElecPower ),
-			ElecConsumption( ElecConsumption ),
-			DehumidPLR( DehumidPLR ),
-			DehumidRTF( DehumidRTF ),
-			DehumidCondVolFlowRate( DehumidCondVolFlowRate ),
-			DehumidCondVol( DehumidCondVol ),
-			OutletAirTemp( OutletAirTemp ),
-			OffCycleParasiticElecPower( OffCycleParasiticElecPower ),
-			OffCycleParasiticElecCons( OffCycleParasiticElecCons )
-		{}
-
 	};
 
 	// Object Data
 	extern Array1D< ZoneDehumidifierData > ZoneDehumid;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimZoneDehumidifier(

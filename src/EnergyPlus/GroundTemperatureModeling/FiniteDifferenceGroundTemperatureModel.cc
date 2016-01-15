@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -89,7 +89,7 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Finite difference model factory
-	std::shared_ptr< FiniteDiffGroundTempsModel > 
+	std::shared_ptr< FiniteDiffGroundTempsModel >
 	FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(
 		int objectType,
 		std::string objectName
@@ -233,6 +233,12 @@ namespace EnergyPlus {
 		bool EndDayFlag_reset = EndDayFlag;
 		bool BeginHourFlag_reset = BeginHourFlag;
 		bool EndHourFlag_reset = EndHourFlag;
+
+		if ( !WeatherFileExists ){
+			ShowContinueError( "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file." );
+			ShowContinueError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+			ShowFatalError( "Simulation halted due to input error in ground temperaure model." );
+		}
 
 		++NumOfEnvrn;
 		++TotRunPers;
@@ -397,16 +403,16 @@ namespace EnergyPlus {
 		// Creates static mesh used for model
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
+
 		// Surface layer parameters
 		Real64 surfaceLayerThickness = 2.0;
 		Real64 surfaceLayerCellThickness = 0.015;
 		int surfaceLayerNumCells = surfaceLayerThickness / surfaceLayerCellThickness;
-		
+
 		// Center layer parameters
 		Real64 centerLayerExpansionCoeff = 1.10879;
-		int centerLayerNumCells = 80; 
-		
+		int centerLayerNumCells = 80;
+
 		// Deep layer parameters
 		Real64 deepLayerThickness = 0.2;
 		Real64 deepLayerCellThickness = surfaceLayerCellThickness;
@@ -426,11 +432,11 @@ namespace EnergyPlus {
 			// Reference to thisCell
 			auto & thisCell = cellArray( i );
 
-			// Set the index 
+			// Set the index
 			thisCell.index = i;
 
 			// Give thickness to the cells
-			if ( i <= surfaceLayerNumCells ) {				
+			if ( i <= surfaceLayerNumCells ) {
 				// Constant thickness mesh here
 				thisCell.thickness = surfaceLayerCellThickness;
 
@@ -443,7 +449,7 @@ namespace EnergyPlus {
 				} else {
 					thisCell.thickness = cellArray( ( surfaceLayerNumCells + ( centerLayerNumCells / 2 ) ) - ( numCenterCell - ( centerLayerNumCells / 2 ) ) ).thickness;
 				}
-			} else if ( i > ( centerLayerNumCells + surfaceLayerNumCells ) ) {			
+			} else if ( i > ( centerLayerNumCells + surfaceLayerNumCells ) ) {
 				// Constant thickness mesh here
 				thisCell.thickness = deepLayerCellThickness;
 			}
@@ -485,14 +491,14 @@ namespace EnergyPlus {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		timeStepInSeconds = SecsInDay; 
+		timeStepInSeconds = SecsInDay;
 		bool convergedFinal = false;
 
 		initDomain();
 
 		// Loop until converged
 		do {
-		
+
 			// loop over all days
 			for ( simDay = 1; simDay <= NumDaysInYear; ++simDay ) {
 
@@ -502,7 +508,7 @@ namespace EnergyPlus {
 
 					// Loop until iteration temperature converges
 					do {
-			
+
 						// For all cells
 						for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 
@@ -522,7 +528,7 @@ namespace EnergyPlus {
 							// Shift temperatures for next iteration
 							updateIterationTemperatures();
 						}
-					
+
 					} while ( !iterationConverged );
 
 					// Shift temperatures for next timestep
@@ -552,9 +558,9 @@ namespace EnergyPlus {
 		// Determines heat transfer to surface. Updates surface cell temperature.
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 numerator;
-		Real64 denominator;
-		Real64 resistance;
+		Real64 numerator( 0.0 );
+		Real64 denominator( 0.0 );
+		Real64 resistance( 0.0 );
 		Real64 incidentHeatGain;
 		Real64 incidentSolar_MJhrmin;
 		Real64 evapotransHeatLoss_Wm2;
@@ -583,11 +589,6 @@ namespace EnergyPlus {
 		Real64 const convert_Wm2_To_MJhrmin( 3600.0 / 1000000.0 );
 		Real64 const convert_MJhrmin_To_Wm2( 1.0 / convert_Wm2_To_MJhrmin );
 
-		// initialize values
-		numerator = 0.0;
-		denominator = 0.0;
-		resistance = 0.0;
-
 		auto & thisCell = cellArray( 1 );
 		auto & cellBelow_thisCell = cellArray( 2 );
 		auto & cwd = weatherDataArray( simDay ); // "Current Weather Day"
@@ -597,7 +598,7 @@ namespace EnergyPlus {
 		++denominator;
 
 		// Conduction to lower cell
-		resistance = ( thisCell.thickness / 2.0 ) / ( thisCell.props.conductivity * thisCell.conductionArea ) 
+		resistance = ( thisCell.thickness / 2.0 ) / ( thisCell.props.conductivity * thisCell.conductionArea )
 						+ ( cellBelow_thisCell.thickness / 2.0 )/( cellBelow_thisCell.props.conductivity * cellBelow_thisCell.conductionArea );
 		numerator += ( thisCell.beta / resistance ) * cellBelow_thisCell.temperature;
 		denominator += ( thisCell.beta / resistance );
@@ -687,7 +688,7 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	void
-	FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature( 
+	FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature(
 		int const cell
 	)
 	{
@@ -701,9 +702,9 @@ namespace EnergyPlus {
 		// Update cell temperature based on HT from cells above and below
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 numerator = 0.0;
-		Real64 denominator = 0.0;
-		Real64 resistance = 0.0;
+		Real64 numerator( 0.0 );
+		Real64 denominator( 0.0 );
+		Real64 resistance( 0.0 );
 
 		auto & thisCell = cellArray( cell );
 		auto & cellAbove_thisCell = cellArray( cell - 1 );
@@ -711,17 +712,17 @@ namespace EnergyPlus {
 
 		// add effect from cell history
 		numerator += thisCell.temperature_prevTimeStep;
-		++denominator;			
+		++denominator;
 
 		// Conduction resistance between this cell and above cell
-		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) ) 
+		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) )
 					+ ( ( cellAbove_thisCell.thickness / 2.0 ) / ( cellAbove_thisCell.conductionArea * cellAbove_thisCell.props.conductivity ) );
 
 		numerator += ( thisCell.beta / resistance ) * cellAbove_thisCell.temperature;
 		denominator += thisCell.beta / resistance;
 
 		// Conduction resitance between this cell and below cell
-		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) ) 
+		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) )
 					+ ( ( cellBelow_thisCell.thickness / 2.0 ) / ( cellBelow_thisCell.conductionArea * cellBelow_thisCell.props.conductivity ) );
 
 		numerator += ( thisCell.beta / resistance ) * cellBelow_thisCell.temperature;
@@ -751,26 +752,21 @@ namespace EnergyPlus {
 		//	IPCC scoping meeting on renewable energy sources: 59-80.
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 numerator;
-		Real64 denominator;
-		Real64 resistance;
+		Real64 numerator( 0.0 );
+		Real64 denominator( 0.0 );
+		Real64 resistance( 0.0 );
 		Real64 HTBottom;
-		Real64 geothermalGradient;
+		Real64 geothermalGradient( 0.025 ); // C/m
 
 		auto & thisCell = cellArray( totalNumCells );
 		auto & cellAbove_thisCell = cellArray( totalNumCells - 1 );
-
-		numerator = 0.0;
-		denominator = 0.0;
-		resistance = 0.0;
-		geothermalGradient = 0.025; // C/m
 
 		// Initialize
 		numerator += thisCell.temperature_prevTimeStep;
 		++denominator;
 
 		// Conduction resistance between this cell and above cell
-		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) ) 
+		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) )
 					+ ( ( cellAbove_thisCell.thickness / 2.0 ) / ( cellAbove_thisCell.conductionArea * cellAbove_thisCell.props.conductivity ) );
 
 		numerator += ( thisCell.beta / resistance ) * cellAbove_thisCell.temperature;
@@ -804,7 +800,7 @@ namespace EnergyPlus {
 		if ( numIterYears == maxYearsToIterate ) return converged;
 
 		for ( int cell = 1; cell <= totalNumCells; ++ cell ) {
-		
+
 			auto & thisCell = cellArray( cell );
 
 			if ( std::abs( thisCell.temperature - thisCell.temperature_finalConvergence ) >= finalTempConvergenceCriteria ) {
@@ -837,7 +833,7 @@ namespace EnergyPlus {
 		bool converged = true;
 
 		for ( int cell = 1; cell <= totalNumCells; ++ cell ) {
-		
+
 			if ( std::abs( cellArray( cell ).temperature - cellArray( cell ).temperature_prevIteration ) >= iterationTempConvergenceCriteria ) {
 				converged = false;
 				break;
@@ -851,7 +847,7 @@ namespace EnergyPlus {
 
 	void
 	FiniteDiffGroundTempsModel::initDomain()
-	{		
+	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
 		//       DATE WRITTEN   Summer 2015
@@ -867,7 +863,7 @@ namespace EnergyPlus {
 		using namespace GroundTemperatureManager;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
+
 		// Temporary KA model for initialization
 		std::unique_ptr< KusudaGroundTempsModel > tempModel( new KusudaGroundTempsModel() );
 
@@ -881,9 +877,9 @@ namespace EnergyPlus {
 		// Intialize temperatures and volume
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
 			auto & thisCell = cellArray( cell );
-			
+
 			Real64 depth = ( thisCell.maxZValue + thisCell.minZValue ) / 2.0;
-			
+
 			// Initialize temperatures
 			if ( tempModel ) {
 				thisCell.temperature = tempModel->getGroundTempAtTimeInSeconds( depth, 0.0 );  // Initialized at first day of year
@@ -965,7 +961,7 @@ namespace EnergyPlus {
 		// Updates cell properties for each timestep
 
 		for ( int cell = 1; cell <= totalNumCells; ++cell ) {
-			
+
 			auto & thisCell = cellArray( cell );
 
 			evaluateSoilRhoCp( cell );
@@ -1022,7 +1018,7 @@ namespace EnergyPlus {
 		if ( depth < 0.0 ) {
 			depth = 0.0;
 		}
-		
+
 		// Get index of nearest cell with depth less than depth
 		auto it = std::lower_bound( cellDepths.begin(), cellDepths.end(), depth );
 		j0 = std::distance( cellDepths.begin(), it );
@@ -1177,7 +1173,7 @@ namespace EnergyPlus {
 	}
 
 	//******************************************************************************
-	
+
 	void
 	FiniteDiffGroundTempsModel::evaluateSoilRhoCp(
 		Optional< int const > cell,
@@ -1260,7 +1256,7 @@ namespace EnergyPlus {
 		} else {
 			assert( false ); // Shouldn't get here
 		}
-		
+
 		thisCell.props.rhoCp = baseDensity * baseSpecificHeat; //rhoCP_soil;
 
 		thisCell.props.specificHeat = thisCell.props.rhoCp / thisCell.props.density;
