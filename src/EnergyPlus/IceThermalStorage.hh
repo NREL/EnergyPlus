@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef IceThermalStorage_hh_INCLUDED
 #define IceThermalStorage_hh_INCLUDED
 
@@ -118,19 +176,6 @@ namespace IceThermalStorage {
 			LocalEqNum( 0 )
 		{}
 
-		// Member Constructor
-		IceStorageMapping(
-			std::string const & Name, // User identifier
-			std::string const & StorageType,
-			int const StorageType_Num,
-			int const LocalEqNum
-		) :
-			Name( Name ),
-			StorageType( StorageType ),
-			StorageType_Num( StorageType_Num ),
-			LocalEqNum( LocalEqNum )
-		{}
-
 	};
 
 	struct IceStorageSpecs
@@ -165,37 +210,6 @@ namespace IceThermalStorage {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			DesignMassFlowRate( 0.0 )
-		{}
-
-		// Member Constructor
-		IceStorageSpecs(
-			std::string const & Name, // User identifier
-			std::string const & ITSType, // Ice Thermal Storage Type
-			int const ITSType_Num, // Storage Type as number (IceOnCoilInternal,IceOnCoilExternal)
-			int const MapNum, // Number to Map structure
-			int const UratePtr, // Charging/Discharging SchedulePtr: u value schedule
-			Real64 const ITSNomCap, // Design nominal capacity of Ice Thermal Storage [J] (user input in GJ)
-			int const PltInletNodeNum, // Node number on the inlet side of the plant
-			int const PltOutletNodeNum, // Node number on the outlet side of the plant
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum,
-			Real64 const DesignMassFlowRate
-		) :
-			Name( Name ),
-			ITSType( ITSType ),
-			ITSType_Num( ITSType_Num ),
-			MapNum( MapNum ),
-			UratePtr( UratePtr ),
-			ITSNomCap( ITSNomCap ),
-			PltInletNodeNum( PltInletNodeNum ),
-			PltOutletNodeNum( PltOutletNodeNum ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			DesignMassFlowRate( DesignMassFlowRate )
 		{}
 
 	};
@@ -298,105 +312,6 @@ namespace IceThermalStorage {
 			ChargeErrorCount( 0 )
 		{}
 
-		// Member Constructor
-		DetailedIceStorageData(
-			std::string const & Name, // User identifier
-			std::string const & ScheduleName, // User identifier
-			int const ScheduleIndex, // Plant inlet node number for ice storage unit
-			Real64 const NomCapacity, // Design storage capacity of Ice Thermal Storage system [W-hr]
-			int const PlantInNodeNum, // Plant inlet node number for ice storage unit
-			int const PlantOutNodeNum, // Plant outlet node number for ice storage unit
-			int const PlantLoopNum,
-			int const PlantLoopSideNum,
-			int const PlantBranchNum,
-			int const PlantCompNum,
-			Real64 const DesignMassFlowRate,
-			int const MapNum, // Number to Map structure
-			std::string const & DischargeCurveType, // Type of discharging equation entered by user (QuadraticLinear or CubicLinear)
-			int const DischargeCurveTypeNum, // integer version of previous variable
-			std::string const & DischargeCurveName, // Curve name for discharging (used to find the curve index)
-			int const DischargeCurveNum, // Curve index for discharging
-			std::string const & ChargeCurveType, // Type of charging equation entered by user (QuadraticLinear or CubicLinear)
-			int const ChargeCurveTypeNum,        // integer version of previous variable
-			std::string const & ChargeCurveName, // Curve name for charging (used to find the curve index)
-			int const ChargeCurveNum, // Curve index for charging
-			Real64 const CurveFitTimeStep, // Time step used to generate performance data [hours]
-			Real64 const DischargeParaElecLoad, // Parasitic electric load duing discharging [dimensionless]
-			Real64 const ChargeParaElecLoad, // Parasitic electric load duing charging [dimensionless]
-			Real64 const TankLossCoeff, // Fraction of total storage capacity lost per hour [1/hours]
-			Real64 const FreezingTemp, // Freezing/melting temperature of ice storage unit [C]
-			Real64 const CompLoad, // load requested by plant [W]
-			Real64 const IceFracChange, // Change in fraction of ice stored during the time step [fraction]
-			Real64 const IceFracRemaining, // Fraction of ice remaining in storage [fraction]
-			std::string const & ThawProcessIndicator, // User input determining whether system is inside or outside melt
-			int const ThawProcessIndex, // Conversion of thaw process indicator to integer index
-			Real64 const IceFracOnCoil, // Fraction of ice on the coil (affects charging) [fraction]
-			Real64 const DischargingRate, // Rate at which energy is being added (thawing) to ice unit [W]
-			Real64 const DischargingEnergy, // Total energy added to the ice storage unit [J]
-			Real64 const ChargingRate, // Rate at which energy is removed (freezing) to ice unit [W]
-			Real64 const ChargingEnergy, // Total energy removed from ice storage unit [J]
-			Real64 const MassFlowRate, // Total mass flow rate to component [kg/s]
-			Real64 const BypassMassFlowRate, // Mass flow rate that bypasses the ice unit locally [kg/s]
-			Real64 const TankMassFlowRate, // Mass flow rate through the ice storage unit [kg/s]
-			Real64 const InletTemp, // Component inlet temperature (same as bypass temperature) [C]
-			Real64 const OutletTemp, // Component outlet temperature (blended) [C]
-			Real64 const TankOutletTemp, // Ice storage unit outlet temperature [C]
-			Real64 const ParasiticElecRate, // Parasitic electrical energy rate consumed by ice storage [W]
-			Real64 const ParasiticElecEnergy, // Total parasitic electrical energy consumed by ice storage [J]
-			int const DischargeIterErrors, // Number of max iterations exceeded errors during discharging
-			int const DischargeErrorCount, // Index for error counting routine
-			int const ChargeIterErrors, // Number of max iterations exceeded errors during charging
-			int const ChargeErrorCount // Index for error counting routine
-		) :
-			Name( Name ),
-			ScheduleName( ScheduleName ),
-			ScheduleIndex( ScheduleIndex ),
-			NomCapacity( NomCapacity ),
-			PlantInNodeNum( PlantInNodeNum ),
-			PlantOutNodeNum( PlantOutNodeNum ),
-			PlantLoopNum( PlantLoopNum ),
-			PlantLoopSideNum( PlantLoopSideNum ),
-			PlantBranchNum( PlantBranchNum ),
-			PlantCompNum( PlantCompNum ),
-			DesignMassFlowRate( DesignMassFlowRate ),
-			MapNum( MapNum ),
-			DischargeCurveType( DischargeCurveType ),
-			DischargeCurveTypeNum( DischargeCurveTypeNum ),
-			DischargeCurveName( DischargeCurveName ),
-			DischargeCurveNum( DischargeCurveNum ),
-			ChargeCurveType( ChargeCurveType ),
-			ChargeCurveTypeNum( ChargeCurveTypeNum ),
-			ChargeCurveName( ChargeCurveName ),
-			ChargeCurveNum( ChargeCurveNum ),
-			CurveFitTimeStep( CurveFitTimeStep ),
-			DischargeParaElecLoad( DischargeParaElecLoad ),
-			ChargeParaElecLoad( ChargeParaElecLoad ),
-			TankLossCoeff( TankLossCoeff ),
-			FreezingTemp( FreezingTemp ),
-			CompLoad( CompLoad ),
-			IceFracChange( IceFracChange ),
-			IceFracRemaining( IceFracRemaining ),
-			ThawProcessIndicator( ThawProcessIndicator ),
-			ThawProcessIndex( ThawProcessIndex ),
-			IceFracOnCoil( IceFracOnCoil ),
-			DischargingRate( DischargingRate ),
-			DischargingEnergy( DischargingEnergy ),
-			ChargingRate( ChargingRate ),
-			ChargingEnergy( ChargingEnergy ),
-			MassFlowRate( MassFlowRate ),
-			BypassMassFlowRate( BypassMassFlowRate ),
-			TankMassFlowRate( TankMassFlowRate ),
-			InletTemp( InletTemp ),
-			OutletTemp( OutletTemp ),
-			TankOutletTemp( TankOutletTemp ),
-			ParasiticElecRate( ParasiticElecRate ),
-			ParasiticElecEnergy( ParasiticElecEnergy ),
-			DischargeIterErrors( DischargeIterErrors ),
-			DischargeErrorCount( DischargeErrorCount ),
-			ChargeIterErrors( ChargeIterErrors ),
-			ChargeErrorCount( ChargeErrorCount )
-		{}
-
 	};
 
 	struct ReportVars
@@ -427,33 +342,6 @@ namespace IceThermalStorage {
 			ITSmdot( 0.0 ),
 			ITSInletTemp( 0.0 ),
 			ITSOutletTemp( 0.0 )
-		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const MyLoad, // load requested by plant [W]
-			Real64 const U, // [fraction]
-			Real64 const Urate, // [fraction]
-			Real64 const IceFracRemain, // Fraction of ice remaining in storage [fraction]
-			Real64 const ITSCoolingRate, // [W]
-			Real64 const ITSCoolingEnergy, // [J]
-			Real64 const ITSChargingRate, // [W]
-			Real64 const ITSChargingEnergy, // [J]
-			Real64 const ITSmdot, // [kg/s]
-			Real64 const ITSInletTemp, // [C]
-			Real64 const ITSOutletTemp // [C]
-		) :
-			MyLoad( MyLoad ),
-			U( U ),
-			Urate( Urate ),
-			IceFracRemain( IceFracRemain ),
-			ITSCoolingRate( ITSCoolingRate ),
-			ITSCoolingEnergy( ITSCoolingEnergy ),
-			ITSChargingRate( ITSChargingRate ),
-			ITSChargingEnergy( ITSChargingEnergy ),
-			ITSmdot( ITSmdot ),
-			ITSInletTemp( ITSInletTemp ),
-			ITSOutletTemp( ITSOutletTemp )
 		{}
 
 	};
@@ -609,29 +497,6 @@ namespace IceThermalStorage {
 
 	void
 	ReportDetailedIceStorage();
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // IceThermalStorage
 

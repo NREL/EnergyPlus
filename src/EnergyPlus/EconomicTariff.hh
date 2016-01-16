@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef EconomicTariff_hh_INCLUDED
 #define EconomicTariff_hh_INCLUDED
 
@@ -259,43 +317,6 @@ namespace EconomicTariff {
 			varUnitType( 0 )
 		{}
 
-		// Member Constructor
-		EconVarType(
-			std::string const & name, // name of the economics object or variable
-			int const tariffIndx, // index of the tariff name in the tariff array
-			int const kindOfObj, // enumerated list for the kind of economics object
-			int const index, // pointer to item in specific array
-			Array1< Real64 > const & values, // values
-			bool const isArgument, // flag if the variable is ever used as an argument (value needed)
-			bool const isAssigned, // flag if the variable is ever assigned to
-			int const specific, // the specific type of variable - see enumerated lists
-			int const cntMeDependOn, // count of items in depend this line depends upon
-			int const Operator, // operator used in equation (usually opSUM or opNOOP)
-			int const firstOperand, // first item in the operand array
-			int const lastOperand, // last item in the operand array
-			bool const activeNow, // flag if the econVar is used in the current tariff
-			bool const isEvaluated, // flag if the economics object that results in this variable
-			bool const isReported, // flag if the econVar has been reported in the output file
-			int const varUnitType // variable unit type: energy, demand, dimensionless, currency
-		) :
-			name( name ),
-			tariffIndx( tariffIndx ),
-			kindOfObj( kindOfObj ),
-			index( index ),
-			values( MaxNumMonths, values ),
-			isArgument( isArgument ),
-			isAssigned( isAssigned ),
-			specific( specific ),
-			cntMeDependOn( cntMeDependOn ),
-			Operator( Operator ),
-			firstOperand( firstOperand ),
-			lastOperand( lastOperand ),
-			activeNow( activeNow ),
-			isEvaluated( isEvaluated ),
-			isReported( isReported ),
-			varUnitType( varUnitType )
-		{}
-
 	};
 
 	struct TariffType
@@ -494,197 +515,6 @@ namespace EconomicTariff {
 			totalAnnualEnergy( 0.0 )
 		{}
 
-		// Member Constructor
-		TariffType(
-			std::string const & tariffName, // name of the tariff
-			std::string const & reportMeter, // name of the report meter
-			int const reportMeterIndx, // index of the report meter
-			int const kindElectricMtr, // kind of electric meter - see enumerated list above, 0 is not electric
-			int const resourceNum, // based on list of DataGlobalConstants
-			int const convChoice, // enumerated choice index of the conversion factor
-			Real64 const energyConv, // energy conversion factor
-			Real64 const demandConv, // demand conversion factor
-			std::string const & periodSchedule, // name of the period schedule (time of day)
-			int const periodSchIndex, // index to the period schedule
-			std::string const & seasonSchedule, // name of the season schedule (winter/summer)
-			int const seasonSchIndex, // index to the season schedule
-			std::string const & monthSchedule, // name of month schedule (when months end)
-			int const monthSchIndex, // index to the month schedule
-			int const demandWindow, // enumerated list of the kind of demand window
-			Real64 const demWinTime, // length of time for the demand window
-			Real64 const monthChgVal, // monthly charge value
-			int const monthChgPt, // pointer to a variable that contains the monthly charge
-			Real64 const minMonthChgVal, // minimum monthly charge value
-			int const minMonthChgPt, // pointer to a variable that contains the minimum monthly charge
-			std::string const & chargeSchedule, // name of the charge schedule (for real time pricing)
-			int const chargeSchIndex, // index to the charge schedule
-			std::string const & baseUseSchedule, // name of the baseline use schedule (for real time pricing)
-			int const baseUseSchIndex, // index to the baseline use schedule
-			std::string const & groupName, // name of the group
-			std::string const & monetaryUnit, // text string representing monetary unit, usually $
-			int const buyOrSell, // enumerated choice index of the buy or sell options
-			int const firstCategory, // first category referenced
-			int const lastCategory, // last category referenced
-			int const ptEnergyCharges,
-			int const ptDemandCharges,
-			int const ptServiceCharges,
-			int const ptBasis,
-			int const ptAdjustment,
-			int const ptSurcharge,
-			int const ptSubtotal,
-			int const ptTaxes,
-			int const ptTotal,
-			int const ptNotIncluded,
-			int const firstNative,
-			int const lastNative,
-			int const nativeTotalEnergy,
-			int const nativeTotalDemand,
-			int const nativePeakEnergy,
-			int const nativePeakDemand,
-			int const nativeShoulderEnergy,
-			int const nativeShoulderDemand,
-			int const nativeOffPeakEnergy,
-			int const nativeOffPeakDemand,
-			int const nativeMidPeakEnergy,
-			int const nativeMidPeakDemand,
-			int const nativePeakExceedsOffPeak,
-			int const nativeOffPeakExceedsPeak,
-			int const nativePeakExceedsMidPeak,
-			int const nativeMidPeakExceedsPeak,
-			int const nativePeakExceedsShoulder,
-			int const nativeShoulderExceedsPeak,
-			int const nativeIsWinter,
-			int const nativeIsNotWinter,
-			int const nativeIsSpring,
-			int const nativeIsNotSpring,
-			int const nativeIsSummer,
-			int const nativeIsNotSummer,
-			int const nativeIsAutumn,
-			int const nativeIsNotAutumn,
-			int const nativePeakAndShoulderEnergy,
-			int const nativePeakAndShoulderDemand,
-			int const nativePeakAndMidPeakEnergy,
-			int const nativePeakAndMidPeakDemand,
-			int const nativeShoulderAndOffPeakEnergy,
-			int const nativeShoulderAndOffPeakDemand,
-			int const nativePeakAndOffPeakEnergy,
-			int const nativePeakAndOffPeakDemand,
-			int const nativeRealTimePriceCosts,
-			int const nativeAboveCustomerBaseCosts,
-			int const nativeBelowCustomerBaseCosts,
-			int const nativeAboveCustomerBaseEnergy,
-			int const nativeBelowCustomerBaseEnergy,
-			Array2< Real64 > const & gatherEnergy,
-			Array2< Real64 > const & gatherDemand,
-			Real64 const collectTime,
-			Real64 const collectEnergy,
-			Array1< Real64 > const & RTPcost,
-			Array1< Real64 > const & RTPaboveBaseCost,
-			Array1< Real64 > const & RTPbelowBaseCost,
-			Array1< Real64 > const & RTPaboveBaseEnergy,
-			Array1< Real64 > const & RTPbelowBaseEnergy,
-			Array1_int const & seasonForMonth,
-			bool const isQualified,
-			int const ptDisqualifier,
-			bool const isSelected,
-			Real64 const totalAnnualCost,
-			Real64 const totalAnnualEnergy
-		) :
-			tariffName( tariffName ),
-			reportMeter( reportMeter ),
-			reportMeterIndx( reportMeterIndx ),
-			kindElectricMtr( kindElectricMtr ),
-			resourceNum( resourceNum ),
-			convChoice( convChoice ),
-			energyConv( energyConv ),
-			demandConv( demandConv ),
-			periodSchedule( periodSchedule ),
-			periodSchIndex( periodSchIndex ),
-			seasonSchedule( seasonSchedule ),
-			seasonSchIndex( seasonSchIndex ),
-			monthSchedule( monthSchedule ),
-			monthSchIndex( monthSchIndex ),
-			demandWindow( demandWindow ),
-			demWinTime( demWinTime ),
-			monthChgVal( monthChgVal ),
-			monthChgPt( monthChgPt ),
-			minMonthChgVal( minMonthChgVal ),
-			minMonthChgPt( minMonthChgPt ),
-			chargeSchedule( chargeSchedule ),
-			chargeSchIndex( chargeSchIndex ),
-			baseUseSchedule( baseUseSchedule ),
-			baseUseSchIndex( baseUseSchIndex ),
-			groupName( groupName ),
-			monetaryUnit( monetaryUnit ),
-			buyOrSell( buyOrSell ),
-			firstCategory( firstCategory ),
-			lastCategory( lastCategory ),
-			ptEnergyCharges( ptEnergyCharges ),
-			ptDemandCharges( ptDemandCharges ),
-			ptServiceCharges( ptServiceCharges ),
-			ptBasis( ptBasis ),
-			ptAdjustment( ptAdjustment ),
-			ptSurcharge( ptSurcharge ),
-			ptSubtotal( ptSubtotal ),
-			ptTaxes( ptTaxes ),
-			ptTotal( ptTotal ),
-			ptNotIncluded( ptNotIncluded ),
-			firstNative( firstNative ),
-			lastNative( lastNative ),
-			nativeTotalEnergy( nativeTotalEnergy ),
-			nativeTotalDemand( nativeTotalDemand ),
-			nativePeakEnergy( nativePeakEnergy ),
-			nativePeakDemand( nativePeakDemand ),
-			nativeShoulderEnergy( nativeShoulderEnergy ),
-			nativeShoulderDemand( nativeShoulderDemand ),
-			nativeOffPeakEnergy( nativeOffPeakEnergy ),
-			nativeOffPeakDemand( nativeOffPeakDemand ),
-			nativeMidPeakEnergy( nativeMidPeakEnergy ),
-			nativeMidPeakDemand( nativeMidPeakDemand ),
-			nativePeakExceedsOffPeak( nativePeakExceedsOffPeak ),
-			nativeOffPeakExceedsPeak( nativeOffPeakExceedsPeak ),
-			nativePeakExceedsMidPeak( nativePeakExceedsMidPeak ),
-			nativeMidPeakExceedsPeak( nativeMidPeakExceedsPeak ),
-			nativePeakExceedsShoulder( nativePeakExceedsShoulder ),
-			nativeShoulderExceedsPeak( nativeShoulderExceedsPeak ),
-			nativeIsWinter( nativeIsWinter ),
-			nativeIsNotWinter( nativeIsNotWinter ),
-			nativeIsSpring( nativeIsSpring ),
-			nativeIsNotSpring( nativeIsNotSpring ),
-			nativeIsSummer( nativeIsSummer ),
-			nativeIsNotSummer( nativeIsNotSummer ),
-			nativeIsAutumn( nativeIsAutumn ),
-			nativeIsNotAutumn( nativeIsNotAutumn ),
-			nativePeakAndShoulderEnergy( nativePeakAndShoulderEnergy ),
-			nativePeakAndShoulderDemand( nativePeakAndShoulderDemand ),
-			nativePeakAndMidPeakEnergy( nativePeakAndMidPeakEnergy ),
-			nativePeakAndMidPeakDemand( nativePeakAndMidPeakDemand ),
-			nativeShoulderAndOffPeakEnergy( nativeShoulderAndOffPeakEnergy ),
-			nativeShoulderAndOffPeakDemand( nativeShoulderAndOffPeakDemand ),
-			nativePeakAndOffPeakEnergy( nativePeakAndOffPeakEnergy ),
-			nativePeakAndOffPeakDemand( nativePeakAndOffPeakDemand ),
-			nativeRealTimePriceCosts( nativeRealTimePriceCosts ),
-			nativeAboveCustomerBaseCosts( nativeAboveCustomerBaseCosts ),
-			nativeBelowCustomerBaseCosts( nativeBelowCustomerBaseCosts ),
-			nativeAboveCustomerBaseEnergy( nativeAboveCustomerBaseEnergy ),
-			nativeBelowCustomerBaseEnergy( nativeBelowCustomerBaseEnergy ),
-			gatherEnergy( MaxNumMonths, countPeriod, gatherEnergy ),
-			gatherDemand( MaxNumMonths, countPeriod, gatherDemand ),
-			collectTime( collectTime ),
-			collectEnergy( collectEnergy ),
-			RTPcost( MaxNumMonths, RTPcost ),
-			RTPaboveBaseCost( MaxNumMonths, RTPaboveBaseCost ),
-			RTPbelowBaseCost( MaxNumMonths, RTPbelowBaseCost ),
-			RTPaboveBaseEnergy( MaxNumMonths, RTPaboveBaseEnergy ),
-			RTPbelowBaseEnergy( MaxNumMonths, RTPbelowBaseEnergy ),
-			seasonForMonth( MaxNumMonths, seasonForMonth ),
-			isQualified( isQualified ),
-			ptDisqualifier( ptDisqualifier ),
-			isSelected( isSelected ),
-			totalAnnualCost( totalAnnualCost ),
-			totalAnnualEnergy( totalAnnualEnergy )
-		{}
-
 	};
 
 	struct QualifyType
@@ -713,29 +543,6 @@ namespace EconomicTariff {
 			numberOfMonths( 0 )
 		{}
 
-		// Member Constructor
-		QualifyType(
-			int const namePt, // index of the name and variable in the variable array
-			int const tariffIndx, // index of the tariff name in the tariff array
-			int const sourcePt, // index of the variable in the variable array
-			bool const isMaximum, // indicator if maximum test otherwise minimum
-			Real64 const thresholdVal, // value of the threshold
-			int const thresholdPt, // pointer to the variable holding the values
-			int const season, // enumerated list of the kind of season
-			bool const isConsecutive, // indicator if consecutive months otherwise count
-			int const numberOfMonths // number of months the test must be good for
-		) :
-			namePt( namePt ),
-			tariffIndx( tariffIndx ),
-			sourcePt( sourcePt ),
-			isMaximum( isMaximum ),
-			thresholdVal( thresholdVal ),
-			thresholdPt( thresholdPt ),
-			season( season ),
-			isConsecutive( isConsecutive ),
-			numberOfMonths( numberOfMonths )
-		{}
-
 	};
 
 	struct ChargeSimpleType
@@ -758,25 +565,6 @@ namespace EconomicTariff {
 			categoryPt( 0 ),
 			costPerVal( 0.0 ),
 			costPerPt( 0 )
-		{}
-
-		// Member Constructor
-		ChargeSimpleType(
-			int const namePt, // index of the name and variable in the variable array
-			int const tariffIndx, // index of the tariff name in the tariff array
-			int const sourcePt, // index of the variable in the variable array
-			int const season, // enumerated list of the kind of season
-			int const categoryPt, // index of the category in the variable array
-			Real64 const costPerVal, // cost per unit value
-			int const costPerPt // cost per unit index in the variable array (0 is flag for no variable)
-		) :
-			namePt( namePt ),
-			tariffIndx( tariffIndx ),
-			sourcePt( sourcePt ),
-			season( season ),
-			categoryPt( categoryPt ),
-			costPerVal( costPerVal ),
-			costPerPt( costPerPt )
 		{}
 
 	};
@@ -815,37 +603,6 @@ namespace EconomicTariff {
 			blkCostPt( maxNumBlk, 0 )
 		{}
 
-		// Member Constructor
-		ChargeBlockType(
-			int const namePt, // index of the name and variable in the variable array
-			int const tariffIndx, // index of the tariff name in the tariff array
-			int const sourcePt, // index of the variable in the variable array
-			int const season, // enumerated list of the kind of season
-			int const categoryPt, // index of the category in the variable array
-			int const remainingPt, // index of the remaining into variable in the variable array
-			Real64 const blkSzMultVal, // block size multiplier value
-			int const blkSzMultPt, // block size variable in the variable array (0 is flag for no variable)
-			int const numBlk, // number of blocks used
-			Array1< Real64 > const & blkSzVal, // array of block size values
-			Array1_int const & blkSzPt, // block size variables index to the variable array (0 is no variable)
-			Array1< Real64 > const & blkCostVal, // array of block cost values
-			Array1_int const & blkCostPt // block cost variables index to the variable array (0 is no variable)
-		) :
-			namePt( namePt ),
-			tariffIndx( tariffIndx ),
-			sourcePt( sourcePt ),
-			season( season ),
-			categoryPt( categoryPt ),
-			remainingPt( remainingPt ),
-			blkSzMultVal( blkSzMultVal ),
-			blkSzMultPt( blkSzMultPt ),
-			numBlk( numBlk ),
-			blkSzVal( maxNumBlk, blkSzVal ),
-			blkSzPt( maxNumBlk, blkSzPt ),
-			blkCostVal( maxNumBlk, blkCostVal ),
-			blkCostPt( maxNumBlk, blkCostPt )
-		{}
-
 	};
 
 	struct RatchetType
@@ -876,31 +633,6 @@ namespace EconomicTariff {
 			offsetPt( 0 )
 		{}
 
-		// Member Constructor
-		RatchetType(
-			int const namePt, // index of the name and variable in the variable array
-			int const tariffIndx, // index of the tariff name in the tariff array
-			int const baselinePt, // index of the baseline variable in the variable array
-			int const adjustmentPt, // index fo the adjustment variable in the variable array
-			int const seasonFrom, // enumerated list of the kind of season
-			int const seasonTo, // enumerated list of the kind of season
-			Real64 const multiplierVal, // value of the ratchet multiplier
-			int const multiplierPt, // multiplier variable in the variable array (0 for no variable)
-			Real64 const offsetVal, // value of the ratchet offset
-			int const offsetPt // offset variable in the variable array (0 for no variable)
-		) :
-			namePt( namePt ),
-			tariffIndx( tariffIndx ),
-			baselinePt( baselinePt ),
-			adjustmentPt( adjustmentPt ),
-			seasonFrom( seasonFrom ),
-			seasonTo( seasonTo ),
-			multiplierVal( multiplierVal ),
-			multiplierPt( multiplierPt ),
-			offsetVal( offsetVal ),
-			offsetPt( offsetPt )
-		{}
-
 	};
 
 	struct ComputationType
@@ -918,19 +650,6 @@ namespace EconomicTariff {
 			isUserDef( false )
 		{}
 
-		// Member Constructor
-		ComputationType(
-			std::string const & computeName, // name of the compute
-			int const firstStep, // index to steps array for the first step in this compute steps
-			int const lastStep, // index to steps array for the last step in this compute steps
-			bool const isUserDef // if the computation steps were user defined
-		) :
-			computeName( computeName ),
-			firstStep( firstStep ),
-			lastStep( lastStep ),
-			isUserDef( isUserDef )
-		{}
-
 	};
 
 	struct StackType
@@ -943,15 +662,6 @@ namespace EconomicTariff {
 		StackType() :
 			varPt( 0 ),
 			values( MaxNumMonths, 0.0 )
-		{}
-
-		// Member Constructor
-		StackType(
-			int const varPt, // pointer to item in specific array
-			Array1< Real64 > const & values // values
-		) :
-			varPt( varPt ),
-			values( MaxNumMonths, values )
 		{}
 
 	};
@@ -1184,29 +894,6 @@ namespace EconomicTariff {
 		int const inResourceNumber,
 		Array1A< Real64 > outMonthlyCosts
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // EconomicTariff
 

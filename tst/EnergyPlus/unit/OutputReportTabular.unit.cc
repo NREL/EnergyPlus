@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // EnergyPlus::OutputReportTabular Unit Tests
 
 // Google Test Headers
@@ -11,6 +69,8 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -23,7 +83,9 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
+using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputReportTabular;
 using namespace EnergyPlus::OutputProcessor;
@@ -42,7 +104,7 @@ TEST( OutputReportTabularTest, ConfirmSetUnitsStyleFromString )
 	EXPECT_EQ( unitsStyleNotFound, SetUnitsStyleFromString( "qqq" ) );
 }
 
-TEST( OutputReportTabularTest, Basic )
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_Basic )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, Basic" );
 
@@ -115,7 +177,7 @@ TEST(OutputReportTabularTest, ConfirmWaterConversion)
 
 }
 
-TEST( OutputReportTabularTest, GetUnitConversion )
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, GetUnitConversion" );
 
@@ -177,6 +239,226 @@ TEST( OutputReportTabularTest, GetUnitConversion )
 
 }
 
+TEST( OutputReportTabularTest, GetColumnUsingTabs )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, GetColumnUsingTabs" );
+{
+	std::string inString = " Col1 \t Col2 \t Col3 ";
+	EXPECT_EQ( " Col1 ", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( " Col2 ", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( " Col3 ", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 4 ) );
+}
+
+{
+	std::string inString = "Col1\tCol2\tCol3";
+	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 4 ) );
+}
+
+{
+	std::string inString = "Col1\tCol2\tCol3\t";
+	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 4 )  );
+}
+
+{
+	std::string inString = "";
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 2 ) );
+}
+
+{
+	std::string inString = " ";
+	EXPECT_EQ( " ", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 2 ) );
+}
+
+{
+	std::string inString = "\t";
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 3 ) );
+}
+
+{
+	std::string inString = " \t ";
+	EXPECT_EQ( " ", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( " ", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 3 ) );
+}
+
+{
+	std::string inString = "\tCol1\tCol2\tCol3\t";
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString, 4 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 5 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 6 ) );
+}
+
+{
+	std::string inString = "Col1\t\tCol2\tCol3\t";
+	EXPECT_EQ( "Col1", GetColumnUsingTabs( inString, 1 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 2 ) );
+	EXPECT_EQ( "Col2", GetColumnUsingTabs( inString, 3 ) );
+	EXPECT_EQ( "Col3", GetColumnUsingTabs( inString, 4 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 5 ) );
+	EXPECT_EQ( "", GetColumnUsingTabs( inString, 6 ) );
+}
+
+}
+
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest )
+{
+	ShowMessage( "Begin Test: EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest" );
+
+	TotDesDays = 2;
+	TotRunDesPersDays = 3;
+	NumOfZones = 4;
+	TotSurfaces = 7;
+	NumOfTimeStepInHour = 4;
+
+	AllocateLoadComponentArrays();
+
+	// radiantPulseUsed.allocate( { 0, TotDesDays + TotRunDesPersDays }, NumOfZones );
+	EXPECT_EQ( radiantPulseUsed.size(), 24u );
+
+	// radiantPulseTimestep.allocate( { 0, TotDesDays + TotRunDesPersDays }, NumOfZones );
+	EXPECT_EQ( radiantPulseTimestep.size(), 24u );
+
+	// radiantPulseReceived.allocate( { 0, TotDesDays + TotRunDesPersDays }, TotSurfaces );
+	EXPECT_EQ( radiantPulseReceived.size(), 42u );
+
+	// loadConvectedNormal.allocate( TotDesDays + TotRunDesPersDays, { 0, NumOfTimeStepInHour * 24 }, TotSurfaces );
+	EXPECT_EQ( loadConvectedNormal.size(), 3395u );
+
+	// loadConvectedWithPulse.allocate( TotDesDays + TotRunDesPersDays, { 0, NumOfTimeStepInHour * 24 }, TotSurfaces );
+	EXPECT_EQ( loadConvectedWithPulse.size(), 3395u );
+
+	// netSurfRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( netSurfRadSeq.size(), 3360u );
+
+	// decayCurveCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( decayCurveCool.size(), 672u );
+
+	// decayCurveHeat.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( decayCurveHeat.size(), 672u );
+
+	// ITABSFseq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( ITABSFseq.size(), 3360u );
+
+	// TMULTseq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( TMULTseq.size(), 1920u );
+
+	// peopleInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( peopleInstantSeq.size(), 1920u );
+
+	// peopleLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( peopleLatentSeq.size(), 1920u );
+
+	// peopleRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( peopleRadSeq.size(), 1920u );
+
+	// peopleDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( peopleDelaySeq.size(), 1920u );
+
+	// lightInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( lightInstantSeq.size(), 1920u );
+
+	// lightRetAirSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( lightRetAirSeq.size(), 1920u );
+
+	// lightLWRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( lightLWRadSeq.size(), 1920u );
+
+	// lightSWRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( lightSWRadSeq.size(), 3360u );
+
+	// lightDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( lightDelaySeq.size(), 1920u );
+
+	// equipInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( equipInstantSeq.size(), 1920u );
+
+	// equipLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( equipLatentSeq.size(), 1920u );
+
+	// equipRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( equipRadSeq.size(), 1920u );
+
+	// equipDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( equipDelaySeq.size(), 1920u );
+
+	// refrigInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( refrigInstantSeq.size(), 1920u );
+
+	// refrigRetAirSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( refrigRetAirSeq.size(), 1920u );
+
+	// refrigLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( refrigLatentSeq.size(), 1920u );
+
+	// waterUseInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( waterUseInstantSeq.size(), 1920u );
+
+	// waterUseLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( waterUseLatentSeq.size(), 1920u );
+
+	// hvacLossInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( hvacLossInstantSeq.size(), 1920u );
+
+	// hvacLossRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( hvacLossRadSeq.size(), 1920u );
+
+	// hvacLossDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( hvacLossDelaySeq.size(), 1920u );
+
+	// powerGenInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( powerGenInstantSeq.size(), 1920u );
+
+	// powerGenRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( powerGenRadSeq.size(), 1920u );
+
+	// powerGenDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( powerGenDelaySeq.size(), 1920u );
+
+	// infilInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( infilInstantSeq.size(), 1920u );
+
+	// infilLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( infilLatentSeq.size(), 1920u );
+
+	// zoneVentInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( zoneVentInstantSeq.size(), 1920u );
+
+	// zoneVentLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( zoneVentLatentSeq.size(), 1920u );
+
+	// interZoneMixInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( interZoneMixInstantSeq.size(), 1920u );
+
+	// interZoneMixLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( interZoneMixLatentSeq.size(), 1920u );
+
+	// feneCondInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( feneCondInstantSeq.size(), 1920u );
+
+	// feneSolarRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( feneSolarRadSeq.size(), 3360u );
+
+	// feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( feneSolarDelaySeq.size(), 1920u );
+
+	// surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( surfDelaySeq.size(), 3360u );
+
+}
 
 TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {
@@ -1063,7 +1345,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 	UpdateMeterReporting();
 	UpdateDataandReport( 1 );
 	GatherBEPSResultsForTimestep( 1 );
-	EXPECT_EQ( extLitUse * 9, gatherEndUseBEPS( 1, endUseExteriorLights )  );
+	EXPECT_EQ( extLitUse * 9, gatherEndUseBEPS( 1, endUseExteriorLights ) );
 
 	ResetBEPSGathering();
 

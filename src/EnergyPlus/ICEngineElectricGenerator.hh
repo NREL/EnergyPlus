@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef ICEngineElectricGenerator_hh_INCLUDED
 #define ICEngineElectricGenerator_hh_INCLUDED
 
@@ -147,117 +205,6 @@ namespace ICEngineElectricGenerator {
 			HRCompNum( 0 )
 		{}
 
-		// Member Constructor
-		ICEngineGeneratorSpecs(
-			std::string const & Name, // user identifier
-			std::string const & TypeOf, // Type of Generator
-			int const CompType_Num,
-			std::string const & FuelType, // Type of Fuel - DIESEL, GASOLINE, GAS
-			Real64 const RatedPowerOutput, // W - design nominal capacity of Generator
-			int const ElectricCircuitNode, // Electric Circuit Node
-			Real64 const MinPartLoadRat, // (IC ENGINE MIN) min allowed operating frac full load
-			Real64 const MaxPartLoadRat, // (IC ENGINE MAX) max allowed operating frac full load
-			Real64 const OptPartLoadRat, // (IC ENGINE BEST) optimal operating frac full load
-			Real64 const ElecOutputFuelRat, // (RELDC) Ratio of Generator output to Fuel Energy Input
-			int const ElecOutputFuelCurve, // Curve Index for generator output to Fuel Energy Input Coeff Poly Fit
-			Real64 const RecJacHeattoFuelRat, // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-			int const RecJacHeattoFuelCurve, // Curve Index for Ratio of Recoverable Jacket Heat to
-			Real64 const RecLubeHeattoFuelRat, // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
-			int const RecLubeHeattoFuelCurve, // Curve Index for Ratio of Recoverable Lube Oil Heat to
-			Real64 const TotExhausttoFuelRat, // (REXDC) Total Exhaust heat Input to Fuel Energy Input
-			int const TotExhausttoFuelCurve, // Curve Index for Total Exhaust heat Input to Fuel Energy Input
-			Real64 const ExhaustTemp, // (TEXDC) Exhaust Gas Temp to Fuel Energy Input
-			int const ExhaustTempCurve, // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
-			int const ErrExhaustTempIndex, // error index for temp curve
-			Real64 const UA, // (UACDC) exhaust gas Heat Exchanger UA to Capacity
-			Array1< Real64 > const & UACoef, // Heat Exchanger UA Coeffs Poly Fit
-			Real64 const MaxExhaustperPowerOutput, // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
-			Real64 const DesignMinExitGasTemp, // Steam Saturation Temperature
-			Real64 const FuelHeatingValue, // Heating Value of Fuel in kJ/kg
-			Real64 const DesignHeatRecVolFlowRate, // m3/s, Design Water mass flow rate through heat recovery loop
-			Real64 const DesignHeatRecMassFlowRate, // kg/s, Design Water mass flow rate through heat recovery loop
-			bool const HeatRecActive, // True if Heat Rec Design Vol Flow Rate > 0
-			int const HeatRecInletNodeNum, // Node number on the heat recovery inlet side of the condenser
-			int const HeatRecOutletNodeNum, // Node number on the heat recovery outlet side of the condenser
-			Real64 const HeatRecInletTemp, // Inlet Temperature of the heat recovery fluid
-			Real64 const HeatRecOutletTemp, // Outlet Temperature of the heat recovery fluid
-			Real64 const HeatRecMdotDesign, // reporting: Heat Recovery Loop Mass flow rate
-			Real64 const HeatRecMdotActual,
-			Real64 const QTotalHeatRecovered, // total heat recovered (W)
-			Real64 const QJacketRecovered, // heat recovered from jacket (W)
-			Real64 const QLubeOilRecovered, // heat recovered from lube (W)
-			Real64 const QExhaustRecovered, // exhaust gas heat recovered (W)
-			Real64 const FuelEnergyUseRate, // Fuel Energy used (W)
-			Real64 const TotalHeatEnergyRec, // total heat recovered (J)
-			Real64 const JacketEnergyRec, // heat recovered from jacket (J)
-			Real64 const LubeOilEnergyRec, // heat recovered from lube (J)
-			Real64 const ExhaustEnergyRec, // exhaust gas heat recovered (J)
-			Real64 const FuelEnergy, // Fuel Energy used (J)
-			Real64 const FuelMdot, // Fuel Amount used (Kg/s)
-			Real64 const ExhaustStackTemp, // Exhaust Stack Temperature (C)
-			Real64 const ElecPowerGenerated, // Electric Power Generated (W)
-			Real64 const ElecEnergyGenerated, // Amount of Electric Energy Generated (J)
-			Real64 const HeatRecMaxTemp, // Max Temp that can be produced in heat recovery
-			int const HRLoopNum, // cooling water plant loop index number, for heat recovery
-			int const HRLoopSideNum, // cooling water plant loop side index, for heat recovery
-			int const HRBranchNum, // cooling water plant loop branch index, for heat recovery
-			int const HRCompNum // cooling water plant loop component index, for heat recovery
-		) :
-			Name( Name ),
-			TypeOf( TypeOf ),
-			CompType_Num( CompType_Num ),
-			FuelType( FuelType ),
-			RatedPowerOutput( RatedPowerOutput ),
-			ElectricCircuitNode( ElectricCircuitNode ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			OptPartLoadRat( OptPartLoadRat ),
-			ElecOutputFuelRat( ElecOutputFuelRat ),
-			ElecOutputFuelCurve( ElecOutputFuelCurve ),
-			RecJacHeattoFuelRat( RecJacHeattoFuelRat ),
-			RecJacHeattoFuelCurve( RecJacHeattoFuelCurve ),
-			RecLubeHeattoFuelRat( RecLubeHeattoFuelRat ),
-			RecLubeHeattoFuelCurve( RecLubeHeattoFuelCurve ),
-			TotExhausttoFuelRat( TotExhausttoFuelRat ),
-			TotExhausttoFuelCurve( TotExhausttoFuelCurve ),
-			ExhaustTemp( ExhaustTemp ),
-			ExhaustTempCurve( ExhaustTempCurve ),
-			ErrExhaustTempIndex( ErrExhaustTempIndex ),
-			UA( UA ),
-			UACoef( 2, UACoef ),
-			MaxExhaustperPowerOutput( MaxExhaustperPowerOutput ),
-			DesignMinExitGasTemp( DesignMinExitGasTemp ),
-			FuelHeatingValue( FuelHeatingValue ),
-			DesignHeatRecVolFlowRate( DesignHeatRecVolFlowRate ),
-			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
-			HeatRecActive( HeatRecActive ),
-			HeatRecInletNodeNum( HeatRecInletNodeNum ),
-			HeatRecOutletNodeNum( HeatRecOutletNodeNum ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMdotDesign( HeatRecMdotDesign ),
-			HeatRecMdotActual( HeatRecMdotActual ),
-			QTotalHeatRecovered( QTotalHeatRecovered ),
-			QJacketRecovered( QJacketRecovered ),
-			QLubeOilRecovered( QLubeOilRecovered ),
-			QExhaustRecovered( QExhaustRecovered ),
-			FuelEnergyUseRate( FuelEnergyUseRate ),
-			TotalHeatEnergyRec( TotalHeatEnergyRec ),
-			JacketEnergyRec( JacketEnergyRec ),
-			LubeOilEnergyRec( LubeOilEnergyRec ),
-			ExhaustEnergyRec( ExhaustEnergyRec ),
-			FuelEnergy( FuelEnergy ),
-			FuelMdot( FuelMdot ),
-			ExhaustStackTemp( ExhaustStackTemp ),
-			ElecPowerGenerated( ElecPowerGenerated ),
-			ElecEnergyGenerated( ElecEnergyGenerated ),
-			HeatRecMaxTemp( HeatRecMaxTemp ),
-			HRLoopNum( HRLoopNum ),
-			HRLoopSideNum( HRLoopSideNum ),
-			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum )
-		{}
-
 	};
 
 	struct ReportVars
@@ -300,45 +247,6 @@ namespace ICEngineElectricGenerator {
 			HeatRecInletTemp( 0.0 ),
 			HeatRecOutletTemp( 0.0 ),
 			HeatRecMdot( 0.0 )
-		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const PowerGen, // reporting: power (W)
-			Real64 const EnergyGen, // reporting: energy (J)
-			Real64 const QJacketRecovered, // reporting: Heat Recovered from Jacket (W)
-			Real64 const QLubeOilRecovered, // reporting: Heat Recovered from Lubricant (W)
-			Real64 const QExhaustRecovered, // reporting: exhaust gas heat recovered (W)
-			Real64 const QTotalHeatRecovered, // reporting: Total Heat Recovered (W)
-			Real64 const TotalHeatEnergyRec, // reporting: total heat recovered (J)
-			Real64 const JacketEnergyRec, // reporting: heat recovered from jacket (J)
-			Real64 const LubeOilEnergyRec, // reporting: heat recovered from lube (J)
-			Real64 const ExhaustEnergyRec, // reporting: exhaust gas heat recovered (J)
-			Real64 const FuelEnergy, // reporting: Fuel Energy used (J)
-			Real64 const FuelEnergyUseRate, // reporting: Fuel Energy used (W)
-			Real64 const FuelMdot, // reporting: Fuel used (Kg/s)
-			Real64 const ExhaustStackTemp, // reporting: Exhaust Stack Temperature (C)
-			Real64 const HeatRecInletTemp, // reporting: Heat Recovery Loop Inlet Temperature (C)
-			Real64 const HeatRecOutletTemp, // reporting: Heat Recovery Loop Outlet Temperature (C)
-			Real64 const HeatRecMdot // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-		) :
-			PowerGen( PowerGen ),
-			EnergyGen( EnergyGen ),
-			QJacketRecovered( QJacketRecovered ),
-			QLubeOilRecovered( QLubeOilRecovered ),
-			QExhaustRecovered( QExhaustRecovered ),
-			QTotalHeatRecovered( QTotalHeatRecovered ),
-			TotalHeatEnergyRec( TotalHeatEnergyRec ),
-			JacketEnergyRec( JacketEnergyRec ),
-			LubeOilEnergyRec( LubeOilEnergyRec ),
-			ExhaustEnergyRec( ExhaustEnergyRec ),
-			FuelEnergy( FuelEnergy ),
-			FuelEnergyUseRate( FuelEnergyUseRate ),
-			FuelMdot( FuelMdot ),
-			ExhaustStackTemp( ExhaustStackTemp ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMdot( HeatRecMdot )
 		{}
 
 	};

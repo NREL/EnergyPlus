@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 #include <string>
@@ -407,7 +465,7 @@ namespace InternalHeatGains {
 						People( Loop ).Name = AlphaName( 1 );
 						People( Loop ).ZonePtr = PeopleObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, PeopleObjects( Item ).Name, People.Name(), Loop - 1, People( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, PeopleObjects( Item ).Name, People, Loop - 1, People( Loop ).Name, errFlag );
 						People( Loop ).ZonePtr = ZoneList( PeopleObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -955,7 +1013,7 @@ namespace InternalHeatGains {
 						Lights( Loop ).Name = AlphaName( 1 );
 						Lights( Loop ).ZonePtr = LightsObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, LightsObjects( Item ).Name, Lights.Name(), Loop - 1, Lights( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, LightsObjects( Item ).Name, Lights, Loop - 1, Lights( Loop ).Name, errFlag );
 						Lights( Loop ).ZonePtr = ZoneList( LightsObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1222,7 +1280,7 @@ namespace InternalHeatGains {
 						ZoneElectric( Loop ).Name = AlphaName( 1 );
 						ZoneElectric( Loop ).ZonePtr = ZoneElectricObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneElectricObjects( Item ).Name, ZoneElectric.Name(), Loop - 1, ZoneElectric( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneElectricObjects( Item ).Name, ZoneElectric, Loop - 1, ZoneElectric( Loop ).Name, errFlag );
 						ZoneElectric( Loop ).ZonePtr = ZoneList( ZoneElectricObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1432,7 +1490,7 @@ namespace InternalHeatGains {
 						ZoneGas( Loop ).Name = AlphaName( 1 );
 						ZoneGas( Loop ).ZonePtr = ZoneGasObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneGasObjects( Item ).Name, ZoneGas.Name(), Loop - 1, ZoneGas( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, ZoneGasObjects( Item ).Name, ZoneGas, Loop - 1, ZoneGas( Loop ).Name, errFlag );
 						ZoneGas( Loop ).ZonePtr = ZoneList( ZoneGasObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1663,7 +1721,7 @@ namespace InternalHeatGains {
 						ZoneHWEq( Loop ).Name = AlphaName( 1 );
 						ZoneHWEq( Loop ).ZonePtr = HotWaterEqObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, HotWaterEqObjects( Item ).Name, ZoneHWEq.Name(), Loop - 1, ZoneHWEq( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, HotWaterEqObjects( Item ).Name, ZoneHWEq, Loop - 1, ZoneHWEq( Loop ).Name, errFlag );
 						ZoneHWEq( Loop ).ZonePtr = ZoneList( HotWaterEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -1873,7 +1931,7 @@ namespace InternalHeatGains {
 						ZoneSteamEq( Loop ).Name = AlphaName( 1 );
 						ZoneSteamEq( Loop ).ZonePtr = SteamEqObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, SteamEqObjects( Item ).Name, ZoneSteamEq.Name(), Loop - 1, ZoneSteamEq( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, SteamEqObjects( Item ).Name, ZoneSteamEq, Loop - 1, ZoneSteamEq( Loop ).Name, errFlag );
 						ZoneSteamEq( Loop ).ZonePtr = ZoneList( SteamEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -2083,7 +2141,7 @@ namespace InternalHeatGains {
 						ZoneOtherEq( Loop ).Name = AlphaName( 1 );
 						ZoneOtherEq( Loop ).ZonePtr = OtherEqObjects( Item ).ZoneOrZoneListPtr;
 					} else {
-						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, OtherEqObjects( Item ).Name, ZoneOtherEq.Name(), Loop - 1, ZoneOtherEq( Loop ).Name, errFlag );
+						CheckCreatedZoneItemName( RoutineName, CurrentModuleObject, Zone( ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 ) ).Name, ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).MaxZoneNameLength, OtherEqObjects( Item ).Name, ZoneOtherEq, Loop - 1, ZoneOtherEq( Loop ).Name, errFlag );
 						ZoneOtherEq( Loop ).ZonePtr = ZoneList( OtherEqObjects( Item ).ZoneOrZoneListPtr ).Zone( Item1 );
 						if ( errFlag ) ErrorsFound = true;
 					}
@@ -3268,49 +3326,53 @@ namespace InternalHeatGains {
 		//  IF (.NOT. ALLOCATED(QSA)) ALLOCATE(QSA(NumOfZones))
 
 		//  Zero out time step variables
-		ZoneIntGain.NOFOCC() = 0.0;
-		ZoneIntGain.QOCTOT() = 0.0;
-		ZoneIntGain.QOCSEN() = 0.0;
-		ZoneIntGain.QOCLAT() = 0.0;
-		ZoneIntGain.QOCRAD() = 0.0;
-		ZoneIntGain.QOCCON() = 0.0;
-		ZoneIntGain.QLTSW() = 0.0;
-		ZoneIntGain.QLTCRA() = 0.0;
-		ZoneIntGain.QLTRAD() = 0.0;
-		ZoneIntGain.QLTCON() = 0.0;
-		ZoneIntGain.QLTTOT() = 0.0;
+		for ( auto & e : ZoneIntGain ) {
+			e.NOFOCC = 0.0;
+			e.QOCTOT = 0.0;
+			e.QOCSEN = 0.0;
+			e.QOCLAT = 0.0;
+			e.QOCRAD = 0.0;
+			e.QOCCON = 0.0;
+			e.QLTSW = 0.0;
+			e.QLTCRA = 0.0;
+			e.QLTRAD = 0.0;
+			e.QLTCON = 0.0;
+			e.QLTTOT = 0.0;
 
-		ZoneIntGain.QEELAT() = 0.0;
-		ZoneIntGain.QEERAD() = 0.0;
-		ZoneIntGain.QEECON() = 0.0;
-		ZoneIntGain.QEELost() = 0.0;
-		ZoneIntGain.QGELAT() = 0.0;
-		ZoneIntGain.QGERAD() = 0.0;
-		ZoneIntGain.QGECON() = 0.0;
-		ZoneIntGain.QGELost() = 0.0;
-		ZoneIntGain.QBBRAD() = 0.0;
-		ZoneIntGain.QBBCON() = 0.0;
-		ZoneIntGain.QOELAT() = 0.0;
-		ZoneIntGain.QOERAD() = 0.0;
-		ZoneIntGain.QOECON() = 0.0;
-		ZoneIntGain.QOELost() = 0.0;
-		ZoneIntGain.QHWLAT() = 0.0;
-		ZoneIntGain.QHWRAD() = 0.0;
-		ZoneIntGain.QHWCON() = 0.0;
-		ZoneIntGain.QHWLost() = 0.0;
-		ZoneIntGain.QSELAT() = 0.0;
-		ZoneIntGain.QSERAD() = 0.0;
-		ZoneIntGain.QSECON() = 0.0;
-		ZoneIntGain.QSELost() = 0.0;
+			e.QEELAT = 0.0;
+			e.QEERAD = 0.0;
+			e.QEECON = 0.0;
+			e.QEELost = 0.0;
+			e.QGELAT = 0.0;
+			e.QGERAD = 0.0;
+			e.QGECON = 0.0;
+			e.QGELost = 0.0;
+			e.QBBRAD = 0.0;
+			e.QBBCON = 0.0;
+			e.QOELAT = 0.0;
+			e.QOERAD = 0.0;
+			e.QOECON = 0.0;
+			e.QOELost = 0.0;
+			e.QHWLAT = 0.0;
+			e.QHWRAD = 0.0;
+			e.QHWCON = 0.0;
+			e.QHWLost = 0.0;
+			e.QSELAT = 0.0;
+			e.QSERAD = 0.0;
+			e.QSECON = 0.0;
+			e.QSELost = 0.0;
+		}
 
 		ZoneIntEEuse = zeroZoneCatEUse; // Set all member arrays to zeros
 
-		ZnRpt.LtsPower() = 0.0;
-		ZnRpt.ElecPower() = 0.0;
-		ZnRpt.GasPower() = 0.0;
-		ZnRpt.HWPower() = 0.0;
-		ZnRpt.SteamPower() = 0.0;
-		ZnRpt.BaseHeatPower() = 0.0;
+		for ( auto & e : ZnRpt ) {
+			e.LtsPower = 0.0;
+			e.ElecPower = 0.0;
+			e.GasPower = 0.0;
+			e.HWPower = 0.0;
+			e.SteamPower = 0.0;
+			e.BaseHeatPower = 0.0;
+		}
 
 		//  QSA = 0.0
 
@@ -5575,29 +5637,6 @@ namespace InternalHeatGains {
 		SumReturnAirGainRate = tmpSumReturnAirGainRate;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // InternalHeatGains
 
