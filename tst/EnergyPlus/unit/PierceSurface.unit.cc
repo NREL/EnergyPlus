@@ -78,8 +78,6 @@ using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 using Vector2D = DataSurfaces::Surface2D::Vector2D;
 
-// Note: PierceSurface rayDir argument does not need to be a unit vector and in some tests here it isn't
-
 TEST( PierceSurfaceTest, Rectangular )
 {
 	DataSurfaces::SurfaceData floor;
@@ -104,6 +102,17 @@ TEST( PierceSurfaceTest, Rectangular )
 		EXPECT_TRUE( hit );
 		EXPECT_DOUBLE_EQ( 0.5, hitPt.x );
 		EXPECT_DOUBLE_EQ( 0.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+		PierceSurface( floor, rayOri, rayDir, 1.1, hitPt, hit ); // Distance limit > 1.0 => Still hits
+		EXPECT_TRUE( hit );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.5, hitPt.y );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
+		hitPt = 0.0;
+		PierceSurface( floor, rayOri, rayDir, 0.9, hitPt, hit ); // Distance limit < 1.0 => Doesn't hit
+		EXPECT_FALSE( hit );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.x );
+		EXPECT_DOUBLE_EQ( 0.0, hitPt.y );
 		EXPECT_DOUBLE_EQ( 0.0, hitPt.z );
 	}
 

@@ -3188,7 +3188,7 @@ namespace DaylightingManager {
 		Real64 CosIncAngRec; // Cos of angle of incidence of reflected beam on receiving window
 		bool hitRefl; // True iff ray hits reflecting surface
 		static Vector3< Real64 > HitPtRefl; // Point that ray hits reflecting surface
-		Real64 ReflDistanceSq; // Distance squared between ref pt and hit point on reflecting surf (m)
+		Real64 ReflDistanceSq; // Distance squared between ref pt and hit point on reflecting surf (m^2)
 		Real64 ReflDistance; // Distance between ref pt and hit point on reflecting surf (m)
 		bool hitObsRefl; // True iff obstruction hit between ref pt and reflection point
 		static Vector3< Real64 > HitPtObs; // Hit point on obstruction
@@ -5611,7 +5611,7 @@ namespace DaylightingManager {
 
 		hit = false;
 		RN = ( R2 - R1 ).normalize(); // Unit vector
-		Real64 const d12( distance( R1, R2 ) ); // Distance squared between R1 and R2 (m)
+		Real64 const d12( distance( R1, R2 ) ); // Distance between R1 and R2 (m)
 
 		auto const & window1( Surface( IWin1 ) );
 		auto const window1_iBaseSurf( window1.BaseSurf );

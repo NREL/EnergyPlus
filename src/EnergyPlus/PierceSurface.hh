@@ -331,7 +331,7 @@ PierceSurface(
 	Real64 const den( ( plane.x * rayDir.x ) + ( plane.y * rayDir.y ) + ( plane.z * rayDir.z ) );
 	if ( den == 0.0 ) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
 		return;
-	} else { // Ray intersects plane
+	} else { // Ray's line intersects plane
 		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) );
 		if ( num * den <= 0.0 ) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
 			return;
@@ -372,7 +372,7 @@ void
 PierceSurface(
 	DataSurfaces::SurfaceData const & surface, // Surface
 	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction vector
+	Vector3< Real64 > const & rayDir, // Ray direction unit vector
 	Real64 const dMax, // Max distance from rayOri to hit point
 	Vector3< Real64 > & hitPt, // Ray-plane intersection point
 	bool & hit // Ray intersects surface?
@@ -389,6 +389,7 @@ PierceSurface(
 	//  Jan 2016: Initial release
 
 	// Input checks
+	assert( std::abs( rayDir.mag_squared() - 1.0 ) < 4 * std::numeric_limits< Real64 >::epsilon() ); // Check unit vector
 	assert( dMax >= 0.0 ); // Distance must be nonnegative
 
 	// Find ray intersection with surface plane
@@ -397,7 +398,7 @@ PierceSurface(
 	Real64 const den( ( plane.x * rayDir.x ) + ( plane.y * rayDir.y ) + ( plane.z * rayDir.z ) );
 	if ( den == 0.0 ) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
 		return;
-	} else { // Ray intersects plane
+	} else { // Ray's line intersects plane
 		Real64 const num( -( ( plane.x * rayOri.x ) + ( plane.y * rayOri.y ) + ( plane.z * rayOri.z ) + plane.w ) );
 		if ( num * den <= 0.0 ) { // Ray points away from surface or ray origin is on surface: This looks odd but is fast way to check for different signs
 			return;
@@ -419,7 +420,7 @@ void
 PierceSurface(
 	int const iSurf, // Surface index
 	Vector3< Real64 > const & rayOri, // Ray origin point
-	Vector3< Real64 > const & rayDir, // Ray direction vector
+	Vector3< Real64 > const & rayDir, // Ray direction unit vector
 	Real64 const dMax, // Max distance from rayOri to hit point
 	Vector3< Real64 > & hitPt, // Ray-plane intersection point
 	bool & hit // Ray intersects surface?
