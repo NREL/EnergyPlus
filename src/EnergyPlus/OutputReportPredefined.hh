@@ -724,19 +724,6 @@ namespace OutputReportPredefined {
 			show( false )
 		{}
 
-		// Member Constructor
-		reportNameType(
-			std::string const & name,
-			std::string const & namewithspaces, // a "prettier version" than the key value
-			std::string const & abrev,
-			bool const show
-		) :
-			name( name ),
-			namewithspaces( namewithspaces ),
-			abrev( abrev ),
-			show( show )
-		{}
-
 	};
 
 	struct SubTableType
@@ -751,17 +738,6 @@ namespace OutputReportPredefined {
 			indexReportName( 0 )
 		{}
 
-		// Member Constructor
-		SubTableType(
-			std::string const & name,
-			int const indexReportName,
-			std::string const & footnote
-		) :
-			name( name ),
-			indexReportName( indexReportName ),
-			footnote( footnote )
-		{}
-
 	};
 
 	struct ColumnTagType
@@ -773,15 +749,6 @@ namespace OutputReportPredefined {
 		// Default Constructor
 		ColumnTagType() :
 			indexSubTable( 0 )
-		{}
-
-		// Member Constructor
-		ColumnTagType(
-			std::string const & heading,
-			int const indexSubTable
-		) :
-			heading( heading ),
-			indexSubTable( indexSubTable )
 		{}
 
 	};
@@ -808,27 +775,6 @@ namespace OutputReportPredefined {
 			origEntryIsReal( false )
 		{}
 
-		// Member Constructor
-		TableEntryType(
-			std::string const & charEntry,
-			std::string const & objectName,
-			int const indexColumn,
-			int const subTableIndex,
-			int const uniqueObjName,
-			Real64 const origRealEntry,
-			int const significantDigits,
-			bool const origEntryIsReal
-		) :
-			charEntry( charEntry ),
-			objectName( objectName ),
-			indexColumn( indexColumn ),
-			subTableIndex( subTableIndex ),
-			uniqueObjName( uniqueObjName ),
-			origRealEntry( origRealEntry ),
-			significantDigits( significantDigits ),
-			origEntryIsReal( origEntryIsReal )
-		{}
-
 	};
 
 	struct CompSizeTableEntryType
@@ -848,23 +794,6 @@ namespace OutputReportPredefined {
 			written( false )
 		{}
 
-		// Member Constructor
-		CompSizeTableEntryType(
-			std::string const & typeField,
-			std::string const & nameField,
-			std::string const & description,
-			Real64 const valField,
-			bool const active,
-			bool const written
-		) :
-			typeField( typeField ),
-			nameField( nameField ),
-			description( description ),
-			valField( valField ),
-			active( active ),
-			written( written )
-		{}
-
 	};
 
 	struct ShadowRelateType
@@ -881,17 +810,6 @@ namespace OutputReportPredefined {
 			castSurf( 0 ),
 			recSurf( 0 ),
 			recKind( 0 )
-		{}
-
-		// Member Constructor
-		ShadowRelateType(
-			int const castSurf,
-			int const recSurf,
-			int const recKind
-		) :
-			castSurf( castSurf ),
-			recSurf( recSurf ),
-			recKind( recKind )
 		{}
 
 	};

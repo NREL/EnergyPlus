@@ -477,7 +477,7 @@ namespace CurveManager {
 		int VarIndex;
 		int TempVarIndex;
 		int TempVarIndex1;
-		Real64 MinTableData;
+		Real64 MinTableData( 999999.0 );
 		Real64 MaxTableDataValue;
 		int NextXVar;
 		bool FoundNewData;
@@ -1944,7 +1944,6 @@ namespace CurveManager {
 			TempTableData = TableData;
 			while ( NumXVar <= MaxTableNums ) {
 
-				MinTableData = 999999.0;
 				MinTableData = minval( TempTableData( TableNum ).X1 );
 				for ( VarIndex = 1; VarIndex <= MaxTableNums; ++VarIndex ) {
 					if ( TempTableData( TableNum ).X1( VarIndex ) == MinTableData ) {
@@ -2133,7 +2132,6 @@ namespace CurveManager {
 			Temp2TableData = TableData;
 			while ( NumXVar <= MaxTableNums ) {
 
-				MinTableData = 999999.0;
 				MinTableData = minval( TempTableData( TableNum ).X1 );
 				for ( VarIndex = 1; VarIndex <= MaxTableNums; ++VarIndex ) {
 					if ( TempTableData( TableNum ).X1( VarIndex ) == MinTableData ) {

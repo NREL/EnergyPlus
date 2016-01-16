@@ -102,31 +102,6 @@ namespace DataViewFactorInformation {
 			NumOfSurfaces( 0 )
 		{}
 
-		// Member Constructor
-		ZoneViewFactorInformation(
-			std::string const & Name, // Zone name
-			int const NumOfSurfaces, // Number of surfaces in the zone
-			Array2< Real64 > const & F, // View Factors
-			Array2< Real64 > const & ScriptF, // Hottel's Script F //Tuned Transposed
-			Array1< Real64 > const & Area, // Surface area
-			Array1< Real64 > const & Emissivity, // Surface emissivity
-			Array1< Real64 > const & Azimuth, // Azimuth angle of the surface (in degrees)
-			Array1< Real64 > const & Tilt, // Tilt angle of the surface (in degrees)
-			Array1_int const & SurfacePtr, // Surface ALLOCATABLE (to Surface derived type)
-			Array1_string const & Class // Class of surface (Wall, Roof, etc.)
-		) :
-			Name( Name ),
-			NumOfSurfaces( NumOfSurfaces ),
-			F( F ),
-			ScriptF( ScriptF ),
-			Area( Area ),
-			Emissivity( Emissivity ),
-			Azimuth( Azimuth ),
-			Tilt( Tilt ),
-			SurfacePtr( SurfacePtr ),
-			Class( Class )
-		{}
-
 	};
 
 	// Object Data

@@ -7671,7 +7671,6 @@ namespace HVACVariableRefrigerantFlow {
 							Par( 3 ) = VRF( VRFCond ).OUCoolingCAPFT( CounterCompSpdTemp );
 
 							// Update Te'( MinOutdoorUnitTe ) to meet the required evaporator capacity
-							MinOutdoorUnitTe = 6;
 							Pdischarge = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, VRF( VRFCond ).CondensingTemp, RefrigerantIndex, RoutineName );
 
 							MinRefriPe = GetSatPressureRefrig( VRF( VRFCond ).RefrigerantName, -15, RefrigerantIndex, RoutineName );
