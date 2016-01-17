@@ -1,6 +1,5 @@
 
 # Compiler-agnostic compiler flags first
-ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ARRAY_NOALIGN") # Disable experimental ObjexxFCL array alignment
 ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_ARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging
 
 # Make sure expat is compiled as a static library

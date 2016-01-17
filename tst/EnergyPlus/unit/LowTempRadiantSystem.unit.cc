@@ -1,9 +1,68 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // EnergyPlus::Low Temperature Radiant Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataPlant.hh>
@@ -25,11 +84,9 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::FluidProperties;
 
 
-class LowTempRadiantSystemTest : public ::testing::Test
+class LowTempRadiantSystemTest : public EnergyPlusFixture
 {
-
 public:
-
 	int RadSysNum;
 	int SystemType;
 	Real64 ExpectedResult1;
@@ -38,9 +95,10 @@ public:
 	Real64 const CpWater = 4180.0; // For estimating the expected result
 	Real64 const RhoWater = 1000.0; // For estimating the expected result
 
-	// constructor for test fixture class
-	LowTempRadiantSystemTest( )
-	{
+protected:
+	virtual void SetUp() {
+		EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+
 		ElecRadSys.allocate( 1 );
 		HydrRadSys.allocate( 1 );
 		CFloRadSys.allocate( 1 );
@@ -95,66 +153,15 @@ public:
 		ExpectedResult1 = 0.0;
 		ExpectedResult2 = 0.0;
 		ExpectedResult3 = 0.0;
-
-		int write_stat;
-		// Open the Initialization Output File (lifted from SimulationManager.cc)
-		OutputFileInits = GetNewUnitNumber( );
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
 	}
 
-	//destructor
-	~LowTempRadiantSystemTest( )
-	{
-
-		// Reset sizing flags to prevent interactions with other unit tests when run as a group
-		DataFracOfAutosizedCoolingAirflow = 1.0; // fraction of design cooling supply air flow rate
-		DataFracOfAutosizedHeatingAirflow = 1.0; // fraction of design heating supply air flow rate
-		DataFlowPerCoolingCapacity = 0.0; // cooling supply air flow per unit cooling capacity
-		DataFlowPerHeatingCapacity = 0.0; // heating supply air flow per unit heating capacity
-		DataFracOfAutosizedCoolingCapacity = 1.0; // fraction of autosized cooling capacity
-		DataFracOfAutosizedHeatingCapacity = 1.0; // fraction of autosized heating capacit
-		DataAutosizedCoolingCapacity = 0.0; // Autosized cooling capacity used for multiplying flow per capacity to get flow rate
-		DataAutosizedHeatingCapacity = 0.0; // Autosized heating capacit used for multiplying flow per capacity to get flow rate
-		DataConstantUsedForSizing = 0.0; // base value used for sizing inputs that are ratios of other inputs
-		DataFractionUsedForSizing = 0.0; // fractional value of base value used for sizing inputs that are ratios of other inputs
-		DataScalableSizingON = false; // boolean determines scalable flow sizing is specified
-		DataScalableCapSizingON = false; // boolean determines scalable capacity sizing is specified
-		DataSysScalableFlowSizingON = false; // boolean determines scalable system flow sizing is specified
-		DataSysScalableCapSizingON = false; // boolean determines scalable system capacity sizing is specified
-
-		ElecRadSys.deallocate( );
-		HydrRadSys( 1 ).NumCircuits.deallocate( );
-		HydrRadSys.deallocate( );
-		CFloRadSys.deallocate( );
-		ElecRadSysNumericFields( 1 ).FieldNames.deallocate( );
-		ElecRadSysNumericFields.deallocate( );
-		CalcFinalZoneSizing.deallocate( );
-		ZoneEqSizing( 1 ).SizingMethod.deallocate( );
-		ZoneEqSizing.deallocate( );
-		Zone.deallocate( );
-		HydronicRadiantSysNumericFields( 1 ).FieldNames.deallocate( );
-		HydronicRadiantSysNumericFields.deallocate( );
-		for ( int loopindex = 1; loopindex <= TotNumLoops; ++loopindex ) {
-			auto & loopsidebranch( PlantLoop( loopindex ).LoopSide( 1 ).Branch( 1 ) );
-			loopsidebranch.Comp.deallocate( );
-			auto & loopside( PlantLoop( loopindex ).LoopSide( 1 ) );
-			loopside.Branch.deallocate( );
-			auto & loop( PlantLoop( loopindex ) );
-			loop.LoopSide.deallocate( );
-		}
-		PlantLoop.deallocate( );
-		PlantSizData.deallocate( );
-
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+	virtual void TearDown() {
+		EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
 	}
-
 };
 
 TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantElectric )
 {
-	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeLowTempRadiantElectric" );
-
 	SystemType = ElectricSystem;
 	ElecRadSys( RadSysNum ).Name = "LowTempElectric 1";
 	ElecRadSys( RadSysNum ).ZonePtr = 1;
@@ -189,8 +196,6 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantElectric )
 
 TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow )
 {
-	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow" );
-
 	SystemType = HydronicSystem;
 	HydrRadSys( RadSysNum ).Name = "LowTempVarFlow 1";
 	HydrRadSys( RadSysNum ).ZonePtr = 1;
@@ -274,9 +279,9 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow )
 	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat, 0.1 );
 	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).WaterVolFlowMaxCool, 0.1 );
 }
-TEST_F( LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow ) {
-	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow" );
 
+TEST_F( LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow )
+{
 	SystemType = HydronicSystem;
 	HydrRadSys( RadSysNum ).Name = "LowTempVarFlow 1";
 	HydrRadSys( RadSysNum ).ZonePtr = 1;
@@ -341,9 +346,9 @@ TEST_F( LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow ) {
 	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).ScaledHeatingCapacity, 0.1 );
 	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).ScaledCoolingCapacity, 0.1 );
 }
-TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow ) {
-	ShowMessage( "Begin Test: LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow" );
 
+TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow )
+{
 	SystemType = ConstantFlowSystem;
 	CFloRadSys( RadSysNum ).Name = "LowTempConstantFlow 1";
 	CFloRadSys( RadSysNum ).ZonePtr = 1;
@@ -368,11 +373,11 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow ) {
 	CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.2;
 	ExpectedResult1 = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 	ExpectedResult1 = ExpectedResult1 / ( PlantSizData( 1 ).DeltaT * RhoWater * CpWater );
-	
+
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult1, CFloRadSys( RadSysNum ).WaterVolFlowMax, 0.001 );
 
-	//Hydronic - cold water volume flow rate autosize 
+	//Hydronic - cold water volume flow rate autosize
 	CFloRadSys( RadSysNum ).HotWaterInNode = 0;
 	CFloRadSys( RadSysNum ).HotWaterOutNode = 0;
 	CFloRadSys( RadSysNum ).ColdWaterInNode = 3;
@@ -386,14 +391,14 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow ) {
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult2, CFloRadSys( RadSysNum ).WaterVolFlowMax, 0.001 );
 
-	//Hydronic - maximum water volume flow rate autosize 
+	//Hydronic - maximum water volume flow rate autosize
 	CFloRadSys( RadSysNum ).WaterVolFlowMax = AutoSize;
 	CFloRadSys( RadSysNum ).HotWaterInNode = 1;
 	CFloRadSys( RadSysNum ).HotWaterOutNode = 2;
 	CFloRadSys( RadSysNum ).ColdWaterInNode = 3;
 	CFloRadSys( RadSysNum ).ColdWaterOutNode = 4;
 
-	//Hydronic - embeded tube length autosize 
+	//Hydronic - embeded tube length autosize
 	CFloRadSys( RadSysNum ).NumCircCalcMethod = 0;
 	CFloRadSys( RadSysNum ).NumOfSurfaces = 1;
 	CFloRadSys( RadSysNum ).TubeLength = AutoSize;

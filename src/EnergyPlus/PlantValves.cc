@@ -1,6 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
+// C++ Headers
+#include <algorithm>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <PlantValves.hh>
@@ -299,14 +359,6 @@ namespace PlantValves {
 		int SetPntNode; // local working variable for setpoint node number
 		int PumpOutNode; // local working variable for pump outlet node number
 
-		int i; // plant loop do loop counter
-		int j; // plant half loop do loop counter
-		int k; // plant branches do loop counter
-		int kk; // plant branches do loop counter, nested
-		int l; // plant components do loop counter
-		//  INTEgER :: ll ! plant components do loop counter, nested
-		int m; // plant splitter do loop counter
-		int n; // plant mixer do loop counter
 		bool InNodeOnSplitter; // input data check
 		bool PumpOutNodeOkay; // input data check
 		bool ErrorsFound; // input data check
@@ -351,14 +403,14 @@ namespace PlantValves {
 
 					// . A) find indexes of PlantLoop, Half loop, and Branch by searching CompData
 					if ( allocated( PlantLoop ) ) {
-						for ( i = 1; i <= NumPlantLoops; ++i ) {
+						for ( int i = 1; i <= NumPlantLoops; ++i ) {
 							if ( ! allocated( PlantLoop( i ).LoopSide ) ) continue;
 							numLoopSides = size( PlantLoop( i ).LoopSide );
-							for ( j = 1; j <= numLoopSides; ++j ) {
+							for ( int j = 1; j <= numLoopSides; ++j ) {
 								if ( ! allocated( PlantLoop( i ).LoopSide( j ).Branch ) ) continue;
-								for ( k = 1; k <= PlantLoop( i ).LoopSide( j ).TotalBranches; ++k ) {
+								for ( int k = 1, k_end = PlantLoop( i ).LoopSide( j ).TotalBranches; k <= k_end; ++k ) {
 									if ( ! allocated( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp ) ) continue;
-									for ( l = 1; l <= PlantLoop( i ).LoopSide( j ).Branch( k ).TotalComponents; ++l ) {
+									for ( int l = 1, l_end = PlantLoop( i ).LoopSide( j ).Branch( k ).TotalComponents; l <= l_end; ++l ) {
 
 										if ( ( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).TypeOf_Num == CompTypeNum ) && ( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).CompNum == CompNum ) ) { // we found it.
 
@@ -372,7 +424,7 @@ namespace PlantValves {
 
 											// is Valve inlet node an outlet node of a splitter
 											if ( allocated( PlantLoop( i ).LoopSide( j ).Splitter ) ) {
-												for ( m = 1; m <= PlantLoop( i ).LoopSide( j ).NumSplitters; ++m ) {
+												for ( int m = 1, m_end = PlantLoop( i ).LoopSide( j ).NumSplitters; m <= m_end; ++m ) {
 													if ( allocated( PlantLoop( i ).LoopSide( j ).Splitter( m ).NodeNumOut ) ) {
 														if ( any_eq( PlantLoop( i ).LoopSide( j ).Splitter( m ).NodeNumOut, TemperValve( CompNum ).PltInletNodeNum ) ) {
 															InNodeOnSplitter = true;
@@ -383,33 +435,33 @@ namespace PlantValves {
 													if ( PlantLoop( i ).LoopSide( j ).Splitter( m ).TotalOutletNodes == 2 ) {
 														TwoBranchesBetwn = true;
 													}
-												} //loop over splitters
+												} // loop over splitters
 											} // allocated %splitter
 
 											// is stream 2 node an inlet to the mixer ?
 											if ( allocated( PlantLoop( i ).LoopSide( j ).Mixer ) ) {
-												for ( n = 1; n <= PlantLoop( i ).LoopSide( j ).NumMixers; ++n ) {
+												for ( int n = 1, n_end = PlantLoop( i ).LoopSide( j ).NumMixers; n <= n_end; ++n ) {
 													if ( ! allocated( PlantLoop( i ).LoopSide( j ).Mixer( n ).NodeNumIn ) ) continue;
 													if ( any_eq( PlantLoop( i ).LoopSide( j ).Mixer( n ).NodeNumIn, TemperValve( CompNum ).PltStream2NodeNum ) ) {
 
 														// Check other branches component's node, current branch is k
-														for ( kk = 1; kk <= PlantLoop( i ).LoopSide( j ).TotalBranches; ++kk ) {
+														for ( int kk = 1, kk_end = PlantLoop( i ).LoopSide( j ).TotalBranches; kk <= kk_end; ++kk ) {
 															if ( k == kk ) continue; //already looped into this one
 															if ( ! allocated( PlantLoop( i ).LoopSide( j ).Branch( kk ).Comp ) ) continue;
-															if ( any_eq( PlantLoop( i ).LoopSide( j ).Branch( kk ).Comp.NodeNumOut(), TemperValve( CompNum ).PltStream2NodeNum ) ) { //it is on other branch
-
+															auto const & comp( PlantLoop( i ).LoopSide( j ).Branch( kk ).Comp );
+															if ( std::any_of( comp.begin(), comp.end(), [CompNum]( DataPlant::CompData const & e ){ return e.NodeNumOut == TemperValve( CompNum ).PltStream2NodeNum; } ) ) { // it is on other branch
 																Stream2NodeOkay = true;
-
 															}
 														} // kk branch nested loop
 													} // stream 2 node is inlet to mixer
-												} //mixer loop
+												} // mixer loop
 											} // mixer allocated
 
 											// is pump node really the outlet of a branch with a pump?
-											for ( kk = 1; kk <= PlantLoop( i ).LoopSide( j ).TotalBranches; ++kk ) {
+											for ( int kk = 1, kk_end = PlantLoop( i ).LoopSide( j ).TotalBranches; kk <= kk_end; ++kk ) {
 												if ( PlantLoop( i ).LoopSide( j ).Branch( kk ).NodeNumOut == TemperValve( CompNum ).PltPumpOutletNodeNum ) {
-													if ( any_eq( PlantLoop( i ).LoopSide( j ).Branch( kk ).Comp.GeneralEquipType(), GenEquipTypes_Pump ) ) {
+													auto const & comp( PlantLoop( i ).LoopSide( j ).Branch( kk ).Comp );
+													if ( std::any_of( comp.begin(), comp.end(), []( DataPlant::CompData const & e ){ return e.GeneralEquipType == DataPlant::GenEquipTypes_Pump; } ) ) { // it is on other branch
 														//IF (PlantLoop(i)%LoopSide(j)%Branch(kk)%PumpPresent) THEN
 														PumpOutNodeOkay = true;
 													}
@@ -702,29 +754,6 @@ namespace PlantValves {
 		// Nothing needs to be done (yet)
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PlantValves
 
