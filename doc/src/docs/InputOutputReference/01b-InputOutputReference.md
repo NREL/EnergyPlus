@@ -14138,7 +14138,7 @@ This model is an equation-fit model from the catalog data which resembles a blac
 
 **HeatPump:WaterToWater:ParameterEstimation:Heating**
 
-This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently “hardwired” to fluid property R22.
+This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently “hardwired” to fluid property R22. FluidProperties:* objects for R-22 must be included in the idf file. These may be copied from DataSets\FluidPropertiesRefData.idf.
 
 Descriptions and strength of each respective model is available in the following references:
 
