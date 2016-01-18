@@ -315,8 +315,8 @@ TEST( OutputReportTabularTest, GetColumnUsingTabs )
 }
 
 TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest )
-	ShowMessage( "Begin Test: EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest" );
 {
+	ShowMessage("Begin Test: EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest");
 
 	TotDesDays = 2;
 	TotRunDesPersDays = 3;
