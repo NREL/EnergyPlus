@@ -1,8 +1,8 @@
 A New VRF Heat Recovery System Model
 ================
 
-**Rongpeng Zhang, Tianzhen Hong**
-**Lawrence Berkeley National Laboratory**
+ **Rongpeng Zhang, Tianzhen Hong.**
+ **Lawrence Berkeley National Laboratory**
 
  - Original Date: 01/16/2016
  - Revision Date: NA
