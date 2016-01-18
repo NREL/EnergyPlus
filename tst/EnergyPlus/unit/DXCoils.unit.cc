@@ -103,14 +103,16 @@ namespace EnergyPlus {
 		DXCoilNum = 2;
 		DXCoil.allocate( NumDXCoils );
 		DXCoil( 1 ).DXCoilType_Num = CoilDX_MultiSpeedCooling;
+		DXCoil( 1 ).DXCoilType = "Coil:Cooling:DX:MultiSpeed";
 		DXCoil( 2 ).DXCoilType_Num = CoilDX_MultiSpeedHeating;
+		DXCoil( 2 ).DXCoilType = "Coil:Heating:DX:MultiSpeed";
 		DXCoil( 1 ).MSRatedTotCap.allocate( 2 );
 		DXCoil( 2 ).MSRatedTotCap.allocate( 2 );
 		DXCoil( 2 ).CompanionUpstreamDXCoil = 1;
 
 		DXCoilNumericFields.allocate( NumDXCoils );
 		DXCoilNumericFields( 2 ).PerfMode.allocate( 1 );
-		DXCoilNumericFields( 2 ).PerfMode( 1 ).FieldNames.allocate( 4 );
+		DXCoilNumericFields( 2 ).PerfMode( 1 ).FieldNames.allocate( 15 );
 		DXCoil( 2 ).DefrostStrategy = Resistive;
 		DXCoil( 2 ).DefrostCapacity = 5000.0;
 		DXCoil( 2 ).Name = "DX Heating coil";
@@ -374,7 +376,7 @@ namespace EnergyPlus {
 		DXCoilFanOpMode.allocate( NumDXCoils );
 		DXCoilPartLoadRatio.allocate( NumDXCoils );
 		DXCoilNumericFields( DXCoilNum ).PerfMode.allocate( 1 );
-		DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate( 4 );
+		DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate( 15 );
 		Coil.DefrostStrategy = Resistive;
 		Coil.Name = "DX Heating coil";
 		Coil.NumOfSpeeds = 2;

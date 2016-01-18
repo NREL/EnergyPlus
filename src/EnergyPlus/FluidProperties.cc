@@ -421,17 +421,6 @@ namespace FluidProperties {
 				NumOfTemps( 0 )
 			{}
 
-			// Member Constructor
-			FluidTempData(
-				std::string const & Name, // Name of the temperature list
-				int const NumOfTemps, // Number of temperatures in a particular arry
-				Array1< Real64 > const & Temps // Temperature values (degrees C)
-			) :
-				Name( Name ),
-				NumOfTemps( NumOfTemps ),
-				Temps( Temps )
-			{}
-
 		};
 
 		struct PressureSequence
@@ -446,15 +435,6 @@ namespace FluidProperties {
 				InPtr( 0 )
 			{}
 
-			// Member Constructor
-			PressureSequence(
-				Real64 const Pressure,
-				int const InPtr
-			) :
-				Pressure( Pressure ),
-				InPtr( InPtr )
-			{}
-
 		};
 
 		struct FluidData
@@ -466,15 +446,6 @@ namespace FluidProperties {
 			// Default Constructor
 			FluidData() :
 				IsGlycol( false )
-			{}
-
-			// Member Constructor
-			FluidData(
-				std::string const & Name,
-				bool const IsGlycol
-			) :
-				Name( Name ),
-				IsGlycol( IsGlycol )
 			{}
 
 		};

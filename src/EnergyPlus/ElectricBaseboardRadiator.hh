@@ -155,69 +155,6 @@ namespace ElectricBaseboardRadiator {
 			ScaledHeatingCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		ElecBaseboardParams(
-			std::string const & EquipName,
-			int const EquipType,
-			std::string const & Schedule,
-			Array1_string const & SurfaceName,
-			Array1_int const & SurfacePtr,
-			int const ZonePtr,
-			int const SchedPtr,
-			int const TotSurfToDistrib,
-			Real64 const NominalCapacity,
-			Real64 const BaseboardEfficiency,
-			Real64 const AirInletTemp,
-			Real64 const AirInletHumRat,
-			Real64 const AirOutletTemp,
-			Real64 const ElecUseLoad,
-			Real64 const ElecUseRate,
-			Real64 const FracRadiant,
-			Real64 const FracConvect,
-			Real64 const FracDistribPerson,
-			Real64 const TotPower,
-			Real64 const Power,
-			Real64 const ConvPower,
-			Real64 const RadPower,
-			Real64 const TotEnergy,
-			Real64 const Energy,
-			Real64 const ConvEnergy,
-			Real64 const RadEnergy,
-			Array1< Real64 > const & FracDistribToSurf,
-			int const HeatingCapMethod,
-			Real64 const ScaledHeatingCapacity
-		) :
-			EquipName( EquipName ),
-			EquipType( EquipType ),
-			Schedule( Schedule ),
-			SurfaceName( SurfaceName ),
-			SurfacePtr( SurfacePtr ),
-			ZonePtr( ZonePtr ),
-			SchedPtr( SchedPtr ),
-			TotSurfToDistrib( TotSurfToDistrib ),
-			NominalCapacity( NominalCapacity ),
-			BaseboardEfficiency( BaseboardEfficiency ),
-			AirInletTemp( AirInletTemp ),
-			AirInletHumRat( AirInletHumRat ),
-			AirOutletTemp( AirOutletTemp ),
-			ElecUseLoad( ElecUseLoad ),
-			ElecUseRate( ElecUseRate ),
-			FracRadiant( FracRadiant ),
-			FracConvect( FracConvect ),
-			FracDistribPerson( FracDistribPerson ),
-			TotPower( TotPower ),
-			Power( Power ),
-			ConvPower( ConvPower ),
-			RadPower( RadPower ),
-			TotEnergy( TotEnergy ),
-			Energy( Energy ),
-			ConvEnergy( ConvEnergy ),
-			RadEnergy( RadEnergy ),
-			FracDistribToSurf( FracDistribToSurf ),
-			HeatingCapMethod( HeatingCapMethod ),
-			ScaledHeatingCapacity( ScaledHeatingCapacity )
-		{}
-
 	};
 
 	struct ElecBaseboardNumericFieldData
@@ -229,12 +166,6 @@ namespace ElectricBaseboardRadiator {
 		ElecBaseboardNumericFieldData()
 		{}
 
-		// Member Constructor
-		ElecBaseboardNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data

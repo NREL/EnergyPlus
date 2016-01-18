@@ -2867,7 +2867,6 @@ namespace PlantCondLoopOperation {
 		CompMinLoad = this_component.MinLoad;
 		CompMaxLoad = this_component.MaxLoad;
 		CompOptLoad = this_component.OptLoad;
-		DemandMdot = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).SetPointFlowRate;
 		DemandNode = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).DemandNodeNum;
 		SetPtNode = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).EquipList( ListPtr ).Comp( CompPtr ).SetPointNodeNum;
 		TempIn = Node( DemandNode ).Temp;

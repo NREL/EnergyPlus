@@ -217,23 +217,6 @@ namespace ConvectionCoefficients {
 			HcFnACHDivPerimLengthCurveNum( 0 )
 		{}
 
-		// Member Constructor
-		HcInsideFaceUserCurveStruct(
-			std::string const & Name, // user's name for object
-			int const ReferenceTempType,
-			int const HcFnTempDiffCurveNum,
-			int const HcFnTempDiffDivHeightCurveNum,
-			int const HcFnACHCurveNum,
-			int const HcFnACHDivPerimLengthCurveNum
-		) :
-			Name( Name ),
-			ReferenceTempType( ReferenceTempType ),
-			HcFnTempDiffCurveNum( HcFnTempDiffCurveNum ),
-			HcFnTempDiffDivHeightCurveNum( HcFnTempDiffDivHeightCurveNum ),
-			HcFnACHCurveNum( HcFnACHCurveNum ),
-			HcFnACHDivPerimLengthCurveNum( HcFnACHDivPerimLengthCurveNum )
-		{}
-
 	};
 
 	struct HcOutsideFaceUserCurveStruct
@@ -255,25 +238,6 @@ namespace ConvectionCoefficients {
 			HfFnWindSpeedCurveNum( 0 ),
 			HnFnTempDiffCurveNum( 0 ),
 			HnFnTempDiffDivHeightCurveNum( 0 )
-		{}
-
-		// Member Constructor
-		HcOutsideFaceUserCurveStruct(
-			std::string const & Name,
-			int const ReferenceTempType,
-			bool const SuppressRainChange,
-			int const WindSpeedType,
-			int const HfFnWindSpeedCurveNum,
-			int const HnFnTempDiffCurveNum,
-			int const HnFnTempDiffDivHeightCurveNum
-		) :
-			Name( Name ),
-			ReferenceTempType( ReferenceTempType ),
-			SuppressRainChange( SuppressRainChange ),
-			WindSpeedType( WindSpeedType ),
-			HfFnWindSpeedCurveNum( HfFnWindSpeedCurveNum ),
-			HnFnTempDiffCurveNum( HnFnTempDiffCurveNum ),
-			HnFnTempDiffDivHeightCurveNum( HnFnTempDiffDivHeightCurveNum )
 		{}
 
 	};
@@ -469,195 +433,6 @@ namespace ConvectionCoefficients {
 			MixedWindowsUserCurveNum( 0 )
 		{}
 
-		// Member Constructor
-		InsideFaceAdaptiveConvAlgoStruct(
-			bool const EnteredByUser,
-			std::string const & Name,
-			int const SimpleBouyVertWallEqNum, // InConvClass_A3_VertWalls
-			int const SimpleBouyVertWallUserCurveNum,
-			int const SimpleBouyStableHorizEqNum, // InConvClass_A3_StableHoriz
-			int const SimpleBouyStableHorizUserCurveNum,
-			int const SimpleBouyUnstableHorizEqNum, // InConvClass_A3_UnstableHoriz
-			int const SimpleBouyUnstableHorizUserCurveNum,
-			int const SimpleBouyStableTiltedEqNum, // InConvClass_A3_StableTilted
-			int const SimpleBouyStableTiltedUserCurveNum,
-			int const SimpleBouyUnstableTiltedEqNum, // InConvClass_A3_UnstableTilted
-			int const SimpleBouyUnstableTiltedUserCurveNum,
-			int const SimpleBouyWindowsEqNum, // InConvClass_A3_Windows
-			int const SimpleBouyWindowsUserCurveNum,
-			int const FloorHeatCeilingCoolVertWallEqNum, // InConvClass_A1_VertWalls
-			int const FloorHeatCeilingCoolVertWallUserCurveNum,
-			int const FloorHeatCeilingCoolStableHorizEqNum, // InConvClass_A1_StableHoriz
-			int const FloorHeatCeilingCoolStableHorizUserCurveNum,
-			int const FloorHeatCeilingCoolUnstableHorizEqNum, // InConvClass_A1_UntableHoriz
-			int const FloorHeatCeilingCoolUnstableHorizUserCurveNum,
-			int const FloorHeatCeilingCoolHeatedFloorEqNum, // InConvClass_A1_HeatedFloor
-			int const FloorHeatCeilingCoolHeatedFloorUserCurveNum,
-			int const FloorHeatCeilingCoolChilledCeilingEqNum, // InConvClass_A1_ChilledCeil
-			int const FloorHeatCeilingCoolChilledCeilingUserCurveNum,
-			int const FloorHeatCeilingCoolStableTiltedEqNum, // InConvClass_A1_StableTilted
-			int const FloorHeatCeilingCoolStableTiltedUserCurveNum,
-			int const FloorHeatCeilingCoolUnstableTiltedEqNum, // InConvClass_A1_UnstableTilted
-			int const FloorHeatCeilingCoolUnstableTiltedUserCurveNum,
-			int const FloorHeatCeilingCoolWindowsEqNum, // InConvClass_A1_Windows
-			int const FloorHeatCeilingCoolWindowsUserCurveNum,
-			int const WallPanelHeatVertWallEqNum, // InConvClass_A2_VertWallsNonHeated
-			int const WallPanelHeatVertWallUserCurveNum,
-			int const WallPanelHeatHeatedWallEqNum, // InConvClass_A2_HeatedVerticalWall
-			int const WallPanelHeatHeatedWallUserCurveNum,
-			int const WallPanelHeatStableHorizEqNum, // InConvClass_A2_StableHoriz
-			int const WallPanelHeatStableHorizUserCurveNum,
-			int const WallPanelHeatUnstableHorizEqNum, // InConvClass_A2_UnstableHoriz
-			int const WallPanelHeatUnstableHorizUserCurveNum,
-			int const WallPanelHeatStableTiltedEqNum, // InConvClass_A2_StableTilted
-			int const WallPanelHeatStableTiltedUserCurveNum,
-			int const WallPanelHeatUnstableTiltedEqNum, // InConvClass_A2_UnstableTilted
-			int const WallPanelHeatUnstableTiltedUserCurveNum,
-			int const WallPanelHeatWindowsEqNum, // InConvClass_A2_Windows
-			int const WallPanelHeatWindowsUserCurveNum,
-			int const ConvectiveHeatVertWallEqNum,
-			int const ConvectiveHeatVertWallUserCurveNum,
-			int const ConvectiveHeatVertWallNearHeaterEqNum,
-			int const ConvectiveHeatVertWallNearHeaterUserCurveNum,
-			int const ConvectiveHeatStableHorizEqNum,
-			int const ConvectiveHeatStableHorizUserCurveNum,
-			int const ConvectiveHeatUnstableHorizEqNum,
-			int const ConvectiveHeatUnstableHorizUserCurveNum,
-			int const ConvectiveHeatStableTiltedEqNum,
-			int const ConvectiveHeatStableTiltedUserCurveNum,
-			int const ConvectiveHeatUnstableTiltedEqNum,
-			int const ConvectiveHeatUnstableTiltedUserCurveNum,
-			int const ConvectiveHeatWindowsEqNum,
-			int const ConvectiveHeatWindowsUserCurveNum,
-			int const CentralAirWallEqNum,
-			int const CentralAirWallUserCurveNum,
-			int const CentralAirCeilingEqNum,
-			int const CentralAirCeilingUserCurveNum,
-			int const CentralAirFloorEqNum,
-			int const CentralAirFloorUserCurveNum,
-			int const CentralAirWindowsEqNum,
-			int const CentralAirWindowsUserCurveNum,
-			int const ZoneFanCircVertWallEqNum,
-			int const ZoneFanCircVertWallUserCurveNum,
-			int const ZoneFanCircStableHorizEqNum,
-			int const ZoneFanCircStableHorizUserCurveNum,
-			int const ZoneFanCircUnstableHorizEqNum,
-			int const ZoneFanCircUnstableHorizUserCurveNum,
-			int const ZoneFanCircStableTiltedEqNum,
-			int const ZoneFanCircStableTiltedUserCurveNum,
-			int const ZoneFanCircUnstableTiltedEqNum,
-			int const ZoneFanCircUnstableTiltedUserCurveNum,
-			int const ZoneFanCircWindowsEqNum,
-			int const ZoneFanCircWindowsUserCurveNum,
-			int const MixedBouyAssistingFlowWallEqNum,
-			int const MixedBouyAssistingFlowWallUserCurveNum,
-			int const MixedBouyOppossingFlowWallEqNum,
-			int const MixedBouyOppossingFlowWallUserCurveNum,
-			int const MixedStableFloorEqNum,
-			int const MixedStableFloorUserCurveNum,
-			int const MixedUnstableFloorEqNum,
-			int const MixedUnstableFloorUserCurveNum,
-			int const MixedStableCeilingEqNum,
-			int const MixedStableCeilingUserCurveNum,
-			int const MixedUnstableCeilingEqNum,
-			int const MixedUnstableCeilingUserCurveNum,
-			int const MixedWindowsEqNum,
-			int const MixedWindowsUserCurveNum
-		) :
-			EnteredByUser( EnteredByUser ),
-			Name( Name ),
-			SimpleBouyVertWallEqNum( SimpleBouyVertWallEqNum ),
-			SimpleBouyVertWallUserCurveNum( SimpleBouyVertWallUserCurveNum ),
-			SimpleBouyStableHorizEqNum( SimpleBouyStableHorizEqNum ),
-			SimpleBouyStableHorizUserCurveNum( SimpleBouyStableHorizUserCurveNum ),
-			SimpleBouyUnstableHorizEqNum( SimpleBouyUnstableHorizEqNum ),
-			SimpleBouyUnstableHorizUserCurveNum( SimpleBouyUnstableHorizUserCurveNum ),
-			SimpleBouyStableTiltedEqNum( SimpleBouyStableTiltedEqNum ),
-			SimpleBouyStableTiltedUserCurveNum( SimpleBouyStableTiltedUserCurveNum ),
-			SimpleBouyUnstableTiltedEqNum( SimpleBouyUnstableTiltedEqNum ),
-			SimpleBouyUnstableTiltedUserCurveNum( SimpleBouyUnstableTiltedUserCurveNum ),
-			SimpleBouyWindowsEqNum( SimpleBouyWindowsEqNum ),
-			SimpleBouyWindowsUserCurveNum( SimpleBouyWindowsUserCurveNum ),
-			FloorHeatCeilingCoolVertWallEqNum( FloorHeatCeilingCoolVertWallEqNum ),
-			FloorHeatCeilingCoolVertWallUserCurveNum( FloorHeatCeilingCoolVertWallUserCurveNum ),
-			FloorHeatCeilingCoolStableHorizEqNum( FloorHeatCeilingCoolStableHorizEqNum ),
-			FloorHeatCeilingCoolStableHorizUserCurveNum( FloorHeatCeilingCoolStableHorizUserCurveNum ),
-			FloorHeatCeilingCoolUnstableHorizEqNum( FloorHeatCeilingCoolUnstableHorizEqNum ),
-			FloorHeatCeilingCoolUnstableHorizUserCurveNum( FloorHeatCeilingCoolUnstableHorizUserCurveNum ),
-			FloorHeatCeilingCoolHeatedFloorEqNum( FloorHeatCeilingCoolHeatedFloorEqNum ),
-			FloorHeatCeilingCoolHeatedFloorUserCurveNum( FloorHeatCeilingCoolHeatedFloorUserCurveNum ),
-			FloorHeatCeilingCoolChilledCeilingEqNum( FloorHeatCeilingCoolChilledCeilingEqNum ),
-			FloorHeatCeilingCoolChilledCeilingUserCurveNum( FloorHeatCeilingCoolChilledCeilingUserCurveNum ),
-			FloorHeatCeilingCoolStableTiltedEqNum( FloorHeatCeilingCoolStableTiltedEqNum ),
-			FloorHeatCeilingCoolStableTiltedUserCurveNum( FloorHeatCeilingCoolStableTiltedUserCurveNum ),
-			FloorHeatCeilingCoolUnstableTiltedEqNum( FloorHeatCeilingCoolUnstableTiltedEqNum ),
-			FloorHeatCeilingCoolUnstableTiltedUserCurveNum( FloorHeatCeilingCoolUnstableTiltedUserCurveNum ),
-			FloorHeatCeilingCoolWindowsEqNum( FloorHeatCeilingCoolWindowsEqNum ),
-			FloorHeatCeilingCoolWindowsUserCurveNum( FloorHeatCeilingCoolWindowsUserCurveNum ),
-			WallPanelHeatVertWallEqNum( WallPanelHeatVertWallEqNum ),
-			WallPanelHeatVertWallUserCurveNum( WallPanelHeatVertWallUserCurveNum ),
-			WallPanelHeatHeatedWallEqNum( WallPanelHeatHeatedWallEqNum ),
-			WallPanelHeatHeatedWallUserCurveNum( WallPanelHeatHeatedWallUserCurveNum ),
-			WallPanelHeatStableHorizEqNum( WallPanelHeatStableHorizEqNum ),
-			WallPanelHeatStableHorizUserCurveNum( WallPanelHeatStableHorizUserCurveNum ),
-			WallPanelHeatUnstableHorizEqNum( WallPanelHeatUnstableHorizEqNum ),
-			WallPanelHeatUnstableHorizUserCurveNum( WallPanelHeatUnstableHorizUserCurveNum ),
-			WallPanelHeatStableTiltedEqNum( WallPanelHeatStableTiltedEqNum ),
-			WallPanelHeatStableTiltedUserCurveNum( WallPanelHeatStableTiltedUserCurveNum ),
-			WallPanelHeatUnstableTiltedEqNum( WallPanelHeatUnstableTiltedEqNum ),
-			WallPanelHeatUnstableTiltedUserCurveNum( WallPanelHeatUnstableTiltedUserCurveNum ),
-			WallPanelHeatWindowsEqNum( WallPanelHeatWindowsEqNum ),
-			WallPanelHeatWindowsUserCurveNum( WallPanelHeatWindowsUserCurveNum ),
-			ConvectiveHeatVertWallEqNum( ConvectiveHeatVertWallEqNum ),
-			ConvectiveHeatVertWallUserCurveNum( ConvectiveHeatVertWallUserCurveNum ),
-			ConvectiveHeatVertWallNearHeaterEqNum( ConvectiveHeatVertWallNearHeaterEqNum ),
-			ConvectiveHeatVertWallNearHeaterUserCurveNum( ConvectiveHeatVertWallNearHeaterUserCurveNum ),
-			ConvectiveHeatStableHorizEqNum( ConvectiveHeatStableHorizEqNum ),
-			ConvectiveHeatStableHorizUserCurveNum( ConvectiveHeatStableHorizUserCurveNum ),
-			ConvectiveHeatUnstableHorizEqNum( ConvectiveHeatUnstableHorizEqNum ),
-			ConvectiveHeatUnstableHorizUserCurveNum( ConvectiveHeatUnstableHorizUserCurveNum ),
-			ConvectiveHeatStableTiltedEqNum( ConvectiveHeatStableTiltedEqNum ),
-			ConvectiveHeatStableTiltedUserCurveNum( ConvectiveHeatStableTiltedUserCurveNum ),
-			ConvectiveHeatUnstableTiltedEqNum( ConvectiveHeatUnstableTiltedEqNum ),
-			ConvectiveHeatUnstableTiltedUserCurveNum( ConvectiveHeatUnstableTiltedUserCurveNum ),
-			ConvectiveHeatWindowsEqNum( ConvectiveHeatWindowsEqNum ),
-			ConvectiveHeatWindowsUserCurveNum( ConvectiveHeatWindowsUserCurveNum ),
-			CentralAirWallEqNum( CentralAirWallEqNum ),
-			CentralAirWallUserCurveNum( CentralAirWallUserCurveNum ),
-			CentralAirCeilingEqNum( CentralAirCeilingEqNum ),
-			CentralAirCeilingUserCurveNum( CentralAirCeilingUserCurveNum ),
-			CentralAirFloorEqNum( CentralAirFloorEqNum ),
-			CentralAirFloorUserCurveNum( CentralAirFloorUserCurveNum ),
-			CentralAirWindowsEqNum( CentralAirWindowsEqNum ),
-			CentralAirWindowsUserCurveNum( CentralAirWindowsUserCurveNum ),
-			ZoneFanCircVertWallEqNum( ZoneFanCircVertWallEqNum ),
-			ZoneFanCircVertWallUserCurveNum( ZoneFanCircVertWallUserCurveNum ),
-			ZoneFanCircStableHorizEqNum( ZoneFanCircStableHorizEqNum ),
-			ZoneFanCircStableHorizUserCurveNum( ZoneFanCircStableHorizUserCurveNum ),
-			ZoneFanCircUnstableHorizEqNum( ZoneFanCircUnstableHorizEqNum ),
-			ZoneFanCircUnstableHorizUserCurveNum( ZoneFanCircUnstableHorizUserCurveNum ),
-			ZoneFanCircStableTiltedEqNum( ZoneFanCircStableTiltedEqNum ),
-			ZoneFanCircStableTiltedUserCurveNum( ZoneFanCircStableTiltedUserCurveNum ),
-			ZoneFanCircUnstableTiltedEqNum( ZoneFanCircUnstableTiltedEqNum ),
-			ZoneFanCircUnstableTiltedUserCurveNum( ZoneFanCircUnstableTiltedUserCurveNum ),
-			ZoneFanCircWindowsEqNum( ZoneFanCircWindowsEqNum ),
-			ZoneFanCircWindowsUserCurveNum( ZoneFanCircWindowsUserCurveNum ),
-			MixedBouyAssistingFlowWallEqNum( MixedBouyAssistingFlowWallEqNum ),
-			MixedBouyAssistingFlowWallUserCurveNum( MixedBouyAssistingFlowWallUserCurveNum ),
-			MixedBouyOppossingFlowWallEqNum( MixedBouyOppossingFlowWallEqNum ),
-			MixedBouyOppossingFlowWallUserCurveNum( MixedBouyOppossingFlowWallUserCurveNum ),
-			MixedStableFloorEqNum( MixedStableFloorEqNum ),
-			MixedStableFloorUserCurveNum( MixedStableFloorUserCurveNum ),
-			MixedUnstableFloorEqNum( MixedUnstableFloorEqNum ),
-			MixedUnstableFloorUserCurveNum( MixedUnstableFloorUserCurveNum ),
-			MixedStableCeilingEqNum( MixedStableCeilingEqNum ),
-			MixedStableCeilingUserCurveNum( MixedStableCeilingUserCurveNum ),
-			MixedUnstableCeilingEqNum( MixedUnstableCeilingEqNum ),
-			MixedUnstableCeilingUserCurveNum( MixedUnstableCeilingUserCurveNum ),
-			MixedWindowsEqNum( MixedWindowsEqNum ),
-			MixedWindowsUserCurveNum( MixedWindowsUserCurveNum )
-		{}
-
 	};
 
 	struct OutsideFaceAdpativeConvAlgoStruct
@@ -697,41 +472,6 @@ namespace ConvectionCoefficients {
 			HNatUstableHorizUserCurveNum( 0 )
 		{}
 
-		// Member Constructor
-		OutsideFaceAdpativeConvAlgoStruct(
-			bool const EnteredByUser,
-			std::string const & Name,
-			bool const SuppressRainChange,
-			int const HWindWallWindwardEqNum,
-			int const HWindWallWindwardUserCurveNum,
-			int const HWindWallLeewardEqNum,
-			int const HWindWallLeewardUserCurveNum,
-			int const HWindHorizRoofEqNum,
-			int const HWindHorizRoofUserCurveNum,
-			int const HNatVertWallEqNum,
-			int const HNatVertWallUserCurveNum,
-			int const HNatStableHorizEqNum,
-			int const HNatStableHorizUserCurveNum,
-			int const HNatUnstableHorizEqNum,
-			int const HNatUstableHorizUserCurveNum
-		) :
-			EnteredByUser( EnteredByUser ),
-			Name( Name ),
-			SuppressRainChange( SuppressRainChange ),
-			HWindWallWindwardEqNum( HWindWallWindwardEqNum ),
-			HWindWallWindwardUserCurveNum( HWindWallWindwardUserCurveNum ),
-			HWindWallLeewardEqNum( HWindWallLeewardEqNum ),
-			HWindWallLeewardUserCurveNum( HWindWallLeewardUserCurveNum ),
-			HWindHorizRoofEqNum( HWindHorizRoofEqNum ),
-			HWindHorizRoofUserCurveNum( HWindHorizRoofUserCurveNum ),
-			HNatVertWallEqNum( HNatVertWallEqNum ),
-			HNatVertWallUserCurveNum( HNatVertWallUserCurveNum ),
-			HNatStableHorizEqNum( HNatStableHorizEqNum ),
-			HNatStableHorizUserCurveNum( HNatStableHorizUserCurveNum ),
-			HNatUnstableHorizEqNum( HNatUnstableHorizEqNum ),
-			HNatUstableHorizUserCurveNum( HNatUstableHorizUserCurveNum )
-		{}
-
 	};
 
 	struct BoundingBoxVertStruct
@@ -746,17 +486,6 @@ namespace ConvectionCoefficients {
 			SurfNum( 0 ),
 			VertNum( 0 ),
 			Vertex( 0.0, 0.0, 0.0 )
-		{}
-
-		// Member Constructor
-		BoundingBoxVertStruct(
-			int const SurfNum,
-			int const VertNum,
-			Vector const & Vertex
-		) :
-			SurfNum( SurfNum ),
-			VertNum( VertNum ),
-			Vertex( Vertex )
 		{}
 
 	};
@@ -783,35 +512,6 @@ namespace ConvectionCoefficients {
 			Area( 0.0 ),
 			Perimeter( 0.0 ),
 			Height( 0.0 )
-		{}
-
-		// Member Constructor
-		RoofGeoCharactisticsStruct(
-			BoundingBoxVertStruct const & XdYdZd, // 1 low x, low y, low z
-			BoundingBoxVertStruct const & XdYdZu, // 2 low x, low y, hi z
-			BoundingBoxVertStruct const & XdYuZd, // 3 low x, hi y, low z
-			BoundingBoxVertStruct const & XdYuZu, // 4 low x, hi y, hi z
-			BoundingBoxVertStruct const & XuYdZd, // 5 hi x, low y, low z
-			BoundingBoxVertStruct const & XuYuZd, // 6 hi x, hi y, low z
-			BoundingBoxVertStruct const & XuYdZu, // 7 hi x, low y, hi z
-			BoundingBoxVertStruct const & XuYuZu, // 8 hi x, hi y, hi z
-			Array1< Vector > const & BoundSurf, // long edge of roof group bounding surface
-			Real64 const Area,
-			Real64 const Perimeter,
-			Real64 const Height
-		) :
-			XdYdZd( XdYdZd ),
-			XdYdZu( XdYdZu ),
-			XdYuZd( XdYuZd ),
-			XdYuZu( XdYuZu ),
-			XuYdZd( XuYdZd ),
-			XuYuZd( XuYuZd ),
-			XuYdZu( XuYdZu ),
-			XuYuZu( XuYuZu ),
-			BoundSurf( 4, BoundSurf ),
-			Area( Area ),
-			Perimeter( Perimeter ),
-			Height( Height )
 		{}
 
 	};

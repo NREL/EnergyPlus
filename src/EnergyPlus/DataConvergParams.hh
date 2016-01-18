@@ -162,19 +162,6 @@ namespace DataConvergParams {
 			Temperature( ConvergLogStackDepth )
 		{}
 
-		// Member Constructor
-		HVACNodeConvergLogStruct(
-			int const NodeNum,
-			Array1< Real64 > const & HumidityRatio,
-			Array1< Real64 > const & MassFlowRate,
-			Array1< Real64 > const & Temperature
-		) :
-			NodeNum( NodeNum ),
-			HumidityRatio( ConvergLogStackDepth, HumidityRatio ),
-			MassFlowRate( ConvergLogStackDepth, MassFlowRate ),
-			Temperature( ConvergLogStackDepth, Temperature )
-		{}
-
 	};
 
 	struct HVACZoneInletConvergenceStruct
@@ -187,17 +174,6 @@ namespace DataConvergParams {
 		// Default Constructor
 		HVACZoneInletConvergenceStruct() :
 			NumInletNodes( 0 )
-		{}
-
-		// Member Constructor
-		HVACZoneInletConvergenceStruct(
-			std::string const & ZoneName,
-			int const NumInletNodes, // number of inlet nodes for zone
-			Array1< HVACNodeConvergLogStruct > const & InletNode
-		) :
-			ZoneName( ZoneName ),
-			NumInletNodes( NumInletNodes ),
-			InletNode( InletNode )
 		{}
 
 	};
@@ -266,67 +242,6 @@ namespace DataConvergParams {
 			HVACQualitySupplyDeck2ToDemandTolValue( ConvergLogStackDepth, 0.0 )
 		{}
 
-		// Member Constructor
-		HVACAirLoopIterationConvergenceStruct(
-			Array1D_bool const HVACMassFlowNotConverged, // Flag to show mass flow convergence
-			Array1< Real64 > const & HVACFlowDemandToSupplyTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACFlowSupplyDeck1ToDemandTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACFlowSupplyDeck2ToDemandTolValue, // Queue of convergence "results"
-			Array1D_bool const HVACHumRatNotConverged, // Flag to show humidity ratio convergence   or failure
-			Array1< Real64 > const & HVACHumDemandToSupplyTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACHumSupplyDeck1ToDemandTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACHumSupplyDeck2ToDemandTolValue, // Queue of convergence "results"
-			Array1D_bool const HVACTempNotConverged, // Flag to show temperature convergence  or failure
-			Array1< Real64 > const & HVACTempDemandToSupplyTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACTempSupplyDeck1ToDemandTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACTempSupplyDeck2ToDemandTolValue, // Queue of convergence "results"
-			Array1D_bool const HVACEnergyNotConverged, // Flag to show energy convergence   or failure
-			Array1< Real64 > const & HVACEnergyDemandToSupplyTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACEnergySupplyDeck1ToDemandTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACEnergySupplyDeck2ToDemandTolValue, // Queue of convergence "results"
-			Array1D_bool const HVACEnthalpyNotConverged, // Flag to show energy convergence   or failure
-			Array1< Real64 > const & HVACEnthalpyDemandToSupplyTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACEnthalpySupplyDeck1ToDemandTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACEnthalpySupplyDeck2ToDemandTolValue, // Queue of convergence "results"
-			Array1D_bool const HVACPressureNotConverged, // Flag to show energy convergence   or failure
-			Array1< Real64 > const & HVACPressureDemandToSupplyTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACPressureSupplyDeck1ToDemandTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACPressueSupplyDeck2ToDemandTolValue, // Queue of convergence "results"
-			Array1D_bool const HVACQualityNotConverged, // Flag to show energy convergence   or failure
-			Array1< Real64 > const & HVACQualityDemandToSupplyTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACQualitSupplyDeck1ToDemandTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & HVACQualitySupplyDeck2ToDemandTolValue // Queue of convergence "results"
-		) :
-			HVACMassFlowNotConverged( 3, HVACMassFlowNotConverged ),
-			HVACFlowDemandToSupplyTolValue( ConvergLogStackDepth, HVACFlowDemandToSupplyTolValue ),
-			HVACFlowSupplyDeck1ToDemandTolValue( ConvergLogStackDepth, HVACFlowSupplyDeck1ToDemandTolValue ),
-			HVACFlowSupplyDeck2ToDemandTolValue( ConvergLogStackDepth, HVACFlowSupplyDeck2ToDemandTolValue ),
-			HVACHumRatNotConverged( 3, HVACHumRatNotConverged ),
-			HVACHumDemandToSupplyTolValue( ConvergLogStackDepth, HVACHumDemandToSupplyTolValue ),
-			HVACHumSupplyDeck1ToDemandTolValue( ConvergLogStackDepth, HVACHumSupplyDeck1ToDemandTolValue ),
-			HVACHumSupplyDeck2ToDemandTolValue( ConvergLogStackDepth, HVACHumSupplyDeck2ToDemandTolValue ),
-			HVACTempNotConverged( 3, HVACTempNotConverged ),
-			HVACTempDemandToSupplyTolValue( ConvergLogStackDepth, HVACTempDemandToSupplyTolValue ),
-			HVACTempSupplyDeck1ToDemandTolValue( ConvergLogStackDepth, HVACTempSupplyDeck1ToDemandTolValue ),
-			HVACTempSupplyDeck2ToDemandTolValue( ConvergLogStackDepth, HVACTempSupplyDeck2ToDemandTolValue ),
-			HVACEnergyNotConverged( 3, HVACEnergyNotConverged ),
-			HVACEnergyDemandToSupplyTolValue( ConvergLogStackDepth, HVACEnergyDemandToSupplyTolValue ),
-			HVACEnergySupplyDeck1ToDemandTolValue( ConvergLogStackDepth, HVACEnergySupplyDeck1ToDemandTolValue ),
-			HVACEnergySupplyDeck2ToDemandTolValue( ConvergLogStackDepth, HVACEnergySupplyDeck2ToDemandTolValue ),
-			HVACEnthalpyNotConverged( 3, HVACEnthalpyNotConverged ),
-			HVACEnthalpyDemandToSupplyTolValue( ConvergLogStackDepth, HVACEnthalpyDemandToSupplyTolValue ),
-			HVACEnthalpySupplyDeck1ToDemandTolValue( ConvergLogStackDepth, HVACEnthalpySupplyDeck1ToDemandTolValue ),
-			HVACEnthalpySupplyDeck2ToDemandTolValue( ConvergLogStackDepth, HVACEnthalpySupplyDeck2ToDemandTolValue ),
-			HVACPressureNotConverged( 3, HVACPressureNotConverged ),
-			HVACPressureDemandToSupplyTolValue( ConvergLogStackDepth, HVACPressureDemandToSupplyTolValue ),
-			HVACPressureSupplyDeck1ToDemandTolValue( ConvergLogStackDepth, HVACPressureSupplyDeck1ToDemandTolValue ),
-			HVACPressueSupplyDeck2ToDemandTolValue( ConvergLogStackDepth, HVACPressueSupplyDeck2ToDemandTolValue ),
-			HVACQualityNotConverged( 3, HVACQualityNotConverged ),
-			HVACQualityDemandToSupplyTolValue( ConvergLogStackDepth, HVACQualityDemandToSupplyTolValue ),
-			HVACQualitSupplyDeck1ToDemandTolValue( ConvergLogStackDepth, HVACQualitSupplyDeck1ToDemandTolValue ),
-			HVACQualitySupplyDeck2ToDemandTolValue( ConvergLogStackDepth, HVACQualitySupplyDeck2ToDemandTolValue )
-		{}
-
 	};
 
 	struct PlantIterationConvergenceStruct
@@ -347,23 +262,6 @@ namespace DataConvergParams {
 			PlantTempNotConverged( false ),
 			PlantTempDemandToSupplyTolValue( ConvergLogStackDepth, 0.0 ),
 			PlantTempSupplyToDemandTolValue( ConvergLogStackDepth, 0.0 )
-		{}
-
-		// Member Constructor
-		PlantIterationConvergenceStruct(
-			bool const PlantMassFlowNotConverged, // Flag to show mass flow convergence
-			Array1< Real64 > const & PlantFlowDemandToSupplyTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & PlantFlowSupplyToDemandTolValue, // Queue of convergence "results"
-			bool const PlantTempNotConverged, // Flag to show temperature convergence (0) or failure (1)
-			Array1< Real64 > const & PlantTempDemandToSupplyTolValue, // Queue of convergence "results"
-			Array1< Real64 > const & PlantTempSupplyToDemandTolValue // Queue of convergence "results"
-		) :
-			PlantMassFlowNotConverged( PlantMassFlowNotConverged ),
-			PlantFlowDemandToSupplyTolValue( ConvergLogStackDepth, PlantFlowDemandToSupplyTolValue ),
-			PlantFlowSupplyToDemandTolValue( ConvergLogStackDepth, PlantFlowSupplyToDemandTolValue ),
-			PlantTempNotConverged( PlantTempNotConverged ),
-			PlantTempDemandToSupplyTolValue( ConvergLogStackDepth, PlantTempDemandToSupplyTolValue ),
-			PlantTempSupplyToDemandTolValue( ConvergLogStackDepth, PlantTempSupplyToDemandTolValue )
 		{}
 
 	};

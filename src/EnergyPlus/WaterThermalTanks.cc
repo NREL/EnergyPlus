@@ -961,19 +961,6 @@ namespace WaterThermalTanks {
 			WaterHeaterSaveNodes()
 			{}
 
-			// Member Constructor
-			WaterHeaterSaveNodes(
-				std::string const & InletNodeName1,
-				std::string const & OutletNodeName1,
-				std::string const & InletNodeName2,
-				std::string const & OutletNodeName2
-			) :
-				InletNodeName1( InletNodeName1 ),
-				OutletNodeName1( OutletNodeName1 ),
-				InletNodeName2( InletNodeName2 ),
-				OutletNodeName2( OutletNodeName2 )
-			{}
-
 		};
 
 		// Object Data
