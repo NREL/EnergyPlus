@@ -54,9 +54,9 @@ Figure 2. Heat Balance Diagram for All Six VRF-HR Operational Modes
 
 With the help of FWV and BS units, every operational mode has its own refrigerant piping connections for different refrigerant flow directions, as shown in Table 1. This leads to different refrigerant operations (HP charts shown in Table 2) and piping loss situations. The operational control logics for various modes are also different. Therefore, we need to design particular algorithm for every operational mode.
 
-![](NewVRFHeatRecoveryModel_Table1.png)
+![](NewVRFHeatRecoveryModel_Table1.PNG)
 
-![](NewVRFHeatRecoveryModel_Table2.png)
+![](NewVRFHeatRecoveryModel_Table2.PNG)
 
 The holistic logic of the new VRF-HR algorithm (using Mode 1 as an example) is shown in Figure 3. Note that a number of calculation steps are coupled together, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the compressor, which may lead to a different loading index and thus affects the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem. The iteration design may be different in different operational modes.
 
