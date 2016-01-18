@@ -743,44 +743,55 @@ namespace DataSurfaces {
 			// Project along axis of min surface range for 2D intersection use
 			Vertices::size_type const n( Vertex.size() );
 			assert( n >= 3 );
+			assert( plane == computed_plane() ); // Set plane first
 			using Vertex2D = ObjexxFCL::Vector2< Real64 >;
 			using Vertices2D = ObjexxFCL::Array1D< Vertex2D >;
+
+			// Select axis to project along
+			Real64 const a( std::abs( plane.x ) ); // Plane normal x coordinate magnitude
+			Real64 const b( std::abs( plane.y ) ); // Plane normal y coordinate magnitude
+			Real64 const c( std::abs( plane.z ) ); // Plane normal z coordinate magnitude
+			int const axis( a >= std::max( b, c ) ? 0 : ( b >= std::max( a, c ) ? 1 : 2 ) ); // Project along plane's normal's largest magnitude coordinate
+
+			// Set up 2D surface
+			Vertices2D v2d( n );
 			Vector const & v0( Vertex[ 0 ] );
-			Real64 xl( v0.x ), xu( v0.x ); // x coordinate ranges
-			Real64 yl( v0.y ), yu( v0.y ); // y coordinate ranges
-			Real64 zl( v0.z ), zu( v0.z ); // z coordinate ranges
-			for ( Vertices::size_type i = 1; i < n; ++i ) {
-				Vector const & v( Vertex[ i ] );
-				xl = std::min( xl, v.x );
-				yl = std::min( yl, v.y );
-				zl = std::min( zl, v.z );
-				xu = std::max( xu, v.x );
-				yu = std::max( yu, v.y );
-				zu = std::max( zu, v.z );
-			}
-			Real64 const xd( xu - xl );
-			Real64 const yd( yu - yl );
-			Real64 const zd( zu - zl );
-			Real64 const d_min( ObjexxFCL::min( xd, yd, zd ) );
-			Vertices2D v2d( Vertex.isize() );
-			if ( d_min == xd ) { // Use y,z for 2D surface
+			if ( axis == 0 ) { // Use y,z for 2D surface
+				Real64 yl( v0.y ), yu( v0.y ); // y coordinate ranges
+				Real64 zl( v0.z ), zu( v0.z ); // z coordinate ranges
 				for ( Vertices::size_type i = 0; i < n; ++i ) {
 					Vector const & v( Vertex[ i ] );
 					v2d[ i ] = Vertex2D( v.y, v.z );
+					yl = std::min( yl, v.y );
+					yu = std::max( yu, v.y );
+					zl = std::min( zl, v.z );
+					zu = std::max( zu, v.z );
 				}
-				return Surface2D( shapeCat, 0, v2d, Vertex2D( yl, zl ), Vertex2D( yu, zu ) );
-			} else if ( d_min == yd ) { // Use x,z for 2D surface
+				return Surface2D( shapeCat, axis, v2d, Vertex2D( yl, zl ), Vertex2D( yu, zu ) );
+			} else if ( axis == 1 ) { // Use x,z for 2D surface
+				Real64 xl( v0.x ), xu( v0.x ); // x coordinate ranges
+				Real64 zl( v0.z ), zu( v0.z ); // z coordinate ranges
 				for ( Vertices::size_type i = 0; i < n; ++i ) {
 					Vector const & v( Vertex[ i ] );
 					v2d[ i ] = Vertex2D( v.x, v.z );
+					xl = std::min( xl, v.x );
+					xu = std::max( xu, v.x );
+					zl = std::min( zl, v.z );
+					zu = std::max( zu, v.z );
 				}
-				return Surface2D( shapeCat, 1, v2d, Vertex2D( xl, zl ), Vertex2D( xu, zu ) );
+				return Surface2D( shapeCat, axis, v2d, Vertex2D( xl, zl ), Vertex2D( xu, zu ) );
 			} else { // Use x,y for 2D surface
+				Real64 xl( v0.x ), xu( v0.x ); // x coordinate ranges
+				Real64 yl( v0.y ), yu( v0.y ); // y coordinate ranges
 				for ( Vertices::size_type i = 0; i < n; ++i ) {
 					Vector const & v( Vertex[ i ] );
 					v2d[ i ] = Vertex2D( v.x, v.y );
+					xl = std::min( xl, v.x );
+					xu = std::max( xu, v.x );
+					yl = std::min( yl, v.y );
+					yu = std::max( yu, v.y );
 				}
-				return Surface2D( shapeCat, 2, v2d, Vertex2D( xl, yl ), Vertex2D( xu, yu ) );
+				return Surface2D( shapeCat, axis, v2d, Vertex2D( xl, yl ), Vertex2D( xu, yu ) );
 			}
 		}
 
