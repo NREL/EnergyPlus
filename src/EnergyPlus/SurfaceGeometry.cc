@@ -10488,9 +10488,9 @@ namespace SurfaceGeometry {
 						//          CALL ShowContinueError('...theta angle=['//TRIM(RoundSigDigits(Theta,6))//']')
 						//          CALL ShowContinueError('...last theta angle=['//TRIM(RoundSigDigits(LastTheta,6))//']')
 					}
-					SurfaceTmp( SurfNum ).IsConvex = false;
-					break;
 				}
+				SurfaceTmp( SurfNum ).IsConvex = false;
+				break;
 			}
 			PrevSignFlag = SignFlag;
 			LastTheta = Theta;
