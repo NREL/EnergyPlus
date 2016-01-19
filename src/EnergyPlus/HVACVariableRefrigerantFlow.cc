@@ -6173,8 +6173,7 @@ namespace HVACVariableRefrigerantFlow {
 		} else {
 			AverageUnitMassFlow = CompOnMassFlow;
 			AverageOAMassFlow = OACompOnMassFlow;
-			// CompOffMassFlow and OACompOffMassFlow are arleady set in InitVRF depending on the fan operating mode
-			// so averaging air flow when the compressor is off should be reset as follows
+			// set the averaging air flow to off compressor values if the compressor PartLoadRatio is zero
 			if ( PartLoadRatio == 0.0 ) {
 				AverageUnitMassFlow = CompOffMassFlow;
 				AverageOAMassFlow = OACompOffMassFlow;
