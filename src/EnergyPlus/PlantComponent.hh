@@ -66,7 +66,7 @@ namespace EnergyPlus {
 	class PlantComponent {
 
 		public:
-			virtual bool simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration ) = 0;
+			virtual bool simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip ) = 0;
 
 	};
 

@@ -308,10 +308,10 @@ namespace PlantLoopEquip {
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
 
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
 
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
 				SimPipesHeatTransfer( TypeOf_PipeExterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );

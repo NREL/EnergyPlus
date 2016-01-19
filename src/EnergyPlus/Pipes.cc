@@ -153,7 +153,7 @@ namespace Pipes {
 		return nullptr;
 	}
 
-	bool LocalPipeData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ) ) {
+	bool LocalPipeData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), bool const EP_UNUSED( InitLoopEquip ) ) {
 		if ( this->OneTimeInit ) {
 			int FoundOnLoop = 0;
 			bool errFlag = false;
