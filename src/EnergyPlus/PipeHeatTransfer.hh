@@ -71,6 +71,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -210,6 +211,18 @@ namespace PipeHeatTransfer {
 		bool CheckEquipName;
 		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 
+		// Report data
+		Real64 FluidInletTemp; // inlet temperature [C]
+		Real64 FluidOutletTemp; // outlet temperature [C]
+		Real64 MassFlowRate; // mass flow rate [kg/s]
+		Real64 FluidHeatLossRate; // overall heat transfer rate from fluid to pipe [W]
+		Real64 FluidHeatLossEnergy; // energy transferred from fluid to pipe [J]
+		Real64 PipeInletTemp; // pipe temperature at inlet [C]
+		Real64 PipeOutletTemp; // pipe temperature at Oulet [C]
+		Real64 EnvironmentHeatLossRate; // overall heat transfer rate from pipe to environment [W]
+		Real64 EnvHeatLossEnergy; // energy transferred from pipe to environment [J]
+		Real64 VolumeFlowRate;
+
 		// Default Constructor
 		PipeHTData() :
 			Length( 0.0 ),
@@ -279,28 +292,7 @@ namespace PipeHeatTransfer {
 			LoopSideNum( 0 ),
 			BranchNum( 0 ),
 			CompNum( 0 ),
-			CheckEquipName( true )
-		{}
-
-	};
-
-	struct PipeHeatTransferReport
-	{
-		// Members
-		// Report data
-		Real64 FluidInletTemp; // inlet temperature [C]
-		Real64 FluidOutletTemp; // outlet temperature [C]
-		Real64 MassFlowRate; // mass flow rate [kg/s]
-		Real64 FluidHeatLossRate; // overall heat transfer rate from fluid to pipe [W]
-		Real64 FluidHeatLossEnergy; // energy transferred from fluid to pipe [J]
-		Real64 PipeInletTemp; // pipe temperature at inlet [C]
-		Real64 PipeOutletTemp; // pipe temperature at Oulet [C]
-		Real64 EnvironmentHeatLossRate; // overall heat transfer rate from pipe to environment [W]
-		Real64 EnvHeatLossEnergy; // energy transferred from pipe to environment [J]
-		Real64 VolumeFlowRate;
-
-		// Default Constructor
-		PipeHeatTransferReport() :
+			CheckEquipName( true ),
 			FluidInletTemp( 0.0 ),
 			FluidOutletTemp( 0.0 ),
 			MassFlowRate( 0.0 ),
@@ -317,7 +309,6 @@ namespace PipeHeatTransfer {
 
 	// Object Data
 	extern Array1D< PipeHTData > PipeHT;
-	extern Array1D< PipeHeatTransferReport > PipeHTReport;
 
 	// Functions
 

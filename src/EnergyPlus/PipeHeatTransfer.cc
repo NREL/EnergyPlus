@@ -170,7 +170,6 @@ namespace PipeHeatTransfer {
 
 	// Object Data
 	Array1D< PipeHTData > PipeHT;
-	Array1D< PipeHeatTransferReport > PipeHTReport;
 
 	//==============================================================================
 
@@ -377,10 +376,10 @@ namespace PipeHeatTransfer {
 		NumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
 		// allocate data structures
 		if ( allocated( PipeHT ) ) PipeHT.deallocate();
-		if ( allocated( PipeHTReport ) ) PipeHTReport.deallocate();
+		if ( allocated( PipeHT ) ) PipeHT.deallocate();
 
 		PipeHT.allocate( NumOfPipeHT );
-		PipeHTReport.allocate( NumOfPipeHT );
+		PipeHT.allocate( NumOfPipeHT );
 
 		//  Numbers = 0.0
 		//  Alphas = Blank
@@ -758,21 +757,21 @@ namespace PipeHeatTransfer {
 		// Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
 		for ( Item = 1; Item <= NumOfPipeHT; ++Item ) {
 
-			SetupOutputVariable( "Pipe Fluid Heat Transfer Rate [W]", PipeHTReport( Item ).FluidHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Fluid Heat Transfer Energy [J]", PipeHTReport( Item ).FluidHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Fluid Heat Transfer Rate [W]", PipeHT( Item ).FluidHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Fluid Heat Transfer Energy [J]", PipeHT( Item ).FluidHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
 
 			if ( PipeHT( Item ).EnvironmentPtr == ZoneEnv ) {
-				SetupOutputVariable( "Pipe Ambient Heat Transfer Rate [W]", PipeHTReport( Item ).EnvironmentHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
-				SetupOutputVariable( "Pipe Ambient Heat Transfer Energy [J]", PipeHTReport( Item ).EnvHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
+				SetupOutputVariable( "Pipe Ambient Heat Transfer Rate [W]", PipeHT( Item ).EnvironmentHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
+				SetupOutputVariable( "Pipe Ambient Heat Transfer Energy [J]", PipeHT( Item ).EnvHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
 
 				SetupZoneInternalGain( PipeHT( Item ).EnvrZonePtr, "Pipe:Indoor", PipeHT( Item ).Name, IntGainTypeOf_PipeIndoor, PipeHT( Item ).ZoneHeatGainRate );
 
 			}
 
-			SetupOutputVariable( "Pipe Mass Flow Rate [kg/s]", PipeHTReport( Item ).MassFlowRate, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Volume Flow Rate [m3/s]", PipeHTReport( Item ).VolumeFlowRate, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Inlet Temperature [C]", PipeHTReport( Item ).FluidInletTemp, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Outlet Temperature [C]", PipeHTReport( Item ).FluidOutletTemp, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Mass Flow Rate [kg/s]", PipeHT( Item ).MassFlowRate, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Volume Flow Rate [m3/s]", PipeHT( Item ).VolumeFlowRate, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Inlet Temperature [C]", PipeHT( Item ).FluidInletTemp, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Outlet Temperature [C]", PipeHT( Item ).FluidOutletTemp, "Plant", "Average", PipeHT( Item ).Name );
 		}
 
 	}
@@ -1147,10 +1146,10 @@ namespace PipeHeatTransfer {
 		PipeHT( PipeHTNum ).FluidDensity = GetDensityGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
 
 		// At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
-		PipeHTReport( PipeHTNum ).FluidHeatLossRate = 0.0;
-		PipeHTReport( PipeHTNum ).FluidHeatLossEnergy = 0.0;
-		PipeHTReport( PipeHTNum ).EnvironmentHeatLossRate = 0.0;
-		PipeHTReport( PipeHTNum ).EnvHeatLossEnergy = 0.0;
+		PipeHT( PipeHTNum ).FluidHeatLossRate = 0.0;
+		PipeHT( PipeHTNum ).FluidHeatLossEnergy = 0.0;
+		PipeHT( PipeHTNum ).EnvironmentHeatLossRate = 0.0;
+		PipeHT( PipeHTNum ).EnvHeatLossEnergy = 0.0;
 		PipeHT( PipeHTNum ).ZoneHeatGainRate = 0.0;
 		FluidHeatLossRate = 0.0;
 		EnvHeatLossRate = 0.0;
@@ -1616,7 +1615,7 @@ namespace PipeHeatTransfer {
 			}
 
 			//If we didn't cycle back, then the system is converged
-			//PipeHTReport(PipeHTNum)%PipeUGIters=IterationIndex
+			//PipeHT(PipeHTNum)%PipeUGIters=IterationIndex
 			goto IterationLoop_exit;
 
 			IterationLoop_loop: ;
@@ -1726,24 +1725,24 @@ namespace PipeHeatTransfer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// update flows and temps from module variables
-		PipeHTReport( PipeHTNum ).FluidInletTemp = InletTemp;
-		PipeHTReport( PipeHTNum ).FluidOutletTemp = OutletTemp;
-		PipeHTReport( PipeHTNum ).MassFlowRate = MassFlowRate;
-		PipeHTReport( PipeHTNum ).VolumeFlowRate = VolumeFlowRate;
+		PipeHT( PipeHTNum ).FluidInletTemp = InletTemp;
+		PipeHT( PipeHTNum ).FluidOutletTemp = OutletTemp;
+		PipeHT( PipeHTNum ).MassFlowRate = MassFlowRate;
+		PipeHT( PipeHTNum ).VolumeFlowRate = VolumeFlowRate;
 
 		// update other variables from module variables
-		PipeHTReport( PipeHTNum ).FluidHeatLossRate = FluidHeatLossRate;
-		PipeHTReport( PipeHTNum ).FluidHeatLossEnergy = FluidHeatLossRate * DeltaTime; // DeltaTime is in seconds
-		PipeHTReport( PipeHTNum ).PipeInletTemp = PipeHT( PipeHTNum ).PipeTemp( 1 );
-		PipeHTReport( PipeHTNum ).PipeOutletTemp = PipeHT( PipeHTNum ).PipeTemp( PipeHT( PipeHTNum ).NumSections );
+		PipeHT( PipeHTNum ).FluidHeatLossRate = FluidHeatLossRate;
+		PipeHT( PipeHTNum ).FluidHeatLossEnergy = FluidHeatLossRate * DeltaTime; // DeltaTime is in seconds
+		PipeHT( PipeHTNum ).PipeInletTemp = PipeHT( PipeHTNum ).PipeTemp( 1 );
+		PipeHT( PipeHTNum ).PipeOutletTemp = PipeHT( PipeHTNum ).PipeTemp( PipeHT( PipeHTNum ).NumSections );
 
 		// need to average the heat rate because it is now summing over multiple inner time steps
-		PipeHTReport( PipeHTNum ).EnvironmentHeatLossRate = EnvHeatLossRate / NumInnerTimeSteps;
-		PipeHTReport( PipeHTNum ).EnvHeatLossEnergy = PipeHTReport( PipeHTNum ).EnvironmentHeatLossRate * DeltaTime;
+		PipeHT( PipeHTNum ).EnvironmentHeatLossRate = EnvHeatLossRate / NumInnerTimeSteps;
+		PipeHT( PipeHTNum ).EnvHeatLossEnergy = PipeHT( PipeHTNum ).EnvironmentHeatLossRate * DeltaTime;
 
 		// for zone heat gains, we assign the averaged heat rate over all inner time steps
 		if ( PipeHT( PipeHTNum ).EnvironmentPtr == ZoneEnv ) {
-			PipeHT( PipeHTNum ).ZoneHeatGainRate = PipeHTReport( PipeHTNum ).EnvironmentHeatLossRate;
+			PipeHT( PipeHTNum ).ZoneHeatGainRate = PipeHT( PipeHTNum ).EnvironmentHeatLossRate;
 		}
 
 	}
