@@ -126,11 +126,6 @@ namespace Pipes {
 	// Object Data
 	Array1D< std::shared_ptr< LocalPipeData > > LocalPipe; // dimension to number of pipes
 
-	// MODULE SUBROUTINES:
-
-	// Beginning of Plant Loop Module Driver Subroutines
-	//*************************************************************************
-
 	// Functions
 	void
 	clear_state()
@@ -183,12 +178,6 @@ namespace Pipes {
 
 		return true;
 	}
-
-	// End Plant Loop Module Driver Subroutines
-	//******************************************************************************
-
-	// Beginning of Plant Loop Module Get Input subroutines
-	//******************************************************************************
 
 	void
 	GetPipeInput()
@@ -298,93 +287,6 @@ namespace Pipes {
 		}
 
 	}
-
-	// End of Get Input subroutines for the Plant Loop Module
-	//******************************************************************************
-
-	// Beginning Initialization Section of the Plant Loop Module
-	//******************************************************************************
-
-	//void
-	//InitializePipes(
-		//int const EP_UNUSED( PipeType ), // Type of Pipe
-		//std::string const & PipeName, // Name of Pipe
-		//int & PipeNum, // Index into pipe structure for name
-		//Real64 const EP_UNUSED( MaxVolFlowRate ) // unused at present time
-	//)
-	//{
-
-		//// SUBROUTINE INFORMATION:
-		////       AUTHOR         Linda Lawrie
-		////       DATE WRITTEN   October 2007
-		////       MODIFIED       na
-		////       RE-ENGINEERED  na
-
-		//// PURPOSE OF THIS SUBROUTINE:
-		//// Provide an external call to initialize Pipes/index numbers.
-
-		//// METHODOLOGY EMPLOYED:
-		//// na
-
-		//// REFERENCES:
-		//// na
-
-		//// Using/Aliasing
-		//using InputProcessor::FindItemInList;
-		//using General::TrimSigDigits;
-
-		//// Locals
-		//// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		//// SUBROUTINE PARAMETER DEFINITIONS:
-		//// na
-
-		//// INTERFACE BLOCK SPECIFICATIONS:
-		//// na
-
-		//// DERIVED TYPE DEFINITIONS:
-		//// na
-
-		//// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//// na
-
-		//if ( GetPipeInputFlag ) {
-			//GetPipeInput();
-			//GetPipeInputFlag = false;
-		//}
-
-		//if ( PipeNum == 0 ) {
-			//PipeNum = FindItemInList( PipeName, LocalPipe );
-			//if ( PipeNum == 0 ) {
-				//ShowFatalError( "SimPipes: Pipe requested not found =" + PipeName ); // Catch any bad names before crashing
-			//}
-		//} else {
-			//if ( PipeNum > NumLocalPipes || PipeNum < 1 ) {
-				//ShowFatalError( "InitializePipe: Invalid PipeNum passed=" + TrimSigDigits( PipeNum ) + ", Number of Pipes=" + TrimSigDigits( NumLocalPipes ) + ", Pipe name=" + PipeName );
-			//}
-			//if ( LocalPipe( PipeNum )->CheckEquipName ) {
-				//if ( PipeName != LocalPipe( PipeNum )->Name ) {
-					//ShowFatalError( "InitializePipe: Invalid PipeNum passed=" + TrimSigDigits( PipeNum ) + ", Pipe name=" + PipeName + ", stored Pipe Name for that index=" + LocalPipe( PipeNum )->Name );
-				//}
-				//LocalPipe( PipeNum )->CheckEquipName = false;
-			//}
-		//}
-
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%FluidType            = Node(LocalPipe(PipeNum)%InletNodeNum)%FluidType
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%Temp                 = Node(LocalPipe(PipeNum)%InletNodeNum)%Temp
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%TempMin              = Node(LocalPipe(PipeNum)%InletNodeNum)%TempMin
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%TempMax              = Node(LocalPipe(PipeNum)%InletNodeNum)%TempMax
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%MassFlowRate         = Node(LocalPipe(PipeNum)%InletNodeNum)%MassFlowRate
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%MassFlowRateMin      = Node(LocalPipe(PipeNum)%InletNodeNum)%MassFlowRateMin
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%MassFlowRateMax      = Node(LocalPipe(PipeNum)%InletNodeNum)%MassFlowRateMax
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%MassFlowRateMinAvail = Node(LocalPipe(PipeNum)%InletNodeNum)%MassFlowRateMinAvail
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%MassFlowRateMaxAvail = Node(LocalPipe(PipeNum)%InletNodeNum)%MassFlowRateMaxAvail
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%Quality              = Node(LocalPipe(PipeNum)%InletNodeNum)%Quality
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%Press                = Node(LocalPipe(PipeNum)%InletNodeNum)%Press
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%Enthalpy             = Node(LocalPipe(PipeNum)%InletNodeNum)%Enthalpy
-		////  Node(LocalPipe(PipeNum)%OutletNodeNum)%HumRat               = Node(LocalPipe(PipeNum)%InletNodeNum)%HumRat
-
-	//}
 
 } // Pipes
 

@@ -136,28 +136,8 @@ namespace Pipes {
 	void
 	clear_state();
 
-	// End Plant Loop Module Driver Subroutines
-	//******************************************************************************
-
-	// Beginning of Plant Loop Module Get Input subroutines
-	//******************************************************************************
-
 	void
 	GetPipeInput();
-
-	// End of Get Input subroutines for the Plant Loop Module
-	//******************************************************************************
-
-	// Beginning Initialization Section of the Plant Loop Module
-	//******************************************************************************
-
-	//void
-	//InitializePipes(
-		//int const PipeType, // Type of Pipe
-		//std::string const & PipeName, // Name of Pipe
-		//int & PipeNum, // Index into pipe structure for name
-		//Real64 const MaxVolFlowRate // unused at present time
-	//);
 
 } // Pipes
 

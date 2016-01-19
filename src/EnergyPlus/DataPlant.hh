@@ -72,7 +72,6 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <PlantComponent.hh>
-#include <PlantLocation.hh>
 
 namespace EnergyPlus {
 

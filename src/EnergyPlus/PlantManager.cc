@@ -746,7 +746,6 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-		//using Pipes::InitializePipes;
 		using PipeHeatTransfer::InitializeHeatTransferPipes;
 
 		// Locals
