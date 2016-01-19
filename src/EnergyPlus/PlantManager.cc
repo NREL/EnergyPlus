@@ -746,7 +746,7 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-		using Pipes::InitializePipes;
+		//using Pipes::InitializePipes;
 		using PipeHeatTransfer::InitializeHeatTransferPipes;
 
 		// Locals
@@ -889,10 +889,12 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Pipe;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_Pipe, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Adiabatic:Steam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeSteam;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_PipeSteam, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Outdoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeExterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;

@@ -59,6 +59,9 @@
 #ifndef DataPlant_hh_INCLUDED
 #define DataPlant_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -68,6 +71,8 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
+#include <PlantComponent.hh>
+#include <PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -597,6 +602,7 @@ namespace DataPlant {
 		int IndexInLoopSidePumps; // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
 		Real64 TempDesCondIn;
 		Real64 TempDesEvapOut;
+		std::shared_ptr< PlantComponent > compPtr;
 
 		// Default Constructor
 		CompData() :
@@ -629,7 +635,8 @@ namespace DataPlant {
 			FreeCoolCntrlNodeNum( 0 ),
 			IndexInLoopSidePumps( 0 ),
 			TempDesCondIn( 0.0 ),
-			TempDesEvapOut( 0.0 )
+			TempDesEvapOut( 0.0 ),
+			compPtr( nullptr )
 		{}
 
 	};

@@ -217,7 +217,6 @@ namespace PlantLoopEquip {
 		using HeatPumpWaterToWaterCOOLING::SimHPWatertoWaterCOOLING;
 		using HeatPumpWaterToWaterSimple::SimHPWatertoWaterSimple;
 		using OutsideEnergySources::SimOutsideEnergy;
-		using Pipes::SimPipes;
 		using PipeHeatTransfer::SimPipesHeatTransfer;
 		using Pumps::SimPumps;
 
@@ -280,6 +279,7 @@ namespace PlantLoopEquip {
 		int GeneralEquipType; // Basic Equipment type from EquipType Used to help organize this routine
 		Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
 		Real64 TempEvapOutDesign;
+		EnergyPlus::PlantLocation sim_component_location( LoopNum, LoopSideNum, BranchNum, Num );
 
 		// set up a reference for this component
 		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
@@ -308,10 +308,10 @@ namespace PlantLoopEquip {
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				SimPipes( TypeOf_Pipe, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				SimPipes( TypeOf_PipeSteam, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
 				SimPipesHeatTransfer( TypeOf_PipeExterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
