@@ -11381,7 +11381,7 @@ This field defines the number of cooling speeds for the heat pump, and must matc
 
 #### Field: Single Mode Operation
 
-This field specifies the coil operation mode for multiple speed DX cooling and heating coils. The allowed choice is Yes or No. The No choice allows a coil works between two adjacent speeds when a system load is greater than the coil capacity at speed 1. The Yes choice allows a coil works with a single capacity at a different speed. The speed number is determined by a system load.  
+This field specifies the coil operation mode for multiple speed DX cooling and heating coils during each HVAC timestep. The allowed choice is Yes or No. The No choice allows a coil works between two adjacent speeds when a system load is greater than the coil capacity at speed 1. The Yes choice allows a coil works with a single capacity at a different speed. The speed number is determined by a system load.  
 
 #### Field: Heating Speed 1 Supply Air Flow Ratio
 

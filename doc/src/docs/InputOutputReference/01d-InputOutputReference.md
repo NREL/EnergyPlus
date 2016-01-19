@@ -15761,7 +15761,7 @@ In EnergyPlus the relief and outdoor air dampers, the economizer, and any outdoo
 
 Of course any type of setpoint manager can be used to establish a temperature setpoint at the mixed air node. But the Mixed Air Setpoint Manager is likely to be the most useful.
 
-When optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node are provided, the setpoint temperature at the mixed air node is calculated based on the maximum of both the reference setpoint temperature and minimum cooling coil outlet temperature, minus the cooling coil air temperature reduction and the supply fan air temperature rise if the supply fan placement is blow through. The setpoin temperature at the mixed air node is used to claculate the maximum outdoor air flow fraction in the corresponding Controller:OutdoorAir object. The outdoor air flow fraction is cappedd at the maximum outdoor air flow fraction to prevent cooling coil from freezing, even though the fraction is below the minimum outdoor air flow fraction.  
+When optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node are provided, the setpoint temperature at the mixed air node is calculated based on the maximum of both the reference setpoint temperature and minimum cooling coil outlet temperature, minus the cooling coil air temperature reduction and the supply fan air temperature rise if the supply fan placement is blow through. The setpoin temperature at the mixed air node is used to calculate the maximum outdoor air flow fraction in the corresponding Controller:OutdoorAir object. The outdoor air flow fraction is capped at the maximum outdoor air flow fraction to prevent the cooling coil from freezing, even though the fraction is below the minimum outdoor air flow fraction.  
 
 #### Field: Name
 
@@ -15797,7 +15797,7 @@ The name of the cooling coil outlet node.
 
 #### Field: Minimum Temperature at Cooling Coil Outlet Node
 
-In order to prevent cooling coil freezing, the minimum temperature at the cooling coil outlet is required based on requirement of ASHRAE Standard 90.1. The default value is 7.2C.
+In order to prevent cooling coil freezing during economizer operation, the minimum temperature at the cooling coil outlet is required based on requirement of ASHRAE Standard 90.1. The default value is 7.2C.
 
 Below is an example input for a Mixed Air Setpoint Manager.
 
@@ -17247,7 +17247,7 @@ Note that the key value for these outputs is the AirLoopHVAC name, not the name 
 
 * HVAC,Average,Air System Mixed Air Mass Flow Rate [kg/s]
 
-* HVAC,Average,Air System Ourdoor Air Maximum Flow Fraction []
+* HVAC,Average,Air System Outdoor Air Maximum Flow Fraction []
 
 #### Air System Outdoor Air Economizer Status []
 

@@ -52152,6 +52152,10 @@ UnitarySystemPerformance:Multispeed,
        \key Yes
        \key No
        \default No
+       \note Controls coil operation during each HVAC timestep. 
+       \note This choice does not apply to spped 1 opeation.
+       \note Yes = operate at the higher speed possible without exceeding the current load.
+       \note No = allow operation at the average of two adjacent speeds to match the current load.
   N3 , \field Heating Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
@@ -71472,13 +71476,16 @@ SetpointManager:MixedAir,
        \note Node(s) at which the temperature will be set
   A7 , \field Cooling Coil Inlet Node Name
        \type node
+       \note Optional field used to limit economizer operation to prevent freezing of DX cooling coil.
   A8 , \field Cooling coil Outlet Node Name
        \type node
+       \note Optional field used to limit economizer operation to prevent freezing of DX cooling coil.
   N1 ; \field Minimum Temperature at Cooling Coil Outlet Node
        \type real
        \units C
        \minimum> 0.0
        \default 7.2
+       \note Optional field used to limit economizer operation to prevent freezing of DX cooling coil.
 
 SetpointManager:OutdoorAirPretreat,
        \min-fields 11
