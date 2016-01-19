@@ -100,20 +100,21 @@ namespace PipeHeatTransfer {
 	// the model data structures
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern int NumOfPipeHT; // Number of Pipe Heat Transfer objects
-	extern int InletNodeNum; // module variable for inlet node number
-	extern int OutletNodeNum; // module variable for outlet node number
-	extern int PipeHTNum; // object index
-	extern Real64 MassFlowRate; // pipe mass flow rate
-	extern Real64 VolumeFlowRate; // pipe volumetric flow rate
-	extern Real64 DeltaTime; // time change from last update
-	extern Real64 InletTemp; // pipe inlet temperature
-	extern Real64 OutletTemp; // pipe outlet temperature
-	extern Real64 EnvironmentTemp; // environmental temperature (surrounding pipe)
-	extern Real64 EnvHeatLossRate; // heat loss rate from pipe to the environment
-	extern Real64 FluidHeatLossRate; // overall heat loss from fluid to pipe
+	extern int nsvNumOfPipeHT; // Number of Pipe Heat Transfer objects
+	extern int nsvInletNodeNum; // module variable for inlet node number
+	extern int nsvOutletNodeNum; // module variable for outlet node number
+	extern int nsvPipeHTNum; // object index
+	extern Real64 nsvMassFlowRate; // pipe mass flow rate
+	extern Real64 nsvVolumeFlowRate; // pipe volumetric flow rate
+	extern Real64 nsvDeltaTime; // time change from last update
+	extern Real64 nsvInletTemp; // pipe inlet temperature
+	extern Real64 nsvOutletTemp; // pipe outlet temperature
+	extern Real64 nsvEnvironmentTemp; // environmental temperature (surrounding pipe)
+	extern Real64 nsvEnvHeatLossRate; // heat loss rate from pipe to the environment
+	extern Real64 nsvFluidHeatLossRate; // overall heat loss from fluid to pipe
+	extern int nsvNumInnerTimeSteps; // the number of "inner" time steps for our model
+
 	extern bool GetPipeInputFlag; // First time, input is "gotten"
-	extern int NumInnerTimeSteps; // the number of "inner" time steps for our model
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 

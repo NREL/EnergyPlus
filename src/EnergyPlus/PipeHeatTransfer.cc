@@ -151,20 +151,21 @@ namespace PipeHeatTransfer {
 	// the model data structures
 
 	// MODULE VARIABLE DECLARATIONS:
-	int NumOfPipeHT( 0 ); // Number of Pipe Heat Transfer objects
-	int InletNodeNum( 0 ); // module variable for inlet node number
-	int OutletNodeNum( 0 ); // module variable for outlet node number
-	int PipeHTNum( 0 ); // object index
-	Real64 MassFlowRate( 0.0 ); // pipe mass flow rate
-	Real64 VolumeFlowRate( 0.0 ); // pipe volumetric flow rate
-	Real64 DeltaTime( 0.0 ); // time change from last update
-	Real64 InletTemp( 0.0 ); // pipe inlet temperature
-	Real64 OutletTemp( 0.0 ); // pipe outlet temperature
-	Real64 EnvironmentTemp( 0.0 ); // environmental temperature (surrounding pipe)
-	Real64 EnvHeatLossRate( 0.0 ); // heat loss rate from pipe to the environment
-	Real64 FluidHeatLossRate( 0.0 ); // overall heat loss from fluid to pipe
+	int nsvNumOfPipeHT( 0 ); // Number of Pipe Heat Transfer objects
+	int nsvInletNodeNum( 0 ); // module variable for inlet node number
+	int nsvOutletNodeNum( 0 ); // module variable for outlet node number
+	int nsvPipeHTNum( 0 ); // object index
+	Real64 nsvMassFlowRate( 0.0 ); // pipe mass flow rate
+	Real64 nsvVolumeFlowRate( 0.0 ); // pipe volumetric flow rate
+	Real64 nsvDeltaTime( 0.0 ); // time change from last update
+	Real64 nsvInletTemp( 0.0 ); // pipe inlet temperature
+	Real64 nsvOutletTemp( 0.0 ); // pipe outlet temperature
+	Real64 nsvEnvironmentTemp( 0.0 ); // environmental temperature (surrounding pipe)
+	Real64 nsvEnvHeatLossRate( 0.0 ); // heat loss rate from pipe to the environment
+	Real64 nsvFluidHeatLossRate( 0.0 ); // overall heat loss from fluid to pipe
+	int nsvNumInnerTimeSteps( 0 ); // the number of "inner" time steps for our model
+
 	bool GetPipeInputFlag( true ); // First time, input is "gotten"
-	int NumInnerTimeSteps( 0 ); // the number of "inner" time steps for our model
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -227,41 +228,41 @@ namespace PipeHeatTransfer {
 		}
 
 		if ( EqNum == 0 ) {
-			PipeHTNum = FindItemInList( EquipName, PipeHT );
-			if ( PipeHTNum == 0 ) {
+			nsvPipeHTNum = FindItemInList( EquipName, PipeHT );
+			if ( nsvPipeHTNum == 0 ) {
 				ShowFatalError( "SimPipeHeatTransfer: Pipe:heat transfer requested not found=" + EquipName ); // Catch any bad names before crashing
 			}
-			EqNum = PipeHTNum;
+			EqNum = nsvPipeHTNum;
 		} else {
-			PipeHTNum = EqNum;
-			if ( PipeHTNum > NumOfPipeHT || PipeHTNum < 1 ) {
-				ShowFatalError( "SimPipeHeatTransfer:  Invalid component index passed=" + TrimSigDigits( PipeHTNum ) + ", Number of Units=" + TrimSigDigits( NumOfPipeHT ) + ", Entered Unit name=" + EquipName );
+			nsvPipeHTNum = EqNum;
+			if ( nsvPipeHTNum > nsvNumOfPipeHT || nsvPipeHTNum < 1 ) {
+				ShowFatalError( "SimPipeHeatTransfer:  Invalid component index passed=" + TrimSigDigits( nsvPipeHTNum ) + ", Number of Units=" + TrimSigDigits( nsvNumOfPipeHT ) + ", Entered Unit name=" + EquipName );
 			}
-			if ( PipeHT( PipeHTNum ).CheckEquipName ) {
-				if ( EquipName != PipeHT( PipeHTNum ).Name ) {
-					ShowFatalError( "SimPipeHeatTransfer: Invalid component name passed=" + TrimSigDigits( PipeHTNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + PipeHT( PipeHTNum ).Name );
+			if ( PipeHT( nsvPipeHTNum ).CheckEquipName ) {
+				if ( EquipName != PipeHT( nsvPipeHTNum ).Name ) {
+					ShowFatalError( "SimPipeHeatTransfer: Invalid component name passed=" + TrimSigDigits( nsvPipeHTNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + PipeHT( nsvPipeHTNum ).Name );
 				}
-				PipeHT( PipeHTNum ).CheckEquipName = false;
+				PipeHT( nsvPipeHTNum ).CheckEquipName = false;
 			}
 		}
 
 		if ( InitLoopEquip ) return;
 		// initialize
-		InitPipesHeatTransfer( EquipType, PipeHTNum, FirstHVACIteration );
+		InitPipesHeatTransfer( EquipType, nsvPipeHTNum, FirstHVACIteration );
 		// make the calculations
-		for ( InnerTimeStepCtr = 1; InnerTimeStepCtr <= NumInnerTimeSteps; ++InnerTimeStepCtr ) {
-			{ auto const SELECT_CASE_var( PipeHT( PipeHTNum ).EnvironmentPtr );
+		for ( InnerTimeStepCtr = 1; InnerTimeStepCtr <= nsvNumInnerTimeSteps; ++InnerTimeStepCtr ) {
+			{ auto const SELECT_CASE_var( PipeHT( nsvPipeHTNum ).EnvironmentPtr );
 			if ( SELECT_CASE_var == GroundEnv ) {
-				CalcBuriedPipeSoil( PipeHTNum );
+				CalcBuriedPipeSoil( nsvPipeHTNum );
 			} else {
-				CalcPipesHeatTransfer( PipeHTNum );
+				CalcPipesHeatTransfer( nsvPipeHTNum );
 			}}
-			PushInnerTimeStepArrays( PipeHTNum );
+			PushInnerTimeStepArrays( nsvPipeHTNum );
 		}
 		// update vaiables
 		UpdatePipesHeatTransfer();
 		// update report variables
-		ReportPipesHeatTransfer( PipeHTNum );
+		ReportPipesHeatTransfer( nsvPipeHTNum );
 
 	}
 
@@ -373,13 +374,11 @@ namespace PipeHeatTransfer {
 		cCurrentModuleObject = "Pipe:Underground";
 		NumOfPipeHTUG = GetNumObjectsFound( cCurrentModuleObject );
 
-		NumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
+		nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
 		// allocate data structures
 		if ( allocated( PipeHT ) ) PipeHT.deallocate();
-		if ( allocated( PipeHT ) ) PipeHT.deallocate();
 
-		PipeHT.allocate( NumOfPipeHT );
-		PipeHT.allocate( NumOfPipeHT );
+		PipeHT.allocate( nsvNumOfPipeHT );
 
 		//  Numbers = 0.0
 		//  Alphas = Blank
@@ -718,7 +717,7 @@ namespace PipeHeatTransfer {
 
 		} // PipeUG input loop
 
-		for ( Item = 1; Item <= NumOfPipeHT; ++Item ) {
+		for ( Item = 1; Item <= nsvNumOfPipeHT; ++Item ) {
 			// Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
 			NumSections = NumPipeSections;
 			PipeHT( Item ).NumSections = NumPipeSections;
@@ -755,7 +754,7 @@ namespace PipeHeatTransfer {
 		}
 
 		// Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
-		for ( Item = 1; Item <= NumOfPipeHT; ++Item ) {
+		for ( Item = 1; Item <= nsvNumOfPipeHT; ++Item ) {
 
 			SetupOutputVariable( "Pipe Fluid Heat Transfer Rate [W]", PipeHT( Item ).FluidHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
 			SetupOutputVariable( "Pipe Fluid Heat Transfer Energy [J]", PipeHT( Item ).FluidHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
@@ -955,16 +954,16 @@ namespace PipeHeatTransfer {
 		CurSimDay = double( DayOfSim );
 
 		// some useful module variables
-		InletNodeNum = PipeHT( PipeHTNum ).InletNodeNum;
-		OutletNodeNum = PipeHT( PipeHTNum ).OutletNodeNum;
-		MassFlowRate = Node( InletNodeNum ).MassFlowRate;
-		InletTemp = Node( InletNodeNum ).Temp;
+		nsvInletNodeNum = PipeHT( PipeHTNum ).InletNodeNum;
+		nsvOutletNodeNum = PipeHT( PipeHTNum ).OutletNodeNum;
+		nsvMassFlowRate = Node( nsvInletNodeNum ).MassFlowRate;
+		nsvInletTemp = Node( nsvInletNodeNum ).Temp;
 
 		// get some data only once
 		if ( OneTimeInit ) {
 
 			errFlag = false;
-			for ( PipeNum = 1; PipeNum <= NumOfPipeHT; ++PipeNum ) {
+			for ( PipeNum = 1; PipeNum <= nsvNumOfPipeHT; ++PipeNum ) {
 
 				ScanPlantLoopsForObject( PipeHT( PipeNum ).Name, PipeHT( PipeNum ).TypeOf, PipeHT( PipeNum ).LoopNum, PipeHT( PipeNum ).LoopSideNum, PipeHT( PipeNum ).BranchNum, PipeHT( PipeNum ).CompNum, _, _, _, _, _, errFlag );
 
@@ -998,7 +997,7 @@ namespace PipeHeatTransfer {
 		if ( ( BeginSimFlag && PipeHT( PipeHTNum ).BeginSimInit ) || ( BeginEnvrnFlag && PipeHT( PipeHTNum ).BeginSimEnvrn ) ) {
 
 			// For underground pipes, we need to re-init the cartesian array each environment
-			for ( PipeNum = 1; PipeNum <= NumOfPipeHT; ++PipeNum ) {
+			for ( PipeNum = 1; PipeNum <= nsvNumOfPipeHT; ++PipeNum ) {
 				if ( PipeHT( PipeNum ).EnvironmentPtr == GroundEnv ) {
 					for ( TimeIndex = PreviousTimeIndex; TimeIndex <= TentativeTimeIndex; ++TimeIndex ) {
 						//Loop through all length, depth, and width of pipe to init soil temperature
@@ -1023,11 +1022,11 @@ namespace PipeHeatTransfer {
 			PipeHT( PipeHTNum ).PipeTemp = FirstTemperatures;
 			PipeHT( PipeHTNum ).PreviousPipeTemp = FirstTemperatures;
 			PipeHT( PipeHTNum ).PreviousSimTime = 0.0;
-			DeltaTime = 0.0;
-			OutletTemp = 0.0;
-			EnvironmentTemp = 0.0;
-			EnvHeatLossRate = 0.0;
-			FluidHeatLossRate = 0.0;
+			nsvDeltaTime = 0.0;
+			nsvOutletTemp = 0.0;
+			nsvEnvironmentTemp = 0.0;
+			nsvEnvHeatLossRate = 0.0;
+			nsvFluidHeatLossRate = 0.0;
 
 			PipeHT( PipeHTNum ).BeginSimInit = false;
 			PipeHT( PipeHTNum ).BeginSimEnvrn = false;
@@ -1038,8 +1037,8 @@ namespace PipeHeatTransfer {
 		if ( ! BeginEnvrnFlag ) PipeHT( PipeHTNum ).BeginSimEnvrn = true;
 
 		// time step in seconds
-		DeltaTime = TimeStepSys * SecInHour;
-		NumInnerTimeSteps = int( DeltaTime / InnerDeltaTime );
+		nsvDeltaTime = TimeStepSys * SecInHour;
+		nsvNumInnerTimeSteps = int( nsvDeltaTime / InnerDeltaTime );
 
 		// previous temps are updated if necessary at start of timestep rather than end
 		if ( ( FirstHVACIteration && PipeHT( PipeHTNum ).FirstHVACupdateFlag ) || ( BeginEnvrnFlag && PipeHT( PipeHTNum ).BeginEnvrnupdateFlag ) ) {
@@ -1071,13 +1070,13 @@ namespace PipeHeatTransfer {
 			if ( SELECT_CASE_var == GroundEnv ) {
 				//EnvironmentTemp = GroundTemp
 			} else if ( SELECT_CASE_var == OutsideAirEnv ) {
-				EnvironmentTemp = OutDryBulbTemp;
+				nsvEnvironmentTemp = OutDryBulbTemp;
 			} else if ( SELECT_CASE_var == ZoneEnv ) {
-				EnvironmentTemp = MAT( PipeHT( PipeHTNum ).EnvrZonePtr );
+				nsvEnvironmentTemp = MAT( PipeHT( PipeHTNum ).EnvrZonePtr );
 			} else if ( SELECT_CASE_var == ScheduleEnv ) {
-				EnvironmentTemp = GetCurrentScheduleValue( PipeHT( PipeHTNum ).EnvrSchedPtr );
+				nsvEnvironmentTemp = GetCurrentScheduleValue( PipeHT( PipeHTNum ).EnvrSchedPtr );
 			} else if ( SELECT_CASE_var == None ) { //default to outside temp
-				EnvironmentTemp = OutDryBulbTemp;
+				nsvEnvironmentTemp = OutDryBulbTemp;
 			}}
 
 			PipeHT( PipeHTNum ).BeginEnvrnupdateFlag = false;
@@ -1142,8 +1141,8 @@ namespace PipeHeatTransfer {
 		//Even though the loop eventually has no flow rate, it appears it initializes to a value, then converges to OFF
 		//Thus, this is called at the beginning of every time step once.
 
-		PipeHT( PipeHTNum ).FluidSpecHeat = GetSpecificHeatGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
-		PipeHT( PipeHTNum ).FluidDensity = GetDensityGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
+		PipeHT( PipeHTNum ).FluidSpecHeat = GetSpecificHeatGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, nsvInletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
+		PipeHT( PipeHTNum ).FluidDensity = GetDensityGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, nsvInletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
 
 		// At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
 		PipeHT( PipeHTNum ).FluidHeatLossRate = 0.0;
@@ -1151,13 +1150,13 @@ namespace PipeHeatTransfer {
 		PipeHT( PipeHTNum ).EnvironmentHeatLossRate = 0.0;
 		PipeHT( PipeHTNum ).EnvHeatLossEnergy = 0.0;
 		PipeHT( PipeHTNum ).ZoneHeatGainRate = 0.0;
-		FluidHeatLossRate = 0.0;
-		EnvHeatLossRate = 0.0;
-		OutletTemp = 0.0;
+		nsvFluidHeatLossRate = 0.0;
+		nsvEnvHeatLossRate = 0.0;
+		nsvOutletTemp = 0.0;
 
 		if ( PipeHT( PipeHTNum ).FluidDensity > 0.0 ) {
 			//The density will only be zero the first time through, which will be a warmup day, and not reported
-			VolumeFlowRate = MassFlowRate / PipeHT( PipeHTNum ).FluidDensity;
+			nsvVolumeFlowRate = nsvMassFlowRate / PipeHT( PipeHTNum ).FluidDensity;
 		}
 
 	}
@@ -1217,8 +1216,8 @@ namespace PipeHeatTransfer {
 				ShowFatalError( "SimPipes: Pipe requested not found =" + PipeName ); // Catch any bad names before crashing
 			}
 		} else {
-			if ( PipeNum > NumOfPipeHT || PipeNum < 1 ) {
-				ShowFatalError( "InitializePipe: Invalid PipeNum passed=" + TrimSigDigits( PipeNum ) + ", Number of Pipes=" + TrimSigDigits( NumOfPipeHT ) + ", Pipe name=" + PipeName );
+			if ( PipeNum > nsvNumOfPipeHT || PipeNum < 1 ) {
+				ShowFatalError( "InitializePipe: Invalid PipeNum passed=" + TrimSigDigits( PipeNum ) + ", Number of Pipes=" + TrimSigDigits( nsvNumOfPipeHT ) + ", Pipe name=" + PipeName );
 			}
 			if ( PipeName != PipeHT( PipeNum ).Name ) {
 				ShowFatalError( "InitializePipe: Invalid PipeNum passed=" + TrimSigDigits( PipeNum ) + ", Pipe name=" + PipeName + ", stored Pipe Name for that index=" + PipeHT( PipeNum ).Name );
@@ -1299,10 +1298,10 @@ namespace PipeHeatTransfer {
 		// traps fluid properties problems such as freezing conditions
 		if ( PipeHT( PipeHTNum ).FluidSpecHeat <= 0.0 || PipeHT( PipeHTNum ).FluidDensity <= 0.0 ) {
 			// leave the state of the pipe as it was
-			OutletTemp = PipeHT( PipeHTNum ).TentativeFluidTemp( PipeHT( PipeHTNum ).NumSections );
+			nsvOutletTemp = PipeHT( PipeHTNum ).TentativeFluidTemp( PipeHT( PipeHTNum ).NumSections );
 			// set heat transfer rates to zero for consistency
-			EnvHeatLossRate = 0.0;
-			FluidHeatLossRate = 0.0;
+			nsvEnvHeatLossRate = 0.0;
+			nsvFluidHeatLossRate = 0.0;
 			return;
 		}
 
@@ -1313,7 +1312,7 @@ namespace PipeHeatTransfer {
 			AirConvCoef = 1.0 / ( 1.0 / OutsidePipeHeatTransCoef( PipeHTNum ) + PipeHT( PipeHTNum ).InsulationResistance );
 		}
 
-		FluidConvCoef = CalcPipeHeatTransCoef( PipeHTNum, InletTemp, MassFlowRate, PipeHT( PipeHTNum ).PipeID );
+		FluidConvCoef = CalcPipeHeatTransCoef( PipeHTNum, nsvInletTemp, nsvMassFlowRate, PipeHT( PipeHTNum ).PipeID );
 
 		// heat transfer to air or ground
 		{ auto const SELECT_CASE_var( PipeHT( PipeHTNum ).EnvironmentPtr );
@@ -1337,24 +1336,24 @@ namespace PipeHeatTransfer {
 		FluidNodeHeatCapacity = PipeHT( PipeHTNum ).SectionArea * PipeHT( PipeHTNum ).Length / PipeHT( PipeHTNum ).NumSections * PipeHT( PipeHTNum ).FluidSpecHeat * PipeHT( PipeHTNum ).FluidDensity; // Mass of Node x Specific heat
 
 		// coef of fluid heat balance
-		A1 = FluidNodeHeatCapacity + MassFlowRate * PipeHT( PipeHTNum ).FluidSpecHeat * DeltaTime + FluidConvCoef * PipeHT( PipeHTNum ).InsideArea * DeltaTime;
+		A1 = FluidNodeHeatCapacity + nsvMassFlowRate * PipeHT( PipeHTNum ).FluidSpecHeat * nsvDeltaTime + FluidConvCoef * PipeHT( PipeHTNum ).InsideArea * nsvDeltaTime;
 
-		A2 = MassFlowRate * PipeHT( PipeHTNum ).FluidSpecHeat * DeltaTime;
+		A2 = nsvMassFlowRate * PipeHT( PipeHTNum ).FluidSpecHeat * nsvDeltaTime;
 
-		A3 = FluidConvCoef * PipeHT( PipeHTNum ).InsideArea * DeltaTime;
+		A3 = FluidConvCoef * PipeHT( PipeHTNum ).InsideArea * nsvDeltaTime;
 
 		A4 = FluidNodeHeatCapacity;
 
 		// coef of pipe heat balance
-		B1 = PipeHT( PipeHTNum ).PipeHeatCapacity + FluidConvCoef * PipeHT( PipeHTNum ).InsideArea * DeltaTime + EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * DeltaTime;
+		B1 = PipeHT( PipeHTNum ).PipeHeatCapacity + FluidConvCoef * PipeHT( PipeHTNum ).InsideArea * nsvDeltaTime + EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * nsvDeltaTime;
 
 		B2 = A3;
 
-		B3 = EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * DeltaTime;
+		B3 = EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * nsvDeltaTime;
 
 		B4 = PipeHT( PipeHTNum ).PipeHeatCapacity;
 
-		PipeHT( PipeHTNum ).TentativeFluidTemp( 0 ) = InletTemp;
+		PipeHT( PipeHTNum ).TentativeFluidTemp( 0 ) = nsvInletTemp;
 
 		PipeHT( PipeHTNum ).TentativePipeTemp( 0 ) = PipeHT( PipeHTNum ).PipeTemp( 1 ); // for convenience
 
@@ -1365,44 +1364,44 @@ namespace PipeHeatTransfer {
 			TempBelow = PipeHT( PipeHTNum ).T( PipeWidth, PipeDepth + 1, LengthIndex, CurrentTimeIndex );
 			TempBeside = PipeHT( PipeHTNum ).T( PipeWidth - 1, PipeDepth, LengthIndex, CurrentTimeIndex );
 			TempAbove = PipeHT( PipeHTNum ).T( PipeWidth, PipeDepth - 1, LengthIndex, CurrentTimeIndex );
-			EnvironmentTemp = ( TempBelow + TempBeside + TempAbove ) / 3.0;
+			nsvEnvironmentTemp = ( TempBelow + TempBeside + TempAbove ) / 3.0;
 
-			PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex ) = ( A2 * PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex - 1 ) + A3 / B1 * ( B3 * EnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( LengthIndex ) ) + A4 * PipeHT( PipeHTNum ).PreviousFluidTemp( LengthIndex ) ) / ( A1 - A3 * B2 / B1 );
+			PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex ) = ( A2 * PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex - 1 ) + A3 / B1 * ( B3 * nsvEnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( LengthIndex ) ) + A4 * PipeHT( PipeHTNum ).PreviousFluidTemp( LengthIndex ) ) / ( A1 - A3 * B2 / B1 );
 
-			PipeHT( PipeHTNum ).TentativePipeTemp( LengthIndex ) = ( B2 * PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex ) + B3 * EnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( LengthIndex ) ) / B1;
+			PipeHT( PipeHTNum ).TentativePipeTemp( LengthIndex ) = ( B2 * PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex ) + B3 * nsvEnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( LengthIndex ) ) / B1;
 
 			// Get exterior surface temperature from energy balance at the surface
-			Numerator = EnvironmentTemp - PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex );
+			Numerator = nsvEnvironmentTemp - PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex );
 			Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + PipeHT( PipeHTNum ).SumTK );
-			SurfaceTemp = EnvironmentTemp - Numerator / Denominator;
+			SurfaceTemp = nsvEnvironmentTemp - Numerator / Denominator;
 
 			// keep track of environmental heat loss rate - not same as fluid loss at same time
-			EnvHeatLossRate += EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * ( SurfaceTemp - EnvironmentTemp );
+			nsvEnvHeatLossRate += EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * ( SurfaceTemp - nsvEnvironmentTemp );
 
 		} else { //Simulate all sections at once if not pipe:underground
 
 			// start loop along pipe
 			// b1 must not be zero but this should have been checked on input
 			for ( curnode = 1; curnode <= PipeHT( PipeHTNum ).NumSections; ++curnode ) {
-				PipeHT( PipeHTNum ).TentativeFluidTemp( curnode ) = ( A2 * PipeHT( PipeHTNum ).TentativeFluidTemp( curnode - 1 ) + A3 / B1 * ( B3 * EnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( curnode ) ) + A4 * PipeHT( PipeHTNum ).PreviousFluidTemp( curnode ) ) / ( A1 - A3 * B2 / B1 );
+				PipeHT( PipeHTNum ).TentativeFluidTemp( curnode ) = ( A2 * PipeHT( PipeHTNum ).TentativeFluidTemp( curnode - 1 ) + A3 / B1 * ( B3 * nsvEnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( curnode ) ) + A4 * PipeHT( PipeHTNum ).PreviousFluidTemp( curnode ) ) / ( A1 - A3 * B2 / B1 );
 
-				PipeHT( PipeHTNum ).TentativePipeTemp( curnode ) = ( B2 * PipeHT( PipeHTNum ).TentativeFluidTemp( curnode ) + B3 * EnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( curnode ) ) / B1;
+				PipeHT( PipeHTNum ).TentativePipeTemp( curnode ) = ( B2 * PipeHT( PipeHTNum ).TentativeFluidTemp( curnode ) + B3 * nsvEnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( curnode ) ) / B1;
 
 				// Get exterior surface temperature from energy balance at the surface
-				Numerator = EnvironmentTemp - PipeHT( PipeHTNum ).TentativeFluidTemp( curnode );
+				Numerator = nsvEnvironmentTemp - PipeHT( PipeHTNum ).TentativeFluidTemp( curnode );
 				Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + PipeHT( PipeHTNum ).SumTK );
-				SurfaceTemp = EnvironmentTemp - Numerator / Denominator;
+				SurfaceTemp = nsvEnvironmentTemp - Numerator / Denominator;
 
 				// Keep track of environmental heat loss
-				EnvHeatLossRate += EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * ( SurfaceTemp - EnvironmentTemp );
+				nsvEnvHeatLossRate += EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * ( SurfaceTemp - nsvEnvironmentTemp );
 
 			}
 
 		}
 
-		FluidHeatLossRate = MassFlowRate * PipeHT( PipeHTNum ).FluidSpecHeat * ( PipeHT( PipeHTNum ).TentativeFluidTemp( 0 ) - PipeHT( PipeHTNum ).TentativeFluidTemp( PipeHT( PipeHTNum ).NumSections ) );
+		nsvFluidHeatLossRate = nsvMassFlowRate * PipeHT( PipeHTNum ).FluidSpecHeat * ( PipeHT( PipeHTNum ).TentativeFluidTemp( 0 ) - PipeHT( PipeHTNum ).TentativeFluidTemp( PipeHT( PipeHTNum ).NumSections ) );
 
-		OutletTemp = PipeHT( PipeHTNum ).TentativeFluidTemp( PipeHT( PipeHTNum ).NumSections );
+		nsvOutletTemp = PipeHT( PipeHTNum ).TentativeFluidTemp( PipeHT( PipeHTNum ).NumSections );
 
 	}
 
@@ -1482,7 +1481,7 @@ namespace PipeHeatTransfer {
 		static Real64 Cp( 0.0 ); // Placeholder for soil specific heat
 
 		// There are a number of coefficients which change through the simulation, and they are updated here
-		PipeHT( PipeHTNum ).FourierDS = PipeHT( PipeHTNum ).SoilDiffusivity * DeltaTime / pow_2( PipeHT( PipeHTNum ).dSregular ); //Eq. D4
+		PipeHT( PipeHTNum ).FourierDS = PipeHT( PipeHTNum ).SoilDiffusivity * nsvDeltaTime / pow_2( PipeHT( PipeHTNum ).dSregular ); //Eq. D4
 		PipeHT( PipeHTNum ).CoefA1 = PipeHT( PipeHTNum ).FourierDS / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D2
 		PipeHT( PipeHTNum ).CoefA2 = 1 / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D3
 
@@ -1546,7 +1545,7 @@ namespace PipeHeatTransfer {
 								NodeLeft = PipeHT( PipeHTNum ).T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
 
 								//-Update Equation, basically a detailed energy balance at the surface
-								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + 2 * NodeLeft ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
+								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + 2 * NodeLeft ) + ( rho * Cp / nsvDeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / nsvDeltaTime ) );
 
 							} else { //Soil surface, but not on centerline
 
@@ -1556,7 +1555,7 @@ namespace PipeHeatTransfer {
 								NodeRight = PipeHT( PipeHTNum ).T( WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex );
 
 								//-Update Equation
-								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + NodeLeft + NodeRight ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
+								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + NodeLeft + NodeRight ) + ( rho * Cp / nsvDeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / nsvDeltaTime ) );
 
 							} //Soil-to-air surface node structure
 
@@ -1665,25 +1664,25 @@ namespace PipeHeatTransfer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// only outlet node temp should need updating
-		Node( OutletNodeNum ).Temp = OutletTemp;
+		Node( nsvOutletNodeNum ).Temp = nsvOutletTemp;
 
 		// pass everything else through
-		Node( OutletNodeNum ).TempMin = Node( InletNodeNum ).TempMin;
-		Node( OutletNodeNum ).TempMax = Node( InletNodeNum ).TempMax;
-		Node( OutletNodeNum ).MassFlowRate = Node( InletNodeNum ).MassFlowRate;
-		Node( OutletNodeNum ).MassFlowRateMin = Node( InletNodeNum ).MassFlowRateMin;
-		Node( OutletNodeNum ).MassFlowRateMax = Node( InletNodeNum ).MassFlowRateMax;
-		Node( OutletNodeNum ).MassFlowRateMinAvail = Node( InletNodeNum ).MassFlowRateMinAvail;
-		Node( OutletNodeNum ).MassFlowRateMaxAvail = Node( InletNodeNum ).MassFlowRateMaxAvail;
-		Node( OutletNodeNum ).Quality = Node( InletNodeNum ).Quality;
+		Node( nsvOutletNodeNum ).TempMin = Node( nsvInletNodeNum ).TempMin;
+		Node( nsvOutletNodeNum ).TempMax = Node( nsvInletNodeNum ).TempMax;
+		Node( nsvOutletNodeNum ).MassFlowRate = Node( nsvInletNodeNum ).MassFlowRate;
+		Node( nsvOutletNodeNum ).MassFlowRateMin = Node( nsvInletNodeNum ).MassFlowRateMin;
+		Node( nsvOutletNodeNum ).MassFlowRateMax = Node( nsvInletNodeNum ).MassFlowRateMax;
+		Node( nsvOutletNodeNum ).MassFlowRateMinAvail = Node( nsvInletNodeNum ).MassFlowRateMinAvail;
+		Node( nsvOutletNodeNum ).MassFlowRateMaxAvail = Node( nsvInletNodeNum ).MassFlowRateMaxAvail;
+		Node( nsvOutletNodeNum ).Quality = Node( nsvInletNodeNum ).Quality;
 		//Only pass pressure if we aren't doing a pressure simulation
-		if ( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).PressureSimType > 1 ) {
+		if ( PlantLoop( PipeHT( nsvPipeHTNum ).LoopNum ).PressureSimType > 1 ) {
 			//Don't do anything
 		} else {
-			Node( OutletNodeNum ).Press = Node( InletNodeNum ).Press;
+			Node( nsvOutletNodeNum ).Press = Node( nsvInletNodeNum ).Press;
 		}
-		Node( OutletNodeNum ).Enthalpy = Node( InletNodeNum ).Enthalpy;
-		Node( OutletNodeNum ).HumRat = Node( InletNodeNum ).HumRat;
+		Node( nsvOutletNodeNum ).Enthalpy = Node( nsvInletNodeNum ).Enthalpy;
+		Node( nsvOutletNodeNum ).HumRat = Node( nsvInletNodeNum ).HumRat;
 
 	}
 
@@ -1725,20 +1724,20 @@ namespace PipeHeatTransfer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// update flows and temps from module variables
-		PipeHT( PipeHTNum ).FluidInletTemp = InletTemp;
-		PipeHT( PipeHTNum ).FluidOutletTemp = OutletTemp;
-		PipeHT( PipeHTNum ).MassFlowRate = MassFlowRate;
-		PipeHT( PipeHTNum ).VolumeFlowRate = VolumeFlowRate;
+		PipeHT( PipeHTNum ).FluidInletTemp = nsvInletTemp;
+		PipeHT( PipeHTNum ).FluidOutletTemp = nsvOutletTemp;
+		PipeHT( PipeHTNum ).MassFlowRate = nsvMassFlowRate;
+		PipeHT( PipeHTNum ).VolumeFlowRate = nsvVolumeFlowRate;
 
 		// update other variables from module variables
-		PipeHT( PipeHTNum ).FluidHeatLossRate = FluidHeatLossRate;
-		PipeHT( PipeHTNum ).FluidHeatLossEnergy = FluidHeatLossRate * DeltaTime; // DeltaTime is in seconds
+		PipeHT( PipeHTNum ).FluidHeatLossRate = nsvFluidHeatLossRate;
+		PipeHT( PipeHTNum ).FluidHeatLossEnergy = nsvFluidHeatLossRate * nsvDeltaTime; // DeltaTime is in seconds
 		PipeHT( PipeHTNum ).PipeInletTemp = PipeHT( PipeHTNum ).PipeTemp( 1 );
 		PipeHT( PipeHTNum ).PipeOutletTemp = PipeHT( PipeHTNum ).PipeTemp( PipeHT( PipeHTNum ).NumSections );
 
 		// need to average the heat rate because it is now summing over multiple inner time steps
-		PipeHT( PipeHTNum ).EnvironmentHeatLossRate = EnvHeatLossRate / NumInnerTimeSteps;
-		PipeHT( PipeHTNum ).EnvHeatLossEnergy = PipeHT( PipeHTNum ).EnvironmentHeatLossRate * DeltaTime;
+		PipeHT( PipeHTNum ).EnvironmentHeatLossRate = nsvEnvHeatLossRate / nsvNumInnerTimeSteps;
+		PipeHT( PipeHTNum ).EnvHeatLossEnergy = PipeHT( PipeHTNum ).EnvironmentHeatLossRate * nsvDeltaTime;
 
 		// for zone heat gains, we assign the averaged heat rate over all inner time steps
 		if ( PipeHT( PipeHTNum ).EnvironmentPtr == ZoneEnv ) {
@@ -1776,7 +1775,7 @@ namespace PipeHeatTransfer {
 		//  REAL(r64) :: QLossToZone
 
 		// FLOW:
-		if ( NumOfPipeHT == 0 ) return;
+		if ( nsvNumOfPipeHT == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
 			for ( auto & e : PipeHT ) e.ZoneHeatGainRate = 0.0;
