@@ -56,90 +56,20 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#ifndef Pipes_hh_INCLUDED
-#define Pipes_hh_INCLUDED
+#ifndef NAMED_HH_INCLUDED
+#define NAMED_HH_INCLUDED
 
-// C++ Headers
-#include <memory>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
-// EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <DataGlobals.hh>
-#include <PlantComponent.hh>
-#include <PlantLocation.hh>
+#include <string>
 
 namespace EnergyPlus {
 
-namespace Pipes {
-
-	// Using/Aliasing
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-
-	// MODULE VARIABLE DECLARATIONS:
-
-	extern int NumLocalPipes;
-	extern bool GetPipeInputFlag;
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
-
-	// Types
-
-	struct LocalPipeData : public PlantComponent
-	{
-		// Members
-		int TypeOf; // type of pipe
-		int InletNodeNum; // Node number on the inlet side of the plant
-		int OutletNodeNum; // Node number on the inlet side of the plant
-		int LoopNum; // Index of plant loop where this pipe resides
-		int LoopSide; // Index of plant loop side where this pipe resides
-		int BranchIndex; // Index of plant Branch index where this pipe resides
-		int CompIndex; // Index of plant Comp index where this pipe resides
-		bool OneTimeInit;
-		bool CheckEquipName;
-		bool EnvrnFlag;
-
-		// Default Constructor
-		LocalPipeData() :
-			TypeOf( 0 ),
-			InletNodeNum( 0 ),
-			OutletNodeNum( 0 ),
-			LoopNum( 0 ),
-			LoopSide( 0 ),
-			BranchIndex( 0 ),
-			CompIndex( 0 ),
-			OneTimeInit( true ),
-			CheckEquipName( true ),
-			EnvrnFlag( true )
-		{}
+	class Named {
 
 		public:
-			static std::shared_ptr< PlantComponent > factory( int objectType, std::string objectName );
-
-		public:
-			bool simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip );
+		std::string name;
 
 	};
 
-	// Object Data
-	extern Array1D< std::shared_ptr< LocalPipeData > > LocalPipe; // dimension to number of pipes
-
-	// Functions
-	void
-	clear_state();
-
-	void
-	GetPipeInput();
-
-} // Pipes
-
-} // EnergyPlus
+}
 
 #endif

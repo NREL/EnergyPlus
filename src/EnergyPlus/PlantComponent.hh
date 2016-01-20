@@ -59,11 +59,12 @@
 #ifndef PLANTCOMPONENT_HH_INCLUDED
 #define PLANTCOMPONENT_HH_INCLUDED
 
+#include <Named.hh>
 #include <PlantLocation.hh>
 
 namespace EnergyPlus {
 
-	class PlantComponent {
+	class PlantComponent : public Named {
 
 		public:
 			virtual bool simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip ) = 0;

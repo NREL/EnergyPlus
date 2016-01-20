@@ -124,7 +124,6 @@ namespace PipeHeatTransfer {
 	{
 		// Members
 		// Input data
-		std::string Name; // name of the component
 		std::string Construction; // construction object name
 		std::string Environment; // keyword:  'Schedule', 'OutdoorAir', 'Zone'
 		std::string EnvrSchedule; // temperature schedule for environmental temp
