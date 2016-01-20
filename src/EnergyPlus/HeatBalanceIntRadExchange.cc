@@ -86,6 +86,8 @@
 #include <Timer.h>
 #include <Vectorize.hh>
 
+#undef CI
+
 namespace EnergyPlus {
 
 #undef VECTORIZATION_TUTORIAL
