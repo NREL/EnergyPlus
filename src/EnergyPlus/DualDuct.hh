@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DualDuct_hh_INCLUDED
 #define DualDuct_hh_INCLUDED
 
@@ -128,73 +186,6 @@ namespace DualDuct {
 			AirLoopNum( 0 )
 		{}
 
-		// Member Constructor
-		DamperDesignParams(
-			std::string const & DamperName, // Name of the Damper
-			int const DamperType, // Type of Damper ie. VAV, Mixing, Inducing, etc.
-			std::string const & Schedule, // Damper Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			Real64 const MaxAirVolFlowRate, // Max Specified Volume Flow Rate of Damper [m3/sec]
-			Real64 const MaxAirMassFlowRate, // Max Specified MAss Flow Rate of Damper [kg/s]
-			int const InletNodeNum,
-			int const HotAirInletNodeNum,
-			int const ColdAirInletNodeNum,
-			int const OutletNodeNum,
-			Real64 const ZoneMinAirFrac,
-			Real64 const ColdAirDamperPosition,
-			Real64 const HotAirDamperPosition,
-			int const OAInletNodeNum, // Alternate Node for VAV:OutdoorAir for Outdoor Air
-			int const RecircAirInletNodeNum, // Alternate Node for VAV:OutdoorAir for Recirc Air
-			bool const RecircIsUsed, // if true. then not using recirc duct, which is okay
-			Real64 const DesignOAFlowRate, // Terminal Outdoor Air Design Flow Rate for VAV:OutdoorAir, m3/s
-			Real64 const DesignRecircFlowRate, // Terminal Recirc Air Design Flow Rate for VAV:OutdoorAir, m3/s
-			int const OAControlMode, // Choice of scheduled, constant, or dynamic for VAV:OutdoorAir
-			Real64 const RecircAirDamperPosition, // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
-			Real64 const OADamperPosition, // Alternate Damper Pos Output for VAV:OutdoorAir for Recirc Air
-			Real64 const OAFraction, // Outdoor Air Fraction for VAV:OutdoorAir
-			int const ADUNum, // index of corresponding air distribution unit
-			int const CtrlZoneNum, // Pointer to CtrlZone data structure
-			int const ActualZoneNum, // Pointer to Zone data Structure
-			Real64 const OutdoorAirFlowRate, // report variable for TU outdoor air flow rate
-			bool const NoOAFlowInputFromUser, // avoids OA calculation if no input specified by user
-			int const OARequirementsPtr, // - Index to DesignSpecification:OutdoorAir object
-			int const OAPerPersonMode, // mode for how per person rates are determined, DCV or design.
-			Real64 const OAPerPersonByDesignLevel, // store sum of people and per person rate, constant, m3/s
-			int const AirLoopNum
-		) :
-			DamperName( DamperName ),
-			DamperType( DamperType ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			MaxAirVolFlowRate( MaxAirVolFlowRate ),
-			MaxAirMassFlowRate( MaxAirMassFlowRate ),
-			InletNodeNum( InletNodeNum ),
-			HotAirInletNodeNum( HotAirInletNodeNum ),
-			ColdAirInletNodeNum( ColdAirInletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			ZoneMinAirFrac( ZoneMinAirFrac ),
-			ColdAirDamperPosition( ColdAirDamperPosition ),
-			HotAirDamperPosition( HotAirDamperPosition ),
-			OAInletNodeNum( OAInletNodeNum ),
-			RecircAirInletNodeNum( RecircAirInletNodeNum ),
-			RecircIsUsed( RecircIsUsed ),
-			DesignOAFlowRate( DesignOAFlowRate ),
-			DesignRecircFlowRate( DesignRecircFlowRate ),
-			OAControlMode( OAControlMode ),
-			RecircAirDamperPosition( RecircAirDamperPosition ),
-			OADamperPosition( OADamperPosition ),
-			OAFraction( OAFraction ),
-			ADUNum( ADUNum ),
-			CtrlZoneNum( CtrlZoneNum ),
-			ActualZoneNum( ActualZoneNum ),
-			OutdoorAirFlowRate( OutdoorAirFlowRate ),
-			NoOAFlowInputFromUser( NoOAFlowInputFromUser ),
-			OARequirementsPtr( OARequirementsPtr ),
-			OAPerPersonMode( OAPerPersonMode ),
-			OAPerPersonByDesignLevel( OAPerPersonByDesignLevel ),
-			AirLoopNum( AirLoopNum )
-		{}
-
 	};
 
 	struct DamperFlowConditions
@@ -225,33 +216,6 @@ namespace DualDuct {
 			AirMassFlowRateHist2( 0.0 ),
 			AirMassFlowRateHist3( 0.0 ),
 			AirMassFlowDiffMag( 0.0 )
-		{}
-
-		// Member Constructor
-		DamperFlowConditions(
-			Real64 const AirMassFlowRate, // MassFlow through the Damper being Simulated [kg/Sec]
-			Real64 const AirMassFlowRateMaxAvail, // MassFlow through the Damper being Simulated [kg/Sec]
-			Real64 const AirMassFlowRateMinAvail, // MassFlow through the Damper being Simulated [kg/Sec]
-			Real64 const AirMassFlowRateMax, // Max Mass Flow Rate or the Design Mass Flow Rate
-			Real64 const AirTemp,
-			Real64 const AirHumRat,
-			Real64 const AirEnthalpy,
-			Real64 const AirMassFlowRateHist1, // flow history back 1 iteration kg/s
-			Real64 const AirMassFlowRateHist2, // flow history back 2 iteration kg/s
-			Real64 const AirMassFlowRateHist3, // flow history back 3 iteration kg/s
-			Real64 const AirMassFlowDiffMag // flow difference scale, kg/s
-		) :
-			AirMassFlowRate( AirMassFlowRate ),
-			AirMassFlowRateMaxAvail( AirMassFlowRateMaxAvail ),
-			AirMassFlowRateMinAvail( AirMassFlowRateMinAvail ),
-			AirMassFlowRateMax( AirMassFlowRateMax ),
-			AirTemp( AirTemp ),
-			AirHumRat( AirHumRat ),
-			AirEnthalpy( AirEnthalpy ),
-			AirMassFlowRateHist1( AirMassFlowRateHist1 ),
-			AirMassFlowRateHist2( AirMassFlowRateHist2 ),
-			AirMassFlowRateHist3( AirMassFlowRateHist3 ),
-			AirMassFlowDiffMag( AirMassFlowDiffMag )
 		{}
 
 	};
@@ -368,29 +332,6 @@ namespace DualDuct {
 
 	//        End of Reporting subroutines for the Damper Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DualDuct
 

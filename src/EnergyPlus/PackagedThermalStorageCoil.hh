@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef PackagedThermalStorageCoil_hh_INCLUDED
 #define PackagedThermalStorageCoil_hh_INCLUDED
 
@@ -505,409 +563,6 @@ namespace PackagedThermalStorageCoil {
 			EvapCondPumpElecConsumption( 0.0 )
 		{}
 
-		// Member Constructor
-		PackagedTESCoolingCoilStruct(
-			std::string const & Name, // Name of TES cooling package
-			int const AvailSchedNum, // pointer to availability schedule
-			int const ModeControlType, // how are operation modes controlled
-			int const ControlModeSchedNum, // pointer to control schedule if used
-			bool const EMSControlModeOn, // if true, then EMS actuator has been used
-			Real64 const EMSControlModeValue, // value to use from EMS actuator for control mode
-			int const CurControlMode,
-			int const ControlModeErrorIndex,
-			Real64 const RatedEvapAirVolFlowRate, // [m3/s]
-			Real64 const RatedEvapAirMassFlowRate, // [kg/s]
-			int const EvapAirInletNodeNum, // evaporator inlet node pointer
-			int const EvapAirOutletNodeNum, // evaporator outlet node pointer
-			bool const CoolingOnlyModeIsAvailable,
-			Real64 const CoolingOnlyRatedTotCap, // gross total cooling capacity at rating conditions [W]
-			Real64 const CoolingOnlyRatedSHR, // Sensible heat ratio (sens cap/total cap) at rating conditions [W/W]
-			Real64 const CoolingOnlyRatedCOP, // Coefficient of performance at rating conditions [W/W]
-			int const CoolingOnlyCapFTempCurve, // curve index for total cooling capacity modifier curve
-			int const CoolingOnlyCapFTempObjectNum, // type of object used for curve input
-			int const CoolingOnlyCapFFlowCurve, // curve index for total cooling capacity modifier curve
-			int const CoolingOnlyCapFFlowObjectNum, // type of object used for curve input
-			int const CoolingOnlyEIRFTempCurve, // curve index for energy input ratio modifier curve
-			int const CoolingOnlyEIRFTempObjectNum, // type of object used for curve input
-			int const CoolingOnlyEIRFFlowCurve, // curve index for energy input ratio modifier curve
-			int const CoolingOnlyEIRFFlowObjectNum, // type of object used for curve input
-			int const CoolingOnlyPLFFPLRCurve, // curve index for part-load fact vs part load ratio,EIR modifier
-			int const CoolingOnlyPLFFPLRObjectNum, // type of object used for curve input
-			int const CoolingOnlySHRFTempCurve, // curve index for sensible heat ratio modifier curve
-			int const CoolingOnlySHRFTempObjectNum, // type of object used for curve input
-			int const CoolingOnlySHRFFlowCurve, // curve index for sensible heat ratio modifer curve
-			int const CoolingOnlySHRFFlowObjectNum,
-			bool const CoolingAndChargeModeAvailable,
-			Real64 const CoolingAndChargeRatedTotCap, // gross total evaporator cooling capacity at rating conditions [W]
-			Real64 const CoolingAndChargeRatedTotCapSizingFactor, // sizing factor for gross total evaporator [ ]
-			Real64 const CoolingAndChargeRatedChargeCap, // net storage charging capacity at rating conditions [W]
-			Real64 const CoolingAndChargeRatedChargeCapSizingFactor, // sizing factor for charging capacity [ ]
-			Real64 const CoolingAndChargeRatedSHR, // Sensible heat ratio (sens cap/total cap) at rating conditions [W/W]
-			Real64 const CoolingAndChargeCoolingRatedCOP, // Coefficient of performance at rating conditions, for cooling [W/W]
-			Real64 const CoolingAndChargeChargingRatedCOP, // Coefficient of performance at rating conditions, for charging [W/W]
-			int const CoolingAndChargeCoolingCapFTempCurve, // curve index for total cooling capacity modifier curve
-			int const CoolingAndChargeCoolingCapFTempObjectNum,
-			int const CoolingAndChargeCoolingCapFFlowCurve, // curve index for total cooling capacity modifier curve
-			int const CoolingAndChargeCoolingCapFFlowObjectNum,
-			int const CoolingAndChargeCoolingEIRFTempCurve, // curve index for cooling energy input ratio modifier curve
-			int const CoolingAndChargeCoolingEIRFTempObjectNum,
-			int const CoolingAndChargeCoolingEIRFFlowCurve, // curve index for cooling energy input ratio modifier curve
-			int const CoolingAndChargeCoolingEIRFFlowObjectNum,
-			int const CoolingAndChargeCoolingPLFFPLRCurve, // curve index for cooling part-load fact vs part load ratio, EIR modifier
-			int const CoolingAndChargeCoolingPLFFPLRObjectNum,
-			int const CoolingAndChargeChargingCapFTempCurve, // curve index for charging capacity modifier curve
-			int const CoolingAndChargeChargingCapFTempObjectNum,
-			int const CoolingAndChargeChargingCapFEvapPLRCurve, // curve index for charging capacity modifier curve
-			int const CoolingAndChargeChargingCapFEvapPLRObjectNum,
-			int const CoolingAndChargeChargingEIRFTempCurve, // curve index for charging energy input ratio modifier curve
-			int const CoolingAndChargeChargingEIRFTempObjectNum,
-			int const CoolingAndChargeChargingEIRFFLowCurve, // curve index for charging energy input ratio modifier curve
-			int const CoolingAndChargeChargingEIRFFLowObjectNum,
-			int const CoolingAndChargeChargingPLFFPLRCurve, // curve index for chargine part-load fact vs part load ratio, EIR modif
-			int const CoolingAndChargeChargingPLFFPLRObjectNum,
-			int const CoolingAndChargeSHRFTempCurve, // curve index for sensible heat ratio modifier curve
-			int const CoolingAndChargeSHRFTempObjectNum,
-			int const CoolingAndChargeSHRFFlowCurve, // curve index for sensible heat ratio modifer curve
-			int const CoolingAndChargeSHRFFlowObjectNum,
-			bool const CoolingAndDischargeModeAvailable,
-			Real64 const CoolingAndDischargeRatedTotCap, // gross total evaporator cooling capacity at rating conditions [W]
-			Real64 const CoolingAndDischargeRatedTotCapSizingFactor, // sizing factor gross total cooling capacity []
-			Real64 const CoolingAndDischargeRatedDischargeCap, // net storage discharging capacity at rating conditions [W]
-			Real64 const CoolingAndDischargeRatedDischargeCapSizingFactor, // sizing factor discharging capacity []
-			Real64 const CoolingAndDischargeRatedSHR, // Sensible heat ratio (sens cap/total cap) at rating conditions [W/W]
-			Real64 const CoolingAndDischargeCoolingRatedCOP, // Coefficient of performance at rating conditions, for cooling [W/W]
-			Real64 const CoolingAndDischargeDischargingRatedCOP, // Coefficient of performance at rating conditions, for charging [W/W]
-			int const CoolingAndDischargeCoolingCapFTempCurve, // curve index for total cooling capacity modifier curve
-			int const CoolingAndDischargeCoolingCapFTempObjectNum,
-			int const CoolingAndDischargeCoolingCapFFlowCurve, // curve index for total cooling capacity modifier curve
-			int const CoolingAndDischargeCoolingCapFFlowObjectNum,
-			int const CoolingAndDischargeCoolingEIRFTempCurve, // curve index for cooling energy input ratio modifier curve
-			int const CoolingAndDischargeCoolingEIRFTempObjectNum,
-			int const CoolingAndDischargeCoolingEIRFFlowCurve, // curve index for cooling energy input ratio modifier curve
-			int const CoolingAndDischargeCoolingEIRFFlowObjectNum,
-			int const CoolingAndDischargeCoolingPLFFPLRCurve, // curve index for cooling part-load fact vs part load ratio,
-			int const CoolingAndDischargeCoolingPLFFPLRObjectNum,
-			int const CoolingAndDischargeDischargingCapFTempCurve, // curve index for discharging capacity modifier curve
-			int const CoolingAndDischargeDischargingCapFTempObjectNum,
-			int const CoolingAndDischargeDischargingCapFFlowCurve, // curve index for discharging capacity modifier curve
-			int const CoolingAndDischargeDischargingCapFFlowObjectNum,
-			int const CoolingAndDischargeDischargingCapFEvapPLRCurve, // curve index for discharging capacity modifier curve
-			int const CoolingAndDischargeDischargingCapFEvapPLRObjectNum,
-			int const CoolingAndDischargeDischargingEIRFTempCurve, // curve index for discharging energy input ratio modifier curve
-			int const CoolingAndDischargeDischargingEIRFTempObjectNum,
-			int const CoolingAndDischargeDischargingEIRFFLowCurve, // curve index for discharging energy input ratio modifier curve
-			int const CoolingAndDischargeDischargingEIRFFLowObjectNum,
-			int const CoolingAndDischargeDischargingPLFFPLRCurve, // curve index for discharging part-load fact vs part load ratio
-			int const CoolingAndDischargeDischargingPLFFPLRObjectNum,
-			int const CoolingAndDischargeSHRFTempCurve, // curve index for sensible heat ratio modifier curve
-			int const CoolingAndDischargeSHRFTempObjectNum,
-			int const CoolingAndDischargeSHRFFlowCurve, // curve index for sensible heat ratio modifer curve
-			int const CoolingAndDischargeSHRFFlowObjectNum,
-			bool const ChargeOnlyModeAvailable,
-			Real64 const ChargeOnlyRatedCapacity, // net storage charging capacity at rating conditions [W]
-			Real64 const ChargeOnlyRatedCapacitySizingFactor, // sizing factor for charging capacity []
-			Real64 const ChargeOnlyRatedCOP, // coefficient of performance at rating conditions [W/W]
-			int const ChargeOnlyChargingCapFTempCurve, // curve index for charging capacity modifier curve
-			int const ChargeOnlyChargingCapFTempObjectNum,
-			int const ChargeOnlyChargingEIRFTempCurve, // curve index for charging energy input ratio modifier curve
-			int const ChargeOnlyChargingEIRFTempObjectNum,
-			bool const DischargeOnlyModeAvailable,
-			Real64 const DischargeOnlyRatedDischargeCap, // gross total evaporator cooling capacity at rating conditions [W]
-			Real64 const DischargeOnlyRatedDischargeCapSizingFactor, // sizing factor for cooling capacity []
-			Real64 const DischargeOnlyRatedSHR, // sensible heat ratio (sens cap/total cap) at rating conditions
-			Real64 const DischargeOnlyRatedCOP, // coefficient of performance at rating conditions for discharging [W/W]
-			int const DischargeOnlyCapFTempCurve, // curve index for total cooling capacity modifier curve
-			int const DischargeOnlyCapFTempObjectNum,
-			int const DischargeOnlyCapFFlowCurve, // curve index for tot cooling capacity modifier curve
-			int const DischargeOnlyCapFFlowObjectNum,
-			int const DischargeOnlyEIRFTempCurve, // curve index for energy input ratio modifier curve
-			int const DischargeOnlyEIRFTempObjectNum,
-			int const DischargeOnlyEIRFFlowCurve, // curve index for energy input ratio modifier curve
-			int const DischargeOnlyEIRFFlowObjectNum,
-			int const DischargeOnlyPLFFPLRCurve, // curve index for part-load fact vs evaporator part load ratio
-			int const DischargeOnlyPLFFPLRObjectNum,
-			int const DischargeOnlySHRFTempCurve, // curve index for sensible heat ratio modifier curve
-			int const DischargeOnlySHRFTempObjectNum,
-			int const DischargeOnlySHRFFLowCurve, // curve index for
-			int const DischargeOnlySHRFFLowObjectNum,
-			Real64 const AncillaryControlsPower, // standby and controls electric power, draws when available [W]
-			Real64 const ColdWeatherMinimumTempLimit, // temperature limit for cold weather operation mode [C]
-			Real64 const ColdWeatherAncillaryPower, // electrical power draw during cold weather [W]
-			int const CondAirInletNodeNum, // Condenser air inlet node num pointer
-			int const CondAirOutletNodeNum, // condenser air outlet node num pointer
-			int const CondenserType, // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
-			Real64 const CondenserAirVolumeFlow, // design air flow rate thru condenser [m3/s]
-			Real64 const CondenserAirFlowSizingFactor, // scale condenser air flow relative to evap air flow when autosizing
-			Real64 const CondenserAirMassFlow, // design air flow rate thru condenser [kg/s]
-			Real64 const EvapCondEffect, // effectiveness of the evaporatively cooled condenser
-			Real64 const CondInletTemp, // air temperature drybulb entering condenser section after evap cooling [C]
-			Real64 const EvapCondPumpElecNomPower, // Nominal power input to the evap condenser water circulation pump [W]
-			Real64 const EvapCondPumpElecEnergy, // Electric energy used by condenser water circulation pump [J]
-			Real64 const BasinHeaterPowerFTempDiff, // Basin heater power for evaporatively cooled condensers [W/K]
-			int const BasinHeaterAvailSchedNum, // basin heater availability schedule pointer num
-			Real64 const BasinHeaterSetpointTemp, // evap water basin temperature setpoint [C]
-			int const EvapWaterSupplyMode, // where does evap water come from
-			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
-			int const EvapWaterSupTankID, // supply tank index, if any
-			int const EvapWaterTankDemandARRID, // evap water demand array index
-			int const CondensateCollectMode, // where does condensate  water go to
-			std::string const & CondensateCollectName, // name of water source e.g. water storage tank
-			int const CondensateTankID,
-			int const CondensateTankSupplyARRID,
-			int const StorageMedia, // water/fluid or ice based TES
-			std::string const & StorageFluidName, // if user defined, name of fluid type
-			int const StorageFluidIndex, // if user defined, index of fluid type
-			Real64 const FluidStorageVolume, // volume of water in storage tank for water systems [m3/s]
-			Real64 const IceStorageCapacity, // capacity of storage in J
-			Real64 const StorageCapacitySizingFactor, // storage time used to autocalculate capacity [hr]
-			Real64 const MinimumFluidTankTempLimit, // optional inputs [C]
-			Real64 const MaximumFluidTankTempLimit, // optional inputs [C]
-			Real64 const RatedFluidTankTemp, // rating point condition for fluid storage tanks [C]
-			int const StorageAmbientNodeNum, // node "pointer" for ambient conditions exposed to TES
-			Real64 const StorageUA, // overall heat transfer coefficient for TES to ambient [W/k]
-			bool const TESPlantConnectionAvailable,
-			int const TESPlantInletNodeNum, // plant loop inlet node index
-			int const TESPlantOutletNodeNum, // plant loop outlet node index
-			int const TESPlantLoopNum, // plant loop connection index
-			int const TESPlantLoopSideNum, // plant loop side connection index
-			int const TESPlantBranchNum, // plant loop branch connection index
-			int const TESPlantCompNum, // plant loop component connection index
-			Real64 const TESPlantDesignVolumeFlowRate, // plant connection design mass flow rate [m3/s]
-			Real64 const TESPlantDesignMassFlowRate, // [kg/s]
-			Real64 const TESPlantEffectiveness,
-			Real64 const TimeElapsed,
-			Real64 const IceFracRemain, // state of storage for current time step [0..1.0]
-			Real64 const IceFracRemainLastTimestep, // state of storage for previous time step [0..1.0]
-			Real64 const FluidTankTempFinal,
-			Real64 const FluidTankTempFinalLastTimestep,
-			Real64 const QdotPlant, // heat exchange rate for plant connection to TES tank [W]
-			Real64 const Q_Plant, // heat exchange energy for plant connection to TES tank [J]
-			Real64 const QdotAmbient, // heat exchange rate for skin losses/gains for TES tank to surroundings [W]
-			Real64 const Q_Ambient, // heat exchange enegy for skin losses/gains for TES tank to surroundings [J]
-			Real64 const QdotTES, // heat exchange rate by mechanical systems to charge or discharge TES [W]
-			Real64 const Q_TES, // heat exchange energy by mechanical systems to charge or discharge TES [J]
-			Real64 const ElecCoolingPower, // electric power for cooling [W]
-			Real64 const ElecCoolingEnergy, // electric energy for cooling [J], metered
-			Real64 const EvapTotCoolingRate, // evaporator coil total cooling rate [W]
-			Real64 const EvapTotCoolingEnergy, // evaporatory coil total cooling energy [J], metered
-			Real64 const EvapSensCoolingRate,
-			Real64 const EvapSensCoolingEnergy,
-			Real64 const EvapLatCoolingRate,
-			Real64 const EvapLatCoolingEnergy,
-			Real64 const RuntimeFraction,
-			Real64 const CondenserRuntimeFraction,
-			Real64 const ElectColdWeatherPower, // electric power for cold weather protection [W]
-			Real64 const ElectColdWeatherEnergy, // electric energy for cold weather protection [J], metered
-			Real64 const ElectEvapCondBasinHeaterPower,
-			Real64 const ElectEvapCondBasinHeaterEnergy,
-			Real64 const EvapWaterConsumpRate, // Evap Water Consumption rate in m3/sec
-			Real64 const EvapWaterConsump, // Evap Water Consumption in m3
-			Real64 const EvapWaterStarvMakupRate, // Evap water consumed but not really available from tank m3/s
-			Real64 const EvapWaterStarvMakup, // Evap water consumed but not really available from tank m3
-			Real64 const EvapCondPumpElecPower,
-			Real64 const EvapCondPumpElecConsumption
-		) :
-			Name( Name ),
-			AvailSchedNum( AvailSchedNum ),
-			ModeControlType( ModeControlType ),
-			ControlModeSchedNum( ControlModeSchedNum ),
-			EMSControlModeOn( EMSControlModeOn ),
-			EMSControlModeValue( EMSControlModeValue ),
-			CurControlMode( CurControlMode ),
-			ControlModeErrorIndex( ControlModeErrorIndex ),
-			RatedEvapAirVolFlowRate( RatedEvapAirVolFlowRate ),
-			RatedEvapAirMassFlowRate( RatedEvapAirMassFlowRate ),
-			EvapAirInletNodeNum( EvapAirInletNodeNum ),
-			EvapAirOutletNodeNum( EvapAirOutletNodeNum ),
-			CoolingOnlyModeIsAvailable( CoolingOnlyModeIsAvailable ),
-			CoolingOnlyRatedTotCap( CoolingOnlyRatedTotCap ),
-			CoolingOnlyRatedSHR( CoolingOnlyRatedSHR ),
-			CoolingOnlyRatedCOP( CoolingOnlyRatedCOP ),
-			CoolingOnlyCapFTempCurve( CoolingOnlyCapFTempCurve ),
-			CoolingOnlyCapFTempObjectNum( CoolingOnlyCapFTempObjectNum ),
-			CoolingOnlyCapFFlowCurve( CoolingOnlyCapFFlowCurve ),
-			CoolingOnlyCapFFlowObjectNum( CoolingOnlyCapFFlowObjectNum ),
-			CoolingOnlyEIRFTempCurve( CoolingOnlyEIRFTempCurve ),
-			CoolingOnlyEIRFTempObjectNum( CoolingOnlyEIRFTempObjectNum ),
-			CoolingOnlyEIRFFlowCurve( CoolingOnlyEIRFFlowCurve ),
-			CoolingOnlyEIRFFlowObjectNum( CoolingOnlyEIRFFlowObjectNum ),
-			CoolingOnlyPLFFPLRCurve( CoolingOnlyPLFFPLRCurve ),
-			CoolingOnlyPLFFPLRObjectNum( CoolingOnlyPLFFPLRObjectNum ),
-			CoolingOnlySHRFTempCurve( CoolingOnlySHRFTempCurve ),
-			CoolingOnlySHRFTempObjectNum( CoolingOnlySHRFTempObjectNum ),
-			CoolingOnlySHRFFlowCurve( CoolingOnlySHRFFlowCurve ),
-			CoolingOnlySHRFFlowObjectNum( CoolingOnlySHRFFlowObjectNum ),
-			CoolingAndChargeModeAvailable( CoolingAndChargeModeAvailable ),
-			CoolingAndChargeRatedTotCap( CoolingAndChargeRatedTotCap ),
-			CoolingAndChargeRatedTotCapSizingFactor( CoolingAndChargeRatedTotCapSizingFactor ),
-			CoolingAndChargeRatedChargeCap( CoolingAndChargeRatedChargeCap ),
-			CoolingAndChargeRatedChargeCapSizingFactor( CoolingAndChargeRatedChargeCapSizingFactor ),
-			CoolingAndChargeRatedSHR( CoolingAndChargeRatedSHR ),
-			CoolingAndChargeCoolingRatedCOP( CoolingAndChargeCoolingRatedCOP ),
-			CoolingAndChargeChargingRatedCOP( CoolingAndChargeChargingRatedCOP ),
-			CoolingAndChargeCoolingCapFTempCurve( CoolingAndChargeCoolingCapFTempCurve ),
-			CoolingAndChargeCoolingCapFTempObjectNum( CoolingAndChargeCoolingCapFTempObjectNum ),
-			CoolingAndChargeCoolingCapFFlowCurve( CoolingAndChargeCoolingCapFFlowCurve ),
-			CoolingAndChargeCoolingCapFFlowObjectNum( CoolingAndChargeCoolingCapFFlowObjectNum ),
-			CoolingAndChargeCoolingEIRFTempCurve( CoolingAndChargeCoolingEIRFTempCurve ),
-			CoolingAndChargeCoolingEIRFTempObjectNum( CoolingAndChargeCoolingEIRFTempObjectNum ),
-			CoolingAndChargeCoolingEIRFFlowCurve( CoolingAndChargeCoolingEIRFFlowCurve ),
-			CoolingAndChargeCoolingEIRFFlowObjectNum( CoolingAndChargeCoolingEIRFFlowObjectNum ),
-			CoolingAndChargeCoolingPLFFPLRCurve( CoolingAndChargeCoolingPLFFPLRCurve ),
-			CoolingAndChargeCoolingPLFFPLRObjectNum( CoolingAndChargeCoolingPLFFPLRObjectNum ),
-			CoolingAndChargeChargingCapFTempCurve( CoolingAndChargeChargingCapFTempCurve ),
-			CoolingAndChargeChargingCapFTempObjectNum( CoolingAndChargeChargingCapFTempObjectNum ),
-			CoolingAndChargeChargingCapFEvapPLRCurve( CoolingAndChargeChargingCapFEvapPLRCurve ),
-			CoolingAndChargeChargingCapFEvapPLRObjectNum( CoolingAndChargeChargingCapFEvapPLRObjectNum ),
-			CoolingAndChargeChargingEIRFTempCurve( CoolingAndChargeChargingEIRFTempCurve ),
-			CoolingAndChargeChargingEIRFTempObjectNum( CoolingAndChargeChargingEIRFTempObjectNum ),
-			CoolingAndChargeChargingEIRFFLowCurve( CoolingAndChargeChargingEIRFFLowCurve ),
-			CoolingAndChargeChargingEIRFFLowObjectNum( CoolingAndChargeChargingEIRFFLowObjectNum ),
-			CoolingAndChargeChargingPLFFPLRCurve( CoolingAndChargeChargingPLFFPLRCurve ),
-			CoolingAndChargeChargingPLFFPLRObjectNum( CoolingAndChargeChargingPLFFPLRObjectNum ),
-			CoolingAndChargeSHRFTempCurve( CoolingAndChargeSHRFTempCurve ),
-			CoolingAndChargeSHRFTempObjectNum( CoolingAndChargeSHRFTempObjectNum ),
-			CoolingAndChargeSHRFFlowCurve( CoolingAndChargeSHRFFlowCurve ),
-			CoolingAndChargeSHRFFlowObjectNum( CoolingAndChargeSHRFFlowObjectNum ),
-			CoolingAndDischargeModeAvailable( CoolingAndDischargeModeAvailable ),
-			CoolingAndDischargeRatedTotCap( CoolingAndDischargeRatedTotCap ),
-			CoolingAndDischargeRatedTotCapSizingFactor( CoolingAndDischargeRatedTotCapSizingFactor ),
-			CoolingAndDischargeRatedDischargeCap( CoolingAndDischargeRatedDischargeCap ),
-			CoolingAndDischargeRatedDischargeCapSizingFactor( CoolingAndDischargeRatedDischargeCapSizingFactor ),
-			CoolingAndDischargeRatedSHR( CoolingAndDischargeRatedSHR ),
-			CoolingAndDischargeCoolingRatedCOP( CoolingAndDischargeCoolingRatedCOP ),
-			CoolingAndDischargeDischargingRatedCOP( CoolingAndDischargeDischargingRatedCOP ),
-			CoolingAndDischargeCoolingCapFTempCurve( CoolingAndDischargeCoolingCapFTempCurve ),
-			CoolingAndDischargeCoolingCapFTempObjectNum( CoolingAndDischargeCoolingCapFTempObjectNum ),
-			CoolingAndDischargeCoolingCapFFlowCurve( CoolingAndDischargeCoolingCapFFlowCurve ),
-			CoolingAndDischargeCoolingCapFFlowObjectNum( CoolingAndDischargeCoolingCapFFlowObjectNum ),
-			CoolingAndDischargeCoolingEIRFTempCurve( CoolingAndDischargeCoolingEIRFTempCurve ),
-			CoolingAndDischargeCoolingEIRFTempObjectNum( CoolingAndDischargeCoolingEIRFTempObjectNum ),
-			CoolingAndDischargeCoolingEIRFFlowCurve( CoolingAndDischargeCoolingEIRFFlowCurve ),
-			CoolingAndDischargeCoolingEIRFFlowObjectNum( CoolingAndDischargeCoolingEIRFFlowObjectNum ),
-			CoolingAndDischargeCoolingPLFFPLRCurve( CoolingAndDischargeCoolingPLFFPLRCurve ),
-			CoolingAndDischargeCoolingPLFFPLRObjectNum( CoolingAndDischargeCoolingPLFFPLRObjectNum ),
-			CoolingAndDischargeDischargingCapFTempCurve( CoolingAndDischargeDischargingCapFTempCurve ),
-			CoolingAndDischargeDischargingCapFTempObjectNum( CoolingAndDischargeDischargingCapFTempObjectNum ),
-			CoolingAndDischargeDischargingCapFFlowCurve( CoolingAndDischargeDischargingCapFFlowCurve ),
-			CoolingAndDischargeDischargingCapFFlowObjectNum( CoolingAndDischargeDischargingCapFFlowObjectNum ),
-			CoolingAndDischargeDischargingCapFEvapPLRCurve( CoolingAndDischargeDischargingCapFEvapPLRCurve ),
-			CoolingAndDischargeDischargingCapFEvapPLRObjectNum( CoolingAndDischargeDischargingCapFEvapPLRObjectNum ),
-			CoolingAndDischargeDischargingEIRFTempCurve( CoolingAndDischargeDischargingEIRFTempCurve ),
-			CoolingAndDischargeDischargingEIRFTempObjectNum( CoolingAndDischargeDischargingEIRFTempObjectNum ),
-			CoolingAndDischargeDischargingEIRFFLowCurve( CoolingAndDischargeDischargingEIRFFLowCurve ),
-			CoolingAndDischargeDischargingEIRFFLowObjectNum( CoolingAndDischargeDischargingEIRFFLowObjectNum ),
-			CoolingAndDischargeDischargingPLFFPLRCurve( CoolingAndDischargeDischargingPLFFPLRCurve ),
-			CoolingAndDischargeDischargingPLFFPLRObjectNum( CoolingAndDischargeDischargingPLFFPLRObjectNum ),
-			CoolingAndDischargeSHRFTempCurve( CoolingAndDischargeSHRFTempCurve ),
-			CoolingAndDischargeSHRFTempObjectNum( CoolingAndDischargeSHRFTempObjectNum ),
-			CoolingAndDischargeSHRFFlowCurve( CoolingAndDischargeSHRFFlowCurve ),
-			CoolingAndDischargeSHRFFlowObjectNum( CoolingAndDischargeSHRFFlowObjectNum ),
-			ChargeOnlyModeAvailable( ChargeOnlyModeAvailable ),
-			ChargeOnlyRatedCapacity( ChargeOnlyRatedCapacity ),
-			ChargeOnlyRatedCapacitySizingFactor( ChargeOnlyRatedCapacitySizingFactor ),
-			ChargeOnlyRatedCOP( ChargeOnlyRatedCOP ),
-			ChargeOnlyChargingCapFTempCurve( ChargeOnlyChargingCapFTempCurve ),
-			ChargeOnlyChargingCapFTempObjectNum( ChargeOnlyChargingCapFTempObjectNum ),
-			ChargeOnlyChargingEIRFTempCurve( ChargeOnlyChargingEIRFTempCurve ),
-			ChargeOnlyChargingEIRFTempObjectNum( ChargeOnlyChargingEIRFTempObjectNum ),
-			DischargeOnlyModeAvailable( DischargeOnlyModeAvailable ),
-			DischargeOnlyRatedDischargeCap( DischargeOnlyRatedDischargeCap ),
-			DischargeOnlyRatedDischargeCapSizingFactor( DischargeOnlyRatedDischargeCapSizingFactor ),
-			DischargeOnlyRatedSHR( DischargeOnlyRatedSHR ),
-			DischargeOnlyRatedCOP( DischargeOnlyRatedCOP ),
-			DischargeOnlyCapFTempCurve( DischargeOnlyCapFTempCurve ),
-			DischargeOnlyCapFTempObjectNum( DischargeOnlyCapFTempObjectNum ),
-			DischargeOnlyCapFFlowCurve( DischargeOnlyCapFFlowCurve ),
-			DischargeOnlyCapFFlowObjectNum( DischargeOnlyCapFFlowObjectNum ),
-			DischargeOnlyEIRFTempCurve( DischargeOnlyEIRFTempCurve ),
-			DischargeOnlyEIRFTempObjectNum( DischargeOnlyEIRFTempObjectNum ),
-			DischargeOnlyEIRFFlowCurve( DischargeOnlyEIRFFlowCurve ),
-			DischargeOnlyEIRFFlowObjectNum( DischargeOnlyEIRFFlowObjectNum ),
-			DischargeOnlyPLFFPLRCurve( DischargeOnlyPLFFPLRCurve ),
-			DischargeOnlyPLFFPLRObjectNum( DischargeOnlyPLFFPLRObjectNum ),
-			DischargeOnlySHRFTempCurve( DischargeOnlySHRFTempCurve ),
-			DischargeOnlySHRFTempObjectNum( DischargeOnlySHRFTempObjectNum ),
-			DischargeOnlySHRFFLowCurve( DischargeOnlySHRFFLowCurve ),
-			DischargeOnlySHRFFLowObjectNum( DischargeOnlySHRFFLowObjectNum ),
-			AncillaryControlsPower( AncillaryControlsPower ),
-			ColdWeatherMinimumTempLimit( ColdWeatherMinimumTempLimit ),
-			ColdWeatherAncillaryPower( ColdWeatherAncillaryPower ),
-			CondAirInletNodeNum( CondAirInletNodeNum ),
-			CondAirOutletNodeNum( CondAirOutletNodeNum ),
-			CondenserType( CondenserType ),
-			CondenserAirVolumeFlow( CondenserAirVolumeFlow ),
-			CondenserAirFlowSizingFactor( CondenserAirFlowSizingFactor ),
-			CondenserAirMassFlow( CondenserAirMassFlow ),
-			EvapCondEffect( EvapCondEffect ),
-			CondInletTemp( CondInletTemp ),
-			EvapCondPumpElecNomPower( EvapCondPumpElecNomPower ),
-			EvapCondPumpElecEnergy( EvapCondPumpElecEnergy ),
-			BasinHeaterPowerFTempDiff( BasinHeaterPowerFTempDiff ),
-			BasinHeaterAvailSchedNum( BasinHeaterAvailSchedNum ),
-			BasinHeaterSetpointTemp( BasinHeaterSetpointTemp ),
-			EvapWaterSupplyMode( EvapWaterSupplyMode ),
-			EvapWaterSupplyName( EvapWaterSupplyName ),
-			EvapWaterSupTankID( EvapWaterSupTankID ),
-			EvapWaterTankDemandARRID( EvapWaterTankDemandARRID ),
-			CondensateCollectMode( CondensateCollectMode ),
-			CondensateCollectName( CondensateCollectName ),
-			CondensateTankID( CondensateTankID ),
-			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
-			StorageMedia( StorageMedia ),
-			StorageFluidName( StorageFluidName ),
-			StorageFluidIndex( StorageFluidIndex ),
-			FluidStorageVolume( FluidStorageVolume ),
-			IceStorageCapacity( IceStorageCapacity ),
-			StorageCapacitySizingFactor( StorageCapacitySizingFactor ),
-			MinimumFluidTankTempLimit( MinimumFluidTankTempLimit ),
-			MaximumFluidTankTempLimit( MaximumFluidTankTempLimit ),
-			RatedFluidTankTemp( RatedFluidTankTemp ),
-			StorageAmbientNodeNum( StorageAmbientNodeNum ),
-			StorageUA( StorageUA ),
-			TESPlantConnectionAvailable( TESPlantConnectionAvailable ),
-			TESPlantInletNodeNum( TESPlantInletNodeNum ),
-			TESPlantOutletNodeNum( TESPlantOutletNodeNum ),
-			TESPlantLoopNum( TESPlantLoopNum ),
-			TESPlantLoopSideNum( TESPlantLoopSideNum ),
-			TESPlantBranchNum( TESPlantBranchNum ),
-			TESPlantCompNum( TESPlantCompNum ),
-			TESPlantDesignVolumeFlowRate( TESPlantDesignVolumeFlowRate ),
-			TESPlantDesignMassFlowRate( TESPlantDesignMassFlowRate ),
-			TESPlantEffectiveness( TESPlantEffectiveness ),
-			TimeElapsed( TimeElapsed ),
-			IceFracRemain( IceFracRemain ),
-			IceFracRemainLastTimestep( IceFracRemainLastTimestep ),
-			FluidTankTempFinal( FluidTankTempFinal ),
-			FluidTankTempFinalLastTimestep( FluidTankTempFinalLastTimestep ),
-			QdotPlant( QdotPlant ),
-			Q_Plant( Q_Plant ),
-			QdotAmbient( QdotAmbient ),
-			Q_Ambient( Q_Ambient ),
-			QdotTES( QdotTES ),
-			Q_TES( Q_TES ),
-			ElecCoolingPower( ElecCoolingPower ),
-			ElecCoolingEnergy( ElecCoolingEnergy ),
-			EvapTotCoolingRate( EvapTotCoolingRate ),
-			EvapTotCoolingEnergy( EvapTotCoolingEnergy ),
-			EvapSensCoolingRate( EvapSensCoolingRate ),
-			EvapSensCoolingEnergy( EvapSensCoolingEnergy ),
-			EvapLatCoolingRate( EvapLatCoolingRate ),
-			EvapLatCoolingEnergy( EvapLatCoolingEnergy ),
-			RuntimeFraction( RuntimeFraction ),
-			CondenserRuntimeFraction( CondenserRuntimeFraction ),
-			ElectColdWeatherPower( ElectColdWeatherPower ),
-			ElectColdWeatherEnergy( ElectColdWeatherEnergy ),
-			ElectEvapCondBasinHeaterPower( ElectEvapCondBasinHeaterPower ),
-			ElectEvapCondBasinHeaterEnergy( ElectEvapCondBasinHeaterEnergy ),
-			EvapWaterConsumpRate( EvapWaterConsumpRate ),
-			EvapWaterConsump( EvapWaterConsump ),
-			EvapWaterStarvMakupRate( EvapWaterStarvMakupRate ),
-			EvapWaterStarvMakup( EvapWaterStarvMakup ),
-			EvapCondPumpElecPower( EvapCondPumpElecPower ),
-			EvapCondPumpElecConsumption( EvapCondPumpElecConsumption )
-		{}
-
 	};
 
 	// Object Data
@@ -977,7 +632,7 @@ namespace PackagedThermalStorageCoil {
 
 	void
 	ControlTESIceStorageTankCoil(
-		std::string const CoilName,
+		std::string const & CoilName,
 		int CoilIndex,
 		std::string SystemType,
 		int const FanOpMode,
@@ -1034,7 +689,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		int & CoilAirInletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 	void
@@ -1042,7 +697,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		int & CoilAirOutletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 	void
@@ -1050,7 +705,7 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		Real64 & CoilCoolCapacity,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
 
 	void
@@ -1058,31 +713,8 @@ namespace PackagedThermalStorageCoil {
 		std::string const & CoilName,
 		Real64 & CoilCoolAirFlow,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PackagedThermalStorageCoil
 

@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -159,8 +217,8 @@ namespace VariableSpeedCoils {
 	void
 	clear_state()
 	{
-		NumWatertoAirHPs = 0; 
-		GetCoilsInputFlag = true ; 
+		NumWatertoAirHPs = 0;
+		GetCoilsInputFlag = true ;
 		SourceSideMassFlowRate = 0.0;
 		SourceSideInletTemp = 0.0;
 		SourceSideInletEnth = 0.0;
@@ -174,12 +232,12 @@ namespace VariableSpeedCoils {
 		LoadSideOutletEnth = 0.0;
 		QSensible = 0.0;
 		QLoadTotal = 0.0;
-		QLatRated = 0.0; 
-		QLatActual = 0.0; 
-		QSource = 0.0; 
-		Winput = 0.0; 
+		QLatRated = 0.0;
+		QLatActual = 0.0;
+		QSource = 0.0;
+		Winput = 0.0;
 		PLRCorrLoadSideMdot = 0.0;
-		VSHPWHHeatingCapacity = 0.0; 
+		VSHPWHHeatingCapacity = 0.0;
 		VSHPWHHeatingCOP = 0.0;
 		VarSpeedCoil.deallocate();
 	}
@@ -1964,7 +2022,7 @@ namespace VariableSpeedCoils {
 
 			//Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
 			VarSpeedCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( VarSpeedCoil( DXCoilNum ).AirInletNodeNum );
-			
+
 			//Water nodes
 			VarSpeedCoil(DXCoilNum).WaterInletNodeNum = GetOnlySingleNode(AlphArray(7), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
@@ -2272,7 +2330,7 @@ namespace VariableSpeedCoils {
 			SetupOutputVariable("Cooling Coil Sensible Cooling Energy [J]", VarSpeedCoil(DXCoilNum).EnergySensible, "System", "Summed", VarSpeedCoil(DXCoilNum).Name);
 			SetupOutputVariable("Cooling Coil Latent Cooling Energy [J]", VarSpeedCoil(DXCoilNum).EnergyLatent, "System", "Summed", VarSpeedCoil(DXCoilNum).Name);
 			SetupOutputVariable("Cooling Coil Water Side Heat Transfer Energy [J]", VarSpeedCoil(DXCoilNum).EnergySource, "System", "Summed", VarSpeedCoil(DXCoilNum).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System");
-			
+
 			if( VarSpeedCoil( DXCoilNum ).IsDXCoilInZone ){
 				SetupOutputVariable( "Cooling Coil Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			} else {
@@ -3666,7 +3724,7 @@ namespace VariableSpeedCoils {
 				//ENDIF
 			} else {
 				// sensible capacity does not have an input field
-				if ( RatedCapCoolSensDes > 0.0 && RatedCapCoolSensDes > 0.0 ) {
+				if ( RatedCapCoolSensDes > 0.0 ) {
 					VarSpeedCoil( DXCoilNum ).RatedCapCoolSens = RatedCapCoolSensDes;
 					ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Sensible Cooling Capacity [W]", RatedCapCoolSensDes ); //, &
 					//                            'User-Specified Rated Sensible Cooling Capacity [W]', &
@@ -4691,7 +4749,6 @@ namespace VariableSpeedCoils {
 				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
 
 			Winput = OperatingHeatingCapacity / COP;
-			OperatingHeatingPower = Winput;
 			Winput1 = Winput;
 			WHCAP1 = OperatingHeatingCapacity;
 
@@ -4719,7 +4776,6 @@ namespace VariableSpeedCoils {
 				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
 
 			Winput = OperatingHeatingCapacity / COP;
-			OperatingHeatingPower = Winput;
 
 			Winput2 = Winput;
 			WHCAP2 = OperatingHeatingCapacity;
@@ -6594,36 +6650,26 @@ namespace VariableSpeedCoils {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 InletAirEnthalpy; // Enthalpy of inlet air to evaporator at given conditions [J/kg]
-		Real64 DeltaH; // Enthalpy drop across evaporator at given conditions [J/kg]
-		Real64 DeltaT; // Temperature drop across evaporator at given conditions [C]
-		Real64 DeltaHumRat; // Humidity ratio drop across evaporator at given conditions [kg/kg]
-		Real64 OutletAirTemp; // Outlet dry-bulb temperature from evaporator at given conditions [C]
+		Real64 DeltaH( 0.0 ); // Enthalpy drop across evaporator at given conditions [J/kg]
+		Real64 DeltaT( 0.0 ); // Temperature drop across evaporator at given conditions [C]
+		Real64 DeltaHumRat( 0.0 ); // Humidity ratio drop across evaporator at given conditions [kg/kg]
+		Real64 OutletAirTemp( InletAirTemp ); // Outlet dry-bulb temperature from evaporator at given conditions [C]
 		Real64 OutletAirEnthalpy; // Enthalpy of outlet air at given conditions [J/kg]
-		Real64 OutletAirHumRat; // Outlet humidity ratio from evaporator at given conditions [kg/kg]
+		Real64 OutletAirHumRat( InletAirHumRat ); // Outlet humidity ratio from evaporator at given conditions [kg/kg]
 		Real64 OutletAirRH; // relative humidity of the outlet air
 		Real64 Error; // Error term used in given coil bypass factor (CBF) calculations
 		Real64 ErrorLast; // Error term, from previous iteration
 		int Iter; // Iteration loop counter in CBF calculations
-		int IterMax; // Maximum number of iterations in CBF calculations
+		int IterMax( 50 ); // Maximum number of iterations in CBF calculations
 		Real64 ADPTemp; // Apparatus dewpoint temperature used in CBF calculations [C]
 		Real64 ADPHumRat; // Apparatus dewpoint humidity used in CBF calculations [kg/kg]
 		Real64 ADPEnthalpy; // Air enthalpy at apparatus dew point [J/kg]
 		Real64 DeltaADPTemp; // Change in Apparatus Dew Point used in CBF calculations [C]
-		Real64 SlopeAtConds; // Slope (DeltaHumRat/DeltaT) at given conditions
-		Real64 Slope; // Calculated Slope used while hunting for Tadp
+		Real64 SlopeAtConds( 0.0 ); // Slope (DeltaHumRat/DeltaT) at given conditions
+		Real64 Slope( 0.0 ); // Calculated Slope used while hunting for Tadp
 		Real64 Tolerance; // Convergence tolerance for CBF calculations
 		Real64 HTinHumRatOut; // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
 		static bool CBFErrors( false ); // Set to true if errors in CBF calculation, fatal at end of routine
-
-		DeltaH = 0.0;
-		DeltaT = 0.0;
-		DeltaHumRat = 0.0;
-		OutletAirTemp = InletAirTemp;
-		OutletAirHumRat = InletAirHumRat;
-		SlopeAtConds = 0.0;
-		Slope = 0.0;
-		IterMax = 50;
-		CBFErrors = false;
 
 		DeltaH = TotCap / AirMassFlowRate;
 		InletAirEnthalpy = PsyHFnTdbW( InletAirTemp, InletAirHumRat );
@@ -6775,29 +6821,6 @@ namespace VariableSpeedCoils {
 
 		return CBF;
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // VariableSpeedCoils
 

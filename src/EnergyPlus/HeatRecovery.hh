@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef HeatRecovery_hh_INCLUDED
 #define HeatRecovery_hh_INCLUDED
 
@@ -167,7 +225,7 @@ namespace HeatRecovery {
 		int UnBalancedErrCount; // Counter for recurring warning message
 		int UnBalancedErrIndex; // Index to recurring warning message
 		bool myEnvrnFlag; // one-time-init flag
-		
+
 		// Default Constructor
 		HeatExchCond() :
 			ExchTypeNum( 0 ),
@@ -606,389 +664,6 @@ namespace HeatRecovery {
 			RegenOutHumRatLast( 0.0 )
 		{}
 
-		// Member Constructor
-		BalancedDesDehumPerfData(
-			std::string const & Name, // unique name of balanced desiccant performance data type object
-			std::string const & PerfType, // Type of performance data set
-			Real64 const NomSupAirVolFlow, // nominal supply air volumetric flow rate m^3/s
-			Real64 const NomProcAirFaceVel, // nominal process air face velocity m/s
-			Real64 const NomElecPower, // nominal electric power consumption [W]
-			Real64 const B1, // constant coefficient for outlet regeneration temprature equation
-			Real64 const B2, // regen inlet humrat coeff for outlet regen temperature equation
-			Real64 const B3, // regen inlet temp coeff for outlet regen temprature equation
-			Real64 const B4, // (regen in humrat/regen in temp) coeff for outlet regen temp eq
-			Real64 const B5, // process inlet humrat coeff for outlet regen temp equation
-			Real64 const B6, // process inlet temp coeff for outlet regen temp equation
-			Real64 const B7, // (process in humrat/proc in temp) coeff for outlet regen temp eq
-			Real64 const B8, // process, regen face velocity coeff for outlet regen temp eq
-			Real64 const T_MinRegenAirInTemp, // min allowable regen inlet air temperature [C]
-			Real64 const T_MaxRegenAirInTemp, // max allowable regen inlet air temperature [C]
-			Real64 const T_MinRegenAirInHumRat, // min allowable regen inlet air humidity ratio [kg water / kg air]
-			Real64 const T_MaxRegenAirInHumRat, // max allowable regen inlet air humidity ratio [kg water / kg air]
-			Real64 const T_MinProcAirInTemp, // min allowable process inlet air temperature [C]
-			Real64 const T_MaxProcAirInTemp, // max allowable process inlet air temperature [C]
-			Real64 const T_MinProcAirInHumRat, // min allowable process inlet air humidity ratio [kg water/kg air]
-			Real64 const T_MaxProcAirInHumRat, // max allowable process inlet air humidity ratio [kg water/kg air]
-			Real64 const T_MinFaceVel, // min allowable process, regen face velocity [m/s]
-			Real64 const T_MaxFaceVel, // max allowable process, regen face velocity [m/s]
-			Real64 const MinRegenAirOutTemp, // min allowable regen outlet air temperature [C]
-			Real64 const MaxRegenAirOutTemp, // max allowable regen outlet air temperature [C]
-			Real64 const T_MinRegenAirInRelHum, // min allowable regen inlet air relative humidity [%]
-			Real64 const T_MaxRegenAirInRelHum, // max allowable regen inlet air relative humidity [%]
-			Real64 const T_MinProcAirInRelHum, // min allowable process inlet air relative humidity [%]
-			Real64 const T_MaxProcAirInRelHum, // max allowable process inlet air relative humidity [%]
-			Real64 const C1, // constant coeff for outlet regen humidity ratio equation
-			Real64 const C2, // regen inlet humrat coeff for outlet regen humidity ratio eq
-			Real64 const C3, // regen inlet temp coeff for outlet regen humidity ratio equation
-			Real64 const C4, // (regen in humrat/regen in temp) coeff for outlet regen humrat eq
-			Real64 const C5, // process inlet humrat coeff for outlet regen humidity ratio eq
-			Real64 const C6, // process inlet temp coeff for outlet regen humidity ratio eq
-			Real64 const C7, // (proc in humrat/proc in temp) coeff for outlet regen humrat eq
-			Real64 const C8, // process, regen face velocity coeff for outlet regen humrat eq
-			Real64 const H_MinRegenAirInTemp, // min allowable regen inlet air temperature [C]
-			Real64 const H_MaxRegenAirInTemp, // max allowable regen inlet air temperature [C]
-			Real64 const H_MinRegenAirInHumRat, // min allowable regen inlet air humidity ratio [kg water / kg air]
-			Real64 const H_MaxRegenAirInHumRat, // max allowable regen inlet air humidity ratio [kg water / kg air]
-			Real64 const H_MinProcAirInTemp, // min allowable process inlet air temperature [C]
-			Real64 const H_MaxProcAirInTemp, // max allowable process inlet air temperature [C]
-			Real64 const H_MinProcAirInHumRat, // min allowable process inlet air humidity ratio [kg water/kg air]
-			Real64 const H_MaxProcAirInHumRat, // max allowable process inlet air humidity ratio [kg water/kg air]
-			Real64 const H_MinFaceVel, // min allowable process, regen face velocity [m/s]
-			Real64 const H_MaxFaceVel, // max allowable process, regen face velocity [m/s]
-			Real64 const MinRegenAirOutHumRat, // min allowable regen outlet air temperature [C]
-			Real64 const MaxRegenAirOutHumRat, // max allowable regen outlet air temperature [C]
-			Real64 const H_MinRegenAirInRelHum, // min allowable regen inlet air relative humidity [%]
-			Real64 const H_MaxRegenAirInRelHum, // max allowable regen inlet air relative humidity [%]
-			Real64 const H_MinProcAirInRelHum, // min allowable process inlet air relative humidity [%]
-			Real64 const H_MaxProcAirInRelHum, // max allowable process inlet air relative humidity [%]
-			bool const PrintRegenInRelHumTempMess, // - flag to print regen in RH error message for temp eq
-			int const RegenInRelHumTempErrIndex, // - index to recurring error struc for regen outlet hum rat
-			int const RegenInRelHumTempErrorCount, // - counter if regen outlet temp limits are exceeded
-			std::string const & RegenInRelHumTempBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & RegenInRelHumTempBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & RegenInRelHumTempBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
-			Real64 const RegenInRelHumTempLast, // - last value of regen outlet humidity ratio
-			bool const PrintProcInRelHumTempMess, // - flag to print regen in RH error message for temp eq
-			int const ProcInRelHumTempErrIndex, // - index to recurring error struc for regen outlet hum rat
-			int const ProcInRelHumTempErrorCount, // - counter if regen outlet temp limits are exceeded
-			std::string const & ProcInRelHumTempBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & ProcInRelHumTempBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & ProcInRelHumTempBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
-			Real64 const ProcInRelHumTempLast, // - last value of regen outlet humidity ratio
-			bool const PrintRegenInRelHumHumRatMess, // - flag to print regen in RH error message for temp eq
-			int const RegenInRelHumHumRatErrIndex, // - index to recurring error struc for regen outlet hum rat
-			int const RegenInRelHumHumRatErrorCount, // - counter if regen outlet temp limits are exceeded
-			std::string const & RegenInRelHumHumRatBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & RegenInRelHumHumRatBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & RegenInRelHumHumRatBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
-			Real64 const RegenInRelHumHumRatLast, // - last value of regen outlet humidity ratio
-			bool const PrintProcInRelHumHumRatMess, // - flag to print regen in RH error message for temp eq
-			int const ProcInRelHumHumRatErrIndex, // - index to recurring error struc for regen outlet hum rat
-			int const ProcInRelHumHumRatErrorCount, // - counter if regen outlet temp limits are exceeded
-			std::string const & ProcInRelHumHumRatBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & ProcInRelHumHumRatBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & ProcInRelHumHumRatBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
-			Real64 const ProcInRelHumHumRatLast, // - last value of regen outlet humidity ratio
-			bool const PrintT_RegenInTempMessage, // - flag to print regen in temp error message for temp eq
-			bool const PrintT_RegenInHumRatMessage, // - flag to print regen in humrat err message for temp eq
-			bool const PrintT_ProcInTempMessage, // - flag to print proc inlet temp err message for temp eq
-			bool const PrintT_ProcInHumRatMessage, // - flag to print process hum rat err message for temp eq
-			bool const PrintT_FaceVelMessage, // - flag to print face velocity error message
-			bool const PrintRegenOutTempMessage, // - flag to print regen outlet temp error message
-			bool const PrintRegenOutTempFailedMessage, // - flag to print regen outlet temp error message
-			bool const PrintH_RegenInTempMessage, // - flag to print regen in temp err message for humrat eq
-			bool const PrintH_RegenInHumRatMessage, // - flag for regen in humrat err message for humrat eq
-			bool const PrintH_ProcInTempMessage, // - flag for process inlet temp err message for humrat eq
-			bool const PrintH_ProcInHumRatMessage, // - flag for process hum rat error message for hum rat eq
-			bool const PrintH_FaceVelMessage, // - flag for face velocity error message
-			bool const PrintRegenOutHumRatMessage, // - flag for regen outlet hum rat error message
-			bool const PrintRegenInHumRatMessage, // - flag for regen outlet hum rat error message
-			bool const PrintRegenOutHumRatFailedMess, // - flag for regen outlet hum rat error message
-			int const RegenOutHumRatFailedErrIndex, // - index to recurring error struc for regen outlet hum rat
-			int const RegenOutHumRatFailedErrorCount, // - counter if regen outlet temp limits are exceeded
-			std::string const & RegenOutHumRatFailedBuffer1, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & RegenOutHumRatFailedBuffer2, // - buffer for RegenOutHumRat warn mess on following timstep
-			std::string const & RegenOutHumRatFailedBuffer3, // - buffer for RegenOutHumRat warn mess on following timstep
-			Real64 const RegenOutHumRatFailedLast, // - last value of regen outlet humidity ratio
-			bool const PrintImbalancedMassFlowMess, // - flag for imbalanced regen and process mass flow rate
-			int const ImbalancedFlowErrIndex, // - index to recurring error struc for imbalanced flow
-			int const ImbalancedMassFlowErrorCount, // - counter for imbalanced regen and process mass flow rate
-			std::string const & ImbalancedMassFlowBuffer1, // - buffer for imbalanced regen and process mass flow rate
-			std::string const & ImbalancedMassFlowBuffer2, // - buffer for imbalanced regen and process mass flow rate
-			std::string const & ImbalancedMassFlowBuffer3, // - buffer for imbalanced regen and process mass flow rate
-			Real64 const ABSImbalancedFlow, // - last value of heat exchanger mass flow rate imbalance
-			int const T_RegenInTempErrorCount, // - counter if regen inlet temp limits are exceeded
-			int const T_RegenInHumRatErrorCount, // - counter if regen inlet hum rat limits are exceeded
-			int const T_ProcInTempErrorCount, // - counter if process inlet temperature limits are exceeded
-			int const T_ProcInHumRatErrorCount, // - counter if process inlet hum rat limits are exceeded
-			int const T_FaceVelErrorCount, // - counter if regen and proc face vel limits are exceeded
-			int const T_RegenInTempErrIndex, // - index to recurring error structure for regen inlet temp
-			int const T_RegenInHumRatErrIndex, // - index to recurring error structure for regen in humrat
-			int const T_ProcInTempErrIndex, // - index to recurring error structure for process in temp
-			int const T_ProcInHumRatErrIndex, // - index to recurring error structure for process in humrat
-			int const T_FaceVelocityErrIndex, // - index to recurring err struc for proc and regen face vel
-			int const RegenOutTempErrorCount, // - counter if regen outlet temp limits are exceeded
-			int const RegenOutTempErrIndex, // - index to recurring error structure for regen outlet temp
-			int const RegenOutTempFailedErrorCount, // - counter if regen outlet temp limits are exceeded
-			int const RegenOutTempFailedErrIndex, // - index to recurring error structure for regen outlet temp
-			std::string const & RegenOutTempFailedBuffer1, // - buffer for RegenOutTemp warn messages on following timestep
-			std::string const & RegenOutTempFailedBuffer2, // - buffer for RegenOutTemp warn messages on following timestep
-			std::string const & RegenOutTempFailedBuffer3, // - buffer for RegenOutTemp warn messages on following timestep
-			Real64 const RegenOutTempFailedLast, // - last value of regen outlet temp
-			int const H_RegenInTempErrorCount, // - counter if regen inlet temp limits are exceeded
-			int const H_RegenInHumRatErrorCount, // - counter if regen inlet hum rat limits are exceeded
-			int const H_ProcInTempErrorCount, // - counter if process inlet temperature limits are exceeded
-			int const H_ProcInHumRatErrorCount, // - counter if process inlet hum rat limits are exceeded
-			int const H_FaceVelErrorCount, // - counter if regen and proc face vel limits are exceeded
-			int const H_RegenInTempErrIndex, // - index to recurring error structure for regen inlet temp
-			int const H_RegenInHumRatErrIndex, // - index to recurring error struc for regen inlet humrat
-			int const H_ProcInTempErrIndex, // - index to recurring error struc for process inlet temp
-			int const H_ProcInHumRatErrIndex, // - index to recurring error struc for process inlet hum rat
-			int const H_FaceVelocityErrIndex, // - index to recurring err struc for proc and regen face vel
-			int const RegenOutHumRatErrorCount, // - counter if regen outlet temp limits are exceeded
-			int const RegenOutHumRatErrIndex, // - index to recurring error struc for regen outlet hum rat
-			int const RegenInHumRatErrorCount, // - counter if regen outlet temp limits are exceeded
-			int const RegenInHumRatErrIndex, // - index to recurring error struc for regen outlet hum rat
-			std::string const & T_RegenInTempBuffer1, // - buffer for T_RegenInTemp warn message on following timestep
-			std::string const & T_RegenInTempBuffer2, // - buffer for T_RegenInTemp warn message on following timestep
-			std::string const & T_RegenInTempBuffer3, // - buffer for T_RegenInTemp warn message on following timestep
-			Real64 const T_RegenInTempLast, // - last value of regen inlet temp
-			std::string const & T_RegenInHumRatBuffer1, // - buffer for T_RegenInHumRat warn messag on following timestep
-			std::string const & T_RegenInHumRatBuffer2, // - buffer for T_RegenInHumRat warn messag on following timestep
-			std::string const & T_RegenInHumRatBuffer3, // - buffer for T_RegenInHumRat warn messag on following timestep
-			Real64 const T_RegenInHumRatLast, // - last value of regen inlet humidity ratio
-			std::string const & T_ProcInTempBuffer1, // - buffer for T_ProcInTemp warning messag on following timestep
-			std::string const & T_ProcInTempBuffer2, // - buffer for T_ProcInTemp warning messag on following timestep
-			std::string const & T_ProcInTempBuffer3, // - buffer for T_ProcInTemp warning messag on following timestep
-			Real64 const T_ProcInTempLast, // - last value of process inlet temp
-			std::string const & T_ProcInHumRatBuffer1, // - buffer for T_ProcInHumRat warn message on following timestep
-			std::string const & T_ProcInHumRatBuffer2, // - buffer for T_ProcInHumRat warn message on following timestep
-			std::string const & T_ProcInHumRatBuffer3, // - buffer for T_ProcInHumRat warn message on following timestep
-			Real64 const T_ProcInHumRatLast, // - last value of process inlet humidity ratio
-			std::string const & T_FaceVelBuffer1, // - buffer for T_FaceVel warning messages on following time step
-			std::string const & T_FaceVelBuffer2, // - buffer for T_FaceVel warning messages on following time step
-			std::string const & T_FaceVelBuffer3, // - buffer for T_FaceVel warning messages on following time step
-			Real64 const T_FaceVelLast, // - last value of process and regen face velocity
-			std::string const & RegenOutTempBuffer1, // - buffer for RegenOutTemp warn messages on following timestep
-			std::string const & RegenOutTempBuffer2, // - buffer for RegenOutTemp warn messages on following timestep
-			std::string const & RegenOutTempBuffer3, // - buffer for RegenOutTemp warn messages on following timestep
-			Real64 const RegenOutTempLast, // - last value of regen outlet temp
-			std::string const & H_RegenInTempBuffer1, // - buffer for H_RegenInTemp warn message on following time step
-			std::string const & H_RegenInTempBuffer2, // - buffer for H_RegenInTemp warn message on following time step
-			std::string const & H_RegenInTempBuffer3, // - buffer for H_RegenInTemp warn message on following time step
-			Real64 const H_RegenInTempLast, // - last value of regen inlet temp
-			std::string const & H_RegenInHumRatBuffer1, // - buffer for H_RegenInHumRat warn messag on following timestep
-			std::string const & H_RegenInHumRatBuffer2, // - buffer for H_RegenInHumRat warn messag on following timestep
-			std::string const & H_RegenInHumRatBuffer3, // - buffer for H_RegenInHumRat warn messag on following timestep
-			Real64 const H_RegenInHumRatLast, // - last value of regen inlet humidity ratio
-			std::string const & H_ProcInTempBuffer1, // - buffer for H_ProcInTemp warn messages on following time step
-			std::string const & H_ProcInTempBuffer2, // - buffer for H_ProcInTemp warn messages on following time step
-			std::string const & H_ProcInTempBuffer3, // - buffer for H_ProcInTemp warn messages on following time step
-			Real64 const H_ProcInTempLast, // - last value of process inlet temp
-			std::string const & H_ProcInHumRatBuffer1, // - buffer for H_ProcInHumRat warn message on following timestep
-			std::string const & H_ProcInHumRatBuffer2, // - buffer for H_ProcInHumRat warn message on following timestep
-			std::string const & H_ProcInHumRatBuffer3, // - buffer for H_ProcInHumRat warn message on following timestep
-			Real64 const H_ProcInHumRatLast, // - last value of process inlet humidity ratio
-			std::string const & H_FaceVelBuffer1, // - buffer for H_FaceVel warning messages on following time step
-			std::string const & H_FaceVelBuffer2, // - buffer for H_FaceVel warning messages on following time step
-			std::string const & H_FaceVelBuffer3, // - buffer for H_FaceVel warning messages on following time step
-			Real64 const H_FaceVelLast, // - last value of process and regen face velocity
-			std::string const & RegenOutHumRatBuffer1, // - buffer for RegenOutHumRat warn message on following timestep
-			std::string const & RegenOutHumRatBuffer2, // - buffer for RegenOutHumRat warn message on following timestep
-			std::string const & RegenOutHumRatBuffer3, // - buffer for RegenOutHumRat warn message on following timestep
-			Real64 const RegenOutHumRatLast // - last value of regen outlet humidity ratio
-		) :
-			Name( Name ),
-			PerfType( PerfType ),
-			NomSupAirVolFlow( NomSupAirVolFlow ),
-			NomProcAirFaceVel( NomProcAirFaceVel ),
-			NomElecPower( NomElecPower ),
-			B1( B1 ),
-			B2( B2 ),
-			B3( B3 ),
-			B4( B4 ),
-			B5( B5 ),
-			B6( B6 ),
-			B7( B7 ),
-			B8( B8 ),
-			T_MinRegenAirInTemp( T_MinRegenAirInTemp ),
-			T_MaxRegenAirInTemp( T_MaxRegenAirInTemp ),
-			T_MinRegenAirInHumRat( T_MinRegenAirInHumRat ),
-			T_MaxRegenAirInHumRat( T_MaxRegenAirInHumRat ),
-			T_MinProcAirInTemp( T_MinProcAirInTemp ),
-			T_MaxProcAirInTemp( T_MaxProcAirInTemp ),
-			T_MinProcAirInHumRat( T_MinProcAirInHumRat ),
-			T_MaxProcAirInHumRat( T_MaxProcAirInHumRat ),
-			T_MinFaceVel( T_MinFaceVel ),
-			T_MaxFaceVel( T_MaxFaceVel ),
-			MinRegenAirOutTemp( MinRegenAirOutTemp ),
-			MaxRegenAirOutTemp( MaxRegenAirOutTemp ),
-			T_MinRegenAirInRelHum( T_MinRegenAirInRelHum ),
-			T_MaxRegenAirInRelHum( T_MaxRegenAirInRelHum ),
-			T_MinProcAirInRelHum( T_MinProcAirInRelHum ),
-			T_MaxProcAirInRelHum( T_MaxProcAirInRelHum ),
-			C1( C1 ),
-			C2( C2 ),
-			C3( C3 ),
-			C4( C4 ),
-			C5( C5 ),
-			C6( C6 ),
-			C7( C7 ),
-			C8( C8 ),
-			H_MinRegenAirInTemp( H_MinRegenAirInTemp ),
-			H_MaxRegenAirInTemp( H_MaxRegenAirInTemp ),
-			H_MinRegenAirInHumRat( H_MinRegenAirInHumRat ),
-			H_MaxRegenAirInHumRat( H_MaxRegenAirInHumRat ),
-			H_MinProcAirInTemp( H_MinProcAirInTemp ),
-			H_MaxProcAirInTemp( H_MaxProcAirInTemp ),
-			H_MinProcAirInHumRat( H_MinProcAirInHumRat ),
-			H_MaxProcAirInHumRat( H_MaxProcAirInHumRat ),
-			H_MinFaceVel( H_MinFaceVel ),
-			H_MaxFaceVel( H_MaxFaceVel ),
-			MinRegenAirOutHumRat( MinRegenAirOutHumRat ),
-			MaxRegenAirOutHumRat( MaxRegenAirOutHumRat ),
-			H_MinRegenAirInRelHum( H_MinRegenAirInRelHum ),
-			H_MaxRegenAirInRelHum( H_MaxRegenAirInRelHum ),
-			H_MinProcAirInRelHum( H_MinProcAirInRelHum ),
-			H_MaxProcAirInRelHum( H_MaxProcAirInRelHum ),
-			PrintRegenInRelHumTempMess( PrintRegenInRelHumTempMess ),
-			RegenInRelHumTempErrIndex( RegenInRelHumTempErrIndex ),
-			RegenInRelHumTempErrorCount( RegenInRelHumTempErrorCount ),
-			RegenInRelHumTempBuffer1( RegenInRelHumTempBuffer1 ),
-			RegenInRelHumTempBuffer2( RegenInRelHumTempBuffer2 ),
-			RegenInRelHumTempBuffer3( RegenInRelHumTempBuffer3 ),
-			RegenInRelHumTempLast( RegenInRelHumTempLast ),
-			PrintProcInRelHumTempMess( PrintProcInRelHumTempMess ),
-			ProcInRelHumTempErrIndex( ProcInRelHumTempErrIndex ),
-			ProcInRelHumTempErrorCount( ProcInRelHumTempErrorCount ),
-			ProcInRelHumTempBuffer1( ProcInRelHumTempBuffer1 ),
-			ProcInRelHumTempBuffer2( ProcInRelHumTempBuffer2 ),
-			ProcInRelHumTempBuffer3( ProcInRelHumTempBuffer3 ),
-			ProcInRelHumTempLast( ProcInRelHumTempLast ),
-			PrintRegenInRelHumHumRatMess( PrintRegenInRelHumHumRatMess ),
-			RegenInRelHumHumRatErrIndex( RegenInRelHumHumRatErrIndex ),
-			RegenInRelHumHumRatErrorCount( RegenInRelHumHumRatErrorCount ),
-			RegenInRelHumHumRatBuffer1( RegenInRelHumHumRatBuffer1 ),
-			RegenInRelHumHumRatBuffer2( RegenInRelHumHumRatBuffer2 ),
-			RegenInRelHumHumRatBuffer3( RegenInRelHumHumRatBuffer3 ),
-			RegenInRelHumHumRatLast( RegenInRelHumHumRatLast ),
-			PrintProcInRelHumHumRatMess( PrintProcInRelHumHumRatMess ),
-			ProcInRelHumHumRatErrIndex( ProcInRelHumHumRatErrIndex ),
-			ProcInRelHumHumRatErrorCount( ProcInRelHumHumRatErrorCount ),
-			ProcInRelHumHumRatBuffer1( ProcInRelHumHumRatBuffer1 ),
-			ProcInRelHumHumRatBuffer2( ProcInRelHumHumRatBuffer2 ),
-			ProcInRelHumHumRatBuffer3( ProcInRelHumHumRatBuffer3 ),
-			ProcInRelHumHumRatLast( ProcInRelHumHumRatLast ),
-			PrintT_RegenInTempMessage( PrintT_RegenInTempMessage ),
-			PrintT_RegenInHumRatMessage( PrintT_RegenInHumRatMessage ),
-			PrintT_ProcInTempMessage( PrintT_ProcInTempMessage ),
-			PrintT_ProcInHumRatMessage( PrintT_ProcInHumRatMessage ),
-			PrintT_FaceVelMessage( PrintT_FaceVelMessage ),
-			PrintRegenOutTempMessage( PrintRegenOutTempMessage ),
-			PrintRegenOutTempFailedMessage( PrintRegenOutTempFailedMessage ),
-			PrintH_RegenInTempMessage( PrintH_RegenInTempMessage ),
-			PrintH_RegenInHumRatMessage( PrintH_RegenInHumRatMessage ),
-			PrintH_ProcInTempMessage( PrintH_ProcInTempMessage ),
-			PrintH_ProcInHumRatMessage( PrintH_ProcInHumRatMessage ),
-			PrintH_FaceVelMessage( PrintH_FaceVelMessage ),
-			PrintRegenOutHumRatMessage( PrintRegenOutHumRatMessage ),
-			PrintRegenInHumRatMessage( PrintRegenInHumRatMessage ),
-			PrintRegenOutHumRatFailedMess( PrintRegenOutHumRatFailedMess ),
-			RegenOutHumRatFailedErrIndex( RegenOutHumRatFailedErrIndex ),
-			RegenOutHumRatFailedErrorCount( RegenOutHumRatFailedErrorCount ),
-			RegenOutHumRatFailedBuffer1( RegenOutHumRatFailedBuffer1 ),
-			RegenOutHumRatFailedBuffer2( RegenOutHumRatFailedBuffer2 ),
-			RegenOutHumRatFailedBuffer3( RegenOutHumRatFailedBuffer3 ),
-			RegenOutHumRatFailedLast( RegenOutHumRatFailedLast ),
-			PrintImbalancedMassFlowMess( PrintImbalancedMassFlowMess ),
-			ImbalancedFlowErrIndex( ImbalancedFlowErrIndex ),
-			ImbalancedMassFlowErrorCount( ImbalancedMassFlowErrorCount ),
-			ImbalancedMassFlowBuffer1( ImbalancedMassFlowBuffer1 ),
-			ImbalancedMassFlowBuffer2( ImbalancedMassFlowBuffer2 ),
-			ImbalancedMassFlowBuffer3( ImbalancedMassFlowBuffer3 ),
-			ABSImbalancedFlow( ABSImbalancedFlow ),
-			T_RegenInTempErrorCount( T_RegenInTempErrorCount ),
-			T_RegenInHumRatErrorCount( T_RegenInHumRatErrorCount ),
-			T_ProcInTempErrorCount( T_ProcInTempErrorCount ),
-			T_ProcInHumRatErrorCount( T_ProcInHumRatErrorCount ),
-			T_FaceVelErrorCount( T_FaceVelErrorCount ),
-			T_RegenInTempErrIndex( T_RegenInTempErrIndex ),
-			T_RegenInHumRatErrIndex( T_RegenInHumRatErrIndex ),
-			T_ProcInTempErrIndex( T_ProcInTempErrIndex ),
-			T_ProcInHumRatErrIndex( T_ProcInHumRatErrIndex ),
-			T_FaceVelocityErrIndex( T_FaceVelocityErrIndex ),
-			RegenOutTempErrorCount( RegenOutTempErrorCount ),
-			RegenOutTempErrIndex( RegenOutTempErrIndex ),
-			RegenOutTempFailedErrorCount( RegenOutTempFailedErrorCount ),
-			RegenOutTempFailedErrIndex( RegenOutTempFailedErrIndex ),
-			RegenOutTempFailedBuffer1( RegenOutTempFailedBuffer1 ),
-			RegenOutTempFailedBuffer2( RegenOutTempFailedBuffer2 ),
-			RegenOutTempFailedBuffer3( RegenOutTempFailedBuffer3 ),
-			RegenOutTempFailedLast( RegenOutTempFailedLast ),
-			H_RegenInTempErrorCount( H_RegenInTempErrorCount ),
-			H_RegenInHumRatErrorCount( H_RegenInHumRatErrorCount ),
-			H_ProcInTempErrorCount( H_ProcInTempErrorCount ),
-			H_ProcInHumRatErrorCount( H_ProcInHumRatErrorCount ),
-			H_FaceVelErrorCount( H_FaceVelErrorCount ),
-			H_RegenInTempErrIndex( H_RegenInTempErrIndex ),
-			H_RegenInHumRatErrIndex( H_RegenInHumRatErrIndex ),
-			H_ProcInTempErrIndex( H_ProcInTempErrIndex ),
-			H_ProcInHumRatErrIndex( H_ProcInHumRatErrIndex ),
-			H_FaceVelocityErrIndex( H_FaceVelocityErrIndex ),
-			RegenOutHumRatErrorCount( RegenOutHumRatErrorCount ),
-			RegenOutHumRatErrIndex( RegenOutHumRatErrIndex ),
-			RegenInHumRatErrorCount( RegenInHumRatErrorCount ),
-			RegenInHumRatErrIndex( RegenInHumRatErrIndex ),
-			T_RegenInTempBuffer1( T_RegenInTempBuffer1 ),
-			T_RegenInTempBuffer2( T_RegenInTempBuffer2 ),
-			T_RegenInTempBuffer3( T_RegenInTempBuffer3 ),
-			T_RegenInTempLast( T_RegenInTempLast ),
-			T_RegenInHumRatBuffer1( T_RegenInHumRatBuffer1 ),
-			T_RegenInHumRatBuffer2( T_RegenInHumRatBuffer2 ),
-			T_RegenInHumRatBuffer3( T_RegenInHumRatBuffer3 ),
-			T_RegenInHumRatLast( T_RegenInHumRatLast ),
-			T_ProcInTempBuffer1( T_ProcInTempBuffer1 ),
-			T_ProcInTempBuffer2( T_ProcInTempBuffer2 ),
-			T_ProcInTempBuffer3( T_ProcInTempBuffer3 ),
-			T_ProcInTempLast( T_ProcInTempLast ),
-			T_ProcInHumRatBuffer1( T_ProcInHumRatBuffer1 ),
-			T_ProcInHumRatBuffer2( T_ProcInHumRatBuffer2 ),
-			T_ProcInHumRatBuffer3( T_ProcInHumRatBuffer3 ),
-			T_ProcInHumRatLast( T_ProcInHumRatLast ),
-			T_FaceVelBuffer1( T_FaceVelBuffer1 ),
-			T_FaceVelBuffer2( T_FaceVelBuffer2 ),
-			T_FaceVelBuffer3( T_FaceVelBuffer3 ),
-			T_FaceVelLast( T_FaceVelLast ),
-			RegenOutTempBuffer1( RegenOutTempBuffer1 ),
-			RegenOutTempBuffer2( RegenOutTempBuffer2 ),
-			RegenOutTempBuffer3( RegenOutTempBuffer3 ),
-			RegenOutTempLast( RegenOutTempLast ),
-			H_RegenInTempBuffer1( H_RegenInTempBuffer1 ),
-			H_RegenInTempBuffer2( H_RegenInTempBuffer2 ),
-			H_RegenInTempBuffer3( H_RegenInTempBuffer3 ),
-			H_RegenInTempLast( H_RegenInTempLast ),
-			H_RegenInHumRatBuffer1( H_RegenInHumRatBuffer1 ),
-			H_RegenInHumRatBuffer2( H_RegenInHumRatBuffer2 ),
-			H_RegenInHumRatBuffer3( H_RegenInHumRatBuffer3 ),
-			H_RegenInHumRatLast( H_RegenInHumRatLast ),
-			H_ProcInTempBuffer1( H_ProcInTempBuffer1 ),
-			H_ProcInTempBuffer2( H_ProcInTempBuffer2 ),
-			H_ProcInTempBuffer3( H_ProcInTempBuffer3 ),
-			H_ProcInTempLast( H_ProcInTempLast ),
-			H_ProcInHumRatBuffer1( H_ProcInHumRatBuffer1 ),
-			H_ProcInHumRatBuffer2( H_ProcInHumRatBuffer2 ),
-			H_ProcInHumRatBuffer3( H_ProcInHumRatBuffer3 ),
-			H_ProcInHumRatLast( H_ProcInHumRatLast ),
-			H_FaceVelBuffer1( H_FaceVelBuffer1 ),
-			H_FaceVelBuffer2( H_FaceVelBuffer2 ),
-			H_FaceVelBuffer3( H_FaceVelBuffer3 ),
-			H_FaceVelLast( H_FaceVelLast ),
-			RegenOutHumRatBuffer1( RegenOutHumRatBuffer1 ),
-			RegenOutHumRatBuffer2( RegenOutHumRatBuffer2 ),
-			RegenOutHumRatBuffer3( RegenOutHumRatBuffer3 ),
-			RegenOutHumRatLast( RegenOutHumRatLast )
-		{}
-
 	};
 
 	// Object Data
@@ -996,6 +671,9 @@ namespace HeatRecovery {
 	extern Array1D< BalancedDesDehumPerfData > BalDesDehumPerfData;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimHeatRecovery(
@@ -1039,7 +717,7 @@ namespace HeatRecovery {
 		int const FanOpMode, // Supply air fan operating mode (1=cycling, 2=constant)
 		Optional_bool_const EconomizerFlag = _, // economizer flag pass by air loop or OA sys
 		Optional_bool_const HighHumCtrlFlag = _, // high humidity control flag passed by airloop or OA sys
-		Optional< Real64 const > HXPartLoadRatio = _ // 
+		Optional< Real64 const > HXPartLoadRatio = _ //
 		);
 
 	void
@@ -1209,29 +887,6 @@ namespace HeatRecovery {
 		Optional< Real64 > SupplyAirVolFlow = _, // HX supply air flow rate    [m3/s]
 		Optional< Real64 > SecondaryAirVolFlow = _ // HX secondary air flow rate [m3/s]
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HeatRecovery
 

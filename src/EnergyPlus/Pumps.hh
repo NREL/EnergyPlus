@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef Pumps_hh_INCLUDED
 #define Pumps_hh_INCLUDED
 
@@ -37,6 +95,12 @@ namespace Pumps {
 	extern std::string const cPumpBank_ConSpeed;
 	extern int const PumpBank_ConSpeed;
 	extern Array1D_string const cPumpTypes;
+
+	enum powerSizingMethodEnum {
+		sizePowerPerFlow,
+		sizePowerPerFlowPerPressure
+	};
+
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -91,41 +155,6 @@ namespace Pumps {
 			PumpActualRPM( 0.0 )
 		{}
 
-		// Member Constructor
-		PumpVFDControlData(
-			std::string const & Name,
-			std::string const & ManualRPMSchedName,
-			int const ManualRPMSchedIndex,
-			std::string const & LowerPsetSchedName,
-			int const LowerPsetSchedIndex,
-			std::string const & UpperPsetSchedName,
-			int const UpperPsetSchedIndex,
-			std::string const & MinRPMSchedName,
-			int const MinRPMSchedIndex,
-			std::string const & MaxRPMSchedName,
-			int const MaxRPMSchedIndex,
-			int const VFDControlType, // Integer equivalent of VFDControlType
-			Real64 const MaxRPM, // Maximum RPM range value - schedule limit
-			Real64 const MinRPM, // Minimum RPM range value - schedule limit
-			Real64 const PumpActualRPM // RPM recalculated from final flow through the loop
-		) :
-			Name( Name ),
-			ManualRPMSchedName( ManualRPMSchedName ),
-			ManualRPMSchedIndex( ManualRPMSchedIndex ),
-			LowerPsetSchedName( LowerPsetSchedName ),
-			LowerPsetSchedIndex( LowerPsetSchedIndex ),
-			UpperPsetSchedName( UpperPsetSchedName ),
-			UpperPsetSchedIndex( UpperPsetSchedIndex ),
-			MinRPMSchedName( MinRPMSchedName ),
-			MinRPMSchedIndex( MinRPMSchedIndex ),
-			MaxRPMSchedName( MaxRPMSchedName ),
-			MaxRPMSchedIndex( MaxRPMSchedIndex ),
-			VFDControlType( VFDControlType ),
-			MaxRPM( MaxRPM ),
-			MinRPM( MinRPM ),
-			PumpActualRPM( PumpActualRPM )
-		{}
-
 	};
 
 	struct PumpSpecs
@@ -159,12 +188,16 @@ namespace Pumps {
 		Real64 NomSteamVolFlowRate; // For Steam Pump
 		bool NomSteamVolFlowRateWasAutoSized; // true if steam volume flow rate was autosize on input
 		Real64 MinVolFlowRate; // For a Variable Flow Pump this is the minimum capacity during operation.
+		bool minVolFlowRateWasAutosized; // true if minimum flow rate was autosize on input
 		Real64 MassFlowRateMin; // For a Variable Flow Pump this is the minimum capacity during operation.
 		Real64 NomPumpHead; // design nominal head pressure of Pump, [Pa]
 		bool EMSPressureOverrideOn; // if true, EMS is calling to override pump pressure
 		Real64 EMSPressureOverrideValue; // EMS value to use for pressure [Pa]
 		Real64 NomPowerUse; // design nominal capacity of Pump
 		bool NomPowerUseWasAutoSized; // true if power was autosize on input
+		powerSizingMethodEnum powerSizingMethod; // which method is used for sizing nominal power use
+		Real64 powerPerFlowScalingFactor; // design electric power per unit flow rate
+		Real64 powerPerFlowPerPressureScalingFactor; // design shaft power per unit flow rate per unit head
 		Real64 MotorEffic; // efficiency of the motor
 		Real64 PumpEffic; // efficiency of the pump
 		Real64 FracMotorLossToFluid; // ?????
@@ -216,12 +249,16 @@ namespace Pumps {
 			NomSteamVolFlowRate( 0.0 ),
 			NomSteamVolFlowRateWasAutoSized( false ),
 			MinVolFlowRate( 0.0 ),
+			minVolFlowRateWasAutosized( false ),
 			MassFlowRateMin( 0.0 ),
 			NomPumpHead( 0.0 ),
 			EMSPressureOverrideOn( false ),
 			EMSPressureOverrideValue( 0.0 ),
 			NomPowerUse( 0.0 ),
 			NomPowerUseWasAutoSized( false ),
+			powerSizingMethod( sizePowerPerFlowPerPressure ),
+			powerPerFlowScalingFactor( 348701.1 ), // 22 W/gpm
+			powerPerFlowPerPressureScalingFactor( 1/0.78 ), // legacy impeller efficiency
 			MotorEffic( 0.0 ),
 			PumpEffic( 0.0 ),
 			FracMotorLossToFluid( 0.0 ),
@@ -245,123 +282,6 @@ namespace Pumps {
 			ZoneNum( 0 ),
 			SkinLossRadFraction( 0.0 ),
 			LoopSolverOverwriteFlag( false )
-		{}
-
-		// Member Constructor
-		PumpSpecs(
-			std::string const & Name, // user identifier
-			std::string const & PumpSchedule, // Schedule to modify the design nominal capacity of the pump
-			std::string const & PressureCurve_Name, // - placeholder for pump curve name
-			int const PumpType, // pump type integer, based on local parameter values, used to identify
-			int const TypeOf_Num, // pump type of number in reference to the dataplant values
-			int const LoopNum, // loop where pump is located
-			int const LoopSideNum, // LoopSide index on loop where pump is located
-			int const BranchNum, // branch index on LoopSide where pump is located
-			int const CompNum, // component index on branch where pump is located
-			int const PumpControl, // Integer equivalent of PumpControlType
-			int const PumpScheduleIndex, // Schedule Pointer
-			int const InletNodeNum, // Node number on the inlet side of the plant
-			int const OutletNodeNum, // Node number on the outlet side of the plant
-			int const SequencingScheme, // Optimal, Sequential, User-Defined
-			int const FluidIndex, // Index for Fluid Properties
-			int const NumPumpsInBank, // Node number on the inlet side of the plant
-			int const PowerErrIndex1, // for recurring errors
-			int const PowerErrIndex2, // for recurring errors
-			Real64 const MinVolFlowRateFrac, // minimum schedule value fraction modifier
-			Real64 const NomVolFlowRate, // design nominal capacity of Pump
-			bool const NomVolFlowRateWasAutoSized, // true if nom vol flow rate was autosize
-			Real64 const MassFlowRateMax, // design nominal capacity of Pump
-			bool const EMSMassFlowOverrideOn, // if true, then EMS is calling to override flow requests.
-			Real64 const EMSMassFlowValue, // EMS value to use for mass flow rate [kg/s]
-			Real64 const NomSteamVolFlowRate, // For Steam Pump
-			Real64 const MinVolFlowRate, // For a Variable Flow Pump this is the minimum capacity during operation.
-			Real64 const MassFlowRateMin, // For a Variable Flow Pump this is the minimum capacity during operation.
-			Real64 const NomPumpHead, // design nominal head pressure of Pump, [Pa]
-			bool const EMSPressureOverrideOn, // if true, EMS is calling to override pump pressure
-			Real64 const EMSPressureOverrideValue, // EMS value to use for pressure [Pa]
-			Real64 const NomPowerUse, // design nominal capacity of Pump
-			bool const NomPowerUseWasAutoSized, // true if previous is autosize on input
-			Real64 const MotorEffic, // efficiency of the motor
-			Real64 const PumpEffic, // efficiency of the pump
-			Real64 const FracMotorLossToFluid, // ?????
-			Real64 const Energy, // Energy consumed
-			Real64 const Power, // Power used
-			Array1< Real64 > const & PartLoadCoef, // Pump Curve Coefficients
-			int const PressureCurve_Index, // Pointer to a pump coefficient curve
-			Real64 const PumpMassFlowRateMaxRPM, // Mass flow rate calculated from maximum rpm
-			Real64 const PumpMassFlowRateMinRPM, // Mass flow rate calculated from minimum rpm
-			Real64 const MinPhiValue, // Minimum value of Phi (from CurveManager)
-			Real64 const MaxPhiValue, // Maximum value of Phi (from CurveManager)
-			Real64 const ImpellerDiameter, // Pump Impeller Diameter [m]
-			Real64 const RotSpeed_RPM, // Rotational speed used for input in revs/min
-			Real64 const RotSpeed, // Rotational speed for calculations in revs/sec
-			bool const PumpInitFlag,
-			bool const PumpOneTimeFlag,
-			bool const CheckEquipName,
-			bool const HasVFD,
-			PumpVFDControlData const & VFD,
-			bool const OneTimePressureWarning,
-			bool const HeatLossesToZone, // if true then pump losses added to surrounding zone
-			int const ZoneNum, // index for zone surrounding pump
-			Real64 const SkinLossRadFraction, // radiative split for skin losses to zone
-			bool const LoopSolverOverwriteFlag
-		) :
-			Name( Name ),
-			PumpSchedule( PumpSchedule ),
-			PressureCurve_Name( PressureCurve_Name ),
-			PumpType( PumpType ),
-			TypeOf_Num( TypeOf_Num ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			PumpControl( PumpControl ),
-			PumpScheduleIndex( PumpScheduleIndex ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			SequencingScheme( SequencingScheme ),
-			FluidIndex( FluidIndex ),
-			NumPumpsInBank( NumPumpsInBank ),
-			PowerErrIndex1( PowerErrIndex1 ),
-			PowerErrIndex2( PowerErrIndex2 ),
-			MinVolFlowRateFrac( MinVolFlowRateFrac ),
-			NomVolFlowRate( NomVolFlowRate ),
-			NomVolFlowRateWasAutoSized( NomVolFlowRateWasAutoSized ),
-			MassFlowRateMax( MassFlowRateMax ),
-			EMSMassFlowOverrideOn( EMSMassFlowOverrideOn ),
-			EMSMassFlowValue( EMSMassFlowValue ),
-			NomSteamVolFlowRate( NomSteamVolFlowRate ),
-			MinVolFlowRate( MinVolFlowRate ),
-			MassFlowRateMin( MassFlowRateMin ),
-			NomPumpHead( NomPumpHead ),
-			EMSPressureOverrideOn( EMSPressureOverrideOn ),
-			EMSPressureOverrideValue( EMSPressureOverrideValue ),
-			NomPowerUse( NomPowerUse ),
-			NomPowerUseWasAutoSized( NomPowerUseWasAutoSized ),
-			MotorEffic( MotorEffic ),
-			PumpEffic( PumpEffic ),
-			FracMotorLossToFluid( FracMotorLossToFluid ),
-			Energy( Energy ),
-			Power( Power ),
-			PartLoadCoef( 4, PartLoadCoef ),
-			PressureCurve_Index( PressureCurve_Index ),
-			PumpMassFlowRateMaxRPM( PumpMassFlowRateMaxRPM ),
-			PumpMassFlowRateMinRPM( PumpMassFlowRateMinRPM ),
-			MinPhiValue( MinPhiValue ),
-			MaxPhiValue( MaxPhiValue ),
-			ImpellerDiameter( ImpellerDiameter ),
-			RotSpeed_RPM( RotSpeed_RPM ),
-			RotSpeed( RotSpeed ),
-			PumpInitFlag( PumpInitFlag ),
-			PumpOneTimeFlag( PumpOneTimeFlag ),
-			CheckEquipName( CheckEquipName ),
-			HasVFD( HasVFD ),
-			VFD( VFD ),
-			OneTimePressureWarning( OneTimePressureWarning ),
-			HeatLossesToZone( HeatLossesToZone ),
-			ZoneNum( ZoneNum ),
-			SkinLossRadFraction( SkinLossRadFraction ),
-			LoopSolverOverwriteFlag( LoopSolverOverwriteFlag )
 		{}
 
 	};
@@ -392,31 +312,6 @@ namespace Pumps {
 			ZoneTotalGainEnergy( 0.0 ),
 			ZoneConvGainRate( 0.0 ),
 			ZoneRadGainRate( 0.0 )
-		{}
-
-		// Member Constructor
-		ReportVars(
-			int const NumPumpsOperating, // Used in pump bank. reports how many pumps are ON
-			Real64 const PumpMassFlowRate, // Mass flow rate of the pump
-			Real64 const PumpHeattoFluid, // Heat transfer from pump to fluid (W)
-			Real64 const PumpHeattoFluidEnergy, // Pump Energy dissipated into fluid stream
-			Real64 const OutletTemp, // Pump outlet temperature
-			Real64 const ShaftPower, // Power input at the shaft
-			Real64 const ZoneTotalGainRate, // total pump skin losses to zone (W)
-			Real64 const ZoneTotalGainEnergy, // total pump skin losses to zone energy (J)
-			Real64 const ZoneConvGainRate, // pump skin losses convecting to zone air (W)
-			Real64 const ZoneRadGainRate // pump skin losses radiating to inside of zone (W)
-		) :
-			NumPumpsOperating( NumPumpsOperating ),
-			PumpMassFlowRate( PumpMassFlowRate ),
-			PumpHeattoFluid( PumpHeattoFluid ),
-			PumpHeattoFluidEnergy( PumpHeattoFluidEnergy ),
-			OutletTemp( OutletTemp ),
-			ShaftPower( ShaftPower ),
-			ZoneTotalGainRate( ZoneTotalGainRate ),
-			ZoneTotalGainEnergy( ZoneTotalGainEnergy ),
-			ZoneConvGainRate( ZoneConvGainRate ),
-			ZoneRadGainRate( ZoneRadGainRate )
 		{}
 
 	};
@@ -508,29 +403,6 @@ namespace Pumps {
 	);
 
 	//=================================================================================================!
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Pumps
 

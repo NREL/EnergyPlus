@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef WaterThermalTanks_hh_INCLUDED
 #define WaterThermalTanks_hh_INCLUDED
 
@@ -174,59 +232,6 @@ namespace WaterThermalTanks {
 			HPWHWrappedCondenserHeatingFrac(0.0)
 		{}
 
-		// Member Constructor
-		StratifiedNodeData(
-			Real64 const Mass, // All nodes have the same mass (kg)
-			Real64 const OnCycLossCoeff,
-			Real64 const OffCycLossCoeff,
-			Real64 const Temp,
-			Real64 const SavedTemp,
-			Real64 const NewTemp,
-			Real64 const TempSum,
-			Real64 const TempAvg, // Average node temperature over the time step (C)
-			Real64 const CondCoeffUp,
-			Real64 const CondCoeffDn,
-			Real64 const OffCycParaLoad, // Heat delivered to the tank from off-cycle parasitic sources
-			Real64 const OnCycParaLoad,
-			Real64 const UseMassFlowRate,
-			Real64 const SourceMassFlowRate,
-			Real64 const MassFlowFromUpper, // Mass flow rate into this node from node above
-			Real64 const MassFlowFromLower, // Mass flow rate into this node from node below
-			Real64 const MassFlowToUpper, // Mass flow rate from this node to node above
-			Real64 const MassFlowToLower, // Mass flow rate from this node to node below
-			Real64 const Volume,
-			Real64 const Height, // Node height from top to bottom (like a thickness)
-			Real64 const MaxCapacity, // For reporting
-			int const Inlets,
-			int const Outlets,
-			Real64 const HPWHWrappedCondenserHeatingFrac
-		) :
-			Mass( Mass ),
-			OnCycLossCoeff( OnCycLossCoeff ),
-			OffCycLossCoeff( OffCycLossCoeff ),
-			Temp( Temp ),
-			SavedTemp( SavedTemp ),
-			NewTemp( NewTemp ),
-			TempSum( TempSum ),
-			TempAvg( TempAvg ),
-			CondCoeffUp( CondCoeffUp ),
-			CondCoeffDn( CondCoeffDn ),
-			OffCycParaLoad( OffCycParaLoad ),
-			OnCycParaLoad( OnCycParaLoad ),
-			UseMassFlowRate( UseMassFlowRate ),
-			SourceMassFlowRate( SourceMassFlowRate ),
-			MassFlowFromUpper( MassFlowFromUpper ),
-			MassFlowFromLower( MassFlowFromLower ),
-			MassFlowToUpper( MassFlowToUpper ),
-			MassFlowToLower( MassFlowToLower ),
-			Volume( Volume ),
-			Height( Height ),
-			MaxCapacity( MaxCapacity ),
-			Inlets( Inlets ),
-			Outlets( Outlets ),
-			HPWHWrappedCondenserHeatingFrac( HPWHWrappedCondenserHeatingFrac )
-		{}
-
 	};
 
 	struct WaterHeaterSizingData
@@ -275,49 +280,6 @@ namespace WaterThermalTanks {
 			PeakNumberOfPeople( 0.0 ),
 			TotalFloorArea( 0.0 ),
 			TotalSolarCollectorArea( 0.0 )
-		{}
-
-		// Member Constructor
-		WaterHeaterSizingData(
-			int const DesignMode, // what sizing method to use
-			Real64 const TankDrawTime, // in hours, time storage can meet peak demand
-			Real64 const RecoveryTime, // time for tank to recover
-			Real64 const NominalVolForSizingDemandSideFlow, // nominal tank size to use in sizing demand side connections
-			int const NumberOfBedrooms,
-			Real64 const NumberOfBathrooms,
-			Real64 const TankCapacityPerPerson,
-			Real64 const RecoveryCapacityPerPerson,
-			Real64 const TankCapacityPerArea,
-			Real64 const RecoveryCapacityPerArea,
-			Real64 const NumberOfUnits,
-			Real64 const TankCapacityPerUnit,
-			Real64 const RecoveryCapacityPerUnit,
-			Real64 const TankCapacityPerCollectorArea,
-			Real64 const HeightAspectRatio,
-			Real64 const PeakDemand,
-			Real64 const PeakNumberOfPeople,
-			Real64 const TotalFloorArea,
-			Real64 const TotalSolarCollectorArea
-		) :
-			DesignMode( DesignMode ),
-			TankDrawTime( TankDrawTime ),
-			RecoveryTime( RecoveryTime ),
-			NominalVolForSizingDemandSideFlow( NominalVolForSizingDemandSideFlow ),
-			NumberOfBedrooms( NumberOfBedrooms ),
-			NumberOfBathrooms( NumberOfBathrooms ),
-			TankCapacityPerPerson( TankCapacityPerPerson ),
-			RecoveryCapacityPerPerson( RecoveryCapacityPerPerson ),
-			TankCapacityPerArea( TankCapacityPerArea ),
-			RecoveryCapacityPerArea( RecoveryCapacityPerArea ),
-			NumberOfUnits( NumberOfUnits ),
-			TankCapacityPerUnit( TankCapacityPerUnit ),
-			RecoveryCapacityPerUnit( RecoveryCapacityPerUnit ),
-			TankCapacityPerCollectorArea( TankCapacityPerCollectorArea ),
-			HeightAspectRatio( HeightAspectRatio ),
-			PeakDemand( PeakDemand ),
-			PeakNumberOfPeople( PeakNumberOfPeople ),
-			TotalFloorArea( TotalFloorArea ),
-			TotalSolarCollectorArea( TotalSolarCollectorArea )
 		{}
 
 	};
@@ -915,231 +877,6 @@ namespace WaterThermalTanks {
 			MSWaterSpeedRatio( MaxSpedLevels, 0.0 )
 		{}
 
-		// Member Constructor
-		HeatPumpWaterHeaterData(
-			std::string const & Name, // Name of heat pump water heater
-			std::string const & Type, // Type of water heater (HEAT PUMP:WATER HEATER)
-			int const TypeNum, // integer parameter for heat pump water heater
-			std::string const & TankName, // Name of tank associated with heat pump water heater
-			std::string const & TankType, // Type of water heater (MIXED or STRATIFIED) used with heat pump
-			int const TankTypeNum, // Parameter for tank type (MIXED or STRATIFIED)
-			bool const StandAlone, // Flag for operation with no plant connections (no use nodes)
-			int const AvailSchedPtr, // Index to Availability Schedule curve index
-			int const SetPointTempSchedule, // Index to Setpoint Temperature Schedule curve
-			Real64 const DeadBandTempDiff, // Dead band temperature difference (cut-in temperature)
-			Real64 const Capacity, // Heat Pump rated capacity (W)
-			Real64 const BackupElementCapacity, // Tank backup element capacity (W)
-			Real64 const BackupElementEfficiency, // Tank backup element efficiency
-			Real64 const WHOnCycParaLoad, // tank's on-cycle parasitic load (W), disable for rating
-			Real64 const WHOffCycParaLoad, // tank's off-cycle parasitic load (W), disable for rating
-			Real64 const WHOnCycParaFracToTank, // tank's on-cycle parasitic frac to tank, disable for rating
-			Real64 const WHOffCycParaFracToTank, // tank's off-cycle parasitic frac to tank, disable for rating
-			int const WHPLFCurve, // tank part-load fraction curve index, used for rating procedure
-			Real64 const OperatingAirFlowRate, // Operating volumetric air flow rate (m3/s)
-			Real64 const OperatingWaterFlowRate, // Operating volumetric water flow rate (m3/s)
-			Real64 const COP, // Heat Pump coefficient of performance (W/W)
-			Real64 const SHR, // Heat Pump air-side coil sensible heat ratio
-			Real64 const RatedInletDBTemp, // Rated evaporator inlet air dry-bulb temperature (C)
-			Real64 const RatedInletWBTemp, // Rated evaporator inlet air wet-bulb temperature (C)
-			Real64 const RatedInletWaterTemp, // Rated condenser inlet water temperature (C)
-			bool const FoundTank, // Found storage tank flag associated with HP water heater
-			int const HeatPumpAirInletNode, // HP air inlet node (for zone, zone/outdoor or scheduled)
-			int const HeatPumpAirOutletNode, // HP air outlet node (for zone, zone/outdoor or scheduled)
-			int const OutsideAirNode, // outdoor air node (for outdoor or zone/outdoor air unit only)
-			int const ExhaustAirNode, // Exhaust air node (for outdoor or zone/outdoor air unit only)
-			int const CondWaterInletNode, // Condenser water inlet node
-			int const CondWaterOutletNode, // Condenser water outlet node
-			int const WHUseInletNode, // Water heater tank use side inlet node
-			int const WHUseOutletNode, // Water heater tank use side outlet node
-			int const WHUseSidePlantLoopNum, // if not zero, then this water heater is on plant loop #
-			std::string const & DXCoilType, // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
-			std::string const & DXCoilName, // Name of DX coil
-			int const DXCoilNum, // Index of DX coil
-			int const DXCoilTypeNum, // DX Coil type number
-			int const DXCoilAirInletNode, // Inlet air node number of DX coil
-			int const DXCoilPLFFPLR, // Index to HPWH's DX Coil PLF as a function of PLR curve
-			std::string const & FanType, // Type of Fan (Fan:OnOff)
-			int const FanType_Num, // Integer type of fan (3 = Fan:OnOff)
-			std::string const & FanName, // Name of Fan
-			int const FanNum, // Index of Fan
-			int const FanPlacement, // Location of Fan
-			int const FanOutletNode, // Outlet node of heat pump water heater fan
-			int const WaterHeaterTankNum, // Index of Water Heater Tank
-			int const OutletAirSplitterSchPtr, // Index to air-side outlet air splitter schedule
-			int const InletAirMixerSchPtr, // Index to air-side inlet air mixer schedule
-			int const Mode, // HP mode (0 = float, 1 = heating [-1 = venting na for HP])
-			int const SaveMode, // HP mode on first iteration
-			int const SaveWHMode, // mode of water heater tank element (backup element)
-			Real64 const Power, // HP power used for reporting
-			Real64 const Energy, // HP energy used for reporting
-			Real64 const HeatingPLR, // HP PLR used for reporting
-			Real64 const SetPointTemp, // set point or cut-out temperature [C]
-			Real64 const MinAirTempForHPOperation, // HP does not operate below this ambient temperature
-			Real64 const MaxAirTempForHPOperation, // HP does not operate above this ambient temperature
-			int const InletAirMixerNode, // Inlet air mixer node number of HP water heater
-			int const OutletAirSplitterNode, // Outlet air splitter node number of HP water heater
-			Real64 const SourceMassFlowRate, // Maximum mass flow rate on the source side (kg/s)
-			int const InletAirConfiguration, // Identifies source of HPWH inlet air
-			int const AmbientTempSchedule, // Schedule index pointer for ambient air temp at HPWH inlet
-			int const AmbientRHSchedule, // Schedule index pointer for ambient air RH at HPWH inlet
-			int const AmbientTempZone, // Index of ambient zone for ambient air at HPWH inlet
-			int const CrankcaseTempIndicator, // Indicator for HPWH compressor/crankcase heater location
-			int const CrankcaseTempSchedule, // Schedule index pointer where crankcase heater is located
-			int const CrankcaseTempZone, // Index of zone where compressor/crankcase heater is located
-			Real64 const OffCycParaLoad, // Rate for off-cycle parasitic load (W)
-			Real64 const OnCycParaLoad, // Rate for on-cycle parasitic load (W)
-			int const ParasiticTempIndicator, // Indicator for HPWH parasitic heat rejection location
-			Real64 const OffCycParaFuelRate, // Electric consumption rate for off-cycle parasitic load (W)
-			Real64 const OnCycParaFuelRate, // Electric consumption rate for on-cycle parasitic load (W)
-			Real64 const OffCycParaFuelEnergy, // Electric energy consumption for off-cycle parasitic load (J)
-			Real64 const OnCycParaFuelEnergy, // Electric energy consumption for on-cycle parasitic load (J)
-			bool const AirFlowRateAutoSized, // Used to report air flow autosize info in Init
-			bool const WaterFlowRateAutoSized, // Used to report water flow autosize info in Init
-			int const HPSetPointError, // Used when temperature SP's in tank and HP are reversed
-			int const HPSetPointErrIndex1, // Index to recurring error for tank/HP set point temp
-			int const IterLimitErrIndex1, // Index for recurring iteration limit warning messages
-			int const IterLimitExceededNum1, // Counter for recurring iteration limit warning messages
-			int const RegulaFalsiFailedIndex1, // Index for recurring RegulaFalsi failed warning messages
-			int const RegulaFalsiFailedNum1, // Counter for recurring RegulaFalsi failed warning messages
-			int const IterLimitErrIndex2, // Index for recurring iteration limit warning messages
-			int const IterLimitExceededNum2, // Counter for recurring iteration limit warning messages
-			int const RegulaFalsiFailedIndex2, // Index for recurring RegulaFalsi failed warning messages
-			int const RegulaFalsiFailedNum2, // Counter for recurring RegulaFalsi failed warning messages
-			bool const FirstTimeThroughFlag, // Flag for saving water heater status
-			bool const ShowSetPointWarning, // Warn when set point is greater than max tank temp limit
-			Real64 const HPWaterHeaterSensibleCapacity, // sensible capacity delivered when HPWH is attached to a zone (W)
-			Real64 const HPWaterHeaterLatentCapacity, // latent capacity delivered when HPWH is attached to a zone (kg/s)
-			Real64 const WrappedCondenserBottomLocation,
-			Real64 const WrappedCondenserTopLocation,
-			Real64 const ControlSensor1Height, // location from bottom of tank of control sensor 1
-			int const ControlSensor1Node,
-			Real64 const ControlSensor1Weight, // weight of control sensor 1
-			Real64 const ControlSensor2Height, // location from bottom of tank of control sensor 2
-			int const ControlSensor2Node,
-			Real64 const ControlSensor2Weight, // weight of control sensor 2
-			Real64 const ControlTempAvg,
-			Real64 const ControlTempFinal,
-			bool const AllowHeatingElementAndHeatPumpToRunAtSameTime,
-			int const NumofSpeed,
-			Array1< Real64 > const & HPWHAirVolFlowRate,
-			Array1< Real64 > const & HPWHAirMassFlowRate,
-			Array1< Real64 > const & HPWHWaterVolFlowRate,
-			Array1< Real64 > const & HPWHWaterMassFlowRate,
-			Array1< Real64 > const & MSAirSpeedRatio,
-			Array1< Real64 > const & MSWaterSpeedRatio
-		) :
-			Name( Name ),
-			Type( Type ),
-			TypeNum( TypeNum ),
-			TankName( TankName ),
-			TankType( TankType ),
-			TankTypeNum( TankTypeNum ),
-			StandAlone( StandAlone ),
-			AvailSchedPtr( AvailSchedPtr ),
-			SetPointTempSchedule( SetPointTempSchedule ),
-			DeadBandTempDiff( DeadBandTempDiff ),
-			Capacity( Capacity ),
-			BackupElementCapacity( BackupElementCapacity ),
-			BackupElementEfficiency( BackupElementEfficiency ),
-			WHOnCycParaLoad( WHOnCycParaLoad ),
-			WHOffCycParaLoad( WHOffCycParaLoad ),
-			WHOnCycParaFracToTank( WHOnCycParaFracToTank ),
-			WHOffCycParaFracToTank( WHOffCycParaFracToTank ),
-			WHPLFCurve( WHPLFCurve ),
-			OperatingAirFlowRate( OperatingAirFlowRate ),
-			OperatingWaterFlowRate( OperatingWaterFlowRate ),
-			COP( COP ),
-			SHR( SHR ),
-			RatedInletDBTemp( RatedInletDBTemp ),
-			RatedInletWBTemp( RatedInletWBTemp ),
-			RatedInletWaterTemp( RatedInletWaterTemp ),
-			FoundTank( FoundTank ),
-			HeatPumpAirInletNode( HeatPumpAirInletNode ),
-			HeatPumpAirOutletNode( HeatPumpAirOutletNode ),
-			OutsideAirNode( OutsideAirNode ),
-			ExhaustAirNode( ExhaustAirNode ),
-			CondWaterInletNode( CondWaterInletNode ),
-			CondWaterOutletNode( CondWaterOutletNode ),
-			WHUseInletNode( WHUseInletNode ),
-			WHUseOutletNode( WHUseOutletNode ),
-			WHUseSidePlantLoopNum( WHUseSidePlantLoopNum ),
-			DXCoilType( DXCoilType ),
-			DXCoilName( DXCoilName ),
-			DXCoilNum( DXCoilNum ),
-			DXCoilTypeNum( DXCoilTypeNum ),
-			DXCoilAirInletNode( DXCoilAirInletNode ),
-			DXCoilPLFFPLR( DXCoilPLFFPLR ),
-			FanType( FanType ),
-			FanType_Num( FanType_Num ),
-			FanName( FanName ),
-			FanNum( FanNum ),
-			FanPlacement( FanPlacement ),
-			FanOutletNode( FanOutletNode ),
-			WaterHeaterTankNum( WaterHeaterTankNum ),
-			OutletAirSplitterSchPtr( OutletAirSplitterSchPtr ),
-			InletAirMixerSchPtr( InletAirMixerSchPtr ),
-			Mode( Mode ),
-			SaveMode( SaveMode ),
-			SaveWHMode( SaveWHMode ),
-			Power( Power ),
-			Energy( Energy ),
-			HeatingPLR( HeatingPLR ),
-			SetPointTemp( SetPointTemp ),
-			MinAirTempForHPOperation( MinAirTempForHPOperation ),
-			MaxAirTempForHPOperation( MaxAirTempForHPOperation ),
-			InletAirMixerNode( InletAirMixerNode ),
-			OutletAirSplitterNode( OutletAirSplitterNode ),
-			SourceMassFlowRate( SourceMassFlowRate ),
-			InletAirConfiguration( InletAirConfiguration ),
-			AmbientTempSchedule( AmbientTempSchedule ),
-			AmbientRHSchedule( AmbientRHSchedule ),
-			AmbientTempZone( AmbientTempZone ),
-			CrankcaseTempIndicator( CrankcaseTempIndicator ),
-			CrankcaseTempSchedule( CrankcaseTempSchedule ),
-			CrankcaseTempZone( CrankcaseTempZone ),
-			OffCycParaLoad( OffCycParaLoad ),
-			OnCycParaLoad( OnCycParaLoad ),
-			ParasiticTempIndicator( ParasiticTempIndicator ),
-			OffCycParaFuelRate( OffCycParaFuelRate ),
-			OnCycParaFuelRate( OnCycParaFuelRate ),
-			OffCycParaFuelEnergy( OffCycParaFuelEnergy ),
-			OnCycParaFuelEnergy( OnCycParaFuelEnergy ),
-			AirFlowRateAutoSized( AirFlowRateAutoSized ),
-			WaterFlowRateAutoSized( WaterFlowRateAutoSized ),
-			HPSetPointError( HPSetPointError ),
-			HPSetPointErrIndex1( HPSetPointErrIndex1 ),
-			IterLimitErrIndex1( IterLimitErrIndex1 ),
-			IterLimitExceededNum1( IterLimitExceededNum1 ),
-			RegulaFalsiFailedIndex1( RegulaFalsiFailedIndex1 ),
-			RegulaFalsiFailedNum1( RegulaFalsiFailedNum1 ),
-			IterLimitErrIndex2( IterLimitErrIndex2 ),
-			IterLimitExceededNum2( IterLimitExceededNum2 ),
-			RegulaFalsiFailedIndex2( RegulaFalsiFailedIndex2 ),
-			RegulaFalsiFailedNum2( RegulaFalsiFailedNum2 ),
-			FirstTimeThroughFlag( FirstTimeThroughFlag ),
-			ShowSetPointWarning( ShowSetPointWarning ),
-			HPWaterHeaterSensibleCapacity( HPWaterHeaterSensibleCapacity ),
-			HPWaterHeaterLatentCapacity( HPWaterHeaterLatentCapacity ),
-			WrappedCondenserBottomLocation( WrappedCondenserBottomLocation ),
-			WrappedCondenserTopLocation( WrappedCondenserTopLocation ),
-			ControlSensor1Height( ControlSensor1Height ),
-			ControlSensor1Node( ControlSensor1Node ),
-			ControlSensor1Weight( ControlSensor1Weight ),
-			ControlSensor2Height( ControlSensor2Height ),
-			ControlSensor2Node( ControlSensor2Node ),
-			ControlSensor2Weight( ControlSensor2Weight ),
-			ControlTempAvg( ControlTempAvg ),
-			ControlTempFinal( ControlTempFinal ),
-			AllowHeatingElementAndHeatPumpToRunAtSameTime( AllowHeatingElementAndHeatPumpToRunAtSameTime ),
-			NumofSpeed( NumofSpeed ),
-			HPWHAirVolFlowRate( MaxSpedLevels, HPWHAirVolFlowRate ),
-			HPWHAirMassFlowRate( MaxSpedLevels, HPWHAirMassFlowRate ),
-			HPWHWaterVolFlowRate( MaxSpedLevels, HPWHWaterVolFlowRate ),
-			HPWHWaterMassFlowRate( MaxSpedLevels, HPWHWaterMassFlowRate ),
-			MSAirSpeedRatio( MaxSpedLevels, MSAirSpeedRatio ),
-			MSWaterSpeedRatio( MaxSpedLevels, MSWaterSpeedRatio )
-		{}
-
 	};
 
 	struct WaterHeaterDesuperheaterData
@@ -1255,119 +992,6 @@ namespace WaterThermalTanks {
 			IterLimitExceededNum2( 0 ),
 			RegulaFalsiFailedIndex2( 0 ),
 			RegulaFalsiFailedNum2( 0 )
-		{}
-
-		// Member Constructor
-		WaterHeaterDesuperheaterData(
-			std::string const & Name, // Name of heat pump water heater desuperheater
-			std::string const & Type, // Type of water heater desuperheating coil
-			int const InsuffTemperatureWarn, // Used for recurring error count on low source temperature
-			int const AvailSchedPtr, // Index to Availability Schedule curve index
-			int const SetPointTempSchedule, // Index to Setpoint Temperature Schedule curve
-			Real64 const DeadBandTempDiff, // Dead band temperature difference (cut-in temperature)
-			Real64 const HeatReclaimRecoveryEff, // recovery efficiency of desuperheater (0.3 max)
-			int const WaterInletNode, // Desuperheater water inlet node
-			int const WaterOutletNode, // Desuperheater water outlet node
-			Real64 const RatedInletWaterTemp, // Inlet water temp at rated heat reclaim recovery eff (C)
-			Real64 const RatedOutdoorAirTemp, // Outdoor air temp at rated heat reclaim recovery eff (C)
-			Real64 const MaxInletWaterTemp, // Max water temp for heat reclaim recovery (C)
-			std::string const & TankType, // Type of water heater (MIXED or STRATIFIED)
-			int const TankTypeNum, // Parameter for tank type (MIXED or STRATIFIED)
-			std::string const & TankName, // Name of tank associated with desuperheater
-			bool const StandAlone, // Flag for operation with no plant connections (no use nodes)
-			std::string const & HeatingSourceType, // Type of heating source (DX coil or refrigerated rack)
-			std::string const & HeatingSourceName, // Name of heating source
-			Real64 const HeaterRate, // Report variable for desuperheater heating rate [W]
-			Real64 const HeaterEnergy, // Report variable for desuperheater heating energy [J]
-			Real64 const PumpPower, // Report variable for water circulation pump power [W]
-			Real64 const PumpEnergy, // Report variable for water circulation pump energy [J]
-			Real64 const PumpElecPower, // Nominal power input to the water circulation pump [W]
-			Real64 const PumpFracToWater, // Nominal power fraction to water for the water circulation pump
-			Real64 const OperatingWaterFlowRate, // Operating volumetric water flow rate (m3/s)
-			int const HEffFTemp, // Heating capacity as a function of temperature curve index
-			Real64 const HEffFTempOutput, // report variable for HEffFTemp curve
-			Real64 const SetPointTemp, // set point or cut-out temperature [C]
-			int const WaterHeaterTankNum, // Index of Water Heater Tank
-			Real64 const DesuperheaterPLR, // part load ratio of desuperheater
-			Real64 const OnCycParaLoad, // Rate for on-cycle parasitic load (W)
-			Real64 const OffCycParaLoad, // Rate for off-cycle parasitic load (W)
-			Real64 const OnCycParaFuelEnergy, // Electric energy consumption for on-cycle parasitic load (J)
-			Real64 const OnCycParaFuelRate, // Electric consumption rate for on-cycle parasitic load (W)
-			Real64 const OffCycParaFuelEnergy, // Electric energy consumption for off-cycle parasitic load (J)
-			Real64 const OffCycParaFuelRate, // Electric consumption rate for off-cycle parasitic load (W)
-			int const Mode, // mode (0 = float, 1 = heating [-1=venting na for desuperheater])
-			int const SaveMode, // desuperheater mode on first iteration
-			int const SaveWHMode, // mode of water heater tank element (backup element)
-			Real64 const BackupElementCapacity, // Tank backup element capacity (W)
-			Real64 const DXSysPLR, // runtime fraction of desuperheater heating coil
-			std::string const & ReclaimHeatingSourceName, // The source name for the Desuperheater Heating Coil
-			int const ReclaimHeatingSourceIndexNum, // Index to reclaim heating source (condenser) of a specific type
-			int const ReclaimHeatingSource, // The source for the Desuperheater Heating Coil
-			int const SetPointError, // Used when temp SP in tank and desuperheater are reversed
-			int const SetPointErrIndex1, // Index to recurring error for tank/desuperheater set point temp
-			int const IterLimitErrIndex1, // Index for recurring iteration limit warning messages
-			int const IterLimitExceededNum1, // Counter for recurring iteration limit warning messages
-			int const RegulaFalsiFailedIndex1, // Index for recurring RegulaFalsi failed warning messages
-			int const RegulaFalsiFailedNum1, // Counter for recurring RegulaFalsi failed warning messages
-			int const IterLimitErrIndex2, // Index for recurring iteration limit warning messages
-			int const IterLimitExceededNum2, // Counter for recurring iteration limit warning messages
-			int const RegulaFalsiFailedIndex2, // Index for recurring RegulaFalsi failed warning messages
-			int const RegulaFalsiFailedNum2 // Counter for recurring RegulaFalsi failed warning messages
-		) :
-			Name( Name ),
-			Type( Type ),
-			InsuffTemperatureWarn( InsuffTemperatureWarn ),
-			AvailSchedPtr( AvailSchedPtr ),
-			SetPointTempSchedule( SetPointTempSchedule ),
-			DeadBandTempDiff( DeadBandTempDiff ),
-			HeatReclaimRecoveryEff( HeatReclaimRecoveryEff ),
-			WaterInletNode( WaterInletNode ),
-			WaterOutletNode( WaterOutletNode ),
-			RatedInletWaterTemp( RatedInletWaterTemp ),
-			RatedOutdoorAirTemp( RatedOutdoorAirTemp ),
-			MaxInletWaterTemp( MaxInletWaterTemp ),
-			TankType( TankType ),
-			TankTypeNum( TankTypeNum ),
-			TankName( TankName ),
-			StandAlone( StandAlone ),
-			HeatingSourceType( HeatingSourceType ),
-			HeatingSourceName( HeatingSourceName ),
-			HeaterRate( HeaterRate ),
-			HeaterEnergy( HeaterEnergy ),
-			PumpPower( PumpPower ),
-			PumpEnergy( PumpEnergy ),
-			PumpElecPower( PumpElecPower ),
-			PumpFracToWater( PumpFracToWater ),
-			OperatingWaterFlowRate( OperatingWaterFlowRate ),
-			HEffFTemp( HEffFTemp ),
-			HEffFTempOutput( HEffFTempOutput ),
-			SetPointTemp( SetPointTemp ),
-			WaterHeaterTankNum( WaterHeaterTankNum ),
-			DesuperheaterPLR( DesuperheaterPLR ),
-			OnCycParaLoad( OnCycParaLoad ),
-			OffCycParaLoad( OffCycParaLoad ),
-			OnCycParaFuelEnergy( OnCycParaFuelEnergy ),
-			OnCycParaFuelRate( OnCycParaFuelRate ),
-			OffCycParaFuelEnergy( OffCycParaFuelEnergy ),
-			OffCycParaFuelRate( OffCycParaFuelRate ),
-			Mode( Mode ),
-			SaveMode( SaveMode ),
-			SaveWHMode( SaveWHMode ),
-			BackupElementCapacity( BackupElementCapacity ),
-			DXSysPLR( DXSysPLR ),
-			ReclaimHeatingSourceName( ReclaimHeatingSourceName ),
-			ReclaimHeatingSourceIndexNum( ReclaimHeatingSourceIndexNum ),
-			ReclaimHeatingSource( ReclaimHeatingSource ),
-			SetPointError( SetPointError ),
-			SetPointErrIndex1( SetPointErrIndex1 ),
-			IterLimitErrIndex1( IterLimitErrIndex1 ),
-			IterLimitExceededNum1( IterLimitExceededNum1 ),
-			RegulaFalsiFailedIndex1( RegulaFalsiFailedIndex1 ),
-			RegulaFalsiFailedNum1( RegulaFalsiFailedNum1 ),
-			IterLimitErrIndex2( IterLimitErrIndex2 ),
-			IterLimitExceededNum2( IterLimitExceededNum2 ),
-			RegulaFalsiFailedIndex2( RegulaFalsiFailedIndex2 ),
-			RegulaFalsiFailedNum2( RegulaFalsiFailedNum2 )
 		{}
 
 	};
@@ -1614,29 +1238,6 @@ namespace WaterThermalTanks {
 	);
 
 	void clear_state();
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // WaterThermalTanks
 

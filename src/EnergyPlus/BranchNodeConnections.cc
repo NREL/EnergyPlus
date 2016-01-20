@@ -1,7 +1,65 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -269,6 +327,10 @@ namespace BranchNodeConnections {
 		//        same node name appears as an INLET to an AirLoopHVAC, CondenserLoop, or PlantLoop.
 		// 6.  Any given node can only be an inlet once in the list of Non-Parent Node Connections
 		// 7.  Any given node can only be an outlet once in the list of Non-Parent Node Connections
+		// 8.  non-parent outlet nodes -- must never be an outlet more than once
+		// 9.  nodes of type OutsideAirReference must be registered as NodeConnectionType_OutsideAir
+		// 10. fluid streams cannot have multiple inlet/outlet nodes on same component
+		// 11. zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
 
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
@@ -558,7 +620,7 @@ namespace BranchNodeConnections {
 		// Check 10 -- fluid streams cannot have multiple inlet/outlet nodes on same component
 		//  can have multiple inlets with one outlet or vice versa but cannot have multiple both inlet and outlet
 		if ( NumOfNodeConnections > 0 ) {
-			MaxFluidStream = maxval( NodeConnections.FluidStream() );
+			MaxFluidStream = maxval( NodeConnections, &NodeConnectionDef::FluidStream );
 			FluidStreamInletCount.allocate( MaxFluidStream );
 			FluidStreamOutletCount.allocate( MaxFluidStream );
 			FluidStreamCounts.allocate( MaxFluidStream );
@@ -616,6 +678,25 @@ namespace BranchNodeConnections {
 			FluidStreamOutletCount.deallocate();
 			FluidStreamCounts.deallocate();
 			NodeObjects.deallocate();
+		}
+
+		//Check 11 - zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
+		for ( Loop1 = 1; Loop1 <= NumOfNodeConnections; ++Loop1 ) {
+			if ( NodeConnections( Loop1 ).ConnectionType != ValidConnectionTypes( NodeConnectionType_ZoneNode ) ) continue;
+			IsValid = true;
+			for ( Loop2 = Loop1; Loop2 <= NumOfNodeConnections; ++Loop2 ) {
+				if ( Loop1 == Loop2 ) continue;
+				if ( NodeConnections( Loop1 ).NodeName == NodeConnections( Loop2 ).NodeName ) {
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Sensor ) ) continue;
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_Actuator ) ) continue;
+					if ( NodeConnections( Loop2 ).ConnectionType == ValidConnectionTypes( NodeConnectionType_SetPoint ) ) continue;
+					ShowSevereError( "Node Connection Error, Node Name=\"" + NodeConnections( Loop1 ).NodeName + "\", The same zone node appears more than once." );
+					ShowContinueError( "Reference Object=" + NodeConnections( Loop1 ).ObjectType + ", Object Name=" + NodeConnections( Loop1 ).ObjectName );
+					ShowContinueError( "Reference Object=" + NodeConnections( Loop2 ).ObjectType + ", Object Name=" + NodeConnections( Loop2 ).ObjectName );
+					++ErrorCounter;
+					ErrorsFound = true;
+				}
+			}
 		}
 
 		NumNodeConnectionErrors += ErrorCounter;
@@ -1893,7 +1974,7 @@ namespace BranchNodeConnections {
 
 		if ( allocated( NodeConnectType ) ) NodeConnectType.deallocate();
 
-		FindAllNumbersInList( NodeNumber, NodeConnections.NodeNumber(), NumOfNodeConnections, NumInList, ListArray );
+		FindAllNodeNumbersInList( NodeNumber, NodeConnections, NumOfNodeConnections, NumInList, ListArray );
 
 		NodeConnectType.allocate( NumInList );
 
@@ -1913,9 +1994,9 @@ namespace BranchNodeConnections {
 	}
 
 	void
-	FindAllNumbersInList(
+	FindAllNodeNumbersInList(
 		int const WhichNumber,
-		Array1A_int const ListOfItems,
+		Array1< DataBranchNodeConnections::NodeConnectionDef > const & NodeConnections,
 		int const NumItems,
 		int & CountOfItems, // Number of items found
 		Array1D_int & AllNumbersInList // Index array to all numbers found
@@ -1942,9 +2023,6 @@ namespace BranchNodeConnections {
 		// USE STATEMENTS:
 		// na
 
-		// Argument array dimensioning
-		ListOfItems.dim( _ );
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1965,7 +2043,7 @@ namespace BranchNodeConnections {
 		if ( allocated( AllNumbersInList ) ) AllNumbersInList.deallocate();
 
 		for ( Count = 1; Count <= NumItems; ++Count ) {
-			if ( WhichNumber == ListOfItems( Count ) ) {
+			if ( WhichNumber == NodeConnections( Count ).NodeNumber ) {
 				++CountOfItems;
 			}
 		}
@@ -1976,7 +2054,7 @@ namespace BranchNodeConnections {
 			CountOfItems = 0;
 
 			for ( Count = 1; Count <= NumItems; ++Count ) {
-				if ( WhichNumber == ListOfItems( Count ) ) {
+				if ( WhichNumber == NodeConnections( Count ).NodeNumber ) {
 					++CountOfItems;
 					AllNumbersInList( CountOfItems ) = Count;
 				}
@@ -1985,29 +2063,6 @@ namespace BranchNodeConnections {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // BranchNodeConnections
 

@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataRuntimeLanguage_hh_INCLUDED
 #define DataRuntimeLanguage_hh_INCLUDED
 
@@ -210,27 +268,6 @@ namespace DataRuntimeLanguage {
 			SchedNum( 0 )
 		{}
 
-		// Member Constructor
-		OutputVarSensorType(
-			std::string const & Name, // name of associated Erl Variable
-			std::string const & UniqueKeyName, // unique key name associated with output variable
-			std::string const & OutputVarName, // name of output variable
-			bool const CheckedOkay, // set to true once checked out okay
-			int const Type, // type of output var, 1=integer, 2=real, 3=meter
-			int const Index, // ref index in output processor, points to variable
-			int const VariableNum, // ref to global variable in runtime language
-			int const SchedNum // ref index ptr to schedule service (filled if Schedule Value)
-		) :
-			Name( Name ),
-			UniqueKeyName( UniqueKeyName ),
-			OutputVarName( OutputVarName ),
-			CheckedOkay( CheckedOkay ),
-			Type( Type ),
-			Index( Index ),
-			VariableNum( VariableNum ),
-			SchedNum( SchedNum )
-		{}
-
 	};
 
 	struct InternalVarsAvailableType
@@ -247,23 +284,6 @@ namespace DataRuntimeLanguage {
 		// Default Constructor
 		InternalVarsAvailableType() :
 			PntrVarTypeUsed( 0 )
-		{}
-
-		// Member Constructor
-		InternalVarsAvailableType(
-			std::string const & DataTypeName, // general internal variable name registered, All uppercase
-			std::string const & UniqueIDName, // unique id for internal var, All uppercase
-			std::string const & Units, // registered units, used for reporting and checks.
-			int const PntrVarTypeUsed, // data type used: integer (PntrInteger) or real (PntrReal)
-			Reference< Real64 > const RealValue, // fortran POINTER to the REAL value that is being accessed
-			Reference_int const IntValue // fortran POINTER to the Integer value that is being accessed
-		) :
-			DataTypeName( DataTypeName ),
-			UniqueIDName( UniqueIDName ),
-			Units( Units ),
-			PntrVarTypeUsed( PntrVarTypeUsed ),
-			RealValue( RealValue ),
-			IntValue( IntValue )
 		{}
 
 	};
@@ -284,23 +304,6 @@ namespace DataRuntimeLanguage {
 			CheckedOkay( false ),
 			ErlVariableNum( 0 ),
 			InternVarNum( 0 )
-		{}
-
-		// Member Constructor
-		InternalVarsUsedType(
-			std::string const & Name, // Erl variable name
-			std::string const & InternalDataTypeName, // general internal variable name, All uppercase
-			std::string const & UniqueIDName, // unique id for internal var, All uppercase
-			bool const CheckedOkay, // set to true once matched to available internal var
-			int const ErlVariableNum, // points to global Erl variable, matches Name
-			int const InternVarNum // points to index match in EMSInternalVarsAvailable structure
-		) :
-			Name( Name ),
-			InternalDataTypeName( InternalDataTypeName ),
-			UniqueIDName( UniqueIDName ),
-			CheckedOkay( CheckedOkay ),
-			ErlVariableNum( ErlVariableNum ),
-			InternVarNum( InternVarNum )
 		{}
 
 	};
@@ -325,29 +328,6 @@ namespace DataRuntimeLanguage {
 			PntrVarTypeUsed( 0 )
 		{}
 
-		// Member Constructor
-		EMSActuatorAvailableType(
-			std::string const & ComponentTypeName, // general actuator name registered, All uppercase
-			std::string const & UniqueIDName, // unique id for actuator, All uppercase
-			std::string const & ControlTypeName, // control type id for actuator, All uppercase
-			std::string const & Units, // control value units, used for reporting and checks.
-			int const PntrVarTypeUsed, // data type used: integer (PntrInteger), real (PntrReal)
-			Reference_bool const Actuated, // fortran POINTER to the logical value that signals EMS is actuating
-			Reference< Real64 > const RealValue, // fortran POINTER to the REAL value that is being actuated
-			Reference_int const IntValue, // fortran POINTER to the Integer value that is being actuated
-			Reference_bool const LogValue // fortran POINTER to the Logical value that is being actuated
-		) :
-			ComponentTypeName( ComponentTypeName ),
-			UniqueIDName( UniqueIDName ),
-			ControlTypeName( ControlTypeName ),
-			Units( Units ),
-			PntrVarTypeUsed( PntrVarTypeUsed ),
-			Actuated( Actuated ),
-			RealValue( RealValue ),
-			IntValue( IntValue ),
-			LogValue( LogValue )
-		{}
-
 	};
 
 	struct ActuatorUsedType
@@ -369,25 +349,6 @@ namespace DataRuntimeLanguage {
 			ActuatorVariableNum( 0 )
 		{}
 
-		// Member Constructor
-		ActuatorUsedType(
-			std::string const & Name, // Erl variable name
-			std::string const & ComponentTypeName, // general actuator name, All uppercase
-			std::string const & UniqueIDName, // unique id for actuator, All uppercase
-			std::string const & ControlTypeName, // control type id for actuator, All uppercase
-			bool const CheckedOkay, // set to true once matched to available actuator
-			int const ErlVariableNum, // points to global Erl variable, matches Name
-			int const ActuatorVariableNum // points to index match in EMSActuatorAvailable structure
-		) :
-			Name( Name ),
-			ComponentTypeName( ComponentTypeName ),
-			UniqueIDName( UniqueIDName ),
-			ControlTypeName( ControlTypeName ),
-			CheckedOkay( CheckedOkay ),
-			ErlVariableNum( ErlVariableNum ),
-			ActuatorVariableNum( ActuatorVariableNum )
-		{}
-
 	};
 
 	struct EMSProgramCallManagementType
@@ -403,19 +364,6 @@ namespace DataRuntimeLanguage {
 		EMSProgramCallManagementType() :
 			CallingPoint( 0 ),
 			NumErlPrograms( 0 )
-		{}
-
-		// Member Constructor
-		EMSProgramCallManagementType(
-			std::string const & Name, // user defined name for calling manager
-			int const CallingPoint, // EMS Calling point for this manager, see parameters emsCallFrom*
-			int const NumErlPrograms, // count of total number of Erl programs called by this manager
-			Array1_int const & ErlProgramARR // list of integer pointers to Erl programs used by this manager
-		) :
-			Name( Name ),
-			CallingPoint( CallingPoint ),
-			NumErlPrograms( NumErlPrograms ),
-			ErlProgramARR( ErlProgramARR )
 		{}
 
 	};
@@ -484,21 +432,6 @@ namespace DataRuntimeLanguage {
 			SetByExternalInterface( false )
 		{}
 
-		// Member Constructor
-		ErlVariableType(
-			std::string const & Name, // Erl Variable Name
-			int const StackNum, // 0 for global Erl variables, index in ErlStack structure if local
-			ErlValueType const & Value, // values taken by Erl variables
-			bool const ReadOnly, // true if Erl variable is read-only
-			bool const SetByExternalInterface // set to true if value is set by ExternalInterface
-		) :
-			Name( Name ),
-			StackNum( StackNum ),
-			Value( Value ),
-			ReadOnly( ReadOnly ),
-			SetByExternalInterface( SetByExternalInterface )
-		{}
-
 	};
 
 	struct InstructionType
@@ -516,19 +449,6 @@ namespace DataRuntimeLanguage {
 			Keyword( 0 ),
 			Argument1( 0 ),
 			Argument2( 0 )
-		{}
-
-		// Member Constructor
-		InstructionType(
-			int const LineNum, // Erl program line number reference
-			int const Keyword, // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
-			int const Argument1, // Index to a variable, function, expression, or stack
-			int const Argument2 // Index to a variable, function, expression, or stack
-		) :
-			LineNum( LineNum ),
-			Keyword( Keyword ),
-			Argument1( Argument1 ),
-			Argument2( Argument2 )
 		{}
 
 	};
@@ -551,25 +471,6 @@ namespace DataRuntimeLanguage {
 			NumErrors( 0 )
 		{}
 
-		// Member Constructor
-		ErlStackType(
-			std::string const & Name, // Erl program or subroutine name, user defined
-			int const NumLines, // count of lines in Erl program or subroutine
-			Array1_string const & Line, // string array holding lines of Erl code (for processing)
-			int const NumInstructions, // count of program instructions in stack
-			Array1< InstructionType > const & Instruction, // structure array of program instructions
-			int const NumErrors, // count of errors during stack parsing
-			Array1_string const & Error // array of error messages from stack parsing
-		) :
-			Name( Name ),
-			NumLines( NumLines ),
-			Line( Line ),
-			NumInstructions( NumInstructions ),
-			Instruction( Instruction ),
-			NumErrors( NumErrors ),
-			Error( Error )
-		{}
-
 	};
 
 	struct ErlExpressionType
@@ -583,17 +484,6 @@ namespace DataRuntimeLanguage {
 		ErlExpressionType() :
 			Operator( 0 ),
 			NumOperands( 0 )
-		{}
-
-		// Member Constructor
-		ErlExpressionType(
-			int const Operator, // indicates the type of operator or function 1..64
-			int const NumOperands, // count of operands in expression
-			Array1< ErlValueType > const & Operand // holds Erl values for operands in expression
-		) :
-			Operator( Operator ),
-			NumOperands( NumOperands ),
-			Operand( Operand )
 		{}
 
 	};
@@ -612,17 +502,6 @@ namespace DataRuntimeLanguage {
 			NumOperands( 0 )
 		{}
 
-		// Member Constructor
-		OperatorType(
-			std::string const & Symbol, // string representation of operator or function (for reporting)
-			int const Code, // integer code 1..64, identifies operator or function
-			int const NumOperands // count of operands or function arguments.
-		) :
-			Symbol( Symbol ),
-			Code( Code ),
-			NumOperands( NumOperands )
-		{}
-
 	};
 
 	struct TrendVariableType
@@ -639,23 +518,6 @@ namespace DataRuntimeLanguage {
 		TrendVariableType() :
 			ErlVariablePointer( 0 ),
 			LogDepth( 0 )
-		{}
-
-		// Member Constructor
-		TrendVariableType(
-			std::string const & Name,
-			int const ErlVariablePointer, // the Erl variable being logged in trend
-			int const LogDepth, // number of timesteps back
-			Array1< Real64 > const & TrendValARR, // the main storage of trend data
-			Array1< Real64 > const & tempTrendARR, // temporary holder during push
-			Array1< Real64 > const & TimeARR // hours back in time for trend points
-		) :
-			Name( Name ),
-			ErlVariablePointer( ErlVariablePointer ),
-			LogDepth( LogDepth ),
-			TrendValARR( TrendValARR ),
-			tempTrendARR( tempTrendARR ),
-			TimeARR( TimeARR )
 		{}
 
 	};
@@ -724,29 +586,6 @@ namespace DataRuntimeLanguage {
 		bool & errFlag, // true if errors found in this routine.
 		bool & ErrorsFound // true if errors found in this routine.
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DataRuntimeLanguage
 

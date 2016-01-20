@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef WaterToAirHeatPumpSimple_hh_INCLUDED
 #define WaterToAirHeatPumpSimple_hh_INCLUDED
 
@@ -248,181 +306,6 @@ namespace WaterToAirHeatPumpSimple {
 			MaxONOFFCyclesperHour( 0.0 ),
 			HPTimeConstant( 0.0 ),
 			FanDelayTime( 0.0 )
-		{}
-
-		// Member Constructor
-		SimpleWatertoAirHPConditions(
-			std::string const & Name, // Name of the Water to Air Heat pump
-			std::string const & WatertoAirHPType, // Type of WatertoAirHP ie. Heating or Cooling
-			int const WAHPPlantTypeOfNum, // type of component in plant
-			bool const SimFlag, // Heat Pump Simulation Flag
-			Real64 const AirVolFlowRate, // Air Volumetric Flow Rate[m3/s]
-			Real64 const AirMassFlowRate, // Air Mass Flow Rate[kg/s]
-			Real64 const InletAirDBTemp, // Inlet Air Dry Bulb Temperature [C]
-			Real64 const InletAirHumRat, // Inlet Air Humidity Ratio [kg/kg]
-			Real64 const InletAirEnthalpy, // Inlet Air Enthalpy [J/kg]
-			Real64 const OutletAirDBTemp, // Outlet Air Dry Bulb Temperature [C]
-			Real64 const OutletAirHumRat, // Outlet Air Humidity Ratio [kg/kg]
-			Real64 const OutletAirEnthalpy, // Outlet Air Enthalpy [J/kg]
-			Real64 const WaterVolFlowRate, // Water Volumetric Flow Rate [m3/s]
-			Real64 const WaterMassFlowRate, // Water Mass Flow Rate [kg/s]
-			Real64 const DesignWaterMassFlowRate,
-			Real64 const InletWaterTemp, // Inlet Water Temperature [C]
-			Real64 const InletWaterEnthalpy, // Inlet Water Enthalpy [J/kg]
-			Real64 const OutletWaterTemp, // Outlet Water Temperature [C]
-			Real64 const OutletWaterEnthalpy, // Outlet Water Enthalpy [J/kg]
-			Real64 const Power, // Power Consumption [W]
-			Real64 const QLoadTotal, // Load Side Total Heat Transfer Rate [W]
-			Real64 const QSensible, // Sensible Load Side Heat Transfer Rate [W]
-			Real64 const QLatent, // Latent Load Side Heat Transfer Rate [W]
-			Real64 const QSource, // Source Side Heat Transfer Rate [W]
-			Real64 const Energy, // Energy Consumption [J]
-			Real64 const EnergyLoadTotal, // Load Side Total Heat Transferred [J]
-			Real64 const EnergySensible, // Sensible Load Side Heat Transferred [J]
-			Real64 const EnergyLatent, // Latent Load Side Heat Transferred [J]
-			Real64 const EnergySource, // Source Side Heat Transferred [J]
-			Real64 const COP, // Heat Pump Coefficient of Performance [-]
-			Real64 const RunFrac, // Duty Factor
-			Real64 const PartLoadRatio, // Part Load Ratio
-			Real64 const RatedWaterVolFlowRate, // Rated/Ref Water Volumetric Flow Rate [m3/s]
-			Real64 const RatedAirVolFlowRate, // Rated/Ref Air Volumetric Flow Rate [m3/s]
-			Real64 const RatedCapHeat, // Rated/Ref Heating Capacity [W]
-			Real64 const RatedPowerHeat, // Rated/Ref Heating Power Consumption[W]
-			Real64 const RatedCOPHeat, // Rated/Ref Heating COP [W/W]
-			Real64 const RatedCapCoolTotal, // Rated/Ref Total Cooling Capacity [W]
-			Real64 const RatedCapCoolSens, // Rated/Ref Sensible Cooling Capacity [W]
-			Real64 const RatedPowerCool, // Rated/Ref Cooling Power Consumption[W]
-			Real64 const RatedCOPCool, // Rated/Ref Cooling COP [W/W]
-			Real64 const HeatCap1, // 1st coefficient of the Heating capacity performance curve
-			Real64 const HeatCap2, // 2nd coefficient of the Heating capacity performance curve
-			Real64 const HeatCap3, // 3rd coefficient of the Heating capacity performance curve
-			Real64 const HeatCap4, // 4th coefficient of the Heating capacity performance curve
-			Real64 const HeatCap5, // 5th coefficient of the Heating capacity performance curve
-			Real64 const HeatPower1, // 1st coefficient of the Heating power consumption curve
-			Real64 const HeatPower2, // 2nd coefficient of the Heating power consumption curve
-			Real64 const HeatPower3, // 3rd coefficient of the Heating power consumption curve
-			Real64 const HeatPower4, // 4th coefficient of the Heating power consumption curve
-			Real64 const HeatPower5, // 5th coefficient of the Heating power consumption curve
-			Real64 const TotalCoolCap1, // 1st coefficient of the Total Cooling capacity performance curve
-			Real64 const TotalCoolCap2, // 2nd coefficient of the Total Cooling capacity performance curve
-			Real64 const TotalCoolCap3, // 3rd coefficient of the Total Cooling capacity performance curve
-			Real64 const TotalCoolCap4, // 4th coefficient of the Total Cooling capacity performance curve
-			Real64 const TotalCoolCap5, // 5th coefficient of the Total Cooling capacity performance curve
-			Real64 const SensCoolCap1, // 1st coefficient of the Sensible Cooling capacity performance curve
-			Real64 const SensCoolCap2, // 2nd coefficient of the Sensible Cooling capacity performance curve
-			Real64 const SensCoolCap3, // 3rd coefficient of the Sensible Cooling capacity performance curve
-			Real64 const SensCoolCap4, // 4th coefficient of the Sensible Cooling capacity performance curve
-			Real64 const SensCoolCap5, // 5th coefficient of the Sensible Cooling capacity performance curve
-			Real64 const SensCoolCap6, // 6th coefficient of the Sensible Cooling capacity performance curve
-			Real64 const CoolPower1, // 1st coefficient of the Cooling power consumption curve
-			Real64 const CoolPower2, // 2nd coefficient of the Cooling power consumption curve
-			Real64 const CoolPower3, // 3rd coefficient of the Cooling power consumption curve
-			Real64 const CoolPower4, // 4th coefficient of the Cooling power consumption curve
-			Real64 const CoolPower5, // 5th coefficient of the Cooling power consumption curve
-			int const AirInletNodeNum, // Node Number of the Air Inlet
-			int const AirOutletNodeNum, // Node Number of the Air Outlet
-			int const WaterInletNodeNum, // Node Number of the Water Onlet
-			int const WaterOutletNodeNum, // Node Number of the Water Outlet
-			int const LoopNum, // plant loop index for water side
-			int const LoopSide, // plant loop side index
-			int const BranchNum, // plant branch index
-			int const CompNum, // plant component index
-			int const WaterCyclingMode, // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
-			int const LastOperatingMode, // type of coil calling for water flow, either heating or cooling,
-			bool const WaterFlowMode, // whether the water flow through the coil is called
-			int const CompanionCoolingCoilNum, // Heating coil companion cooling coil index
-			int const CompanionHeatingCoilNum, // Cooling coil companion heating coil index
-			Real64 const Twet_Rated, // Nominal Time for Condensate Removal to Begin [s]
-			Real64 const Gamma_Rated, // Ratio of Initial Moisture Evaporation Rate
-			Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-			Real64 const HPTimeConstant, // Heat pump time constant [s]
-			Real64 const FanDelayTime // Fan delay time, time delay for the HP's fan to
-		) :
-			Name( Name ),
-			WatertoAirHPType( WatertoAirHPType ),
-			WAHPPlantTypeOfNum( WAHPPlantTypeOfNum ),
-			SimFlag( SimFlag ),
-			AirVolFlowRate( AirVolFlowRate ),
-			AirMassFlowRate( AirMassFlowRate ),
-			InletAirDBTemp( InletAirDBTemp ),
-			InletAirHumRat( InletAirHumRat ),
-			InletAirEnthalpy( InletAirEnthalpy ),
-			OutletAirDBTemp( OutletAirDBTemp ),
-			OutletAirHumRat( OutletAirHumRat ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			WaterVolFlowRate( WaterVolFlowRate ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			DesignWaterMassFlowRate( DesignWaterMassFlowRate ),
-			InletWaterTemp( InletWaterTemp ),
-			InletWaterEnthalpy( InletWaterEnthalpy ),
-			OutletWaterTemp( OutletWaterTemp ),
-			OutletWaterEnthalpy( OutletWaterEnthalpy ),
-			Power( Power ),
-			QLoadTotal( QLoadTotal ),
-			QSensible( QSensible ),
-			QLatent( QLatent ),
-			QSource( QSource ),
-			Energy( Energy ),
-			EnergyLoadTotal( EnergyLoadTotal ),
-			EnergySensible( EnergySensible ),
-			EnergyLatent( EnergyLatent ),
-			EnergySource( EnergySource ),
-			COP( COP ),
-			RunFrac( RunFrac ),
-			PartLoadRatio( PartLoadRatio ),
-			RatedWaterVolFlowRate( RatedWaterVolFlowRate ),
-			RatedAirVolFlowRate( RatedAirVolFlowRate ),
-			RatedCapHeat( RatedCapHeat ),
-			RatedPowerHeat( RatedPowerHeat ),
-			RatedCOPHeat( RatedCOPHeat ),
-			RatedCapCoolTotal( RatedCapCoolTotal ),
-			RatedCapCoolSens( RatedCapCoolSens ),
-			RatedPowerCool( RatedPowerCool ),
-			RatedCOPCool( RatedCOPCool ),
-			HeatCap1( HeatCap1 ),
-			HeatCap2( HeatCap2 ),
-			HeatCap3( HeatCap3 ),
-			HeatCap4( HeatCap4 ),
-			HeatCap5( HeatCap5 ),
-			HeatPower1( HeatPower1 ),
-			HeatPower2( HeatPower2 ),
-			HeatPower3( HeatPower3 ),
-			HeatPower4( HeatPower4 ),
-			HeatPower5( HeatPower5 ),
-			TotalCoolCap1( TotalCoolCap1 ),
-			TotalCoolCap2( TotalCoolCap2 ),
-			TotalCoolCap3( TotalCoolCap3 ),
-			TotalCoolCap4( TotalCoolCap4 ),
-			TotalCoolCap5( TotalCoolCap5 ),
-			SensCoolCap1( SensCoolCap1 ),
-			SensCoolCap2( SensCoolCap2 ),
-			SensCoolCap3( SensCoolCap3 ),
-			SensCoolCap4( SensCoolCap4 ),
-			SensCoolCap5( SensCoolCap5 ),
-			SensCoolCap6( SensCoolCap6 ),
-			CoolPower1( CoolPower1 ),
-			CoolPower2( CoolPower2 ),
-			CoolPower3( CoolPower3 ),
-			CoolPower4( CoolPower4 ),
-			CoolPower5( CoolPower5 ),
-			AirInletNodeNum( AirInletNodeNum ),
-			AirOutletNodeNum( AirOutletNodeNum ),
-			WaterInletNodeNum( WaterInletNodeNum ),
-			WaterOutletNodeNum( WaterOutletNodeNum ),
-			LoopNum( LoopNum ),
-			LoopSide( LoopSide ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			WaterCyclingMode( WaterCyclingMode ),
-			LastOperatingMode( LastOperatingMode ),
-			WaterFlowMode( WaterFlowMode ),
-			CompanionCoolingCoilNum( CompanionCoolingCoilNum ),
-			CompanionHeatingCoilNum( CompanionHeatingCoilNum ),
-			Twet_Rated( Twet_Rated ),
-			Gamma_Rated( Gamma_Rated ),
-			MaxONOFFCyclesperHour( MaxONOFFCyclesperHour ),
-			HPTimeConstant( HPTimeConstant ),
-			FanDelayTime( FanDelayTime )
 		{}
 
 	};
