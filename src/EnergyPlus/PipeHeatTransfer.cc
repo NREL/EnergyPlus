@@ -257,16 +257,16 @@ namespace PipeHeatTransfer {
 		for ( InnerTimeStepCtr = 1; InnerTimeStepCtr <= nsvNumInnerTimeSteps; ++InnerTimeStepCtr ) {
 			{ auto const SELECT_CASE_var( PipeHT( nsvPipeHTNum ).EnvironmentPtr );
 			if ( SELECT_CASE_var == GroundEnv ) {
-				CalcBuriedPipeSoil( nsvPipeHTNum );
+				PipeHT( nsvPipeHTNum ).CalcBuriedPipeSoil();
 			} else {
-				CalcPipesHeatTransfer( nsvPipeHTNum );
+				PipeHT( nsvPipeHTNum ).CalcPipesHeatTransfer();
 			}}
 			PipeHT( nsvPipeHTNum ).PushInnerTimeStepArrays();
 		}
 		// update vaiables
-		UpdatePipesHeatTransfer();
+		PipeHT( nsvPipeHTNum ).UpdatePipesHeatTransfer();
 		// update report variables
-		ReportPipesHeatTransfer( nsvPipeHTNum );
+		PipeHT( nsvPipeHTNum ).ReportPipesHeatTransfer();
 
 	}
 
@@ -404,9 +404,6 @@ namespace PipeHeatTransfer {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
-				//    ELSE
-				//      CALL ValidatePipeConstruction(TRIM(cCurrentModuleObject),TRIM(cAlphaArgs(2)),TRIM(cAlphaFieldNames(2)),  &
-				//         PipeHT(Item)%ConstructionNum,Item,ErrorsFound)
 			}
 
 			//get inlet node data
@@ -489,7 +486,7 @@ namespace PipeHeatTransfer {
 			}
 
 			if ( PipeHT( Item ).ConstructionNum != 0 ) {
-				ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), PipeHT( Item ).ConstructionNum, Item, ErrorsFound );
+				PipeHT( Item ).ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), PipeHT( Item ).ConstructionNum, ErrorsFound );
 			}
 
 		} // end of input loop
@@ -518,9 +515,6 @@ namespace PipeHeatTransfer {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
-				//    ELSE
-				//      CALL ValidatePipeConstruction(TRIM(cCurrentModuleObject),TRIM(cAlphaArgs(2)),TRIM(cAlphaFieldNames(2)),  &
-				//         PipeHT(Item)%ConstructionNum,Item,ErrorsFound)
 			}
 
 			//get inlet node data
@@ -581,7 +575,7 @@ namespace PipeHeatTransfer {
 			}
 
 			if ( PipeHT( Item ).ConstructionNum != 0 ) {
-				ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), PipeHT( Item ).ConstructionNum, Item, ErrorsFound );
+				PipeHT( Item ).ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), PipeHT( Item ).ConstructionNum, ErrorsFound );
 			}
 
 		} // end of input loop
@@ -611,9 +605,6 @@ namespace PipeHeatTransfer {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
-				//    ELSE
-				//      CALL ValidatePipeConstruction(TRIM(cCurrentModuleObject),TRIM(cAlphaArgs(2)),TRIM(cAlphaFieldNames(2)),  &
-				//         PipeHT(Item)%ConstructionNum,Item,ErrorsFound)
 			}
 
 			//get inlet node data
@@ -697,7 +688,7 @@ namespace PipeHeatTransfer {
 			}
 
 			if ( PipeHT( Item ).ConstructionNum != 0 ) {
-				ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), PipeHT( Item ).ConstructionNum, Item, ErrorsFound );
+				PipeHT( Item ).ValidatePipeConstruction( cCurrentModuleObject, cAlphaArgs( 2 ), cAlphaFieldNames( 2 ), PipeHT( Item ).ConstructionNum, ErrorsFound );
 			}
 
 			// Get ground temperature model
@@ -772,12 +763,11 @@ namespace PipeHeatTransfer {
 	}
 
 	void
-	ValidatePipeConstruction(
+	PipeHTData::ValidatePipeConstruction(
 		std::string const & PipeType, // module object of pipe (error messages)
 		std::string const & ConstructionName, // construction name of pipe (error messages)
 		std::string const & FieldName, // fieldname of pipe (error messages)
 		int const ConstructionNum, // pointer into construction data
-		int const PipeNum, // pointer into pipe data
 		bool & ErrorsFound // set to true if errors found here
 	)
 	{
@@ -830,12 +820,12 @@ namespace PipeHeatTransfer {
 		// get pipe properties
 		if ( TotalLayers == 1 ) { // no insulation layer
 
-			PipeHT( PipeNum ).PipeConductivity = Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Conductivity;
-			PipeHT( PipeNum ).PipeDensity = Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Density;
-			PipeHT( PipeNum ).PipeCp = Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).SpecHeat;
-			PipeHT( PipeNum ).PipeOD = PipeHT( PipeNum ).PipeID + 2.0 * Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Thickness;
-			PipeHT( PipeNum ).InsulationOD = PipeHT( PipeNum ).PipeOD;
-			PipeHT( PipeNum ).SumTK = Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Thickness / Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Conductivity;
+			this->PipeConductivity = Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Conductivity;
+			this->PipeDensity = Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Density;
+			this->PipeCp = Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).SpecHeat;
+			this->PipeOD = this->PipeID + 2.0 * Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Thickness;
+			this->InsulationOD = this->PipeOD;
+			this->SumTK = Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Thickness / Material( Construct( ConstructionNum ).LayerPoint( 1 ) ).Conductivity;
 
 		} else if ( TotalLayers >= 2 ) { // first layers are insulation, last layer is pipe
 
@@ -844,22 +834,22 @@ namespace PipeHeatTransfer {
 				Density = Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Density * Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Thickness;
 				TotThickness += Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Thickness;
 				SpHeat = Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).SpecHeat * Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Thickness;
-				PipeHT( PipeNum ).InsulationThickness = Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Thickness;
-				PipeHT( PipeNum ).SumTK += Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Thickness / Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Conductivity;
+				this->InsulationThickness = Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Thickness;
+				this->SumTK += Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Thickness / Material( Construct( ConstructionNum ).LayerPoint( LayerNum ) ).Conductivity;
 			}
 
-			PipeHT( PipeNum ).InsulationResistance = Resistance;
-			PipeHT( PipeNum ).InsulationConductivity = TotThickness / Resistance;
-			PipeHT( PipeNum ).InsulationDensity = Density / TotThickness;
-			PipeHT( PipeNum ).InsulationCp = SpHeat / TotThickness;
-			PipeHT( PipeNum ).InsulationThickness = TotThickness;
+			this->InsulationResistance = Resistance;
+			this->InsulationConductivity = TotThickness / Resistance;
+			this->InsulationDensity = Density / TotThickness;
+			this->InsulationCp = SpHeat / TotThickness;
+			this->InsulationThickness = TotThickness;
 
-			PipeHT( PipeNum ).PipeConductivity = Material( Construct( ConstructionNum ).LayerPoint( TotalLayers ) ).Conductivity;
-			PipeHT( PipeNum ).PipeDensity = Material( Construct( ConstructionNum ).LayerPoint( TotalLayers ) ).Density;
-			PipeHT( PipeNum ).PipeCp = Material( Construct( ConstructionNum ).LayerPoint( TotalLayers ) ).SpecHeat;
+			this->PipeConductivity = Material( Construct( ConstructionNum ).LayerPoint( TotalLayers ) ).Conductivity;
+			this->PipeDensity = Material( Construct( ConstructionNum ).LayerPoint( TotalLayers ) ).Density;
+			this->PipeCp = Material( Construct( ConstructionNum ).LayerPoint( TotalLayers ) ).SpecHeat;
 
-			PipeHT( PipeNum ).PipeOD = PipeHT( PipeNum ).PipeID + 2.0 * Material( Construct( ConstructionNum ).LayerPoint( TotalLayers ) ).Thickness;
-			PipeHT( PipeNum ).InsulationOD = PipeHT( PipeNum ).PipeOD + 2.0 * PipeHT( PipeNum ).InsulationThickness;
+			this->PipeOD = this->PipeID + 2.0 * Material( Construct( ConstructionNum ).LayerPoint( TotalLayers ) ).Thickness;
+			this->InsulationOD = this->PipeOD + 2.0 * this->InsulationThickness;
 
 		} else {
 			ShowSevereError( PipeType + ": invalid " + FieldName + "=\"" + ConstructionName + "\", too many layers=[" + TrimSigDigits( TotalLayers ) + "], only 1 or 2 allowed." );
@@ -1195,8 +1185,7 @@ namespace PipeHeatTransfer {
 	//==============================================================================
 
 	void
-	CalcPipesHeatTransfer(
-		int const PipeHTNum, // component number
+	PipeHTData::CalcPipesHeatTransfer(
 		Optional_int_const LengthIndex
 	)
 	{
@@ -1262,9 +1251,9 @@ namespace PipeHeatTransfer {
 		Real64 SurfaceTemp;
 
 		// traps fluid properties problems such as freezing conditions
-		if ( PipeHT( PipeHTNum ).FluidSpecHeat <= 0.0 || PipeHT( PipeHTNum ).FluidDensity <= 0.0 ) {
+		if ( this->FluidSpecHeat <= 0.0 || this->FluidDensity <= 0.0 ) {
 			// leave the state of the pipe as it was
-			nsvOutletTemp = PipeHT( PipeHTNum ).TentativeFluidTemp( PipeHT( PipeHTNum ).NumSections );
+			nsvOutletTemp = this->TentativeFluidTemp( this->NumSections );
 			// set heat transfer rates to zero for consistency
 			nsvEnvHeatLossRate = 0.0;
 			nsvFluidHeatLossRate = 0.0;
@@ -1274,18 +1263,18 @@ namespace PipeHeatTransfer {
 		//  AirConvCoef =  OutsidePipeHeatTransCoef(PipeHTNum)
 		// Revised by L. Gu by including insulation conductance 6/19/08
 
-		if ( PipeHT( PipeHTNum ).EnvironmentPtr != GroundEnv ) {
-			AirConvCoef = 1.0 / ( 1.0 / OutsidePipeHeatTransCoef( PipeHTNum ) + PipeHT( PipeHTNum ).InsulationResistance );
+		if ( this->EnvironmentPtr != GroundEnv ) {
+			AirConvCoef = 1.0 / ( 1.0 / this->OutsidePipeHeatTransCoef() + this->InsulationResistance );
 		}
 
-		FluidConvCoef = CalcPipeHeatTransCoef( PipeHTNum, nsvInletTemp, nsvMassFlowRate, PipeHT( PipeHTNum ).PipeID );
+		FluidConvCoef = this->CalcPipeHeatTransCoef( nsvInletTemp, nsvMassFlowRate, this->PipeID );
 
 		// heat transfer to air or ground
-		{ auto const SELECT_CASE_var( PipeHT( PipeHTNum ).EnvironmentPtr );
+		{ auto const SELECT_CASE_var( this->EnvironmentPtr );
 		if ( SELECT_CASE_var == GroundEnv ) {
 			//Approximate conductance using ground conductivity, (h=k/L), where L is grid spacing
 			// between pipe wall and next closest node.
-			EnvHeatTransCoef = PipeHT( PipeHTNum ).SoilConductivity / ( PipeHT( PipeHTNum ).dSregular - ( PipeHT( PipeHTNum ).PipeID / 2.0 ) );
+			EnvHeatTransCoef = this->SoilConductivity / ( this->dSregular - ( this->PipeID / 2.0 ) );
 		} else if ( SELECT_CASE_var == OutsideAirEnv ) {
 			EnvHeatTransCoef = AirConvCoef;
 		} else if ( SELECT_CASE_var == ZoneEnv ) {
@@ -1299,82 +1288,82 @@ namespace PipeHeatTransfer {
 		}}
 
 		// work out the coefficients
-		FluidNodeHeatCapacity = PipeHT( PipeHTNum ).SectionArea * PipeHT( PipeHTNum ).Length / PipeHT( PipeHTNum ).NumSections * PipeHT( PipeHTNum ).FluidSpecHeat * PipeHT( PipeHTNum ).FluidDensity; // Mass of Node x Specific heat
+		FluidNodeHeatCapacity = this->SectionArea * this->Length / this->NumSections * this->FluidSpecHeat * this->FluidDensity; // Mass of Node x Specific heat
 
 		// coef of fluid heat balance
-		A1 = FluidNodeHeatCapacity + nsvMassFlowRate * PipeHT( PipeHTNum ).FluidSpecHeat * nsvDeltaTime + FluidConvCoef * PipeHT( PipeHTNum ).InsideArea * nsvDeltaTime;
+		A1 = FluidNodeHeatCapacity + nsvMassFlowRate * this->FluidSpecHeat * nsvDeltaTime + FluidConvCoef * this->InsideArea * nsvDeltaTime;
 
-		A2 = nsvMassFlowRate * PipeHT( PipeHTNum ).FluidSpecHeat * nsvDeltaTime;
+		A2 = nsvMassFlowRate * this->FluidSpecHeat * nsvDeltaTime;
 
-		A3 = FluidConvCoef * PipeHT( PipeHTNum ).InsideArea * nsvDeltaTime;
+		A3 = FluidConvCoef * this->InsideArea * nsvDeltaTime;
 
 		A4 = FluidNodeHeatCapacity;
 
 		// coef of pipe heat balance
-		B1 = PipeHT( PipeHTNum ).PipeHeatCapacity + FluidConvCoef * PipeHT( PipeHTNum ).InsideArea * nsvDeltaTime + EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * nsvDeltaTime;
+		B1 = this->PipeHeatCapacity + FluidConvCoef * this->InsideArea * nsvDeltaTime + EnvHeatTransCoef * this->OutsideArea * nsvDeltaTime;
 
 		B2 = A3;
 
-		B3 = EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * nsvDeltaTime;
+		B3 = EnvHeatTransCoef * this->OutsideArea * nsvDeltaTime;
 
-		B4 = PipeHT( PipeHTNum ).PipeHeatCapacity;
+		B4 = this->PipeHeatCapacity;
 
-		PipeHT( PipeHTNum ).TentativeFluidTemp( 0 ) = nsvInletTemp;
+		this->TentativeFluidTemp( 0 ) = nsvInletTemp;
 
-		PipeHT( PipeHTNum ).TentativePipeTemp( 0 ) = PipeHT( PipeHTNum ).PipeTemp( 1 ); // for convenience
+		this->TentativePipeTemp( 0 ) = this->PipeTemp( 1 ); // for convenience
 
 		if ( present( LengthIndex ) ) { //Just simulate the single section if being called from Pipe:Underground
 
-			PipeDepth = PipeHT( PipeHTNum ).PipeNodeDepth;
-			PipeWidth = PipeHT( PipeHTNum ).PipeNodeWidth;
-			TempBelow = PipeHT( PipeHTNum ).T( PipeWidth, PipeDepth + 1, LengthIndex, CurrentTimeIndex );
-			TempBeside = PipeHT( PipeHTNum ).T( PipeWidth - 1, PipeDepth, LengthIndex, CurrentTimeIndex );
-			TempAbove = PipeHT( PipeHTNum ).T( PipeWidth, PipeDepth - 1, LengthIndex, CurrentTimeIndex );
+			PipeDepth = this->PipeNodeDepth;
+			PipeWidth = this->PipeNodeWidth;
+			TempBelow = this->T( PipeWidth, PipeDepth + 1, LengthIndex, CurrentTimeIndex );
+			TempBeside = this->T( PipeWidth - 1, PipeDepth, LengthIndex, CurrentTimeIndex );
+			TempAbove = this->T( PipeWidth, PipeDepth - 1, LengthIndex, CurrentTimeIndex );
 			nsvEnvironmentTemp = ( TempBelow + TempBeside + TempAbove ) / 3.0;
 
-			PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex ) = ( A2 * PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex - 1 ) + A3 / B1 * ( B3 * nsvEnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( LengthIndex ) ) + A4 * PipeHT( PipeHTNum ).PreviousFluidTemp( LengthIndex ) ) / ( A1 - A3 * B2 / B1 );
+			this->TentativeFluidTemp( LengthIndex ) = ( A2 * this->TentativeFluidTemp( LengthIndex - 1 ) + A3 / B1 * ( B3 * nsvEnvironmentTemp + B4 * this->PreviousPipeTemp( LengthIndex ) ) + A4 * this->PreviousFluidTemp( LengthIndex ) ) / ( A1 - A3 * B2 / B1 );
 
-			PipeHT( PipeHTNum ).TentativePipeTemp( LengthIndex ) = ( B2 * PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex ) + B3 * nsvEnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( LengthIndex ) ) / B1;
+			this->TentativePipeTemp( LengthIndex ) = ( B2 * this->TentativeFluidTemp( LengthIndex ) + B3 * nsvEnvironmentTemp + B4 * this->PreviousPipeTemp( LengthIndex ) ) / B1;
 
 			// Get exterior surface temperature from energy balance at the surface
-			Numerator = nsvEnvironmentTemp - PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex );
-			Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + PipeHT( PipeHTNum ).SumTK );
+			Numerator = nsvEnvironmentTemp - this->TentativeFluidTemp( LengthIndex );
+			Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + this->SumTK );
 			SurfaceTemp = nsvEnvironmentTemp - Numerator / Denominator;
 
 			// keep track of environmental heat loss rate - not same as fluid loss at same time
-			nsvEnvHeatLossRate += EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * ( SurfaceTemp - nsvEnvironmentTemp );
+			nsvEnvHeatLossRate += EnvHeatTransCoef * this->OutsideArea * ( SurfaceTemp - nsvEnvironmentTemp );
 
 		} else { //Simulate all sections at once if not pipe:underground
 
 			// start loop along pipe
 			// b1 must not be zero but this should have been checked on input
-			for ( curnode = 1; curnode <= PipeHT( PipeHTNum ).NumSections; ++curnode ) {
-				PipeHT( PipeHTNum ).TentativeFluidTemp( curnode ) = ( A2 * PipeHT( PipeHTNum ).TentativeFluidTemp( curnode - 1 ) + A3 / B1 * ( B3 * nsvEnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( curnode ) ) + A4 * PipeHT( PipeHTNum ).PreviousFluidTemp( curnode ) ) / ( A1 - A3 * B2 / B1 );
+			for ( curnode = 1; curnode <= this->NumSections; ++curnode ) {
+				this->TentativeFluidTemp( curnode ) = ( A2 * this->TentativeFluidTemp( curnode - 1 ) + A3 / B1 * ( B3 * nsvEnvironmentTemp + B4 * this->PreviousPipeTemp( curnode ) ) + A4 * this->PreviousFluidTemp( curnode ) ) / ( A1 - A3 * B2 / B1 );
 
-				PipeHT( PipeHTNum ).TentativePipeTemp( curnode ) = ( B2 * PipeHT( PipeHTNum ).TentativeFluidTemp( curnode ) + B3 * nsvEnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( curnode ) ) / B1;
+				this->TentativePipeTemp( curnode ) = ( B2 * this->TentativeFluidTemp( curnode ) + B3 * nsvEnvironmentTemp + B4 * this->PreviousPipeTemp( curnode ) ) / B1;
 
 				// Get exterior surface temperature from energy balance at the surface
-				Numerator = nsvEnvironmentTemp - PipeHT( PipeHTNum ).TentativeFluidTemp( curnode );
-				Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + PipeHT( PipeHTNum ).SumTK );
+				Numerator = nsvEnvironmentTemp - this->TentativeFluidTemp( curnode );
+				Denominator = EnvHeatTransCoef * ( ( 1 / EnvHeatTransCoef ) + this->SumTK );
 				SurfaceTemp = nsvEnvironmentTemp - Numerator / Denominator;
 
 				// Keep track of environmental heat loss
-				nsvEnvHeatLossRate += EnvHeatTransCoef * PipeHT( PipeHTNum ).OutsideArea * ( SurfaceTemp - nsvEnvironmentTemp );
+				nsvEnvHeatLossRate += EnvHeatTransCoef * this->OutsideArea * ( SurfaceTemp - nsvEnvironmentTemp );
 
 			}
 
 		}
 
-		nsvFluidHeatLossRate = nsvMassFlowRate * PipeHT( PipeHTNum ).FluidSpecHeat * ( PipeHT( PipeHTNum ).TentativeFluidTemp( 0 ) - PipeHT( PipeHTNum ).TentativeFluidTemp( PipeHT( PipeHTNum ).NumSections ) );
+		nsvFluidHeatLossRate = nsvMassFlowRate * this->FluidSpecHeat * ( this->TentativeFluidTemp( 0 ) - this->TentativeFluidTemp( this->NumSections ) );
 
-		nsvOutletTemp = PipeHT( PipeHTNum ).TentativeFluidTemp( PipeHT( PipeHTNum ).NumSections );
+		nsvOutletTemp = this->TentativeFluidTemp( this->NumSections );
 
 	}
 
 	//==============================================================================
 
 	void
-	CalcBuriedPipeSoil( int const PipeHTNum ) // Current Simulation Pipe Number
+	PipeHTData::CalcBuriedPipeSoil() // Current Simulation Pipe Number
 	{
 
 		//       AUTHOR         Edwin Lee
@@ -1425,7 +1414,7 @@ namespace PipeHeatTransfer {
 		static Real64 ConvCoef( 0.0 ); // Current convection coefficient = f(Wind Speed,Roughness)
 		static Real64 RadCoef( 0.0 ); // Current radiation coefficient
 		static Real64 QSolAbsorbed( 0.0 ); // Current total solar energy absorbed
-		Array3D< Real64 > T_O( PipeHT( PipeHTNum ).PipeNodeWidth, PipeHT( PipeHTNum ).NumDepthNodes, NumSections );
+		Array3D< Real64 > T_O( this->PipeNodeWidth, this->NumDepthNodes, NumSections );
 
 		//Local variable placeholders for code readability
 		static Real64 A1( 0.0 ); // Placeholder for CoefA1
@@ -1447,46 +1436,46 @@ namespace PipeHeatTransfer {
 		static Real64 Cp( 0.0 ); // Placeholder for soil specific heat
 
 		// There are a number of coefficients which change through the simulation, and they are updated here
-		PipeHT( PipeHTNum ).FourierDS = PipeHT( PipeHTNum ).SoilDiffusivity * nsvDeltaTime / pow_2( PipeHT( PipeHTNum ).dSregular ); //Eq. D4
-		PipeHT( PipeHTNum ).CoefA1 = PipeHT( PipeHTNum ).FourierDS / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D2
-		PipeHT( PipeHTNum ).CoefA2 = 1 / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D3
+		this->FourierDS = this->SoilDiffusivity * nsvDeltaTime / pow_2( this->dSregular ); //Eq. D4
+		this->CoefA1 = this->FourierDS / ( 1 + 4 * this->FourierDS ); //Eq. D2
+		this->CoefA2 = 1 / ( 1 + 4 * this->FourierDS ); //Eq. D3
 
 		for ( IterationIndex = 1; IterationIndex <= MaxIterations; ++IterationIndex ) {
 			if ( IterationIndex == MaxIterations ) {
-				ShowWarningError( "BuriedPipeHeatTransfer: Large number of iterations detected in object: " + PipeHT( PipeHTNum ).Name );
+				ShowWarningError( "BuriedPipeHeatTransfer: Large number of iterations detected in object: " + this->Name );
 			}
 
 			//Store computed values in T_O array
-			for ( LengthIndex = 2; LengthIndex <= PipeHT( PipeHTNum ).NumSections; ++LengthIndex ) {
-				for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes - 1; ++DepthIndex ) {
-					for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
-						T_O( WidthIndex, DepthIndex, LengthIndex ) = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
+			for ( LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex ) {
+				for ( DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex ) {
+					for ( WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
+						T_O( WidthIndex, DepthIndex, LengthIndex ) = this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
 					}
 				}
 			}
 
 			//Loop along entire length of pipe, analyzing cross sects
-			for ( LengthIndex = 1; LengthIndex <= PipeHT( PipeHTNum ).NumSections; ++LengthIndex ) {
-				for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes - 1; ++DepthIndex ) {
-					for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
+			for ( LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex ) {
+				for ( DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex ) {
+					for ( WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 
 						if ( DepthIndex == 1 ) { //Soil Surface Boundary
 
 							//If on soil boundary, load up local variables and perform calculations
-							NodePast = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex );
+							NodePast = this->T( WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex );
 							PastNodeTempAbs = NodePast + KelvinConv;
 							SkyTempAbs = SkyTemp + KelvinConv;
-							TopRoughness = PipeHT( PipeHTNum ).SoilRoughness;
-							TopThermAbs = PipeHT( PipeHTNum ).SoilThermAbs;
-							TopSolarAbs = PipeHT( PipeHTNum ).SoilSolarAbs;
-							kSoil = PipeHT( PipeHTNum ).SoilConductivity;
-							dS = PipeHT( PipeHTNum ).dSregular;
-							rho = PipeHT( PipeHTNum ).SoilDensity;
-							Cp = PipeHT( PipeHTNum ).SoilCp;
+							TopRoughness = this->SoilRoughness;
+							TopThermAbs = this->SoilThermAbs;
+							TopSolarAbs = this->SoilSolarAbs;
+							kSoil = this->SoilConductivity;
+							dS = this->dSregular;
+							rho = this->SoilDensity;
+							Cp = this->SoilCp;
 
 							// ASHRAE simple convection coefficient model for external surfaces.
-							PipeHT( PipeHTNum ).OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff( TopRoughness, WindSpeed );
-							ConvCoef = PipeHT( PipeHTNum ).OutdoorConvCoef;
+							this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff( TopRoughness, WindSpeed );
+							ConvCoef = this->OutdoorConvCoef;
 
 							// thermal radiation coefficient using surf temp from past time step
 							if ( std::abs( PastNodeTempAbs - SkyTempAbs ) > rTinyValue ) {
@@ -1499,70 +1488,70 @@ namespace PipeHeatTransfer {
 							QSolAbsorbed = TopSolarAbs * ( max( SOLCOS( 3 ), 0.0 ) * BeamSolarRad + DifSolarRad );
 
 							// If sun is not exposed, then turn off both solar and thermal radiation
-							if ( ! PipeHT( PipeHTNum ).SolarExposed ) {
+							if ( ! this->SolarExposed ) {
 								RadCoef = 0.0;
 								QSolAbsorbed = 0.0;
 							}
 
-							if ( WidthIndex == PipeHT( PipeHTNum ).PipeNodeWidth ) { //Symmetric centerline boundary
+							if ( WidthIndex == this->PipeNodeWidth ) { //Symmetric centerline boundary
 
 								//-Coefficients and Temperatures
-								NodeBelow = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
-								NodeLeft = PipeHT( PipeHTNum ).T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+								NodeBelow = this->T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
+								NodeLeft = this->T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
 
 								//-Update Equation, basically a detailed energy balance at the surface
-								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + 2 * NodeLeft ) + ( rho * Cp / nsvDeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / nsvDeltaTime ) );
+								this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + 2 * NodeLeft ) + ( rho * Cp / nsvDeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / nsvDeltaTime ) );
 
 							} else { //Soil surface, but not on centerline
 
 								//-Coefficients and Temperatures
-								NodeBelow = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
-								NodeLeft = PipeHT( PipeHTNum ).T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
-								NodeRight = PipeHT( PipeHTNum ).T( WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+								NodeBelow = this->T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
+								NodeLeft = this->T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+								NodeRight = this->T( WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex );
 
 								//-Update Equation
-								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + NodeLeft + NodeRight ) + ( rho * Cp / nsvDeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / nsvDeltaTime ) );
+								this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + NodeLeft + NodeRight ) + ( rho * Cp / nsvDeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / nsvDeltaTime ) );
 
 							} //Soil-to-air surface node structure
 
-						} else if ( WidthIndex == PipeHT( PipeHTNum ).PipeNodeWidth ) { //On Symmetric centerline boundary
+						} else if ( WidthIndex == this->PipeNodeWidth ) { //On Symmetric centerline boundary
 
-							if ( DepthIndex == PipeHT( PipeHTNum ).PipeNodeDepth ) { //On the node containing the pipe
+							if ( DepthIndex == this->PipeNodeDepth ) { //On the node containing the pipe
 
 								//-Call to simulate a single pipe segment (by passing OPTIONAL LengthIndex argument)
-								CalcPipesHeatTransfer( PipeHTNum, LengthIndex );
+								this->CalcPipesHeatTransfer( LengthIndex );
 
 								//-Update node for cartesian system
-								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = PipeHT( PipeHTNum ).PipeTemp( LengthIndex );
+								this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = this->PipeTemp( LengthIndex );
 
 							} else if ( DepthIndex != 1 ) { //Not surface node
 
 								//-Coefficients and Temperatures
-								NodeLeft = PipeHT( PipeHTNum ).T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
-								NodeAbove = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex );
-								NodeBelow = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
-								NodePast = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1 );
-								A1 = PipeHT( PipeHTNum ).CoefA1;
-								A2 = PipeHT( PipeHTNum ).CoefA2;
+								NodeLeft = this->T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+								NodeAbove = this->T( WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex );
+								NodeBelow = this->T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
+								NodePast = this->T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1 );
+								A1 = this->CoefA1;
+								A2 = this->CoefA2;
 
 								//-Update Equation
-								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = A1 * ( NodeBelow + NodeAbove + 2 * NodeLeft ) + A2 * NodePast;
+								this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = A1 * ( NodeBelow + NodeAbove + 2 * NodeLeft ) + A2 * NodePast;
 
 							} //Symmetric centerline node structure
 
 						} else { //All Normal Interior Nodes
 
 							//-Coefficients and Temperatures
-							A1 = PipeHT( PipeHTNum ).CoefA1;
-							A2 = PipeHT( PipeHTNum ).CoefA2;
-							NodeBelow = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
-							NodeAbove = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex );
-							NodeRight = PipeHT( PipeHTNum ).T( WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex );
-							NodeLeft = PipeHT( PipeHTNum ).T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
-							NodePast = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1 );
+							A1 = this->CoefA1;
+							A2 = this->CoefA2;
+							NodeBelow = this->T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
+							NodeAbove = this->T( WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex );
+							NodeRight = this->T( WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+							NodeLeft = this->T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+							NodePast = this->T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1 );
 
 							//-Update Equation
-							PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = A1 * ( NodeBelow + NodeAbove + NodeRight + NodeLeft ) + A2 * NodePast; //Eq. D1
+							this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = A1 * ( NodeBelow + NodeAbove + NodeRight + NodeLeft ) + A2 * NodePast; //Eq. D1
 
 						}
 					}
@@ -1570,10 +1559,10 @@ namespace PipeHeatTransfer {
 			}
 
 			//Check for convergence
-			for ( LengthIndex = 2; LengthIndex <= PipeHT( PipeHTNum ).NumSections; ++LengthIndex ) {
-				for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes - 1; ++DepthIndex ) {
-					for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
-						Ttemp = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
+			for ( LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex ) {
+				for ( DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex ) {
+					for ( WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
+						Ttemp = this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
 						if ( std::abs( T_O( WidthIndex, DepthIndex, LengthIndex ) - Ttemp ) > ConvCrit ) goto IterationLoop_loop;
 					}
 				}
@@ -1594,7 +1583,7 @@ namespace PipeHeatTransfer {
 	//==============================================================================
 
 	void
-	UpdatePipesHeatTransfer()
+	PipeHTData::UpdatePipesHeatTransfer()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1642,7 +1631,7 @@ namespace PipeHeatTransfer {
 		Node( nsvOutletNodeNum ).MassFlowRateMaxAvail = Node( nsvInletNodeNum ).MassFlowRateMaxAvail;
 		Node( nsvOutletNodeNum ).Quality = Node( nsvInletNodeNum ).Quality;
 		//Only pass pressure if we aren't doing a pressure simulation
-		if ( PlantLoop( PipeHT( nsvPipeHTNum ).LoopNum ).PressureSimType > 1 ) {
+		if ( PlantLoop( this->LoopNum ).PressureSimType > 1 ) {
 			//Don't do anything
 		} else {
 			Node( nsvOutletNodeNum ).Press = Node( nsvInletNodeNum ).Press;
@@ -1655,7 +1644,7 @@ namespace PipeHeatTransfer {
 	//==============================================================================
 
 	void
-	ReportPipesHeatTransfer( int const PipeHTNum ) // Index for the surface under consideration
+	PipeHTData::ReportPipesHeatTransfer()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1690,24 +1679,24 @@ namespace PipeHeatTransfer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// update flows and temps from module variables
-		PipeHT( PipeHTNum ).FluidInletTemp = nsvInletTemp;
-		PipeHT( PipeHTNum ).FluidOutletTemp = nsvOutletTemp;
-		PipeHT( PipeHTNum ).MassFlowRate = nsvMassFlowRate;
-		PipeHT( PipeHTNum ).VolumeFlowRate = nsvVolumeFlowRate;
+		this->FluidInletTemp = nsvInletTemp;
+		this->FluidOutletTemp = nsvOutletTemp;
+		this->MassFlowRate = nsvMassFlowRate;
+		this->VolumeFlowRate = nsvVolumeFlowRate;
 
 		// update other variables from module variables
-		PipeHT( PipeHTNum ).FluidHeatLossRate = nsvFluidHeatLossRate;
-		PipeHT( PipeHTNum ).FluidHeatLossEnergy = nsvFluidHeatLossRate * nsvDeltaTime; // DeltaTime is in seconds
-		PipeHT( PipeHTNum ).PipeInletTemp = PipeHT( PipeHTNum ).PipeTemp( 1 );
-		PipeHT( PipeHTNum ).PipeOutletTemp = PipeHT( PipeHTNum ).PipeTemp( PipeHT( PipeHTNum ).NumSections );
+		this->FluidHeatLossRate = nsvFluidHeatLossRate;
+		this->FluidHeatLossEnergy = nsvFluidHeatLossRate * nsvDeltaTime; // DeltaTime is in seconds
+		this->PipeInletTemp = this->PipeTemp( 1 );
+		this->PipeOutletTemp = this->PipeTemp( this->NumSections );
 
 		// need to average the heat rate because it is now summing over multiple inner time steps
-		PipeHT( PipeHTNum ).EnvironmentHeatLossRate = nsvEnvHeatLossRate / nsvNumInnerTimeSteps;
-		PipeHT( PipeHTNum ).EnvHeatLossEnergy = PipeHT( PipeHTNum ).EnvironmentHeatLossRate * nsvDeltaTime;
+		this->EnvironmentHeatLossRate = nsvEnvHeatLossRate / nsvNumInnerTimeSteps;
+		this->EnvHeatLossEnergy = this->EnvironmentHeatLossRate * nsvDeltaTime;
 
 		// for zone heat gains, we assign the averaged heat rate over all inner time steps
-		if ( PipeHT( PipeHTNum ).EnvironmentPtr == ZoneEnv ) {
-			PipeHT( PipeHTNum ).ZoneHeatGainRate = PipeHT( PipeHTNum ).EnvironmentHeatLossRate;
+		if ( this->EnvironmentPtr == ZoneEnv ) {
+			this->ZoneHeatGainRate = this->EnvironmentHeatLossRate;
 		}
 
 	}
@@ -1715,7 +1704,7 @@ namespace PipeHeatTransfer {
 	//==============================================================================
 
 	void
-	CalcZonePipesHeatGain()
+	PipeHTData::CalcZonePipesHeatGain()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1762,8 +1751,7 @@ namespace PipeHeatTransfer {
 	//==============================================================================
 
 	Real64
-	CalcPipeHeatTransCoef(
-		int const PipeHTNum,
+	PipeHTData::CalcPipeHeatTransCoef(
 		Real64 const Temperature, // Temperature of water entering the surface, in C
 		Real64 const MassFlowRate, // Mass flow rate, in kg/s
 		Real64 const Diameter // Pipe diameter, m
@@ -1828,7 +1816,7 @@ namespace PipeHeatTransfer {
 		int LoopNum;
 
 		//retrieve loop index for this component so we can look up fluid properties
-		LoopNum = PipeHT( PipeHTNum ).LoopNum;
+		LoopNum = this->LoopNum;
 
 		//since the fluid properties routine doesn't have Prandtl, we'll just use water values
 		idx = 1;
@@ -1850,8 +1838,8 @@ namespace PipeHeatTransfer {
 		}
 
 		//look up conductivity and viscosity
-		Kactual = GetConductivityGlycol( PlantLoop( LoopNum ).FluidName, PipeHT( PipeHTNum ).FluidTemp( 0 ), PlantLoop( LoopNum ).FluidIndex, RoutineName ); //W/m-K
-		MUactual = GetViscosityGlycol( PlantLoop( LoopNum ).FluidName, PipeHT( PipeHTNum ).FluidTemp( 0 ), PlantLoop( LoopNum ).FluidIndex, RoutineName ) / 1000.0; //Note fluid properties routine returns mPa-s, we need Pa-s
+		Kactual = GetConductivityGlycol( PlantLoop( LoopNum ).FluidName, this->FluidTemp( 0 ), PlantLoop( LoopNum ).FluidIndex, RoutineName ); //W/m-K
+		MUactual = GetViscosityGlycol( PlantLoop( LoopNum ).FluidName, this->FluidTemp( 0 ), PlantLoop( LoopNum ).FluidIndex, RoutineName ) / 1000.0; //Note fluid properties routine returns mPa-s, we need Pa-s
 
 		// Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter) - as RadiantSysLowTemp
 		ReD = 4.0 * MassFlowRate / ( Pi * MUactual * Diameter );
@@ -1881,7 +1869,7 @@ namespace PipeHeatTransfer {
 	//==============================================================================
 
 	Real64
-	OutsidePipeHeatTransCoef( int const PipeHTNum ) // Index number of surface under consideration
+	PipeHTData::OutsidePipeHeatTransCoef()
 	{
 
 		// FUNCTION INFORMATION:
@@ -1950,31 +1938,31 @@ namespace PipeHeatTransfer {
 		bool CoefSet;
 
 		//Set environmental variables
-		{ auto const SELECT_CASE_var( PipeHT( PipeHTNum ).TypeOf );
+		{ auto const SELECT_CASE_var( this->TypeOf );
 
 		if ( SELECT_CASE_var == TypeOf_PipeInterior ) {
 
-			{ auto const SELECT_CASE_var1( PipeHT( PipeHTNum ).EnvironmentPtr );
+			{ auto const SELECT_CASE_var1( this->EnvironmentPtr );
 			if ( SELECT_CASE_var1 == ScheduleEnv ) {
-				AirTemp = GetCurrentScheduleValue( PipeHT( PipeHTNum ).EnvrSchedPtr );
-				AirVel = GetCurrentScheduleValue( PipeHT( PipeHTNum ).EnvrVelSchedPtr );
+				AirTemp = GetCurrentScheduleValue( this->EnvrSchedPtr );
+				AirVel = GetCurrentScheduleValue( this->EnvrVelSchedPtr );
 
 			} else if ( SELECT_CASE_var1 == ZoneEnv ) {
-				AirTemp = MAT( PipeHT( PipeHTNum ).EnvrZonePtr );
+				AirTemp = MAT( this->EnvrZonePtr );
 				AirVel = RoomAirVel;
 			}}
 
 		} else if ( SELECT_CASE_var == TypeOf_PipeExterior ) {
 
-			{ auto const SELECT_CASE_var1( PipeHT( PipeHTNum ).EnvironmentPtr );
+			{ auto const SELECT_CASE_var1( this->EnvironmentPtr );
 			if ( SELECT_CASE_var1 == OutsideAirEnv ) {
-				AirTemp = Node( PipeHT( PipeHTNum ).EnvrAirNodeNum ).Temp;
+				AirTemp = Node( this->EnvrAirNodeNum ).Temp;
 				AirVel = WindSpeed;
 			}}
 
 		}}
 
-		PipeOD = PipeHT( PipeHTNum ).InsulationOD;
+		PipeOD = this->InsulationOD;
 
 		ViscositySet = false;
 		for ( idx = 1; idx <= NumOfPropDivisions; ++idx ) {
@@ -1988,7 +1976,7 @@ namespace PipeHeatTransfer {
 		if ( ! ViscositySet ) {
 			AirVisc = DynVisc( NumOfPropDivisions );
 			if ( AirTemp > Temperature( NumOfPropDivisions ) ) {
-				ShowWarningError( "Heat Transfer Pipe = " + PipeHT( PipeHTNum ).Name + "Viscosity out of range, air temperature too high, setting to upper limit." );
+				ShowWarningError( "Heat Transfer Pipe = " + this->Name + "Viscosity out of range, air temperature too high, setting to upper limit." );
 			}
 		}
 
@@ -2011,7 +1999,7 @@ namespace PipeHeatTransfer {
 			Coef = CCoef( NumOfParamDivisions );
 			rExp = mExp( NumOfParamDivisions );
 			if ( ReD > UpperBound( NumOfParamDivisions ) ) {
-				ShowWarningError( "Heat Transfer Pipe = " + PipeHT( PipeHTNum ).Name + "Reynolds Number out of range, setting coefficients to upper limit." );
+				ShowWarningError( "Heat Transfer Pipe = " + this->Name + "Reynolds Number out of range, setting coefficients to upper limit." );
 			}
 		}
 

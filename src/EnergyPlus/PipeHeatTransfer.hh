@@ -323,6 +323,44 @@ namespace PipeHeatTransfer {
 			Real64 const DayOfSim // Current Simulation Day
 		);
 
+		void
+		CalcBuriedPipeSoil();
+
+		void
+		CalcPipesHeatTransfer(
+			Optional_int_const LengthIndex = _
+		);
+
+		Real64
+		OutsidePipeHeatTransCoef();
+
+		Real64
+		CalcPipeHeatTransCoef(
+			Real64 const Temperature, // Temperature of water entering the surface, in C
+			Real64 const MassFlowRate, // Mass flow rate, in kg/s
+			Real64 const Diameter // Pipe diameter, m
+		);
+
+		void
+		ReportPipesHeatTransfer(); // Index for the surface under consideration
+
+		void
+		UpdatePipesHeatTransfer();
+
+		void
+		ValidatePipeConstruction(
+			std::string const & PipeType, // module object of pipe (error messages)
+			std::string const & ConstructionName, // construction name of pipe (error messages)
+			std::string const & FieldName, // fieldname of pipe (error messages)
+			int const ConstructionNum, // pointer into construction data
+			bool & ErrorsFound // set to true if errors found here
+		);
+
+		static
+		void
+		CalcZonePipesHeatGain();
+
+
 	};
 
 	// Object Data
@@ -338,27 +376,8 @@ namespace PipeHeatTransfer {
 		bool const FirstHVACIteration // component number
 	);
 
-	//==============================================================================
-
-
 	void
 	GetPipesHeatTransfer();
-
-	void
-	ValidatePipeConstruction(
-		std::string const & PipeType, // module object of pipe (error messages)
-		std::string const & ConstructionName, // construction name of pipe (error messages)
-		std::string const & FieldName, // fieldname of pipe (error messages)
-		int const ConstructionNum, // pointer into construction data
-		int const PipeNum, // pointer into pipe data
-		bool & ErrorsFound // set to true if errors found here
-	);
-
-	//==============================================================================
-
-
-
-	//==============================================================================
 
 	void
 	InitializeHeatTransferPipes(
@@ -367,56 +386,6 @@ namespace PipeHeatTransfer {
 		int & PipeNum // Index into pipe structure for name
 	);
 
-	//==============================================================================
-
-	void
-	CalcPipesHeatTransfer(
-		int const PipeHTNum, // component number
-		Optional_int_const LengthIndex = _
-	);
-
-	//==============================================================================
-
-	void
-	CalcBuriedPipeSoil( int const PipeHTNum ); // Current Simulation Pipe Number
-
-	//==============================================================================
-
-	void
-	UpdatePipesHeatTransfer();
-
-	//==============================================================================
-
-	void
-	ReportPipesHeatTransfer( int const PipeHTNum ); // Index for the surface under consideration
-
-	//==============================================================================
-
-	void
-	CalcZonePipesHeatGain();
-
-	//==============================================================================
-
-	Real64
-	CalcPipeHeatTransCoef(
-		int const PipeHTNum,
-		Real64 const Temperature, // Temperature of water entering the surface, in C
-		Real64 const MassFlowRate, // Mass flow rate, in kg/s
-		Real64 const Diameter // Pipe diameter, m
-	);
-
-	//==============================================================================
-
-	Real64
-	OutsidePipeHeatTransCoef( int const PipeHTNum ); // Index number of surface under consideration
-
-	//==============================================================================
-
-
-
-	//===============================================================================
-
-	//===============================================================================
 
 } // PipeHeatTransfer
 
