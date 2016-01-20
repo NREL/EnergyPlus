@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef SingleDuct_hh_INCLUDED
 #define SingleDuct_hh_INCLUDED
 
@@ -217,155 +275,6 @@ namespace SingleDuct {
 			IterationFailed( 0 )
 		{}
 
-		// Member Constructor
-		SysDesignParams(
-			std::string const & SysName, // Name of the Sys
-			std::string const & SysType, // Type of Sys ie. VAV, Mixing, Inducing, etc.
-			int const SysType_Num, // Numeric Equivalent for System type
-			std::string const & Schedule, // Sys Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			std::string const & ReheatComp, // Type of the Reheat Coil Object
-			int const ReheatComp_Num, // Numeric Equivalent in this module for Coil type
-			int const ReheatComp_Index, // Returned Index number from other routines
-			std::string const & ReheatName, // name of reheat coil
-			int const ReheatComp_PlantType, // typeOf_ number for plant type of heating coil
-			std::string const & FanType, // Type of the Fan Object
-			int const Fan_Num, // Numeric Equivalent in this module for fan type
-			int const Fan_Index, // Returned Index number from other routines
-			int const ControlCompTypeNum,
-			int const CompErrIndex,
-			std::string const & FanName, // name of fan
-			Real64 const MaxAirVolFlowRate, // Max Specified Volume Flow Rate of Sys (cooling max) [m3/sec]
-			Real64 const AirMassFlowRateMax, // Max Specified Mass Flow Rate of Sys (cooling max) [kg/sec]
-			Real64 const MaxHeatAirVolFlowRate, // Max specified volume flow rate of unit at max heating [m3/s]
-			Real64 const HeatAirMassFlowRateMax, // Max Specified Mass Flow Rate of unit at max heating [kg/sec]
-			int const ZoneMinAirFracMethod, // parameter for what method is used for min flow fraction
-			Real64 const ZoneMinAirFrac, // Fraction of supply air used as minimum flow
-			Real64 const ZoneFixedMinAir, // Absolute minimum supply air flow
-			int const ZoneMinAirFracSchPtr, // pointer to the schedule for min flow fraction
-			bool const ConstantMinAirFracSetByUser, // record if user left field blank for constant min fraction.
-			bool const FixedMinAirSetByUser, // record if user left field blank for constant min fraction.
-			Real64 const DesignMinAirFrac, // store user entered constant min flow fract for design
-			Real64 const DesignFixedMinAir, // store user entered constant min flow for design
-			int const InletNodeNum, // terminal unit inlet node number; damper inlet node number
-			int const OutletNodeNum, // damper outlet node number for VAV; unused by CV; coil air inlet node for VAV
-			int const ReheatControlNode, // hot water inlet node for heating coil
-			int const ReheatCoilOutletNode, // outlet node for heating coil
-			Real64 const ReheatCoilMaxCapacity, // heating coil capacity, W
-			int const ReheatAirOutletNode, // terminal unit outlet node; heating coil air outlet node
-			Real64 const MaxReheatWaterVolFlow, // m3/s
-			Real64 const MaxReheatSteamVolFlow, // m3/s
-			Real64 const MaxReheatWaterFlow, // kg/s
-			Real64 const MaxReheatSteamFlow, // kg/s
-			Real64 const MinReheatWaterVolFlow, // m3/s
-			Real64 const MinReheatSteamVolFlow, // m3/s
-			Real64 const MinReheatWaterFlow, // kg/s
-			Real64 const MinReheatSteamFlow, // kg/s
-			Real64 const ControllerOffset,
-			Real64 const MaxReheatTemp, // C
-			bool const MaxReheatTempSetByUser,
-			int const DamperHeatingAction, // ! 1=NORMAL;  2=REVERSE ACTION
-			Real64 const DamperPosition,
-			int const ADUNum, // index of corresponding air distribution unit
-			int const FluidIndex, // Refrigerant index
-			int const ErrCount1, // iteration limit exceeded in Hot Water Flow Calc
-			int const ErrCount1c, // iteration limit exceeded in Hot Water Flow Calc - continue
-			int const ErrCount2, // bad iterations limits in hot water flow calc
-			Real64 const ZoneFloorArea, // Zone floor area
-			int const CtrlZoneNum, // Pointer to CtrlZone data structure
-			int const ActualZoneNum, // Pointer to Zone data Structure
-			Real64 const MaxAirVolFlowRateDuringReheat, // Maximum vol flow during reheat
-			Real64 const MaxAirVolFractionDuringReheat, // Maximum vol flow fraction during reheat
-			Real64 const AirMassFlowDuringReheatMax, // Maximum mass flow during reheat
-			int const ZoneOutdoorAirMethod, // Outdoor air method
-			Real64 const OutdoorAirFlowRate, // report variable for TU outdoor air flow rate
-			bool const NoOAFlowInputFromUser, // avoids OA calculation if no input specified by user
-			int const OARequirementsPtr, // - Index to DesignSpecification:OutdoorAir object
-			int const AirLoopNum,
-			int const HWLoopNum, // plant topology, loop number
-			int const HWLoopSide, // plant topology, loop side number
-			int const HWBranchIndex, // plant topology, Branch number
-			int const HWCompIndex, // plant topology, Component number
-			std::string const & ZoneHVACUnitType, // type of Zone HVAC unit for air terminal mixer units
-			std::string const & ZoneHVACUnitName, // name of Zone HVAC unit for air terminal mixer units
-			int const SecInNode, // zone or zone unit air node number
-			int const IterationLimit, // Used for RegulaFalsi error -1
-			int const IterationFailed // Used for RegulaFalsi error -2
-		) :
-			SysName( SysName ),
-			SysType( SysType ),
-			SysType_Num( SysType_Num ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			ReheatComp( ReheatComp ),
-			ReheatComp_Num( ReheatComp_Num ),
-			ReheatComp_Index( ReheatComp_Index ),
-			ReheatName( ReheatName ),
-			ReheatComp_PlantType( ReheatComp_PlantType ),
-			FanType( FanType ),
-			Fan_Num( Fan_Num ),
-			Fan_Index( Fan_Index ),
-			ControlCompTypeNum( ControlCompTypeNum ),
-			CompErrIndex( CompErrIndex ),
-			FanName( FanName ),
-			MaxAirVolFlowRate( MaxAirVolFlowRate ),
-			AirMassFlowRateMax( AirMassFlowRateMax ),
-			MaxHeatAirVolFlowRate( MaxHeatAirVolFlowRate ),
-			HeatAirMassFlowRateMax( HeatAirMassFlowRateMax ),
-			ZoneMinAirFracMethod( ZoneMinAirFracMethod ),
-			ZoneMinAirFrac( ZoneMinAirFrac ),
-			ZoneFixedMinAir( ZoneFixedMinAir ),
-			ZoneMinAirFracSchPtr( ZoneMinAirFracSchPtr ),
-			ConstantMinAirFracSetByUser( ConstantMinAirFracSetByUser ),
-			FixedMinAirSetByUser( FixedMinAirSetByUser ),
-			DesignMinAirFrac( DesignMinAirFrac ),
-			DesignFixedMinAir( DesignFixedMinAir ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			ReheatControlNode( ReheatControlNode ),
-			ReheatCoilOutletNode( ReheatCoilOutletNode ),
-			ReheatCoilMaxCapacity( ReheatCoilMaxCapacity ),
-			ReheatAirOutletNode( ReheatAirOutletNode ),
-			MaxReheatWaterVolFlow( MaxReheatWaterVolFlow ),
-			MaxReheatSteamVolFlow( MaxReheatSteamVolFlow ),
-			MaxReheatWaterFlow( MaxReheatWaterFlow ),
-			MaxReheatSteamFlow( MaxReheatSteamFlow ),
-			MinReheatWaterVolFlow( MinReheatWaterVolFlow ),
-			MinReheatSteamVolFlow( MinReheatSteamVolFlow ),
-			MinReheatWaterFlow( MinReheatWaterFlow ),
-			MinReheatSteamFlow( MinReheatSteamFlow ),
-			ControllerOffset( ControllerOffset ),
-			MaxReheatTemp( MaxReheatTemp ),
-			MaxReheatTempSetByUser( MaxReheatTempSetByUser ),
-			DamperHeatingAction( DamperHeatingAction ),
-			DamperPosition( DamperPosition ),
-			ADUNum( ADUNum ),
-			FluidIndex( FluidIndex ),
-			ErrCount1( ErrCount1 ),
-			ErrCount1c( ErrCount1c ),
-			ErrCount2( ErrCount2 ),
-			ZoneFloorArea( ZoneFloorArea ),
-			CtrlZoneNum( CtrlZoneNum ),
-			ActualZoneNum( ActualZoneNum ),
-			MaxAirVolFlowRateDuringReheat( MaxAirVolFlowRateDuringReheat ),
-			MaxAirVolFractionDuringReheat( MaxAirVolFractionDuringReheat ),
-			AirMassFlowDuringReheatMax( AirMassFlowDuringReheatMax ),
-			ZoneOutdoorAirMethod( ZoneOutdoorAirMethod ),
-			OutdoorAirFlowRate( OutdoorAirFlowRate ),
-			NoOAFlowInputFromUser( NoOAFlowInputFromUser ),
-			OARequirementsPtr( OARequirementsPtr ),
-			AirLoopNum( AirLoopNum ),
-			HWLoopNum( HWLoopNum ),
-			HWLoopSide( HWLoopSide ),
-			HWBranchIndex( HWBranchIndex ),
-			HWCompIndex( HWCompIndex ),
-			ZoneHVACUnitType( ZoneHVACUnitType ),
-			ZoneHVACUnitName( ZoneHVACUnitName ),
-			SecInNode( SecInNode ),
-			IterationLimit( IterationLimit ),
-			IterationFailed( IterationFailed )
-		{}
-
 	};
 
 	struct AirTerminalMixerData
@@ -421,57 +330,6 @@ namespace SingleDuct {
 			MaxAirMassFlowRate( 0.0 )
 		{}
 
-		// Member Constructor
-		AirTerminalMixerData(
-			std::string const & Name, // name of unit
-			int const MixerType, // type of inlet mixer, 1 = inlet side, 2 = supply side
-			int const ZoneHVACUnitType, // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
-			std::string const & ZoneHVACUnitName, // name of Zone HVAC unit
-			int const SecInNode, // secondary air inlet node number
-			int const PriInNode, // primary air inlet node number
-			int const MixedAirOutNode, // mixed air outlet node number
-			Real64 const ZoneAirTemp, // zone air in temp
-			Real64 const ZoneAirHumRat, // zone air in hum rat
-			Real64 const ZoneAirEnthalpy, // zone air in enthalpy
-			Real64 const ZoneAirPressure, // zone air in pressure
-			Real64 const ZoneAirMassFlowRate, // zone air in mass flow rate
-			Real64 const DOASTemp, // DOAS air in temp
-			Real64 const DOASHumRat, // DOAS air in hum rat
-			Real64 const DOASEnthalpy, // DOAS air in enthalpy
-			Real64 const DOASPressure, // DOAS air in pressure
-			Real64 const DOASMassFlowRate, // DOAS air in mass flow rate
-			Real64 const MixedAirTemp, // mixed air in temp
-			Real64 const MixedAirHumRat, // mixed air in hum rat
-			Real64 const MixedAirEnthalpy, // mixed air in enthalpy
-			Real64 const MixedAirPressure, // mixed air in pressure
-			Real64 const MixedAirMassFlowRate, // mixed air in mass flow rate
-			Real64 const MaxAirMassFlowRate // maximum air mass flow rate allowed through component
-		) :
-			Name( Name ),
-			MixerType( MixerType ),
-			ZoneHVACUnitType( ZoneHVACUnitType ),
-			ZoneHVACUnitName( ZoneHVACUnitName ),
-			SecInNode( SecInNode ),
-			PriInNode( PriInNode ),
-			MixedAirOutNode( MixedAirOutNode ),
-			ZoneAirTemp( ZoneAirTemp ),
-			ZoneAirHumRat( ZoneAirHumRat ),
-			ZoneAirEnthalpy( ZoneAirEnthalpy ),
-			ZoneAirPressure( ZoneAirPressure ),
-			ZoneAirMassFlowRate( ZoneAirMassFlowRate ),
-			DOASTemp( DOASTemp ),
-			DOASHumRat( DOASHumRat ),
-			DOASEnthalpy( DOASEnthalpy ),
-			DOASPressure( DOASPressure ),
-			DOASMassFlowRate( DOASMassFlowRate ),
-			MixedAirTemp( MixedAirTemp ),
-			MixedAirHumRat( MixedAirHumRat ),
-			MixedAirEnthalpy( MixedAirEnthalpy ),
-			MixedAirPressure( MixedAirPressure ),
-			MixedAirMassFlowRate( MixedAirMassFlowRate ),
-			MaxAirMassFlowRate( MaxAirMassFlowRate )
-		{}
-
 	};
 
 	struct SysFlowConditions
@@ -496,25 +354,6 @@ namespace SingleDuct {
 			AirPressure( 0.0 )
 		{}
 
-		// Member Constructor
-		SysFlowConditions(
-			Real64 const AirMassFlowRate, // MassFlow through the Sys being Simulated [kg/Sec]
-			Real64 const AirMassFlowRateMaxAvail, // MassFlow through the Sys being Simulated [kg/Sec]
-			Real64 const AirMassFlowRateMinAvail, // MassFlow through the Sys being Simulated [kg/Sec]
-			Real64 const AirTemp, // (C)
-			Real64 const AirHumRat, // (Kg/Kg)
-			Real64 const AirEnthalpy, // (J/Kg)
-			Real64 const AirPressure
-		) :
-			AirMassFlowRate( AirMassFlowRate ),
-			AirMassFlowRateMaxAvail( AirMassFlowRateMaxAvail ),
-			AirMassFlowRateMinAvail( AirMassFlowRateMinAvail ),
-			AirTemp( AirTemp ),
-			AirHumRat( AirHumRat ),
-			AirEnthalpy( AirEnthalpy ),
-			AirPressure( AirPressure )
-		{}
-
 	};
 
 	// Object Data
@@ -524,6 +363,8 @@ namespace SingleDuct {
 	extern Array1D< AirTerminalMixerData > SysATMixer;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimulateSingleDuct(
@@ -725,29 +566,6 @@ namespace SingleDuct {
 
 	//        End of Reporting subroutines for the Sys Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SingleDuct
 

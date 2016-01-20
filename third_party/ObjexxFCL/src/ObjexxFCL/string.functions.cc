@@ -420,7 +420,7 @@ std::string &
 replace( std::string & s, std::string const & a, std::string const & b )
 {
 	std::string::size_type const la( a.length() ), lb( b.length() );
-	std::string::size_type pos( 0 );
+	std::string::size_type pos( 0u );
 	while ( ( pos = s.find( a, pos ) ) != std::string::npos ) {
 		s.replace( pos, la, b );
 		pos += lb;

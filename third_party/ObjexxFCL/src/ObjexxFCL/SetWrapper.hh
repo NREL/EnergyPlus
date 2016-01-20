@@ -41,19 +41,16 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	SetWrapper()
 	{}
 
 	// Destructor
-	inline
 	~SetWrapper()
 	{}
 
 public: // Inspector
 
 	// set Accessor
-	inline
 	Container const &
 	operator ()() const
 	{
@@ -63,7 +60,6 @@ public: // Inspector
 public: // Modifier
 
 	// set Accessor
-	inline
 	Container &
 	operator ()()
 	{

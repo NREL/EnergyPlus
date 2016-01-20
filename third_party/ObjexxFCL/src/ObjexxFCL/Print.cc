@@ -15,7 +15,7 @@
 
 namespace ObjexxFCL {
 
-	// Static Data Member Definitions
-	std::string const Print::asterisk = std::string( "*" ); // List-directed format string
+// Static Data Member Definitions
+std::string const Print::asterisk = std::string( "*" ); // List-directed format string
 
 } // ObjexxFCL

@@ -41,14 +41,12 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	Optional() :
 	 ptr_( nullptr ),
 	 own_( false )
 	{}
 
 	// Copy Constructor
-	inline
 	Optional( Optional const & o ) :
 	 ptr_( o.own_ ? new T( o() ) : o.ptr_ ),
 	 own_( o.own_ )
@@ -56,14 +54,12 @@ public: // Creation
 
 	// Optional Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
-	inline
 	Optional( Optional< U, Enable > const & o ) :
 	 ptr_( o.own_ ? new T( o() ) : o.ptr_ ),
 	 own_( o.own_ )
 	{}
 
 	// Value Constructor
-	inline
 	Optional( T const & val ) :
 	 ptr_( const_cast< T * >( &val ) ),
 	 own_( false )
@@ -71,28 +67,24 @@ public: // Creation
 
 	// Value Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	Optional( U const & val ) :
 	 ptr_( new T( val ) ), // Requires Value( U ) constructor
 	 own_( true )
 	{}
 
 	// rvalue Constructor
-	inline
 	Optional( T && val ) :
 	 ptr_( new T( val ) ), // Requires Value copy constructor
 	 own_( true )
 	{}
 
 	// Omit Constructor
-	inline
 	Optional( Omit ) :
 	 ptr_( nullptr ),
 	 own_( false )
 	{}
 
 	// Destructor
-	inline
 	~Optional()
 	{
 		if ( own_ ) delete ptr_;
@@ -101,7 +93,6 @@ public: // Creation
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	Optional &
 	operator =( Optional const & o )
 	{
@@ -114,7 +105,6 @@ public: // Assignment
 	}
 
 	// Value Assignment
-	inline
 	Optional &
 	operator =( T const & val )
 	{
@@ -125,7 +115,6 @@ public: // Assignment
 
 	// Value Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Optional &
 	operator =( U const & val )
 	{
@@ -135,7 +124,6 @@ public: // Assignment
 	}
 
 	// rvalue Assignment
-	inline
 	Optional &
 	operator =( T && val )
 	{
@@ -145,7 +133,6 @@ public: // Assignment
 	}
 
 	// Omit Assignment
-	inline
 	Optional &
 	operator =( Omit )
 	{
@@ -158,7 +145,6 @@ public: // Assignment
 public: // Conversion
 
 	// Value Conversion
-	inline
 	operator Tr() const
 	{
 		assert( ptr_ != nullptr );
@@ -166,7 +152,6 @@ public: // Conversion
 	}
 
 	// Value Conversion
-	inline
 	operator T &()
 	{
 		assert( ptr_ != nullptr );
@@ -176,7 +161,6 @@ public: // Conversion
 public: // Operators
 
 	// Value
-	inline
 	Tr
 	operator ()() const
 	{
@@ -185,7 +169,6 @@ public: // Operators
 	}
 
 	// Value
-	inline
 	T &
 	operator ()()
 	{
@@ -196,7 +179,6 @@ public: // Operators
 public: // Properties
 
 	// Present?
-	inline
 	bool
 	present() const
 	{
@@ -204,7 +186,6 @@ public: // Properties
 	}
 
 	// Own?
-	inline
 	bool
 	own() const
 	{
@@ -214,7 +195,6 @@ public: // Properties
 public: // Modifiers
 
 	// Clear
-	inline
 	void
 	clear()
 	{
@@ -227,7 +207,6 @@ public: // Comparison
 
 	// Optional == Optional
 	friend
-	inline
 	bool
 	operator ==( Optional const & a, Optional const & b )
 	{
@@ -236,7 +215,6 @@ public: // Comparison
 
 	// Optional != Optional
 	friend
-	inline
 	bool
 	operator !=( Optional const & a, Optional const & b )
 	{
@@ -245,7 +223,6 @@ public: // Comparison
 
 	// Optional == Value
 	friend
-	inline
 	bool
 	operator ==( Optional const & a, Tc b )
 	{
@@ -254,7 +231,6 @@ public: // Comparison
 
 	// Optional != Value
 	friend
-	inline
 	bool
 	operator !=( Optional const & a, Tc b )
 	{
@@ -263,7 +239,6 @@ public: // Comparison
 
 	// Value == Optional
 	friend
-	inline
 	bool
 	operator ==( Tc a, Optional const & b )
 	{
@@ -272,7 +247,6 @@ public: // Comparison
 
 	// Value != Optional
 	friend
-	inline
 	bool
 	operator !=( Tc a, Optional const & b )
 	{
@@ -305,45 +279,38 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	Optional() :
 	 ptr_( nullptr )
 	{}
 
 	// Copy Constructor
-	inline
 	Optional( Optional const & o ) :
 	 ptr_( o.ptr_ )
 	{}
 
 	// Optional Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
-	inline
 	Optional( Optional< U, EnableType > const & o ) :
 	 ptr_( o.ptr_ )
 	{}
 
 	// Value Constructor
-	inline
 	Optional( T const & val ) :
 	 ptr_( const_cast< T * >( &val ) )
 	{}
 
 	// Omit Constructor
-	inline
 	Optional( Omit ) :
 	 ptr_( nullptr )
 	{}
 
 	// Destructor
-	inline
 	~Optional()
 	{}
 
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	Optional &
 	operator =( Optional const & o )
 	{
@@ -352,7 +319,6 @@ public: // Assignment
 	}
 
 	// Value Assignment
-	inline
 	Optional &
 	operator =( T const & val )
 	{
@@ -363,7 +329,6 @@ public: // Assignment
 
 	// Value Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Optional &
 	operator =( U const & val )
 	{
@@ -373,7 +338,6 @@ public: // Assignment
 	}
 
 	// rvalue Assignment
-	inline
 	Optional &
 	operator =( T && val )
 	{
@@ -383,7 +347,6 @@ public: // Assignment
 	}
 
 	// Omit Assignment
-	inline
 	Optional &
 	operator =( Omit )
 	{
@@ -394,7 +357,6 @@ public: // Assignment
 public: // Conversion
 
 	// Value Conversion
-	inline
 	operator Tr() const
 	{
 		assert( ptr_ != nullptr );
@@ -402,7 +364,6 @@ public: // Conversion
 	}
 
 	// Value Conversion
-	inline
 	operator T &()
 	{
 		assert( ptr_ != nullptr );
@@ -412,7 +373,6 @@ public: // Conversion
 public: // Operators
 
 	// Value
-	inline
 	Tr
 	operator ()() const
 	{
@@ -421,7 +381,6 @@ public: // Operators
 	}
 
 	// Value
-	inline
 	T &
 	operator ()()
 	{
@@ -432,7 +391,6 @@ public: // Operators
 public: // Properties
 
 	// Present?
-	inline
 	bool
 	present() const
 	{
@@ -442,7 +400,6 @@ public: // Properties
 public: // Modifiers
 
 	// Clear
-	inline
 	void
 	clear()
 	{
@@ -453,7 +410,6 @@ public: // Comparison
 
 	// Optional == Optional
 	friend
-	inline
 	bool
 	operator ==( Optional const & a, Optional const & b )
 	{
@@ -462,7 +418,6 @@ public: // Comparison
 
 	// Optional != Optional
 	friend
-	inline
 	bool
 	operator !=( Optional const & a, Optional const & b )
 	{
@@ -471,7 +426,6 @@ public: // Comparison
 
 	// Optional == Value
 	friend
-	inline
 	bool
 	operator ==( Optional const & a, Tc b )
 	{
@@ -480,7 +434,6 @@ public: // Comparison
 
 	// Optional != Value
 	friend
-	inline
 	bool
 	operator !=( Optional const & a, Tc b )
 	{
@@ -489,7 +442,6 @@ public: // Comparison
 
 	// Value == Optional
 	friend
-	inline
 	bool
 	operator ==( Tc a, Optional const & b )
 	{
@@ -498,7 +450,6 @@ public: // Comparison
 
 	// Value != Optional
 	friend
-	inline
 	bool
 	operator !=( Tc a, Optional const & b )
 	{

@@ -1,11 +1,68 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
 #include <CrossVentMgr.hh>
@@ -435,9 +492,9 @@ namespace CrossVentMgr {
 		Real64 Uin; // Inflow air velocity [m/s]
 		Real64 CosPhi; // Angle (in degrees) between the wind and the outward normal of the dominant surface
 		Real64 SurfNorm; // Outward normal of surface
-		Real64 SumToZone; // Sum of velocities through
-		Real64 MaxFlux;
-		int MaxSurf;
+		Real64 SumToZone( 0.0 ); // Sum of velocities through
+		Real64 MaxFlux( 0.0 );
+		int MaxSurf( 0 );
 		Real64 XX;
 		Real64 YY;
 		Real64 ZZ;
@@ -451,9 +508,6 @@ namespace CrossVentMgr {
 		static int NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
 		static int NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
 
-		MaxSurf = 0;
-		SumToZone = 0.0;
-		MaxFlux = 0.0;
 		RecInflowRatio( ZoneNum ) = 0.0;
 
 		// Identify the dominant aperture:
@@ -489,8 +543,11 @@ namespace CrossVentMgr {
 		CosPhi = std::cos( ( WindDir - SurfNorm ) * DegToRadians );
 		if ( CosPhi <= 0 ) {
 			AirModel( ZoneNum ).SimAirModel = false;
-			CVJetRecFlows( _, ZoneNum ).Ujet() = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Urec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = 0.0;
+			}
 			Urec( ZoneNum ) = 0.0;
 			Ujet( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
@@ -532,16 +589,25 @@ namespace CrossVentMgr {
 		// is a Window or Door it looks for the second base surface).
 		// Dstar is Droom corrected for wind angle
 		Wroom = Zone( ZoneNum ).Volume / Zone( ZoneNum ).FloorArea;
-		if ( ( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Sides == 3 ) || ( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Sides == 4 ) ) {
-			XX = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Centroid.x;
-			YY = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Centroid.y;
-			ZZ = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Centroid.z;
+		auto const & baseSurface( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ) );
+		if ( ( baseSurface.Sides == 3 ) || ( baseSurface.Sides == 4 ) ) {
+			XX = baseSurface.Centroid.x;
+			YY = baseSurface.Centroid.y;
+			ZZ = baseSurface.Centroid.z;
 		} else {
 			// If the surface has more than 4 vertex then average the vertex coordinates in X, Y and Z.
-			NSides = Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Sides;
-			XX = sum( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Vertex( {1,NSides} ).x() ) / double( NSides );
-			YY = sum( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Vertex( {1,NSides} ).y() ) / double( NSides );
-			ZZ = sum( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).BaseSurf ).Vertex( {1,NSides} ).z() ) / double( NSides );
+			NSides = baseSurface.Sides;
+			assert( NSides > 0 );
+			XX = YY = ZZ = 0.0;
+			for ( int i = 1; i <= NSides; ++i ) {
+				auto const & v( baseSurface.Vertex( i ) );
+				XX += v.x;
+				YY += v.y;
+				ZZ += v.z;
+			}
+			XX /= double( NSides );
+			YY /= double( NSides );
+			ZZ /= double( NSides );
 		}
 
 		Real64 const Wroom_2( pow_2( Wroom ) );
@@ -552,9 +618,17 @@ namespace CrossVentMgr {
 				ZZ_Wall = Surface( APos_Wall( Ctd ) ).Centroid.z;
 			} else {
 				NSides = Surface( APos_Wall( Ctd ) ).Sides;
-				XX_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).x() ) / double( NSides );
-				YY_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).y() ) / double( NSides );
-				ZZ_Wall = sum( Surface( APos_Wall( Ctd ) ).Vertex( {1,NSides} ).z() ) / double( NSides );
+				assert( NSides > 0 );
+				XX_Wall = YY_Wall = ZZ_Wall = 0.0;
+				for ( int i = 1; i <= NSides; ++i ) {
+					auto const & v( Surface( APos_Wall( Ctd ) ).Vertex( i ) );
+					XX_Wall += v.x;
+					YY_Wall += v.y;
+					ZZ_Wall += v.z;
+				}
+				XX_Wall /= double( NSides );
+				YY_Wall /= double( NSides );
+				ZZ_Wall /= double( NSides );
 			}
 			auto DroomTemp = std::sqrt( pow_2( XX - XX_Wall ) + pow_2( YY - YY_Wall ) + pow_2( ZZ - ZZ_Wall ) );
 			if ( DroomTemp > Droom( ZoneNum ) ) {
@@ -617,8 +691,11 @@ namespace CrossVentMgr {
 			Urec( ZoneNum ) = 0.0;
 			Ujet( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Ujet() = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Urec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = 0.0;
+			}
 			return;
 		}
 
@@ -637,8 +714,11 @@ namespace CrossVentMgr {
 			Ujet( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
 			RecInflowRatio( ZoneNum ) = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Ujet() = 0.0;
-			CVJetRecFlows( _, ZoneNum ).Urec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = 0.0;
+			}
 			if ( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond > 0 ) {
 				Tin( ZoneNum ) = MAT( Surface( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond ).Zone );
 			} else if ( Surface( MultizoneSurfaceData( MaxSurf ).SurfNum ).ExtBoundCond == ExternalEnvironment ) {
@@ -673,9 +753,11 @@ namespace CrossVentMgr {
 		Urec( ZoneNum ) = 0.0;
 		Qrec( ZoneNum ) = 0.0;
 		Qtot( ZoneNum ) = 0.0;
-		CVJetRecFlows( _, ZoneNum ).Ujet() = 0.0;
-		CVJetRecFlows( _, ZoneNum ).Urec() = 0.0;
-		CVJetRecFlows( _, ZoneNum ).Qrec() = 0.0;
+			auto flows( CVJetRecFlows( _, ZoneNum ) );
+			for ( int i = 1, u = flows.u(); i <= u; ++i ) {
+				auto & e( flows( i ) );
+				e.Ujet = e.Urec = e.Qrec = 0.0;
+			}
 		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Ctd ) {
 			if ( CVJetRecFlows( Ctd, ZoneNum ).Uin != 0 ) {
 				CVJetRecFlows( Ctd, ZoneNum ).Vjet = CVJetRecFlows( Ctd, ZoneNum ).Uin * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) * 6.3 * std::log( Dstar( ZoneNum ) / ( 6.0 * std::sqrt( CVJetRecFlows( Ctd, ZoneNum ).Area ) ) ) / Dstar( ZoneNum );
@@ -873,8 +955,10 @@ namespace CrossVentMgr {
 				Urec( ZoneNum ) = 0.0;
 				Qrec( ZoneNum ) = 0.0;
 				RecInflowRatio( ZoneNum ) = 0.0;
-				CVJetRecFlows.Ujet() = 0.0;
-				CVJetRecFlows.Urec() = 0.0;
+				for ( auto & e : CVJetRecFlows ) {
+					e.Ujet = 0.0;
+					e.Urec = 0.0;
+				}
 				for ( Ctd = 1; Ctd <= 3; ++Ctd ) {
 					ZTAveraged = MAT( ZoneNum );
 					RoomOutflowTemp( ZoneNum ) = ZTAveraged;
@@ -903,8 +987,10 @@ namespace CrossVentMgr {
 			Urec( ZoneNum ) = 0.0;
 			Qrec( ZoneNum ) = 0.0;
 			RecInflowRatio( ZoneNum ) = 0.0;
-			CVJetRecFlows.Ujet() = 0.0;
-			CVJetRecFlows.Urec() = 0.0;
+			for ( auto & e : CVJetRecFlows ) {
+				e.Ujet = 0.0;
+				e.Urec = 0.0;
+			}
 			for ( Ctd = 1; Ctd <= 3; ++Ctd ) {
 				ZTAveraged = MAT( ZoneNum );
 				RoomOutflowTemp( ZoneNum ) = ZTAveraged;
@@ -928,29 +1014,6 @@ namespace CrossVentMgr {
 		//============================================================================================================
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // CrossVentMgr
 

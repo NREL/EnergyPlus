@@ -71,19 +71,16 @@ public: // Types
 public: // Creation
 
 	// Copy Constructor
-	inline
 	MArray2( MArray2 const & a ) :
 	 Super( a )
 	{}
 
 	// Constructor
-	inline
 	MArray2( A & a, T Class::* pmem ) :
 	 Super( a, pmem )
 	{}
 
 	// Destructor
-	inline
 	virtual
 	~MArray2()
 	{}
@@ -91,7 +88,6 @@ public: // Creation
 public: // Assignment: Array
 
 	// Copy Assignment
-	inline
 	MArray2 &
 	operator =( MArray2 const & a )
 	{
@@ -108,7 +104,6 @@ public: // Assignment: Array
 
 	// Copy Assignment Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray2 &
 	operator =( MArray2< Aa, Ta > const & a )
 	{
@@ -123,7 +118,6 @@ public: // Assignment: Array
 
 	// Array Assignment Template
 	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray2 &
 	operator =( Ar< U > const & a )
 	{
@@ -138,7 +132,6 @@ public: // Assignment: Array
 
 	// += MArray2 Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray2 &
 	operator +=( MArray2< Aa, Ta > const & a )
 	{
@@ -153,7 +146,6 @@ public: // Assignment: Array
 
 	// -= MArray2 Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray2 &
 	operator -=( MArray2< Aa, Ta > const & a )
 	{
@@ -168,7 +160,6 @@ public: // Assignment: Array
 
 	// *= MArray2 Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray2 &
 	operator *=( MArray2< Aa, Ta > const & a )
 	{
@@ -183,7 +174,6 @@ public: // Assignment: Array
 
 	// /= MArray2 Template
 	template< typename Aa, typename Ta >
-	inline
 	MArray2 &
 	operator /=( MArray2< Aa, Ta > const & a )
 	{
@@ -199,7 +189,6 @@ public: // Assignment: Array
 
 	// += Array Template
 	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray2 &
 	operator +=( Ar< U > const & a )
 	{
@@ -214,7 +203,6 @@ public: // Assignment: Array
 
 	// -= Array Template
 	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray2 &
 	operator -=( Ar< U > const & a )
 	{
@@ -229,7 +217,6 @@ public: // Assignment: Array
 
 	// *= Array Template
 	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray2 &
 	operator *=( Ar< U > const & a )
 	{
@@ -244,7 +231,6 @@ public: // Assignment: Array
 
 	// /= Array Template
 	template< template< typename > class Ar, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray2 &
 	operator /=( Ar< U > const & a )
 	{
@@ -262,7 +248,6 @@ public: // Assignment: Logical
 
 	// &&= MArray2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray2 &
 	and_equals( MArray2 const & a )
 	{
@@ -277,7 +262,6 @@ public: // Assignment: Logical
 
 	// ||= MArray2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray2 &
 	or_equals( MArray2 const & a )
 	{
@@ -293,7 +277,6 @@ public: // Assignment: Logical
 public: // Assignment: Value
 
 	// = Value
-	inline
 	MArray2 &
 	operator =( T const & t )
 	{
@@ -307,7 +290,6 @@ public: // Assignment: Value
 
 	// = Value Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray2 &
 	operator =( U const & t )
 	{
@@ -320,7 +302,6 @@ public: // Assignment: Value
 	}
 
 	// += Value
-	inline
 	MArray2 &
 	operator +=( T const & t )
 	{
@@ -333,7 +314,6 @@ public: // Assignment: Value
 	}
 
 	// -= Value
-	inline
 	MArray2 &
 	operator -=( T const & t )
 	{
@@ -346,7 +326,6 @@ public: // Assignment: Value
 	}
 
 	// *= Value
-	inline
 	MArray2 &
 	operator *=( T const & t )
 	{
@@ -360,7 +339,6 @@ public: // Assignment: Value
 
 	// /= Value
 	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
-	inline
 	MArray2 &
 	operator /=( U const & u )
 	{
@@ -375,8 +353,7 @@ public: // Assignment: Value
 	}
 
 	// /= Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
-	inline
+	template< typename U, class = typename std::enable_if< ! std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
 	MArray2 &
 	operator /=( U const & u )
 	{
@@ -392,7 +369,6 @@ public: // Assignment: Value
 public: // Subscript
 
 	// array( i1, i2 ) const
-	inline
 	T const &
 	operator ()( int const i1, int const i2 ) const
 	{
@@ -401,7 +377,6 @@ public: // Subscript
 	}
 
 	// array( i1, i2 )
-	inline
 	T &
 	operator ()( int const i1, int const i2 )
 	{
@@ -412,7 +387,6 @@ public: // Subscript
 public: // Predicate
 
 	// Contains Indexed Element?
-	inline
 	bool
 	contains( int const i1, int const i2 ) const
 	{
@@ -423,7 +397,6 @@ public: // Predicate
 
 	// Conformable?
 	template< typename Aa, typename Ta >
-	inline
 	bool
 	conformable( MArray2< Aa, Ta > const & a ) const
 	{
@@ -432,7 +405,6 @@ public: // Predicate
 
 	// Conformable?
 	template< class Ar >
-	inline
 	bool
 	conformable( Ar const & a ) const
 	{
@@ -441,7 +413,6 @@ public: // Predicate
 
 	// Equal Dimensions?
 	template< typename Aa, typename Ta >
-	inline
 	bool
 	equal_dimensions( MArray2< Aa, Ta > const & a ) const
 	{
@@ -450,7 +421,6 @@ public: // Predicate
 
 	// Equal Dimensions?
 	template< class Ar >
-	inline
 	bool
 	equal_dimensions( Ar const & a ) const
 	{
@@ -460,7 +430,6 @@ public: // Predicate
 public: // Inspector
 
 	// IndexRange of Dimension 1
-	inline
 	IR
 	I1() const
 	{
@@ -468,7 +437,6 @@ public: // Inspector
 	}
 
 	// Lower Index of Dimension 1
-	inline
 	int
 	l1() const
 	{
@@ -476,7 +444,6 @@ public: // Inspector
 	}
 
 	// Upper Index of Dimension 1
-	inline
 	int
 	u1() const
 	{
@@ -484,7 +451,6 @@ public: // Inspector
 	}
 
 	// Size of Dimension 1
-	inline
 	size_type
 	size1() const
 	{
@@ -492,7 +458,6 @@ public: // Inspector
 	}
 
 	// Size of Dimension 1
-	inline
 	int
 	isize1() const
 	{
@@ -500,7 +465,6 @@ public: // Inspector
 	}
 
 	// IndexRange of Dimension 2
-	inline
 	IR
 	I2() const
 	{
@@ -508,7 +472,6 @@ public: // Inspector
 	}
 
 	// Lower Index of Dimension 2
-	inline
 	int
 	l2() const
 	{
@@ -516,7 +479,6 @@ public: // Inspector
 	}
 
 	// Upper Index of Dimension 2
-	inline
 	int
 	u2() const
 	{
@@ -524,7 +486,6 @@ public: // Inspector
 	}
 
 	// Size of Dimension 2
-	inline
 	size_type
 	size2() const
 	{
@@ -532,7 +493,6 @@ public: // Inspector
 	}
 
 	// Size of Dimension 2
-	inline
 	int
 	isize2() const
 	{
@@ -547,7 +507,6 @@ public: // MArray Generators
 
 	// MArray Generator
 	template< typename M >
-	inline
 	MArray2< MArray2 const, M >
 	ma( M ClassT::* pmem ) const
 	{
@@ -556,7 +515,6 @@ public: // MArray Generators
 
 	// MArray Generator
 	template< typename M >
-	inline
 	MArray2< MArray2, M >
 	ma( M ClassT::* pmem )
 	{
@@ -567,7 +525,6 @@ public: // Comparison: Predicate
 
 	// MArray2 == MArray2
 	friend
-	inline
 	bool
 	eq( MArray2 const & a, MArray2 const & b )
 	{
@@ -584,7 +541,6 @@ public: // Comparison: Predicate
 
 	// MArray2 != MArray2
 	friend
-	inline
 	bool
 	ne( MArray2 const & a, MArray2 const & b )
 	{
@@ -593,7 +549,6 @@ public: // Comparison: Predicate
 
 	// MArray2 < MArray2
 	friend
-	inline
 	bool
 	lt( MArray2 const & a, MArray2 const & b )
 	{
@@ -610,7 +565,6 @@ public: // Comparison: Predicate
 
 	// MArray2 <= MArray2
 	friend
-	inline
 	bool
 	le( MArray2 const & a, MArray2 const & b )
 	{
@@ -627,7 +581,6 @@ public: // Comparison: Predicate
 
 	// MArray2 > MArray2
 	friend
-	inline
 	bool
 	gt( MArray2 const & a, MArray2 const & b )
 	{
@@ -636,7 +589,6 @@ public: // Comparison: Predicate
 
 	// MArray2 >= MArray2
 	friend
-	inline
 	bool
 	ge( MArray2 const & a, MArray2 const & b )
 	{
@@ -645,7 +597,6 @@ public: // Comparison: Predicate
 
 	// MArray2 == Value
 	friend
-	inline
 	bool
 	eq( MArray2 const & a, T const & t )
 	{
@@ -660,7 +611,6 @@ public: // Comparison: Predicate
 
 	// MArray2 != Value
 	friend
-	inline
 	bool
 	ne( MArray2 const & a, T const & t )
 	{
@@ -669,7 +619,6 @@ public: // Comparison: Predicate
 
 	// MArray2 < Value
 	friend
-	inline
 	bool
 	lt( MArray2 const & a, T const & t )
 	{
@@ -685,7 +634,6 @@ public: // Comparison: Predicate
 
 	// MArray2 <= Value
 	friend
-	inline
 	bool
 	le( MArray2 const & a, T const & t )
 	{
@@ -701,7 +649,6 @@ public: // Comparison: Predicate
 
 	// MArray2 > Value
 	friend
-	inline
 	bool
 	gt( MArray2 const & a, T const & t )
 	{
@@ -710,7 +657,6 @@ public: // Comparison: Predicate
 
 	// MArray2 >= Value
 	friend
-	inline
 	bool
 	ge( MArray2 const & a, T const & t )
 	{
@@ -719,7 +665,6 @@ public: // Comparison: Predicate
 
 	// Value == MArray2
 	friend
-	inline
 	bool
 	eq( T const & t, MArray2 const & a )
 	{
@@ -728,7 +673,6 @@ public: // Comparison: Predicate
 
 	// Value != MArray2
 	friend
-	inline
 	bool
 	ne( T const & t, MArray2 const & a )
 	{
@@ -737,7 +681,6 @@ public: // Comparison: Predicate
 
 	// Value < MArray2
 	friend
-	inline
 	bool
 	lt( T const & t, MArray2 const & a )
 	{
@@ -753,7 +696,6 @@ public: // Comparison: Predicate
 
 	// Value <= MArray2
 	friend
-	inline
 	bool
 	le( T const & t, MArray2 const & a )
 	{
@@ -769,7 +711,6 @@ public: // Comparison: Predicate
 
 	// Value > MArray2
 	friend
-	inline
 	bool
 	gt( T const & t, MArray2 const & a )
 	{
@@ -778,7 +719,6 @@ public: // Comparison: Predicate
 
 	// Value >= MArray2
 	friend
-	inline
 	bool
 	ge( T const & t, MArray2 const & a )
 	{
@@ -789,7 +729,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 == MArray2
 	friend
-	inline
 	bool
 	any_eq( MArray2 const & a, MArray2 const & b )
 	{
@@ -806,7 +745,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 != MArray2
 	friend
-	inline
 	bool
 	any_ne( MArray2 const & a, MArray2 const & b )
 	{
@@ -815,7 +753,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 < MArray2
 	friend
-	inline
 	bool
 	any_lt( MArray2 const & a, MArray2 const & b )
 	{
@@ -832,7 +769,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 <= MArray2
 	friend
-	inline
 	bool
 	any_le( MArray2 const & a, MArray2 const & b )
 	{
@@ -849,7 +785,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 > MArray2
 	friend
-	inline
 	bool
 	any_gt( MArray2 const & a, MArray2 const & b )
 	{
@@ -858,7 +793,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 >= MArray2
 	friend
-	inline
 	bool
 	any_ge( MArray2 const & a, MArray2 const & b )
 	{
@@ -867,7 +801,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 == Value
 	friend
-	inline
 	bool
 	any_eq( MArray2 const & a, T const & t )
 	{
@@ -882,7 +815,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 != Value
 	friend
-	inline
 	bool
 	any_ne( MArray2 const & a, T const & t )
 	{
@@ -891,7 +823,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 < Value
 	friend
-	inline
 	bool
 	any_lt( MArray2 const & a, T const & t )
 	{
@@ -906,7 +837,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 <= Value
 	friend
-	inline
 	bool
 	any_le( MArray2 const & a, T const & t )
 	{
@@ -921,7 +851,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 > Value
 	friend
-	inline
 	bool
 	any_gt( MArray2 const & a, T const & t )
 	{
@@ -930,7 +859,6 @@ public: // Comparison: Predicate: Any
 
 	// Any MArray2 >= Value
 	friend
-	inline
 	bool
 	any_ge( MArray2 const & a, T const & t )
 	{
@@ -939,7 +867,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value == MArray2
 	friend
-	inline
 	bool
 	any_eq( T const & t, MArray2 const & a )
 	{
@@ -948,7 +875,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value != MArray2
 	friend
-	inline
 	bool
 	any_ne( T const & t, MArray2 const & a )
 	{
@@ -957,7 +883,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value < MArray2
 	friend
-	inline
 	bool
 	any_lt( T const & t, MArray2 const & a )
 	{
@@ -972,7 +897,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value <= MArray2
 	friend
-	inline
 	bool
 	any_le( T const & t, MArray2 const & a )
 	{
@@ -987,7 +911,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value > MArray2
 	friend
-	inline
 	bool
 	any_gt( T const & t, MArray2 const & a )
 	{
@@ -996,7 +919,6 @@ public: // Comparison: Predicate: Any
 
 	// Any Value >= MArray2
 	friend
-	inline
 	bool
 	any_ge( T const & t, MArray2 const & a )
 	{
@@ -1007,7 +929,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 == MArray2
 	friend
-	inline
 	bool
 	all_eq( MArray2 const & a, MArray2 const & b )
 	{
@@ -1016,7 +937,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 != MArray2
 	friend
-	inline
 	bool
 	all_ne( MArray2 const & a, MArray2 const & b )
 	{
@@ -1025,7 +945,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 < MArray2
 	friend
-	inline
 	bool
 	all_lt( MArray2 const & a, MArray2 const & b )
 	{
@@ -1034,7 +953,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 <= MArray2
 	friend
-	inline
 	bool
 	all_le( MArray2 const & a, MArray2 const & b )
 	{
@@ -1043,7 +961,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 > MArray2
 	friend
-	inline
 	bool
 	all_gt( MArray2 const & a, MArray2 const & b )
 	{
@@ -1052,7 +969,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 >= MArray2
 	friend
-	inline
 	bool
 	all_ge( MArray2 const & a, MArray2 const & b )
 	{
@@ -1061,7 +977,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 == Value
 	friend
-	inline
 	bool
 	all_eq( MArray2 const & a, T const & t )
 	{
@@ -1070,7 +985,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 != Value
 	friend
-	inline
 	bool
 	all_ne( MArray2 const & a, T const & t )
 	{
@@ -1079,7 +993,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 < Value
 	friend
-	inline
 	bool
 	all_lt( MArray2 const & a, T const & t )
 	{
@@ -1088,7 +1001,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 <= Value
 	friend
-	inline
 	bool
 	all_le( MArray2 const & a, T const & t )
 	{
@@ -1097,7 +1009,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 > Value
 	friend
-	inline
 	bool
 	all_gt( MArray2 const & a, T const & t )
 	{
@@ -1106,7 +1017,6 @@ public: // Comparison: Predicate: All
 
 	// All MArray2 >= Value
 	friend
-	inline
 	bool
 	all_ge( MArray2 const & a, T const & t )
 	{
@@ -1115,7 +1025,6 @@ public: // Comparison: Predicate: All
 
 	// All Value == MArray2
 	friend
-	inline
 	bool
 	all_eq( T const & t, MArray2 const & a )
 	{
@@ -1124,7 +1033,6 @@ public: // Comparison: Predicate: All
 
 	// All Value != MArray2
 	friend
-	inline
 	bool
 	all_ne( T const & t, MArray2 const & a )
 	{
@@ -1133,7 +1041,6 @@ public: // Comparison: Predicate: All
 
 	// All Value < MArray2
 	friend
-	inline
 	bool
 	all_lt( T const & t, MArray2 const & a )
 	{
@@ -1142,7 +1049,6 @@ public: // Comparison: Predicate: All
 
 	// All Value <= MArray2
 	friend
-	inline
 	bool
 	all_le( T const & t, MArray2 const & a )
 	{
@@ -1151,7 +1057,6 @@ public: // Comparison: Predicate: All
 
 	// All Value > MArray2
 	friend
-	inline
 	bool
 	all_gt( T const & t, MArray2 const & a )
 	{
@@ -1160,7 +1065,6 @@ public: // Comparison: Predicate: All
 
 	// All Value >= MArray2
 	friend
-	inline
 	bool
 	all_ge( T const & t, MArray2 const & a )
 	{
@@ -1171,14 +1075,13 @@ public: // Comparison: Count
 
 	// Count MArray2 == MArray2
 	friend
-	inline
 	size_type
 	count_eq( MArray2 const & a, MArray2 const & b )
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return a.size();
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) == b( i1, i2 ) ) ++n;
@@ -1189,14 +1092,13 @@ public: // Comparison: Count
 
 	// Count MArray2 != MArray2
 	friend
-	inline
 	size_type
 	count_ne( MArray2 const & a, MArray2 const & b )
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) != b( i1, i2 ) ) ++n;
@@ -1207,14 +1109,13 @@ public: // Comparison: Count
 
 	// Count MArray2 < MArray2
 	friend
-	inline
 	size_type
 	count_lt( MArray2 const & a, MArray2 const & b )
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) < b( i1, i2 ) ) ++n;
@@ -1225,14 +1126,13 @@ public: // Comparison: Count
 
 	// Count MArray2 <= MArray2
 	friend
-	inline
 	size_type
 	count_le( MArray2 const & a, MArray2 const & b )
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return a.size();
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) <= b( i1, i2 ) ) ++n;
@@ -1243,14 +1143,13 @@ public: // Comparison: Count
 
 	// Count MArray2 > MArray2
 	friend
-	inline
 	size_type
 	count_gt( MArray2 const & a, MArray2 const & b )
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) > b( i1, i2 ) ) ++n;
@@ -1261,14 +1160,13 @@ public: // Comparison: Count
 
 	// Count MArray2 >= MArray2
 	friend
-	inline
 	size_type
 	count_ge( MArray2 const & a, MArray2 const & b )
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		if ( &a == &b ) return a.size();
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) >= b( i1, i2 ) ) ++n;
@@ -1279,12 +1177,11 @@ public: // Comparison: Count
 
 	// Count MArray2 == Value
 	friend
-	inline
 	size_type
 	count_eq( MArray2 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) == t ) ++n;
@@ -1295,7 +1192,6 @@ public: // Comparison: Count
 
 	// Count Value == MArray2
 	friend
-	inline
 	size_type
 	count_eq( T const & t, MArray2 const & a )
 	{
@@ -1304,12 +1200,11 @@ public: // Comparison: Count
 
 	// Count MArray2 != Value
 	friend
-	inline
 	size_type
 	count_ne( MArray2 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) != t ) ++n;
@@ -1320,7 +1215,6 @@ public: // Comparison: Count
 
 	// Count Value != MArray2
 	friend
-	inline
 	size_type
 	count_ne( T const & t, MArray2 const & a )
 	{
@@ -1329,12 +1223,11 @@ public: // Comparison: Count
 
 	// Count MArray2 < Value
 	friend
-	inline
 	size_type
 	count_lt( MArray2 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) < t ) ++n;
@@ -1345,7 +1238,6 @@ public: // Comparison: Count
 
 	// Count Value < MArray2
 	friend
-	inline
 	size_type
 	count_lt( T const & t, MArray2 const & a )
 	{
@@ -1354,12 +1246,11 @@ public: // Comparison: Count
 
 	// Count MArray2 <= Value
 	friend
-	inline
 	size_type
 	count_le( MArray2 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) <= t ) ++n;
@@ -1370,7 +1261,6 @@ public: // Comparison: Count
 
 	// Count Value <= MArray2
 	friend
-	inline
 	size_type
 	count_le( T const & t, MArray2 const & a )
 	{
@@ -1379,12 +1269,11 @@ public: // Comparison: Count
 
 	// Count MArray2 > Value
 	friend
-	inline
 	size_type
 	count_gt( MArray2 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) > t ) ++n;
@@ -1395,7 +1284,6 @@ public: // Comparison: Count
 
 	// Count Value > MArray2
 	friend
-	inline
 	size_type
 	count_gt( T const & t, MArray2 const & a )
 	{
@@ -1404,12 +1292,11 @@ public: // Comparison: Count
 
 	// Count MArray2 >= Value
 	friend
-	inline
 	size_type
 	count_ge( MArray2 const & a, T const & t )
 	{
 		if ( a.empty() ) return 0;
-		size_type n( 0 );
+		size_type n( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) >= t ) ++n;
@@ -1420,7 +1307,6 @@ public: // Comparison: Count
 
 	// Count Value >= MArray2
 	friend
-	inline
 	size_type
 	count_ge( T const & t, MArray2 const & a )
 	{

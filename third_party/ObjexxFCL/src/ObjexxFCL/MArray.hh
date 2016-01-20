@@ -64,7 +64,6 @@ public: // Types
 protected: // Creation
 
 	// Copy Constructor
-	inline
 	MArray( MArray const & a ) :
 	 BArray( a ),
 	 array_( a.array_ ),
@@ -72,7 +71,6 @@ protected: // Creation
 	{}
 
 	// Constructor
-	inline
 	MArray( A & a, T Class::* pmem ) :
 	 array_( a ),
 	 pmem_( pmem )
@@ -81,7 +79,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~MArray()
 	{}
@@ -89,14 +86,12 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	MArray &
 	operator =( MArray const & a ); // Disallow
 
 public: // Predicate
 
 	// Allocated
-	inline
 	bool
 	allocated() const
 	{
@@ -104,7 +99,6 @@ public: // Predicate
 	}
 
 	// Active Array Empty?
-	inline
 	bool
 	empty() const
 	{
@@ -112,7 +106,6 @@ public: // Predicate
 	}
 
 	// Active Array Size Bounded?
-	inline
 	bool
 	size_bounded() const
 	{
@@ -121,7 +114,6 @@ public: // Predicate
 
 	// Conformable?
 	template< class Ar >
-	inline
 	bool
 	conformable( Ar const & a ) const
 	{
@@ -136,7 +128,6 @@ public: // Inspector
 	rank() const = 0;
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -144,7 +135,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	int
 	isize() const
 	{
@@ -152,7 +142,6 @@ public: // Inspector
 	}
 
 	// IndexRange of a Dimension
-	inline
 	IR
 	I( int const d ) const
 	{
@@ -160,7 +149,6 @@ public: // Inspector
 	}
 
 	// Lower Index of a Dimension
-	inline
 	int
 	l( int const d ) const
 	{
@@ -172,7 +160,6 @@ public: // Inspector
 	}
 
 	// Upper Index of a Dimension
-	inline
 	int
 	u( int const d ) const
 	{
@@ -180,7 +167,6 @@ public: // Inspector
 	}
 
 	// Size of a Dimension
-	inline
 	size_type
 	size( int const d ) const
 	{
@@ -188,7 +174,6 @@ public: // Inspector
 	}
 
 	// Size of a Dimension
-	inline
 	int
 	isize( int const d ) const
 	{
@@ -196,7 +181,6 @@ public: // Inspector
 	}
 
 	// Proxied Array
-	inline
 	A const &
 	array() const
 	{
@@ -204,7 +188,6 @@ public: // Inspector
 	}
 
 	// Proxied Array
-	inline
 	A &
 	array()
 	{
@@ -214,7 +197,6 @@ public: // Inspector
 protected: // Methods
 
 	// Array Index of an Index of Dimension
-	inline
 	int
 	j( int const d, int const i ) const
 	{
@@ -222,7 +204,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 1
-	inline
 	int
 	j1( int const i ) const
 	{
@@ -230,7 +211,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 2
-	inline
 	int
 	j2( int const i ) const
 	{
@@ -238,7 +218,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 3
-	inline
 	int
 	j3( int const i ) const
 	{
@@ -246,7 +225,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 4
-	inline
 	int
 	j4( int const i ) const
 	{
@@ -254,7 +232,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 5
-	inline
 	int
 	j5( int const i ) const
 	{
@@ -262,7 +239,6 @@ protected: // Methods
 	}
 
 	// Array Index of Dimension 6
-	inline
 	int
 	j6( int const i ) const
 	{
@@ -272,7 +248,6 @@ protected: // Methods
 protected: // Static Methods
 
 	// Is Last Index in [1,u] Range?
-	inline
 	static
 	bool
 	in_range( int const u, int const i )
@@ -282,7 +257,6 @@ protected: // Static Methods
 	}
 
 	// Are Last Two Indexes in [1,u] Range?
-	inline
 	static
 	bool
 	in_range( int const u, int const i, int const j )

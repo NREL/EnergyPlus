@@ -70,14 +70,12 @@ class Skip
 public: // Creation
 
 	// Constructor
-	inline
 	explicit
 	Skip( Size const w = 1ul ) :
 	 w_( w )
 	{}
 
 	// Destructor
-	inline
 	~Skip()
 	{}
 

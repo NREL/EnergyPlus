@@ -75,13 +75,11 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	Array1A() :
 	 Super( ProxySentinel() )
 	{}
 
 	// Copy Constructor
-	inline
 	Array1A( Array1A const & a ) :
 	 Super( a, ProxySentinel() )
 	{
@@ -89,7 +87,6 @@ public: // Creation
 	}
 
 	// Super Constructor
-	inline
 	Array1A( Super const & a ) :
 	 Super( a, ProxySentinel() )
 	{
@@ -97,7 +94,6 @@ public: // Creation
 	}
 
 	// Slice Constructor
-	inline
 	Array1A( Array1S< T > const & a ) :
 	 Super( a, ProxySentinel() )
 	{
@@ -105,7 +101,6 @@ public: // Creation
 	}
 
 	// Base Constructor
-	inline
 	Array1A( Base const & a ) :
 	 Super( a, ProxySentinel() )
 	{
@@ -113,7 +108,6 @@ public: // Creation
 	}
 
 	// Tail Constructor
-	inline
 	Array1A( Tail const & s ) :
 	 Super( s, ProxySentinel() )
 	{
@@ -121,7 +115,6 @@ public: // Creation
 	}
 
 	// Value Constructor
-	inline
 	Array1A( T const & t ) :
 	 Super( t, ProxySentinel() )
 	{
@@ -129,7 +122,6 @@ public: // Creation
 	}
 
 	// Copy + IndexRange Constructor
-	inline
 	Array1A( Array1A const & a, IR const & I ) :
 	 Super( a, I, ProxySentinel() )
 	{
@@ -137,7 +129,6 @@ public: // Creation
 	}
 
 	// Super + IndexRange Constructor
-	inline
 	Array1A( Super const & a, IR const & I ) :
 	 Super( a, I, ProxySentinel() )
 	{
@@ -145,7 +136,6 @@ public: // Creation
 	}
 
 	// Slice + IndexRange Constructor
-	inline
 	Array1A( Array1S< T > const & a, IR const & I ) :
 	 Super( a, I, ProxySentinel() )
 	{
@@ -153,7 +143,6 @@ public: // Creation
 	}
 
 	// Base + IndexRange Constructor
-	inline
 	Array1A( Base const & a, IR const & I ) :
 	 Super( a, I, ProxySentinel() )
 	{
@@ -161,7 +150,6 @@ public: // Creation
 	}
 
 	// Tail + IndexRange Constructor
-	inline
 	Array1A( Tail const & s, IR const & I ) :
 	 Super( s, I, ProxySentinel() )
 	{
@@ -169,7 +157,6 @@ public: // Creation
 	}
 
 	// Value + IndexRange Constructor
-	inline
 	Array1A( T const & t, IR const & I ) :
 	 Super( t, I, ProxySentinel() )
 	{
@@ -177,7 +164,6 @@ public: // Creation
 	}
 
 	// Destructor
-	inline
 	virtual
 	~Array1A()
 	{}
@@ -185,7 +171,6 @@ public: // Creation
 public: // Assignment: Array
 
 	// Copy Assignment
-	inline
 	Array1A &
 	operator =( Array1A const & a )
 	{
@@ -197,7 +182,6 @@ public: // Assignment: Array
 	}
 
 	// Super Assignment
-	inline
 	Array1A &
 	operator =( Super const & a )
 	{
@@ -210,7 +194,6 @@ public: // Assignment: Array
 
 	// Super Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator =( Array1< U > const & a )
 	{
@@ -221,7 +204,6 @@ public: // Assignment: Array
 
 	// Slice Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator =( Array1S< U > const & a )
 	{
@@ -231,7 +213,6 @@ public: // Assignment: Array
 
 	// MArray Assignment Template
 	template< class A, typename M >
-	inline
 	Array1A &
 	operator =( MArray1< A, M > const & a )
 	{
@@ -241,7 +222,6 @@ public: // Assignment: Array
 
 	// Initializer List Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator =( std::initializer_list< U > const l )
 	{
@@ -251,7 +231,6 @@ public: // Assignment: Array
 
 	// std::array Assignment Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator =( std::array< U, s > const & a )
 	{
@@ -261,7 +240,6 @@ public: // Assignment: Array
 
 	// std::vector Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator =( std::vector< U > const & v )
 	{
@@ -271,7 +249,6 @@ public: // Assignment: Array
 
 	// Vector2 Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator =( Vector2< U > const & v )
 	{
@@ -281,7 +258,6 @@ public: // Assignment: Array
 
 	// Vector3 Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator =( Vector3< U > const & v )
 	{
@@ -291,7 +267,6 @@ public: // Assignment: Array
 
 	// Vector4 Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator =( Vector4< U > const & v )
 	{
@@ -301,7 +276,6 @@ public: // Assignment: Array
 
 	// += Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator +=( Array1< U > const & a )
 	{
@@ -311,7 +285,6 @@ public: // Assignment: Array
 
 	// -= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator -=( Array1< U > const & a )
 	{
@@ -321,7 +294,6 @@ public: // Assignment: Array
 
 	// *= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator *=( Array1< U > const & a )
 	{
@@ -331,7 +303,6 @@ public: // Assignment: Array
 
 	// /= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator /=( Array1< U > const & a )
 	{
@@ -341,7 +312,6 @@ public: // Assignment: Array
 
 	// += Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator +=( Array1S< U > const & a )
 	{
@@ -351,7 +321,6 @@ public: // Assignment: Array
 
 	// -= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator -=( Array1S< U > const & a )
 	{
@@ -361,7 +330,6 @@ public: // Assignment: Array
 
 	// *= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator *=( Array1S< U > const & a )
 	{
@@ -371,7 +339,6 @@ public: // Assignment: Array
 
 	// /= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator /=( Array1S< U > const & a )
 	{
@@ -381,7 +348,6 @@ public: // Assignment: Array
 
 	// += MArray Template
 	template< class A, typename M >
-	inline
 	Array1A &
 	operator +=( MArray1< A, M > const & a )
 	{
@@ -391,7 +357,6 @@ public: // Assignment: Array
 
 	// -= MArray Template
 	template< class A, typename M >
-	inline
 	Array1A &
 	operator -=( MArray1< A, M > const & a )
 	{
@@ -401,7 +366,6 @@ public: // Assignment: Array
 
 	// *= MArray Template
 	template< class A, typename M >
-	inline
 	Array1A &
 	operator *=( MArray1< A, M > const & a )
 	{
@@ -411,7 +375,6 @@ public: // Assignment: Array
 
 	// /= MArray Template
 	template< class A, typename M >
-	inline
 	Array1A &
 	operator /=( MArray1< A, M > const & a )
 	{
@@ -421,7 +384,6 @@ public: // Assignment: Array
 
 	// += Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator +=( std::initializer_list< U > const l )
 	{
@@ -431,7 +393,6 @@ public: // Assignment: Array
 
 	// -= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator -=( std::initializer_list< U > const l )
 	{
@@ -441,7 +402,6 @@ public: // Assignment: Array
 
 	// *= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator *=( std::initializer_list< U > const l )
 	{
@@ -451,7 +411,6 @@ public: // Assignment: Array
 
 	// /= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator /=( std::initializer_list< U > const l )
 	{
@@ -461,7 +420,6 @@ public: // Assignment: Array
 
 	// += std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator +=( std::array< U, s > const & a )
 	{
@@ -471,7 +429,6 @@ public: // Assignment: Array
 
 	// -= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator -=( std::array< U, s > const & a )
 	{
@@ -481,7 +438,6 @@ public: // Assignment: Array
 
 	// *= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator *=( std::array< U, s > const & a )
 	{
@@ -491,7 +447,6 @@ public: // Assignment: Array
 
 	// /= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator /=( std::array< U, s > const & a )
 	{
@@ -501,7 +456,6 @@ public: // Assignment: Array
 
 	// += std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator +=( std::vector< U > const & v )
 	{
@@ -511,7 +465,6 @@ public: // Assignment: Array
 
 	// -= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator -=( std::vector< U > const & v )
 	{
@@ -521,7 +474,6 @@ public: // Assignment: Array
 
 	// *= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator *=( std::vector< U > const & v )
 	{
@@ -531,7 +483,6 @@ public: // Assignment: Array
 
 	// /= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator /=( std::vector< U > const & v )
 	{
@@ -541,7 +492,6 @@ public: // Assignment: Array
 
 	// += Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator +=( Vector2< U > const & v )
 	{
@@ -551,7 +501,6 @@ public: // Assignment: Array
 
 	// -= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator -=( Vector2< U > const & v )
 	{
@@ -561,7 +510,6 @@ public: // Assignment: Array
 
 	// *= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator *=( Vector2< U > const & v )
 	{
@@ -571,7 +519,6 @@ public: // Assignment: Array
 
 	// /= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator /=( Vector2< U > const & v )
 	{
@@ -581,7 +528,6 @@ public: // Assignment: Array
 
 	// += Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator +=( Vector3< U > const & v )
 	{
@@ -591,7 +537,6 @@ public: // Assignment: Array
 
 	// -= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator -=( Vector3< U > const & v )
 	{
@@ -601,7 +546,6 @@ public: // Assignment: Array
 
 	// *= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator *=( Vector3< U > const & v )
 	{
@@ -611,7 +555,6 @@ public: // Assignment: Array
 
 	// /= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator /=( Vector3< U > const & v )
 	{
@@ -621,7 +564,6 @@ public: // Assignment: Array
 
 	// += Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator +=( Vector4< U > const & v )
 	{
@@ -631,7 +573,6 @@ public: // Assignment: Array
 
 	// -= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator -=( Vector4< U > const & v )
 	{
@@ -641,7 +582,6 @@ public: // Assignment: Array
 
 	// *= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator *=( Vector4< U > const & v )
 	{
@@ -651,7 +591,6 @@ public: // Assignment: Array
 
 	// /= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	operator /=( Vector4< U > const & v )
 	{
@@ -663,7 +602,6 @@ public: // Assignment: Array: Logical
 
 	// &&= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	and_equals( Array1< U > const & a )
 	{
@@ -673,7 +611,6 @@ public: // Assignment: Array: Logical
 
 	// ||= Array Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	or_equals( Array1< U > const & a )
 	{
@@ -683,7 +620,6 @@ public: // Assignment: Array: Logical
 
 	// &&= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	and_equals( Array1S< U > const & a )
 	{
@@ -693,7 +629,6 @@ public: // Assignment: Array: Logical
 
 	// ||= Slice Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	or_equals( Array1S< U > const & a )
 	{
@@ -703,7 +638,6 @@ public: // Assignment: Array: Logical
 
 	// &&= MArray Template
 	template< class A, typename M >
-	inline
 	Array1A &
 	and_equals( MArray1< A, M > const & a )
 	{
@@ -713,7 +647,6 @@ public: // Assignment: Array: Logical
 
 	// ||= MArray Template
 	template< class A, typename M >
-	inline
 	Array1A &
 	or_equals( MArray1< A, M > const & a )
 	{
@@ -723,7 +656,6 @@ public: // Assignment: Array: Logical
 
 	// &&= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	and_equals( std::initializer_list< U > const l )
 	{
@@ -733,7 +665,6 @@ public: // Assignment: Array: Logical
 
 	// ||= Initializer List Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	or_equals( std::initializer_list< U > const l )
 	{
@@ -743,7 +674,6 @@ public: // Assignment: Array: Logical
 
 	// &&= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	and_equals( std::array< U, s > const & a )
 	{
@@ -753,7 +683,6 @@ public: // Assignment: Array: Logical
 
 	// ||= std::array Template
 	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	or_equals( std::array< U, s > const & a )
 	{
@@ -763,7 +692,6 @@ public: // Assignment: Array: Logical
 
 	// &&= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	and_equals( std::vector< U > const & v )
 	{
@@ -773,7 +701,6 @@ public: // Assignment: Array: Logical
 
 	// ||= std::vector Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	or_equals( std::vector< U > const & v )
 	{
@@ -783,7 +710,6 @@ public: // Assignment: Array: Logical
 
 	// &&= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	and_equals( Vector2< U > const & v )
 	{
@@ -793,7 +719,6 @@ public: // Assignment: Array: Logical
 
 	// ||= Vector2 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	or_equals( Vector2< U > const & v )
 	{
@@ -803,7 +728,6 @@ public: // Assignment: Array: Logical
 
 	// &&= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	and_equals( Vector3< U > const & v )
 	{
@@ -813,7 +737,6 @@ public: // Assignment: Array: Logical
 
 	// ||= Vector3 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	or_equals( Vector3< U > const & v )
 	{
@@ -823,7 +746,6 @@ public: // Assignment: Array: Logical
 
 	// &&= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	and_equals( Vector4< U > const & v )
 	{
@@ -833,7 +755,6 @@ public: // Assignment: Array: Logical
 
 	// ||= Vector4 Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Array1A &
 	or_equals( Vector4< U > const & v )
 	{
@@ -844,7 +765,6 @@ public: // Assignment: Array: Logical
 public: // Assignment: Value
 
 	// = Value
-	inline
 	Array1A &
 	operator =( T const & t )
 	{
@@ -853,7 +773,6 @@ public: // Assignment: Value
 	}
 
 	// += Value
-	inline
 	Array1A &
 	operator +=( T const & t )
 	{
@@ -862,7 +781,6 @@ public: // Assignment: Value
 	}
 
 	// -= Value
-	inline
 	Array1A &
 	operator -=( T const & t )
 	{
@@ -871,7 +789,6 @@ public: // Assignment: Value
 	}
 
 	// *= Value
-	inline
 	Array1A &
 	operator *=( T const & t )
 	{
@@ -880,7 +797,6 @@ public: // Assignment: Value
 	}
 
 	// /= Value
-	inline
 	Array1A &
 	operator /=( T const & t )
 	{
@@ -891,7 +807,6 @@ public: // Assignment: Value
 public: // Predicate
 
 	// Initializer Active?
-	inline
 	bool
 	initializer_active() const
 	{
@@ -901,7 +816,6 @@ public: // Predicate
 public: // Modifier
 
 	// Clear
-	inline
 	Array1A &
 	clear()
 	{
@@ -910,7 +824,6 @@ public: // Modifier
 	}
 
 	// Dimension by IndexRange Even if Const
-	inline
 	Array1A const &
 	dim( IR const & I ) const
 	{
@@ -920,7 +833,6 @@ public: // Modifier
 
 	// Dimension by Array Even if Const
 	template< typename U >
-	inline
 	Array1A const &
 	dim( Array1< U > const & a ) const
 	{
@@ -929,7 +841,6 @@ public: // Modifier
 	}
 
 	// Dimension by IndexRange
-	inline
 	Array1A &
 	dimension( IR const & I )
 	{
@@ -940,7 +851,6 @@ public: // Modifier
 
 	// Dimension by Array
 	template< typename U >
-	inline
 	Array1A &
 	dimension( Array1< U > const & a )
 	{
@@ -950,7 +860,6 @@ public: // Modifier
 	}
 
 	// Attach to Super Array
-	inline
 	Array1A &
 	attach( Super const & a )
 	{
@@ -960,7 +869,6 @@ public: // Modifier
 	}
 
 	// Attach to Non-Const Super Array
-	inline
 	Array1A &
 	attach( Super & a )
 	{
@@ -970,7 +878,6 @@ public: // Modifier
 	}
 
 	// Attach to Base Array
-	inline
 	Array1A &
 	attach( Base const & a )
 	{
@@ -980,7 +887,6 @@ public: // Modifier
 	}
 
 	// Attach to Non-Const Base Array
-	inline
 	Array1A &
 	attach( Base & a )
 	{
@@ -990,7 +896,6 @@ public: // Modifier
 	}
 
 	// Attach to Tail
-	inline
 	Array1A &
 	attach( Tail const & s )
 	{
@@ -1000,7 +905,6 @@ public: // Modifier
 	}
 
 	// Attach to Non-Const Tail
-	inline
 	Array1A &
 	attach( Tail & s )
 	{
@@ -1010,7 +914,6 @@ public: // Modifier
 	}
 
 	// Attach to Value
-	inline
 	Array1A &
 	attach( T const & t )
 	{
@@ -1020,7 +923,6 @@ public: // Modifier
 	}
 
 	// Attach to Non-Const Value
-	inline
 	Array1A &
 	attach( T & t )
 	{
@@ -1030,7 +932,6 @@ public: // Modifier
 	}
 
 	// Detach from Source Array
-	inline
 	Array1A &
 	detach()
 	{
@@ -1042,7 +943,6 @@ public: // Modifier
 protected: // Functions
 
 	// Dimension by IndexRange
-	inline
 	void
 	dimension_assign( IR const & I )
 	{
@@ -1053,7 +953,6 @@ protected: // Functions
 private: // Functions
 
 	// Dimension by Current IndexRange
-	inline
 	void
 	dimension_argument()
 	{

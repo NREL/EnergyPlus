@@ -755,7 +755,7 @@ Table 1. Values for "Terrain"
 
 #### Warmup Convergence
 
-The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisifed too early and you may not get the results you expect from the actual simulation.
+The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions: temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisifed too early and you may not get the results you expect from the actual simulation.
 
 #### Field: Loads Convergence Tolerance Value
 
@@ -2883,7 +2883,7 @@ Site:GroundDomain:Slab,
     Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
 ```
 
-### Site:GroundDomain Outputs
+### Site:GroundDomain:Slab Outputs
 
 The following output variables are available.
 
@@ -2892,11 +2892,11 @@ The following output variables are available.
 
 #### Zone Coupled Surface Heat Flux [W/m2]
 
-This is the value of the heat flux provided to the GroundDomain as a boundary condition which is determined by taking the average of all surfaces coupled to the domains OtherSideBoudaryCondition model.
+This is the value of the heat flux provided to the GroundDomain as a boundary condition. This is calculated by taking the average heat flux of all surfaces coupled to the domain's SurfaceProperty:OtherSideConditionsModel model.
 
 #### Zone Coupled Surface Temperature [C]
 
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled surfaces as an outside boundary condition.
+This is the value of the SurfaceProperty:OtherSideConditionsModel surface temperature. This is the temperature provided to the ground coupled surfaces as an outside boundary condition.
 
 ### Site:GroundDomain:Basement
 
@@ -3030,7 +3030,7 @@ Alpha field indicating whether the domain will update temperatures at each zone 
 
 Integer field indicating the density of the finite difference ground domain cells between the basement and the far field boundaries. Default value is 4. Total number of ground domain cells, insulation cells, and ground surface cells are indicated as outputs to the eio file.
 
-Site:GroundDomain:Basement Output Variables
+### Site:GroundDomain:Basement Outputs
 
 The following output variables are available.
 
@@ -3048,7 +3048,7 @@ This is the value of the heat flux provided to ground domain as a boundary condi
 
 #### Wall Interface Temperature [C]
 
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the basement wall surfaces as an outside boundary condition.
+This is the value of the SurfaceProperty:OtherSideConditionsModel surface temperature. This is the temperature provided to the basement wall surfaces as an outside boundary condition.
 
 #### Floor Interface Heat Flux [W/m2]
 
@@ -3056,7 +3056,7 @@ This is the value of the heat flux provided to ground domain as a boundary condi
 
 #### Floor Interface Temperature [C]
 
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled floor surfaces as an outside boundary condition.
+This is the value of the SurfaceProperty:OtherSideConditionsModel surface temperature. This is the temperature provided to the ground coupled floor surfaces as an outside boundary condition.
 
 
 
@@ -4677,6 +4677,15 @@ This outputs the count of iterations on the inner solver loop of CondFD for each
 #### CondFD Surface Temperature Node &lt;X&gt; [C]
 
 This will output temperatures for a node in the surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file
+
+#### CondFD Surface Heat Flux Node &lt;X&gt; [W/m2]
+
+This will output heat flux at each node in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. A positive value indicates heat flowing towards the inside face of the surface. Note that this matches the sign convention for Surface Inside Face Conduction Heat Transfer Rate per Area and is opposite the sign of Surface OUtside Face Conduction Heat Transfer Rate per Area.
+
+#### CondFD Surface Heat Capacitance Outer Half Node &lt;X&gt; [W/m2-K]
+#### CondFD Surface Heat Capacitance Inner Half Node &lt;X&gt; [W/m2-K]
+
+These will output the half-node heat capacitance in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. For this output, the heat capacitance is defined as the product of specific heat, density, and node thickness. Zero is reported for R-layer half-nodes and for undefined half-nodes.  There is no outer half-node for Node 1 which is the outside face of the surface, and there is no inner half-node for Node N which is the inside face of the surface. CondFD Surface Heat Capacitance is only available with Output:Diagnostics,DisplayAdvancedReportVariables.
 
 ### MaterialProperty:HeatAndMoistureTransfer:Settings
 
@@ -8713,7 +8722,9 @@ EnergyPlus allows for several surface types:
 
 - **Shading:Zone:Detailed**
 
-Each of the preceding surfaces has “correct” geometry specifications. BuildingSurface and Fenestration surfaces (heat transfer surfaces) are used to describe the important elements of the building (walls, roofs, floors, windows, doors) that will determine the interactions of the building surfaces with the outside environment parameters and the internal space requirements. These surfaces are also used to represent “interzone” heat transfer. During specification of surfaces, several “outside” environments may be chosen:
+Each of the preceding surfaces has “correct” geometry specifications. BuildingSurface and Fenestration surfaces (heat transfer surfaces) are used to describe the important elements of the building (walls, roofs, floors, windows, doors) that will determine the interactions of the building surfaces with the outside environment parameters and the internal space requirements. These surfaces are also used to represent “interzone” heat transfer. All surfaces are modeled as a thin plane (with no thickness) except that material thicknesses are taken into account for heat transfer calculations. 
+
+During specification of surfaces, several “outside” environments may be chosen:
 
 - **Ground** – when the surface is in touch with the ground (e.g. slab floors)
 
@@ -8745,7 +8756,7 @@ Each of the preceding surfaces has “correct” geometry specifications. Buildi
 
 - The zone that contains the other surface that is adjactent to this surface but is not entered in input.
 
-Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coeffients neither inside nor outside are used in the description – these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction.
+Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coeffients neither inside nor outside are used in the description – these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction. When a surface is connected as the outside boundary condition for another surface, the two surfaces may be in the same plane, or they may be separated to imply thickness.
 
 **Shading** surfaces are used to describe aspects of the site which do not directly impact the physical interactions of the environmental parameters but may significantly shade the building during specific hours of the day or time so the year (e.g. trees, bushes, mountains, nearby buildings which aren’t being simulated as part of this facility, etc.)
 
@@ -17296,7 +17307,7 @@ This field is the name of the schedule that approximates the amount of air movem
 
 #### Field: Thermal Comfort Model Type (up to 5 allowed)
 
-The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55,, and AdaptiveCEN15251, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, and the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251 results for this particular people statement. Note that since up to five models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all five models if desired. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. For descriptions of the thermal comfort calculations, see the Engineering Reference document.
+The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55,, and AdaptiveCEN15251, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, and the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251 results for this particular people statement. AdaptiveASH55 is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 33.5C.  AdaptiveCEN15251 is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 30.0C. Note that since up to five models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all five models if desired. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. For descriptions of the thermal comfort calculations, see the Engineering Reference document.
 
 The following IDF example allows for a maximum of 31 people with scheduled occupancy of “Office Occupancy”, 60% radiant using an Activity Schedule of “Activity Sch”. The example allows for thermal comfort reporting.
 
@@ -17588,11 +17599,11 @@ This field is the “thermal sensation vote” (TSV) calculated using the KSU tw
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model 90% Acceptability Status []
 
-This field is to report whether the operative temperature falls into the 90% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the 90% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status [ ]
 
-This field is to report whether the operative temperature falls into the 80% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the 80% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature [C]
 
@@ -17602,27 +17613,27 @@ If the .epw file is used, the field reports the simple running average of the da
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature [C]
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80% acceptability limits for indoor operative temperature are defined as no greater than 2.5 degrees C from the adaptive comfort temperature. The 90% acceptability limits are defined as no greater than 3.5 degrees C from the adaptive comfort temperature.
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80% acceptability limits for indoor operative temperature are defined as no greater than 3.5 degrees C from the adaptive comfort temperature. The 90% acceptability limits are defined as no greater than 2.5 degrees C from the adaptive comfort temperature. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status
 
-This field is to report whether the operative temperature falls into the Category I (90% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category I (90% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status
 
-This field is to report whether the operative temperature falls into the Category II (80% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category II (80% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status
 
-This field is to report whether the operative temperature falls into the Category III (65% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category III (65% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature
 
-This field reports the weighted average of the outdoor air temperature of the previous five days, an input parameter for the CEN-15251 adaptive comfort model.
+This field reports the weighted average of the outdoor air temperature of the previous seven days, an input parameter for the CEN-15251 adaptive comfort model.
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Temperature
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively.
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 ### Simplified ASHRAE 55-2004 Graph Related Outputs
 
@@ -17857,59 +17868,212 @@ The fraction of heat from lights that goes into the zone as long-wave (thermal) 
 
 The fraction of heat from lights that goes into the zone as visible (short-wave) radiation. The program calculates how much of this radiation is absorbed by the inside surfaces of the zone according the area times solar absorptance product of these surfaces.
 
-Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table 14 for overhead fluorescent lighting for the luminaire configurations shown in Figure 51.
+Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table 14 for overhead fluorescent lighting for a variety of luminaire configurations. The data is based on ASHRAE 1282-RP "Lighting Heat Gain Distribution in Buildings" by Daniel E. Fisher and Chanvit Chantrasrisalai.
 
-Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. These values assume that no light heat goes into an adjacent zone. Source: *Lighting Handbook: Reference & Application*, 8<sup>th</sup> Edition, Illuminating Engineering Society of North America, New York, 1993, p. 355.
+Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. 
 
 <table class="table table-striped">
   <tr>
-    <th rowspan="2">Field Name</th>
-    <th colspan="5">Luminaire Configuration, Flourescent Lighting</th>
+    <th>Fixture No.</th>
+    <th>Luminaire Feature</th>
+    <th>Return Air Fraction</th>
+    <th>Fraction Radiant</th>
+    <th>Fraction Visible</th>
+    <th>fconvected</th>
   </tr>
   <tr>
-    <td>Suspended</td>
-    <td>Surface Mount</td>
-    <td>Recessed</td>
-    <td>Luminous and louvered ceiling</td>
-    <td>Return-air ducted</td>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8</td>
+    <td>0.31</td>
+    <td>0.22</td>
+    <td>0.20</td>
+    <td>0.27</td>
   </tr>
   <tr>
-    <td>Return Air Fraction</td>
-    <td>0.0</td>
-    <td>0.0</td>
-    <td>0.0</td>
-    <td>0.0</td>
+    <td>2</td>
+    <td>Recessed, Acrylic Lens, Non-Vented, T8</td>
+    <td>0.56</td>
+    <td>0.12</td>
+    <td>0.20</td>
+    <td>0.12</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8</td>
+    <td>0.28</td>
+    <td>0.19</td>
+    <td>0.20</td>
+    <td>0.33</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Recessed, Acrylic Lens, Vented, T8</td>
+    <td>0.54</td>
+    <td>0.10</td>
+    <td>0.18</td>
+    <td>0.18</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8</td>
+    <td>0.34</td>
+    <td>0.17</td>
+    <td>0.16</td>
+    <td>0.33</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>Recessed, Volumetric, T5</td>
+    <td>0.54</td>
+    <td>0.13</td>
+    <td>0.20</td>
+    <td>0.13</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>Downlights, Compact Fluorescent, DTT</td>
+    <td>0.86</td>
+    <td>0.04</td>
+    <td>0.10</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>Downlights, Compact Fluorescent, TRT</td>
+    <td>0.78</td>
+    <td>0.09</td>
+    <td>0.13</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>9a</td>
+    <td>Downlights, Incandescent, A21</td>
+    <td>0.29</td>
+    <td>0.10</td>
+    <td>0.6</td>
+    <td>0.01</td>
+  </tr>
+  <tr>
+    <td>9b</td>
+    <td>Downlights, Incandescent, BR40</td>
+    <td>0.21</td>
+    <td>0.08</td>
+    <td>0.71</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>Surface Mounted, T5HO</td>
+    <td>0.00</td>
+    <td>0.27</td>
+    <td>0.23</td>
+    <td>0.50</td>
+  </tr>
+  <tr>
+    <td>11</td>
+    <td>Pendant, Direct/Indirect, T8</td>
+    <td>0.00</td>
+    <td>0.32</td>
+    <td>0.23</td>
+    <td>0.45</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>Pendant, Indirect, T5HO</td>
+    <td>0.00</td>
+    <td>0.32</td>
+    <td>0.25</td>
+    <td>0.43</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Ducted</td>
+    <td>0.27</td>
+    <td>0.27</td>
+    <td>0.21</td>
+    <td>0.25</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Ducted</td>
+    <td>0.27</td>
+    <td>0.22</td>
+    <td>0.17</td>
+    <td>0.34</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.45</td>
+    <td>0.30</td>
+    <td>0.22</td>
+    <td>0.03</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.43</td>
+    <td>0.25</td>
+    <td>0.21</td>
+    <td>0.11</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.43</td>
+    <td>0.27</td>
+    <td>0.18</td>
+    <td>0.12</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.10</td>
+    <td>0.16</td>
+    <td>0.20</td>
     <td>0.54</td>
   </tr>
   <tr>
-    <td>Fraction Radiant</td>
-    <td>0.42</td>
-    <td>0.72</td>
-    <td>0.37</td>
-    <td>0.37</td>
-    <td>0.18</td>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.11</td>
+    <td>0.15</td>
+    <td>0.19</td>
+    <td>0.55</td>
   </tr>
   <tr>
-    <td>Fraction Visible</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-  </tr>
-  <tr>
-    <td>f<sub>convected</sub></td>
-    <td>0.40</td>
-    <td>0.10</td>
-    <td>0.45</td>
-    <td>0.45</td>
-    <td>0.10</td>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.04</td>
+    <td>0.13</td>
+    <td>0.16</td>
+    <td>0.67</td>
   </tr>
 </table>
-
-![](media/image086.svg)
-
-Figure 51. Overhead fluorescent luminaire configurations.
 
 #### Field: Fraction Replaceable
 

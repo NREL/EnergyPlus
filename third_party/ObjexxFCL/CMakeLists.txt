@@ -13,10 +13,8 @@ set(src
   src/ObjexxFCL/Array1D.hh
   src/ObjexxFCL/Array1.fwd.hh
   src/ObjexxFCL/Array1.hh
-  src/ObjexxFCL/Array1.Project.MArray.hh
   src/ObjexxFCL/Array1S.fwd.hh
   src/ObjexxFCL/Array1S.hh
-  src/ObjexxFCL/Array1S.Project.MArray.hh
   src/ObjexxFCL/Array2A.fwd.hh
   src/ObjexxFCL/Array2A.hh
   src/ObjexxFCL/Array2.all.fwd.hh
@@ -25,10 +23,8 @@ set(src
   src/ObjexxFCL/Array2D.hh
   src/ObjexxFCL/Array2.fwd.hh
   src/ObjexxFCL/Array2.hh
-  src/ObjexxFCL/Array2.Project.MArray.hh
   src/ObjexxFCL/Array2S.fwd.hh
   src/ObjexxFCL/Array2S.hh
-  src/ObjexxFCL/Array2S.Project.MArray.hh
   src/ObjexxFCL/Array3A.fwd.hh
   src/ObjexxFCL/Array3A.hh
   src/ObjexxFCL/Array3.all.fwd.hh
@@ -143,7 +139,6 @@ set(src
   src/ObjexxFCL/IOFlags.hh
   src/ObjexxFCL/MArray1.fwd.hh
   src/ObjexxFCL/MArray1.hh
-  src/ObjexxFCL/MArray1.Project.MArray.hh
   src/ObjexxFCL/MArray2.fwd.hh
   src/ObjexxFCL/MArray2.hh
   src/ObjexxFCL/MArray3.fwd.hh
@@ -161,6 +156,7 @@ set(src
   src/ObjexxFCL/MArray.hh
   src/ObjexxFCL/MArrayR.fwd.hh
   src/ObjexxFCL/MArrayR.hh
+  src/ObjexxFCL/member.functions.hh
   src/ObjexxFCL/noexcept.hh
   src/ObjexxFCL/numeric.cc
   src/ObjexxFCL/numeric.hh
@@ -221,6 +217,7 @@ set(src
   src/ObjexxFCL/Vector3.hh
   src/ObjexxFCL/Vector4.fwd.hh
   src/ObjexxFCL/Vector4.hh
+  src/ObjexxFCL/vectorize.hh
   src/ObjexxFCL/Write.cc
   src/ObjexxFCL/Write.fwd.hh
   src/ObjexxFCL/Write.hh
@@ -255,6 +252,7 @@ set( test_src
   tst/unit/Index.unit.cc
   tst/unit/main.cc
   tst/unit/MArray.unit.cc
+  tst/unit/member.functions.unit.cc
   tst/unit/numeric.unit.cc
   tst/unit/ObjexxFCL.unit.hh
   tst/unit/Optional.unit.cc

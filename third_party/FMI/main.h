@@ -63,6 +63,7 @@ typedef fmiStatus (*fDoStep) (fmiComponent c, fmiReal currentCommunicationPoint,
 
 typedef struct FMU{
 	int index;
+	fmiString instanceName;
 	fmiString modelID;
 	fmiString modelGUID;
 	ModelDescription* modelDescription;
@@ -102,7 +103,7 @@ fmiStatus fmiEPlusSetReal(fmiComponent *fmuInstance, const fmiValueReference val
 fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint,
 	fmiReal *commStepSize, fmiInteger *newStep, fmiInteger *index);
 
-fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index);
+fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index, fmiInteger *fmiEndSimulation);
 
 fmiStatus fmiEPlusResetSlave(fmiComponent *fmuInstance, fmiInteger *index);
 
@@ -113,13 +114,13 @@ fmiInteger addLibPathCurrentWorkingFolder(char* trimfmuOutputWorkingFolder_wLiB,
 	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder,
 	fmiInteger *index);
 
-fmiInteger getValueReferenceByNameFMUInputVariables(char* variableName,
+fmiValueReference getValueReferenceByNameFMUInputVariables(char* variableName,
 	fmiInteger *sizeVariableName, fmiInteger *index);
 
-fmiInteger getValueReferenceByNameFMUOutputVariables(char* variableName,
+fmiValueReference getValueReferenceByNameFMUOutputVariables(char* variableName,
 	fmiInteger *sizeVariableName, fmiInteger *index);
 
-fmiInteger model_ID_GUID(char* fmuWorkingFolder,
+fmiInteger model_ID_GUID(char* fmuInstanceName, char* fmuWorkingFolder,
 	fmiInteger *sizefmuWorkingFolder, fmiInteger *numInputs,
 	fmiInteger *numOutputs);
 

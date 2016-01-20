@@ -1160,7 +1160,7 @@ pack( Array1< T > const & a, Array1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
 	}
@@ -1179,7 +1179,7 @@ pack( Array2< T > const & a, Array2< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
 	}
@@ -1198,7 +1198,7 @@ pack( Array3< T > const & a, Array3< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
 	}
@@ -1217,7 +1217,7 @@ pack( Array4< T > const & a, Array4< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
 	}
@@ -1236,7 +1236,7 @@ pack( Array5< T > const & a, Array5< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
 	}
@@ -1255,7 +1255,7 @@ pack( Array6< T > const & a, Array6< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
 	}
@@ -1297,7 +1297,7 @@ cshift( Array2< T > const & a, int const shift, int const dim = 1 )
 	Array2D< T > o( Array2D< T >::shape( a ) );
 	int const s1( a.isize1() );
 	int const s2( a.isize2() );
-	size_type l( 0 );
+	size_type l( 0u );
 	switch ( dim ) {
 	case 1:
 		{
@@ -1337,7 +1337,7 @@ cshift( Array2< T > const & a, Array1< int > const & shift, int const dim = 1 )
 	Array2D< T > o( Array2D< T >::shape( a ) );
 	int const s1( a.isize1() );
 	int const s2( a.isize2() );
-	size_type l( 0 );
+	size_type l( 0u );
 	switch ( dim ) {
 	case 1:
 		assert( shift.size() == a.size2() );
@@ -2063,8 +2063,8 @@ minval( Array< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  Array< bool >::size_type  size_type;
-	T r( std::numeric_limits< T >::max() );
-	for ( size_type i = 0; i < a.size(); ++i ) {
+	T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
+	for ( size_type i = 1; i < a.size(); ++i ) {
 		r = std::min( r, a[ i ] );
 	}
 	return r;
@@ -2079,8 +2079,8 @@ maxval( Array< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  Array< bool >::size_type  size_type;
-	T r( std::numeric_limits< T >::lowest() );
-	for ( size_type i = 0; i < a.size(); ++i ) {
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
+	for ( size_type i = 1; i < a.size(); ++i ) {
 		r = std::max( r, a[ i ] );
 	}
 	return r;
@@ -2095,14 +2095,14 @@ minloc( Array1< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  Array< bool >::size_type  size_type;
-	int const as1( a.isize1() );
-	Array1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
-	for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
+	int const as( a.isize1() );
+	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
+	size_type l( 1u );
+	for ( int i = 2; i <= as; ++i, ++l ) {
 		if ( a[ l ] < r ) {
 			r = a[ l ];
-			loc = { i1 };
+			loc = { i };
 		}
 	}
 	return loc;
@@ -2117,9 +2117,9 @@ minloc( Array2< T > const & a )
 	typedef  Array< bool >::size_type  size_type;
 	int const as1( a.isize1() );
 	int const as2( a.isize2() );
-	Array1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	Array1D< int > loc( 2, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
 			if ( a[ l ] < r ) {
@@ -2141,9 +2141,9 @@ minloc( Array3< T > const & a )
 	int const as1( a.isize1() );
 	int const as2( a.isize2() );
 	int const as3( a.isize3() );
-	Array1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	Array1D< int > loc( 3, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3, ++l ) {
@@ -2168,9 +2168,9 @@ minloc( Array4< T > const & a )
 	int const as2( a.isize2() );
 	int const as3( a.isize3() );
 	int const as4( a.isize4() );
-	Array1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	Array1D< int > loc( 4, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
@@ -2198,9 +2198,9 @@ minloc( Array5< T > const & a )
 	int const as3( a.isize3() );
 	int const as4( a.isize4() );
 	int const as5( a.isize5() );
-	Array1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	Array1D< int > loc( 5, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
@@ -2231,9 +2231,9 @@ minloc( Array6< T > const & a )
 	int const as4( a.isize4() );
 	int const as5( a.isize5() );
 	int const as6( a.isize6() );
-	Array1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	Array1D< int > loc( 6, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
@@ -2283,7 +2283,7 @@ minloc( Array2< T > const & a, int const dim )
 		Array1D< int > loc( as2, as2 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		if ( as2 <= TypeTraits< T >::loc_2_crossover ) { // Cache-unfriendly small array method
 			for ( int i2 = 1; i2 <= as2; ++i2 ) {
-				T r( std::numeric_limits< T >::max() );
+				T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
 				size_type l( i2 - 1 );
 				for ( int i1 = 1; i1 <= as1; ++i1, l += as2 ) {
 					if ( a[ l ] < r ) {
@@ -2293,8 +2293,8 @@ minloc( Array2< T > const & a, int const dim )
 				}
 			}
 		} else { // Cache-friendly large array method
-			Array1D< T > val( as2, std::numeric_limits< T >::max() );
-			size_type l( 0 );
+			Array1D< T > val( as2, a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
+			size_type l( 0u );
 			for ( int i1 = 1; i1 <= as1; ++i1 ) {
 				for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
 					if ( a[ l ] < val( i2 ) ) {
@@ -2309,9 +2309,9 @@ minloc( Array2< T > const & a, int const dim )
 	case 2:
 		{
 		Array1D< int > loc( as1, as1 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-		size_type l( 0 );
+		size_type l( 0u );
 		for ( int i1 = 1; i1 <= as1; ++i1 ) {
-			T r( std::numeric_limits< T >::max() );
+			T r( a.empty() ? std::numeric_limits< T >::max() : a[ 0 ] );
 			for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
 				if ( a[ l ] < r ) {
 					r = a[ l ];
@@ -2335,14 +2335,21 @@ minloc( Array1< T > const & a, Array1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	int const as1( a.isize1() );
-	Array1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	int const as( a.isize1() );
+	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
-	for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
-		if ( mask[ l ] && ( a[ l ] < r ) ) {
-			r = a[ l ];
-			loc = { i1 };
+	size_type l( 0u );
+	bool first( true );
+	for ( int i = 1; i <= as; ++i, ++l ) {
+		if ( mask[ l ] ) {
+			if ( first ) {
+				first = false;
+				r = a[ l ];
+				loc = { i };
+			} else if ( a[ l ] < r ) {
+				r = a[ l ];
+				loc = { i };
+			}
 		}
 	}
 	return loc;
@@ -2358,14 +2365,21 @@ minloc( Array2< T > const & a, Array2< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	int const as1( a.isize1() );
 	int const as2( a.isize2() );
-	Array1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 2, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
-			if ( mask[ l ] && ( a[ l ] < r ) ) {
-				r = a[ l ];
-				loc = { i1, i2 };
+			if ( mask[ l ] ) {
+				if ( first ) {
+					first = false;
+					r = a[ l ];
+					loc = { i1, i2 };
+				} else if ( a[ l ] < r ) {
+					r = a[ l ];
+					loc = { i1, i2 };
+				}
 			}
 		}
 	}
@@ -2383,15 +2397,22 @@ minloc( Array3< T > const & a, Array3< bool > const & mask )
 	int const as1( a.isize1() );
 	int const as2( a.isize2() );
 	int const as3( a.isize3() );
-	Array1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 3, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3, ++l ) {
-				if ( mask[ l ] && ( a[ l ] < r ) ) {
-					r = a[ l ];
-					loc = { i1, i2, i3 };
+				if ( mask[ l ] ) {
+					if ( first ) {
+						first = false;
+						r = a[ l ];
+						loc = { i1, i2, i3 };
+					} else if ( a[ l ] < r ) {
+						r = a[ l ];
+						loc = { i1, i2, i3 };
+					}
 				}
 			}
 		}
@@ -2411,16 +2432,23 @@ minloc( Array4< T > const & a, Array4< bool > const & mask )
 	int const as2( a.isize2() );
 	int const as3( a.isize3() );
 	int const as4( a.isize4() );
-	Array1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 4, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
 				for ( int i4 = 1; i4 <= as4; ++i4, ++l ) {
-					if ( mask[ l ] && ( a[ l ] < r ) ) {
-						r = a[ l ];
-						loc = { i1, i2, i3, i4 };
+					if ( mask[ l ] ) {
+						if ( first ) {
+							first = false;
+							r = a[ l ];
+							loc = { i1, i2, i3, i4 };
+						} else if ( a[ l ] < r ) {
+							r = a[ l ];
+							loc = { i1, i2, i3, i4 };
+						}
 					}
 				}
 			}
@@ -2442,17 +2470,24 @@ minloc( Array5< T > const & a, Array5< bool > const & mask )
 	int const as3( a.isize3() );
 	int const as4( a.isize4() );
 	int const as5( a.isize5() );
-	Array1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 5, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
 				for ( int i4 = 1; i4 <= as4; ++i4 ) {
 					for ( int i5 = 1; i5 <= as5; ++i5, ++l ) {
-						if ( mask[ l ] && ( a[ l ] < r ) ) {
-							r = a[ l ];
-							loc = { i1, i2, i3, i4, i5 };
+						if ( mask[ l ] ) {
+							if ( first ) {
+								first = false;
+								r = a[ l ];
+								loc = { i1, i2, i3, i4, i5 };
+							} else if ( a[ l ] < r ) {
+								r = a[ l ];
+								loc = { i1, i2, i3, i4, i5 };
+							}
 						}
 					}
 				}
@@ -2476,18 +2511,25 @@ minloc( Array6< T > const & a, Array6< bool > const & mask )
 	int const as4( a.isize4() );
 	int const as5( a.isize5() );
 	int const as6( a.isize6() );
-	Array1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 6, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
 				for ( int i4 = 1; i4 <= as4; ++i4 ) {
 					for ( int i5 = 1; i5 <= as5; ++i5 ) {
 						for ( int i6 = 1; i6 <= as6; ++i6, ++l ) {
-							if ( mask[ l ] && ( a[ l ] < r ) ) {
-								r = a[ l ];
-								loc = { i1, i2, i3, i4, i5, i6 };
+							if ( mask[ l ] ) {
+								if ( first ) {
+									first = false;
+									r = a[ l ];
+									loc = { i1, i2, i3, i4, i5, i6 };
+								} else if ( a[ l ] < r ) {
+									r = a[ l ];
+									loc = { i1, i2, i3, i4, i5, i6 };
+								}
 							}
 						}
 					}
@@ -2507,14 +2549,14 @@ maxloc( Array1< T > const & a )
 {
 	assert( a.size_bounded() );
 	typedef  Array< bool >::size_type  size_type;
-	int const as1( a.isize1() );
-	Array1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
-	for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
+	int const as( a.isize1() );
+	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
+	size_type l( 1u );
+	for ( int i = 2; i <= as; ++i, ++l ) {
 		if ( a[ l ] > r ) {
 			r = a[ l ];
-			loc = { i1 };
+			loc = { i };
 		}
 	}
 	return loc;
@@ -2529,9 +2571,9 @@ maxloc( Array2< T > const & a )
 	typedef  Array< bool >::size_type  size_type;
 	int const as1( a.isize1() );
 	int const as2( a.isize2() );
-	Array1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	Array1D< int > loc( 2, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
 			if ( a[ l ] > r ) {
@@ -2553,9 +2595,9 @@ maxloc( Array3< T > const & a )
 	int const as1( a.isize1() );
 	int const as2( a.isize2() );
 	int const as3( a.isize3() );
-	Array1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	Array1D< int > loc( 3, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3, ++l ) {
@@ -2580,9 +2622,9 @@ maxloc( Array4< T > const & a )
 	int const as2( a.isize2() );
 	int const as3( a.isize3() );
 	int const as4( a.isize4() );
-	Array1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	Array1D< int > loc( 4, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
@@ -2610,9 +2652,9 @@ maxloc( Array5< T > const & a )
 	int const as3( a.isize3() );
 	int const as4( a.isize4() );
 	int const as5( a.isize5() );
-	Array1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	Array1D< int > loc( 5, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
@@ -2643,9 +2685,9 @@ maxloc( Array6< T > const & a )
 	int const as4( a.isize4() );
 	int const as5( a.isize5() );
 	int const as6( a.isize6() );
-	Array1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	Array1D< int > loc( 6, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
+	size_type l( 0u );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
@@ -2695,7 +2737,7 @@ maxloc( Array2< T > const & a, int const dim )
 		Array1D< int > loc( as2, as2 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		if ( as2 <= TypeTraits< T >::loc_2_crossover ) { // Cache-unfriendly small array method
 			for ( int i2 = 1; i2 <= as2; ++i2 ) {
-				T r( std::numeric_limits< T >::lowest() );
+				T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
 				size_type l( i2 - 1 );
 				for ( int i1 = 1; i1 <= as1; ++i1, l += as2 ) {
 					if ( a[ l ] > r ) {
@@ -2705,8 +2747,8 @@ maxloc( Array2< T > const & a, int const dim )
 				}
 			}
 		} else { // Cache-friendly large array method
-			Array1D< T > val( as2, std::numeric_limits< T >::lowest() );
-			size_type l( 0 );
+			Array1D< T > val( as2, a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
+			size_type l( 0u );
 			for ( int i1 = 1; i1 <= as1; ++i1 ) {
 				for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
 					if ( a[ l ] > val( i2 ) ) {
@@ -2721,9 +2763,9 @@ maxloc( Array2< T > const & a, int const dim )
 	case 2:
 		{
 		Array1D< int > loc( as1, as1 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-		size_type l( 0 );
+		size_type l( 0u );
 		for ( int i1 = 1; i1 <= as1; ++i1 ) {
-			T r( std::numeric_limits< T >::lowest() );
+			T r( a.empty() ? std::numeric_limits< T >::lowest() : a[ 0 ] );
 			for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
 				if ( a[ l ] > r ) {
 					r = a[ l ];
@@ -2747,14 +2789,21 @@ maxloc( Array1< T > const & a, Array1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	int const as1( a.isize1() );
-	Array1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	int const as( a.isize1() );
+	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
-	for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
-		if ( mask[ l ] && ( a[ l ] > r ) ) {
-			r = a[ l ];
-			loc = { i1 };
+	size_type l( 0u );
+	bool first( true );
+	for ( int i = 1; i <= as; ++i, ++l ) {
+		if ( mask[ l ] ) {
+			if ( first ) {
+				first = false;
+				r = a[ l ];
+				loc = { i };
+			} else if ( a[ l ] > r ) {
+				r = a[ l ];
+				loc = { i };
+			}
 		}
 	}
 	return loc;
@@ -2770,14 +2819,21 @@ maxloc( Array2< T > const & a, Array2< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	int const as1( a.isize1() );
 	int const as2( a.isize2() );
-	Array1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 2, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2, ++l ) {
-			if ( mask[ l ] && ( a[ l ] > r ) ) {
-				r = a[ l ];
-				loc = { i1, i2 };
+			if ( mask[ l ] ) {
+				if ( first ) {
+					first = false;
+					r = a[ l ];
+					loc = { i1, i2 };
+				} else if ( a[ l ] > r ) {
+					r = a[ l ];
+					loc = { i1, i2 };
+				}
 			}
 		}
 	}
@@ -2795,15 +2851,22 @@ maxloc( Array3< T > const & a, Array3< bool > const & mask )
 	int const as1( a.isize1() );
 	int const as2( a.isize2() );
 	int const as3( a.isize3() );
-	Array1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 3, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3, ++l ) {
-				if ( mask[ l ] && ( a[ l ] > r ) ) {
-					r = a[ l ];
-					loc = { i1, i2, i3 };
+				if ( mask[ l ] ) {
+					if ( first ) {
+						first = false;
+						r = a[ l ];
+						loc = { i1, i2, i3 };
+					} else if ( a[ l ] > r ) {
+						r = a[ l ];
+						loc = { i1, i2, i3 };
+					}
 				}
 			}
 		}
@@ -2823,16 +2886,23 @@ maxloc( Array4< T > const & a, Array4< bool > const & mask )
 	int const as2( a.isize2() );
 	int const as3( a.isize3() );
 	int const as4( a.isize4() );
-	Array1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 4, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
 				for ( int i4 = 1; i4 <= as4; ++i4, ++l ) {
-					if ( mask[ l ] && ( a[ l ] > r ) ) {
-						r = a[ l ];
-						loc = { i1, i2, i3, i4 };
+					if ( mask[ l ] ) {
+						if ( first ) {
+							first = false;
+							r = a[ l ];
+							loc = { i1, i2, i3, i4 };
+						} else if ( a[ l ] > r ) {
+							r = a[ l ];
+							loc = { i1, i2, i3, i4 };
+						}
 					}
 				}
 			}
@@ -2854,17 +2924,24 @@ maxloc( Array5< T > const & a, Array5< bool > const & mask )
 	int const as3( a.isize3() );
 	int const as4( a.isize4() );
 	int const as5( a.isize5() );
-	Array1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 5, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
 				for ( int i4 = 1; i4 <= as4; ++i4 ) {
 					for ( int i5 = 1; i5 <= as5; ++i5, ++l ) {
-						if ( mask[ l ] && ( a[ l ] > r ) ) {
-							r = a[ l ];
-							loc = { i1, i2, i3, i4, i5 };
+						if ( mask[ l ] ) {
+							if ( first ) {
+								first = false;
+								r = a[ l ];
+								loc = { i1, i2, i3, i4, i5 };
+							} else if ( a[ l ] > r ) {
+								r = a[ l ];
+								loc = { i1, i2, i3, i4, i5 };
+							}
 						}
 					}
 				}
@@ -2888,18 +2965,25 @@ maxloc( Array6< T > const & a, Array6< bool > const & mask )
 	int const as4( a.isize4() );
 	int const as5( a.isize5() );
 	int const as6( a.isize6() );
-	Array1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 6, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1; i1 <= as1; ++i1 ) {
 		for ( int i2 = 1; i2 <= as2; ++i2 ) {
 			for ( int i3 = 1; i3 <= as3; ++i3 ) {
 				for ( int i4 = 1; i4 <= as4; ++i4 ) {
 					for ( int i5 = 1; i5 <= as5; ++i5 ) {
 						for ( int i6 = 1; i6 <= as6; ++i6, ++l ) {
-							if ( mask[ l ] && ( a[ l ] > r ) ) {
-								r = a[ l ];
-								loc = { i1, i2, i3, i4, i5, i6 };
+							if ( mask[ l ] ) {
+								if ( first ) {
+									first = false;
+									r = a[ l ];
+									loc = { i1, i2, i3, i4, i5, i6 };
+								} else if ( a[ l ] > r ) {
+									r = a[ l ];
+									loc = { i1, i2, i3, i4, i5, i6 };
+								}
 							}
 						}
 					}

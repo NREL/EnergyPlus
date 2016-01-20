@@ -78,7 +78,6 @@ public: // Predicates
 public: // Inspectors
 
 	// Size
-	inline
 	UnitStreams::size_type
 	size() const
 	{
@@ -86,7 +85,6 @@ public: // Inspectors
 	}
 
 	// Next Free Unit
-	inline
 	Unit
 	next_unit() const
 	{
@@ -132,7 +130,6 @@ public: // Methods
 	del( Unit const unit );
 
 	// Remove a File Stream
-	inline
 	void
 	rem( Unit const unit )
 	{
@@ -140,7 +137,6 @@ public: // Methods
 	}
 
 	// Remove a File Stream
-	inline
 	void
 	remove( Unit const unit )
 	{

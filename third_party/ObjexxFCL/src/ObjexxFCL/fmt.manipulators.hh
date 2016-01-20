@@ -53,7 +53,6 @@ struct Signed
 
 	// Is Value Negative?
 	template< typename T >
-	inline
 	static
 	bool
 	is_negative( T )
@@ -71,7 +70,6 @@ struct Signed< true >
 
 	// Is Value Negative?
 	template< typename T >
-	inline
 	static
 	bool
 	is_negative( T v )
@@ -91,39 +89,33 @@ struct Binary_num_put : std::num_put< char >
 	using std::num_put< char >::do_put;
 
 	// Constructor
-	inline
 	Binary_num_put()
 	{}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, bool v ) const
 	{
 		return binary_do_put( out, str, fill, static_cast< unsigned int >( v ) );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long int v ) const
 	{
 		return binary_do_put( out, str, fill, static_cast< unsigned long int >( v ) ); // Fortran treat's value as unsigned
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long int v ) const
 	{
 		return binary_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long long int v ) const
 	{
 		return binary_do_put( out, str, fill, static_cast< unsigned long int >( v ) ); // Fortran treat's value as unsigned
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long long int v ) const
 	{
@@ -132,7 +124,6 @@ struct Binary_num_put : std::num_put< char >
 
 private: // Methods
 
-	inline
 	static
 	int
 	geti()
@@ -142,7 +133,6 @@ private: // Methods
 	}
 
 	template< typename T >
-	inline
 	static
 	iter_type
 	binary_do_put( iter_type out, std::ios_base & str, char_type fill, T v )
@@ -188,7 +178,6 @@ struct Exponent_num_put : std::num_put< char >
 	using std::num_put< char >::do_put;
 
 	// Constructor
-	inline
 	explicit
 	Exponent_num_put( Size const d = 0ul, Size const e = 2ul, int const k = 0, char const E = 'E' ) :
 	 d_( d ),
@@ -197,56 +186,48 @@ struct Exponent_num_put : std::num_put< char >
 	 E_( E )
 	{}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, bool v ) const
 	{
 		return exponent_do_put( out, str, fill, static_cast< unsigned int >( v ) );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long int v ) const
 	{
 		return exponent_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long int v ) const
 	{
 		return exponent_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long long int v ) const
 	{
 		return exponent_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long long int v ) const
 	{
 		return exponent_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, float v ) const
 	{
 		return exponent_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, double v ) const
 	{
 		return exponent_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long double v ) const
 	{
@@ -255,7 +236,6 @@ struct Exponent_num_put : std::num_put< char >
 
 public: // Custom methods
 
-	inline
 	void
 	set( Size const d, Size const e = 2ul, int const k = 0, char const E = 'E' )
 	{
@@ -267,7 +247,6 @@ public: // Custom methods
 
 private: // Methods
 
-	inline
 	static
 	int
 	geti()
@@ -277,7 +256,6 @@ private: // Methods
 	}
 
 	template< typename T >
-	inline
 	iter_type
 	exponent_do_put( iter_type out, std::ios_base & str, char_type fill, T v ) const
 	{
@@ -374,63 +352,54 @@ struct Engineering_num_put : std::num_put< char >
 	using std::num_put< char >::do_put;
 
 	// Constructor
-	inline
 	explicit
 	Engineering_num_put( Size const d = 0ul, Size const e = 2ul ) :
 	 d_( d ),
 	 e_( e )
 	{}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, bool v ) const
 	{
 		return engineering_do_put( out, str, fill, static_cast< unsigned int >( v ) );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long int v ) const
 	{
 		return engineering_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long int v ) const
 	{
 		return engineering_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long long int v ) const
 	{
 		return engineering_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long long int v ) const
 	{
 		return engineering_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, float v ) const
 	{
 		return engineering_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, double v ) const
 	{
 		return engineering_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long double v ) const
 	{
@@ -439,7 +408,6 @@ struct Engineering_num_put : std::num_put< char >
 
 public: // Custom methods
 
-	inline
 	void
 	set( Size const d, Size const e = 2ul )
 	{
@@ -449,7 +417,6 @@ public: // Custom methods
 
 private: // Methods
 
-	inline
 	static
 	int
 	geti()
@@ -459,7 +426,6 @@ private: // Methods
 	}
 
 	template< typename T >
-	inline
 	iter_type
 	engineering_do_put( iter_type out, std::ios_base & str, char_type fill, T v ) const
 	{
@@ -528,63 +494,54 @@ struct Scientific_num_put : std::num_put< char >
 	using std::num_put< char >::do_put;
 
 	// Constructor
-	inline
 	explicit
 	Scientific_num_put( Size const d = 0ul, Size const e = 2ul ) :
 	 d_( d ),
 	 e_( e )
 	{}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, bool v ) const
 	{
 		return scientific_do_put( out, str, fill, static_cast< unsigned int >( v ) );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long int v ) const
 	{
 		return scientific_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long int v ) const
 	{
 		return scientific_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long long int v ) const
 	{
 		return scientific_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, unsigned long long int v ) const
 	{
 		return scientific_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, float v ) const
 	{
 		return scientific_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, double v ) const
 	{
 		return scientific_do_put( out, str, fill, v );
 	}
 
-	inline
 	iter_type
 	do_put( iter_type out, std::ios_base & str, char_type fill, long double v ) const
 	{
@@ -593,7 +550,6 @@ struct Scientific_num_put : std::num_put< char >
 
 public: // Custom methods
 
-	inline
 	void
 	set( Size const d, Size const e = 2ul )
 	{
@@ -603,7 +559,6 @@ public: // Custom methods
 
 private: // Methods
 
-	inline
 	static
 	int
 	geti()
@@ -613,7 +568,6 @@ private: // Methods
 	}
 
 	template< typename T >
-	inline
 	iter_type
 	scientific_do_put( iter_type out, std::ios_base & str, char_type fill, T v ) const
 	{

@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef HVACCooledBeam_hh_INCLUDED
 #define HVACCooledBeam_hh_INCLUDED
 
@@ -136,107 +194,6 @@ namespace HVACCooledBeam {
 			CBWaterOutletTempReSimIndex( 0 )
 		{}
 
-		// Member Constructor
-		CoolBeamData(
-			std::string const & Name, // name of unit
-			std::string const & UnitType, // type of unit = AirTerminal:SingleDuct:ConstantVolume:CooledBeam
-			int const UnitType_Num, // index to type of unit = 1 (there's only 1 type so far)
-			std::string const & CBType, // type of cooled beam: active | passive
-			int const CBType_Num, // index to type of cooled beam: passive=1; active=2
-			std::string const & Sched, // availability schedule
-			int const SchedPtr, // index to schedule
-			Real64 const MaxAirVolFlow, // m3/s (autosizable)
-			Real64 const MaxAirMassFlow, // kg/s
-			Real64 const MaxCoolWaterVolFlow, // m3/s
-			Real64 const MaxCoolWaterMassFlow, // kg/s
-			int const AirInNode, // unit air inlet node number
-			int const AirOutNode, // unit air outlet node number
-			int const CWInNode, // chilled water inlet node
-			int const CWOutNode, // chilled water outlet node
-			int const ADUNum, // index of corresponding air distribution unit
-			Real64 const NumBeams, // number of beams in the zone
-			Real64 const BeamLength, // length of individual beam [m]
-			Real64 const DesInletWaterTemp, // design inlet water temperature [C]
-			Real64 const DesOutletWaterTemp, // design outlet water Temperature [c]
-			Real64 const CoilArea, // coil surface area per coil length [m2/m]
-			Real64 const a, // model parameter a
-			Real64 const n1, // model parameter n0
-			Real64 const n2, // model parameter n1
-			Real64 const n3, // model parameter n2
-			Real64 const a0, // model parameter a0
-			Real64 const K1, // model parameter K1
-			Real64 const n, // model parameter n
-			Real64 const Kin, // Coefficient of Induction Kin
-			Real64 const InDiam, // Leaving Pipe Inside Diameter
-			Real64 const TWIn, // current inlet water temperature [C]
-			Real64 const TWOut, // current outlet water temperature [C]
-			Real64 const EnthWaterOut, // current outlet water enthalpy [J/kg]
-			Real64 const BeamFlow, // supply air flow per beam [m3/s]
-			Real64 const CoolWaterMassFlow, // chilled water mass flow rate [kg/s]
-			Real64 const BeamCoolingEnergy, // Cooled beam cooling energy of all beams in the zone [J]
-			Real64 const BeamCoolingRate, // Cooled beam cooling rate of all beams in the zone [W]
-			Real64 const SupAirCoolingEnergy, // Total cooling energy from supply air [J]
-			Real64 const SupAirCoolingRate, // Total cooling rate from supply air [W]
-			Real64 const SupAirHeatingEnergy, // Total cooling energy from supply air [J]
-			Real64 const SupAirHeatingRate, // Total cooling rate from supply air [W]
-			int const CWLoopNum, // cooling water plant loop index number
-			int const CWLoopSideNum, // cooling water plant loop side index
-			int const CWBranchNum, // cooling water plant loop branch index
-			int const CWCompNum, // cooling water plant loop component index
-			int const CBLoadReSimIndex,
-			int const CBMassFlowReSimIndex,
-			int const CBWaterOutletTempReSimIndex
-		) :
-			Name( Name ),
-			UnitType( UnitType ),
-			UnitType_Num( UnitType_Num ),
-			CBType( CBType ),
-			CBType_Num( CBType_Num ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			MaxAirVolFlow( MaxAirVolFlow ),
-			MaxAirMassFlow( MaxAirMassFlow ),
-			MaxCoolWaterVolFlow( MaxCoolWaterVolFlow ),
-			MaxCoolWaterMassFlow( MaxCoolWaterMassFlow ),
-			AirInNode( AirInNode ),
-			AirOutNode( AirOutNode ),
-			CWInNode( CWInNode ),
-			CWOutNode( CWOutNode ),
-			ADUNum( ADUNum ),
-			NumBeams( NumBeams ),
-			BeamLength( BeamLength ),
-			DesInletWaterTemp( DesInletWaterTemp ),
-			DesOutletWaterTemp( DesOutletWaterTemp ),
-			CoilArea( CoilArea ),
-			a( a ),
-			n1( n1 ),
-			n2( n2 ),
-			n3( n3 ),
-			a0( a0 ),
-			K1( K1 ),
-			n( n ),
-			Kin( Kin ),
-			InDiam( InDiam ),
-			TWIn( TWIn ),
-			TWOut( TWOut ),
-			EnthWaterOut( EnthWaterOut ),
-			BeamFlow( BeamFlow ),
-			CoolWaterMassFlow( CoolWaterMassFlow ),
-			BeamCoolingEnergy( BeamCoolingEnergy ),
-			BeamCoolingRate( BeamCoolingRate ),
-			SupAirCoolingEnergy( SupAirCoolingEnergy ),
-			SupAirCoolingRate( SupAirCoolingRate ),
-			SupAirHeatingEnergy( SupAirHeatingEnergy ),
-			SupAirHeatingRate( SupAirHeatingRate ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			CBLoadReSimIndex( CBLoadReSimIndex ),
-			CBMassFlowReSimIndex( CBMassFlowReSimIndex ),
-			CBWaterOutletTempReSimIndex( CBWaterOutletTempReSimIndex )
-		{}
-
 	};
 
 	// Object Data
@@ -295,29 +252,6 @@ namespace HVACCooledBeam {
 
 	void
 	ReportCoolBeam( int const CBNum );
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACCooledBeam
 
