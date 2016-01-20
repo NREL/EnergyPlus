@@ -66,7 +66,7 @@ namespace EnergyPlus {
 	class Named {
 
 		public:
-		std::string name;
+		std::string Name;
 
 	};
 

@@ -369,7 +369,7 @@ namespace PipeHeatTransfer {
 	};
 
 	// Object Data
-	extern Array1D< std::shared_ptr< PipeHTData > > PipeHT;
+	extern Array1D< PipeHTData > PipeHT;
 
 	void
 	GetPipesHeatTransfer();
