@@ -2662,9 +2662,7 @@ namespace EnergyPlus {
 		//static std::string const RoutineName( "VRFTest_NoLoadOAFlowTest" );
 		bool ErrorsFound( false );        // function returns true on error
 		bool FirstHVACIteration( true );  // simulate the first pass through HVAC simulation, use false for next iteration
-		int VRFCond( 1 );                 // index to VRF condenser
 		int VRFTUNum( 1 );                // index to VRF terminal unit
-		int EquipPtr( 1 );                // index to equipment list
 		int CurZoneNum( 1 );              // index to zone
 		int ZoneInletAirNode( 0 );        // zone inlet node number
 		int OutsideAirNode( 0 );          // VRFTU Outside air inlet node
