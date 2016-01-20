@@ -217,7 +217,6 @@ namespace PlantLoopEquip {
 		using HeatPumpWaterToWaterCOOLING::SimHPWatertoWaterCOOLING;
 		using HeatPumpWaterToWaterSimple::SimHPWatertoWaterSimple;
 		using OutsideEnergySources::SimOutsideEnergy;
-		using PipeHeatTransfer::SimPipesHeatTransfer;
 		using Pumps::SimPumps;
 
 		using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
@@ -314,13 +313,13 @@ namespace PlantLoopEquip {
 				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
 
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				SimPipesHeatTransfer( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
 
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				SimPipesHeatTransfer( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
 
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				SimPipesHeatTransfer( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
 
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );

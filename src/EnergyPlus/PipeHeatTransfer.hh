@@ -120,7 +120,7 @@ namespace PipeHeatTransfer {
 
 	// Types
 
-	struct PipeHTData
+	struct PipeHTData : public PlantComponent
 	{
 		// Members
 		// Input data
@@ -309,6 +309,12 @@ namespace PipeHeatTransfer {
 
 		{}
 
+		static
+		std::shared_ptr< PlantComponent > factory( int objectType, std::string objectName );
+
+		bool
+		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip );
+
 		void
 		PushInnerTimeStepArrays();
 
@@ -364,27 +370,10 @@ namespace PipeHeatTransfer {
 	};
 
 	// Object Data
-	extern Array1D< PipeHTData > PipeHT;
-
-	// Functions
-
-	void
-	SimPipesHeatTransfer(
-		std::string const & EquipName, // name of the Pipe Heat Transfer.
-		int & EqNum, // index in local derived types for external calling
-		bool const InitLoopEquip,
-		bool const FirstHVACIteration // component number
-	);
+	extern Array1D< std::shared_ptr< PipeHTData > > PipeHT;
 
 	void
 	GetPipesHeatTransfer();
-
-	void
-	InitializeHeatTransferPipes(
-		int const PipeType, // Type of Pipe
-		std::string const & PipeName, // Name of Pipe
-		int & PipeNum // Index into pipe structure for name
-	);
 
 
 } // PipeHeatTransfer
