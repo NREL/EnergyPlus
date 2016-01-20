@@ -6173,9 +6173,8 @@ namespace HVACVariableRefrigerantFlow {
 		} else {
 			AverageUnitMassFlow = CompOnMassFlow;
 			AverageOAMassFlow = OACompOnMassFlow;
-			// set the averaging air flow to off compressor values if the compressor PartLoadRatio is zero
+			// set the average OA air flow to off compressor values if the compressor PartLoadRatio is zero
 			if ( PartLoadRatio == 0.0 ) {
-				AverageUnitMassFlow = CompOffMassFlow;
 				AverageOAMassFlow = OACompOffMassFlow;
 			}
 		}
