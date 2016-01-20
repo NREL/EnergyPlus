@@ -5,6 +5,10 @@ Pressure Control Through Pressure Controller
 
 **Florida Solar Energy Center**
 
+**Fourth revision**
+1/15/16
+Add design document.
+
 **Third revision**
 1/12/16
 Revise NFP based on comments from the first review meeting.
@@ -438,6 +442,266 @@ A new example file will be created to demonstrate pressure control.
 
 No transition is needed.
 
+##Design Document##
+
+This new feature will revise several modules: DataAirflowNetwork, AirflowNetworkBalanceManager, and AirfowNetworkSolver.
+
+###DataAirflowNetwork###
+
+The revision includes three new variables and two new structs. The three new variables allow data exchange among AirflowNetwork modules. Two new structs accommodate 3 new objects. It should be pointed out that  both AirflowNetwork:Distribution:Component:OutdoorAirFlow and AirflowNetwork:Distribution:Component:ReliefAirFlow objects have similar fields. They can be combined together as a single struct.   
+
+#### PressureSetFlag
+
+A new variable of PressureSetFlag will be added to show pressure control status.
+ 
+	0: No pressure control;
+	1: Use exhaust fan to perform pressure control
+	2: Use a central relief flow to perform pressure control
+
+####ExhaustFanMassFlowRate and ReliefMassFlowRate
+
+Two new variables of mass flow rate are added to allow the model to access the variables to perform pressure control. The first variable represents the exhaust fan flow rate when PressureSetFlag = 1. The second variable represents the central relief flow rate when PressureSetFlag = 2. These two variables are used in Regula Falsi to reach pressure control. 
+
+	Real64 ExhaustFanMassFlowRate( 0.0 ); // Exhaust fan flow rate used in PressureStat
+	Real64 ReliefMassFlowRate( 0.0 ); // OA Mixer relief node flow rate used in PressureStat
+
+####Struct of AirflowNetwork:ZoneControl:PressureController
+
+The struct below shows members used to describe a PressureController object.
+
+	struct PressureControllerProp
+	{
+		// Members
+		std::string Name; // Provide a unique object name
+		std::string ZoneName; // Name of the zone that is being controlled
+		int ZoneNum; // Zone number
+		std::string ControlObjectType; // The control type to be used for pressure control
+		std::string ControlObjectName; // Corresponding control type name
+		int AvailSchedPtr; // Availability schedule pointer
+		int PresSetpointSchedPtr; // Pressure setpoint schedule pointer
+	}
+
+	extern Array1D< PressureControllerProp > PressureControllerData;
+
+####Struct of AirflowNetwork:Distribution:Component:OutdoorAirFlow and AirflowNetwork:Distribution:Component:ReliefAirFlow
+
+Since both objects have similar fields, they can share the same struct.
+
+	struct MultizoneCompAirflowProp // Zone exhaust fan component
+	{
+		// Members
+		std::string Name; // Name of exhaust fan component
+		int SchedPtr; // Schedule pointer
+		Real64 FlowCoef; // Air Mass Flow Coefficient
+		Real64 FlowExpo; // Air Mass Flow exponent
+		Real64 StandardT; // Standard temperature for crack data
+		Real64 StandardP; // Standard borometric pressure for crack data
+		Real64 StandardW; // Standard humidity ratio for crack data
+		int InletNode; // Inlet node number
+		int OutletNode; // Outlet node number
+	}
+
+Then, each new object has its own array:
+
+	extern Array1D< MultizoneCompAirflowProp > MultizoneCompOutdoorAirData;
+	extern Array1D< MultizoneCompAirflowProp > MultizoneCompReliefAirData;
+
+###AirflowNetworkBalanceManager###
+
+The revision includes modification of two existing function and addition of a new function. Two functions will be revised to accommodate the proposed changes. The first function is GetAirflowNetworkInput. A new section will be added to read three new objects. The second function is CalcAirflowNetworkAirBalance. A new section will allow iterations using the Regula Falsi method to find flow rate of either exhaust fan or relief node for zone pressure control. A new function will be created to apply the Regula Falsi method.
+
+####Revision of GetAirflowNetworkInput function
+
+A new section will be added to read inputs of three new objects: PressureControllerData, MultizoneCompOutdoorAirData, and MultizoneCompReliefAirData.
+
+1.	Read inputs of PressureControllerData object
+2.	Read inputs of MultizoneCompOutdoorAirData object
+3.	Read inputs of MultizoneCompReliefAirData object
+
+####Revision of CalcAirflowNetworkAirBalance function
+
+Add a new section to allow iteration to find flow rate of either exhaust fan or relief node for zone pressure control:
+
+		if ( PressureSetFlag == 0 ) {
+			AIRMOV( );
+		} else if ( PressureSetFlag == 1 ) { // Exhasut control
+			ExhaustFanMassFlowRate = MinExhaustMassFlowrate;
+			AIRMOV( );
+			ZonePressure1 = AirflowNetworkNodeSimu( ControlledZoneNum ).PZ;
+			if ( ZonePressure1 <= PressureSet ) {
+				// The highet pressure due to minimum flow rate could not reach Pressure set, bypass pressureset calculation
+				if ( !WarmupFlag ) {
+					if ( ErrCountLowPre == 0 ) {
+						++ErrCountLowPre;
+						ShowWarningError( "The calculated pressure with minimum exhaust fan rate is lower than the pressure setpoint. The pressure control is unable to perform." );
+						ShowContinueErrorTimeStamp( "Calculated pressure = " + RoundSigDigits( ZonePressure1, 2 ) + "[Pa], Pressure setpoint =" + RoundSigDigits( PressureSet, 2 ) );
+					} else {
+						++ErrCountLowPre;
+						ShowRecurringWarningErrorAtEnd( AirflowNetworkNodeData( 3 ).Name + ": The AFN model continues not to perform pressure control due to lower zone pressure...", ErrIndexLowPre, ZonePressure1, ZonePressure1 );
+					}
+				}
+			} else {
+				ExhaustFanMassFlowRate = MaxExhaustMassFlowrate;
+				AIRMOV( );
+				ZonePressure2 = AirflowNetworkNodeSimu( ControlledZoneNum ).PZ;
+				if ( ZonePressure2 >= PressureSet ) {
+					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressureset calculation
+					if ( !WarmupFlag ) {
+						if ( ErrCountHighPre == 0 ) {
+							++ErrCountHighPre;
+							ShowWarningError( "The calculated pressure with maximum exhaust fan rate is higher than the pressure setpoint. The pressure control is unable to perform." );
+							ShowContinueErrorTimeStamp( "Calculated pressure = " + RoundSigDigits( ZonePressure2, 2 ) + "[Pa], Pressure setpoint = " + RoundSigDigits( PressureSet, 2 ) );
+						} else {
+							++ErrCountHighPre;
+							ShowRecurringWarningErrorAtEnd( AirflowNetworkNodeData( 3 ).Name + ": The AFN model continues not to perform pressure control due to higher zone pressure...", ErrIndexHighPre, ZonePressure2, ZonePressure2 );
+						}
+					}
+				} else {
+					//					if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
+					Par( 1 ) = PressureSet;
+					SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par );
+					if ( SolFla == -1 ) {
+						if ( !WarmupFlag ) {
+							if ( ErrCountVar == 0 ) {
+								++ErrCountVar;
+								ShowWarningError( "Iteration limit exceeded calculating DX unit speed ratio, for unit=" );
+								//							ShowContinueErrorTimeStamp( "Speed ratio returned=[" + RoundSigDigits( SpeedRatio, 2 ) + "], Speed number =" + RoundSigDigits( SpeedNum ) );
+							} else {
+								++ErrCountVar;
+								//							ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
+							}
+						}
+					} else if ( SolFla == -2 ) {
+						ShowFatalError( "DX unit compressor speed calculation failed: speed limits exceeded, for unit=" );
+					}
+				}
+			}
+		} else { // Relief flow control
+			Real64 MinReliefMassFlowrate = 0.000;
+			Real64 MaxReliefMassFlowrate = Node( OAinletNode ).MassFlowRate;
+			ReliefMassFlowRate = MinReliefMassFlowrate;
+			AIRMOV( );
+			ZonePressure1 = AirflowNetworkNodeSimu( ControlledZoneNum ).PZ;
+			if ( ZonePressure1 <= PressureSet ) {
+				// The highet pressure due to minimum flow rate could not reach Pressure set, bypass pressureset calculation
+				if ( !WarmupFlag ) {
+					if ( ErrCountLowPre == 0 ) {
+						++ErrCountLowPre;
+						ShowWarningError( "The calculated pressure with minimum exhaust fan rate is lower than the pressure setpoint. The pressure control is unable to perform." );
+						ShowContinueErrorTimeStamp( "Calculated pressure = " + RoundSigDigits( ZonePressure1, 2 ) + "[Pa], Pressure setpoint =" + RoundSigDigits( PressureSet, 2 ) );
+					} else {
+						++ErrCountLowPre;
+						ShowRecurringWarningErrorAtEnd( AirflowNetworkNodeData( 3 ).Name + ": The AFN model continues not to perform pressure control due to lower zone pressure...", ErrIndexLowPre, ZonePressure1, ZonePressure1 );
+					}
+				}
+			} else {
+				ReliefMassFlowRate = MaxReliefMassFlowrate;
+				AIRMOV( );
+				ZonePressure2 = AirflowNetworkNodeSimu( 3 ).PZ;
+				if ( ZonePressure2 >= PressureSet ) {
+					// The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressureset calculation
+					if ( !WarmupFlag ) {
+						if ( ErrCountHighPre == 0 ) {
+							++ErrCountHighPre;
+							ShowWarningError( "The calculated pressure with maximum exhaust fan rate is higher than the pressure setpoint. The pressure control is unable to perform." );
+							ShowContinueErrorTimeStamp( "Calculated pressure = " + RoundSigDigits( ZonePressure2, 2 ) + "[Pa], Pressure setpoint = " + RoundSigDigits( PressureSet, 2 ) );
+						} else {
+							++ErrCountHighPre;
+							ShowRecurringWarningErrorAtEnd( AirflowNetworkNodeData( 3 ).Name + ": The AFN model continues not to perform pressure control due to higher zone pressure...", ErrIndexHighPre, ZonePressure2, ZonePressure2 );
+						}
+					}
+				} else {
+					//					if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
+					Par( 1 ) = PressureSet;
+					SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par );
+					if ( SolFla == -1 ) {
+						if ( !WarmupFlag ) {
+							if ( ErrCountVar == 0 ) {
+								++ErrCountVar;
+								ShowWarningError( "Iteration limit exceeded calculating DX unit speed ratio, for unit=" );
+								//							ShowContinueErrorTimeStamp( "Speed ratio returned=[" + RoundSigDigits( SpeedRatio, 2 ) + "], Speed number =" + RoundSigDigits( SpeedNum ) );
+							} else {
+								++ErrCountVar;
+								//							ShowRecurringWarningErrorAtEnd( MSHeatPump( MSHeatPumpNum ).Name + "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...", MSHeatPump( MSHeatPumpNum ).ErrIndexVar, SpeedRatio, SpeedRatio );
+							}
+						}
+					} else if ( SolFla == -2 ) {
+						ShowFatalError( "DX unit compressor speed calculation failed: speed limits exceeded, for unit=" );
+					}
+				}
+			}
+		}
+
+
+####A new function to handle Regula Falsi
+
+A new function of AFNPressureResidual will be generated to find a solution of exhaust fan flow rate for pressure control. The argument variable is ExFanMassFlowRate.  
+
+	Real64 AFNPressureResidual (
+		Real64 const PresCtrMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+		Array1< Real64 > const & Par // par(1) = Pressure setpoint
+	)
+	{
+		PressureSet = Par( 1 );
+		if ( PressureSetFlag == 1 ) {
+			ExhaustFanMassFlowRate = PresCtrMassFlowRate;
+		}
+
+		if ( PressureSetFlag == 2 ) {
+			ReliefMassFlowRate = PresCtrMassFlowRate;
+		}
+
+		AIRMOV( );
+
+		ZonePressure = AirflowNetworkNodeSimu( AFNControlledZoneNum ).PZ;
+
+		if ( PressureSet != 0.0 ) {
+			AFNPressureResidual = ( ZonePressure - PressureSet ) / PressureSet;
+		} else {
+			AFNPressureResidual = ( ZonePressure - PressureSet );
+		}
+		return AFNPressureResidual;
+	}
+
+
+###AirflowNetworkSolver###
+
+The revision involves modification of an existing function as AFEEXF and additions of two functions as AFEOAF and AFEREF.  
+
+####A modified function of AFEEXF
+
+The function is used to simulate an zone exhaust fan flow rate with a fixed airflow. The function will be modified to allow the variation of the fan flow rate to achieve the zone pressure control.
+
+Here is a new section to handle exhaust fan flow rate for pressure control:
+
+		if ( PressureSetFlag == 1 && AirflowNetworkFanActivated ) {
+			NF = 1;
+			F( 1 ) = ExhaustFanMassFlowRate;
+			DF( 1 ) = 0.0;
+			Node( InletNode ).MassFlowRate = F( 1 );
+			return;
+		}
+
+####A new function AFEOAF
+
+This function will simulate a fan to deliver outdoor air specified in an Controller:OutdoorAir. The mass flow rate provided in the OA controller will be forced in the AirflowNetwork model. When there is no outdoor air flow, this function performs like a crack.
+
+		if ( PressureSetFlag == 0 ) {
+			Crack flow rate calculation
+		} else if ( PressureSetFlag == 1 ) {
+			F( 1 ) = OA flow rate calculation
+		}
+
+####A new function AFEREF
+
+This function will simulate a fan to deliver relief air. The mass flow rate will vary between 0 and outdoor air specified in an Controller:OutdoorAir to perform pressure control.  When there is no outdoor air flow, this function performs like a crack.
+
+
+		if ( PressureSetFlag == 0 ) {
+			Crack flow rate calculation
+		} else if ( PressureSetFlag == 2 ) {
+			F( 1 ) = ReliefMassFlowRate
+		}
 
 ## References ##
 
