@@ -314,13 +314,13 @@ namespace PlantLoopEquip {
 				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
 
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeExterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				SimPipesHeatTransfer( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeInterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				SimPipesHeatTransfer( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				SimPipesHeatTransfer( TypeOf_PipeUnderground, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				SimPipesHeatTransfer( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );

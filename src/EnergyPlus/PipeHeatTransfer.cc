@@ -178,7 +178,6 @@ namespace PipeHeatTransfer {
 
 	void
 	SimPipesHeatTransfer(
-		int const EquipType,
 		std::string const & EquipName, // name of the Pipe Heat Transfer.
 		int & EqNum, // index in local derived types for external calling
 		bool const InitLoopEquip,
@@ -247,8 +246,13 @@ namespace PipeHeatTransfer {
 		}
 
 		if ( InitLoopEquip ) return;
+
+		// Now do some operations using member functions
+		PipeHT( nsvPipeHTNum ).InitPipesHeatTransfer( FirstHVACIteration );
+
+
 		// initialize
-		InitPipesHeatTransfer( EquipType, nsvPipeHTNum, FirstHVACIteration );
+		//InitPipesHeatTransfer( EquipType, nsvPipeHTNum, FirstHVACIteration );
 		// make the calculations
 		for ( InnerTimeStepCtr = 1; InnerTimeStepCtr <= nsvNumInnerTimeSteps; ++InnerTimeStepCtr ) {
 			{ auto const SELECT_CASE_var( PipeHT( nsvPipeHTNum ).EnvironmentPtr );
@@ -257,7 +261,7 @@ namespace PipeHeatTransfer {
 			} else {
 				CalcPipesHeatTransfer( nsvPipeHTNum );
 			}}
-			PushInnerTimeStepArrays( nsvPipeHTNum );
+			PipeHT( nsvPipeHTNum ).PushInnerTimeStepArrays();
 		}
 		// update vaiables
 		UpdatePipesHeatTransfer();
@@ -269,30 +273,22 @@ namespace PipeHeatTransfer {
 	//==============================================================================
 
 	void
-	PushInnerTimeStepArrays( int const PipeHTNum )
+	PipeHTData::PushInnerTimeStepArrays()
 	{
-
-		// Locals
-		int LengthIndex;
-		int DepthIndex;
-		int WidthIndex;
-
-		if ( PipeHT( PipeHTNum ).EnvironmentPtr == GroundEnv ) {
-			for ( LengthIndex = 2; LengthIndex <= PipeHT( PipeHTNum ).NumSections; ++LengthIndex ) {
-				for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes; ++DepthIndex ) {
-					for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
+		if ( this->EnvironmentPtr == GroundEnv ) {
+			for ( int LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex ) {
+				for ( int DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
+					for ( int WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 						//This will store the old 'current' values as the new 'previous values'  This allows
 						// us to use the previous time array as history terms in the equations
-						PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex ) = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex );
+						this->T( WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex ) = this->T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex );
 					}
 				}
 			}
 		}
-
 		//Then update the Hanby near pipe model temperatures
-		PipeHT( PipeHTNum ).PreviousFluidTemp = PipeHT( PipeHTNum ).FluidTemp;
-		PipeHT( PipeHTNum ).PreviousPipeTemp = PipeHT( PipeHTNum ).PipeTemp;
-
+		this->PreviousFluidTemp = this->FluidTemp;
+		this->PreviousPipeTemp = this->PipeTemp;
 	}
 
 	void
@@ -875,9 +871,7 @@ namespace PipeHeatTransfer {
 	//==============================================================================
 
 	void
-	InitPipesHeatTransfer(
-		int const EP_UNUSED( PipeType ),
-		int const PipeHTNum, // component number
+	PipeHTData::InitPipesHeatTransfer(
 		bool const FirstHVACIteration // component number
 	)
 	{
@@ -937,9 +931,7 @@ namespace PipeHeatTransfer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		static bool OneTimeInit( true ); // one time flag
 		Real64 FirstTemperatures; // initial temperature of every node in pipe (set to inlet temp) [C]
-		int PipeNum; // number of pipes
 		int TimeIndex;
 		int LengthIndex;
 		int DepthIndex;
@@ -954,59 +946,33 @@ namespace PipeHeatTransfer {
 		CurSimDay = double( DayOfSim );
 
 		// some useful module variables
-		nsvInletNodeNum = PipeHT( PipeHTNum ).InletNodeNum;
-		nsvOutletNodeNum = PipeHT( PipeHTNum ).OutletNodeNum;
+		nsvInletNodeNum = this->InletNodeNum;
+		nsvOutletNodeNum = this->OutletNodeNum;
 		nsvMassFlowRate = Node( nsvInletNodeNum ).MassFlowRate;
 		nsvInletTemp = Node( nsvInletNodeNum ).Temp;
 
 		// get some data only once
-		if ( OneTimeInit ) {
-
+		if ( this->OneTimeInit ) {
 			errFlag = false;
-			for ( PipeNum = 1; PipeNum <= nsvNumOfPipeHT; ++PipeNum ) {
-
-				ScanPlantLoopsForObject( PipeHT( PipeNum ).Name, PipeHT( PipeNum ).TypeOf, PipeHT( PipeNum ).LoopNum, PipeHT( PipeNum ).LoopSideNum, PipeHT( PipeNum ).BranchNum, PipeHT( PipeNum ).CompNum, _, _, _, _, _, errFlag );
-
-				// 2010-03-15 ESL:
-				// The following code was in place because during the first implementation stage, bizarre MaxIters were found when
-				//  heat transfer pipes were placed on demand sides
-				// Since then, a large number of plant and component upgrades were performed.  As such, heat transfer pipes were
-				//  re-tested on several locations of the demand side
-				// No problems were encountered placing the pipes on the demand side.  This restriction is removed unless there are any
-				//  problems encountered.  If problems are encountered, it is expected that this restriction will still be avoided, and
-				//  the proper fix implemented to allow the pipes to be placed on the demand side
-				//  IF (PipeHT(PipeNum)%LoopSideNum == DemandSide) THEN
-				//    CALL ShowSevereError('InitPipesHeatTransfer: Heat Transfer Pipe='//TRIM(PipeHT(PipeNum)%Name)//&
-				//                      ' was encountered on the demand side of loop: '//TRIM(PlantLoop(PipeHT(PipeNum)%LoopNum)%Name)//'.')
-				//    CALL ShowContinueError('Due to simulation restrictions, heat transfer pipes are only allowed on supply sides.')
-				//    CALL ShowFatalError('Preceding errors cause termination')
-				//  END IF
-
-				if ( errFlag ) continue;
-
-			}
+			ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "InitPipesHeatTransfer: Program terminated due to previous condition(s)." );
 			}
 			// unset one-time flag
-			OneTimeInit = false;
-
+			this->OneTimeInit = false;
 		}
 
 		// initialize temperatures by inlet node temp
-		if ( ( BeginSimFlag && PipeHT( PipeHTNum ).BeginSimInit ) || ( BeginEnvrnFlag && PipeHT( PipeHTNum ).BeginSimEnvrn ) ) {
+		if ( ( BeginSimFlag && this->BeginSimInit ) || ( BeginEnvrnFlag && this->BeginSimEnvrn ) ) {
 
-			// For underground pipes, we need to re-init the cartesian array each environment
-			for ( PipeNum = 1; PipeNum <= nsvNumOfPipeHT; ++PipeNum ) {
-				if ( PipeHT( PipeNum ).EnvironmentPtr == GroundEnv ) {
-					for ( TimeIndex = PreviousTimeIndex; TimeIndex <= TentativeTimeIndex; ++TimeIndex ) {
-						//Loop through all length, depth, and width of pipe to init soil temperature
-						for ( LengthIndex = 1; LengthIndex <= PipeHT( PipeNum ).NumSections; ++LengthIndex ) {
-							for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeNum ).NumDepthNodes; ++DepthIndex ) {
-								for ( WidthIndex = 1; WidthIndex <= PipeHT( PipeNum ).PipeNodeWidth; ++WidthIndex ) {
-									CurrentDepth = ( DepthIndex - 1 ) * PipeHT( PipeNum ).dSregular;
-									PipeHT( PipeNum ).T( WidthIndex, DepthIndex, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay, PipeNum );
-								}
+			if ( this->EnvironmentPtr == GroundEnv ) {
+				for ( TimeIndex = PreviousTimeIndex; TimeIndex <= TentativeTimeIndex; ++TimeIndex ) {
+					//Loop through all length, depth, and width of pipe to init soil temperature
+					for ( LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex ) {
+						for ( DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
+							for ( WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
+								CurrentDepth = ( DepthIndex - 1 ) * this->dSregular;
+								this->T( WidthIndex, DepthIndex, LengthIndex, TimeIndex ) = this->TBND( CurrentDepth, CurSimDay );
 							}
 						}
 					}
@@ -1015,83 +981,83 @@ namespace PipeHeatTransfer {
 
 			// We also need to re-init the Hanby arrays for all pipes, including buried
 			FirstTemperatures = 21.0; //Node(InletNodeNum)%Temp
-			PipeHT( PipeHTNum ).TentativeFluidTemp = FirstTemperatures;
-			PipeHT( PipeHTNum ).FluidTemp = FirstTemperatures;
-			PipeHT( PipeHTNum ).PreviousFluidTemp = FirstTemperatures;
-			PipeHT( PipeHTNum ).TentativePipeTemp = FirstTemperatures;
-			PipeHT( PipeHTNum ).PipeTemp = FirstTemperatures;
-			PipeHT( PipeHTNum ).PreviousPipeTemp = FirstTemperatures;
-			PipeHT( PipeHTNum ).PreviousSimTime = 0.0;
+			this->TentativeFluidTemp = FirstTemperatures;
+			this->FluidTemp = FirstTemperatures;
+			this->PreviousFluidTemp = FirstTemperatures;
+			this->TentativePipeTemp = FirstTemperatures;
+			this->PipeTemp = FirstTemperatures;
+			this->PreviousPipeTemp = FirstTemperatures;
+			this->PreviousSimTime = 0.0;
 			nsvDeltaTime = 0.0;
 			nsvOutletTemp = 0.0;
 			nsvEnvironmentTemp = 0.0;
 			nsvEnvHeatLossRate = 0.0;
 			nsvFluidHeatLossRate = 0.0;
 
-			PipeHT( PipeHTNum ).BeginSimInit = false;
-			PipeHT( PipeHTNum ).BeginSimEnvrn = false;
+			this->BeginSimInit = false;
+			this->BeginSimEnvrn = false;
 
 		}
 
-		if ( ! BeginSimFlag ) PipeHT( PipeHTNum ).BeginSimInit = true;
-		if ( ! BeginEnvrnFlag ) PipeHT( PipeHTNum ).BeginSimEnvrn = true;
+		if ( ! BeginSimFlag ) this->BeginSimInit = true;
+		if ( ! BeginEnvrnFlag ) this->BeginSimEnvrn = true;
 
 		// time step in seconds
 		nsvDeltaTime = TimeStepSys * SecInHour;
 		nsvNumInnerTimeSteps = int( nsvDeltaTime / InnerDeltaTime );
 
 		// previous temps are updated if necessary at start of timestep rather than end
-		if ( ( FirstHVACIteration && PipeHT( PipeHTNum ).FirstHVACupdateFlag ) || ( BeginEnvrnFlag && PipeHT( PipeHTNum ).BeginEnvrnupdateFlag ) ) {
+		if ( ( FirstHVACIteration && this->FirstHVACupdateFlag ) || ( BeginEnvrnFlag && this->BeginEnvrnupdateFlag ) ) {
 
 			//We need to update boundary conditions here, as well as updating the arrays
-			if ( PipeHT( PipeHTNum ).EnvironmentPtr == GroundEnv ) {
+			if ( this->EnvironmentPtr == GroundEnv ) {
 
 				// And then update Ground Boundary Conditions
 				for ( TimeIndex = 1; TimeIndex <= TentativeTimeIndex; ++TimeIndex ) {
-					for ( LengthIndex = 1; LengthIndex <= PipeHT( PipeHTNum ).NumSections; ++LengthIndex ) {
-						for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes; ++DepthIndex ) {
+					for ( LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex ) {
+						for ( DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
 							//Farfield boundary
-							CurrentDepth = ( DepthIndex - 1 ) * PipeHT( PipeHTNum ).dSregular;
-							CurTemp = TBND( CurrentDepth, CurSimDay, PipeHTNum );
-							PipeHT( PipeHTNum ).T( 1, DepthIndex, LengthIndex, TimeIndex ) = CurTemp;
+							CurrentDepth = ( DepthIndex - 1 ) * this->dSregular;
+							CurTemp = this->TBND( CurrentDepth, CurSimDay );
+							this->T( 1, DepthIndex, LengthIndex, TimeIndex ) = CurTemp;
 						}
-						for ( WidthIndex = 1; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
+						for ( WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 							//Bottom side of boundary
-							CurrentDepth = PipeHT( PipeHTNum ).DomainDepth;
-							CurTemp = TBND( CurrentDepth, CurSimDay, PipeHTNum );
-							PipeHT( PipeHTNum ).T( WidthIndex, PipeHT( PipeHTNum ).NumDepthNodes, LengthIndex, TimeIndex ) = CurTemp;
+							CurrentDepth = this->DomainDepth;
+							CurTemp = this->TBND( CurrentDepth, CurSimDay );
+							this->T( WidthIndex, this->NumDepthNodes, LengthIndex, TimeIndex ) = CurTemp;
 						}
 					}
 				}
 			}
 
 			// should next choose environment temperature according to coupled with air or ground
-			{ auto const SELECT_CASE_var( PipeHT( PipeHTNum ).EnvironmentPtr );
+			{ auto const SELECT_CASE_var( this->EnvironmentPtr );
 			if ( SELECT_CASE_var == GroundEnv ) {
 				//EnvironmentTemp = GroundTemp
 			} else if ( SELECT_CASE_var == OutsideAirEnv ) {
 				nsvEnvironmentTemp = OutDryBulbTemp;
 			} else if ( SELECT_CASE_var == ZoneEnv ) {
-				nsvEnvironmentTemp = MAT( PipeHT( PipeHTNum ).EnvrZonePtr );
+				nsvEnvironmentTemp = MAT( this->EnvrZonePtr );
 			} else if ( SELECT_CASE_var == ScheduleEnv ) {
-				nsvEnvironmentTemp = GetCurrentScheduleValue( PipeHT( PipeHTNum ).EnvrSchedPtr );
+				nsvEnvironmentTemp = GetCurrentScheduleValue( this->EnvrSchedPtr );
 			} else if ( SELECT_CASE_var == None ) { //default to outside temp
 				nsvEnvironmentTemp = OutDryBulbTemp;
 			}}
 
-			PipeHT( PipeHTNum ).BeginEnvrnupdateFlag = false;
-			PipeHT( PipeHTNum ).FirstHVACupdateFlag = false;
+			this->BeginEnvrnupdateFlag = false;
+			this->FirstHVACupdateFlag = false;
 
 		}
 
-		if ( ! BeginEnvrnFlag ) PipeHT( PipeHTNum ).BeginEnvrnupdateFlag = true;
-		if ( ! FirstHVACIteration ) PipeHT( PipeHTNum ).FirstHVACupdateFlag = true;
+		if ( ! BeginEnvrnFlag ) this->BeginEnvrnupdateFlag = true;
+		if ( ! FirstHVACIteration ) this->FirstHVACupdateFlag = true;
 
 		//Calculate the current sim time for this pipe (not necessarily structure variable, but it is ok for consistency)
-		PipeHT( PipeHTNum ).CurrentSimTime = ( DayOfSim - 1 ) * 24 + HourOfDay - 1 + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed;
-		if ( std::abs( PipeHT( PipeHTNum ).CurrentSimTime - PipeHT( PipeHTNum ).PreviousSimTime ) > 1.0e-6 ) {
+		this->CurrentSimTime = ( DayOfSim - 1 ) * 24 + HourOfDay - 1 + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed;
+		if ( std::abs( this->CurrentSimTime - this->PreviousSimTime ) > 1.0e-6 ) {
 			PushArrays = true;
-			PipeHT( PipeHTNum ).PreviousSimTime = PipeHT( PipeHTNum ).CurrentSimTime;
+			this->PreviousSimTime = this->CurrentSimTime;
 		} else {
 			PushArrays = false; //Time hasn't passed, don't accept the tentative values yet!
 		}
@@ -1101,39 +1067,39 @@ namespace PipeHeatTransfer {
 			//If sim time has changed all values from previous runs should have been acceptable.
 			// Thus we will now shift the arrays from 2>1 and 3>2 so we can then begin
 			// to update 2 and 3 again.
-			if ( PipeHT( PipeHTNum ).EnvironmentPtr == GroundEnv ) {
-				for ( LengthIndex = 2; LengthIndex <= PipeHT( PipeHTNum ).NumSections; ++LengthIndex ) {
-					for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes; ++DepthIndex ) {
-						for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
+			if ( this->EnvironmentPtr == GroundEnv ) {
+				for ( LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex ) {
+					for ( DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
+						for ( WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 							//This will essentially 'accept' the tentative values that were calculated last iteration
 							// as the new officially 'current' values
-							PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex ) = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
+							this->T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex ) = this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
 						}
 					}
 				}
 			}
 
 			//Then update the Hanby near pipe model temperatures
-			PipeHT( PipeHTNum ).FluidTemp = PipeHT( PipeHTNum ).TentativeFluidTemp;
-			PipeHT( PipeHTNum ).PipeTemp = PipeHT( PipeHTNum ).TentativePipeTemp;
+			this->FluidTemp = this->TentativeFluidTemp;
+			this->PipeTemp = this->TentativePipeTemp;
 
 		} else { //  IF(.NOT. FirstHVACIteration)THEN
 
 			//If we don't have FirstHVAC, the last iteration values were not accepted, and we should
 			// not step through time.  Thus we will revert our T(3,:,:,:) array back to T(2,:,:,:) to
 			// start over with the same values as last time.
-			for ( LengthIndex = 2; LengthIndex <= PipeHT( PipeHTNum ).NumSections; ++LengthIndex ) {
-				for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes; ++DepthIndex ) {
-					for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
+			for ( LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex ) {
+				for ( DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex ) {
+					for ( WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex ) {
 						//This will essentially erase the past iterations and revert back to the correct values
-						PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex );
+						this->T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = this->T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex );
 					}
 				}
 			}
 
 			//Similarly for Hanby model arrays
-			PipeHT( PipeHTNum ).TentativeFluidTemp = PipeHT( PipeHTNum ).FluidTemp;
-			PipeHT( PipeHTNum ).TentativePipeTemp = PipeHT( PipeHTNum ).PipeTemp;
+			this->TentativeFluidTemp = this->FluidTemp;
+			this->TentativePipeTemp = this->PipeTemp;
 
 		}
 
@@ -1141,22 +1107,22 @@ namespace PipeHeatTransfer {
 		//Even though the loop eventually has no flow rate, it appears it initializes to a value, then converges to OFF
 		//Thus, this is called at the beginning of every time step once.
 
-		PipeHT( PipeHTNum ).FluidSpecHeat = GetSpecificHeatGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, nsvInletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
-		PipeHT( PipeHTNum ).FluidDensity = GetDensityGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, nsvInletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
+		this->FluidSpecHeat = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, nsvInletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+		this->FluidDensity = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, nsvInletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 
 		// At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
-		PipeHT( PipeHTNum ).FluidHeatLossRate = 0.0;
-		PipeHT( PipeHTNum ).FluidHeatLossEnergy = 0.0;
-		PipeHT( PipeHTNum ).EnvironmentHeatLossRate = 0.0;
-		PipeHT( PipeHTNum ).EnvHeatLossEnergy = 0.0;
-		PipeHT( PipeHTNum ).ZoneHeatGainRate = 0.0;
+		this->FluidHeatLossRate = 0.0;
+		this->FluidHeatLossEnergy = 0.0;
+		this->EnvironmentHeatLossRate = 0.0;
+		this->EnvHeatLossEnergy = 0.0;
+		this->ZoneHeatGainRate = 0.0;
 		nsvFluidHeatLossRate = 0.0;
 		nsvEnvHeatLossRate = 0.0;
 		nsvOutletTemp = 0.0;
 
-		if ( PipeHT( PipeHTNum ).FluidDensity > 0.0 ) {
+		if ( this->FluidDensity > 0.0 ) {
 			//The density will only be zero the first time through, which will be a warmup day, and not reported
-			nsvVolumeFlowRate = nsvMassFlowRate / PipeHT( PipeHTNum ).FluidDensity;
+			nsvVolumeFlowRate = nsvMassFlowRate / this->FluidDensity;
 		}
 
 	}
@@ -2065,10 +2031,9 @@ namespace PipeHeatTransfer {
 	//==============================================================================
 
 	Real64
-	TBND(
+	PipeHTData::TBND(
 		Real64 const z, // Current Depth
-		Real64 const DayOfSim, // Current Simulation Day
-		int const PipeHTNum // Current Pipe Number
+		Real64 const DayOfSim // Current Simulation Day
 	)
 	{
 
@@ -2090,7 +2055,7 @@ namespace PipeHeatTransfer {
 		Real64 curSimTime = DayOfSim * SecsInDay;
 		Real64 TBND;
 
-		TBND = PipeHT( PipeHTNum ).groundTempModel->getGroundTempAtTimeInSeconds( z, curSimTime );
+		TBND = this->groundTempModel->getGroundTempAtTimeInSeconds( z, curSimTime );
 
 		return TBND;
 

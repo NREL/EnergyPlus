@@ -211,6 +211,7 @@ namespace PipeHeatTransfer {
 		int CompNum; // ..Branch%Comp index where this pipe lies
 		bool CheckEquipName;
 		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
+		bool OneTimeInit;
 
 		// Report data
 		Real64 FluidInletTemp; // inlet temperature [C]
@@ -294,6 +295,7 @@ namespace PipeHeatTransfer {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			CheckEquipName( true ),
+			OneTimeInit( true ),
 			FluidInletTemp( 0.0 ),
 			FluidOutletTemp( 0.0 ),
 			MassFlowRate( 0.0 ),
@@ -304,7 +306,22 @@ namespace PipeHeatTransfer {
 			EnvironmentHeatLossRate( 0.0 ),
 			EnvHeatLossEnergy( 0.0 ),
 			VolumeFlowRate( 0.0 )
+
 		{}
+
+		void
+		PushInnerTimeStepArrays();
+
+		void
+		InitPipesHeatTransfer(
+			bool const FirstHVACIteration // component number
+		);
+
+		Real64
+		TBND(
+			Real64 const z, // Current Depth
+			Real64 const DayOfSim // Current Simulation Day
+		);
 
 	};
 
@@ -315,7 +332,6 @@ namespace PipeHeatTransfer {
 
 	void
 	SimPipesHeatTransfer(
-		int const EquipType,
 		std::string const & EquipName, // name of the Pipe Heat Transfer.
 		int & EqNum, // index in local derived types for external calling
 		bool const InitLoopEquip,
@@ -324,8 +340,6 @@ namespace PipeHeatTransfer {
 
 	//==============================================================================
 
-	void
-	PushInnerTimeStepArrays( int const PipeHTNum );
 
 	void
 	GetPipesHeatTransfer();
@@ -342,12 +356,7 @@ namespace PipeHeatTransfer {
 
 	//==============================================================================
 
-	void
-	InitPipesHeatTransfer(
-		int const PipeType,
-		int const PipeHTNum, // component number
-		bool const FirstHVACIteration // component number
-	);
+
 
 	//==============================================================================
 
@@ -403,12 +412,7 @@ namespace PipeHeatTransfer {
 
 	//==============================================================================
 
-	Real64
-	TBND(
-		Real64 const z, // Current Depth
-		Real64 const DayOfSim, // Current Simulation Day
-		int const PipeHTNum // Current Pipe Number
-	);
+
 
 	//===============================================================================
 
