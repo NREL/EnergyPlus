@@ -3739,7 +3739,6 @@ namespace ZoneEquipmentManager {
 		using DataHeatBalFanSys::ZoneReOrder;
 		using DataHVACGlobals::ZoneMassBalanceHVACReSim;
 		using DataHVACGlobals::SmallMassFlow;
-		using DataHVACGlobals::VerySmallMassFlow;
 		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
@@ -3952,7 +3951,7 @@ namespace ZoneEquipmentManager {
 				}
 				//
 
-				TotSupplyAirMassFlowRate = max( 0.0 , ( TotInletAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) - ZoneEquipConfig(ZoneNum).PlenumMassFlow ) );
+				TotSupplyAirMassFlowRate = TotInletAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) - ZoneEquipConfig(ZoneNum).PlenumMassFlow;
 
 				if ( AirLoopNum > 0 ) {
 					AirLoopFlow(AirLoopNum).ZoneExhaust += ZoneEquipConfig(ZoneNum).ZoneExh;
@@ -3968,7 +3967,7 @@ namespace ZoneEquipmentManager {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				UnbalancedExhaustDelta = (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).RetFlowAdjustment) - (AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced);
 				UnbalancedExhaustDelta = max(UnbalancedExhaustDelta, (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).RetFlowAdjustment) - (AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced) );
-				if ( (UnbalancedExhaustDelta > VerySmallMassFlow) && !AirLoopFlow( AirLoopNum ).FlowError && AirLoopsSimOnce ) {
+				if ( (UnbalancedExhaustDelta > SmallMassFlow) && !AirLoopFlow( AirLoopNum ).FlowError && AirLoopsSimOnce ) {
 					if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
 						ShowWarningError( "In AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " there is unbalanced exhaust air flow." );
 						ShowContinueErrorTimeStamp( "" );
