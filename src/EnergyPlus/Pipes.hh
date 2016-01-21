@@ -59,9 +59,6 @@
 #ifndef Pipes_hh_INCLUDED
 #define Pipes_hh_INCLUDED
 
-// C++ Headers
-#include <memory>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -129,7 +126,7 @@ namespace Pipes {
 	};
 
 	// Object Data
-	extern Array1D< std::shared_ptr< LocalPipeData > > LocalPipe; // dimension to number of pipes
+	extern Array1D< LocalPipeData > LocalPipe; // dimension to number of pipes
 
 	// Functions
 	void
