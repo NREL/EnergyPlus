@@ -870,7 +870,7 @@ private: // data
 
 }; //class ElectPowerLoadCenter
 
-class ElectricPowerServiceManager
+class ElectricPowerServiceManager // 
 {
 
 public: // Creation

@@ -244,7 +244,7 @@ namespace ElectricPowerService {
 	if ( this->numLoadCenters > 0 ){
 		for ( auto iLoadCenterNum = 1; iLoadCenterNum <= this->numLoadCenters; ++iLoadCenterNum ){
 			// call Electric Power Load Center constructor, in place
-			this->elecLoadCenterObjs.emplace_back( std::make_unique < ElectPowerLoadCenter > ( iLoadCenterNum) );
+			this->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( iLoadCenterNum) );
 		}
 	
 	} else {
@@ -255,7 +255,7 @@ namespace ElectricPowerService {
 		//   but only if there are any other electricity components set up (yet) for metering
 		int anyElectricityPresent = GetMeterIndex( "ELECTRICITY:FACILITY" );
 		if ( anyElectricityPresent > 0 ) {
-			this->elecLoadCenterObjs.emplace_back( std::make_unique < ElectPowerLoadCenter > ( 0 ) );
+			this->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 0 ) );
 			this->numLoadCenters = 1;
 		}
 	}
@@ -269,7 +269,7 @@ namespace ElectricPowerService {
 		int iOStat; // IO Status when calling get input subroutine
 		int facilityPowerInTransformerIDFObjNum = 0;
 		bool foundInFromGridTransformer = false;
-		bool foundPowerOutFromOnsiteTransformer = false;
+//		bool foundPowerOutFromOnsiteTransformer = false;
 
 		DataIPShortCuts::cCurrentModuleObject =  "ElectricLoadCenter:Transformer";
 		for ( auto loopTransformer = 1; loopTransformer <= this->numTransformers; ++loopTransformer) {
@@ -290,12 +290,12 @@ namespace ElectricPowerService {
 			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutFromOnsiteGeneration" ) ) {
 				++this->numPowerOutTransformers;
 				this->powerOutTransformerNames.push_back( DataIPShortCuts::cAlphaArgs( 1 ) ) ;
-				this->powerOutTransformerObjs.emplace_back( std::make_unique< ElectricTransformer >( DataIPShortCuts::cAlphaArgs( 1 ) ) );
+				this->powerOutTransformerObjs.emplace_back( new ElectricTransformer ( DataIPShortCuts::cAlphaArgs( 1 ) ) );
 			}
 		}
 		if ( foundInFromGridTransformer ) {
 			//call transformer constructor
-			facilityPowerInTransformerObj = std::make_unique< ElectricTransformer >( this->facilityPowerInTransformerName  );
+			facilityPowerInTransformerObj = std::unique_ptr < ElectricTransformer > ( new ElectricTransformer ( this->facilityPowerInTransformerName  ) );
 		}
 	} // if transformers
 
@@ -387,7 +387,7 @@ namespace ElectricPowerService {
 	void
 	ElectricPowerServiceManager::verifyCustomMetersElecPowerMgr()
 	{
-		for ( auto loop = 0; loop < this->elecLoadCenterObjs.size(); ++loop ) {
+		for ( int loop = 0; loop < this->elecLoadCenterObjs.size(); ++loop ) {
 			this->elecLoadCenterObjs[ loop ]->setupLoadCenterMeterIndices();
 		}
 	}
@@ -579,7 +579,7 @@ namespace ElectricPowerService {
 			for ( auto genCount = 1; genCount <= this->numGenerators; ++genCount) {
 				// call constructor in place
 				this->generatorsPresent = true;
-				this->elecGenCntrlObj.emplace_back( std::make_unique < GeneratorController >( DataIPShortCuts::cAlphaArgs( alphaCount ), DataIPShortCuts::cAlphaArgs( alphaCount + 1 ), DataIPShortCuts::rNumericArgs( 2 * genCount - 1 ), DataIPShortCuts::cAlphaArgs( alphaCount + 2 ), DataIPShortCuts::rNumericArgs( 2 * genCount) ) );
+				this->elecGenCntrlObj.emplace_back( new GeneratorController ( DataIPShortCuts::cAlphaArgs( alphaCount ), DataIPShortCuts::cAlphaArgs( alphaCount + 1 ), DataIPShortCuts::rNumericArgs( 2 * genCount - 1 ), DataIPShortCuts::cAlphaArgs( alphaCount + 2 ), DataIPShortCuts::rNumericArgs( 2 * genCount) ) );
 				++alphaCount;
 				++alphaCount;
 				++alphaCount;
@@ -588,12 +588,12 @@ namespace ElectricPowerService {
 
 		if ( ! errorsFound && this->inverterPresent ) {
 			// call inverter constructor
-			this->inverterObj = std::make_unique< DCtoACInverter >  ( this->inverterName ) ;
+			this->inverterObj = std::unique_ptr < DCtoACInverter >  ( new DCtoACInverter( this->inverterName ) ) ;
 		}
 
 		if ( ! errorsFound && this->storagePresent ) {
 			// call storage constructor 
-			this->storageObj =  std::make_unique< ElectricStorage >(  this->storageName  );
+			this->storageObj =  std::unique_ptr < ElectricStorage > ( new ElectricStorage( this->storageName ) );
 		}
 
 		if ( ! errorsFound && this->transformerPresent ) {
@@ -601,7 +601,7 @@ namespace ElectricPowerService {
 			
 			//call transformer constructor 
 
-			//this->transformerObj = std::make_unique< ElectricTransformer >( this->transformerName  );
+			//this->transformerObj = std::unique_ptr < ElectricTransformer >( new ElectricTransformer (this->transformerName ) );
 		}
 
 		//Setup general output variables for reporting in the electric load center
@@ -1211,6 +1211,9 @@ namespace ElectricPowerService {
 				}
 				break;
 			}
+			case bussNotYetSet: {
+				// do nothing
+			}
 
 			} // end switch
 			this->thermalProdRate = 0.0;
@@ -1405,6 +1408,10 @@ namespace ElectricPowerService {
 			thermalPowerOutput = this->thermalProdRate;
 			break;
 		}
+		case generatorNotYetSet: {
+			// do nothing
+			break;
+		}
 		} // end switch
 	}
 
@@ -1542,6 +1549,10 @@ namespace ElectricPowerService {
 				this->efficiency = DataIPShortCuts::rNumericArgs( 2 );
 				break;
 			}
+			case notYetSet: {
+				// do nothing
+				break;
+			}
 
 			} // end switch modelType
 		
@@ -1567,6 +1578,10 @@ namespace ElectricPowerService {
 				}
 				case cECLookUpTableModel: {
 					SetupZoneInternalGain( this->zoneNum, "ElectricLoadCenter:Inverter:LookUpTable", this->name, DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, this->qdotConvZone, _, this->qdotRadZone );
+					break;
+				}
+				case notYetSet: {
+					// do nothing
 					break;
 				}
 				} // end switch modelType
@@ -1687,6 +1702,11 @@ namespace ElectricPowerService {
 			}
 			case simpleConstantEff: {
 				tempACPower = this->efficiency * this->dCPowerIn;
+				break;
+			}
+			case notYetSet: {
+				// do nothing
+				tempACPower = 0.0;
 				break;
 			}
 
@@ -1951,6 +1971,10 @@ namespace ElectricPowerService {
 				}
 				break;
 			}
+			case storageTypeNotSet: {
+				// do nothing
+				break;
+			}
 
 			} // switch storage model type
 
@@ -1982,6 +2006,11 @@ namespace ElectricPowerService {
 					SetupZoneInternalGain( this->zoneNum, "ElectricLoadCenter:Storage:Battery", this->name , DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageBattery, this->qdotConvZone, _, this->qdotRadZone );
 					break;
 				}
+				case storageTypeNotSet: {
+					// do nothing
+					break;
+				}
+
 				} // switch storage model type
 			}
 		} else { // storage not found
@@ -2957,7 +2986,7 @@ namespace ElectricPowerService {
 		switch ( this->usageMode )
 		{
 		case powerInFromGrid: {
-			for ( auto meterNum = 0; meterNum < this->wiredMeterPtrs.size(); ++meterNum ) {
+			for ( int meterNum = 0; meterNum < this->wiredMeterPtrs.size(); ++meterNum ) {
 
 				if ( DataGlobals::MetersHaveBeenInitialized ) {
 
@@ -3096,7 +3125,7 @@ namespace ElectricPowerService {
 	ElectricTransformer::setupMeterIndices()
 	{
 		if (this->usageMode == powerInFromGrid ) {
-			for ( auto meterNum = 0; meterNum < this->wiredMeterNames.size(); ++meterNum ) {
+			for ( int meterNum = 0; meterNum < this->wiredMeterNames.size(); ++meterNum ) {
 
 				this->wiredMeterPtrs[ meterNum ] = GetMeterIndex( this->wiredMeterNames[ meterNum ] );
 
