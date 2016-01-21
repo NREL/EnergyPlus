@@ -118,7 +118,7 @@ namespace Pipes {
 		{}
 
 		public:
-			static std::shared_ptr< PlantComponent > factory( int objectType, std::string objectName );
+			static PlantComponent * factory( int objectType, std::string objectName );
 
 		public:
 			bool simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip );

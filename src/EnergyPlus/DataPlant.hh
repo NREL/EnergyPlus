@@ -601,7 +601,7 @@ namespace DataPlant {
 		int IndexInLoopSidePumps; // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
 		Real64 TempDesCondIn;
 		Real64 TempDesEvapOut;
-		std::shared_ptr< PlantComponent > compPtr;
+		PlantComponent * compPtr;
 
 		// Default Constructor
 		CompData() :
