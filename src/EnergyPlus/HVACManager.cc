@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 #include <string>
@@ -147,7 +205,7 @@ namespace HVACManager {
 	//Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
 	//Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
 	//Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
-	
+
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
 	// to facilitate easier unit testing of those functions.
@@ -155,6 +213,7 @@ namespace HVACManager {
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool SimHVACIterSetup( false );
+		bool TriggerGetAFN( true );
 	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
@@ -168,6 +227,7 @@ namespace HVACManager {
 		HVACManageIteration = 0;
 		RepIterAir = 0;
 		SimHVACIterSetup = false;
+		TriggerGetAFN = true;
 	}
 
 
@@ -267,7 +327,6 @@ namespace HVACManager {
 		Real64 ZoneTempChange( 0.0 ); // change in zone air temperature from timestep t-1 to t
 		int NodeNum;
 		bool ReportDebug;
-		static bool TriggerGetAFN( true );
 		int ZoneNum;
 		static bool PrintedWarmup( false );
 
@@ -658,7 +717,6 @@ namespace HVACManager {
 
 		int AirSysNum;
 		int StackDepth;
-		std::string HistoryStack;
 		std::string HistoryTrace;
 		Real64 SlopeHumRat;
 		Real64 SlopeMdot;
@@ -679,22 +737,24 @@ namespace HVACManager {
 		FirstHVACIteration = true;
 
 		if ( AirLoopInputsFilled ) {
-			// Reset air loop control info for cooling coil active flag (used in TU's for reheat air flow control)
-			AirLoopControlInfo.CoolingActiveFlag() = false;
-			// Reset air loop control info for heating coil active flag (used in OA controller for HX control)
-			AirLoopControlInfo.HeatingActiveFlag() = false;
-			// reset outside air system HX to off first time through
-			AirLoopControlInfo.HeatRecoveryBypass() = true;
-			// set HX check status flag to check for custom control in MixedAir.cc
-			AirLoopControlInfo.CheckHeatRecoveryBypassStatus() = true;
-			// set OA comp simulated flag to false
-			AirLoopControlInfo.OASysComponentsSimulated() = false;
-			// set economizer flow locked flag to false, will reset if custom HX control is used
-			AirLoopControlInfo.EconomizerFlowLocked() = false;
-			// set air loop resim flags for when heat recovery is used and air loop needs another iteration
-			AirLoopControlInfo.HeatRecoveryResimFlag() = true;
-			AirLoopControlInfo.HeatRecoveryResimFlag2() = false;
-			AirLoopControlInfo.ResimAirLoopFlag() = false;
+			for ( auto & e : AirLoopControlInfo ) {
+				// Reset air loop control info for cooling coil active flag (used in TU's for reheat air flow control)
+				e.CoolingActiveFlag = false;
+				// Reset air loop control info for heating coil active flag (used in OA controller for HX control)
+				e.HeatingActiveFlag = false;
+				// reset outside air system HX to off first time through
+				e.HeatRecoveryBypass = true;
+				// set HX check status flag to check for custom control in MixedAir.cc
+				e.CheckHeatRecoveryBypassStatus = true;
+				// set OA comp simulated flag to false
+				e.OASysComponentsSimulated = false;
+				// set economizer flow locked flag to false, will reset if custom HX control is used
+				e.EconomizerFlowLocked = false;
+				// set air loop resim flags for when heat recovery is used and air loop needs another iteration
+				e.HeatRecoveryResimFlag = true;
+				e.HeatRecoveryResimFlag2 = false;
+				e.ResimAirLoopFlag = false;
+			}
 		}
 
 		// This setups the reports for the Iteration variable that limits how many times
@@ -967,9 +1027,6 @@ namespace HVACManager {
 					for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 						for ( NodeIndex = 1; NodeIndex <= ZoneInletConvergence( ZoneNum ).NumInletNodes; ++NodeIndex ) {
-							ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedHumRate = false;
-							ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedMassFlow = false;
-							ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedTemp = false;
 
 							// Check humidity ratio
 							FoundOscillationByDuplicate = false;
@@ -982,7 +1039,6 @@ namespace HVACManager {
 								for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {
 									if ( std::abs( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio( 1 ) - ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio( StackDepth ) ) < HVACHumRatOscillationToler ) {
 										FoundOscillationByDuplicate = true;
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedHumRate = true;
 										ShowContinueError( "Node named " + NodeID( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NodeNum ) + " shows oscillating humidity ratio across iterations with a repeated value of " + RoundSigDigits( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio( 1 ), 6 ) );
 										break;
 									}
@@ -1038,7 +1094,6 @@ namespace HVACManager {
 								for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {
 									if ( std::abs( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate( 1 ) - ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate( StackDepth ) ) < HVACFlowRateOscillationToler ) {
 										FoundOscillationByDuplicate = true;
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedMassFlow = true;
 										ShowContinueError( "Node named " + NodeID( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NodeNum ) + " shows oscillating mass flow rate across iterations with a repeated value of " + RoundSigDigits( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate( 1 ), 6 ) );
 										break;
 									}
@@ -1046,7 +1101,6 @@ namespace HVACManager {
 								if ( ! FoundOscillationByDuplicate ) {
 									SlopeMdot = ( sum_ConvergLogStackARR * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) ) ) / ( square_sum_ConvergLogStackARR - double( ConvergLogStackDepth ) * sum_square_ConvergLogStackARR );
 									if ( std::abs( SlopeMdot ) > HVACFlowRateSlopeToler ) {
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedMassFlow = true;
 										if ( SlopeMdot < 0.0 ) { // check for monotic decrease
 											MonotonicDecreaseFound = true;
 											for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {
@@ -1094,7 +1148,6 @@ namespace HVACManager {
 								for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {
 									if ( std::abs( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature( 1 ) - ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature( StackDepth ) ) < HVACTemperatureOscillationToler ) {
 										FoundOscillationByDuplicate = true;
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedTemp = true;
 										ShowContinueError( "Node named " + NodeID( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NodeNum ) + " shows oscillating temperatures across iterations with a repeated value of " + RoundSigDigits( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature( 1 ), 6 ) );
 										break;
 									}
@@ -1102,7 +1155,6 @@ namespace HVACManager {
 								if ( ! FoundOscillationByDuplicate ) {
 									SlopeTemps = ( sum_ConvergLogStackARR * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) ) ) / ( square_sum_ConvergLogStackARR - double( ConvergLogStackDepth ) * sum_square_ConvergLogStackARR );
 									if ( std::abs( SlopeTemps ) > HVACTemperatureSlopeToler ) {
-										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedTemp = true;
 										if ( SlopeTemps < 0.0 ) { // check for monotic decrease
 											MonotonicDecreaseFound = true;
 											for ( StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth ) {
@@ -1413,11 +1465,13 @@ namespace HVACManager {
 		if ( ! ZoneSizingCalc && ! SysSizingCalc ) {
 			if ( MySetPointInit ) {
 				if ( NumOfNodes > 0 ) {
-					Node.TempSetPoint() = SensedNodeFlagValue;
-					Node.HumRatSetPoint() = SensedNodeFlagValue;
-					Node.HumRatMin() = SensedNodeFlagValue;
-					Node.HumRatMax() = SensedNodeFlagValue;
-					Node.MassFlowRateSetPoint() = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
+					for ( auto & e : Node ) {
+						e.TempSetPoint = SensedNodeFlagValue;
+						e.HumRatSetPoint = SensedNodeFlagValue;
+						e.HumRatMin = SensedNodeFlagValue;
+						e.HumRatMax = SensedNodeFlagValue;
+						e.MassFlowRateSetPoint = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
+					}
 					DefaultNodeValues.TempSetPoint = SensedNodeFlagValue;
 					DefaultNodeValues.HumRatSetPoint = SensedNodeFlagValue;
 					DefaultNodeValues.HumRatMin = SensedNodeFlagValue;
@@ -1888,9 +1942,11 @@ namespace HVACManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( NumPrimaryAirSys == 0 ) return;
-		AirLoopControlInfo.NightVent() = false;
-		AirLoopControlInfo.LoopFlowRateSet() = false;
-		AirLoopFlow.ReqSupplyFrac() = 1.0;
+		for ( auto & e : AirLoopControlInfo ) {
+			e.NightVent = false;
+			e.LoopFlowRateSet = false;
+		}
+		for ( auto & e : AirLoopFlow ) e.ReqSupplyFrac = 1.0;
 
 	}
 
@@ -1932,33 +1988,37 @@ namespace HVACManager {
 		// na
 		if ( NumOfNodes <= 0 ) return;
 
-		Node.Temp() = DefaultNodeValues.Temp;
-		Node.TempMin() = DefaultNodeValues.TempMin;
-		Node.TempMax() = DefaultNodeValues.TempMax;
-		Node.TempSetPoint() = DefaultNodeValues.TempSetPoint;
-		Node.MassFlowRate() = DefaultNodeValues.MassFlowRate;
-		Node.MassFlowRateMin() = DefaultNodeValues.MassFlowRateMin;
-		Node.MassFlowRateMax() = DefaultNodeValues.MassFlowRateMax;
-		Node.MassFlowRateMinAvail() = DefaultNodeValues.MassFlowRateMinAvail;
-		Node.MassFlowRateMaxAvail() = DefaultNodeValues.MassFlowRateMaxAvail;
-		Node.MassFlowRateSetPoint() = DefaultNodeValues.MassFlowRateSetPoint;
-		Node.Quality() = DefaultNodeValues.Quality;
-		Node.Press() = DefaultNodeValues.Press;
-		Node.Enthalpy() = DefaultNodeValues.Enthalpy;
-		Node.HumRat() = DefaultNodeValues.HumRat;
-		Node.HumRatMin() = DefaultNodeValues.HumRatMin;
-		Node.HumRatMax() = DefaultNodeValues.HumRatMax;
-		Node.HumRatSetPoint() = DefaultNodeValues.HumRatSetPoint;
-		Node.TempSetPointHi() = DefaultNodeValues.TempSetPointHi;
-		Node.TempSetPointLo() = DefaultNodeValues.TempSetPointLo;
+		for ( auto & e : Node ) {
+			e.Temp = DefaultNodeValues.Temp;
+			e.TempMin = DefaultNodeValues.TempMin;
+			e.TempMax = DefaultNodeValues.TempMax;
+			e.TempSetPoint = DefaultNodeValues.TempSetPoint;
+			e.MassFlowRate = DefaultNodeValues.MassFlowRate;
+			e.MassFlowRateMin = DefaultNodeValues.MassFlowRateMin;
+			e.MassFlowRateMax = DefaultNodeValues.MassFlowRateMax;
+			e.MassFlowRateMinAvail = DefaultNodeValues.MassFlowRateMinAvail;
+			e.MassFlowRateMaxAvail = DefaultNodeValues.MassFlowRateMaxAvail;
+			e.MassFlowRateSetPoint = DefaultNodeValues.MassFlowRateSetPoint;
+			e.Quality = DefaultNodeValues.Quality;
+			e.Press = DefaultNodeValues.Press;
+			e.Enthalpy = DefaultNodeValues.Enthalpy;
+			e.HumRat = DefaultNodeValues.HumRat;
+			e.HumRatMin = DefaultNodeValues.HumRatMin;
+			e.HumRatMax = DefaultNodeValues.HumRatMax;
+			e.HumRatSetPoint = DefaultNodeValues.HumRatSetPoint;
+			e.TempSetPointHi = DefaultNodeValues.TempSetPointHi;
+			e.TempSetPointLo = DefaultNodeValues.TempSetPointLo;
+		}
 
 		if ( allocated( MoreNodeInfo ) ) {
-			MoreNodeInfo.WetBulbTemp() = DefaultNodeValues.Temp;
-			MoreNodeInfo.RelHumidity() = 0.0;
-			MoreNodeInfo.ReportEnthalpy() = DefaultNodeValues.Enthalpy;
-			MoreNodeInfo.VolFlowRateStdRho() = 0.0;
-			MoreNodeInfo.VolFlowRateCrntRho() = 0.0;
-			MoreNodeInfo.Density() = 0.0;
+			for ( auto & e : MoreNodeInfo ) {
+				e.WetBulbTemp = DefaultNodeValues.Temp;
+				e.RelHumidity = 0.0;
+				e.ReportEnthalpy = DefaultNodeValues.Enthalpy;
+				e.VolFlowRateStdRho = 0.0;
+				e.VolFlowRateCrntRho = 0.0;
+				e.Density = 0.0;
+			}
 		}
 
 	}
@@ -2655,29 +2715,6 @@ namespace HVACManager {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACManager
 

@@ -1,12 +1,70 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
+#include <algorithm>
 #include <cmath>
+#include <limits>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -84,6 +142,13 @@ namespace RoomAirModelManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		GetUCSDDVDataFlag = true;
+		GetAirModelData = true;
+	}
 
 	void
 	ManageAirModel( int & ZoneNum )
@@ -347,7 +412,6 @@ namespace RoomAirModelManager {
 
 			GetObjectItem( cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//first get zone ID
-			ZoneNum = 0;
 			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum == 0 ) { //throw error
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
@@ -1459,7 +1523,7 @@ namespace RoomAirModelManager {
 
 		for ( Loop = 1; Loop <= NumOfRoomAirflowNetControl; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name( ), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone, NumOfZones );
 			if ( ZoneNum == 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 2 ) );
@@ -1494,7 +1558,7 @@ namespace RoomAirModelManager {
 				RoomAirflowNetworkZoneInfo( ZoneNum ).Node( thisAirNodeinZone ).Name = cAlphaArgs( AlphaArgNum );
 			}
 			// control point node
-			AirCntrlNodeNum = FindItemInList( cAlphaArgs( 3 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node.Name( ), RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+			AirCntrlNodeNum = FindItemInList( cAlphaArgs( 3 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
 			if ( AirCntrlNodeNum == 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -1513,7 +1577,7 @@ namespace RoomAirModelManager {
 		for ( Loop = 1; Loop <= TotNumOfRoomAFNNodes; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _,
 				lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name( ), NumOfZones );
+			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone, NumOfZones );
 			if ( ZoneNum == 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -1522,7 +1586,7 @@ namespace RoomAirModelManager {
 				continue;
 			}
 
-			RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node.Name( ), RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
+			RAFNNodeNum = FindItemInList( cAlphaArgs( 1 ), RoomAirflowNetworkZoneInfo( ZoneNum ).Node, RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes );
 			if ( RAFNNodeNum == 0 ) {
 				ShowSevereError( "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -1972,8 +2036,13 @@ namespace RoomAirModelManager {
 				for ( SurfNum = Zone( ZNum ).SurfaceFirst; SurfNum <= Zone( ZNum ).SurfaceLast; ++SurfNum ) {
 					if ( Surface( SurfNum ).Class != SurfaceClass_IntMass ) {
 						// Recalculate lowest and highest height for the zone
-						Z1Zone = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
-						Z2Zone = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
+						Z1Zone = std::numeric_limits< Real64 >::max();
+						Z2Zone = std::numeric_limits< Real64 >::lowest();
+						for ( int i = 1, u = Surface( SurfNum ).Sides; i <= u; ++i ) {
+							Real64 const z_i( Surface( SurfNum ).Vertex( i ).z );
+							Z1Zone = std::min( Z1Zone, z_i );
+							Z2Zone = std::max( Z2Zone, z_i );
+						}
 					}
 
 					if ( SetZoneAux ) {
@@ -2084,6 +2153,7 @@ namespace RoomAirModelManager {
 				// the 0 component of the array has the number of relevant AirflowNetwork surfaces for the zone
 				AirflowNetworkSurfaceUCSDCV( 0, Loop ) = AuxSurf( Loop );
 				if ( AuxSurf( Loop ) != 0 ) {
+					Real64 const ceilingHeight( ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 ) );
 					SurfNum = 1;
 					for ( Loop2 = 1; Loop2 <= NumOfLinksMultiZone; ++Loop2 ) {
 						if ( Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Zone == Loop ) {
@@ -2130,13 +2200,25 @@ namespace RoomAirModelManager {
 							if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_DOP ) {
 								AirflowNetworkSurfPtr = MultizoneSurfaceData( Loop2 ).SurfNum;
 								NSides = Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Sides;
-								SurfParametersCVDV( Loop2 ).Zmin = minval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
-								SurfParametersCVDV( Loop2 ).Zmax = maxval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
+								Real64 z_min( std::numeric_limits< Real64 >::max() ), z_max( std::numeric_limits< Real64 >::lowest() );
+								for ( int i = 1; i <= NSides; ++i ) {
+									Real64 const z_i( Surface( AirflowNetworkSurfPtr ).Vertex( i ).z );
+									z_min = std::min( z_min, z_i );
+									z_max = std::max( z_max, z_i );
+								}
+								SurfParametersCVDV( Loop2 ).Zmin = z_min - ceilingHeight;
+								SurfParametersCVDV( Loop2 ).Zmax = z_max - ceilingHeight;
 							} else if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_SCR ) { // surface type = CRACK
 								AirflowNetworkSurfPtr = MultizoneSurfaceData( Loop2 ).SurfNum;
 								NSides = Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Sides;
-								SurfParametersCVDV( Loop2 ).Zmin = minval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
-								SurfParametersCVDV( Loop2 ).Zmax = maxval( Surface( AirflowNetworkSurfPtr ).Vertex( {1,NSides} ).z() ) - ZoneCeilingHeight( ( Loop - 1 ) * 2 + 1 );
+								Real64 z_min( std::numeric_limits< Real64 >::max() ), z_max( std::numeric_limits< Real64 >::lowest() );
+								for ( int i = 1; i <= NSides; ++i ) {
+									Real64 const z_i( Surface( AirflowNetworkSurfPtr ).Vertex( i ).z );
+									z_min = std::min( z_min, z_i );
+									z_max = std::max( z_max, z_i );
+								}
+								SurfParametersCVDV( Loop2 ).Zmin = z_min - ceilingHeight;
+								SurfParametersCVDV( Loop2 ).Zmax = z_max - ceilingHeight;
 							}
 
 							++SurfNum;
@@ -2623,7 +2705,7 @@ namespace RoomAirModelManager {
 
 		//Obtains and Allocates RoomAirSettings : AirflowNetwork
 		if ( GetAirModelData ) {
-			GetAirModelDatas( );
+			GetAirModelDatas();
 			GetAirModelData = false;
 		}
 
@@ -2631,7 +2713,7 @@ namespace RoomAirModelManager {
 		RAFNNodeNum = 0;
 		for ( I = 1; I <= NumOfZones; ++I ) {
 			if ( RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes > 0 ) {
-				RAFNNodeNum = FindItemInList( RAFNNodeName, RoomAirflowNetworkZoneInfo( I ).Node.Name( ), RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes );
+				RAFNNodeNum = FindItemInList( RAFNNodeName, RoomAirflowNetworkZoneInfo( I ).Node, RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes );
 				if ( RAFNNodeNum > 0 ) {
 					ZoneNum = I;
 					break;
@@ -2654,7 +2736,7 @@ namespace RoomAirModelManager {
 		std::string & SupplyNodeName, // Supply node name
 		std::string & ReturnNodeName, // Return node name
 		int TotNumEquip, // equipment type number
-		int TypeNum // Supply air node number 
+		int TypeNum // Supply air node number
 	)
 	{
 
@@ -2911,16 +2993,16 @@ namespace RoomAirModelManager {
 				ReturnNodeName = "";
 			}
 		} else if ( TypeNum == 37 ) {  // AirLoopHVACReturnAir
-			SupplyNodeName = Alphas( 4 ); // 
-			ReturnNodeName = ""; // 
+			SupplyNodeName = Alphas( 4 ); //
+			ReturnNodeName = ""; //
 		}
 
 		// Need to find a better to handle allocate and deallocate
 		if ( MaxAlphas > NumAlphas ) {
-			Alphas.deallocate( );
+			Alphas.deallocate();
 		}
 		if ( MaxNums > NumNumbers ) {
-			Numbers.deallocate( );
+			Numbers.deallocate();
 		}
 
 		return EquipFind;
@@ -2929,28 +3011,6 @@ namespace RoomAirModelManager {
 
 
 	//*****************************************************************************************
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // RoomAirModelManager
 

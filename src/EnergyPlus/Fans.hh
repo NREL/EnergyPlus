@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef Fans_hh_INCLUDED
 #define Fans_hh_INCLUDED
 
@@ -264,213 +322,6 @@ namespace Fans {
 			BalancedOutletMassFlowRate( 0.0 )
 		{}
 
-		// Member Constructor
-		FanEquipConditions(
-			std::string const & FanName, // Name of the fan
-			std::string const & FanType, // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
-			std::string const & AvailSchedName, // Fan Operation Schedule
-			int const FanType_Num, // DataHVACGlobals fan type
-			int const AvailSchedPtrNum, // Pointer to the availability schedule
-			Real64 const InletAirMassFlowRate, // MassFlow through the Fan being Simulated [kg/Sec]
-			Real64 const OutletAirMassFlowRate,
-			Real64 const MaxAirFlowRate, // Max Specified Volume Flow Rate of Fan [m3/sec]
-			bool const MaxAirFlowRateIsAutosizable, // if true, then this type of fan could be autosize
-			bool const MaxAirFlowRateEMSOverrideOn, // if true, EMS wants to override fan size for Max Volume Flow Rate
-			Real64 const MaxAirFlowRateEMSOverrideValue, // EMS value to use for override of  Max Volume Flow Rate
-			Real64 const MinAirFlowRate, // Min Specified Volume Flow Rate of Fan [m3/sec]
-			Real64 const MaxAirMassFlowRate, // Max flow rate of fan in kg/sec
-			Real64 const MinAirMassFlowRate, // Min flow rate of fan in kg/sec
-			int const FanMinAirFracMethod, // parameter for what method is used for min flow fraction
-			Real64 const FanMinFrac, // Minimum fan air flow fraction
-			Real64 const FanFixedMin, // Absolute minimum fan air flow [m3/s]
-			bool const EMSMaxMassFlowOverrideOn, // if true, then EMS is calling to override mass flow
-			Real64 const EMSAirMassFlowValue, // value EMS is directing to use [kg/s]
-			Real64 const InletAirTemp,
-			Real64 const OutletAirTemp,
-			Real64 const InletAirHumRat,
-			Real64 const OutletAirHumRat,
-			Real64 const InletAirEnthalpy,
-			Real64 const OutletAirEnthalpy,
-			Real64 const FanPower, // Power of the Fan being Simulated [kW]
-			Real64 const FanEnergy, // Fan energy in [kJ]
-			Real64 const FanRuntimeFraction, // Fraction of the timestep that the fan operates
-			Real64 const DeltaTemp, // Temp Rise across the Fan [C]
-			Real64 const DeltaPress, // Delta Pressure Across the Fan [N/m2]
-			bool const EMSFanPressureOverrideOn, // if true, then EMS is calling to override
-			Real64 const EMSFanPressureValue, // EMS value for Delta Pressure Across the Fan [Pa]
-			Real64 const FanEff, // Fan total system efficiency (fan*belt*motor*VFD)
-			bool const EMSFanEffOverrideOn, // if true, then EMS is calling to override
-			Real64 const EMSFanEffValue, // EMS value for total efficiency of the Fan, fraction on 0..1
-			bool FaultyFilterFlag, // Indicate whether there is a fouling air filter corresponding to the fan
-			int FaultyFilterIndex,  // Index of the fouling air filter corresponding to the fan
-			Real64 const MotEff, // Fan motor efficiency
-			Real64 const MotInAirFrac, // Fraction of motor heat entering air stream
-			Array1< Real64 > const & FanCoeff, // Fan Part Load Coefficients to match fan type
-			Real64 const MassFlowRateMaxAvail,
-			Real64 const MassFlowRateMinAvail,
-			Real64 const RhoAirStdInit,
-			int const InletNodeNum,
-			int const OutletNodeNum,
-			int const NVPerfNum,
-			int const FanPowerRatAtSpeedRatCurveIndex,
-			int const FanEffRatioCurveIndex,
-			std::string const & EndUseSubcategoryName,
-			bool const OneTimePowerRatioCheck, // one time flag used for error message
-			bool const OneTimeEffRatioCheck, // one time flag used for error message
-			Real64 const FanWheelDia, // Fan wheel outer diameter [m]
-			Real64 const FanOutletArea, // Fan outlet area [m2]
-			Real64 const FanMaxEff, // Fan maximum static efficiency [-]
-			Real64 const EuMaxEff, // Euler number at fan maximum static efficiency [-]
-			Real64 const FanMaxDimFlow, // Fan maximum dimensionless airflow [-]
-			Real64 const FanShaftPwrMax, // Fan shaft maximum input power [W]
-			Real64 const FanSizingFactor, // Fan sizing factor [-] cpw31Aug2010
-			Real64 const PulleyDiaRatio, // Motor/fan pulley diameter ratio [-]
-			Real64 const BeltMaxTorque, // Belt maximum torque [N-m]
-			Real64 const BeltSizingFactor, // Belt sizing factor [-]
-			Real64 const BeltTorqueTrans, // Belt fractional torque transition Region 1-2 [-]
-			Real64 const MotorMaxSpd, // Motor maximum speed [rpm]
-			Real64 const MotorMaxOutPwr, // Motor maximum output power [W]
-			Real64 const MotorSizingFactor, // Motor sizing factor [-]
-			std::string const & VFDEffType, // VFD efficiency type [Speed or Power]
-			Real64 const VFDMaxOutPwr, // VFD maximum output power [W]
-			Real64 const VFDSizingFactor, // VFD sizing factor [-] cpw31Aug2010
-			int const PressRiseCurveIndex, // Fan pressure rise curve index
-			int const PressResetCurveIndex, // Duct static pressure reset curve index
-			int const PLFanEffNormCurveIndex, // Fan part-load efficiency (normal) curve index
-			int const PLFanEffStallCurveIndex, // Fan part-load efficiency (stall) curve index
-			int const DimFlowNormCurveIndex, // Fan dimensionless airflow (normal) curve index
-			int const DimFlowStallCurveIndex, // Fan dimensionless airflow (stall) curve index
-			int const BeltMaxEffCurveIndex, // Belt maximum efficiency curve index
-			int const PLBeltEffReg1CurveIndex, // Belt part-load efficiency (Region 1) curve index
-			int const PLBeltEffReg2CurveIndex, // Belt part-load efficiency (Region 2) curve index
-			int const PLBeltEffReg3CurveIndex, // Belt part-load efficiency (Region 3) curve index
-			int const MotorMaxEffCurveIndex, // Motor maximum efficiency curve index
-			int const PLMotorEffCurveIndex, // Motor part-load efficiency curve index
-			int const VFDEffCurveIndex, // VFD efficiency curve index
-			Real64 const DeltaPressTot, // Total pressure rise across fan [N/m2]
-			Real64 const FanAirPower, // Air power for fan being Simulated [W]
-			Real64 const FanSpd, // Fan shaft rotational speed [rpm]
-			Real64 const FanTrq, // Fan shaft torque [N-m]
-			Real64 const FanWheelEff, // Fan efficiency (mechanical)
-			Real64 const FanShaftPower, // Shaft input power for fan being Simulated [W]
-			Real64 const BeltMaxEff, // Belt maximum efficiency (mechanical) cpw31Aug2010
-			Real64 const BeltEff, // Belt efficiency (mechanical)
-			Real64 const BeltInputPower, // Belt input power for fan being Simulated [W]
-			Real64 const MotorMaxEff, // Motor maximum efficiency (electrical) cpw31Aug2010
-			Real64 const MotorInputPower, // Motor input power for fan being Simulated [W]
-			Real64 const VFDEff, // VFD efficiency (electrical)
-			Real64 const VFDInputPower, // VFD input power for fan being Simulated [W]
-			Real64 const MaxFanPowerEncountered, // Maximum VFD input power encountered [W]
-			int const FlowFractSchedNum, // schedule index flow rate modifier schedule
-			int const AvailManagerMode, // mode for how exhaust fan should react to availability managers
-			int const MinTempLimitSchedNum, // schedule index minimum temperature limit
-			int const BalancedFractSchedNum, // schedule index portion recirculated
-			Real64 const UnbalancedOutletMassFlowRate,
-			Real64 const BalancedOutletMassFlowRate
-		) :
-			FanName( FanName ),
-			FanType( FanType ),
-			AvailSchedName( AvailSchedName ),
-			FanType_Num( FanType_Num ),
-			AvailSchedPtrNum( AvailSchedPtrNum ),
-			InletAirMassFlowRate( InletAirMassFlowRate ),
-			OutletAirMassFlowRate( OutletAirMassFlowRate ),
-			MaxAirFlowRate( MaxAirFlowRate ),
-			MaxAirFlowRateIsAutosizable( MaxAirFlowRateIsAutosizable ),
-			MaxAirFlowRateEMSOverrideOn( MaxAirFlowRateEMSOverrideOn ),
-			MaxAirFlowRateEMSOverrideValue( MaxAirFlowRateEMSOverrideValue ),
-			MinAirFlowRate( MinAirFlowRate ),
-			MaxAirMassFlowRate( MaxAirMassFlowRate ),
-			MinAirMassFlowRate( MinAirMassFlowRate ),
-			FanMinAirFracMethod( FanMinAirFracMethod ),
-			FanMinFrac( FanMinFrac ),
-			FanFixedMin( FanFixedMin ),
-			EMSMaxMassFlowOverrideOn( EMSMaxMassFlowOverrideOn ),
-			EMSAirMassFlowValue( EMSAirMassFlowValue ),
-			InletAirTemp( InletAirTemp ),
-			OutletAirTemp( OutletAirTemp ),
-			InletAirHumRat( InletAirHumRat ),
-			OutletAirHumRat( OutletAirHumRat ),
-			InletAirEnthalpy( InletAirEnthalpy ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			FanPower( FanPower ),
-			FanEnergy( FanEnergy ),
-			FanRuntimeFraction( FanRuntimeFraction ),
-			DeltaTemp( DeltaTemp ),
-			DeltaPress( DeltaPress ),
-			EMSFanPressureOverrideOn( EMSFanPressureOverrideOn ),
-			EMSFanPressureValue( EMSFanPressureValue ),
-			FanEff( FanEff ),
-			EMSFanEffOverrideOn( EMSFanEffOverrideOn ),
-			EMSFanEffValue( EMSFanEffValue ),
-			FaultyFilterFlag( FaultyFilterFlag ),
-			FaultyFilterIndex( FaultyFilterIndex ),
-			MotEff( MotEff ),
-			MotInAirFrac( MotInAirFrac ),
-			FanCoeff( 5, FanCoeff ),
-			MassFlowRateMaxAvail( MassFlowRateMaxAvail ),
-			MassFlowRateMinAvail( MassFlowRateMinAvail ),
-			RhoAirStdInit( RhoAirStdInit ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			NVPerfNum( NVPerfNum ),
-			FanPowerRatAtSpeedRatCurveIndex( FanPowerRatAtSpeedRatCurveIndex ),
-			FanEffRatioCurveIndex( FanEffRatioCurveIndex ),
-			EndUseSubcategoryName( EndUseSubcategoryName ),
-			OneTimePowerRatioCheck( OneTimePowerRatioCheck ),
-			OneTimeEffRatioCheck( OneTimeEffRatioCheck ),
-			FanWheelDia( FanWheelDia ),
-			FanOutletArea( FanOutletArea ),
-			FanMaxEff( FanMaxEff ),
-			EuMaxEff( EuMaxEff ),
-			FanMaxDimFlow( FanMaxDimFlow ),
-			FanShaftPwrMax( FanShaftPwrMax ),
-			FanSizingFactor( FanSizingFactor ),
-			PulleyDiaRatio( PulleyDiaRatio ),
-			BeltMaxTorque( BeltMaxTorque ),
-			BeltSizingFactor( BeltSizingFactor ),
-			BeltTorqueTrans( BeltTorqueTrans ),
-			MotorMaxSpd( MotorMaxSpd ),
-			MotorMaxOutPwr( MotorMaxOutPwr ),
-			MotorSizingFactor( MotorSizingFactor ),
-			VFDEffType( VFDEffType ),
-			VFDMaxOutPwr( VFDMaxOutPwr ),
-			VFDSizingFactor( VFDSizingFactor ),
-			PressRiseCurveIndex( PressRiseCurveIndex ),
-			PressResetCurveIndex( PressResetCurveIndex ),
-			PLFanEffNormCurveIndex( PLFanEffNormCurveIndex ),
-			PLFanEffStallCurveIndex( PLFanEffStallCurveIndex ),
-			DimFlowNormCurveIndex( DimFlowNormCurveIndex ),
-			DimFlowStallCurveIndex( DimFlowStallCurveIndex ),
-			BeltMaxEffCurveIndex( BeltMaxEffCurveIndex ),
-			PLBeltEffReg1CurveIndex( PLBeltEffReg1CurveIndex ),
-			PLBeltEffReg2CurveIndex( PLBeltEffReg2CurveIndex ),
-			PLBeltEffReg3CurveIndex( PLBeltEffReg3CurveIndex ),
-			MotorMaxEffCurveIndex( MotorMaxEffCurveIndex ),
-			PLMotorEffCurveIndex( PLMotorEffCurveIndex ),
-			VFDEffCurveIndex( VFDEffCurveIndex ),
-			DeltaPressTot( DeltaPressTot ),
-			FanAirPower( FanAirPower ),
-			FanSpd( FanSpd ),
-			FanTrq( FanTrq ),
-			FanWheelEff( FanWheelEff ),
-			FanShaftPower( FanShaftPower ),
-			BeltMaxEff( BeltMaxEff ),
-			BeltEff( BeltEff ),
-			BeltInputPower( BeltInputPower ),
-			MotorMaxEff( MotorMaxEff ),
-			MotorInputPower( MotorInputPower ),
-			VFDEff( VFDEff ),
-			VFDInputPower( VFDInputPower ),
-			MaxFanPowerEncountered( MaxFanPowerEncountered ),
-			FlowFractSchedNum( FlowFractSchedNum ),
-			AvailManagerMode( AvailManagerMode ),
-			MinTempLimitSchedNum( MinTempLimitSchedNum ),
-			BalancedFractSchedNum( BalancedFractSchedNum ),
-			UnbalancedOutletMassFlowRate( UnbalancedOutletMassFlowRate ),
-			BalancedOutletMassFlowRate( BalancedOutletMassFlowRate )
-		{}
-
 	};
 
 	struct NightVentPerfData
@@ -494,25 +345,6 @@ namespace Fans {
 			MotInAirFrac( 0.0 )
 		{}
 
-		// Member Constructor
-		NightVentPerfData(
-			std::string const & FanName, // Name of the fan that will use this data
-			Real64 const FanEff, // Fan total efficiency; motor and mechanical
-			Real64 const DeltaPress, // Delta Pressure Across the Fan [N/m2]
-			Real64 const MaxAirFlowRate, // Max Specified Volume Flow Rate of Fan [m3/s]
-			Real64 const MaxAirMassFlowRate, // Max flow rate of fan in kg/sec
-			Real64 const MotEff, // Fan motor efficiency
-			Real64 const MotInAirFrac // Fraction of motor heat entering air stream
-		) :
-			FanName( FanName ),
-			FanEff( FanEff ),
-			DeltaPress( DeltaPress ),
-			MaxAirFlowRate( MaxAirFlowRate ),
-			MaxAirMassFlowRate( MaxAirMassFlowRate ),
-			MotEff( MotEff ),
-			MotInAirFrac( MotInAirFrac )
-		{}
-
 	};
 
 	struct FanNumericFieldData
@@ -524,12 +356,6 @@ namespace Fans {
 		FanNumericFieldData()
 		{}
 
-		// Member Constructor
-		FanNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-		) :
-			FieldNames( FieldNames )
-		{}
 	};
 
 	// Object Data
@@ -728,29 +554,6 @@ namespace Fans {
 
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Fans
 

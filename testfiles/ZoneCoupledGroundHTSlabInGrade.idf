@@ -583,7 +583,7 @@ Output:VariableDictionary,IDF;
 Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [C]
 Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,hourly; 
 Output:Variable,*,Surface Average Face Conduction Heat Transfer Rate per Area,hourly;
-Output:Variable,*,Zone Coupled Surface Heat Flux,hourly;
-Output:Variable,*,Zone Coupled Surface Temperature,hourly;
+Output:Variable,*,GroundDomain Slab Zone Coupled Surface Heat Flux,hourly;
+Output:Variable,*,GroundDomain Slab Zone Coupled Surface Temperature,hourly;
 OutputControl:Table:Style, HTML;
 Output:Table:SummaryReports, AllSummary;

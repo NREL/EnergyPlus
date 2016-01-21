@@ -1,4 +1,63 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -244,7 +303,7 @@ namespace SimAirServingZones {
 
 		// This flag could be used to resimulate only the air loops that needed additional iterations.
 		// This flag would have to be moved inside SimAirLoops to gain this flexibility.
-		SimAir = any( AirLoopControlInfo.ResimAirLoopFlag() );
+		SimAir = std::any_of( AirLoopControlInfo.begin(), AirLoopControlInfo.end(), []( DataAirLoop::AirLoopControlData const & e ){ return e.ResimAirLoopFlag; } );
 
 	}
 
@@ -338,6 +397,7 @@ namespace SimAirServingZones {
 		using MixedAir::GetOASysNumSimpControllers;
 		using MixedAir::GetOASysNumCoolingCoils;
 		using MixedAir::GetOASysNumHeatingCoils;
+		using MixedAir::GetOASysNumHXs;
 		using MixedAir::GetOACompListNumber;
 		using MixedAir::GetOACompName;
 		using MixedAir::GetOACompType;
@@ -419,7 +479,7 @@ namespace SimAirServingZones {
 		static bool SplitterExists( false ); // TRUE if there is a slitter in a primary air system
 		static bool MixerExists( false ); // TRUE if there is a mixer in a primary air system
 		bool errFlag;
-		/////////// hoisted into namespace 
+		/////////// hoisted into namespace
 		//static int TestUniqueNodesNum( 0 );
 		///////////////////////////
 		int NumOASysSimpControllers; // number of simple controllers in the OA Sys of an air primary system
@@ -444,19 +504,6 @@ namespace SimAirServingZones {
 			// Default Constructor
 			AirUniqueNodes() :
 				NodeNameUsed( false )
-			{}
-
-			// Member Constructor
-			AirUniqueNodes(
-				std::string const & NodeName,
-				std::string const & AirLoopName,
-				std::string const & FieldName,
-				bool const NodeNameUsed
-			) :
-				NodeName( NodeName ),
-				AirLoopName( AirLoopName ),
-				FieldName( FieldName ),
-				NodeNameUsed( NodeNameUsed )
 			{}
 
 		};
@@ -752,6 +799,7 @@ namespace SimAirServingZones {
 							NumOASysSimpControllers = GetOASysNumSimpControllers( OANum );
 							PrimaryAirSystem( AirSysNum ).NumOAHeatCoils = GetOASysNumHeatingCoils( OANum );
 							PrimaryAirSystem( AirSysNum ).NumOACoolCoils = GetOASysNumCoolingCoils( OANum );
+							PrimaryAirSystem( AirSysNum ).NumOAHXs = GetOASysNumHXs( OANum );
 							OASysContListNum = GetOASysControllerListIndex( OANum );
 							OAMixNum = FindOAMixerMatchForOASystem( OANum );
 							if ( OAMixNum > 0 ) {
@@ -1377,6 +1425,7 @@ namespace SimAirServingZones {
 		int SupFanIndex;
 		int RetFanIndex;
 		bool FoundOASys;
+		bool FoundCentralHeatCoil;
 		static int TUInNode( 0 ); // inlet node number of a terminal unit
 		static Real64 MassFlowSetToler;
 		static Array1D_int CtrlZoneNumsCool;
@@ -1841,6 +1890,20 @@ namespace SimAirServingZones {
 
 			} // end of AirLoop loop
 
+			// Check whether there are Central Heating Coils in the Primary Air System
+			for( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+				FoundCentralHeatCoil = false;
+				for( BranchNum = 1; ! FoundCentralHeatCoil && BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
+					for( CompNum = 1; ! FoundCentralHeatCoil && CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+						CompTypeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num;
+						if( CompTypeNum == WaterCoil_SimpleHeat || CompTypeNum == Coil_ElectricHeat || CompTypeNum == Coil_GasHeat ) {
+							FoundCentralHeatCoil = true;
+						}
+					} // end of component loop
+				} // end of Branch loop			
+				PrimaryAirSystem( AirLoopNum ).CentralHeatCoilExists = FoundCentralHeatCoil;
+			} // end of AirLoop loop
+
 		} // one time flag
 
 		// Size the air loop branch air flows
@@ -1876,9 +1939,11 @@ namespace SimAirServingZones {
 		if ( BeginEnvrnFlag && FirstHVACIteration && MyEnvrnFlag ) {
 
 			if ( NumPrimaryAirSys > 0 ) {
-				PriAirSysAvailMgr.AvailStatus() = NoAction;
-				PriAirSysAvailMgr.StartTime() = 0;
-				PriAirSysAvailMgr.StopTime() = 0;
+				for ( auto & e : PriAirSysAvailMgr ) {
+					e.AvailStatus = NoAction;
+					e.StartTime = 0;
+					e.StopTime = 0;
+				}
 			}
 
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) { // Start looping through all of the air loops...
@@ -1995,7 +2060,7 @@ namespace SimAirServingZones {
 			if ( FirstHVACIteration ) {
 				// At each new HVAC iteration reset air loop converged flag to avoid attempting a warm restart
 				// in SimAirLoop
-				AirLoopControlInfo.ConvergedFlag() = false;
+				for ( auto & e : AirLoopControlInfo ) e.ConvergedFlag = false;
 
 				for ( InNum = 1; InNum <= PrimaryAirSystem( AirLoopNum ).NumInletBranches; ++InNum ) {
 					InBranchNum = PrimaryAirSystem( AirLoopNum ).InletBranchNum( InNum );
@@ -5674,32 +5739,36 @@ namespace SimAirServingZones {
 			}
 
 			// Move final system design data (calculated from zone data) to user design array
-			FinalSysSizing.CoolDesDay() = CalcSysSizing.CoolDesDay();
-			FinalSysSizing.HeatDesDay() = CalcSysSizing.HeatDesDay();
-			FinalSysSizing.CoinCoolMassFlow() = CalcSysSizing.CoinCoolMassFlow();
-			FinalSysSizing.CoinHeatMassFlow() = CalcSysSizing.CoinHeatMassFlow();
-			FinalSysSizing.NonCoinCoolMassFlow() = CalcSysSizing.NonCoinCoolMassFlow();
-			FinalSysSizing.NonCoinHeatMassFlow() = CalcSysSizing.NonCoinHeatMassFlow();
-			FinalSysSizing.DesMainVolFlow() = CalcSysSizing.DesMainVolFlow();
-			FinalSysSizing.DesHeatVolFlow() = CalcSysSizing.DesHeatVolFlow();
-			FinalSysSizing.DesCoolVolFlow() = CalcSysSizing.DesCoolVolFlow();
-			FinalSysSizing.MassFlowAtCoolPeak() = CalcSysSizing.MassFlowAtCoolPeak();
-			FinalSysSizing.SensCoolCap() = CalcSysSizing.SensCoolCap();
-			FinalSysSizing.TotCoolCap() = CalcSysSizing.TotCoolCap();
-			FinalSysSizing.HeatCap() = CalcSysSizing.HeatCap();
-			FinalSysSizing.PreheatCap() = CalcSysSizing.PreheatCap();
-			FinalSysSizing.MixTempAtCoolPeak() = CalcSysSizing.MixTempAtCoolPeak();
-			FinalSysSizing.MixHumRatAtCoolPeak() = CalcSysSizing.MixHumRatAtCoolPeak();
-			FinalSysSizing.RetTempAtCoolPeak() = CalcSysSizing.RetTempAtCoolPeak();
-			FinalSysSizing.RetHumRatAtCoolPeak() = CalcSysSizing.RetHumRatAtCoolPeak();
-			FinalSysSizing.OutTempAtCoolPeak() = CalcSysSizing.OutTempAtCoolPeak();
-			FinalSysSizing.OutHumRatAtCoolPeak() = CalcSysSizing.OutHumRatAtCoolPeak();
-			FinalSysSizing.HeatMixTemp() = CalcSysSizing.HeatMixTemp();
-			FinalSysSizing.HeatMixHumRat() = CalcSysSizing.HeatMixHumRat();
-			FinalSysSizing.HeatRetTemp() = CalcSysSizing.HeatRetTemp();
-			FinalSysSizing.HeatRetHumRat() = CalcSysSizing.HeatRetHumRat();
-			FinalSysSizing.HeatOutTemp() = CalcSysSizing.HeatOutTemp();
-			FinalSysSizing.HeatOutHumRat() = CalcSysSizing.HeatOutHumRat();
+			for ( std::size_t i = 0; i < FinalSysSizing.size(); ++i ) {
+				auto & z( FinalSysSizing[ i ] );
+				auto & c( CalcSysSizing[ i ] );
+				z.CoolDesDay = c.CoolDesDay;
+				z.HeatDesDay = c.HeatDesDay;
+				z.CoinCoolMassFlow = c.CoinCoolMassFlow;
+				z.CoinHeatMassFlow = c.CoinHeatMassFlow;
+				z.NonCoinCoolMassFlow = c.NonCoinCoolMassFlow;
+				z.NonCoinHeatMassFlow = c.NonCoinHeatMassFlow;
+				z.DesMainVolFlow = c.DesMainVolFlow;
+				z.DesHeatVolFlow = c.DesHeatVolFlow;
+				z.DesCoolVolFlow = c.DesCoolVolFlow;
+				z.MassFlowAtCoolPeak = c.MassFlowAtCoolPeak;
+				z.SensCoolCap = c.SensCoolCap;
+				z.TotCoolCap = c.TotCoolCap;
+				z.HeatCap = c.HeatCap;
+				z.PreheatCap = c.PreheatCap;
+				z.MixTempAtCoolPeak = c.MixTempAtCoolPeak;
+				z.MixHumRatAtCoolPeak = c.MixHumRatAtCoolPeak;
+				z.RetTempAtCoolPeak = c.RetTempAtCoolPeak;
+				z.RetHumRatAtCoolPeak = c.RetHumRatAtCoolPeak;
+				z.OutTempAtCoolPeak = c.OutTempAtCoolPeak;
+				z.OutHumRatAtCoolPeak = c.OutHumRatAtCoolPeak;
+				z.HeatMixTemp = c.HeatMixTemp;
+				z.HeatMixHumRat = c.HeatMixHumRat;
+				z.HeatRetTemp = c.HeatRetTemp;
+				z.HeatRetHumRat = c.HeatRetHumRat;
+				z.HeatOutTemp = c.HeatOutTemp;
+				z.HeatOutHumRat = c.HeatOutHumRat;
+			}
 
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
@@ -5936,6 +6005,24 @@ namespace SimAirServingZones {
 
 			}
 
+			// Specify the heating supply air Temp/HumRat for different system configurations
+			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+				
+				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
+
+				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
+					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+
+						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum );
+						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum );
+
+						TermUnitFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU;
+						TermUnitFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU;
+					}
+				}
+			}
+
 			// EMS calling point to customize zone sizing results
 			ManageEMS( emsCallFromSystemSizing );
 
@@ -6119,9 +6206,6 @@ namespace SimAirServingZones {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string CompName; // component name
-		std::string CompType; // component type
-		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		Real64 TempSize; // autosized value
 		Real64 CoilInTemp; // entering coil air temperature [C]
 		Real64 CoilInHumRat; // entering coil air humidity ratio [kg/kg]
@@ -6252,6 +6336,169 @@ namespace SimAirServingZones {
 
 	}
 
+	Real64
+	GetHeatingSATempForSizing(
+		int const IndexAirLoop // air loop index 
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl, Rongpeng Zhang
+		//       DATE WRITTEN   October 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine get the proper reheat coil inlet temperature for sizing, depending on 
+		// the system configurations: 
+		// (1) Central heating coils exist
+		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
+		// (3) No central heating coils; No preheating coils or OA heat-exchangers
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataSizing;
+		using DataAirSystems::PrimaryAirSystem;
+		using Psychrometrics::PsyHFnTdbW;
+		using Psychrometrics::PsyTdbFnHW;
+
+		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
+
+		// Locals
+		Real64 ReheatCoilInTempForSizing; // Dry bulb temperature of the reheat coil inlet air [C]
+		Real64 ReheatCoilInHumRatForSizing; // Humidity ratio of the reheat coil inlet air [kg/kg]
+		Real64 ReheatCoilInEnthalpyForSizing; // Enthalpy of the reheat coil inlet air [J/kg]
+		Real64 OutAirFrac;
+		
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		
+		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ){
+		//Case: Central heating coils exist
+			
+			ReheatCoilInTempForSizing = CalcSysSizing( IndexAirLoop ).HeatSupTemp;
+			
+		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
+		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
+
+			if( FinalSysSizing( IndexAirLoop ).DesHeatVolFlow > 0 ){
+				OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
+				OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+			} else {
+				OutAirFrac = 0.0;
+			}
+
+			// Mixed air humidity ratio and enthalpy
+			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
+			ReheatCoilInEnthalpyForSizing = OutAirFrac * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).PreheatTemp, FinalSysSizing( IndexAirLoop ).PreheatHumRat ) 
+			                      + ( 1 - OutAirFrac ) * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).HeatRetTemp, FinalSysSizing( IndexAirLoop ).HeatRetHumRat );
+
+			// Mixed air dry bulb temperature
+			ReheatCoilInTempForSizing = PsyTdbFnHW( ReheatCoilInEnthalpyForSizing, ReheatCoilInHumRatForSizing );
+			
+		} else {
+		//Case: No central heating coils; No preheating coils or OA heat-exchangers
+			
+			ReheatCoilInTempForSizing = FinalSysSizing( IndexAirLoop ).HeatMixTemp;
+		
+		}
+
+		return ReheatCoilInTempForSizing;
+		
+	}
+
+	Real64
+	GetHeatingSATempHumRatForSizing(
+		int const IndexAirLoop // air loop index 
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl, Rongpeng Zhang
+		//       DATE WRITTEN   October 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine get the proper reheat coil inlet humidity ratio for sizing, depending on 
+		// the system configurations: 
+		// (1) Central heating coils exist
+		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
+		// (3) No central heating coils; No preheating coils or OA heat-exchangers
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataSizing;
+		using DataAirSystems::PrimaryAirSystem;
+		
+		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
+
+		// Locals
+		Real64 ReheatCoilInHumRatForSizing;
+		Real64 OutAirFrac;
+		
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		
+		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ) {
+		//Case: Central heating coils exist
+			
+			ReheatCoilInHumRatForSizing = CalcSysSizing( IndexAirLoop ).HeatSupHumRat;
+		
+		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
+		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
+
+			if( FinalSysSizing( IndexAirLoop ).DesHeatVolFlow > 0 ){
+				OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
+				OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+			} else {
+				OutAirFrac = 0.0;
+			}
+
+			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
+		
+		} else {
+		//Case: No central heating coils; No preheating coils or OA heat-exchangers
+		
+			ReheatCoilInHumRatForSizing = FinalSysSizing( IndexAirLoop ).HeatMixHumRat;
+		
+		}
+
+		return ReheatCoilInHumRatForSizing;
+		
+	}
+	
+
 	// End Algorithm Section of the Module
 	// *****************************************************************************
 
@@ -6266,29 +6513,6 @@ namespace SimAirServingZones {
 
 	//        End of Utility subroutines for the SimAir Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SimAirServingZones
 

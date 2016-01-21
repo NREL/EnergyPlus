@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataGenerators_hh_INCLUDED
 #define DataGenerators_hh_INCLUDED
 
@@ -230,139 +288,6 @@ namespace DataGenerators {
 			RegulaFalsiIter( 0 )
 		{}
 
-		// Member Constructor
-		FCPowerModuleStruct(
-			std::string const & Name, // name of this PowerModule data
-			int const EffMode, // mode for efficiency curves
-			int const EffCurveID, // pointer to curve for efficiency
-			Real64 const NomEff, // nominal efficiency
-			Real64 const NomPel, // nominal power rate at rating point
-			int const NumCycles, // number of start stop cycles
-			Real64 const CyclingDegradRat, // rate of degradation from cycles
-			Real64 const NumRunHours, // number of hours of operation
-			Real64 const OperateDegradRat, // rate of degradation from run time (per hour)
-			Real64 const ThreshRunHours, // number of hours before degradation starts
-			Real64 const UpTranLimit, // power up transient limit
-			Real64 const DownTranLimit, // power down tran limit
-			Real64 const StartUpTime, // time for start up [hours]
-			Real64 const StartUpFuel, // fuel use during start up
-			Real64 const StartUpElectConsum, // electricity used during start up
-			Real64 const StartUpElectProd, // electricity produced during start up
-			Real64 const ShutDownTime, // time to shut down [hours]
-			Real64 const ShutDownFuel, // fuel consumed during shut down
-			Real64 const ShutDownElectConsum, // Elect consumed during shut down
-			Real64 const ANC0, // Ancilliary Loads constant term
-			Real64 const ANC1, // Ancilliary Loads linear term
-			int const SkinLossMode, // how are skin losses determined
-			std::string const & ZoneName,
-			int const ZoneID, // "pointer" to zone with component in it
-			Real64 const RadiativeFract,
-			Real64 const QdotSkin,
-			Real64 const UAskin,
-			int const SkinLossCurveID,
-			int const WaterSupplyCurveID, // pointer to curve for water use in reforming
-			Real64 const NdotDilutionAir, // user defined constant flow of dilution air (kmol/sec)
-			Real64 const StackHeatLossToDilution, // (watts)
-			std::string const & DilutionInletNodeName, // dilution -> AirHR ?? added air heat recovery path
-			int const DilutionInletNode, // pointer to node for inlet
-			std::string const & DilutionExhaustNodeName,
-			int const DilutionExhaustNode, // pointer to node getting exhaust
-			Real64 const PelMin, // minimum operating point for FCPM electrical power Pel
-			Real64 const PelMax, // maximum operating point for FCPM electrical power Pel
-			Real64 const Pel, // current DC electrical power produced
-			Real64 const PelLastTimeStep,
-			Real64 const Eel, // power module efficiency
-			Real64 const QdotStackCool, // Heat removed by stack cooler
-			Real64 const FractionalDayofLastStartUp, // fractional days into simulation
-			Real64 const FractionalDayofLastShutDown, // fractional Days into simulations
-			bool const HasBeenOn,
-			bool const DuringShutDown,
-			bool const DuringStartUp,
-			Real64 const NdotFuel, // molar fuel use rate.  (kmol/sec)
-			Real64 const TotFuelInEnthalphy, // Enthalpy of fuel coming into FCPM (watts)
-			Real64 const NdotProdGas, // (kmol/sec)
-			Array1< Real64 > const & ConstitMolalFract,
-			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
-			Real64 const TprodGasLeavingFCPM,
-			Real64 const NdotAir, // molar air use rate    (kmol/sec)
-			Real64 const TotAirInEnthalphy, // Enthalpy of air coming nto FCPM energy balance (watts)
-			Real64 const NdotLiqwater, // molar water use rate (kmol/sec)
-			Real64 const TwaterInlet,
-			Real64 const WaterInEnthalpy, // Enthalpy of liquid water used for reforming (watts)
-			Real64 const DilutionAirInEnthalpy, // Enthalpy of Dilution air coming into FCPM (watts)
-			Real64 const DilutionAirOutEnthalpy,
-			Real64 const PelancillariesAC, // ancillary power (watts)
-			Real64 const TotProdGasEnthalphy, // Enthalphy of product gases leaving FCPM   (watts)
-			Real64 const WaterOutEnthalpy, // enthalpy of vapor from water used for reforming
-			int const SeqSubstitIter,
-			int const RegulaFalsiIter
-		) :
-			Name( Name ),
-			EffMode( EffMode ),
-			EffCurveID( EffCurveID ),
-			NomEff( NomEff ),
-			NomPel( NomPel ),
-			NumCycles( NumCycles ),
-			CyclingDegradRat( CyclingDegradRat ),
-			NumRunHours( NumRunHours ),
-			OperateDegradRat( OperateDegradRat ),
-			ThreshRunHours( ThreshRunHours ),
-			UpTranLimit( UpTranLimit ),
-			DownTranLimit( DownTranLimit ),
-			StartUpTime( StartUpTime ),
-			StartUpFuel( StartUpFuel ),
-			StartUpElectConsum( StartUpElectConsum ),
-			StartUpElectProd( StartUpElectProd ),
-			ShutDownTime( ShutDownTime ),
-			ShutDownFuel( ShutDownFuel ),
-			ShutDownElectConsum( ShutDownElectConsum ),
-			ANC0( ANC0 ),
-			ANC1( ANC1 ),
-			SkinLossMode( SkinLossMode ),
-			ZoneName( ZoneName ),
-			ZoneID( ZoneID ),
-			RadiativeFract( RadiativeFract ),
-			QdotSkin( QdotSkin ),
-			UAskin( UAskin ),
-			SkinLossCurveID( SkinLossCurveID ),
-			WaterSupplyCurveID( WaterSupplyCurveID ),
-			NdotDilutionAir( NdotDilutionAir ),
-			StackHeatLossToDilution( StackHeatLossToDilution ),
-			DilutionInletNodeName( DilutionInletNodeName ),
-			DilutionInletNode( DilutionInletNode ),
-			DilutionExhaustNodeName( DilutionExhaustNodeName ),
-			DilutionExhaustNode( DilutionExhaustNode ),
-			PelMin( PelMin ),
-			PelMax( PelMax ),
-			Pel( Pel ),
-			PelLastTimeStep( PelLastTimeStep ),
-			Eel( Eel ),
-			QdotStackCool( QdotStackCool ),
-			FractionalDayofLastStartUp( FractionalDayofLastStartUp ),
-			FractionalDayofLastShutDown( FractionalDayofLastShutDown ),
-			HasBeenOn( HasBeenOn ),
-			DuringShutDown( DuringShutDown ),
-			DuringStartUp( DuringStartUp ),
-			NdotFuel( NdotFuel ),
-			TotFuelInEnthalphy( TotFuelInEnthalphy ),
-			NdotProdGas( NdotProdGas ),
-			ConstitMolalFract( 14, ConstitMolalFract ),
-			GasLibID( 14, GasLibID ),
-			TprodGasLeavingFCPM( TprodGasLeavingFCPM ),
-			NdotAir( NdotAir ),
-			TotAirInEnthalphy( TotAirInEnthalphy ),
-			NdotLiqwater( NdotLiqwater ),
-			TwaterInlet( TwaterInlet ),
-			WaterInEnthalpy( WaterInEnthalpy ),
-			DilutionAirInEnthalpy( DilutionAirInEnthalpy ),
-			DilutionAirOutEnthalpy( DilutionAirOutEnthalpy ),
-			PelancillariesAC( PelancillariesAC ),
-			TotProdGasEnthalphy( TotProdGasEnthalphy ),
-			WaterOutEnthalpy( WaterOutEnthalpy ),
-			SeqSubstitIter( SeqSubstitIter ),
-			RegulaFalsiIter( RegulaFalsiIter )
-		{}
-
 	};
 
 	struct FCAirSupplyDataStruct
@@ -415,55 +340,6 @@ namespace DataGenerators {
 			PairCompEl( 0.0 ),
 			QskinLoss( 0.0 ),
 			QintakeRecovery( 0.0 )
-		{}
-
-		// Member Constructor
-		FCAirSupplyDataStruct(
-			std::string const & Name, // name of this
-			std::string const & NodeName, // Air supply node name
-			int const SupNodeNum, // Air supply node ID
-			int const BlowerPowerCurveID, // "pointer" to blower power quadratic
-			Real64 const BlowerHeatLossFactor, // alpha for blower heat loss fraction
-			int const AirSupRateMode, // control for modeling method used to deterime supply air flow rate
-			Real64 const Stoics, // excess air ratio
-			int const AirFuncPelCurveID, // "pointer" to curve for air as function of power
-			Real64 const AirTempCoeff, // coeff a3 in equ 16.
-			int const AirFuncNdotCurveID, // "pointer" to curve for air as function of fuel flow rate
-			int const IntakeRecoveryMode,
-			int const ConstituentMode, // how are air data input
-			int const NumConstituents,
-			Array1_string const & ConstitName,
-			Array1< Real64 > const & ConstitMolalFract,
-			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
-			Real64 const O2fraction,
-			Real64 const TairIntoBlower, // temperature entering blower
-			Real64 const TairIntoFCPM, // temperature leaving blower and entering FCPM
-			Real64 const PairCompEl, // power drawn by compressor
-			Real64 const QskinLoss, // pumping losses for zone
-			Real64 const QintakeRecovery // heat recovered on intake air by accessories
-		) :
-			Name( Name ),
-			NodeName( NodeName ),
-			SupNodeNum( SupNodeNum ),
-			BlowerPowerCurveID( BlowerPowerCurveID ),
-			BlowerHeatLossFactor( BlowerHeatLossFactor ),
-			AirSupRateMode( AirSupRateMode ),
-			Stoics( Stoics ),
-			AirFuncPelCurveID( AirFuncPelCurveID ),
-			AirTempCoeff( AirTempCoeff ),
-			AirFuncNdotCurveID( AirFuncNdotCurveID ),
-			IntakeRecoveryMode( IntakeRecoveryMode ),
-			ConstituentMode( ConstituentMode ),
-			NumConstituents( NumConstituents ),
-			ConstitName( 14, ConstitName ),
-			ConstitMolalFract( 14, ConstitMolalFract ),
-			GasLibID( 14, GasLibID ),
-			O2fraction( O2fraction ),
-			TairIntoBlower( TairIntoBlower ),
-			TairIntoFCPM( TairIntoFCPM ),
-			PairCompEl( PairCompEl ),
-			QskinLoss( QskinLoss ),
-			QintakeRecovery( QintakeRecovery )
 		{}
 
 	};
@@ -527,63 +403,6 @@ namespace DataGenerators {
 			qs_air( 0.0 )
 		{}
 
-		// Member Constructor
-		FCStackCoolerDataStruct(
-			std::string const & Name, // name of this stack cooler module
-			std::string const & WaterInNodeName, // HR Water Inlet Node
-			int const WaterInNode, // HR Water Outlet Node ID
-			std::string const & WaterOutNodeName, // HR water outlet Node name
-			int const WaterOutNode, // HR Water outlet Node ID
-			Real64 const TstackNom, // nominal fuel cell stack temperature
-			Real64 const TstackActual, // actual fuel cell stack temperature
-			Real64 const r0, // stack cooling power coefficient r0
-			Real64 const r1, // stack cooling power coefficient r1
-			Real64 const r2, // stack cooling power coefficient r2
-			Real64 const r3, // stack cooling power coefficient r3
-			Real64 const MdotStackCoolant, // stack coolant flow rate kg/s
-			Real64 const UAs_cool, // stack heat transfer coef
-			Real64 const Fs_cogen,
-			Real64 const As_cogen,
-			Real64 const MdotCogenNom,
-			Real64 const hCogenNom,
-			Real64 const ns,
-			Real64 const PstackPumpEl,
-			Real64 const PmpPowerLossFactor,
-			Real64 const f0,
-			Real64 const f1,
-			Real64 const f2,
-			bool const StackCoolerPresent, // control modeling
-			Real64 const qs_cool,
-			Real64 const qs_air
-		) :
-			Name( Name ),
-			WaterInNodeName( WaterInNodeName ),
-			WaterInNode( WaterInNode ),
-			WaterOutNodeName( WaterOutNodeName ),
-			WaterOutNode( WaterOutNode ),
-			TstackNom( TstackNom ),
-			TstackActual( TstackActual ),
-			r0( r0 ),
-			r1( r1 ),
-			r2( r2 ),
-			r3( r3 ),
-			MdotStackCoolant( MdotStackCoolant ),
-			UAs_cool( UAs_cool ),
-			Fs_cogen( Fs_cogen ),
-			As_cogen( As_cogen ),
-			MdotCogenNom( MdotCogenNom ),
-			hCogenNom( hCogenNom ),
-			ns( ns ),
-			PstackPumpEl( PstackPumpEl ),
-			PmpPowerLossFactor( PmpPowerLossFactor ),
-			f0( f0 ),
-			f1( f1 ),
-			f2( f2 ),
-			StackCoolerPresent( StackCoolerPresent ),
-			qs_cool( qs_cool ),
-			qs_air( qs_air )
-		{}
-
 	};
 
 	struct FCWaterSupplyDataStruct
@@ -617,37 +436,6 @@ namespace DataGenerators {
 			TwaterIntoFCPM( 0.0 ),
 			PwaterCompEl( 0.0 ),
 			QskinLoss( 0.0 )
-		{}
-
-		// Member Constructor
-		FCWaterSupplyDataStruct(
-			std::string const & Name, // name of this water supply module
-			int const WaterTempMode, // temperature of water inlet determination
-			std::string const & NodeName, // node name for temperature at input
-			int const NodeNum, // node number for temperature at input
-			int const SchedNum, // water temperature at input
-			int const WaterSupRateCurveID, // "pointer" to water flow rate curve as a function of fuel rate
-			int const PmpPowerCurveID, // "pointer to Pump power curve as a function of water flow Rate
-			Real64 const PmpPowerLossFactor, // Pump heat loss factor
-			bool const IsModeled,
-			Real64 const TwaterIntoCompress, // inlet Water Temperature
-			Real64 const TwaterIntoFCPM, // pumped water temp
-			Real64 const PwaterCompEl, // water pump power
-			Real64 const QskinLoss // pumping losses for zone
-		) :
-			Name( Name ),
-			WaterTempMode( WaterTempMode ),
-			NodeName( NodeName ),
-			NodeNum( NodeNum ),
-			SchedNum( SchedNum ),
-			WaterSupRateCurveID( WaterSupRateCurveID ),
-			PmpPowerCurveID( PmpPowerCurveID ),
-			PmpPowerLossFactor( PmpPowerLossFactor ),
-			IsModeled( IsModeled ),
-			TwaterIntoCompress( TwaterIntoCompress ),
-			TwaterIntoFCPM( TwaterIntoFCPM ),
-			PwaterCompEl( PwaterCompEl ),
-			QskinLoss( QskinLoss )
 		{}
 
 	};
@@ -695,49 +483,6 @@ namespace DataGenerators {
 			GasLibID( 14, 0 ),
 			QskinLoss( 0.0 ),
 			QairIntake( 0.0 )
-		{}
-
-		// Member Constructor
-		FCAuxilHeatDataStruct(
-			std::string const & Name, // name of this auxiliary heating module
-			std::string const & ZoneName,
-			int const ZoneID,
-			Real64 const UASkin, // for skin losses to zone
-			Real64 const ExcessAirRAT,
-			Real64 const ANC0,
-			Real64 const ANC1,
-			int const SkinLossDestination, // control mode for where lost heat goes
-			Real64 const MaxPowerW,
-			Real64 const MinPowerW,
-			Real64 const MaxPowerkmolperSec,
-			Real64 const MinPowerkmolperSec,
-			int const NumConstituents,
-			Real64 const TauxMix,
-			Real64 const NdotAuxMix,
-			Array1< Real64 > const & ConstitMolalFract,
-			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
-			Real64 const QskinLoss, // Heat lost to room
-			Real64 const QairIntake // heat into intake air
-		) :
-			Name( Name ),
-			ZoneName( ZoneName ),
-			ZoneID( ZoneID ),
-			UASkin( UASkin ),
-			ExcessAirRAT( ExcessAirRAT ),
-			ANC0( ANC0 ),
-			ANC1( ANC1 ),
-			SkinLossDestination( SkinLossDestination ),
-			MaxPowerW( MaxPowerW ),
-			MinPowerW( MinPowerW ),
-			MaxPowerkmolperSec( MaxPowerkmolperSec ),
-			MinPowerkmolperSec( MinPowerkmolperSec ),
-			NumConstituents( NumConstituents ),
-			TauxMix( TauxMix ),
-			NdotAuxMix( NdotAuxMix ),
-			ConstitMolalFract( 14, ConstitMolalFract ),
-			GasLibID( 14, GasLibID ),
-			QskinLoss( QskinLoss ),
-			QairIntake( QairIntake )
 		{}
 
 	};
@@ -826,89 +571,6 @@ namespace DataGenerators {
 			WaterOutletEnthalpy( 0.0 )
 		{}
 
-		// Member Constructor
-		FCExhaustHXDataStruct(
-			std::string const & Name, // name of this exhaust gas heat recovery
-			std::string const & WaterInNodeName, // HR Water Inlet Node
-			int const WaterInNode, // HR Water Outlet Node ID
-			std::string const & WaterOutNodeName, // HR water outlet Node name
-			int const WaterOutNode, // HR Water outlet Node ID
-			Real64 const WaterVolumeFlowMax, // HR water flow rate max avail
-			std::string const & ExhaustOutNodeName, // air node for exhaust flow
-			int const ExhaustOutNode, // Exhaust Air node ID
-			int const HXmodelMode, // Heat Exchanger Calculation Method
-			Real64 const HXEffect, // Heat Exchanger Effectiveness (method 1)
-			Real64 const hxs0, // (method 2)
-			Real64 const hxs1, // (method 2)
-			Real64 const hxs2, // (method 2)
-			Real64 const hxs3, // (method 2)
-			Real64 const hxs4, // (method 2)
-			Real64 const h0gas, // (method 3)
-			Real64 const NdotGasRef, // (method 3)
-			Real64 const nCoeff, // (method 3)
-			Real64 const AreaGas, // (method 3)
-			Real64 const h0Water, // (method 3)
-			Real64 const NdotWaterRef, // (method 3)
-			Real64 const mCoeff, // (method 3)
-			Real64 const AreaWater, // (method 3)
-			Real64 const Fadjust, // (method 3)
-			Real64 const l1Coeff, // (method 4)
-			Real64 const l2Coeff, // (method 4)
-			Real64 const CondensationThresholdTemp, // (method 4) [degrees C]
-			Real64 const qHX, // heat flow from gas stream to water
-			Real64 const THXexh, // temperature of exhaust gases leaving heat exchanger.
-			Real64 const WaterMassFlowRateDesign, // Design level of water flow rate
-			Real64 const WaterMassFlowRate, // water flow rate in plant loop
-			Real64 const WaterInletTemp,
-			Real64 const WaterVaporFractExh, // water vapor fraction in exhaust gas stream.
-			Real64 const CondensateRate, // water condensation rate.
-			Array1< Real64 > const & ConstitMolalFract,
-			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
-			Real64 const NdotHXleaving,
-			Real64 const WaterOutletTemp,
-			Real64 const WaterOutletEnthalpy
-		) :
-			Name( Name ),
-			WaterInNodeName( WaterInNodeName ),
-			WaterInNode( WaterInNode ),
-			WaterOutNodeName( WaterOutNodeName ),
-			WaterOutNode( WaterOutNode ),
-			WaterVolumeFlowMax( WaterVolumeFlowMax ),
-			ExhaustOutNodeName( ExhaustOutNodeName ),
-			ExhaustOutNode( ExhaustOutNode ),
-			HXmodelMode( HXmodelMode ),
-			HXEffect( HXEffect ),
-			hxs0( hxs0 ),
-			hxs1( hxs1 ),
-			hxs2( hxs2 ),
-			hxs3( hxs3 ),
-			hxs4( hxs4 ),
-			h0gas( h0gas ),
-			NdotGasRef( NdotGasRef ),
-			nCoeff( nCoeff ),
-			AreaGas( AreaGas ),
-			h0Water( h0Water ),
-			NdotWaterRef( NdotWaterRef ),
-			mCoeff( mCoeff ),
-			AreaWater( AreaWater ),
-			Fadjust( Fadjust ),
-			l1Coeff( l1Coeff ),
-			l2Coeff( l2Coeff ),
-			CondensationThresholdTemp( CondensationThresholdTemp ),
-			qHX( qHX ),
-			THXexh( THXexh ),
-			WaterMassFlowRateDesign( WaterMassFlowRateDesign ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			WaterInletTemp( WaterInletTemp ),
-			WaterVaporFractExh( WaterVaporFractExh ),
-			CondensateRate( CondensateRate ),
-			ConstitMolalFract( 14, ConstitMolalFract ),
-			GasLibID( 14, GasLibID ),
-			NdotHXleaving( NdotHXleaving ),
-			WaterOutletTemp( WaterOutletTemp ),
-			WaterOutletEnthalpy( WaterOutletEnthalpy )
-		{}
-
 	};
 
 	struct BatteryDichargeDataStruct
@@ -938,33 +600,6 @@ namespace DataGenerators {
 			k( 0.0 ),
 			c( 0.0 ),
 			qmax( 0.0 )
-		{}
-
-		// Member Constructor
-		BatteryDichargeDataStruct(
-			std::string const & Name, // name of this battery data set
-			Real64 const NumInSeries,
-			Real64 const NumInParallel,
-			Real64 const NominalVoltage,
-			Real64 const LowVoltsDischarged, // not used
-			int const NumTablePairs,
-			Array1< Real64 > const & DischargeCurrent, // amps
-			Array1< Real64 > const & DischargeTime, // hours
-			Real64 const k, // parameter in Manwell McGowan model
-			Real64 const c, // parameter in Manwell McGowan model
-			Real64 const qmax // parameter in Manwell McGowan model
-		) :
-			Name( Name ),
-			NumInSeries( NumInSeries ),
-			NumInParallel( NumInParallel ),
-			NominalVoltage( NominalVoltage ),
-			LowVoltsDischarged( LowVoltsDischarged ),
-			NumTablePairs( NumTablePairs ),
-			DischargeCurrent( DischargeCurrent ),
-			DischargeTime( DischargeTime ),
-			k( k ),
-			c( c ),
-			qmax( qmax )
 		{}
 
 	};
@@ -1014,47 +649,6 @@ namespace DataGenerators {
 			QairIntake( 0.0 )
 		{}
 
-		// Member Constructor
-		FCElecStorageDataStruct(
-			std::string const & Name, // name of this electrical storage module
-			int const StorageModelMode,
-			Real64 const StartingEnergyStored, // joules inside
-			Real64 const EnergeticEfficCharge, // for
-			Real64 const EnergeticEfficDischarge,
-			Real64 const MaxPowerDraw, // for simple bucket method 0
-			Real64 const MaxPowerStore, // for simple bucket method 0
-			Real64 const NominalVoltage,
-			Real64 const NominalEnergyCapacity, // [J]
-			Real64 const ThisTimeStepStateOfCharge, // [J]
-			Real64 const LastTimeStepStateOfCharge, // [J]
-			Real64 const PelNeedFromStorage,
-			Real64 const IdesiredDischargeCurrent,
-			Real64 const PelFromStorage, // power
-			Real64 const IfromStorage, // current this timestepm
-			Real64 const PelIntoStorage,
-			Real64 const QairIntake, // heat into intake air
-			BatteryDichargeDataStruct const & Battery
-		) :
-			Name( Name ),
-			StorageModelMode( StorageModelMode ),
-			StartingEnergyStored( StartingEnergyStored ),
-			EnergeticEfficCharge( EnergeticEfficCharge ),
-			EnergeticEfficDischarge( EnergeticEfficDischarge ),
-			MaxPowerDraw( MaxPowerDraw ),
-			MaxPowerStore( MaxPowerStore ),
-			NominalVoltage( NominalVoltage ),
-			NominalEnergyCapacity( NominalEnergyCapacity ),
-			ThisTimeStepStateOfCharge( ThisTimeStepStateOfCharge ),
-			LastTimeStepStateOfCharge( LastTimeStepStateOfCharge ),
-			PelNeedFromStorage( PelNeedFromStorage ),
-			IdesiredDischargeCurrent( IdesiredDischargeCurrent ),
-			PelFromStorage( PelFromStorage ),
-			IfromStorage( IfromStorage ),
-			PelIntoStorage( PelIntoStorage ),
-			QairIntake( QairIntake ),
-			Battery( Battery )
-		{}
-
 	};
 
 	struct FCInverterDataStruct
@@ -1076,23 +670,6 @@ namespace DataGenerators {
 			EffQuadraticCurveID( 0 ),
 			PCUlosses( 0.0 ),
 			QairIntake( 0.0 )
-		{}
-
-		// Member Constructor
-		FCInverterDataStruct(
-			std::string const & Name, // name of this inverter
-			int const EffMode, // efficiency calculation mode
-			Real64 const ConstEff,
-			int const EffQuadraticCurveID,
-			Real64 const PCUlosses,
-			Real64 const QairIntake
-		) :
-			Name( Name ),
-			EffMode( EffMode ),
-			ConstEff( ConstEff ),
-			EffQuadraticCurveID( EffQuadraticCurveID ),
-			PCUlosses( PCUlosses ),
-			QairIntake( QairIntake )
 		{}
 
 	};
@@ -1243,143 +820,6 @@ namespace DataGenerators {
 			ExergyEfficiency( 0.0 )
 		{}
 
-		// Member Constructor
-		FCReportDataStruct(
-			Real64 const ACPowerGen, // reporting: power (W)
-			Real64 const ACEnergyGen, // reporting: energy (J)
-			Real64 const QdotExhaust, // reporting: exhaust gas heat recovered (W)
-			Real64 const TotalHeatEnergyRec, // reporting: total heat recovered (J)
-			Real64 const ExhaustEnergyRec, // reporting: exhaust gas heat recovered (J)
-			Real64 const FuelEnergyLHV, // reporting: Fuel Energy used in Lower Heating Value(J)
-			Real64 const FuelEnergyUseRateLHV, // reporting: Fuel Energy used in Lower Heating Value(W)
-			Real64 const FuelEnergyHHV, // reporting: Fuel Energy used in Lower Heating Value(J)
-			Real64 const FuelEnergyUseRateHHV, // reporting: Fuel Energy used in Lower Heating Value(W)
-			Real64 const FuelRateMdot, // (Kg/s)
-			Real64 const HeatRecInletTemp, // reporting: Heat Recovery Loop Inlet Temperature (C)
-			Real64 const HeatRecOutletTemp, // reporting: Heat Recovery Loop Outlet Temperature (C)
-			Real64 const HeatRecMdot, // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-			Real64 const TairInlet, // State point 1
-			Real64 const TairIntoFCPM, // Temperature at State point 4
-			Real64 const NdotAir, // air flow in kmol/sec
-			Real64 const TotAirInEnthalphy, // Enthalpy at State point 4
-			Real64 const BlowerPower, // electrical power used by air supply blower
-			Real64 const BlowerEnergy, // electrical energy used by air supply blower
-			Real64 const BlowerSkinLoss, // heat rate of losses by blower
-			Real64 const TfuelInlet, // State point 2 [C]
-			Real64 const TfuelIntoFCPM, // state point 5 [C]
-			Real64 const NdotFuel, // fuel flow in [kmol/sec]
-			Real64 const TotFuelInEnthalpy, // state point 5 [W]
-			Real64 const FuelCompressPower, // electrical power used by fuel supply compressor [W]
-			Real64 const FuelCompressEnergy, // electrical energy used by fuel supply compressor [J]
-			Real64 const FuelCompressSkinLoss, // heat rate of losses.by fuel supply compressor [W]
-			Real64 const TwaterInlet, // State point 3
-			Real64 const TwaterIntoFCPM, // State point 6
-			Real64 const NdotWater, // water flow in kmol/sec (reformer water)
-			Real64 const WaterPumpPower, // electrical power used by water pump [W]
-			Real64 const WaterPumpEnergy, // electrical energy used by water pump [J]
-			Real64 const WaterIntoFCPMEnthalpy, // state point 6
-			Real64 const TprodGas, // State point 7 Product Gas temperature
-			Real64 const EnthalProdGas, // state point 7 product gas enthalpy
-			Real64 const NdotProdGas, // point 7 flow rate [kmol/sec]
-			Real64 const NdotProdAr, // argon flow rate at point 7
-			Real64 const NdotProdCO2, // carbon dioxide flow rate at point 7
-			Real64 const NdotProdH2O, // water vapor flow rate at point 7
-			Real64 const NdotProdN2, // nitrogen flow rate at point 7
-			Real64 const NdotProdO2, // oxygen flow rate at point 7
-			Real64 const qHX, // heat flow from gas stream to water [W]
-			Real64 const HXenergy, // energy from gas stream to water [J]
-			Real64 const THXexh, // temperature of exhaust gases leaving heat exchanger.
-			Real64 const WaterVaporFractExh, // water vapor fraction in exhaust gas stream
-			Real64 const CondensateRate, // water condensation rate [kmol/s]
-			int const SeqSubstIterations, // number of iterations in SOFC loop
-			int const RegulaFalsiIterations, // number of iterations in Tproduct gas solving
-			Real64 const ACancillariesPower,
-			Real64 const ACancillariesEnergy,
-			Real64 const PCUlosses, // power conditioning Unit losses
-			Real64 const DCPowerGen, // Pel, Power module power level [W]
-			Real64 const DCPowerEff, // Eel, power module efficiency []
-			Real64 const ElectEnergyinStorage, // State of charge in Electrical Storage [J]
-			Real64 const StoredPower, // Power added to Electrical Storage [W]
-			Real64 const StoredEnergy, // energy added to Electrical STorage [J]
-			Real64 const DrawnPower, // Power drawn from Electrical STorage [W]
-			Real64 const DrawnEnergy, // Energy drawn from Electrical STorage [J]
-			Real64 const SkinLossPower, // heat loss to surrounding zone [W]
-			Real64 const SkinLossEnergy, // heat loss to surround zone [J]
-			Real64 const SkinLossConvect, // convective heat loss to zone [W]
-			Real64 const SkinLossRadiat, // radiative heat loss to zone [W}
-			Real64 const ElectEfficiency,
-			Real64 const ThermalEfficiency,
-			Real64 const OverallEfficiency,
-			Real64 const ExergyEfficiency
-		) :
-			ACPowerGen( ACPowerGen ),
-			ACEnergyGen( ACEnergyGen ),
-			QdotExhaust( QdotExhaust ),
-			TotalHeatEnergyRec( TotalHeatEnergyRec ),
-			ExhaustEnergyRec( ExhaustEnergyRec ),
-			FuelEnergyLHV( FuelEnergyLHV ),
-			FuelEnergyUseRateLHV( FuelEnergyUseRateLHV ),
-			FuelEnergyHHV( FuelEnergyHHV ),
-			FuelEnergyUseRateHHV( FuelEnergyUseRateHHV ),
-			FuelRateMdot( FuelRateMdot ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMdot( HeatRecMdot ),
-			TairInlet( TairInlet ),
-			TairIntoFCPM( TairIntoFCPM ),
-			NdotAir( NdotAir ),
-			TotAirInEnthalphy( TotAirInEnthalphy ),
-			BlowerPower( BlowerPower ),
-			BlowerEnergy( BlowerEnergy ),
-			BlowerSkinLoss( BlowerSkinLoss ),
-			TfuelInlet( TfuelInlet ),
-			TfuelIntoFCPM( TfuelIntoFCPM ),
-			NdotFuel( NdotFuel ),
-			TotFuelInEnthalpy( TotFuelInEnthalpy ),
-			FuelCompressPower( FuelCompressPower ),
-			FuelCompressEnergy( FuelCompressEnergy ),
-			FuelCompressSkinLoss( FuelCompressSkinLoss ),
-			TwaterInlet( TwaterInlet ),
-			TwaterIntoFCPM( TwaterIntoFCPM ),
-			NdotWater( NdotWater ),
-			WaterPumpPower( WaterPumpPower ),
-			WaterPumpEnergy( WaterPumpEnergy ),
-			WaterIntoFCPMEnthalpy( WaterIntoFCPMEnthalpy ),
-			TprodGas( TprodGas ),
-			EnthalProdGas( EnthalProdGas ),
-			NdotProdGas( NdotProdGas ),
-			NdotProdAr( NdotProdAr ),
-			NdotProdCO2( NdotProdCO2 ),
-			NdotProdH2O( NdotProdH2O ),
-			NdotProdN2( NdotProdN2 ),
-			NdotProdO2( NdotProdO2 ),
-			qHX( qHX ),
-			HXenergy( HXenergy ),
-			THXexh( THXexh ),
-			WaterVaporFractExh( WaterVaporFractExh ),
-			CondensateRate( CondensateRate ),
-			SeqSubstIterations( SeqSubstIterations ),
-			RegulaFalsiIterations( RegulaFalsiIterations ),
-			ACancillariesPower( ACancillariesPower ),
-			ACancillariesEnergy( ACancillariesEnergy ),
-			PCUlosses( PCUlosses ),
-			DCPowerGen( DCPowerGen ),
-			DCPowerEff( DCPowerEff ),
-			ElectEnergyinStorage( ElectEnergyinStorage ),
-			StoredPower( StoredPower ),
-			StoredEnergy( StoredEnergy ),
-			DrawnPower( DrawnPower ),
-			DrawnEnergy( DrawnEnergy ),
-			SkinLossPower( SkinLossPower ),
-			SkinLossEnergy( SkinLossEnergy ),
-			SkinLossConvect( SkinLossConvect ),
-			SkinLossRadiat( SkinLossRadiat ),
-			ElectEfficiency( ElectEfficiency ),
-			ThermalEfficiency( ThermalEfficiency ),
-			OverallEfficiency( OverallEfficiency ),
-			ExergyEfficiency( ExergyEfficiency )
-		{}
-
 	};
 
 	struct FCDataStruct
@@ -1429,69 +869,6 @@ namespace DataGenerators {
 			QradZone( 0.0 ),
 			DynamicsControlID( 0 ),
 			TimeElapsed( 0.0 )
-		{}
-
-		// Member Constructor
-		FCDataStruct(
-			std::string const & Name, // user identifier
-			std::string const & NameFCPM, // name of FC Power Module
-			FCPowerModuleStruct const & FCPM, // data for Power Module
-			std::string const & NameFCAirSup, // name of air supply module for fuel cell
-			FCAirSupplyDataStruct const & AirSup, // data for air supply module
-			std::string const & NameFCFuelSup, // name of fuel supply module
-			int const FuelSupNum, // indes for fuel supply module structure
-			std::string const & NameFCWaterSup, // name of water supply module
-			FCWaterSupplyDataStruct const & WaterSup, // data for water supply module
-			std::string const & NameFCAuxilHeat, // name of auxiliary heating module
-			FCAuxilHeatDataStruct const & AuxilHeat, // data for auxiliary heating module
-			std::string const & NameExhaustHX, // name of Exhaust HX module
-			FCExhaustHXDataStruct const & ExhaustHX, // data for Exhaust heat exchanger module
-			std::string const & NameElecStorage, // name of Battery module
-			FCElecStorageDataStruct const & ElecStorage, // data for Battery module
-			std::string const & NameInverter, // name of Inverter Module
-			FCInverterDataStruct const & Inverter, // data for INverter module
-			std::string const & NameStackCooler, // name of Inverter Module
-			FCStackCoolerDataStruct const & StackCooler, // data for INverter module
-			int const CWLoopNum, // cooling water plant loop index number
-			int const CWLoopSideNum, // cooling water plant loop side index
-			int const CWBranchNum, // cooling water plant loop branch index
-			int const CWCompNum, // cooling water plant loop component index
-			FCReportDataStruct const & Report, // data for reporting as E+ output variables
-			Real64 const ACPowerGen, // Net output from SOFC unit
-			Real64 const QconvZone, // convective heat lost to surrounding zone
-			Real64 const QradZone, // radiative heat lost to surrounding zone
-			int const DynamicsControlID,
-			Real64 const TimeElapsed // used to track when timestep has changed
-		) :
-			Name( Name ),
-			NameFCPM( NameFCPM ),
-			FCPM( FCPM ),
-			NameFCAirSup( NameFCAirSup ),
-			AirSup( AirSup ),
-			NameFCFuelSup( NameFCFuelSup ),
-			FuelSupNum( FuelSupNum ),
-			NameFCWaterSup( NameFCWaterSup ),
-			WaterSup( WaterSup ),
-			NameFCAuxilHeat( NameFCAuxilHeat ),
-			AuxilHeat( AuxilHeat ),
-			NameExhaustHX( NameExhaustHX ),
-			ExhaustHX( ExhaustHX ),
-			NameElecStorage( NameElecStorage ),
-			ElecStorage( ElecStorage ),
-			NameInverter( NameInverter ),
-			Inverter( Inverter ),
-			NameStackCooler( NameStackCooler ),
-			StackCooler( StackCooler ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			Report( Report ),
-			ACPowerGen( ACPowerGen ),
-			QconvZone( QconvZone ),
-			QradZone( QradZone ),
-			DynamicsControlID( DynamicsControlID ),
-			TimeElapsed( TimeElapsed )
 		{}
 
 	};
@@ -1555,63 +932,6 @@ namespace DataGenerators {
 			H20ProductGasCoef( 0.0 )
 		{}
 
-		// Member Constructor
-		GeneratorFuelSupplyDataStruct(
-			std::string const & Name, // name of this fuel supply module
-			int const FuelTempMode, // temperature of fuel node
-			int const FuelTypeMode, // type of fuel, gasous or liquid
-			std::string const & NodeName, // node name for temperature at input
-			int const NodeNum, // node number for temperature at input
-			int const SchedNum, // fuel temperature at input
-			int const CompPowerCurveID, // "pointer" to compressor power cubic curve
-			Real64 const CompPowerLossFactor,
-			int const NumConstituents, // number of constituents in fue supply
-			Array1_string const & ConstitName,
-			Array1< Real64 > const & ConstitMolalFract,
-			Array1_int const & GasLibID, // lookup ID in Gas Phase ThermoChemistry Structure Array
-			Real64 const LHV, // lower heating value of gaseous fuel (kJ/mol)
-			Real64 const LHVJperkg, // lower heating value of gaseous fuel (J/kg)
-			Real64 const LHVliquid, // userdefined lhv for generic liquid (J/kg)
-			Real64 const HHV, // higher heating value of fuel (J/kg)
-			Real64 const MW, // molecular weight g/mol
-			Real64 const eCO2, // mass flow based CO2 emmissions factor for complete combustion (-)
-			Real64 const KmolPerSecToKgPerSec, // conversion from moles to kilograms for this fuel. (
-			Real64 const StoicOxygenRate,
-			Real64 const TfuelIntoCompress, // inlet fuel temperature
-			Real64 const TfuelIntoFCPM, // compressed fuel temp
-			Real64 const PfuelCompEl, // fuel compressor power
-			Real64 const QskinLoss, // pumping losses for zone
-			Real64 const CO2ProductGasCoef, // molar multiplier for stoic products of this fuel
-			Real64 const H20ProductGasCoef // molar multiplier for stoic products of this fuel
-		) :
-			Name( Name ),
-			FuelTempMode( FuelTempMode ),
-			FuelTypeMode( FuelTypeMode ),
-			NodeName( NodeName ),
-			NodeNum( NodeNum ),
-			SchedNum( SchedNum ),
-			CompPowerCurveID( CompPowerCurveID ),
-			CompPowerLossFactor( CompPowerLossFactor ),
-			NumConstituents( NumConstituents ),
-			ConstitName( 14, ConstitName ),
-			ConstitMolalFract( 14, ConstitMolalFract ),
-			GasLibID( 14, GasLibID ),
-			LHV( LHV ),
-			LHVJperkg( LHVJperkg ),
-			LHVliquid( LHVliquid ),
-			HHV( HHV ),
-			MW( MW ),
-			eCO2( eCO2 ),
-			KmolPerSecToKgPerSec( KmolPerSecToKgPerSec ),
-			StoicOxygenRate( StoicOxygenRate ),
-			TfuelIntoCompress( TfuelIntoCompress ),
-			TfuelIntoFCPM( TfuelIntoFCPM ),
-			PfuelCompEl( PfuelCompEl ),
-			QskinLoss( QskinLoss ),
-			CO2ProductGasCoef( CO2ProductGasCoef ),
-			H20ProductGasCoef( H20ProductGasCoef )
-		{}
-
 	};
 
 	struct GasPropertyDataStruct
@@ -1664,57 +984,6 @@ namespace DataGenerators {
 			NASA_A5( 0.0 ),
 			NASA_A6( 0.0 ),
 			NASA_A7( 0.0 )
-		{}
-
-		// Member Constructor
-		GasPropertyDataStruct(
-			std::string const & ConstituentName,
-			std::string const & ConstituentFormula,
-			Real64 const StdRefMolarEnthOfForm,
-			int const ThermoMode, // method of calculation for thermodynamics
-			Real64 const ShomateA,
-			Real64 const ShomateB,
-			Real64 const ShomateC,
-			Real64 const ShomateD,
-			Real64 const ShomateE,
-			Real64 const ShomateF,
-			Real64 const ShomateG,
-			Real64 const ShomateH,
-			Real64 const NumCarbons,
-			Real64 const NumHydrogens,
-			Real64 const NumOxygens,
-			Real64 const MolecularWeight,
-			Real64 const NASA_A1,
-			Real64 const NASA_A2,
-			Real64 const NASA_A3,
-			Real64 const NASA_A4,
-			Real64 const NASA_A5,
-			Real64 const NASA_A6,
-			Real64 const NASA_A7
-		) :
-			ConstituentName( ConstituentName ),
-			ConstituentFormula( ConstituentFormula ),
-			StdRefMolarEnthOfForm( StdRefMolarEnthOfForm ),
-			ThermoMode( ThermoMode ),
-			ShomateA( ShomateA ),
-			ShomateB( ShomateB ),
-			ShomateC( ShomateC ),
-			ShomateD( ShomateD ),
-			ShomateE( ShomateE ),
-			ShomateF( ShomateF ),
-			ShomateG( ShomateG ),
-			ShomateH( ShomateH ),
-			NumCarbons( NumCarbons ),
-			NumHydrogens( NumHydrogens ),
-			NumOxygens( NumOxygens ),
-			MolecularWeight( MolecularWeight ),
-			NASA_A1( NASA_A1 ),
-			NASA_A2( NASA_A2 ),
-			NASA_A3( NASA_A3 ),
-			NASA_A4( NASA_A4 ),
-			NASA_A5( NASA_A5 ),
-			NASA_A6( NASA_A6 ),
-			NASA_A7( NASA_A7 )
 		{}
 
 	};
@@ -1818,103 +1087,6 @@ namespace DataGenerators {
 			QdotHXMax( 0.0 ),
 			QdotHXMin( 0.0 ),
 			QdotHXOpt( 0.0 )
-		{}
-
-		// Member Constructor
-		GeneratorDynamicsManagerStruct(
-			std::string const & Name,
-			Real64 const PelMin, // minimum operating point for electrical power Pel
-			Real64 const PelMax, // maximum operating point for electrical power Pel
-			Real64 const UpTranLimit, // power up transient limit W/s
-			Real64 const DownTranLimit, // power down tran limit  W/s
-			Real64 const UpTranLimitFuel, // fuel up transient limit kg/s
-			Real64 const DownTranLimitFuel, // fuel down transient limit kg/s
-			bool const WarmUpByTimeDelay, // Warm up mode control
-			bool const WarmUpByEngineTemp, // Warm up mode control
-			Real64 const StartUpTimeDelay, // time for start up [hours]
-			Real64 const WarmUpDelay, // time for warm up delay [s]
-			Real64 const StartUpFuel, // fuel use during start up
-			Real64 const StartUpElectConsum, // electricity used during start up
-			Real64 const StartUpElectProd, // electricity produced during start up
-			Real64 const ShutDownFuel, // fuel consumed during shut down
-			Real64 const ShutDownElectConsum, // Elect consumed during shut down
-			Real64 const PcoolDown, // power during cool down
-			Real64 const CoolDownDelay, // time for cool down delay [hours]
-			int const NumCyclesInit, // number of start stop cycles at beginning
-			Real64 const NumRunHoursInit, // number of hours of operation beginning
-			Real64 const Pstandby, // standby power [w]
-			Real64 const MCeng, // aggregated thermal mass of engine [  ]
-			Real64 const MCcw, // aggregated thermal mass of heat recovery [   ]
-			Real64 const kf, // coefficient k_f for warmup fuel flow rate
-			Real64 const TnomEngOp, // nominal engine operating temperature [C]
-			Real64 const kp, // coefficient k_p for warmup power
-			bool const MandatoryFullCoolDown,
-			bool const WarmRestartOkay,
-			int const AvailabilitySchedID,
-			int const CurrentOpMode, // current operating mode, uses params like OpModeNormal
-			int const LastOpMode,
-			Real64 const FractionalDayofLastShutDown,
-			Real64 const FractionalDayofLastStartUp,
-			bool const HasBeenOn,
-			bool const DuringStartUp,
-			bool const DuringShutDown,
-			Real64 const FuelMdotLastTimestep,
-			Real64 const PelLastTimeStep,
-			int const NumCycles,
-			Real64 const PLRforSubtimestepStartUp,
-			Real64 const PLRforSubtimestepShutDown, // part load for not in shut down, shut down part is (1 - PLR)
-			Real64 const ElectEffNom, // efficiency to use for control decisions
-			Real64 const ThermEffNom, // thermal efficiency to use fo control decisions
-			Real64 const QdotHXMax, // Thermal power max
-			Real64 const QdotHXMin, // thermal power min
-			Real64 const QdotHXOpt // thermal power nominal/optimal
-		) :
-			Name( Name ),
-			PelMin( PelMin ),
-			PelMax( PelMax ),
-			UpTranLimit( UpTranLimit ),
-			DownTranLimit( DownTranLimit ),
-			UpTranLimitFuel( UpTranLimitFuel ),
-			DownTranLimitFuel( DownTranLimitFuel ),
-			WarmUpByTimeDelay( WarmUpByTimeDelay ),
-			WarmUpByEngineTemp( WarmUpByEngineTemp ),
-			StartUpTimeDelay( StartUpTimeDelay ),
-			WarmUpDelay( WarmUpDelay ),
-			StartUpFuel( StartUpFuel ),
-			StartUpElectConsum( StartUpElectConsum ),
-			StartUpElectProd( StartUpElectProd ),
-			ShutDownFuel( ShutDownFuel ),
-			ShutDownElectConsum( ShutDownElectConsum ),
-			PcoolDown( PcoolDown ),
-			CoolDownDelay( CoolDownDelay ),
-			NumCyclesInit( NumCyclesInit ),
-			NumRunHoursInit( NumRunHoursInit ),
-			Pstandby( Pstandby ),
-			MCeng( MCeng ),
-			MCcw( MCcw ),
-			kf( kf ),
-			TnomEngOp( TnomEngOp ),
-			kp( kp ),
-			MandatoryFullCoolDown( MandatoryFullCoolDown ),
-			WarmRestartOkay( WarmRestartOkay ),
-			AvailabilitySchedID( AvailabilitySchedID ),
-			CurrentOpMode( CurrentOpMode ),
-			LastOpMode( LastOpMode ),
-			FractionalDayofLastShutDown( FractionalDayofLastShutDown ),
-			FractionalDayofLastStartUp( FractionalDayofLastStartUp ),
-			HasBeenOn( HasBeenOn ),
-			DuringStartUp( DuringStartUp ),
-			DuringShutDown( DuringShutDown ),
-			FuelMdotLastTimestep( FuelMdotLastTimestep ),
-			PelLastTimeStep( PelLastTimeStep ),
-			NumCycles( NumCycles ),
-			PLRforSubtimestepStartUp( PLRforSubtimestepStartUp ),
-			PLRforSubtimestepShutDown( PLRforSubtimestepShutDown ),
-			ElectEffNom( ElectEffNom ),
-			ThermEffNom( ThermEffNom ),
-			QdotHXMax( QdotHXMax ),
-			QdotHXMin( QdotHXMin ),
-			QdotHXOpt( QdotHXOpt )
 		{}
 
 	};
@@ -2035,117 +1207,6 @@ namespace DataGenerators {
 			QdotRadZone( 0.0 )
 		{}
 
-		// Member Constructor
-		MicroCHPParamsNonNormalized(
-			std::string const & Name, // name of this PowerModule data
-			Real64 const MaxElecPower, // net electric power [W]
-			Real64 const MinElecPower, // net electric power [W]
-			Real64 const MinWaterMdot, // minimum cooling water flow [kg/s]
-			Real64 const MaxWaterTemp, // limit temp for inlet cooling water [C]
-			int const ElecEffCurveID, // index for TriQuadratic for electrical efficiency
-			int const ThermalEffCurveID, // index for TriQuadric for thermal efficiency
-			bool const InternalFlowControl, // Plant or Internal Flow rate control?
-			bool const PlantFlowControl, // default is plant control
-			int const WaterFlowCurveID, // index for BiQuadratic for water flow rate internal control
-			int const AirFlowCurveID, // index for Quadratic for generator air flow
-			Real64 const DeltaPelMax, // max rate of change in net electric power [W/s}
-			Real64 const DeltaFuelMdotMax, // Maximum Rate of change in fuel flow rate [kmol/s2]
-			Real64 const UAhx, // heat exchanger UA [W/K]
-			Real64 const UAskin, // skin loss UA [W/K]
-			Real64 const RadiativeFraction, // skin loss fraction to radiant energy []
-			Real64 const MCeng, // aggregated thermal mass of engine [J/K]
-			Real64 const MCcw, // aggregated thermal mass of heat recovery [J/k]
-			Real64 const Pstandby, // standby power [w]
-			bool const WarmUpByTimeDelay, // Warm up mode control
-			bool const WarmUpByEngineTemp, // Warm up mode control
-			Real64 const kf, // coefficient k_f for warmup fuel flow rate
-			Real64 const TnomEngOp, // nominal engine operating temperature [C]
-			Real64 const kp, // coefficient k_p for warmup power
-			Real64 const Rfuelwarmup, // Warm Up Fuel Flow Rate Limit Ratio
-			Real64 const WarmUpDelay, // time for warm up delay [s]
-			Real64 const PcoolDown, // power during cool down
-			Real64 const CoolDownDelay, // time for cool down delay [s]
-			bool const MandatoryFullCoolDown,
-			bool const WarmRestartOkay,
-			Real64 const TimeElapsed, // Fraction of the current hour that has elapsed (h)
-			int const OpMode,
-			Real64 const OffModeTime, // amount of time generator spent in Off mode
-			Real64 const StandyByModeTime, // amount of time generator spent in standby mode
-			Real64 const WarmUpModeTime, // amount of time generator spent in warm up mode
-			Real64 const NormalModeTime, // amount of time generator spent in normal mode
-			Real64 const CoolDownModeTime, // amount of time generator spent in Cool down mode
-			Real64 const TengLast, // last timestep's value for engine temperature
-			Real64 const TempCWOutLast, // last timestep's value for cooling water outlet temperature
-			Real64 const Pnet,
-			Real64 const ElecEff,
-			Real64 const Qgross,
-			Real64 const ThermEff,
-			Real64 const Qgenss,
-			Real64 const NdotFuel,
-			Real64 const MdotFuel,
-			Real64 const Teng,
-			Real64 const TcwIn,
-			Real64 const TcwOut,
-			Real64 const MdotAir,
-			Real64 const QdotSkin, // rate of heat loss to zone
-			Real64 const QdotConvZone,
-			Real64 const QdotRadZone
-		) :
-			Name( Name ),
-			MaxElecPower( MaxElecPower ),
-			MinElecPower( MinElecPower ),
-			MinWaterMdot( MinWaterMdot ),
-			MaxWaterTemp( MaxWaterTemp ),
-			ElecEffCurveID( ElecEffCurveID ),
-			ThermalEffCurveID( ThermalEffCurveID ),
-			InternalFlowControl( InternalFlowControl ),
-			PlantFlowControl( PlantFlowControl ),
-			WaterFlowCurveID( WaterFlowCurveID ),
-			AirFlowCurveID( AirFlowCurveID ),
-			DeltaPelMax( DeltaPelMax ),
-			DeltaFuelMdotMax( DeltaFuelMdotMax ),
-			UAhx( UAhx ),
-			UAskin( UAskin ),
-			RadiativeFraction( RadiativeFraction ),
-			MCeng( MCeng ),
-			MCcw( MCcw ),
-			Pstandby( Pstandby ),
-			WarmUpByTimeDelay( WarmUpByTimeDelay ),
-			WarmUpByEngineTemp( WarmUpByEngineTemp ),
-			kf( kf ),
-			TnomEngOp( TnomEngOp ),
-			kp( kp ),
-			Rfuelwarmup( Rfuelwarmup ),
-			WarmUpDelay( WarmUpDelay ),
-			PcoolDown( PcoolDown ),
-			CoolDownDelay( CoolDownDelay ),
-			MandatoryFullCoolDown( MandatoryFullCoolDown ),
-			WarmRestartOkay( WarmRestartOkay ),
-			TimeElapsed( TimeElapsed ),
-			OpMode( OpMode ),
-			OffModeTime( OffModeTime ),
-			StandyByModeTime( StandyByModeTime ),
-			WarmUpModeTime( WarmUpModeTime ),
-			NormalModeTime( NormalModeTime ),
-			CoolDownModeTime( CoolDownModeTime ),
-			TengLast( TengLast ),
-			TempCWOutLast( TempCWOutLast ),
-			Pnet( Pnet ),
-			ElecEff( ElecEff ),
-			Qgross( Qgross ),
-			ThermEff( ThermEff ),
-			Qgenss( Qgenss ),
-			NdotFuel( NdotFuel ),
-			MdotFuel( MdotFuel ),
-			Teng( Teng ),
-			TcwIn( TcwIn ),
-			TcwOut( TcwOut ),
-			MdotAir( MdotAir ),
-			QdotSkin( QdotSkin ),
-			QdotConvZone( QdotConvZone ),
-			QdotRadZone( QdotRadZone )
-		{}
-
 	};
 
 	struct MicroCHPReportDataStruct // these are all for reporting only!
@@ -2240,85 +1301,6 @@ namespace DataGenerators {
 			OverallEfficiency( 0.0 )
 		{}
 
-		// Member Constructor
-		MicroCHPReportDataStruct(
-			int const Mode, // report operating mode (dev only, remove at end)
-			Real64 const OffModeTime, // amount of time generator spent in Off mode
-			Real64 const StandyByModeTime, // amount of time generator spent in standby mode
-			Real64 const WarmUpModeTime, // amount of time generator spent in warm up mode
-			Real64 const NormalModeTime, // amount of time generator spent in normal mode
-			Real64 const CoolDownModeTime, // amount of time generator spent in Cool down mode
-			Real64 const ACPowerGen, // reporting: power (W)
-			Real64 const ACEnergyGen, // reporting: energy (J)
-			Real64 const QdotGross, // reporting: interim gross power (W)
-			Real64 const Qgenss, // reporting: net recovered heat rate steadystate(0)
-			Real64 const QdotHX, // reporting: rate of heat exchange from engine to coolant (W)
-			Real64 const QdotHR, // reporting: rate of heat recovered (W)
-			Real64 const Tengine, // reporting: engine mass temperature (C)
-			Real64 const TotalHeatEnergyRec, // reporting: total heat recovered (J)
-			Real64 const ExhaustEnergyRec, // reporting: exhaust gas heat recovered (J)
-			Real64 const FuelEnergyLHV, // reporting: Fuel Energy used in Lower Heating Value(J)
-			Real64 const FuelEnergyUseRateLHV, // reporting: Fuel Energy used in Lower Heating Value(W)
-			Real64 const FuelEnergyHHV, // reporting: Fuel Energy used in Higher Heating Value(J)
-			Real64 const FuelEnergyUseRateHHV, // reporting: Fuel Energy used in Higher Heating Value(W)
-			Real64 const HeatRecInletTemp, // reporting: Heat Recovery Loop Inlet Temperature (C)
-			Real64 const HeatRecOutletTemp, // reporting: Heat Recovery Loop Outlet Temperature (C)
-			Real64 const HeatRecMdot, // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-			Real64 const TairInlet, // State point 1
-			Real64 const MdotAir, // air flow in kmol/sec
-			Real64 const TfuelInlet, // State point 2 [C]
-			Real64 const NdotFuel, // fuel flow in [kmol/sec]
-			Real64 const MdotFuel, // fuel flow in [kg/s]
-			Real64 const FuelCompressPower, // electrical power used by fuel supply compressor [W]
-			Real64 const FuelCompressEnergy, // electrical energy used by fuel supply compressor [J]
-			Real64 const FuelCompressSkinLoss, // heat rate of losses.by fuel supply compressor [W]
-			Real64 const SkinLossPower, // heat loss to surrounding zone [W]
-			Real64 const SkinLossEnergy, // heat loss to surround zone [J]
-			Real64 const SkinLossConvect, // convective heat loss to zone [W]
-			Real64 const SkinLossRadiat, // radiative heat loss to zone [W}
-			Real64 const ElectEfficiency,
-			Real64 const ThermalEfficiency,
-			Real64 const OverallEfficiency
-		) :
-			Mode( Mode ),
-			OffModeTime( OffModeTime ),
-			StandyByModeTime( StandyByModeTime ),
-			WarmUpModeTime( WarmUpModeTime ),
-			NormalModeTime( NormalModeTime ),
-			CoolDownModeTime( CoolDownModeTime ),
-			ACPowerGen( ACPowerGen ),
-			ACEnergyGen( ACEnergyGen ),
-			QdotGross( QdotGross ),
-			Qgenss( Qgenss ),
-			QdotHX( QdotHX ),
-			QdotHR( QdotHR ),
-			Tengine( Tengine ),
-			TotalHeatEnergyRec( TotalHeatEnergyRec ),
-			ExhaustEnergyRec( ExhaustEnergyRec ),
-			FuelEnergyLHV( FuelEnergyLHV ),
-			FuelEnergyUseRateLHV( FuelEnergyUseRateLHV ),
-			FuelEnergyHHV( FuelEnergyHHV ),
-			FuelEnergyUseRateHHV( FuelEnergyUseRateHHV ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMdot( HeatRecMdot ),
-			TairInlet( TairInlet ),
-			MdotAir( MdotAir ),
-			TfuelInlet( TfuelInlet ),
-			NdotFuel( NdotFuel ),
-			MdotFuel( MdotFuel ),
-			FuelCompressPower( FuelCompressPower ),
-			FuelCompressEnergy( FuelCompressEnergy ),
-			FuelCompressSkinLoss( FuelCompressSkinLoss ),
-			SkinLossPower( SkinLossPower ),
-			SkinLossEnergy( SkinLossEnergy ),
-			SkinLossConvect( SkinLossConvect ),
-			SkinLossRadiat( SkinLossRadiat ),
-			ElectEfficiency( ElectEfficiency ),
-			ThermalEfficiency( ThermalEfficiency ),
-			OverallEfficiency( OverallEfficiency )
-		{}
-
 	};
 
 	struct MicroCHPDataStruct
@@ -2381,6 +1363,9 @@ namespace DataGenerators {
 	extern Array1D< MicroCHPDataStruct > MicroCHP;
 	extern Array1D< MicroCHPParamsNonNormalized > MicroCHPParamInput; // Used during get input then put into nested
 	extern Array1D< GeneratorDynamicsManagerStruct > GeneratorDynamics;
+
+	void
+	clear_state();
 
 } // DataGenerators
 

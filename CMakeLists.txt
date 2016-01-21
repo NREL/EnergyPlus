@@ -39,6 +39,14 @@ else()
   set(GIT_DIR "")
 endif()
 
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+    "MinSizeRel" "RelWithDebInfo")
+endif()
 
 set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
@@ -59,15 +67,16 @@ endif()
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
+option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
 option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-# we don't need all devs to have Python installed.  There are 2 cases where we do want it
-# 1. Doing regression testing; which would be: BUILD_TESTING AND ENABLE_REGRESSION_TESTING
-# 2. Doing package building, since Python is going to be our tool for some things; thus: BUILD_PACKAGE
+# we are making python a required dependency, so find it here...starting off by requiring at least 2.7
+find_package(PythonInterp 2.7 REQUIRED)
 
-if( ( BUILD_TESTING AND ENABLE_REGRESSION_TESTING ) OR ( BUILD_PACKAGE ) )
-  find_package(PythonInterp 2.7 REQUIRED)
+# then we can add python-based tests for it
+if ( BUILD_TESTING )
+  add_test( NAME VerifyIDFsInCMakeFolder COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/scripts/dev/VerifyIDFsInCMake.py" "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" )
 endif()
 
 if( BUILD_TESTING )
@@ -170,7 +179,25 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
   ADD_SUBDIRECTORY(tst/jsoncpp/unit)
+
+  option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
+
+  if (BUILD_PERFORMANCE_TESTS)
+
+    if (UNIX AND NOT APPLE)
+      option( VALGRIND_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via valgrind / callgrind" OFF )
+
+      if (VALGRIND_ANALYZE_PERFORMANCE_TESTS)
+        find_program(VALGRIND NAMES valgrind PATH /usr/bin /usr/local/bin)
+      endif()
+    endif()
+    ADD_SUBDIRECTORY(performance_tests)
+  endif()
 endif()
+
+configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
+configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
+configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
@@ -178,6 +205,9 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
+  file( COPY "idd/V8-4-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V8-5-0-Energy+.idd" )
+  file( COPY "src/Transition/SupportFiles/Report Variables 8-4-0 to 8-5-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
@@ -185,10 +215,6 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/CalcSoilSurfTemp PROJECT CalcSoilSurfTemp NO_EXTERNAL_INSTALL )
 endif()
-
-configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
-configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
-configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
@@ -353,4 +379,3 @@ endif()
 if (BUILD_DOCS)
   add_subdirectory(doc/src)
 endif()
-

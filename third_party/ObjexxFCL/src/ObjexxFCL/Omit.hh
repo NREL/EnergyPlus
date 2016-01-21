@@ -22,7 +22,6 @@ class Omit
 public: // Creation
 
 	// Default Constructor
-	inline
 	Omit()
 	{}
 

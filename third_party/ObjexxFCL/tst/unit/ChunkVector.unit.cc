@@ -79,18 +79,18 @@ TEST( ChunkVectorTest, Construction )
 
 	{ // Size constructor
 		ChunkVector_int v( 10, 2u ); // Uninitialized
-		EXPECT_EQ( 10U, v.size() );
-		EXPECT_EQ( 2U, v.chunk_exponent() );
-		EXPECT_EQ( 4U, v.chunk_size() );
-		EXPECT_EQ( 3U, v.n_chunk() );
+		EXPECT_EQ( 10u, v.size() );
+		EXPECT_EQ( 2u, v.chunk_exponent() );
+		EXPECT_EQ( 4u, v.chunk_size() );
+		EXPECT_EQ( 3u, v.n_chunk() );
 	}
 
 	{ // Size + value constructor
 		ChunkVector_int v( 10, 2u, 22 );
-		EXPECT_EQ( 10U, v.size() );
-		EXPECT_EQ( 2U, v.chunk_exponent() );
-		EXPECT_EQ( 4U, v.chunk_size() );
-		EXPECT_EQ( 3U, v.n_chunk() );
+		EXPECT_EQ( 10u, v.size() );
+		EXPECT_EQ( 2u, v.chunk_exponent() );
+		EXPECT_EQ( 4u, v.chunk_size() );
+		EXPECT_EQ( 3u, v.n_chunk() );
 		EXPECT_EQ( vector_int( 10, 22 ), v );
 	}
 
@@ -114,7 +114,7 @@ TEST( ChunkVectorTest, Construction )
 		EXPECT_EQ( v, w );
 		EXPECT_EQ( w, v );
 		EXPECT_EQ( v.size(), s.size() );
-		EXPECT_EQ( 15U, v.size() );
+		EXPECT_EQ( 15u, v.size() );
 	}
 
 	{ // std::vector constructor and assignment template
@@ -220,9 +220,9 @@ TEST( ChunkVectorTest, Append )
 	ChunkVector_int const w( 10, 2u, 2 );
 	vector_float const s( 10, 22.0 );
 	v.append( w );
-	EXPECT_EQ( 20U, v.size() );
+	EXPECT_EQ( 20u, v.size() );
 	v.append( s );
-	EXPECT_EQ( 30U, v.size() );
+	EXPECT_EQ( 30u, v.size() );
 	EXPECT_EQ( 1, v[ 0 ] );
 	EXPECT_EQ( 1, v[ 9 ] );
 	EXPECT_EQ( 2, v[ 10 ] );
@@ -234,19 +234,19 @@ TEST( ChunkVectorTest, Append )
 TEST( ChunkVectorTest, ResizeGrowShrink )
 {
 	ChunkVector_int v( 10, 2u, 1 );
-	EXPECT_EQ( 10U, v.size() );
+	EXPECT_EQ( 10u, v.size() );
 	v.push_back( 2 );
 	EXPECT_TRUE( v != ChunkVector_int( 10, 2u, 1 ) );
-	EXPECT_EQ( 11U, v.size() );
+	EXPECT_EQ( 11u, v.size() );
 	EXPECT_EQ( 2, v( 11 ) );
 	v.pop_back();
-	EXPECT_EQ( 10U, v.size() );
+	EXPECT_EQ( 10u, v.size() );
 	EXPECT_EQ( ChunkVector_int( 10, 2u, 1 ), v );
 	v.shrink();
-	EXPECT_EQ( 10U, v.size() );
+	EXPECT_EQ( 10u, v.size() );
 	EXPECT_EQ( ChunkVector_int( 10, 2u, 1 ), v );
 	v.resize( 20 );
-	EXPECT_EQ( 20U, v.size() );
+	EXPECT_EQ( 20u, v.size() );
 	EXPECT_EQ( 1, v( 10 ) );
 	EXPECT_EQ( 0, v( 11 ) );
 	v.resize( 10 );
@@ -258,11 +258,11 @@ TEST( ChunkVectorTest, ResizeFill )
 {
 	ChunkVector_int v( 10, 2u, 22 );
 	v.resize( 20, 33 );
-	EXPECT_EQ( 20U, v.size() );
-	for ( ChunkVector_int::size_type i = 0; i < 10; ++i ) {
+	EXPECT_EQ( 20u, v.size() );
+	for ( ChunkVector_int::size_type i = 0; i < 10u; ++i ) {
 		EXPECT_EQ( 22, v[ i ] );
 	}
-	for ( ChunkVector_int::size_type i = 10; i < 20; ++i ) {
+	for ( ChunkVector_int::size_type i = 10u; i < 20u; ++i ) {
 		EXPECT_EQ( 33, v[ i ] );
 	}
 }
@@ -271,27 +271,27 @@ TEST( ChunkVectorTest, NonpreservingResize )
 {
 	ChunkVector_int v( 10, 2u, 22 );
 	v.non_preserving_resize( 20U ); // Added element values are arbitrary
-	EXPECT_EQ( 20U, v.size() );
+	EXPECT_EQ( 20u, v.size() );
 }
 
 TEST( ChunkVectorTest, ReservePushPopShrink )
 {
 	ChunkVector_int v( 10, 2u, 22 );
-	EXPECT_EQ( 10U, v.size() );
-	EXPECT_EQ( 10U, v.size() );
-	for ( ChunkVector_int::size_type i = 0; i < 10; ++i ) {
+	EXPECT_EQ( 10u, v.size() );
+	EXPECT_EQ( 10u, v.size() );
+	for ( ChunkVector_int::size_type i = 0; i < 10u; ++i ) {
 		EXPECT_EQ( 22, v[ i ] );
 	}
 	v.push_back( 33 );
-	EXPECT_EQ( 11U, v.size() );
+	EXPECT_EQ( 11u, v.size() );
 	v.push_back( 44 );
-	EXPECT_EQ( 12U, v.size() );
+	EXPECT_EQ( 12u, v.size() );
 	v.push_back( 55 );
-	EXPECT_EQ( 13U, v.size() );
+	EXPECT_EQ( 13u, v.size() );
 	v.pop_back();
-	EXPECT_EQ( 12U, v.size() );
+	EXPECT_EQ( 12u, v.size() );
 	v.pop_back();
-	EXPECT_EQ( 11U, v.size() );
+	EXPECT_EQ( 11u, v.size() );
 	v.shrink();
-	EXPECT_EQ( 11U, v.size() );
+	EXPECT_EQ( 11u, v.size() );
 }

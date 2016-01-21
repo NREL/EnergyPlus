@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -10,6 +68,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
@@ -48,6 +107,7 @@
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SQLiteProcedures.hh>
+#include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <VentilatedSlab.hh>
 #include <ZonePlenum.hh>
@@ -170,9 +230,9 @@ namespace OutputReportTabular {
 
 	// arrays for time binned results
 
-	int OutputTableBinnedCount;
-	int BinResultsTableCount;
-	int BinResultsIntervalCount;
+	int OutputTableBinnedCount( 0 );
+	int BinResultsTableCount( 0 );
+	int BinResultsIntervalCount( 0 );
 
 	int const numNamedMonthly( 62 );
 	// These reports are detailed/named in routine InitializePredefinedMonthlyTitles
@@ -188,7 +248,7 @@ namespace OutputReportTabular {
 	int TOCEntriesCount( 0 );
 	int TOCEntriesSize( 0 );
 
-	int UnitConvSize;
+	int UnitConvSize( 0 );
 
 	bool WriteTabularFiles( false );
 
@@ -273,6 +333,8 @@ namespace OutputReportTabular {
 	Real64 gatherElecPurchased( 0.0 );
 	int meterNumElecSurplusSold( 0 );
 	Real64 gatherElecSurplusSold( 0.0 );
+	int meterNumElecStorage = ( 0 );
+	Real64 gatherElecStorage = ( 0.0 );
 	// for on site thermal source components on BEPS report
 	int meterNumWaterHeatRecovery( 0 );
 	Real64 gatherWaterHeatRecovery( 0.0 );
@@ -415,7 +477,190 @@ namespace OutputReportTabular {
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
 
+	namespace {
+		bool GatherMonthlyResultsForTimestepRunOnce( true );
+		bool UpdateTabularReportsGetInput( true );
+		bool GatherHeatGainReportfirstTime( true );
+		bool AllocateLoadComponentArraysDoAllocate( true );
+	}
+
 	// Functions
+	void
+	clear_state(){
+		GatherMonthlyResultsForTimestepRunOnce =  true;
+		UpdateTabularReportsGetInput = true;
+		GatherHeatGainReportfirstTime = true;
+		AllocateLoadComponentArraysDoAllocate = true;
+		OutputTableBinnedCount = 0;
+		BinResultsTableCount = 0;
+		BinResultsIntervalCount = 0;
+		MonthlyInputCount = 0;
+		sizeMonthlyInput = 0;
+		MonthlyFieldSetInputCount = 0;
+		sizeMonthlyFieldSetInput = 0;
+		MonthlyTablesCount = 0;
+		MonthlyColumnsCount = 0;
+		IsMonthGathered = Array1D_bool ( 12, false );
+		TOCEntriesCount = 0;
+		TOCEntriesSize = 0;
+		UnitConvSize = 0;
+		WriteTabularFiles = false;
+		unitsStyle = 0;
+		numStyles = 0;
+		TabularOutputFile = Array1D< std::ofstream * > ( maxNumStyles, { &csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream } );
+		del = Array1D_string ( maxNumStyles );
+		TableStyle = Array1D_int ( maxNumStyles, 0 );
+		timeInYear = 0.0;
+		displayTabularBEPS = false;
+		displayLEEDSummary = false;
+		displayTabularCompCosts = false;
+		displayTabularVeriSum = false;
+		displayComponentSizing = false;
+		displaySurfaceShadowing = false;
+		displayDemandEndUse = false;
+		displayAdaptiveComfort = false;
+		displaySourceEnergyEndUseSummary = false;
+		displayZoneComponentLoadSummary = false;
+		meterNumTotalsBEPS = Array1D_int ( numResourceTypes, 0 );
+		meterNumTotalsSource = Array1D_int ( numSourceTypes, 0 );
+		fuelfactorsused = Array1D_bool ( numSourceTypes, false );
+		ffUsed = Array1D_bool ( numResourceTypes, false );
+		SourceFactors = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		ffSchedUsed = Array1D_bool ( numResourceTypes, false );
+		ffSchedIndex = Array1D_int ( numResourceTypes, 0 );
+		meterNumEndUseBEPS = Array2D_int ( numResourceTypes, NumEndUses, 0 );
+		meterNumEndUseSubBEPS.deallocate();
+//		resourceTypeNames.deallocate();
+//		sourceTypeNames.deallocate();
+//		endUseNames.deallocate();
+		gatherTotalsBEPS = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		gatherTotalsBySourceBEPS = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		gatherTotalsSource = Array1D< Real64 > ( numSourceTypes, 0.0 );
+		gatherTotalsBySource= Array1D< Real64 > ( numSourceTypes, 0.0 );
+		gatherEndUseBEPS = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
+		gatherEndUseBySourceBEPS = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
+		gatherEndUseSubBEPS.deallocate();
+		gatherDemandTotal = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		gatherDemandEndUse = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
+		gatherDemandEndUseSub.deallocate();
+		gatherDemandTimeStamp = Array1D_int ( numResourceTypes, 0 );
+		gatherElapsedTimeBEPS = 0.0;
+		buildingGrossFloorArea = 0.0;
+		buildingConditionedFloorArea = 0.0;
+		fuelFactorSchedulesUsed = false;
+		meterNumPowerFuelFireGen = 0;
+		gatherPowerFuelFireGen = 0.0;
+		meterNumPowerPV = 0;
+		gatherPowerPV = 0.0;
+		meterNumPowerWind = 0;
+		gatherPowerWind = 0.0;
+		OverallNetEnergyFromStorage = 0.0;
+		meterNumPowerHTGeothermal = 0;
+		gatherPowerHTGeothermal = 0.0;
+		meterNumElecProduced = 0;
+		gatherElecProduced = 0.0;
+		meterNumElecPurchased = 0;
+		gatherElecPurchased = 0.0;
+		meterNumElecSurplusSold = 0;
+		gatherElecSurplusSold = 0.0;
+		meterNumWaterHeatRecovery = 0;
+		gatherWaterHeatRecovery = 0.0;
+		meterNumAirHeatRecoveryCool = 0;
+		gatherAirHeatRecoveryCool = 0.0;
+		meterNumAirHeatRecoveryHeat = 0;
+		gatherAirHeatRecoveryHeat = 0.0;
+		meterNumHeatHTGeothermal = 0;
+		gatherHeatHTGeothermal = 0.0;
+		meterNumHeatSolarWater = 0;
+		gatherHeatSolarWater = 0.0;
+		meterNumHeatSolarAir = 0;
+		gatherHeatSolarAir = 0.0;
+		meterNumRainWater = 0;
+		gatherRainWater = 0.0;
+		meterNumCondensate = 0;
+		gatherCondensate = 0.0;
+		meterNumGroundwater = 0;
+		gatherWellwater = 0.0;
+		meterNumMains = 0;
+		gatherMains = 0.0;
+		meterNumWaterEndUseTotal = 0;
+		gatherWaterEndUseTotal = 0.0;
+		sourceFactorElectric = 0.0;
+		sourceFactorNaturalGas = 0.0;
+		efficiencyDistrictCooling = 0.0;
+		efficiencyDistrictHeating = 0.0;
+		sourceFactorSteam = 0.0;
+		sourceFactorGasoline = 0.0;
+		sourceFactorDiesel = 0.0;
+		sourceFactorCoal = 0.0;
+		sourceFactorFuelOil1 = 0.0;
+		sourceFactorFuelOil2 = 0.0;
+		sourceFactorPropane = 0.0;
+		sourceFactorOtherFuel1 = 0.0;
+		sourceFactorOtherFuel2 = 0.0;
+		DesignDayName.deallocate();
+		DesignDayCount = 0;
+		radiantPulseUsed.deallocate();
+		radiantPulseTimestep.deallocate();
+		radiantPulseReceived.deallocate();
+		loadConvectedNormal.deallocate();
+		loadConvectedWithPulse.deallocate();
+		netSurfRadSeq.deallocate();
+		decayCurveCool.deallocate();
+		decayCurveHeat.deallocate();
+		ITABSFseq.deallocate();
+		TMULTseq.deallocate();
+		peopleInstantSeq.deallocate();
+		peopleLatentSeq.deallocate();
+		peopleRadSeq.deallocate();
+		peopleDelaySeq.deallocate();
+		lightInstantSeq.deallocate();
+		lightRetAirSeq.deallocate();
+		lightLWRadSeq.deallocate();
+		lightSWRadSeq.deallocate();
+		lightDelaySeq.deallocate();
+		equipInstantSeq.deallocate();
+		equipLatentSeq.deallocate();
+		equipRadSeq.deallocate();
+		equipDelaySeq.deallocate();
+		refrigInstantSeq.deallocate();
+		refrigRetAirSeq.deallocate();
+		refrigLatentSeq.deallocate();
+		waterUseInstantSeq.deallocate();
+		waterUseLatentSeq.deallocate();
+		hvacLossInstantSeq.deallocate();
+		hvacLossRadSeq.deallocate();
+		hvacLossDelaySeq.deallocate();
+		powerGenInstantSeq.deallocate();
+		powerGenRadSeq.deallocate();
+		powerGenDelaySeq.deallocate();
+		infilInstantSeq.deallocate();
+		infilLatentSeq.deallocate();
+		zoneVentInstantSeq.deallocate();
+		zoneVentLatentSeq.deallocate();
+		interZoneMixInstantSeq.deallocate();
+		interZoneMixLatentSeq.deallocate();
+		feneCondInstantSeq.deallocate();
+		feneSolarRadSeq.deallocate();
+		feneSolarDelaySeq.deallocate();
+		surfDelaySeq.deallocate();
+		maxUniqueKeyCount = 0;
+		OutputTableBinned.deallocate();
+		BinResults.deallocate();
+		BinResultsBelow.deallocate();
+		BinResultsAbove.deallocate();
+		BinObjVarID.deallocate();
+		BinStatistics.deallocate();
+		namedMonthly.deallocate();
+		MonthlyFieldSetInput.deallocate();
+		MonthlyInput.deallocate();
+		MonthlyTables.deallocate();
+		MonthlyColumns.deallocate();
+		TOCEntries.deallocate();
+		UnitConv.deallocate();
+
+		OutputReportTabular::ResetTabularReports();
+	}
 
 	void
 	UpdateTabularReports( int const IndexTypeKey ) // What kind of data to update (Zone, HVAC)
@@ -452,13 +697,13 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
+
 
 		if ( IndexTypeKey != ZoneTSReporting && IndexTypeKey != HVACTSReporting ) {
 			ShowFatalError( "Invalid reporting requested -- UpdateTabularReports" );
 		}
 
-		if ( GetInput ) {
+		if ( UpdateTabularReportsGetInput ) {
 			GetInputTabularMonthly();
 			OutputReportTabularAnnual::GetInputTabularAnnual();
 			GetInputTabularTimeBins();
@@ -469,7 +714,7 @@ namespace OutputReportTabular {
 			GetInputFuelAndPollutionFactors();
 			SetupUnitConversions();
 			AddTOCZoneLoadComponentTable();
-			GetInput = false;
+			UpdateTabularReportsGetInput = false;
 			date_and_time( _, _, _, td );
 		}
 		if ( DoOutputReporting && WriteTabularFiles && ( KindOfSim == ksRunPeriodWeather ) ) {
@@ -929,17 +1174,21 @@ namespace OutputReportTabular {
 		MonthlyTables.allocate( MonthlyTablesCount );
 		MonthlyColumns.allocate( MonthlyColumnsCount );
 		// Initialize tables and results
-		MonthlyTables.keyValue() = "";
-		MonthlyTables.firstColumn() = 0;
-		MonthlyTables.numColumns() = 0;
+		for ( auto & e : MonthlyTables ) {
+			e.keyValue.clear();
+			e.firstColumn = 0;
+			e.numColumns = 0;
+		}
 
-		MonthlyColumns.varName() = "";
-		MonthlyColumns.varNum() = 0;
-		MonthlyColumns.typeOfVar() = 0;
-		MonthlyColumns.avgSum() = 0;
-		MonthlyColumns.stepType() = 0;
-		MonthlyColumns.units() = "";
-		MonthlyColumns.aggType() = 0;
+		for ( auto & e : MonthlyColumns ) {
+			e.varName.clear();
+			e.varNum = 0;
+			e.typeOfVar = 0;
+			e.avgSum = 0;
+			e.stepType = 0;
+			e.units.clear();
+			e.aggType = 0;
+		}
 		for ( colNum = 1; colNum <= MonthlyColumnsCount; ++colNum ) {
 			MonthlyColumns( colNum ).reslt = 0.0;
 			MonthlyColumns( colNum ).timeStamp = 0;
@@ -1336,20 +1585,27 @@ namespace OutputReportTabular {
 			}
 		}
 		// clear the binning arrays to zeros
-		BinResults.mnth() = 0.0;
-		BinResultsBelow.mnth() = 0.0;
-		BinResultsAbove.mnth() = 0.0;
-		BinResults.hrly() = 0.0;
-		BinResultsBelow.hrly() = 0.0;
-		BinResultsAbove.hrly() = 0.0;
+		for ( auto & e : BinResults ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsBelow ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsAbove ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
 
 		// initialize statistics counters
-		BinStatistics.minimum() = huge( bigVal );
-		BinStatistics.maximum() = -huge( bigVal );
-		BinStatistics.n() = 0;
-		BinStatistics.sum() = 0.0;
-		BinStatistics.sum2() = 0.0;
-
+		for ( auto & e : BinStatistics ) {
+			e.minimum = huge( bigVal );
+			e.maximum = -huge( bigVal );
+			e.n = 0;
+			e.sum = 0.0;
+			e.sum2 = 0.0;
+		}
 	}
 
 	bool
@@ -1882,6 +2138,7 @@ namespace OutputReportTabular {
 			meterNumPowerPV = GetMeterIndex( "Photovoltaic:ElectricityProduced" );
 			meterNumPowerWind = GetMeterIndex( "WindTurbine:ElectricityProduced" );
 			meterNumPowerHTGeothermal = GetMeterIndex( "HTGeothermal:ElectricityProduced" );
+			meterNumElecStorage = GetMeterIndex( "ElectricStorage:ElectricityProduced" );
 			meterNumElecProduced = GetMeterIndex( "ElectricityProduced:Facility" );
 			meterNumElecPurchased = GetMeterIndex( "ElectricityPurchased:Facility" );
 			meterNumElecSurplusSold = GetMeterIndex( "ElectricitySurplusSold:Facility" );
@@ -1900,6 +2157,7 @@ namespace OutputReportTabular {
 			gatherElecProduced = 0.0;
 			gatherElecPurchased = 0.0;
 			gatherElecSurplusSold = 0.0;
+			gatherElecStorage = 0.0;
 
 			// get meter numbers for onsite thermal components on BEPS report
 			meterNumWaterHeatRecovery = GetMeterIndex( "HeatRecovery:EnergyTransfer" );
@@ -3276,6 +3534,7 @@ namespace OutputReportTabular {
 		static std::string const Component_Cost_Economics_Summary( "Component Cost Economics Summary" );
 		static std::string const Component_Sizing_Summary( "Component Sizing Summary" );
 		static std::string const Surface_Shadowing_Summary( "Surface Shadowing Summary" );
+		static std::string const Adaptive_Comfort_Summary( "Adaptive Comfort Summary" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3323,6 +3582,9 @@ namespace OutputReportTabular {
 				}
 				if ( displaySurfaceShadowing ) {
 					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Surface_Shadowing_Summary, Entire_Facility ) << "\">Surface Shadowing Summary</a>\n";
+				}
+				if ( displayAdaptiveComfort ){
+					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Adaptive_Comfort_Summary, Entire_Facility ) << "\">Adaptive Comfort Summary</a>\n";
 				}
 				for ( kReport = 1; kReport <= numReportName; ++kReport ) {
 					if ( reportName( kReport ).show ) {
@@ -3482,6 +3744,16 @@ namespace OutputReportTabular {
 						if ( OutputTableBinned( iInObj ).avgSum == isSum ) { // if it is a summed variable
 							curValue /= ( elapsedTime * SecInHour );
 						}
+						// round the value to the number of signficant digits used in the final output report
+						if ( curIntervalSize < 1 ) {
+							curValue = round( curValue * 10000.0 ) / 10000.0; // four significant digits
+						}
+						else if ( curIntervalSize >= 10 ) {
+							curValue = round( curValue ); // zero significant digits
+						}
+						else {
+							curValue = round( curValue * 100.0 ) / 100.0; // two significant digits
+						}
 						// check if the value is above the maximum or below the minimum value
 						// first before binning the value within the range.
 						if ( curValue < curIntervalStart ) {
@@ -3573,7 +3845,7 @@ namespace OutputReportTabular {
 		Real64 oldScanValue;
 		// local copies of some of the MonthlyColumns array references since
 		// profiling showed that they were slow.
-		static bool RunOnce( true );
+
 		static Array1D_int MonthlyColumnsTypeOfVar;
 		static Array1D_int MonthlyColumnsStepType;
 		static Array1D_int MonthlyColumnsAggType;
@@ -3583,18 +3855,29 @@ namespace OutputReportTabular {
 
 		if ( ! DoWeathSim ) return;
 
-		//create temporary arrays to speed processing of these arrays
-		if ( RunOnce ) {
-			//MonthlyColumns
-			MonthlyColumnsTypeOfVar = MonthlyColumns.typeOfVar();
-			MonthlyColumnsStepType = MonthlyColumns.stepType();
-			MonthlyColumnsAggType = MonthlyColumns.aggType();
-			MonthlyColumnsVarNum = MonthlyColumns.varNum();
-			//MonthlyTables
-			MonthlyTablesNumColumns = MonthlyTables.numColumns();
+		// create temporary arrays to speed processing of these arrays
+		if ( GatherMonthlyResultsForTimestepRunOnce ) {
+			// MonthlyColumns
+			MonthlyColumnsTypeOfVar.allocate( MonthlyColumns.I() );
+			MonthlyColumnsStepType.allocate( MonthlyColumns.I() );
+			MonthlyColumnsAggType.allocate( MonthlyColumns.I() );
+			MonthlyColumnsVarNum.allocate( MonthlyColumns.I() );
+			for ( int i = MonthlyColumns.l(), e = MonthlyColumns.u(); i <= e; ++i ) {
+				auto const & col( MonthlyColumns( i ) );
+				MonthlyColumnsTypeOfVar( i ) = col.typeOfVar;
+				MonthlyColumnsStepType( i ) = col.stepType;
+				MonthlyColumnsAggType( i ) = col.aggType;
+				MonthlyColumnsVarNum( i ) = col.varNum;
+			}
 
-			//set flag so this block is only executed once
-			RunOnce = false;
+			// MonthlyTables
+			MonthlyTablesNumColumns.allocate( MonthlyTables.I() );
+			for ( int i = MonthlyTables.l(), e = MonthlyTables.u(); i <= e; ++i ) {
+				MonthlyTablesNumColumns( i ) = MonthlyTables( i ).numColumns;
+			}
+
+			// set flag so this block is only executed once
+			GatherMonthlyResultsForTimestepRunOnce = false;
 		}
 
 		elapsedTime = TimeStepSys;
@@ -3968,6 +4251,7 @@ namespace OutputReportTabular {
 			gatherElecProduced += GetCurrentMeterValue( meterNumElecProduced );
 			gatherElecPurchased += GetCurrentMeterValue( meterNumElecPurchased );
 			gatherElecSurplusSold += GetCurrentMeterValue( meterNumElecSurplusSold );
+			gatherElecStorage += GetCurrentMeterValue( meterNumElecStorage );
 			// gather the onsite thermal components
 			gatherWaterHeatRecovery += GetCurrentMeterValue( meterNumWaterHeatRecovery );
 			gatherAirHeatRecoveryCool += GetCurrentMeterValue( meterNumAirHeatRecoveryCool );
@@ -4355,7 +4639,7 @@ namespace OutputReportTabular {
 		static Real64 bldgHtPk( 0.0 );
 		static Real64 bldgClPk( 0.0 );
 		static Real64 timeStepRatio( 0.0 );
-		static bool firstTime( true );
+
 		Real64 mult; // zone list and group multipliers
 
 		int ActualTimeMin;
@@ -4366,12 +4650,12 @@ namespace OutputReportTabular {
 
 		if ( IndexTypeKey == stepTypeZone ) return; //only add values over the HVAC timestep basis
 
-		if ( firstTime ) {
+		if ( GatherHeatGainReportfirstTime ) {
 			radiantHeat.allocate( NumOfZones );
 			radiantCool.allocate( NumOfZones );
 			ATUHeat.allocate( NumOfZones );
 			ATUCool.allocate( NumOfZones );
-			firstTime = false;
+			GatherHeatGainReportfirstTime = false;
 		}
 		//clear the radiant surface accumulation variables
 		radiantHeat = 0.0;
@@ -5494,7 +5778,6 @@ namespace OutputReportTabular {
 		//   na
 
 		// Return value
-		std::string resultString; // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5509,36 +5792,25 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string::size_type startPos = 0;
 
-		std::string procIn; // processed input string
-		std::string::size_type startTab;
-		std::string::size_type endTab;
-		std::string::size_type inLen;
+		auto endPos = inString.find_first_of( tb );
+		if ( colNum == 1 ) {
+			if ( endPos == std::string::npos ) return inString;
+			return inString.substr( startPos, endPos - startPos );
+		}
+		if ( endPos == std::string::npos ) return "";
 
-		procIn = inString;
-		inLen = len( procIn );
-		startTab = std::string::npos;
-		endTab = index( procIn, tb );
-		if ( endTab != std::string::npos ) {
-			procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-		} else {
-			endTab = inLen; // one character past the end of string since substract one when extracting
+		int numCols = 1;
+		while ( numCols < colNum ) {
+			startPos = endPos + 1;
+			endPos = inString.find_first_of( tb, startPos );
+			++numCols;
+			if ( endPos == std::string::npos ) break;
 		}
-		for ( int i = 2; i <= colNum; ++i ) { // already have first column identified so do loop only if for column 2 or greater.
-			startTab = endTab;
-			endTab = index( procIn, tb );
-			if ( endTab != std::string::npos ) {
-				procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-			} else {
-				endTab = inLen; // one character past the end of string since substract one when extracting
-			}
-		}
-		if ( startTab < endTab ) {
-			resultString = procIn.substr( startTab + 1, endTab - startTab - 1 ); // extract but leave tab characters out
-		} else {
-			resultString = "";
-		}
-		return resultString;
+		if ( colNum > numCols ) return "";
+		if ( endPos == std::string::npos ) endPos = inString.size();
+		return inString.substr( startPos, endPos - startPos );
 	}
 
 	void
@@ -6460,11 +6732,11 @@ namespace OutputReportTabular {
 			columnWidth = 14; //array assignment - same for all columns
 			tableBody.allocate( curIntervalCount + 3, 39 );
 			tableBody = "";
-			columnHead = "-";
+			columnHead = "- [hr]";
 			tableBody( 1, 1 ) = "less than";
 			tableBody( 1, 2 ) = RealToStr( curIntervalStart, numIntervalDigits );
 			for ( nCol = 1; nCol <= curIntervalCount; ++nCol ) {
-				columnHead( nCol + 1 ) = IntToStr( nCol );
+				columnHead( nCol + 1 ) = IntToStr( nCol ) + " [hr]";
 				//beginning of interval
 				tableBody( nCol + 1, 1 ) = RealToStr( curIntervalStart + ( nCol - 1 ) * curIntervalSize, numIntervalDigits ) + "<=";
 				//end of interval
@@ -6605,7 +6877,7 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
-		using ManageElectricPower::ElecStorage;
+		using DataWater::StorageTankDataStruct;
 		using ManageElectricPower::NumElecStorageDevices;
 		using DataHVACGlobals::deviationFromSetPtThresholdHtg;
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
@@ -6675,7 +6947,6 @@ namespace OutputReportTabular {
 		std::string curNameWithSIUnits;
 		std::string curNameAndUnits;
 		int indexUnitConv;
-		std::string tableString;
 		Real64 processFraction;
 		Real64 processElecCost;
 		Real64 processGasCost;
@@ -6793,7 +7064,9 @@ namespace OutputReportTabular {
 
 			// get change in overall state of charge for electrical storage devices.
 			if ( NumElecStorageDevices > 0 ) {
-				OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge() ) );
+				// All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not necessary
+				// OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
+				OverallNetEnergyFromStorage = gatherElecStorage;
 				OverallNetEnergyFromStorage /= largeConversionFactor;
 			} else {
 				OverallNetEnergyFromStorage = 0.0;
@@ -7865,8 +8138,8 @@ namespace OutputReportTabular {
 			tableBody( 1, 4 ) = RealToStr( totalOnsiteWater / waterConversionFactor, 2 );
 
 			if ( allocated( WaterStorage ) ) {
-				initialStorage = sum( WaterStorage.InitialVolume() );
-				finalStorage = sum( WaterStorage.ThisTimeStepVolume() );
+				initialStorage = sum( WaterStorage, &StorageTankDataStruct::InitialVolume );
+				finalStorage = sum( WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume );
 				StorageChange = initialStorage - finalStorage;
 			} else {
 				initialStorage = 0.0;
@@ -8048,8 +8321,6 @@ namespace OutputReportTabular {
 		Real64 largeConversionFactor;
 		Real64 areaConversionFactor;
 		Real64 convBldgCondFloorArea;
-		std::string curNameWithSIUnits;
-		std::string curNameAndUnits;
 
 		if ( displaySourceEnergyEndUseSummary ) {
 			// show the headers of the report
@@ -8275,7 +8546,6 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
-		using ManageElectricPower::ElecStorage;
 		using ManageElectricPower::NumElecStorageDevices;
 
 		// Locals
@@ -9046,6 +9316,7 @@ namespace OutputReportTabular {
 		using DataEnvironment::RunPeriodStartDayOfWeek;
 		using DataEnvironment::WeatherFileLocationTitle;
 		using DataHeatBalance::Zone;
+		using DataHeatBalance::ZoneData;
 		using DataHeatBalance::BuildingAzimuth;
 		using DataHeatBalance::TotLights;
 		using DataHeatBalance::Lights;
@@ -9558,8 +9829,10 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 			}
 
-			if ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) > 0.0 || sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) > 0.0 ) {
-				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
+			Real64 const totExtGrossWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossWallArea_Multiplied ) );
+			Real64 const totExtGrossGroundWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied ) );
+			if ( totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0 ) {
+				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied ) ) / ( totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied );
 				if ( pdiff > 0.019 ) {
 					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls" );
 					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100.0, 1 ) + "% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions." );
@@ -9569,8 +9842,8 @@ namespace OutputReportTabular {
 					//         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
 					ShowContinueError( "Check classes of surfaces and tilts for discrepancies." );
 					ShowContinueError( "Total wall area by ASHRAE 90.1 definition=" + stripped( RealToStr( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ), 3 ) ) + " m2." );
-					ShowContinueError( "Total exterior wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ), 3 ) ) + " m2." );
-					ShowContinueError( "Total ground contact wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ), 3 ) ) + " m2." );
+					ShowContinueError( "Total exterior wall area from user entered classes=" + stripped( RealToStr( totExtGrossWallArea_Multiplied, 3 ) ) + " m2." );
+					ShowContinueError( "Total ground contact wall area from user entered classes=" + stripped( RealToStr( totExtGrossGroundWallArea_Multiplied, 3 ) ) + " m2." );
 				}
 			}
 			//---- Space Summary Sub-Table
@@ -10163,7 +10436,7 @@ namespace OutputReportTabular {
 				}
 				if ( foundEntry == 0 ) break; //leave main loop - all items put into tables
 				//clear active items
-				CompSizeTableEntry.active() = false;
+				for ( auto & e : CompSizeTableEntry ) e.active = false;
 				//make an unwritten item that is of the same type active - these will be the
 				//entries for the particular subtable.
 				for ( iTableEntry = 1; iTableEntry <= numCompSizeTableEntry; ++iTableEntry ) {
@@ -10521,9 +10794,9 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool DoAllocate( true );
 
-		if ( DoAllocate ) {
+
+		if ( AllocateLoadComponentArraysDoAllocate ) {
 			//For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
 			radiantPulseUsed.allocate( {0,TotDesDays + TotRunDesPersDays}, NumOfZones );
 			radiantPulseUsed = 0.0;
@@ -10611,11 +10884,11 @@ namespace OutputReportTabular {
 			//  feneSolarInstantSeq = 0.0d0
 			feneSolarRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			feneSolarRadSeq = 0.0;
-			feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+			feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			feneSolarDelaySeq = 0.0;
 			surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			surfDelaySeq = 0.0;
-			DoAllocate = false;
+			AllocateLoadComponentArraysDoAllocate = false;
 		}
 	}
 
@@ -11237,7 +11510,6 @@ namespace OutputReportTabular {
 		Real64 totalGrandTotal;
 		Real64 powerConversion;
 		int tempConvIndx; // temperature conversion index
-		std::string stringWithTemp;
 		int curExtBoundCond;
 		Real64 mult; // zone multiplier
 
@@ -11753,9 +12025,9 @@ namespace OutputReportTabular {
 						if ( ZoneNum != iZone ) continue;
 						if ( ZoneNum == 0 ) continue;
 						if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
-						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Cooling," << Zone( iZone ).Name << Surface( kSurf ).Name; }
+						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Cooling," << Zone( iZone ).Name << ',' << Surface( kSurf ).Name; }
 						for ( jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
-							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << decayCurveCool( jTime, kSurf ); }
+							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << ',' << decayCurveCool( jTime, kSurf ); }
 						}
 						{ IOFlags flags; flags.ADVANCE( "YES" ); gio::write( OutputFileInits, "()", flags ); } //put a line feed at the end of the line
 					}
@@ -11941,12 +12213,12 @@ namespace OutputReportTabular {
 
 					//DOAS
 					tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
-					grandTotalRow( cSensDelay ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+					totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+					grandTotalRow( cSensDelay ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
 
 					tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
-					grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+					totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+					grandTotalRow( cLatent ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
 
 					//INFILTRATION
 					seqData = infilInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
@@ -12234,9 +12506,9 @@ namespace OutputReportTabular {
 						if ( ZoneNum != iZone ) continue;
 						if ( ZoneNum == 0 ) continue;
 						if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
-						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Heating," << Zone( iZone ).Name << Surface( kSurf ).Name; }
+						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Heating," << Zone( iZone ).Name << ',' << Surface( kSurf ).Name; }
 						for ( jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
-							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << decayCurveHeat( jTime, kSurf ); }
+							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << ',' << decayCurveHeat( jTime, kSurf ); }
 						}
 						{ IOFlags flags; flags.ADVANCE( "YES" ); gio::write( OutputFileInits, "()", flags ); } //put a line feed at the end of the line
 					}
@@ -13107,6 +13379,334 @@ namespace OutputReportTabular {
 			}
 		}
 	}
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	//    ROUTINES TO RESET GATHERED VALUES TO ZERO
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	void
+	ResetTabularReports()
+	{
+		// Jason Glazer - October 2015
+		// Reset all gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		using ThermalComfort::ResetThermalComfortSimpleASH55;
+		using ThermalComfort::ResetSetPointMet;
+		using OutputProcessor::isFinalYear;
+
+		gatherElapsedTimeBEPS = 0.0;
+		ResetMonthlyGathering();
+		OutputReportTabularAnnual::ResetAnnualGathering();
+		ResetBinGathering();
+		ResetBEPSGathering();
+		ResetSourceEnergyEndUseGathering();
+		ResetPeakDemandGathering();
+		ResetHeatGainGathering();
+		ResetRemainingPredefinedEntries();
+		ResetThermalComfortSimpleASH55();
+		ResetSetPointMet();
+		ResetAdaptiveComfort();
+		isFinalYear = true;
+	}
+
+	void
+	ResetMonthlyGathering(){
+		// Jason Glazer - October 2015
+		// Reset all monthly gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		int iInput;
+		int jTable;
+		int kColumn;
+		int curTable;
+		int curCol;
+		static Real64 BigNum( 0.0 );
+
+		for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
+			for ( jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
+				curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
+				for ( kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
+					curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
+					MonthlyColumns( curCol ).timeStamp = 0;
+					MonthlyColumns( curCol ).duration = 0.0;
+					if ( MonthlyColumns( curCol ).aggType == aggTypeMaximum || MonthlyColumns( curCol ).aggType == aggTypeMaximumDuringHoursShown ){
+						MonthlyColumns( curCol ).reslt = -huge( BigNum );
+					}
+					else if ( MonthlyColumns( curCol ).aggType == aggTypeMinimum || MonthlyColumns( curCol ).aggType == aggTypeMinimumDuringHoursShown ){
+						MonthlyColumns( curCol ).reslt = huge( BigNum );
+					}
+					else {
+						MonthlyColumns( curCol ).reslt = 0.0;
+					}
+				}
+			}
+		}
+	}
+
+	void
+	ResetBinGathering(){
+		// Jason Glazer - October 2015
+		// Reset all timebins gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+
+		// clear the binning arrays to zeros
+		for ( auto & e : BinResults ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsBelow ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsAbove ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+
+		// re-initialize statistics counters
+		for ( auto & e : BinStatistics ) {
+			e.minimum = huge( bigVal );
+			e.maximum = -huge( bigVal );
+			e.n = 0;
+			e.sum = 0.0;
+			e.sum2 = 0.0;
+		}
+	}
+
+	void
+	ResetBEPSGathering(){
+		// Jason Glazer - October 2015
+		// Reset all ABUPS gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherTotalsBEPS = 0.0;
+		gatherEndUseBEPS = 0.0;
+		gatherEndUseSubBEPS = 0.0;
+		gatherTotalsSource = 0.0;
+		// reset the specific componenents being gathered
+		gatherPowerFuelFireGen = 0.0;
+		gatherPowerPV = 0.0;
+		gatherPowerWind = 0.0;
+		gatherPowerHTGeothermal = 0.0;
+		gatherElecProduced = 0.0;
+		gatherElecPurchased = 0.0;
+		gatherElecSurplusSold = 0.0;
+		gatherElecStorage = 0.0;
+		gatherWaterHeatRecovery = 0.0;
+		gatherAirHeatRecoveryCool = 0.0;
+		gatherAirHeatRecoveryHeat = 0.0;
+		gatherHeatHTGeothermal = 0.0;
+		gatherHeatSolarWater = 0.0;
+		gatherHeatSolarAir = 0.0;
+		gatherRainWater = 0.0;
+		gatherCondensate = 0.0;
+		gatherWellwater = 0.0;
+		gatherMains = 0.0;
+		gatherWaterEndUseTotal = 0.0;
+	}
+
+	void
+	ResetSourceEnergyEndUseGathering(){
+		// Jason Glazer - October 2015
+		// Reset all source energy end use table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherTotalsBySourceBEPS = 0.0;
+		gatherEndUseBySourceBEPS = 0.0;
+	}
+
+	void
+	ResetPeakDemandGathering(){
+		// Jason Glazer - October 2015
+		// Reset all demand end use components table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherDemandTotal = 0.0;
+		gatherDemandTimeStamp = 0;
+		gatherDemandEndUse = 0.0;
+		gatherDemandEndUseSub = 0.0;
+
+	}
+
+	void
+	ResetHeatGainGathering(){
+		// Jason Glazer - October 2015
+		// Reset all sensible heat gas summary report gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		using DataHeatBalance::ZonePreDefRep;
+		using DataHeatBalance::BuildingPreDefRep;
+		int iZone;
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			ZonePreDefRep( iZone ).SHGSAnPeoplAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnLiteAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacHt = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacCl = 0.;
+			ZonePreDefRep( iZone ).SHGSAnIzaAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnIzaRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnWindAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnWindRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnInfilAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnInfilRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnEquipAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnEquipRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacATUHt = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacATUCl = 0.;
+			ZonePreDefRep( iZone ).SHGSAnSurfHt = 0.;
+			ZonePreDefRep( iZone ).SHGSAnSurfCl = 0.;
+			ZonePreDefRep( iZone ).SHGSAnOtherAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnOtherRem = 0.;
+			ZonePreDefRep( iZone ).htPeak = 0.;
+			ZonePreDefRep( iZone ).htPtTimeStamp = 0;
+			ZonePreDefRep( iZone ).SHGSHtHvacHt = 0.;
+			ZonePreDefRep( iZone ).SHGSHtHvacCl = 0.;
+			ZonePreDefRep( iZone ).SHGSHtSurfHt = 0.;
+			ZonePreDefRep( iZone ).SHGSHtSurfCl = 0.;
+			ZonePreDefRep( iZone ).SHGSHtHvacATUHt = 0.;
+			ZonePreDefRep( iZone ).SHGSHtHvacATUCl = 0.;
+			ZonePreDefRep( iZone ).SHGSHtPeoplAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtLiteAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtEquipAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtEquipRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtWindAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtWindRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtIzaAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtIzaRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtInfilAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtInfilRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtOtherAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtOtherRem = 0.;
+			ZonePreDefRep( iZone ).clPeak = 0.;
+			ZonePreDefRep( iZone ).clPtTimeStamp = 0;
+			ZonePreDefRep( iZone ).SHGSClHvacHt = 0.;
+			ZonePreDefRep( iZone ).SHGSClHvacCl = 0.;
+			ZonePreDefRep( iZone ).SHGSClSurfHt = 0.;
+			ZonePreDefRep( iZone ).SHGSClSurfCl = 0.;
+			ZonePreDefRep( iZone ).SHGSClHvacATUHt = 0.;
+			ZonePreDefRep( iZone ).SHGSClHvacATUCl = 0.;
+			ZonePreDefRep( iZone ).SHGSClPeoplAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClLiteAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClEquipAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClEquipRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClWindAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClWindRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClIzaAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClIzaRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClInfilAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClInfilRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClOtherAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClOtherRem = 0.;
+		}
+
+		BuildingPreDefRep.htPeak = 0.;
+		BuildingPreDefRep.htPtTimeStamp = 0;
+		BuildingPreDefRep.SHGSHtHvacHt = 0.0;
+		BuildingPreDefRep.SHGSHtHvacCl = 0.0;
+		BuildingPreDefRep.SHGSHtHvacATUHt = 0.0;
+		BuildingPreDefRep.SHGSHtHvacATUCl = 0.0;
+		BuildingPreDefRep.SHGSHtSurfHt = 0.0;
+		BuildingPreDefRep.SHGSHtSurfCl = 0.0;
+		BuildingPreDefRep.SHGSHtPeoplAdd = 0.0;
+		BuildingPreDefRep.SHGSHtLiteAdd = 0.0;
+		BuildingPreDefRep.SHGSHtEquipAdd = 0.0;
+		BuildingPreDefRep.SHGSHtWindAdd = 0.0;
+		BuildingPreDefRep.SHGSHtIzaAdd = 0.0;
+		BuildingPreDefRep.SHGSHtInfilAdd = 0.0;
+		BuildingPreDefRep.SHGSHtOtherAdd = 0.0;
+		BuildingPreDefRep.SHGSHtEquipRem = 0.0;
+		BuildingPreDefRep.SHGSHtWindRem = 0.0;
+		BuildingPreDefRep.SHGSHtIzaRem = 0.0;
+		BuildingPreDefRep.SHGSHtInfilRem = 0.0;
+		BuildingPreDefRep.SHGSHtOtherRem = 0.0;
+
+		BuildingPreDefRep.clPeak = 0.;
+		BuildingPreDefRep.clPtTimeStamp = 0;
+		BuildingPreDefRep.SHGSClHvacHt = 0.0;
+		BuildingPreDefRep.SHGSClHvacCl = 0.0;
+		BuildingPreDefRep.SHGSClSurfHt = 0.0;
+		BuildingPreDefRep.SHGSClSurfCl = 0.0;
+		BuildingPreDefRep.SHGSClHvacATUHt = 0.0;
+		BuildingPreDefRep.SHGSClHvacATUCl = 0.0;
+		BuildingPreDefRep.SHGSClPeoplAdd = 0.0;
+		BuildingPreDefRep.SHGSClLiteAdd = 0.0;
+		BuildingPreDefRep.SHGSClEquipAdd = 0.0;
+		BuildingPreDefRep.SHGSClWindAdd = 0.0;
+		BuildingPreDefRep.SHGSClIzaAdd = 0.0;
+		BuildingPreDefRep.SHGSClInfilAdd = 0.0;
+		BuildingPreDefRep.SHGSClOtherAdd = 0.0;
+		BuildingPreDefRep.SHGSClEquipRem = 0.0;
+		BuildingPreDefRep.SHGSClWindRem = 0.0;
+		BuildingPreDefRep.SHGSClIzaRem = 0.0;
+		BuildingPreDefRep.SHGSClInfilRem = 0.0;
+		BuildingPreDefRep.SHGSClOtherRem = 0.0;
+
+	}
+
+	void
+	ResetRemainingPredefinedEntries(){
+		// Jason Glazer - October 2015
+		// Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		using DataHeatBalance::TotLights;
+		using DataHeatBalance::Lights;
+		using ExteriorEnergyUse::ExteriorLights;
+		using ExteriorEnergyUse::NumExteriorLights;
+		using DataHeatBalance::Zone;
+		using DataHeatBalance::ZonePreDefRep;
+
+		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+		int iLight;
+		int iZone;
+
+		for ( iLight = 1; iLight <= TotLights; ++iLight ) {
+			Lights( iLight ).SumTimeNotZeroCons = 0.;
+			Lights( iLight ).SumConsumption = 0.;
+		}
+		for ( iLight = 1; iLight <= NumExteriorLights; ++iLight ) {
+			ExteriorLights( iLight ).SumTimeNotZeroCons = 0.;
+			ExteriorLights( iLight ).SumConsumption = 0.;
+		}
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			if ( Zone( iZone ).SystemZoneNodeNumber >= 0 ) { //conditioned zones only
+				if ( Zone( iZone ).isNominalOccupied ) {
+					ZonePreDefRep( iZone ).MechVentVolTotal = 0.;
+					ZonePreDefRep( iZone ).MechVentVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).InfilVolTotal = 0.;
+					ZonePreDefRep( iZone ).InfilVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).AFNInfilVolTotal = 0.;
+					ZonePreDefRep( iZone ).AFNInfilVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).SimpVentVolTotal = 0.;
+					ZonePreDefRep( iZone ).SimpVentVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).TotTimeOcc = 0.;
+				}
+			}
+		}
+	}
+
+	void
+	ResetAdaptiveComfort()
+	{
+	// Jason Glazer - October 2015
+	// Reset accumulation variable for adaptive comfort report to zero for multi-year simulations
+	// so that only last year is reported in tabular reports
+		using DataHeatBalance::People;
+		using DataHeatBalance::TotPeople;
+		int i;
+		if ( displayAdaptiveComfort && TotPeople > 0 ) {
+			for ( i = 1; i <= TotPeople; ++i ) {
+				if ( People( i ).AdaptiveASH55 ) {
+					People( i ).TimeNotMetASH5590 = 0.;
+					People( i ).TimeNotMetASH5580 = 0.;
+				}
+				if ( People( i ).AdaptiveCEN15251 ) {
+					People( i ).TimeNotMetCEN15251CatI = 0.;
+					People( i ).TimeNotMetCEN15251CatII = 0.;
+					People( i ).TimeNotMetCEN15251CatIII = 0.;
+				}
+			}
+		}
+	}
+
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -14388,29 +14988,6 @@ Label900: ;
 		}
 		return getSpecificUnitIndex;
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutputReportTabular
 

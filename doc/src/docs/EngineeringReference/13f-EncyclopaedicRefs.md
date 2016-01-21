@@ -1658,7 +1658,7 @@ Adaptive comfort model, intended for use in naturally ventilated buildings, dete
 
 In ASHRAE Standard 55, the monthly mean outdoor air temperature, used in the adaptive comfort model, is defined as the simple running average of the previous thirty daily average outdoor air temperatures.
 
-The model defines two comfort regions: 80% Acceptability, and 90% Acceptability. If the monthly mean outdoor air temperature is not within the specified domain, the model is not applicable.
+The model defines two comfort regions: 80% Acceptability, and 90% Acceptability. If the monthly mean outdoor air temperature is not within the specified domain of 10.0 to 33.5C, the model is not applicable.
 
 ![](media/image6814.png)
 
@@ -1700,7 +1700,7 @@ For a detailed description of this model, please see *ASHRAE Standard 55-2010, T
 
 The EN15251-2007 is similar to ASHRAE 55-2010, but with slightly different curves of the indoor operative temperature and acceptability limits (Fig. 2). The model, intended for use in naturally ventilated buildings, determines the acceptability of indoor conditions given the 7-day weighted mean outdoor air temperature and the indoor operative temperature. The 7-day weighted mean outdoor air temperature (T<sub>rm</sub>) is defined as the weighted running average of the previous 7 daily average outdoor air temperatures.
 
-This weighted running average is calculated from a full annual weather file that must be specified for the simulation. This is used as an index for occupant adaptation to outdoor conditions, and determines the acceptability of indoor conditions. The model also accounts for people’s clothing adaptation in naturally conditioned spaces by relating the acceptable range of indoor temperatures to the outdoor climate, so it is not necessary to estimate the clothing values for the space. No humidity or air-speed limits are required when this option is used. The model defines three comfort regions: Category I (90%) Acceptability, Category II (80%) Acceptability, and Category III (65%) Acceptability. If T<sub>rm</sub> is not within the specified domain, the model is not applicable.
+This weighted running average is calculated from a full annual weather file that must be specified for the simulation. This is used as an index for occupant adaptation to outdoor conditions, and determines the acceptability of indoor conditions. The model also accounts for people’s clothing adaptation in naturally conditioned spaces by relating the acceptable range of indoor temperatures to the outdoor climate, so it is not necessary to estimate the clothing values for the space. No humidity or air-speed limits are required when this option is used. The model defines three comfort regions: Category I (90%) Acceptability, Category II (80%) Acceptability, and Category III (65%) Acceptability. If T<sub>rm</sub> is not within the specified domain of 10.0 to 30.0C, the model is not applicable.
 
 ![](media/image6819.png)
 
@@ -5243,43 +5243,174 @@ The fraction of evaporation rate, *f*, also depends mainly on the soil cover and
 
 Relative humidity, *r<sub>a</sub>*, is also calculated from EnergyPlus weather data by averaging individual relative humidity values of the whole year.
 
-The soil thermal diffusivity (m<sup>2</sup>/s), *α<sub>s</sub>*, and conductivity (W/m°C), *k<sub>s</sub>*, varies with the density and moisture content. According to the 1991 ASHRAE Handbook of HVAC Applications (Table 4, pp. 11.4), the following values are recommended under different conditions.
+The soil thermal diffusivity (m<sup>2</sup>/s), *α<sub>s</sub>*, and conductivity (W/m°C), *k<sub>s</sub>*, varies with the density and moisture content. From Table 3.3, pg. 26 of ASHRAE's Ground Source Heat Pumpss--Design of Geothermal Systems for Commercial and Institutional Buildings, 1997, the following values are recommended under different conditions.
 
-<table class="table table-striped">
-<tr>
-<td>Soil condition</td>
-<td>k<sub>s</sub> (W/m°C)</td>
-<td>α<sub>s</sub> x 10<sup>-7</sup> (m<sup>2</sup>/s)</td>
-</tr>
-<tr>
-<td>Heavy soil, saturated</td>
-<td>2.42</td>
-<td>9.04</td>
-</tr>
-<tr>
-<td>Heavy soil, damp solid masonry</td>
-<td>1.30</td>
-<td>6.45</td>
-</tr>
-<tr>
-<td>Heavy soil, dry</td>
-<td>0.865</td>
-<td>5.16</td>
-</tr>
-<tr>
-<td>Light soil, damp</td>
-<td>-</td>
-<td>-</td>
-</tr>
-<tr>
-<td>Light soil, dry</td>
-<td>0.346</td>
-<td>2.80</td>
-</tr>
-
+<table>
+  <tr>
+    <th></th>
+    <th>Moisture Content</th>
+    <th>5%</th>
+    <th>5%</th>
+    <th>10%</th>
+    <th>10%</th>
+    <th>15%</th>
+    <th>15%</th>
+    <th>20%</th>
+    <th>20%</th>
+  </tr>
+  <tr>
+    <td>Soil <br>Type</td>
+    <td>Dry Density<br>[kg/m3]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+  </tr>
+  <tr>
+    <td>Coarse 100%<br>Sand</td>
+    <td>1922</td>
+    <td>2.77</td>
+    <td>1.34E-06</td>
+    <td>2.94</td>
+    <td>1.24E-06</td>
+    <td>3.29</td>
+    <td>1.18E-06</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>1602</td>
+    <td>1.90</td>
+    <td>1.18E-06</td>
+    <td>2.34</td>
+    <td>1.18E-06</td>
+    <td>2.51</td>
+    <td>1.08E-06</td>
+    <td>2.68</td>
+    <td>8.82E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>1281</td>
+    <td>1.38</td>
+    <td>1.18E-06</td>
+    <td>1.56</td>
+    <td>9.14E-07</td>
+    <td>1.56</td>
+    <td>8.06E-07</td>
+    <td>1.47</td>
+    <td>6.99E-07</td>
+  </tr>
+  <tr>
+    <td>Fine Grain<br>100% Clay</td>
+    <td>1922</td>
+    <td>1.21</td>
+    <td>5.91E-07</td>
+    <td>1.21</td>
+    <td>4.84E-07</td>
+    <td>1.64</td>
+    <td>5.70E-07</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>1602</td>
+    <td>0.95</td>
+    <td>5.70E-07</td>
+    <td>0.95</td>
+    <td>4.73E-07</td>
+    <td>1.12</td>
+    <td>4.73E-07</td>
+    <td>1.21</td>
+    <td>5.16E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>1281</td>
+    <td>0.69</td>
+    <td>4.84E-07</td>
+    <td>0.74</td>
+    <td>4.62E-07</td>
+    <td>0.81</td>
+    <td>4.73E-07</td>
+    <td>0.87</td>
+    <td>4.09E-07</td>
+  </tr>
 </table>
 
+The following information is also available for reference from Table 4, pg. 34.6 of the ASHRAE Applications Handbook, 2015.
 
+<table>
+  <tr>
+    <th>Soils</th>
+    <th>Moisture<br>Content</th>
+    <th>Density<br>[kg/m3]</th>
+    <th>k<br>[W/m-K]</th>
+    <th>α<sub>s</sub><br>[m^2/s]</th>
+  </tr>
+  <tr>
+    <td>Heavy clay</td>
+    <td>15% water</td>
+    <td>1922</td>
+    <td>1.558</td>
+    <td>5.914E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>5% water</td>
+    <td>1922</td>
+    <td>1.212</td>
+    <td>6.452E-07</td>
+  </tr>
+  <tr>
+    <td>Light clay</td>
+    <td>15% water</td>
+    <td>1281</td>
+    <td>0.865</td>
+    <td>4.624E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>5% water</td>
+    <td>1281</td>
+    <td>0.692</td>
+    <td>4.839E-07</td>
+  </tr>
+  <tr>
+    <td>Heavy sand</td>
+    <td>15% water</td>
+    <td>1922</td>
+    <td>3.115</td>
+    <td>1.129E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>5% water</td>
+    <td>1922</td>
+    <td>2.596</td>
+    <td>1.344E-06</td>
+  </tr>
+  <tr>
+    <td>Light sand</td>
+    <td>15% water</td>
+    <td>1281</td>
+    <td>1.558</td>
+    <td>8.065E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>5% water</td>
+    <td>1281</td>
+    <td>1.385</td>
+    <td>9.677E-07</td>
+  </tr>
+</table>
 
 Annual angular frequency, *w*, is equal to 1.992 x 10<sup>-7</sup>rad/s, and dampening depth (m), D, is calculated from the following equation:
 

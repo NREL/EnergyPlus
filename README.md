@@ -42,7 +42,7 @@ These instructions were written around Ubuntu, but should be valid for other Deb
 2. Install cmake tools and the cmake "GUI", for Debian/Ubuntu it should be as simple as apt-get cmake cmake-curses-gui.
 3. Navigate in the terminal to the root of the build tree.  You will launch the cmake GUI from this location.  The program must be passed an argument that specifies the location of the root of the source tree.  For example, if the build directory is directly next to the source directory, the command could be called for the default build environment by calling the GUI as such: ```ccmake ../EnergyPlusTeam```
 
-4. Configure the build in ccmake, then generate the make files. 
+4. Configure the build in ccmake, then generate the make files. By default, the build type is set to "Release", but this can be changed to "Debug" (or other build types) from within ccmake.
 5. Since you are already in the build folder, just run make -j N, where N is the number of process you'd like to employ to build the project.
 
 ## Mac
@@ -51,10 +51,10 @@ These instructions were written for Mac OS X Version 10.9.  Newer versions of OS
 
 1. Install Xcode which is available on the App Store.
 2. Install CMake from http://www.cmake.org/download/.
-3. Launch CMake.app and click the "Browse Source" button, then select the directory where the source is located.
+3. Launch CMake.app and click the "Browse Source" button, then select the directory where the source is located. (Alternatively, you may use ccmake from the command line similar to the Linux instructions.)
 4. Make a new directory at the root of the source tree called build.
 5. In CMake.app "Browse Build" and select the new build directory.
-5. Press Configure.
+5. Press Configure. By default, the build type is set to "Release", but this can be changed to "Debug" (or other build types) from within CMake.app.
 6. When prompted to specify the generator choose "Unix Makefiles" and default native compilers.
 6. Press Generate.
 7. Using the command line interface of Terminal.app navigate to the build directory.
@@ -63,4 +63,3 @@ These instructions were written for Mac OS X Version 10.9.  Newer versions of OS
 # Building Installer Packages
 
 Building an installer package is simply a matter of compiling the "Package" target.  On Windows you must have the NSIS tool installed first.  On Mac you must install PackageMaker.  Once the appropriate packaging tool is installed, use the CMake interface to turn on the "BUILD\_PACKAGE" option and regenerate the project.  A separate repository contains many binary pieces that are downloaded during the process of compiling the installer.  These are being transitioned to build from source where possible, in which case they will end up in this repository along with the other source.  Because this content is automatically downloaded from a separate GitHub repository during the packaging process, you will need to have an internet connection while generating an installer.  The completed installer package will be copied into the root of the build directory.
- 

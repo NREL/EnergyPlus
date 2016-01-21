@@ -58,8 +58,8 @@ TEST( ChunkTest, Construction )
 		Chunk_int w( v );
 		EXPECT_EQ( v, w );
 		EXPECT_EQ( w, v );
-		EXPECT_EQ( 0U, v.size() );
-		EXPECT_EQ( 0U, w.size() );
+		EXPECT_EQ( 0u, v.size() );
+		EXPECT_EQ( 0u, w.size() );
 	}
 
 	{ // Copy constructor and assignment
@@ -85,7 +85,7 @@ TEST( ChunkTest, Construction )
 
 	{ // Size + value constructor and subscripting
 		Chunk_int v( 10, 2 );
-		EXPECT_EQ( 10U, v.size() );
+		EXPECT_EQ( 10u, v.size() );
 		for ( Chunk_int::size_type i = 0; i < v.size(); ++i ) {
 			v[ i ] = static_cast< int >( i );
 			EXPECT_EQ( int( i ), v[ i ] );
@@ -142,7 +142,7 @@ TEST( ChunkTest, Swap )
 TEST( ChunkTest, FrontBack )
 {
 	Chunk_int v( 10 );
-	for ( Chunk_int::size_type i = 0; i < 10; ++i ) {
+	for ( Chunk_int::size_type i = 0; i < 10u; ++i ) {
 		v[ i ] = int( i );
 		EXPECT_EQ( int( i ), v[ i ] );
 	}
@@ -154,8 +154,8 @@ TEST( ChunkTest, Resize )
 {
 	Chunk_int v( 10, 22 );
 	v.resize( 20 ); // Added values are uninitialized
-	EXPECT_EQ( 20U, v.size() );
-	for ( Chunk_int::size_type i = 0; i < 10; ++i ) {
+	EXPECT_EQ( 20u, v.size() );
+	for ( Chunk_int::size_type i = 0; i < 10u; ++i ) {
 		EXPECT_EQ( 22, v[ i ] );
 	}
 }
@@ -164,8 +164,8 @@ TEST( ChunkTest, ResizeFill )
 {
 	Chunk_int v( 10, 22 );
 	v.resize( 20, 33 );
-	EXPECT_EQ( 20U, v.size() );
-	for ( Chunk_int::size_type i = 0; i < 10; ++i ) {
+	EXPECT_EQ( 20u, v.size() );
+	for ( Chunk_int::size_type i = 0; i < 10u; ++i ) {
 		EXPECT_EQ( 22, v[ i ] );
 	}
 	for ( Chunk_int::size_type i = 10; i < 20; ++i ) {
@@ -177,16 +177,16 @@ TEST( ChunkTest, NonpreservingResize )
 {
 	Chunk_int v( 10, 22 );
 	v.non_preserving_resize( 20 ); // Values can be arbitrary
-	EXPECT_EQ( 20U, v.size() );
-	EXPECT_EQ( 20U, v.capacity() ); // Resize forced reallocation
+	EXPECT_EQ( 20u, v.size() );
+	EXPECT_EQ( 20u, v.capacity() ); // Resize forced reallocation
 }
 
 TEST( ChunkTest, NonpreservingResizeFill )
 {
 	Chunk_int v( 10, 22 );
 	v.non_preserving_resize( 20, 33 );
-	EXPECT_EQ( 20U, v.size() );
-	EXPECT_EQ( 20U, v.capacity() ); // Resize forced reallocation
+	EXPECT_EQ( 20u, v.size() );
+	EXPECT_EQ( 20u, v.capacity() ); // Resize forced reallocation
 	for ( Chunk_int::size_type i = 0; i < 20; ++i ) {
 		EXPECT_EQ( 33, v[ i ] );
 	}
@@ -195,30 +195,30 @@ TEST( ChunkTest, NonpreservingResizeFill )
 TEST( ChunkTest, ReservePushPopShrink )
 {
 	Chunk_int v( 10, 22 );
-	EXPECT_EQ( 10U, v.size() );
-	EXPECT_EQ( 10U, v.capacity() );
+	EXPECT_EQ( 10u, v.size() );
+	EXPECT_EQ( 10u, v.capacity() );
 	v.reserve( 12 );
-	EXPECT_EQ( 10U, v.size() );
-	EXPECT_EQ( 12U, v.capacity() );
-	for ( Chunk_int::size_type i = 0; i < 10; ++i ) {
+	EXPECT_EQ( 10u, v.size() );
+	EXPECT_EQ( 12u, v.capacity() );
+	for ( Chunk_int::size_type i = 0; i < 10u; ++i ) {
 		EXPECT_EQ( 22, v[ i ] );
 	}
 	v.push_back( 33 );
-	EXPECT_EQ( 11U, v.size() );
-	EXPECT_EQ( 12U, v.capacity() );
+	EXPECT_EQ( 11u, v.size() );
+	EXPECT_EQ( 12u, v.capacity() );
 	v.push_back( 44 );
-	EXPECT_EQ( 12U, v.size() );
-	EXPECT_EQ( 12U, v.capacity() );
+	EXPECT_EQ( 12u, v.size() );
+	EXPECT_EQ( 12u, v.capacity() );
 	v.push_back( 55 );
-	EXPECT_EQ( 13U, v.size() );
-	EXPECT_EQ( 24U, v.capacity() );
+	EXPECT_EQ( 13u, v.size() );
+	EXPECT_EQ( 24u, v.capacity() );
 	v.pop_back();
-	EXPECT_EQ( 12U, v.size() );
-	EXPECT_EQ( 24U, v.capacity() );
+	EXPECT_EQ( 12u, v.size() );
+	EXPECT_EQ( 24u, v.capacity() );
 	v.pop_back();
-	EXPECT_EQ( 11U, v.size() );
-	EXPECT_EQ( 24U, v.capacity() );
+	EXPECT_EQ( 11u, v.size() );
+	EXPECT_EQ( 24u, v.capacity() );
 	v.shrink();
-	EXPECT_EQ( 11U, v.size() );
-	EXPECT_EQ( 11U, v.capacity() );
+	EXPECT_EQ( 11u, v.size() );
+	EXPECT_EQ( 11u, v.capacity() );
 }

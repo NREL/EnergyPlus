@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef MixedAir_hh_INCLUDED
 #define MixedAir_hh_INCLUDED
 
@@ -143,19 +201,6 @@ namespace MixedAir {
 			NumControllers( 0 )
 		{}
 
-		// Member Constructor
-		ControllerListProps(
-			std::string const & Name,
-			int const NumControllers, // number of controllers on list
-			Array1_string const & ControllerType,
-			Array1_string const & ControllerName
-		) :
-			Name( Name ),
-			NumControllers( NumControllers ),
-			ControllerType( ControllerType ),
-			ControllerName( ControllerName )
-		{}
-
 	};
 
 	struct OAControllerProps // Derived type for Outside Air Controller data
@@ -296,137 +341,6 @@ namespace MixedAir {
 			DemandLimitFlowRate( 0.0 )
 		{}
 
-		// Member Constructor
-		OAControllerProps(
-			std::string const & Name,
-			std::string const & ControllerType,
-			int const ControllerType_Num, // Parameter equivalent of controller type
-			int const OACtrlIndex,
-			int const Lockout, // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
-			bool const FixedMin, // Fixed Minimum or Proportional Minimum
-			Real64 const TempLim, // Temperature Limit
-			Real64 const TempLowLim, // Temperature Lower Limit
-			Real64 const EnthLim, // Enthalpy Limit
-			Real64 const DPTempLim, // Dew Point Temperature Limit
-			int const EnthalpyCurvePtr, // Electronic Enthalpy Curve Index (max HumRat = f[OAT])
-			Real64 const MinOA, // Minimum outside air flow (m3/sec)
-			Real64 const MaxOA, // Maximum outside air flow (m3/sec)
-			int const Econo, // 0 = NoEconomizer, 1 = FixedDryBulb, 2 = FixedEnthalpy, 3=DifferentialDryBulb,
-			bool const EconBypass, // ModulateFlow =FALSE , MinimumFlowWithBypass =TRUE
-			int const MixNode, // Controlled node (mixed air node)
-			int const OANode, // Actuated node (outside air node)
-			int const InletNode, // Inlet Air Node for into Mixer  (BTG Nov 2004)
-			int const RelNode, // Relief Air Node Number
-			int const RetNode, // Return Air Node Number
-			std::string const & MinOASch, // Name of the minimum outside air schedule
-			int const MinOASchPtr, // Index to the minimum outside air schedule
-			Real64 const RelMassFlow,
-			Real64 const OAMassFlow,
-			Real64 const ExhMassFlow,
-			Real64 const MixMassFlow,
-			Real64 const InletTemp,
-			Real64 const InletEnth,
-			Real64 const InletPress,
-			Real64 const InletHumRat,
-			Real64 const OATemp,
-			Real64 const OAEnth,
-			Real64 const OAPress,
-			Real64 const OAHumRat,
-			Real64 const RetTemp,
-			Real64 const RetEnth,
-			Real64 const MixSetTemp,
-			Real64 const MinOAMassFlowRate, // Minimum outside air flow (kg/s)
-			Real64 const MaxOAMassFlowRate, // Maximum outside air flow (kg/s)
-			int const ZoneEquipZoneNum,
-			std::string const & VentilationMechanicalName, // Name of ventilation:mechanical object used for DCV
-			int const VentMechObjectNum, // Index to VENTILATION:MECHANICAL object for this controller
-			int const HumidistatZoneNum, // zone number where humidistat is located
-			int const NodeNumofHumidistatZone, // node number of zone where humidistat is located
-			Real64 const HighRHOAFlowRatio, // Modify ratio with respect to maximum outdoor air flow rate (high RH)
-			bool const ModifyDuringHighOAMoisture, // flag to Modify outdoor air flow, TRUE when modify any time
-			int const EconomizerOASchedPtr, // schedule to modify outdoor air flow
-			std::string const & MinOAflowSch, // Name of the Minimum fraction of Design/Mixed Mass of air
-			std::string const & MaxOAflowSch, // Name of the Maximum fraction of Design/Mixed Mass of air
-			int const MinOAflowSchPtr, // Index to the minimum outside air schedule
-			int const MaxOAflowSchPtr, // Index to the minimum outside air schedule
-			int const EconomizerStatus, // Air Economizer status (1 = on, 0 = off or economizer not exists)
-			int const HeatRecoveryBypassStatus, // OA Sys Heat Recovery Bypass status (1 = on, 0 = off or economizer not exists)
-			int const HRHeatingCoilActive, // OA Sys Heat Recovery Heating Coil Was Active status (1 = on, 0 = off)
-			Real64 const MixedAirTempAtMinOAFlow, // calculated mixed air temp when using special HX bypass control
-			int const HighHumCtrlStatus, // High Humidity Control status (1 = on, 0 = off or high hum ctrl not used)
-			Real64 const OAFractionRpt, // Actual outdoor air fraction for reporting (based on mixed air flow rate),
-			Real64 const MinOAFracLimit, // Minimum OA fraction limit
-			bool const EMSOverrideOARate, // if true, EMS is calling to override OA rate
-			Real64 const EMSOARateValue, // Value EMS is directing to use. [kg/s]
-			int const HeatRecoveryBypassControlType, // User input selects type of heat recovery optimization
-			bool const ManageDemand,
-			Real64 DemandLimitFlowRate
-		) :
-			Name( Name ),
-			ControllerType( ControllerType ),
-			ControllerType_Num( ControllerType_Num ),
-			OACtrlIndex( OACtrlIndex ),
-			Lockout( Lockout ),
-			FixedMin( FixedMin ),
-			TempLim( TempLim ),
-			TempLowLim( TempLowLim ),
-			EnthLim( EnthLim ),
-			DPTempLim( DPTempLim ),
-			EnthalpyCurvePtr( EnthalpyCurvePtr ),
-			MinOA( MinOA ),
-			MaxOA( MaxOA ),
-			Econo( Econo ),
-			EconBypass( EconBypass ),
-			MixNode( MixNode ),
-			OANode( OANode ),
-			InletNode( InletNode ),
-			RelNode( RelNode ),
-			RetNode( RetNode ),
-			MinOASch( MinOASch ),
-			MinOASchPtr( MinOASchPtr ),
-			RelMassFlow( RelMassFlow ),
-			OAMassFlow( OAMassFlow ),
-			ExhMassFlow( ExhMassFlow ),
-			MixMassFlow( MixMassFlow ),
-			InletTemp( InletTemp ),
-			InletEnth( InletEnth ),
-			InletPress( InletPress ),
-			InletHumRat( InletHumRat ),
-			OATemp( OATemp ),
-			OAEnth( OAEnth ),
-			OAPress( OAPress ),
-			OAHumRat( OAHumRat ),
-			RetTemp( RetTemp ),
-			RetEnth( RetEnth ),
-			MixSetTemp( MixSetTemp ),
-			MinOAMassFlowRate( MinOAMassFlowRate ),
-			MaxOAMassFlowRate( MaxOAMassFlowRate ),
-			ZoneEquipZoneNum( ZoneEquipZoneNum ),
-			VentilationMechanicalName( VentilationMechanicalName ),
-			VentMechObjectNum( VentMechObjectNum ),
-			HumidistatZoneNum( HumidistatZoneNum ),
-			NodeNumofHumidistatZone( NodeNumofHumidistatZone ),
-			HighRHOAFlowRatio( HighRHOAFlowRatio ),
-			ModifyDuringHighOAMoisture( ModifyDuringHighOAMoisture ),
-			EconomizerOASchedPtr( EconomizerOASchedPtr ),
-			MinOAflowSch( MinOAflowSch ),
-			MaxOAflowSch( MaxOAflowSch ),
-			MinOAflowSchPtr( MinOAflowSchPtr ),
-			MaxOAflowSchPtr( MaxOAflowSchPtr ),
-			EconomizerStatus( EconomizerStatus ),
-			HeatRecoveryBypassStatus( HeatRecoveryBypassStatus ),
-			HRHeatingCoilActive( HRHeatingCoilActive ),
-			MixedAirTempAtMinOAFlow( MixedAirTempAtMinOAFlow ),
-			HighHumCtrlStatus( HighHumCtrlStatus ),
-			OAFractionRpt( OAFractionRpt ),
-			MinOAFracLimit( MinOAFracLimit ),
-			EMSOverrideOARate( EMSOverrideOARate ),
-			EMSOARateValue( EMSOARateValue ),
-			HeatRecoveryBypassControlType( HeatRecoveryBypassControlType ),
-			ManageDemand( ManageDemand ),
-			DemandLimitFlowRate( DemandLimitFlowRate )
-		{}
-
 	};
 
 	struct VentilationMechanicalProps // Derived type for Ventilation:Mechanical data
@@ -490,69 +404,6 @@ namespace MixedAir {
 			CO2GainErrorIndex( 0 )
 		{}
 
-		// Member Constructor
-		VentilationMechanicalProps(
-			std::string const & Name, // Name of Ventilation:Mechanical object
-			std::string const & SchName, // Name of the mechanical ventilation schedule
-			int const SchPtr, // Index to the mechanical ventilation schedule
-			bool const DCVFlag, // if true, implement OA based on demand controlled ventilation
-			int const NumofVentMechZones, // Number of zones with mechanical ventilation
-			Real64 const TotAreaOAFlow, // Total outdoor air flow rate for all zones per area (m3/s/m2)
-			Real64 const TotPeopleOAFlow, // Total outdoor air flow rate for all PEOPLE objects in zones (m3/s)
-			Real64 const TotZoneOAFlow, // Total outdoor air flow rate for all zones (m3/s)
-			Real64 const TotZoneOAACH, // Total outdoor air flow rate for all zones Air Changes per hour (m3/s/m3)
-			int const SystemOAMethod, // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP
-			Real64 const ZoneMaxOAFraction, // Zone maximum outdoor air fraction
-			Array1< Real64 > const & ZoneOAAreaRate, // Mechanical ventilation rate (m3/s/m2) for each zone
-			Array1< Real64 > const & ZoneOAPeopleRate, // Mechanical ventilation rate (m3/s/person) for each zone
-			Array1< Real64 > const & ZoneOAFlow, // OA Flow Rate (m3/s/zone) for each zone
-			Array1< Real64 > const & ZoneOAACH, // OA ACH (m3/s/volume) for each zone
-			Array1_int const & Zone, // Zones requiring mechanical ventilation
-			Array1_int const & ZoneDesignSpecOAObjIndex, // index of the design specification outdoor air object
-			Array1_string const & ZoneDesignSpecOAObjName, // name of the design specification outdoor air object
-			int const CO2MaxMinLimitErrorCount, // Counter when max CO2 concentration < min CO2 concentration
-			int const CO2MaxMinLimitErrorIndex, // Index for max CO2 concentration < min CO2 concentration recurring error message
-			int const CO2GainErrorCount, // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
-			int const CO2GainErrorIndex, // Index for recurring error message when CO2 generation from people is zero
-			Array1< Real64 > const & ZoneADEffCooling, // Zone air distribution effectiveness in cooling mode
-			Array1< Real64 > const & ZoneADEffHeating, // Zone air distribution effectiveness in heating mode
-			Array1_int const & ZoneADEffSchPtr, // Pointer to the zone air distribution effectiveness schedule
-			Array1_string const & ZoneADEffSchName, // Zone air distribution effectiveness schedule name
-			Array1_int const & ZoneDesignSpecADObjIndex, // index of the design specification zone air
-			Array1_string const & ZoneDesignSpecADObjName, // name of the design specification zone air
-			Array1< Real64 > const & ZoneSecondaryRecirculation // zone air secondary recirculation ratio
-		) :
-			Name( Name ),
-			SchName( SchName ),
-			SchPtr( SchPtr ),
-			DCVFlag( DCVFlag ),
-			NumofVentMechZones( NumofVentMechZones ),
-			TotAreaOAFlow( TotAreaOAFlow ),
-			TotPeopleOAFlow( TotPeopleOAFlow ),
-			TotZoneOAFlow( TotZoneOAFlow ),
-			TotZoneOAACH( TotZoneOAACH ),
-			SystemOAMethod( SystemOAMethod ),
-			ZoneMaxOAFraction( ZoneMaxOAFraction ),
-			ZoneOAAreaRate( ZoneOAAreaRate ),
-			ZoneOAPeopleRate( ZoneOAPeopleRate ),
-			ZoneOAFlow( ZoneOAFlow ),
-			ZoneOAACH( ZoneOAACH ),
-			Zone( Zone ),
-			ZoneDesignSpecOAObjIndex( ZoneDesignSpecOAObjIndex ),
-			ZoneDesignSpecOAObjName( ZoneDesignSpecOAObjName ),
-			CO2MaxMinLimitErrorCount( CO2MaxMinLimitErrorCount ),
-			CO2MaxMinLimitErrorIndex( CO2MaxMinLimitErrorIndex ),
-			CO2GainErrorCount( CO2GainErrorCount ),
-			CO2GainErrorIndex( CO2GainErrorIndex ),
-			ZoneADEffCooling( ZoneADEffCooling ),
-			ZoneADEffHeating( ZoneADEffHeating ),
-			ZoneADEffSchPtr( ZoneADEffSchPtr ),
-			ZoneADEffSchName( ZoneADEffSchName ),
-			ZoneDesignSpecADObjIndex( ZoneDesignSpecADObjIndex ),
-			ZoneDesignSpecADObjName( ZoneDesignSpecADObjName ),
-			ZoneSecondaryRecirculation( ZoneSecondaryRecirculation )
-		{}
-
 	};
 
 	struct OAMixerProps // Derived type for Outside Air Mixing Component
@@ -612,63 +463,6 @@ namespace MixedAir {
 			RetEnthalpy( 0.0 ),
 			RetPressure( 0.0 ),
 			RetMassFlowRate( 0.0 )
-		{}
-
-		// Member Constructor
-		OAMixerProps(
-			std::string const & Name,
-			int const MixerIndex, // Set on first call...
-			int const MixNode, // Outlet node - mixed air
-			int const InletNode, // Inlet node for outside air stream (Nov. 2004 BTG was OANode )
-			int const RelNode, // Outlet node - relief air
-			int const RetNode, // Inlet node - return air
-			Real64 const MixTemp,
-			Real64 const MixHumRat,
-			Real64 const MixEnthalpy,
-			Real64 const MixPressure,
-			Real64 const MixMassFlowRate,
-			Real64 const OATemp,
-			Real64 const OAHumRat,
-			Real64 const OAEnthalpy,
-			Real64 const OAPressure,
-			Real64 const OAMassFlowRate,
-			Real64 const RelTemp,
-			Real64 const RelHumRat,
-			Real64 const RelEnthalpy,
-			Real64 const RelPressure,
-			Real64 const RelMassFlowRate,
-			Real64 const RetTemp,
-			Real64 const RetHumRat,
-			Real64 const RetEnthalpy,
-			Real64 const RetPressure,
-			Real64 const RetMassFlowRate
-		) :
-			Name( Name ),
-			MixerIndex( MixerIndex ),
-			MixNode( MixNode ),
-			InletNode( InletNode ),
-			RelNode( RelNode ),
-			RetNode( RetNode ),
-			MixTemp( MixTemp ),
-			MixHumRat( MixHumRat ),
-			MixEnthalpy( MixEnthalpy ),
-			MixPressure( MixPressure ),
-			MixMassFlowRate( MixMassFlowRate ),
-			OATemp( OATemp ),
-			OAHumRat( OAHumRat ),
-			OAEnthalpy( OAEnthalpy ),
-			OAPressure( OAPressure ),
-			OAMassFlowRate( OAMassFlowRate ),
-			RelTemp( RelTemp ),
-			RelHumRat( RelHumRat ),
-			RelEnthalpy( RelEnthalpy ),
-			RelPressure( RelPressure ),
-			RelMassFlowRate( RelMassFlowRate ),
-			RetTemp( RetTemp ),
-			RetHumRat( RetHumRat ),
-			RetEnthalpy( RetEnthalpy ),
-			RetPressure( RetPressure ),
-			RetMassFlowRate( RetMassFlowRate )
 		{}
 
 	};
@@ -872,6 +666,9 @@ namespace MixedAir {
 	GetOASysNumHeatingCoils( int const OASysNumber ); // OA Sys Number
 
 	int
+	GetOASysNumHXs( int const OASysNumber ); // OA Sys Number
+
+	int
 	GetOASysNumCoolingCoils( int const OASysNumber ); // OA Sys Number
 
 	int
@@ -974,29 +771,6 @@ namespace MixedAir {
 
 	// End of Utility Section of the Module
 	//******************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // MixedAir
 

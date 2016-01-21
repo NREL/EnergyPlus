@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -246,9 +304,11 @@ namespace MundtSimMgr {
 
 		// allocate and initialize zone data
 		ZoneData.allocate( NumOfZones );
-		ZoneData.SurfFirst() = 0;
-		ZoneData.NumOfSurfs() = 0;
-		ZoneData.MundtZoneIndex() = 0;
+		for ( auto & e : ZoneData ) {
+			e.SurfFirst = 0;
+			e.NumOfSurfs = 0;
+			e.MundtZoneIndex = 0;
+		}
 
 		// get zone data
 		NumOfMundtZones = 0;
@@ -281,14 +341,18 @@ namespace MundtSimMgr {
 		MundtAirSurf.allocate( MaxNumOfSurfs, NumOfMundtZones );
 		LineNode.allocate( MaxNumOfAirNodes, NumOfMundtZones );
 		for ( SurfNum = 1; SurfNum <= MaxNumOfSurfs; ++SurfNum ) ID1dSurf( SurfNum ) = SurfNum;
-		MundtAirSurf.Area() = 0.0;
-		MundtAirSurf.Temp() = 25.0;
-		MundtAirSurf.Hc() = 0.0;
-		MundtAirSurf.TMeanAir() = 25.0;
-		LineNode.AirNodeName() = "";
-		LineNode.ClassType() = -1;
-		LineNode.Height() = 0.0;
-		LineNode.Temp() = 25.0;
+		for ( auto & e : MundtAirSurf ) {
+			e.Area = 0.0;
+			e.Temp = 25.0;
+			e.Hc = 0.0;
+			e.TMeanAir = 25.0;
+		}
+		for ( auto & e : LineNode ) {
+			e.AirNodeName.clear();
+			e.ClassType = -1;
+			e.Height = 0.0;
+			e.Temp = 25.0;
+		}
 
 		// get constant data (unchanged over time) for surfaces and air nodes
 		for ( MundtZoneIndex = 1; MundtZoneIndex <= NumOfMundtZones; ++MundtZoneIndex ) {
@@ -585,9 +649,11 @@ namespace MundtSimMgr {
 			NumFloorSurfs = count( LineNode( MundtFootAirID, MundtZoneNum ).SurfMask );
 			FloorSurfSetIDs = pack( ID1dSurf, LineNode( MundtFootAirID, MundtZoneNum ).SurfMask );
 			// initialize floor surface data (a must since NumFloorSurfs is varied among zones)
-			FloorSurf.Temp() = 25.0;
-			FloorSurf.Hc() = 0.0;
-			FloorSurf.Area() = 0.0;
+			for ( auto & e : FloorSurf ) {
+				e.Temp = 25.0;
+				e.Hc = 0.0;
+				e.Area = 0.0;
+			}
 			// get floor surface data
 			for ( SurfNum = 1; SurfNum <= NumFloorSurfs; ++SurfNum ) {
 				FloorSurf( SurfNum ).Temp = MundtAirSurf( FloorSurfSetIDs( SurfNum ), MundtZoneNum ).Temp;
@@ -665,8 +731,12 @@ namespace MundtSimMgr {
 		// Begin computations for Mundt model
 
 		// do summations for floor surfaces of this zone
-		FloorSumHAT = sum( FloorSurf.Area() * FloorSurf.Hc() * FloorSurf.Temp() );
-		FloorSumHA = sum( FloorSurf.Area() * FloorSurf.Hc() );
+		FloorSumHAT = 0.0;
+		FloorSumHA = 0.0;
+		for ( auto const & s : FloorSurf ) {
+			FloorSumHAT += s.Area * s.Hc * s.Temp;
+			FloorSumHA += s.Area * s.Hc;
+		}
 
 		// Eq 2.2 in ASHRAE RP 1222 Final report
 		TAirFoot = ( ( ZoneAirDensity * CpAir * SupplyAirVolumeRate * SupplyAirTemp ) + ( FloorSumHAT ) + QequipConvFloor + QSensInfilFloor ) / ( ( ZoneAirDensity * CpAir * SupplyAirVolumeRate ) + ( FloorSumHA ) );
@@ -879,7 +949,7 @@ namespace MundtSimMgr {
 		int NumOfSurfs; // number of surfaces in the zone
 		int ZoneNodeNum; // index number of the zone node
 		Real64 DeltaTemp; // dummy variable for temperature difference
-		Real64 TRoomAverage; // dummy variable for mean air temperature
+		// Real64 TRoomAverage; // dummy variable for mean air temperature
 		// FLOW:
 
 		// get surface info
@@ -898,7 +968,7 @@ namespace MundtSimMgr {
 				}
 				// b) Average zone air temperature -> ZT(ZoneNum)
 				// For Mundt model, average room air is the weighted value of floor and ceiling air temps
-				TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
+				// TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
 				//ZT(ZoneNum) = TRoomAverage
 				// c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
 				ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
@@ -916,8 +986,8 @@ namespace MundtSimMgr {
 				}
 				// b) Average zone air temperature -> ZT(ZoneNum)
 				// For Mundt model, average room air is the weighted value of floor and ceiling air temps
-				TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
-				DeltaTemp = TRoomAverage - LineNode( TstatNodeID, MundtZoneNum ).Temp;
+				// TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
+				// DeltaTemp = TRoomAverage - LineNode( TstatNodeID, MundtZoneNum ).Temp;
 				// ZT(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp
 				// c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
 				ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
@@ -942,29 +1012,6 @@ namespace MundtSimMgr {
 	}
 
 	//*****************************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // MundtSimMgr
 

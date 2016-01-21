@@ -34,12 +34,10 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	Sticky()
 	{}
 
 	// Value Constructor
-	inline
 	explicit
 	Sticky( T const & val ) :
 	 val_( val )
@@ -47,7 +45,6 @@ public: // Creation
 
 	// Value Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	inline
 	explicit
 	Sticky( U const & val ) :
 	 val_( val )
@@ -56,7 +53,6 @@ public: // Creation
 public: // Assignment
 
 	// Value Assignment
-	inline
 	Sticky &
 	operator =( T const & val )
 	{
@@ -66,7 +62,6 @@ public: // Assignment
 
 	// Value Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	inline
 	Sticky &
 	operator =( U const & val )
 	{
@@ -77,14 +72,12 @@ public: // Assignment
 public: // Conversion
 
 	// Value Conversion
-	inline
 	operator T const &() const
 	{
 		return val_;
 	}
 
 	// Value Conversion
-	inline
 	operator T &()
 	{
 		return val_;
@@ -93,7 +86,6 @@ public: // Conversion
 public: // Operators
 
 	// Value
-	inline
 	T const &
 	operator ()() const
 	{
@@ -101,7 +93,6 @@ public: // Operators
 	}
 
 	// Value
-	inline
 	T &
 	operator ()()
 	{
