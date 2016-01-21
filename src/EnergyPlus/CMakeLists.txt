@@ -198,6 +198,8 @@ SET( SRC
   EconomicTariff.hh
   ElectricBaseboardRadiator.cc
   ElectricBaseboardRadiator.hh
+  ElectricPowerServiceManager.hh
+  ElectricPowerServiceManager.cc
   EnergyPlus.hh
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
@@ -326,8 +328,6 @@ SET( SRC
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
-  ManageElectricPower.cc
-  ManageElectricPower.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
   MicroCHPElectricGenerator.cc
