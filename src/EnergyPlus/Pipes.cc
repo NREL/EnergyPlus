@@ -135,16 +135,16 @@ namespace Pipes {
 		LocalPipe.deallocate();
 	}
 
-	PlantComponent * LocalPipeData::factory( int objectType, std::string objectName ) {
+	std::shared_ptr< PlantComponent > LocalPipeData::factory( int objectType, std::string objectName ) {
 		// Process the input data for pipes if it hasn't been done already
 		if ( GetPipeInputFlag ) {
 			GetPipeInput();
 			GetPipeInputFlag = false;
 		}
 		// Now look for this particular pipe in the list
-		for ( auto & pipe : LocalPipe ) {
+		for ( auto pipe : LocalPipe ) {
 			if ( pipe.TypeOf == objectType && pipe.Name == objectName ) {
-				return &pipe;
+				return std::make_shared< LocalPipeData >( pipe );
 			}
 		}
 		// If we didn't find it, fatal

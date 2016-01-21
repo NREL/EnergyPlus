@@ -176,16 +176,16 @@ namespace PipeHeatTransfer {
 
 	// Functions
 
-	PlantComponent * PipeHTData::factory( int objectType, std::string objectName ) {
+	std::shared_ptr< PlantComponent > PipeHTData::factory( int objectType, std::string objectName ) {
 		// Process the input data for pipes if it hasn't been done already
 		if ( GetPipeInputFlag ) {
 			GetPipesHeatTransfer();
 			GetPipeInputFlag = false;
 		}
 		// Now look for this particular pipe in the list
-		for ( auto & pipe : PipeHT ) {
+		for ( auto pipe : PipeHT ) {
 			if ( pipe.TypeOf == objectType && pipe.Name == objectName ) {
-				return &pipe;
+				return std::make_shared< PipeHTData >( pipe );
 			}
 		}
 		// If we didn't find it, fatal

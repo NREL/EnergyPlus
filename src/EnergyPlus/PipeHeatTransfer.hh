@@ -309,7 +309,7 @@ namespace PipeHeatTransfer {
 		{}
 
 		static
-		PlantComponent * factory( int objectType, std::string objectName );
+		std::shared_ptr< PlantComponent > factory( int objectType, std::string objectName );
 
 		bool
 		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip );
