@@ -184,7 +184,7 @@ namespace PipeHeatTransfer {
 		}
 		// Now look for this particular pipe in the list
 		for ( auto pipe : PipeHT ) {
-			if ( pipe->TypeOf == objectType && pipe->Name == objectName ) {
+			if ( pipe->TypeOf == objectType && pipe->name == objectName ) {
 				return pipe;
 			}
 		}
@@ -340,7 +340,7 @@ namespace PipeHeatTransfer {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			PipeHT( Item )->Name = cAlphaArgs( 1 );
+			PipeHT( Item )->name = cAlphaArgs( 1 );
 			PipeHT( Item )->TypeOf = TypeOf_PipeInterior;
 
 			// General user input data
@@ -451,7 +451,7 @@ namespace PipeHeatTransfer {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			PipeHT( Item )->Name = cAlphaArgs( 1 );
+			PipeHT( Item )->name = cAlphaArgs( 1 );
 			PipeHT( Item )->TypeOf = TypeOf_PipeExterior;
 
 			// General user input data
@@ -541,7 +541,7 @@ namespace PipeHeatTransfer {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			PipeHT( Item )->Name = cAlphaArgs( 1 );
+			PipeHT( Item )->name = cAlphaArgs( 1 );
 			PipeHT( Item )->TypeOf = TypeOf_PipeUnderground;
 
 			// General user input data
@@ -611,7 +611,7 @@ namespace PipeHeatTransfer {
 			PipeHT( Item )->SoilMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material );
 			if ( PipeHT( Item )->SoilMaterialNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + PipeHT( Item )->SoilMaterial );
-				ShowContinueError( "Found in " + cCurrentModuleObject + '=' + PipeHT( Item )->Name );
+				ShowContinueError( "Found in " + cCurrentModuleObject + '=' + PipeHT( Item )->name );
 				ErrorsFound = true;
 			} else {
 				PipeHT( Item )->SoilDensity = Material( PipeHT( Item )->SoilMaterialNum ).Density;
@@ -690,21 +690,21 @@ namespace PipeHeatTransfer {
 		// Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
 		for ( Item = 1; Item <= nsvNumOfPipeHT; ++Item ) {
 
-			SetupOutputVariable( "Pipe Fluid Heat Transfer Rate [W]", PipeHT( Item )->FluidHeatLossRate, "Plant", "Average", PipeHT( Item )->Name );
-			SetupOutputVariable( "Pipe Fluid Heat Transfer Energy [J]", PipeHT( Item )->FluidHeatLossEnergy, "Plant", "Sum", PipeHT( Item )->Name );
+			SetupOutputVariable( "Pipe Fluid Heat Transfer Rate [W]", PipeHT( Item )->FluidHeatLossRate, "Plant", "Average", PipeHT( Item )->name );
+			SetupOutputVariable( "Pipe Fluid Heat Transfer Energy [J]", PipeHT( Item )->FluidHeatLossEnergy, "Plant", "Sum", PipeHT( Item )->name );
 
 			if ( PipeHT( Item )->EnvironmentPtr == ZoneEnv ) {
-				SetupOutputVariable( "Pipe Ambient Heat Transfer Rate [W]", PipeHT( Item )->EnvironmentHeatLossRate, "Plant", "Average", PipeHT( Item )->Name );
-				SetupOutputVariable( "Pipe Ambient Heat Transfer Energy [J]", PipeHT( Item )->EnvHeatLossEnergy, "Plant", "Sum", PipeHT( Item )->Name );
+				SetupOutputVariable( "Pipe Ambient Heat Transfer Rate [W]", PipeHT( Item )->EnvironmentHeatLossRate, "Plant", "Average", PipeHT( Item )->name );
+				SetupOutputVariable( "Pipe Ambient Heat Transfer Energy [J]", PipeHT( Item )->EnvHeatLossEnergy, "Plant", "Sum", PipeHT( Item )->name );
 
-				SetupZoneInternalGain( PipeHT( Item )->EnvrZonePtr, "Pipe:Indoor", PipeHT( Item )->Name, IntGainTypeOf_PipeIndoor, PipeHT( Item )->ZoneHeatGainRate );
+				SetupZoneInternalGain( PipeHT( Item )->EnvrZonePtr, "Pipe:Indoor", PipeHT( Item )->name, IntGainTypeOf_PipeIndoor, PipeHT( Item )->ZoneHeatGainRate );
 
 			}
 
-			SetupOutputVariable( "Pipe Mass Flow Rate [kg/s]", PipeHT( Item )->MassFlowRate, "Plant", "Average", PipeHT( Item )->Name );
-			SetupOutputVariable( "Pipe Volume Flow Rate [m3/s]", PipeHT( Item )->VolumeFlowRate, "Plant", "Average", PipeHT( Item )->Name );
-			SetupOutputVariable( "Pipe Inlet Temperature [C]", PipeHT( Item )->FluidInletTemp, "Plant", "Average", PipeHT( Item )->Name );
-			SetupOutputVariable( "Pipe Outlet Temperature [C]", PipeHT( Item )->FluidOutletTemp, "Plant", "Average", PipeHT( Item )->Name );
+			SetupOutputVariable( "Pipe Mass Flow Rate [kg/s]", PipeHT( Item )->MassFlowRate, "Plant", "Average", PipeHT( Item )->name );
+			SetupOutputVariable( "Pipe Volume Flow Rate [m3/s]", PipeHT( Item )->VolumeFlowRate, "Plant", "Average", PipeHT( Item )->name );
+			SetupOutputVariable( "Pipe Inlet Temperature [C]", PipeHT( Item )->FluidInletTemp, "Plant", "Average", PipeHT( Item )->name );
+			SetupOutputVariable( "Pipe Outlet Temperature [C]", PipeHT( Item )->FluidOutletTemp, "Plant", "Average", PipeHT( Item )->name );
 		}
 
 	}
@@ -891,7 +891,7 @@ namespace PipeHeatTransfer {
 		// get some data only once
 		if ( this->OneTimeInit ) {
 			errFlag = false;
-			ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
+			ScanPlantLoopsForObject( this->name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "InitPipesHeatTransfer: Program terminated due to previous condition(s)." );
 			}
@@ -1324,7 +1324,7 @@ namespace PipeHeatTransfer {
 
 		for ( IterationIndex = 1; IterationIndex <= MaxIterations; ++IterationIndex ) {
 			if ( IterationIndex == MaxIterations ) {
-				ShowWarningError( "BuriedPipeHeatTransfer: Large number of iterations detected in object: " + this->Name );
+				ShowWarningError( "BuriedPipeHeatTransfer: Large number of iterations detected in object: " + this->name );
 			}
 
 			//Store computed values in T_O array
@@ -1858,7 +1858,7 @@ namespace PipeHeatTransfer {
 		if ( ! ViscositySet ) {
 			AirVisc = DynVisc( NumOfPropDivisions );
 			if ( AirTemp > Temperature( NumOfPropDivisions ) ) {
-				ShowWarningError( "Heat Transfer Pipe = " + this->Name + "Viscosity out of range, air temperature too high, setting to upper limit." );
+				ShowWarningError( "Heat Transfer Pipe = " + this->name + "Viscosity out of range, air temperature too high, setting to upper limit." );
 			}
 		}
 
@@ -1881,7 +1881,7 @@ namespace PipeHeatTransfer {
 			Coef = CCoef( NumOfParamDivisions );
 			rExp = mExp( NumOfParamDivisions );
 			if ( ReD > UpperBound( NumOfParamDivisions ) ) {
-				ShowWarningError( "Heat Transfer Pipe = " + this->Name + "Reynolds Number out of range, setting coefficients to upper limit." );
+				ShowWarningError( "Heat Transfer Pipe = " + this->name + "Reynolds Number out of range, setting coefficients to upper limit." );
 			}
 		}
 
