@@ -168,61 +168,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 	int VentSlabZoneNum( 1 ); // number of zone being served
 	bool FirstHVACIteration( true ); // TRUE if 1st HVAC simulation of system timestep
 
-	//Real64 PowerMet = 0.0;
-	//Real64 LatOutputProvided = 0.0;
-
-	//NumOfVentSlabs = 1;
-	//VentSlab.allocate( NumOfVentSlabs );
-	//int Item = 1;
-	//int FanOutletNode = 1;
-	//int OutletNode = 2;
-	//VentSlab( Item ).FanOutletNode = FanOutletNode;
-	//VentSlab( Item ).RadInNode = OutletNode;
-	//Node.allocate( 2 );
-	//Node( OutletNode ).MassFlowRate = 0.5;
-
-	//// Sensible Heating
-	//Node( FanOutletNode ).Temp = 15.0;
-	//Node( FanOutletNode ).HumRat = 0.003;
-	//Node( OutletNode ).Temp = 20.0;
-	//Node( OutletNode ).HumRat = 0.003;
-	//CalcVentilatedSlabCoilOutput( Item, PowerMet, LatOutputProvided );
-
-	//EXPECT_TRUE( VentSlab( Item ).HeatCoilPower > 0.0 );
-	//EXPECT_TRUE( VentSlab( Item ).SensCoolCoilPower == 0.0 );
-	//EXPECT_TRUE( VentSlab( Item ).TotCoolCoilPower == 0.0 );
-	//EXPECT_TRUE( VentSlab( Item ).LateCoolCoilPower == 0.0 );
-	//EXPECT_TRUE( LatOutputProvided == 0.0 );
-	//EXPECT_TRUE( PowerMet > 0.0 );
-
-	//// Sensible Cooling
-	//Node( FanOutletNode ).Temp = 25.0;
-	//Node( FanOutletNode ).HumRat = 0.003;
-	//Node( OutletNode ).Temp = 20.0;
-	//Node( OutletNode ).HumRat = 0.003;
-	//CalcVentilatedSlabCoilOutput( Item, PowerMet, LatOutputProvided );
-
-	//EXPECT_TRUE( VentSlab( Item ).HeatCoilPower == 0.0 );
-	//EXPECT_TRUE( VentSlab( Item ).SensCoolCoilPower > 0.0 );
-	//EXPECT_TRUE( VentSlab( Item ).TotCoolCoilPower == VentSlab( Item ).SensCoolCoilPower );
-	//EXPECT_TRUE( VentSlab( Item ).LateCoolCoilPower == 0.0 );
-	//EXPECT_TRUE( LatOutputProvided == 0.0 );
-	//EXPECT_TRUE( PowerMet < 0.0 );
-
-	//// Sensible and Latent Cooling
-	//Node( FanOutletNode ).Temp = 25.0;
-	//Node( FanOutletNode ).HumRat = 0.008;
-	//Node( OutletNode ).Temp = 20.0;
-	//Node( OutletNode ).HumRat = 0.003;
-	//CalcVentilatedSlabCoilOutput( Item, PowerMet, LatOutputProvided );
-
-	//EXPECT_TRUE( VentSlab( Item ).HeatCoilPower == 0.0 );
-	//EXPECT_TRUE( VentSlab( Item ).SensCoolCoilPower > 0.0 );
-	//EXPECT_TRUE( VentSlab( Item ).TotCoolCoilPower > VentSlab( Item ).SensCoolCoilPower );
-	//EXPECT_TRUE( VentSlab( Item ).LateCoolCoilPower > 0.0 );
-	//EXPECT_TRUE( LatOutputProvided < 0.0 );
-	//EXPECT_TRUE( PowerMet < 0.0 );
-
 	std::string const idf_objects = delimited_string( {
 	"  Version,8.4;",
 
@@ -321,9 +266,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Yes,                     !- Use Weather File Rain Indicators",
 		"    Yes;                     !- Use Weather File Snow Indicators",
 
-
 		"  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
-
 
 		"  ScheduleTypeLimits,",
 		"    Any Number;              !- Name",
@@ -457,6 +400,13 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Through: 12/31,          !- Field 1",
 		"    For: AllDays,            !- Field 2",
 		"    Until: 24:00,20;         !- Field 3",
+
+		"  Schedule:Compact,",
+		"    ShadeTransSch,           !- Name",
+		"    Fraction,                !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,0.0;        !- Field 3",
 
 		"  Material,",
 		"    WD10,                    !- Name",
@@ -677,7 +627,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    0.65,                    !- Solar Absorptance",
 		"    0.65;                    !- Visible Absorptance",
 
-
 		"  Material:AirGap,",
 		"    AL21,                    !- Name",
 		"    0.1570000;               !- Thermal Resistance {m2-K/W}",
@@ -685,7 +634,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"  Material:AirGap,",
 		"    AL23,                    !- Name",
 		"    0.1530000;               !- Thermal Resistance {m2-K/W}",
-
 
 		"  WindowMaterial:Glazing,",
 		"    CLEAR 3MM,               !- Name",
@@ -751,7 +699,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    0.10,                    !- Back Side Infrared Hemispherical Emissivity",
 		"    0.9;                     !- Conductivity {W/m-K}",
 
-
 		"  WindowMaterial:Gas,",
 		"    AIR 6MM,                 !- Name",
 		"    Air,                     !- Gas Type",
@@ -766,7 +713,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    ARGON 13MM,              !- Name",
 		"    Argon,                   !- Gas Type",
 		"    0.0127;                  !- Thickness {m}",
-
 
 		"  Construction,",
 		"    ROOF-1,                  !- Name",
@@ -835,7 +781,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    AIR 6MM,                 !- Layer 2",
 		"    CLEAR 6MM;               !- Layer 3",
 
-
 		"  Construction:InternalSource,",
 		"    Ceiling with Radiant,    !- Name",
 		"    2,                       !- Source Present After Layer Number",
@@ -869,12 +814,10 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    CONC,                    !- Layer 3",
 		"    FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 4",
 
-
 		"  GlobalGeometryRules,",
 		"    UpperLeftCorner,         !- Starting Vertex Position",
 		"    CounterClockWise,        !- Vertex Entry Direction",
 		"    relative;                !- Coordinate System",
-
 
 		"  Zone,",
 		"    PLENUM-1,                !- Name",
@@ -941,7 +884,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    1,                       !- Multiplier",
 		"    2.438400269,             !- Ceiling Height {m}",
 		"    447.682556152;           !- Volume {m3}",
-
 
 		"  BuildingSurface:Detailed,",
 		"    WALL-1PF,                !- Name",
@@ -1583,7 +1525,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    3.7,3.7,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
 		"    3.7,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}",
 
-
 		"  FenestrationSurface:Detailed,",
 		"    WF-1,                    !- Name",
 		"    WINDOW,                  !- Surface Type",
@@ -1680,7 +1621,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    0.0,3.8,0.9,  !- X,Y,Z ==> Vertex 3 {m}",
 		"    0.0,3.8,2.1;  !- X,Y,Z ==> Vertex 4 {m}",
 
-
 		"  Shading:Zone:Detailed,",
 		"    Main South Overhang,     !- Name",
 		"    FRONT-1,                 !- Base Surface Name",
@@ -1700,7 +1640,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    21.0,0.0,2.6,  !- X,Y,Z ==> Vertex 2 {m}",
 		"    24.1,0.0,2.6,  !- X,Y,Z ==> Vertex 3 {m}",
 		"    24.1,-2.0,2.6;  !- X,Y,Z ==> Vertex 4 {m}",
-
 
 		"  ZoneHVAC:VentilatedSlab,",
 		"    Zone1VentSlab,           !- Name",
@@ -1782,7 +1721,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Zone4VentSlabCoolingCoil,!- Cooling Coil Name",
 		"    Zone4VentSlabChWInletNode;  !- Cold Water Inlet Node Name",
 
-
 		"  ZoneHVAC:VentilatedSlab:SlabGroup,",
 		"    Z125,                    !- Name",
 		"    SPACE1-1,                !- Zone 1 Name",
@@ -1824,7 +1762,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Z3VentSlabIn,            !- Slab Inlet Node Name for Surface 2",
 		"    Z3VentSlabOut;           !- Slab Outlet Node Name for Surface 2",
 
-
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone1Equipment,          !- Name",
 		"    ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type",
@@ -1838,7 +1775,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Zone4VentSlab,           !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
 		"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
-
 
 		"  ZoneHVAC:EquipmentConnections,",
 		"    SPACE1-1,                !- Zone Name",
@@ -1855,7 +1791,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    ,                        !- Zone Air Exhaust Node or NodeList Name",
 		"    Zone 4 Node,             !- Zone Air Node Name",
 		"    Zone 4 Outlet Node;      !- Zone Return Air Node Name",
-
 
 		"  Fan:ConstantVolume,",
 		"    Zone1VentSlabFan,        !- Name",
@@ -1878,7 +1813,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    1.0,                     !- Motor In Airstream Fraction",
 		"    Zone4VentSlabOAMixerOutletNode,  !- Air Inlet Node Name",
 		"    Zone4VentSlabFanOutletNode;  !- Air Outlet Node Name",
-
 
 		"  Coil:Cooling:Water,",
 		"    Zone1VentSlabCoolingCoil,!- Name",
@@ -1914,7 +1848,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    SimpleAnalysis,          !- Type of Analysis",
 		"    CrossFlow;               !- Heat Exchanger Configuration",
 
-
 		"  Coil:Heating:Water,",
 		"    Zone1VentSlabHeatingCoil,!- Name",
 		"    FanAndCoilAvailSched,    !- Availability Schedule Name",
@@ -1932,7 +1865,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    ,                        !- Rated Outlet Air Temperature {C}",
 		"    ;                        !- Rated Ratio for Air and Water Convection",
 
-
 		"  Coil:Heating:Electric,",
 		"    Zone4VentSlabHeatingCoil,!- Name",
 		"    FanAndCoilAvailSched,    !- Availability Schedule Name",
@@ -1940,7 +1872,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    40000,                   !- Nominal Capacity {W}",
 		"    Zone4VentSlabCCOutletNode,  !- Air Inlet Node Name",
 		"    Zone4VentSlabSlabInNode; !- Air Outlet Node Name",
-
 
 		"  Branch,",
 		"    Cooling Supply Inlet Branch,  !- Name",
@@ -2112,7 +2043,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Zone4VentSlabChWOutletNode,  !- Component 1 Outlet Node Name",
 		"    ACTIVE;                  !- Component 1 Branch Control Type",
 
-
 		"  BranchList,",
 		"    Cooling Supply Side Branches,  !- Name",
 		"    Cooling Supply Inlet Branch,  !- Branch 1 Name",
@@ -2142,7 +2072,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    ZonesHWBypassBranch,     !- Branch 3 Name",
 		"    ZonesHWOutletBranch;     !- Branch 4 Name",
 
-
 		"  Connector:Splitter,",
 		"    Cooling Supply Splitter, !- Name",
 		"    Cooling Supply Inlet Branch,  !- Inlet Branch Name",
@@ -2168,7 +2097,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Zone1HWBranch,           !- Outlet Branch 1 Name",
 		"    ZonesHWBypassBranch;     !- Outlet Branch 2 Name",
 
-
 		"  Connector:Mixer,",
 		"    Cooling Supply Mixer,    !- Name",
 		"    Cooling Supply Outlet Branch,  !- Outlet Branch Name",
@@ -2193,7 +2121,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    ZonesHWOutletBranch,     !- Outlet Branch Name",
 		"    Zone1HWBranch,           !- Inlet Branch 1 Name",
 		"    ZonesHWBypassBranch;     !- Inlet Branch 2 Name",
-
 
 		"  ConnectorList,",
 		"    Cooling Supply Side Connectors,  !- Name",
@@ -2223,7 +2150,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Connector:Mixer,         !- Connector 2 Object Type",
 		"    Zones HW Mixer;          !- Connector 2 Name",
 
-
 		"  NodeList,",
 		"    Chilled Water Loop Setpoint Node List,  !- Name",
 		"    ChW Supply Outlet Node;  !- Node 1 Name",
@@ -2232,7 +2158,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Hot Water Loop Setpoint Node List,  !- Name",
 		"    HW Supply Outlet Node;   !- Node 1 Name",
 
-
 		"  OutdoorAir:Node,",
 		"    Zone1VentSlabOAInNode,   !- Name",
 		"    -1.0;                    !- Height Above Ground {m}",
@@ -2240,7 +2165,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"  OutdoorAir:Node,",
 		"    Zone4VentSlabOAInNode,   !- Name",
 		"    -1.0;                    !- Height Above Ground {m}",
-
 
 		"  Pump:VariableSpeed,",
 		"    ChW Circ Pump,           !- Name",
@@ -2274,20 +2198,17 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    0,                       !- Minimum Flow Rate {m3/s}",
 		"    INTERMITTENT;            !- Pump Control Type",
 
-
 		"  DistrictCooling,",
 		"    Purchased Cooling,       !- Name",
 		"    Purchased Cooling Inlet Node,  !- Chilled Water Inlet Node Name",
 		"    Purchased Cooling Outlet Node,  !- Chilled Water Outlet Node Name",
 		"    1000000;                 !- Nominal Capacity {W}",
 
-
 		"  DistrictHeating,",
 		"    Purchased Heating,       !- Name",
 		"    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
 		"    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",
 		"    1000000;                 !- Nominal Capacity {W}",
-
 
 		"  PlantLoop,",
 		"    Chilled Water Loop,      !- Name",
@@ -2330,7 +2251,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    Heating Demand Side Branches,  !- Demand Side Branch List Name",
 		"    Heating Demand Side Connectors,  !- Demand Side Connector List Name",
 		"    Optimal;                 !- Load Distribution Scheme",
-
 
 		"  Pipe:Adiabatic,",
 		"    Cooling Supply Side Bypass,  !- Name",
@@ -2382,7 +2302,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    ZonesHWBypassInletNode,  !- Inlet Node Name",
 		"    ZonesHWBypassOutletNode; !- Outlet Node Name",
 
-
 		"  PlantEquipmentList,",
 		"    cooling plant,           !- Name",
 		"    DistrictCooling,         !- Equipment 1 Object Type",
@@ -2406,7 +2325,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    1000000,                 !- Load Range 1 Upper Limit {W}",
 		"    heating plant;           !- Range 1 Equipment List Name",
 
-
 		"  PlantEquipmentOperationSchemes,",
 		"    Chilled Loop Operation,  !- Name",
 		"    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type",
@@ -2418,7 +2336,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type",
 		"    Purchased Heating Only,  !- Control Scheme 1 Name",
 		"    ON;                      !- Control Scheme 1 Schedule Name",
-
 
 		"  SetpointManager:Scheduled,",
 		"    Chilled Water Loop Setpoint Manager,  !- Name",
@@ -2436,38 +2353,39 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-		ProcessScheduleInput();
+		ProcessScheduleInput(); // read schedule data
 
+		ErrorsFound = false;
+		HeatBalanceManager::GetProjectControlData( ErrorsFound ); // read project control data
+		EXPECT_FALSE( ErrorsFound );
+
+		ErrorsFound = false;
 		HeatBalanceManager::GetZoneData( ErrorsFound ); // read zone data
 		EXPECT_FALSE( ErrorsFound );
 
 		ErrorsFound = false;
-		GetMaterialData( ErrorsFound );
+		GetMaterialData( ErrorsFound ); // read construction material data
 		EXPECT_FALSE( ErrorsFound );
 
 		ErrorsFound = false;
-		HeatBalanceManager::GetConstructData( ErrorsFound ); // If errors found in input
+		HeatBalanceManager::GetConstructData( ErrorsFound ); // read construction data
 		EXPECT_FALSE( ErrorsFound );
 
 		ErrorsFound = false;
-		SetupZoneGeometry( ErrorsFound ); // If errors found in input
+		SetupZoneGeometry( ErrorsFound ); // read zone geometry data
 		EXPECT_FALSE( ErrorsFound );
 
 		ErrorsFound = false;
-		GetSurfaceData( ErrorsFound ); // If errors found in input
-		EXPECT_FALSE( ErrorsFound );
-
-		ErrorsFound = false;
-		GetSurfaceListsInputs();
+		GetSurfaceListsInputs(); // read surface data
 		EXPECT_FALSE( ErrorsFound );
 		
+		GetVentilatedSlabInput(); // read ventilated slab data
+		EXPECT_EQ( 2, NumOfVentSlabs );
+		EXPECT_EQ( "ZONE1VENTSLAB", VentSlab( 1 ).Name );
+		EXPECT_EQ( "ZONE4VENTSLAB", VentSlab( 2 ).Name );
 
-		GetVentilatedSlabInput();
-
-		InitVentilatedSlab( Item, VentSlabZoneNum, FirstHVACIteration );
-
-	// Deallocate everything
-	VentSlab.deallocate();
-	Node.deallocate();
+		InitVentilatedSlab( Item, VentSlabZoneNum, FirstHVACIteration );		
+		EXPECT_EQ( 324.38499999999999, VentSlab( 1 ).TotalSurfaceArea );
+		EXPECT_EQ( 139.21499999999997, VentSlab( 2 ).TotalSurfaceArea );
 
 }
