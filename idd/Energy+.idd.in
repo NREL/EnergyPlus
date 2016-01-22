@@ -36470,14 +36470,16 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
 ZoneHVAC:CoolingPanel:RadiantConvective:Water,
   A1 , \field Name
        \required-field
-  A2 , \field Available Schedule Name
+  A2 , \field Availability Schedule Name
        \required-field
        \type object-list
        \object-list ScheduleNames
-  A3 , \field Inlet Node Name
+  A3 , \field Water Inlet Node Name
        \required-field
-  A4 , \field Outlet Node Name
+       \type node
+  A4 , \field Water Outlet Node Name
        \required-field
+       \type node
   N1 , \field Rated Inlet Water Temperature
        \type real
        \units C
@@ -36489,9 +36491,9 @@ ZoneHVAC:CoolingPanel:RadiantConvective:Water,
   N3 , \field Rated Water Mass Flow Rate
        \type real
        \minimum> 0.0
-       \units Kg/s
+       \units kg/s
        \default 0.063
-  N4 , \field Rated Capacity 
+  N4 , \field Rated Cooling Capacity 
        \autosizable
        \type real
        \units W
@@ -36501,7 +36503,7 @@ ZoneHVAC:CoolingPanel:RadiantConvective:Water,
        \type real
        \units m3/s
   A5 , \field Control Type
-       \note (Temperature on which unit is controlled)
+       \note Temperature on which unit is controlled
        \type choice
        \key MeanAirTemperature
        \key MeanRadiantTemperature

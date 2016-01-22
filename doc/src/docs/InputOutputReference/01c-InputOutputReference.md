@@ -15495,11 +15495,11 @@ The name of the water outlet node for the radiant cooling panel.
 
 #### Field: Rated Inlet Water Temperature
 
-This field is the inlet temperature to the panel under conditions used to rate the capacity of the panel.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  The default value is 5°C (44°F).
+This field is the inlet temperature to the panel under conditions used to rate the capacity of the panel.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the zone.  The default value is 5°C (44°F).
 
 #### Field: Rated Space Temperature
 
-This field is the combined space temperature (air and surface) that the panel is exposed to during the rating process to obtain a rated capacity.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  The default value is 24°C (75.2°F).
+This field is the combined space temperature (air and surface) that the panel is exposed to during the rating process to obtain a rated capacity.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the zone.  The default value is 24°C (75.2°F).
 
 #### Field: Rated Water Mass Flow Rate
 
@@ -15516,8 +15516,16 @@ The maximum chilled water volumetric flow rate in m3/sec.  This field can also b
 #### Field: Control Type
 
 This field specifies two different types of control categories: temperature or zone load.  For one of the temperature based controls, this field along with the throttling range and setpoint schedules determines how the user wishes to control the radiant cooling panel.  The temperature denoted in the setpoint schedule can refer to one of five different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, or the outdoor wet-bulb temperature.  The current field controls the choice of temperature.  For controls that are based more on zone load, the user can make one of two choices based on whether the zone load is met by only the convective output of the unit or the total output of the unit.  These zone load controls will not perform as precisely as air-based systems.  The convective zone load control will come close to meeting the current setpoint temperature (defined by the typical zone thermostat input by the user) since the convective output of the unit will be set to match the remaining zone load.  However, in the long run, this will likely overcool the space since radiant energy is being absorbed by surfaces and this will impact the zone conditions at later time steps.  The total zone load control will likely undercool the space in the short term since the total output (radiant and convective) of the unit will be set to meet the remaining zone load.  However, this will not fully impact the zone air temperature immediately since some of the energy is being absorbed from surfaces rather than the zone air.  The user must select from the following options:
+
 * MeanAirTemperature
-* MeanRadiantTemperature* OperativeTemperature* OutdoorDryBulbTemperature* OutdoorWetBulbTemperature* ZoneConvectiveLoad* ZoneTotalLoadOperative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, MeanAirTemperature control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
+* MeanRadiantTemperature
+* OperativeTemperature
+* OutdoorDryBulbTemperature
+* OutdoorWetBulbTemperature
+* ZoneConvectiveLoad
+* ZoneTotalLoad
+
+Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature. If the user does not select a control type, MeanAirTemperature control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information.
 
 #### Field: Cooling Control Throttling Range
 
@@ -15557,12 +15565,12 @@ An example input for the radiant cooling panel is shown below.
 ZoneHVAC:CoolingPanel:RadiantConvective:Water,
 Radiant Cooling Panel 1,   !- Name
 RCP Schedule 1,            !- Availability schedule
-RCP Water Inlet Node,      !- Inlet node name
-RCP Water Outlet Node,     !- Outlet node name
+RCP Water Inlet Node,      !- Water Inlet node name
+RCP Water Outlet Node,     !- Water Outlet node name
 5.0,                       !- Rated Water Inlet Temperature {C}
 24.0,                      !- Rated Space Temperature {C}
 0.063,                     !- Rated Water Mass Flow Rate {kg/s}
-5000.0,                    !- Rated capacity
+5000.0,                    !- Rated cooling capacity {W}
 0.1,                       !- Maximum water flow rate {m3/s}
 MeanAirTemperature,        !- Temperature Control Type
 1.0,                       !- Cooling Control Throttling Range

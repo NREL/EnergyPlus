@@ -704,7 +704,7 @@ NTU=UA/(m ̇c_p )_water  	(4)
 
 The above equations will be used to model the performance of the panel within EnergyPlus and also to obtain a “design” UA value for the panel.
 
-Calculating the UA value of a cooling panel or coming up with a relationship for such a term is not a simple mater.  However, most devices are either rated or tested by the manufacturer under certain conditions.  From this rating information, a UA value can be calculated.  The EnergyPlus model will request rating information (inlet water temperature, mass flow rate, “air” temperature, and panel output under rating conditions) and then use it to calculate a UA value that will be used to model the performance of the panel.
+Calculating the UA value of a cooling panel or coming up with a relationship for such a term is not a simple matter.  However, most devices are either rated or tested by the manufacturer under certain conditions.  From this rating information, a UA value can be calculated.  The EnergyPlus model will request rating information (inlet water temperature, mass flow rate, “air” temperature, and panel output under rating conditions) and then use it to calculate a UA value that will be used to model the performance of the panel.
 
 The development of the method for estimating the panel UA value will use the same equations shown above but simply with the purpose of calculating UA rather than the performance of the device, i.e. determining the output of the panel.  The method for estimating the UA value of the panel begins with the panel rating data that includes the following values:
 
@@ -730,7 +730,10 @@ Finally, substituting the definition of NTU as shown in Equation 4, we obtain an
 
 UA=-((m_r ) ̇c_p )_water ln⁡(1-Q_r/(((m_r ) ̇c_p )_water (T_rwi-T_rz ) )) 	(7)
 
-This UA value will be used by the simple model to calculate the output of the radiant cooling panel based on the current water inlet temperature and mass flow rate as well as the space temperature (combination of air and radiant temperature) as described below.Algorithm Details: Zone Temperature for Radiant Panel Output and “Fraction Radiant” InputThe output from the panel will be based on the mean air temperature (MAT) and the mean radiant temperature (MRT) from the space.  These two temperatures will be combined to create a “zone” temperature that will be used in the model to calculate the radiant cooling panel output.  As shown in the previous section, a UA value will be calculated using rated conditions.  This UA value will be assumed to be constant and used in conjunction with the effectiveness-NTU method described in the previous section to determine the output of the panel based on water inlet temperature, water mass flow rate, and space conditions.  The space conditions will take into account both the mean air temperature and the mean radiant temperature via the following equation:
+This UA value will be used by the simple model to calculate the output of the radiant cooling panel based on the current water inlet temperature and mass flow rate as well as the space temperature (combination of air and radiant temperature) as described below.
+
+#### Algorithm Details: Zone Temperature for Radiant Panel Output and “Fraction Radiant” Input
+The output from the panel will be based on the mean air temperature (MAT) and the mean radiant temperature (MRT) from the space.  These two temperatures will be combined to create a “zone” temperature that will be used in the model to calculate the radiant cooling panel output.  As shown in the previous section, a UA value will be calculated using rated conditions.  This UA value will be assumed to be constant and used in conjunction with the effectiveness-NTU method described in the previous section to determine the output of the panel based on water inlet temperature, water mass flow rate, and space conditions.  The space conditions will take into account both the mean air temperature and the mean radiant temperature via the following equation:
 
 T_z=x_r MRT+(1-x_r )MAT 	(8)
 
