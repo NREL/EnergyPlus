@@ -97,6 +97,7 @@
 #include <PlantComponentTemperatureSources.hh>
 #include <PlantHeatExchangerFluidToFluid.hh>
 #include <PlantLoadProfile.hh>
+#include <PlantLocation.hh>
 #include <PlantPipingSystemsManager.hh>
 #include <PlantValves.hh>
 #include <PondGroundHeatExchanger.hh>

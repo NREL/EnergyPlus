@@ -60,9 +60,11 @@
 #define PLANTCOMPONENT_HH_INCLUDED
 
 #include <Named.hh>
-#include <PlantLocation.hh>
 
 namespace EnergyPlus {
+
+	// Forward Declarations
+	struct PlantLocation;
 
 	class PlantComponent : public Named {
 

@@ -62,6 +62,7 @@
 // C++ Headers
 #include <iosfwd>
 #include <type_traits>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
