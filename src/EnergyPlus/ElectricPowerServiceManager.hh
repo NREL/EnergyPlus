@@ -94,6 +94,18 @@ class DCtoACInverter
 private: // Creation
 	// Default Constructor
 		DCtoACInverter() :
+			aCPowerOut( 0.0 ),
+			aCEnergyOut( 0.0 ),
+			efficiency( 0.0 ),
+			dCPowerIn( 0.0 ),
+			dCEnergyIn( 0.0 ),
+			thermLossRate( 0.0 ),
+			thermLossEnergy( 0.0 ),
+			qdotConvZone( 0.0 ),
+			qdotRadZone( 0.0 ),
+			ancillACuseRate( 0.0 ),
+			ancillACuseEnergy( 0.0 ),
+			name( ""),
 			modelType( notYetSet ),
 			availSchedPtr( 0 ),
 			heatLossesDestination( heatLossNotDetermined ),
@@ -108,18 +120,8 @@ private: // Creation
 			maxPower( 0.0 ),
 			minEfficiency( 0.0 ),
 			maxEfficiency( 0.0 ),
-			standbyPower( 0.0 ),
-			efficiency( 0.0 ),
-			dCPowerIn( 0.0 ),
-			aCPowerOut( 0.0 ),
-			dCEnergyIn( 0.0 ),
-			aCEnergyOut( 0.0 ),
-			thermLossRate( 0.0 ),
-			thermLossEnergy( 0.0 ),
-			qdotConvZone( 0.0 ),
-			qdotRadZone( 0.0 ),
-			ancillACuseRate( 0.0 ),
-			ancillACuseEnergy( 0.0 )
+			standbyPower( 0.0 )
+
 		{}
 
 	// Copy Constructor
@@ -214,9 +216,15 @@ class ElectricStorage
 private: // Creation
 	// Default Constructor
 	ElectricStorage() :
+			storedPower( 0.0 ),
+			storedEnergy( 0.0 ),
+			drawnPower( 0.0 ),
+			drawnEnergy( 0.0 ),
+			decrementedEnergyStored( 0.0 ),
 			maxRainflowArrayBounds( 100 ),
 			maxRainflowArrayInc( 100 ),
 			myWarmUpFlag( false ),
+			name( "" ),
 			storageModelMode( storageTypeNotSet ),
 			availSchedPtr( 0 ),
 			heatLossesDestination( heatLossNotDetermined ),
@@ -265,11 +273,7 @@ private: // Creation
 			lastTwoTimeStepBound( 0.0 ),
 			count0( 0 ),
 			electEnergyinStorage( 0.0 ),
-			storedPower( 0.0 ),
-			storedEnergy( 0.0 ),
-			decrementedEnergyStored( 0.0 ),
-			drawnPower( 0.0 ),
-			drawnEnergy( 0.0 ),
+
 			thermLossRate( 0.0 ),
 			thermLossEnergy( 0.0 ),
 			storageMode( 0 ),
@@ -464,6 +468,7 @@ class ElectricTransformer
 private: // Creation
 	// Default Constructor
 		ElectricTransformer() :
+			name( " "),
 			myOneTimeFlag( true ),
 			availSchedPtr( 0 ),
 			usageMode( useNotYetSet ),
@@ -620,12 +625,13 @@ class GeneratorController
 private: // Creation
 	// Default Constructor
 	GeneratorController() :
-		name(""),
-		typeOfName(""),
+		name( "" ),
+		typeOfName( "" ),
 		compPlantTypeOf_Num( 0 ),
 		generatorType( generatorNotYetSet ),
 		generatorIndex( 0 ),
 		maxPowerOut( 0.0 ),
+		availSched( " " ),
 		availSchedPtr( 0 ),
 		powerRequestThisTimestep( 0.0 ),
 		onThisTimestep( false ),
@@ -723,29 +729,34 @@ class ElectPowerLoadCenter
 private: // Creation
 	// Default Constructor
 	ElectPowerLoadCenter() :
+		numGenerators( 0 ),
+		bussType( bussNotYetSet ),
+		electricityProd( 0.0 ),
+		electProdRate( 0.0 ),
+		thermalProd( 0.0 ),
+		thermalProdRate( 0.0 ),
+		inverterPresent( false ),
+		inverterName( " "),
 		name( ""),
 		generatorListName( ""),
 		genOperationScheme( genOpSchemeNotYetSet ),
 		demandMeterPtr( 0 ),
 		generatorsPresent( false ),
-		numGenerators( 0 ),
+
 		myCoGenSetupFlag( true ),
 		demandLimit( 0.0 ),
 		trackSchedPtr( 0 ),
-		bussType( bussNotYetSet ),
-		inverterPresent( false ),
-//		inverterModelNum( 0 ),
+
+
 		dCElectricityProd( 0.0 ),
 		dCElectProdRate( 0.0 ),
 		dCpowerConditionLosses( 0.0 ),
 		storagePresent( false ),
-//		storageModelNum( 0 ),
+		storageName ( "" ),
 		transformerPresent( false ),
-		transformerModelNum( 0 ),
-		electricityProd( 0.0 ),
-		electProdRate( 0.0 ),
-		thermalProd( 0.0 ),
-		thermalProdRate( 0.0 ),
+		transformerName( "" ),
+
+
 		totalPowerRequest( 0.0 ),
 		totalThermalPowerRequest( 0.0 ),
 		electDemand( 0.0 )
@@ -862,7 +873,7 @@ private: // data
 	bool transformerPresent; // should only be transformers for on-site load center, not facility service 
 	std::string transformerName; // hold name for verificaton and error messages
 	std::unique_ptr < ElectricTransformer > transformerObj;
-	int transformerModelNum; // simulation model parameter type
+
 
 	Real64 totalPowerRequest; // Total electric power request from the load center (W)
 	Real64 totalThermalPowerRequest; // Total thermal power request from the load center (W)
@@ -878,11 +889,10 @@ public: // Creation
 	// Default Constructor
 	ElectricPowerServiceManager() :
 			newEnvironmentInternalGainsFlag( true ),
+			numElecStorageDevices( 0 ),
 			getInputFlag( true ),
 			newEnvironmentFlag( true ),
 			numLoadCenters( 0 ),
-
-			numElecStorageDevices( 0 ),
 			numTransformers( 0 ),
 			setupMeterIndexFlag( true ),
 			elecFacilityIndex( 0 ),
@@ -892,7 +902,7 @@ public: // Creation
 			elecProducedStorageIndex( 0 ),
 			name( "Whole Building" ),
 			facilityPowerInTransformerPresent( false ),
-			facilityPowerInTransformerName( ""),
+			facilityPowerInTransformerName( "" ),
 			numPowerOutTransformers( 0 ),
 			wholeBldgRemainingLoad( 0.0 ),
 			electricityProd( 0.0 ),

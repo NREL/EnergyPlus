@@ -165,7 +165,7 @@ namespace ElectricPowerService {
 				for (auto loopPowerOutTransformers = 0; loopPowerOutTransformers < this->numPowerOutTransformers; ++loopPowerOutTransformers) {
 					//determine surplus production from the load centers connected to this transformer
 //					auto loadCenters = this->powerOutTransformerObjs[ loopPowerOutTransformers ]->getLoadCenterObjIndices;
-//					for (auto loopLoadCenters = 0; loopLoadCenters < loadCenters.size; ++loopLoadCenters){
+//					for (std::size_t loopLoadCenters = 0; loopLoadCenters < loadCenters.size; ++loopLoadCenters){
 	// this needs to be from takin the total surplus out to utility grid and partitioning out what fraction of that is from the load centers that point to this transformer.  TODO
 	// legacy code is not correct. defer for now. 
 
@@ -193,7 +193,7 @@ namespace ElectricPowerService {
 				for (auto loopPowerOutTransformers = 0; loopPowerOutTransformers < this->numPowerOutTransformers; ++loopPowerOutTransformers) {
 					//determine surplus production from the load centers connected to this transformer
 		//			auto loadCenters = this->powerOutTransformerObjs[ loopPowerOutTransformers ]->getLoadCenterObjIndices;
-		//			for (auto loopLoadCenters = 0; loopLoadCenters < loadCenters.size; ++loopLoadCenters){
+		//			for (std::size_t loopLoadCenters = 0; loopLoadCenters < loadCenters.size; ++loopLoadCenters){
 	// this needs to be from takin the total surplus out to utility grid and partitioning out what fraction of that is from the load centers that point to this transformer.  TODO
 	// legacy code is not correct. defer for now. 
 
@@ -387,7 +387,7 @@ namespace ElectricPowerService {
 	void
 	ElectricPowerServiceManager::verifyCustomMetersElecPowerMgr()
 	{
-		for ( int loop = 0; loop < this->elecLoadCenterObjs.size(); ++loop ) {
+		for ( std::size_t loop = 0; loop < this->elecLoadCenterObjs.size(); ++loop ) {
 			this->elecLoadCenterObjs[ loop ]->setupLoadCenterMeterIndices();
 		}
 	}
@@ -436,14 +436,11 @@ namespace ElectricPowerService {
 		this->trackSchedPtr = 0;
 		this->bussType = bussNotYetSet;
 		this->inverterPresent = false;
-//		this->inverterModelNum = 0;
 		this->dCElectricityProd = 0.0;
 		this->dCElectProdRate = 0.0;
 		this->dCpowerConditionLosses = 0.0;
 		this->storagePresent = false;
-//		this->storageModelNum = 0;
 		this->transformerPresent = false;
-		this->transformerModelNum = 0;
 		this->electricityProd = 0.0;
 		this->electProdRate = 0.0;
 		this->thermalProd = 0.0;
@@ -2986,7 +2983,7 @@ namespace ElectricPowerService {
 		switch ( this->usageMode )
 		{
 		case powerInFromGrid: {
-			for ( int meterNum = 0; meterNum < this->wiredMeterPtrs.size(); ++meterNum ) {
+			for ( std::size_t meterNum = 0; meterNum < this->wiredMeterPtrs.size(); ++meterNum ) {
 
 				if ( DataGlobals::MetersHaveBeenInitialized ) {
 
@@ -3014,6 +3011,14 @@ namespace ElectricPowerService {
 		}
 		case powerOutFromBldgToGrid : {
 			this->powerIn = surplusPowerOutFromLoadCenters;
+			break;
+		}
+		case powerFromLoadCenterToBldg : {
+			//TODO, new configuration for transformer, really part of the specific load center and connects it to the main building bus
+			break;
+		}
+		case useNotYetSet : {
+			// do nothing
 			break;
 		}
 		} // switch usage mode
@@ -3096,6 +3101,14 @@ namespace ElectricPowerService {
 			this->elecUseUtility = 0.0;
 			break;
 		}
+		case powerFromLoadCenterToBldg : {
+			//TODO, new configuration for transformer, really part of the specific load center and connects it to the main building bus
+			break;
+		}
+		case useNotYetSet : {
+			// do nothing
+			break;
+		}
 		} // switch
 
 		if ( this->powerIn <= 0 ) {
@@ -3125,7 +3138,7 @@ namespace ElectricPowerService {
 	ElectricTransformer::setupMeterIndices()
 	{
 		if (this->usageMode == powerInFromGrid ) {
-			for ( int meterNum = 0; meterNum < this->wiredMeterNames.size(); ++meterNum ) {
+			for ( std::size_t meterNum = 0; meterNum < this->wiredMeterNames.size(); ++meterNum ) {
 
 				this->wiredMeterPtrs[ meterNum ] = GetMeterIndex( this->wiredMeterNames[ meterNum ] );
 

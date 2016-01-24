@@ -206,7 +206,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest )
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	ElectricPowerService::createFacilityElectricPowerServiceObject();
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( std::make_unique < ElectricPowerService::ElectPowerLoadCenter > ( 1 ) );
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectricPowerService::ElectPowerLoadCenter ( 1 ) );
 
 	int CurveNum1 = 1;
 	Real64 k = 0.5874;
