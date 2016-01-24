@@ -178,7 +178,6 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest )
 "    9000.0,                  !- Generator 1 Rated Electric Power Output {W}",
 "    ALWAYS_ON,               !- Generator 1 Availability Schedule Name",
 "    ;                        !- Generator 1 Rated Thermal to Electrical Power Ratio",
-"    ;                        !- Generator 5 Rated Thermal to Electrical Power Ratio",
 
 "  Generator:Photovoltaic,",
 "    PV:ZN_1_FLR_1_SEC_1_Ceiling,  !- Name",
@@ -234,26 +233,49 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest )
 
 }
 
-TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords )
+TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1 )
 {
-	ShowMessage( "Begin Test: Electric Power Service Manager, UpdateLoadCenterRecords" );
-	ElectricPowerService::createFacilityElectricPowerServiceObject();
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( std::make_unique < ElectricPowerService::ElectPowerLoadCenter > ( 1 ) );
 
-//	NumLoadCenters = 1;
-//	int LoadCenterNum( 1 );
-//	ElecLoadCenter.allocate( NumLoadCenters );
-//	ElecLoadCenter( LoadCenterNum ).OperationScheme = 0;
-//	ElecLoadCenter( LoadCenterNum ).DemandMeterPtr = 0;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->numGenerators = 2;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj.emplace_back( std::make_unique < ElectricPowerService::GeneratorController >( "Test Gen 1", "Generator:InternalCombustionEngine", 1000.0, "Test Avail Sched Name", 0.5 ));
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj.emplace_back( std::make_unique < ElectricPowerService::GeneratorController >( "Test Gen 2", "Generator:WindTurbine", 2000.0, "Test Avail Sched Name", 0.375 ));
-//ElecLoadCenter( LoadCenterNum ).ElecGen.allocate( ElecLoadCenter( LoadCenterNum ).NumGenerators );
-//	ElecLoadCenter( LoadCenterNum ).TrackSchedPtr = 0;
-//	ElecLoadCenter( LoadCenterNum ).ElectricityProd = 0.0;
-//	ElecLoadCenter( LoadCenterNum ).ElectProdRate = 0.0;
-//	ElecLoadCenter( LoadCenterNum ).ThermalProd = 0.0;
-//	ElecLoadCenter( LoadCenterNum ).ThermalProdRate = 0.0;
+	std::string const idf_objects = delimited_string( { 
+	"Version,8.4;",
+
+"  ElectricLoadCenter:Distribution,",
+"    Test Load Center,    !- Name",
+"    Test Generator List,          !- Generator List Name",
+"    TrackElectrical,         !- Generator Operation Scheme Type",
+"    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}",
+"    ,                        !- Track Schedule Name Scheme Schedule Name",
+"    ,                        !- Track Meter Scheme Meter Name",
+"    AlternatingCurrent,                  !- Electrical Buss Type",
+"    ,                        !- Inverter Object Name",
+"    ;                        !- Electrical Storage Object Name",
+
+"  ElectricLoadCenter:Generators,",
+"    Test Generator List,          !- Name",
+"    Test Gen 1,  !- Generator 1 Name",
+"    Generator:InternalCombustionEngine,  !- Generator 1 Object Type",
+"    1000.0,                  !- Generator 1 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 1 Availability Schedule Name",
+"    ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio",
+"    Test Gen 2,  !- Generator 2 Name",
+"    Generator:WindTurbine,  !- Generator 2 Object Type",
+"    2000.0,                  !- Generator 2 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 2 Availability Schedule Name",
+"    ;                        !- Generator 2 Rated Thermal to Electrical Power Ratio",
+
+
+"  Schedule:Compact,",
+"    ALWAYS_ON,               !- Name",
+"    On/Off,                  !- Schedule Type Limits Name",
+"    Through: 12/31,          !- Field 1",
+"    For: AllDays,            !- Field 2",
+"    Until: 24:00,1;          !- Field 3",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	ElectricPowerService::createFacilityElectricPowerServiceObject();
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectricPowerService::ElectPowerLoadCenter ( 1 ) );
 
 
 	// Case 1 ACBuss - Generators 1000+2000=3000, thermal 500+750=1250
@@ -276,32 +298,148 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords )
 	EXPECT_NEAR( ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->thermalProdRate, 1250.0, 0.1 );
 	EXPECT_NEAR( ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->thermalProd, 1250.0*3600.0, 0.1 );
 
-	// reset
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electricityProd = 0.0;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electProdRate   = 0.0;
+}
+
+TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2 )
+{
+
+	std::string const idf_objects = delimited_string( { 
+	"Version,8.4;",
+
+"  ElectricLoadCenter:Distribution,",
+"    Test Load Center,        !- Name",
+"    Test Generator List,     !- Generator List Name",
+"    TrackElectrical,         !- Generator Operation Scheme Type",
+"    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}",
+"    ,                        !- Track Schedule Name Scheme Schedule Name",
+"    ,                        !- Track Meter Scheme Meter Name",
+"    AlternatingCurrentWithStorage,                  !- Electrical Buss Type",
+"     ,                        !- Inverter Object Name",
+"    Test Storage Bank;       !- Electrical Storage Object Name",
+
+"  ElectricLoadCenter:Storage:Simple,",
+"    Test Storage Bank,",
+"    ALWAYS_ON, !- availability schedule",
+"    , !- zone name"   ,
+"    , !- radiative fraction",
+"    1.0 , !- Nominal Energetic Efficiency for Charging",
+"    1.0,  !- Nominal Discharging Energetic efficiency",
+"    1.0E9, !- Maximum storage capacity",
+"    5000.0, !- Maximum Power for Discharging",
+"    5000.0, !- Maximum Power for Charging",
+"    1.0E9; !- initial stat of charge",
+
+"  ElectricLoadCenter:Generators,",
+"    Test Generator List,     !- Name",
+"    Test Gen 1,              !- Generator 1 Name",
+"    Generator:InternalCombustionEngine,  !- Generator 1 Object Type",
+"    1000.0,                  !- Generator 1 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 1 Availability Schedule Name",
+"    ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio",
+"    Test Gen 2,              !- Generator 2 Name",
+"    Generator:WindTurbine,   !- Generator 2 Object Type",
+"    2000.0,                  !- Generator 2 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 2 Availability Schedule Name",
+"    ;                        !- Generator 2 Rated Thermal to Electrical Power Ratio",
+
+"  Schedule:Compact,",
+"    ALWAYS_ON,               !- Name",
+"    On/Off,                  !- Schedule Type Limits Name",
+"    Through: 12/31,          !- Field 1",
+"    For: AllDays,            !- Field 2",
+"    Until: 24:00,1;          !- Field 3",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	ElectricPowerService::createFacilityElectricPowerServiceObject();
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectricPowerService::ElectPowerLoadCenter ( 1 ) );
+
 
 	// Case 2 ACBussStorage - Generators 1000+2000=3000, Storage 200-150=50
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->bussType = ElectricPowerService::ElectPowerLoadCenter::aCBussStorage;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj = std::make_unique< ElectricPowerService::ElectricStorage >(  "Test Storage"  );
-//	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageModelNum = 1;
+//	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storagePresent
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj = std::unique_ptr < ElectricPowerService::ElectricStorage >( new ElectricPowerService::ElectricStorage (  "TEST STORAGE BANK"  ) );
 
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 0 ]->electProdRate = 1000.0;
+
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 1 ]->electProdRate = 2000.0;
+
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 0 ]->electricityProd = 1000.0*3600.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 1 ]->electricityProd = 2000.0*3600.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 0 ]->thermalProdRate = 500.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 1 ]->thermalProdRate = 750.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 0 ]->thermalProd     = 500.0*3600.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 1 ]->thermalProd     = 750.0*3600.0;
 
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->drawnPower   = 200.0;
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->storedPower  = 150.0;
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->drawnEnergy  = 200.0*3600.0;
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->storedEnergy = 150.0*3600.0;
+
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->updateLoadCenterRecords();
 
 	EXPECT_NEAR( ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electProdRate, 3050.0, 0.1 );
 	EXPECT_NEAR( ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electricityProd, 3050.0*3600.0, 0.1 );
 
-	// reset
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electricityProd = 0.0;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electProdRate   = 0.0;
+	}
+
+
+TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3 )
+{
+
+	std::string const idf_objects = delimited_string( { 
+	"Version,8.4;",
+
+"  ElectricLoadCenter:Distribution,",
+"    Test Load Center,        !- Name",
+"    Test Generator List,     !- Generator List Name",
+"    TrackElectrical,         !- Generator Operation Scheme Type",
+"    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}",
+"    ,                        !- Track Schedule Name Scheme Schedule Name",
+"    ,                        !- Track Meter Scheme Meter Name",
+"    DirectCurrentWithInverter,                  !- Electrical Buss Type",
+"    Test Inverter ,                        !- Inverter Object Name",
+"    ;       !- Electrical Storage Object Name",
+
+"  ElectricLoadCenter:Inverter:Simple,",
+"    Test Inverter,",
+"    ALWAYS_ON, !- availability schedule",
+"    , !- zone name"   ,
+"    , !- radiative fraction",
+"    1.0 ; !- Inverter efficiency",
+
+
+"  ElectricLoadCenter:Generators,",
+"    Test Generator List,     !- Name",
+"    Test Gen 1,              !- Generator 1 Name",
+"    Generator:InternalCombustionEngine,  !- Generator 1 Object Type",
+"    1000.0,                  !- Generator 1 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 1 Availability Schedule Name",
+"    ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio",
+"    Test Gen 2,              !- Generator 2 Name",
+"    Generator:WindTurbine,   !- Generator 2 Object Type",
+"    2000.0,                  !- Generator 2 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 2 Availability Schedule Name",
+"    ;                        !- Generator 2 Rated Thermal to Electrical Power Ratio",
+
+"  Schedule:Compact,",
+"    ALWAYS_ON,               !- Name",
+"    On/Off,                  !- Schedule Type Limits Name",
+"    Through: 12/31,          !- Field 1",
+"    For: AllDays,            !- Field 2",
+"    Until: 24:00,1;          !- Field 3",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	ElectricPowerService::createFacilityElectricPowerServiceObject();
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectricPowerService::ElectPowerLoadCenter ( 1 ) );
+
 
 	// Case 3 DCBussInverter   Inverter = 5000,
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->bussType = ElectricPowerService::ElectPowerLoadCenter::dCBussInverter;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj = std::make_unique< ElectricPowerService::DCtoACInverter >( "Test Inverter");
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj = std::unique_ptr < ElectricPowerService::DCtoACInverter >( new ElectricPowerService::DCtoACInverter( "TEST INVERTER") );
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterPresent = true;
 
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj->aCPowerOut  = 5000.0;
@@ -310,26 +448,163 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords )
 
 	EXPECT_NEAR( ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electProdRate,   5000.0, 0.1 );
 	EXPECT_NEAR( ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electricityProd, 5000.0*3600.0, 0.1 );
+}
 
-	// reset
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electricityProd = 0.0;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electProdRate   = 0.0;
+TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4 )
+{
+
+	std::string const idf_objects = delimited_string( { 
+	"Version,8.4;",
+
+"  ElectricLoadCenter:Distribution,",
+"    Test Load Center,        !- Name",
+"    Test Generator List,     !- Generator List Name",
+"    TrackElectrical,         !- Generator Operation Scheme Type",
+"    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}",
+"    ,                        !- Track Schedule Name Scheme Schedule Name",
+"    ,                        !- Track Meter Scheme Meter Name",
+"    DirectCurrentWithInverterDCStorage,                  !- Electrical Buss Type",
+"    Test Inverter ,                        !- Inverter Object Name",
+"    Test Storage Bank;       !- Electrical Storage Object Name",
+
+"  ElectricLoadCenter:Inverter:Simple,",
+"    Test Inverter,",
+"    ALWAYS_ON, !- availability schedule",
+"    , !- zone name"   ,
+"    , !- radiative fraction",
+"    1.0 ; !- Inverter efficiency",
+
+"  ElectricLoadCenter:Storage:Simple,",
+"    Test Storage Bank,",
+"    ALWAYS_ON, !- availability schedule",
+"    , !- zone name"   ,
+"    , !- radiative fraction",
+"    1.0 , !- Nominal Energetic Efficiency for Charging",
+"    1.0,  !- Nominal Discharging Energetic efficiency",
+"    1.0E9, !- Maximum storage capacity",
+"    5000.0, !- Maximum Power for Discharging",
+"    5000.0, !- Maximum Power for Charging",
+"    1.0E9; !- initial stat of charge",
+
+"  ElectricLoadCenter:Generators,",
+"    Test Generator List,     !- Name",
+"    Test Gen 1,              !- Generator 1 Name",
+"    Generator:InternalCombustionEngine,  !- Generator 1 Object Type",
+"    1000.0,                  !- Generator 1 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 1 Availability Schedule Name",
+"    ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio",
+"    Test Gen 2,              !- Generator 2 Name",
+"    Generator:WindTurbine,   !- Generator 2 Object Type",
+"    2000.0,                  !- Generator 2 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 2 Availability Schedule Name",
+"    ;                        !- Generator 2 Rated Thermal to Electrical Power Ratio",
+
+"  Schedule:Compact,",
+"    ALWAYS_ON,               !- Name",
+"    On/Off,                  !- Schedule Type Limits Name",
+"    Through: 12/31,          !- Field 1",
+"    For: AllDays,            !- Field 2",
+"    Until: 24:00,1;          !- Field 3",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	ElectricPowerService::createFacilityElectricPowerServiceObject();
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectricPowerService::ElectPowerLoadCenter ( 1 ) );
+
 
 	// Case 4 DCBussInverterDCStorage    Inverter = 5000,
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->bussType = ElectricPowerService::ElectPowerLoadCenter::dCBussInverterDCStorage ;
+
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj = std::unique_ptr < ElectricPowerService::DCtoACInverter >( new ElectricPowerService::DCtoACInverter( "TEST INVERTER") );
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterPresent = true;
+
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj->aCPowerOut  = 5000.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj->aCEnergyOut = 5000.0*3600.0;
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->updateLoadCenterRecords();
 
 	EXPECT_NEAR( ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electProdRate,   5000.0, 0.1 );
 	EXPECT_NEAR( ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electricityProd, 5000.0*3600.0, 0.1 );
+}
 
-	// reset
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electricityProd = 0.0;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electProdRate   = 0.0;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->thermalProdRate = 0.0;
-	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->thermalProd     = 0.0;
+TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5 )
+{
+
+	std::string const idf_objects = delimited_string( { 
+	"Version,8.4;",
+
+"  ElectricLoadCenter:Distribution,",
+"    Test Load Center,        !- Name",
+"    Test Generator List,     !- Generator List Name",
+"    TrackElectrical,         !- Generator Operation Scheme Type",
+"    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}",
+"    ,                        !- Track Schedule Name Scheme Schedule Name",
+"    ,                        !- Track Meter Scheme Meter Name",
+"    DirectCurrentWithInverterACStorage,                  !- Electrical Buss Type",
+"    Test Inverter ,                        !- Inverter Object Name",
+"    Test Storage Bank;       !- Electrical Storage Object Name",
+
+"  ElectricLoadCenter:Inverter:Simple,",
+"    Test Inverter,",
+"    ALWAYS_ON, !- availability schedule",
+"    , !- zone name"   ,
+"    , !- radiative fraction",
+"    1.0 ; !- Inverter efficiency",
+
+"  ElectricLoadCenter:Storage:Simple,",
+"    Test Storage Bank,",
+"    ALWAYS_ON, !- availability schedule",
+"    , !- zone name"   ,
+"    , !- radiative fraction",
+"    1.0 , !- Nominal Energetic Efficiency for Charging",
+"    1.0,  !- Nominal Discharging Energetic efficiency",
+"    1.0E9, !- Maximum storage capacity",
+"    5000.0, !- Maximum Power for Discharging",
+"    5000.0, !- Maximum Power for Charging",
+"    1.0E9; !- initial stat of charge",
+
+"  ElectricLoadCenter:Generators,",
+"    Test Generator List,     !- Name",
+"    Test Gen 1,              !- Generator 1 Name",
+"    Generator:InternalCombustionEngine,  !- Generator 1 Object Type",
+"    1000.0,                  !- Generator 1 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 1 Availability Schedule Name",
+"    ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio",
+"    Test Gen 2,              !- Generator 2 Name",
+"    Generator:WindTurbine,   !- Generator 2 Object Type",
+"    2000.0,                  !- Generator 2 Rated Electric Power Output {W}",
+"    ALWAYS_ON,               !- Generator 2 Availability Schedule Name",
+"    ;                        !- Generator 2 Rated Thermal to Electrical Power Ratio",
+
+"  Schedule:Compact,",
+"    ALWAYS_ON,               !- Name",
+"    On/Off,                  !- Schedule Type Limits Name",
+"    Through: 12/31,          !- Field 1",
+"    For: AllDays,            !- Field 2",
+"    Until: 24:00,1;          !- Field 3",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	ElectricPowerService::createFacilityElectricPowerServiceObject();
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectricPowerService::ElectPowerLoadCenter ( 1 ) );
+
 
 	// Case 5 DCBussInverterACStorage     Inverter = 5000, , Storage 200-150=50, thermal should still be same as Case 1
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->bussType =  ( ElectricPowerService::ElectPowerLoadCenter::dCBussInverterACStorage );
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj = std::unique_ptr < ElectricPowerService::DCtoACInverter >( new ElectricPowerService::DCtoACInverter( "TEST INVERTER") );
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterPresent = true;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj = std::unique_ptr < ElectricPowerService::ElectricStorage >( new ElectricPowerService::ElectricStorage (  "TEST STORAGE BANK"  ) );
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->drawnPower   = 200.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->storedPower  = 150.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->drawnEnergy  = 200.0*3600.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->storedEnergy = 150.0*3600.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 0 ]->thermalProdRate = 500.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 1 ]->thermalProdRate = 750.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 0 ]->thermalProd     = 500.0*3600.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 1 ]->thermalProd     = 750.0*3600.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj->aCPowerOut  = 5000.0;
+	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj->aCEnergyOut = 5000.0*3600.0;
 	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->updateLoadCenterRecords();
 
 	EXPECT_NEAR( ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->electProdRate,   5050.0, 0.1 );
