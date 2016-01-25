@@ -631,7 +631,8 @@ private: // Creation
 	GeneratorController() :
 		name( "" ),
 		typeOfName( "" ),
-		compTypeOf_Num( 0 ),
+		compGenTypeOf_Num( 0 ),
+		compPlantTypeOf_Num( 0 ),
 		generatorType( generatorNotYetSet ),
 		generatorIndex( 0 ),
 		maxPowerOut( 0.0 ),
@@ -705,7 +706,8 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
 
 	std::string name; // user identifier
 	std::string typeOfName; // equipment type
-	int compTypeOf_Num; // Numeric designator for CompType (TypeOf)
+	int compGenTypeOf_Num; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
+	int compPlantTypeOf_Num; // numeric designator for plant component, in DataPlant
 	generatorTypeEnum generatorType;
 	int generatorIndex; // index in generator model data struct
 	Real64 maxPowerOut; // Maximum Power Output (W)
@@ -968,6 +970,9 @@ private: //Methods
 
 	void
 	reportPVandWindCapacity();
+
+	void
+	sumUpNumberOfStorageDevices();
 
 public: // data
 	bool newEnvironmentInternalGainsFlag;

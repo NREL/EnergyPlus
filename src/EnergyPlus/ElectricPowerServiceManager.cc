@@ -331,6 +331,8 @@ namespace ElectricPowerService {
 		SetupOutputVariable( "Facility Total Produced Electric Energy [J]", this->electricityProd, "System", "Sum", this->name );
 
 		this->reportPVandWindCapacity();
+
+		this->sumUpNumberOfStorageDevices();
 	}
 
 
@@ -401,7 +403,8 @@ namespace ElectricPowerService {
 	void
 	ElectricPowerServiceManager::updateWholeBuildingRecords()
 	{
-		this->electricityProd = GetInstantMeterValue( this->elecProducedCoGenIndex, 2 ) + ( this->elecProducedPVRate + this->elecProducedWTRate + this->elecProducedStorageRate ) * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; //whole building
+		Real64 elecProducedCoGen = GetInstantMeterValue( this->elecProducedCoGenIndex, 2 );
+		this->electricityProd = elecProducedCoGen + ( this->elecProducedPVRate + this->elecProducedWTRate + this->elecProducedStorageRate ) * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; //whole building
 		this->electProdRate = this->electricityProd / ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour ); //whole building
 
 		//Report the Total Electric Power Purchased [W], If negative then there is extra power to be sold or stored.
@@ -435,10 +438,10 @@ namespace ElectricPowerService {
 		for ( auto count = 0; count < this->numLoadCenters; ++count ) {
 			if ( this->elecLoadCenterObjs[ count ]->numGenerators > 0 ) {
 				for ( auto genCount = 0; genCount < this->elecLoadCenterObjs[ count ]->numGenerators; ++genCount ) {
-					if ( this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->compTypeOf_Num == DataGlobalConstants::iGeneratorPV ) {
+					if ( this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->compGenTypeOf_Num == DataGlobalConstants::iGeneratorPV ) {
 						pvTotalCapacity += this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->maxPowerOut;
 					}
-					if ( this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->compTypeOf_Num  == DataGlobalConstants::iGeneratorWindTurbine ) {
+					if ( this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->compGenTypeOf_Num  == DataGlobalConstants::iGeneratorWindTurbine ) {
 						windTotalCapacity += this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->maxPowerOut;
 					}
 				}
@@ -449,6 +452,18 @@ namespace ElectricPowerService {
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchLeedRenRatCap, "Wind", this->windTotalCapacity / 1000, 2 );
 
 		//TODO, this approach is relying on the correct power output to have been placed in the Generator list.  There could be a difference between this control input and the actual size of the systems as defined as generators.
+
+	}
+
+	void
+	ElectricPowerServiceManager::sumUpNumberOfStorageDevices(){
+		this->numElecStorageDevices = 0;
+		for ( auto loop = 0; loop < this->numLoadCenters; ++loop ) {
+			if ( this->elecLoadCenterObjs[ loop ]->storageObj != nullptr ) {
+				++this->numElecStorageDevices;
+			}
+
+		}
 
 	}
 
@@ -1263,7 +1278,7 @@ namespace ElectricPowerService {
 			bool plantNotFound = false;
 			for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
 				plantNotFound = false;
-				DataPlant::ScanPlantLoopsForObject( this->elecGenCntrlObj[ loopGenNum ]->name, this->elecGenCntrlObj[ loopGenNum ]->compTypeOf_Num, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.loopNum, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.loopSideNum, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.branchNum, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.compNum, _, _, _, _, _, plantNotFound );
+				DataPlant::ScanPlantLoopsForObject( this->elecGenCntrlObj[ loopGenNum ]->name, this->elecGenCntrlObj[ loopGenNum ]->compPlantTypeOf_Num, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.loopNum, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.loopSideNum, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.branchNum, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.compNum, _, _, _, _, _, plantNotFound );
 				if ( ! plantNotFound ) this->elecGenCntrlObj[ loopGenNum ]->plantInfoFound = true;
 			}
 		} // cogen setup
@@ -1290,7 +1305,8 @@ namespace ElectricPowerService {
 		//initialization
 		this->name = "";
 		this->typeOfName= "";
-		this->compTypeOf_Num = 0;
+		this->compGenTypeOf_Num = 0;
+		this->compPlantTypeOf_Num = 0;
 		this->generatorType = generatorNotYetSet;
 		this->generatorIndex = 0;
 		this->maxPowerOut = 0.0;
@@ -1316,25 +1332,32 @@ namespace ElectricPowerService {
 		this->typeOfName             = objectType;
 		if ( InputProcessor::SameString( objectType, "Generator:InternalCombustionEngine" ) ) {
 			this->generatorType = generatorICEngine;
-			this->compTypeOf_Num = DataGlobalConstants::iGeneratorICEngine;
+			this->compGenTypeOf_Num   = DataGlobalConstants::iGeneratorICEngine;
+			this->compPlantTypeOf_Num = DataPlant::TypeOf_Generator_ICEngine;
 		} else if ( InputProcessor::SameString( objectType, "Generator:CombustionTurbine" ) ) {
 			this->generatorType = generatorCombTurbine;
-			this->compTypeOf_Num = DataGlobalConstants::iGeneratorCombTurbine;
+			this->compGenTypeOf_Num = DataGlobalConstants::iGeneratorCombTurbine;
+			this->compPlantTypeOf_Num = DataPlant::TypeOf_Generator_CTurbine;
 		} else if ( InputProcessor::SameString( objectType, "Generator:MicroTurbine" ) ) {
 			this->generatorType = generatorMicroturbine;
-			this->compTypeOf_Num = DataGlobalConstants::iGeneratorMicroturbine;
+			this->compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroturbine;
+			this->compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroTurbine;
 		} else if ( InputProcessor::SameString( objectType, "Generator:Photovoltaic" ) ) {
 			this->generatorType = generatorPV;
-			this->compTypeOf_Num = DataGlobalConstants::iGeneratorPV;
+			this->compGenTypeOf_Num = DataGlobalConstants::iGeneratorPV;
+			this->compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
 		} else if ( InputProcessor::SameString( objectType, "Generator:FuelCell" ) ) {
 			this->generatorType = generatorFuelCell;
-			this->compTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
+			this->compGenTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
+			this->compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCStackCooler;
 		} else if ( InputProcessor::SameString( objectType, "Generator:MicroCHP" ) ) {
 			this->generatorType = generatorMicroCHP;
-			this->compTypeOf_Num = DataGlobalConstants::iGeneratorMicroCHP;
+			this->compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroCHP;
+			this->compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
 		} else if ( InputProcessor::SameString( objectType, "Generator:WindTurbine" ) ) {
 			this->generatorType = generatorWindTurbine;
-			this->compTypeOf_Num = DataGlobalConstants::iGeneratorWindTurbine;
+			this->compGenTypeOf_Num = DataGlobalConstants::iGeneratorWindTurbine;
+			this->compPlantTypeOf_Num = DataPlant::TypeOf_Other;
 		} else {
 			ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + " invalid entry." );
 			ShowContinueError( "Invalid " + objectType + " associated with generator = " + objectName ) ;
@@ -2193,6 +2216,15 @@ namespace ElectricPowerService {
 		Real64 qmax = 0.0;
 		Real64 Pactual = 0.0;
 		Real64 q0 = 0.0;
+		Real64 E0d = 0.0;
+
+		if ( this->storageModelMode == kiBaMBattery ) {
+			qmax = this->maxAhCapacity;
+			E0c = this->chargedOCV;
+			E0d = this->dischargedOCV;
+			k = this->chargeConversionRate;
+			c = this->availableFrac;
+		}
 
 		// step 1 figure out what is desired of electrical storage system
 
@@ -2286,17 +2318,12 @@ namespace ElectricPowerService {
 
 			if ( this->storageModelMode == kiBaMBattery ) {
 
-			//	InternalR = this->internalR;
-				qmax = this->maxAhCapacity;
-				E0c = this->chargedOCV;
-				Real64 E0d = this->dischargedOCV;
-				k = this->chargeConversionRate;
-				c = this->availableFrac;
+
 				//*************************************************
 				//The sign of power and current is negative in charging
 				//*************************************************
 				Real64 Pw = -tmpPcharge / this->numBattery;
-				Real64 q0 = this->lastTimeStepAvailable + this->lastTimeStepBound;
+				q0 = this->lastTimeStepAvailable + this->lastTimeStepBound;
 
 				I0 = 1.0; // Initial assumption
 				T0 = std::abs( qmax / I0 ); // Initial Assumption
@@ -2378,7 +2405,7 @@ namespace ElectricPowerService {
 				//**********************************************
 
 				Real64 Pw = tmpPdraw / this->numBattery;
-				Real64 q0 = this->lastTimeStepAvailable + this->lastTimeStepBound;
+				q0 = this->lastTimeStepAvailable + this->lastTimeStepBound;
 				bool const ok = this->determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, this->dischargeCurveNum, k, c, qmax, E0c, this->internalR );
 				if ( !ok ) {
 					ShowFatalError( "ElectricLoadCenter:Storage:Battery named=\"" + this->name + "\". Battery discharge current could not be estimated due to iteration limit reached. " );
@@ -2487,7 +2514,9 @@ namespace ElectricPowerService {
 //TODO change sign convention here				this->storedEnergy = -1.0 * Volt * I0 * numbattery * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 				this->storedPower = Volt * I0 * this->numBattery;
 				this->storedEnergy =  Volt * I0 * this->numBattery * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-				this->decrementedEnergyStored = this->storedEnergy; 
+// TODO, this next is a sign mistake in current dev, only mimic for no diff check in.
+//				this->decrementedEnergyStored = this->storedEnergy;  // should be this
+				this->decrementedEnergyStored = -1.0 * this->storedEnergy; // this is wrong
 				this->drawnPower = 0.0;
 				this->drawnEnergy = 0.0;
 
