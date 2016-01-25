@@ -1010,19 +1010,19 @@ namespace DataHeatBalance {
 	}
 
 	void
-	SetZoneOutBulbTempAt()
+	SetZoneOutBulbTempAt( Real64 &maxZ, std::string &ZoneName, Real64 &minBulb )
 	{
-		// Using/Aliasing
-		using DataEnvironment::SetOutBulbTempAt_error;
-
-		Real64 maxZ( 0.0 );
-		Real64 minBulb( 0.0 );
+		maxZ = 0.0;
+		minBulb = 0.0;
+		ZoneName = "";
 		for ( auto & zone : Zone ) {
 			zone.SetOutBulbTempAt();
 			minBulb = min( minBulb, zone.OutDryBulbTemp, zone.OutWetBulbTemp );
-			maxZ = max( maxZ, zone.Centroid.z );
+			if ( zone.Centroid.z > maxZ ) {
+				maxZ = zone.Centroid.z;
+				ZoneName = zone.Name;
+			}
 		}
-		if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Zone", maxZ );
 	}
 
 	void

@@ -3377,7 +3377,7 @@ namespace DataHeatBalance {
 	clear_state();
 
 	void
-	SetZoneOutBulbTempAt();
+	SetZoneOutBulbTempAt( Real64 &maxheight, std::string &ZoneName, Real64 &minBulb );
 
 	void
 	SetZoneWindSpeedAt();

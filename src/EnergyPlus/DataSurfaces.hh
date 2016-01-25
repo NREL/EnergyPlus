@@ -1690,7 +1690,7 @@ namespace DataSurfaces {
 	clear_state();
 
 	void
-	SetSurfaceOutBulbTempAt();
+	SetSurfaceOutBulbTempAt( Real64 &maxheight, std::string &SurfaceName, Real64 &minBulb );
 
 	void
 	SetSurfaceWindSpeedAt();

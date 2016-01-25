@@ -232,8 +232,16 @@ namespace DataEnvironment {
 	void
 	SetOutBulbTempAt_error(
 		std::string const & Settings,
-		Real64 const max_height
+		Real64 const max_height,
+		std::string const & SettingsName
 	);
+
+/*	void
+	SetOutBulbTempAt_errorcheck(
+		std::string const & Settings,
+		Real64 const max_height,
+		std::string const & SettingsName
+	)*/;
 
 } // DataEnvironment
 

@@ -675,19 +675,19 @@ namespace DataSurfaces {
 	}
 
 	void
-	SetSurfaceOutBulbTempAt()
+	SetSurfaceOutBulbTempAt( Real64 &maxZ, std::string &SurfaceName, Real64 &minBulb )
 	{
-		// Using/Aliasing
-		using DataEnvironment::SetOutBulbTempAt_error;
-
-		Real64 maxZ( 0.0 );
-		Real64 minBulb( 0.0 );
+		maxZ = 0.0;
+		minBulb = 0.0;
+		SurfaceName = "";
 		for ( auto & surface : Surface ) {
 			surface.SetOutBulbTempAt();
 			minBulb = min( minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp );
-			maxZ = max( maxZ, surface.Centroid.z );
+			if ( surface.Centroid.z > maxZ ) {
+				maxZ = surface.Centroid.z;
+				SurfaceName = surface.Name;
+			}
 		}
-		if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Surface", maxZ );
 	}
 
 	void

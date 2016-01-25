@@ -20,6 +20,7 @@ set( test_src
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
+  DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
   DOASEffectOnZoneSizing.unit.cc
