@@ -66,9 +66,11 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <PlantComponent.hh>
-#include <PlantLocation.hh>
 
 namespace EnergyPlus {
+
+	// Forward Declarations
+	struct PlantLocation;
 
 namespace Pipes {
 
