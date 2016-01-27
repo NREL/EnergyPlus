@@ -57,7 +57,6 @@
 // in binary and source code form.
 
 // C++ Headers
-#include <memory>
 #include <string>
 
 // EnergyPlus Headers
@@ -124,7 +123,7 @@ namespace Pipes {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
 	// Object Data
-	Array1D< std::shared_ptr< LocalPipeData > > LocalPipe; // dimension to number of pipes
+	Array1D< LocalPipeData > LocalPipe; // dimension to number of pipes
 
 	// Functions
 	void
@@ -135,16 +134,16 @@ namespace Pipes {
 		LocalPipe.deallocate();
 	}
 
-	std::shared_ptr< PlantComponent > LocalPipeData::factory( int objectType, std::string objectName ) {
+	PlantComponent * LocalPipeData::factory( int objectType, std::string objectName ) {
 		// Process the input data for pipes if it hasn't been done already
 		if ( GetPipeInputFlag ) {
 			GetPipeInput();
 			GetPipeInputFlag = false;
 		}
 		// Now look for this particular pipe in the list
-		for ( auto pipe : LocalPipe ) {
-			if ( pipe->TypeOf == objectType && pipe->name == objectName ) {
-				return pipe;
+		for ( auto & pipe : LocalPipe ) {
+			if ( pipe.TypeOf == objectType && pipe.name == objectName ) {
+				return &pipe;
 			}
 		}
 		// If we didn't find it, fatal
@@ -237,9 +236,6 @@ namespace Pipes {
 		NumSteamPipes = GetNumObjectsFound( "Pipe:Adiabatic:Steam" );
 		NumLocalPipes = NumWaterPipes + NumSteamPipes;
 		LocalPipe.allocate( NumLocalPipes );
-		for ( int p = 1; p <= NumLocalPipes; ++p ) {
-			LocalPipe( p ) = std::shared_ptr< LocalPipeData >( new LocalPipeData() );
-		}
 
 		cCurrentModuleObject = "Pipe:Adiabatic";
 		for ( PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum ) {
@@ -253,11 +249,11 @@ namespace Pipes {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			LocalPipe( PipeNum )->name = cAlphaArgs( 1 );
-			LocalPipe( PipeNum )->TypeOf = TypeOf_Pipe;
+			LocalPipe( PipeNum ).name = cAlphaArgs( 1 );
+			LocalPipe( PipeNum ).TypeOf = TypeOf_Pipe;
 
-			LocalPipe( PipeNum )->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			LocalPipe( PipeNum )->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			LocalPipe( PipeNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			LocalPipe( PipeNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
 		}
 
@@ -275,10 +271,10 @@ namespace Pipes {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			LocalPipe( PipeNum )->name = cAlphaArgs( 1 );
-			LocalPipe( PipeNum )->TypeOf = TypeOf_PipeSteam;
-			LocalPipe( PipeNum )->InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			LocalPipe( PipeNum )->OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			LocalPipe( PipeNum ).name = cAlphaArgs( 1 );
+			LocalPipe( PipeNum ).TypeOf = TypeOf_PipeSteam;
+			LocalPipe( PipeNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			LocalPipe( PipeNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Pipe Nodes" );
 		}
 

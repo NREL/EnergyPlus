@@ -59,9 +59,6 @@
 #ifndef DataPlant_hh_INCLUDED
 #define DataPlant_hh_INCLUDED
 
-// C++ Headers
-#include <memory>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -601,7 +598,7 @@ namespace DataPlant {
 		int IndexInLoopSidePumps; // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
 		Real64 TempDesCondIn;
 		Real64 TempDesEvapOut;
-		std::shared_ptr< PlantComponent > compPtr;
+		PlantComponent * compPtr;
 
 		// Default Constructor
 		CompData() :

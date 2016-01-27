@@ -309,7 +309,7 @@ namespace PipeHeatTransfer {
 		{}
 
 		static
-		std::shared_ptr< PlantComponent > factory( int objectType, std::string objectName );
+		PlantComponent * factory( int objectType, std::string objectName );
 
 		bool
 		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip );
@@ -369,7 +369,7 @@ namespace PipeHeatTransfer {
 	};
 
 	// Object Data
-	extern Array1D< std::shared_ptr< PipeHTData > > PipeHT;
+	extern Array1D< PipeHTData > PipeHT;
 
 	void
 	GetPipesHeatTransfer();
