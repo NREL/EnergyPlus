@@ -678,9 +678,9 @@ namespace ThermalComfort {
 			RadTemp = CalcRadTemp( PeopleNum );
 			// Use mean air temp for calculating RH when thermal comfort control is used
 			if ( present( PNum ) ) {
-				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
+				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			} else {
-				RelHum = PsyRhFnTdbWPb( ZTAVComf( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
+				RelHum = PsyRhFnTdbWPb( AirTemp, ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			}
 			People( PeopleNum ).TemperatureInZone = AirTemp;
 			People( PeopleNum ).RelativeHumidityInZone = RelHum * 100.0;
@@ -963,7 +963,7 @@ namespace ThermalComfort {
 				AirTemp = ZTAV( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
+			RelHum = PsyRhFnTdbWPb( AirTemp, ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			// Metabolic rate of body (W/m2)
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			// Energy consumption by external work (W/m2)
@@ -1395,7 +1395,7 @@ namespace ThermalComfort {
 				AirTemp = ZTAV( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
+			RelHum = PsyRhFnTdbWPb( AirTemp, ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			WorkEff = GetCurrentScheduleValue( People( PeopleNum ).WorkEffPtr ) * ActLevel;
 			{ auto const SELECT_CASE_var( People( PeopleNum ).ClothingType );
