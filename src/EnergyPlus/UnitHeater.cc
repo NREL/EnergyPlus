@@ -169,6 +169,8 @@ namespace UnitHeater {
 	Real64 QZnReq; // heating or cooling needed by zone [watts]
 	Array1D_bool MySizeFlag;
 	Array1D_bool CheckEquipName;
+	bool MyOneTimeFlag( true );
+	bool GetInputFlag( true ); // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
 
@@ -188,6 +190,8 @@ namespace UnitHeater {
 		CheckEquipName.deallocate();
 		UnitHeat.deallocate();
 		UnitHeatNumericFields.deallocate();
+		MyOneTimeFlag = true;
+		GetInputFlag = true;
 	}
 
 	void
@@ -236,7 +240,6 @@ namespace UnitHeater {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitHeatNum; // index of unit heater being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 
 		// FLOW:
 		if ( GetInputFlag ) {
@@ -701,7 +704,6 @@ namespace UnitHeater {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyPlantScanFlag;
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers

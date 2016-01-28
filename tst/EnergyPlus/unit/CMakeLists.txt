@@ -85,6 +85,7 @@ set( test_src
   SurfaceGeometry.unit.cc
   SwimmingPool.unit.cc
   ThermalComfort.unit.cc
+  UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
