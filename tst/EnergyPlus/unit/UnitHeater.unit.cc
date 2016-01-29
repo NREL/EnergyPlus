@@ -1185,12 +1185,8 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	int UnitHeatNum( 1 ); // unit heat index
 	int ZoneNum( 1 ); // zone index
 	int CoilNum( 1 ); // heating coil index
-	int WCAirInletNode( 0 ); // water coil air inlet node
-	int WCAirOutletNode( 0 ); // water coil air outlet node
 	int WCWaterInletNode( 0 ); // water coil water inlet node
 	int WCWaterOutletNode( 0 ); // water coil water outlet node
-	int FanInletNode( 0 ); // fan air inlet node
-	int FanOutletNode( 0 ); // fan air outlet node
 	int UHAirInletNode( 0 ); // unit heater air inlet node
 	int UHAirOutletNode( 0 ); // unit heater air outlet node
 
