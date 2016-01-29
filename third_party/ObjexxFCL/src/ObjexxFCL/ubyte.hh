@@ -28,90 +28,77 @@ class ubyte
 public: // Creation
 
 	// Default Constructor
-	inline
 	ubyte() :
 	 b_( static_cast< unsigned char >( 0 ) )
 	{}
 
 	// short Constructor
-	inline
 	explicit
 	ubyte( unsigned short int const i ) :
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// short Constructor
-	inline
 	explicit
 	ubyte( short int const i ) :
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// int Constructor
-	inline
 	explicit
 	ubyte( unsigned int const i ) :
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// int Constructor
-	inline
 	explicit
 	ubyte( int const i ) :
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// long Constructor
-	inline
 	explicit
 	ubyte( unsigned long int const i ) :
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// long Constructor
-	inline
 	explicit
 	ubyte( long int const i ) :
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// long long Constructor
-	inline
 	explicit
 	ubyte( unsigned long long int const i ) :
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// long long Constructor
-	inline
 	explicit
 	ubyte( long long int const i ) :
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// char Constructor
-	inline
 	explicit
 	ubyte( unsigned char const c ) :
 	 b_( c )
 	{}
 
 	// char Constructor
-	inline
 	explicit
 	ubyte( char const c ) :
 	 b_( c )
 	{}
 
 	// Destructor
-	inline
 	~ubyte()
 	{}
 
 public: // Conversion
 
 	// short Conversion
-	inline
 	operator unsigned short int() const
 	{
 		return static_cast< unsigned short int >( b_ );
@@ -120,7 +107,6 @@ public: // Conversion
 public: // Assignment
 
 	// = short
-	inline
 	ubyte &
 	operator =( unsigned short int const i )
 	{
@@ -129,7 +115,6 @@ public: // Assignment
 	}
 
 	// += short
-	inline
 	ubyte &
 	operator +=( unsigned short int const i )
 	{
@@ -138,7 +123,6 @@ public: // Assignment
 	}
 
 	// -= short
-	inline
 	ubyte &
 	operator -=( unsigned short int const i )
 	{
@@ -147,7 +131,6 @@ public: // Assignment
 	}
 
 	// *= short
-	inline
 	ubyte &
 	operator *=( unsigned short int const i )
 	{
@@ -156,7 +139,6 @@ public: // Assignment
 	}
 
 	// /= short
-	inline
 	ubyte &
 	operator /=( unsigned short int const i )
 	{
@@ -168,7 +150,6 @@ public: // Assignment
 public: // Incrememt/Decrement
 
 	// ++ubyte
-	inline
 	ubyte &
 	operator ++()
 	{
@@ -177,7 +158,6 @@ public: // Incrememt/Decrement
 	}
 
 	// ubyte++
-	inline
 	ubyte const
 	operator ++( int )
 	{
@@ -187,7 +167,6 @@ public: // Incrememt/Decrement
 	}
 
 	// --ubyte
-	inline
 	ubyte &
 	operator --()
 	{
@@ -196,7 +175,6 @@ public: // Incrememt/Decrement
 	}
 
 	// ubyte--
-	inline
 	ubyte const
 	operator --( int )
 	{
@@ -208,7 +186,6 @@ public: // Incrememt/Decrement
 public: // Math
 
 	// +ubyte
-	inline
 	ubyte
 	operator +() const
 	{
@@ -216,7 +193,6 @@ public: // Math
 	}
 
 	// -ubyte
-	inline
 	ubyte
 	operator -() const
 	{
@@ -225,7 +201,6 @@ public: // Math
 
 	// ubyte + ubyte
 	friend
-	inline
 	ubyte
 	operator +( ubyte const & i, ubyte const & j )
 	{
@@ -234,7 +209,6 @@ public: // Math
 
 	// ubyte - ubyte
 	friend
-	inline
 	ubyte
 	operator -( ubyte const & i, ubyte const & j )
 	{
@@ -243,7 +217,6 @@ public: // Math
 
 	// ubyte * ubyte
 	friend
-	inline
 	ubyte
 	operator *( ubyte const & i, ubyte const & j )
 	{
@@ -252,7 +225,6 @@ public: // Math
 
 	// ubyte / ubyte
 	friend
-	inline
 	ubyte
 	operator /( ubyte const & i, ubyte const & j )
 	{
@@ -263,7 +235,6 @@ public: // Math
 public: // Bitwise Logical
 
 	// ~ubyte
-	inline
 	ubyte
 	operator ~() const
 	{
@@ -271,7 +242,6 @@ public: // Bitwise Logical
 	}
 
 	// ubyte >> std::size_t
-	inline
 	ubyte
 	operator >>( std::size_t const n ) const
 	{
@@ -279,7 +249,6 @@ public: // Bitwise Logical
 	}
 
 	// ubyte >> ubyte
-	inline
 	ubyte
 	operator >>( ubyte const n ) const
 	{
@@ -287,7 +256,6 @@ public: // Bitwise Logical
 	}
 
 	// ubyte << std::size_t
-	inline
 	ubyte
 	operator <<( std::size_t const n ) const
 	{
@@ -295,7 +263,6 @@ public: // Bitwise Logical
 	}
 
 	// ubyte << ubyte
-	inline
 	ubyte
 	operator <<( ubyte const n ) const
 	{
@@ -303,7 +270,6 @@ public: // Bitwise Logical
 	}
 
 	// &= ubyte
-	inline
 	ubyte &
 	operator &=( ubyte const & i )
 	{
@@ -312,7 +278,6 @@ public: // Bitwise Logical
 	}
 
 	// |= ubyte
-	inline
 	ubyte &
 	operator |=( ubyte const & i )
 	{
@@ -321,7 +286,6 @@ public: // Bitwise Logical
 	}
 
 	// ^= ubyte
-	inline
 	ubyte &
 	operator ^=( ubyte const & i )
 	{
@@ -331,7 +295,6 @@ public: // Bitwise Logical
 
 	// ubyte & ubyte
 	friend
-	inline
 	ubyte
 	operator &( ubyte const & i, ubyte const & j )
 	{
@@ -340,7 +303,6 @@ public: // Bitwise Logical
 
 	// ubyte | ubyte
 	friend
-	inline
 	ubyte
 	operator |( ubyte const & i, ubyte const & j )
 	{
@@ -349,7 +311,6 @@ public: // Bitwise Logical
 
 	// ubyte ^ ubyte
 	friend
-	inline
 	ubyte
 	operator ^( ubyte const & i, ubyte const & j )
 	{
@@ -360,7 +321,6 @@ public: // Comparison
 
 	// ubyte == ubyte
 	friend
-	inline
 	bool
 	operator ==( ubyte const & i, ubyte const & j )
 	{
@@ -369,7 +329,6 @@ public: // Comparison
 
 	// ubyte != ubyte
 	friend
-	inline
 	bool
 	operator !=( ubyte const & i, ubyte const & j )
 	{
@@ -378,7 +337,6 @@ public: // Comparison
 
 	// ubyte < ubyte
 	friend
-	inline
 	bool
 	operator <( ubyte const & i, ubyte const & j )
 	{
@@ -387,7 +345,6 @@ public: // Comparison
 
 	// ubyte <= ubyte
 	friend
-	inline
 	bool
 	operator <=( ubyte const & i, ubyte const & j )
 	{
@@ -396,7 +353,6 @@ public: // Comparison
 
 	// ubyte > ubyte
 	friend
-	inline
 	bool
 	operator >( ubyte const & i, ubyte const & j )
 	{
@@ -405,7 +361,6 @@ public: // Comparison
 
 	// ubyte >= ubyte
 	friend
-	inline
 	bool
 	operator >=( ubyte const & i, ubyte const & j )
 	{
@@ -416,7 +371,6 @@ public: // I/O
 
 	// Stream >> ubyte
 	friend
-	inline
 	std::istream &
 	operator >>( std::istream & stream, ubyte & b )
 	{
@@ -430,7 +384,6 @@ public: // I/O
 
 	// Stream << ubyte
 	friend
-	inline
 	std::ostream &
 	operator <<( std::ostream & stream, ubyte const & b )
 	{

@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef TranspiredCollector_hh_INCLUDED
 #define TranspiredCollector_hh_INCLUDED
 
@@ -166,139 +224,6 @@ namespace TranspiredCollector {
 			UTSCCollEff( 0.0 )
 		{}
 
-		// Member Constructor
-		UTSCDataStruct(
-			std::string const & Name,
-			std::string const & OSCMName, // OtherSideConditionsModel
-			int const OSCMPtr, // OtherSideConditionsModel index
-			int const SchedPtr, // Availablity schedule
-			Array1_int const & InletNode, // Air system node "pointer", should be set to outdoor air
-			Array1_int const & OutletNode, // Air system node "pointer", outlet from UTSC
-			Array1_int const & ControlNode, // Air system node "pointer", should have mixed air setpoint
-			Array1_int const & ZoneNode, // Air system node "pointer", should have zone node
-			int const Layout, // 'Square' or 'Triangle'
-			int const Correlation, // which heat exchanger effectiveness model
-			Real64 const HoleDia, // Diameter of Perforations in Collector [m]
-			Real64 const Pitch, // Distance between Perforations in Collector [m]
-			Real64 const LWEmitt, // Thermal Emissivity of Collector Surface [dimensionless]
-			Real64 const SolAbsorp, // Solar Absorbtivity of Collector Surface [dimensionless]
-			int const CollRoughness, // surface roughness for exterior convection calcs.
-			Real64 const PlenGapThick, // Depth of Plenum Behind Collector [m]
-			Real64 const PlenCrossArea, // cross section area of plenum behind collector [m2]
-			int const NumSurfs, // a single collector can have multiple surfaces underneath it
-			Array1_int const & SurfPtrs, // = 0  ! array of pointers for participating underlying surfaces
-			Real64 const Height, // Overall Height of Collector  [m]
-			Real64 const AreaRatio, // Ratio of actual surface are to projected surface area [dimensionless]
-			Real64 const CollectThick, // Thickness of collector absorber plate material.  [m]
-			Real64 const Cv, // volume-based effectiveness of openings for wind-driven vent when Passive
-			Real64 const Cd, // discharge coefficient of openings for bouyancy-driven vent when Passive
-			int const NumOASysAttached, // =1 if no splitter, other wise set by Splitter object
-			int const FreeHeatSetPointSchedPtr, // used for controlling seperately from usual setpoint managers.
-			int const VsucErrIndex,
-			Real64 const ActualArea, // Overall Area of Collect with surface corrugations.
-			Real64 const ProjArea, // Overall Area of Collector projected, as if flat [m2]
-			Vector const & Centroid, // computed centroid
-			Real64 const Porosity, // fraction of absorber plate [--]
-			bool const IsOn, // .TRUE. means "on" or "ACTIVE" , .false means "off" or "PASSIVE
-			Real64 const Tplen, // modeled drybulb temperature for air between collector and wall [C]
-			Real64 const Tcoll, // modeled surface temperature for collector [C]
-			Real64 const TplenLast, // Old Value for modeled drybulb temp if air between collector and wall [C]
-			Real64 const TcollLast, // Old value for modeled surface temperature for collector [C]
-			Real64 const HrPlen, // Modeled radiation coef for OSCM [W/m2-C]
-			Real64 const HcPlen, // Modeled Convection coef for OSCM [W/m2-C]
-			Real64 const MdotVent, // air mass flow exchanging with ambient when passive.
-			Real64 const HdeltaNPL, // lenth scale for bouyancy-driven vent when Passive [m]
-			Real64 const TairHX, // air drybulb of air leaving collector when Active [C]
-			Real64 const InletMDot, // flow rate from outdoor mixer controller
-			Real64 const InletTempDB,
-			Real64 const Tilt, // Tilt from area weighted average of underlying surfaces
-			Real64 const Azimuth, // Azimuth from area weighted average of underlying surfaces
-			Real64 const QdotSource, // Source/sink term
-			Real64 const Isc, // total incident solar on collector [W]
-			Real64 const HXeff, // heat exchanger effectiveness [--]
-			Real64 const Vsuction, // Average suction face velocity [m/s]
-			Real64 const PassiveACH, // air changes per hour when passive [1/hr]
-			Real64 const PassiveMdotVent, // Total Nat Vent air change rate  [kg/s]
-			Real64 const PassiveMdotWind, // Nat Vent air change rate from Wind-driven [kg/s]
-			Real64 const PassiveMdotTherm, // Nat. Vent air change rate from bouyancy-driven flow [kg/s]
-			Real64 const PlenumVelocity, // effective velocity inside plenum [m/s]
-			Real64 const SupOutTemp, // supply air outlet temperature [C]
-			Real64 const SupOutHumRat, // supply air outlet humidity ratio [kg water/kg dry air]
-			Real64 const SupOutEnth, // supply air outlet enthalpy [J/kg]
-			Real64 const SupOutMassFlow, // supply air outlet mass flow rate [kg/s]
-			Real64 const SensHeatingRate, // rate of sensible heat being added to the supply (primary) air [W]
-			Real64 const SensHeatingEnergy, // sensible heat added to the supply (primary) air [J]
-			Real64 const SensCoolingRate, // rate of sensible heat being removed from the supply (primary) air [W]
-			Real64 const SensCoolingEnergy, // sensible heat removed from the supply (primary) air [J]
-			Real64 const UTSCEfficiency, // Total Efficiency (with wall) SensHeatingRate/IncidentRadiation[--]
-			Real64 const UTSCCollEff // Collector-only Efficiency [--]
-		) :
-			Name( Name ),
-			OSCMName( OSCMName ),
-			OSCMPtr( OSCMPtr ),
-			SchedPtr( SchedPtr ),
-			InletNode( InletNode ),
-			OutletNode( OutletNode ),
-			ControlNode( ControlNode ),
-			ZoneNode( ZoneNode ),
-			Layout( Layout ),
-			Correlation( Correlation ),
-			HoleDia( HoleDia ),
-			Pitch( Pitch ),
-			LWEmitt( LWEmitt ),
-			SolAbsorp( SolAbsorp ),
-			CollRoughness( CollRoughness ),
-			PlenGapThick( PlenGapThick ),
-			PlenCrossArea( PlenCrossArea ),
-			NumSurfs( NumSurfs ),
-			SurfPtrs( SurfPtrs ),
-			Height( Height ),
-			AreaRatio( AreaRatio ),
-			CollectThick( CollectThick ),
-			Cv( Cv ),
-			Cd( Cd ),
-			NumOASysAttached( NumOASysAttached ),
-			FreeHeatSetPointSchedPtr( FreeHeatSetPointSchedPtr ),
-			VsucErrIndex( VsucErrIndex ),
-			ActualArea( ActualArea ),
-			ProjArea( ProjArea ),
-			Centroid( Centroid ),
-			Porosity( Porosity ),
-			IsOn( IsOn ),
-			Tplen( Tplen ),
-			Tcoll( Tcoll ),
-			TplenLast( TplenLast ),
-			TcollLast( TcollLast ),
-			HrPlen( HrPlen ),
-			HcPlen( HcPlen ),
-			MdotVent( MdotVent ),
-			HdeltaNPL( HdeltaNPL ),
-			TairHX( TairHX ),
-			InletMDot( InletMDot ),
-			InletTempDB( InletTempDB ),
-			Tilt( Tilt ),
-			Azimuth( Azimuth ),
-			QdotSource( QdotSource ),
-			Isc( Isc ),
-			HXeff( HXeff ),
-			Vsuction( Vsuction ),
-			PassiveACH( PassiveACH ),
-			PassiveMdotVent( PassiveMdotVent ),
-			PassiveMdotWind( PassiveMdotWind ),
-			PassiveMdotTherm( PassiveMdotTherm ),
-			PlenumVelocity( PlenumVelocity ),
-			SupOutTemp( SupOutTemp ),
-			SupOutHumRat( SupOutHumRat ),
-			SupOutEnth( SupOutEnth ),
-			SupOutMassFlow( SupOutMassFlow ),
-			SensHeatingRate( SensHeatingRate ),
-			SensHeatingEnergy( SensHeatingEnergy ),
-			SensCoolingRate( SensCoolingRate ),
-			SensCoolingEnergy( SensCoolingEnergy ),
-			UTSCEfficiency( UTSCEfficiency ),
-			UTSCCollEff( UTSCCollEff )
-		{}
-
 	};
 
 	// Object Data
@@ -344,31 +269,6 @@ namespace TranspiredCollector {
 		int const UTSCNum,
 		Real64 & TsColl
 	);
-
-	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // TranspiredCollector
 

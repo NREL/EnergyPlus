@@ -71,7 +71,7 @@ equali( std::string const & s, c_cstring const t )
 {
 #if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
 	std::string::size_type const s_len( s.length() );
-	std::string::size_type i( 0 );
+	std::string::size_type i( 0u );
 	char c( to_lower( t[ 0 ] ) );
 	while ( ( i < s_len ) && ( c != '\0' ) && ( to_lower( s[ i ] ) == c ) ) {
 		c = to_lower( t[ ++i ] );
@@ -95,7 +95,7 @@ equali( c_cstring const t, std::string const & s )
 {
 #if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
 	std::string::size_type const s_len( s.length() );
-	std::string::size_type i( 0 );
+	std::string::size_type i( 0u );
 	char c( to_lower( t[ 0 ] ) );
 	while ( ( i < s_len ) && ( c != '\0' ) && ( to_lower( s[ i ] ) == c ) ) {
 		c = to_lower( t[ ++i ] );
@@ -117,7 +117,7 @@ inline
 bool
 equali( c_cstring const s, c_cstring const t )
 {
-	std::string::size_type i( 0 );
+	std::string::size_type i( 0u );
 	char c( to_lower( s[ 0 ] ) );
 	while ( c == to_lower( t[ i ] ) ) {
 		if ( c == '\0' ) return true;

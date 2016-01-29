@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // EnergyPlus::DXCoils unit tests
 // DX heating coil defrost capacity with electric resistance
 
@@ -45,14 +103,16 @@ namespace EnergyPlus {
 		DXCoilNum = 2;
 		DXCoil.allocate( NumDXCoils );
 		DXCoil( 1 ).DXCoilType_Num = CoilDX_MultiSpeedCooling;
+		DXCoil( 1 ).DXCoilType = "Coil:Cooling:DX:MultiSpeed";
 		DXCoil( 2 ).DXCoilType_Num = CoilDX_MultiSpeedHeating;
+		DXCoil( 2 ).DXCoilType = "Coil:Heating:DX:MultiSpeed";
 		DXCoil( 1 ).MSRatedTotCap.allocate( 2 );
 		DXCoil( 2 ).MSRatedTotCap.allocate( 2 );
 		DXCoil( 2 ).CompanionUpstreamDXCoil = 1;
 
 		DXCoilNumericFields.allocate( NumDXCoils );
 		DXCoilNumericFields( 2 ).PerfMode.allocate( 1 );
-		DXCoilNumericFields( 2 ).PerfMode( 1 ).FieldNames.allocate( 4 );
+		DXCoilNumericFields( 2 ).PerfMode( 1 ).FieldNames.allocate( 15 );
 		DXCoil( 2 ).DefrostStrategy = Resistive;
 		DXCoil( 2 ).DefrostCapacity = 5000.0;
 		DXCoil( 2 ).Name = "DX Heating coil";
@@ -156,8 +216,8 @@ namespace EnergyPlus {
 		EXPECT_TRUE( has_cerr_output() );
 
 		// fails on windows due to endline issue... this outputs /r/n on Windows but it is outputting /n on Windows for some reason...
-		// EXPECT_TRUE( compare_cerr_stream( delimited_string( { 
-		// 	"! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number", 
+		// EXPECT_TRUE( compare_cerr_stream( delimited_string( {
+		// 	"! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number",
 		// 	" DX Heating Coil Standard Rating Information, , DX Heating coil, 6414.3, 6414.3, 6.58, 4" } ) ) );
 
 		// Clean up
@@ -259,10 +319,10 @@ namespace EnergyPlus {
 
 		EXPECT_TRUE( has_cerr_output() );
 
-		// EXPECT_TRUE( compare_cerr_stream( delimited_string( { 
-		// 	"! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value", 
-		// 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Design Size  [W], 0.00000", 
-		// 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, User-Specified  [W], 5000.00000", 
+		// EXPECT_TRUE( compare_cerr_stream( delimited_string( {
+		// 	"! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value",
+		// 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Design Size  [W], 0.00000",
+		// 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, User-Specified  [W], 5000.00000",
 		// 	" DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, 0.0, 0.0, 3.51, 4"} ) ) );
 
 		// Output from CI, I don't know why it is different than above...
@@ -316,7 +376,7 @@ namespace EnergyPlus {
 		DXCoilFanOpMode.allocate( NumDXCoils );
 		DXCoilPartLoadRatio.allocate( NumDXCoils );
 		DXCoilNumericFields( DXCoilNum ).PerfMode.allocate( 1 );
-		DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate( 4 );
+		DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate( 15 );
 		Coil.DefrostStrategy = Resistive;
 		Coil.Name = "DX Heating coil";
 		Coil.NumOfSpeeds = 2;
@@ -801,15 +861,15 @@ namespace EnergyPlus {
 		AirPressure = StdPressureSeaLevel;
 		InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(InletDBTemp, InletWBTemp, AirPressure );
 		AirMassFlowRate = AirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW( AirPressure, InletDBTemp, InletAirHumRat );
-		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, AirPressure );
+		CBF_calculated = CalcCBF( CoilType, CoilName, InletDBTemp, InletAirHumRat, TotalCap, AirMassFlowRate, SHR, true, AirPressure );
 		CBF_expected = 0.17268167698750708;
 		EXPECT_DOUBLE_EQ( CBF_calculated, CBF_expected );
 	}
 
 	TEST_F( EnergyPlusFixture, DXCoilEvapCondPumpSizingTest ) {
-		
+
 		// tests autosizing evaporatively cooled condenser pump #4802
-		
+
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
 			"	Schedule:Compact,",
@@ -911,7 +971,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( DataSizing::AutoSize, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
 
 		SetPredefinedTables();
-		
+
 		SizeDXCoil( 1 );
 		EXPECT_EQ( 25000.0, DXCoil( 1 ).RatedTotCap( 1 ) );
 		EXPECT_EQ( DXCoil( 1 ).RatedTotCap( 1 ) * 0.004266, DXCoil( 1 ).EvapCondPumpElecNomPower( 1 ) );
@@ -919,26 +979,26 @@ namespace EnergyPlus {
 		// clear
 		DXCoil.deallocate();
 	}
-	
+
 	TEST_F( EnergyPlusFixture, TestDXCoilIndoorOrOutdoor ) {
-		
+
 		//Test whether the coil is placed indoor or outdoor, by checking the air inlet node location
-		
+
 		using namespace DXCoils;
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
 		// Common Inputs
-		int NumCoils; // total number of coils 
-		int DXCoilNum; // index to the current coil 
+		int NumCoils; // total number of coils
+		int DXCoilNum; // index to the current coil
 
 		// Allocate
 		NumCoils = 3;
 		DXCoil.allocate( NumCoils );
-			
+
 		// IDF snippets
 		std::string const idf_objects = delimited_string({
-			"Version,8.3;                                          ", 
+			"Version,8.3;                                          ",
 			"OutdoorAir:Node,                                      ",
 			"   Outside Air Inlet Node 1; !- Name                  ",
 			"OutdoorAir:NodeList,                                  ",
@@ -947,30 +1007,30 @@ namespace EnergyPlus {
 			"   OutsideAirInletNodes,    !- Name                   ",
 			"   Outside Air Inlet Node 2;!- Node 1 Name            ",
 		});
-		
+
 		ASSERT_FALSE( process_idf( idf_objects ) );
-		
+
 		// Run
-		DXCoilNum = 1;  
+		DXCoilNum = 1;
 		DXCoil(DXCoilNum).AirInNode = 1; // "Outside Air Inlet Node 1"
 		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
-		
-		DXCoilNum = 2;  
+
+		DXCoilNum = 2;
 		DXCoil(DXCoilNum).AirInNode = 2; // "Outside Air Inlet Node 2"
 		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
-		
+
 		DXCoilNum = 3; // "Inside Air Inlet Node"
 		DXCoil( DXCoilNum ).IsDXCoilInZone = ! CheckOutAirNodeNumber( DXCoil( DXCoilNum ).AirInNode );
-		
+
 		// Check
 		EXPECT_FALSE( DXCoil( 1 ).IsDXCoilInZone );
 		EXPECT_FALSE( DXCoil( 2 ).IsDXCoilInZone );
 		EXPECT_TRUE( DXCoil( 3 ).IsDXCoilInZone );
 
 		// Clean up
-		DXCoil.deallocate( ); 
+		DXCoil.deallocate();
 	}
-	
+
 	TEST_F( EnergyPlusFixture, TestMultiSpeedWasteHeat )
 	{
 		// Test the waste heat function #4536
@@ -1145,7 +1205,7 @@ namespace EnergyPlus {
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
 		// Case 1 test
-		GetDXCoils( );
+		GetDXCoils();
 
 		EXPECT_EQ( FuelTypeElectricity, DXCoil( 1 ).FuelType );
 		EXPECT_EQ( 0, DXCoil( 1 ).MSWasteHeat( 2 ) );
@@ -1177,7 +1237,7 @@ namespace EnergyPlus {
 		DXCoil( 1 ).MSRatedCBF( 2 ) = 0.0408;
 
 		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1 );
-		
+
 		EXPECT_EQ( 0, MSHPWasteHeat );
 
 		// Case 3 heat recovery is true and no waste heat function cuvre
@@ -1190,7 +1250,161 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 1303.4304, MSHPWasteHeat, 0.001 );
 
 		// clear
-		DXCoil.deallocate( );
+		DXCoil.deallocate();
 
 	}
+
+	TEST_F( EnergyPlusFixture, DXCoil_ValidateADPFunction ) {
+
+		using Psychrometrics::PsyRhoAirFnPbTdbW;
+
+		// tests autosizing DX coil SHR #4853
+
+		std::string const idf_objects = delimited_string( {
+			"	Schedule:Compact,",
+			"	FanAndCoilAvailSched, !- Name",
+			"	Fraction,             !- Schedule Type Limits Name",
+			"	Through: 12/31,       !- Field 1",
+			"	For: AllDays,         !- Field 2",
+			"	Until: 24:00, 1.0;    !- Field 3",
+			"Curve:Biquadratic,",
+			"	WindACCoolCapFT, !- Name",
+			"	0.942587793,     !- Coefficient1 Constant",
+			"	0.009543347,     !- Coefficient2 x",
+			"	0.000683770,     !- Coefficient3 x**2",
+			"	-0.011042676,    !- Coefficient4 y",
+			"	0.000005249,     !- Coefficient5 y**2",
+			"	-0.000009720,    !- Coefficient6 x*y",
+			"	12.77778,        !- Minimum Value of x",
+			"	23.88889,        !- Maximum Value of x",
+			"	18.0,            !- Minimum Value of y",
+			"	46.11111,        !- Maximum Value of y",
+			"	,                !- Minimum Curve Output",
+			"	,                !- Maximum Curve Output",
+			"	Temperature,     !- Input Unit Type for X",
+			"	Temperature,     !- Input Unit Type for Y",
+			"	Dimensionless;   !- Output Unit Type",
+			"Curve:Biquadratic,",
+			"	WindACEIRFT,   !- Name",
+			"	0.342414409,   !- Coefficient1 Constant",
+			"	0.034885008,   !- Coefficient2 x",
+			"	-0.000623700,  !- Coefficient3 x**2",
+			"	0.004977216,   !- Coefficient4 y",
+			"	0.000437951,   !- Coefficient5 y**2",
+			"	-0.000728028,  !- Coefficient6 x*y",
+			"	12.77778,      !- Minimum Value of x",
+			"	23.88889,      !- Maximum Value of x",
+			"	18.0,          !- Minimum Value of y",
+			"	46.11111,      !- Maximum Value of y",
+			"	,              !- Minimum Curve Output",
+			"	,              !- Maximum Curve Output",
+			"	Temperature,   !- Input Unit Type for X",
+			"	Temperature,   !- Input Unit Type for Y",
+			"	Dimensionless; !- Output Unit Type",
+			"Curve:Quadratic,",
+			"	WindACCoolCapFFF, !- Name",
+			"	0.8,              !- Coefficient1 Constant",
+			"	0.2,              !- Coefficient2 x",
+			"	0.0,              !- Coefficient3 x**2",
+			"	0.5,              !- Minimum Value of x",
+			"	1.5;              !- Maximum Value of x",
+			"Curve:Quadratic,",
+			"	WindACEIRFFF, !- Name",
+			"	1.1552,       !- Coefficient1 Constant",
+			"  -0.1808,       !- Coefficient2 x",
+			"	0.0256,       !- Coefficient3 x**2",
+			"	0.5,          !- Minimum Value of x",
+			"	1.5;          !- Maximum Value of x",
+			"Curve:Quadratic,",
+			"	WindACPLFFPLR, !- Name",
+			"	0.85,          !- Coefficient1 Constant",
+			"	0.15,          !- Coefficient2 x",
+			"	0.0,           !- Coefficient3 x**2",
+			"	0.0,           !- Minimum Value of x",
+			"	1.0;           !- Maximum Value of x",
+			"Coil:Cooling:DX:SingleSpeed,",
+			"	Furnace ACDXCoil 1,   !- Name",
+			" 	FanAndCoilAvailSched, !- Availability Schedule Name",
+			"	25000.0,              !- Gross Rated Total Cooling Capacity { W }",
+			"	autosize,             !- Gross Rated Sensible Heat Ratio",
+			"	4.40,                 !- Gross Rated Cooling COP { W / W }",
+			"	1.30,                 !- Rated Air Flow Rate { m3 / s }",
+			"	,                     !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+			"	DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+			"	Heating Coil Air Inlet Node,    !- Air Outlet Node Name",
+			"	WindACCoolCapFT,      !- Total Cooling Capacity Function of Temperature Curve Name",
+			"	WindACCoolCapFFF,     !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+			"	WindACEIRFT,          !- Energy Input Ratio Function of Temperature Curve Name",
+			"	WindACEIRFFF,         !- Energy Input Ratio Function of Flow Fraction Curve Name",
+			"	WindACPLFFPLR,        !- Part Load Fraction Correlation Curve Name",
+			"	0.0,                  !- Nominal Time for Condensate Removal to Begin",
+			"	0.0,                  !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+			"	0.0,                  !- Maximum Cycling Rate",
+			"	0.0,                  !- Latent Capacity Time Constant",
+			"	Split TSW Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+			"	EvaporativelyCooled,  !- Condenser Type",
+			"	0.0,                  !- Evaporative Condenser Effectiveness",
+			"	,                     !- Evaporative Condenser Air Flow Rate",
+			"	autosize,             !- Evaporative Condenser Pump Rated Power Consumption",
+			"	0.0,                  !- Crankcase Heater Capacity",
+			"	10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		ProcessScheduleInput();
+		GetCurveInput();
+		GetDXCoils();
+		SetPredefinedTables();
+		CurZoneEqNum = 1;
+
+		// Need this to prevent crash in RequestSizing
+		FinalZoneSizing.allocate( 1 );
+		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.1;
+		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.1;
+		DataFlowUsedForSizing = 0.1;
+		ZoneEqSizing.allocate( 1 );
+		ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+		ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = DXCoil( 1 ).RatedTotCap( 1 );
+		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
+		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
+		ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::SystemAirflowSizing ) = DataSizing::SupplyAirFlowRate;
+		ZoneSizingInput.allocate( 1 );
+		ZoneSizingInput( 1 ).ZoneNum = 1;
+		DataSizing::NumZoneSizingInput = 1;
+		ZoneSizingRunDone = true;
+		StdBaroPress = 101325.0;
+
+		SizeDXCoil( 1 ); // normal sizing
+
+		Real64 const RatedInletAirTemp( 26.6667 ); // 26.6667C or 80F
+		Real64 const RatedInletAirHumRat( 0.01125 ); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+		std::string const CallingRoutine( "DXCoil_ValidateADPFunction" );
+
+		Real64 DesMassFlow = DXCoil( 1 ).RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
+		Real64 CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+
+		EXPECT_NEAR( 0.747472, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
+		EXPECT_NEAR( 0.1012203, CBF_calculated, 0.0000001 );
+
+		DXCoil( 1 ).RatedTotCap( 1 ) = 35000.0; // run right at the saturation curve
+		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
+
+		SizeDXCoil( 1 );
+		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+
+		EXPECT_NEAR( 0.67608322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
+		EXPECT_NEAR( 0.0003243, CBF_calculated, 0.0000001 );
+
+		DXCoil( 1 ).RatedTotCap( 1 ) = 40000.0; // reverse perturb SHR (i.e., decrease SHR), CalcCBF would have failed with RH >= 1.0
+		DXCoil( 1 ).RatedSHR( 1 ) = AutoSize;
+
+		SizeDXCoil( 1 );
+		CBF_calculated = CalcCBF( DXCoil( 1 ).DXCoilType, DXCoil( 1 ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( 1 ).RatedTotCap( 1 ), DesMassFlow, DXCoil( 1 ).RatedSHR( 1 ), true );
+
+		EXPECT_NEAR( 0.64408322, DXCoil( 1 ).RatedSHR( 1 ), 0.0000001 );
+		EXPECT_NEAR( 0.0028271, CBF_calculated, 0.0000001 );
+
+	}
+
 }

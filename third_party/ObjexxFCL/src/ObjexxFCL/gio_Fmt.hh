@@ -31,19 +31,16 @@ class Fmt
 public: // Creation
 
 	// Default Constructor
-	inline
 	Fmt() :
 	 format_( nullptr )
 	{}
 
 	// Copy Constructor
-	inline
 	Fmt( Fmt const & fmt ) :
 	 format_( fmt.format_ ? fmt.format_->clone() : nullptr )
 	{}
 
 	// Move Constructor
-	inline
 	Fmt( Fmt && fmt ) NOEXCEPT :
 	 format_( fmt.format_ ? &fmt.format_->reset() : nullptr )
 	{
@@ -51,13 +48,11 @@ public: // Creation
 	}
 
 	// String Constructor
-	inline
 	Fmt( std::string const & format_string ) :
 	 format_( FormatFactory::create( format_string ) )
 	{}
 
 	// Destructor
-	inline
 	~Fmt()
 	{
 		if ( format_ ) delete format_;
@@ -66,7 +61,6 @@ public: // Creation
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	Fmt &
 	operator =( Fmt const & fmt )
 	{
@@ -78,7 +72,6 @@ public: // Assignment
 	}
 
 	// Move Assignment
-	inline
 	Fmt &
 	operator =( Fmt && fmt )
 	{
@@ -90,7 +83,6 @@ public: // Assignment
 	}
 
 	// String Assignment
-	inline
 	Fmt &
 	operator =( std::string const & format_string )
 	{
@@ -102,7 +94,6 @@ public: // Assignment
 public: // Properties
 
 	// Format
-	inline
 	Format const *
 	format() const
 	{
@@ -110,7 +101,6 @@ public: // Properties
 	}
 
 	// Format Clone
-	inline
 	Format *
 	format_clone() const
 	{
@@ -120,7 +110,6 @@ public: // Properties
 public: // Methods
 
 	// Reset
-	inline
 	Format *
 	format_reset()
 	{

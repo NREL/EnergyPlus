@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef BranchInputManager_hh_INCLUDED
 #define BranchInputManager_hh_INCLUDED
 
@@ -68,25 +126,6 @@ namespace BranchInputManager {
 			NumOfMixers( 0 )
 		{}
 
-		// Member Constructor
-		ConnectorData(
-			std::string const & Name, // Name for this Connector
-			int const NumOfConnectors, // Number of Connectors in this group
-			int const NumOfSplitters, // Number of Splitters in this connector group
-			int const NumOfMixers, // Number of Mixers in this connector group
-			Array1_string const & ConnectorType, // Connector:Splitter or Connector:Mixer
-			Array1_string const & ConnectorName, // Name for that Connector:Splitter or Connector:Mixer
-			Array1_int const & ConnectorMatchNo // Pointer to index where this Splitter or Mixer matches
-		) :
-			Name( Name ),
-			NumOfConnectors( NumOfConnectors ),
-			NumOfSplitters( NumOfSplitters ),
-			NumOfMixers( NumOfMixers ),
-			ConnectorType( ConnectorType ),
-			ConnectorName( ConnectorName ),
-			ConnectorMatchNo( ConnectorMatchNo )
-		{}
-
 	};
 
 	struct BranchListData
@@ -101,21 +140,6 @@ namespace BranchInputManager {
 		// Default Constructor
 		BranchListData() :
 			NumOfBranchNames( 0 )
-		{}
-
-		// Member Constructor
-		BranchListData(
-			std::string const & Name, // Name of this Branch List
-			int const NumOfBranchNames, // Number of Branches on the Branch List
-			Array1_string const & BranchNames, // Names of the branches on this branch list
-			std::string const & LoopName, // Name of Loop this Branch list belongs to
-			std::string const & LoopType // Loop type this branch is on
-		) :
-			Name( Name ),
-			NumOfBranchNames( NumOfBranchNames ),
-			BranchNames( BranchNames ),
-			LoopName( LoopName ),
-			LoopType( LoopType )
 		{}
 
 	};
@@ -136,25 +160,6 @@ namespace BranchInputManager {
 			CtrlType( 0 ),
 			InletNode( 0 ),
 			OutletNode( 0 )
-		{}
-
-		// Member Constructor
-		ComponentData(
-			std::string const & CType, // Component Type (Cannot be SPLITTER or MIXER)
-			std::string const & Name, // Component Name
-			int const CtrlType, // Active, Passive, Bypass (1,2,3)
-			std::string const & InletNodeName, // Inlet Node ID
-			int const InletNode, // Inlet Node Number
-			std::string const & OutletNodeName, // Outlet Node ID
-			int const OutletNode // Outlet Node Number
-		) :
-			CType( CType ),
-			Name( Name ),
-			CtrlType( CtrlType ),
-			InletNodeName( InletNodeName ),
-			InletNode( InletNode ),
-			OutletNodeName( OutletNodeName ),
-			OutletNode( OutletNode )
 		{}
 
 	};
@@ -180,27 +185,6 @@ namespace BranchInputManager {
 			NumOfComponents( 0 )
 		{}
 
-		// Member Constructor
-		BranchData(
-			std::string const & Name, // Name for this Branch
-			std::string const & AssignedLoopName, // Loop Name for this branch
-			Real64 const MaxFlowRate, // Max Flow Rate of the Branch
-			int const PressureCurveType, // Integer index of pressure curve type
-			int const PressureCurveIndex, // Integer index of pressure curve
-			int const FluidType, // Fluid type (see DataLoopNode)
-			int const NumOfComponents, // Number of Components on this Branch
-			Array1< ComponentData > const & Component // Component definitions for each component
-		) :
-			Name( Name ),
-			AssignedLoopName( AssignedLoopName ),
-			MaxFlowRate( MaxFlowRate ),
-			PressureCurveType( PressureCurveType ),
-			PressureCurveIndex( PressureCurveIndex ),
-			FluidType( FluidType ),
-			NumOfComponents( NumOfComponents ),
-			Component( Component )
-		{}
-
 	};
 
 	struct SplitterData
@@ -216,19 +200,6 @@ namespace BranchInputManager {
 			NumOutletBranches( 0 )
 		{}
 
-		// Member Constructor
-		SplitterData(
-			std::string const & Name, // Splitter Name
-			std::string const & InletBranchName, // Splitter Inlet Branch Name
-			int const NumOutletBranches, // Number of outlets on this Splitter
-			Array1_string const & OutletBranchNames // Names of the Outlet Branches
-		) :
-			Name( Name ),
-			InletBranchName( InletBranchName ),
-			NumOutletBranches( NumOutletBranches ),
-			OutletBranchNames( OutletBranchNames )
-		{}
-
 	};
 
 	struct MixerData
@@ -242,19 +213,6 @@ namespace BranchInputManager {
 		// Default Constructor
 		MixerData() :
 			NumInletBranches( 0 )
-		{}
-
-		// Member Constructor
-		MixerData(
-			std::string const & Name, // Mixer Name
-			std::string const & OutletBranchName, // Mixer Outlet Branch Name
-			int const NumInletBranches, // Number of inlets for this Mixer
-			Array1_string const & InletBranchNames // Names of Inlet Branches
-		) :
-			Name( Name ),
-			OutletBranchName( OutletBranchName ),
-			NumInletBranches( NumInletBranches ),
-			InletBranchNames( InletBranchNames )
 		{}
 
 	};
@@ -479,29 +437,6 @@ namespace BranchInputManager {
 
 	void
 	TestBranchIntegrity( bool & ErrFound );
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // BranchInputManager
 

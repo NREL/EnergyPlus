@@ -1078,7 +1078,7 @@ reshape( MArray1< A, T > const & a, std::array< I, 1 > const & shape )
 	assert( a.size_bounded() );
 	typedef  typename MArray1< A, T >::size_type  size_type;
 	Array1D< T > r( shape[ 0 ] );
-	size_type l( 0 );
+	size_type l( 0u );
 	size_type const s( r.size() );
 	for ( int i = 1, e = a.u(); ( ( i <= e ) && ( l < s ) ); ++i, ++l ) {
 		r[ l ] = a( i );
@@ -1094,7 +1094,7 @@ reshape( MArray1< A, T > const & a, std::array< I, 2 > const & shape )
 	assert( a.size_bounded() );
 	typedef  typename MArray1< A, T >::size_type  size_type;
 	Array2D< T > r( shape[ 0 ], shape[ 1 ] );
-	size_type l( 0 );
+	size_type l( 0u );
 	size_type const s( r.size() );
 	for ( int i = 1, e = a.u(); ( ( i <= e ) && ( l < s ) ); ++i, ++l ) {
 		r[ l ] = a( i );
@@ -1110,7 +1110,7 @@ reshape( MArray1< A, T > const & a, std::array< I, 3 > const & shape )
 	assert( a.size_bounded() );
 	typedef  typename MArray1< A, T >::size_type  size_type;
 	Array3D< T > r( shape[ 0 ], shape[ 1 ], shape[ 2 ] );
-	size_type l( 0 );
+	size_type l( 0u );
 	size_type const s( r.size() );
 	for ( int i = 1, e = a.u(); ( ( i <= e ) && ( l < s ) ); ++i, ++l ) {
 		r[ l ] = a( i );
@@ -1126,7 +1126,7 @@ reshape( MArray1< A, T > const & a, std::array< I, 4 > const & shape )
 	assert( a.size_bounded() );
 	typedef  typename MArray1< A, T >::size_type  size_type;
 	Array4D< T > r( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ] );
-	size_type l( 0 );
+	size_type l( 0u );
 	size_type const s( r.size() );
 	for ( int i = 1, e = a.u(); ( ( i <= e ) && ( l < s ) ); ++i, ++l ) {
 		r[ l ] = a( i );
@@ -1142,7 +1142,7 @@ reshape( MArray1< A, T > const & a, std::array< I, 5 > const & shape )
 	assert( a.size_bounded() );
 	typedef  typename MArray1< A, T >::size_type  size_type;
 	Array5D< T > r( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], shape[ 4 ] );
-	size_type l( 0 );
+	size_type l( 0u );
 	size_type const s( r.size() );
 	for ( int i = 1, e = a.u(); ( ( i <= e ) && ( l < s ) ); ++i, ++l ) {
 		r[ l ] = a( i );
@@ -1158,7 +1158,7 @@ reshape( MArray1< A, T > const & a, std::array< I, 6 > const & shape )
 	assert( a.size_bounded() );
 	typedef  typename MArray1< A, T >::size_type  size_type;
 	Array6D< T > r( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], shape[ 4 ], shape[ 5 ] );
-	size_type l( 0 );
+	size_type l( 0u );
 	size_type const s( r.size() );
 	for ( int i = 1, e = a.u(); ( ( i <= e ) && ( l < s ) ); ++i, ++l ) {
 		r[ l ] = a( i );
@@ -1174,7 +1174,7 @@ reshape( MArray2< A, T > const & a, std::array< I, 1 > const & shape )
 	assert( a.size_bounded() );
 	typedef  typename MArray2< A, T >::size_type  size_type;
 	Array1D< T > r( shape[ 0 ] );
-	size_type l( 0 );
+	size_type l( 0u );
 	size_type const s( r.size() );
 	for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = a.u1(); ( ( i1 <= e1 ) && ( l < s ) ); ++i1, ++l ) {
@@ -1192,7 +1192,7 @@ reshape( MArray2< A, T > const & a, std::array< I, 2 > const & shape )
 	assert( a.size_bounded() );
 	typedef  typename MArray2< A, T >::size_type  size_type;
 	Array2D< T > r( shape[ 0 ], shape[ 1 ] );
-	size_type l( 0 );
+	size_type l( 0u );
 	size_type const s( r.size() );
 	for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = a.u1(); ( ( i1 <= e1 ) && ( l < s ) ); ++i1, ++l ) {
@@ -1214,12 +1214,12 @@ pack( MArray1< A, T > const & a, Array1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array1< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
 	Array1D< T > r( static_cast< int >( n ) );
-	size_type l( 0 ), k( 0 );
+	size_type l( 0u ), k( 0u );
 	for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
 		if ( mask[ l ] ) r[ k++ ] = a( i );
 	}
@@ -1234,12 +1234,12 @@ pack( MArray2< A, T > const & a, Array2< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array2< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
 	Array1D< T > r( static_cast< int >( n ) );
-	size_type l( 0 ), k( 0 );
+	size_type l( 0u ), k( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2, ++l ) {
 			if ( mask[ l ] ) r[ k++ ] = a( i1, i2 );
@@ -1256,12 +1256,12 @@ pack( MArray3< A, T > const & a, Array3< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array3< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
 	Array1D< T > r( static_cast< int >( n ) );
-	size_type l( 0 ), k( 0 );
+	size_type l( 0u ), k( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3, ++l ) {
@@ -1280,12 +1280,12 @@ pack( MArray4< A, T > const & a, Array4< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array4< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
 	Array1D< T > r( static_cast< int >( n ) );
-	size_type l( 0 ), k( 0 );
+	size_type l( 0u ), k( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -1306,12 +1306,12 @@ pack( MArray5< A, T > const & a, Array5< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array5< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
 	Array1D< T > r( static_cast< int >( n ) );
-	size_type l( 0 ), k( 0 );
+	size_type l( 0u ), k( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -1334,12 +1334,12 @@ pack( MArray6< A, T > const & a, Array6< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array6< bool >::size_type  size_type;
-	size_type n( 0 );
+	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
 	Array1D< T > r( static_cast< int >( n ) );
-	size_type l( 0 ), k( 0 );
+	size_type l( 0u ), k( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -1555,11 +1555,11 @@ T
 sum( MArray1< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
-		s += a( i );
+		r += a( i );
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1568,13 +1568,13 @@ T
 sum( MArray2< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			s += a( i1, i2 );
+			r += a( i1, i2 );
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1583,15 +1583,15 @@ T
 sum( MArray3< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				s += a( i1, i2, i3 );
+				r += a( i1, i2, i3 );
 			}
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1600,17 +1600,17 @@ T
 sum( MArray4< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					s += a( i1, i2, i3, i4 );
+					r += a( i1, i2, i3, i4 );
 				}
 			}
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1619,19 +1619,19 @@ T
 sum( MArray5< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						s += a( i1, i2, i3, i4, i5 );
+						r += a( i1, i2, i3, i4, i5 );
 					}
 				}
 			}
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1640,21 +1640,21 @@ T
 sum( MArray6< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 						for ( int i6 = 1, e6 = a.u6(); i6 <= e6; ++i6 ) {
-							s += a( i1, i2, i3, i4, i5, i6 );
+							r += a( i1, i2, i3, i4, i5, i6 );
 						}
 					}
 				}
 			}
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1667,11 +1667,11 @@ sum( MArray1< A, T > const & a, int const dim )
 #ifdef NDEBUG
 	static_cast< void >( dim ); // Suppress unused warning
 #endif
-	T s( 0 );
+	T r( 0 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
-		s += a( i );
+		r += a( i );
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1719,12 +1719,12 @@ sum( MArray1< A, T > const & a, Array1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T s( 0 );
-	size_type l( 0 );
+	T r( 0 );
+	size_type l( 0u );
 	for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-		if ( mask[ l ] ) s += a( i );
+		if ( mask[ l ] ) r += a( i );
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1735,14 +1735,14 @@ sum( MArray2< A, T > const & a, Array2< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T s( 0 );
-	size_type l( 0 );
+	T r( 0 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2, ++l ) {
-			if ( mask[ l ] ) s += a( i1, i2 );
+			if ( mask[ l ] ) r += a( i1, i2 );
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1753,16 +1753,16 @@ sum( MArray3< A, T > const & a, Array3< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T s( 0 );
-	size_type l( 0 );
+	T r( 0 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3, ++l ) {
-				if ( mask[ l ] ) s += a( i1, i2, i3 );
+				if ( mask[ l ] ) r += a( i1, i2, i3 );
 			}
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1773,18 +1773,18 @@ sum( MArray4< A, T > const & a, Array4< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T s( 0 );
-	size_type l( 0 );
+	T r( 0 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4, ++l ) {
-					if ( mask[ l ] ) s += a( i1, i2, i3, i4 );
+					if ( mask[ l ] ) r += a( i1, i2, i3, i4 );
 				}
 			}
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1795,20 +1795,20 @@ sum( MArray5< A, T > const & a, Array5< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T s( 0 );
-	size_type l( 0 );
+	T r( 0 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						if ( mask[ l ] ) s += a( i1, i2, i3, i4, i5 );
+						if ( mask[ l ] ) r += a( i1, i2, i3, i4, i5 );
 					}
 				}
 			}
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1819,22 +1819,22 @@ sum( MArray6< A, T > const & a, Array6< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T s( 0 );
-	size_type l( 0 );
+	T r( 0 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 						for ( int i6 = 1, e6 = a.u6(); i6 <= e6; ++i6, ++l ) {
-							if ( mask[ l ] ) s += a( i1, i2, i3, i4, i5, i6 );
+							if ( mask[ l ] ) r += a( i1, i2, i3, i4, i5, i6 );
 						}
 					}
 				}
 			}
 		}
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1867,11 +1867,11 @@ typename T::value_type
 sum_col( MArray1< A, T > const & a, int const j )
 {
 	assert( a.size_bounded() );
-	typename T::value_type s( 0 );
+	typename T::value_type r( 0 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
-		s += a( i )( j );
+		r += a( i )( j );
 	}
-	return s;
+	return r;
 }
 
 template< class A, class B, typename T >
@@ -1881,11 +1881,11 @@ sum_product_col( MArray1< A, T > const & a, MArray1< B, T > const & b, int const
 {
 	assert( a.size_bounded() );
 	assert( a.u() == b.u() );
-	typename T::value_type s( 0 );
+	typename T::value_type r( 0 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
-		s += a( i )( j ) * b( i )( j );
+		r += a( i )( j ) * b( i )( j );
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1894,11 +1894,11 @@ T
 sum_sub( MArray1< A, T > const & a, Array1< int > const & sub )
 {
 	assert( sub.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
-		s += a( sub( i ) );
+		r += a( sub( i ) );
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1907,11 +1907,11 @@ T
 sum_sub( MArray1< A, T > const & a, Array1S< int > const & sub )
 {
 	assert( sub.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
-		s += a( sub( i ) );
+		r += a( sub( i ) );
 	}
-	return s;
+	return r;
 }
 
 template< class A, class B, typename T >
@@ -1920,12 +1920,12 @@ T
 sum_product_sub( MArray1< A, T > const & a, MArray1< B, T > const & b, Array1< int > const & sub )
 {
 	assert( sub.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 template< class A, class B, typename T >
@@ -1933,12 +1933,12 @@ inline
 T
 sum_product_sub( MArray1< A, T > const & a, MArray1< B, T > const & b, Array1S< int > const & sub )
 {
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 template< class B, typename T >
@@ -1947,12 +1947,12 @@ T
 sum_product_sub( Array1< T > const & a, MArray1< B, T > const & b, Array1< int > const & sub )
 {
 	assert( sub.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 template< class B, typename T >
@@ -1960,12 +1960,12 @@ inline
 T
 sum_product_sub( Array1< T > const & a, MArray1< B, T > const & b, Array1S< int > const & sub )
 {
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1974,12 +1974,12 @@ T
 sum_product_sub( MArray1< A, T > const & a, Array1< T > const & b, Array1< int > const & sub )
 {
 	assert( sub.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -1987,12 +1987,12 @@ inline
 T
 sum_product_sub( MArray1< A, T > const & a, Array1< T > const & b, Array1S< int > const & sub )
 {
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 template< class B, typename T >
@@ -2001,12 +2001,12 @@ T
 sum_product_sub( Array1S< T > const & a, MArray1< B, T > const & b, Array1< int > const & sub )
 {
 	assert( sub.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 template< class B, typename T >
@@ -2014,12 +2014,12 @@ inline
 T
 sum_product_sub( Array1S< T > const & a, MArray1< B, T > const & b, Array1S< int > const & sub )
 {
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -2028,12 +2028,12 @@ T
 sum_product_sub( MArray1< A, T > const & a, Array1S< T > const & b, Array1< int > const & sub )
 {
 	assert( sub.size_bounded() );
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 template< class A, typename T >
@@ -2041,12 +2041,12 @@ inline
 T
 sum_product_sub( MArray1< A, T > const & a, Array1S< T > const & b, Array1S< int > const & sub )
 {
-	T s( 0 );
+	T r( 0 );
 	for ( int i = sub.l(), e = sub.u(); i <= e; ++i ) {
 		int const j( sub( i ) );
-		s += a( j ) * b( j );
+		r += a( j ) * b( j );
 	}
-	return s;
+	return r;
 }
 
 // product /////
@@ -2057,11 +2057,11 @@ T
 product( MArray1< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T p( 1 );
+	T r( 1 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
-		p *= a( i );
+		r *= a( i );
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2070,13 +2070,13 @@ T
 product( MArray2< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T p( 1 );
+	T r( 1 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			p *= a( i1, i2 );
+			r *= a( i1, i2 );
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2085,15 +2085,15 @@ T
 product( MArray3< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T p( 1 );
+	T r( 1 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				p *= a( i1, i2, i3 );
+				r *= a( i1, i2, i3 );
 			}
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2102,17 +2102,17 @@ T
 product( MArray4< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T p( 1 );
+	T r( 1 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-					p *= a( i1, i2, i3, i4 );
+					r *= a( i1, i2, i3, i4 );
 				}
 			}
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2121,19 +2121,19 @@ T
 product( MArray5< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T p( 1 );
+	T r( 1 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
-						p *= a( i1, i2, i3, i4, i5 );
+						r *= a( i1, i2, i3, i4, i5 );
 					}
 				}
 			}
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2142,21 +2142,21 @@ T
 product( MArray6< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T p( 1 );
+	T r( 1 );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 						for ( int i6 = 1, e6 = a.u6(); i6 <= e6; ++i6 ) {
-							p *= a( i1, i2, i3, i4, i5, i6 );
+							r *= a( i1, i2, i3, i4, i5, i6 );
 						}
 					}
 				}
 			}
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2169,11 +2169,11 @@ product( MArray1< A, T > const & a, int const dim )
 #ifdef NDEBUG
 	static_cast< void >( dim ); // Suppress unused warning
 #endif
-	T p( 1 );
+	T r( 1 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
-		p *= a( i );
+		r *= a( i );
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2221,12 +2221,12 @@ product( MArray1< A, T > const & a, Array1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T p( 1 );
-	size_type l( 0 );
+	T r( 1 );
+	size_type l( 0u );
 	for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-		if ( mask[ l ] ) p *= a( i );
+		if ( mask[ l ] ) r *= a( i );
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2237,14 +2237,14 @@ product( MArray2< A, T > const & a, Array2< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T p( 1 );
-	size_type l( 0 );
+	T r( 1 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2, ++l ) {
-			if ( mask[ l ] ) p *= a( i1, i2 );
+			if ( mask[ l ] ) r *= a( i1, i2 );
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2255,16 +2255,16 @@ product( MArray3< A, T > const & a, Array3< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T p( 1 );
-	size_type l( 0 );
+	T r( 1 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3, ++l ) {
-				if ( mask[ l ] ) p *= a( i1, i2, i3 );
+				if ( mask[ l ] ) r *= a( i1, i2, i3 );
 			}
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2275,18 +2275,18 @@ product( MArray4< A, T > const & a, Array4< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T p( 1 );
-	size_type l( 0 );
+	T r( 1 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4, ++l ) {
-					if ( mask[ l ] ) p *= a( i1, i2, i3, i4 );
+					if ( mask[ l ] ) r *= a( i1, i2, i3, i4 );
 				}
 			}
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2297,20 +2297,20 @@ product( MArray5< A, T > const & a, Array5< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T p( 1 );
-	size_type l( 0 );
+	T r( 1 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						if ( mask[ l ] ) p *= a( i1, i2, i3, i4, i5 );
+						if ( mask[ l ] ) r *= a( i1, i2, i3, i4, i5 );
 					}
 				}
 			}
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2321,22 +2321,22 @@ product( MArray6< A, T > const & a, Array6< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	T p( 1 );
-	size_type l( 0 );
+	T r( 1 );
+	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 						for ( int i6 = 1, e6 = a.u6(); i6 <= e6; ++i6, ++l ) {
-							if ( mask[ l ] ) p *= a( i1, i2, i3, i4, i5, i6 );
+							if ( mask[ l ] ) r *= a( i1, i2, i3, i4, i5, i6 );
 						}
 					}
 				}
 			}
 		}
 	}
-	return p;
+	return r;
 }
 
 template< class A, typename T >
@@ -2689,8 +2689,8 @@ T
 minval( MArray1< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::max() );
-	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1 ) );
+	for ( int i = 2, e = a.u(); i <= e; ++i ) {
 		r = std::min( r, a( i ) );
 	}
 	return r;
@@ -2702,9 +2702,9 @@ T
 minval( MArray2< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::max() );
-	for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1 ) );
+	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			r = std::min( r, a( i1, i2 ) );
 		}
 	}
@@ -2717,7 +2717,7 @@ T
 minval( MArray3< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::max() );
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2734,7 +2734,7 @@ T
 minval( MArray4< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::max() );
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2753,7 +2753,7 @@ T
 minval( MArray5< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::max() );
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2774,7 +2774,7 @@ T
 minval( MArray6< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::max() );
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2799,8 +2799,8 @@ T
 maxval( MArray1< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::lowest() );
-	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1 ) );
+	for ( int i = 2, e = a.u(); i <= e; ++i ) {
 		r = std::max( r, a( i ) );
 	}
 	return r;
@@ -2812,7 +2812,7 @@ T
 maxval( MArray2< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::lowest() );
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			r = std::max( r, a( i1, i2 ) );
@@ -2827,7 +2827,7 @@ T
 maxval( MArray3< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::lowest() );
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2844,7 +2844,7 @@ T
 maxval( MArray4< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::lowest() );
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2863,7 +2863,7 @@ T
 maxval( MArray5< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::lowest() );
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2884,7 +2884,7 @@ T
 maxval( MArray6< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	T r( std::numeric_limits< T >::lowest() );
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2909,9 +2909,9 @@ Array1D< int >
 minloc( MArray1< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
-	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1 ) );
+	for ( int i = 2, e = a.u(); i <= e; ++i ) {
 		if ( a( i ) < r ) {
 			r = a( i );
 			loc = { i };
@@ -2926,8 +2926,8 @@ Array1D< int >
 minloc( MArray2< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
+	Array1D< int > loc( 2, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			if ( a( i1, i2 ) < r ) {
@@ -2945,8 +2945,8 @@ Array1D< int >
 minloc( MArray3< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
+	Array1D< int > loc( 3, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2966,8 +2966,8 @@ Array1D< int >
 minloc( MArray4< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
+	Array1D< int > loc( 4, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2989,8 +2989,8 @@ Array1D< int >
 minloc( MArray5< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
+	Array1D< int > loc( 5, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -3014,8 +3014,8 @@ Array1D< int >
 minloc( MArray6< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::max() );
+	Array1D< int > loc( 6, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1, 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -3061,7 +3061,7 @@ minloc( MArray2< A, T > const & a, int const dim )
 		{
 		Array1D< int > loc( a.isize2(), a.size2() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			T r( std::numeric_limits< T >::max() );
+			T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1 ) );
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 				if ( a( i1, i2 ) < r ) {
 					r = a( i1, i2 );
@@ -3075,7 +3075,7 @@ minloc( MArray2< A, T > const & a, int const dim )
 		{
 		Array1D< int > loc( a.isize1(), a.size1() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-			T r( std::numeric_limits< T >::max() );
+			T r( a.empty() ? std::numeric_limits< T >::max() : a( 1, 1 ) );
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) < r ) {
 					r = a( i1, i2 );
@@ -3099,13 +3099,20 @@ minloc( MArray1< A, T > const & a, Array1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	Array1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-		if ( mask[ l ] && ( a( i ) < r ) ) {
-			r = a( i );
-			loc = { i };
+		if ( mask[ l ] ) {
+			if ( first ) {
+				first = false;
+				r = a( i );
+				loc = { i };
+			} else if ( a( i ) < r ) {
+				r = a( i );
+				loc = { i };
+			}
 		}
 	}
 	return loc;
@@ -3121,12 +3128,19 @@ minloc( MArray2< A, T > const & a, Array2< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 2, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2, ++l ) {
-			if ( mask[ l ] && ( a( i1, i2 ) < r ) ) {
-				r = a( i1, i2 );
-				loc = { i1, i2 };
+			if ( mask[ l ] ) {
+				if ( first ) {
+					first = false;
+					r = a( i1, i2 );
+					loc = { i1, i2 };
+				} else if ( a( i1, i2 ) < r ) {
+					r = a( i1, i2 );
+					loc = { i1, i2 };
+				}
 			}
 		}
 	}
@@ -3143,13 +3157,20 @@ minloc( MArray3< A, T > const & a, Array3< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 3, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3, ++l ) {
-				if ( mask[ l ] && ( a( i1, i2, i3 ) < r ) ) {
-					r = a( i1, i2, i3 );
-					loc = { i1, i2, i3 };
+				if ( mask[ l ] ) {
+					if ( first ) {
+						first = false;
+						r = a( i1, i2, i3 );
+						loc = { i1, i2, i3 };
+					} else if ( a( i1, i2, i3 ) < r ) {
+						r = a( i1, i2, i3 );
+						loc = { i1, i2, i3 };
+					}
 				}
 			}
 		}
@@ -3167,14 +3188,21 @@ minloc( MArray4< A, T > const & a, Array4< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 4, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4, ++l ) {
-					if ( mask[ l ] && ( a( i1, i2, i3, i4 ) < r ) ) {
-						r = a( i1, i2, i3, i4 );
-						loc = { i1, i2, i3, i4 };
+					if ( mask[ l ] ) {
+						if ( first ) {
+							first = false;
+							r = a( i1, i2, i3, i4 );
+							loc = { i1, i2, i3, i4 };
+						} else if ( a( i1, i2, i3, i4 ) < r ) {
+							r = a( i1, i2, i3, i4 );
+							loc = { i1, i2, i3, i4 };
+						}
 					}
 				}
 			}
@@ -3193,15 +3221,22 @@ minloc( MArray5< A, T > const & a, Array5< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 5, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						if ( mask[ l ] && ( a( i1, i2, i3, i4, i5 ) < r ) ) {
-							r = a( i1, i2, i3, i4, i5 );
-							loc = { i1, i2, i3, i4, i5 };
+						if ( mask[ l ] ) {
+							if ( first ) {
+								first = false;
+								r = a( i1, i2, i3, i4, i5 );
+								loc = { i1, i2, i3, i4, i5 };
+							} else if ( a( i1, i2, i3, i4, i5 ) < r ) {
+								r = a( i1, i2, i3, i4, i5 );
+								loc = { i1, i2, i3, i4, i5 };
+							}
 						}
 					}
 				}
@@ -3221,16 +3256,23 @@ minloc( MArray6< A, T > const & a, Array6< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 6, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 						for ( int i6 = 1, e6 = a.u6(); i6 <= e6; ++i6, ++l ) {
-							if ( mask[ l ] && ( a( i1, i2, i3, i4, i5, i6 ) < r ) ) {
-								r = a( i1, i2, i3, i4, i5, i6 );
-								loc = { i1, i2, i3, i4, i5, i6 };
+							if ( mask[ l ] ) {
+								if ( first ) {
+									first = false;
+									r = a( i1, i2, i3, i4, i5, i6 );
+									loc = { i1, i2, i3, i4, i5, i6 };
+								} else if ( a( i1, i2, i3, i4, i5, i6 ) < r ) {
+									r = a( i1, i2, i3, i4, i5, i6 );
+									loc = { i1, i2, i3, i4, i5, i6 };
+								}
 							}
 						}
 					}
@@ -3249,9 +3291,9 @@ Array1D< int >
 maxloc( MArray1< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
-	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1 ) );
+	for ( int i = 2, e = a.u(); i <= e; ++i ) {
 		if ( a( i ) > r ) {
 			r = a( i );
 			loc = { i };
@@ -3266,8 +3308,8 @@ Array1D< int >
 maxloc( MArray2< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 2, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
+	Array1D< int > loc( 2, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			if ( a( i1, i2 ) > r ) {
@@ -3285,8 +3327,8 @@ Array1D< int >
 maxloc( MArray3< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 3, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
+	Array1D< int > loc( 3, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -3306,8 +3348,8 @@ Array1D< int >
 maxloc( MArray4< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 4, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
+	Array1D< int > loc( 4, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -3329,8 +3371,8 @@ Array1D< int >
 maxloc( MArray5< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 5, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
+	Array1D< int > loc( 5, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -3354,8 +3396,8 @@ Array1D< int >
 maxloc( MArray6< A, T > const & a )
 {
 	assert( a.size_bounded() );
-	Array1D< int > loc( 6, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-	T r( std::numeric_limits< T >::lowest() );
+	Array1D< int > loc( 6, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
+	T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1, 1, 1, 1, 1 ) );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -3401,7 +3443,7 @@ maxloc( MArray2< A, T > const & a, int const dim )
 		{
 		Array1D< int > loc( a.isize2(), a.size2() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-			T r( std::numeric_limits< T >::lowest() );
+			T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1 ) );
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 				if ( a( i1, i2 ) > r ) {
 					r = a( i1, i2 );
@@ -3415,7 +3457,7 @@ maxloc( MArray2< A, T > const & a, int const dim )
 		{
 		Array1D< int > loc( a.isize1(), a.size1() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-			T r( std::numeric_limits< T >::lowest() );
+			T r( a.empty() ? std::numeric_limits< T >::lowest() : a( 1, 1 ) );
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				if ( a( i1, i2 ) > r ) {
 					r = a( i1, i2 );
@@ -3439,13 +3481,20 @@ maxloc( MArray1< A, T > const & a, Array1< bool > const & mask )
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
 	typedef  Array< bool >::size_type  size_type;
-	Array1D< int > loc( 1, a.size() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-		if ( mask[ l ] && ( a( i ) > r ) ) {
-			r = a( i );
-			loc = { i };
+		if ( mask[ l ] ) {
+			if ( first ) {
+				first = false;
+				r = a( i );
+				loc = { i };
+			} else if ( a( i ) > r ) {
+				r = a( i );
+				loc = { i };
+			}
 		}
 	}
 	return loc;
@@ -3461,12 +3510,19 @@ maxloc( MArray2< A, T > const & a, Array2< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 2, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2, ++l ) {
-			if ( mask[ l ] && ( a( i1, i2 ) > r ) ) {
-				r = a( i1, i2 );
-				loc = { i1, i2 };
+			if ( mask[ l ] ) {
+				if ( first ) {
+					first = false;
+					r = a( i1, i2 );
+					loc = { i1, i2 };
+				} else if ( a( i1, i2 ) > r ) {
+					r = a( i1, i2 );
+					loc = { i1, i2 };
+				}
 			}
 		}
 	}
@@ -3483,13 +3539,20 @@ maxloc( MArray3< A, T > const & a, Array3< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 3, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3, ++l ) {
-				if ( mask[ l ] && ( a( i1, i2, i3 ) > r ) ) {
-					r = a( i1, i2, i3 );
-					loc = { i1, i2, i3 };
+				if ( mask[ l ] ) {
+					if ( first ) {
+						first = false;
+						r = a( i1, i2, i3 );
+						loc = { i1, i2, i3 };
+					} else if ( a( i1, i2, i3 ) > r ) {
+						r = a( i1, i2, i3 );
+						loc = { i1, i2, i3 };
+					}
 				}
 			}
 		}
@@ -3507,14 +3570,21 @@ maxloc( MArray4< A, T > const & a, Array4< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 4, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4, ++l ) {
-					if ( mask[ l ] && ( a( i1, i2, i3, i4 ) > r ) ) {
-						r = a( i1, i2, i3, i4 );
-						loc = { i1, i2, i3, i4 };
+					if ( mask[ l ] ) {
+						if ( first ) {
+							first = false;
+							r = a( i1, i2, i3, i4 );
+							loc = { i1, i2, i3, i4 };
+						} else if ( a( i1, i2, i3, i4 ) > r ) {
+							r = a( i1, i2, i3, i4 );
+							loc = { i1, i2, i3, i4 };
+						}
 					}
 				}
 			}
@@ -3533,15 +3603,22 @@ maxloc( MArray5< A, T > const & a, Array5< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 5, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5, ++l ) {
-						if ( mask[ l ] && ( a( i1, i2, i3, i4, i5 ) > r ) ) {
-							r = a( i1, i2, i3, i4, i5 );
-							loc = { i1, i2, i3, i4, i5 };
+						if ( mask[ l ] ) {
+							if ( first ) {
+								first = false;
+								r = a( i1, i2, i3, i4, i5 );
+								loc = { i1, i2, i3, i4, i5 };
+							} else if ( a( i1, i2, i3, i4, i5 ) > r ) {
+								r = a( i1, i2, i3, i4, i5 );
+								loc = { i1, i2, i3, i4, i5 };
+							}
 						}
 					}
 				}
@@ -3561,16 +3638,23 @@ maxloc( MArray6< A, T > const & a, Array6< bool > const & mask )
 	typedef  Array< bool >::size_type  size_type;
 	Array1D< int > loc( 6, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
-	size_type l( 0 );
+	size_type l( 0u );
+	bool first( true );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 					for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 						for ( int i6 = 1, e6 = a.u6(); i6 <= e6; ++i6, ++l ) {
-							if ( mask[ l ] && ( a( i1, i2, i3, i4, i5, i6 ) > r ) ) {
-								r = a( i1, i2, i3, i4, i5, i6 );
-								loc = { i1, i2, i3, i4, i5, i6 };
+							if ( mask[ l ] ) {
+								if ( first ) {
+									first = false;
+									r = a( i1, i2, i3, i4, i5, i6 );
+									loc = { i1, i2, i3, i4, i5, i6 };
+								} else if ( a( i1, i2, i3, i4, i5, i6 ) > r ) {
+									r = a( i1, i2, i3, i4, i5, i6 );
+									loc = { i1, i2, i3, i4, i5, i6 };
+								}
 							}
 						}
 					}

@@ -31,42 +31,36 @@ class Index
 public: // Creation
 
 	// Default Constructor
-	inline
 	Index() :
 	 init_( false ),
 	 i_( 0 )
 	{}
 
 	// Copy Constructor
-	inline
 	Index( Index const & I ) :
 	 init_( I.init_ ),
 	 i_( I.i_ )
 	{}
 
 	// Index Constructor
-	inline
 	Index( int const i ) :
 	 init_( true ),
 	 i_( i )
 	{}
 
 	// Omit Constructor
-	inline
 	Index( Omit ) :
 	 init_( false ),
 	 i_( 0 )
 	{}
 
 	// Destructor
-	inline
 	~Index()
 	{}
 
 public: // Assignment
 
 	// Scalar Assignment
-	inline
 	Index &
 	operator =( int const i )
 	{
@@ -78,7 +72,6 @@ public: // Assignment
 public: // Conversion
 
 	// int Conversion
-	inline
 	operator int() const
 	{
 		assert( init_ );
@@ -88,7 +81,6 @@ public: // Conversion
 public: // Predicate
 
 	// Initialized?
-	inline
 	bool
 	initialized() const
 	{
@@ -98,7 +90,6 @@ public: // Predicate
 public: // Inspector
 
 	// Index
-	inline
 	int
 	i() const
 	{
@@ -109,7 +100,6 @@ public: // Inspector
 public: // Modifier
 
 	// Clear
-	inline
 	void
 	clear()
 	{
@@ -118,7 +108,6 @@ public: // Modifier
 	}
 
 	// Index Set
-	inline
 	Index &
 	i( int const i )
 	{
@@ -128,7 +117,6 @@ public: // Modifier
 	}
 
 	// Swap
-	inline
 	void
 	swap( Index & I )
 	{

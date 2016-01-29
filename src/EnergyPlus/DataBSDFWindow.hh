@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataBSDFWindow_hh_INCLUDED
 #define DataBSDFWindow_hh_INCLUDED
 
@@ -81,39 +139,6 @@ namespace DataBSDFWindow {
 		BasisElemDescr()
 		{}
 
-		// Member Constructor
-		BasisElemDescr(
-			Real64 const Theta, // Centroid Theta value
-			Real64 const Phi, // Centroid Phi value
-			Real64 const dTheta, // Element width, Theta
-			Real64 const dPhi, // Element width, Phi
-			Real64 const UpprTheta, // Patch upper edge, Theta
-			Real64 const LwrTheta, // Patch lower edge, Theta
-			Real64 const UpprPhi, // Patch upper edge, Phi
-			Real64 const LwrPhi, // Patch lower edge, Phi
-			int const INNbInL, // Index of inward (lower Theta) neighbor, lower phi
-			int const INNbInH, // Index of inward (lower Theta) neighbor, higher phi
-			int const INNbOutL, // Index of outward (higher Theta) neighbor, lower phi
-			int const INNbOutH, // Index of outward (higher Theta) neighbor, higher phi
-			int const INNbLft, // Index of leftward (higher Phi) neighbor (same Theta)
-			int const INNbRt // Index of rightward (lower Phi) neighbor (same Theta)
-		) :
-			Theta( Theta ),
-			Phi( Phi ),
-			dTheta( dTheta ),
-			dPhi( dPhi ),
-			UpprTheta( UpprTheta ),
-			LwrTheta( LwrTheta ),
-			UpprPhi( UpprPhi ),
-			LwrPhi( LwrPhi ),
-			INNbInL( INNbInL ),
-			INNbInH( INNbInH ),
-			INNbOutL( INNbOutL ),
-			INNbOutH( INNbOutH ),
-			INNbLft( INNbLft ),
-			INNbRt( INNbRt )
-		{}
-
 	};
 
 	struct BSDFDaylghtPosition
@@ -160,35 +185,6 @@ namespace DataBSDFWindow {
 			BasisMatIndex( 0 ),
 			NBasis( 0 ),
 			NThetas( 0 )
-		{}
-
-		// Member Constructor
-		BasisStruct(
-			int const BasisType, // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
-			int const BasisSymmetryType, // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
-			int const BasisMatIndex, // pointer to matrix for basis
-			int const NBasis, // No. elements in basis
-			Array1< Real64 > const & Lamda, // Vector of diagonal Lamda matrix elems for grid
-			Array1< Real64 > const & SolAng, // Vector of basis element solid angles for grid
-			int const NThetas, // No. Theta values in basis
-			Array1< Real64 > const & Thetas, // List of basis theta values
-			Array1_int const & NPhis, // No. basis phi values for each theta
-			Array2< Real64 > const & Phis, // List of basis phi values for each theta
-			Array2_int const & BasisIndex, // Index of basis element for theta, phi
-			Array1< BasisElemDescr > const & Grid // actual basis (to be constructed from matrix)
-		) :
-			BasisType( BasisType ),
-			BasisSymmetryType( BasisSymmetryType ),
-			BasisMatIndex( BasisMatIndex ),
-			NBasis( NBasis ),
-			Lamda( Lamda ),
-			SolAng( SolAng ),
-			NThetas( NThetas ),
-			Thetas( Thetas ),
-			NPhis( NPhis ),
-			Phis( Phis ),
-			BasisIndex( BasisIndex ),
-			Grid( Grid )
 		{}
 
 	};
@@ -242,79 +238,6 @@ namespace DataBSDFWindow {
 			InitState( true )
 		{}
 
-		// Member Constructor
-		BSDFGeomDescr(
-			BasisStruct const & Inc, // Basis for incident hemisphere
-			Array1< Vector > const & sInc, // Central direction vectors of incident grid (World coords)
-			Array1< BSDFDaylghtPosition > const & pInc, // azimuth and altitude of incidence vectors
-			Array1< Real64 > const & CosInc, // cosine of incident angle
-			Array1< Real64 > const & DAInc, // cosine of incident angle times delta theta time delta phi (used in daylighting calculations)
-			int const NSkyUnobs, // Number of Inc basis rays from unobstructed sky
-			int const NGndUnobs, // Number of Inc basis rays from unobstructed ground
-			int const NSky, // Number of Inc basis rays from sky
-			int const NGnd, // Number of Inc basis rays from gnd
-			int const NReflSurf, // Number of Inc basis rays from (potentially reflecting) surfaces
-			Array1_int const & SkyIndex, // list of sky basis indices
-			Array1_int const & GndIndex, // list of gnd basis indices
-			Array1< Vector > const & GndPt, // gnd intersection pt of gnd basis ray (z=0)
-			Array1_int const & RefSurfIndex, // list of basis indices of rays striking exterior surf
-			Array1_int const & RefRayNHits, // for a given ray striking a surface, no. of surfaces pierced
-			Array2_int const & HitSurfNo, // for a given ray striking surface, list of intersected surf nos
-			Array2< Real64 > const & HitSurfDSq, // for a given ray striking surface, list of distance^2
-			Array2< Vector > const & HitPt, // for a given ray striking surface, list of hit pts
-			Array1< Real64 > const & SolSkyWt, // Sky intensity weights
-			Array1< Real64 > const & SolSkyGndWt, // Wts for sky rad refl from grn
-			Array3< Real64 > const & SolBmGndWt, // Wts for beam rad refl from gnd (hour, timestep)
-			Array2_int const & SolBmIndex, // Basis index corresponding to beam dir (hour, timestep)
-			Array2< Real64 > const & ThetaBm, // Theta angle corresponging to beam dir (hour, timestep) (rad)
-			Array2< Real64 > const & PhiBm, // Theta angle corresponging to beam dir (hour, timestep) (rad)
-			BasisStruct const & Trn,
-			Array1< Vector > const & sTrn, // Central direction vectors of Outgoing grid (World coords)
-			Array1< BSDFDaylghtPosition > const & pTrn, // azimuth and altitude of incidence vectors
-			Array1_int const & NSurfInt, // No. of basis rays intersecting back surface (dim from
-			Array2_int const & SurfInt, // Basis index (IBkSurf, j) of the jth ray intersecting IBkSurf
-			Array2< Real64 > const & SjdotN, // dot product (IBksurf, j) of the jth ray direction with
-			Array2< Real64 > const & AOverlap, // Overlap areas for each outgoing
-			Array2< Real64 > const & ARhoVisOverlap, // Overlap areas multiplied with surface reflectance for each outgoing direction (Trn) (no of outgoing dir, NBKSurf)
-			Array1< Real64 > const & AveRhoVisOverlap, // Average visible reflectance from overlap surface which originates from one outgoing direction
-			bool const InitState // Flag for marking that state needs to be initalized
-		) :
-			Inc( Inc ),
-			sInc( sInc ),
-			pInc( pInc ),
-			CosInc( CosInc ),
-			DAInc( DAInc ),
-			NSkyUnobs( NSkyUnobs ),
-			NGndUnobs( NGndUnobs ),
-			NSky( NSky ),
-			NGnd( NGnd ),
-			NReflSurf( NReflSurf ),
-			SkyIndex( SkyIndex ),
-			GndIndex( GndIndex ),
-			GndPt( GndPt ),
-			RefSurfIndex( RefSurfIndex ),
-			RefRayNHits( RefRayNHits ),
-			HitSurfNo( HitSurfNo ),
-			HitSurfDSq( HitSurfDSq ),
-			HitPt( HitPt ),
-			SolSkyWt( SolSkyWt ),
-			SolSkyGndWt( SolSkyGndWt ),
-			SolBmGndWt( SolBmGndWt ),
-			SolBmIndex( SolBmIndex ),
-			ThetaBm( ThetaBm ),
-			PhiBm( PhiBm ),
-			Trn( Trn ),
-			sTrn( sTrn ),
-			pTrn( pTrn ),
-			NSurfInt( NSurfInt ),
-			SurfInt( SurfInt ),
-			SjdotN( SjdotN ),
-			AOverlap( AOverlap ),
-			ARhoVisOverlap( ARhoVisOverlap ),
-			AveRhoVisOverlap( AveRhoVisOverlap ),
-			InitState( InitState )
-		{}
-
 	};
 
 	struct BSDFRefPoints
@@ -341,43 +264,6 @@ namespace DataBSDFWindow {
 		BSDFRefPoints()
 		{}
 
-		// Member Constructor
-		BSDFRefPoints(
-			Array1_int const & NSky, // number of sky elements for each window element (# window el)
-			Array1_int const & NGnd, // number of ground elements for each window element (# window el)
-			Array1_int const & NReflSurf, // number of Inc basis rays from reflecting surfaces (# window el)
-			Array2_int const & SkyIndex, // list of sky basis indices (# window el, NSky)
-			Array2_int const & GndIndex, // list of gnd basis indices (# window el, NGnd)
-			Array2< Vector > const & GndPt, // gnd intersection pt of gnd basis ray (z=0) (# window el, NGnd)
-			Array2< Real64 > const & GndObstrMultiplier, // ground obstruction multiplier used in reflection calculatations (# window el, NGnd)
-			Array2_int const & RefSurfIndex, // list of basis indices of rays striking exterior surf (# window el, NReflSurf)
-			Array2_int const & RefRayNHits, // for a given ray striking a surface, no. of surfaces pierced (# window el, NReflSurf)
-			Array2< Real64 > const & TransOutSurf, // total transmittance of exterior obstructions for given incoming basis direction. (# window el, NReflSurf)
-			Array3_int const & HitSurfNo, // for a given ray striking surface, list of intersected surf nos (# window el, NReflSurf, RefRayNHits)
-			Array3< Real64 > const & HitSurfDSq, // for a given ray striking surface, list of distance^2 from window (# window el, NReflSurf, RefRayNHits)
-			Array3< Vector > const & HitPt, // for a given ray striking surface, list of hit pts (# window el, NReflSurf, RefRayNHits)
-			Array1_int const & RefPointIndex, // outgoing direction which containts reference point (# window el)
-			Array1_bool const & RefPointIntersection, // determines if reference point is laying in light tube of bsdf outgoing direction (NTrnBasis)
-			Array1< Real64 > const & RefPtIntPosFac // position factors for intersections from reference point to window for each outgoing direction (NTrnBasis)
-		) :
-			NSky( NSky ),
-			NGnd( NGnd ),
-			NReflSurf( NReflSurf ),
-			SkyIndex( SkyIndex ),
-			GndIndex( GndIndex ),
-			GndPt( GndPt ),
-			GndObstrMultiplier( GndObstrMultiplier ),
-			RefSurfIndex( RefSurfIndex ),
-			RefRayNHits( RefRayNHits ),
-			TransOutSurf( TransOutSurf ),
-			HitSurfNo( HitSurfNo ),
-			HitSurfDSq( HitSurfDSq ),
-			HitPt( HitPt ),
-			RefPointIndex( RefPointIndex ),
-			RefPointIntersection( RefPointIntersection ),
-			RefPtIntPosFac( RefPtIntPosFac )
-		{}
-
 	};
 
 	struct BSDFDaylghtGeomDescr
@@ -388,15 +274,6 @@ namespace DataBSDFWindow {
 
 		// Default Constructor
 		BSDFDaylghtGeomDescr()
-		{}
-
-		// Member Constructor
-		BSDFDaylghtGeomDescr(
-			Array2< BSDFRefPoints > const & IlluminanceMap, // array to keep bsdf coefficients for different illuminance maps (# of illuminance maps, # of reference points)
-			Array1< BSDFRefPoints > const & RefPoint // keep reference points daylight coefficients (# of reference points)
-		) :
-			IlluminanceMap( IlluminanceMap ),
-			RefPoint( RefPoint )
 		{}
 
 	};
@@ -415,15 +292,6 @@ namespace DataBSDFWindow {
 
 		// Default Constructor
 		BSDFBkSurfDescr()
-		{}
-
-		// Member Constructor
-		BSDFBkSurfDescr(
-			Array2< Real64 > const & WinDHBkRefl, // Back directional hemispherical reflectance
-			Array3< Real64 > const & WinDirBkAbs // back absorptance (hr, timestep, layer)
-		) :
-			WinDHBkRefl( WinDHBkRefl ),
-			WinDirBkAbs( WinDirBkAbs )
 		{}
 
 	};
@@ -479,61 +347,6 @@ namespace DataBSDFWindow {
 			NLayers( 0 )
 		{}
 
-		// Member Constructor
-		BSDFStateDescr(
-			int const Konst, // pointer to construction for this state; property matrices are in the construction
-			Real64 const WinDiffTrans, // Window hemispherical ave diff trans
-			Real64 const WinDiffVisTrans, // Window hemispherical ave diff trans for visible spectrum
-			Array2< Real64 > const & WinDirHemiTrans, // Directional-hemispherical transmittance(hr,ts)
-			Array2< Real64 > const & WinDirSpecTrans, // Directional specular transmittance(hr,ts)
-			Real64 const WinSkyTrans, // Transmittance for sky radiation (weighted average over sky viewed)
-			Real64 const WinSkyGndTrans, // Transmittance for sky radiation reflected from ground (average over
-			Array2< Real64 > const & WinBmGndTrans, // Transmittance (hour, timestep) for beam radiation reflected
-			Real64 const WinBkHemRefl, // Window back hemispherical reflectance
-			Real64 const WinBkHemVisRefl, // Window back hemispherical reflectance (visible spectrum)
-			int const NLayers, // Number of absorbing layers in this window
-			Array3< Real64 > const & WinBmFtAbs, // Front directional absorptance (hour, timestep, layer)
-			Array1< Real64 > const & WinSkyFtAbs, // Front absorptance (layer) averaged over sky
-			Array1< Real64 > const & WinSkyGndAbs, // Front absorptance (layer) averaged over ground
-			Array3< Real64 > const & WinBmGndAbs, // Front absorptance (hour, timestep, layer) averaged
-			Array1< Real64 > const & WinFtHemAbs, // Front hemispherical absorptance (layers)
-			Array1< Real64 > const & WinBkHemAbs, // Back hemispherical absorptance (layers)
-			Array3< Real64 > const & WinToSurfBmTrans, // Beam transmittance (hour, timestep, bk surf no)
-			Array1< BSDFBkSurfDescr > const & BkSurf, // Structure dimensioned (bk surface no)
-			Array1< Real64 > const & IntegratedFtAbs, // Sum of all back layer absorptances (for each back direction)
-			Array1< Real64 > const & IntegratedFtRefl, // Integrated back layer reflectance (for each back direction)
-			Array1< Real64 > const & IntegratedFtTrans, // Integrated back layer transmittance (for each back direction)
-			Array1< Real64 > const & IntegratedBkAbs, // Sum of all back layer absorptances (for each back direction)
-			Array1< Real64 > const & IntegratedBkRefl, // Integrated back layer reflectance (for each back direction)
-			Array1< Real64 > const & IntegratedBkTrans // Integrated back layer transmittance (for each back direction)
-		) :
-			Konst( Konst ),
-			WinDiffTrans( WinDiffTrans ),
-			WinDiffVisTrans( WinDiffVisTrans ),
-			WinDirHemiTrans( WinDirHemiTrans ),
-			WinDirSpecTrans( WinDirSpecTrans ),
-			WinSkyTrans( WinSkyTrans ),
-			WinSkyGndTrans( WinSkyGndTrans ),
-			WinBmGndTrans( WinBmGndTrans ),
-			WinBkHemRefl( WinBkHemRefl ),
-			WinBkHemVisRefl( WinBkHemVisRefl ),
-			NLayers( NLayers ),
-			WinBmFtAbs( WinBmFtAbs ),
-			WinSkyFtAbs( WinSkyFtAbs ),
-			WinSkyGndAbs( WinSkyGndAbs ),
-			WinBmGndAbs( WinBmGndAbs ),
-			WinFtHemAbs( WinFtHemAbs ),
-			WinBkHemAbs( WinBkHemAbs ),
-			WinToSurfBmTrans( WinToSurfBmTrans ),
-			BkSurf( BkSurf ),
-			IntegratedFtAbs( IntegratedFtAbs ),
-			IntegratedFtRefl( IntegratedFtRefl ),
-			IntegratedFtTrans( IntegratedFtTrans ),
-			IntegratedBkAbs( IntegratedBkAbs ),
-			IntegratedBkRefl( IntegratedBkRefl ),
-			IntegratedBkTrans( IntegratedBkTrans )
-		{}
-
 	};
 
 	struct BSDFRefPointsGeomDescr
@@ -544,15 +357,6 @@ namespace DataBSDFWindow {
 
 		// Default Constructor
 		BSDFRefPointsGeomDescr()
-		{}
-
-		// Member Constructor
-		BSDFRefPointsGeomDescr(
-			Array1< Real64 > const & SolidAngle, // Solid angle from daylighting reference point to each window element (# window el)
-			Array1< Vector > const & SolidAngleVec // unit vector from reference point towards center of window element (# window el)
-		) :
-			SolidAngle( SolidAngle ),
-			SolidAngleVec( SolidAngleVec )
 		{}
 
 	};
@@ -582,29 +386,6 @@ namespace DataBSDFWindow {
 			NBkSurf( 0 )
 		{}
 
-		// Member Constructor
-		BSDFWindowGeomDescr(
-			int const NumStates, // Number of states for this window
-			Array1< BSDFGeomDescr > const & Geom, // This is dimensioned with number of states
-			Array1< BSDFDaylghtGeomDescr > const & DaylghtGeom, // This is dimensioned with number of states
-			bool const DaylightingInitialized, // used for one time initialization only
-			int const NBkSurf, // Number of back (interior) surfaces viewed by this window
-			Array1< Vector > const & sWinSurf, // Unit vector from window center to center of IBkSurf
-			Array1< Real64 > const & sdotN, // Dot product of unit vector s with back surface normal
-			Array2< BSDFRefPointsGeomDescr > const & IlluminanceMap, // array to keep bsdf coefficients for different illuminance maps (# of illuminance maps, # of reference points)
-			Array1< BSDFRefPointsGeomDescr > const & RefPoint // keep reference points daylight coefficients (# of reference points)
-		) :
-			NumStates( NumStates ),
-			Geom( Geom ),
-			DaylghtGeom( DaylghtGeom ),
-			DaylightingInitialized( DaylightingInitialized ),
-			NBkSurf( NBkSurf ),
-			sWinSurf( sWinSurf ),
-			sdotN( sdotN ),
-			IlluminanceMap( IlluminanceMap ),
-			RefPoint( RefPoint )
-		{}
-
 	};
 
 	struct BSDFWindowDescript
@@ -630,19 +411,6 @@ namespace DataBSDFWindow {
 			CurrentState( 1 )
 		{}
 
-		// Member Constructor
-		BSDFWindowDescript(
-			int const NumStates, // Number of states for this window
-			int const CurrentState, // Current state of this window
-			Array2< Real64 > const & ResultAllStates, // Array to hold calculated
-			Array1< BSDFStateDescr > const & State // State description, dimensioned with number of states
-		) :
-			NumStates( NumStates ),
-			CurrentState( CurrentState ),
-			ResultAllStates( ResultAllStates ),
-			State( State )
-		{}
-
 	};
 
 	struct BSDFLayerAbsorpStruct
@@ -661,23 +429,6 @@ namespace DataBSDFWindow {
 			FrtAbsIndex( 0 ),
 			AbsNcols( 0 ),
 			BkAbsIndex( 0 )
-		{}
-
-		// Member Constructor
-		BSDFLayerAbsorpStruct(
-			int const MaterialIndex, // pointer to material layer
-			int const FrtAbsIndex, // pointer to matrix for Front directional absorptance vector
-			int const AbsNcols, // Number of elements (columns) in each of the absorption (row) vectors
-			Array2< Real64 > const & FrtAbs, // Front directional absorptance vector
-			int const BkAbsIndex, // pointer to matrix for Back directional absorptance vector
-			Array2< Real64 > const & BkAbs // Back directional absorptance vector
-		) :
-			MaterialIndex( MaterialIndex ),
-			FrtAbsIndex( FrtAbsIndex ),
-			AbsNcols( AbsNcols ),
-			FrtAbs( FrtAbs ),
-			BkAbsIndex( BkAbsIndex ),
-			BkAbs( BkAbs )
 		{}
 
 	};
@@ -737,63 +488,6 @@ namespace DataBSDFWindow {
 			VisBkReflNrows( 0 ),
 			VisBkReflNcols( 0 ),
 			NumLayers( 0 )
-		{}
-
-		// Member Constructor
-		BSDFWindowInputStruct(
-			int const BasisType,
-			int const BasisSymmetryType,
-			int const ThermalModel, // Pointer to thermal model
-			int const BasisMatIndex, // pointer to matrix for basis
-			int const BasisMatNrows, // No. rows in matrix
-			int const BasisMatNcols, // No. columns in matrix
-			int const NBasis, // No. elements in basis
-			Array2< Real64 > const & BasisMat, // basis matrix
-			int const SolFrtTransIndex, // pointer to matrix for Front optical transmittance matrix
-			int const SolFrtTransNrows, // No. rows in matrix
-			int const SolFrtTransNcols, // No. columns in matrix
-			Array2< Real64 > const & SolFrtTrans, // Front optical transmittance matrix
-			int const SolBkReflIndex, // pointer to matrix for Back optical reflectance matrix
-			int const SolBkReflNrows, // No. rows in matrix
-			int const SolBkReflNcols, // No. columns in matrix
-			Array2< Real64 > const & SolBkRefl, // Back optical reflectance matrix
-			int const VisFrtTransIndex, // pointer to matrix for Front visible transmittance matrix
-			int const VisFrtTransNrows, // No. rows in matrix
-			int const VisFrtTransNcols, // No. columns in matrix
-			Array2< Real64 > const & VisFrtTrans, // Front visible transmittance matrix
-			int const VisBkReflIndex, // pointer to matrix for Back visible reflectance matrix
-			int const VisBkReflNrows, // No. rows in matrix
-			int const VisBkReflNcols, // No. columns in matrix
-			Array2< Real64 > const & VisBkRefl, // Back visible reflectance matrix
-			int const NumLayers,
-			Array1< BSDFLayerAbsorpStruct > const & Layer
-		) :
-			BasisType( BasisType ),
-			BasisSymmetryType( BasisSymmetryType ),
-			ThermalModel( ThermalModel ),
-			BasisMatIndex( BasisMatIndex ),
-			BasisMatNrows( BasisMatNrows ),
-			BasisMatNcols( BasisMatNcols ),
-			NBasis( NBasis ),
-			BasisMat( BasisMat ),
-			SolFrtTransIndex( SolFrtTransIndex ),
-			SolFrtTransNrows( SolFrtTransNrows ),
-			SolFrtTransNcols( SolFrtTransNcols ),
-			SolFrtTrans( SolFrtTrans ),
-			SolBkReflIndex( SolBkReflIndex ),
-			SolBkReflNrows( SolBkReflNrows ),
-			SolBkReflNcols( SolBkReflNcols ),
-			SolBkRefl( SolBkRefl ),
-			VisFrtTransIndex( VisFrtTransIndex ),
-			VisFrtTransNrows( VisFrtTransNrows ),
-			VisFrtTransNcols( VisFrtTransNcols ),
-			VisFrtTrans( VisFrtTrans ),
-			VisBkReflIndex( VisBkReflIndex ),
-			VisBkReflNrows( VisBkReflNrows ),
-			VisBkReflNcols( VisBkReflNcols ),
-			VisBkRefl( VisBkRefl ),
-			NumLayers( NumLayers ),
-			Layer( Layer )
 		{}
 
 	};

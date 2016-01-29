@@ -47,7 +47,6 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	inline
 	IndexRange() :
 	 l_( 1 ),
 	 u_( 0 ),
@@ -55,7 +54,6 @@ public: // Creation
 	{}
 
 	// Copy Constructor
-	inline
 	IndexRange( IndexRange const & I ) :
 	 l_( I.l_ ),
 	 u_( I.u_ ),
@@ -63,7 +61,6 @@ public: // Creation
 	{}
 
 	// Upper Index Constructor
-	inline
 	IndexRange( int const u ) :
 	 l_( 1 ),
 	 u_( clean_u( u ) ),
@@ -73,7 +70,6 @@ public: // Creation
 	}
 
 	// Index Range Constructor
-	inline
 	IndexRange( int const l, int const u ) :
 	 l_( l ),
 	 u_( clean_u( u ) ),
@@ -84,7 +80,6 @@ public: // Creation
 
 	// Initializer List of Integer Constructor
 	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
-	inline
 	IndexRange( std::initializer_list< U > const lu ) :
 	 l_( 1 ),
 	 u_( 0 ),
@@ -112,7 +107,6 @@ public: // Creation
 	}
 
 	// Initializer List of Index Constructor
-	inline
 	IndexRange( std::initializer_list< Index > const lu ) :
 	 l_( 1 ),
 	 u_( 0 ),
@@ -140,7 +134,6 @@ public: // Creation
 	}
 
 	// Omit Constructor
-	inline
 	IndexRange( Omit const ) :
 	 l_( 1 ),
 	 u_( -1 ),
@@ -148,7 +141,6 @@ public: // Creation
 	{}
 
 	// Lower Index + Omit Constructor
-	inline
 	IndexRange( int const l, Omit const ) :
 	 l_( l ),
 	 u_( l_ - 2 ),
@@ -156,7 +148,6 @@ public: // Creation
 	{}
 
 	// Omit + Upper Index Constructor
-	inline
 	IndexRange( Omit const, int const u ) :
 	 l_( u + 2 ),
 	 u_( u ),
@@ -166,7 +157,6 @@ public: // Creation
 	}
 
 	// Omit + Omit Constructor
-	inline
 	IndexRange( Omit const, Omit const ) :
 	 l_( 1 ),
 	 u_( -1 ),
@@ -174,14 +164,12 @@ public: // Creation
 	{}
 
 	// Destructor
-	inline
 	~IndexRange()
 	{}
 
 public: // Assignment
 
 	// Copy Assignment
-	inline
 	IndexRange &
 	operator =( IndexRange const & I )
 	{
@@ -195,7 +183,6 @@ public: // Assignment
 	}
 
 	// Upper Index Assignment
-	inline
 	IndexRange &
 	operator =( int const u )
 	{
@@ -208,7 +195,6 @@ public: // Assignment
 
 	// Initializer List of int Assignment
 	template< typename U, class = typename std::enable_if< std::is_assignable< int&, U >::value >::type >
-	inline
 	IndexRange &
 	operator =( std::initializer_list< U > const lu )
 	{
@@ -235,7 +221,6 @@ public: // Assignment
 	}
 
 	// Initializer List of Index Assignment
-	inline
 	IndexRange &
 	operator =( std::initializer_list< Index > const lu )
 	{
@@ -262,7 +247,6 @@ public: // Assignment
 	}
 
 	// IndexRange Assignment
-	inline
 	IndexRange &
 	assign( IndexRange const & I )
 	{
@@ -274,7 +258,6 @@ public: // Assignment
 	}
 
 	// Upper Index Assignment
-	inline
 	IndexRange &
 	assign( int const u )
 	{
@@ -286,7 +269,6 @@ public: // Assignment
 	}
 
 	// Index Range Assignment
-	inline
 	IndexRange &
 	assign( int const l, int const u )
 	{
@@ -300,7 +282,6 @@ public: // Assignment
 public: // Subscript
 
 	// IndexRange( i ): Internal Index for i
-	inline
 	int
 	operator ()( int const i ) const
 	{
@@ -308,7 +289,6 @@ public: // Subscript
 	}
 
 	// IndexRange[ i ]: Internal Index for Zero-Based i
-	inline
 	int
 	operator []( int const i ) const
 	{
@@ -318,7 +298,6 @@ public: // Subscript
 public: // Predicate
 
 	// Legal?
-	inline
 	bool
 	legal() const
 	{
@@ -326,7 +305,6 @@ public: // Predicate
 	}
 
 	// Bounded?
-	inline
 	bool
 	bounded() const
 	{
@@ -334,7 +312,6 @@ public: // Predicate
 	}
 
 	// Unbounded?
-	inline
 	bool
 	unbounded() const
 	{
@@ -342,7 +319,6 @@ public: // Predicate
 	}
 
 	// Not Unbounded?
-	inline
 	bool
 	not_unbounded() const
 	{
@@ -350,7 +326,6 @@ public: // Predicate
 	}
 
 	// Empty?
-	inline
 	bool
 	empty() const
 	{
@@ -358,7 +333,6 @@ public: // Predicate
 	}
 
 	// Non-Empty?
-	inline
 	bool
 	non_empty() const
 	{
@@ -366,7 +340,6 @@ public: // Predicate
 	}
 
 	// Bounded with Positive Size?
-	inline
 	bool
 	positive() const
 	{
@@ -374,7 +347,6 @@ public: // Predicate
 	}
 
 	// Contains an Index?
-	inline
 	bool
 	contains( int const i ) const
 	{
@@ -382,7 +354,6 @@ public: // Predicate
 	}
 
 	// Contains Two Indexes?
-	inline
 	bool
 	contains( int const i, int const j ) const
 	{
@@ -400,7 +371,6 @@ public: // Predicate
 public: // Inspector
 
 	// Lower Index
-	inline
 	int
 	l() const
 	{
@@ -408,7 +378,6 @@ public: // Inspector
 	}
 
 	// Upper Index
-	inline
 	int
 	u() const
 	{
@@ -416,7 +385,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	size_type
 	size() const
 	{
@@ -424,7 +392,6 @@ public: // Inspector
 	}
 
 	// Size
-	inline
 	int
 	isize() const
 	{
@@ -433,7 +400,6 @@ public: // Inspector
 	}
 
 	// Offset of an Index
-	inline
 	int
 	offset( int const i ) const
 	{
@@ -441,7 +407,6 @@ public: // Inspector
 	}
 
 	// Last Index
-	inline
 	int
 	last() const
 	{
@@ -449,7 +414,6 @@ public: // Inspector
 	}
 
 	// Next Index
-	inline
 	int
 	next( int const i ) const
 	{
@@ -459,7 +423,6 @@ public: // Inspector
 public: // Modifier
 
 	// Lower Index Set
-	inline
 	IndexRange &
 	l( int const l )
 	{
@@ -475,7 +438,6 @@ public: // Modifier
 	}
 
 	// Upper Index Set
-	inline
 	IndexRange &
 	u( int const u )
 	{
@@ -485,7 +447,6 @@ public: // Modifier
 	}
 
 	// Grow Upper
-	inline
 	IndexRange &
 	grow( int const n = 1 )
 	{
@@ -498,7 +459,6 @@ public: // Modifier
 	}
 
 	// Shrink Upper
-	inline
 	IndexRange &
 	shrink( int const n = 1 )
 	{
@@ -510,7 +470,6 @@ public: // Modifier
 	}
 
 	// Expand to Contain an Index
-	inline
 	IndexRange &
 	contain( int const i )
 	{
@@ -537,7 +496,6 @@ public: // Modifier
 	intersect( IndexRange const & I );
 
 	// Clear
-	inline
 	IndexRange &
 	clear()
 	{
@@ -548,7 +506,6 @@ public: // Modifier
 	}
 
 	// Clean
-	inline
 	IndexRange &
 	clean()
 	{
@@ -561,7 +518,6 @@ public: // Modifier
 	}
 
 	// Swap
-	inline
 	IndexRange &
 	swap( IndexRange & I )
 	{
@@ -576,7 +532,6 @@ public: // Modifier
 private: // Methods
 
 	// Computed Size
-	inline
 	size_type
 	computed_size() const
 	{
@@ -584,7 +539,6 @@ private: // Methods
 	}
 
 	// Clean Upper Index Value After Lower Index Set
-	inline
 	int
 	clean_u( int const u )
 	{

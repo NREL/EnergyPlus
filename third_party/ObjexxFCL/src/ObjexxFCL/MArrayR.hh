@@ -69,7 +69,6 @@ public: // Types
 protected: // Creation
 
 	// Copy Constructor
-	inline
 	MArrayR( MArrayR const & a ) :
 	 Super( a )
 	{
@@ -77,7 +76,6 @@ protected: // Creation
 	}
 
 	// Constructor
-	inline
 	MArrayR( A & a, T Class::* pmem ) :
 	 Super( a, pmem )
 	{}
@@ -85,7 +83,6 @@ protected: // Creation
 public: // Creation
 
 	// Destructor
-	inline
 	virtual
 	~MArrayR()
 	{}
@@ -93,14 +90,12 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	inline
 	MArrayR &
 	operator =( MArrayR const & a ); // Disallow
 
 public: // Inspector
 
 	// Rank
-	inline
 	int
 	rank() const
 	{

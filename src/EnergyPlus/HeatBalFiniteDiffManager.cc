@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -185,6 +243,26 @@ namespace HeatBalFiniteDiffManager {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		SigmaR.deallocate();
+		SigmaC.deallocate();
+		QHeatInFlux.deallocate();
+		QHeatOutFlux.deallocate();
+		CondFDSchemeType = FullyImplicitFirstOrder;
+		SpaceDescritConstant = 3.0;
+		MinTempLimit = -100.0;
+		MaxTempLimit = 100.0;
+		MaxGSiter = 30;
+		fracTimeStepZone_Hour = 0.0;
+		GetHBFiniteDiffInputFlag = true;
+		WarmupSurfTemp = 0;
+		ConstructFD.deallocate();
+		SurfaceFD.deallocate();
+		MaterialFD.deallocate();
+	}
 
 	void
 	ManageHeatBalFiniteDiff(
@@ -564,6 +642,10 @@ namespace HeatBalFiniteDiffManager {
 				SurfaceFD( SurfNum ).EnthOld = EnthInitValue;
 				SurfaceFD( SurfNum ).EnthNew = EnthInitValue;
 				SurfaceFD( SurfNum ).EnthLast = EnthInitValue;
+				SurfaceFD( SurfNum ).QDreport = 0.0;
+				SurfaceFD( SurfNum ).CpDelXRhoS1 = 0.0;
+				SurfaceFD( SurfNum ).CpDelXRhoS2 = 0.0;
+				SurfaceFD( SurfNum ).TDpriortimestep = 0.0;
 
 				TempOutsideAirFD( SurfNum ) = 0.0;
 				RhoVaporAirOut( SurfNum ) = 0.0;
@@ -599,6 +681,8 @@ namespace HeatBalFiniteDiffManager {
 			SurfaceFD( SurfNum ).EnthOld = SurfaceFD( SurfNum ).EnthOld;
 			SurfaceFD( SurfNum ).EnthNew = SurfaceFD( SurfNum ).EnthOld;
 			SurfaceFD( SurfNum ).EnthLast = SurfaceFD( SurfNum ).EnthOld;
+			SurfaceFD( SurfNum ).TDpriortimestep = SurfaceFD( SurfNum ).TDreport; // Save TD for heat flux calc
+
 		}
 
 	}
@@ -629,6 +713,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataSurfaces::HeatTransferModel_CondFD;
 		using DataHeatBalance::HighDiffusivityThreshold;
 		using DataHeatBalance::ThinMaterialLayerThreshold;
+		using DataGlobals::DisplayAdvancedReportVariables;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -646,7 +731,6 @@ namespace HeatBalFiniteDiffManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Lay;
 		int SurfNum;
-		std::string LayChar;
 
 		Real64 dxn; // Intermediate calculation of nodal spacing. This is the full dx. There is
 		// a half dxn thick node at each surface. dxn is the "capacitor" spacing.
@@ -940,6 +1024,10 @@ namespace HeatBalFiniteDiffManager {
 			SurfaceFD( Surf ).EnthOld.allocate( TotNodes + 1 );
 			SurfaceFD( Surf ).EnthNew.allocate( TotNodes + 1 );
 			SurfaceFD( Surf ).EnthLast.allocate( TotNodes + 1 );
+			SurfaceFD( Surf ).QDreport.allocate( TotNodes + 1 );
+			SurfaceFD( Surf ).CpDelXRhoS1.allocate( TotNodes + 1 );
+			SurfaceFD( Surf ).CpDelXRhoS2.allocate( TotNodes + 1 );
+			SurfaceFD( Surf ).TDpriortimestep.allocate( TotNodes + 1 );
 
 			//Initialize the allocated arrays.
 			SurfaceFD( Surf ).T = TempInitValue;
@@ -958,6 +1046,10 @@ namespace HeatBalFiniteDiffManager {
 			SurfaceFD( Surf ).EnthOld = EnthInitValue;
 			SurfaceFD( Surf ).EnthNew = EnthInitValue;
 			SurfaceFD( Surf ).EnthLast = EnthInitValue;
+			SurfaceFD( Surf ).QDreport = 0.0;
+			SurfaceFD( Surf ).CpDelXRhoS1 = 0.0;
+			SurfaceFD( Surf ).CpDelXRhoS2 = 0.0;
+			SurfaceFD( Surf ).TDpriortimestep = 0.0;
 		}
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -979,6 +1071,11 @@ namespace HeatBalFiniteDiffManager {
 			TotNodes = ConstructFD( Surface( SurfNum ).Construction ).TotNodes; // Full size nodes, start with outside face.
 			for ( Lay = 1; Lay <= TotNodes + 1; ++Lay ) { // include inside face node
 				SetupOutputVariable( "CondFD Surface Temperature Node " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Surface Heat Flux Node " + TrimSigDigits( Lay ) + " [W/m2]", SurfaceFD( SurfNum ).QDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				if ( DisplayAdvancedReportVariables ) {
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+			}
 			}
 
 		} // End of the Surface Loop for Report Variable Setup
@@ -1018,7 +1115,7 @@ namespace HeatBalFiniteDiffManager {
 
 	void
 	CalcHeatBalFiniteDiff(
-		int const Surf,
+		int const Surf, // Surface number
 		Real64 & TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Real64 & TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
 	)
@@ -1190,6 +1287,13 @@ namespace HeatBalFiniteDiffManager {
 		TempSurfOutTmp = TDT( 1 );
 		TempSurfInTmp = TDT( TotNodes + 1 );
 		RhoVaporSurfIn( Surf ) = 0.0;
+
+		// For ground surfaces or when raining, outside face inner half-node heat capacity was unknown and set to -1 in ExteriorBCEqns
+		// Now check for the flag and set equal to the second node's outer half-node heat capacity if needed
+		if ( surfaceFD.CpDelXRhoS2( 1 ) == -1.0 ) {
+			surfaceFD.CpDelXRhoS2( 1 ) = surfaceFD.CpDelXRhoS1( 2 ); // Set to node 2's outer half node heat capacity
+		}
+		CalcNodeHeatFlux( Surf, TotNodes );
 
 		// Determine largest change in node temps
 		MaxDelTemp = 0.0;
@@ -1470,6 +1574,8 @@ namespace HeatBalFiniteDiffManager {
 		if ( surface_ExtBoundCond == Ground || IsRain ) {
 			TDT( i ) = TT( i ) = TempOutsideAirFD( Surf );
 			RhoT( i ) = RhoVaporAirOut( Surf );
+			SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; // Outside face  does not have an outer half node
+			SurfaceFD( Surf ).CpDelXRhoS2( i ) = -1.0; // Set this to -1 as a flag, then set to node 2's outer half node heat capacity
 		} else if ( surface_ExtBoundCond > 0 ) {
 			// this is actually the inside face of another surface, or maybe this same surface if adiabatic
 			// switch around arguments for the other surf and call routines as for interior side BC from opposite face
@@ -1487,6 +1593,9 @@ namespace HeatBalFiniteDiffManager {
 				TT( i ) = surfaceFD.TT( TotNodesPlusOne );
 				RhoT( i ) = surfaceFD.RhoT( TotNodesPlusOne );
 
+				surfaceFD.CpDelXRhoS1( i ) = 0.0; // Outside face  does not have an outer half node
+				surfaceFD.CpDelXRhoS2( i ) = surfaceFD.CpDelXRhoS1( TotNodesPlusOne ); // Save this for computing node flux values
+
 			} else {
 
 				// potential-lkl-from old      CALL InteriorBCEqns(Delt,nodeIn,LayIn,Surf,SurfaceFD(Surface(Surf)%ExtBoundCond)%T, &
@@ -1496,6 +1605,9 @@ namespace HeatBalFiniteDiffManager {
 				TDT( i ) = surfaceFDEBC.TDT( TotNodesPlusOne );
 				TT( i ) = surfaceFDEBC.TT( TotNodesPlusOne );
 				RhoT( i ) = surfaceFDEBC.RhoT( TotNodesPlusOne );
+
+				SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; // Outside face  does not have an outer half node
+				SurfaceFD( Surf ).CpDelXRhoS2( i ) = surfaceFDEBC.CpDelXRhoS1( TotNodesPlusOne ); // Save this for computing node flux values
 
 			}
 			//    CALL InteriorBCEqns(Delt,nodeIn,Layin,Surface(Surf)%ExtBoundCond,SurfaceFD(Surf)%T, &
@@ -1589,6 +1701,9 @@ namespace HeatBalFiniteDiffManager {
 					Real64 const RhoS( mat.Density );
 					Real64 const DelX( ConstructFD( ConstrNum ).DelX( Lay ) );
 					Real64 const Delt_DelX( Delt * DelX );
+					SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; // Outside face  does not have an outer half node
+					SurfaceFD( Surf ).CpDelXRhoS2( i ) = ( Cp * DelX * RhoS ) / 2.0; // Save this for computing node flux values
+
 					if ( HMovInsul <= 0.0 ) { // Regular  case
 
 						if ( CondFDSchemeType == CrankNicholsonSecondOrder ) { // Second Order equation
@@ -1785,6 +1900,7 @@ namespace HeatBalFiniteDiffManager {
 		}
 
 		TDT( i ) = TDT_i;
+		SurfaceFD( Surf ).CpDelXRhoS1( i ) = SurfaceFD( Surf ).CpDelXRhoS2( i ) = ( Cp * DelX * RhoS ) / 2.0; // Save this for computing node flux values, half nodes are the same here
 	}
 
 	void
@@ -1960,6 +2076,8 @@ namespace HeatBalFiniteDiffManager {
 					} else if ( TDT_i > MaxSurfaceTempLimit ) {
 						TDT_i = MaxSurfaceTempLimit;
 					}
+					SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; //  - rlayer has no capacitance, so this is zero
+					SurfaceFD( Surf ).CpDelXRhoS2( i ) = ( Cp2 * Delx2 * RhoS2 ) / 2.0; // Save this for computing node flux values
 
 				} else if ( ! RLayerPresent && RLayer2Present ) { // R-layer second
 
@@ -1990,6 +2108,8 @@ namespace HeatBalFiniteDiffManager {
 					} else if ( TDT_i > MaxSurfaceTempLimit ) {
 						TDT_i = MaxSurfaceTempLimit;
 					}
+					SurfaceFD( Surf ).CpDelXRhoS1( i ) = ( Cp1 * Delx1 * RhoS1 ) / 2.0; // Save this for computing node flux values
+					SurfaceFD( Surf ).CpDelXRhoS2( i ) = 0.0; //  - rlayer has no capacitance, so this is zero
 
 				} else { // Regular or Phase Change on both sides of interface
 
@@ -2053,10 +2173,14 @@ namespace HeatBalFiniteDiffManager {
 					} else if ( TDT_i > MaxSurfaceTempLimit ) {
 						TDT_i = MaxSurfaceTempLimit;
 					}
+					SurfaceFD( Surf ).CpDelXRhoS1( i ) = ( Cp1 * Delx1 * RhoS1 ) / 2.0; // Save this for computing node flux values
+					SurfaceFD( Surf ).CpDelXRhoS2( i ) = ( Cp2 * Delx2 * RhoS2 ) / 2.0; // Save this for computing node flux values
 
 					if ( construct.SourceSinkPresent && ( Lay == construct.SourceAfterLayer ) ) {
 						TCondFDSourceNode( Surf ) = TDT_i; // Transfer node temp to Radiant System
 						TempSource( Surf ) = TDT_i; // Transfer node temp to DataHeatBalSurface module
+						SurfaceFD( Surf ).QSource = QSSFlux;
+						SurfaceFD( Surf ).SourceNodeNum = i;
 					}
 
 				} // End of R-layer and Regular check
@@ -2169,6 +2293,8 @@ namespace HeatBalFiniteDiffManager {
 				} else { // regular wall
 					TDT_i = ( TDT( i - 1 ) + ( QFac + hconvi * Tia + TDreport( i ) * IterDampConst ) * Rlayer ) / ( 1.0 + ( hconvi + IterDampConst ) * Rlayer );
 				}
+				SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; // Save this for computing node flux values - rlayer has no capacitance
+				SurfaceFD( Surf ).CpDelXRhoS2( i ) = 0.0; // Inside face  does not have an inner half node
 
 			} else { //  Regular or PCM
 				auto const TDT_m( TDT( i - 1 ) );
@@ -2222,6 +2348,8 @@ namespace HeatBalFiniteDiffManager {
 						TDT_i = ( Two_Delt_DelX * ( QFac + hconvi * Tia ) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_m ) / ( Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS );
 					}
 				}
+				SurfaceFD( Surf ).CpDelXRhoS1( i ) = ( Cp * DelX * RhoS ) / 2.0; // Save this for computing node flux values
+				SurfaceFD( Surf ).CpDelXRhoS2( i ) = 0.0; // Inside face  does not have an inner half node
 
 				//  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
 				//          OpaqSurfInsFaceConductionFlux(Surf)= (TDT(I-1)-TDT(I))*kt/Delx
@@ -2298,7 +2426,7 @@ namespace HeatBalFiniteDiffManager {
 		//      IF ((TH(SurfNum,1,2) > MaxSurfaceTempLimit) .OR. &
 		//          (TH(SurfNum,1,2) < MinSurfaceTempLimit) ) THEN
 		if ( WarmupFlag ) ++WarmupSurfTemp;
-		if ( ! WarmupFlag || ( WarmupFlag && WarmupSurfTemp > 10 ) || DisplayExtraWarnings ) {
+		if ( ! WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings ) {
 			if ( CheckTemperature < MinSurfaceTempLimit ) {
 				if ( Surface( SurfNum ).LowTempErrCount == 0 ) {
 					ShowSevereMessage( "Temperature (low) out of bounds [" + RoundSigDigits( CheckTemperature, 2 ) + "] for zone=\"" + Zone( ZoneNum ).Name + "\", for surface=\"" + Surface( SurfNum ).Name + "\"" );
@@ -2360,30 +2488,52 @@ namespace HeatBalFiniteDiffManager {
 
 	}
 
+	void
+	CalcNodeHeatFlux(
+		int const Surf, // surface number
+		int const TotNodes // number of nodes in surface
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   Sept-Nov 2015
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculate flux at each condFD node
+		using General::RoundSigDigits;
+
+		int node; // node counter
+
+		auto & surfaceFD( SurfaceFD( Surf ) );
+
+		// SurfaceFD.QDreport( n ) is the flux at node n
+		// When this is called TDT( NodeNum ) is the new node temp and TDpriortimestep( NodeNum ) holds the previous node temp
+		// For the TDT and TDpriortimestep arrays, Node 1 is the outside face, and Node TotNodes+1 is the inside face
+
+		// Last node is always the surface inside face.  Start calculations here because the outside face is not defined for all surfaces.
+		// Note that TotNodes is the number of nodes in the surface including the outside face node, but not the inside face node
+		// so the arrays are all allocated to Totodes+1
+
+		// Heat flux at the inside face node (TotNodes+1)
+		surfaceFD.QDreport( TotNodes + 1 ) = OpaqSurfInsFaceConductionFlux( Surf );
+
+		// Heat flux for remaining nodes.
+		for ( node = TotNodes; node >= 1; --node ) {
+				// Start with inside face (above) and work outward, positive value is flowing towards the inside face
+				// CpDelXRhoS1 is outer half-node heat capacity, CpDelXRhoS2 is inner half node heat capacity
+			Real64 interNodeFlux; // heat flux at the plane between node and node+1 [W/m2]
+			Real64 sourceFlux; // Internal source flux [W/m2]
+			if ( surfaceFD.SourceNodeNum == node) {
+				sourceFlux = surfaceFD.QSource;
+			} else {
+				sourceFlux = 0.0;
+			}
+			interNodeFlux = surfaceFD.QDreport( node + 1 ) + surfaceFD.CpDelXRhoS1( node + 1 )  * ( surfaceFD.TDT( node + 1 ) - surfaceFD.TDpriortimestep( node + 1 ) ) / TimeStepZoneSec;
+			surfaceFD.QDreport( node ) = interNodeFlux - sourceFlux + surfaceFD.CpDelXRhoS2( node )  * ( surfaceFD.TDT( node ) - surfaceFD.TDpriortimestep( node ) ) / TimeStepZoneSec;
+		}
+	}
 	// *****************************************************************************
 
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HeatBalFiniteDiffManager
 

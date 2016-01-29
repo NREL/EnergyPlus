@@ -7593,7 +7593,7 @@ The name of the AirLoopHVAC corresponding to this Sizing:System object. This is 
 
 #### Field: Type of Load to Size On
 
-The user specified type of load on which to size the central system. The choices are *Sensible*, *Total* and *VentilationRequirement*.  *Sensible* means that the central system supply air flow rate will be determined by combining the zone design air flow rates, which have been calculated to meet the zone sensible loads from the design days. *VentilationRequirement* means that the central system supply air flow rate will be determined by the system ventilation requirement.  In addition Sensible tells the program to size the central cooling coil using entering air flow rate and air conditions at the sensible load peak; Total  indicates that the program should size  the central cooling coil at the air flow rate and conditions at the total load peak. The central heating coil is always sized at the conditions at the peak sensible heating load.
+The user specified type of load on which to size the central system. The choices are *Sensible*, *Total* and *VentilationRequirement*.  *Sensible* and *Total* mean that the central system supply air flow rate will be determined by combining the zone design air flow rates, which have been calculated to meet the zone sensible loads from the design days. *VentilationRequirement* means that the central system supply air flow rate will be determined by the system ventilation requirement.  In addition *Sensible* tells the program to size the central cooling coil using entering air flow rate and air conditions at the sensible load peak; *Total* indicates that the program should size  the central cooling coil at the air flow rate and conditions at the total load peak. The central heating coil is always sized at the conditions at the peak sensible heating load.
 
 #### Field: Design Outdoor Air Flow Rate
 
@@ -7625,7 +7625,7 @@ The design supply air temperature for cooling in degrees Celsius. This should be
 
 #### Field: Central Heating Design Supply Air Temperature
 
-The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil.
+The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system.
 
 #### Field: Type of Zone Sum to Use
 
@@ -7641,11 +7641,11 @@ Entering *Yes* means the system will be sized for heating using 100% outdoor air
 
 #### Field: Central Cooling Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Central Heating Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Cooling Supply Air Flow Rate Method
 
@@ -7959,6 +7959,7 @@ In addition, properties of each node is available during the simulation:
 
 * HVAC,Average,System Node Height [m]
 
+* HVAC,Average,System Node Specific Heat [J/kg-K]
 
 **The following node variable is also available for system nodes that are for “air”:**
 
@@ -8071,6 +8072,10 @@ The current system node vapor fraction/percent {0.0-1.0}.
 #### System Node Height [m]
 
 The current system node height {m}. Only applicable to outdoor air nodes.
+
+#### System Node Specific Heat [J/kg-K]
+
+The current specific heat capacity of the fluid at the node in units of J/kg-K.  Not available for steam nodes. 
 
 **Additional Node Reporting for Air Nodes**
 
@@ -11096,7 +11101,7 @@ This choice field determines how the chiller operates with respect to the intend
 
 #### Field: Design Heat Recovery Water Flow Rate
 
-This is the design flow rate used if the heat recovery option is being simulated. If this value is greater than 0.0 then a heat recovery loop must be specified and attached to the chiller using the next 2 node fields. To determine how the heat recovery algorithm works look at the Enegineering Manual at the Chiller:Electric with Heat Recovery section. The units are in cubic meters per second. This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below.
+This is the design flow rate used if the heat recovery option is being simulated. If this value is greater than 0.0 then a heat recovery loop must be specified and attached to the chiller using the next 2 node fields. To determine how the heat recovery algorithm works look at the Engineering Manual at the Chiller:Electric with Heat Recovery section. The units are in cubic meters per second. This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below. Note that heat recovery is only available with Condenser Type = WaterCooled.
 
 #### Field: Heat Recovery Inlet Node Name
 
@@ -11459,7 +11464,7 @@ This choice field determines how the chiller operates with respect to the intend
 
 #### Field: Design Heat Recovery Water Flow Rate
 
-This is the design heat recovery water flow rate if the heat recovery option is being simulated. If this value is greater than 0.0 (or Autosize), a heat recovery loop must be specified and attached to the chiller using the next two node fields. The units are in cubic meters per second.  This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below.
+This is the design heat recovery water flow rate if the heat recovery option is being simulated. If this value is greater than 0.0 (or Autosize), a heat recovery loop must be specified and attached to the chiller using the next two node fields. The units are in cubic meters per second.  This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below. Note that heat recovery is only available with Condenser Type = WaterCooled.
 
 #### Field: Heat Recovery Inlet Node Name
 

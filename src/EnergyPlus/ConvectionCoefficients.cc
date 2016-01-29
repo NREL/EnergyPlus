@@ -1,12 +1,73 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <limits>
 #include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <ConvectionCoefficients.hh>
@@ -290,35 +351,41 @@ namespace ConvectionCoefficients {
 		}
 
 		if ( BeginEnvrnFlag && MyEnvirnFlag ) {
-			if ( any_eq( Surface.IntConvCoeff(), AdaptiveConvectionAlgorithm ) || any_eq( Zone.InsideConvectionAlgo(), AdaptiveConvectionAlgorithm ) ) {
-				//need to clear out node conditions because dynamic assignments will be affected
+			if (
+			 std::any_of( Surface.begin(), Surface.end(), []( DataSurfaces::SurfaceData const & e ){ return e.IntConvCoeff == DataHeatBalance::AdaptiveConvectionAlgorithm; } ) ||
+			 std::any_of( Zone.begin(), Zone.end(), []( DataHeatBalance::ZoneData const & e ){ return e.InsideConvectionAlgo == DataHeatBalance::AdaptiveConvectionAlgorithm; } ) ) {
+				// need to clear out node conditions because dynamic assignments will be affected
 				if ( NumOfNodes > 0 && allocated( Node ) ) {
-					Node.Temp() = DefaultNodeValues.Temp;
-					Node.TempMin() = DefaultNodeValues.TempMin;
-					Node.TempMax() = DefaultNodeValues.TempMax;
-					Node.TempSetPoint() = DefaultNodeValues.TempSetPoint;
-					Node.MassFlowRate() = DefaultNodeValues.MassFlowRate;
-					Node.MassFlowRateMin() = DefaultNodeValues.MassFlowRateMin;
-					Node.MassFlowRateMax() = DefaultNodeValues.MassFlowRateMax;
-					Node.MassFlowRateMinAvail() = DefaultNodeValues.MassFlowRateMinAvail;
-					Node.MassFlowRateMaxAvail() = DefaultNodeValues.MassFlowRateMaxAvail;
-					Node.MassFlowRateSetPoint() = DefaultNodeValues.MassFlowRateSetPoint;
-					Node.Quality() = DefaultNodeValues.Quality;
-					Node.Press() = DefaultNodeValues.Press;
-					Node.Enthalpy() = DefaultNodeValues.Enthalpy;
-					Node.HumRat() = DefaultNodeValues.HumRat;
-					Node.HumRatMin() = DefaultNodeValues.HumRatMin;
-					Node.HumRatMax() = DefaultNodeValues.HumRatMax;
-					Node.HumRatSetPoint() = DefaultNodeValues.HumRatSetPoint;
-					Node.TempSetPointHi() = DefaultNodeValues.TempSetPointHi;
-					Node.TempSetPointLo() = DefaultNodeValues.TempSetPointLo;
+					for ( auto & e : Node ) {
+						e.Temp = DefaultNodeValues.Temp;
+						e.TempMin = DefaultNodeValues.TempMin;
+						e.TempMax = DefaultNodeValues.TempMax;
+						e.TempSetPoint = DefaultNodeValues.TempSetPoint;
+						e.MassFlowRate = DefaultNodeValues.MassFlowRate;
+						e.MassFlowRateMin = DefaultNodeValues.MassFlowRateMin;
+						e.MassFlowRateMax = DefaultNodeValues.MassFlowRateMax;
+						e.MassFlowRateMinAvail = DefaultNodeValues.MassFlowRateMinAvail;
+						e.MassFlowRateMaxAvail = DefaultNodeValues.MassFlowRateMaxAvail;
+						e.MassFlowRateSetPoint = DefaultNodeValues.MassFlowRateSetPoint;
+						e.Quality = DefaultNodeValues.Quality;
+						e.Press = DefaultNodeValues.Press;
+						e.Enthalpy = DefaultNodeValues.Enthalpy;
+						e.HumRat = DefaultNodeValues.HumRat;
+						e.HumRatMin = DefaultNodeValues.HumRatMin;
+						e.HumRatMax = DefaultNodeValues.HumRatMax;
+						e.HumRatSetPoint = DefaultNodeValues.HumRatSetPoint;
+						e.TempSetPointHi = DefaultNodeValues.TempSetPointHi;
+						e.TempSetPointLo = DefaultNodeValues.TempSetPointLo;
+					}
 					if ( allocated( MoreNodeInfo ) ) {
-						MoreNodeInfo.WetBulbTemp() = DefaultNodeValues.Temp;
-						MoreNodeInfo.RelHumidity() = 0.0;
-						MoreNodeInfo.ReportEnthalpy() = DefaultNodeValues.Enthalpy;
-						MoreNodeInfo.VolFlowRateStdRho() = 0.0;
-						MoreNodeInfo.VolFlowRateCrntRho() = 0.0;
-						MoreNodeInfo.Density() = 0.0;
+						for ( auto & e : MoreNodeInfo ) {
+							e.WetBulbTemp = DefaultNodeValues.Temp;
+							e.RelHumidity = 0.0;
+							e.ReportEnthalpy = DefaultNodeValues.Enthalpy;
+							e.VolFlowRateStdRho = 0.0;
+							e.VolFlowRateCrntRho = 0.0;
+							e.Density = 0.0;
+						}
 					}
 				}
 			}
@@ -1127,7 +1194,6 @@ namespace ConvectionCoefficients {
 		int Ptr;
 		int Pass;
 		int FieldNo;
-		std::string CFieldNo;
 		int NumField;
 		std::string CurrentModuleObject;
 		int PotentialAssignedValue;
@@ -1816,7 +1882,7 @@ namespace ConvectionCoefficients {
 			ErrorsFound = true;
 		}
 
-		if ( DefaultOutsideConvectionAlgo == ASHRAESimple || any_eq( Zone.OutsideConvectionAlgo(), ASHRAESimple ) ) {
+		if ( DefaultOutsideConvectionAlgo == ASHRAESimple || std::any_of( Zone.begin(), Zone.end(), []( DataHeatBalance::ZoneData const & e ){ return e.OutsideConvectionAlgo == DataHeatBalance::ASHRAESimple; } ) ) {
 			Count = 0;
 			for ( Loop = 1; Loop <= TotExtConvCoeff; ++Loop ) {
 				SurfNum = UserExtConvectionCoeffs( Loop ).WhichSurface;
@@ -4875,78 +4941,86 @@ namespace ConvectionCoefficients {
 			thisAzimuth = Surface( SurfLoop ).Azimuth;
 			thisArea = Surface( SurfLoop ).Area;
 			thisZone = Surface( SurfLoop ).Zone;
-			if ( ( Surface( SurfLoop ).Tilt >= 45.0 ) && ( Surface( SurfLoop ).Tilt < 135.0 ) ) {
-				//treat as vertical wall
+			if ( ( Surface( SurfLoop ).Tilt >= 45.0 ) && ( Surface( SurfLoop ).Tilt < 135.0 ) ) { // treat as vertical wall
+
+				auto const & vertices( Surface( SurfLoop ).Vertex );
+				Real64 const x_min( minval( vertices, &Vector::x ) );
+				Real64 const y_min( minval( vertices, &Vector::y ) );
+				Real64 const z_min( minval( vertices, &Vector::z ) );
+				Real64 const x_max( maxval( vertices, &Vector::x ) );
+				Real64 const y_max( maxval( vertices, &Vector::y ) );
+				Real64 const z_max( maxval( vertices, &Vector::z ) );
+
 				if ( ( thisAzimuth >= NorthFacade.AzimuthRangeLow ) || ( thisAzimuth < NorthFacade.AzimuthRangeHi ) ) {
 					NorthFacade.Area += thisArea;
-					NorthFacade.Zmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), NorthFacade.Zmax );
-					NorthFacade.Zmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), NorthFacade.Zmin );
-					NorthFacade.Ymax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), NorthFacade.Ymax );
-					NorthFacade.Ymin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), NorthFacade.Ymin );
-					NorthFacade.Xmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), NorthFacade.Xmax );
-					NorthFacade.Xmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), NorthFacade.Xmin );
+					NorthFacade.Zmax = max( z_max, NorthFacade.Zmax );
+					NorthFacade.Zmin = min( z_min, NorthFacade.Zmin );
+					NorthFacade.Ymax = max( y_max, NorthFacade.Ymax );
+					NorthFacade.Ymin = min( y_min, NorthFacade.Ymin );
+					NorthFacade.Xmax = max( x_max, NorthFacade.Xmax );
+					NorthFacade.Xmin = min( x_min, NorthFacade.Xmin );
 
 				} else if ( ( thisAzimuth >= NorthEastFacade.AzimuthRangeLow ) && ( thisAzimuth < NorthEastFacade.AzimuthRangeHi ) ) {
 					NorthEastFacade.Area += thisArea;
-					NorthEastFacade.Zmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), NorthEastFacade.Zmax );
-					NorthEastFacade.Zmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), NorthEastFacade.Zmin );
-					NorthEastFacade.Ymax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), NorthEastFacade.Ymax );
-					NorthEastFacade.Ymin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), NorthEastFacade.Ymin );
-					NorthEastFacade.Xmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), NorthEastFacade.Xmax );
-					NorthEastFacade.Xmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), NorthEastFacade.Xmin );
+					NorthEastFacade.Zmax = max( z_max, NorthEastFacade.Zmax );
+					NorthEastFacade.Zmin = min( z_min, NorthEastFacade.Zmin );
+					NorthEastFacade.Ymax = max( y_max, NorthEastFacade.Ymax );
+					NorthEastFacade.Ymin = min( y_min, NorthEastFacade.Ymin );
+					NorthEastFacade.Xmax = max( x_max, NorthEastFacade.Xmax );
+					NorthEastFacade.Xmin = min( x_min, NorthEastFacade.Xmin );
 
 				} else if ( ( thisAzimuth >= EastFacade.AzimuthRangeLow ) && ( thisAzimuth < EastFacade.AzimuthRangeHi ) ) {
 					EastFacade.Area += thisArea;
-					EastFacade.Zmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), EastFacade.Zmax );
-					EastFacade.Zmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), EastFacade.Zmin );
-					EastFacade.Ymax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), EastFacade.Ymax );
-					EastFacade.Ymin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), EastFacade.Ymin );
-					EastFacade.Xmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), EastFacade.Xmax );
-					EastFacade.Xmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), EastFacade.Xmin );
+					EastFacade.Zmax = max( z_max, EastFacade.Zmax );
+					EastFacade.Zmin = min( z_min, EastFacade.Zmin );
+					EastFacade.Ymax = max( y_max, EastFacade.Ymax );
+					EastFacade.Ymin = min( y_min, EastFacade.Ymin );
+					EastFacade.Xmax = max( x_max, EastFacade.Xmax );
+					EastFacade.Xmin = min( x_min, EastFacade.Xmin );
 				} else if ( ( thisAzimuth >= SouthEastFacade.AzimuthRangeLow ) && ( thisAzimuth < SouthEastFacade.AzimuthRangeHi ) ) {
 					SouthEastFacade.Area += thisArea;
-					SouthEastFacade.Zmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), SouthEastFacade.Zmax );
-					SouthEastFacade.Zmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), SouthEastFacade.Zmin );
-					SouthEastFacade.Ymax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), SouthEastFacade.Ymax );
-					SouthEastFacade.Ymin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), SouthEastFacade.Ymin );
-					SouthEastFacade.Xmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), SouthEastFacade.Xmax );
-					SouthEastFacade.Xmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), SouthEastFacade.Xmin );
+					SouthEastFacade.Zmax = max( z_max, SouthEastFacade.Zmax );
+					SouthEastFacade.Zmin = min( z_min, SouthEastFacade.Zmin );
+					SouthEastFacade.Ymax = max( y_max, SouthEastFacade.Ymax );
+					SouthEastFacade.Ymin = min( y_min, SouthEastFacade.Ymin );
+					SouthEastFacade.Xmax = max( x_max, SouthEastFacade.Xmax );
+					SouthEastFacade.Xmin = min( x_min, SouthEastFacade.Xmin );
 
 				} else if ( ( thisAzimuth >= SouthFacade.AzimuthRangeLow ) && ( thisAzimuth < SouthFacade.AzimuthRangeHi ) ) {
 					SouthFacade.Area += thisArea;
-					SouthFacade.Zmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), SouthFacade.Zmax );
-					SouthFacade.Zmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), SouthFacade.Zmin );
-					SouthFacade.Ymax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), SouthFacade.Ymax );
-					SouthFacade.Ymin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), SouthFacade.Ymin );
-					SouthFacade.Xmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), SouthFacade.Xmax );
-					SouthFacade.Xmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), SouthFacade.Xmin );
+					SouthFacade.Zmax = max( z_max, SouthFacade.Zmax );
+					SouthFacade.Zmin = min( z_min, SouthFacade.Zmin );
+					SouthFacade.Ymax = max( y_max, SouthFacade.Ymax );
+					SouthFacade.Ymin = min( y_min, SouthFacade.Ymin );
+					SouthFacade.Xmax = max( x_max, SouthFacade.Xmax );
+					SouthFacade.Xmin = min( x_min, SouthFacade.Xmin );
 
 				} else if ( ( thisAzimuth >= SouthWestFacade.AzimuthRangeLow ) && ( thisAzimuth < SouthWestFacade.AzimuthRangeHi ) ) {
 					SouthWestFacade.Area += thisArea;
-					SouthWestFacade.Zmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), SouthWestFacade.Zmax );
-					SouthWestFacade.Zmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), SouthWestFacade.Zmin );
-					SouthWestFacade.Ymax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), SouthWestFacade.Ymax );
-					SouthWestFacade.Ymin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), SouthWestFacade.Ymin );
-					SouthWestFacade.Xmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), SouthWestFacade.Xmax );
-					SouthWestFacade.Xmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), SouthWestFacade.Xmin );
+					SouthWestFacade.Zmax = max( z_max, SouthWestFacade.Zmax );
+					SouthWestFacade.Zmin = min( z_min, SouthWestFacade.Zmin );
+					SouthWestFacade.Ymax = max( y_max, SouthWestFacade.Ymax );
+					SouthWestFacade.Ymin = min( y_min, SouthWestFacade.Ymin );
+					SouthWestFacade.Xmax = max( x_max, SouthWestFacade.Xmax );
+					SouthWestFacade.Xmin = min( x_min, SouthWestFacade.Xmin );
 
 				} else if ( ( thisAzimuth >= WestFacade.AzimuthRangeLow ) && ( thisAzimuth < WestFacade.AzimuthRangeHi ) ) {
 					WestFacade.Area += thisArea;
-					WestFacade.Zmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), WestFacade.Zmax );
-					WestFacade.Zmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), WestFacade.Zmin );
-					WestFacade.Ymax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), WestFacade.Ymax );
-					WestFacade.Ymin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), WestFacade.Ymin );
-					WestFacade.Xmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), WestFacade.Xmax );
-					WestFacade.Xmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), WestFacade.Xmin );
+					WestFacade.Zmax = max( z_max, WestFacade.Zmax );
+					WestFacade.Zmin = min( z_min, WestFacade.Zmin );
+					WestFacade.Ymax = max( y_max, WestFacade.Ymax );
+					WestFacade.Ymin = min( y_min, WestFacade.Ymin );
+					WestFacade.Xmax = max( x_max, WestFacade.Xmax );
+					WestFacade.Xmin = min( x_min, WestFacade.Xmin );
 
 				} else if ( ( thisAzimuth >= NorthWestFacade.AzimuthRangeLow ) && ( thisAzimuth < NorthWestFacade.AzimuthRangeHi ) ) {
 					NorthWestFacade.Area += thisArea;
-					NorthWestFacade.Zmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), NorthWestFacade.Zmax );
-					NorthWestFacade.Zmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).z() ), NorthWestFacade.Zmin );
-					NorthWestFacade.Ymax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), NorthWestFacade.Ymax );
-					NorthWestFacade.Ymin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).y() ), NorthWestFacade.Ymin );
-					NorthWestFacade.Xmax = max( maxval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), NorthWestFacade.Xmax );
-					NorthWestFacade.Xmin = min( minval( Surface( SurfLoop ).Vertex( {1,Surface( SurfLoop ).Sides} ).x() ), NorthWestFacade.Xmin );
+					NorthWestFacade.Zmax = max( z_max, NorthWestFacade.Zmax );
+					NorthWestFacade.Zmin = min( z_min, NorthWestFacade.Zmin );
+					NorthWestFacade.Ymax = max( y_max, NorthWestFacade.Ymax );
+					NorthWestFacade.Ymin = min( y_min, NorthWestFacade.Ymin );
+					NorthWestFacade.Xmax = max( x_max, NorthWestFacade.Xmax );
+					NorthWestFacade.Xmin = min( x_min, NorthWestFacade.Xmin );
 
 				}
 			} else if ( Surface( SurfLoop ).Tilt < 45.0 ) { //TODO Double check tilt wrt outside vs inside
@@ -5166,49 +5240,54 @@ namespace ConvectionCoefficients {
 			if ( Surface( SurfLoop ).ExtBoundCond != ExternalEnvironment ) continue;
 			if ( ! Surface( SurfLoop ).HeatTransSurf ) continue;
 			thisAzimuth = Surface( SurfLoop ).Azimuth;
-			if ( ( Surface( SurfLoop ).Tilt >= 45.0 ) && ( Surface( SurfLoop ).Tilt < 135.0 ) ) {
-				//treat as vertical wall
+
+			auto const & vertices( Surface( SurfLoop ).Vertex );
+			Real64 const z_min( minval( vertices, &Vector::z ) );
+			Real64 const z_max( maxval( vertices, &Vector::z ) );
+			Real64 const z_del( z_max - z_min );
+
+			if ( ( Surface( SurfLoop ).Tilt >= 45.0 ) && ( Surface( SurfLoop ).Tilt < 135.0 ) ) { // treat as vertical wall
 				if ( ( thisAzimuth >= NorthFacade.AzimuthRangeLow ) || ( thisAzimuth < NorthFacade.AzimuthRangeHi ) ) {
 					Surface( SurfLoop ).OutConvFaceArea = max( NorthFacade.Area, Surface( SurfLoop ).GrossArea );
 					Surface( SurfLoop ).OutConvFacePerimeter = max( NorthFacade.Perimeter, Surface( SurfLoop ).Perimeter );
-					Surface( SurfLoop ).OutConvFaceHeight = max( NorthFacade.Height, ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) ) );
+					Surface( SurfLoop ).OutConvFaceHeight = max( NorthFacade.Height, z_del );
 				} else if ( ( thisAzimuth >= NorthEastFacade.AzimuthRangeLow ) && ( thisAzimuth < NorthEastFacade.AzimuthRangeHi ) ) {
 					Surface( SurfLoop ).OutConvFaceArea = max( NorthEastFacade.Area, Surface( SurfLoop ).GrossArea );
 					Surface( SurfLoop ).OutConvFacePerimeter = max( NorthEastFacade.Perimeter, Surface( SurfLoop ).Perimeter );
-					Surface( SurfLoop ).OutConvFaceHeight = max( NorthEastFacade.Height, ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) ) );
+					Surface( SurfLoop ).OutConvFaceHeight = max( NorthEastFacade.Height, z_del );
 				} else if ( ( thisAzimuth >= EastFacade.AzimuthRangeLow ) && ( thisAzimuth < EastFacade.AzimuthRangeHi ) ) {
 					Surface( SurfLoop ).OutConvFaceArea = max( EastFacade.Area, Surface( SurfLoop ).GrossArea );
 					Surface( SurfLoop ).OutConvFacePerimeter = max( EastFacade.Perimeter, Surface( SurfLoop ).Perimeter );
-					Surface( SurfLoop ).OutConvFaceHeight = max( EastFacade.Height, ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) ) );
+					Surface( SurfLoop ).OutConvFaceHeight = max( EastFacade.Height, z_del );
 				} else if ( ( thisAzimuth >= SouthEastFacade.AzimuthRangeLow ) && ( thisAzimuth < SouthEastFacade.AzimuthRangeHi ) ) {
 					Surface( SurfLoop ).OutConvFaceArea = max( SouthEastFacade.Area, Surface( SurfLoop ).GrossArea );
 					Surface( SurfLoop ).OutConvFacePerimeter = max( SouthEastFacade.Perimeter, Surface( SurfLoop ).Perimeter );
-					Surface( SurfLoop ).OutConvFaceHeight = max( SouthEastFacade.Height, ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) ) );
+					Surface( SurfLoop ).OutConvFaceHeight = max( SouthEastFacade.Height, z_del );
 				} else if ( ( thisAzimuth >= SouthFacade.AzimuthRangeLow ) && ( thisAzimuth < SouthFacade.AzimuthRangeHi ) ) {
 					Surface( SurfLoop ).OutConvFaceArea = max( SouthFacade.Area, Surface( SurfLoop ).GrossArea );
 					Surface( SurfLoop ).OutConvFacePerimeter = max( SouthFacade.Perimeter, Surface( SurfLoop ).Perimeter );
-					Surface( SurfLoop ).OutConvFaceHeight = max( SouthFacade.Height, ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) ) );
+					Surface( SurfLoop ).OutConvFaceHeight = max( SouthFacade.Height, z_del );
 				} else if ( ( thisAzimuth >= SouthWestFacade.AzimuthRangeLow ) && ( thisAzimuth < SouthWestFacade.AzimuthRangeHi ) ) {
 					Surface( SurfLoop ).OutConvFaceArea = max( SouthWestFacade.Area, Surface( SurfLoop ).GrossArea );
 					Surface( SurfLoop ).OutConvFacePerimeter = max( SouthWestFacade.Perimeter, Surface( SurfLoop ).Perimeter );
-					Surface( SurfLoop ).OutConvFaceHeight = max( SouthWestFacade.Height, ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) ) );
+					Surface( SurfLoop ).OutConvFaceHeight = max( SouthWestFacade.Height, z_del );
 				} else if ( ( thisAzimuth >= WestFacade.AzimuthRangeLow ) && ( thisAzimuth < WestFacade.AzimuthRangeHi ) ) {
 					Surface( SurfLoop ).OutConvFaceArea = max( WestFacade.Area, Surface( SurfLoop ).GrossArea );
 					Surface( SurfLoop ).OutConvFacePerimeter = max( WestFacade.Perimeter, Surface( SurfLoop ).Perimeter );
-					Surface( SurfLoop ).OutConvFaceHeight = max( WestFacade.Height, ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) ) );
+					Surface( SurfLoop ).OutConvFaceHeight = max( WestFacade.Height, z_del );
 				} else if ( ( thisAzimuth >= NorthWestFacade.AzimuthRangeLow ) && ( thisAzimuth < NorthWestFacade.AzimuthRangeHi ) ) {
 					Surface( SurfLoop ).OutConvFaceArea = max( NorthWestFacade.Area, Surface( SurfLoop ).GrossArea );
 					Surface( SurfLoop ).OutConvFacePerimeter = max( NorthWestFacade.Perimeter, Surface( SurfLoop ).Perimeter );
-					Surface( SurfLoop ).OutConvFaceHeight = max( NorthWestFacade.Height, ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) ) );
+					Surface( SurfLoop ).OutConvFaceHeight = max( NorthWestFacade.Height, z_del );
 				}
 			} else if ( Surface( SurfLoop ).Tilt < 45.0 ) { // assume part of roof
 				Surface( SurfLoop ).OutConvFaceArea = max( RoofGeo.Area, Surface( SurfLoop ).GrossArea );
 				Surface( SurfLoop ).OutConvFacePerimeter = max( RoofGeo.Perimeter, Surface( SurfLoop ).Perimeter );
-				Surface( SurfLoop ).OutConvFaceHeight = max( RoofGeo.Height, ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) ) );
+				Surface( SurfLoop ).OutConvFaceHeight = max( RoofGeo.Height, z_del );
 			} else if ( Surface( SurfLoop ).Tilt >= 135.0 ) { //assume floor over exterior, just use surface's geometry
 				Surface( SurfLoop ).OutConvFaceArea = Surface( SurfLoop ).GrossArea;
 				Surface( SurfLoop ).OutConvFacePerimeter = Surface( SurfLoop ).Perimeter;
-				Surface( SurfLoop ).OutConvFaceHeight = ( maxval( Surface( SurfLoop ).Vertex.z() ) - minval( Surface( SurfLoop ).Vertex.z() ) );
+				Surface( SurfLoop ).OutConvFaceHeight = z_del;
 			}
 		} // second pass thru surfs for outside face convection params.
 
@@ -9476,7 +9555,7 @@ namespace ConvectionCoefficients {
 		// 1. Nusselt, W., W. Jurges. 1922. Die Kuhlung einer ebenen Wand durch einen Luftstrom
 		//     (The cooling of a plane wall by an air flow). Gesundheits Ingenieur 52, Heft, 45, Jargang.
 		// 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
-		//     envelope energy systems’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
+		//     envelope energy systems' modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
 		// USE STATEMENTS:
 		// na
@@ -9524,7 +9603,7 @@ namespace ConvectionCoefficients {
 		// REFERENCES:
 		// 1. McAdams, W.H., 1954. Heat Transmission, third ed., McGraw-Hill, New York.
 		// 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
-		//     envelope energy systems’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
+		//     envelope energy systems' modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
 		// USE STATEMENTS:
 		// na
@@ -9576,7 +9655,7 @@ namespace ConvectionCoefficients {
 		// REFERENCES:
 		// 1. Mitchell, J.W., 1976. Heat transfer from spheres and other animal forms. Biophy. J. 16 (1976) 561
 		// 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
-		//     envelope energy systems’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
+		//     envelope energy systems' modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
 		// USE STATEMENTS:
 		// na
@@ -9639,7 +9718,7 @@ namespace ConvectionCoefficients {
 		// Blocken, B., T. Defraeye, D. Derome, J. Carmeliet. 2009.
 		//  High-Resolution CFD Simulations for Forced Convection
 		//   Heat Transfer Coefficients at the Facade of a Low-Rise Building.
-		//   Building and Environment 44 (2009) 2396 – 2412.
+		//   Building and Environment 44 (2009) 2396 - 2412.
 
 		// USE STATEMENTS:
 		// na
@@ -9941,29 +10020,6 @@ namespace ConvectionCoefficients {
 		return Hc;
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ConvectionCoefficients
 

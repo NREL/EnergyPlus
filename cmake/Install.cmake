@@ -142,7 +142,8 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/ep.gif" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/ObjectStatus.xls" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/readme.html" "./" "readme.html" TRUE)
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/${RULES_XLS}" "./")
+install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/InputRulesFiles/${RULES_XLS}" DESTINATION "./")
+install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/OutputRulesFiles/OutputChanges8-4-0-to-8-5-0.md" DESTINATION "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" "PreProcess/HVACCurveFitTool/")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/Report%20Variables%208-4-0%20to%208-5-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-4-0 to 8-5-0.csv")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-4-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
@@ -376,7 +377,7 @@ if( UNIX AND NOT APPLE )
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater%20Libs/RBGUIFramework.so" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater%20Libs/libc++.so.1" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater" "PreProcess/IDFVersionUpdater/")
-    
+
   install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/bin/EPMacro/Linux/EPMacro" "./")
 
   configure_file(scripts/runenergyplus.in "${CMAKE_BINARY_DIR}/scripts/runenergyplus" @ONLY)

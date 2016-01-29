@@ -816,7 +816,6 @@ dim( T const & x, T const & y )
 template< typename R, typename T, bool >
 struct NearestSelector
 {
-	inline
 	static
 	R
 	nearest( T const & x )
@@ -829,7 +828,6 @@ struct NearestSelector
 template< typename R, typename T >
 struct NearestSelector< R, T, true >
 {
-	inline
 	static
 	R
 	nearest( T const & x )
@@ -914,7 +912,6 @@ nint64( T const & x )
 template< typename T, bool >
 struct ModSelector
 {
-	inline
 	static
 	T
 	mod( T const & x, T const & y )
@@ -929,7 +926,6 @@ struct ModSelector
 template< typename T >
 struct ModSelector< T, true >
 {
-	inline
 	static
 	T
 	mod( T const & x, T const & y )
@@ -980,7 +976,6 @@ mod( long double const & i, long double const & n )
 template< typename T, bool >
 struct ModuloSelector
 {
-	inline
 	static
 	T
 	modulo( T const & x, T const & y )
@@ -993,7 +988,6 @@ struct ModuloSelector
 template< typename T >
 struct ModuloSelector< T, true >
 {
-	inline
 	static
 	T
 	modulo( T const & x, T const & y )
