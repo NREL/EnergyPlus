@@ -529,15 +529,12 @@ namespace PlantComponentTemperatureSources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
-		bool ErrorsFound; // If errors detected in input
+		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 tmpVolFlowRate; // local design volume flow rate
-		Real64 DesVolFlowRateUser; // Hardsized design volume flow rate for reporting
+		Real64 DesVolFlowRateUser( 0.0 ); // Hardsized design volume flow rate for reporting
 
-		PltSizNum = 0;
-		ErrorsFound = false;
 		tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
-		DesVolFlowRateUser = 0.0;
 
 		PltSizNum = PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).PlantSizNum;
 

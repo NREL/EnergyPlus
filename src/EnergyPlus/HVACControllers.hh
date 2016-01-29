@@ -158,17 +158,6 @@ namespace HVACControllers {
 			Mode( iModeNone )
 		{}
 
-		// Member Constructor
-		SolutionTrackerType(
-			bool const DefinedFlag, // Flag set to TRUE when tracker is up-to-date. FALSE otherwise.
-			Real64 const ActuatedValue, // Actuated value
-			int const Mode // Operational model of controller
-		) :
-			DefinedFlag( DefinedFlag ),
-			ActuatedValue( ActuatedValue ),
-			Mode( Mode )
-		{}
-
 	};
 
 	struct ControllerPropsType
@@ -294,93 +283,6 @@ namespace HVACControllers {
 			BadActionErrIndex( 0 )
 		{}
 
-		// Member Constructor
-		ControllerPropsType(
-			std::string const & ControllerName, // Name of the Controller
-			std::string const & ControllerType, // Type of Controller
-			int const ControllerType_Num,
-			int const ControlVar, // The type of control variable being sensed
-			int const ActuatorVar, // The variable that the controller will act on ie. flow
-			int const Action, // Controller Action - Reverse or Normal
-			bool const InitFirstPass,
-			int const NumCalcCalls, // Number of Calc() calls since last call to Reset()
-			int const Mode, // Operational model of controller at current iteration
-			bool const DoWarmRestartFlag,
-			bool const ReuseIntermediateSolutionFlag,
-			bool const ReusePreviousSolutionFlag,
-			Array1< SolutionTrackerType > const & SolutionTrackers,
-			Real64 const MaxAvailActuated, // kg/s, The maximum actuated variable currently available.
-			Real64 const MaxAvailSensed, // Sensed value at maximum available actuated variable
-			Real64 const MinAvailActuated, // kg/s, The minimum actuated variable currently available.
-			Real64 const MinAvailSensed, // Sensed value at maximum available actuated variable
-			Real64 const MaxVolFlowActuated, // m3/s, From User input the Max amount for the actuated variable
-			Real64 const MinVolFlowActuated, // m3/s, From User input the Min amount for the actuated variable
-			Real64 const MaxActuated, // kg/s, From User input the Max amount for the actuated variable
-			Real64 const MinActuated, // kg/s, From User input the Min amount for the actuated variable
-			int const ActuatedNode, // The node that is acted upon by the controller
-			Real64 const ActuatedValue, // Value of actuated variable before change by the controller
-			Real64 const NextActuatedValue, // The new control actuated value
-			int const ActuatedNodePlantLoopNum, // the plant loop index for the actuated node DSU3
-			int const ActuatedNodePlantLoopSide, // the plant loop side for the actuated node DSU3
-			int const ActuatedNodePlantLoopBranchNum, // the plant loop branch num for actuated node DSU3
-			int const SensedNode, // The sensed node number from the grid
-			bool const IsSetPointDefinedFlag, // If TRUE indicates that the setpoint has been defined and can
-			Real64 const SetPointValue, // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
-			Real64 const SensedValue, // The sensed control variable of any type
-			Real64 const DeltaSensed, // Difference of sensed to setpoint value for calculating proportional gain
-			Real64 const Offset, // This is the tolerance or droop from the error
-			int const HumRatCntrlType, // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
-			std::string const & LimitType, // Limit type as in HIGH or LOW
-			Real64 const Range, // The range or hysteresis of the control limit
-			Real64 const Limit, // The Limit value for a Limit Controller
-			int const TraceFileUnit, // File unit for individual controller trace file to use if > 0
-			bool const FirstTraceFlag, // To detect first individual write operation to individual controller trace file
-			int const BadActionErrCount, // Counts number of incorrect action errors
-			int const BadActionErrIndex // index to recurring error structure for bad action error
-		) :
-			ControllerName( ControllerName ),
-			ControllerType( ControllerType ),
-			ControllerType_Num( ControllerType_Num ),
-			ControlVar( ControlVar ),
-			ActuatorVar( ActuatorVar ),
-			Action( Action ),
-			InitFirstPass( InitFirstPass ),
-			NumCalcCalls( NumCalcCalls ),
-			Mode( Mode ),
-			DoWarmRestartFlag( DoWarmRestartFlag ),
-			ReuseIntermediateSolutionFlag( ReuseIntermediateSolutionFlag ),
-			ReusePreviousSolutionFlag( ReusePreviousSolutionFlag ),
-			SolutionTrackers( 2, SolutionTrackers ),
-			MaxAvailActuated( MaxAvailActuated ),
-			MaxAvailSensed( MaxAvailSensed ),
-			MinAvailActuated( MinAvailActuated ),
-			MinAvailSensed( MinAvailSensed ),
-			MaxVolFlowActuated( MaxVolFlowActuated ),
-			MinVolFlowActuated( MinVolFlowActuated ),
-			MaxActuated( MaxActuated ),
-			MinActuated( MinActuated ),
-			ActuatedNode( ActuatedNode ),
-			ActuatedValue( ActuatedValue ),
-			NextActuatedValue( NextActuatedValue ),
-			ActuatedNodePlantLoopNum( ActuatedNodePlantLoopNum ),
-			ActuatedNodePlantLoopSide( ActuatedNodePlantLoopSide ),
-			ActuatedNodePlantLoopBranchNum( ActuatedNodePlantLoopBranchNum ),
-			SensedNode( SensedNode ),
-			IsSetPointDefinedFlag( IsSetPointDefinedFlag ),
-			SetPointValue( SetPointValue ),
-			SensedValue( SensedValue ),
-			DeltaSensed( DeltaSensed ),
-			Offset( Offset ),
-			HumRatCntrlType( HumRatCntrlType ),
-			LimitType( LimitType ),
-			Range( Range ),
-			Limit( Limit ),
-			TraceFileUnit( TraceFileUnit ),
-			FirstTraceFlag( FirstTraceFlag ),
-			BadActionErrCount( BadActionErrCount ),
-			BadActionErrIndex( BadActionErrIndex )
-		{}
-
 	};
 
 	struct ControllerStatsType
@@ -395,17 +297,6 @@ namespace HVACControllers {
 			NumCalls( {iFirstMode,iLastMode}, 0 ),
 			TotIterations( {iFirstMode,iLastMode}, 0 ),
 			MaxIterations( {iFirstMode,iLastMode}, 0 )
-		{}
-
-		// Member Constructor
-		ControllerStatsType(
-			Array1_int const & NumCalls, // Number of times this controller operated in each mode
-			Array1_int const & TotIterations, // Total number of iterations required to solve this controller
-			Array1_int const & MaxIterations // Maximum number of iterations required to solve this controller
-		) :
-			NumCalls( {iFirstMode,iLastMode}, NumCalls ),
-			TotIterations( {iFirstMode,iLastMode}, TotIterations ),
-			MaxIterations( {iFirstMode,iLastMode}, MaxIterations )
 		{}
 
 	};
@@ -436,31 +327,6 @@ namespace HVACControllers {
 			MaxSimAirLoopComponents( 0 ),
 			TotIterations( 0 ),
 			MaxIterations( 0 )
-		{}
-
-		// Member Constructor
-		AirLoopStatsType(
-			int const TraceFileUnit, // File unit for trace file for all controllers on each air loop.
-			bool const FirstTraceFlag, // To detect first trace to air loop trace file
-			int const NumCalls, // Number of times air loop is simulated (number of calls to SimAirLoop)
-			int const NumFailedWarmRestarts, // Number of times speculative warm restart was attempted and failed
-			int const NumSuccessfulWarmRestarts, // Number of times speculative warm restart was attempted and succeeded
-			int const TotSimAirLoopComponents, // Total number of times the SimAirLoopComponents() routine has been invoked
-			int const MaxSimAirLoopComponents, // Maximum number of times the SimAirLoopComponents() routine has been invoked
-			int const TotIterations, // Total number of iterations required to solve the controllers on this air loop
-			int const MaxIterations, // Maximum number of iterations required to solve the controllers on this air loop
-			Array1< ControllerStatsType > const & ControllerStats // Array of statistics for each controller
-		) :
-			TraceFileUnit( TraceFileUnit ),
-			FirstTraceFlag( FirstTraceFlag ),
-			NumCalls( NumCalls ),
-			NumFailedWarmRestarts( NumFailedWarmRestarts ),
-			NumSuccessfulWarmRestarts( NumSuccessfulWarmRestarts ),
-			TotSimAirLoopComponents( TotSimAirLoopComponents ),
-			MaxSimAirLoopComponents( MaxSimAirLoopComponents ),
-			TotIterations( TotIterations ),
-			MaxIterations( MaxIterations ),
-			ControllerStats( ControllerStats )
 		{}
 
 	};

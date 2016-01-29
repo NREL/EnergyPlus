@@ -126,25 +126,6 @@ namespace BranchInputManager {
 			NumOfMixers( 0 )
 		{}
 
-		// Member Constructor
-		ConnectorData(
-			std::string const & Name, // Name for this Connector
-			int const NumOfConnectors, // Number of Connectors in this group
-			int const NumOfSplitters, // Number of Splitters in this connector group
-			int const NumOfMixers, // Number of Mixers in this connector group
-			Array1_string const & ConnectorType, // Connector:Splitter or Connector:Mixer
-			Array1_string const & ConnectorName, // Name for that Connector:Splitter or Connector:Mixer
-			Array1_int const & ConnectorMatchNo // Pointer to index where this Splitter or Mixer matches
-		) :
-			Name( Name ),
-			NumOfConnectors( NumOfConnectors ),
-			NumOfSplitters( NumOfSplitters ),
-			NumOfMixers( NumOfMixers ),
-			ConnectorType( ConnectorType ),
-			ConnectorName( ConnectorName ),
-			ConnectorMatchNo( ConnectorMatchNo )
-		{}
-
 	};
 
 	struct BranchListData
@@ -159,21 +140,6 @@ namespace BranchInputManager {
 		// Default Constructor
 		BranchListData() :
 			NumOfBranchNames( 0 )
-		{}
-
-		// Member Constructor
-		BranchListData(
-			std::string const & Name, // Name of this Branch List
-			int const NumOfBranchNames, // Number of Branches on the Branch List
-			Array1_string const & BranchNames, // Names of the branches on this branch list
-			std::string const & LoopName, // Name of Loop this Branch list belongs to
-			std::string const & LoopType // Loop type this branch is on
-		) :
-			Name( Name ),
-			NumOfBranchNames( NumOfBranchNames ),
-			BranchNames( BranchNames ),
-			LoopName( LoopName ),
-			LoopType( LoopType )
 		{}
 
 	};
@@ -194,25 +160,6 @@ namespace BranchInputManager {
 			CtrlType( 0 ),
 			InletNode( 0 ),
 			OutletNode( 0 )
-		{}
-
-		// Member Constructor
-		ComponentData(
-			std::string const & CType, // Component Type (Cannot be SPLITTER or MIXER)
-			std::string const & Name, // Component Name
-			int const CtrlType, // Active, Passive, Bypass (1,2,3)
-			std::string const & InletNodeName, // Inlet Node ID
-			int const InletNode, // Inlet Node Number
-			std::string const & OutletNodeName, // Outlet Node ID
-			int const OutletNode // Outlet Node Number
-		) :
-			CType( CType ),
-			Name( Name ),
-			CtrlType( CtrlType ),
-			InletNodeName( InletNodeName ),
-			InletNode( InletNode ),
-			OutletNodeName( OutletNodeName ),
-			OutletNode( OutletNode )
 		{}
 
 	};
@@ -238,27 +185,6 @@ namespace BranchInputManager {
 			NumOfComponents( 0 )
 		{}
 
-		// Member Constructor
-		BranchData(
-			std::string const & Name, // Name for this Branch
-			std::string const & AssignedLoopName, // Loop Name for this branch
-			Real64 const MaxFlowRate, // Max Flow Rate of the Branch
-			int const PressureCurveType, // Integer index of pressure curve type
-			int const PressureCurveIndex, // Integer index of pressure curve
-			int const FluidType, // Fluid type (see DataLoopNode)
-			int const NumOfComponents, // Number of Components on this Branch
-			Array1< ComponentData > const & Component // Component definitions for each component
-		) :
-			Name( Name ),
-			AssignedLoopName( AssignedLoopName ),
-			MaxFlowRate( MaxFlowRate ),
-			PressureCurveType( PressureCurveType ),
-			PressureCurveIndex( PressureCurveIndex ),
-			FluidType( FluidType ),
-			NumOfComponents( NumOfComponents ),
-			Component( Component )
-		{}
-
 	};
 
 	struct SplitterData
@@ -274,19 +200,6 @@ namespace BranchInputManager {
 			NumOutletBranches( 0 )
 		{}
 
-		// Member Constructor
-		SplitterData(
-			std::string const & Name, // Splitter Name
-			std::string const & InletBranchName, // Splitter Inlet Branch Name
-			int const NumOutletBranches, // Number of outlets on this Splitter
-			Array1_string const & OutletBranchNames // Names of the Outlet Branches
-		) :
-			Name( Name ),
-			InletBranchName( InletBranchName ),
-			NumOutletBranches( NumOutletBranches ),
-			OutletBranchNames( OutletBranchNames )
-		{}
-
 	};
 
 	struct MixerData
@@ -300,19 +213,6 @@ namespace BranchInputManager {
 		// Default Constructor
 		MixerData() :
 			NumInletBranches( 0 )
-		{}
-
-		// Member Constructor
-		MixerData(
-			std::string const & Name, // Mixer Name
-			std::string const & OutletBranchName, // Mixer Outlet Branch Name
-			int const NumInletBranches, // Number of inlets for this Mixer
-			Array1_string const & InletBranchNames // Names of Inlet Branches
-		) :
-			Name( Name ),
-			OutletBranchName( OutletBranchName ),
-			NumInletBranches( NumInletBranches ),
-			InletBranchNames( InletBranchNames )
 		{}
 
 	};

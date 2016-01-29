@@ -93,8 +93,8 @@ namespace GroundTemperatureManager {
 
 	std::shared_ptr< BaseGroundTempsModel >
 	GetGroundTempModelAndInit(
-		std::string const objectType_str,
-		std::string const objectName
+		std::string const & objectType_str,
+		std::string const & objectName
 	)
 	{
 		// SUBROUTINE INFORMATION:

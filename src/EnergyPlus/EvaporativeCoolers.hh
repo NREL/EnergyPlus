@@ -433,12 +433,6 @@ namespace EvaporativeCoolers {
 		ZoneEvapCoolerUnitFieldData()
 		{}
 
-		// Member Constructor
-		ZoneEvapCoolerUnitFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data

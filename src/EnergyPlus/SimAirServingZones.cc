@@ -397,6 +397,7 @@ namespace SimAirServingZones {
 		using MixedAir::GetOASysNumSimpControllers;
 		using MixedAir::GetOASysNumCoolingCoils;
 		using MixedAir::GetOASysNumHeatingCoils;
+		using MixedAir::GetOASysNumHXs;
 		using MixedAir::GetOACompListNumber;
 		using MixedAir::GetOACompName;
 		using MixedAir::GetOACompType;
@@ -503,19 +504,6 @@ namespace SimAirServingZones {
 			// Default Constructor
 			AirUniqueNodes() :
 				NodeNameUsed( false )
-			{}
-
-			// Member Constructor
-			AirUniqueNodes(
-				std::string const & NodeName,
-				std::string const & AirLoopName,
-				std::string const & FieldName,
-				bool const NodeNameUsed
-			) :
-				NodeName( NodeName ),
-				AirLoopName( AirLoopName ),
-				FieldName( FieldName ),
-				NodeNameUsed( NodeNameUsed )
 			{}
 
 		};
@@ -811,6 +799,7 @@ namespace SimAirServingZones {
 							NumOASysSimpControllers = GetOASysNumSimpControllers( OANum );
 							PrimaryAirSystem( AirSysNum ).NumOAHeatCoils = GetOASysNumHeatingCoils( OANum );
 							PrimaryAirSystem( AirSysNum ).NumOACoolCoils = GetOASysNumCoolingCoils( OANum );
+							PrimaryAirSystem( AirSysNum ).NumOAHXs = GetOASysNumHXs( OANum );
 							OASysContListNum = GetOASysControllerListIndex( OANum );
 							OAMixNum = FindOAMixerMatchForOASystem( OANum );
 							if ( OAMixNum > 0 ) {
@@ -1439,6 +1428,7 @@ namespace SimAirServingZones {
 		int SupFanIndex;
 		int RetFanIndex;
 		bool FoundOASys;
+		bool FoundCentralHeatCoil;
 		static int TUInNode( 0 ); // inlet node number of a terminal unit
 		static Real64 MassFlowSetToler;
 		static Array1D_int CtrlZoneNumsCool;
@@ -1901,6 +1891,20 @@ namespace SimAirServingZones {
 				PrimaryAirSystem(AirLoopNum).SupFanNum = SupFanIndex;
 				PrimaryAirSystem(AirLoopNum).RetFanNum = RetFanIndex;
 
+			} // end of AirLoop loop
+
+			// Check whether there are Central Heating Coils in the Primary Air System
+			for( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+				FoundCentralHeatCoil = false;
+				for( BranchNum = 1; ! FoundCentralHeatCoil && BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
+					for( CompNum = 1; ! FoundCentralHeatCoil && CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+						CompTypeNum = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num;
+						if( CompTypeNum == WaterCoil_SimpleHeat || CompTypeNum == Coil_ElectricHeat || CompTypeNum == Coil_GasHeat ) {
+							FoundCentralHeatCoil = true;
+						}
+					} // end of component loop
+				} // end of Branch loop			
+				PrimaryAirSystem( AirLoopNum ).CentralHeatCoilExists = FoundCentralHeatCoil;
 			} // end of AirLoop loop
 
 		} // one time flag
@@ -6004,6 +6008,24 @@ namespace SimAirServingZones {
 
 			}
 
+			// Specify the heating supply air Temp/HumRat for different system configurations
+			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+				
+				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
+
+				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
+					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+
+						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum );
+						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum );
+
+						TermUnitFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU;
+						TermUnitFinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU;
+					}
+				}
+			}
+
 			// EMS calling point to customize zone sizing results
 			ManageEMS( emsCallFromSystemSizing );
 
@@ -6187,9 +6209,6 @@ namespace SimAirServingZones {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string CompName; // component name
-		std::string CompType; // component type
-		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		Real64 TempSize; // autosized value
 		Real64 CoilInTemp; // entering coil air temperature [C]
 		Real64 CoilInHumRat; // entering coil air humidity ratio [kg/kg]
@@ -6319,6 +6338,169 @@ namespace SimAirServingZones {
 		}
 
 	}
+
+	Real64
+	GetHeatingSATempForSizing(
+		int const IndexAirLoop // air loop index 
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl, Rongpeng Zhang
+		//       DATE WRITTEN   October 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine get the proper reheat coil inlet temperature for sizing, depending on 
+		// the system configurations: 
+		// (1) Central heating coils exist
+		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
+		// (3) No central heating coils; No preheating coils or OA heat-exchangers
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataSizing;
+		using DataAirSystems::PrimaryAirSystem;
+		using Psychrometrics::PsyHFnTdbW;
+		using Psychrometrics::PsyTdbFnHW;
+
+		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
+
+		// Locals
+		Real64 ReheatCoilInTempForSizing; // Dry bulb temperature of the reheat coil inlet air [C]
+		Real64 ReheatCoilInHumRatForSizing; // Humidity ratio of the reheat coil inlet air [kg/kg]
+		Real64 ReheatCoilInEnthalpyForSizing; // Enthalpy of the reheat coil inlet air [J/kg]
+		Real64 OutAirFrac;
+		
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		
+		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ){
+		//Case: Central heating coils exist
+			
+			ReheatCoilInTempForSizing = CalcSysSizing( IndexAirLoop ).HeatSupTemp;
+			
+		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
+		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
+
+			if( FinalSysSizing( IndexAirLoop ).DesHeatVolFlow > 0 ){
+				OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
+				OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+			} else {
+				OutAirFrac = 0.0;
+			}
+
+			// Mixed air humidity ratio and enthalpy
+			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
+			ReheatCoilInEnthalpyForSizing = OutAirFrac * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).PreheatTemp, FinalSysSizing( IndexAirLoop ).PreheatHumRat ) 
+			                      + ( 1 - OutAirFrac ) * PsyHFnTdbW( FinalSysSizing( IndexAirLoop ).HeatRetTemp, FinalSysSizing( IndexAirLoop ).HeatRetHumRat );
+
+			// Mixed air dry bulb temperature
+			ReheatCoilInTempForSizing = PsyTdbFnHW( ReheatCoilInEnthalpyForSizing, ReheatCoilInHumRatForSizing );
+			
+		} else {
+		//Case: No central heating coils; No preheating coils or OA heat-exchangers
+			
+			ReheatCoilInTempForSizing = FinalSysSizing( IndexAirLoop ).HeatMixTemp;
+		
+		}
+
+		return ReheatCoilInTempForSizing;
+		
+	}
+
+	Real64
+	GetHeatingSATempHumRatForSizing(
+		int const IndexAirLoop // air loop index 
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl, Rongpeng Zhang
+		//       DATE WRITTEN   October 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine get the proper reheat coil inlet humidity ratio for sizing, depending on 
+		// the system configurations: 
+		// (1) Central heating coils exist
+		// (2) No central heating coils, but preheating coils or OA heat-exchangers exist
+		// (3) No central heating coils; No preheating coils or OA heat-exchangers
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataSizing;
+		using DataAirSystems::PrimaryAirSystem;
+		
+		// USE ZoneAirLoopEquipmentManager, ONLY: GetZoneAirLoopEquipment
+
+		// Locals
+		Real64 ReheatCoilInHumRatForSizing;
+		Real64 OutAirFrac;
+		
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		
+		if ( PrimaryAirSystem( IndexAirLoop ).CentralHeatCoilExists ) {
+		//Case: Central heating coils exist
+			
+			ReheatCoilInHumRatForSizing = CalcSysSizing( IndexAirLoop ).HeatSupHumRat;
+		
+		} else if ( ( PrimaryAirSystem( IndexAirLoop ).NumOAHeatCoils > 0 ) || ( PrimaryAirSystem( IndexAirLoop ).NumOAHXs ) ) {
+		//Case: No central heating coils, but preheating coils or OA heat-exchangers exist
+
+			if( FinalSysSizing( IndexAirLoop ).DesHeatVolFlow > 0 ){
+				OutAirFrac = FinalSysSizing( IndexAirLoop ).DesOutAirVolFlow / FinalSysSizing( IndexAirLoop ).DesHeatVolFlow;
+				OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+			} else {
+				OutAirFrac = 0.0;
+			}
+
+			ReheatCoilInHumRatForSizing = OutAirFrac * FinalSysSizing( IndexAirLoop ).PreheatHumRat + ( 1 - OutAirFrac ) * FinalSysSizing( IndexAirLoop ).HeatRetHumRat;
+		
+		} else {
+		//Case: No central heating coils; No preheating coils or OA heat-exchangers
+		
+			ReheatCoilInHumRatForSizing = FinalSysSizing( IndexAirLoop ).HeatMixHumRat;
+		
+		}
+
+		return ReheatCoilInHumRatForSizing;
+		
+	}
+	
 
 	// End Algorithm Section of the Module
 	// *****************************************************************************

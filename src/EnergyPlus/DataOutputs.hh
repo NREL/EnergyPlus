@@ -106,19 +106,6 @@ namespace DataOutputs {
 			Next( 0 )
 		{}
 
-		// Member Constructor
-		OutputReportingVariables(
-			std::string const & Key, // could be a key or "*"  (upper case)
-			std::string const & VarName, // variable name (upper case)
-			int const Previous, // Pointer to Previous of same variable name
-			int const Next // Pointer to Next of same variable name
-		) :
-			Key( Key ),
-			VarName( VarName ),
-			Previous( Previous ),
-			Next( Next )
-		{}
-
 	};
 
 	// Object Data
