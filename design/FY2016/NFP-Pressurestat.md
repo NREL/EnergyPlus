@@ -5,6 +5,10 @@ Pressure Control Through Pressure Controller
 
 **Florida Solar Energy Center**
 
+**Fifth revision**
+1/xx/16
+Add more E-mail communications.
+
 **Fourth revision**
 1/15/16
 Add design document.
@@ -68,6 +72,16 @@ The first review meeting was held on 1/12/16. Michael Witte, Jason DeGraw, Tianz
 The main concern is the object name of the PressureStat. The consensus conclusion is a new object name: AirflowNetwork:ZoneControl:PressureController to replace ZoneControl:PressureStat.
 
 Another concern is to prevent circulation of OA flow and zone exhaust fan flow rate. The current practice is that when exhaust fan flow rate is greater than OA flow rate, the OA flow rate will increase to match exhaust fan flow rate. This concern will be considered during coding to avoid possible circulation of both airflow rates.  
+
+###E-mail communications after submission of design document
+
+Bereket on 1/21/16
+
+I read the design document.  The intent and implementation are well described.  I have one question that came to my mind.  Does the pressure controlled zone have to be the same zone controlled by thermostat, or it can be any of the zones served by the air loop?
+ 
+Gu's reply on 1/22/16
+
+Since the zone name is a field of the AirflowNetwork:ZoneControl:PressureController object, one of any zones served by the same air loop is allowed, although I prefer to be the same zone with the thermostat.
 
 ## Overview ##
 
