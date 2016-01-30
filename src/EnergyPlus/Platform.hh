@@ -56,20 +56,22 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#ifndef EnergyPlus_ALWAYS_INLINE_hh_INCLUDED
-#define EnergyPlus_ALWAYS_INLINE_hh_INCLUDED
+#ifndef EnergyPlus_Platform_hh_INCLUDED
+#define EnergyPlus_Platform_hh_INCLUDED
 
-// Purpose: Portable Macros for Forcing Inlining
+// Purpose: Macros Wrapping Platform-Specific Capabilities
 //
 // Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
 //
 // History:
 //  Jan 2016: Initial release
 
+// Clang-Specific
 #ifndef __has_attribute
 #define __has_attribute(x) 0
 #endif
 
+// Force inlining
 #ifndef ALWAYS_INLINE
 #if defined(__GNUC__) || ( defined(__clang__) && __has_attribute(always_inline) )
 #define ALWAYS_INLINE inline __attribute__((__always_inline__))

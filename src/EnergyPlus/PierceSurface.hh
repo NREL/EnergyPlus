@@ -81,8 +81,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <ALWAYS_INLINE.hh>
 #include <DataSurfaces.hh>
+#include <Platform.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Vector2.hh>

@@ -16,7 +16,6 @@ SET( SRC
   AirflowNetworkSolver.cc
   AirflowNetworkSolver.hh
   AirTerminalUnit.hh
-  ALWAYS_INLINE.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -405,6 +404,7 @@ SET( SRC
   PlantUtilities.hh
   PlantValves.cc
   PlantValves.hh
+  Platform.hh
   PollutionModule.cc
   PollutionModule.hh
   PondGroundHeatExchanger.cc
