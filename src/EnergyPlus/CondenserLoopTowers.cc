@@ -236,23 +236,23 @@ namespace CondenserLoopTowers {
 	void
 	clear_state()
 	{
-		NumSimpleTowers = 0; 
+		NumSimpleTowers = 0;
 		GetInput = true;
 		InitTowerOneTimeFlag = true;
-		InletWaterTemp = 0.0; 
+		InletWaterTemp = 0.0;
 		OutletWaterTemp = 0.0;
 		WaterInletNode = 0;
 		WaterOutletNode = 0;
 		WaterMassFlowRate = 0.0;
-		Qactual = 0.0; 
+		Qactual = 0.0;
 		CTFanPower = 0.0;
 		AirFlowRateRatio = 0.0;
 		BasinHeaterPower = 0.0;
 		WaterUsage = 0.0;
-		FanCyclingRatio = 0.0; 
+		FanCyclingRatio = 0.0;
 		CheckEquipName.deallocate();
 		SimpleTower.deallocate();
-		SimpleTowerInlet.deallocate(); 
+		SimpleTowerInlet.deallocate();
 		SimpleTowerReport.deallocate();
 		VSTower.deallocate();
 	}
@@ -2360,9 +2360,9 @@ namespace CondenserLoopTowers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizCondNum; // Plant Sizing index for condenser loop
+		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
 		int SolFla; // Flag of solver
-		Real64 DesTowerLoad; // Design tower load [W]
+		Real64 DesTowerLoad( 0.0 ); // Design tower load [W]
 		Real64 UA0; // Lower bound for UA [W/C]
 		Real64 UA1; // Upper bound for UA [W/C]
 		Real64 UA; // Calculated UA value
@@ -2392,8 +2392,6 @@ namespace CondenserLoopTowers {
 		Real64 AssumedExitTemp; // default for cp fo nominal capacity of hard sized with UA method
 		bool ErrorsFound;
 
-		PltSizCondNum = 0;
-		DesTowerLoad = 0.0;
 		tmpDesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 		tmpHighSpeedFanPower = SimpleTower( TowerNum ).HighSpeedFanPower;
 		tmpHighSpeedAirFlowRate = SimpleTower( TowerNum ).HighSpeedAirFlowRate;

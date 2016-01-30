@@ -256,21 +256,6 @@ namespace DataHeatBalFanSys {
 			DualPMVErrIndex( 0 )
 		{}
 
-		// Member Constructor
-		ZoneComfortControlsFangerData(
-			int const FangerType, // Index for Fanger type
-			Real64 const LowPMV, // Low PMV value
-			Real64 const HighPMV, // High PMV Value
-			int const DualPMVErrCount, // Dual PMV setpoint error count
-			int const DualPMVErrIndex // Dual PMV setpoint error index
-		) :
-			FangerType( FangerType ),
-			LowPMV( LowPMV ),
-			HighPMV( HighPMV ),
-			DualPMVErrCount( DualPMVErrCount ),
-			DualPMVErrIndex( DualPMVErrIndex )
-		{}
-
 	};
 
 	// Object Data

@@ -875,6 +875,8 @@ namespace HVACSingleDuctInduc {
 					if ( IsAutoSize ) {
 						IndUnit( IUNum ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
 						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Maximum Hot Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes );
+						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
+						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );
 					} else {
 						if ( IndUnit( IUNum ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
 							MaxVolHotWaterFlowUser = IndUnit( IUNum ).MaxVolHotWaterFlow;

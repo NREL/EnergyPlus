@@ -201,67 +201,6 @@ namespace loc {
 			CompNum( 0 )
 		{}
 
-		// Member Constructor
-		SurfaceGroundHeatExchangerData(
-			std::string const & Name, // name of surface GHE
-			std::string const & ConstructionName, // name of the associated construction
-			std::string const & InletNode, // surface GHE inlet fluid node
-			std::string const & OutletNode, // surface GHE outlet fluid node
-			Real64 const DesignMassFlowRate,
-			Real64 const TubeDiameter, // hydronic tube inside diameter
-			Real64 const TubeSpacing, // tube spacing
-			Real64 const SurfaceLength, // active length of surface GHE
-			Real64 const SurfaceWidth, // active width of surface GHE
-			Real64 const TopThermAbs, // Thermal absortivity of top layer
-			Real64 const TopSolarAbs, // solar absortivity of top layer
-			Real64 const BtmThermAbs, // Thermal absortivity of bottom layer
-			int const LowerSurfCond, // Type of lower surf. boundary condition
-			int const TubeCircuits, // number of circuits in total
-			int const ConstructionNum, // construction index number
-			int const InletNodeNum, // inlet node number
-			int const OutletNodeNum, // oulet node number
-			int const TopRoughness, // roughness of top layer
-			int const BtmRoughness, // roughness of bottom layer
-			int const FrozenErrIndex1, // recurring error index
-			int const FrozenErrIndex2, // recurring error index
-			int const ConvErrIndex1, // recurring error index
-			int const ConvErrIndex2, // recurring error index
-			int const ConvErrIndex3, // recurring error index
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			Name( Name ),
-			ConstructionName( ConstructionName ),
-			InletNode( InletNode ),
-			OutletNode( OutletNode ),
-			DesignMassFlowRate( DesignMassFlowRate ),
-			TubeDiameter( TubeDiameter ),
-			TubeSpacing( TubeSpacing ),
-			SurfaceLength( SurfaceLength ),
-			SurfaceWidth( SurfaceWidth ),
-			TopThermAbs( TopThermAbs ),
-			TopSolarAbs( TopSolarAbs ),
-			BtmThermAbs( BtmThermAbs ),
-			LowerSurfCond( LowerSurfCond ),
-			TubeCircuits( TubeCircuits ),
-			ConstructionNum( ConstructionNum ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			TopRoughness( TopRoughness ),
-			BtmRoughness( BtmRoughness ),
-			FrozenErrIndex1( FrozenErrIndex1 ),
-			FrozenErrIndex2( FrozenErrIndex2 ),
-			ConvErrIndex1( ConvErrIndex1 ),
-			ConvErrIndex2( ConvErrIndex2 ),
-			ConvErrIndex3( ConvErrIndex3 ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
-		{}
-
 	};
 
 	struct SurfaceGroundHeatExchangerQTF
@@ -331,65 +270,6 @@ namespace loc {
 			LastTimeStepSys( 0.0 )
 		{}
 
-		// Member Constructor
-		SurfaceGroundHeatExchangerQTF(
-			Real64 const TsrcConstCoef,
-			Real64 const TsrcVarCoef,
-			Real64 const QbtmConstCoef,
-			Real64 const QbtmVarCoef,
-			Real64 const QtopConstCoef,
-			Real64 const QtopVarCoef,
-			int const NumCTFTerms, // number of terms for surface
-			Array1< Real64 > const & CTFin, // surf flux in ctf - X
-			Array1< Real64 > const & CTFout, // surf flux in ctf - Z
-			Array1< Real64 > const & CTFcross, // surf flux in ctf - Y
-			Array1< Real64 > const & CTFflux, // surf flux in ctf - F
-			Array1< Real64 > const & CTFSourceIn, // surf flux in ctf - Wi
-			Array1< Real64 > const & CTFSourceOut, // surf flux out ctf - Wo
-			Array1< Real64 > const & CTFTSourceOut, // surf flux in qtf - x
-			Array1< Real64 > const & CTFTSourceIn, // surf flux in qtf - y
-			Array1< Real64 > const & CTFTSourceQ, // surf flux in qtf - f
-			Array1< Real64 > const & TbtmHistory,
-			Array1< Real64 > const & TtopHistory,
-			Array1< Real64 > const & TsrcHistory,
-			Array1< Real64 > const & QbtmHistory,
-			Array1< Real64 > const & QtopHistory,
-			Array1< Real64 > const & QsrcHistory,
-			Real64 const QSrc,
-			Real64 const QSrcAvg,
-			Real64 const LastQSrc,
-			Real64 const LastSysTimeElapsed,
-			Real64 const LastTimeStepSys
-		) :
-			TsrcConstCoef( TsrcConstCoef ),
-			TsrcVarCoef( TsrcVarCoef ),
-			QbtmConstCoef( QbtmConstCoef ),
-			QbtmVarCoef( QbtmVarCoef ),
-			QtopConstCoef( QtopConstCoef ),
-			QtopVarCoef( QtopVarCoef ),
-			NumCTFTerms( NumCTFTerms ),
-			CTFin( {0,loc::MaxCTFTerms-1}, CTFin ),
-			CTFout( {0,loc::MaxCTFTerms-1}, CTFout ),
-			CTFcross( {0,loc::MaxCTFTerms-1}, CTFcross ),
-			CTFflux( {0,loc::MaxCTFTerms-1}, CTFflux ),
-			CTFSourceIn( {0,loc::MaxCTFTerms-1}, CTFSourceIn ),
-			CTFSourceOut( {0,loc::MaxCTFTerms-1}, CTFSourceOut ),
-			CTFTSourceOut( {0,loc::MaxCTFTerms-1}, CTFTSourceOut ),
-			CTFTSourceIn( {0,loc::MaxCTFTerms-1}, CTFTSourceIn ),
-			CTFTSourceQ( {0,loc::MaxCTFTerms-1}, CTFTSourceQ ),
-			TbtmHistory( {0,loc::MaxCTFTerms-1}, TbtmHistory ),
-			TtopHistory( {0,loc::MaxCTFTerms-1}, TtopHistory ),
-			TsrcHistory( {0,loc::MaxCTFTerms-1}, TsrcHistory ),
-			QbtmHistory( {0,loc::MaxCTFTerms-1}, QbtmHistory ),
-			QtopHistory( {0,loc::MaxCTFTerms-1}, QtopHistory ),
-			QsrcHistory( {0,loc::MaxCTFTerms-1}, QsrcHistory ),
-			QSrc( QSrc ),
-			QSrcAvg( QSrcAvg ),
-			LastQSrc( LastQSrc ),
-			LastSysTimeElapsed( LastSysTimeElapsed ),
-			LastTimeStepSys( LastTimeStepSys )
-		{}
-
 	};
 
 	struct SurfaceGroundHeatExchngrReport
@@ -423,35 +303,6 @@ namespace loc {
 			Energy( 0.0 ),
 			SurfEnergy( 0.0 ),
 			SourceTemp( 0.0 )
-		{}
-
-		// Member Constructor
-		SurfaceGroundHeatExchngrReport(
-			Real64 const InletTemp, // water inlet temperature
-			Real64 const OutletTemp, // water outlet temperature
-			Real64 const MassFlowRate, // water mass flow rate
-			Real64 const TopSurfaceTemp, // Top surface temperature
-			Real64 const BtmSurfaceTemp, // Bottom  surface temperature
-			Real64 const TopSurfaceFlux, // Top  surface heat flux
-			Real64 const BtmSurfaceFlux, // Bottom  surface heat flux
-			Real64 const HeatTransferRate, // total fluid heat transfer rate, Watts
-			Real64 const SurfHeatTransferRate, // total surface heat transfer rate, Watts
-			Real64 const Energy, // cumulative energy, Joules
-			Real64 const SurfEnergy, // cumulative energy, Joules
-			Real64 const SourceTemp // Source temperature
-		) :
-			InletTemp( InletTemp ),
-			OutletTemp( OutletTemp ),
-			MassFlowRate( MassFlowRate ),
-			TopSurfaceTemp( TopSurfaceTemp ),
-			BtmSurfaceTemp( BtmSurfaceTemp ),
-			TopSurfaceFlux( TopSurfaceFlux ),
-			BtmSurfaceFlux( BtmSurfaceFlux ),
-			HeatTransferRate( HeatTransferRate ),
-			SurfHeatTransferRate( SurfHeatTransferRate ),
-			Energy( Energy ),
-			SurfEnergy( SurfEnergy ),
-			SourceTemp( SourceTemp )
 		{}
 
 	};

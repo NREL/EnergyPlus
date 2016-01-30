@@ -978,15 +978,6 @@ namespace ZoneContaminantPredictorCorrector {
 				DidHave( 4, false )
 			{}
 
-			// Member Constructor
-			NeededControlTypes(
-				Array1_bool const & MustHave, // 4= the four control types
-				Array1_bool const & DidHave
-			) :
-				MustHave( 4, MustHave ),
-				DidHave( 4, DidHave )
-			{}
-
 		};
 
 		struct NeededComfortControlTypes
@@ -999,15 +990,6 @@ namespace ZoneContaminantPredictorCorrector {
 			NeededComfortControlTypes() :
 				MustHave( 12, false ),
 				DidHave( 12, false )
-			{}
-
-			// Member Constructor
-			NeededComfortControlTypes(
-				Array1_bool const & MustHave, // 4= the four control types
-				Array1_bool const & DidHave
-			) :
-				MustHave( 12, MustHave ),
-				DidHave( 12, DidHave )
 			{}
 
 		};

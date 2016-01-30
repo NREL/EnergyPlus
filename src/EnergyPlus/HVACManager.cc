@@ -717,7 +717,6 @@ namespace HVACManager {
 
 		int AirSysNum;
 		int StackDepth;
-		std::string HistoryStack;
 		std::string HistoryTrace;
 		Real64 SlopeHumRat;
 		Real64 SlopeMdot;

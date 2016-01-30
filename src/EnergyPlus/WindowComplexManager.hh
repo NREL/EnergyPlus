@@ -124,15 +124,6 @@ namespace WindowComplexManager {
 			NumStates( 0 )
 		{}
 
-		// Member Constructor
-		WindowIndex(
-			int const NumStates, // No States for this window
-			int const SurfNo // Surface number of window
-		) :
-			NumStates( NumStates ),
-			SurfNo( SurfNo )
-		{}
-
 	};
 
 	struct WindowStateIndex
@@ -149,25 +140,6 @@ namespace WindowComplexManager {
 
 		// Default Constructor
 		WindowStateIndex()
-		{}
-
-		// Member Constructor
-		WindowStateIndex(
-			int const InitInc, // Flag indicating initialization needed on Incoming basis
-			int const IncBasisIndx, // Index of basis list entry for Incoming basis
-			int const CopyIncState, // Pointer to state from which geometry can be copied (Incident)
-			int const InitTrn, // Flag indicating initialization needed on Outgoing basis
-			int const TrnBasisIndx, // Index of basis list entry for Outgoing basis
-			int const CopyTrnState, // Pointer to state from which geometry can be copied (Outgoing)
-			int const Konst // Index of state descript in Construct array
-		) :
-			InitInc( InitInc ),
-			IncBasisIndx( IncBasisIndx ),
-			CopyIncState( CopyIncState ),
-			InitTrn( InitTrn ),
-			TrnBasisIndx( TrnBasisIndx ),
-			CopyTrnState( CopyTrnState ),
-			Konst( Konst )
 		{}
 
 	};

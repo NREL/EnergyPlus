@@ -115,19 +115,6 @@ namespace NodeInputManager {
 			NumOfNodesInList( 0 )
 		{}
 
-		// Member Constructor
-		NodeListDef(
-			std::string const & Name, // Name of this Node List
-			int const NumOfNodesInList, // Number of Nodes in this Node List
-			Array1_string const & NodeNames, // List of Names in this Node List
-			Array1_int const & NodeNumbers // Number of each Node (ref NodeNames) in this Node List
-		) :
-			Name( Name ),
-			NumOfNodesInList( NumOfNodesInList ),
-			NodeNames( NodeNames ),
-			NodeNumbers( NodeNumbers )
-		{}
-
 	};
 
 	// Object Data
