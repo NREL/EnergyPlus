@@ -194,6 +194,7 @@ namespace SingleDuct {
 	Array1D< Real64 > MassFlowDiff;
 	bool GetInputFlag( true ); // Flag set to make sure you get input once
 	bool GetATMixerFlag( true ); // Flag set to make sure you get input once
+	bool InitSysFlag( true ); // Flag set to make sure you do begin simulation initializaztions once
 	int NumConstVolSys( 0 );
 	Array1D_bool CheckEquipName;
 
@@ -230,6 +231,7 @@ namespace SingleDuct {
 	{
 		GetInputFlag = true;
 		GetATMixerFlag = true;
+		InitSysFlag = true;
 	}
 
 	void
@@ -1544,7 +1546,6 @@ namespace SingleDuct {
 		int OutletNode;
 		int ADUNum;
 		int SysIndex;
-		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MySizeFlag;
@@ -1559,7 +1560,7 @@ namespace SingleDuct {
 		// FLOW:
 
 		// Do the Begin Simulation initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitSysFlag ) {
 
 			MyEnvrnFlag.allocate( NumSys );
 			MySizeFlag.allocate( NumSys );
@@ -1569,7 +1570,7 @@ namespace SingleDuct {
 			MySizeFlag = true;
 			PlantLoopScanFlag = true;
 			GetGasElecHeatCoilCap = true;
-			MyOneTimeFlag = false;
+			InitSysFlag = false;
 		}
 
 		if ( PlantLoopScanFlag( SysNum ) && allocated( PlantLoop ) ) {

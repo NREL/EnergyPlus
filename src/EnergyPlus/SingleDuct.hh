@@ -108,6 +108,7 @@ namespace SingleDuct {
 	extern Array1D< Real64 > MassFlowDiff;
 	extern bool GetInputFlag; // Flag set to make sure you get input once
 	extern bool GetATMixerFlag; // Flag set to make sure you get input once
+	extern bool InitSysFlag; // Flag set to make sure you do begin simulation initializaztions once
 	extern int NumConstVolSys;
 	extern Array1D_bool CheckEquipName;
 

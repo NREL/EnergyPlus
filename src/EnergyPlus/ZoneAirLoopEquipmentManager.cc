@@ -125,6 +125,7 @@ namespace ZoneAirLoopEquipmentManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	bool GetAirDistUnitsFlag( true ); // If TRUE, Air Distribution Data has not been read in yet
+	bool InitAirDistUnitsFlag( true ); // If TRUE, Air Distribution unit actualtzonenums have not been initialized yet
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -139,6 +140,7 @@ namespace ZoneAirLoopEquipmentManager {
 	clear_state()
 	{
 		GetAirDistUnitsFlag = true;
+		InitAirDistUnitsFlag = true;
 	}
 
 	void
@@ -555,14 +557,13 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
 		// int ZoneEqNum;
 		static Array1D_bool EachOnceFlag;
 		// Do the Begin Simulation initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitAirDistUnitsFlag ) {
 			EachOnceFlag.allocate( NumAirDistUnits );
 			EachOnceFlag = true;
-			MyOneTimeFlag = false;
+			InitAirDistUnitsFlag = false;
 		}
 		if ( EachOnceFlag( AirDistUnitNum )) {
 			AirDistUnit( AirDistUnitNum ).ZoneNum = ZoneNum;
