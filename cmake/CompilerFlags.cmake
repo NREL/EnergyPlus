@@ -1,7 +1,7 @@
 
 # Compiler-agnostic compiler flags first
+ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ALIGN=64") # Align ObjexxFCL arrays to 64B
 ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_ARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging
-ADD_CXX_RELEASE_DEFINITIONS("-DOBJEXXFCL_ALIGN=64") # Align ObjexxFCL arrays to 64B
 
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
@@ -109,7 +109,8 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     endif()
 
   ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
-  ADD_CXX_RELEASE_DEFINITIONS("-Ofast -fno-stack-protector") # -Ofast (or -ffast-math) needed to auto-vectorize floating point loops
+  ADD_CXX_RELEASE_DEFINITIONS("-fno-stack-protector")
+  # ADD_CXX_RELEASE_DEFINITIONS("-Ofast") # -Ofast (or -ffast-math) needed to auto-vectorize floating point loops
 
 ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
@@ -143,11 +144,11 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables better optimization via strict aliasing rules
-    ADD_CXX_RELEASE_DEFINITIONS("/O3") # Enables agressive optimization
-    ADD_CXX_RELEASE_DEFINITIONS("/fp:fast=2") # Enables more aggressive optimizations on floating-point data
     ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # Faster division
     ADD_CXX_RELEASE_DEFINITIONS("/Qip") # Enables inter-procedural optimnization within a single file
     ADD_CXX_RELEASE_DEFINITIONS("/Qinline-factor:225") # Enables more aggressive inlining
+    # ADD_CXX_RELEASE_DEFINITIONS("/O3") # Enables agressive optimization
+    # ADD_CXX_RELEASE_DEFINITIONS("/fp:fast=2") # Enables more aggressive optimizations on floating-point data
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     ADD_CXX_DEBUG_DEFINITIONS("/fp:source") # Use source-specified floating point precision
