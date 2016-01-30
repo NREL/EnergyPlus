@@ -342,6 +342,7 @@ SET( SRC
   MoistureBalanceEMPDManager.hh
   MundtSimMgr.cc
   MundtSimMgr.hh
+  Named.hh
   NodeInputManager.cc
   NodeInputManager.hh
   NonZoneEquipmentManager.cc
@@ -382,6 +383,7 @@ SET( SRC
   PlantCentralGSHP.hh
   PlantChillers.cc
   PlantChillers.hh
+  PlantComponent.hh
   PlantComponentTemperatureSources.cc
   PlantComponentTemperatureSources.hh
   PlantCondLoopOperation.cc

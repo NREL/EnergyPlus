@@ -68,6 +68,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -597,6 +598,7 @@ namespace DataPlant {
 		int IndexInLoopSidePumps; // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
 		Real64 TempDesCondIn;
 		Real64 TempDesEvapOut;
+		PlantComponent * compPtr;
 
 		// Default Constructor
 		CompData() :
@@ -629,7 +631,8 @@ namespace DataPlant {
 			FreeCoolCntrlNodeNum( 0 ),
 			IndexInLoopSidePumps( 0 ),
 			TempDesCondIn( 0.0 ),
-			TempDesEvapOut( 0.0 )
+			TempDesEvapOut( 0.0 ),
+			compPtr( nullptr )
 		{}
 
 	};
