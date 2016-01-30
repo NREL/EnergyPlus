@@ -71,8 +71,6 @@ namespace ZoneAirLoopEquipmentManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern bool GetAirDistUnitsFlag; // If TRUE, Air Distribution Data has not been read in yet
-	extern bool InitAirDistUnitsFlag; // If TRUE, Air Distribution unit actualtzonenums have not been initialized yet
 
 	// DERIVED TYPE DEFINITIONS:
 	// na

@@ -194,7 +194,6 @@ namespace SingleDuct {
 	Array1D< Real64 > MassFlowDiff;
 	bool GetInputFlag( true ); // Flag set to make sure you get input once
 	bool GetATMixerFlag( true ); // Flag set to make sure you get input once
-	bool InitSysFlag( true ); // Flag set to make sure you do begin simulation initializaztions once
 	int NumConstVolSys( 0 );
 	Array1D_bool CheckEquipName;
 
@@ -220,6 +219,15 @@ namespace SingleDuct {
 	Array1D< SysFlowConditions > SysInlet;
 	Array1D< SysFlowConditions > SysOutlet;
 	Array1D< AirTerminalMixerData > SysATMixer;
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitSysFlag( true ); // Flag set to make sure you do begin simulation initializaztions once
+	}
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
