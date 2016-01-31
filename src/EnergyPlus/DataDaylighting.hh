@@ -130,17 +130,6 @@ namespace DataDaylighting {
 			NumOfIntWindows( 0 )
 		{}
 
-		// Member Constructor
-		IntWinAdjZoneExtWinStruct(
-			int const SurfNum, // exterior window index
-			int const NumOfIntWindows, // count of interior windows associated with this ext win
-			Array1_int const & IntWinNum // index numbers for interior windows assoc with this ext win
-		) :
-			SurfNum( SurfNum ),
-			NumOfIntWindows( NumOfIntWindows ),
-			IntWinNum( IntWinNum )
-		{}
-
 	};
 
 	struct ZoneDaylightCalc
@@ -253,115 +242,6 @@ namespace DataDaylighting {
 			MapCount( 0 )
 		{}
 
-		// Member Constructor
-		ZoneDaylightCalc(
-			int const DaylightType, // Type of Daylighting (1=Detailed, 2=DElight)
-			int const AvailSchedNum, // pointer to availability schedule if present
-			int const TotalDaylRefPoints, // Number of detailed daylighting reference points in a zone (0,1 or 2)
-			int const TotalDElightRefPts, // Number of DElight daylighting reference points in a zone (0,1 or 2) - RJH
-			Array2< Real64 > const & DaylRefPtAbsCoord, // =0.0 ! X,Y,Z coordinates of all daylighting reference points
-			Array1_bool const & DaylRefPtInBounds, // True when coordinates are in bounds of zone coordinates
-			Array1< Real64 > const & FracZoneDaylit, // =0.0  ! Fraction of zone controlled by each reference point
-			Array1< Real64 > const & IllumSetPoint, // =0.0  ! Illuminance setpoint at each reference point (lux)
-			int const LightControlType, // Lighting control type (same for all reference points)
-			Real64 const ViewAzimuthForGlare, // View direction relative to window for glare calculation (deg)
-			int const MaxGlareallowed, // Maximum allowable discomfort glare index
-			Real64 const MinPowerFraction, // Minimum fraction of power input that continuous dimming system can dim down to
-			Real64 const MinLightFraction, // Minimum fraction of light output that continuous dimming system can dim down to
-			int const LightControlSteps, // Number of levels (excluding zero) of stepped control system
-			Real64 const LightControlProbability, // For manual control of stepped systems, probability that lighting will
-			int const TotalExtWindows, // Total number of exterior windows in the zone
-			Real64 const AveVisDiffReflect, // Area-weighted average inside surface visible reflectance of zone
-			Array1< Real64 > const & RefPtPowerReductionFactor, // =1.0  ! Electric power reduction factor at reference points
-			Real64 const ZonePowerReductionFactor, // Electric power reduction factor for entire zone due to daylighting
-			Array1< Real64 > const & DaylIllumAtRefPt, // =0.0 ! Daylight illuminance at reference points (lux)
-			Array1< Real64 > const & GlareIndexAtRefPt, // =0.0 ! Glare index at reference points
-			Array1_int const & AdjIntWinZoneNums, // List of zone numbers of adjacent zones that have exterior windows and
-			int const NumOfIntWinAdjZones, // Number of adjacent zones that have exterior windows and share one or
-			int const NumOfIntWinAdjZoneExtWins, // number of exterior windows associated with zone via interior windows
-			Array1< IntWinAdjZoneExtWinStruct > const & IntWinAdjZoneExtWin, // nested structure | info about exterior window associated with zone via interior window
-			int const NumOfDayltgExtWins, // Number of associated exterior windows providing daylight to this zone
-			Array1_int const & DayltgExtWinSurfNums, // List of surface numbers of zone's exterior windows or
-			Array1_int const & DayltgFacPtrsForExtWins, // Zone's daylighting factor pointers.
-			Real64 const MinIntWinSolidAng, // Minimum solid angle subtended by an interior window in a zone
-			Real64 const TotInsSurfArea, // Total inside surface area of a daylit zone (m2)
-			Real64 const FloorVisRefl, // Area-weighted visible reflectance of floor of a daylit zone
-			Real64 const InterReflIllFrIntWins, // Inter-reflected illuminance due to beam and diffuse solar passing
-			Array1< Real64 > const & BacLum, // =0.0 ! Background luminance at each reference point (cd/m2)
-			Array2< Real64 > const & SolidAngAtRefPt, // (MaxRefPoints,50)
-			Array2< Real64 > const & SolidAngAtRefPtWtd, // (MaxRefPoints,50)
-			Array3< Real64 > const & IllumFromWinAtRefPt, // (MaxRefPoints,2,50)
-			Array3< Real64 > const & BackLumFromWinAtRefPt, // (MaxRefPoints,2,50)
-			Array3< Real64 > const & SourceLumFromWinAtRefPt, // (MaxRefPoints,2,50)
-			Array5< Real64 > const & DaylIllFacSky,
-			Array5< Real64 > const & DaylSourceFacSky,
-			Array5< Real64 > const & DaylBackFacSky,
-			Array4< Real64 > const & DaylIllFacSun,
-			Array4< Real64 > const & DaylIllFacSunDisk,
-			Array4< Real64 > const & DaylSourceFacSun,
-			Array4< Real64 > const & DaylSourceFacSunDisk,
-			Array4< Real64 > const & DaylBackFacSun,
-			Array4< Real64 > const & DaylBackFacSunDisk,
-			Array1< Real64 > const & TimeExceedingGlareIndexSPAtRefPt,
-			Array1< Real64 > const & TimeExceedingDaylightIlluminanceSPAtRefPt,
-			bool const AdjZoneHasDayltgCtrl,
-			int const MapCount, // Number of maps assigned to Zone
-			Array1_int const & ZoneToMap // Pointers to maps allocated to Zone
-		) :
-			DaylightType( DaylightType ),
-			AvailSchedNum( AvailSchedNum ),
-			TotalDaylRefPoints( TotalDaylRefPoints ),
-			TotalDElightRefPts( TotalDElightRefPts ),
-			DaylRefPtAbsCoord( DaylRefPtAbsCoord ),
-			DaylRefPtInBounds( DaylRefPtInBounds ),
-			FracZoneDaylit( FracZoneDaylit ),
-			IllumSetPoint( IllumSetPoint ),
-			LightControlType( LightControlType ),
-			ViewAzimuthForGlare( ViewAzimuthForGlare ),
-			MaxGlareallowed( MaxGlareallowed ),
-			MinPowerFraction( MinPowerFraction ),
-			MinLightFraction( MinLightFraction ),
-			LightControlSteps( LightControlSteps ),
-			LightControlProbability( LightControlProbability ),
-			TotalExtWindows( TotalExtWindows ),
-			AveVisDiffReflect( AveVisDiffReflect ),
-			RefPtPowerReductionFactor( RefPtPowerReductionFactor ),
-			ZonePowerReductionFactor( ZonePowerReductionFactor ),
-			DaylIllumAtRefPt( DaylIllumAtRefPt ),
-			GlareIndexAtRefPt( GlareIndexAtRefPt ),
-			AdjIntWinZoneNums( AdjIntWinZoneNums ),
-			NumOfIntWinAdjZones( NumOfIntWinAdjZones ),
-			NumOfIntWinAdjZoneExtWins( NumOfIntWinAdjZoneExtWins ),
-			IntWinAdjZoneExtWin( IntWinAdjZoneExtWin ),
-			NumOfDayltgExtWins( NumOfDayltgExtWins ),
-			DayltgExtWinSurfNums( DayltgExtWinSurfNums ),
-			DayltgFacPtrsForExtWins( DayltgFacPtrsForExtWins ),
-			MinIntWinSolidAng( MinIntWinSolidAng ),
-			TotInsSurfArea( TotInsSurfArea ),
-			FloorVisRefl( FloorVisRefl ),
-			InterReflIllFrIntWins( InterReflIllFrIntWins ),
-			BacLum( BacLum ),
-			SolidAngAtRefPt( SolidAngAtRefPt ),
-			SolidAngAtRefPtWtd( SolidAngAtRefPtWtd ),
-			IllumFromWinAtRefPt( IllumFromWinAtRefPt ),
-			BackLumFromWinAtRefPt( BackLumFromWinAtRefPt ),
-			SourceLumFromWinAtRefPt( SourceLumFromWinAtRefPt ),
-			DaylIllFacSky( DaylIllFacSky ),
-			DaylSourceFacSky( DaylSourceFacSky ),
-			DaylBackFacSky( DaylBackFacSky ),
-			DaylIllFacSun( DaylIllFacSun ),
-			DaylIllFacSunDisk( DaylIllFacSunDisk ),
-			DaylSourceFacSun( DaylSourceFacSun ),
-			DaylSourceFacSunDisk( DaylSourceFacSunDisk ),
-			DaylBackFacSun( DaylBackFacSun ),
-			DaylBackFacSunDisk( DaylBackFacSunDisk ),
-			TimeExceedingGlareIndexSPAtRefPt( TimeExceedingGlareIndexSPAtRefPt ),
-			TimeExceedingDaylightIlluminanceSPAtRefPt( TimeExceedingDaylightIlluminanceSPAtRefPt ),
-			AdjZoneHasDayltgCtrl( AdjZoneHasDayltgCtrl ),
-			MapCount( MapCount ),
-			ZoneToMap( ZoneToMap )
-		{}
-
 	};
 
 	struct IllumMapData
@@ -397,39 +277,6 @@ namespace DataDaylighting {
 			UnitNo( 0 ),
 			HeaderXLineLengthNeeded( true ),
 			HeaderXLineLength( 0 )
-		{}
-
-		// Member Constructor
-		IllumMapData(
-			std::string const & Name, // Map name
-			int const Zone, // Pointer to zone being mapped
-			Real64 const Z, // Elevation or height
-			Real64 const Xmin, // Minimum X value
-			Real64 const Xmax, // Maximum X value
-			int const Xnum, // Number of X reference points (going N-S)
-			Real64 const Xinc, // Increment between X reference points
-			Real64 const Ymin, // Minimum Y value
-			Real64 const Ymax, // Maximum Y value
-			int const Ynum, // Number of Y reference points (going E-W)
-			Real64 const Yinc, // Increment between Y reference points
-			int const UnitNo, // Unit number for map output (later merged to final file)
-			bool const HeaderXLineLengthNeeded, // X header will likely be the longest line in the file
-			int const HeaderXLineLength // actual length of this X header line
-		) :
-			Name( Name ),
-			Zone( Zone ),
-			Z( Z ),
-			Xmin( Xmin ),
-			Xmax( Xmax ),
-			Xnum( Xnum ),
-			Xinc( Xinc ),
-			Ymin( Ymin ),
-			Ymax( Ymax ),
-			Ynum( Ynum ),
-			Yinc( Yinc ),
-			UnitNo( UnitNo ),
-			HeaderXLineLengthNeeded( HeaderXLineLengthNeeded ),
-			HeaderXLineLength( HeaderXLineLength )
 		{}
 
 	};
@@ -479,55 +326,6 @@ namespace DataDaylighting {
 		MapCalcData() :
 			TotalMapRefPoints( 0 ),
 			Zone( 0 )
-		{}
-
-		// Member Constructor
-		MapCalcData(
-			int const TotalMapRefPoints, // Number of illuminance map reference points in this zone (up to 100)
-			int const Zone, // Pointer to zone being mapped
-			Array2< Real64 > const & MapRefPtAbsCoord, // X,Y,Z coordinates of all illuminance map reference points
-			Array1_bool const & MapRefPtInBounds, // True when coordinates are in bounds of zone coordinates
-			Array1< Real64 > const & DaylIllumAtMapPt, // Daylight illuminance at illuminance map points (lux)
-			Array1< Real64 > const & GlareIndexAtMapPt, // Glare index at illuminance map points
-			Array1< Real64 > const & DaylIllumAtMapPtHr, // Daylight illuminance at illuminance map points (lux)
-			Array1< Real64 > const & GlareIndexAtMapPtHr, // Glare index at illuminance map points
-			Array2< Real64 > const & SolidAngAtMapPt, // (MaxRefPoints,50)
-			Array2< Real64 > const & SolidAngAtMapPtWtd, // (MaxRefPoints,50)
-			Array3< Real64 > const & IllumFromWinAtMapPt, // (MaxRefPoints,2,50)
-			Array3< Real64 > const & BackLumFromWinAtMapPt, // (MaxRefPoints,2,50)
-			Array3< Real64 > const & SourceLumFromWinAtMapPt, // (MaxRefPoints,2,50)
-			Array5< Real64 > const & DaylIllFacSky,
-			Array5< Real64 > const & DaylSourceFacSky,
-			Array5< Real64 > const & DaylBackFacSky,
-			Array4< Real64 > const & DaylIllFacSun,
-			Array4< Real64 > const & DaylIllFacSunDisk,
-			Array4< Real64 > const & DaylSourceFacSun,
-			Array4< Real64 > const & DaylSourceFacSunDisk,
-			Array4< Real64 > const & DaylBackFacSun,
-			Array4< Real64 > const & DaylBackFacSunDisk
-		) :
-			TotalMapRefPoints( TotalMapRefPoints ),
-			Zone( Zone ),
-			MapRefPtAbsCoord( MapRefPtAbsCoord ),
-			MapRefPtInBounds( MapRefPtInBounds ),
-			DaylIllumAtMapPt( DaylIllumAtMapPt ),
-			GlareIndexAtMapPt( GlareIndexAtMapPt ),
-			DaylIllumAtMapPtHr( DaylIllumAtMapPtHr ),
-			GlareIndexAtMapPtHr( GlareIndexAtMapPtHr ),
-			SolidAngAtMapPt( SolidAngAtMapPt ),
-			SolidAngAtMapPtWtd( SolidAngAtMapPtWtd ),
-			IllumFromWinAtMapPt( IllumFromWinAtMapPt ),
-			BackLumFromWinAtMapPt( BackLumFromWinAtMapPt ),
-			SourceLumFromWinAtMapPt( SourceLumFromWinAtMapPt ),
-			DaylIllFacSky( DaylIllFacSky ),
-			DaylSourceFacSky( DaylSourceFacSky ),
-			DaylBackFacSky( DaylBackFacSky ),
-			DaylIllFacSun( DaylIllFacSun ),
-			DaylIllFacSunDisk( DaylIllFacSunDisk ),
-			DaylSourceFacSun( DaylSourceFacSun ),
-			DaylSourceFacSunDisk( DaylSourceFacSunDisk ),
-			DaylBackFacSun( DaylBackFacSun ),
-			DaylBackFacSunDisk( DaylBackFacSunDisk )
 		{}
 
 	};

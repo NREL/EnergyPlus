@@ -2257,8 +2257,6 @@ namespace ThermalISO15099Calc {
 		static Real64 aveGlassConductivity( 0.0 );
 		static int i( 0 );
 		static int k( 0 );
-		std::string a;
-		std::string b;
 
 		for ( i = 1; i <= nlayer - 1; ++i ) {
 			k = 2 * i + 1;

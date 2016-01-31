@@ -3198,15 +3198,6 @@ namespace BranchInputManager {
 				NumNodes( 0 )
 			{}
 
-			// Member Constructor
-			BranchUniqueNodes(
-				int const NumNodes,
-				Array1_string const & UniqueNodeNames
-			) :
-				NumNodes( NumNodes ),
-				UniqueNodeNames( UniqueNodeNames )
-			{}
-
 		};
 
 		// Object Data

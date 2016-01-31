@@ -234,7 +234,6 @@ namespace FaultsManager {
 		// check number of faults
 		NumFaults = 0;
 		for ( i = 1; i <= NumFaultTypes; ++i ) {
-			iFaults = 0;
 			iFaults = GetNumObjectsFound( cFaults( i ) );
 			NumFaults += iFaults;
 		}

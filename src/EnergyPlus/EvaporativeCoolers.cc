@@ -721,11 +721,7 @@ namespace EvaporativeCoolers {
 
 			EvapCond( EvapCoolNum ).VolFlowRate = rNumericArgs( 2 );
 			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 3 );
-			if ( lNumericFieldBlanks( 4 ) ) {
-				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = 0.0;
-			} else {
-				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 4 );
-			}
+			EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 4 );
 			if ( lNumericFieldBlanks( 5 ) ) {
 				EvapCond( EvapCoolNum ).DriftFraction = 0.0;
 			} else {
@@ -3963,7 +3959,7 @@ namespace EvaporativeCoolers {
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		Real64 TempSize; // autosized value of coil input field
-		int FieldNum = 1; // IDD numeric field number where input field description is found
+		int FieldNum; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification

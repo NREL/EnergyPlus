@@ -1333,21 +1333,6 @@ namespace SizingManager {
 				ZoneListActive( false )
 			{}
 
-			// Member Constructor
-			GlobalMiscObject(
-				std::string const & Name,
-				int const ZoneOrZoneListPtr,
-				int const NumOfZones,
-				int const StartPtr,
-				bool const ZoneListActive
-			) :
-				Name( Name ),
-				ZoneOrZoneListPtr( ZoneOrZoneListPtr ),
-				NumOfZones( NumOfZones ),
-				StartPtr( StartPtr ),
-				ZoneListActive( ZoneListActive )
-			{}
-
 		};
 
 		// Object Data
@@ -2189,7 +2174,7 @@ namespace SizingManager {
 			SysSizInput( SysSizIndex ).CoolSupTemp = rNumericArgs( iCentralCoolDesignSATempNumericNum );
 			SysSizInput( SysSizIndex ).HeatSupTemp = rNumericArgs( iCentralHeatDesignSATempNumericNum );
 			SysSizInput( SysSizIndex ).CoolSupHumRat = rNumericArgs( iCentralCoolDesignSAHumRatNumericNum );
-			SysSizInput( SysSizIndex).HeatSupHumRat = rNumericArgs( iCentralHeatDesignSAHumRatNumericNum );
+			SysSizInput( SysSizIndex ).HeatSupHumRat = rNumericArgs( iCentralHeatDesignSAHumRatNumericNum );
 			//  N11, \field Cooling Design Air Flow Rate
 			//      \note This input is used if Cooling Design Air Flow Method is Flow/System
 			//      \note This value will *not* be multiplied by any sizing factor or by zone multipliers.

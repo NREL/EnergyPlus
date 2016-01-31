@@ -1304,7 +1304,7 @@ namespace RefrigeratedCase {
 						ErrorsFound = true;
 					}
 					//   disregard defrost power for Off-Cycle or None defrost types
-					if ( ( DefType == DefOffCycle || DefType == DefOffCycle ) && ( RefrigCase( CaseNum ).DefrostPower > 0.0 ) ) {
+					if ( ( DefType == DefOffCycle || DefType == DefNone ) && ( RefrigCase( CaseNum ).DefrostPower > 0.0 ) ) {
 						RefrigCase( CaseNum ).DefrostPower = 0.0;
 						ShowWarningError( CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", " + cNumericFieldNames( NumNum ) + " for " + cAlphaFieldNames( 8 ) + " None or Off-Cycle will be set to 0 and simulation continues." );
 					}

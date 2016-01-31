@@ -109,23 +109,6 @@ namespace ZoneEquipmentManager {
 			HeatingPriority( 0 )
 		{}
 
-		// Member Constructor
-		SimulationOrder(
-			std::string const & EquipType,
-			int const EquipType_Num,
-			std::string const & EquipName,
-			int const EquipPtr,
-			int const CoolingPriority,
-			int const HeatingPriority
-		) :
-			EquipType( EquipType ),
-			EquipType_Num( EquipType_Num ),
-			EquipName( EquipName ),
-			EquipPtr( EquipPtr ),
-			CoolingPriority( CoolingPriority ),
-			HeatingPriority( HeatingPriority )
-		{}
-
 	};
 
 	// Object Data

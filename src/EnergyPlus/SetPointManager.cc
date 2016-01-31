@@ -6743,7 +6743,7 @@ namespace SetPointManager {
 			// In this section we find the worst case of (Cond ent - Evap lvg) for the
 			// chillers that are running.
 			DCESPMCur_MinLiftTD = 9999.0;
-			temp_MinLiftTD = 20.0 / 1.8;
+			// temp_MinLiftTD = 20.0 / 1.8;
 			temp_MinLiftTD = DCESPMCondInletTemp - DCESPMEvapOutletTemp;
 			DCESPMCur_MinLiftTD = min( DCESPMCur_MinLiftTD, temp_MinLiftTD );
 		}
