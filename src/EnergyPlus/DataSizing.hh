@@ -1258,7 +1258,7 @@ namespace DataSizing {
 			ZoneADEffHeating( 1.0 ),
 			ZoneSecondaryRecirculation( 0.0 ),
 			ZoneADEffSchPtr( 0 ),
-			ZoneVentilationEff( 0 )
+			ZoneVentilationEff( 0.0 )
 		{}
 
 	};

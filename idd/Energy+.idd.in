@@ -31039,10 +31039,16 @@ DesignSpecification:ZoneAirDistribution,
         \object-list ScheduleNames
         \note optionally used to replace Zone Air Distribution Effectiveness in Cooling and
         \note Heating Mode
-   N3;  \field Zone Secondary Recirculation Fraction
+   N3,  \field Zone Secondary Recirculation Fraction
         \type real
         \default 0.0
         \minimum 0.0
+        \units dimensionless
+   N4;  \field Minimum Zone Ventilation Efficiency
+        \type real
+        \default 0.0
+        \minimum 0.0
+        \maximum 1.0
         \units dimensionless
 
 Sizing:Parameters,
@@ -38747,10 +38753,14 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \key Constant
        \key FixedFlowRate
        \key Scheduled
+       \default Constant
        \note Constant = Constant Minimum Air Flow Fraction (a fraction of Maximum Air Flow Rate)
        \note FixedFlowRate = Fixed Minimum Air Flow Rate (a fixed minimum air volume flow rate)
        \note Scheduled = Scheduled Minimum Air Flow Fraction (a fraction of Maximum Air Flow
   N2 , \field Constant Minimum Air Flow Fraction
+       \type real
+       \autosizable
+       \default autosize
        \note This field is used if the field Zone Minimum Air Flow Input Method is Constant
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
@@ -38758,6 +38768,8 @@ AirTerminal:SingleDuct:VAV:Reheat,
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
        \units m3/s
+       \autosizable
+       \default autosize       
        \note This field is used if the field Zone Minimum Air Flow Input Method is FixedFlowRate.
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
