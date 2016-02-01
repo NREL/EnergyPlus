@@ -121,17 +121,6 @@ namespace DataComplexFenestration {
 			Radius( 0.0 )
 		{}
 
-		// Member Constructor
-		GapSupportPillar(
-			std::string const & Name, // Name of support pillar
-			Real64 const Spacing, // Spacing between centers of support pillars (m)
-			Real64 const Radius // Support pillar radius (m)
-		) :
-			Name( Name ),
-			Spacing( Spacing ),
-			Radius( Radius )
-		{}
-
 	};
 
 	struct GapDeflectionState
@@ -143,15 +132,6 @@ namespace DataComplexFenestration {
 		// Default Constructor
 		GapDeflectionState() :
 			DeflectedThickness( 0.0 )
-		{}
-
-		// Member Constructor
-		GapDeflectionState(
-			std::string const & Name, // Name of deflection state
-			Real64 const DeflectedThickness
-		) :
-			Name( Name ),
-			DeflectedThickness( DeflectedThickness )
 		{}
 
 	};
@@ -199,47 +179,6 @@ namespace DataComplexFenestration {
 			SlatCurve( 0.0 )
 		{}
 
-		// Member Constructor
-		WindowComplexShade(
-			std::string const & Name, // Name for complex shade
-			int const LayerType, // Layer type (OtherShadingType, Venetian, Woven, Perforated)
-			Real64 const Thickness, // Layer thickness (m)
-			Real64 const Conductivity, // Layer conductivity (W/m2K)
-			Real64 const IRTransmittance, // IR Transmittance
-			Real64 const FrontEmissivity, // Emissivity of front suraface
-			Real64 const BackEmissivity, // Emissivity of back surface
-			Real64 const TopOpeningMultiplier, // Coverage percent for top opening (%)
-			Real64 const BottomOpeningMultiplier, // Coverage percent for bottom opening (%)
-			Real64 const LeftOpeningMultiplier, // Coverage percent for left opening (%)
-			Real64 const RightOpeningMultiplier, // Coverage percent for right opening (%)
-			Real64 const FrontOpeningMultiplier, // Coverage percent for front opening (%)
-			Real64 const SlatWidth, // Slat width (m)
-			Real64 const SlatSpacing, // Slat spacing (m)
-			Real64 const SlatThickness, // Slat thickness (m)
-			Real64 const SlatAngle, // Slat angle (deg)
-			Real64 const SlatConductivity, // Slat conductivity (W/m2K)
-			Real64 const SlatCurve // Curvature radius of slat (if =0 then flat) (m)
-		) :
-			Name( Name ),
-			LayerType( LayerType ),
-			Thickness( Thickness ),
-			Conductivity( Conductivity ),
-			IRTransmittance( IRTransmittance ),
-			FrontEmissivity( FrontEmissivity ),
-			BackEmissivity( BackEmissivity ),
-			TopOpeningMultiplier( TopOpeningMultiplier ),
-			BottomOpeningMultiplier( BottomOpeningMultiplier ),
-			LeftOpeningMultiplier( LeftOpeningMultiplier ),
-			RightOpeningMultiplier( RightOpeningMultiplier ),
-			FrontOpeningMultiplier( FrontOpeningMultiplier ),
-			SlatWidth( SlatWidth ),
-			SlatSpacing( SlatSpacing ),
-			SlatThickness( SlatThickness ),
-			SlatAngle( SlatAngle ),
-			SlatConductivity( SlatConductivity ),
-			SlatCurve( SlatCurve )
-		{}
-
 	};
 
 	struct WindowThermalModelParams
@@ -263,27 +202,6 @@ namespace DataComplexFenestration {
 			VacuumPressureLimit( 0.0 ),
 			InitialTemperature( 0.0 ),
 			InitialPressure( 0.0 )
-		{}
-
-		// Member Constructor
-		WindowThermalModelParams(
-			std::string const & Name, // Window thermal model name
-			int const CalculationStandard, // Tarcog calculation standard
-			int const ThermalModel, // Tarcog thermal model
-			Real64 const SDScalar, // SDScalar coefficient
-			int const DeflectionModel, // Deflection model
-			Real64 const VacuumPressureLimit, // Pressure limit at which it will be considered vacuum gas state
-			Real64 const InitialTemperature, // Window(s) temperature in time of fabrication
-			Real64 const InitialPressure // Window(s) pressure in time of fabrication
-		) :
-			Name( Name ),
-			CalculationStandard( CalculationStandard ),
-			ThermalModel( ThermalModel ),
-			SDScalar( SDScalar ),
-			DeflectionModel( DeflectionModel ),
-			VacuumPressureLimit( VacuumPressureLimit ),
-			InitialTemperature( InitialTemperature ),
-			InitialPressure( InitialPressure )
 		{}
 
 	};

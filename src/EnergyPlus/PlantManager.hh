@@ -130,33 +130,6 @@ namespace PlantManager {
 			LoopHasConnectionComp( false )
 		{}
 
-		// Member Constructor
-		TempLoopData(
-			std::string const & Name, // Name of the component list
-			std::string const & BranchList, // Branch list name for the half loop
-			std::string const & ConnectList, // Connector list name for the half loop
-			int const TotalBranches, // Total number of branches on the loop
-			Array1< BranchData > const & Branch, // Branch data
-			Array1< SplitterData > const & Splitter, // Data for splitter on branch (if any)
-			Array1< MixerData > const & Mixer, // Data for mixer on branch (if any)
-			bool const SplitterExists, // Logical Flag indication splitter exists in the half loop
-			bool const MixerExists, // Logical Flag indication mixer exists in the half loop
-			bool const BypassExists,
-			bool const LoopHasConnectionComp
-		) :
-			Name( Name ),
-			BranchList( BranchList ),
-			ConnectList( ConnectList ),
-			TotalBranches( TotalBranches ),
-			Branch( Branch ),
-			Splitter( Splitter ),
-			Mixer( Mixer ),
-			SplitterExists( SplitterExists ),
-			MixerExists( MixerExists ),
-			BypassExists( BypassExists ),
-			LoopHasConnectionComp( LoopHasConnectionComp )
-		{}
-
 	};
 
 	struct LoopPipeData
@@ -168,15 +141,6 @@ namespace PlantManager {
 		// Default Constructor
 		LoopPipeData() :
 			NumPipes( 0 )
-		{}
-
-		// Member Constructor
-		LoopPipeData(
-			int const NumPipes, // Total number of pipes
-			Array1< PipeData > const & Pipe // Pipe data, using definition from DataPlant
-		) :
-			NumPipes( NumPipes ),
-			Pipe( Pipe )
 		{}
 
 	};

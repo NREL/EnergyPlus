@@ -116,33 +116,6 @@ namespace Pipes {
 			EnvrnFlag( true )
 		{}
 
-		// Member Constructor
-		LocalPipeData(
-			std::string const & Name, // main plant (cooling) loop ID
-			int const TypeOf, // type of pipe
-			int const InletNodeNum, // Node number on the inlet side of the plant
-			int const OutletNodeNum, // Node number on the inlet side of the plant
-			int const LoopNum, // Index of plant loop where this pipe resides
-			int const LoopSide, // Index of plant loop side where this pipe resides
-			int const BranchIndex, // Index of plant Branch index where this pipe resides
-			int const CompIndex, // Index of plant Comp index where this pipe resides
-			bool const OneTimeInit,
-			bool const CheckEquipName,
-			bool const EnvrnFlag
-		) :
-			Name( Name ),
-			TypeOf( TypeOf ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			LoopNum( LoopNum ),
-			LoopSide( LoopSide ),
-			BranchIndex( BranchIndex ),
-			CompIndex( CompIndex ),
-			OneTimeInit( OneTimeInit ),
-			CheckEquipName( CheckEquipName ),
-			EnvrnFlag( EnvrnFlag )
-		{}
-
 	};
 
 	// Object Data

@@ -103,15 +103,6 @@ namespace GlobalNames {
 		ComponentNameData()
 		{}
 
-		// Member Constructor
-		ComponentNameData(
-			std::string const & CompType, // Component Type
-			std::string const & CompName // Component Name (user supplied)
-		) :
-			CompType( CompType ),
-			CompName( CompName )
-		{}
-
 	};
 
 	// Object Data

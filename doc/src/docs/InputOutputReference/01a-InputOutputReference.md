@@ -17868,59 +17868,212 @@ The fraction of heat from lights that goes into the zone as long-wave (thermal) 
 
 The fraction of heat from lights that goes into the zone as visible (short-wave) radiation. The program calculates how much of this radiation is absorbed by the inside surfaces of the zone according the area times solar absorptance product of these surfaces.
 
-Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table 14 for overhead fluorescent lighting for the luminaire configurations shown in Figure 51.
+Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table 14 for overhead fluorescent lighting for a variety of luminaire configurations. The data is based on ASHRAE 1282-RP "Lighting Heat Gain Distribution in Buildings" by Daniel E. Fisher and Chanvit Chantrasrisalai.
 
-Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. These values assume that no light heat goes into an adjacent zone. Source: *Lighting Handbook: Reference & Application*, 8<sup>th</sup> Edition, Illuminating Engineering Society of North America, New York, 1993, p. 355.
+Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. 
 
 <table class="table table-striped">
   <tr>
-    <th rowspan="2">Field Name</th>
-    <th colspan="5">Luminaire Configuration, Flourescent Lighting</th>
+    <th>Fixture No.</th>
+    <th>Luminaire Feature</th>
+    <th>Return Air Fraction</th>
+    <th>Fraction Radiant</th>
+    <th>Fraction Visible</th>
+    <th>fconvected</th>
   </tr>
   <tr>
-    <td>Suspended</td>
-    <td>Surface Mount</td>
-    <td>Recessed</td>
-    <td>Luminous and louvered ceiling</td>
-    <td>Return-air ducted</td>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8</td>
+    <td>0.31</td>
+    <td>0.22</td>
+    <td>0.20</td>
+    <td>0.27</td>
   </tr>
   <tr>
-    <td>Return Air Fraction</td>
-    <td>0.0</td>
-    <td>0.0</td>
-    <td>0.0</td>
-    <td>0.0</td>
+    <td>2</td>
+    <td>Recessed, Acrylic Lens, Non-Vented, T8</td>
+    <td>0.56</td>
+    <td>0.12</td>
+    <td>0.20</td>
+    <td>0.12</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8</td>
+    <td>0.28</td>
+    <td>0.19</td>
+    <td>0.20</td>
+    <td>0.33</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Recessed, Acrylic Lens, Vented, T8</td>
+    <td>0.54</td>
+    <td>0.10</td>
+    <td>0.18</td>
+    <td>0.18</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8</td>
+    <td>0.34</td>
+    <td>0.17</td>
+    <td>0.16</td>
+    <td>0.33</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>Recessed, Volumetric, T5</td>
+    <td>0.54</td>
+    <td>0.13</td>
+    <td>0.20</td>
+    <td>0.13</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>Downlights, Compact Fluorescent, DTT</td>
+    <td>0.86</td>
+    <td>0.04</td>
+    <td>0.10</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>Downlights, Compact Fluorescent, TRT</td>
+    <td>0.78</td>
+    <td>0.09</td>
+    <td>0.13</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>9a</td>
+    <td>Downlights, Incandescent, A21</td>
+    <td>0.29</td>
+    <td>0.10</td>
+    <td>0.6</td>
+    <td>0.01</td>
+  </tr>
+  <tr>
+    <td>9b</td>
+    <td>Downlights, Incandescent, BR40</td>
+    <td>0.21</td>
+    <td>0.08</td>
+    <td>0.71</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>Surface Mounted, T5HO</td>
+    <td>0.00</td>
+    <td>0.27</td>
+    <td>0.23</td>
+    <td>0.50</td>
+  </tr>
+  <tr>
+    <td>11</td>
+    <td>Pendant, Direct/Indirect, T8</td>
+    <td>0.00</td>
+    <td>0.32</td>
+    <td>0.23</td>
+    <td>0.45</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>Pendant, Indirect, T5HO</td>
+    <td>0.00</td>
+    <td>0.32</td>
+    <td>0.25</td>
+    <td>0.43</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Ducted</td>
+    <td>0.27</td>
+    <td>0.27</td>
+    <td>0.21</td>
+    <td>0.25</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Ducted</td>
+    <td>0.27</td>
+    <td>0.22</td>
+    <td>0.17</td>
+    <td>0.34</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.45</td>
+    <td>0.30</td>
+    <td>0.22</td>
+    <td>0.03</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.43</td>
+    <td>0.25</td>
+    <td>0.21</td>
+    <td>0.11</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.43</td>
+    <td>0.27</td>
+    <td>0.18</td>
+    <td>0.12</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.10</td>
+    <td>0.16</td>
+    <td>0.20</td>
     <td>0.54</td>
   </tr>
   <tr>
-    <td>Fraction Radiant</td>
-    <td>0.42</td>
-    <td>0.72</td>
-    <td>0.37</td>
-    <td>0.37</td>
-    <td>0.18</td>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.11</td>
+    <td>0.15</td>
+    <td>0.19</td>
+    <td>0.55</td>
   </tr>
   <tr>
-    <td>Fraction Visible</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-  </tr>
-  <tr>
-    <td>f<sub>convected</sub></td>
-    <td>0.40</td>
-    <td>0.10</td>
-    <td>0.45</td>
-    <td>0.45</td>
-    <td>0.10</td>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.04</td>
+    <td>0.13</td>
+    <td>0.16</td>
+    <td>0.67</td>
   </tr>
 </table>
-
-![](media/image086.svg)
-
-Figure 51. Overhead fluorescent luminaire configurations.
 
 #### Field: Fraction Replaceable
 
