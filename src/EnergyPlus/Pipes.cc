@@ -142,7 +142,7 @@ namespace Pipes {
 		}
 		// Now look for this particular pipe in the list
 		for ( auto & pipe : LocalPipe ) {
-			if ( pipe.TypeOf == objectType && pipe.name == objectName ) {
+			if ( pipe.TypeOf == objectType && pipe.Name == objectName ) {
 				return &pipe;
 			}
 		}
@@ -152,13 +152,13 @@ namespace Pipes {
 		return nullptr;
 	}
 
-	bool LocalPipeData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), bool const EP_UNUSED( InitLoopEquip ) ) {
+	void LocalPipeData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ) ) {
 		if ( this->OneTimeInit ) {
 			int FoundOnLoop = 0;
 			bool errFlag = false;
-			DataPlant::ScanPlantLoopsForObject( this->name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, _, _, FoundOnLoop, _, _, errFlag );
+			DataPlant::ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, _, _, FoundOnLoop, _, _, errFlag );
 			if ( FoundOnLoop == 0 ) {
-				ShowFatalError( "SimPipes: Pipe=\"" + this->name + "\" not found on a Plant Loop." );
+				ShowFatalError( "SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop." );
 			}
 			if ( errFlag ) {
 				ShowFatalError( "SimPipes: Program terminated due to previous condition(s)." );
@@ -174,8 +174,6 @@ namespace Pipes {
 		if ( ! DataGlobals::BeginEnvrnFlag ) this->EnvrnFlag = true;
 
 		PlantUtilities::SafeCopyPlantNode( this->InletNodeNum, this->OutletNodeNum, this->LoopNum );
-
-		return true;
 	}
 
 	void
@@ -244,12 +242,12 @@ namespace Pipes {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( LocalPipe.begin(), LocalPipe.end(), cAlphaArgs( 1 ), IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), LocalPipe, PipeWaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			LocalPipe( PipeNum ).name = cAlphaArgs( 1 );
+			LocalPipe( PipeNum ).Name = cAlphaArgs( 1 );
 			LocalPipe( PipeNum ).TypeOf = TypeOf_Pipe;
 
 			LocalPipe( PipeNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
@@ -266,12 +264,12 @@ namespace Pipes {
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( LocalPipe.begin(), LocalPipe.end(), cAlphaArgs( 1 ), IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), LocalPipe, PipeWaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
-			LocalPipe( PipeNum ).name = cAlphaArgs( 1 );
+			LocalPipe( PipeNum ).Name = cAlphaArgs( 1 );
 			LocalPipe( PipeNum ).TypeOf = TypeOf_PipeSteam;
 			LocalPipe( PipeNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			LocalPipe( PipeNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent );

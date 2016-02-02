@@ -59,17 +59,23 @@
 #ifndef PLANTCOMPONENT_HH_INCLUDED
 #define PLANTCOMPONENT_HH_INCLUDED
 
-#include <Named.hh>
-
 namespace EnergyPlus {
 
 	// Forward Declarations
 	struct PlantLocation;
 
-	class PlantComponent : public Named {
+	class PlantComponent {
 
 		public:
-			virtual bool simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip ) = 0;
+			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration ) = 0;
+
+			virtual void getDesignCapacities( Real64 & EP_UNUSED(MaxLoad), Real64 & EP_UNUSED(MinLoad), Real64 & EP_UNUSED(OptLoad) ) {}
+
+			virtual void getDesignTemperatures( Real64 & EP_UNUSED(TempDesCondIn), Real64 & EP_UNUSED(TempDesEvapOut) ) {}
+
+			virtual void getSizingFactor( Real64 & EP_UNUSED(SizFac) ) {}
+
+		~PlantComponent() {}
 
 	};
 

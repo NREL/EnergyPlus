@@ -124,6 +124,7 @@ namespace PipeHeatTransfer {
 	{
 		// Members
 		// Input data
+		std::string Name;
 		std::string Construction; // construction object name
 		std::string Environment; // keyword:  'Schedule', 'OutdoorAir', 'Zone'
 		std::string EnvrSchedule; // temperature schedule for environmental temp
@@ -311,8 +312,8 @@ namespace PipeHeatTransfer {
 		static
 		PlantComponent * factory( int objectType, std::string objectName );
 
-		bool
-		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip );
+		void
+		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration );
 
 		void
 		PushInnerTimeStepArrays();
