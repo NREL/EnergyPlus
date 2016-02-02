@@ -211,7 +211,9 @@ namespace GroundHeatExchangers {
 		virtual void
 		getAnnualTimeConstant()=0;
 
-		void getDesignCapacities( Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
+		void onInitLoopEquip();
+
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
 
 		static PlantComponent * factory( int const objectType, std::string objectName );
 
@@ -261,8 +263,6 @@ namespace GroundHeatExchangers {
 			Real64 const time
 		);
 
-		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration );
-
 	};
 
 	struct GLHESlinky:GLHEBase
@@ -303,8 +303,6 @@ namespace GroundHeatExchangers {
 			maxSimYears( 0.0 ),
 			minSurfTemp( 0.0 )
 		{}
-
-		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration );
 
 		void
 		calcHXResistance();

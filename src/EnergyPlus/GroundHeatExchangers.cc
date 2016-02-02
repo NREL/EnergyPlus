@@ -190,17 +190,11 @@ namespace GroundHeatExchangers {
 	}
 
 
-	void GLHEBase::getDesignCapacities( Real64 & EP_UNUSED(MaxLoad), Real64 & EP_UNUSED(MinLoad), Real64 & EP_UNUSED(OptLoad) ) {
+	void GLHEBase::onInitLoopEquip() {
 		this->initGLHESimVars();
 	}
 
-	void GLHEVert::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration) ) {
-		this->initGLHESimVars();
-		this->calcGroundHeatExchanger();
-		this->updateGHX();
-	}
-
-	void GLHESlinky::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration) ) {
+	void GLHEBase::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 const EP_UNUSED( CurLoad ) ) {
 		this->initGLHESimVars();
 		this->calcGroundHeatExchanger();
 		this->updateGHX();
