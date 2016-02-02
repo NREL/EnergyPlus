@@ -67,7 +67,7 @@ namespace EnergyPlus {
 	class PlantComponent {
 
 		public:
-			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration ) = 0;
+			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad ) = 0;
 
 			virtual void getDesignCapacities( Real64 & EP_UNUSED(MaxLoad), Real64 & EP_UNUSED(MinLoad), Real64 & EP_UNUSED(OptLoad) ) {}
 
