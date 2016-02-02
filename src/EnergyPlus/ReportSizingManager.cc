@@ -85,6 +85,7 @@
 #include <DataPlant.hh>
 #include <WaterCoils.hh>
 #include <Fans.hh>
+#include <DesiccantDehumidifiers.hh>
 
 namespace EnergyPlus {
 
@@ -372,6 +373,7 @@ namespace ReportSizingManager {
 		using WaterCoils::SimpleHeatingCoilUAResidual;
 		using Fans::FanDesDT;
 		using Fans::FanDesHeatGain;
+		using DesiccantDehumidifiers::DesicDehum;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Acc( 0.0001 ); // Accuracy of result
@@ -1508,6 +1510,16 @@ namespace ReportSizingManager {
 						}
 					}
 					bCheckForZero = false;
+				} else if ( SizingType == DesiccantRegCoilDesAirInletTempSizing ) {
+					if ( DesicDehum( DataDesicDehumNum ).RegenInletIsOutsideAirNode ) {
+						AutosizeDes = FinalSysSizing( CurSysNum ).HeatOutTemp;
+					} else {
+						AutosizeDes = FinalSysSizing( CurSysNum ).HeatRetTemp;
+					}
+					bCheckForZero = false;
+				} else if ( SizingType == DesiccantRegCoilDesAirOutletTempSizing ) {
+					AutosizeDes = DesicDehum( DataDesicDehumNum ).RegenSetPointTemp;
+					bCheckForZero = false;
 				} else if ( SizingType == CoolingSHRSizing ) {
 					if ( DataFlowUsedForSizing >= SmallAirVolFlow && DataCapacityUsedForSizing > 0.0 ) {
 						// For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
@@ -1712,6 +1724,9 @@ namespace ReportSizingManager {
 						if ( OASysEqSizing( CurOASysNum ).HeatingCapacity ) {
 							DesCoilLoad = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
 							CoilOutTemp = -999.0;
+						} else if ( DataDesicRegCoil ) {
+							DesCoilLoad = CpAirStd * DesMassFlow * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+							CoilOutTemp = DataDesOutletAirTemp;
 						} else {
 							DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).PreheatTemp - CoilInTemp );
 							CoilOutTemp = FinalSysSizing( CurSysNum ).PreheatTemp;
@@ -1720,6 +1735,9 @@ namespace ReportSizingManager {
 						if ( UnitarySysEqSizing( CurSysNum ).HeatingCapacity ) {
 							DesCoilLoad = UnitarySysEqSizing( CurSysNum ).DesHeatingLoad;
 							CoilOutTemp = -999.0;
+						} else if ( DataDesicRegCoil ) {
+							DesCoilLoad = CpAirStd * DesMassFlow * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+							CoilOutTemp = DataDesOutletAirTemp;
 						} else {
 							DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
 							CoilOutTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;

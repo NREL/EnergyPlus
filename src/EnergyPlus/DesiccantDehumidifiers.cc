@@ -919,6 +919,12 @@ namespace DesiccantDehumidifiers {
 						ErrorsFoundGeneric = true;
 					}
 
+					RegisterRegenerationCoil( RegenCoilType, RegenCoilName, DesicDehumNum, ErrorsFound2 );
+					if ( ErrorsFound2 ) {
+						ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
+						ErrorsFoundGeneric = true;
+					}
+
 				} else if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Water" ) ) {
 					DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingWater;
 					ValidateComponent( RegenCoilType, RegenCoilName, IsNotOK, CurrentModuleObject );
