@@ -296,8 +296,8 @@ namespace DataSizing {
 	extern Array1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
 	extern Array1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
 	extern char SizingFileColSep; // Character to separate columns in sizing outputs
-
-
+	extern int DataDesicDehumNum; // index to desiccant dehumidifier
+	extern bool DataDesicRegCoil; // TRUE if heating coil desiccant regeneration coil
 	// Types
 
 	struct ZoneSizingInputData

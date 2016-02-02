@@ -1169,6 +1169,7 @@ namespace HeatingCoils {
 		int NumOfStages; // total number of stages of multi-stage heating coil
 		int FieldNum = 2; // IDD numeric field number where input field description is found
 		int NumCoilsSized = 0; // counter used to deallocate temporary string array after all coils have been sized
+		Real64 TempSize; // sizing variable temp value
 
 		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage ) {
 			FieldNum = 1 + ( HeatingCoil( CoilNum ).NumOfStages * 2 );
@@ -1187,8 +1188,27 @@ namespace HeatingCoils {
 		CompName = HeatingCoil( CoilNum ).Name;
 		DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
 		DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
+
+		if ( TempCap == AutoSize ) {
+			if ( HeatingCoil( CoilNum ).DesiccantRegenerationCoil ) {
+				bPRINT = false;
+				DataDesicDehumNum = HeatingCoil( CoilNum ).DesiccantDehumNum;
+				TempSize = AutoSize;
+				RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+				DataDesInletAirTemp = TempSize;
+				TempSize = AutoSize;
+				RequestSizing( CompType, CompName, DesiccantRegCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+				DataDesOutletAirTemp = TempSize;
+				DataDesicDehumNum = 0;
+				DataDesicRegCoil = true;
+				bPRINT = true;
+			}
+		}
 		RequestSizing( CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName );
 		DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
+		DataDesicRegCoil = false; // reset global to false so other heating coils are not affected
+		DataDesInletAirTemp = 0.0; // reset global data to zero so other heating coils are not 
+		DataDesOutletAirTemp = 0.0; // reset global data to zero so other heating coils are not affected
 
 		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage || HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGas_MultiStage ) {
 			HeatingCoil( CoilNum ).MSNominalCapacity( HeatingCoil( CoilNum ).NumOfStages ) = TempCap;
@@ -3320,6 +3340,74 @@ namespace HeatingCoils {
 
 	}
 
+	void
+	RegisterRegenerationCoil(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		int & DesiccantDehumIndex, // index of desiccant dehumidifier
+		bool & ErrorsFound // set to true if problem
+		) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   February 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up the given coil and registers the coil as desiccant regeneration coil.
+		// If incorrect coil type or name is given, ErrorsFound is returned as true
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+
+		// Return value
+		// na
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int WhichCoil;
+		int FoundType; // Integer equivalent of coil type
+
+		// Obtains and Allocates HeatingCoil related parameters from input file
+		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
+			GetHeatingCoilInput();
+			GetCoilsInputFlag = false;
+		}
+
+		WhichCoil = 0;
+		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
+		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingDesuperheater ) {
+			WhichCoil = FindItem( CoilName, HeatingCoil );
+			if ( WhichCoil != 0 ) {
+				HeatingCoil( WhichCoil ).DesiccantRegenerationCoil = true;
+				HeatingCoil( WhichCoil ).DesiccantDehumNum = DesiccantDehumIndex;
+			}
+		}
+
+		if ( WhichCoil == 0 ) {
+			ShowSevereError( "GetCoilOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
+			ErrorsFound = true;
+		}
+
+	}
 	//        End of Utility subroutines for the HeatingCoil Module
 
 } // HeatingCoils

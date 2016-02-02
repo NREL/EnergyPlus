@@ -169,6 +169,8 @@ namespace HeatingCoils {
 		Array1D< Real64 > MSNominalCapacity; // Nominal Capacity MS AC Furnace [W]
 		Array1D< Real64 > MSEfficiency; // Efficiency for MS AC Furnace [dimensionless]
 		Array1D< Real64 > MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
+		bool DesiccantRegenerationCoil; // true if it is a gegeneration coil defined in Desiccant Dehumidifier system
+		int DesiccantDehumNum; // index to desiccant dehumidifier object
 
 		// Default Constructor
 		HeatingCoilEquipConditions() :
@@ -210,7 +212,9 @@ namespace HeatingCoils {
 			PLFErrorCount( 0 ),
 			ReclaimHeatingSourceIndexNum( 0 ),
 			ReclaimHeatingSource( 0 ),
-			NumOfStages( 0 )
+			NumOfStages( 0 ),
+			DesiccantRegenerationCoil( false ),
+			DesiccantDehumNum( 0 )
 		{}
 
 	};
@@ -426,6 +430,15 @@ namespace HeatingCoils {
 	void
 	clear_state();
 
+	// register that a coil is used as a rgeneration coil in
+	// desiccant dehumidification system
+	void
+	RegisterRegenerationCoil(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		int & DesiccantDehumIndex, // index of desiccant dehumidifier
+		bool & ErrorsFound // set to true if problem
+	);
 	//        End of Utility subroutines for the HeatingCoil Module
 
 } // HeatingCoils
