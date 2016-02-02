@@ -66,6 +66,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -87,10 +88,10 @@ namespace GroundHeatExchangers {
 
 	// Types
 
-	struct GLHEBase
+	struct GLHEBase : PlantComponent
 	{
 		// Destructor
-		virtual 
+		virtual
 		~GLHEBase()
 		{}
 
@@ -210,6 +211,10 @@ namespace GroundHeatExchangers {
 		virtual void
 		getAnnualTimeConstant()=0;
 
+		void getDesignCapacities( Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
+
+		static PlantComponent * factory( int const objectType, std::string objectName );
+
 	};
 
 	struct GLHEVert:GLHEBase
@@ -256,6 +261,8 @@ namespace GroundHeatExchangers {
 			Real64 const time
 		);
 
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration );
+
 	};
 
 	struct GLHESlinky:GLHEBase
@@ -296,6 +303,8 @@ namespace GroundHeatExchangers {
 			maxSimYears( 0.0 ),
 			minSurfTemp( 0.0 )
 		{}
+
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration );
 
 		void
 		calcHXResistance();
@@ -402,16 +411,6 @@ namespace GroundHeatExchangers {
 
 	void
 	clear_state();
-
-	void
-	SimGroundHeatExchangers(
-		int const GLHETypeNum,
-		std::string const & name,
-		int & compIndex,
-		bool const runFlag,
-		bool const firstIteration,
-		bool const initLoopEquip
-	);
 
 	void
 	GetGroundHeatExchangerInput();
