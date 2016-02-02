@@ -75,6 +75,8 @@ namespace EnergyPlus {
 
 			virtual void getSizingFactor( Real64 & EP_UNUSED(SizFac) ) {}
 
+			virtual void onInitLoopEquip() {}
+
 		~PlantComponent() {}
 
 	};
