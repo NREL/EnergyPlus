@@ -303,24 +303,33 @@ namespace PlantLoopEquip {
 		RunFlag = sim_component.ON;
 		CurLoad = sim_component.MyLoad;
 
+		if ( InitLoopEquip ) {
+			sim_component.compPtr->getDesignCapacities( sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad );
+			sim_component.compPtr->getDesignTemperatures( sim_component.TempDesCondIn, sim_component.TempDesEvapOut );
+			return;
+		}
+		if ( GetCompSizFac ) {
+			sim_component.compPtr->getSizingFactor( sim_component.SizFac );
+		}
+
 		//select equipment and call equiment simulation
 		//PIPES
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration );
 
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );

@@ -94,6 +94,7 @@ namespace Pipes {
 	struct LocalPipeData : public PlantComponent
 	{
 		// Members
+		std::string Name;
 		int TypeOf; // type of pipe
 		int InletNodeNum; // Node number on the inlet side of the plant
 		int OutletNodeNum; // Node number on the inlet side of the plant
@@ -123,7 +124,7 @@ namespace Pipes {
 			static PlantComponent * factory( int objectType, std::string objectName );
 
 		public:
-			bool simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, bool const InitLoopEquip );
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration );
 
 	};
 
