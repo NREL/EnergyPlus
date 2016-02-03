@@ -83,6 +83,8 @@
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
+#include <PlantComponent.hh>
+#include <PlantLocation.hh>
 #include <PlantUtilities.hh>
 #include <ReportSizingManager.hh>
 #include <UtilityRoutines.hh>
@@ -141,7 +143,6 @@ namespace BoilerSteam {
 
 	// Object Data
 	Array1D< BoilerSteamSpecs > Boiler; // dimension to number of machines
-	Array1D< ReportVars > BoilerReport;
 
 	// MODULE SUBROUTINES:
 
@@ -162,7 +163,6 @@ namespace BoilerSteam {
 		BoilerMassFlowMinAvail = 0.0;
 		CheckEquipName.deallocate();
 		Boiler.deallocate();
-		BoilerReport.deallocate();
 	}
 
 	PlantComponent * BoilerSteamSpecs::factory( int const EP_UNUSED(objectType), std::string objectName ) {
@@ -193,29 +193,10 @@ namespace BoilerSteam {
 		bool const FirstHVACIteration, 
 		Real64 & CurLoad )
 	{
-	}
-	
-	void
-	SimSteamBoiler(
-		std::string const & EP_UNUSED( BoilerType ), // boiler type (used in CASE statement)
-		std::string const & BoilerName, // boiler identifier
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int & CompIndex, // boiler counter/identifier
-		bool const RunFlag, // if TRUE run boiler simulation--boiler is ON
-		bool const FirstHVACIteration, // TRUE if First iteration of simulation
-		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
-		Real64 & MyLoad, // W - Actual demand boiler must satisfy--calculated by load dist. routine
-		Real64 & MaxCap, // W - maximum boiler operating capacity
-		Real64 & MinCap, // W - minimum boiler operating capacity
-		Real64 & OptCap, // W - optimal boiler operating capacity
-		bool const GetSizingFactor, // TRUE when just the sizing factor is requested
-		Real64 & SizingFactor // sizing factor
-	)
-	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rahul Chillar
-		//       DATE WRITTEN
-		//       MODIFIED
+		//       DATE WRITTEN   
+		//       MODIFIED       Feb. 2016, R. Zhang - LBNL, refactor plant component
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -226,40 +207,35 @@ namespace BoilerSteam {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using namespace FluidProperties;
+		// na
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		bool RunFlag;
+		int EquipFlowCtrl;
 
 		// DERIVED TYPE DEFINITIONS
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int BoilerNum; // boiler counter/identifier
-
-		// Initialize Loop Equipment
-		if ( InitLoopEquip ) {
-			InitBoiler( BoilerNum );
-			SizeBoiler( BoilerNum );
-			MinCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MinPartLoadRat;
-			MaxCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MaxPartLoadRat;
-			OptCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).OptPartLoadRat;
-			if ( GetSizingFactor ) {
-				SizingFactor = Boiler( BoilerNum ).SizFac;
-			}
-			return;
-		}
+		// na
 
 		//Calculate Load
 		//Select boiler type and call boiler model
-		InitBoiler( BoilerNum );
-		CalcBoilerModel( BoilerNum, MyLoad, RunFlag, EquipFlowCtrl );
-		UpdateBoilerRecords( MyLoad, RunFlag, BoilerNum, FirstHVACIteration );
-
+		this->InitBoiler();
+		
+		if ( std::abs( CurLoad ) < DataPlant::LoopDemandTol ){
+			RunFlag = false;
+		} else {
+			RunFlag = true;
+		}
+		
+		EquipFlowCtrl = DataPlant::PlantLoop( calledFromLocation.loopNum ).LoopSide( calledFromLocation.loopSideNum ).Branch( calledFromLocation.branchNum ).Comp( calledFromLocation.compNum ).FlowCtrl;
+		
+		this->CalcBoilerModel( CurLoad, RunFlag, EquipFlowCtrl );
+		this->UpdateBoilerRecords( CurLoad, RunFlag );
 	}
 
 	void 
@@ -299,7 +275,7 @@ namespace BoilerSteam {
 	};
 	
 	void 
-	BoilerSpecs::getDesignCapacities( 
+	BoilerSteamSpecs::getDesignCapacities( 
 		const PlantLocation & EP_UNUSED(calledFromLocation), 
 		Real64 & MaxLoad, 
 		Real64 & MinLoad, 
@@ -413,8 +389,6 @@ namespace BoilerSteam {
 		Boiler.allocate( NumBoilers );
 		CheckEquipName.dimension( NumBoilers, true );
 		BoilerFuelTypeForOutputVariable.allocate( NumBoilers );
-
-		BoilerReport.allocate( NumBoilers );
 
 		//LOAD ARRAYS WITH CURVE FIT Boiler DATA
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
@@ -540,17 +514,17 @@ namespace BoilerSteam {
 		}
 
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
-			SetupOutputVariable( "Boiler Heating Rate [W]", BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Heating Energy [J]", BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
+			SetupOutputVariable( "Boiler Heating Rate [W]", Boiler( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Heating Energy [J]", Boiler( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
 			if ( SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
-				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power [W]", Boiler( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			} else {
-				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", Boiler( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", _, "Plant" );
-			SetupOutputVariable( "Boiler Steam Inlet Temperature [C]", BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Steam Outlet Temperature [C]", BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Steam Mass Flow Rate [kg/s]", BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", Boiler( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", _, "Plant" );
+			SetupOutputVariable( "Boiler Steam Inlet Temperature [C]", Boiler( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Steam Outlet Temperature [C]", Boiler( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Steam Mass Flow Rate [kg/s]", Boiler( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );
 
 		}
 

@@ -224,7 +224,7 @@ namespace PlantLoopEquip {
 		using CondenserLoopTowers::SimTowers;
 		using FluidCoolers::SimFluidCoolers;
 		using EvaporativeFluidCoolers::SimEvapFluidCoolers;
-		using BoilerSteam::SimSteamBoiler;
+		//using BoilerSteam::SimSteamBoiler;
 		using IceThermalStorage::SimIceStorage;
 		using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
 		using MicroCHPElectricGenerator::SimMicroCHPPlantHeatRecovery;
@@ -692,7 +692,8 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_Boiler_Steam ) {
-				SimSteamBoiler( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				//SimSteamBoiler( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;

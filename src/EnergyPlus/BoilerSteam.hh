@@ -140,7 +140,6 @@ namespace BoilerSteam {
 		Real64 BoilerInletTemp; // C - Boiler inlet temperature
 		Real64 BoilerOutletTemp; // C - Boiler outlet temperature
 		Real64 Mdot; // kg/s - Boiler mass flow rate
-		Real64 BoilerMaxOperPress;
 
 		// Default Constructor
 		BoilerSteamSpecs() :
@@ -180,8 +179,7 @@ namespace BoilerSteam {
 			FuelConsumed( 0.0 ),
 			BoilerInletTemp( 0.0 ),
 			BoilerOutletTemp( 0.0 ),
-			Mdot( 0.0 ),
-			BoilerMaxOperPress( 0.0 )
+			Mdot( 0.0 )
 		{}
 		
 		
