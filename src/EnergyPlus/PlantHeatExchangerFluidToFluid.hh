@@ -65,6 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -105,9 +106,9 @@ namespace PlantHeatExchangerFluidToFluid {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern std::string ComponentClassName;
+	extern std::string nsvComponentClassName;
 	extern int NumberOfPlantFluidHXs;
-	extern bool GetInput;
+	extern bool GetHXInput;
 	extern Array1D_bool CheckFluidHXs;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -178,7 +179,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 	};
 
-	struct HeatExchangerStruct
+	struct HeatExchangerStruct: public PlantComponent
 	{
 		// Members
 		std::string Name;
@@ -209,6 +210,8 @@ namespace PlantHeatExchangerFluidToFluid {
 		int DmdSideModulatSolvNoConvergeErrorIndex;
 		int DmdSideModulatSolvFailErrorCount;
 		int DmdSideModulatSolvFailErrorIndex;
+		bool myFlag;
+		bool myEnvrnFlag;
 
 		// Default Constructor
 		HeatExchangerStruct() :
@@ -231,8 +234,48 @@ namespace PlantHeatExchangerFluidToFluid {
 			DmdSideModulatSolvNoConvergeErrorCount( 0 ),
 			DmdSideModulatSolvNoConvergeErrorIndex( 0 ),
 			DmdSideModulatSolvFailErrorCount( 0 ),
-			DmdSideModulatSolvFailErrorIndex( 0 )
+			DmdSideModulatSolvFailErrorIndex( 0 ),
+			myFlag( true ),
+			myEnvrnFlag( true )
 		{}
+
+		public:
+			static PlantComponent * factory( int objectType, std::string objectName );
+
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+
+			void getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & EP_UNUSED(MaxLoad), Real64 & EP_UNUSED(MinLoad), Real64 & EP_UNUSED(OptLoad) ) override;
+
+			void onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) override;
+
+		private:
+			void init();
+
+			void size();
+
+			void control(
+				Real64 const MyLoad
+			);
+
+			void calc(
+				Real64 const SupSideMdot, // mass flow rate of fluid entering from supply side loop
+				Real64 const DmdSideMdot // mass flow rate of fluid entering from demand side loop
+			);
+
+			void update();
+
+			void report();
+
+			void findHXDemandSideLoopFlow(
+				Real64 const TargetSupplySideLoopLeavingTemp,
+				int const HXActionMode
+			);
+
+			Real64 HXDemandSideLoopFlowResidual(
+				Real64 const DmdSideMassFlowRate,
+				Array1< Real64 > const & Par // Par(1) = HX index number
+			);
+
 
 	};
 
@@ -241,64 +284,10 @@ namespace PlantHeatExchangerFluidToFluid {
 
 	// Functions
 
-	void
-	SimFluidHeatExchanger(
-		int const LoopNum, // plant loop sim call originated from
-		int const LoopSideNum, // plant loop side sim call originated from
-		std::string const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
-		std::string const & EquipName, // user name for component
-		int & CompIndex,
-		bool & InitLoopEquip,
-		Real64 const MyLoad,
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap
-	);
 
 	void
 	GetFluidHeatExchangerInput();
 
-	void
-	InitFluidHeatExchanger(
-		int const CompNum,
-		int const LoopNum
-	);
-
-	void
-	SizeFluidHeatExchanger( int const CompNum );
-
-	void
-	ControlFluidHeatExchanger(
-		int const CompNum,
-		int const LoopNum,
-		Real64 const MyLoad
-	);
-
-	void
-	CalcFluidHeatExchanger(
-		int const CompNum,
-		Real64 const SupSideMdot, // mass flow rate of fluid entering from supply side loop
-		Real64 const DmdSideMdot // mass flow rate of fluid entering from demand side loop
-	);
-
-	void
-	FindHXDemandSideLoopFlow(
-		int const CompNum,
-		Real64 const TargetSupplySideLoopLeavingTemp,
-		int const HXActionMode
-	);
-
-	Real64
-	HXDemandSideLoopFlowResidual(
-		Real64 const DmdSideMassFlowRate,
-		Array1< Real64 > const & Par // Par(1) = HX index number
-	);
-
-	void
-	UpdateFluidHeatExchanger( int const CompNum );
-
-	void
-	ReportFluidHeatExchanger( int const CompNum );
 
 } // PlantHeatExchangerFluidToFluid
 
