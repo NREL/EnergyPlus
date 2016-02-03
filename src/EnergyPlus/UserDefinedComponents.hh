@@ -83,16 +83,16 @@ namespace UserDefinedComponents {
 
 	// MODULE VARIABLE DECLARATIONS:
 
-	extern int NumUserPlantComps;
-	extern int NumUserCoils;
-	extern int NumUserZoneAir;
-	extern int NumUserAirTerminals;
+	extern int zzzNumUserPlantComps;
+	extern int zzzNumUserCoils;
+	extern int zzzNumUserZoneAir;
+	extern int zzzNumUserAirTerminals;
 
-	extern Array1D_bool CheckUserPlantCompName;
-	extern Array1D_bool CheckUserCoilName;
-	extern Array1D_bool CheckUserZoneAirName;
-	extern Array1D_bool CheckUserAirTerminal;
-	extern bool GetInput;
+	extern Array1D_bool zzzCheckUserPlantCompName;
+	extern Array1D_bool zzzCheckUserCoilName;
+	extern Array1D_bool zzzCheckUserZoneAirName;
+	extern Array1D_bool zzzCheckUserAirTerminal;
+	extern bool zzzGetInput;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
