@@ -65,8 +65,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
+
+	// Forward Declarations
+	struct PlantLocation;
 
 namespace Boilers {
 
@@ -113,7 +117,7 @@ namespace Boilers {
 
 	// Types
 
-	struct BoilerSpecs
+	struct BoilerSpecs : public PlantComponent
 	{
 		// Members
 		std::string Name; // user identifier
@@ -193,7 +197,14 @@ namespace Boilers {
 			CalculatedEffIndex( 0 ),
 			IsThisSized( false )
 		{}
+		
+		
+		public:
+			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
 
+		public:
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
+ 
 	};
 
 	struct ReportVars

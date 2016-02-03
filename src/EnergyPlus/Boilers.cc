@@ -85,6 +85,8 @@
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <PlantUtilities.hh>
+#include <PlantComponent.hh>
+#include <PlantLocation.hh>
 #include <ReportSizingManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -194,6 +196,29 @@ namespace Boilers {
 		BoilerReport.deallocate();
 	}
 
+	PlantComponent * BoilerSpecs::factory( int const EP_UNUSED(objectType), std::string objectName ) {
+
+		//Get Input
+		if ( GetInput ) {
+			GetBoilerInput();
+			GetInput = false;
+		}
+		
+		// Now look for this particular component in the list
+		for ( auto & BoilerItem : Boiler ) {
+			if ( BoilerItem.Name == objectName ) {
+				return &BoilerItem;
+			}
+		}
+		// If we didn't find it, fatal
+		ShowFatalError( "BoilerSpecs::factory : Error getting inputs for Boiler named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
+	}
+
+	void BoilerSpecs::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 const EP_UNUSED( CurLoad ) ) {
+	}
+
 	void
 	SimBoiler(
 		std::string const & EP_UNUSED( BoilerType ), // boiler type (used in CASE statement)
@@ -239,12 +264,6 @@ namespace Boilers {
 		int BoilerNum; // boiler counter/identifier
 
 		//FLOW
-
-		//Get Input
-		if ( GetInput ) {
-			GetBoilerInput();
-			GetInput = false;
-		}
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
