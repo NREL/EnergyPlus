@@ -303,8 +303,8 @@ namespace PlantLoopEquip {
 
 		if ( sim_component.compPtr != nullptr ) {
 			if ( InitLoopEquip ) {
-				sim_component.compPtr->onInitLoopEquip();
-				sim_component.compPtr->getDesignCapacities( sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad );
+				sim_component.compPtr->onInitLoopEquip( sim_component_location );
+				sim_component.compPtr->getDesignCapacities( sim_component_location, sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad );
 				sim_component.compPtr->getDesignTemperatures( sim_component.TempDesCondIn, sim_component.TempDesEvapOut );
 				return;
 			}
