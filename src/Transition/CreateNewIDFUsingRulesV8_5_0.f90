@@ -800,6 +800,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ENDIF
                 ENDDO
 
+              CASE('AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT')  
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:15)=InArgs(1:15)   ! No change at all
+                OutArgs(16:16)=InArgs(17:17) ! Moved up
+                CurArgs = CurArgs - 1
+              CASE('AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT')  
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:16)=InArgs(1:16)   ! No change at all
+                OutArgs(17:17)=InArgs(18:18) ! Moved up
+                CurArgs = CurArgs - 1
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
                     WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is not in the "new" IDD.'
