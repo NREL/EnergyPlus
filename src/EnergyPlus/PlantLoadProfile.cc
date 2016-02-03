@@ -147,7 +147,7 @@ namespace PlantLoadProfile {
 	void
 	PlantProfileData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ),
 				    bool const EP_UNUSED( FirstHVACIteration ),
-				    Real64 const EP_UNUSED( CurLoad ) )
+				    Real64 & EP_UNUSED( CurLoad ) )
 	{
 
 		// SUBROUTINE INFORMATION:

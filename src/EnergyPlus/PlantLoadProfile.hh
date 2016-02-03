@@ -151,7 +151,7 @@ namespace PlantLoadProfile {
 		void
 		simulate( const PlantLocation & calledFromLocation,
 			  bool const FirstHVACIteration,
-			  Real64 const CurLoad 
+			  Real64 & CurLoad 
 			 );
 
 		void
