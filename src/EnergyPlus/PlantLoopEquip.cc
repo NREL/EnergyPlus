@@ -246,7 +246,7 @@ namespace PlantLoopEquip {
 		using PhotovoltaicThermalCollectors::SimPVTcollectors;
 		using PhotovoltaicThermalCollectors::CalledFromPlantLoopEquipMgr;
 		using PlantPipingSystemsManager::SimPipingSystemCircuit;
-		using UserDefinedComponents::SimUserDefinedPlantComponent;
+		//using UserDefinedComponents::simulate;
 		using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
 		using PlantComponentTemperatureSources::SimWaterSource;
 		using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
@@ -1140,7 +1140,8 @@ namespace PlantLoopEquip {
 
 			if ( EquipTypeNum == TypeOf_PlantComponentUserDefined ) {
 
-				SimUserDefinedPlantComponent( LoopNum, LoopSideNum, sim_component.TypeOf, sim_component.Name, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				//SimUserDefinedPlantComponent( LoopNum, LoopSideNum, sim_component.TypeOf, sim_component.Name, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;

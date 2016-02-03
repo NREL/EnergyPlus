@@ -256,18 +256,31 @@ namespace UserDefinedComponents {
 		AirConnectionStruct Air;
 		WaterUseTankConnectionStruct Water;
 		ZoneInternalGainsStruct Zone;
+		bool MyFlag;
+		bool MyEnvrnFlag;
 
 		// Default Constructor
 		UserPlantComponentStruct() :
 			ErlSimProgramMngr( 0 ),
-			NumPlantConnections( 0 )
+			NumPlantConnections( 0 ),
+			MyFlag( true ),
+			MyEnvrnFlag( true )
 		{}
 
 		public:
+			//virtual
 			static PlantComponent * factory( std::string objectName );
-
-		public:
-			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
+			
+			void simulate( const PlantLocation & calledFromLocation, bool const EP_UNUSED( FirstHVACIteration ), Real64 const CurLoad );
+			
+			void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 OptLoad, int  ) {} 
+			
+			void onInitLoopEquip( const PlantLocation & calledFromLocation, Real64 const CurLoad ); //@@
+			
+			//not virtual
+			void InitPlantUserComponent( int const LoopNum, Real64 const CurLoad );
+			
+			void ReportPlantUserComponent( int const LoopNum );
 
 	};
 
@@ -365,20 +378,6 @@ namespace UserDefinedComponents {
 	// Functions
 
 	void
-	SimUserDefinedPlantComponent(
-		int const LoopNum, // plant loop sim call originated from
-		int const LoopSideNum, // plant loop side sim call originated from
-		std::string const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
-		std::string const & EquipName, // user name for component
-		int & CompIndex,
-		bool & InitLoopEquip,
-		Real64 const MyLoad,
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap
-	);
-
-	void
 	SimCoilUserDefined(
 		std::string const & EquipName, // user name for component
 		int & CompIndex,
@@ -409,13 +408,6 @@ namespace UserDefinedComponents {
 	GetUserDefinedComponents();
 
 	void
-	InitPlantUserComponent(
-		int const CompNum,
-		int const LoopNum,
-		Real64 const MyLoad
-	);
-
-	void
 	InitCoilUserDefined( int const CompNum );
 
 	void
@@ -428,12 +420,6 @@ namespace UserDefinedComponents {
 	InitAirTerminalUserDefined(
 		int const CompNum,
 		int const ZoneNum
-	);
-
-	void
-	ReportPlantUserComponent(
-		int const CompNum,
-		int const LoopNum
 	);
 
 	void
