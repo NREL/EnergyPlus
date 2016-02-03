@@ -78,7 +78,7 @@ namespace EnergyPlus {
 
 		HeatPumpWaterToWaterParameterEstimationHeating();
 
-		~HeatPumpWaterToWaterParameterEstimationHeating() {}
+		virtual ~HeatPumpWaterToWaterParameterEstimationHeating() {}
 
 		void 
 		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
