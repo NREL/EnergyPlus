@@ -268,8 +268,8 @@ namespace UserDefinedComponents {
 		{}
 
 		public:
-			//virtual
-			static PlantComponent * factory( std::string objectName );
+			
+			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
 			
 			void simulate( const PlantLocation & calledFromLocation, bool const EP_UNUSED( FirstHVACIteration ), Real64 const CurLoad );
 			
@@ -277,7 +277,6 @@ namespace UserDefinedComponents {
 			
 			void onInitLoopEquip( const PlantLocation & calledFromLocation ); 
 			
-			//not virtual
 			void InitPlantUserComponent( int const LoopNum, Real64 const CurLoad );
 			
 			void ReportPlantUserComponent( int const LoopNum );

@@ -151,7 +151,7 @@ namespace UserDefinedComponents {
 
 	// Functions
 
-	PlantComponent * UserPlantComponentStruct::factory( std::string objectName ) {
+	PlantComponent * UserPlantComponentStruct::factory( int const EP_UNUSED(objectType),  std::string objectName ) {
 
 		if ( zzzGetInput ) {
 			GetUserDefinedComponents();

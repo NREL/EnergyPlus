@@ -95,6 +95,7 @@
 #include <SetPointManager.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
+#include <UserDefinedComponents.hh>
 
 namespace EnergyPlus {
 
@@ -1312,6 +1313,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
 							this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
 							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+							this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory( TypeOf_PlantComponentUserDefined, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Coil:UserDefined" ) ) {
 							this_comp.TypeOf_Num = TypeOf_CoilUserDefined;
 							this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
