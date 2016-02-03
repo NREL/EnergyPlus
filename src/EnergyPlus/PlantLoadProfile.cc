@@ -137,9 +137,9 @@ namespace PlantLoadProfile {
 		// Shut up the compiler
 		return nullptr;
 	}
-						
+
 	void
-	PlantProfileData::onInitLoopEquip( void )
+	PlantProfileData::onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) )
 	{
 		this->InitPlantProfile( );
 	}
@@ -176,29 +176,25 @@ namespace PlantLoadProfile {
 		static std::string const RoutineName( "SimulatePlantProfile" );
 		Real64 DeltaTemp;
 
-		Real64 Cp; // local fluid specific heat
-
-		
 		this->InitPlantProfile( );
 
 		if ( this->MassFlowRate > 0.0 ) {
-
-			Cp = GetSpecificHeatGlycol( PlantLoop( this->WLoopNum ).FluidName, this->InletTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
-			
+			Real64 Cp = GetSpecificHeatGlycol( PlantLoop( this->WLoopNum ).FluidName, this->InletTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
 			DeltaTemp = this->Power / ( this->MassFlowRate * Cp );
 		} else {
 			this->Power = 0.0;
 			DeltaTemp = 0.0;
 		}
-		
+
 		this->OutletTemp = this->InletTemp - DeltaTemp;
-		
+
 		this->UpdatePlantProfile( );
 		this->ReportPlantProfile( );
+
 	} // simulate()
 
 	void
-	PlantProfileData::InitPlantProfile( void )
+	PlantProfileData::InitPlantProfile()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -227,9 +223,6 @@ namespace PlantLoadProfile {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "InitPlantProfile" );
-		int InletNode;
-		int OutletNode;
-		Real64 MaxFlowMultiplier;
 		Real64 FluidDensityInit;
 		bool errFlag;
 
@@ -248,10 +241,6 @@ namespace PlantLoadProfile {
 			}
 		}
 
-		// FLOW:
-		InletNode = this->InletNode;
-		OutletNode = this->OutletNode;
-
 		if ( ! SysSizingCalc && this->InitSizing ) {
 			RegisterPlantCompDesignFlow( InletNode, this->PeakVolFlowRate );
 			this->InitSizing = false;
@@ -265,9 +254,9 @@ namespace PlantLoadProfile {
 
 			FluidDensityInit = GetDensityGlycol( PlantLoop( this->WLoopNum ).FluidName, InitConvTemp, PlantLoop( this->WLoopNum ).FluidIndex, RoutineName );
 
-			MaxFlowMultiplier = GetScheduleMaxValue( this->FlowRateFracSchedule );
+			Real64 MaxFlowMultiplier = GetScheduleMaxValue( this->FlowRateFracSchedule );
 
-			InitComponentNodes( 0.0, this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum );
+			InitComponentNodes( 0.0, this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, this->InletNode, this->OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum );
 
 			this->EMSOverrideMassFlow = false;
 			this->EMSMassFlowValue = 0.0;
@@ -301,7 +290,7 @@ namespace PlantLoadProfile {
 	} // InitPlantProfile()
 
 	void
-	PlantProfileData::UpdatePlantProfile( void )
+	PlantProfileData::UpdatePlantProfile()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -337,7 +326,7 @@ namespace PlantLoadProfile {
 	}
 
 	void
-	PlantProfileData::ReportPlantProfile( void )
+	PlantProfileData::ReportPlantProfile()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -480,14 +469,14 @@ namespace PlantLoadProfile {
 
 	}
 
-	void 
+	void
 	clear_state(){
 		NumOfPlantProfile = 0;
 		GetPlantLoadProfileInputFlag = true;
 		PlantProfile.deallocate();
 	}
 
-	
+
 } // namespace PlantLoadProfile
 
 } // namespace EnergyPlus

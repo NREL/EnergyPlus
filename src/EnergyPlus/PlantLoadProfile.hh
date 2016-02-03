@@ -151,28 +151,28 @@ namespace PlantLoadProfile {
 		void
 		simulate( const PlantLocation & calledFromLocation,
 			  bool const FirstHVACIteration,
-			  Real64 & CurLoad 
+			  Real64 & CurLoad
 			 );
 
 		void
-		onInitLoopEquip( void );
-		
+		onInitLoopEquip( const PlantLocation & calledFromLocation );
+
 		void
-		InitPlantProfile( void );
-		
+		InitPlantProfile();
+
 		void
-		UpdatePlantProfile( void );
-		
+		UpdatePlantProfile();
+
 		void
-		ReportPlantProfile( void );
+		ReportPlantProfile();
 	};
-	
+
 	// Object Data
 	extern Array1D< PlantProfileData > PlantProfile;
 
 	// This could be static inside the class
 	void
-	GetPlantProfileInput( void );
+	GetPlantProfileInput();
 
 	// As could this
 	void
