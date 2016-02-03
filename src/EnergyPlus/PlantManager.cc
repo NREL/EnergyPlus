@@ -67,6 +67,7 @@
 
 // EnergyPlus Headers
 #include <PlantManager.hh>
+#include <Boilers.hh>
 #include <BranchInputManager.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
@@ -80,6 +81,7 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -746,8 +748,6 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-		using Pipes::InitializePipes;
-		using PipeHeatTransfer::InitializeHeatTransferPipes;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -889,22 +889,27 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Pipe;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_Pipe, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Adiabatic:Steam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeSteam;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_PipeSteam, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Outdoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeExterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeExterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Indoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeInterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeInterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Underground" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeUnderground;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeUnderground, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "PipingSystem:Underground:PipeCircuit" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
@@ -1016,6 +1021,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgVertical;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgVertical, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
@@ -1028,6 +1034,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgSlinky, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Chiller:Electric:EIR" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1080,6 +1087,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
 							this_comp.GeneralEquipType = GenEquipTypes_Boiler;
 							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+							this_comp.compPtr = Boilers::BoilerSpecs::factory( TypeOf_Boiler_Simple, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Boiler:Steam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Boiler_Steam;
 							this_comp.GeneralEquipType = GenEquipTypes_Boiler;
@@ -1588,7 +1596,7 @@ namespace PlantManager {
 									//                            TempLoop%Branch(BranchNum)%Comp(CompNum)%CompNum, &
 									//                            0.0d0)
 								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior ) {
-									InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
+									//InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
 								}
 							}
 						}
