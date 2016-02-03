@@ -806,33 +806,6 @@ namespace DataPlant {
 
 	};
 
-	struct PlantLocation
-	{
-		// Members
-		int LoopNum;
-		int LoopSideNum;
-		int BranchNum;
-		int CompNum;
-
-		// Default Constructor
-		PlantLocation()
-		{}
-
-		// Member Constructor
-		PlantLocation(
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
-		{}
-
-	};
-
 	struct PlantConvergencePoint
 	{
 		// Members

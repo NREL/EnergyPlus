@@ -302,14 +302,16 @@ namespace PlantLoopEquip {
 		RunFlag = sim_component.ON;
 		CurLoad = sim_component.MyLoad;
 
-		if ( InitLoopEquip ) {
-			sim_component.compPtr->onInitLoopEquip();
-			sim_component.compPtr->getDesignCapacities( sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad );
-			sim_component.compPtr->getDesignTemperatures( sim_component.TempDesCondIn, sim_component.TempDesEvapOut );
-			return;
-		}
-		if ( GetCompSizFac ) {
-			sim_component.compPtr->getSizingFactor( sim_component.SizFac );
+		if ( sim_component.compPtr != nullptr ) {
+			if ( InitLoopEquip ) {
+				sim_component.compPtr->onInitLoopEquip();
+				sim_component.compPtr->getDesignCapacities( sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad );
+				sim_component.compPtr->getDesignTemperatures( sim_component.TempDesCondIn, sim_component.TempDesEvapOut );
+				return;
+			}
+			if ( GetCompSizFac ) {
+				sim_component.compPtr->getSizingFactor( sim_component.SizFac );
+			}
 		}
 
 		//select equipment and call equiment simulation
