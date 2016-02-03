@@ -194,7 +194,7 @@ namespace PipeHeatTransfer {
 		return nullptr;
 	}
 
-	void PipeHTData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 const EP_UNUSED( CurLoad ) ) {
+	void PipeHTData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 & EP_UNUSED( CurLoad ) ) {
 		this->InitPipesHeatTransfer( FirstHVACIteration );
 		// make the calculations
 		for ( int InnerTimeStepCtr = 1; InnerTimeStepCtr <= nsvNumInnerTimeSteps; ++InnerTimeStepCtr ) {
