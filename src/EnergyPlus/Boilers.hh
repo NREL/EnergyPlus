@@ -157,6 +157,8 @@ namespace Boilers {
 		int CalculatedEffError; // calculated efficiency >1.1 recurring warning error counter
 		int CalculatedEffIndex; // calculated efficiency >1.1 recurring warning error message index
 		bool IsThisSized; // TRUE if sizing is done
+		bool MyEnvrnFlag; // environment flag
+		bool MyFlag;
 
 		// Default Constructor
 		BoilerSpecs() :
@@ -202,9 +204,12 @@ namespace Boilers {
 		public:
 			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
 
-		public:
 			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
  
+			void onInitLoopEquip( const PlantLocation & calledFromLocation ); 
+			
+			void InitBoiler();
+			void SizeBoiler();
 	};
 
 	struct ReportVars
@@ -264,12 +269,6 @@ namespace Boilers {
 
 	void
 	GetBoilerInput();
-
-	void
-	InitBoiler( int const BoilerNum ); // number of the current boiler being simulated
-
-	void
-	SizeBoiler( int const BoilerNum );
 
 	void
 	CalcBoilerModel(

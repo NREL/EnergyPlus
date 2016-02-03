@@ -218,96 +218,62 @@ namespace Boilers {
 
 	void BoilerSpecs::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 const EP_UNUSED( CurLoad ) ) {
 	}
-
-	void
-	SimBoiler(
-		std::string const & EP_UNUSED( BoilerType ), // boiler type (used in CASE statement)
-		std::string const & BoilerName, // boiler identifier
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int & CompIndex, // boiler counter/identifier
-		bool const RunFlag, // if TRUE run boiler simulation--boiler is ON
-		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
-		Real64 & MyLoad, // W - Actual demand boiler must satisfy--calculated by load dist. routine
-		Real64 & MaxCap, // W - maximum boiler operating capacity
-		Real64 & MinCap, // W - minimum boiler operating capacity
-		Real64 & OptCap, // W - optimal boiler operating capacity
-		bool const GetSizingFactor, // TRUE when just the sizing factor is requested
-		Real64 & SizingFactor // sizing factor
-	)
+	
+	void 
+	BoilerSpecs::onInitLoopEquip(
+		const PlantLocation & calledFromLocation 
+	){
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         DAN FISHER
-		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       Taecheol Kim, May 2000
+		//       DATE WRITTEN   Sep. 1998
+		//       MODIFIED       May. 2000, T. Kim
+		//       MODIFIED       Feb. 2016, R. Zhang, Refactor plant component
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subrountine controls the boiler component simulation
+		// User Defined plant generic component
 
-		// METHODOLOGY EMPLOYED: na
+		// METHODOLOGY EMPLOYED:
+		// This routine to be called from PlantLoopEquipment.
 
-		// REFERENCES: na
+		// REFERENCES:
+		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+		using General::TrimSigDigits;
+		using EMSManager::ManageEMS;
+		using PlantUtilities::RegisterPlantCompDesignFlow;
+		using PlantUtilities::InitComponentNodes;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
+
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
 
-		// DERIVED TYPE DEFINITIONS
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true ); // if TRUE read user input
-		int BoilerNum; // boiler counter/identifier
-
-		//FLOW
-
-		// Find the correct Equipment
-		if ( CompIndex == 0 ) {
-			BoilerNum = FindItemInList( BoilerName, Boiler );
-			if ( BoilerNum == 0 ) {
-				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
-			}
-			CompIndex = BoilerNum;
-		} else {
-			BoilerNum = CompIndex;
-			if ( BoilerNum > NumBoilers || BoilerNum < 1 ) {
-				ShowFatalError( "SimBoiler:  Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Number of Units=" + TrimSigDigits( NumBoilers ) + ", Entered Unit name=" + BoilerName );
-			}
-			if ( CheckEquipName( BoilerNum ) ) {
-				if ( BoilerName != Boiler( BoilerNum ).Name ) {
-					ShowFatalError( "SimBoiler: Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Unit name=" + BoilerName + ", stored Unit Name for that index=" + Boiler( BoilerNum ).Name );
-				}
-				CheckEquipName( BoilerNum ) = false;
-			}
+		
+		// this->IsThisSized = false;
+		// this->IsThisSized = true;
+		this->InitBoiler();
+		this->SizeBoiler();
+		MinCap = this->NomCap * this->MinPartLoadRat;
+		MaxCap = this->NomCap * this->MaxPartLoadRat;
+		OptCap = this->NomCap * this->OptPartLoadRat;
+		if ( GetSizingFactor ) {
+			SizingFactor = this->SizFac;
 		}
-
-		// Initialize Loop Equipment
-		if ( InitLoopEquip ) {
-//			Boiler( BoilerNum ).IsThisSized = false;
-			InitBoiler( BoilerNum );
-//			Boiler( BoilerNum ).IsThisSized = true;
-			SizeBoiler( BoilerNum );
-			MinCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MinPartLoadRat;
-			MaxCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MaxPartLoadRat;
-			OptCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).OptPartLoadRat;
-			if ( GetSizingFactor ) {
-				SizingFactor = Boiler( BoilerNum ).SizFac;
-			}
-			return;
-		}
-		//Calculate Load
-
-		//Select boiler type and call boiler model
-		InitBoiler( BoilerNum );
-		CalcBoilerModel( BoilerNum, MyLoad, RunFlag, EquipFlowCtrl );
-		UpdateBoilerRecords( MyLoad, RunFlag, BoilerNum );
-
-	}
-
+	
+	};
+	
+		
 	void
 	GetBoilerInput()
 	{
@@ -596,13 +562,13 @@ namespace Boilers {
 	}
 
 	void
-	InitBoiler( int const BoilerNum ) // number of the current boiler being simulated
+	BoilerSpecs::InitBoiler()
 	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   April 2002
-		//       MODIFIED       na
+		//       MODIFIED       Feb. 2016, R. Zhang, Refactor plant component
 		//       RE-ENGINEERED  Brent Griffith, rework for plant upgrade
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -640,105 +606,94 @@ namespace Boilers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true ); // one time flag
-		static Array1D_bool MyEnvrnFlag; // environment flag
-		static Array1D_bool MyFlag;
 		Real64 rho;
 		bool FatalError;
 		bool errFlag;
 		// FLOW:
 
-		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumBoilers );
-			MyEnvrnFlag.allocate( NumBoilers );
-			MyFlag = true;
-			MyEnvrnFlag = true;
-			MyOneTimeFlag = false;
-		}
-
 		// Init more variables
-		if ( MyFlag( BoilerNum ) ) {
+		if ( this->MyFlag ) {
 			// Locate the boilers on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( Boiler( BoilerNum ).Name, TypeOf_Boiler_Simple, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum, _, Boiler( BoilerNum ).TempUpLimitBoilerOut, _, _, _, errFlag );
+			ScanPlantLoopsForObject( this->Name, TypeOf_Boiler_Simple, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, this->TempUpLimitBoilerOut, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "InitBoiler: Program terminated due to previous condition(s)." );
 			}
 
-			if ( ( Boiler( BoilerNum ).FlowMode == LeavingSetPointModulated ) || ( Boiler( BoilerNum ).FlowMode == ConstantFlow ) ) {
+			if ( ( this->FlowMode == LeavingSetPointModulated ) || ( this->FlowMode == ConstantFlow ) ) {
 				// reset flow priority
-				PlantLoop( Boiler( BoilerNum ).LoopNum ).LoopSide( Boiler( BoilerNum ).LoopSideNum ).Branch( Boiler( BoilerNum ).BranchNum ).Comp( Boiler( BoilerNum ).CompNum ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+				PlantLoop( this->LoopNum ).LoopSide( this->LoopSideNum ).Branch( this->BranchNum ).Comp( this->CompNum ).FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
 			}
 
-			MyFlag( BoilerNum ) = false;
+			this->MyFlag = false;
 		}
 
-		if ( MyEnvrnFlag( BoilerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+		if ( this->MyEnvrnFlag && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
 			//if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
-			rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
-			Boiler( BoilerNum ).DesMassFlowRate = Boiler( BoilerNum ).VolFlowRate * rho;
+			rho = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, InitConvTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+			this->DesMassFlowRate = this->VolFlowRate * rho;
 
-			InitComponentNodes( 0.0, Boiler( BoilerNum ).DesMassFlowRate, Boiler( BoilerNum ).BoilerInletNodeNum, Boiler( BoilerNum ).BoilerOutletNodeNum, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum );
+			InitComponentNodes( 0.0, this->DesMassFlowRate, this->BoilerInletNodeNum, this->BoilerOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
 
-			if ( Boiler( BoilerNum ).FlowMode == LeavingSetPointModulated ) { // check if setpoint on outlet node
-				if ( ( Node( Boiler( BoilerNum ).BoilerOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( Boiler( BoilerNum ).BoilerOutletNodeNum ).TempSetPointLo == SensedNodeFlagValue ) ) {
+			if ( this->FlowMode == LeavingSetPointModulated ) { // check if setpoint on outlet node
+				if ( ( Node( this->BoilerOutletNodeNum ).TempSetPoint == SensedNodeFlagValue ) && ( Node( this->BoilerOutletNodeNum ).TempSetPointLo == SensedNodeFlagValue ) ) {
 					if ( ! AnyEnergyManagementSystemInModel ) {
-						if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
-							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
+						if ( ! this->ModulatedFlowErrDone ) {
+							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + this->Name );
 							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... " );
-							Boiler( BoilerNum ).ModulatedFlowErrDone = true;
+							this->ModulatedFlowErrDone = true;
 						}
 					} else {
 						// need call to EMS to check node
 						FatalError = false; // but not really fatal yet, but should be.
-						CheckIfNodeSetPointManagedByEMS( Boiler( BoilerNum ).BoilerOutletNodeNum, iTemperatureSetPoint, FatalError );
+						CheckIfNodeSetPointManagedByEMS( this->BoilerOutletNodeNum, iTemperatureSetPoint, FatalError );
 						if ( FatalError ) {
-							if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
-								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
+							if ( ! this->ModulatedFlowErrDone ) {
+								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + this->Name );
 								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the boiler outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the boiler outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... " );
-								Boiler( BoilerNum ).ModulatedFlowErrDone = true;
+								this->ModulatedFlowErrDone = true;
 							}
 						}
 					}
-					Boiler( BoilerNum ).ModulatedFlowSetToLoop = true; // this is for backward compatibility and could be removed
+					this->ModulatedFlowSetToLoop = true; // this is for backward compatibility and could be removed
 				}
 			}
 
-			MyEnvrnFlag( BoilerNum ) = false;
+			this->MyEnvrnFlag = false;
 		}
 
 		if ( ! BeginEnvrnFlag ) {
-			MyEnvrnFlag( BoilerNum ) = true;
+			this->MyEnvrnFlag = true;
 		}
 
 		// every iteration inits.  (most in calc routine)
 
-		if ( ( Boiler( BoilerNum ).FlowMode == LeavingSetPointModulated ) && Boiler( BoilerNum ).ModulatedFlowSetToLoop ) {
+		if ( ( this->FlowMode == LeavingSetPointModulated ) && this->ModulatedFlowSetToLoop ) {
 			// fix for clumsy old input that worked because loop setpoint was spread.
 			//  could be removed with transition, testing , model change, period of being obsolete.
-			{ auto const SELECT_CASE_var( PlantLoop( Boiler( BoilerNum ).LoopNum ).LoopDemandCalcScheme );
+			{ auto const SELECT_CASE_var( PlantLoop( this->LoopNum ).LoopDemandCalcScheme );
 			if ( SELECT_CASE_var == SingleSetPoint ) {
-				Node( Boiler( BoilerNum ).BoilerOutletNodeNum ).TempSetPoint = Node( PlantLoop( Boiler( BoilerNum ).LoopNum ).TempSetPointNodeNum ).TempSetPoint;
+				Node( this->BoilerOutletNodeNum ).TempSetPoint = Node( PlantLoop( this->LoopNum ).TempSetPointNodeNum ).TempSetPoint;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
-				Node( Boiler( BoilerNum ).BoilerOutletNodeNum ).TempSetPointLo = Node( PlantLoop( Boiler( BoilerNum ).LoopNum ).TempSetPointNodeNum ).TempSetPointLo;
+				Node( this->BoilerOutletNodeNum ).TempSetPointLo = Node( PlantLoop( this->LoopNum ).TempSetPointNodeNum ).TempSetPointLo;
 			}}
 		}
 
 	}
-
+	
 	void
-	SizeBoiler( int const BoilerNum )
+	BoilerSpecs::SizeBoiler()
 	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   April 2002
-		//       MODIFIED       November 2013 Daeho Kang, add component sizing table entries
+		//       MODIFIED       Nov. 2013, D. Kang, Add component sizing table entries
+		//       MODIFIED       Feb. 2016, R. Zhang, Refactor plant component
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -787,42 +742,42 @@ namespace Boilers {
 		Real64 NomCapUser( 0.0 ); // Hardsized nominal capacity for reporting
 		Real64 VolFlowRateUser( 0.0 ); // Hardsized volume flow for reporting
 
-		tmpNomCap = Boiler( BoilerNum ).NomCap;
-		tmpBoilerVolFlowRate = Boiler( BoilerNum ).VolFlowRate;
+		tmpNomCap = this->NomCap;
+		tmpBoilerVolFlowRate = this->VolFlowRate;
 
-		PltSizNum = PlantLoop( Boiler( BoilerNum ).LoopNum ).PlantSizNum;
+		PltSizNum = PlantLoop( this->LoopNum ).PlantSizNum;
 
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 
-				rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
-				Cp = GetSpecificHeatGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, Boiler( BoilerNum ).TempDesBoilerOut, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
-				tmpNomCap = Cp * rho * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
-				if ( ! Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = Boiler( BoilerNum ).NomCap;
+				rho = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, InitConvTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, this->TempDesBoilerOut, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+				tmpNomCap = Cp * rho * this->SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
+				if ( ! this->NomCapWasAutoSized ) tmpNomCap = this->NomCap;
 
 			} else {
-				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = 0.0;
+				if ( this->NomCapWasAutoSized ) tmpNomCap = 0.0;
 
 			}
 			if ( PlantFirstSizesOkayToFinalize ) {
-				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) {
-					Boiler( BoilerNum ).NomCap = tmpNomCap;
+				if ( this->NomCapWasAutoSized ) {
+					this->NomCap = tmpNomCap;
 					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+						ReportSizingOutput( "Boiler:HotWater", this->Name,
 							"Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+						ReportSizingOutput( "Boiler:HotWater", this->Name,
 							"Initial Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 				} else { // Hard-sized with sizing data
-					if ( Boiler( BoilerNum ).NomCap > 0.0 && tmpNomCap > 0.0 ) {
-						NomCapUser = Boiler( BoilerNum ).NomCap;
+					if ( this->NomCap > 0.0 && tmpNomCap > 0.0 ) {
+						NomCapUser = this->NomCap;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
+							ReportSizingOutput( "Boiler:HotWater", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeBoilerHotWater: Potential issue with equipment sizing for " + Boiler( BoilerNum ).Name );
+									ShowMessage( "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name );
 									ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
 									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( tmpNomCap, 2 ) + " [W]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -835,45 +790,44 @@ namespace Boilers {
 				}
 			}
 		} else {
-			if ( Boiler( BoilerNum ).NomCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
+			if ( this->NomCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
+				ShowContinueError( "Occurs in Boiler object=" + this->Name );
 				ErrorsFound = true;
 			}
-			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && PlantFinalSizesOkayToReport
-					&& ( Boiler( BoilerNum ).NomCap > 0.0 ) ) { // Hard-sized with no sizing data
-					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
-						"User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
+			if ( ! this->NomCapWasAutoSized && PlantFinalSizesOkayToReport
+					&& ( this->NomCap > 0.0 ) ) { // Hard-sized with no sizing data
+					ReportSizingOutput( "Boiler:HotWater", this->Name,
+						"User-Specified Nominal Capacity [W]", this->NomCap );
 			}
 		}
 
-
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-				tmpBoilerVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * Boiler( BoilerNum ).SizFac;
-				if ( ! Boiler( BoilerNum ).VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = Boiler( BoilerNum ).VolFlowRate;
+				tmpBoilerVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * this->SizFac;
+				if ( ! this->VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = this->VolFlowRate;
 			} else {
-				if ( Boiler( BoilerNum ).VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = 0.0;
+				if ( this->VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = 0.0;
 			}
 			if ( PlantFirstSizesOkayToFinalize ) {
-				if ( Boiler( BoilerNum ).VolFlowRateWasAutoSized ) {
-					Boiler( BoilerNum ).VolFlowRate = tmpBoilerVolFlowRate;
+				if ( this->VolFlowRateWasAutoSized ) {
+					this->VolFlowRate = tmpBoilerVolFlowRate;
 					if ( PlantFinalSizesOkayToReport) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+						ReportSizingOutput( "Boiler:HotWater", this->Name,
 							"Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate );
 					}
 					if ( PlantFirstSizesOkayToReport) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
+						ReportSizingOutput( "Boiler:HotWater", this->Name,
 							"Initial Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate );
 					}
 				} else {
-					if ( Boiler( BoilerNum ).VolFlowRate > 0.0 && tmpBoilerVolFlowRate > 0.0 ) {
-						VolFlowRateUser = Boiler( BoilerNum ).VolFlowRate;
+					if ( this->VolFlowRate > 0.0 && tmpBoilerVolFlowRate > 0.0 ) {
+						VolFlowRateUser = this->VolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate, "User-Specified Design Water Flow Rate [m3/s]", VolFlowRateUser );
+							ReportSizingOutput( "Boiler:HotWater", this->Name, "Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate, "User-Specified Design Water Flow Rate [m3/s]", VolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpBoilerVolFlowRate - VolFlowRateUser ) / VolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeBoilerHotWater: Potential issue with equipment sizing for " + Boiler( BoilerNum ).Name );
+									ShowMessage( "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name );
 									ShowContinueError( "User-Specified Design Water Flow Rate of " + RoundSigDigits( VolFlowRateUser, 2 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Design Water Flow Rate of " + RoundSigDigits( tmpBoilerVolFlowRate, 2 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -886,26 +840,26 @@ namespace Boilers {
 				}
 			}
 		} else {
-			if ( Boiler( BoilerNum ).VolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
+			if ( this->VolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Boiler design flow rate requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
+				ShowContinueError( "Occurs in Boiler object=" + this->Name );
 				ErrorsFound = true;
 			}
-			if ( ! Boiler( BoilerNum ).VolFlowRateWasAutoSized && PlantFinalSizesOkayToReport
-					&& ( Boiler( BoilerNum ).VolFlowRate > 0.0 ) ) { // Hard-sized with no sizing data
-					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name,
-						"User-Specified Design Water Flow Rate [m3/s]", Boiler( BoilerNum ).VolFlowRate );
+			if ( ! this->VolFlowRateWasAutoSized && PlantFinalSizesOkayToReport
+					&& ( this->VolFlowRate > 0.0 ) ) { // Hard-sized with no sizing data
+					ReportSizingOutput( "Boiler:HotWater", this->Name,
+						"User-Specified Design Water Flow Rate [m3/s]", this->VolFlowRate );
 			}
 		}
 
-		RegisterPlantCompDesignFlow( Boiler( BoilerNum ).BoilerInletNodeNum, tmpBoilerVolFlowRate );
+		RegisterPlantCompDesignFlow( this->BoilerInletNodeNum, tmpBoilerVolFlowRate );
 
 		if ( PlantFinalSizesOkayToReport ) {
 			//create predefined report
-			equipName = Boiler( BoilerNum ).Name;
+			equipName = this->Name;
 			PreDefTableEntry( pdchMechType, equipName, "Boiler:HotWater" );
-			PreDefTableEntry( pdchMechNomEff, equipName, Boiler( BoilerNum ).Effic );
-			PreDefTableEntry( pdchMechNomCap, equipName, Boiler( BoilerNum ).NomCap );
+			PreDefTableEntry( pdchMechNomEff, equipName, this->Effic );
+			PreDefTableEntry( pdchMechNomCap, equipName, this->NomCap );
 		}
 
 		if ( ErrorsFound ) {
@@ -913,7 +867,7 @@ namespace Boilers {
 		}
 
 	}
-
+	
 	void
 	CalcBoilerModel(
 		int & BoilerNum, // boiler identifier
