@@ -159,6 +159,16 @@ namespace Boilers {
 		bool IsThisSized; // TRUE if sizing is done
 		bool MyEnvrnFlag; // environment flag
 		bool MyFlag;
+		Real64 BoilerLoad; // W - Boiler operating load
+		Real64 BoilerEnergy; // J - Boiler energy integrated over time
+		Real64 FuelUsed; // W - Boiler fuel used
+		Real64 FuelConsumed; // J - Boiler Fuel consumed integrated over time
+		Real64 BoilerInletTemp; // C - Boiler inlet temperature
+		Real64 BoilerOutletTemp; // C - Boiler outlet temperature
+		Real64 Mdot; // kg/s - Boiler mass flow rate
+		Real64 ParasiticElecPower; // W - Parasitic Electrical Power (e.g. forced draft fan)
+		Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
+		Real64 BoilerPLR; // Boiler operating part-load ratio
 
 		// Default Constructor
 		BoilerSpecs() :
@@ -197,42 +207,7 @@ namespace Boilers {
 			EffCurveOutputIndex( 0 ),
 			CalculatedEffError( 0 ),
 			CalculatedEffIndex( 0 ),
-			IsThisSized( false )
-		{}
-		
-		
-		public:
-			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
-
-			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
-			
-			void getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
-			
-			void getSizingFactor( Real64 & SizFac );
- 
-			void onInitLoopEquip( const PlantLocation & calledFromLocation ); 
-			
-			void InitBoiler();
-			
-			void SizeBoiler();
-	};
-
-	struct ReportVars
-	{
-		// Members
-		Real64 BoilerLoad; // W - Boiler operating load
-		Real64 BoilerEnergy; // J - Boiler energy integrated over time
-		Real64 FuelUsed; // W - Boiler fuel used
-		Real64 FuelConsumed; // J - Boiler Fuel consumed integrated over time
-		Real64 BoilerInletTemp; // C - Boiler inlet temperature
-		Real64 BoilerOutletTemp; // C - Boiler outlet temperature
-		Real64 Mdot; // kg/s - Boiler mass flow rate
-		Real64 ParasiticElecPower; // W - Parasitic Electrical Power (e.g. forced draft fan)
-		Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-		Real64 BoilerPLR; // Boiler operating part-load ratio
-
-		// Default Constructor
-		ReportVars() :
+			IsThisSized( false ),
 			BoilerLoad( 0.0 ),
 			BoilerEnergy( 0.0 ),
 			FuelUsed( 0.0 ),
@@ -244,12 +219,31 @@ namespace Boilers {
 			ParasiticElecConsumption( 0.0 ),
 			BoilerPLR( 0.0 )
 		{}
+		
+		
+		public:
+			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
 
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
+			
+			void getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
+			
+			void getSizingFactor( Real64 & SizFac );
+			 
+			void onInitLoopEquip( const PlantLocation & calledFromLocation ); 
+			
+			void InitBoiler();
+			
+			void SizeBoiler();
+			
+			void CalcBoilerModel( Real64 const CurLoad, bool const RunFlag, int const EquipFlowCtrl );
+			
+			void UpdateBoilerRecords( Real64 const CurLoad, bool const RunFlag );
 	};
+
 
 	// Object Data
 	extern Array1D< BoilerSpecs > Boiler; // boiler data - dimension to number of machines
-	extern Array1D< ReportVars > BoilerReport; // report vars - dimension to number of machines
 
 	// Functions
 
@@ -257,41 +251,10 @@ namespace Boilers {
 	clear_state();
 
 	void
-	SimBoiler(
-		std::string const & BoilerType, // boiler type (used in CASE statement)
-		std::string const & BoilerName, // boiler identifier
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int & CompIndex, // boiler counter/identifier
-		bool const RunFlag, // if TRUE run boiler simulation--boiler is ON
-		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
-		Real64 & MyLoad, // W - Actual demand boiler must satisfy--calculated by load dist. routine
-		Real64 & MaxCap, // W - maximum boiler operating capacity
-		Real64 & MinCap, // W - minimum boiler operating capacity
-		Real64 & OptCap, // W - optimal boiler operating capacity
-		bool const GetSizingFactor, // TRUE when just the sizing factor is requested
-		Real64 & SizingFactor // sizing factor
-	);
-
-	void
 	GetBoilerInput();
-
-	void
-	CalcBoilerModel(
-		int & BoilerNum, // boiler identifier
-		Real64 const MyLoad, // W - hot water demand to be met by boiler
-		bool const RunFlag, // TRUE if boiler operating
-		int const EquipFlowCtrl // Flow control mode for the equipment
-	);
 
 	// Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
 	// *****************************************************************************
-
-	void
-	UpdateBoilerRecords(
-		Real64 const MyLoad, // boiler operating load
-		bool const RunFlag, // boiler on when TRUE
-		int const Num // boiler number
-	);
 
 	// End of Record Keeping subroutines for the BOILER:HOTWATER Module
 	// *****************************************************************************
