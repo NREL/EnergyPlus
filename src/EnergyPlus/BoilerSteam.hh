@@ -72,7 +72,7 @@ namespace EnergyPlus {
 	// Forward Declarations
 	struct PlantLocation;
  
-namespace BoilerSteam : public PlantComponent {
+namespace BoilerSteam {
 
 	// Using/Aliasing
 
@@ -98,7 +98,7 @@ namespace BoilerSteam : public PlantComponent {
 
 	// Types
 
-	struct BoilerSteamSpecs
+	struct BoilerSteamSpecs : public PlantComponent 
 	{
 		// Members
 		std::string Name; // user identifier
@@ -131,6 +131,8 @@ namespace BoilerSteam : public PlantComponent {
 		int CompNum; // Plant loop component index number
 		int PressErrIndex; // index pointer for recurring errors
 		int FluidIndex; // Steam index
+		bool MyEnvrnFlag; // environment flag
+		bool MyFlag;
 
 		// Default Constructor
 		BoilerSteamSpecs() :
@@ -161,7 +163,9 @@ namespace BoilerSteam : public PlantComponent {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			PressErrIndex( 0 ),
-			FluidIndex( 0 )
+			FluidIndex( 0 ),
+			MyEnvrnFlag( true ),
+			MyFlag( true )
 		{}
 		
 		
@@ -236,12 +240,6 @@ namespace BoilerSteam : public PlantComponent {
 
 	void
 	GetBoilerInput();
-
-	void
-	InitBoiler( int const BoilerNum ); // number of the current electric chiller being simulated
-
-	void
-	SizeBoiler( int const BoilerNum );
 
 	void
 	CalcBoilerModel(
