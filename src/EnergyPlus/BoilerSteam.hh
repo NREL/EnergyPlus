@@ -68,8 +68,7 @@
 #include <PlantComponent.hh>
 
 namespace EnergyPlus {
-
-		  
+		
 	// Forward Declarations
 	struct PlantLocation;
  
@@ -170,6 +169,16 @@ namespace BoilerSteam : public PlantComponent {
 			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
 
 			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
+			 
+			void onInitLoopEquip( const PlantLocation & calledFromLocation ); 
+			
+			void getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
+			
+			void getSizingFactor( Real64 & SizFac );
+			
+			void InitBoiler();
+			
+			void SizeBoiler();
  
 	};
 

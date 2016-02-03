@@ -262,6 +262,94 @@ namespace BoilerSteam {
 
 	}
 
+	void 
+	BoilerSteamSpecs::onInitLoopEquip(
+		const PlantLocation & calledFromLocation 
+	){
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rahul Chillar
+		//       DATE WRITTEN   
+		//       MODIFIED       Feb. 2016, R. Zhang - LBNL, refactor plant component
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subrountine controls the boiler component simulation
+
+		// METHODOLOGY EMPLOYED: na
+
+		// REFERENCES: na
+
+		// Using/Aliasing
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		
+		this->InitBoiler();
+		this->SizeBoiler();
+		
+	};
+	
+	void 
+	BoilerSpecs::getDesignCapacities( 
+		const PlantLocation & EP_UNUSED(calledFromLocation), 
+		Real64 & MaxLoad, 
+		Real64 & MinLoad, 
+		Real64 & OptLoad 
+	){
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rahul Chillar
+		//       DATE WRITTEN   
+		//       MODIFIED       Feb. 2016, R. Zhang - LBNL, refactor plant component
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// User Defined plant generic component
+
+		// METHODOLOGY EMPLOYED:
+		// This routine to be called from PlantLoopEquipment.
+
+		// REFERENCES:
+		// na
+		
+		// now interface sizing related values with rest of E+
+		MinLoad = this->NomCap * this->MinPartLoadRat;
+		MaxLoad = this->NomCap * this->MaxPartLoadRat;
+		OptLoad = this->NomCap * this->OptPartLoadRat;
+		
+	}
+	
+	void 
+	BoilerSteamSpecs::getSizingFactor( 
+		Real64 & SizFac 
+	){
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         DAN FISHER
+		//       DATE WRITTEN   Sep. 1998
+		//       MODIFIED       Feb. 2016, R. Zhang, Refactor plant component
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// User Defined plant generic component
+
+		// METHODOLOGY EMPLOYED:
+		// This routine to be called from PlantLoopEquipment.
+
+		// REFERENCES:
+		// na
+		
+		SizFac = this->SizFac;
+	}
+	
 	void
 	GetBoilerInput()
 	{
