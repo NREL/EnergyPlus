@@ -273,9 +273,9 @@ namespace UserDefinedComponents {
 			
 			void simulate( const PlantLocation & calledFromLocation, bool const EP_UNUSED( FirstHVACIteration ), Real64 const CurLoad );
 			
-			void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 OptLoad, int  ) {} 
+			void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
 			
-			void onInitLoopEquip( const PlantLocation & calledFromLocation, Real64 const CurLoad ); //@@
+			void onInitLoopEquip( const PlantLocation & calledFromLocation ); 
 			
 			//not virtual
 			void InitPlantUserComponent( int const LoopNum, Real64 const CurLoad );

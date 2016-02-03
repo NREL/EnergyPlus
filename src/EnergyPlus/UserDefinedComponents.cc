@@ -1332,7 +1332,7 @@ namespace UserDefinedComponents {
 		const PlantLocation & calledFromLocation, 
 		Real64 & MaxLoad, 
 		Real64 & MinLoad, 
-		Real64 OptLoad 
+		Real64 & OptLoad 
 	) {
 		
 		// SUBROUTINE INFORMATION:
@@ -1363,7 +1363,7 @@ namespace UserDefinedComponents {
 	}
 	
 	void 
-	UserPlantComponentStruct::onInitLoopEquip( 
+	UserPlantComponentStruct::onInitLoopEquip(
 		const PlantLocation & calledFromLocation 
 	){
 		
@@ -1402,22 +1402,22 @@ namespace UserDefinedComponents {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		
-		this->InitPlantUserComponent( calledFromLocation->LoopNum, 0.0 );
+		this->InitPlantUserComponent( calledFromLocation.loopNum, 0.0 );
 
-		ThisLoop = calledFromLocation->LoopNum;
+		int ThisLoop = calledFromLocation.loopNum;
 		
 		if ( ThisLoop > 0 ) {
 			if ( this->Loop( ThisLoop ).ErlInitProgramMngr > 0 ) {
 				ManageEMS( emsCallFromUserDefinedComponentModel, this->Loop( ThisLoop ).ErlInitProgramMngr );
 			}
 
-			InitComponentNodes( this->Loop( ThisLoop ).MassFlowRateMin, this->Loop( ThisLoop ).MassFlowRateMax, this->Loop( ThisLoop ).InletNodeNum, this->Loop( ThisLoop ).OutletNodeNum, this->Loop( ThisLoop ).calledFromLocation->LoopNum, this->Loop( ThisLoop ).calledFromLocation->LoopSideNum, this->Loop( ThisLoop ).BranchNum, this->Loop( ThisLoop ).CompNum );
+			InitComponentNodes( this->Loop( ThisLoop ).MassFlowRateMin, this->Loop( ThisLoop ).MassFlowRateMax, this->Loop( ThisLoop ).InletNodeNum, this->Loop( ThisLoop ).OutletNodeNum, this->Loop( ThisLoop ).LoopNum, this->Loop( ThisLoop ).LoopSideNum, this->Loop( ThisLoop ).BranchNum, this->Loop( ThisLoop ).CompNum );
 
 			RegisterPlantCompDesignFlow( this->Loop( ThisLoop ).InletNodeNum, this->Loop( ThisLoop ).DesignVolumeFlowRate );
 
 		} else {
 			// throw warning
-			ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from loop number called from =" + TrimSigDigits( calledFromLocation->LoopNum ) + " , loop side called from =" + TrimSigDigits( calledFromLocation->LoopSideNum ) );
+			ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from loop number called from =" + TrimSigDigits( calledFromLocation.loopNum ) + " , loop side called from =" + TrimSigDigits( calledFromLocation.loopSideNum ) );
 		}
 	
 	};
