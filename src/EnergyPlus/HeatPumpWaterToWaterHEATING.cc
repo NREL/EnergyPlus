@@ -106,9 +106,6 @@ namespace HeatPumpWaterToWaterHEATING {
 
 	// OTHER NOTES: none
 
-	// USE STATEMENTS:
-	// Use statements for data only modules
-	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::BeginSimFlag;
 	using DataGlobals::InitConvTemp;
@@ -122,46 +119,85 @@ namespace HeatPumpWaterToWaterHEATING {
 	using DataGlobals::SecInHour;
 	using namespace DataLoopNode;
 
-	// Use statements for access to subroutines in other modules
-
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-	std::string const ModuleCompName( "HeatPump:WaterToWater:ParameterEstimation:Heating" );
-	std::string const ModuleCompNameUC( "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING" );
+	std::string const GshpSpecs::ModuleCompName( "HeatPump:WaterToWater:ParameterEstimation:Heating" );
+	std::string const GshpSpecs::ModuleCompNameUC( "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING" );
 	bool GshpSpecs::GetInputFlag(true);
-
-	// DERIVED TYPE DEFINITIONS
-
-	// Type Description of Heat Pump
-
-	// Output Variables Type definition
-
-	// MODULE VARIABLE DECLARATIONS:
-
-	std::string GSHPRefrigerant( "R22" ); // Refrigerent name and index
-	int GSHPRefrigIndex( 0 );
-
-	int NumGSHPs( 0 ); // number of Gshps specified in input
-	Real64 LoadSideWaterMassFlowRate( 0.0 ); // Load Side mass flow rate, water side Kg/s
-	Real64 SourceSideWaterMassFlowRate( 0.0 ); // Source Side mass flow rate, water side Kg/s
-	Real64 Power( 0.0 ); // power consumption Watts Joules/sec
-	Real64 QLoad( 0.0 ); // heat rejection from Load Side coil Joules
-	Real64 QSource( 0.0 ); // cooling capacity Joules
-	Real64 SourceSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 SourceSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
-	Array1D_bool CheckEquipName;
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE
-
-	// Name Public routines, optionally name Private routines within this module
+	std::string GshpSpecs::GSHPRefrigerant( "R22" );
+	int GshpSpecs::GSHPRefrigIndex( 0 );
 
 	// Object Data
 	Array1D< GshpSpecs > GSHP; // dimension to number of machines
-	Array1D< ReportVars > GSHPReport;
 
-	// MODULE SUBROUTINES:
+	GshpSpecs::GshpSpecs() :
+		WWHPPlantTypeOfNum( 0 ),
+		Available( false ),
+		ON( false ),
+		COP( 0.0 ),
+		NomCap( 0.0 ),
+		MinPartLoadRat( 0.0 ),
+		MaxPartLoadRat( 0.0 ),
+		OptPartLoadRat( 0.0 ),
+		LoadSideVolFlowRate( 0.0 ),
+		LoadSideDesignMassFlow( 0.0 ),
+		SourceSideVolFlowRate( 0.0 ),
+		SourceSideDesignMassFlow( 0.0 ),
+		SourceSideInletNodeNum( 0 ),
+		SourceSideOutletNodeNum( 0 ),
+		LoadSideInletNodeNum( 0 ),
+		LoadSideOutletNodeNum( 0 ),
+		SourceSideUACoeff( 0.0 ),
+		LoadSideUACoeff( 0.0 ),
+		CompPistonDisp( 0.0 ),
+		CompClearanceFactor( 0.0 ),
+		CompSucPressDrop( 0.0 ),
+		SuperheatTemp( 0.0 ),
+		PowerLosses( 0.0 ),
+		LossFactor( 0.0 ),
+		HighPressCutoff( 0.0 ),
+		LowPressCutoff( 0.0 ),
+		IsOn( false ),
+		MustRun( false ),
+		SourceLoopNum( 0 ),
+		SourceLoopSideNum( 0 ),
+		SourceBranchNum( 0 ),
+		SourceCompNum( 0 ),
+		LoadLoopNum( 0 ),
+		LoadLoopSideNum( 0 ),
+		LoadBranchNum( 0 ),
+		LoadCompNum( 0 ),
+		CondMassFlowIndex( 0 ),
+		MyEnvrnFlag(true),
+		MyPlanScanFlag(true),
+		RoutineName( "CalcGshpModel" ),
+		RoutineNameLoadSideTemp( "CalcGSHPModel:LoadSideTemp" ),
+		RoutineNameSourceSideTemp( "CalcGSHPModel:SourceSideTemp" ),
+		RoutineNameCompressInletTemp( "CalcGSHPModel:CompressInletTemp" ),
+		RoutineNameSuctionPr( "CalcGSHPModel:SuctionPr" ),
+		RoutineNameCompSuctionTemp( "CalcGSHPModel:CompSuctionTemp" ),
+		fmtLD( "*" ),
+		LoadSideWaterMassFlowRate( 0.0 ),
+		SourceSideWaterMassFlowRate( 0.0 ),
+		Power( 0.0 ),
+		QLoad( 0.0 ),
+		QSource( 0.0 ),
+		SourceSideWaterOutletTemp( 0.0 ),
+		SourceSideWaterInletTemp( 0.0 ),
+		LoadSideWaterOutletTemp( 0.0 ),
+		LoadSideWaterInletTemp( 0.0 ),
+		RVPower( 0.0 ),
+		RVEnergy( 0.0 ),
+		RVQLoad( 0.0 ),
+		RVQLoadEnergy( 0.0 ),
+		RVQSource( 0.0 ),
+		RVQSourceEnergy( 0.0 ),
+		RVLoadSideWaterInletTemp( 0.0 ),
+		RVSourceSideWaterInletTemp( 0.0 ),
+		RVLoadSideWaterOutletTemp( 0.0 ),
+		RVSourceSideWaterOutletTemp( 0.0 ),
+		RVLoadSidemdot( 0.0 ),
+		RVSourceSidemdot( 0.0 ),
+		RVRunning( 0 )
+	{}
 
 	void
 	GshpSpecs::InitGshp() // GSHP number
@@ -201,18 +237,18 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		//For each new environment
 		if ( BeginEnvrnFlag && this->MyEnvrnFlag ) {
-			this->QLoad = 0.0;
-			this->QSource = 0.0;
-			this->Power = 0.0;
-			this->QLoadEnergy = 0.0;
-			this->QSourceEnergy = 0.0;
-			this->Energy = 0.0;
-			this->LoadSideWaterInletTemp = 0.0;
-			this->SourceSideWaterInletTemp = 0.0;
-			this->LoadSideWaterOutletTemp = 0.0;
-			this->SourceSideWaterOutletTemp = 0.0;
-			this->SourceSidemdot = 0.0;
-			this->LoadSidemdot = 0.0;
+			this->RVQLoad = 0.0;
+			this->RVQSource = 0.0;
+			this->RVPower = 0.0;
+			this->RVQLoadEnergy = 0.0;
+			this->RVQSourceEnergy = 0.0;
+			this->RVEnergy = 0.0;
+			this->RVLoadSideWaterInletTemp = 0.0;
+			this->RVSourceSideWaterInletTemp = 0.0;
+			this->RVLoadSideWaterOutletTemp = 0.0;
+			this->RVSourceSideWaterOutletTemp = 0.0;
+			this->RVSourceSidemdot = 0.0;
+			this->RVLoadSidemdot = 0.0;
 			this->IsOn = false;
 			this->MustRun = true;
 
@@ -236,7 +272,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		if ( ! BeginEnvrnFlag ) this->MyEnvrnFlag = true;
 
 		//On every call
-		this->Running = 0;
+		this->RVRunning = 0;
 
 		this->MustRun = true; // Reset MustRun Flag to TRUE
 
@@ -353,7 +389,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		HighPressCutoff = this->HighPressCutoff;
 		LowPressCutoff = this->LowPressCutoff;
 		// REPORT VAR
-		this->Running = 0;
+		this->RVRunning = 0;
 
 		// Init Module level Variables
 		this->MustRun = true; // Reset MustRun Flag to TRUE
@@ -597,7 +633,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		LoadSideWaterOutletTemp = LoadSideWaterInletTemp + QLoad / ( LoadSideWaterMassFlowRate * CpLoadSide );
 		SourceSideWaterOutletTemp = SourceSideWaterInletTemp - QSource / ( SourceSideWaterMassFlowRate * CpSourceSide );
 		// REPORT VAR
-		this->Running = 1;
+		this->RVRunning = 1;
 
 	}
 
@@ -644,18 +680,18 @@ namespace HeatPumpWaterToWaterHEATING {
 			Node( SourceSideOutletNode ).Temp = Node( SourceSideInletNode ).Temp;
 			Node( LoadSideOutletNode ).Temp = Node( LoadSideInletNode ).Temp;
 
-			this->Power = 0.0;
-			this->Energy = 0.0;
-			this->QSource = 0.0;
-			this->QSourceEnergy = 0.0;
-			this->QLoad = 0.0;
-			this->QLoadEnergy = 0.0;
-			this->SourceSideWaterInletTemp = Node( SourceSideInletNode ).Temp;
-			this->SourceSideWaterOutletTemp = Node( SourceSideOutletNode ).Temp;
-			this->LoadSideWaterInletTemp = Node( LoadSideInletNode ).Temp;
-			this->LoadSideWaterOutletTemp = Node( LoadSideOutletNode ).Temp;
-			this->SourceSidemdot = SourceSideWaterMassFlowRate;
-			this->LoadSidemdot = LoadSideWaterMassFlowRate;
+			this->RVPower = 0.0;
+			this->RVEnergy = 0.0;
+			this->RVQSource = 0.0;
+			this->RVQSourceEnergy = 0.0;
+			this->RVQLoad = 0.0;
+			this->RVQLoadEnergy = 0.0;
+			this->RVSourceSideWaterInletTemp = Node( SourceSideInletNode ).Temp;
+			this->RVSourceSideWaterOutletTemp = Node( SourceSideOutletNode ).Temp;
+			this->RVLoadSideWaterInletTemp = Node( LoadSideInletNode ).Temp;
+			this->RVLoadSideWaterOutletTemp = Node( LoadSideOutletNode ).Temp;
+			this->RVSourceSidemdot = SourceSideWaterMassFlowRate;
+			this->RVLoadSidemdot = LoadSideWaterMassFlowRate;
 
 		} else {
 			//set node temperatures
@@ -663,21 +699,21 @@ namespace HeatPumpWaterToWaterHEATING {
 			Node( SourceSideOutletNode ).Temp = SourceSideWaterOutletTemp;
 
 			ReportingConstant = TimeStepSys * SecInHour;
-			this->Energy = Power * ReportingConstant;
-			this->QSourceEnergy = QSource * ReportingConstant;
-			this->QLoadEnergy = QLoad * ReportingConstant;
-			this->LoadSideWaterInletTemp = Node( LoadSideInletNode ).Temp;
-			this->LoadSideWaterOutletTemp = Node( LoadSideOutletNode ).Temp;
-			this->SourceSideWaterInletTemp = Node( SourceSideInletNode ).Temp;
-			this->SourceSideWaterOutletTemp = Node( SourceSideOutletNode ).Temp;
-			this->SourceSidemdot = SourceSideWaterMassFlowRate;
-			this->LoadSidemdot = LoadSideWaterMassFlowRate;
+			this->RVEnergy = Power * ReportingConstant;
+			this->RVQSourceEnergy = QSource * ReportingConstant;
+			this->RVQLoadEnergy = QLoad * ReportingConstant;
+			this->RVLoadSideWaterInletTemp = Node( LoadSideInletNode ).Temp;
+			this->RVLoadSideWaterOutletTemp = Node( LoadSideOutletNode ).Temp;
+			this->RVSourceSideWaterInletTemp = Node( SourceSideInletNode ).Temp;
+			this->RVSourceSideWaterOutletTemp = Node( SourceSideOutletNode ).Temp;
+			this->RVSourceSidemdot = SourceSideWaterMassFlowRate;
+			this->RVLoadSidemdot = LoadSideWaterMassFlowRate;
 
 		}
 	}
 
 	void
-	GetGshpInput()
+	GshpSpecs::GetGshpInput()
 	{
 		//       SUBROUTINE INFORMATION:
 		//       AUTHOR:
@@ -731,7 +767,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 
-		NumGSHPs = GetNumObjectsFound( ModuleCompName );
+		int NumGSHPs = GetNumObjectsFound( ModuleCompName );
 
 		if ( NumGSHPs <= 0 ) {
 			ShowSevereError( ModuleCompName + ": No Equipment found" );
@@ -740,8 +776,6 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		// Allocate Arrays
 		GSHP.allocate( NumGSHPs );
-		GSHPReport.allocate( NumGSHPs );
-		CheckEquipName.dimension( NumGSHPs, true );
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
@@ -878,21 +912,21 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		// CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			SetupOutputVariable( "Water to Water Heat Pump Electric Power [W]", GSHPReport( GSHPNum ).Power, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Power [W]", GSHP( GSHPNum ).RVPower, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", GSHP( GSHPNum ).RVEnergy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
 
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate [W]", GSHPReport( GSHPNum ).QLoad, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy [J]", GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate [W]", GSHP( GSHPNum ).RVQLoad, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy [J]", GSHP( GSHPNum ).RVQLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate [W]", GSHPReport( GSHPNum ).QSource, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy [J]", GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate [W]", GSHP( GSHPNum ).RVQSource, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy [J]", GSHP( GSHPNum ).RVQSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature [C]", GSHPReport( GSHPNum ).LoadSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature [C]", GSHPReport( GSHPNum ).LoadSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature [C]", GSHPReport( GSHPNum ).SourceSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature [C]", GSHPReport( GSHPNum ).SourceSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate [kg/s]", GSHPReport( GSHPNum ).LoadSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate [kg/s]", GSHPReport( GSHPNum ).SourceSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature [C]", GSHP( GSHPNum ).RVLoadSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature [C]", GSHP( GSHPNum ).RVLoadSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature [C]", GSHP( GSHPNum ).RVSourceSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature [C]", GSHP( GSHPNum ).RVSourceSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate [kg/s]", GSHP( GSHPNum ).RVLoadSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate [kg/s]", GSHP( GSHPNum ).RVSourceSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
 		}
 
 	}
@@ -939,7 +973,7 @@ namespace HeatPumpWaterToWaterHEATING {
 			CalcGshpModel( CurLoad, FirstHVACIteration );
 			UpdateGSHPRecords();
 		} else if ( calledFromLocation.loopNum == this->SourceLoopNum ) { // condenser loop
-			UpdateChillerComponentCondenserSide( this->SourceLoopNum, this->SourceLoopSideNum, TypeOf_HPWaterEFHeating, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, - this->QSource, this->SourceSideWaterInletTemp, this->SourceSideWaterOutletTemp, this->SourceSidemdot, FirstHVACIteration );
+			UpdateChillerComponentCondenserSide( this->SourceLoopNum, this->SourceLoopSideNum, TypeOf_HPWaterEFHeating, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, - this->RVQSource, this->RVSourceSideWaterInletTemp, this->RVSourceSideWaterOutletTemp, this->RVSourceSidemdot, FirstHVACIteration );
 		} else {
 			ShowFatalError( "SimHPWatertoWaterHEATING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + this->Name );
 		}
