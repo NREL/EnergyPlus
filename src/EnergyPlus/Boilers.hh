@@ -205,10 +205,15 @@ namespace Boilers {
 			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
 
 			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
+			
+			void getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
+			
+			void getSizingFactor( Real64 & SizFac );
  
 			void onInitLoopEquip( const PlantLocation & calledFromLocation ); 
 			
 			void InitBoiler();
+			
 			void SizeBoiler();
 	};
 

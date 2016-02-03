@@ -264,16 +264,64 @@ namespace Boilers {
 		// this->IsThisSized = true;
 		this->InitBoiler();
 		this->SizeBoiler();
-		MinCap = this->NomCap * this->MinPartLoadRat;
-		MaxCap = this->NomCap * this->MaxPartLoadRat;
-		OptCap = this->NomCap * this->OptPartLoadRat;
 		if ( GetSizingFactor ) {
 			SizingFactor = this->SizFac;
 		}
 	
 	};
 	
+	void 
+	BoilerSpecs::getSizingFactor( 
+		Real64 & SizFac 
+	){
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         DAN FISHER
+		//       DATE WRITTEN   Sep. 1998
+		//       MODIFIED       Feb. 2016, R. Zhang, Refactor plant component
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// User Defined plant generic component
+
+		// METHODOLOGY EMPLOYED:
+		// This routine to be called from PlantLoopEquipment.
+
+		// REFERENCES:
+		// na
 		
+		SizFac = this->SizFac;
+	}
+			
+	void 
+	BoilerSpecs::getDesignCapacities( 
+		const PlantLocation & EP_UNUSED(calledFromLocation), 
+		Real64 & MaxLoad, 
+		Real64 & MinLoad, 
+		Real64 & OptLoad )
+	{
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         DAN FISHER
+		//       DATE WRITTEN   Sep. 1998
+		//       MODIFIED       Feb. 2016, R. Zhang, Refactor plant component
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// User Defined plant generic component
+
+		// METHODOLOGY EMPLOYED:
+		// This routine to be called from PlantLoopEquipment.
+
+		// REFERENCES:
+		// na
+		
+		// now interface sizing related values with rest of E+
+		MinLoad = this->NomCap * this->MinPartLoadRat;
+		MaxLoad = this->NomCap * this->MaxPartLoadRat;
+		OptLoad = this->NomCap * this->OptPartLoadRat;
+		
+	}
+	
 	void
 	GetBoilerInput()
 	{
