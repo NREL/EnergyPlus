@@ -72,13 +72,13 @@ namespace EnergyPlus {
 
 	struct PlantLocation;
 
-namespace HeatPumpWaterToWaterHEATING {
-
-	class GshpSpecs : public PlantComponent
+	class HeatPumpWaterToWaterParameterEstimationHeating : public PlantComponent
 	{
 		public:
 
-		GshpSpecs();
+		HeatPumpWaterToWaterParameterEstimationHeating();
+
+		~HeatPumpWaterToWaterParameterEstimationHeating() {}
 
 		void 
 		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
@@ -112,6 +112,8 @@ namespace HeatPumpWaterToWaterHEATING {
 		private:
 
 		// Members
+		static Array1D< HeatPumpWaterToWaterParameterEstimationHeating > instances;
+
 		int WWHPPlantTypeOfNum; // equipment type num
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // simulate the machine at it's operating part load ratio
@@ -192,11 +194,6 @@ namespace HeatPumpWaterToWaterHEATING {
 		static std::string GSHPRefrigerant; // Refrigerent name and index
 		static int GSHPRefrigIndex;
 	};
-
-	// Object Data
-	extern Array1D< GshpSpecs > GSHP; // dimension to number of machines
-
-} // HeatPumpWaterToWaterHEATING
 
 } // EnergyPlus
 

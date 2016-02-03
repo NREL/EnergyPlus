@@ -83,7 +83,6 @@
 
 namespace EnergyPlus {
 
-namespace HeatPumpWaterToWaterHEATING {
 	// Module containing the routines dealing with the Water to Water Heat Pump (Heating)
 
 	// MODULE INFORMATION:
@@ -119,16 +118,14 @@ namespace HeatPumpWaterToWaterHEATING {
 	using DataGlobals::SecInHour;
 	using namespace DataLoopNode;
 
-	std::string const GshpSpecs::ModuleCompName( "HeatPump:WaterToWater:ParameterEstimation:Heating" );
-	std::string const GshpSpecs::ModuleCompNameUC( "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING" );
-	bool GshpSpecs::GetInputFlag(true);
-	std::string GshpSpecs::GSHPRefrigerant( "R22" );
-	int GshpSpecs::GSHPRefrigIndex( 0 );
+	Array1D< HeatPumpWaterToWaterParameterEstimationHeating > HeatPumpWaterToWaterParameterEstimationHeating::instances;
+	std::string const HeatPumpWaterToWaterParameterEstimationHeating::ModuleCompName( "HeatPump:WaterToWater:ParameterEstimation:Heating" );
+	std::string const HeatPumpWaterToWaterParameterEstimationHeating::ModuleCompNameUC( "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING" );
+	bool HeatPumpWaterToWaterParameterEstimationHeating::GetInputFlag(true);
+	std::string HeatPumpWaterToWaterParameterEstimationHeating::GSHPRefrigerant( "R22" );
+	int HeatPumpWaterToWaterParameterEstimationHeating::GSHPRefrigIndex( 0 );
 
-	// Object Data
-	Array1D< GshpSpecs > GSHP; // dimension to number of machines
-
-	GshpSpecs::GshpSpecs() :
+	HeatPumpWaterToWaterParameterEstimationHeating::HeatPumpWaterToWaterParameterEstimationHeating() :
 		WWHPPlantTypeOfNum( 0 ),
 		Available( false ),
 		ON( false ),
@@ -200,7 +197,7 @@ namespace HeatPumpWaterToWaterHEATING {
 	{}
 
 	void
-	GshpSpecs::InitGshp() // GSHP number
+	HeatPumpWaterToWaterParameterEstimationHeating::InitGshp() // GSHP number
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
@@ -285,7 +282,7 @@ namespace HeatPumpWaterToWaterHEATING {
 	}
 
 	void
-	GshpSpecs::CalcGshpModel(
+	HeatPumpWaterToWaterParameterEstimationHeating::CalcGshpModel(
 		Real64 & MyLoad, // Operating Load
 		bool const EP_UNUSED( FirstHVACIteration )
 	)
@@ -638,7 +635,7 @@ namespace HeatPumpWaterToWaterHEATING {
 	}
 
 	void
-	GshpSpecs::UpdateGSHPRecords() // GSHP number
+	HeatPumpWaterToWaterParameterEstimationHeating::UpdateGSHPRecords() // GSHP number
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Arun
@@ -653,15 +650,6 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SourceSideInletNode; // Source Side inlet node number, water side
@@ -713,7 +701,7 @@ namespace HeatPumpWaterToWaterHEATING {
 	}
 
 	void
-	GshpSpecs::GetGshpInput()
+	HeatPumpWaterToWaterParameterEstimationHeating::GetGshpInput()
 	{
 		//       SUBROUTINE INFORMATION:
 		//       AUTHOR:
@@ -775,129 +763,129 @@ namespace HeatPumpWaterToWaterHEATING {
 		}
 
 		// Allocate Arrays
-		GSHP.allocate( NumGSHPs );
+		instances.allocate( NumGSHPs );
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			VerifyName( AlphArray( 1 ), instances, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			GSHP( GSHPNum ).Name = AlphArray( 1 );
+			instances( GSHPNum ).Name = AlphArray( 1 );
 
-			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterPEHeating;
+			instances( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterPEHeating;
 
-			GSHP( GSHPNum ).COP = NumArray( 1 );
+			instances( GSHPNum ).COP = NumArray( 1 );
 			if ( NumArray( 1 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":COP = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
 			// zero values for NumArray 3 - 6 checked in input - idd
-			GSHP( GSHPNum ).NomCap = NumArray( 2 );
+			instances( GSHPNum ).NomCap = NumArray( 2 );
 
-			GSHP( GSHPNum ).MinPartLoadRat = NumArray( 3 );
+			instances( GSHPNum ).MinPartLoadRat = NumArray( 3 );
 
-			GSHP( GSHPNum ).MaxPartLoadRat = NumArray( 4 );
+			instances( GSHPNum ).MaxPartLoadRat = NumArray( 4 );
 
-			GSHP( GSHPNum ).OptPartLoadRat = NumArray( 5 );
+			instances( GSHPNum ).OptPartLoadRat = NumArray( 5 );
 
-			GSHP( GSHPNum ).LoadSideVolFlowRate = NumArray( 6 );
+			instances( GSHPNum ).LoadSideVolFlowRate = NumArray( 6 );
 			if ( NumArray( 6 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":Load Side Flow Rate = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GSHP( GSHPNum ).SourceSideVolFlowRate = NumArray( 7 );
+			instances( GSHPNum ).SourceSideVolFlowRate = NumArray( 7 );
 			if ( NumArray( 7 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":Source Side Flow Rate = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GSHP( GSHPNum ).LoadSideUACoeff = NumArray( 8 );
+			instances( GSHPNum ).LoadSideUACoeff = NumArray( 8 );
 			if ( NumArray( 8 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":Load Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GSHP( GSHPNum ).SourceSideUACoeff = NumArray( 9 );
+			instances( GSHPNum ).SourceSideUACoeff = NumArray( 9 );
 			if ( NumArray( 9 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":Source Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GSHP( GSHPNum ).CompPistonDisp = NumArray( 10 );
+			instances( GSHPNum ).CompPistonDisp = NumArray( 10 );
 			if ( NumArray( 10 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":Compressor Piston displacement/Storke = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GSHP( GSHPNum ).CompClearanceFactor = NumArray( 11 );
+			instances( GSHPNum ).CompClearanceFactor = NumArray( 11 );
 			if ( NumArray( 11 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":Compressor Clearance Factor = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GSHP( GSHPNum ).CompSucPressDrop = NumArray( 12 );
+			instances( GSHPNum ).CompSucPressDrop = NumArray( 12 );
 			if ( NumArray( 12 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ": Pressure Drop = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GSHP( GSHPNum ).SuperheatTemp = NumArray( 13 );
+			instances( GSHPNum ).SuperheatTemp = NumArray( 13 );
 			if ( NumArray( 13 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":Source Side SuperHeat = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GSHP( GSHPNum ).PowerLosses = NumArray( 14 );
+			instances( GSHPNum ).PowerLosses = NumArray( 14 );
 			if ( NumArray( 14 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":Compressor Power Loss = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
-			GSHP( GSHPNum ).LossFactor = NumArray( 15 );
+			instances( GSHPNum ).LossFactor = NumArray( 15 );
 			if ( NumArray( 15 ) == 0.0 ) {
 				ShowSevereError( ModuleCompName + ":Efficiency = 0.0, Heatpump=" + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
 
-			GSHP( GSHPNum ).HighPressCutoff = NumArray( 16 );
+			instances( GSHPNum ).HighPressCutoff = NumArray( 16 );
 			if ( NumArray( 16 ) == 0.0 ) {
-				GSHP( GSHPNum ).HighPressCutoff = 500000000.0;
+				instances( GSHPNum ).HighPressCutoff = 500000000.0;
 				//CALL ShowWarningError(ModuleCompName//': High Pressure Cut Off= 0.0 Heat Pump'//TRIM(AlphArray(1)))
 			}
 
-			GSHP( GSHPNum ).LowPressCutoff = NumArray( 17 );
+			instances( GSHPNum ).LowPressCutoff = NumArray( 17 );
 			if ( NumArray( 17 ) == 0.0 ) {
-				GSHP( GSHPNum ).LowPressCutoff = 0.0;
+				instances( GSHPNum ).LowPressCutoff = 0.0;
 				//CALL ShowWarningError(ModuleCompName//': Low Pressure Cut Off= 0.0 Heat Pump'//TRIM(AlphArray(1)))
 			}
 
 //Autodesk:Bug CycleTime was removed in 8.2 so this doesn't compile
-//			GSHP( GSHPNum ).CycleTime = NumArray( 18 );
+//			instances( GSHPNum ).CycleTime = NumArray( 18 );
 //			if ( NumArray( 18 ) == 0.0 ) {
-//				GSHP( GSHPNum ).CycleTime = 0.10;
+//				instances( GSHPNum ).CycleTime = 0.10;
 //				ShowWarningError( ModuleCompName + ": Unit Cycle Time= 0.0 Heat Pump" + trim( AlphArray( 1 ) ) );
 //			}
 
-			GSHP( GSHPNum ).SourceSideInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, ModuleCompName, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			instances( GSHPNum ).SourceSideInletNodeNum = GetOnlySingleNode( AlphArray( 2 ), ErrorsFound, ModuleCompName, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			GSHP( GSHPNum ).SourceSideOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, ModuleCompName, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			instances( GSHPNum ).SourceSideOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, ModuleCompName, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			GSHP( GSHPNum ).LoadSideInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, ModuleCompName, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			instances( GSHPNum ).LoadSideInletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, ModuleCompName, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 
-			GSHP( GSHPNum ).LoadSideOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, ModuleCompName, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			instances( GSHPNum ).LoadSideOutletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, ModuleCompName, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 
 			// Test node sets
 			TestCompSet( ModuleCompNameUC, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Condenser Water Nodes" );
 			TestCompSet( ModuleCompNameUC, AlphArray( 1 ), AlphArray( 4 ), AlphArray( 5 ), "Hot Water Nodes" );
 
 			// save the design source side flow rate for use by plant loop sizing algorithms
-			RegisterPlantCompDesignFlow( GSHP( GSHPNum ).SourceSideInletNodeNum, 0.5 * GSHP( GSHPNum ).SourceSideVolFlowRate );
+			RegisterPlantCompDesignFlow( instances( GSHPNum ).SourceSideInletNodeNum, 0.5 * instances( GSHPNum ).SourceSideVolFlowRate );
 
 		}
 
@@ -912,26 +900,26 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		// CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			SetupOutputVariable( "Water to Water Heat Pump Electric Power [W]", GSHP( GSHPNum ).RVPower, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", GSHP( GSHPNum ).RVEnergy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Power [W]", instances( GSHPNum ).RVPower, "System", "Average", instances( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", instances( GSHPNum ).RVEnergy, "System", "Sum", instances( GSHPNum ).Name, _, "Electricity", "Heating", _, "Plant" );
 
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate [W]", GSHP( GSHPNum ).RVQLoad, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy [J]", GSHP( GSHPNum ).RVQLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate [W]", instances( GSHPNum ).RVQLoad, "System", "Average", instances( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy [J]", instances( GSHPNum ).RVQLoadEnergy, "System", "Sum", instances( GSHPNum ).Name );
 
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate [W]", GSHP( GSHPNum ).RVQSource, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy [J]", GSHP( GSHPNum ).RVQSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate [W]", instances( GSHPNum ).RVQSource, "System", "Average", instances( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy [J]", instances( GSHPNum ).RVQSourceEnergy, "System", "Sum", instances( GSHPNum ).Name );
 
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature [C]", GSHP( GSHPNum ).RVLoadSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature [C]", GSHP( GSHPNum ).RVLoadSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature [C]", GSHP( GSHPNum ).RVSourceSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature [C]", GSHP( GSHPNum ).RVSourceSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate [kg/s]", GSHP( GSHPNum ).RVLoadSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate [kg/s]", GSHP( GSHPNum ).RVSourceSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature [C]", instances( GSHPNum ).RVLoadSideWaterOutletTemp, "System", "Average", instances( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature [C]", instances( GSHPNum ).RVLoadSideWaterInletTemp, "System", "Average", instances( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature [C]", instances( GSHPNum ).RVSourceSideWaterOutletTemp, "System", "Average", instances( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature [C]", instances( GSHPNum ).RVSourceSideWaterInletTemp, "System", "Average", instances( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate [kg/s]", instances( GSHPNum ).RVLoadSidemdot, "System", "Average", instances( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate [kg/s]", instances( GSHPNum ).RVSourceSidemdot, "System", "Average", instances( GSHPNum ).Name );
 		}
 
 	}
 
-	void GshpSpecs::simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad )
+	void HeatPumpWaterToWaterParameterEstimationHeating::simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad )
 	{
 		//       SUBROUTINE INFORMATION:
 		//       AUTHOR    Arun
@@ -954,18 +942,6 @@ namespace HeatPumpWaterToWaterHEATING {
 		using namespace DataEnvironment;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// Simulate the model for the Demand "MyLoad"
 
 		if ( calledFromLocation.loopNum == this->LoadLoopNum ) { // chilled water loop
@@ -979,21 +955,21 @@ namespace HeatPumpWaterToWaterHEATING {
 		}
 	}
 
-	void GshpSpecs::getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad )
+	void HeatPumpWaterToWaterParameterEstimationHeating::getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad )
 	{
 		MinLoad = this->NomCap * this->MinPartLoadRat;
 		MaxLoad = this->NomCap * this->MaxPartLoadRat;
 		OptLoad = this->NomCap * this->OptPartLoadRat;
 	}
 
-	PlantComponent * GshpSpecs::factory( int objectType, std::string objectName ) {
+	PlantComponent * HeatPumpWaterToWaterParameterEstimationHeating::factory( int objectType, std::string objectName ) {
 		// Process the input data for pipes if it hasn't been done already
 		if ( GetInputFlag ) {
 			GetGshpInput();
 			GetInputFlag = false;
 		}
 		// Now look for this particular pipe in the list
-		for ( auto & t_gshp : GSHP ) {
+		for ( auto & t_gshp : instances ) {
 			if ( t_gshp.WWHPPlantTypeOfNum == objectType && t_gshp.Name == objectName ) {
 				return &t_gshp;
 			}
@@ -1005,7 +981,7 @@ namespace HeatPumpWaterToWaterHEATING {
 	}
 
 	void
-	GshpSpecs::onInitLoopEquip( const PlantLocation & EP_UNUSED(calledFromLocation) )
+	HeatPumpWaterToWaterParameterEstimationHeating::onInitLoopEquip( const PlantLocation & EP_UNUSED(calledFromLocation) )
 	{
 			//scan for loop connection data
 			bool errFlag = false;
@@ -1020,8 +996,5 @@ namespace HeatPumpWaterToWaterHEATING {
 				ShowFatalError( "GetWatertoWaterHPInput: Program terminated on scan for loop data" );
 			}
 	}
-
-
-} // HeatPumpWaterToWaterHEATING
 
 } // EnergyPlus

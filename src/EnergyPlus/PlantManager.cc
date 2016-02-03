@@ -1157,7 +1157,7 @@ namespace PlantManager {
 							} else if ( LoopSideNum == SupplySide ) {
 								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
-							this_comp.compPtr = HeatPumpWaterToWaterHEATING::GshpSpecs::factory( TypeOf_Pipe, CompNames( CompNum ) );
+							this_comp.compPtr = HeatPumpWaterToWaterParameterEstimationHeating::factory( TypeOf_Pipe, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "HeatPump:WaterToWater:ParameterEstimation:Cooling" ) ) {
 							this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
 							this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
