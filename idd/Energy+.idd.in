@@ -51140,6 +51140,9 @@ Dehumidifier:Desiccant:System,
   N1,  \field Regeneration Inlet Air Setpoint Temperature
        \type real
        \units C
+       \default 46.11
+       \note This value is also used as regeneration coil air outlet temperature 
+       \note to autosize the regeneration coil capacity.
   A11, \field Companion Cooling Coil Object Type
        \type choice
        \key Coil:Cooling:DX:SingleSpeed

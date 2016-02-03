@@ -429,6 +429,8 @@ namespace DataSizing {
 		DesDayWeath.deallocate();
 		CompDesWaterFlow.deallocate();
 		ZoneHVACSizing.deallocate();
+		DataDesicDehumNum = 0;
+		DataDesicRegCoil = false;
 	}
 
 } // DataSizing

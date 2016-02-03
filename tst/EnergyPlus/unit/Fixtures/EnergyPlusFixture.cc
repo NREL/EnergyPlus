@@ -107,6 +107,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -294,6 +295,7 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DesiccantDehumidifiers::clear_state();
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();
 		EMSManager::clear_state();

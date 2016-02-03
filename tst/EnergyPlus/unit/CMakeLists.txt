@@ -23,6 +23,7 @@ set( test_src
   Datasets.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DesiccantDehumidifiers.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   EMSManager.unit.cc

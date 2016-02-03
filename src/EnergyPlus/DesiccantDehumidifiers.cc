@@ -188,6 +188,8 @@ namespace DesiccantDehumidifiers {
 	int NumSolidDesicDehums; // number of solid desiccant dehumidifiers
 	int NumGenericDesicDehums; // number of generic desiccant dehumidifiers
 	Real64 TempSteamIn( 100.0 ); // steam coil steam inlet temperature
+	static bool GetInputFlag( true ); // First time, input is "gotten"
+	static bool MyOneTimeFlag( true );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
 
@@ -239,7 +241,7 @@ namespace DesiccantDehumidifiers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DesicDehumNum; // index of solid desiccant unit being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
+		//static bool GetInputFlag( true ); // First time, input is "gotten"
 		Real64 HumRatNeeded; // process air leaving humidity ratio set by controller [kg water/kg air]
 
 		if ( GetInputFlag ) {
@@ -1427,7 +1429,7 @@ namespace DesiccantDehumidifiers {
 		int RegenInNode; // inlet node number
 		int ControlNode; // control node number
 		static bool MySetPointCheckFlag( true );
-		static bool MyOneTimeFlag( true );
+		//static bool MyOneTimeFlag( true );
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
 
@@ -2867,6 +2869,18 @@ namespace DesiccantDehumidifiers {
 			Residuum = 0.0;
 		}
 		return Residuum;
+	}
+
+	// Clears the global data in HeatingCoils.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state() {
+		NumDesicDehums = 0;
+		NumSolidDesicDehums = 0;
+		NumGenericDesicDehums = 0;
+		GetInputFlag = true;
+		MyOneTimeFlag = true;	
+		DesicDehum.deallocate();
 	}
 
 	//        End of Reporting subroutines for the SimAir Module
