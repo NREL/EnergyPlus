@@ -124,7 +124,7 @@ namespace Pipes {
 			static PlantComponent * factory( int objectType, std::string objectName );
 
 		public:
-			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
 
 	};
 

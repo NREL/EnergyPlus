@@ -313,7 +313,7 @@ namespace PipeHeatTransfer {
 		PlantComponent * factory( int objectType, std::string objectName );
 
 		void
-		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
+		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
 
 		void
 		PushInnerTimeStepArrays();
