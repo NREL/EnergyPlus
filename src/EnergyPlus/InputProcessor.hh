@@ -78,9 +78,6 @@
 
 namespace EnergyPlus {
 
-	// Forward Declarations
-	class Named;
-
 namespace InputProcessor {
 
 	// Using/Aliasing
@@ -687,7 +684,7 @@ namespace InputProcessor {
 	)
 	{
 		using valueType = typename std::iterator_traits< InputIterator >::value_type;
-		static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+		//static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
 
 		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s.name == str; } );
 		if ( it != last ) return it - first + 1; // 1-based return index
@@ -709,7 +706,7 @@ namespace InputProcessor {
 	)
 	{
 		using valueType = typename std::iterator_traits< InputIterator >::value_type;
-		static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+		//static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
 
 		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s->name == str; } );
 		if ( it != last ) return it - first + 1; // 1-based return index

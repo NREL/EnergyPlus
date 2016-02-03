@@ -232,7 +232,6 @@ namespace PlantLoopEquip {
 		using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
 		using CTElectricGenerator::SimCTPlantHeatRecovery;
 		using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
-		using GroundHeatExchangers::SimGroundHeatExchangers;
 		using SurfaceGroundHeatExchanger::SimSurfaceGroundHeatExchanger;
 		using PondGroundHeatExchanger::SimPondGroundHeatExchanger;
 
@@ -303,24 +302,36 @@ namespace PlantLoopEquip {
 		RunFlag = sim_component.ON;
 		CurLoad = sim_component.MyLoad;
 
+		if ( sim_component.compPtr != nullptr ) {
+			if ( InitLoopEquip ) {
+				sim_component.compPtr->onInitLoopEquip( sim_component_location );
+				sim_component.compPtr->getDesignCapacities( sim_component_location, sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad );
+				sim_component.compPtr->getDesignTemperatures( sim_component.TempDesCondIn, sim_component.TempDesEvapOut );
+				return;
+			}
+			if ( GetCompSizFac ) {
+				sim_component.compPtr->getSizingFactor( sim_component.SizFac );
+			}
+		}
+
 		//select equipment and call equiment simulation
 		//PIPES
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
@@ -791,7 +802,8 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_GroundHeatExchanger ) {
 
 			if ( EquipTypeNum == TypeOf_GrndHtExchgVertical ) { // 'GROUND HEAT EXCHANGER:VERTICAL'
-				SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip ); //DSU
+				//sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				GroundHeatExchangers::SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip ); //DSU
 
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;
@@ -823,11 +835,13 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSlinky ) { // 'GROUND HEAT EXCHANGER:SLINKY'
-				SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip );
+				//sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				GroundHeatExchangers::SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip );
 
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;
 				}
+
 
 			}
 			// THERMAL STORAGE

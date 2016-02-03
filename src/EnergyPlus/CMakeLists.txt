@@ -342,7 +342,6 @@ SET( SRC
   MoistureBalanceEMPDManager.hh
   MundtSimMgr.cc
   MundtSimMgr.hh
-  Named.hh
   NodeInputManager.cc
   NodeInputManager.hh
   NonZoneEquipmentManager.cc
