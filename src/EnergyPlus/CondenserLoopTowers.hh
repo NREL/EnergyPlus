@@ -112,28 +112,23 @@ namespace CondenserLoopTowers {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumSimpleTowers; // Number of similar towers
+	extern Array1D_bool CheckEquipName;
 
 	//? The following block of variables are used to carry model results for a tower instance
 	//   across sim, update, and report routines.  Simulation manager must be careful
 	//   in models with multiple towers.
 
-	extern Real64 InletWaterTemp; // CW temperature at tower inlet
-	extern Real64 OutletWaterTemp; // CW temperature at tower outlet
-	extern int WaterInletNode; // Node number at tower inlet
-	extern int WaterOutletNode; // Node number at tower outlet
-	extern Real64 WaterMassFlowRate; // WaterMassFlowRate through tower
-	//DSU this is plant level stuff now REAL(r64)         :: TowerMassFlowRateMax     = 0.0d0    ! Max Hardware Mass Flow Rate
-	//DSU this is plant level stuff now REAL(r64)         :: TowerMassFlowRateMin     = 0.0d0    ! Min Hardware Mass Flow Rate
-	//DSU this is plant level stuff now REAL(r64)         :: LoopMassFlowRateMaxAvail = 0.0d0    ! Max Loop Mass Flow Rate available
-	//DSU this is plant level stuff now REAL(r64)         :: LoopMassFlowRateMinAvail = 0.0d0    ! Min Loop Mass Flow Rate available
-	extern Real64 Qactual; // Tower heat transfer
-	extern Real64 CTFanPower; // Tower fan power used
-	extern Real64 AirFlowRateRatio; // Ratio of air flow rate through VS cooling tower to design air flow rate
-	extern Real64 BasinHeaterPower; // Basin heater power use (W)
-	extern Real64 WaterUsage; // Tower water usage (m3/s)
-	extern Real64 FanCyclingRatio; // cycling ratio of tower fan when min fan speed provide to much capacity
-
-	extern Array1D_bool CheckEquipName;
+	extern Real64 nsvInletWaterTemp; // CW temperature at tower inlet
+	extern Real64 nsvOutletWaterTemp; // CW temperature at tower outlet
+	extern int nsvWaterInletNode; // Node number at tower inlet
+	extern int nsvWaterOutletNode; // Node number at tower outlet
+	extern Real64 nsvWaterMassFlowRate; // WaterMassFlowRate through tower
+	extern Real64 nsvQactual; // Tower heat transfer
+	extern Real64 nsvCTFanPower; // Tower fan power used
+	extern Real64 nsvAirFlowRateRatio; // Ratio of air flow rate through VS cooling tower to design air flow rate
+	extern Real64 nsvBasinHeaterPower; // Basin heater power use (W)
+	extern Real64 nsvWaterUsage; // Tower water usage (m3/s)
+	extern Real64 nsvFanCyclingRatio; // cycling ratio of tower fan when min fan speed provide to much capacity
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopTowers
 
