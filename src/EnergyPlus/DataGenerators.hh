@@ -65,6 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -822,57 +823,6 @@ namespace DataGenerators {
 
 	};
 
-	struct FCDataStruct
-	{
-		// Members
-		// from input data and nested types for subsystems
-		std::string Name; // user identifier
-		std::string NameFCPM; // name of FC Power Module
-		FCPowerModuleStruct FCPM; // data for Power Module
-		std::string NameFCAirSup; // name of air supply module for fuel cell
-		FCAirSupplyDataStruct AirSup; // data for air supply module
-		std::string NameFCFuelSup; // name of fuel supply module
-		int FuelSupNum; // indes for fuel supply module structure
-		std::string NameFCWaterSup; // name of water supply module
-		FCWaterSupplyDataStruct WaterSup; // data for water supply module
-		std::string NameFCAuxilHeat; // name of auxiliary heating module
-		FCAuxilHeatDataStruct AuxilHeat; // data for auxiliary heating module
-		std::string NameExhaustHX; // name of Exhaust HX module
-		FCExhaustHXDataStruct ExhaustHX; // data for Exhaust heat exchanger module
-		std::string NameElecStorage; // name of Battery module
-		FCElecStorageDataStruct ElecStorage; // data for Battery module
-		std::string NameInverter; // name of Inverter Module
-		FCInverterDataStruct Inverter; // data for INverter module
-		std::string NameStackCooler; // name of Inverter Module
-		FCStackCoolerDataStruct StackCooler; // data for INverter module
-		int CWLoopNum; // cooling water plant loop index number
-		int CWLoopSideNum; // cooling water plant loop side index
-		int CWBranchNum; // cooling water plant loop branch index
-		int CWCompNum; // cooling water plant loop component index
-		FCReportDataStruct Report; // data for reporting as E+ output variables
-		// calculated whole-system level variables
-		Real64 ACPowerGen; // Net output from SOFC unit
-		Real64 QconvZone; // convective heat lost to surrounding zone
-		Real64 QradZone; // radiative heat lost to surrounding zone
-		int DynamicsControlID;
-		Real64 TimeElapsed; // used to track when timestep has changed
-
-		// Default Constructor
-		FCDataStruct() :
-			FuelSupNum( 0 ),
-			CWLoopNum( 0 ),
-			CWLoopSideNum( 0 ),
-			CWBranchNum( 0 ),
-			CWCompNum( 0 ),
-			ACPowerGen( 0.0 ),
-			QconvZone( 0.0 ),
-			QradZone( 0.0 ),
-			DynamicsControlID( 0 ),
-			TimeElapsed( 0.0 )
-		{}
-
-	};
-
 	struct GeneratorFuelSupplyDataStruct
 	{
 		// Members
@@ -1357,7 +1307,6 @@ namespace DataGenerators {
 	};
 
 	// Object Data
-	extern Array1D< FCDataStruct > FuelCell; // dimension to number of machines
 	extern Array1D< GasPropertyDataStruct > GasPhaseThermoChemistryData;
 	extern Array1D< GeneratorFuelSupplyDataStruct > FuelSupply; // fuel supply (reused across various)
 	extern Array1D< MicroCHPDataStruct > MicroCHP;

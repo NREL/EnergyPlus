@@ -226,7 +226,6 @@ namespace PlantLoopEquip {
 		using EvaporativeFluidCoolers::SimEvapFluidCoolers;
 		using BoilerSteam::SimSteamBoiler;
 		using IceThermalStorage::SimIceStorage;
-		using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
 		using MicroCHPElectricGenerator::SimMicroCHPPlantHeatRecovery;
 		using PlantValves::SimPlantValves;
 		using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
@@ -915,22 +914,10 @@ namespace PlantLoopEquip {
 			// for heat recovery plant interactions.
 
 			if ( EquipTypeNum == TypeOf_Generator_FCExhaust ) {
-				SimFuelCellPlantHeatRecovery( sim_component.TypeOf, sim_component.Name, TypeOf_Generator_FCExhaust, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_Generator_FCStackCooler ) {
-				SimFuelCellPlantHeatRecovery( sim_component.TypeOf, sim_component.Name, TypeOf_Generator_FCStackCooler, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_Generator_MicroCHP ) {
 				SimMicroCHPPlantHeatRecovery( sim_component.TypeOf, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
