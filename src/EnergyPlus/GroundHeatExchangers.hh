@@ -211,7 +211,7 @@ namespace GroundHeatExchangers {
 		virtual void
 		getAnnualTimeConstant()=0;
 
-		void onInitLoopEquip();
+		void onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) );
 
 		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
 
