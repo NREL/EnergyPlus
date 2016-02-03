@@ -190,7 +190,7 @@ namespace GroundHeatExchangers {
 	}
 
 
-	void GLHEBase::onInitLoopEquip() {
+	void GLHEBase::onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) {
 		this->initGLHESimVars();
 	}
 
