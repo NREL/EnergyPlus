@@ -435,17 +435,11 @@ namespace PoweredInductionUnits {
 			PIU( PIUNum ).HCoilInAirNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, PIU( PIUNum ).UnitType, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent, cAlphaFieldNames( 6 ) );
 			// The reheat coil control node is necessary for hot water reheat, but not necessary for
 			// electric or gas reheat.
-			if ( PIU( PIUNum ).HCoilType_Num == HCoilType_Gas || PIU( PIUNum ).HCoilType_Num == HCoilType_Electric ) {
-				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					ShowWarningError( "In " + cCurrentModuleObject + " = " + PIU( PIUNum ).Name + " the " + cAlphaFieldNames( 11 ) + " is not needed and will be ignored." );
-					ShowContinueError( "  It is used for hot water reheat coils only." );
-				}
-			} else {
-				if ( lAlphaFieldBlanks( 11 ) ) {
-					ShowSevereError( "In " + cCurrentModuleObject + " = " + PIU( PIUNum ).Name + " the " + cAlphaFieldNames( 11 ) + " is undefined." );
-					ErrorsFound = true;
-				}
-				PIU( PIUNum ).HotControlNode = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent, cAlphaFieldNames( 11 ) );
+			if ( PIU( PIUNum ).HCoilType_Num == HCoilType_SimpleHeating ) {
+				PIU( PIUNum ).HotControlNode = GetCoilWaterInletNode( cAlphaArgs( 9 ), cAlphaArgs( 10 ), ErrorsFound );
+			}
+			if ( PIU( PIUNum ).HCoilType_Num == HCoilType_SteamAirHeating ) {
+				PIU( PIUNum ).HotControlNode = GetCoilSteamInletNode( cAlphaArgs( 9 ), cAlphaArgs( 10 ), ErrorsFound );
 			}
 			PIU( PIUNum ).MixerName = cAlphaArgs( 7 ); // name of zone mixer object
 			PIU( PIUNum ).FanName = cAlphaArgs( 8 ); // name of fan object
