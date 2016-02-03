@@ -228,7 +228,6 @@ namespace PlantLoopEquip {
 		using IceThermalStorage::SimIceStorage;
 		using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
 		using MicroCHPElectricGenerator::SimMicroCHPPlantHeatRecovery;
-		using PlantValves::SimPlantValves;
 		using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
 		using CTElectricGenerator::SimCTPlantHeatRecovery;
 		using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
@@ -892,13 +891,7 @@ namespace PlantLoopEquip {
 
 		} else if ( GeneralEquipType == GenEquipTypes_Valve ) {
 			if ( EquipTypeNum == TypeOf_ValveTempering ) {
-				SimPlantValves( EquipTypeNum, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Valve Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
