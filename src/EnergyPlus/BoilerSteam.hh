@@ -183,6 +183,8 @@ namespace BoilerSteam {
 			void InitBoiler();
 			
 			void SizeBoiler();
+			
+			void CalcBoilerModel( Real64 & MyLoad, bool const RunFlag, int const EquipFlowCtrl );
  
 	};
 

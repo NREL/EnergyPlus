@@ -845,8 +845,7 @@ namespace BoilerSteam {
 	}
 
 	void
-	CalcBoilerModel(
-		int & BoilerNum, // boiler identifier
+	BoilerSteamSpecs::CalcBoilerModel(
 		Real64 & MyLoad, // W - hot water demand to be met by boiler
 		bool const RunFlag, // TRUE if boiler operating
 		int const EquipFlowCtrl // Flow control mode for the equipment
@@ -916,20 +915,20 @@ namespace BoilerSteam {
 		//Loading the variables derived type in to local variables
 		BoilerLoad = 0.0;
 		BoilerMassFlowRate = 0.0;
-		BoilerInletNode = Boiler( BoilerNum ).BoilerInletNodeNum;
-		BoilerOutletNode = Boiler( BoilerNum ).BoilerOutletNodeNum;
-		BoilerNomCap = Boiler( BoilerNum ).NomCap;
-		BoilerMaxPLR = Boiler( BoilerNum ).MaxPartLoadRat;
-		BoilerMinPLR = Boiler( BoilerNum ).MinPartLoadRat;
-		LoadCoef = Boiler( BoilerNum ).FullLoadCoef;
-		TempUpLimitBout = Boiler( BoilerNum ).TempUpLimitBoilerOut;
-		BoilerMassFlowRateMax = Boiler( BoilerNum ).DesMassFlowRate;
-		BoilerMaxPress = Boiler( BoilerNum ).BoilerMaxOperPress;
-		BoilerEff = Boiler( BoilerNum ).Effic;
+		BoilerInletNode = this->BoilerInletNodeNum;
+		BoilerOutletNode = this->BoilerOutletNodeNum;
+		BoilerNomCap = this->NomCap;
+		BoilerMaxPLR = this->MaxPartLoadRat;
+		BoilerMinPLR = this->MinPartLoadRat;
+		LoadCoef = this->FullLoadCoef;
+		TempUpLimitBout = this->TempUpLimitBoilerOut;
+		BoilerMassFlowRateMax = this->DesMassFlowRate;
+		BoilerMaxPress = this->BoilerMaxOperPress;
+		BoilerEff = this->Effic;
 
 		QualitySteam = Node( BoilerInletNode ).Quality;
-		LoopNum = Boiler( BoilerNum ).LoopNum;
-		LoopSideNum = Boiler( BoilerNum ).LoopSideNum;
+		LoopNum = this->LoopNum;
+		LoopSideNum = this->LoopSideNum;
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
 			BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPoint;
@@ -947,24 +946,24 @@ namespace BoilerSteam {
 		//Set the current load equal to the boiler load
 		BoilerLoad = MyLoad;
 
-		Boiler( BoilerNum ).BoilerPressCheck = GetSatPressureRefrig( FluidNameSteam, BoilerOutletTemp, Boiler( BoilerNum ).FluidIndex, RoutineName );
+		this->BoilerPressCheck = GetSatPressureRefrig( FluidNameSteam, BoilerOutletTemp, this->FluidIndex, RoutineName );
 
-		if ( ( Boiler( BoilerNum ).BoilerPressCheck ) > BoilerMaxPress ) {
-			if ( Boiler( BoilerNum ).PressErrIndex == 0 ) {
-				ShowSevereError( "Boiler:Steam=\"" + Boiler( BoilerNum ).Name + "\", Saturation Pressure is greater than Maximum Operating Pressure," );
+		if ( ( this->BoilerPressCheck ) > BoilerMaxPress ) {
+			if ( this->PressErrIndex == 0 ) {
+				ShowSevereError( "Boiler:Steam=\"" + this->Name + "\", Saturation Pressure is greater than Maximum Operating Pressure," );
 				ShowContinueError( "Lower Input Temperature" );
 				ShowContinueError( "Steam temperature=[" + RoundSigDigits( BoilerOutletTemp, 2 ) + "] C" );
-				ShowContinueError( "Refrigerant Saturation Pressure =[" + RoundSigDigits( Boiler( BoilerNum ).BoilerPressCheck, 0 ) + "] Pa" );
+				ShowContinueError( "Refrigerant Saturation Pressure =[" + RoundSigDigits( this->BoilerPressCheck, 0 ) + "] Pa" );
 			}
-			ShowRecurringSevereErrorAtEnd( "Boiler:Steam=\"" + Boiler( BoilerNum ).Name + "\", Saturation Pressure is greater than Maximum Operating Pressure..continues", Boiler( BoilerNum ).PressErrIndex, Boiler( BoilerNum ).BoilerPressCheck, Boiler( BoilerNum ).BoilerPressCheck, _, "[Pa]", "[Pa]" );
+			ShowRecurringSevereErrorAtEnd( "Boiler:Steam=\"" + this->Name + "\", Saturation Pressure is greater than Maximum Operating Pressure..continues", this->PressErrIndex, this->BoilerPressCheck, this->BoilerPressCheck, _, "[Pa]", "[Pa]" );
 		}
 
-		CpWater = GetSatSpecificHeatRefrig( FluidNameSteam, Node( BoilerInletNode ).Temp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+		CpWater = GetSatSpecificHeatRefrig( FluidNameSteam, Node( BoilerInletNode ).Temp, 0.0, this->FluidIndex, RoutineName );
 
 		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == 0 ) {
 			// Calculate the flow for the boiler
 
-			{ auto const SELECT_CASE_var( PlantLoop( Boiler( BoilerNum ).LoopNum ).LoopDemandCalcScheme );
+			{ auto const SELECT_CASE_var( PlantLoop( this->LoopNum ).LoopDemandCalcScheme );
 			if ( SELECT_CASE_var == SingleSetPoint ) {
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPoint - Node( BoilerInletNode ).Temp;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
@@ -974,9 +973,9 @@ namespace BoilerSteam {
 			}}
 			BoilerOutletTemp = BoilerDeltaTemp + Node( BoilerInletNode ).Temp;
 
-			EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+			EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName );
 
-			EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+			EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName );
 
 			LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -986,13 +985,13 @@ namespace BoilerSteam {
 			//       BoilerMassFlowRate = MIN(BoilerMassFlowRate,Node(BoilerInletNode)%MassFlowRateMaxAvail)  !CRBranchPump
 			//       BoilerMassFlowRate = MAX(BoilerMassFlowRate,Node(BoilerInletNode)%MassFlowRateMinAvail)     !CRBranchPump
 
-			SetComponentFlowRate( BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum );
+			SetComponentFlowRate( BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
 
 		} else { // If FlowLock is True
 			// Set the boiler flow rate from inlet node and then check performance
 			BoilerMassFlowRate = Node( BoilerInletNode ).MassFlowRate;
 			// Assume that it can meet the setpoint
-			{ auto const SELECT_CASE_var( PlantLoop( Boiler( BoilerNum ).LoopNum ).LoopDemandCalcScheme );
+			{ auto const SELECT_CASE_var( PlantLoop( this->LoopNum ).LoopDemandCalcScheme );
 			if ( SELECT_CASE_var == SingleSetPoint ) {
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPoint - Node( BoilerInletNode ).Temp;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
@@ -1000,14 +999,14 @@ namespace BoilerSteam {
 			}}
 			//If boiler outlet temp is already greater than setpoint than it does not need to operate this iteration
 			if ( BoilerDeltaTemp < 0.0 ) {
-				{ auto const SELECT_CASE_var( PlantLoop( Boiler( BoilerNum ).LoopNum ).LoopDemandCalcScheme );
+				{ auto const SELECT_CASE_var( PlantLoop( this->LoopNum ).LoopDemandCalcScheme );
 				if ( SELECT_CASE_var == SingleSetPoint ) {
 					BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPoint;
 				} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 					BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPointLo;
 				}}
-				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
-				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName );
+				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName );
 
 				LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -1015,15 +1014,15 @@ namespace BoilerSteam {
 
 			} else {
 
-				{ auto const SELECT_CASE_var( PlantLoop( Boiler( BoilerNum ).LoopNum ).LoopDemandCalcScheme );
+				{ auto const SELECT_CASE_var( PlantLoop( this->LoopNum ).LoopDemandCalcScheme );
 				if ( SELECT_CASE_var == SingleSetPoint ) {
 					BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPoint;
 				} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 					BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPointLo;
 				}}
 
-				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
-				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName );
+				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName );
 
 				LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -1037,16 +1036,16 @@ namespace BoilerSteam {
 				BoilerLoad = MyLoad;
 
 				// Reset later , here just for calculating latent heat
-				{ auto const SELECT_CASE_var( PlantLoop( Boiler( BoilerNum ).LoopNum ).LoopDemandCalcScheme );
+				{ auto const SELECT_CASE_var( PlantLoop( this->LoopNum ).LoopDemandCalcScheme );
 				if ( SELECT_CASE_var == SingleSetPoint ) {
 					BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPoint;
 				} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 					BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPointLo;
 				}}
 
-				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName );
 
-				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName );
 
 				LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -1054,7 +1053,7 @@ namespace BoilerSteam {
 
 				BoilerMassFlowRate = BoilerLoad / ( LatentEnthSteam + CpWater * BoilerDeltaTemp );
 
-				SetComponentFlowRate( BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum );
+				SetComponentFlowRate( BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
 			}
 
 			// Checks Boiler Load on the basis of the machine limits.
@@ -1062,8 +1061,8 @@ namespace BoilerSteam {
 				if ( BoilerMassFlowRate > MassFlowTolerance ) {
 					BoilerLoad = BoilerNomCap;
 
-					EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
-					EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+					EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName );
+					EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName );
 
 					LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -1071,7 +1070,7 @@ namespace BoilerSteam {
 
 					BoilerMassFlowRate = BoilerLoad / ( LatentEnthSteam + CpWater * BoilerDeltaTemp );
 
-					SetComponentFlowRate( BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum );
+					SetComponentFlowRate( BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
 				} else {
 					BoilerLoad = 0.0;
 					BoilerOutletTemp = Node( BoilerInletNode ).Temp;
