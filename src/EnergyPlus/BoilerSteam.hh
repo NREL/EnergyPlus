@@ -133,6 +133,14 @@ namespace BoilerSteam {
 		int FluidIndex; // Steam index
 		bool MyEnvrnFlag; // environment flag
 		bool MyFlag;
+		Real64 BoilerLoad; // W - Boiler operating load
+		Real64 BoilerEnergy; // J - Boiler energy integrated over time
+		Real64 FuelUsed; // W - Boiler fuel used
+		Real64 FuelConsumed; // J - Boiler Fuel consumed integrated over time
+		Real64 BoilerInletTemp; // C - Boiler inlet temperature
+		Real64 BoilerOutletTemp; // C - Boiler outlet temperature
+		Real64 Mdot; // kg/s - Boiler mass flow rate
+		Real64 BoilerMaxOperPress;
 
 		// Default Constructor
 		BoilerSteamSpecs() :
@@ -165,7 +173,15 @@ namespace BoilerSteam {
 			PressErrIndex( 0 ),
 			FluidIndex( 0 ),
 			MyEnvrnFlag( true ),
-			MyFlag( true )
+			MyFlag( true ),
+			BoilerLoad( 0.0 ),
+			BoilerEnergy( 0.0 ),
+			FuelUsed( 0.0 ),
+			FuelConsumed( 0.0 ),
+			BoilerInletTemp( 0.0 ),
+			BoilerOutletTemp( 0.0 ),
+			Mdot( 0.0 ),
+			BoilerMaxOperPress( 0.0 )
 		{}
 		
 		
@@ -185,38 +201,13 @@ namespace BoilerSteam {
 			void SizeBoiler();
 			
 			void CalcBoilerModel( Real64 & MyLoad, bool const RunFlag, int const EquipFlowCtrl );
+
+			void UpdateBoilerRecords( Real64 const MyLoad, bool const RunFlag );
  
-	};
-
-	struct ReportVars
-	{
-		// Members
-		Real64 BoilerLoad; // W - Boiler operating load
-		Real64 BoilerEnergy; // J - Boiler energy integrated over time
-		Real64 FuelUsed; // W - Boiler fuel used
-		Real64 FuelConsumed; // J - Boiler Fuel consumed integrated over time
-		Real64 BoilerInletTemp; // C - Boiler inlet temperature
-		Real64 BoilerOutletTemp; // C - Boiler outlet temperature
-		Real64 Mdot; // kg/s - Boiler mass flow rate
-		Real64 BoilerMaxOperPress;
-
-		// Default Constructor
-		ReportVars() :
-			BoilerLoad( 0.0 ),
-			BoilerEnergy( 0.0 ),
-			FuelUsed( 0.0 ),
-			FuelConsumed( 0.0 ),
-			BoilerInletTemp( 0.0 ),
-			BoilerOutletTemp( 0.0 ),
-			Mdot( 0.0 ),
-			BoilerMaxOperPress( 0.0 )
-		{}
-
 	};
 
 	// Object Data
 	extern Array1D< BoilerSteamSpecs > Boiler; // dimension to number of machines
-	extern Array1D< ReportVars > BoilerReport;
 
 	// Functions
 
@@ -243,23 +234,7 @@ namespace BoilerSteam {
 	void
 	GetBoilerInput();
 
-	void
-	CalcBoilerModel(
-		int & BoilerNum, // boiler identifier
-		Real64 & MyLoad, // W - hot water demand to be met by boiler
-		bool const RunFlag, // TRUE if boiler operating
-		int const EquipFlowCtrl // Flow control mode for the equipment
-	);
-
 	// Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
-
-	void
-	UpdateBoilerRecords(
-		Real64 const MyLoad, // boiler operating load
-		bool const RunFlag, // boiler on when TRUE
-		int const Num, // boiler number
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
-	);
 
 	// End of Record Keeping subroutines for the BOILER:STEAM Module
 

@@ -1100,11 +1100,9 @@ namespace BoilerSteam {
 	// Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
 
 	void
-	UpdateBoilerRecords(
+	BoilerSteamSpecs::UpdateBoilerRecords(
 		Real64 const MyLoad, // boiler operating load
-		bool const RunFlag, // boiler on when TRUE
-		int const Num, // boiler number
-		bool const EP_UNUSED( FirstHVACIteration ) // TRUE if First iteration of simulation
+		bool const RunFlag   // boiler on when TRUE
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1148,17 +1146,17 @@ namespace BoilerSteam {
 
 		ReportingConstant = TimeStepSys * SecInHour;
 
-		BoilerInletNode = Boiler( Num ).BoilerInletNodeNum;
-		BoilerOutletNode = Boiler( Num ).BoilerOutletNodeNum;
+		BoilerInletNode = this->BoilerInletNodeNum;
+		BoilerOutletNode = this->BoilerOutletNodeNum;
 
 		if ( MyLoad <= 0.0 || ! RunFlag ) {
 			//set node temperatures
 			SafeCopyPlantNode( BoilerInletNode, BoilerOutletNode );
 			Node( BoilerOutletNode ).Temp = Node( BoilerInletNode ).Temp;
-			BoilerReport( Num ).BoilerOutletTemp = Node( BoilerInletNode ).Temp;
-			BoilerReport( Num ).BoilerLoad = 0.0;
-			BoilerReport( Num ).FuelUsed = 0.0;
-			Node( BoilerInletNode ).Press = Boiler( Num ).BoilerPressCheck;
+			this->BoilerOutletTemp = Node( BoilerInletNode ).Temp;
+			this->BoilerLoad = 0.0;
+			this->FuelUsed = 0.0;
+			Node( BoilerInletNode ).Press = this->BoilerPressCheck;
 			Node( BoilerOutletNode ).Press = Node( BoilerInletNode ).Press;
 			Node( BoilerInletNode ).Quality = 0.0;
 			Node( BoilerOutletNode ).Quality = Node( BoilerInletNode ).Quality;
@@ -1167,22 +1165,22 @@ namespace BoilerSteam {
 			//set node temperatures
 			SafeCopyPlantNode( BoilerInletNode, BoilerOutletNode );
 			Node( BoilerOutletNode ).Temp = BoilerOutletTemp;
-			BoilerReport( Num ).BoilerOutletTemp = BoilerOutletTemp;
-			BoilerReport( Num ).BoilerLoad = BoilerLoad;
-			BoilerReport( Num ).FuelUsed = FuelUsed;
-			Node( BoilerInletNode ).Press = Boiler( Num ).BoilerPressCheck; //???
+			this->BoilerOutletTemp = BoilerOutletTemp;
+			this->BoilerLoad = BoilerLoad;
+			this->FuelUsed = FuelUsed;
+			Node( BoilerInletNode ).Press = this->BoilerPressCheck; //???
 			Node( BoilerOutletNode ).Press = Node( BoilerInletNode ).Press;
 			Node( BoilerOutletNode ).Quality = 1.0; // Model assumes saturated steam exiting the boiler
 
 		}
 
-		BoilerReport( Num ).BoilerInletTemp = Node( BoilerInletNode ).Temp;
-		BoilerReport( Num ).Mdot = Node( BoilerOutletNode ).MassFlowRate;
-		LoopNum = Boiler( Num ).LoopNum;
-		LoopSideNum = Boiler( Num ).LoopSideNum;
+		this->BoilerInletTemp = Node( BoilerInletNode ).Temp;
+		this->Mdot = Node( BoilerOutletNode ).MassFlowRate;
+		LoopNum = this->LoopNum;
+		LoopSideNum = this->LoopSideNum;
 
-		BoilerReport( Num ).BoilerEnergy = BoilerReport( Num ).BoilerLoad * ReportingConstant;
-		BoilerReport( Num ).FuelConsumed = BoilerReport( Num ).FuelUsed * ReportingConstant;
+		this->BoilerEnergy = this->BoilerLoad * ReportingConstant;
+		this->FuelConsumed = this->FuelUsed * ReportingConstant;
 
 	}
 
