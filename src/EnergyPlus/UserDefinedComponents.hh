@@ -66,9 +66,13 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataPlant.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
+	// Forward Declarations
+	struct PlantLocation;
+	
 namespace UserDefinedComponents {
 
 	// Using/Aliasing
@@ -242,7 +246,7 @@ namespace UserDefinedComponents {
 
 	};
 
-	struct UserPlantComponentStruct
+	struct UserPlantComponentStruct : public PlantComponent
 	{
 		// Members
 		std::string Name; // user identifier
@@ -258,6 +262,12 @@ namespace UserDefinedComponents {
 			ErlSimProgramMngr( 0 ),
 			NumPlantConnections( 0 )
 		{}
+
+		public:
+			static PlantComponent * factory( std::string objectName );
+
+		public:
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
 
 	};
 

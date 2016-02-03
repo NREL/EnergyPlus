@@ -82,6 +82,8 @@
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
+#include <PlantComponent.hh>
+#include <PlantLocation.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -150,6 +152,28 @@ namespace UserDefinedComponents {
 
 	// Functions
 
+	PlantComponent * UserPlantComponentStruct::factory( std::string objectName ) {
+
+		if ( zzzGetInput ) {
+			GetUserDefinedComponents();
+			zzzGetInput = false;
+		}
+		
+		// Now look for this particular UserPlantComponent in the list
+		for ( auto & UserPlantCompItem : UserPlantComp ) {
+			if ( UserPlantCompItem.Name == objectName ) {
+				return &UserPlantCompItem;
+			}
+		}
+		// If we didn't find it, fatal
+		ShowFatalError( "UserPlantComponentStruct::factory : Error getting inputs for pipe named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
+	}
+
+	void UserPlantComponentStruct::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 const EP_UNUSED( CurLoad ) ) {
+	}
+
 	void
 	SimUserDefinedPlantComponent(
 		int const LoopNum, // plant loop sim call originated from
@@ -207,11 +231,6 @@ namespace UserDefinedComponents {
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		ThisLoop = 0; //Autodesk:Uninit Force default initialization
-
-		if ( zzzGetInput ) {
-			GetUserDefinedComponents();
-			zzzGetInput = false;
-		}
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
