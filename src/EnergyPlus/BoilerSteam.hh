@@ -65,10 +65,15 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
-namespace BoilerSteam {
+		  
+	// Forward Declarations
+	struct PlantLocation;
+ 
+namespace BoilerSteam : public PlantComponent {
 
 	// Using/Aliasing
 
@@ -94,7 +99,7 @@ namespace BoilerSteam {
 
 	// Types
 
-	struct BoilerSpecs
+	struct BoilerSteamSpecs
 	{
 		// Members
 		std::string Name; // user identifier
@@ -129,7 +134,7 @@ namespace BoilerSteam {
 		int FluidIndex; // Steam index
 
 		// Default Constructor
-		BoilerSpecs() :
+		BoilerSteamSpecs() :
 			FuelType( 0 ),
 			Available( false ),
 			ON( false ),
@@ -159,6 +164,13 @@ namespace BoilerSteam {
 			PressErrIndex( 0 ),
 			FluidIndex( 0 )
 		{}
+		
+		
+		public:
+			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
+
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
+ 
 	};
 
 	struct ReportVars
@@ -188,7 +200,7 @@ namespace BoilerSteam {
 	};
 
 	// Object Data
-	extern Array1D< BoilerSpecs > Boiler; // dimension to number of machines
+	extern Array1D< BoilerSteamSpecs > Boiler; // dimension to number of machines
 	extern Array1D< ReportVars > BoilerReport;
 
 	// Functions

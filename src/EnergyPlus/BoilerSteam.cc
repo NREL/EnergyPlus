@@ -140,7 +140,7 @@ namespace BoilerSteam {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
 	// Object Data
-	Array1D< BoilerSpecs > Boiler; // dimension to number of machines
+	Array1D< BoilerSteamSpecs > Boiler; // dimension to number of machines
 	Array1D< ReportVars > BoilerReport;
 
 	// MODULE SUBROUTINES:
@@ -165,6 +165,36 @@ namespace BoilerSteam {
 		BoilerReport.deallocate();
 	}
 
+	PlantComponent * BoilerSteamSpecs::factory( int const EP_UNUSED(objectType), std::string objectName ) {
+
+		static bool GetInput( true ); // if TRUE read user input
+		
+		//Get Input
+		if ( GetInput ) {
+			GetBoilerInput();
+			GetInput = false;
+		}
+		
+		// Now look for this particular component in the list
+		for ( auto & BoilerItem : Boiler ) {
+			if ( BoilerItem.Name == objectName ) {
+				return &BoilerItem;
+			}
+		}
+		// If we didn't find it, fatal
+		ShowFatalError( "BoilerSteamSpecs::factory : Error getting inputs for Boiler named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
+	}
+	
+	void
+	BoilerSteamSpecs::simulate( 
+		const PlantLocation & calledFromLocation, 
+		bool const FirstHVACIteration, 
+		Real64 & CurLoad )
+	{
+	}
+	
 	void
 	SimSteamBoiler(
 		std::string const & EP_UNUSED( BoilerType ), // boiler type (used in CASE statement)
@@ -209,34 +239,7 @@ namespace BoilerSteam {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true ); // if TRUE read user input
 		int BoilerNum; // boiler counter/identifier
-
-		//Get Input
-		if ( GetInput ) {
-			GetBoilerInput();
-			GetInput = false;
-		}
-
-		// Find the correct Equipment
-		if ( CompIndex == 0 ) {
-			BoilerNum = FindItemInList( BoilerName, Boiler );
-			if ( BoilerNum == 0 ) {
-				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
-			}
-			CompIndex = BoilerNum;
-		} else {
-			BoilerNum = CompIndex;
-			if ( BoilerNum > NumBoilers || BoilerNum < 1 ) {
-				ShowFatalError( "SimBoiler:  Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Number of Units=" + TrimSigDigits( NumBoilers ) + ", Entered Unit name=" + BoilerName );
-			}
-			if ( CheckEquipName( BoilerNum ) ) {
-				if ( BoilerName != Boiler( BoilerNum ).Name ) {
-					ShowFatalError( "SimBoiler: Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Unit name=" + BoilerName + ", stored Unit Name for that index=" + Boiler( BoilerNum ).Name );
-				}
-				CheckEquipName( BoilerNum ) = false;
-			}
-		}
 
 		// Initialize Loop Equipment
 		if ( InitLoopEquip ) {
