@@ -69,11 +69,11 @@ namespace EnergyPlus {
 		public:
 			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad ) = 0;
 
-			virtual void getDesignCapacities( Real64 & MaxCap, Real64 & MinCap, Real64 & OptCap ) {}
+			virtual void getDesignCapacities( Real64 & EP_UNUSED(MaxLoad), Real64 & EP_UNUSED(MinLoad), Real64 & EP_UNUSED(OptLoad) ) {}
 
-			virtual void getDesignTemperatures( Real64 & TempDesCondIn, Real64 & TempDesEvapOut ) {}
+			virtual void getDesignTemperatures( Real64 & EP_UNUSED(TempDesCondIn), Real64 & EP_UNUSED(TempDesEvapOut) ) {}
 
-			virtual void getSizingFactor( Real64 & SizFac ) {}
+			virtual void getSizingFactor( Real64 & EP_UNUSED(SizFac) ) {}
 
 			virtual void onInitLoopEquip() {}
 
