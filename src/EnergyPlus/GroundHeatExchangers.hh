@@ -213,7 +213,7 @@ namespace GroundHeatExchangers {
 
 		void onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) );
 
-		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
 
 		static PlantComponent * factory( int const objectType, std::string objectName );
 
