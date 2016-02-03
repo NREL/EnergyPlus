@@ -1189,7 +1189,7 @@ namespace HeatingCoils {
 		DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
 		DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
 
-		if ( TempCap == AutoSize ) {
+		if ( TempCap == AutoSize) {
 			if ( HeatingCoil( CoilNum ).DesiccantRegenerationCoil ) {
 				bPRINT = false;
 				DataDesicDehumNum = HeatingCoil( CoilNum ).DesiccantDehumNum;
