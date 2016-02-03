@@ -83,10 +83,10 @@ namespace BoilerSteam {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern Real64 FuelUsed; // W - Boiler fuel used
-	extern Real64 BoilerLoad; // W - Boiler Load
+	extern Real64 nsvFuelUsed; // W - Boiler fuel used
+	extern Real64 nsvBoilerLoad; // W - Boiler Load
 	extern Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
-	extern Real64 BoilerOutletTemp; // W - Boiler outlet temperature
+	extern Real64 nsvBoilerOutletTemp; // W - Boiler outlet temperature
 	extern Real64 BoilerMaxPress;
 	extern int NumBoilers; // Number of boilers
 	extern Real64 BoilerMassFlowMaxAvail; // kg/s - Boiler mass flow rate
