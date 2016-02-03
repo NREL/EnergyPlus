@@ -175,11 +175,11 @@ namespace PondGroundHeatExchanger {
 			MyFlag( true )
 		{}
 
-		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
 
 		static PlantComponent * factory( int const objectType, std::string objectName );
 
-		void getDesignCapacities( Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
+		void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
 
 		void
 		InitPondGroundHeatExchanger(

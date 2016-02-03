@@ -158,15 +158,15 @@ namespace PondGroundHeatExchanger {
 	Real64 PastPondTemp( 0.0 ); // past pond temperature
 	Real64 PondArea( 0.0 ); // pond surface area
 	Real64 PondDepth( 0.0 ); // pond depth
-	Real64 TubeInDiameter( 0.0 ); // hydronic tube inside diameter
-	Real64 TubeOutDiameter( 0.0 ); // hydronic tube outside diameter
-	Real64 TubeConductivity( 0.0 ); // hydronic tube thermal conductivity
-	Real64 GrndConductivity( 0.0 ); // ground thermal conductivity
+	//Real64 TubeInDiameter( 0.0 ); // hydronic tube inside diameter
+	//Real64 TubeOutDiameter( 0.0 ); // hydronic tube outside diameter
+	//Real64 TubeConductivity( 0.0 ); // hydronic tube thermal conductivity
+	//Real64 GrndConductivity( 0.0 ); // ground thermal conductivity
 	Real64 Concentration( 0.0 ); // fluid/glycol concentration 0.0-1.0 proportion.
 	Real64 CircLength( 0.0 ); // length of each circuit
-	int NumCircuits( 0 ); // number of circuits in total
-	int InletNodeNum( 0 ); // inlet node number
-	int OutletNodeNum( 0 ); // oulet node number
+	//int NumCircuits( 0 ); // number of circuits in total
+	//int InletNodeNum( 0 ); // inlet node number
+	//int OutletNodeNum( 0 ); // oulet node number
 	int WaterIndex( 0 ); // Fluid index for pond water
 	bool NoDeepGroundTempObjWarning( true ); // This will cause a warning to be issued if no "deep" ground
 	// temperature object was input.
@@ -179,7 +179,7 @@ namespace PondGroundHeatExchanger {
 	Array1D< PondGroundHeatExchangerData > PondGHE;
 
 
-	void PondGroundHeatExchangerData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 const EP_UNUSED( CurLoad ) ) {
+	void PondGroundHeatExchangerData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 & EP_UNUSED( CurLoad ) ) {
 		this->InitPondGroundHeatExchanger( FirstHVACIteration );
 		this->CalcPondGroundHeatExchanger();
 		this->UpdatePondGroundHeatExchanger();
@@ -203,7 +203,7 @@ namespace PondGroundHeatExchanger {
 		return nullptr;
 	}
 
-	void PondGroundHeatExchangerData::getDesignCapacities( Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad ) {
+	void PondGroundHeatExchangerData::getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad ) {
 		this->InitPondGroundHeatExchanger( true );
 		MaxLoad = this->DesignCapacity;
 		MinLoad = 0.0;
@@ -475,7 +475,7 @@ namespace PondGroundHeatExchanger {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		Real64 DesignFlow; // Hypothetical design flow rate
-		int PondNum; // loop counter
+		//int PondNum; // loop counter
 		int LoopNum;
 		int LoopSideNum;
 		Real64 rho;
@@ -518,17 +518,17 @@ namespace PondGroundHeatExchanger {
 		}
 
 		// initialize - module variables
-		InletNodeNum = this->InletNodeNum;
-		OutletNodeNum = this->OutletNodeNum;
+		//InletNodeNum = this->InletNodeNum;
+		//OutletNodeNum = this->OutletNodeNum;
 		PondArea = this->Area;
 		PondDepth = this->Depth;
 		InletTemp = Node( InletNodeNum ).Temp;
 		OutletTemp = Node( OutletNodeNum ).Temp;
-		TubeInDiameter = this->TubeInDiameter;
-		TubeOutDiameter = this->TubeOutDiameter;
-		TubeConductivity = this->TubeConductivity;
-		GrndConductivity = this->GrndConductivity;
-		NumCircuits = this->NumCircuits;
+		//TubeInDiameter = this->TubeInDiameter;
+		//TubeOutDiameter = this->TubeOutDiameter;
+		//TubeConductivity = this->TubeConductivity;
+		//GrndConductivity = this->GrndConductivity;
+		//NumCircuits = this->NumCircuits;
 		CircLength = this->CircuitLength;
 		// temperatures
 		PondTemp = this->BulkTemperature;
@@ -1156,7 +1156,7 @@ namespace PondGroundHeatExchanger {
 		// update other variables from module variables
 		this->HeatTransferRate = HeatTransRate;
 		this->Energy = HeatTransRate * TimeStepSys * SecInHour;
-		this->PondTemp = PondTemp;
+		//this->PondTemp = PondTemp;
 
 	}
 
