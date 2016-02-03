@@ -11164,7 +11164,7 @@ namespace OutputReportTabular {
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   March 2012
 		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Amir Roth, Feb 2016 (unified with ComputeDelayedComponents to simplify code and debugging)
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//   Write the tables for the ZoneLoadComponentSummary and
