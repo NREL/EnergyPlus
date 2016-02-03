@@ -82,6 +82,8 @@
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
+#include <PlantComponent.hh>
+#include <PlantLocation.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -129,16 +131,15 @@ namespace UserDefinedComponents {
 
 	// MODULE VARIABLE DECLARATIONS:
 
-	int NumUserPlantComps( 0 );
-	int NumUserCoils( 0 );
-	int NumUserZoneAir( 0 );
-	int NumUserAirTerminals( 0 );
+	int zzzNumUserPlantComps( 0 );
+	int zzzNumUserCoils( 0 );
+	int zzzNumUserZoneAir( 0 );
+	int zzzNumUserAirTerminals( 0 );
 
-	Array1D_bool CheckUserPlantCompName;
-	Array1D_bool CheckUserCoilName;
-	Array1D_bool CheckUserZoneAirName;
-	Array1D_bool CheckUserAirTerminal;
-	bool GetInput( true );
+	Array1D_bool zzzCheckUserCoilName;
+	Array1D_bool zzzCheckUserZoneAirName;
+	Array1D_bool zzzCheckUserAirTerminal;
+	bool zzzGetInput( true );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -150,25 +151,36 @@ namespace UserDefinedComponents {
 
 	// Functions
 
-	void
-	SimUserDefinedPlantComponent(
-		int const LoopNum, // plant loop sim call originated from
-		int const LoopSideNum, // plant loop side sim call originated from
-		std::string const & EP_UNUSED( EquipType ), // type of equipment, 'PlantComponent:UserDefined'
-		std::string const & EquipName, // user name for component
-		int & CompIndex,
-		bool & InitLoopEquip,
-		Real64 const MyLoad,
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap
-	)
-	{
+	PlantComponent * UserPlantComponentStruct::factory( int const EP_UNUSED(objectType),  std::string objectName ) {
 
+		if ( zzzGetInput ) {
+			GetUserDefinedComponents();
+			zzzGetInput = false;
+		}
+		
+		// Now look for this particular UserPlantComponent in the list
+		for ( auto & UserPlantCompItem : UserPlantComp ) {
+			if ( UserPlantCompItem.Name == objectName ) {
+				return &UserPlantCompItem;
+			}
+		}
+		// If we didn't find it, fatal
+		ShowFatalError( "UserPlantComponentStruct::factory : Error getting inputs for pipe named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
+	}
+
+	void
+	UserPlantComponentStruct::simulate( 
+		const PlantLocation & calledFromLocation, 
+		bool const EP_UNUSED( FirstHVACIteration ), 
+		Real64 const CurLoad 
+	) {
+		
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   Jan 2012
-		//       MODIFIED       na
+		//       MODIFIED       R. Zhang, Feb. 2016, Refactor plant component
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -181,11 +193,7 @@ namespace UserDefinedComponents {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using General::TrimSigDigits;
 		using EMSManager::ManageEMS;
-		using PlantUtilities::InitComponentNodes;
-		using PlantUtilities::RegisterPlantCompDesignFlow;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -201,90 +209,26 @@ namespace UserDefinedComponents {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int CompNum;
 		int ThisLoop;
-		int Loop;
 
-		//Autodesk:Uninit Initialize variables used uninitialized
-		ThisLoop = 0; //Autodesk:Uninit Force default initialization
+		ThisLoop = calledFromLocation.loopNum;
 
-		if ( GetInput ) {
-			GetUserDefinedComponents();
-			GetInput = false;
-		}
-
-		// Find the correct Equipment
-		if ( CompIndex == 0 ) {
-			CompNum = FindItemInList( EquipName, UserPlantComp );
-			if ( CompNum == 0 ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Plant Component not found" );
-			}
-			CompIndex = CompNum;
-		} else {
-			CompNum = CompIndex;
-			if ( CompNum < 1 || CompNum > NumUserPlantComps ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserPlantComps ) + ", Entered Unit name = " + EquipName );
-			}
-			if ( CheckUserPlantCompName( CompNum ) ) {
-				if ( EquipName != UserPlantComp( CompNum ).Name ) {
-					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + EquipName + ", stored unit name for that index=" + UserPlantComp( CompNum ).Name );
-				}
-				CheckUserPlantCompName( CompNum ) = false;
-			}
-		}
-
-		if ( InitLoopEquip || BeginEnvrnFlag ) {
-			InitPlantUserComponent( CompNum, LoopNum, MyLoad );
-			// find loop connection number from LoopNum and LoopSide
-			ThisLoop = 0;
-			for ( Loop = 1; Loop <= UserPlantComp( CompNum ).NumPlantConnections; ++Loop ) {
-				if ( LoopNum != UserPlantComp( CompNum ).Loop( Loop ).LoopNum ) continue;
-				if ( LoopSideNum != UserPlantComp( CompNum ).Loop( Loop ).LoopSideNum ) continue;
-				ThisLoop = Loop;
-			}
-			if ( ThisLoop > 0 ) {
-				if ( UserPlantComp( CompNum ).Loop( ThisLoop ).ErlInitProgramMngr > 0 ) {
-					ManageEMS( emsCallFromUserDefinedComponentModel, UserPlantComp( CompNum ).Loop( ThisLoop ).ErlInitProgramMngr );
-				}
-				// now interface sizing related values with rest of E+
-				MinCap = UserPlantComp( CompNum ).Loop( ThisLoop ).MinLoad;
-				MaxCap = UserPlantComp( CompNum ).Loop( ThisLoop ).MaxLoad;
-				OptCap = UserPlantComp( CompNum ).Loop( ThisLoop ).OptLoad;
-
-				InitComponentNodes( UserPlantComp( CompNum ).Loop( ThisLoop ).MassFlowRateMin, UserPlantComp( CompNum ).Loop( ThisLoop ).MassFlowRateMax, UserPlantComp( CompNum ).Loop( ThisLoop ).InletNodeNum, UserPlantComp( CompNum ).Loop( ThisLoop ).OutletNodeNum, UserPlantComp( CompNum ).Loop( ThisLoop ).LoopNum, UserPlantComp( CompNum ).Loop( ThisLoop ).LoopSideNum, UserPlantComp( CompNum ).Loop( ThisLoop ).BranchNum, UserPlantComp( CompNum ).Loop( ThisLoop ).CompNum );
-
-				RegisterPlantCompDesignFlow( UserPlantComp( CompNum ).Loop( ThisLoop ).InletNodeNum, UserPlantComp( CompNum ).Loop( ThisLoop ).DesignVolumeFlowRate );
-
-			} else {
-				// throw warning
-				ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from loop number called from =" + TrimSigDigits( LoopNum ) + " , loop side called from =" + TrimSigDigits( LoopSideNum ) );
-			}
-			return;
-		}
-
-		ThisLoop = 0;
-		for ( Loop = 1; Loop <= UserPlantComp( CompNum ).NumPlantConnections; ++Loop ) {
-			if ( LoopNum != UserPlantComp( CompNum ).Loop( Loop ).LoopNum ) continue;
-			if ( LoopSideNum != UserPlantComp( CompNum ).Loop( Loop ).LoopSideNum ) continue;
-			ThisLoop = Loop;
-		}
-
-		InitPlantUserComponent( CompNum, ThisLoop, MyLoad );
+		this->InitPlantUserComponent( calledFromLocation.loopNum, CurLoad );
 
 		if ( ThisLoop > 0 ) {
-			if ( UserPlantComp( CompNum ).Loop( ThisLoop ).ErlSimProgramMngr > 0 ) {
-				ManageEMS( emsCallFromUserDefinedComponentModel, UserPlantComp( CompNum ).Loop( ThisLoop ).ErlSimProgramMngr );
+			if ( this->Loop( ThisLoop ).ErlSimProgramMngr > 0 ) {
+				ManageEMS( emsCallFromUserDefinedComponentModel, this->Loop( ThisLoop ).ErlSimProgramMngr );
 			}
 		}
 
-		if ( UserPlantComp( CompNum ).ErlSimProgramMngr > 0 ) {
-			ManageEMS( emsCallFromUserDefinedComponentModel, UserPlantComp( CompNum ).ErlSimProgramMngr );
+		if ( this->ErlSimProgramMngr > 0 ) {
+			ManageEMS( emsCallFromUserDefinedComponentModel, this->ErlSimProgramMngr );
 		}
 
-		ReportPlantUserComponent( CompNum, ThisLoop );
+		this->ReportPlantUserComponent( ThisLoop );
 
 	}
-
+	
 	void
 	SimCoilUserDefined(
 		std::string const & EquipName, // user name for component
@@ -336,9 +280,9 @@ namespace UserDefinedComponents {
 		Real64 EnthOutlet;
 		int CompNum;
 
-		if ( GetInput ) {
+		if ( zzzGetInput ) {
 			GetUserDefinedComponents();
-			GetInput = false;
+			zzzGetInput = false;
 		}
 
 		// Find the correct Equipment
@@ -350,14 +294,14 @@ namespace UserDefinedComponents {
 			CompIndex = CompNum;
 		} else {
 			CompNum = CompIndex;
-			if ( CompNum < 1 || CompNum > NumUserCoils ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserCoils ) + ", Entered Unit name = " + EquipName );
+			if ( CompNum < 1 || CompNum > zzzNumUserCoils ) {
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( zzzNumUserCoils ) + ", Entered Unit name = " + EquipName );
 			}
-			if ( CheckUserCoilName( CompNum ) ) {
+			if ( zzzCheckUserCoilName( CompNum ) ) {
 				if ( EquipName != UserCoil( CompNum ).Name ) {
 					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + EquipName + ", stored unit name for that index=" + UserCoil( CompNum ).Name );
 				}
-				CheckUserCoilName( CompNum ) = false;
+				zzzCheckUserCoilName( CompNum ) = false;
 			}
 		}
 
@@ -455,9 +399,9 @@ namespace UserDefinedComponents {
 		Real64 SpecHumOut;
 		Real64 SpecHumIn;
 
-		if ( GetInput ) {
+		if ( zzzGetInput ) {
 			GetUserDefinedComponents();
-			GetInput = false;
+			zzzGetInput = false;
 		}
 
 		// Find the correct Equipment
@@ -469,14 +413,14 @@ namespace UserDefinedComponents {
 			CompIndex = CompNum;
 		} else {
 			CompNum = CompIndex;
-			if ( CompNum < 1 || CompNum > NumUserZoneAir ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserZoneAir ) + ", Entered Unit name = " + CompName );
+			if ( CompNum < 1 || CompNum > zzzNumUserZoneAir ) {
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( zzzNumUserZoneAir ) + ", Entered Unit name = " + CompName );
 			}
-			if ( CheckUserZoneAirName( CompNum ) ) {
+			if ( zzzCheckUserZoneAirName( CompNum ) ) {
 				if ( CompName != UserZoneAirHVAC( CompNum ).Name ) {
 					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + UserZoneAirHVAC( CompNum ).Name );
 				}
-				CheckUserZoneAirName( CompNum ) = false;
+				zzzCheckUserZoneAirName( CompNum ) = false;
 			}
 		}
 
@@ -567,9 +511,9 @@ namespace UserDefinedComponents {
 		int CompNum;
 		int Loop;
 
-		if ( GetInput ) {
+		if ( zzzGetInput ) {
 			GetUserDefinedComponents();
-			GetInput = false;
+			zzzGetInput = false;
 		}
 
 		// Find the correct Equipment
@@ -581,14 +525,14 @@ namespace UserDefinedComponents {
 			CompIndex = CompNum;
 		} else {
 			CompNum = CompIndex;
-			if ( CompNum < 1 || CompNum > NumUserAirTerminals ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserAirTerminals ) + ", Entered Unit name = " + CompName );
+			if ( CompNum < 1 || CompNum > zzzNumUserAirTerminals ) {
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( zzzNumUserAirTerminals ) + ", Entered Unit name = " + CompName );
 			}
-			if ( CheckUserAirTerminal( CompNum ) ) {
+			if ( zzzCheckUserAirTerminal( CompNum ) ) {
 				if ( CompName != UserAirTerminal( CompNum ).Name ) {
 					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + UserAirTerminal( CompNum ).Name );
 				}
-				CheckUserAirTerminal( CompNum ) = false;
+				zzzCheckUserAirTerminal( CompNum ) = false;
 			}
 		}
 
@@ -718,11 +662,10 @@ namespace UserDefinedComponents {
 		//need to make sure GetEMSInput has run...
 
 		cCurrentModuleObject = "PlantComponent:UserDefined";
-		NumUserPlantComps = GetNumObjectsFound( cCurrentModuleObject );
-		if ( NumUserPlantComps > 0 ) {
-			UserPlantComp.allocate( NumUserPlantComps );
-			CheckUserPlantCompName.dimension( NumUserPlantComps, true );
-			for ( CompLoop = 1; CompLoop <= NumUserPlantComps; ++CompLoop ) {
+		zzzNumUserPlantComps = GetNumObjectsFound( cCurrentModuleObject );
+		if ( zzzNumUserPlantComps > 0 ) {
+			UserPlantComp.allocate( zzzNumUserPlantComps );
+			for ( CompLoop = 1; CompLoop <= zzzNumUserPlantComps; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
@@ -897,18 +840,18 @@ namespace UserDefinedComponents {
 				}
 
 			}
-		} //NumUserPlantComps > 0
+		} //zzzNumUserPlantComps > 0
 
 		if ( ErrorsFound ) {
 			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 		cCurrentModuleObject = "Coil:UserDefined";
-		NumUserCoils = GetNumObjectsFound( cCurrentModuleObject );
-		if ( NumUserCoils > 0 ) {
-			UserCoil.allocate( NumUserCoils );
-			CheckUserCoilName.dimension( NumUserCoils, true );
-			for ( CompLoop = 1; CompLoop <= NumUserCoils; ++CompLoop ) {
+		zzzNumUserCoils = GetNumObjectsFound( cCurrentModuleObject );
+		if ( zzzNumUserCoils > 0 ) {
+			UserCoil.allocate( zzzNumUserCoils );
+			zzzCheckUserCoilName.dimension( zzzNumUserCoils, true );
+			for ( CompLoop = 1; CompLoop <= zzzNumUserCoils; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
@@ -1050,18 +993,18 @@ namespace UserDefinedComponents {
 				}
 			}
 
-		} //NumUserCoils > 0
+		} //zzzNumUserCoils > 0
 
 		if ( ErrorsFound ) {
 			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 		cCurrentModuleObject = "ZoneHVAC:ForcedAir:UserDefined";
-		NumUserZoneAir = GetNumObjectsFound( cCurrentModuleObject );
-		if ( NumUserZoneAir > 0 ) {
-			UserZoneAirHVAC.allocate( NumUserZoneAir );
-			CheckUserZoneAirName.dimension( NumUserZoneAir, true );
-			for ( CompLoop = 1; CompLoop <= NumUserZoneAir; ++CompLoop ) {
+		zzzNumUserZoneAir = GetNumObjectsFound( cCurrentModuleObject );
+		if ( zzzNumUserZoneAir > 0 ) {
+			UserZoneAirHVAC.allocate( zzzNumUserZoneAir );
+			zzzCheckUserZoneAirName.dimension( zzzNumUserZoneAir, true );
+			for ( CompLoop = 1; CompLoop <= zzzNumUserZoneAir; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
@@ -1202,18 +1145,18 @@ namespace UserDefinedComponents {
 				}
 
 			}
-		} //NumUserZoneAir > 0
+		} //zzzNumUserZoneAir > 0
 
 		if ( ErrorsFound ) {
 			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 		cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
-		NumUserAirTerminals = GetNumObjectsFound( cCurrentModuleObject );
-		if ( NumUserAirTerminals > 0 ) {
-			UserAirTerminal.allocate( NumUserAirTerminals );
-			CheckUserAirTerminal.dimension( NumUserAirTerminals, true );
-			for ( CompLoop = 1; CompLoop <= NumUserAirTerminals; ++CompLoop ) {
+		zzzNumUserAirTerminals = GetNumObjectsFound( cCurrentModuleObject );
+		if ( zzzNumUserAirTerminals > 0 ) {
+			UserAirTerminal.allocate( zzzNumUserAirTerminals );
+			zzzCheckUserAirTerminal.dimension( zzzNumUserAirTerminals, true );
+			for ( CompLoop = 1; CompLoop <= zzzNumUserAirTerminals; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
@@ -1376,17 +1319,111 @@ namespace UserDefinedComponents {
 				}
 
 			}
-		} //NumUserZoneAir > 0
+		} //zzzNumUserZoneAir > 0
 
 		if ( ErrorsFound ) {
 			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
 		}
 
 	}
+	
+	void 
+	UserPlantComponentStruct::getDesignCapacities( 
+		const PlantLocation & calledFromLocation, 
+		Real64 & MaxLoad, 
+		Real64 & MinLoad, 
+		Real64 & OptLoad 
+	) {
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Griffith
+		//       DATE WRITTEN   Jan 2012
+		//       MODIFIED       R. Zhang, Feb. 2016, Refactor plant component
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// User Defined plant generic component
+
+		// METHODOLOGY EMPLOYED:
+		// This routine to be called from PlantLoopEquipment.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		// na
+		
+		int ThisLoop =  calledFromLocation.loopNum;
+		
+		// now interface sizing related values with rest of E+
+		MinLoad = this->Loop( ThisLoop ).MinLoad;
+		MaxLoad = this->Loop( ThisLoop ).MaxLoad;
+		OptLoad = this->Loop( ThisLoop ).OptLoad;
+		
+	}
+	
+	void 
+	UserPlantComponentStruct::onInitLoopEquip(
+		const PlantLocation & calledFromLocation 
+	){
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Griffith
+		//       DATE WRITTEN   Jan 2012
+		//       MODIFIED       R. Zhang, Feb. 2016, Refactor plant component
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// User Defined plant generic component
+
+		// METHODOLOGY EMPLOYED:
+		// This routine to be called from PlantLoopEquipment.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using General::TrimSigDigits;
+		using EMSManager::ManageEMS;
+		using PlantUtilities::RegisterPlantCompDesignFlow;
+		using PlantUtilities::InitComponentNodes;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		
+		this->InitPlantUserComponent( calledFromLocation.loopNum, 0.0 );
+
+		int ThisLoop = calledFromLocation.loopNum;
+		
+		if ( ThisLoop > 0 ) {
+			if ( this->Loop( ThisLoop ).ErlInitProgramMngr > 0 ) {
+				ManageEMS( emsCallFromUserDefinedComponentModel, this->Loop( ThisLoop ).ErlInitProgramMngr );
+			}
+
+			InitComponentNodes( this->Loop( ThisLoop ).MassFlowRateMin, this->Loop( ThisLoop ).MassFlowRateMax, this->Loop( ThisLoop ).InletNodeNum, this->Loop( ThisLoop ).OutletNodeNum, this->Loop( ThisLoop ).LoopNum, this->Loop( ThisLoop ).LoopSideNum, this->Loop( ThisLoop ).BranchNum, this->Loop( ThisLoop ).CompNum );
+
+			RegisterPlantCompDesignFlow( this->Loop( ThisLoop ).InletNodeNum, this->Loop( ThisLoop ).DesignVolumeFlowRate );
+
+		} else {
+			// throw warning
+			ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from loop number called from =" + TrimSigDigits( calledFromLocation.loopNum ) + " , loop side called from =" + TrimSigDigits( calledFromLocation.loopSideNum ) );
+		}
+	
+	};
+	
 	void
-	InitPlantUserComponent(
-		int const CompNum,
+	UserPlantComponentStruct::InitPlantUserComponent(
 		int const LoopNum,
 		Real64 const MyLoad
 	)
@@ -1427,56 +1464,45 @@ namespace UserDefinedComponents {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true ); // one time flag
-		static Array1D_bool MyEnvrnFlag; // environment flag
-		static Array1D_bool MyFlag;
 		int ConnectionNum;
 		bool errFlag;
 		//  REAL(r64) :: rho
 		//  REAL(r64) :: Cp
 
-		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumUserPlantComps );
-			MyEnvrnFlag.allocate( NumUserPlantComps );
-			MyFlag = true;
-			MyEnvrnFlag = true;
-			MyOneTimeFlag = false;
-		}
-
-		if ( MyFlag( CompNum ) ) {
+		if ( this->MyFlag ) {
 			// locate the connections to the plant loops
-			for ( ConnectionNum = 1; ConnectionNum <= UserPlantComp( CompNum ).NumPlantConnections; ++ConnectionNum ) {
+			for ( ConnectionNum = 1; ConnectionNum <= this->NumPlantConnections; ++ConnectionNum ) {
 				errFlag = false;
-				ScanPlantLoopsForObject( UserPlantComp( CompNum ).Name, TypeOf_PlantComponentUserDefined, UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopSideNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).BranchNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).CompNum, _, _, _, UserPlantComp( CompNum ).Loop( ConnectionNum ).InletNodeNum );
+				ScanPlantLoopsForObject( this->Name, TypeOf_PlantComponentUserDefined, this->Loop( ConnectionNum ).LoopNum, this->Loop( ConnectionNum ).LoopSideNum, this->Loop( ConnectionNum ).BranchNum, this->Loop( ConnectionNum ).CompNum, _, _, _, this->Loop( ConnectionNum ).InletNodeNum );
 				if ( errFlag ) {
 					ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );
 				}
 
 				//set user input for flow priority
-				PlantLoop( UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopNum ).LoopSide( UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopSideNum ).Branch( UserPlantComp( CompNum ).Loop( ConnectionNum ).BranchNum ).Comp( UserPlantComp( CompNum ).Loop( ConnectionNum ).CompNum ).FlowPriority = UserPlantComp( CompNum ).Loop( ConnectionNum ).FlowPriority;
+				PlantLoop( this->Loop( ConnectionNum ).LoopNum ).LoopSide( this->Loop( ConnectionNum ).LoopSideNum ).Branch( this->Loop( ConnectionNum ).BranchNum ).Comp( this->Loop( ConnectionNum ).CompNum ).FlowPriority = this->Loop( ConnectionNum ).FlowPriority;
 
 				// set user input for how loads served
-				PlantLoop( UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopNum ).LoopSide( UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopSideNum ).Branch( UserPlantComp( CompNum ).Loop( ConnectionNum ).BranchNum ).Comp( UserPlantComp( CompNum ).Loop( ConnectionNum ).CompNum ).HowLoadServed = UserPlantComp( CompNum ).Loop( ConnectionNum ).HowLoadServed;
+				PlantLoop( this->Loop( ConnectionNum ).LoopNum ).LoopSide( this->Loop( ConnectionNum ).LoopSideNum ).Branch( this->Loop( ConnectionNum ).BranchNum ).Comp( this->Loop( ConnectionNum ).CompNum ).HowLoadServed = this->Loop( ConnectionNum ).HowLoadServed;
 
 			}
 
-			MyFlag( CompNum ) = false;
+			this->MyFlag = false;
 		}
 
-		if ( LoopNum <= 0 || LoopNum > UserPlantComp( CompNum ).NumPlantConnections ) return;
+		if ( LoopNum <= 0 || LoopNum > this->NumPlantConnections ) return;
 
 		// fill internal variable targets
-		UserPlantComp( CompNum ).Loop( LoopNum ).MyLoad = MyLoad;
-		UserPlantComp( CompNum ).Loop( LoopNum ).InletRho = GetDensityGlycol( PlantLoop( UserPlantComp( CompNum ).Loop( LoopNum ).LoopNum ).FluidName, Node( UserPlantComp( CompNum ).Loop( LoopNum ).InletNodeNum ).Temp, PlantLoop( UserPlantComp( CompNum ).Loop( LoopNum ).LoopNum ).FluidIndex, RoutineName );
-		UserPlantComp( CompNum ).Loop( LoopNum ).InletCp = GetSpecificHeatGlycol( PlantLoop( UserPlantComp( CompNum ).Loop( LoopNum ).LoopNum ).FluidName, Node( UserPlantComp( CompNum ).Loop( LoopNum ).InletNodeNum ).Temp, PlantLoop( UserPlantComp( CompNum ).Loop( LoopNum ).LoopNum ).FluidIndex, RoutineName );
-		UserPlantComp( CompNum ).Loop( LoopNum ).InletMassFlowRate = Node( UserPlantComp( CompNum ).Loop( LoopNum ).InletNodeNum ).MassFlowRate;
-		UserPlantComp( CompNum ).Loop( LoopNum ).InletTemp = Node( UserPlantComp( CompNum ).Loop( LoopNum ).InletNodeNum ).Temp;
-		if ( UserPlantComp( CompNum ).Air.InletNodeNum > 0 ) {
-			UserPlantComp( CompNum ).Air.InletRho = PsyRhoAirFnPbTdbW( OutBaroPress, Node( UserPlantComp( CompNum ).Air.InletNodeNum ).Temp, Node( UserPlantComp( CompNum ).Air.InletNodeNum ).HumRat, RoutineName );
-			UserPlantComp( CompNum ).Air.InletCp = PsyCpAirFnWTdb( Node( UserPlantComp( CompNum ).Air.InletNodeNum ).HumRat, Node( UserPlantComp( CompNum ).Air.InletNodeNum ).Temp );
-			UserPlantComp( CompNum ).Air.InletTemp = Node( UserPlantComp( CompNum ).Air.InletNodeNum ).Temp;
-			UserPlantComp( CompNum ).Air.InletMassFlowRate = Node( UserPlantComp( CompNum ).Air.InletNodeNum ).MassFlowRate;
-			UserPlantComp( CompNum ).Air.InletHumRat = Node( UserPlantComp( CompNum ).Air.InletNodeNum ).HumRat;
+		this->Loop( LoopNum ).MyLoad = MyLoad;
+		this->Loop( LoopNum ).InletRho = GetDensityGlycol( PlantLoop( this->Loop( LoopNum ).LoopNum ).FluidName, Node( this->Loop( LoopNum ).InletNodeNum ).Temp, PlantLoop( this->Loop( LoopNum ).LoopNum ).FluidIndex, RoutineName );
+		this->Loop( LoopNum ).InletCp = GetSpecificHeatGlycol( PlantLoop( this->Loop( LoopNum ).LoopNum ).FluidName, Node( this->Loop( LoopNum ).InletNodeNum ).Temp, PlantLoop( this->Loop( LoopNum ).LoopNum ).FluidIndex, RoutineName );
+		this->Loop( LoopNum ).InletMassFlowRate = Node( this->Loop( LoopNum ).InletNodeNum ).MassFlowRate;
+		this->Loop( LoopNum ).InletTemp = Node( this->Loop( LoopNum ).InletNodeNum ).Temp;
+		if ( this->Air.InletNodeNum > 0 ) {
+			this->Air.InletRho = PsyRhoAirFnPbTdbW( OutBaroPress, Node( this->Air.InletNodeNum ).Temp, Node( this->Air.InletNodeNum ).HumRat, RoutineName );
+			this->Air.InletCp = PsyCpAirFnWTdb( Node( this->Air.InletNodeNum ).HumRat, Node( this->Air.InletNodeNum ).Temp );
+			this->Air.InletTemp = Node( this->Air.InletNodeNum ).Temp;
+			this->Air.InletMassFlowRate = Node( this->Air.InletNodeNum ).MassFlowRate;
+			this->Air.InletHumRat = Node( this->Air.InletNodeNum ).HumRat;
 		}
 
 	}
@@ -1526,7 +1552,7 @@ namespace UserDefinedComponents {
 		int Loop;
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.dimension( NumUserCoils, true );
+			MyFlag.dimension( zzzNumUserCoils, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -1616,7 +1642,7 @@ namespace UserDefinedComponents {
 		int Loop;
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.dimension( NumUserZoneAir, true );
+			MyFlag.dimension( zzzNumUserZoneAir, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -1716,7 +1742,7 @@ namespace UserDefinedComponents {
 		int Loop;
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.dimension( NumUserAirTerminals, true );
+			MyFlag.dimension( zzzNumUserAirTerminals, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -1767,8 +1793,7 @@ namespace UserDefinedComponents {
 	}
 
 	void
-	ReportPlantUserComponent(
-		int const CompNum,
+	UserPlantComponentStruct::ReportPlantUserComponent(
 		int const LoopNum
 	)
 	{
@@ -1776,7 +1801,7 @@ namespace UserDefinedComponents {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   Feb. 2012
-		//       MODIFIED       na
+		//       MODIFIED       R. Zhang, Feb. 2016, Refactor plant component
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1807,36 +1832,36 @@ namespace UserDefinedComponents {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		SafeCopyPlantNode( UserPlantComp( CompNum ).Loop( LoopNum ).InletNodeNum, UserPlantComp( CompNum ).Loop( LoopNum ).OutletNodeNum );
+		SafeCopyPlantNode( this->Loop( LoopNum ).InletNodeNum, this->Loop( LoopNum ).OutletNodeNum );
 
 		//unload Actuators to node data structure
 
-		Node( UserPlantComp( CompNum ).Loop( LoopNum ).OutletNodeNum ).Temp = UserPlantComp( CompNum ).Loop( LoopNum ).OutletTemp;
+		Node( this->Loop( LoopNum ).OutletNodeNum ).Temp = this->Loop( LoopNum ).OutletTemp;
 
 		//make mass flow requests, just this loop
-		SetComponentFlowRate( UserPlantComp( CompNum ).Loop( LoopNum ).MassFlowRateRequest, UserPlantComp( CompNum ).Loop( LoopNum ).InletNodeNum, UserPlantComp( CompNum ).Loop( LoopNum ).OutletNodeNum, UserPlantComp( CompNum ).Loop( LoopNum ).LoopNum, UserPlantComp( CompNum ).Loop( LoopNum ).LoopSideNum, UserPlantComp( CompNum ).Loop( LoopNum ).BranchNum, UserPlantComp( CompNum ).Loop( LoopNum ).CompNum );
+		SetComponentFlowRate( this->Loop( LoopNum ).MassFlowRateRequest, this->Loop( LoopNum ).InletNodeNum, this->Loop( LoopNum ).OutletNodeNum, this->Loop( LoopNum ).LoopNum, this->Loop( LoopNum ).LoopSideNum, this->Loop( LoopNum ).BranchNum, this->Loop( LoopNum ).CompNum );
 
-		if ( UserPlantComp( CompNum ).Air.OutletNodeNum > 0 ) {
-			Node( UserPlantComp( CompNum ).Air.OutletNodeNum ).Temp = UserPlantComp( CompNum ).Air.OutletTemp;
-			Node( UserPlantComp( CompNum ).Air.OutletNodeNum ).HumRat = UserPlantComp( CompNum ).Air.OutletHumRat;
-			Node( UserPlantComp( CompNum ).Air.OutletNodeNum ).MassFlowRate = UserPlantComp( CompNum ).Air.OutletMassFlowRate;
-			Node( UserPlantComp( CompNum ).Air.OutletNodeNum ).Enthalpy = PsyHFnTdbW( UserPlantComp( CompNum ).Air.OutletTemp, UserPlantComp( CompNum ).Air.OutletHumRat );
+		if ( this->Air.OutletNodeNum > 0 ) {
+			Node( this->Air.OutletNodeNum ).Temp = this->Air.OutletTemp;
+			Node( this->Air.OutletNodeNum ).HumRat = this->Air.OutletHumRat;
+			Node( this->Air.OutletNodeNum ).MassFlowRate = this->Air.OutletMassFlowRate;
+			Node( this->Air.OutletNodeNum ).Enthalpy = PsyHFnTdbW( this->Air.OutletTemp, this->Air.OutletHumRat );
 		}
 
-		if ( UserPlantComp( CompNum ).Water.SuppliedByWaterSystem ) {
-			WaterStorage( UserPlantComp( CompNum ).Water.SupplyTankID ).VdotRequestDemand( UserPlantComp( CompNum ).Water.SupplyTankDemandARRID ) = UserPlantComp( CompNum ).Water.SupplyVdotRequest;
+		if ( this->Water.SuppliedByWaterSystem ) {
+			WaterStorage( this->Water.SupplyTankID ).VdotRequestDemand( this->Water.SupplyTankDemandARRID ) = this->Water.SupplyVdotRequest;
 		}
 
-		if ( UserPlantComp( CompNum ).Water.CollectsToWaterSystem ) {
-			WaterStorage( UserPlantComp( CompNum ).Water.CollectionTankID ).VdotAvailSupply( UserPlantComp( CompNum ).Water.CollectionTankSupplyARRID ) = UserPlantComp( CompNum ).Water.CollectedVdot;
+		if ( this->Water.CollectsToWaterSystem ) {
+			WaterStorage( this->Water.CollectionTankID ).VdotAvailSupply( this->Water.CollectionTankSupplyARRID ) = this->Water.CollectedVdot;
 		}
 
-		if ( UserPlantComp( CompNum ).Loop( LoopNum ).HowLoadServed == HowMet_ByNominalCapLowOutLimit ) {
-			PlantLoop( UserPlantComp( CompNum ).Loop( LoopNum ).LoopNum ).LoopSide( UserPlantComp( CompNum ).Loop( LoopNum ).LoopSideNum ).Branch( UserPlantComp( CompNum ).Loop( LoopNum ).BranchNum ).Comp( UserPlantComp( CompNum ).Loop( LoopNum ).CompNum ).MinOutletTemp = UserPlantComp( CompNum ).Loop( LoopNum ).LowOutTempLimit;
+		if ( this->Loop( LoopNum ).HowLoadServed == HowMet_ByNominalCapLowOutLimit ) {
+			PlantLoop( this->Loop( LoopNum ).LoopNum ).LoopSide( this->Loop( LoopNum ).LoopSideNum ).Branch( this->Loop( LoopNum ).BranchNum ).Comp( this->Loop( LoopNum ).CompNum ).MinOutletTemp = this->Loop( LoopNum ).LowOutTempLimit;
 		}
 
-		if ( UserPlantComp( CompNum ).Loop( LoopNum ).HowLoadServed == HowMet_ByNominalCapHiOutLimit ) {
-			PlantLoop( UserPlantComp( CompNum ).Loop( LoopNum ).LoopNum ).LoopSide( UserPlantComp( CompNum ).Loop( LoopNum ).LoopSideNum ).Branch( UserPlantComp( CompNum ).Loop( LoopNum ).BranchNum ).Comp( UserPlantComp( CompNum ).Loop( LoopNum ).CompNum ).MaxOutletTemp = UserPlantComp( CompNum ).Loop( LoopNum ).HiOutTempLimit;
+		if ( this->Loop( LoopNum ).HowLoadServed == HowMet_ByNominalCapHiOutLimit ) {
+			PlantLoop( this->Loop( LoopNum ).LoopNum ).LoopSide( this->Loop( LoopNum ).LoopSideNum ).Branch( this->Loop( LoopNum ).BranchNum ).Comp( this->Loop( LoopNum ).CompNum ).MaxOutletTemp = this->Loop( LoopNum ).HiOutTempLimit;
 		}
 
 	}
@@ -2101,13 +2126,13 @@ namespace UserDefinedComponents {
 		// na
 
 		// Obtains and allocates TESCoil related parameters from input file
-		if ( GetInput ) { // First time subroutine has been called, get input data
+		if ( zzzGetInput ) { // First time subroutine has been called, get input data
 			GetUserDefinedComponents();
-			GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+			zzzGetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
 		}
 
-		if ( NumUserCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, UserCoil, NumUserCoils );
+		if ( zzzNumUserCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, UserCoil, zzzNumUserCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -2163,13 +2188,13 @@ namespace UserDefinedComponents {
 		int CoilIndex;
 
 		// Obtains and allocates TESCoil related parameters from input file
-		if ( GetInput ) { // First time subroutine has been called, get input data
+		if ( zzzGetInput ) { // First time subroutine has been called, get input data
 			GetUserDefinedComponents();
-			GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+			zzzGetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
 		}
 
-		if ( NumUserCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, UserCoil, NumUserCoils );
+		if ( zzzNumUserCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, UserCoil, zzzNumUserCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -2228,13 +2253,13 @@ namespace UserDefinedComponents {
 		int CoilIndex;
 
 		// Obtains and allocates TESCoil related parameters from input file
-		if ( GetInput ) { // First time subroutine has been called, get input data
+		if ( zzzGetInput ) { // First time subroutine has been called, get input data
 			GetUserDefinedComponents();
-			GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
+			zzzGetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
 		}
 
-		if ( NumUserCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, UserCoil, NumUserCoils );
+		if ( zzzNumUserCoils > 0 ) {
+			CoilIndex = FindItem( CoilName, UserCoil, zzzNumUserCoils );
 		} else {
 			CoilIndex = 0;
 		}

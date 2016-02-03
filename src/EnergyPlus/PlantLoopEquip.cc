@@ -97,6 +97,7 @@
 #include <PlantComponentTemperatureSources.hh>
 #include <PlantHeatExchangerFluidToFluid.hh>
 #include <PlantLoadProfile.hh>
+#include <PlantLocation.hh>
 #include <PlantPipingSystemsManager.hh>
 #include <PlantValves.hh>
 #include <PondGroundHeatExchanger.hh>
@@ -217,8 +218,6 @@ namespace PlantLoopEquip {
 		using HeatPumpWaterToWaterCOOLING::SimHPWatertoWaterCOOLING;
 		using HeatPumpWaterToWaterSimple::SimHPWatertoWaterSimple;
 		using OutsideEnergySources::SimOutsideEnergy;
-		using Pipes::SimPipes;
-		using PipeHeatTransfer::SimPipesHeatTransfer;
 		using Pumps::SimPumps;
 
 		using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
@@ -233,7 +232,6 @@ namespace PlantLoopEquip {
 		using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
 		using CTElectricGenerator::SimCTPlantHeatRecovery;
 		using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
-		using GroundHeatExchangers::SimGroundHeatExchangers;
 		using SurfaceGroundHeatExchanger::SimSurfaceGroundHeatExchanger;
 		using PondGroundHeatExchanger::SimPondGroundHeatExchanger;
 
@@ -248,7 +246,7 @@ namespace PlantLoopEquip {
 		using PhotovoltaicThermalCollectors::SimPVTcollectors;
 		using PhotovoltaicThermalCollectors::CalledFromPlantLoopEquipMgr;
 		using PlantPipingSystemsManager::SimPipingSystemCircuit;
-		using UserDefinedComponents::SimUserDefinedPlantComponent;
+		//using UserDefinedComponents::simulate;
 		using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
 		using PlantComponentTemperatureSources::SimWaterSource;
 		using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
@@ -280,6 +278,7 @@ namespace PlantLoopEquip {
 		int GeneralEquipType; // Basic Equipment type from EquipType Used to help organize this routine
 		Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
 		Real64 TempEvapOutDesign;
+		EnergyPlus::PlantLocation sim_component_location( LoopNum, LoopSideNum, BranchNum, Num );
 
 		// set up a reference for this component
 		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
@@ -303,24 +302,36 @@ namespace PlantLoopEquip {
 		RunFlag = sim_component.ON;
 		CurLoad = sim_component.MyLoad;
 
+		if ( sim_component.compPtr != nullptr ) {
+			if ( InitLoopEquip ) {
+				sim_component.compPtr->onInitLoopEquip( sim_component_location );
+				sim_component.compPtr->getDesignCapacities( sim_component_location, sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad );
+				sim_component.compPtr->getDesignTemperatures( sim_component.TempDesCondIn, sim_component.TempDesEvapOut );
+				return;
+			}
+			if ( GetCompSizFac ) {
+				sim_component.compPtr->getSizingFactor( sim_component.SizFac );
+			}
+		}
+
 		//select equipment and call equiment simulation
 		//PIPES
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				SimPipes( TypeOf_Pipe, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				SimPipes( TypeOf_PipeSteam, sim_component.Name, sim_component.CompNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).MaxVolFlowRate, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeExterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				SimPipesHeatTransfer( TypeOf_PipeInterior, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				SimPipesHeatTransfer( TypeOf_PipeUnderground, sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
@@ -791,11 +802,7 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_GroundHeatExchanger ) {
 
 			if ( EquipTypeNum == TypeOf_GrndHtExchgVertical ) { // 'GROUND HEAT EXCHANGER:VERTICAL'
-				SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip ); //DSU
-
-				if ( InitLoopEquip ) {
-					sim_component.CompNum = EquipNum;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSurface ) { // 'GROUND HEAT EXCHANGER:SURFACE'
 				SimSurfaceGroundHeatExchanger( sim_component.Name, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip ); //DSU
@@ -823,11 +830,8 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSlinky ) { // 'GROUND HEAT EXCHANGER:SLINKY'
-				SimGroundHeatExchangers( sim_component.TypeOf_Num, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
-				if ( InitLoopEquip ) {
-					sim_component.CompNum = EquipNum;
-				}
 
 			}
 			// THERMAL STORAGE
@@ -1136,7 +1140,8 @@ namespace PlantLoopEquip {
 
 			if ( EquipTypeNum == TypeOf_PlantComponentUserDefined ) {
 
-				SimUserDefinedPlantComponent( LoopNum, LoopSideNum, sim_component.TypeOf, sim_component.Name, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, InitLoopEquip );
+				//SimUserDefinedPlantComponent( LoopNum, LoopSideNum, sim_component.TypeOf, sim_component.Name, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;

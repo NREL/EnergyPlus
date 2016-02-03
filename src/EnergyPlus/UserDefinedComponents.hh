@@ -66,9 +66,13 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataPlant.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
+	// Forward Declarations
+	struct PlantLocation;
+	
 namespace UserDefinedComponents {
 
 	// Using/Aliasing
@@ -83,16 +87,16 @@ namespace UserDefinedComponents {
 
 	// MODULE VARIABLE DECLARATIONS:
 
-	extern int NumUserPlantComps;
-	extern int NumUserCoils;
-	extern int NumUserZoneAir;
-	extern int NumUserAirTerminals;
+	extern int zzzNumUserPlantComps;
+	extern int zzzNumUserCoils;
+	extern int zzzNumUserZoneAir;
+	extern int zzzNumUserAirTerminals;
 
-	extern Array1D_bool CheckUserPlantCompName;
-	extern Array1D_bool CheckUserCoilName;
-	extern Array1D_bool CheckUserZoneAirName;
-	extern Array1D_bool CheckUserAirTerminal;
-	extern bool GetInput;
+	extern Array1D_bool zzzCheckUserPlantCompName;
+	extern Array1D_bool zzzCheckUserCoilName;
+	extern Array1D_bool zzzCheckUserZoneAirName;
+	extern Array1D_bool zzzCheckUserAirTerminal;
+	extern bool zzzGetInput;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -242,7 +246,7 @@ namespace UserDefinedComponents {
 
 	};
 
-	struct UserPlantComponentStruct
+	struct UserPlantComponentStruct : public PlantComponent
 	{
 		// Members
 		std::string Name; // user identifier
@@ -252,12 +256,30 @@ namespace UserDefinedComponents {
 		AirConnectionStruct Air;
 		WaterUseTankConnectionStruct Water;
 		ZoneInternalGainsStruct Zone;
+		bool MyFlag;
+		bool MyEnvrnFlag;
 
 		// Default Constructor
 		UserPlantComponentStruct() :
 			ErlSimProgramMngr( 0 ),
-			NumPlantConnections( 0 )
+			NumPlantConnections( 0 ),
+			MyFlag( true ),
+			MyEnvrnFlag( true )
 		{}
+
+		public:
+			
+			static PlantComponent * factory( int const EP_UNUSED(objectType), std::string objectName );
+			
+			void simulate( const PlantLocation & calledFromLocation, bool const EP_UNUSED( FirstHVACIteration ), Real64 const CurLoad );
+			
+			void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
+			
+			void onInitLoopEquip( const PlantLocation & calledFromLocation ); 
+			
+			void InitPlantUserComponent( int const LoopNum, Real64 const CurLoad );
+			
+			void ReportPlantUserComponent( int const LoopNum );
 
 	};
 
@@ -355,20 +377,6 @@ namespace UserDefinedComponents {
 	// Functions
 
 	void
-	SimUserDefinedPlantComponent(
-		int const LoopNum, // plant loop sim call originated from
-		int const LoopSideNum, // plant loop side sim call originated from
-		std::string const & EquipType, // type of equipment, 'PlantComponent:UserDefined'
-		std::string const & EquipName, // user name for component
-		int & CompIndex,
-		bool & InitLoopEquip,
-		Real64 const MyLoad,
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap
-	);
-
-	void
 	SimCoilUserDefined(
 		std::string const & EquipName, // user name for component
 		int & CompIndex,
@@ -399,13 +407,6 @@ namespace UserDefinedComponents {
 	GetUserDefinedComponents();
 
 	void
-	InitPlantUserComponent(
-		int const CompNum,
-		int const LoopNum,
-		Real64 const MyLoad
-	);
-
-	void
 	InitCoilUserDefined( int const CompNum );
 
 	void
@@ -418,12 +419,6 @@ namespace UserDefinedComponents {
 	InitAirTerminalUserDefined(
 		int const CompNum,
 		int const ZoneNum
-	);
-
-	void
-	ReportPlantUserComponent(
-		int const CompNum,
-		int const LoopNum
 	);
 
 	void
