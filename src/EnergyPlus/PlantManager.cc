@@ -93,6 +93,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -1025,6 +1026,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData::factory( TypeOf_GrndHtExchgSurface, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Pond" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;

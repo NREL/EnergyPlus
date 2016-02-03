@@ -232,7 +232,6 @@ namespace PlantLoopEquip {
 		using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
 		using CTElectricGenerator::SimCTPlantHeatRecovery;
 		using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
-		using SurfaceGroundHeatExchanger::SimSurfaceGroundHeatExchanger;
 		using PondGroundHeatExchanger::SimPondGroundHeatExchanger;
 
 		using PlantLoadProfile::SimulatePlantProfile;
@@ -803,11 +802,7 @@ namespace PlantLoopEquip {
 				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSurface ) { // 'GROUND HEAT EXCHANGER:SURFACE'
-				SimSurfaceGroundHeatExchanger( sim_component.Name, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip ); //DSU
-
-				if ( InitLoopEquip ) {
-					sim_component.CompNum = EquipNum;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgPond ) { // 'GROUND HEAT EXCHANGER:POND'
 				SimPondGroundHeatExchanger( sim_component.Name, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad ); //DSU
