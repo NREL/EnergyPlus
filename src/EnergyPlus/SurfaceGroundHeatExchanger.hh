@@ -302,7 +302,7 @@ namespace loc {
 			SurfaceArea( 0.0 )
 		{}
 
-		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
 
 		static PlantComponent * factory( int const objectType, std::string const objectName );
 

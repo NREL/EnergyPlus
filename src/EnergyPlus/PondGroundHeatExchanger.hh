@@ -83,27 +83,27 @@ namespace PondGroundHeatExchanger {
 	// utility variables initialized once
 	extern int NumOfPondGHEs; // Number of pond ground heat exchangers
 	// Utility variables - initialized for each instance of a pond
-	extern Real64 nsvInletTemp; // water inlet temperature
-	extern Real64 nsvOutletTemp; // water outlet temperature
-	extern Real64 FlowRate; // water mass flow rate
-	extern Real64 HeatTransRate; // total heat transfer rate, Watts
-	extern Real64 PondTemp; // pond temperature
-	extern Real64 PastPondTemp; // past pond temperature
-	extern Real64 PondArea; // pond surface area
-	extern Real64 PondDepth; // pond depth
-	extern Real64 TubeInDiameter; // hydronic tube inside diameter
-	extern Real64 TubeOutDiameter; // hydronic tube outside diameter
-	extern Real64 TubeConductivity; // hydronic tube thermal conductivity
-	extern Real64 GrndConductivity; // ground thermal conductivity
-	extern Real64 Concentration; // fluid/glycol concentration 0.0-1.0 proportion.
-	extern Real64 CircLength; // length of each circuit
-	extern int NumCircuits; // number of circuits in total
-	extern int InletNodeNum; // inlet node number
-	extern int OutletNodeNum; // oulet node number
-	extern int WaterIndex; // Fluid index for pond water
-	extern bool NoDeepGroundTempObjWarning; // This will cause a warning to be issued if no "deep" ground
-	// temperature object was input.
-	extern Array1D_bool CheckEquipName;
+	//extern Real64 nsvInletTemp; // water inlet temperature
+	//extern Real64 nsvOutletTemp; // water outlet temperature
+	//extern Real64 FlowRate; // water mass flow rate
+	//extern Real64 HeatTransRate; // total heat transfer rate, Watts
+	//extern Real64 PondTemp; // pond temperature
+	//extern Real64 PastPondTemp; // past pond temperature
+	//extern Real64 PondArea; // pond surface area
+	//extern Real64 PondDepth; // pond depth
+	//extern Real64 TubeInDiameter; // hydronic tube inside diameter
+	//extern Real64 TubeOutDiameter; // hydronic tube outside diameter
+	//extern Real64 TubeConductivity; // hydronic tube thermal conductivity
+	//extern Real64 GrndConductivity; // ground thermal conductivity
+	//extern Real64 Concentration; // fluid/glycol concentration 0.0-1.0 proportion.
+	//extern Real64 CircLength; // length of each circuit
+	//extern int NumCircuits; // number of circuits in total
+	//extern int InletNodeNum; // inlet node number
+	//extern int OutletNodeNum; // oulet node number
+	//extern int WaterIndex; // Fluid index for pond water
+	//extern bool NoDeepGroundTempObjWarning; // This will cause a warning to be issued if no "deep" ground
+	//// temperature object was input.
+	//extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PlantPondGroundHeatExchangers
 
@@ -149,6 +149,8 @@ namespace PondGroundHeatExchanger {
 		bool OneTimeFlag;
 		bool MyFlag;
 
+		int WaterIndex;
+
 		// Default Constructor
 		PondGroundHeatExchangerData() :
 			DesignMassFlowRate( 0.0 ),
@@ -172,14 +174,15 @@ namespace PondGroundHeatExchanger {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			OneTimeFlag( true ),
-			MyFlag( true )
+			MyFlag( true ),
+			WaterIndex( 0 )
 		{}
 
-		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
 
 		static PlantComponent * factory( int const objectType, std::string objectName );
 
-		void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad );
+		void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad ) override;
 
 		void
 		InitPondGroundHeatExchanger(
