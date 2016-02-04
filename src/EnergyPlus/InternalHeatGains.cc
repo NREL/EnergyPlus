@@ -3634,7 +3634,7 @@ namespace InternalHeatGains {
 
 		CalcWaterThermalTankZoneGains();
 		PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
-		CalcWaterUseZoneGains();
+		WaterUse::CalcWaterUseZoneGains();
 		FigureFuelCellZoneGains();
 		FigureMicroCHPZoneGains();
 		FigureInverterZoneGains();

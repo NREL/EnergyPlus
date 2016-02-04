@@ -65,6 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -99,6 +100,7 @@ namespace WaterUse {
 
 	// Types
 
+	// Don't think this needs to inherit from PlantComponent since it doesn't "simulate"
 	struct WaterEquipmentType
 	{
 		// Members
@@ -181,18 +183,24 @@ namespace WaterUse {
 		void
 		reset()
 		{
-			SensibleRate = 0.0;
-			SensibleEnergy = 0.0;
-			LatentRate = 0.0;
-			LatentEnergy = 0.0;
-			MixedTemp = 0.0;
-			TotalMassFlowRate = 0.0;
-			DrainTemp = 0.0;
+			this->SensibleRate = 0.0;
+			this->SensibleEnergy = 0.0;
+			this->LatentRate = 0.0;
+			this->LatentEnergy = 0.0;
+			this->MixedTemp = 0.0;
+			this->TotalMassFlowRate = 0.0;
+			this->DrainTemp = 0.0;
 		}
 
+		void
+		CalcEquipmentFlowRates( );
+		
+		void
+		CalcEquipmentDrainTemp( );
+		
 	};
 
-	struct WaterConnectionsType
+	struct WaterConnectionsType : public PlantComponent
 	{
 		// Members
 		std::string Name; // Name of DHW
@@ -248,12 +256,17 @@ namespace WaterUse {
 		Real64 Energy; // Heating energy required to raise temperature from cold to hot (J)
 		int NumWaterEquipment;
 		int MaxIterationsErrorIndex; // recurring error index
-		Array1D_int WaterEquipment;
+
+		// This shadows the namespace level array WaterEquipment
+		Array1D_int localWaterEquipment;
+		
 		int PlantLoopNum;
 		int PlantLoopSide;
 		int PlantLoopBranchNum;
 		int PlantLoopCompNum;
 
+		bool SetLoopIndexFlag; // Constructed as true and set to false after connections are initialized
+		
 		// Default Constructor
 		WaterConnectionsType() :
 			Init( true ),
@@ -311,69 +324,62 @@ namespace WaterUse {
 			PlantLoopNum( 0 ),
 			PlantLoopSide( 0 ),
 			PlantLoopBranchNum( 0 ),
-			PlantLoopCompNum( 0 )
+			PlantLoopCompNum( 0 ),
+			SetLoopIndexFlag( true )
 		{}
 
-	};
+		// Functions
 
+		static
+		PlantComponent *
+		factory( const std::string objectName );
+		
+		void
+		simulate ( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override ;
+		
+		void
+		onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
+		
+		void
+		InitConnections( );
+		
+		void
+		CalcConnectionsFlowRates( bool const FirstHVACIteration );
+		
+		void
+		CalcConnectionsDrainTemp( );
+		
+		void
+		CalcConnectionsHeatRecovery( );
+		
+		void
+		UpdateWaterConnections( );
+		
+		void
+		ReportWaterUse( );
+		
+	};
+	
 	// Object Data
 	extern Array1D< WaterEquipmentType > WaterEquipment;
 	extern Array1D< WaterConnectionsType > WaterConnections;
-
-	// Functions
 
 	void
 	clear_state();
 
 	void
-	SimulateWaterUse( bool const FirstHVACIteration );
-
-	void
-	SimulateWaterUseConnection(
-		int const EquipTypeNum,
-		std::string const & CompName,
-		int & CompIndex,
-		bool const InitLoopEquip,
-		bool const FirstHVACIteration
-	);
-
-	void
 	GetWaterUseInput();
-
-	void
-	CalcEquipmentFlowRates( int const WaterEquipNum );
-
-	void
-	CalcEquipmentDrainTemp( int const WaterEquipNum );
-
-	void
-	InitConnections( int const WaterConnNum );
-
-	void
-	CalcConnectionsFlowRates(
-		int const WaterConnNum,
-		bool const FirstHVACIteration
-	);
-
-	void
-	CalcConnectionsDrainTemp( int const WaterConnNum );
-
-	void
-	CalcConnectionsHeatRecovery( int const WaterConnNum );
-
-	void
-	UpdateWaterConnections( int const WaterConnNum );
-
-	void
-	ReportStandAloneWaterUse();
-
-	void
-	ReportWaterUse( int const WaterConnNum );
 
 	void
 	CalcWaterUseZoneGains();
 
-} // WaterUse
+        void
+	SimulateWaterUse( bool const FirstHVACIteration );
+
+	void
+	ReportStandAloneWaterUse();
+		
+	} // WaterUse
 
 } // EnergyPlus
 
