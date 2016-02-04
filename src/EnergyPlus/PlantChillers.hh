@@ -169,6 +169,17 @@ namespace PlantChillers {
 		Real64 CondOutletTemp; // C - condenser outlet temperature, air or water side
 		Real64 CondOutletHumRat; // kg/kg - condenser outlet humditiy ratio, air side
 		Real64 EvapOutletTemp; // C - evaporator outlet temperature, water side
+		Real64 Power; // W - rate of chiller energy use
+		Real64 QEvaporator; // W - rate of heat transfer to the evaporator coil
+		Real64 QCondenser; // W - rate of heat transfer to the condenser coil
+		Real64 Energy; // J - chiller energy use
+		Real64 EvaporatorEnergy; // J - rate of heat transfer to the evaporator coil
+		Real64 CondenserEnergy; // J - rate of heat transfer to the condenser coil
+		Real64 QHeatRecovered; // W - rate of heat transfer to the Heat Recovery coil
+		Real64 HeatRecOutletTemp; // C - Heat Rec outlet temperature, water side
+		Real64 AvgCondSinkTemp; // condenser temperature value for use in curves [C]
+		Real64 ChillerCyclingRatio; // Cycling ratio for chiller when load is below MinPLR
+		Real64 BasinHeaterPower; // Basin heater power (W)
 
 
 		// Default Constructor
@@ -215,7 +226,18 @@ namespace PlantChillers {
 			EvapMassFlowRate( 0.0 ), // Kg/s - evaporator mass flow rate, water side
 			CondOutletTemp( 0.0 ), // C - condenser outlet temperature, air or water side
 			CondOutletHumRat( 0.0 ), // kg/kg - condenser outlet humditiy ratio, air side
-			EvapOutletTemp( 0.0 ) // C - evaporator outlet temperature, water side
+			EvapOutletTemp( 0.0 ), // C - evaporator outlet temperature, water side
+			Power( 0.0 ), // W - rate of chiller energy use
+			QEvaporator( 0.0 ), // W - rate of heat transfer to the evaporator coil
+			QCondenser( 0.0 ), // W - rate of heat transfer to the condenser coil
+			Energy( 0.0 ), // J - chiller energy use
+			EvaporatorEnergy( 0.0 ), // J - rate of heat transfer to the evaporator coil
+			CondenserEnergy( 0.0 ), // J - rate of heat transfer to the condenser coil
+			QHeatRecovered( 0.0 ), // W - rate of heat transfer to the Heat Recovery coil
+			HeatRecOutletTemp( 0.0 ), // C - Heat Rec outlet temperature, water side
+			AvgCondSinkTemp( 0.0 ), // condenser temperature value for use in curves [C]
+			ChillerCyclingRatio( 0.0 ), // Cycling ratio for chiller when load is below MinPLR
+			BasinHeaterPower( 0.0 ) // Basin heater power (W)
 
 		{}
 	};

@@ -151,29 +151,9 @@ namespace PlantChillers {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumElectricChillers( 0 ); // number of Electric chillers specified in input
-	Real64 Power( 0.0 ); // W - rate of chiller energy use
-	Real64 QEvaporator( 0.0 ); // W - rate of heat transfer to the evaporator coil
-	Real64 QCondenser( 0.0 ); // W - rate of heat transfer to the condenser coil
-	Real64 Energy( 0.0 ); // J - chiller energy use
-	Real64 EvaporatorEnergy( 0.0 ); // J - rate of heat transfer to the evaporator coil
-	Real64 CondenserEnergy( 0.0 ); // J - rate of heat transfer to the condenser coil
-	Real64 QHeatRecovered( 0.0 ); // W - rate of heat transfer to the Heat Recovery coil
-	Real64 HeatRecOutletTemp( 0.0 ); // C - Heat Rec outlet temperature, water side
-	Real64 AvgCondSinkTemp( 0.0 ); // condenser temperature value for use in curves [C]
-	Real64 ChillerCyclingRatio( 0.0 ); // Cycling ratio for chiller when load is below MinPLR
-	Real64 BasinHeaterPower( 0.0 ); // Basin heater power (W)
-
-	//engine driven:
 	int NumEngineDrivenChillers( 0 ); // number of EngineDriven chillers specified in input
-
-	//gas turbine
 	int NumGTChillers( 0 ); // number of GT chillers specified in input
-
-	// const COP
 	int NumConstCOPChillers( 0 );
-
-	// DERIVED TYPE DEFINITIONS
-
 	bool GetEngineDrivenInput( true ); // then TRUE, calls subroutine to read input file.
 	bool GetElectricInput( true ); // then TRUE, calls subroutine to read input file.
 	bool GetGasTurbineInput( true ); // then TRUE, calls subroutine to read input file.
