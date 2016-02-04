@@ -765,10 +765,10 @@ namespace EnergyPlus {
 		}
 
 		for ( GSHPNum = 0; GSHPNum < NumGSHPs; ++GSHPNum ) {
-			GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			GetObjectItem( ModuleCompNameUC, GSHPNum + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
 			IsBlank = true;
-			//VerifyName( AlphArray( 1 ), instances, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			VerifyName( instances.begin(), instances.end(), AlphArray( 1 ), IsNotOK, IsBlank, "GHSP Name" );
 
 			if ( IsNotOK ) {
 				ErrorsFound = true;
@@ -974,7 +974,7 @@ namespace EnergyPlus {
 			}
 		}
 		// If we didn't find it, fatal
-		ShowFatalError( "LocalPipeDataFactory: Error getting inputs for pipe named: " + objectName );
+		ShowFatalError( "LocalPipeDataFactory: Error getting inputs for HeatPump:WaterToWater:ParameterEstimation:Heating named: " + objectName );
 		// Shut up the compiler
 		return nullptr;
 	}
