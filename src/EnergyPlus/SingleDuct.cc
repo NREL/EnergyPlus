@@ -551,16 +551,20 @@ namespace SingleDuct {
 				ErrorsFound = true;
 			}
 
-			if ( ! lNumericBlanks( 2 ) ) {
-				Sys( SysNum ).ZoneMinAirFrac = Numbers( 2 );
+			Sys( SysNum ).ZoneMinAirFrac = Numbers( 2 );
+			Sys( SysNum ).DesignMinAirFrac = Numbers( 2 );
+			if ( lNumericBlanks( 2 ) ) {
+				Sys( SysNum ).ConstantMinAirFracSetByUser = false;
+			} else {
 				Sys( SysNum ).ConstantMinAirFracSetByUser = true;
-				Sys( SysNum ).DesignMinAirFrac = Numbers( 2 );
 			}
 
-			if ( ! lNumericBlanks( 3 ) ) {
-				Sys( SysNum ).ZoneFixedMinAir = Numbers( 3 );
+			Sys( SysNum ).ZoneFixedMinAir = Numbers( 3 );
+			Sys( SysNum ).DesignFixedMinAir = Numbers( 3 );
+			if ( lNumericBlanks( 3 ) ) {
+				Sys( SysNum ).FixedMinAirSetByUser = false;
+			} else {
 				Sys( SysNum ).FixedMinAirSetByUser = true;
-				Sys( SysNum ).DesignFixedMinAir = Numbers( 3 );
 			}
 
 			Sys( SysNum ).ZoneMinAirFracSchPtr = GetScheduleIndex( Alphas( 6 ) );
@@ -1051,16 +1055,22 @@ namespace SingleDuct {
 				ErrorsFound = true;
 			}
 
-			if ( ! lNumericBlanks( 2 ) ) {
-				Sys( SysNum ).ZoneMinAirFrac = Numbers( 2 );
+			Sys( SysNum ).ZoneMinAirFrac = Numbers( 2 );
+			Sys( SysNum ).DesignMinAirFrac = Numbers( 2 );
+			if ( lNumericBlanks( 2 ) ) {
+				Sys( SysNum ).ConstantMinAirFracSetByUser = false;
+			}
+			else {
 				Sys( SysNum ).ConstantMinAirFracSetByUser = true;
-				Sys( SysNum ).DesignMinAirFrac = Numbers( 2 );
 			}
 
-			if ( ! lNumericBlanks( 3 ) ) {
-				Sys( SysNum ).ZoneFixedMinAir = Numbers( 3 );
+			Sys( SysNum ).ZoneFixedMinAir = Numbers( 3 );
+			Sys( SysNum ).DesignFixedMinAir = Numbers( 3 );
+			if ( lNumericBlanks( 3 ) ) {
+				Sys( SysNum ).FixedMinAirSetByUser = false;
+			}
+			else {
 				Sys( SysNum ).FixedMinAirSetByUser = true;
-				Sys( SysNum ).DesignFixedMinAir = Numbers( 3 );
 			}
 
 			Sys( SysNum ).ZoneMinAirFracSchPtr = GetScheduleIndex( Alphas( 6 ) );
@@ -1792,6 +1802,7 @@ namespace SingleDuct {
 		using DataPlant::MyPlantSizingIndex;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1831,6 +1842,8 @@ namespace SingleDuct {
 		static int DummyWaterIndex( 1 );
 		static Real64 UserInputMaxHeatAirVolFlowRate( 0.0 ); // user input for MaxHeatAirVolFlowRate
 		bool IsAutoSize;
+		int ZoneNum( 0 );
+		Real64 MinMinFlowRatio( 0.0 ); // the minimum minimum flow ratio
 		Real64 MaxAirVolFlowRateDes; // Autosized maximum air flow rate for reporting
 		Real64 MaxAirVolFlowRateUser; // Hardsized maximum air flow rate for reporting
 		Real64 MaxHeatAirVolFlowRateDes; // Autosized maximum heating air flow rate for reporting
@@ -1860,6 +1873,9 @@ namespace SingleDuct {
 		MaxReheatWaterVolFlowUser = 0.0;
 		MaxReheatSteamVolFlowDes = 0.0;
 		MaxReheatSteamVolFlowUser = 0.0;
+		MinMinFlowRatio = 0.0;
+
+		ZoneNum = Sys( SysNum ).ActualZoneNum;
 
 		if ( Sys( SysNum ).MaxAirVolFlowRate == AutoSize ) {
 			IsAutoSize = true;
@@ -1936,6 +1952,49 @@ namespace SingleDuct {
 						}
 					}
 				}
+			}
+		}
+
+		IsAutoSize = false;
+		if ( Sys( SysNum ).ZoneMinAirFrac == AutoSize && Sys( SysNum ).ZoneMinAirFracMethod == ConstantMinFrac ) {
+			IsAutoSize = true;
+		}
+		if ( CurZoneEqNum > 0 ) {
+			if ( IsAutoSize ) {
+				CheckZoneSizing( Sys( SysNum ).SysType, Sys( SysNum ).SysName );
+				if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
+					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
+						Sys( SysNum ).ZoneMinAirFrac = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate;
+					}
+				}
+				else {
+					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
+						MinMinFlowRatio = ( 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier ) /
+							Sys( SysNum ).MaxAirVolFlowRate;
+						Sys( SysNum ).ZoneMinAirFrac = max( 0.2, MinMinFlowRatio );
+					}
+				}
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Constant Minimum Air Flow Fraction",
+					Sys( SysNum ).ZoneMinAirFrac );
+			}
+		}
+
+		IsAutoSize = false;
+		if ( Sys( SysNum ).ZoneFixedMinAir == AutoSize && Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
+			IsAutoSize = true;
+		}
+		if ( CurZoneEqNum > 0 ) {
+			if ( IsAutoSize ) {
+				CheckZoneSizing( Sys( SysNum ).SysType, Sys( SysNum ).SysName );
+				if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
+					Sys( SysNum ).ZoneFixedMinAir = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin;
+				}
+				else {
+					Sys( SysNum ).ZoneFixedMinAir = max( 0.2, 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier *
+						Zone( ZoneNum ).ListMultiplier );
+				}
+				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Fixed Minimum Air Flow Rate [m3/s]", 
+					Sys( SysNum ).ZoneFixedMinAir );
 			}
 		}
 
