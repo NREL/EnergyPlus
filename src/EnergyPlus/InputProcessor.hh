@@ -173,7 +173,10 @@ namespace InputProcessor {
 	// Types
 
 	template <class T> struct is_shared_ptr : std::false_type {};
-	template <class T> struct is_shared_ptr<std::shared_ptr<T> > : std::true_type {};
+	template <class T> struct is_shared_ptr< std::shared_ptr<T> > : std::true_type {};
+
+	template <class T> struct is_unique_ptr : std::false_type {};
+	template <class T> struct is_unique_ptr< std::unique_ptr<T> > : std::true_type {};
 
 	struct RangeCheckDef
 	{
@@ -686,10 +689,10 @@ namespace InputProcessor {
 		using valueType = typename std::iterator_traits< InputIterator >::value_type;
 		//static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
 
-		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s.name == str; } );
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s.Name == str; } );
 		if ( it != last ) return it - first + 1; // 1-based return index
 
-		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s.name, str ); } );
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s.Name, str ); } );
 		if ( it2 != last ) return it2 - first + 1; // 1-based return index
 
 		return 0; // Not found
@@ -708,10 +711,10 @@ namespace InputProcessor {
 		using valueType = typename std::iterator_traits< InputIterator >::value_type;
 		//static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
 
-		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s->name == str; } );
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s->Name == str; } );
 		if ( it != last ) return it - first + 1; // 1-based return index
 
-		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s->name, str ); } );
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s->Name, str ); } );
 		if ( it2 != last ) return it2 - first + 1; // 1-based return index
 
 		return 0; // Not found
@@ -726,7 +729,11 @@ namespace InputProcessor {
 		std::string const & str
 	)
 	{
-		return FindItem( first, last, str, is_shared_ptr< typename std::iterator_traits< InputIterator >::value_type >{} );
+		return FindItem( first, last, str, std::integral_constant< bool,
+			is_unique_ptr< typename std::iterator_traits< InputIterator >::value_type >{} ||
+			is_shared_ptr< typename std::iterator_traits< InputIterator >::value_type >{}
+			>()
+		);
 	}
 
 	int
