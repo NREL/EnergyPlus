@@ -65,11 +65,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace PlantLoadProfile {
-
 	// Using/Aliasing
 
 	// Data
@@ -84,7 +84,7 @@ namespace PlantLoadProfile {
 
 	// Types
 
-	struct PlantProfileData
+	struct PlantProfileData : public PlantComponent
 	{
 		// Members
 		std::string Name; // Name of Plant Load Profile object
@@ -143,39 +143,43 @@ namespace PlantLoadProfile {
 			SetLoopIndexFlag( true )
 		{}
 
+		// Functions
+		static
+		PlantComponent *
+		factory( std::string objectName );
+
+		void
+		simulate( const PlantLocation & calledFromLocation,
+			  bool const FirstHVACIteration,
+			  Real64 & CurLoad
+			 );
+
+		void
+		onInitLoopEquip( const PlantLocation & calledFromLocation );
+
+		void
+		InitPlantProfile();
+
+		void
+		UpdatePlantProfile();
+
+		void
+		ReportPlantProfile();
 	};
 
 	// Object Data
 	extern Array1D< PlantProfileData > PlantProfile;
 
-	// Functions
-	void
-	clear_state();
-
-	void
-	SimulatePlantProfile(
-		std::string const & EquipTypeName, // description of model (not used until different types of profiles)
-		std::string const & EquipName, // the user-defined name
-		int const EquipTypeNum, // the plant parameter ID for equipment model
-		int & ProfileNum, // the index for specific load profile
-		bool const FirstHVACIteration,
-		bool const InitLoopEquip // flag indicating if called in special initialization mode.
-	);
-
+	// This could be static inside the class
 	void
 	GetPlantProfileInput();
 
+	// As could this
 	void
-	InitPlantProfile( int const ProfileNum );
+	clear_state();
 
-	void
-	UpdatePlantProfile( int const ProfileNum );
+} // namespace PlantLoadProfile
 
-	void
-	ReportPlantProfile( int const ProfileNum );
-
-} // PlantLoadProfile
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif
