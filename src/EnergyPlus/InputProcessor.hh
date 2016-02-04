@@ -62,6 +62,7 @@
 // C++ Headers
 #include <iosfwd>
 #include <type_traits>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -170,6 +171,9 @@ namespace InputProcessor {
 	//Derived Types Variables
 
 	// Types
+
+	template <class T> struct is_shared_ptr : std::false_type {};
+	template <class T> struct is_shared_ptr<std::shared_ptr<T> > : std::true_type {};
 
 	struct RangeCheckDef
 	{
@@ -669,6 +673,62 @@ namespace InputProcessor {
 		return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
 	}
 
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str,
+		std::false_type
+	)
+	{
+		using valueType = typename std::iterator_traits< InputIterator >::value_type;
+		//static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s.name == str; } );
+		if ( it != last ) return it - first + 1; // 1-based return index
+
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s.name, str ); } );
+		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+
+		return 0; // Not found
+	}
+
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str,
+		std::true_type
+	)
+	{
+		using valueType = typename std::iterator_traits< InputIterator >::value_type;
+		//static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s->name == str; } );
+		if ( it != last ) return it - first + 1; // 1-based return index
+
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s->name, str ); } );
+		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+
+		return 0; // Not found
+	}
+
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str
+	)
+	{
+		return FindItem( first, last, str, is_shared_ptr< typename std::iterator_traits< InputIterator >::value_type >{} );
+	}
+
 	int
 	FindItem(
 		std::string const & String,
@@ -828,6 +888,33 @@ namespace InputProcessor {
 	{
 		// case insensitive comparison
 		return equali( s, t );
+	}
+
+	template < typename InputIterator >
+	inline
+	void
+	VerifyName(
+		InputIterator first,
+		InputIterator last,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+		IsBlank = false;
+		ErrorFound = false;
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+			return;
+		}
+		int Found = FindItem( first, last, NameToVerify );
+		if ( Found != 0 ) {
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+			ErrorFound = true;
+		}
 	}
 
 	void

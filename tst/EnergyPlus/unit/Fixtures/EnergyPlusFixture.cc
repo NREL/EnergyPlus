@@ -153,6 +153,7 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantManager.hh>
@@ -337,6 +338,7 @@ namespace EnergyPlus {
 		OutsideEnergySources::clear_state();
 		PlantCondLoopOperation::clear_state();
 		PlantChillers::clear_state();
+		PlantHeatExchangerFluidToFluid.clear_state();
 		PlantLoadProfile::clear_state();
 		PlantLoopSolver::clear_state();
 		PlantManager::clear_state();
