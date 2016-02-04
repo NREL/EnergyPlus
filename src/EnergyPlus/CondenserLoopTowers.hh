@@ -65,8 +65,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
+
+	// Forward Declarations
+	struct PlantLocation;
 
 namespace CondenserLoopTowers {
 
@@ -142,12 +146,93 @@ namespace CondenserLoopTowers {
 
 	// Types
 
-	struct Towerspecs
+	struct Towerspecs : public PlantComponent
 	{
+	public:
+
+		static PlantComponent * factory( int objectType, std::string objectName );
+
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
+
+		void getDesignCapacities( const PlantLocation & EP_UNUSED( calledFromLocation ), Real64 & EP_UNUSED( MaxLoad ), Real64 & EP_UNUSED( MinLoad ), Real64 & EP_UNUSED( OptLoad ) );
+
+//		void getDesignTemperatures( Real64 & EP_UNUSED( TempDesCondIn ), Real64 & EP_UNUSED( TempDesEvapOut ) );
+
+		void getSizingFactor( Real64 & EP_UNUSED( SizFac ) );
+
+		void onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) );
+
+	private:
+
+		void SimSimpleTower( Real64 const WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 & OutletWaterTemp );
+
+		void SimVariableTower( Real64 const WaterFlowRateRatio, Real64 const AirFlowRateRatio, Real64 const Twb, Real64 & OutletWaterTemp );
+
+		void InitTower();
+
+		void SizeTower();
+
+		void SizeVSMerkelTower();
+
+		void CalcSingleSpeedTower();
+
+		void CalcTwoSpeedTower();
+
+		void CalcMerkelVariableSpeedTower( Real64 const MyLoad );
+
+		void CalcVariableSpeedTower();
+
+		void CalculateWaterUseage();
+
+		void UpdateTowers();
+
+		void ReportTowers();
+
+		Real64 VSMerkelResidual(
+			Real64 const AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
+			Array1< Real64 > const & Par // par(1) = Tower number
+		);
+
+		void CalcVSTowerApproach(
+			Real64 const PctWaterFlow, // Water flow ratio of cooling tower
+			Real64 const AirFlowRatio, // Air flow ratio of cooling tower
+			Real64 const Twb, // Inlet air wet-bulb temperature [C]
+			Real64 const Tr, // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
+			Real64 & Approach // Calculated approach temperature [C]
+		);
+
+		void CheckModelBounds(
+			Real64 const Twb, // current inlet air wet-bulb temperature (C)
+			Real64 const Tr, // requested range temperature for current time step (C)
+			Real64 const Ta, // requested approach temperature for current time step (C)
+			Real64 const WaterFlowRateRatio, // current water flow rate ratio at water inlet node
+			Real64 & TwbCapped, // bounded value of inlet air wet-bulb temperature (C)
+			Real64 & TrCapped, // bounded value of range temperature (C)
+			Real64 & TaCapped, // bounded value of approach temperature (C)
+			Real64 & WaterFlowRateRatioCapped // bounded value of water flow rate ratio
+		);
+
+		Real64 simpleTowerUAResidual(
+			Real64 const UA, // UA of cooling tower
+			Array1< Real64 > const & Par // par(1) = design tower load [W]
+		);
+
+		Real64 simpleTowerTrResidual(
+			Real64 const Trange, // cooling tower range temperature [C]
+			Array1< Real64 > const & Par // par(1) = tower number
+		);
+
+		Real64 SimpleTowerApproachResidual(
+			Real64 const FlowRatio, // water or air flow ratio of cooling tower
+			Array1< Real64 > const & Par // par(1) = tower number
+		);
+
+	public:
 		// Members
 		std::string Name; // User identifier
 		std::string TowerType; // Type of cooling tower
 		int TowerType_Num;
+		int Tower_TypeOf;
 		int PerformanceInputMethod_Num; // Method of entering tower performance: UA and Design Water
 		//  Flow Rate, or Nominal Capacity
 		std::string ModelCoeffObjectName; // Cooling Tower:Variable Speed Model Coefficient Object name
@@ -268,10 +353,96 @@ namespace CondenserLoopTowers {
 		bool SetpointIsOnOutlet; // if true look to outlet node of tower, if flase look to overall loop setpoint
 		int VSMerkelAFRErrorIter; // error counter for regula falsi failed with max iterations, vs merkel model
 		int VSMerkelAFRErrorFail; // error counter for regula falsi failed with limits exceeded, vs merkel model
+		Real64 WaterTemp; // Tower water inlet temperature (C)
+		Real64 AirTemp; // Tower air inlet dry-bulb temperature (C)
+		Real64 AirWetBulb; // Tower air inlet wet-bulb temperature (C)
+		Real64 AirPress; // Tower air barometric pressure
+		Real64 AirHumRat; // Tower air inlet humidity ratio (kg/kg)
+		Real64 InletWaterTemp; // Tower inlet water temperature (C)
+		Real64 OutletWaterTemp; // Tower outlet water temperature (C)
+		Real64 WaterMassFlowRate; // Tower water mass flow rate (m3/s)
+		Real64 Qactual; // Tower heat rejection rate (W)
+		Real64 FanPower; // Tower fan power (W)
+		Real64 FanEnergy; // Tower fan energy consumption (J)
+		Real64 AirFlowRatio; // Air flow ratio through variable speed cooling tower
+		Real64 BasinHeaterPower; // Basin heater power (W)
+		Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
+		Real64 WaterAmountUsed; // Tower make up water usage (m3)
+		Real64 FanCyclingRatio; // cycling ratio of tower fan when min fan speed provide too much capacity (for VFD)
+		Real64 EvaporationVdot;
+		Real64 EvaporationVol;
+		Real64 DriftVdot;
+		Real64 DriftVol;
+		Real64 BlowdownVdot;
+		Real64 BlowdownVol;
+		Real64 MakeUpVdot;
+		Real64 MakeUpVol;
+		Real64 TankSupplyVdot;
+		Real64 TankSupplyVol;
+		Real64 StarvedMakeUpVdot;
+		Real64 StarvedMakeUpVol;
+		//		Real64 BypassFraction; // Added for fluid bypass
+		//		int NumCellOn; // for multi-cell tower
+		//		int SpeedSelected; // Speed selected for the two speed tower
+		Array1D< Real64 > Coeff; // - model coefficients
+		bool FoundModelCoeff; // - TRUE if model is calibratable
+		Real64 MinInletAirWBTemp; // - model limit for min inlet air WB temp
+		Real64 MaxInletAirWBTemp; // - model limit for max inlet air WB temp
+		Real64 MinRangeTemp; // - model limit for min range temp
+		Real64 MaxRangeTemp; // - model limit for max range temp
+		Real64 MinApproachTemp; // - model limit for min approach temp
+		Real64 MaxApproachTemp; // - model limit for max approach temp
+		Real64 MinWaterFlowRatio; // - model limit for min water flow rate ratio
+		Real64 MaxWaterFlowRatio; // - model limit for max water flow rate ratio
+		Real64 MaxLiquidToGasRatio; // - model limit for max liquid to gas ratio
+		int VSErrorCountFlowFrac; // - counter if water flow rate ratio limits are exceeded
+		int VSErrorCountWFRR; // - counter if water flow rate ratio limits are exceeded
+		int VSErrorCountIAWB; // - counter if inlet air wet-bulb temperature limits are exceeded
+		int VSErrorCountTR; // - counter if tower range temperature limits are exceeded
+		int VSErrorCountTA; // - counter if tower approach temperature limits are exceeded
+		int ErrIndexFlowFrac; // - index to recurring error structure for liquid to gas ratio
+		int ErrIndexWFRR; // - index to recurring error structure for water flow rate ratio
+		int ErrIndexIAWB; // - index to recurring error structure for inlet air WB
+		int ErrIndexTR; // - index to recurring error structure for tower range
+		int ErrIndexTA; // - index to recurring error structure for tower approach
+		int ErrIndexLG; // - index to recurring error structure for tower liquid/gas ratio
+		//- Tr = Range temperature
+		std::string TrBuffer1; // - buffer to print Tr warning messages on following time step
+		std::string TrBuffer2; // - buffer to print Tr warning messages on following time step
+		std::string TrBuffer3; // - buffer to print Tr warning messages on following time step
+		//- Twb = Wet-bulb temperature
+		std::string TwbBuffer1; // - buffer to print Twb warning messages on following time step
+		std::string TwbBuffer2; // - buffer to print Twb warning messages on following time step
+		std::string TwbBuffer3; // - buffer to print Twb warning messages on following time step
+		//- Ta = Approach temperature
+		std::string TaBuffer1; // - buffer to print Ta warning messages on following time step
+		std::string TaBuffer2; // - buffer to print Ta warning messages on following time step
+		std::string TaBuffer3; // - buffer to print Ta warning messages on following time step
+		//- WFRR = Water flow rate ratio
+		std::string WFRRBuffer1; // - buffer to print WFRR warning messages on following time step
+		std::string WFRRBuffer2; // - buffer to print WFRR warning messages on following time step
+		std::string WFRRBuffer3; // - buffer to print WFRR warning messages on following time step
+		//- LG = Liquid to gas ratio
+		std::string LGBuffer1; // - buffer to print LG warning messages on following time step
+		std::string LGBuffer2; // - buffer to print LG warning messages on following time step
+		std::string LGBuffer3; // - buffer to print LG warning messages on following time step
+		bool PrintTrMessage; // - flag to print Tr error message
+		bool PrintTwbMessage; // - flag to print Twb error message
+		bool PrintTaMessage; // - flag to print Ta error message
+		bool PrintWFRRMessage; // - flag to print WFRR error message
+		bool PrintLGMessage; // - flag to print liquid-gas ratio error message
+		Real64 TrLast; // value of Tr when warning occurred (passed to Recurring Warning)
+		Real64 TwbLast; // value of Twb when warning occurred (passed to Recurring Warning)
+		Real64 TaLast; // value of Ta when warning occurred (passed to Recurring Warning)
+		Real64 WaterFlowRateRatioLast; // value of WFRR when warning occurred (passed to Recurring Warn)
+		Real64 LGLast; // value of LG when warning occurred (passed to Recurring Warn)
+		bool OneTimeFlagForEachTower; // flag used for single action
+		bool MyEnvrnFlag; // flag used for action on begin environment flag
 
 		// Default Constructor
-		Towerspecs() :
+		Towerspecs():
 			TowerType_Num( 0 ),
+			Tower_TypeOf( 0 ),
 			PerformanceInputMethod_Num( 0 ),
 			Available( true ),
 			ON( true ),
@@ -370,62 +541,12 @@ namespace CondenserLoopTowers {
 			UAModFuncWaterFlowRatioCurvePtr( 0 ),
 			SetpointIsOnOutlet( false ),
 			VSMerkelAFRErrorIter( 0 ),
-			VSMerkelAFRErrorFail( 0 )
-		{}
-	};
-
-	struct TowerInletConds
-	{
-		// Members
-		Real64 WaterTemp; // Tower water inlet temperature (C)
-		Real64 AirTemp; // Tower air inlet dry-bulb temperature (C)
-		Real64 AirWetBulb; // Tower air inlet wet-bulb temperature (C)
-		Real64 AirPress; // Tower air barometric pressure
-		Real64 AirHumRat; // Tower air inlet humidity ratio (kg/kg)
-
-		// Default Constructor
-		TowerInletConds() :
+			VSMerkelAFRErrorFail( 0 ),
 			WaterTemp( 0.0 ),
 			AirTemp( 0.0 ),
 			AirWetBulb( 0.0 ),
 			AirPress( 0.0 ),
-			AirHumRat( 0.0 )
-		{}
-
-	};
-
-	struct ReportVars
-	{
-		// Members
-		Real64 InletWaterTemp; // Tower inlet water temperature (C)
-		Real64 OutletWaterTemp; // Tower outlet water temperature (C)
-		Real64 WaterMassFlowRate; // Tower water mass flow rate (m3/s)
-		Real64 Qactual; // Tower heat rejection rate (W)
-		Real64 FanPower; // Tower fan power (W)
-		Real64 FanEnergy; // Tower fan energy consumption (J)
-		Real64 AirFlowRatio; // Air flow ratio through variable speed cooling tower
-		Real64 BasinHeaterPower; // Basin heater power (W)
-		Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
-		Real64 WaterAmountUsed; // Tower make up water usage (m3)
-		Real64 FanCyclingRatio; // cycling ratio of tower fan when min fan speed provide too much capacity (for VFD)
-		Real64 EvaporationVdot;
-		Real64 EvaporationVol;
-		Real64 DriftVdot;
-		Real64 DriftVol;
-		Real64 BlowdownVdot;
-		Real64 BlowdownVol;
-		Real64 MakeUpVdot;
-		Real64 MakeUpVol;
-		Real64 TankSupplyVdot;
-		Real64 TankSupplyVol;
-		Real64 StarvedMakeUpVdot;
-		Real64 StarvedMakeUpVol;
-		Real64 BypassFraction; // Added for fluid bypass
-		int NumCellOn; // for multi-cell tower
-		int SpeedSelected; // Speed selected for the two speed tower
-
-		// Default Constructor
-		ReportVars() :
+			AirHumRat( 0.0 ),
 			InletWaterTemp( 0.0 ),
 			OutletWaterTemp( 0.0 ),
 			WaterMassFlowRate( 0.0 ),
@@ -449,72 +570,9 @@ namespace CondenserLoopTowers {
 			TankSupplyVol( 0.0 ),
 			StarvedMakeUpVdot( 0.0 ),
 			StarvedMakeUpVol( 0.0 ),
-			BypassFraction( 0.0 ),
-			NumCellOn( 0 ),
-			SpeedSelected( 0 )
-		{}
-
-	};
-
-	struct VSTowerData
-	{
-		// Members
-		// variables specific to variable-speed towers
-		Array1D< Real64 > Coeff; // - model coefficients
-		bool FoundModelCoeff; // - TRUE if model is calibratable
-		Real64 MinInletAirWBTemp; // - model limit for min inlet air WB temp
-		Real64 MaxInletAirWBTemp; // - model limit for max inlet air WB temp
-		Real64 MinRangeTemp; // - model limit for min range temp
-		Real64 MaxRangeTemp; // - model limit for max range temp
-		Real64 MinApproachTemp; // - model limit for min approach temp
-		Real64 MaxApproachTemp; // - model limit for max approach temp
-		Real64 MinWaterFlowRatio; // - model limit for min water flow rate ratio
-		Real64 MaxWaterFlowRatio; // - model limit for max water flow rate ratio
-		Real64 MaxLiquidToGasRatio; // - model limit for max liquid to gas ratio
-		int VSErrorCountFlowFrac; // - counter if water flow rate ratio limits are exceeded
-		int VSErrorCountWFRR; // - counter if water flow rate ratio limits are exceeded
-		int VSErrorCountIAWB; // - counter if inlet air wet-bulb temperature limits are exceeded
-		int VSErrorCountTR; // - counter if tower range temperature limits are exceeded
-		int VSErrorCountTA; // - counter if tower approach temperature limits are exceeded
-		int ErrIndexFlowFrac; // - index to recurring error structure for liquid to gas ratio
-		int ErrIndexWFRR; // - index to recurring error structure for water flow rate ratio
-		int ErrIndexIAWB; // - index to recurring error structure for inlet air WB
-		int ErrIndexTR; // - index to recurring error structure for tower range
-		int ErrIndexTA; // - index to recurring error structure for tower approach
-		int ErrIndexLG; // - index to recurring error structure for tower liquid/gas ratio
-		//- Tr = Range temperature
-		std::string TrBuffer1; // - buffer to print Tr warning messages on following time step
-		std::string TrBuffer2; // - buffer to print Tr warning messages on following time step
-		std::string TrBuffer3; // - buffer to print Tr warning messages on following time step
-		//- Twb = Wet-bulb temperature
-		std::string TwbBuffer1; // - buffer to print Twb warning messages on following time step
-		std::string TwbBuffer2; // - buffer to print Twb warning messages on following time step
-		std::string TwbBuffer3; // - buffer to print Twb warning messages on following time step
-		//- Ta = Approach temperature
-		std::string TaBuffer1; // - buffer to print Ta warning messages on following time step
-		std::string TaBuffer2; // - buffer to print Ta warning messages on following time step
-		std::string TaBuffer3; // - buffer to print Ta warning messages on following time step
-		//- WFRR = Water flow rate ratio
-		std::string WFRRBuffer1; // - buffer to print WFRR warning messages on following time step
-		std::string WFRRBuffer2; // - buffer to print WFRR warning messages on following time step
-		std::string WFRRBuffer3; // - buffer to print WFRR warning messages on following time step
-		//- LG = Liquid to gas ratio
-		std::string LGBuffer1; // - buffer to print LG warning messages on following time step
-		std::string LGBuffer2; // - buffer to print LG warning messages on following time step
-		std::string LGBuffer3; // - buffer to print LG warning messages on following time step
-		bool PrintTrMessage; // - flag to print Tr error message
-		bool PrintTwbMessage; // - flag to print Twb error message
-		bool PrintTaMessage; // - flag to print Ta error message
-		bool PrintWFRRMessage; // - flag to print WFRR error message
-		bool PrintLGMessage; // - flag to print liquid-gas ratio error message
-		Real64 TrLast; // value of Tr when warning occurred (passed to Recurring Warning)
-		Real64 TwbLast; // value of Twb when warning occurred (passed to Recurring Warning)
-		Real64 TaLast; // value of Ta when warning occurred (passed to Recurring Warning)
-		Real64 WaterFlowRateRatioLast; // value of WFRR when warning occurred (passed to Recurring Warn)
-		Real64 LGLast; // value of LG when warning occurred (passed to Recurring Warn)
-
-		// Default Constructor
-		VSTowerData() :
+			//			BypassFraction( 0.0 ),
+			//			NumCellOn( 0 ),
+			//			SpeedSelected( 0 ),
 			FoundModelCoeff( false ),
 			MinInletAirWBTemp( 0.0 ),
 			MaxInletAirWBTemp( 0.0 ),
@@ -545,176 +603,22 @@ namespace CondenserLoopTowers {
 			TwbLast( 0.0 ),
 			TaLast( 0.0 ),
 			WaterFlowRateRatioLast( 0.0 ),
-			LGLast( 0.0 )
+			LGLast( 0.0 ),
+			OneTimeFlagForEachTower( true ),
+			MyEnvrnFlag( true )
 		{}
 
 	};
 
 	// Object Data
-	extern Array1D< Towerspecs > SimpleTower; // dimension to number of machines
-	extern Array1D< TowerInletConds > SimpleTowerInlet; // inlet conditions
-	extern Array1D< ReportVars > SimpleTowerReport; // report variables
-	extern Array1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
+	extern Array1D< Towerspecs > SimpleTower;
 
 	// Functions
-	void
-	clear_state();
+	void clear_state();
 
-	void
-	SimTowers(
-		std::string const & TowerType,
-		std::string const & TowerName,
-		int & CompIndex,
-		bool & RunFlag,
-		bool const InitLoopEquip,
-		Real64 & MyLoad,
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const GetSizingFactor, // TRUE when just the sizing factor is requested
-		Real64 & SizingFactor // sizing factor
-	);
+	void GetTowerInput();
 
-	// End CondenserLoopTowers Module Driver Subroutines
-	//******************************************************************************
-
-	// Beginning of CondenserLoopTowers Module Get Input subroutines
-	//******************************************************************************
-
-	void
-	GetTowerInput();
-
-	// End of Get Input subroutines for the CondenserLoopTowers Module
-	//******************************************************************************
-
-	// Beginning Initialization Section for the CondenserLoopTowers Module
-	//******************************************************************************
-
-	void
-	InitSimVars();
-
-	void
-	InitTower(
-		int const TowerNum, // Number of the current cooling tower being simulated
-		bool const RunFlag // Indication of
-	);
-
-	void
-	SizeTower( int const TowerNum );
-
-	void
-	SizeVSMerkelTower( int const TowerNum );
-
-	// End Initialization Section for the CondenserLoopTowers Module
-	//******************************************************************************
-
-	// Beginning of the CondenserLoopTowers Module Simulation Subroutines
-	// *****************************************************************************
-
-	void
-	CalcSingleSpeedTower( int & TowerNum );
-
-	void
-	CalcTwoSpeedTower( int & TowerNum );
-
-	void
-	CalcMerkelVariableSpeedTower(
-		int const TowerNum,
-		Real64 & MyLoad
-	);
-
-	Real64
-	VSMerkelResidual(
-		Real64 const AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-		Array1< Real64 > const & Par // par(1) = Tower number
-	);
-
-	void
-	CalcVariableSpeedTower( int const TowerNum );
-
-	void
-	SimSimpleTower(
-		int const TowerNum,
-		Real64 const WaterMassFlowRate,
-		Real64 const AirFlowRate,
-		Real64 const UAdesign,
-		Real64 & OutletWaterTemp
-	);
-
-	void
-	SimVariableTower(
-		int const TowerNum, // variable speed tower index
-		Real64 const WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
-		Real64 const AirFlowRateRatio, // current air flow rate ratio
-		Real64 const Twb, // current inlet air wet-bulb temperature (C, capped if applicable)
-		Real64 & OutletWaterTemp // calculated tower outlet water temperature (C)
-	);
-
-	void
-	CalcVSTowerApproach(
-		int const TowerNum, // Index to cooling tower
-		Real64 const PctWaterFlow, // Water flow ratio of cooling tower
-		Real64 const AirFlowRatio, // Air flow ratio of cooling tower
-		Real64 const Twb, // Inlet air wet-bulb temperature [C]
-		Real64 const Tr, // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
-		Real64 & Approach // Calculated approach temperature [C]
-	);
-
-	void
-	CheckModelBounds(
-		int const TowerNum, // index to tower
-		Real64 const Twb, // current inlet air wet-bulb temperature (C)
-		Real64 const Tr, // requested range temperature for current time step (C)
-		Real64 const Ta, // requested approach temperature for current time step (C)
-		Real64 const WaterFlowRateRatio, // current water flow rate ratio at water inlet node
-		Real64 & TwbCapped, // bounded value of inlet air wet-bulb temperature (C)
-		Real64 & TrCapped, // bounded value of range temperature (C)
-		Real64 & TaCapped, // bounded value of approach temperature (C)
-		Real64 & WaterFlowRateRatioCapped // bounded value of water flow rate ratio
-	);
-
-	Real64
-	SimpleTowerUAResidual(
-		Real64 const UA, // UA of cooling tower
-		Array1< Real64 > const & Par // par(1) = design tower load [W]
-	);
-
-	Real64
-	SimpleTowerTrResidual(
-		Real64 const Trange, // cooling tower range temperature [C]
-		Array1< Real64 > const & Par // par(1) = tower number
-	);
-
-	Real64
-	SimpleTowerApproachResidual(
-		Real64 const FlowRatio, // water or air flow ratio of cooling tower
-		Array1< Real64 > const & Par // par(1) = tower number
-	);
-
-	// End of the CondenserLoopTowers Module Simulation Subroutines
-
-	// *****************************************************************************
-
-	void
-	CalculateWaterUseage( int const TowerNum );
-
-	// Beginning of Record Keeping subroutines for the Tower Module
-	// *****************************************************************************
-
-	void
-	UpdateTowers( int const TowerNum );
-
-	// End of Record Keeping subroutines for the Tower Module
-	// *****************************************************************************
-
-	// Beginning of Reporting subroutines for the Tower Module
-	// *****************************************************************************
-
-	void
-	ReportTowers(
-		bool const RunFlag,
-		int const TowerNum
-	);
+	void InitSimVars();
 
 } // CondenserLoopTowers
 

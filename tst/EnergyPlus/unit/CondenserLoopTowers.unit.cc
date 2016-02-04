@@ -64,9 +64,12 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <CondenserLoopTowers.hh>
 #include <OutputProcessor.hh>
+#include <DataPlant.hh>
 #include <SimulationManager.hh>
 #include <BranchInputManager.hh>
 #include <PlantManager.hh>
+#include <PlantComponent.hh>
+#include <PlantLocation.hh>
 #include <WeatherManager.hh>
 #include <DataHVACGlobals.hh>
 #include <OutputReportPredefined.hh>
@@ -522,13 +525,29 @@ namespace EnergyPlus {
 		SimulationManager::SetupSimulation( ErrorsFound );
 		CondenserLoopTowers::GetTowerInput();
 
-		CondenserLoopTowers::InitTower( 1, false );
-		CondenserLoopTowers::SizeVSMerkelTower( 1 );
-		CondenserLoopTowers::InitTower( 1, true );
-		Real64 MyLoad = 0.0;
-		CondenserLoopTowers::CalcMerkelVariableSpeedTower( 1, MyLoad );
-		CondenserLoopTowers::UpdateTowers( 1 );
-		CondenserLoopTowers::ReportTowers( true, 1 );
+		PlantComponent * compPtr;
+		PlantLocation dummyLoc;
+		Real64 MaxLoad;
+		Real64 MinLoad;
+		Real64 OptLoad;
+		Real64 CurLoad = 0.0;
+
+		compPtr = CondenserLoopTowers::Towerspecs::factory( DataPlant::TypeOf_CoolingTower_VarSpdMerkel, "TOWERWATERSYS COOLTOWER1" );
+
+		// call other plant member functions if needed
+		compPtr->onInitLoopEquip( dummyLoc );
+		compPtr->getDesignCapacities( dummyLoc, MaxLoad, MinLoad, OptLoad );
+
+		// call the new simulate routine
+		compPtr->simulate( dummyLoc, true, CurLoad );
+
+//		CondenserLoopTowers::InitTower( 1, false );
+//		CondenserLoopTowers::SizeVSMerkelTower( 1 );
+//		CondenserLoopTowers::InitTower( 1, true );
+//		Real64 MyLoad = 0.0;
+//		CondenserLoopTowers::CalcMerkelVariableSpeedTower( 1, MyLoad );
+//		CondenserLoopTowers::UpdateTowers( 1 );
+//		CondenserLoopTowers::ReportTowers( true, 1 );
 
 		// test that tower is really not cooling with no load so temp in and out is the same issue #4927
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node(9).Temp, DataLoopNode::Node(10).Temp);

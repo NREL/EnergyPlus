@@ -68,6 +68,7 @@
 // EnergyPlus Headers
 #include <PlantManager.hh>
 #include <BranchInputManager.hh>
+#include <CondenserLoopTowers.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
@@ -747,6 +748,7 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
+		using namespace CondenserLoopTowers;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -1110,17 +1112,21 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
 							this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
 							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( this_comp_type, "CoolingTower:TwoSpeed" ) ) {
+							this_comp.compPtr = CondenserLoopTowers::Towerspecs::factory( TypeOf_CoolingTower_SingleSpd, CompNames( CompNum ) );
+						} else if( SameString( this_comp_type, "CoolingTower:TwoSpeed" ) ) {
 							this_comp.TypeOf_Num = TypeOf_CoolingTower_TwoSpd;
 							this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
 							this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-						} else if ( SameString( this_comp_type, "CoolingTower:VariableSpeed" ) ) {
+							this_comp.compPtr = CondenserLoopTowers::Towerspecs::factory( TypeOf_CoolingTower_TwoSpd, CompNames( CompNum ) );
+						} else if( SameString( this_comp_type, "CoolingTower:VariableSpeed" ) ) {
 							this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpd;
 							this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
-						} else if ( SameString( this_comp_type, "CoolingTower:VariableSpeed:Merkel" ) ) {
+							this_comp.compPtr = CondenserLoopTowers::Towerspecs::factory( TypeOf_CoolingTower_VarSpd, CompNames( CompNum ) );
+						} else if( SameString( this_comp_type, "CoolingTower:VariableSpeed:Merkel" ) ) {
 							this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpdMerkel;
 							this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
-						} else if ( SameString( this_comp_type, "Generator:FuelCell:ExhaustGasToWaterHeatExchanger" ) ) {
+							this_comp.compPtr = CondenserLoopTowers::Towerspecs::factory( TypeOf_CoolingTower_VarSpdMerkel, CompNames( CompNum ) );
+						} else if( SameString( this_comp_type, "Generator:FuelCell:ExhaustGasToWaterHeatExchanger" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
 							this_comp.GeneralEquipType = GenEquipTypes_Generator;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;

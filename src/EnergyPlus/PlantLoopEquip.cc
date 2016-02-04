@@ -221,7 +221,7 @@ namespace PlantLoopEquip {
 		using Pumps::SimPumps;
 
 		using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
-		using CondenserLoopTowers::SimTowers;
+//		using CondenserLoopTowers::SimTowers;
 		using FluidCoolers::SimFluidCoolers;
 		using EvaporativeFluidCoolers::SimEvapFluidCoolers;
 		using BoilerSteam::SimSteamBoiler;
@@ -547,55 +547,20 @@ namespace PlantLoopEquip {
 			//TOWERS
 			if ( EquipTypeNum == TypeOf_CoolingTower_SingleSpd ) {
 
-				SimTowers( sim_component.TypeOf, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-				}
-				if ( GetCompSizFac ) {
-					sim_component.SizFac = SizingFac;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_CoolingTower_TwoSpd ) {
 
-				SimTowers( sim_component.TypeOf, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-				}
-				if ( GetCompSizFac ) {
-					sim_component.SizFac = SizingFac;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_CoolingTower_VarSpd ) { // 'CoolingTower:VariableSpeed'
 
-				SimTowers( sim_component.TypeOf, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-				}
-				if ( GetCompSizFac ) {
-					sim_component.SizFac = SizingFac;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_CoolingTower_VarSpdMerkel ) {
 
-				SimTowers( sim_component.TypeOf, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac );
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-				}
-				if ( GetCompSizFac ) {
-					sim_component.SizFac = SizingFac;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Tower Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
