@@ -283,7 +283,8 @@ namespace PlantHeatExchangerFluidToFluid {
 	extern Array1D< HeatExchangerStruct > FluidHX;
 
 	// Functions
-
+	void
+	clear_state();
 
 	void
 	GetFluidHeatExchangerInput();

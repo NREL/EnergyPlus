@@ -150,7 +150,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	// MODULE VARIABLE DECLARATIONS:
 	std::string nsvComponentClassName( "HeatExchanger:FluidToFluid" );
 	int NumberOfPlantFluidHXs( 0 );
-	bool GetInput( true );
+	bool GetHXInput( true );
 	Array1D_bool CheckFluidHXs;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -159,6 +159,16 @@ namespace PlantHeatExchangerFluidToFluid {
 	Array1D< HeatExchangerStruct > FluidHX;
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumberOfPlantFluidHXs = 0;
+		GetHXInput = true;
+		FluidHX.deallocate();
+		CheckFluidHXs.deallocate();
+	}
+
+
 	PlantComponent * HeatExchangerStruct::factory( int EP_UNUSED( objectType ), std::string objectName ) {
 		if ( GetHXInput ) {
 			GetFluidHeatExchangerInput();

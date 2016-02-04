@@ -87,6 +87,7 @@
 #include <OutputProcessor.hh>
 #include <PipeHeatTransfer.hh>
 #include <Pipes.hh>
+#include <PlantHeatExchangerFluidToFluid.hh>
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
@@ -1195,6 +1196,7 @@ namespace PlantManager {
 							} else if ( LoopSideNum == SupplySide ) {
 								this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
 							}
+							this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory( TypeOf_FluidToFluidPlantHtExchg, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Generator:MicroTurbine" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
 							this_comp.GeneralEquipType = GenEquipTypes_Generator;
