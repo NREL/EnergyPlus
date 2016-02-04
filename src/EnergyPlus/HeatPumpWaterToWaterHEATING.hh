@@ -59,6 +59,8 @@
 #ifndef HeatPumpWaterToWaterHEATING_hh_INCLUDED
 #define HeatPumpWaterToWaterHEATING_hh_INCLUDED
 
+#include <memory>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/gio.hh>
@@ -75,8 +77,6 @@ namespace EnergyPlus {
 	class HeatPumpWaterToWaterParameterEstimationHeating : public PlantComponent
 	{
 		public:
-
-		HeatPumpWaterToWaterParameterEstimationHeating();
 
 		virtual ~HeatPumpWaterToWaterParameterEstimationHeating() {}
 
@@ -111,12 +111,20 @@ namespace EnergyPlus {
 
 		private:
 
+		// Copy Constructor
+		HeatPumpWaterToWaterParameterEstimationHeating( HeatPumpWaterToWaterParameterEstimationHeating const & ) = default;
+	
+		// Move Constructor
+#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
+		HeatPumpWaterToWaterParameterEstimationHeating( HeatPumpWaterToWaterParameterEstimationHeating && ) = default;
+#endif
+
+		HeatPumpWaterToWaterParameterEstimationHeating();
+
 		// Members
-		static Array1D< HeatPumpWaterToWaterParameterEstimationHeating > instances;
+		static std::vector< std::unique_ptr<HeatPumpWaterToWaterParameterEstimationHeating> > instances;
 
 		int WWHPPlantTypeOfNum; // equipment type num
-		bool Available; // need an array of logicals--load identifiers of available equipment
-		bool ON; // simulate the machine at it's operating part load ratio
 		Real64 COP; // Coefficient of Performance of the machine
 		Real64 NomCap; // Nominal Capcity of the HeatPump
 		Real64 MinPartLoadRat; // Minimum operating Part Load Ratio
@@ -156,7 +164,6 @@ namespace EnergyPlus {
 		int LoadCompNum; // load side plant loop component index
 		int CondMassFlowIndex; // index for criteria in PullCompInterconnectTrigger
 		bool MyEnvrnFlag;
-		bool MyPlanScanFlag;
 		std::string RoutineName;
 		std::string RoutineNameLoadSideTemp;
 		std::string RoutineNameSourceSideTemp;
