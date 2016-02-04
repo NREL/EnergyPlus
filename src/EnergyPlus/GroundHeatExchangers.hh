@@ -211,9 +211,9 @@ namespace GroundHeatExchangers {
 		virtual void
 		getAnnualTimeConstant()=0;
 
-		void onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) );
+		void onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) override;
 
-		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
 
 		static PlantComponent * factory( int const objectType, std::string objectName );
 

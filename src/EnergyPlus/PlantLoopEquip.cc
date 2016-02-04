@@ -235,9 +235,8 @@ namespace PlantLoopEquip {
 		using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
 		using CTElectricGenerator::SimCTPlantHeatRecovery;
 		using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
-		using PondGroundHeatExchanger::SimPondGroundHeatExchanger;
 
-		using PlantLoadProfile::SimulatePlantProfile;
+		// using PlantLoadProfile::PlantProfileData::simulate;
 		using WaterCoils::UpdateWaterToAirCoilPlantConnection;
 		// using WaterUse::WaterConnectionsType::simulate;
 		using SolarCollectors::SimSolarCollector;
@@ -798,15 +797,7 @@ namespace PlantLoopEquip {
 				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgPond ) { // 'GROUND HEAT EXCHANGER:POND'
-				SimPondGroundHeatExchanger( sim_component.Name, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad ); //DSU
-
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgHorizTrench ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
@@ -970,7 +961,7 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_LoadProfile ) { // DSU2 draft out InitLoopEquip on a demand side component
 
 			if ( EquipTypeNum == TypeOf_PlantLoadProfile ) {
-				SimulatePlantProfile( sim_component.TypeOf, sim_component.Name, TypeOf_PlantLoadProfile, EquipNum, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;
 
