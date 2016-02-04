@@ -476,7 +476,11 @@ namespace CostEstimateManager {
 					ErrorsFound = true;
 				}
 
-				thisChil = FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
+				for ( auto iii = 1u; iii <= ElectricChiller.size(); iii++ ) {
+					if ( ElectricChiller( iii ).Name == CostLineItem( Item ).ParentObjName ) {
+						thisChil = iii;
+					}
+				}
 				if ( thisChil == 0 ) {
 					ShowWarningError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Chiller:Electric, invalid chiller specified." );
 					ShowContinueError( "Chiller Specified=\"" + CostLineItem( Item ).ParentObjName + "\", calculations will not be completed for this item." );
@@ -798,15 +802,20 @@ namespace CostEstimateManager {
 				}
 
 			} else if ( SELECT_CASE_var == "CHILLER:ELECTRIC" ) {
-				thisChil = FindItem( CostLineItem( Item ).ParentObjName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
+				thisChil = 0;
+				for ( auto iii = 1u; iii <= ElectricChiller.size(); iii++ ) {
+					if ( ElectricChiller( iii ).Name == CostLineItem( Item ).ParentObjName ) {
+						thisChil = iii;
+					}
+				}
 				if ( ( thisChil > 0 ) && ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) ) {
-					CostLineItem( Item ).Qty = ElectricChiller( thisChil ).Base.NomCap / 1000.0;
+					CostLineItem( Item ).Qty = ElectricChiller( thisChil ).NomCap / 1000.0;
 					CostLineItem( Item ).Units = "kW (tot cool cap.)";
 					CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKiloWattCap;
 					CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
 				}
 				if ( ( thisChil > 0 ) && ( CostLineItem( Item ).PerKWCapPerCOP > 0.0 ) ) {
-					CostLineItem( Item ).Qty = ElectricChiller( thisChil ).Base.COP * ElectricChiller( thisChil ).Base.NomCap / 1000.0;
+					CostLineItem( Item ).Qty = ElectricChiller( thisChil ).COP * ElectricChiller( thisChil ).NomCap / 1000.0;
 					CostLineItem( Item ).Units = "kW*COP (total, rated) ";
 					CostLineItem( Item ).ValuePer = CostLineItem( Item ).PerKWCapPerCOP;
 					CostLineItem( Item ).LineSubTotal = CostLineItem( Item ).Qty * CostLineItem( Item ).ValuePer;
