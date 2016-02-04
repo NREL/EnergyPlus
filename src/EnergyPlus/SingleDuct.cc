@@ -1990,7 +1990,7 @@ namespace SingleDuct {
 					Sys( SysNum ).ZoneFixedMinAir = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin;
 				}
 				else {
-					Sys( SysNum ).ZoneFixedMinAir = max( 0.2, 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier *
+					Sys( SysNum ).ZoneFixedMinAir = max( 0.2*Sys( SysNum ).MaxAirVolFlowRate, 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier *
 						Zone( ZoneNum ).ListMultiplier );
 				}
 				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Fixed Minimum Air Flow Rate [m3/s]", 
