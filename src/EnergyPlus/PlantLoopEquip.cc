@@ -236,7 +236,7 @@ namespace PlantLoopEquip {
 		using CTElectricGenerator::SimCTPlantHeatRecovery;
 		using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
 
-		using PlantLoadProfile::SimulatePlantProfile;
+		// using PlantLoadProfile::PlantProfileData::simulate;
 		using WaterCoils::UpdateWaterToAirCoilPlantConnection;
 		using WaterUse::SimulateWaterUseConnection;
 		using SolarCollectors::SimSolarCollector;
@@ -961,7 +961,7 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_LoadProfile ) { // DSU2 draft out InitLoopEquip on a demand side component
 
 			if ( EquipTypeNum == TypeOf_PlantLoadProfile ) {
-				SimulatePlantProfile( sim_component.TypeOf, sim_component.Name, TypeOf_PlantLoadProfile, EquipNum, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;
 
