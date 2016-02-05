@@ -89,6 +89,7 @@
 #include <DataSystemVariables.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingDevices.hh>
+#include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <EconomicTariff.hh>
 #include <EMSManager.hh>
@@ -344,7 +345,12 @@ namespace HeatBalanceManager {
 			// Surface octree setup
 			//  The surface octree holds live references to surfaces so it must be updated
 			//   if in the future surfaces are altered after this point
-			surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
+			if ( TotSurfaces >= DaylightingManager::octreeCrossover ) { // Octree can be active
+				if ( GetNumObjectsFound( "Daylighting:Controls" ) > 0 ) { // Daylighting is active
+					surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
+				}
+			}
+
 			for ( auto & surface : DataSurfaces::Surface ) surface.set_computed_geometry(); // Set up extra surface geometry info for PierceSurface
 
 			ManageHeatBalanceGetInputFlag = false;
