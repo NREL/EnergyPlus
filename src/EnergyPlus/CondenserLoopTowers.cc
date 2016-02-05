@@ -275,7 +275,7 @@ namespace CondenserLoopTowers {
 		return nullptr;
 	}
 
-	void Towerspecs::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 const CurLoad ) {
+	void Towerspecs::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 & CurLoad ) {
 
 		//INITIALIZE
 		InitSimVars();

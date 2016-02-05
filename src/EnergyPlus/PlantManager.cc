@@ -751,7 +751,6 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-		using namespace CondenserLoopTowers;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:

@@ -152,7 +152,7 @@ namespace CondenserLoopTowers {
 
 		static PlantComponent * factory( int objectType, std::string objectName );
 
-		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 const CurLoad );
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
 
 		void getDesignCapacities( const PlantLocation & EP_UNUSED( calledFromLocation ), Real64 & EP_UNUSED( MaxLoad ), Real64 & EP_UNUSED( MinLoad ), Real64 & EP_UNUSED( OptLoad ) );
 
