@@ -2075,6 +2075,14 @@ namespace FanCoilUnits {
 			}
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 
+			// data needed to solve for resulting parameters
+			// QZnReq or ZoneNum
+			// equipment type (fan coil, PTAC, etc)
+			// equipment index
+			// ASHRAE design zone sensible load (W)
+			// air inlet node (might be able to get using equipment type and index?)
+			// water inlet node (might be able to get using equipment type and index?)
+			//
 			if ( UnitOn && ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP < ( -1.0 * SmallLoad ) && TempControlType( ZoneNum ) != SingleHeatingSetPoint ) {
 				// cooling coil action, maximum cold water flow
 				mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
