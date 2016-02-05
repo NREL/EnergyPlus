@@ -1546,7 +1546,6 @@ namespace SingleDuct {
 		int OutletNode;
 		int ADUNum;
 		int SysIndex;
-		// static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MySizeFlag;

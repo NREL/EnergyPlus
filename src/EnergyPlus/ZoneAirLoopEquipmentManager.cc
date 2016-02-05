@@ -557,7 +557,6 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// static bool MyOneTimeFlag( true );
 		// int ZoneEqNum;
 		static Array1D_bool EachOnceFlag;
 		// Do the Begin Simulation initializations

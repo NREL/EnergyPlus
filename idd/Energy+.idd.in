@@ -51133,16 +51133,22 @@ Dehumidifier:Desiccant:System,
        \key Coil:Heating:Gas
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
-       \note works with gas, electric, hot water and steam heating coils
+       \note works with gas, electric, hot water and steam heating coils.
+       \note For autosizing the regeneration air heating coil the 
+       \note Design Coil Inlet Air Condition used is the outdoor air condition
+       \note if the desiccant system is on the primary air loop, or else if the  
+       \note desiccant system is on outdoor air system then it is the return air
+       \note condition. The Design Coil Outlet Air Temperature is the Regeneration
+       \note Inlet Air Setpoint Temperature specified in the input field below.   
   A10, \field Regeneration Air Heater Name
        \type object-list
        \object-list HeatingCoilName
   N1,  \field Regeneration Inlet Air Setpoint Temperature
        \type real
        \units C
-       \default 46.11
-       \note This value is also used as regeneration coil air outlet temperature 
-       \note to autosize the regeneration coil capacity.
+       \default 46.0
+       \note This value is also used as regeneration air heater design coil air
+       \note outlet temperature for autosizing calculation of the heater.
   A11, \field Companion Cooling Coil Object Type
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
