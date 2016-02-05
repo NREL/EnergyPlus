@@ -2014,6 +2014,17 @@ namespace WaterCoils {
 				SizingString.clear(); // doesn't matter
 				CompType = cAllCoilTypes(Coil_HeatingWater); // "Coil:Heating:Water"
 				CompName = WaterCoil( CoilNum ).Name;
+				if ( WaterCoil( CoilNum ).DesiccantRegenerationCoil ) {
+					DataDesicRegCoil = true;
+					DataDesicDehumNum = WaterCoil( CoilNum ).DesiccantDehumNum;
+					TempSize = AutoSize;
+					RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+					DataDesInletAirTemp = TempSize;
+					TempSize = AutoSize;
+					RequestSizing( CompType, CompName, DesiccantRegCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+					DataDesOutletAirTemp = TempSize;
+					TempSize = AutoSize; // reset back
+				}
 				RequestSizing( CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName );
 				// reset the design air volume flow rate for air loop coils only
 				if ( CurSysNum > 0 ) WaterCoil( CoilNum ).DesAirVolFlowRate = TempSize;
@@ -2056,15 +2067,30 @@ namespace WaterCoils {
 				// initialize the water coil inlet conditions
 				bPRINT = false; // no need to print to eio since we only need the values
 				DataFlowUsedForSizing = DataAirFlowUsedForSizing;
-				TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-				RequestSizing( CompType, CompName, HeatingWaterDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
-				WaterCoil ( CoilNum ).InletAirTemp = TempSize;
-				TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-				RequestSizing( CompType, CompName, HeatingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName );
-				WaterCoil ( CoilNum ).InletAirHumRat = TempSize;
-				TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-				RequestSizing( CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName );
-				WaterCoil ( CoilNum ).InletAirMassFlowRate = TempSize;
+
+				if ( WaterCoil( CoilNum ).DesiccantRegenerationCoil ) {
+					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
+					RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+					WaterCoil( CoilNum ).InletAirTemp = TempSize;
+					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
+					RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName );
+					WaterCoil( CoilNum ).InletAirHumRat = TempSize;
+					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
+					RequestSizing( CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName );
+					//WaterCoil( CoilNum ).InletAirMassFlowRate = TempSize;
+					WaterCoil( CoilNum ).InletAirMassFlowRate = DataAirFlowUsedForSizing;
+				} else {
+					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
+					RequestSizing( CompType, CompName, HeatingWaterDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+					WaterCoil( CoilNum ).InletAirTemp = TempSize;
+					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
+					RequestSizing( CompType, CompName, HeatingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName );
+					WaterCoil( CoilNum ).InletAirHumRat = TempSize;
+					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
+					RequestSizing( CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName );
+					WaterCoil( CoilNum ).InletAirMassFlowRate = TempSize;
+				}
+
 				// zone and air loop coils use different design coil load calculations, air loop coils use air side capacity, zone coils use water side capacity
 				DataDesInletAirTemp = WaterCoil ( CoilNum ).InletAirTemp;
 				DataDesInletAirHumRat = WaterCoil ( CoilNum ).InletAirHumRat;
@@ -2105,6 +2131,8 @@ namespace WaterCoils {
 				DataDesInletAirHumRat = 0.0;
 				DataAirFlowUsedForSizing = 0.0;
 				DataFlowUsedForSizing = 0.0;
+				DataDesicDehumNum = 0;
+				DataDesicRegCoil = false;
 
 			} else {
 				// if there is no heating Plant Sizing object and autosizng was requested, issue an error message
@@ -6136,6 +6164,74 @@ Label10: ;
 		}
 
 		return AvailSchIndex;
+	}
+
+	void
+	SetHWCoilAsDesicRegenCoil(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		int & DesiccantDehumIndex, // index of desiccant dehumidifier
+		bool & ErrorsFound // set to true if problem
+		) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   February 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		//  This function looks up the given coil and registers the coil as desiccant regeneration air heating coil.
+		// If incorrect coil type or name is given, ErrorsFound is returned as true
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+		using InputProcessor::SameString;
+
+		// Return value
+		// na
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int WhichCoil;
+
+		// Obtains and Allocates HeatingCoil related parameters from input file
+		if ( GetWaterCoilsInputFlag ) {
+			GetWaterCoilInput();
+			GetWaterCoilsInputFlag = false;
+		}
+
+		WhichCoil = 0;
+		if ( SameString( CoilType, "Coil:Heating:Water" ) ) {
+			WhichCoil = FindItem( CoilName, WaterCoil );
+			if ( WhichCoil != 0 ) {
+				WaterCoil( WhichCoil ).DesiccantRegenerationCoil = true;
+				WaterCoil( WhichCoil ).DesiccantDehumNum = DesiccantDehumIndex;
+			}
+		}
+
+		if ( WhichCoil == 0 ) {
+			ShowSevereError( "SetHWCoilAsDesicRegenCoil: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
+			ErrorsFound = true;
+		}
+
 	}
 
 	// End of Coil Utility subroutines

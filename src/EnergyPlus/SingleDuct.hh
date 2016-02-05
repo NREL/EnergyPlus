@@ -110,6 +110,7 @@ namespace SingleDuct {
 	extern bool GetATMixerFlag; // Flag set to make sure you get input once
 	extern int NumConstVolSys;
 	extern Array1D_bool CheckEquipName;
+	extern bool MyOneTimeFlag;
 
 	// INTERFACE BLOCK SPECIFICATIONS
 

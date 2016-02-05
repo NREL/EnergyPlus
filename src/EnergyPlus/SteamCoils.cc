@@ -670,6 +670,7 @@ namespace SteamCoils {
 		using FluidProperties::GetSatDensityRefrig;
 		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::RequestSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -705,6 +706,14 @@ namespace SteamCoils {
 		Real64 CpAirStd; // specific heat of air at std conditions
 		Real64 CpWater; // specific heat of water (condensed steam)
 
+		int FieldNum = 2; // IDD numeric field number where input field description is found
+		std::string CompName; // component name
+		std::string	CompType; // component type
+		int SizingType; // type of sizing to perform
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		bool bPRINT = false; // TRUE if sizing is reported to output (eio)
+		Real64 TempSize; // autosized value
+
 		ErrorsFound = false;
 		PltSizSteamNum = 0;
 		PltSizNum = 0;
@@ -730,6 +739,24 @@ namespace SteamCoils {
 				// If the coil water volume flow rate needs autosizing, then do it
 				if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == AutoSize ) {
 					CheckSysSizing( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name );
+
+					if ( SteamCoil( CoilNum ).DesiccantRegenerationCoil ) {
+
+						DataDesicRegCoil = true;
+						DataDesicDehumNum = SteamCoil( CoilNum ).DesiccantDehumNum;
+						CompType = SteamCoil( CoilNum ).SteamCoilType;
+						CompName = SteamCoil( CoilNum ).Name;
+						SizingString = "";
+						bPRINT = false;
+						TempSize = AutoSize;
+						RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+						DataDesInletAirTemp = TempSize;
+						TempSize = AutoSize;
+						RequestSizing( CompType, CompName, DesiccantRegCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+						DataDesOutletAirTemp = TempSize;
+						TempSize = AutoSize; // reset back
+					}
+
 					// Set the duct flow rate
 					{ auto const SELECT_CASE_var( CurDuctType );
 					if ( SELECT_CASE_var == Main ) {
@@ -743,6 +770,9 @@ namespace SteamCoils {
 					} else {
 						DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					}}
+					if ( DataDesicRegCoil ) {
+						DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+					}
 					DesMassFlow = RhoAirStd * DesVolFlow;
 					// get the outside air fraction
 					if ( FinalSysSizing( CurSysNum ).HeatOAOption == MinOA ) {
@@ -755,10 +785,15 @@ namespace SteamCoils {
 					} else {
 						OutAirFrac = 1.0;
 					}
-					// mixed air temp
-					CoilInTemp = OutAirFrac * FinalSysSizing( CurSysNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
-					// coil load
-					DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
+
+					if ( DataDesicRegCoil ) {
+						DesCoilLoad = CpAirStd * DesMassFlow * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+					} else {
+						// mixed air temp
+						CoilInTemp = OutAirFrac * FinalSysSizing( CurSysNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
+						// coil load
+						DesCoilLoad = CpAirStd * DesMassFlow * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
+					}
 					//AUTOSTEAMCOIL
 					if ( DesCoilLoad >= SmallLoad ) {
 						//TempSteamIn=SteamCoil(CoilNum)%InletSteamTemp
@@ -787,6 +822,7 @@ namespace SteamCoils {
 					}
 					ReportSizingOutput( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name, "Maximum Steam Flow Rate [m3/s]", SteamCoil( CoilNum ).MaxSteamVolFlowRate );
 				}
+				DataDesicRegCoil = false; // reset all globals to 0 to ensure correct sizing for other child components
 				// if this is a zone coil
 			} else if ( CurZoneEqNum > 0 ) {
 				CheckZoneSizing( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name );
@@ -2406,6 +2442,73 @@ namespace SteamCoils {
 
 	}
 
+	void
+	SetSteamCoilAsDesicRegenCoil(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		int & DesiccantDehumIndex, // index of desiccant dehumidifier
+		bool & ErrorsFound // set to true if problem
+		) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   February 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up the given coil and registers the coil as desiccant regeneration air heating coil.
+		// If incorrect coil type or name is given, ErrorsFound is returned as true
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItem;
+		using InputProcessor::SameString;
+
+		// Return value
+		// na
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int WhichCoil;
+
+		// Obtains and Allocates SteamCoil related parameters from input file
+		if ( GetSteamCoilsInputFlag ) { //First time subroutine has been entered
+			GetSteamCoilInput();
+			GetSteamCoilsInputFlag = false;
+		}
+
+		WhichCoil = 0;
+		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			WhichCoil = FindItem( CoilName, SteamCoil );
+			if ( WhichCoil != 0 ) {
+				SteamCoil( WhichCoil ).DesiccantRegenerationCoil = true;
+				SteamCoil( WhichCoil ).DesiccantDehumNum = DesiccantDehumIndex;
+			}
+		}
+
+		if ( WhichCoil == 0 ) {
+			ShowSevereError( "SetSteamCoilAsDesicRegenCoil: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
+			ErrorsFound = true;
+		}
+
+	}
 	// End of Utility subroutines for the SteamCoil Module
 
 } // SteamCoils

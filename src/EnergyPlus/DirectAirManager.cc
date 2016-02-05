@@ -128,6 +128,7 @@ namespace DirectAirManager {
 	//MODULE VARIABLE DECLARATIONS:
 	int NumDirectAir( 0 );
 	Array1D_bool CheckEquipName;
+	bool GetDirectAirInputFlag( true );
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
@@ -140,6 +141,7 @@ namespace DirectAirManager {
 		NumDirectAir = 0;
 		CheckEquipName.deallocate();
 		DirectAir.deallocate();
+		GetDirectAirInputFlag = true;
 	}
 
 	// Functions
@@ -188,7 +190,6 @@ namespace DirectAirManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DirectAirNum;
-		static bool GetDirectAirInputFlag( true );
 
 		if ( GetDirectAirInputFlag ) { //First time subroutine has been entered
 			GetDirectAirInput();

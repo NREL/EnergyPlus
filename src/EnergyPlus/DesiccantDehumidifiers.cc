@@ -356,6 +356,8 @@ namespace DesiccantDehumidifiers {
 		using SteamCoils::GetSteamCoilControlNodeNum;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
+		using WaterCoils::SetHWCoilAsDesicRegenCoil;
+		using SteamCoils::SetSteamCoilAsDesicRegenCoil;
 		using namespace DataIPShortCuts;
 
 		// Locals
@@ -921,7 +923,7 @@ namespace DesiccantDehumidifiers {
 						ErrorsFoundGeneric = true;
 					}
 
-					RegisterRegenerationCoil( RegenCoilType, RegenCoilName, DesicDehumNum, ErrorsFound2 );
+					SetHeatingCoilAsDesicRegenCoil( RegenCoilType, RegenCoilName, DesicDehumNum, ErrorsFound2 );
 					if ( ErrorsFound2 ) {
 						ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 						ErrorsFoundGeneric = true;
@@ -980,6 +982,12 @@ namespace DesiccantDehumidifiers {
 						if ( errFlag ) {
 							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + DesicDehum( DesicDehumNum ).Name );
 							ErrorsFound = true;
+						}
+
+						SetHWCoilAsDesicRegenCoil( RegenCoilType, RegenCoilName, DesicDehumNum, ErrorsFound2 );
+						if ( ErrorsFound2 ) {
+							ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
+							ErrorsFoundGeneric = true;
 						}
 
 					}
@@ -1055,6 +1063,12 @@ namespace DesiccantDehumidifiers {
 						ShowContinueError( "..." + cAlphaFields( 10 ) + " = " + DesicDehum( DesicDehumNum ).RegenCoilName );
 						ShowContinueError( "...heating coil temperature setpoint node = " + NodeID( RegenCoilControlNodeNum ) );
 						ShowContinueError( "...leave the heating coil temperature setpoint node name blank in the regen heater object." );
+						ErrorsFoundGeneric = true;
+					}
+
+					SetSteamCoilAsDesicRegenCoil( RegenCoilType, RegenCoilName, DesicDehumNum, ErrorsFound2 );
+					if ( ErrorsFound2 ) {
+						ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 						ErrorsFoundGeneric = true;
 					}
 

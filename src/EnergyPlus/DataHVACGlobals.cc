@@ -128,6 +128,7 @@ namespace DataHVACGlobals {
 	int const AutoCalculateSizing ( 25 ); // identifies an autocalulate input
 	int const DesiccantRegCoilDesAirInletTempSizing( 26 ); // request sizing for desicant regeneration coil inlet air temp
 	int const DesiccantRegCoilDesAirOutletTempSizing( 27 ); // request sizing for desicant regeneration coil outlet air temp
+	int const DesiccantRegCoilDesAirInletHumRatSizing( 28 ); // request sizing for desicant regeneration coil inlet air humidity ratio
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	int const AirCooled( 1 ); // Air-cooled condenser

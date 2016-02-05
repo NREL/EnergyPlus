@@ -1301,6 +1301,8 @@ namespace ReportSizingManager {
 						} else if ( OASysEqSizing( CurOASysNum ).HeatingAirFlow ) {
 							// Parent object sets heating flow rate
 							AutosizeDes = OASysEqSizing ( CurOASysNum ).HeatingAirVolFlow;
+						} else if ( DataDesicRegCoil ) {
+							AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 						} else {
 							AutosizeDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 						}
@@ -1312,15 +1314,17 @@ namespace ReportSizingManager {
 						} else {
 							if ( CurDuctType == Main ) {
 								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
-									if (FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0) {
+									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesMainVolFlow;
+									} else if ( DataDesicRegCoil ) {
+										AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 									} else {
 										AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 									}
 								} else {
 									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								}
-								} else if ( CurDuctType == Cooling ) {
+							} else if ( CurDuctType == Cooling ) {
 								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
 									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
@@ -1520,6 +1524,13 @@ namespace ReportSizingManager {
 				} else if ( SizingType == DesiccantRegCoilDesAirOutletTempSizing ) {
 					AutosizeDes = DesicDehum( DataDesicDehumNum ).RegenSetPointTemp;
 					bCheckForZero = false;
+				} else if ( SizingType == DesiccantRegCoilDesAirInletHumRatSizing ) {
+					if ( DesicDehum( DataDesicDehumNum ).RegenInletIsOutsideAirNode ) {
+						AutosizeDes = FinalSysSizing( CurSysNum ).HeatOutHumRat;
+					} else {
+						AutosizeDes = FinalSysSizing( CurSysNum ).HeatRetHumRat;
+					}
+					bCheckForZero = false;
 				} else if ( SizingType == CoolingSHRSizing ) {
 					if ( DataFlowUsedForSizing >= SmallAirVolFlow && DataCapacityUsedForSizing > 0.0 ) {
 						// For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
@@ -1664,6 +1675,8 @@ namespace ReportSizingManager {
 							DesVolFlow = OASysEqSizing(CurOASysNum).AirVolFlow;
 						} else if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
 							DesVolFlow = OASysEqSizing(CurOASysNum).HeatingAirVolFlow;
+						} else if ( DataDesicRegCoil ) {
+							DesVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 						} else {
 							DesVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 						}
@@ -1679,8 +1692,10 @@ namespace ReportSizingManager {
 							DesVolFlow = UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow;
 						} else {
 							if ( CurDuctType == Main ) {
-								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
+								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
 									DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat*FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								} else if ( DataDesicRegCoil ) {
+									DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								} else {
 									DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								}
@@ -1814,9 +1829,17 @@ namespace ReportSizingManager {
 					// coil load
 					CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
 					if ( CurOASysNum > 0 ) {
-						AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( FinalSysSizing( CurSysNum ).PreheatTemp - CoilInTemp );
+						if ( DataDesicRegCoil ) {
+							AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+						} else {
+							AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( FinalSysSizing( CurSysNum ).PreheatTemp - CoilInTemp );
+						}
 					} else {
-						AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
+						if ( DataDesicRegCoil ) {
+							AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( DataDesOutletAirTemp - DataDesInletAirTemp );
+						} else {
+							AutosizeDes = CpAirStd * StdRhoAir * DataAirFlowUsedForSizing * ( FinalSysSizing( CurSysNum ).HeatSupTemp - CoilInTemp );
+						}
 					}
 				} else if ( SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing ) {
 					AutosizeDes = DataWaterFlowUsedForSizing;

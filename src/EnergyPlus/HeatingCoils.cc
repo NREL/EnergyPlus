@@ -1189,7 +1189,7 @@ namespace HeatingCoils {
 		DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
 		DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
 
-		if ( TempCap == AutoSize) {
+		if ( TempCap == AutoSize ) {
 			if ( HeatingCoil( CoilNum ).DesiccantRegenerationCoil ) {
 				bPRINT = false;
 				DataDesicDehumNum = HeatingCoil( CoilNum ).DesiccantDehumNum;
@@ -3341,7 +3341,7 @@ namespace HeatingCoils {
 	}
 
 	void
-	RegisterRegenerationCoil(
+	SetHeatingCoilAsDesicRegenCoil(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
 		int & DesiccantDehumIndex, // index of desiccant dehumidifier
@@ -3355,7 +3355,7 @@ namespace HeatingCoils {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// This function looks up the given coil and registers the coil as desiccant regeneration coil.
+		// This function looks up the given coil and registers the coil as desiccant regeneration air heating coil.
 		// If incorrect coil type or name is given, ErrorsFound is returned as true
 
 		// METHODOLOGY EMPLOYED:
@@ -3403,7 +3403,7 @@ namespace HeatingCoils {
 		}
 
 		if ( WhichCoil == 0 ) {
-			ShowSevereError( "GetCoilOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
+			ShowSevereError( "SetHeatingCoilAsDesicRegenCoil: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 		}
 

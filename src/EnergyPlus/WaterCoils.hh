@@ -271,6 +271,8 @@ namespace WaterCoils {
 		//COIL:Water:SimpleHeating Coil Performance Input Method
 		int CoilPerfInpMeth; // 1 = UA and Design Water Flow Rate; 2 = Nominal Capacity
 		Real64 FoulingFactor; // Coil fouling factor [m2K/W]
+		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
+		int DesiccantDehumNum; // index to desiccant dehumidifier object
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -379,7 +381,9 @@ namespace WaterCoils {
 			CondensateVdot( 0.0 ),
 			CondensateVol( 0.0 ),
 			CoilPerfInpMeth( 0 ),
-			FoulingFactor( 0.0 )
+			FoulingFactor( 0.0 ),
+			DesiccantRegenerationCoil( false ),
+			DesiccantDehumNum( 0 )
 		{}
 
 	};
@@ -759,6 +763,15 @@ namespace WaterCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	// register that a coil is used as a regeneration air heating coil in
+	// desiccant dehumidification system
+	void
+	SetHWCoilAsDesicRegenCoil(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		int & DesiccantDehumIndex, // index of desiccant dehumidifier
+		bool & ErrorsFound // set to true if problem
+	);
 	// End of Coil Utility subroutines
 	// *****************************************************************************
 
