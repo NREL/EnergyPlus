@@ -312,7 +312,7 @@ namespace CondenserLoopTowers {
 
 	}
 
-	void Towerspecs::getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad )
+	void Towerspecs::getDesignCapacities( const PlantLocation & EP_UNUSED( calledFromLocation ), Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad )
 	{
 
 		if ( this->TowerType_Num == CoolingTower_VariableSpeedMerkel ) {
@@ -342,175 +342,6 @@ namespace CondenserLoopTowers {
 		SizFac = this->SizFac;
 
 	}
-
-//	void
-//	SimTowers(
-//		std::string const & TowerType,
-//		std::string const & TowerName,
-//		int & CompIndex,
-//		bool & RunFlag,
-//		bool const InitLoopEquip,
-//		Real64 & MyLoad,
-//		Real64 & MaxCap,
-//		Real64 & MinCap,
-//		Real64 & OptCap,
-//		bool const GetSizingFactor, // TRUE when just the sizing factor is requested
-//		Real64 & SizingFactor // sizing factor
-//	)
-//	{
-//
-//		// SUBROUTINE INFORMATION:
-//		//       AUTHOR         Don Shirey
-//		//       DATE WRITTEN   Dec. 2000
-//		//       MODIFIED       Fred Buhl, May 2002; Richard Raustad, FSEC, Feb 2005 (added VS tower)
-//		//       RE-ENGINEERED  na
-//
-//		// PURPOSE OF THIS SUBROUTINE:
-//		// Main cooling tower driver subroutine.  Gets called from
-//		// PlantLoopEquipments.
-//
-//		// METHODOLOGY EMPLOYED:
-//		// After being called by PlantLoopEquipments, this subroutine
-//		// calls GetTowerInput to get all cooling tower input info (one time only),
-//		// then calls the appropriate subroutine to calculate tower performance,
-//		// update records (node info) and writes output report info.
-//
-//		// REFERENCES:
-//		// na
-//
-//		// Using/Aliasing
-//		using InputProcessor::FindItemInList;
-//
-//		// Locals
-//		// SUBROUTINE ARGUMENT DEFINITIONS:
-//
-//		// SUBROUTINE PARAMETER DEFINITIONS:
-//		// na
-//
-//		// INTERFACE BLOCK SPECIFICATIONS
-//		// na
-//
-//		// DERIVED TYPE DEFINITIONS
-//		// na
-//
-//		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-//
-//		int TowerNum;
-//
-//		//GET INPUT
-//		if ( GetInput ) {
-//			GetTowerInput();
-//			GetInput = false;
-//		}
-//
-//		// Find the correct CoolingTower
-//		if ( CompIndex == 0 ) {
-//			TowerNum = FindItemInList( TowerName, SimpleTower );
-//			if ( TowerNum == 0 ) {
-//				ShowFatalError( "SimTowers: Unit not found=" + TowerName );
-//			}
-//			CompIndex = TowerNum;
-//		} else {
-//			TowerNum = CompIndex;
-//			if ( TowerNum > NumSimpleTowers || TowerNum < 1 ) {
-//				ShowFatalError( "SimTowers:  Invalid CompIndex passed=" + TrimSigDigits( TowerNum ) + ", Number of Units=" + TrimSigDigits( NumSimpleTowers ) + ", Entered Unit name=" + TowerName );
-//			}
-//			if ( CheckEquipName( TowerNum ) ) {
-//				if ( TowerName != SimpleTower( TowerNum ).Name ) {
-//					ShowFatalError( "SimTowers: Invalid CompIndex passed=" + TrimSigDigits( TowerNum ) + ", Unit name=" + TowerName + ", stored Unit Name for that index=" + SimpleTower( TowerNum ).Name );
-//				}
-//				CheckEquipName( TowerNum ) = false;
-//			}
-//		}
-//
-//		//INITIALIZE
-//		InitSimVars();
-//
-//		//CALCULATE
-//		{ auto const SELECT_CASE_var( SimpleTower( TowerNum ).TowerType_Num );
-//
-//		if ( SELECT_CASE_var == CoolingTower_SingleSpeed ) {
-//
-//			if ( InitLoopEquip ) {
-//				InitTower( TowerNum, RunFlag );
-//				SizeTower( TowerNum );
-//				MinCap = 0.0;
-//				MaxCap = SimpleTower( TowerNum ).TowerNominalCapacity * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
-//				OptCap = SimpleTower( TowerNum ).TowerNominalCapacity;
-//				if ( GetSizingFactor ) {
-//					SizingFactor = SimpleTower( TowerNum ).SizFac;
-//				}
-//				return;
-//			}
-//			InitTower( TowerNum, RunFlag );
-//			CalcSingleSpeedTower( TowerNum );
-//			CalculateWaterUseage( TowerNum );
-//			UpdateTowers( TowerNum );
-//			ReportTowers( RunFlag, TowerNum );
-//
-//		} else if ( SELECT_CASE_var == CoolingTower_TwoSpeed ) {
-//
-//			if ( InitLoopEquip ) {
-//				InitTower( TowerNum, RunFlag );
-//				SizeTower( TowerNum );
-//				MinCap = 0.0;
-//				MaxCap = SimpleTower( TowerNum ).TowerNominalCapacity * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
-//				OptCap = SimpleTower( TowerNum ).TowerNominalCapacity;
-//				if ( GetSizingFactor ) {
-//					SizingFactor = SimpleTower( TowerNum ).SizFac;
-//				}
-//				return;
-//			}
-//			InitTower( TowerNum, RunFlag );
-//			CalcTwoSpeedTower( TowerNum );
-//			CalculateWaterUseage( TowerNum );
-//			UpdateTowers( TowerNum );
-//			ReportTowers( RunFlag, TowerNum );
-//
-//		} else if ( SELECT_CASE_var == CoolingTower_VariableSpeedMerkel ) {
-//
-//			if ( InitLoopEquip ) {
-//				InitTower( TowerNum, RunFlag );
-//				SizeVSMerkelTower( TowerNum );
-//				MinCap = 0.0;
-//				MaxCap = SimpleTower( TowerNum ).TowerNominalCapacity * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
-//				OptCap = SimpleTower( TowerNum ).TowerNominalCapacity;
-//				if ( GetSizingFactor ) {
-//					SizingFactor = SimpleTower( TowerNum ).SizFac;
-//				}
-//				return;
-//			}
-//			InitTower( TowerNum, RunFlag );
-//			CalcMerkelVariableSpeedTower( TowerNum, MyLoad );
-//			CalculateWaterUseage( TowerNum );
-//			UpdateTowers( TowerNum );
-//			ReportTowers( RunFlag, TowerNum );
-//
-//		} else if ( SELECT_CASE_var == CoolingTower_VariableSpeed ) {
-//
-//			if ( InitLoopEquip ) {
-//				InitTower( TowerNum, RunFlag );
-//				SizeTower( TowerNum );
-//				MinCap = 0.0;
-//				MaxCap = SimpleTower( TowerNum ).TowerNominalCapacity * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
-//				OptCap = SimpleTower( TowerNum ).TowerNominalCapacity;
-//				if ( GetSizingFactor ) {
-//					SizingFactor = SimpleTower( TowerNum ).SizFac;
-//				}
-//				return;
-//			}
-//			InitTower( TowerNum, RunFlag );
-//			CalcVariableSpeedTower( TowerNum );
-//			CalculateWaterUseage( TowerNum );
-//			UpdateTowers( TowerNum );
-//			ReportTowers( RunFlag, TowerNum );
-//
-//		} else {
-//			ShowFatalError( "SimTowers: Invalid Tower Type Requested=" + TowerType );
-//
-//		}} // TypeOfEquip
-//
-//	}
 
 	// End CondenserLoopTowers Module Driver Subroutines
 	//******************************************************************************
@@ -6024,37 +5855,20 @@ namespace CondenserLoopTowers {
 
 		ReportingConstant = TimeStepSys * SecInHour;
 
-//		if ( ! RunFlag ) {
-			this->InletWaterTemp = Node( nsvWaterInletNode ).Temp;
-			this->OutletWaterTemp = Node( nsvWaterInletNode ).Temp;
-			this->WaterMassFlowRate = nsvWaterMassFlowRate;
-			this->Qactual = 0.0;
-			this->FanPower = 0.0;
-			this->FanEnergy = 0.0;
-			this->AirFlowRatio = 0.0;
-			this->WaterAmountUsed = 0.0;
-			this->BasinHeaterPower = nsvBasinHeaterPower;
-			this->BasinHeaterConsumption = nsvBasinHeaterPower * ReportingConstant;
-			this->FanCyclingRatio = 0.0;
-			this->BypassFraction = 0.0; // added for fluid bypass
-			this->NumCellOn = 0;
-			this->SpeedSelected = 0;
-//		} else {
-//			this->InletWaterTemp = Node( nsvWaterInletNode ).Temp;
-//			this->OutletWaterTemp = nsvOutletWaterTemp;
-//			this->WaterMassFlowRate = nsvWaterMassFlowRate;
-//			this->Qactual = nsvQactual;
-//			this->FanPower = nsvCTFanPower;
-//			this->FanEnergy = nsvCTFanPower * ReportingConstant;
-//			this->AirFlowRatio = nsvAirFlowRateRatio;
-//			this->WaterAmountUsed = nsvWaterUsage * ReportingConstant;
-//			this->BasinHeaterPower = nsvBasinHeaterPower;
-//			this->BasinHeaterConsumption = nsvBasinHeaterPower * ReportingConstant;
-//			this->FanCyclingRatio = nsvFanCyclingRatio;
-//			this->BypassFraction = this->BypassFraction; // added for fluid bypass
-//			this->NumCellOn = this->NumCellOn;
-//			this->SpeedSelected = this->SpeedSelected;
-//		}
+		this->InletWaterTemp = Node( nsvWaterInletNode ).Temp;
+		this->OutletWaterTemp = nsvOutletWaterTemp;
+		this->WaterMassFlowRate = nsvWaterMassFlowRate;
+		this->Qactual = nsvQactual;
+		this->FanPower = nsvCTFanPower;
+		this->FanEnergy = nsvCTFanPower * ReportingConstant;
+		this->AirFlowRatio = nsvAirFlowRateRatio;
+		this->WaterAmountUsed = nsvWaterUsage * ReportingConstant;
+		this->BasinHeaterPower = nsvBasinHeaterPower;
+		this->BasinHeaterConsumption = nsvBasinHeaterPower * ReportingConstant;
+		this->FanCyclingRatio = nsvFanCyclingRatio;
+		this->BypassFraction = this->BypassFraction; // added for fluid bypass
+		this->NumCellOn = this->NumCellOn;
+		this->SpeedSelected = this->SpeedSelected;
 
 	}
 
