@@ -56,6 +56,9 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
+// C++ Headers
+#include <algorithm>
+
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
@@ -232,10 +235,8 @@ namespace PlantLoopEquip {
 		using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
 		using CTElectricGenerator::SimCTPlantHeatRecovery;
 		using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
-		using SurfaceGroundHeatExchanger::SimSurfaceGroundHeatExchanger;
-		using PondGroundHeatExchanger::SimPondGroundHeatExchanger;
 
-		using PlantLoadProfile::SimulatePlantProfile;
+		// using PlantLoadProfile::PlantProfileData::simulate;
 		using WaterCoils::UpdateWaterToAirCoilPlantConnection;
 		using WaterUse::SimulateWaterUseConnection;
 		using SolarCollectors::SimSolarCollector;
@@ -251,24 +252,10 @@ namespace PlantLoopEquip {
 		using PlantComponentTemperatureSources::SimWaterSource;
 		using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EquipNum; // Plant side component list equipment number
 		int EquipTypeNum;
 		bool RunFlag; // TRUE if operating this iteration
-		// std::string EquipType; // local equipment type
-		// std::string EquipName; // local equipment name
 		int EquipFlowCtrl;
 		Real64 CurLoad;
 		Real64 MaxLoad;
@@ -283,21 +270,12 @@ namespace PlantLoopEquip {
 		// set up a reference for this component
 		auto & sim_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( Num ) );
 
-		// GeneralEquipType = sim_component.GeneralEquipType;
-		// Based on the general equip type and the GetCompSizFac value, see if we can just leave early
-// no, no, can't do this, because all the plant components need to run their init and size routines, not just chillers, boilers and cooling towers.  Other things happen besides sizing fac.
-
-//		if ( GetCompSizFac && ( GeneralEquipType != GenEquipTypes_Chiller && GeneralEquipType != GenEquipTypes_Boiler ) && GeneralEquipType != GenEquipTypes_CoolingTower ) {
-//			sim_component.SizFac = 0.0;
-//			return;
-//		}
+		static std::vector< int > compsToSimAfterInitLoopEquip = { TypeOf_Pipe, TypeOf_PipeSteam };
 
 		//set local variables
-		// EquipType = sim_component.TypeOf;
 		EquipTypeNum = sim_component.TypeOf_Num;
 		EquipFlowCtrl = sim_component.FlowCtrl;
 		GeneralEquipType = sim_component.GeneralEquipType;
-		// EquipName = sim_component.Name;
 		EquipNum = sim_component.CompNum;
 		RunFlag = sim_component.ON;
 		CurLoad = sim_component.MyLoad;
@@ -307,7 +285,18 @@ namespace PlantLoopEquip {
 				sim_component.compPtr->onInitLoopEquip( sim_component_location );
 				sim_component.compPtr->getDesignCapacities( sim_component_location, sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad );
 				sim_component.compPtr->getDesignTemperatures( sim_component.TempDesCondIn, sim_component.TempDesEvapOut );
-				return;
+
+				// KLUGEY HACK ALERT!!!
+				// Some components before transition were never checking InitLoopEquip, and each call to SimXYZ would actually just pass through the calculation
+				// Other components, on the other hand, would check InitLoopEquip, do a few things, then exit early without doing any calculation
+				// This may be wrong...but during this transition, it would be very nice to keep no diffs
+				// Thus, I will return here for all components that actually returned after their onInitLoopEquip stuff
+				//   and I will fall through and actually call simulate on the components that did that before
+				// I anticipate the list of components that fall through to be very small, so that is the check I will do.
+				// If std::find returns the .end() iterator, that means it didn't find it in the list, which means it's not one of the ones to fall through, so RETURN
+				if ( std::find( compsToSimAfterInitLoopEquip.begin(), compsToSimAfterInitLoopEquip.end(), EquipTypeNum ) == compsToSimAfterInitLoopEquip.end() ) {
+					return;
+				}
 			}
 			if ( GetCompSizFac ) {
 				sim_component.compPtr->getSizingFactor( sim_component.SizFac );
@@ -770,22 +759,10 @@ namespace PlantLoopEquip {
 				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSurface ) { // 'GROUND HEAT EXCHANGER:SURFACE'
-				SimSurfaceGroundHeatExchanger( sim_component.Name, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip ); //DSU
-
-				if ( InitLoopEquip ) {
-					sim_component.CompNum = EquipNum;
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgPond ) { // 'GROUND HEAT EXCHANGER:POND'
-				SimPondGroundHeatExchanger( sim_component.Name, EquipNum, FirstHVACIteration, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad ); //DSU
-
-				if ( InitLoopEquip ) {
-					sim_component.MaxLoad = MaxLoad;
-					sim_component.MinLoad = MinLoad;
-					sim_component.OptLoad = OptLoad;
-					sim_component.CompNum = EquipNum;
-
-				}
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgHorizTrench ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
@@ -949,7 +926,7 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_LoadProfile ) { // DSU2 draft out InitLoopEquip on a demand side component
 
 			if ( EquipTypeNum == TypeOf_PlantLoadProfile ) {
-				SimulatePlantProfile( sim_component.TypeOf, sim_component.Name, TypeOf_PlantLoadProfile, EquipNum, FirstHVACIteration, InitLoopEquip );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;
 
