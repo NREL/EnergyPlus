@@ -5866,9 +5866,6 @@ namespace CondenserLoopTowers {
 		this->BasinHeaterPower = nsvBasinHeaterPower;
 		this->BasinHeaterConsumption = nsvBasinHeaterPower * ReportingConstant;
 		this->FanCyclingRatio = nsvFanCyclingRatio;
-		this->BypassFraction = this->BypassFraction; // added for fluid bypass
-		this->NumCellOn = this->NumCellOn;
-		this->SpeedSelected = this->SpeedSelected;
 
 	}
 
