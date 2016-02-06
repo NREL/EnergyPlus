@@ -307,7 +307,7 @@ namespace CondenserLoopTowers {
 
 		this->CalculateWaterUseage();
 		this->UpdateTowers();
-		this->ReportTowers();
+		this->ReportTowers( CurLoad );
 
 
 	}
@@ -5817,7 +5817,7 @@ namespace CondenserLoopTowers {
 	// *****************************************************************************
 
 	void
-	Towerspecs::ReportTowers()
+		Towerspecs::ReportTowers( Real64 const MyLoad )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -5855,17 +5855,34 @@ namespace CondenserLoopTowers {
 
 		ReportingConstant = TimeStepSys * SecInHour;
 
-		this->InletWaterTemp = Node( nsvWaterInletNode ).Temp;
-		this->OutletWaterTemp = nsvOutletWaterTemp;
-		this->WaterMassFlowRate = nsvWaterMassFlowRate;
-		this->Qactual = nsvQactual;
-		this->FanPower = nsvCTFanPower;
-		this->FanEnergy = nsvCTFanPower * ReportingConstant;
-		this->AirFlowRatio = nsvAirFlowRateRatio;
-		this->WaterAmountUsed = nsvWaterUsage * ReportingConstant;
-		this->BasinHeaterPower = nsvBasinHeaterPower;
-		this->BasinHeaterConsumption = nsvBasinHeaterPower * ReportingConstant;
-		this->FanCyclingRatio = nsvFanCyclingRatio;
+		if ( MyLoad == 0.0 ) {
+			this->InletWaterTemp = Node( nsvWaterInletNode ).Temp;
+			this->OutletWaterTemp = Node( nsvWaterInletNode ).Temp;
+			this->WaterMassFlowRate = nsvWaterMassFlowRate;
+			this->Qactual = 0.0;
+			this->FanPower = 0.0;
+			this->FanEnergy = 0.0;
+			this->AirFlowRatio = 0.0;
+			this->WaterAmountUsed = 0.0;
+			this->BasinHeaterPower = nsvBasinHeaterPower;
+			this->BasinHeaterConsumption = nsvBasinHeaterPower * ReportingConstant;
+			this->FanCyclingRatio = 0.0;
+			this->BypassFraction = 0.0; // added for fluid bypass
+			this->NumCellOn = 0;
+			this->SpeedSelected = 0;
+		} else {
+			this->InletWaterTemp = Node( nsvWaterInletNode ).Temp;
+			this->OutletWaterTemp = nsvOutletWaterTemp;
+			this->WaterMassFlowRate = nsvWaterMassFlowRate;
+			this->Qactual = nsvQactual;
+			this->FanPower = nsvCTFanPower;
+			this->FanEnergy = nsvCTFanPower * ReportingConstant;
+			this->AirFlowRatio = nsvAirFlowRateRatio;
+			this->WaterAmountUsed = nsvWaterUsage * ReportingConstant;
+			this->BasinHeaterPower = nsvBasinHeaterPower;
+			this->BasinHeaterConsumption = nsvBasinHeaterPower * ReportingConstant;
+			this->FanCyclingRatio = nsvFanCyclingRatio;
+		}
 
 	}
 

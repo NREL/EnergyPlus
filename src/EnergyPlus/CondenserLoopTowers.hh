@@ -186,7 +186,7 @@ namespace CondenserLoopTowers {
 
 		void UpdateTowers();
 
-		void ReportTowers();
+		void ReportTowers( Real64 const MyLoad );
 
 		Real64 VSMerkelResidual(
 			Real64 const AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
