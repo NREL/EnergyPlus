@@ -87,6 +87,7 @@
 #include <OutputProcessor.hh>
 #include <PipeHeatTransfer.hh>
 #include <Pipes.hh>
+#include <PlantChillers.hh>
 #include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
@@ -165,11 +166,8 @@ namespace PlantManager {
 
 	// Object Data
 	Array1D< LoopPipeData > LoopPipe;
-	TempLoopData TempLoop; // =(' ',' ',' ',0, , , ,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.)
+	TempLoopData TempLoop;
 
-	// MODULE SUBROUTINES
-
-	// Functions
 
 	void
 	clear_state()
@@ -1064,6 +1062,7 @@ namespace PlantManager {
 							} else if ( LoopSideNum == SupplySide ) {
 								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
+							this_comp.compPtr = PlantChillers::BaseChillerSpecs::factory( TypeOf_Chiller_Electric, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Chiller:EngineDriven" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_EngineDriven;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1072,6 +1071,7 @@ namespace PlantManager {
 							} else if ( LoopSideNum == SupplySide ) {
 								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
+							this_comp.compPtr = PlantChillers::BaseChillerSpecs::factory( TypeOf_Chiller_EngineDriven, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Chiller:CombustionTurbine" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_CombTurbine;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1080,6 +1080,7 @@ namespace PlantManager {
 							} else if ( LoopSideNum == SupplySide ) {
 								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
+							this_comp.compPtr = PlantChillers::BaseChillerSpecs::factory( TypeOf_Chiller_CombTurbine, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Chiller:ConstantCOP" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_ConstCOP;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1088,6 +1089,7 @@ namespace PlantManager {
 							} else if ( LoopSideNum == SupplySide ) {
 								this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
 							}
+							this_comp.compPtr = PlantChillers::BaseChillerSpecs::factory( TypeOf_Chiller_ConstCOP, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Boiler:HotWater" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
 							this_comp.GeneralEquipType = GenEquipTypes_Boiler;

@@ -65,6 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -238,7 +239,7 @@ namespace PlantChillers {
 		{}
 	};
 
-	struct BaseChillerSpecs
+	struct BaseChillerSpecs : PlantComponent
 	{
 		// Members
 		std::string Name; // user identifier
@@ -359,6 +360,9 @@ namespace PlantChillers {
 			BasinHeaterPower( 0.0 ) // Basin heater power (W)
 
 		{}
+
+		static PlantComponent * factory( int objectType, std::string objectName );
+
 	};
 
 	struct ElectricChillerSpecs : BaseChillerSpecs
@@ -390,6 +394,8 @@ namespace PlantChillers {
 		int HRLoopSideNum; // heat recovery water plant loop side index
 		int HRBranchNum; // heat recovery water plant loop branch index
 		int HRCompNum; // heat recovery water plant loop component index
+		bool MyFlag;
+		bool MyEnvrnFlag;
 		ElectricReportVars reports;
 
 		// Default Constructor
@@ -417,9 +423,48 @@ namespace PlantChillers {
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
 			HRBranchNum( 0 ),
-			HRCompNum( 0 )
+			HRCompNum( 0 ),
+			MyFlag( true ),
+			MyEnvrnFlag( true )
 
 		{}
+		virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+		virtual void onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
+		virtual void getSizingFactor( Real64 & SizFac ) override;
+		virtual void getDesignTemperatures( Real64 & TempDesCondIn, Real64 & TempDesEvapOut ) override;
+		virtual void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad ) override;
+
+		void
+		InitElectricChiller(
+			bool const RunFlag, // TRUE when chiller operating
+			Real64 const MyLoad
+		);
+
+		void
+		SizeElectricChiller();
+
+		void
+		CalcElectricChillerModel(
+			Real64 & MyLoad, // operating load
+			int const EquipFlowCtrl, // Flow control mode for the equipment
+			bool const RunFlag // TRUE when chiller operating
+		);
+
+		void
+		CalcElectricChillerHeatRecovery(
+			Real64 & QCond, // current condenser load
+			Real64 const CondMassFlow, // current condenser Mass Flow
+			Real64 const CondInletTemp, // current condenser Inlet Temp
+			Real64 & QHeatRec // amount of heat recovered
+		);
+
+		void
+		UpdateElectricChillerRecords(
+			Real64 const MyLoad, // current load
+			bool const RunFlag // TRUE if chiller operating
+		);
+
+
 	};
 
 	struct EngineDrivenChillerSpecs : BaseChillerSpecs
@@ -474,6 +519,8 @@ namespace PlantChillers {
 		Real64 FuelEnergy; // Fuel Energy used (J)
 		Real64 FuelMdot; // Fuel Amount used (Kg/s)
 		Real64 ExhaustStackTemp; // Exhaust Stack Temperature (C)
+		bool MyFlag;
+		bool MyEnvrnFlag;
 		EngineDrivenReportVars reports;
 
 		// Default Constructor
@@ -523,9 +570,47 @@ namespace PlantChillers {
 			ExhaustEnergyRec( 0.0 ), // exhaust gas heat recovered (J)
 			FuelEnergy( 0.0 ), // Fuel Energy used (J)
 			FuelMdot( 0.0 ), // Fuel Amount used (Kg/s)
-			ExhaustStackTemp( 0.0 ) // Exhaust Stack Temperature (C)
-
+			ExhaustStackTemp( 0.0 ), // Exhaust Stack Temperature (C)
+			MyFlag( true ),
+			MyEnvrnFlag( true )
 		{}
+
+		virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+		virtual void onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
+		virtual void getSizingFactor( Real64 & SizFac ) override;
+		virtual void getDesignTemperatures( Real64 & TempDesCondIn, Real64 & TempDesEvapOut ) override;
+		virtual void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad ) override;
+
+		void
+		InitEngineDrivenChiller(
+			bool const RunFlag, // TRUE when chiller operating
+			Real64 const MyLoad
+		);
+
+
+		void
+		SizeEngineDrivenChiller();
+
+		void
+		CalcEngineDrivenChillerModel(
+			Real64 & MyLoad, // operating load
+			bool const RunFlag, // TRUE when chiller operating
+			int const EquipFlowCtrl // Flow control mode for the equipment
+		);
+
+
+		void
+		CalcEngineChillerHeatRec(
+			Real64 const EnergyRecovered, // Amount of heat recovered
+			Real64 & HeatRecRatio // Max Heat recovery ratio
+		);
+
+
+		void
+		UpdateEngineDrivenChiller(
+			Real64 const MyLoad, // current load
+			bool const RunFlag // TRUE if chiller operating
+		);
 
 	};
 
@@ -579,6 +664,8 @@ namespace PlantChillers {
 		int HRLoopSideNum; // heat recovery water plant loop side index
 		int HRBranchNum; // heat recovery water plant loop branch index
 		int HRCompNum; // heat recovery water plant loop component index
+		bool MyFlag;
+		bool MyEnvrnFlag;
 		GasTurbineReportVars reports;
 
 		// Default Constructor
@@ -624,8 +711,40 @@ namespace PlantChillers {
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
 			HRBranchNum( 0 ),
-			HRCompNum( 0 )
+			HRCompNum( 0 ),
+			MyFlag( true ),
+			MyEnvrnFlag( true )
 		{}
+
+		virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+		virtual void onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
+		virtual void getSizingFactor( Real64 & SizFac ) override;
+		virtual void getDesignTemperatures( Real64 & TempDesCondIn, Real64 & TempDesEvapOut ) override;
+		virtual void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad ) override;
+
+		void
+		InitGTChiller(
+			bool const RunFlag, // TRUE when chiller operating
+			Real64 const MyLoad
+		);
+
+		void
+		SizeGTChiller();
+
+		void
+		CalcGTChillerModel(
+			Real64 & MyLoad, // operating load
+			bool const RunFlag, // TRUE when chiller operating
+			int const EquipFlowCtrl // Flow control mode for the equipment
+		);
+
+		void
+		UpdateGTChillerRecords(
+			Real64 const MyLoad, // current load
+			bool const RunFlag // TRUE if chiller operating
+		);
+
+
 	};
 
 	struct ConstCOPChillerSpecs : BaseChillerSpecs
@@ -633,13 +752,45 @@ namespace PlantChillers {
 		// Members
 		Real64 EvapInletTemp;
 		Real64 CondInletTemp;
+		bool MyFlag;
+		bool MyEnvrnFlag;
 		ConstCOPReportVars reports;
 
 		// Default Constructor
 		ConstCOPChillerSpecs() :
 			EvapInletTemp( 0.0 ),
-			CondInletTemp( 0.0 )
+			CondInletTemp( 0.0 ),
+			MyFlag( true ),
+			MyEnvrnFlag( true )
 		{}
+
+		virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+		virtual void onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
+		virtual void getSizingFactor( Real64 & SizFac ) override;
+		virtual void getDesignTemperatures( Real64 & TempDesCondIn, Real64 & TempDesEvapOut ) override;
+		virtual void getDesignCapacities( const PlantLocation & calledFromLocation, Real64 & MaxLoad, Real64 & MinLoad, Real64 & OptLoad ) override;
+
+		void
+		InitConstCOPChiller(
+			bool const RunFlag, // TRUE when chiller operating
+			Real64 const MyLoad
+		);
+
+		void
+		SizeConstCOPChiller();
+
+		void
+		CalcConstCOPChillerModel(
+			Real64 & MyLoad,
+			bool const RunFlag,
+			int const EquipFlowCtrl // Flow control mode for the equipment
+		);
+
+		void
+		UpdateConstCOPChillerRecords(
+			Real64 const MyLoad, // unused1208
+			bool const RunFlag // unused1208
+		);
 
 	};
 
@@ -653,27 +804,6 @@ namespace PlantChillers {
 	clear_state();
 
 	void
-	SimChiller(
-		int const LoopNum, // Flow control mode for the equipment
-		int const LoopSide, // chiller number pointer
-		int const ChillerType, // type of chiller
-		std::string const & ChillerName, // user specified name of chiller
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int & CompIndex, // chiller number pointer
-		bool const RunFlag, // simulate chiller when TRUE
-		bool const FirstHVACIteration, // initialize variables when TRUE
-		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
-		Real64 & MyLoad, // loop demand component will meet
-		Real64 & MaxCap, // W - maximum operating capacity of chiller
-		Real64 & MinCap, // W - minimum operating capacity of chiller
-		Real64 & OptCap, // W - optimal operating capacity of chiller
-		bool const GetSizingFactor, // TRUE when just the sizing factor is requested
-		Real64 & SizingFactor, // sizing factor
-		Real64 & TempCondInDesign, // design condenser inlet temperature, water side
-		Real64 & TempEvapOutDesign // design evaporator outlet temperature, water side
-	);
-
-	void
 	GetElectricChillerInput();
 
 	void
@@ -684,131 +814,6 @@ namespace PlantChillers {
 
 	void
 	GetConstCOPChillerInput();
-
-	void
-	InitElectricChiller(
-		int const ChillNum, // number of the current electric chiller being simulated
-		bool const RunFlag, // TRUE when chiller operating
-		Real64 const MyLoad
-	);
-
-	void
-	InitEngineDrivenChiller(
-		int const ChillNum, // number of the current engine driven chiller being simulated
-		bool const RunFlag, // TRUE when chiller operating
-		Real64 const MyLoad
-	);
-
-	void
-	InitGTChiller(
-		int const ChillNum, // number of the current engine driven chiller being simulated
-		bool const RunFlag, // TRUE when chiller operating
-		Real64 const MyLoad
-	);
-
-	void
-	InitConstCOPChiller(
-		int const ChillNum, // number of the current electric chiller being simulated
-		bool const RunFlag, // TRUE when chiller operating
-		Real64 const MyLoad
-	);
-
-	void
-	SizeElectricChiller( int const ChillNum );
-
-	void
-	SizeEngineDrivenChiller( int const ChillNum );
-
-	void
-	SizeGTChiller( int const ChillNum );
-
-	void
-	SizeConstCOPChiller( int const ChillNum );
-
-	void
-	CalcElectricChillerModel(
-		int & ChillNum, // chiller number
-		Real64 & MyLoad, // operating load
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		bool const RunFlag // TRUE when chiller operating
-	);
-
-	void
-	CalcEngineDrivenChillerModel(
-		int & ChillerNum, // chiller number
-		Real64 & MyLoad, // operating load
-		bool const RunFlag, // TRUE when chiller operating
-		int const EquipFlowCtrl // Flow control mode for the equipment
-	);
-
-	void
-	CalcGTChillerModel(
-		int & ChillerNum, // chiller number
-		Real64 & MyLoad, // operating load
-		bool const RunFlag, // TRUE when chiller operating
-		int const EquipFlowCtrl // Flow control mode for the equipment
-	);
-
-	void
-	CalcConstCOPChillerModel(
-		int const ChillNum,
-		Real64 & MyLoad,
-		bool const RunFlag,
-		int const EquipFlowCtrl // Flow control mode for the equipment
-	);
-
-	void
-	CalcElectricChillerHeatRecovery(
-		int const ChillNum, // number of the current electric chiller being simulated
-		Real64 & QCond, // current condenser load
-		Real64 const CondMassFlow, // current condenser Mass Flow
-		Real64 const CondInletTemp, // current condenser Inlet Temp
-		Real64 & QHeatRec // amount of heat recovered
-	);
-
-	void
-	CalcEngineChillerHeatRec(
-		int const ChillerNum, // Chiller number
-		Real64 const EnergyRecovered, // Amount of heat recovered
-		Real64 & HeatRecRatio // Max Heat recovery ratio
-	);
-
-	void
-	UpdateElectricChillerRecords(
-		Real64 const MyLoad, // current load
-		bool const RunFlag, // TRUE if chiller operating
-		int const Num // chiller number
-	);
-
-	// End of EngineDriven Chiller Module Utility Subroutines
-	// *****************************************************************************
-
-	// Beginning of Record Keeping subroutines for the EngineDriven Chiller Module
-	// *****************************************************************************
-
-	void
-	UpdateEngineDrivenChiller(
-		Real64 const MyLoad, // current load
-		bool const RunFlag, // TRUE if chiller operating
-		int const Num // chiller number
-	);
-
-	void
-	UpdateGTChillerRecords(
-		Real64 const MyLoad, // current load
-		bool const RunFlag, // TRUE if chiller operating
-		int const Num // chiller number
-	);
-
-	void
-	UpdateConstCOPChillerRecords(
-		Real64 const MyLoad, // unused1208
-		bool const RunFlag, // unused1208
-		int const Num
-	);
-
-	// End of Record Keeping subroutines for the Const COP Chiller Module
-	// *****************************************************************************
 
 } // PlantChillers
 
