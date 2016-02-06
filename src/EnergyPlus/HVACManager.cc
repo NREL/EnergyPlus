@@ -214,6 +214,7 @@ namespace HVACManager {
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool SimHVACIterSetup( false );
 		bool TriggerGetAFN( true );
+		bool ReportAirHeatBalanceFirstTimeFlag( true );
 	}
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
@@ -228,6 +229,7 @@ namespace HVACManager {
 		RepIterAir = 0;
 		SimHVACIterSetup = false;
 		TriggerGetAFN = true;
+		ReportAirHeatBalanceFirstTimeFlag = true;
 	}
 
 
@@ -2181,7 +2183,6 @@ namespace HVACManager {
 		int VentZoneNum; // Number of ventilation object per zone
 		Real64 VentZoneMassflow; // Total mass flow rate per zone
 		Real64 VentZoneAirTemp; // Average Zone inlet temperature
-		static bool firstTime( true );
 
 		// Ensure no airflownetwork and simple calculations
 		if ( SimulateAirflowNetwork == 0 ) return;
@@ -2191,10 +2192,10 @@ namespace HVACManager {
 		// Report results for SIMPLE option only
 		if ( ! ( SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS ) ) return;
 
-		if ( firstTime ) {
+		if (ReportAirHeatBalanceFirstTimeFlag) {
 			MixSenLoad.allocate( NumOfZones );
 			MixLatLoad.allocate( NumOfZones );
-			firstTime = false;
+			ReportAirHeatBalanceFirstTimeFlag = false;
 		}
 
 		for ( ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) { // Start of zone loads report variable update loop ...
