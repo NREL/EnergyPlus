@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -473,17 +473,28 @@ TEST( Array1Test, ConstructionOneBasedInitializerList )
 	EXPECT_EQ( 33, r( 3 ) );
 }
 
-TEST( Array1Test, AssignmentBasic )
+TEST( Array1Test, AssignmentCopy )
 {
 	Array1D_double v( 22, 55.5 );
 	Array1D_double const w( 13, 6.789 );
 	v = w;
 	EXPECT_TRUE( eq( w, v ) );
-	v = 45.6;
+	v = 45.5;
 	EXPECT_EQ( 13u, v.size() );
-	for ( int i = 1; i <= 13; ++i ) {
-		EXPECT_EQ( 45.6, v( i ) );
-	}
+	EXPECT_TRUE( eq( v, 45.5 ) );
+}
+
+TEST( Array1Test, AssignmentMove )
+{
+	Array1D_double v( 22, 55.5 );
+	v = Array1D_double( 13, 6.75 );
+	EXPECT_EQ( 13u, v.size() );
+	EXPECT_TRUE( eq( v, 6.75 ) );
+	Array1D_double w;
+	w = std::move( v );
+	EXPECT_EQ( 0u, v.size() );
+	EXPECT_EQ( 13u, w.size() );
+	EXPECT_TRUE( eq( w, 6.75 ) );
 }
 
 TEST( Array1Test, ArrayTail )

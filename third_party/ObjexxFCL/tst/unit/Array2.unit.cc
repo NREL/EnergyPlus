@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -1072,7 +1072,7 @@ TEST( Array2Test, ConstructIdentity )
 			EXPECT_EQ( ( i1 == i2 ) ? 1 : 0, A1( i1, i2 ) );
 }
 
-TEST( Array2Test, AssignDefault )
+TEST( Array2Test, AssignmentCopy )
 {
 	Array2D_double A1( 2, 3, 3.1459 );
 	Array2D_double const A2( 2, 3, 2.718 );
@@ -1096,7 +1096,24 @@ TEST( Array2Test, AssignDefault )
 	}
 }
 
-TEST( Array2Test, AssignOtherData )
+TEST( Array2Test, AssignmentMove )
+{
+	Array2D_double A1( 2, 3, 3.1459 );
+	A1 = Array2D_double( 3, 3, 2.25 );
+	EXPECT_EQ( 3u, A1.size1() );
+	EXPECT_EQ( 3u, A1.size2() );
+	EXPECT_EQ( 9u, A1.size() );
+	EXPECT_TRUE( eq( A1, 2.25 ) );
+	Array2D_double A2( 4, 2, 3.5 );
+	A1 = std::move( A2 );
+	EXPECT_EQ( 0u, A2.size() );
+	EXPECT_EQ( 8u, A1.size() );
+	EXPECT_EQ( 4u, A1.size1() );
+	EXPECT_EQ( 2u, A1.size2() );
+	EXPECT_TRUE( eq( A1, 3.5 ) );
+}
+
+TEST( Array2Test, AssignmentOtherDataType )
 {
 	Array2D_int A1( 2, 3, 31459 );
 	for ( int i1 = A1.l1(); i1 <= A1.u1(); ++i1 ) {
@@ -1139,7 +1156,7 @@ TEST( Array2Test, AssignOtherData )
 
 }
 
-TEST( Array2Test, AssignArgument )
+TEST( Array2Test, AssignmentArgument )
 {
 	Array2D_int A1( 2, 3, 31459 );
 	Array2A_int A2( A1 );
@@ -1158,7 +1175,7 @@ TEST( Array2Test, AssignArgument )
 	}
 }
 
-TEST( Array2Test, AssignArithmetic )
+TEST( Array2Test, AssignmentArithmetic )
 {
 	Array2D_int A1( 2, 3, 11 );
 	Array2D_int const A2( 2, 3, 10 );
@@ -1182,7 +1199,7 @@ TEST( Array2Test, AssignArithmetic )
 	EXPECT_TRUE( eq( Array2D_int( 2, 3, 11 ), A1 ) );
 }
 
-TEST( Array2Test, AssignArithmeticArgument )
+TEST( Array2Test, AssignmentArithmeticArgument )
 {
 	Array2D_int A1( 2, 3, 11 );
 	Array2D_int const A2( 2, 3, 10 );
