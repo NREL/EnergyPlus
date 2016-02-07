@@ -15716,10 +15716,10 @@ Table 10. Summary of Room Air Models
 
 <table class="table table-striped">
 <tr>
-<th>Air Mohel Key</th>
-<th>Air mohel Algorithm</th>
+<th>Air Model Key</th>
+<th>Air model Algorithm</th>
 <th>Applicability</th>
-<th>Input Objects Requireh</th>
+<th>Input Objects Required</th>
 </tr>
 <tr>
 <td>Mixing</td>
