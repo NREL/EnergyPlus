@@ -189,145 +189,39 @@ namespace GroundHeatExchangers {
 		slinkyGLHE.deallocate();
 	}
 
-	void
-	SimGroundHeatExchangers(
-		int const typeNum,
-		std::string const & name,
-		int & compIndex,
-		bool const EP_UNUSED( runFlag ),
-		bool const EP_UNUSED( firstIteration ),
-		bool const initLoopEquip
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Dan Fisher
-		//       DATE WRITTEN:    August, 2000
-		//       MODIFIED         Arun Murugappan
-		//       RE-ENGINEERED    na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// mananges the simulation of the vertical closed-loop ground heat
-		// exchangers (GLHE) model
+	void GLHEBase::onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) {
+		this->initGLHESimVars();
+	}
 
-		// METHODOLOGY EMPLOYED:
+	void GLHEBase::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 & EP_UNUSED( CurLoad ) ) {
+		this->initGLHESimVars();
+		this->calcGroundHeatExchanger();
+		this->updateGHX();
+	}
 
-		// REFERENCES:
-		// Eskilson, P. 'Thermal Analysis of Heat Extraction Boreholes' Ph.D. Thesis:
-		//   Dept. of Mathematical Physics, University of Lund, Sweden, June 1987.
-		// Yavuzturk, C., J.D. Spitler. 1999. 'A Short Time Step Response Factor Model
-		//   for Vertical Ground Loop Heat Exchangers. ASHRAE Transactions. 105(2): 475-485.
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		int GLHENum;
-
-		//GET INPUT
+	PlantComponent * GLHEBase::factory( int const objectType, std::string objectName ) {
 		if ( GetInput ) {
 			GetGroundHeatExchangerInput();
 			GetInput = false;
 		}
-
-		if ( typeNum == DataPlant::TypeOf_GrndHtExchgVertical ) {
-
-			// Find the correct GLHE
-			if ( compIndex == 0 ) {
-				Array1D< std::string > tmpNames( numVerticalGLHEs );
-				for ( int i = 1; i <= numVerticalGLHEs; ++i ) {
-					tmpNames( i ) = verticalGLHE( i ).Name;
-				}
-				GLHENum = FindItemInList( name, tmpNames, numVerticalGLHEs );
-				if ( GLHENum == 0 ) {
-					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
-				}
-				compIndex = GLHENum;
-			} else {
-				GLHENum = compIndex;
-				if ( GLHENum > numVerticalGLHEs || GLHENum < 1 ) {
-					ShowFatalError( "SimGroundHeatExchangers:  Invalid compIndex passed=" + TrimSigDigits( GLHENum ) + ", Number of Units=" + TrimSigDigits( numVerticalGLHEs ) + ", Entered Unit name=" + name );
-				}
-				if ( checkEquipName( GLHENum ) ) {
-					if ( name != verticalGLHE( GLHENum ).Name ) {
-						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numVerticalGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + verticalGLHE( GLHENum ).Name );
-					}
-					checkEquipName( GLHENum ) = false;
+		if ( objectType == DataPlant::TypeOf_GrndHtExchgVertical ) {
+			for ( auto & ghx : verticalGLHE ) {
+				if ( ghx.Name == objectName ) {
+					return &ghx;
 				}
 			}
-
-			auto & thisGLHE( verticalGLHE( GLHENum ) );
-
-			if ( initLoopEquip ) {
-				thisGLHE.initGLHESimVars();
-				return;
-			}
-
-			// Initialize HX
-			thisGLHE.initGLHESimVars();
-
-			// Simulat HX
-			thisGLHE.calcGroundHeatExchanger();
-
-			// Update HX Report Vars
-			thisGLHE.updateGHX();
-
-		} else if ( typeNum == DataPlant::TypeOf_GrndHtExchgSlinky ) {
-
-			// Find the correct GLHE
-			if ( compIndex == 0 ) {
-				Array1D< std::string > tmpNames( numSlinkyGLHEs );
-				for ( int i = 1; i <= numSlinkyGLHEs; ++i ) {
-					tmpNames( i ) = slinkyGLHE( i ).Name;
-				}
-				GLHENum = FindItemInList( name, tmpNames, numSlinkyGLHEs );
-				if ( GLHENum == 0 ) {
-					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
-				}
-				compIndex = GLHENum;
-			} else {
-				GLHENum = compIndex;
-				if ( GLHENum > numSlinkyGLHEs || GLHENum < 1 ) {
-					ShowFatalError( "SimGroundHeatExchangers:  Invalid compIndex passed=" + TrimSigDigits( GLHENum ) + ", Number of Units=" + TrimSigDigits( numSlinkyGLHEs ) + ", Entered Unit name=" + name );
-				}
-				if ( checkEquipName( GLHENum ) ) {
-					if ( name != slinkyGLHE( GLHENum ).Name ) {
-						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numSlinkyGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + slinkyGLHE( GLHENum ).Name );
-					}
-					checkEquipName( GLHENum ) = false;
+		} else if ( objectType == DataPlant::TypeOf_GrndHtExchgSlinky ) {
+			for ( auto & ghx : slinkyGLHE ) {
+				if ( ghx.Name == objectName ) {
+					return &ghx;
 				}
 			}
-
-			auto & thisGLHE( slinkyGLHE( GLHENum ) );
-
-			if ( initLoopEquip ) {
-				thisGLHE.initGLHESimVars();
-				return;
-			}
-
-			// Initialize HX
-			thisGLHE.initGLHESimVars();
-
-			// Simulate HX
-			thisGLHE.calcGroundHeatExchanger();
-
-			// Update HX Report Vars
-			thisGLHE.updateGHX();
 		}
+		// If we didn't find it, fatal
+		ShowFatalError( "Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );
+		// Shut up the compiler
+		return nullptr;
 	}
 
 	//******************************************************************************
@@ -2245,7 +2139,7 @@ namespace GroundHeatExchangers {
 			InitComponentNodes( 0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
 
 			lastQnSubHr = 0.0;
-			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime ); 
+			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime );
 			Node( outletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime );
 
 			// zero out all history arrays

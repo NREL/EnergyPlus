@@ -65,6 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -89,17 +90,17 @@ namespace loc {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// utility variables initialized once
-	extern int NumOfSurfaceGHEs; // Number of surface GHE ground heat exchangers
-	extern bool NoSurfaceGroundTempObjWarning; // This will cause a warning to be issued if no "surface" ground
-	// temperature object was input.
-	// Utility variables - initialized for each instance of a surface GHE
-	extern int InletNodeNum; // inlet node number
-	extern int OutletNodeNum; // oulet node number
-	extern int ConstructionNum; // construction index number
-	extern int TopRoughness; // roughness of top layer
-	extern int BtmRoughness; // roughness of bottom layer
-	extern Real64 InletTemp; // water inlet temperature
-	extern Real64 OutletTemp; // water outlet temperature
+	//extern int NumOfSurfaceGHEs; // Number of surface GHE ground heat exchangers
+	//extern bool NoSurfaceGroundTempObjWarning; // This will cause a warning to be issued if no "surface" ground
+	//// temperature object was input.
+	//// Utility variables - initialized for each instance of a surface GHE
+	//extern int InletNodeNum; // inlet node number
+	//extern int OutletNodeNum; // oulet node number
+	//extern int ConstructionNum; // construction index number
+	//extern int TopRoughness; // roughness of top layer
+	//extern int BtmRoughness; // roughness of bottom layer
+	extern Real64 nsvInletTemp; // water inlet temperature
+	extern Real64 nsvOutletTemp; // water outlet temperature
 	extern Real64 FlowRate; // water mass flow rate
 	extern Real64 TopSurfTemp; // Top  surface temperature
 	extern Real64 BtmSurfTemp; // Bottom  surface temperature
@@ -107,7 +108,6 @@ namespace loc {
 	extern Real64 BtmSurfFlux; // Bottom  surface heat flux
 	extern Real64 SourceFlux; // total heat transfer rate, Watts
 	extern Real64 SourceTemp; // total heat transfer rate, Watts
-	extern Real64 SurfaceArea; // surface GHE surface area
 	extern Real64 TopThermAbs; // Thermal absortivity of top layer
 	extern Real64 BtmThermAbs; // Thermal absortivity of bottom layer
 	extern Real64 TopSolarAbs; // Solar absortivity of top layer
@@ -130,6 +130,9 @@ namespace loc {
 	extern Real64 PastWindSpeed; // Previous outdoor air wind speed
 	extern Real64 PastCloudFraction; // Previous Fraction of sky covered by clouds
 
+	// get input flag
+	extern bool GetInputFlag;
+
 	// time keeping variables used for keeping track of average flux over each time step
 	extern Array1D< Real64 > QRadSysSrcAvg; // Average source over the time step
 	extern Array1D< Real64 > LastSysTimeElapsed; // record of system time
@@ -139,7 +142,7 @@ namespace loc {
 
 	// Types
 
-	struct SurfaceGroundHeatExchangerData
+	struct SurfaceGroundHeatExchangerData : PlantComponent
 	{
 		// Members
 		// Input data
@@ -173,39 +176,6 @@ namespace loc {
 		int BranchNum;
 		int CompNum;
 
-		// Default Constructor
-		SurfaceGroundHeatExchangerData() :
-			DesignMassFlowRate( 0.0 ),
-			TubeDiameter( 0.0 ),
-			TubeSpacing( 0.0 ),
-			SurfaceLength( 0.0 ),
-			SurfaceWidth( 0.0 ),
-			TopThermAbs( 0.0 ),
-			TopSolarAbs( 0.0 ),
-			BtmThermAbs( 0.0 ),
-			LowerSurfCond( 0 ),
-			TubeCircuits( 0 ),
-			ConstructionNum( 0 ),
-			InletNodeNum( 0 ),
-			OutletNodeNum( 0 ),
-			TopRoughness( 0 ),
-			BtmRoughness( 0 ),
-			FrozenErrIndex1( 0 ),
-			FrozenErrIndex2( 0 ),
-			ConvErrIndex1( 0 ),
-			ConvErrIndex2( 0 ),
-			ConvErrIndex3( 0 ),
-			LoopNum( 0 ),
-			LoopSideNum( 0 ),
-			BranchNum( 0 ),
-			CompNum( 0 )
-		{}
-
-	};
-
-	struct SurfaceGroundHeatExchangerQTF
-	{
-		// Members
 		// QTF Constants
 		Real64 TsrcConstCoef;
 		Real64 TsrcVarCoef;
@@ -239,8 +209,52 @@ namespace loc {
 		Real64 LastSysTimeElapsed;
 		Real64 LastTimeStepSys;
 
+		// Report data
+		Real64 InletTemp; // water inlet temperature
+		Real64 OutletTemp; // water outlet temperature
+		Real64 MassFlowRate; // water mass flow rate
+		Real64 TopSurfaceTemp; // Top surface temperature
+		Real64 BtmSurfaceTemp; // Bottom  surface temperature
+		Real64 TopSurfaceFlux; // Top  surface heat flux
+		Real64 BtmSurfaceFlux; // Bottom  surface heat flux
+		Real64 HeatTransferRate; // total fluid heat transfer rate, Watts
+		Real64 SurfHeatTransferRate; // total surface heat transfer rate, Watts
+		Real64 Energy; // cumulative energy, Joules
+		Real64 SurfEnergy; // cumulative energy, Joules
+		Real64 SourceTemp; // Source temperature
+
+		bool MyFlag;
+		bool InitQTF;
+		bool MyEnvrnFlag;
+		Real64 SurfaceArea; // surface GHE surface area
+
 		// Default Constructor
-		SurfaceGroundHeatExchangerQTF() :
+		SurfaceGroundHeatExchangerData() :
+			DesignMassFlowRate( 0.0 ),
+			TubeDiameter( 0.0 ),
+			TubeSpacing( 0.0 ),
+			SurfaceLength( 0.0 ),
+			SurfaceWidth( 0.0 ),
+			TopThermAbs( 0.0 ),
+			TopSolarAbs( 0.0 ),
+			BtmThermAbs( 0.0 ),
+			LowerSurfCond( 0 ),
+			TubeCircuits( 0 ),
+			ConstructionNum( 0 ),
+			InletNodeNum( 0 ),
+			OutletNodeNum( 0 ),
+			TopRoughness( 0 ),
+			BtmRoughness( 0 ),
+			FrozenErrIndex1( 0 ),
+			FrozenErrIndex2( 0 ),
+			ConvErrIndex1( 0 ),
+			ConvErrIndex2( 0 ),
+			ConvErrIndex3( 0 ),
+			LoopNum( 0 ),
+			LoopSideNum( 0 ),
+			BranchNum( 0 ),
+			CompNum( 0 ),
+
 			TsrcConstCoef( 0.0 ),
 			TsrcVarCoef( 0.0 ),
 			QbtmConstCoef( 0.0 ),
@@ -267,30 +281,8 @@ namespace loc {
 			QSrcAvg( 0.0 ),
 			LastQSrc( 0.0 ),
 			LastSysTimeElapsed( 0.0 ),
-			LastTimeStepSys( 0.0 )
-		{}
+			LastTimeStepSys( 0.0 ),
 
-	};
-
-	struct SurfaceGroundHeatExchngrReport
-	{
-		// Members
-		// Report data
-		Real64 InletTemp; // water inlet temperature
-		Real64 OutletTemp; // water outlet temperature
-		Real64 MassFlowRate; // water mass flow rate
-		Real64 TopSurfaceTemp; // Top surface temperature
-		Real64 BtmSurfaceTemp; // Bottom  surface temperature
-		Real64 TopSurfaceFlux; // Top  surface heat flux
-		Real64 BtmSurfaceFlux; // Bottom  surface heat flux
-		Real64 HeatTransferRate; // total fluid heat transfer rate, Watts
-		Real64 SurfHeatTransferRate; // total surface heat transfer rate, Watts
-		Real64 Energy; // cumulative energy, Joules
-		Real64 SurfEnergy; // cumulative energy, Joules
-		Real64 SourceTemp; // Source temperature
-
-		// Default Constructor
-		SurfaceGroundHeatExchngrReport() :
 			InletTemp( 0.0 ),
 			OutletTemp( 0.0 ),
 			MassFlowRate( 0.0 ),
@@ -302,139 +294,124 @@ namespace loc {
 			SurfHeatTransferRate( 0.0 ),
 			Energy( 0.0 ),
 			SurfEnergy( 0.0 ),
-			SourceTemp( 0.0 )
+			SourceTemp( 0.0 ),
+
+			MyFlag( true ),
+			InitQTF( true ),
+			MyEnvrnFlag( true ),
+			SurfaceArea( 0.0 )
 		{}
+
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+
+		static PlantComponent * factory( int const objectType, std::string const objectName );
+
+
+		void
+		InitSurfaceGroundHeatExchanger();
+
+		//==============================================================================
+
+		void
+		CalcSurfaceGroundHeatExchanger(
+			bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+		);
+
+		//==============================================================================
+
+		void
+		CalcBottomFluxCoefficents(
+			Real64 const Tbottom, // current bottom (lower) surface temperature
+			Real64 const Ttop // current top (upper) surface temperature
+		);
+
+		//==============================================================================
+
+		void
+		CalcTopFluxCoefficents(
+			Real64 const Tbottom, // current bottom (lower) surface temperature
+			Real64 const Ttop // current top (upper) surface temperature
+		);
+
+		//==============================================================================
+
+		void
+		CalcSourceTempCoefficents(
+			Real64 const Tbottom, // current bottom (lower) surface temperature
+			Real64 const Ttop // current top (upper) surface temperature
+		);
+
+		//==============================================================================
+
+		Real64
+		CalcSourceFlux(); // component number
+
+		//==============================================================================
+
+		void
+		UpdateHistories(
+			Real64 const TopFlux, // current top (top) surface flux
+			Real64 const BottomFlux, // current bottom (bottom) surface flux
+			Real64 const SourceFlux, // current source surface flux
+			Real64 const SourceTemp // current source temperature
+		);
+
+		//==============================================================================
+
+		Real64
+		CalcHXEffectTerm(
+			Real64 const Temperature, // Temperature of water entering the surface, in C
+			Real64 const WaterMassFlow // Mass flow rate, in kg/s
+		);
+
+		//==============================================================================
+
+		void
+		CalcTopSurfTemp(
+			Real64 const FluxTop, // top surface flux
+			Real64 & TempTop, // top surface temperature
+			Real64 const ThisDryBulb, // dry bulb temperature
+			Real64 const ThisWetBulb, // wet bulb temperature
+			Real64 const ThisSkyTemp, // sky temperature
+			Real64 const ThisBeamSolarRad, // beam solar radiation
+			Real64 const ThisDifSolarRad, // diffuse solar radiation
+			Real64 const ThisSolarDirCosVert, // vertical component of solar normal
+			Real64 const ThisWindSpeed, // wind speed
+			bool const ThisIsRain, // rain flag
+			bool const ThisIsSnow // snow flag
+		);
+
+		//==============================================================================
+
+		void
+		CalcBottomSurfTemp(
+			Real64 const FluxBtm, // bottom surface flux
+			Real64 & TempBtm, // bottom surface temperature
+			Real64 const ThisDryBulb, // dry bulb temperature
+			Real64 const ThisWindSpeed, // wind speed
+			Real64 const ThisGroundTemp // ground temperature
+		);
+
+		//==============================================================================
+
+		void
+		UpdateSurfaceGroundHeatExchngr(); // Index for the surface
+
+		//==============================================================================
+
+		void
+		ReportSurfaceGroundHeatExchngr(); // Index for the surface under consideration
+
 
 	};
 
 	// Object Data
 	extern Array1D< SurfaceGroundHeatExchangerData > SurfaceGHE;
-	extern Array1D< SurfaceGroundHeatExchangerQTF > SurfaceGHEQTF;
-	extern Array1D< SurfaceGroundHeatExchngrReport > SurfaceGHEReport;
-
-	// Functions
-
-	void
-	SimSurfaceGroundHeatExchanger(
-		std::string const & CompName, // name of the surface GHE
-		int & CompIndex,
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-		bool const RunFlag, // TRUE if equipment is operating
-		bool & InitLoopEquip
-	);
-
-	//==============================================================================
 
 	void
 	GetSurfaceGroundHeatExchanger();
 
 	//==============================================================================
-
-	void
-	InitSurfaceGroundHeatExchanger(
-		int const SurfaceGHENum, // component number
-		bool const RunFlag // TRUE if equipment is operating
-	);
-
-	//==============================================================================
-
-	void
-	CalcSurfaceGroundHeatExchanger(
-		int const SurfaceGHENum, // component number
-		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-	);
-
-	//==============================================================================
-
-	void
-	CalcBottomFluxCoefficents(
-		int const SurfaceGHENum, // component number
-		Real64 const Tbottom, // current bottom (lower) surface temperature
-		Real64 const Ttop // current top (upper) surface temperature
-	);
-
-	//==============================================================================
-
-	void
-	CalcTopFluxCoefficents(
-		int const SurfaceGHENum, // component number
-		Real64 const Tbottom, // current bottom (lower) surface temperature
-		Real64 const Ttop // current top (upper) surface temperature
-	);
-
-	//==============================================================================
-
-	void
-	CalcSourceTempCoefficents(
-		int const SurfaceGHENum, // component number
-		Real64 const Tbottom, // current bottom (lower) surface temperature
-		Real64 const Ttop // current top (upper) surface temperature
-	);
-
-	//==============================================================================
-
-	Real64
-	CalcSourceFlux( int const SurfaceGHENum ); // component number
-
-	//==============================================================================
-
-	void
-	UpdateHistories(
-		int const SurfaceGHENum, // component number
-		Real64 const TopFlux, // current top (top) surface flux
-		Real64 const BottomFlux, // current bottom (bottom) surface flux
-		Real64 const SourceFlux, // current source surface flux
-		Real64 const SourceTemp // current source temperature
-	);
-
-	//==============================================================================
-
-	Real64
-	CalcHXEffectTerm(
-		int const SurfaceGHENum, // Index number of surface under consideration
-		Real64 const Temperature, // Temperature of water entering the surface, in C
-		Real64 const WaterMassFlow // Mass flow rate, in kg/s
-	);
-
-	//==============================================================================
-
-	void
-	CalcTopSurfTemp(
-		int const SurfaceNum, // surface index number
-		Real64 const FluxTop, // top surface flux
-		Real64 & TempTop, // top surface temperature
-		Real64 const ThisDryBulb, // dry bulb temperature
-		Real64 const ThisWetBulb, // wet bulb temperature
-		Real64 const ThisSkyTemp, // sky temperature
-		Real64 const ThisBeamSolarRad, // beam solar radiation
-		Real64 const ThisDifSolarRad, // diffuse solar radiation
-		Real64 const ThisSolarDirCosVert, // vertical component of solar normal
-		Real64 const ThisWindSpeed, // wind speed
-		bool const ThisIsRain, // rain flag
-		bool const ThisIsSnow // snow flag
-	);
-
-	//==============================================================================
-
-	void
-	CalcBottomSurfTemp(
-		int const SurfaceNum, // surface index number
-		Real64 const FluxBtm, // bottom surface flux
-		Real64 & TempBtm, // bottom surface temperature
-		Real64 const ThisDryBulb, // dry bulb temperature
-		Real64 const ThisWindSpeed, // wind speed
-		Real64 const ThisGroundTemp // ground temperature
-	);
-
-	//==============================================================================
-
-	void
-	UpdateSurfaceGroundHeatExchngr( int const SurfaceGHENum ); // Index for the surface
-
-	//==============================================================================
-
-	void
-	ReportSurfaceGroundHeatExchngr( int const SurfaceGHENum ); // Index for the surface under consideration
 
 } // SurfaceGroundHeatExchanger
 
