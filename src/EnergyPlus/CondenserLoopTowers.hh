@@ -186,7 +186,7 @@ namespace CondenserLoopTowers {
 
 		void UpdateTowers();
 
-		void ReportTowers( Real64 const MyLoad );
+		void ReportTowers();
 
 		Real64 VSMerkelResidual(
 			Real64 const AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
@@ -381,9 +381,6 @@ namespace CondenserLoopTowers {
 		Real64 TankSupplyVol;
 		Real64 StarvedMakeUpVdot;
 		Real64 StarvedMakeUpVol;
-		//		Real64 BypassFraction; // Added for fluid bypass
-		//		int NumCellOn; // for multi-cell tower
-		//		int SpeedSelected; // Speed selected for the two speed tower
 		Array1D< Real64 > Coeff; // - model coefficients
 		bool FoundModelCoeff; // - TRUE if model is calibratable
 		Real64 MinInletAirWBTemp; // - model limit for min inlet air WB temp
@@ -570,9 +567,6 @@ namespace CondenserLoopTowers {
 			TankSupplyVol( 0.0 ),
 			StarvedMakeUpVdot( 0.0 ),
 			StarvedMakeUpVol( 0.0 ),
-			//			BypassFraction( 0.0 ),
-			//			NumCellOn( 0 ),
-			//			SpeedSelected( 0 ),
 			FoundModelCoeff( false ),
 			MinInletAirWBTemp( 0.0 ),
 			MaxInletAirWBTemp( 0.0 ),

@@ -225,8 +225,6 @@ namespace CondenserLoopTowers {
 
 	// Object Data
 	Array1D< Towerspecs > SimpleTower; // dimension to number of machines
-//	Array1D< ReportVars > SimpleTowerReport; // report variables
-//	Array1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
 
 	// MODULE SUBROUTINES:
 
@@ -307,7 +305,7 @@ namespace CondenserLoopTowers {
 
 		this->CalculateWaterUseage();
 		this->UpdateTowers();
-		this->ReportTowers( CurLoad );
+		this->ReportTowers();
 
 
 	}
@@ -5817,7 +5815,7 @@ namespace CondenserLoopTowers {
 	// *****************************************************************************
 
 	void
-		Towerspecs::ReportTowers( Real64 const MyLoad )
+		Towerspecs::ReportTowers()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -5852,10 +5850,13 @@ namespace CondenserLoopTowers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 ReportingConstant;
+		bool RunFlag;
 
 		ReportingConstant = TimeStepSys * SecInHour;
 
-		if ( MyLoad == 0.0 ) {
+		RunFlag = PlantLoop( this->LoopNum ).LoopSide( this->LoopSideNum ).Branch( this->BranchNum ).Comp( this->CompNum ).ON;
+
+		if ( !RunFlag ) {
 			this->InletWaterTemp = Node( nsvWaterInletNode ).Temp;
 			this->OutletWaterTemp = Node( nsvWaterInletNode ).Temp;
 			this->WaterMassFlowRate = nsvWaterMassFlowRate;
