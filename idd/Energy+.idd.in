@@ -38870,22 +38870,31 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \minimum 0.0
        \maximum 1.0
        \note fraction of cooling air flow rate
-  A3,  \field Fan Object Type
+  A3,  \field Air Inlet Node Name
+       \type node
+       \note The name of the HVAC system node that is the air inlet node for the 
+       \note terminal unit. This is also the air inlet node for the unit’s fan.  
+  A4,  \field Air Outlet Node Name
+       \type node
+       \note The name of the HVAC system node that is the air outlet node for the 
+       \note terminal unit. This is also the air outlet node for the unit’s heating
+       \note coil’s air outlet node. This node is also a zone inlet node.
+  A5,  \field Fan Object Type
        \required-field
        \type choice
        \key Fan:VariableVolume
-  A4,  \field Fan Name
+  A6,  \field Fan Name
        \required-field
        \type object-list
        \object-list FansVAV
-  A5,  \field Heating Coil Object Type
+  A7,  \field Heating Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A6,  \field Heating Coil Name
+  A8,  \field Heating Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName

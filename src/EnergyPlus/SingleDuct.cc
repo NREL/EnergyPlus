@@ -430,6 +430,8 @@ namespace SingleDuct {
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
+		std::string AirTermSysInletNodeName; // air terminal single duct system inlet node name
+		std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
 		// Flow
 		NumVAVSys = GetNumObjectsFound( "AirTerminal:SingleDuct:VAV:Reheat" );
@@ -1231,8 +1233,8 @@ namespace SingleDuct {
 			Sys( SysNum ).SysName = Alphas( 1 );
 			Sys( SysNum ).SysType = CurrentModuleObject;
 			Sys( SysNum ).SysType_Num = SingleDuctVAVReheatVSFan;
-			Sys( SysNum ).ReheatComp = Alphas( 5 );
-			Sys( SysNum ).ReheatName = Alphas( 6 );
+			Sys( SysNum ).ReheatComp = Alphas( 7 );
+			Sys( SysNum ).ReheatName = Alphas( 8 );
 			IsNotOK = false;
 			if ( SameString( Sys( SysNum ).ReheatComp, "Coil:Heating:Gas" ) ) {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_Gas;
@@ -1251,7 +1253,7 @@ namespace SingleDuct {
 				Sys( SysNum ).ReheatComp_Num = HCoilType_SteamAirHeating;
 				Sys( SysNum ).ReheatComp_PlantType = TypeOf_CoilSteamAirHeating;
 			} else if ( Sys( SysNum ).ReheatComp != "" ) {
-				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 7 ) + " = " + Sys( SysNum ).ReheatComp + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
@@ -1260,15 +1262,15 @@ namespace SingleDuct {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).FanType = Alphas( 3 );
+			Sys( SysNum ).FanType = Alphas( 5 );
 			if ( SameString( Sys( SysNum ).FanType, "Fan:VariableVolume" ) ) {
 				Sys( SysNum ).Fan_Num = FanType_VS;
 			} else if ( Sys( SysNum ).FanType != "" ) {
-				ShowSevereError( "Illegal " + cAlphaFields( 3 ) + " = " + Sys( SysNum ).FanType + '.' );
+				ShowSevereError( "Illegal " + cAlphaFields( 5 ) + " = " + Sys( SysNum ).FanType + '.' );
 				ShowContinueError( "Occurs in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ErrorsFound = true;
 			}
-			Sys( SysNum ).FanName = Alphas( 4 );
+			Sys( SysNum ).FanName = Alphas( 6 );
 			ValidateComponent( Sys( SysNum ).FanType, Sys( SysNum ).FanName, IsNotOK, Sys( SysNum ).SysType );
 			if ( IsNotOK ) {
 				ShowContinueError( "In " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
@@ -1311,6 +1313,14 @@ namespace SingleDuct {
 			}
 			//               GetOnlySingleNode(Alphas(3),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
 			//                           NodeType_Air,NodeConnectionType_Inlet,1,ObjectIsParent)
+			AirTermSysInletNodeName = NodeID( Sys( SysNum ).InletNodeNum );
+			if ( ! SameString( Alphas( 3 ), AirTermSysInletNodeName ) ) {
+				ShowWarningError( RoutineName + "invlid air terminal object air inlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+				ShowContinueError( " Specified air inlet node name is = " + Alphas( 3 ) + "." );
+				ShowContinueError( " Expected air inlet node name is = " + AirTermSysInletNodeName + "." );
+				//ErrorsFound = true;
+			}
+
 			Sys( SysNum ).MaxAirVolFlowRate = Numbers( 1 );
 			Sys( SysNum ).MaxHeatAirVolFlowRate = Numbers( 2 );
 			Sys( SysNum ).ZoneMinAirFrac = Numbers( 3 );
@@ -1377,6 +1387,14 @@ namespace SingleDuct {
 			//        Sys(SysNum)%ReheatAirOutletNode  = &
 			//               GetOnlySingleNode(Alphas(4),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
 			//                            NodeType_Air,NodeConnectionType_Outlet,1,ObjectIsParent)
+			AirTermSysOutletNodeName = NodeID( Sys( SysNum ).ReheatAirOutletNode );
+			if ( ! SameString( Alphas( 4 ), AirTermSysOutletNodeName ) ) {
+				ShowWarningError( RoutineName + "invlid air terminal object air outlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+				ShowContinueError( " Specified air outlet node name is = " + Alphas( 4 ) + "." );
+				ShowContinueError( " Expected air outlet node name is = " + AirTermSysOutletNodeName + "." );
+				//ErrorsFound = true;
+			}
+
 			if ( Sys( SysNum ).ReheatComp_Num == HCoilType_SteamAirHeating ) {
 				Sys( SysNum ).MaxReheatSteamVolFlow = Numbers( 4 );
 				Sys( SysNum ).MinReheatSteamVolFlow = Numbers( 5 );
@@ -1421,9 +1439,9 @@ namespace SingleDuct {
 			}
 
 			// Add reheat coil to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), NodeID( Sys( SysNum ).OutletNodeNum ), NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 7 ), Alphas( 8 ), NodeID( Sys( SysNum ).OutletNodeNum ), NodeID( Sys( SysNum ).ReheatAirOutletNode ) );
 			// Add fan to component sets array
-			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 3 ), Alphas( 4 ), NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).OutletNodeNum ) );
+			SetUpCompSets( Sys( SysNum ).SysType, Sys( SysNum ).SysName, Alphas( 5 ), Alphas( 6 ), NodeID( Sys( SysNum ).InletNodeNum ), NodeID( Sys( SysNum ).OutletNodeNum ) );
 
 			//Setup the Average damper Position output variable
 			SetupOutputVariable( "Zone Air Terminal VAV Damper Position []", Sys( SysNum ).DamperPosition, "System", "Average", Sys( SysNum ).SysName );

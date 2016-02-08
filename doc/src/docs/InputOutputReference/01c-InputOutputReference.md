@@ -3,7 +3,7 @@
 
 The EnergyPlus Ground loop heat exchanger is a condenser component. This serves the condenser supply side in addition to the cooling towers and other condensing components. The following figure shows the Ground Heat Exchanger in the simulation environment.
 
-The heat exchanger response is defined by a G-function. This is a non-dimensional function that is used to calculate the response to square heat pulses of different duration. (This function is not the same as ‘G-factors’ referred to in the ASHRAE Applications Handbook). This continuous function is specified by a series of data pairs (LNTTS*i*, GFNC*i*) where,
+The heat exchanger response is defined by a G-AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFanfunction. This is a non-dimensional function that is used to calculate the response to square heat pulses of different duration. (This function is not the same as ‘G-factors’ referred to in the ASHRAE Applications Handbook). This continuous function is specified by a series of data pairs (LNTTS*i*, GFNC*i*) where,
 
 - LNTTS*i* is the non-dimensional time: *ln(T/T<sub>s</sub>)*
 
@@ -5304,6 +5304,14 @@ The maximum volumetric air flow rate through the unit in cubic meters per second
 
 The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. For this unit this is the flow rate when the fan is off.
 
+#### Field: Air Inlet Node Name
+
+The name of the HVAC system node that is the air inlet node for the terminal unit. This is also the air inlet node for the unit’s fan.
+
+#### Field: Air Outlet Node Name
+
+The name of the HVAC system node that is the air outlet node of the unit. This same node will be the unit heating coil’s air outlet node. This node is also a zone inlet node.
+
 #### Field: Fan Object Type
 
 The type of fan in the terminal unit. At this time the only type of fan allowed is *Fan:VariableVolume*.
@@ -5351,6 +5359,8 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
     autosize,                !- Maximum cooling air volume flow rate
     autosize,                !- Maximum heating air volume flow rate
     0.05,                    !- Zone Minimum Air Flow Fraction
+    SPACE2-1 ATU In Node,    !- Air Inlet Node Name
+    SPACE2-1 In Node,        !- Air Outlet Node Name
     FAN:SIMPLE:VariableVolume,       !- Fan object
     SPACE2-1 Zone Fan,       !- Fan name
     COIL:Water:SimpleHeating,!- Heating coil object

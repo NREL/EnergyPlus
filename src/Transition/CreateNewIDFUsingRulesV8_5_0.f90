@@ -844,10 +844,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 !- Air Inlet Node Name, Air Outlet Node Name, Heating Coil Air Inlet Node Name, & Hot Water or Steam Inlet Node Name
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:5) = InArgs(1:5)   ! F1-F5  No Change
-                ! Old input Fields F6 - F9 removed 
-                OutArgs(6:CurArgs-4) = InArgs(10:CurArgs)  ! Move up old F10 - F16
-                CurArgs = CurArgs - 4
+                OutArgs(1:5) = InArgs(1:5)   ! F1-F7  No Change
+                ! Old input Fields F8 - F9 removed 
+                OutArgs(8:CurArgs-2) = InArgs(10:CurArgs)  ! Move up old F10 - F16
+                CurArgs = CurArgs - 2
 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
