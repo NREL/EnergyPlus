@@ -415,6 +415,8 @@ namespace EnergyPlus {
 			"    autosize,                !- Maximum Cooling Air Flow Rate {m3/s}",
 			"    autosize,                !- Maximum Heating Air Flow Rate {m3/s}",
 			"    0.05,                    !- Zone Minimum Air Flow Fraction",
+			"    SPACE1 - 1 ATU In Node, !- Air Inlet Node Name",
+			"    SPACE1 - 1 In Node, !- Air Outlet Node Name",
 			"    Fan:VariableVolume,      !- Fan Object Type",
 			"    SPACE1-1 Zone Fan,       !- Fan Name",
 			"    Coil:Heating:Water,      !- Heating Coil Object Type",

@@ -3,7 +3,7 @@
 
 The EnergyPlus Ground loop heat exchanger is a condenser component. This serves the condenser supply side in addition to the cooling towers and other condensing components. The following figure shows the Ground Heat Exchanger in the simulation environment.
 
-The heat exchanger response is defined by a G-AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFanfunction. This is a non-dimensional function that is used to calculate the response to square heat pulses of different duration. (This function is not the same as ‘G-factors’ referred to in the ASHRAE Applications Handbook). This continuous function is specified by a series of data pairs (LNTTS*i*, GFNC*i*) where,
+The heat exchanger response is defined by a G-function. This is a non-dimensional function that is used to calculate the response to square heat pulses of different duration. (This function is not the same as ‘G-factors’ referred to in the ASHRAE Applications Handbook). This continuous function is specified by a series of data pairs (LNTTS*i*, GFNC*i*) where,
 
 - LNTTS*i* is the non-dimensional time: *ln(T/T<sub>s</sub>)*
 

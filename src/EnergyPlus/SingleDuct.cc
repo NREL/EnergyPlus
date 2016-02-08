@@ -1325,7 +1325,7 @@ namespace SingleDuct {
 			//                           NodeType_Air,NodeConnectionType_Inlet,1,ObjectIsParent)
 			AirTermSysInletNodeName = NodeID( Sys( SysNum ).InletNodeNum );
 			if ( ! SameString( Alphas( 3 ), AirTermSysInletNodeName ) ) {
-				ShowWarningError( RoutineName + "invlid air terminal object air inlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+				ShowWarningError( RoutineName + "Invalid air terminal object air inlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ShowContinueError( " Specified air inlet node name is = " + Alphas( 3 ) + "." );
 				ShowContinueError( " Expected air inlet node name is = " + AirTermSysInletNodeName + "." );
 				//ErrorsFound = true;
@@ -1399,7 +1399,7 @@ namespace SingleDuct {
 			//                            NodeType_Air,NodeConnectionType_Outlet,1,ObjectIsParent)
 			AirTermSysOutletNodeName = NodeID( Sys( SysNum ).ReheatAirOutletNode );
 			if ( ! SameString( Alphas( 4 ), AirTermSysOutletNodeName ) ) {
-				ShowWarningError( RoutineName + "invlid air terminal object air outlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
+				ShowWarningError( RoutineName + "Invalid air terminal object air outlet node name in " + Sys( SysNum ).SysType + " = " + Sys( SysNum ).SysName );
 				ShowContinueError( " Specified air outlet node name is = " + Alphas( 4 ) + "." );
 				ShowContinueError( " Expected air outlet node name is = " + AirTermSysOutletNodeName + "." );
 				//ErrorsFound = true;
