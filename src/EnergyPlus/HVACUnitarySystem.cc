@@ -2745,6 +2745,7 @@ namespace HVACUnitarySystem {
 		using UserDefinedComponents::GetUserDefinedCoilAirInletNode;
 		using UserDefinedComponents::GetUserDefinedCoilAirOutletNode;
 		using PackagedThermalStorageCoil::GetTESCoilCoolingCapacity;
+		using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5810,6 +5811,12 @@ namespace HVACUnitarySystem {
 
 					TestCompSet( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iHRWaterInletNodeAlphaNum ), Alphas( iHRWaterOutletNodeAlphaNum ), "Unitary System Heat receovery Nodes" );
 
+					if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) {
+						SetMSHPDXCoilHeatRecoveryFlag( UnitarySystem( UnitarySysNum ).CoolingCoilIndex );
+					}
+					if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating ) {
+						SetMSHPDXCoilHeatRecoveryFlag( UnitarySystem( UnitarySysNum ).HeatingCoilIndex );
+					}
 					if ( errFlag ) {
 						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
