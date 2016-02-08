@@ -159,6 +159,7 @@
 #include <EnergyPlus/PlantManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -345,6 +346,7 @@ namespace EnergyPlus {
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
 		Pipes::clear_state();
+		PollutionModule::clear_state();
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
