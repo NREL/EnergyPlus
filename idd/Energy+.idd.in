@@ -54475,12 +54475,10 @@ Controller:WaterCoil,
        \type real
        \units m3/s
        \autosizable
-       \ip-units gal/min
   N3 ; \field Minimum Actuated Flow
        \type real
        \default 0.0000001
        \units m3/s
-       \ip-units gal/min
 
 Controller:OutdoorAir,
        \memo Controller to set the outdoor air flow rate for an air loop. Control options include
