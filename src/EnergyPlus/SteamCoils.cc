@@ -706,10 +706,8 @@ namespace SteamCoils {
 		Real64 CpAirStd; // specific heat of air at std conditions
 		Real64 CpWater; // specific heat of water (condensed steam)
 
-		int FieldNum = 2; // IDD numeric field number where input field description is found
 		std::string CompName; // component name
 		std::string	CompType; // component type
-		int SizingType; // type of sizing to perform
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		bool bPRINT = false; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value
