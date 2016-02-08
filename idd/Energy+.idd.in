@@ -50516,7 +50516,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note This is the nominal design pump power of water recirculation and spray for evaporation at design air flow
        \note rates and cooler design effectiveness
        \autosizable
-       \default autosize 
+       \default autosize
   N4 , \field Water Pump Power Sizing Factor
        \type real
        \units W/(m3/s)
@@ -50525,7 +50525,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power
        \note sizing factor was estimated from pump power and secondary air design flow rates inputs from energyplus example
        \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Secondary Air Design Flow Rate). The factor ranges from
-       \note 55.0 to 150.0 [W/(m3/s)] were noted. The pump power can be sized to zero by setting this factor to zero. 
+       \note 55.0 to 150.0 [W/(m3/s)] were noted. The pump power can be sized to zero by setting this factor to zero.
   A5 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
        \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Air
@@ -50542,7 +50542,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
-       \default autosize   
+       \default autosize
   N6 , \field Secondary Air Flow Scaling Factor
        \type real
        \units dimensionless
@@ -50554,7 +50554,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units W
        \note This is the fan design power at Secondary Design Air Flow Rate. This is the nominal design power at full speed.
        \autosizable
-       \default autosize   
+       \default autosize
   N8 , \field Secondary Air Fan Sizing Specific Power
        \type real
        \units W/(m3/s)
@@ -50584,7 +50584,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
-       \default autosize 
+       \default autosize
   N10, \field Dewpoint Effectiveness Factor
        \type real
        \minimum 0.0
@@ -50705,7 +50705,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power
        \note sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example
        \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Primary Air Design Flow Rate). The factor ranges from
-       \note 55.0 to 150.0 [W/(m3/s)]. The pump power can be sized to zero by setting this factor to zero. 
+       \note 55.0 to 150.0 [W/(m3/s)]. The pump power can be sized to zero by setting this factor to zero.
   A4 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
        \note x = ff = flow fraction on the primary air. The flow fraction is the secondary air flow rate during current operation divided
@@ -54475,10 +54475,12 @@ Controller:WaterCoil,
        \type real
        \units m3/s
        \autosizable
+       \ip-units gal/min
   N3 ; \field Minimum Actuated Flow
        \type real
        \default 0.0000001
        \units m3/s
+       \ip-units gal/min
 
 Controller:OutdoorAir,
        \memo Controller to set the outdoor air flow rate for an air loop. Control options include
@@ -59103,7 +59105,7 @@ Pump:VariableSpeed,
         \type choice
         \key PowerPerFlow
         \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-        \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+        \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
         \key PowerPerFlowPerPressure
         \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
         \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
@@ -59212,7 +59214,7 @@ Pump:ConstantSpeed,
        \type choice
        \key PowerPerFlow
        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
        \key PowerPerFlowPerPressure
        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
@@ -59300,7 +59302,7 @@ Pump:VariableSpeed:Condensate,
        \type choice
        \key PowerPerFlow
        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
        \key PowerPerFlowPerPressure
        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
@@ -59393,7 +59395,7 @@ HeaderedPumps:ConstantSpeed,
        \type choice
        \key PowerPerFlow
        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
        \key PowerPerFlowPerPressure
        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
@@ -59412,7 +59414,7 @@ HeaderedPumps:ConstantSpeed,
        \units W/((m3/s)-Pa)
        \ip-units W/((gal/min)-ftH20)
        \minimum> 0
-       
+
 HeaderedPumps:VariableSpeed,
        \memo This Headered pump object describes a pump bank with more than 1 pump in parallel
        \min-fields 14
@@ -59499,7 +59501,7 @@ HeaderedPumps:VariableSpeed,
        \type choice
        \key PowerPerFlow
        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
        \key PowerPerFlowPerPressure
        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
