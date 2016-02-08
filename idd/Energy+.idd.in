@@ -20735,10 +20735,12 @@ SwimmingPool:Indoor,
   N6,  \field Pool Heating System Maximum Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
   N7,  \field Pool Miscellaneous Equipment Power
        \note Power input per pool water flow rate
        \units W/(m3/s)
+       \ip-units W/(gal/min)
        \type real
        \minimum 0.0
   A8,  \field Setpoint Temperature Schedule
@@ -22248,6 +22250,7 @@ ZoneCoolTower:Shower,
  N1, \field Maximum Water Flow Rate
      \required-field
      \units m3/s
+     \ip-units gal/min
      \type real
  N2, \field Effective Tower Height
      \note This field is from either the spray or the wet pad to the top of the outlet.
@@ -34209,6 +34212,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \autosizable
        \type real
        \units m3/s
+       \ip-units gal/min
   N7,  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -45945,6 +45949,7 @@ Coil:Cooling:WaterToAirHeatPump:EquationFit,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
         \autosizable
    N3,  \field Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
@@ -46084,6 +46089,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N5,  \field Rated Water Flow Rate At Selected Nominal Speed Level
         \units m3/s
+        \ip-units gal/min
         \type real
         \autosizable
         \default autosize
@@ -46139,6 +46145,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N13, \field Speed 1 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
         \required-field
@@ -46223,6 +46230,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N19, \field Speed 2 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A14, \field Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -46298,6 +46306,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N25, \field Speed 3 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A21, \field Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -46380,6 +46389,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N31, \field Speed 4 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A28, \field Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -46462,6 +46472,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N37, \field Speed 5 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A35, \field Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -46544,6 +46555,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N43, \field Speed 6 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A42, \field Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -46626,6 +46638,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N49, \field Speed 7 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A49, \field Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -46708,6 +46721,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N55, \field Speed 8 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A56, \field Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -46790,6 +46804,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N61, \field Speed 9 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A63, \field Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -46872,6 +46887,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N67, \field Speed 10 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A70, \field Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -46966,6 +46982,7 @@ Coil:Heating:WaterToAirHeatPump:EquationFit,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
         \autosizable
    N3,  \field Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
@@ -47057,6 +47074,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N5,  \field Rated Water Flow Rate At Selected Nominal Speed Level
         \units m3/s
+        \ip-units gal/min
         \type real
         \autosizable
         \default autosize
@@ -47087,6 +47105,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N9,  \field Speed 1 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
         \required-field
@@ -47166,6 +47185,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N14, \field Speed 2 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A14, \field Speed 2 Heating Capacity Function of Temperature Curve Name
@@ -47237,6 +47257,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N19, \field Speed 3 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A21, \field Speed 3 Heating Capacity Function of Temperature Curve Name
@@ -47314,6 +47335,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N24, \field Speed 4 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A28, \field Speed 4 Heating Capacity Function of Temperature Curve Name
@@ -47391,6 +47413,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N29, \field Speed 5 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A35, \field Speed 5 Heating Capacity Function of Temperature Curve Name
@@ -47468,6 +47491,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N34, \field Speed 6 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A42, \field Speed 6 Heating Capacity Function of Temperature Curve Name
@@ -47545,6 +47569,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N39, \field Speed 7 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A49, \field Speed 7 Heating Capacity Function of Temperature Curve Name
@@ -47622,6 +47647,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N44, \field Speed 8 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A56, \field Speed 8 Heating Capacity Function of Temperature Curve Name
@@ -47699,6 +47725,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N49, \field Speed 9 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A63, \field Speed 9 Heating Capacity Function of Temperature Curve Name
@@ -47776,6 +47803,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N54, \field Speed 10 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A70, \field Speed 10 Heating Capacity Function of Temperature Curve Name
@@ -47907,6 +47935,7 @@ Coil:WaterHeating:AirToWaterHeatPump:Pumped,
   N8 , \field Rated Condenser Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \autocalculatable
        \note Condenser water flow rate corresponding to rated coil performance
@@ -48291,6 +48320,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
   N8 , \field Rated Condenser Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \autocalculatable
        \note Condenser water flow rate corresponding to rated coil performance
@@ -48418,6 +48448,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \required-field
   N16, \field Speed 1 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
        \required-field
@@ -48505,6 +48536,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N22, \field Speed 2 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N23, \field Speed 2 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48584,6 +48616,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N28, \field Speed 3 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N29, \field Speed 3 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48663,6 +48696,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N34, \field Speed 4 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N35, \field Speed 4 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48742,6 +48776,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N40, \field Speed 5 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N41, \field Speed 5 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48821,6 +48856,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N46, \field Speed 6 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N47, \field Speed 6 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48900,6 +48936,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N52, \field Speed 7 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N53, \field Speed 7 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48979,6 +49016,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N58, \field Speed 8 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N59, \field Speed 8 Reference Unit Water Pump Input Power At Rated Conditions
@@ -49058,6 +49096,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N64, \field Speed 9 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N65, \field Speed 9 Reference Unit Water Pump Input Power At Rated Conditions
@@ -49137,6 +49176,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N70, \field Speed 10 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N71, \field Speed 10 Reference Unit Water Pump Input Power At Rated Conditions
@@ -49296,6 +49336,7 @@ Coil:WaterHeating:Desuperheater,
        \required-field
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \note The operating water flow rate.
   N7 , \field Water Pump Power
@@ -52101,6 +52142,7 @@ AirLoopHVAC:UnitarySystem,
   N25, \field Design Heat Recovery Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
@@ -53274,6 +53316,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
         \note Used for heat recovery to an EnergyPlus plant loop.
         \units m3/s
+        \ip-units gal/min
         \minimum 0.0
         \default 0.0
    N7,  \field Maximum Temperature for Heat Recovery
@@ -54474,8 +54517,8 @@ Controller:WaterCoil,
   N2 , \field Maximum Actuated Flow
        \type real
        \units m3/s
-       \autosizable
        \ip-units gal/min
+       \autosizable
   N3 ; \field Minimum Actuated Flow
        \type real
        \default 0.0000001
@@ -63477,6 +63520,7 @@ CoolingTower:VariableSpeed:Merkel,
   N6 , \field Design Water Flow Rate per Unit of Nominal Capacity
        \note This field is only used if the previous is set to autocalculate and performance input method is NominalCapacity
        \units m3/s-W
+       \ip-units gal/min-W
        \default 5.382E-8
        \type real
   N7 , \field Design Air Flow Rate
@@ -66496,6 +66540,7 @@ WaterHeater:HeatPump:PumpedCondenser,
   N2 , \field Condenser Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \autocalculatable
        \note Actual water flow rate through the heat pump's water coil (condenser).
@@ -75651,6 +75696,7 @@ Generator:MicroTurbine,
  N14, \field Reference Heat Recovery Water Flow Rate
       \type real
       \units m3/s
+      \ip-units gal/min
       \minimum> 0.0
  A10, \field Heat Recovery Water Flow Rate Function of Temperature and Power Curve Name
       \type object-list
@@ -75696,11 +75742,13 @@ Generator:MicroTurbine,
  N15, \field Minimum Heat Recovery Water Flow Rate
       \type real
       \units m3/s
+      \ip-units gal/min
       \minimum 0.0
       \default 0.0
  N16, \field Maximum Heat Recovery Water Flow Rate
       \type real
       \units m3/s
+      \ip-units gal/min
       \minimum 0.0
       \default 0.0
  N17, \field Maximum Heat Recovery Water Temperature
