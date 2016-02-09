@@ -96,6 +96,7 @@
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HVACUnitarySystem.hh>
+#include <Humidifiers.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -209,6 +210,7 @@ namespace MixedAir {
 	int const DXHeatPumpSystem( 19 );
 	int const Coil_UserDefined( 20 );
 	int const UnitarySystem( 21 );
+	int const Humidifier( 22 );
 
 	int const ControllerSimple( 1 );
 	int const ControllerOutsideAir( 2 );
@@ -639,7 +641,7 @@ namespace MixedAir {
 		using HVACUnitarySystem::SimUnitarySystem;
 		using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
-
+		using Humidifiers::SimHumidifier;
 		// Locals
 		// SUBROUTINE ARGUMENTS:
 
@@ -771,6 +773,13 @@ namespace MixedAir {
 				SimDesiccantDehumidifier( CompName, FirstHVACIteration, CompIndex );
 			}
 			OAHX = true;
+
+			// Humidifiers
+		} else if ( SELECT_CASE_var == Humidifier ) { // 'Humidifier:Steam:Electric'
+			// 'Humidifier:Steam:Gas'
+			if ( Sim ) {
+				SimHumidifier( CompName, FirstHVACIteration, CompIndex );
+			}
 
 			// Unglazed Transpired Solar Collector
 		} else if ( SELECT_CASE_var == Unglazed_SolarCollector ) { // 'SolarCollector:UnglazedTranspired'
@@ -1224,6 +1233,11 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Desiccant;
 				} else if ( SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:SYSTEM" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Desiccant;
+					// Humidifiers: Humidifier:Steam:Electric and Humidifier:Steam:Gas
+				} else if ( SELECT_CASE_var == "HUMIDIFIER:STEAM:ELECTRIC" ) {
+					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Humidifier;
+				} else if ( SELECT_CASE_var == "HUMIDIFIER:STEAM:GAS" ) {
+					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Humidifier;
 
 					// Unglazed Transpired Solar Collector
 				} else if ( SELECT_CASE_var == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED" ) {
