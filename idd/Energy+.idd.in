@@ -78212,6 +78212,7 @@ WaterUse:Equipment,
   N1 , \field Peak Flow Rate
        \required-field
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0.0
   A3 , \field Flow Rate Fraction Schedule Name
@@ -78348,10 +78349,12 @@ WaterUse:Storage,
   N3 , \field Design In Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \note Defaults to unlimited flow.
   N4 , \field Design Out Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \note Defaults to unlimited flow.
   A3 , \field Overflow Destination
        \type object-list
@@ -78427,6 +78430,7 @@ WaterUse:Well,
   N2 , \field Pump Rated Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
   N3 , \field Pump Rated Head
        \type real
        \units Pa
@@ -78479,6 +78483,7 @@ WaterUse:RainCollector,
   N2 , \field Maximum Collection Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \note Defaults to unlimited flow.
   A5 , \field Collection Surface 1 Name
        \begin-extensible
