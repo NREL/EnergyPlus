@@ -2443,7 +2443,7 @@ When a triangular subsurface is used, the model provides a warning and treats th
 
 Effective width = 0.75 * Length between Vertex 1 and Vertex 2
 
-Effective width = 4 * Area / ( 3 * Length between Vertex 2 and Vertex 3 )   
+Effective height = 4 * Area / ( 3 * Length between Vertex 2 and Vertex 3 )   
 
 #### Field: Surface Name
 
