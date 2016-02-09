@@ -80,7 +80,7 @@ TEST_F( EnergyPlusFixture, SwimmingPool_MakeUpWaterVolFlow )
 
 	//Tests for MakeUpWaterVolFunct
 	EXPECT_EQ( 0.05, MakeUpWaterVolFunct( 5, 100 ) );
-	EXPECT_NEAR( 0.00392, MakeUpWaterVolFunct( 0.001, 25.5 ), .0001 );
+	EXPECT_NEAR( 0.00392, MakeUpWaterVolFunct( 0.1, 25.5 ), .0001 );
 	EXPECT_EQ( -180, MakeUpWaterVolFunct( -9, .05 ) );
 	EXPECT_NE( 10, MakeUpWaterVolFunct( 10, 0.01 ) );
 
