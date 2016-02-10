@@ -38622,17 +38622,14 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \units m3/s
        \minimum 0.0
        \autosizable
-  A5,  \field Hot Water or Steam Inlet Node Name
-       \deprecated
-       \type node
-  A6,  \field Reheat Coil Object Type
+  A5,  \field Reheat Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A7,  \field Reheat Coil Name
+  A6,  \field Reheat Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -38875,32 +38872,29 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \note fraction of cooling air flow rate
   A3,  \field Air Inlet Node Name
        \type node
-       \deprecated
+       \note The name of the HVAC system node that is the air inlet node for the 
+       \note terminal unit. This is also the air inlet node for the unit’s fan.  
   A4,  \field Air Outlet Node Name
        \type node
-       \deprecated
-  A5,  \field Heating Coil Air Inlet Node Name
-       \type node
-       \deprecated
-  A6,  \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
-  A7,  \field Fan Object Type
+       \note The name of the HVAC system node that is the air outlet node for the 
+       \note terminal unit. This is also the air outlet node for the unit’s heating
+       \note coil’s air outlet node. This node is also a zone inlet node.
+  A5,  \field Fan Object Type
        \required-field
        \type choice
        \key Fan:VariableVolume
-  A8,  \field Fan Name
+  A6,  \field Fan Name
        \required-field
        \type object-list
        \object-list FansVAV
-  A9,  \field Heating Coil Object Type
+  A7,  \field Heating Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A10, \field Heating Coil Name
+  A8,  \field Heating Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -38955,7 +38949,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
 AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \memo Central air system terminal unit, single duct, variable volume for both cooling and
        \memo heating, with reheat coil (hot water, electric, gas, or steam).
-       \min-fields 12
+       \min-fields 11
   A1,  \field Name
        \required-field
   A2 , \field Availability Schedule Name
@@ -38982,17 +38976,14 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \minimum 0.0
        \maximum 1.0
        \note fraction of maximum air flow
-  A5,  \field Hot Water or Steam Inlet Node Name
-       \deprecated
-       \type node
-  A6,  \field Reheat Coil Object Type
+  A5,  \field Reheat Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A7,  \field Reheat Coil Name
+  A6,  \field Reheat Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -39008,7 +38999,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A8,  \field Air Outlet Node Name
+  A7,  \field Air Outlet Node Name
        \required-field
        \type node
        \note The outlet node of the terminal unit and the reheat coil.
@@ -39092,9 +39083,6 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A11, \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
   N6;  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -39176,9 +39164,6 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A11, \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
   N7;  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -39218,17 +39203,11 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type node
        \required-field
        \note should be a zone inlet node
-  A6,  \field Hot Water Inlet Node Name
-       \type node
-       \deprecated
-  A7,  \field Cold Water Inlet Node Name
-       \type node
-       \deprecated
-  A8,  \field Heating Coil Object Type
+  A6,  \field Heating Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
-  A9,  \field Heating Coil Name
+  A7,  \field Heating Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -39249,11 +39228,11 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type real
        \minimum> 0.0
        \default 0.001
-  A10, \field Cooling Coil Object Type
+  A8,  \field Cooling Coil Object Type
        \type choice
        \key Coil:Cooling:Water
        \key Coil:Cooling:Water:DetailedGeometry
-  A11, \field Cooling Coil Name
+  A9,  \field Cooling Coil Name
        \type object-list
        \object-list CoolingCoilName
   N6,  \field Maximum Cold Water Flow Rate
@@ -39271,7 +39250,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type real
        \minimum> 0.0
        \default 0.001
-  A12; \field Zone Mixer Name
+  A10; \field Zone Mixer Name
        \required-field
        \type object-list
        \object-list ZoneMixers
@@ -61674,12 +61653,8 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
-            \object-list UniVariateTables
+            \object-list BiquadraticCurves
+            \object-list BiVariateTables
   A9   ,  \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the fuel input to the chiller at full load as
             \note it varies by temperature.  The curve is normalized so that at design conditions the
@@ -61687,23 +61662,15 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
-            \object-list UniVariateTables
+            \object-list BiquadraticCurves
+            \object-list BiVariateTables
   A10  ,  \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the fuel input to the chiller as the load on
             \note the chiller varies but the operating temperatures remain at the design values.
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A11  ,  \field Electric Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the electricity to the chiller at full load as
@@ -61712,23 +61679,15 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
-            \object-list UniVariateTables
+            \object-list BiquadraticCurves
+            \object-list BiVariateTables
   A12  ,  \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the electricity to the chiller as the load on
             \note the chiller varies but the operating temperatures remain at the design values.
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A13  ,  \field Heating Capacity Function of Cooling Capacity Curve Name
             \note The curve represents how the heating capacity of the chiller varies with cooling
@@ -61737,11 +61696,7 @@ ChillerHeater:Absorption:DirectFired,
             \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A14  ,  \field Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
             \note When the chiller is operating as only a heater, this curve is used to represent the
@@ -61749,11 +61704,7 @@ ChillerHeater:Absorption:DirectFired,
             \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
             \note will probably be similar to a boiler curve for most chillers.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A15  ,  \field Temperature Curve Input Variable
             \type choice
@@ -61914,12 +61865,8 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
-       \object-list UniVariateTables
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
   A9 , \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the fuel input to the chiller at full load as
        \note it varies by temperature.  The curve is normalized so that at design conditions the
@@ -61927,23 +61874,15 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
-       \object-list UniVariateTables
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
   A10, \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the fuel input to the chiller as the load on
        \note the chiller varies but the operating temperatures remain at the design values.
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A11, \field Electric Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the electricity to the chiller at full load as
@@ -61952,23 +61891,15 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
-       \object-list UniVariateTables
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
   A12, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the electricity to the chiller as the load on
        \note the chiller varies but the operating temperatures remain at the design values.
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A13, \field Heating Capacity Function of Cooling Capacity Curve Name
        \note The curve represents how the heating capacity of the chiller varies with cooling
@@ -61977,11 +61908,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A14, \field Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
        \note When the chiller is operating as only a heater, this curve is used to represent the
@@ -61989,11 +61916,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
        \note will probably be similar to a boiler curve for most chillers.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A15, \field Temperature Curve Input Variable
        \type choice
@@ -77054,8 +76977,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N2 , \field Generator 1 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A5 , \field Generator 2 Name
        \type object-list
        \object-list GeneratorNames
@@ -77077,8 +76998,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N4,  \field Generator 2 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A8,  \field Generator 3 Name
        \type object-list
        \object-list GeneratorNames
@@ -77100,8 +77019,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N6,  \field Generator 3 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A11, \field Generator 4 Name
        \type object-list
        \object-list GeneratorNames
@@ -77123,8 +77040,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N8,  \field Generator 4 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A14, \field Generator 5 Name
        \type object-list
        \object-list GeneratorNames
@@ -77146,8 +77061,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N10, \field Generator 5 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A17, \field Generator 6 Name
        \type object-list
        \object-list GeneratorNames
@@ -77169,8 +77082,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N12,  \field Generator 6 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A20, \field Generator 7 Name
        \type object-list
        \object-list GeneratorNames
@@ -77192,8 +77103,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N14, \field Generator 7 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A23, \field Generator 8 Name
        \type object-list
        \object-list GeneratorNames
@@ -77215,8 +77124,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N16, \field Generator 8 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A26, \field Generator 9 Name
        \type object-list
        \object-list GeneratorNames
@@ -77238,8 +77145,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N18, \field Generator 9 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A29, \field Generator 10 Name
        \type object-list
        \object-list GeneratorNames
@@ -77261,8 +77166,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N20, \field Generator 10 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A32, \field Generator 11 Name
        \type object-list
        \object-list GeneratorNames
@@ -77284,8 +77187,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N22, \field Generator 11 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A35, \field Generator 12 Name
        \type object-list
        \object-list GeneratorNames
@@ -77307,8 +77208,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N24, \field Generator 12 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A38, \field Generator 13 Name
        \type object-list
        \object-list GeneratorNames
@@ -77330,8 +77229,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N26, \field Generator 13 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A41, \field Generator 14 Name
        \type object-list
        \object-list GeneratorNames
@@ -77353,8 +77250,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N28, \field Generator 14 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A44, \field Generator 15 Name
        \type object-list
        \object-list GeneratorNames
@@ -77376,8 +77271,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N30, \field Generator 15 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A47, \field Generator 16 Name
        \type object-list
        \object-list GeneratorNames
@@ -77399,8 +77292,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N32, \field Generator 16 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A50, \field Generator 17 Name
        \type object-list
        \object-list GeneratorNames
@@ -77422,8 +77313,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N34, \field Generator 17 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A53, \field Generator 18 Name
        \type object-list
        \object-list GeneratorNames
@@ -77445,8 +77334,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N36, \field Generator 18 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A56, \field Generator 19 Name
        \type object-list
        \object-list GeneratorNames
@@ -77468,8 +77355,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N38, \field Generator 19 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A59, \field Generator 20 Name
        \type object-list
        \object-list GeneratorNames
@@ -77491,8 +77376,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N40, \field Generator 20 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A62, \field Generator 21 Name
        \type object-list
        \object-list GeneratorNames
@@ -77514,8 +77397,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N42, \field Generator 21 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A65, \field Generator 22 Name
        \type object-list
        \object-list GeneratorNames
@@ -77537,8 +77418,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N44, \field Generator 22 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A68, \field Generator 23 Name
        \type object-list
        \object-list GeneratorNames
@@ -77560,8 +77439,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N46, \field Generator 23 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A71, \field Generator 24 Name
        \type object-list
        \object-list GeneratorNames
@@ -77583,8 +77460,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N48, \field Generator 24 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A74, \field Generator 25 Name
        \type object-list
        \object-list GeneratorNames
@@ -77606,8 +77481,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N50, \field Generator 25 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A77, \field Generator 26 Name
        \type object-list
        \object-list GeneratorNames
@@ -77629,8 +77502,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N52, \field Generator 26 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A80, \field Generator 27 Name
        \type object-list
        \object-list GeneratorNames
@@ -77652,8 +77523,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N54, \field Generator 27 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A83, \field Generator 28 Name
        \type object-list
        \object-list GeneratorNames
@@ -77675,8 +77544,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N56, \field Generator 28 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A86, \field Generator 29 Name
        \type object-list
        \object-list GeneratorNames
@@ -77698,8 +77565,6 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N58, \field Generator 29 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
   A89, \field Generator 30 Name
        \type object-list
        \object-list GeneratorNames
@@ -77721,9 +77586,7 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N60; \field Generator 30 Rated Thermal to Electrical Power Ratio
-       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
-       \type real
-       
+
 ElectricLoadCenter:Inverter:Simple,
         \memo Electric power inverter to convert from direct current (DC) to alternating current
         \memo (AC) in an electric load center that contains photovoltaic modules. This input
@@ -78010,12 +77873,10 @@ ElectricLoadCenter:Transformer,
        \type choice
        \key PowerInFromGrid
        \key PowerOutFromOnsiteGeneration
-       \key LoadCenterProductionConditioning
        \default PowerInFromGrid
        \note A transformer can be used to transfer electric energy from utility grid to
        \note building (PowerInFromGrid)or from building on-site generation to
-       \note the grid (PowerOutFromOnsiteGeneration) or within a load center to match generation 
-       \note to the facility service before exporting to the grid (LoadCenterProductionConditioning)
+       \note the grid (PowerOutFromOnsiteGeneration)
   A4,  \field Zone Name
        \type object-list
        \object-list ZoneNames
@@ -78176,15 +78037,14 @@ ElectricLoadCenter:Distribution,
        \key TrackMeter
        \key FollowThermal
        \key FollowThermalLimitElectrical
-  N1,  \field Generator Demand Limit Scheme Purchased Electric Demand Limit
+  N1,  \field Demand Limit Scheme Purchased Electric Demand Limit
        \type real
        \units W
-  A4,  \field Generator Track Schedule Name Scheme Schedule Name
+  A4,  \field Track Schedule Name Scheme Schedule Name
        \note required when Generator Operation Scheme Type=TrackSchedule
-       \note schedule values in Watts
        \type object-list
        \object-list ScheduleNames
-  A5,  \field Generator Track Meter Scheme Meter Name
+  A5,  \field Track Meter Scheme Meter Name
        \note required when Generator Operation Scheme Type=TrackMeter
        \type external-list
        \external-list autoRDDmeter
@@ -78196,169 +78056,21 @@ ElectricLoadCenter:Distribution,
        \key DirectCurrentWithInverterDCStorage
        \key DirectCurrentWithInverterACStorage
        \default AlternatingCurrent
-!  A ,  \field Inverter Object Type
-!       \type choice
-!       \key ElectricLoadCenter:Inverter:Simple
-!       \key ElectricLoadCenter:Inverter:FunctionOfPower
-!       \key ElectricLoadCenter:Inverter:LookUpTable
-  
-  A7,  \field Inverter Name
+  A7,  \field Inverter Object Name
        \note required when Electrical Buss Type=DirectCurrentWithInverter, DirectCurrentWithInverterDCStorage,
        \note or DirectCurrentWithInverterACStorage
        \type object-list
        \object-list InverterList
-!  A ,  \field Electric Storage Object Type
-!       \type choice
-!       \key ElectricLoadCenter:Storage:Simple
-!       \key ElectricLoadCenter:Storage:Battery
-  
   A8,  \field Electrical Storage Object Name
        \note required when Electrical Buss Type=AlternatingCurrentWithStorage, DirectCurrentWithInverterDCStorage,
        \note or DirectCurrentWithInverterACStorage
        \type object-list
        \object-list ElecStorageList
-  A9,  \field Transformer Object Name
-       \note required when power needs to be output from on-site generation or storage to the grid via transformer
+  A9;  \field Transformer Object Name
+       \note required when power needs to be output from on-site generation to the grid via transformer
        \type object-list
        \object-list TransformerNames
 
-  A10, \field Storage Charge Power Source
-       \note Select what type of power sources can be used to charge storage.
-       \type choice
-       \key OnSiteGenerators
-       \note OnSiteGenerators indicates that all power produced on-site is used to charge
-       \key OnSiteGeneratorsSurplus
-       \note OnSiteGeneratorsSurplus indicates that power produced on-site that exceeds the facility demand is used to charge (legacy behavior)
-       \key ScheduledGridSupply
-       \note ScheduledGridSupply indicates that power used to charge will be drawn from the utility service connection, per a schedule.
-       \key OnSiteGeneratorSurplusPlusScheduledGridSupply
-       \note OnSiteGeneratorSurplusPlusScheduledGridSupply indicates that power used to charge will be the sum of power produced on-site 
-       \note that exceeds the facility demand and power drawn from the utility service connection, per a schedule.
-       \default OnSiteGeneratorsSurplus
-  N2 , \field Maximum Storage State of Charge Fraction
-       \note Fraction of storage capacity used as upper limit for controlling charging.
-       \type real
-       \default 1.0
-  N3,  \field Minimum Storage State of Charge Fraction
-       \note Fraction of storage capacity used as lower limit for controlling discharging.
-       \type real
-       \default 0.0
-  N4 , \field Maximum Storage Charge Grid Supply Power
-       \note Maximum rate that electric power can be taken from grid to charge storage. 
-       \note Storage charging adjusted downward for conversion losses.
-       \note Rate is modified by fractional values in the next field. 
-       \note required field if Storage Charge Operation Scheme is set to ScheduledGridSupply or OnSiteGeneratorSurplusPlusScheduledGridSupply
-       \type real
-       \units W
-  A11, \field Storage Charge Grid Supply Power Fraction Schedule Name
-       \note controls timing and magnitude of charging from grid
-       \note required field if Storage Charge Operation Scheme is set to ScheduledGridSupply or OnSiteGeneratorSurplusPlusScheduledGridSupply
-       \note Schedule values should be fractions from 0.0 to 1.0, inclusive.
-       \type object-list
-       \object-list ScheduleNames
-  A12, \field Storage Converter Object Name
-       \note name of ElectricLoadCenter:Storage:Converter used to convert AC to DC when charging DC storage from grid supply.
-       \note Required field when both buss type is DirectCurrentWithInverterDCStorage and Storage Charge Operation
-       \note Scheme is set to ScheduledGridSupply or OnSiteGeneratorSurplusPlusScheduledGridSupply.
-       \note A single bidirectional device will reference both an inverter object (DC to AC) and a converter object (AC to DC).
-       \type object-list
-       \object-list ConverterList
-  
-  A13, \field Storage Operation Scheme
-       \note Select method to govern how storage charge and discharge is controlled
-       \type choice
-       \key DemandLimit
-       \note FacilityDemandLimit indicates that storage discharge control will limit facility power demand drawn from the utility service 
-       \note while accounting for any on-site generation
-       \key TrackFacilityElectricDemand
-       \note TrackFacilityElectricDemand indicates that storage discharge control will follow the facility power demand 
-       \note while accounting for any on-site generation (legacy behavior)
-       \default TrackFacilityElectricDemand
-       \key TrackSchedule
-       \note TrackSchedule indicates that storage discharge control will follow the schedule in the Storage Discharge Track Schedule Name. 
-       \key TrackMeter
-       \note TrackMeter indicates that storage discharge control will follow an electric meter named in the field called Storage Discharge Track Meter Name.  
-       \key ScheduledGridExport
-       \note ScheduledGridExport indicates that storage discharge control will export power to the utility service connection following 
-       \note the power level in the field called Maximum Storage Discharge Grid Export Power multiplied by the value in the schedule 
-       \note named in the field Storage Discharge Grid Export Fraction Schedule Name. 
-  N5,  \field Storage Discharge Utility Demand Limit
-       \note Target utility service demand power for discharge control.  Storage draws are adjusted upwards for conversion losses. 
-       \note Required field for DemandLimit discharge operation scheme
-       \type real
-       \units W
-  A14, \field Storage Discharge Utility Demand Limit Fraction Schedule Name
-       \note Modifies the target utility service demand power over time.
-       \note Schedule values should be fractions from 0.0 to 1.0, inclusive.
-       \note if omitted a schedule value of 1.0 is used. 
-       \type object-list
-       \object-list ScheduleNames
-  A15, \field Storage Discharge Track Schedule Name
-       \note Required field when Storage Discharge Operation Scheme is set to TrackSchedule.
-       \note Schedule values in Watts.
-       \type object-list
-       \object-list ScheduleNames
-  A16, \field Storage Discharge Track Meter Name
-       \note required when Discharge Operation Scheme Type is set to TrackMeter.
-       \type external-list
-       \external-list autoRDDmeter
-  N6 , \field Maximum Storage Discharge Grid Export Power
-       \note Maximum rate that electric power can be fed to grid from storage discharge
-       \type real
-       \units W
-  A17; \field Storage Discharge Grid Export Fraction Schedule Name
-       \note controls timing and magnitude of discharging to grid
-       \note required 
-  
-  ElectricLoadCenter:Storage:Converter,
-        \memo This model is for converting AC to DC for grid-supplied charging of DC storage
-        \min-fields 4
-   A1 , \field Name
-        \reference ConverterList
-   A2 , \field Availability Schedule Name
-        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
-        \note If this field is blank, the converter is always available.
-        \type object-list
-        \object-list ScheduleNames
-   A3 , \field Power Conversion Efficiency Method
-        \type choice
-        \key SimpleFixed
-        \default SimpleFixed
-        \note SimpleFixed indicates power conversion losses are based on Simple Fixed Efficiency
-        \key FunctionOfPower
-        \note FunctionOfPower indicates power conversion losses are a function of normalized power using a curve or table.
-   N1 , \field Simple Fixed Efficiency
-        \note Constant efficiency for conversion of AC to DC at all power levels.
-        \note Field is only used when Power Conversion Efficiency Method is set to SimpleFixed.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.95
-   N2,  \field Design Maximum Continuous Input Power
-        \note Required field when Power Conversion Efficiency Method is set to FunctionOfPower.
-        \type real
-        \units W
-   A4 , \field Efficiency Function of Power Curve Name
-        \note Curve or table with a single independent variable that describes efficiency as a function of normalized power.
-        \note The "x" input for curve or table is the ratio of current input power divided by design power in the previous field
-        \note Required field when Power Conversion Efficiency Method is set to FunctionOfPower.
-        \type object-list
-        \object-list UniVariateCurves
-        \object-list UniVariateTables
-   N3 , \field Ancillary Power Consumed In Standby
-        \note Optional standby power consumed when converter is available but no power is being conditioned. 
-        \type real
-        \units W
-   A5 , \field Zone Name
-        \note enter name of zone to receive converter losses as heat
-        \note if blank then converter is assumed to be outdoors
-        \type object-list
-        \object-list ZoneNames
-   N4 ; \field Radiative Fraction
-        \note fraction of zone heat gains treated as thermal radiation
-        \minimum 0.0
-        \maximum 1.0
-        
 \group Water Systems
 
 WaterUse:Equipment,
