@@ -669,8 +669,9 @@ namespace SurfaceGeometry {
 		} // ZoneNum
 
 		// Do the Stratosphere check
-		SetZoneOutBulbTempAt( maxheight, ZoneName, minBulb );
-		if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Zone", maxheight, ZoneName );
+		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
+		//if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Zone", maxheight, ZoneName );
 
 		//  IF (ALLOCATED(ZoneSurfacesCount)) DEALLOCATE(ZoneSurfacesCount)
 		//  IF (ALLOCATED(ZoneSubSurfacesCount)) DEALLOCATE(ZoneSubSurfacesCount)

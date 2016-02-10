@@ -427,8 +427,9 @@ namespace HeatBalanceSurfaceManager {
 		// Initialize zone outdoor environmental variables
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the zone, modify the zone  Dry/Wet BulbTemps
-		SetZoneOutBulbTempAt( maxheight, ZoneName, minBulb );
-		if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Zone", maxheight, ZoneName );
+		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
+		//if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Zone", maxheight, ZoneName );
 
 		SetZoneWindSpeedAt();
 		//  DO ZoneNum = 1, NumOfZones
@@ -438,8 +439,9 @@ namespace HeatBalanceSurfaceManager {
 		// Initialize surface outdoor environmental variables
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the surface centroids, modify the surface Dry/Wet BulbTemps
-		SetSurfaceOutBulbTempAt( maxheight, SurfaceName, minBulb );
-		if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Surface", maxheight, SurfaceName );
+		SetSurfaceOutBulbTempAt();
+		CheckSurfaceOutBulbTempAt();
+		//if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Surface", maxheight, SurfaceName );
 
 		SetSurfaceWindSpeedAt();
 		//  DO SurfNum = 1, TotSurfaces
