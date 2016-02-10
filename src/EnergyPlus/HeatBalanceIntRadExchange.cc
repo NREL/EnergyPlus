@@ -238,7 +238,7 @@ namespace EnergyPlus {
 	// different compiler alignment hints.  It is defined in
 	// ObjexxFCL/vectorize.hh.
 
-	ASSUME_ALIGNED_OBJEXXFCL(vecSurfaceTempK4);
+	ASSUME_ALIGNED(vecSurfaceTempK4, VEC_WIDTH);
 
 	// For documentation purposes, the hand-vectorized code will
 	// be conditionally compiled immediately under the
@@ -545,7 +545,7 @@ namespace HeatBalanceIntRadExchange {
 					// multiply by StefanBoltzmannConstant
 					Real64 * RESTRICT vecZvfiScriptF ( &zvfi.ScriptF[ 0 ] );
 #ifndef EXPLICIT_VECTORIZATION
-					ASSUME_ALIGNED_OBJEXXFCL(vecZvfiScriptF);
+					ASSUME_ALIGNED(vecZvfiScriptF, VEC_WIDTH);
 					int zvfiNumOfSurfacesTimesNumOfSurfacesVec = zvfi.NumOfSurfaces * zvfi.NumOfSurfacesVec;
 					assert( (zvfiNumOfSurfacesTimesNumOfSurfacesVec % 2) == 0);
 					for (int i = 0; i < zvfiNumOfSurfacesTimesNumOfSurfacesVec; ++i) {
@@ -640,8 +640,8 @@ namespace HeatBalanceIntRadExchange {
 			Real64 * RESTRICT vecSurfaceTempK4( &SurfaceTempK4[ 0 ] );
 #ifndef EXPLICIT_VECTORIZATION
 
-			ASSUME_ALIGNED_OBJEXXFCL(vecSurfaceTempK4);
-			assert( ( zvfi.NumOfSurfacesVec % 2 ) == 0 );
+			ASSUME_ALIGNED(vecSurfaceTempK4, VEC_WIDTH);
+			assert( ( zvfi.NumOfSurfacesVec % VEC_LENGTH ) == 0 );
 			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfacesVec; ++ZoneSurfNum ) {
 				vecSurfaceTempK4[ ZoneSurfNum ] = pow_4( vecSurfaceTempK4 [ ZoneSurfNum ] + KelvinConv );
 			} // for ZoneSurfNum
@@ -664,8 +664,8 @@ namespace HeatBalanceIntRadExchange {
 
 #ifndef EXPLICIT_VECTORIZATION
 
-			ASSUME_ALIGNED_OBJEXXFCL(vecIRfromParentZone_Temp);
-			assert( ( zvfi.NumOfSurfacesVec % 2 ) == 0 );
+			ASSUME_ALIGNED(vecIRfromParentZone_Temp, VEC_WIDTH);
+			assert( ( zvfi.NumOfSurfacesVec % VEC_LENGTH ) == 0 );
 			for ( int ZoneSurfNum = 0; ZoneSurfNum < zvfi.NumOfSurfacesVec; ++ZoneSurfNum ) {
 				vecIRfromParentZone_Temp[ZoneSurfNum] = 0.0;
 			} // ZoneSurfNum
@@ -696,11 +696,11 @@ namespace HeatBalanceIntRadExchange {
 				// long-wave radiation for windows.
 
 #ifndef EXPLICIT_VECTORIZATION
-				ASSUME_ALIGNED_OBJEXXFCL(vecIRfromParentZone_Temp);
-				ASSUME_ALIGNED_OBJEXXFCL(vecSurfaceTempK4);
-				ASSUME_ALIGNED_OBJEXXFCL(vecZvfiScriptF);
+				ASSUME_ALIGNED(vecIRfromParentZone_Temp, VEC_WIDTH);
+				ASSUME_ALIGNED(vecSurfaceTempK4, VEC_WIDTH);
+				ASSUME_ALIGNED(vecZvfiScriptF, VEC_WIDTH);
 
-				assert( ( zvfi.NumOfSurfacesVec % 2 ) == 0 );
+				assert( ( zvfi.NumOfSurfacesVec % VEC_LENGTH ) == 0 );
 				for ( ; RecvZoneSurfNum < zvfi.NumOfSurfacesVec; ++RecvZoneSurfNum ) {
 					// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
 
