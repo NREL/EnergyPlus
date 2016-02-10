@@ -942,7 +942,6 @@ namespace EnergyPlus {
 		DataGlobals::BeginEnvrnFlag = true;
 		int AirloopNum = 1;
 		int OASysNum = 1;
-		int OAControllerNum = 1;
 		int HumNum( 1 );
 		int AirInNode( 0 );
 		int AirOutNode( 0 );
