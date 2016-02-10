@@ -8332,7 +8332,7 @@ This output is the availability status of the zone evaporative cooler unit’s f
 
 The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to model dedicated outdoor air systems (DOAS) and other similar systems which aim to provide either additional outside air or some limited amount of sensible and/or latent conditioning.  The zone outdoor air unit is a piece of zone equipment that can consist of a supply fan, an exhaust fan (optional), heating and cooling coils, and heat recovery.  The outdoor air unit input simply requires information about flow rates, schedules, node names, and a list of component that are part of the unit.  These components require additional input as per the requirements for these components.  In addition, the input includes information about controls for the unit.  It should be noted that the components that make up the zone outdoor air unit do not require additional controls or setpoints.  The unit input defines how the unit outlet temperature is controlled as described below.
 
-![](media/image282.png)
+![](media/image7466.png)
 
 Figure 110. Zone Outdoor Air Unit Schematic
 

@@ -63,16 +63,20 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
+using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::SurfaceGeometry;
+using namespace EnergyPlus::HeatBalanceManager;
 //using namespace ObjexxFCL;
 
-	
+
 TEST_F( EnergyPlusFixture, BaseSurfaceRectangularTest )
 {
 
@@ -288,3 +292,136 @@ TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
 	EXPECT_TRUE( has_err_output() );
 
 }
+
+TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
+{
+	std::string const idf_objects = delimited_string( {
+		"Version,8.3;",
+		"BuildingSurface:Detailed,",
+		" FRONT-1,                  !- Name",
+		" WALL,                     !- Surface Type",
+		" INT-WALL-1,               !- Construction Name",
+		" Space,                    !- Zone Name",
+		" Outdoors,                 !- Outside Boundary Condition",
+		" ,                         !- Outside Boundary Condition Object",
+		" SunExposed,               !- Sun Exposure",
+		" WindExposed,              !- Wind Exposure",
+		" 0.50000,                  !- View Factor to Ground",
+		" 4,                        !- Number of Vertices",
+		" 0.0, 0.0, 2.4,            !- X, Y, Z == > Vertex 1 {m}",
+		" 0.0, 0.0, 0.0,            !- X, Y, Z == > Vertex 2 {m}",
+		" 30.5, 0.0, 0.0,           !- X, Y, Z == > Vertex 3 {m}",
+		" 30.5, 0.0, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
+		" ",
+		"Zone,",
+		"  Space,                   !- Name",
+		"  0.0000,                  !- Direction of Relative North {deg}",
+		"  0.0000,                  !- X Origin {m}",
+		"  0.0000,                  !- Y Origin {m}",
+		"  0.0000,                  !- Z Origin {m}",
+		"  1,                       !- Type",
+		"  1,                       !- Multiplier",
+		"  2.0,                     !- Ceiling Height {m}",
+		"  ,                        !- Volume {m3}",
+		"  autocalculate,           !- Floor Area {m2}",
+		"  ,                        !- Zone Inside Convection Algorithm",
+		"  ,                        !- Zone Outside Convection Algorithm",
+		"  Yes;                     !- Part of Total Floor Area",
+		" ",
+		"Construction,",
+		" INT-WALL-1,               !- Name",
+		" GP02;                     !- Outside Layer",
+		" ",
+		"Material,",
+		" GP02,                     !- Name",
+		" MediumSmooth,             !- Roughness",
+		" 1.5900001E-02,            !- Thickness{ m }",
+		" 0.1600000,                !- Conductivity{ W / m - K }",
+		" 801.0000,                 !- Density{ kg / m3 }",
+		" 837.0000,                 !- Specific Heat{ J / kg - K }",
+		" 0.9000000,                !- Thermal Absorptance",
+		" 0.7500000,                !- Solar Absorptance",
+		" 0.7500000;                !- Visible Absorptance",
+		" ",
+		"  Timestep, 4;",
+		" ",
+		"BUILDING, Bldg2, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
+		" ",
+		"SimulationControl, YES, NO, NO, YES, NO;",
+		" ",
+		"  Site:Location,",
+		"    Miami Intl Ap FL USA TMY3 WMO=722020E,    !- Name",
+		"    25.82,                   !- Latitude {deg}",
+		"    -80.30,                  !- Longitude {deg}",
+		"    -5.00,                   !- Time Zone {hr}",
+		"    11;                      !- Elevation {m}",
+		" ",
+
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	bool FoundError = false;
+	GetMaterialData( FoundError );
+	GetConstructData( FoundError );
+	GetZoneData( FoundError ); // Read Zone data from input file
+	HeatTransferAlgosUsed.allocate( 1 );
+	HeatTransferAlgosUsed( 1 ) = OverallHeatTransferSolutionAlgo;
+	SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
+
+	//compare_err_stream( "" ); // just for debugging
+
+	EXPECT_FALSE( FoundError );
+
+	// test coordinate on existing surface
+	EXPECT_EQ( TotSurfaces, 1 );
+
+	EXPECT_EQ( Surface( TotSurfaces ).Name, "FRONT-1" );
+
+	// move surface to SurfaceTmp since MakeMirrorSurface uses that array
+	SurfaceTmp.allocate( 10 );
+	SurfaceTmp( TotSurfaces ) = Surface( TotSurfaces );
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Name, "FRONT-1" );
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 1 ).x, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 1 ).y, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 1 ).z, 2.4 );
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 2 ).x, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 2 ).y, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 2 ).z, 0. );
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 3 ).x, 30.5 );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 3 ).y, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 3 ).z, 0. );
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 4 ).x, 30.5 );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 4 ).y, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 4 ).z, 2.4 );
+
+	MakeMirrorSurface( TotSurfaces ); 	// This call increments TotSurfaces so the references after this are for the created mirror surface
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Name, "Mir-FRONT-1" );
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 1 ).x, 30.5 );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 1 ).y, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 1 ).z, 2.4 );
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 2 ).x, 30.5 );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 2 ).y, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 2 ).z, 0. );
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 3 ).x, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 3 ).y, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 3 ).z, 0. );
+
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 4 ).x, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 4 ).y, 0. );
+	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 4 ).z, 2.4 );
+
+}
+
+
+

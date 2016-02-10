@@ -85,7 +85,7 @@ namespace EnergyPlus {
 
 
 	TEST_F( EnergyPlusFixture, Beam_FactoryAllAutosize ) {
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
 		"AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,",
 		"    Perimeter_top_ZN_4 4pipe Beam, !- Name",
@@ -171,7 +171,7 @@ namespace EnergyPlus {
 		"    1.0,      1.0,",
 		"    1.2857,   1.0778; ",
 		} );
-	
+
 		ASSERT_FALSE( process_idf( idf_objects ) );
 		DataGlobals::NumOfZones = 1;
 
@@ -206,9 +206,9 @@ namespace EnergyPlus {
 	}
 
 
-	TEST_F( EnergyPlusFixture, Beam_sizeandSimulateOneZone ) 
+	TEST_F( EnergyPlusFixture, Beam_sizeandSimulateOneZone )
 	{
-			std::string const idf_objects = delimited_string( { 
+			std::string const idf_objects = delimited_string( {
 		"    SimulationControl,",
 		"    YES,                     !- Do Zone Sizing Calculation",
 		"    YES,                     !- Do System Sizing Calculation",
@@ -301,7 +301,7 @@ namespace EnergyPlus {
 		"    Through: 12/31,          !- Field 9",
 		"    For: AllDays,            !- Field 10",
 		"    Until: 24:00,1.0;        !- Field 11",
-		
+
 		"    Schedule:Compact,",
 		"    BLDG_OCC_SCH,            !- Name",
 		"    Fraction,                !- Schedule Type Limits Name",
@@ -329,7 +329,7 @@ namespace EnergyPlus {
 		"    Until: 24:00,0.0,        !- Field 39",
 		"    For: AllOtherDays,       !- Field 41",
 		"    Until: 24:00,0.0;        !- Field 42",
-		
+
 		"    Schedule:Compact,",
 		"    BLDG_LIGHT_SCH,          !- Name",
 		"    Fraction,                !- Schedule Type Limits Name",
@@ -1324,7 +1324,7 @@ namespace EnergyPlus {
 		"    CoolSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name",
 		"    CoolSys1 Demand Bypass Pipe Outlet Node,  !- Component 1 Outlet Node Name",
 		"    Bypass;                  !- Component 1 Branch Control Type",
-		
+
 		"  Sizing:Plant,",
 		"    HeatSys1 Loop,                !- Plant or Condenser Loop Name",
 		"    Heating,                 !- Loop Type",
@@ -1652,7 +1652,7 @@ namespace EnergyPlus {
 		"    1.0,      1.0,",
 		"    1.2857,   1.0778; ",
 				} );
-	
+
 		ASSERT_FALSE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 
@@ -1703,7 +1703,7 @@ namespace EnergyPlus {
 
 		EXPECT_NEAR( DataLoopNode::Node( 1 ).MassFlowRate, 0.3521952339035046, 0.00001 );
 		EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 19.191523455437512, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.046199561631265804, 0.00001 ); 
+		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.046199561631265804, 0.00001 );
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 
@@ -1718,7 +1718,7 @@ namespace EnergyPlus {
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 ); 
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 );
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 35.064466069323743, 0.00001 );
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.19320550334974979, 0.00001 );
 
@@ -1741,7 +1741,7 @@ namespace EnergyPlus {
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
 		EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 18.027306264618733, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001); 
+		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001);
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 
@@ -1758,14 +1758,14 @@ namespace EnergyPlus {
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate(FirstHVACIteration, NonAirSysOutput);
 
 		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0);
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0); 
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0);
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 33.836239364981424, 0.00001 );
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
 
 		EXPECT_NEAR( NonAirSysOutput, 4685.4000901131676, 0.0001 );
 
-	
+
 	}
-	
+
 
 }
