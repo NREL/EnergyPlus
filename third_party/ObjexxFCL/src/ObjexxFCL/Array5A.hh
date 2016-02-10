@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -661,7 +661,7 @@ public: // Modifier
 protected: // Functions
 
 	// Dimension by IndexRange
-	void
+	bool
 	dimension_assign( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 )
 	{
 		I1_.assign( I1 );
@@ -675,6 +675,7 @@ protected: // Functions
 		z4_ = I4_.size();
 		z5_ = I5_.size();
 		dimension_argument();
+		return false;
 	}
 
 private: // Functions

@@ -5,7 +5,7 @@
 	<title>ObjexxFCL Users Guide: Array</title>
 	<meta name="description" content="Objexx Fortran Compatibility Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright 2000-2015 Objexx Engineering, Inc. All rights reserved.">
+	<meta name="copyright" content="Copyright 2000-2016 Objexx Engineering, Inc. All rights reserved.">
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
@@ -22,7 +22,7 @@
 		<td></td>
 		<td height="70"><a href="ObjexxFCL.html"><img src="images/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
 		<td></td>
-		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.0</div></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.1</div></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -69,10 +69,10 @@
 				<li>Linear index subscripting for fast inner loop operations.</li>
 				<li>Dynamic (run-time) sizing.</li>
 				<li>Iterator access.</li>
-				<li><span class="source">std::vector</span> style grow/shrink-friendly performance.</li>
+				<li><span class="source">std::vector</span>-like API with grow/shrink-friendly operations like push_back, emplace, and reserve.</li>
 			</ul>
 			<p class="body">The Arrays are not intended to be a complete numerical matrix class library. A number of general purpose matrix libraries are available for C++ and Objexx Engineering can provide interfacing to those libraries. Objexx Engineering can also provide linear algebra functions and solvers for the Array classes to meet project requirements.</p>
-			<p class="body">There are five types of Arrays:</p>
+			<p class="body">There are a few types of Arrays:</p>
 			<ul class="body">
 				<li><a href="#Base_Arrays">Base Arrays</a> are the abstract base class for the three concrete Array types.</li>
 				<li><a href="#Real_Arrays">Real Arrays</a> are regular arrays that own their data.</li>
@@ -436,8 +436,28 @@ Array2A_int const C( A ); // Can alter A's data but not C's state</pre>
 
 			<p class="body"><b>Warning!:</b> Resizing a real Array invalidates any argument Arrays that are attached to its data.</p>
 
-<!--			<h2 class="h3"><a name="Key_Arrays" id="Key_Arrays"></a>Key Arrays</h2>																																																																																																																																																																-->
+<!--			<h2 class="h3"><a name="Key_Arrays" id="Key_Arrays"></a>Key Arrays</h2> -->
 <!--			<p class="body">Key Arrays are real Arrays that are accessed by key index objects rather than integer indices. Any key type that the Key Array is able to convert to an integer will work: if the integer index for a key is a protected or private conversion then the Key Array will have to be a friend of the key type. -->
+
+			<h2 class="h3">Vectorization</h2>
+			<p class="body">Vectorization allows modern CPUs to process multiple loop passes in a single operation on SIMD hardware. There are restrictions on the types of loops that can be vectorized but the performance benefits of vectorization are large enough that sometimes it is worthwhile rewriting loops to make them amenable to vectorization.</p>
+			<p class="body">Modern C++ compilers have auto-vectorization support that can vectorize a subset of amenable loops automatically, without any developer intervention. Each compiler has a different method of enabling auto-vectorization but many enable it at the higher optimization levels.</p>
+			<p class="body">Because vectorization reorders operations the "fast floating point" mode (<span class="source">/fp:fast</span> on Intel C++ and <span class="source">-Ofast</span> or <span class="source">-ffast-math</span> on GCC) must be enabled to allow floating point loops to vectorize.</p>
+			<p class="body">Good performance can normally be obtained just by enabling auto-vectorization across your application. In performance-critical sections it may be possible to further improve performance by explicit vectorization hints and/or restructing the loops to make them more amenable to the auto-vectorizers. This is a large and complex topic that is covered in depth elsewhere.</p>
+			<p class="body">Alignment of array elements, which is beneficial for vectorization performance, is discussed next.</p>
+
+			<h3 class="h4">Alignment</h3>
+			<p class="body">Aligned array elements allow more efficient vectorization by eliminating the up-front "peel" loop needed to deal with the unaligned elements. While unaligned access has a smaller performance cost on modern CPUs usign aligned array data is still faster. The ObjexxFCL real arrays, Array<i>N</i>D, have optional element alignment support to enable more efficient vectorization.</p>
+			<p class="body">To enable aligned array element data so that the first array element address is aligned properly for the target build hardware define the OBJEXXFCL_ALIGN preprocessor symbol in the compilation process. This will align the Array (and CArrayA) first elements to be aligned properly for the target hardware. For SSE targets this gives 16 byte alignment, for AVX and AVX2 this gives 32 byte alignment, and for AVX-512 and MIC (Intel Phi) targets this gives 64 byte alignment. The alignment can be overridden to specify a larger (power of 2) alignment by giving a value to OBJEXXFCL_ALIGN. For example, to get 64 byte alignment on AVX2 hardware, perhaps to match the cache line size, you can add a compile flag that typically looks like -DOBJEXXFCL_ALIGN=64.</p>
+			<p class="body">For 2+ dimension arrays aligning the first element is not sufficient for optimal performance: ideally you want the first element of the innermost loop "row" aligned. Considering 2D arrays, there are a couple of ways to achieve this:</p>
+				<ul>
+					<li>An array of arrays design with each row an aligned Array1D or CArrayA (or a raw C array that is aligned). This is non-contiguous between rows but that may not harm performance for row-dominated operations. Heap allocation of each row can be a performance consideration if the 2D array is constructed frequently.</li>
+					<li>An Array2D with row lengths padded to assure rows are aligned properly. The<br> <span class="source">padded< T >( row )</span> function in align.hh will give the padded row length needed for a given nominal row length. The cost of processing the extra padding elements is normally small since they are just filling out the SIMD lines. To communicate the row alignment to the compiler it may work to use <span class="source">ASSUME( row % N == 0 )</span> where the <span class="source">ASSUME</span> macro is from vectorize.hh, row is the row length (after padding) and <span class="source">N</span> is the number of elements of that type to fill the hardware alignment width (such as 4 for doubles with AVX 32 byte alignment).</li>
+				</ul>
+			<p class="body">For the compiler to exploit array alignment additional "hints" must be added to your code. One method is to use "assume aligned" directives: these differ across platforms but the vectorize.hh header has a portable macro ASSUME_ALIGNED_OBJEXXFCL(p) where p is a pointer to the first array element (this macro knows the ObjexxFCL alignment so it isn't passed as an argument). The "assume aligned" approach has the downside that the address of Array elements can't be passed so the loop must be rewritten with raw pointers. A simpler approach is avaiable for Intel C++ when all array accesses are aligned by placing a <span class="source">#pragma vector aligned</span> line before the loop, so placing a block like this before the for loop should suffice:</p>
+<pre>#if defined(__INTEL_COMPILER) && defined(OBJEXXFCL_ALIGN)
+#pragma vector aligned
+#endif</pre>
 
 			<h2 class="h3"><a name="Slice_Arrays" id="Slice_Arrays"></a>Slice Arrays</h2>
 			<p class="body">Slice Arrays are array proxies that present a slice of another array as an array of the same or lesser rank. A slice Array is normally created by an indexing operation on an array where some or all of the indexes are index slices rather than scalar indexes. An index slice has a start index, an end index, and a stride, or step, value. Index slices are denoted with a <span class="source">{start,end,stride}</span> syntax:</p>
@@ -650,7 +670,7 @@ C = A + 3; // Adds 3 to each element</pre>
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2015 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2016 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>
