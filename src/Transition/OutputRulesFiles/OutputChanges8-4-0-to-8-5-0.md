@@ -30,3 +30,7 @@ For version 8.5, the strings used to report pump sizes have changed In the EIO f
     Initial Rated Flow Rate [m3/s] => Initial Design Flow Rate [m3/s]
     Rated Power Consumption [W] => Design Power Consumption [W]
     Initial Rated Power Consumption [W] => Initial Design Power Consumption [W]
+
+### Net Area added to Envelope Summary tabular report
+
+Added new "Net Area" column to the Envelope Summary report Opaque Exterior table that represents the gross wall area minus the window and door areas.
