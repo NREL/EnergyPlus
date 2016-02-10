@@ -217,7 +217,7 @@ namespace EnergyPlus {
 
 	}
 
-	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_TestWarningMessage ) {
+	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangulerWindowWarning ) {
 
 		// Unit test for #5384
 

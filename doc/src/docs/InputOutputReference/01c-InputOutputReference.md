@@ -2441,9 +2441,9 @@ An interior heat transfer surface (BuildingSurface:Detailed) whose surface name 
 
 When a triangular subsurface is used, the model provides a warning and treats this subsurface as rectangular. The effective width and height calculated in the ProcessSurfaceVertices function of the SurfaceGeometry module are used to represent a rectangular subsurface.
 
-Effective width = 0.75 * Length between Vertex 1 and Vertex 2
+Effective width = 0.75 x Length between Vertex 1 and Vertex 2
 
-Effective height = 4 * Area / ( 3 * Length between Vertex 2 and Vertex 3 )   
+Effective height = 4 x Area / ( 3 x Length between Vertex 2 and Vertex 3 )   
 
 #### Field: Surface Name
 
