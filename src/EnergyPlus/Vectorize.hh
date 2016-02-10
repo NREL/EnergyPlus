@@ -15,7 +15,7 @@
 
 namespace EnergyPlus {
 
-	int const VEC_LENGTH = VEC_ALIGN / sizeof(Real64);
+	int const VEC_LENGTH = OBJEXXFCL_ALIGN / sizeof(Real64);
 
 #define ROUND_TO_VEC_LENGTH(I) (((I) + ((VEC_LENGTH) - 1)) & ~((VEC_LENGTH) - 1))
 

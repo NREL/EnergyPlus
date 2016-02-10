@@ -34,23 +34,15 @@
 // Disable alignment hints for 32-bit windows builds
 #elif defined(_WIN32) && ( defined(_MSC_VER) || defined(__INTEL_COMPILER) )
 #define ASSUME(b) __assume(b)
-#define ASSUME_ALIGNED(p,b) 
+#define ASSUME_ALIGNED(p,b)
+#define ASSUME_ALIGNED_OBJEXXFCL(p)
 #define RESTRICT __restrict
 
 #else
 #define ASSUME(b)
 #define ASSUME_ALIGNED(p,b)
-#define ASSUME_ALIGNED_OBJEXXFCL(p,b)
+#define ASSUME_ALIGNED_OBJEXXFCL(p)
 #define RESTRICT
-#endif
-
-// Alignment for Compiler Options
-#if defined (__AVX2__)
-int const VEC_ALIGN( 64 ); // size of __m512* types
-#elif defined (__AVX__)
-int const VEC_ALIGN( 32 ); // size of __m256* types
-#else
-int const VEC_ALIGN( 16 ); // size of __m128* types
 #endif
 
 namespace ObjexxFCL {
@@ -84,39 +76,6 @@ round_up_pow_2( T const t )
 	T power( 1 );
 	while ( power < t ) power <<= one;
 	return power;
-}
-
-// Byte Address Rounded Up to Satisfy Alignment
-template< typename T >
-T *
-aligned( T * const mem ) // Can add a variant taking a void * if needed
-{
-	static T const ALIGN( VEC_ALIGN );
-	static T const zero( 0 );
-	static T const one( 1 );
-	static_assert( ( ALIGN > zero ) && ( ( ALIGN & ( ALIGN - one ) ) == zero ), "Byte alignment must be a positive power of 2" ); // Positive power of 2 check
-	return ( ( mem == nullptr ) || ( ALIGN <= T( 0 ) ) ? mem : reinterpret_cast< T * >( ( reinterpret_cast< std::uintptr_t >( mem ) + static_cast< std::uintptr_t >( ALIGN - 1 ) ) & ~static_cast< std::uintptr_t >( ALIGN - 1 ) ) );
-}
-
-// Can Row Length be Padded to Satisfy Alignment?
-template< typename T >
-bool
-paddable() // Call as paddable< Type >()
-{
-	static int const REM( VEC_ALIGN % static_cast< int >( sizeof( T ) ) );
-	return REM == 0;
-}
-
-// Row Length Rounded up to Satisfy Alignment
-template< typename T >
-T
-padded( int const row ) // Call as padded< Type >( row )
-{
-	static_assert( VEC_ALIGN % static_cast< int >( sizeof( T ) ) == 0, "Type is not row-paddable for the byte alignment" ); // Paddable check
-	assert( row >= 0 );
-	static int const MUL( VEC_ALIGN / static_cast< int >( sizeof( T ) ) ); // Aligned multiple of T
-	int const rem( row % MUL );
-	return ( rem > 0 ? row + MUL - rem : row );
 }
 
 } // ObjexxFCL
