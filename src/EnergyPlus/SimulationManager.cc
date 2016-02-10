@@ -1748,7 +1748,6 @@ namespace SimulationManager {
 		int NumNonParents;
 		int NumNonConnected;
 		std::string ChrOut;
-		Array1D_bool NonConnectedNodes;
 		bool ParentComponentFound;
 
 		// Formats

@@ -38642,17 +38642,14 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \units m3/s
        \minimum 0.0
        \autosizable
-  A5,  \field Hot Water or Steam Inlet Node Name
-       \deprecated
-       \type node
-  A6,  \field Reheat Coil Object Type
+  A5,  \field Reheat Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A7,  \field Reheat Coil Name
+  A6,  \field Reheat Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -38895,32 +38892,29 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \note fraction of cooling air flow rate
   A3,  \field Air Inlet Node Name
        \type node
-       \deprecated
+       \note The name of the HVAC system node that is the air inlet node for the 
+       \note terminal unit. This is also the air inlet node for the unit’s fan.  
   A4,  \field Air Outlet Node Name
        \type node
-       \deprecated
-  A5,  \field Heating Coil Air Inlet Node Name
-       \type node
-       \deprecated
-  A6,  \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
-  A7,  \field Fan Object Type
+       \note The name of the HVAC system node that is the air outlet node for the 
+       \note terminal unit. This is also the air outlet node for the unit’s heating
+       \note coil’s air outlet node. This node is also a zone inlet node.
+  A5,  \field Fan Object Type
        \required-field
        \type choice
        \key Fan:VariableVolume
-  A8,  \field Fan Name
+  A6,  \field Fan Name
        \required-field
        \type object-list
        \object-list FansVAV
-  A9,  \field Heating Coil Object Type
+  A7,  \field Heating Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A10, \field Heating Coil Name
+  A8,  \field Heating Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -38975,7 +38969,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
 AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \memo Central air system terminal unit, single duct, variable volume for both cooling and
        \memo heating, with reheat coil (hot water, electric, gas, or steam).
-       \min-fields 12
+       \min-fields 11
   A1,  \field Name
        \required-field
   A2 , \field Availability Schedule Name
@@ -39002,17 +38996,14 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \minimum 0.0
        \maximum 1.0
        \note fraction of maximum air flow
-  A5,  \field Hot Water or Steam Inlet Node Name
-       \deprecated
-       \type node
-  A6,  \field Reheat Coil Object Type
+  A5,  \field Reheat Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A7,  \field Reheat Coil Name
+  A6,  \field Reheat Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -39028,7 +39019,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A8,  \field Air Outlet Node Name
+  A7,  \field Air Outlet Node Name
        \required-field
        \type node
        \note The outlet node of the terminal unit and the reheat coil.
@@ -39112,9 +39103,6 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A11, \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
   N6;  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -39196,9 +39184,6 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A11, \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
   N7;  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -39238,17 +39223,11 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type node
        \required-field
        \note should be a zone inlet node
-  A6,  \field Hot Water Inlet Node Name
-       \type node
-       \deprecated
-  A7,  \field Cold Water Inlet Node Name
-       \type node
-       \deprecated
-  A8,  \field Heating Coil Object Type
+  A6,  \field Heating Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
-  A9,  \field Heating Coil Name
+  A7,  \field Heating Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -39269,11 +39248,11 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type real
        \minimum> 0.0
        \default 0.001
-  A10, \field Cooling Coil Object Type
+  A8,  \field Cooling Coil Object Type
        \type choice
        \key Coil:Cooling:Water
        \key Coil:Cooling:Water:DetailedGeometry
-  A11, \field Cooling Coil Name
+  A9,  \field Cooling Coil Name
        \type object-list
        \object-list CoolingCoilName
   N6,  \field Maximum Cold Water Flow Rate
@@ -39291,7 +39270,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type real
        \minimum> 0.0
        \default 0.001
-  A12; \field Zone Mixer Name
+  A10; \field Zone Mixer Name
        \required-field
        \type object-list
        \object-list ZoneMixers
