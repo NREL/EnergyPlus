@@ -1319,7 +1319,7 @@ namespace SwimmingPool {
 	MakeUpWaterVolFlowFunct( Real64 MakeUpWaterMassFlowRate, Real64 Density )
 	{
 		Real64 MakeUpWaterVolumeFlow;
-		MakeUpWaterVolumeFlow = MakeUpWaterMassFlowRate * Density;
+		MakeUpWaterVolumeFlow = MakeUpWaterMassFlowRate / Density;
 		return MakeUpWaterVolumeFlow;
 	}
 
@@ -1327,7 +1327,7 @@ namespace SwimmingPool {
 	MakeUpWaterVolFunct( Real64 MakeUpWaterMass, Real64 Density )
 	{
 		Real64 MakeUpWaterVolume;
-		MakeUpWaterVolume = MakeUpWaterMass * Density;
+		MakeUpWaterVolume = MakeUpWaterMass / Density;
 		return MakeUpWaterVolume;
 	}
 
