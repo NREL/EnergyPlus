@@ -1227,9 +1227,9 @@ namespace VentilatedSlab {
 
 			// Initialize total areas for all radiant systems
 			for ( RadNum = 1; RadNum <= NumOfVentSlabs; ++RadNum ) {
-				VentSlab( Item ).TotalSurfaceArea = 0.0;
-				for ( SurfNum = 1; SurfNum <= VentSlab( Item ).NumOfSurfaces; ++SurfNum ) {
-					VentSlab( Item ).TotalSurfaceArea += Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Area;
+				VentSlab( RadNum ).TotalSurfaceArea = 0.0;
+				for ( SurfNum = 1; SurfNum <= VentSlab( RadNum ).NumOfSurfaces; ++SurfNum ) {
+					VentSlab( RadNum ).TotalSurfaceArea += Surface( VentSlab( RadNum ).SurfacePtr( SurfNum ) ).Area;
 				}
 			}
 			MyEnvrnFlag = true;
