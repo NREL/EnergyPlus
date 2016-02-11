@@ -71,8 +71,6 @@ namespace ZoneAirLoopEquipmentManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	extern bool GetAirDistUnitsFlag; // If TRUE, Air Distribution Data has not been read in yet
-	extern bool MyOneTimeFlag;
 
 	// DERIVED TYPE DEFINITIONS:
 	// na

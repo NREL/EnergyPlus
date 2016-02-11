@@ -1789,7 +1789,7 @@ namespace AirflowNetworkBalanceManager {
 			if ( j > 0 ) {
 				if ( Surface( MultizoneSurfaceData( i ).SurfNum ).Sides == 3 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData( i ).SurfName + "\"." );
-					ShowContinueError( "The opening is a Triangular subsurface. A rectangular subsurface should be used." );
+					ShowContinueError( "The opening is a Triangular subsurface. A rectangular subsurface will be used with effective width and height." );
 				}
 				if ( ! MultizoneSurfaceData( i ).VentingSchName.empty() ) {
 					MultizoneSurfaceData( i ).VentingSchNum = GetScheduleIndex( MultizoneSurfaceData( i ).VentingSchName );

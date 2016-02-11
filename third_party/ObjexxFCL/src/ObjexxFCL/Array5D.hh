@@ -5,18 +5,20 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array5D.fwd.hh>
 #include <ObjexxFCL/Array5.hh>
-#include <ObjexxFCL/ArrayInitializer.hh>
+
+// C++ Headers
+#include <functional>
 
 namespace ObjexxFCL {
 
@@ -39,7 +41,9 @@ public: // Types
 
 	typedef  typename Super::Base  Base;
 	typedef  typename Super::Tail  Tail;
+	typedef  typename Super::Traits  Traits;
 	typedef  typename Super::IR  IR;
+	typedef  typename Super::Initializer  Initializer;
 
 	// STL Style
 	typedef  typename Super::value_type  value_type;
@@ -67,9 +71,9 @@ public: // Types
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
-	typedef  ArrayInitializer< T, ObjexxFCL::Array5D >  Initializer;
-	typedef  typename Initializer::Function  InitializerFunction;
+	typedef  std::function< void( Array5D< T > & ) >  InitializerFunction;
 
+	using Super::assign;
 	using Super::clear_move;
 	using Super::conformable;
 	using Super::contains;
@@ -90,6 +94,7 @@ public: // Types
 	using Super::operator [];
 	using Super::resize;
 	using Super::shift_set;
+	using Super::shift_only_set;
 	using Super::size1;
 	using Super::size2;
 	using Super::size3;
@@ -195,9 +200,10 @@ public: // Creation
 	}
 
 	// Sticky Initializer Value Constructor
+	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
 	explicit
-	Array5D( Sticky< T > const & t ) :
-	 initializer_( t )
+	Array5D( Sticky< S > const & s ) :
+	 initializer_( s )
 	{}
 
 	// IndexRange Constructor
@@ -209,38 +215,49 @@ public: // Creation
 
 	// IndexRange + Initializer Value Constructor
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, T const & t ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( t )
+	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
 	{
 		setup_real();
 		initialize( t );
 	}
 
 	// IndexRange + Sticky Initializer Value Constructor
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t ) :
+	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s ) :
 	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( t )
+	 initializer_( s )
 	{
 		setup_real();
-		initialize( t );
+		initialize( s );
 	}
 
 	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t, T const & u ) :
+	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s, U const & u ) :
 	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( t )
+	 initializer_( s )
 	{
 		setup_real();
-		initialize( u );
+		initialize( s );
+		assign( u );
 	}
 
 	// IndexRange + Initializer Function Constructor
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, InitializerFunction const & fxn ) :
-	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( fxn )
+	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
 	{
 		setup_real();
-		fxn( *this );
+		initialize( fxn );
+	}
+
+	// IndexRange + Sticky Initializer Value + Initializer Function Constructor
+	template< typename S, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s, InitializerFunction const & fxn ) :
+	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
+	 initializer_( s )
+	{
+		setup_real();
+		initialize( fxn );
 	}
 
 	// IndexRange + Initializer List Constructor Template
@@ -251,13 +268,16 @@ public: // Creation
 		setup_real();
 	}
 
-	// IndexRange + Sticky Initializer + Initializer List Constructor Template
-	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t, std::initializer_list< U > const l ) :
-	 Super( I1, I2, I3, I4, I5, l ),
-	 initializer_( t )
+	// IndexRange + Sticky Initializer Value + Initializer List Constructor Template
+	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s, std::initializer_list< U > const l ) :
+	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
+	 initializer_( s )
 	{
+		assert( size_ == l.size() );
 		setup_real();
+		initialize( s );
+		std::copy( l.begin(), l.end(), data_ );
 	}
 
 	// IndexRange + Super Constructor Template
@@ -265,24 +285,21 @@ public: // Creation
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Array5< U > const & a ) :
 	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
 	{
-		setup_real();
 		assert( conformable( a ) );
-		for ( size_type i = 0; i < size_; ++i ) {
-			initialize( i, a[ i ] );
-		}
+		setup_real();
+		initialize( a );
 	}
 
-	// IndexRange + Sticky Initializer + Super Constructor Template
-	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
-	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t, Array5< U > const & a ) :
+	// IndexRange + Sticky Initializer Value + Super Constructor Template
+	template< typename U, typename S, class = typename std::enable_if< std::is_constructible< T, U >::value >::type, class = typename std::enable_if< std::is_constructible< T, S >::value >::type >
+	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< S > const & s, Array5< U > const & a ) :
 	 Super( I1, I2, I3, I4, I5, InitializerSentinel() ),
-	 initializer_( t )
+	 initializer_( s )
 	{
-		setup_real();
 		assert( conformable( a ) );
-		for ( size_type i = 0; i < size_; ++i ) {
-			initialize( i, a[ i ] );
-		}
+		setup_real();
+		initialize( s );
+		assign( a );
 	}
 
 	// IndexRange + Slice Constructor Template
@@ -290,8 +307,8 @@ public: // Creation
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Array5S< U > const & a ) :
 	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
 	{
-		setup_real();
 		assert( conformable( a ) );
+		setup_real();
 		size_type l( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
@@ -311,8 +328,8 @@ public: // Creation
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, MArray5< A, M > const & a ) :
 	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
 	{
-		setup_real();
 		assert( conformable( a ) );
+		setup_real();
 		size_type l( 0u );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
@@ -332,11 +349,9 @@ public: // Creation
 	Array5D( Array5< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
 	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
 	{
-		setup_real();
 		assert( conformable( a ) );
-		for ( size_type i = 0; i < size_; ++i ) {
-			initialize( i, a[ i ] );
-		}
+		setup_real();
+		initialize( a );
 	}
 
 	// IndexRange + Base Constructor Template
@@ -344,11 +359,9 @@ public: // Creation
 	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Array< U > const & a ) :
 	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
 	{
-		setup_real();
 		assert( size_ == a.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			initialize( i, a[ i ] );
-		}
+		setup_real();
+		initialize( a );
 	}
 
 	// Base + IndexRange Constructor Template
@@ -356,14 +369,12 @@ public: // Creation
 	Array5D( Array< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
 	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
 	{
-		setup_real();
 		assert( size_ == a.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			initialize( i, a[ i ] );
-		}
+		setup_real();
+		initialize( a );
 	}
 
-	// Range Named Constructor Template
+	// Array Range Named Constructor Template
 	template< typename U >
 	static
 	Array5D
@@ -372,7 +383,7 @@ public: // Creation
 		return Array5D( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ );
 	}
 
-	// Range + Initializer Value Named Constructor Template
+	// Array Range + Initializer Value Named Constructor Template
 	template< typename U >
 	static
 	Array5D
@@ -467,6 +478,25 @@ public: // Creation
 	~Array5D()
 	{}
 
+private: // Creation
+
+	// IndexRange Raw Constructor
+	explicit
+	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, InitializerSentinel const & initialized ) :
+	 Super( I1, I2, I3, I4, I5, initialized )
+	{
+		setup_real();
+	}
+
+	// IndexRange Raw Initializer Constructor
+	explicit
+	Array5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Initializer const & initializer ) :
+	 Super( I1, I2, I3, I4, I5, InitializerSentinel() )
+	{
+		setup_real();
+		initialize( initializer );
+	}
+
 public: // Assignment: Array
 
 	// Copy Assignment
@@ -474,8 +504,11 @@ public: // Assignment: Array
 	operator =( Array5D const & a )
 	{
 		if ( this != &a ) {
-			if ( ! conformable( a ) ) size_real( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ );
-			Base::operator =( a );
+			if ( ( conformable( a ) ) || ( ! size_real( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ ) ) ) {
+				Base::operator =( a );
+			} else {
+				Base::initialize( a );
+			}
 		}
 		return *this;
 	}
@@ -508,8 +541,11 @@ public: // Assignment: Array
 	operator =( Super const & a )
 	{
 		if ( this != &a ) {
-			if ( ! conformable( a ) ) size_real( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ );
-			Base::operator =( a );
+			if ( ( conformable( a ) ) || ( ! size_real( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ ) ) ) {
+				Base::operator =( a );
+			} else {
+				Base::initialize( a );
+			}
 		}
 		return *this;
 	}
@@ -519,7 +555,11 @@ public: // Assignment: Array
 	Array5D &
 	operator =( Array5< U > const & a )
 	{
-		if ( ! conformable( a ) ) size_real( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ );
+		if ( ( conformable( a ) ) || ( ! size_real( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ ) ) ) {
+			Base::operator =( a );
+		} else {
+			Base::initialize( a );
+		}
 		Base::operator =( a );
 		return *this;
 	}
@@ -783,7 +823,7 @@ public: // Predicate
 	bool
 	initializer_active() const
 	{
-		return initializer_.is_active();
+		return initializer_.active();
 	}
 
 public: // Modifier
@@ -819,7 +859,6 @@ public: // Modifier
 	deallocate()
 	{
 		Super::clear();
-		initializer_.clear_nonsticky();
 		return *this;
 	}
 
@@ -878,52 +917,62 @@ public: // Modifier
 	Array5D &
 	redimension( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 )
 	{
-		Array5D o( I1, I2, I3, I4, I5 );
-		int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
-		int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
-		int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
-		int const b4( std::max( I4.l(), l4() ) ), e4( std::min( I4.u(), u4() ) );
-		int const b5( std::max( I5.l(), l5() ) ), e5( std::min( I5.u(), u5() ) );
-		for ( int i1 = b1; i1 <= e1; ++i1 ) {
-			for ( int i2 = b2; i2 <= e2; ++i2 ) {
-				for ( int i3 = b3; i3 <= e3; ++i3 ) {
-					for ( int i4 = b4; i4 <= e4; ++i4 ) {
-						size_type l( index( i1, i2, i3, i4, b5 ) );
-						size_type m( o.index( i1, i2, i3, i4, b5 ) );
-						for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
-							o[ m ] = move_if( operator []( l ) );
+		if ( size_ == 0u ) { // No data
+			return dimension( I1, I2, I3, I4, I5 );
+		} else { // Allocate new space
+			Array5D o( I1, I2, I3, I4, I5, initializer_ );
+			int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
+			int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
+			int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
+			int const b4( std::max( I4.l(), l4() ) ), e4( std::min( I4.u(), u4() ) );
+			int const b5( std::max( I5.l(), l5() ) ), e5( std::min( I5.u(), u5() ) );
+			for ( int i1 = b1; i1 <= e1; ++i1 ) {
+				for ( int i2 = b2; i2 <= e2; ++i2 ) {
+					for ( int i3 = b3; i3 <= e3; ++i3 ) {
+						for ( int i4 = b4; i4 <= e4; ++i4 ) {
+							size_type l( index( i1, i2, i3, i4, b5 ) );
+							size_type m( o.index( i1, i2, i3, i4, b5 ) );
+							for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
+								o[ m ] = move_if( operator []( l ) );
+							}
 						}
 					}
 				}
 			}
+			swap5( o );
+			return *this;
 		}
-		return swap( o );
 	}
 
 	// Data-Preserving Redimension by IndexRange + Fill Value
 	Array5D &
 	redimension( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, T const & t )
 	{
-		Array5D o( I1, I2, I3, I4, I5, t );
-		int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
-		int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
-		int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
-		int const b4( std::max( I4.l(), l4() ) ), e4( std::min( I4.u(), u4() ) );
-		int const b5( std::max( I5.l(), l5() ) ), e5( std::min( I5.u(), u5() ) );
-		for ( int i1 = b1; i1 <= e1; ++i1 ) {
-			for ( int i2 = b2; i2 <= e2; ++i2 ) {
-				for ( int i3 = b3; i3 <= e3; ++i3 ) {
-					for ( int i4 = b4; i4 <= e4; ++i4 ) {
-						size_type l( index( i1, i2, i3, i4, b5 ) );
-						size_type m( o.index( i1, i2, i3, i4, b5 ) );
-						for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
-							o[ m ] = move_if( operator []( l ) );
+		if ( size_ == 0u ) { // No data
+			return dimension( I1, I2, I3, I4, I5, t );
+		} else { // Allocate new space
+			Array5D o( I1, I2, I3, I4, I5, t );
+			int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
+			int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
+			int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
+			int const b4( std::max( I4.l(), l4() ) ), e4( std::min( I4.u(), u4() ) );
+			int const b5( std::max( I5.l(), l5() ) ), e5( std::min( I5.u(), u5() ) );
+			for ( int i1 = b1; i1 <= e1; ++i1 ) {
+				for ( int i2 = b2; i2 <= e2; ++i2 ) {
+					for ( int i3 = b3; i3 <= e3; ++i3 ) {
+						for ( int i4 = b4; i4 <= e4; ++i4 ) {
+							size_type l( index( i1, i2, i3, i4, b5 ) );
+							size_type m( o.index( i1, i2, i3, i4, b5 ) );
+							for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
+								o[ m ] = move_if( operator []( l ) );
+							}
 						}
 					}
 				}
 			}
+			swap5( o );
+			return *this;
 		}
-		return swap( o );
 	}
 
 	// Data-Preserving Redimension by Array Template
@@ -931,26 +980,7 @@ public: // Modifier
 	Array5D &
 	redimension( Array5< U > const & a )
 	{
-		Array5D o( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ );
-		int const b1( std::max( a.l1(), l1() ) ), e1( std::min( a.u1(), u1() ) );
-		int const b2( std::max( a.l2(), l2() ) ), e2( std::min( a.u2(), u2() ) );
-		int const b3( std::max( a.l3(), l3() ) ), e3( std::min( a.u3(), u3() ) );
-		int const b4( std::max( a.l4(), l4() ) ), e4( std::min( a.u4(), u4() ) );
-		int const b5( std::max( a.l5(), l5() ) ), e5( std::min( a.u5(), u5() ) );
-		for ( int i1 = b1; i1 <= e1; ++i1 ) {
-			for ( int i2 = b2; i2 <= e2; ++i2 ) {
-				for ( int i3 = b3; i3 <= e3; ++i3 ) {
-					for ( int i4 = b4; i4 <= e4; ++i4 ) {
-						size_type l( index( i1, i2, i3, i4, b5 ) );
-						size_type m( o.index( i1, i2, i3, i4, b5 ) );
-						for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
-							o[ m ] = move_if( operator []( l ) );
-						}
-					}
-				}
-			}
-		}
-		return swap( o );
+		return redimension( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_ );
 	}
 
 	// Data-Preserving Redimension by Array + Fill Value Template
@@ -958,26 +988,7 @@ public: // Modifier
 	Array5D &
 	redimension( Array5< U > const & a, T const & t )
 	{
-		Array5D o( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_, t );
-		int const b1( std::max( a.l1(), l1() ) ), e1( std::min( a.u1(), u1() ) );
-		int const b2( std::max( a.l2(), l2() ) ), e2( std::min( a.u2(), u2() ) );
-		int const b3( std::max( a.l3(), l3() ) ), e3( std::min( a.u3(), u3() ) );
-		int const b4( std::max( a.l4(), l4() ) ), e4( std::min( a.u4(), u4() ) );
-		int const b5( std::max( a.l5(), l5() ) ), e5( std::min( a.u5(), u5() ) );
-		for ( int i1 = b1; i1 <= e1; ++i1 ) {
-			for ( int i2 = b2; i2 <= e2; ++i2 ) {
-				for ( int i3 = b3; i3 <= e3; ++i3 ) {
-					for ( int i4 = b4; i4 <= e4; ++i4 ) {
-						size_type l( index( i1, i2, i3, i4, b5 ) );
-						size_type m( o.index( i1, i2, i3, i4, b5 ) );
-						for ( int i5 = b5; i5 <= e5; ++i5, ++l, ++m ) {
-							o[ m ] = move_if( operator []( l ) );
-						}
-					}
-				}
-			}
-		}
-		return swap( o );
+		return redimension( a.I1_, a.I2_, a.I3_, a.I4_, a.I5_, t );
 	}
 
 	// Set Initializer Value
@@ -989,18 +1000,11 @@ public: // Modifier
 	}
 
 	// Set Initializer Sticky Value
+	template< typename S, class = typename std::enable_if< std::is_assignable< T&, S >::value >::type >
 	Array5D &
-	initializer( Sticky< T > const & t )
+	initializer( Sticky< S > const & s )
 	{
-		initializer_ = t;
-		return *this;
-	}
-
-	// Set Initializer Function
-	Array5D &
-	initializer( InitializerFunction const & fxn )
-	{
-		initializer_ = fxn;
+		initializer_ = s;
 		return *this;
 	}
 
@@ -1009,20 +1013,6 @@ public: // Modifier
 	initializer_clear()
 	{
 		initializer_.clear();
-		return *this;
-	}
-
-	// Initialize
-	Array5D &
-	initialize()
-	{
-		if ( initializer_.is_active() ) {
-			if ( initializer_.is_value() ) {
-				initialize( initializer_.value() );
-			} else if ( initializer_.is_function() ) {
-				initializer_.function()( *this );
-			}
-		}
 		return *this;
 	}
 
@@ -1039,10 +1029,54 @@ public: // Modifier
 protected: // Functions
 
 	// Dimension by IndexRange
-	void
+	bool
 	dimension_assign( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 )
 	{
-		size_real( I1, I2, I3, I4, I5 );
+		return size_real( I1, I2, I3, I4, I5 );
+	}
+
+	// Initialize to Default State
+	void
+	initialize()
+	{
+		if ( initializer_.active() ) { // Sticky initialize
+			T const fill( initializer_() );
+			for ( size_type i = 0; i < size_; ++i ) {
+				new ( data_ + i ) T( fill );
+			}
+		} else { // Default initialize
+#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
+			std::uninitialized_fill_n( data_, size_, Traits::initial_array_value() );
+#else
+			for ( size_type i = 0; i < size_; ++i ) {
+				new ( data_ + i ) T;
+			}
+#endif
+		}
+	}
+
+	// Initialize by Function
+	void
+	initialize( InitializerFunction const & fxn )
+	{
+		initialize();
+		fxn( *this );
+	}
+
+	// Assignment to Default State
+	void
+	assign()
+	{
+		if ( initializer_.active() ) { // Sticky initialize
+			T const fill( initializer_() );
+			for ( size_type i = 0; i < size_; ++i ) {
+				data_[ i ] = fill;
+			}
+		} else { // Default initialize
+#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
+			std::fill_n( data_, size_, Traits::initial_array_value() );
+#endif
+		}
 	}
 
 private: // Functions
@@ -1055,7 +1089,7 @@ private: // Functions
 	}
 
 	// Size by IndexRange
-	void
+	bool
 	size_real( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 )
 	{
 		I1_.assign( I1 );
@@ -1068,35 +1102,40 @@ private: // Functions
 		z3_ = I3_.size();
 		z4_ = I4_.size();
 		z5_ = I5_.size();
-		resize( size_of( z1_, z2_, z3_, z4_, z5_ ) );
-		setup_real();
+		shift_only_set( ( ( ( ( ( ( ( I1_.l() * z2_ ) + I2_.l() ) * z3_ ) + I3_.l() ) * z4_ ) + I4_.l() ) * z5_ ) + I5_.l() );
+		return resize( size_of( z1_, z2_, z3_, z4_, z5_ ) );
 	}
 
 	// Dimension by IndexRange
 	void
 	dimension_real( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 )
 	{
-		size_real( I1, I2, I3, I4, I5 );
-		initializer_.clear_nonsticky();
-		initialize();
+		if ( size_real( I1, I2, I3, I4, I5 ) ) {
+			initialize();
+		} else {
+#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
+			assign();
+#endif
+		}
 	}
 
 	// Dimension by IndexRange + Initializer Value
 	void
 	dimension_real( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, T const & t )
 	{
-		size_real( I1, I2, I3, I4, I5 );
-		initializer_ = t;
-		initialize();
+		if ( size_real( I1, I2, I3, I4, I5 ) ) {
+			initialize( t );
+		} else {
+			assign( t );
+		}
 	}
 
 	// Dimension by IndexRange + Initializer Function
 	void
 	dimension_real( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, InitializerFunction const & fxn )
 	{
-		size_real( I1, I2, I3, I4, I5 );
-		initializer_ = fxn;
-		initialize();
+		if ( size_real( I1, I2, I3, I4, I5 ) ) initialize();
+		fxn( *this );
 	}
 
 private: // Data

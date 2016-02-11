@@ -13,10 +13,13 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  AirTerminalSingleDuct.unit.cc
+  AirTerminalSingleDuctPIUReheat.unit.cc
   BranchNodeConnections.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerIndirectAbsorption.unit.cc
   CondenserLoopTowers.unit.cc
+  ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
