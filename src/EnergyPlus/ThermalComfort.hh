@@ -332,8 +332,11 @@ namespace ThermalComfort {
 	CalcThermalComfortFanger(
 		Optional_int_const PNum = _, // People number for thermal comfort control
 		Optional< Real64 const > Tset = _, // Temperature setpoint for thermal comfort control
-		Optional< Real64 > PMVResult = _ // PMV value for thermal comfort control
-	);
+		Optional< Real64 > PMVResult = _, // PMV value for thermal comfort control
+		Optional< Real64 > setActLevel = _,
+		Optional< Real64 > setWorkEff = _,
+		Optional< Real64 > setCloUnit = _
+		);
 
 	void
 	CalcThermalComfortPierce();

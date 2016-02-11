@@ -68,25 +68,25 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ThermalComfort;
+using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobals;
+using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
+using namespace EnergyPlus::DataRoomAirModel;
+using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace ObjexxFCL;
 
 using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-using DataHeatBalFanSys::TempControlType;
-using DataRoomAirModel::AirModel;
-using DataRoomAirModel::RoomAirModel_Mixing;
-using DataHeatBalFanSys::ZTAV;
-using DataHeatBalFanSys::ZoneThermostatSetPointLo;
-using DataHeatBalFanSys::ZoneThermostatSetPointHi;
 
 
 TEST_F( EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1 )
@@ -200,3 +200,80 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1 )
 	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCooling );
 	EXPECT_EQ( TimeStepZone, ThermalComfortSetPoint( 1 ).notMetCoolingOccupied );
 }
+
+TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger )
+{
+	TotPeople = 1;
+	People.allocate( TotPeople );
+	People( 1 ).Fanger = true;
+	People( 1 ).ZonePtr = 1;
+	People( 1 ).MRTCalcType = ZoneAveraged;
+	People( 1 ).ActivityLevelPtr = 0;
+	People( 1 ).ClothingType = 1;  //ClothingInsulationSchedule
+
+	NumOfZones = 1;
+	Zone.allocate( NumOfZones );
+
+	IsZoneCV.allocate(NumOfZones);
+	IsZoneCV( 1 ) = false;
+	IsZoneDV.allocate( NumOfZones );
+	IsZoneDV( 1 ) = false;
+	IsZoneUI.allocate( NumOfZones );
+	IsZoneUI( 1 ) = false;
+	ZTAVComf.allocate( NumOfZones );
+	MRT.allocate( NumOfZones );
+
+	QHTRadSysToPerson.allocate( NumOfZones);
+	QHTRadSysToPerson( 1 ) = 0.0;
+	QHWBaseboardToPerson.allocate( NumOfZones );
+	QHWBaseboardToPerson( 1 ) = 0.0;
+	QSteamBaseboardToPerson.allocate( NumOfZones );
+	QSteamBaseboardToPerson( 1 ) = 0.0;
+	QElecBaseboardToPerson.allocate( NumOfZones );
+	QElecBaseboardToPerson( 1 ) = 0.0;
+	ZoneAirHumRatAvgComf.allocate( NumOfZones );
+	OutBaroPress = 101325.; // sea level
+
+	ThermalComfortData.allocate( TotPeople );
+
+	Real64 sActLevel = 70.; // 50 to 150
+	Real64 sWorkEff = 0.0;
+	Real64 sCloUnit = 1.0;  //0.5 to 1.0
+
+	ZTAVComf( 1 ) = 21.0;
+	MRT( 1 ) = 19.0;
+	ZoneAirHumRatAvgComf( 1 ) = 0.00529; // 0.002 to 0.006
+
+	CalcThermalComfortFanger(_,_,_, sActLevel, sWorkEff, sCloUnit);
+
+	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPMV, -0.955, 0.005 );
+	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 24.3, 0.1 );
+
+	ZTAVComf( 1 ) = 22.0;
+	MRT( 1 ) = 24.0;
+	ZoneAirHumRatAvgComf( 1 ) = 0.00529; // 0.002 to 0.006
+
+	CalcThermalComfortFanger( _, _, _, sActLevel, sWorkEff, sCloUnit );
+
+	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPMV, -0.450, 0.005 );
+	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 9.2, 0.1 );
+
+	ZTAVComf( 1 ) = 24.0;
+	MRT( 1 ) = 25.0;
+	ZoneAirHumRatAvgComf( 1 ) = 0.00529; // 0.002 to 0.006
+
+	CalcThermalComfortFanger( _, _, _, sActLevel, sWorkEff, sCloUnit );
+
+	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPMV, -0.003, 0.005 );
+	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 5.0, 0.1 );
+
+	ZTAVComf( 1 ) = 25.0;
+	MRT( 1 ) = 26.0;
+	ZoneAirHumRatAvgComf( 1 ) = 0.00629; // 0.002 to 0.006
+
+	CalcThermalComfortFanger( _, _, _, sActLevel, sWorkEff, sCloUnit );
+
+	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPMV, 0.288, 0.005 );
+	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 6.7, 0.1 );
+}
+
