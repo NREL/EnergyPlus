@@ -158,6 +158,9 @@ namespace FanCoilUnits {
 		Real64 SpeedRatio; // speed ratio when the fan is cycling between stages
 		int FanOpModeSchedPtr; // pointer to supply air fan operating mode schedule
 		int FanOpMode; // 1=cycling fan cycling coil; 2=constant fan cycling coil
+		Real64 MinSATempCooling; // ASHRAE90.1 maximum supply air temperature in Cooling mode
+		Real64 MaxSATempHeating; // ASHRAE90.1 maximum supply air temperature in Heating mode
+		bool ASHRAETempControl; // ASHRAE90.1 control to temperature set point when true
 
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
@@ -243,6 +246,9 @@ namespace FanCoilUnits {
 			SpeedRatio( 0.0 ),
 			FanOpModeSchedPtr( 0 ),
 			FanOpMode( 1 ),
+			MinSATempCooling( 0.0 ),
+			MaxSATempHeating( 0.0 ),
+			ASHRAETempControl( false ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			TotCoolPower( 0.0 ),
