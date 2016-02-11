@@ -4590,7 +4590,6 @@ Where:
 *COP<sub>h</sub>*                   = Heating coefficient of performance, W/W
 
 
-
 If the load side heat transfer rate (*Q<sub>c</sub>* or *Q<sub>h</sub>*) or power consumption (*Power<sub>c</sub>* or *Power<sub>h</sub>*) are less than or equal to zero, then the heat pump is turned off for that simulation time step, a warning is issued, and the simulation continues.
 
 The inlet conditions or variables are divided by the reference conditions. This formulation allows the coefficients to fall into smaller range of values. Moreover, the value of the coefficient indirectly represents the sensitivity of the output to that particular inlet variable. The reference conditions used when generating the performance coefficients must be the same as the reference conditions used later in the model. The reference temperature <span>\({T_{ref}}\)</span>is fixed at 283K. Temperature unit of Kelvin is used instead of Celsius to keep the ratio of the water inlet temperature and reference temperature positive value should the water inlet temperature drop below the freezing point.
