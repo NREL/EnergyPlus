@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -473,17 +473,28 @@ TEST( Array1Test, ConstructionOneBasedInitializerList )
 	EXPECT_EQ( 33, r( 3 ) );
 }
 
-TEST( Array1Test, AssignmentBasic )
+TEST( Array1Test, AssignmentCopy )
 {
 	Array1D_double v( 22, 55.5 );
 	Array1D_double const w( 13, 6.789 );
 	v = w;
 	EXPECT_TRUE( eq( w, v ) );
-	v = 45.6;
+	v = 45.5;
 	EXPECT_EQ( 13u, v.size() );
-	for ( int i = 1; i <= 13; ++i ) {
-		EXPECT_EQ( 45.6, v( i ) );
-	}
+	EXPECT_TRUE( eq( v, 45.5 ) );
+}
+
+TEST( Array1Test, AssignmentMove )
+{
+	Array1D_double v( 22, 55.5 );
+	v = Array1D_double( 13, 6.75 );
+	EXPECT_EQ( 13u, v.size() );
+	EXPECT_TRUE( eq( v, 6.75 ) );
+	Array1D_double w;
+	w = std::move( v );
+	EXPECT_EQ( 0u, v.size() );
+	EXPECT_EQ( 13u, w.size() );
+	EXPECT_TRUE( eq( w, 6.75 ) );
 }
 
 TEST( Array1Test, ArrayTail )
@@ -842,6 +853,110 @@ TEST( Array1Test, Redimension )
 		EXPECT_EQ( 1, A( 2 ) );
 		EXPECT_EQ( 2, A( 3 ) );
 		EXPECT_EQ( 2, A( 4 ) );
+	}
+
+	{ // No moving
+		Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+		A.redimension( 4 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 2, A( 2 ) );
+		EXPECT_EQ( 3, A( 3 ) );
+		EXPECT_EQ( 4, A( 4 ) );
+		A.redimension( 5, 6 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 5, A.u() );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 2, A( 2 ) );
+		EXPECT_EQ( 3, A( 3 ) );
+		EXPECT_EQ( 4, A( 4 ) );
+		EXPECT_EQ( 6, A( 5 ) );
+		EXPECT_EQ( 5u, A.capacity() );
+		A.redimension( 6, 7 ); // Reallocates
+		EXPECT_EQ( 6u, A.capacity() );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 6, A.u() );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 2, A( 2 ) );
+		EXPECT_EQ( 3, A( 3 ) );
+		EXPECT_EQ( 4, A( 4 ) );
+		EXPECT_EQ( 6, A( 5 ) );
+		EXPECT_EQ( 7, A( 6 ) );
+	}
+
+	{ // No overlap
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { -5, -1 }, 3 );
+		EXPECT_EQ( -5, A.l() );
+		EXPECT_EQ( -1, A.u() );
+		EXPECT_EQ( 3, A( -5 ) );
+		EXPECT_EQ( 3, A( -4 ) );
+		EXPECT_EQ( 3, A( -3 ) );
+		EXPECT_EQ( 3, A( -2 ) );
+		EXPECT_EQ( 3, A( -1 ) );
+	}
+
+	{ // No overlap
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { 11, 15 }, 3 );
+		EXPECT_EQ( 11, A.l() );
+		EXPECT_EQ( 15, A.u() );
+		EXPECT_EQ( 3, A( 11 ) );
+		EXPECT_EQ( 3, A( 12 ) );
+		EXPECT_EQ( 3, A( 13 ) );
+		EXPECT_EQ( 3, A( 14 ) );
+		EXPECT_EQ( 3, A( 15 ) );
+	}
+
+	{ // Up 1 overlap
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { 5, 9 }, 3 );
+		EXPECT_EQ( 5, A.l() );
+		EXPECT_EQ( 9, A.u() );
+		EXPECT_EQ( 5, A( 5 ) );
+		EXPECT_EQ( 3, A( 6 ) );
+		EXPECT_EQ( 3, A( 7 ) );
+		EXPECT_EQ( 3, A( 8 ) );
+		EXPECT_EQ( 3, A( 9 ) );
+	}
+
+	{ // Down 1 overlap
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { -3, 1 }, 3 );
+		EXPECT_EQ( -3, A.l() );
+		EXPECT_EQ( 1, A.u() );
+		EXPECT_EQ( 3, A( -3 ) );
+		EXPECT_EQ( 3, A( -2 ) );
+		EXPECT_EQ( 3, A( -1 ) );
+		EXPECT_EQ( 3, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+	}
+
+	{ // Up 1 overlap with reallocation
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { 5, 10 }, 3 );
+		EXPECT_EQ( 5, A.l() );
+		EXPECT_EQ( 10, A.u() );
+		EXPECT_EQ( 5, A( 5 ) );
+		EXPECT_EQ( 3, A( 6 ) );
+		EXPECT_EQ( 3, A( 7 ) );
+		EXPECT_EQ( 3, A( 8 ) );
+		EXPECT_EQ( 3, A( 9 ) );
+		EXPECT_EQ( 3, A( 10 ) );
+	}
+
+	{ // Down 1 overlap with reallocation
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { -4, 1 }, 3 );
+		EXPECT_EQ( -4, A.l() );
+		EXPECT_EQ( 1, A.u() );
+		EXPECT_EQ( 3, A( -4 ) );
+		EXPECT_EQ( 3, A( -3 ) );
+		EXPECT_EQ( 3, A( -2 ) );
+		EXPECT_EQ( 3, A( -1 ) );
+		EXPECT_EQ( 3, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
 	}
 }
 
