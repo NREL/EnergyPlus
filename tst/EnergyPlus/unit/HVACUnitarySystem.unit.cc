@@ -70,6 +70,7 @@
 #include <General.hh>
 #include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -95,7 +96,6 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -2185,6 +2185,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
         "  MultiSpeed Performance,  !- Name",
         "  1,                       !- Number of Speeds for Heating",
         "  3,                       !- Number of Speeds for Cooling",
+		"  No,                      !- Single Mode Operation",
         "  autosize,                !- Heating Speed 1 Supply Air Flow Ratio",
         "  autosize,                !- Cooling Speed 1 Supply Air Flow Ratio",
         "  autosize,                !- Heating Speed 2 Supply Air Flow Ratio",
