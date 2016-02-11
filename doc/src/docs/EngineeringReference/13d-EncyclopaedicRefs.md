@@ -624,7 +624,6 @@ Incropera, F.P. and Dewitt, D.P. 1996. Fundamentals of Heat Transfer, 4th Editio
 
 Spang, Bernhard. Correlations for Convective Heat Transfer. Chemical Engineers’ Resource Page:
 
-
 ### Underground Pipe (Object: Pipe:Underground)
 
 #### Description of Model
