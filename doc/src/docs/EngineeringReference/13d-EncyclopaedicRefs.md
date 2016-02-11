@@ -1,4 +1,5 @@
-<!--RemoveStart-->
+﻿
+﻿<!--RemoveStart-->
 Simulation Models – Encyclopedic Reference
 ==========================================
 
@@ -531,7 +532,6 @@ Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd
 Kittler, R. (1989). Indoor Natatorium Design and Energy Recycling. ASHRAE Transactions 95(1), p.521-526.
 
 Smith, C., R. Jones, and G. Löf (1993). Energy Requirements and Potential Savings for Heated Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
-
 
 
 Pipes <a name="Pipes"></a>
@@ -1575,4 +1575,3 @@ The logic of this component is quite simple: if there is flow through the compon
 #### References
 
 No specific references.
-
