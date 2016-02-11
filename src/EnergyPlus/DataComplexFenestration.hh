@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataComplexFenestration_hh_INCLUDED
 #define DataComplexFenestration_hh_INCLUDED
 
@@ -63,17 +121,6 @@ namespace DataComplexFenestration {
 			Radius( 0.0 )
 		{}
 
-		// Member Constructor
-		GapSupportPillar(
-			std::string const & Name, // Name of support pillar
-			Real64 const Spacing, // Spacing between centers of support pillars (m)
-			Real64 const Radius // Support pillar radius (m)
-		) :
-			Name( Name ),
-			Spacing( Spacing ),
-			Radius( Radius )
-		{}
-
 	};
 
 	struct GapDeflectionState
@@ -85,15 +132,6 @@ namespace DataComplexFenestration {
 		// Default Constructor
 		GapDeflectionState() :
 			DeflectedThickness( 0.0 )
-		{}
-
-		// Member Constructor
-		GapDeflectionState(
-			std::string const & Name, // Name of deflection state
-			Real64 const DeflectedThickness
-		) :
-			Name( Name ),
-			DeflectedThickness( DeflectedThickness )
 		{}
 
 	};
@@ -141,47 +179,6 @@ namespace DataComplexFenestration {
 			SlatCurve( 0.0 )
 		{}
 
-		// Member Constructor
-		WindowComplexShade(
-			std::string const & Name, // Name for complex shade
-			int const LayerType, // Layer type (OtherShadingType, Venetian, Woven, Perforated)
-			Real64 const Thickness, // Layer thickness (m)
-			Real64 const Conductivity, // Layer conductivity (W/m2K)
-			Real64 const IRTransmittance, // IR Transmittance
-			Real64 const FrontEmissivity, // Emissivity of front suraface
-			Real64 const BackEmissivity, // Emissivity of back surface
-			Real64 const TopOpeningMultiplier, // Coverage percent for top opening (%)
-			Real64 const BottomOpeningMultiplier, // Coverage percent for bottom opening (%)
-			Real64 const LeftOpeningMultiplier, // Coverage percent for left opening (%)
-			Real64 const RightOpeningMultiplier, // Coverage percent for right opening (%)
-			Real64 const FrontOpeningMultiplier, // Coverage percent for front opening (%)
-			Real64 const SlatWidth, // Slat width (m)
-			Real64 const SlatSpacing, // Slat spacing (m)
-			Real64 const SlatThickness, // Slat thickness (m)
-			Real64 const SlatAngle, // Slat angle (deg)
-			Real64 const SlatConductivity, // Slat conductivity (W/m2K)
-			Real64 const SlatCurve // Curvature radius of slat (if =0 then flat) (m)
-		) :
-			Name( Name ),
-			LayerType( LayerType ),
-			Thickness( Thickness ),
-			Conductivity( Conductivity ),
-			IRTransmittance( IRTransmittance ),
-			FrontEmissivity( FrontEmissivity ),
-			BackEmissivity( BackEmissivity ),
-			TopOpeningMultiplier( TopOpeningMultiplier ),
-			BottomOpeningMultiplier( BottomOpeningMultiplier ),
-			LeftOpeningMultiplier( LeftOpeningMultiplier ),
-			RightOpeningMultiplier( RightOpeningMultiplier ),
-			FrontOpeningMultiplier( FrontOpeningMultiplier ),
-			SlatWidth( SlatWidth ),
-			SlatSpacing( SlatSpacing ),
-			SlatThickness( SlatThickness ),
-			SlatAngle( SlatAngle ),
-			SlatConductivity( SlatConductivity ),
-			SlatCurve( SlatCurve )
-		{}
-
 	};
 
 	struct WindowThermalModelParams
@@ -205,27 +202,6 @@ namespace DataComplexFenestration {
 			VacuumPressureLimit( 0.0 ),
 			InitialTemperature( 0.0 ),
 			InitialPressure( 0.0 )
-		{}
-
-		// Member Constructor
-		WindowThermalModelParams(
-			std::string const & Name, // Window thermal model name
-			int const CalculationStandard, // Tarcog calculation standard
-			int const ThermalModel, // Tarcog thermal model
-			Real64 const SDScalar, // SDScalar coefficient
-			int const DeflectionModel, // Deflection model
-			Real64 const VacuumPressureLimit, // Pressure limit at which it will be considered vacuum gas state
-			Real64 const InitialTemperature, // Window(s) temperature in time of fabrication
-			Real64 const InitialPressure // Window(s) pressure in time of fabrication
-		) :
-			Name( Name ),
-			CalculationStandard( CalculationStandard ),
-			ThermalModel( ThermalModel ),
-			SDScalar( SDScalar ),
-			DeflectionModel( DeflectionModel ),
-			VacuumPressureLimit( VacuumPressureLimit ),
-			InitialTemperature( InitialTemperature ),
-			InitialPressure( InitialPressure )
 		{}
 
 	};

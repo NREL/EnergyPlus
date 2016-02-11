@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -135,22 +135,6 @@ TEST_F( PrintTest, PrintLD_1E17 ) // Exact output is platform/compiler dependent
 #endif
 #endif
 }
-
-#ifndef __INTEL_COMPILER
-TEST_F( PrintTest, PrintLD_1E_Big )
-{
-	Print( "*" ) << 8.0e-309; // Intel C++ says this underflows
-#ifdef _MSC_VER // Overflow
-#if _MSC_VER < 1900
-	EXPECT_EQ( "  1.#INF00000000000E-309\n", buf.str() );
-#else
-	EXPECT_EQ( "                infE-309\n", buf.str() );
-#endif
-#else
-	EXPECT_EQ( "  8.000000000000000E-309\n", buf.str() );
-#endif
-}
-#endif
 
 TEST_F( PrintTest, PrintStringLiteralNestedToStream )
 {

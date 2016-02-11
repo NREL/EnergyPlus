@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -293,8 +293,11 @@ public: // Assignment: Array
 	operator =( Array1 const & a )
 	{
 		if ( this != &a ) {
-			if ( ! conformable( a ) ) dimension_assign( a.I_ );
-			Super::operator =( a );
+			if ( ( conformable( a ) ) || ( ! dimension_assign( a.I_ ) ) ) {
+				Super::operator =( a );
+			} else {
+				Super::initialize( a );
+			}
 		}
 		return *this;
 	}
@@ -304,8 +307,11 @@ public: // Assignment: Array
 	Array1 &
 	operator =( Array1< U > const & a )
 	{
-		if ( ! conformable( a ) ) dimension_assign( a.I_ );
-		Super::operator =( a );
+		if ( ( conformable( a ) ) || ( ! dimension_assign( a.I_ ) ) ) {
+			Super::operator =( a );
+		} else {
+			Super::initialize( a );
+		}
 		return *this;
 	}
 
@@ -313,19 +319,24 @@ public: // Assignment: Array
 	Array1 &
 	operator =( Array1S< T > const & a )
 	{
-		if ( ! conformable( a ) ) dimension_assign( a.I() );
 		size_type l( 0u );
-		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( a.size() );
-			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-				c[ l ] = a( i );
+		if ( ( conformable( a ) ) || ( ! dimension_assign( a.I() ) ) ) {
+			if ( overlap( a ) ) { // Overlap-safe
+				CArrayA< T > c( a.size() );
+				for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
+					c[ l ] = a( i );
+				}
+				for ( size_type i = 0; i < c.size(); ++i ) {
+					data_[ i ] = c[ i ];
+				}
+			} else { // Not overlap-safe
+				for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
+					data_[ l ] = a( i );
+				}
 			}
-			for ( size_type i = 0; i < c.size(); ++i ) {
-				data_[ i ] = c[ i ];
-			}
-		} else { // Not overlap-safe
+		} else {
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-				data_[ l ] = a( i );
+				new ( data_ + l ) T( a( i ) );
 			}
 		}
 		return *this;
@@ -336,10 +347,15 @@ public: // Assignment: Array
 	Array1 &
 	operator =( Array1S< U > const & a )
 	{
-		if ( ! conformable( a ) ) dimension_assign( a.I() );
 		size_type l( 0u );
-		for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-			data_[ l ] = a( i );
+		if ( ( conformable( a ) ) || ( ! dimension_assign( a.I() ) ) ) {
+			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
+				data_[ l ] = a( i );
+			}
+		} else {
+			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
+				new ( data_ + l ) T( a( i ) );
+			}
 		}
 		return *this;
 	}
@@ -349,10 +365,15 @@ public: // Assignment: Array
 	Array1 &
 	operator =( MArray1< A, M > const & a )
 	{
-		if ( ! conformable( a ) ) dimension_assign( a.I() );
 		size_type l( 0u );
-		for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-			data_[ l ] = a( i );
+		if ( ( conformable( a ) ) || ( ! dimension_assign( a.I() ) ) ) {
+			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
+				data_[ l ] = a( i );
+			}
+		} else {
+			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
+				new ( data_ + l ) T( a( i ) );
+			}
 		}
 		return *this;
 	}
@@ -458,7 +479,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		size_type l( 0u );
 		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( a.size() );
+			CArrayA< T > c( a.size() );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
 				c[ l ] = a( i );
 			}
@@ -480,7 +501,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		size_type l( 0u );
 		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( a.size() );
+			CArrayA< T > c( a.size() );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
 				c[ l ] = a( i );
 			}
@@ -502,7 +523,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		size_type l( 0u );
 		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( a.size() );
+			CArrayA< T > c( a.size() );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
 				c[ l ] = a( i );
 			}
@@ -524,7 +545,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		size_type l( 0u );
 		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( a.size() );
+			CArrayA< T > c( a.size() );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
 				assert( a( i ) != T( 0 ) );
 				c[ l ] = a( i );
@@ -892,7 +913,7 @@ public: // Assignment: Array: Logical
 		assert( conformable( a ) );
 		size_type l( 0u );
 		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( a.size() );
+			CArrayA< T > c( a.size() );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
 				c[ l ] = a( i );
 			}
@@ -914,7 +935,7 @@ public: // Assignment: Array: Logical
 		assert( conformable( a ) );
 		size_type l( 0u );
 		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( a.size() );
+			CArrayA< T > c( a.size() );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
 				c[ l ] = a( i );
 			}
@@ -1488,8 +1509,6 @@ public: // MArray Generators
 	{
 		return MArray1< Array1, M >( *this, pmem );
 	}
-
-#include <ObjexxFCL/Array1.Project.MArray.hh> // Inject project-specific MArray generators
 
 public: // Comparison: Predicate
 
@@ -2775,7 +2794,7 @@ protected: // Functions
 
 	// Dimension by IndexRange
 	virtual
-	void
+	bool
 	dimension_assign( IR const & I ) = 0;
 
 	// Clear on Move

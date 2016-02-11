@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef ConvectionCoefficients_hh_INCLUDED
 #define ConvectionCoefficients_hh_INCLUDED
 
@@ -159,23 +217,6 @@ namespace ConvectionCoefficients {
 			HcFnACHDivPerimLengthCurveNum( 0 )
 		{}
 
-		// Member Constructor
-		HcInsideFaceUserCurveStruct(
-			std::string const & Name, // user's name for object
-			int const ReferenceTempType,
-			int const HcFnTempDiffCurveNum,
-			int const HcFnTempDiffDivHeightCurveNum,
-			int const HcFnACHCurveNum,
-			int const HcFnACHDivPerimLengthCurveNum
-		) :
-			Name( Name ),
-			ReferenceTempType( ReferenceTempType ),
-			HcFnTempDiffCurveNum( HcFnTempDiffCurveNum ),
-			HcFnTempDiffDivHeightCurveNum( HcFnTempDiffDivHeightCurveNum ),
-			HcFnACHCurveNum( HcFnACHCurveNum ),
-			HcFnACHDivPerimLengthCurveNum( HcFnACHDivPerimLengthCurveNum )
-		{}
-
 	};
 
 	struct HcOutsideFaceUserCurveStruct
@@ -197,25 +238,6 @@ namespace ConvectionCoefficients {
 			HfFnWindSpeedCurveNum( 0 ),
 			HnFnTempDiffCurveNum( 0 ),
 			HnFnTempDiffDivHeightCurveNum( 0 )
-		{}
-
-		// Member Constructor
-		HcOutsideFaceUserCurveStruct(
-			std::string const & Name,
-			int const ReferenceTempType,
-			bool const SuppressRainChange,
-			int const WindSpeedType,
-			int const HfFnWindSpeedCurveNum,
-			int const HnFnTempDiffCurveNum,
-			int const HnFnTempDiffDivHeightCurveNum
-		) :
-			Name( Name ),
-			ReferenceTempType( ReferenceTempType ),
-			SuppressRainChange( SuppressRainChange ),
-			WindSpeedType( WindSpeedType ),
-			HfFnWindSpeedCurveNum( HfFnWindSpeedCurveNum ),
-			HnFnTempDiffCurveNum( HnFnTempDiffCurveNum ),
-			HnFnTempDiffDivHeightCurveNum( HnFnTempDiffDivHeightCurveNum )
 		{}
 
 	};
@@ -411,195 +433,6 @@ namespace ConvectionCoefficients {
 			MixedWindowsUserCurveNum( 0 )
 		{}
 
-		// Member Constructor
-		InsideFaceAdaptiveConvAlgoStruct(
-			bool const EnteredByUser,
-			std::string const & Name,
-			int const SimpleBouyVertWallEqNum, // InConvClass_A3_VertWalls
-			int const SimpleBouyVertWallUserCurveNum,
-			int const SimpleBouyStableHorizEqNum, // InConvClass_A3_StableHoriz
-			int const SimpleBouyStableHorizUserCurveNum,
-			int const SimpleBouyUnstableHorizEqNum, // InConvClass_A3_UnstableHoriz
-			int const SimpleBouyUnstableHorizUserCurveNum,
-			int const SimpleBouyStableTiltedEqNum, // InConvClass_A3_StableTilted
-			int const SimpleBouyStableTiltedUserCurveNum,
-			int const SimpleBouyUnstableTiltedEqNum, // InConvClass_A3_UnstableTilted
-			int const SimpleBouyUnstableTiltedUserCurveNum,
-			int const SimpleBouyWindowsEqNum, // InConvClass_A3_Windows
-			int const SimpleBouyWindowsUserCurveNum,
-			int const FloorHeatCeilingCoolVertWallEqNum, // InConvClass_A1_VertWalls
-			int const FloorHeatCeilingCoolVertWallUserCurveNum,
-			int const FloorHeatCeilingCoolStableHorizEqNum, // InConvClass_A1_StableHoriz
-			int const FloorHeatCeilingCoolStableHorizUserCurveNum,
-			int const FloorHeatCeilingCoolUnstableHorizEqNum, // InConvClass_A1_UntableHoriz
-			int const FloorHeatCeilingCoolUnstableHorizUserCurveNum,
-			int const FloorHeatCeilingCoolHeatedFloorEqNum, // InConvClass_A1_HeatedFloor
-			int const FloorHeatCeilingCoolHeatedFloorUserCurveNum,
-			int const FloorHeatCeilingCoolChilledCeilingEqNum, // InConvClass_A1_ChilledCeil
-			int const FloorHeatCeilingCoolChilledCeilingUserCurveNum,
-			int const FloorHeatCeilingCoolStableTiltedEqNum, // InConvClass_A1_StableTilted
-			int const FloorHeatCeilingCoolStableTiltedUserCurveNum,
-			int const FloorHeatCeilingCoolUnstableTiltedEqNum, // InConvClass_A1_UnstableTilted
-			int const FloorHeatCeilingCoolUnstableTiltedUserCurveNum,
-			int const FloorHeatCeilingCoolWindowsEqNum, // InConvClass_A1_Windows
-			int const FloorHeatCeilingCoolWindowsUserCurveNum,
-			int const WallPanelHeatVertWallEqNum, // InConvClass_A2_VertWallsNonHeated
-			int const WallPanelHeatVertWallUserCurveNum,
-			int const WallPanelHeatHeatedWallEqNum, // InConvClass_A2_HeatedVerticalWall
-			int const WallPanelHeatHeatedWallUserCurveNum,
-			int const WallPanelHeatStableHorizEqNum, // InConvClass_A2_StableHoriz
-			int const WallPanelHeatStableHorizUserCurveNum,
-			int const WallPanelHeatUnstableHorizEqNum, // InConvClass_A2_UnstableHoriz
-			int const WallPanelHeatUnstableHorizUserCurveNum,
-			int const WallPanelHeatStableTiltedEqNum, // InConvClass_A2_StableTilted
-			int const WallPanelHeatStableTiltedUserCurveNum,
-			int const WallPanelHeatUnstableTiltedEqNum, // InConvClass_A2_UnstableTilted
-			int const WallPanelHeatUnstableTiltedUserCurveNum,
-			int const WallPanelHeatWindowsEqNum, // InConvClass_A2_Windows
-			int const WallPanelHeatWindowsUserCurveNum,
-			int const ConvectiveHeatVertWallEqNum,
-			int const ConvectiveHeatVertWallUserCurveNum,
-			int const ConvectiveHeatVertWallNearHeaterEqNum,
-			int const ConvectiveHeatVertWallNearHeaterUserCurveNum,
-			int const ConvectiveHeatStableHorizEqNum,
-			int const ConvectiveHeatStableHorizUserCurveNum,
-			int const ConvectiveHeatUnstableHorizEqNum,
-			int const ConvectiveHeatUnstableHorizUserCurveNum,
-			int const ConvectiveHeatStableTiltedEqNum,
-			int const ConvectiveHeatStableTiltedUserCurveNum,
-			int const ConvectiveHeatUnstableTiltedEqNum,
-			int const ConvectiveHeatUnstableTiltedUserCurveNum,
-			int const ConvectiveHeatWindowsEqNum,
-			int const ConvectiveHeatWindowsUserCurveNum,
-			int const CentralAirWallEqNum,
-			int const CentralAirWallUserCurveNum,
-			int const CentralAirCeilingEqNum,
-			int const CentralAirCeilingUserCurveNum,
-			int const CentralAirFloorEqNum,
-			int const CentralAirFloorUserCurveNum,
-			int const CentralAirWindowsEqNum,
-			int const CentralAirWindowsUserCurveNum,
-			int const ZoneFanCircVertWallEqNum,
-			int const ZoneFanCircVertWallUserCurveNum,
-			int const ZoneFanCircStableHorizEqNum,
-			int const ZoneFanCircStableHorizUserCurveNum,
-			int const ZoneFanCircUnstableHorizEqNum,
-			int const ZoneFanCircUnstableHorizUserCurveNum,
-			int const ZoneFanCircStableTiltedEqNum,
-			int const ZoneFanCircStableTiltedUserCurveNum,
-			int const ZoneFanCircUnstableTiltedEqNum,
-			int const ZoneFanCircUnstableTiltedUserCurveNum,
-			int const ZoneFanCircWindowsEqNum,
-			int const ZoneFanCircWindowsUserCurveNum,
-			int const MixedBouyAssistingFlowWallEqNum,
-			int const MixedBouyAssistingFlowWallUserCurveNum,
-			int const MixedBouyOppossingFlowWallEqNum,
-			int const MixedBouyOppossingFlowWallUserCurveNum,
-			int const MixedStableFloorEqNum,
-			int const MixedStableFloorUserCurveNum,
-			int const MixedUnstableFloorEqNum,
-			int const MixedUnstableFloorUserCurveNum,
-			int const MixedStableCeilingEqNum,
-			int const MixedStableCeilingUserCurveNum,
-			int const MixedUnstableCeilingEqNum,
-			int const MixedUnstableCeilingUserCurveNum,
-			int const MixedWindowsEqNum,
-			int const MixedWindowsUserCurveNum
-		) :
-			EnteredByUser( EnteredByUser ),
-			Name( Name ),
-			SimpleBouyVertWallEqNum( SimpleBouyVertWallEqNum ),
-			SimpleBouyVertWallUserCurveNum( SimpleBouyVertWallUserCurveNum ),
-			SimpleBouyStableHorizEqNum( SimpleBouyStableHorizEqNum ),
-			SimpleBouyStableHorizUserCurveNum( SimpleBouyStableHorizUserCurveNum ),
-			SimpleBouyUnstableHorizEqNum( SimpleBouyUnstableHorizEqNum ),
-			SimpleBouyUnstableHorizUserCurveNum( SimpleBouyUnstableHorizUserCurveNum ),
-			SimpleBouyStableTiltedEqNum( SimpleBouyStableTiltedEqNum ),
-			SimpleBouyStableTiltedUserCurveNum( SimpleBouyStableTiltedUserCurveNum ),
-			SimpleBouyUnstableTiltedEqNum( SimpleBouyUnstableTiltedEqNum ),
-			SimpleBouyUnstableTiltedUserCurveNum( SimpleBouyUnstableTiltedUserCurveNum ),
-			SimpleBouyWindowsEqNum( SimpleBouyWindowsEqNum ),
-			SimpleBouyWindowsUserCurveNum( SimpleBouyWindowsUserCurveNum ),
-			FloorHeatCeilingCoolVertWallEqNum( FloorHeatCeilingCoolVertWallEqNum ),
-			FloorHeatCeilingCoolVertWallUserCurveNum( FloorHeatCeilingCoolVertWallUserCurveNum ),
-			FloorHeatCeilingCoolStableHorizEqNum( FloorHeatCeilingCoolStableHorizEqNum ),
-			FloorHeatCeilingCoolStableHorizUserCurveNum( FloorHeatCeilingCoolStableHorizUserCurveNum ),
-			FloorHeatCeilingCoolUnstableHorizEqNum( FloorHeatCeilingCoolUnstableHorizEqNum ),
-			FloorHeatCeilingCoolUnstableHorizUserCurveNum( FloorHeatCeilingCoolUnstableHorizUserCurveNum ),
-			FloorHeatCeilingCoolHeatedFloorEqNum( FloorHeatCeilingCoolHeatedFloorEqNum ),
-			FloorHeatCeilingCoolHeatedFloorUserCurveNum( FloorHeatCeilingCoolHeatedFloorUserCurveNum ),
-			FloorHeatCeilingCoolChilledCeilingEqNum( FloorHeatCeilingCoolChilledCeilingEqNum ),
-			FloorHeatCeilingCoolChilledCeilingUserCurveNum( FloorHeatCeilingCoolChilledCeilingUserCurveNum ),
-			FloorHeatCeilingCoolStableTiltedEqNum( FloorHeatCeilingCoolStableTiltedEqNum ),
-			FloorHeatCeilingCoolStableTiltedUserCurveNum( FloorHeatCeilingCoolStableTiltedUserCurveNum ),
-			FloorHeatCeilingCoolUnstableTiltedEqNum( FloorHeatCeilingCoolUnstableTiltedEqNum ),
-			FloorHeatCeilingCoolUnstableTiltedUserCurveNum( FloorHeatCeilingCoolUnstableTiltedUserCurveNum ),
-			FloorHeatCeilingCoolWindowsEqNum( FloorHeatCeilingCoolWindowsEqNum ),
-			FloorHeatCeilingCoolWindowsUserCurveNum( FloorHeatCeilingCoolWindowsUserCurveNum ),
-			WallPanelHeatVertWallEqNum( WallPanelHeatVertWallEqNum ),
-			WallPanelHeatVertWallUserCurveNum( WallPanelHeatVertWallUserCurveNum ),
-			WallPanelHeatHeatedWallEqNum( WallPanelHeatHeatedWallEqNum ),
-			WallPanelHeatHeatedWallUserCurveNum( WallPanelHeatHeatedWallUserCurveNum ),
-			WallPanelHeatStableHorizEqNum( WallPanelHeatStableHorizEqNum ),
-			WallPanelHeatStableHorizUserCurveNum( WallPanelHeatStableHorizUserCurveNum ),
-			WallPanelHeatUnstableHorizEqNum( WallPanelHeatUnstableHorizEqNum ),
-			WallPanelHeatUnstableHorizUserCurveNum( WallPanelHeatUnstableHorizUserCurveNum ),
-			WallPanelHeatStableTiltedEqNum( WallPanelHeatStableTiltedEqNum ),
-			WallPanelHeatStableTiltedUserCurveNum( WallPanelHeatStableTiltedUserCurveNum ),
-			WallPanelHeatUnstableTiltedEqNum( WallPanelHeatUnstableTiltedEqNum ),
-			WallPanelHeatUnstableTiltedUserCurveNum( WallPanelHeatUnstableTiltedUserCurveNum ),
-			WallPanelHeatWindowsEqNum( WallPanelHeatWindowsEqNum ),
-			WallPanelHeatWindowsUserCurveNum( WallPanelHeatWindowsUserCurveNum ),
-			ConvectiveHeatVertWallEqNum( ConvectiveHeatVertWallEqNum ),
-			ConvectiveHeatVertWallUserCurveNum( ConvectiveHeatVertWallUserCurveNum ),
-			ConvectiveHeatVertWallNearHeaterEqNum( ConvectiveHeatVertWallNearHeaterEqNum ),
-			ConvectiveHeatVertWallNearHeaterUserCurveNum( ConvectiveHeatVertWallNearHeaterUserCurveNum ),
-			ConvectiveHeatStableHorizEqNum( ConvectiveHeatStableHorizEqNum ),
-			ConvectiveHeatStableHorizUserCurveNum( ConvectiveHeatStableHorizUserCurveNum ),
-			ConvectiveHeatUnstableHorizEqNum( ConvectiveHeatUnstableHorizEqNum ),
-			ConvectiveHeatUnstableHorizUserCurveNum( ConvectiveHeatUnstableHorizUserCurveNum ),
-			ConvectiveHeatStableTiltedEqNum( ConvectiveHeatStableTiltedEqNum ),
-			ConvectiveHeatStableTiltedUserCurveNum( ConvectiveHeatStableTiltedUserCurveNum ),
-			ConvectiveHeatUnstableTiltedEqNum( ConvectiveHeatUnstableTiltedEqNum ),
-			ConvectiveHeatUnstableTiltedUserCurveNum( ConvectiveHeatUnstableTiltedUserCurveNum ),
-			ConvectiveHeatWindowsEqNum( ConvectiveHeatWindowsEqNum ),
-			ConvectiveHeatWindowsUserCurveNum( ConvectiveHeatWindowsUserCurveNum ),
-			CentralAirWallEqNum( CentralAirWallEqNum ),
-			CentralAirWallUserCurveNum( CentralAirWallUserCurveNum ),
-			CentralAirCeilingEqNum( CentralAirCeilingEqNum ),
-			CentralAirCeilingUserCurveNum( CentralAirCeilingUserCurveNum ),
-			CentralAirFloorEqNum( CentralAirFloorEqNum ),
-			CentralAirFloorUserCurveNum( CentralAirFloorUserCurveNum ),
-			CentralAirWindowsEqNum( CentralAirWindowsEqNum ),
-			CentralAirWindowsUserCurveNum( CentralAirWindowsUserCurveNum ),
-			ZoneFanCircVertWallEqNum( ZoneFanCircVertWallEqNum ),
-			ZoneFanCircVertWallUserCurveNum( ZoneFanCircVertWallUserCurveNum ),
-			ZoneFanCircStableHorizEqNum( ZoneFanCircStableHorizEqNum ),
-			ZoneFanCircStableHorizUserCurveNum( ZoneFanCircStableHorizUserCurveNum ),
-			ZoneFanCircUnstableHorizEqNum( ZoneFanCircUnstableHorizEqNum ),
-			ZoneFanCircUnstableHorizUserCurveNum( ZoneFanCircUnstableHorizUserCurveNum ),
-			ZoneFanCircStableTiltedEqNum( ZoneFanCircStableTiltedEqNum ),
-			ZoneFanCircStableTiltedUserCurveNum( ZoneFanCircStableTiltedUserCurveNum ),
-			ZoneFanCircUnstableTiltedEqNum( ZoneFanCircUnstableTiltedEqNum ),
-			ZoneFanCircUnstableTiltedUserCurveNum( ZoneFanCircUnstableTiltedUserCurveNum ),
-			ZoneFanCircWindowsEqNum( ZoneFanCircWindowsEqNum ),
-			ZoneFanCircWindowsUserCurveNum( ZoneFanCircWindowsUserCurveNum ),
-			MixedBouyAssistingFlowWallEqNum( MixedBouyAssistingFlowWallEqNum ),
-			MixedBouyAssistingFlowWallUserCurveNum( MixedBouyAssistingFlowWallUserCurveNum ),
-			MixedBouyOppossingFlowWallEqNum( MixedBouyOppossingFlowWallEqNum ),
-			MixedBouyOppossingFlowWallUserCurveNum( MixedBouyOppossingFlowWallUserCurveNum ),
-			MixedStableFloorEqNum( MixedStableFloorEqNum ),
-			MixedStableFloorUserCurveNum( MixedStableFloorUserCurveNum ),
-			MixedUnstableFloorEqNum( MixedUnstableFloorEqNum ),
-			MixedUnstableFloorUserCurveNum( MixedUnstableFloorUserCurveNum ),
-			MixedStableCeilingEqNum( MixedStableCeilingEqNum ),
-			MixedStableCeilingUserCurveNum( MixedStableCeilingUserCurveNum ),
-			MixedUnstableCeilingEqNum( MixedUnstableCeilingEqNum ),
-			MixedUnstableCeilingUserCurveNum( MixedUnstableCeilingUserCurveNum ),
-			MixedWindowsEqNum( MixedWindowsEqNum ),
-			MixedWindowsUserCurveNum( MixedWindowsUserCurveNum )
-		{}
-
 	};
 
 	struct OutsideFaceAdpativeConvAlgoStruct
@@ -639,41 +472,6 @@ namespace ConvectionCoefficients {
 			HNatUstableHorizUserCurveNum( 0 )
 		{}
 
-		// Member Constructor
-		OutsideFaceAdpativeConvAlgoStruct(
-			bool const EnteredByUser,
-			std::string const & Name,
-			bool const SuppressRainChange,
-			int const HWindWallWindwardEqNum,
-			int const HWindWallWindwardUserCurveNum,
-			int const HWindWallLeewardEqNum,
-			int const HWindWallLeewardUserCurveNum,
-			int const HWindHorizRoofEqNum,
-			int const HWindHorizRoofUserCurveNum,
-			int const HNatVertWallEqNum,
-			int const HNatVertWallUserCurveNum,
-			int const HNatStableHorizEqNum,
-			int const HNatStableHorizUserCurveNum,
-			int const HNatUnstableHorizEqNum,
-			int const HNatUstableHorizUserCurveNum
-		) :
-			EnteredByUser( EnteredByUser ),
-			Name( Name ),
-			SuppressRainChange( SuppressRainChange ),
-			HWindWallWindwardEqNum( HWindWallWindwardEqNum ),
-			HWindWallWindwardUserCurveNum( HWindWallWindwardUserCurveNum ),
-			HWindWallLeewardEqNum( HWindWallLeewardEqNum ),
-			HWindWallLeewardUserCurveNum( HWindWallLeewardUserCurveNum ),
-			HWindHorizRoofEqNum( HWindHorizRoofEqNum ),
-			HWindHorizRoofUserCurveNum( HWindHorizRoofUserCurveNum ),
-			HNatVertWallEqNum( HNatVertWallEqNum ),
-			HNatVertWallUserCurveNum( HNatVertWallUserCurveNum ),
-			HNatStableHorizEqNum( HNatStableHorizEqNum ),
-			HNatStableHorizUserCurveNum( HNatStableHorizUserCurveNum ),
-			HNatUnstableHorizEqNum( HNatUnstableHorizEqNum ),
-			HNatUstableHorizUserCurveNum( HNatUstableHorizUserCurveNum )
-		{}
-
 	};
 
 	struct BoundingBoxVertStruct
@@ -688,17 +486,6 @@ namespace ConvectionCoefficients {
 			SurfNum( 0 ),
 			VertNum( 0 ),
 			Vertex( 0.0, 0.0, 0.0 )
-		{}
-
-		// Member Constructor
-		BoundingBoxVertStruct(
-			int const SurfNum,
-			int const VertNum,
-			Vector const & Vertex
-		) :
-			SurfNum( SurfNum ),
-			VertNum( VertNum ),
-			Vertex( Vertex )
 		{}
 
 	};
@@ -725,35 +512,6 @@ namespace ConvectionCoefficients {
 			Area( 0.0 ),
 			Perimeter( 0.0 ),
 			Height( 0.0 )
-		{}
-
-		// Member Constructor
-		RoofGeoCharactisticsStruct(
-			BoundingBoxVertStruct const & XdYdZd, // 1 low x, low y, low z
-			BoundingBoxVertStruct const & XdYdZu, // 2 low x, low y, hi z
-			BoundingBoxVertStruct const & XdYuZd, // 3 low x, hi y, low z
-			BoundingBoxVertStruct const & XdYuZu, // 4 low x, hi y, hi z
-			BoundingBoxVertStruct const & XuYdZd, // 5 hi x, low y, low z
-			BoundingBoxVertStruct const & XuYuZd, // 6 hi x, hi y, low z
-			BoundingBoxVertStruct const & XuYdZu, // 7 hi x, low y, hi z
-			BoundingBoxVertStruct const & XuYuZu, // 8 hi x, hi y, hi z
-			Array1< Vector > const & BoundSurf, // long edge of roof group bounding surface
-			Real64 const Area,
-			Real64 const Perimeter,
-			Real64 const Height
-		) :
-			XdYdZd( XdYdZd ),
-			XdYdZu( XdYdZu ),
-			XdYuZd( XdYuZd ),
-			XdYuZu( XdYuZu ),
-			XuYdZd( XuYdZd ),
-			XuYuZd( XuYuZd ),
-			XuYdZu( XuYdZu ),
-			XuYuZu( XuYuZu ),
-			BoundSurf( 4, BoundSurf ),
-			Area( Area ),
-			Perimeter( Perimeter ),
-			Height( Height )
 		{}
 
 	};
@@ -1211,29 +969,6 @@ namespace ConvectionCoefficients {
 		Real64 const RoofArea,
 		Real64 const RoofPerimeter
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ConvectionCoefficients
 

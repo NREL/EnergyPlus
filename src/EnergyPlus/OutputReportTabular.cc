@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -10,6 +68,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
@@ -1115,17 +1174,21 @@ namespace OutputReportTabular {
 		MonthlyTables.allocate( MonthlyTablesCount );
 		MonthlyColumns.allocate( MonthlyColumnsCount );
 		// Initialize tables and results
-		MonthlyTables.keyValue() = "";
-		MonthlyTables.firstColumn() = 0;
-		MonthlyTables.numColumns() = 0;
+		for ( auto & e : MonthlyTables ) {
+			e.keyValue.clear();
+			e.firstColumn = 0;
+			e.numColumns = 0;
+		}
 
-		MonthlyColumns.varName() = "";
-		MonthlyColumns.varNum() = 0;
-		MonthlyColumns.typeOfVar() = 0;
-		MonthlyColumns.avgSum() = 0;
-		MonthlyColumns.stepType() = 0;
-		MonthlyColumns.units() = "";
-		MonthlyColumns.aggType() = 0;
+		for ( auto & e : MonthlyColumns ) {
+			e.varName.clear();
+			e.varNum = 0;
+			e.typeOfVar = 0;
+			e.avgSum = 0;
+			e.stepType = 0;
+			e.units.clear();
+			e.aggType = 0;
+		}
 		for ( colNum = 1; colNum <= MonthlyColumnsCount; ++colNum ) {
 			MonthlyColumns( colNum ).reslt = 0.0;
 			MonthlyColumns( colNum ).timeStamp = 0;
@@ -1522,20 +1585,27 @@ namespace OutputReportTabular {
 			}
 		}
 		// clear the binning arrays to zeros
-		BinResults.mnth() = 0.0;
-		BinResultsBelow.mnth() = 0.0;
-		BinResultsAbove.mnth() = 0.0;
-		BinResults.hrly() = 0.0;
-		BinResultsBelow.hrly() = 0.0;
-		BinResultsAbove.hrly() = 0.0;
+		for ( auto & e : BinResults ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsBelow ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsAbove ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
 
 		// initialize statistics counters
-		BinStatistics.minimum() = huge( bigVal );
-		BinStatistics.maximum() = -huge( bigVal );
-		BinStatistics.n() = 0;
-		BinStatistics.sum() = 0.0;
-		BinStatistics.sum2() = 0.0;
-
+		for ( auto & e : BinStatistics ) {
+			e.minimum = huge( bigVal );
+			e.maximum = -huge( bigVal );
+			e.n = 0;
+			e.sum = 0.0;
+			e.sum2 = 0.0;
+		}
 	}
 
 	bool
@@ -3785,17 +3855,28 @@ namespace OutputReportTabular {
 
 		if ( ! DoWeathSim ) return;
 
-		//create temporary arrays to speed processing of these arrays
+		// create temporary arrays to speed processing of these arrays
 		if ( GatherMonthlyResultsForTimestepRunOnce ) {
-			//MonthlyColumns
-			MonthlyColumnsTypeOfVar = MonthlyColumns.typeOfVar();
-			MonthlyColumnsStepType = MonthlyColumns.stepType();
-			MonthlyColumnsAggType = MonthlyColumns.aggType();
-			MonthlyColumnsVarNum = MonthlyColumns.varNum();
-			//MonthlyTables
-			MonthlyTablesNumColumns = MonthlyTables.numColumns();
+			// MonthlyColumns
+			MonthlyColumnsTypeOfVar.allocate( MonthlyColumns.I() );
+			MonthlyColumnsStepType.allocate( MonthlyColumns.I() );
+			MonthlyColumnsAggType.allocate( MonthlyColumns.I() );
+			MonthlyColumnsVarNum.allocate( MonthlyColumns.I() );
+			for ( int i = MonthlyColumns.l(), e = MonthlyColumns.u(); i <= e; ++i ) {
+				auto const & col( MonthlyColumns( i ) );
+				MonthlyColumnsTypeOfVar( i ) = col.typeOfVar;
+				MonthlyColumnsStepType( i ) = col.stepType;
+				MonthlyColumnsAggType( i ) = col.aggType;
+				MonthlyColumnsVarNum( i ) = col.varNum;
+			}
 
-			//set flag so this block is only executed once
+			// MonthlyTables
+			MonthlyTablesNumColumns.allocate( MonthlyTables.I() );
+			for ( int i = MonthlyTables.l(), e = MonthlyTables.u(); i <= e; ++i ) {
+				MonthlyTablesNumColumns( i ) = MonthlyTables( i ).numColumns;
+			}
+
+			// set flag so this block is only executed once
 			GatherMonthlyResultsForTimestepRunOnce = false;
 		}
 
@@ -5697,7 +5778,6 @@ namespace OutputReportTabular {
 		//   na
 
 		// Return value
-		std::string resultString; // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5712,36 +5792,25 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string::size_type startPos = 0;
 
-		std::string procIn; // processed input string
-		std::string::size_type startTab;
-		std::string::size_type endTab;
-		std::string::size_type inLen;
+		auto endPos = inString.find_first_of( tb );
+		if ( colNum == 1 ) {
+			if ( endPos == std::string::npos ) return inString;
+			return inString.substr( startPos, endPos - startPos );
+		}
+		if ( endPos == std::string::npos ) return "";
 
-		procIn = inString;
-		inLen = len( procIn );
-		startTab = std::string::npos;
-		endTab = index( procIn, tb );
-		if ( endTab != std::string::npos ) {
-			procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-		} else {
-			endTab = inLen; // one character past the end of string since substract one when extracting
+		int numCols = 1;
+		while ( numCols < colNum ) {
+			startPos = endPos + 1;
+			endPos = inString.find_first_of( tb, startPos );
+			++numCols;
+			if ( endPos == std::string::npos ) break;
 		}
-		for ( int i = 2; i <= colNum; ++i ) { // already have first column identified so do loop only if for column 2 or greater.
-			startTab = endTab;
-			endTab = index( procIn, tb );
-			if ( endTab != std::string::npos ) {
-				procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-			} else {
-				endTab = inLen; // one character past the end of string since substract one when extracting
-			}
-		}
-		if ( startTab < endTab ) {
-			resultString = procIn.substr( startTab + 1, endTab - startTab - 1 ); // extract but leave tab characters out
-		} else {
-			resultString = "";
-		}
-		return resultString;
+		if ( colNum > numCols ) return "";
+		if ( endPos == std::string::npos ) endPos = inString.size();
+		return inString.substr( startPos, endPos - startPos );
 	}
 
 	void
@@ -6808,6 +6877,7 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
+		using DataWater::StorageTankDataStruct;
 		using ManageElectricPower::NumElecStorageDevices;
 		using DataHVACGlobals::deviationFromSetPtThresholdHtg;
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
@@ -6877,7 +6947,6 @@ namespace OutputReportTabular {
 		std::string curNameWithSIUnits;
 		std::string curNameAndUnits;
 		int indexUnitConv;
-		std::string tableString;
 		Real64 processFraction;
 		Real64 processElecCost;
 		Real64 processGasCost;
@@ -6996,7 +7065,7 @@ namespace OutputReportTabular {
 			// get change in overall state of charge for electrical storage devices.
 			if ( NumElecStorageDevices > 0 ) {
 				// All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not necessary
-				// OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored( ) ) - sum( ElecStorage.ThisTimeStepStateOfCharge( ) ) ) + gatherElecStorage;
+				// OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
 				OverallNetEnergyFromStorage = gatherElecStorage;
 				OverallNetEnergyFromStorage /= largeConversionFactor;
 			} else {
@@ -8069,8 +8138,8 @@ namespace OutputReportTabular {
 			tableBody( 1, 4 ) = RealToStr( totalOnsiteWater / waterConversionFactor, 2 );
 
 			if ( allocated( WaterStorage ) ) {
-				initialStorage = sum( WaterStorage.InitialVolume() );
-				finalStorage = sum( WaterStorage.ThisTimeStepVolume() );
+				initialStorage = sum( WaterStorage, &StorageTankDataStruct::InitialVolume );
+				finalStorage = sum( WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume );
 				StorageChange = initialStorage - finalStorage;
 			} else {
 				initialStorage = 0.0;
@@ -8252,8 +8321,6 @@ namespace OutputReportTabular {
 		Real64 largeConversionFactor;
 		Real64 areaConversionFactor;
 		Real64 convBldgCondFloorArea;
-		std::string curNameWithSIUnits;
-		std::string curNameAndUnits;
 
 		if ( displaySourceEnergyEndUseSummary ) {
 			// show the headers of the report
@@ -9249,6 +9316,7 @@ namespace OutputReportTabular {
 		using DataEnvironment::RunPeriodStartDayOfWeek;
 		using DataEnvironment::WeatherFileLocationTitle;
 		using DataHeatBalance::Zone;
+		using DataHeatBalance::ZoneData;
 		using DataHeatBalance::BuildingAzimuth;
 		using DataHeatBalance::TotLights;
 		using DataHeatBalance::Lights;
@@ -9761,8 +9829,10 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 			}
 
-			if ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) > 0.0 || sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) > 0.0 ) {
-				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
+			Real64 const totExtGrossWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossWallArea_Multiplied ) );
+			Real64 const totExtGrossGroundWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied ) );
+			if ( totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0 ) {
+				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied ) ) / ( totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied );
 				if ( pdiff > 0.019 ) {
 					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls" );
 					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100.0, 1 ) + "% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions." );
@@ -9772,8 +9842,8 @@ namespace OutputReportTabular {
 					//         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
 					ShowContinueError( "Check classes of surfaces and tilts for discrepancies." );
 					ShowContinueError( "Total wall area by ASHRAE 90.1 definition=" + stripped( RealToStr( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ), 3 ) ) + " m2." );
-					ShowContinueError( "Total exterior wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ), 3 ) ) + " m2." );
-					ShowContinueError( "Total ground contact wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ), 3 ) ) + " m2." );
+					ShowContinueError( "Total exterior wall area from user entered classes=" + stripped( RealToStr( totExtGrossWallArea_Multiplied, 3 ) ) + " m2." );
+					ShowContinueError( "Total ground contact wall area from user entered classes=" + stripped( RealToStr( totExtGrossGroundWallArea_Multiplied, 3 ) ) + " m2." );
 				}
 			}
 			//---- Space Summary Sub-Table
@@ -10366,7 +10436,7 @@ namespace OutputReportTabular {
 				}
 				if ( foundEntry == 0 ) break; //leave main loop - all items put into tables
 				//clear active items
-				CompSizeTableEntry.active() = false;
+				for ( auto & e : CompSizeTableEntry ) e.active = false;
 				//make an unwritten item that is of the same type active - these will be the
 				//entries for the particular subtable.
 				for ( iTableEntry = 1; iTableEntry <= numCompSizeTableEntry; ++iTableEntry ) {
@@ -10814,7 +10884,7 @@ namespace OutputReportTabular {
 			//  feneSolarInstantSeq = 0.0d0
 			feneSolarRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			feneSolarRadSeq = 0.0;
-			feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+			feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			feneSolarDelaySeq = 0.0;
 			surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			surfDelaySeq = 0.0;
@@ -11440,7 +11510,6 @@ namespace OutputReportTabular {
 		Real64 totalGrandTotal;
 		Real64 powerConversion;
 		int tempConvIndx; // temperature conversion index
-		std::string stringWithTemp;
 		int curExtBoundCond;
 		Real64 mult; // zone multiplier
 
@@ -12144,12 +12213,12 @@ namespace OutputReportTabular {
 
 					//DOAS
 					tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
-					grandTotalRow( cSensDelay ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+					totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+					grandTotalRow( cSensDelay ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
 
 					tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
-					grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+					totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+					grandTotalRow( cLatent ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
 
 					//INFILTRATION
 					seqData = infilInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
@@ -13184,6 +13253,29 @@ namespace OutputReportTabular {
 	}
 
 	std::string
+	ConvertUnicodeToUTF8( unsigned long const codepoint )
+	{
+		// Taken from http://stackoverflow.com/a/19968992/2358662 and http://stackoverflow.com/a/148766/2358662
+		std::string s;
+		if ( codepoint <= 0x7f ) {
+			s.push_back( static_cast<char>( codepoint ) );
+		} else if ( codepoint <= 0x7ff ) {
+			s.push_back( static_cast<char>( 0xc0 | ( ( codepoint >> 6 ) & 0x1f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( codepoint & 0x3f ) ) );
+		} else if ( codepoint <= 0xffff ) {
+			s.push_back( static_cast<char>( 0xe0 | ( ( codepoint >> 12 ) & 0x0f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( ( codepoint >> 6 ) & 0x3f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( codepoint & 0x3f ) ) );
+		} else if ( codepoint <= 0x10ffff ) {
+			s.push_back( static_cast<char>( 0xf0 | ( ( codepoint >> 18 ) & 0x07 ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( ( codepoint >> 12 ) & 0x3f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( ( codepoint >> 6 ) & 0x3f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( codepoint & 0x3f ) ) );
+		}
+		return s;
+	}
+
+	std::string
 	ConvertToEscaped( std::string const & inString ) // Input String
 	{
 		// SUBROUTINE INFORMATION:
@@ -13197,46 +13289,74 @@ namespace OutputReportTabular {
 		//   so it excludes:
 		//               " ' < > &
 
-		// METHODOLOGY EMPLOYED:
-		//   na
+		if ( inString.empty() ) return "";
 
-		// Return value
-		std::string outString; // Result String
+		std::string s;
+		auto const inputSize = inString.size();
+		s.reserve( inputSize );
+		size_t index( 0 );
+		char c;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		for ( std::string::size_type iIn = 0; iIn < len( inString ); ++iIn ) {
-			char const c( inString[ iIn ] );
-			int const curCharVal = int( c );
-			if ( curCharVal == 34 ) { //  "
-				outString += "&quot;";
-			} else if ( curCharVal == 38 ) { //   &
-				outString += "&amp;";
-			} else if ( curCharVal == 39 ) { //   '
-				outString += "&apos;";
-			} else if ( curCharVal == 60 ) { //   <
-				outString += "&lt;";
-			} else if ( curCharVal == 62 ) { //   >
-				outString += "&gt;";
-			} else if ( curCharVal == 176 ) { //   degree
-				outString += '*'; // replace degree symbol with asterisk to avoid errors from various XML editors
-			} else { // most characters are fine
-				outString += c;
+		while ( true ) {
+			if ( index == inputSize ) break;
+			c = inString[ index++ ];
+			if ( c == '\"' ) {
+				s += "&quot;";
+			} else if ( c == '&' ) {
+				s += "&amp;";
+			} else if ( c == '\'' ) {
+				s += "&apos;";
+			} else if ( c == '<' ) {
+				s += "&lt;";
+			} else if ( c == '>' ) {
+				s += "&gt;";
+			} else if ( c == char( 176 ) ) {
+				s += "&deg;";
+			} else if ( c == '\xC2' ) {
+				if ( index == inputSize ) {
+					s += '\xC2';
+				} else {
+					c = inString[ index++ ];
+					if ( c == '\xB0' ) {
+						s += "&deg;";
+					} else {
+						s += '\xC2';
+						s += c;
+					}
+				}
+			} else if ( c == '\xB0' ) {
+				s += "&deg;";
+			} else if ( c == '\\' ) {
+				if ( index == inputSize ) break;
+				c = inString[ index++ ];
+				if ( c == '"' ) {
+					s += "&quot;";
+				} else if ( c == '\'' ) {
+					s += "&apos;";
+				} else if ( c == 'u' || c == 'x' ) {
+					int remainingLen = inputSize - index;
+					unsigned long codePoint( 0 );
+					if ( c == 'u' && remainingLen > 3 ) {
+						codePoint = std::stoul( inString.substr( index, 4 ), nullptr, 16 );
+						index += 4;
+					} else if ( c == 'x' && remainingLen > 1 ) {
+						codePoint = std::stoul( inString.substr( index, 2 ), nullptr, 16 );
+						index += 2;
+					}
+					auto const unicodeString = ConvertUnicodeToUTF8( codePoint );
+					if ( unicodeString == "\xC2\xB0" ) { // only check for degree at this point
+						s += "&deg;";
+					} else {
+						s += unicodeString;
+					}
+				} else {
+					s += c;
+				}
+			} else {
+				s += c;
 			}
 		}
-		return outString;
+		return s;
 	}
 
 	void
@@ -13385,19 +13505,27 @@ namespace OutputReportTabular {
 		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
 		// clear the binning arrays to zeros
-		BinResults.mnth() = 0.0;
-		BinResultsBelow.mnth() = 0.0;
-		BinResultsAbove.mnth() = 0.0;
-		BinResults.hrly() = 0.0;
-		BinResultsBelow.hrly() = 0.0;
-		BinResultsAbove.hrly() = 0.0;
+		for ( auto & e : BinResults ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsBelow ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsAbove ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
 
 		// re-initialize statistics counters
-		BinStatistics.minimum() = huge( bigVal );
-		BinStatistics.maximum() = -huge( bigVal );
-		BinStatistics.n() = 0;
-		BinStatistics.sum() = 0.0;
-		BinStatistics.sum2() = 0.0;
+		for ( auto & e : BinStatistics ) {
+			e.minimum = huge( bigVal );
+			e.maximum = -huge( bigVal );
+			e.n = 0;
+			e.sum = 0.0;
+			e.sum2 = 0.0;
+		}
 	}
 
 	void
@@ -14911,29 +15039,6 @@ Label900: ;
 		}
 		return getSpecificUnitIndex;
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutputReportTabular
 
