@@ -52153,8 +52153,8 @@ UnitarySystemPerformance:Multispeed,
        \key No
        \default No
        \note Controls coil operation during each HVAC timestep. 
-       \note This choice does not apply to spped 1 opeation.
-       \note Yes = operate at the higher speed possible without exceeding the current load.
+       \note This choice does not apply to speed 1 operation.
+       \note Yes = operate at the highest speed possible without exceeding the current load.
        \note No = allow operation at the average of two adjacent speeds to match the current load.
   N3 , \field Heating Speed 1 Supply Air Flow Ratio
        \required-field
