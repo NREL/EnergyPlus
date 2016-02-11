@@ -61653,12 +61653,8 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
-            \object-list UniVariateTables
+            \object-list BiquadraticCurves
+            \object-list BiVariateTables
   A9   ,  \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the fuel input to the chiller at full load as
             \note it varies by temperature.  The curve is normalized so that at design conditions the
@@ -61666,23 +61662,15 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
-            \object-list UniVariateTables
+            \object-list BiquadraticCurves
+            \object-list BiVariateTables
   A10  ,  \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the fuel input to the chiller as the load on
             \note the chiller varies but the operating temperatures remain at the design values.
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A11  ,  \field Electric Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the electricity to the chiller at full load as
@@ -61691,23 +61679,15 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
-            \object-list UniVariateTables
+            \object-list BiquadraticCurves
+            \object-list BiVariateTables
   A12  ,  \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the electricity to the chiller as the load on
             \note the chiller varies but the operating temperatures remain at the design values.
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A13  ,  \field Heating Capacity Function of Cooling Capacity Curve Name
             \note The curve represents how the heating capacity of the chiller varies with cooling
@@ -61716,11 +61696,7 @@ ChillerHeater:Absorption:DirectFired,
             \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A14  ,  \field Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
             \note When the chiller is operating as only a heater, this curve is used to represent the
@@ -61728,11 +61704,7 @@ ChillerHeater:Absorption:DirectFired,
             \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
             \note will probably be similar to a boiler curve for most chillers.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A15  ,  \field Temperature Curve Input Variable
             \type choice
@@ -61893,12 +61865,8 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
-       \object-list UniVariateTables
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
   A9 , \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the fuel input to the chiller at full load as
        \note it varies by temperature.  The curve is normalized so that at design conditions the
@@ -61906,23 +61874,15 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
-       \object-list UniVariateTables
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
   A10, \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the fuel input to the chiller as the load on
        \note the chiller varies but the operating temperatures remain at the design values.
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A11, \field Electric Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the electricity to the chiller at full load as
@@ -61931,23 +61891,15 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
-       \object-list UniVariateTables
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
   A12, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the electricity to the chiller as the load on
        \note the chiller varies but the operating temperatures remain at the design values.
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A13, \field Heating Capacity Function of Cooling Capacity Curve Name
        \note The curve represents how the heating capacity of the chiller varies with cooling
@@ -61956,11 +61908,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A14, \field Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
        \note When the chiller is operating as only a heater, this curve is used to represent the
@@ -61968,11 +61916,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
        \note will probably be similar to a boiler curve for most chillers.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A15, \field Temperature Curve Input Variable
        \type choice

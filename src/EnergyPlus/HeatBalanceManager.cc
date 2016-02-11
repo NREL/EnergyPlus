@@ -3853,7 +3853,7 @@ namespace HeatBalanceManager {
 				ShowContinueError( "Construction=" + Construct( TotRegConstructs + ConstrNum ).Name + " is affected." );
 				Construct( TotRegConstructs + ConstrNum ).SolutionDimensions = 1;
 			}
-			Construct( TotRegConstructs + ConstrNum ).ThicknessPerpend = DummyProps( 4 );
+			Construct( TotRegConstructs + ConstrNum ).ThicknessPerpend = DummyProps( 4 ) / 2.0;
 
 			//Set the total number of layers for the construction
 			Construct( TotRegConstructs + ConstrNum ).TotLayers = ConstructNumAlpha - 1;
