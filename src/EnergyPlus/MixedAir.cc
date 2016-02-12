@@ -1415,6 +1415,16 @@ namespace MixedAir {
 		NumERVControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
 		NumOAControllers += NumERVControllers;
 
+
+		// Find number of primary air systems - fixes 5476
+		NumPrimaryAirSys = GetNumObjectsFound( "AirLoopHVAC" );
+		int NumOACntrlOrPrimAirSys = max( NumPrimaryAirSys, NumOAControllers );
+		AirLoopControlInfo.allocate( NumOACntrlOrPrimAirSys );
+		AirLoopFlow.allocate( NumOACntrlOrPrimAirSys );
+		PrimaryAirSystem.allocate( NumOACntrlOrPrimAirSys );
+		AirToZoneNodeInfo.allocate( NumOACntrlOrPrimAirSys );
+
+
 		//     Mangesh code to fix CR 8225 - 09/14/2010
 		//NumControllerList = GetNumObjectsFound("AirLoopHVAC:ControllerList")
 		//NumOASys = GetNumObjectsFound("AirLoopHVAC:OutdoorAirSystem")
@@ -5430,7 +5440,7 @@ namespace MixedAir {
 	}
 
 	int
-	GetOASysNumHXs( int const OASysNumber ) 
+	GetOASysNumHXs( int const OASysNumber )
 	{
 
 		// FUNCTION INFORMATION:
