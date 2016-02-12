@@ -56,32 +56,100 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// EnergyPlus::SwimmingPool Unit Tests
+// EnergyPlus::ZoneEquipmentManager Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/SwimmingPool.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::SwimmingPool;
+using namespace ObjexxFCL;
+using namespace EnergyPlus::ZoneEquipmentManager;
+using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::DataZoneEquipment;
+using namespace EnergyPlus::HeatBalanceAirManager;
+using namespace EnergyPlus::HeatBalanceManager;
 
-TEST_F( EnergyPlusFixture, SwimmingPool_MakeUpWaterVolFlow )
+TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 {
 
-	//Tests for MakeUpWaterVolFlowFunct
-	EXPECT_EQ( 0.05, MakeUpWaterVolFlowFunct( 5, 100 ) );
-	EXPECT_NEAR( 0.00392, MakeUpWaterVolFlowFunct( 0.1, 25.5 ), .0001 );
-	EXPECT_EQ( -180, MakeUpWaterVolFlowFunct( -9, .05 ) );
-	EXPECT_NE( 10, MakeUpWaterVolFlowFunct( 10, 0.01 ) );
+	std::string const idf_objects = delimited_string({
+		" Version,8.4;",
 
-	//Tests for MakeUpWaterVolFunct
-	EXPECT_EQ( 0.05, MakeUpWaterVolFunct( 5, 100 ) );
-	EXPECT_NEAR( 0.00392, MakeUpWaterVolFunct( 0.1, 25.5 ), .0001 );
-	EXPECT_EQ( -180, MakeUpWaterVolFunct( -9, .05 ) );
-	EXPECT_NE( 10, MakeUpWaterVolFunct( 10, 0.01 ) );
+		"Zone,",
+		"  Space;                   !- Name",
 
+		"ZoneHVAC:EquipmentConnections,",
+		" Space,                    !- Zone Name",
+		" Space Equipment,          !- Zone Conditioning Equipment List Name",
+		" Space In Node,            !- Zone Air Inlet Node or NodeList Name",
+		" Space Exh Nodes,           !- Zone Air Exhaust Node or NodeList Name",
+		" Space Node,               !- Zone Air Node Name",
+		" Space Ret Node;           !- Zone Return Air Node Name",
+
+		"ZoneHVAC:EquipmentList,",
+		" Space Equipment,          !- Name",
+		" Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
+		" Exhaust Fan,              !- Zone Equipment 1 Name",
+		" 1,                        !- Zone Equipment 1 Cooling Sequence",
+		" 1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+
+		"Fan:ZoneExhaust,",
+		"Exhaust Fan,               !- Name",
+		",                          !- Availability Schedule Name",
+		"0.338,                     !- Fan Total Efficiency",
+		"125.0000,                  !- Pressure Rise{Pa}",
+		"0.3000,                    !- Maximum Flow Rate{m3/s}",
+		"Exhaust Fan Inlet Node,    !- Air Inlet Node Name",
+		"Exhaust Fan Outlet Node,   !- Air Outlet Node Name",
+		"Zone Exhaust Fans;         !- End - Use Subcategory",
+
+		"NodeList,",
+		"  Space Exh Nodes,  !- Name",
+		"  Space ZoneHVAC Exh Node, !- Node 1 Name",
+		"  Exhaust Fan Inlet Node; !- Node 1 Name",
+
+	} );
+
+	ASSERT_FALSE(process_idf(idf_objects));
+	EXPECT_FALSE(has_err_output());
+	bool ErrorsFound = false;
+	GetZoneData(ErrorsFound);
+	AllocateHeatBalArrays();
+	GetZoneEquipmentData1();
+	GetSimpleAirModelInputs(ErrorsFound);
+
+	int ZoneNum = 1;
+	int NodeNum;
+	for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
+		Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+	}
+	// Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
+	Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
+	DataAirSystems::PrimaryAirSystem.allocate( 1 );
+	DataAirLoop::AirLoopFlow.allocate( 1 );
+	DataHVACGlobals::NumPrimaryAirSys = 1;
+
+	ZoneEquipConfig(ZoneNum).AirLoopNum = 1;
+	DataHVACGlobals::AirLoopsSimOnce = true;
+	CalcZoneMassBalance( );
+	EXPECT_FALSE(has_err_output());
+
+	// Add true zone exhuast from exhuast fan, now there should be warning
+	ZoneEquipConfig(ZoneNum).ZoneExh = 0.1;
+	CalcZoneMassBalance();
+	EXPECT_TRUE(has_err_output());
+
+	// Deallocate everything - should all be taken care of in clear_states
 }
