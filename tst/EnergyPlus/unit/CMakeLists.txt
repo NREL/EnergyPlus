@@ -13,10 +13,13 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  AirTerminalSingleDuct.unit.cc
+  AirTerminalSingleDuctPIUReheat.unit.cc
   BranchNodeConnections.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerIndirectAbsorption.unit.cc
   CondenserLoopTowers.unit.cc
+  ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
@@ -94,6 +97,7 @@ set( test_src
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
   XingGroundTemperatureModel.unit.cc
+  ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
