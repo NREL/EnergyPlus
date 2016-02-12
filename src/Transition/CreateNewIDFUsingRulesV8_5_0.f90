@@ -119,20 +119,22 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutScheduleName
 
   LOGICAL :: ErrFlag
-  
+
   REAL :: IndirectOldFieldFive
   REAL :: IndirectOldFieldSix
   REAL :: IndirectNewFieldThirteen
   CHARACTER(len=10) :: IndirectNewFieldString
 
-  INTEGER :: HeightFieldNum
-  INTEGER :: TankSearchNum
-  INTEGER :: HeaterNum
-  CHARACTER(len=MaxNameLength) :: ThisObjectType
-  CHARACTER(len=MaxNameLength) :: ThisObjectName
-  CHARACTER(len=MaxNameLength) :: LookingForTankName
-
-  INTEGER :: I, CurField, KAindex=0, SearchNum
+  REAL MaterialDensity
+  REAL EMPDCoeffA
+  REAL EMPDCoeffB
+  REAL EMPDCoeffC
+  REAL EMPDCoeffD
+  REAL EMPDCoeffDEMPD
+  REAL MuEMPD
+  INTEGER MatlSearchNum
+  REAL, EXTERNAL :: CalculateMuEMPD
+  LOGICAL FoundMaterial
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -364,13 +366,49 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
 
     !!!    Changes for this version
-!              CASE('COIL:WATERHEATING:AIRTOWATERHEATPUMP')
-!                ! object rename only
-!                ObjectName = "Coil:WaterHeating:AirToWaterHeatPump:Pumped"
-!                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-!                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-!                nodiff=.true.
-                        
+              CASE('MATERIALPROPERTY:MOISTUREPENETRATIONDEPTH:SETTINGS')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! Write out the new field values
+                OutArgs(1)  = InArgs(1) ! Name
+                OutArgs(2)  = "Could not find Material Match for "//InArgs(1)         ! Initialize to something dumb in case we don't find a matching material
+                OutArgs(3)  = InArgs(3) ! coefficient a
+                OutArgs(4)  = InArgs(4) ! coefficient b
+                OutArgs(5)  = InArgs(5) ! coefficient c
+                OutArgs(6)  = InArgs(6) ! coefficient d
+                OutArgs(7)  = InArgs(2) ! original d_empd value
+                OutArgs(8)  = "0"       ! New field with default of 0
+                OutArgs(9)  = "0"       ! New field with default of 0
+                OutArgs(10) = "0"       ! New field with default of 0
+                ! Tell the "output" processor that we have 10 fields now
+                CurArgs = 10
+				! Get density of the material using InArgs(1) as the name, converted to a REAL
+				FoundMaterial = .FALSE.
+				DO MatlSearchNum = 1, NumIDFRecords
+				  IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Name) /= 'MATERIAL') CYCLE
+				  IF (MakeUPPERCase(IDFRecords(MatlSearchNum)%Alphas(1)) == MakeUPPERCase(InArgs(1))) THEN
+				    FoundMaterial = .TRUE.
+					! We have our match for the stratified tank child
+					WRITE(diflfn,fmta) '! Found a material component match; name ='//IDFRecords(MatlSearchNum)%Alphas(1)
+					! Now simply get the material density
+					READ (IDFRecords(MatlSearchNum)%Numbers(3),*) MaterialDensity
+				  END IF
+				END DO
+				IF ( .NOT. FoundMaterial ) THEN
+				  WRITE(diflfn,fmta) '! Didnt find a material component match for name ='//IDFRecords(MatlSearchNum)%Alphas(1)
+				  CALL ShowFatalError( 'Material match issue' )
+				END IF
+				! Get other values into REALs
+				READ (InArgs(3),*) EMPDCoeffA
+				READ (InArgs(4),*) EMPDCoeffB
+				READ (InArgs(5),*) EMPDCoeffC
+				READ (InArgs(6),*) EMPDCoeffD
+				READ (InArgs(2),*) EMPDCoeffDEMPD
+				! Get new mu_empd value from a function that deals with REALs
+				MuEMPD = CalculateMuEMPD(EMPDCoeffA, EMPDCoeffB, EMPDCoeffC, EMPDCoeffD, EMPDCoeffDEMPD, MaterialDensity)
+				! Read the real value back and assign to OutArgs(2)
+				WRITE(OutArgs(2),*) MuEMPD
+
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -800,13 +838,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ENDIF
                 ENDDO
 
-              CASE('AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT')  
+              CASE('AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT')
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:15)=InArgs(1:15)   ! No change at all
                 OutArgs(16:16)=InArgs(17:17) ! Moved up
                 CurArgs = CurArgs - 1
-              CASE('AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT')  
+              CASE('AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT')
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:16)=InArgs(1:16)   ! No change at all
@@ -817,7 +855,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:5) = InArgs(1:5)   ! F1-F5  No Change
-                ! Old input field F6 removed 
+                ! Old input field F6 removed
                 OutArgs(6:CurArgs-1) = InArgs(7:CurArgs)  ! Move up old F7 - F12
                 CurArgs = CurArgs - 1
 
@@ -826,7 +864,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:7) = InArgs(1:7)   ! F1-F7  No Change
-                ! Old input fields F8 - F9 removed 
+                ! Old input fields F8 - F9 removed
                 OutArgs(8:CurArgs-2) = InArgs(10:CurArgs)  ! Move up old Fields F10 - F20
                 CurArgs = CurArgs - 2
 
@@ -835,17 +873,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:6) = InArgs(1:6)   ! F1-F6  No Change
-                ! Old input field F7 removed 
+                ! Old input field F7 removed
                 OutArgs(7:CurArgs-1) = InArgs(8:CurArgs)  ! Move up old F8 - F14
                 CurArgs = CurArgs - 1
 
               CASE('AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN')
-                ! Removed Input Fields 
+                ! Removed Input Fields
                 !- Air Inlet Node Name, Air Outlet Node Name, Heating Coil Air Inlet Node Name, & Hot Water or Steam Inlet Node Name
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:7) = InArgs(1:7)   ! F1-F7  No Change
-                ! Old input Fields F8 - F9 removed 
+                ! Old input Fields F8 - F9 removed
                 OutArgs(8:CurArgs-2) = InArgs(10:CurArgs)  ! Move up old F10 - F16
                 CurArgs = CurArgs - 2
 
