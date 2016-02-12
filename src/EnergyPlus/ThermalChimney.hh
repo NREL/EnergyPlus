@@ -116,39 +116,6 @@ namespace ThermalChimney {
 			TotZoneToDistrib( 0 )
 		{}
 
-		// Member Constructor
-		ThermalChimneyData(
-			std::string const & Name,
-			int const RealZonePtr,
-			std::string const & RealZoneName,
-			int const SchedPtr,
-			std::string const & SchedName,
-			Real64 const AbsorberWallWidth,
-			Real64 const AirOutletCrossArea,
-			Real64 const DischargeCoeff,
-			int const TotZoneToDistrib,
-			Array1_int const & ZonePtr,
-			Array1_string const & ZoneName,
-			Array1< Real64 > const & DistanceThermChimInlet,
-			Array1< Real64 > const & RatioThermChimAirFlow,
-			Array1< Real64 > const & EachAirInletCrossArea
-		) :
-			Name( Name ),
-			RealZonePtr( RealZonePtr ),
-			RealZoneName( RealZoneName ),
-			SchedPtr( SchedPtr ),
-			SchedName( SchedName ),
-			AbsorberWallWidth( AbsorberWallWidth ),
-			AirOutletCrossArea( AirOutletCrossArea ),
-			DischargeCoeff( DischargeCoeff ),
-			TotZoneToDistrib( TotZoneToDistrib ),
-			ZonePtr( ZonePtr ),
-			ZoneName( ZoneName ),
-			DistanceThermChimInlet( DistanceThermChimInlet ),
-			RatioThermChimAirFlow( RatioThermChimAirFlow ),
-			EachAirInletCrossArea( EachAirInletCrossArea )
-		{}
-
 	};
 
 	struct ThermChimZnReportVars
@@ -167,19 +134,6 @@ namespace ThermalChimney {
 			ThermalChimneyMass( 0.0 )
 		{}
 
-		// Member Constructor
-		ThermChimZnReportVars(
-			Real64 const ThermalChimneyHeatLoss, // Heat Gain {Joules} due to ThermalChimney
-			Real64 const ThermalChimneyHeatGain, // Heat Loss {Joules} due to ThermalChimney
-			Real64 const ThermalChimneyVolume, // Volume of Air {m3} due to ThermalChimney
-			Real64 const ThermalChimneyMass // Mass of Air {kg} due to ThermalChimney
-		) :
-			ThermalChimneyHeatLoss( ThermalChimneyHeatLoss ),
-			ThermalChimneyHeatGain( ThermalChimneyHeatGain ),
-			ThermalChimneyVolume( ThermalChimneyVolume ),
-			ThermalChimneyMass( ThermalChimneyMass )
-		{}
-
 	};
 
 	struct ThermChimReportVars
@@ -196,19 +150,6 @@ namespace ThermalChimney {
 			OverallTCVolumeFlowStd( 0.0 ),
 			OverallTCMassFlow( 0.0 ),
 			OutletAirTempThermalChim( 0.0 )
-		{}
-
-		// Member Constructor
-		ThermChimReportVars(
-			Real64 const OverallTCVolumeFlow, // Volume of Air {m3/s} due to ThermalChimney
-			Real64 const OverallTCVolumeFlowStd, // Volume of Air {m3/s} due to ThermalChimney at standard conditions
-			Real64 const OverallTCMassFlow, // Mass of Air {kg/s} due to ThermalChimney
-			Real64 const OutletAirTempThermalChim // Air Temp {C} of ThermalChimney
-		) :
-			OverallTCVolumeFlow( OverallTCVolumeFlow ),
-			OverallTCVolumeFlowStd( OverallTCVolumeFlowStd ),
-			OverallTCMassFlow( OverallTCMassFlow ),
-			OutletAirTempThermalChim( OutletAirTempThermalChim )
 		{}
 
 	};

@@ -125,49 +125,6 @@ namespace MixerComponent {
 			NumInletNodes( 0 )
 		{}
 
-		// Member Constructor
-		MixerConditions(
-			std::string const & MixerName, // Name of the Mixer
-			Real64 const OutletTemp,
-			Real64 const OutletHumRat,
-			Real64 const OutletEnthalpy,
-			Real64 const OutletPressure,
-			int const OutletNode,
-			Real64 const OutletMassFlowRate, // MassFlow through the Mixer being Simulated [kg/Sec]
-			Real64 const OutletMassFlowRateMaxAvail, // [kg/Sec]
-			Real64 const OutletMassFlowRateMinAvail, // [kg/Sec]
-			bool const InitFlag,
-			int const NumInletNodes,
-			Array1_int const & InletNode,
-			Array1< Real64 > const & InletMassFlowRate,
-			Array1< Real64 > const & InletMassFlowRateMaxAvail,
-			Array1< Real64 > const & InletMassFlowRateMinAvail,
-			Array1< Real64 > const & InletTemp,
-			Array1< Real64 > const & InletHumRat,
-			Array1< Real64 > const & InletEnthalpy,
-			Array1< Real64 > const & InletPressure
-		) :
-			MixerName( MixerName ),
-			OutletTemp( OutletTemp ),
-			OutletHumRat( OutletHumRat ),
-			OutletEnthalpy( OutletEnthalpy ),
-			OutletPressure( OutletPressure ),
-			OutletNode( OutletNode ),
-			OutletMassFlowRate( OutletMassFlowRate ),
-			OutletMassFlowRateMaxAvail( OutletMassFlowRateMaxAvail ),
-			OutletMassFlowRateMinAvail( OutletMassFlowRateMinAvail ),
-			InitFlag( InitFlag ),
-			NumInletNodes( NumInletNodes ),
-			InletNode( InletNode ),
-			InletMassFlowRate( InletMassFlowRate ),
-			InletMassFlowRateMaxAvail( InletMassFlowRateMaxAvail ),
-			InletMassFlowRateMinAvail( InletMassFlowRateMinAvail ),
-			InletTemp( InletTemp ),
-			InletHumRat( InletHumRat ),
-			InletEnthalpy( InletEnthalpy ),
-			InletPressure( InletPressure )
-		{}
-
 	};
 
 	// Object Data

@@ -13,10 +13,13 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  AirTerminalSingleDuct.unit.cc
+  AirTerminalSingleDuctPIUReheat.unit.cc
   BranchNodeConnections.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerIndirectAbsorption.unit.cc
   CondenserLoopTowers.unit.cc
+  ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
@@ -33,6 +36,7 @@ set( test_src
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   Furnaces.unit.cc
+  General.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalFiniteDiffManager.unit.cc
@@ -70,6 +74,7 @@ set( test_src
   ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
+  SimAirServingZones.unit.cc
   SiteBuildingSurfaceGroundTemperatures.unit.cc
   SiteDeepGroundTemperatures.unit.cc
   SiteFCFactorMethodGroundTemperatures.unit.cc

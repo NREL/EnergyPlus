@@ -612,7 +612,7 @@ The DElight method of analyzing daylighting in buildings is very similar to that
 
 There are two primary differences between the Detailed and DElight methods of calculating interior illuminance levels. The first is that DElight includes the capability of analyzing complex fenestration systems that include geometrically complicated shading systems (e.g., roof monitors) and/or optically complicated glazings (e.g., prismatic or holographic glass). The second key difference is that DElight uses a radiosity method to calculate the effects of light reflection inside a zone. These methods are discussed in more detail in the engineering documentation.
 
-There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the Detailed method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles). Another is the DElight ability to include more than two reference points in its interior illuminance and electric lighting reduction calculations. A third is the current lack of visual quality (e.g., glare) calculations performed by DElight. Fourth, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the Detailed method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details.
+There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the Detailed method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles). Another is the DElight ability to include more than two reference points in its interior illuminance and electric lighting reduction calculations. A third is the current lack of visual quality (e.g., glare) calculations performed by DElight. Fourth, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the Detailed method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details. Fifth, when using DElight daylighting the presence of exterior shading surfaces such as overhangs is ignored.
 
 Input for invoking the DElight method involves three object types: **Daylighting:DELight:Controls**, **Daylighting:DELight:ReferencePoint**, and **Daylighting:DELight:ComplexFenestration**. Each of these objects is described below.
 
@@ -7625,7 +7625,7 @@ The design supply air temperature for cooling in degrees Celsius. This should be
 
 #### Field: Central Heating Design Supply Air Temperature
 
-The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil.
+The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system.
 
 #### Field: Type of Zone Sum to Use
 
@@ -7641,11 +7641,11 @@ Entering *Yes* means the system will be sized for heating using 100% outdoor air
 
 #### Field: Central Cooling Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Central Heating Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Cooling Supply Air Flow Rate Method
 

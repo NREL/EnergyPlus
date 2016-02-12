@@ -1080,49 +1080,6 @@ namespace PlantPipingSystemsManager {
 					VertInsDepth( 0.0 ),
 					OSCMIndex( 0 )
 				{}
-				// Member Constructor
-				GroundDomainData(
-					std::string const & ObjName,
-					Real64 const Depth,
-					Real64 const AspectRatio,
-					Real64 const PerimeterOffset,
-					Real64 const SoilConductivity,
-					Real64 const SoilDensity,
-					Real64 const SoilSpecificHeat,
-					Real64 const MoistureContent,
-					Real64 const SaturationMoistureContent,
-					Real64 const EvapotranspirationCoeff,
-					Real64 const MinSurfTemp,
-					int const MonthOfMinSurfTemp,
-					Real64 const HorizInsWidth,
-					Real64 const VertInsDepth,
-					int const OSCMIndex,
-					std::string const & OSCMName,
-					std::string const & SlabMaterial,
-					std::string const & HorizInsMaterial,
-					std::string const & VertInsMaterial
-					) :
-				ObjName( ObjName ),
-					Depth( Depth ),
-					AspectRatio( AspectRatio ),
-					PerimeterOffset( PerimeterOffset ),
-					SoilConductivity( SoilConductivity ),
-					SoilDensity( SoilDensity ),
-					SoilSpecificHeat( SoilSpecificHeat ),
-					MoistureContent( MoistureContent ),
-					SaturationMoistureContent( SaturationMoistureContent ),
-					EvapotranspirationCoeff( EvapotranspirationCoeff ),
-					MinSurfTemp( MinSurfTemp ),
-					MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
-					HorizInsWidth( HorizInsWidth ),
-					VertInsDepth( VertInsDepth ),
-					OSCMIndex( OSCMIndex ),
-					OSCMName( OSCMName ),
-					SlabMaterial( SlabMaterial ),
-					HorizInsMaterial( HorizInsMaterial ),
-					VertInsMaterial( VertInsMaterial )
-				{}
-
 			};
 
 			// Object Data
@@ -1448,31 +1405,6 @@ namespace PlantPipingSystemsManager {
 				MonthOfMinSurfTemp( 0 ),
 				HorizInsWidth( 0.0 ),
 				VertInsDepth( 0.0 )
-			{}
-
-			// Member Constructor
-			GroundDomainData(
-				std::string const & ObjName,
-				Real64 const Depth,
-				Real64 const AspectRatio,
-				Real64 const PerimeterOffset,
-				Real64 const MinSurfTemp,
-				int const MonthOfMinSurfTemp,
-				Real64 const HorizInsWidth,
-				Real64 const VertInsDepth,
-				std::string const & HorizInsMaterial,
-				std::string const & VertInsMaterial
-			) :
-				ObjName( ObjName ),
-				Depth( Depth ),
-				AspectRatio( AspectRatio ),
-				PerimeterOffset( PerimeterOffset ),
-				MinSurfTemp( MinSurfTemp ),
-				MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
-				HorizInsWidth( HorizInsWidth ),
-				VertInsDepth( VertInsDepth ),
-				HorizInsMaterial( HorizInsMaterial ),
-				VertInsMaterial( VertInsMaterial )
 			{}
 
 		};
@@ -2047,53 +1979,6 @@ namespace PlantPipingSystemsManager {
 				EvapotranspirationCoeff( 0.0 ),
 				MinSurfTemp( 0.0 ),
 				MonthOfMinSurfTemp( 0 )
-			{}
-
-			// Member Constructor
-			HorizontalTrenchData(
-				std::string const & ObjName,
-				std::string const & InletNodeName,
-				std::string const & OutletNodeName,
-				Real64 const AxialLength,
-				Real64 const PipeID,
-				Real64 const PipeOD,
-				int const NumPipes,
-				Real64 const BurialDepth,
-				Real64 const DesignFlowRate,
-				Real64 const SoilConductivity,
-				Real64 const SoilDensity,
-				Real64 const SoilSpecificHeat,
-				Real64 const PipeConductivity,
-				Real64 const PipeDensity,
-				Real64 const PipeSpecificHeat,
-				Real64 const InterPipeSpacing,
-				Real64 const MoistureContent,
-				Real64 const SaturationMoistureContent,
-				Real64 const EvapotranspirationCoeff,
-				Real64 const MinSurfTemp,
-				int const MonthOfMinSurfTemp
-			) :
-				ObjName( ObjName ),
-				InletNodeName( InletNodeName ),
-				OutletNodeName( OutletNodeName ),
-				AxialLength( AxialLength ),
-				PipeID( PipeID ),
-				PipeOD( PipeOD ),
-				NumPipes( NumPipes ),
-				BurialDepth( BurialDepth ),
-				DesignFlowRate( DesignFlowRate ),
-				SoilConductivity( SoilConductivity ),
-				SoilDensity( SoilDensity ),
-				SoilSpecificHeat( SoilSpecificHeat ),
-				PipeConductivity( PipeConductivity ),
-				PipeDensity( PipeDensity ),
-				PipeSpecificHeat( PipeSpecificHeat ),
-				InterPipeSpacing( InterPipeSpacing ),
-				MoistureContent( MoistureContent ),
-				SaturationMoistureContent( SaturationMoistureContent ),
-				EvapotranspirationCoeff( EvapotranspirationCoeff ),
-				MinSurfTemp( MinSurfTemp ),
-				MonthOfMinSurfTemp( MonthOfMinSurfTemp )
 			{}
 
 		};
@@ -5149,7 +5034,7 @@ namespace PlantPipingSystemsManager {
 					LeftRegionExtent = ThesePartitionRegions( Index - 1 ).Max;
 				}
 				// Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ). Do not add a mesh region to the left of ThesePartitionRegions( 1 ).-SA
-				if ( !PipingSystemDomains( DomainNum ).HasCoupledBasement || ( PipingSystemDomains( DomainNum ).HasCoupledBasement && ( Index == 0 || Index == 2 ) ) ) {
+				if ( ! PipingSystemDomains( DomainNum ).HasCoupledBasement || ( Index == 0 || Index == 2 ) ) {
 					//'add a mesh region to the "left" of the partition
 					++PreviousUbound;
 					TempRegions( PreviousUbound ) = TempGridRegionData( LeftRegionExtent, ThisRegion.Min, DirDirection );
@@ -8231,7 +8116,6 @@ namespace PlantPipingSystemsManager {
 
 			Numerator = 0.0;
 			Denominator = 0.0;
-			Resistance = 0.0;
 
 			//'convenience variables
 			ThisRadialCellOuterRadius = ThisCell.PipeCellData.Soil( rCtr ).OuterRadius;

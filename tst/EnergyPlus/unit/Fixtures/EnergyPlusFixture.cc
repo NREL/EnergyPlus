@@ -407,20 +407,6 @@ namespace EnergyPlus {
 		}
 	}
 
-	template < typename T, class T2 >
-	bool EnergyPlusFixture::compare_containers( T const & expected_container, T2 const & actual_container ) {
-		bool is_valid = ( expected_container.size() == actual_container.size() );
-		EXPECT_EQ( expected_container.size(), actual_container.size() ) << "Containers are not equal size.";
-		auto expected = expected_container.begin();
-		auto actual = actual_container.begin();
-		for ( ; expected != expected_container.end(); ++expected, ++actual ) {
-			// This may fail due to floating point issues for float and double...
-			EXPECT_EQ( *expected, *actual ) << "Incorrect 0-based index: " << ( expected - expected_container.begin() );
-			is_valid = ( *expected == *actual );
-		}
-		return is_valid;
-	}
-
 	std::string EnergyPlusFixture::delimited_string( std::vector<std::string> const & strings, std::string const & delimiter ) {
 		std::ostringstream compare_text;
 		for( auto const & str : strings ) {

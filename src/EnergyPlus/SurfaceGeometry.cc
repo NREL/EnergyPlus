@@ -1929,6 +1929,14 @@ namespace SurfaceGeometry {
 			ShowFatalError( RoutineName + "Errors discovered, program terminates." );
 		}
 
+		int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection;
+		int NumDElightControls = GetNumObjectsFound( "Daylighting:DElight:Controls" );
+		int NumDElightRefPt = GetNumObjectsFound( "Daylighting:DElight:ReferencePoint" );
+		int NumDElightCmplxFen = GetNumObjectsFound( "Daylighting:DElight:ComplexFenestration" );
+		int TotDElightObj = NumDElightControls + NumDElightRefPt + NumDElightCmplxFen;
+		if ( TotShadSurf > 0 && TotDElightObj > 0 ){
+			ShowWarningError( RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored." );
+		}
 	}
 
 	void
@@ -6137,7 +6145,6 @@ namespace SurfaceGeometry {
 				ErrorsFoundByConstruct = true;
 			}}
 
-			Found = 0;
 			Found = FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
@@ -7036,7 +7043,7 @@ namespace SurfaceGeometry {
 					ShowContinueError( cAlphaFieldNames( 8 ) + " in error=\"" + Material( IShadingDevice ).Name + "\"." );
 					ErrorsFound = true;
 				}
-				if ( ShTyp == WSC_ST_BetweenGlassBlind || ShTyp == WSC_ST_BetweenGlassBlind ) {
+				if ( ShTyp == WSC_ST_BetweenGlassShade || ShTyp == WSC_ST_BetweenGlassBlind ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + WindowShadingControl( ControlNum ).Name + "\" has " + cAlphaArgs( 2 ) + "= BetweenGlassShade or BetweenGlassBlind and" );
 					ShowContinueError( cAlphaFieldNames( 8 ) + " is specified. This is illegal. Specify shaded construction instead." );
 					ErrorsFound = true;
@@ -9324,12 +9331,6 @@ namespace SurfaceGeometry {
 				Vertex( 4 )
 			{}
 
-			// Member Constructor
-			explicit
-			rectangularwindow( Array1< Vector > const & Vertex ) :
-				Vertex( 4, Vertex )
-			{}
-
 		};
 
 		// Object Data
@@ -9505,12 +9506,6 @@ namespace SurfaceGeometry {
 			// Default Constructor
 			rectangularwindow() :
 				Vertex( 4 )
-			{}
-
-			// Member Constructor
-			explicit
-			rectangularwindow( Array1< Vector > const & Vertex ) :
-				Vertex( 4, Vertex )
 			{}
 
 		};

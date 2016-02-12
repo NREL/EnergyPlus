@@ -320,12 +320,6 @@ namespace FanCoilUnits {
 		FanCoilNumericFieldData()
 		{}
 
-		// Member Constructor
-		FanCoilNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames(FieldNames)
-		{}
 	};
 
 	// Object Data

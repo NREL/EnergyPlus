@@ -216,4 +216,127 @@ namespace EnergyPlus {
 		SurfaceWindow.deallocate();
 
 	}
+
+	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangulerWindowWarning ) {
+
+		// Unit test for #5384
+
+		Zone.allocate( 1 );
+		Zone( 1 ).Name = "WEST_ZONE";
+
+		Surface.allocate( 3 );
+		Surface( 1 ).Name = "SURFACE_1";
+		Surface( 1 ).Zone = 1;
+		Surface( 1 ).ZoneName = "WEST_ZONE";
+		Surface( 1 ).Azimuth = 0.0;
+		Surface( 1 ).ExtBoundCond = 0;
+		Surface( 1 ).HeatTransSurf = true;
+		Surface( 1 ).Tilt = 90.0;
+		Surface( 1 ).Sides = 4;
+		Surface( 2 ).Name = "SURFACE_2";
+		Surface( 2 ).Zone = 1;
+		Surface( 2 ).ZoneName = "WEST_ZONE";
+		Surface( 2 ).Azimuth = 180.0;
+		Surface( 2 ).ExtBoundCond = 0;
+		Surface( 2 ).HeatTransSurf = true;
+		Surface( 2 ).Tilt = 90.0;
+		Surface( 2 ).Sides = 4;
+		Surface( 3 ).Name = "WINDOW1";
+		Surface( 3 ).Zone = 1;
+		Surface( 3 ).ZoneName = "WEST_ZONE";
+		Surface( 3 ).Azimuth = 180.0;
+		Surface( 3 ).ExtBoundCond = 0;
+		Surface( 3 ).HeatTransSurf = true;
+		Surface( 3 ).Tilt = 90.0;
+		Surface( 3 ).Sides = 3;
+
+		SurfaceWindow.allocate( 3 );
+		SurfaceWindow( 1 ).OriginalClass = 11;
+		SurfaceWindow( 2 ).OriginalClass = 11;
+		SurfaceWindow( 3 ).OriginalClass = 11;
+		NumOfZones = 1;
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+			"Schedule:Constant,OnSch,,1.0;",
+			"Schedule:Constant,Aula people sched,,0.0;",
+			"Schedule:Constant,Sempre 21,,21.0;",
+			"AirflowNetwork:SimulationControl,",
+			"  NaturalVentilation, !- Name",
+			"  MultizoneWithoutDistribution, !- AirflowNetwork Control",
+			"  SurfaceAverageCalculation, !- Wind Pressure Coefficient Type",
+			"  , !- AirflowNetwork Wind Pressure Coefficient Array Name",
+			"  , !- Height Selection for Local Wind Pressure Calculation",
+			"  LOWRISE, !- Building Type",
+			"  1000, !- Maximum Number of Iterations{ dimensionless }",
+			"  LinearInitializationMethod, !- Initialization Type",
+			"  0.0001, !- Relative Airflow Convergence Tolerance{ dimensionless }",
+			"  0.0001, !- Absolute Airflow Convergence Tolerance{ kg / s }",
+			"  -0.5, !- Convergence Acceleration Limit{ dimensionless }",
+			"  90, !- Azimuth Angle of Long Axis of Building{ deg }",
+			"  0.36;                    !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+
+			"AirflowNetwork:MultiZone:Zone,",
+			"  WEST_ZONE, !- Zone Name",
+			"  Temperature, !- Ventilation Control Mode",
+			"  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+			"  1, !- Minimum Venting Open Factor{ dimensionless }",
+			"  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+			"  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+			"  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+			"  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+			"  Aula people sched, !- Venting Availability Schedule Name",
+			"  Standard;                !- Single Sided Wind Pressure Coefficient Algorithm",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  Surface_1, !- Surface Name",
+			"  CR-1, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1; !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  Surface_2, !- Surface Name",
+			"  CR-1, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1; !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"AirflowNetwork:MultiZone:Surface,",
+			"  Window1, !- Surface Name",
+			"  Simple Window, !- Leakage Component Name",
+			"  , !- External Node Name",
+			"  1; !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+			"AirflowNetwork:MultiZone:Component:SimpleOpening,",
+			"  Simple Window, !- Name",
+			"  0.0010, !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
+			"  0.65, !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
+			"  0.01, !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
+			"  0.78;                    !- Discharge Coefficient{ dimensionless }",
+			"AirflowNetwork:MultiZone:ReferenceCrackConditions,",
+			"  ReferenceCrackConditions, !- Name",
+			"  20.0, !- Reference Temperature{ C }",
+			"  101320, !- Reference Barometric Pressure{ Pa }",
+			"  0.005;                   !- Reference Humidity Ratio{ kgWater / kgDryAir }",
+			"AirflowNetwork:MultiZone:Surface:Crack,",
+			"  CR-1, !- Name",
+			"  0.01, !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
+			"  0.667, !- Air Mass Flow Exponent{ dimensionless }",
+			"  ReferenceCrackConditions; !- Reference Crack Conditions",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetAirflowNetworkInput( );
+		std::string const error_string = delimited_string( {
+			"   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
+			"   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with effective width and height.",
+		} );
+
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
+		AirflowNetworkNodeData.deallocate( );
+		AirflowNetworkCompData.deallocate( );
+		MultizoneExternalNodeData.deallocate( );
+		Zone.deallocate( );
+		Surface.deallocate( );
+		SurfaceWindow.deallocate( );
+
+	}
+
 }

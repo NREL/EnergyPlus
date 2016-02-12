@@ -590,101 +590,6 @@ namespace PollutionModule {
 			ElecSurplusSoldFacility( 0.0 )
 		{}
 
-		// Member Constructor
-		FuelTypeProps(
-			Array1_string const & FuelTypeNames,
-			Real64 const Elec,
-			Real64 const NatGas,
-			Real64 const FuelOil1,
-			Real64 const FuelOil2,
-			Real64 const Coal,
-			Real64 const Gasoline,
-			Real64 const Propane,
-			Real64 const Diesel,
-			Real64 const OtherFuel1,
-			Real64 const OtherFuel2,
-			Real64 const ElecPurch,
-			Real64 const ElecSold,
-			int const ElecFacilityIndex,
-			int const DieselFacilityIndex,
-			int const PurchCoolFacilityIndex,
-			int const PurchHeatFacilityIndex,
-			int const NatGasFacilityIndex,
-			int const GasolineFacilityIndex,
-			int const CoalFacilityIndex,
-			int const FuelOil1FacilityIndex,
-			int const FuelOil2FacilityIndex,
-			int const PropaneFacilityIndex,
-			int const OtherFuel1FacilityIndex,
-			int const OtherFuel2FacilityIndex,
-			int const ElecProducedFacilityIndex,
-			int const SteamFacilityIndex,
-			int const ElecPurchasedFacilityIndex,
-			int const ElecSurplusSoldFacilityIndex,
-			Real64 const ElecFacility,
-			Real64 const DieselFacility,
-			Real64 const PurchCoolFacility,
-			Real64 const PurchHeatFacility,
-			Real64 const NatGasFacility,
-			Real64 const GasolineFacility,
-			Real64 const CoalFacility,
-			Real64 const FuelOil1Facility,
-			Real64 const FuelOil2Facility,
-			Real64 const PropaneFacility,
-			Real64 const OtherFuel1Facility,
-			Real64 const OtherFuel2Facility,
-			Real64 const ElecProducedFacility,
-			Real64 const SteamFacility,
-			Real64 const ElecPurchasedFacility,
-			Real64 const ElecSurplusSoldFacility
-		) :
-			FuelTypeNames( {1,PollFactorNumTypes}, FuelTypeNames ),
-			Elec( Elec ),
-			NatGas( NatGas ),
-			FuelOil1( FuelOil1 ),
-			FuelOil2( FuelOil2 ),
-			Coal( Coal ),
-			Gasoline( Gasoline ),
-			Propane( Propane ),
-			Diesel( Diesel ),
-			OtherFuel1( OtherFuel1 ),
-			OtherFuel2( OtherFuel2 ),
-			ElecPurch( ElecPurch ),
-			ElecSold( ElecSold ),
-			ElecFacilityIndex( ElecFacilityIndex ),
-			DieselFacilityIndex( DieselFacilityIndex ),
-			PurchCoolFacilityIndex( PurchCoolFacilityIndex ),
-			PurchHeatFacilityIndex( PurchHeatFacilityIndex ),
-			NatGasFacilityIndex( NatGasFacilityIndex ),
-			GasolineFacilityIndex( GasolineFacilityIndex ),
-			CoalFacilityIndex( CoalFacilityIndex ),
-			FuelOil1FacilityIndex( FuelOil1FacilityIndex ),
-			FuelOil2FacilityIndex( FuelOil2FacilityIndex ),
-			PropaneFacilityIndex( PropaneFacilityIndex ),
-			OtherFuel1FacilityIndex( OtherFuel1FacilityIndex ),
-			OtherFuel2FacilityIndex( OtherFuel2FacilityIndex ),
-			ElecProducedFacilityIndex( ElecProducedFacilityIndex ),
-			SteamFacilityIndex( SteamFacilityIndex ),
-			ElecPurchasedFacilityIndex( ElecPurchasedFacilityIndex ),
-			ElecSurplusSoldFacilityIndex( ElecSurplusSoldFacilityIndex ),
-			ElecFacility( ElecFacility ),
-			DieselFacility( DieselFacility ),
-			PurchCoolFacility( PurchCoolFacility ),
-			PurchHeatFacility( PurchHeatFacility ),
-			NatGasFacility( NatGasFacility ),
-			GasolineFacility( GasolineFacility ),
-			CoalFacility( CoalFacility ),
-			FuelOil1Facility( FuelOil1Facility ),
-			FuelOil2Facility( FuelOil2Facility ),
-			PropaneFacility( PropaneFacility ),
-			OtherFuel1Facility( OtherFuel1Facility ),
-			OtherFuel2Facility( OtherFuel2Facility ),
-			ElecProducedFacility( ElecProducedFacility ),
-			SteamFacility( SteamFacility ),
-			ElecPurchasedFacility( ElecPurchasedFacility ),
-			ElecSurplusSoldFacility( ElecSurplusSoldFacility )
-		{}
-
 	};
 
 	// Object Data
@@ -692,6 +597,11 @@ namespace PollutionModule {
 	extern FuelTypeProps FuelType;
 
 	// Functions
+
+	// Clears the global data in OutputProcessor.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	clear_state();

@@ -69,6 +69,8 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -83,8 +85,10 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
+using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::OutputReportTabular;
@@ -243,7 +247,6 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 TEST( OutputReportTabularTest, GetColumnUsingTabs )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, GetColumnUsingTabs" );
-
 {
 	std::string inString = " Col1 \t Col2 \t Col3 ";
 	EXPECT_EQ( " Col1 ", GetColumnUsingTabs( inString, 1 ) );
@@ -314,6 +317,194 @@ TEST( OutputReportTabularTest, GetColumnUsingTabs )
 	EXPECT_EQ( "", GetColumnUsingTabs( inString, 6 ) );
 }
 
+}
+
+TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest )
+{
+	ShowMessage("Begin Test: EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest");
+
+	TotDesDays = 2;
+	TotRunDesPersDays = 3;
+	NumOfZones = 4;
+	TotSurfaces = 7;
+	NumOfTimeStepInHour = 4;
+
+	AllocateLoadComponentArrays();
+
+	// radiantPulseUsed.allocate( { 0, TotDesDays + TotRunDesPersDays }, NumOfZones );
+	EXPECT_EQ( radiantPulseUsed.size(), 24u );
+
+	// radiantPulseTimestep.allocate( { 0, TotDesDays + TotRunDesPersDays }, NumOfZones );
+	EXPECT_EQ( radiantPulseTimestep.size(), 24u );
+
+	// radiantPulseReceived.allocate( { 0, TotDesDays + TotRunDesPersDays }, TotSurfaces );
+	EXPECT_EQ( radiantPulseReceived.size(), 42u );
+
+	// loadConvectedNormal.allocate( TotDesDays + TotRunDesPersDays, { 0, NumOfTimeStepInHour * 24 }, TotSurfaces );
+	EXPECT_EQ( loadConvectedNormal.size(), 3395u );
+
+	// loadConvectedWithPulse.allocate( TotDesDays + TotRunDesPersDays, { 0, NumOfTimeStepInHour * 24 }, TotSurfaces );
+	EXPECT_EQ( loadConvectedWithPulse.size(), 3395u );
+
+	// netSurfRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( netSurfRadSeq.size(), 3360u );
+
+	// decayCurveCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( decayCurveCool.size(), 672u );
+
+	// decayCurveHeat.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( decayCurveHeat.size(), 672u );
+
+	// ITABSFseq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( ITABSFseq.size(), 3360u );
+
+	// TMULTseq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( TMULTseq.size(), 1920u );
+
+	// peopleInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( peopleInstantSeq.size(), 1920u );
+
+	// peopleLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( peopleLatentSeq.size(), 1920u );
+
+	// peopleRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( peopleRadSeq.size(), 1920u );
+
+	// peopleDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( peopleDelaySeq.size(), 1920u );
+
+	// lightInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( lightInstantSeq.size(), 1920u );
+
+	// lightRetAirSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( lightRetAirSeq.size(), 1920u );
+
+	// lightLWRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( lightLWRadSeq.size(), 1920u );
+
+	// lightSWRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( lightSWRadSeq.size(), 3360u );
+
+	// lightDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( lightDelaySeq.size(), 1920u );
+
+	// equipInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( equipInstantSeq.size(), 1920u );
+
+	// equipLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( equipLatentSeq.size(), 1920u );
+
+	// equipRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( equipRadSeq.size(), 1920u );
+
+	// equipDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( equipDelaySeq.size(), 1920u );
+
+	// refrigInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( refrigInstantSeq.size(), 1920u );
+
+	// refrigRetAirSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( refrigRetAirSeq.size(), 1920u );
+
+	// refrigLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( refrigLatentSeq.size(), 1920u );
+
+	// waterUseInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( waterUseInstantSeq.size(), 1920u );
+
+	// waterUseLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( waterUseLatentSeq.size(), 1920u );
+
+	// hvacLossInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( hvacLossInstantSeq.size(), 1920u );
+
+	// hvacLossRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( hvacLossRadSeq.size(), 1920u );
+
+	// hvacLossDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( hvacLossDelaySeq.size(), 1920u );
+
+	// powerGenInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( powerGenInstantSeq.size(), 1920u );
+
+	// powerGenRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( powerGenRadSeq.size(), 1920u );
+
+	// powerGenDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( powerGenDelaySeq.size(), 1920u );
+
+	// infilInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( infilInstantSeq.size(), 1920u );
+
+	// infilLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( infilLatentSeq.size(), 1920u );
+
+	// zoneVentInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( zoneVentInstantSeq.size(), 1920u );
+
+	// zoneVentLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( zoneVentLatentSeq.size(), 1920u );
+
+	// interZoneMixInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( interZoneMixInstantSeq.size(), 1920u );
+
+	// interZoneMixLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( interZoneMixLatentSeq.size(), 1920u );
+
+	// feneCondInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( feneCondInstantSeq.size(), 1920u );
+
+	// feneSolarRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( feneSolarRadSeq.size(), 3360u );
+
+	// feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	EXPECT_EQ( feneSolarDelaySeq.size(), 1920u );
+
+	// surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+	EXPECT_EQ( surfDelaySeq.size(), 3360u );
+
+}
+
+TEST( OutputReportTabularTest, ConfirmConvertToEscaped )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, ConfirmConvertToEscaped" );
+	EXPECT_EQ( "", ConvertToEscaped( "" ) );
+	EXPECT_EQ( " ", ConvertToEscaped( " " ) );
+	EXPECT_EQ( "String with &gt; in it", ConvertToEscaped( "String with > in it" ) );
+	EXPECT_EQ( "String with &lt; in it", ConvertToEscaped( "String with < in it" ) );
+	EXPECT_EQ( "String with &amp; in it", ConvertToEscaped( "String with & in it" ) );
+	EXPECT_EQ( "String with &quot; in it", ConvertToEscaped( "String with \" in it" ) );
+	EXPECT_EQ( "String with &apos; in it", ConvertToEscaped( "String with \' in it" ) );
+	EXPECT_EQ( "String with &quot; in it", ConvertToEscaped( R"(String with \" in it)" ) );
+	EXPECT_EQ( "String with &apos; in it", ConvertToEscaped( R"(String with \' in it)" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( std::string( "String with " ) +  char( 176 ) + std::string( " in it" ) ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( "String with \u00B0 in it" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( "String with \xB0 in it" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( "String with \xC2\xB0 in it" ) );
+	EXPECT_EQ( "String with \xC2 in it", ConvertToEscaped( "String with \xC2 in it" ) );
+	EXPECT_EQ( "String with \xC2\xB1 in it", ConvertToEscaped( "String with \xC2\xB1 in it" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( R"(String with \u00B0 in it)" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( R"(String with \xB0 in it)" ) );
+	EXPECT_ANY_THROW( ConvertToEscaped( R"(String with \u in it)" ) );
+	EXPECT_ANY_THROW( ConvertToEscaped( R"(String with \x in it)" ) );
+}
+
+TEST( OutputReportTabularTest, ConvertUnicodeToUTF8 )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, ConvertUnicodeToUTF8" );
+
+	{
+		std::string test;
+		test += static_cast<char>( 0 );
+		EXPECT_EQ( test, ConvertUnicodeToUTF8( std::stoul( "0x0000", nullptr, 16 ) ) );
+	}
+	EXPECT_EQ( "\x7F", ConvertUnicodeToUTF8( std::stoul( "0x7F", nullptr, 16 ) ) );
+	EXPECT_EQ( "\xC2\xB0", ConvertUnicodeToUTF8( std::stoul( "0xB0", nullptr, 16 ) ) );
+	EXPECT_EQ( "\xC2\xB0", ConvertUnicodeToUTF8( std::stoul( "0x00B0", nullptr, 16 ) ) );
+	EXPECT_EQ( "\xEF\xBF\xBF", ConvertUnicodeToUTF8( std::stoul( "0xFFFF", nullptr, 16 ) ) );
+	EXPECT_EQ( "\xF4\x8F\xBF\xBF", ConvertUnicodeToUTF8( std::stoul( "0x10FFFF", nullptr, 16 ) ) );
+	EXPECT_EQ( "", ConvertUnicodeToUTF8( std::stoul( "0x110000", nullptr, 16 ) ) );
+	EXPECT_EQ( "", ConvertUnicodeToUTF8( std::stoul( "0x1FFFFF", nullptr, 16 ) ) );
 }
 
 

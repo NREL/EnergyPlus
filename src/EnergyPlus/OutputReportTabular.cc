@@ -6950,7 +6950,6 @@ namespace OutputReportTabular {
 		std::string curNameWithSIUnits;
 		std::string curNameAndUnits;
 		int indexUnitConv;
-		std::string tableString;
 		Real64 processFraction;
 		Real64 processElecCost;
 		Real64 processGasCost;
@@ -8325,8 +8324,6 @@ namespace OutputReportTabular {
 		Real64 largeConversionFactor;
 		Real64 areaConversionFactor;
 		Real64 convBldgCondFloorArea;
-		std::string curNameWithSIUnits;
-		std::string curNameAndUnits;
 
 		if ( displaySourceEnergyEndUseSummary ) {
 			// show the headers of the report
@@ -10898,7 +10895,7 @@ namespace OutputReportTabular {
 			//  feneSolarInstantSeq = 0.0d0
 			feneSolarRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			feneSolarRadSeq = 0.0;
-			feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
+			feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			feneSolarDelaySeq = 0.0;
 			surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			surfDelaySeq = 0.0;
@@ -11524,7 +11521,6 @@ namespace OutputReportTabular {
 		Real64 totalGrandTotal;
 		Real64 powerConversion;
 		int tempConvIndx; // temperature conversion index
-		std::string stringWithTemp;
 		int curExtBoundCond;
 		Real64 mult; // zone multiplier
 
@@ -13268,6 +13264,29 @@ namespace OutputReportTabular {
 	}
 
 	std::string
+	ConvertUnicodeToUTF8( unsigned long const codepoint )
+	{
+		// Taken from http://stackoverflow.com/a/19968992/2358662 and http://stackoverflow.com/a/148766/2358662
+		std::string s;
+		if ( codepoint <= 0x7f ) {
+			s.push_back( static_cast<char>( codepoint ) );
+		} else if ( codepoint <= 0x7ff ) {
+			s.push_back( static_cast<char>( 0xc0 | ( ( codepoint >> 6 ) & 0x1f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( codepoint & 0x3f ) ) );
+		} else if ( codepoint <= 0xffff ) {
+			s.push_back( static_cast<char>( 0xe0 | ( ( codepoint >> 12 ) & 0x0f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( ( codepoint >> 6 ) & 0x3f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( codepoint & 0x3f ) ) );
+		} else if ( codepoint <= 0x10ffff ) {
+			s.push_back( static_cast<char>( 0xf0 | ( ( codepoint >> 18 ) & 0x07 ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( ( codepoint >> 12 ) & 0x3f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( ( codepoint >> 6 ) & 0x3f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( codepoint & 0x3f ) ) );
+		}
+		return s;
+	}
+
+	std::string
 	ConvertToEscaped( std::string const & inString ) // Input String
 	{
 		// SUBROUTINE INFORMATION:
@@ -13281,46 +13300,74 @@ namespace OutputReportTabular {
 		//   so it excludes:
 		//               " ' < > &
 
-		// METHODOLOGY EMPLOYED:
-		//   na
+		if ( inString.empty() ) return "";
 
-		// Return value
-		std::string outString; // Result String
+		std::string s;
+		auto const inputSize = inString.size();
+		s.reserve( inputSize );
+		size_t index( 0 );
+		char c;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		for ( std::string::size_type iIn = 0; iIn < len( inString ); ++iIn ) {
-			char const c( inString[ iIn ] );
-			int const curCharVal = int( c );
-			if ( curCharVal == 34 ) { //  "
-				outString += "&quot;";
-			} else if ( curCharVal == 38 ) { //   &
-				outString += "&amp;";
-			} else if ( curCharVal == 39 ) { //   '
-				outString += "&apos;";
-			} else if ( curCharVal == 60 ) { //   <
-				outString += "&lt;";
-			} else if ( curCharVal == 62 ) { //   >
-				outString += "&gt;";
-			} else if ( curCharVal == 176 ) { //   degree
-				outString += '*'; // replace degree symbol with asterisk to avoid errors from various XML editors
-			} else { // most characters are fine
-				outString += c;
+		while ( true ) {
+			if ( index == inputSize ) break;
+			c = inString[ index++ ];
+			if ( c == '\"' ) {
+				s += "&quot;";
+			} else if ( c == '&' ) {
+				s += "&amp;";
+			} else if ( c == '\'' ) {
+				s += "&apos;";
+			} else if ( c == '<' ) {
+				s += "&lt;";
+			} else if ( c == '>' ) {
+				s += "&gt;";
+			} else if ( c == char( 176 ) ) {
+				s += "&deg;";
+			} else if ( c == '\xC2' ) {
+				if ( index == inputSize ) {
+					s += '\xC2';
+				} else {
+					c = inString[ index++ ];
+					if ( c == '\xB0' ) {
+						s += "&deg;";
+					} else {
+						s += '\xC2';
+						s += c;
+					}
+				}
+			} else if ( c == '\xB0' ) {
+				s += "&deg;";
+			} else if ( c == '\\' ) {
+				if ( index == inputSize ) break;
+				c = inString[ index++ ];
+				if ( c == '"' ) {
+					s += "&quot;";
+				} else if ( c == '\'' ) {
+					s += "&apos;";
+				} else if ( c == 'u' || c == 'x' ) {
+					int remainingLen = inputSize - index;
+					unsigned long codePoint( 0 );
+					if ( c == 'u' && remainingLen > 3 ) {
+						codePoint = std::stoul( inString.substr( index, 4 ), nullptr, 16 );
+						index += 4;
+					} else if ( c == 'x' && remainingLen > 1 ) {
+						codePoint = std::stoul( inString.substr( index, 2 ), nullptr, 16 );
+						index += 2;
+					}
+					auto const unicodeString = ConvertUnicodeToUTF8( codePoint );
+					if ( unicodeString == "\xC2\xB0" ) { // only check for degree at this point
+						s += "&deg;";
+					} else {
+						s += unicodeString;
+					}
+				} else {
+					s += c;
+				}
+			} else {
+				s += c;
 			}
 		}
-		return outString;
+		return s;
 	}
 
 	void

@@ -5,31 +5,40 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Sticky.fwd.hh>
+#include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
-#include <cassert>
 #include <type_traits>
+#include <utility>
 
 namespace ObjexxFCL {
 
-// Sticky Argument Wrapper
+// Sticky: Sticky Argument Wrapper
 template< typename T >
 class Sticky
 {
 
 public: // Types
 
-	typedef  T  Value; // Type: Includes const attribute for const argument
+	// STL style
+	typedef  T  value_type;
+
+	// C++ style
+	typedef  T  Value;
+
+private: // Types
+
+	template< typename > friend class Sticky;
 
 public: // Creation
 
@@ -37,50 +46,52 @@ public: // Creation
 	Sticky()
 	{}
 
-	// Value Constructor
+	// Copy Constructor
+	Sticky( Sticky const & s ) :
+	 value_( s.value_ )
+	{}
+
+	// Copy Constructor Template
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	Sticky( Sticky< U > const & s ) :
+	 value_( s.value_ )
+	{}
+
+	// Move Constructor
+	Sticky( Sticky && s ) NOEXCEPT :
+	 value_( std::move( s.value_ ) )
+	{}
+
+	// Value Copy Constructor
 	explicit
-	Sticky( T const & val ) :
-	 val_( val )
+	Sticky( T const & value ) :
+	 value_( value )
 	{}
 
 	// Value Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	explicit
-	Sticky( U const & val ) :
-	 val_( val )
+	Sticky( U const & value ) :
+	 value_( value )
 	{}
 
-public: // Assignment
-
-	// Value Assignment
-	Sticky &
-	operator =( T const & val )
-	{
-		val_ = val;
-		return *this;
-	}
-
-	// Value Assignment Template
-	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
-	Sticky &
-	operator =( U const & val )
-	{
-		val_ = val;
-		return *this;
-	}
+	// Value Move Constructor
+	Sticky( T && value ) NOEXCEPT :
+	 value_( std::move( value ) )
+	{}
 
 public: // Conversion
 
 	// Value Conversion
 	operator T const &() const
 	{
-		return val_;
+		return value_;
 	}
 
 	// Value Conversion
 	operator T &()
 	{
-		return val_;
+		return value_;
 	}
 
 public: // Operators
@@ -89,25 +100,121 @@ public: // Operators
 	T const &
 	operator ()() const
 	{
-		return val_;
+		return value_;
 	}
 
 	// Value
 	T &
 	operator ()()
 	{
-		return val_;
+		return value_;
+	}
+
+public: // Assignment
+
+	// Copy Assignment
+	Sticky &
+	operator =( Sticky const & s )
+	{
+		if ( this != &s ) {
+			value_ = s.value_;
+		}
+		return *this;
+	}
+
+	// Copy Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	Sticky &
+	operator =( Sticky< U > const & s )
+	{
+		value_ = s.value_;
+		return *this;
+	}
+
+	// Move Assignment
+	Sticky &
+	operator =( Sticky && s ) NOEXCEPT
+	{
+		value_ = std::move( s.value_ );
+		return *this;
+	}
+
+	// Value Copy Assignment
+	Sticky &
+	operator =( T const & value )
+	{
+		value_ = value;
+		return *this;
+	}
+
+	// Value Copy Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	Sticky &
+	operator =( U const & value )
+	{
+		value_ = value;
+		return *this;
+	}
+
+	// Value Move Assignment
+	Sticky &
+	operator =( T && value )
+	{
+		value_ = std::move( value );
+		return *this;
+	}
+
+public: // Property
+
+	// Value
+	T const &
+	value() const
+	{
+		return value_;
+	}
+
+	// Value
+	T &
+	value()
+	{
+		return value_;
+	}
+
+public: // Modifier
+
+	// Clear
+	void
+	clear()
+	{
+		value_ = T();
+	}
+
+	// Swap
+	void
+	swap( Sticky & o )
+	{
+		using std::swap;
+		swap( value_, o.value_ );
 	}
 
 private: // Data
 
-	T val_; // Object
+	T value_; // Object
 
 }; // Sticky
 
-// Functions
+// Swap
+template< typename T >
+inline
+void
+swap( Sticky< T > & a, Sticky< T > & b )
+{
+	a.swap( b );
+}
 
-// Sticky Maker
+// Makers
+
+// Sticky Copy Maker
 template< typename T >
 inline
 Sticky< T >
@@ -116,13 +223,31 @@ make_Sticky( T const & t )
 	return Sticky< T >( t );
 }
 
-// Sticky Maker
+// Sticky Copy Maker
 template< typename T >
 inline
 Sticky< T >
 sticky( T const & t )
 {
 	return Sticky< T >( t );
+}
+
+// Sticky Move Maker
+template< typename T >
+inline
+Sticky< T >
+make_Sticky( T && t )
+{
+	return Sticky< T >( std::move( t ) );
+}
+
+// Sticky Move Maker
+template< typename T >
+inline
+Sticky< T >
+sticky( T && t )
+{
+	return Sticky< T >( std::move( t ) );
 }
 
 // Comparison

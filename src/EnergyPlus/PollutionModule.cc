@@ -162,10 +162,15 @@ namespace PollutionModule {
 	//*************************************************************************
 
 	// Functions
+	// Clears the global data in Pollution module.
+	// Needed for unit tests, should not be normally called.
 	void
-	clear_state() {
-		GetInputFlagPollution = true;
+	clear_state()
+	{
 		PollutionReportSetup = false;
+		GetInputFlagPollution = true;
+		NumEnvImpactFactors = 0;
+		NumFuelFactors = 0;
 	}
 
 	void

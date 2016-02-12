@@ -743,7 +743,7 @@ namespace WaterManager {
 				if ( ( RainFall.RainSchedID == 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
 					ShowSevereError( "Schedule not found for " + cCurrentModuleObject + " object" );
 					ErrorsFound = true;
-				} else if ( ( RainFall.RainSchedID == 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
+				} else if ( ( RainFall.RainSchedID != 0 ) && ( RainFall.ModeID == RainSchedDesign ) ) {
 					if ( ! CheckScheduleValueMinMax( RainFall.RainSchedID, ">=", 0.0 ) ) {
 						ShowSevereError( "Schedule=" + cAlphaArgs( 2 ) + " for " + cCurrentModuleObject + " object has values < 0." );
 						ErrorsFound = true;

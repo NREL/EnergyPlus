@@ -132,37 +132,6 @@ namespace DataBranchAirLoopPlant {
 			CurveInput3( 0.0 )
 		{}
 
-		// Member Constructor
-		PlantPressureCurveData(
-			std::string const & Name,
-			Real64 const EquivDiameter, // - An effective diameter for calculation of Re & e/D [m]
-			Real64 const MinorLossCoeff, // - K factor                                          [-]
-			Real64 const EquivLength, // - An effective length to apply friction calculation [m]
-			Real64 const EquivRoughness, // - An effective roughness (e) to calculate e/D       [m]
-			bool const ConstantFPresent, // - Signal for if a constant value of f was entered
-			Real64 const ConstantF, // - Constant value of f (if applicable)               [-]
-			bool const EMSOverrideOn, // if TRUE, then EMS is calling to override curve value
-			Real64 const EMSOverrideCurveValue, // Value of curve result EMS is directing to use
-			Real64 const CurveOutput,
-			Real64 const CurveInput1, // - MassFlow                                         [kg/s]
-			Real64 const CurveInput2, // - Density                                          [kg/m3]
-			Real64 const CurveInput3 // - Velocity                                         [m/s]
-		) :
-			Name( Name ),
-			EquivDiameter( EquivDiameter ),
-			MinorLossCoeff( MinorLossCoeff ),
-			EquivLength( EquivLength ),
-			EquivRoughness( EquivRoughness ),
-			ConstantFPresent( ConstantFPresent ),
-			ConstantF( ConstantF ),
-			EMSOverrideOn( EMSOverrideOn ),
-			EMSOverrideCurveValue( EMSOverrideCurveValue ),
-			CurveOutput( CurveOutput ),
-			CurveInput1( CurveInput1 ),
-			CurveInput2( CurveInput2 ),
-			CurveInput3( CurveInput3 )
-		{}
-
 	};
 
 	// Object Data
