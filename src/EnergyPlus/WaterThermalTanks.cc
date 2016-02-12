@@ -6259,6 +6259,7 @@ namespace WaterThermalTanks {
 		Real64 Qunmet; // The difference between Qneeded and Qheater (W)
 		Real64 Qvent; // Heating rate due to venting because tank exceeded max temperature limit (W)
 		Real64 Qfuel; // Heating rate for fuel consumed (W)
+		Real64 Qusl; // Quse + Qsource + Qloss
 		Real64 UseInletTemp; // Use side inlet temperature (C)
 		Real64 UseMassFlowRate; // Use side flow rate, including effectiveness factor (kg/s)
 		Real64 SourceInletTemp; // Source side inlet temperature (C)
@@ -6343,6 +6344,7 @@ namespace WaterThermalTanks {
 		} else {
 			Cp = GetSpecificHeatGlycol( fluidNameWater, Tank.TankTemp, DummyWaterIndex, RoutineName );
 		}
+		Real64 const dt_Cp( dt / Cp );
 
 		TempUp = 0.0;
 		TempDn = 0.0;
@@ -6368,7 +6370,9 @@ namespace WaterThermalTanks {
 		if ( Tank.InletMode == InletModeFixed ) CalcNodeMassFlows( WaterThermalTankNum, InletModeFixed );
 
 		TimeRemaining = SecInTimeStep;
-		while ( TimeRemaining > 0.0 ) {
+		Real64 & tank_node1_newTemp( Tank.Node( 1 ).NewTemp );
+		Real64 const & tank_useOutletStratNode_temp( Tank.Node( Tank.UseOutletStratNode ).Temp );
+		while ( TimeRemaining > 0.0 ) { //? Might be good to use a check that is tolerant to some epsilon * dt to avoid an extra pass due to roundoff when subtracting dt (if dt is ever not a value with an exact floating point representation)
 
 			if ( Tank.InletMode == InletModeSeeking ) CalcNodeMassFlows( WaterThermalTankNum, InletModeSeeking );
 
@@ -6376,8 +6380,7 @@ namespace WaterThermalTanks {
 
 				// Control the first heater element (master)
 				if ( Tank.MaxCapacity > 0.0 ) {
-					NodeNum = Tank.HeaterNode1;
-					NodeTemp = Tank.Node( NodeNum ).Temp;
+					NodeTemp = Tank.Node( Tank.HeaterNode1 ).Temp;
 
 					if ( Tank.HeaterOn1 ) {
 						if ( NodeTemp >= SetPointTemp1 ) {
@@ -6405,8 +6408,7 @@ namespace WaterThermalTanks {
 						Tank.HeaterOn2 = false;
 
 					} else {
-						NodeNum = Tank.HeaterNode2;
-						NodeTemp = Tank.Node( NodeNum ).Temp;
+						NodeTemp = Tank.Node( Tank.HeaterNode2 ).Temp;
 
 						if ( Tank.HeaterOn2 ) {
 							if ( NodeTemp >= SetPointTemp2 ) {
@@ -6434,11 +6436,12 @@ namespace WaterThermalTanks {
 				Qheater2 = 0.0;
 
 			}
+			Real64 const Qheaters( Qheater1 + Qheater2 );
 
 			if ( Tank.HeaterOn1 || Tank.HeaterOn2 ) {
 				Runtime += dt;
 
-				Qfuel = ( Qheater1 + Qheater2 ) / Tank.Efficiency;
+				Qfuel = Qheaters / Tank.Efficiency;
 				Qoncycfuel = Tank.OnCycParaLoad;
 				Qoffcycfuel = 0.0;
 			} else {
@@ -6448,12 +6451,13 @@ namespace WaterThermalTanks {
 			}
 
 			// Loop through all nodes and simulate heat balance
-			for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
-				NodeMass = Tank.Node( NodeNum ).Mass;
-				NodeTemp = Tank.Node( NodeNum ).Temp;
+			for ( int NodeNum = 1, nTankNodes = Tank.Nodes; NodeNum <= nTankNodes; ++NodeNum ) {
+				auto & tank_node( Tank.Node( NodeNum ) );
+				NodeMass = tank_node.Mass;
+				NodeTemp = tank_node.Temp;
 
-				UseMassFlowRate = Tank.Node( NodeNum ).UseMassFlowRate * Tank.UseEffectiveness;
-				SourceMassFlowRate = Tank.Node( NodeNum ).SourceMassFlowRate * Tank.SourceEffectiveness;
+				UseMassFlowRate = tank_node.UseMassFlowRate * Tank.UseEffectiveness;
+				SourceMassFlowRate = tank_node.SourceMassFlowRate * Tank.SourceEffectiveness;
 
 				// Heat transfer due to fluid flow entering an inlet node
 				Quse = UseMassFlowRate * Cp * ( UseInletTemp - NodeTemp );
@@ -6467,11 +6471,11 @@ namespace WaterThermalTanks {
 						}
 					} else {
 						assert( HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterWrapped );
-						Qsource = Qheatpump * Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac;
+						Qsource = Qheatpump * tank_node.HPWHWrappedCondenserHeatingFrac;
 					}
 				} else {
 					// Constant temperature source side flow
-					Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - Tank.Node( NodeNum ).Temp );
+					Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - NodeTemp );
 				}
 
 				InvMixUp = 0.0;
@@ -6479,64 +6483,69 @@ namespace WaterThermalTanks {
 					TempUp = Tank.Node( NodeNum - 1 ).Temp;
 					if ( TempUp < NodeTemp ) InvMixUp = Tank.InversionMixingRate;
 				}
+//BUG? When NodeNum==1 TempUp is 0.0   Shouldn't it be NodeTemp to void the vertical conduction? !!!!!!!!!!!!!!!!!
+				Real64 const delTempUp( TempUp - NodeTemp );
 
 				InvMixDn = 0.0;
-				if ( NodeNum < Tank.Nodes ) {
+				if ( NodeNum < nTankNodes ) {
 					TempDn = Tank.Node( NodeNum + 1 ).Temp;
 					if ( TempDn > NodeTemp ) InvMixDn = Tank.InversionMixingRate;
 				}
+				Real64 const delTempDn( TempDn - NodeTemp );
 
 				// Heat transfer due to vertical conduction between nodes
-				Qcond = Tank.Node( NodeNum ).CondCoeffUp * ( TempUp - NodeTemp ) + Tank.Node( NodeNum ).CondCoeffDn * ( TempDn - NodeTemp );
+				Qcond = tank_node.CondCoeffUp * delTempUp + tank_node.CondCoeffDn * delTempDn;
 
 				// Heat transfer due to fluid flow between inlet and outlet nodes
-				Qflow = Tank.Node( NodeNum ).MassFlowFromUpper * Cp * ( TempUp - NodeTemp ) + Tank.Node( NodeNum ).MassFlowFromLower * Cp * ( TempDn - NodeTemp );
+				Qflow = Cp * ( tank_node.MassFlowFromUpper * delTempUp + tank_node.MassFlowFromLower * delTempDn );
 
 				// Heat transfer due to temperature inversion mixing between nodes
-				Qmix = InvMixUp * Cp * ( TempUp - NodeTemp ) + InvMixDn * Cp * ( TempDn - NodeTemp );
+				Qmix = Cp * ( InvMixUp * delTempUp + InvMixDn * delTempDn );
 
 				if ( Tank.HeaterOn1 || Tank.HeaterOn2 ) {
-					LossCoeff = Tank.Node( NodeNum ).OnCycLossCoeff;
+					LossCoeff = tank_node.OnCycLossCoeff;
 					Qloss = LossCoeff * ( AmbientTemp - NodeTemp );
-					Qlosszone = Qloss * Tank.SkinLossFracToZone;
-					Qoncycheat = Tank.Node( NodeNum ).OnCycParaLoad * Tank.OnCycParaFracToTank;
+					Qheat = Qoncycheat = tank_node.OnCycParaLoad * Tank.OnCycParaFracToTank;
+					Qusl = Quse + Qsource + Qloss;
 
-					Qneeded = max( -Quse - Qsource - Qloss - Qoncycheat, 0.0 );
+					Qneeded = max( -Qusl - Qoncycheat, 0.0 );
 
-					Qheat = Qoncycheat;
-					if ( NodeNum == Tank.HeaterNode1 ) Qheat += Qheater1;
-					if ( NodeNum == Tank.HeaterNode2 ) Qheat += Qheater2;
+					if ( NodeNum == Tank.HeaterNode1 ) {
+						Qheat += Qheater1;
+					} else if ( NodeNum == Tank.HeaterNode2 ) {
+						Qheat += Qheater2;
+					}
 				} else {
-					LossCoeff = Tank.Node( NodeNum ).OffCycLossCoeff;
+					LossCoeff = tank_node.OffCycLossCoeff;
 					Qloss = LossCoeff * ( AmbientTemp - NodeTemp );
-					Qlosszone = Qloss * Tank.SkinLossFracToZone;
-					Qoffcycheat = Tank.Node( NodeNum ).OffCycParaLoad * Tank.OffCycParaFracToTank;
+					Qheat = Qoffcycheat = tank_node.OffCycParaLoad * Tank.OffCycParaFracToTank;
+					Qusl = Quse + Qsource + Qloss;
 
-					Qneeded = max( -Quse - Qsource - Qloss - Qoffcycheat, 0.0 );
-					Qheat = Qoffcycheat;
+					Qneeded = max( -Qusl - Qoffcycheat, 0.0 );
 				}
 
-				Qunmet = max( Qneeded - Qheater1 - Qheater2, 0.0 );
+				Qunmet = max( Qneeded - Qheaters, 0.0 );
 
 				// Calculate node heat balance
-				Tank.Node( NodeNum ).NewTemp = NodeTemp + ( Quse + Qsource + Qcond + Qflow + Qmix + Qloss + Qheat ) * dt / ( NodeMass * Cp );
+				tank_node.NewTemp = NodeTemp + ( Qusl + Qcond + Qflow + Qmix + Qheat ) * dt_Cp / NodeMass;
 
 				if ( ! Tank.IsChilledWaterTank ) {
-					if ( ( NodeNum == 1 ) && ( Tank.Node( 1 ).NewTemp > MaxTemp ) ) {
-						Event += NodeMass * Cp * ( MaxTemp - Tank.Node( 1 ).NewTemp );
-						Tank.Node( 1 ).NewTemp = MaxTemp;
+					if ( ( NodeNum == 1 ) && ( tank_node1_newTemp > MaxTemp ) ) {
+						Event += NodeMass * ( MaxTemp - tank_node1_newTemp );
+						tank_node1_newTemp = MaxTemp;
 					}
 				}
 
-				Esource += Qsource * dt;
-				Eloss += Qloss * dt;
-				Elosszone += Qlosszone * dt;
-				Eneeded += Qneeded * dt;
-				Eunmet += Qunmet * dt;
+				Esource += Qsource;
+				Eloss += Qloss;
+				Eneeded += Qneeded;
+				Eunmet += Qunmet;
 
 			} // NodeNum
 
-			Euse += UseMassFlowRate * Cp * (UseInletTemp - Tank.Node( Tank.UseOutletStratNode ).Temp) * dt;
+			Euse += UseMassFlowRate * ( UseInletTemp - tank_useOutletStratNode_temp );
+//? This is using the value of UseMassFlowRate from the last node
+//  If that is intended a comment would be a good idea
 
 			// Calculation for standard ratings
 			if ( ! Tank.FirstRecoveryDone ) {
@@ -6553,6 +6562,15 @@ namespace WaterThermalTanks {
 			TimeRemaining -= dt;
 
 		} // TimeRemaining > 0.0
+
+		// Finalize accumulated values
+		Event *= Cp;
+		Esource *= dt;
+		Eloss *= dt;
+		Elosszone = Eloss * Tank.SkinLossFracToZone;
+		Eneeded *= dt;
+		Eunmet *= dt;
+		Euse *= Cp * dt;
 
 		Eheater1 = Tank.MaxCapacity * Runtime1;
 		Eheater2 = Tank.MaxCapacity2 * Runtime2;
