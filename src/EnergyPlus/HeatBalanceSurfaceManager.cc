@@ -406,11 +406,6 @@ namespace HeatBalanceSurfaceManager {
 		bool bEndofErrFile; // End of Error File flag
 		int iDElightRefPt; // Reference Point number for reading DElight Dump File (eplusout.delighteldmp)
 		Real64 dRefPtIllum; // tmp var for reading RefPt illuminance
-		Real64 minBulb; // outdoor air minimum drybulb or wetbulb temperature at surface centroid height
-		Real64 maxheight; // surface centroid maximum height
-		std::string SurfaceName; // surface name
-		std::string ZoneName; // zone name
-
 		// RJH DElight Modification End
 
 		int MapNum;
@@ -429,7 +424,6 @@ namespace HeatBalanceSurfaceManager {
 		// using the zone, modify the zone  Dry/Wet BulbTemps
 		SetZoneOutBulbTempAt();
 		CheckZoneOutBulbTempAt();
-		//if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Zone", maxheight, ZoneName );
 
 		SetZoneWindSpeedAt();
 		//  DO ZoneNum = 1, NumOfZones
@@ -441,7 +435,6 @@ namespace HeatBalanceSurfaceManager {
 		// using the surface centroids, modify the surface Dry/Wet BulbTemps
 		SetSurfaceOutBulbTempAt();
 		CheckSurfaceOutBulbTempAt();
-		//if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Surface", maxheight, SurfaceName );
 
 		SetSurfaceWindSpeedAt();
 		//  DO SurfNum = 1, TotSurfaces

@@ -284,9 +284,7 @@ namespace SurfaceGeometry {
 
 		bool nonInternalMassSurfacesPresent;
 		bool DetailedWWR;
-		Real64 minBulb; // outdoor air minimum drybulb or wetbulb temperature at surface centroid height
-		Real64 maxheight; // surface centroid maximum height
-		std::string ZoneName; // zone name
+
 
 		// Formats
 		static gio::Fmt Format_720( "(' Zone Information, ',A,28(',',A))" );
@@ -671,7 +669,6 @@ namespace SurfaceGeometry {
 		// Do the Stratosphere check
 		SetZoneOutBulbTempAt();
 		CheckZoneOutBulbTempAt();
-		//if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Zone", maxheight, ZoneName );
 
 		//  IF (ALLOCATED(ZoneSurfacesCount)) DEALLOCATE(ZoneSurfacesCount)
 		//  IF (ALLOCATED(ZoneSubSurfacesCount)) DEALLOCATE(ZoneSubSurfacesCount)
