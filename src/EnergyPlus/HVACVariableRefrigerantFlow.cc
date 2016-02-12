@@ -6171,19 +6171,11 @@ namespace HVACVariableRefrigerantFlow {
 			AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
 			AverageOAMassFlow = ( PartLoadRatio * OACompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * OACompOffMassFlow );
 		} else {
-			if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeSysCurve ) {
-				if ( PartLoadRatio == 0.0 ) {
-					// set the average OA air flow to off compressor values if the compressor PartLoadRatio is zero
-					AverageUnitMassFlow = CompOffMassFlow;
-					AverageOAMassFlow = OACompOffMassFlow;
-				} else {
-					AverageUnitMassFlow = CompOnMassFlow;
-					AverageOAMassFlow = OACompOnMassFlow;
-				}
-			} else { //AlgorithmTypeFluidTCtrl
-				// The physics based VRF model sets the CompOnMassFlow variable in CalcVRF_FluidTCtrl routine and subsequently
-				// used here. CompOnMassFlow is reset to OACompOnMassFlow in this routine. Should AverageUnitMassFlow be set to 
-				// CompOffMassFlow if the comprtessor is off? We need to review this logic for the physics based VRF model
+			if ( PartLoadRatio == 0.0 ) {
+				// set the average OA air flow to off compressor values if the compressor PartLoadRatio is zero
+				AverageUnitMassFlow = CompOffMassFlow;
+				AverageOAMassFlow = OACompOffMassFlow;
+			} else {
 				AverageUnitMassFlow = CompOnMassFlow;
 				AverageOAMassFlow = OACompOnMassFlow;
 			}
@@ -8882,6 +8874,7 @@ namespace HVACVariableRefrigerantFlow {
 		if( PartLoadRatio == 0 ) {
 			// only provide required OA when coil is off
 			CompOnMassFlow = OACompOnMassFlow;
+			CompOffMassFlow = OACompOffMassFlow;
 		} else {
 			// identify the air flow rate corresponding to the coil load
 			CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl( VRFTUNum, PartLoadRatio, FirstHVACIteration );
