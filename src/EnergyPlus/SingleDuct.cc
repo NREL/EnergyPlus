@@ -1956,22 +1956,37 @@ namespace SingleDuct {
 		}
 
 		IsAutoSize = false;
-		if ( Sys( SysNum ).ZoneMinAirFrac == AutoSize && Sys( SysNum ).ZoneMinAirFracMethod == ConstantMinFrac ) {
-			IsAutoSize = true;
+		if ( Sys( SysNum ).ZoneMinAirFrac == AutoSize ) {
+			if ( Sys( SysNum ).ZoneMinAirFracMethod == ConstantMinFrac ) {
+				IsAutoSize = true;
+			} else {
+				Sys( SysNum ).ZoneMinAirFrac = 0.0;
+			}
 		}
 		if ( CurZoneEqNum > 0 ) {
 			if ( IsAutoSize ) {
-				CheckZoneSizing( Sys( SysNum ).SysType, Sys( SysNum ).SysName );
-				if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
-					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
-						Sys( SysNum ).ZoneMinAirFrac = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate;
+				if ( ZoneSizingRunDone ) {
+					if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
+						// if the user input a value for min flow frac in Sizing:Zone, use it
+						Sys( SysNum ).ZoneMinAirFrac = FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac;
+					} else {
+						// otherwise use the combined defaults or other user inputs stored in DesCoolVolFlowMin
+						if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
+							Sys( SysNum ).ZoneMinAirFrac = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate;
+						}
+						else {
+							Sys( SysNum ).ZoneMinAirFrac = 0.0;
+						}
 					}
-				}
-				else {
+				} else {
+					// if no sizing run, do same defaulting as would have been done in zone sizing
 					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
 						MinMinFlowRatio = ( 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier ) /
 							Sys( SysNum ).MaxAirVolFlowRate;
 						Sys( SysNum ).ZoneMinAirFrac = max( 0.2, MinMinFlowRatio );
+					}
+					else {
+						Sys( SysNum ).ZoneMinAirFrac = 0.0;
 					}
 				}
 				ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "Design Size Constant Minimum Air Flow Fraction",
@@ -1980,16 +1995,25 @@ namespace SingleDuct {
 		}
 
 		IsAutoSize = false;
-		if ( Sys( SysNum ).ZoneFixedMinAir == AutoSize && Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
-			IsAutoSize = true;
+		if ( Sys( SysNum ).ZoneFixedMinAir == AutoSize ) {
+			if ( Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
+				IsAutoSize = true;
+			}
+			else {
+				Sys( SysNum ).ZoneFixedMinAir = 0.0;
+			}
 		}
 		if ( CurZoneEqNum > 0 ) {
 			if ( IsAutoSize ) {
-				CheckZoneSizing( Sys( SysNum ).SysType, Sys( SysNum ).SysName );
-				if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
-					Sys( SysNum ).ZoneFixedMinAir = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin;
-				}
-				else {
+				if ( ZoneSizingRunDone ) {
+					if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg ) {
+						// if the user input a value for min flow frac in Sizing:Zone, use it
+						Sys( SysNum ).ZoneFixedMinAir = FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac * Sys( SysNum ).MaxAirVolFlowRate;
+					} else {
+						// otherwise use the combined defaults or other user inputs stored in DesCoolVolFlowMin
+						Sys( SysNum ).ZoneFixedMinAir = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin;
+					}
+				} else {
 					Sys( SysNum ).ZoneFixedMinAir = max( 0.2*Sys( SysNum ).MaxAirVolFlowRate, 0.000762 * Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier *
 						Zone( ZoneNum ).ListMultiplier );
 				}

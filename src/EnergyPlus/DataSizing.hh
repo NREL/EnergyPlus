@@ -330,11 +330,9 @@ namespace DataSizing {
 		//  3 = apply limits to air flow rate from DD calc
 		Real64 DesCoolAirFlow; // design zone supply air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
-		bool DesCoolMinAirFlowPerAreaUsInpFlg; // user input flag for design cooling minimum air flow rate per zone area
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
-		bool DesCoolMinAirFlowUsInpFlg; // user input flag for design cooling minimum air flow rate
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
-		bool DesCoolMinAirFlowFracUsInpFlg; // user input flag for minimum air flow rate fraction
+		bool DesCoolMinAirFlowFracUsInpFlg; // user input for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -377,9 +375,7 @@ namespace DataSizing {
 			CoolAirDesMethod( 0 ),
 			DesCoolAirFlow( 0.0 ),
 			DesCoolMinAirFlowPerArea( 0.0 ),
-			DesCoolMinAirFlowPerAreaUsInpFlg( false ),
 			DesCoolMinAirFlow( 0.0 ),
-			DesCoolMinAirFlowUsInpFlg( false ),
 			DesCoolMinAirFlowFrac( 0.0 ),
 			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
@@ -434,11 +430,9 @@ namespace DataSizing {
 		//  3 = apply limits to air flow rate from DD calc
 		Real64 InpDesCoolAirFlow; // design zone supply air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
-		bool DesCoolMinAirFlowPerAreaUsInpFlg; // user input flag for design cooling minimum air flow rate per zone area
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
-		bool DesCoolMinAirFlowUsInpFlg; // user input flag for design cooling minimum air flow rate
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
-		bool DesCoolMinAirFlowFracUsInpFlg; // user input flag for minimum air flow rate fraction
+		bool DesCoolMinAirFlowFracUsInpFlg; // user flag for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -602,9 +596,7 @@ namespace DataSizing {
 			CoolAirDesMethod( 0 ),
 			InpDesCoolAirFlow( 0.0 ),
 			DesCoolMinAirFlowPerArea( 0.0 ),
-			DesCoolMinAirFlowPerAreaUsInpFlg( false ),
 			DesCoolMinAirFlow( 0.0 ),
-			DesCoolMinAirFlowUsInpFlg( false ),
 			DesCoolMinAirFlowFrac( 0.0 ),
 			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),

@@ -1088,9 +1088,7 @@ namespace ZoneEquipmentManager {
 					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( ZoneSizNum ).HeatAirDesMethod;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolAirFlow;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
-					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerAreaUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerAreaUsInpFlg;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
-					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowUsInpFlg;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFracUsInpFlg;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
@@ -1119,9 +1117,7 @@ namespace ZoneEquipmentManager {
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( ZoneSizNum ).HeatAirDesMethod;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolAirFlow;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
-					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerAreaUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerAreaUsInpFlg;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
-					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowUsInpFlg;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFracUsInpFlg;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
@@ -1159,9 +1155,7 @@ namespace ZoneEquipmentManager {
 					ZoneSizing( DesDayNum, CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( 1 ).HeatAirDesMethod;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( 1 ).DesCoolAirFlow;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
-					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerAreaUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerAreaUsInpFlg;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
-					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowUsInpFlg;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowFracUsInpFlg;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
@@ -1190,9 +1184,7 @@ namespace ZoneEquipmentManager {
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( 1 ).HeatAirDesMethod;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( 1 ).DesCoolAirFlow;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
-					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowPerAreaUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerAreaUsInpFlg;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
-					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowUsInpFlg;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowFracUsInpFlg;
 					CalcZoneSizing( DesDayNum, CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
@@ -1337,9 +1329,7 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( ZoneSizNum ).HeatAirDesMethod;
 				FinalZoneSizing( CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolAirFlow;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
-				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerAreaUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerAreaUsInpFlg;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
-				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowUsInpFlg;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFracUsInpFlg;
 				FinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
@@ -1373,9 +1363,7 @@ namespace ZoneEquipmentManager {
 				CalcFinalZoneSizing( CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( ZoneSizNum ).HeatAirDesMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolAirFlow;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerArea;
-				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerAreaUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowPerAreaUsInpFlg;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlow;
-				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowUsInpFlg;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFrac;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( ZoneSizNum ).DesCoolMinAirFlowFracUsInpFlg;
 				CalcFinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( ZoneSizNum ).DesHeatAirFlow;
@@ -1408,9 +1396,7 @@ namespace ZoneEquipmentManager {
 				FinalZoneSizing( CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( 1 ).HeatAirDesMethod;
 				FinalZoneSizing( CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( 1 ).DesCoolAirFlow;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
-				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerAreaUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerAreaUsInpFlg;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
-				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowUsInpFlg;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
 				FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowFracUsInpFlg;
 				FinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
@@ -1444,9 +1430,7 @@ namespace ZoneEquipmentManager {
 				CalcFinalZoneSizing( CtrlZoneNum ).HeatAirDesMethod = ZoneSizingInput( 1 ).HeatAirDesMethod;
 				CalcFinalZoneSizing( CtrlZoneNum ).InpDesCoolAirFlow = ZoneSizingInput( 1 ).DesCoolAirFlow;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerArea;
-				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerAreaUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowPerAreaUsInpFlg;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow = ZoneSizingInput( 1 ).DesCoolMinAirFlow;
-				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowUsInpFlg;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( 1 ).DesCoolMinAirFlowFrac;
 				CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( 1 ).DesCoolMinAirFlowFracUsInpFlg;
 				CalcFinalZoneSizing( CtrlZoneNum ).InpDesHeatAirFlow = ZoneSizingInput( 1 ).DesHeatAirFlow;
@@ -2928,7 +2912,9 @@ namespace ZoneEquipmentManager {
 
 				// set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
 				// minimum flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
+				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, 
+					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, 
+					FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
 				// set the zone maximum heating supply air flow rate. This will be used for autosizing VAV terminal unit
 				// max heating flow rates
 				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow * FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac );

@@ -31171,7 +31171,7 @@ Sizing:Zone,
       \note fraction of the Cooling design Air Flow Rate
       \type real
       \minimum 0
-      \default 0
+      \default 0.2
       \note This input is currently used in sizing the Fan minimum Flow Rate.
       \note It does not currently affect other component autosizing.
   A6, \field Heating Design Air Flow Method
