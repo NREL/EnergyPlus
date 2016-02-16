@@ -409,6 +409,22 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 				! Read the real value back and assign to OutArgs(2)
 				WRITE(OutArgs(2),*) MuEMPD
 
+              ! It is debatable whether I should actually improve this to make it more like the report variables
+              ! I think it is much less likely that these will change between versions
+              ! So for now I'll just change them on a version by version basis.
+              CASE ('ENERGYMANAGEMENTSYSTEM:ACTUATOR')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                SELECT CASE ( MakeUPPERCase ( InArgs(4) ) )
+                CASE ('OUTDOOR AIR DRYBLUB TEMPERATURE')
+				  nodiff = .true.
+				  OutArgs = InArgs
+				  OutArgs(4) = 'Outdoor Air Drybulb Temperature'
+                CASE ('OUTDOOR AIR WETBLUB TEMPERATURE')
+                  nodiff = .true.
+                  OutArgs = InArgs
+				  OutArgs(4) = 'Outdoor Air Wetbulb Temperature'
+                END SELECT
+
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)

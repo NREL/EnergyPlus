@@ -655,7 +655,7 @@ Figure 58.  Geometry for calculation of direct component of daylight illuminanc
 
 For the unshaded window case, the luminance of the window element is found by projecting the ray from reference point to window element and determining whether it intersects the sky or an exterior obstruction such as an overhang. If *L* is the corresponding luminance of the sky or obstruction, the window luminance is
 
-<div>$${L_w} = L{\tau_{vis}}(\cos B)$$</div>
+<div>$${L_w} = L{\tau_{vis}}$$</div>
 
 where <span>\({\tau_{vis}}\)</span>is the visible transmittance of the glass for incidence angle *B*.
 

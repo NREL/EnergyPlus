@@ -3380,6 +3380,9 @@ namespace DataHeatBalance {
 	SetZoneOutBulbTempAt();
 
 	void
+	CheckZoneOutBulbTempAt();
+
+	void
 	SetZoneWindSpeedAt();
 
 	void
