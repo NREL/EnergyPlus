@@ -1668,7 +1668,7 @@ namespace EnergyPlus {
 		OutputProcessor::SetupTimePointers( "Zone", DataGlobals::TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		OutputProcessor::SetupTimePointers( "HVAC", DataHVACGlobals::TimeStepSys );
 		PlantManager::CheckIfAnyPlant();
-		ElectricPowerService::createFacilityElectricPowerServiceObject();
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput(); // just gets input and returns.
 		DataGlobals::DoingSizing = true;
 		SizingManager::ManageSizing();

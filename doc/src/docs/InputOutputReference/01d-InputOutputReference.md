@@ -19993,6 +19993,18 @@ There are no output variables reported for the DemandManager:Ventilation object.
 
 Group -- Electric Load Center-Generator Specifications
 ------------------------------------------------------
+This group of input objects is related electric power serving the facility.  EnergyPlus has models for various types of electric generators and power conditioning devices that might be part of the electric power system serving the building being modeled.  Buildings with simple utility electric power service will not necesarily any of the models in this group.  A simple straightforward utility connection is assumed for all EnergyPlus models that have any electric power consumption.  The models in this group are useful for facilities that include the following sorts of equipment as part of the electric power service.
+
+   - Utility service is at a voltage higher than used in the building and a transformer  conditioning power coming into to the building is part of the facility.
+   - On site generators produce electricity within the facility
+   - On site electric storage of electricity
+
+For facilities that own their own transformer, and the utility services is metered on the high voltage side, the ElectricLoadCenter:Transformer object can be used, and may be the only input object needed.  
+
+All other applications involving on-site generation or storage will require at least one ElectricLoadCenter:Distribution to describe the arrangement and control of a set of electric power devices.  Each of these load centers is like a subpanel connected to the main electrical panel for the facility.  The main panel is assumed to exist whenever the rest of the model includes something that consumes electricity and does not have any input.  Each ElectricLoadCenter:Distribution input object describes what devices are on a subpanel connected to the main panel, as well as how they are controlled, dispatched, and arranged to provide some service related to the facility's electric power.  The ElectricLoadCenter:Distribution object manages and calls the individual generator models that connected to it by being listed in an ElectricLoadCenter:Generators object, such as natural gas powered turbines, photovoltaic panels, wind turbines, etc.  Unlike elsewhere in EnergyPlus where there are loops, branches, or generic equipment lists that allow describing custom arrangements, the electric power service modeling is restricted to a small collection of arrangements, or buss types.  Many on site generation and storage configurations common in buildings can be modeled using just one ElectricLoadCenter:Distribution object.  However, by combining multiple load centers with different equipment and operations schemes, it is possible to model more complex configurations.  Note that when using multiple ElectricLoadCenter:Distribution objects, the order of the ElectricLoadCenter:Distribution objects within the input file determines the order in which they are called to interact with the main panel.
+
+
+
 
 ### ElectricLoadCenter:Transformer
 
@@ -20198,11 +20210,11 @@ This alpha field contains the identifying name for the electric load center.
 
 #### Field: Generator List Name
 
-This alpha field contains the identifying name for the list of generators in the set.
+This alpha field contains the identifying name for the list of generators in the set defined in an ElectricLoadCenter:Generators object.  All the generators connected to this load center need to be of the same type in terms of all AC or all DC.  Currently the only DC generators are photovoltaic panels, the others are all AC.  A facility with both AC and DC generators will need to use seperate ElectricLoadCenter:Distribution objects.  
 
 #### Field: Generator Operation Scheme Type
 
-This alpha field specifies the type of operating scheme for the generator set. The available operating schemes are    Baseload,       DemandLimit,       TrackElectrical,       TrackSchedule,       TrackMeter,       FollowThermal,    and    FollowThermalLimitElectrical.    The Baseload scheme operates the generators at their rated (requested) electric power output when the generator is scheduled ON (ref. ElectricLoadCenter:Generators). The Baseload scheme requests all generators scheduled ON (available) to operate, even if the amount of electric power generated exceeds the total facility electric power demand. The DemandLimit scheme limits the amount of purchased electrical from the utility to the amount specified in the input object. The DemandLimit scheme tries to have the generators meet all of the demand above the purchased electric limit set by the user in the next field. The TrackElectrical scheme tries to have the generators meet all of the electrical demand for the building. The TrackSchedule scheme tries to have the generators meet all of the electrical demand determined in a user-defined schedule. The TrackMeter scheme tries to have the generators meet all the electrical demand from a meter, which could also be a user-defined custom meter.
+This alpha field specifies the type of operating scheme for the generator set. The available operating schemes are Baseload, DemandLimit, TrackElectrical, TrackSchedule, TrackMeter, FollowThermal,    and FollowThermalLimitElectrical.  The Baseload scheme operates the generators at their rated (requested) electric power output when the generator is scheduled ON (ref. ElectricLoadCenter:Generators). The Baseload scheme requests all generators scheduled ON (available) to operate, even if the amount of electric power generated exceeds the total facility electric power demand. The DemandLimit scheme limits the amount of purchased electrical from the utility to the amount specified in the input object. The DemandLimit scheme tries to have the generators meet all of the demand above the purchased electric limit set by the user in the next field. The TrackElectrical scheme tries to have the generators meet all of the electrical demand for the building. The TrackSchedule scheme tries to have the generators meet all of the electrical demand determined in a user-defined schedule. The TrackMeter scheme tries to have the generators meet all the electrical demand from a meter, which could also be a user-defined custom meter.
 
 The DemandLimit, TrackElectrical, TrackSchedule, and TrackMeter schemes will sequentially load the available generators. All demand not met by available generator capacity will be met by purchased electrical. Therefore, if DemandLimit, TrackElectrical, TrackSchedule, or TrackMeter is utilized and the available generators are not enough to meet demand, then purchased electrical will offset the difference. If a generator is needed in the simulation for a small load and it is less than the minimum part load ratio the generator will operate at the minimum part load ratio and the excess will either reduce demand or the excess energy will be available for returning to the electric grid.
 
@@ -20236,7 +20248,7 @@ This alpha field is used to describe how the electric load center is configured 
 
 - DirectCurrentWithInverterACStorage
 
-AlternatingCurrent is the default.   All the generators connected to a specific load center need to be of the same type (all AC or all DC).   If the generators are DC, then an inverter is needed to convert the DC to AC.   If there are DC generators and a DC electrical storage device on the buss along with an inverter, then use DirectCurrentWithInverterDCStorage in this field.   See the Engineering Reference for more information including diagrams of the load center configurations.
+AlternatingCurrent is the default.      If the generators are DC, then an inverter is needed to convert the DC to AC.   If there are DC generators and a DC electrical storage device on the buss along with an inverter, then use DirectCurrentWithInverterDCStorage in this field.   See the Engineering Reference for more information including diagrams of the load center configurations.
 
 #### Field: Inverter Object Name
 

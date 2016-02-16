@@ -376,7 +376,7 @@ namespace SimulationManager {
 		CheckIfAnySlabs();
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
-		ElectricPowerService::createFacilityElectricPowerServiceObject();
+		createFacilityElectricPowerServiceObject();
 
 		ManageBranchInput(); // just gets input and returns.
 
@@ -425,7 +425,7 @@ namespace SimulationManager {
 			SetupPollutionMeterReporting();
 			UpdateMeterReporting();
 			CheckPollutionMeterReporting();
-			ElectricPowerService::facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
+			facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
 			SetupPollutionCalculations();
 			InitDemandManagers();
 

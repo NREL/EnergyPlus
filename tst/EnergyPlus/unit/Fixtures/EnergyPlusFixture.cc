@@ -297,7 +297,7 @@ namespace EnergyPlus {
 		DataZoneEquipment::clear_state();
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();
-		ElectricPowerService::clear_state();
+		clearFacilityElectricPowerServiceObject();
 		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
 		FluidProperties::clear_state();

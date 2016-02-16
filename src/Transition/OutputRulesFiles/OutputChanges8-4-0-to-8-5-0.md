@@ -30,3 +30,8 @@ For version 8.5, the strings used to report pump sizes have changed In the EIO f
     Initial Rated Flow Rate [m3/s] => Initial Design Flow Rate [m3/s]
     Rated Power Consumption [W] => Design Power Consumption [W]
     Initial Rated Power Consumption [W] => Initial Design Power Consumption [W]
+
+
+### Electric Load Center Changes
+
+The metering of photovoltaic power production has been changed.  Previously it was assumed that all AC power produced by an inverter was from photovoltaics because that was the only DC generator.  However new features for charging DC storage from grid supplied power make this assumption untenable.  Photovoltaic generators now meter their DC energy production (on Photovoltaic:ElectrictyProduced).  There is a new subenduse meter type called "PowerConversion:ElectricityProduced" and the inverter (and new AC to DC Converter) meter the electric power losses from power conversion on this meter (as negative values). 

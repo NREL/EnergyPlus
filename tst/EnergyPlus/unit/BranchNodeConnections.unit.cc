@@ -1110,7 +1110,7 @@ namespace EnergyPlus {
 		GetProjectData( );
 		OutputReportPredefined::SetPredefinedTables( );
 		SetPreConstructionInputParameters( ); //establish array bounds for constructions early
-		ElectricPowerService::createFacilityElectricPowerServiceObject();
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput( );
 		BeginSimFlag = true;
 		BeginEnvrnFlag = true;
@@ -2114,7 +2114,7 @@ namespace EnergyPlus {
 		GetProjectData( );
 		OutputReportPredefined::SetPredefinedTables( );
 		SetPreConstructionInputParameters( ); //establish array bounds for constructions early
-		ElectricPowerService::createFacilityElectricPowerServiceObject();
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput( );
 		BeginSimFlag = true;
 		BeginEnvrnFlag = true;

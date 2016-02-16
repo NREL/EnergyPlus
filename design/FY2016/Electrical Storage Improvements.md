@@ -62,10 +62,10 @@ A number of known issues related to storage will be addressed as part of a gener
 
 Introductory text will be added at the Group level to help explain how the various ElectricLoadCenter:* and Generator:* objects relate to one another to provide higher level guidance. 
 
-The ElectricLoadCenter:Distribution object will be modified to add the following new input fields at the end of the object.  All of the new inputs will be setup so if they are omitted the legacy behavior, or at least intended behavior where there no issues, will be retained. 
+The ElectricLoadCenter:Distribution object will be modified to add the following new input fields at the end of the object.  All of the new inputs will be setup so if they are omitted the legacy behavior, or at least intended behavior were there no issues, will be retained. 
 
-#### Field: Storage Charge Operation Scheme
-This field is used to determine which power source is used to charge the electric storage device. There are four choices: OnSiteGenerators, OnSiteGeneratorsSurplus, ScheduledGridSupply, and OnSiteGeneratorSurplusPlusScheduledGridSupply. 
+#### Field: Storage Charge Power Source
+This field is used to determine the power source used to charge the electric storage device. There are four choices: OnSiteGenerators, OnSiteGeneratorsSurplus, ScheduledGridSupply, and OnSiteGeneratorSurplusPlusScheduledGridSupply. 
 
 - OnSiteGenerators key choice indicates that all the power produced on-site is used to charge the storage regardless of the current facility power demand. The rate of charging will depend on how the generators are controlled.
 - OnSiteGeneratorsSurplus key choice indicates that the power produced on-site that exceeds the facility demand is used to charge the storage.  The rate of charging will depend on how the generators are controlled and the current level of power consumed by the building and its systems. This was the intended legacy behavior prior to version 8.5 and is therefore the default. 
@@ -87,8 +87,8 @@ This field is the name of a schedule that is used to control the timing and magn
 #### Field: Storage Converter Name
  This field is the name of an ElectricLoadCenter:Storage:Converter object defined elsewhere in the input file that describes the performance of converting convert AC to DC when charging DC storage from grid supply. This field is required when using DC storage (buss type DirectCurrentWithInverterDCStorage) with grid supplied charging power (Storage Charge Operation Scheme is set to ScheduledGridSupply or OnSiteGeneratorSurplusPlusScheduledGridSupply.) Although some inverter devices are bidirectional a separate converter object is needed to describe AC to DC performance. 
 
-#### Field: Storage Discharge Operation Scheme
-This field is used to determine how storage discharge is controlled.  There are five choices:  FacilityDemandLimit, TrackFacilityElectricDemand, TrackSchedule, TrackMeter, and ScheduledGridExport.
+#### Field: Storage Operation Scheme
+This field is used to determine how storage charge and discharge is controlled.  There are five choices:  FacilityDemandLimit, TrackFacilityElectricDemand, TrackSchedule, TrackMeter, and ScheduledGridExport.
 
 - DemandLimit indicates that storage discharge control will limit facility power demand drawn from the utility service while accounting for any on-site generation.  The rate of discharge will depend on the current level of power consumed by the building and its systems, the power generated any on-site generation, and conversion losses as well as demand limit and schedule in the next two fields. This is intended to help control demand (kW) charges in the electric service tariff. 
 - TrackElectric indicates that storage discharge control will follow the facility power demand while accounting for any on-site generation.  This was the intended behavior prior to version 8.5 and is therefore the default. 
@@ -108,8 +108,8 @@ This field is the name of a schedule that is used control the storage discharge.
 #### Field: Storage Discharge Track Meter Name
 This field is the name of an EnergyPlus electric meter that is used to control storage discharge. The power level from the meter is considered as AC and used to control the discharge.  The rate of discharge is determined by first using an on-site generation and then meeting the remaining load by drawing from storage.  When the storage is DC the discharge rate will be adjusted upward to account for inverter losses (but not transformer losses).   This field is only used, and is required, when the Storage Discharge Operation Scheme Type is set to TrackMeter.  
  
-#### Field: Maximum Storage Discharge Grid Export Power
-This numeric field is the target net power exported to the utility service, in Watts.  This is maximum value and is modified by the values in the schedule named in the following field.  The target export power is used in the control of storage discharge along with the current on-site generation.  This value is the power as viewed from the grid. Power conversion losses from any inverter and/or transformer located between the storage and the utility service connection are considered and the storage discharge will be adjusted higher to compensate.  
+#### Field: Design Storage Discharge Grid Export Power
+This numeric field is the target net power exported to the utility service, in Watts.  This is maximum value and is modified by the values in the schedule named in the following field.  The target export power is used in the control of storage discharge along with the current on-site generation.  This value is the power as viewed from the storage. Power conversion losses from any inverter and/or transformer located between the storage and the utility service connection are considered and the actual grid export will be adjusted lower to compensate.  
 
        
 #### Field: Storage Discharge Grid Export Fraction Schedule Name

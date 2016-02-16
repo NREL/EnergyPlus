@@ -316,6 +316,7 @@ namespace DataHeatBalance {
 	int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed( 49 );
 	int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed( 50 );
 	int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed( 51 );
+	int const IntGainTypeOf_ElectricLoadCenterConverter( 52 );
 
 	//Parameters for checking surface heat transfer models
 	Real64 const HighDiffusivityThreshold( 1.e-5 ); // used to check if Material properties are out of line.

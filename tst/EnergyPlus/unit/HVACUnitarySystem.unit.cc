@@ -2715,7 +2715,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
 
 	SimulationManager::GetProjectData();
-	ElectricPowerService::createFacilityElectricPowerServiceObject();
+	createFacilityElectricPowerServiceObject();
 	DataGlobals::BeginSimFlag = true;
 	DataGlobals::DoingSizing = true;
 	SizingManager::ManageSizing();

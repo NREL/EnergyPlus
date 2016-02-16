@@ -76,10 +76,10 @@
 
 namespace EnergyPlus {
 
-namespace ElectricPowerService {
 
-	enum thermalLossDestinationEnum {
-		heatLossNotDetermined,
+
+	enum class ThermalLossDestination : int {
+		heatLossNotDetermined = 0,
 		zoneGains,
 		lostToOutside
 	};
@@ -93,36 +93,38 @@ class DCtoACInverter
 {
 private: // Creation
 	// Default Constructor
-		DCtoACInverter() :
-			aCPowerOut( 0.0 ),
-			aCEnergyOut( 0.0 ),
-			efficiency( 0.0 ),
-			dCPowerIn( 0.0 ),
-			dCEnergyIn( 0.0 ),
-			thermLossRate( 0.0 ),
-			thermLossEnergy( 0.0 ),
-			qdotConvZone( 0.0 ),
-			qdotRadZone( 0.0 ),
-			ancillACuseRate( 0.0 ),
-			ancillACuseEnergy( 0.0 ),
-			name( ""),
-			modelType( notYetSet ),
-			availSchedPtr( 0 ),
-			heatLossesDestination( heatLossNotDetermined ),
-			zoneNum( 0 ),
-			zoneRadFract( 0.0 ),
-			nightTareLossPower( 0.0 ),
-			nominalVoltage( 0.0 ),
-			nomVoltEfficiencyARR( 6, 0.0 ),
-			curveNum( 0 ),
-			ratedPower( 0.0 ),
-			minPower( 0.0 ),
-			maxPower( 0.0 ),
-			minEfficiency( 0.0 ),
-			maxEfficiency( 0.0 ),
-			standbyPower( 0.0 )
+	DCtoACInverter() :
+		aCPowerOut( 0.0 ),
+		aCEnergyOut( 0.0 ),
+		efficiency( 0.0 ),
+		dCPowerIn( 0.0 ),
+		dCEnergyIn( 0.0 ),
+		conversionLossPower( 0.0 ),
+		conversionLossEnergy( 0.0 ),
+		conversionLossEnergyDecrement( 0.0 ),
+		thermLossRate( 0.0 ),
+		thermLossEnergy( 0.0 ),
+		qdotConvZone( 0.0 ),
+		qdotRadZone( 0.0 ),
+		ancillACuseRate( 0.0 ),
+		ancillACuseEnergy( 0.0 ),
+		name( ""),
+		modelType( InverterModelType::notYetSet ),
+		availSchedPtr( 0 ),
+		heatLossesDestination( ThermalLossDestination::heatLossNotDetermined ),
+		zoneNum( 0 ),
+		zoneRadFract( 0.0 ),
+		nominalVoltage( 0.0 ),
+		nomVoltEfficiencyARR( 6, 0.0 ),
+		curveNum( 0 ),
+		ratedPower( 0.0 ),
+		minPower( 0.0 ),
+		maxPower( 0.0 ),
+		minEfficiency( 0.0 ),
+		maxEfficiency( 0.0 ),
+		standbyPower( 0.0 )
 
-		{}
+	{}
 
 	// Copy Constructor
 	DCtoACInverter( DCtoACInverter const & ) = default;
@@ -144,9 +146,8 @@ public: // Methods
 	);
 
 	void
-	manageInverter( 
-		Real64 const powerDCElectProductionRate,
-		Real64 const powerDCElectStorageDrawRate
+	simulate( 
+		Real64 const powerIntoInverter
 	); // Load Center number counter
 
 	void
@@ -159,6 +160,11 @@ public: // Methods
 	getThermLossRate();
 
 	Real64
+	getLossRateForOutputPower(
+		Real64 const powerOutOfInverter
+	);
+
+	Real64
 	getACPowerOut();
 
 	Real64
@@ -167,15 +173,21 @@ public: // Methods
 
 private: //Methods
 
+	void
+	calcEfficiency();
+
+
+
 public: // data public for unit test
 		Real64 aCPowerOut;
 		Real64 aCEnergyOut;
 		//results and reporting
 		Real64 efficiency;
 		Real64 dCPowerIn;
-
 		Real64 dCEnergyIn;
-
+		Real64 conversionLossPower;
+		Real64 conversionLossEnergy;
+		Real64 conversionLossEnergyDecrement;
 		Real64 thermLossRate;
 		Real64 thermLossEnergy;
 		Real64 qdotConvZone;
@@ -184,7 +196,7 @@ public: // data public for unit test
 		Real64 ancillACuseEnergy;
 
 private: // data
-		enum inverterModelTypeEnum {
+		enum class InverterModelType : int {
 			notYetSet,
 			cECLookUpTableModel,
 			curveFuncOfPower,
@@ -192,12 +204,11 @@ private: // data
 		};
 
 		std::string name; // user identifier
-		inverterModelTypeEnum modelType; // type of inverter model used
+		InverterModelType modelType; // type of inverter model used
 		int availSchedPtr; // number for availability schedule.
-		thermalLossDestinationEnum heatLossesDestination;
+		ThermalLossDestination heatLossesDestination;
 		int zoneNum; // destination zone for heat losses from inverter.
 		Real64 zoneRadFract; // radiative fraction for thermal losses to zone
-		Real64 nightTareLossPower; // CEC lookup table model
 		Real64 nominalVoltage; // CEC lookup table model
 		std::vector < Real64 > nomVoltEfficiencyARR; // eff at 10, 20, 30, 50, 75, & 100% CEC lookup table model
 		int curveNum; // curve index for eff as func of power
@@ -210,6 +221,128 @@ private: // data
 
 
 }; //DCtoACInverter
+
+
+class ACtoDCConverter
+{
+
+private: // creation
+	//Default Constructor
+	ACtoDCConverter() :
+		efficiency( 0.0 ),
+		aCPowerIn( 0.0 ),
+		aCEnergyIn( 0.0 ),
+		dCPowerOut( 0.0 ),
+		dCEnergyOut( 0.0 ),
+		conversionLossPower( 0.0 ),
+		conversionLossEnergy( 0.0 ),
+		conversionLossEnergyDecrement( 0.0 ),
+		thermLossRate( 0.0 ),
+		thermLossEnergy( 0.0 ),
+		qdotConvZone( 0.0 ),
+		qdotRadZone( 0.0 ),
+		ancillACuseRate( 0.0 ),
+		ancillACuseEnergy( 0.0 ),
+		name ( "" ), 
+		availSchedPtr( 0 ),
+		modelType( ConverterModelType::notYetSet ),
+		heatLossesDestination( ThermalLossDestination::heatLossNotDetermined ),
+		zoneNum( 0 ),
+		zoneRadFract( 0.0 ), // radiative fraction for thermal losses to zone
+		standbyPower( 0.0 ), 
+		maxPower( 0.0 )
+	{}
+
+
+	// Copy Constructor
+	ACtoDCConverter( ACtoDCConverter const & ) = default;
+
+	// Move Constructor
+#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
+	ACtoDCConverter( ACtoDCConverter && ) = default;
+#endif
+
+public: // Methods
+
+	// Destructor
+	~ACtoDCConverter()
+	{}
+
+	// Constructor
+	ACtoDCConverter(
+		std::string const objectName
+	);
+
+	void
+	simulate(
+		Real64 const powerOutFromConverter
+	); // Load Center number counter
+
+	void
+	reinitAtBeginEnvironment();
+
+	void
+	reinitZoneGainsAtBeginEnvironment();
+
+	Real64
+	getThermLossRate();
+
+	Real64
+	getDCPowerOut();
+
+	Real64
+	getDCEnergyOut();
+
+	Real64 
+	getACPowerIn();
+
+	Real64
+	getLossRateForInputPower(
+		Real64 const powerIntoConverter //AC power going into inverter
+	);
+
+private: //methods
+	
+	void
+	calcEfficiency();
+
+public: // data public for unit test
+	
+		Real64 efficiency;
+		Real64 aCPowerIn;
+		Real64 aCEnergyIn;
+		Real64 dCPowerOut;
+		Real64 dCEnergyOut;
+		Real64 conversionLossPower;
+		Real64 conversionLossEnergy;
+		Real64 conversionLossEnergyDecrement;
+		Real64 thermLossRate;
+		Real64 thermLossEnergy;
+		Real64 qdotConvZone;
+		Real64 qdotRadZone;
+		Real64 ancillACuseRate;
+		Real64 ancillACuseEnergy;
+
+private: // data
+		enum class ConverterModelType : int {
+			notYetSet,
+			curveFuncOfPower,
+			simpleConstantEff
+		};
+
+		std::string name; // user identifier
+		int availSchedPtr; // number for availability schedule.
+		ConverterModelType modelType; // type of inverter model used
+		int curveNum; // performance curve or table index
+		ThermalLossDestination heatLossesDestination;
+		int zoneNum; // destination zone for heat losses from inverter.
+		Real64 zoneRadFract; // radiative fraction for thermal losses to zone
+		Real64 standbyPower; 
+		Real64 maxPower;
+
+};
+
+
 
 class ElectricStorage
 {
@@ -225,9 +358,9 @@ private: // Creation
 			maxRainflowArrayInc( 100 ),
 			myWarmUpFlag( false ),
 			name( "" ),
-			storageModelMode( storageTypeNotSet ),
+			storageModelMode( StorageModelType::storageTypeNotSet ),
 			availSchedPtr( 0 ),
-			heatLossesDestination( heatLossNotDetermined ),
+			heatLossesDestination( ThermalLossDestination::heatLossNotDetermined ),
 			zoneNum( 0 ),
 			zoneRadFract( 0.0 ),
 			startingEnergyStored( 0.0 ),
@@ -252,17 +385,17 @@ private: // Creation
 			maxDischargeI( 0.0 ),
 			cutoffV( 0.0 ),
 			maxChargeRate( 0.0 ),
-			lifeCalculation( degredationNotSet ),
+			lifeCalculation( BatteyDegredationModelType::degredationNotSet ),
 			lifeCurveNum( 0 ),
 			thisTimeStepStateOfCharge( 0.0 ),
 			lastTimeStepStateOfCharge( 0.0 ),
 			pelNeedFromStorage( 0.0 ),
 			pelFromStorage( 0.0 ),
-			eMSOverridePelFromStorage( false ),
-			eMSValuePelFromStorage( 0.0 ),
+//			eMSOverridePelFromStorage( false ),
+//			eMSValuePelFromStorage( 0.0 ),
 			pelIntoStorage( 0.0 ),
-			eMSOverridePelIntoStorage( false ),
-			eMSValuePelIntoStorage( 0.0 ),
+//			eMSOverridePelIntoStorage( false ),
+//			eMSValuePelIntoStorage( 0.0 ),
 			qdotConvZone( 0.0 ),
 			qdotRadZone( 0.0 ),
 			timeElapsed( 0.0 ),
@@ -307,6 +440,32 @@ public: //methods
 	);
 
 	void
+	timeCheckAndUpdate();
+
+	void
+	simulate(
+		Real64 & powerCharge,
+		Real64 & powerDischarge,
+		bool & charging,
+		bool & discharging,
+		Real64 const controlSOCMaxFracLimit,
+		Real64 const controlSOCMinFracLimit
+	);
+
+
+
+
+	void
+	calcAndReportSimpleBucketModel();
+
+	void
+	trailCalcKinetcBatteryModel();
+
+	void
+	calcAndReportKineticBatteryModel();
+
+// move some of this up to load center, storage operation scheme stuff pulled out of battery 
+	void
 	manageElectCenterStorageInteractions(
 		Real64 const powerDemand, // load center power demand minus any inverter losses that need to be applied
 		Real64 const powerGenSupply, // sum of load center generator production
@@ -350,6 +509,26 @@ public: //methods
 private: //methods
 
 	void
+	simulateSimpleBucketModel( // request charge discharge and 
+		Real64 & powerCharge,
+		Real64 & powerDischarge,
+		bool & charging,
+		bool & discharging,
+		Real64 const controlSOCMaxFracLimit,
+		Real64 const controlSOCMinFracLimit
+	);
+
+	void
+	simulateKineticBatteryModel(
+		Real64 & powerCharge,
+		Real64 & powerDischarge,
+		bool & charging,
+		bool & discharging,
+		Real64 const controlSOCMaxFracLimit,
+		Real64 const controlSOCMinFracLimit
+	);
+
+	void
 	rainflow(
 		int const numbin, // numbin = constant value
 		Real64 const input, // input = input value from other object (battery model)
@@ -380,24 +559,24 @@ public: //data public for unit tests
 
 private: //data
 
-	enum storageModelTypeEnum {
-		storageTypeNotSet,
+	enum class StorageModelType : int {
+		storageTypeNotSet = 0,
 		simpleBucketStorage,
 		kiBaMBattery
 	};
 
-	enum degredationModelTypeEnum {
-		degredationNotSet,
-		batteryLifeCalculationYes,
-		batteryLifeCalculationNo
+	enum class BatteyDegredationModelType : int{
+		degredationNotSet = 0,
+		lifeCalculationYes,
+		lifeCalculationNo
 	};
 	int maxRainflowArrayBounds;
 	int const maxRainflowArrayInc = 100;
 	bool myWarmUpFlag;
 	std::string name; // name of this electrical storage module
-	storageModelTypeEnum storageModelMode; // type of model parameter, SimpleBucketStorage
+	StorageModelType storageModelMode; // type of model parameter, SimpleBucketStorage
 	int availSchedPtr; // availability schedule index.
-	thermalLossDestinationEnum heatLossesDestination; // mode for where thermal losses go
+	ThermalLossDestination heatLossesDestination; // mode for where thermal losses go
 	int zoneNum; // destination zone for heat losses from inverter.
 	Real64 zoneRadFract; // radiative fraction for thermal losses to zone
 	Real64 startingEnergyStored; // [J] joules inside at beginning of environment period
@@ -422,18 +601,22 @@ private: //data
 	Real64 maxDischargeI; // [A] maximum discharging current
 	Real64 cutoffV; // [V] cut-off voltage
 	Real64 maxChargeRate; // [1/h]charge rate limit
-	degredationModelTypeEnum lifeCalculation; // [ ]battery life calculation: Yes or No
+	BatteyDegredationModelType lifeCalculation; // [ ]battery life calculation: Yes or No
 	int lifeCurveNum; // [ ]battery life curve name index number
 	//calculated and from elsewhere vars
 	Real64 thisTimeStepStateOfCharge; // [J]
 	Real64 lastTimeStepStateOfCharge; // [J]
+
+// move to load center
 	Real64 pelNeedFromStorage; // [W]
 	Real64 pelFromStorage; // [W]
-	bool eMSOverridePelFromStorage; // if true, EMS calling for override
-	Real64 eMSValuePelFromStorage; // value EMS is directing to use, power from storage [W]
+//	bool eMSOverridePelFromStorage; // if true, EMS calling for override
+//	Real64 eMSValuePelFromStorage; // value EMS is directing to use, power from storage [W]
 	Real64 pelIntoStorage; // [W]
-	bool eMSOverridePelIntoStorage; // if true, EMS calling for override
-	Real64 eMSValuePelIntoStorage; // value EMS is directing to use, power into storage [W]
+//	bool eMSOverridePelIntoStorage; // if true, EMS calling for override
+//	Real64 eMSValuePelIntoStorage; // value EMS is directing to use, power into storage [W]
+// move to load center
+
 	Real64 qdotConvZone; // [W]
 	Real64 qdotRadZone; // [W]
 	Real64 timeElapsed; // [h]
@@ -473,8 +656,8 @@ private: // Creation
 			name( " "),
 			myOneTimeFlag( true ),
 			availSchedPtr( 0 ),
-			usageMode( useNotYetSet ),
-			heatLossesDestination( heatLossNotDetermined ),
+			usageMode( TransformerUse::usenotYetSet ),
+			heatLossesDestination( ThermalLossDestination::heatLossNotDetermined ),
 			zoneNum( 0 ),
 			zoneRadFrac( 0.0 ),
 			ratedCapacity( 0.0 ),
@@ -482,7 +665,7 @@ private: // Creation
 			factorTempCoeff( 0.0 ),
 			tempRise( 0.0 ),
 			eddyFrac( 0.0 ),
-			performanceInputMode( perfInputMethodNotSet ),
+			performanceInputMode( TransformerPerformanceInput::perfInputMethodNotSet ),
 			ratedEfficiency( 0.0 ),
 			ratedPUL( 0.0 ),
 			ratedTemp( 0.0 ),
@@ -504,7 +687,7 @@ private: // Creation
 			thermalLossRate( 0.0 ),
 			thermalLossEnergy( 0.0 ),
 			elecUseUtility( 0.0 ),
-			elecProducedCoGen( 0.0 ),
+			elecUseOutToGrid( 0.0 ),
 			qdotConvZone( 0.0 ),
 			qdotRadZone( 0.0 )
 		{}
@@ -530,6 +713,16 @@ public: //methods
 		std::string objectName
 	);
 
+	Real64
+	getLossRateForOutputPower(
+		Real64 const powerOutOfTransformer
+	);
+
+	Real64
+	getLossRateForInputPower(
+		Real64 const powerIntoTransformer
+	);
+
 	void
 	manageTransformers(
 		Real64 const surplusPowerOutFromLoadCenters
@@ -553,6 +746,7 @@ public: //methods
 	getLoadCenterObjIndices();
 
 
+
 private: //methods
 
 public: 
@@ -560,14 +754,14 @@ public:
 	std::vector < int > loadCenterObjIndexes; // index array of load centers served by the transformer
 private: //data
 
-	enum transformerUseEnum {
-		useNotYetSet,
+	enum class TransformerUse : int {
+		usenotYetSet = 0,
 		powerInFromGrid, // condition power from grid going into building buss
 		powerOutFromBldgToGrid, // condition power from building buss going out to grid
 		powerFromLoadCenterToBldg // condition power from a load center going into building buss
 	};
-	enum transformerPerformanceInputEnum {
-		perfInputMethodNotSet,
+	enum class TransformerPerformanceInput : int {
+		perfInputMethodNotSet = 0,
 		lossesMethod,
 		efficiencyMethod
 	
@@ -576,8 +770,8 @@ private: //data
 	std::string name; // user identifier
 	bool myOneTimeFlag;
 	int availSchedPtr; // availability schedule index.
-	transformerUseEnum usageMode; // mode for transformer usage
-	thermalLossDestinationEnum heatLossesDestination; // mode for where thermal losses go
+	TransformerUse usageMode; // mode for transformer usage
+	ThermalLossDestination heatLossesDestination; // mode for where thermal losses go
 	int zoneNum; // destination zone for heat losses from inverter.
 	Real64 zoneRadFrac; // radiative fraction for thermal losses to zone
 	Real64 ratedCapacity; // rated capacity [VA]
@@ -585,7 +779,7 @@ private: //data
 	Real64 factorTempCoeff; // thermal coefficient of resistance for winding material
 	Real64 tempRise; // full load temperature rise [C]
 	Real64 eddyFrac; // fraction of eddy current losses []
-	transformerPerformanceInputEnum performanceInputMode; // performance input method
+	TransformerPerformanceInput performanceInputMode; // performance input method
 	Real64 ratedEfficiency; // nameplate efficiency []
 	Real64 ratedPUL; // per unit load for nameplate efficiency []
 	Real64 ratedTemp; // reference temperature for nameplate efficiency [C]
@@ -612,11 +806,13 @@ private: //data
 	Real64 noLoadLossEnergy; // [J]
 	Real64 loadLossRate; // [W]
 	Real64 loadLossEnergy; // [J]
+	Real64 totalLossRate;
+
 	Real64 thermalLossRate; // [W]
 	Real64 thermalLossEnergy; // [J]
 	Real64 elecUseUtility; // [J] Energy consumption for a utility transformer (power in)
 	// Positive values
-	Real64 elecProducedCoGen; // [J] Energy consumption for a cogeneration transformer (power out)
+	Real64 elecUseOutToGrid; // [J] Energy consumption for a (cogeneration )transformer (power out from building to grid)
 	// Negative values
 	Real64 qdotConvZone; // [W]
 	Real64 qdotRadZone; // [W]
@@ -633,7 +829,7 @@ private: // Creation
 		typeOfName( "" ),
 		compGenTypeOf_Num( 0 ),
 		compPlantTypeOf_Num( 0 ),
-		generatorType( generatorNotYetSet ),
+		generatorType( GeneratorType::notYetSet ),
 		generatorIndex( 0 ),
 		maxPowerOut( 0.0 ),
 		availSched( " " ),
@@ -650,7 +846,7 @@ private: // Creation
 		electricityProd( 0.0 ),
 		electProdRate( 0.0 ),
 		thermalProd( 0.0 ),
-		thermalProdRate( 0.0 )
+		thermProdRate( 0.0 )
 	{}
 
 	// Copy Constructor
@@ -692,15 +888,15 @@ private: //Methods
 
 
 public: // data // might make this class a friend of ElectPowerLoadCenter?
-	enum generatorTypeEnum {
-		generatorNotYetSet,
-		generatorICEngine,
-		generatorCombTurbine,
-		generatorPV,
-		generatorFuelCell,
-		generatorMicroCHP,
-		generatorMicroturbine,
-		generatorWindTurbine
+	enum class GeneratorType : int {
+		notYetSet = 0,
+		iCEngine,
+		combTurbine,
+		pV,
+		fuelCell,
+		microCHP,
+		microturbine,
+		windTurbine
 	};
 
 
@@ -708,7 +904,7 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
 	std::string typeOfName; // equipment type
 	int compGenTypeOf_Num; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
 	int compPlantTypeOf_Num; // numeric designator for plant component, in DataPlant
-	generatorTypeEnum generatorType;
+	GeneratorType generatorType;
 	int generatorIndex; // index in generator model data struct
 	Real64 maxPowerOut; // Maximum Power Output (W)
 	std::string availSched; // Operation Schedule.
@@ -726,27 +922,40 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
 	Real64 electricityProd; // Current AC Electric Produced from Equipment (J)
 	Real64 electProdRate; // Current AC Electric Production Rate from Equipment (W)
 	Real64 thermalProd; // Current Thermal energy Produced from Equipment (J)
-	Real64 thermalProdRate; // Current Thermal energy Production Rate from Equipment (W)
+	Real64 thermProdRate; // Current Thermal energy Production Rate from Equipment (W)
 }; //class GeneratorController
 
 class ElectPowerLoadCenter
 {
 
+// a load center can be thought of as a kind of subpanel that connects power equipment to the main panel
+// multiple subpanels can be connected to the main panel and each ElectPowerLoadCenter object is a subpanel
+
 private: // Creation
 	// Default Constructor
 	ElectPowerLoadCenter() :
 		numGenerators( 0 ),
-		bussType( bussNotYetSet ),
-		electricityProd( 0.0 ),
-		electProdRate( 0.0 ),
+		bussType( ElectricBussType::notYetSet ),
+
 		thermalProd( 0.0 ),
 		thermalProdRate( 0.0 ),
 		inverterPresent( false ),
 		inverterName( " "),
-		electDemand( 0.0 ),
+		subpanelFeedInRequest( 0.0 ),
+//		subpanelFeedInElectric( 0.0 ),
+		subpanelFeedInRate( 0.0 ),
+//		subpanelDrawElectric( 0.0 ),
+		subpanelDrawRate( 0.0 ),
+		genElectricProd( 0.0 ),
+		genElectProdRate( 0.0 ),
+		storOpCVDrawRate( 0.0 ),
+		storOpCVFeedInRate( 0.0 ),
+		storOpCVChargeRate( 0.0 ),
+		storOpCVDischargeRate( 0.0 ),
+
 		name( ""),
 		generatorListName( ""),
-		genOperationScheme( genOpSchemeNotYetSet ),
+		genOperationScheme( GeneratorOpScheme::notYetSet ),
 		demandMeterPtr( 0 ),
 		generatorsPresent( false ),
 
@@ -765,8 +974,28 @@ private: // Creation
 
 
 		totalPowerRequest( 0.0 ),
-		totalThermalPowerRequest( 0.0 )
+		totalThermalPowerRequest( 0.0 ),
 
+		storageScheme( StorageOpScheme::notYetSet ),
+		trackSorageOpMeterName( "" ),
+		trackStorageOpMeterIndex( 0 ),
+		converterPresent( false ),
+		converterName( "" ),
+
+		maxStorageSOCFraction( 1.0 ),
+		minStorageSOCFraction( 0.0 ),
+		designStorageChargePower( 0.0 ),
+		designStorageChargePowerWasSet( false ),
+		designStorageDischargePower( 0.0 ),
+		designStorageDischargePowerWasSet( false ),
+		storageChargeModSchedIndex( 0 ),
+		storageDischargeModSchedIndex( 0 ),
+		facilityDemandTarget( 0.0 ),
+		facilityDemandTargetModSchedIndex( 0 ),
+		eMSOverridePelFromStorage( false ), // if true, EMS calling for override
+		eMSValuePelFromStorage( 0.0 ), // value EMS is directing to use, power from storage [W]
+		eMSOverridePelIntoStorage( false ), // if true, EMS calling for override
+		eMSValuePelIntoStorage ( 0.0 ) // value EMS is directing to use, power into storage [W]
 	{}
 
 	// Copy Constructor
@@ -795,6 +1024,8 @@ public: // Methods
 		Real64 & remainingPowerDemand
 	);
 
+
+
 	void
 	setupLoadCenterMeterIndices();
 
@@ -808,11 +1039,20 @@ public: // Methods
 	getTransformerName();
 
 	void
-	updateLoadCenterRecords();
+	updateLoadCenterGeneratorRecords();
 
 private: //Methods
 
+	void
+	dispatchGenerators(
+		bool const firstHVACIteration,
+		Real64 & remainingPowerDemand
+	);
 
+	void
+	dispatchStorage(
+		Real64 const remainingPowerDemand
+	);
 
 	void
 	calcLoadCenterThermalLoad(
@@ -820,45 +1060,73 @@ private: //Methods
 	);
 
 public: // data public for unit test
-	enum electricBussTypeEnum {
-		bussNotYetSet,
+	enum class ElectricBussType : int {
+		notYetSet,
 		aCBuss,
 		dCBussInverter,
 		aCBussStorage,
 		dCBussInverterDCStorage,
 		dCBussInverterACStorage
 	};
+
+
 	std::unique_ptr < ElectricStorage > storageObj;  
 //	int storageModelNum; // simulation model parameter type
 	int numGenerators; // Number of Generators
 	std::vector < std::unique_ptr <GeneratorController> > elecGenCntrlObj; // generator controller objects
-	electricBussTypeEnum bussType; // is this load center powered by AC or DC generators
-	Real64 electricityProd; // Current AC Electric Produced from Equipment (J)
-	Real64 electProdRate; // Current Electric Production Rate from Equipment (W)
-	Real64 thermalProd; // Current Thermal energy Produced from Equipment (J)
-	Real64 thermalProdRate; // Current Thermal energy Production Rate from Equipment (W)
+	ElectricBussType bussType; // is this load center powered by AC or DC generators
+
+
+	Real64 thermalProd; // Current thermal energy Produced from generators in load center (J)
+	Real64 thermalProdRate; // Current thermal energy production rate from generators in load center (W)
 	bool inverterPresent;
 	std::string inverterName; // hold name for verificaton and error messages
 	std::unique_ptr < DCtoACInverter > inverterObj;
-	Real64 electDemand; // Current electric power demand on the load center (W)
+
+	Real64 subpanelFeedInRequest; 
+	// subpanel terms, interact with main panel
+//	Real64 subpanelFeedInElectric; // Current AC electric fed into main panel by load center, adjusted by inverter if any (J)
+	Real64 subpanelFeedInRate; // Current AC electric power fed into main panel by load center, adjusted by inverter if any (W)
+//	Real64 subpanelDrawElectric; // Current AC electric drawn from main panel into load center (J)
+	Real64 subpanelDrawRate; // Current AC electric power draw from main panel into load center (W)
+
+	// storage operation terms, 
+	Real64 genElectricProd; // Current electric produced by generators in the load center, DC or AC (J)
+	Real64 genElectProdRate; // Current electric power produced by generators in the load center, DC or AC (W)
+	Real64 storOpCVGenRate; // power from generators (and maybe inverter) going into storage operation control volume, DC or AC ( W )
+	Real64 storOpCVDrawRate; // power drawn from main panel into storage operation control volume after any converter, DC or AC ( W )
+	Real64 storOpCVFeedInRate; // power fed toward main panel from storage operation control volume before any inverter, DC or AC ( W )
+	Real64 storOpCVChargeRate; // power fed into storage device from storage operation control volume, before any storage losses, DC or AC ( W )
+	Real64 storOpCVDischargeRate; // power drawn from storage device into storage operation control volume, after any storage losses, DC or AC ( W )
+	bool storOpIsCharging;
+	bool storOpIsDischarging; 
+
+
+
 
 private: // data
-	enum generatorOpSchemeEnum {
-		genOpSchemeNotYetSet,
-		genOpSchemeBaseLoad,
-		genOpSchemeDemandLimit,
-		genOpSchemeTrackElectrical,
-		genOpSchemeTrackSchedule,
-		genOpSchemeTrackMeter,
-		genOpSchemeThermalFollow,
-		genOpSchemeThermalFollowLimitElectrical
+	enum class GeneratorOpScheme : int {
+		notYetSet = 0,
+		baseLoad,
+		demandLimit,
+		trackElectrical,
+		trackSchedule,
+		trackMeter,
+		thermalFollow,
+		thermalFollowLimitElectrical
 	};
 
-
+	enum class StorageOpScheme : int {
+		notYetSet = 0,
+		facilityDemandStoreExcessOnSite, // legacy control behavior
+		meterDemandStoreExcessOnSite,
+		chargeDischargeSchedules,
+		facilityDemandLeveling
+	};
 
 	std::string name; // user identifier
 	std::string generatorListName; // List name of available generators
-	generatorOpSchemeEnum genOperationScheme; // Name of Operation Scheme
+	GeneratorOpScheme genOperationScheme; // Name of Operation Scheme
 	std::string demandMeterName; // Name of Demand Energy Meter for "on demand" operation
 	int demandMeterPtr; // "pointer" to Meter for electrical Demand to meet
 	std::string generationMeterName; // Name of Generated Energy Meter for "on demand" operation
@@ -886,6 +1154,27 @@ private: // data
 	Real64 totalPowerRequest; // Total electric power request from the load center (W)
 	Real64 totalThermalPowerRequest; // Total thermal power request from the load center (W)
 
+	StorageOpScheme storageScheme; // what options are available for charging storage.
+	std::string trackSorageOpMeterName; // user name for a specific meter
+	int trackStorageOpMeterIndex; // points to meter being 
+	bool converterPresent;
+	std::string converterName;
+	std::unique_ptr < ACtoDCConverter > converterObj;
+
+	Real64 maxStorageSOCFraction; // Fraction of storage capacity used as upper limit for controlling charging (don't overcharge the batteries)
+	Real64 minStorageSOCFraction; // Fraction of storage capacity used as lower limit for controlling discharging (dont drain the batteries too far)
+	Real64 designStorageChargePower; // rate of electric power drawn from grid to go into storage
+	bool designStorageChargePowerWasSet; // true if a value was input
+	Real64 designStorageDischargePower; // rate of electric power exported to grid by being drawn from storage
+	bool designStorageDischargePowerWasSet; // true if value was input
+	int storageChargeModSchedIndex; // index of fraction schedule for controlling charge rate over time
+	int storageDischargeModSchedIndex; // index of fraction schedule for controlling discharge rate over time.
+	Real64 facilityDemandTarget; // target utility demand level in Watts
+	int facilityDemandTargetModSchedIndex; // index of fracton schedule for controlling target demand over time.
+	bool eMSOverridePelFromStorage; // if true, EMS calling for override
+	Real64 eMSValuePelFromStorage; // value EMS is directing to use, power from storage [W]
+	bool eMSOverridePelIntoStorage; // if true, EMS calling for override
+	Real64 eMSValuePelIntoStorage; // value EMS is directing to use, power into storage [W]
 
 }; //class ElectPowerLoadCenter
 
@@ -908,6 +1197,7 @@ public: // Creation
 			elecProducedPVIndex( 0 ),
 			elecProducedWTIndex( 0 ),
 			elecProducedStorageIndex( 0 ),
+			elecProducedPowerConversionIndex( 0 ),
 			name( "Whole Building" ),
 			facilityPowerInTransformerPresent( false ),
 			facilityPowerInTransformerName( "" ),
@@ -926,7 +1216,10 @@ public: // Creation
 			totalElectricDemand( 0.0 ),
 			elecProducedPVRate( 0.0 ),
 			elecProducedWTRate( 0.0 ),
-			elecProducedStorageRate( 0.0 )
+			elecProducedStorageRate( 0.0 ),
+			elecProducedPowerConversionRate( 0.0 ),
+			elecProducedCoGenRate( 0.0 )
+
 		{}
 	// Copy Constructor
 	ElectricPowerServiceManager( ElectricPowerServiceManager const & ) = default;
@@ -991,6 +1284,7 @@ private: // data
 	int elecProducedPVIndex;
 	int elecProducedWTIndex;
 	int elecProducedStorageIndex;
+	int elecProducedPowerConversionIndex;
 	std::string name;
 
 	bool facilityPowerInTransformerPresent;
@@ -1015,21 +1309,23 @@ private: // data
 	Real64 elecProducedPVRate; // Current Rate of PV Produced from the Arrays (W)
 	Real64 elecProducedWTRate; // Current Rate of Wind Turbine Produced (W)
 	Real64 elecProducedStorageRate; // Current Rate of power to(-)/from(+) storage
+	Real64 elecProducedPowerConversionRate; // Current rate of power loss from power conversion, negative (W)
+	Real64 elecProducedCoGenRate; // Current Rate of Cogeneration generators produced ( W )
 
 	Real64 pvTotalCapacity; // for LEED report, total installed PV capacity
 	Real64 windTotalCapacity; // for LEED report, total installed wind capacity
 
 }; // class ElectricPowerServiceManager
 
-	extern std::unique_ptr< ElectricPowerService::ElectricPowerServiceManager > facilityElectricServiceObj;
+	extern std::unique_ptr< ElectricPowerServiceManager > facilityElectricServiceObj;
 
 	void
 	createFacilityElectricPowerServiceObject();
 
 	void
-	clear_state();
+	clearFacilityElectricPowerServiceObject();
 
-} // ElectricPowerService namespace
+
 
 
 } // EnergyPlus namespace

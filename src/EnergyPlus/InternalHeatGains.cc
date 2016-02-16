@@ -3635,7 +3635,7 @@ namespace InternalHeatGains {
 		CalcWaterUseZoneGains();
 		FigureFuelCellZoneGains();
 		FigureMicroCHPZoneGains();
-		ElectricPowerService::initializeElectricPowerServiceZoneGains();
+		initializeElectricPowerServiceZoneGains();
 		FigureTDDZoneGains();
 		FigureRefrigerationZoneGains();
 
