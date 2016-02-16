@@ -58,6 +58,9 @@
 
 // EnergyPlus::DataSurfaces Unit Tests
 
+// C++ Headers
+#include <cmath>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -79,6 +82,7 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace ObjexxFCL;
+using DataVectorTypes::Vector;
 
 TEST_F( EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest )
 {
@@ -198,4 +202,55 @@ TEST_F( EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest )
 	EXPECT_GT( Surface( 1 ).Centroid.z, 20000.0 ); // this condition is fatal
 	EXPECT_LT( Surface( 1 ).OutDryBulbTemp, -100.0 ); // this condition is fatal
 	EXPECT_LT( Surface( 1 ).OutWetBulbTemp, -100.0 ); // this condition is fatal
+}
+
+TEST( SurfaceTest, Plane )
+{
+	{
+		SurfaceData s;
+		s.Vertex.dimension( 3 );
+		s.Vertex = { Vector(1,1,1), Vector(-1,1,0), Vector(2,0,3) };
+		s.Shape = Triangle;
+		s.set_computed_geometry();
+
+		EXPECT_DOUBLE_EQ( -1.0, s.plane.x );
+		EXPECT_DOUBLE_EQ(  3.0, s.plane.y );
+		EXPECT_DOUBLE_EQ(  2.0, s.plane.z );
+		EXPECT_DOUBLE_EQ( -4.0, s.plane.w );
+	}
+	{
+		SurfaceData s;
+		s.Vertex.dimension( 3 );
+		s.Vertex = { Vector(2,1,-1), Vector(0,-2,0), Vector(1,-1,2) };
+		s.Shape = Triangle;
+		s.set_computed_geometry();
+
+		EXPECT_DOUBLE_EQ( -7.0, s.plane.x );
+		EXPECT_DOUBLE_EQ(  5.0, s.plane.y );
+		EXPECT_DOUBLE_EQ(  1.0, s.plane.z );
+		EXPECT_DOUBLE_EQ( 10.0, s.plane.w );
+	}
+}
+
+TEST( SurfaceTest, Surface2D )
+{
+	{
+		using Vector2D = Surface2D::Vector2D;
+		SurfaceData s;
+		s.Vertex.dimension( 4 );
+		s.Vertex = { Vector(0,0,0), Vector(1,0,0), Vector(1,1,0), Vector(0,1,0) };
+		s.Shape = Rectangle;
+		s.set_computed_geometry();
+
+		Surface2D const & s2d( s.surface2d );
+		EXPECT_EQ( 2, s2d.axis ); // Projection along z axis
+		EXPECT_EQ( Vector2D(0,0), s2d.vertices[ 0 ] );
+		EXPECT_EQ( Vector2D(1,0), s2d.vertices[ 1 ] );
+		EXPECT_EQ( Vector2D(1,1), s2d.vertices[ 2 ] );
+		EXPECT_EQ( Vector2D(0,1), s2d.vertices[ 3 ] );
+		EXPECT_DOUBLE_EQ( 0.0, s2d.vl.x );
+		EXPECT_DOUBLE_EQ( 0.0, s2d.vl.y );
+		EXPECT_DOUBLE_EQ( 1.0, s2d.vu.x );
+		EXPECT_DOUBLE_EQ( 1.0, s2d.vu.y );
+	}
 }
