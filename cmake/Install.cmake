@@ -10,7 +10,7 @@ set(CPACK_PACKAGE_VERSION_BUILD "${CMAKE_VERSION_BUILD}" )
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${CPACK_PACKAGE_VERSION_BUILD}")
 
 # set the buildsupport reference (branch name/tag)
-SET( BUILDSUPPORTREF v8.5.0 )
+SET( BUILDSUPPORTREF master )
 
 include(cmake/TargetArch.cmake)
 target_architecture(TARGET_ARCH)
@@ -147,7 +147,7 @@ install(FILES "${CMAKE_SOURCE_DIR}/release/readme.html" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/InputRulesFiles/${RULES_XLS}" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/OutputRulesFiles/OutputChanges8-4-0-to-8-5-0.md" DESTINATION "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" "PreProcess/HVACCurveFitTool/")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/${BUILDSUPPORTREF}/release/Report%20Variables%208-4-0%20to%208-5-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-4-0 to 8-5-0.csv")
+install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/SupportFiles/Report Variables 8-4-0 to 8-5-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-4-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V8-5-0-Energy+.idd" )
 
