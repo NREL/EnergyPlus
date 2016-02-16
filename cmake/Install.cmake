@@ -28,9 +28,8 @@ if( WIN32 AND NOT UNIX )
   endif()
 endif()
 
-configure_file(cmake/license.in.txt "${CMAKE_BINARY_DIR}/license.txt" @ONLY)
-install(FILES "${CMAKE_BINARY_DIR}/license.txt" DESTINATION "./")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/license.txt")
+install(FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt" DESTINATION "./")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION ./ )
 
@@ -138,10 +137,10 @@ INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
 set( RULES_XLS Rules8-4-0-to-8-5-0.xls )
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/Bugreprt.txt" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/ep.gif" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/ObjectStatus.xls" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/readme.html" "./" "readme.html" TRUE)
+install(FILES "${CMAKE_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
+install(FILES "${CMAKE_SOURCE_DIR}/release/ep.gif" DESTINATION "./")
+#install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/release/ObjectStatus.xls" "./")
+install(FILES "${CMAKE_SOURCE_DIR}/release/readme.html" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/InputRulesFiles/${RULES_XLS}" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/OutputRulesFiles/OutputChanges8-4-0-to-8-5-0.md" DESTINATION "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.5.0/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" "PreProcess/HVACCurveFitTool/")
