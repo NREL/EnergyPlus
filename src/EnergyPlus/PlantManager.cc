@@ -984,7 +984,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
 							this_comp.GeneralEquipType = GenEquipTypes_WaterUse;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
-							this_comp.compPtr = WaterUse::WaterConnectionsType::factory( CompNames( CompNum ) );
+							this_comp.compPtr = WaterUse::WaterConnections_T::factory( CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Coil:Cooling:Water" ) ) {
 							this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
 							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
