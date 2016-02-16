@@ -58,20 +58,151 @@
 
 // EnergyPlus::DataSurfaces Unit Tests
 
+// C++ Headers
+#include <cmath>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
-// C++ Headers
-#include <cmath>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::DataEnvironment;
+using namespace EnergyPlus::DataGlobals;
+using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataSurfaces;
+using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::SurfaceGeometry;
 using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
+
+TEST_F( EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest )
+{
+
+	bool ErrorsFound( false );
+
+	std::string const idf_objects = delimited_string({
+		"Version,",
+		"    8.4;                     !- Version Identifier",
+
+		"	BuildingSurface:Detailed,",
+		"    T3-RF1 - Floor:n,        !- Name",
+		"    Floor,                   !- Surface Type",
+		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
+		"    T3-RF1,                  !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    NoSun,                   !- Sun Exposure",
+		"    NoWind,                  !- Wind Exposure",
+		"    ,                        !- View Factor to Ground",
+		"    ,                        !- Number of Vertices",
+		"    -73.4395447868102,       !- Vertex 1 X-coordinate {m}",
+		"    115.81641271866,         !- Vertex 1 Y-coordinate {m}",
+		"    -4.90860981523342e-014,  !- Vertex 1 Z-coordinate {m}",
+		"    -58.0249751030646,       !- Vertex 2 X-coordinate {m}",
+		"    93.1706338416311,        !- Vertex 2 Y-coordinate {m}",
+		"    -6.93120848813091e-014,  !- Vertex 2 Z-coordinate {m}",
+		"    -68.9295447868101,       !- Vertex 3 X-coordinate {m}",
+		"    74.3054685889134,        !- Vertex 3 Y-coordinate {m}",
+		"    -6.06384403665968e-014,  !- Vertex 3 Z-coordinate {m}",
+		"    -58.0345461881513,       !- Vertex 4 X-coordinate {m}",
+		"    93.1761597101821,        !- Vertex 4 Y-coordinate {m}",
+		"    -6.9300904918858e-014;   !- Vertex 4 Z-coordinate {m}",
+
+		"Zone,",
+		"    T3-RF1,                  !- Name",
+		"    60,                      !- Direction of Relative North {deg}",
+		"    234.651324196041,        !- X Origin {m}",
+		"    -132.406575100608,       !- Y Origin {m}",
+		"    14.8000000000003,        !- Z Origin {m}",
+		"    ,                        !- Type",
+		"    ,                        !- Multiplier",
+		"    ,                        !- Ceiling Height {m}",
+		"    ,                        !- Volume {m3}",
+		"    ,                        !- Floor Area {m2}",
+		"    ,                        !- Zone Inside Convection Algorithm",
+		"    ,                        !- Zone Outside Convection Algorithm",
+		"    No;                      !- Part of Total Floor Area",
+
+		"Construction,",
+		"    ExtSlabCarpet 4in ClimateZone 1-8,  !- Name",
+		"    MAT-CC05 4 HW CONCRETE,  !- Outside Layer",
+		"    CP02 CARPET PAD;         !- Layer 2",
+
+		"Material,",
+		"    MAT-CC05 4 HW CONCRETE,  !- Name",
+		"    Rough,                   !- Roughness",
+		"    0.1016,                  !- Thickness {m}",
+		"    1.311,                   !- Conductivity {W/m-K}",
+		"    2240,                    !- Density {kg/m3}",
+		"    836.800000000001,        !- Specific Heat {J/kg-K}",
+		"    0.9,                     !- Thermal Absorptance",
+		"    0.85,                    !- Solar Absorptance",
+		"    0.85;                    !- Visible Absorptance",
+
+		"Material:NoMass,",
+		"    CP02 CARPET PAD,         !- Name",
+		"    Smooth,                  !- Roughness",
+		"    0.1,                     !- Thermal Resistance {m2-K/W}",
+		"    0.9,                     !- Thermal Absorptance",
+		"    0.8,                     !- Solar Absorptance",
+		"    0.8;                     !- Visible Absorptance",
+
+		"SurfaceConvectionAlgorithm:Inside,TARP;",
+
+		"SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+		"HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+		"ZoneAirHeatBalanceAlgorithm,",
+		"    AnalyticalSolution;      !- Algorithm",
+
+		});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	ErrorsFound = false;
+	GetProjectControlData( ErrorsFound ); // read project control data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	ErrorsFound = false;
+	GetMaterialData( ErrorsFound ); // read material data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	ErrorsFound = false;
+	GetConstructData( ErrorsFound ); // read construction data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	ErrorsFound = false;
+	GetZoneData( ErrorsFound ); // read zone data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	CosZoneRelNorth.allocate( 1 );
+	SinZoneRelNorth.allocate( 1 );
+
+	CosZoneRelNorth( 1 ) = std::cos( -Zone( 1 ).RelNorth * DegToRadians );
+	SinZoneRelNorth( 1 ) = std::sin( -Zone( 1 ).RelNorth * DegToRadians );
+	CosBldgRelNorth = 1.0;
+	SinBldgRelNorth = 0.0;
+
+	ErrorsFound = false;
+	GetSurfaceData( ErrorsFound ); // setup zone geometry and get zone data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	SetSurfaceOutBulbTempAt();
+	EXPECT_EQ( "T3-RF1 - FLOOR:N", Surface( 1 ).Name );
+	EXPECT_GT( Surface( 1 ).Centroid.z, 20000.0 ); // this condition is fatal
+	EXPECT_LT( Surface( 1 ).OutDryBulbTemp, -100.0 ); // this condition is fatal
+	EXPECT_LT( Surface( 1 ).OutWetBulbTemp, -100.0 ); // this condition is fatal
+}
 
 TEST( SurfaceTest, Plane )
 {

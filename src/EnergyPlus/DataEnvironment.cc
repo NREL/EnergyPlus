@@ -596,7 +596,8 @@ namespace DataEnvironment {
 	void
 	SetOutBulbTempAt_error(
 		std::string const & Settings,
-		Real64 const max_height
+		Real64 const max_height,
+		std::string const & SettingsName
 	)
 	{
 		// Using/Aliasing
@@ -606,6 +607,7 @@ namespace DataEnvironment {
 		ShowContinueError( "...check " + Settings + " Heights - Maximum " + Settings + " Height=[" + RoundSigDigits( max_height, 0 ) + "]." );
 		if ( max_height >= 20000.0 ) {
 			ShowContinueError( "...according to your maximum Z height, your building is somewhere in the Stratosphere." );
+			ShowContinueError( "...look at " + Settings + " Name= " + SettingsName );
 		}
 		ShowFatalError( "Program terminates due to preceding condition(s)." );
 	}

@@ -908,17 +908,22 @@ namespace DataSurfaces {
 	void
 	SetSurfaceOutBulbTempAt()
 	{
-		// Using/Aliasing
-		using DataEnvironment::SetOutBulbTempAt_error;
-
-		Real64 maxZ( 0.0 );
-		Real64 minBulb( 0.0 );
 		for ( auto & surface : Surface ) {
 			surface.SetOutBulbTempAt();
-			minBulb = min( minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp );
-			maxZ = max( maxZ, surface.Centroid.z );
 		}
-		if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Surface", maxZ );
+	}
+
+	void
+	CheckSurfaceOutBulbTempAt() 
+	{
+		// Using/Aliasing
+		using DataEnvironment::SetOutBulbTempAt_error;
+		
+		Real64 minBulb = 0.0;
+		for ( auto & surface : Surface ) {
+			minBulb = min( minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp );
+			if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Surface", surface.Centroid.z, surface.Name );
+		}
 	}
 
 	void

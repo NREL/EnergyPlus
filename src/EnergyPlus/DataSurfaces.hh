@@ -1829,6 +1829,9 @@ namespace DataSurfaces {
 	SetSurfaceOutBulbTempAt();
 
 	void
+	CheckSurfaceOutBulbTempAt();
+
+	void
 	SetSurfaceWindSpeedAt();
 
 	std::string
