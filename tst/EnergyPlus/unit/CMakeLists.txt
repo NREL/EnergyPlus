@@ -23,6 +23,7 @@ set( test_src
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
+  DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
   DOASEffectOnZoneSizing.unit.cc
@@ -68,6 +69,7 @@ set( test_src
   OutputReportData.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
+  PierceSurface.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
@@ -86,6 +88,7 @@ set( test_src
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
   SurfaceGeometry.unit.cc
+  SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   ThermalComfort.unit.cc
   VariableSpeedCoils.unit.cc

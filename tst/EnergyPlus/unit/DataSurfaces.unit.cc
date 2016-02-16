@@ -56,109 +56,70 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Vector3.hh>
+// EnergyPlus::DataSurfaces Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <PierceSurface.hh>
-#include <DataSurfaces.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
-namespace EnergyPlus {
+// C++ Headers
+#include <cmath>
 
-void
-PierceSurface(
-	int const ISurf, // Surface index
-	Vector3< Real64 > const & R1, // Point from which ray originates
-	Vector3< Real64 > const & RN, // Unit vector along in direction of ray whose
-	int & IPIERC, // =1 if line through point R1 in direction of unit vector
-	Vector3< Real64 > & CPhit // Point that ray along RN intersects plane of surface
-)
+using namespace EnergyPlus;
+using namespace EnergyPlus::DataSurfaces;
+using namespace ObjexxFCL;
+using DataVectorTypes::Vector;
+
+TEST( SurfaceTest, Plane )
 {
+	{
+		SurfaceData s;
+		s.Vertex.dimension( 3 );
+		s.Vertex = { Vector(1,1,1), Vector(-1,1,0), Vector(2,0,3) };
+		s.Shape = Triangle;
+		s.set_computed_geometry();
 
-	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Fred Winkelmann
-	//       DATE WRITTEN   July 1997
-	//       MODIFIED       Sept 2003, FCW: modification of Daylighting routine DayltgPierceSurface
-	//       RE-ENGINEERED  June 2015, Stuart Mentzer: Performance tuned and merged 3 equivalent variants
-
-	// PURPOSE OF THIS SUBROUTINE:
-	// Returns point CPhit that line through point R1 in direction of unit vector RN intersects
-	// the plan of surface ISurf. IPIERC = 1 if CPhit is inside the perimeter of ISurf. If not,
-	// IPIERC = 0. This routine works for convex and concave surfaces with 3 or more vertices.
-	// METHODOLOGY EMPLOYED:
-
-	// REFERENCES:
-	// Based on DOE-2.1E subroutine DPIERC.
-
-	// USE STATEMENTS:na
-
-	// Locals
-	// SUBROUTINE PARAMETER DEFINITIONS:na
-	// INTERFACE BLOCK SPECIFICATIONS:na
-	// DERIVED TYPE DEFINITIONS:na
-
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	using namespace DataSurfaces;
-
-	// FLOW:
-	IPIERC = 0;
-
-	// Aliases
-	auto const & surface( Surface( ISurf ) );
-	auto const & V( surface.Vertex );
-	Vector3< Real64 > const V2( V( 2 ) );
-
-	// Set the first two A
-	Vector3< Real64 > const A1( V2 - V( 1 ) );
-	Vector3< Real64 > const A2( V( 3 ) - V2 );
-
-	// Vector normal to surface (A1 X A2)
-	Vector3< Real64 > const SN( cross( A1, A2 ) );
-
-	// Scale factor, the solution of SN.(CPhit-V2) = 0 and
-	// CPhit = R1 + SCALE*RN, where CPhit is the point that RN,
-	// when extended, intersects the plane of the surface.
-	Real64 const F2 = dot( SN, RN );
-	if ( std::abs( F2 ) < 0.01 ) return; // Skip surfaces that are parallel to RN
-	Real64 const SCALE = dot( SN, V2 - R1 ) / F2; // Scale factor
-	if ( SCALE <= 0.0 ) return; // Skip surfaces that RN points away from
-	//Tuned Avoid array temporary and unroll: Was CPhit = R1 + RN * SCALE
-	CPhit.x = R1.x + ( RN.x * SCALE );
-	CPhit.y = R1.y + ( RN.y * SCALE );
-	CPhit.z = R1.z + ( RN.z * SCALE );
-
-	// Two cases: rectangle and non-rectangle; do rectangle
-	// first since most common shape and faster calculation
-	auto shape( surface.Shape );
-	if ( shape == Rectangle || shape == RectangularDoorWindow || shape == RectangularOverhang || shape == RectangularLeftFin || shape == RectangularRightFin ) { // Surface is rectangular
-		Vector3< Real64 > const CCC( CPhit - V2 ); // Vector from vertex 2 to CP
-		// Intersection point, CCC, is inside rectangle if
-		// 0 < CCC.A2 < A2.A2 AND 0 < CCC.AAA < AAA.AAA
-		Real64 const DOTCB( dot( CCC, A2 ) ); // Dot product of vectors CCC and A2
-		if ( ( DOTCB < 0.0 ) || ( DOTCB > A2.magnitude_squared() ) ) return;
-		Real64 const DOTCA( -dot( CCC, A1 ) ); // Dot product of vectors CCC and AAA (AAA == -A1)
-		if ( ( DOTCA < 0.0 ) || ( DOTCA > A1.magnitude_squared() ) ) return;
-		IPIERC = 1; // Surface is intersected
-	} else { // Surface is not rectangular
-		// If at least one of these dot products is negative intersection point is outside of surface
-		if ( dot( cross( A1, CPhit - V( 1 ) ), SN ) < 0.0 ) return;
-		if ( dot( cross( A2, CPhit - V2 ), SN ) < 0.0 ) return;
-		int const NV( surface.Sides ); // Number of vertices
-		assert( NV >= 3 );
-		if ( NV > 3 ) {
-			if ( NV == 4 ) {
-				if ( dot( cross( V( 4 ) - V( 3 ), CPhit - V( 3 ) ), SN ) < 0.0 ) return;
-			} else { // NV > 4
-				for ( int N = 3; N < NV; ++N ) {
-					if ( dot( cross( V( N + 1 ) - V( N ), CPhit - V( N ) ), SN ) < 0.0 ) return;
-				}
-			}
-		}
-		if ( dot( cross( V( 1 ) - V( NV ), CPhit - V( NV ) ), SN ) < 0.0 ) return; // Last vertex
-		IPIERC = 1; // Surface is intersected
+		EXPECT_DOUBLE_EQ( -1.0, s.plane.x );
+		EXPECT_DOUBLE_EQ(  3.0, s.plane.y );
+		EXPECT_DOUBLE_EQ(  2.0, s.plane.z );
+		EXPECT_DOUBLE_EQ( -4.0, s.plane.w );
 	}
+	{
+		SurfaceData s;
+		s.Vertex.dimension( 3 );
+		s.Vertex = { Vector(2,1,-1), Vector(0,-2,0), Vector(1,-1,2) };
+		s.Shape = Triangle;
+		s.set_computed_geometry();
 
+		EXPECT_DOUBLE_EQ( -7.0, s.plane.x );
+		EXPECT_DOUBLE_EQ(  5.0, s.plane.y );
+		EXPECT_DOUBLE_EQ(  1.0, s.plane.z );
+		EXPECT_DOUBLE_EQ( 10.0, s.plane.w );
+	}
 }
 
-} // EnergyPlus
+TEST( SurfaceTest, Surface2D )
+{
+	{
+		using Vector2D = Surface2D::Vector2D;
+		SurfaceData s;
+		s.Vertex.dimension( 4 );
+		s.Vertex = { Vector(0,0,0), Vector(1,0,0), Vector(1,1,0), Vector(0,1,0) };
+		s.Shape = Rectangle;
+		s.set_computed_geometry();
+
+		Surface2D const & s2d( s.surface2d );
+		EXPECT_EQ( 2, s2d.axis ); // Projection along z axis
+		EXPECT_EQ( Vector2D(0,0), s2d.vertices[ 0 ] );
+		EXPECT_EQ( Vector2D(1,0), s2d.vertices[ 1 ] );
+		EXPECT_EQ( Vector2D(1,1), s2d.vertices[ 2 ] );
+		EXPECT_EQ( Vector2D(0,1), s2d.vertices[ 3 ] );
+		EXPECT_DOUBLE_EQ( 0.0, s2d.vl.x );
+		EXPECT_DOUBLE_EQ( 0.0, s2d.vl.y );
+		EXPECT_DOUBLE_EQ( 1.0, s2d.vu.x );
+		EXPECT_DOUBLE_EQ( 1.0, s2d.vu.y );
+	}
+}
