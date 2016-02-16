@@ -4899,7 +4899,6 @@ namespace FluidProperties {
 		int GlycolNum;
 		bool LowErrorThisTime;
 		bool HighErrorThisTime;
-		static bool showedInterpError (false);
 
 		// FLOW:
 		LowErrorThisTime = false;
@@ -4909,6 +4908,13 @@ namespace FluidProperties {
 		if ( GetInput ) {
 			GetFluidPropertiesData();
 			GetInput = false;
+		}
+
+		// if input temperature is not a number (NAN) just return the average of the hi and low
+		if ( std::isnan( Temperature ) ){
+			ReturnValue = ( GlycolData( GlycolIndex ).RhoValues( GlycolData( GlycolIndex ).RhoLowTempIndex ) + GlycolData( GlycolIndex ).RhoValues( GlycolData( GlycolIndex ).RhoHighTempIndex ) ) / 2;
+			ShowWarningMessage( RoutineName + "Requested temperature was NAN when computing for:  [" + GlycolData( GlycolIndex ).Name + "]. Used average of high and low instead." );
+			return ReturnValue;
 		}
 
 		// If no glycols, no fluid properties can be evaluated
@@ -4978,15 +4984,6 @@ namespace FluidProperties {
 			}
 			if ( HighErrorThisTime ) {
 				ShowRecurringWarningErrorAtEnd( RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData( GlycolIndex ).Name + "] density **", GlycolErrorTracking( GlycolIndex ).DensityHighErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
-			}
-		}
-
-		// if stuff went really haywire just return the average of the hi and low
-		if ( std::isnan( ReturnValue ) ){
-			ReturnValue = (GlycolData( GlycolIndex ).RhoValues( GlycolData( GlycolIndex ).RhoLowTempIndex ) + GlycolData( GlycolIndex ).RhoValues( GlycolData( GlycolIndex ).RhoHighTempIndex ))/2;
-			if ( !showedInterpError ){
-				ShowWarningMessage( RoutineName + "Interpolation failed when computing density for  [" + GlycolData( GlycolIndex ).Name + "] and a NAN was the result. Used average of high and low instead." );
-				showedInterpError = true;
 			}
 		}
 
