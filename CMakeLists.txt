@@ -243,7 +243,7 @@ endif()
 
 
 set(OPTIMIZABLE_TARGETS
-  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib energypluslib2
+  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib
     )
 if(NOT APPLE AND NOT MSVC)
   list(APPEND OPTIMIZABLE_TARGETS parser)
