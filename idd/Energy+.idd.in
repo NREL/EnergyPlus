@@ -6837,6 +6837,8 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \units dimensionless
        \minimum 0.0
        \type real
+       \note Ratio of water vapor permeability of stagnant air to water vapor 
+       \note permeability of material
   N2 , \field Moisture Equation Coefficient a
        \required-field
        \units dimensionless
@@ -6853,27 +6855,33 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
        \required-field
        \units dimensionless
        \type real
-  N6 , \field Surface-layer penetration depth
+  N6 , \field Surface Layer Penetration Depth
        \required-field
        \units m
+       \ip-units in
        \type real
        \minimum> 0
-  N7 , \field Deep-layer penetration depth
+  N7 , \field Deep Layer Penetration Depth
        \required-field
        \units m
+       \ip-units in
        \type real
        \minimum 0
        \default 0
-  N8 , \field Coating layer thickness
+  N8 , \field Coating Layer Thickness
        \required-field
        \type real
        \units m
+       \ip-units in
        \minimum 0
-  N9 ; \field Coating layer water vapor diffusion resistance factor
+  N9 ; \field Coating Layer Water Vapor Diffusion Resistance Factor
        \required-field
        \type real
        \units dimensionless
        \minimum 0
+       \note The coating's resistance to water vapor diffusion relative to the
+       \note resistance to water vapor diffusion in stagnant air 
+       \note (see Water Vapor Diffusion Resistance Factor above).
 
 MaterialProperty:PhaseChange,
     \memo Additional properties for temperature dependent thermal conductivity

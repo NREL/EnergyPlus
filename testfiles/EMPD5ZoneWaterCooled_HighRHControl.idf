@@ -430,10 +430,10 @@
     2.32,                    !- Moisture Equation Coefficient b {dimensionless}
     0.43,                    !- Moisture Equation Coefficient c {dimensionless}
     72,                      !- Moisture Equation Coefficient d {dimensionless}
-    0.0011,                  !- Surface-layer penetration depth {m}
-    0.004,                   !- Deep-layer penetration depth {m}
-    0,                       !- Coating layer thickness {m}
-    0;                       !- Coating layer water vapor diffusion resistance factor {m}
+    0.0011,                  !- Surface Layer Penetration Depth {m}
+    0.004,                   !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {m}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     GP01,                    !- Name
@@ -442,10 +442,10 @@
     0.939,                   !- Moisture Equation Coefficient b {dimensionless}
     0.0202,                  !- Moisture Equation Coefficient c {dimensionless}
     12.2,                    !- Moisture Equation Coefficient d {dimensionless}
-    0.019,                   !- Surface-layer penetration depth {m}
-    0.073,                   !- Deep-layer penetration depth {m}
-    0,                       !- Coating layer thickness {m}
-    0;                       !- Coating layer water vapor diffusion resistance factor {m}
+    0.019,                   !- Surface Layer Penetration Depth {m}
+    0.073,                   !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {m}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     GP02,                    !- Name
@@ -454,10 +454,10 @@
     0.939,                   !- Moisture Equation Coefficient b {dimensionless}
     0.0202,                  !- Moisture Equation Coefficient c {dimensionless}
     12.2,                    !- Moisture Equation Coefficient d {dimensionless}
-    0.019,                   !- Surface-layer penetration depth {m}
-    0.073,                   !- Deep-layer penetration depth {m}
-    0,                       !- Coating layer thickness {m}
-    0;                       !- Coating layer water vapor diffusion resistance factor {m}
+    0.019,                   !- Surface Layer Penetration Depth {m}
+    0.073,                   !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {m}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     CC03,                    !- Name
@@ -466,10 +466,10 @@
     0.352,                   !- Moisture Equation Coefficient b {dimensionless}
     0.0859,                  !- Moisture Equation Coefficient c {dimensionless}
     14.8,                    !- Moisture Equation Coefficient d {dimensionless}
-    0.008,                   !- Surface-layer penetration depth {m}
-    0.03,                    !- Deep-layer penetration depth {m}
-    0,                       !- Coating layer thickness {m}
-    0;                       !- Coating layer water vapor diffusion resistance factor {m}
+    0.008,                   !- Surface Layer Penetration Depth {m}
+    0.03,                    !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {m}
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     MAT-CLNG-1,              !- Name
@@ -478,10 +478,10 @@
     0.1593,                  !- Moisture Equation Coefficient b {dimensionless}
     0.0019,                  !- Moisture Equation Coefficient c {dimensionless}
     5.91,                    !- Moisture Equation Coefficient d {dimensionless}
-    0.0847,                  !- Surface-layer penetration depth {m}
-    0.317,                   !- Deep-layer penetration depth {m}
-    0,                       !- Coating layer thickness {m}
-    0;                       !- Coating layer water vapor diffusion resistance factor {m}
+    0.0847,                  !- Surface Layer Penetration Depth {m}
+    0.317,                   !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {m}
 
   Construction,
     ROOF-1,                  !- Name

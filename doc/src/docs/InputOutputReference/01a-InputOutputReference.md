@@ -4422,7 +4422,7 @@ This moisture model will be used when the appropriate EMPD moisture materials ar
 
 This field is a unique reference name that the user assigns to a particular material. This name can then be referred to by other input data (ref: Construction object).
 
-#### Field: Vapor diffusion resistance factor
+#### Field: Water Vapor Diffusion Resistance Factor
 
 The vapor diffusion resistance factor is the resistance to water vapor diffusion *relative* to the resistance to water vapor diffusion in stagnant air. In other words, $\mu$ equals 1 for air, and is generally greater than 1 for building materials.
 
@@ -4452,9 +4452,9 @@ $u$ = Moisture content defined as the mass fraction of water contained in a mate
 
 $\phi$ = Surface air relative humidity [0 to 1],
 
-#### Field: Surface-layer penetration depth
+#### Field: Surface Layer Penetration Depth
 
-The surface-layer penetration depth is the fictitious thickness of the surface layer, and is used to calculate the volume of material that participates in short-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The penetration depth is based on the amount of material that interacts with the zone air when subject to a cyclic relative humidity variation. The surface penetration depth can be estimated with the following equation:
+The surface-layer penetration depth is the fictitious thickness of the surface layer in meters, and is used to calculate the volume of material that participates in short-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The penetration depth is based on the amount of material that interacts with the zone air when subject to a cyclic relative humidity variation. The surface penetration depth can be estimated with the following equation:
 
 $$ d_{EMPD,surf} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{surf}}{\rho_{material} \frac{du}{d\phi} \pi}} $$
 
@@ -4470,20 +4470,20 @@ $\rho_{material}$ = dry density of material, kg/m^3
 
 $\frac{du}{d\phi}$ = slope of moisture soprtion curve, $a b  \phi^{b-1} + c d \phi^{d-1}$
 
-#### Field: Deep-layer penetration depth
+#### Field: Deep Layer Penetration Depth
 
-The deep-layer penetration depth is the fictitious thickness of the deep layer, and is used to calculate the volume of material that participates in long-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The deep penetration depth is based on the amount of material that interacts with the surface layer when subject to cyclic relative humidity variation. The deep penetration depth can be estimated with the following equation:
+The deep-layer penetration depth is the fictitious thickness of the deep layer in meters, and is used to calculate the volume of material that participates in long-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The deep penetration depth is based on the amount of material that interacts with the surface layer when subject to cyclic relative humidity variation. The deep penetration depth can be estimated with the following equation:
 
 $$ d_{EMPD,deep} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{deep}} {\rho_{material} \frac{du}{d\phi} \pi}} $$
 
 where each term is the same as the surface layer, except that the cycle period is different. This is usually on the order of weeks for the deep layer.
 
-#### Field: Coating layer thickness
-The coating layer thickness adds an additional resistance between the surface layer and the zone and represents a thin coating, such as paint, plaster, or other wall coverings.
+#### Field: Coating Layer Thickness
+The coating layer thickness (in meters) adds an additional resistance between the surface layer and the zone and represents a thin coating, such as paint, plaster, or other wall coverings.
 
 This input is optional, and an input of zero implies no coating.
 
-#### Field: Coating vapor diffusion resistance factor
+#### Field: Coating Layer Water Vapor Diffusion Resistance Factor
 
 The vapor diffusion resistance factor of the coating is the coating's resistance to water vapor diffusion *relative* to the resistance to water vapor diffusion in stagnant air (see Vapor diffusion resistance factor section above).
 
@@ -4543,19 +4543,19 @@ Other materials inputs can be estimated using the equations above and material p
 
 ### Moisture Penetration Depth (EMPD) Outputs
 
-#### EMPD surface inside face water vapor density [kg/m^3]
+#### EMPD surface inside face water vapor density [kg/m3]
 
 The vapor density at the inside face of the surface, where the EMPD moisture balance solution algorithm is applied. This is the *actual* surface, separated from the zone air only by the convective mass transfer coefficient.
 
 Units are kg of water per cubic meter of air.
 
-#### EMPD surface layer moisture content [kg/m^3]
+#### EMPD surface layer moisture content [kg/m3]
 
 The moisture content, *u*, of the fictitious surface layer. The surface layer node is not at the actual surface, but is instead at the center of surface layer, which has a uniform moisture content. This node is separated from the inside face of the surface by a diffusive resistance, as described in the Engineering Reference.
 
 Units are kg of water per cubic meter of solid material (e.g., gypsum).
 
-#### EMPD deep layer moisture content [kg/m^3]
+#### EMPD deep layer moisture content [kg/m3]
 
 The moisture content, *u*, of the fictitious deep layer. The deep layer node interacts only with the surface layer node through a diffusive resistance.
 
@@ -4577,12 +4577,12 @@ The equivalent humidity ratio of the surface layer. Units are kg of water per kg
 
 The equivalent humidity ratio of the deep layer. Units are kg of water per kg of dry air.
 
-#### EMPD zone mass flux [kg/m^2-s]
+#### EMPD zone mass flux [kg/m2-s]
 
 The mass flux of water vapor from the surface layer of a specific surface to the zone air. A positive mass flux is from the surface to the zone.
 
 
-#### EMPD deep layer moisture flux [kg/m^2-s]
+#### EMPD deep layer moisture flux [kg/m2-s]
 
 The mass flux of water vapor from the deep layer of a specific surface to the surface layer of that surface. A positive flux is from the surface layer to the deep layer.
 

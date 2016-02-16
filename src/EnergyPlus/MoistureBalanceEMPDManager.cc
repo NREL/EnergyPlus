@@ -395,15 +395,15 @@ namespace MoistureBalanceEMPDManager {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) continue;
 			EMPDReportVarsData & rvd = EMPDReportVars( SurfNum );
 			const std::string surf_name = Surface( SurfNum ).Name;
-			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density [kg/m^3]", rvd.rv_surface, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Moisture Content [kg/m^3]", rvd.u_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Moisture Content [kg/m^3]", rvd.u_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density [kg/m3]", rvd.rv_surface, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Moisture Content [kg/m3]", rvd.u_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Content [kg/m3]", rvd.u_deep_layer, "Zone", "State", surf_name );
 			SetupOutputVariable( "EMPD Surface Layer Equivalent Relative Humidity [%]", rvd.RH_surface_layer, "Zone", "State", surf_name );
 			SetupOutputVariable( "EMPD Deep Layer Equivalent Relative Humidity [%]", rvd.RH_deep_layer, "Zone", "State", surf_name );
 			SetupOutputVariable( "EMPD Surface Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_surface_layer, "Zone", "State", surf_name );
 			SetupOutputVariable( "EMPD Deep Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Moisture Flux to Zone [kg/m^2-s]", rvd.mass_flux_zone, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Moisture Flux [kg/m^2-s]", rvd.mass_flux_deep, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Moisture Flux to Zone [kg/m2-s]", rvd.mass_flux_zone, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Flux [kg/m2-s]", rvd.mass_flux_deep, "Zone", "State", surf_name );
 		}
 
 		if ( InitEnvrnFlag ) InitEnvrnFlag = false;
@@ -554,7 +554,7 @@ namespace MoistureBalanceEMPDManager {
 		if (material.EMPDDeepDepth <= 0.0) {
 			hm_deep_layer = 0;
 		} else {
-		hm_deep_layer = 2.0 * EMPDdiffusivity / ( material.EMPDDeepDepth + material.EMPDSurfaceDepth );
+			hm_deep_layer = 2.0 * EMPDdiffusivity / ( material.EMPDDeepDepth + material.EMPDSurfaceDepth );
 		}
 		// Calculate resistance between surface-layer/air interface and center of surface layer. [s/m]
 		// This is the physical surface of the material.
