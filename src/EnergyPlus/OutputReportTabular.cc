@@ -176,7 +176,7 @@ namespace OutputReportTabular {
 	using namespace DataGlobalConstants;
 	using namespace OutputReportPredefined;
 	using namespace DataHeatBalance;
-	
+
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
 
@@ -11309,7 +11309,7 @@ namespace OutputReportTabular {
 		Array2D_string tableBody;
 
 		// Delayed components are moved into this function so that we can calculate them one zone at a time
-		// with Array1D 
+		// with Array1D
 		Array1D< Real64 > peopleDelaySeqHeat;
 		Array1D< Real64 > peopleDelaySeqCool;
 		Array1D< Real64 > lightDelaySeqHeat;
@@ -11324,7 +11324,7 @@ namespace OutputReportTabular {
 		Array1D< Real64 > feneSolarDelaySeqCool;
 		Array2D< Real64 > surfDelaySeqHeat;
 		Array2D< Real64 > surfDelaySeqCool;
-		
+
 		peopleDelaySeqHeat.dimension( NumOfTimeStepInHour * 24, 0.0 );
 		peopleDelaySeqHeat = 0.0;
 		peopleDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
@@ -11353,13 +11353,13 @@ namespace OutputReportTabular {
 		surfDelaySeqHeat = 0.0;
 		surfDelaySeqCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
 		surfDelaySeqCool = 0.0;
-		
+
 		Array1D< Real64 > peopleRadIntoSurf;
 		Array1D< Real64 > equipRadIntoSurf;
 		Array1D< Real64 > hvacLossRadIntoSurf;
 		Array1D< Real64 > powerGenRadIntoSurf;
 		Array1D< Real64 > lightLWRadIntoSurf;
-		
+
 		peopleRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
 		equipRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
 		hvacLossRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
@@ -11400,7 +11400,7 @@ namespace OutputReportTabular {
 				// Heating design days
 				int desSelected = CalcFinalZoneSizing( iZone ).HeatDDNum;
 				if ( desSelected != 0 ) {
-					
+
 					for ( int kTimeStep = 1; kTimeStep <= NumOfTimeStepInHour * 24; ++kTimeStep ) {
 						Real64 peopleConvIntoZone = 0.0;
 						Real64 equipConvIntoZone = 0.0;
@@ -11410,10 +11410,10 @@ namespace OutputReportTabular {
 						Real64 lightSWConvIntoZone = 0.0;
 						Real64 feneSolarConvIntoZone = 0.0;
 						Real64 adjFeneSurfNetRadSeq = 0.0;
-						
+
 						for ( int jSurf = zd.SurfaceFirst; jSurf <= zd.SurfaceLast; ++jSurf ) {
 							if ( ! Surface( jSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
-							
+
 							//determine for each timestep the amount of radiant heat for each end use absorbed in each surface
 							Real64 QRadThermInAbsMult = TMULTseq( desSelected, kTimeStep, iZone ) * ITABSFseq( desSelected, kTimeStep, jSurf ) * Surface( jSurf ).Area;
 							peopleRadIntoSurf( kTimeStep ) = peopleRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
@@ -11466,11 +11466,11 @@ namespace OutputReportTabular {
 						feneCondInstantSeq( desSelected, kTimeStep, iZone ) -= adjFeneSurfNetRadSeq;
 					} // for kTimeStep
 				} // if desSelected != 0
-				
+
 				// Cooling design days
 				desSelected = CalcFinalZoneSizing( iZone ).CoolDDNum;
 				if ( desSelected != 0 ) {
-					
+
 					for ( int kTimeStep = 1; kTimeStep <= NumOfTimeStepInHour * 24; ++kTimeStep ) {
 						Real64 peopleConvIntoZone = 0.0;
 						Real64 equipConvIntoZone = 0.0;
@@ -11480,10 +11480,10 @@ namespace OutputReportTabular {
 						Real64 lightSWConvIntoZone = 0.0;
 						Real64 feneSolarConvIntoZone = 0.0;
 						Real64 adjFeneSurfNetRadSeq = 0.0;
-						
+
 						for ( int jSurf = zd.SurfaceFirst; jSurf <= zd.SurfaceLast; ++jSurf ) {
 							if ( ! Surface( jSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
-								
+
 							//determine for each timestep the amount of radiant heat for each end use absorbed in each surface
 							Real64 QRadThermInAbsMult = TMULTseq( desSelected, kTimeStep, iZone ) * ITABSFseq( desSelected, kTimeStep, jSurf ) * Surface( jSurf ).Area;
 							peopleRadIntoSurf( kTimeStep ) = peopleRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
@@ -11536,7 +11536,7 @@ namespace OutputReportTabular {
 						feneCondInstantSeq( desSelected, kTimeStep, iZone ) -= adjFeneSurfNetRadSeq;
 					} // for kTimeStep
 				} // if desSelected != 0
-				
+
 			} // if allocated( CalcFinalZoneSizing )
 
 			//---- Cooling Peak Load Components Sub-Table
@@ -12017,7 +12017,7 @@ namespace OutputReportTabular {
 					{ IOFlags flags; flags.ADVANCE( "YES" ); gio::write( OutputFileInits, "()", flags ); } //put a line feed at the end of the line
 				}
 			}
-		
+
 			//---- Heating Peak Load Components Sub-Table
 			rowHead.allocate( rGrdTot );
 			columnHead.allocate( cPerc );
@@ -12501,7 +12501,7 @@ namespace OutputReportTabular {
 		hvacLossRadIntoSurf.deallocate();
 		powerGenRadIntoSurf.deallocate();
 		lightLWRadIntoSurf.deallocate();
-		
+
 		peopleDelaySeqHeat.deallocate();
 		peopleDelaySeqCool.deallocate();
 		lightDelaySeqHeat.deallocate();
