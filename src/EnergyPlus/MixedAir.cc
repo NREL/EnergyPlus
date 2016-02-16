@@ -1415,16 +1415,6 @@ namespace MixedAir {
 		NumERVControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
 		NumOAControllers += NumERVControllers;
 
-
-		// Find number of primary air systems - fixes 5476
-		NumPrimaryAirSys = GetNumObjectsFound( "AirLoopHVAC" );
-		int NumOACntrlOrPrimAirSys = max( NumPrimaryAirSys, NumOAControllers );
-		AirLoopControlInfo.allocate( NumOACntrlOrPrimAirSys );
-		AirLoopFlow.allocate( NumOACntrlOrPrimAirSys );
-		PrimaryAirSystem.allocate( NumOACntrlOrPrimAirSys );
-		AirToZoneNodeInfo.allocate( NumOACntrlOrPrimAirSys );
-
-
 		//     Mangesh code to fix CR 8225 - 09/14/2010
 		//NumControllerList = GetNumObjectsFound("AirLoopHVAC:ControllerList")
 		//NumOASys = GetNumObjectsFound("AirLoopHVAC:OutdoorAirSystem")
@@ -1680,13 +1670,16 @@ namespace MixedAir {
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
 					VentMechZoneName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 5 );
 
-					for ( OutAirNum = 1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
-						if ( OAController( OutAirNum ).VentilationMechanicalName == VentilationMechanical( VentMechNum ).Name && VentilationMechanical( VentMechNum ).DCVFlag ) {
-							AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = true;
-						} else {
-							AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = false;
+					if ( AirLoopControlInfo.size() >= NumOAControllers ){
+						for ( OutAirNum = 1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
+							if ( OAController( OutAirNum ).VentilationMechanicalName == VentilationMechanical( VentMechNum ).Name && VentilationMechanical( VentMechNum ).DCVFlag ) {
+								AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = true;
+							} else {
+								AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = false;
+							}
 						}
 					}
+
 
 					//     Getting OA details from design specification OA object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 6 ) ) {
@@ -3058,32 +3051,34 @@ namespace MixedAir {
 					auto const & zone( Zone( ZoneNum ) );
 					FoundZone = false;
 
-					for ( AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo( AirLoopNum ).NumZones; ++AirLoopZoneInfoZoneNum ) {
-						NumZone = AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( AirLoopZoneInfoZoneNum );
-						if ( ZoneNum == NumZone ) {
-							FoundZone = true;
-							++TempMechVentArrayCounter;
-							if ( TempMechVentArrayCounter < NumMechVentZone ) { // Copy to lower index
-								vent_mech.Zone( TempMechVentArrayCounter ) = vent_mech.Zone( NumMechVentZone );
-								vent_mech.ZoneOAAreaRate( TempMechVentArrayCounter ) = vent_mech.ZoneOAAreaRate( NumMechVentZone );
-								vent_mech.ZoneOAPeopleRate( TempMechVentArrayCounter ) = vent_mech.ZoneOAPeopleRate( NumMechVentZone );
-								vent_mech.ZoneOAFlow( TempMechVentArrayCounter ) = vent_mech.ZoneOAFlow( NumMechVentZone );
-								vent_mech.ZoneOAACH( TempMechVentArrayCounter ) = vent_mech.ZoneOAACH( NumMechVentZone );
-								vent_mech.ZoneDesignSpecOAObjIndex( TempMechVentArrayCounter ) = vent_mech.ZoneDesignSpecOAObjIndex( NumMechVentZone );
-								vent_mech.ZoneDesignSpecOAObjName( TempMechVentArrayCounter ) = vent_mech.ZoneDesignSpecOAObjName( NumMechVentZone );
+					if ( AirLoopZoneInfo.size() >= AirLoopNum ){
+						for ( AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo( AirLoopNum ).NumZones; ++AirLoopZoneInfoZoneNum ) {
+							NumZone = AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( AirLoopZoneInfoZoneNum );
+							if ( ZoneNum == NumZone ) {
+								FoundZone = true;
+								++TempMechVentArrayCounter;
+								if ( TempMechVentArrayCounter < NumMechVentZone ) { // Copy to lower index
+									vent_mech.Zone( TempMechVentArrayCounter ) = vent_mech.Zone( NumMechVentZone );
+									vent_mech.ZoneOAAreaRate( TempMechVentArrayCounter ) = vent_mech.ZoneOAAreaRate( NumMechVentZone );
+									vent_mech.ZoneOAPeopleRate( TempMechVentArrayCounter ) = vent_mech.ZoneOAPeopleRate( NumMechVentZone );
+									vent_mech.ZoneOAFlow( TempMechVentArrayCounter ) = vent_mech.ZoneOAFlow( NumMechVentZone );
+									vent_mech.ZoneOAACH( TempMechVentArrayCounter ) = vent_mech.ZoneOAACH( NumMechVentZone );
+									vent_mech.ZoneDesignSpecOAObjIndex( TempMechVentArrayCounter ) = vent_mech.ZoneDesignSpecOAObjIndex( NumMechVentZone );
+									vent_mech.ZoneDesignSpecOAObjName( TempMechVentArrayCounter ) = vent_mech.ZoneDesignSpecOAObjName( NumMechVentZone );
 
-								// new DCV
-								vent_mech.ZoneADEffCooling( TempMechVentArrayCounter ) = vent_mech.ZoneADEffCooling( NumMechVentZone );
-								vent_mech.ZoneADEffHeating( TempMechVentArrayCounter ) = vent_mech.ZoneADEffHeating( NumMechVentZone );
-								vent_mech.ZoneADEffSchPtr( TempMechVentArrayCounter ) = vent_mech.ZoneADEffSchPtr( NumMechVentZone );
-								vent_mech.ZoneADEffSchName( TempMechVentArrayCounter ) = vent_mech.ZoneADEffSchName( NumMechVentZone );
+									// new DCV
+									vent_mech.ZoneADEffCooling( TempMechVentArrayCounter ) = vent_mech.ZoneADEffCooling( NumMechVentZone );
+									vent_mech.ZoneADEffHeating( TempMechVentArrayCounter ) = vent_mech.ZoneADEffHeating( NumMechVentZone );
+									vent_mech.ZoneADEffSchPtr( TempMechVentArrayCounter ) = vent_mech.ZoneADEffSchPtr( NumMechVentZone );
+									vent_mech.ZoneADEffSchName( TempMechVentArrayCounter ) = vent_mech.ZoneADEffSchName( NumMechVentZone );
+								}
+
+								// Sum outside air per unit floor area for each mechanical ventilation object only once per simulation
+								vent_mech.TotAreaOAFlow += zone.FloorArea * zone.Multiplier * zone.ListMultiplier * vent_mech.ZoneOAAreaRate( NumMechVentZone );
+								vent_mech.TotZoneOAFlow += zone.Multiplier * zone.ListMultiplier * vent_mech.ZoneOAFlow( NumMechVentZone );
+								vent_mech.TotZoneOAACH += zone.Multiplier * zone.ListMultiplier * ( vent_mech.ZoneOAACH( NumMechVentZone ) * zone.Volume / 3600.0 );
+								break;
 							}
-
-							// Sum outside air per unit floor area for each mechanical ventilation object only once per simulation
-							vent_mech.TotAreaOAFlow += zone.FloorArea * zone.Multiplier * zone.ListMultiplier * vent_mech.ZoneOAAreaRate( NumMechVentZone );
-							vent_mech.TotZoneOAFlow += zone.Multiplier * zone.ListMultiplier * vent_mech.ZoneOAFlow( NumMechVentZone );
-							vent_mech.TotZoneOAACH += zone.Multiplier * zone.ListMultiplier * ( vent_mech.ZoneOAACH( NumMechVentZone ) * zone.Volume / 3600.0 );
-							break;
 						}
 					}
 					if ( ! FoundZone ) {
@@ -3124,61 +3119,63 @@ namespace MixedAir {
 				}
 
 				// Check to see if any zones on an air loop are not accounted for by a mechanical ventilation object
-				for ( AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo( AirLoopNum ).NumZones; ++AirLoopZoneInfoZoneNum ) {
-					NumZone = AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( AirLoopZoneInfoZoneNum );
-					FoundAreaZone = false;
-					FoundPeopleZone = false;
-					for ( NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone ) {
-						ZoneNum = vent_mech.Zone( NumMechVentZone );
-						if ( ZoneNum == NumZone ) {
-							FoundAreaZone = true;
-							if ( vent_mech.ZoneOAPeopleRate( NumMechVentZone ) > 0.0 ) {
-								FoundPeopleZone = true;
+				if ( AirLoopZoneInfo.size() >= AirLoopNum ){
+					for ( AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo( AirLoopNum ).NumZones; ++AirLoopZoneInfoZoneNum ) {
+						NumZone = AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( AirLoopZoneInfoZoneNum );
+						FoundAreaZone = false;
+						FoundPeopleZone = false;
+						for ( NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone ) {
+							ZoneNum = vent_mech.Zone( NumMechVentZone );
+							if ( ZoneNum == NumZone ) {
+								FoundAreaZone = true;
+								if ( vent_mech.ZoneOAPeopleRate( NumMechVentZone ) > 0.0 ) {
+									FoundPeopleZone = true;
+								}
+								break;
 							}
-							break;
 						}
-					}
-					if ( ! FoundAreaZone ) {
-						ShowWarningError( "Zone name = " + Zone( NumZone ).Name + " is not accounted for by " + CurrentModuleObjects( CMO_MechVentilation ) + " object name = " + OAController( OAControllerNum ).VentilationMechanicalName );
-						ShowContinueError( "Ventilation per unit floor area has not been specified for this zone, which is connected to" );
-						ShowContinueError( "the air loop served by Controller:OutdoorAir = " + OAController( OAControllerNum ).Name + ". Simulation will continue..." );
-					}
-					if ( ! FoundPeopleZone ) {
-						// Loop through people objects to see if this zone has a people object and only then show a warning
-						for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
-							if ( People( PeopleNum ).ZonePtr == NumZone ) {
-								if ( ! FoundAreaZone ) {
-									//  !             If the zone was found, then the people ventilation rate is set to 0
-									//                CALL ShowWarningError('PEOPLE object for zone = '//TRIM(Zone(NumZone)%Name)// &
-									//                                    ' is not accounted for by '//TRIM(CurrentModuleObjects(CMO_MechVentilation))//  &
-									//                                    ' object name = '//TRIM(OAController(OAControllerNum)%VentilationMechanicalName))
-									//                CALL ShowContinueError('A "PEOPLE" object has been specified in the idf for this zone, '// &
-									//                                       'but the ventilation rate is set to 0 in this Controller:MechanicalVentilation Object.')
-									//                CALL ShowContinueError('Check ventilation rate in Controller:MechanicalVentilation object. '//  &
-									//                   ' Simulation will continue.')
-									//              ELSE
-									//             If the zone was not found, then the PEOPLE objects are not accounted for
-									ShowWarningError( "PEOPLE object for zone = " + Zone( NumZone ).Name + " is not accounted for by " + CurrentModuleObjects( CMO_MechVentilation ) + " object name = " + OAController( OAControllerNum ).VentilationMechanicalName );
-									ShowContinueError( "A \"PEOPLE\" object has been specified in the idf for this zone, but it is not included in this " + CurrentModuleObjects( CMO_MechVentilation ) + " Object." );
-									ShowContinueError( "Check " + CurrentModuleObjects( CMO_MechVentilation ) + " object. Simulation will continue." );
+						if ( !FoundAreaZone ) {
+							ShowWarningError( "Zone name = " + Zone( NumZone ).Name + " is not accounted for by " + CurrentModuleObjects( CMO_MechVentilation ) + " object name = " + OAController( OAControllerNum ).VentilationMechanicalName );
+							ShowContinueError( "Ventilation per unit floor area has not been specified for this zone, which is connected to" );
+							ShowContinueError( "the air loop served by Controller:OutdoorAir = " + OAController( OAControllerNum ).Name + ". Simulation will continue..." );
+						}
+						if ( !FoundPeopleZone ) {
+							// Loop through people objects to see if this zone has a people object and only then show a warning
+							for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
+								if ( People( PeopleNum ).ZonePtr == NumZone ) {
+									if ( !FoundAreaZone ) {
+										//  !             If the zone was found, then the people ventilation rate is set to 0
+										//                CALL ShowWarningError('PEOPLE object for zone = '//TRIM(Zone(NumZone)%Name)// &
+										//                                    ' is not accounted for by '//TRIM(CurrentModuleObjects(CMO_MechVentilation))//  &
+										//                                    ' object name = '//TRIM(OAController(OAControllerNum)%VentilationMechanicalName))
+										//                CALL ShowContinueError('A "PEOPLE" object has been specified in the idf for this zone, '// &
+										//                                       'but the ventilation rate is set to 0 in this Controller:MechanicalVentilation Object.')
+										//                CALL ShowContinueError('Check ventilation rate in Controller:MechanicalVentilation object. '//  &
+										//                   ' Simulation will continue.')
+										//              ELSE
+										//             If the zone was not found, then the PEOPLE objects are not accounted for
+										ShowWarningError( "PEOPLE object for zone = " + Zone( NumZone ).Name + " is not accounted for by " + CurrentModuleObjects( CMO_MechVentilation ) + " object name = " + OAController( OAControllerNum ).VentilationMechanicalName );
+										ShowContinueError( "A \"PEOPLE\" object has been specified in the idf for this zone, but it is not included in this " + CurrentModuleObjects( CMO_MechVentilation ) + " Object." );
+										ShowContinueError( "Check " + CurrentModuleObjects( CMO_MechVentilation ) + " object. Simulation will continue." );
+									}
 								}
 							}
 						}
-					} else { // People > 0, check to make sure there is a people statement in the zone
-						FoundAreaZone = false;
-						for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
-							if ( People( PeopleNum ).ZonePtr != NumZone ) continue;
-							FoundAreaZone = true;
-							break;
-						}
-						if ( ! FoundAreaZone ) {
-							ShowWarningError( CurrentModuleObjects( CMO_MechVentilation ) + " = \"" + OAController( OAControllerNum ).VentilationMechanicalName + "\", Zone=\"" + Zone( NumZone ).Name + "\"." );
-							ShowContinueError( "No \"PEOPLE\" object has been specified in the idf for this zone, but the ventilation rate is > 0 in this Controller:MechanicalVentilation Object." );
-							ShowContinueError( "Check ventilation rate in Controller:MechanicalVentilation object.  Simulation will continue." );
+						else { // People > 0, check to make sure there is a people statement in the zone
+							FoundAreaZone = false;
+							for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
+								if ( People( PeopleNum ).ZonePtr != NumZone ) continue;
+								FoundAreaZone = true;
+								break;
+							}
+							if ( !FoundAreaZone ) {
+								ShowWarningError( CurrentModuleObjects( CMO_MechVentilation ) + " = \"" + OAController( OAControllerNum ).VentilationMechanicalName + "\", Zone=\"" + Zone( NumZone ).Name + "\"." );
+								ShowContinueError( "No \"PEOPLE\" object has been specified in the idf for this zone, but the ventilation rate is > 0 in this Controller:MechanicalVentilation Object." );
+								ShowContinueError( "Check ventilation rate in Controller:MechanicalVentilation object.  Simulation will continue." );
+							}
 						}
 					}
 				}
-
 			}
 
 			MechVentCheckFlag( OAControllerNum ) = false;
