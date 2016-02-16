@@ -56,92 +56,100 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// EnergyPlus::DataPlant Unit Tests
+// EnergyPlus::ZoneEquipmentManager Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataPlant;
 using namespace ObjexxFCL;
+using namespace EnergyPlus::ZoneEquipmentManager;
+using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::DataZoneEquipment;
+using namespace EnergyPlus::HeatBalanceAirManager;
+using namespace EnergyPlus::HeatBalanceManager;
 
-TEST_F( EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim )
+TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 {
-	TotNumLoops = 3;
-	PlantLoop.allocate( TotNumLoops );
-	for ( int l = 1; l <= TotNumLoops; ++l ) {
-		auto & loop( PlantLoop( l ) );
-		loop.LoopSide.allocate( 2 );
+
+	std::string const idf_objects = delimited_string({
+		" Version,8.4;",
+
+		"Zone,",
+		"  Space;                   !- Name",
+
+		"ZoneHVAC:EquipmentConnections,",
+		" Space,                    !- Zone Name",
+		" Space Equipment,          !- Zone Conditioning Equipment List Name",
+		" Space In Node,            !- Zone Air Inlet Node or NodeList Name",
+		" Space Exh Nodes,           !- Zone Air Exhaust Node or NodeList Name",
+		" Space Node,               !- Zone Air Node Name",
+		" Space Ret Node;           !- Zone Return Air Node Name",
+
+		"ZoneHVAC:EquipmentList,",
+		" Space Equipment,          !- Name",
+		" Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
+		" Exhaust Fan,              !- Zone Equipment 1 Name",
+		" 1,                        !- Zone Equipment 1 Cooling Sequence",
+		" 1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+
+		"Fan:ZoneExhaust,",
+		"Exhaust Fan,               !- Name",
+		",                          !- Availability Schedule Name",
+		"0.338,                     !- Fan Total Efficiency",
+		"125.0000,                  !- Pressure Rise{Pa}",
+		"0.3000,                    !- Maximum Flow Rate{m3/s}",
+		"Exhaust Fan Inlet Node,    !- Air Inlet Node Name",
+		"Exhaust Fan Outlet Node,   !- Air Outlet Node Name",
+		"Zone Exhaust Fans;         !- End - Use Subcategory",
+
+		"NodeList,",
+		"  Space Exh Nodes,  !- Name",
+		"  Space ZoneHVAC Exh Node, !- Node 1 Name",
+		"  Exhaust Fan Inlet Node; !- Node 1 Name",
+
+	} );
+
+	ASSERT_FALSE(process_idf(idf_objects));
+	EXPECT_FALSE(has_err_output());
+	bool ErrorsFound = false;
+	GetZoneData(ErrorsFound);
+	AllocateHeatBalArrays();
+	GetZoneEquipmentData1();
+	GetSimpleAirModelInputs(ErrorsFound);
+
+	int ZoneNum = 1;
+	int NodeNum;
+	for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
+		Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
 	}
+	// Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
+	Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
+	DataAirSystems::PrimaryAirSystem.allocate( 1 );
+	DataAirLoop::AirLoopFlow.allocate( 1 );
+	DataHVACGlobals::NumPrimaryAirSys = 1;
 
-	EXPECT_TRUE( AnyPlantLoopSidesNeedSim() ); // SimLoopSideNeeded is set to true in default ctor
-	SetAllPlantSimFlagsToValue( false ); // Set all SimLoopSideNeeded to false
-	EXPECT_FALSE( AnyPlantLoopSidesNeedSim() );
-}
+	ZoneEquipConfig(ZoneNum).AirLoopNum = 1;
+	DataHVACGlobals::AirLoopsSimOnce = true;
+	CalcZoneMassBalance( );
+	EXPECT_FALSE(has_err_output());
 
-TEST_F( EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop )
-{
+	// Add true zone exhuast from exhuast fan, now there should be warning
+	ZoneEquipConfig(ZoneNum).ZoneExh = 0.1;
+	CalcZoneMassBalance();
+	EXPECT_TRUE(has_err_output());
 
-	// not using the DataPlantTest base class because of how specific this one is and that one is very general
-	if ( PlantLoop.allocated() ) PlantLoop.deallocate();
-	TotNumLoops = 2;
-	PlantLoop.allocate( 2 );
-	PlantLoop( 1 ).LoopSide.allocate(2);
-	PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 2 ).Branch.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 2 ).LoopSide.allocate(2);
-	PlantLoop( 2 ).LoopSide( 1 ).Branch.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 2 ).Branch.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
-
-	// initialize all node numbers to zero
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-
-	// specify the node numbers of interest
-	int const nodeNumA = 1;
-	int const nodeNumB = 2;
-
-	// first test, expected pass
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
-	EXPECT_TRUE( verifyTwoNodeNumsOnSamePlantLoop( nodeNumA, nodeNumB ) );
-
-	// reset node numbers
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-
-	// second test, expected false
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
-	EXPECT_FALSE( verifyTwoNodeNumsOnSamePlantLoop( nodeNumA, nodeNumB ) );
-
-	TotNumLoops = 0;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 1 ).LoopSide( 1 ).Branch.deallocate();
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 1 ).LoopSide( 2 ).Branch.deallocate();
-	PlantLoop( 1 ).LoopSide.deallocate();
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 2 ).LoopSide( 1 ).Branch.deallocate();
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 2 ).LoopSide( 2 ).Branch.deallocate();
-	PlantLoop( 2 ).LoopSide.deallocate();
-	PlantLoop.allocate( 2 );
-
+	// Deallocate everything - should all be taken care of in clear_states
 }

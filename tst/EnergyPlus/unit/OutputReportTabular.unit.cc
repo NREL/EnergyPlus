@@ -316,7 +316,7 @@ TEST( OutputReportTabularTest, GetColumnUsingTabs )
 
 TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest )
 {
-	ShowMessage( "Begin Test: EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest" );
+	ShowMessage("Begin Test: EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest");
 
 	TotDesDays = 2;
 	TotRunDesPersDays = 3;
@@ -459,6 +459,49 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTe
 	EXPECT_EQ( surfDelaySeq.size(), 3360u );
 
 }
+
+TEST( OutputReportTabularTest, ConfirmConvertToEscaped )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, ConfirmConvertToEscaped" );
+	EXPECT_EQ( "", ConvertToEscaped( "" ) );
+	EXPECT_EQ( " ", ConvertToEscaped( " " ) );
+	EXPECT_EQ( "String with &gt; in it", ConvertToEscaped( "String with > in it" ) );
+	EXPECT_EQ( "String with &lt; in it", ConvertToEscaped( "String with < in it" ) );
+	EXPECT_EQ( "String with &amp; in it", ConvertToEscaped( "String with & in it" ) );
+	EXPECT_EQ( "String with &quot; in it", ConvertToEscaped( "String with \" in it" ) );
+	EXPECT_EQ( "String with &apos; in it", ConvertToEscaped( "String with \' in it" ) );
+	EXPECT_EQ( "String with &quot; in it", ConvertToEscaped( R"(String with \" in it)" ) );
+	EXPECT_EQ( "String with &apos; in it", ConvertToEscaped( R"(String with \' in it)" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( std::string( "String with " ) +  char( 176 ) + std::string( " in it" ) ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( "String with \u00B0 in it" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( "String with \xB0 in it" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( "String with \xC2\xB0 in it" ) );
+	EXPECT_EQ( "String with \xC2 in it", ConvertToEscaped( "String with \xC2 in it" ) );
+	EXPECT_EQ( "String with \xC2\xB1 in it", ConvertToEscaped( "String with \xC2\xB1 in it" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( R"(String with \u00B0 in it)" ) );
+	EXPECT_EQ( "String with &deg; in it", ConvertToEscaped( R"(String with \xB0 in it)" ) );
+	EXPECT_ANY_THROW( ConvertToEscaped( R"(String with \u in it)" ) );
+	EXPECT_ANY_THROW( ConvertToEscaped( R"(String with \x in it)" ) );
+}
+
+TEST( OutputReportTabularTest, ConvertUnicodeToUTF8 )
+{
+	ShowMessage( "Begin Test: OutputReportTabularTest, ConvertUnicodeToUTF8" );
+
+	{
+		std::string test;
+		test += static_cast<char>( 0 );
+		EXPECT_EQ( test, ConvertUnicodeToUTF8( std::stoul( "0x0000", nullptr, 16 ) ) );
+	}
+	EXPECT_EQ( "\x7F", ConvertUnicodeToUTF8( std::stoul( "0x7F", nullptr, 16 ) ) );
+	EXPECT_EQ( "\xC2\xB0", ConvertUnicodeToUTF8( std::stoul( "0xB0", nullptr, 16 ) ) );
+	EXPECT_EQ( "\xC2\xB0", ConvertUnicodeToUTF8( std::stoul( "0x00B0", nullptr, 16 ) ) );
+	EXPECT_EQ( "\xEF\xBF\xBF", ConvertUnicodeToUTF8( std::stoul( "0xFFFF", nullptr, 16 ) ) );
+	EXPECT_EQ( "\xF4\x8F\xBF\xBF", ConvertUnicodeToUTF8( std::stoul( "0x10FFFF", nullptr, 16 ) ) );
+	EXPECT_EQ( "", ConvertUnicodeToUTF8( std::stoul( "0x110000", nullptr, 16 ) ) );
+	EXPECT_EQ( "", ConvertUnicodeToUTF8( std::stoul( "0x1FFFFF", nullptr, 16 ) ) );
+}
+
 
 TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {
