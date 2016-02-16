@@ -2439,6 +2439,12 @@ The AirflowNetwork:Multizone:Surface object allows a heat transfer surface or su
 
 An interior heat transfer surface (BuildingSurface:Detailed) whose surface name is used as the input for the Outside Boundary Condition Object field represents a floor without ground contact and is not allowed as an AirflowNetwork:Multizone:Surface. A heat transfer surface defined in the BuildingSurface:Detailed:ExteriorNaturalVentedCavity is also not allowed.
 
+When a triangular subsurface is used, the model provides a warning and treats this subsurface as rectangular. The effective width and height calculated in the ProcessSurfaceVertices function of the SurfaceGeometry module are used to represent a rectangular subsurface.
+
+Effective width = 0.75 x Length between Vertex 1 and Vertex 2
+
+Effective height = 4 x Area / ( 3 x Length between Vertex 2 and Vertex 3 )   
+
 #### Field: Surface Name
 
 This is the name of the corresponding surface (wall, roof, ceiling, floor, window, door or glass door).
@@ -8332,7 +8338,7 @@ This output is the availability status of the zone evaporative cooler unit’s f
 
 The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to model dedicated outdoor air systems (DOAS) and other similar systems which aim to provide either additional outside air or some limited amount of sensible and/or latent conditioning.  The zone outdoor air unit is a piece of zone equipment that can consist of a supply fan, an exhaust fan (optional), heating and cooling coils, and heat recovery.  The outdoor air unit input simply requires information about flow rates, schedules, node names, and a list of component that are part of the unit.  These components require additional input as per the requirements for these components.  In addition, the input includes information about controls for the unit.  It should be noted that the components that make up the zone outdoor air unit do not require additional controls or setpoints.  The unit input defines how the unit outlet temperature is controlled as described below.
 
-![](media/image282.png)
+![](media/image7466.png)
 
 Figure 110. Zone Outdoor Air Unit Schematic
 
