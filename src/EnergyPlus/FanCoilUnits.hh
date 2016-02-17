@@ -392,6 +392,12 @@ namespace FanCoilUnits {
 	);
 
 	Real64
+	CalcFanCoilWaterFlowTempResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+	
+	Real64
 	CalcFanCoilWaterFlowResidual(
 		Real64 const WaterFlow, // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
