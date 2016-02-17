@@ -471,22 +471,23 @@ namespace EnergyPlus {
 
 		//first fill in a vector of names
 		std::vector < std::string > storageNames;
-
-		for ( std::size_t i = 0; i < elecLoadCenterObjs.size(); ++i ) {
-			if ( elecLoadCenterObjs[ i ]->storageObj != nullptr ) {
-				storageNames.emplace_back( elecLoadCenterObjs[ i ]->storageObj->name );
+		for ( auto & e : elecLoadCenterObjs ) {
+			if ( e->storageObj != nullptr ) {
+				storageNames.emplace_back( e->storageObj->name );
 			}
 		}
 
 		//then check the vector for duplicates. 
 		for ( std::size_t i = 0; i < storageNames.size(); ++i ) {
 			for ( std::size_t j = 0; j < storageNames.size(); ++j ) {
-				if ( storageNames[ i ] == storageNames[ j ] ) {
+				if ( storageNames[ i ] == storageNames[ j ] && i != j ) {
 					ShowWarningError( "ElectricPowerServiceManager::checkLoadCenters, the electrical storage device named = " + storageNames[ i ] + " is used on more than one ElectricLoadCenter:Distribution input object." );
 					ShowContinueError( "Electric Load Centers cannot share the same storage device." );
 				}
 			}
 		}
+
+
 	}
 
 	ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
@@ -692,7 +693,7 @@ namespace EnergyPlus {
 			} else {
 				if ( this->storageScheme == StorageOpScheme::meterDemandStoreExcessOnSite ) { // throw error
 					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 11 ) + ", cannot be blank when storage scheme is TrackMeterDemandStoreExcessOnSite" );
+					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 11 ) + ", cannot be blank when storage operation scheme is TrackMeterDemandStoreExcessOnSite" );
 					errorsFound = true;
 				}
 			}
@@ -700,6 +701,12 @@ namespace EnergyPlus {
 			if ( ! DataIPShortCuts::lAlphaFieldBlanks( 12 ) ) {
 				this->converterName = DataIPShortCuts::cAlphaArgs( 12 );
 				this->converterPresent = true;
+			} else {
+				if ( this->storageScheme == StorageOpScheme::chargeDischargeSchedules || this->storageScheme == StorageOpScheme::facilityDemandLeveling ) {
+					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
+					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 12 ) + ", cannot be blank when storage scheme is " + DataIPShortCuts::cAlphaArgs( 10 ) );
+					errorsFound = true;
+				}
 			}
 
 			if ( DataIPShortCuts::lNumericFieldBlanks( 2 ) ) {
@@ -834,8 +841,8 @@ namespace EnergyPlus {
 
 		//Setup general output variables for reporting in the electric load center
 
-		SetupOutputVariable( "Electric Load Center Produced Electric Power [W]", this->genElectricProd, "System", "Average", this->name );
-		SetupOutputVariable( "Electric Load Center Produced Electric Energy [J]", this->genElectProdRate, "System", "Sum", this->name );
+		SetupOutputVariable( "Electric Load Center Produced Electric Power [W]",this->genElectProdRate, "System", "Average", this->name );
+		SetupOutputVariable( "Electric Load Center Produced Electric Energy [J]",this->genElectricProd, "System", "Sum", this->name );
 		SetupOutputVariable( "Electric Load Center Supplied Electric Power [W]", this->subpanelFeedInRate, "System", "Average", this->name );
 		SetupOutputVariable( "Electric Load Center Drawn Electric Power [W]", this->subpanelDrawRate, "System", "Average", this->name );
 		SetupOutputVariable( "Electric Load Center Produced Thermal Rate [W]", this->thermalProdRate, "System", "Average", this->name );
@@ -845,6 +852,10 @@ namespace EnergyPlus {
 		if ( DataGlobals::AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Electrical Storage", this->name , "Power Draw Rate", "[W]", this->eMSOverridePelFromStorage, this->eMSValuePelFromStorage );
 				SetupEMSActuator( "Electrical Storage", this->name , "Power Charge Rate", "[W]", this->eMSOverridePelIntoStorage, this->eMSValuePelIntoStorage );
+		}
+
+		if ( errorsFound ) {
+			ShowFatalError( routineName + "Preceding errors terminate program." );
 		}
 	}
 

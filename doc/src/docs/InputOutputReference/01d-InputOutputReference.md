@@ -20346,48 +20346,34 @@ ElectricLoadCenter:Distribution,
 
 There are three levels of results reporting related to electric load centers and generators.   The top level of reporting provides results across the whole building and all the different electric load centers and generators.   The second level of reporting provides results for individual load centers.   The third level is for each type of generator (see individual generator descriptions).   This section discusses the first two levels.
 
-The whole-building summary output variables are:
-
-* HVAC,Average,Facility Total Produced Electric Power [W]
-
-* HVAC,Sum,Facility Total Produced Electric Energy [J]
+Even if no ElectricLoadCenter:Distribution object is included, the following whole-building summary output variables are also available for all simulations that have any electricity consuming equipment.  
 
 * HVAC,Average,Facility Total Purchased Electric Power [W]
-
 * HVAC,Sum,Facility Total Purchased Electric Energy [J]
-
+* HVAC,Sum,Facility Total Surplus Electric Energy [J]
+* HVAC,Average,Facility Net Purchased Electric Power [W]
+* HVAC,Sum,Facility Net Purchased Electric Energy [J]
 * HVAC,Average,Facility Total Building Electric Demand Power [W]
-
 * HVAC,Average,Facility Total HVAC Electric Demand Power [W]
-
 * HVAC,Average,Facility Total Electric Demand Power [W]
+* HVAC,Average,Facility Total Produced Electric Power [W]
+* HVAC,Sum,Facility Total Produced Electric Energy [J]
 
 These output variables all use a default keyword    Whole Building.   
 
-These output variables can also be accessed without specifying generation equipment by including the syntax shown below:
-
-```idf
-ElectricLoadCenter:Distribution,
-   Electric Load Center; !- Name
-```
-
-Even if no ElectricLoadCenter:Distribution object is included, these output variables are also available for all simulations that have any electricity consuming equipment with the default keyword name    Electrical Service.   
-
-#### Facility Total Produced Electric Power [W]
-
-#### Facility Total Produced Electric Energy [J]
-
-These outputs are the total generator and photovoltaic electricity produced on-site for the entire model, and they are in both Power and Energy units.   When electrical storage is used with on-site production, the electricity put into storage is decremented from production and the electricity removed storage is added to production.   This means that losses from a round trip through electrical storage decrease on-site electricity production.
-
 #### Facility Total Purchased Electric Power [W]
-
 #### Facility Total Purchased Electric Energy [J]
-
-These outputs are the total of electricity purchased for the entire model in both Power and Energy units. This value is always positive and indicates the amount of energy is purchased from the utility.
+ 
+These outputs are the total of electricity purchased for the entire facility in both Power and Energy units. This value is always positive and indicates the amount of energy that is purchased from the utility.
 
 #### Facility Total Surplus Electric Energy [J]
 
-This output is the excess electricity produced and sent out to the electrical grid. This value is always positive and indicates the surplus electricity from generation that exceeds whole-building demand and fed into the grid.
+This output is the excess electricity produced and sent out to the electrical grid. This value is always positive and indicates the surplus electric power (from generation and/or storage discharge) exceeds the whole-building demand and electricity is being fed from the facility into the grid.
+
+#### Facility Net Purchased Electric Power [W]
+#### Facility Net Purchased Electric Energy [J]
+
+These outputs are the net electricity purchased in both Power and Energy units. This value can be either positive or negative. Positive values are defined as electricity purchased from the utility. Negative values are defined as surplus electricity fed back into the grid.
 
 #### Facility Total Building Electric Demand Power [W]
 
@@ -20401,39 +20387,47 @@ This output variable includes all of the electric demand from the HVAC portion o
 
 This is the total of the whole Building and HVAC electric demands.
 
-#### Facility Net Purchased Electric Power [W]
+#### Facility Total Produced Electric Power [W]
+#### Facility Total Produced Electric Energy [J]
 
-#### Facility Net Purchased Electric Energy [J]
+These outputs are the total generator and photovoltaic electricity produced on-site for the entire model, and they are in both Power and Energy units.  When the electric power production system includes power conversion devices including DC to AC inverters, AC to DC converters, or transformers, the power conversion losses are included as negative values in these reports. When electrical storage is used with on-site production, the electricity put into storage is decremented from production and the electricity removed storage is added to production.   This means that losses from a round trip through electrical storage decrease on-site electricity production.
 
-These outputs are the net electricity purchased in both Power and Energy units. This value can be either positive or negative. Positive values are defined as electricity purchased from the utility. Negative values are defined as surplus electricity fed back into the grid.
 
-Each ElectricLoadCenter also collects results from the individual generators that are connected to that load center.   The output variables available at the ElectricLoadCenter level are:
+Each ElectricLoadCenter also collects results from the individual generators that are connected to that load center.  The keywords for these reports are the unique names of ElectricLoadCenter:Distribution objects.  The output variables available at the ElectricLoadCenter level are:
 
-HVAC,Average,Electric Load Center Requested Electric Power [W]
+* HVAC,Average,Electric Load Center Produced Electric Power [W]
+* HVAC,Sum,Electric Load Center Produced Electric Energy [J]
+* HVAC,Average,Electric Load Center Supplied Electric Power [W]
+* HVAC,Average,Electric Load Center Drawn Electric Power [W]
+* HVAC,Average,Electric Load Center Produced Thermal Rate [W]
+* HVAC,Sum,Electric Load Center Produced Thermal Energy [J]
+* HVAC,Average,Electric Load Center Requested Electric Power [W]
 
-HVAC,Average,Electric Load Center Produced Electric Power [W]
-
-HVAC,Sum,Electric Load Center Produced Electric Energy [J]
-
-HVAC,Average,Electric Load Center Produced Thermal Rate [W]
-
-HVAC,Sum,Electric Load Center Produced Thermal Energy [J]
-
-#### Electric Load Center Requested Electric Power [W]
-
-This output variable is the average electric power supply (in watts) requested by the load center from its generators for the time step being reported. For the baseload operating scheme, this output variable should equal the sum of the power supply requests for the    available    generators associated with this load center (ref. ElectricLoadCenter:Generators). In other cases, this output could be different from the sum of the power supply requests for the generators associated with this load center. For example, a generator might be requested to provide a certain amount of power but can only provide a fraction of the requested amount. In this case the load center will detect this shortfall and include it when calculating the power request for the next available generator. Therefore, the sum of the power supply requests for the individual generators associated with this load center (ref. ElectricLoadCenter:Generators) could be greater than the Electric Load Center Requested Electric Power output variable.
 
 #### Electric Load Center Produced Electric Power [W]
 
 #### Electric Load Center Produced Electric Energy [J]
 
-These outputs are the sum of electrical energy and power produced by the generators attached to a particular load center.   The keywords for these reports are the unique names of ElectricLoadCenter:Distribution objects.
+These outputs are the sum of electrical energy and power produced by the generators attached to a particular load center.  This could be DC or AC depending on the type of buss.  The power actually delivered by the load center may be adjusted by power conversion losses from an inverter or transformer or by interaction with the any electrical storage. 
+
+#### Electric Load Center Supplied Electric Power [W]
+
+This output is the power fed from the electric load center into the main distribution panel, in Watts.  This power is generated or discharged by on site equipment and has been adjusted to account for any power conversion by an inverter and/or transformer on the load center. 
+
+#### Electric Load Center Drawn Electric Power [W]
+
+This output is the power fed from the main distribution panel into the load center, in Watts.  This power draw is typically only for charging storage with power from either the grid or another load center. 
 
 #### Electric Load Center Produced Thermal Rate [W]
 
 #### Electric Load Center Produced Thermal Energy [J]
 
 These outputs are the sum of the thermal energy and power produced by the generators attached to a particular load center.   The keywords for these reports are the unique names of ElectricLoadCenter:Distribution objects.
+
+#### Electric Load Center Requested Electric Power [W]
+
+This output variable is the average electric power supply (in watts) requested of the load center by the facility's main distribution panel, for the time step being reported.  This is used by the load center generator and storage operation control logic when determining how to run the generators and/or storage devices.  For the baseload generator operating scheme, this output variable should equal the sum of the power supply requests for the available generators associated with this load center (ref. ElectricLoadCenter:Generators). In other cases, this output could be different from the sum of the power supply requests for the generators associated with this load center. For example, a generator might be requested to provide a certain amount of power but can only provide a fraction of the requested amount. In this case the load center will detect this shortfall and include it when calculating the power request for the next available generator. Therefore, the sum of the power supply requests for the individual generators associated with this load center (ref. ElectricLoadCenter:Generators) could be greater than the Electric Load Center Requested Electric Power output variable.
+
 
 ### ElectricLoadCenter:Generators
 
@@ -20481,7 +20475,7 @@ This alpha field is used as an identifying field for the generator availability 
 
 #### Field: Generator &lt;x&gt; Rated Thermal to Electrical Power Ratio
 
-This numeric field contains the ratio of the rated thermal output to the rated electric output.   It is only needed and used if the operation scheme is set to **FollowThermal** or **FollowThermalLimitElectrical**.   This nominal ratio is only used for control and dispatch decisions.   This value should be generally consistent with the more detailed performance input for the individual generator component models but it is not used in those component models.
+This numeric field contains the ratio of the rated thermal output to the rated electric output.   It is required and used if the operation scheme is set to **FollowThermal** or **FollowThermalLimitElectrical**.   This nominal ratio is only used for control and dispatch decisions.   This value should be generally consistent with the more detailed performance input for the individual generator component models but it is not used in those component models.
 
 An example IDF showing how this object is used is provided below:
 
@@ -20513,7 +20507,7 @@ A single output variable is available for each generator specified via this obje
 
 #### Generator Requested Electric Power [W]
 
-This output variable represents the average electric power supply in Watts that is being requested from a specific generator for the time step being reported. In some instances the output value may be the Rated Electric Power Output specified for the generator in the ElectricLoadCenter:Generators object. If the generator is not available for a simulation time step (as indicated by its availability schedule), then the power supply request will be zero. The power supply request may be less than the rated electric power output if the overall electric power reduction target has already been met, partially or completely, by electric power produced by other generators. If an EnergyPlus Energy Management System is used to specify an electric power supply request for this generator, then that EMS request will be reflected in this output variable.
+This output variable represents the average electric power supply in Watts that is being requested by the generator operation scheme from a specific generator for the time step being reported. In some instances the output value may be the Rated Electric Power Output specified for the generator in the ElectricLoadCenter:Generators object. If the generator is not available for a simulation time step (as indicated by its availability schedule), then the power supply request will be zero. The power supply request may be less than the rated electric power output if the overall electric power reduction target has already been met, partially or completely, by electric power produced by other generators. If an EnergyPlus Energy Management System is used to specify an electric power supply request for this generator, then that EMS request will be reflected in this output variable.
 
 ### ElectricLoadCenter:Inverter:Simple
 
@@ -20696,48 +20690,45 @@ An example IDF showing how this object is used is provided below:
 
 Each inverter can report the following seven output variables.
 
-* HVAC,Average,Inverter DC to AC Efficiency [ ]
-
-* HVAC,Average,Inverter DC Input Elecric Power [W]
-
+* HVAC,Average,Inverter DC to AC Efficiency []
+* HVAC,Average,Inverter DC Input Electric Power [W]
 * HVAC,Sum,Inverter DC Input Electric Energy [J]
-
 * HVAC,Average,Inverter AC Output Electric Power [W]
-
 * HVAC,Sum,Inverter AC Output Electric Energy [J]
-
+* HVAC,Average,Inverter Conversion Loss Power [W]
+* HVAC,Sum,Inverter Conversion Loss Energy [J]
+* HVAC,Sum,Inverter Conversion Loss Decrement Energy [J]
 * HVAC,Average,Inverter Thermal Loss Rate [W]
-
 * HVAC,Sum,Inverter Thermal Loss Energy [J]
-
-* HVAC,Sum,Inverter Ancillary AC Electric Energy [J]
-
 * HVAC,Average,Inverter Ancillary AC Electric Power [W]
+* HVAC,Sum,Inverter Ancillary AC Electric Energy [J]
 
 #### Inverter DC to AC Efficiency [ ]
 
 This is the efficiency with which DC power is converted to AC power by the inverter.
 
 #### Inverter DC Input Elecric Power [W]
-
 #### Inverter DC Input Electric Energy [J]
 
 These outputs are total electricity power or energy fed into the inverter.  This is Direct Current from photovoltaics (or DC-based electrical storage) going into the inverter.
 
 #### Inverter AC Output Electric Power [W]
-
 #### Inverter AC Output Electric Energy [J]
 
 These outputs are the total electricity power or energy produced by the inverter.   This is Alternating Current going out of the inverter.
 
-#### Inverter Thermal Loss Rate [W]
+#### Inverter Conversion Loss Power [W]
+#### Inverter Conversion Loss Energy [J]
+#### Inverter Conversion Loss Decrement Energy [J]
 
+These outputs are the thermal power or energy losses in the inverter that stem from converting from DC to AC.  The decrement energy is negative and is metered as "PowerConversion" on the "ElectricityProduced" resource.
+
+#### Inverter Thermal Loss Rate [W]
 #### Inverter Thermal Loss Energy [J]
 
-These outputs are the thermal power or energy losses in the inverter that stem from converting from DC to AC.
+These outputs are the thermal power or energy losses in the inverter that stem from converting from DC to AC plus any ancillary electric power. 
 
 #### Inverter Ancillary AC Electric Power [W]
-
 #### Inverter Ancillary AC Electric Energy [J]
 
 These outputs are the Alternating Current electricity consumed by the inverter.   These are ancillary, or night tare loss, power uses by the inverter and modeled as if powered by the building   s grid connection.   These ancillary power draws generally occur when the inverter is not generating power but waiting in a standby mode ready to begin generating power.
@@ -20910,7 +20901,7 @@ An example IDF showing how this object is used is provided below:
 
 Each electrical storage device can report the following seven output variables.
 
-* HVAC,Average,Electric Storage Charge State [J]
+* HVAC,Average,Electric Storage Simple Charge State [J]
 
 * HVAC,Average,Electric Storage Charge Power [W]
 
@@ -20926,9 +20917,9 @@ Each electrical storage device can report the following seven output variables.
 
 * HVAC,Sum,Electric Storage Production Decrement Energy [J]
 
-#### Electric Storage Charge State [J]
+#### Electric Storage Simple Charge State [J]
 
-This output is the state of charge of the storage device.   State of charge is the amount of electrical energy stored in the device at a point of time.   The amount of energy stored in tracked in Joules.
+This output is the state of charge of the storage device.  State of charge is the amount of electrical energy stored in the device at a point of time.  The amount of energy stored in tracked in Joules.
 
 #### Electric Storage Charge Power [W]
 

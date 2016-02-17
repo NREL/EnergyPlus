@@ -5079,7 +5079,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
     Electric Storage Thermal Loss Energy,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
-    Electric Storage Charge State,  !- Variable or Meter 7 Name
+    Electric Storage Battery Charge State,  !- Variable or Meter 7 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 7
 
   Output:Table:Monthly,
@@ -5362,7 +5362,7 @@
 
   Output:Variable,*,Electric Storage Operating Mode Index,timestep;
 
-  Output:Variable,*,Electric Storage Charge State,timestep;
+  Output:Variable,*,Electric Storage Battery Charge State,timestep;
 
   Output:Variable,*,Electric Storage Charge Power,timestep;
 
