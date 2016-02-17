@@ -19993,17 +19993,15 @@ There are no output variables reported for the DemandManager:Ventilation object.
 
 Group -- Electric Load Center-Generator Specifications
 ------------------------------------------------------
-This group of input objects is related electric power serving the facility.  EnergyPlus has models for various types of electric generators and power conditioning devices that might be part of the electric power system serving the building being modeled.  Buildings with simple utility electric power service will not necesarily any of the models in this group.  A simple straightforward utility connection is assumed for all EnergyPlus models that have any electric power consumption.  The models in this group are useful for facilities that include the following sorts of equipment as part of the electric power service.
+This group of input objects is related to electric power serving the facility.  EnergyPlus has models for various types of electric generators and power conditioning devices that might be part of the electric power system serving the building being modeled.  Buildings with simple utility electric power service will not necesarily need any of the models in this group.  All EnergyPlus models that have any electric power consumption are assumed to have a straightforward connection to utility grid service and no extra input is needed.  The models in this group of inputs are useful for facilities that more complex electric power service such as:
 
-   - Utility service is at a voltage higher than used in the building and a transformer  conditioning power coming into to the building is part of the facility.
-   - On site generators produce electricity within the facility
-   - On site electric storage of electricity
+   - Utility service is at a voltage higher than used in the building and a transformer conditions power coming into to the building as part of the facility.
+   - On site generators produce electricity within the facility.  For example solar photovoltaic panels or natural gas powered electric generators. 
+   - On site electric storage devices. 
 
-For facilities that own their own transformer, and the utility services is metered on the high voltage side, the ElectricLoadCenter:Transformer object can be used, and may be the only input object needed.  
+For facilities that own their transformer, and the utility services is metered on the high voltage side, the ElectricLoadCenter:Transformer object can be used, and may be the only input object needed.  
 
-All other applications involving on-site generation or storage will require at least one ElectricLoadCenter:Distribution to describe the arrangement and control of a set of electric power devices.  Each of these load centers is like a subpanel connected to the main electrical panel for the facility.  The main panel is assumed to exist whenever the rest of the model includes something that consumes electricity and does not have any input.  Each ElectricLoadCenter:Distribution input object describes what devices are on a subpanel connected to the main panel, as well as how they are controlled, dispatched, and arranged to provide some service related to the facility's electric power.  The ElectricLoadCenter:Distribution object manages and calls the individual generator models that connected to it by being listed in an ElectricLoadCenter:Generators object, such as natural gas powered turbines, photovoltaic panels, wind turbines, etc.  Unlike elsewhere in EnergyPlus where there are loops, branches, or generic equipment lists that allow describing custom arrangements, the electric power service modeling is restricted to a small collection of arrangements, or buss types.  Many on site generation and storage configurations common in buildings can be modeled using just one ElectricLoadCenter:Distribution object.  However, by combining multiple load centers with different equipment and operations schemes, it is possible to model more complex configurations.  Note that when using multiple ElectricLoadCenter:Distribution objects, the order of the ElectricLoadCenter:Distribution objects within the input file determines the order in which they are called to interact with the main panel.
-
-
+All other applications involving on-site generation or storage will require at least one ElectricLoadCenter:Distribution to describe the arrangement and control of a set of electric power devices.  Each of these load centers is like a subpanel connected to the main electrical panel for the facility.  The main panel is assumed to exist whenever the rest of the model includes something that consumes electricity (and does not require any input object).  Each ElectricLoadCenter:Distribution input object describes what devices are on a subpanel connected to the main panel, as well as how they are controlled, dispatched, and arranged to provide some service related to the facility's electric power.  The ElectricLoadCenter:Distribution object manages and calls the individual generator models that are connected to it by being listed in an ElectricLoadCenter:Generators object, such as natural gas powered turbines, photovoltaic panels, wind turbines, etc.  Unlike elsewhere in EnergyPlus where there are loops, branches, or generic equipment lists that allow describing custom arrangements, the electric power service modeling is restricted to a collection of predefined arrangements, called "buss types."  Many on site generation and storage configurations common in buildings can be modeled using just one ElectricLoadCenter:Distribution object.  However, by combining multiple load centers with different equipment and operations schemes, it is possible to model more complex configurations.  (Note that when using multiple ElectricLoadCenter:Distribution objects, the order of the ElectricLoadCenter:Distribution objects within the input file determines the order in which they are called to interact with the main panel.)
 
 
 ### ElectricLoadCenter:Transformer
@@ -20022,7 +20020,10 @@ This alpha field contains the schedule name (ref. Schedule objects) that contain
 
 #### Field: Transformer Usage
 
-This field indicates one of the two supported transformer application types: PowerInFromGrid and PowerOutFromOnsiteGeneration. The first type of transformer is used to step down voltage from the electricity grid to a building. The second type of transformer is used to match voltage from building onsite generators to the electricity grid.
+This field indicates one of the three supported transformer application types: PowerInFromGrid, PowerOutToGrid, and LoadCenterPowerConditioning. 
+A PowerInFromGrid type of transformer is used to step down voltage from the electricity grid to the building.  The transformer with this type of use is somewhat free standing and does not need to be referenced in any ElectricLoadCenter:Distribution object.  There should be only one PowerInFromGrid transformer in the model. 
+A PowerOutToGrid type of transformer is used to match voltage from the building to the electricity grid. This conditions power exported out of the facility and feed back into the grid.  This type of transformer will only be needed if the building ever exports power and the building and grid connection have different voltages.  There should be only one PowerOutToGrid transformer in the model and it will serve all the surplus electricity produced by electric load center(s).
+A LoadCenterPowerConditioning type of transformer is used to match voltage between an electic load center (subpanel) and the facility's main panel.  Each electric load center can have its own transformer to condition power fed into the main panel.  For electric load centers that also draw power from the main panel, to charge storage, the transformer is assumed to operate in both directions (at the same performance). This type of transformer should be named in an ElectricLoadCenter:Distribution object.
 
 #### Field: Zone Name
 
@@ -20050,23 +20051,23 @@ This numeric field defines the temperature rise of the windings above the ambien
 
 #### Field: Fraction of Eddy Current Losses
 
-This field defines the fraction of load losses resulting from the eddy currents. Transformer   s load losses comprise two parts: the ohmic loss due to the current flowing in the resistance of the windings and the eddy and stray losses due to the eddy currents. This field indicates the fraction of the load losses due to the eddy currents. This numeric field should have a value between 0.0 and 1.0. The default is 0.1.
+This field defines the fraction of load losses resulting from the eddy currents. Transformer's load losses comprise two parts: the ohmic loss due to the current flowing in the resistance of the windings and the eddy and stray losses due to the eddy currents. This field indicates the fraction of the load losses due to the eddy currents. This numeric field should have a value between 0.0 and 1.0. The default is 0.1.
 
 #### Field: Performance Input Method
 
-This alpha field contains the method by which the user will specify the transformer performance:    RatedLosses    or    NominalEfficiency   . If this field is left blank in the input data file, the default input method is assumed to be    RatedLosses   . If the method    NominalEfficiency    is selected, the user must enter the fields for the nameplate efficiency and the corresponding reference coditions as described below. If the method    RatedLosses    is selected, then the fields for rated no load loss and load loss must be entered as described below.
+This alpha field contains the method by which the user will specify the transformer performance: RatedLosses or NominalEfficiency. If this field is left blank in the input data file, the default input method is assumed to be RatedLosses. If the method NominalEfficiency is selected, the user must enter the fields for the nameplate efficiency and the corresponding reference coditions as described below. If the method RatedLosses is selected, then the fields for rated no load loss and load loss must be entered as described below.
 
 #### Field: Rated No Load Loss
 
-This field defines the no load loss (W) at rated load and conditions. The no load loss is roughly constant and exists whenever the transformer is energized. The no load loss is also called the core loss. This field is used only if the field of Performance Input Method is specified as    RatedLosses   .
+This field defines the no load loss (W) at rated load and conditions. The no load loss is roughly constant and exists whenever the transformer is energized. The no load loss is also called the core loss. This field is used only if the field of Performance Input Method is specified as RatedLosses.
 
 #### Field: Rated Load Loss
 
-This field defines the load loss (W) at rated load and conditions. The load loss varies with the square of the load being served by the transformer. The load loss is also called the winding loss because the load loss occurs in the primary and secondary windings around the core. This field is used only if the field of Performance Input Method is specified as    RatedLosses   .
+This field defines the load loss (W) at rated load and conditions. The load loss varies with the square of the load being served by the transformer. The load loss is also called the winding loss because the load loss occurs in the primary and secondary windings around the core. This field is used only if the field of Performance Input Method is specified as RatedLosses.
 
 #### Field: Nameplate Efficiency
 
-This field contains the value for transformer efficiency at a given per unit load and specified reference temperature. This field is used only if the field of Performance Input Method is specified as    NominalEfficiency   . The default is 0.98.
+This field contains the value for transformer efficiency at a given per unit load and specified reference temperature. This field is used only if the field of Performance Input Method is specified as NominalEfficiency. The default is 0.98.
 
 #### Field: Per Unit Load for Nameplate Efficiency
 
@@ -20082,37 +20083,36 @@ This field defines the percentage of the rated capacity at which the maximum eff
 
 #### Field: Consider Transformer Loss for Utility Cost
 
-This field indicates whether the transformer losses are considered to calculate utility cost. In some cases, the transformer losses are required but they are not part of the energy consumption for utility cost calculation. For example, the transformer is owned by the utility company but it locates in the building. In this case, it might be desired to model transformer energy losses for HVAC operation but the energy losses will not be accounted for utility cost.
+This field indicates whether the transformer losses are considered to calculate utility cost.  This field applies to a PowerInFromGrid type of transformer.  In some cases, the transformer losses are required but they are not part of the energy consumption for utility cost calculation. For example, the transformer is owned by the utility company but it locates in the building. In this case, it might be desired to model transformer energy losses for HVAC operation but the energy losses will not be accounted for utility cost.
 
 #### Field: Electric Meter 1-10 Name
 
-A transformer may serve different loads such as plug loads, some lighting loads, and some HVAC equipment loads. The user needs to specify which loads are connected to the transformer. This is achieved by providing a list of electric meters wired to the transformer. The input object can currently accommodate up to ten meters, but it is extensible by modifying the Energy+.idd entry. Any valid electric meter name can be used here to wire to the transformer loads. Many different meters are automatically generated by the program and will depend on the objects used throughout the input file. The typical process of determining the exact name to enter in this field involves doing an initial run of EnergyPlus and then examining the \*.mdd file which will list the meters and their resulting names. A custom meter is also supported. The meter must have electricity as its resource type.
+A transformer may serve different loads such as plug loads, some lighting loads, and some HVAC equipment loads. These fields apply to a PowerInFromGrid type of transformer.  The user needs to specify which loads are connected to the transformer.  For example the HVAC and Plant equipment might use a higher voltage than the building and only the building loads need power conditioning.  This is achieved by providing a list of electric meters wired to the transformer. The input object can currently accommodate up to ten meters, but it is extensible by modifying the Energy+.idd entry. Any valid electric meter name can be used here to wire to the transformer loads. Many different meters are automatically generated by the program and will depend on the objects used throughout the input file. The typical process of determining the exact name to enter in this field involves doing an initial run of EnergyPlus and then examining the \*.mdd file which will list the meters and their resulting names. A custom meter is also supported. The meter must have electricity as its resource type.
 
 An example input of the ElectricLoadCenter:Transformer input is:
-
 
 
 ```idf
    ElectricLoadCenter:Transformer,
        Transformer 1,                       !-Name
-       Always On,                               !- Availability Schedule Name
-       PowerInFromGrid,                   !- Transformer Usage
-       ,                                                 !- Zone Name
-       ,                                                 !-Radiative Fraction
-       15000,                                       !- Nameplate Rating {VA}
-       3,                                               !- Phase
-       Aluminum,                                 !- Conductor Material
-       150,                                           !- Full Load Temperature Rise { &deg;C}
-       0.1,                                           !- Fraction of Eddy Current Losses
-       NominalEfficiency,               !- Performance Input Method
-       ,                                                 !- Rated No Load Loss {W}
-       ,                                                 !- Rated Load Loss {W}
-       0.985,                                       !- Nameplate Efficiency
-       0.35,                                         !- Per Unit Load for Nameplate Efficiency
-       75,                                             !- Reference Temperature for Nameplate Efficiency { &deg;C}
-       ,                                                 !- Per Unit Load for Maximum Efficiency
-       Yes,                                           !- Consider Transformer Loss for Utility Cost
-       Electricity:Building;         !- Meter 1 Name
+       Always On,                           !- Availability Schedule Name
+       PowerInFromGrid,                     !- Transformer Usage
+       ,                                    !- Zone Name
+       ,                                    !-Radiative Fraction
+       15000,                               !- Nameplate Rating {VA}
+       3,                                   !- Phase
+       Aluminum,                            !- Conductor Material
+       150,                                 !- Full Load Temperature Rise { &deg;C}
+       0.1,                                 !- Fraction of Eddy Current Losses
+       NominalEfficiency,                   !- Performance Input Method
+       ,                                    !- Rated No Load Loss {W}
+       ,                                    !- Rated Load Loss {W}
+       0.985,                               !- Nameplate Efficiency
+       0.35,                                !- Per Unit Load for Nameplate Efficiency
+       75,                                  !- Reference Temperature for Nameplate Efficiency { &deg;C}
+       ,                                    !- Per Unit Load for Maximum Efficiency
+       Yes,                                 !- Consider Transformer Loss for Utility Cost
+       Electricity:Building;                !- Meter 1 Name
 
 
    Schedule:Compact,
@@ -20261,6 +20261,59 @@ This field is used to identify the electrical storage connected to this load cen
 #### Field: Transformer Object Name
 
 This field is used to identify the transformer connected to this load center (if any). This field can be used for any electrical buss types. Enter the name of an ElectricLoadCenter:Transformer object defined elsewhere in the input file.
+
+#### Field: Storage Operation Scheme
+
+This field is used to select the operation scheme usd to govern how storage charge and discharge is controlled.  There are four options:  TrackFacilityElectricDemandStoreExcessOnSite, TrackMeterDemandStoreExcessOnSite, TrackChargeDischargeSchedules, or FacilityDemandLeveling.
+
+TrackFacilityElectricDemandStoreExcessOnSite indicates that storage control will follow the facility power demand (meter Facility:Electricity) while accounting for any on-site generation.  Only excess on site generation gets stored.  This is the legacy control behavior before version 8.5 and is the default.
+
+TrackMeterDemandStoreExcessOnSite indicates that storage discharge control will follow an electric meter named in the field called Storage Control Track Meter Name.  This scheme is similiar TrackFacilityElectricDemandStoreExcessOnSite except that instead of the main facility electric meter, the control is based off of a user-selected meter.
+
+TrackChargeDischargeSchedules indicates that control will follow the charging and discharging power and schedules defined in the fields called Maximum Storage Charge Grid Supply Power, Storage Charge Grid Supply Power Fraction Schedule Name, Design Storage Discharge Grid Export Power, and Storage Discharge Grid Export Fraction Schedule Name.
+
+FacilityDemandLeveling indicates that storage control will attempt to control the facility's power demand drawn from the utility service to a prescribed level.  The target utility demand is entered in the fields called Storage Control Utility Demand Limit and Storage Control Utility Demand Limit Fraction Schedule Name.  This scheme first accounts for any on-site generation and during times of high use will discharge storage to reduce facility grid demand to meet the target level and during times of low use will charge storage from the grid to increase facility grid demand to meet the target level.
+
+#### Field: Storage Control Track Meter Name
+
+This field is the name of a meter to use when a custom meter is to be used.  This is required when Storage Operation Scheme is set to TrackMeterDemandStoreExcessOnSite.
+
+#### Field: Storage Converter Object Name
+
+This field is the name of an ElectricLoadCenter:Storage:Converter object defined elsewhere in the input file that describes the performance of converting convert AC to DC when charging DC storage from grid supply. This field is required when using DC storage (buss type DirectCurrentWithInverterDCStorage) with grid supplied charging power (Storage Operation Scheme is set to TrackChargeDischargeSchedules or FacilityDemandLeveling.)  Although some inverter devices are bidirectional a separate converter object is needed to describe AC to DC performance.
+
+#### Field: Maximum Storage State of Charge Fraction
+
+This numeric field specifies the fraction of storage capacity used as an upper limit for controlling charging.  Charging will be constrained so that charging will stop the once this limit is reached. This fraction is the state of charge of the storage device where 1.0 is completely full and 0.0 is completely empty.  This allows supervisory control over charging to model behavior intended to protect the battery from damage. The legacy behavior prior to version 8.5 was to charge to full capacity and therefore the default is 1.0.  
+
+#### Field: Minimum Storage State of Charge Fraction
+
+This numeric field specifies the fraction of storage capacity used as lower limit for controlling discharging.  Discharging will be constrained so that discharging will stop once this limit is reached.  This fraction is the state of charge of the storage device where 1.0 is completely full and 0.0 is completely empty.  This allows supervisory control over discharging to model behavior intended to protect the battery from damage. The legacy behavior prior to version 8.5 was to discharge to empty and therefore the default is 0.0.  
+
+#### Field: Design Storage Control Charge Power
+
+This field is the design maximum rate that electric power can be charged into storage, in Watts.  This field is used as an upper limit for most storage control operation schemes. However for TrackChargeDischargeSchedules, this is the design value for how much power to use when charging and it is multipled by the power fraction schedule in the next field.  Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
+
+#### Field: Storage Charge Power Fraction Schedule Name
+
+This field contains the name of a schedule that controls the timing and magnitude of charging storage.  This is a required field if Storage Operation Scheme is set to TrackChargeDischargeSchedules.  Schedule values should be fractions from 0.0 to 1.0, inclusive.  This schedule will need to be coordinated with the discharging schedule named below. 
+
+#### Field: Design Storage Control Discharge Power
+
+This field is the design maximum rate that electric power can be discharged from storage.  This field is used as an upper limit for most storage control operation schemes. However for TrackChargeDischargeSchedules, this is the design value for how much power to draw when discharging and it is multiplied by the power fraction schedule in the next field.  Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
+
+#### Field: Storage Discharge Power Fraction Schedule Name
+
+This field contains the name of a schedule that controls the timing and magnitude of discharging storage. Required field if Storage Operation Scheme is set to TrackChargeDischargeSchedules.  Schedule values should be fractions from 0.0 to 1.0, inclusive.  This schedule will need to be coordinated with the charging schedule named above.
+
+#### Field: Storage Control Utility Demand Target
+
+This field contains the design demand target in Watts.  This field is used when the storage operation scheme is set to FacilityDemandLeveling.  This becomes the target utility service demand power for discharge control.  This design value is multiplied by the fraction schedule named in the next field.  This is more than an upper limit, it is also going to call for extra electric power to raise demand up to the target and put the extra power into on-site storage.  This field is required for FacilityDemandLimit storage operation scheme.
+
+#### Field: Storage Control Utility Demand Target Fraction Schedule Name
+
+This field is the name of schedule that modifies the utility demand power target over time. Schedule values should be fractions from -1.0 to 1.0, inclusive. Negative values indicate export to grid.  This field is required if Storage Operation Scheme is set to FacilityDemandLeveling.
+
 
 Examples of this object are:
 
@@ -20669,7 +20722,7 @@ This is the efficiency with which DC power is converted to AC power by the inver
 
 #### Inverter DC Input Electric Energy [J]
 
-These outputs are total electricity power or energy fed into the inverter.   This is Direct Current from photovoltaics (or DC-based electrical storage) going into the inverter.
+These outputs are total electricity power or energy fed into the inverter.  This is Direct Current from photovoltaics (or DC-based electrical storage) going into the inverter.
 
 #### Inverter AC Output Electric Power [W]
 
@@ -20688,6 +20741,110 @@ These outputs are the thermal power or energy losses in the inverter that stem f
 #### Inverter Ancillary AC Electric Energy [J]
 
 These outputs are the Alternating Current electricity consumed by the inverter.   These are ancillary, or night tare loss, power uses by the inverter and modeled as if powered by the building   s grid connection.   These ancillary power draws generally occur when the inverter is not generating power but waiting in a standby mode ready to begin generating power.
+
+
+###  ElectricLoadCenter:Storage:Converter
+
+This model is for converting AC to DC for grid-supplied charging of DC storage.  The model is only for power conversion and does not consider voltage. There are two methods available for determining the efficiency with which power is converted.  The efficiency is defined as the ratio of DC power output divided by AC power input.  If the name of a zone is entered the power conversion losses will be added to the zone as internal heat gains.  The converter is part of a single electric load center.
+
+#### Field: Name
+
+This field contains a unique name for the AC to DC converter.  This name will be referenced in an ElectricLoadCenter:Distribution object. 
+
+#### Field: Availability Schedule Name
+
+This field contains the name of a schedule that describes when the power converter is available. If power conversion is not available then electric power from the grid cannot be used to charge storage. Any non-zero value means the converter is available. If this field is blank, the schedule has a value of 1 for all time periods and the converter is always available. Standby power consumption is on when converter is available and off when the converter is not available. 
+
+#### Field: Power Conversion Efficiency Method
+
+This choice field is used to select which method is used to define the efficiency with which power is converted from AC to DC.  There are two options: SimpleFixed or FunctionOfPower.
+- SimpleFixed indicates that power conversion efficiency is a constant with the value set in the next field. There is no need to size the converter (with a value in the field called Design Maximum Continuous Input Power) and varying levels of power do not affect the efficiency. SimpleFixed is the default. 
+- FunctionOfPower indicates that the power conversion efficiency is a function of the level of power being converted. This method is intended to model the characteristic that converters tend to operate less efficiently when loaded well below their design size. The converter must be sized with a value in the Design Maximum Continuous Input Power and the functional relationship described in a performance curve or look-up table. 
+
+#### Field: Simple Fixed Efficiency
+
+This numeric field is used to set a constant efficiency for conversion of AC to DC at all power levels. This field is only used, and is required, when the Power Conversion Efficiency Method is set to SimpleFixed. The value must be greater than 0.0 and less than equal to 1.0.  The default is 0.95. 
+ 
+#### Field: Design Maximum Continuous Input Power
+
+This numeric field describes the size of the power converter in terms of its design input power level, in Watts.  This is the AC power going into the converter.  This field is only used, and is required, when the the Power Conversion Efficiency Method is set to FunctionOfPower.  This input serves as an upper limit for the AC power input and is used to normalize power for use in the performance curve or table.  The AC power being converted at any given time is divided by the value in this field.  
+
+#### Field: Efficiency Function of Power Curve Name
+
+This field is the name of a performance curve or table object that describes how efficiency varies as a function of normalized power.  The single independent "x" variable input for the curve or table is the ratio of AC input power at a given time divided by design power in the previous field.  The result of the curve should be the power conversion efficiency for that normalized power so that DC power output is the product of efficiency multiplied by the AC power input.  Any of the single-variable performance curves or lookup table objects can be used to describe performance. This field is only used, and is required, when the the Power Conversion Efficiency Method is set to FunctionOfPower. 
+
+#### Field: Ancillary Power Consumed In Standby
+
+This numeric field describes the ancillary power consumed by the converter when it is available but not converting power, in Watts.  This field is optional and can be used with any of the efficiency methods. If this converter is really on mode of a bidirectional inverter, take care not to double count the ancillary consumption by including them in both this component and the inverter component. 
+
+#### Field: Zone Name
+
+This field is the name of thermal zone where the converter is located.  If this field is omitted then the converter is considered outdoors.  The power lost during the conversion process is treated as heat gains and added the thermal zone named in this field.  The split between radiation and convection can be controlled in the next input field. 
+
+ #### Field: Radiative Fraction
+ 
+This numeric field is the fraction of zone heat gains that are handled as infrared thermal radiation.  This field is only used if a zone is named in the previous field.  The portion of zone gains that are not radiative are added to the zone as convection. If a zone is named and this field left blank or omitted then all the zone heat gains will be convective. 
+
+An example IDF showing how this object is used is provided below:
+
+   ElectricLoadCenter:Storage:Converter,
+       Grid Charge Converter ,   !- Name
+       ALWAYS_ON ,               !- Availability Schedule Name
+       SimpleFixed ,             !- Power Conversion Efficiency Method
+       0.95 ,                    !- Simple Fixed Efficiency
+       ,                         !- Design Maximum Continuous Input Power
+       ,                         !- Efficiency Function of Power Curve Name
+       20 ,                      !- Ancillary Power Consumed In Standby
+        ,                         !- Zone Name
+       0.25;                     !- Radiative Fraction
+
+### Electric Load Center Converter Outputs
+
+Each converter can report the following output variables
+
+* HVAC,Average,Converter AC to DC Efficiency []
+* HVAC,Average,Converter AC Input Electric Power [W]
+* HVAC,Sum,Converter AC Input Electric Energy [J]
+* HVAC,Average,Converter DC Output Electric Power [W]
+* HVAC,Sum,Converter DC Output Electric Energy [J]
+* HVAC,Average,Converter Electric Loss Power [W]
+* HVAC,Sum,Converter Electric Loss Energy [J]
+* HVAC,Sum,Converter Electric Loss Decrement Energy [J]
+* HVAC,Average,Converter Thermal Loss Rate [W]
+* HVAC,Sum,Converter Thermal Loss Energy [J]
+* HVAC,Average,Converter Ancillary AC Electric Power [W]
+* HVAC,Sum,Converter Ancillary AC Electric Energy [J]
+
+#### Converter AC to DC Efficiency []
+
+This is the efficiency with which AC power is converted to DC power by the converter
+
+#### Converter AC Input Electric Power [W]
+#### Converter AC Input Electric Energy [J]
+
+These outputs are the total electric power or energy fed into the converter.  This is Alternating Current, or AC, drawn from the main panel into the load center. 
+
+#### Converter DC Output Electric Power [W]
+#### Converter DC Output Electric Energy [J]
+
+These outputs are the total electric power or energy leaving the converter.  This is Direct Current, or DC, that will go into charging storage. 
+
+#### Converter Electric Loss Power [W]
+#### Converter Electric Loss Energy [J]
+#### Converter Electric Loss Decrement Energy [J]
+
+These outputs are the conversion losses that result from inefficiencies in the conversion from AC to DC.  The power and energy are positive while the decrement energy is negative and is metered on the "PowerConversion" end use for "ElectricityProduced".  
+
+#### Converter Thermal Loss Rate [W]
+#### Converter Thermal Loss Energy [J]
+
+These outputs are the power and energy losses that result from the inefficiencies in the conversion from AC to DC and the ancillary standby power. 
+
+#### Converter Ancillary AC Electric Power [W]
+#### Converter Ancillary AC Electric Energy [J]
+
+These outputs are the power and energy consumed in standby operation when the converter is not being used but is available and ready to be used. The ancillary power consumption is metered on the "Cogeneration" end use for "Electricity."
+
 
 ### ElectricLoadCenter:Storage:Simple
 

@@ -78028,12 +78028,12 @@ ElectricLoadCenter:Transformer,
        \type choice
        \key PowerInFromGrid
        \key PowerOutToGrid
-       \key LoadCenterProductionConditioning
+       \key LoadCenterPowerConditioning
        \default PowerInFromGrid
        \note A transformer can be used to transfer electric energy from utility grid to
        \note building (PowerInFromGrid)or from building on-site generation to
        \note the grid (PowerOutToGrid) or within a load center to match generation 
-       \note to the facility service main panel (LoadCenterProductionConditioning)
+       \note to the facility service main panel (LoadCenterPowerConditioning)
   A4,  \field Zone Name
        \type object-list
        \object-list ZoneNames
@@ -78177,7 +78177,6 @@ ElectricLoadCenter:Transformer,
        \note Only required when transformer is used for power in from the utility grid
 
 
-
 ElectricLoadCenter:Distribution,
        \memo Describes a subpanel 
        \memo a list of meters that can be reported are available after a run on
@@ -78257,7 +78256,6 @@ ElectricLoadCenter:Distribution,
        \external-list autoRDDmeter
   A12, \field Storage Converter Object Name
        \note Name of an ElectricLoadCenter:Storage:Converter used to convert AC to DC when charging DC storage from grid supply.
-       \note The presence of a converter informs the storage control operation that grid power can be used to charge storage.
        \note A converter is expected when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules
        \note A single bidirectional device will reference both an inverter object (DC to AC) and a converter object (AC to DC).
        \type object-list
@@ -78295,14 +78293,14 @@ ElectricLoadCenter:Distribution,
        \note Schedule values should be fractions from 0.0 to 1.0, inclusive.
   N6,  \field Storage Control Utility Demand Target
        \note Target utility service demand power for discharge control.  Storage draws are adjusted upwards for conversion losses. 
-       \note Required field for FacilityDemandLimit discharge operation scheme
+       \note Required field for FacilityDemandLeveling storage operation scheme
        \type real
        \units W
   A15; \field Storage Control Utility Demand Target Fraction Schedule Name
        \note Modifies the target utility service demand power over time.
        \note Schedule values should be fractions from -1.0 to 1.0, inclusive.
        \note if omitted a schedule value of 1.0 is used. Negative values indicate export to grid
-       \not Schedule is used if Storage Operation Scheme is set to FacilityDemandLimit.
+       \not Schedule is used if Storage Operation Scheme is set to FacilityDemandLeveling.
        \type object-list
        \object-list ScheduleNames
 

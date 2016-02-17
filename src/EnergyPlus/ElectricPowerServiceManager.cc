@@ -162,20 +162,6 @@ namespace EnergyPlus {
 				this->facilityPowerInTransformerObj->manageTransformers( 0.0 );
 			}
 
-			if ( this->numPowerOutTransformers > 0 ) {
-				for (auto loopPowerOutTransformers = 0; loopPowerOutTransformers < this->numPowerOutTransformers; ++loopPowerOutTransformers) {
-					//determine surplus production from the load centers connected to this transformer
-//					auto loadCenters = this->powerOutTransformerObjs[ loopPowerOutTransformers ]->getLoadCenterObjIndices;
-//					for (std::size_t loopLoadCenters = 0; loopLoadCenters < loadCenters.size; ++loopLoadCenters){
-	// this needs to be from takin the total surplus out to utility grid and partitioning out what fraction of that is from the load centers that point to this transformer.  TODO
-	// legacy code is not correct. defer for now. 
-
-	//					this->elecLoadCenterObjs[ loadCenters[ loopLoadCenters ] ]->
-//					}
-
-				}
-			}
-
 			this->updateWholeBuildingRecords();
 			return;
 		}
@@ -193,25 +179,8 @@ namespace EnergyPlus {
 		}
 
 		this->updateWholeBuildingRecords();
-		if ( this->numPowerOutTransformers >0 ){
-
-			for ( auto loopPowerOutTransformers = 0; loopPowerOutTransformers < this->numPowerOutTransformers; ++loopPowerOutTransformers ) {
-			//	Real64 surplusPower = 0.0;
-
-// TODO this needs to be done in a better way. 
-// should be only one
-			//	if ( this->powerOutTransformerObjs[ loopPowerOutTransformers ]->numLoadCenters > 0 ) {
-			//		for (auto loopLoadCenters = 0; loopLoadCenters < this->powerOutTransformerObjs[ loopPowerOutTransformers ]->numLoadCenters; ++loopLoadCenters) {
-			//			int thisLoadCenterIndex = this->powerOutTransformerObjs[ loopPowerOutTransformers ]->loadCenterObjIndexes[ loopLoadCenters ];
-
-			//			surplusPower += max( this->elecLoadCenterObjs[ thisLoadCenterIndex ]->electProdRate - this->elecLoadCenterObjs[ thisLoadCenterIndex ]->electDemand, 0.0);
-
-			//		}
-				
-
-				this->powerOutTransformerObjs[ loopPowerOutTransformers ]->manageTransformers( this->electSurplusRate );
-
-			}
+		if ( this->powerOutTransformerObj != nullptr ){
+			this->powerOutTransformerObj->manageTransformers( this->electSurplusRate );
 		}
 
 
@@ -233,10 +202,8 @@ namespace EnergyPlus {
 		if ( this->facilityPowerInTransformerPresent ) {
 			this->facilityPowerInTransformerObj->reinitZoneGainsAtBeginEnvironment();
 		}
-		if ( this->numPowerOutTransformers > 0 ) {
-			for ( auto loop = 0; loop < this->numPowerOutTransformers; ++loop ) {
-				this->powerOutTransformerObjs[ loop ]->reinitZoneGainsAtBeginEnvironment();
-			}
+		if ( this->powerOutTransformerObj != nullptr ) {
+				this->powerOutTransformerObj->reinitZoneGainsAtBeginEnvironment();
 		}
 		if ( this->numLoadCenters > 0 ) {
 			for ( auto loop = 0; loop < this->numLoadCenters; ++loop ) {
@@ -259,9 +226,31 @@ namespace EnergyPlus {
 		}
 	
 	} else {
-// TODO check that the distribution object isn't just missing but is needed. #issue 4639
-	
-
+		// issue #4639. see if there are any generators, inverters, converters, or storage devcies, that really need a ElectricLoadCenter:Distribution
+		int numGenLists   = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Generators" );
+		if ( numGenLists > 0 ) {
+			ShowWarningError( "ElectricLoadCenter:Generators input object requires an ElectricLoadCenterDistribution input object." );
+		}
+		int numInverters  = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:Simple" );
+			numInverters += InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:FunctionOfPower" );
+			numInverters += InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Inverter:LookUpTable" );
+		if ( numInverters > 0 ) {
+			ShowWarningError( "ElectricLoadCenter:Inverter:* input objects require an ElectricLoadCenter:Distribution input object." );
+		}
+		int numStorage    = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Storage:Simple" );
+			numStorage   += InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Storage:Battery" );
+		if ( numStorage > 0 ) {
+			ShowWarningError( "ElectricLoadCenter:Storage:* input objects require an ElectricLoadCenter:Distribution input object." );
+		}
+		int numGenerators  = InputProcessor::GetNumObjectsFound( "Generator:InternalCombustionEngine" );
+			numGenerators += InputProcessor::GetNumObjectsFound( "Generator:CombustionTurbine" );
+			numGenerators += InputProcessor::GetNumObjectsFound( "Generator:MicroCHP" );
+			numGenerators += InputProcessor::GetNumObjectsFound( "Generator:FuelCell" );
+			numGenerators += InputProcessor::GetNumObjectsFound( "Generator:Photovoltaic" );
+			numGenerators += InputProcessor::GetNumObjectsFound( "Generator:WindTurbine" );
+		if ( numGenerators > 0 ) {
+			ShowWarningError( "Electric generator input objects require and ElectricLoadCenter:Distribution input object." );
+		}
 			// if user input did not include an Electric Load center, create a simple default one here for reporting purposes
 		//   but only if there are any other electricity components set up (yet) for metering
 		int anyElectricityPresent = GetMeterIndex( "ELECTRICITY:FACILITY" );
@@ -271,7 +260,7 @@ namespace EnergyPlus {
 		}
 	}
 
-	// see if there is a transformer of the type powerInFromGrid
+	// see if there are any transformers of the type powerInFromGrid
 	this->numTransformers = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Transformer" );
 
 	if ( this->numTransformers > 0 ) {
@@ -280,7 +269,7 @@ namespace EnergyPlus {
 		int iOStat; // IO Status when calling get input subroutine
 		int facilityPowerInTransformerIDFObjNum = 0;
 		bool foundInFromGridTransformer = false;
-//		bool foundPowerOutFromOnsiteTransformer = false;
+
 
 		DataIPShortCuts::cCurrentModuleObject =  "ElectricLoadCenter:Transformer";
 		for ( auto loopTransformer = 1; loopTransformer <= this->numTransformers; ++loopTransformer) {
@@ -298,10 +287,16 @@ namespace EnergyPlus {
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " = " + DataIPShortCuts::cAlphaArgs( 3 ) );
 					ShowContinueError("Only one transformer with Usage PowerInFromGrid can be used, first one in input file will be used and the simulation continues...");
 				}
-			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutFromOnsiteGeneration" ) ) {
-				++this->numPowerOutTransformers;
-				this->powerOutTransformerNames.push_back( DataIPShortCuts::cAlphaArgs( 1 ) ) ;
-				this->powerOutTransformerObjs.emplace_back( new ElectricTransformer ( DataIPShortCuts::cAlphaArgs( 1 ) ) );
+			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
+				if ( this->powerOutTransformerObj == nullptr ) {
+					++this->numPowerOutTransformers;
+					this->powerOutTransformerName = DataIPShortCuts::cAlphaArgs( 1 );
+					this->powerOutTransformerObj = std::unique_ptr < ElectricTransformer > ( new ElectricTransformer ( this->powerOutTransformerName ) );
+					
+				} else {
+					ShowWarningError( "Found more than one transformer set to PowerOutFromOnsiteGeneration, however only the first one will be used." );
+				}
+
 			}
 		}
 		if ( foundInFromGridTransformer ) {
@@ -310,15 +305,7 @@ namespace EnergyPlus {
 		}
 	} // if transformers
 
-	// loop over power out transformers and electric load centers and register load center object index
-	for (auto loopPowerOutTransformers = 0; loopPowerOutTransformers < this->numPowerOutTransformers; ++loopPowerOutTransformers ) {
 
-		for ( auto loopElectLoadCenters = 0; loopElectLoadCenters < this->numLoadCenters; ++loopElectLoadCenters ) {
-			if (InputProcessor::SameString( this->powerOutTransformerNames[ loopPowerOutTransformers ], this->elecLoadCenterObjs[ loopElectLoadCenters ]->getTransformerName() ) ){
-				this->powerOutTransformerObjs[ loopPowerOutTransformers ]->addLoadCenterIndex( loopElectLoadCenters );
-			}
-		}
-	}
 
 	if ( this->numLoadCenters > 0 ) { 
 		SetupOutputVariable( "Facility Total Purchased Electric Power [W]", this->electPurchRate, "System", "Average", this->name );
@@ -339,6 +326,8 @@ namespace EnergyPlus {
 		this->reportPVandWindCapacity();
 
 		this->sumUpNumberOfStorageDevices();
+
+		this->checkLoadCenters(); // for issue #5302.  
 	}
 
 
@@ -394,10 +383,8 @@ namespace EnergyPlus {
 		if ( this->facilityPowerInTransformerPresent ) {
 			facilityPowerInTransformerObj->reinitAtBeginEnvironment();
 		}
-		if ( this->numPowerOutTransformers > 0 ) {
-			for (auto loopOutTransformers = 0; loopOutTransformers < this->numPowerOutTransformers ; ++loopOutTransformers ) {
-				this->powerOutTransformerObjs[ loopOutTransformers ]->reinitAtBeginEnvironment();
-			}
+		if ( this->powerOutTransformerObj != nullptr ) {
+			this->powerOutTransformerObj->reinitAtBeginEnvironment();
 		}
 	}
 
@@ -415,7 +402,6 @@ namespace EnergyPlus {
 
 		// main panel clearing house.
 
-		// where do subpanel draws come in? 
 		this->totalBldgElecDemand = GetInstantMeterValue( this->elecFacilityIndex, 1 ) / DataGlobals::TimeStepZoneSec;
 		this->totalHVACElecDemand = GetInstantMeterValue( this->elecFacilityIndex, 2 ) / ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
 		this->totalElectricDemand = this->totalBldgElecDemand + this->totalHVACElecDemand;
@@ -474,7 +460,7 @@ namespace EnergyPlus {
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchLeedRenRatCap, "Photovoltaic", this->pvTotalCapacity / 1000, 2 );
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchLeedRenRatCap, "Wind", this->windTotalCapacity / 1000, 2 );
 
-		//TODO, this approach is relying on the correct power output to have been placed in the Generator list.  There could be a difference between this control input and the actual size of the systems as defined as generators.
+		//future work: this legacy approach is relying on the correct power output to have been placed in the Generator list.  There could be a difference between this control input and the actual size of the systems as defined in the generator objects.
 
 	}
 
@@ -487,6 +473,35 @@ namespace EnergyPlus {
 			}
 
 		}
+
+	}
+
+	void
+	ElectricPowerServiceManager::checkLoadCenters() {
+	
+	//issue #5302, detect if storage used on more than one load center. This is really a kind of GlobalNames issue, 
+
+	//first fill in a vector of names
+	std::vector < std::string > storageNames;
+
+	for ( std::size_t i = 0; i < elecLoadCenterObjs.size(); ++i ) {
+		if ( elecLoadCenterObjs[ i ]->storageObj != nullptr ) {
+			storageNames.emplace_back( elecLoadCenterObjs[ i ]->storageObj->name );
+		}
+	}
+
+	//then check the vector for duplicates. 
+	for ( std::size_t i = 0; i < storageNames.size(); ++i ) {
+		for ( std::size_t j = 0; j < storageNames.size(); ++j ) {
+			if ( storageNames[ i ] == storageNames[ j ] ) {
+				ShowWarningError( "ElectricPowerServiceManager::checkLoadCenters, the electrical storage device named = " + storageNames[ i ] + " is used on more than one ElectricLoadCenter:Distribution input object." );
+				ShowContinueError( "Electric Load Centers cannot share the same storage device." );
+			}
+		}
+	}
+
+
+
 
 	}
 
@@ -800,6 +815,18 @@ namespace EnergyPlus {
 				++alphaCount;
 				++alphaCount;
 			}
+
+			//issue #5299 check for non-zero values in thermal electric ratio if gen op scheme is thermalFollow*
+			if ( this->genOperationScheme == GeneratorOpScheme::thermalFollow || this->genOperationScheme == GeneratorOpScheme::thermalFollowLimitElectrical ) {
+				// check to make sure the user didn't input zeros for thermalToElectricControlRatio
+				for ( auto & g : elecGenCntrlObj ) {
+					if ( g->nominalThermElectRatio <= 0.0 ) {
+						ShowErrorMessage( "Generator operation need to be based on following thermal loads and needs values for Rated Thermal to Electrical Power Ratio in " + DataIPShortCuts::cCurrentModuleObject + " named " + DataIPShortCuts::cAlphaArgs( 1 ) );
+					}
+				}
+
+
+			}
 		}
 
 		if ( ! errorsFound && this->inverterPresent ) {
@@ -813,11 +840,16 @@ namespace EnergyPlus {
 		}
 
 		if ( ! errorsFound && this->transformerPresent ) {
-// TODO figure out if the transformer is of usage type LoadCenterProductionConditioning, new for v8.5
-			
-			//call transformer constructor 
 
-			//this->transformerObj = std::unique_ptr < ElectricTransformer >( new ElectricTransformer (this->transformerName ) );
+			DataIPShortCuts::cCurrentModuleObject =  "ElectricLoadCenter:Transformer";
+			int transformerItemNum = InputProcessor::GetObjectItemNum( DataIPShortCuts::cCurrentModuleObject, this->transformerName );
+			int iOStat;
+			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerItemNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
+			if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) { // this is the right kind of transformer
+				this->transformerObj = std::unique_ptr < ElectricTransformer >( new ElectricTransformer (this->transformerName ) );
+			} else {
+				ShowWarningError( "Transformer named " + this->transformerName + " associated with the load center named " + this->name + " should have " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " set to LoadCenterPowerConditioning." );
+			}
 		}
 
 		if ( ! errorsFound && this->converterPresent ) {
@@ -827,15 +859,10 @@ namespace EnergyPlus {
 
 		//Setup general output variables for reporting in the electric load center
 
-
 		SetupOutputVariable( "Electric Load Center Produced Electric Power [W]", this->genElectricProd, "System", "Average", this->name );
-
 		SetupOutputVariable( "Electric Load Center Produced Electric Energy [J]", this->genElectProdRate, "System", "Sum", this->name );
-
 		SetupOutputVariable( "Electric Load Center Supplied Electric Power [W]", this->subpanelFeedInRate, "System", "Average", this->name );
-
 		SetupOutputVariable( "Electric Load Center Drawn Electric Power [W]", this->subpanelDrawRate, "System", "Average", this->name );
-
 		SetupOutputVariable( "Electric Load Center Produced Thermal Rate [W]", this->thermalProdRate, "System", "Average", this->name );
 
 		SetupOutputVariable( "Electric Load Center Produced Thermal Energy [J]", this->thermalProd, "System", "Sum", this->name );
@@ -846,7 +873,6 @@ namespace EnergyPlus {
 				SetupEMSActuator( "Electrical Storage", this->name , "Power Draw Rate", "[W]", this->eMSOverridePelFromStorage, this->eMSValuePelFromStorage );
 				SetupEMSActuator( "Electrical Storage", this->name , "Power Charge Rate", "[W]", this->eMSOverridePelIntoStorage, this->eMSValuePelIntoStorage );
 		}
-
 	}
 
 	void
@@ -889,7 +915,7 @@ namespace EnergyPlus {
 			if ( this->storOpCVFeedInRate > 0.0 ) {
 				this->transformerObj->manageTransformers( this->storOpCVFeedInRate );
 			} else if ( this->storOpCVDrawRate > 0.0 ) {
-				this->transformerObj->manageTransformers( this->storOpCVDrawRate );
+				this->transformerObj->manageTransformers( this->subpanelDrawRate );
 			}
 			
 		}
@@ -1700,6 +1726,9 @@ namespace EnergyPlus {
 				}
 				// no inverter, no storage, so generator production equals subpanel feed in
 				this->subpanelFeedInRate = this->genElectProdRate;
+				if ( this->transformerObj != nullptr ) {
+					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->genElectProdRate );
+				}
 				this->subpanelDrawRate   = 0.0;
 
 				break;
@@ -1713,6 +1742,11 @@ namespace EnergyPlus {
 				}
 				if ( this->storagePresent ) {
 					this->subpanelFeedInRate = this->genElectProdRate + this->storOpCVDischargeRate - this->storOpCVChargeRate;
+				} else {
+					this->subpanelFeedInRate = this->genElectProdRate;
+				}
+				if ( this->transformerObj != nullptr ) {
+					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
 				}
 				this->subpanelDrawRate   = 0.0;
 				break;
@@ -1725,9 +1759,11 @@ namespace EnergyPlus {
 					this->genElectricProd += this->elecGenCntrlObj[ loop ]->electricityProd;
 				}
 
-				if ( this->inverterPresent ) {
+				if ( this->inverterObj != nullptr ) {
 					this->subpanelFeedInRate = this->inverterObj->getACPowerOut();
-					//this->electricityProd = this->inverterObj->getACEnergyOut();
+				}
+				if ( this->transformerObj != nullptr ) {
+					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
 				}
 				this->subpanelDrawRate   = 0.0;
 				break;
@@ -1740,11 +1776,16 @@ namespace EnergyPlus {
 					this->genElectProdRate += this->elecGenCntrlObj[ loop ]->electProdRate; 
 					this->genElectricProd += this->elecGenCntrlObj[ loop ]->electricityProd;
 				}
-				if ( this->inverterPresent ) {
+				if ( this->inverterObj != nullptr ) {
 					this->subpanelFeedInRate = this->inverterObj->getACPowerOut();
 				}
-				if ( this->converterPresent ) {
+
+				if ( this->converterObj != nullptr ) {
 					this->subpanelDrawRate   = this->converterObj->getACPowerIn();
+				}
+				if ( this->transformerObj != nullptr ) {
+					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
+					this->subpanelDrawRate   += this->transformerObj->getLossRateForOutputPower( this->subpanelDrawRate );
 				}
 				break;
 			}
@@ -1760,11 +1801,15 @@ namespace EnergyPlus {
 				}
 
 				this->subpanelDrawRate   = this->storOpCVDrawRate; // no converter for AC storage
-
+				if ( this->transformerObj != nullptr ) {
+					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
+					this->subpanelDrawRate   += this->transformerObj->getLossRateForOutputPower( this->subpanelDrawRate );
+				}
 				break;
 			}
 			case ElectricBussType::notYetSet: {
 				// do nothing
+				assert( false );
 			}
 
 			} // end switch
@@ -2126,7 +2171,7 @@ namespace EnergyPlus {
 			SetupOutputVariable( "Inverter AC Output Electric Energy [J]", this->aCEnergyOut, "System", "Sum", this->name ); 
 			SetupOutputVariable( "Inverter Conversion Loss Power [W]", this->conversionLossPower, "System", "Average", this->name );
 			SetupOutputVariable( "Inverter Conversion Loss Energy [J]", this->conversionLossEnergy, "System", "Sum", this->name );
-			SetupOutputVariable( "Inverter Conversion Loss Decrement Energy [J]", this->conversionLossEnergyDecrement, "System", "Sum", this->name, _, "ElectricityProduced", "PowerConversion", _, "Plant" );
+			SetupOutputVariable( "Inverter Conversion Loss Decrement Energy [J]", this->conversionLossEnergyDecrement, "System", "Sum", this->name, _, "ElectricityProduced", "POWERCONVERSION", _, "Plant" );
 			SetupOutputVariable( "Inverter Thermal Loss Rate [W]", this->thermLossRate, "System", "Average", this->name );
 			SetupOutputVariable( "Inverter Thermal Loss Energy [J]", this->thermLossEnergy, "System", "Sum", this->name );
 			SetupOutputVariable( "Inverter Ancillary AC Electric Power [W]", this->ancillACuseRate, "System", "Average", this->name );
@@ -2452,7 +2497,7 @@ namespace EnergyPlus {
 
 			SetupOutputVariable( "Converter Electric Loss Power [W]", this->conversionLossPower, "System", "Average", this->name );
 			SetupOutputVariable( "Converter Electric Loss Energy [J]", this->conversionLossEnergy, "System", "Sum", this->name);
-			SetupOutputVariable( "Converter Electric Loss Decrement Energy [J]", this->conversionLossEnergyDecrement, "System", "Sum", this->name, _, "ElectricityProduced", "PowerConversion", _, "Plant" );
+			SetupOutputVariable( "Converter Electric Loss Decrement Energy [J]", this->conversionLossEnergyDecrement, "System", "Sum", this->name, _, "ElectricityProduced", "POWERCONVERSION", _, "Plant" );
 			SetupOutputVariable( "Converter Thermal Loss Rate [W]", this->thermLossRate, "System", "Average", this->name );
 			SetupOutputVariable( "Converter Thermal Loss Energy [J]", this->thermLossEnergy, "System", "Sum", this->name );
 			SetupOutputVariable( "Converter Ancillary AC Electric Power [W]", this->ancillACuseRate, "System", "Average", this->name );
@@ -2722,7 +2767,7 @@ namespace EnergyPlus {
 				this->maxPowerDraw            = DataIPShortCuts::rNumericArgs( 5 );
 				this->maxPowerStore           = DataIPShortCuts::rNumericArgs( 6 );
 				this->startingEnergyStored    = DataIPShortCuts::rNumericArgs( 7 );
-				SetupOutputVariable( "Electric Storage Charge State [J]", this->electEnergyinStorage, "System", "Average", this->name );
+				SetupOutputVariable( "Electric Storage Simple Charge State [J]", this->electEnergyinStorage, "System", "Average", this->name ); // issue #4921
 				break;
 			}
 			
@@ -2812,7 +2857,7 @@ namespace EnergyPlus {
 				this->maxChargeRate        = DataIPShortCuts::rNumericArgs( 13 );
 
 				SetupOutputVariable( "Electric Storage Operating Mode Index []", this->storageMode, "System", "Average", this->name );
-				SetupOutputVariable( "Electric Storage Charge State [Ah]", this->absoluteSOC, "System", "Average", this->name );
+				SetupOutputVariable( "Electric Storage Battery Charge State [Ah]", this->absoluteSOC, "System", "Average", this->name );  // issue #4921
 				SetupOutputVariable( "Electric Storage Charge Fraction []", this->fractionSOC, "System", "Average", this->name );
 				SetupOutputVariable( "Electric Storage Total Current [A]", this->batteryCurrent, "System", "Average", this->name );
 				SetupOutputVariable( "Electric Storage Total Voltage [V]", this->batteryVoltage, "System", "Average", this->name );
@@ -2838,12 +2883,10 @@ namespace EnergyPlus {
 			SetupOutputVariable( "Electric Storage Thermal Loss Energy [J]", this->thermLossEnergy, "System", "Sum", this->name  );
 			if ( DataGlobals::AnyEnergyManagementSystemInModel ) {
 				if ( this->storageModelMode == StorageModelType::simpleBucketStorage ) {
-					SetupEMSInternalVariable( "Electrical Storage Maximum Capacity", this->name , "[J]", this->maxEnergyCapacity );
+					SetupEMSInternalVariable( "Electrical Storage Simple Maximum Capacity", this->name , "[J]", this->maxEnergyCapacity );
 				} else if ( this->storageModelMode == StorageModelType::kiBaMBattery ) {
-					SetupEMSInternalVariable( "Electrical Storage Maximum Capacity", this->name , "[Ah]", this->maxAhCapacity );
+					SetupEMSInternalVariable( "Electrical Storage Battery Maximum Capacity", this->name , "[Ah]", this->maxAhCapacity );
 				}
-//				SetupEMSActuator( "Electrical Storage", this->name , "Power Draw Rate", "[W]", this->eMSOverridePelFromStorage, this->eMSValuePelFromStorage );
-//				SetupEMSActuator( "Electrical Storage", this->name , "Power Charge Rate", "[W]", this->eMSOverridePelIntoStorage, this->eMSValuePelIntoStorage );
 			}
 
 			if ( this->zoneNum > 0 ) {
@@ -3077,7 +3120,7 @@ namespace EnergyPlus {
 		}
 
 		// updates and reports
-		this->electEnergyinStorage = this->thisTimeStepStateOfCharge;
+		this->electEnergyinStorage = this->thisTimeStepStateOfCharge; //[J]
 		this->storedPower          = this->pelIntoStorage;
 		this->storedEnergy         = this->pelIntoStorage * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 		this->decrementedEnergyStored = -1.0 * this->storedEnergy;
@@ -3238,13 +3281,9 @@ namespace EnergyPlus {
 		//output1
 		if ( TotalSOC > q0 ) {
 			this->storageMode = 2;
-//TODO change sign convention here		this->storedPower = -1.0 * Volt * I0 * numbattery;
-//TODO change sign convention here				this->storedEnergy = -1.0 * Volt * I0 * numbattery * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-			this->storedPower = -1.0 *Volt * I0 * this->numBattery;
+			this->storedPower = -1.0 *Volt * I0 * this->numBattery; //Issue #5303, fix sign issue
 			this->storedEnergy =  -1.0 *Volt * I0 * this->numBattery * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-// TODO, this next is a sign mistake in current dev, only mimic for no diff check in.
-//				this->decrementedEnergyStored = this->storedEnergy;  // should be this
-			this->decrementedEnergyStored = -1.0 * this->storedEnergy; // this is wrong
+			this->decrementedEnergyStored = -1.0 * this->storedEnergy;
 			this->drawnPower = 0.0;
 			this->drawnEnergy = 0.0;
 
@@ -3282,395 +3321,7 @@ namespace EnergyPlus {
 
 
 	}
-
-	void
-	ElectricStorage::manageElectCenterStorageInteractions(
-		Real64 const powerDemand, // load center power demand minus any inverter losses that need to be applied
-		Real64 const powerGenSupply, // sum of load center generator production
-		Real64 & StorageDrawnPower, // Electric Power Draw Rate from storage units
-		Real64 & StorageStoredPower // Electric Power Store Rate from storage units
-	)
-	{
-		if ( this->myWarmUpFlag && ( ! DataGlobals::WarmupFlag ) ) {
-			this->reinitAtBeginEnvironment();
-			this->myWarmUpFlag = false;
-		}
-
-		Real64 timeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
-		if ( this->timeElapsed != timeElapsed ) { //time changed, update last with "current" result from previous time
-			if ( this->storageModelMode == StorageModelType::kiBaMBattery && this->lifeCalculation == BatteyDegredationModelType::lifeCalculationYes ) {
-				//    At this point, the current values, last time step values and last two time step values have not been updated, hence:
-				//    "ThisTimeStep*" actually points to the previous one time step
-				//    "LastTimeStep*" actually points to the previous two time steps
-				//    "LastTwoTimeStep" actually points to the previous three time steps
-
-				//      Calculate the fractional SOC change between the "current" time step and the "previous one" time step
-				Real64 deltaSOC1 = this->thisTimeStepAvailable +this->thisTimeStepBound - this->lastTimeStepAvailable - this->lastTimeStepBound;
-				deltaSOC1 /= this->maxAhCapacity;
-
-				//      Calculate the fractional SOC change between the "previous one" time step and the "previous two" time steps
-				Real64 deltaSOC2 = this->lastTimeStepAvailable + this->lastTimeStepBound - this->lastTwoTimeStepAvailable - this->lastTwoTimeStepBound;
-				deltaSOC2 /= this->maxAhCapacity;
-
-				//     DeltaSOC2 = 0 may occur at the begining of each simulation environment.
-				//     DeltaSOC1 * DeltaSOC2 means that the SOC from "LastTimeStep" is a peak or valley. Only peak or valley needs
-				//     to call the rain flow algorithm
-				if ( ( deltaSOC2 == 0 ) || ( ( deltaSOC1 * deltaSOC2 ) < 0 ) ) {
-					//     Because we cannot determine whehter "ThisTimeStep" is a peak or valley (next time step is unknown yet), we
-					//     use the "LastTimeStep" value for battery life calculation.
-					Real64 input0 = ( this->lastTimeStepAvailable + this->lastTimeStepBound ) / this->maxAhCapacity;
-					this->b10[ this->count0 ] = input0;
-
-					//        The arrary size needs to be increased when count = MaxRainflowArrayBounds. Please note that (MaxRainflowArrayBounds +1)
-					//        is the index used in the subroutine RainFlow. So we cannot reallocate array size until count = MaxRainflowArrayBounds +1.
-					if ( this->count0 == this->maxRainflowArrayBounds ) {
-						this->b10.resize( this->maxRainflowArrayBounds + 1 + this->maxRainflowArrayInc, 0.0 );
-						this->x0.resize( this->maxRainflowArrayBounds + 1 + this->maxRainflowArrayInc, 0.0 );
-						this->maxRainflowArrayBounds += this->maxRainflowArrayInc;
-					}
-
-					this->rainflow( this->cycleBinNum, input0, this->b10, this->x0, this->count0, this->nmb0, this->oneNmb0);
-
-					this->batteryDamage = 0.0;
-
-					for ( auto binNum = 0; binNum < this->cycleBinNum; ++binNum ) {
-						//       Battery damage is calculated by accumulating the impact from each cycle.
-						this->batteryDamage += this->oneNmb0[ binNum ] / CurveManager::CurveValue( this->lifeCurveNum, ( double( binNum ) / double( this->cycleBinNum ) ) );
-					}
-				}
-			}
-
-			this->lastTimeStepStateOfCharge = this->thisTimeStepStateOfCharge;
-			this->lastTwoTimeStepAvailable = this->lastTimeStepAvailable;
-			this->lastTwoTimeStepBound = this->lastTimeStepBound;
-			this->lastTimeStepAvailable = this->thisTimeStepAvailable;
-			this->lastTimeStepBound = this->thisTimeStepBound;
-			this->timeElapsed = timeElapsed;
-
-		} // end if time changed
-		// end Inits
-
-
-		//initialize locals
-		Real64 tmpPdraw = 0.0;
-		Real64 tmpPcharge = 0.0;
-		bool drawing = false;
-		bool charging = false;
-		Real64 Pstorage = 0.0;
-		Real64 I0 = 0.0;
-		Real64 Volt = 0.0;
-
-		Real64 T0 = 0.0;
-		Real64 E0c = 0.0;
-		Real64 k = 0.0;
-		Real64 c = 0.0;
-		Real64 qmaxf = 0.0;
-		Real64 Ef = 0.0;
-		Real64 qmax = 0.0;
-		Real64 Pactual = 0.0;
-		Real64 q0 = 0.0;
-		Real64 E0d = 0.0;
-
-		if ( this->storageModelMode == StorageModelType::kiBaMBattery ) {
-			qmax = this->maxAhCapacity;
-			E0c = this->chargedOCV;
-			E0d = this->dischargedOCV;
-			k = this->chargeConversionRate;
-			c = this->availableFrac;
-		}
-
-		// step 1 figure out what is desired of electrical storage system
-
-		if ( powerGenSupply < ( powerDemand ) ) {
-			//draw from storage
-			tmpPdraw = powerDemand - powerGenSupply;
-			tmpPcharge = 0.0;
-			drawing = true;
-			charging = false;
-
-		} else if ( powerGenSupply > ( powerDemand ) ) {
-			//add to storage
-			tmpPcharge = powerGenSupply - powerDemand;
-			tmpPdraw = 0.0;
-			charging = true;
-			drawing = false;
-
-		} else if ( powerGenSupply == ( powerDemand ) ) {
-			//do nothing
-			tmpPcharge = 0.0;
-			tmpPdraw = 0.0;
-			charging = false;
-			drawing = false;
-		}
-
-
-		//*****************************************************************************************************************
-
-		//  step 2, figure out what is possible for electrical storage draws/charges
-
-		if ( charging ) {
-
-			if ( this->storageModelMode == StorageModelType::simpleBucketStorage ) {
-
-				if ( this->lastTimeStepStateOfCharge >= this->maxEnergyCapacity ) {
-					// storage full!  no more allowed!
-					tmpPcharge = 0.0;
-					//       Constrained = .TRUE.
-					charging = false;
-				}
-				if ( tmpPcharge > this->maxPowerStore ) {
-					tmpPcharge = this->maxPowerStore;
-					//        Constrained = .TRUE.
-				}
-
-				//now add energy to storage from charging
-				if ( ( this->lastTimeStepStateOfCharge + tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->energeticEfficCharge ) < this->maxEnergyCapacity ) {
-
-					this->thisTimeStepStateOfCharge = this->lastTimeStepStateOfCharge + tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->energeticEfficCharge;
-				} else { // would over charge this time step
-
-					tmpPcharge = ( this->maxEnergyCapacity - this->lastTimeStepStateOfCharge ) / ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->energeticEfficCharge );
-					//     Constrained = .TRUE.
-					this->thisTimeStepStateOfCharge = this->lastTimeStepStateOfCharge + tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->energeticEfficCharge;
-				}
-				Pstorage = tmpPcharge;
-
-			}
-
-			if ( this->storageModelMode == StorageModelType::kiBaMBattery ) {
-
-
-				//*************************************************
-				//The sign of power and current is negative in charging
-				//*************************************************
-				Real64 Pw = -tmpPcharge / this->numBattery;
-				q0 = this->lastTimeStepAvailable + this->lastTimeStepBound;
-
-				I0 = 1.0; // Initial assumption
-				T0 = std::abs( qmax / I0 ); // Initial Assumption
-				qmaxf = qmax * k * c * T0 / ( 1.0 - std::exp( -k * T0 ) + c * ( k * T0 - 1.0 + std::exp( -k * T0 ) ) ); //Initial calculation of a function qmax(I)
-				Real64 Xf = q0 / qmaxf;
-				Ef = E0d + CurveManager::CurveValue( this->chargeCurveNum, Xf ); //E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
-				Volt = Ef - I0 * this->internalR;
-				Real64 Inew = Pw / Volt;
-				Real64 Tnew = qmaxf / std::abs( Inew );
-				Real64 error = 1.0;
-
-				while ( error > 0.0001 ) { //Iteration process to get converged current(I)
-					I0 = Inew;
-					T0 = Tnew;
-					qmaxf = qmax * k * c * T0 / ( 1.0 - std::exp( -k * T0 ) + c * ( k * T0 - 1.0 + std::exp( -k * T0 ) ) );
-					Xf = q0 / qmaxf;
-					Ef = E0d + CurveManager::CurveValue( this->chargeCurveNum, Xf ); //E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
-					Volt = Ef - I0 * this->internalR;
-					Inew = Pw / Volt;
-					Tnew = std::abs( qmaxf / Inew ); // ***Always positive here
-					error = std::abs( Inew - I0 );
-				}
-
-				Real64 dividend = -k * c * qmax + k * this->lastTimeStepAvailable * std::exp( -k * DataHVACGlobals::TimeStepSys ) + q0 * k * c * ( 1.0 - std::exp( -k * DataHVACGlobals::TimeStepSys ) );
-				Real64 divisor = 1.0 - std::exp( -k * DataHVACGlobals::TimeStepSys ) + c * ( k * DataHVACGlobals::TimeStepSys - 1 + std::exp( -k * DataHVACGlobals::TimeStepSys ) );
-				Real64 Imax = dividend / divisor;
-				// Below: This is the limit of charging current from Charge Rate Limit (input)
-				Imax = max( Imax, - ( qmax - q0 ) * this->maxChargeRate );
-				
-				if ( std::abs( I0 ) <= std::abs( Imax ) ) {
-					I0 = Pw / Volt;
-					Pactual = I0 * Volt;
-				} else {
-					I0 = Imax;
-					qmaxf = 80.0; //Initial assumption to solve the equation using iterative method
-					error = 10.0; //Initial assumption ...
-					while ( error > 0.001 ) {
-						// *** I0(current) should be positive for this calculation
-						Real64 RHS = ( qmax * k * c * qmaxf / std::abs( I0 ) ) / ( 1.0 - std::exp( -k * qmaxf / std::abs( I0 ) ) + c * ( k * qmaxf / std::abs( I0 ) - 1.0 + std::exp( -k * qmaxf / std::abs( I0 ) ) ) );
-						error = std::abs( qmaxf - RHS );
-						qmaxf = RHS;
-					}
-				}
-
-			} // end KiBaM charging
-
-		} //charging
-
-		if ( drawing ) {
-			if ( this->storageModelMode == StorageModelType::simpleBucketStorage ) {
-
-				if ( this->lastTimeStepStateOfCharge <= 0.0 ) {
-					// storage empty  no more allowed!
-					tmpPdraw = 0.0;
-					drawing = false;
-				}
-				if ( tmpPdraw > this->maxPowerDraw ) {
-					tmpPdraw = this->maxPowerDraw;
-				}
-
-				//now take energy from storage by drawing  (amplified by energetic effic)
-				if ( ( this->lastTimeStepStateOfCharge - tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / this->energeticEfficDischarge ) > 0.0 ) {
-
-					this->thisTimeStepStateOfCharge = this->lastTimeStepStateOfCharge - tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / this->energeticEfficDischarge;
-				} else { //would over drain storage this timestep so reduce tmpPdraw
-					tmpPdraw = this->lastTimeStepStateOfCharge * this->energeticEfficDischarge / ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
-					this->thisTimeStepStateOfCharge = this->lastTimeStepStateOfCharge - tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / this->energeticEfficDischarge;
-					this->thisTimeStepStateOfCharge = max( this->thisTimeStepStateOfCharge, 0.0 );
-				}
-
-				this->thermLossRate = tmpPdraw * ( 1.0 / this->energeticEfficDischarge - 1.0 );
-				Pstorage = -tmpPdraw;
-			} // simple discharging
-
-			if ( this->storageModelMode == StorageModelType::kiBaMBattery ) {
-
-				//**********************************************
-				//The sign of power and current is positive in discharging
-				//**********************************************
-
-				Real64 Pw = tmpPdraw / this->numBattery;
-				q0 = this->lastTimeStepAvailable + this->lastTimeStepBound;
-				bool const ok = this->determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, this->dischargeCurveNum, k, c, qmax, E0c, this->internalR );
-				if ( !ok ) {
-					ShowFatalError( "ElectricLoadCenter:Storage:Battery named=\"" + this->name + "\". Battery discharge current could not be estimated due to iteration limit reached. " );
-					//issue #5301, need more diagnostics for this. 
-				}
-
-				Real64 dividend = k * this->lastTimeStepAvailable * std::exp( -k * DataHVACGlobals::TimeStepSys ) + q0 * k * c * ( 1.0 - std::exp( -k * DataHVACGlobals::TimeStepSys ) );
-				Real64 divisor = 1.0 - std::exp( -k * DataHVACGlobals::TimeStepSys ) + c * ( k * DataHVACGlobals::TimeStepSys - 1.0 + std::exp( -k * DataHVACGlobals::TimeStepSys ) );
-				Real64 Imax = dividend / divisor;
-				Imax = min( Imax, this->maxDischargeI );
-				if ( std::abs( I0 ) <= Imax ) {
-					I0 = Pw / Volt;
-					Pactual = I0 * Volt;
-				} else {
-					I0 = Imax;
-					qmaxf = 10.0; //Initial assumption to solve the equation using iterative method
-					Real64 error = 10.0; //Initial assumption ...
-					while ( error > 0.001 ) {
-						Real64 RHS = ( qmax * k * c * qmaxf / I0 ) / ( 1.0 - std::exp( -k * qmaxf / I0 ) + c * ( k * qmaxf / I0 - 1 + std::exp( -k * qmaxf / I0 ) ) );
-						error = std::abs( qmaxf - RHS );
-						qmaxf = RHS;
-					}
-					Real64 Xf = ( qmax - q0 ) / qmaxf;
-					Ef = E0c + CurveManager::CurveValue( this->dischargeCurveNum, Xf );
-					Volt = Ef - I0 * this->internalR;
-				}
-
-				if ( Volt < this->cutoffV ) {
-					I0 = 0.0;
-				}
-			} // end KiBaM discharging
-
-		} //drawing
-
-
-
-		if ( this->storageModelMode == StorageModelType::simpleBucketStorage ) {
-			if ( ( ! charging ) && ( ! drawing ) ) {
-
-				this->thisTimeStepStateOfCharge = this->lastTimeStepStateOfCharge;
-				this->pelIntoStorage = 0.0;
-				this->pelFromStorage = 0.0;
-				Pstorage = 0.0;
-			}
-
-			if ( Pstorage >= 0.0 ) {
-
-				this->pelIntoStorage = Pstorage;
-				this->pelFromStorage = 0.0;
-			}
-
-			if ( Pstorage < 0.0 ) {
-
-				this->pelIntoStorage = 0.0;
-				this->pelFromStorage = -Pstorage;
-
-			}
-
-			this->electEnergyinStorage = this->thisTimeStepStateOfCharge;
-			this->storedPower = this->pelIntoStorage;
-			this->storedEnergy = this->pelIntoStorage * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-			this->decrementedEnergyStored = -1.0 * this->storedEnergy;
-			this->drawnPower = this->pelFromStorage;
-			this->drawnEnergy = this->pelFromStorage * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-			this->thermLossRate = max( this->storedPower * ( 1.0 - this->energeticEfficCharge ), this->drawnPower * ( 1.0 - this->energeticEfficDischarge ) );
-			this->thermLossEnergy = this->thermLossRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-			if ( this->zoneNum > 0 ) { // set values for zone heat gains
-				this->qdotConvZone = ( 1.0 - this->zoneRadFract ) * this->thermLossRate;
-				this->qdotRadZone = ( this->zoneRadFract ) * this->thermLossRate;
-			}
-
-			StorageStoredPower = this->storedPower;
-			StorageDrawnPower = this->drawnPower;
-		} // Outputs for simple battery model
-
-		if ( this->storageModelMode == StorageModelType::kiBaMBattery ) {
-
-			if ( ( ! charging ) && ( ! drawing ) ) {
-				this->thisTimeStepAvailable = this->lastTimeStepAvailable;
-				this->thisTimeStepBound = this->lastTimeStepBound;
-				I0 = 0.0;
-				Volt = 0.0;
-				q0 = this->lastTimeStepAvailable + this->lastTimeStepBound;
-			} else {
-				Real64 newAvailable = this->lastTimeStepAvailable * std::exp( -k * DataHVACGlobals::TimeStepSys ) + ( q0 * k * c - I0 ) * ( 1.0 - std::exp( -k * DataHVACGlobals::TimeStepSys ) ) / k - I0 * c * ( k * DataHVACGlobals::TimeStepSys - 1.0 + std::exp( -k * DataHVACGlobals::TimeStepSys ) ) / k;
-				Real64 newBound = this->lastTimeStepBound * std::exp( -k * DataHVACGlobals::TimeStepSys ) + q0 * ( 1.0 - c ) * ( 1.0 - std::exp( -k * DataHVACGlobals::TimeStepSys ) ) - I0 * ( 1.0 - c ) * ( k * DataHVACGlobals::TimeStepSys - 1.0 + std::exp( -k * DataHVACGlobals::TimeStepSys ) ) / k;
-				this->thisTimeStepAvailable = max( 0.0, newAvailable );
-				this->thisTimeStepBound = max( 0.0, newBound );
-			}
-
-			Pactual = I0 * Volt;
-			Real64 TotalSOC = this->thisTimeStepAvailable + this->thisTimeStepBound;
-
-			//output1
-			if ( TotalSOC > q0 ) {
-				this->storageMode = 2;
-//TODO change sign convention here		this->storedPower = -1.0 * Volt * I0 * numbattery;
-//TODO change sign convention here				this->storedEnergy = -1.0 * Volt * I0 * numbattery * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-				this->storedPower = -1.0 *Volt * I0 * this->numBattery;
-				this->storedEnergy =  -1.0 *Volt * I0 * this->numBattery * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-// TODO, this next is a sign mistake in current dev, only mimic for no diff check in.
-//				this->decrementedEnergyStored = this->storedEnergy;  // should be this
-				this->decrementedEnergyStored = -1.0 * this->storedEnergy; // this is wrong
-				this->drawnPower = 0.0;
-				this->drawnEnergy = 0.0;
-
-			} else if ( TotalSOC < q0 ) {
-				this->storageMode = 1;
-				this->storedPower = 0.0;
-				this->storedEnergy = 0.0;
-				this->decrementedEnergyStored = 0.0;
-				this->drawnPower = Volt * I0 * this->numBattery;
-				this->drawnEnergy = Volt * I0 * this->numBattery * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-			} else {
-				this->storageMode = 0;
-				this->storedPower = 0.0;
-				this->storedEnergy = 0.0;
-				this->decrementedEnergyStored = 0.0;
-				this->drawnPower = 0.0;
-				this->drawnEnergy = 0.0;
-			}
-
-			this->absoluteSOC = TotalSOC * this->numBattery;
-			this->fractionSOC = TotalSOC / qmax;
-			this->batteryCurrent = I0 * this->parallelNum;
-			this->batteryVoltage = Volt * this->seriesNum;
-			this->thermLossRate = this->internalR * pow_2( I0 ) * this->numBattery;
-			this->thermLossEnergy = this->internalR * pow_2( I0 ) * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->numBattery;
-
-			if ( this->zoneNum > 0 ) { // set values for zone heat gains
-				this->qdotConvZone = ( ( 1.0 - this->zoneRadFract ) * this->thermLossRate ) * this->numBattery;
-				this->qdotRadZone = ( ( this->zoneRadFract ) * this->thermLossRate ) * this->numBattery;
-			}
-
-			StorageStoredPower = this->storedPower;
-			StorageDrawnPower = this->drawnPower;
-
-		} // Outputs for kibam model
-
-
-	}
-
+	
 	Real64
 	ElectricStorage::getDrawnPower()
 	{
@@ -3701,8 +3352,8 @@ namespace EnergyPlus {
 		Real64& curI0,
 		Real64& curT0,
 		Real64& curVolt,
-		Real64 const Pw,
-		Real64 const q0,
+		Real64 const Pw, // Power withdraw from each module, 
+		Real64 const q0, // available charge last timestep, sum of available and bound 
 		int const CurveNum,
 		Real64 const k,
 		Real64 const c,
@@ -3727,7 +3378,7 @@ namespace EnergyPlus {
 			curI0 = Inew;
 			curT0 = Tnew;
 			qmaxf = qmax * k * c * curT0 / ( 1.0 - std::exp( -k * curT0 ) + c * ( k * curT0 - 1.0 + std::exp( -k * curT0 ) ) );
-		//TODO add div by zero protection #5301
+		//add div by zero protection #5301
 			if ( qmaxf != 0.0 ) {
 				Xf = ( qmax - q0 ) / qmaxf;
 			} else { 
@@ -3737,14 +3388,14 @@ namespace EnergyPlus {
 			
 			Ef = E0c + CurveManager::CurveValue( CurveNum, Xf ); //E0c+Ad*Xf+Cd*X/(Dd-Xf)
 			curVolt = Ef - curI0 * InternalR;
-		//TODO add div by zero protection #5301
+		//add div by zero protection #5301
 			if ( curVolt != 0.0 ) {
 				Inew = Pw / curVolt;
 			} else {
 				Inew = 1.0;
 			}
 			
-		//TODO add div by zero protection #5301
+		// add div by zero protection #5301
 			if ( Inew != 0.0 ) {
 				Tnew = qmaxf / Inew;
 			} else {
@@ -3756,7 +3407,27 @@ namespace EnergyPlus {
 			if ( countForIteration > 1000 ) {
 				exceedIterationLimit = true;
 				//Issue #5301 need more diagnostics for this case
-				ShowWarningError( "ElectricStorage::determineCurrentForBatteryDischarge, iteration limit exceeded  " );
+				ShowWarningError( "ElectricStorage::determineCurrentForBatteryDischarge, iteration limit exceeded, failed to solve for discharge current." );
+				ShowContinueError( "Last timestep charge available, q0 = " + General::RoundSigDigits( q0, 5 ) );
+				ShowContinueError( "New Current, Inew = " + General::RoundSigDigits( Inew, 5 ) + " [Amps]"  );
+				ShowContinueError( "Power discharge per module cell, Pw = " +General::RoundSigDigits( Pw, 5) +  " ");
+				ShowContinueError( "Charge Conversion Rate, [1/h] change rate from bound charge energy to available charge, parameter k = " + General::RoundSigDigits( k, 5) );
+				ShowContinueError( "parameter c = " + General::RoundSigDigits( c, 5) );
+				ShowContinueError( "parameter qmax = " + General::RoundSigDigits( qmax, 5) );
+				ShowContinueError( "Fully charged open circuit voltage, parameter E0c  = " + General::RoundSigDigits( E0c, 5) );
+				ShowContinueError( "parameter InternalR = " + General::RoundSigDigits( InternalR, 5) );
+				if ( qmaxf == 0.0 ) {
+					ShowContinueError( "qmaxf was zero, would have divided by zero.");
+				}
+				if ( Inew == 0.0 ) {
+					ShowContinueError( "Inew was zero, would have divided by zero. ");
+				}
+				if ( curVolt == 0.0 ) {
+					ShowContinueError("curVolt was zero, would have divided by zero. ");
+				}
+
+				ShowContinueErrorTimeStamp( "ElectricStorage::determineCurrentForBatteryDischarge " );
+
 
 				break;
 			}
@@ -3954,7 +3625,6 @@ namespace EnergyPlus {
 		this->considerLosses = true;
 		this->ratedNL = 0.0;
 		this->ratedLL = 0.0;
-		this->numLoadCenters = 0;
 		this->overloadErrorIndex = 0;
 		this->efficiency = 0.0;
 		this->powerIn = 0.0;
@@ -3967,8 +3637,8 @@ namespace EnergyPlus {
 		this->loadLossEnergy = 0.0;
 		this->thermalLossRate = 0.0;
 		this->thermalLossEnergy = 0.0;
-		this->elecUseUtility = 0.0;
-		this->elecUseOutToGrid = 0.0;
+		this->elecUseMeteredUtilityLosses = 0.0;
+		this->powerConversionMeteredLosses = 0.0;
 		this->qdotConvZone = 0.0;
 		this->qdotRadZone = 0.0;
 				
@@ -4000,10 +3670,10 @@ namespace EnergyPlus {
 				this->usageMode = TransformerUse::powerInFromGrid; //default
 			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerInFromGrid" ) ) {
 				this->usageMode = TransformerUse::powerInFromGrid;
-			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutFromOnsiteGeneration" ) ) {
+			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "PowerOutToGrid" ) ) {
 				this->usageMode = TransformerUse::powerOutFromBldgToGrid;
-			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterProductionConditioning" ) ) {
-				this->usageMode = TransformerUse::powerFromLoadCenterToBldg;
+			} else if ( InputProcessor::SameString(DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) {
+				this->usageMode = TransformerUse::powerBetweenLoadCenterAndBldg;
 
 			} else {
 					ShowWarningError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
@@ -4116,8 +3786,16 @@ namespace EnergyPlus {
 			SetupOutputVariable( "Transformer Load Loss Energy [J]", this->loadLossEnergy, "System", "Sum", this->name );
 			SetupOutputVariable( "Transformer Thermal Loss Rate [W]", this->thermalLossRate, "System", "Average", this->name );
 			SetupOutputVariable( "Transformer Thermal Loss Energy [J]", this->thermalLossEnergy, "System", "Sum", this->name );
-			SetupOutputVariable( "Transformer Distribution Electric Loss Energy [J]", this->elecUseUtility, "System", "Sum", this->name, _, "Electricity", "ExteriorEquipment", "Transformer", "System" );
-			SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", this->elecUseOutToGrid, "System", "Sum", this->name, _, "ElectricityProduced", "COGENERATION", _, "System" );
+			if ( this->usageMode == TransformerUse::powerInFromGrid ) { // power losses metered as an end use exterior equipment
+				SetupOutputVariable( "Transformer Distribution Electric Loss Energy [J]", this->elecUseMeteredUtilityLosses, "System", "Sum", this->name, _, "Electricity", "ExteriorEquipment", "Transformer", "System" );
+			}
+			if ( this->usageMode == TransformerUse::powerOutFromBldgToGrid ) { 
+				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", this->powerConversionMeteredLosses, "System", "Sum", this->name, _, "ElectricityProduced", "POWERCONVERSION", "Transformer", "System" );
+			}
+			if ( this->usageMode == TransformerUse::powerOutFromBldgToGrid ) {
+				SetupOutputVariable( "Transformer Conversion Electric Loss Energy [J]", this->powerConversionMeteredLosses, "System", "Sum", this->name, _, "ElectricityProduced", "POWERCONVERSION", "Transformer", "System" );
+			}
+
 
 			if ( this->zoneNum > 0 ) {
 				SetupZoneInternalGain( this->zoneNum, "ElectricLoadCenter:Transformer", this->name, DataHeatBalance::IntGainTypeOf_ElectricLoadCenterTransformer, this->qdotConvZone, _, this->qdotRadZone );
@@ -4131,22 +3809,6 @@ namespace EnergyPlus {
 		if ( errorsFound ) {
 			ShowFatalError( routineName + "Preceding errors terminate program." );
 		}
-	}
-
-	void
-	ElectricTransformer::addLoadCenterIndex( 
-		int const objectIndex
-	)
-	{
-		++this->numLoadCenters;
-		this->loadCenterObjIndexes.push_back( objectIndex );
-	}
-
-	std::vector< int >
-	ElectricTransformer::getLoadCenterObjIndices()
-	{
-		return this->loadCenterObjIndexes;
-
 	}
 
 	Real64
@@ -4231,7 +3893,7 @@ namespace EnergyPlus {
 			elecLoad = surplusPowerOutFromLoadCenters; // TODO this is input but should be output with the losses, but we don't have them yet. 
 			break;
 		}
-		case TransformerUse::powerFromLoadCenterToBldg : {
+		case TransformerUse::powerBetweenLoadCenterAndBldg : {
 			//TODO, new configuration for transformer, really part of the specific load center and connects it to the main building bus
 			this->powerIn = surplusPowerOutFromLoadCenters;
 			elecLoad = surplusPowerOutFromLoadCenters;
@@ -4297,39 +3959,35 @@ namespace EnergyPlus {
 			//are considered in utility cost. If transformer losses are not considered in utility cost, 0 is assigned
 			//to the variable "%ElecUseUtility".
 			if ( this->considerLosses ) {
-				this->elecUseUtility = this->totalLossRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+				this->elecUseMeteredUtilityLosses = this->totalLossRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 			} else {
-				this->elecUseUtility = 0.0;
+				this->elecUseMeteredUtilityLosses = 0.0;
 			}
 
 			//Transformer has two modes.If it works in one mode, the variable for meter output in the other mode
 			//is assigned 0
-			this->elecUseOutToGrid = 0.0;
+			this->totalLossEnergy = this->totalLossRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
 			break;
 		}
 
-		case TransformerUse::powerOutFromBldgToGrid: {
+		case TransformerUse::powerOutFromBldgToGrid: 
+		case TransformerUse::powerBetweenLoadCenterAndBldg : {
 			this->powerOut = elecLoad - this->totalLossRate;
 
 			if ( this->powerOut < 0 ) this->powerOut = 0.0;
 
-			this->elecUseOutToGrid = -1.0 * this->totalLossRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+			this->powerConversionMeteredLosses = -1.0 * this->totalLossRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
 			//Transformer has two modes.If it works in one mode, the variable for meter output in the other mode
 			//is assigned 0
-			this->elecUseUtility = 0.0;
+			this->elecUseMeteredUtilityLosses = 0.0;
 			break;
 		}
-		case TransformerUse::powerFromLoadCenterToBldg : {
-			//TODO, new configuration for transformer, really part of the specific load center and connects it to the main building bus
 
-
-			break;
-		}
 		case TransformerUse::usenotYetSet : {
 			// do nothing
-			break;
+			assert( false );
 		}
 		} // switch
 
@@ -4389,8 +4047,8 @@ namespace EnergyPlus {
 		this->loadLossEnergy    = 0.0;
 		this->thermalLossRate   = 0.0;
 		this->thermalLossEnergy = 0.0;
-		this->elecUseUtility    = 0.0;
-		this->elecUseOutToGrid  = 0.0;
+		this->elecUseMeteredUtilityLosses    = 0.0;
+		this->powerConversionMeteredLosses  = 0.0;
 		this->qdotConvZone      = 0.0;
 		this->qdotRadZone       = 0.0;
 	}

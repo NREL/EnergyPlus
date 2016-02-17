@@ -418,7 +418,6 @@ private: // Creation
 			batteryDamage( 0.0 )
 		{}
 
-
 	// Copy Constructor
 	ElectricStorage( ElectricStorage const & ) = default;
 
@@ -452,9 +451,6 @@ public: //methods
 		Real64 const controlSOCMinFracLimit
 	);
 
-
-
-
 	void
 	calcAndReportSimpleBucketModel();
 
@@ -463,15 +459,6 @@ public: //methods
 
 	void
 	calcAndReportKineticBatteryModel();
-
-// move some of this up to load center, storage operation scheme stuff pulled out of battery 
-	void
-	manageElectCenterStorageInteractions(
-		Real64 const powerDemand, // load center power demand minus any inverter losses that need to be applied
-		Real64 const powerGenSupply, // sum of load center generator production
-		Real64 & StorageDrawnPower, // Electric Power Draw Rate from storage units
-		Real64 & StorageStoredPower // Electric Power Store Rate from storage units
-	);
 
 	void
 	reinitAtBeginEnvironment();
@@ -556,6 +543,7 @@ public: //data public for unit tests
 	Real64 drawnPower; // [W]
 	Real64 drawnEnergy; // [J]
 	Real64 decrementedEnergyStored; // [J] this is the negative of StoredEnergy
+	std::string name; // name of this electrical storage module
 
 private: //data
 
@@ -573,7 +561,7 @@ private: //data
 	int maxRainflowArrayBounds;
 	int const maxRainflowArrayInc = 100;
 	bool myWarmUpFlag;
-	std::string name; // name of this electrical storage module
+
 	StorageModelType storageModelMode; // type of model parameter, SimpleBucketStorage
 	int availSchedPtr; // availability schedule index.
 	ThermalLossDestination heatLossesDestination; // mode for where thermal losses go
@@ -595,7 +583,7 @@ private: //data
 	Real64 maxAhCapacity; // [Ah]maximum capacity
 	Real64 availableFrac; // [ ] fraction of available charge capacity
 	Real64 chargeConversionRate; // [1/h]change rate from bound charge energy to available charge
-	Real64 chargedOCV; // [V] fully charged oppen circuit voltage
+	Real64 chargedOCV; // [V] fully charged open circuit voltage
 	Real64 dischargedOCV; // [V] fully discharged open circuit voltage
 	Real64 internalR; // [ohm]internal electric resistance
 	Real64 maxDischargeI; // [A] maximum discharging current
@@ -635,7 +623,6 @@ private: //data
 	//report
 	Real64 electEnergyinStorage; // [J] state of charge
 
-
 	Real64 thermLossRate; // [W]
 	Real64 thermLossEnergy; // [J]
 	int storageMode; // [ ] mode of operation 0 for idle, 1 for discharging, 2 for charging
@@ -652,7 +639,6 @@ class ElectricTransformer
 private: // Creation
 	// Default Constructor
 		ElectricTransformer() :
-			numLoadCenters( 0 ),
 			name( " "),
 			myOneTimeFlag( true ),
 			availSchedPtr( 0 ),
@@ -686,8 +672,8 @@ private: // Creation
 			loadLossEnergy( 0.0 ),
 			thermalLossRate( 0.0 ),
 			thermalLossEnergy( 0.0 ),
-			elecUseUtility( 0.0 ),
-			elecUseOutToGrid( 0.0 ),
+			elecUseMeteredUtilityLosses( 0.0 ),
+			powerConversionMeteredLosses( 0.0 ),
 			qdotConvZone( 0.0 ),
 			qdotRadZone( 0.0 )
 		{}
@@ -737,28 +723,20 @@ public: //methods
 	void
 	reinitZoneGainsAtBeginEnvironment();
 
-	void
-	addLoadCenterIndex( 
-		int const objectIndex
-	);
-
-	std::vector< int >
-	getLoadCenterObjIndices();
 
 
 
 private: //methods
 
 public: 
-	int numLoadCenters; // number of load centers served by the transformer
-	std::vector < int > loadCenterObjIndexes; // index array of load centers served by the transformer
+
 private: //data
 
 	enum class TransformerUse : int {
 		usenotYetSet = 0,
 		powerInFromGrid, // condition power from grid going into building buss
 		powerOutFromBldgToGrid, // condition power from building buss going out to grid
-		powerFromLoadCenterToBldg // condition power from a load center going into building buss
+		powerBetweenLoadCenterAndBldg // condition power from a load center going into building buss, or from building buss into load center for draws
 	};
 	enum class TransformerPerformanceInput : int {
 		perfInputMethodNotSet = 0,
@@ -806,13 +784,14 @@ private: //data
 	Real64 noLoadLossEnergy; // [J]
 	Real64 loadLossRate; // [W]
 	Real64 loadLossEnergy; // [J]
-	Real64 totalLossRate;
+	Real64 totalLossRate; // [W]
+	Real64 totalLossEnergy; // [J]
 
 	Real64 thermalLossRate; // [W]
 	Real64 thermalLossEnergy; // [J]
-	Real64 elecUseUtility; // [J] Energy consumption for a utility transformer (power in)
+	Real64 elecUseMeteredUtilityLosses; // [J] Energy consumption for a utility transformer (power in)
 	// Positive values
-	Real64 elecUseOutToGrid; // [J] Energy consumption for a (cogeneration )transformer (power out from building to grid)
+	Real64 powerConversionMeteredLosses; // [J] Energy consumption for a (cogeneration )transformer (power out from building to grid)
 	// Negative values
 	Real64 qdotConvZone; // [W]
 	Real64 qdotRadZone; // [W]
@@ -1267,6 +1246,9 @@ private: //Methods
 	void
 	sumUpNumberOfStorageDevices();
 
+	void
+	checkLoadCenters();
+
 public: // data
 	bool newEnvironmentInternalGainsFlag;
 	int numElecStorageDevices;
@@ -1291,8 +1273,8 @@ private: // data
 	std::string facilityPowerInTransformerName; // hold name for verificaton and error messages
 	std::unique_ptr < ElectricTransformer > facilityPowerInTransformerObj;
 	int numPowerOutTransformers;
-	std::vector< std::string > powerOutTransformerNames;
-	std::vector< std::unique_ptr < ElectricTransformer > > powerOutTransformerObjs;
+	std::string powerOutTransformerName;
+	std::unique_ptr < ElectricTransformer >  powerOutTransformerObj;
 
 	Real64 wholeBldgRemainingLoad;
 	Real64 electricityProd; // Current Electric Produced from Equipment (J)

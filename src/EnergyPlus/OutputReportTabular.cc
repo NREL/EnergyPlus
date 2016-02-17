@@ -2141,7 +2141,7 @@ namespace OutputReportTabular {
 			meterNumPowerWind = GetMeterIndex( "WindTurbine:ElectricityProduced" );
 			meterNumPowerHTGeothermal = GetMeterIndex( "HTGeothermal:ElectricityProduced" );
 			meterNumElecStorage = GetMeterIndex( "ElectricStorage:ElectricityProduced" );
-			meterNumPowerConversion = GetMeterIndex( "PowerConversion:ELectricityProduced");
+			meterNumPowerConversion = GetMeterIndex( "PowerConversion:ElectricityProduced");
 			meterNumElecProduced = GetMeterIndex( "ElectricityProduced:Facility" );
 			meterNumElecPurchased = GetMeterIndex( "ElectricityPurchased:Facility" );
 			meterNumElecSurplusSold = GetMeterIndex( "ElectricitySurplusSold:Facility" );
@@ -7992,20 +7992,20 @@ namespace OutputReportTabular {
 			// show annual values
 			unconvert = largeConversionFactor / 1000000000.0; //to avoid double converting, the values for the LEED report should be in GJ
 
-			tableBody( 1, 1 ) = RealToStr( gatherPowerFuelFireGen, 4 );
-			tableBody( 1, 2 ) = RealToStr( gatherPowerHTGeothermal, 4 );
-			tableBody( 1, 3 ) = RealToStr( gatherPowerPV, 4 );
+			tableBody( 1, 1 ) = RealToStr( gatherPowerFuelFireGen, 3 );
+			tableBody( 1, 2 ) = RealToStr( gatherPowerHTGeothermal, 3 );
+			tableBody( 1, 3 ) = RealToStr( gatherPowerPV, 3 );
 			PreDefTableEntry( pdchLeedRenAnGen, "Photovoltaic", unconvert * gatherPowerPV, 2 );
-			tableBody( 1, 4 ) = RealToStr( gatherPowerWind, 4 );
+			tableBody( 1, 4 ) = RealToStr( gatherPowerWind, 3 );
 			PreDefTableEntry( pdchLeedRenAnGen, "Wind", unconvert * gatherPowerWind, 2 );
-			tableBody( 1, 5 ) = RealToStr( gatherPowerConversion, 4 );
-			tableBody( 1, 6 ) = RealToStr( OverallNetEnergyFromStorage, 4 );
-			tableBody( 1, 7 ) = RealToStr( gatherElecProduced, 4 );
-			tableBody( 1, 9 ) = RealToStr( gatherElecPurchased, 4 );
-			tableBody( 1, 10 ) = RealToStr( gatherElecSurplusSold, 4 );
-			tableBody( 1, 11 ) = RealToStr( gatherElecPurchased - gatherElecSurplusSold, 4 );
-			tableBody( 1, 13 ) = RealToStr( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ), 2 );
-			tableBody( 1, 14 ) = RealToStr( collapsedTotal( 1 ), 2 );
+			tableBody( 1, 5 ) = RealToStr( gatherPowerConversion, 3 );
+			tableBody( 1, 6 ) = RealToStr( OverallNetEnergyFromStorage, 3 );
+			tableBody( 1, 7 ) = RealToStr( gatherElecProduced, 3 );
+			tableBody( 1, 9 ) = RealToStr( gatherElecPurchased, 3 );
+			tableBody( 1, 10 ) = RealToStr( gatherElecSurplusSold, 3 );
+			tableBody( 1, 11 ) = RealToStr( gatherElecPurchased - gatherElecSurplusSold, 3 );
+			tableBody( 1, 13 ) = RealToStr( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ), 3 );
+			tableBody( 1, 14 ) = RealToStr( collapsedTotal( 1 ), 3 );
 
 			// show annual percentages
 			if ( collapsedTotal( 1 ) > 0 ) {
@@ -8013,8 +8013,8 @@ namespace OutputReportTabular {
 				tableBody( 2, 2 ) = RealToStr( 100.0 * gatherPowerHTGeothermal / collapsedTotal( 1 ), 2 );
 				tableBody( 2, 3 ) = RealToStr( 100.0 * gatherPowerPV / collapsedTotal( 1 ), 2 );
 				tableBody( 2, 4 ) = RealToStr( 100.0 * gatherPowerWind / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 5 ) = RealToStr( 100.0 * gatherPowerWind / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 6 ) = RealToStr( 100.0 * gatherPowerConversion / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 5 ) = RealToStr( 100.0 * gatherPowerConversion / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 6 ) = RealToStr( 100.0 * OverallNetEnergyFromStorage / collapsedTotal( 1 ), 2 );
 				tableBody( 2, 7 ) = RealToStr( 100.0 * gatherElecProduced / collapsedTotal( 1 ), 2 );
 				tableBody( 2, 9 ) = RealToStr( 100.0 * gatherElecPurchased / collapsedTotal( 1 ), 2 );
 				tableBody( 2, 10 ) = RealToStr( 100.0 * gatherElecSurplusSold / collapsedTotal( 1 ), 2 );
