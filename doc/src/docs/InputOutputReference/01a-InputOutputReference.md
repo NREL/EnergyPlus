@@ -4543,46 +4543,46 @@ Other materials inputs can be estimated using the equations above and material p
 
 ### Moisture Penetration Depth (EMPD) Outputs
 
-#### EMPD surface inside face water vapor density [kg/m3]
+#### EMPD Surface Inside Face Water Vapor Density [kg/m3]
 
 The vapor density at the inside face of the surface, where the EMPD moisture balance solution algorithm is applied. This is the *actual* surface, separated from the zone air only by the convective mass transfer coefficient.
 
 Units are kg of water per cubic meter of air.
 
-#### EMPD surface layer moisture content [kg/m3]
+#### EMPD Surface Layer Moisture Content [kg/m3]
 
 The moisture content, *u*, of the fictitious surface layer. The surface layer node is not at the actual surface, but is instead at the center of surface layer, which has a uniform moisture content. This node is separated from the inside face of the surface by a diffusive resistance, as described in the Engineering Reference.
 
 Units are kg of water per cubic meter of solid material (e.g., gypsum).
 
-#### EMPD deep layer moisture content [kg/m3]
+#### EMPD Deep Layer Moisture Content [kg/m3]
 
 The moisture content, *u*, of the fictitious deep layer. The deep layer node interacts only with the surface layer node through a diffusive resistance.
 
 Units are kg of water per cubic meter of solid material.
 
-#### EMPD surface layer equivalent relative humidity
+#### EMPD Surface Layer Equivalent Relative Humidity [%]
 
 The equivalent relative humidity of the surface layer, converted from the surface-layer moisture content discussed above and the surface temperature. The moisture content is related to the relative humidity through the slope of the moisture curve, the surface penetration depth, and the material density, as discussed in the engineering reference.
 
-#### EMPD deep layer equivalent relative humidity
+#### EMPD Deep Layer Equivalent Relative Humidity [%]
 
 The equivalent relative humidity of the deep layer, converted from the deep-layer moisture content discussed above and the surface temperature.
 
-#### EMPD surface layer equivalent humidity ratio
+#### EMPD Surface Layer Equivalent Humidity Ratio [kgWater/kgDryAir]
 
 The equivalent humidity ratio of the surface layer. Units are kg of water per kg of dry air.
 
-#### EMPD deep layer equivalent humidity ratio
+#### EMPD Deep Layer Equivalent Humidity Ratio [kgWater/kgDryAir]
 
 The equivalent humidity ratio of the deep layer. Units are kg of water per kg of dry air.
 
-#### EMPD zone mass flux [kg/m2-s]
+#### EMPD Surface Moisture Flux to Zone [kg/m2-s]
 
 The mass flux of water vapor from the surface layer of a specific surface to the zone air. A positive mass flux is from the surface to the zone.
 
 
-#### EMPD deep layer moisture flux [kg/m2-s]
+#### EMPD Deep Layer Moisture Flux [kg/m2-s]
 
 The mass flux of water vapor from the deep layer of a specific surface to the surface layer of that surface. A positive flux is from the surface layer to the deep layer.
 
