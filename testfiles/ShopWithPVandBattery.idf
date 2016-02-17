@@ -5109,7 +5109,13 @@
     ,                        !- Track Meter Scheme Meter Name
     DirectCurrentWithInverterDCStorage,  !- Electrical Buss Type
     PV Inverter,             !- Inverter Object Name
-    Kibam;                   !- Electrical Storage Object Name
+    Kibam,                   !- Electrical Storage Object Name
+    ,                        !- Transformer Object Name
+    TrackFacilityElectricDemandStoreExcessOnSite,   !- Storage Operation Scheme
+    ,                        !- Storage Control Track Meter Name
+    ,                        !- Storage Converter Object Name
+    0.95,                    !- Maximum Storage State of Charge Fraction
+    0.20;                    !- Minimum Storage State of Charge Fraction
 
   Curve:DoubleExponentialDecay,
     Doubleexponential,       !- Name

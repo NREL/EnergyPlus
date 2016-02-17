@@ -3104,7 +3104,7 @@ namespace EnergyPlus {
 		Real64 q0 = 0.0;
 		Real64 E0d = 0.0;
 
-		qmax = this->maxAhCapacity * controlSOCMaxFracLimit; // apply limit passed in from controller
+		qmax = this->maxAhCapacity;
 		E0c = this->chargedOCV;
 		E0d = this->dischargedOCV;
 		k = this->chargeConversionRate;
@@ -3117,6 +3117,10 @@ namespace EnergyPlus {
 			//*************************************************
 			Real64 Pw = -powerCharge / this->numBattery;
 			q0 = this->lastTimeStepAvailable + this->lastTimeStepBound;
+			if ( q0 > qmax * controlSOCMaxFracLimit ) {
+				//stop charging with controller signal for max state of charge
+				Pw = 0.0;
+			}
 
 			I0 = 1.0; // Initial assumption
 			T0 = std::abs( qmax / I0 ); // Initial Assumption
