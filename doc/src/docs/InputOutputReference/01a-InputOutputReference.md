@@ -4454,7 +4454,7 @@ $\phi$ = Surface air relative humidity [0 to 1],
 
 #### Field: Surface Layer Penetration Depth
 
-The surface-layer penetration depth is the fictitious thickness of the surface layer in meters, and is used to calculate the volume of material that participates in short-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The penetration depth is based on the amount of material that interacts with the zone air when subject to a cyclic relative humidity variation. The surface penetration depth can be estimated with the following equation:
+The Surface Layer Penetration Depth is the fictitious thickness of the surface layer in meters, and is used to calculate the volume of material that participates in short-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The penetration depth is based on the amount of material that interacts with the zone air when subject to a cyclic relative humidity variation. The surface penetration depth can be estimated with the following equation:
 
 $$ d_{EMPD,surf} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{surf}}{\rho_{material} \frac{du}{d\phi} \pi}} $$
 
@@ -4472,14 +4472,14 @@ $\frac{du}{d\phi}$ = slope of moisture soprtion curve, $a b  \phi^{b-1} + c d \p
 
 #### Field: Deep Layer Penetration Depth
 
-The deep-layer penetration depth is the fictitious thickness of the deep layer in meters, and is used to calculate the volume of material that participates in long-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The deep penetration depth is based on the amount of material that interacts with the surface layer when subject to cyclic relative humidity variation. The deep penetration depth can be estimated with the following equation:
+The Deep Layer Penetration Depth is the fictitious thickness of the deep layer in meters, and is used to calculate the volume of material that participates in long-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a *lumped-capacitance*. The deep penetration depth is based on the amount of material that interacts with the surface layer when subject to cyclic relative humidity variation. The deep penetration depth can be estimated with the following equation:
 
 $$ d_{EMPD,deep} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{deep}} {\rho_{material} \frac{du}{d\phi} \pi}} $$
 
 where each term is the same as the surface layer, except that the cycle period is different. This is usually on the order of weeks for the deep layer.
 
 #### Field: Coating Layer Thickness
-The coating layer thickness (in meters) adds an additional resistance between the surface layer and the zone and represents a thin coating, such as paint, plaster, or other wall coverings.
+The Coating Layer Thickness (in meters) adds an additional resistance between the surface layer and the zone and represents a thin coating, such as paint, plaster, or other wall coverings.
 
 This input is optional, and an input of zero implies no coating.
 
@@ -4501,10 +4501,10 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
     1,                   !- Moisture Equation Coefficient b {dimensionless}
     0,                   !- Moisture Equation Coefficient c {dimensionless}
     1,                   !- Moisture Equation Coefficient d {dimensionless}
-    0.007,              !- Surface-layer penetration depth {m}
-    0.024,               !- Deep-layer penetration depth {m}
-    0,                   !- Coating layer thickness {m}
-    1;                   !- Coating layer water vapor diffusion resistance factor {dimensionless}
+    0.007,               !- Surface Layer Penetration Depth {m}
+    0.024,               !- Deep Layer Penetration Depth {m}
+    0,                   !- Coating Layer Thickness {m}
+    1;                   !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 ```
 
 This set of inputs is for gypsum board with density 750 kg/m^3. This also assumes 2 coats of latex paint:
@@ -4517,10 +4517,10 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
     0.65,                !- Moisture Equation Coefficient b {dimensionless}
     0.022,               !- Moisture Equation Coefficient c {dimensionless}
     10,                  !- Moisture Equation Coefficient d {dimensionless}
-    0.021,               !- Surface-layer penetration depth {m}
-    0.08,                !- Deep-layer penetration depth {m}
-    0.0003,              !- Coating layer thickness {m}
-    6000;                !- Coating layer water vapor diffusion resistance factor {dimensionless}
+    0.021,               !- Surface Layer Penetration Depth {m}
+    0.08,                !- Deep Layer Penetration Depth {m}
+    0.0003,              !- Coating Layer Thickness {m}
+    6000;                !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 ```
 
 Finally, here are values representing the empirical whole-house inputs from Woods et al., 2014 (see Engineering Reference). Density is kg/m^3:
@@ -4533,10 +4533,10 @@ MaterialProperty:MoisturePenetrationDepth:Settings,
     1,                   !- Moisture Equation Coefficient b {dimensionless}
     0,                   !- Moisture Equation Coefficient c {dimensionless}
     1,                   !- Moisture Equation Coefficient d {dimensionless}
-    0.019,               !- Surface-layer penetration depth {m}
-    0.113,               !- Deep-layer penetration depth {m}
-    0,                   !- Coating layer thickness {m}
-    1;                   !- Coating layer water vapor diffusion resistance factor {dimensionless}
+    0.019,               !- Surface Layer Penetration Depth {m}
+    0.113,               !- Deep Layer Penetration Depth {m}
+    0,                   !- Coating Layer Thickness {m}
+    1;                   !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 ```
 
 Other materials inputs can be estimated using the equations above and material properties from a variety of sources, such as [*Kumaran, 1996*](http://www.iea-ebc.org/fileadmin/user_upload/images/Pictures/EBC_Annex_24_Report_3.pdf), the [*WUFI*](http://WUFI.de/en/) simulation software, or the [*ASHRAE 1018-RP*](http://www.techstreet.com/products/1719052) report.
