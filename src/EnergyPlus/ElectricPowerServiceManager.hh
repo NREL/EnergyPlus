@@ -140,7 +140,7 @@ public: // Methods
 	void
 	simulate( 
 		Real64 const powerIntoInverter
-	); // Load Center number counter
+	);
 
 	void
 	reinitAtBeginEnvironment();

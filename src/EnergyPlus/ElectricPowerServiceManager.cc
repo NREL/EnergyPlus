@@ -1695,9 +1695,9 @@ namespace EnergyPlus {
 			case ElectricBussType::aCBuss: {
 				this->genElectProdRate = 0.0;
 				this->genElectricProd = 0.0;
-				for ( auto loop=0; loop < this->numGenerators ; ++loop ) {
-					this->genElectProdRate += this->elecGenCntrlObj[ loop ]->electProdRate; 
-					this->genElectricProd += this->elecGenCntrlObj[ loop ]->electricityProd;
+				for ( auto & gc : this->elecGenCntrlObj ) {
+					this->genElectProdRate += gc->electProdRate; 
+					this->genElectricProd  += gc->electricityProd;
 				}
 				// no inverter, no storage, so generator production equals subpanel feed in
 				this->subpanelFeedInRate = this->genElectProdRate;
@@ -1711,9 +1711,9 @@ namespace EnergyPlus {
 			case ElectricBussType::aCBussStorage: {
 				this->genElectProdRate = 0.0;
 				this->genElectricProd = 0.0;
-				for ( auto loop=0; loop < this->numGenerators ; ++loop ) {
-					this->genElectProdRate += this->elecGenCntrlObj[ loop ]->electProdRate; 
-					this->genElectricProd += this->elecGenCntrlObj[ loop ]->electricityProd;
+				for ( auto & gc : this->elecGenCntrlObj ) {
+					this->genElectProdRate += gc->electProdRate; 
+					this->genElectricProd  += gc->electricityProd;
 				}
 				if ( this->storagePresent ) {
 					this->subpanelFeedInRate = this->genElectProdRate + this->storOpCVDischargeRate - this->storOpCVChargeRate;
@@ -1729,9 +1729,9 @@ namespace EnergyPlus {
 			case ElectricBussType::dCBussInverter: {
 				this->genElectProdRate = 0.0;
 				this->genElectricProd = 0.0;
-				for ( auto loop=0; loop < this->numGenerators ; ++loop ) {
-					this->genElectProdRate += this->elecGenCntrlObj[ loop ]->electProdRate; 
-					this->genElectricProd += this->elecGenCntrlObj[ loop ]->electricityProd;
+				for ( auto & gc : this->elecGenCntrlObj ) {
+					this->genElectProdRate += gc->electProdRate; 
+					this->genElectricProd  += gc->electricityProd;
 				}
 
 				if ( this->inverterObj != nullptr ) {
@@ -1747,9 +1747,9 @@ namespace EnergyPlus {
 			case ElectricBussType::dCBussInverterDCStorage: {
 				this->genElectProdRate = 0.0;
 				this->genElectricProd = 0.0;
-				for ( auto loop=0; loop < this->numGenerators ; ++loop ) {
-					this->genElectProdRate += this->elecGenCntrlObj[ loop ]->electProdRate; 
-					this->genElectricProd += this->elecGenCntrlObj[ loop ]->electricityProd;
+				for ( auto & gc : this->elecGenCntrlObj ) {
+					this->genElectProdRate += gc->electProdRate; 
+					this->genElectricProd  += gc->electricityProd;
 				}
 				if ( this->inverterObj != nullptr ) {
 					this->subpanelFeedInRate = this->inverterObj->getACPowerOut();
@@ -1767,9 +1767,9 @@ namespace EnergyPlus {
 			case ElectricBussType::dCBussInverterACStorage: {
 				this->genElectProdRate = 0.0;
 				this->genElectricProd = 0.0;
-				for ( auto loop=0; loop < this->numGenerators ; ++loop ) {
-					this->genElectProdRate += this->elecGenCntrlObj[ loop ]->electProdRate; 
-					this->genElectricProd += this->elecGenCntrlObj[ loop ]->electricityProd;
+				for ( auto & gc : this->elecGenCntrlObj ) {
+					this->genElectProdRate += gc->electProdRate; 
+					this->genElectricProd  += gc->electricityProd;
 				}
 				if ( this->inverterPresent && this->storagePresent  ) {
 					this->subpanelFeedInRate = this->inverterObj->getACPowerOut() +  this->storOpCVDischargeRate - this->storOpCVChargeRate;
@@ -1790,9 +1790,9 @@ namespace EnergyPlus {
 			} // end switch
 			this->thermalProdRate = 0.0;
 			this->thermalProd = 0.0;
-			for ( auto loop=0; loop < this->numGenerators ; ++loop ) { 
-				this->thermalProdRate += this->elecGenCntrlObj[ loop ]->thermProdRate;
-				this->thermalProd += this->elecGenCntrlObj[ loop ]->thermalProd;
+			for ( auto & gc : this->elecGenCntrlObj ) { 
+				this->thermalProdRate += gc->thermProdRate;
+				this->thermalProd     += gc->thermalProd;
 			}
 		}
 	}

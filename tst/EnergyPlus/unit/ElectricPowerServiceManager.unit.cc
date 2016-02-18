@@ -372,15 +372,16 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2
 	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 0 ]->thermalProd     = 500.0*3600.0;
 	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 1 ]->thermalProd     = 750.0*3600.0;
 
-	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->drawnPower   = 200.0;
-	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->storedPower  = 150.0;
-	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->drawnEnergy  = 200.0*3600.0;
-	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storageObj->storedEnergy = 150.0*3600.0;
+	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storOpCVDischargeRate   = 200.0;
+	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storOpCVChargeRate      = 150.0;
+
 
 	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->updateLoadCenterGeneratorRecords();
 
-	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->genElectProdRate, 3050.0, 0.1 );
-	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->genElectricProd, 3050.0*3600.0, 0.1 );
+	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->genElectProdRate,   3000.0, 0.1 );
+	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->genElectricProd,    3000.0*3600.0, 0.1 );
+	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->subpanelFeedInRate, 3050.0, 0.1 );
+	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->subpanelDrawRate,      0.0, 0.1 );
 
 	}
 
@@ -398,9 +399,22 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3
 "    0,                       !- Demand Limit Scheme Purchased Electric Demand Limit {W}",
 "    ,                        !- Track Schedule Name Scheme Schedule Name",
 "    ,                        !- Track Meter Scheme Meter Name",
-"    DirectCurrentWithInverter,                  !- Electrical Buss Type",
-"    Test Inverter ,                        !- Inverter Object Name",
-"    ;       !- Electrical Storage Object Name",
+"    DirectCurrentWithInverter,    !- Electrical Buss Type",
+"    Test Inverter ,          !- Inverter Object Name",
+"    ,                        !- Electrical Storage Object Name",
+"    ,                        !- Transformer Object Name",
+"    ,                        !- Storage Operation Scheme",
+"    ,                        !- Storage Control Track Meter Name",
+"    ,                        !- Storage Converter Object Name",
+"    ,                        !- Maximum Storage State of Charge Fraction",
+"    ,                        !- Minimum Storage State of Charge Fraction",
+"    100000,                  !- Design Storage Control Charge Power",
+"    ,                        !- Storage Charge Power Fraction Schedule Name",
+"    100000,                  !- Design Storage Control Discharge Power",
+"    ,                        !- Storage Discharge Power Fraction Schedule Name",
+"    ,                        !- Storage Control Utility Demand Target",
+"    ;                        !- Storage Control Utility Demand Target Fraction Schedule Name  ",
+
 
 "  ElectricLoadCenter:Inverter:Simple,",
 "    Test Inverter,",
@@ -441,13 +455,19 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3
 	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->bussType = ElectPowerLoadCenter::ElectricBussType::dCBussInverter;
 	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj = std::unique_ptr < DCtoACInverter >( new DCtoACInverter( "TEST INVERTER") );
 	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterPresent = true;
+//	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->generatorsPresent = true;
+	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 0 ]->electProdRate = 1000.0;
 
-	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj->aCPowerOut  = 5000.0;
-	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj->aCEnergyOut = 5000.0*3600.0;
+	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 1 ]->electProdRate = 2000.0;
+
+	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 0 ]->electricityProd = 1000.0*3600.0;
+	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->elecGenCntrlObj[ 1 ]->electricityProd = 2000.0*3600.0;
 	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->updateLoadCenterGeneratorRecords();
-
-	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->genElectProdRate,   5000.0, 0.1 );
-	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->genElectricProd, 5000.0*3600.0, 0.1 );
+	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->inverterObj->simulate( 3000.0 );
+	facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->updateLoadCenterGeneratorRecords();
+	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->genElectProdRate,   3000.0, 0.1 );
+	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->genElectricProd,    3000.0*3600.0, 0.1 );
+	EXPECT_NEAR( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->subpanelFeedInRate, 3000.0, 0.1 );
 }
 
 TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4 )
