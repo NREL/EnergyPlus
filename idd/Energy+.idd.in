@@ -321,6 +321,8 @@
 !      W/m2                   =>   W/m2                1
 !      W/m-K                  =>   Btu/h-ft-F          0.577796066000163
 !      W/person               =>   W/person            1
+!      W/(m3/s)               =>   W/(gal/min)         0.0000630902
+!      W/((m3/s)-Pa)          =>   W/((gal/min)-ftH20) 0.188554
 !
 ! Units fields that are not translated
 !      $
@@ -20733,10 +20735,12 @@ SwimmingPool:Indoor,
   N6,  \field Pool Heating System Maximum Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
   N7,  \field Pool Miscellaneous Equipment Power
        \note Power input per pool water flow rate
        \units W/(m3/s)
+       \ip-units W/(gal/min)
        \type real
        \minimum 0.0
   A8,  \field Setpoint Temperature Schedule
@@ -22246,6 +22250,7 @@ ZoneCoolTower:Shower,
  N1, \field Maximum Water Flow Rate
      \required-field
      \units m3/s
+     \ip-units gal/min
      \type real
  N2, \field Effective Tower Height
      \note This field is from either the spray or the wet pad to the top of the outlet.
@@ -24316,6 +24321,7 @@ Exterior:WaterEquipment,
   N1 , \field Design Level
        \required-field
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   A4 ; \field End-Use Subcategory
@@ -34219,6 +34225,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \autosizable
        \type real
        \units m3/s
+       \ip-units gal/min
   N7,  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -36792,6 +36799,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \default MeanAirTemperature
    N3 , \field Rated Flow Rate
         \units m3/s
+        \ip-units gal/min
         \autosizable
    A6 , \field Pump Flow Rate Schedule Name
         \note Modifies the Rated Flow Rate of the pump on a time basis
@@ -38632,17 +38640,14 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
        \units m3/s
        \minimum 0.0
        \autosizable
-  A5,  \field Hot Water or Steam Inlet Node Name
-       \deprecated
-       \type node
-  A6,  \field Reheat Coil Object Type
+  A5,  \field Reheat Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A7,  \field Reheat Coil Name
+  A6,  \field Reheat Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -38885,32 +38890,29 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
        \note fraction of cooling air flow rate
   A3,  \field Air Inlet Node Name
        \type node
-       \deprecated
+       \note The name of the HVAC system node that is the air inlet node for the 
+       \note terminal unit. This is also the air inlet node for the unit’s fan.  
   A4,  \field Air Outlet Node Name
        \type node
-       \deprecated
-  A5,  \field Heating Coil Air Inlet Node Name
-       \type node
-       \deprecated
-  A6,  \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
-  A7,  \field Fan Object Type
+       \note The name of the HVAC system node that is the air outlet node for the 
+       \note terminal unit. This is also the air outlet node for the unit’s heating
+       \note coil’s air outlet node. This node is also a zone inlet node.
+  A5,  \field Fan Object Type
        \required-field
        \type choice
        \key Fan:VariableVolume
-  A8,  \field Fan Name
+  A6,  \field Fan Name
        \required-field
        \type object-list
        \object-list FansVAV
-  A9,  \field Heating Coil Object Type
+  A7,  \field Heating Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A10, \field Heating Coil Name
+  A8,  \field Heating Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -38965,7 +38967,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
 AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \memo Central air system terminal unit, single duct, variable volume for both cooling and
        \memo heating, with reheat coil (hot water, electric, gas, or steam).
-       \min-fields 12
+       \min-fields 11
   A1,  \field Name
        \required-field
   A2 , \field Availability Schedule Name
@@ -38992,17 +38994,14 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \minimum 0.0
        \maximum 1.0
        \note fraction of maximum air flow
-  A5,  \field Hot Water or Steam Inlet Node Name
-       \deprecated
-       \type node
-  A6,  \field Reheat Coil Object Type
+  A5,  \field Reheat Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
        \key Coil:Heating:Electric
        \key Coil:Heating:Gas
        \key Coil:Heating:Steam
-  A7,  \field Reheat Coil Name
+  A6,  \field Reheat Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -39018,7 +39017,7 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A8,  \field Air Outlet Node Name
+  A7,  \field Air Outlet Node Name
        \required-field
        \type node
        \note The outlet node of the terminal unit and the reheat coil.
@@ -39102,9 +39101,6 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A11, \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
   N6;  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -39186,9 +39182,6 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
        \minimum 0.0
        \default 0.0
        \ip-units gal/min
-  A11, \field Hot Water or Steam Inlet Node Name
-       \type node
-       \deprecated
   N7;  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -39228,17 +39221,11 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type node
        \required-field
        \note should be a zone inlet node
-  A6,  \field Hot Water Inlet Node Name
-       \type node
-       \deprecated
-  A7,  \field Cold Water Inlet Node Name
-       \type node
-       \deprecated
-  A8,  \field Heating Coil Object Type
+  A6,  \field Heating Coil Object Type
        \required-field
        \type choice
        \key Coil:Heating:Water
-  A9,  \field Heating Coil Name
+  A7,  \field Heating Coil Name
        \required-field
        \type object-list
        \object-list HeatingCoilName
@@ -39259,11 +39246,11 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type real
        \minimum> 0.0
        \default 0.001
-  A10, \field Cooling Coil Object Type
+  A8,  \field Cooling Coil Object Type
        \type choice
        \key Coil:Cooling:Water
        \key Coil:Cooling:Water:DetailedGeometry
-  A11, \field Cooling Coil Name
+  A9,  \field Cooling Coil Name
        \type object-list
        \object-list CoolingCoilName
   N6,  \field Maximum Cold Water Flow Rate
@@ -39281,7 +39268,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \type real
        \minimum> 0.0
        \default 0.001
-  A12; \field Zone Mixer Name
+  A10; \field Zone Mixer Name
        \required-field
        \type object-list
        \object-list ZoneMixers
@@ -39343,12 +39330,14 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
   N2 , \field Design Chilled Water Volume Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \autosizable
        \default autosize
   N3 , \field Design Hot Water Volume Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \autosizable
        \default autosize
@@ -39381,6 +39370,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \note The volume flow rate of chilled water per meter of beam length at the rating point.
        \type real
        \units m3/s-m
+       \ip-units gal/min-ft
        \minimum> 0.0
        \default 0.00005
   A11, \field Beam Cooling Capacity Temperature Difference Modification Factor Curve Name
@@ -39423,6 +39413,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \note The volume flow rate of hoy water per meter of beam length at the rating point.
        \type real
        \units m3/s-m
+       \ip-units gal/min-ft
        \minimum> 0.0
        \default 0.00005
   A14, \field Beam Heating Capacity Temperature Difference Modification Factor Curve Name
@@ -39488,6 +39479,7 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
   N2,  \field Maximum Total Chilled Water Volumetric Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \autosizable
        \default autosize
@@ -45646,6 +45638,7 @@ Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N2,  \field Nominal Cooling Coil Capacity
         \required-field
         \type real
@@ -45814,6 +45807,7 @@ Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N2,  \field Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
         \required-field
@@ -45961,6 +45955,7 @@ Coil:Cooling:WaterToAirHeatPump:EquationFit,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
         \autosizable
    N3,  \field Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
@@ -46100,6 +46095,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N5,  \field Rated Water Flow Rate At Selected Nominal Speed Level
         \units m3/s
+        \ip-units gal/min
         \type real
         \autosizable
         \default autosize
@@ -46155,6 +46151,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N13, \field Speed 1 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
         \required-field
@@ -46239,6 +46236,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N19, \field Speed 2 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A14, \field Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -46314,6 +46312,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N25, \field Speed 3 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A21, \field Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -46396,6 +46395,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N31, \field Speed 4 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A28, \field Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -46478,6 +46478,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N37, \field Speed 5 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A35, \field Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -46560,6 +46561,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N43, \field Speed 6 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A42, \field Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -46642,6 +46644,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N49, \field Speed 7 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A49, \field Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -46724,6 +46727,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N55, \field Speed 8 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A56, \field Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -46806,6 +46810,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N61, \field Speed 9 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A63, \field Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -46888,6 +46893,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N67, \field Speed 10 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A70, \field Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -46982,6 +46988,7 @@ Coil:Heating:WaterToAirHeatPump:EquationFit,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
         \autosizable
    N3,  \field Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
@@ -47073,6 +47080,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N5,  \field Rated Water Flow Rate At Selected Nominal Speed Level
         \units m3/s
+        \ip-units gal/min
         \type real
         \autosizable
         \default autosize
@@ -47103,6 +47111,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N9,  \field Speed 1 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
         \required-field
@@ -47182,6 +47191,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N14, \field Speed 2 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A14, \field Speed 2 Heating Capacity Function of Temperature Curve Name
@@ -47253,6 +47263,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N19, \field Speed 3 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A21, \field Speed 3 Heating Capacity Function of Temperature Curve Name
@@ -47330,6 +47341,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N24, \field Speed 4 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A28, \field Speed 4 Heating Capacity Function of Temperature Curve Name
@@ -47407,6 +47419,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N29, \field Speed 5 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A35, \field Speed 5 Heating Capacity Function of Temperature Curve Name
@@ -47484,6 +47497,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N34, \field Speed 6 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A42, \field Speed 6 Heating Capacity Function of Temperature Curve Name
@@ -47561,6 +47575,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N39, \field Speed 7 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A49, \field Speed 7 Heating Capacity Function of Temperature Curve Name
@@ -47638,6 +47653,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N44, \field Speed 8 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A56, \field Speed 8 Heating Capacity Function of Temperature Curve Name
@@ -47715,6 +47731,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N49, \field Speed 9 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A63, \field Speed 9 Heating Capacity Function of Temperature Curve Name
@@ -47792,6 +47809,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N54, \field Speed 10 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A70, \field Speed 10 Heating Capacity Function of Temperature Curve Name
@@ -47923,6 +47941,7 @@ Coil:WaterHeating:AirToWaterHeatPump:Pumped,
   N8 , \field Rated Condenser Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \autocalculatable
        \note Condenser water flow rate corresponding to rated coil performance
@@ -48307,6 +48326,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
   N8 , \field Rated Condenser Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \autocalculatable
        \note Condenser water flow rate corresponding to rated coil performance
@@ -48434,6 +48454,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \required-field
   N16, \field Speed 1 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
        \required-field
@@ -48521,6 +48542,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N22, \field Speed 2 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N23, \field Speed 2 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48600,6 +48622,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N28, \field Speed 3 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N29, \field Speed 3 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48679,6 +48702,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N34, \field Speed 4 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N35, \field Speed 4 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48758,6 +48782,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N40, \field Speed 5 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N41, \field Speed 5 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48837,6 +48862,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N46, \field Speed 6 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N47, \field Speed 6 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48916,6 +48942,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N52, \field Speed 7 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N53, \field Speed 7 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48995,6 +49022,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N58, \field Speed 8 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N59, \field Speed 8 Reference Unit Water Pump Input Power At Rated Conditions
@@ -49074,6 +49102,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N64, \field Speed 9 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N65, \field Speed 9 Reference Unit Water Pump Input Power At Rated Conditions
@@ -49153,6 +49182,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N70, \field Speed 10 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N71, \field Speed 10 Reference Unit Water Pump Input Power At Rated Conditions
@@ -49312,11 +49342,13 @@ Coil:WaterHeating:Desuperheater,
        \required-field
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \note The operating water flow rate.
   N7 , \field Water Pump Power
        \type real
        \units W
+       \ip-units W
        \minimum 0.0
        \default 0.0
        \note The water circulation pump electric power.
@@ -49564,6 +49596,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \note This field is required when Storage Type is UserDefinedFluidType
   N1 , \field Fluid Storage Volume
        \units m3
+       \ip-units gal
        \type real
        \minimum> 0
        \note required field if Storage Type is Water or UserDefinedFluidType
@@ -50297,6 +50330,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
   N40, \field Storage Tank Plant Connection Design Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
   N41, \field Storage Tank Plant Connection Heat Transfer Effectiveness
        \type real
@@ -50532,15 +50566,17 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note This is the nominal design pump power of water recirculation and spray for evaporation at design air flow
        \note rates and cooler design effectiveness
        \autosizable
+       \default autosize
   N4 , \field Water Pump Power Sizing Factor
        \type real
        \units W/(m3/s)
+       \ip-units W/(gal/min)
        \default 90.0
        \note This field is used when the previous field is set to autosize. The pump power is scaled with Secondary Air
        \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power
        \note sizing factor was estimated from pump power and secondary air design flow rates inputs from energyplus example
        \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Secondary Air Design Flow Rate). The factor ranges from
-       \note 55.0 to 150.0 [W/(m3/s)] were noted.
+       \note 55.0 to 150.0 [W/(m3/s)] were noted. The pump power can be sized to zero by setting this factor to zero.
   A5 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
        \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Air
@@ -50557,6 +50593,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
+       \default autosize
   N6 , \field Secondary Air Flow Scaling Factor
        \type real
        \units dimensionless
@@ -50568,6 +50605,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units W
        \note This is the fan design power at Secondary Design Air Flow Rate. This is the nominal design power at full speed.
        \autosizable
+       \default autosize
   N8 , \field Secondary Air Fan Sizing Specific Power
        \type real
        \units W/(m3/s)
@@ -50597,6 +50635,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
+       \default autosize
   N10, \field Dewpoint Effectiveness Factor
        \type real
        \minimum 0.0
@@ -50700,6 +50739,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
+       \default autosize
   N3 , \field Recirculating Water Pump Design Power
        \units W
        \ip-units W
@@ -50707,15 +50747,17 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note This is the design water pump or spray for evaporation at the primary air design air flow rates
        \note and cooler design effectiveness
        \autosizable
+       \default autosize
   N4 , \field Water Pump Power Sizing Factor
        \type real
        \units W/(m3/s)
+       \ip-units W/(gal/min)
        \default 90.0
        \note This field is used when the previous field is set to autosize. The pump power is scaled with Secondary Air
        \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power
        \note sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example
        \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Primary Air Design Flow Rate). The factor ranges from
-       \note 55.0 to 150.0 [W/(m3/s)].
+       \note 55.0 to 150.0 [W/(m3/s)]. The pump power can be sized to zero by setting this factor to zero.
   A4 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
        \note x = ff = flow fraction on the primary air. The flow fraction is the secondary air flow rate during current operation divided
@@ -52111,6 +52153,7 @@ AirLoopHVAC:UnitarySystem,
   N25, \field Design Heat Recovery Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
@@ -53284,6 +53327,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
         \note Used for heat recovery to an EnergyPlus plant loop.
         \units m3/s
+        \ip-units gal/min
         \minimum 0.0
         \default 0.0
    N7,  \field Maximum Temperature for Heat Recovery
@@ -53806,6 +53850,7 @@ AirConditioner:VariableRefrigerantFlow,
   N23, \field Water Condenser Volume Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \autosizable
        \note Only used when Condenser Type = WaterCooled.
   N24, \field Evaporative Condenser Effectiveness
@@ -54484,11 +54529,13 @@ Controller:WaterCoil,
   N2 , \field Maximum Actuated Flow
        \type real
        \units m3/s
+       \ip-units gal/min
        \autosizable
   N3 ; \field Minimum Actuated Flow
        \type real
        \default 0.0000001
        \units m3/s
+       \ip-units gal/min
 
 Controller:OutdoorAir,
        \memo Controller to set the outdoor air flow rate for an air loop. Control options include
@@ -58881,6 +58928,7 @@ PipingSystem:Underground:PipeCircuit,
         \required-field
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0
    A2,  \field Circuit Inlet Node
         \required-field
@@ -58998,40 +59046,39 @@ Pump:VariableSpeed,
        \memo This pump model is described in the ASHRAE secondary HVAC toolkit.
        \min-fields 14
   A1 , \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Rated Flow Rate
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
-  N2 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N3 , \field Rated Power Consumption
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \required-field
+       \type node
+  N1 , \field Design Maximum Flow Rate
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
+  N2 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N3 , \field Design Power Consumption
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
+       \units W
+       \autosizable
+       \ip-units W
   N4 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N5 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   N6 , \field Coefficient 1 of the Part Load Performance Curve
        \default 0.0
   N7 , \field Coefficient 2 of the Part Load Performance Curve
@@ -59040,10 +59087,11 @@ Pump:VariableSpeed,
        \default 0.0
   N9 , \field Coefficient 4 of the Part Load Performance Curve
        \default 0.0
-  N10, \field Minimum Flow Rate
-        \note This value can be zero and will be defaulted to that if not specified.
+  N10, \field Design Minimum Flow Rate
+        \note When autosized the scaling factor is the input field Design Minimum Flow Rate Fraction
         \units m3/s
-        \default 0.0
+        \autosizable
+        \default autosize
         \ip-units gal/min
   A4 , \field Pump Control Type
         \type choice
@@ -59072,11 +59120,11 @@ Pump:VariableSpeed,
         \units m
         \type real
         \note "D" in above expression in field A6
-  A7 , \field VFD Control Type
-         \type choice
-         \key ManualControl
-         \key PressureSetpointControl
-  A8 , \field Pump rpm Schedule Name
+  A7 ,  \field VFD Control Type
+        \type choice
+        \key ManualControl
+        \key PressureSetpointControl
+  A8 ,  \field Pump rpm Schedule Name
         \note Modifies the rpm of the pump on a time basis. Default is
         \note that the pump is on and runs according to its other operational requirements
         \note specified above.  The schedule is for special pump operations.
@@ -59102,309 +59150,432 @@ Pump:VariableSpeed,
         \note optional, if used pump losses transfered to zone as internal gains
         \type object-list
         \object-list ZoneNames
-  N12;  \field Skin Loss Radiative Fraction
+  N12,  \field Skin Loss Radiative Fraction
         \note optional. If zone identified in previous field then this determines
         \note the split between convection and radiation for the skin losses
         \type real
         \minimum 0.0
+        \maximum 1.0
+  A14,  \field Design Power Sizing Method
+        \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+        \type choice
+        \key PowerPerFlow
+        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
+        \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
+        \key PowerPerFlowPerPressure
+        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
+        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+        \default PowerPerFlowPerPressure
+  N13,  \field Design Electric Power per Unit Flow Rate
+        \type real
+        \note Used to size Design Power Consumption from design flow rate
+        \default 348701.1
+        \units W/(m3/s)
+        \ip-units W/(gal/min)
+        \minimum> 0
+  N14,  \field Design Shaft Power per Unit Flow Rate per Unit Head
+        \type real
+        \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+        \default 1.282051282
+        \units W/((m3/s)-Pa)
+        \ip-units W/((gal/min)-ftH20)
+        \minimum> 0
+  N15;  \field Design Minimum Flow Rate Fraction
+        \type real
+        \note Used to size Design Minimum Flow Rate
+        \default 0.0
+        \minimum 0
         \maximum 1.0
 
 Pump:ConstantSpeed,
        \memo This pump model is described in the ASHRAE secondary HVAC toolkit.
        \min-fields 9
   A1,  \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Rated Flow Rate
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
-  N2 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N3 , \field Rated Power Consumption
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \required-field
+       \type node
+  N1 , \field Design Flow Rate
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
+  N2 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N3 , \field Design Power Consumption
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
+       \units W
+       \autosizable
+       \ip-units W
   N4 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N5 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   A4 , \field Pump Control Type
-        \type choice
-        \key Continuous
-        \key Intermittent
-        \default Continuous
+       \type choice
+       \key Continuous
+       \key Intermittent
+       \default Continuous
   A5 , \field Pump Flow Rate Schedule Name
-        \note Modifies the rated flow rate of the pump on a time basis. Default is
-        \note that the pump is on and runs according to its other operational requirements
-        \note specified above.  The schedule is for special pump operations.
-        \type object-list
-        \object-list ScheduleNames
+       \note Modifies the rated flow rate of the pump on a time basis. Default is
+       \note that the pump is on and runs according to its other operational requirements
+       \note specified above.  The schedule is for special pump operations.
+       \type object-list
+       \object-list ScheduleNames
   A6 , \field Pump Curve Name
-        \type object-list
-        \object-list UniVariateCurves
-        \object-list UniVariateTables
-        \note This references any single independent variable polynomial curve in order to
-        \note  do pressure vs. flow calculations for this pump.  The available types are then:
-        \note  Linear, Quadratic, Cubic, and Quartic
-        \note The non-dimensional pump pressure relationship is of the following form:
-        \note  (psi = C4*phi^4 + C3*phi^3 + C2*phi^2 + C1*phi + C0)
-        \note Where the non-dimensional variables are defined as:
-        \note  delP = rho * ((N/60)^2) * (D^2) * psi
-        \note  mdot = rho * (N/60) * (D^3) * phi
+       \type object-list
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+       \note This references any single independent variable polynomial curve in order to
+       \note  do pressure vs. flow calculations for this pump.  The available types are then:
+       \note  Linear, Quadratic, Cubic, and Quartic
+       \note The non-dimensional pump pressure relationship is of the following form:
+       \note  (psi = C4*phi^4 + C3*phi^3 + C2*phi^2 + C1*phi + C0)
+       \note Where the non-dimensional variables are defined as:
+       \note  delP = rho * ((N/60)^2) * (D^2) * psi
+       \note  mdot = rho * (N/60) * (D^3) * phi
   N6 , \field Impeller Diameter
-        \units m
-        \type real
-        \note "D" in above expression in field A6
+       \units m
+       \type real
+       \note "D" in above expression in field A6
   N7 , \field Rotational Speed
-        \units rev/min
-        \type real
-        \note "N" in above expression in field A6
-  A7,   \field Zone Name
-        \note optional, if used pump losses transfered to zone as internal gains
-        \type object-list
-        \object-list ZoneNames
-  N8;   \field Skin Loss Radiative Fraction
-        \note optional. If zone identified in previous field then this determines
-        \note the split between convection and radiation for the skin losses
-        \type real
-        \minimum 0.0
-        \maximum 1.0
+       \units rev/min
+       \type real
+       \note "N" in above expression in field A6
+  A7,  \field Zone Name
+       \note optional, if used pump losses transfered to zone as internal gains
+       \type object-list
+       \object-list ZoneNames
+  N8,  \field Skin Loss Radiative Fraction
+       \note optional. If zone identified in previous field then this determines
+       \note the split between convection and radiation for the skin losses
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A8,  \field Design Power Sizing Method
+       \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+       \type choice
+       \key PowerPerFlow
+       \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
+       \key PowerPerFlowPerPressure
+       \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+       \default PowerPerFlowPerPressure
+  N9,  \field Design Electric Power per Unit Flow Rate
+       \type real
+       \note Used to size Design Power Consumption from design flow rate
+       \default 348701.1
+       \units W/(m3/s)
+       \ip-units W/(gal/min)
+       \minimum> 0
+  N10; \field Design Shaft Power per Unit Flow Rate per Unit Head
+       \type real
+       \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+       \default 1.282051282
+       \units W/((m3/s)-Pa)
+       \ip-units W/((gal/min)-ftH20)
+       \minimum> 0
 
 Pump:VariableSpeed:Condensate,
        \memo This pump model is described in the ASHRAE secondary HVAC toolkit.
        \memo Variable Speed Condensate pump for Steam Systems
        \min-fields 13
   A1 , \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Rated Flow Rate
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
-  N2 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N3 , \field Rated Power Consumption
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \required-field
+       \type node
+  N1 , \field Design Steam Volume Flow Rate
+       \note this is the volume of steam before condensation, the volume of condensate is much lower and calculated from steam density
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
+  N2 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N3 , \field Design Power Consumption
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
+       \units W
+       \autosizable
+       \ip-units W
   N4 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N5 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   N6 , \field Coefficient 1 of the Part Load Performance Curve
        \default 0.0
   N7 , \field Coefficient 2 of the Part Load Performance Curve
        \default 1.0
   N8 , \field Coefficient 3 of the Part Load Performance Curve
        \default 0.0
-  N9 , \field Coefficient 4 of the Part Load Performance Curve
+  N9,  \field Coefficient 4 of the Part Load Performance Curve
        \default 0.0
   A4 , \field Pump Flow Rate Schedule Name
-        \note Modifies the rated flow rate of the pump on a time basis. Default is
-        \note that the pump is on and runs according to its other operational requirements
-        \note specified above.  The schedule is for special pump operations.
-        \type object-list
-        \object-list ScheduleNames
-  A5 ,  \field Zone Name
-        \note optional, if used pump losses transfered to zone as internal gains
-        \type object-list
-        \object-list ZoneNames
-  N10;  \field Skin Loss Radiative Fraction
-        \note optional. If zone identified in previous field then this determines
-        \note the split between convection and radiation for the skin losses
-        \type real
-        \minimum 0.0
-        \maximum 1.0
+       \note Modifies the rated flow rate of the pump on a time basis. Default is
+       \note that the pump is on and runs according to its other operational requirements
+       \note specified above.  The schedule is for special pump operations.
+       \type object-list
+       \object-list ScheduleNames
+  A5 , \field Zone Name
+       \note optional, if used pump losses transfered to zone as internal gains
+       \type object-list
+       \object-list ZoneNames
+  N10, \field Skin Loss Radiative Fraction
+       \note optional. If zone identified in previous field then this determines
+       \note the split between convection and radiation for the skin losses
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A6,  \field Design Power Sizing Method
+       \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+       \type choice
+       \key PowerPerFlow
+       \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
+       \key PowerPerFlowPerPressure
+       \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+       \default PowerPerFlowPerPressure
+  N11, \field Design Electric Power per Unit Flow Rate
+       \type real
+       \note Used to size Design Power Consumption from design flow rate
+       \default 348701.1
+       \units W/(m3/s)
+       \ip-units W/(gal/min)
+       \minimum> 0
+  N12; \field Design Shaft Power per Unit Flow Rate per Unit Head
+       \type real
+       \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+       \default 1.282051282
+       \units W/((m3/s)-Pa)
+       \ip-units W/((gal/min)-ftH20)
+       \minimum> 0
 
 HeaderedPumps:ConstantSpeed,
        \memo This Headered pump object describes a pump bank with more than 1 pump in parallel
        \min-fields 9
   A1 , \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Total Rated Flow Rate
-        \note If the field is not autosized set to the flow rate to
-        \note the total flow when all pumps are running at full load
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
+       \required-field
+       \type node
+  N1 , \field Total Design Flow Rate
+       \note If the field is not autosized set to the flow rate to
+       \note the total flow when all pumps are running at full load
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
   N2 , \field Number of Pumps in Bank
        \type integer
   A4 , \field Flow Sequencing Control Scheme
-        \type choice
-        \key Sequential
-        \default Sequential
-  N3 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N4 , \field Rated Power Consumption
-        \note If the field is not autosized set to the power consumed by the pump bank
-        \note when all the pumps are running at nominal flow
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Total Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \type choice
+       \key Sequential
+       \default Sequential
+  N3 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N4 , \field Design Power Consumption
+       \note If the field is not autosized set to the power consumed by the pump bank
+       \note when all the pumps are running at nominal flow
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
+       \units W
+       \autosizable
+       \ip-units W
   N5 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N6 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   A5 , \field Pump Control Type
-        \type choice
-        \key Continuous
-        \key Intermittent
-        \default Continuous
+       \type choice
+       \key Continuous
+       \key Intermittent
+       \default Continuous
   A6 , \field Pump Flow Rate Schedule Name
-        \note Modifies the rated flow rate of the pump on a time basis. Default is
-        \note that the pump is on and runs according to its other operational requirements
-        \note specified above.  The schedule is for special pump operations.
-        \type object-list
-        \object-list ScheduleNames
-  A7 ,  \field Zone Name
-        \note optional, if used pump losses transfered to zone as internal gains
-        \type object-list
-        \object-list ZoneNames
-  N7 ;  \field Skin Loss Radiative Fraction
-        \note optional. If zone identified in previous field then this determines
-        \note the split between convection and radiation for the skin losses
-        \type real
-        \minimum 0.0
-        \maximum 1.0
+       \note Modifies the rated flow rate of the pump on a time basis. Default is
+       \note that the pump is on and runs according to its other operational requirements
+       \note specified above.  The schedule is for special pump operations.
+       \type object-list
+       \object-list ScheduleNames
+  A7 , \field Zone Name
+       \note optional, if used pump losses transfered to zone as internal gains
+       \type object-list
+       \object-list ZoneNames
+  N7 , \field Skin Loss Radiative Fraction
+       \note optional. If zone identified in previous field then this determines
+       \note the split between convection and radiation for the skin losses
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A8,  \field Design Power Sizing Method
+       \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+       \type choice
+       \key PowerPerFlow
+       \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
+       \key PowerPerFlowPerPressure
+       \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+       \default PowerPerFlowPerPressure
+  N8,  \field Design Electric Power per Unit Flow Rate
+       \type real
+       \note Used to size Design Power Consumption from design flow rate
+       \default 348701.1
+       \units W/(m3/s)
+       \ip-units W/(gal/min)
+       \minimum> 0
+  N9; \field Design Shaft Power per Unit Flow Rate per Unit Head
+       \type real
+       \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+       \default 1.282051282
+       \units W/((m3/s)-Pa)
+       \ip-units W/((gal/min)-ftH20)
+       \minimum> 0
 
 HeaderedPumps:VariableSpeed,
        \memo This Headered pump object describes a pump bank with more than 1 pump in parallel
        \min-fields 14
   A1 , \field Name
-        \required-field
+       \required-field
   A2 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A3 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field Total Rated Flow Rate
-        \note If the field is not autosized set to the flow rate to
-        \note the total flow when all pumps are running at full load
-        \units m3/s
-        \autosizable
-        \ip-units gal/min
-        \minimum> 0
+       \required-field
+       \type node
+  N1 , \field Total Design Flow Rate
+       \note If the field is not autosized set to the flow rate to
+       \note the total flow when all pumps are running at full load
+       \units m3/s
+       \autosizable
+       \ip-units gal/min
+       \minimum> 0
   N2 , \field Number of Pumps in Bank
        \type integer
   A4 , \field Flow Sequencing Control Scheme
-        \type choice
-        \key Sequential
-        \default Sequential
-  N3 , \field Rated Pump Head
-        \units Pa
-        \default 179352
-        \note default head is 60 feet
-        \ip-units ftH2O
-  N4 , \field Rated Power Consumption
-        \note If the field is not autosized set to the power consumed by the pump bank
-        \note when all the pumps are running at nominal flow
-        \note If this field is autosized, an impeller efficiency of 0.78 is assumed.
-        \note autosized Rated Power Consumption = Total Rated Flow Rate * Rated Pump Head / (0.78 * Motor Efficiency)
-        \units W
-        \autosizable
-        \ip-units W
+       \type choice
+       \key Sequential
+       \default Sequential
+  N3 , \field Design Pump Head
+       \units Pa
+       \default 179352
+       \note default head is 60 feet
+       \ip-units ftH2O
+  N4 , \field Design Power Consumption
+       \note If the field is not autosized set to the power consumed by the pump bank
+       \note when all the pumps are running at nominal flow
+       \note When autosized the type of scaling factor is chosen in the input field Design Power Sizing Method
+       \units W
+       \autosizable
+       \ip-units W
   N5 , \field Motor Efficiency
-        \note This is the motor efficiency only. When the Rated Power Consumption if autosized,
-        \note an impeller efficiency of 0.78 is assumed in addition to the motor efficiency.
-        \type real
-        \minimum> 0.0
-        \maximum 1.0
-        \default 0.9
+       \note This is the motor efficiency only. When the Design Power Consumption is autosized using PowerPerFlowPerPressure,
+       \note the Design Shaft Power per Unit Flow Rate per Unit Head is used in addition to the motor efficiency.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.9
   N6 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   N7 , \field Coefficient 1 of the Part Load Performance Curve
        \default 0.0
   N8 , \field Coefficient 2 of the Part Load Performance Curve
        \default 1.0
-  N9 , \field Coefficient 3 of the Part Load Performance Curve
+  N9, \field Coefficient 3 of the Part Load Performance Curve
        \default 0.0
   N10, \field Coefficient 4 of the Part Load Performance Curve
        \default 0.0
   N11, \field Minimum Flow Rate Fraction
-        \note This value can be zero and will be defaulted to that if not specified.
-        \default 0.0
-        \minimum 0.0
-        \maximum 1.0
+       \note This value can be zero and will be defaulted to that if not specified.
+       \default 0.0
+       \minimum 0.0
+       \maximum 1.0
   A5 , \field Pump Control Type
-        \type choice
-        \key Continuous
-        \key Intermittent
-        \default Continuous
+       \type choice
+       \key Continuous
+       \key Intermittent
+       \default Continuous
   A6 , \field Pump Flow Rate Schedule Name
-        \note Modifies the rated flow rate of the pump on a time basis. Default is
-        \note that the pump is on and runs according to its other operational requirements
-        \note specified above.  The schedule is for special pump operations.
-        \type object-list
-        \object-list ScheduleNames
-  A7 ,  \field Zone Name
-        \note optional, if used pump losses transfered to zone as internal gains
-        \type object-list
-        \object-list ZoneNames
-  N12;  \field Skin Loss Radiative Fraction
-        \note optional. If zone identified in previous field then this determines
-        \note the split between convection and radiation for the skin losses
-        \type real
-        \minimum 0.0
-        \maximum 1.0
+       \note Modifies the rated flow rate of the pump on a time basis. Default is
+       \note that the pump is on and runs according to its other operational requirements
+       \note specified above.  The schedule is for special pump operations.
+       \type object-list
+       \object-list ScheduleNames
+  A7 , \field Zone Name
+       \note optional, if used pump losses transfered to zone as internal gains
+       \type object-list
+       \object-list ZoneNames
+  N12, \field Skin Loss Radiative Fraction
+       \note optional. If zone identified in previous field then this determines
+       \note the split between convection and radiation for the skin losses
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+  A8,  \field Design Power Sizing Method
+       \note Used to indicate which sizing factor is used to calculate Design Power Consumption.
+       \type choice
+       \key PowerPerFlow
+       \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
+       \key PowerPerFlowPerPressure
+       \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
+       \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
+       \default PowerPerFlowPerPressure
+  N13, \field Design Electric Power per Unit Flow Rate
+       \type real
+       \note Used to size Design Power Consumption from design flow rate
+       \default 348701.1
+       \units W/(m3/s)
+       \ip-units W/(gal/min)
+       \minimum> 0
+  N14; \field Design Shaft Power per Unit Flow Rate per Unit Head
+       \type real
+       \note Used to size Design Power Consumption from design flow rate for head and motor efficiency
+       \default 1.282051282
+       \units W/((m3/s)-Pa)
+       \ip-units W/((gal/min)-ftH20)
+       \minimum> 0
 
 \group Plant-Condenser Flow Control
 
@@ -59460,6 +59631,7 @@ LoadProfile:Plant,
        \required-field
        \type real
        \units m3/s
+       \ip-units gal/min
   A5 ; \field Flow Rate Fraction Schedule Name
        \required-field
        \type object-list
@@ -59492,6 +59664,7 @@ SolarCollectorPerformance:FlatPlate,
        \type real
        \minimum> 0
        \units m3/s
+       \ip-units gal/min
   A3 , \field Test Correlation Type
        \required-field
        \type choice
@@ -59546,6 +59719,7 @@ SolarCollector:FlatPlate:Water,
        \type real
        \minimum> 0
        \units m3/s
+       \ip-units gal/min
 
 SolarCollector:FlatPlate:PhotovoltaicThermal,
        \memo Models hybrid photovoltaic-thermal (PVT) solar collectors that convert incident solar
@@ -59644,6 +59818,7 @@ SolarCollector:IntegralCollectorStorage,
        \type real
        \minimum> 0
        \units m3/s
+       \ip-units gal/min
 
 SolarCollectorPerformance:IntegralCollectorStorage,
        \memo Thermal and optical performance parameters for a single glazed solar collector with
@@ -59665,6 +59840,7 @@ SolarCollectorPerformance:IntegralCollectorStorage,
        \type real
        \minimum> 0
        \units m3
+       \ip-units gal
   N3,  \field Bottom Heat Loss Conductance
        \required-field
        \type real
@@ -60855,6 +61031,7 @@ Chiller:Absorption:Indirect,
   N11, \field Design Generator Fluid Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \autosizable
        \note  For variable flow this is the max flow and for constant flow this is the flow.
   N12, \field Temperature Lower Limit Generator Inlet
@@ -60978,6 +61155,7 @@ Chiller:Absorption,
        \type real
        \autosizable
        \units m3/s
+       \ip-units gal/min
        \minimum> 0.0
   N17, \field Degree of Subcooling in Steam Generator
        \type real
@@ -61555,12 +61733,8 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
-            \object-list UniVariateTables
+            \object-list BiquadraticCurves
+            \object-list BiVariateTables
   A9   ,  \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the fuel input to the chiller at full load as
             \note it varies by temperature.  The curve is normalized so that at design conditions the
@@ -61568,23 +61742,15 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
-            \object-list UniVariateTables
+            \object-list BiquadraticCurves
+            \object-list BiVariateTables
   A10  ,  \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the fuel input to the chiller as the load on
             \note the chiller varies but the operating temperatures remain at the design values.
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A11  ,  \field Electric Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the electricity to the chiller at full load as
@@ -61593,23 +61759,15 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
-            \object-list UniVariateTables
+            \object-list BiquadraticCurves
+            \object-list BiVariateTables
   A12  ,  \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the electricity to the chiller as the load on
             \note the chiller varies but the operating temperatures remain at the design values.
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A13  ,  \field Heating Capacity Function of Cooling Capacity Curve Name
             \note The curve represents how the heating capacity of the chiller varies with cooling
@@ -61618,11 +61776,7 @@ ChillerHeater:Absorption:DirectFired,
             \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A14  ,  \field Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
             \note When the chiller is operating as only a heater, this curve is used to represent the
@@ -61630,11 +61784,7 @@ ChillerHeater:Absorption:DirectFired,
             \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
             \note will probably be similar to a boiler curve for most chillers.
             \type object-list
-            \object-list LinearCurves
-            \object-list QuadraticCurves
-            \object-list CubicCurves
-            \object-list QuarticCurves
-            \object-list ExponentCurves
+            \object-list UniVariateCurves
             \object-list UniVariateTables
   A15  ,  \field Temperature Curve Input Variable
             \type choice
@@ -61795,12 +61945,8 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
-       \object-list UniVariateTables
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
   A9 , \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the fuel input to the chiller at full load as
        \note it varies by temperature.  The curve is normalized so that at design conditions the
@@ -61808,23 +61954,15 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
-       \object-list UniVariateTables
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
   A10, \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the fuel input to the chiller as the load on
        \note the chiller varies but the operating temperatures remain at the design values.
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A11, \field Electric Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the electricity to the chiller at full load as
@@ -61833,23 +61971,15 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
-       \object-list UniVariateTables
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
   A12, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the electricity to the chiller as the load on
        \note the chiller varies but the operating temperatures remain at the design values.
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A13, \field Heating Capacity Function of Cooling Capacity Curve Name
        \note The curve represents how the heating capacity of the chiller varies with cooling
@@ -61858,11 +61988,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A14, \field Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
        \note When the chiller is operating as only a heater, this curve is used to represent the
@@ -61870,11 +61996,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
        \note will probably be similar to a boiler curve for most chillers.
        \type object-list
-       \object-list LinearCurves
-       \object-list QuadraticCurves
-       \object-list CubicCurves
-       \object-list QuarticCurves
-       \object-list ExponentCurves
+       \object-list UniVariateCurves
        \object-list UniVariateTables
   A15, \field Temperature Curve Input Variable
        \type choice
@@ -61931,11 +62053,13 @@ HeatPump:WaterToWater:EquationFit:Heating,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N2,  \field Rated Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N3,  \field Rated Heating Capacity
         \required-field
         \type real
@@ -61999,11 +62123,13 @@ HeatPump:WaterToWater:EquationFit:Cooling,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N2,  \field Rated Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N3,  \field Rated Cooling Capacity
         \required-field
         \type real
@@ -63362,6 +63488,7 @@ CoolingTower:VariableSpeed:Merkel,
   N6 , \field Design Water Flow Rate per Unit of Nominal Capacity
        \note This field is only used if the previous is set to autocalculate and performance input method is NominalCapacity
        \units m3/s-W
+       \ip-units gal/min-W
        \default 5.382E-8
        \type real
   N7 , \field Design Air Flow Rate
@@ -65301,6 +65428,7 @@ GroundHeatExchanger:HorizontalTrench,
         \required-field
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0
    N2 , \field Trench Length in Pipe Axial Direction
         \note This is the total pipe axial length of the heat exchanger
@@ -65428,6 +65556,7 @@ GroundHeatExchanger:Slinky,
    N1 , \field Design Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0
         \default 0.002
    N2 , \field Soil Thermal Conductivity
@@ -65707,6 +65836,7 @@ WaterHeater:Mixed,
        \note Not yet implemented
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \default 0.0
   N7 , \field Heater Ignition Delay
@@ -66278,6 +66408,7 @@ WaterHeater:Sizing,
   N3 , \field Nominal Tank Volume for Autosizing Plant Connections
        \type real
        \units m3
+       \ip-units gal
        \note Only used if Design Mode = PeakDraw and the water heater also
        \note has autosized flow rates for connections on the demand side of a plant loop
   N4 , \field Number of Bedrooms
@@ -66291,21 +66422,25 @@ WaterHeater:Sizing,
   N6 , \field Storage Capacity per Person
        \type real
        \units m3/Person
+       \ip-units gal/Person
        \note Only used for Design Mode = PerPerson
        \minimum 0.0
   N7 , \field Recovery Capacity per Person
        \type real
        \units m3/hr-person
+       \ip-units gal/hr-person
        \note Only used for Design Mode = PerPerson
        \minimum 0.0
   N8 , \field Storage Capacity per Floor Area
        \type real
        \units m3/m2
+       \ip-units gal/ft2
        \note Only used for Design Mode = PerFloorArea
        \minimum 0.0
   N9 , \field Recovery Capacity per Floor Area
        \type real
        \units m3/hr-m2
+       \ip-units gal/hr-ft2
        \note Only used for Design Mode = PerFloorArea
        \minimum 0.0
   N10 , \field Number of Units
@@ -66313,16 +66448,19 @@ WaterHeater:Sizing,
        \note Only used for Design Mode = PerUnit
   N11 , \field Storage Capacity per Unit
        \units m3
+       \ip-units gal
        \type real
        \note Only used for Design Mode = PerUnit
        \minimum 0.0
   N12 , \field Recovery Capacity PerUnit
        \units m3/hr
+       \ip-units gal/hr
        \type real
        \note Only used for Design Mode = PerUnit
        \minimum 0.0
   N13 ,\field Storage Capacity per Collector Area
        \units m3/m2
+       \ip-units gal/ft2
        \type real
        \note Only used for Design Mode = PerSolarCollectorArea
        \minimum 0.0
@@ -66381,6 +66519,7 @@ WaterHeater:HeatPump:PumpedCondenser,
   N2 , \field Condenser Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \autocalculatable
        \note Actual water flow rate through the heat pump's water coil (condenser).
@@ -72451,11 +72590,13 @@ Refrigeration:CompressorRack,
   N3,   \field Water-Cooled Condenser Design Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0.0
         \note Applicable only when loop flow type is ConstantFlow.
   N4,   \field Water-Cooled Condenser Maximum Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0.0
   N5,   \field Water-Cooled Condenser Maximum Water Outlet Temperature
         \type real
@@ -72978,12 +73119,14 @@ Refrigeration:Condenser:WaterCooled,
   N5 ,  \field Water Design Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \note note required units must be converted from L/s as specified in ARI 450-2007
         \minimum> 0.0
         \note Applicable only when loop flow type is Constant Flow.
   N6 ,  \field Water Maximum Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0.0
   N7 ,  \field Water Maximum Water Outlet Temperature
         \type real
@@ -73739,7 +73882,8 @@ Refrigeration:SecondarySystem,
   N2 ,  \field Evaporator Flow Rate for Secondary Fluid
         \type real
         \minimum 0.0
-        \units M3/s
+        \units m3/s
+        \ip-units gal/min
         \note For "FluidAlwaysLiquid", at least one of the two, Evaporator Capacity OR
         \note    Evaporator Flow Rate for Secondary Fluid, is required.
         \note For "FluidPhaseChange" loops, this input is not used. (see PhaseChange Circulating
@@ -73774,7 +73918,8 @@ Refrigeration:SecondarySystem,
   N7 ,  \field Total Pump Flow Rate
         \type real
         \minimum 0.0
-        \units M3/s
+        \units m3/s
+        \ip-units gal/min
         \note For "FluidAlwaysLiquid",if not input, Evaporator Flow Rate for Secondary Fluid
         \note       will be used.
         \note For "FluidPhaseChange", if not input, this will be calculated using the
@@ -75536,6 +75681,7 @@ Generator:MicroTurbine,
  N14, \field Reference Heat Recovery Water Flow Rate
       \type real
       \units m3/s
+      \ip-units gal/min
       \minimum> 0.0
  A10, \field Heat Recovery Water Flow Rate Function of Temperature and Power Curve Name
       \type object-list
@@ -75581,11 +75727,13 @@ Generator:MicroTurbine,
  N15, \field Minimum Heat Recovery Water Flow Rate
       \type real
       \units m3/s
+      \ip-units gal/min
       \minimum 0.0
       \default 0.0
  N16, \field Maximum Heat Recovery Water Flow Rate
       \type real
       \units m3/s
+      \ip-units gal/min
       \minimum 0.0
       \default 0.0
  N17, \field Maximum Heat Recovery Water Temperature
@@ -76275,6 +76423,7 @@ Generator:FuelCell:ExhaustGasToWaterHeatExchanger,
       \type node
   N1, \field Heat Recovery Water Maximum Flow Rate
       \units m3/s
+      \ip-units gal/min
   A4, \field Exhaust Outlet Air Node Name
       \type node
   A5, \field Heat Exchanger Calculation Method
@@ -78049,6 +78198,7 @@ WaterUse:Equipment,
   N1 , \field Peak Flow Rate
        \required-field
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0.0
   A3 , \field Flow Rate Fraction Schedule Name
@@ -78178,17 +78328,21 @@ WaterUse:Storage,
   N1 , \field Maximum Capacity
        \type real
        \units m3
+       \ip-units gal
        \note Defaults to unlimited capacity.
   N2 , \field Initial Volume
        \type real
        \units m3
+       \ip-units gal
   N3 , \field Design In Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \note Defaults to unlimited flow.
   N4 , \field Design Out Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \note Defaults to unlimited flow.
   A3 , \field Overflow Destination
        \type object-list
@@ -78203,14 +78357,17 @@ WaterUse:Storage,
   N5 , \field Float Valve On Capacity
        \type real
        \units m3
+       \ip-units gal
        \note Lower range of target storage level e.g. float valve kicks on
   N6 , \field Float Valve Off Capacity
        \type real
        \units m3
+       \ip-units gal
        \note Upper range of target storage level e.g. float valve kicks off
   N7 , \field Backup Mains Capacity
        \type real
        \units m3
+       \ip-units gal
        \note Lower range of secondary target storage level
        \note used to keep tanks at a minimum level using
        \note mains water if well can't keep up
@@ -78264,6 +78421,7 @@ WaterUse:Well,
   N2 , \field Pump Rated Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
   N3 , \field Pump Rated Head
        \type real
        \units Pa
@@ -78275,9 +78433,11 @@ WaterUse:Well,
   N6 , \field Well Recovery Rate
        \type real
        \units m3/s
+       \ip-units gal/min
   N7 , \field Nominal Well Storage Volume
        \type real
        \units m3
+       \ip-units gal
   A3 , \field Water Table Depth Mode
        \type choice
        \key Constant
@@ -78316,6 +78476,7 @@ WaterUse:RainCollector,
   N2 , \field Maximum Collection Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \note Defaults to unlimited flow.
   A5 , \field Collection Surface 1 Name
        \begin-extensible

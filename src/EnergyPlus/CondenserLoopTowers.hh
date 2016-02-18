@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef CondenserLoopTowers_hh_INCLUDED
 #define CondenserLoopTowers_hh_INCLUDED
 
@@ -495,105 +553,6 @@ namespace CondenserLoopTowers {
 			LGLast( 0.0 )
 		{}
 
-		// Member Constructor
-		VSTowerData(
-			Array1< Real64 > const & Coeff, // - model coefficients
-			bool const FoundModelCoeff, // - TRUE if model is calibratable
-			Real64 const MinInletAirWBTemp, // - model limit for min inlet air WB temp
-			Real64 const MaxInletAirWBTemp, // - model limit for max inlet air WB temp
-			Real64 const MinRangeTemp, // - model limit for min range temp
-			Real64 const MaxRangeTemp, // - model limit for max range temp
-			Real64 const MinApproachTemp, // - model limit for min approach temp
-			Real64 const MaxApproachTemp, // - model limit for max approach temp
-			Real64 const MinWaterFlowRatio, // - model limit for min water flow rate ratio
-			Real64 const MaxWaterFlowRatio, // - model limit for max water flow rate ratio
-			Real64 const MaxLiquidToGasRatio, // - model limit for max liquid to gas ratio
-			int const VSErrorCountFlowFrac, // - counter if water flow rate ratio limits are exceeded
-			int const VSErrorCountWFRR, // - counter if water flow rate ratio limits are exceeded
-			int const VSErrorCountIAWB, // - counter if inlet air wet-bulb temperature limits are exceeded
-			int const VSErrorCountTR, // - counter if tower range temperature limits are exceeded
-			int const VSErrorCountTA, // - counter if tower approach temperature limits are exceeded
-			int const ErrIndexFlowFrac, // - index to recurring error structure for liquid to gas ratio
-			int const ErrIndexWFRR, // - index to recurring error structure for water flow rate ratio
-			int const ErrIndexIAWB, // - index to recurring error structure for inlet air WB
-			int const ErrIndexTR, // - index to recurring error structure for tower range
-			int const ErrIndexTA, // - index to recurring error structure for tower approach
-			int const ErrIndexLG, // - index to recurring error structure for tower liquid/gas ratio
-			std::string const & TrBuffer1, // - buffer to print Tr warning messages on following time step
-			std::string const & TrBuffer2, // - buffer to print Tr warning messages on following time step
-			std::string const & TrBuffer3, // - buffer to print Tr warning messages on following time step
-			std::string const & TwbBuffer1, // - buffer to print Twb warning messages on following time step
-			std::string const & TwbBuffer2, // - buffer to print Twb warning messages on following time step
-			std::string const & TwbBuffer3, // - buffer to print Twb warning messages on following time step
-			std::string const & TaBuffer1, // - buffer to print Ta warning messages on following time step
-			std::string const & TaBuffer2, // - buffer to print Ta warning messages on following time step
-			std::string const & TaBuffer3, // - buffer to print Ta warning messages on following time step
-			std::string const & WFRRBuffer1, // - buffer to print WFRR warning messages on following time step
-			std::string const & WFRRBuffer2, // - buffer to print WFRR warning messages on following time step
-			std::string const & WFRRBuffer3, // - buffer to print WFRR warning messages on following time step
-			std::string const & LGBuffer1, // - buffer to print LG warning messages on following time step
-			std::string const & LGBuffer2, // - buffer to print LG warning messages on following time step
-			std::string const & LGBuffer3, // - buffer to print LG warning messages on following time step
-			bool const PrintTrMessage, // - flag to print Tr error message
-			bool const PrintTwbMessage, // - flag to print Twb error message
-			bool const PrintTaMessage, // - flag to print Ta error message
-			bool const PrintWFRRMessage, // - flag to print WFRR error message
-			bool const PrintLGMessage, // - flag to print liquid-gas ratio error message
-			Real64 const TrLast, // value of Tr when warning occurred (passed to Recurring Warning)
-			Real64 const TwbLast, // value of Twb when warning occurred (passed to Recurring Warning)
-			Real64 const TaLast, // value of Ta when warning occurred (passed to Recurring Warning)
-			Real64 const WaterFlowRateRatioLast, // value of WFRR when warning occurred (passed to Recurring Warn)
-			Real64 const LGLast // value of LG when warning occurred (passed to Recurring Warn)
-		) :
-			Coeff( Coeff ),
-			FoundModelCoeff( FoundModelCoeff ),
-			MinInletAirWBTemp( MinInletAirWBTemp ),
-			MaxInletAirWBTemp( MaxInletAirWBTemp ),
-			MinRangeTemp( MinRangeTemp ),
-			MaxRangeTemp( MaxRangeTemp ),
-			MinApproachTemp( MinApproachTemp ),
-			MaxApproachTemp( MaxApproachTemp ),
-			MinWaterFlowRatio( MinWaterFlowRatio ),
-			MaxWaterFlowRatio( MaxWaterFlowRatio ),
-			MaxLiquidToGasRatio( MaxLiquidToGasRatio ),
-			VSErrorCountFlowFrac( VSErrorCountFlowFrac ),
-			VSErrorCountWFRR( VSErrorCountWFRR ),
-			VSErrorCountIAWB( VSErrorCountIAWB ),
-			VSErrorCountTR( VSErrorCountTR ),
-			VSErrorCountTA( VSErrorCountTA ),
-			ErrIndexFlowFrac( ErrIndexFlowFrac ),
-			ErrIndexWFRR( ErrIndexWFRR ),
-			ErrIndexIAWB( ErrIndexIAWB ),
-			ErrIndexTR( ErrIndexTR ),
-			ErrIndexTA( ErrIndexTA ),
-			ErrIndexLG( ErrIndexLG ),
-			TrBuffer1( TrBuffer1 ),
-			TrBuffer2( TrBuffer2 ),
-			TrBuffer3( TrBuffer3 ),
-			TwbBuffer1( TwbBuffer1 ),
-			TwbBuffer2( TwbBuffer2 ),
-			TwbBuffer3( TwbBuffer3 ),
-			TaBuffer1( TaBuffer1 ),
-			TaBuffer2( TaBuffer2 ),
-			TaBuffer3( TaBuffer3 ),
-			WFRRBuffer1( WFRRBuffer1 ),
-			WFRRBuffer2( WFRRBuffer2 ),
-			WFRRBuffer3( WFRRBuffer3 ),
-			LGBuffer1( LGBuffer1 ),
-			LGBuffer2( LGBuffer2 ),
-			LGBuffer3( LGBuffer3 ),
-			PrintTrMessage( PrintTrMessage ),
-			PrintTwbMessage( PrintTwbMessage ),
-			PrintTaMessage( PrintTaMessage ),
-			PrintWFRRMessage( PrintWFRRMessage ),
-			PrintLGMessage( PrintLGMessage ),
-			TrLast( TrLast ),
-			TwbLast( TwbLast ),
-			TaLast( TaLast ),
-			WaterFlowRateRatioLast( WaterFlowRateRatioLast ),
-			LGLast( LGLast )
-		{}
-
 	};
 
 	// Object Data
@@ -761,29 +720,6 @@ namespace CondenserLoopTowers {
 		bool const RunFlag,
 		int const TowerNum
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // CondenserLoopTowers
 

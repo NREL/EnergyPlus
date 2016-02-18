@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataDaylighting_hh_INCLUDED
 #define DataDaylighting_hh_INCLUDED
 
@@ -70,17 +128,6 @@ namespace DataDaylighting {
 		IntWinAdjZoneExtWinStruct() :
 			SurfNum( 0 ),
 			NumOfIntWindows( 0 )
-		{}
-
-		// Member Constructor
-		IntWinAdjZoneExtWinStruct(
-			int const SurfNum, // exterior window index
-			int const NumOfIntWindows, // count of interior windows associated with this ext win
-			Array1_int const & IntWinNum // index numbers for interior windows assoc with this ext win
-		) :
-			SurfNum( SurfNum ),
-			NumOfIntWindows( NumOfIntWindows ),
-			IntWinNum( IntWinNum )
 		{}
 
 	};
@@ -195,115 +242,6 @@ namespace DataDaylighting {
 			MapCount( 0 )
 		{}
 
-		// Member Constructor
-		ZoneDaylightCalc(
-			int const DaylightType, // Type of Daylighting (1=Detailed, 2=DElight)
-			int const AvailSchedNum, // pointer to availability schedule if present
-			int const TotalDaylRefPoints, // Number of detailed daylighting reference points in a zone (0,1 or 2)
-			int const TotalDElightRefPts, // Number of DElight daylighting reference points in a zone (0,1 or 2) - RJH
-			Array2< Real64 > const & DaylRefPtAbsCoord, // =0.0 ! X,Y,Z coordinates of all daylighting reference points
-			Array1_bool const & DaylRefPtInBounds, // True when coordinates are in bounds of zone coordinates
-			Array1< Real64 > const & FracZoneDaylit, // =0.0  ! Fraction of zone controlled by each reference point
-			Array1< Real64 > const & IllumSetPoint, // =0.0  ! Illuminance setpoint at each reference point (lux)
-			int const LightControlType, // Lighting control type (same for all reference points)
-			Real64 const ViewAzimuthForGlare, // View direction relative to window for glare calculation (deg)
-			int const MaxGlareallowed, // Maximum allowable discomfort glare index
-			Real64 const MinPowerFraction, // Minimum fraction of power input that continuous dimming system can dim down to
-			Real64 const MinLightFraction, // Minimum fraction of light output that continuous dimming system can dim down to
-			int const LightControlSteps, // Number of levels (excluding zero) of stepped control system
-			Real64 const LightControlProbability, // For manual control of stepped systems, probability that lighting will
-			int const TotalExtWindows, // Total number of exterior windows in the zone
-			Real64 const AveVisDiffReflect, // Area-weighted average inside surface visible reflectance of zone
-			Array1< Real64 > const & RefPtPowerReductionFactor, // =1.0  ! Electric power reduction factor at reference points
-			Real64 const ZonePowerReductionFactor, // Electric power reduction factor for entire zone due to daylighting
-			Array1< Real64 > const & DaylIllumAtRefPt, // =0.0 ! Daylight illuminance at reference points (lux)
-			Array1< Real64 > const & GlareIndexAtRefPt, // =0.0 ! Glare index at reference points
-			Array1_int const & AdjIntWinZoneNums, // List of zone numbers of adjacent zones that have exterior windows and
-			int const NumOfIntWinAdjZones, // Number of adjacent zones that have exterior windows and share one or
-			int const NumOfIntWinAdjZoneExtWins, // number of exterior windows associated with zone via interior windows
-			Array1< IntWinAdjZoneExtWinStruct > const & IntWinAdjZoneExtWin, // nested structure | info about exterior window associated with zone via interior window
-			int const NumOfDayltgExtWins, // Number of associated exterior windows providing daylight to this zone
-			Array1_int const & DayltgExtWinSurfNums, // List of surface numbers of zone's exterior windows or
-			Array1_int const & DayltgFacPtrsForExtWins, // Zone's daylighting factor pointers.
-			Real64 const MinIntWinSolidAng, // Minimum solid angle subtended by an interior window in a zone
-			Real64 const TotInsSurfArea, // Total inside surface area of a daylit zone (m2)
-			Real64 const FloorVisRefl, // Area-weighted visible reflectance of floor of a daylit zone
-			Real64 const InterReflIllFrIntWins, // Inter-reflected illuminance due to beam and diffuse solar passing
-			Array1< Real64 > const & BacLum, // =0.0 ! Background luminance at each reference point (cd/m2)
-			Array2< Real64 > const & SolidAngAtRefPt, // (MaxRefPoints,50)
-			Array2< Real64 > const & SolidAngAtRefPtWtd, // (MaxRefPoints,50)
-			Array3< Real64 > const & IllumFromWinAtRefPt, // (MaxRefPoints,2,50)
-			Array3< Real64 > const & BackLumFromWinAtRefPt, // (MaxRefPoints,2,50)
-			Array3< Real64 > const & SourceLumFromWinAtRefPt, // (MaxRefPoints,2,50)
-			Array5< Real64 > const & DaylIllFacSky,
-			Array5< Real64 > const & DaylSourceFacSky,
-			Array5< Real64 > const & DaylBackFacSky,
-			Array4< Real64 > const & DaylIllFacSun,
-			Array4< Real64 > const & DaylIllFacSunDisk,
-			Array4< Real64 > const & DaylSourceFacSun,
-			Array4< Real64 > const & DaylSourceFacSunDisk,
-			Array4< Real64 > const & DaylBackFacSun,
-			Array4< Real64 > const & DaylBackFacSunDisk,
-			Array1< Real64 > const & TimeExceedingGlareIndexSPAtRefPt,
-			Array1< Real64 > const & TimeExceedingDaylightIlluminanceSPAtRefPt,
-			bool const AdjZoneHasDayltgCtrl,
-			int const MapCount, // Number of maps assigned to Zone
-			Array1_int const & ZoneToMap // Pointers to maps allocated to Zone
-		) :
-			DaylightType( DaylightType ),
-			AvailSchedNum( AvailSchedNum ),
-			TotalDaylRefPoints( TotalDaylRefPoints ),
-			TotalDElightRefPts( TotalDElightRefPts ),
-			DaylRefPtAbsCoord( DaylRefPtAbsCoord ),
-			DaylRefPtInBounds( DaylRefPtInBounds ),
-			FracZoneDaylit( FracZoneDaylit ),
-			IllumSetPoint( IllumSetPoint ),
-			LightControlType( LightControlType ),
-			ViewAzimuthForGlare( ViewAzimuthForGlare ),
-			MaxGlareallowed( MaxGlareallowed ),
-			MinPowerFraction( MinPowerFraction ),
-			MinLightFraction( MinLightFraction ),
-			LightControlSteps( LightControlSteps ),
-			LightControlProbability( LightControlProbability ),
-			TotalExtWindows( TotalExtWindows ),
-			AveVisDiffReflect( AveVisDiffReflect ),
-			RefPtPowerReductionFactor( RefPtPowerReductionFactor ),
-			ZonePowerReductionFactor( ZonePowerReductionFactor ),
-			DaylIllumAtRefPt( DaylIllumAtRefPt ),
-			GlareIndexAtRefPt( GlareIndexAtRefPt ),
-			AdjIntWinZoneNums( AdjIntWinZoneNums ),
-			NumOfIntWinAdjZones( NumOfIntWinAdjZones ),
-			NumOfIntWinAdjZoneExtWins( NumOfIntWinAdjZoneExtWins ),
-			IntWinAdjZoneExtWin( IntWinAdjZoneExtWin ),
-			NumOfDayltgExtWins( NumOfDayltgExtWins ),
-			DayltgExtWinSurfNums( DayltgExtWinSurfNums ),
-			DayltgFacPtrsForExtWins( DayltgFacPtrsForExtWins ),
-			MinIntWinSolidAng( MinIntWinSolidAng ),
-			TotInsSurfArea( TotInsSurfArea ),
-			FloorVisRefl( FloorVisRefl ),
-			InterReflIllFrIntWins( InterReflIllFrIntWins ),
-			BacLum( BacLum ),
-			SolidAngAtRefPt( SolidAngAtRefPt ),
-			SolidAngAtRefPtWtd( SolidAngAtRefPtWtd ),
-			IllumFromWinAtRefPt( IllumFromWinAtRefPt ),
-			BackLumFromWinAtRefPt( BackLumFromWinAtRefPt ),
-			SourceLumFromWinAtRefPt( SourceLumFromWinAtRefPt ),
-			DaylIllFacSky( DaylIllFacSky ),
-			DaylSourceFacSky( DaylSourceFacSky ),
-			DaylBackFacSky( DaylBackFacSky ),
-			DaylIllFacSun( DaylIllFacSun ),
-			DaylIllFacSunDisk( DaylIllFacSunDisk ),
-			DaylSourceFacSun( DaylSourceFacSun ),
-			DaylSourceFacSunDisk( DaylSourceFacSunDisk ),
-			DaylBackFacSun( DaylBackFacSun ),
-			DaylBackFacSunDisk( DaylBackFacSunDisk ),
-			TimeExceedingGlareIndexSPAtRefPt( TimeExceedingGlareIndexSPAtRefPt ),
-			TimeExceedingDaylightIlluminanceSPAtRefPt( TimeExceedingDaylightIlluminanceSPAtRefPt ),
-			AdjZoneHasDayltgCtrl( AdjZoneHasDayltgCtrl ),
-			MapCount( MapCount ),
-			ZoneToMap( ZoneToMap )
-		{}
-
 	};
 
 	struct IllumMapData
@@ -339,39 +277,6 @@ namespace DataDaylighting {
 			UnitNo( 0 ),
 			HeaderXLineLengthNeeded( true ),
 			HeaderXLineLength( 0 )
-		{}
-
-		// Member Constructor
-		IllumMapData(
-			std::string const & Name, // Map name
-			int const Zone, // Pointer to zone being mapped
-			Real64 const Z, // Elevation or height
-			Real64 const Xmin, // Minimum X value
-			Real64 const Xmax, // Maximum X value
-			int const Xnum, // Number of X reference points (going N-S)
-			Real64 const Xinc, // Increment between X reference points
-			Real64 const Ymin, // Minimum Y value
-			Real64 const Ymax, // Maximum Y value
-			int const Ynum, // Number of Y reference points (going E-W)
-			Real64 const Yinc, // Increment between Y reference points
-			int const UnitNo, // Unit number for map output (later merged to final file)
-			bool const HeaderXLineLengthNeeded, // X header will likely be the longest line in the file
-			int const HeaderXLineLength // actual length of this X header line
-		) :
-			Name( Name ),
-			Zone( Zone ),
-			Z( Z ),
-			Xmin( Xmin ),
-			Xmax( Xmax ),
-			Xnum( Xnum ),
-			Xinc( Xinc ),
-			Ymin( Ymin ),
-			Ymax( Ymax ),
-			Ynum( Ynum ),
-			Yinc( Yinc ),
-			UnitNo( UnitNo ),
-			HeaderXLineLengthNeeded( HeaderXLineLengthNeeded ),
-			HeaderXLineLength( HeaderXLineLength )
 		{}
 
 	};
@@ -421,55 +326,6 @@ namespace DataDaylighting {
 		MapCalcData() :
 			TotalMapRefPoints( 0 ),
 			Zone( 0 )
-		{}
-
-		// Member Constructor
-		MapCalcData(
-			int const TotalMapRefPoints, // Number of illuminance map reference points in this zone (up to 100)
-			int const Zone, // Pointer to zone being mapped
-			Array2< Real64 > const & MapRefPtAbsCoord, // X,Y,Z coordinates of all illuminance map reference points
-			Array1_bool const & MapRefPtInBounds, // True when coordinates are in bounds of zone coordinates
-			Array1< Real64 > const & DaylIllumAtMapPt, // Daylight illuminance at illuminance map points (lux)
-			Array1< Real64 > const & GlareIndexAtMapPt, // Glare index at illuminance map points
-			Array1< Real64 > const & DaylIllumAtMapPtHr, // Daylight illuminance at illuminance map points (lux)
-			Array1< Real64 > const & GlareIndexAtMapPtHr, // Glare index at illuminance map points
-			Array2< Real64 > const & SolidAngAtMapPt, // (MaxRefPoints,50)
-			Array2< Real64 > const & SolidAngAtMapPtWtd, // (MaxRefPoints,50)
-			Array3< Real64 > const & IllumFromWinAtMapPt, // (MaxRefPoints,2,50)
-			Array3< Real64 > const & BackLumFromWinAtMapPt, // (MaxRefPoints,2,50)
-			Array3< Real64 > const & SourceLumFromWinAtMapPt, // (MaxRefPoints,2,50)
-			Array5< Real64 > const & DaylIllFacSky,
-			Array5< Real64 > const & DaylSourceFacSky,
-			Array5< Real64 > const & DaylBackFacSky,
-			Array4< Real64 > const & DaylIllFacSun,
-			Array4< Real64 > const & DaylIllFacSunDisk,
-			Array4< Real64 > const & DaylSourceFacSun,
-			Array4< Real64 > const & DaylSourceFacSunDisk,
-			Array4< Real64 > const & DaylBackFacSun,
-			Array4< Real64 > const & DaylBackFacSunDisk
-		) :
-			TotalMapRefPoints( TotalMapRefPoints ),
-			Zone( Zone ),
-			MapRefPtAbsCoord( MapRefPtAbsCoord ),
-			MapRefPtInBounds( MapRefPtInBounds ),
-			DaylIllumAtMapPt( DaylIllumAtMapPt ),
-			GlareIndexAtMapPt( GlareIndexAtMapPt ),
-			DaylIllumAtMapPtHr( DaylIllumAtMapPtHr ),
-			GlareIndexAtMapPtHr( GlareIndexAtMapPtHr ),
-			SolidAngAtMapPt( SolidAngAtMapPt ),
-			SolidAngAtMapPtWtd( SolidAngAtMapPtWtd ),
-			IllumFromWinAtMapPt( IllumFromWinAtMapPt ),
-			BackLumFromWinAtMapPt( BackLumFromWinAtMapPt ),
-			SourceLumFromWinAtMapPt( SourceLumFromWinAtMapPt ),
-			DaylIllFacSky( DaylIllFacSky ),
-			DaylSourceFacSky( DaylSourceFacSky ),
-			DaylBackFacSky( DaylBackFacSky ),
-			DaylIllFacSun( DaylIllFacSun ),
-			DaylIllFacSunDisk( DaylIllFacSunDisk ),
-			DaylSourceFacSun( DaylSourceFacSun ),
-			DaylSourceFacSunDisk( DaylSourceFacSunDisk ),
-			DaylBackFacSun( DaylBackFacSun ),
-			DaylBackFacSunDisk( DaylBackFacSunDisk )
 		{}
 
 	};

@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef FluidProperties_hh_INCLUDED
 #define FluidProperties_hh_INCLUDED
 
@@ -164,119 +222,6 @@ namespace FluidProperties {
 			NumSuperPressPts( 0 )
 		{}
 
-		// Member Constructor
-		FluidPropsRefrigerantData(
-			std::string const & Name, // Name of the refrigerant
-			int const NumPsPoints, // Number of saturation pressure
-			Real64 const PsLowTempValue, // Low Temperature Value for Ps (>0.0)
-			Real64 const PsHighTempValue, // High Temperature Value for Ps (max in tables)
-			int const PsLowTempIndex, // Low Temperature Min Index for Ps (>0.0)
-			int const PsHighTempIndex, // High Temperature Max Index for Ps (>0.0)
-			Real64 const PsLowPresValue, // Low Pressure Value for Ps (>0.0)
-			Real64 const PsHighPresValue, // High Pressure Value for Ps (max in tables)
-			int const PsLowPresIndex, // Low Pressure Min Index for Ps (>0.0)
-			int const PsHighPresIndex, // High Pressure Max Index for Ps (>0.0)
-			Array1< Real64 > const & PsTemps, // Temperatures for saturation pressures
-			Array1< Real64 > const & PsValues, // Saturation pressures at PsTemps
-			int const NumHPoints, // Number of enthalpy points
-			Real64 const HfLowTempValue, // Low Temperature Value for Hf (>0.0)
-			Real64 const HfHighTempValue, // High Temperature Value for Hf (max in tables)
-			int const HfLowTempIndex, // Low Temperature Min Index for Hf (>0.0)
-			int const HfHighTempIndex, // High Temperature Max Index for Hf (>0.0)
-			Real64 const HfgLowTempValue, // Low Temperature Value for Hfg (>0.0)
-			Real64 const HfgHighTempValue, // High Temperature Value for Hfg (max in tables)
-			int const HfgLowTempIndex, // Low Temperature Min Index for Hfg (>0.0)
-			int const HfgHighTempIndex, // High Temperature Max Index for Hfg (>0.0)
-			Array1< Real64 > const & HTemps, // Temperatures for enthalpy points
-			Array1< Real64 > const & HfValues, // Enthalpy of saturated fluid at HTemps
-			Array1< Real64 > const & HfgValues, // Enthalpy of saturated fluid/gas at HTemps
-			int const NumCpPoints, // Number of specific heat of fluid points
-			Real64 const CpfLowTempValue, // Low Temperature Value for Cpf (>0.0)
-			Real64 const CpfHighTempValue, // High Temperature Value for Cpf (max in tables)
-			int const CpfLowTempIndex, // Low Temperature Min Index for Cpf (>0.0)
-			int const CpfHighTempIndex, // High Temperature Max Index for Cpf (>0.0)
-			Real64 const CpfgLowTempValue, // Low Temperature Value for Cpfg (>0.0)
-			Real64 const CpfgHighTempValue, // High Temperature Value for Cpfg (max in tables)
-			int const CpfgLowTempIndex, // Low Temperature Min Index for Cpfg (>0.0)
-			int const CpfgHighTempIndex, // High Temperature Max Index for Cpfg (>0.0)
-			Array1< Real64 > const & CpTemps, // Temperatures for specific heat points
-			Array1< Real64 > const & CpfValues, // Specific heat of saturated fluid at CpTemps
-			Array1< Real64 > const & CpfgValues, // Specific heat of saturated fluid/gas at CpTemps
-			int const NumRhoPoints, // Number of density of fluid points
-			Real64 const RhofLowTempValue, // Low Temperature Value for Rhof (>0.0)
-			Real64 const RhofHighTempValue, // High Temperature Value for Rhof (max in tables)
-			int const RhofLowTempIndex, // Low Temperature Min Index for Rhof (>0.0)
-			int const RhofHighTempIndex, // High Temperature Max Index for Rhof (>0.0)
-			Real64 const RhofgLowTempValue, // Low Temperature Value for Rhofg (>0.0)
-			Real64 const RhofgHighTempValue, // High Temperature Value for Rhofg (max in tables)
-			int const RhofgLowTempIndex, // Low Temperature Min Index for Rhofg (>0.0)
-			int const RhofgHighTempIndex, // High Temperature Max Index for Rhofg (>0.0)
-			Array1< Real64 > const & RhoTemps, // Temperatures for density of fluid points
-			Array1< Real64 > const & RhofValues, // Density of saturated fluid at RhoTemps
-			Array1< Real64 > const & RhofgValues, // Density of saturated fluid/gas at RhoTemps
-			int const NumSuperTempPts, // Number of temperature points for superheated enthalpy
-			int const NumSuperPressPts, // Number of pressure points for superheated enthalpy
-			Array1< Real64 > const & SHTemps, // Temperatures for superheated gas
-			Array1< Real64 > const & SHPress, // Pressures for superheated gas
-			Array2< Real64 > const & HshValues, // Enthalpy of superheated gas at HshTemps, HshPress
-			Array2< Real64 > const & RhoshValues // Density of superheated gas at HshTemps, HshPress
-		) :
-			Name( Name ),
-			NumPsPoints( NumPsPoints ),
-			PsLowTempValue( PsLowTempValue ),
-			PsHighTempValue( PsHighTempValue ),
-			PsLowTempIndex( PsLowTempIndex ),
-			PsHighTempIndex( PsHighTempIndex ),
-			PsLowPresValue( PsLowPresValue ),
-			PsHighPresValue( PsHighPresValue ),
-			PsLowPresIndex( PsLowPresIndex ),
-			PsHighPresIndex( PsHighPresIndex ),
-			PsTemps( PsTemps ),
-			PsValues( PsValues ),
-			NumHPoints( NumHPoints ),
-			HfLowTempValue( HfLowTempValue ),
-			HfHighTempValue( HfHighTempValue ),
-			HfLowTempIndex( HfLowTempIndex ),
-			HfHighTempIndex( HfHighTempIndex ),
-			HfgLowTempValue( HfgLowTempValue ),
-			HfgHighTempValue( HfgHighTempValue ),
-			HfgLowTempIndex( HfgLowTempIndex ),
-			HfgHighTempIndex( HfgHighTempIndex ),
-			HTemps( HTemps ),
-			HfValues( HfValues ),
-			HfgValues( HfgValues ),
-			NumCpPoints( NumCpPoints ),
-			CpfLowTempValue( CpfLowTempValue ),
-			CpfHighTempValue( CpfHighTempValue ),
-			CpfLowTempIndex( CpfLowTempIndex ),
-			CpfHighTempIndex( CpfHighTempIndex ),
-			CpfgLowTempValue( CpfgLowTempValue ),
-			CpfgHighTempValue( CpfgHighTempValue ),
-			CpfgLowTempIndex( CpfgLowTempIndex ),
-			CpfgHighTempIndex( CpfgHighTempIndex ),
-			CpTemps( CpTemps ),
-			CpfValues( CpfValues ),
-			CpfgValues( CpfgValues ),
-			NumRhoPoints( NumRhoPoints ),
-			RhofLowTempValue( RhofLowTempValue ),
-			RhofHighTempValue( RhofHighTempValue ),
-			RhofLowTempIndex( RhofLowTempIndex ),
-			RhofHighTempIndex( RhofHighTempIndex ),
-			RhofgLowTempValue( RhofgLowTempValue ),
-			RhofgHighTempValue( RhofgHighTempValue ),
-			RhofgLowTempIndex( RhofgLowTempIndex ),
-			RhofgHighTempIndex( RhofgHighTempIndex ),
-			RhoTemps( RhoTemps ),
-			RhofValues( RhofValues ),
-			RhofgValues( RhofgValues ),
-			NumSuperTempPts( NumSuperTempPts ),
-			NumSuperPressPts( NumSuperPressPts ),
-			SHTemps( SHTemps ),
-			SHPress( SHPress ),
-			HshValues( HshValues ),
-			RhoshValues( RhoshValues )
-		{}
-
 	};
 
 	struct FluidPropsGlycolRawData
@@ -322,61 +267,6 @@ namespace FluidProperties {
 			ViscDataPresent( false ),
 			NumViscTempPts( 0 ),
 			NumViscConcPts( 0 )
-		{}
-
-		// Member Constructor
-		FluidPropsGlycolRawData(
-			std::string const & Name, // Name of the glycol
-			bool const CpDataPresent, // Flag set when specific heat data is available
-			int const NumCpTempPts, // Number of temperature points for specific heat
-			int const NumCpConcPts, // Number of concentration points for specific heat
-			Array1< Real64 > const & CpTemps, // Temperatures for specific heat of glycol
-			Array1< Real64 > const & CpConcs, // Concentration for specific heat of glycol
-			Array2< Real64 > const & CpValues, // Specific heat data values
-			bool const RhoDataPresent, // Flag set when density data is available
-			int const NumRhoTempPts, // Number of temperature points for density
-			int const NumRhoConcPts, // Number of concentration points for density
-			Array1< Real64 > const & RhoTemps, // Temperatures for density of glycol
-			Array1< Real64 > const & RhoConcs, // Concentration for density of glycol
-			Array2< Real64 > const & RhoValues, // Density data values
-			bool const CondDataPresent, // Flag set when conductivity data is available
-			int const NumCondTempPts, // Number of temperature points for conductivity
-			int const NumCondConcPts, // Number of concentration points for conductivity
-			Array1< Real64 > const & CondTemps, // Temperatures for conductivity of glycol
-			Array1< Real64 > const & CondConcs, // Concentration for conductivity of glycol
-			Array2< Real64 > const & CondValues, // conductivity values
-			bool const ViscDataPresent, // Flag set when viscosity data is available
-			int const NumViscTempPts, // Number of temperature points for viscosity
-			int const NumViscConcPts, // Number of concentration points for viscosity
-			Array1< Real64 > const & ViscTemps, // Temperatures for viscosity of glycol
-			Array1< Real64 > const & ViscConcs, // Concentration for viscosity of glycol
-			Array2< Real64 > const & ViscValues // viscosity values
-		) :
-			Name( Name ),
-			CpDataPresent( CpDataPresent ),
-			NumCpTempPts( NumCpTempPts ),
-			NumCpConcPts( NumCpConcPts ),
-			CpTemps( CpTemps ),
-			CpConcs( CpConcs ),
-			CpValues( CpValues ),
-			RhoDataPresent( RhoDataPresent ),
-			NumRhoTempPts( NumRhoTempPts ),
-			NumRhoConcPts( NumRhoConcPts ),
-			RhoTemps( RhoTemps ),
-			RhoConcs( RhoConcs ),
-			RhoValues( RhoValues ),
-			CondDataPresent( CondDataPresent ),
-			NumCondTempPts( NumCondTempPts ),
-			NumCondConcPts( NumCondConcPts ),
-			CondTemps( CondTemps ),
-			CondConcs( CondConcs ),
-			CondValues( CondValues ),
-			ViscDataPresent( ViscDataPresent ),
-			NumViscTempPts( NumViscTempPts ),
-			NumViscConcPts( NumViscConcPts ),
-			ViscTemps( ViscTemps ),
-			ViscConcs( ViscConcs ),
-			ViscValues( ViscValues )
 		{}
 
 	};
@@ -453,83 +343,6 @@ namespace FluidProperties {
 			ViscHighTempIndex( 0 )
 		{}
 
-		// Member Constructor
-		FluidPropsGlycolData(
-			std::string const & Name, // Name of the glycol mixture (used by other parts of code)
-			std::string const & GlycolName, // Name of non-water fluid that is part of this mixture
-			int const GlycolIndex, // Index in user defined glycol data (>0 = index in raw data,
-			Real64 const Concentration, // Concentration (if applicable)
-			bool const CpDataPresent, // Flag set when specific heat data is available
-			Real64 const CpLowTempValue, // Low Temperature Value for Cp (>0.0)
-			Real64 const CpHighTempValue, // High Temperature Value for Cp (max in tables)
-			int const CpLowTempIndex, // Low Temperature Min Index for Cp (>0.0)
-			int const CpHighTempIndex, // High Temperature Max Index for Cp (>0.0)
-			int const NumCpTempPts, // Number of temperature points for specific heat
-			Array1< Real64 > const & CpTemps, // Temperatures for specific heat of glycol
-			Array1< Real64 > const & CpValues, // Specific heat data values (J/kg-K)
-			bool const RhoDataPresent, // Flag set when density data is available
-			int const NumRhoTempPts, // Number of temperature points for density
-			Real64 const RhoLowTempValue, // Low Temperature Value for Rho (>0.0)
-			Real64 const RhoHighTempValue, // High Temperature Value for Rho (max in tables)
-			int const RhoLowTempIndex, // Low Temperature Min Index for Rho (>0.0)
-			int const RhoHighTempIndex, // High Temperature Max Index for Rho (>0.0)
-			Array1< Real64 > const & RhoTemps, // Temperatures for density of glycol
-			Array1< Real64 > const & RhoValues, // Density data values (kg/m3)
-			bool const CondDataPresent, // Flag set when conductivity data is available
-			int const NumCondTempPts, // Number of temperature points for conductivity
-			Real64 const CondLowTempValue, // Low Temperature Value for Cond (>0.0)
-			Real64 const CondHighTempValue, // High Temperature Value for Cond (max in tables)
-			int const CondLowTempIndex, // Low Temperature Min Index for Cond (>0.0)
-			int const CondHighTempIndex, // High Temperature Max Index for Cond (>0.0)
-			Array1< Real64 > const & CondTemps, // Temperatures for conductivity of glycol
-			Array1< Real64 > const & CondValues, // conductivity values (W/m-K)
-			bool const ViscDataPresent, // Flag set when viscosity data is available
-			int const NumViscTempPts, // Number of temperature points for viscosity
-			Real64 const ViscLowTempValue, // Low Temperature Value for Visc (>0.0)
-			Real64 const ViscHighTempValue, // High Temperature Value for Visc (max in tables)
-			int const ViscLowTempIndex, // Low Temperature Min Index for Visc (>0.0)
-			int const ViscHighTempIndex, // High Temperature Max Index for Visc (>0.0)
-			Array1< Real64 > const & ViscTemps, // Temperatures for viscosity of glycol
-			Array1< Real64 > const & ViscValues // viscosity values (mPa-s)
-		) :
-			Name( Name ),
-			GlycolName( GlycolName ),
-			GlycolIndex( GlycolIndex ),
-			Concentration( Concentration ),
-			CpDataPresent( CpDataPresent ),
-			CpLowTempValue( CpLowTempValue ),
-			CpHighTempValue( CpHighTempValue ),
-			CpLowTempIndex( CpLowTempIndex ),
-			CpHighTempIndex( CpHighTempIndex ),
-			NumCpTempPts( NumCpTempPts ),
-			CpTemps( CpTemps ),
-			CpValues( CpValues ),
-			RhoDataPresent( RhoDataPresent ),
-			NumRhoTempPts( NumRhoTempPts ),
-			RhoLowTempValue( RhoLowTempValue ),
-			RhoHighTempValue( RhoHighTempValue ),
-			RhoLowTempIndex( RhoLowTempIndex ),
-			RhoHighTempIndex( RhoHighTempIndex ),
-			RhoTemps( RhoTemps ),
-			RhoValues( RhoValues ),
-			CondDataPresent( CondDataPresent ),
-			NumCondTempPts( NumCondTempPts ),
-			CondLowTempValue( CondLowTempValue ),
-			CondHighTempValue( CondHighTempValue ),
-			CondLowTempIndex( CondLowTempIndex ),
-			CondHighTempIndex( CondHighTempIndex ),
-			CondTemps( CondTemps ),
-			CondValues( CondValues ),
-			ViscDataPresent( ViscDataPresent ),
-			NumViscTempPts( NumViscTempPts ),
-			ViscLowTempValue( ViscLowTempValue ),
-			ViscHighTempValue( ViscHighTempValue ),
-			ViscLowTempIndex( ViscLowTempIndex ),
-			ViscHighTempIndex( ViscHighTempIndex ),
-			ViscTemps( ViscTemps ),
-			ViscValues( ViscValues )
-		{}
-
 	};
 
 	struct FluidPropsRefrigErrors
@@ -589,61 +402,6 @@ namespace FluidProperties {
 			SatSupDensityPresErrCount( 0 )
 		{}
 
-		// Member Constructor
-		FluidPropsRefrigErrors(
-			std::string const & Name,
-			int const SatTempErrIndex, // Index for Sat Temperature Error (Recurring errors)
-			int const SatTempErrCount, // Count for Sat Temperature Error (Recurring errors)
-			int const SatPressErrIndex, // Index for Sat Pressure Error (Recurring errors)
-			int const SatPressErrCount, // Count for Sat Pressure Error (Recurring errors)
-			int const SatTempDensityErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatTempDensityErrCount, // Count for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupEnthalpyErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupEnthalpyErrCount, // Count for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupEnthalpyTempErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupEnthalpyTempErrCount, // Count for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupEnthalpyPresErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupEnthalpyPresErrCount, // Count for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupPressureErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupPressureErrCount, // Count for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupPressureTempErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupPressureTempErrCount, // Count for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupPressureEnthErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupPressureEnthErrCount, // Count for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupDensityErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupDensityErrCount, // Count for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupDensityTempErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupDensityTempErrCount, // Count for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupDensityPresErrIndex, // Index for Sat Temperature (Density) Error (Recurring errors)
-			int const SatSupDensityPresErrCount // Count for Sat Temperature (Density) Error (Recurring errors)
-		) :
-			Name( Name ),
-			SatTempErrIndex( SatTempErrIndex ),
-			SatTempErrCount( SatTempErrCount ),
-			SatPressErrIndex( SatPressErrIndex ),
-			SatPressErrCount( SatPressErrCount ),
-			SatTempDensityErrIndex( SatTempDensityErrIndex ),
-			SatTempDensityErrCount( SatTempDensityErrCount ),
-			SatSupEnthalpyErrIndex( SatSupEnthalpyErrIndex ),
-			SatSupEnthalpyErrCount( SatSupEnthalpyErrCount ),
-			SatSupEnthalpyTempErrIndex( SatSupEnthalpyTempErrIndex ),
-			SatSupEnthalpyTempErrCount( SatSupEnthalpyTempErrCount ),
-			SatSupEnthalpyPresErrIndex( SatSupEnthalpyPresErrIndex ),
-			SatSupEnthalpyPresErrCount( SatSupEnthalpyPresErrCount ),
-			SatSupPressureErrIndex( SatSupPressureErrIndex ),
-			SatSupPressureErrCount( SatSupPressureErrCount ),
-			SatSupPressureTempErrIndex( SatSupPressureTempErrIndex ),
-			SatSupPressureTempErrCount( SatSupPressureTempErrCount ),
-			SatSupPressureEnthErrIndex( SatSupPressureEnthErrIndex ),
-			SatSupPressureEnthErrCount( SatSupPressureEnthErrCount ),
-			SatSupDensityErrIndex( SatSupDensityErrIndex ),
-			SatSupDensityErrCount( SatSupDensityErrCount ),
-			SatSupDensityTempErrIndex( SatSupDensityTempErrIndex ),
-			SatSupDensityTempErrCount( SatSupDensityTempErrCount ),
-			SatSupDensityPresErrIndex( SatSupDensityPresErrIndex ),
-			SatSupDensityPresErrCount( SatSupDensityPresErrCount )
-		{}
-
 	};
 
 	struct FluidPropsGlycolErrors
@@ -687,45 +445,6 @@ namespace FluidProperties {
 			ViscosityHighErrCount( 0 )
 		{}
 
-		// Member Constructor
-		FluidPropsGlycolErrors(
-			std::string const & Name, // Which glycol this error structure is for
-			int const SpecHeatLowErrIndex, // Index for Specific Heat Low Error (Recurring errors)
-			int const SpecHeatHighErrIndex, // Index for Specific Heat High Error (Recurring errors)
-			int const SpecHeatLowErrCount, // Count for Specific Heat Low Error (Recurring errors)
-			int const SpecHeatHighErrCount, // Count for Specific Heat High Error (Recurring errors)
-			int const DensityHighErrCount, // Index for Density Low Error (Recurring errors)
-			int const DensityLowErrIndex, // Index for Density High Error (Recurring errors)
-			int const DensityHighErrIndex, // Count for Density Low Error (Recurring errors)
-			int const DensityLowErrCount, // Count for Density High Error (Recurring errors)
-			int const ConductivityLowErrIndex, // Index for Conductivity Low Error (Recurring errors)
-			int const ConductivityHighErrIndex, // Index for Conductivity High Error (Recurring errors)
-			int const ConductivityLowErrCount, // Count for Conductivity Low Error (Recurring errors)
-			int const ConductivityHighErrCount, // Count for Conductivity High Error (Recurring errors)
-			int const ViscosityLowErrIndex, // Index for Viscosity Low Error (Recurring errors)
-			int const ViscosityHighErrIndex, // Index for Viscosity High Error (Recurring errors)
-			int const ViscosityLowErrCount, // Count for Viscosity Low Error (Recurring errors)
-			int const ViscosityHighErrCount // Count for Viscosity High Error (Recurring errors)
-		) :
-			Name( Name ),
-			SpecHeatLowErrIndex( SpecHeatLowErrIndex ),
-			SpecHeatHighErrIndex( SpecHeatHighErrIndex ),
-			SpecHeatLowErrCount( SpecHeatLowErrCount ),
-			SpecHeatHighErrCount( SpecHeatHighErrCount ),
-			DensityHighErrCount( DensityHighErrCount ),
-			DensityLowErrIndex( DensityLowErrIndex ),
-			DensityHighErrIndex( DensityHighErrIndex ),
-			DensityLowErrCount( DensityLowErrCount ),
-			ConductivityLowErrIndex( ConductivityLowErrIndex ),
-			ConductivityHighErrIndex( ConductivityHighErrIndex ),
-			ConductivityLowErrCount( ConductivityLowErrCount ),
-			ConductivityHighErrCount( ConductivityHighErrCount ),
-			ViscosityLowErrIndex( ViscosityLowErrIndex ),
-			ViscosityHighErrIndex( ViscosityHighErrIndex ),
-			ViscosityLowErrCount( ViscosityLowErrCount ),
-			ViscosityHighErrCount( ViscosityHighErrCount )
-		{}
-
 	};
 
 	// Object Data
@@ -736,6 +455,9 @@ namespace FluidProperties {
 	extern Array1D< FluidPropsGlycolErrors > GlycolErrorTracking;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	GetFluidPropertiesData();
@@ -1082,29 +804,6 @@ namespace FluidProperties {
 		Real64 & MinTempLimit,
 		Real64 & MaxTempLimit
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // FluidProperties
 

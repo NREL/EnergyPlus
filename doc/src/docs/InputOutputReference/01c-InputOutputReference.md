@@ -2439,6 +2439,12 @@ The AirflowNetwork:Multizone:Surface object allows a heat transfer surface or su
 
 An interior heat transfer surface (BuildingSurface:Detailed) whose surface name is used as the input for the Outside Boundary Condition Object field represents a floor without ground contact and is not allowed as an AirflowNetwork:Multizone:Surface. A heat transfer surface defined in the BuildingSurface:Detailed:ExteriorNaturalVentedCavity is also not allowed.
 
+When a triangular subsurface is used, the model provides a warning and treats this subsurface as rectangular. The effective width and height calculated in the ProcessSurfaceVertices function of the SurfaceGeometry module are used to represent a rectangular subsurface.
+
+Effective width = 0.75 x Length between Vertex 1 and Vertex 2
+
+Effective height = 4 x Area / ( 3 x Length between Vertex 2 and Vertex 3 )   
+
 #### Field: Surface Name
 
 This is the name of the corresponding surface (wall, roof, ceiling, floor, window, door or glass door).
@@ -5035,14 +5041,6 @@ The air-inlet node name that connects the air splitter to the individual zone AD
 
 The design constant volume flow rate (m<sup>3</sup>/sec) specified for the terminal reheat ADU.
 
-#### Control Fields:
-
-The last several fields for this object describe the type of reheat coil that is being used and how it is controlled. Most of the fields pertain to the hot water coil since the gas and electric coil are much more simplified.
-
-#### Field: Hot Water or Steam Inlet Node Name
-
-For the hot water reheat coil there is a node on the water side that would control the flow to the coil capacity to allow the coil to meet the zone demand. This control location is the name of the control node for the terminal reheat ADU. For the gas and electric coil this is left blank.
-
 #### Field: Reheat Coil Object Type
 
 The valid reheat component objects currently available are:
@@ -5084,7 +5082,6 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
     Zone 1 Reheat Air Outlet Node,  !- Unit Air Outlet Node
     Zone 1 Reheat Air Inlet Node,  !- Unit Air Inlet Node
     0.59,  !- Maximum air flow rate {m3/s}
-    ,  !- Control node
     COIL:Gas:Heating,  !- Reheat Component Object
     Reheat Coil Zone 1,  !- Name of Reheat Component
     0.0,  !- Max Reheat Water Flow {m3/s}
@@ -5321,14 +5318,6 @@ The name of the HVAC system node that is the air inlet node for the terminal uni
 
 The name of the HVAC system node that is the air outlet node of the unit. This same node will be the unit heating coil’s air outlet node. This node is also a zone inlet node.
 
-#### Field: Heating Coil Air Inlet Node Name
-
-The name of the HVAC system node that is the air inlet node of the unit’s heating coil. The same node is the outlet node of the unit’s fan. This is an internal node of this compound component.
-
-#### Field: Hot Water or Steam Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of hot water through the unit’s hot water heating coil. This should be the same node as the water inlet node of the hot water coil. For gas or electric coils this field should be left blank.
-
 #### Field: Fan Object Type
 
 The type of fan in the terminal unit. At this time the only type of fan allowed is *Fan:VariableVolume*.
@@ -5375,11 +5364,9 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
     ReheatCoilAvailSched,    !- System Availability schedule
     autosize,                !- Maximum cooling air volume flow rate
     autosize,                !- Maximum heating air volume flow rate
-    0.05,                     !- Zone Minimum Air Flow Fraction
-    SPACE2-1 ATU In Node,    !- Unit supply air inlet node
-    SPACE2-1 In Node,        !- Unit supply air outlet node
-    SPACE2-1 Zone Coil Air In Node,  !- heating coil air inlet node
-    SPACE2-1 Zone Coil Water In Node,!- Hot water control node
+    0.05,                    !- Zone Minimum Air Flow Fraction
+    SPACE2-1 ATU In Node,    !- Air Inlet Node Name
+    SPACE2-1 In Node,        !- Air Outlet Node Name
     FAN:SIMPLE:VariableVolume,       !- Fan object
     SPACE2-1 Zone Fan,       !- Fan name
     COIL:Water:SimpleHeating,!- Heating coil object
@@ -5461,14 +5448,6 @@ This numeric field defines the design maximum volumetric flow rate (m<sup>3</sup
 
 This numeric field defines the minimum air volumetric flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates as needed to maintain the heating set point specified in the Zone Control:Thermostatic object. This value must be between 0 and 1.
 
-#### Control Fields:
-
-The last several fields for this terminal reheat component describe the type of reheat coil that is being used and how it is controlled. Most of the fields pertain to the hot water coil since the gas and electric coil are much more simplified.
-
-#### Field: Hot Water or Steam Inlet Node Name
-
-For the hot water reheat coil there is a node on the water side that would control the water flow rate to allow the coil to meet the zone demand. This control location is the name of the control node for this terminal reheat ADU. For the gas and electric coils this field is left blank.
-
 #### Field: Reheat Coil Object Type
 
 The valid reheat component objects currently available are:
@@ -5517,7 +5496,6 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
     Zone 1 VAV Inlet Node,         !- UNIT Air Inlet Node
     0.583,                         !- Maximum air flow rate {m3/s}
     0.25,                          !- Zone Minimum Air Flow Fraction
-    ,                              !- Control node
     Coil:Heating:Electric,         !- Reheat Component Object
     Reheat Coil Zone 1,            !- Name of Reheat Component
     0.0,                           !- Max Reheat Water Flow {m3/s}
@@ -5774,10 +5752,6 @@ The maximum hot water volumetric flow rate in m<sup>3</sup>/sec through the unit
 
 The minimum hot water volumetric flow rate in m<sup>3</sup>/sec through the unit’s heating coil. If the heating coil is gas or electric this field should be blank.
 
-#### Field: Hot Water or Steam Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of hot water through the unit. This should be the same node as the water inlet node of the unit’s hot water coil. For gas or electric heating coils, this input should be blank.
-
 #### Field: Convergence Tolerance
 
 The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For units with water coils, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
@@ -5805,8 +5779,7 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
           Reheat Coil Zone 1,              ! name of air terminal unit reheat coil
           0.0013,                          ! Max Reheat Water Flow {Flow: m3/sec}
           0.0,                             ! Min Reheat Water Flow {Flow: m3/sec}
-          Zone 1 Reheat Water Inlet Node,  ! Control node
-          0.001;                    ! Convergence tolerance
+          0.001;                           ! Convergence tolerance
 ```
 
 
@@ -5922,10 +5895,6 @@ The maximum hot water or steam volumetric flow rate in m<sup>3</sup>/s through t
 
 The minimum hot water or steam volumetric flow rate in m<sup>3</sup>/s through the unit’s heating coil. The steam volumetric flow rate is calculated at 100C and 101325 Pa. If the heating coil is gas or electric this field should be blank.
 
-#### Field: Hot Water or Steam Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of hot water through the unit. This should be the same node as the water inlet node of the unit’s hot water coil. For gas or electric heating coils, this input should be blank.
-
 #### Field: Convergence Tolerance
 
 The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For units with water coils, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
@@ -5954,8 +5923,7 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
           Reheat Coil Zone 3,              ! name of air terminal unit reheat coil
           0.0013,                          ! Max Reheat Water Flow {Flow: m3/sec}
           0.0,                             ! Min Reheat Water Flow {Flow: m3/sec}
-          Zone 3 Reheat Water Inlet Node,  ! Control node
-          0.001;                    ! Convergence tolerance
+          0.001;                           ! Convergence tolerance
 ```
 
 
@@ -6018,14 +5986,6 @@ The name of the HVAC system node from which the unit draws its secondary or reci
 #### Field: Air Outlet Node Name
 
 The name of the HVAC system node to which the unit sends its outlet air. This should be one of the inlet air nodes of the zone which is being served.
-
-#### Field: Hot Water Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of hot water through the unit. This should be the same node as the water inlet node of the unit’s hot water coil.
-
-#### Field: Cold Water Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of cold water through the unit. This should be the same node as the water inlet node of the unit’s chilled water coil.
 
 #### Field: Heating Coil Object Type
 
@@ -6100,8 +6060,6 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
     SPACE2-1 ATU Supply Node, !- Terminal unit supply air inlet node
     SPACE2-1 ATU Induc Node,  !- Terminal unit induced air inlet node
     SPACE2-1 In Node,         !- Terminal unit air outlet node
-    SPACE2-1 HW Coil Water In Node, !- Hot water control node
-    SPACE2-1 CW Coil Water In Node, !- Cold water control node
     COIL:Heating:Water,       !- Heating coil object
     SPACE2-1 HW Coil,         !- Heating coil name
     autosize,                 !- Max hot water flow
@@ -6182,12 +6140,6 @@ The name of the chilled water inlet node.  If desired, the chilled water node co
 #### Field: Chilled Water Outlet Node Name
 The name of the chilled water outlet node.
 
-#### Field: Hot Water Inlet Node Name
-The name of the hot water inlet node.  If desired, the hot water node connections can be omitted and the model will assume the intent is to model a two-pipe cooling only beam.
-
-#### Field: Hot Water Outlet Node Name
-The name of the hot water outlet node.
-
 #### Field: Design Primary Air Volume Flow Rate
 This is the air flow rate (m3/s) of the primary air entering the air terminal unit from the central air handling unit. This input can be autosized.
 
@@ -6251,8 +6203,6 @@ An example input follows:
         Zone One 4pipe Beam Outlet Node Name , !- Primary Air Outlet Node Name
         Zone One 4pipe Beam CW Inlet Node , !- Chilled Water Inlet Node Name
         Zone One 4pipe Beam CW Outlet Node , !- Chilled Water Outlet Node Name
-        Zone One 4pipe Beam HW Inlet Node , !- Hot Water Inlet Node Name
-        Zone One 4pipe Beam HW Outlet Node, !- Hot Water Outlet Node Name
         AUTOSIZE , !- Design Primary Air Volume Flow Rate
         AUTOSIZE , !- Design Chilled Water Volume Flow Rate
         AUTOSIZE , !- Design Hot Water Volume Flow Rate
@@ -7389,11 +7339,11 @@ A unique user assigned name for an instance of a Fan Coil unit. Any reference to
 
 The name of the schedule (ref: Schedule) that denotes whether the fan coil unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
 
-***Field: Capacity Control  Method***
+***Field: Capacity Control Method***
 
-This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, ***MultiSpeedFan***, or ***ASHRAE90.1***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. For *ASHRAE90.1*, the fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. The water coil water flow rate, or the electric heating coil part-load ratio, is modulated to meet the zone load. If the zone sensible load is greater than the zone sensible load multiplied by the low speed supply air flow ratio, then the air and water flow rate is increased to meet the load. If the zone load is greater than the design sensible load, the fan air flow rate is maintained at the maximum value while the water flow rate is further increased to the maximum available while electric heating coils are maintained at the maximum output.
+This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, ***MultiSpeedFan***, or ***ASHRAE90VariableFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. For *ASHRAE90VariableFan*, the fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. The water coil water flow rate, or the electric heating coil part-load ratio, is modulated to meet the zone load. If the zone sensible load is greater than the zone sensible load multiplied by the low speed supply air flow ratio, then the air and water flow rate is increased to meet the load. If the zone load is greater than the design sensible load, the fan air flow rate is maintained at the maximum value while the water flow rate is further increased to the maximum available while electric heating coils are maintained at the maximum output.
 
-***Note: when ASHRAE90.1 is selected, the simulation must include zone sizing to calculate the zone design sensible cooling and heating load.***
+***Note: when ASHRAE90VariableFan is selected, the simulation must include zone sizing to calculate the zone design sensible cooling and heating load unless the Minimum Supply Air Temperature in Cooling/Heating Mode inputs are specified.***
 
 ***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schedule type. The model selects at what fan speed to run depending on cooling or heating load.
 
@@ -7403,7 +7353,7 @@ The maximum volumetric airflow rate (m<sup>3</sup>/sec) through the fan coil uni
 
 #### Field: Low Speed Supply Air Flow Ratio
 
-This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. This value should be less than the *Medium Speed Supply Air Flow Ratio.* If left blank, the default value is 0.33. Leave this field blank if the capacity control method selected is not *CyclingFan* or *ASHRAE90.1*. The suggested value is 0.5 when using the ASHRAE90.1 capacity control method.
+This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. This value should be less than the *Medium Speed Supply Air Flow Ratio.* If left blank, the default value is 0.33. Leave this field blank if the capacity control method selected is not *CyclingFan* or *ASHRAE90VariableFan*. The suggested value is 0.5 when using the ASHRAE90VariableFan capacity control method.
 
 #### Field: Medium Speed Supply Air  Flow Ratio
 
@@ -7447,7 +7397,7 @@ This field specifies the type of supply air fan object used by this fan coil. Th
 
 #### Field: Supply Air Fan Name
 
-The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. For *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume* should be chosen. For *MultiSpeedFan* a *Fan:OnOff* should be used. And for *ASHRAE90.1*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen. 
+The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. For *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume* should be chosen. For *MultiSpeedFan* a *Fan:OnOff* should be used. And for *ASHRAE90VariableFan*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen. 
 
     The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
     The fan’s outlet node should be the same as the cooling coil’s air inlet node.
@@ -7533,6 +7483,12 @@ This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing o
 #### Field: Supply Air Fan Operating Mode Schedule Name
 This input field is the name of a schedule that controls fan operation. Schedule Name values of 0
 denote cycling fan operation (fan cycles with heating or cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiSpeedFan* capacity control method only.
+
+#### Field: Minimum Supply Air Temperature in Cooling Mode
+This optional input is used only when *Capacity Control Method = ASHRAE90VariableFan*. Specify the minimum supply air temperature in cooling mode. When the fan coil capacity is greater than the zone load, the fan speed will modulate down to the minimum fan speed specified and the water flow rate will also be reduced to maintain the zone thermostat set point temperature. When these fields are not entered, a zone sizing simulation must be performed. Both the cooling and heating supply air temperature must be entered or blank in unison.
+
+#### Field: Maximum Supply Air Temperature in Heating Mode
+This optional input is used only when *Capacity Control Method = ASHRAE90VariableFan*. Specify the maximum supply air temperature in heating mode. When the fan coil capacity is greater than the zone load, the fan speed will modulate down to the minimum fan speed specified and the water flow rate will also be reduced to maintain the zone thermostat set point temperature. When these fields are not entered, a zone sizing simulation must be performed. Both the cooling and heating supply air temperature must be entered or blank in unison.
 
 
 An example input for a fan coil unit, including its constituent components, is shown below.
@@ -8393,7 +8349,7 @@ This output is the availability status of the zone evaporative cooler unit’s f
 
 The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to model dedicated outdoor air systems (DOAS) and other similar systems which aim to provide either additional outside air or some limited amount of sensible and/or latent conditioning.  The zone outdoor air unit is a piece of zone equipment that can consist of a supply fan, an exhaust fan (optional), heating and cooling coils, and heat recovery.  The outdoor air unit input simply requires information about flow rates, schedules, node names, and a list of component that are part of the unit.  These components require additional input as per the requirements for these components.  In addition, the input includes information about controls for the unit.  It should be noted that the components that make up the zone outdoor air unit do not require additional controls or setpoints.  The unit input defines how the unit outlet temperature is controlled as described below.
 
-![](media/image282.png)
+![](media/image7466.png)
 
 Figure 110. Zone Outdoor Air Unit Schematic
 

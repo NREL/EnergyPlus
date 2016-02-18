@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataPhotovoltaics_hh_INCLUDED
 #define DataPhotovoltaics_hh_INCLUDED
 
@@ -78,23 +136,6 @@ namespace DataPhotovoltaics {
 			PVEfficiency( 0.0 )
 		{}
 
-		// Member Constructor
-		SimplePVParamsStruct(
-			std::string const & Name, // name as identified in Sandia database
-			Real64 const AreaCol, // effective area of solar collection
-			Real64 const ActiveFraction, // fraction of parent surface that has active solar cells
-			int const EfficencyInputMode, // to schedule or not
-			int const EffSchedPtr, // index pointer for efficiency schedule
-			Real64 const PVEfficiency // fixed or current PV efficiency
-		) :
-			Name( Name ),
-			AreaCol( AreaCol ),
-			ActiveFraction( ActiveFraction ),
-			EfficencyInputMode( EfficencyInputMode ),
-			EffSchedPtr( EffSchedPtr ),
-			PVEfficiency( PVEfficiency )
-		{}
-
 	};
 
 	struct TRNSYSPVModuleParamsStruct // for  GENERATOR:PV:Equivalent One-Diode Model
@@ -144,51 +185,6 @@ namespace DataPhotovoltaics {
 			HeatCapacity( 0.0 )
 		{}
 
-		// Member Constructor
-		TRNSYSPVModuleParamsStruct(
-			std::string const & Name,
-			int const CellsInSeries, // cells in series [-]
-			int const CellType, // type of PV cell (crystalline, amorphous )
-			Real64 const Area, // module area [m2]
-			Real64 const TauAlpha, // tau alpha product at normal incidence [-]
-			Real64 const SemiConductorBandgap, // electron bandgap [eV]
-			Real64 const ShuntResistance, // shunt resistance [ohms]
-			Real64 const RefIsc, // short circuit current at reference conditions [A/K]
-			Real64 const RefVoc, // open circuit voltage at reference conditions [V/K]
-			Real64 const RefTemperature, // temperature at reference conditions
-			Real64 const RefInsolation, // radiation at reference conditions [W/m2]
-			Real64 const Imp, // current at max power [A]
-			Real64 const Vmp, // voltage at max power [V]
-			Real64 const TempCoefIsc, // temperature coefficient of short circuit current
-			Real64 const TempCoefVoc, // temperature coefficient of open circuit voltage
-			Real64 const NOCTAmbTemp, // ambient temperature at NOCT [C]
-			Real64 const NOCTCellTemp, // cell temperature at NOCT [C]
-			Real64 const NOCTInsolation, // radiation at NOCT [W/m2]
-			Real64 const HeatLossCoef, // heat loss coefficient [W/m2.K]
-			Real64 const HeatCapacity // total heat capacity (only used in TC mode 1)
-		) :
-			Name( Name ),
-			CellsInSeries( CellsInSeries ),
-			CellType( CellType ),
-			Area( Area ),
-			TauAlpha( TauAlpha ),
-			SemiConductorBandgap( SemiConductorBandgap ),
-			ShuntResistance( ShuntResistance ),
-			RefIsc( RefIsc ),
-			RefVoc( RefVoc ),
-			RefTemperature( RefTemperature ),
-			RefInsolation( RefInsolation ),
-			Imp( Imp ),
-			Vmp( Vmp ),
-			TempCoefIsc( TempCoefIsc ),
-			TempCoefVoc( TempCoefVoc ),
-			NOCTAmbTemp( NOCTAmbTemp ),
-			NOCTCellTemp( NOCTCellTemp ),
-			NOCTInsolation( NOCTInsolation ),
-			HeatLossCoef( HeatLossCoef ),
-			HeatCapacity( HeatCapacity )
-		{}
-
 	};
 
 	struct TRNSYSPVCalcStruct
@@ -219,33 +215,6 @@ namespace DataPhotovoltaics {
 			LastCellTempK( 0.0 ),
 			ArrayIsc( 0.0 ),
 			ArrayVoc( 0.0 )
-		{}
-
-		// Member Constructor
-		TRNSYSPVCalcStruct(
-			Real64 const Insolation, // radiation [W/m2]
-			Real64 const ArrayCurrent, // array current at current conditions [A]
-			Real64 const ArrayVoltage, // array voltage at current conditions [V]
-			Real64 const ArrayPower, // array power at current conditions [W]
-			Real64 const ArrayEfficiency, // array efficiency at current conditions [0..1]
-			Real64 const CellTemp, // array cell temperature at current conditions [C]
-			Real64 const CellTempK, // array cell temperature (for setting last cell temp) [K]
-			Real64 const TimeElapsed, // time previous update of last cell temp
-			Real64 const LastCellTempK, // array cell temperature at previous conditions [K]
-			Real64 const ArrayIsc, // array short circuit current at current conditions [A]
-			Real64 const ArrayVoc // array open circuit voltage at current conditions [V]
-		) :
-			Insolation( Insolation ),
-			ArrayCurrent( ArrayCurrent ),
-			ArrayVoltage( ArrayVoltage ),
-			ArrayPower( ArrayPower ),
-			ArrayEfficiency( ArrayEfficiency ),
-			CellTemp( CellTemp ),
-			CellTempK( CellTempK ),
-			TimeElapsed( TimeElapsed ),
-			LastCellTempK( LastCellTempK ),
-			ArrayIsc( ArrayIsc ),
-			ArrayVoc( ArrayVoc )
 		{}
 
 	};
@@ -348,91 +317,6 @@ namespace DataPhotovoltaics {
 			c_7( 0.0 )
 		{}
 
-		// Member Constructor
-		SNLModuleParamsStuct(
-			std::string const & name, // name as identified in Sandia database
-			Real64 const Acoll, // Active collector area (m2, single module)
-			Real64 const NcellSer, // Number of cells in series in a module's cell-string (unitless)
-			Real64 const NparSerCells, // Number of cell-strings in parallel in module (unitless)
-			Real64 const Isc0, // Short circuit current at reference conditions (Amps)
-			Real64 const Voc0, // Open circuit voltage at reference conditions (Volts)
-			Real64 const Imp0, // Max power point current at reference conditions (Amps)
-			Real64 const Vmp0, // Voltage at max power at reference conditions (Volts)
-			Real64 const aIsc, // Normalized temperature coefficient for Isc (Amps/degC) Isc temperature coeff
-			Real64 const aImp, // Normalized temperature coefficient for Imp (1/degC) Imp temperature coeff
-			Real64 const c_0, // Empirical coefficients relating Imp to Ee (unitless)
-			Real64 const c_1, // Empirical coefficients relating Imp to Ee (unitless)
-			Real64 const BVoc0, // Temperature coefficient for module open-circuit-voltage at reference conditions
-			Real64 const mBVoc, // Coefficient for irradiance dependence of open-circuit-voltage-temperature
-			Real64 const BVmp0, // Temperature coefficient for module maximum-power-voltage at reference conditions
-			Real64 const mBVmp, // Cofficient for irradiance dependence of maximum-power-voltage-temperature
-			Real64 const DiodeFactor, // Empirically determined 'diode factor' for individual cells (unitless)
-			Real64 const c_2, // Empirical coefficients relating Vmp to Ee (unitless)
-			Real64 const c_3, // Empirical coefficients relating Vmp to Ee (unitless)
-			Real64 const a_0, // Empirical coefficients for f1(AMa) polynomial (unitless)
-			Real64 const a_1, // Empirical coefficients for f1(AMa) polynomial (unitless)
-			Real64 const a_2, // Empirical coefficients for f1(AMa) polynomial (unitless)
-			Real64 const a_3, // Empirical coefficients for f1(AMa) polynomial (unitless)
-			Real64 const a_4, // Empirical coefficients for f1(AMa) polynomial (unitless)
-			Real64 const b_0, // Empirical coefficients for f1(AOI) polynomial (unitless)
-			Real64 const b_1, // Empirical coefficients for f1(AOI) polynomial (unitless)
-			Real64 const b_2, // Empirical coefficients for f1(AOI) polynomial (unitless)
-			Real64 const b_3, // Empirical coefficients for f1(AOI) polynomial (unitless)
-			Real64 const b_4, // Empirical coefficients for f1(AOI) polynomial (unitless)
-			Real64 const b_5, // Empirical coefficients for f1(AOI) polynomial (unitless)
-			Real64 const DT0, // Temperature difference between Tc and Tm at Eo (°C),
-			Real64 const fd, // Fraction of diffuse irradiance used by module (unitless)
-			Real64 const a, // Empirical coefficient for module temp.at low wind,
-			Real64 const b, // Empirical coefficient relating module temp.
-			Real64 const c_4, // Empirical coefficients relating Ix to Ee (unitless)
-			Real64 const c_5, // Empirical coefficients relating Ix to Ee (unitless)
-			Real64 const Ix0, // Current at V = 0.5 Voc and at reference conditions (Amps)
-			Real64 const Ixx0, // Current at V = 0.5 (Vmp + Voc) and at reference conditions (Amps)
-			Real64 const c_6, // Empirical coefficients relating Ixx to Ee (unitless)
-			Real64 const c_7 // Empirical coefficients relating Ixx to Ee (unitless)
-		) :
-			name( name ),
-			Acoll( Acoll ),
-			NcellSer( NcellSer ),
-			NparSerCells( NparSerCells ),
-			Isc0( Isc0 ),
-			Voc0( Voc0 ),
-			Imp0( Imp0 ),
-			Vmp0( Vmp0 ),
-			aIsc( aIsc ),
-			aImp( aImp ),
-			c_0( c_0 ),
-			c_1( c_1 ),
-			BVoc0( BVoc0 ),
-			mBVoc( mBVoc ),
-			BVmp0( BVmp0 ),
-			mBVmp( mBVmp ),
-			DiodeFactor( DiodeFactor ),
-			c_2( c_2 ),
-			c_3( c_3 ),
-			a_0( a_0 ),
-			a_1( a_1 ),
-			a_2( a_2 ),
-			a_3( a_3 ),
-			a_4( a_4 ),
-			b_0( b_0 ),
-			b_1( b_1 ),
-			b_2( b_2 ),
-			b_3( b_3 ),
-			b_4( b_4 ),
-			b_5( b_5 ),
-			DT0( DT0 ),
-			fd( fd ),
-			a( a ),
-			b( b ),
-			c_4( c_4 ),
-			c_5( c_5 ),
-			Ix0( Ix0 ),
-			Ixx0( Ixx0 ),
-			c_6( c_6 ),
-			c_7( c_7 )
-		{}
-
 	};
 
 	struct SNLPVInputStruct // for data obtained elsewhere in EnergyPlus
@@ -455,25 +339,6 @@ namespace DataPhotovoltaics {
 			Tamb( 0.0 ),
 			WindSpeed( 0.0 ),
 			Altitude( 0.0 )
-		{}
-
-		// Member Constructor
-		SNLPVInputStruct(
-			Real64 const IcBeam, // incident beam solar (W/m2)
-			Real64 const IcDiffuse, // incident diffuse solar (W/m2)
-			Real64 const IncidenceAngle, // angle from normal for beam (deg)
-			Real64 const ZenithAngle, // solar zenith angle (deg)
-			Real64 const Tamb, // outdoor drybulb temperature (C)
-			Real64 const WindSpeed, // outdoor windspeed. (m/s)
-			Real64 const Altitude // elevation above sea level. (m)
-		) :
-			IcBeam( IcBeam ),
-			IcDiffuse( IcDiffuse ),
-			IncidenceAngle( IncidenceAngle ),
-			ZenithAngle( ZenithAngle ),
-			Tamb( Tamb ),
-			WindSpeed( WindSpeed ),
-			Altitude( Altitude )
 		{}
 
 	};
@@ -518,43 +383,6 @@ namespace DataPhotovoltaics {
 			SurfaceSink( 0.0 )
 		{}
 
-		// Member Constructor
-		SNLPVCalcStruct(
-			Real64 const Vmp, // (Volts) maximum power voltage
-			Real64 const Imp, // (Amps) maximum power current
-			Real64 const Pmp, // (W) (was kJ/hr) maximum power point power
-			Real64 const EffMax, // (unitless) conversion efficiency at max power point
-			Real64 const Isc, // (Amps) short circuit current
-			Real64 const Voc, // (Volts) open circuit voltage
-			Real64 const Tcell, // (deg C) solar cell operating temperature
-			Real64 const Tback, // (deg C) solar module operation temp, at back of module
-			Real64 const AMa, // (unitless) Absolute Air mass
-			Real64 const F1, // (unitless) holds result of "AMa-Function" for solar spectrum influence
-			Real64 const F2, // (unitless) holds result of AOI-Function for angle-of-incidence
-			Real64 const Ix, // (Amps) Current at V = 0.5 Voc
-			Real64 const Vx, // (Volts) Voltage at 0.5 Voc
-			Real64 const Ixx, // (Amps) current at V = 0.5(Vmpp + Voc)
-			Real64 const Vxx, // (Volts) voltage at 0.5(Vmpp + Voc)
-			Real64 const SurfaceSink // (Watts) energy balance term to account for electricity leaving
-		) :
-			Vmp( Vmp ),
-			Imp( Imp ),
-			Pmp( Pmp ),
-			EffMax( EffMax ),
-			Isc( Isc ),
-			Voc( Voc ),
-			Tcell( Tcell ),
-			Tback( Tback ),
-			AMa( AMa ),
-			F1( F1 ),
-			F2( F2 ),
-			Ix( Ix ),
-			Vx( Vx ),
-			Ixx( Ixx ),
-			Vxx( Vxx ),
-			SurfaceSink( SurfaceSink )
-		{}
-
 	};
 
 	struct PVReportVariables // for  GENERATOR:PV:EQUIVALENT ONE-DIODE MODEL
@@ -579,27 +407,6 @@ namespace DataPhotovoltaics {
 			ArrayVoc( 0.0 ),
 			ArrayCurrent( 0.0 ),
 			ArrayVoltage( 0.0 )
-		{}
-
-		// Member Constructor
-		PVReportVariables(
-			Real64 const DCPower, // Direct Current power from PV array
-			Real64 const DCEnergy, // Direct Current energy from PV array
-			Real64 const ArrayEfficiency, // array efficiency at current conditions [0..1]
-			Real64 const CellTemp, // array cell temperature at current conditions [C]
-			Real64 const ArrayIsc, // array short circuit current at current conditions [A]
-			Real64 const ArrayVoc, // array open circuit voltage at current conditions [V]
-			Real64 const ArrayCurrent,
-			Real64 const ArrayVoltage
-		) :
-			DCPower( DCPower ),
-			DCEnergy( DCEnergy ),
-			ArrayEfficiency( ArrayEfficiency ),
-			CellTemp( CellTemp ),
-			ArrayIsc( ArrayIsc ),
-			ArrayVoc( ArrayVoc ),
-			ArrayCurrent( ArrayCurrent ),
-			ArrayVoltage( ArrayVoltage )
 		{}
 
 	};
@@ -640,49 +447,6 @@ namespace DataPhotovoltaics {
 			ExtVentCavPtr( 0 ),
 			PVTPtr( 0 ),
 			SurfaceSink( 0.0 )
-		{}
-
-		// Member Constructor
-		PVArrayStruct(
-			std::string const & Name,
-			std::string const & SurfaceName, // named surface in heat balance domain
-			std::string const & PerfObjName,
-			int const SurfacePtr, // index for named surface
-			int const PVModelType, // type of performance modeling, Simple, TRNSYS or Equivalent 1-diode, or Sandia/King model
-			int const CellIntegrationMode, // how are PV cells integrated with other E+ modeling
-			Real64 const NumModNSeries, // number of modules in series in one string
-			Real64 const NumSeriesNParall, // number of series strings in parallel
-			int const UTSCPtr, // pointer to UTSC number for INTEGRATED TRANSPIRED COLLECTOR mode
-			int const ExtVentCavPtr, // pointer to Exterior Vented Cavity EXTERIOR VENTED CAVITY
-			int const PVTPtr, // pointer to PVT model
-			Real64 const SurfaceSink, // PV power "sink" for integration
-			PVReportVariables const & Report, // report variables
-			SimplePVParamsStruct const & SimplePVModule, // simple model input params
-			TRNSYSPVModuleParamsStruct const & TRNSYSPVModule, // equivalent one-diode input params
-			SNLModuleParamsStuct const & SNLPVModule, // Sandia/King model input parameter data
-			TRNSYSPVCalcStruct const & TRNSYSPVcalc,
-			SNLPVInputStruct const & SNLPVinto, // model input from elsewhere in EnergyPlus
-			SNLPVCalcStruct const & SNLPVCalc // calc'd data for GENERATOR:PV:Sandia model
-		) :
-			Name( Name ),
-			SurfaceName( SurfaceName ),
-			PerfObjName( PerfObjName ),
-			SurfacePtr( SurfacePtr ),
-			PVModelType( PVModelType ),
-			CellIntegrationMode( CellIntegrationMode ),
-			NumModNSeries( NumModNSeries ),
-			NumSeriesNParall( NumSeriesNParall ),
-			UTSCPtr( UTSCPtr ),
-			ExtVentCavPtr( ExtVentCavPtr ),
-			PVTPtr( PVTPtr ),
-			SurfaceSink( SurfaceSink ),
-			Report( Report ),
-			SimplePVModule( SimplePVModule ),
-			TRNSYSPVModule( TRNSYSPVModule ),
-			SNLPVModule( SNLPVModule ),
-			TRNSYSPVcalc( TRNSYSPVcalc ),
-			SNLPVinto( SNLPVinto ),
-			SNLPVCalc( SNLPVCalc )
 		{}
 
 	};

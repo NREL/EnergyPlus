@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <vector>
 #include <string>
@@ -46,7 +104,6 @@ namespace EnergyPlus {
 
 			static std::string const currentModuleObject( "Output:Table:Annual" );
 
-			std::string curAggString; // Current aggregation sting
 			int jAlpha;
 			int numParams; // Number of elements combined
 			int numAlphas; // Number of elements in the alpha array
@@ -110,7 +167,7 @@ namespace EnergyPlus {
 		// This method is used along with the constructor to convert the GetInput for REPORT:TABLE:ANNUAL
 		// into the class data.
 		{
-			m_annualFields.push_back(AnnualFieldSet(varName,aggKind, dgts)  );
+			m_annualFields.push_back( AnnualFieldSet( varName, aggKind, dgts ) );
 			m_annualFields.back().m_colHead = varName; // use the variable name for the column heading
 		}
 
@@ -144,7 +201,7 @@ namespace EnergyPlus {
 			bool useFilter = (m_filter.size() != 0);
 
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				keyCount = fldStIt->getVariableKeyCountandTypeFromFldSt( typeVar, avgSumVar, stepTypeVar, unitsVar );
 				fldStIt->getVariableKeysFromFldSt( typeVar, keyCount, fldStIt->m_namesOfKeys, fldStIt->m_indexesForKeyVar );
 				for ( std::string nm : fldStIt->m_namesOfKeys ){
@@ -164,15 +221,15 @@ namespace EnergyPlus {
 			allKeys.unique(); // will now just have a list of the unique keys that is sorted
 			std::copy( allKeys.begin(), allKeys.end(), back_inserter( m_objectNames) );  // copy list to the object names
 			// size all columns list of cells to be the size of the
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ )
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt )
 			{
 				fldStIt->m_cell.resize( m_objectNames.size() );
 			}
 			// for each column (field set) set the rows cell to the output variable index (for variables)
 			int foundKeyIndex;
 			int tableRowIndex = 0;
-			for ( std::vector<std::string>::iterator objNmIt = m_objectNames.begin(); objNmIt != m_objectNames.end(); objNmIt++ ){
-				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( std::vector<std::string>::iterator objNmIt = m_objectNames.begin(); objNmIt != m_objectNames.end(); ++objNmIt ){
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 					foundKeyIndex = -1;
 					for ( std::string::size_type i = 0; i < fldStIt->m_namesOfKeys.size(); i++ ){
 						if ( fldStIt->m_namesOfKeys[i] == *objNmIt ){
@@ -209,7 +266,7 @@ namespace EnergyPlus {
 			// This function is not part of the class but acts as an interface between procedural code and the class by
 			// gathering data for each of the AnnualTable objects
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->gatherForTimestep( kindOfTimeStep );
 			}
 		}
@@ -237,7 +294,7 @@ namespace EnergyPlus {
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			std::vector<AnnualFieldSet>::iterator fldStRemainIt;
 			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
-				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 					int curTypeOfVar = fldStIt->m_typeOfVar;
 					int curStepType = fldStIt->m_varStepType;
 					if ( curStepType == kindOfTimeStep )  // this is a much simpler conditional than the code in monthly gathering
@@ -400,7 +457,7 @@ namespace EnergyPlus {
 							// if another minimum or maximum column is found then end
 							// the scan (it will be taken care of when that column is done)
 							if ( activeMinMax ) {
-								for ( fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); fldStRemainIt++ ) {
+								for ( fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); ++fldStRemainIt ) {
 									if ( fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum || fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum ){
 										// end scanning since these might reset
 										break; // for fldStRemainIt
@@ -426,7 +483,7 @@ namespace EnergyPlus {
 							// If the hours variable is active then scan through the rest of the variables
 							// and accumulate
 							if ( activeHoursShown ) {
-								for ( fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); fldStRemainIt++ ) {
+								for ( fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); ++fldStRemainIt ) {
 									int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
 									//int scanStepType = fldStRemainIt->m_varStepType;
 									int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
@@ -486,7 +543,7 @@ namespace EnergyPlus {
 			// This function is not part of the class but acts as an interface between procedural code and the class by
 			// reseting data for each of the AnnualTable objects
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->resetGathering();
 			}
 		}
@@ -495,9 +552,8 @@ namespace EnergyPlus {
 		AnnualTable::resetGathering()
 		{
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			std::vector<AnnualFieldSet>::iterator fldStRemainIt;
 			for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
-				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 					if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximum || fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::maximumDuringHoursShown ){
 						fldStIt->m_cell[row].result = -9.9e99;
 					} else if ( fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimum || fldStIt->m_aggregate == AnnualFieldSet::AggregationKind::minimumDuringHoursShown ){
@@ -547,7 +603,7 @@ namespace EnergyPlus {
 			// This function is not part of the class but acts as an interface between procedural code and the class by
 			// invoking the writeTable member function for each of the AnnualTable objects
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->writeTable( OutputReportTabular::unitsStyle );
 			}
 		}
@@ -594,7 +650,7 @@ namespace EnergyPlus {
 			// and the timestamp).
 			int columnCount = 0;
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				columnCount += columnCountForAggregation( fldStIt->m_aggregate );
 			}
 			columnHead.allocate( columnCount );
@@ -616,7 +672,7 @@ namespace EnergyPlus {
 			tableBody.allocate( columnCount, rowCount );
 			tableBody = ""; //set entire table to blank as default
 			int columnRecount = 0;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				std::string curAggString = aggString[ (int) fldStIt->m_aggregate ];
 				if ( curAggString.size() > 0 ) {
 					curAggString = " {" + trim( curAggString ) + '}';
@@ -871,7 +927,7 @@ namespace EnergyPlus {
 				rowHeadRange( 1 ) = ">=";
 				rowHeadRange( 2 ) = "<";
 				tableBodyRange.allocate( 10, 2 );
-				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+				for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 					int curAgg = fldStIt->m_aggregate;
 					if (( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax ) ||
 						( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax ) ||
@@ -1123,7 +1179,7 @@ namespace EnergyPlus {
 			// This function is not part of the class but acts as an interface between procedural code and the class by
 			// invoking the writeTable member function for each of the AnnualTable objects
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->addTableOfContents( nameOfStream );
 			}
 		}
@@ -1139,7 +1195,7 @@ namespace EnergyPlus {
 			std::vector<AnnualFieldSet>::iterator fldStIt;
 			Real64 const veryLarge = 1.0E280;
 			Real64 const verySmall = -1.0E280;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				int curAgg = fldStIt->m_aggregate;
 				// for columns with binning aggregation types compute the statistics
 				if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax ||
@@ -1284,7 +1340,7 @@ namespace EnergyPlus {
 			std::vector<Real64>::iterator elapsedTimeIt;
 			elapsedTimeIt = corrElapsedTime.begin();
 			std::vector<Real64>::iterator valueIt;
-			for ( valueIt = valuesToBin.begin(); valueIt != valuesToBin.end(); valueIt++ ){
+			for ( valueIt = valuesToBin.begin(); valueIt != valuesToBin.end(); ++valueIt ){
 				if ( *valueIt < bottomOfBins ) {
 					timeBelowBottomBin += *elapsedTimeIt;
 				}
@@ -1296,7 +1352,7 @@ namespace EnergyPlus {
 					binNum = int( ( *valueIt - bottomOfBins ) / intervalSize );
 					returnBins[binNum] += *elapsedTimeIt;
 				}
-				elapsedTimeIt++;
+				++elapsedTimeIt;
 			}
 			return returnBins;
 		}
@@ -1304,7 +1360,7 @@ namespace EnergyPlus {
 		void
 		AnnualTable::columnHeadersToTitleCase(){
 			std::vector<AnnualFieldSet>::iterator fldStIt;
-			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); fldStIt++ ){
+			for ( fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt ){
 				if ( fldStIt->m_variMeter == fldStIt->m_colHead ){
 					if ( fldStIt->m_indexesForKeyVar.size() > 0 ){
 						int varNum = fldStIt->m_indexesForKeyVar[0];
@@ -1317,7 +1373,7 @@ namespace EnergyPlus {
 		void
 		clear_state(){ // for unit tests
 			std::vector<AnnualTable>::iterator annualTableIt;
-			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); annualTableIt++ ){
+			for ( annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt ){
 				annualTableIt->clearTable();
 			}
 			annualTables.clear();
@@ -1382,30 +1438,3 @@ namespace EnergyPlus {
 	} //OutputReportTabularAnnual
 
 } // EnergyPlus
-
-
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
-

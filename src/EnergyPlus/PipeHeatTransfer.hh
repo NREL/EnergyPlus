@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef PipeHeatTransfer_hh_INCLUDED
 #define PipeHeatTransfer_hh_INCLUDED
 
@@ -224,181 +282,6 @@ namespace PipeHeatTransfer {
 			CheckEquipName( true )
 		{}
 
-		// Member Constructor
-		PipeHTData(
-			std::string const & Name, // name of the component
-			std::string const & Construction, // construction object name
-			std::string const & Environment, // keyword:  'Schedule', 'OutdoorAir', 'Zone'
-			std::string const & EnvrSchedule, // temperature schedule for environmental temp
-			std::string const & EnvrVelSchedule, // temperature schedule for environmental temp
-			std::string const & EnvrZone, // zone providing environmental temp
-			std::string const & EnvrAirNode, // outside air node providing environmental temp
-			Real64 const Length, // total pipe length [m]
-			Real64 const PipeID, // pipe inside diameter [m]
-			std::string const & InletNode, // inlet node name
-			std::string const & OutletNode, // outlet node name
-			int const InletNodeNum, // inlet node number
-			int const OutletNodeNum, // outlet node number
-			int const TypeOf, // Type of pipe
-			int const ConstructionNum, // construction ref number
-			int const EnvironmentPtr,
-			int const EnvrSchedPtr, // pointer to schedule used to set environmental temp
-			int const EnvrVelSchedPtr, // pointer to schedule used to set environmental temp
-			int const EnvrZonePtr, // pointer to zone number used to set environmental temp
-			int const EnvrAirNodeNum, // pointer to outside air node used to set environmental temp
-			int const NumSections, // total number of nodes along pipe length
-			Real64 const FluidSpecHeat, // fluid Cp [J/kg.K]
-			Real64 const FluidDensity, // density [kg/m3]
-			Real64 const MaxFlowRate, // max flow rate (from loop/node data)
-			Real64 const FluidSectionVol, // volume of each pipe section (node) [m^3]
-			Real64 const InsideArea, // pipe section inside surface area [m^2]
-			Real64 const OutsideArea, // pipe section outside surface area [m^2]
-			Real64 const SectionArea, // cross sectional area [m^2]
-			Real64 const PipeHeatCapacity, // heat capacity of pipe section [J/m.K]
-			Real64 const PipeOD, // pipe outside diameter [m]
-			Real64 const PipeCp, // pipe materail Cp [J/kg.K]
-			Real64 const PipeDensity, // pipe material density [kg/m3]
-			Real64 const PipeConductivity, // pipe material thermal conductivity [W/m.K]
-			Real64 const InsulationOD, // insulation outside diameter [m]
-			Real64 const InsulationCp, // insulation  specific heat [J/kg.K]
-			Real64 const InsulationDensity, // insulation density [kg/m3]
-			Real64 const InsulationConductivity, // insulation conductivity [W/m.K]
-			Real64 const InsulationThickness, // insulation thickness [m]
-			Real64 const InsulationResistance, // Insulation thermal resistance [m2.K/W]
-			Real64 const CurrentSimTime, // Current simulation time [hr]
-			Real64 const PreviousSimTime, // simulation time the report data was last updated
-			Array1< Real64 > const & TentativeFluidTemp,
-			Array1< Real64 > const & FluidTemp, // arrays for fluid and pipe temperatures at each node
-			Array1< Real64 > const & PreviousFluidTemp,
-			Array1< Real64 > const & TentativePipeTemp,
-			Array1< Real64 > const & PipeTemp,
-			Array1< Real64 > const & PreviousPipeTemp,
-			int const NumDepthNodes, // number of soil grid points in the depth direction
-			int const PipeNodeDepth, // soil depth grid point where pipe is located
-			int const PipeNodeWidth, // soil width grid point where pipe is located
-			Real64 const PipeDepth, // pipe burial depth [m]
-			Real64 const DomainDepth, // soil grid depth [m]
-			Real64 const dSregular, // grid spacing in cartesian domain [m]
-			Real64 const OutdoorConvCoef, // soil to air convection coefficient [W/m2.K]
-			std::string const & SoilMaterial, // name of soil material:regular object
-			int const SoilMaterialNum, // soil material index in material data structure
-			int const MonthOfMinSurfTemp, // month of minimum ground surface temperature
-			Real64 const MinSurfTemp, // minimum annual surface temperature [C]
-			Real64 const SoilDensity, // density of soil [kg/m3]
-			Real64 const SoilDepth, // thickness of soil [m]
-			Real64 const SoilCp, // specific heat of soil [J/kg.K]
-			Real64 const SoilConductivity, // thermal conductivity of soil [W/m.K]
-			Real64 const SoilRoughness, // ground surface roughness
-			Real64 const SoilThermAbs, // ground surface thermal absorptivity
-			Real64 const SoilSolarAbs, // ground surface solar absorptivity
-			Real64 const CoefS1, // soil surface finite difference coefficient
-			Real64 const CoefS2, // soil surface finite difference coefficient
-			Real64 const CoefA1, // soil finite difference coefficient
-			Real64 const CoefA2, // soil finite difference coefficient
-			Real64 const FourierDS, // soil Fourier number based on grid spacing
-			Real64 const SoilDiffusivity, // soil thermal diffusivity [m2/s]
-			Real64 const SoilDiffusivityPerDay, // soil thermal diffusivity [m2/day]
-			Array4< Real64 > const & T, // soil temperature array
-			bool const BeginSimInit, // begin sim and begin environment flag
-			bool const BeginSimEnvrn, // begin sim and begin environment flag
-			bool const FirstHVACupdateFlag,
-			bool const BeginEnvrnupdateFlag,
-			bool const SolarExposed, // Flag to determine if solar is included at ground surface
-			Real64 const SumTK, // Sum of thickness/conductivity over all material layers
-			Real64 const ZoneHeatGainRate, // Lagged energy summation for zone heat gain {W}
-			int const LoopNum, // PlantLoop index where this pipe lies
-			int const LoopSideNum, // PlantLoop%LoopSide index where this pipe lies
-			int const BranchNum, // ..LoopSide%Branch index where this pipe lies
-			int const CompNum, // ..Branch%Comp index where this pipe lies
-			bool const CheckEquipName
-		) :
-			Name( Name ),
-			Construction( Construction ),
-			Environment( Environment ),
-			EnvrSchedule( EnvrSchedule ),
-			EnvrVelSchedule( EnvrVelSchedule ),
-			EnvrZone( EnvrZone ),
-			EnvrAirNode( EnvrAirNode ),
-			Length( Length ),
-			PipeID( PipeID ),
-			InletNode( InletNode ),
-			OutletNode( OutletNode ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			TypeOf( TypeOf ),
-			ConstructionNum( ConstructionNum ),
-			EnvironmentPtr( EnvironmentPtr ),
-			EnvrSchedPtr( EnvrSchedPtr ),
-			EnvrVelSchedPtr( EnvrVelSchedPtr ),
-			EnvrZonePtr( EnvrZonePtr ),
-			EnvrAirNodeNum( EnvrAirNodeNum ),
-			NumSections( NumSections ),
-			FluidSpecHeat( FluidSpecHeat ),
-			FluidDensity( FluidDensity ),
-			MaxFlowRate( MaxFlowRate ),
-			FluidSectionVol( FluidSectionVol ),
-			InsideArea( InsideArea ),
-			OutsideArea( OutsideArea ),
-			SectionArea( SectionArea ),
-			PipeHeatCapacity( PipeHeatCapacity ),
-			PipeOD( PipeOD ),
-			PipeCp( PipeCp ),
-			PipeDensity( PipeDensity ),
-			PipeConductivity( PipeConductivity ),
-			InsulationOD( InsulationOD ),
-			InsulationCp( InsulationCp ),
-			InsulationDensity( InsulationDensity ),
-			InsulationConductivity( InsulationConductivity ),
-			InsulationThickness( InsulationThickness ),
-			InsulationResistance( InsulationResistance ),
-			CurrentSimTime( CurrentSimTime ),
-			PreviousSimTime( PreviousSimTime ),
-			TentativeFluidTemp( TentativeFluidTemp ),
-			FluidTemp( FluidTemp ),
-			PreviousFluidTemp( PreviousFluidTemp ),
-			TentativePipeTemp( TentativePipeTemp ),
-			PipeTemp( PipeTemp ),
-			PreviousPipeTemp( PreviousPipeTemp ),
-			NumDepthNodes( NumDepthNodes ),
-			PipeNodeDepth( PipeNodeDepth ),
-			PipeNodeWidth( PipeNodeWidth ),
-			PipeDepth( PipeDepth ),
-			DomainDepth( DomainDepth ),
-			dSregular( dSregular ),
-			OutdoorConvCoef( OutdoorConvCoef ),
-			SoilMaterial( SoilMaterial ),
-			SoilMaterialNum( SoilMaterialNum ),
-			MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
-			MinSurfTemp( MinSurfTemp ),
-			SoilDensity( SoilDensity ),
-			SoilDepth( SoilDepth ),
-			SoilCp( SoilCp ),
-			SoilConductivity( SoilConductivity ),
-			SoilRoughness( SoilRoughness ),
-			SoilThermAbs( SoilThermAbs ),
-			SoilSolarAbs( SoilSolarAbs ),
-			CoefS1( CoefS1 ),
-			CoefS2( CoefS2 ),
-			CoefA1( CoefA1 ),
-			CoefA2( CoefA2 ),
-			FourierDS( FourierDS ),
-			SoilDiffusivity( SoilDiffusivity ),
-			SoilDiffusivityPerDay( SoilDiffusivityPerDay ),
-			T( T ),
-			BeginSimInit( BeginSimInit ),
-			BeginSimEnvrn( BeginSimEnvrn ),
-			FirstHVACupdateFlag( FirstHVACupdateFlag ),
-			BeginEnvrnupdateFlag( BeginEnvrnupdateFlag ),
-			SolarExposed( SolarExposed ),
-			SumTK( SumTK ),
-			ZoneHeatGainRate( ZoneHeatGainRate ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			CheckEquipName( CheckEquipName )
-		{}
-
 	};
 
 	struct PipeHeatTransferReport
@@ -428,31 +311,6 @@ namespace PipeHeatTransfer {
 			EnvironmentHeatLossRate( 0.0 ),
 			EnvHeatLossEnergy( 0.0 ),
 			VolumeFlowRate( 0.0 )
-		{}
-
-		// Member Constructor
-		PipeHeatTransferReport(
-			Real64 const FluidInletTemp, // inlet temperature [C]
-			Real64 const FluidOutletTemp, // outlet temperature [C]
-			Real64 const MassFlowRate, // mass flow rate [kg/s]
-			Real64 const FluidHeatLossRate, // overall heat transfer rate from fluid to pipe [W]
-			Real64 const FluidHeatLossEnergy, // energy transferred from fluid to pipe [J]
-			Real64 const PipeInletTemp, // pipe temperature at inlet [C]
-			Real64 const PipeOutletTemp, // pipe temperature at Oulet [C]
-			Real64 const EnvironmentHeatLossRate, // overall heat transfer rate from pipe to environment [W]
-			Real64 const EnvHeatLossEnergy, // energy transferred from pipe to environment [J]
-			Real64 const VolumeFlowRate
-		) :
-			FluidInletTemp( FluidInletTemp ),
-			FluidOutletTemp( FluidOutletTemp ),
-			MassFlowRate( MassFlowRate ),
-			FluidHeatLossRate( FluidHeatLossRate ),
-			FluidHeatLossEnergy( FluidHeatLossEnergy ),
-			PipeInletTemp( PipeInletTemp ),
-			PipeOutletTemp( PipeOutletTemp ),
-			EnvironmentHeatLossRate( EnvironmentHeatLossRate ),
-			EnvHeatLossEnergy( EnvHeatLossEnergy ),
-			VolumeFlowRate( VolumeFlowRate )
 		{}
 
 	};
@@ -563,29 +421,6 @@ namespace PipeHeatTransfer {
 	//===============================================================================
 
 	//===============================================================================
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PipeHeatTransfer
 
