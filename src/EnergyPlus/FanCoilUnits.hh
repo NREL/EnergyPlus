@@ -471,6 +471,12 @@ namespace FanCoilUnits {
 	);
 
 	Real64
+	CalcFanCoilAirAndWaterInStepResidual(
+		Real64 const PLR, // air and water mass flow rate ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
 	CalcFanCoilBothFlowResidual(
 		Real64 const PLR, // air and water mass flow rate ratio
 		Array1< Real64 > const & Par // Function parameters
@@ -478,6 +484,12 @@ namespace FanCoilUnits {
 
 	Real64
 	CalcFanCoilElecHeatResidual(
+		Real64 const PLR, // electric heating coil part load ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilElecHeatTempResidual(
 		Real64 const PLR, // electric heating coil part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	);
