@@ -424,6 +424,7 @@ namespace HeatBalanceSurfaceManager {
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the zone, modify the zone  Dry/Wet BulbTemps
 		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
 
 		SetZoneWindSpeedAt();
 		//  DO ZoneNum = 1, NumOfZones
@@ -434,6 +435,7 @@ namespace HeatBalanceSurfaceManager {
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the surface centroids, modify the surface Dry/Wet BulbTemps
 		SetSurfaceOutBulbTempAt();
+		CheckSurfaceOutBulbTempAt();
 
 		SetSurfaceWindSpeedAt();
 		//  DO SurfNum = 1, TotSurfaces
