@@ -714,7 +714,7 @@ namespace DataRoomAirModel {
 		int AirflowNetworkLinkageDataID; // point to this linkage in AirflowNetworkLinkageData structure
 		int AirflowNetworkLinkReportID; // point to this linkage in AirflowNetworkLinkReport structure
 		Real64 MdotIn; // mass flow rate of air into control volume(neg means leaving control volume) (kg / s)
-		Real64 TempIn; // dryblub temperature of air into control volume
+		Real64 TempIn; // drybulb temperature of air into control volume
 		Real64 HumRatIn; // humidity ratio of air into control volume
 
 		// Default Constructor
