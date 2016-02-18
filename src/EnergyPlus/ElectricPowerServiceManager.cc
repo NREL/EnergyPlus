@@ -163,8 +163,8 @@ namespace EnergyPlus {
 			return;
 		}
 
-		for ( auto loopElecLoadCenter= 0; loopElecLoadCenter< this->numLoadCenters; ++loopElecLoadCenter ){
-			this->elecLoadCenterObjs[ loopElecLoadCenter ]->manageElecLoadCenter( firstHVACIteration, this->wholeBldgRemainingLoad );
+		for ( auto & e : this->elecLoadCenterObjs ) {
+			e->manageElecLoadCenter( firstHVACIteration, this->wholeBldgRemainingLoad );
 		}
 
 		this->updateWholeBuildingRecords();
@@ -335,8 +335,8 @@ namespace EnergyPlus {
 		this->elecProducedPowerConversionIndex =  EnergyPlus::GetMeterIndex( "PowerConversion:ElectricityProduced" );
 
 		if ( this->numLoadCenters > 0 ){
-			for( auto loopLoadCenters = 0; loopLoadCenters < this->numLoadCenters; ++loopLoadCenters ){
-				elecLoadCenterObjs[ loopLoadCenters ]->setupLoadCenterMeterIndices();
+			for ( auto & e : this->elecLoadCenterObjs ) {
+				e->setupLoadCenterMeterIndices();
 			}
 		}
 		if (this->facilityPowerInTransformerPresent ) {
@@ -366,8 +366,8 @@ namespace EnergyPlus {
 		this->elecProducedCoGenRate   = 0.0;
 
 		if ( this->numLoadCenters > 0 ){
-			for( auto loopLoadCenters = 0; loopLoadCenters < this->numLoadCenters; ++loopLoadCenters ){
-				elecLoadCenterObjs[ loopLoadCenters ]->reinitAtBeginEnvironment();
+			for ( auto & e : this->elecLoadCenterObjs ) {
+				e->reinitAtBeginEnvironment();
 			}
 		}
 		if ( this->facilityPowerInTransformerPresent ) {
@@ -457,8 +457,8 @@ namespace EnergyPlus {
 	void
 	ElectricPowerServiceManager::sumUpNumberOfStorageDevices(){
 		this->numElecStorageDevices = 0;
-		for ( auto loop = 0; loop < this->numLoadCenters; ++loop ) {
-			if ( this->elecLoadCenterObjs[ loop ]->storageObj != nullptr ) {
+		for ( auto & e : this->elecLoadCenterObjs ) {
+			if ( e->storageObj != nullptr ) {
 				++this->numElecStorageDevices;
 			}
 		}
@@ -779,6 +779,9 @@ namespace EnergyPlus {
 				ShowContinueError( "Schedule not found; Must be entered and valid when Storage Operation Scheme = FacilityDemandLeveling" );
 				errorsFound = true;
 			}
+		} else { // object num == 0
+			// just construct an empty object and return
+			return;
 		}
 
 		// now that we are done with processing get input for ElectricLoadCenter:Distribution we can call child input objects without IP shortcut problems
@@ -849,7 +852,7 @@ namespace EnergyPlus {
 		SetupOutputVariable( "Electric Load Center Produced Thermal Energy [J]", this->thermalProd, "System", "Sum", this->name );
 		SetupOutputVariable( "Electric Load Center Requested Electric Power [W]", this->totalPowerRequest, "System", "Average", this->name );
 
-		if ( DataGlobals::AnyEnergyManagementSystemInModel ) {
+		if ( DataGlobals::AnyEnergyManagementSystemInModel && this->storagePresent ) {
 				SetupEMSActuator( "Electrical Storage", this->name , "Power Draw Rate", "[W]", this->eMSOverridePelFromStorage, this->eMSValuePelFromStorage );
 				SetupEMSActuator( "Electrical Storage", this->name , "Power Charge Rate", "[W]", this->eMSOverridePelIntoStorage, this->eMSValuePelIntoStorage );
 		}
@@ -933,33 +936,33 @@ namespace EnergyPlus {
 
 			loadCenterElectricLoad = remainingWholePowerDemand;
 
-			for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
+			for ( auto & g : this->elecGenCntrlObj ) {
 
-				if ( ScheduleManager::GetCurrentScheduleValue( this->elecGenCntrlObj[ loopGenNum ]->availSchedPtr ) > 0.0 ) {
+				if ( ScheduleManager::GetCurrentScheduleValue( g->availSchedPtr ) > 0.0 ) {
 					// Set the Operation Flag
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					g->onThisTimestep = true;
 					// Set the electric generator load request
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut;
+					g->powerRequestThisTimestep = g->maxPowerOut;
 				} else {
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = 0.0;
+					g->onThisTimestep = false;
+					g->powerRequestThisTimestep = 0.0;
 				}
 
 				// now handle EMS override
-				if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-					if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-						this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+				if ( g->eMSRequestOn ) {
+					g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+					if ( g->powerRequestThisTimestep > 0.0 ) {
+						g->onThisTimestep = true;
 					} else {
-						this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+						g->onThisTimestep = false;
 					}
 				}
 
 				// Get generator's actual electrical and thermal power outputs
-				this->elecGenCntrlObj[ loopGenNum ]->simGeneratorGetPowerOutput ( this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep, this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep, firstHVACIteration, this->elecGenCntrlObj[ loopGenNum ]->electProdRate, this->elecGenCntrlObj[ loopGenNum ]->thermProdRate );
+				g->simGeneratorGetPowerOutput ( g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate );
 
-				this->totalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep;
-				remainingWholePowerDemand -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update whole building remaining load
+				this->totalPowerRequest += g->powerRequestThisTimestep;
+				remainingWholePowerDemand -= g->electProdRate; // Update whole building remaining load
 			}
 			break;
 		}
@@ -969,52 +972,52 @@ namespace EnergyPlus {
 			remainingLoad = remainingWholePowerDemand - this->demandLimit;
 			loadCenterElectricLoad = remainingLoad;
 
-			for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
+			for ( auto & g : this->elecGenCntrlObj ) {
 
-				if ( ScheduleManager::GetCurrentScheduleValue( this->elecGenCntrlObj[ loopGenNum ]->availSchedPtr ) > 0.0 && remainingLoad > 0.0 ) {
+				if ( ScheduleManager::GetCurrentScheduleValue( g->availSchedPtr ) > 0.0 && remainingLoad > 0.0 ) {
 					// Set the Operation Flag
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					g->onThisTimestep = true;
 
 					// Set the electric generator load
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = min( this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut, remainingLoad );
+					g->powerRequestThisTimestep = min( g->maxPowerOut, remainingLoad );
 
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				} else {
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = 0.0;
+					g->onThisTimestep = false;
+					g->powerRequestThisTimestep = 0.0;
 
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				}
 
 				// Get generator's actual electrical and thermal power outputs
-				this->elecGenCntrlObj[ loopGenNum ]->simGeneratorGetPowerOutput ( this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep, this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep, firstHVACIteration, this->elecGenCntrlObj[ loopGenNum ]->electProdRate, this->elecGenCntrlObj[ loopGenNum ]->thermProdRate );
+				g->simGeneratorGetPowerOutput ( g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate );
 
-				if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-					this->totalPowerRequest += max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
+				if ( g->eMSRequestOn ) {
+					this->totalPowerRequest += max( g->eMSPowerRequest, 0.0 );
 				} else {
-					if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-						this->totalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut;
+					if ( g->powerRequestThisTimestep > 0.0 ) {
+						this->totalPowerRequest += g->maxPowerOut;
 						this->totalPowerRequest = min( loadCenterElectricLoad, this->totalPowerRequest );
 					}
 				}
-				remainingLoad -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update remaining load to be met by this load center
-				remainingWholePowerDemand -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update whole building remaining load
+				remainingLoad -= g->electProdRate; // Update remaining load to be met by this load center
+				remainingWholePowerDemand -= g->electProdRate; // Update whole building remaining load
 			}
 			break;
 		}
@@ -1023,51 +1026,51 @@ namespace EnergyPlus {
 			remainingLoad = remainingWholePowerDemand;
 			loadCenterElectricLoad = remainingLoad;
 
-			for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
+			for ( auto & g : this->elecGenCntrlObj ) {
 
-				if ( ScheduleManager::GetCurrentScheduleValue( this->elecGenCntrlObj[ loopGenNum ]->availSchedPtr ) > 0.0 && remainingLoad > 0.0 ) {
+				if ( ScheduleManager::GetCurrentScheduleValue( g->availSchedPtr ) > 0.0 && remainingLoad > 0.0 ) {
 					// Set the Operation Flag
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					g->onThisTimestep = true;
 
 					// Set the electric generator load
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = min( this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut, remainingLoad );
+					g->powerRequestThisTimestep = min( g->maxPowerOut, remainingLoad );
 
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				} else {
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = 0.0;
+					g->onThisTimestep = false;
+					g->powerRequestThisTimestep = 0.0;
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				}
 
 				// Get generator's actual electrical and thermal power outputs
-				this->elecGenCntrlObj[ loopGenNum ]->simGeneratorGetPowerOutput ( this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep, this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep, firstHVACIteration, this->elecGenCntrlObj[ loopGenNum ]->electProdRate, this->elecGenCntrlObj[ loopGenNum ]->thermProdRate );
+				g->simGeneratorGetPowerOutput ( g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate );
 
-				if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-					this->totalPowerRequest += max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
+				if ( g->eMSRequestOn ) {
+					this->totalPowerRequest += max( g->eMSPowerRequest, 0.0 );
 				} else {
-					if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-						this->totalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut;
+					if ( g->powerRequestThisTimestep > 0.0 ) {
+						this->totalPowerRequest += g->maxPowerOut;
 						this->totalPowerRequest = min( loadCenterElectricLoad, this->totalPowerRequest );
 					}
 				}
-				remainingLoad -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update remaining load to be met by this load center
-				remainingWholePowerDemand -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update whole building remaining load
+				remainingLoad -= g->electProdRate; // Update remaining load to be met by this load center
+				remainingWholePowerDemand -= g->electProdRate; // Update whole building remaining load
 			}
 			break;
 		}
@@ -1078,52 +1081,52 @@ namespace EnergyPlus {
 			remainingLoad = ScheduleManager::GetCurrentScheduleValue( this->trackSchedPtr );
 			loadCenterElectricLoad = remainingLoad;
 
-			for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
+			for ( auto & g : this->elecGenCntrlObj ) {
 
-				if ( ScheduleManager::GetCurrentScheduleValue( this->elecGenCntrlObj[ loopGenNum ]->availSchedPtr ) > 0.0 && remainingLoad > 0.0 ) {
+				if ( ScheduleManager::GetCurrentScheduleValue( g->availSchedPtr ) > 0.0 && remainingLoad > 0.0 ) {
 					// Set the Operation Flag
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					g->onThisTimestep = true;
 
 					// Set the electric generator load
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = min( this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut, remainingLoad );
+					g->powerRequestThisTimestep = min( g->maxPowerOut, remainingLoad );
 
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				} else {
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = 0.0;
+					g->onThisTimestep = false;
+					g->powerRequestThisTimestep = 0.0;
 
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				}
 
 				// Get generator's actual electrical and thermal power outputs
-				this->elecGenCntrlObj[ loopGenNum ]->simGeneratorGetPowerOutput ( this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep, this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep, firstHVACIteration, this->elecGenCntrlObj[ loopGenNum ]->electProdRate, this->elecGenCntrlObj[ loopGenNum ]->thermProdRate );
+				g->simGeneratorGetPowerOutput ( g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate );
 
-				if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-					this->totalPowerRequest += max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
+				if ( g->eMSRequestOn ) {
+					this->totalPowerRequest += max( g->eMSPowerRequest, 0.0 );
 				} else {
-					if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-						this->totalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut;
+					if ( g->powerRequestThisTimestep > 0.0 ) {
+						this->totalPowerRequest += g->maxPowerOut;
 						this->totalPowerRequest = min( loadCenterElectricLoad, this->totalPowerRequest );
 					}
 				}
-				remainingLoad -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update remaining load to be met by this load center
-				remainingWholePowerDemand -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update whole building remaining load
+				remainingLoad -= g->electProdRate; // Update remaining load to be met by this load center
+				remainingWholePowerDemand -= g->electProdRate; // Update whole building remaining load
 			}
 			break;
 		}
@@ -1136,50 +1139,50 @@ namespace EnergyPlus {
 			remainingLoad = customMeterDemand;
 			loadCenterElectricLoad = remainingLoad;
 
-			for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
-				if ( ScheduleManager::GetCurrentScheduleValue( this->elecGenCntrlObj[ loopGenNum ]->availSchedPtr ) > 0.0 && remainingLoad > 0.0 ) {
+			for ( auto & g : this->elecGenCntrlObj ) {
+				if ( ScheduleManager::GetCurrentScheduleValue( g->availSchedPtr ) > 0.0 && remainingLoad > 0.0 ) {
 					// Set the Operation Flag
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					g->onThisTimestep = true;
 					// Set the electric generator load
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = min( this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut, remainingLoad );
+					g->powerRequestThisTimestep = min( g->maxPowerOut, remainingLoad );
 
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				} else {
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = 0.0;
+					g->onThisTimestep = false;
+					g->powerRequestThisTimestep = 0.0;
 
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				}
 
 				// Get generator's actual electrical and thermal power outputs
-				this->elecGenCntrlObj[ loopGenNum ]->simGeneratorGetPowerOutput ( this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep, this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep, firstHVACIteration, this->elecGenCntrlObj[ loopGenNum ]->electProdRate, this->elecGenCntrlObj[ loopGenNum ]->thermProdRate );
+				g->simGeneratorGetPowerOutput ( g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate );
 
-				if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-					this->totalPowerRequest += max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
+				if ( g->eMSRequestOn ) {
+					this->totalPowerRequest += max( g->eMSPowerRequest, 0.0 );
 				} else {
-					if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-						this->totalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut;
+					if ( g->powerRequestThisTimestep > 0.0 ) {
+						this->totalPowerRequest += g->maxPowerOut;
 						this->totalPowerRequest = min( loadCenterElectricLoad, this->totalPowerRequest );
 					}
 				}
-				remainingLoad -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update remaining load to be met by this load center
-				remainingWholePowerDemand -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update whole building remaining load
+				remainingLoad -= g->electProdRate; // Update remaining load to be met by this load center
+				remainingWholePowerDemand -= g->electProdRate; // Update whole building remaining load
 			} // end for
 			break;
 		}
@@ -1189,61 +1192,61 @@ namespace EnergyPlus {
 
 			this->calcLoadCenterThermalLoad( remainingThermalLoad );
 			Real64 loadCenterThermalLoad = remainingThermalLoad;
-			for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
+			for ( auto & g : this->elecGenCntrlObj ) {
 
-				if ( ScheduleManager::GetCurrentScheduleValue( this->elecGenCntrlObj[ loopGenNum ]->availSchedPtr ) > 0.0 && remainingThermalLoad > 0.0 ) {
+				if ( ScheduleManager::GetCurrentScheduleValue( g->availSchedPtr ) > 0.0 && remainingThermalLoad > 0.0 ) {
 
-					if ( this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio > 0.0 ) {
-						remainingLoad = remainingThermalLoad / this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio;
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = min( this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut, remainingLoad );
-						this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->nominalThermElectRatio > 0.0 ) {
+						remainingLoad = remainingThermalLoad / g->nominalThermElectRatio;
+						g->powerRequestThisTimestep = min( g->maxPowerOut, remainingLoad );
+						g->onThisTimestep = true;
 						// now handle EMS override
-						if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-							this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-							if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-								this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+						if ( g->eMSRequestOn ) {
+							g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+							if ( g->powerRequestThisTimestep > 0.0 ) {
+								g->onThisTimestep = true;
 							} else {
-								this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+								g->onThisTimestep = false;
 							}
 						}
 					}
 				} else {
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = 0.0;
+					g->onThisTimestep = false;
+					g->powerRequestThisTimestep = 0.0;
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				}
 
 				// Get generator's actual electrical and thermal power outputs
-				this->elecGenCntrlObj[ loopGenNum ]->simGeneratorGetPowerOutput ( this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep, this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep, firstHVACIteration, this->elecGenCntrlObj[ loopGenNum ]->electProdRate, this->elecGenCntrlObj[ loopGenNum ]->thermProdRate );
+				g->simGeneratorGetPowerOutput ( g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate );
 
-				if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-					this->totalThermalPowerRequest += ( max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 ) ) * this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio;
-					this->totalPowerRequest += ( max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 ) );
+				if ( g->eMSRequestOn ) {
+					this->totalThermalPowerRequest += ( max( g->eMSPowerRequest, 0.0 ) ) * g->nominalThermElectRatio;
+					this->totalPowerRequest += ( max( g->eMSPowerRequest, 0.0 ) );
 				} else {
-					if ( this->totalThermalPowerRequest < loadCenterThermalLoad && this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-						Real64 excessThermalPowerRequest = this->totalThermalPowerRequest + this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut * this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio - loadCenterThermalLoad;
+					if ( this->totalThermalPowerRequest < loadCenterThermalLoad && g->powerRequestThisTimestep > 0.0 ) {
+						Real64 excessThermalPowerRequest = this->totalThermalPowerRequest + g->maxPowerOut * g->nominalThermElectRatio - loadCenterThermalLoad;
 						if ( excessThermalPowerRequest < 0.0 ) {
-							this->totalThermalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut * this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio;
-							this->totalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut;
+							this->totalThermalPowerRequest += g->maxPowerOut * g->nominalThermElectRatio;
+							this->totalPowerRequest += g->maxPowerOut;
 						} else {
 							this->totalThermalPowerRequest = loadCenterThermalLoad;
-							if ( this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio > 0.0 ) {
-								this->totalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut - ( excessThermalPowerRequest / this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio );
+							if ( g->nominalThermElectRatio > 0.0 ) {
+								this->totalPowerRequest += g->maxPowerOut - ( excessThermalPowerRequest / g->nominalThermElectRatio );
 							}
 						}
 					}
 				}
-				remainingThermalLoad -= this->elecGenCntrlObj[ loopGenNum ]->thermProdRate; // Update remaining load to be met
+				remainingThermalLoad -= g->thermProdRate; // Update remaining load to be met
 				// by this load center
-				remainingWholePowerDemand -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update whole building remaining load
+				remainingWholePowerDemand -= g->electProdRate; // Update whole building remaining load
 			}
 			break;
 		}
@@ -1256,59 +1259,59 @@ namespace EnergyPlus {
 			remainingLoad = remainingWholePowerDemand;
 			loadCenterElectricLoad = remainingWholePowerDemand;
 			Real64 loadCenterThermalLoad = remainingThermalLoad;
-			for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
-				if ( ( ScheduleManager::GetCurrentScheduleValue( this->elecGenCntrlObj[ loopGenNum ]->availSchedPtr ) > 0.0 ) && ( remainingThermalLoad > 0.0 ) && ( remainingLoad > 0.0 ) ) {
-					if ( this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio > 0.0 ) {
-						remainingLoad = min( remainingWholePowerDemand, remainingThermalLoad / this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio );
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = min( this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut, remainingLoad );
-						this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+			for ( auto & g : this->elecGenCntrlObj ) {
+				if ( ( ScheduleManager::GetCurrentScheduleValue( g->availSchedPtr ) > 0.0 ) && ( remainingThermalLoad > 0.0 ) && ( remainingLoad > 0.0 ) ) {
+					if ( g->nominalThermElectRatio > 0.0 ) {
+						remainingLoad = min( remainingWholePowerDemand, remainingThermalLoad / g->nominalThermElectRatio );
+						g->powerRequestThisTimestep = min( g->maxPowerOut, remainingLoad );
+						g->onThisTimestep = true;
 						// now handle EMS override
-						if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-							this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-							if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-								this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+						if ( g->eMSRequestOn ) {
+							g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+							if ( g->powerRequestThisTimestep > 0.0 ) {
+								g->onThisTimestep = true;
 							} else {
-								this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+								g->onThisTimestep = false;
 							}
 						}
 					}
 				} else {
-					this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
-					this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = 0.0;
+					g->onThisTimestep = false;
+					g->powerRequestThisTimestep = 0.0;
 					// now handle EMS override
-					if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-						this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep = max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 );
-						if ( this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = true;
+					if ( g->eMSRequestOn ) {
+						g->powerRequestThisTimestep = max( g->eMSPowerRequest, 0.0 );
+						if ( g->powerRequestThisTimestep > 0.0 ) {
+							g->onThisTimestep = true;
 						} else {
-							this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep = false;
+							g->onThisTimestep = false;
 						}
 					}
 				}
 				// Get generator's actual electrical and thermal power outputs
-				this->elecGenCntrlObj[ loopGenNum ]->simGeneratorGetPowerOutput ( this->elecGenCntrlObj[ loopGenNum ]->onThisTimestep, this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep, firstHVACIteration, this->elecGenCntrlObj[ loopGenNum ]->electProdRate, this->elecGenCntrlObj[ loopGenNum ]->thermProdRate );
+				g->simGeneratorGetPowerOutput ( g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate );
 
-				if ( this->elecGenCntrlObj[ loopGenNum ]->eMSRequestOn ) {
-					this->totalThermalPowerRequest += ( max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 ) ) * this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio;
-					this->totalPowerRequest += ( max( this->elecGenCntrlObj[ loopGenNum ]->eMSPowerRequest, 0.0 ) );
+				if ( g->eMSRequestOn ) {
+					this->totalThermalPowerRequest += ( max( g->eMSPowerRequest, 0.0 ) ) * g->nominalThermElectRatio;
+					this->totalPowerRequest += ( max( g->eMSPowerRequest, 0.0 ) );
 				} else {
-					if ( this->totalThermalPowerRequest < loadCenterThermalLoad && this->elecGenCntrlObj[ loopGenNum ]->powerRequestThisTimestep > 0.0 ) {
-						Real64 excessThermalPowerRequest = this->totalThermalPowerRequest + this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut * this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio - loadCenterThermalLoad;
+					if ( this->totalThermalPowerRequest < loadCenterThermalLoad && g->powerRequestThisTimestep > 0.0 ) {
+						Real64 excessThermalPowerRequest = this->totalThermalPowerRequest + g->maxPowerOut * g->nominalThermElectRatio - loadCenterThermalLoad;
 						if ( excessThermalPowerRequest < 0.0 ) {
-							this->totalThermalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut * this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio;
-							this->totalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut;
+							this->totalThermalPowerRequest += g->maxPowerOut * g->nominalThermElectRatio;
+							this->totalPowerRequest += g->maxPowerOut;
 						} else {
 							this->totalThermalPowerRequest = loadCenterThermalLoad;
-							if ( this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio > 0.0 ) {
-								this->totalPowerRequest += this->elecGenCntrlObj[ loopGenNum ]->maxPowerOut - ( excessThermalPowerRequest / this->elecGenCntrlObj[ loopGenNum ]->nominalThermElectRatio );
+							if ( g->nominalThermElectRatio > 0.0 ) {
+								this->totalPowerRequest += g->maxPowerOut - ( excessThermalPowerRequest / g->nominalThermElectRatio );
 							}
 						}
 						this->totalPowerRequest = min( loadCenterElectricLoad, this->totalPowerRequest );
 					}
 				}
-				remainingThermalLoad -= this->elecGenCntrlObj[ loopGenNum ]->thermProdRate; // Update remaining thermal load to
+				remainingThermalLoad -= g->thermProdRate; // Update remaining thermal load to
 				// be met by this load center
-				remainingWholePowerDemand -= this->elecGenCntrlObj[ loopGenNum ]->electProdRate; // Update whole building remaining
+				remainingWholePowerDemand -= g->electProdRate; // Update whole building remaining
 				// electric load
 			}
 			break;
@@ -1321,10 +1324,10 @@ namespace EnergyPlus {
 		// sum up generator production
 		this->genElectProdRate = 0.0;
 		this->genElectricProd = 0.0;
-		for ( auto loop=0; loop < this->numGenerators ; ++loop ) {
-			this->genElectProdRate += this->elecGenCntrlObj[ loop ]->electProdRate; 
-			this->elecGenCntrlObj[ loop ]->electricityProd = this->elecGenCntrlObj[ loop ]->electProdRate * ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
-			this->genElectricProd += this->elecGenCntrlObj[ loop ]->electricityProd;
+		for ( auto & g : this->elecGenCntrlObj ) {
+			this->genElectProdRate += g->electProdRate; 
+			g->electricityProd = g->electProdRate * ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
+			this->genElectricProd += g->electricityProd;
 		}
 	}
 
@@ -1637,8 +1640,8 @@ namespace EnergyPlus {
 		this->storOpCVDischargeRate    = 0.0;
 
 		if ( this->generatorsPresent && this->numGenerators > 0 ) {
-			for ( auto genLoop=0; genLoop < this->numGenerators; ++genLoop ) {
-				this->elecGenCntrlObj[ genLoop ]->reinitAtBeginEnvironment();
+			for ( auto & g : this->elecGenCntrlObj ) {
+				g->reinitAtBeginEnvironment();
 			}
 		}
 
@@ -1804,18 +1807,18 @@ namespace EnergyPlus {
 	{
 		if ( this->myCoGenSetupFlag ) {
 			bool plantNotFound = false;
-			for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
+			for ( auto & g : this->elecGenCntrlObj ) {
 				plantNotFound = false;
-				DataPlant::ScanPlantLoopsForObject( this->elecGenCntrlObj[ loopGenNum ]->name, this->elecGenCntrlObj[ loopGenNum ]->compPlantTypeOf_Num, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.loopNum, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.loopSideNum, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.branchNum, this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.compNum, _, _, _, _, _, plantNotFound );
-				if ( ! plantNotFound ) this->elecGenCntrlObj[ loopGenNum ]->plantInfoFound = true;
+				DataPlant::ScanPlantLoopsForObject( g->name, g->compPlantTypeOf_Num, g->cogenLocation.loopNum, g->cogenLocation.loopSideNum, g->cogenLocation.branchNum, g->cogenLocation.compNum, _, _, _, _, _, plantNotFound );
+				if ( ! plantNotFound ) g->plantInfoFound = true;
 			}
 		} // cogen setup
 
 		// sum up "MyLoad" for all generators on this load center from plant structure
 		thermalLoad = 0.0;
-		for ( auto loopGenNum = 0; loopGenNum < this->numGenerators; ++loopGenNum ) {
-			if ( this->elecGenCntrlObj[ loopGenNum ]->plantInfoFound  ) {
-				thermalLoad += DataPlant::PlantLoop( this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.loopNum ).LoopSide( this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.loopSideNum ).Branch( this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.branchNum ).Comp( this->elecGenCntrlObj[ loopGenNum ]->cogenLocation.compNum ).MyLoad;
+		for ( auto & g : this->elecGenCntrlObj ) {
+			if ( g->plantInfoFound  ) {
+				thermalLoad += DataPlant::PlantLoop( g->cogenLocation.loopNum ).LoopSide( g->cogenLocation.loopSideNum ).Branch( g->cogenLocation.branchNum ).Comp( g->cogenLocation.compNum ).MyLoad;
 			}
 		}
 	}
