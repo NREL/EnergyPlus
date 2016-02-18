@@ -869,11 +869,11 @@ namespace EnergyPlus {
 			"  SetpointManager:Scheduled,",
 			"    Main Humidifier setpoint Mgr,  !- Name",
 			"    MinimumHumidityRatio,          !- Control Variable",
-			"    Seasonal Reset Hum Ratio Sch,  !- Schedule Name",
+			"    Humidifier Setpoint Schedule,  !- Schedule Name",
 			"    DOAS Humidifier Air Outlet;    !- Setpoint Node or NodeList Name",
 
 			"  Schedule:Compact,",
-			"    Seasonal Reset Hum Ratio Sch,  !- Name",
+			"    Humidifier Setpoint Schedule,  !- Name",
 			"    HumidityRatio,           !- Schedule Type Limits Name",
 			"    Through: 12/31,          !- Field 1",
 			"    For: Alldays,            !- Field 2",
@@ -903,7 +903,7 @@ namespace EnergyPlus {
 			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
 			"    ,                        !- Electronic Enthalpy Limit Curve Name",
 			"    12.2,                    !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
-			"    NoLockout,               !- Lockout Type", // No lockout
+			"    NoLockout,               !- Lockout Type",
 			"    ProportionalMinimum,     !- Minimum Limit Type",
 			"    ,                        !- Minimum Outdoor Air Schedule Name",
 			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
@@ -984,8 +984,8 @@ namespace EnergyPlus {
 		// get humidifier's air inlet and outlet node number
 		AirInNode = Humidifiers::Humidifier( HumNum ).AirInNode;
 		AirOutNode = Humidifiers::Humidifier( HumNum ).AirOutNode;
-		// Calculate humidifier water consumption rate
-		WaterConsumptionRate = Humidifiers::Humidifier( HumNum ).AirInMassFlowRate * ( DataLoopNode::Node( AirOutNode ).HumRat - DataLoopNode::Node( AirInNode ).HumRat );
+		// Calculate expected humidifier water consumption rate
+		WaterConsumptionRate = 1.0 * ( 0.005 - 0.0005 );
 		// Calculate humidifier electric use rate (fan electric power and standby electric power are zero)
 		ElecPowerInput = ( WaterConsumptionRate / Humidifiers::Humidifier( HumNum ).NomCap ) * Humidifiers::Humidifier( HumNum ).NomPower;
 		// Confirm humidifier water consumption calculation

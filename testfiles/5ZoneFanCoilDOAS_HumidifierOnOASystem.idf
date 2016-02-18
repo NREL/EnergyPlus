@@ -2640,7 +2640,7 @@ Coil:Cooling:Water,
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     DOAS Cooling Coil ChW Inlet,  !- Water Inlet Node Name
     DOAS Cooling Coil ChW Outlet,  !- Water Outlet Node Name
-    DOAS Heat Recovery Supply Outlet,   !- Air Inlet Node Name
+    DOAS Mixed Air Outlet,   !- Air Inlet Node Name
     DOAS Cooling Coil Outlet,!- Air Outlet Node Name
     DetailedAnalysis,        !- Type of Analysis
     CrossFlow;               !- Heat Exchanger Configuration
@@ -2749,35 +2749,6 @@ Coil:Heating:Water,
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     0.5;                     !- Rated Ratio for Air and Water Convection
-
-
-!-   ===========  ALL OBJECTS IN CLASS: HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT ===========
-
-HeatExchanger:AirToAir:SensibleAndLatent,
-    DOAS Heat Recovery,      !- Name
-    HVACTemplate-Always 1,   !- Availability Schedule Name
-    autosize,                !- Nominal Supply Air Flow Rate {m3/s}
-    0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.750000,                !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.700000,                !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.7,                     !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.65,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.750000,                !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.700000,                !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
-    DOAS Mixed Air Outlet,   !- Supply Air Inlet Node Name
-    DOAS Heat Recovery Supply Outlet,  !- Supply Air Outlet Node Name
-    DOAS Relief Air Outlet,  !- Exhaust Air Inlet Node Name
-    DOAS Heat Recovery Relief Outlet,  !- Exhaust Air Outlet Node Name
-    0,                       !- Nominal Electric Power {W}
-    Yes,                     !- Supply Air Outlet Temperature Control
-    Plate,                   !- Heat Exchanger Type
-    MinimumExhaustTemperature,  !- Frost Control Type
-    1.7,                     !- Threshold Temperature {C}
-    0.083,                   !- Initial Defrost Time Fraction {dimensionless}
-    0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}
-    Yes;                     !- Economizer Lockout
-
  
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:WATERCOIL ===========
 
@@ -2859,10 +2830,39 @@ AirLoopHVAC,
 
 AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     DOAS OA System Equipment,!- Name
-    Humidifier:Steam:Electric,        !- Component 1 Object Type
-    DOAS OA Humidifier,      !- Component 1 Name
-    OutdoorAir:Mixer,        !- Component 2 Object Type
-    DOAS OA Mixing Box;      !- Component 2 Name
+    HeatExchanger:AirToAir:SensibleAndLatent, !- Component 1 Object Type
+    DOAS Heat Recovery,      !- Component 1 Name
+    Humidifier:Steam:Electric, !- Component 2 Object Type
+    DOAS OA Humidifier,      !- Component 2 Name
+    OutdoorAir:Mixer,        !- Component 3 Object Type
+    DOAS OA Mixing Box;      !- Component 3 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT ===========
+
+HeatExchanger:AirToAir:SensibleAndLatent,
+    DOAS Heat Recovery,      !- Name
+    HVACTemplate-Always 1,   !- Availability Schedule Name
+    autosize,                !- Nominal Supply Air Flow Rate {m3/s}
+    0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
+    0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
+    0.750000,                !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
+    0.700000,                !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
+    0.7,                     !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
+    0.65,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
+    0.750000,                !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
+    0.700000,                !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
+    DOAS Outdoor Air Inlet,  !- Supply Air Inlet Node Name
+    DOAS Heat Recovery Outlet,  !- Supply Air Outlet Node Name
+    DOAS Relief Air Outlet,  !- Exhaust Air Inlet Node Name
+    DOAS Heat Recovery Relief Outlet,  !- Exhaust Air Outlet Node Name
+    0,                       !- Nominal Electric Power {W}
+    Yes,                     !- Supply Air Outlet Temperature Control
+    Plate,                   !- Heat Exchanger Type
+    MinimumExhaustTemperature,  !- Frost Control Type
+    1.7,                     !- Threshold Temperature {C}
+    0.083,                   !- Initial Defrost Time Fraction {dimensionless}
+    0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}
+    Yes;                     !- Economizer Lockout
 
   Humidifier:Steam:Electric,
     DOAS OA Humidifier,      !- Name
@@ -2871,52 +2871,18 @@ AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     autosize,                !- Rated Power {W}
     0,                       !- Rated Fan Power {W}
     0,                       !- Standby Power {W}
-    DOAS Outdoor Air Inlet,  !- Air Inlet Node Name
+    DOAS Heat Recovery Outlet,  !- Air Inlet Node Name
     DOAS Humidifier Air Outlet, !- Air Outlet Node Name
     ;                        !- Water Storage Tank Name
-
-!AirLoopHVAC:OutdoorAirSystem:EquipmentList,
-!    DOAS OA System Equipment,!- Name
-!    Humidifier:Steam:Gas,    !- Component 1 Object Type
-!    !Humidifier:Steam:Electric,        !- Component 1 Object Type
-!    DOAS OA Humidifier,      !- Component 1 Name
-!    OutdoorAir:Mixer,        !- Component 2 Object Type
-!    DOAS OA Mixing Box;      !- Component 2 Name
-
-!  Humidifier:Steam:Gas,
-!    DOAS OA Humidifier,      !- Name
-!    FanAvailSched,           !- Availability Schedule Name
-!    autosize,                !- Rated Capacity {m3/s}
-!    autosize,                !- Rated Gas Use Rate {W}
-!    1.0 ,                    !- Thermal Efficiency {-} 
-!    ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name
-!    0,                       !- Rated Fan Power {W}
-!    0,                       !- Auxiliary Electric Power {W}
-!    DOAS Outdoor Air Inlet,  !- Air Inlet Node Name
-!    DOAS Humidifier Air Outlet, !- Air Outlet Node Name
-!    ;                        !- Water Storage Tank Name
-
-!  Curve:Cubic,
-!    ThermalEfficiencyFPLR,   !- Name
-!    1.0,                     !- Coefficient1 Constant
-!    0.0,                     !- Coefficient2 x
-!    0.0,                     !- Coefficient3 x**2
-!    0.0,                     !- Coefficient4 x**3
-!    0.0,                     !- Minimum Value of x
-!    1.0,                     !- Maximum Value of x
-!    ,                        !- Minimum Curve Output
-!    ,                        !- Maximum Curve Output
-!    Dimensionless,           !- Input Unit Type for X
-!    Dimensionless;           !- Output Unit Type
 
   SetpointManager:Scheduled,
     Main Humidifier setpoint Mgr,  !- Name
     MinimumHumidityRatio,          !- Control Variable
-    Seasonal Reset Hum Ratio Sch,  !- Schedule Name
+    Humidifier Setpoint Schedule,  !- Schedule Name
     DOAS Humidifier Air Outlet;    !- Setpoint Node or NodeList Name
 
   Schedule:Compact,
-    Seasonal Reset Hum Ratio Sch,  !- Name
+    Humidifier Setpoint Schedule,  !- Name
     HumidityRatio,           !- Schedule Type Limits Name
     Through: 12/31,          !- Field 9
     For: Alldays,            !- Field 10
@@ -3135,26 +3101,21 @@ Branch,
     DOAS Air Loop Inlet,     !- Component 1 Inlet Node Name
     DOAS Mixed Air Outlet,   !- Component 1 Outlet Node Name
     Passive,                 !- Component 1 Branch Control Type
-    HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 1 Object Type
-    DOAS Heat Recovery,      !- Component 2 Name
+    Coil:Cooling:Water,      !- Component 2 Object Type
+    DOAS Cooling Coil,       !- Component 2 Name
     DOAS Mixed Air Outlet,   !- Component 2 Inlet Node Name
-    DOAS Heat Recovery Supply Outlet,  !- Component 2 Outlet Node Name
+    DOAS Cooling Coil Outlet,!- Component 2 Outlet Node Name
     Passive,                 !- Component 2 Branch Control Type
-    Coil:Cooling:Water,      !- Component 3 Object Type
-    DOAS Cooling Coil,       !- Component 3 Name
-    DOAS Heat Recovery Supply Outlet,   !- Component 3 Inlet Node Name
-    DOAS Cooling Coil Outlet,!- Component 3 Outlet Node Name
+    Coil:Heating:Water,      !- Component 3 Object Type
+    DOAS Heating Coil,       !- Component 3 Name
+    DOAS Cooling Coil Outlet,!- Component 3 Inlet Node Name
+    DOAS Heating Coil Outlet,!- Component 3 Outlet Node Name
     Passive,                 !- Component 3 Branch Control Type
-    Coil:Heating:Water,      !- Component 4 Object Type
-    DOAS Heating Coil,       !- Component 4 Name
-    DOAS Cooling Coil Outlet,!- Component 4 Inlet Node Name
-    DOAS Heating Coil Outlet,!- Component 4 Outlet Node Name
-    Passive,                 !- Component 4 Branch Control Type
-    Fan:VariableVolume,      !- Component 5 Object Type
-    DOAS Supply Fan,         !- Component 5 Name
-    DOAS Heating Coil Outlet,!- Component 5 Inlet Node Name
-    DOAS Supply Fan Outlet,  !- Component 5 Outlet Node Name
-    Active;                  !- Component 5 Branch Control Type
+    Fan:VariableVolume,      !- Component 4 Object Type
+    DOAS Supply Fan,         !- Component 4 Name
+    DOAS Heating Coil Outlet,!- Component 4 Inlet Node Name
+    DOAS Supply Fan Outlet,  !- Component 4 Outlet Node Name
+    Active;                  !- Component 4 Branch Control Type
 
 Branch,
     DOAS Cooling Coil ChW Branch,  !- Name
@@ -3805,7 +3766,7 @@ SetpointManager:MixedAir,
     DOAS Supply Path Inlet,  !- Reference Setpoint Node Name
     DOAS Heating Coil Outlet,!- Fan Inlet Node Name
     DOAS Supply Fan Outlet,  !- Fan Outlet Node Name
-    DOAS Heat Recovery Supply Outlet;  !- Setpoint Node or NodeList Name
+    DOAS Heat Recovery Outlet;  !- Setpoint Node or NodeList Name
 
 SetpointManager:MixedAir,
     DOAS Heat Recovery Economizer Temp Manager,  !- Name
@@ -3878,7 +3839,7 @@ Output:Variable,DOAS Supply Fan Outlet,System Node Relative Humidity,hourly;
 Output:Variable,DOAS Supply Fan Outlet,System Node Standard Density Volume Flow Rate,hourly;
 
 Output:Variable,DOAS Mixed Air Outlet,System Node Temperature,hourly;
-Output:Variable,DOAS Heat Recovery Supply Outlet,System Node Temperature,hourly;
+Output:Variable,DOAS Heat Recovery Outlet,System Node Temperature,hourly;
 Output:Variable,DOAS Mixed Air Outlet,System Node Mass Flow Rate,hourly;
 Output:Variable,DOAS Outdoor Air Inlet,System Node Temperature,hourly;
 Output:Variable,DOAS Outdoor Air Inlet,System Node Humidity Ratio,hourly;
