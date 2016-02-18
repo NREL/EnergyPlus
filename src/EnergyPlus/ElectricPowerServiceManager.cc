@@ -117,7 +117,10 @@ namespace EnergyPlus {
 		if ( ! DataGlobals::BeginEnvrnFlag ) {
 			facilityElectricServiceObj->newEnvironmentInternalGainsFlag = true;
 		}
+
+
 	}
+
 
 	void
 	ElectricPowerServiceManager::manageElectricPowerService(
@@ -876,9 +879,9 @@ namespace EnergyPlus {
 				firstHVACIteration,
 				remainingWholePowerDemand
 			);
-			this->updateLoadCenterGeneratorRecords();
-		} // if generators present
 
+		} // if generators present
+		this->updateLoadCenterGeneratorRecords();
 		if ( this->bussType == ElectricBussType::dCBussInverter || this->bussType == ElectricBussType::dCBussInverterACStorage) {
 			this->inverterObj->simulate( this->genElectProdRate ); 
 		}
@@ -905,6 +908,7 @@ namespace EnergyPlus {
 				this->transformerObj->manageTransformers( this->subpanelDrawRate );
 			}
 		}
+		this->updateLoadCenterGeneratorRecords();
 	}
 
 	void
@@ -1691,113 +1695,113 @@ namespace EnergyPlus {
 	void
 	ElectPowerLoadCenter::updateLoadCenterGeneratorRecords()
 	{
-		if ( this->generatorsPresent) { //TODO revise for no generators storage 
 
-			switch ( this->bussType )
-			{
-			case ElectricBussType::aCBuss: {
-				this->genElectProdRate = 0.0;
-				this->genElectricProd = 0.0;
-				for ( auto & gc : this->elecGenCntrlObj ) {
-					this->genElectProdRate += gc->electProdRate; 
-					this->genElectricProd  += gc->electricityProd;
-				}
-				// no inverter, no storage, so generator production equals subpanel feed in
-				this->subpanelFeedInRate = this->genElectProdRate;
-				if ( this->transformerObj != nullptr ) {
-					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->genElectProdRate );
-				}
-				this->subpanelDrawRate   = 0.0;
 
-				break;
+		switch ( this->bussType )
+		{
+		case ElectricBussType::aCBuss: {
+			this->genElectProdRate = 0.0;
+			this->genElectricProd = 0.0;
+			for ( auto & gc : this->elecGenCntrlObj ) {
+				this->genElectProdRate += gc->electProdRate; 
+				this->genElectricProd  += gc->electricityProd;
 			}
-			case ElectricBussType::aCBussStorage: {
-				this->genElectProdRate = 0.0;
-				this->genElectricProd = 0.0;
-				for ( auto & gc : this->elecGenCntrlObj ) {
-					this->genElectProdRate += gc->electProdRate; 
-					this->genElectricProd  += gc->electricityProd;
-				}
-				if ( this->storagePresent ) {
-					this->subpanelFeedInRate = this->genElectProdRate + this->storOpCVDischargeRate - this->storOpCVChargeRate;
-				} else {
-					this->subpanelFeedInRate = this->genElectProdRate;
-				}
-				if ( this->transformerObj != nullptr ) {
-					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
-				}
-				this->subpanelDrawRate   = 0.0;
-				break;
+			// no inverter, no storage, so generator production equals subpanel feed in
+			this->subpanelFeedInRate = this->genElectProdRate;
+			if ( this->transformerObj != nullptr ) {
+				this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->genElectProdRate );
 			}
-			case ElectricBussType::dCBussInverter: {
-				this->genElectProdRate = 0.0;
-				this->genElectricProd = 0.0;
-				for ( auto & gc : this->elecGenCntrlObj ) {
-					this->genElectProdRate += gc->electProdRate; 
-					this->genElectricProd  += gc->electricityProd;
-				}
+			this->subpanelDrawRate   = 0.0;
 
-				if ( this->inverterObj != nullptr ) {
-					this->subpanelFeedInRate = this->inverterObj->getACPowerOut();
-				}
-				if ( this->transformerObj != nullptr ) {
-					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
-				}
-				this->subpanelDrawRate   = 0.0;
-				break;
-			}
-
-			case ElectricBussType::dCBussInverterDCStorage: {
-				this->genElectProdRate = 0.0;
-				this->genElectricProd = 0.0;
-				for ( auto & gc : this->elecGenCntrlObj ) {
-					this->genElectProdRate += gc->electProdRate; 
-					this->genElectricProd  += gc->electricityProd;
-				}
-				if ( this->inverterObj != nullptr ) {
-					this->subpanelFeedInRate = this->inverterObj->getACPowerOut();
-				}
-
-				if ( this->converterObj != nullptr ) {
-					this->subpanelDrawRate   = this->converterObj->getACPowerIn();
-				}
-				if ( this->transformerObj != nullptr ) {
-					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
-					this->subpanelDrawRate   += this->transformerObj->getLossRateForOutputPower( this->subpanelDrawRate );
-				}
-				break;
-			}
-			case ElectricBussType::dCBussInverterACStorage: {
-				this->genElectProdRate = 0.0;
-				this->genElectricProd = 0.0;
-				for ( auto & gc : this->elecGenCntrlObj ) {
-					this->genElectProdRate += gc->electProdRate; 
-					this->genElectricProd  += gc->electricityProd;
-				}
-				if ( this->inverterPresent && this->storagePresent  ) {
-					this->subpanelFeedInRate = this->inverterObj->getACPowerOut() +  this->storOpCVDischargeRate - this->storOpCVChargeRate;
-				}
-
-				this->subpanelDrawRate   = this->storOpCVDrawRate; // no converter for AC storage
-				if ( this->transformerObj != nullptr ) {
-					this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
-					this->subpanelDrawRate   += this->transformerObj->getLossRateForOutputPower( this->subpanelDrawRate );
-				}
-				break;
-			}
-			case ElectricBussType::notYetSet: {
-				// do nothing
-				assert( false );
-			}
-
-			} // end switch
-			this->thermalProdRate = 0.0;
-			this->thermalProd = 0.0;
-			for ( auto & gc : this->elecGenCntrlObj ) { 
-				this->thermalProdRate += gc->thermProdRate;
-				this->thermalProd     += gc->thermalProd;
-			}
+			break;
 		}
+		case ElectricBussType::aCBussStorage: {
+			this->genElectProdRate = 0.0;
+			this->genElectricProd = 0.0;
+			for ( auto & gc : this->elecGenCntrlObj ) {
+				this->genElectProdRate += gc->electProdRate; 
+				this->genElectricProd  += gc->electricityProd;
+			}
+			if ( this->storagePresent ) {
+				this->subpanelFeedInRate = this->genElectProdRate + this->storOpCVDischargeRate - this->storOpCVChargeRate;
+			} else {
+				this->subpanelFeedInRate = this->genElectProdRate;
+			}
+			if ( this->transformerObj != nullptr ) {
+				this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
+			}
+			this->subpanelDrawRate   = 0.0;
+			break;
+		}
+		case ElectricBussType::dCBussInverter: {
+			this->genElectProdRate = 0.0;
+			this->genElectricProd = 0.0;
+			for ( auto & gc : this->elecGenCntrlObj ) {
+				this->genElectProdRate += gc->electProdRate; 
+				this->genElectricProd  += gc->electricityProd;
+			}
+
+			if ( this->inverterObj != nullptr ) {
+				this->subpanelFeedInRate = this->inverterObj->getACPowerOut();
+			}
+			if ( this->transformerObj != nullptr ) {
+				this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
+			}
+			this->subpanelDrawRate   = 0.0;
+			break;
+		}
+
+		case ElectricBussType::dCBussInverterDCStorage: {
+			this->genElectProdRate = 0.0;
+			this->genElectricProd = 0.0;
+			for ( auto & gc : this->elecGenCntrlObj ) {
+				this->genElectProdRate += gc->electProdRate; 
+				this->genElectricProd  += gc->electricityProd;
+			}
+			if ( this->inverterObj != nullptr ) {
+				this->subpanelFeedInRate = this->inverterObj->getACPowerOut();
+			}
+
+			if ( this->converterObj != nullptr ) {
+				this->subpanelDrawRate   = this->converterObj->getACPowerIn();
+			}
+			if ( this->transformerObj != nullptr ) {
+				this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
+				this->subpanelDrawRate   += this->transformerObj->getLossRateForOutputPower( this->subpanelDrawRate );
+			}
+			break;
+		}
+		case ElectricBussType::dCBussInverterACStorage: {
+			this->genElectProdRate = 0.0;
+			this->genElectricProd = 0.0;
+			for ( auto & gc : this->elecGenCntrlObj ) {
+				this->genElectProdRate += gc->electProdRate; 
+				this->genElectricProd  += gc->electricityProd;
+			}
+			if ( this->inverterPresent && this->storagePresent  ) {
+				this->subpanelFeedInRate = this->inverterObj->getACPowerOut() +  this->storOpCVDischargeRate - this->storOpCVChargeRate;
+			}
+
+			this->subpanelDrawRate   = this->storOpCVDrawRate; // no converter for AC storage
+			if ( this->transformerObj != nullptr ) {
+				this->subpanelFeedInRate -= this->transformerObj->getLossRateForInputPower( this->subpanelFeedInRate );
+				this->subpanelDrawRate   += this->transformerObj->getLossRateForOutputPower( this->subpanelDrawRate );
+			}
+			break;
+		}
+		case ElectricBussType::notYetSet: {
+			// do nothing
+			assert( false );
+		}
+
+		} // end switch
+		this->thermalProdRate = 0.0;
+		this->thermalProd = 0.0;
+		for ( auto & gc : this->elecGenCntrlObj ) { 
+			this->thermalProdRate += gc->thermProdRate;
+			this->thermalProd     += gc->thermalProd;
+		}
+
 	}
 
 	void
