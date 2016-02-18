@@ -56,92 +56,30 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// EnergyPlus::DataPlant Unit Tests
+#ifndef EnergyPlus_Platform_hh_INCLUDED
+#define EnergyPlus_Platform_hh_INCLUDED
 
-// Google Test Headers
-#include <gtest/gtest.h>
+// Purpose: Macros Wrapping Platform-Specific Capabilities
+//
+// Author: Stuart Mentzer (Stuart_Mentzer@objexx.com)
+//
+// History:
+//  Jan 2016: Initial release
 
-// EnergyPlus Headers
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
+// Clang-Specific
+#ifndef __has_attribute
+#define __has_attribute(x) 0
+#endif
 
-#include "Fixtures/EnergyPlusFixture.hh"
+// Force inlining
+#ifndef ALWAYS_INLINE
+#if defined(__GNUC__) || ( defined(__clang__) && __has_attribute(always_inline) )
+#define ALWAYS_INLINE inline __attribute__((__always_inline__))
+#elif defined(_MSC_VER) || defined(__INTEL_COMPILER)
+#define ALWAYS_INLINE __forceinline
+#else
+#define ALWAYS_INLINE inline
+#endif
+#endif
 
-using namespace EnergyPlus;
-using namespace EnergyPlus::DataPlant;
-using namespace ObjexxFCL;
-
-TEST_F( EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim )
-{
-	TotNumLoops = 3;
-	PlantLoop.allocate( TotNumLoops );
-	for ( int l = 1; l <= TotNumLoops; ++l ) {
-		auto & loop( PlantLoop( l ) );
-		loop.LoopSide.allocate( 2 );
-	}
-
-	EXPECT_TRUE( AnyPlantLoopSidesNeedSim() ); // SimLoopSideNeeded is set to true in default ctor
-	SetAllPlantSimFlagsToValue( false ); // Set all SimLoopSideNeeded to false
-	EXPECT_FALSE( AnyPlantLoopSidesNeedSim() );
-}
-
-TEST_F( EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop )
-{
-
-	// not using the DataPlantTest base class because of how specific this one is and that one is very general
-	if ( PlantLoop.allocated() ) PlantLoop.deallocate();
-	TotNumLoops = 2;
-	PlantLoop.allocate( 2 );
-	PlantLoop( 1 ).LoopSide.allocate(2);
-	PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 2 ).Branch.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 2 ).LoopSide.allocate(2);
-	PlantLoop( 2 ).LoopSide( 1 ).Branch.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 2 ).Branch.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
-
-	// initialize all node numbers to zero
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-
-	// specify the node numbers of interest
-	int const nodeNumA = 1;
-	int const nodeNumB = 2;
-
-	// first test, expected pass
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
-	EXPECT_TRUE( verifyTwoNodeNumsOnSamePlantLoop( nodeNumA, nodeNumB ) );
-
-	// reset node numbers
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-
-	// second test, expected false
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
-	EXPECT_FALSE( verifyTwoNodeNumsOnSamePlantLoop( nodeNumA, nodeNumB ) );
-
-	TotNumLoops = 0;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 1 ).LoopSide( 1 ).Branch.deallocate();
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 1 ).LoopSide( 2 ).Branch.deallocate();
-	PlantLoop( 1 ).LoopSide.deallocate();
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 2 ).LoopSide( 1 ).Branch.deallocate();
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 2 ).LoopSide( 2 ).Branch.deallocate();
-	PlantLoop( 2 ).LoopSide.deallocate();
-	PlantLoop.allocate( 2 );
-
-}
+#endif

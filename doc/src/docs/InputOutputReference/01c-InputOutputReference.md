@@ -2439,6 +2439,12 @@ The AirflowNetwork:Multizone:Surface object allows a heat transfer surface or su
 
 An interior heat transfer surface (BuildingSurface:Detailed) whose surface name is used as the input for the Outside Boundary Condition Object field represents a floor without ground contact and is not allowed as an AirflowNetwork:Multizone:Surface. A heat transfer surface defined in the BuildingSurface:Detailed:ExteriorNaturalVentedCavity is also not allowed.
 
+When a triangular subsurface is used, the model provides a warning and treats this subsurface as rectangular. The effective width and height calculated in the ProcessSurfaceVertices function of the SurfaceGeometry module are used to represent a rectangular subsurface.
+
+Effective width = 0.75 x Length between Vertex 1 and Vertex 2
+
+Effective height = 4 x Area / ( 3 x Length between Vertex 2 and Vertex 3 )   
+
 #### Field: Surface Name
 
 This is the name of the corresponding surface (wall, roof, ceiling, floor, window, door or glass door).
