@@ -11131,6 +11131,7 @@ UnitarySystemPerformance:Multispeed,
    MyMultispeedHPSpec,      !- Name
    4,                       !- Number of Speeds for Heating
    4,                       !- Number of Speeds for Cooling
+   No,                      !- Single Mode Operation
    0.235294118,             !- Heating Speed 1 Supply Air Flow Rate {m3/s}
    0.235294118,             !- Cooling Speed 1 Supply Air Flow Rate {m3/s}
    0.470588235,             !- Heating Speed 2 Supply Air Flow Rate {m3/s}
@@ -11221,11 +11222,15 @@ This output variable is the ratio of the sensible load (heating or cooling) to t
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the unitary system’s DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the unitary system is cycling on and off its lowest speed (Speed 1) and 1.0 when the unitary system operates at speeds above 1.
 
+When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed. 
+
 #### Unitary System DX Coil Speed Ratio []
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( [Compressor Speed - Compressor speed at Speed i-1] / [Compressor speed at Speed i - Compressor speed at Speed i-1]). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
 The physical meaning of the speed ratio is dependent on the compressor configuration defined in the field of child coil object: Apply Part Load Fraction to Speeds greater than 1. The allowed choice is either Yes or No. When No is entered, one compressor is assumed for all speeds.  The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep. When Yes is entered, multiple compressors are assumed, and each compressor has associated speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the low speed runs in a whole system timestep.
+
+When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1 and 1 at Speed > 1.
 
 #### Unitary System DX Coil Speed Level []
 
@@ -11323,6 +11328,10 @@ This field defines the number of heating speeds for the heat pump, and must matc
 #### Field: Number of Speeds for Cooling
 
 This field defines the number of cooling speeds for the heat pump, and must match the number of cooling speeds defined in the associated DX cooling coil. The value for this input field defines the number of airflow rate ratios that must be defined for cooling in the fields below. The minimum value for this field is one and the maximum value is the number specified in the coil object. If the cooling coil type used in the unitary system object is not a multispeed coil type, then this field should be 1.
+
+#### Field: Single Mode Operation
+
+This field specifies the coil operation mode for multiple speed DX cooling and heating coils during each HVAC timestep. The allowed choice is Yes or No. The No choice allows a coil works between two adjacent speeds when a system load is greater than the coil capacity at speed 1. The Yes choice allows a coil works with a single capacity at a different speed. The speed number is determined by a system load.  
 
 #### Field: Heating Speed 1 Supply Air Flow Ratio
 
@@ -12527,11 +12536,15 @@ This output variable is the ratio of the sensible load (heating or cooling) to t
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed heat pump’s DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the heat pump is cycling on and off its lowest speed (Speed 1) and 1.0 when the multispeed heat pump operates at speeds above 1.
 
+When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed. 
+
 #### Unitary System DX Coil Speed Ratio []
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( [Compressor Speed - Compressor speed at Speed i-1] / [Compressor speed at Speed i - Compressor speed at Speed i-1]). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
 The physical meaning of the speed ratio is dependent on the compressor configuration defined in the field of child coil object: Apply Part Load Fraction to Speeds greater than 1. The allowed choice is either Yes or No. When No is entered, one compressor is assumed for all speeds.  The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep. When Yes is entered, multiple compressors are assumed, and each compressor has associated speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the low speed runs in a whole system timestep.
+
+When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1, and 1 at Speed > 1
 
 #### Unitary System DX Coil Speed Level []
 

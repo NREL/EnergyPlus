@@ -280,6 +280,9 @@ namespace MixedAir {
 		int HeatRecoveryBypassControlType; // User input selects type of heat recovery optimization
 		bool ManageDemand; // Used by demand manager to manage ventilation
 		Real64 DemandLimitFlowRate; //Current demand limit if demand manager is ON
+		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
+		int MixedAirSPMNum; // index of mixed air setpoint manager
+		bool CoolCoilFreezeCheck; // if true, cooling coil freezing is prevented by recalculating the amount of OA
 
 		// Default Constructor
 		OAControllerProps() :
@@ -339,7 +342,10 @@ namespace MixedAir {
 			EMSOARateValue( 0.0 ),
 			HeatRecoveryBypassControlType( BypassWhenWithinEconomizerLimits ),
 			ManageDemand( false ),
-			DemandLimitFlowRate( 0.0 )
+			DemandLimitFlowRate( 0.0 ),
+			MaxOAFracBySetPoint( 0 ),
+			MixedAirSPMNum( 0 ),
+			CoolCoilFreezeCheck( false )
 		{}
 
 	};

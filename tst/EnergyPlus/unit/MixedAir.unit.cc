@@ -993,4 +993,86 @@ namespace EnergyPlus {
 		// confirm that electric energy is used by the humidifier		
 		EXPECT_EQ( ElecPowerInput, Humidifiers::Humidifier( HumNum ).ElecUseRate );
 	}
+
+	TEST_F( EnergyPlusFixture, FreezingCheckTest )
+	{
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+			"  OutdoorAir:Node,",
+			"    Outside Air Inlet Node 1; !- Name",
+			"  Schedule:Constant,",
+			"    OAFractionSched, !- Name",
+			"     , !- Schedule Type Limits Name",
+			"     1.0; !- Hourly value",
+			"  Controller:OutdoorAir,",
+			"    OA Controller 1,         !- Name",
+			"    Relief Air Outlet Node 1, !- Relief Air Outlet Node Name",
+			"    Outdoor Air Mixer Inlet Node,    !- Return Air Node Name",
+			"    Mixed Air Node,        !- Mixed Air Node Name",
+			"    Outside Air Inlet Node, !- Actuator Node Name",
+			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    NoEconomizer,     !- Economizer Control Type", // Economizer should open for this one, so OA flow should be > min OA
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+			"    NoLockout,               !- Lockout Type", // No lockout
+			"    ProportionalMinimum,     !- Minimum Limit Type",
+			"    OAFractionSched;                        !- Minimum Outdoor Air Schedule Name",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetOAControllerInputs( );
+
+		AirLoopControlInfo.allocate( 1 ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
+		AirLoopFlow.allocate( 1 ); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
+		Node.allocate( 5 ); // will be deallocated by DataLoopNode::clear_state(); in EnergyPlusFixture
+
+		int OAControllerNum = 1;
+		int AirLoopNum = 1;
+
+		AirLoopControlInfo( AirLoopNum ).EconoLockout = false;
+		AirLoopControlInfo( AirLoopNum ).NightVent = false;
+		AirLoopControlInfo( AirLoopNum ).FanOpMode = DataHVACGlobals::CycFanCycCoil;
+		AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet = false;
+		AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus = true;
+		AirLoopControlInfo( AirLoopNum ).OASysComponentsSimulated = true;
+		AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = false;
+		AirLoopControlInfo( AirLoopNum ).HeatRecoveryBypass = false;
+		AirLoopControlInfo( AirLoopNum ).HeatRecoveryResimFlag = false; // Need this to avoid resetting hxbypass, saying this has already been simulated
+		AirLoopFlow( AirLoopNum ).DesSupply = 1.0;
+
+		StdBaroPress = StdPressureSeaLevel;
+		StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW( StdBaroPress, 20.0, 0.0 );
+
+		// Initialize common OA controller and node data
+		OAController( OAControllerNum ).MinOAMassFlowRate = OAController( OAControllerNum ).MinOA * StdRhoAir;
+		OAController( OAControllerNum ).MaxOAMassFlowRate = OAController( OAControllerNum ).MaxOA * StdRhoAir;
+		OAController( OAControllerNum ).InletNode = OAController( OAControllerNum ).OANode;
+		OAController( OAControllerNum ).RetTemp = 24.0;
+		OAController( OAControllerNum ).InletTemp = 5.0; // This is the same as the outdoor air dry bulb for these tests
+		OAController( OAControllerNum ).OATemp = 5.0;
+		OAController( OAControllerNum ).MixSetTemp = 22.0;
+		OAController( OAControllerNum ).ExhMassFlow = 0.0;
+		// OAController( OAControllerNum ).InletEnth = needs to be initialized if an enthalpy economizer is tested
+		// OAController( OAControllerNum ).RetEnth = needs to be initialized if an enthalpy economizer is tested
+		OAController( OAControllerNum ).MixMassFlow = 0.5; // Note this is 50% of design flow set above
+		Node( OAControllerNum * 4 ).MassFlowRate = OAController( OAControllerNum ).MixMassFlow; // Return air nodes
+		Node( OAControllerNum * 4 ).Temp = OAController( OAControllerNum ).RetTemp; // Return air nodes
+		Node( OAControllerNum * 4 ).Enthalpy = Psychrometrics::PsyHFnTdbW( OAController( OAControllerNum ).RetTemp, 0.0 ); // Return air nodes, dry air
+		Node( OAControllerNum * 4 - 3 ).TempSetPoint = OAController( OAControllerNum ).MixSetTemp; // Mixed air nodes
+		Node( OAControllerNum * 4 - 2 ).Enthalpy = Psychrometrics::PsyHFnTdbW( OAController( OAControllerNum ).InletTemp, 0.0 );; // OA inlet (actuated) air nodes, dry air
+
+		OAController( 1 ).CoolCoilFreezeCheck = true;
+		Schedule( 1 ).CurrentValue = 1.0;
+
+		CalcOAController( OAControllerNum, AirLoopNum );
+
+		EXPECT_NEAR( 0.2408617, OAController( 1 ).OAFractionRpt, 0.00001 );
+
+	}
 }
