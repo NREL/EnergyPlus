@@ -32484,6 +32484,7 @@ ZoneHVAC:FourPipeFanCoil,
         \key VariableFanVariableFlow
         \key VariableFanConstantFlow
         \key MultiSpeedFan
+        \key ASHRAE90VariableFan
    N1 , \field Maximum Supply Air Flow Rate
         \required-field
         \autosizable
@@ -32527,8 +32528,9 @@ ZoneHVAC:FourPipeFanCoil,
         \key Fan:VariableVolume
         \note Fan type must be according to capacity control method (see I/O)
         \note For ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.
-        \note For CyclingFan, a Fan:OnOff is valid.
+        \note For CyclingFan a Fan:OnOff is valid.
         \note For VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.
+        \note For ASHRAE90.1 a Fan:OnOff or Fan:VariableVolume is valid.
         \note The fan's inlet node should be the same as the outdoor air mixer's mixed air node.
    A10, \field Supply Air Fan Name
         \required-field
@@ -32588,7 +32590,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
-   A17; \field Supply Air Fan Operating Mode Schedule Name
+   A17, \field Supply Air Fan Operating Mode Schedule Name
         \type object-list
         \object-list ScheduleNames
         \note Enter the name of a schedule that controls fan operation. Schedule Name values of 0 denote
@@ -32596,6 +32598,20 @@ ZoneHVAC:FourPipeFanCoil,
         \note than 0 denote constant fan operation (fan runs continually regardless of coil operation).
         \note The fan operating mode defaults to cycling fan operation if this field is left blank.
         \note This input field is currently used with MultiStageFan capacity control method
+   N11, \field Minimum Supply Air Temperature in Cooling Mode
+        \note For Capacity Control Method = ASHRAE90VariableFan, enter the minimum air temperature in cooling mode.
+        \note Leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1. In this case, a zone sizing simulation is required.
+        \type real
+        \minimum 0.0
+        \autosizable
+        \default autosize
+   N12; \field Maximum Supply Air Temperature in Heating Mode
+        \note For Capacity Control Method = ASHRAE90VariableFan, enter the maximum air temperature in heating mode.
+        \note Leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1. In this case, a zone sizing simulation is required.
+        \type real
+        \minimum 0.0
+        \autosizable
+        \default autosize
 
 ZoneHVAC:WindowAirConditioner,
         \memo Window air conditioner. Forced-convection cooling-only unit with supply fan, direct
