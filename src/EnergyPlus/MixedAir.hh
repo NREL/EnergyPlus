@@ -115,6 +115,7 @@ namespace MixedAir {
 	extern int const DXHeatPumpSystem;
 	extern int const Coil_UserDefined;
 	extern int const UnitarySystem;
+	extern int const Humidifier;
 
 	extern int const ControllerSimple;
 	extern int const ControllerOutsideAir;
