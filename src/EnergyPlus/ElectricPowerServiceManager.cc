@@ -3167,8 +3167,14 @@ namespace EnergyPlus {
 			Real64 Xf = q0 / qmaxf;
 			Ef = E0d + CurveManager::CurveValue( this->chargeCurveNum, Xf ); //E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
 			Volt = Ef - I0 * this->internalR;
-			Real64 Inew = Pw / Volt;
-			Real64 Tnew = qmaxf / std::abs( Inew );
+			Real64 Inew = 0.0;
+			if ( Volt != 0.0 ) {
+				Inew = Pw / Volt;
+			} 
+			Real64 Tnew = 0.0;
+			if ( Inew != 0.0 ) {
+				Tnew = qmaxf / std::abs( Inew );
+			}
 			Real64 error = 1.0;
 
 			while ( error > 0.0001 ) { //Iteration process to get converged current(I)
