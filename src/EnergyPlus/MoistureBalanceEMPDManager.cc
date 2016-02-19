@@ -415,7 +415,7 @@ namespace MoistureBalanceEMPDManager {
 		int const SurfNum,
 		Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
 		Real64 const TempZone, // Zone temperature at current time step.
-		Real64 & TempSat // Satutare surface temperature.
+		Real64 & TempSat // Saturated surface temperature.
 	)
 	{
 
@@ -491,19 +491,19 @@ namespace MoistureBalanceEMPDManager {
 		}
 
 		auto const & surface( Surface( SurfNum ) ); // input
-		auto & rv_surface( RVSurface( SurfNum ) ); // input + output
+		auto & rv_surface( RVSurface( SurfNum ) ); // output
 		auto const & rv_surface_old( RVSurfaceOld( SurfNum ) ); // input
 		auto const & h_mass_conv_in_fd( HMassConvInFD( SurfNum ) ); // input
 		auto const & rho_vapor_air_in( RhoVaporAirIn( SurfNum ) ); // input
 		Real64 mass_flux_surf_layer;
 		Real64 mass_flux_deep_layer;
 		Real64 mass_flux_zone;
-		auto & rv_surf_layer( RVSurfLayer( SurfNum ) ); // input + output
-		Real64 hm_surf_layer;
-		auto & rv_deep_layer( RVDeepLayer( SurfNum ) ); // input + output
-		auto & heat_flux_latent( HeatFluxLatent( SurfNum ) ); // output
-		auto const & rv_deep_old( RVdeepOld( SurfNum ) ); // input
+		auto & rv_surf_layer( RVSurfLayer( SurfNum ) ); // output
 		auto const & rv_surf_layer_old( RVSurfLayerOld( SurfNum ) ); // input
+		Real64 hm_surf_layer;
+		auto & rv_deep_layer( RVDeepLayer( SurfNum ) ); // output
+		auto const & rv_deep_old( RVdeepOld( SurfNum ) ); // input
+		auto & heat_flux_latent( HeatFluxLatent( SurfNum ) ); // output
 
 		heat_flux_latent = 0.0;
 		Flag = 1;
@@ -522,7 +522,7 @@ namespace MoistureBalanceEMPDManager {
 
 		Taver = TempSurfIn;
 		// Calculate average vapor density [kg/m^3], and RH for use in material property calculations.
-		RVaver = ( rv_surface + rv_surface_old ) * 0.5;
+		RVaver = rv_surface_old;
 		RHaver = RVaver * 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ));
 
 		// Calculate the saturated vapor pressure, surface vapor pressure and dewpoint. Used to check for condensation in HeatBalanceSurfaceManager
@@ -561,9 +561,9 @@ namespace MoistureBalanceEMPDManager {
 		RSurfaceLayer = 1.0 / hm_surf_layer - 1.0 / h_mass_conv_in_fd - Rcoating;
 
 		// Calculate vapor flux leaving surface layer, entering deep layer, and entering zone.
-		mass_flux_surf_layer = hm_surf_layer * ( rv_surf_layer - rho_vapor_air_in ) + hm_deep_layer * ( rv_surf_layer - rv_deep_layer );
-		mass_flux_deep_layer = hm_deep_layer * ( rv_surf_layer - rv_deep_layer );
-		mass_flux_zone = hm_surf_layer * ( rv_surf_layer - rho_vapor_air_in );
+		mass_flux_surf_layer = hm_surf_layer * ( rv_surf_layer_old - rho_vapor_air_in ) + hm_deep_layer * ( rv_surf_layer_old - rv_deep_old );
+		mass_flux_deep_layer = hm_deep_layer * ( rv_surf_layer_old - rv_deep_old );
+		mass_flux_zone = hm_surf_layer * ( rv_surf_layer_old - rho_vapor_air_in );
 
 		// Convert stored vapor density from previous timestep to RH.
 		RH_deep_layer_old = PsyRhFnTdbRhov( Taver, rv_deep_old );
@@ -571,6 +571,9 @@ namespace MoistureBalanceEMPDManager {
 
 		// Calculate new surface layer RH using mass balance on surface layer
 		RH_surf_layer = RH_surf_layer_old + TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
+		if (SurfNum == 194) {
+			std::cout << mass_flux_surf_layer << " " << mass_flux_deep_layer << " " << mass_flux_zone << std::endl;
+		}
 		// Calculate new deep layer RH using mass balance on deep layer (unless depth <= 0).
 		if (material.EMPDDeepDepth <= 0.0) {
 			RH_deep_layer = RH_deep_layer_old;
@@ -638,6 +641,7 @@ namespace MoistureBalanceEMPDManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
+		if (SurfNum==194) std::cout << "---" << std::endl;
 		RVSurfaceOld( SurfNum ) = RVSurface( SurfNum );
 		RVdeepOld( SurfNum ) = RVDeepLayer( SurfNum );
 		RVSurfLayerOld( SurfNum ) = RVSurfLayer( SurfNum );
