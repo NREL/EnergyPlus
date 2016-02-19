@@ -68,7 +68,7 @@ The input data file is the primary file that EnergyPlus uses to create the build
 
 ### EnergyPlus Output Processing
 
-1)    Unlike the usual formatted output text formatted reports, EnergyPlus usual output is either at the summary or at the detailed (variable) level. Summary reports exist for many inputs as well as sizing results. The more detailed variable level reporting is produced as “stream of consciousness” (as the simulation happens) and must be post-processed for more sensible viewing. Note that the terms “output variable” and “output variable” (accessed by the Output:Variable and/or Output:Meter objects) are used interchangably in this document.
+1)    Unlike the usual formatted output text formatted reports, EnergyPlus usual output is either at the summary or at the detailed (variable) level. Summary reports exist for many inputs as well as sizing results. The more detailed variable level reporting is produced as “stream of consciousness” (as the simulation happens) and must be post-processed for more sensible viewing. Note that the terms “output variable” and “output variable” (accessed by the Output:Variable and/or Output:Meter objects) are used interchangeably in this document.
 
 2)    Most EnergyPlus reporting can be readily viewed in current spreadsheet programs – or other software that can process “delimited variable” reports. In these kind of reports, each “column” is separated from the next by a “delimiter”. Typical delimiters are “comma” and “tab”. Gradually, EnergyPlus reporting is moving from all comma separated reports to allow the user to select the delimiter via “style” objects.
 
@@ -686,11 +686,11 @@ In order to reduce time used in simulating your building, you may choose to ente
 
 #### Field: Minimum Plant Iterations
 
-The plant system modeling includes a solver that iterates within a single HVAC manager iteration.  This input field and the next one provide some control over how the plant solver iterates.  This field sets a minimum threshold for plant interations. The default for this field is the value “2” which indicates that a minimum of two full plant model interations will be performed every time plant is called by the HVAC manager.  For faster performance with simple plant systems, this input field could be set to the value “1”.  For complicated plant systems that present difficulties to solve, this value may need to be set higher to ensure accuracy but at the expense of speed.  Complicated plant systems include those with several interconnected loops, sizing miss-matches such that plant components are starved of flow compared to their desired flow, heat recovery systems, and thermal load following onsite generators.
+The plant system modeling includes a solver that iterates within a single HVAC manager iteration.  This input field and the next one provide some control over how the plant solver iterates.  This field sets a minimum threshold for plant iterations. The default for this field is the value “2” which indicates that a minimum of two full plant model iterations will be performed every time plant is called by the HVAC manager.  For faster performance with simple plant systems, this input field could be set to the value “1”.  For complicated plant systems that present difficulties to solve, this value may need to be set higher to ensure accuracy but at the expense of speed.  Complicated plant systems include those with several interconnected loops, sizing miss-matches such that plant components are starved of flow compared to their desired flow, heat recovery systems, and thermal load following onsite generators.
 
 #### Field: Maximum Plant Iterations
 
-The plant system solver iterates within a single HVAC manager iteration.  This input field and the previous one provide some control over how the plant model iterates.  This field sets a maximum limit for plant interations.  The default for this field is the value “8” which indicates that the plant solver will exit after having completed eight full iterations.  This value can be raised for better accuracy with complex plants or lowered for faster speed with simple plants. The output variable called “Plant Solver Sub Iteration Count” (typically reported at the “detailed” frequency) is useful for understanding how many plant solver iterations are actually being used during a particular simulation.  The lower limit of the value for this field is “2.”
+The plant system solver iterates within a single HVAC manager iteration.  This input field and the previous one provide some control over how the plant model iterates.  This field sets a maximum limit for plant iterations.  The default for this field is the value “8” which indicates that the plant solver will exit after having completed eight full iterations.  This value can be raised for better accuracy with complex plants or lowered for faster speed with simple plants. The output variable called “Plant Solver Sub Iteration Count” (typically reported at the “detailed” frequency) is useful for understanding how many plant solver iterations are actually being used during a particular simulation.  The lower limit of the value for this field is “2.”
 
 Use in an IDF:
 
@@ -755,7 +755,7 @@ Table 1. Values for "Terrain"
 
 #### Warmup Convergence
 
-The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions: temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisifed too early and you may not get the results you expect from the actual simulation.
+The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions: temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisfied too early and you may not get the results you expect from the actual simulation.
 
 #### Field: Loads Convergence Tolerance Value
 
@@ -905,7 +905,7 @@ Various exterior convection models may be selected for global use.  The optiona
 
 The available key choices are **SimpleCombined**, **TARP**, **MoWiTT**, **DOE-2**, and **AdaptiveConvectionAlgorithm**.
 
-The **Simple** convection model applies heat transfer coefficients depending on the roughness and windspeed. This is a combined heat transfer coefficient that includes radiation to sky, ground, and air. The correlation is based on Figure 1, Page 25.1 (Thermal and Water Vapor Transmission Data), 2001 ASHRAE Handbook of Fundamentals. Note that if **Simple** is chosen here or in the Zone field and a SurfaceProperty:ConvectionCoefficients object attempts to override the caulcation with a different choice, the action will still be one of combined calculation. To change this, you must select one of the other methods for the global default.
+The **Simple** convection model applies heat transfer coefficients depending on the roughness and windspeed. This is a combined heat transfer coefficient that includes radiation to sky, ground, and air. The correlation is based on Figure 1, Page 25.1 (Thermal and Water Vapor Transmission Data), 2001 ASHRAE Handbook of Fundamentals. Note that if **Simple** is chosen here or in the Zone field and a SurfaceProperty:ConvectionCoefficients object attempts to override the calculation with a different choice, the action will still be one of combined calculation. To change this, you must select one of the other methods for the global default.
 
 All other convection models apply heat transfer coefficients depending on the roughness, windspeed, and terrain of the building’s location. These are *convection only* heat transfer coefficients; radiation heat transfer coefficients are calculated automatically by the program.
 
@@ -947,7 +947,7 @@ Four values are allowed to select which solution will be used.
 
 - MaterialProperty:VariableThermalConductivity
 
-- **Advanced/Research usage:** The **CombinedHeatAndMoistureFiniteElement** is a coupled heat and moisture transfer and storage solution. The solution technique uses a one dimensional finite difference solution in the construction elements and requires further materialproperties described in the Heat and Moisture Transfer material properties objects. Outputs from the algorithm are described with these objects. The Heat and Moisture Transfer property objects are:
+- **Advanced/Research usage:** The **CombinedHeatAndMoistureFiniteElement** is a coupled heat and moisture transfer and storage solution. The solution technique uses a one dimensional finite difference solution in the construction elements and requires further material properties described in the Heat and Moisture Transfer material properties objects. Outputs from the algorithm are described with these objects. The Heat and Moisture Transfer property objects are:
 
 - MaterialProperty:HeatAndMoistureTransfer:Settings
 
@@ -1057,7 +1057,7 @@ Input is Yes or No. The default is No. If Yes, simulation of carbon dioxide conc
 
 #### Field: Outdoor Carbon Dioxide Schedule Name
 
-This field specifies the name of a schedule that contains outdoor air carbon dioxide level values in units of ppm. One source of monthly average CO<sub>2</sub> levels in the atmosphere is available at a NOAA ftpsite as .
+This field specifies the name of a schedule that contains outdoor air carbon dioxide level values in units of ppm. One source of monthly average CO<sub>2</sub> levels in the atmosphere is available at [NOAA’s website](http://www.esrl.noaa.gov/gmd/ccgg/trends/) or via [ftp](ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_mm_mlo.txt).
 
 #### Field: Generic Contaminant Concentration
 
@@ -1116,7 +1116,7 @@ This is the rate of generic air contaminant added (or subtracted) to a zone from
 
 ### ShadowCalculation
 
-This object is used to control some details of EnergyPlus’s solar, shadowing and daylighting models. There are two basic methods available for the calculations. In order to speed up the calculations, shadowing calculations (sun position, etc.) for the default method are performed over a period of days. Note that this value may be very important for determining the amount of sun entering your building and by inference the amount of cooling or heating load needed for maintaining the building. Though termed “shadowing” calculations, it in affect determines the sun position for a particular day in a weather file period simulation. (Each design day will use the date of the design day object). Even though weather file data contains the amount of solar radiation, the internal calculation of sun position will govern how that affects various parts of the building. By default, the calculations are done for every 20 days throughout a weather run period; an average solar position is chosen and the solar factors (such as sunlit areas of surfaces) remain the same for that number of days. When more integrated calculations are needed for controlling dynamic windows or shades, a secod method is available where solar calculations are performed at each zone timestep.
+This object is used to control some details of EnergyPlus’s solar, shadowing and daylighting models. There are two basic methods available for the calculations. In order to speed up the calculations, shadowing calculations (sun position, etc.) for the default method are performed over a period of days. Note that this value may be very important for determining the amount of sun entering your building and by inference the amount of cooling or heating load needed for maintaining the building. Though termed “shadowing” calculations, it in affect determines the sun position for a particular day in a weather file period simulation. (Each design day will use the date of the design day object). Even though weather file data contains the amount of solar radiation, the internal calculation of sun position will govern how that affects various parts of the building. By default, the calculations are done for every 20 days throughout a weather run period; an average solar position is chosen and the solar factors (such as sunlit areas of surfaces) remain the same for that number of days. When more integrated calculations are needed for controlling dynamic windows or shades, a second method is available where solar calculations are performed at each zone timestep.
 
 #### Field: Calculation Method
 
@@ -1270,7 +1270,7 @@ This field is used to alter the effective carbon dioxide capacitance of the zone
 
 #### Field: Generic Contaminant Capacity Multiplier
 
-This field is used to alter the effective generic contaminantcapacitance of the zone air volume. This affects the transient calculations of zone air generic contaminantconcentration.  Values greater than 1.0 have the effect of smoothing or damping the rate of change in the generic contaminantlevel of zone air from timestep to timestep.
+This field is used to alter the effective generic contaminant capacitance of the zone air volume. This affects the transient calculations of zone air generic contaminant concentration.  Values greater than 1.0 have the effect of smoothing or damping the rate of change in the generic contaminant level of zone air from timestep to timestep.
 
 ### SimulationControl
 
@@ -1321,7 +1321,7 @@ An IDF example:
 
 ### ProgramControl
 
-This object is currently disabled. The ProgramControl object can be used to control how the EnergyPlus program executes on the computer.  Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation.  This multithreading may not be desireable when running more than one simulation at a time on the same computer (because it can actually run more slowly).  This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed.  When this object is used, its input for the number of threads will take precedent over the value of the environment variable **“EP\_OMP\_NUM\_THREADS”** which is an alternate method of controlling the program’s threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is &lt;= 30.
+This object is currently disabled. The ProgramControl object can be used to control how the EnergyPlus program executes on the computer.  Portions of EnergyPlus have been programmed to use more than one processor, or CPU core, at the same time during a single simulation.  This multithreading may not be desirable when running more than one simulation at a time on the same computer (because it can actually run more slowly).  This input object is optional and allows controlling the number of threads (or cores, or processors) that EnergyPlus will use so that conflicts can be managed.  When this object is used, its input for the number of threads will take precedent over the value of the environment variable **“EP\_OMP\_NUM\_THREADS”** which is an alternate method of controlling the program’s threading. Since the primary method for OpenMP simulations currently (V7.1 and V7.2) is the interior radiant exchange to solve for inside surface temperatures, EnergyPlus sets the threads to 1 if the nominal number of surfaces is &lt;= 30.
 
 #### Field: Number of Threads Allowed
 
@@ -1789,7 +1789,7 @@ Optical depth for diffuse radiation, used only when Solar Model Indicator is ASH
 
 #### Field: Sky Clearness
 
-If the choice in the Solar Model Indicator field is ASHRAEClearSky or ZhangHuang, then this numeric field should be entered. This value represents the “clearness” value for the day. This value, along with the solar position as defined by the Location information and the date entered for the design day, help define the solar radiation values for each hour of the day. Clearness may range from 0.0 to 1.2, where 1.0 represents a clear sky at sea level.  Values greated than 1.0 may be used for high altitude locations. Traditionally, one uses 0.0 clearness for Winter Design Days. Note that this “sky clearness” does not have the same meaning as output variable “Site Daylighting Model Sky Clearness”.
+If the choice in the Solar Model Indicator field is ASHRAEClearSky or ZhangHuang, then this numeric field should be entered. This value represents the “clearness” value for the day. This value, along with the solar position as defined by the Location information and the date entered for the design day, help define the solar radiation values for each hour of the day. Clearness may range from 0.0 to 1.2, where 1.0 represents a clear sky at sea level.  Values greater than 1.0 may be used for high altitude locations. Traditionally, one uses 0.0 clearness for Winter Design Days. Note that this “sky clearness” does not have the same meaning as output variable “Site Daylighting Model Sky Clearness”.
 
 IDF Examples:
 
@@ -1908,7 +1908,7 @@ This schedule value is active when any Design Day objects have / use the humidit
 
 #### Sizing Period Site Drybulb Temperature Range Modifier Schedule Value [C]
 
-This schedule value is active when any Design Day objects have / use the drybulb temperature range modifier chedule option. For those objects that don’t have this option, the value will be displayed as -999.
+This schedule value is active when any Design Day objects have / use the drybulb temperature range modifier schedule option. For those objects that don’t have this option, the value will be displayed as -999.
 
 #### Sizing Period Site Sky Temperature Schedule Value [deltaC]
 
@@ -2054,7 +2054,7 @@ The RunPeriod object describes the elements necessary to create a weather file s
 
 #### Field: Name
 
-This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appened to this name in tabular/summary reports.
+This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appended to this name in tabular/summary reports.
 
 #### Field: Begin Month
 
@@ -2157,7 +2157,7 @@ The RunPeriod:CustomRange object describes the elements necessary to use a speci
 
 #### Field: Name
 
-This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appened to this name in tabular/summary reports.
+This optional field allows the RunPeriod to be named for output reporting. When left blank, the weather file location name is used. Note that the weather file location name will be appended to this name in tabular/summary reports.
 
 #### Field: Begin Month
 
@@ -2315,7 +2315,7 @@ Of course, these could not all appear in the same IDF as only one DaylightSaving
 
 ### WeatherProperty:SkyTemperature
 
-Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus using an algorithm using horizontal infrared radiation from sky, cloudiness factors and current temperaure. The algorithm is fully described in the Engineering Reference document. For flexibility, the following object can be entered to override the internal calculations. Much of the literature describes the sky temperature as relative to either drybulb or dewpoint temperature.
+Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus using an algorithm using horizontal infrared radiation from sky, cloudiness factors and current temperature. The algorithm is fully described in the Engineering Reference document. For flexibility, the following object can be entered to override the internal calculations. Much of the literature describes the sky temperature as relative to either drybulb or dewpoint temperature.
 
 #### Field: Name
 
@@ -2333,7 +2333,7 @@ An example of IDF usage (with DesignDay):
 
 ```idf
   SizingPeriod:DesignDay,
-    DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
+    DENVER_STAPLETON Ann Clg 1% Sky Temperature modifier,  !- Name
     32.6,               !- Maximum Dry-Bulb Temperature {C}
     15.2,               !- Daily Temperature Range {deltaC}
     15.5,               !- Humidity Indicating Conditions at Maximum Dry-Bulb
@@ -2354,7 +2354,7 @@ An example of IDF usage (with DesignDay):
 
 
   WeatherProperty:SkyTemperature,
-    DENVER_STAPLETON Ann Clg 1% Sky Temperature modfier,  !- Name
+    DENVER_STAPLETON Ann Clg 1% Sky Temperature modifier,  !- Name
     ScheduleValue,           !- Calculation Type
     DaySchedule5;            !- Schedule Name
 
@@ -2392,7 +2392,7 @@ Table 4. Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005).
 <tr>
 <th>Terrain Description</th>
 <th>Exponent</th>
-<th>Bounhary Layer Thickness (m)</th>
+<th>Boundary Layer Thickness (m)</th>
 </tr>
 <tr>
 <td>Flat, open country</td>
@@ -2573,7 +2573,7 @@ Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 
 ###Site:GroundTemperature:Undisturbed:FiniteDifference
 
-Site:GroundTemperature:Undisturbed:FiniteDifference may be used by all objects requiring "undisturbed" ground temperatures. The object uses a 1D finite difference heat transfer model which uses the weather file to obtain surface boundary conditions. An annual simulation is run on the model during it's initialization until the annual ground temperature profile has reached steady periodic behavior. Once steady periodic behavior is reached, the ground tempeatures are cached for retrieval during the rest of the simulation.
+Site:GroundTemperature:Undisturbed:FiniteDifference may be used by all objects requiring "undisturbed" ground temperatures. The object uses a 1D finite difference heat transfer model which uses the weather file to obtain surface boundary conditions. An annual simulation is run on the model during it's initialization until the annual ground temperature profile has reached steady periodic behavior. Once steady periodic behavior is reached, the ground temperatures are cached for retrieval during the rest of the simulation.
 
 #### Field: Soil Thermal Conductivity
 
@@ -3183,7 +3183,7 @@ A set of schedules for site precipitation have been developed for USA weather lo
 
 <div>\[Amount\,(m/hour) = \,\left\{ {\begin{array}{*{20}{c}}{Light = 0.0125}\\\{Moderate = 0.052}\\\{Heavy = 0.1}\end{array}} \right.\]</div>
 
-The values were inserted on hour by hour basis for the month based on the observations. Then each month was rescaled to meet the average precipitation for the month based on the 30-year average (1971-2000) provided by the NOAA/NCDC. Therefore, the flags in the EPW file match the precipitation schedules for the USA. Note that summing the average monthly precipitation values will not give you the average yearly precipitiation. The resulting value may be lower or higher than the average yearly value.
+The values were inserted on hour by hour basis for the month based on the observations. Then each month was rescaled to meet the average precipitation for the month based on the 30-year average (1971-2000) provided by the NOAA/NCDC. Therefore, the flags in the EPW file match the precipitation schedules for the USA. Note that summing the average monthly precipitation values will not give you the average yearly precipitation. The resulting value may be lower or higher than the average yearly value.
 
 Once the typical rainfall pattern and rates are scheduled, the Site:Precipitation object provides a method of shifting the total rainfall up or down for design purposes. Wetter or drier conditions can be modeled by changing the Design Annual Precipitation although the timing of precipitation throughout the year will not be changed.
 
@@ -3490,7 +3490,7 @@ The Site Simple Factor Model Ground Temperature is reported in degrees C – thi
 
 #### Site Outdoor Air Enthalpy [J/kg]
 
-Outdoor enthalpy is derived at each timestep from the Site Outdoor Air Drybulb Temperatureand the Site Outdoor Air Humidity Ratio. It is reported in J/kg.
+Outdoor enthalpy is derived at each timestep from the Site Outdoor Air Drybulb Temperature and the Site Outdoor Air Humidity Ratio. It is reported in J/kg.
 
 #### Site Outdoor Air Density [kg/m3]
 
@@ -3551,7 +3551,7 @@ This field shows when daylight saving time (1=yes, 0=no) is in effect. Though sh
 
 #### Site Day Type Index []
 
-This field shows what “day type” the current day is. Daytypes are (1=Sunday, 2=Monday, etc.) with Holiday=8, SummerDesignDay=9, WinterDesignDay=10, CustomDay1=11, CustomDay2=12. Though shown as an average variable, this value is only set on a daily basis.
+This field shows what “day type” the current day is. Day types are (1=Sunday, 2=Monday, etc.) with Holiday=8, SummerDesignDay=9, WinterDesignDay=10, CustomDay1=11, CustomDay2=12. Though shown as an average variable, this value is only set on a daily basis.
 
 #### Site Mains Water Temperature [C]
 
@@ -3561,7 +3561,7 @@ The value of the Water Mains Temperature is reported in C following the calculat
 
 #### Site Precipitation Depth [m]
 
-The rate and quantity of precipitation at the site. These outputs are only available if a Site Precipication object is used. Precipitation is measured in meters.
+The rate and quantity of precipitation at the site. These outputs are only available if a Site Precipitation object is used. Precipitation is measured in meters.
 
 #### Water System Roof Irrigation Scheduled Depth[m]
 
@@ -4090,7 +4090,7 @@ Many times the data in a file contains rows (lines) that are describing the file
 
 #### Field: Number of Hours of Data
 
-The value entered in this field should be either 8760 or 8784 as the number of hours of data. 8760 does not include the extra 24 hours for a leap year (if needed).  8784 will include the possibility of leap year data which can be processed according to leap year indicators in the weather file or specified elsewhere. Note if the simulation does not have a leap year specified but the schedule file contains 8784 hours of data, the first 8760 hours of data will be used. The schedule manager will not know to skip the 24 hours representing Feburary 29.
+The value entered in this field should be either 8760 or 8784 as the number of hours of data. 8760 does not include the extra 24 hours for a leap year (if needed).  8784 will include the possibility of leap year data which can be processed according to leap year indicators in the weather file or specified elsewhere. Note if the simulation does not have a leap year specified but the schedule file contains 8784 hours of data, the first 8760 hours of data will be used. The schedule manager will not know to skip the 24 hours representing February 29.
 
 #### Field: Column Separator
 
@@ -4595,7 +4595,7 @@ MaterialProperty:PhaseChange,
     20.,             !- Temperature 2, C
     33400,           !- Enthalpy 2, (J/kg)
     20.5,            !- temperature 3, C
-    70000,           !- Ethalpy 3, (J/kg)
+    70000,           !- Enthalpy 3, (J/kg)
     100.,            !- Temperature 4, C
     137000;          !- Enthalpy 4, (J/kg)
 ```
@@ -4680,7 +4680,7 @@ This will output temperatures for a node in the surfaces being simulated with Co
 
 #### CondFD Surface Heat Flux Node &lt;X&gt; [W/m2]
 
-This will output heat flux at each node in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. A positive value indicates heat flowing towards the inside face of the surface. Note that this matches the sign convention for Surface Inside Face Conduction Heat Transfer Rate per Area and is opposite the sign of Surface OUtside Face Conduction Heat Transfer Rate per Area.
+This will output heat flux at each node in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. A positive value indicates heat flowing towards the inside face of the surface. Note that this matches the sign convention for Surface Inside Face Conduction Heat Transfer Rate per Area and is opposite the sign of Surface Outside Face Conduction Heat Transfer Rate per Area.
 
 #### CondFD Surface Heat Capacitance Outer Half Node &lt;X&gt; [W/m2-K]
 #### CondFD Surface Heat Capacitance Inner Half Node &lt;X&gt; [W/m2-K]
@@ -4689,7 +4689,7 @@ These will output the half-node heat capacitance in surfaces being simulated wit
 
 ### MaterialProperty:HeatAndMoistureTransfer:Settings
 
-**Advanced/Research Usage:** This object is used to describe two of the seven additional material properties needed for the CombinedHeatAndMoistureFiniteElement heat balance solution algorithm. The settings object is used when the solutions algorithm is set to CombinedHeatAndMoistureFiniteElement and the appropriate material properties are assigned to each material. This permits the simulation of the moisture dependant thermal properties of the material as well as the transfer of moisture through, into and out of the material into the zone or exterior.
+**Advanced/Research Usage:** This object is used to describe two of the seven additional material properties needed for the CombinedHeatAndMoistureFiniteElement heat balance solution algorithm. The settings object is used when the solutions algorithm is set to CombinedHeatAndMoistureFiniteElement and the appropriate material properties are assigned to each material. This permits the simulation of the moisture dependent thermal properties of the material as well as the transfer of moisture through, into and out of the material into the zone or exterior.
 
 In addition to the Porosity and Initial Water content properties described here, five additional properties, described by tabulated relationships between variables, are required. These properties are;
 
@@ -4733,7 +4733,7 @@ MaterialProperty:HeatAndMoistureTransfer:Settings,
 
 **Advanced/Research Usage:** This material property is used in conjunction with the CombinedHeatAndMoistureFiniteElement heat balance solution algorithm.
 
-The Isotherm data relates the moisture, or water content [kg/m3] of a material with the relative humidity (RH). The water content is expected to increase as relative humidity increases, starting at zero content at 0.0relative humidity fraction and reaching a maximum, defined by the porosity, at 1.0 relative humidity fraction, which corresponds to 100% relatve humidity. Relative humidities are entered as fraction for this object ranging from 0.0 to 1.0. These two extremes (0.0 and 1.0) are automatically set by the HAMT solution. However, if they are entered they will be used as extra data points. Data should be provided with increasing RH and moisture content up to as high an RH as possible to provide a stable solution. One possible reason for the following error message may be that a material has a very rapid increase in water content for a small change in RH, which can happen if the last entered water content point is at a low RH and the material has a very high porosity.
+The Isotherm data relates the moisture, or water content [kg/m3] of a material with the relative humidity (RH). The water content is expected to increase as relative humidity increases, starting at zero content at 0.0relative humidity fraction and reaching a maximum, defined by the porosity, at 1.0 relative humidity fraction, which corresponds to 100% relative humidity. Relative humidities are entered as fraction for this object ranging from 0.0 to 1.0. These two extremes (0.0 and 1.0) are automatically set by the HAMT solution. However, if they are entered they will be used as extra data points. Data should be provided with increasing RH and moisture content up to as high an RH as possible to provide a stable solution. One possible reason for the following error message may be that a material has a very rapid increase in water content for a small change in RH, which can happen if the last entered water content point is at a low RH and the material has a very high porosity.
 
 ```
   ** Warning ** HeatAndMoistureTransfer: Large Latent Heat for Surface ROOF
@@ -5183,7 +5183,7 @@ Figure 10. Comparison between transmittance properties of transparent glass (Sol
 
 #### Field: Young’s modulus
 
-A measure of the stiffness of an elastic material.  It is defined as the ratio of the unaxial stress over the uniaxial strain in the range of stress in which Hooke’s Law holds. It is used only with complex fenestration systems defined through the Construction:ComplexFenestrationState object. The default value for glass is 7.2e10 Pa.
+A measure of the stiffness of an elastic material.  It is defined as the ratio of the uniaxial stress over the uniaxial strain in the range of stress in which Hooke’s Law holds. It is used only with complex fenestration systems defined through the Construction:ComplexFenestrationState object. The default value for glass is 7.2e10 Pa.
 
 #### Field: Poisson’s ratio
 
@@ -5816,7 +5816,7 @@ The pressure (Pa) of the gas in the gap layer, used to calculate the gas propert
 
 #### Field: Deflection State
 
-This field is used when modeling the deflection of the glass layers in a window if the WinodowThermalModel:Params value for “deflection model” is “MeasuredDeflection”.
+This field is used when modeling the deflection of the glass layers in a window if the WindowThermalModel:Params value for “deflection model” is “MeasuredDeflection”.
 
 #### Field: Support Pillar
 
@@ -5876,7 +5876,7 @@ Unique name of the deflection state.
 
 #### Field: Deflected Thickness
 
-The thickness (m) of the gap in deflected state.  It represents value of deflection at point of maximum which is usualy at the center poing of glazing system.  It is used only with tarcog algorithm set to Measured Deflection (WindowThermalModel:Params), otherwise this field will be ignored.
+The thickness (m) of the gap in deflected state.  It represents value of deflection at point of maximum which is usually at the center poing of glazing system.  It is used only with tarcog algorithm set to Measured Deflection (WindowThermalModel:Params), otherwise this field will be ignored.
 
 
 
@@ -6400,11 +6400,11 @@ The bottom opening multiplier (d<sub>bot</sub>) is calculated in the same way as
 
 #### Field: Left Side Opening Multiplier
 
-The left side opening multiplier (d<sub>left</sub>) is calcuated in the same way as the top opening multiplier, with the rules applied to the left side of the shading device.
+The left side opening multiplier (d<sub>left</sub>) is calculated in the same way as the top opening multiplier, with the rules applied to the left side of the shading device.
 
 #### Field: Right Side Opening Multiplier
 
-The right side opening multiplier (d<sub>right</sub>)  is calcuated in the same way as the top opening multiplier, with the rules applied to the right side of the shading device.
+The right side opening multiplier (d<sub>right</sub>)  is calculated in the same way as the top opening multiplier, with the rules applied to the right side of the shading device.
 
 #### Field: Front Opening Multiplier
 
@@ -6646,7 +6646,7 @@ WindowProperty:ShadingControl,
 
 ### WindowMaterial:Shade:EquivalentLayer
 
-This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.  The beam-beam transmittnec is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-dffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a mximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank.
+This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.  The beam-beam transmittance is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank.
 
 #### Field: Name
 
@@ -6707,8 +6707,8 @@ WindowMaterial:Shade:EquivalentLayer,
   0.499,         !- Front Side Shade Beam-Diffuse Solar Reflectance
   0.499,         !- Back Side Shade Beam-Diffuse Solar Reflectance
   0.0,           !- Shade Beam-Beam Visible Transmittance
-  0.0,           !- Shade Beam-Diffuse Vissible Transmittance
-  0.0,           !- Shade Vissible Reflectance
+  0.0,           !- Shade Beam-Diffuse Visible Transmittance
+  0.0,           !- Shade Visible Reflectance
   0.0,           !- Shade Material Infrared Transmittance
   0.84,          !- Front Side Shade Material Infrared Emissivity
   0.84;          !- Back Side Shade Material Infrared Emissivity
@@ -6719,7 +6719,7 @@ WindowMaterial:Shade:EquivalentLayer,
 
 Specifies the optical and thermal properties of equivalent layer window drape fabric materials.
 
-Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (infrared) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as showsn in Figure 21.For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure 21.  The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.  Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1%.
+Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (infrared) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure 21.For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure 21.  The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.  Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations require that the solar absorptance of the fabric, at normal incidence, is not less than 1%.
 
 ![](media/image045.svg)
 
@@ -6731,7 +6731,7 @@ Name of the drape fabric shade layer. It is referenced as an inside, in between 
 
 #### Field: Drape Beam-Beam Solar Transmittance
 
-This value is the drape fabric beam-beam transmittance at normal incidence, and it is the same as the drape fabric openness area fraction.  Assumed to be the same for front and back sides of the drape fabric layer.  The minimum value is 0.0 and maximum value is less than 1.0. For most drape fabric materials the maximum frabric openness fraction do not exceed 0.2.  The default value is 0.0.
+This value is the drape fabric beam-beam transmittance at normal incidence, and it is the same as the drape fabric openness area fraction.  Assumed to be the same for front and back sides of the drape fabric layer.  The minimum value is 0.0 and maximum value is less than 1.0. For most drape fabric materials the maximum fabric openness fraction do not exceed 0.2.  The default value is 0.0.
 
 #### Field: Front Side Drape Beam-Diffuse Solar Transmittance
 
@@ -6767,7 +6767,7 @@ This value is the long-wave hemispherical transmittance of the fabric material a
 
 #### Field: Front Side Drape Material Infrared Emissivity
 
-This value is the front side long-wave hemispherical emissivity of fabric material at zero shade opennes. The minimum value is 0.0 and maximum value is less than 1.0. the default value is 0.87. The front side effective emissivity of the drape fabric layer is calculated using this value and the fabric openness area fraction specified above.
+This value is the front side long-wave hemispherical emissivity of fabric material at zero shade openness. The minimum value is 0.0 and maximum value is less than 1.0. the default value is 0.87. The front side effective emissivity of the drape fabric layer is calculated using this value and the fabric openness area fraction specified above.
 
 #### Field: Back Side Drape Material Infrared Emissivity
 
@@ -6804,7 +6804,7 @@ WindowMaterial:Drape:EquivalentLayer,
 
 ### WindowMaterial:Blind:EquivalentLayer
 
-This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The the model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crwon.  Slats are assumed to transmit and reflect diffusely.The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown ![](media/image046.svg)
+This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The the model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crown. Slats are assumed to transmit and reflect diffusely.The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown ![](media/image046.svg)
 
 Figure 22. Geometry and Properties used for venetian blind analysis
 
@@ -6886,7 +6886,7 @@ This value is the slat back side diffuse-diffuse solar reflectance for hemispher
 
 #### Field: Slat Diffuse-Diffuse Visible Transmittance
 
-This value is the slat diffuse-diffuse visible transmittance for hemispherically diffuse visible spectrum range of solar radiation. This value is the same for front and back side of the slat.  Minimum value is 0.0,  and the maximumvalue is less than 1.0. This input field is not used currently.
+This value is the slat diffuse-diffuse visible transmittance for hemispherically diffuse visible spectrum range of solar radiation. This value is the same for front and back side of the slat.  Minimum value is 0.0,  and the maximum value is less than 1.0. This input field is not used currently.
 
 #### Field: Front Side Slat Diffuse-Diffuse Visible Reflectance
 
@@ -6910,7 +6910,7 @@ This value is the back side long-wave hemispherical emissivity of the slat mater
 
 #### Field: Slat Angle Control
 
-This input field is used only if slat angle control is desired.  The three key choice inputsallowed are “FixedSlatAngle”, “MaximizeSolar”, and “BlockBeamSolar”.  The default value is “FixedSlatAngle”.If Type of Slat Angle Control for Blinds = MaximizeSolar the slat angle is adjusted to maximize solar gain. If Type of Slat Angle Control for Blinds = BlockBeamSolar, the slat angle is adjusted to maximize visibiity while eliminating beam solar radiation. If Type of Slat Angle Control for Blinds = FixedSlatAngle, then the model uses a fixed slat angle specified above.
+This input field is used only if slat angle control is desired.  The three key choice inputs allowed are “FixedSlatAngle”, “MaximizeSolar”, and “BlockBeamSolar”.  The default value is “FixedSlatAngle”.If Type of Slat Angle Control for Blinds = MaximizeSolar the slat angle is adjusted to maximize solar gain. If Type of Slat Angle Control for Blinds = BlockBeamSolar, the slat angle is adjusted to maximize visibility while eliminating beam solar radiation. If Type of Slat Angle Control for Blinds = FixedSlatAngle, then the model uses a fixed slat angle specified above.
 
 An IDF example for this object, is shown below:
 
@@ -6945,7 +6945,7 @@ WindowMaterial:Blind:EquivalentLayer,
 
 ### WindowMaterial:Screen:EquivalentLayer
 
-This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-difuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.  Insect screen geometry is shown in Figure 23.  The calculation of effective solar properties requires a set of properties measured at normal incidence.
+This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-diffuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.  Insect screen geometry is shown in Figure 23.  The calculation of effective solar properties requires a set of properties measured at normal incidence.
 
 ![](media/image048.svg)
 
@@ -6959,7 +6959,7 @@ Name of the insect screen. It is referenced as an outside layer in an equivalent
 
 #### Field: Screen Beam-Beam Solar Transmittance
 
-This value is the beam-beam transmittance of the screen material at normal incidence. This value is the same as the screen oppenness area fraction.  This value can be autocalculated from the wire spacing and wire diameter. It is the same for both sides of the screen. The minimum value is 0.0, and maximum value is less than 1.0.
+This value is the beam-beam transmittance of the screen material at normal incidence. This value is the same as the screen openness area fraction.  This value can be autocalculated from the wire spacing and wire diameter. It is the same for both sides of the screen. The minimum value is 0.0, and maximum value is less than 1.0.
 
 #### Field: Screen Beam-Diffuse Solar Transmittance
 
@@ -7168,7 +7168,7 @@ WindowMaterial:Glazing:EquivalentLayer,
 
 ### WindowMaterial:Gap:EquivalentLayer
 
-This object is used in windows equivalent layer construction object andspecifies the properties of the gap between the layers in multi-layer equivalent layer window object. There is an EnergyPlus Reference Data Set for Material:WindowGas that contains several types of gas. This object uses the gas types: Air, Argon, Xenon, Crypton, and Custom.  For Custom gas type users are required to entering the thermophicial properties.
+This object is used in windows equivalent layer construction object and specifies the properties of the gap between the layers in multi-layer equivalent layer window object. There is an EnergyPlus Reference Data Set for Material:WindowGas that contains several types of gas. This object uses the gas types: Air, Argon, Xenon, Krypton, and Custom.  For Custom gas type users are required to entering the thermophysical properties.
 
 #### Field: Name
 
@@ -7184,7 +7184,7 @@ The thickness (m) of the gap layer.
 
 #### Field: Gap Vent Type
 
-This inputfiled contains the valid key choice for gap vent type.  The valid vent types are: Sealed, VentedIndoor, and VentedOutdoor.  Sealed means the gap is enclosed and gas tight, i.e., no venting to indoor or outdoor environment. The gap types “VentedIndoor” and “VentedOutdoor” are used with gas type “Air” only. VentedIndoor means the air in the gap is naturally vented to indoor environment, and  VentedOutdoor means the air in the gap is naturally vented to the outdoor environment.
+This input field contains the valid key choice for gap vent type.  The valid vent types are: Sealed, VentedIndoor, and VentedOutdoor.  Sealed means the gap is enclosed and gas tight, i.e., no venting to indoor or outdoor environment. The gap types “VentedIndoor” and “VentedOutdoor” are used with gas type “Air” only. VentedIndoor means the air in the gap is naturally vented to indoor environment, and  VentedOutdoor means the air in the gap is naturally vented to the outdoor environment.
 
 #### Properties for Custom Gas Types
 
@@ -7335,7 +7335,7 @@ The field allows for user input of the residual moisture content of the soil lay
 
 #### Field: Initial Volumetric Moisture Content of the Soil Layer
 
-The field allows for user input of the initial moisture content of the soil layer. Range is (.05, .5] with the defaulte being .1.
+The field allows for user input of the initial moisture content of the soil layer. Range is (.05, .5] with the default being .1.
 
 #### Field: Moisture Diffusion Calculation Method
 
@@ -8147,7 +8147,7 @@ WindowThermalModel:Params,
 
 
 
-An IDF example for thermal paramters (with deflection):
+An IDF example for thermal parameters (with deflection):
 
 ```idf
 WindowThermalModel:Params,
@@ -8177,7 +8177,7 @@ NoDeflection,                                 �
 ```
 
 
-### Matix:TwoDimension
+### Matrix:TwoDimension
 
 This is input object is only used with Construction:ComplexFenestrationState object to enter a two-dimensional matrix of values.
 
@@ -8217,7 +8217,7 @@ An IDF example of matrix for defining BSDF basis:
 Matrix:TwoDimension,       !- matrix for basis definition
   CFS_Glz_1_Basis,         !- basis matrix name
   9,                       !- number of rows
-  2,                       !- number of colums
+  2,                       !- number of columns
   0.00000, 1.00000,
   10.00000, 8.00000,
   20.00000, 16.00000,
@@ -8359,7 +8359,7 @@ Zone type is currently unused.
 
 #### Field: Multiplier
 
-Zone Multiplier is designed as a “multiplier” for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be mutliplied.  The default is 1.
+Zone Multiplier is designed as a “multiplier” for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be multiplied.  The default is 1.
 
 #### Field: Ceiling Height
 
@@ -8377,7 +8377,7 @@ Zone floor area is used in many places within EnergyPlus. EnergyPlus automatical
 
 #### Field: Zone Inside Convection Algorithm
 
-The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaes associated with this zone. The choices are: **Simple** (constant natural convection - ASHRAE), **Detailed** (variable natural convection based on temperature difference - ASHRAE), **CeilingDiffuser** (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), **AdaptiveConvectionAlgorithm** (complex arrangement of various models that adapt to various zone conditions and can be customized) and **TrombeWall** (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
+The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: **Simple** (constant natural convection - ASHRAE), **Detailed** (variable natural convection based on temperature difference - ASHRAE), **CeilingDiffuser** (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), **AdaptiveConvectionAlgorithm** (complex arrangement of various models that adapt to various zone conditions and can be customized) and **TrombeWall** (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
 
 If omitted or blank, the algorithm specified in the SurfaceConvectionAlgorithm:Inside object is the default.
 
@@ -8545,7 +8545,7 @@ The Zone Air Heat Balance Outdoor Air Transfer Rate is the sum, in watts, of hea
 
 #### Zone Air Heat Balance System Air Transfer Rate [W]
 
-The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units.  Such HVAC systems are connected to the zone by an inlet node (see ZoneHVac:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units.  Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers.
 
 #### Zone Air Heat Balance System Convective Heat Gain Rate [W]
 
@@ -8665,7 +8665,7 @@ NOTE:  Although ZoneLists are not exclusive by themselves, ZoneLists used to fo
 
 - For floors that are multiplied, connect exterior boundary conditions of the floor to the ceiling and vice versa.
 
-- Since exterior convection coefficients vary with elevation, locate the typical middle floor zones midheight between the lowest and highest middle floors to be modeled.
+- Since exterior convection coefficients vary with elevation, locate the typical middle floor zones mid-height between the lowest and highest middle floors to be modeled.
 
 - Shading must be identical for all multiplied floors or less accurate results may be obtained by using the zone list multiplier.
 
@@ -8681,7 +8681,7 @@ Reference to a ZoneList object. The zones in the list constitute the zones in th
 
 #### Field: Zone List Multiplier
 
-An integer multiplier. Zone List Multiplier is designed as a “multiplier” for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be mutliplied. The default is 1.
+An integer multiplier. Zone List Multiplier is designed as a “multiplier” for floor area, zone loads, and energy consumed by internal gains. It takes the calculated load for the zone and multiplies it, sending the multiplied load to the attached HVAC system. The HVAC system size is specified to meet the entire multiplied zone load and will report the amount of the load met in the Zone Air System Sensible Heating or Cooling Energy/Rate output variable. Autosizing automatically accounts for multipliers. Metered energy consumption by internal gains objects such as Lights or Electric Equipment will be multiplied. The default is 1.
 
 ```idf
 ZONE GROUP,
@@ -8754,9 +8754,9 @@ During specification of surfaces, several “outside” environments may be chos
 
 **Zone** items must also specify an “outside face object”. This is
 
-- The zone that contains the other surface that is adjactent to this surface but is not entered in input.
+- The zone that contains the other surface that is adjacent to this surface but is not entered in input.
 
-Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coeffients neither inside nor outside are used in the description – these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction. When a surface is connected as the outside boundary condition for another surface, the two surfaces may be in the same plane, or they may be separated to imply thickness.
+Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coefficients neither inside nor outside are used in the description – these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction. When a surface is connected as the outside boundary condition for another surface, the two surfaces may be in the same plane, or they may be separated to imply thickness.
 
 **Shading** surfaces are used to describe aspects of the site which do not directly impact the physical interactions of the environmental parameters but may significantly shade the building during specific hours of the day or time so the year (e.g. trees, bushes, mountains, nearby buildings which aren’t being simulated as part of this facility, etc.)
 
@@ -9254,7 +9254,7 @@ This field is the width of the floor in meters.
 
 ### Floor:Adiabatic
 
-The Floor:Adiabatict object is used to describe interior floors or floors that you wish to model with no heat transfer from the exterior to the floor.
+The Floor:Adiabatic object is used to describe interior floors or floors that you wish to model with no heat transfer from the exterior to the floor.
 
 #### Field: Name
 
@@ -9366,7 +9366,7 @@ This is a unique name associated with the window.
 
 #### Field: Construction Name
 
-This is the name of the subsurface’s construction (ref: objects: Construction, Construction:WindowDataFile, Construction:CompexFenestrationState).
+This is the name of the subsurface’s construction (ref: objects: Construction, Construction:WindowDataFile, Construction:ComplexFenestrationState).
 
 For windows, if Construction Name is not found among the constructions on the input (.idf) file, the Window Data File (ref. Construction:WindowDataFile object) will be searched for that Construction Name (see “Importing Windows from WINDOW”). If that file is not present or if the Construction Name does not match the name of an entry on the file, an error will result. If there is a match, a window construction and its corresponding glass and gas materials will be created from the information read from the file.
 
@@ -9398,7 +9398,7 @@ If Multiplier &gt; 1, you will get
 
 #### Starting Corner for the surface
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 #### Field: Starting X Coordinate
 
@@ -9446,7 +9446,7 @@ If Multiplier &gt; 1, you will get
 
 #### Starting Corner for the surface
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 #### Field: Starting X Coordinate
 
@@ -9474,7 +9474,7 @@ This is a unique name associated with the glass door.
 
 #### Field: Construction Name
 
-This is the name of the subsurface’s construction (ref: objects: Construction, Construction:WindowDataFile, Construction:CompexFenestrationState).
+This is the name of the subsurface’s construction (ref: objects: Construction, Construction:WindowDataFile, Construction:ComplexFenestrationState).
 
 For windows, if Construction Name is not found among the constructions on the input (.idf) file, the Window Data File (ref. Construction:WindowDataFile object) will be searched for that Construction Name (see “Importing Windows from WINDOW”). If that file is not present or if the Construction Name does not match the name of an entry on the file, an error will result. If there is a match, a window construction and its corresponding glass and gas materials will be created from the information read from the file.
 
@@ -9506,7 +9506,7 @@ If Multiplier &gt; 1, you will get
 
 #### Starting Corner for the surface
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 #### Field: Starting X Coordinate
 
@@ -9534,7 +9534,7 @@ This is a unique name associated with the window.
 
 #### Field: Construction Name
 
-This is the name of the subsurface’s construction (ref: objects: Construction, Construction:WindowDataFile, Construction:CompexFenestrationState).
+This is the name of the subsurface’s construction (ref: objects: Construction, Construction:WindowDataFile, Construction:ComplexFenestrationState).
 
 For windows, if Construction Name is not found among the constructions on the input (.idf) file, the Window Data File (ref. Construction:WindowDataFile object) will be searched for that Construction Name (see “Importing Windows from WINDOW”). If that file is not present or if the Construction Name does not match the name of an entry on the file, an error will result. If there is a match, a window construction and its corresponding glass and gas materials will be created from the information read from the file.
 
@@ -9560,7 +9560,7 @@ If Multiplier &gt; 1, you will get
 
 #### Starting Corner for the surface
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 #### Field: Starting X Coordinate
 
@@ -9612,7 +9612,7 @@ If Multiplier &gt; 1, you will get
 
 #### Starting Corner for the surface
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 #### Field: Starting X Coordinate
 
@@ -9666,7 +9666,7 @@ If Multiplier &gt; 1, you will get
 
 #### Starting Corner for the surface
 
-The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specifed relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
+The rectangular subsurfaces specify the lower left corner of the surface for their starting coordinate.  This corner is specified relative to the lower left corner of the base surface by specifying the X and Z values from that corner.
 
 #### Field: Starting X Coordinate
 
@@ -9783,7 +9783,7 @@ Each of the following surfaces:
 
 * Floor:Detailed
 
-* FenstrationSurface:Detailed
+* FenestrationSurface:Detailed
 
 * Shading:Site:Detailed
 
@@ -10057,7 +10057,7 @@ This value can be one of several things depending on the actual kind of surface.
 
 7)   **OtherSideCoefficients** – if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
 
-8)   **OtherSideConditionsModel** – if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModelspecification.
+8)   **OtherSideConditionsModel** – if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
 
 9)   **GroundSlabPreprocessorAverage** – uses the average results from the Slab preprocessor calculations.
 
@@ -10214,7 +10214,7 @@ This value can be one of several things depending on the actual kind of surface.
 
 7)   **OtherSideCoefficients** – if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
 
-8)   **OtherSideConditionsModel** – if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModelspecification.
+8)   **OtherSideConditionsModel** – if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
 
 9)   **GroundSlabPreprocessorAverage** – uses the average results from the Slab preprocessor calculations.
 
@@ -10446,7 +10446,7 @@ Table 8. Window Modeling Options
 <tr>
 <th>Option</th>
 <th>Object/Field or Output Variable</th>
-<th>Input File (histributeh with install)</th>
+<th>Input File (distributed with install)</th>
 </tr>
 <tr>
 <td>Build up a window from layers</td>
@@ -10569,7 +10569,7 @@ Table 8. Window Modeling Options
 
 ### InternalMass
 
-Any surface that would logically be described as an interior wall, floor or ceiling can just as easily be described as Internal Mass. Internal Mass surface types only exchange energy with the zone in which they are described; they do not see any other zones. There are two approaches to using internal mass. The first approach is to have several pieces of internal mass with each piece having a different construction type. The other approach is to choose an average construction type and combine all of the interior surfaces into a single internal mass. Similar to internal surfaces with an adiabatic boundary condtion, the zone will only exchange energy with the inside of the Internal Mass construction. If both sides of the surface exchange energy with the zone then the user should input twice the area when defining the Internal Mass object. Note that furniture and other large objects within a zone can be described using internal mass. However, simplifying calculations using internal mass must be used with caution when the “FullInteriorAndExterior” or “FullInteriorAndExteriorWithReflections” Solar Distribution model (see Building parameters) is chosen.
+Any surface that would logically be described as an interior wall, floor or ceiling can just as easily be described as Internal Mass. Internal Mass surface types only exchange energy with the zone in which they are described; they do not see any other zones. There are two approaches to using internal mass. The first approach is to have several pieces of internal mass with each piece having a different construction type. The other approach is to choose an average construction type and combine all of the interior surfaces into a single internal mass. Similar to internal surfaces with an adiabatic boundary condition, the zone will only exchange energy with the inside of the Internal Mass construction. If both sides of the surface exchange energy with the zone then the user should input twice the area when defining the Internal Mass object. Note that furniture and other large objects within a zone can be described using internal mass. However, simplifying calculations using internal mass must be used with caution when the “FullInteriorAndExterior” or “FullInteriorAndExteriorWithReflections” Solar Distribution model (see Building parameters) is chosen.
 
 #### Example
 
@@ -11746,7 +11746,7 @@ The net exchange of infrared radiation heat transfer from the shade or blind to 
 
 The other (extra) convection heat transfer rate from the inside face of a an equivalent layer window. This output is computed from the difference in convection flux when using equivalent inside surface temperature of a window instead of the inside surface temperature from the standard surface heat balance calculation.
 
-### Thermochomic Window Outputs
+### Thermochromic Window Outputs
 
 #### Window Thermochromic Layer Temperature [C]
 
@@ -11824,7 +11824,7 @@ It is important to note that EnergyPlus will automatically account for “self-s
 
 Shading surfaces can also **reflect** solar radiation onto the building. This feature is simulated if you choose FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building object (ref: Building - Field: Solar Distribution). In this case, you may specify the reflectance properties of a shading surface with the ShadingProperty:Reflectance object. Note: If no ShadingProperty:Reflectance object is defined, then the shading surface reflectance values are assumed to be 0.2 and the fraction of shading surface that is glazed is assumed to be 0.0.
 
-Shading surfaces also automatically shade diffuse solar radiation (and long-wave radiation) from the sky. And they will automically shade diffuse solar radiation from the ground if Solar Distribution Field = FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building  object. (If the reflections option for Solar Distribution is used, the program also takes into account the reduction of solar radiation reflected from the ground due to shading of the ground by shading surfaces and by the building itself.)  Otherwise, shading surfaces will not shade diffuse radiation from the ground unless you enter a reduced value for View Factor to Ground for those building surfaces that are shaded (ref: BuildingSurface:Detailed - Field: View Factor to Ground and FenestrationSurface:Detailed - Field: View Factor to Ground).
+Shading surfaces also automatically shade diffuse solar radiation (and long-wave radiation) from the sky. And they will automatically shade diffuse solar radiation from the ground if Solar Distribution Field = FullExteriorWithReflections or FullInteriorAndExteriorWithReflections in the Building  object. (If the reflections option for Solar Distribution is used, the program also takes into account the reduction of solar radiation reflected from the ground due to shading of the ground by shading surfaces and by the building itself.)  Otherwise, shading surfaces will not shade diffuse radiation from the ground unless you enter a reduced value for View Factor to Ground for those building surfaces that are shaded (ref: BuildingSurface:Detailed - Field: View Factor to Ground and FenestrationSurface:Detailed - Field: View Factor to Ground).
 
 ### Detached Shading Surfaces
 
@@ -12393,7 +12393,7 @@ The type of shading device. The choices are:
 
 *BetweenGlassShade*: A diffusing shade is between two glass layers. (In the shaded Construction the shading layer must be a WindowMaterial:Shade.) This shading type is allowed only for double- and triple-glazing. For triple-glazing the shade must be between the two inner glass layers.
 
-*ExteriorScreen*: An insect screen is on the outside of the window. (In the shaded Construction the shadling layer must be a WindowMaterial:Screen.)
+*ExteriorScreen*: An insect screen is on the outside of the window. (In the shaded Construction the shading layer must be a WindowMaterial:Screen.)
 
 *InteriorBlind*: A slat-type shading device, such as a Venetian blind, is on the inside of the window. (In the shaded Construction the shading layer must be a WindowMaterial:Blind.)
 
@@ -12511,7 +12511,7 @@ The name of a WindowMaterial:Shade, WindowMaterial:Screen or WindowMaterial:Blin
 
 Applies only to Shading Type = InteriorBlind, ExteriorBlind or BetweenGlassBlind. Specifies how the slat angle is controlled. The choices are FixedSlatAngle, ScheduledSlatAngle and BlockBeamSolar.
 
- If FixedSlatAngle (the default), the angle of the slat is fixed at the value input for the WindowMaterial:Blind that is contained in the construction specified by Name of Construction with Shading or is specified by Material Name of Shading Device.
+If FixedSlatAngle (the default), the angle of the slat is fixed at the value input for the WindowMaterial:Blind that is contained in the construction specified by Name of Construction with Shading or is specified by Material Name of Shading Device.
 
 If ScheduledSlatAngle, the slat angle varies according to the schedule specified by Slat Angle Schedule Name, below.
 
@@ -12523,9 +12523,7 @@ This is the name of a schedule of slat angles that is used when Type of Slat Ang
 
 #### Field: Setpoint 2
 
-Used only as the second setpoint for the following two-setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow,  OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow,
-
-and OnIfHighZoneAirTempAndHighHorizontalSolar
+Used only as the second setpoint for the following two-setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow,  OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar.
 
 An IDF example: window with interior roll shade that is deployed when solar incident on the window exceeds 50 W/m<sup>2</sup>.
 
@@ -13365,7 +13363,7 @@ This field is used to determine the heat transfer algorithm that is to be applie
 
 #### Field: Construction Name
 
-This field is the name of a Construction object defined elsewhere.  All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm slected in the previous field.
+This field is the name of a Construction object defined elsewhere.  All the surfaces in the model that are assigned this type of construction will be assigned to use the heat transfer algorithm selected in the previous field.
 
 An example IDF object follows.
 
@@ -13470,7 +13468,7 @@ The value for “period” is controlled in the following field.  The value for
 
 #### Field: Period of Sinusoidal Variation
 
-This field is used to define the period of the sine wave when using the Sinusodial Variation of Constant Temperature Coefficient capability selected in the previous field.  This field is the time period of the sine wave in units of hours.  The default is 24 hours and provides a diurnal sine wave.  The value entered here is “period” in the equation in the previous field.
+This field is used to define the period of the sine wave when using the Sinusoidal Variation of Constant Temperature Coefficient capability selected in the previous field.  This field is the time period of the sine wave in units of hours.  The default is 24 hours and provides a diurnal sine wave.  The value entered here is “period” in the equation in the previous field.
 
 #### Field: Previous Other Side Temperature Coefficient
 
@@ -13522,7 +13520,7 @@ SurfaceProperty:OtherSideCoefficients,
     Zn005Wall003OtherSideTempSched;  !- Constant Temperature Schedule Name
 
 
-!  Example input for outside heat transfer coefficient of 1.23, using Tosdb
+!  Example input for outside heat transfer coefficient of 1.23, using Toadb
 SurfaceProperty:OtherSideCoefficients,
     OSCCoef:Zn005:Wall004,   !- Name
     1.230000,                !- Combined Convective/Radiative Film Coefficient {W/m2-K}
@@ -13603,7 +13601,7 @@ This is the effective temperature exposed to the other side of the surface for t
 
 #### Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient [W/m2-K]
 
-This is the effective (Iinearized) radiation heat transfer coefficient applied to the other side of the surface by the model.
+This is the effective (Linearized) radiation heat transfer coefficient applied to the other side of the surface by the model.
 
 ### SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections
 
@@ -13925,11 +13923,11 @@ The key choice options include:  BeausoleilMorrisonMixedAssistedWall, AlamdariH
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve.
 
-#### Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation Source
+#### Field: Mixed Regime Buoyancy Opposing Flow on Walls Equation Source
 
 The key choice options include:  BeausoleilMorrisonMixedOpposingWall, AlamdariHammondVerticalWall, FohannoPolidoriVerticalWall, ASHRAEVerticalWall, FisherPedersenCeilingDiffuserWalls, GoldsteinNovoselacCeilingDiffuserWalls, or UserCurve
 
-#### Field: Mixed Regime Buoyancy Oppossing Flow on Walls Equation User Curve Name
+#### Field: Mixed Regime Buoyancy Opposing Flow on Walls Equation User Curve Name
 
 The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the previous field is set to UserCurve
 
@@ -14023,7 +14021,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 #### Field: Natural Convection Unstable Horizontal Equation Source
 
-This is for just the natural convection portion of the total film coefficient.  This is for horizontal surfaces with heat flow directed for unstable thermal stratification. The key choice optios include:  WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, UserCurve, or None
+This is for just the natural convection portion of the total film coefficient.  This is for horizontal surfaces with heat flow directed for unstable thermal stratification. The key choice options include:  WaltonUnstableHorizontalOrTilt, AlamdariHammondUnstableHorizontal, UserCurve, or None
 
 #### Field: Natural Convection Unstable Horizontal Equation User Curve Name
 
@@ -14067,7 +14065,7 @@ Unique name of input object.
 
 #### Field: Wind Speed Type for Curve
 
-This field specifies what sort of wind velocity data should be used in when evaluating the curve in the following field.  There are for key choice options. “WeatherFile” directs  using the unmodified value from the epw file or design weather data.  “HeightAdjust” uses the value from the epw file modified for height above ground, as determined by the z cooridinate, using the site terrain and weather station information.  “ParallelComponent” uses the value from the epw file modified to take just the velocity component that is parallel to the surface.  “ParallelComponentHeightAdjust” uses the height adjusted wind velocity and then computes the parallel component.
+This field specifies what sort of wind velocity data should be used in when evaluating the curve in the following field.  There are for key choice options. “WeatherFile” directs  using the unmodified value from the epw file or design weather data.  “HeightAdjust” uses the value from the epw file modified for height above ground, as determined by the z coordinate, using the site terrain and weather station information.  “ParallelComponent” uses the value from the epw file modified to take just the velocity component that is parallel to the surface.  “ParallelComponentHeightAdjust” uses the height adjusted wind velocity and then computes the parallel component.
 
 #### Field: Hf Function of Wind Speed Curve Name
 
@@ -14112,7 +14110,7 @@ The entries can be of several types: Value (simple numeric value), Schedule (nam
 <table class="table table-striped">
 <tr>
 <th>Key choice</th>
-<th>Applies to Insihe or Outsihe</th>
+<th>Applies to Inside or Outside</th>
 </tr>
 <tr>
 <td>Value</td>
@@ -14312,7 +14310,7 @@ The complete IDD definition for the ConvectionCoefficients object follows:
 
 #### Field: Convection Coefficient 2 User Curve Name
 
-If the Convection type was “UserCurve”, then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input objct describing the model equations to be used during the time intervals for the schedule.
+If the Convection type was “UserCurve”, then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input object describing the model equations to be used during the time intervals for the schedule.
 
 In IDF usage:
 
@@ -14399,7 +14397,7 @@ The entries can be of several types: Value (simple numeric value), Schedule (nam
 <table class="table table-striped">
 <tr>
 <th>Key choice</th>
-<th>Applies to Insihe or Outsihe</th>
+<th>Applies to Inside or Outside</th>
 </tr>
 <tr>
 <td>Value</td>
@@ -14595,7 +14593,7 @@ If the Convection type was “Schedule”, then this field contains the name of 
 
 #### Field: Convection Coefficient 2 User Curve Name
 
-If the Convection type was “UserCurve”, then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input objct describing the model equations to be used during the time intervals for the schedule.
+If the Convection type was “UserCurve”, then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input object describing the model equations to be used during the time intervals for the schedule.
 
 In IDF usage:
 
@@ -14609,7 +14607,7 @@ MoWitt;              ! Convection Coefficient 1 Type
 
 ### Convection Coefficient Application Hierarchy
 
-Ultimate flexibility and possibly ultimate user confusion can result from the convection coefficient possibilties in EnergyPlus. The objects that control how convection models are assigned to individual surfaces  are:
+Ultimate flexibility and possibly ultimate user confusion can result from the convection coefficient possibilities in EnergyPlus. The objects that control how convection models are assigned to individual surfaces  are:
 
 - SurfaceConvectionAlgorithm:Inside
 
@@ -14676,7 +14674,7 @@ This variable reports how the surface was classified as part of the adaptive con
 
 <table class="table table-striped">
 <tr>
-<th>Cohe</th>
+<th>Code</th>
 <th>Zone Airflow Regime</th>
 <th>Type of surface</th>
 <th>Heat Flow</th>
@@ -14955,12 +14953,12 @@ This variable reports how the surface was classified as part of the adaptive con
 
 #### Surface Inside Face Convection Model Equation Index
 
-This variable reports the specific model equation used to calculate the inside face convection coefficient.  This can vary when using the adaptive convection algorithm and so the result of that selection algorithm is reported here.  The following table lists the models associated with specific interger codes reported here.  The models correspond to key words used in input objects.
+This variable reports the specific model equation used to calculate the inside face convection coefficient.  This can vary when using the adaptive convection algorithm and so the result of that selection algorithm is reported here.  The following table lists the models associated with specific integer codes reported here.  The models correspond to key words used in input objects.
 
 <table class="table table-striped">
 <tr>
-<th>Report Cohe</th>
-<th>Relateh key anh mohel</th>
+<th>Report Code</th>
+<th>Related key and model</th>
 </tr>
 <tr>
 <td>200</td>
@@ -15094,8 +15092,8 @@ The inside face convection heat transfer calculations can be based on different 
 
 <table class="table table-striped">
 <tr>
-<th>Report Cohe</th>
-<th>Reference Air Temperature Methoh</th>
+<th>Report Code</th>
+<th>Reference Air Temperature Method</th>
 </tr>
 <tr>
 <td>1</td>
@@ -15117,7 +15115,7 @@ This variable reports how the surface was classified as part of the adaptive con
 
 <table class="table table-striped">
 <tr>
-<th>Report Cohe</th>
+<th>Report Code</th>
 <th>Surface Classification</th>
 </tr>
 <tr>
@@ -15146,8 +15144,8 @@ These variables report the specific model equation used to calculate the outside
 
 <table class="table table-striped">
 <tr>
-<th>Report Cohe</th>
-<th>Relateh key anh mohel</th>
+<th>Report Code</th>
+<th>Related key and model</th>
 </tr>
 <tr>
 <td>300</td>
@@ -15269,7 +15267,7 @@ Select ‘yes’ to use the value supplied as the external vapor transfer coeffi
 
 #### Field: External Vapor Coefficient Value
 
-HAMT will use this value to calculate the vapour transfer into and out off the external surface of this surface. Units are kg/Pa.s.m2.
+HAMT will use this value to calculate the vapor transfer into and out off the external surface of this surface. Units are kg/Pa.s.m2.
 
 #### Field: Constant Internal vapor Transfer Coefficient
 
@@ -15297,7 +15295,7 @@ This object is used to model a multi-skin exterior heat transfer surface. This i
 
 The area and orientation are obtained from **BuildingSurface:Detailed** objects, which are referenced by name. This object can be used to model certain types of photovoltaic mounting configurations such as interlocking roof pavers. If the baffle covers only part of a surface, then that surface should be split into separate **BuildingSurface:Detailed** objects where one matches the size of the baffle. A single baffle can be associated with as many **BuildingSurface:Detailed** objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The base heat transfer surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
 
-Note that the model involves predicting the rates that ambient air moves in and out of the cavity. Accurate modeling of these air flows would be extremely challenging and so the models provided through this object are simplistic engineering models based on discharge coefficients that are sensitive to wind and bouancy effects. The accuracy depends on the values for, and applicability of, the discharge coefficients and unfortunately little research is available to help characterize these. The models should be considered rudimentary and the user is encouraged to explore different values for the coefficients in attempts to bound the importance of natural ventilation for the cavities. See the Engineering Reference for more details.
+Note that the model involves predicting the rates that ambient air moves in and out of the cavity. Accurate modeling of these air flows would be extremely challenging and so the models provided through this object are simplistic engineering models based on discharge coefficients that are sensitive to wind and buoyancy effects. The accuracy depends on the values for, and applicability of, the discharge coefficients and unfortunately little research is available to help characterize these. The models should be considered rudimentary and the user is encouraged to explore different values for the coefficients in attempts to bound the importance of natural ventilation for the cavities. See the Engineering Reference for more details.
 
 #### Field: Name
 
@@ -15317,11 +15315,11 @@ This field is used to enter the thermal emissivity of the baffler. This surface 
 
 #### Field: Solar Absorptivity of Exterior Baffle
 
-This field is used to enter the solar absorbtivity of the baffle. This surface property is for shortwave, solar radiation. The property is used for the front side of the baffle that faces the environment. Darker colors have a higher absorptivity. While black is the highest performance, other colors might be used to match the color scheme of the rest of the façade.
+This field is used to enter the solar absorptivity of the baffle. This surface property is for shortwave, solar radiation. The property is used for the front side of the baffle that faces the environment. Darker colors have a higher absorptivity. While black is the highest performance, other colors might be used to match the color scheme of the rest of the façade.
 
 #### Field: Height Scale for Buoyancy-Driven Ventilation
 
-This field is used to enter a nominal height scale (m) for prediction of ventilation induced by bouancy. This value (<span>\(\Delta {H_{NPL}}\)</span>) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
+This field is used to enter a nominal height scale (m) for prediction of ventilation induced by buoyancy. This value (<span>\(\Delta {H_{NPL}}\)</span>) is defined as the height from the midpoint of the lower opening to the neutral pressure level. Increasing the value will increase the ventilation rate due to buoyancy.
 
 #### Field: Effective Thickness of Cavity Behind Exterior Baffle
 
@@ -15716,10 +15714,10 @@ Table 10. Summary of Room Air Models
 
 <table class="table table-striped">
 <tr>
-<th>Air Mohel Key</th>
-<th>Air mohel Algorithm</th>
+<th>Air Model Key</th>
+<th>Air model Algorithm</th>
 <th>Applicability</th>
-<th>Input Objects Requireh</th>
+<th>Input Objects Required</th>
 </tr>
 <tr>
 <td>Mixing</td>
@@ -15830,7 +15828,7 @@ An example of this object is
 
 ```idf
 RoomAir:TemperaturePattern:UserDefined,
-  Ground Floor South Air Temp Contrls , ! Name
+  Ground Floor South Air Temp Controls , ! Name
   ZN2_S_1 ,          ! Zone Name
   Always_on ,        ! Availability Schedule Name
   Roomair Pattern 1; ! Pattern Control Schedule Name
@@ -16731,7 +16729,7 @@ Each room air model sets up outputs specific to that model. The effect of room a
 
 #### Zone Predicted Sensible Load Room Air Correction Factor
 
-This output variable provides the value of the correction factor applied to the predicted zone loads.  Predicted zone load to setpoint is (usually) used to control HVAC air systems and the presence of a room air model has an impact on the loads.  The predicited loads are multiplied by the factor in this output variable.  The value is always 1.0 when there is no Room Air model.  When there is a Room Air model, this output shows how that model is increasing or decreasing overall zone loads experienced by the air system.
+This output variable provides the value of the correction factor applied to the predicted zone loads.  Predicted zone load to setpoint is (usually) used to control HVAC air systems and the presence of a room air model has an impact on the loads.  The predicted loads are multiplied by the factor in this output variable.  The value is always 1.0 when there is no Room Air model.  When there is a Room Air model, this output shows how that model is increasing or decreasing overall zone loads experienced by the air system.
 
 ### RoomAir:TemperaturePattern:TwoGradient Outputs
 
@@ -17271,7 +17269,7 @@ This field is only valid when the user selects “surfaceweighted” for the MRT
 
 #### Field: Work Efficiency Schedule Name
 
-This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero correspondsto all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts thethermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.  Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort..
+This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero corresponds to all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts the thermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.  Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort..
 
 #### Field: Clothing Insulation Calculation Method
 
@@ -17515,11 +17513,11 @@ These output variables are the total amount of heat gain for this People object 
 
 #### People Air Temperature [C]
 
-This output variable represents the zone air temperature based on the Fanger thermal comfort model.  If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of “People Air Temperature” is determined based on the thermal comfort hat satisfies the thermal comfort setpoint PMV value specified; othwesie, it is set to average zone air temperature.
+This output variable represents the zone air temperature based on the Fanger thermal comfort model.  If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of “People Air Temperature” is determined based on the thermal comfort hat satisfies the thermal comfort setpoint PMV value specified; otherwise, it is set to average zone air temperature.
 
 #### People Air Relative Humidity [%]
 
-This output variable represents the zone air relative humidity based on the Fanger thermal comfort model.  If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of “People Air Relative Humidity” is determined from the mean zone air temperature and zone air humidity ratio that satisfies the thermal comfort setpoint PMV value specified; othwesie, it is calculated from the zone air temperature and humidity ratio averaged over the time step.
+This output variable represents the zone air relative humidity based on the Fanger thermal comfort model.  If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of “People Air Relative Humidity” is determined from the mean zone air temperature and zone air humidity ratio that satisfies the thermal comfort setpoint PMV value specified; otherwise, it is calculated from the zone air temperature and humidity ratio averaged over the time step.
 
 #### Zone People Occupant Count []
 
@@ -17788,7 +17786,7 @@ An example IDF with an electric low temperature radiant system is shown below.
 ```idf
 ComfortViewFactorAngles,
     South Zone Angle Factors, !- name of angle factor list
-    Sourth Zone,              !- Zone Name
+    South Zone,              !- Zone Name
     Zn001:Flr001,             !- Surface name 1
     0.75,                     !- Angle factor for surface 1
     Zn001:Wall001,            !- Surface name 2
@@ -17810,7 +17808,7 @@ The name of the Lights object.
 
 #### Field: Zone or ZoneList Name
 
-The field is the name of the thermal zone (ref: Zone) or ZoneList (ref: ZoneLIst) and links this Lights statement to a thermal zone or set of thermal zones in the buidling. When the ZoneList option is used then this lights definition is applied to each of the zones in the zone list effecting a global definition for the amount of light wattage in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+The field is the name of the thermal zone (ref: Zone) or ZoneList (ref: ZoneList) and links this Lights statement to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this lights definition is applied to each of the zones in the zone list effecting a global definition for the amount of light wattage in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
 
 The name of the actual lights object becomes &lt;Zone Name&gt; &lt;Lights Object Name&gt; and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
@@ -18157,7 +18155,7 @@ Global Lights Object:
 
 ### Lights Report Outputs
 
-If daylighting controls are operating in the zone, all of the Lights objects with a Fraction Replaceble  greater than zero will be reduced by a multiplicative factor that accounts for how much the electric lighting is lowered due to daylighting.
+If daylighting controls are operating in the zone, all of the Lights objects with a Fraction Replaceable greater than zero will be reduced by a multiplicative factor that accounts for how much the electric lighting is lowered due to daylighting.
 
 Lights objects have output variables for individual objects and for zone totals.
 
@@ -18307,7 +18305,7 @@ Table 15. Distribution of Lights to Meters
 <tr>
 <th>Meter Name</th>
 <th>Scope</th>
-<th>Lights Specfics</th>
+<th>Lights Specifics</th>
 </tr>
 <tr>
 <td>Electricity:Facility</td>
@@ -18624,7 +18622,7 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 #### Field: End-Use Subcategory
 
-Allows you to specify a user-defined end-use subcategory, e.g., "Cooking", "Clothes Drying", etc. A new meter for reporting is created for each unique subcategory  (ref: Output:Meter obejct). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the "General" end-use subcategory.
+Allows you to specify a user-defined end-use subcategory, e.g., "Cooking", "Clothes Drying", etc. A new meter for reporting is created for each unique subcategory  (ref: Output:Meter object). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the "General" end-use subcategory.
 
 IDF Examples:
 
@@ -19272,25 +19270,25 @@ Electric Equipment
 
 #### Electric Equipment Electric Energy [J]
 
-The electric equipment electric power consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the electricity meters that are associated with the zone – Electricity:Facility, Electricity:Buidling, Electricity:Zone:&lt;Zone Name&gt;, InteriorEquipment:Electricity: :Zone:&lt;Zone Name&gt;, and &lt;End-Use Subcategory&gt;:InteriorEquipment:Electricity.
+The electric equipment electric power consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the electricity meters that are associated with the zone – Electricity:Facility, Electricity:Building, Electricity:Zone:&lt;Zone Name&gt;, InteriorEquipment:Electricity: :Zone:&lt;Zone Name&gt;, and &lt;End-Use Subcategory&gt;:InteriorEquipment:Electricity.
 
 #### Gas Equipment Gas Rate [W]
 
 #### Gas Equipment Gas Energy [J]
 
-The gas equipment natural gas consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the electricity meters that are associated with the zone – Gas:Facility, Gas:Buidling, Gas:Zone:&lt;Zone Name&gt;, InteriorEquipment:Gas: :Zone:&lt;Zone Name&gt;, and &lt;End-Use Subcategory&gt;:InteriorEquipment:Gas.
+The gas equipment natural gas consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the electricity meters that are associated with the zone – Gas:Facility, Gas:Building, Gas:Zone:&lt;Zone Name&gt;, InteriorEquipment:Gas: :Zone:&lt;Zone Name&gt;, and &lt;End-Use Subcategory&gt;:InteriorEquipment:Gas.
 
 #### Hot Water Equipment District Heating Rate [W]
 
 #### Hot Water Equipment District Heating Energy [J]
 
-The hot water equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the district heating meters that are associated with the zone – DistrictHeating:Facility, DistrictHeating:Buidling, DistrictHeating:Zone:&lt;Zone Name&gt;, InteriorEquipment: DistrictHeating: :Zone:&lt;Zone Name&gt;, and &lt;End-Use Subcategory&gt;:InteriorEquipment: DistrictHeating.
+The hot water equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the district heating meters that are associated with the zone – DistrictHeating:Facility, DistrictHeating:Building, DistrictHeating:Zone:&lt;Zone Name&gt;, InteriorEquipment: DistrictHeating: :Zone:&lt;Zone Name&gt;, and &lt;End-Use Subcategory&gt;:InteriorEquipment: DistrictHeating.
 
 #### Steam Equipment District Heating Rate [W]
 
 #### Steam Equipment District Heating Energy [J]
 
-The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the district heating meters that are associated with the zone – DistrictHeating:Facility, DistrictHeating:Buidling, DistrictHeating:Zone:&lt;Zone Name&gt;, InteriorEquipment: DistrictHeating: :Zone:&lt;Zone Name&gt;, and &lt;End-Use Subcategory&gt;:InteriorEquipment: DistrictHeating.
+The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the district heating meters that are associated with the zone – DistrictHeating:Facility, DistrictHeating:Building, DistrictHeating:Zone:&lt;Zone Name&gt;, InteriorEquipment: DistrictHeating: :Zone:&lt;Zone Name&gt;, and &lt;End-Use Subcategory&gt;:InteriorEquipment: DistrictHeating.
 
 Note that zone energy consumption is not reported for OTHER EQUIPMENT and does not go on any meter.
 
@@ -19661,7 +19659,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 #### ITE Air Inlet Dewpoint Temperature Difference Above Operating Range [deltaC]
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Envionmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Environmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 #### Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
 
@@ -19671,7 +19669,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 #### ITE Air Inlet Dewpoint Temperature Difference Below Operating Range [deltaC]
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Envionmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Environmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 #### Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time [hr]
 
@@ -19681,7 +19679,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 #### ITE Air Inlet Relative Humidity Difference Above Operating Range [%]
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Envionmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Environmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 #### Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time [hr]
 
@@ -19691,7 +19689,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 #### ITE Air Inlet Relative Humidity Difference Below Operating Range [%]
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Envionmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Environmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 ### ZoneContaminantSourceAndSink:CarbonDioxide
 
@@ -19732,7 +19730,7 @@ HVAC,Average, Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate [m3/s]
 
 #### Contaminant Source or Sink CO2 Gain Volume Flow Rate [m3/s]
 
-This output is the net carbond dioxide internal gain/loss in m3/s for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
+This output is the net carbon dioxide internal gain/loss in m3/s for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
 
 #### Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate [m3/s]
 
@@ -19994,9 +19992,9 @@ This output is the average generic contaminant decay rate from each SurfaceConta
 
 This output is the decay time since the start of emission. The start time is either at the beginning of each run period, including design day simulations, or the time when the egenration schedule value is zero.
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion
+### SurfaceContaminantSourceAndSink:GenericContaminant:BoundaryLayerDiffusion
 
-The SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
+The SurfaceContaminantSourceAndSink:GenericContaminant:BoundaryLayerDiffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
 
 The boundary layer diffusion controlled reversible sink/source model with a linear sorption isotherm follows the descriptions presented in [Axley 1991]. The boundary layer refers to the region above the surface of a material through which a concentration gradient exists between the near-surface concentration and the air-phase concentration. The rate at which a contaminant is transferred onto a surface (sink) is defined as:
 
@@ -20037,7 +20035,7 @@ This field denotes the generic contaminant Henry partition coefficient in the un
 An IDF example is provided below:
 
 ```idf
-SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion,
+SurfaceContaminantSourceAndSink:GenericContaminant:BoundaryLayerDiffusion,
     WEST ZONE GC BLD,       !- Name
     Zn001:Wall001,          !- Surface Name
     1.0E-2,                 !- Mass Transfer Coefficient {m/s}
@@ -20048,7 +20046,7 @@ SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion,
 
 ### SurfaceContaminantSourceAndSink:GenericContaminant:BoundaryLayerDiffusion Outputs
 
-When a SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion object is specified, the following output variables are available:
+When a SurfaceContaminantSourceAndSink:GenericContaminant:BoundaryLayerDiffusion object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]
 
@@ -20056,7 +20054,7 @@ ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Inside Face Conce
 
 #### Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant:BoundaryLayerDiffusion object.
 
 #### Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration [ppm]
 
