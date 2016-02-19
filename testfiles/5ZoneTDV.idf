@@ -3244,7 +3244,7 @@
   Schedule:File,
     elecTDVfromCZ06com,      !- Name
     Any Number,              !- Schedule Type Limits Name
-    ..\datasets\TDV\TDV_2008_kBtu_CTZ06.csv,  !- File Name
+    ..\..\..\datasets\TDV\TDV_2008_kBtu_CTZ06.csv,  !- File Name
     1,                       !- Column Number
     4,                       !- Rows to Skip at Top
     ,                        !- Number of Hours of Data
