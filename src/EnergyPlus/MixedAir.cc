@@ -3643,7 +3643,7 @@ namespace MixedAir {
 		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
 		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
 		Real64 CO2PeopleGeneration; // CO2 generation from people at design level
-		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
+		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
 
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
@@ -4166,7 +4166,7 @@ namespace MixedAir {
 			OutAirSignal = ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).MixSetTemp ) / ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp );
 			if ( OAController( OAControllerNum ).CoolCoilFreezeCheck ) {
 				OAController( OAControllerNum ).MaxOAFracBySetPoint = 0.0;
-				MaxOAFracBySetPoint = OutAirSignal;
+				MaximumOAFracBySetPoint = OutAirSignal;
 			}
 		} else {
 			if ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).MixSetTemp < 0.0 ) {
@@ -4348,13 +4348,13 @@ namespace MixedAir {
 		}
 
 		if ( OAController( OAControllerNum ).CoolCoilFreezeCheck ) {
-			MaxOAFracBySetPoint = min( max( MaxOAFracBySetPoint, 0.0 ), 1.0 );
-			OAController( OAControllerNum ).MaxOAFracBySetPoint = MaxOAFracBySetPoint;
-			if ( MaxOAFracBySetPoint < OutAirMinFrac ) {
-				OutAirMinFrac = MaxOAFracBySetPoint;
+			MaximumOAFracBySetPoint = min( max( MaximumOAFracBySetPoint, 0.0 ), 1.0 );
+			OAController( OAControllerNum ).MaxOAFracBySetPoint = MaximumOAFracBySetPoint;
+			if ( MaximumOAFracBySetPoint < OutAirMinFrac ) {
+				OutAirMinFrac = MaximumOAFracBySetPoint;
 				if ( AirLoopNum > 0 ) AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * OAController( OAControllerNum ).MixMassFlow;
 			}
-			OASignal = min( MaxOAFracBySetPoint, OASignal );
+			OASignal = min( MaximumOAFracBySetPoint, OASignal );
 		}
 
 		OAController( OAControllerNum ).OAMassFlow = OASignal * OAController( OAControllerNum ).MixMassFlow;

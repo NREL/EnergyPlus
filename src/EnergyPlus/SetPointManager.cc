@@ -5358,22 +5358,21 @@ namespace SetPointManager {
 			this->MySetPointCheckFlag = false;
 		}
 
-		if ( CoolCoilInNode == 0 && CoolCoilOutNode == 0 ) {
-			this->SetPt = Node( RefNode ).TempSetPoint - ( Node( FanOutNode ).Temp - Node( FanInNode ).Temp );
-		} else {
+		this->SetPt = Node( RefNode ).TempSetPoint - ( Node( FanOutNode ).Temp - Node( FanInNode ).Temp );
+		if ( CoolCoilInNode > 0 && CoolCoilOutNode > 0 ) {
 			dtFan = Node( FanOutNode ).Temp - Node( FanInNode ).Temp;
 			dtCoolCoil = Node( CoolCoilInNode ).Temp - Node( CoolCoilOutNode ).Temp;
-			if ( Node( RefNode ).Temp == Node( CoolCoilOutNode ).Temp ) { // blow through
-				this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) - dtFan + dtCoolCoil;
-			} else { // draw through
-				if ( RefNode != CoolCoilOutNode ) { // Ref node is outlet node
-					this->SetPt = max( Node( RefNode ).TempSetPoint - dtFan, MinTemp ) + dtCoolCoil;
-				} else {
-					this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) + dtCoolCoil;
-				}
-			}
 			if ( dtCoolCoil > 0.0 && MinTemp > OutDryBulbTemp ) {
 				this->FreezeCheckEnable = true;
+				if ( Node( RefNode ).Temp == Node( CoolCoilOutNode ).Temp ) { // blow through
+					this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) - dtFan + dtCoolCoil;
+				} else { // draw through
+					if ( RefNode != CoolCoilOutNode ) { // Ref node is outlet node
+						this->SetPt = max( Node( RefNode ).TempSetPoint - dtFan, MinTemp ) + dtCoolCoil;
+					} else {
+						this->SetPt = max( Node( RefNode ).TempSetPoint, MinTemp ) + dtCoolCoil;
+					}
+				}
 			}
 		}
 
