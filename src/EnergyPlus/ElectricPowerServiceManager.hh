@@ -953,6 +953,9 @@ public: // Methods
 	std::string
 	getTransformerName();
 
+	std::string
+	getGenListName();
+
 	void
 	updateLoadCenterGeneratorRecords();
 

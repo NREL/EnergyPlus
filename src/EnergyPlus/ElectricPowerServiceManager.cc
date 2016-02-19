@@ -438,14 +438,14 @@ namespace EnergyPlus {
 			// LEED report
 		this->pvTotalCapacity = 0.0;
 		this->windTotalCapacity = 0.0;
-		for ( auto count = 0; count < this->numLoadCenters; ++count ) {
-			if ( this->elecLoadCenterObjs[ count ]->numGenerators > 0 ) {
-				for ( auto genCount = 0; genCount < this->elecLoadCenterObjs[ count ]->numGenerators; ++genCount ) {
-					if ( this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->compGenTypeOf_Num == DataGlobalConstants::iGeneratorPV ) {
-						pvTotalCapacity += this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->maxPowerOut;
+		for ( auto & lc : this->elecLoadCenterObjs ) {
+			if ( lc->numGenerators > 0 ) {
+				for ( auto & g : lc->elecGenCntrlObj ) {
+					if ( g->compGenTypeOf_Num == DataGlobalConstants::iGeneratorPV ) {
+						pvTotalCapacity += g->maxPowerOut;
 					}
-					if ( this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->compGenTypeOf_Num  == DataGlobalConstants::iGeneratorWindTurbine ) {
-						windTotalCapacity += this->elecLoadCenterObjs[ count ]->elecGenCntrlObj[ genCount ]->maxPowerOut;
+					if ( g->compGenTypeOf_Num  == DataGlobalConstants::iGeneratorWindTurbine ) {
+						windTotalCapacity += g->maxPowerOut;
 					}
 				}
 			}
@@ -475,9 +475,13 @@ namespace EnergyPlus {
 
 		//first fill in a vector of names
 		std::vector < std::string > storageNames;
+		std::vector < std::string > genListNames;
 		for ( auto & e : elecLoadCenterObjs ) {
 			if ( e->storageObj != nullptr ) {
 				storageNames.emplace_back( e->storageObj->name );
+			}
+			if ( ! e->elecGenCntrlObj.empty()  ) {
+				genListNames.emplace_back( e->getGenListName() );
 			}
 		}
 
@@ -491,7 +495,14 @@ namespace EnergyPlus {
 			}
 		}
 
-
+		for ( std::size_t i = 0; i < genListNames.size(); ++i ) {
+			for ( std::size_t j = 0; j < genListNames.size(); ++j ) {
+				if ( genListNames[ i ] == genListNames[ j ] && i != j ) {
+					ShowWarningError( "ElectricPowerServiceManager::checkLoadCenters, the generator list named = " + genListNames[ i ] + " is used on more than one ElectricLoadCenter:Distribution input object." );
+					ShowContinueError( "Electric Load Centers cannot share the same generator list (ElectricLoadCenter:Generators)." );
+				}
+			}
+		}
 	}
 
 	ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
@@ -1693,6 +1704,12 @@ namespace EnergyPlus {
 		}
 	}
 
+	std::string
+	ElectPowerLoadCenter::getGenListName()
+	{
+		return generatorListName;
+	}
+
 	void
 	ElectPowerLoadCenter::updateLoadCenterGeneratorRecords()
 	{
@@ -1792,7 +1809,6 @@ namespace EnergyPlus {
 		}
 		case ElectricBussType::notYetSet: {
 			// do nothing
-			assert( false );
 		}
 
 		} // end switch
