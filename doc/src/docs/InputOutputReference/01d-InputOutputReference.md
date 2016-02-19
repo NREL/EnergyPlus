@@ -20202,11 +20202,9 @@ This output is the total energy losses occurred in the transformer when it is us
 
 ### ElectricLoadCenter:Distribution
 
-ElectricLoadCenter:Distribution objects are used to include on-site electricity generators in a simulation. The electric load center dispatches generators according to operation schemes and tracks and reports the amount of electricity generated and purchased. When using on-site generators, the program provides a    net    report where the total electricity used is reduced by the amount generated on site. Electrical demand tracking is done by the internal or custom meters used by EnergyPlus for reporting. The thermal demand tracking uses internal load calculations from the plant simulation. The dispatching of different generators is based on expectations based on their nominal/rated electric power output. If the current conditions are such that the generator model determines that generation was higher or lower, then the results of the dispatch may differ from expectations.
+ElectricLoadCenter:Distribution objects are used to include on-site electricity generators and or storage in a simulation. The electric load center dispatches both generators and storage according to operation schemes and tracks and reports the amount of electricity generated and purchased. When using on-site generators, the program provides various reports for the electricity used, generated on site, stored, exported etc.  There are two separate operation schemes, one for generators and a second for storage, and they can be different.  The generator operation is managed before the storage operation.  Facility electrical demand tracking is done by the internal or custom meters used by EnergyPlus for reporting. The thermal demand tracking uses internal load calculations from the plant simulation. The dispatching of different generators is based on expectations based on their nominal/rated electric power output. If the current conditions are such that the generator model determines that generation was higher or lower, then the results of the dispatch may differ from expectations.
 
 Multiple different ElectricLoadCenter:Distribution objects can be included in an input file.   A great deal of flexibility is available by mixing different load centers and operating schemes. If multiple load centers are used, the supervisory control will dispatch generators sequentially across the load centers.   Therefore, the order of these input objects in the IDF file becomes important with the generators associated with first load center in the file being the first to be managed.   A certain amount of caution is needed to avoid conflicting operating schemes.
-
-The electricity produced from photovoltaic arrays will be reported in the electricity produced output variable and will reduce the demand that the generators will try to meet for that timestep.
 
 #### Field: Name
 
@@ -20214,17 +20212,17 @@ This alpha field contains the identifying name for the electric load center.
 
 #### Field: Generator List Name
 
-This alpha field contains the identifying name for the list of generators in the set defined in an ElectricLoadCenter:Generators object.  All the generators connected to this load center need to be of the same type in terms of all AC or all DC.  Currently the only DC generators are photovoltaic panels, the others are all AC.  A facility with both AC and DC generators will need to use seperate ElectricLoadCenter:Distribution objects.  
+This alpha field contains the identifying name for the list of generators in the set defined in an ElectricLoadCenter:Generators object.  All the generators connected to this load center need to be of the same type in terms of all AC or all DC.  Currently the only DC generators are photovoltaic panels, the others are all AC.  A facility with both AC and DC generators will need to use seperate ElectricLoadCenter:Distribution objects.  The generator list named here can only be associated with one load center.  This field can be left blank if there are no generators. 
 
 #### Field: Generator Operation Scheme Type
 
-This alpha field specifies the type of operating scheme for the generator set. The available operating schemes are Baseload, DemandLimit, TrackElectrical, TrackSchedule, TrackMeter, FollowThermal,    and FollowThermalLimitElectrical.  The Baseload scheme operates the generators at their rated (requested) electric power output when the generator is scheduled ON (ref. ElectricLoadCenter:Generators). The Baseload scheme requests all generators scheduled ON (available) to operate, even if the amount of electric power generated exceeds the total facility electric power demand. The DemandLimit scheme limits the amount of purchased electrical from the utility to the amount specified in the input object. The DemandLimit scheme tries to have the generators meet all of the demand above the purchased electric limit set by the user in the next field. The TrackElectrical scheme tries to have the generators meet all of the electrical demand for the building. The TrackSchedule scheme tries to have the generators meet all of the electrical demand determined in a user-defined schedule. The TrackMeter scheme tries to have the generators meet all the electrical demand from a meter, which could also be a user-defined custom meter.
+This alpha field specifies the type of operating scheme for the generator set. The available operating schemes are Baseload, DemandLimit, TrackElectrical, TrackSchedule, TrackMeter, FollowThermal, and FollowThermalLimitElectrical.  The Baseload scheme operates the generators at their rated (requested) electric power output when the generator is scheduled ON (ref. ElectricLoadCenter:Generators). The Baseload scheme requests all generators scheduled ON (available) to operate, even if the amount of electric power generated exceeds the total facility electric power demand. The DemandLimit scheme limits the amount of purchased electrical from the utility to the amount specified in the input object. The DemandLimit scheme tries to have the generators meet all of the demand above the purchased electric limit set by the user in the next field. The TrackElectrical scheme tries to have the generators meet all of the electrical demand for the building. The TrackSchedule scheme tries to have the generators meet all of the electrical demand determined in a user-defined schedule. The TrackMeter scheme tries to have the generators meet all the electrical demand from a meter, which could also be a user-defined custom meter.
 
-The DemandLimit, TrackElectrical, TrackSchedule, and TrackMeter schemes will sequentially load the available generators. All demand not met by available generator capacity will be met by purchased electrical. Therefore, if DemandLimit, TrackElectrical, TrackSchedule, or TrackMeter is utilized and the available generators are not enough to meet demand, then purchased electrical will offset the difference. If a generator is needed in the simulation for a small load and it is less than the minimum part load ratio the generator will operate at the minimum part load ratio and the excess will either reduce demand or the excess energy will be available for returning to the electric grid.
+The DemandLimit, TrackElectrical, TrackSchedule, and TrackMeter schemes will sequentially load the available generators. All demand not met by available generator capacity (or storage) will be met by purchased electrical. Therefore, if DemandLimit, TrackElectrical, TrackSchedule, or TrackMeter is utilized and the available generators are not enough to meet demand, then purchased electrical will offset the difference. If a generator is needed in the simulation for a small load and it is less than the minimum part load ratio the generator will operate at the minimum part load ratio and the excess will either reduce demand or the excess energy will be available for returning to the electric grid.
 
-The FollowThermal and FollowThermalLimitElectrical schemes are for heat following cogeneration and run the generators to meet the thermal demand.   The FollowThermal schemes allow excess electrical generation to be exported to the grid, while the FollowThermalLimitElectrical scheme restricts generator output to a maximum of the building   s current electrical demand (so that no electricity is exported).   The thermal demand is determined from the plant modeling and depends on the flow requested by other components on the demand side of the plant loop, the loop temperatures, and the loop temperature set point.   The electric load center converts the thermal load to an electrical load using a nominal ratio of the thermal to electrical power production for each generator.   For these schemes, the generator needs to be connected to the supply side of a plant loop and   components that request hot water need to be on the demand side of the plant loop.   This is different than the usual configuration for electrical following schemes where the generator is put on the demand side and request flow for the purposes of cooling the generator.   Therefore a switch from one of the electrical-based operating schemes to one of the thermal-based operating schemes requires a substantial change in plant topology.
+The FollowThermal and FollowThermalLimitElectrical schemes are for heat following cogeneration and run the generators to meet the thermal demand.  The FollowThermal schemes allow excess electrical generation to be exported to the grid, while the FollowThermalLimitElectrical scheme restricts generator output to a maximum of the building's current electrical demand (so that no electricity is exported).  The thermal demand is determined from the plant modeling and depends on the flow requested by other components on the demand side of the plant loop, the loop temperatures, and the loop temperature set point.  The electric load center converts the thermal load to an electrical load using a nominal ratio of the thermal to electrical power production for each generator.  For these schemes, the generator needs to be connected to the supply side of a plant loop and components that request hot water need to be on the demand side of the plant loop.   This is different than the usual configuration for electrical following schemes where the generator is put on the demand side and request flow for the purposes of cooling the generator.  Therefore a switch from one of the electrical-based operating schemes to one of the thermal-based operating schemes requires a substantial change in plant topology.
 
-If the load center includes electrical storage, then the choice of operating schemes will also affect how storage is managed.
+If the load center includes electrical storage, then the choice of generator operating schemes will also affect how storage is managed.  The generator operation scheme and dispatch is modeled before the storage operation scheme so that the current generator production is available for use with the storage operation scheme. 
 
 #### Field: Demand Limit Scheme Purchased Electric Demand Limit
 
@@ -20240,43 +20238,52 @@ This alpha field is the user input for the name of a meter. Any valid meter name
 
 #### Field: Electrical Buss Type
 
-This alpha field is used to describe how the electric load center is configured with respect to any power conditioning and/or storage equipment. There are five configurations for load centers available by using one of these keywords:
+This alpha field is used to describe how the electric load center is configured with respect to any power conditioning and/or storage equipment. There are five configurations available for load centers that are selected using one of these keywords:  AlternatingCurrent, AlternatingCurrentWithStorage, DirectCurrentWithInverter, DirectCurrentWithInverterDCStorage, or DirectCurrentWithInverterACStorage.  This input informs the program which of the five pre-configured arrangements is to be used for this load center.  The following diagrams show the kinds of devices and how they are arranged for each of the buss types.
 
-- AlternatingCurrent
+- AlternatingCurrent.  This type of load center is for adding one or more on-site generators that produce AC power.  If the voltage does not match a transformer can be included but is not needed.  AlternatingCurrent is the default.
 
-- AlternatingCurrentWithStorage
+![LoadCenterBussType](media/ACBussDiagram.png)
 
-- DirectCurrentWithInverter
+- AlternatingCurrentWithStorage.  This type of load center is for adding one or more on-site generators that produce AC power and one on-site electric storage device that uses AC power.  The connection between the load center and the main building panel is bidirectional so that storage can be charged by drawing from the grid.  Transformer is optional.   
 
-- DirectCurrentWithInverterDCStorage
+![LoadCenterBussType](media/ACStorageBussDiagram.png)
 
-- DirectCurrentWithInverterACStorage
+- DirectCurrentWithInverter.  This type of load center is for adding one or more on-site generators that produce DC power, typically photovoltaic panels.  An inverter is needed to convert generated power from DC to AC.  Transformer is optional. 
 
-AlternatingCurrent is the default.      If the generators are DC, then an inverter is needed to convert the DC to AC.   If there are DC generators and a DC electrical storage device on the buss along with an inverter, then use DirectCurrentWithInverterDCStorage in this field.   See the Engineering Reference for more information including diagrams of the load center configurations.
+![LoadCenterBussType](media/DCInverterBussDiagram.png)
+
+- DirectCurrentWithInverterDCStorage.  This type of load center is for adding one or more on-site generatros the produce DC power and one on-site storage device that uses DC power.  An inverter is needed to convert power from DC to AC and is located between the storage and where the subpanel feeds into the main panel.  The connection between the load center and the main building panel is bidirectional so that storage can be charged by drawing from the grid.  An AC to DC converter is needed if the storage operation scheme is such that the control might draw power from the main facility panel into the load center in order to charge storage. Transformer is optional.
+
+![LoadCenterBussType](media/DCInverterWithDCStorageBussDiagram.png)
+
+- DirectCurrentWithInverterACStorage.  This type of load center is for adding one or more on-site generatros the produce DC power and one on-site storage device that uses AC power.   The connection between the load center and the main building panel is bidirectional so that storage can be charged by drawing from the grid.  The inverter is located between the generators and the storage device. Transformer is optional.
+
+![LoadCenterBussType](media/DCInverterWithACStorageBussDiagram.png)
+
 
 #### Field: Inverter Object Name
 
-This field is used to identify the inverter connected to this load center (if any).   This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverter and should contain the user-defined name of an inverter object.   There are three types of inverter models available  -see ElectricLoadCenter:Inverter:Simple, ElectricLoadCenter:Inverter:LookUpTable,   or ElectricLoadCenter:Inverter:FunctionOfPower.   Enter the name of one of these types of inverter objects defined elsewhere in the input file.
+This field is used to identify the inverter connected to this load center (if any).  This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverter, DirectCurrentWithInverterDCStorage, or DirectCurrentWithInverterACStorage and should contain the user-defined name of an inverter object.   There are three types of inverter models available  -see ElectricLoadCenter:Inverter:Simple, ElectricLoadCenter:Inverter:LookUpTable,   or ElectricLoadCenter:Inverter:FunctionOfPower.   Enter the name of one of these types of inverter objects defined elsewhere in the input file.
 
 #### Field: Electrical Storage Object Name
 
-This field is used to identify the electrical storage connected to this load center (if any).   This field is only used if the Electrical Buss Type is set to DirectCurrentWithInverterDCStorage or DirectCurrentWithInverterACStorage.   Enter the name of an ElectricLoadCenter:Storage:* object defined elsewhere in the input file.
+This field is used to identify the electrical storage connected to this load center (if any).   This field is only used if the Electrical Buss Type is set to AlternatingCurrentWithStorage, DirectCurrentWithInverterDCStorage or DirectCurrentWithInverterACStorage.   Enter the name of an ElectricLoadCenter:Storage:* object defined elsewhere in the input file.
 
 #### Field: Transformer Object Name
 
-This field is used to identify the transformer connected to this load center (if any). This field can be used for any electrical buss types. Enter the name of an ElectricLoadCenter:Transformer object defined elsewhere in the input file.
+This field is used to identify the transformer connected to this load center (if any). This field can be used for any electrical buss types. Enter the name of an ElectricLoadCenter:Transformer object defined elsewhere in the input file.  The transformer should have use type set to LoadCenterPowerConditioning.
 
 #### Field: Storage Operation Scheme
 
-This field is used to select the operation scheme usd to govern how storage charge and discharge is controlled.  There are four options:  TrackFacilityElectricDemandStoreExcessOnSite, TrackMeterDemandStoreExcessOnSite, TrackChargeDischargeSchedules, or FacilityDemandLeveling.
+This field is used to select the operation scheme used to govern how storage charge and discharge is controlled.  There are four options:  TrackFacilityElectricDemandStoreExcessOnSite, TrackMeterDemandStoreExcessOnSite, TrackChargeDischargeSchedules, or FacilityDemandLeveling.  
 
 TrackFacilityElectricDemandStoreExcessOnSite indicates that storage control will follow the facility power demand (meter Facility:Electricity) while accounting for any on-site generation.  Only excess on site generation gets stored.  This is the legacy control behavior before version 8.5 and is the default.
 
-TrackMeterDemandStoreExcessOnSite indicates that storage discharge control will follow an electric meter named in the field called Storage Control Track Meter Name.  This scheme is similiar TrackFacilityElectricDemandStoreExcessOnSite except that instead of the main facility electric meter, the control is based off of a user-selected meter.
+TrackMeterDemandStoreExcessOnSite indicates that storage discharge control will follow an electric meter named in the field called Storage Control Track Meter Name.  This scheme is similar TrackFacilityElectricDemandStoreExcessOnSite except that instead of the main facility electric meter, the control is based off of a user-selected meter.
 
 TrackChargeDischargeSchedules indicates that control will follow the charging and discharging power and schedules defined in the fields called Maximum Storage Charge Grid Supply Power, Storage Charge Grid Supply Power Fraction Schedule Name, Design Storage Discharge Grid Export Power, and Storage Discharge Grid Export Fraction Schedule Name.
 
-FacilityDemandLeveling indicates that storage control will attempt to control the facility's power demand drawn from the utility service to a prescribed level.  The target utility demand is entered in the fields called Storage Control Utility Demand Limit and Storage Control Utility Demand Limit Fraction Schedule Name.  This scheme first accounts for any on-site generation and during times of high use will discharge storage to reduce facility grid demand to meet the target level and during times of low use will charge storage from the grid to increase facility grid demand to meet the target level.
+FacilityDemandLeveling indicates that storage control will attempt to control the facility's power demand drawn from the utility service to a prescribed level.  The target utility demand is entered in the fields called Storage Control Utility Demand Limit and Storage Control Utility Demand Limit Fraction Schedule Name.  This scheme first accounts for any on-site generation and during times of high use will discharge storage to reduce facility grid demand to meet the target level and during times of low use will charge storage from the grid to increase facility grid demand to meet the target level.  This scheme allows controlling the load factor as long as the storage capacity and rates are not limiting what is possible.  Negative schedule values can be used so that a negative demand target is exporting power out to the grid. 
 
 #### Field: Storage Control Track Meter Name
 
@@ -20284,7 +20291,7 @@ This field is the name of a meter to use when a custom meter is to be used.  Thi
 
 #### Field: Storage Converter Object Name
 
-This field is the name of an ElectricLoadCenter:Storage:Converter object defined elsewhere in the input file that describes the performance of converting convert AC to DC when charging DC storage from grid supply. This field is required when using DC storage (buss type DirectCurrentWithInverterDCStorage) with grid supplied charging power (Storage Operation Scheme is set to TrackChargeDischargeSchedules or FacilityDemandLeveling.)  Although some inverter devices are bidirectional a separate converter object is needed to describe AC to DC performance.
+This field is the name of an ElectricLoadCenter:Storage:Converter object defined elsewhere in the input file that describes the performance when converting AC to DC when charging DC storage from grid supply. This field is required when using DC storage (buss type DirectCurrentWithInverterDCStorage) with grid supplied charging power (Storage Operation Scheme is set to TrackChargeDischargeSchedules or FacilityDemandLeveling.)  Although some inverter devices are bidirectional a separate converter object is needed to describe AC to DC performance.
 
 #### Field: Maximum Storage State of Charge Fraction
 
@@ -20296,7 +20303,7 @@ This numeric field specifies the fraction of storage capacity used as lower limi
 
 #### Field: Design Storage Control Charge Power
 
-This field is the design maximum rate that electric power can be charged into storage, in Watts.  This field is used as an upper limit for most storage control operation schemes. However for TrackChargeDischargeSchedules, this is the design value for how much power to use when charging and it is multipled by the power fraction schedule in the next field.  Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
+This field is the design maximum rate that electric power can be charged into storage, in Watts.  This field is used as an upper limit for most storage control operation schemes. However for TrackChargeDischargeSchedules, this is the design value for how much power to use when charging and it is multipled by the power fraction schedule in the next field.  Required field when using Storage Operation Schemes set to FacilityDemandLeveling or TrackChargeDischargeSchedules.
 
 #### Field: Storage Charge Power Fraction Schedule Name
 
@@ -20304,7 +20311,7 @@ This field contains the name of a schedule that controls the timing and magnitud
 
 #### Field: Design Storage Control Discharge Power
 
-This field is the design maximum rate that electric power can be discharged from storage.  This field is used as an upper limit for most storage control operation schemes. However for TrackChargeDischargeSchedules, this is the design value for how much power to draw when discharging and it is multiplied by the power fraction schedule in the next field.  Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
+This field is the design maximum rate that electric power can be discharged from storage.  This field is used as an upper limit for most storage control operation schemes. However for TrackChargeDischargeSchedules, this is the design value for how much power to draw when discharging and it is multiplied by the power fraction schedule in the next field.  Required field when using Storage Operation Schemes set to FacilityDemandLeveling or TrackChargeDischargeSchedules.
 
 #### Field: Storage Discharge Power Fraction Schedule Name
 
@@ -20323,15 +20330,15 @@ Examples of this object are:
 
 ```idf
 ElectricLoadCenter:Distribution,
-       SOFC Electric Load Center,   !- Name
+       SOFC Electric Load Center,      !- Name
        Micro-Generators,               !- Generator List Name
-       Baseload,                               !- Generator Operation Scheme Type
-       0.0,                                         !- Demand Limit Scheme Purchased Electric Demand Limit {W}
-       ,                                               !- Track Schedule Name Scheme Schedule Name
-       ,                                               !- Track Meter Scheme Meter Name
-       AlternatingCurrent,           !- Electrical Buss Type
-       ,                                               !- Inverter Object Name
-       ;                                               !- Electrical Storage Object Name
+       Baseload,                       !- Generator Operation Scheme Type
+       0.0,                            !- Demand Limit Scheme Purchased Electric Demand Limit {W}
+       ,                               !- Track Schedule Name Scheme Schedule Name
+       ,                               !- Track Meter Scheme Meter Name
+       AlternatingCurrent,             !- Electrical Buss Type
+       ,                               !- Inverter Object Name
+       ;                               !- Electrical Storage Object Name
 
 
    ElectricLoadCenter:Distribution,
