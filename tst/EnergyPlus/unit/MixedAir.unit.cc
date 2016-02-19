@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -91,6 +92,7 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
@@ -824,6 +826,173 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest ) {
+		std::string const idf_objects = delimited_string( {
+			"Version,8.4;",
+
+			"AirLoopHVAC:OutdoorAirSystem,",
+			"    DOAS OA System,          !- Name",
+			"    DOAS OA System Controllers,  !- Controller List Name",
+			"    DOAS OA System Equipment;!- Outdoor Air Equipment List Name",
+
+			"AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+			"    DOAS OA System Equipment,!- Name",
+			"    Humidifier:Steam:Electric,        !- Component 1 Object Type",
+			"    DOAS OA Humidifier,      !- Component 1 Name",
+			"    OutdoorAir:Mixer,        !- Component 2 Object Type",
+			"    DOAS OA Mixing Box;      !- Component 2 Name",
+
+			"  Humidifier:Steam:Electric,",
+			"    DOAS OA Humidifier,      !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    8.0E-006,                !- Rated Capacity {m3/s}",
+			"    21000.0,                 !- Rated Power {W}",
+			"    0,                       !- Rated Fan Power {W}",
+			"    0,                       !- Standby Power {W}",
+			"    DOAS Outdoor Air Inlet,  !- Air Inlet Node Name",
+			"    DOAS Humidifier Air Outlet, !- Air Outlet Node Name",
+			"    ;                        !- Water Storage Tank Name",
+
+			"Schedule:Compact,",
+			"    FanAvailSched,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: Alldays,            !- Field 2",
+			"    Until: 24:00, 1.0;       !- Field 3",
+			
+			"ScheduleTypeLimits,",
+			"    Fraction,                !- Name",
+			"    0.0,                     !- Lower Limit Value",
+			"    1.0,                     !- Upper Limit Value",
+			"    CONTINUOUS;              !- Numeric Type",
+
+			"  SetpointManager:Scheduled,",
+			"    Main Humidifier setpoint Mgr,  !- Name",
+			"    MinimumHumidityRatio,          !- Control Variable",
+			"    Humidifier Setpoint Schedule,  !- Schedule Name",
+			"    DOAS Humidifier Air Outlet;    !- Setpoint Node or NodeList Name",
+
+			"  Schedule:Compact,",
+			"    Humidifier Setpoint Schedule,  !- Name",
+			"    HumidityRatio,           !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: Alldays,            !- Field 2",
+			"    Until: 24:00,0.005;      !- Field 3",
+
+			"  ScheduleTypeLimits,",
+			"    HumidityRatio,           !- Name",
+			"    0.0001,                  !- Lower Limit Value",
+			"    0.0120,                  !- Upper Limit Value",
+			"    CONTINUOUS;              !- Numeric Type",
+
+			"OutdoorAir:NodeList,",
+			"    DOAS Outdoor Air Inlet;  !- Node or NodeList Name 1",
+
+			"Controller:OutdoorAir,",
+			"    DOAS OA Controller,      !- Name",
+			"    DOAS Relief Air Outlet,  !- Relief Air Outlet Node Name",
+			"    DOAS Air Loop Inlet,     !- Return Air Node Name",
+			"    DOAS Mixed Air Outlet,   !- Mixed Air Node Name",
+			"    DOAS Outdoor Air Inlet,  !- Actuator Node Name",
+			"    1.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    1.0,                     !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    NoEconomizer,            !- Economizer Control Type",
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    12.2,                    !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+			"    NoLockout,               !- Lockout Type",
+			"    ProportionalMinimum,     !- Minimum Limit Type",
+			"    ,                        !- Minimum Outdoor Air Schedule Name",
+			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    ,                        !- Mechanical Ventilation Controller Name",
+			"    ,                        !- Time of Day Economizer Control Schedule Name",
+			"    No,                      !- High Humidity Control",
+			"    ,                        !- Humidistat Control Zone Name",
+			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+			"    No;                      !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+
+			"OutdoorAir:Mixer,",
+			"    DOAS OA Mixing Box,      !- Name",
+			"    DOAS Mixed Air Outlet,   !- Mixed Air Node Name",
+			"    DOAS Humidifier Air Outlet, !- Outdoor Air Stream Node Name",
+			"    DOAS Relief Air Outlet,  !- Relief Air Stream Node Name",
+			"    DOAS Air Loop Inlet;     !- Return Air Stream Node Name",
+
+			"AirLoopHVAC:ControllerList,",
+			"    DOAS OA System Controllers,  !- Name",
+			"    Controller:OutdoorAir,   !- Controller 1 Object Type",
+			"    DOAS OA Controller;      !- Controller 1 Name",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::HourOfDay = 1;
+		DataEnvironment::DayOfWeek = 1;
+		DataEnvironment::DayOfYear_Schedule = 1;
+		ScheduleManager::UpdateScheduleValues();
+
+		GetOASysInputFlag = true;
+		DataGlobals::BeginEnvrnFlag = true;
+		int AirloopNum = 1;
+		int OASysNum = 1;
+		int HumNum( 1 );
+		int AirInNode( 0 );
+		int AirOutNode( 0 );
+		Real64 WaterConsumptionRate( 0.0 ); // water use rate of the humidifier
+		Real64 ElecPowerInput( 0.0 ); // electric use rate of the humidifier
+
+		AirLoopControlInfo.allocate( AirloopNum ); 
+		AirLoopFlow.allocate( AirloopNum ); 
+		AirLoopFlow( AirloopNum ).DesSupply = 1.0;
+		DataEnvironment::StdRhoAir = 1.2;
+		DataEnvironment::OutBaroPress = 101250.0;
+		DataSizing::SysSizingRunDone = false;
+		DataSizing::CurSysNum = 1;
+
+		GetOutsideAirSysInputs();
+		EXPECT_EQ( 1, NumOASystems );
+		EXPECT_EQ( "DOAS OA SYSTEM", OutsideAirSys( OASysNum ).Name );
+
+		// setup OA system and initialize nodes
+		ManageOutsideAirSystem( OutsideAirSys( OASysNum ).Name, true, AirloopNum, OASysNum );
+		// reset nodes to common property
+		for ( int i = 1; i <= DataLoopNode::NumOfNodes; ++i ) {
+			Node( i ).Temp = 20.0;
+			Node( i ).HumRat = 0.0005;
+			Node( i ).Enthalpy = Psychrometrics::PsyHFnTdbW( DataLoopNode::Node( i ).Temp, DataLoopNode::Node( i ).HumRat );
+			Node( i ).MassFlowRate = 1.0;
+			Node( i ).MassFlowRateMaxAvail = 1.0;
+			Node( i ).Press = 101250.0;
+		}
+		// simulate OA system, common node properties are propagated
+		ManageOutsideAirSystem( OutsideAirSys( OASysNum ).Name, true, AirloopNum, OASysNum );
+		// humidifier water and electric use rate are zero (no Hum Rat setpoint applied)
+		EXPECT_EQ( 0.0, Humidifiers::Humidifier( HumNum ).WaterAdd );
+		EXPECT_EQ( 0.0, Humidifiers::Humidifier( HumNum ).ElecUseRate );
+
+		// Add humidity ratio setpoint to the humidifier air outlet node
+		Node( 2 ).HumRatMin = 0.005;  // humidity ratio setpoint value
+		// simulate OA system
+		ManageOutsideAirSystem( OutsideAirSys( OASysNum ).Name, true, AirloopNum, OASysNum );
+		// get humidifier's air inlet and outlet node number
+		AirInNode = Humidifiers::Humidifier( HumNum ).AirInNode;
+		AirOutNode = Humidifiers::Humidifier( HumNum ).AirOutNode;
+		// Calculate expected humidifier water consumption rate
+		WaterConsumptionRate = 1.0 * ( 0.005 - 0.0005 );
+		// Calculate humidifier electric use rate (fan electric power and standby electric power are zero)
+		ElecPowerInput = ( WaterConsumptionRate / Humidifiers::Humidifier( HumNum ).NomCap ) * Humidifiers::Humidifier( HumNum ).NomPower;
+		// Confirm humidifier water consumption calculation
+		EXPECT_EQ( WaterConsumptionRate, Humidifiers::Humidifier( HumNum ).WaterAdd );
+		// confirm that electric energy is used by the humidifier		
+		EXPECT_EQ( ElecPowerInput, Humidifiers::Humidifier( HumNum ).ElecUseRate );
+	}
 
 	TEST_F( EnergyPlusFixture, FreezingCheckTest )
 	{
