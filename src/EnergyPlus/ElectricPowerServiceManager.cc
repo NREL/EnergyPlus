@@ -1672,6 +1672,10 @@ namespace EnergyPlus {
 		if ( this->inverterPresent &&  this->inverterObj != nullptr ) {
 			this->inverterObj->reinitAtBeginEnvironment();
 		}
+
+		if ( this->converterPresent && this->converterObj != nullptr ) {
+			this->converterObj->reinitAtBeginEnvironment();
+		}
 	}
 
 	void 
