@@ -20003,6 +20003,10 @@ For facilities that own their transformer, and the utility services is metered o
 
 All other applications involving on-site generation or storage will require at least one ElectricLoadCenter:Distribution to describe the arrangement and control of a set of electric power devices.  Each of these load centers is like a subpanel connected to the main electrical panel for the facility.  The main panel is assumed to exist whenever the rest of the model includes something that consumes electricity (and does not require any input object).  Each ElectricLoadCenter:Distribution input object describes what devices are on a subpanel connected to the main panel, as well as how they are controlled, dispatched, and arranged to provide some service related to the facility's electric power.  The ElectricLoadCenter:Distribution object manages and calls the individual generator models that are connected to it by being listed in an ElectricLoadCenter:Generators object, such as natural gas powered turbines, photovoltaic panels, wind turbines, etc.  Unlike elsewhere in EnergyPlus where there are loops, branches, or generic equipment lists that allow describing custom arrangements, the electric power service modeling is restricted to a collection of predefined arrangements, called "buss types."  Many on site generation and storage configurations common in buildings can be modeled using just one ElectricLoadCenter:Distribution object.  However, by combining multiple load centers with different equipment and operations schemes, it is possible to model more complex configurations.  (Note that when using multiple ElectricLoadCenter:Distribution objects, the order of the ElectricLoadCenter:Distribution objects within the input file determines the order in which they are called to interact with the main panel.)
 
+The following diagram shows some of the devices and arrangements that can be modeled using the inputs in this group. 
+
+![PowerServiceOverview](media/ElectPowerServiceOverview.png)
+
 
 ### ElectricLoadCenter:Transformer
 
@@ -20350,6 +20354,7 @@ Even if no ElectricLoadCenter:Distribution object is included, the following who
 
 * HVAC,Average,Facility Total Purchased Electric Power [W]
 * HVAC,Sum,Facility Total Purchased Electric Energy [J]
+* HVAC,Average,Facility Total Surplus Electric Power [W]
 * HVAC,Sum,Facility Total Surplus Electric Energy [J]
 * HVAC,Average,Facility Net Purchased Electric Power [W]
 * HVAC,Sum,Facility Net Purchased Electric Energy [J]
@@ -20364,11 +20369,12 @@ These output variables all use a default keyword    Whole Building.
 #### Facility Total Purchased Electric Power [W]
 #### Facility Total Purchased Electric Energy [J]
  
-These outputs are the total of electricity purchased for the entire facility in both Power and Energy units. This value is always positive and indicates the amount of energy that is purchased from the utility.
+These outputs are the total of electricity purchased for the entire facility in both power and energy units. This value is always positive and indicates the amount of energy that is purchased from the utility.
 
+#### Facility Total Surplus Electric Power [W]
 #### Facility Total Surplus Electric Energy [J]
 
-This output is the excess electricity produced and sent out to the electrical grid. This value is always positive and indicates the surplus electric power (from generation and/or storage discharge) exceeds the whole-building demand and electricity is being fed from the facility into the grid.
+These outputs are the total excess electricity exported and sent out to the electrical grid in both power and energy units. This value is always positive and indicates the surplus electric power (from generation and/or storage discharge) exceeds the whole-building demand and electricity is being fed from the facility into the grid.
 
 #### Facility Net Purchased Electric Power [W]
 #### Facility Net Purchased Electric Energy [J]

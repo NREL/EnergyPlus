@@ -307,6 +307,7 @@ namespace EnergyPlus {
 			SetupOutputVariable( "Facility Total Purchased Electric Power [W]", this->electPurchRate, "System", "Average", this->name );
 			SetupOutputVariable( "Facility Total Purchased Electric Energy [J]", this->electricityPurch, "System", "Sum", this->name, _, "ElectricityPurchased", "COGENERATION", _, "Plant" );
 
+			SetupOutputVariable( "Facility Total Surplus Electric Power [W]", this->electSurplusRate, "System", "Average", this->name );
 			SetupOutputVariable( "Facility Total Surplus Electric Energy [J]", this->electricitySurplus, "System", "Sum", this->name, _, "ElectricitySurplusSold", "COGENERATION", _, "Plant" );
 
 			SetupOutputVariable( "Facility Net Purchased Electric Power [W]", this->electricityNetRate, "System", "Average", this->name );
