@@ -3159,6 +3159,15 @@ namespace EnergyPlus {
 			if ( q0 > qmax * controlSOCMaxFracLimit ) {
 				//stop charging with controller signal for max state of charge
 				Pw = 0.0;
+				powerCharge = 0.0;
+				charging = false;
+				this->storageMode = 0;
+				this->storedPower = 0.0;
+				this->storedEnergy =  0.0;
+				this->decrementedEnergyStored = 0.0;
+				this->drawnPower = 0.0;
+				this->drawnEnergy = 0.0;
+				return;
 			}
 
 			I0 = 1.0; // Initial assumption
@@ -3222,6 +3231,16 @@ namespace EnergyPlus {
 			if ( q0 < qmax * controlSOCMinFracLimit ) {
 				// stop discharging with controller signal for min state of charge
 				Pw = 0.0;
+				discharging = false;
+				powerDischarge = 0.0;
+				this->storageMode = 0;
+				this->storedPower = 0.0;
+				this->storedEnergy =  0.0;
+				this->decrementedEnergyStored = 0.0;
+				this->drawnPower = 0.0;
+				this->drawnEnergy = 0.0;
+				return;
+
 			}
 
 			bool const ok = this->determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, this->dischargeCurveNum, k, c, qmax, E0c, this->internalR );
