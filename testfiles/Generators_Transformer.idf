@@ -2598,7 +2598,7 @@
   ElectricLoadCenter:Transformer,
     Transformer 2,           !- Name
     Always On,               !- Availability Schedule Name
-    PowerOutFromOnsiteGeneration,  !- Transformer Usage
+    PowerOutToGrid,  !- Transformer Usage
     ,                        !- Zone Name
     ,                        !- Radiative Fraction
     150000,                  !- Rated Capacity {VA}
