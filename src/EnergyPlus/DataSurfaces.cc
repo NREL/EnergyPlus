@@ -56,15 +56,17 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-// C++ Headers
-#include <cmath>
-
-// ObjexxFCL Headers
-
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
 #include <DataSurfaces.hh>
 #include <DataPrecisionGlobals.hh>
+
+// C++ Headers
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <limits>
+#include <tuple>
 
 namespace EnergyPlus {
 
@@ -331,6 +333,9 @@ namespace DataSurfaces {
 	int const WindowBSDFModel( 101 ); // indicates complex fenestration window 6 implementation
 	int const WindowEQLModel( 102 ); // indicates equivalent layer winodw model implementation
 
+	// Parameters for PierceSurface
+	std::size_t const nVerticesBig( 20 ); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// Definitions used for scheduled surface gains
@@ -498,6 +503,298 @@ namespace DataSurfaces {
 	Array1D< SurfaceSolarIncident > SurfIncSolSSG;
 	Array1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
 
+	// Class Methods
+
+		// Constructor
+		Surface2D::
+		Surface2D( ShapeCat const shapeCat, int const axis, Vertices const & v, Vector2D const & vl, Vector2D const & vu ) :
+			axis( axis ),
+			vertices( v ),
+			vl( vl ),
+			vu( vu )
+		{
+			size_type const n( vertices.size() );
+			assert( n >= 3 );
+
+			// Reverse vertices order if clockwise
+			// If sorting by y for slab method can detect clockwise faster by just comparing edges at bottom or top-most vertex
+			Real64 area( 0.0 ); // Actually 2x the signed area
+			for ( Vertices::size_type i = 0; i < n; ++i ) {
+				Vector2D const & v( vertices[ i ] );
+				Vector2D const & w( vertices[ ( i + 1 ) % n ] );
+				area += ( v.x * w.y ) - ( w.x * v.y );
+			}
+			if ( area < 0.0 ) std::reverse( vertices.begin() + 1, vertices.end() ); // Vertices in clockwise order: Reverse all but first
+
+			// Set up edge vectors for ray--surface intersection tests
+			edges.reserve( n );
+			for ( Vertices::size_type i = 0; i < n; ++i ) {
+				edges.push_back( vertices[ ( i + 1 ) % n ] - vertices[ i ] );
+			}
+			if ( shapeCat == ShapeCat::Rectangular ) { // Set side length squared for ray--surface intersection tests
+				assert( n == 4u );
+				s1 = edges[ 0 ].magnitude_squared();
+				s3 = edges[ 3 ].magnitude_squared();
+			} else if ( ( shapeCat == ShapeCat::Nonconvex ) || ( n >= nVerticesBig ) ) { // Set up slabs
+				assert( n >= 4u );
+				slabYs.reserve( n );
+				for ( size_type i = 0; i < n; ++i ) slabYs.push_back( vertices[ i ].y );
+				std::sort( slabYs.begin(), slabYs.end() ); // Sort the vertex y coordinates
+				auto const iClip( std::unique( slabYs.begin(), slabYs.end() ) ); // Remove duplicate y-coordinate elements
+				slabYs.erase( iClip, slabYs.end() );
+				slabYs.shrink_to_fit();
+				for ( size_type iSlab = 0, iSlab_end = slabYs.size() - 1; iSlab < iSlab_end; ++iSlab ) { // Create slabs
+					Real64 xl( std::numeric_limits< Real64 >::max() );
+					Real64 xu( std::numeric_limits< Real64 >::lowest() );
+					Real64 const yl( slabYs[ iSlab ] );
+					Real64 const yu( slabYs[ iSlab + 1 ] );
+					slabs.push_back( Slab( yl, yu ) );
+					Slab & slab( slabs.back() );
+					using CrossEdge = std::tuple< Real64, Real64, size_type >;
+					using CrossEdges = std::vector< CrossEdge >;
+					CrossEdges crossEdges;
+					for ( size_type i = 0; i < n; ++i ) { // Find edges crossing slab
+						Vector2D const & v( vertices[ i ] );
+						Vector2D const & w( vertices[ ( i + 1 ) % n ] );
+						if (
+						 ( ( v.y <= yl ) && ( yu <= w.y ) ) || // Crosses upward
+						 ( ( yu <= v.y ) && ( w.y <= yl ) ) ) // Crosses downward
+						{
+							Edge const & e( edges[ i ] );
+							assert( e.y != 0.0 );
+							Real64 const exy( e.x / e.y );
+							Real64 const xb( v.x + ( yl - v.y ) * exy ); // x_bot coordinate where edge intersects yl
+							Real64 const xt( v.x + ( yu - v.y ) * exy ); // x_top coordinate where edge intersects yu
+							xl = std::min( xl, std::min( xb, xt ) );
+							xu = std::max( xu, std::max( xb, xt ) );
+							crossEdges.push_back( std::make_tuple( xb, xt, i ) );
+						}
+					}
+					slab.xl = xl;
+					slab.xu = xu;
+					assert( crossEdges.size() >= 2u );
+					std::sort( crossEdges.begin(), crossEdges.end(),
+					 []( CrossEdge const & e1, CrossEdge const & e2 ) -> bool // Lambda to sort by x_mid
+						{
+							return std::get< 0 >( e1 ) + std::get< 1 >( e1 ) < std::get< 0 >( e2 ) + std::get< 1 >( e2 ); // Sort edges by x_mid: x_bot or x_top could have repeats with shared vertex
+						}
+					);
+#ifndef NDEBUG // Check x_bot and x_top are also sorted
+					Real64 xb( std::get< 0 >( crossEdges[ 0 ] ) );
+					Real64 xt( std::get< 1 >( crossEdges[ 0 ] ) );
+					Real64 const tol( 1.0e-9 * std::max( std::abs( xl ), std::abs( xu ) ) ); // EnergyPlus vertex precision is not tight so tolerance isn't either
+					for ( auto const & edge: crossEdges ) { // Detect non-simple polygon with crossing edges
+						Real64 const xbe( std::get< 0 >( edge ) );
+						Real64 const xte( std::get< 1 >( edge ) );
+						assert( xb <= xbe + tol );
+						assert( xt <= xte + tol );
+						xb = xbe;
+						xt = xte;
+					}
+#endif
+					assert( ( shapeCat == ShapeCat::Nonconvex ) || ( crossEdges.size() == 2 ) );
+					for ( auto const & edge: crossEdges ) {
+						size_type const iEdge( std::get< 2 >( edge ) );
+						slab.edges.push_back( iEdge ); // Add edge to slab
+						Vector2D const & e( edges[ iEdge ] );
+						assert( e.y != 0.0 ); // Constant y edge can't be a crossing edge
+						slab.edgesXY.push_back( e.y != 0.0 ? e.x / e.y : 0.0 ); // Edge inverse slope
+					}
+					assert( slab.edges.size() %2 == 0u );
+					assert( slab.edges.size() == slab.edgesXY.size() );
+				}
+			}
+		}
+
+		// Set Precomputed Parameters
+		void
+		SurfaceData::
+		set_computed_geometry()
+		{
+			if ( Vertex.size() >= 3 ) { // Skip no-vertex "surfaces"
+				shapeCat = computed_shapeCat();
+				plane = computed_plane();
+				surface2d = computed_surface2d();
+			}
+		}
+
+		void
+		SurfaceData::
+		SetOutBulbTempAt()
+		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Noel Keen (LBL)/Linda Lawrie
+			//       DATE WRITTEN   August 2010
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Routine provides facility for doing bulk Set Temperature at Height.
+
+			// Using/Aliasing
+			using DataEnvironment::EarthRadius;
+			using DataEnvironment::SiteTempGradient;
+			using DataEnvironment::WeatherFileTempModCoeff;
+
+			if ( SiteTempGradient == 0.0 ) {
+				OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+				OutWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+			} else {
+				// Base temperatures at Z = 0 (C)
+				Real64 const BaseDryTemp( DataEnvironment::OutDryBulbTemp + WeatherFileTempModCoeff );
+				Real64 const BaseWetTemp( DataEnvironment::OutWetBulbTemp + WeatherFileTempModCoeff );
+
+				Real64 const Z( Centroid.z ); // Centroid value
+				if ( Z <= 0.0 ) {
+					OutDryBulbTemp = BaseDryTemp;
+					OutWetBulbTemp = BaseWetTemp;
+				} else {
+					OutDryBulbTemp = BaseDryTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
+					OutWetBulbTemp = BaseWetTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
+				}
+			}
+		}
+
+		void
+		SurfaceData::
+		SetWindSpeedAt( Real64 const fac )
+		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Linda Lawrie
+			//       DATE WRITTEN   June 2013
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Routine provides facility for doing bulk Set Windspeed at Height.
+
+			// Using/Aliasing
+			using DataEnvironment::SiteWindExp;
+
+			if ( SiteWindExp == 0.0 ) {
+				WindSpeed = DataEnvironment::WindSpeed;
+			} else {
+				Real64 const Z( Centroid.z ); // Centroid value
+				if ( Z <= 0.0 ) {
+					WindSpeed = 0.0;
+				} else {
+					//  [Met] - at meterological Station, Height of measurement is usually 10m above ground
+					//  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
+					//                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
+					WindSpeed = fac * std::pow( Z, SiteWindExp );
+				}
+			}
+		}
+
+		// Computed Shape Category
+		ShapeCat
+		SurfaceData::
+		computed_shapeCat() const
+		{
+			if ( Shape == Triangle ) {
+				return ShapeCat::Triangular;
+			} else if ( Shape == TriangularWindow ) {
+				return ShapeCat::Triangular;
+			} else if ( Shape == TriangularDoor ) {
+				return ShapeCat::Triangular;
+			} else if ( Shape == Rectangle ) {
+				return ShapeCat::Rectangular;
+			} else if ( Shape == RectangularDoorWindow ) {
+				return ShapeCat::Rectangular;
+			} else if ( Shape == RectangularOverhang ) {
+				return ShapeCat::Rectangular;
+			} else if ( Shape == RectangularLeftFin ) {
+				return ShapeCat::Rectangular;
+			} else if ( Shape == RectangularRightFin ) {
+				return ShapeCat::Rectangular;
+			} else if ( IsConvex ) {
+				return ShapeCat::Convex;
+			} else {
+				return ShapeCat::Nonconvex;
+			}
+		}
+
+		// Computed Plane
+		SurfaceData::Plane
+		SurfaceData::
+		computed_plane() const
+		{
+			Vertices::size_type const n( Vertex.size() );
+			assert( n >= 3 );
+			Vector center( 0.0 ); // Center (vertex average) point (not mass centroid)
+			Real64 a( 0.0 ), b( 0.0 ), c( 0.0 ), d( 0.0 ); // Plane coefficients
+			for ( Vertices::size_type i = 0; i < n; ++i ) { // Newell's method for robustness (not speed)
+				Vector const & v( Vertex[ i ] );
+				Vector const & w( Vertex[ ( i + 1 ) % n ] );
+				a += ( v.y - w.y ) * ( v.z + w.z );
+				b += ( v.z - w.z ) * ( v.x + w.x );
+				c += ( v.x - w.x ) * ( v.y + w.y );
+				center += v;
+			}
+			d = -( dot( center, Vector( a, b, c ) ) / n ); // center/n is the center point
+			return Plane( a, b, c, d ); // a*x + b*y + c*z + d = 0
+		}
+
+		// Computed axis-projected 2D surface
+		Surface2D
+		SurfaceData::
+		computed_surface2d() const
+		{
+			// Project along axis of min surface range for 2D intersection use
+			Vertices::size_type const n( Vertex.size() );
+			assert( n >= 3 );
+			assert( plane == computed_plane() ); // Set plane first
+			using Vertex2D = ObjexxFCL::Vector2< Real64 >;
+			using Vertices2D = ObjexxFCL::Array1D< Vertex2D >;
+
+			// Select axis to project along
+			Real64 const a( std::abs( plane.x ) ); // Plane normal x coordinate magnitude
+			Real64 const b( std::abs( plane.y ) ); // Plane normal y coordinate magnitude
+			Real64 const c( std::abs( plane.z ) ); // Plane normal z coordinate magnitude
+			int const axis( a >= std::max( b, c ) ? 0 : ( b >= std::max( a, c ) ? 1 : 2 ) ); // Project along plane's normal's largest magnitude coordinate
+
+			// Set up 2D surface
+			Vertices2D v2d( n );
+			Vector const & v0( Vertex[ 0 ] );
+			if ( axis == 0 ) { // Use y,z for 2D surface
+				Real64 yl( v0.y ), yu( v0.y ); // y coordinate ranges
+				Real64 zl( v0.z ), zu( v0.z ); // z coordinate ranges
+				for ( Vertices::size_type i = 0; i < n; ++i ) {
+					Vector const & v( Vertex[ i ] );
+					v2d[ i ] = Vertex2D( v.y, v.z );
+					yl = std::min( yl, v.y );
+					yu = std::max( yu, v.y );
+					zl = std::min( zl, v.z );
+					zu = std::max( zu, v.z );
+				}
+				return Surface2D( shapeCat, axis, v2d, Vertex2D( yl, zl ), Vertex2D( yu, zu ) );
+			} else if ( axis == 1 ) { // Use x,z for 2D surface
+				Real64 xl( v0.x ), xu( v0.x ); // x coordinate ranges
+				Real64 zl( v0.z ), zu( v0.z ); // z coordinate ranges
+				for ( Vertices::size_type i = 0; i < n; ++i ) {
+					Vector const & v( Vertex[ i ] );
+					v2d[ i ] = Vertex2D( v.x, v.z );
+					xl = std::min( xl, v.x );
+					xu = std::max( xu, v.x );
+					zl = std::min( zl, v.z );
+					zu = std::max( zu, v.z );
+				}
+				return Surface2D( shapeCat, axis, v2d, Vertex2D( xl, zl ), Vertex2D( xu, zu ) );
+			} else { // Use x,y for 2D surface
+				Real64 xl( v0.x ), xu( v0.x ); // x coordinate ranges
+				Real64 yl( v0.y ), yu( v0.y ); // y coordinate ranges
+				for ( Vertices::size_type i = 0; i < n; ++i ) {
+					Vector const & v( Vertex[ i ] );
+					v2d[ i ] = Vertex2D( v.x, v.y );
+					xl = std::min( xl, v.x );
+					xu = std::max( xu, v.x );
+					yl = std::min( yl, v.y );
+					yu = std::max( yu, v.y );
+				}
+				return Surface2D( shapeCat, axis, v2d, Vertex2D( xl, yl ), Vertex2D( xu, yu ) );
+			}
+		}
+
 	// Functions
 
 	// Clears the global data in DataSurfaces.
@@ -609,85 +906,24 @@ namespace DataSurfaces {
 	}
 
 	void
-	SurfaceData::SetOutBulbTempAt()
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Noel Keen (LBL)/Linda Lawrie
-		//       DATE WRITTEN   August 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Routine provides facility for doing bulk Set Temperature at Height.
-
-		// Using/Aliasing
-		using DataEnvironment::EarthRadius;
-		using DataEnvironment::SiteTempGradient;
-		using DataEnvironment::WeatherFileTempModCoeff;
-
-		if ( SiteTempGradient == 0.0 ) {
-			OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-			OutWetBulbTemp = DataEnvironment::OutWetBulbTemp;
-		} else {
-			// Base temperatures at Z = 0 (C)
-			Real64 const BaseDryTemp( DataEnvironment::OutDryBulbTemp + WeatherFileTempModCoeff );
-			Real64 const BaseWetTemp( DataEnvironment::OutWetBulbTemp + WeatherFileTempModCoeff );
-
-			Real64 const Z( Centroid.z ); // Centroid value
-			if ( Z <= 0.0 ) {
-				OutDryBulbTemp = BaseDryTemp;
-				OutWetBulbTemp = BaseWetTemp;
-			} else {
-				OutDryBulbTemp = BaseDryTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-				OutWetBulbTemp = BaseWetTemp - SiteTempGradient * EarthRadius * Z / ( EarthRadius + Z );
-			}
-		}
-	}
-
-	void
-	SurfaceData::SetWindSpeedAt( Real64 const fac )
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   June 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Routine provides facility for doing bulk Set Windspeed at Height.
-
-		// Using/Aliasing
-		using DataEnvironment::SiteWindExp;
-
-		if ( SiteWindExp == 0.0 ) {
-			WindSpeed = DataEnvironment::WindSpeed;
-		} else {
-			Real64 const Z( Centroid.z ); // Centroid value
-			if ( Z <= 0.0 ) {
-				WindSpeed = 0.0;
-			} else {
-				//  [Met] - at meterological Station, Height of measurement is usually 10m above ground
-				//  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
-				//                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-				WindSpeed = fac * std::pow( Z, SiteWindExp );
-			}
-		}
-	}
-
-	void
 	SetSurfaceOutBulbTempAt()
+	{
+		for ( auto & surface : Surface ) {
+			surface.SetOutBulbTempAt();
+		}
+	}
+
+	void
+	CheckSurfaceOutBulbTempAt() 
 	{
 		// Using/Aliasing
 		using DataEnvironment::SetOutBulbTempAt_error;
-
-		Real64 maxZ( 0.0 );
-		Real64 minBulb( 0.0 );
+		
+		Real64 minBulb = 0.0;
 		for ( auto & surface : Surface ) {
-			surface.SetOutBulbTempAt();
 			minBulb = min( minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp );
-			maxZ = max( maxZ, surface.Centroid.z );
+			if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Surface", surface.Centroid.z, surface.Name );
 		}
-		if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Surface", maxZ );
 	}
 
 	void

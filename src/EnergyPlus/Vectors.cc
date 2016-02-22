@@ -787,7 +787,7 @@ namespace Vectors {
 		// na
 
 		// Argument array dimensioning
-		Surf.dim( {1} );
+		Surf.dim( {1,NSides} );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

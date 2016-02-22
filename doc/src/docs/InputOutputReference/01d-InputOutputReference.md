@@ -15829,6 +15829,8 @@ In EnergyPlus the relief and outdoor air dampers, the economizer, and any outdoo
 
 Of course any type of setpoint manager can be used to establish a temperature setpoint at the mixed air node. But the Mixed Air Setpoint Manager is likely to be the most useful.
 
+When optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node are provided, the setpoint temperature at the mixed air node is calculated based on the maximum of both the reference setpoint temperature and minimum cooling coil outlet temperature, minus the cooling coil air temperature reduction and the supply fan air temperature rise if the supply fan placement is blow through. The setpoin temperature at the mixed air node is used to calculate the maximum outdoor air flow fraction in the corresponding Controller:OutdoorAir object. The outdoor air flow fraction is capped at the maximum outdoor air flow fraction to prevent the cooling coil from freezing, even though the fraction is below the minimum outdoor air flow fraction.  
+
 #### Field: Name
 
 A unique, user-assigned name for an instance of a mixed air setpoint manager. Anywhere in the input that this setpoint manager is used, it is referred to by this name.
@@ -15852,6 +15854,18 @@ The name of the supply fan outlet node.
 #### Field: Setpoint Node or NodeList Name
 
 The name of a NodeList object containing the names of the HVAC system nodes or the HVAC System Node Name where temperature setpoints will be established by this setpoint manager.
+
+#### Field: Cooling Coil Inlet Node Name
+
+The name of the cooling coil inlet node.
+
+#### Field: Cooling Coil Outlet Node Name
+
+The name of the cooling coil outlet node.
+
+#### Field: Minimum Temperature at Cooling Coil Outlet Node
+
+In order to prevent cooling coil freezing during economizer operation, the minimum temperature at the cooling coil outlet is required based on requirement of ASHRAE Standard 90.1. The default value is 7.2C.
 
 Below is an example input for a Mixed Air Setpoint Manager.
 
@@ -15881,9 +15895,6 @@ NodeList, Supply Air Temp Nodes,
 NodeList, Mixed Air Nodes,
            Mixed Air Node; ! Setpoint Nodes
 ```
-
-
-
 
 ### SetpointManager:OutdoorAirPretreat
 
@@ -17304,6 +17315,8 @@ Note that the key value for these outputs is the AirLoopHVAC name, not the name 
 
 * HVAC,Average,Air System Mixed Air Mass Flow Rate [kg/s]
 
+* HVAC,Average,Air System Outdoor Air Maximum Flow Fraction []
+
 #### Air System Outdoor Air Economizer Status []
 
 Reports the average operating status of an air economizer over the reporting interval. The economizer status is set to 1 when the conditions are favorable for the economizer to operate (i.e., none of the control limits have been exceeded). While conditions may be favorable for economizer operation, it does not guarantee that the air-side economizer has increased outdoor air flow above the minimum level since the actual outdoor air flow rate is also governed by other controls (e.g., mixed air set point tempeature, time of day economizer control, maximum humidity setpoint, etc.). This variable is set to 0 if conditions disable economizer operation or NoEconomizer (Economizer Control Type) is specified.
@@ -17339,6 +17352,10 @@ Reports the average outdoor air mass flow rate introduced by the outdoor air con
 #### Air System Mixed Air Mass Flow Rate [kg/s]
 
 Reports the average mixed air mass flow rate of the HVAC air loop associated with this outdoor air controller over the reporting interval.
+
+#### Air System Outdoor Air Maximum Flow Fraction []
+
+Reports the average maximum limit of the outdoor air fraction for the outdoor air controller over the reporting interval. The maximum flow fraction is used to prevent DX cooling coils from freezing, specified by ASHRAE Stadard 90.1. This output variable is available when a corresponding SetpointManager:MixedAir object specifies optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node.     
 
 ### Controller:MechanicalVentilation
 
