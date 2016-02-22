@@ -138,9 +138,9 @@ namespace EMSManager {
 	void
 	clear_state()
 	{
-		GetEMSUserInput = true ; 
+		GetEMSUserInput = true ;
 		ZoneThermostatActuatorsHaveBeenSetup = false ;
-		FinishProcessingUserInput = true ; 
+		FinishProcessingUserInput = true ;
 	}
 
 	void
@@ -1678,7 +1678,7 @@ namespace EMSManager {
 	}
 
 	bool
-	CheckIfNodeMoreInfoSensedByEMS( 
+	CheckIfNodeMoreInfoSensedByEMS(
 		int const nodeNum, // index of node being checked.
 		std::string const & varName
 	) {
@@ -2012,9 +2012,9 @@ namespace EMSManager {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 			if ( ! ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment ) ) continue;
 
-			SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Dryblub Temperature", "[C]", Surface( SurfNum ).OutDryBulbTempEMSOverrideOn, Surface( SurfNum ).OutDryBulbTempEMSOverrideValue );
+			SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Drybulb Temperature", "[C]", Surface( SurfNum ).OutDryBulbTempEMSOverrideOn, Surface( SurfNum ).OutDryBulbTempEMSOverrideValue );
 
-			SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wetblub Temperature", "[C]", Surface( SurfNum ).OutWetBulbTempEMSOverrideOn, Surface( SurfNum ).OutWetBulbTempEMSOverrideValue );
+			SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wetbulb Temperature", "[C]", Surface( SurfNum ).OutWetBulbTempEMSOverrideOn, Surface( SurfNum ).OutWetBulbTempEMSOverrideValue );
 			if ( Surface( SurfNum ).ExtWind ) {
 				SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wind Speed", "[m/s]", Surface( SurfNum ).WindSpeedEMSOverrideOn, Surface( SurfNum ).WindSpeedEMSOverrideValue );
 			}
