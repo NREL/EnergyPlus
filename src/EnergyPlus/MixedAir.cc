@@ -1685,17 +1685,6 @@ namespace MixedAir {
 				for ( groupNum = 1; groupNum <= NumGroups; ++groupNum ) {
 					VentMechZoneName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 5 );
 
-					if ( AirLoopControlInfo.size() >= NumOAControllers ){
-						for ( OutAirNum = 1; OutAirNum <= NumOAControllers; ++OutAirNum ) {
-							if ( OAController( OutAirNum ).VentilationMechanicalName == VentilationMechanical( VentMechNum ).Name && VentilationMechanical( VentMechNum ).DCVFlag ) {
-								AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = true;
-							} else {
-								AirLoopControlInfo( OutAirNum ).AirLoopDCVFlag = false;
-							}
-						}
-					}
-
-
 					//     Getting OA details from design specification OA object
 					if ( ! lAlphaBlanks( ( groupNum - 1 ) * 3 + 6 ) ) {
 						DesignSpecOAObjName( groupNum ) = AlphArray( ( groupNum - 1 ) * 3 + 6 );
@@ -3286,6 +3275,11 @@ namespace MixedAir {
 						SetupEMSActuator( "Outdoor Air Controller", OAController( OAControllerLoop ).Name, "Air Mass Flow Rate", "[kg/s]", OAController( OAControllerLoop ).EMSOverrideOARate, OAController( OAControllerLoop ).EMSOARateValue );
 					}
 
+					if ( OAController( OAControllerLoop ).VentMechObjectNum > 0 && thisOASys > 0){
+						if ( !VentilationMechanical( OAController( OAControllerLoop ).VentMechObjectNum ).DCVFlag ){
+							AirLoopControlInfo( thisOASys ).AirLoopDCVFlag = false;
+						}
+					}
 				}
 
 				InitOAControllerSetUpAirLoopHVACVariables = false;
@@ -3664,7 +3658,7 @@ namespace MixedAir {
 		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
 		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
 		Real64 CO2PeopleGeneration; // CO2 generation from people at design level
-		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
+		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check
 
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
