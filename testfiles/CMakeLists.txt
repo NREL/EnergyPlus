@@ -16,8 +16,8 @@ ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolledResLayers.idf EPW_FILE 94810-1956.
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_DD2009.idf EPW_FILE 94810-1953-1957.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_DDChanges.idf EPW_FILE 94810-1953-1957.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_FCfactor_Slab_UGWall.idf EPW_FILE 94810-1953-1957.epw)
-ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_1.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw DATASET)
-ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_2.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw DATASET)
+ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_1.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_2.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneWith14ControlledHeat-CoolPanels.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 4ZoneWithShading_Simple_1.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 4ZoneWithShading_Simple_2.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
@@ -65,7 +65,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5ZoneSteamBaseboard.idf EPW_FILE USA_IL_Chicago-OHa
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneSupRetPlenRAB.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneSupRetPlenVSATU.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneSwimmingPool.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE 5ZoneTDV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw DATASET)
+ADD_SIMULATION_TEST(IDF_FILE 5ZoneTDV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneVAV-ChilledWaterStorage-Mixed.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneVAV-ChilledWaterStorage-Mixed_DCV_MaxZd.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneVAV-ChilledWaterStorage-Mixed_DCV_MultiPath.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -529,14 +529,15 @@ ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise1C-Solution.idf EPW_FILE USA_IL
 ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise1D-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE BasicsFiles/Exercise2.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 
+
 # Macro files
-ADD_SIMULATION_TEST(IDF_FILE AbsorptionChiller_Macro.imf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -m)
+ADD_SIMULATION_TEST(IDF_FILE AbsorptionChiller_Macro.imf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -m) 
 
 # External interface files -- note they don't work on Mac
 if ( NOT APPLE )
-  ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-actuator.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw DATASET)
-  ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-schedule.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw DATASET)
-  ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-variable.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw DATASET)
+  ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-actuator.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+  ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-schedule.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+  ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-variable.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 endif ()
 
 IF (BUILD_FORTRAN)

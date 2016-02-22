@@ -32,11 +32,6 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${OUTPUT_DIR_PATH}
 # Read the file contents to check for special cases
 file(READ "${IDF_PATH}" IDF_CONTENT)
 
-# Copy dataset files as necessary
-if(DATASETCOPY)
-  file ( COPY "${SOURCE_DIR}/datasets" DESTINATION "${OUTPUT_DIR_PATH}/.." )
-endif()
-
 # Convert flags back to CMake list
 string(STRIP ${ENERGYPLUS_FLAGS} ENERGYPLUS_FLAGS)
 string(REPLACE " " ";" ENERGYPLUS_FLAGS_LIST ${ENERGYPLUS_FLAGS})
