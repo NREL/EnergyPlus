@@ -13565,7 +13565,7 @@ This is the string referenced in the Surface statement that is using OtherSideMo
 
 #### Field: Type of Modeling
 
-This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ”GapConvectionRadiation” or “UndergroundPipingSystemSurface.”
+This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ”GapConvectionRadiation,” “UndergroundPipingSystemSurface,” and "GroundCoupledSurface."
 
 ![OtherSideConditionsFig](media/image070.png)
 

@@ -10,6 +10,7 @@
 *.o
 *.o-*
 *.obj
+*.optrpt
 *.orig
 *.pdb
 *.res
@@ -44,4 +45,3 @@ Builds
 .cproject
 .idea
 .se
-
