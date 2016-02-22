@@ -175,11 +175,13 @@ namespace HVACUnitarySystem {
 		int NumOfSpeedHeating; // The number of speeds for heating
 		Array1D< Real64 > CoolingVolFlowRatio; // The ratio of flow to max for this speed
 		Array1D< Real64 > HeatingVolFlowRatio; // The ratio of flow to max for this speed
+		bool SingleModeFlag; // If yes, single mode operation
 
 		// Default Constructor
 		DesignSpecMSHPData() :
 			NumOfSpeedCooling( 0 ),
-			NumOfSpeedHeating( 0 )
+			NumOfSpeedHeating( 0 ),
+			SingleModeFlag( false )
 		{}
 
 	};
@@ -464,6 +466,7 @@ namespace HVACUnitarySystem {
 		int HeatCountAvail; // Counter used to minimize the occurrence of output warnings
 		int HeatIndexAvail; // Index used to minimize the occurrence of output warnings
 		bool FirstPass; // used to determine when first call is made
+		int SingleMode; // Single mode operation Yes/No; 1=Yes, 0=No
 
 		// Default Constructor
 		UnitarySystemData() :
@@ -711,7 +714,8 @@ namespace HVACUnitarySystem {
 			CoolIndexAvail( 0 ),
 			HeatCountAvail( 0 ),
 			HeatIndexAvail( 0 ),
-			FirstPass( true )
+			FirstPass( true ),
+			SingleMode( 0 )
 		{}
 
 	};

@@ -237,6 +237,8 @@ namespace OutputReportTabular {
 	extern Real64 gatherElecSurplusSold;
 	extern int meterNumElecStorage;
 	extern Real64 gatherElecStorage;
+	extern int meterNumPowerConversion;
+	extern Real64 gatherPowerConversion;
 	// for on site thermal source components on BEPS report
 	extern int meterNumWaterHeatRecovery;
 	extern Real64 gatherWaterHeatRecovery;
@@ -832,6 +834,9 @@ namespace OutputReportTabular {
 
 	std::string
 	ConvertToElementTag( std::string const & inString ); // Input String
+
+	std::string
+	ConvertUnicodeToUTF8( unsigned long const codepoint );
 
 	std::string
 	ConvertToEscaped( std::string const & inString ); // Input String

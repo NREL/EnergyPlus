@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -107,7 +107,7 @@ namespace EnergyPlus {
 			"    autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0001;                  !- Convergence Tolerance",
-			
+
 			"  Coil:Heating:Water,",
 			"    SPACE1-1 Zone Coil,      !- Name",
 			"    ReheatCoilAvailSched,    !- Availability Schedule Name",
@@ -124,14 +124,14 @@ namespace EnergyPlus {
 			"    71.1,                    !- Rated Outlet Water Temperature {C}",
 			"    32.2,                    !- Rated Outlet Air Temperature {C}",
 			"    ;                        !- Rated Ratio for Air and Water Convection",
-												
+
 			"  Schedule:Compact,",
 			"    ReheatCoilAvailSched,    !- Name",
 			"    Fraction,                !- Schedule Type Limits Name",
 			"    Through: 12/31,           !- Field 1",
 			"    For: AllDays,            !- Field 2",
 			"    Until: 24:00,1.0;        !- Field 3",
-			
+
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE1-1 Eq,             !- Name",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
@@ -186,10 +186,10 @@ namespace EnergyPlus {
 		GetZoneAirLoopEquipment();
 
 		GetPIUs();
-		
+
 		ASSERT_EQ( 1, NumSeriesPIUs );
 		EXPECT_EQ( "SPACE1-1 ZONE COIL", PIU( 1 ).HCoil ); // heating coil name
-		EXPECT_EQ( "COIL:HEATING:WATER", PIU( 1 ).HCoilType ); // hot water heating coil 
+		EXPECT_EQ( "COIL:HEATING:WATER", PIU( 1 ).HCoilType ); // hot water heating coil
 		EXPECT_GT( PIU( 1 ).HotControlNode, 0 );  // none zero integer node index is expected
 
 	}
