@@ -4,7 +4,7 @@ include(CMakeParseArguments)
 # TYPE can be either "FILES" or "PROGRAMS"
 # Use the appropriate TYPE to get the proper permissions on the installed file
 # SOURCE should be a url where the function will attempt to download from
-# DESTINATION is the absolute or relative destination which will be passed to 
+# DESTINATION is the absolute or relative destination which will be passed to
 # the built in install command after the SOURCE is downloaded to a temporary location
 # If a fourth argument is provided it will be used for the file's install name.
 # If a fifth argument is provided and "TRUE" the file will be saved to the temporary
@@ -30,7 +30,7 @@ function( install_remote TYPE SOURCE DESTINATION )
     list(GET status_var 1 status_msg)
     if( NOT (status EQUAL 0) )
       message(SEND_ERROR \"install_remote failed after 2 attempts: ${SOURCE} error ${status_msg}\")
-    endif() 
+    endif()
   endif()
   ")
   install(${TYPE} "${OUTPUT_DIR}/${FILENAME}" DESTINATION ${DESTINATION})
@@ -49,8 +49,8 @@ function( install_remote_plist SOURCE DESTINATION APP_NAME )
     return()
   endif()
   install(CODE "
-    file(DOWNLOAD \"${SOURCE}\" 
-      \"${CMAKE_BINARY_DIR}/install_temp/Info.in.plist\" 
+    file(DOWNLOAD \"${SOURCE}\"
+      \"${CMAKE_BINARY_DIR}/install_temp/Info.in.plist\"
     )
     set(MACOSX_BUNDLE_GUI_IDENTIFIER \"gov.nrel.energyplus.${CMAKE_VERSION_BUILD}.${APP_NAME}\")
     configure_file(\"${CMAKE_BINARY_DIR}/install_temp/Info.in.plist\" \"${CMAKE_BINARY_DIR}/install_temp/Info.plist\")
@@ -70,7 +70,7 @@ macro(ADD_GOOGLE_TESTS executable)
       string(REGEX MATCHALL "TEST_?F?\\(([A-Za-z_0-9 ,]+)\\)" found_tests ${contents})
       foreach(hit ${found_tests})
         string(REGEX REPLACE ".*\\(( )*([A-Za-z_0-9]+)( )*,( )*([A-Za-z_0-9]+)( )*\\).*" "\\2.\\5" test_name ${hit})
-        add_test(NAME ${test_name} 
+        add_test(NAME ${test_name}
                  COMMAND "${executable}" "--gtest_filter=${test_name}")
       endforeach(hit)
     endif()
@@ -107,7 +107,7 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
     endif()
 
     CREATE_SRC_GROUPS( "${SRC}" )
-    
+
     get_target_property(BASE_NAME_TYPE ${BASE_NAME} TYPE)
     if ("${BASE_NAME_TYPE}" STREQUAL "EXECUTABLE")
       # don't link base name
@@ -116,31 +116,32 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
       # also link base name
       set(ALL_DEPENDENCIES ${BASE_NAME} ${DEPENDENCIES} )
     endif()
-      
-    target_link_libraries( ${BASE_NAME}_tests 
-      ${ALL_DEPENDENCIES} 
-      gtest 
+
+    target_link_libraries( ${BASE_NAME}_tests
+      ${ALL_DEPENDENCIES}
+      gtest
     )
 
     ADD_GOOGLE_TESTS( ${BASE_NAME}_tests ${SRC} )
   endif()
 endmacro()
 
-# Named arguments 
+# Named arguments
 # IDF_FILE <filename> IDF input file
 # EPW_FILE <filename> EPW weather file
-# 
+#
 # Optional Arguments
 # DESIGN_DAY_ONLY force design day simulation
 # ANNUAL_SIMULATION force annual simulation
 # EXPECT_FATAL Expect simulation to fail
 # PERFORMANCE Tag test as performance analysis
+# DATASET If added, it will copy the datasets/ folder in the repo for use with simulations
 # COST <integer> Cost of this simulation relative to other simulations.
 #                Higher cost simulations run earlier in an attempt to enhance
 #                test parallelization and reduce overall test run time.
 
 function( ADD_SIMULATION_TEST )
-  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL PERFORMANCE)
+  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL PERFORMANCE DATASET)
   set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs ENERGYPLUS_FLAGS)
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
@@ -159,7 +160,13 @@ function( ADD_SIMULATION_TEST )
   else()
    set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D -r" )
   endif()
-  
+
+  if(ADD_SIM_TEST_DATASET)
+    set( DATASETCOPY TRUE )
+  else()
+    set( DATASETCOPY FALSE )
+  endif()
+
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
 
   if ( PROFILE_GENERATE AND IDF_NAME MATCHES "^(ChilledWaterStorage-Mixed|AirflowNetwork3zVent|AirflowNetwork3zVentAutoWPC|DElightCFSWindow|PipeHeatTransfer_Outair|RadHiTempElecTermReheat|RadLoTempCFloTermReheat|RadLoTempHydrMulti10|RefBldgSmallOfficeNew2004_Chicago|WindowTestsSimple|.*CentralChillerHeaterSystem.*|EMSCustomOutputVariable|EMSTestMathAndKill)$")
@@ -192,8 +199,9 @@ function( ADD_SIMULATION_TEST )
     -DTEST_FILE_FOLDER=${TEST_FILE_FOLDER}
     -DRUN_CALLGRIND:BOOL=${RUN_CALLGRIND}
     -DVALGRIND=${VALGRIND}
+    -DDATASETCOPY=${DATASETCOPY}
     -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
-  )  
+  )
 
   # MSVC's profile generator does not work with parallel runs
   #if( MSVC AND PROFILE_GENERATE )
