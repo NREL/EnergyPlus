@@ -510,9 +510,9 @@ Fanger developed the model based on the research he performed at Kansas State Un
 
 <span>\(L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W\)</span>                                                         W/m<sup>2</sup>
 
-<span>\({Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_a}) + 0.0014M(34 - {T_a})\)</span>     W/m<sup>2</sup>
+<span>\({Q_{res}} = {E_{res}} + {C_{res}} = 0.000017M(5867 - {P_a}) + 0.0014M(34 - {T_a})\)</span>     W/m<sup>2</sup>
 
-LatRespHeatLoss = 0.0023\*ActLevel\*(44. - VapPress)
+LatRespHeatLoss = 0.000017\*ActLevel\*(5867. - VapPress)
 
 DryRespHeatLoss = 0.0014\*ActLevel\*(34.- AirTemp)
 
@@ -520,15 +520,15 @@ RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
 
 <span>\({Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})\)</span>                                                               W/m<sup>2</sup>
 
-<span>\({Q_r} = {f_{eff}}{f_{cl}}\varepsilon \sigma ({T_{cla}}^4 - {T_{ra}}^4)\)</span>                                                       W/m<sup>2</sup>
+<span>Q<sub>r</sub> = 3.96\*f<sub>cl</sub>\*[(0.01\*T<sub>cla</sub>)^4 - (0.01\*T<sub>ra</sub>)^4]</span>                                                       W/m<sup>2</sup>
 
 <span>\({Q_{dry}} = {Q_c} + {Q_r}\)</span>                                                                         W/m<sup>2</sup>
 
 ConvHeatLos = CloBodyRat\*Hc\*(CloSurfTemp - AirTemp)
 
-RadHeatLoss = RadSurfEff\*CloBodyRat\*SkinEmiss\*StefanBoltz &
+RadHeatLoss = 3.96\*CloBodyRat &
 
-\*(AbsCloSurfTemp\*\*4 - AbsRadTemp\*\*4)
+\*[(0.01\*AbsCloSurfTemp)\*\*4 - (0.01\*AbsRadTemp)\*\*4]
 
 DryHeatLoss = ConvHeatLoss + RadHeatLoss
 
@@ -536,7 +536,7 @@ For<span>\(H > 58.2\)</span>, <span>\({E_{rsw}} = 0.42(H - 58.2)\)</span>   �
 
 For <span>\(H \le 58.2\)</span>, <span>\({E_{rsw}} = 0\)</span>                                                           W/m<sup>2</sup>
 
-<span>\({E_{diff}} = 0.68 \times 0.61({P_{sk}} - {P_a}) = 0.4148({P_{sk}} - {P_a})\)</span>                        W/m<sup>2</sup>
+<span>E<sub>diff</sub> = 0.00305\*(5733.0 - 6.99H - P<sub>a</sub>)</span>                        W/m<sup>2</sup>
 
 <span>\({E_{sk}} = {E_{rsw}} + {E_{diff}}\)</span>                                                                      W/m<sup>2</sup>
 
@@ -544,15 +544,11 @@ EvapHeatLossRegComf = 0.42\*(IntHeatProd - ActLevelConv)
 
 EvapHeatLossRegComf = 0.0
 
-EvapHeatLossDiff = 0.4148\*(SkinComfVpress - VapPress)
+EvapHeatLossDiff = 0.00305\*(5733.0 - 6.99\*IntHeatProd - VapPress)
 
 EvapHeatLoss = EvapHeatLossRegComf + EvapHeatLossDiff
 
 Where,
-
-0.68 is the passive water vapor diffusion rate, (g/h·m<sup>2</sup>·Torr)
-
-0.61 is the latent heat of water, (W·h/g)
 
 P<sub>sk</sub> is the saturated water vapor pressure at the skin temperature required to achieve the thermal comfort
 
