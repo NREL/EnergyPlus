@@ -8631,7 +8631,7 @@ The name of the ZoneList object. Must be unique across ZoneLists.
 
 Reference to a Zone object. This field is extensible; for greater than 20 zones, edit the IDD to add more *Zone Name* fields.
 
-```idf
+Z```idf
 oneList,
   Mid Floor List,  !- Name
   Mid West Zone,  !- Zone 1 Name
@@ -19772,7 +19772,7 @@ This field signifies the Name of the zone with constant generic contaminant sour
 
 This field denotes the full generic contaminant design generation rate (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
 
-When the mass generation rate is available, a conversion is required to meet input requirement with volumetric flow rate. This can be accomplished by the mass flow rate divided by the density of generic contaminant.  
+When the mass generation rate is available, the rate must be converted to a volume flow rate. Use the mass flow rate divided by the vapor density of the generic contaminant.  
 
 #### Field: Generation Schedule Name
 
@@ -19896,7 +19896,7 @@ This field represents the name of the zone with generic contaminant source and s
 
 This field denotes the full generic contaminant design generation rate (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
 
-When the mass generation rate is available, a conversion is required to meet input requirement with volumetric flow rate. This can be accomplished by the mass flow rate divided by the density of generic contaminant.  
+When the mass generation rate is available, the rate must be converted to a volume flow rate. Use the mass flow rate divided by the vapor density of the generic contaminant.  
 
 #### Field: Generation Schedule Name
 
@@ -19998,9 +19998,9 @@ This output is the average generic contaminant decay rate from each SurfaceConta
 
 This output is the decay time since the start of emission. The start time is either at the beginning of each run period, including design day simulations, or the time when the egenration schedule value is zero.
 
-### SurfaceContaminantSourceAndSink:Generic:BoudaryLayerDiffusion
+### SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion
 
-The SurfaceContaminantSourceAndSink:Generic:BoudaryLayerDiffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
+The SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
 
 The boundary layer diffusion controlled reversible sink/source model with a linear sorption isotherm follows the descriptions presented in [Axley 1991]. The boundary layer refers to the region above the surface of a material through which a concentration gradient exists between the near-surface concentration and the air-phase concentration. The rate at which a contaminant is transferred onto a surface (sink) is defined as:
 
@@ -20036,14 +20036,14 @@ This field specifies the average mass transfer coefficient of the contaminant ge
 
 This field is the name of the schedule (ref: Schedule) that modifies the mass transfer coefficient with the value between 0.0 and 1.0. 
 
-#### Field: Henry adsorption constant or partition coefficient
+#### Field: Henry Adsorption Constant or Partition Coefficient
 
 This field denotes the generic contaminant Henry partition coefficient in the units of dimensionless. The coefficient relates the concentration of the contaminant generic contaminant in the bulk-air to that at the surface of the adsorption material.
 
 An IDF example is provided below:
 
 ```idf
-SurfaceContaminantSourceAndSink:Generic:BoudaryLayerDiffusion,
+SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
     WEST ZONE GC BLD,       !- Name
     Zn001:Wall001,          !- Surface Name
     1.0E-2,                 !- Mass Transfer Coefficient {m/s}
@@ -20053,7 +20053,7 @@ SurfaceContaminantSourceAndSink:Generic:BoudaryLayerDiffusion,
 
 ### SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion Outputs
 
-When a SurfaceContaminantSourceAndSink:Generic:BoudaryLayerDiffusion object is specified, the following output variables are available:
+When a SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]
 
@@ -20061,7 +20061,7 @@ ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Inside Face Conce
 
 #### Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:BoudaryLayerDiffusion object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object.
 
 #### Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration [ppm]
 
