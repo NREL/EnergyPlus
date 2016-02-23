@@ -78337,7 +78337,7 @@ ElectricLoadCenter:Distribution,
        \note Modifies the target utility service demand power over time.
        \note Schedule values should be fractions from -1.0 to 1.0, inclusive.
        \note if omitted a schedule value of 1.0 is used. Negative values indicate export to grid
-       \not Schedule is used if Storage Operation Scheme is set to FacilityDemandLeveling.
+       \note Schedule is used if Storage Operation Scheme is set to FacilityDemandLeveling.
        \type object-list
        \object-list ScheduleNames
 
