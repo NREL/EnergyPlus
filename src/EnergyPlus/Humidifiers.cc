@@ -513,8 +513,8 @@ namespace Humidifiers {
 				SetupOutputVariable( "Humidifier Electric Power [W]", Humidifier( HumNum ).ElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Electric Energy [J]", Humidifier( HumNum ).ElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
 			} else if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Gas ) {
-				SetupOutputVariable( "Humidifier Gas USe Thermal Efficiency []", Humidifier( HumNum ).ThermalEff, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Gas USe Rate [W]", Humidifier( HumNum ).GasUseRate, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Gas Use Thermal Efficiency []", Humidifier( HumNum ).ThermalEff, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Gas Use Rate [W]", Humidifier( HumNum ).GasUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Gas Use Energy [J]", Humidifier( HumNum ).GasUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "GAS", "HUMIDIFIER", _, "System" );
 				SetupOutputVariable( "Humidifier Auxiliary Electric Power [W]", Humidifier( HumNum ).AuxElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Auxiliary Electric Energy [J]", Humidifier( HumNum ).AuxElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
