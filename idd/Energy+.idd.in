@@ -671,8 +671,8 @@ ZoneAirMassFlowConservation,
        \memo infiltration object mass flow rates.
        \memo If either mixing or infiltration is active, then the zone air mass flow
        \memo balance calculation will attempt to enforce conservation of mass for each zone.
-       \note If mixing is "No" and infiltration is "None", then the zone air mass flow
-       \note calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
+       \memo If mixing is "No" and infiltration is "None", then the zone air mass flow
+       \memo calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
        \unique-object
        \min-fields 3
   A1,  \field Adjust Zone Mixing For Zone Air Mass Flow Balance
