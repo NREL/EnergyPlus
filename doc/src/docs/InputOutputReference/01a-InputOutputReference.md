@@ -8619,7 +8619,7 @@ These output variables represent the sum of all heat gains throughout the zone i
 
 ### ZoneList
 
-The ZoneList object defines a list of Zone objects. It is primarily used with the ZoneGroup object to provide a generalized way for doing "Floor Multipliers". (See the ZoneGroup description below.)  The associated ZoneList output variables also provide a way to aggregate and organize zone loads.
+The ZoneList object defines a list of Zone objects. It is primarily used with the ZoneGroup object to provide a generalized way for doing "Floor Multipliers". (See the ZoneGroup description below.) The associated ZoneList output variables also provide a way to aggregate and organize zone loads.
 
 Zone lists are not exclusive. A zone can be referenced be more than one ZoneList object.
 
@@ -8627,16 +8627,16 @@ Zone lists are not exclusive. A zone can be referenced be more than one ZoneList
 
 The name of the ZoneList object. Must be unique across ZoneLists.
 
-#### Field: Zone 1 – 20 Name
+#### Field: Zone 1 - Zone 20 Name
 
 Reference to a Zone object. This field is extensible; for greater than 20 zones, edit the IDD to add more *Zone Name* fields.
 
-Z```idf
-oneList,
-  Mid Floor List,  !- Name
-  Mid West Zone,  !- Zone 1 Name
-  Mid Center Zone,  !- Zone 2 Name
-  Mid East Zone;  !- Zone 3 Name
+```idf
+ZoneList,
+  Mid Floor List,  !- Name
+  Mid West Zone,   !- Zone 1 Name
+  Mid Center Zone, !- Zone 2 Name
+  Mid East Zone;   !- Zone 3 Name
 ```
 
 
