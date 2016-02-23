@@ -741,8 +741,6 @@ namespace EnergyPlus {
 		int ZoneNum( 1 );
 		bool FirstHVACIteration( false );
 		bool ErrorsFound( false );
-		Real64 PartLoadRatio( 1.0 );
-		Real64 SpeedRatio( 0.0 );
 		Real64 QZnReq( 0.0 );
 		Real64 HotWaterMassFlowRate( 0.0 );
 		Real64 ColdWaterMassFlowRate( 0.0 );
