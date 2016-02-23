@@ -4910,13 +4910,6 @@ namespace FluidProperties {
 			GetInput = false;
 		}
 
-		// if input temperature is not a number (NAN) just return the average of the hi and low
-		if ( std::isnan( Temperature ) ){
-			ReturnValue = ( GlycolData( GlycolIndex ).RhoValues( GlycolData( GlycolIndex ).RhoLowTempIndex ) + GlycolData( GlycolIndex ).RhoValues( GlycolData( GlycolIndex ).RhoHighTempIndex ) ) / 2;
-			ShowWarningMessage( RoutineName + "Requested temperature was NAN when computing for:  [" + GlycolData( GlycolIndex ).Name + "]. Used average of high and low instead." );
-			return ReturnValue;
-		}
-
 		// If no glycols, no fluid properties can be evaluated
 		GlycolNum = 0;
 		if ( NumOfGlycols == 0 ) ReportFatalGlycolErrors( NumOfGlycols, GlycolNum, true, Glycol, "GetDensityGlycol", "density", CalledFrom );
