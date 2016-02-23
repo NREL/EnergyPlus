@@ -3779,6 +3779,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 		"  MultiSpeed Performance,  !- Name",
 		"  4,                       !- Number of Speeds for Heating",
 		"  3,                       !- Number of Speeds for Cooling",
+		"  No,                      !- Single Mode Operation",
 		"  autosize,                !- Heating Speed 1 Supply Air Flow Ratio",
 		"  autosize,                !- Cooling Speed 1 Supply Air Flow Ratio",
 		"  autosize,                !- Heating Speed 2 Supply Air Flow Ratio",
@@ -4520,6 +4521,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
 
 	SimulationManager::GetProjectData( );
+	createFacilityElectricPowerServiceObject( );
 
 	DataGlobals::BeginSimFlag = true;
 	DataGlobals::DoingSizing = true;
