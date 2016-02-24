@@ -73,7 +73,7 @@ using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::FluidProperties;
 
-TEST_F( EnergyPlusFixture, FluidProperties_GetDensityGlycol_WithNAN )
+TEST_F( EnergyPlusFixture, FluidProperties_GetDensityGlycol)
 {
 
 	std::string const idf_objects = delimited_string({
@@ -92,7 +92,7 @@ TEST_F( EnergyPlusFixture, FluidProperties_GetDensityGlycol_WithNAN )
 
 	int FluidIndex;
 
-	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFluid", -35.0, FluidIndex, "UnitTest" ), 0.01 ); //max
+	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFluid", -35.0, FluidIndex, "UnitTest" ), 0.01 );
 	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFluid", -15.0, FluidIndex, "UnitTest" ), 0.01 );
 	EXPECT_NEAR( 1034.46, GetDensityGlycol( "GLHXFluid", 5.0, FluidIndex, "UnitTest" ), 0.01 );
 	EXPECT_NEAR( 1030.51, GetDensityGlycol( "GLHXFluid", 15.0, FluidIndex, "UnitTest" ), 0.01 );
@@ -102,8 +102,7 @@ TEST_F( EnergyPlusFixture, FluidProperties_GetDensityGlycol_WithNAN )
 	EXPECT_NEAR( 1003.13, GetDensityGlycol( "GLHXFluid", 65.0, FluidIndex, "UnitTest" ), 0.01 );
 	EXPECT_NEAR(  988.60, GetDensityGlycol( "GLHXFluid", 85.0, FluidIndex, "UnitTest" ), 0.01 );
 	EXPECT_NEAR(  972.03, GetDensityGlycol( "GLHXFluid", 105.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  953.41, GetDensityGlycol( "GLHXFluid", 125.0, FluidIndex, "UnitTest" ), 0.01 ); //min
-	EXPECT_NEAR(  995.65, GetDensityGlycol( "GLHXFluid", nanf( "" ), FluidIndex, "UnitTest" ), 0.01 ); //half way between max and min
+	EXPECT_NEAR(  953.41, GetDensityGlycol( "GLHXFluid", 125.0, FluidIndex, "UnitTest" ), 0.01 );
 
 }
 
