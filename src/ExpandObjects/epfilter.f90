@@ -16135,6 +16135,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Unitary System MultiSpeed Performance')
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
+    CALL AddToObjStr('Single Mode Operation', 'No') 
     CALL AddToObjStr('Heating Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Cooling Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Heating Speed 2 Supply Air Flow Ratio', 'autosize')

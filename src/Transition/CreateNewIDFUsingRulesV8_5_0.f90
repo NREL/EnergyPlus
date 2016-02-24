@@ -858,6 +858,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(8:CurArgs-2) = InArgs(10:CurArgs)  ! Move up old F10 - F16
                 CurArgs = CurArgs - 2
 
+              CASE('UNITARYSYSTEMPERFORMANCE:MULTISPEED')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:3)=InArgs(1:3)   ! No change at all
+                OutArgs(4) = 'No'
+                OutArgs(5:12)=InArgs(4:11) ! Moved down
+                CurArgs = CurArgs + 1
+
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
                     WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is not in the "new" IDD.'

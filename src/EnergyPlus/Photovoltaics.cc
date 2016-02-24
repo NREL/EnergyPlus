@@ -727,7 +727,7 @@ namespace Photovoltaics {
 
 			//set up report variables CurrentModuleObject='Photovoltaics'
 			SetupOutputVariable( "Generator Produced DC Electric Power [W]", PVarray( PVnum ).Report.DCPower, "System", "Average", PVarray( PVnum ).Name );
-			SetupOutputVariable( "Generator Produced DC Electric Energy [J]", PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name );
+			SetupOutputVariable( "Generator Produced DC Electric Energy [J]", PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
 			SetupOutputVariable( "Generator PV Array Efficiency []", PVarray( PVnum ).Report.ArrayEfficiency, "System", "Average", PVarray( PVnum ).Name );
 
 			// CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
