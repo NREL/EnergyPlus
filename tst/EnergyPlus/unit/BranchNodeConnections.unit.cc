@@ -75,6 +75,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -1109,6 +1110,7 @@ namespace EnergyPlus {
 		GetProjectData( );
 		OutputReportPredefined::SetPredefinedTables( );
 		SetPreConstructionInputParameters( ); //establish array bounds for constructions early
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput( );
 		BeginSimFlag = true;
 		BeginEnvrnFlag = true;
@@ -2112,6 +2114,7 @@ namespace EnergyPlus {
 		GetProjectData( );
 		OutputReportPredefined::SetPredefinedTables( );
 		SetPreConstructionInputParameters( ); //establish array bounds for constructions early
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput( );
 		BeginSimFlag = true;
 		BeginEnvrnFlag = true;

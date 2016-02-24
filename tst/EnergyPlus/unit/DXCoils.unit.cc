@@ -103,14 +103,16 @@ namespace EnergyPlus {
 		DXCoilNum = 2;
 		DXCoil.allocate( NumDXCoils );
 		DXCoil( 1 ).DXCoilType_Num = CoilDX_MultiSpeedCooling;
+		DXCoil( 1 ).DXCoilType = "Coil:Cooling:DX:MultiSpeed";
 		DXCoil( 2 ).DXCoilType_Num = CoilDX_MultiSpeedHeating;
+		DXCoil( 2 ).DXCoilType = "Coil:Heating:DX:MultiSpeed";
 		DXCoil( 1 ).MSRatedTotCap.allocate( 2 );
 		DXCoil( 2 ).MSRatedTotCap.allocate( 2 );
 		DXCoil( 2 ).CompanionUpstreamDXCoil = 1;
 
 		DXCoilNumericFields.allocate( NumDXCoils );
 		DXCoilNumericFields( 2 ).PerfMode.allocate( 1 );
-		DXCoilNumericFields( 2 ).PerfMode( 1 ).FieldNames.allocate( 4 );
+		DXCoilNumericFields( 2 ).PerfMode( 1 ).FieldNames.allocate( 15 );
 		DXCoil( 2 ).DefrostStrategy = Resistive;
 		DXCoil( 2 ).DefrostCapacity = 5000.0;
 		DXCoil( 2 ).Name = "DX Heating coil";
@@ -374,7 +376,7 @@ namespace EnergyPlus {
 		DXCoilFanOpMode.allocate( NumDXCoils );
 		DXCoilPartLoadRatio.allocate( NumDXCoils );
 		DXCoilNumericFields( DXCoilNum ).PerfMode.allocate( 1 );
-		DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate( 4 );
+		DXCoilNumericFields( DXCoilNum ).PerfMode( 1 ).FieldNames.allocate( 15 );
 		Coil.DefrostStrategy = Resistive;
 		Coil.Name = "DX Heating coil";
 		Coil.NumOfSpeeds = 2;
@@ -637,14 +639,14 @@ namespace EnergyPlus {
 
 		// Defroster on
 		OutDryBulbTemp = -5.0; // cold
-		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
+		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0 );
 		Real64 COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue( nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF2, 1 ) );
 		Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_LT( COPwDefrost, COPwoDefrost );
 
 		// Defroster off
 		OutDryBulbTemp = 5.0; // not cold enough for defroster
-		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
+		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0 );
 		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue( nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF2, 1 ) );
 		COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_DOUBLE_EQ( COPwoDefrost, COPwDefrost );
@@ -654,14 +656,14 @@ namespace EnergyPlus {
 
 		// Defroster on
 		OutDryBulbTemp = -5.0; // cold
-		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
+		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0 );
 		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue( nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF1, 1 ) );
 		COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_LT( COPwDefrost, COPwoDefrost );
 
 		// Defroster off
 		OutDryBulbTemp = 5.0; // not cold enough for defroster
-		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
+		CalcMultiSpeedDXCoilHeating( DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0 );
 		COPwoDefrost = Coil.MSRatedCOP( SpeedNum ) / ( CurveValue( nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp ) * CurveValue( nEIRfFF1, 1 ) );
 		COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
 		EXPECT_DOUBLE_EQ( COPwoDefrost, COPwDefrost );
@@ -1234,7 +1236,7 @@ namespace EnergyPlus {
 		DXCoil( 1 ).MSRatedCBF( 1 ) = 0.1262;
 		DXCoil( 1 ).MSRatedCBF( 2 ) = 0.0408;
 
-		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1 );
+		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1, 0 );
 
 		EXPECT_EQ( 0, MSHPWasteHeat );
 
@@ -1243,7 +1245,7 @@ namespace EnergyPlus {
 		DXCoil( 1 ).MSWasteHeat( 2 ) = 0;
 		DXCoil( 1 ).MSHPHeatRecActive = true;
 
-		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1 );
+		CalcMultiSpeedDXCoilCooling( 1, 1, 1, 2, 1, 1, 0 );
 
 		EXPECT_NEAR( 1303.4304, MSHPWasteHeat, 0.001 );
 
