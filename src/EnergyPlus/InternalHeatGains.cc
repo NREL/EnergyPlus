@@ -87,7 +87,6 @@
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
 #include <InputProcessor.hh>
-#include <ManageElectricPower.hh>
 #include <MicroCHPElectricGenerator.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -104,6 +103,7 @@
 #include <NodeInputManager.hh>
 #include <CurveManager.hh>
 #include <DataHVACGlobals.hh>
+#include <ElectricPowerServiceManager.hh>
 
 namespace EnergyPlus {
 
@@ -3277,9 +3277,6 @@ namespace InternalHeatGains {
 		using WaterUse::CalcWaterUseZoneGains;
 		using FuelCellElectricGenerator::FigureFuelCellZoneGains;
 		using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
-		using ManageElectricPower::FigureInverterZoneGains;
-		using ManageElectricPower::FigureElectricalStorageZoneGains;
-		using ManageElectricPower::FigureTransformerZoneGains;
 		using DaylightingDevices::FigureTDDZoneGains;
 		using RefrigeratedCase::FigureRefrigerationZoneGains;
 		using OutputReportTabular::radiantPulseUsed;
@@ -3638,9 +3635,7 @@ namespace InternalHeatGains {
 		CalcWaterUseZoneGains();
 		FigureFuelCellZoneGains();
 		FigureMicroCHPZoneGains();
-		FigureInverterZoneGains();
-		FigureElectricalStorageZoneGains();
-		FigureTransformerZoneGains();
+		initializeElectricPowerServiceZoneGains();
 		FigureTDDZoneGains();
 		FigureRefrigerationZoneGains();
 

@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>EnergyPlus ReadMeFirst</title>
+<meta content="text/html; charset=iso-8859-1">
+<meta content="Microsoft FrontPage 4.0" name="GENERATOR">
+<style type="text/css">
+<!--
+ li.MsoNormal
+    {mso-style-parent:"";
+    margin-bottom:.0001pt;
+    font-size:12.0pt;
+    font-family:"Times New Roman";
+    margin-left:0in; margin-right:0in; margin-top:0in}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF">
+<h1 align="left"><b>Installing EnergyPlus</b></h1>
+<img align="right" alt="ep.gif (6134 bytes)" height="203" src="ep.gif" width="300"><br>
+<b>Version 8.4.0<br>
+30 September 2015<br></b>
+<h5 align="center"><i>EnergyPlus is a trademark of the US Department of Energy.</i></h5>
+<hr>
+<h2>EnergyPlus</h2>
+<p><b>What it is, What it is not</b></p>
+<p>EnergyPlus is a simulation program designed for modeling buildings with all their associated heating, cooling, lighting, ventilating, and other energy flows. EnergyPlus is a stand-alone simulation
+engine without a 'user friendly' graphical interface . . . EnergyPlus reads input and writes output as text files.</p>
+<p>Utilities and tools for creating, editing, and running input files that come with EnergyPlus include IDF Editor and EP-Launch. Many graphical user interfaces for EnergyPlus are available or under development.  For the latest tools, please see <a href="https://energyplus.net/interfaces">this EnergyPlus website for third party interfaces</a>.
+<p>A number of third-party tools are available to create EnergyPlus input files (IDF).  For the latest tools, please see <a href="https://energyplus.net/input-files">this EnergyPlus website for third party IDF creation tools</a>.  Some of these may produce out of date IDF files; you can then use the IDFVersionUpdater program to convert older files to current EnergyPlus version (you may need to use the Multiple Version Conversions set -- see below.</p>
+<h3>What's going on in V8.4?</h3>
+<p><i>Will there be any considerable difference between version 8.3 and 8.4?</i></p>
+<blockquote>
+<p class=MsoNormal>Yes.... and no.&nbsp; The basic structure of EnergyPlus is still as it has been but there are some significant changes that you will want to be aware of:</p>
+<p>As always, there are a number of new features and bug fixes. The highlights of features for this version are listed below&mdash;see <a href="https://github.com/NREL/EnergyPlus/releases/latest">EnergyPlus Features Page</a> for a complete list of new features added in this and previous versions:</p>
+<p></p>
+</blockquote>
+<p><i>How about IDF and IDD? Do they remain unchanged?</i></p>
+<blockquote>
+<p class=MsoNormal>There are a few key changes in the V8.4 IDD. For best results, use the transition program to transfer from the earlier V8.3 files. Use the IDFVersionUpdater program for best results.
+<p><i>Is version 8.4 backward compatible? Can I run v8.3 file in v8.4?</i></p>
+<blockquote>
+<p class=MsoNormal>There have been changes in the following objects which require conversion. Either read and follow the Rules spreadsheet or use the IDFVersionUpdater utility.  The "Rules" spreadsheet that contains information on exact object
+changes that you can do by hand.
+For the v8.4 release, the following objects require conversion (from V8.3):
+<li>Coil:WaterHeating:Airtowaterheatpump</li>
+<li>WaterHeater:Stratified</li>
+<li>WaterHeater:HeatPump</li>
+<li>EvaporativeCooler:Direct:ResearchSpecial</li>
+<li>Controller:MechanicalVentilation</li>
+<li>Site:GroundDomain:slab</li>
+<li>Site:GroundDomain:Basement</li>
+<li>PipingSystem:Underground:Domain</li>
+<li>Pipe:Underground</li>
+<li>GroundHeatExchanger:HorizontalTrench</li>
+<li>GroundHeatExchanger:Slinky</li>
+<li>ZoneAirMassFlowConservation</li>
+</blockquote>
+<p class=MsoNormal>There is also the "Rules" spreadsheet that contains information on exact object changes that you can do by hand - for best results, the included conversion (utility IDFVersionUpdater) program can be used.  The updater program is described more fully in the Auxiliary Programs document. The next section describes how to get the set of programs for multiple version conversions.</p>
+<p class=MsoNormal>In addition, as happens in every EnergyPlus release, there are new checks on user input. Even if your file ran in an earlier version, it may not run in the newer version after conversion due to newer checks on the validity of input.</p>
+</blockquote>
+<h3>Multiple Version Conversions</h3>
+<p>The install includes the IDFVersionUpdater program and the necessary programs to convert from the previous version (including .rvi and .mvi files) to the current version. For older versions, you will need to visit the helpdesk and download the multiple conversion set of programs. The HelpDesk downloads area: <a href="http://energyplus.helpserve.com/Knowledgebase/List/Index/46/converting-older-version-files">Converting Older Files</a> will contain the necessary readmes and zip/tar files of programs to convert IDFs from V1.0 to the current version.</p>
+<h3>Documentation</h3>
+<p>The EnergyPlus documentation is included in pdf form in the installer.  Big Ladder Software is also hosting html versions of the EnergyPlus Documentation <a href="http://bigladdersoftware.com/epx/docs/">online</a>
+<p>There are some other documents of interest available on the web site including:</p>
+<ul>
+<li>Testing and Validation Reports: <a href="https://energyplus.net/testing">EnergyPlus Testing and Validation Reports
+</a></li>
+</li>
+</ul>
+<h3>Weather Data</h3>
+<p>A small subset of weather files that are available on the web site are also installed in the WeatherData folder. EnergyPlus uses these files directly for annual simulations.&nbsp;The Weather
+Converter program that is part of EnergyPlus can read these weather files and provide .csv (comma separated variable) as well as statistics reports about the included (or other) files.&nbsp;
+<b>Weather data</b> for more than 2100 locations in more than 100 countries can be downloaded on the <a href="http://apps1.eere.energy.gov/buildings/energyplus/weatherdata_about.cfm">DOE EnergyPlus web site
+weather data page</a>.</p>
+<h3>Highlights of this release (V8.4.0)</h3>
+<p>The highlights &ndash; improved and new features &ndash; are displayed by category.</p>
+<blockquote>
+<h4>Core changes to EnergyPlus</h4>
+<ul>
+<li>Many new features were added, described below, see the installed changelog for a full list of changes</li>
+</ul>
+<h4>General</h4>
+<ul>
+<li>Bug fixes throughout.</li>
+</ul>
+<h4>New Features</h4>
+<ul>
+ <li>Residential Heat Pump Water Heater Improvements</li>
+ <li>New Variable Speed Heat Pump Water Heater Model</li>
+ <li>Update Life cycle costing data set files for 2013 and 2014</li>
+ <li>Add Fault Simulation for Dirty Air Filters</li>
+ <li>Add PlantEquipmentOperation:ThermalEnergyStorage controls</li>
+ <li>New VRF Heat Pump Model</li>
+ <li>Add Multiple Tower Support in Condenser Entering Temp Reset Setpoint Managers</li>
+ <li>Link Infiltration to HVAC Operation and Add Return Air Flow Controls</li>
+ <li>Four pipe beam air terminal</li>
+ <li>Improved Ground Temperature Models</li>
+</ul>
+<h4>Platforms</h4>
+<ul>
+<li>Windows 7 & 8</li>
+<li>Linux (Ubuntu 14.04 and compatible) 64 bit versions; (32-bit and RHEL-compatible versions may be available via Helpdesk)</li>
+<li>Mac OSX 10.9 64 bit versions</li>
+<li>EnergyPlus V8.4 has been tested on all of these platforms</li>
+<li><i>EnergyPlus does intensive computations, and based on configuration, can write massive amounts of data to disk.  For best performance, computers should have a substantial amount of memory and high speed hard drives.</i></li>
+</ul>
+<p>And many other enhancements throughout.</p>
+</blockquote>
+<h2>Installation contents</h2>
+<p>The installation creates a program folder with icons/shortcuts for the programs/files in EnergyPlus that can be accessed from Windows menus, including removing EnergyPlus from your
+system. In Windows OS, these will be available from the "Programs" area in the Start Menu. Note that only a few
+of the programs will store anything in your Windows\System directory (IDFEditor, EPLaunch, WeatherConverter).</p>
+<h2>Known problems</h2>
+<p>While every effort has been made to clean up all the &ldquo;defects&rdquo; that have occurred during our testing, quite a few known (and even more unknown) probably remain. Specifics on the
+remaining known problems can be found on the GitHub repository <a href="github.com/NREL/EnergyPlus/issues">issues page</a>. If you are interested in what has been addressed, the issues resolved in this release are
+installed similarly in the <a href="changelog.html">changelog</a>.</p>
+<h2>Thanks</h2>
+<p>Special thanks to our beta testers for this release.</p>
+<p>Thanks for downloading EnergyPlus. If you did not download the previous version, we welcome you. If you are a returning customer, we hope you find the latest release exceeding your expectations.</p>
+<p>We look forward to serving you!</p>
+<p><b>EnergyPlus Development, Testing, and Support Team</b></p>
+<p>Additional steps you may want to consider:</p>
+<ol>
+<li>Download additional <a href="http://apps1.eere.energy.gov/buildings/energyplus/weatherdata_about.cfm">Weather Data</a> for use in running example files or your files.&nbsp;<br>
+</li>
+<br>
+<li>The helpdesk (<a href="http://energyplus.helpserve.com">energyplus.helpserve.com</a>) is the primary support site.
+The helpdesk site requires a login via self-registration or via sending a problem/question to the email address. Go to the helpdesk site or send a support request to: email address of
+<a href="mailto:EnergyPlus-Support@gard.com">EnergyPlus-Support@gard.com</a>. In addition to having support tickets and responses from helpdesk personnel, there are knowledgebase articles, download area and news subscription or viewing.<br></li>
+<br>
+<li>Join the <b>EnergyPlus_Support email group</b> at YahooGroups:&nbsp;&nbsp;<br>
+We have established an email group to foster user-to-user discussion as well as maintain an archive of information for EnergyPlus users. The files area will allow for uploads of specific files though
+attachments to email are also allowed. &nbsp; The main page for the group is at: <a href=
+"http://groups.yahoo.com/group/EnergyPlus_Support">groups.yahoo.com/group/EnergyPlus_Support</a> .&nbsp; To subscribe, send an email message to: <a href=
+"mailto:EnergyPlus_Support-subscribe@yahoogroups.com">EnergyPlus_Support-subscribe@yahoogroups.com</a><br>
+&nbsp;</li>
+<li><b>BLDG-SIM<br></b> A free e-mail list for all building energy simulation program users to ask questions to other users. See <a href=
+"http://lists.onebuilding.org/listinfo.cgi/bldg-sim-onebuilding.org">lists.onebuilding.org/listinfo.cgi/bldg-sim-onebuilding.org</a>&nbsp; for information on joining this email list.<br>&nbsp;</li>
+<li><b>Open-Source License (or distribution license)<br></b> Licenses for the source code and distribution are available from the website: <a href="http://apps1.eere.energy.gov/buildings/energyplus/energyplus_licensing.cfm">Licensing Info</a></li>
+</ol>
+If you have any other questions, contact <a href="mailto:energyplus-support@gard.com">EnergyPlus Support</a>.<br>
+<p>Copyright &copy; 1996-2015 The Board of Trustees of the University of Illinois and The Regents of the University of California through Ernest Orlando Lawrence Berkeley National Laboratory. All
+rights reserved.</p>
+<p>Other Notices and Acknowledgments are found in the <a href="Documentation/Acknowledgments.pdf">Acknowledgments</a> document.</p>
+</body>
+</html>
