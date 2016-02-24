@@ -409,13 +409,6 @@ Table 81.  Nomenclature list for Fanger model
 <td>PPD</td>
 </tr>
 <tr>
-<td>P<sub>sk</sub></td>
-<td>Saturated water vapor pressure at required skin temperature</td>
-<td>Torr</td>
-<td>-</td>
-<td>SatSkinVapPress</td>
-</tr>
-<tr>
 <td>Q<sub>c</sub></td>
 <td>The rate of convective heat loss</td>
 <td>W/m<sup>2</sup></td>
@@ -470,13 +463,6 @@ Table 81.  Nomenclature list for Fanger model
 <td>°K</td>
 <td>-</td>
 <td>AbsRadTemp</td>
-</tr>
-<tr>
-<td>T<sub>skr</sub></td>
-<td>Skin temperature required to achieve thermal comfort</td>
-<td>°C</td>
-<td> </td>
-<td>SkinComfTemp</td>
 </tr>
 <tr>
 <td>W</td>
@@ -548,19 +534,7 @@ EvapHeatLossDiff = 0.00305\*(5733.0 - 6.99\*IntHeatProd - VapPress)
 
 EvapHeatLoss = EvapHeatLossRegComf + EvapHeatLossDiff
 
-Where,
-
-P<sub>sk</sub> is the saturated water vapor pressure at the skin temperature required to achieve the thermal comfort
-
-<span>\({P_{sk}} = 1.92{T_{skr}} - 25.3\)</span>                                                                Torr
-
-SatSkinVapPress = 1.92\*SkinTempComf - 25.3
-
-<span>\({T_{skr}} = 35.7 - 0.028H\)</span>                                                               °C
-
-SkinTempComf = 35.7 - 0.028\*IntHeatProd
-
-By determining the skin temperature and evaporative sweat rate that a thermally comfortable person would have in a given set of conditions, the model calculates the energy loss (L). Then, using the thermal sensation votes from subjects at KSU and Denmark, a Predicted Mean Vote (PMV) thermal sensation scale is based on how the energy loss (L) deviates from the metabolic rate (M) in the following form:
+The Fanger model was developed using the thermal sensation votes from subjects at KSU and Denmark, and the Predicted Mean Vote (PMV) thermal sensation scale is based on how the energy loss (L) deviates from the metabolic rate (M) in the following form:
 
 <div>$$PMV = (0.303{e^{ - 0.036M}} + 0.028)(H - L)$$</div>
 
