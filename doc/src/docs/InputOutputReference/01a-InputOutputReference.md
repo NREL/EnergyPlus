@@ -2876,7 +2876,8 @@ Site:GroundDomain:Slab,
     Yes,                !- Vertical Insulation (Yes/No)
     Slab Insulation,    !- Vertical Insulation Name
     2,                  !- Vertical perimeter insulation depth from surface
-    Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
+    Hourly;             !- Simulation Timestep</td>
+
 ```
 
 ### Site:GroundDomain:Slab Outputs
