@@ -2182,7 +2182,7 @@ namespace EnergyPlus {
 			SetupOutputVariable( "Inverter Thermal Loss Rate [W]", this->thermLossRate, "System", "Average", this->name );
 			SetupOutputVariable( "Inverter Thermal Loss Energy [J]", this->thermLossEnergy, "System", "Sum", this->name );
 			SetupOutputVariable( "Inverter Ancillary AC Electric Power [W]", this->ancillACuseRate, "System", "Average", this->name );
-			SetupOutputVariable( "Inverter Ancillary AC Electric Energy [J]", this->ancillACuseEnergy, "System", "Sum", this->name, _, "Electricity", "Cogeneration", _, "Plant" ); // called cogeneration for end use table
+			SetupOutputVariable( "Inverter Ancillary AC Electric Energy [J]", this->ancillACuseEnergy, "System", "Sum", this->name, _, "Electricity", "Cogeneration", "DCtoACInverter Ancillary", "Plant" ); // called cogeneration for end use table
 			if ( this->zoneNum > 0 ) {
 				switch (this->modelType )
 				{
@@ -2503,7 +2503,7 @@ namespace EnergyPlus {
 			SetupOutputVariable( "Converter Thermal Loss Rate [W]", this->thermLossRate, "System", "Average", this->name );
 			SetupOutputVariable( "Converter Thermal Loss Energy [J]", this->thermLossEnergy, "System", "Sum", this->name );
 			SetupOutputVariable( "Converter Ancillary AC Electric Power [W]", this->ancillACuseRate, "System", "Average", this->name );
-			SetupOutputVariable( "Converter Ancillary AC Electric Energy [J]", this->ancillACuseEnergy, "System", "Sum", this->name ,  _, "Electricity", "Cogeneration", _, "Plant" ); // called cogeneration for end use table
+			SetupOutputVariable( "Converter Ancillary AC Electric Energy [J]", this->ancillACuseEnergy, "System", "Sum", this->name ,  _, "Electricity", "Cogeneration", "ACtoDCConverter Ancillary", "Plant" ); // called cogeneration for end use table
 			if ( this->zoneNum > 0 ) {
 					SetupZoneInternalGain( this->zoneNum, "ElectricLoadCenter:Storage:Converter", this->name, DataHeatBalance::IntGainTypeOf_ElectricLoadCenterConverter, this->qdotConvZone, _, this->qdotRadZone );
 			}
@@ -3807,10 +3807,10 @@ namespace EnergyPlus {
 				SetupOutputVariable( "Transformer Distribution Electric Loss Energy [J]", this->elecUseMeteredUtilityLosses, "System", "Sum", this->name, _, "Electricity", "ExteriorEquipment", "Transformer", "System" );
 			}
 			if ( this->usageMode == TransformerUse::powerOutFromBldgToGrid ) { 
-				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", this->powerConversionMeteredLosses, "System", "Sum", this->name, _, "ElectricityProduced", "POWERCONVERSION", "Transformer", "System" );
+				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", this->powerConversionMeteredLosses, "System", "Sum", this->name, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );
 			}
-			if ( this->usageMode == TransformerUse::powerOutFromBldgToGrid ) {
-				SetupOutputVariable( "Transformer Conversion Electric Loss Energy [J]", this->powerConversionMeteredLosses, "System", "Sum", this->name, _, "ElectricityProduced", "POWERCONVERSION", "Transformer", "System" );
+			if ( this->usageMode == TransformerUse::powerBetweenLoadCenterAndBldg ) {
+				SetupOutputVariable( "Transformer Conversion Electric Loss Energy [J]", this->powerConversionMeteredLosses, "System", "Sum", this->name, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );
 			}
 
 
