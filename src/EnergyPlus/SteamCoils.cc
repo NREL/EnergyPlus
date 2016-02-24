@@ -747,10 +747,10 @@ namespace SteamCoils {
 						SizingString = "";
 						bPRINT = false;
 						TempSize = AutoSize;
-						RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+						RequestSizing( CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
 						DataDesInletAirTemp = TempSize;
 						TempSize = AutoSize;
-						RequestSizing( CompType, CompName, DesiccantRegCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+						RequestSizing( CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
 						DataDesOutletAirTemp = TempSize;
 						TempSize = AutoSize; // reset back
 					}
@@ -769,7 +769,10 @@ namespace SteamCoils {
 						DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					}}
 					if ( DataDesicRegCoil ) {
-						DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						bPRINT = false;
+						TempSize = AutoSize;
+						RequestSizing( CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName );
+						DesVolFlow = TempSize;
 					}
 					DesMassFlow = RhoAirStd * DesVolFlow;
 					// get the outside air fraction
@@ -2441,11 +2444,11 @@ namespace SteamCoils {
 	}
 
 	void
-	SetSteamCoilAsDesicRegenCoil(
-		std::string const & CoilType, // must match coil types in this module
-		std::string const & CoilName, // must match coil names for the coil type
-		int & DesiccantDehumIndex, // index of desiccant dehumidifier
-		bool & ErrorsFound // set to true if problem
+	SetSteamCoilData(
+		int const CoilNum, // Number of hot water heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
 		) {
 
 		// FUNCTION INFORMATION:
@@ -2455,8 +2458,8 @@ namespace SteamCoils {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// This function looks up the given coil and registers the coil as desiccant regeneration air heating coil.
-		// If incorrect coil type or name is given, ErrorsFound is returned as true
+		// This function sets data to water Heating Coil using the coil index and arguments passed
+		// If incorrect coil index is passed, ErrorsFound is returned as true
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -2465,8 +2468,7 @@ namespace SteamCoils {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+		using General::TrimSigDigits;
 
 		// Return value
 		// na
@@ -2484,26 +2486,27 @@ namespace SteamCoils {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int WhichCoil;
+		// na
 
+		// Obtains and Allocates water coil parameters from input file
 		// Obtains and Allocates SteamCoil related parameters from input file
 		if ( GetSteamCoilsInputFlag ) { //First time subroutine has been entered
 			GetSteamCoilInput();
 			GetSteamCoilsInputFlag = false;
 		}
 
-		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil );
-			if ( WhichCoil != 0 ) {
-				SteamCoil( WhichCoil ).DesiccantRegenerationCoil = true;
-				SteamCoil( WhichCoil ).DesiccantDehumNum = DesiccantDehumIndex;
-			}
+		if ( CoilNum <= 0 || CoilNum > NumSteamCoils ) {
+			ShowSevereError( "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits( CoilNum ) + " should be >0 and <" + TrimSigDigits( NumSteamCoils ) );
+				ErrorsFound = true;
+				return;
 		}
 
-		if ( WhichCoil == 0 ) {
-			ShowSevereError( "SetSteamCoilAsDesicRegenCoil: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
-			ErrorsFound = true;
+		if ( present( DesiccantRegenerationCoil ) ) {
+				SteamCoil( CoilNum ).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
+		}
+
+		if ( present( DesiccantDehumIndex ) ) {
+				SteamCoil( CoilNum ).DesiccantDehumNum = DesiccantDehumIndex;
 		}
 
 	}

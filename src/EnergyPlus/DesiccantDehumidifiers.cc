@@ -196,8 +196,8 @@ namespace DesiccantDehumidifiers {
 		// These are purposefully not in the header file as an extern variable. No one outside of this should
 		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-		static bool GetInputDesiccantDehumidifier( true ); // First time, input is "gotten"
-		static bool InitDesiccantDehumidifierOneTimeFlag( true );
+		bool GetInputDesiccantDehumidifier( true ); // First time, input is "gotten"
+		bool InitDesiccantDehumidifierOneTimeFlag( true );
 	}
 
 	// Name Public routines, optionally name Private routines within this module
@@ -362,8 +362,8 @@ namespace DesiccantDehumidifiers {
 		using SteamCoils::GetSteamCoilControlNodeNum;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
-		using WaterCoils::SetHWCoilAsDesicRegenCoil;
-		using SteamCoils::SetSteamCoilAsDesicRegenCoil;
+		using WaterCoils::SetWaterCoilData;
+		using SteamCoils::SetSteamCoilData;
 		using namespace DataIPShortCuts;
 
 		// Locals
@@ -421,6 +421,7 @@ namespace DesiccantDehumidifiers {
 		std::string RegenCoilName; // Regen heating coil name
 		static Real64 SteamDensity( 0.0 ); // density of steam at 100C
 		int SteamIndex; // steam coil Index
+		bool RegairHeatingCoilFlag( false ); // local error flag
 
 		NumSolidDesicDehums = GetNumObjectsFound( dehumidifierDesiccantNoFans );
 		NumGenericDesicDehums = GetNumObjectsFound( "Dehumidifier:Desiccant:System" );
@@ -929,7 +930,8 @@ namespace DesiccantDehumidifiers {
 						ErrorsFoundGeneric = true;
 					}
 
-					SetHeatingCoilAsDesicRegenCoil( RegenCoilType, RegenCoilName, DesicDehumNum, ErrorsFound2 );
+					RegairHeatingCoilFlag = true;
+					SetHeatingCoilData( DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorsFound2, RegairHeatingCoilFlag, DesicDehumNum );
 					if ( ErrorsFound2 ) {
 						ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 						ErrorsFoundGeneric = true;
@@ -990,7 +992,8 @@ namespace DesiccantDehumidifiers {
 							ErrorsFound = true;
 						}
 
-						SetHWCoilAsDesicRegenCoil( RegenCoilType, RegenCoilName, DesicDehumNum, ErrorsFound2 );
+						RegairHeatingCoilFlag = true;
+						SetWaterCoilData( DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorsFound2, RegairHeatingCoilFlag, DesicDehumNum );
 						if ( ErrorsFound2 ) {
 							ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 							ErrorsFoundGeneric = true;
@@ -1072,7 +1075,8 @@ namespace DesiccantDehumidifiers {
 						ErrorsFoundGeneric = true;
 					}
 
-					SetSteamCoilAsDesicRegenCoil( RegenCoilType, RegenCoilName, DesicDehumNum, ErrorsFound2 );
+					RegairHeatingCoilFlag = true;
+					SetSteamCoilData( DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorsFound2, RegairHeatingCoilFlag, DesicDehumNum );
 					if ( ErrorsFound2 ) {
 						ShowContinueError( "...occurs in " + DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 						ErrorsFoundGeneric = true;

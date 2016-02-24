@@ -80,7 +80,6 @@ namespace DirectAirManager {
 	//MODULE VARIABLE DECLARATIONS:
 	extern int NumDirectAir;
 	extern Array1D_bool CheckEquipName;
-	extern bool GetDirectAirInputFlag;
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
 	// Types

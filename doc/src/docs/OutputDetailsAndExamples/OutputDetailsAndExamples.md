@@ -3726,6 +3726,8 @@ Component sizing is applicable to all manners of autosized components and equipm
 
  Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design Outlet Air Humidity Ratio, 8.00000E-003
 
+ Component Sizing Information, Coil:Cooling:DX:TwoStageWithHumidityControlMode, ACDXCOIL 2:ACDXCOIL 2 STANDARD MODE-STAGE 1, Rated Air Flow Rate [m3/s], 2.04925
+
  Component Sizing Information, Coil:Heating:Water, MAIN HEATING COIL 1, Maximum Water Flow Rate [m3/s], 7.51969E-005
 
  Component Sizing Information, Coil:Heating:Water, MAIN HEATING COIL 1, Design Coil Load [W], 3457.55329
@@ -12864,7 +12866,7 @@ SizingPeriod:DesignDay
 
 ### Object Count Summary
 
-This report provides the count on the number of specific objects in the file. Directly following is an example of the report. The key used to obtain this report is ObjectCountSummary.
+The object count summary report provides the count on the number of specific objects in the file. Directly following is an example of the report. The key used to obtain this report is ObjectCountSummary.
 
 Report: Object Count Summary
 
@@ -12990,6 +12992,739 @@ HVAC
 <tr>
 <td>Return Plenums</td>
 <td>1</td>
+</tr>
+</table>
+
+
+
+### Component Cost Economics Summary
+
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. Directly following is an example of this report.
+
+Report: Component Cost Economics Summary
+
+For: Entire Facility
+
+Timestamp: 2016-01-12 15:47:39
+
+Construction Cost Estimate Summary
+
+<table class="table table-striped">
+  <tr>
+    <th></th>
+    <th>Reference Bldg.</th>
+    <th>Current Bldg. Model</th>
+    <th>Difference</th>
+  </tr>
+  <tr>
+    <td>Line Item SubTotal ($)</td>
+    <td>665082.04</td>
+    <td>719946.72</td>
+    <td>54864.68</td>
+  </tr>
+  <tr>
+    <td>Misc. Costs ($)</td>
+    <td>928979.09</td>
+    <td>928979.09</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>Regional Adjustment ($)</td>
+    <td>216792.31</td>
+    <td>224253.91</td>
+    <td>7461.6</td>
+  </tr>
+  <tr>
+    <td>Design Fee ($)</td>
+    <td>108651.21</td>
+    <td>149854.38</td>
+    <td>41203.17</td>
+  </tr>
+  <tr>
+    <td>Contractor Fee ($)</td>
+    <td>126759.74</td>
+    <td>131122.58</td>
+    <td>4362.84</td>
+  </tr>
+  <tr>
+    <td>Contingency ($)</td>
+    <td>181085.34</td>
+    <td>187317.97</td>
+    <td>6232.63</td>
+  </tr>
+  <tr>
+    <td>Permits, Bonds, Insurance ($)</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>Commissioning ($)</td>
+    <td>9054.27</td>
+    <td>18731.8</td>
+    <td>9677.53</td>
+  </tr>
+  <tr>
+    <td>Cost Estimate Total ($)</td>
+    <td>2236404</td>
+    <td>2360206.45</td>
+    <td>123802.44</td>
+  </tr>
+  <tr>
+    <td>Cost Per Conditioned Building Area ($/m2)</td>
+    <td>1203.69</td>
+    <td>1270.32</td>
+    <td>66.63</td>
+  </tr>
+</table>
+
+
+
+Cost Line Item Details
+
+<table class="table table-striped">
+  <tr>
+    <th></th>
+    <th>Line No.</th>
+    <th>Item Name</th>
+    <th>Quantity.</th>
+    <th>Units</th>
+    <th>$ per Qty.</th>
+    <th>SubTotal $</th>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>1</td>
+    <td>EXTERIOR WALLS</td>
+    <td>627.57</td>
+    <td>m2</td>
+    <td>168.64</td>
+    <td>105832.65</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>2</td>
+    <td>INTERIOR WALLS</td>
+    <td>854.18</td>
+    <td>m2</td>
+    <td>31.16</td>
+    <td>26616.23</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>3</td>
+    <td>ROOF</td>
+    <td>1857.96</td>
+    <td>m2</td>
+    <td>104.69</td>
+    <td>194509.64</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>4</td>
+    <td>GROUND FLR SLAB</td>
+    <td>1857.96</td>
+    <td>m2</td>
+    <td>56.06</td>
+    <td>104157.14</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>5</td>
+    <td>ACOUSTICAL DROP CEILINGS</td>
+    <td>1857.96</td>
+    <td>m2</td>
+    <td>23.79</td>
+    <td>44200.83</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>6</td>
+    <td>QUAD HIGH SHGC SUPERWINDOWS</td>
+    <td>226.22</td>
+    <td>m2</td>
+    <td>687.84</td>
+    <td>155604.96</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>7</td>
+    <td>QUAD LOW SHGC SUPERWINDOWS</td>
+    <td>42.68</td>
+    <td>m2</td>
+    <td>687.84</td>
+    <td>29359.55</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>8</td>
+    <td>CENTRAL CHILLER</td>
+    <td>150.49</td>
+    <td>kW (tot cool cap.)</td>
+    <td>340</td>
+    <td>51165.73</td>
+  </tr>
+  <tr>
+    <td>--</td>
+    <td>9</td>
+    <td>CONTINUOUS AIR BARRIER</td>
+    <td>1</td>
+    <td>Ea.</td>
+    <td>8500</td>
+    <td>8500</td>
+  </tr>
+  <tr>
+    <td>Line Item SubTotal</td>
+    <td>--</td>
+    <td>--</td>
+    <td>--</td>
+    <td>--</td>
+    <td>--</td>
+    <td>719946.72</td>
+  </tr>
+</table>
+
+
+
+###LEED Summary
+
+The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System™. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
+
+Report: LEED Summary
+
+For: Entire Facility
+
+Timestamp: 2013-03-01 15:24:37
+
+Sec1.1A-General Information
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Data</th>
+</tr>
+<tr>
+<td>Heating Degree Days</td>
+<td>1748</td>
+</tr>
+<tr>
+<td>Cooling Degree Days</td>
+<td>506</td>
+</tr>
+<tr>
+<td>Climate Zone</td>
+<td>5A</td>
+</tr>
+<tr>
+<td>Weather File</td>
+<td>Chicago Ohare Intl Ap IL USA TMY3 WMO#=725300</td>
+</tr>
+<tr>
+<td>HDD and CDD data source</td>
+<td>Weather File Stat</td>
+</tr>
+<tr>
+<td>Total gross floor area [m2]</td>
+<td>927.20</td>
+</tr>
+<tr>
+<td>Principal Heating Source</td>
+<td>Natural Gas</td>
+</tr>
+</table>
+
+
+
+ EAp2-1. Space Usage Type
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Space Area [m2]</th>
+<th>Regularly Occupied Area [m2]</th>
+<th>Unconditioned Area [m2]</th>
+<th>Typical Hours/Week in Operation [hr/wk]</th>
+</tr>
+<tr>
+<td>SPACE1-1</td>
+<td>99.16</td>
+<td>99.16</td>
+<td>0.00</td>
+<td>55.06</td>
+</tr>
+<tr>
+<td>SPACE2-1</td>
+<td>42.73</td>
+<td>42.73</td>
+<td>0.00</td>
+<td>55.06</td>
+</tr>
+<tr>
+<td>SPACE3-1</td>
+<td>96.48</td>
+<td>96.48</td>
+<td>0.00</td>
+<td>55.06</td>
+</tr>
+<tr>
+<td>SPACE4-1</td>
+<td>42.73</td>
+<td>42.73</td>
+<td>0.00</td>
+<td>55.06</td>
+</tr>
+<tr>
+<td>SPACE5-1</td>
+<td>182.49</td>
+<td>182.49</td>
+<td>0.00</td>
+<td>55.06</td>
+</tr>
+<tr>
+<td>PLENUM-1</td>
+<td>463.60</td>
+<td>463.60</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Totals</td>
+<td>927.20</td>
+<td>927.20</td>
+<td>0.00</td>
+<td> </td>
+</tr>
+</table>
+
+
+
+ EAp2-2. Advisory Messages
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Data</th>
+</tr>
+<tr>
+<td>Number of hours heating loads not met</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Number of hours cooling loads not met</td>
+<td>10.75</td>
+</tr>
+<tr>
+<td>Number of hours not met</td>
+<td>10.75</td>
+</tr>
+</table>
+
+
+
+ EAp2-3. Energy Type Summary
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Utility Rate</th>
+<th>Virtual Rate [$/unit energy]</th>
+<th>Units of Energy</th>
+<th>Units of Demand</th>
+</tr>
+<tr>
+<td>Electricity</td>
+<td>EXAMPLEA EXAMPLEI-SELL</td>
+<td>0.055</td>
+<td>kWh</td>
+<td>kW</td>
+</tr>
+<tr>
+<td>Natural Gas</td>
+<td>EXAMPLEA-GAS</td>
+<td>0.569</td>
+<td>Therm</td>
+<td>Therm/Hr</td>
+</tr>
+<tr>
+<td>Other</td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td> </td>
+</tr>
+</table>
+
+
+
+ EAp2-4/5. Performance Rating Method Compliance
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Electric Energy Use [GJ]</th>
+<th>Electric Demand [W]</th>
+<th>Natural Gas Energy Use [GJ]</th>
+<th>Natural Gas Demand [W]</th>
+<th>Other Energy Use [GJ]</th>
+<th>Other Demand [W]</th>
+</tr>
+<tr>
+<td>Interior Lighting</td>
+<td>81.24</td>
+<td>7125.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Exterior Lighting</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Space Heating</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>103.92</td>
+<td>62499.99</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Space Cooling</td>
+<td>17.63</td>
+<td>9523.66</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Pumps</td>
+<td>1.54</td>
+<td>319.57</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Heat Rejection</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Fans-Interior</td>
+<td>7.01</td>
+<td>609.44</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Fans-Parking Garage</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Service Water Heating</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Receptacle Equipment</td>
+<td>47.70</td>
+<td>4500.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Interior Lighting (process)</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Refrigeration Equipment</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Cooking</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Industrial Process</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Elevators and Escalators</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Total Line</td>
+<td>155.12</td>
+<td> </td>
+<td>274.01</td>
+<td> </td>
+<td>0.00</td>
+<td> </td>
+</tr>
+</table>
+
+
+
+ EAp2-6. Energy Use Summary
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Process Subtotal [GJ]</th>
+<th>Total Energy Use [GJ]</th>
+</tr>
+<tr>
+<td>Electricity</td>
+<td>47.70</td>
+<td>155.12</td>
+</tr>
+<tr>
+<td>Natural Gas</td>
+<td>0.00</td>
+<td>274.01</td>
+</tr>
+<tr>
+<td>Other</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>47.70</td>
+<td>429.13</td>
+</tr>
+</table>
+
+
+
+ EAp2-7. Energy Cost Summary
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Process Subtotal [$]</th>
+<th>Total Energy Cost [$]</th>
+</tr>
+<tr>
+<td>Electricity</td>
+<td>552.55</td>
+<td>1796.99</td>
+</tr>
+<tr>
+<td>Natural Gas</td>
+<td>0.00</td>
+<td>1478.58</td>
+</tr>
+<tr>
+<td>Other</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>552.55</td>
+<td>3275.57</td>
+</tr>
+</table>
+
+Process energy cost based on ratio of process to total energy.
+
+ L-1. Renewable Energy Source Summary
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Rated Capacity [kW]</th>
+<th>Annual Energy Generated [GJ]</th>
+</tr>
+<tr>
+<td>Photovoltaic</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Wind</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+</table>
+
+
+
+ EAp2-17a. Energy Use Intensity - Electricity
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Electricty [MJ/m2]</th>
+</tr>
+<tr>
+<td>Interior Lighting</td>
+<td>87.62</td>
+</tr>
+<tr>
+<td>Space Heating</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Space Cooling</td>
+<td>19.02</td>
+</tr>
+<tr>
+<td>Fans-Interior</td>
+<td>7.56</td>
+</tr>
+<tr>
+<td>Service Water Heating</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Receptacle Equipment</td>
+<td>51.44</td>
+</tr>
+<tr>
+<td>Miscellaneous</td>
+<td>1.66</td>
+</tr>
+<tr>
+<td>Subtotal</td>
+<td>167.30</td>
+</tr>
+</table>
+
+
+
+ EAp2-17b. Energy Use Intensity - Natural Gas
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Natural Gas [MJ/m2]</th>
+</tr>
+<tr>
+<td>Space Heating</td>
+<td>112.08</td>
+</tr>
+<tr>
+<td>Service Water Heating</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Miscellaneous</td>
+<td>183.45</td>
+</tr>
+<tr>
+<td>Subtotal</td>
+<td>295.53</td>
+</tr>
+</table>
+
+
+
+ EAp2-17c. Energy Use Intensity - Other
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Other [MJ/m2]</th>
+</tr>
+<tr>
+<td>Miscellaneous</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Subtotal</td>
+<td>0.00</td>
+</tr>
+</table>
+
+
+
+ EAp2-18. End Use Percentage
+
+<table class="table table-striped">
+<tr>
+<th></th>
+<th>Percent [%]</th>
+</tr>
+<tr>
+<td>Interior Lighting</td>
+<td>18.93</td>
+</tr>
+<tr>
+<td>Space Heating</td>
+<td>24.22</td>
+</tr>
+<tr>
+<td>Space Cooling</td>
+<td>4.11</td>
+</tr>
+<tr>
+<td>Fans-Interior</td>
+<td>1.63</td>
+</tr>
+<tr>
+<td>Service Water Heating</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Receptacle Equipment</td>
+<td>11.11</td>
+</tr>
+<tr>
+<td>Miscellaneous</td>
+<td>39.99</td>
 </tr>
 </table>
 

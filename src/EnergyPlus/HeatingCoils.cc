@@ -1194,10 +1194,10 @@ namespace HeatingCoils {
 				bPRINT = false;
 				DataDesicDehumNum = HeatingCoil( CoilNum ).DesiccantDehumNum;
 				TempSize = AutoSize;
-				RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+				RequestSizing( CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
 				DataDesInletAirTemp = TempSize;
 				TempSize = AutoSize;
-				RequestSizing( CompType, CompName, DesiccantRegCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+				RequestSizing( CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
 				DataDesOutletAirTemp = TempSize;
 				DataDesicDehumNum = 0;
 				DataDesicRegCoil = true;
@@ -3341,11 +3341,11 @@ namespace HeatingCoils {
 	}
 
 	void
-	SetHeatingCoilAsDesicRegenCoil(
-		std::string const & CoilType, // must match coil types in this module
-		std::string const & CoilName, // must match coil names for the coil type
-		int & DesiccantDehumIndex, // index of desiccant dehumidifier
-		bool & ErrorsFound // set to true if problem
+	SetHeatingCoilData(
+		int const CoilNum, // Number of electric or gas heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
 		) {
 
 		// FUNCTION INFORMATION:
@@ -3355,8 +3355,8 @@ namespace HeatingCoils {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// This function looks up the given coil and registers the coil as desiccant regeneration air heating coil.
-		// If incorrect coil type or name is given, ErrorsFound is returned as true
+		// This function sets data to Heating Coil using the coil index and arguments passed
+		// If incorrect coil index is passed, ErrorsFound is returned as true
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -3365,7 +3365,7 @@ namespace HeatingCoils {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
+		using General::TrimSigDigits;
 
 		// Return value
 		// na
@@ -3383,8 +3383,7 @@ namespace HeatingCoils {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int WhichCoil;
-		int FoundType; // Integer equivalent of coil type
+		// na
 
 		// Obtains and Allocates HeatingCoil related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
@@ -3392,22 +3391,22 @@ namespace HeatingCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = 0;
-		FoundType = FindItem( CoilType, cAllCoilTypes, NumAllCoilTypes );
-		if ( FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingGas || FoundType == Coil_HeatingDesuperheater ) {
-			WhichCoil = FindItem( CoilName, HeatingCoil );
-			if ( WhichCoil != 0 ) {
-				HeatingCoil( WhichCoil ).DesiccantRegenerationCoil = true;
-				HeatingCoil( WhichCoil ).DesiccantDehumNum = DesiccantDehumIndex;
-			}
+		if ( CoilNum <= 0 || CoilNum > NumHeatingCoils ) {
+			ShowSevereError( "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits( CoilNum ) + " should be >0 and <" + TrimSigDigits( NumHeatingCoils ) );
+			ErrorsFound = true;
+			return;
 		}
 
-		if ( WhichCoil == 0 ) {
-			ShowSevereError( "SetHeatingCoilAsDesicRegenCoil: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
-			ErrorsFound = true;
+		if ( present( DesiccantRegenerationCoil ) ) {
+			HeatingCoil( CoilNum ).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
+		}
+
+		if ( present( DesiccantDehumIndex ) ) {
+			HeatingCoil( CoilNum ).DesiccantDehumNum = DesiccantDehumIndex;
 		}
 
 	}
+
 	//        End of Utility subroutines for the HeatingCoil Module
 
 } // HeatingCoils

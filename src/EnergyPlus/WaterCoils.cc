@@ -2018,10 +2018,10 @@ namespace WaterCoils {
 					DataDesicRegCoil = true;
 					DataDesicDehumNum = WaterCoil( CoilNum ).DesiccantDehumNum;
 					TempSize = AutoSize;
-					RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+					RequestSizing( CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
 					DataDesInletAirTemp = TempSize;
 					TempSize = AutoSize;
-					RequestSizing( CompType, CompName, DesiccantRegCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+					RequestSizing( CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
 					DataDesOutletAirTemp = TempSize;
 					TempSize = AutoSize; // reset back
 				}
@@ -2070,10 +2070,10 @@ namespace WaterCoils {
 
 				if ( WaterCoil( CoilNum ).DesiccantRegenerationCoil ) {
 					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-					RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
+					RequestSizing( CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
 					WaterCoil( CoilNum ).InletAirTemp = TempSize;
 					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-					RequestSizing( CompType, CompName, DesiccantRegCoilDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName );
+					RequestSizing( CompType, CompName, HeatingCoilDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName );
 					WaterCoil( CoilNum ).InletAirHumRat = TempSize;
 					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
 					RequestSizing( CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName );
@@ -6167,11 +6167,11 @@ Label10: ;
 	}
 
 	void
-	SetHWCoilAsDesicRegenCoil(
-		std::string const & CoilType, // must match coil types in this module
-		std::string const & CoilName, // must match coil names for the coil type
-		int & DesiccantDehumIndex, // index of desiccant dehumidifier
-		bool & ErrorsFound // set to true if problem
+	SetWaterCoilData(
+		int const CoilNum, // Number of hot water heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
 		) {
 
 		// FUNCTION INFORMATION:
@@ -6181,8 +6181,8 @@ Label10: ;
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		//  This function looks up the given coil and registers the coil as desiccant regeneration air heating coil.
-		// If incorrect coil type or name is given, ErrorsFound is returned as true
+		// This function sets data to water Heating Coil using the coil index and arguments passed
+		// If incorrect coil index is passed, ErrorsFound is returned as true
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -6191,8 +6191,7 @@ Label10: ;
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
+		using General::TrimSigDigits;
 
 		// Return value
 		// na
@@ -6210,26 +6209,26 @@ Label10: ;
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int WhichCoil;
+		// na
 
-		// Obtains and Allocates HeatingCoil related parameters from input file
+		// Obtains and Allocates water coil parameters from input file
 		if ( GetWaterCoilsInputFlag ) {
 			GetWaterCoilInput();
 			GetWaterCoilsInputFlag = false;
 		}
 
-		WhichCoil = 0;
-		if ( SameString( CoilType, "Coil:Heating:Water" ) ) {
-			WhichCoil = FindItem( CoilName, WaterCoil );
-			if ( WhichCoil != 0 ) {
-				WaterCoil( WhichCoil ).DesiccantRegenerationCoil = true;
-				WaterCoil( WhichCoil ).DesiccantDehumNum = DesiccantDehumIndex;
-			}
+		if ( CoilNum <= 0 || CoilNum > NumWaterCoils ) {
+			ShowSevereError( "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits( CoilNum ) + " should be >0 and <" + TrimSigDigits( NumWaterCoils ) );
+			ErrorsFound = true;
+			return;
 		}
 
-		if ( WhichCoil == 0 ) {
-			ShowSevereError( "SetHWCoilAsDesicRegenCoil: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
-			ErrorsFound = true;
+		if ( present( DesiccantRegenerationCoil ) ) {
+			WaterCoil( CoilNum ).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
+		}
+
+		if ( present( DesiccantDehumIndex ) ) {
+			WaterCoil( CoilNum ).DesiccantDehumNum = DesiccantDehumIndex;
 		}
 
 	}

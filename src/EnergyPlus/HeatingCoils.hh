@@ -430,15 +430,16 @@ namespace HeatingCoils {
 	void
 	clear_state();
 
-	// register that a coil is used as a regeneration air heating coil in
+	// sets data to a coil that is used as a regeneration air heating coil in
 	// desiccant dehumidification system
 	void
-	SetHeatingCoilAsDesicRegenCoil(
-		std::string const & CoilType, // must match coil types in this module
-		std::string const & CoilName, // must match coil names for the coil type
-		int & DesiccantDehumIndex, // index of desiccant dehumidifier
-		bool & ErrorsFound // set to true if problem
+	SetHeatingCoilData(
+		int const CoilNum, // Number of electric or gas heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex = _ // Index for the desiccant dehum system where this caoil is used 
 	);
+
 	//        End of Utility subroutines for the HeatingCoil Module
 
 } // HeatingCoils
