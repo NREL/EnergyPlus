@@ -64,6 +64,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
@@ -94,7 +95,6 @@ namespace DataPlantPipingSystems {
 	extern int const PartitionType_HorizInsZSide;
 	extern int const PartitionType_VertInsLowerEdge;
 
-
 	extern int const RegionType_Pipe;
 	extern int const RegionType_BasementWall;
 	extern int const RegionType_BasementFloor;
@@ -113,6 +113,7 @@ namespace DataPlantPipingSystems {
 
 	extern int const MeshDistribution_Uniform;
 	extern int const MeshDistribution_SymmetricGeometric;
+	extern int const MeshDistribution_Geometric;
 
 	extern int const SegmentFlow_IncreasingZ;
 	extern int const SegmentFlow_DecreasingZ;
@@ -137,6 +138,7 @@ namespace DataPlantPipingSystems {
 	extern int const CellType_Slab;
 	extern int const CellType_HorizInsulation;
 	extern int const CellType_VertInsulation;
+	extern int const CellType_SlabOnGradeEdgeInsu;
 	extern int const CellType_ZoneGroundInterface;
 	extern int const CellType_BasementWallInsu;
 	extern int const CellType_BasementFloorInsu;
@@ -885,6 +887,7 @@ namespace DataPlantPipingSystems {
 		Real64 Density;
 		Real64 InsulationConductivity;
 		Real64 InsulationDensity;
+		int Zone;
 
 		// Default Constructor
 		ZoneCoupledSurfaceData() :
@@ -896,8 +899,8 @@ namespace DataPlantPipingSystems {
 			Conductivity( 0.0 ),
 			Density( 0.0 ),
 			InsulationConductivity( 0.0 ),
-			InsulationDensity( 0.0 )
-
+			InsulationDensity( 0.0 ),
+			Zone( 0 )
 		{}
 
 	};
@@ -982,6 +985,9 @@ namespace DataPlantPipingSystems {
 		int NumDomainCells;
 		int NumGroundSurfCells;
 		int NumInsulationCells;
+		int NumSlabCells;
+		Array2D< Real64 > WeightingFactor;
+		Array2D< Real64 > WeightedHeatFlux;
 
 		// Main 3D cells array
 		Array3D< CartesianCell > Cells;
@@ -1040,8 +1046,8 @@ namespace DataPlantPipingSystems {
 			BasementFloorTemp( 0.0 ),
 			NumDomainCells ( 0 ),
 			NumGroundSurfCells( 0 ),
-			NumInsulationCells( 0 )
-
+			NumInsulationCells( 0 ),
+			NumSlabCells( 0 )
 		{}
 
 	};

@@ -126,6 +126,7 @@ namespace DataPlantPipingSystems {
 
 	int const MeshDistribution_Uniform( -1 );
 	int const MeshDistribution_SymmetricGeometric( -2 );
+	int const MeshDistribution_Geometric( -3 );
 
 	int const SegmentFlow_IncreasingZ( -1 );
 	int const SegmentFlow_DecreasingZ( -2 );
@@ -153,6 +154,7 @@ namespace DataPlantPipingSystems {
 	int const CellType_ZoneGroundInterface( -14 );
 	int const CellType_BasementWallInsu( -15 );
 	int const CellType_BasementFloorInsu( -16 );
+	int const CellType_SlabOnGradeEdgeInsu( -17 );
 
 	// DERIVED TYPE DEFINITIONS:
 

@@ -811,7 +811,8 @@ namespace PlantPipingSystemsManager {
 	int
 	GetCellWidthsCount(
 		int const DomainNum,
-		int const dir // From Enum: RegionType
+		int const dir, // From Enum: RegionType
+		int const n
 	);
 
 	//*********************************************************************************************!
