@@ -285,6 +285,7 @@ namespace SurfaceGeometry {
 		bool nonInternalMassSurfacesPresent;
 		bool DetailedWWR;
 
+
 		// Formats
 		static gio::Fmt Format_720( "(' Zone Information, ',A,28(',',A))" );
 		static gio::Fmt Format_721( "('! <Zone Information>,Zone Name,North Axis {deg},','Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},','Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},','Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},','Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},','Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},','Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST},',' Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2},',' Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces, ',' Part of Total Building Area')" );
@@ -667,6 +668,7 @@ namespace SurfaceGeometry {
 
 		// Do the Stratosphere check
 		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
 
 		//  IF (ALLOCATED(ZoneSurfacesCount)) DEALLOCATE(ZoneSurfacesCount)
 		//  IF (ALLOCATED(ZoneSubSurfacesCount)) DEALLOCATE(ZoneSubSurfacesCount)
@@ -1929,6 +1931,14 @@ namespace SurfaceGeometry {
 			ShowFatalError( RoutineName + "Errors discovered, program terminates." );
 		}
 
+		int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection;
+		int NumDElightControls = GetNumObjectsFound( "Daylighting:DElight:Controls" );
+		int NumDElightRefPt = GetNumObjectsFound( "Daylighting:DElight:ReferencePoint" );
+		int NumDElightCmplxFen = GetNumObjectsFound( "Daylighting:DElight:ComplexFenestration" );
+		int TotDElightObj = NumDElightControls + NumDElightRefPt + NumDElightCmplxFen;
+		if ( TotShadSurf > 0 && TotDElightObj > 0 ){
+			ShowWarningError( RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored." );
+		}
 	}
 
 	void
@@ -10488,9 +10498,9 @@ namespace SurfaceGeometry {
 						//          CALL ShowContinueError('...theta angle=['//TRIM(RoundSigDigits(Theta,6))//']')
 						//          CALL ShowContinueError('...last theta angle=['//TRIM(RoundSigDigits(LastTheta,6))//']')
 					}
-					SurfaceTmp( SurfNum ).IsConvex = false;
-					break;
 				}
+				SurfaceTmp( SurfNum ).IsConvex = false;
+				break;
 			}
 			PrevSignFlag = SignFlag;
 			LastTheta = Theta;

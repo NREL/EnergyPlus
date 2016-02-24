@@ -1,4 +1,4 @@
-<!--RemoveStart-->
+﻿<!--RemoveStart-->
 Simulation Models – Encyclopedic Reference 
 ==========================================
 
@@ -4537,19 +4537,19 @@ There are two water-water heat pump models available in EnergyPlus which are **p
 
 ### Equation Fit Water To Water Heat Pump Model
 
-This section describes the equation-fit model for water-to-water heat pump.   (Object names: HeatPump:WaterToWater:EquationFit:Cooling & HeatPump:WaterToWater:EquationFit:Heating). This documentation is derived from the M.S. dissertation of Tang (2005) which is available on the Oklahoma State University web site . The model uses four non-dimensional equations or curves to predict the heat pump performance in cooling and heating mode. The methodology involved using the generalized least square method to generate a set of performance coefficients from the catalog data at indicated reference conditions. Then the respective coefficients and indicated reference conditions are used in the model to simulate the heat pump performance. The variables that influenced the water-to-water heat pump performance are load side inlet water temperature, source side inlet temperature, source side water flow rate and load side water flow rate. The governing equations for the cooling and heating mode are as following:
+This section describes the equation-fit model for water-to-water heat pump. (Object names: HeatPump:WaterToWater:EquationFit:Cooling & HeatPump:WaterToWater:EquationFit:Heating). This documentation is derived from the M.S. dissertation of Tang (2005) which is available on the Oklahoma State University web site . The model uses four non-dimensional equations or curves to predict the heat pump performance in cooling and heating mode. The methodology involved using the generalized least square method to generate a set of performance coefficients from the catalog data at indicated reference conditions. Then the respective coefficients and indicated reference conditions are used in the model to simulate the heat pump performance. The variables that influenced the water-to-water heat pump performance are load side inlet water temperature, source side inlet temperature, source side water flow rate and load side water flow rate. The governing equations for the cooling and heating mode are as following:
 
 Cooling Mode:
 
 <div>$$\frac{{Q{}_c}}{{Q{}_{c,ref}}} = A1 + A2\left[ {\frac{{T{}_{L,in}}}{{T{}_{ref}}}} \right] + A3\left[ {\frac{{T{}_{S,in}}}{{T{}_{ref}}}} \right] + A4\left[ {\frac{{{{\dot V}_L}}}{{{{\dot V}_{L,ref}}}}} \right] + A5\left[ {\frac{{{{\dot V}_S}}}{{{{\dot V}_{S,ref}}}}} \right]$$</div>
 
-<div>$$Powe{r_c} = \frac{{{Q_c}}}{{CO{P_c}}}$$</div>
+<div>$$Powe{r_c} = B1 + B2\left[ {\frac{{T{}_{L,in}}}{{T{}_{ref}}}} \right] + B3\left[ {\frac{{T{}_{S,in}}}{{T{}_{ref}}}} \right] + B4\left[ {\frac{{{{\dot V}_L}}}{{{{\dot V}_{L,ref}}}}} \right] + B5\left[ {\frac{{{{\dot V}_S}}}{{{{\dot V}_{S,ref}}}}} \right]$$</div>
 
 Heating Mode:
 
 <div>$$\frac{{{Q_h}}}{{Q{}_{h,ref}}} = C1 + C2\left[ {\frac{{T{}_{L,in}}}{{T{}_{ref}}}} \right] + C3\left[ {\frac{{T{}_{S,in}}}{{T{}_{ref}}}} \right] + C4\left[ {\frac{{{{\dot V}_L}}}{{{{\dot V}_{L,ref}}}}} \right] + C5\left[ {\frac{{{{\dot V}_S}}}{{{{\dot V}_{S,ref}}}}} \right]$$</div>
 
-<div>$$Powe{r_h} = \frac{{{Q_h}}}{{CO{P_h}}}$$</div>
+<div>$$Powe{r_h} = D1 + D2\left[ {\frac{{T{}_{L,in}}}{{T{}_{ref}}}} \right] + D3\left[ {\frac{{T{}_{S,in}}}{{T{}_{ref}}}} \right] + D4\left[ {\frac{{{{\dot V}_L}}}{{{{\dot V}_{L,ref}}}}} \right] + D5\left[ {\frac{{{{\dot V}_S}}}{{{{\dot V}_{S,ref}}}}} \right]$$</div>
 
 Assuming no losses, the source side heat transfer rate for cooling and heating mode is calculated as following;
 
@@ -4561,33 +4561,33 @@ Assuming no losses, the source side heat transfer rate for cooling and heating m
 
 Where:
 
-<span>\(A1 - B5\)</span>     = Equation fit coefficients for the cooling and heating mode
+<span>\(A1 - D5\)</span>            = Equation fit coefficients for the cooling and heating mode
 
-<span>\({T_{ref}}\)</span>            = 283.15K
+<span>\({T_{ref}}\)</span>          = 283.15K
 
-<span>\({T_{L,in}}\)</span>           = Entering load side water temperature, K
+<span>\({T_{L,in}}\)</span>         = Entering load side water temperature, K
 
-<span>\({T_{S,in}}\)</span>           = Entering source side water temperature, K
+<span>\({T_{S,in}}\)</span>         = Entering source side water temperature, K
 
-<span>\({\dot V_L}\)</span>                         = Load side volumetric flow rate, m<sup>3</sup>/s
+<span>\({\dot V_L}\)</span>         = Load side volumetric flow rate, m<sup>3</sup>/s
 
-<span>\({\dot V_S}\)</span>                         = Source side volumetric flow rate, m<sup>3</sup>/s
+<span>\({\dot V_S}\)</span>         = Source side volumetric flow rate, m<sup>3</sup>/s
 
-<span>\({Q_c}\)</span>                         = Load side heat transfer rate (cooling mode), W
+<span>\({Q_c}\)</span>              = Load side heat transfer rate (cooling mode), W
 
-<span>\(Powe{r_c}\)</span>     = Power consumption (cooling mode), W
+<span>\(Powe{r_c}\)</span>          = Power consumption (cooling mode), W
 
 <span>\({Q_{source,c}}\)</span>      = Source side heat transfer rate (cooling mode), W
 
-<span>\({Q_h}\)</span>                         = Load side heat transfer rate (heating mode), W
+<span>\({Q_h}\)</span>              = Load side heat transfer rate (heating mode), W
 
-<span>\(Powe{r_h}\)</span>     = Power consumption (heating mode), W
+<span>\(Powe{r_h}\)</span>          = Power consumption (heating mode), W
 
-<span>\({Q_{source,h}}\)</span>      = Source side heat transfer rate (heating mode), W
+<span>\({Q_{source,h}}\)</span>     = Source side heat transfer rate (heating mode), W
 
-*COP<sub>c</sub>*          = Cooling coefficient of performance, W/W
+*COP<sub>c</sub>*                   = Cooling coefficient of performance, W/W
 
-*COP<sub>h</sub>*          = Heating coefficient of performance, W/W
+*COP<sub>h</sub>*                   = Heating coefficient of performance, W/W
 
 
 
@@ -4599,7 +4599,7 @@ For cooling mode, the reference conditions; reference load side volumetric flow 
 
 #### Coefficient estimation procedure:
 
-The generalized least square method is used to generate the coefficients. This method utilizes an optimization method which calculates for the coefficients that will give the least amount of differences between the model outputs and the catalog data. A set of coefficients for the cooling mode is generated which includes A1-A5 for load side heat transfer. The same procedure is repeated for the heating mode to generate the coefficients B1-B5. An information flow chart showing the inputs, reference conditions, performance coefficients and outputs are shown in the figure below:
+The generalized least square method is used to generate the coefficients. This method utilizes an optimization method which calculates for the coefficients that will give the least amount of differences between the model outputs and the catalog data. A set of coefficients for the cooling mode is generated which includes A1-A5 for load side heat transfer. The same procedure is repeated B, C, and D coefficients. An information flow chart showing the inputs, reference conditions, performance coefficients and outputs are shown in the figure below:
 
 ![](media/image5290.png)
 
@@ -8101,4 +8101,3 @@ where
 ASHRAE. 1993. HVAC 2 Toolkit: A Toolkit for Secondary HVAC System Energy Calculations. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.
 
 ASHRAE. 2001. 2001 ASHRAE Handbook Fundamentals. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.
-

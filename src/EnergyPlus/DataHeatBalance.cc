@@ -316,6 +316,7 @@ namespace DataHeatBalance {
 	int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed( 49 );
 	int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed( 50 );
 	int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed( 51 );
+	int const IntGainTypeOf_ElectricLoadCenterConverter( 52 );
 
 	//Parameters for checking surface heat transfer models
 	Real64 const HighDiffusivityThreshold( 1.e-5 ); // used to check if Material properties are out of line.
@@ -1012,17 +1013,22 @@ namespace DataHeatBalance {
 	void
 	SetZoneOutBulbTempAt()
 	{
+		for ( auto & zone : Zone ) {
+			zone.SetOutBulbTempAt();
+		}
+	}
+
+	void
+	CheckZoneOutBulbTempAt() 
+	{
 		// Using/Aliasing
 		using DataEnvironment::SetOutBulbTempAt_error;
 
-		Real64 maxZ( 0.0 );
-		Real64 minBulb( 0.0 );
+		Real64 minBulb = 0.0;
 		for ( auto & zone : Zone ) {
-			zone.SetOutBulbTempAt();
 			minBulb = min( minBulb, zone.OutDryBulbTemp, zone.OutWetBulbTemp );
-			maxZ = max( maxZ, zone.Centroid.z );
+			if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Zone", zone.Centroid.z, zone.Name );
 		}
-		if ( minBulb < -100.0 ) SetOutBulbTempAt_error( "Zone", maxZ );
 	}
 
 	void
