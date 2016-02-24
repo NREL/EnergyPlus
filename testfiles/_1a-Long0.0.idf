@@ -10,7 +10,7 @@
 ! Plant:    None.
 ! Modified:
 
-  Version,8.3;
+  Version,8.4;
 
   Site:Location,
     UNKNOWN,                 !- Name
@@ -25,13 +25,6 @@
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
     No;                      !- Run Simulation for Weather File Run Periods
-
-  Output:PreprocessorMessage,
-    Conversion V7 to V7.1,   !- Preprocessor Name
-    Warning,                 !- Error Severity
-    SizingPeriod:DesignDay object="LONDON/GATWICK Modified Ann Clg .4% Condns DB=>MWB",  !- Message Line 1
-    Solar Model Indicator="Schedule",  !- Message Line 2
-    does not use Sky Clearness but prior input was not blank. Copied to new field.;  !- Message Line 3
 
   SizingPeriod:DesignDay,
     LONDON/GATWICK Modified Ann Clg .4% Condns DB=>MWB,  !- Name

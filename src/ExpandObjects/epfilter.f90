@@ -9364,11 +9364,9 @@ DO iZone = 1, numCompactZoneFPVAV
     IF (reheatCoilType .EQ. ctHotWater) THEN
       CALL AddToObjStr('Max Reheat Water Flow {m3/s}','autosize')
       CALL AddToObjStr('Min Reheat Water Flow {m3/s}','0')
-      CALL AddToObjFld('Reheat Water Sensor Node Name', base + fpvzNameOff,' Reheat Coil HW Inlet')
     ELSE
       CALL AddToObjStr('Max Reheat Water Flow {m3/s}  ','')
       CALL AddToObjStr('Min Reheat Water Flow {m3/s}  ','')
-      CALL AddToObjStr('Reheat Water Sensor Node Name','')
     END IF
     CALL AddToObjStr('Convergence Tolerance','0.001',.TRUE.)
   ELSE
@@ -9404,11 +9402,9 @@ DO iZone = 1, numCompactZoneFPVAV
     IF (reheatCoilType .EQ. ctHotWater) THEN
       CALL AddToObjStr('Max Reheat Water Flow {m3/s}  ','autosize')
       CALL AddToObjStr('Min Reheat Water Flow {m3/s}  ','0')
-      CALL AddToObjFld('Reheat Water Sensor Node Name', base + fpvzNameOff,' Reheat Coil HW Inlet')
     ELSE
       CALL AddToObjStr('Max Reheat Water Flow {m3/s}  ','')
       CALL AddToObjStr('Min Reheat Water Flow {m3/s}  ','')
-      CALL AddToObjStr('Reheat Water Sensor Node Name','')
     END IF
     CALL AddToObjStr('Convergence Tolerance         ','0.001',.TRUE.)
   END IF
@@ -9825,7 +9821,6 @@ DO iZone = 1, numCompactZoneHCVAV
     !CALL AddToObjFld('Maximum air flow rate {m3/s} ', base + hcvzSupplyMaxRateOff,' ')
     CALL AddToObjStr('Maximum Air Flow Rate {m3/s} ', 'autosize')
     CALL AddToObjFld('Zone Minimum Air Flow Fraction', base + hcvzConstantMinFracOff,' ')
-    CALL AddToObjFld('Hot Water or Steam Inlet Node Name', base + hcvzNameOff,' Reheat Coil HW Inlet')
     CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Reheat Coil Name', base + hcvzNameOff,' Reheat Coil')
     CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}  ','autosize')
@@ -9877,7 +9872,6 @@ DO iZone = 1, numCompactZoneHCVAV
     !CALL AddToObjFld('Maximum air flow rate {m3/s}', base + hcvzSupplyMaxRateOff,' ')
     CALL AddToObjStr('Maximum Air Flow Rate {m3/s}','autosize')
     CALL AddToObjFld('Zone Minimum Air Flow Fraction', base + hcvzConstantMinFracOff,' ')
-    CALL AddToObjStr('Hot Water or Steam Inlet Node Name','')
     CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Electric')
     CALL AddToObjFld('Reheat Coil Name', base + hcvzNameOff,' Reheat Coil')
     CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
@@ -9907,7 +9901,6 @@ DO iZone = 1, numCompactZoneHCVAV
     !CR8001
     CALL AddToObjStr('Maximum Air Flow Rate {m3/s}','autosize')
     CALL AddToObjFld('Zone Minimum Air Flow Fraction', base + hcvzConstantMinFracOff,' ')
-    CALL AddToObjStr('Hot Water or Steam Inlet Node Name','')
     CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Gas')
     CALL AddToObjFld('Reheat Coil Name', base + hcvzNameOff,' Reheat Coil')
     CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
@@ -14391,9 +14384,9 @@ DO iSys = 1, numCompactSysUnit
   END IF
   CALL AddToObjFld('Relief Air Stream Node Name', base + usAirHandlerNameOff,' Relief Air Outlet')
   CALL AddToObjStr('Return Air Stream Node Name', TRIM(returnInletToOAMIxer),.TRUE.)
-  !SET POINT MANAGER:SINGLE ZONE REHEAT
-  CALL CreateNewObj('SetpointManager:SingleZone:Reheat')
-  CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Supply Air Temp Manager')
+  !SetpointManager:SingleZone:Cooling
+  CALL CreateNewObj('SetpointManager:SingleZone:Cooling')
+  CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Economizer Supply Air Temp Manager')
   CALL AddToObjStr('Control Variable','Temperature')
   CALL AddToObjStr('minimum supply air temperature {C}','13')
   CALL AddToObjStr('maximum supply air temperature {C}','45')
@@ -15331,9 +15324,9 @@ DO iSys = 1, numCompactSysUnitHP
   END IF
   CALL AddToObjFld('Relief Air Stream Node Name', base + uhpsAirHandlerNameOff,' Relief Air Outlet')
   CALL AddToObjStr('Return Air Stream Node Name', TRIM(returnInletToOAMIxer),.TRUE.)
-  !Object ==> SetpointManager:SingleZone:Reheat
-  CALL CreateNewObj('SetpointManager:SingleZone:Reheat')
-  CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' Supply Air Temp Manager')
+  !Object ==> SetpointManager:SingleZone:Cooling
+  CALL CreateNewObj('SetpointManager:SingleZone:Cooling')
+  CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' Economizer Supply Air Temp Manager')
   CALL AddToObjStr('Control Variable','Temperature')
   CALL AddToObjStr('minimum supply air temperature {C}','13')
   CALL AddToObjStr('maximum supply air temperature {C}','45')
@@ -16142,6 +16135,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Unitary System MultiSpeed Performance')
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
+    CALL AddToObjStr('Single Mode Operation', 'No') 
     CALL AddToObjStr('Heating Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Cooling Speed 1 Supply Air Flow Ratio', 'autosize')
     CALL AddToObjStr('Heating Speed 2 Supply Air Flow Ratio', 'autosize')
@@ -17798,9 +17792,9 @@ DO iSys = 1, numCompactSysUnitarySystem
   END IF
   CALL AddToObjFld('Relief Air Stream Node Name', base + ussAirHandlerNameOff,' Relief Air Outlet')
   CALL AddToObjFld('Return Air Stream Node Name', base + ussAirHandlerNameOff, TRIM(returnInletToOAMIxer),.TRUE.)
-  !Object ==> SetpointManager:SingleZone:Reheat
-  CALL CreateNewObj('SetpointManager:SingleZone:Reheat')
-  CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Supply Air Temp Manager')
+  !Object ==> SetpointManager:SingleZone:Cooling
+  CALL CreateNewObj('SetpointManager:SingleZone:Cooling')
+  CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Economizer Supply Air Temp Manager')
   CALL AddToObjStr('Control Variable','Temperature')
   CALL AddToObjStr('minimum supply air temperature {C}','13')
   CALL AddToObjStr('maximum supply air temperature {C}','45')
@@ -18691,7 +18685,6 @@ DO iZone = 1, numCompactZoneConstVol
     CALL AddToObjStr('Maximum air flow rate {m3/s} ', 'autosize')
     !CR8001
     IF (reheatCoilType .EQ. ctHotWater) THEN
-      CALL AddToObjFld('Hot Water or Steam Inlet Node Name', base + cvzNameOff,' Reheat Coil HW Inlet')
       CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Water')
       CALL AddToObjFld('Reheat Coil Name', base + cvzNameOff,' Reheat Coil')
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}  ','autosize')

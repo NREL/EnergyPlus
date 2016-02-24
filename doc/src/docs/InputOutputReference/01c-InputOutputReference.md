@@ -211,7 +211,7 @@ This is the average temperature of the working fluid inside the heat exchanger.
 
 The GroundHeatExchanger:Slinky use the g-functions to calculate the GHX temperature response, similar to the GroundHeatExchanger:Vertical model, however for this model g-functions are automatically calculated by EnergyPlus without the need of external software or data.
 
-Horizontal slinky-loop ground heat exchangers (GHXs) consist of coiled tubing, with the individual rings spread out along the direction of the trench either horizontally or vertically, as shown in [Figure](#SlinkyIOFig1). A schematic of a slinky GHX can be seen in [Figure](#SlinkyIOFig2). Compared to conventional straight tube horizontal GHXs, slinky loops have a higher tube density; hence, with the same cooling/heating loads, slinky-loop GHXs require less land area and excavation work than straight tube HGHXs. 
+Horizontal slinky-loop ground heat exchangers (GHXs) consist of coiled tubing, with the individual rings spread out along the direction of the trench either horizontally or vertically, as shown in [Figure](#SlinkyIOFig1). A schematic of a slinky GHX can be seen in [Figure](#SlinkyIOFig2). Compared to conventional straight tube horizontal GHXs, slinky loops have a higher tube density; hence, with the same cooling/heating loads, slinky-loop GHXs require less land area and excavation work than straight tube HGHXs.
 
 ![slinky heat exchanger](media/image901.png)
 
@@ -272,11 +272,11 @@ This numeric field is the thermal conductivity of the soil, in W/m-K.
 
 #### Field: Soil Density
 
-This numeric field is the density of the soil, in kg/m3. 
+This numeric field is the density of the soil, in kg/m3.
 
 #### Field: Soil Specific Heat
 
-This numeric field is the specific heat of the soil, in J/kg-K. 
+This numeric field is the specific heat of the soil, in J/kg-K.
 
 #### Field: Pipe Thermal Conductivity
 
@@ -292,7 +292,7 @@ This numeric field is the specific heat of the heat exchanger pipe, in J/kg-K.
 
 #### Field: Pipe Outside Diameter
 
-This numeric field is the outside pipe diameter, in meters. 
+This numeric field is the outside pipe diameter, in meters.
 
 #### Field: Pipe Wall Thickness
 
@@ -304,7 +304,7 @@ This alpha field is heat exchanger configuration, either Vertical or Horizontal.
 
 #### Field: Coil Diameter
 
-This numeric is the diameter of the slinky coil, in meters. 
+This numeric is the diameter of the slinky coil, in meters.
 
 #### Field: Coil Pitch
 
@@ -342,15 +342,15 @@ This numeric field contains the maximum number of years of simulation to be carr
 
 The following output variables are available.
 
-* HVAC,Average,Ground Heat Exchanger Average Borehole Temperature [C] 
+* HVAC,Average,Ground Heat Exchanger Average Borehole Temperature [C]
 
-* HVAC,Average,Ground Heat Exchanger Heat Transfer Rate [W] 
+* HVAC,Average,Ground Heat Exchanger Heat Transfer Rate [W]
 
-* HVAC,Average,Ground Heat Exchanger Inlet Temperature [C] 
+* HVAC,Average,Ground Heat Exchanger Inlet Temperature [C]
 
-* HVAC,Average,Ground Heat Exchanger Outlet Temperature [C] 
+* HVAC,Average,Ground Heat Exchanger Outlet Temperature [C]
 
-* HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s] 
+* HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s]
 
 * HVAC,Average,Ground Heat Exchanger Average Fluid Temperature [C]
 
@@ -1784,6 +1784,10 @@ The impact of using outside air/mechanical ventilation is described in the secti
 
 Used to specify the components in the outdoor air system. The components will be simulated in the order in which they occur in the list.
 
+The following HVAC equipment types are allowed as outdoor air system equipment. The component matrix shows which coils and fans are allowed with which equipment models.
+
+![](media/OASysComponentMatrix.png)
+
 #### Field: Name
 
 The user designated unique name of an instance of an Air Loop Equipment List. Any object referencing this Air Loop Equipment List will do so using this name.
@@ -2435,6 +2439,12 @@ The AirflowNetwork:Multizone:Surface object allows a heat transfer surface or su
 
 An interior heat transfer surface (BuildingSurface:Detailed) whose surface name is used as the input for the Outside Boundary Condition Object field represents a floor without ground contact and is not allowed as an AirflowNetwork:Multizone:Surface. A heat transfer surface defined in the BuildingSurface:Detailed:ExteriorNaturalVentedCavity is also not allowed.
 
+When a triangular subsurface is used, the model provides a warning and treats this subsurface as rectangular. The effective width and height calculated in the ProcessSurfaceVertices function of the SurfaceGeometry module are used to represent a rectangular subsurface.
+
+Effective width = 0.75 x Length between Vertex 1 and Vertex 2
+
+Effective height = 4 x Area / ( 3 x Length between Vertex 2 and Vertex 3 )   
+
 #### Field: Surface Name
 
 This is the name of the corresponding surface (wall, roof, ceiling, floor, window, door or glass door).
@@ -2581,7 +2591,7 @@ If Ventilation Control Mode = NoVent, this schedule has no effect.
 **Note:** In order to establish an airflow network, each AirflowNetwork:Multizone:Zone object must have at least two surfaces defined with AirflowNetwork:Multizone:Surface objects, so that air can flow from one zone into other zones (or to outdoors) through the network (air mass flow conserved). In addition, for all AirflowNetwork:Multizone:Surface objects facing the same Zone Name (ref. BuildingSurface:Detailed), at least two different environments must be defined for the other side of these surfaces (e.g., an external node and an adjacent zone, two adjacent zones, or two external nodes).
 
 #### Field: Occupant Ventilation Control Name
-The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the Ventilation Control defined in the Ventilation Control Mode field will be overridden. 
+The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the Ventilation Control defined in the Ventilation Control Mode field will be overridden.
 
 
 IDF examples are provided below:
@@ -3175,16 +3185,16 @@ AirflowNetwork:MultiZone:WindPressureCoefficientValues,
 
 ###AirflowNetwork:OccupantVentilationControl
 
-The AirflowNetwork:OccupantVentilationControl object provides control options with minimum opening and closing time checks and opening and closing probability values. In general, the probability values could be a constant or a specific function. Due to lack of real data, two schedules are selected to represent probability values. If real data are available, this object may be modified to adopt new data. 
+The AirflowNetwork:OccupantVentilationControl object provides control options with minimum opening and closing time checks and opening and closing probability values. In general, the probability values could be a constant or a specific function. Due to lack of real data, two schedules are selected to represent probability values. If real data are available, this object may be modified to adopt new data.
 
 #### Field: Name
 This is the name of the object.
 
 #### Field: Minimum Opening Time
-The field represents the minimum time that windows will remain open. If a window has been open for a time less than this value, the window will remain open. 
+The field represents the minimum time that windows will remain open. If a window has been open for a time less than this value, the window will remain open.
 
 #### Field: Minimum Closing Time
-The field represents the minimum time that windows will remain closed. If a window has been closed for a time less than this value, the window will remain closed. 
+The field represents the minimum time that windows will remain closed. If a window has been closed for a time less than this value, the window will remain closed.
 
 #### Field: Thermal Comfort Low Temperature Curve Name
 This alpha field defines the name of a curve to be used for thermal comfort temperature calculation at low outdoor dry-bulb temperature. This curve is a linear or quadratic equation using outdoor dry-bulb temperatures as an independent variable. This performance curve can be used to describe the thermal comfort temperature at low outdoor dry-bulb temperature. It allows maximum two curves to describe the thermal comfort temperature in two different outdoor dry-bulb temperature regions. If a single curve is used, blanks are entered in the following two fields.
@@ -3196,7 +3206,7 @@ When there are two piecewise curves to represent thermal comfort temperature cal
 This alpha field defines the name of a curve to be used for thermal comfort temperature calculation at high outdoor dry-bulb temperature. This curve is a linear or quadratic equation using outdoor dry-bulb temperatures as an independent variable. This performance curve can be used to describe the thermal comfort temperature at high outdoor dry-bulb temperature. It allows maximum two curves to describe the thermal comfort temperature in two different outdoor dry-bulb temperature regions. If a single curve is used, blanks are entered in this field.
 
 #### Field: Maximum Threshold for Persons Dissatisfied PPD
-This field is used to calculate the comfort band as a function of predicted percentage of dissatisfied (PPD). The default value is 10%. The equation is based on curve fit and is valid between 0% and 35%.  
+This field is used to calculate the comfort band as a function of predicted percentage of dissatisfied (PPD). The default value is 10%. The equation is based on curve fit and is valid between 0% and 35%.
 
 <div>\[\Theta = -0.0028 (100-PPD)^2 + 0.3419 (100-PPD) - 6.6275\]</div>
 
@@ -3209,7 +3219,7 @@ where
 Input is Yes or No. The default is No. If Yes, an occupancy check is performed used in the opening probability check. If No, the occupancy check is bypassed.
 
 #### Field: Opening Probability Schedule Name
-The name of a schedule of opening probability that controls the opening of windows and doors in the thermal zone to provide natural ventilation. If the probability value is greater a random number, windows are allowed to open. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied. 
+The name of a schedule of opening probability that controls the opening of windows and doors in the thermal zone to provide natural ventilation. If the probability value is greater a random number, windows are allowed to open. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied.
 
 #### Field: Closing Probability Schedule Name
 The name of a schedule of closing probability that controls the closing of windows and doors in the thermal zone to reduce natural ventilation. If the probability value is greater a random number, windows are allowed to be closed. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied.
@@ -3234,7 +3244,7 @@ The next two objects of AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazo
 
 Recent advancements have been made to AirflowNetwork to model large horizontal openings.  This new development makes AirflowNetwork useful for not only modeling air movement between zones (and outdoors), but also within individual thermal zones.
 
-The possible combination will allow the EnergyPlus to simulate a thermal zone using a network approach by assuming internal nodes connected by user-defined patterns of temperatures and airflows. 
+The possible combination will allow the EnergyPlus to simulate a thermal zone using a network approach by assuming internal nodes connected by user-defined patterns of temperatures and airflows.
 It should be pointed out that the new model works when the MultizoneWithoutDistribution is selected in the field of AirflowNetwork Control of the AirflowNetwork:SimulationCOntrol object. The model cannot work with other choices.
 
 ### AirflowNetwork:Intrazone:Node
@@ -3254,7 +3264,7 @@ The name of a zone object, which is also defined in a AirflowNetwork:MultiZone:Z
 
 #### Field: Node Height
 
-This field requires input of node height in meters. 
+This field requires input of node height in meters.
 
 An IDF example is provided below:
 
@@ -3262,7 +3272,7 @@ An IDF example is provided below:
 
 ```idf
 AirflowNetwork:IntraZone:Node,
- LeftUpper,               !- Name 
+ LeftUpper,               !- Name
  LeftUpper,               !- RoomAir:Node:AirflowNetwork Name
  NORTH_ZONE,              !- Zone Name
  4.572;                   !- Node Height {m}
@@ -3278,14 +3288,14 @@ The name identifies the linkage for later reference and in the output listing. E
 
 #### Field: Node 1 Name
 
-The input designates a node name where airflow starts. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object. 
+The input designates a node name where airflow starts. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object.
 
 #### Field: Node 2 Name
 
-The input designates a node name where airflow ends. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object. 
+The input designates a node name where airflow ends. The node name should be defined in an AirflowNetwork:Intrazone:Node object or an AirflowNetwork:MultiZone:Zone object.
 
 Note: One of Node 1 and Node 2 should be defined as an AirflowNetwork:Intrazone:Node object. In other words, both nodes cannot be defined as AirflowNetwork:MultiZone:Zone object. This type of connection should be defined as an AirflowNetwork:MultiZone:Surface object.
-  
+
 #### Field: Component Name
 
 The input designates an AirflowNetwork component name associated with the two nodes. The component name should be one of the AirflowNetwork:Multizone:Component object names. The component is used for intrazone node connection only. If the next field is specified, the input of this field could be a blank.
@@ -3299,14 +3309,14 @@ It should be pointed out that an AirflowNetwork:Multizone:Surface object allows 
 - AirflowNetwork:MultiZone:Component:HorizontalOpening
 
 However, an AirflowNetwork:Intrazone:Linkage object without a surface connection has connection with two intrazone nodes in the same zone and allows two AirflowNetwork:Multizone:Component objects due to lack of geometry inputs.
- 
+
 - AirflowNetwork:MultiZone:Surface:Crack,
 - AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
 
 
 #### Field: Connection Surface
 
-The input specifies an AirflowNetwork:Multizone:Surface object name, when the nodes defined above are not located in the same zone. The surface linkage will be connected by the above two nodes, instead of zone nodes in normal definition. In other words, the connection defined in an AirflowNetwork:Multizone:Surface is removed. Instead, this new connection replaces the the connection specified before. A warning message is issued to let users be aware of the changes. Since each AirflowNetwork:Multizone:Surface object has its own component defined in the Leakage Component Name field, the input of the Component Name field in this object will be ignored.  
+The input specifies an AirflowNetwork:Multizone:Surface object name, when the nodes defined above are not located in the same zone. The surface linkage will be connected by the above two nodes, instead of zone nodes in normal definition. In other words, the connection defined in an AirflowNetwork:Multizone:Surface is removed. Instead, this new connection replaces the the connection specified before. A warning message is issued to let users be aware of the changes. Since each AirflowNetwork:Multizone:Surface object has its own component defined in the Leakage Component Name field, the input of the Component Name field in this object will be ignored.
 
 An IDF example is provided below:
 
@@ -4564,11 +4574,11 @@ The value of the venting opening factor for a particular window or door at the p
 
 #### AFN Surface Opening Elapsed Time [min]
 
-This output is the opening elapsed time in the units of minutes since the window opened. 
+This output is the opening elapsed time in the units of minutes since the window opened.
 
 #### AFN Surface Closing Elapsed Time [min]
 
-This output is the opening elapsed time in the units of minutes since the windows closed. 
+This output is the opening elapsed time in the units of minutes since the windows closed.
 
 #### AFN Surface Opening Status at Previous Time Step []
 
@@ -4580,20 +4590,20 @@ This is the window or door opening factor control status at the current time ste
 
 #### AFN Surface Opening Probability Status []
 
-This is the opening probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no opening probability control action. A value of 1 indicates that a window or door is forced to open when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept. 
+This is the opening probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no opening probability control action. A value of 1 indicates that a window or door is forced to open when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept.
 
 #### AFN Surface Closing Probability Status []
 
-This is the closing probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no closing probability control action. A value of 1 indicates that a window or door is forced to close when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept. 
+This is the closing probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no closing probability control action. A value of 1 indicates that a window or door is forced to close when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept.
 
 #### RoomAirflowNetwork Node Temperature [C]
 
 This is the RoomAirflowNetwork node temperature output in degrees C.
- 
+
 #### RoomAirflowNetwork Node Humidity Ratio [kgWater/kgDryAir]
 
 This is the RoomAirflowNetwork node humidity ratio output in kgWater/kgDryAir.
- 
+
 #### RoomAirflowNetwork Node Total Pressure [Pa]
 
 This is the RoomAirflowNetwork node total pressure in Pa with respect to outdoor barometric pressure. The total pressure is the sum of static pressure, dynamic pressure, and elevation impact at the node’s relative height.
@@ -4783,6 +4793,9 @@ ZoneHVAC:EquipmentConnections,
     SPACE3-1 Out Node;     !- Zone Return Air Node Name
 ```
 
+The following HVAC equipment types are allowed as zone equipment. The component matrix shows which coils and fans are allowed with which equipment models.
+
+![](media/ZoneComponentMatrix.png)
 
 ### ZoneHVAC:EquipmentList
 
@@ -5028,14 +5041,6 @@ The air-inlet node name that connects the air splitter to the individual zone AD
 
 The design constant volume flow rate (m<sup>3</sup>/sec) specified for the terminal reheat ADU.
 
-#### Control Fields:
-
-The last several fields for this object describe the type of reheat coil that is being used and how it is controlled. Most of the fields pertain to the hot water coil since the gas and electric coil are much more simplified.
-
-#### Field: Hot Water or Steam Inlet Node Name
-
-For the hot water reheat coil there is a node on the water side that would control the flow to the coil capacity to allow the coil to meet the zone demand. This control location is the name of the control node for the terminal reheat ADU. For the gas and electric coil this is left blank.
-
 #### Field: Reheat Coil Object Type
 
 The valid reheat component objects currently available are:
@@ -5077,7 +5082,6 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
     Zone 1 Reheat Air Outlet Node,  !- Unit Air Outlet Node
     Zone 1 Reheat Air Inlet Node,  !- Unit Air Inlet Node
     0.59,  !- Maximum air flow rate {m3/s}
-    ,  !- Control node
     COIL:Gas:Heating,  !- Reheat Component Object
     Reheat Coil Zone 1,  !- Name of Reheat Component
     0.0,  !- Max Reheat Water Flow {m3/s}
@@ -5314,14 +5318,6 @@ The name of the HVAC system node that is the air inlet node for the terminal uni
 
 The name of the HVAC system node that is the air outlet node of the unit. This same node will be the unit heating coil’s air outlet node. This node is also a zone inlet node.
 
-#### Field: Heating Coil Air Inlet Node Name
-
-The name of the HVAC system node that is the air inlet node of the unit’s heating coil. The same node is the outlet node of the unit’s fan. This is an internal node of this compound component.
-
-#### Field: Hot Water or Steam Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of hot water through the unit’s hot water heating coil. This should be the same node as the water inlet node of the hot water coil. For gas or electric coils this field should be left blank.
-
 #### Field: Fan Object Type
 
 The type of fan in the terminal unit. At this time the only type of fan allowed is *Fan:VariableVolume*.
@@ -5368,11 +5364,9 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
     ReheatCoilAvailSched,    !- System Availability schedule
     autosize,                !- Maximum cooling air volume flow rate
     autosize,                !- Maximum heating air volume flow rate
-    0.05,                     !- Zone Minimum Air Flow Fraction
-    SPACE2-1 ATU In Node,    !- Unit supply air inlet node
-    SPACE2-1 In Node,        !- Unit supply air outlet node
-    SPACE2-1 Zone Coil Air In Node,  !- heating coil air inlet node
-    SPACE2-1 Zone Coil Water In Node,!- Hot water control node
+    0.05,                    !- Zone Minimum Air Flow Fraction
+    SPACE2-1 ATU In Node,    !- Air Inlet Node Name
+    SPACE2-1 In Node,        !- Air Outlet Node Name
     FAN:SIMPLE:VariableVolume,       !- Fan object
     SPACE2-1 Zone Fan,       !- Fan name
     COIL:Water:SimpleHeating,!- Heating coil object
@@ -5454,14 +5448,6 @@ This numeric field defines the design maximum volumetric flow rate (m<sup>3</sup
 
 This numeric field defines the minimum air volumetric flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates as needed to maintain the heating set point specified in the Zone Control:Thermostatic object. This value must be between 0 and 1.
 
-#### Control Fields:
-
-The last several fields for this terminal reheat component describe the type of reheat coil that is being used and how it is controlled. Most of the fields pertain to the hot water coil since the gas and electric coil are much more simplified.
-
-#### Field: Hot Water or Steam Inlet Node Name
-
-For the hot water reheat coil there is a node on the water side that would control the water flow rate to allow the coil to meet the zone demand. This control location is the name of the control node for this terminal reheat ADU. For the gas and electric coils this field is left blank.
-
 #### Field: Reheat Coil Object Type
 
 The valid reheat component objects currently available are:
@@ -5510,7 +5496,6 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
     Zone 1 VAV Inlet Node,         !- UNIT Air Inlet Node
     0.583,                         !- Maximum air flow rate {m3/s}
     0.25,                          !- Zone Minimum Air Flow Fraction
-    ,                              !- Control node
     Coil:Heating:Electric,         !- Reheat Component Object
     Reheat Coil Zone 1,            !- Name of Reheat Component
     0.0,                           !- Max Reheat Water Flow {m3/s}
@@ -5767,10 +5752,6 @@ The maximum hot water volumetric flow rate in m<sup>3</sup>/sec through the unit
 
 The minimum hot water volumetric flow rate in m<sup>3</sup>/sec through the unit’s heating coil. If the heating coil is gas or electric this field should be blank.
 
-#### Field: Hot Water or Steam Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of hot water through the unit. This should be the same node as the water inlet node of the unit’s hot water coil. For gas or electric heating coils, this input should be blank.
-
 #### Field: Convergence Tolerance
 
 The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For units with water coils, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
@@ -5798,8 +5779,7 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
           Reheat Coil Zone 1,              ! name of air terminal unit reheat coil
           0.0013,                          ! Max Reheat Water Flow {Flow: m3/sec}
           0.0,                             ! Min Reheat Water Flow {Flow: m3/sec}
-          Zone 1 Reheat Water Inlet Node,  ! Control node
-          0.001;                    ! Convergence tolerance
+          0.001;                           ! Convergence tolerance
 ```
 
 
@@ -5915,10 +5895,6 @@ The maximum hot water or steam volumetric flow rate in m<sup>3</sup>/s through t
 
 The minimum hot water or steam volumetric flow rate in m<sup>3</sup>/s through the unit’s heating coil. The steam volumetric flow rate is calculated at 100C and 101325 Pa. If the heating coil is gas or electric this field should be blank.
 
-#### Field: Hot Water or Steam Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of hot water through the unit. This should be the same node as the water inlet node of the unit’s hot water coil. For gas or electric heating coils, this input should be blank.
-
 #### Field: Convergence Tolerance
 
 The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For units with water coils, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
@@ -5947,8 +5923,7 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
           Reheat Coil Zone 3,              ! name of air terminal unit reheat coil
           0.0013,                          ! Max Reheat Water Flow {Flow: m3/sec}
           0.0,                             ! Min Reheat Water Flow {Flow: m3/sec}
-          Zone 3 Reheat Water Inlet Node,  ! Control node
-          0.001;                    ! Convergence tolerance
+          0.001;                           ! Convergence tolerance
 ```
 
 
@@ -6011,14 +5986,6 @@ The name of the HVAC system node from which the unit draws its secondary or reci
 #### Field: Air Outlet Node Name
 
 The name of the HVAC system node to which the unit sends its outlet air. This should be one of the inlet air nodes of the zone which is being served.
-
-#### Field: Hot Water Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of hot water through the unit. This should be the same node as the water inlet node of the unit’s hot water coil.
-
-#### Field: Cold Water Inlet Node Name
-
-The name of the HVAC system node which regulates the flow of cold water through the unit. This should be the same node as the water inlet node of the unit’s chilled water coil.
 
 #### Field: Heating Coil Object Type
 
@@ -6093,8 +6060,6 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
     SPACE2-1 ATU Supply Node, !- Terminal unit supply air inlet node
     SPACE2-1 ATU Induc Node,  !- Terminal unit induced air inlet node
     SPACE2-1 In Node,         !- Terminal unit air outlet node
-    SPACE2-1 HW Coil Water In Node, !- Hot water control node
-    SPACE2-1 CW Coil Water In Node, !- Cold water control node
     COIL:Heating:Water,       !- Heating coil object
     SPACE2-1 HW Coil,         !- Heating coil name
     autosize,                 !- Max hot water flow
@@ -6142,15 +6107,15 @@ There are no specific outputs for the four pipe induction terminal units.
 ### AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
 
 The four-pipe beam air terminal system is a mixed air-hydronic system. A central, single-duct forced-air system that supplies conditioned air to the zones. Chilled water circulates through ceiling-mounted fin-tube convector units to provide sensible cooling. Hot water circulates through the same convectors to provide heating.  Water flow rate through the beam unit is varied to meet the zone sensible cooling or heating load. Any dehumidification is done by the central forced-air system. Thermodynamically, the cooled beam system resembles the four-pipe induction unit (**AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction**).
- 
+
 To model a typical four-pipe beam system the user will need to define a conventional central constant volume forced air system in order to deliver primary air to the beam. This central system (usually) provides outside air for ventilation.  Primary air is normally delivered at a fixed temperature but could be reset by a schedule or using an outdoor air reset setpoint manager. On the supply side of this air loop there will be the usual central conditioning equipment: outside air mixer, fan, heating and cooling coil. On the zone equipment (demand) side of the loop, the four-pipe beams will be represented as air terminal units. Because the four-pipe beam can provide heating the system can avoid over-cooling zones during times of low load with cool primary air temperatures, similar to the action of a reheat coil in a VAV terminal.  Therefore it is not necessary to have additional zone equipment (such as baseboard heaters) to handle heating (or reheating) loads.
 
-Although the four-pipe beam equipment in a zone is treated by the program as a single terminal unit, the actual installation will often have multiple beam units in each zone. In this model, it is only the total length of all the beams and the total air flow of all the units that are described, not the number of individual beam units. 
+Although the four-pipe beam equipment in a zone is treated by the program as a single terminal unit, the actual installation will often have multiple beam units in each zone. In this model, it is only the total length of all the beams and the total air flow of all the units that are described, not the number of individual beam units.
 
-If needed, the program (in its sizing calculation for the system) determines the total length of beams and primary supply air flow that is needed to meet the zone design loads. The four pipe beam air terminal sizing differs from other air terminals in that the primary supply air flow rate is sized using the entire performance model and the flow rate is not the direct result from the Sizing:Zone and Sizing:System calculations. The flow rates will be somewhere between what an air terminal would size out using *VentilationRequirement* or *Sensible* in the Sizing:System object (either setting can be used). 
+If needed, the program (in its sizing calculation for the system) determines the total length of beams and primary supply air flow that is needed to meet the zone design loads. The four pipe beam air terminal sizing differs from other air terminals in that the primary supply air flow rate is sized using the entire performance model and the flow rate is not the direct result from the Sizing:Zone and Sizing:System calculations. The flow rates will be somewhere between what an air terminal would size out using *VentilationRequirement* or *Sensible* in the Sizing:System object (either setting can be used).
 
-The model includes two different types of inputs for flow rates, “design” and “rated … per-meter.”  The design values are the actual sizes of the flow rates as viewed from the zone and central air handler (but before zone multipliers).  The design values include all the individual beam units and their lengths.  The rated per-meter values are used to characterize product performance at nominal rating conditions in such a way that it can be scaled to match the size of a zone.  The performance characteristics at the rating point are not fixed in the program and can be entered by the user when they differ from default values.  The rated per meter values are normalized by the linear dimensions of the beam and are generally obtained from product catalog data by dividing by the length of the beam.  The rated primary air flow rate is assumed to be for sea level conditions while the design primary air flow rate is modeled for the location elevation above sea level. 
- 
+The model includes two different types of inputs for flow rates, “design” and “rated … per-meter.”  The design values are the actual sizes of the flow rates as viewed from the zone and central air handler (but before zone multipliers).  The design values include all the individual beam units and their lengths.  The rated per-meter values are used to characterize product performance at nominal rating conditions in such a way that it can be scaled to match the size of a zone.  The performance characteristics at the rating point are not fixed in the program and can be entered by the user when they differ from default values.  The rated per meter values are normalized by the linear dimensions of the beam and are generally obtained from product catalog data by dividing by the length of the beam.  The rated primary air flow rate is assumed to be for sea level conditions while the design primary air flow rate is modeled for the location elevation above sea level.
+
 #### Field: Name
 A unique user-assigned name for a particular beam unit. Any reference to this unit by another object will use this name.
 
@@ -6159,31 +6124,25 @@ The name of the schedule that denotes whether the terminal unit is operating to 
 
 #### Field: Cooling Availability Schedule Name
 The name of the schedule that denotes whether the terminal unit is operating to provide cooling during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and available for beam cooling during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods. The primary air availability schedule named in the previous input field must have a value that is “on” during times that cooling is available.
- 
+
 #### Field: Heating Availability Schedule Name
 The name of the schedule that denotes whether the terminal unit can operate to provide heating during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the unit is on and available for beam heating during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods. The primary air availability schedule named in the input field above must have a value that is “on” during times that heating is available.
- 
+
 #### Field: Primary Air Inlet Node Name
 The name of the HVAC system air node from which the unit draws its primary air.
- 
+
 #### Field: Primary Air Outlet Node Name
 The name of the HVAC system air node that connects this terminal unit to the zone. The will be the same as one of the zone inlet nodes.
- 
+
 #### Field: Chilled Water Inlet Node Name
 The name of the chilled water inlet node.  If desired, the chilled water node connections can be omitted and the model will assume the intent is to model a two-pipe heating only beam.
- 
+
 #### Field: Chilled Water Outlet Node Name
 The name of the chilled water outlet node.
 
-#### Field: Hot Water Inlet Node Name
-The name of the hot water inlet node.  If desired, the hot water node connections can be omitted and the model will assume the intent is to model a two-pipe cooling only beam.
-
-#### Field: Hot Water Outlet Node Name
-The name of the hot water outlet node.
-
 #### Field: Design Primary Air Volume Flow Rate
 This is the air flow rate (m3/s) of the primary air entering the air terminal unit from the central air handling unit. This input can be autosized.
-  
+
 #### Field: Design Chilled Water Volume Flow Rate
 The maximum chilled water flow rate (m3/s) for the unit(s) serving the entire zone. This input can be autosized based on the zone design load.
 
@@ -6201,7 +6160,7 @@ This is the beam cooling capacity at rating conditions divided by the length of 
 
 #### Field: Beam Rated Cooling Room Air Chilled Water Temperature Difference (Delta C)
 This input defines the value of the temperature difference between the room air and entering chilled water at the rating point, in delta Celsius.  This "catalog" input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Cooling Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 10.0 delta C.
- 
+
 #### Field: Beam Rated Chilled Water Volume Flow Rate per Beam Length (m3/s-m)
 This input defines the value of the chilled water flow rate per meter length of beam at the rating point, in m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Cooling Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Cooling Capacity Chilled Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
 
@@ -6210,7 +6169,7 @@ This field is the name of a curve or table object that describes how the beam co
 
 #### Field: Beam Cooling Capacity Air Flow Modification Factor Curve Name
 This field is the name of a curve or table object that describes how the beam convector's cooling capacity varies as a function of the primary air flow rate.  The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.  The factor is useful to adjust for a range of primary air flow rates that a given product can accommodate.  However since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
- 
+
 #### Field: Beam Cooling Capacity Chilled Water Flow Modification Factor Curve Name
 This field is the name of a curve or table object that describes how the beam convector’s cooling capacity varies as a function of the water flow rate.  The single independent variable is the ratio of the current fluid flow rate to the fluid flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity.  The model will adjust the chilled water flow rate to vary cooling power to meet the zone load, so for control purposes, the range of the independent variable must include all the way down to zero flow, with zero capacity at zero flow.
 
@@ -6219,7 +6178,7 @@ This is the beam heating capacity at rating conditions divided by the length of 
 
 #### Field: Beam Rated Heating Room Air Hot Water Temperature Difference (Delta C)
 This input defines the value of the temperature difference between the entering hot water and the room air at the rating point, in delta Celsius.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter. It is used to normalize the independent variable in the input field called Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name. The default is 27.8 delta C.
- 
+
 #### Field: Beam Rated Hot Water Volume Flow Rate per Beam Length (m3/s-m)
 This input defines the value of the hot water flow rate per meter length of beam at the rating point, in m3/s/m, or more strictly m3/s-m.  This input helps to define the operating conditions that correspond with Rated Beam Heating Capacity per Meter.   It is used to normalize the independent variable in the input field called Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name.  The default is 0.00005 m3/s-m.
 
@@ -6244,8 +6203,6 @@ An example input follows:
         Zone One 4pipe Beam Outlet Node Name , !- Primary Air Outlet Node Name
         Zone One 4pipe Beam CW Inlet Node , !- Chilled Water Inlet Node Name
         Zone One 4pipe Beam CW Outlet Node , !- Chilled Water Outlet Node Name
-        Zone One 4pipe Beam HW Inlet Node , !- Hot Water Inlet Node Name
-        Zone One 4pipe Beam HW Outlet Node, !- Hot Water Outlet Node Name
         AUTOSIZE , !- Design Primary Air Volume Flow Rate
         AUTOSIZE , !- Design Chilled Water Volume Flow Rate
         AUTOSIZE , !- Design Hot Water Volume Flow Rate
@@ -6263,7 +6220,7 @@ An example input follows:
         CapModFuncOfTempDiff, !- Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name
         HeatCapModFuncOfSAFlow, !- Beam Heating Capacity Air Flow Modification Factor Curve or Table Name
         CapModFuncOfWaterFlow; !- Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name
-    
+
       Curve:Linear,  ! y = x
         CapModFuncOfTempDiff, !-Name
         0, !_ Coef Const
@@ -6272,7 +6229,7 @@ An example input follows:
         1.5, !- max x
         0.0 , !- min y
         1.5; ! max y
-    
+
       Table:OneIndependentVariable,
         CoolCapModFuncOfSAFlow, !- Name
         quadratic,!- Curve Type
@@ -6282,12 +6239,12 @@ An example input follows:
         0.8234,!- min y
         1.1256,!- max y
         dimensionless, !-
-        dimensionless, !- 
+        dimensionless, !-
         , !- normalization ref
         0.714286, 0.823403,
         1.0,      1.0,
         1.2857,   1.1256;
-    
+
       Table:OneIndependentVariable,
         CapModFuncOfWaterFlow, !- Name
         quadratic,!- Curve Type
@@ -6297,7 +6254,7 @@ An example input follows:
         0.0,!- min y
         1.04,!- max y
         dimensionless, !-
-        dimensionless, !- 
+        dimensionless, !-
          , !- normalization ref
         0.0,      0.0,
         0.05,     0.001,
@@ -6307,7 +6264,7 @@ An example input follows:
         0.833333, 0.97,
         1.0,      1.0,
         1.333333, 1.04;
-       
+
       Table:OneIndependentVariable,
         HeatCapModFuncOfSAFlow, !- Name
         quadratic,!- Curve Type
@@ -6317,11 +6274,11 @@ An example input follows:
         0.8554,!- min y
         1.0778,!- max y
         dimensionless, !-
-        dimensionless, !- 
+        dimensionless, !-
         , !- normalization ref
         0.714286, 0.8554,
         1.0,      1.0,
-        1.2857,   1.0778; 
+        1.2857,   1.0778;
 
 
 ### AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam Outputs
@@ -6347,7 +6304,7 @@ Heating by the primary air to the zone, exclusive of any cooling or heating done
 Heating by the primary air to the zone, exclusive of any cooling or heating done by the beams.
 
 #### Zone Air Terminal Primary Air Flow Rate [m3/s]
-Air flow rate from the central air handler into the zone in m3/s.  Note that this does not include any of the secondary air flow that is induced by the convector and nozzle action (the model does not resolve secondary air flow rate and the result are not available).  
+Air flow rate from the central air handler into the zone in m3/s.  Note that this does not include any of the secondary air flow that is induced by the convector and nozzle action (the model does not resolve secondary air flow rate and the result are not available).
 
 
 ### AirTerminal:SingleDuct:ConstantVolume:CooledBeam
@@ -7003,7 +6960,7 @@ The latent heat recovery effectiveness, where effectiveness is defined as the ch
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Heating Air Flow Rate and Maximum Cooling Air Flow Rate in a Ideal Load Air System zone HVAC object. The scaled maximum heating and cooling air flow rates are used to size the heating and cooling capacities.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Heating Air Flow Rate and Maximum Cooling Air Flow Rate in a Ideal Load Air System zone HVAC object. The scaled maximum heating and cooling air flow rates are used to size the heating and cooling capacities.
 
 
 
@@ -7144,6 +7101,15 @@ An example of this object in an IDF is:
 * HVAC,Sum,Zone Ideal Loads Heat Recovery Active Time [hr]
 
 * HVAC,Average,Zone Ideal Loads Hybrid Ventilation Available Status []
+
+* HVAC,Average,Zone Ideal Loads Outdoor Air Mass Flow Rate [kg/s]
+
+* HVAC,Average,Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate [m3/s]
+
+* HVAC,Average,Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]
+
+* HVAC,Average,Zone Ideal Loads Supply Air Standard Density Volume Flow Rate [m3/s]
+
 
 
 #### Ideal Loads Output Variable Overview
@@ -7321,15 +7287,31 @@ Hours when the Ideal Loads heat recovery was actively heating or cooling the out
 
 This is the availability status of the ideal loads object as set by the hybrid ventilation manager. Rules to determine the availability status are described in the section ‘Group – System Availability Managers’. The control status outputs are represented using integers 0 and 1. These integers represent NoAction (0) and ForceOff (1). When the availability status is ForceOff, the unit is turned off regardless of its availability schedule. The other status flag i.e. NoAction does not control the unit and the controls of the unit turn it back on. Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the “detailed” reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
+#### Zone Ideal Loads Outdoor Air Mass Flow Rate [kg/s]
+
+The mass flow rate of the outdoor air stream in kg/s.
+
+#### Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate [m3/s]
+
+The volume flow rate of the outdoor air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location’s elevation and a temperature of 20.0ºC. The standard density does not vary over time.
+
+#### Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]
+
+The mass flow rate of the supply air stream in kg/s.
+
+#### Zone Ideal Loads Supply Air Standard Density Volume Flow Rate [m3/s]
+
+The volume flow rate of the supply air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location’s elevation and a temperature of 20.0ºC. The standard density does not vary over time.
+
 ### ZoneHVAC:FourPipeFanCoil
 
 What is a fan coil unit? Like many HVAC terms, “fan coil unit” is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. The hydronic heating coil may be replaced with an electric heating coil. Typically these units are small (200 – 1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, *ZoneHVAC:UnitVentilator* should be used.
 
 The heating or cooling output of the unit ventilator is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit.
 
-Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans ar typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
+Carrier offers a retrofit VSD motor for fan coil units. It claims up to 45% energy savings from such a retrofit, as well as increased comfort and less noise compared to a cycling fan (fan coil fans are typically noisy and inefficient). Some other manufacturers are also offering units with VSD fans. Variable speed fans appear to offer an easy way to significantly increase the efficiency of what have typically been very inefficient units.
 
-EnergyPlus provides 5 capacity control methods for this unit:
+EnergyPlus provides 6 capacity control methods for this unit:
 
   1. multi-speed cycling fan with constant water flow rate
 
@@ -7341,9 +7323,11 @@ EnergyPlus provides 5 capacity control methods for this unit:
 
   5. multi-speed fan with cycling between speeds and  constant water flow.
 
+  6. fan speed control based on ASHRAE 90.1
+
 In EnergyPlus the fan coil units are modeled as compound components. That is, they are assembled from other components. Fan coils contain an outdoor air mixer, a fan, a heating coil and a cooling coil. These components are described elsewhere in this document. The fan coil input simply requires the names of these four components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor airflow rate, and maximum and minimum hot (for hydronic heating coil only) and cold water volumetric flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, and outlet air node names and the outdoor air mixer object name. The outdoor air mixer child object provides the outdoor air and relief air nodes names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. The fan coil unit is connected to a hot water loop through its hot water coil or with no hot water loop when using an electric coil (demand side) and to a chilled water loop (demand side) through its cooling coil.
 
-Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, and for *MultiSpeedFan* a *Fan:OnOff* should be chosen.
+Note that the type of fan component associated with the fan coil unit depends on the type of capacity control method chosen. For *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used, for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*, for *MultiSpeedFan* a *Fan:OnOff* should be used, and for *ASHRAE90VariableFan*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen.
 
 Fan coil units can be 4-pipe or 2-pipe. For 4-pipe units there are 2 supply pipes and 2 return pipes. For 2-pipe units there is a single supply pipe and a single return pipe and the supply is switched between hot and chilled water depending on the season. EnergyPlus models 4-pipe units, but the 4-pipe model can be used to model 2-pipe units by using the coil availability schedules to make sure that either hot or chilled water is exclusively available. Fan coil units with hydronic heat can instead be modeled using an electric heating coil if desired (i.e., replace the hydronic heating coil with an electric heating coil).
 
@@ -7355,11 +7339,13 @@ A unique user assigned name for an instance of a Fan Coil unit. Any reference to
 
 The name of the schedule (ref: Schedule) that denotes whether the fan coil unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
 
-***Field: Capacity Control  Method***
+***Field: Capacity Control Method***
 
-This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, or ***MultiSpeedFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. 
+This input denotes how the unit’s output is controlled in order to meet zone heating or cooling requirement. The choices are ***ConstantFanVariableFlow***, ***CyclingFan***, ***VariableFanVariableFlow***, ***VariableFanConstantFlow***, ***MultiSpeedFan***, or ***ASHRAE90VariableFan***. For *ConstantFanVariableFlow*, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For *CyclingFan*, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For *VariableFanVariableFlow*  both air and water flow rates are varied to match the load. For *VariableFanConstantFlow,* the water flow rate is at full flow and the fan speed varies to meet the load. For *MultiSpeedFan* the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. For *ASHRAE90VariableFan*, the fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. The water coil water flow rate, or the electric heating coil part-load ratio, is modulated to meet the zone load. If the zone sensible load is greater than the zone sensible load multiplied by the low speed supply air flow ratio, then the air and water flow rate is increased to meet the load. If the zone load is greater than the design sensible load, the fan air flow rate is maintained at the maximum value while the water flow rate is further increased to the maximum available while electric heating coils are maintained at the maximum output.
 
-***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schdule type. The model selects at what fan speed to run depending on cooling or heating load. 
+***Note: when ASHRAE90VariableFan is selected, if the the Minimum Supply Air Temperature in Cooling/Heating Mode inputs are not specified, the simulation must include zone sizing to calculate the zone design sensible cooling and heating load used to modulate the fan speed and, for water coils, the water flow rate or for electric heating coils, the part load ratio.***
+
+***MultiSpeedFan:*** for a given load, the fan cycles between speeds when fan speed selected is higher than the minimum speed or the fan cycles on-off when the fan speed selected is the minimum and the fan operating schedule is cycling fan. When the fan is operating as a continuous fan, then the fan runs at minimum speed even when there is no load to meet. When the speed selected is higher than the minimum speed, then the fan cycles between consecutive speed regardless of the fan operating schedule type. The model selects at what fan speed to run depending on cooling or heating load.
 
 #### Field: Maximum Supply Air Flow Rate
 
@@ -7367,11 +7353,11 @@ The maximum volumetric airflow rate (m<sup>3</sup>/sec) through the fan coil uni
 
 #### Field: Low Speed Supply Air Flow Ratio
 
-This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. Its value should be less than *Medium Speed Supply Air Flow Ratio.* If left blank, the default value is 0.33. Leave it blank if the capacity control method selected is not *CyclingFan*.
+This numerical field specifies the ratio of the low speed flow rate to the maximum supply air flow rate. This value should be less than the *Medium Speed Supply Air Flow Ratio.* If left blank, the default value is 0.33. Leave this field blank if the capacity control method selected is not *CyclingFan* or *ASHRAE90VariableFan*. The suggested value is 0.5 when using the ASHRAE90VariableFan capacity control method.
 
 #### Field: Medium Speed Supply Air  Flow Ratio
 
-This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the *Low Speed Supply Air Flow Ratio* but less than 1.If left blank, the default value is 0.66.Leave it blank if the capacity control method selected is not *CyclingFan*.
+This numerical field specifies the ratio of the medium speed flow rate to the maximum supply air flow rate. Its value should be greater than the *Low Speed Supply Air Flow Ratio* but less than 1. If left blank, the default value is 0.66. Leave this field blank if the capacity control method selected is not *CyclingFan* or *MultiSpeedFan*.
 
 #### Field: Maximum Outdoor Air Flow Rate
 
@@ -7411,9 +7397,10 @@ This field specifies the type of supply air fan object used by this fan coil. Th
 
 #### Field: Supply Air Fan Name
 
-The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. And for *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume*  should be chosen. The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
+The name of a fan component that composes part of the fan coil unit. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for *ConstantFanVariableFlow * a *Fan:OnOff* or *Fan:ConstantVolume* should be used. For *CyclingFan*, a *Fan:OnOff* should be used. For *VariableFanVariableFlow* or *VariableFanConstantFlow* a *Fan:VariableVolume* should be chosen. For *MultiSpeedFan* a *Fan:OnOff* should be used. And for *ASHRAE90VariableFan*, a *Fan:OnOff* or *Fan:VariableVolume* should be chosen. 
 
-The fan’s outlet node should be the same as the cooling coil’s air inlet node.
+    The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
+    The fan’s outlet node should be the same as the cooling coil’s air inlet node.
 
 #### Field: Cooling Coil Object Type
 
@@ -7491,11 +7478,17 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Four Pipe FanCoil zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Four Pipe FanCoil zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
-#### Filed: Supply Air Fan Operating Mode Schedule Name
+#### Field: Supply Air Fan Operating Mode Schedule Name
 This input field is the name of a schedule that controls fan operation. Schedule Name values of 0
-denote cycling fan operation (fan cycles with cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiSpeedFan* capacity control method only.
+denote cycling fan operation (fan cycles with heating or cooling coil). Schedule values greater than 0 denote constant fan operation (fan runs continually regardless of coil operation). The fan operating mode defaults to cycling fan operation if this field is left blank. This input field is currently used with *MultiSpeedFan* capacity control method only.
+
+#### Field: Minimum Supply Air Temperature in Cooling Mode
+This optional input is used only when *Capacity Control Method = ASHRAE90VariableFan*. Specify the minimum supply air temperature in cooling mode. When the fan coil capacity is greater than the zone load, the fan speed will modulate down to the minimum fan speed, based on the Low Speed Supply Air Flow Ratio input field, and the water flow rate will also be reduced to maintain the zone thermostat set point temperature. When the zone load is one-half the fan coil capacity, the fan will operate at the minimum speed. When these fields are not entered, a zone sizing simulation must be performed. Both the cooling and heating supply air temperature must be entered or blank in unison. Values must be greater than 0 or this field is autosizable. A value of 0 (in both fields) will disregard these fields.
+
+#### Field: Maximum Supply Air Temperature in Heating Mode
+This optional input is used only when *Capacity Control Method = ASHRAE90VariableFan*. Specify the maximum supply air temperature in heating mode. When the fan coil capacity is greater than the zone load, the fan speed will modulate down to the minimum fan speed, based on the Low Speed Supply Air Flow Ratio input field, and the water flow rate will also be reduced to maintain the zone thermostat set point temperature. When the zone load is one-half the fan coil capacity, the fan will operate at the minimum speed. When these fields are not entered, a zone sizing simulation must be performed. Both the cooling and heating supply air temperature must be entered or blank in unison. Values must be greater than 0 or this field is autosizable. A value of 0 (in both fields) will disregard these fields.
 
 
 An example input for a fan coil unit, including its constituent components, is shown below.
@@ -7675,7 +7668,7 @@ This field is indicates the speed chosen for the fan in the *CyclingFan* and *Mu
 
 #### Fan Coil Part Load Ratio []
 
-When the capacity control method is *VariableFanVariableFlow* or *VariableFanConstantFlow,* this output variable reports the unit part load ratio (ratio of unit heating / cooling output to the maximum heating / cooling output). This variable is defined only for *VariableFanVariableFlow*, *VariableFanConstantFlow* or *MultiSpeedFan* capacity control methods. The unit part load ratio is applicable to *MultiSpeedFan* only when the fan speed level selected is the minimum (Speed 1).  
+When the capacity control method is *VariableFanVariableFlow* or *VariableFanConstantFlow,* this output variable reports the unit part load ratio (ratio of unit heating / cooling output to the maximum heating / cooling output). This variable is defined only for *VariableFanVariableFlow*, *VariableFanConstantFlow* or *MultiSpeedFan* capacity control methods. The unit part load ratio is applicable to *MultiSpeedFan* only when the fan speed level selected is the minimum (Speed 1).
 
 #### Fan Coil Availability Status []
 
@@ -7849,7 +7842,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Unit Ventilator zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Unit Ventilator zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 
 
@@ -8086,7 +8079,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields *Maximum Supply Air Flow Rate* in this Unit Heater zone HVAC object. The scaled maximum supply air flow rates is used to size Maximum Hot Water or Steam Flow Rate if specified as autosize. The scaled Maximum Air Flow Rate in turn is used to size heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields *Maximum Supply Air Flow Rate* in this Unit Heater zone HVAC object. The scaled maximum supply air flow rates is used to size Maximum Hot Water or Steam Flow Rate if specified as autosize. The scaled Maximum Air Flow Rate in turn is used to size heating capacity of the unit.
 
 
 
@@ -8261,7 +8254,7 @@ This optional alpha input field defines the user-defined name of the second evap
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object defined elsewhere. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input field *Design Supply Air Flow Rate* in Evaportaive Cooler zone HVAC object. The scaled design supply air flow rates in turn is used to size capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object defined elsewhere. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input field *Design Supply Air Flow Rate* in Evaportaive Cooler zone HVAC object. The scaled design supply air flow rates in turn is used to size capacity of the unit.
 
 
 
@@ -8683,7 +8676,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Window Air Conditioner zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Window Air Conditioner zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling capacity of the unit.
 
 
 
@@ -8936,7 +8929,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Packaged Terminal Air Conditioner  zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Packaged Terminal Air Conditioner  zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 As shown in the example below, correct specification of the packaged terminal air conditioner requires the following objects in addition to the compound object itself:
 
@@ -9286,7 +9279,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 As shown in the example below, correct specification of the packaged terminal heat pump requires the following objects in addition to the compound object itself:
 
@@ -9756,7 +9749,7 @@ This field specifies the way in which water flow through the heat pump coils wil
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object.  A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Water To Air Heat Pump zone HVAC object.  The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object.  A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Water To Air Heat Pump zone HVAC object.  The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 
 
@@ -10597,7 +10590,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this VRF terminal unit zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this VRF terminal unit zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 
 
@@ -10737,268 +10730,6 @@ This output field is the electricity consumption of the zone terminal unit in Jo
 
 This is the availability status of the Zone Terminal Unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the Zone Terminal Unit object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:\* Outputs). For multiple availability managers in an Availability Manager Assignment List along with Hybrid Ventilation Manager, rules to determine fan availability status are described in the section ‘Group – System Availability Managers’. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the “detailed” reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
-### DesignSpecification:ZoneHVAC:Sizing
-
-This object is used to describe general sizing and scalable sizing methods which are referenced by zone HVAC equipment objects. It is optional input field in zone HVAC objects. If a name of this optional input is not specified or is blank then the sizing method or input specified in the parent object is used.  If the name of this object is entered, then the values or method specified overrides the sizing method in the parent zone HVAC objects. This object is meant to provide scalable sizing method to users. The name of this object is an optional input field in the zoneHVAC objects. When this name in not specified in the zone HVAC object the sizing method or the value specified in the zone HVAC object will be used.
-
-
-
-List of zoneHVAC objects than can reference this object include:
-
-* ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
-
-* ZoneHVAC:PackagedTerminalAirConditioner
-
-* ZoneHVAC:PackagedTerminalHeatPump
-
-* ZoneHVAC:WaterToAirHeatPump
-
-* ZoneHVAC:WindowAirConditioner
-
-* ZoneHVAC:UnitHeater
-
-* ZoneHVAC:UnitVentilator
-
-* ZoneHVAC:FourPipeFanCoil
-
-* ZoneHVAC:VentilatedSlab
-
-* ZoneHVAC:EvaporativeCoolerUnit
-
-* ZoneHVAC:IdealLoadsAirSystem
-
-
-
-The sizing methods input fields available in this objects are for supply air flow and capacity for heating and cooling operating modes. Some zone HVAC equipment has single supply air flow rate input field that serves both cooling and heating operating modes.  So entering either of the cooling or heating scalable sizing input field is sufficient.  When there are separate input fields for cooling, heating, no-cooling, and no-heating operating modes, the corresponding input fields are specified.  The child components supply air flow rate are also sized using scalable sizing methods specified in the parent objects. The methods allow users to enter a fixed or hard sized values, autosizable, or scalable sizing methods.  Methods allowed for sizing supply air flow rates include: *SupplyAirFlowRate*, *FractionOfAutosizedCoolingAirflow*, *FractionOfAutosizedHeatingAirflow*, *FlowPerFloorArea, FlowPerCoolingCapacity*, and *FlowPerHeatingCapacity*.  The different sizing options are defined as follows:
-
-* **SupplyAirFlowRate**: entered when it is intended that the user specified either hard value or the simulation engine autosize the supply air flow rates for cooling, heating, and no-cooling or no-heating operating modes.
-
-* **FlowPerFloorArea**: entered when it is intended that the simulation engine determine the supply air flow rates from the user specified *supply air flow rates per unit floor area* and the zone floor area of the zone served by the zone HVAC equipment.
-
-* **FractionOfAutosizedCoolingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized cooling design supply air flow rate*.
-
-* **FractionOfAutosizedHeatingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized heating design supply air flow rate*.
-
-* **FlowPerCoolingCapacity**: entered when it is intended t that he simulation engine determines the supply air flow rates from the user specified *supply air flow per cooling capacity value* and *autosized cooling design capacity*.
-
-* **FlowPerHeatingCapacity**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *supply air flow per heating capacity value* and *autosized heating design capacity*.
-
-The  Design Specification ZoneHVAC Sizing object also has input fields for sizing or scalable sizing of cooling and heating capacity. However, most of the parent zone HVAC objects do not have input fields for sizing capacities. So, the capacity scalable sizing fields in the parent objects are used for sizing child components capacity sizings.  The scalable capacity sizing may be indirectly impacted by the scalable supply air flow rates sizing values. Moreover, the autosized cold water, hot water and steam flow rates in the parent zone HVAC objects (e.g. FanCoils, UnitHeaters, UnitVentilators, and VentilatedSlabs) and capacity in child components are determined using the scalable sizing methods.  Sizing methods allowed for cooling and heating capacity include: *CoolingDesignCapacity, HeatingDesignCapacity*, *CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity*, *FractionOfAutosizedHeatingCapacity*.
-
-* **CoolingDesignCapacity**: entered when it is intended that user specifies either a hard sized cooling capacity value or the simulation engine autosizes cooling capacity value for the cooling design capacity.
-
-* **HeatingDesignCapacity**: entered when it is intended that user specifies either a hard sized heating capacity value or the simulation engine autosized heating capacity value for the heating design capacity.
-
-* **CapacityPerFloorArea**: is entered when it is intended that the simulation engine determines the cooling or heating capacity from user specified capacity per floor area value and the floor area of the zone served by the zone HVAC equipment.
-
-* **FractionOfAutosizedCoolingCapacity**: entered when it is intended that the simulation engine sizes the cooling capacity from the user specified *capacity fraction* and *autosized cooling design capacity* value.
-
-* **FractionOfAutosizedHeatingCapacity**: entered when it is intended that the simulation engine sizes the heating capacity from the user specified *capacity fraction* and *autosized heating design capacity* value.
-
-Description of the input fields of the design specification zone HVAC sizing object “DesignSpecification:ZoneHVAC:Sizing”:
-
-#### Field: Name
-
-Unique identifier name of the DesignSpecification:ZoneHVAC:Sizing object. This sizing specification object referenced by a zone HVAC equipment whose design calculation will be made using the input data of this object.
-
-#### Field: Cooling Design Air Flow Method
-
-The input of this field must be the method used to determine the cooling supply air volume flow rate. Input allowed is either *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*.  None means cooling coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means the user specifies the magnitude of supply air flow rate or the program calculates the design cooling supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the cooling supply air volume flow rate from zone floor area served by the zone HVAC unit and user specified *Flow Per Floor Area* value. *FractionOfAutosizedCoolingAirflow* means the program calculates the cooling supply air volume flow rate from user specified fraction and the autosized design cooling supply air volume flow rate value determined by the simulation. FlowPerCoolingCapacity means the supply air volume is calculated from user specified flow per cooling capacity and design cooling capacity determined by the simulation. The default method is *SupplyAirFlowRate*.
-
-#### Field: Cooling Design Supply Air Flow Rate {m3/s}
-
-Enter the magnitude of the cooling supply air volume flow rate in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Cooling Design air Flow Method is *SupplyAirFlowRate*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment. This input field is also autosizable.
-
-#### Field: Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-
-Enter the cooling supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Cooling Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the cooling supply air volume flow rate from the zone conditioned floor area served by the zone HVAC equipment and the flow per unit area value specified by the user. Zone sizing object (Sizing:Zone) is not required.
-
-#### Field: Fraction of Autosized Cooling Design Supply Air Flow Rate {-}
-
-Enter the cooling supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required when the Cooling Design air Flow Method is *FractionOfAutosizedCoolingAirflow*. This input field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design air Flow Method is not *FractionOfAutosizedCoolingAirflow*. The program calculates the cooling supply air volume flow rate from the design autosized cooling supply air flow rate and user specified fraction. Zone sizing object (Sizing:Zone) is required.
-
-#### Field: Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-
-Enter the cooling supply air volume flow rate per unit cooling capacity in m3/s-W. This input field is required when the Cooling Design air Flow Method is *FlowPerCoolingCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design air Flow Method is not *FlowPerCoolingCapacity*. The program calculates the cooling supply air volume flow rate from the design autosized cooling capacity and user specified flow per cooling capacity value. Zone sizing object (Sizing:Zone) is required.
-
-#### Field: Supply Air Flow Rate Method When No Cooling or Heating is Required
-
-Enter the method used to determine the supply air volume flow rate when No Cooling or Heating is required. Inputs allowed are *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, and *FractionOfAutosizedHeatingAirflow.* *None* is used when a cooling or heating coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means user specifies the magnitude of supply air flow rate or the program calculates the design supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the supply air volume flow rate from the zone floor area served by the zone HVAC unit and Flow Per Floor Area value specified by user. *FractionOfAutosizedCoolingAirflow* means the program calculates the supply air volume flow rate from user specified fraction and autosized design cooling supply air volume flow rate value determined by the program. FractionOfAutosizedHeatingAirflow means the program calculates the supply air volume flow rate from user specified fraction and autosized heating supply air flow rate value determined by the program. The default method is *SupplyAirFlowRate*.
-
-#### Field: Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
-
-Enter the magnitude of the supply air volume flow rate when no cooling or heating is required in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Supply Air Flow Rate Method When No Cooling or Heating is Required is *SupplyAirFlowRate*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment. This input field is also autosizable.
-
-#### Field: Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required  {m3/s-m2}
-
-Enter the magnitude of supply air volume flow rate per zone floor area in m3/s-m2. This input is a required field when Supply Air  Flow Rate Method When No Cooling or Heating is Required is *FlowPerFloorArea*. The program calculates the supply air flow rate when no cooling or heating is required from user specified flow per floor area and the zone area served by current zoneHVAC equipment.
-
-####  Field: Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required {-}
-
-Enter the fraction of supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required field when Supply Air Flow Rate Method When No Cooling or Heating is Required is *FractionOfAutosizedCoolingAirflow*.  The program calculates the supply air flow rate when no cooling or heating is required from user specified fraction and the design cooling autosized supply air flow rate.
-
-#### Field: Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required {-}
-
-Enter the fraction of supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required field when Supply Air Flow Rate Method When No Cooling or Heating is Required is *FractionOfAutosizedHeatingAirflow*.  The program calculates the supply air flow rate when no cooling or heating is required from user specified fraction and the design heating autosized supply air flow rate.
-
-#### Field: Heating Design Air Flow Method
-
-The input of this field must be the method used to determine the heating supply air volume flow rate. Input allowed is either *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*.  *None* means heating coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means the user specifies the magnitude of supply air flow rate or the program calculates the design heating supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the heating supply air volume flow rate from zone floor area served by the zone HVAC unit and user specified *Flow Per Floor Area* value. *FractionOfAutosizedHeatingAirflow* means the program calculates the heating supply air volume flow rate from user specified fraction and the autosized design heating supply air volume flow rate value determined by the simulation. *FlowPerHeatingCapacity* means the supply air volume is calculated from user specified flow per heating capacity and design heating capacity determined by the simulation. The default method is *SupplyAirFlowRate*.
-
-#### Field: Heating Design Supply Air Flow Rate {m3/s}
-
-Enter the magnitude of the heating supply air volume flow rate in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Heating Design air Flow Method is *SupplyAirFlowRate*. This field may be left blank if a heating coil is not included in the zone HVAC equipment. This input field is also autosizable.
-
-#### Field: Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
-
-Enter the heating supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Heating Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the heating supply air volume flow rate from the zone conditioned floor area served by the zone HVAC equipment and the flow per unit area value specified by the user.
-
-#### Field: Fraction of Autosized Heating Design Supply Air Flow Rate {-}
-
-Enter the heating supply air volume flow rate as a fraction of the autosized heating supply air flow rate. This input field is required when the Heating Design air Flow Method is *FractionOfAutosizedHeatingAirflow*. This input field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design air Flow Method is not *FractionOfAutosizedHeatingAirflow*. The program calculates the heating supply air volume flow rate from the design autosized heating supply air flow rate and user specified fraction.
-
-#### Field: Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-
-Enter the heating supply air volume flow rate per unit heating capacity in m3/s-W. This input field is required when the Heating Design air Flow Method is *FlowPerHeatingCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Heating Design air Flow Method is not *FlowPerHeatingCapacity*. The program calculates the heating supply air volume flow rate from the design autosized heating capacity and user specified flow per unit heating capacity value.
-
-#### Field Cooling Design Capacity Method
-
-Enter the method used to determine the cooling design capacity for scalable sizing. Input allowed is either *None*, *CoolingDesignCapacity*, *CapacityPerFloorArea*, and *FractionOfAutosizedCoolingCapacity*. None is used when a cooling coil is not included in the Zone HVAC equipment or this field may be left blank. If this input field is left blank, then the design cooling capacity is set to zero. *CoolingDesignCapacity* means user specifies the magnitude of cooling capacity or the program calculates the design cooling capacity if autosize is specified. *CapacityPerFloorArea* means the program calculates the design cooling capacity from user specified cooling capacity per floor area and floor area of the zone served by the HVAC unit. *FractionOfAutosizedCoolingCapacity* means the program calculates the design cooling capacity from user specified fraction and the auto-sized design cooling capacity. The default method is *CoolingDesignCapacity*.
-
-#### Field: Cooling Design Capacity {W}
-
-Enter the magnitude of the cooling capacity in Watts. This input is an alternative to using the program auto-calculated cooling capacity value. This input is a required field when the Cooling Design Capacity Method is *CoolingDesignCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or alternative method is specified. This input field is autosizable. Design day sizing run must be specified.
-
-#### Field: Cooling Design Capacity Per Floor Area {W/m2}
-
-Enter the cooling capacity per unit floor area in m3/s-m2. This field is required field when the Cooling Design Capacity Method is *CapacityPerFloorArea*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Capacity Method is not *CapacityPerFloorArea*. The program calculates the cooling capacity from floor area of the zone served by the zone HVAC equipment and the cooling capacity per unit floor area value specified by the user.
-
-#### Field: Fraction of Autosized Cooling Design Capacity {-}
-
-Enter the cooling capacity as a fraction of the autosized cooling capacity. This input field is required when the Cooling Design Capacity Method is *FractionOfAutosizedCoolingCapacity*. This input field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Capacity Method is not *FractionOfAutosizedCoolingCapacity*. The program calculates the cooling capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified.
-
-#### Field: Heating Design Capacity Method
-
-Enter the method used to determine the heating design capacity for scalable sizing. Input allowed is either *None*, *HeatingDesignCapacity*, *CapacityPerFloorArea*, and *FractionOfAutosizedHeatingCapacity*. None is used when a heating coil is not included in the Zone HVAC equipment or this field may be left blank. If this input field is left blank, then the design heating capacity is set to zero. *HeatingDesignCapacity* means user specifies the magnitude of heating capacity or the program calculates the design heating capacity if autosize is specified. *CapacityPerFloorArea* means the program calculates the design heating capacity from user specified heating capacity per floor area and floor area of the zone served by the HVAC unit. *FractionOfAutosizedHeatingCapacity* means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity. The default method is *HeatingDesignCapacity*.
-
-#### Field: Heating Design Capacity {W}
-
-Enter the magnitude of the heating capacity in Watts. This input is an alternative to using the program auto-calculated heating capacity value. This input is a required field when the Heating Design Capacity Method is *HeatingDesignCapacity*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or alternative method is specified. This input field is autosizable. Design day sizing run must be specified.
-
-#### Field: Heating Design Capacity Per Floor Area {W/m2}
-
-Enter the heating capacity per unit floor area in m3/s-m2. This field is required field when the Heating Design Capacity Method is *CapacityPerFloorArea*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Capacity Method is not *CapacityPerFloorArea*. The program calculates the heating capacity from floor area of the zone served by the zone HVAC equipment and the heating capacity per unit floor area value specified by the user.
-
-#### Field: Fraction of Autosized Heating Design Capacity {-}
-
-Enter the heating capacity as a fraction of the autosized heating capacity. This input field is required when the Heating Design Capacity Method is *FractionOfAutosizedHeatingCapacity*. This input field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Capacity Method is not *FractionOfAutosizedHeatingCapacity*. The program calculates the heating capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified.
-
-```idf
-  DesignSpecification:ZoneHVAC:Sizing,
-    VRFDesignSpec1,          !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-  DesignSpecification:ZoneHVAC:Sizing,
-    VRFDesignSpec2,          !- Name
-    FlowPerFloorArea,        !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate
-    3.6311418E-03,           !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    FlowPerFloorArea,        !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-    3.6311418E-03,           !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    FlowPerFloorArea,        !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate
-    3.6311418E-03,           !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-DesignSpecification:ZoneHVAC:Sizing,
-    VRFDesignSpec3,          !- Name
-    FractionOfAutosizedCoolingAirflow,  !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    0.5,                     !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-  FractionOfAutosizedCoolingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    0.5,                 !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                    !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    FractionOfAutosizedHeatingAirflow,  !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    0.5,                     !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-DesignSpecification:ZoneHVAC:Sizing,
-    VRFDesignSpec4,          !- Name
-    FlowPerCoolingCapacity,  !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    2.9541628E-05,           !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-  FractionOfAutosizedHeatingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                    !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    0.413231177,         !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    FlowPerHeatingCapacity,  !- Heating Design Air Flow Method
-    ,                        !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    2.9541628E-05,           !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-```
-
 Group – Unitary Equipment
 -------------------------
 
@@ -11021,6 +10752,10 @@ The components
 * AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed
 
 are compound components usually placed in the primary air loop as the sole component. On the zone equipment side they are usually connected to one or more zones through uncontrolled terminal units (i.e., AirTerminal:SingleDuct:Uncontrolled objects). The maximum or design air flow rate through the furnace or unitary system should usually be set equal to the sum of the maximum air flow rates through the terminal unit objects. However, the simulation program can usually account for unequal air flows if the user wishes to model this scenario.
+
+The following HVAC equipment types are allowed in the air loop. The component matrix shows which coils and fans are allowed with which equipment models.
+
+![](media/AirLoopComponentMatrix.png)
 
 ### AirLoopHVAC:UnitarySystem
 
@@ -11407,6 +11142,7 @@ UnitarySystemPerformance:Multispeed,
    MyMultispeedHPSpec,      !- Name
    4,                       !- Number of Speeds for Heating
    4,                       !- Number of Speeds for Cooling
+   No,                      !- Single Mode Operation
    0.235294118,             !- Heating Speed 1 Supply Air Flow Rate {m3/s}
    0.235294118,             !- Cooling Speed 1 Supply Air Flow Rate {m3/s}
    0.470588235,             !- Heating Speed 2 Supply Air Flow Rate {m3/s}
@@ -11497,11 +11233,15 @@ This output variable is the ratio of the sensible load (heating or cooling) to t
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the unitary system’s DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the unitary system is cycling on and off its lowest speed (Speed 1) and 1.0 when the unitary system operates at speeds above 1.
 
+When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed. 
+
 #### Unitary System DX Coil Speed Ratio []
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( [Compressor Speed - Compressor speed at Speed i-1] / [Compressor speed at Speed i - Compressor speed at Speed i-1]). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
 The physical meaning of the speed ratio is dependent on the compressor configuration defined in the field of child coil object: Apply Part Load Fraction to Speeds greater than 1. The allowed choice is either Yes or No. When No is entered, one compressor is assumed for all speeds.  The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep. When Yes is entered, multiple compressors are assumed, and each compressor has associated speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the low speed runs in a whole system timestep.
+
+When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1 and 1 at Speed > 1.
 
 #### Unitary System DX Coil Speed Level []
 
@@ -11581,7 +11321,7 @@ This output variable is the sensible heating requested from the zone thermostat 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed fan chilled water or hot water coil for the entire system timestep. The value is between 0.0 and 1.0 when the AHU is cycling on and off its lowest speed (fan speed 1) and 1.0 when the multispeed fan chilled water or hot water AHU operates at speed levels above 1.
 
 #### Unitary System Water Coil Speed Ratio []
-This output variable is the ratio of time in a system timestep that the AHU fan is at rated speed between two consecutive speed levels ( [System Load – Capacity at Fan Speed i-1] / [Capacity at Fan Speed i – Capacity at Fan Speed i-1]). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation. AHU speed ratio depends on the system load and the supply air fan speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep. 
+This output variable is the ratio of time in a system timestep that the AHU fan is at rated speed between two consecutive speed levels ( [System Load – Capacity at Fan Speed i-1] / [Capacity at Fan Speed i – Capacity at Fan Speed i-1]). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation. AHU speed ratio depends on the system load and the supply air fan speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep.
 
 #### Unitary System Water Coil Speed Level []
 This output variable reports the maximum speed needed when the system operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the AHU operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed level is above the minimum (speed =1), the system operation is determined by the speed ratio. For example, when the speed ratio is 0.4 and the speed lever is 3, then the supply air fan and water coil operate at Speed 3 for 40% of a system timestep and at Speed 2 for 60% of a system timestep.
@@ -11599,6 +11339,10 @@ This field defines the number of heating speeds for the heat pump, and must matc
 #### Field: Number of Speeds for Cooling
 
 This field defines the number of cooling speeds for the heat pump, and must match the number of cooling speeds defined in the associated DX cooling coil. The value for this input field defines the number of airflow rate ratios that must be defined for cooling in the fields below. The minimum value for this field is one and the maximum value is the number specified in the coil object. If the cooling coil type used in the unitary system object is not a multispeed coil type, then this field should be 1.
+
+#### Field: Single Mode Operation
+
+This field specifies the coil operation mode for multiple speed DX cooling and heating coils during each HVAC timestep. The allowed choice is Yes or No. The No choice allows a coil works between two adjacent speeds when a system load is greater than the coil capacity at speed 1. The Yes choice allows a coil works with a single capacity at a different speed. The speed number is determined by a system load.  
 
 #### Field: Heating Speed 1 Supply Air Flow Ratio
 
@@ -12221,7 +11965,7 @@ This alpha input field contains the type of dehumidification control. The follow
 
 The default is **None**. For the other dehumidification control modes, the maximum humidity setpoint is required. This must be set using a **ZoneControl:Humidistat** object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in AirToAir HeatPumps. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to extra dehumidification required to meet the high relative humidity setpoint.
 
-Note: the air-to-air heat pump’s fan, cooling coil, heating coil and supplementary heating coil must be connected in the air loop according to the configuration shown above (Figure 118) for the blow-through fan configuration. The only other valid configuration is with a draw-through fan placement, where the fan is located between the DX heating coil and the supplementary heating coil. 
+Note: the air-to-air heat pump’s fan, cooling coil, heating coil and supplementary heating coil must be connected in the air loop according to the configuration shown above (Figure 118) for the blow-through fan configuration. The only other valid configuration is with a draw-through fan placement, where the fan is located between the DX heating coil and the supplementary heating coil.
 
 #### AirLoopHVAC:UnitaryHeatPump:AirToAir Example Specification
 
@@ -12543,14 +12287,14 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
     0.2,                     !- Supply air volumetric flow rate when no cooling or heating is needed
     4,                       !- Number of speeds for heating
     4,                       !- Number of speeds for cooling
-    0.4,                     !- Heating Speed 1 Supply Air Flow Rate 
-    0.8,                     !- Heating Speed 2 Supply Air Flow Rate 
-    1.2,                     !- Heating Speed 3 Supply Air Flow Rate 
-    1.7,                     !- Heating Speed 4 Supply Air Flow Rate 
-    0.4,                     !- Cooling Speed 1 Supply Air Flow Rate 
-    0.8,                     !- Cooling Speed 2 Supply Air Flow Rate 
-    1.2,                     !- Cooling Speed 3 Supply Air Flow Rate 
-    1.7;                     !- Cooling Speed 4 Supply Air Flow Rate 
+    0.4,                     !- Heating Speed 1 Supply Air Flow Rate
+    0.8,                     !- Heating Speed 2 Supply Air Flow Rate
+    1.2,                     !- Heating Speed 3 Supply Air Flow Rate
+    1.7,                     !- Heating Speed 4 Supply Air Flow Rate
+    0.4,                     !- Cooling Speed 1 Supply Air Flow Rate
+    0.8,                     !- Cooling Speed 2 Supply Air Flow Rate
+    1.2,                     !- Cooling Speed 3 Supply Air Flow Rate
+    1.7;                     !- Cooling Speed 4 Supply Air Flow Rate
 
 Coil:Heating:DX:MultiSpeed,
     Heat Pump DX Heating Coil 1,  !- Name of heat pump heating coil
@@ -12803,11 +12547,15 @@ This output variable is the ratio of the sensible load (heating or cooling) to t
 
 This output variable is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the multispeed heat pump’s DX heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the heat pump is cycling on and off its lowest speed (Speed 1) and 1.0 when the multispeed heat pump operates at speeds above 1.
 
+When Single Mode Operation is specified, the value is between 0.0 and 1.0 when the heat pump is cycling on at any given speed. 
+
 #### Unitary System DX Coil Speed Ratio []
 
 This output variable is the ratio of time in a system timestep that the compressor is at rated speed between two consecutive speed numbers ( [Compressor Speed - Compressor speed at Speed i-1] / [Compressor speed at Speed i - Compressor speed at Speed i-1]). The compressor speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
 
 The physical meaning of the speed ratio is dependent on the compressor configuration defined in the field of child coil object: Apply Part Load Fraction to Speeds greater than 1. The allowed choice is either Yes or No. When No is entered, one compressor is assumed for all speeds.  The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep. When Yes is entered, multiple compressors are assumed, and each compressor has associated speed. The speed ratio represents how long the higher speed runs as a fraction of the system timestep, and the low speed runs in a whole system timestep.
+
+When Single Mode Operation is specified, the speed ratio is set to 0 at Speed 1, and 1 at Speed > 1
 
 #### Unitary System DX Coil Speed Level []
 
@@ -14015,32 +13763,32 @@ This output field is the dry-bulb set point temperature in degrees Celsius. This
 Group – Variable Refrigerant Flow Equipment
 -------------------------------------------
 
-This group of EnergyPlus input objects describes the configurations of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems. 
+This group of EnergyPlus input objects describes the configurations of Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume) air-conditioning systems.
 
 A VRF system is an air-conditioning system that varies the refrigerant flow rate using variable speed compressor(s) in the outdoor unit, and the electronic expansion valves (EEVs) located in each indoor unit. The system meets the space cooling or heating load requirements by maintaining the zone air temperature at the setpoint. The ability to control the refrigerant mass flow rate according to the cooling and/or heating load enables the use of as many as 60 or more indoor units with differing capacities in conjunction with one single outdoor unit. This unlocks the possibility of having individualized comfort control, simultaneous heating and cooling in different zones, and heat recovery from one zone to another. It may also lead to more efficient operations during part-load conditions.
 
-There are two alternative VRF models in EnergyPlus: 
+There are two alternative VRF models in EnergyPlus:
 
  1. **System curve based model (VRF-SysCurve)**. In this model, a number of system level curves are used to describe the VRF system performance. This model corresponds to the *AirConditioner:VariableRefrigerantFlow* object.
- 
+
  2. **Physics based model (VRF-FluidTCtrl)**. This model is able to consider the dynamics of more operational parameters and is applicable for fluid temperature control. This model corresponds to the *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
- 
+
 ( Please refer to the engineering reference for more technical details of the two models).
 
-In the VRF system model, direct-expansion cooling and/or heating coils are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a *ZoneTerminalUnitList* object, the name of which is entered as an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object. 
+In the VRF system model, direct-expansion cooling and/or heating coils are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a *ZoneTerminalUnitList* object, the name of which is entered as an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
 
 The Energyplus connection methodology is shown as dashed and greyed arrows in the figure below according to the following rules:
 
   * The zone inlet and zone exhaust node names are defined in a *ZoneHVAC:EquipmentConnections* object (bottom of figure).
-  
+
   * A *ZoneHVAC:TerminalUnit:VariableRefrigerantFlow* object will identify these zone exhaust and zone inlet node names as the terminal unit’s air inlet and air outlet nodes, respectively.
-  
+
   * All zone terminal units that are connected to the same *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object are listed in a *ZoneTerminalUnitList* object.
-  
+
   * The name of the *ZoneTerminalUnitList* object is an input to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object.
-  
+
   * The *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* or *AirConditioner:VariableRefrigerantFlow* object is not listed in an AirloopHVAC object, and therefore, can only be simulated if the terminal units are connected to the *AirConditioner:VariableRefrigerantFlow* or *AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl* object using the ZoneTerminalUnitList.
-  
+
   * Secondary ZoneHVAC equipment objects may be used in the same zones as the terminal units for other purposes (e.g., code compliance)
 
 The following schematic demonstrates these connection rules.
@@ -14499,7 +14247,7 @@ AirConditioner:VariableRefrigerantFlow,
 
 ### AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
 
-#### Field: Heat Pump Name 
+#### Field: Heat Pump Name
 
 This alpha field defines a unique user-assigned name for an instance of a variable refrigerant flow heat pump. Any reference to this heat pump will use this name. Since this object is not listed in an AirloopHVAC object, the most likely use of this name would be for reporting purposes.
 
@@ -14513,12 +14261,12 @@ This alpha field defines the name of the zone terminal unit list. The name speci
 
 #### Field: Refrigerant Type
 
-This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid FluidProperties:Name object. 
+This alpha field defines the name of the refrigerant used in the VRF system. The name specified here should match the name of a valid FluidProperties:Name object.
 
 ####Field: Rated Evaporative Capacity
 
 This numeric field defines the total evaporative capacity in watts at rated conditions. This is the capacity corresponding to the max compressor speed at rated conditions. The actual evaporative capacity is obtained by multiplying the rated capacity with the modification factor calculated by Evaporative Capacity Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 40,000 W is assumed.
-	   
+
 ####Field: Rated Compressor Power Per Unit of Rated Evaporative Capacity
 
 This numeric field defines the rated compressor power per Watt of rated evaporative capacity. Rated compressor power corresponds to the max compressor speed at rated conditions. The actual compressor power is obtained by multiplying the rated power with the modification factor calculated by Compressor Power Multiplier Function of Temperature Curve. The value must be greater than 0. If this field is left blank, a default value of 0.35 W/W is assumed.
@@ -14539,23 +14287,23 @@ This numeric field defines the minimum outdoor temperature allowed for heating o
 
 This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
 
-#### Field: Outdoor Unit Reference Superheating 
+#### Field: Outdoor Unit Reference Superheating
 
-This numeric field defines the reference superheating degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used. 
+This numeric field defines the reference superheating degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used.
 
-#### Field: Outdoor Unit Reference Subcooling 
+#### Field: Outdoor Unit Reference Subcooling
 
-This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used. 
+This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used.
 
 #### Field: Refrigerant Temperature Control Algorithm for Indoor Unit
 
 This alpha field specifies the algorithm for the refrigerant temperature control. Two choices are available: ConstantTemp or VariableTemp. The indoor unit evaporating temperature at cooling mode or condensing temperature at heating are fixed in the ConstantTemp algorithm, while in VariableTemp algorithm they can be varied.
 
-#### Field: Reference Evaporating Temperature for Indoor Unit 
+#### Field: Reference Evaporating Temperature for Indoor Unit
 
 This numeric field defines the reference evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 6.0ºC is used.
 
-#### Field: Reference Condensing Temperature for Indoor Unit 
+#### Field: Reference Condensing Temperature for Indoor Unit
 
 This numeric field defines the reference condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 44.0ºC is used.
 
@@ -14576,18 +14324,18 @@ This numeric field defines the minimum condensing temperature for the indoor uni
 This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0ºC is used.
 
 #### Field: Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity
- 
+
 This numeric field defines the outdoor unit fan power per watt of rated evaporative capacity. If this field is blank, the default value of 4.25E-3 W/W is used.
-	   
+
 #### Field: Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity
- 
+
 This numeric field defines the outdoor unit fan volumetric flow rate per watt of rated evaporative capacity. If this field is blank, the default value of 7.50E-5 m<sup>3</sup>/s-W is used.
 
-#### Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name    
+#### Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
 
 This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit evaporating temperature as a function of superheating degrees. The output of this curve is the temperature difference between the coil surface air temperature and the evaporating temperature.
 
-#### Field: Outdoor Unit Condensing Temperature Function of Subcooling Curve Name    
+#### Field: Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
 
 This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
 
@@ -14663,7 +14411,7 @@ This numeric field defines the maximum pressure increase that the compressor can
 
 This numeric field defines the number of compressor loading index entries. Loading index specifies the VRF operational modes at various load conditions. In a single compressor system, loading index reflects the compressor speed. The model requires at least two loading indices. The first index represents the minimal capacity operation, while the last index represents full capacity operation.
 
-#### Field: Compressor Speed at Loading Index i 
+#### Field: Compressor Speed at Loading Index i
 
 This numeric field defines the compressor speed at the i-th loading index. The value must be greater than 0.
 
@@ -14737,8 +14485,8 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     0,                       !- Coefficient1 Constant
     6.05E-1,                 !- Coefficient2 x
     2.50E-2,                 !- Coefficient3 x**2
-    0,                       !- Minimum Value of x    
-    15,                      !- Maximum Value of x    
+    0,                       !- Minimum Value of x
+    15,                      !- Maximum Value of x
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
     Temperature,             !- Input Unit Type for X
@@ -14749,13 +14497,13 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     0,                       !- Coefficient1 Constant
     -2.91,                   !- Coefficient2 x
     1.180,                   !- Coefficient3 x**2
-    0,                       !- Minimum Value of x    
-    20,                      !- Maximum Value of x    
+    0,                       !- Minimum Value of x
+    20,                      !- Maximum Value of x
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
     Temperature,             !- Input Unit Type for X
     Temperature;             !- Output Unit Type
-	
+
   Curve:Biquadratic,
     MinSpdCooling,           !- Name
     3.19E-01,                !- Coefficient1 Constant
@@ -14791,7 +14539,7 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
-	
+
   Curve:Biquadratic,
     Spd1Cooling,             !- Name
     8.12E-01 ,               !- Coefficient1 Constant
@@ -14863,7 +14611,7 @@ Following is an example input for a AirConditioner:VariableRefrigerantFlow:Fluid
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
-	
+
 ```
 
 
@@ -16913,7 +16661,7 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 #### Field: Design Specification ZoneHVAC Sizing Object Name
 
-This optional input field is the name of a DesignSpecificationZoneHVACSizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Ventilated Slab zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the coils.
+This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Ventilated Slab zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the coils.
 
 An example IDF with a ventilated slab is shown below.
 ```idf

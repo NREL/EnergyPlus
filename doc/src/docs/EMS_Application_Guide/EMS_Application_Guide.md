@@ -1,18 +1,12 @@
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Application Guide for EMS</h1>
 <h2>Energy Management System User Guide</h2>
 <br/>
 <p><i>(a.k.a. The Book of Erl)</i></p>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 <br/>
 <br/>
 <p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
@@ -1245,7 +1239,7 @@ The thermal-to-electric ratio describes how the nominal thermal output compares 
 
 ### Electrical Storage
 
-The internal variable called “Electrical Storage Maximum Capacity” provides information about the capacity of electrical storage devices. This is the value of the field called Maximum Storage Capacity in the ElectricLoadCenter:Storage:Simple input object. The units are in Joules.
+The internal variables called Electrical Storage Simple Maximum Capacity and  Electrical Storage Battery Maximum Capacity provide information about the capacity of electrical storage devices. Electrical Storage Simple Maximum Capacity is the value of the field called Maximum Storage Capacity in the ElectricLoadCenter:Storage:Simple input object, the units are in Joules.  Electrical Storage Battery Maximum Capacityâ is the value of the field called Maximum Module Capacity in the ElectricLoadCenter:Storage:Battery input object, the units are in amp-hours for just one battery module.
 
 Sizing
 ------

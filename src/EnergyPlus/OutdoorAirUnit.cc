@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -140,12 +198,12 @@ namespace OutdoorAirUnit {
 	// MODULE VARIABLE DECLARATIONS:
 	int NumOfOAUnits( 0 ); // Number of outdoor air unit in the input file
 	Real64 OAMassFlowRate( 0.0 ); // Outside air mass flow rate for the zone outdoor air unit
-	Array1D_bool MyOneTimeErrorFlag;
 	bool GetOutdoorAirUnitInputFlag( true ); // Flag set to make sure you get input once
 
 	// Autosizing variables
 	Array1D_bool MySizeFlag;
 	Array1D_bool CheckEquipName;
+	Array1D_bool MyOneTimeErrorFlag;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE OUTDOOR AIR UNIT
 	//PRIVATE UpdateOutdoorAirUnit
@@ -154,7 +212,26 @@ namespace OutdoorAirUnit {
 	// Object Data
 	Array1D< OAUnitData > OutAirUnit;
 
+	namespace {
+		bool MyOneTimeFlag( true );
+		bool ZoneEquipmentListChecked( false );
+	}
+
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumOfOAUnits = 0;
+		OAMassFlowRate = 0.0;
+		GetOutdoorAirUnitInputFlag = true;
+		MySizeFlag.deallocate();
+		CheckEquipName.deallocate();
+		MyOneTimeErrorFlag.deallocate();
+		OutAirUnit.deallocate();
+		MyOneTimeFlag = true;
+		ZoneEquipmentListChecked = false;
+	}
 
 	void
 	SimOutdoorAirUnit(
@@ -284,11 +361,13 @@ namespace OutdoorAirUnit {
 		using namespace DataSurfaceLists;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
 		using WaterCoils::GetCoilWaterInletNode;
+		using WaterCoils::GetWaterCoilIndex;
 		auto & GetWCoilInletNode( WaterCoils::GetCoilInletNode );
 		auto & GetWCoilOutletNode( WaterCoils::GetCoilOutletNode );
 		using WaterCoils::GetCoilWaterOutletNode;
 		using HeatingCoils::GetCoilInletNode;
 		using HeatingCoils::GetCoilOutletNode;
+		auto & GetHeatingCoilIndex( HeatingCoils::GetCoilIndex );
 		auto & GetElecCoilInletNode( HeatingCoils::GetCoilInletNode );
 		auto & GetElecCoilOutletNode( HeatingCoils::GetCoilOutletNode );
 		auto & GetHXAssistedCoilFlowRate( HVACHXAssistedCoolingCoil::GetCoilMaxWaterFlowRate );
@@ -301,6 +380,7 @@ namespace OutdoorAirUnit {
 		using Fans::GetFanIndex;
 		using Fans::GetFanType;
 		using Fans::GetFanAvailSchPtr;
+		using Fans::GetFanDesignVolumeFlowRate;
 		using DataHVACGlobals::cFanTypes;
 		using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
@@ -434,7 +514,8 @@ namespace OutdoorAirUnit {
 			}
 			errFlag = false;
 			GetFanType( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
-			if ( ! errFlag ) {
+			OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, errFlag );
+			if( !errFlag ) {
 				OutAirUnit( OAUnitNum ).SFanAvailSchedPtr = GetFanAvailSchPtr( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, errFlag );
 				// get fan index
 				GetFanIndex( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFan_Index, ErrorsFound );
@@ -463,7 +544,8 @@ namespace OutdoorAirUnit {
 				}
 				errFlag = false;
 				GetFanType( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
-				if ( ! errFlag ) {
+				OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
+				if( !errFlag ) {
 					OutAirUnit( OAUnitNum ).ExtFanAvailSchedPtr = GetFanAvailSchPtr( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
 					// get fan index
 					GetFanIndex( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFan_Index, ErrorsFound );
@@ -584,7 +666,7 @@ namespace OutdoorAirUnit {
 						if ( SELECT_CASE_var == "COIL:COOLING:WATER" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_Cooling;
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum = TypeOf_CoilWaterCooling;
-							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = 0;
+							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = GetWaterCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetWCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetWCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterInletNode = GetCoilWaterInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
@@ -595,7 +677,7 @@ namespace OutdoorAirUnit {
 						} else if ( SELECT_CASE_var == "COIL:HEATING:WATER" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_SimpleHeat;
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum = TypeOf_CoilWaterSimpleHeating;
-							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = 0;
+							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = GetWaterCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetWCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetWCoilOutletNode( "Coil:Heating:Water", OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterInletNode = GetCoilWaterInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
@@ -618,6 +700,7 @@ namespace OutdoorAirUnit {
 
 						} else if ( SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_DetailedCool;
+							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex = GetWaterCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum = TypeOf_CoilWaterDetailedFlatCooling;
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetWCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetWCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
@@ -637,11 +720,15 @@ namespace OutdoorAirUnit {
 
 						} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_ElectricHeat;
+							// Get OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, 2 types of mining functions to choose from
+							GetHeatingCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetElecCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetElecCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 
 						} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_GasHeat;
+							// Get OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, 2 types of mining functions to choose from
+							GetHeatingCoilIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirInletNode = GetCoilInletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilAirOutletNode = GetCoilOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
 
@@ -782,7 +869,6 @@ namespace OutdoorAirUnit {
 
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
-		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::StdRhoAir;
 		using DataGlobals::AnyPlantInModel;
@@ -804,6 +890,11 @@ namespace OutdoorAirUnit {
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using PlantUtilities::InitComponentNodes;
+		using FluidProperties::GetDensityGlycol;
+		auto & GetWaterCoilMaxFlowRate( WaterCoils::GetCoilMaxWaterFlowRate );
+		using WaterCoils::SimulateWaterCoilComponents;
+		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -820,8 +911,10 @@ namespace OutdoorAirUnit {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
-		static bool MyOneTimeFlag( true );
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		//////////// hoisted into namespace ////////////////////////////////////////////////
+		// static bool MyOneTimeFlag( true );
+		// static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
+		////////////////////////////////////////////////////////////////////////////////////
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyPlantScanFlag;
 		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -905,6 +998,7 @@ namespace OutdoorAirUnit {
 			RhoAir = StdRhoAir;
 			OAFrac = GetCurrentScheduleValue( OutAirUnit( OAUnitNum ).OutAirSchedPtr );
 			OutAirUnit( OAUnitNum ).OutAirMassFlow = RhoAir * OAFrac * OutAirUnit( OAUnitNum ).OutAirVolFlow;
+			OutAirUnit( OAUnitNum ).SMaxAirMassFlow = RhoAir * OAFrac * OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow;
 
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 				InNode = OutAirUnit( OAUnitNum ).AirInletNode;
@@ -912,20 +1006,23 @@ namespace OutdoorAirUnit {
 				if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 					EAFrac = GetCurrentScheduleValue( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr );
 					OutAirUnit( OAUnitNum ).ExtAirMassFlow = RhoAir * EAFrac * OutAirUnit( OAUnitNum ).ExtAirVolFlow;
-				} else if ( ! OutAirUnit( OAUnitNum ).ExtFan ) {
+					OutAirUnit( OAUnitNum ).EMaxAirMassFlow = RhoAir * EAFrac * OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow;
+				} else if( !OutAirUnit( OAUnitNum ).ExtFan ) {
 					OutAirUnit( OAUnitNum ).ExtAirMassFlow = OutAirUnit( OAUnitNum ).OutAirMassFlow;
+					OutAirUnit( OAUnitNum ).EMaxAirMassFlow = OutAirUnit( OAUnitNum ).SMaxAirMassFlow;
 				}
-				Node( InNode ).MassFlowRateMax = OutAirUnit( OAUnitNum ).MaxAirMassFlow;
+				Node( InNode ).MassFlowRateMax = OutAirUnit( OAUnitNum ).EMaxAirMassFlow;
 				Node( InNode ).MassFlowRateMin = 0.0;
 			}
 			// set the node max and min mass flow rates
-			Node( OutsideAirNode ).MassFlowRateMax = OutAirUnit( OAUnitNum ).OutAirMassFlow;
+			Node( OutsideAirNode ).MassFlowRateMax = OutAirUnit( OAUnitNum ).SMaxAirMassFlow;
 			Node( OutsideAirNode ).MassFlowRateMin = 0.0;
-			Node( OutNode ).MassFlowRate = OutAirUnit( OAUnitNum ).MaxAirMassFlow;
+			Node( OutNode ).MassFlowRate = OutAirUnit( OAUnitNum ).EMaxAirMassFlow;
 
 			if ( ! MyPlantScanFlag( OAUnitNum ) ) {
 				for ( compLoop = 1; compLoop <= OutAirUnit( OAUnitNum ).NumComponents; ++compLoop ) {
 					if ( ( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == TypeOf_CoilWaterCooling ) || ( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
+						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow = GetWaterCoilMaxFlowRate( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentName, errFlag );
 						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow;
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinVolWaterFlow;
@@ -934,6 +1031,7 @@ namespace OutdoorAirUnit {
 					}
 
 					if ( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == TypeOf_CoilWaterSimpleHeating ) {
+						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow = GetWaterCoilMaxFlowRate( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentName, errFlag );
 						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 60.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow;
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinVolWaterFlow;
@@ -946,7 +1044,13 @@ namespace OutdoorAirUnit {
 						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinVolWaterFlow;
 						InitComponentNodes( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterInletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterOutletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopSideNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).BranchNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CompNum );
 					}
-
+					if( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum == WaterCoil_CoolingHXAsst ) {
+						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow = GetWaterCoilMaxFlowRate( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentName, errFlag );
+						rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidName, 60.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum ).FluidIndex, RoutineName );
+						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxVolWaterFlow;
+						OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow = rho * OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinVolWaterFlow;
+						InitComponentNodes( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MinWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).MaxWaterMassFlow, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterInletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilWaterOutletNode, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopSideNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).BranchNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CompNum );
+					}
 				}
 			}
 			MyEnvrnFlag( OAUnitNum ) = false;
@@ -1053,23 +1157,21 @@ namespace OutdoorAirUnit {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace InputProcessor;
-		using WaterCoils::SetCoilDesFlow;
-		using WaterCoils::GetCoilWaterInletNode;
-		using WaterCoils::GetCoilWaterOutletNode;
-		using SteamCoils::GetCoilSteamInletNode;
-		using SteamCoils::GetCoilSteamOutletNode;
-		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
-		using HVACHXAssistedCoolingCoil::GetHXCoilType;
-		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using DataEnvironment::StdRhoAir;
-		using FluidProperties::GetSpecificHeatGlycol;
-		using FluidProperties::GetDensityGlycol;
+		using DataHVACGlobals::cFanTypes;
 		using DataPlant::PlantLoop;
 		using DataPlant::MyPlantSizingIndex;
-		using DataHVACGlobals::cFanTypes;
+		using DataPlant::TypeOf_CoilWaterCooling;
+		using DataPlant::TypeOf_CoilWaterSimpleHeating;
+		using DataPlant::TypeOf_CoilSteamAirHeating;
+		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using ReportSizingManager::ReportSizingOutput;
-		using Fans::SetFanData;
+		using Fans::SimulateFanComponents;
+		using Fans::GetFanDesignVolumeFlowRate;
 		using General::RoundSigDigits;
+		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+		using SteamCoils::SimulateSteamCoilComponents;
+		using WaterCoils::SimulateWaterCoilComponents;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1087,29 +1189,8 @@ namespace OutdoorAirUnit {
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
 		bool ErrorsFound;
-		Real64 CoilInTemp;
-		Real64 CoilOutTemp;
-		Real64 CoilOutHumRat;
-		Real64 CoilInHumRat;
-		Real64 DesCoilLoad;
-		Real64 TempSteamIn;
-		Real64 EnthSteamInDry;
-		Real64 EnthSteamOutWet;
-		Real64 LatentHeatSteam;
-		Real64 SteamDensity;
 		Real64 RhoAir;
-		Real64 SizeAirMassFlow;
-		static int CoilWaterInletNode( 0 );
-		static int CoilWaterOutletNode( 0 );
-		static int CoilSteamInletNode( 0 );
-		static int CoilSteamOutletNode( 0 );
-		std::string CoolingCoilName;
-		std::string CoolingCoilType;
-		int SizeComp;
 		int CompNum;
-		Real64 rho;
-		Real64 Cp;
-		static int DummyWaterIndex( 1 );
 		bool IsAutoSize; // Indicator to autosize
 		Real64 OutAirVolFlowDes; // Autosized outdoor air flow for reporting
 		Real64 OutAirVolFlowUser; // Hardsized outdoor air flow for reporting
@@ -1138,7 +1219,6 @@ namespace OutdoorAirUnit {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( OutAirUnit( OAUnitNum ).OutAirVolFlow > 0.0 ) {
 					ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "User-Specified Outdoor Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).OutAirVolFlow );
-					ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).OutAirVolFlow );
 				}
 			} else {
 				CheckZoneSizing( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name );
@@ -1149,28 +1229,16 @@ namespace OutdoorAirUnit {
 				if ( IsAutoSize ) {
 					OutAirUnit( OAUnitNum ).OutAirVolFlow = OutAirVolFlowDes;
 					ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "Design Size Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes );
-					SetFanData( OutAirUnit( OAUnitNum ).SFan_Index, ErrorsFound, OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).OutAirVolFlow, 0.0 );
-					ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes );
 				} else {
 					if ( OutAirUnit( OAUnitNum ).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0 ) {
 						OutAirVolFlowUser = OutAirUnit( OAUnitNum ).OutAirVolFlow;
-						ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "Design Size Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
+						ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "User-Specified Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
+								ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "Design Size Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes );
 								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
 								ShowContinueError( "User-Specified Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
 								ShowContinueError( "differs from Design Size Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-
-						ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + cFanTypes( OutAirUnit( OAUnitNum ).SFanType ) + ' ' + OutAirUnit( OAUnitNum ).SFanName );
-								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1188,7 +1256,6 @@ namespace OutdoorAirUnit {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
 				if ( OutAirUnit( OAUnitNum ).ExtAirVolFlow > 0.0 ) {
 					ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "User-Specified Exhaust Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).ExtAirVolFlow );
-					ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, "User-Specified Maximum Exhaust Air Flow Rate [m3/s]", OutAirUnit( OAUnitNum ).ExtAirVolFlow );
 				}
 			} else {
 				// set exhaust flow equal to the oa inlet flow
@@ -1196,28 +1263,16 @@ namespace OutdoorAirUnit {
 				if ( IsAutoSize ) {
 					OutAirUnit( OAUnitNum ).ExtAirVolFlow = ExtAirVolFlowDes;
 					ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "Design Size Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes );
-					SetFanData( OutAirUnit( OAUnitNum ).ExtFan_Index, ErrorsFound, OutAirUnit( OAUnitNum ).ExtFanName, ExtAirVolFlowDes, 0.0 );
-					ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes );
 				} else {
 					if ( OutAirUnit( OAUnitNum ).ExtAirVolFlow > 0.0 && ExtAirVolFlowDes > 0.0 ) {
 						ExtAirVolFlowUser = OutAirUnit( OAUnitNum ).ExtAirVolFlow;
-						ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "Design Size Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes, "User-Specified Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser );
+						ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "User-Specified Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( ExtAirVolFlowDes - ExtAirVolFlowUser ) / ExtAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
+								ReportSizingOutput( CurrentModuleObjects( 1 ), OutAirUnit( OAUnitNum ).Name, "Design Size Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes );
 								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
 								ShowContinueError( "User-Specified Exhaust Air Flow Rate of " + RoundSigDigits( ExtAirVolFlowUser, 5 ) + " [m3/s]" );
 								ShowContinueError( "differs from Design Size Exhaust Air Flow Rate of " + RoundSigDigits( ExtAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-
-						ReportSizingOutput( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowDes, "User-Specified Maximum Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( ExtAirVolFlowDes - ExtAirVolFlowUser ) / ExtAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + cFanTypes( OutAirUnit( OAUnitNum ).SFanType ) + ' ' + OutAirUnit( OAUnitNum ).SFanName );
-								ShowContinueError( "User-Specified Maximum Exhaust Air Flow Rate of " + RoundSigDigits( ExtAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Exhaust Air Flow Rate of " + RoundSigDigits( ExtAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1227,356 +1282,46 @@ namespace OutdoorAirUnit {
 			}
 		}
 
-		// air mass flow of unit component sizing is set by input
-		SizeAirMassFlow = RhoAir * OutAirUnit( OAUnitNum ).OutAirVolFlow;
-		SizeComp = OAUnitNum;
-		for ( SizeComp = 1; SizeComp <= NumOfOAUnits; ++SizeComp ) {
-			for ( CompNum = 1; CompNum <= OutAirUnit( OAUnitNum ).NumComponents; ++CompNum ) {
-				IsAutoSize = false;
-				{ auto const SELECT_CASE_var( MakeUPPERCase( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType ) );
+		ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
+		ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
+		ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = OutAirUnit( OAUnitNum ).OutAirVolFlow;
+		ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = OutAirUnit( OAUnitNum ).OutAirVolFlow;
 
-				// Coil Types
-				if ( SELECT_CASE_var == "COIL:COOLING:WATER" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_Cooling;
-					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
-						IsAutoSize = true;
-					}
-					if ( CurZoneEqNum > 0 ) {
-						if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-							if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 ) {
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow );
-							}
-						} else {
-							CheckZoneSizing( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name );
-							CoolingCoilName = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName;
-							CoolingCoilType = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType;
-							CoilWaterInletNode = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterInletNode;
-							CoilWaterOutletNode = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterOutletNode;
-							if ( IsAutoSize ) {
-								PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-								if ( PltSizCoolNum > 0 ) {
-									if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
-										CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-										CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp );
-										CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat );
-										DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
-										DesCoilLoad = max( 0.0, DesCoilLoad );
-										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
-
-										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
-
-										MaxVolWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
-									} else {
-										MaxVolWaterFlowDes = 0.0;
-									}
-								} else {
-									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object or a cooling loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
-									ErrorsFound = true;
-								}
-							}
-							if ( IsAutoSize ) {
-								OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow = MaxVolWaterFlowDes;
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowDes );
-							} else {
-								if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 && MaxVolWaterFlowDes > 0.0 ) {
-									MaxVolWaterFlowUser = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow;
-									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowUser );
-									if ( DisplayExtraWarnings ) {
-										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
-											ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
-											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-										}
-									}
-								}
-							}
-						}
-					}
-					// set the design air flow rates for the heating and cooling coils
-					//          CALL SetCoilDesFlow(CoolingCoilType,CoolingCoilName,OutAirUnit(OAUnitNum)%OutAirVolFlow,&
-					//                                 ErrorsFound)
-
-				} else if ( SELECT_CASE_var == "COIL:HEATING:WATER" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_SimpleHeat;
-					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
-						IsAutoSize = true;
-					}
-					if ( CurZoneEqNum > 0 ) {
-						if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-							if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 ) {
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "User-Specified Maximum Hot Water Flow [m3/s]", OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow );
-							}
-						} else {
-							CheckZoneSizing( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name );
-							CoilWaterInletNode = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterInletNode;
-							CoilWaterOutletNode = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterOutletNode;
-							if ( IsAutoSize ) {
-								PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-								if ( PltSizHeatNum > 0 ) {
-									if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
-										CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-										CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-										CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-										DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
-										DesCoilLoad = max( 0.0, DesCoilLoad );
-										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 60.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
-
-										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 60.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
-
-										MaxVolWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
-									} else {
-										MaxVolWaterFlowDes = 0.0;
-									}
-								} else {
-									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object or a heating loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
-									ErrorsFound = true;
-								}
-							}
-							if ( IsAutoSize ) {
-								OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow = MaxVolWaterFlowDes;
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolWaterFlowDes );
-							} else {
-								if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 && MaxVolWaterFlowDes > 0.0 ) {
-									MaxVolWaterFlowUser = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow;
-									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxVolWaterFlowUser );
-									if ( DisplayExtraWarnings ) {
-										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
-											ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
-											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-										}
-									}
-								}
-							}
-						}
-					}
-					SetCoilDesFlow( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, OutAirUnit( OAUnitNum ).OutAirVolFlow, ErrorsFound );
-
-				} else if ( SELECT_CASE_var == "COIL:HEATING:STEAM" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = SteamCoil_AirHeat;
-					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
-						IsAutoSize = true;
-					}
-					if ( CurZoneEqNum > 0 ) {
-						if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-							if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 ) {
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "User-Specified Maximum Steam Flow [m3/s]", OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow );
-							}
-						} else {
-							CheckZoneSizing( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name );
-							CoilSteamInletNode = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterInletNode;
-							CoilSteamOutletNode = GetCoilSteamOutletNode( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, ErrorsFound );
-							if ( IsAutoSize ) {
-								PltSizHeatNum = MyPlantSizingIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound );
-								if ( PltSizHeatNum > 0 ) {
-									if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
-										CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-										CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-										CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-										DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
-										DesCoilLoad = max( 0.0, DesCoilLoad );
-										TempSteamIn = 100.00;
-										EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).FluidIndex, RoutineName );
-										EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).FluidIndex, RoutineName );
-										LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-										SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).FluidIndex, RoutineName );
-										//DSU?  deal with steam properties
-										Cp = GetSpecificHeatGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
-										rho = GetDensityGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
-										MaxVolWaterFlowDes = DesCoilLoad / ( ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho ) + SteamDensity * LatentHeatSteam );
-									} else {
-										MaxVolWaterFlowDes = 0.0;
-									}
-								} else {
-									ShowSevereError( "Autosizing of Steam flow requires a Sizing:Zone object or a heating loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
-									ErrorsFound = true;
-								}
-							}
-							if ( IsAutoSize ) {
-								OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow = MaxVolWaterFlowDes;
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolWaterFlowDes );
-							} else {
-								if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 && MaxVolWaterFlowDes > 0.0 ) {
-									MaxVolWaterFlowUser = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow;
-									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolWaterFlowUser );
-									if ( DisplayExtraWarnings ) {
-										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
-											ShowContinueError( "User-Specified Maximum Steam Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Steam Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
-											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-										}
-									}
-								}
-							}
-						}
-					}
-
-				} else if ( SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_DetailedCool;
-					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
-						IsAutoSize = true;
-					}
-					if ( CurZoneEqNum > 0 ) {
-						if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-							if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 ) {
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow );
-							}
-						} else {
-							CheckZoneSizing( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name );
-							CoilWaterInletNode = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterInletNode;
-							CoilWaterOutletNode = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterOutletNode;
-							if ( IsAutoSize ) {
-								PltSizCoolNum = MyPlantSizingIndex( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-								if ( PltSizCoolNum > 0 ) {
-									if ( SizeAirMassFlow >= SmallAirVolFlow ) {
-										CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-										CoilOutTemp = min( CoilInTemp, FinalZoneSizing( CurZoneEqNum ).CoolDesTemp );
-										CoilOutHumRat = min( CoilInHumRat, FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat );
-										DesCoilLoad = SizeAirMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
-										DesCoilLoad = max( 0.0, DesCoilLoad );
-										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
-
-										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
-
-										MaxVolWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
-									} else {
-										MaxVolWaterFlowDes = 0.0;
-									}
-								} else {
-									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object or a cooling loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
-									ErrorsFound = true;
-								}
-							}
-							if ( IsAutoSize ) {
-								OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow = MaxVolWaterFlowDes;
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowDes );
-							} else {
-								if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 && MaxVolWaterFlowDes > 0.0 ) {
-									MaxVolWaterFlowUser = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow;
-									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowUser );
-									if ( DisplayExtraWarnings ) {
-										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
-											ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
-											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-										}
-									}
-								}
-							}
-						}
-					}
-					SetCoilDesFlow( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, OutAirUnit( OAUnitNum ).OutAirVolFlow, ErrorsFound );
-
-				} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_CoolingHXAsst;
-					if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
-						IsAutoSize = true;
-					}
-					if ( CurZoneEqNum > 0 ) {
-						if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-							if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 ) {
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow );
-							}
-						} else {
-							CheckZoneSizing( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name );
-							CoolingCoilName = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName;
-							CoolingCoilType = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType;
-							CoilWaterInletNode = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterInletNode;
-							CoilWaterOutletNode = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilWaterOutletNode;
-							if ( IsAutoSize ) {
-								PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-								if ( PltSizCoolNum > 0 ) {
-									if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
-										CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-										CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-										CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
-										CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-										DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
-										rho = GetDensityGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
-
-										Cp = GetSpecificHeatGlycol( PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidName, 5.0, PlantLoop( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).LoopNum ).FluidIndex, RoutineName );
-
-										MaxVolWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
-									} else {
-										MaxVolWaterFlowDes = 0.0;
-									}
-								} else {
-									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object or a cooling loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
-									ErrorsFound = true;
-								}
-							}
-							if ( IsAutoSize ) {
-								OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow = MaxVolWaterFlowDes;
-								ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowDes );
-							} else {
-								if ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow > 0.0 && MaxVolWaterFlowDes > 0.0 ) {
-									MaxVolWaterFlowUser = OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow;
-									ReportSizingOutput( "ZoneHVAC:OutdoorAirUnit", OutAirUnit( OAUnitNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolWaterFlowUser );
-									if ( DisplayExtraWarnings ) {
-										if ( ( std::abs( MaxVolWaterFlowDes - MaxVolWaterFlowUser ) / MaxVolWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-											ShowMessage( "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " + OutAirUnit( OAUnitNum ).Name );
-											ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowUser, 5 ) + " [m3/s]" );
-											ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolWaterFlowDes, 5 ) + " [m3/s]" );
-											ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-											ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-										}
-									}
-								}
-							}
-						}
-					}
-
-				} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:DX" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = DXSystem;
-
-				} else if ( SELECT_CASE_var == "COILSYSTEM:HEATING:DX" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = DXHeatPumpSystem;
-
-				} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = UnitarySystem;
-
-					// Heat recovery
-				} else if ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = HeatXchngr;
-				} else if ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = HeatXchngr;
-					//        CASE('HEATEXCHANGER:DESICCANT:BALANCEDFLOW')
-					//          OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentType_Num= HeatXchngr
-					// Desiccant Dehumidifier
-				} else if ( SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:NOFANS" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Desiccant;
-					//       CASE('DEHUMIDIFIER:DESICCANT:SYSTEM')
-					//         OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentType_Num= Desiccant
-					// Electric Heat Coil
-				} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_ElectricHeat;
-					// Gas Heat Coil
-				} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
-					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_GasHeat;
-				} else {
-					ShowSevereError( "ZoneHVAC:OutdoorAirUnit:EquipmentList = \"OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentListName\" invalid to sizing Outside Air Component=\"" + OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType + "\"." );
-					ErrorsFound = true;
-
-				}}
+		if( OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize ) {
+			SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, true, OutAirUnit( OAUnitNum ).SFan_Index, _, false, false );
+			OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, ErrorsFound );
+		}
+		if( OutAirUnit( OAUnitNum ).ExtFan ) {
+			if( OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow == AutoSize ) {
+				SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, true, OutAirUnit( OAUnitNum ).ExtFan_Index );
+				OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, ErrorsFound );
 			}
 		}
 
-		if ( ErrorsFound ) {
+		for( CompNum = 1; CompNum <= OutAirUnit( OAUnitNum ).NumComponents; ++CompNum ) {
+			if( ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum == TypeOf_CoilWaterCooling ) || ( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
+				if( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
+					SimulateWaterCoilComponents( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, true, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, _, 1, 0.0 );
+				}
+			}
+			if( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum == TypeOf_CoilWaterSimpleHeating ) {
+				if( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
+					SimulateWaterCoilComponents( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, true, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, _, 1, 0.0 );
+				}
+			}
+			if( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum == TypeOf_CoilSteamAirHeating ) {
+				if( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
+					SimulateSteamCoilComponents( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, true, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex );
+				}
+			}
+			if( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).CoilPlantTypeOfNum == WaterCoil_CoolingHXAsst ) {
+				if( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).MaxVolWaterFlow == AutoSize ) {
+					SimHXAssistedCoolingCoil( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentName, true, 1, 0.0, OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentIndex, ContFanCycCoil );
+				}
+			}
+		}
+
+		if( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 
@@ -1618,8 +1363,6 @@ namespace OutdoorAirUnit {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
 		using DataEnvironment::OutBaroPress;
@@ -1647,9 +1390,6 @@ namespace OutdoorAirUnit {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const CurrentModuleObject( "ZoneHVAC:OutdoorAirUnit" );
-		std::string EquipType;
-		std::string EquipName;
-		std::string CtrlName;
 		Real64 DesOATemp; // Design OA Temp degree C
 		Real64 AirMassFlow; // air mass flow rate [kg/s]
 		int ControlNode; // the hot water or cold water inlet node
@@ -1900,7 +1640,8 @@ namespace OutdoorAirUnit {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+//		using InputProcessor::FindItemInList;
+//		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -1964,8 +1705,6 @@ namespace OutdoorAirUnit {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
 		using DataEnvironment::OutBaroPress;
@@ -1984,7 +1723,7 @@ namespace OutdoorAirUnit {
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using HVACDXSystem::SimDXCoolingSystem;
 		using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
-		using SteamCoils::SimulateSteamCoilComponents;
+//		using SteamCoils::SimulateSteamCoilComponents;
 		using HVACUnitarySystem::SimUnitarySystem;
 		//  Use TranspiredCollector, Only:SimTranspiredCollector
 		//  Use EvaporativeCoolers, Only:SimEvapCooler
@@ -2608,29 +2347,6 @@ namespace OutdoorAirUnit {
 	}
 
 	//*****************************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutdoorAirUnit
 

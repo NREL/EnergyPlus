@@ -1,6 +1,6 @@
 
 # Compiler-agnostic compiler flags first
-ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ARRAY_NOALIGN") # Disable experimental ObjexxFCL array alignment
+ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ALIGN=64") # Align ObjexxFCL arrays to 64B
 ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_ARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging
 
 # Make sure expat is compiled as a static library
@@ -40,29 +40,36 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
     set(LINKER_FLAGS "")
-    if(ENABLE_THREAD_SANITIZER)
-      ADD_CXX_DEFINITIONS(-fsanitize=thread )
-      add_definitions(-ggdb -fno-omit-frame-pointer)
+    if (ENABLE_THREAD_SANITIZER)
+      ADD_CXX_DEFINITIONS("-fsanitize=thread")
+      ADD_DEFINITIONS("-ggdb -fno-omit-frame-pointer")
       set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=thread -ggdb")
     endif()
 
     option(ENABLE_ADDRESS_SANITIZER "Enable address sanitizer testing in gcc/clang" FALSE)
-    if(ENABLE_ADDRESS_SANITIZER)
-      ADD_CXX_DEFINITIONS(-fsanitize=address)
-      add_definitions(-ggdb -fno-omit-frame-pointer)
+    if (ENABLE_ADDRESS_SANITIZER)
+      ADD_CXX_DEFINITIONS("-fsanitize=address")
+      ADD_DEFINITIONS("-ggdb -fno-omit-frame-pointer")
       set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -ggdb")
     endif()
 
+    option(ENABLE_MEMORY_SANITIZER "Enable reads of unintialized memory sanitizer testing in gcc/clang" FALSE)
+    if (ENABLE_MEMORY_SANITIZER)
+      ADD_CXX_DEFINITIONS("-fsanitize=memory")
+      ADD_DEFINITIONS("-ggdb -fno-omit-frame-pointer")
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=memory -ggdb")
+    endif()
+
     option(ENABLE_UNDEFINED_SANITIZER "Enable undefined behavior sanitizer testing in gcc/clang" FALSE)
-    if(ENABLE_UNDEFINED_SANITIZER)
-      ADD_CXX_DEFINITIONS(-fsanitize=undefined )
-      add_definitions(-ggdb -fno-omit-frame-pointer)
+    if (ENABLE_UNDEFINED_SANITIZER)
+      ADD_CXX_DEFINITIONS("-fsanitize=undefined")
+      ADD_DEFINITIONS("-ggdb -fno-omit-frame-pointer")
       set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=undefined -ggdb")
     endif()
 
     option(ENABLE_COVERAGE "Enable Coverage Reporting in GCC" FALSE)
-    if(ENABLE_COVERAGE)
-      add_definitions(--coverage -O0)
+    if (ENABLE_COVERAGE)
+      ADD_DEFINITIONS("--coverage -O0")
       set(LINKER_FLAGS "${LINKER_FLAGS} --coverage")
     endif()
 
@@ -71,7 +78,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     if(CMAKE_HOST_UNIX)
       if(NOT APPLE)
         set(LINKER_FLAGS "${LINKER_FLAGS} -pthread")
-        add_definitions(-pthread)
+        ADD_DEFINITIONS("-pthread")
       endif()
     endif()
 
@@ -86,56 +93,62 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-ffor-scope")
     ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
-    if( CMAKE_COMPILER_IS_GNUCXX ) # g++
+    if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
       ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
     elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
       ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()
 
-    # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
+    # ADDITIONAL GCC-SPECIFIC FLAGS
     if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
       ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
       ADD_CXX_DEBUG_DEFINITIONS("-D_GLIBCXX_DEBUG") # Standard container debug mode (bounds checking, ...)
-    endif ()
+      # ADD_CXX_RELEASE_DEFINITIONS("-finline-limit=2000") # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
+    endif()
 
   ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
+  ADD_CXX_RELEASE_DEFINITIONS("-fno-stack-protector")
+  # ADD_CXX_RELEASE_DEFINITIONS("-Ofast") # -Ofast (or -ffast-math) needed to auto-vectorize floating point loops
 
 ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
+    #   161 Unrecognized pragma
     #   177 Variable declared but never referenced
     #   488 Template parameter not used ...
+    #   809 Exception specification consistency warnings that fire in gtest code
     #   869 Parameter never referenced
     #  1786 Use of deprecated items
     #  2259 Non-pointer conversions may lose significant bits
     #  3280 Declaration hides variable
+    # 10382 xHOST remark
     # 11074 Inlining inhibited
     # 11075 Inlining inhibited
 
     # COMPILER FLAGS
+    ADD_CXX_DEFINITIONS("/nologo") # Skip banner text
     ADD_CXX_DEFINITIONS("/Qstd=c++11") # Specify C++11 language
     ADD_CXX_DEFINITIONS("/Qcxx-features") # Enables standard C++ features without disabling Microsoft extensions
     ADD_CXX_DEFINITIONS("/Wall") # Enable "all" warnings
-    ADD_CXX_DEFINITIONS("/Wp64") # 64-bit warnings
-    ADD_CXX_DEFINITIONS("/Qdiag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
+    ADD_CXX_DEFINITIONS("/Qdiag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075") # Disable warnings listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
 
     # Optimization options that had no significant benefit for EnergyPlus
-    #  /Qinline-factor:200
     #  /Qipo instead of /Qip
     #  /Qopt-prefetch
     #  /Qparallel
     #  /Qunroll-aggressive
-    #  /xHost
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    # ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables more aggressive optimizations on floating-point data
-    # ADD_CXX_RELEASE_DEFINITIONS("/fp:fast") # Enables more aggressive optimizations on floating-point data
-    # ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
-    ADD_CXX_RELEASE_DEFINITIONS("/Qip") # Enables inter-procedural optimnization within a single file
+    ADD_CXX_RELEASE_DEFINITIONS("/O3") # Agressive optimization
+    ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # Faster division
+    ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Better optimization via strict aliasing rules
+    ADD_CXX_RELEASE_DEFINITIONS("/Qip") # Inter-procedural optimnization within a single file
+    ADD_CXX_RELEASE_DEFINITIONS("/Qinline-factor:225") # Aggressive inlining
+    # ADD_CXX_RELEASE_DEFINITIONS("/fp:fast=2") # Aggressive optimizations on floating-point data
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     ADD_CXX_DEBUG_DEFINITIONS("/fp:source") # Use source-specified floating point precision
@@ -149,38 +162,40 @@ ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
+    #   161 Unrecognized pragma
     #   177 Variable declared but never referenced
     #   488 Template parameter not used ...
+    #   809 Exception specification consistency warnings that fire in gtest code
     #   869 Parameter never referenced
     #  1786 Use of deprecated items
     #  2259 Non-pointer conversions may lose significant bits
     #  3280 Declaration hides variable
+    # 10382 xHOST remark
     # 11074 Inlining inhibited
     # 11075 Inlining inhibited
 
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-std=c++11") # Specify C++11 language
     ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
-    ADD_CXX_DEFINITIONS("-Wp64") # 64-bit warnings
-    ADD_CXX_DEFINITIONS("-diag-disable:177,488,869,1786,2259,3280,11074,11075") # Disable warnings listed above
+    ADD_CXX_DEFINITIONS("-diag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075") # Disable warnings listed above
 
     IF(NOT APPLE)
       ADD_CXX_DEFINITIONS(-pthread)
     ENDIF()
 
     # Optimization options that had no significant benefit for EnergyPlus
-    #  -inline-factor=200
     #  -ipo instead of -ip
     #  -opt-prefetch
     #  -parallel
     #  -unroll-aggressive
-    #  -xHost
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    # ADD_CXX_RELEASE_DEFINITIONS("-ansi-alias") # Enables more aggressive optimizations on floating-point data
-    # ADD_CXX_RELEASE_DEFINITIONS("-fp:fast") # Enables more aggressive optimizations on floating-point data
-    # ADD_CXX_RELEASE_DEFINITIONS("-prec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
+    ADD_CXX_RELEASE_DEFINITIONS("-O3") # Agressive optimization
+    # ADD_CXX_RELEASE_DEFINITIONS("-Ofast") # More aggressive optimizations (instead of -O3) (enables -no-prec-div and -fp-model fast=2)
+    ADD_CXX_RELEASE_DEFINITIONS("-no-prec-div") # Faster division (enabled by -Ofast)
+    ADD_CXX_RELEASE_DEFINITIONS("-ansi-alias") # Enables more aggressive optimizations on floating-point data
     ADD_CXX_RELEASE_DEFINITIONS("-ip") # Enables inter-procedural optimnization within a single file
+    ADD_CXX_RELEASE_DEFINITIONS("-inline-factor=225") # Enables more aggressive inlining
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     ADD_CXX_DEBUG_DEFINITIONS("-strict-ansi") # Strict language conformance: Performance impact so limit to debug build

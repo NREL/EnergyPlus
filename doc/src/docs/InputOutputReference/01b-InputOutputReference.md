@@ -612,7 +612,7 @@ The DElight method of analyzing daylighting in buildings is very similar to that
 
 There are two primary differences between the Detailed and DElight methods of calculating interior illuminance levels. The first is that DElight includes the capability of analyzing complex fenestration systems that include geometrically complicated shading systems (e.g., roof monitors) and/or optically complicated glazings (e.g., prismatic or holographic glass). The second key difference is that DElight uses a radiosity method to calculate the effects of light reflection inside a zone. These methods are discussed in more detail in the engineering documentation.
 
-There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the Detailed method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles). Another is the DElight ability to include more than two reference points in its interior illuminance and electric lighting reduction calculations. A third is the current lack of visual quality (e.g., glare) calculations performed by DElight. Fourth, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the Detailed method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details.
+There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the Detailed method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles). Another is the DElight ability to include more than two reference points in its interior illuminance and electric lighting reduction calculations. A third is the current lack of visual quality (e.g., glare) calculations performed by DElight. Fourth, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the Detailed method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details. Fifth, when using DElight daylighting the presence of exterior shading surfaces such as overhangs is ignored.
 
 Input for invoking the DElight method involves three object types: **Daylighting:DELight:Controls**, **Daylighting:DELight:ReferencePoint**, and **Daylighting:DELight:ComplexFenestration**. Each of these objects is described below.
 
@@ -7319,6 +7319,264 @@ The zone design air flow rates and loads are output onto the local file “eplus
 
 The calculated zone design air flow rates and the user input or altered zone design air flow rates are also reported on the *eplusout.eio* file. The values are printed out for each zone as comma separated records beginning with *Zone Sizing*. Items output on the *eio* file are: zone name, load type (heating or cooling), design load, calculated design air flow rate, user design air flow rate, design day name, time of peak, outside temperature at peak, outside humidity ratio at peak.
 
+### DesignSpecification:ZoneHVAC:Sizing
+
+This object is used to describe general sizing and scalable sizing methods which are referenced by zone HVAC equipment objects. It is optional input field in zone HVAC objects. If a name of this optional input is not specified or is blank then the sizing method or input specified in the parent object is used.  If the name of this object is entered, then the values or method specified overrides the sizing method in the parent zone HVAC objects. This object is meant to provide scalable sizing method to users. The name of this object is an optional input field in the zoneHVAC objects. When this name in not specified in the zone HVAC object the sizing method or the value specified in the zone HVAC object will be used.
+
+List of zoneHVAC objects than can reference this object include:
+
+* ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+
+* ZoneHVAC:PackagedTerminalAirConditioner
+
+* ZoneHVAC:PackagedTerminalHeatPump
+
+* ZoneHVAC:WaterToAirHeatPump
+
+* ZoneHVAC:WindowAirConditioner
+
+* ZoneHVAC:UnitHeater
+
+* ZoneHVAC:UnitVentilator
+
+* ZoneHVAC:FourPipeFanCoil
+
+* ZoneHVAC:VentilatedSlab
+
+* ZoneHVAC:EvaporativeCoolerUnit
+
+* ZoneHVAC:IdealLoadsAirSystem
+
+The sizing methods input fields available in this objects are for supply air flow and capacity for heating and cooling operating modes. Some zone HVAC equipment has single supply air flow rate input field that serves both cooling and heating operating modes.  So entering either of the cooling or heating scalable sizing input field is sufficient.  When there are separate input fields for cooling, heating, no-cooling, and no-heating operating modes, the corresponding input fields are specified.  The child components supply air flow rate are also sized using scalable sizing methods specified in the parent objects. The methods allow users to enter a fixed or hard sized values, autosizable, or scalable sizing methods.  Methods allowed for sizing supply air flow rates include: *SupplyAirFlowRate*, *FractionOfAutosizedCoolingAirflow*, *FractionOfAutosizedHeatingAirflow*, *FlowPerFloorArea, FlowPerCoolingCapacity*, and *FlowPerHeatingCapacity*.  The different sizing options are defined as follows:
+
+* **SupplyAirFlowRate**: entered when it is intended that the user specified either hard value or the simulation engine autosize the supply air flow rates for cooling, heating, and no-cooling or no-heating operating modes.
+
+* **FlowPerFloorArea**: entered when it is intended that the simulation engine determine the supply air flow rates from the user specified *supply air flow rates per unit floor area* and the zone floor area of the zone served by the zone HVAC equipment.
+
+* **FractionOfAutosizedCoolingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized cooling design supply air flow rate*.
+
+* **FractionOfAutosizedHeatingAirflow**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *flow fraction* and *autosized heating design supply air flow rate*.
+
+* **FlowPerCoolingCapacity**: entered when it is intended t that he simulation engine determines the supply air flow rates from the user specified *supply air flow per cooling capacity value* and *autosized cooling design capacity*.
+
+* **FlowPerHeatingCapacity**: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified *supply air flow per heating capacity value* and *autosized heating design capacity*.
+
+The  Design Specification ZoneHVAC Sizing object also has input fields for sizing or scalable sizing of cooling and heating capacity. However, most of the parent zone HVAC objects do not have input fields for sizing capacities. So, the capacity scalable sizing fields in the parent objects are used for sizing child components capacity sizings.  The scalable capacity sizing may be indirectly impacted by the scalable supply air flow rates sizing values. Moreover, the autosized cold water, hot water and steam flow rates in the parent zone HVAC objects (e.g. FanCoils, UnitHeaters, UnitVentilators, and VentilatedSlabs) and capacity in child components are determined using the scalable sizing methods.  Sizing methods allowed for cooling and heating capacity include: *CoolingDesignCapacity, HeatingDesignCapacity*, *CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity*, *FractionOfAutosizedHeatingCapacity*.
+
+* **CoolingDesignCapacity**: entered when it is intended that user specifies either a hard sized cooling capacity value or the simulation engine autosizes cooling capacity value for the cooling design capacity.
+
+* **HeatingDesignCapacity**: entered when it is intended that user specifies either a hard sized heating capacity value or the simulation engine autosized heating capacity value for the heating design capacity.
+
+* **CapacityPerFloorArea**: is entered when it is intended that the simulation engine determines the cooling or heating capacity from user specified capacity per floor area value and the floor area of the zone served by the zone HVAC equipment.
+
+* **FractionOfAutosizedCoolingCapacity**: entered when it is intended that the simulation engine sizes the cooling capacity from the user specified *capacity fraction* and *autosized cooling design capacity* value.
+
+* **FractionOfAutosizedHeatingCapacity**: entered when it is intended that the simulation engine sizes the heating capacity from the user specified *capacity fraction* and *autosized heating design capacity* value.
+
+Description of the input fields of the design specification zone HVAC sizing object “DesignSpecification:ZoneHVAC:Sizing”:
+
+#### Field: Name
+
+Unique identifier name of the DesignSpecification:ZoneHVAC:Sizing object. This sizing specification object referenced by a zone HVAC equipment whose design calculation will be made using the input data of this object.
+
+#### Field: Cooling Design Air Flow Method
+
+The input of this field must be the method used to determine the cooling supply air volume flow rate. Input allowed is either *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*.  None means cooling coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means the user specifies the magnitude of supply air flow rate or the program calculates the design cooling supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the cooling supply air volume flow rate from zone floor area served by the zone HVAC unit and user specified *Flow Per Floor Area* value. *FractionOfAutosizedCoolingAirflow* means the program calculates the cooling supply air volume flow rate from user specified fraction and the autosized design cooling supply air volume flow rate value determined by the simulation. FlowPerCoolingCapacity means the supply air volume is calculated from user specified flow per cooling capacity and design cooling capacity determined by the simulation. The default method is *SupplyAirFlowRate*.
+
+#### Field: Cooling Design Supply Air Flow Rate {m3/s}
+
+Enter the magnitude of the cooling supply air volume flow rate in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Cooling Design air Flow Method is *SupplyAirFlowRate*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment. This input field is also autosizable.
+
+#### Field: Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+
+Enter the cooling supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Cooling Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the cooling supply air volume flow rate from the zone conditioned floor area served by the zone HVAC equipment and the flow per unit area value specified by the user. Zone sizing object (Sizing:Zone) is not required.
+
+#### Field: Fraction of Autosized Cooling Design Supply Air Flow Rate {-}
+
+Enter the cooling supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required when the Cooling Design air Flow Method is *FractionOfAutosizedCoolingAirflow*. This input field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design air Flow Method is not *FractionOfAutosizedCoolingAirflow*. The program calculates the cooling supply air volume flow rate from the design autosized cooling supply air flow rate and user specified fraction. Zone sizing object (Sizing:Zone) is required.
+
+#### Field: Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+
+Enter the cooling supply air volume flow rate per unit cooling capacity in m3/s-W. This input field is required when the Cooling Design air Flow Method is *FlowPerCoolingCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design air Flow Method is not *FlowPerCoolingCapacity*. The program calculates the cooling supply air volume flow rate from the design autosized cooling capacity and user specified flow per cooling capacity value. Zone sizing object (Sizing:Zone) is required.
+
+#### Field: Supply Air Flow Rate Method When No Cooling or Heating is Required
+
+Enter the method used to determine the supply air volume flow rate when No Cooling or Heating is required. Inputs allowed are *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, and *FractionOfAutosizedHeatingAirflow.* *None* is used when a cooling or heating coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means user specifies the magnitude of supply air flow rate or the program calculates the design supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the supply air volume flow rate from the zone floor area served by the zone HVAC unit and Flow Per Floor Area value specified by user. *FractionOfAutosizedCoolingAirflow* means the program calculates the supply air volume flow rate from user specified fraction and autosized design cooling supply air volume flow rate value determined by the program. FractionOfAutosizedHeatingAirflow means the program calculates the supply air volume flow rate from user specified fraction and autosized heating supply air flow rate value determined by the program. The default method is *SupplyAirFlowRate*.
+
+#### Field: Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
+
+Enter the magnitude of the supply air volume flow rate when no cooling or heating is required in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Supply Air Flow Rate Method When No Cooling or Heating is Required is *SupplyAirFlowRate*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment. This input field is also autosizable.
+
+#### Field: Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required  {m3/s-m2}
+
+Enter the magnitude of supply air volume flow rate per zone floor area in m3/s-m2. This input is a required field when Supply Air  Flow Rate Method When No Cooling or Heating is Required is *FlowPerFloorArea*. The program calculates the supply air flow rate when no cooling or heating is required from user specified flow per floor area and the zone area served by current zoneHVAC equipment.
+
+####  Field: Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required {-}
+
+Enter the fraction of supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required field when Supply Air Flow Rate Method When No Cooling or Heating is Required is *FractionOfAutosizedCoolingAirflow*.  The program calculates the supply air flow rate when no cooling or heating is required from user specified fraction and the design cooling autosized supply air flow rate.
+
+#### Field: Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required {-}
+
+Enter the fraction of supply air volume flow rate as a fraction of the autosized cooling supply air flow rate. This input field is required field when Supply Air Flow Rate Method When No Cooling or Heating is Required is *FractionOfAutosizedHeatingAirflow*.  The program calculates the supply air flow rate when no cooling or heating is required from user specified fraction and the design heating autosized supply air flow rate.
+
+#### Field: Heating Design Air Flow Method
+
+The input of this field must be the method used to determine the heating supply air volume flow rate. Input allowed is either *None*, *SupplyAirFlowRate*, *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*.  *None* means heating coil is not included in the zone HVAC equipment or this field may be left blank. *SupplyAirFlowRate* means the user specifies the magnitude of supply air flow rate or the program calculates the design heating supply air volume flow rate if autosize is specified. *FlowPerFloorArea* means the program calculates the heating supply air volume flow rate from zone floor area served by the zone HVAC unit and user specified *Flow Per Floor Area* value. *FractionOfAutosizedHeatingAirflow* means the program calculates the heating supply air volume flow rate from user specified fraction and the autosized design heating supply air volume flow rate value determined by the simulation. *FlowPerHeatingCapacity* means the supply air volume is calculated from user specified flow per heating capacity and design heating capacity determined by the simulation. The default method is *SupplyAirFlowRate*.
+
+#### Field: Heating Design Supply Air Flow Rate {m3/s}
+
+Enter the magnitude of the heating supply air volume flow rate in m3/s. This input is an alternative to using the program auto-calculated value. This input is a required field when the Heating Design air Flow Method is *SupplyAirFlowRate*. This field may be left blank if a heating coil is not included in the zone HVAC equipment. This input field is also autosizable.
+
+#### Field: Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+
+Enter the heating supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Heating Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the heating supply air volume flow rate from the zone conditioned floor area served by the zone HVAC equipment and the flow per unit area value specified by the user.
+
+#### Field: Fraction of Autosized Heating Design Supply Air Flow Rate {-}
+
+Enter the heating supply air volume flow rate as a fraction of the autosized heating supply air flow rate. This input field is required when the Heating Design air Flow Method is *FractionOfAutosizedHeatingAirflow*. This input field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design air Flow Method is not *FractionOfAutosizedHeatingAirflow*. The program calculates the heating supply air volume flow rate from the design autosized heating supply air flow rate and user specified fraction.
+
+#### Field: Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+
+Enter the heating supply air volume flow rate per unit heating capacity in m3/s-W. This input field is required when the Heating Design air Flow Method is *FlowPerHeatingCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Heating Design air Flow Method is not *FlowPerHeatingCapacity*. The program calculates the heating supply air volume flow rate from the design autosized heating capacity and user specified flow per unit heating capacity value.
+
+#### Field Cooling Design Capacity Method
+
+Enter the method used to determine the cooling design capacity for scalable sizing. Input allowed is either *None*, *CoolingDesignCapacity*, *CapacityPerFloorArea*, and *FractionOfAutosizedCoolingCapacity*. None is used when a cooling coil is not included in the Zone HVAC equipment or this field may be left blank. If this input field is left blank, then the design cooling capacity is set to zero. *CoolingDesignCapacity* means user specifies the magnitude of cooling capacity or the program calculates the design cooling capacity if autosize is specified. *CapacityPerFloorArea* means the program calculates the design cooling capacity from user specified cooling capacity per floor area and floor area of the zone served by the HVAC unit. *FractionOfAutosizedCoolingCapacity* means the program calculates the design cooling capacity from user specified fraction and the auto-sized design cooling capacity. The default method is *CoolingDesignCapacity*.
+
+#### Field: Cooling Design Capacity {W}
+
+Enter the magnitude of the cooling capacity in Watts. This input is an alternative to using the program auto-calculated cooling capacity value. This input is a required field when the Cooling Design Capacity Method is *CoolingDesignCapacity*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or alternative method is specified. This input field is autosizable. Design day sizing run must be specified.
+
+#### Field: Cooling Design Capacity Per Floor Area {W/m2}
+
+Enter the cooling capacity per unit floor area in m3/s-m2. This field is required field when the Cooling Design Capacity Method is *CapacityPerFloorArea*. This field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Capacity Method is not *CapacityPerFloorArea*. The program calculates the cooling capacity from floor area of the zone served by the zone HVAC equipment and the cooling capacity per unit floor area value specified by the user.
+
+#### Field: Fraction of Autosized Cooling Design Capacity {-}
+
+Enter the cooling capacity as a fraction of the autosized cooling capacity. This input field is required when the Cooling Design Capacity Method is *FractionOfAutosizedCoolingCapacity*. This input field may be left blank if a cooling coil is not included in the zone HVAC equipment or the Cooling Design Capacity Method is not *FractionOfAutosizedCoolingCapacity*. The program calculates the cooling capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified.
+
+#### Field: Heating Design Capacity Method
+
+Enter the method used to determine the heating design capacity for scalable sizing. Input allowed is either *None*, *HeatingDesignCapacity*, *CapacityPerFloorArea*, and *FractionOfAutosizedHeatingCapacity*. None is used when a heating coil is not included in the Zone HVAC equipment or this field may be left blank. If this input field is left blank, then the design heating capacity is set to zero. *HeatingDesignCapacity* means user specifies the magnitude of heating capacity or the program calculates the design heating capacity if autosize is specified. *CapacityPerFloorArea* means the program calculates the design heating capacity from user specified heating capacity per floor area and floor area of the zone served by the HVAC unit. *FractionOfAutosizedHeatingCapacity* means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity. The default method is *HeatingDesignCapacity*.
+
+#### Field: Heating Design Capacity {W}
+
+Enter the magnitude of the heating capacity in Watts. This input is an alternative to using the program auto-calculated heating capacity value. This input is a required field when the Heating Design Capacity Method is *HeatingDesignCapacity*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or alternative method is specified. This input field is autosizable. Design day sizing run must be specified.
+
+#### Field: Heating Design Capacity Per Floor Area {W/m2}
+
+Enter the heating capacity per unit floor area in m3/s-m2. This field is required field when the Heating Design Capacity Method is *CapacityPerFloorArea*. This field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Capacity Method is not *CapacityPerFloorArea*. The program calculates the heating capacity from floor area of the zone served by the zone HVAC equipment and the heating capacity per unit floor area value specified by the user.
+
+#### Field: Fraction of Autosized Heating Design Capacity {-}
+
+Enter the heating capacity as a fraction of the autosized heating capacity. This input field is required when the Heating Design Capacity Method is *FractionOfAutosizedHeatingCapacity*. This input field may be left blank if a heating coil is not included in the zone HVAC equipment or the Heating Design Capacity Method is not *FractionOfAutosizedHeatingCapacity*. The program calculates the heating capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified.
+
+```idf
+  DesignSpecification:ZoneHVAC:Sizing,
+    VRFDesignSpec1,          !- Name
+    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
+    autosize,                !- Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+    ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
+    ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    SupplyAirFlowRate,       !- Heating Design Air Flow Method
+    autosize,                !- Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+
+  DesignSpecification:ZoneHVAC:Sizing,
+    VRFDesignSpec2,          !- Name
+    FlowPerFloorArea,        !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Supply Air Flow Rate
+    3.6311418E-03,           !- Cooling Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    FlowPerFloorArea,        !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
+    3.6311418E-03,           !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+    ,                     !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
+    ,                     !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    FlowPerFloorArea,        !- Heating Design Air Flow Method
+    ,                        !- Heating Design Supply Air Flow Rate
+    3.6311418E-03,           !- Heating Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+
+DesignSpecification:ZoneHVAC:Sizing,
+    VRFDesignSpec3,          !- Name
+    FractionOfAutosizedCoolingAirflow,  !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
+    0.5,                     !- Fraction of Autosized Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+  FractionOfAutosizedCoolingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+    0.5,                 !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
+    ,                    !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    FractionOfAutosizedHeatingAirflow,  !- Heating Design Air Flow Method
+    ,                        !- Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
+    0.5,                     !- Fraction of Autosized Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+
+DesignSpecification:ZoneHVAC:Sizing,
+    VRFDesignSpec4,          !- Name
+    FlowPerCoolingCapacity,  !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Supply Air Flow Rate
+    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
+    2.9541628E-05,           !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+  FractionOfAutosizedHeatingAirflow, !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Required
+    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+    ,                    !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
+    0.413231177,         !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
+    FlowPerHeatingCapacity,  !- Heating Design Air Flow Method
+    ,                        !- Heating Design Supply Air Flow Rate
+    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
+    2.9541628E-05,           !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
+```
+
 ### Sizing:System
 
 The Sizing:System object contains the input needed to perform a central forced air system design air flow, heating capacity, and cooling capacity calculation for a system serving one or more zones. The information needed consists of the outside environmental conditions and the design supply air temperatures, outdoor air flow rate, and minimum system air flow ratio.
@@ -7335,7 +7593,7 @@ The name of the AirLoopHVAC corresponding to this Sizing:System object. This is 
 
 #### Field: Type of Load to Size On
 
-The user specified type of load on which to size the central system. The choices are *Sensible*, *Total* and *VentilationRequirement*.  *Sensible* means that the central system supply air flow rate will be determined by combining the zone design air flow rates, which have been calculated to meet the zone sensible loads from the design days. *VentilationRequirement* means that the central system supply air flow rate will be determined by the system ventilation requirement.  In addition Sensible tells the program to size the central cooling coil using entering air flow rate and air conditions at the sensible load peak; Total  indicates that the program should size  the central cooling coil at the air flow rate and conditions at the total load peak. The central heating coil is always sized at the conditions at the peak sensible heating load.
+The user specified type of load on which to size the central system. The choices are *Sensible*, *Total* and *VentilationRequirement*.  *Sensible* and *Total* mean that the central system supply air flow rate will be determined by combining the zone design air flow rates, which have been calculated to meet the zone sensible loads from the design days. *VentilationRequirement* means that the central system supply air flow rate will be determined by the system ventilation requirement.  In addition *Sensible* tells the program to size the central cooling coil using entering air flow rate and air conditions at the sensible load peak; *Total* indicates that the program should size  the central cooling coil at the air flow rate and conditions at the total load peak. The central heating coil is always sized at the conditions at the peak sensible heating load.
 
 #### Field: Design Outdoor Air Flow Rate
 
@@ -7367,7 +7625,7 @@ The design supply air temperature for cooling in degrees Celsius. This should be
 
 #### Field: Central Heating Design Supply Air Temperature
 
-The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil.
+The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system.
 
 #### Field: Type of Zone Sum to Use
 
@@ -7383,11 +7641,11 @@ Entering *Yes* means the system will be sized for heating using 100% outdoor air
 
 #### Field: Central Cooling Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Central Heating Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Cooling Supply Air Flow Rate Method
 
@@ -7701,6 +7959,7 @@ In addition, properties of each node is available during the simulation:
 
 * HVAC,Average,System Node Height [m]
 
+* HVAC,Average,System Node Specific Heat [J/kg-K]
 
 **The following node variable is also available for system nodes that are for “air”:**
 
@@ -7813,6 +8072,10 @@ The current system node vapor fraction/percent {0.0-1.0}.
 #### System Node Height [m]
 
 The current system node height {m}. Only applicable to outdoor air nodes.
+
+#### System Node Specific Heat [J/kg-K]
+
+The current specific heat capacity of the fluid at the node in units of J/kg-K.  Not available for steam nodes. 
 
 **Additional Node Reporting for Air Nodes**
 
@@ -10838,7 +11101,7 @@ This choice field determines how the chiller operates with respect to the intend
 
 #### Field: Design Heat Recovery Water Flow Rate
 
-This is the design flow rate used if the heat recovery option is being simulated. If this value is greater than 0.0 then a heat recovery loop must be specified and attached to the chiller using the next 2 node fields. To determine how the heat recovery algorithm works look at the Enegineering Manual at the Chiller:Electric with Heat Recovery section. The units are in cubic meters per second. This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below.
+This is the design flow rate used if the heat recovery option is being simulated. If this value is greater than 0.0 then a heat recovery loop must be specified and attached to the chiller using the next 2 node fields. To determine how the heat recovery algorithm works look at the Engineering Manual at the Chiller:Electric with Heat Recovery section. The units are in cubic meters per second. This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below. Note that heat recovery is only available with Condenser Type = WaterCooled.
 
 #### Field: Heat Recovery Inlet Node Name
 
@@ -11201,7 +11464,7 @@ This choice field determines how the chiller operates with respect to the intend
 
 #### Field: Design Heat Recovery Water Flow Rate
 
-This is the design heat recovery water flow rate if the heat recovery option is being simulated. If this value is greater than 0.0 (or Autosize), a heat recovery loop must be specified and attached to the chiller using the next two node fields. The units are in cubic meters per second.  This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below.
+This is the design heat recovery water flow rate if the heat recovery option is being simulated. If this value is greater than 0.0 (or Autosize), a heat recovery loop must be specified and attached to the chiller using the next two node fields. The units are in cubic meters per second.  This field is autosizable.  When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below. Note that heat recovery is only available with Condenser Type = WaterCooled.
 
 #### Field: Heat Recovery Inlet Node Name
 
@@ -13875,7 +14138,7 @@ This model is an equation-fit model from the catalog data which resembles a blac
 
 **HeatPump:WaterToWater:ParameterEstimation:Heating**
 
-This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently “hardwired” to fluid property R22.
+This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently “hardwired” to fluid property R22. FluidProperties:* objects for R-22 must be included in the idf file. These may be copied from DataSets\FluidPropertiesRefData.idf.
 
 Descriptions and strength of each respective model is available in the following references:
 
@@ -13925,38 +14188,41 @@ This numeric field contains the rated volumetric flow rate on the source side of
 
 This numeric field contains the rated cooling capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data.
 
-#### Field: Rated Cooling COP
+#### Field: Rated Cooling Power Consumption
 
-This numeric field contains the rated cooling COP of the heat pump in W/W.  The default value is 4.0.
+Rated cooling power consumption, in W.
 
-
-
-#### Fields: Cooling Capacity Coefficients
+#### Fields: Cooling Capacity Coefficients 1-5
 
 Five fields are used to describe the coefficients for the Cooling Capacity curve. More details on how these coefficients are used are described in the Engineering Reference.
 
-#### Field: Cooling Capacity Coefficient 1-5
+#### Field: Cooling Compressor Power Coefficients 1-5
 
-These numeric fields contain the five coefficients for the heat pump capacity.
+Five fields are used to decribe the coefficients for the Cooling Compressor Power curve.
 
 An idf example:
 
 ```idf
-HeatPump:WaterToWater:EquationFit:Cooling,
-    GshpCLG,     !- Water to Water Heat Pump Name
-    GshpCLG SourceSide Inlet Node,  !- Source Side Inlet Node
-    GshpCLG SourceSide Outlet Node, !- Source Side Outlet Node
-    GshpCLG LoadSide Inlet Node,    !- Load Side Inlet Node
-    GshpCLG LoadSide Outlet Node,   !- Load Side Outlet Node
-    1.89E-03,    !- Rated Load Side Flow Rate {m3/s}
-    1.89E-03,    !- Rated Source Side Flow Rate {m3/s}
-    39890.91,    !- Rated Cooling Capacity {W}
-    4.0,         !- Rated Cooling COP {W/W}
-    -1.52030596, !- Cooling Capacity Coefficient 1
-    3.46625667,  !- Cooling Capacity Coefficient 2
-    -1.32267797, !- Cooling Capacity Coefficient 3
-    0.09395678,  !- Cooling Capacity Coefficient 4
-    0.038975504; !- Cooling Capacity Coefficient 5
+  HeatPump:WaterToWater:EquationFit:Cooling,
+    GshpCLG,                 !- Name
+    GshpCLG SourceSide Inlet Node,      !- Source Side Inlet Node Name
+    GshpCLG SourceSide Outlet Node,     !- Source Side Outlet Node Name
+    GshpCLG LoadSide Inlet Node,        !- Load Side Inlet Node Name
+    GshpCLG LoadSide Outlet Node,       !- Load Side Outlet Node Name
+    1.89E-03,                !- Rated Load Side Flow Rate {m3/s}
+    1.89E-03,                !- Rated Source Side Flow Rate {m3/s}
+    39890.91,                !- Rated Cooling Capacity {W}
+    4790.00,                 !- Rated Cooling Power Consumption {W}
+    -1.52030596,             !- Cooling Capacity Coefficient 1
+    3.46625667,              !- Cooling Capacity Coefficient 2
+    -1.32267797,             !- Cooling Capacity Coefficient 3
+    0.09395678,              !- Cooling Capacity Coefficient 4
+    0.038975504,             !- Cooling Capacity Coefficient 5
+    -8.59564386,             !- Cooling Compressor Power Coefficient 1
+    0.96265085,              !- Cooling Compressor Power Coefficient 2
+    8.69489229,              !- Cooling Compressor Power Coefficient 3
+    0.02501669,              !- Cooling Compressor Power Coefficient 4
+    -0.20132665;             !- Cooling Compressor Power Coefficient 5
 ```
 
 
@@ -14039,6 +14305,7 @@ This output variable represents the average fluid flow rate through the load sid
 
 This output variable represents the average fluid flow rate through the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
+
 ### HeatPump:WaterToWater:EquationFit:Heating
 
 #### Field: Name
@@ -14073,38 +14340,43 @@ This numeric field contains the rated volumetric flow rate on the source side of
 
 This numeric field contains the rated heating capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data.
 
-#### Field: Rated Heating COP
+#### Field: Rated Heating Power Consumption
 
-This numeric field contains the rated heating COP of the heat pump in W/W.  The default value is 4.0.
+Rated heating power consumption, in W.
 
-#### Fields: Heating Capacity Coefficients
+#### Fields: Heating Capacity Coefficients 1-5
 
 Five fields are used to describe the coefficients for the Heating Capacity curve. More details on how these coefficients are used are described in the Engineering Reference.
 
-#### Field: Heating Capacity Coefficient 1-5
+#### Field: Heating Compressor Power Coefficients 1-5
 
-These numeric fields contain the five coefficients for the heat pump capacity.
+Five fields are used to describe the coefficients for the Heating Compressor Power curve.
 
 An idf example:
 
 
 
 ```idf
-HeatPump:WaterToWater:EquationFit:Heating,
-    GshpHeating, !- Water to Water Heat Pump Name
-    GshpHeating SourceSide Inlet Node,  !- Source Side Inlet Node
-    GshpHeating SourceSide Outlet Node, !- Source Side Outlet Node
-    GshpHeating LoadSide Inlet Node,    !- Load Side Inlet Node
-    GshpHeating LoadSide Outlet Node,   !- Load Side Outlet Node
-    1.89E-03,    !- Rated Load Side Flow Rate {m3/s}
-    1.89E-03,    !- Rated Source Side Flow Rate {m3/s}
-    39040.92,    !- Rated Heating Capacity {W}
-    4.0,         !- Rated Heating COP {W/W}
-    -3.33491153, !- Heating Capacity Coefficient 1
-    -0.51451946, !- Heating Capacity Coefficient 2
-    4.51592706,  !- Heating Capacity Coefficient 3
-    0.01797107,  !- Heating Capacity Coefficient 4
-    0.155797661; !- Heating Capacity Coefficient 5
+  HeatPump:WaterToWater:EquationFit:Heating,
+    GshpHeating,             !- Name
+    GshpHeating SourceSide Inlet Node,      !- Source Side Inlet Node Name
+    GshpHeating SourceSide Outlet Node,     !- Source Side Outlet Node Name
+    GshpHeating LoadSide Inlet Node,        !- Load Side Inlet Node Name
+    GshpHeating LoadSide Outlet Node,       !- Load Side Outlet Node Name
+    1.89E-03,                !- Rated Load Side Flow Rate {m3/s}
+    1.89E-03,                !- Rated Source Side Flow Rate {m3/s}
+    39040.92,                !- Rated Heating Capacity {W}
+    5130.00,                 !- Rated Heating Power Consumption {W}
+    -3.33491153,             !- Heating Capacity Coefficient 1
+    -0.51451946,             !- Heating Capacity Coefficient 2
+    4.51592706,              !- Heating Capacity Coefficient 3
+    0.01797107,              !- Heating Capacity Coefficient 4
+    0.155797661,             !- Heating Capacity Coefficient 5
+    -8.93121751,             !- Heating Compressor Power Coefficient 1
+    8.57035762,              !- Heating Compressor Power Coefficient 2
+    1.29660976,              !- Heating Compressor Power Coefficient 3
+    -0.21629222,             !- Heating Compressor Power Coefficient 4
+    0.033862378;             !- Heating Compressor Power Coefficient 5
 ```
 
 
@@ -16020,7 +16292,7 @@ An additional destratification conductivity [W/m-K] is added to the fluid conduc
 
 #### Field: Node 1-10 Additional Loss Coefficient
 
-An additional heat gain coefficient [W/m-K] added to the skin gains for a given node to account for thermal shorting due to pipe penetrations, tank feet, and any other loss effects.
+An additional heat gain coefficient [W/K] added to the skin gains for a given node to account for thermal shorting due to pipe penetrations, tank feet, and any other loss effects.
 
 
 
@@ -17031,7 +17303,7 @@ An additional destratification conductivity [W/m-K] is added to the fluid conduc
 
 #### Field: Node 1-12 Additional Loss Coefficient
 
-An additional loss coefficient [W/m-K] added to the skin losses for a given node to account for thermal shorting due to pipe penetrations, water heater feet, and any other loss effects.
+An additional loss coefficient [W/K] added to the skin losses for a given node to account for thermal shorting due to pipe penetrations, water heater feet, and any other loss effects.
 
 #### Field: Source Side Flow Control Mode
 

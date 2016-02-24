@@ -1811,6 +1811,8 @@ This model simulates the thermal performance of the indoor DX cooling coil, and 
 
 When the model determines performance at Speed 1 (the lowest speed) or cycling between OFF and Speed 1, its performance is almost the same as the performance for the Coil:Cooling:DX:SingleSpeed model. However, the outlet conditions are calculated slightly differently. Therefore, the Coil:Cooling:DX:SingleSpeed model may be considered as a subset of the model described here. When the multispeed coil model determines performance at higher speeds (above 1), the model linearly interpolates the performance at two consecutive speeds (n-1 and n) as needed to meet the cooling load, with the fraction of time at each speed established by the speed ratio.
 
+When single mode operation is specified at higher speeds (above 1), defined in the UnitarySystemPerformance:Multispeed object, a child object of AirLoopHVAC:UnitarySystem, its performance is almost the same as the performance for the Coil:Cooling:DX:SingleSpeed model at different flow rate and capacity with given speed number. No linear interpolation is performed between two adjacent speeds. The highest speed which does not exceed the sensible load is used for each HVAC timestep. This operation does not apply to speed 1 operation and the case when the sensible load is above the highest sensible capacity.
+
 #### Model Inputs
 
 The model inputs are also very similar to the inputs of the Coil:Cooling:DX:SingleSpeed object. The main difference is that this multispeed model requires a set of fields at each speed, such as rated capacity, rated SHR, rated COP, two capacity modifiers, two energy input ratio modifiers, part-load correction, and latent degradation inputs. The inputs also include waste heat fraction at the rated conditions and modifier as a function of temperature to calculate recoverable waste heat for heat recovery, which are not available in the similar Coil:Cooling:DX:SingleSpeed object
@@ -2066,6 +2068,10 @@ It is expected to have less latent degradation at Speed n than Speed 1. Therefor
 n Crankcase heater
 
 There is no power need at higher speed operation.
+
+#### Higher Speed Operation with Single Mode Operation
+
+This section describes how higher speed operation is simulated with single mode operation. When the required sensible load is less than the full load sensible capacity at Speed n (Speed Number > 1), its performance is almost the same as the performance for the Coil:Cooling:DX:SingleSpeed model at different flow rate and capacity with given Speed n. No linear interpolation is performed between two adjacent speeds.
 
 #### Waste heat calculation
 
@@ -3817,6 +3823,8 @@ This model simulates the thermal performance of the indoor DX heating coil, and 
 
 When the model determines performance at Speed 1 (the lowest speed) or cycling between OFF and Speed 1, its performance is almost the same as the performance for the Coil:Heating:DX:SingleSpeed model. However, the outlet conditions are calculated slightly differently. Therefore, the Coil:Heating:DX:SingleSpeed model may be considered as a subset of the model described here. When the multispeed coil model determines performance at higher speeds (above 1), the model linearly interpolates the performance at two consecutive speeds (n-1 and n) as needed to meet the heating load, with the fraction of time at each speed established by the speed ratio.
 
+When single mode operation is specified at higher speeds (above 1), defined in the UnitarySystemPerformance:Multispeed object, a child object of AirLoopHVAC:UnitarySystem, its performance is almost the same as the performance for the Coil:Heating:DX:SingleSpeed model at different flow rate and capacity with given speed number. No linear interpolation is performed between two adjacent speeds. The highest speed which does not exceed the sensible load is used for each HVAC timestep. This operation does not apply to speed 1 operation and the case when the sensible load is above the highest sensible capacity.
+
 #### Model Inputs
 
 The model inputs are also very similar to the inputs of the Coil:Heating:DX:SingleSpeed object. The main difference is that this multispeed model requires a set of fields at each speed, such as rated capacity, rated COP, two capacity modifiers, two energy input ratio modifiers, and part-load correction. The inputs also include waste heat fraction and modifier as a function of temperature to calculate recoverable waste heat for heat recovery, which are not available in the similar Coil:Heating:DX:SingleSpeed object.
@@ -4018,6 +4026,10 @@ RTF            = Run time fraction (SpeedRatio/Part-load Fraction) at
 n Crankcase heater
 
 There is no power need at higher speed operation.
+
+#### Higher Speed Operation with Single Mode Operation
+
+This section describes how higher speed operation is simulated with single mode operation. When the required sensible load is less than the full load sensible capacity at Speed n (Speed Number > 1), its performance is almost the same as the performance for the Coil:Heating:DX:SingleSpeed model at different flow rate and capacity with given Speed n. No linear interpolation is performed between two adjacent speeds. The highest speed which does not exceed the sensible load is used for each HVAC timestep. This operation does not apply to the case when the sensible load is above the highest sensible capacity.
 
 #### Waste heat calculation
 
@@ -6826,9 +6838,13 @@ In case that the user has manufacturer’s information regarding the rated capac
 
 where <span>\({c_{p,w}}\)</span> is the specific heat capacity of the water.
 
-The model then assumes the air mass flow rate is twice the rated water mass flow rate. Since the inlet air temperature, <span>\({T_{a,in}}\)</span>, of 18°C and the heating capacity of the unit, i.e. rated capacity, are known, the outlet air temperature, <span>\({T_{a,out}}\)</span>, can be obtained from expression
+The model then assumes the air mass flow rate is given by the following expression: 
 
-<div>$${T_{a,out}} = \frac{{{q_{std}}}}{{2\dot m{}_w{c_{p,a}}}} + {T_{a,in}}$$</div>
+<div>$${\dot m_{a,std}} = {0.0062 + .0000275 \dot Q_{design}}$$<div>
+
+Since the inlet air temperature, <span>\({T_{a,in}}\)</span>, of 18°C and the heating capacity of the unit, i.e. rated capacity, are known, the outlet air temperature, <span>\({T_{a,out}}\)</span>, can be obtained from expression
+
+<div>$${T_{a,out}} = \frac{{{q_{std}}}}{{\dot m_{a,std}{c_{p,a}}}} + {T_{a,in}}$$</div>
 
 where <span>\({c_{p,a}}\)</span> is the specific heat capacity of the air.
 
@@ -6854,13 +6870,15 @@ In case that the user requests autosizing the rated capacity, the model employs 
 
 where <span>\({q_{design}}\)</span> is the design heating load estimated by EnergyPlus in the zone.
 
-Similarly, the model estimates the air outlet temperature assuming the air mass flow rate is twice the rated water mass flow rate as
+Similarly, the model estimates the air outlet temperature using the air mass flow rate calculated above:
 
-<div>$${T_{a,out}} = \frac{{{q_{design}}}}{{2\dot m{}_w{c_{p,a}}}} + {T_{a,in}}$$</div>
+<div>$${T_{a,out}} = \frac{{{q_{design}}}}{{\dot m_{a,std} {c_{p,a}}}} + {T_{a,in}}$$</div>
 
 Temperatures at the nodes are now known and the UA value is determined in the same fashion as the previous case.
 
-Once the UA value is determined, the model employs an effectiveness-NTU heat exchanger method to determine the heat transfer between the water and the zone air as convection-only model does (see “Hot Water Baseboard Heater with Only Convection” model). Note that the model also assumes that the air mass flow rate is twice the water mass flow rate in the main heat exchanger algorithm.
+Once the UA value is determined, the model employs an effectiveness-NTU heat exchanger method to determine the heat transfer between the water and the zone air as convection-only model does (see “Hot Water Baseboard Heater with Only Convection” model). During this calculation the air mass flow rate is proportioned to the water mass flow rate:
+
+<div>$${\dot m_a} = {{\dot m_{a,std}} \frac{\dot m_w}{\dot m_{w,max}}}$$<div>
 
 The model then determines the radiant heat addition by
 

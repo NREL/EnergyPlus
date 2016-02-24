@@ -1,10 +1,12 @@
-Notices and Acknowledgments
+(EnergyPlus Documentation, v8.4.0)
+
+Notices and Acknowledgments 
 ===========================
 
 Copyright Notice
 ----------------
 
-Copyright © 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the University of California through Ernest Orlando Lawrence Berkeley National Laboratory. All rights reserved.
+Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois and The Regents of the University of California through Ernest Orlando Lawrence Berkeley National Laboratory. All rights reserved.
 
 Portions of the EnergyPlus™ software package have been developed and copyrighted by other individuals, companies and institutions. These portions have been incorporated into the EnergyPlus software package under license.
 
@@ -157,7 +159,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ### FMU SDK license
 
-Copyright © 2008-2011, QTronic GmbH. All rights reserved.
+Copyright (c) 2008-2011, QTronic GmbH. All rights reserved.
 
 The FmuSdk is licensed by the copyright holder under the BSD License (&lt;http://www.opensource.org/licenses/bsd-license.html&gt;): Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -183,7 +185,7 @@ Permission is granted to anyone to use this software for any purpose, including 
 
 ### MODELISAR Notice
 
-Copyright © 2008-2010, MODELISAR consortium. All rights reserved.
+Copyright (c) 2008-2010, MODELISAR consortium. All rights reserved.
 
 This file is licensed by the copyright holders under the BSD License (&lt;http://www.opensource.org/licenses/bsd-license.html&gt;):
 
@@ -225,7 +227,7 @@ You are under no obligation whatsoever to provide any bug fixes, patches, or upg
 
 ### Functional Mock-up Unit Export of EnergyPlus Notice
 
-Functional Mock-up Unit Export of EnergyPlus ©2013, The Regents of the University of California, through Lawrence Berkeley National Laboratory (subject to receipt of any required approvals from the U.S. Department of Energy). All rights reserved.
+Functional Mock-up Unit Export of EnergyPlus (c)2013, The Regents of the University of California, through Lawrence Berkeley National Laboratory (subject to receipt of any required approvals from the U.S. Department of Energy). All rights reserved.
 
 If you have questions about your rights to use or distribute this software, please contact Berkeley Lab's Technology Transfer Department at &lt;TTD@lbl.gov&gt;.referring to "Functional Mock-up Unit Export of EnergyPlus (LBNL Ref 2013-088)".
 

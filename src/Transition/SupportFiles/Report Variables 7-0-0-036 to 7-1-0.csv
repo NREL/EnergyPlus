@@ -1,0 +1,33 @@
+7.0.0.036,7.1.0,
+30,30, These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+DXSystem Cycling Part-Load Ratio,Coil System Cycling Part Load Ratio,
+DXSystem Compressor Speed Ratio,Coil System Compressor Speed Ratio,
+DXSystem Part-Load Ratio,Coil System Part Load Ratio,
+Surface Inside Temperature,Surface Inside Face Temperature,
+Surface Outside Temperature,Surface Outside Face Temperature,
+Surface Int Adjacent Air Temperature,Surface Inside Face Adjacent Air Temperature,
+Surface Int Convection Coeff,Surface Inside Face Convection Heat Transfer Coefficient,
+Surface Int Convection Heat Rate,Surface Inside Face Convection Heat Gain Rate,changed sign convention
+Surface Int Convection Heat Rate per Area,Surface Inside Face Convection Heat Gain Rate per Area,changed sign convention
+Surface Int Convection Heat Gain to Air,Surface Inside Face Convection Heat Gain Energy,changed sign convention
+Surface Ext Outdoor Dry Bulb,Surface Outside Face Outdoor Air Dry Bulb Temperature,
+Surface Ext Outdoor Wet Bulb,Surface Outside Face Outdoor Air Wet Bulb Temperature,
+Surface Ext Wind Speed,Surface Outside Face Outdoor Wind Velocity,
+Surface Ext Convection Heat Rate,Surface Outside Face Convection Heat Gain Rate,changed sign convention
+Surface Ext Convection Heat Rate per Area,Surface Outside Face Convection Heat Gain Rate per Area,changed sign convention
+Surface Ext Convection Heat Loss to Outdoors,Surface Outside Face Convection Heat Gain Energy,changed sign convention
+Surface Ext Convection Coeff,Surface Outside Face Convection Heat Transfer Coefficient,
+Surface Ext Thermal Radiation Heat Rate,Surface Outside Face Net Thermal Radiation Heat Gain Rate,changed sign convention
+Surface Ext Thermal Radiation Heat Rate per Area,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,changed sign convention
+Surface Ext Thermal Radiation Heat Loss to Outdoors,Surface Outside Face Net Thermal Radiation Heat Gain Energy,changed sign convention
+Surface Ext Rad to Air Coeff,Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient,
+Surface Ext Rad to Sky Coeff,Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient,
+Surface Ext Rad to Ground Coeff,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient,
+Opaque Surface Inside Face Conduction,Surface Inside Face Conduction Heat Transfer Rate,
+Opaque Surface Inside Face Conduction Gain,Surface Inside Face Conduction Heat Gain Rate,
+Opaque Surface Inside Face Conduction Loss,Surface Inside Face Conduction Heat Loss Rate,
+CondFD Outside Surface Heat Flux,Surface Outside Face Conduction Heat Transfer Rate per Area,new variable must use DisplayAdvancedReportVariables
+CondFD Inside Surface Heat Flux,Surface Inside Face Conduction Heat Transfer Rate per Area,new variable must use DisplayAdvancedReportVariables
+CondFD Outside Heat Flux to Surface,Surface Outside Face Conduction Heat Transfer Rate per Area,new variable must use DisplayAdvancedReportVariables
+CondFD Inside Heat Flux to Surface,Surface Inside Face Conduction Heat Transfer Rate per Area,new variable must use DisplayAdvancedReportVariables
+old variable name,new variable name -- add variable names (before this line) and leave off units -- <DELETE> to delete,

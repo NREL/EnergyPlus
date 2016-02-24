@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef UnitVentilator_hh_INCLUDED
 #define UnitVentilator_hh_INCLUDED
 
@@ -242,197 +300,6 @@ namespace UnitVentilator {
 			HVACSizingIndex( 0 )
 		{}
 
-		// Member Constructor
-		UnitVentilatorData(
-			std::string const & Name, // name of unit
-			std::string const & SchedName, // availability schedule
-			int const SchedPtr, // index to schedule
-			int const AirInNode, // inlet air node number
-			int const AirOutNode, // outlet air node number
-			int const FanOutletNode, // outlet node number for fan exit
-			int const FanType_Num, // Fan type number (see DataHVACGlobals)
-			std::string const & FanType, // type of fan
-			std::string const & FanName, // name of fan
-			int const Fan_Index,
-			int const FanSchedPtr, // index to fan operating mode schedule
-			int const FanAvailSchedPtr, // index to fan availability schedule
-			int const OpMode, // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
-			int const ControlCompTypeNum,
-			int const CompErrIndex,
-			Real64 const MaxAirVolFlow, // m3/s
-			Real64 const MaxAirMassFlow, // kg/s
-			int const OAControlType, // type of control; options are VARIABLE PERCENT and FIXED TEMPERATURE
-			std::string const & MinOASchedName, // schedule of fraction for minimum outside air (all controls)
-			int const MinOASchedPtr, // index to schedule
-			std::string const & MaxOASchedName, // schedule of percentages for maximum outside air fraction (variable %)
-			int const MaxOASchedPtr, // index to schedule
-			std::string const & TempSchedName, // schedule of temperatures for desired "mixed air"
-			int const TempSchedPtr, // index to schedule
-			int const OutsideAirNode, // outside air node number
-			int const AirReliefNode, // relief air node number
-			int const OAMixerOutNode, // outlet node after the outside air mixer (inlet to coils if present)
-			Real64 const OutAirVolFlow, // m3/s
-			Real64 const OutAirMassFlow, // kg/s
-			Real64 const MinOutAirVolFlow, // m3/s
-			Real64 const MinOutAirMassFlow, // kg/s
-			int const CoilOption, // type of coil option; options are BOTH, HEATING, COOLING, AND NONE
-			bool const HCoilPresent, // .TRUE. if unit ventilator has a heating coil
-			int const HCoilType, // type of heating coil (water, gas, electric, etc.)
-			std::string const & HCoilName, // name of heating coil
-			std::string const & HCoilTypeCh, // type of heating coil character string (same as type on idf file).
-			int const HCoil_Index,
-			int const HCoil_PlantTypeNum,
-			int const HCoil_FluidIndex,
-			std::string const & HCoilSchedName, // availability schedule for the heating coil
-			int const HCoilSchedPtr, // index to schedule
-			Real64 const HCoilSchedValue,
-			Real64 const MaxVolHotWaterFlow, // m3/s
-			Real64 const MaxVolHotSteamFlow, // m3/s
-			Real64 const MaxHotWaterFlow, // kg/s
-			Real64 const MaxHotSteamFlow,
-			Real64 const MinHotSteamFlow,
-			Real64 const MinVolHotWaterFlow, // m3/s
-			Real64 const MinVolHotSteamFlow, // m3/s
-			Real64 const MinHotWaterFlow, // kg/s
-			int const HotControlNode, // hot water control node
-			int const HotCoilOutNodeNum, // outlet of coil
-			Real64 const HotControlOffset, // control tolerance
-			int const HWLoopNum, // index for plant loop with hot water coil
-			int const HWLoopSide, // index for plant loop side for hot water coil
-			int const HWBranchNum, // index for plant branch for hot water coil
-			int const HWCompNum, // index for plant component for hot water coil
-			bool const CCoilPresent, // .TRUE. if unit ventilator has a cooling coil
-			std::string const & CCoilName, // name of cooling coil
-			std::string const & CCoilTypeCh, // type of cooling coil as character string (same as on idf file)
-			int const CCoil_Index,
-			std::string const & CCoilPlantName, // name of cooling coil for plant
-			std::string const & CCoilPlantType, // type of cooling coil for plant
-			int const CCoil_PlantTypeNum,
-			int const CCoilType, // type of cooling coil:
-			std::string const & CCoilSchedName, // availability schedule for the cooling coil
-			int const CCoilSchedPtr, // index to schedule
-			Real64 const CCoilSchedValue,
-			Real64 const MaxVolColdWaterFlow, // m3/s
-			Real64 const MaxColdWaterFlow, // kg/s
-			Real64 const MinVolColdWaterFlow, // m3/s
-			Real64 const MinColdWaterFlow, // kg/s
-			int const ColdControlNode, // chilled water control node
-			int const ColdCoilOutNodeNum, // chilled water coil out node
-			Real64 const ColdControlOffset, // control tolerance
-			int const CWLoopNum, // index for plant loop with chilled water coil
-			int const CWLoopSide, // index for plant loop side for chilled water coil
-			int const CWBranchNum, // index for plant branch for chilled water coil
-			int const CWCompNum, // index for plant component for chilled water coil
-			Real64 const HeatPower, // unit heating output in watts
-			Real64 const HeatEnergy, // unit heating output in J
-			Real64 const TotCoolPower,
-			Real64 const TotCoolEnergy,
-			Real64 const SensCoolPower,
-			Real64 const SensCoolEnergy,
-			Real64 const ElecPower,
-			Real64 const ElecEnergy,
-			std::string const & AvailManagerListName, // Name of an availability manager list object
-			int const AvailStatus,
-			Real64 const FanPartLoadRatio, // fan part-load ratio for time step
-			Real64 const PartLoadFrac, // unit ventilator part-load ratio for time step
-			int const ZonePtr, // pointer to a zone served by a unit ventilator
-			int const HVACSizingIndex // index of a HVACSizing object for a unit ventilator
-		) :
-			Name( Name ),
-			SchedName( SchedName ),
-			SchedPtr( SchedPtr ),
-			AirInNode( AirInNode ),
-			AirOutNode( AirOutNode ),
-			FanOutletNode( FanOutletNode ),
-			FanType_Num( FanType_Num ),
-			FanType( FanType ),
-			FanName( FanName ),
-			Fan_Index( Fan_Index ),
-			FanSchedPtr( FanSchedPtr ),
-			FanAvailSchedPtr( FanAvailSchedPtr ),
-			OpMode( OpMode ),
-			ControlCompTypeNum( ControlCompTypeNum ),
-			CompErrIndex( CompErrIndex ),
-			MaxAirVolFlow( MaxAirVolFlow ),
-			MaxAirMassFlow( MaxAirMassFlow ),
-			OAControlType( OAControlType ),
-			MinOASchedName( MinOASchedName ),
-			MinOASchedPtr( MinOASchedPtr ),
-			MaxOASchedName( MaxOASchedName ),
-			MaxOASchedPtr( MaxOASchedPtr ),
-			TempSchedName( TempSchedName ),
-			TempSchedPtr( TempSchedPtr ),
-			OutsideAirNode( OutsideAirNode ),
-			AirReliefNode( AirReliefNode ),
-			OAMixerOutNode( OAMixerOutNode ),
-			OutAirVolFlow( OutAirVolFlow ),
-			OutAirMassFlow( OutAirMassFlow ),
-			MinOutAirVolFlow( MinOutAirVolFlow ),
-			MinOutAirMassFlow( MinOutAirMassFlow ),
-			CoilOption( CoilOption ),
-			HCoilPresent( HCoilPresent ),
-			HCoilType( HCoilType ),
-			HCoilName( HCoilName ),
-			HCoilTypeCh( HCoilTypeCh ),
-			HCoil_Index( HCoil_Index ),
-			HCoil_PlantTypeNum( HCoil_PlantTypeNum ),
-			HCoil_FluidIndex( HCoil_FluidIndex ),
-			HCoilSchedName( HCoilSchedName ),
-			HCoilSchedPtr( HCoilSchedPtr ),
-			HCoilSchedValue( HCoilSchedValue ),
-			MaxVolHotWaterFlow( MaxVolHotWaterFlow ),
-			MaxVolHotSteamFlow( MaxVolHotSteamFlow ),
-			MaxHotWaterFlow( MaxHotWaterFlow ),
-			MaxHotSteamFlow( MaxHotSteamFlow ),
-			MinHotSteamFlow( MinHotSteamFlow ),
-			MinVolHotWaterFlow( MinVolHotWaterFlow ),
-			MinVolHotSteamFlow( MinVolHotSteamFlow ),
-			MinHotWaterFlow( MinHotWaterFlow ),
-			HotControlNode( HotControlNode ),
-			HotCoilOutNodeNum( HotCoilOutNodeNum ),
-			HotControlOffset( HotControlOffset ),
-			HWLoopNum( HWLoopNum ),
-			HWLoopSide( HWLoopSide ),
-			HWBranchNum( HWBranchNum ),
-			HWCompNum( HWCompNum ),
-			CCoilPresent( CCoilPresent ),
-			CCoilName( CCoilName ),
-			CCoilTypeCh( CCoilTypeCh ),
-			CCoil_Index( CCoil_Index ),
-			CCoilPlantName( CCoilPlantName ),
-			CCoilPlantType( CCoilPlantType ),
-			CCoil_PlantTypeNum( CCoil_PlantTypeNum ),
-			CCoilType( CCoilType ),
-			CCoilSchedName( CCoilSchedName ),
-			CCoilSchedPtr( CCoilSchedPtr ),
-			CCoilSchedValue( CCoilSchedValue ),
-			MaxVolColdWaterFlow( MaxVolColdWaterFlow ),
-			MaxColdWaterFlow( MaxColdWaterFlow ),
-			MinVolColdWaterFlow( MinVolColdWaterFlow ),
-			MinColdWaterFlow( MinColdWaterFlow ),
-			ColdControlNode( ColdControlNode ),
-			ColdCoilOutNodeNum( ColdCoilOutNodeNum ),
-			ColdControlOffset( ColdControlOffset ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSide( CWLoopSide ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum ),
-			HeatPower( HeatPower ),
-			HeatEnergy( HeatEnergy ),
-			TotCoolPower( TotCoolPower ),
-			TotCoolEnergy( TotCoolEnergy ),
-			SensCoolPower( SensCoolPower ),
-			SensCoolEnergy( SensCoolEnergy ),
-			ElecPower( ElecPower ),
-			ElecEnergy( ElecEnergy ),
-			AvailManagerListName( AvailManagerListName ),
-			AvailStatus( AvailStatus ),
-			FanPartLoadRatio( FanPartLoadRatio ),
-			PartLoadFrac( PartLoadFrac ),
-			ZonePtr( ZonePtr ),
-			HVACSizingIndex( HVACSizingIndex )
-		{}
-
 	};
 
 	struct UnitVentNumericFieldData
@@ -444,12 +311,6 @@ namespace UnitVentilator {
 		UnitVentNumericFieldData()
 		{}
 
-		// Member Constructor
-		UnitVentNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames( FieldNames )
-		{}
 	};
 
 	// Object Data
@@ -457,6 +318,9 @@ namespace UnitVentilator {
 	extern Array1D< UnitVentNumericFieldData > UnitVentNumericFields;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimUnitVentilator(
@@ -532,29 +396,6 @@ namespace UnitVentilator {
 		Real64 const PartLoadRatio, // Coil Part Load Ratio
 		Array1< Real64 > const & Par // Function parameters
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // UnitVentilator
 

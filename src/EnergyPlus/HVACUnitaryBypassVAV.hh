@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef HVACUnitaryBypassVAV_hh_INCLUDED
 #define HVACUnitaryBypassVAV_hh_INCLUDED
 
@@ -322,267 +380,6 @@ namespace HVACUnitaryBypassVAV {
 			CRDXIterationFailedIndex( 0 )
 		{}
 
-		// Member Constructor
-		CBVAVData(
-			std::string const & Name, // Name of unit
-			std::string const & UnitType, // Type of unit
-			std::string const & Sched, // Availability schedule name
-			int const SchedPtr, // Index number to availability schedule
-			Real64 const MaxCoolAirVolFlow, // System air volumetric flow rate during cooling operation [m3/s]
-			Real64 const MaxHeatAirVolFlow, // System air volumetric flow rate during heating operation [m3/s]
-			Real64 const MaxNoCoolHeatAirVolFlow, // System air volumetric flow rate when no cooling or heating [m3/s]
-			Real64 const MaxCoolAirMassFlow, // System air mass flow rate during cooling operation [kg/s]
-			Real64 const MaxHeatAirMassFlow, // System air mass flow rate during heating operation [kg/s]
-			Real64 const MaxNoCoolHeatAirMassFlow, // System air mass flow rate when no cooling or heating [kg/s]
-			Real64 const CoolOutAirVolFlow, // OA volumetric flow rate during cooling operation [m3/s]
-			Real64 const HeatOutAirVolFlow, // OA volumetric flow rate during heating operation [m3/s]
-			Real64 const NoCoolHeatOutAirVolFlow, // OA volumetric flow rate when no cooling or heating [m3/s]
-			Real64 const CoolOutAirMassFlow, // OA mass flow rate during cooling operation [kg/s]
-			Real64 const HeatOutAirMassFlow, // OA mass flow rate during heating operation [kg/s]
-			Real64 const NoCoolHeatOutAirMassFlow, // OA mass flow rate when no cooling or heating [kg/s]
-			int const OutAirSchPtr, // Index number to outside air multiplier schedule
-			int const AirInNode, // Inlet air node number for CBVAV unit
-			int const AirOutNode, // Outlet air node number for CBVAV unit
-			int const CondenserNodeNum, // DX Coil condenser air inlet node number
-			int const MixerOutsideAirNode, // Outside air node number for OA mixer
-			int const MixerMixedAirNode, // Mixed air node number for OA mixer
-			int const MixerReliefAirNode, // Relief air node number for OA mixer
-			int const MixerInletAirNode, // Return air node number for OA mixer
-			int const SplitterOutletAirNode, // Air node number for splitter (last component outlet node)
-			std::string const & OAMixType, // type of outside air mixer
-			std::string const & OAMixName, // Name of OA mixer
-			int const OAMixIndex, // Index to OA mixer
-			std::string const & FanName, // Name of fan
-			std::string const & FanType, // Type of fan
-			int const FanPlace, // Fan placement is either blowthru (1) or drawthru (2)
-			int const FanType_Num, // Fan type number (see DataHVACGlobals)
-			int const FanIndex, // Index number to fan
-			int const FanOpModeSchedPtr, // Fan operating mode schedule pointer
-			Real64 const FanVolFlow, // Volumetric flow rate of system supply air fan [m3/s]
-			Real64 const HeatingSpeedRatio, // Fan speed ratio in heating mode
-			Real64 const CoolingSpeedRatio, // Fan speed ratio in cooling mode
-			Real64 const NoHeatCoolSpeedRatio, // Fan speed ratio when no cooling or heating
-			bool const CheckFanFlow, // Check fan volumetric flow versus system flow in init routine.
-			std::string const & DXCoolCoilName, // Name of DX cooling coil
-			std::string const & DXCoolCoilType, // Type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
-			int const DXCoolCoilType_Num, // Numeric equivalent for DX cooling coil type
-			int const CoolCoilCompIndex, // cooling coil component index number
-			int const DXCoolCoilIndexNum, // actual DX cooling coil index number
-			int const DXHeatCoilIndexNum, // actual DX heating coil index number
-			std::string const & HeatCoilName, // Name of heating coil
-			std::string const & HeatCoilType, // Type of heating coil,Coil:DX:HeatingEmpirical
-			int const HeatCoilType_Num, // Numeric equivalent for DX heating coil type
-			int const HeatCoilIndex, // DX heating coil index number
-			int const OpMode, // mode of operation; 1=cycling fan, cycling compressor
-			int const CoilControlNode, // heating coil hot water or steam inlet node
-			int const CoilOutletNode, // outlet node for hot water and steam coil
-			int const LoopNum, // plant loop index for water heating coil
-			int const LoopSide, // plant loop side  index for water heating coil
-			int const BranchNum, // plant loop branch index for water heating coil
-			int const CompNum, // plant loop component index for water heating coil
-			int const HotWaterCoilMaxIterIndex, // Index to recurring warning message
-			int const HotWaterCoilMaxIterIndex2, // Index to recurring warning message
-			Real64 const MaxHeatCoilFluidFlow, // water or steam mass flow rate for heating coil [kg/s]
-			Real64 const DesignHeatingCapacity, // design heating capacity of the heating coil
-			Real64 const DesignSuppHeatingCapacity, // Operating capacity of supplemental Heating Coil [W]
-			Real64 const MinOATCompressor, // Minimum OAT for compressor operation [C]
-			Real64 const MinLATCooling, // Minimum leaving air temp for compressor cooling operation [C]
-			Real64 const MaxLATHeating, // Maximum leaving air temp for heating operation [C]
-			Real64 const TotHeatEnergyRate, // Total heating output [W]
-			Real64 const TotHeatEnergy, // Total heating output [J]
-			Real64 const TotCoolEnergyRate, // Total cooling output [W]
-			Real64 const TotCoolEnergy, // Total cooling output [J]
-			Real64 const SensHeatEnergyRate, // Sensible heating output [W]
-			Real64 const SensHeatEnergy, // Sensible heating output [J]
-			Real64 const SensCoolEnergyRate, // Sensible cooling output [W]
-			Real64 const SensCoolEnergy, // Sensible cooling output [J]
-			Real64 const LatHeatEnergyRate, // Latent heating output [W]
-			Real64 const LatHeatEnergy, // Latent heating output [J]
-			Real64 const LatCoolEnergyRate, // Latent cooling output [W]
-			Real64 const LatCoolEnergy, // Latent cooling output [J]
-			Real64 const ElecPower, // Electricity consumed [W]
-			Real64 const ElecConsumption, // Electricity consumed [J]
-			Real64 const FanPartLoadRatio, // Fan part-load ratio for time step
-			Real64 const CompPartLoadRatio, // Compressor part-load ratio for time step
-			int const LastMode, // Last mode of operation, coolingmode or heatingmode
-			int const AirFlowControl, // Fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
-			Real64 const CompPartLoadFrac, // Compressor part load ratio
-			int const AirLoopNumber, // Air loop served by the CBVAV system
-			int const NumControlledZones,
-			Array1_int const & ControlledZoneNum, // Index to controlled zones
-			Array1_int const & ActualZoneNum, // Actual zone number of controlled zone
-			Array1_int const & ActualZoneNodeNum, // Actual zone node num of controlled zone
-			Array1_int const & CBVAVBoxOutletNode, // Outlet node of CBVAV Box in controlled zone
-			Array1_int const & ZoneSequenceCoolingNum, // Index to cooling sequence/priority for this zone
-			Array1_int const & ZoneSequenceHeatingNum, // Index to heating sequence/priority for this zone
-			int const PriorityControl, // Control mode - CoolingPriority, HeatingPriority, or ZonePriority
-			int const NumZonesCooled, // Number of zones requesting cooling
-			int const NumZonesHeated, // Number of zones requesting heating
-			int const PLRMaxIter, // Counter for recurring warning message
-			int const PLRMaxIterIndex, // Index to recurring warning message
-			int const DXCoilInletNode, // Inlet node number of DX cooling coil
-			int const DXCoilOutletNode, // Outlet node number of DX cooling coil
-			int const HeatingCoilInletNode, // Inlet node of heating coil
-			int const HeatingCoilOutletNode, // Outlet node of heating coil
-			int const FanInletNodeNum, // fan inlet node number
-			Real64 const OutletTempSetPoint, // Oulet node temperature setpoint [C]
-			Real64 const CoilTempSetPoint, // Coil oulet node temperature setpoint (inc. fan heat) [C]
-			int const HeatCoolMode, // System operating mode (0 = floating, 1 = cooling, 2 = heating)
-			Real64 const BypassMassFlowRate, // Bypass mass flow rate report variable [m3/s]
-			int const DehumidificationMode, // Dehumidification mode (0=normal, 1=enhanced)
-			int const DehumidControlType, // Dehumidification control type (currently only for multimode coil)
-			bool const HumRatMaxCheck, // Used in Init for warning messages
-			int const DXIterationExceeded, // Counter for DX coil messages
-			int const DXIterationExceededIndex, // Counter for DX coil messages
-			int const DXIterationFailed, // Counter for DX coil messages
-			int const DXIterationFailedIndex, // Counter for DX coil messages
-			int const HXDXIterationExceeded, // Counter for HX assisted DX coil messages
-			int const HXDXIterationExceededIndex, // Counter for HX assisted DX coil messages
-			int const HXDXIterationFailed, // Counter for HX assisted DX coil messages
-			int const HXDXIterationFailedIndex, // Counter for HX assisted DX coil messages
-			int const MMDXIterationExceeded, // Counter for multimode DX coil messages
-			int const MMDXIterationExceededIndex, // Counter for multimode DX coil messages
-			int const MMDXIterationFailed, // Counter for multimode DX coil messages
-			int const MMDXIterationFailedIndex, // Counter for multimode DX coil messages
-			int const DMDXIterationExceeded, // Counter for dehumidifying multimode DX coil messages
-			int const DMDXIterationExceededIndex, // Counter for dehumidifying multimode DX coil messages
-			int const DMDXIterationFailed, // Counter for dehumidifying multimode DX coil messages
-			int const DMDXIterationFailedIndex, // Counter for dehumidifying multimode DX coil messages
-			int const CRDXIterationExceeded, // Counter for cool reheat multimode DX coil messages
-			int const CRDXIterationExceededIndex, // Counter for cool reheat multimode DX coil messages
-			int const CRDXIterationFailed, // Counter for cool reheat multimode DX coil messages
-			int const CRDXIterationFailedIndex // Counter for cool reheat multimode DX coil messages
-		) :
-			Name( Name ),
-			UnitType( UnitType ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			MaxCoolAirVolFlow( MaxCoolAirVolFlow ),
-			MaxHeatAirVolFlow( MaxHeatAirVolFlow ),
-			MaxNoCoolHeatAirVolFlow( MaxNoCoolHeatAirVolFlow ),
-			MaxCoolAirMassFlow( MaxCoolAirMassFlow ),
-			MaxHeatAirMassFlow( MaxHeatAirMassFlow ),
-			MaxNoCoolHeatAirMassFlow( MaxNoCoolHeatAirMassFlow ),
-			CoolOutAirVolFlow( CoolOutAirVolFlow ),
-			HeatOutAirVolFlow( HeatOutAirVolFlow ),
-			NoCoolHeatOutAirVolFlow( NoCoolHeatOutAirVolFlow ),
-			CoolOutAirMassFlow( CoolOutAirMassFlow ),
-			HeatOutAirMassFlow( HeatOutAirMassFlow ),
-			NoCoolHeatOutAirMassFlow( NoCoolHeatOutAirMassFlow ),
-			OutAirSchPtr( OutAirSchPtr ),
-			AirInNode( AirInNode ),
-			AirOutNode( AirOutNode ),
-			CondenserNodeNum( CondenserNodeNum ),
-			MixerOutsideAirNode( MixerOutsideAirNode ),
-			MixerMixedAirNode( MixerMixedAirNode ),
-			MixerReliefAirNode( MixerReliefAirNode ),
-			MixerInletAirNode( MixerInletAirNode ),
-			SplitterOutletAirNode( SplitterOutletAirNode ),
-			OAMixType( OAMixType ),
-			OAMixName( OAMixName ),
-			OAMixIndex( OAMixIndex ),
-			FanName( FanName ),
-			FanType( FanType ),
-			FanPlace( FanPlace ),
-			FanType_Num( FanType_Num ),
-			FanIndex( FanIndex ),
-			FanOpModeSchedPtr( FanOpModeSchedPtr ),
-			FanVolFlow( FanVolFlow ),
-			HeatingSpeedRatio( HeatingSpeedRatio ),
-			CoolingSpeedRatio( CoolingSpeedRatio ),
-			NoHeatCoolSpeedRatio( NoHeatCoolSpeedRatio ),
-			CheckFanFlow( CheckFanFlow ),
-			DXCoolCoilName( DXCoolCoilName ),
-			DXCoolCoilType( DXCoolCoilType ),
-			DXCoolCoilType_Num( DXCoolCoilType_Num ),
-			CoolCoilCompIndex( CoolCoilCompIndex ),
-			DXCoolCoilIndexNum( DXCoolCoilIndexNum ),
-			DXHeatCoilIndexNum( DXHeatCoilIndexNum ),
-			HeatCoilName( HeatCoilName ),
-			HeatCoilType( HeatCoilType ),
-			HeatCoilType_Num( HeatCoilType_Num ),
-			HeatCoilIndex( HeatCoilIndex ),
-			OpMode( OpMode ),
-			CoilControlNode( CoilControlNode ),
-			CoilOutletNode( CoilOutletNode ),
-			LoopNum( LoopNum ),
-			LoopSide( LoopSide ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			HotWaterCoilMaxIterIndex( HotWaterCoilMaxIterIndex ),
-			HotWaterCoilMaxIterIndex2( HotWaterCoilMaxIterIndex2 ),
-			MaxHeatCoilFluidFlow( MaxHeatCoilFluidFlow ),
-			DesignHeatingCapacity( DesignHeatingCapacity ),
-			DesignSuppHeatingCapacity( DesignSuppHeatingCapacity ),
-			MinOATCompressor( MinOATCompressor ),
-			MinLATCooling( MinLATCooling ),
-			MaxLATHeating( MaxLATHeating ),
-			TotHeatEnergyRate( TotHeatEnergyRate ),
-			TotHeatEnergy( TotHeatEnergy ),
-			TotCoolEnergyRate( TotCoolEnergyRate ),
-			TotCoolEnergy( TotCoolEnergy ),
-			SensHeatEnergyRate( SensHeatEnergyRate ),
-			SensHeatEnergy( SensHeatEnergy ),
-			SensCoolEnergyRate( SensCoolEnergyRate ),
-			SensCoolEnergy( SensCoolEnergy ),
-			LatHeatEnergyRate( LatHeatEnergyRate ),
-			LatHeatEnergy( LatHeatEnergy ),
-			LatCoolEnergyRate( LatCoolEnergyRate ),
-			LatCoolEnergy( LatCoolEnergy ),
-			ElecPower( ElecPower ),
-			ElecConsumption( ElecConsumption ),
-			FanPartLoadRatio( FanPartLoadRatio ),
-			CompPartLoadRatio( CompPartLoadRatio ),
-			LastMode( LastMode ),
-			AirFlowControl( AirFlowControl ),
-			CompPartLoadFrac( CompPartLoadFrac ),
-			AirLoopNumber( AirLoopNumber ),
-			NumControlledZones( NumControlledZones ),
-			ControlledZoneNum( ControlledZoneNum ),
-			ActualZoneNum( ActualZoneNum ),
-			ActualZoneNodeNum( ActualZoneNodeNum ),
-			CBVAVBoxOutletNode( CBVAVBoxOutletNode ),
-			ZoneSequenceCoolingNum( ZoneSequenceCoolingNum ),
-			ZoneSequenceHeatingNum( ZoneSequenceHeatingNum ),
-			PriorityControl( PriorityControl ),
-			NumZonesCooled( NumZonesCooled ),
-			NumZonesHeated( NumZonesHeated ),
-			PLRMaxIter( PLRMaxIter ),
-			PLRMaxIterIndex( PLRMaxIterIndex ),
-			DXCoilInletNode( DXCoilInletNode ),
-			DXCoilOutletNode( DXCoilOutletNode ),
-			HeatingCoilInletNode( HeatingCoilInletNode ),
-			HeatingCoilOutletNode( HeatingCoilOutletNode ),
-			FanInletNodeNum( FanInletNodeNum ),
-			OutletTempSetPoint( OutletTempSetPoint ),
-			CoilTempSetPoint( CoilTempSetPoint ),
-			HeatCoolMode( HeatCoolMode ),
-			BypassMassFlowRate( BypassMassFlowRate ),
-			DehumidificationMode( DehumidificationMode ),
-			DehumidControlType( DehumidControlType ),
-			HumRatMaxCheck( HumRatMaxCheck ),
-			DXIterationExceeded( DXIterationExceeded ),
-			DXIterationExceededIndex( DXIterationExceededIndex ),
-			DXIterationFailed( DXIterationFailed ),
-			DXIterationFailedIndex( DXIterationFailedIndex ),
-			HXDXIterationExceeded( HXDXIterationExceeded ),
-			HXDXIterationExceededIndex( HXDXIterationExceededIndex ),
-			HXDXIterationFailed( HXDXIterationFailed ),
-			HXDXIterationFailedIndex( HXDXIterationFailedIndex ),
-			MMDXIterationExceeded( MMDXIterationExceeded ),
-			MMDXIterationExceededIndex( MMDXIterationExceededIndex ),
-			MMDXIterationFailed( MMDXIterationFailed ),
-			MMDXIterationFailedIndex( MMDXIterationFailedIndex ),
-			DMDXIterationExceeded( DMDXIterationExceeded ),
-			DMDXIterationExceededIndex( DMDXIterationExceededIndex ),
-			DMDXIterationFailed( DMDXIterationFailed ),
-			DMDXIterationFailedIndex( DMDXIterationFailedIndex ),
-			CRDXIterationExceeded( CRDXIterationExceeded ),
-			CRDXIterationExceededIndex( CRDXIterationExceededIndex ),
-			CRDXIterationFailed( CRDXIterationFailed ),
-			CRDXIterationFailedIndex( CRDXIterationFailedIndex )
-		{}
-
 	};
 
 	// Object Data
@@ -702,29 +499,6 @@ namespace HVACUnitaryBypassVAV {
 		Real64 const HWFlow, // hot water flow rate in kg/s
 		Array1< Real64 > const & Par // Par(5) is the requested coil load
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACUnitaryBypassVAV
 

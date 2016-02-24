@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
@@ -377,17 +435,11 @@ namespace PoweredInductionUnits {
 			PIU( PIUNum ).HCoilInAirNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, PIU( PIUNum ).UnitType, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent, cAlphaFieldNames( 6 ) );
 			// The reheat coil control node is necessary for hot water reheat, but not necessary for
 			// electric or gas reheat.
-			if ( PIU( PIUNum ).HCoilType_Num == HCoilType_Gas || PIU( PIUNum ).HCoilType_Num == HCoilType_Electric ) {
-				if ( ! lAlphaFieldBlanks( 11 ) ) {
-					ShowWarningError( "In " + cCurrentModuleObject + " = " + PIU( PIUNum ).Name + " the " + cAlphaFieldNames( 11 ) + " is not needed and will be ignored." );
-					ShowContinueError( "  It is used for hot water reheat coils only." );
-				}
-			} else {
-				if ( lAlphaFieldBlanks( 11 ) ) {
-					ShowSevereError( "In " + cCurrentModuleObject + " = " + PIU( PIUNum ).Name + " the " + cAlphaFieldNames( 11 ) + " is undefined." );
-					ErrorsFound = true;
-				}
-				PIU( PIUNum ).HotControlNode = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent, cAlphaFieldNames( 11 ) );
+			if ( PIU( PIUNum ).HCoilType_Num == HCoilType_SimpleHeating ) {
+				PIU( PIUNum ).HotControlNode = GetCoilWaterInletNode( cAlphaArgs( 9 ), cAlphaArgs( 10 ), ErrorsFound );
+			}
+			if ( PIU( PIUNum ).HCoilType_Num == HCoilType_SteamAirHeating ) {
+				PIU( PIUNum ).HotControlNode = GetCoilSteamInletNode( cAlphaArgs( 9 ), cAlphaArgs( 10 ), ErrorsFound );
 			}
 			PIU( PIUNum ).MixerName = cAlphaArgs( 7 ); // name of zone mixer object
 			PIU( PIUNum ).FanName = cAlphaArgs( 8 ); // name of fan object
@@ -1128,6 +1180,8 @@ namespace PoweredInductionUnits {
 					if ( IsAutoSize ) {
 						PIU( PIUNum ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
 						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes );
+						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
+						ReportSizingOutput( PIU( PIUNum ).UnitType, PIU( PIUNum ).Name, "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );
 					} else { // Hardsize with sizing data
 						if ( PIU( PIUNum ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
 							MaxVolHotWaterFlowUser = PIU( PIUNum ).MaxVolHotWaterFlow;
@@ -1292,10 +1346,10 @@ namespace PoweredInductionUnits {
 		Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
 		Real64 QActualHeating; // the heating load seen by the reheat coil [W]
 		Real64 PowerMet; // power supplied
-		bool UnitOn; // TRUE if unit is on
-		bool PriOn; // TRUE if primary air available
-		bool HCoilOn; // TRUE if heating coil is on
-		int ControlNode; // the hot water or cold water inlet node
+		bool UnitOn( true ); // TRUE if unit is on
+		bool PriOn( true ); // TRUE if primary air available
+		bool HCoilOn( true ); // TRUE if heating coil is on
+		int ControlNode( 0 ); // the hot water or cold water inlet node
 		Real64 ControlOffset; // tolerance for output control
 		Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
 		Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/s]
@@ -1309,9 +1363,9 @@ namespace PoweredInductionUnits {
 		Real64 PriAirMassFlowMin; // min primary air mass flow rate [kg/s]
 		Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
 		Real64 CpAirZn; // zone air specific heat [J/kg-C]
-		Real64 FanDeltaTemp; // fan temperature rise [C]
-		Real64 OutletTempNeeded; // unit outlet temperature needed to meet cooling load
-		Real64 MixTempNeeded; // mixer outlet temperature needed to meet cooling load
+		Real64 FanDeltaTemp( 0.0 ); // fan temperature rise [C]
+		Real64 OutletTempNeeded( 0.0 ); // unit outlet temperature needed to meet cooling load
+		Real64 MixTempNeeded( 0.0 ); // mixer outlet temperature needed to meet cooling load
 		Real64 MinSteamFlow;
 		Real64 MaxSteamFlow;
 		Real64 mdot; // local plant fluid flow rate kg/s
@@ -1320,13 +1374,6 @@ namespace PoweredInductionUnits {
 
 		FanElecPower = 0.0;
 		// initialize local variables
-		FanDeltaTemp = 0.0;
-		OutletTempNeeded = 0.0;
-		MixTempNeeded = 0.0;
-		UnitOn = true;
-		PriOn = true;
-		HCoilOn = true;
-		ControlNode = 0;
 		ControlOffset = PIU( PIUNum ).HotControlOffset;
 		OutletNode = PIU( PIUNum ).OutAirNode;
 		PriNode = PIU( PIUNum ).PriAirInNode;
@@ -1536,10 +1583,10 @@ namespace PoweredInductionUnits {
 		Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
 		Real64 QActualHeating; // the heating load seen by the reheat coil [W]
 		Real64 PowerMet; // power supplied
-		bool UnitOn; // TRUE if unit is on
-		bool PriOn; // TRUE if primary air available
-		bool HCoilOn; // TRUE if heating coil is on
-		int ControlNode; // the hot water or cold water inlet node
+		bool UnitOn( true ); // TRUE if unit is on
+		bool PriOn( true ); // TRUE if primary air available
+		bool HCoilOn( true ); // TRUE if heating coil is on
+		int ControlNode( 0 ); // the hot water or cold water inlet node
 		Real64 ControlOffset; // tolerance for output control
 		Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
 		Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/s]
@@ -1553,7 +1600,7 @@ namespace PoweredInductionUnits {
 		Real64 PriAirMassFlowMin; // min primary air mass flow rate [kg/s]
 		Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
 		Real64 CpAirZn; // zone air specific heat [J/kg-C]
-		Real64 FanDeltaTemp; // fan temperature rise [C]
+		Real64 FanDeltaTemp( 0.0 ); // fan temperature rise [C]
 		//unusedREAL(r64)    :: MaxSteamFlow
 		//unusedREAL(r64)    :: MinSteamFlow
 		Real64 mdot; // local fluid flow rate kg/s
@@ -1562,11 +1609,6 @@ namespace PoweredInductionUnits {
 
 		FanElecPower = 0.0;
 		// initialize local variables
-		FanDeltaTemp = 0.0;
-		UnitOn = true;
-		PriOn = true;
-		HCoilOn = true;
-		ControlNode = 0;
 		ControlOffset = PIU( PIUNum ).HotControlOffset;
 		OutletNode = PIU( PIUNum ).OutAirNode;
 		PriNode = PIU( PIUNum ).PriAirInNode;
@@ -1858,29 +1900,6 @@ namespace PoweredInductionUnits {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PoweredInductionUnits
 
