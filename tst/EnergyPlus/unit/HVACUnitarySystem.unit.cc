@@ -96,6 +96,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -2721,7 +2722,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
 
 	SimulationManager::GetProjectData();
-
+	createFacilityElectricPowerServiceObject();
 	DataGlobals::BeginSimFlag = true;
 	DataGlobals::DoingSizing = true;
 	SizingManager::ManageSizing();

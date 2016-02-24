@@ -109,6 +109,7 @@ extern "C" {
 #include <DualDuct.hh>
 #include <EconomicLifeCycleCost.hh>
 #include <EconomicTariff.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <EMSManager.hh>
 #include <ExteriorEnergyUse.hh>
 #include <ExternalInterface.hh>
@@ -123,7 +124,6 @@ extern "C" {
 #include <HVACManager.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <InputProcessor.hh>
-#include <ManageElectricPower.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -293,7 +293,6 @@ namespace SimulationManager {
 		using BranchInputManager::ManageBranchInput;
 		using BranchInputManager::TestBranchIntegrity;
 		using BranchInputManager::InvalidBranchDefinitions;
-		using ManageElectricPower::VerifyCustomMetersElecPowerMgr;
 		using MixedAir::CheckControllerLists;
 		using EMSManager::CheckIfAnyEMS;
 		using EMSManager::ManageEMS;
@@ -377,6 +376,7 @@ namespace SimulationManager {
 		CheckIfAnySlabs();
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
+		createFacilityElectricPowerServiceObject();
 
 		ManageBranchInput(); // just gets input and returns.
 
@@ -425,7 +425,7 @@ namespace SimulationManager {
 			SetupPollutionMeterReporting();
 			UpdateMeterReporting();
 			CheckPollutionMeterReporting();
-			VerifyCustomMetersElecPowerMgr();
+			facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
 			SetupPollutionCalculations();
 			InitDemandManagers();
 
