@@ -8619,7 +8619,7 @@ These output variables represent the sum of all heat gains throughout the zone i
 
 ### ZoneList
 
-The ZoneList object defines a list of Zone objects. It is primarily used with the ZoneGroup object to provide a generalized way for doing "Floor Multipliers". (See the ZoneGroup description below.)  The associated ZoneList output variables also provide a way to aggregate and organize zone loads.
+The ZoneList object defines a list of Zone objects. It is primarily used with the ZoneGroup object to provide a generalized way for doing "Floor Multipliers". (See the ZoneGroup description below.) The associated ZoneList output variables also provide a way to aggregate and organize zone loads.
 
 Zone lists are not exclusive. A zone can be referenced be more than one ZoneList object.
 
@@ -8627,16 +8627,16 @@ Zone lists are not exclusive. A zone can be referenced be more than one ZoneList
 
 The name of the ZoneList object. Must be unique across ZoneLists.
 
-#### Field: Zone 1 – 20 Name
+#### Field: Zone 1 - Zone 20 Name
 
 Reference to a Zone object. This field is extensible; for greater than 20 zones, edit the IDD to add more *Zone Name* fields.
 
-Z```idf
-oneList,
-  Mid Floor List,  !- Name
-  Mid West Zone,  !- Zone 1 Name
-  Mid Center Zone,  !- Zone 2 Name
-  Mid East Zone;  !- Zone 3 Name
+```idf
+ZoneList,
+  Mid Floor List,  !- Name
+  Mid West Zone,   !- Zone 1 Name
+  Mid Center Zone, !- Zone 2 Name
+  Mid East Zone;   !- Zone 3 Name
 ```
 
 
@@ -13565,7 +13565,7 @@ This is the string referenced in the Surface statement that is using OtherSideMo
 
 #### Field: Type of Modeling
 
-This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ”GapConvectionRadiation” or “UndergroundPipingSystemSurface.”
+This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ”GapConvectionRadiation,” “UndergroundPipingSystemSurface,” and "GroundCoupledSurface."
 
 ![OtherSideConditionsFig](media/image070.png)
 
@@ -17868,59 +17868,212 @@ The fraction of heat from lights that goes into the zone as long-wave (thermal) 
 
 The fraction of heat from lights that goes into the zone as visible (short-wave) radiation. The program calculates how much of this radiation is absorbed by the inside surfaces of the zone according the area times solar absorptance product of these surfaces.
 
-Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table 14 for overhead fluorescent lighting for the luminaire configurations shown in Figure 51.
+Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table 14 for overhead fluorescent lighting for a variety of luminaire configurations. The data is based on ASHRAE 1282-RP "Lighting Heat Gain Distribution in Buildings" by Daniel E. Fisher and Chanvit Chantrasrisalai.
 
-Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. These values assume that no light heat goes into an adjacent zone. Source: *Lighting Handbook: Reference & Application*, 8<sup>th</sup> Edition, Illuminating Engineering Society of North America, New York, 1993, p. 355.
+Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. 
 
 <table class="table table-striped">
   <tr>
-    <th rowspan="2">Field Name</th>
-    <th colspan="5">Luminaire Configuration, Flourescent Lighting</th>
+    <th>Fixture No.</th>
+    <th>Luminaire Feature</th>
+    <th>Return Air Fraction</th>
+    <th>Fraction Radiant</th>
+    <th>Fraction Visible</th>
+    <th>fconvected</th>
   </tr>
   <tr>
-    <td>Suspended</td>
-    <td>Surface Mount</td>
-    <td>Recessed</td>
-    <td>Luminous and louvered ceiling</td>
-    <td>Return-air ducted</td>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8</td>
+    <td>0.31</td>
+    <td>0.22</td>
+    <td>0.20</td>
+    <td>0.27</td>
   </tr>
   <tr>
-    <td>Return Air Fraction</td>
-    <td>0.0</td>
-    <td>0.0</td>
-    <td>0.0</td>
-    <td>0.0</td>
+    <td>2</td>
+    <td>Recessed, Acrylic Lens, Non-Vented, T8</td>
+    <td>0.56</td>
+    <td>0.12</td>
+    <td>0.20</td>
+    <td>0.12</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8</td>
+    <td>0.28</td>
+    <td>0.19</td>
+    <td>0.20</td>
+    <td>0.33</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Recessed, Acrylic Lens, Vented, T8</td>
+    <td>0.54</td>
+    <td>0.10</td>
+    <td>0.18</td>
+    <td>0.18</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8</td>
+    <td>0.34</td>
+    <td>0.17</td>
+    <td>0.16</td>
+    <td>0.33</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>Recessed, Volumetric, T5</td>
+    <td>0.54</td>
+    <td>0.13</td>
+    <td>0.20</td>
+    <td>0.13</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>Downlights, Compact Fluorescent, DTT</td>
+    <td>0.86</td>
+    <td>0.04</td>
+    <td>0.10</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>Downlights, Compact Fluorescent, TRT</td>
+    <td>0.78</td>
+    <td>0.09</td>
+    <td>0.13</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>9a</td>
+    <td>Downlights, Incandescent, A21</td>
+    <td>0.29</td>
+    <td>0.10</td>
+    <td>0.6</td>
+    <td>0.01</td>
+  </tr>
+  <tr>
+    <td>9b</td>
+    <td>Downlights, Incandescent, BR40</td>
+    <td>0.21</td>
+    <td>0.08</td>
+    <td>0.71</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>Surface Mounted, T5HO</td>
+    <td>0.00</td>
+    <td>0.27</td>
+    <td>0.23</td>
+    <td>0.50</td>
+  </tr>
+  <tr>
+    <td>11</td>
+    <td>Pendant, Direct/Indirect, T8</td>
+    <td>0.00</td>
+    <td>0.32</td>
+    <td>0.23</td>
+    <td>0.45</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>Pendant, Indirect, T5HO</td>
+    <td>0.00</td>
+    <td>0.32</td>
+    <td>0.25</td>
+    <td>0.43</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Ducted</td>
+    <td>0.27</td>
+    <td>0.27</td>
+    <td>0.21</td>
+    <td>0.25</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Ducted</td>
+    <td>0.27</td>
+    <td>0.22</td>
+    <td>0.17</td>
+    <td>0.34</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.45</td>
+    <td>0.30</td>
+    <td>0.22</td>
+    <td>0.03</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.43</td>
+    <td>0.25</td>
+    <td>0.21</td>
+    <td>0.11</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.43</td>
+    <td>0.27</td>
+    <td>0.18</td>
+    <td>0.12</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.10</td>
+    <td>0.16</td>
+    <td>0.20</td>
     <td>0.54</td>
   </tr>
   <tr>
-    <td>Fraction Radiant</td>
-    <td>0.42</td>
-    <td>0.72</td>
-    <td>0.37</td>
-    <td>0.37</td>
-    <td>0.18</td>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.11</td>
+    <td>0.15</td>
+    <td>0.19</td>
+    <td>0.55</td>
   </tr>
   <tr>
-    <td>Fraction Visible</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-  </tr>
-  <tr>
-    <td>f<sub>convected</sub></td>
-    <td>0.40</td>
-    <td>0.10</td>
-    <td>0.45</td>
-    <td>0.45</td>
-    <td>0.10</td>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.04</td>
+    <td>0.13</td>
+    <td>0.16</td>
+    <td>0.67</td>
   </tr>
 </table>
-
-![](media/image086.svg)
-
-Figure 51. Overhead fluorescent luminaire configurations.
 
 #### Field: Fraction Replaceable
 
@@ -19556,6 +19709,8 @@ This field is the name of the zone (ref: **Zone**) and links a particular ZoneCo
 
 This field denotes the design carbon dioxide generation rate (m<sup>3</sup>/s). The design value is modified by the schedule fraction (see Field: Schedule Name). The resulting volumetric generation rate is converted to mass generation rate using the current zone indoor air density at each time step. The rate can be either positive or negative. A positive value represents a source rate (CO<sub>2</sub> addition to the zone air) and a negative value represents a sink rate (CO<sub>2</sub> removal from the zone air).
 
+When the mass design generation rate is available, a conversion is required to meet input requirement with volumetric flow rate. This can be accomplished by the mass flow rate divided by the density of carbon dioxide.  
+
 #### Field: Schedule Name
 
 This field is the name of the schedule (ref: Schedules) that modifies the design carbon dioxide generation rate (see previous field). The schedule values can be any positive number between 0.0 and 1.0. For each simulation time step, the actual CO<sub>2</sub> generation rate in a zone is the product of the Design Generation Rate field (above) and the value specified by this schedule.
@@ -19585,9 +19740,9 @@ This output is the net carbond dioxide internal gain/loss in m3/s for an individ
 
 This output variable reports the total (net) carbon dioxide internal gains/losses in cubic meters per second for a zone, including impacts from three objects: ZoneContaminantSourceAndSink:CarbonDioxide, People, and GasEquipment. Positive values denote carbon dioxide generation (gain or source), while negative values denote carbon dioxide removal (loss or sink).
 
-### ZoneContaminantSourceAndSink:GenericContaminant:Constant
+### ZoneContaminantSourceAndSink:Generic:Constant
 
-The ZoneContaminantSourceAndSink:GenericContaminant:Constant object specifies the generic contaminant generation rate and removal rate coefficient in a zone. The associated fraction schedules are required for allowing users to change the magnitude of sources and sinks. The object is equivalent to the combination of the constant coefficient model and the burst source model defined in the sources and sinks element types of CONTAM 3.0. The basic equation used to calculate generic contaminant source and sink for the constant model is given below:
+The ZoneContaminantSourceAndSink:Generic:Constant object specifies the generic contaminant generation rate and removal rate coefficient in a zone. The associated fraction schedules are required for allowing users to change the magnitude of sources and sinks. The object is equivalent to the combination of the constant coefficient model and the burst source model defined in the sources and sinks element types of CONTAM 3.0. The basic equation used to calculate generic contaminant source and sink for the constant model is given below:
 
 <div>\[{S_f}(t) = {G_f}(t)*{F_G} - {R_f}(t){C_f}(t)*1.0E - 6*{F_R}\]</div>
 
@@ -19607,15 +19762,17 @@ where
 
 #### Field: Name
 
-This field represents a unique identifying name in a group referring Generic contaminantSourceAndSinkNames.
+This field represents a unique identifying name.
 
 #### Field: Zone Name
 
 This field signifies the Name of the zone with constant generic contaminant source and sink.
 
-#### Field: Maximum Generation Rate
+#### Field: Design Generation Rate
 
-This field denotes the full generic contaminant maximum generation rate (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
+This field denotes the full generic contaminant design generation rate (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
+
+When the mass generation rate is available, the rate must be converted to a volume flow rate. Use the mass flow rate divided by the vapor density of the generic contaminant.  
 
 #### Field: Generation Schedule Name
 
@@ -19629,33 +19786,31 @@ This field denotes the full generic contaminant design removal coefficient (m<su
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design generation rate (R<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>R</sub> in the above equation.
 
-
-
 An IDF example is provided below:
 
 ```idf
-  ZoneContaminantSourceAndSink:GenericContaminant:Constant,
+  ZoneContaminantSourceAndSink:Generic:Constant,
     NORTH ZONE GC,          !- Name
     NORTH ZONE,             !- Zone Name
     1.0E-6,                 !- Design Generation Rate {m3/s}
-    GC Source Schedule,     !- Schedule Name
+    GC Source Schedule,     !- Generation Schedule Name
     1.0E-7,                 !- Design Removal Coefficient {m3/s}
     GC Removal Schedule;    !- Removal Schedule Name
 ```
 
-### ZoneContaminantSourceAndSink:GenericContaminant:Constant Outputs
+### ZoneContaminantSourceAndSink:Generic:Constant Outputs
 
-When a ZoneContaminantSourceAndSink:GenericContaminant:Constant object is specified, the following output variables are available:
+When a ZoneContaminantSourceAndSink:Generic:Constant object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Constant Source Generation Volume Flow Rate [m3/s]
 
 #### Generic Air Contaminant Constant Source Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:GenericContaminant:Constant object. The generation rate is a sum of generation and removal rates. The zone air generic contaminant level at the previous zone time step is used in the removal rate calculation.
+This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:Generic:Constant object. The generation rate is a sum of generation and removal rates. The zone air generic contaminant level at the previous zone time step is used in the removal rate calculation.
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven
+### SurfaceContaminantSourceAndSink:Generic:PressureDriven
 
-The SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven object specifies the generic contaminant generation rate coefficient, which is used to calculate the generation rate due to the pressure difference across the surface. The object is equivalent to the pressure driven model defined in the sources and sinks element types of CONTAM 3.0. This object assumes to work with the AirflowNetwork model. The surface has to be defined in the AirflowNetwork:Multizone:Surface. Although the model is designed to be applied to radon and soil gas entry, it is expanded to be applied to all contaminant transport, including generic contaminant. However, it should be used in caution. The basic equation used to calculate generic contaminant source for the pressure driven constant model is provided below:
+The SurfaceContaminantSourceAndSink:Generic:PressureDriven object specifies the generic contaminant generation rate coefficient, which is used to calculate the generation rate due to the pressure difference across the surface. The object is equivalent to the pressure driven model defined in the sources and sinks element types of CONTAM 3.0. This object assumes to work with the AirflowNetwork model. The surface has to be defined in the AirflowNetwork:Multizone:Surface. Although the model is designed to be applied to radon and soil gas entry, it is expanded to be applied to all contaminant transport, including generic contaminant. However, it should be used in caution. The basic equation used to calculate generic contaminant source for the pressure driven constant model is provided below:
 
 <div>\[{S_f}(t) = {H_f}(t)*{F_G}*{\left( {{P_j} - {P_i}} \right)^n}\]</div>
 
@@ -19675,7 +19830,7 @@ P*<sub>j</sub>* <sub>     </sub> = Pressure in an adjacent zone for a inter
 
 #### Field: Name
 
-The field signifies the unique identifying name in a group referring GenericContaminantSourceAndSinkNames.
+The field signifies the unique identifying name.
 
 #### Field: Surface Name
 
@@ -19685,14 +19840,14 @@ This field represents the name of the surface as a generic contaminant source us
 
 This field denotes the generic contaminant design generation coefficient (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions times the pressure difference with a power exponent across a surface. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
 
-#### Field: Generation Schedule Name
+#### Field: Generation Exponent
 
-This field is the name of the schedule (ref: Schedule) that modifies the maximum design generation rate. This fraction between 0.0 and 1.0 is noted as F<sub>G</sub> in the above equation.
+This field denotes the flow power exponent,* n*, in the contaminant source equation. The valid range is 0.0 to 1.0, 
 
 An IDF example is provided below:
 
 ```idf
-  SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven,
+  SurfaceContaminantSourceAndSink:Generic:PressureDriven,
     WEST ZONE GC BLD,       !- Name
     Zn001:Wall001,          !- Surface Name
     1.0E-6,                 !- Design Generation Rate Coefficient {m3/s}
@@ -19701,17 +19856,17 @@ An IDF example is provided below:
 ```
 
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven Outputs
+### SurfaceContaminantSourceAndSink:Generic:PressureDriven Outputs
 
-When a SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven object is specified, the following output variables are available:
+When a SurfaceContaminantSourceAndSink:Generic:PressureDriven object is specified, the following output variables are available:
 
 ZONE,Average,Generic Air Contaminant Pressure Driven Generation Volume Flow Rate [m3/s]
 
 #### Generic Air Contaminant Pressure Driven Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:PressureDriven object.
 
-### ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel
+### ZoneContaminantSourceAndSink:Generic:CutoffModel
 
 The ZoneContaminantSourceAndSink:Generic contaminant:CutoffModel object specifies the generic contaminant generation rate based on the cutoff concentration model. The basic equation used to calculate generic contaminant source for the pressure driven constant model is given below:
 
@@ -19731,51 +19886,53 @@ where
 
 #### Field: Name
 
-The field signifies the unique identifying name in a group referring GenericContaminantSourceAndSinkNames.
+The field signifies the unique identifying name.
 
 #### Field: Zone Name
 
 This field represents the name of the zone with generic contaminant source and sink using the cutoff model.
 
-#### Field: Design Generation Rate
+#### Field: Design Generation Rate Coefficient
 
 This field denotes the full generic contaminant design generation rate (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
+
+When the mass generation rate is available, the rate must be converted to a volume flow rate. Use the mass flow rate divided by the vapor density of the generic contaminant.  
 
 #### Field: Generation Schedule Name
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design generation rate (G<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>G</sub> in the above equation.
 
-#### Field: Cutoff Concentration
+#### Field: Cutoff Generic Contaminant at which Emission Ceases
 
-This field is the generic contaminant cutoff concentration level where the source ceases its emission.
+This field is the generic contaminant cutoff concentration level where the source ceases its emission. 
 
 ** **
 
 An IDF example is provided below:
 
 ```idf
-ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel,
+ZoneContaminantSourceAndSink:Generic:CutoffModel,
     NORTH ZONE GC CutoffModel,          !- Name
     NORTH ZONE,             !- Zone Name
-    1.0E-5,                 !- Design Generation Rate {m3/s}
+    1.0E-5,                 !- Design Generation Rate Coefficient {m3/s}
     GC Source Schedule,     !- Schedule Name
-    100000;                 !- Cutoff Concentration {ppm}
+    100000;                 !- Cutoff Generic Contaminant at which Emission Ceases {ppm}
 ```
 
 
-### ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel Outputs
+### ZoneContaminantSourceAndSink:Generic:CutoffModel Outputs
 
-When a ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel object is specified, the following output variables are available:
+When a ZoneContaminantSourceAndSink:Generic:CutoffModel object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Cutoff Model Generation Volume Flow Rate [m3/s]
 
 #### Generic Air Contaminant Cutoff Model Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant: CutoffModel object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:CutoffModel object.
 
-### ZoneContaminantSourceAndSink:GenericContaminant:DecaySource
+### ZoneContaminantSourceAndSink:Generic:DecaySource
 
-The ZoneContaminantSourceAndSink:GenericContaminant:DecaySource object specifies the generic contaminant generation rate based on the decay source model. The basic equation used to calculate generic contaminant source for the decay source model is given below:
+The ZoneContaminantSourceAndSink:Generic:DecaySource object specifies the generic contaminant generation rate based on the decay source model. The basic equation used to calculate generic contaminant source for the decay source model is given below:
 
 <div>\[{S_f}(t) = {G_f}(t){F_G}\exp ( - t/{t_c})\]</div>
 
@@ -19793,19 +19950,19 @@ t     = Time since the start of emission [second]
 
 #### Field: Name
 
-This field is the unique identifying name in a group referring GenericContaminantSourceAndSinkNames.
+This field is the unique identifying name.
 
 #### Field: Zone Name
 
 This field represents the name of the zone with a generic contaminant decaying source.
 
-#### Field: Initial Generation Rate
+#### Field: Initial Emission Rate
 
-This field denotes the initial generic contaminant design generation rate (m<sup>3</sup>/s). The generation is controlled by a schedule, as defined in the next field.Generic contaminant generation begins when the schedule changes from a zero to a non-zero value (between zero and one). The initial generation rate is equal to the schedule value times the initial generation rate. A single schedule may be used to initiate several emissions at different times.(see Field:Generation Schedule Name).
+This field denotes the initial generic contaminant design emission rate (m<sup>3</sup>/s). The generation is controlled by a schedule, as defined in the next field. Generic contaminant emission begins when the schedule changes from a zero to a non-zero value (between zero and one). The initial emission rate is equal to the schedule value times the initial generation rate. A single schedule may be used to initiate several emissions at different times.(see Field:Generation Schedule Name).
 
-#### Field: Generation Schedule Name
+#### Field: Schedule Name
 
-This field is the name of the schedule (ref: Schedule) that modifies the maximum design generation rate (G<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>G</sub> in the above equation. When the value is equal to 1, the generation rate is used and time is reset to zero. When the value is equal to zero, the schedule value is ignored in the equation.
+This field is the name of the schedule (ref: Schedule) that modifies the maximum design emission rate (G<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>G</sub> in the above equation. When the value is equal to 1, the generation rate is used and time is reset to zero. When the value is equal to zero, the schedule value is ignored in the equation.
 
 #### Field: Decay Time Constant
 
@@ -19816,18 +19973,18 @@ Note: The variable t, time since the start of emission, will be reset to zero, w
 An IDF example is provided below:
 
 ```idf
-ZoneContaminantSourceAndSink:GenericContaminant:DecaySource,
+ZoneContaminantSourceAndSink:Generic:DecaySource,
     WEST ZONE GC DecaySource,           !- Name
     WEST ZONE,              !- Zone Name
     1.0E-5,                 !- Initial Emission Rate {m3/s}
     GC Source Schedule,     !- Schedule Name
-    100000;                  !- Delay Time Constant {s}
+    100000;                 !- Delay Time Constant {s}
 ```
 
 
-### ZoneContaminantSourceAndSink:GenericContaminant:DecaySource Outputs
+### ZoneContaminantSourceAndSink:Generic:DecaySource Outputs
 
-When a ZoneContaminantSourceAndSink:GenericContaminant:DecaySource object is specified, the following output variables are available:
+When a ZoneContaminantSourceAndSink:Generic:DecaySource object is specified, the following output variables are available:
 
 Zone,Average,Generic Air Contaminant Decay Model Generation Volume Flow Rate [m3/s]
 
@@ -19835,15 +19992,15 @@ Zone,Average,Generic Air Contaminant Decay Model Generation Emission Start Elaps
 
 #### Generic Air Contaminant Decay Model Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant decay rate from each SurfaceContaminantSourceAndSink:GenericContaminant:DecaySource object.
+This output is the average generic contaminant decay rate from each SurfaceContaminantSourceAndSink:Generic:DecaySource object.
 
 #### Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time [s]
 
 This output is the decay time since the start of emission. The start time is either at the beginning of each run period, including design day simulations, or the time when the egenration schedule value is zero.
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion
+### SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion
 
-The SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
+The SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
 
 The boundary layer diffusion controlled reversible sink/source model with a linear sorption isotherm follows the descriptions presented in [Axley 1991]. The boundary layer refers to the region above the surface of a material through which a concentration gradient exists between the near-surface concentration and the air-phase concentration. The rate at which a contaminant is transferred onto a surface (sink) is defined as:
 
@@ -19865,26 +20022,28 @@ where
 
 #### Field: Name
 
-This field signifies a unique identifying name in a group referring GenericContaminanteSourceAndSinkNames.
+This field signifies a unique identifying name.
 
 #### Field: Surface Name
 
 This field denotes the name of the surface as a generic contaminant reversible source or sink using the boundary layer diffusion model.
 
-#### Field: Film Transfer Coefficient
+#### Field: Mass Transfer Coefficient
 
 This field specifies the average mass transfer coefficient of the contaminant generic contaminant within the boundary layer (or film) above the surface of the adsorbent.
 
-#### Field: Henry Partition Coefficient
+#### Field: Schedule Name
+
+This field is the name of the schedule (ref: Schedule) that modifies the mass transfer coefficient with the value between 0.0 and 1.0. 
+
+#### Field: Henry Adsorption Constant or Partition Coefficient
 
 This field denotes the generic contaminant Henry partition coefficient in the units of dimensionless. The coefficient relates the concentration of the contaminant generic contaminant in the bulk-air to that at the surface of the adsorption material.
-
-
 
 An IDF example is provided below:
 
 ```idf
-SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion,
+SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
     WEST ZONE GC BLD,       !- Name
     Zn001:Wall001,          !- Surface Name
     1.0E-2,                 !- Mass Transfer Coefficient {m/s}
@@ -19892,10 +20051,9 @@ SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion,
     2.0;                    !- Henry adsorption constant or partition coefficient
 ```
 
+### SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion Outputs
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:BoundaryLayerDiffusion Outputs
-
-When a SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion object is specified, the following output variables are available:
+When a SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]
 
@@ -19903,15 +20061,15 @@ ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Inside Face Conce
 
 #### Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object.
 
 #### Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration [ppm]
 
 This output is the average generic contaminant level at the interior surface.
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink
+### SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink
 
-The SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink object specifies the generic contaminant removal rate from a surface. The object is equivalent to the deposition velocity sink model defined in CONTAM 3.0 sources and sinks element types.
+The SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink object specifies the generic contaminant removal rate from a surface. The object is equivalent to the deposition velocity sink model defined in CONTAM 3.0 sources and sinks element types.
 
 The deposition velocity model provides for the input of a sink’s characteristic in the familiar term of deposition velocity. The removal stops when the sink concentration level is higher than the zone air concentration level. The deposition velocity model equation is:
 
@@ -19933,7 +20091,7 @@ F<sub>R</sub>   = Schedule or control signal value at time *t* [-]
 
 #### Field: Name
 
-This field denotes a unique identifying name in a group referring GenericContaminant SourceAndSinkNames.
+This field denotes a unique identifying name.
 
 #### Field: Surface Name
 
@@ -19943,14 +20101,14 @@ This field represents the name of the surface as a generic contaminant sink usin
 
 This field specifies the deposition velocity to the surface of the adsorbent in the units of m/s.
 
-#### Field: Removal Schedule Name
+#### Field: Schedule Name
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design removal rate (S<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>R</sub> in the above equation.
 
 An IDF example is provided below:
 
 ```idf
-SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink,
+SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink,
     EAST ZONE GC DVS,       !- Name
     Zn002:Wall001,          !- Surface Name
     1.0E-3,                 !- Deposition Velocity {m/s}
@@ -19958,9 +20116,9 @@ SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink,
 ```
 
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink Outputs
+### SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink Outputs
 
-The following output variables are available when the SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink
+The following output variables are available when the SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink
 
 object is specified.
 
@@ -19968,11 +20126,11 @@ ZONE,Average, Generic Air Contaminant Deposition Velocity Removal Volume Flow Ra
 
 #### Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink object.
 
-### ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink
+### ZoneContaminantSourceAndSink:Generic:DepositionRateSink
 
-The ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink object specifies the generic contaminant removal rate from a zone. The object is equivalent to the deposition rate sink model defined in CONTAM 3.0 sources and sinks element types.
+The ZoneContaminantSourceAndSink:Generic:DepositionRateSink object specifies the generic contaminant removal rate from a zone. The object is equivalent to the deposition rate sink model defined in CONTAM 3.0 sources and sinks element types.
 
 The deposition rate model provides for the input of a sink’s characteristic in the familiar term of deposition rate in a zone. The removal stops when the sink concentration level is higher than the zone air concentration level. The deposition rate model equation is:
 
@@ -19994,7 +20152,7 @@ F<sub>R</sub>   = Schedule or control signal value at time *t* [dimensionless]
 
 #### Field: Name
 
-This field denotes a unique identifying name in a group referring GenericContaminantSourceAndSinkNames.
+This field denotes a unique identifying name.
 
 #### Field: Zone Name
 
@@ -20004,16 +20162,14 @@ This field represents the name of the zone as a generic contaminant sink using t
 
 This field specifies the deposition rate to the zone in the units of 1/s.
 
-#### Field: Removal Schedule Name
+#### Field: Schedule Name
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design removal rate (S<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>R</sub> in the above equation.
-
-
 
 An IDF example is provided below:
 
 ```idf
-ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink,
+ZoneContaminantSourceAndSink:Generic:DepositionRateSink,
     NORTH ZONE GC DRS,      !- Name
     NORTH ZONE,             !- Zone Name
     1.0E-5,                 !- Deposition Rate {m3/s}
@@ -20021,13 +20177,13 @@ ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink,
 ```
 
 
-### ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink Outputs
+### ZoneContaminantSourceAndSink:Generic:DepositionRateSink Outputs
 
-When the ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink object is specified, the following output variables are available:
+When the ZoneContaminantSourceAndSink:Generic:DepositionRateSink object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Deposition Rate Removal Volume Flow Rate [m3/s]
 
 #### Generic Air Contaminant Deposition Rate Removal Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink object.
+This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:Generic:DepositionRateSink object.
 

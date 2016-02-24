@@ -1075,7 +1075,7 @@ namespace HeatBalFiniteDiffManager {
 				if ( DisplayAdvancedReportVariables ) {
 					SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 					SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-			}
+				}
 			}
 
 		} // End of the Surface Loop for Report Variable Setup

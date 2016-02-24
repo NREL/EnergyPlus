@@ -80,7 +80,8 @@ namespace DaylightingManager {
 	using DataBSDFWindow::BSDFRefPointsGeomDescr;
 
 	// Data
-	// MODULE PARAMETER DEFINITIONS: na
+	// MODULE PARAMETER DEFINITIONS:
+	extern int const octreeCrossover; // Surface count crossover for switching to octree algorithm
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int TotWindowsWithDayl; // Total number of exterior windows in all daylit zones
@@ -221,8 +222,8 @@ namespace DaylightingManager {
 		Real64 & TVISB, // Visible transmittance of window for COSB angle of incidence (times light well
 		Real64 & DOMEGA, // Solid angle subtended by window element wrt reference point (steradians)
 		Real64 & THRAY, // Azimuth of ray from reference point to window element (radians)
-		int & IHitIntObs, // = 1 if interior obstruction hit, = 0 otherwise
-		int & IHitExtObs, // 1 if ray from ref pt to ext win hits an exterior obstruction
+		bool & hitIntObs, // True iff interior obstruction hit
+		bool & hitExtObs, // True iff ray from ref pt to ext win hits an exterior obstruction
 		Vector3< Real64 > const & WNORM2, // Unit vector normal to window
 		int const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
 		int const IConst, // Construction counter
@@ -349,8 +350,8 @@ namespace DaylightingManager {
 		int const IConst, // Construction counter
 		Real64 const AZVIEW, // Azimuth of view vector in absolute coord system for glare calculation (radians)
 		Vector3< Real64 > const & RREF2, // Location of virtual reference point in absolute coordinate system
-		int const IHitIntObs, // = 1 if interior obstruction hit, = 0 otherwise
-		int const IHitExtObs, // 1 if ray from ref pt to ext win hits an exterior obstruction
+		bool const hitIntObs, // True iff interior obstruction hit
+		bool const hitExtObs, // True iff ray from ref pt to ext win hits an exterior obstruction
 		int const CalledFrom, // indicate  which type of routine called this routine
 		Real64 & TVISIntWin, // Visible transmittance of int win at COSBIntWin for light from ext win
 		Real64 & TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
@@ -433,7 +434,7 @@ namespace DaylightingManager {
 		int const IWin, // Window index
 		Vector3< Real64 > const & R1, // Origin of ray (m)
 		Vector3< Real64 > const & R2, // Destination of ray (m)
-		int & IHit // Hit flag: 1 = ray hits an obstruction, 0 = does not
+		bool & hit // True iff ray hits an obstruction
 	);
 
 	void
@@ -442,7 +443,7 @@ namespace DaylightingManager {
 		int const IWin2, // Surface number of destination window
 		Vector3< Real64 > const & R1, // Origin of ray (on IWin1) (m)
 		Vector3< Real64 > const & R2, // Destination of ray (on IWin2) (m)
-		int & IHit // Hit flag: 1 = ray hits an obstruction, 0 = does not
+		bool & hit // True iff ray hits an obstruction
 	);
 
 	void

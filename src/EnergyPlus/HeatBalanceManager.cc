@@ -89,6 +89,7 @@
 #include <DataSystemVariables.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingDevices.hh>
+#include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <EconomicTariff.hh>
 #include <EMSManager.hh>
@@ -104,6 +105,7 @@
 #include <ScheduleManager.hh>
 #include <SolarShading.hh>
 #include <SurfaceGeometry.hh>
+#include <SurfaceOctree.hh>
 #include <UtilityRoutines.hh>
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
@@ -339,6 +341,18 @@ namespace HeatBalanceManager {
 		// Get the heat balance input at the beginning of the simulation only
 		if ( ManageHeatBalanceGetInputFlag ) {
 			GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+
+			// Surface octree setup
+			//  The surface octree holds live references to surfaces so it must be updated
+			//   if in the future surfaces are altered after this point
+			if ( TotSurfaces >= DaylightingManager::octreeCrossover ) { // Octree can be active
+				if ( GetNumObjectsFound( "Daylighting:Controls" ) > 0 ) { // Daylighting is active
+					surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
+				}
+			}
+
+			for ( auto & surface : DataSurfaces::Surface ) surface.set_computed_geometry(); // Set up extra surface geometry info for PierceSurface
+
 			ManageHeatBalanceGetInputFlag = false;
 		}
 
@@ -3853,7 +3867,7 @@ namespace HeatBalanceManager {
 				ShowContinueError( "Construction=" + Construct( TotRegConstructs + ConstrNum ).Name + " is affected." );
 				Construct( TotRegConstructs + ConstrNum ).SolutionDimensions = 1;
 			}
-			Construct( TotRegConstructs + ConstrNum ).ThicknessPerpend = DummyProps( 4 );
+			Construct( TotRegConstructs + ConstrNum ).ThicknessPerpend = DummyProps( 4 ) / 2.0;
 
 			//Set the total number of layers for the construction
 			Construct( TotRegConstructs + ConstrNum ).TotLayers = ConstructNumAlpha - 1;

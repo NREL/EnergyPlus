@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -1693,8 +1693,8 @@ alpha_token( Tokens const & tokens )
 		}
 	}
 
-// Static Data Member Definitions
-Format::Size const Format::NOSIZE = static_cast< Size >( -1 );
-std::string const Format::LF = std::string( "\n" );
+	// Static Data Member Definitions
+	Format::Size const Format::NOSIZE = static_cast< Size >( -1 );
+	std::string const Format::LF = std::string( "\n" );
 
 } // ObjexxFCL

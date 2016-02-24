@@ -1,3 +1,4 @@
+
 <!--RemoveStart-->
 Simulation Models – Encyclopedic Reference
 ==========================================
@@ -2708,6 +2709,22 @@ The maximum supply air humidity ratio setpoint is placed on the node(s) specifie
 The input object SetpointManager:MixedAir provides a setpoint manager that takes an already established setpoint (usually the supply air outlet node setpoint temperature), subtracts the supply fan heat gain, and applies the result as the setpoint temperature at the mixed air node (or any other node the user specifies).
 
 <div>$${T_{set}} = {T_{set,ref}} - ({T_{fan,outlet}} - {T_{fan,inlet}})$$</div>
+
+When inputs of optional fields, Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node, are provided, the setpoint temperature at the mixed air node is given below based on supply fan placement and reference node location:
+
+Blow through placement:
+
+<div>$${T_{set}} = max(T_{set,ref}, T_{min}) - ({T_{coil,outlet}} - {T_{coil,inlet}}) - ({T_{fan,outlet}} - {T_{fan,inlet}})$$</div>
+
+Draw through placement:
+
+When the reference node is the cooling coil outlet node:
+
+<div>$${T_{set}} = max(T_{set,ref}, T_{min}) - ({T_{coil,outlet}} - {T_{coil,inlet}})$$</div>
+
+When the reference node is the unitary system outlet node:
+
+<div>$${T_{set}} = max(T_{set,ref} - ({T_{fan,outlet}} - {T_{fan,inlet}}), T_{min}) - ({T_{coil,outlet}} - {T_{coil,inlet}})$$</div>
 
 ### Outdoor Air Pretreat
 

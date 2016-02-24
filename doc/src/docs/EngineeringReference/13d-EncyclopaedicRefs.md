@@ -1,4 +1,5 @@
-<!--RemoveStart-->
+﻿
+﻿<!--RemoveStart-->
 Simulation Models – Encyclopedic Reference
 ==========================================
 
@@ -1102,7 +1103,7 @@ Otherwise the entering air conditions are set equal to the outside air condition
 
 ·        Calculate the supply air temperature required to meet the zone sensible load at the supply air mass flow rate, but limit to the applicable (heating or cooling) supply temperature limit (*T<sub>max,heating</sub>* or *T<sub>min,cooling</sub>*)
 
-<div>$${T_s} = {T_{ma}} + {\dot Q_z}/({c_{p,air}}\cdot {\dot m_s})$$</div>
+<div>$${T_s} = {T_z} + {\dot Q_z}/({c_{p,air}}\cdot {\dot m_s})$$</div>
 
 ·        Calculate the supply humidity ratio based on the specified humidity control types, but limit to the applicable (heating or cooling) supply humidity ratio limit
 
@@ -1574,4 +1575,3 @@ The logic of this component is quite simple: if there is flow through the compon
 #### References
 
 No specific references.
-

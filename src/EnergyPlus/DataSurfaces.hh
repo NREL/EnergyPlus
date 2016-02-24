@@ -59,15 +59,21 @@
 #ifndef DataSurfaces_hh_INCLUDED
 #define DataSurfaces_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array2D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataBSDFWindow.hh>
 #include <DataGlobals.hh>
 #include <DataVectorTypes.hh>
+#include <Shape.hh>
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Vector4.hh>
+
+// C++ Headers
+#include <cstddef>
+#include <vector>
 
 namespace EnergyPlus {
 
@@ -311,6 +317,9 @@ namespace DataSurfaces {
 	extern int const WindowBSDFModel; // indicates complex fenestration window 6 implementation
 	extern int const WindowEQLModel; // indicates equivalent layer winodw model implementation
 
+	// Parameters for PierceSurface
+	extern std::size_t const nVerticesBig; // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// Definitions used for scheduled surface gains
@@ -465,8 +474,109 @@ namespace DataSurfaces {
 
 	// Types
 
+	// Y Slab for Surface2D for PierceSurface support of Nonconvex and Many-Vertex Surfaces
+	struct Surface2DSlab
+	{
+
+	public: // Types
+
+		using Vertex = ObjexxFCL::Vector2< Real64 >;
+		using Vertices = ObjexxFCL::Array1D< Vertex >;
+		using Edge = Vertices::size_type; // The Surface2D vertex and edge index
+		using EdgeXY = Real64; // The edge x/y inverse slope
+		using Edges = std::vector< Edge >;
+		using EdgesXY = std::vector< EdgeXY >;
+
+	public: // Creation
+
+		// Constructor
+		Surface2DSlab( Real64 const yl, Real64 const yu ) :
+			xl( 0.0 ),
+			xu( 0.0 ),
+			yl( yl ),
+			yu( yu )
+		{}
+
+	public: // Data
+
+		Real64 xl, xu; // Lower and upper x coordinates of slab bounding box
+		Real64 yl, yu; // Lower and upper y coordinates of slab
+		Edges edges; // Left-to-right ordered edges crossing the slab
+		EdgesXY edgesXY; // Edge x/y inverse slopes
+
+	}; // Surface2DSlab
+
+	// Projected 2D Surface Representation for Fast Computational Geometry Operations
+	struct Surface2D
+	{
+
+	public: // Types
+
+		using Vector2D = Vector2< Real64 >;
+		using Edge = Vector2D;
+		using Vertices = Array1D< Vector2D >;
+		using Vectors = Array1D< Vector2D >;
+		using Edges = Vectors;
+		using Slab = Surface2DSlab;
+		using Slabs = std::vector< Surface2DSlab >;
+		using SlabYs = std::vector< Real64 >;
+		using size_type = Vertices::size_type;
+
+	public: // Creation
+
+		// Default constructor
+		Surface2D()
+		{}
+
+		// Constructor
+		Surface2D( ShapeCat const shapeCat, int const axis, Vertices const & v, Vector2D const & vl, Vector2D const & vu );
+
+	public: // Predicates
+
+		// Bounding box contains a point?
+		bool
+		bb_contains( Vector2D const & v ) const
+		{
+			return ( vl.x <= v.x ) && ( v.x <= vu.x ) && ( vl.y <= v.y ) && ( v.y <= vu.y );
+		}
+
+	public: // Comparison
+
+		// Equality
+		friend
+		bool
+		operator ==( Surface2D const & a, Surface2D const & b )
+		{
+			return eq( a.vertices, b.vertices );
+		}
+
+		// Inequality
+		friend
+		bool
+		operator !=( Surface2D const & a, Surface2D const & b )
+		{
+			 return !( a == b );
+		}
+
+	public: // Data
+
+		int axis = 0; // Axis of projection (0=x, 1=y, 2=z)
+		Vertices vertices; // Vertices
+		Vector2D vl = Vector2D( 0.0 ), vu = Vector2D( 0.0 ); // Bounding box lower and upper corner vertices
+		Vectors edges; // Edge vectors around the vertices
+		Real64 s1 = 0.0, s3 = 0.0; // Rectangle side widths squared
+		SlabYs slabYs; // Y coordinates of slabs
+		Slabs slabs; // Y slice slabs for fast nonconvex and many vertex intersections
+
+	}; // Surface2D
+
 	struct SurfaceData
 	{
+
+		// Types
+		using Vertices = Array1D< Vector >;
+		using Plane = Vector4< Real64 >;
+
 		// Members
 		std::string Name; // User supplied name of the surface (must be unique)
 		int Construction; // Pointer to the construction in the Construct derived type
@@ -560,7 +670,7 @@ namespace DataSurfaces {
 		int SchedMovInsulExt; // Schedule for exterior movable insulation
 		int SchedMovInsulInt; // Schedule for interior movable insulation
 		// Vertices
-		Array1D< Vector > Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
+		Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
 		Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
 		Vector lcsx;
 		Vector lcsy;
@@ -574,6 +684,10 @@ namespace DataSurfaces {
 		Real64 CosTilt; // Cosine of surface tilt angle
 		bool IsConvex; // true if the surface is convex.
 		bool IsDegenerate; // true if the surface is degenerate.
+		// Precomputed parameters for PierceSurface performance
+		ShapeCat shapeCat; // Shape category
+		Plane plane; // Plane
+		Surface2D surface2d; // 2D projected surface for efficient intersection testing
 		// Window Parameters (when surface is Window)
 		int WindowShadingControlPtr; // Pointer to shading control (windows only)
 		int ShadedConstruction; // Shaded construction (windows only)
@@ -704,6 +818,8 @@ namespace DataSurfaces {
 			CosTilt( 0.0 ),
 			IsConvex( true ),
 			IsDegenerate( false ),
+			shapeCat( ShapeCat::Unknown ),
+			plane( 0.0, 0.0, 0.0, 0.0 ),
 			WindowShadingControlPtr( 0 ),
 			ShadedConstruction( 0 ),
 			StormWinConstruction( 0 ),
@@ -753,11 +869,31 @@ namespace DataSurfaces {
 			GenericContam( 0.0 )
 		{}
 
+	public: // Methods
+
+		// Set Precomputed Parameters
+		void
+		set_computed_geometry();
+
 		void
 		SetOutBulbTempAt();
 
 		void
 		SetWindSpeedAt( Real64 const fac );
+
+	private: // Methods
+
+		// Computed Shape Category
+		ShapeCat
+		computed_shapeCat() const;
+
+		// Computed Plane
+		Plane
+		computed_plane() const;
+
+		// Computed axis-projected 2D surface
+		Surface2D
+		computed_surface2d() const;
 
 	};
 
@@ -1691,6 +1827,9 @@ namespace DataSurfaces {
 
 	void
 	SetSurfaceOutBulbTempAt();
+
+	void
+	CheckSurfaceOutBulbTempAt();
 
 	void
 	SetSurfaceWindSpeedAt();

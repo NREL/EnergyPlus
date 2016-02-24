@@ -98,7 +98,7 @@ namespace DataHVACGlobals {
 	Real64 const RetTempMin( -30.0 ); // minimum return air temperature [deg C]
 
 	// Number of Sizing types from list below
-	int const NumOfSizingTypes( 25 ); // number of sizing types
+	int const NumOfSizingTypes( 29 ); // number of sizing types
 
 	// Sizing types
 	int const CoolingAirflowSizing( 1 ); // request sizing for cooling air flow rate
@@ -125,7 +125,11 @@ namespace DataHVACGlobals {
 	int const CoolingSHRSizing( 22 ); // request sizing for cooling SHR
 	int const HeatingDefrostSizing( 23 ); // request sizing for heating defrost capacity
 	int const MaxHeaterOutletTempSizing( 24 ); // request sizing for heating coil maximum outlet temperature
-	int const AutoCalculateSizing ( 25 ); // identifies an autocalulate input
+	int const AutoCalculateSizing( 25 ); // identifies an autocalulate input
+	int const ZoneCoolingLoadSizing( 26 ); // zone cooling sensible load (zsz file)
+	int const ZoneHeatingLoadSizing( 27 ); // zome heating sensible load (zsz file)
+	int const MinSATempCoolingSizing( 28 ); // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	int const MaxSATempHeatingSizing( 29 ); // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	int const AirCooled( 1 ); // Air-cooled condenser

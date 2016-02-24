@@ -5,7 +5,7 @@
 	<title>ObjexxFCL Users Guide: CArrayP</title>
 	<meta name="description" content="Objexx Fortran Compatibility Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright 2000-2015 Objexx Engineering, Inc. All rights reserved.">
+	<meta name="copyright" content="Copyright 2000-2016 Objexx Engineering, Inc. All rights reserved.">
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
@@ -17,7 +17,7 @@
 		<td></td>
 		<td height="70"><a href="ObjexxFCL.html"><img src="images/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
 		<td></td>
-		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.0</div></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.1</div></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -47,7 +47,7 @@
 		<td></td>
 		<td width="500" valign="top">
 			<h1>CArrayP</h1>
-			<p class="body">The CArrayP class template provides a lightweight memory-managed wrapper for the classic C-style array with a proxy capability:</p>
+			<p class="body">The CArrayP class template provides a lightweight, memory-managed wrapper for the classic C-style array with a proxy capability:</p>
 			<ul>
 				<li>The interface is similar to that of std::vector in some respects.</li>
 				<li>Index and iterator based element access are supported.</li>
@@ -171,14 +171,14 @@ v += 4.2; // Now all elements are 127</pre></td>
 			<h2 class="h3">Special Functions</h2>
 			<p class="body">CArrayPs can be reset to a default-constructed state with the <span class="source">clear</span> member function. Two CArrayPs can efficiently swap their contents with the <span class="source">swap</span> member and free functions. CArrayPs have <span class="source">length</span> and <span class="source">length_squared</span> member functions to compute their L<sub>2</sub> length and squared length and the <span class="source">normalize</span> function to normalize the array to unit length. The <span class="source">dot_product</span> function computes the dot (inner) product of two CArrayPs. The <span class="source">distance</span> and <span class="source">distance_squared</span> functions compute the L<sub>2</sub> distance and squared distance between two CArrayPs.</p>
 			<p class="body">CArrayPs can be made into proxies with the <span class="source">attach</span> member function and made into non-proxies with the <span class="source">detach</span> member function.</p>
+			<h2 class="h3">Output</h2>
+			<p class="body">Stream input and output operators are provided.</p>
 			<h2 class="h3">Debugging</h2>
 			<p class="body">For  performance, CArrayP doesn't check for bounds errors in release builds (when NDEBUG is defined). It is therefore important to test assertion-enabled debug builds of code using CArrayPs.</p>
 			<h2 class="h3">Const-Correctness</h2>
 			<p class="body">Proxy CArrayPs have proxy semantics and share the const-correctness semantics of pointers. The constness of the proxy and the data it is a proxy for are distinct and both are needed to get full constness.</p>
 			<p class="body">One approach sometimes used to address this issue is to provide always-const versions of the proxy classes. This has the benefit of compile-time const correctness checks but forces a lot of code changes and limits the legal attach operations.</p>
 			<p class="body">Argument Arrays (see below) are typically created <i>via</i> pass-by-value function arguments. If the functions do not need to alter the array values then qualify them with const in the function declaration so that the const array subscript operators will be used, avoiding const-correctness violations. Alternatively, a const reference to the proxy CArrayPs can be used for subscripting operations.</p>
-			<h2 class="h3">Output</h2>
-			<p class="body">A stream input and output operators are provided.</p>
 		</td>
 		<td></td>
 		<td width="100%" valign="top">
@@ -204,7 +204,7 @@ v += 4.2; // Now all elements are 127</pre></td>
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2015 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2016 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>
