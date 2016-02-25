@@ -90,19 +90,19 @@ TEST_F( EnergyPlusFixture, FluidProperties_GetDensityGlycol)
 	ASSERT_FALSE(process_idf(idf_objects));
 	EXPECT_FALSE(has_err_output());
 
-	int FluidIndex;
+	int FluidIndex = 0;
 
-	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFluid", -35.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFluid", -15.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1034.46, GetDensityGlycol( "GLHXFluid", 5.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1030.51, GetDensityGlycol( "GLHXFluid", 15.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1026.06, GetDensityGlycol( "GLHXFluid", 25.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1021.09, GetDensityGlycol( "GLHXFluid", 35.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1015.62, GetDensityGlycol( "GLHXFluid", 45.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1003.13, GetDensityGlycol( "GLHXFluid", 65.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  988.60, GetDensityGlycol( "GLHXFluid", 85.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  972.03, GetDensityGlycol( "GLHXFluid", 105.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  953.41, GetDensityGlycol( "GLHXFluid", 125.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFLUID", -35.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFLUID", -15.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR( 1034.46, GetDensityGlycol( "GLHXFLUID", 5.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR( 1030.51, GetDensityGlycol( "GLHXFLUID", 15.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR( 1026.06, GetDensityGlycol( "GLHXFLUID", 25.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR( 1021.09, GetDensityGlycol( "GLHXFLUID", 35.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR( 1015.62, GetDensityGlycol( "GLHXFLUID", 45.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR( 1003.13, GetDensityGlycol( "GLHXFLUID", 65.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR(  988.60, GetDensityGlycol( "GLHXFLUID", 85.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR(  972.03, GetDensityGlycol( "GLHXFLUID", 105.0, FluidIndex, "UnitTest" ), 0.01 );
+	EXPECT_NEAR(  953.41, GetDensityGlycol( "GLHXFLUID", 125.0, FluidIndex, "UnitTest" ), 0.01 );
 
 }
 
