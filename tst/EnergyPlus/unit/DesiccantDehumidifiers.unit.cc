@@ -79,6 +79,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <ElectricPowerServiceManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -2830,6 +2831,7 @@ namespace EnergyPlus {
 
 		SimulationManager::GetProjectData();
 		OutputReportPredefined::SetPredefinedTables();
+		createFacilityElectricPowerServiceObject();
 		SetPreConstructionInputParameters(); //establish array bounds for constructions early
 		BranchInputManager::ManageBranchInput();
 		BeginSimFlag = true;
@@ -4005,6 +4007,7 @@ namespace EnergyPlus {
 
 		SimulationManager::GetProjectData();
 		OutputReportPredefined::SetPredefinedTables();
+		createFacilityElectricPowerServiceObject();
 		SetPreConstructionInputParameters(); //establish array bounds for constructions early
 		BranchInputManager::ManageBranchInput();
 		BeginSimFlag = true;
@@ -5429,6 +5432,7 @@ namespace EnergyPlus {
 
 		SimulationManager::GetProjectData();
 		OutputReportPredefined::SetPredefinedTables();
+		createFacilityElectricPowerServiceObject();
 		SetPreConstructionInputParameters(); //establish array bounds for constructions early
 		BranchInputManager::ManageBranchInput();
 		BeginSimFlag = true;

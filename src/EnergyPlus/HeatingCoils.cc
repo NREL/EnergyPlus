@@ -1191,6 +1191,7 @@ namespace HeatingCoils {
 
 		if ( TempCap == AutoSize ) {
 			if ( HeatingCoil( CoilNum ).DesiccantRegenerationCoil ) {
+				DataDesicRegCoil = true;
 				bPRINT = false;
 				DataDesicDehumNum = HeatingCoil( CoilNum ).DesiccantDehumNum;
 				TempSize = AutoSize;
@@ -1199,8 +1200,11 @@ namespace HeatingCoils {
 				TempSize = AutoSize;
 				RequestSizing( CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName );
 				DataDesOutletAirTemp = TempSize;
+				if ( CurOASysNum > 0 ) {
+					OASysEqSizing( CurOASysNum ).AirFlow = true;
+					OASysEqSizing( CurOASysNum ).AirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+				}
 				DataDesicDehumNum = 0;
-				DataDesicRegCoil = true;
 				bPRINT = true;
 			}
 		}
