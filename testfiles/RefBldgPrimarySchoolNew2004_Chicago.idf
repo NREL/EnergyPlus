@@ -205,7 +205,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 25
 
-  Version,8.4;
+  Version,8.5;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation

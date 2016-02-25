@@ -671,8 +671,8 @@ ZoneAirMassFlowConservation,
        \memo infiltration object mass flow rates.
        \memo If either mixing or infiltration is active, then the zone air mass flow
        \memo balance calculation will attempt to enforce conservation of mass for each zone.
-       \note If mixing is "No" and infiltration is "None", then the zone air mass flow
-       \note calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
+       \memo If mixing is "No" and infiltration is "None", then the zone air mass flow
+       \memo calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
        \unique-object
        \min-fields 3
   A1,  \field Adjust Zone Mixing For Zone Air Mass Flow Balance
@@ -78337,7 +78337,7 @@ ElectricLoadCenter:Distribution,
        \note Modifies the target utility service demand power over time.
        \note Schedule values should be fractions from -1.0 to 1.0, inclusive.
        \note if omitted a schedule value of 1.0 is used. Negative values indicate export to grid
-       \not Schedule is used if Storage Operation Scheme is set to FacilityDemandLeveling.
+       \note Schedule is used if Storage Operation Scheme is set to FacilityDemandLeveling.
        \type object-list
        \object-list ScheduleNames
 
