@@ -713,3 +713,56 @@ TEST_F( EnergyPlusFixture, SetPointManager_CalcSetPointTest)
 	EXPECT_EQ(50, SetPt7);
 	EXPECT_EQ(54, SetPt8);
 }
+
+TEST( SetPointManager, DefineMixedAirSetPointManager )
+{
+
+	// Set up the required node data
+	DataLoopNode::Node.allocate( 5 );
+	DataLoopNode::Node( 1 ).MassFlowRate = 1.0;
+
+	// Set up a cooling setpoint manager
+	SetPointManager::DefineMixedAirSetPointManager mySPM;
+
+	mySPM.FanInNode = 1;
+	mySPM.FanOutNode = 2;
+	mySPM.CoolCoilInNode = 0;
+	mySPM.CoolCoilOutNode = 0;
+	mySPM.RefNode = 5;
+	mySPM.MinCoolCoilOutTemp = 7.2;
+
+	// test 1: Original calculation
+	DataLoopNode::Node( 5 ).TempSetPoint = 13;
+	DataLoopNode::Node( 2 ).Temp = 24.2;
+	DataLoopNode::Node( 1 ).Temp = 24.0;
+	mySPM.calculate( );
+
+	EXPECT_EQ( 12.8, mySPM.SetPt );
+
+	// test 2: Freezing calculation: blow through
+
+	mySPM.CoolCoilInNode = 3;
+	mySPM.CoolCoilOutNode = 4;
+	DataLoopNode::Node( 5 ).TempSetPoint = 7.0;
+	DataLoopNode::Node( 5 ).Temp = 7.0;
+	DataLoopNode::Node( 3 ).Temp = 24.2;
+	DataLoopNode::Node( 4 ).Temp = 7.0;
+	mySPM.calculate( );
+
+	EXPECT_EQ( 24.2, mySPM.SetPt );
+
+	// test 3: Freezing calculation: draw through
+	DataLoopNode::Node( 5 ).TempSetPoint = 7.3;
+	DataLoopNode::Node( 3 ).Temp = 24.2;
+	DataLoopNode::Node( 5 ).Temp = 7.2;
+	DataLoopNode::Node( 4 ).Temp = 7.0;
+	DataLoopNode::Node( 2 ).Temp = 7.2;
+	DataLoopNode::Node( 1 ).Temp = 7.0;
+	mySPM.calculate( );
+
+	EXPECT_EQ( 24.4, mySPM.SetPt );
+
+	// tear down
+	DataLoopNode::Node.deallocate( );
+
+}

@@ -409,13 +409,6 @@ Table 81.  Nomenclature list for Fanger model
 <td>PPD</td>
 </tr>
 <tr>
-<td>P<sub>sk</sub></td>
-<td>Saturated water vapor pressure at required skin temperature</td>
-<td>Torr</td>
-<td>-</td>
-<td>SatSkinVapPress</td>
-</tr>
-<tr>
 <td>Q<sub>c</sub></td>
 <td>The rate of convective heat loss</td>
 <td>W/m<sup>2</sup></td>
@@ -472,13 +465,6 @@ Table 81.  Nomenclature list for Fanger model
 <td>AbsRadTemp</td>
 </tr>
 <tr>
-<td>T<sub>skr</sub></td>
-<td>Skin temperature required to achieve thermal comfort</td>
-<td>°C</td>
-<td> </td>
-<td>SkinComfTemp</td>
-</tr>
-<tr>
 <td>W</td>
 <td>The rate of heat loss due to the performance of work</td>
 <td>W/m<sup>2</sup></td>
@@ -510,9 +496,9 @@ Fanger developed the model based on the research he performed at Kansas State Un
 
 <span>\(L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W\)</span>                                                         W/m<sup>2</sup>
 
-<span>\({Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_a}) + 0.0014M(34 - {T_a})\)</span>     W/m<sup>2</sup>
+<span>\({Q_{res}} = {E_{res}} + {C_{res}} = 0.000017M(5867 - {P_a}) + 0.0014M(34 - {T_a})\)</span>     W/m<sup>2</sup>
 
-LatRespHeatLoss = 0.0023\*ActLevel\*(44. - VapPress)
+LatRespHeatLoss = 0.000017\*ActLevel\*(5867. - VapPress)
 
 DryRespHeatLoss = 0.0014\*ActLevel\*(34.- AirTemp)
 
@@ -520,15 +506,15 @@ RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
 
 <span>\({Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})\)</span>                                                               W/m<sup>2</sup>
 
-<span>\({Q_r} = {f_{eff}}{f_{cl}}\varepsilon \sigma ({T_{cla}}^4 - {T_{ra}}^4)\)</span>                                                       W/m<sup>2</sup>
+<span>Q<sub>r</sub> = 3.96\*f<sub>cl</sub>\*[(0.01\*T<sub>cla</sub>)^4 - (0.01\*T<sub>ra</sub>)^4]</span>                                                       W/m<sup>2</sup>
 
 <span>\({Q_{dry}} = {Q_c} + {Q_r}\)</span>                                                                         W/m<sup>2</sup>
 
 ConvHeatLos = CloBodyRat\*Hc\*(CloSurfTemp - AirTemp)
 
-RadHeatLoss = RadSurfEff\*CloBodyRat\*SkinEmiss\*StefanBoltz &
+RadHeatLoss = 3.96\*CloBodyRat &
 
-\*(AbsCloSurfTemp\*\*4 - AbsRadTemp\*\*4)
+\*[(0.01\*AbsCloSurfTemp)\*\*4 - (0.01\*AbsRadTemp)\*\*4]
 
 DryHeatLoss = ConvHeatLoss + RadHeatLoss
 
@@ -536,7 +522,7 @@ For<span>\(H > 58.2\)</span>, <span>\({E_{rsw}} = 0.42(H - 58.2)\)</span>   �
 
 For <span>\(H \le 58.2\)</span>, <span>\({E_{rsw}} = 0\)</span>                                                           W/m<sup>2</sup>
 
-<span>\({E_{diff}} = 0.68 \times 0.61({P_{sk}} - {P_a}) = 0.4148({P_{sk}} - {P_a})\)</span>                        W/m<sup>2</sup>
+<span>E<sub>diff</sub> = 0.00305\*(5733.0 - 6.99H - P<sub>a</sub>)</span>                        W/m<sup>2</sup>
 
 <span>\({E_{sk}} = {E_{rsw}} + {E_{diff}}\)</span>                                                                      W/m<sup>2</sup>
 
@@ -544,27 +530,11 @@ EvapHeatLossRegComf = 0.42\*(IntHeatProd - ActLevelConv)
 
 EvapHeatLossRegComf = 0.0
 
-EvapHeatLossDiff = 0.4148\*(SkinComfVpress - VapPress)
+EvapHeatLossDiff = 0.00305\*(5733.0 - 6.99\*IntHeatProd - VapPress)
 
 EvapHeatLoss = EvapHeatLossRegComf + EvapHeatLossDiff
 
-Where,
-
-0.68 is the passive water vapor diffusion rate, (g/h·m<sup>2</sup>·Torr)
-
-0.61 is the latent heat of water, (W·h/g)
-
-P<sub>sk</sub> is the saturated water vapor pressure at the skin temperature required to achieve the thermal comfort
-
-<span>\({P_{sk}} = 1.92{T_{skr}} - 25.3\)</span>                                                                Torr
-
-SatSkinVapPress = 1.92\*SkinTempComf - 25.3
-
-<span>\({T_{skr}} = 35.7 - 0.028H\)</span>                                                               °C
-
-SkinTempComf = 35.7 - 0.028\*IntHeatProd
-
-By determining the skin temperature and evaporative sweat rate that a thermally comfortable person would have in a given set of conditions, the model calculates the energy loss (L). Then, using the thermal sensation votes from subjects at KSU and Denmark, a Predicted Mean Vote (PMV) thermal sensation scale is based on how the energy loss (L) deviates from the metabolic rate (M) in the following form:
+The Fanger model was developed using the thermal sensation votes from subjects at KSU and Denmark, and the Predicted Mean Vote (PMV) thermal sensation scale is based on how the energy loss (L) deviates from the metabolic rate (M) in the following form:
 
 <div>$$PMV = (0.303{e^{ - 0.036M}} + 0.028)(H - L)$$</div>
 
@@ -4006,6 +3976,42 @@ SystemLoad 	= system load to be met by the fan coil unit, (W)
 
 {FullLoadOutput_{n}} 	= fully load fan coil unit output at fan speed level n, (W)
 
+##### ASHRAE 90.1
+
+The ASHRAE90.1 control method uses a simple technique to adjust fan speed based on zone design sensible load. The specific section of the Standard is described as:
+
+    Section 6.4.3.10 (“Single Zone Variable-Air-Volume Controls”) of ASHRAE Standard 90.1-2010.
+    HVAC systems shall have variable airflow controls as follows:
+    (a) Air-handling and fan-coil units with chilled-water cooling coils and supply fans with motors 
+        greater than or equal to 5 hp shall have their supply fans controlled by two-speed motors or
+        variable-speed drives. At cooling demands less than or equal to 50%, the supply fan controls
+        shall be able to reduce the airflow to no greater than the larger of the following:
+        • One-half of the full fan speed, or
+        • The volume of outdoor air required to meet the ventilation requirements of Standard 62.1.
+    (b) Effective January 1, 2012, all air-conditioning equipment and air-handling units with direct
+        expansion cooling and a cooling capacity at AHRI conditions greater than or equal to 110,000
+        Btu/h that serve single zones shall have their supply fans controlled by two-speed motors or
+        variable-speed drives. At cooling demands less than or equal to 50%, the supply fan controls
+        shall be able to reduce the airflow to no greater than the larger of the following:
+        • Two-thirds of the full fan speed, or
+        • The volume of outdoor air required to meet the ventilation requirements of Standard 62.1.
+
+This control method assumes that a simulation sizing run is performed to determine the zone design sensible cooling and heating load <span>\({\dot Q_{z,design}}\)</span>.
+
+For fan coil units, the limit used to determine if reduced zone loads are met with reduced fan speed is the fan coil's Low Speed Supply Air Flow Ratio input.
+
+<div>$${\dot Q_{reduced}} = {\dot Q_{z,design}} * {Ratio_{fan,low{\rm{ }}speed}}$$</div>
+
+If the zone load, <span>\({\dot Q_{z,req}}\)</span>, is less than <span>\({Q_{reduced}}\)</span> then the fan is maintained at the reduced speed while the water coils (or electric heating coil) are modulated to meet the zone load.
+
+If the zone load is greater than the design zone sensible load, <span>\({\dot Q_{z,design}}\)</span>, the fan will operate at the maximum supply air flow rate and the water or electric heating coils will modulate to meet the zone load.
+
+If the zone load is between these two extremes, the fan and coil will modulate to meet the zone load.
+
+An example of the ASHRAE 90.1 control method is provided in the following figure. In this figure, the X-axis represents the zone cooling (-) or heating (+) load.
+
+![](media/SZVAV_Fan_Control_FanCoil.jpg)<br>
+Single-Zone VAV Fan Control for Fan Coil Units
 
 #### References
 

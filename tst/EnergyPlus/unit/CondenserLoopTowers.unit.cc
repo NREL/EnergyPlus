@@ -65,6 +65,7 @@
 #include <CondenserLoopTowers.hh>
 #include <OutputProcessor.hh>
 #include <SimulationManager.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <BranchInputManager.hh>
 #include <PlantManager.hh>
 #include <WeatherManager.hh>
@@ -511,6 +512,7 @@ namespace EnergyPlus {
 		OutputProcessor::TimeValue.allocate( 2 );
 		OutputProcessor::SetupTimePointers( "Zone", DataGlobals::TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		OutputProcessor::SetupTimePointers( "HVAC", DataHVACGlobals::TimeStepSys );
+		createFacilityElectricPowerServiceObject();
 		OutputProcessor::GetReportVariableInput();
 		PlantManager::CheckIfAnyPlant();
 		BranchInputManager::ManageBranchInput(); // just gets input and returns.

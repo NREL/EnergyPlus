@@ -98,6 +98,7 @@ namespace FanCoilUnits {
 	extern int const CCM_VarFanVarFlow;
 	extern int const CCM_VarFanConsFlow;
 	extern int const CCM_MultiSpeedFan;
+	extern int const CCM_ASHRAE;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -215,6 +216,9 @@ namespace FanCoilUnits {
 		Real64 SpeedRatio; // speed ratio when the fan is cycling between stages
 		int FanOpModeSchedPtr; // pointer to supply air fan operating mode schedule
 		int FanOpMode; // 1=cycling fan cycling coil; 2=constant fan cycling coil
+		Real64 MinSATempCooling; // ASHRAE90.1 maximum supply air temperature in Cooling mode
+		Real64 MaxSATempHeating; // ASHRAE90.1 maximum supply air temperature in Heating mode
+		bool ASHRAETempControl; // ASHRAE90.1 control to temperature set point when true
 
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
@@ -227,6 +231,9 @@ namespace FanCoilUnits {
 		Real64 ElecEnergy; // unit electiric energy consumption in joules
 		Real64 DesCoolingLoad; // used for reporting in watts
 		Real64 DesHeatingLoad; // used for reporting in watts
+		Real64 DesZoneCoolingLoad; // used for reporting in watts
+		Real64 DesZoneHeatingLoad; // used for reporting in watts
+		int DSOAPtr; // design specification outdoor air object index
 
 		// Default Constructor
 		FanCoilData() :
@@ -297,6 +304,9 @@ namespace FanCoilUnits {
 			SpeedRatio( 0.0 ),
 			FanOpModeSchedPtr( 0 ),
 			FanOpMode( 1 ),
+			MinSATempCooling( 0.0 ),
+			MaxSATempHeating( 0.0 ),
+			ASHRAETempControl( false ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			TotCoolPower( 0.0 ),
@@ -306,7 +316,10 @@ namespace FanCoilUnits {
 			ElecPower( 0.0 ),
 			ElecEnergy( 0.0 ),
 			DesCoolingLoad( 0.0 ),
-			DesHeatingLoad( 0.0 )
+			DesHeatingLoad( 0.0 ),
+			DesZoneCoolingLoad( 0.0 ),
+			DesZoneHeatingLoad( 0.0 ),
+			DSOAPtr( 0 )
 		{}
 
 	};
@@ -432,6 +445,77 @@ namespace FanCoilUnits {
 		Real64 const PartLoadRatio, // DX cooling coil part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	);
+
+	Real64
+	CalcFanCoilWaterFlowTempResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+	
+	Real64
+	CalcFanCoilWaterFlowResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+	
+	Real64
+	CalcFanCoilAirFlowResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilAirAndWaterFlowResidual(
+		Real64 const WaterFlow, // water mass flow rate [kg/s]
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilAirAndWaterInStepResidual(
+		Real64 const PLR, // air and water mass flow rate ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilBothFlowResidual(
+		Real64 const PLR, // air and water mass flow rate ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilElecHeatResidual(
+		Real64 const PLR, // electric heating coil part load ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	Real64
+	CalcFanCoilElecHeatTempResidual(
+		Real64 const PLR, // electric heating coil part load ratio
+		Array1< Real64 > const & Par // Function parameters
+	);
+
+	//     NOTICE
+
+	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
+	//     and The Regents of the University of California through Ernest Orlando Lawrence
+	//     Berkeley National Laboratory.  All rights reserved.
+
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
+	//     by other individuals, companies and institutions.  These portions have been
+	//     incorporated into the EnergyPlus software package under license.   For a complete
+	//     list of contributors, see "Notice" located in main.cc.
+
+	//     NOTICE: The U.S. Government is granted for itself and others acting on its
+	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	//     reproduce, prepare derivative works, and perform publicly and display publicly.
+	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     subject to two possible five year renewals, the U.S. Government is granted for
+	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	//     worldwide license in this data to reproduce, prepare derivative works,
+	//     distribute copies to the public, perform publicly and display publicly, and to
+	//     permit others to do so.
+
+	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // FanCoilUnits
 
