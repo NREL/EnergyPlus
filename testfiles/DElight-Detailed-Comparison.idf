@@ -18,7 +18,7 @@
 ! System:   Ideal Loads
 ! Plant:    None (simple ideal loads)
 
-  Version,8.4;
+  Version,8.5;
 
   RunPeriod,
     ,                        !- Name

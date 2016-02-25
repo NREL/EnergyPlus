@@ -30,3 +30,15 @@ For version 8.5, the strings used to report pump sizes have changed In the EIO f
     Initial Rated Flow Rate [m3/s] => Initial Design Flow Rate [m3/s]
     Rated Power Consumption [W] => Design Power Consumption [W]
     Initial Rated Power Consumption [W] => Initial Design Power Consumption [W]
+
+### Net Area added to Envelope Summary tabular report
+
+Added new "Net Area" column to the Envelope Summary report Opaque Exterior table that represents the gross wall area minus the window and door areas.
+
+### Electric Load Center Changes
+
+The metering of photovoltaic power production has been changed.  Previously it was assumed that all AC power produced by an inverter was from photovoltaics because that was the only DC generator.  However new features for charging DC storage from grid supplied power make this assumption untenable.  Photovoltaic generators now meter their DC energy production directly (on Photovoltaic:ElectrictyProduced) and the inverter losses handled separately.  
+
+There is a new sub end use meter type called PowerConversion which ends up on "PowerConversion:ElectricityProduced" and the inverter (and new AC to DC Converter) meter the electric power losses from power conversion on this meter (as negative values). 
+
+The summary table called Electric Loads Satisfied has been revised to include a new row called Power Conversion. The precision of reported values has been increased. This is the sum of power losses from converting between AC and DC or between different voltage AC.  The inverter, converter, and some applications of transformers now meter their losses on PowerConversion:ElectricityProduced and that is what fills this new row.  The old values for "Photovoltaic Power" should match the sum of the new values for "Photovoltaic Power" and "Power Conversion."  This row includes transformer power conversion losses when the transformer is used to export power back to the grid. 

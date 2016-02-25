@@ -13,18 +13,22 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
   BranchNodeConnections.unit.cc
   ChillerElectricEIR.unit.cc
   ChillerIndirectAbsorption.unit.cc
   CondenserLoopTowers.unit.cc
+  ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
+  DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
+  ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
@@ -43,6 +47,7 @@ set( test_src
   Humidifiers.unit.cc
   HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
+  HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   HVACUnitarySystem.unit.cc
@@ -53,7 +58,6 @@ set( test_src
   InputProcessor.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
-  ManageElectricPower.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc
@@ -66,6 +70,7 @@ set( test_src
   OutputReportData.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
+  PierceSurface.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
@@ -84,6 +89,7 @@ set( test_src
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
   SurfaceGeometry.unit.cc
+  SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   ThermalComfort.unit.cc
   VariableSpeedCoils.unit.cc
@@ -95,6 +101,7 @@ set( test_src
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
   XingGroundTemperatureModel.unit.cc
+  ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc

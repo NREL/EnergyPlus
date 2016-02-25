@@ -69,6 +69,7 @@
 #include <SetPointManager.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <OutputReportPredefined.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
@@ -1110,7 +1111,7 @@ namespace EnergyPlus {
 		OutputProcessor::SetupTimePointers( "Zone", DataGlobals::TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		OutputProcessor::SetupTimePointers( "HVAC", DataHVACGlobals::TimeStepSys );
 		PlantManager::CheckIfAnyPlant();
-
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput(); // just gets input and returns.
 		DataGlobals::DoingSizing = false;
 		DataGlobals::KickOffSimulation = true;
@@ -2236,7 +2237,7 @@ namespace EnergyPlus {
 		OutputProcessor::SetupTimePointers( "Zone", DataGlobals::TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		OutputProcessor::SetupTimePointers( "HVAC", DataHVACGlobals::TimeStepSys );
 		PlantManager::CheckIfAnyPlant();
-
+		createFacilityElectricPowerServiceObject();
 		BranchInputManager::ManageBranchInput(); // just gets input and returns.
 		DataGlobals::DoingSizing = false;
 		DataGlobals::KickOffSimulation = true;

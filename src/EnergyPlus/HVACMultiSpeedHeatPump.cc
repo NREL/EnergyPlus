@@ -2163,8 +2163,7 @@ namespace HVACMultiSpeedHeatPump {
 
 		CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, On, 1, 0.0, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 
-		// If unit is scheduled OFF, setpoint is equal to inlet node temperature.
-		for ( auto & e : MSHeatPump ) {
+		auto & e = MSHeatPump( MSHeatPumpNum ); {
 			e.TotHeatEnergyRate = 0.0;
 			e.SensHeatEnergyRate = 0.0;
 			e.LatHeatEnergyRate = 0.0;
@@ -2172,7 +2171,7 @@ namespace HVACMultiSpeedHeatPump {
 			e.SensCoolEnergyRate = 0.0;
 			e.LatCoolEnergyRate = 0.0;
 		}
-
+		// If unit is scheduled OFF, setpoint is equal to inlet node temperature.
 		//!!LKL Discrepancy with < 0
 		if ( GetCurrentScheduleValue( MSHeatPump( MSHeatPumpNum ).AvaiSchedPtr ) == 0.0 ) {
 			Node( OutNode ).Temp = Node( InNode ).Temp;
