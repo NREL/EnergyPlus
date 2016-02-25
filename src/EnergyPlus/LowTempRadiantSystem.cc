@@ -1926,6 +1926,7 @@ namespace LowTempRadiantSystem {
 			}
 
 		} else if ( SELECT_CASE_var == ConstantFlowSystem ) {
+			CFloRadSys( RadSysNum ).WaterMassFlowRate = 0.0;
 			// Initialize the appropriate node data
 			if ( CFloRadSys( RadSysNum ).HeatingSystem ) {
 				if ( CFloRadSys( RadSysNum ).VolFlowSchedPtr > 0 ) {
@@ -1936,11 +1937,11 @@ namespace LowTempRadiantSystem {
 				if ( CurrentFlowSchedule > 1.0 ) CurrentFlowSchedule = 1.0; // Do not allow more flow than design maximum
 				if ( CurrentFlowSchedule < 0.0 ) CurrentFlowSchedule = 0.0; // Do not allow negative flow
 
-				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate * CurrentFlowSchedule;
+				CFloRadSys( RadSysNum ).HotWaterMassFlowRate = CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate * CurrentFlowSchedule;
 
-				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
+				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).HotWaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
 
-				SetComponentFlowRate( CFloRadSys( RadSysNum ).WaterMassFlowRate, CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, CFloRadSys( RadSysNum ).HWLoopNum, CFloRadSys( RadSysNum ).HWLoopSide, CFloRadSys( RadSysNum ).HWBranchNum, CFloRadSys( RadSysNum ).HWCompNum );
+				SetComponentFlowRate( CFloRadSys( RadSysNum ).HotWaterMassFlowRate, CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, CFloRadSys( RadSysNum ).HWLoopNum, CFloRadSys( RadSysNum ).HWLoopSide, CFloRadSys( RadSysNum ).HWBranchNum, CFloRadSys( RadSysNum ).HWCompNum );
 			}
 			if ( CFloRadSys( RadSysNum ).CoolingSystem ) {
 				if ( CFloRadSys( RadSysNum ).VolFlowSchedPtr > 0 ) {
@@ -1950,11 +1951,11 @@ namespace LowTempRadiantSystem {
 				}
 				if ( CurrentFlowSchedule > 1.0 ) CurrentFlowSchedule = 1.0; // Do not allow more flow than design maximum
 				if ( CurrentFlowSchedule < 0.0 ) CurrentFlowSchedule = 0.0; // Do not allow negative flow
-				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate * CurrentFlowSchedule;
+				CFloRadSys( RadSysNum ).ChWaterMassFlowRate = CFloRadSys( RadSysNum ).ColdDesignWaterMassFlowRate * CurrentFlowSchedule;
 
-				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
+				if ( CFloRadSys( RadSysNum ).EMSOverrideOnWaterMdot ) CFloRadSys( RadSysNum ).ChWaterMassFlowRate = CFloRadSys( RadSysNum ).EMSWaterMdotOverrideValue;
 
-				SetComponentFlowRate( CFloRadSys( RadSysNum ).WaterMassFlowRate, CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, CFloRadSys( RadSysNum ).CWLoopNum, CFloRadSys( RadSysNum ).CWLoopSide, CFloRadSys( RadSysNum ).CWBranchNum, CFloRadSys( RadSysNum ).CWCompNum );
+				SetComponentFlowRate( CFloRadSys( RadSysNum ).ChWaterMassFlowRate, CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, CFloRadSys( RadSysNum ).CWLoopNum, CFloRadSys( RadSysNum ).CWLoopSide, CFloRadSys( RadSysNum ).CWBranchNum, CFloRadSys( RadSysNum ).CWCompNum );
 			}
 
 		} else if ( SELECT_CASE_var == ElectricSystem ) {
@@ -3372,6 +3373,8 @@ namespace LowTempRadiantSystem {
 			if ( SetPointTemp < OffTempHeat ) { // HEATING MODE
 
 				OperatingMode = HeatingMode;
+				
+				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).HotWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).HeatingSystem ) {
 
@@ -3412,6 +3415,8 @@ namespace LowTempRadiantSystem {
 			} else if ( SetPointTemp > OffTempCool ) { // COOLING MODE
 
 				OperatingMode = CoolingMode;
+				
+				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).ChWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).CoolingSystem ) {
 
