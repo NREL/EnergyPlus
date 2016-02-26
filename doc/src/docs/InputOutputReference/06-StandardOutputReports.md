@@ -7,6 +7,8 @@ The following objects allow standard reports to be defined and utilized in Energ
 
 - Output:Table:Monthly
 
+- Output:Table:Annual
+
 - Output:Table:SummaryReports
 
 - OutputControl:Table:Style
@@ -139,6 +141,105 @@ Output:Table:Monthly,
   Site Outdoor Air Drybulb Temperature,                                   ! Variable or Meter 3 Name
   ValueWhenMaxMin;                                    ! Aggregation Type for Variable or Meter 3
 ```
+
+Output:Table:Annual
+-------------------
+
+The Output:Table:Annual object provides a generic method of setting up tables of annual results with each row corresponding to an instance of an object. These tables are good for creating reports that broadly summarize the building performance. At the bottom of the tables, three rows are added for the sum or average depending on the type of variable, the maximum and the minimum of each column. The report produced has multiple columns that are each defined using a repeated group of fields. The fields for the variable name and the aggregation type can be repeated for any number of columns. If the variables from different type of objects are specified in a single Output:Table:Annual, all the object names for each type of objects will be shown as rows. Variables that don't apply for certain objects will be left blank for that cell.  
+
+#### Field: Name
+
+The Name field allows the user to give the output table a label that is shown in the output file.
+
+#### Field: Filter
+
+An optional text string that is compared to the names of the objects referenced by the variables and if they match are included in the table. A footnote will appear that indicates that the objects shown may not be all the objects that of that type that occur in the file. 
+
+#### Field: Schedule Name
+
+Optional schedule name. If left blank, aggregation is performed for all hours simulated. If a schedule is specified, aggregation is performed for non-zero hours in the schedule.
+
+#### Field Set: Variable and Aggregation Type
+
+The Variable Name field and the Aggregation Type field may be repeated for each column desired in the report. These two fields define each column of the report. The IDD object has been set up to allow up to 25 columns. This object is extensible, so the number of columns may be increased by editing the IDD file and adding the desired number of fields at the end of the object.
+
+#### Field: Variable or Meter &lt;\#&gt; Name
+
+The remainder of this input object consists of pairs of fields that can be repeatedVariable Or Meter Name fields contain the name of a variable (see Output:Variable and eplusout.rdd), meter (see Output:Meter and eplusout.mdd), or schedule. This value is shown using the aggregation method specified. If the selected name is used for both a variable or a meter and a schedule name, the variable or meter will be used.
+
+#### Field: Aggregation Type for Variable or Meter &lt;\#&gt;
+
+The aggregation type determines how the variable is aggregated in the table. The choices for aggregation type are described below:
+
+*Simple Aggregation Types*
+
+**SumOrAverage** – For “sum” type variables adds up the values for each timestep and reports the sum of the value. For “average” type variables, the value shown will be the average for the month. SumOrAverage is probably the most common choice for aggregation type.
+
+**Maximum** – Reports the maximum value and the time that the maximum value occurred. When the maximum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the maximum for a variable in Joules is reported in Watts.
+
+**Minimum** – Reports the minimum value and the time that the minimum value occurred. When the minimum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the minimum for a variable in Joules is reported in Watts.
+
+**HoursNonZero** – The HoursNonZero option adds up the elapsed time during the month that this variable is non-zero and would be appropriate to determine the number of hour that a fan operates.
+
+**HoursZero** – The HoursZero option adds up the elapsed time during the month that this variable has a zero value and would be appropriate to determine the number of hour that a fan does not operate.
+
+**HoursPositive** – The HoursPositive option adds up the elapsed time during the month that this variable has a positive value. Hours with a zero value are not included.
+
+**HoursNonPositive** – The HoursNonPositive option adds up the elapsed time during the month that this variable has non-positive value. Hours with a negative value and hours with a zero value are all included.
+
+**HoursNegative** – The HoursNegative option adds up the elapsed time during the month that this variable has a negative value. Hours with a zero value are not included.
+
+**HoursNonNegative** – The HoursNonNegative option adds up the elapsed time during the month that this variable has non-negative value. Hours with a positive value and hours with a zero value are all included.
+
+**HourInTenBinsMinToMax** - Creates 10 columns for the specified variable and shows the number of hours in each of 10 bins based on the minimum and maximum value. The bin sizes will be rounded up to the next most signficant digit value (if the min is 0 and the max is 28786.3, the bin size would be 3000 not 2878.63). A table of the bin ranges would be generated below the main table when this option is selected.
+
+**HourInTenBinsZeroToMax** - Creates 11 columns for the specified variable and shows the number of hours in each of 10 bins from zero to the maximum value and a bin for hours below zero. The bin sizes will be rounded up to the next most significant digit value (if the min is 0 and the max is 28786.3, the bin size would be 3000 not 2878.63). A table of the bin ranges would be generated below the main table when this option is selected. 
+
+**HourInTenBinsMinToZero** - Creates 11 columns for the specified variable and shows the number of hours in each of 10 bins from zero to the minimum value and a bin for hours above zero. The bin sizes will be rounded up to the next most significant digit value (if the min is 0 and the min is -28786.3, the bin size would be 3000 not 2878.63). A table of the bin ranges would be generated below the main table when this option is selected.
+
+*Advanced Aggregation Types*
+
+The advanced aggregation types are described below. These aggregation types rely on doing an operation on the current variable but only during the time or times defined by a previously defined field. The ValueWhenMaxOrMin displays the value of one variable at the same time as the maximum or minimum is set on a previous field that is defined as either a maximum or minimum. The “Hours—“ aggregation types (not including binning) display then number of hours that a variable meets a condition. The “—DuringHoursShown” aggregation types perform those aggregations but instead of for all the hours in the month, only for the hours that the previous “Hours—“ entry applies. Multiple “—DuringHoursShown” after an “Hours—“ will all be based on that single “Hours—“ entry, in fact the “—DuringHoursShown” is based on the next column to the left that contains an “Hours—“ entry even if other types of aggregations are used in intermediate columns. Order of the variables in the report is important when using the advanced aggregation types since they often depend on a previous entry.
+
+**ValueWhenMaximumOrMinimum** – The ValueWhenMaximumOrMinimum option looks at the previous variable in the report that sets a maximum or minimum and displays the value of the current variable at that same timestep. Order of the variables in the report is important when using ValueWhenMaxMin. This can be used, for example, when an outdoor temperature should be reported for the time of the maximum cooling load.
+
+**SumOrAverageDuringHoursShown** – Provides the sum or average of the named variable when during the hours that the previous variable displayed with any of the aggregation types starting with “Hours”. For “sum” type variables adds up the values for each timestep and reports the sum of the value during the hours reported on the previous variable. For “average” type variables, the value shown will be the average for the month during the hours reported on the previous variable. Order of the variables in the report is important when using this aggregation type.
+
+**MaximumDuringHoursShown** – Reports the maximum value and the time that the maximum value occurred but only during the hours reported with the previous “hours-“ aggregation type. When the maximum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the maximum for a variable in Joules is reported in Watts. Order of the variables in the report is important when using this aggregation type.
+
+**MinimumDuringHoursShown** - Reports the minimum value and the time that the minimum value occurred but only during the hours reported with the previous “hours-“ aggregation type. When the minimum option is used with a summed variable the value is divided by the length of the timestep in seconds. For example, the minimum for a variable in Joules is reported in Watts. Order of the variables in the report is important when using this aggregation type.
+
+
+#### Field: Digits After Decimal for Variable or Meter &lt;\#&gt;
+
+The Digits After Decimal field is a numeric value that indicates how many digits after the decimal point should be shown for that column.
+
+An example of this object follows.
+
+```idf
+    Output:Table:Annual,
+    Custom Annual Window Report,  !- Name
+    , !- Report Group Name
+    , !- Filter
+    , !- Schedule Name
+    SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE,  !- Variable, Meter, EMS Int Var, IDF field Name 1
+    SumOrAverage,  !- Aggregation Type for 1
+    2,  !- Digits After Decimal for 1
+    SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION RATE,  !- Variable, Meter, EMS Int Var, IDF field Name 2
+    SumOrAverage,  !- Aggregation Type for 2
+    2,  !- Digits After Decimal for 2
+    SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION RATE,  !- Variable, Meter, EMS Int Var, IDF field Name 3
+    SumOrAverage,  !- Aggregation Type for 3
+    2,  !- Digits After Decimal for 3
+    SURFACE WINDOW HEAT GAIN RATE,  !- Variable, Meter, EMS Int Var, IDF field Name 4
+    SumOrAverage,  !- Aggregation Type for 4
+    2,  !- Digits After Decimal for 4
+    ACE WINDOW HEAT LOSS RATE,  !- Variable, Meter, EMS Int Var, IDF field Name 5
+    SumOrAverage,  !- Aggregation Type for 5
+    2;  !- Digits After Decimal for 5
+```
+
+
 
 Output:Table:SummaryReports
 ---------------------------
@@ -408,6 +509,18 @@ The Standard 62.1 Summary (key: Standard62.1Summary) produces a report that is c
 #### Energy Meters Summary
 
 The Energy Meters Summary (key: EnergyMeters) (which is a slight misnomer as some meters may not be strictly energy) provides the annual period (runperiod) results for each meter (reference the meter data dictionary file (.mdd) and/or the meter details file (.mtd). The results are broken out by fuel type (resource type) in this report.
+
+#### LEED Summary
+
+The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System™. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
+
+#### Object Count Summary
+
+The Object Count Summary provides the count on the number of specific objects in the file. The key used to obtain this report is ObjectCountSummary.
+
+#### Component Cost Economics Summary
+
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. The key used to obtain this report is ComponentCostEconomicsSummary.
 
 ### Predefined Monthly Summary Reports
 

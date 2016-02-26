@@ -106,7 +106,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.3;
+  Version,8.5;
 
   Building,
     NONE,                    !- Name

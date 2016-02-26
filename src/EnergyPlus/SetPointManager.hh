@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef SetPointManager_hh_INCLUDED
 #define SetPointManager_hh_INCLUDED
 
@@ -150,25 +208,6 @@ namespace SetPointManager {
 			AirLoopNum( 0 )
 		{}
 
-		// Member Constructor
-		DataSetPointManager(
-			std::string const & Name, // name of setpoint manager
-			int const SPMType, // integer representing type of setpoint manager
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			int const NumCtrlNodes, // number of control nodes
-			Array1_int const & CtrlNodes, // index to control node
-			int const AirLoopNum, // index to air loop
-			std::string const & AirLoopName // name of air loop
-		) :
-			Name( Name ),
-			SPMType( SPMType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			AirLoopNum( AirLoopNum ),
-			AirLoopName( AirLoopName )
-		{}
-
 	};
 
 	struct DefineScheduledSetPointManager // Derived type for Scheduled Setpoint Manager data
@@ -192,28 +231,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineScheduledSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType,
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & Sched,
-			int const SchedPtr,
-			int const NumCtrlNodes,
-			std::string const & CtrlNodeListName,
-			Array1_int const & CtrlNodes,
-			Real64 const SetPt
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( CtrlNodeListName ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -243,34 +261,7 @@ namespace SetPointManager {
 			SetPtLo( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineSchedDualSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType,
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & SchedHi,
-			std::string const & SchedLo,
-			int const SchedPtrHi,
-			int const SchedPtrLo,
-			int const NumCtrlNodes,
-			std::string const & CtrlNodeListName,
-			Array1_int const & CtrlNodes,
-			Real64 const SetPtHi,
-			Real64 const SetPtLo
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			SchedHi( SchedHi ),
-			SchedLo( SchedLo ),
-			SchedPtrHi( SchedPtrHi ),
-			SchedPtrLo( SchedPtrLo ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( CtrlNodeListName ),
-			CtrlNodes( CtrlNodes ),
-			SetPtHi( SetPtHi ),
-			SetPtLo( SetPtLo )
-		{}
+		void calculate();
 
 	};
 
@@ -311,45 +302,19 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineOutsideAirSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Real64 const OutLowSetPt1, // 1st setpoint at outside low
-			Real64 const OutLow1, // 1st Outside low
-			Real64 const OutHighSetPt1, // 1st setpoint at outside high
-			Real64 const OutHigh1, // 1st Outside high
-			std::string const & Sched, // Optional schedule
-			int const SchedPtr, // Schedule index
-			Real64 const OutLowSetPt2, // 2nd setpoint at outside low (optional)
-			Real64 const OutLow2, // 2nd Outside low (optional)
-			Real64 const OutHighSetPt2, // 2nd setpoint at outside high (optional)
-			Real64 const OutHigh2, // 2nd Outside high (optional)
-			int const NumCtrlNodes,
-			std::string const & CtrlNodeListName,
-			Array1_int const & CtrlNodes,
-			Real64 const SetPt
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			OutLowSetPt1( OutLowSetPt1 ),
-			OutLow1( OutLow1 ),
-			OutHighSetPt1( OutHighSetPt1 ),
-			OutHigh1( OutHigh1 ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			OutLowSetPt2( OutLowSetPt2 ),
-			OutLow2( OutLow2 ),
-			OutHighSetPt2( OutHighSetPt2 ),
-			OutHigh2( OutHigh2 ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( CtrlNodeListName ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate(
+			Optional_int_const NodeNum = _, // When Init Calls this routine, it passes the cur node number
+			Optional_bool_const InitFlag = _ // When Init Calls this routine, it passes True
+		);
 
+		Real64
+		CalcSetPoint(
+			Real64 OutLowTemp,
+			Real64 OutHighTemp,
+			Real64 OutDryBulbTemp,
+			Real64 SetTempAtOutLow,
+			Real64 SetTempAtOutHigh
+		);
 	};
 
 	struct DefineSZReheatSetPointManager // Derived type for the Single Zone Reheat Setpoint Manager data
@@ -394,48 +359,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineSZReheatSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
-			int const ControlZoneNum, // number (index into Zone array) of control zone
-			int const ZoneNodeNum, // zone node number
-			int const ZoneInletNodeNum, // inlet node number for the SZRH air
-			Real64 const MinSetTemp, // minimum supply air setpoint temperature
-			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
-			int const MixedAirNode, // mixed air node number
-			int const FanNodeIn, // fan inlet node number
-			int const FanNodeOut, // fan outlet node number
-			int const AirLoopNum, // air loop index of air loop associated with this setpoint manager
-			int const OAInNode, // outside airstream inlet node to the OA mixer
-			int const RetNode, // return node inlet to OA mixer
-			int const LoopInNode, // Primary Air System inlet node
-			int const NumCtrlNodes,
-			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( ControlZoneName ),
-			ControlZoneNum( ControlZoneNum ),
-			ZoneNodeNum( ZoneNodeNum ),
-			ZoneInletNodeNum( ZoneInletNodeNum ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			MixedAirNode( MixedAirNode ),
-			FanNodeIn( FanNodeIn ),
-			FanNodeOut( FanNodeOut ),
-			AirLoopNum( AirLoopNum ),
-			OAInNode( OAInNode ),
-			RetNode( RetNode ),
-			LoopInNode( LoopInNode ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -467,34 +391,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineSZHeatingSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
-			int const ControlZoneNum, // number (index into Zone array) of control zone
-			int const ZoneNodeNum, // zone node number
-			int const ZoneInletNodeNum, // inlet node number for the supply air
-			Real64 const MinSetTemp, // minimum supply air setpoint temperature
-			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
-			int const NumCtrlNodes,
-			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( ControlZoneName ),
-			ControlZoneNum( ControlZoneNum ),
-			ZoneNodeNum( ZoneNodeNum ),
-			ZoneInletNodeNum( ZoneInletNodeNum ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -526,34 +423,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineSZCoolingSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
-			int const ControlZoneNum, // number (index into Zone array) of control zone
-			int const ZoneNodeNum, // zone node number
-			int const ZoneInletNodeNum, // inlet node number for the supply air
-			Real64 const MinSetTemp, // minimum supply air setpoint temperature
-			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
-			int const NumCtrlNodes,
-			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( ControlZoneName ),
-			ControlZoneNum( ControlZoneNum ),
-			ZoneNodeNum( ZoneNodeNum ),
-			ZoneInletNodeNum( ZoneInletNodeNum ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -579,30 +449,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineSZMinHumSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			int const NumZones, // number of zones whose humidity is being controlled
-			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			Array1_int const & ZoneNodes, // zone node numbers of zones being controlled
-			Array1_int const & ZoneNum, // actual zone number ( index into Zone array)
-			Array1_int const & CtrlZoneNum, // index into ZoneEquipConfig
-			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			NumZones( NumZones ),
-			NumCtrlNodes( NumCtrlNodes ),
-			ZoneNodes( ZoneNodes ),
-			ZoneNum( ZoneNum ),
-			CtrlZoneNum( CtrlZoneNum ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -628,30 +475,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineSZMaxHumSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			int const NumZones, // number of zones whose humidity is being controlled
-			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			Array1_int const & ZoneNodes, // zone node numbers of zones being controlled
-			Array1_int const & ZoneNum, // actual zone number (index into Zone array)
-			Array1_int const & CtrlZoneNum, // index into ZoneEquipConfig
-			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			NumZones( NumZones ),
-			NumCtrlNodes( NumCtrlNodes ),
-			ZoneNodes( ZoneNodes ),
-			ZoneNum( ZoneNum ),
-			CtrlZoneNum( CtrlZoneNum ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -668,6 +492,10 @@ namespace SetPointManager {
 		Array1D_int CtrlNodes; // node numbers of nodes where setpoint is to be set
 		Real64 SetPt; // the setpoint
 		bool MySetPointCheckFlag; // used for mixed air SPM test for missing SP
+		bool FreezeCheckEnable; // Enable freezing check
+		int CoolCoilInNode; // Cooling coil inlet node number
+		int CoolCoilOutNode; // Cooling coil outlet node number
+		Real64 MinCoolCoilOutTemp; // The minimum temperature at cooling coil outlet node
 
 		// Default Constructor
 		DefineMixedAirSetPointManager() :
@@ -677,33 +505,15 @@ namespace SetPointManager {
 			FanOutNode( 0 ),
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 ),
-			MySetPointCheckFlag( true )
+			MySetPointCheckFlag( true ),
+			FreezeCheckEnable( false ),
+			CoolCoilInNode( 0 ),
+			CoolCoilOutNode( 0 ),
+		    MinCoolCoilOutTemp( 7.2 )
+
 		{}
 
-		// Member Constructor
-		DefineMixedAirSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			int const RefNode, // reference node number
-			int const FanInNode, // supply fan inlet node number
-			int const FanOutNode, // Supplt fan outlet node number
-			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
-			Real64 const SetPt, // the setpoint
-			bool const MySetPointCheckFlag // used for mixed air SPM test for missing SP
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			RefNode( RefNode ),
-			FanInNode( FanInNode ),
-			FanOutNode( FanOutNode ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt ),
-			MySetPointCheckFlag( MySetPointCheckFlag )
-		{}
+		void calculate();
 
 	};
 
@@ -742,40 +552,7 @@ namespace SetPointManager {
 			MySetPointCheckFlag( true )
 		{}
 
-		// Member Constructor
-		DefineOAPretreatSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			int const RefNode, // reference node number
-			int const MixedOutNode, // mixed air outlet node number
-			int const OAInNode, // outside air inlet node number
-			int const ReturnInNode, // return air inlet node number
-			Real64 const MinSetTemp, // minimum supply air setpoint temperature [C]
-			Real64 const MaxSetTemp, // maximum supply air setpoint temperature [C]
-			Real64 const MinSetHumRat, // minimum supply air setpoint humidity ratio [kg/kg]
-			Real64 const MaxSetHumRat, // maximum supply air setpoint humidity ratio [kg/kg]
-			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
-			Real64 const SetPt, // the setpoint
-			bool const MySetPointCheckFlag // used for DOAS SPM test for missing SP
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			RefNode( RefNode ),
-			MixedOutNode( MixedOutNode ),
-			OAInNode( OAInNode ),
-			ReturnInNode( ReturnInNode ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			MinSetHumRat( MinSetHumRat ),
-			MaxSetHumRat( MaxSetHumRat ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt ),
-			MySetPointCheckFlag( MySetPointCheckFlag )
-		{}
+		void calculate();
 
 	};
 
@@ -806,32 +583,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineWarmestSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & AirLoopName, // name of air loop that will use "warmest zone" strategy
-			int const AirLoopNum, // index of named air loop
-			Real64 const MinSetTemp, // minimum supply air setpoint temperature
-			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
-			int const Strategy, // supply flow and temperature set strategy
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			Strategy( Strategy ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -862,32 +614,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineColdestSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & AirLoopName, // name of air loop that will use "coldest zone" strategy
-			int const AirLoopNum, // index of named air loop
-			Real64 const MinSetTemp, // minimum supply air setpoint temperature
-			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
-			int const Strategy, // supply flow and temperature set strategy
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			Strategy( Strategy ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -926,40 +653,7 @@ namespace SetPointManager {
 			SimReady( false )
 		{}
 
-		// Member Constructor
-		DefWarmestSetPtManagerTempFlow(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & AirLoopName, // name of air loop that will use "warmest zone" strategy
-			int const AirLoopNum, // index of named air loop
-			Real64 const MinSetTemp, // minimum supply air setpoint temperature
-			Real64 const MaxSetTemp, // maximum supply air setpoint temperature
-			int const Strategy, // supply flow and temperature set strategy
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt, // the setpoint
-			Real64 const MinTurndown, // minimum fractional flow rate
-			Real64 const Turndown, // fractional flow rate
-			int const CritZoneNum,
-			bool const SimReady
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			Strategy( Strategy ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt ),
-			MinTurndown( MinTurndown ),
-			Turndown( Turndown ),
-			CritZoneNum( CritZoneNum ),
-			SimReady( SimReady )
-		{}
+		void calculate();
 
 	};
 
@@ -998,42 +692,7 @@ namespace SetPointManager {
 			AllSetPtMgrIndex( 0 )
 		{}
 
-		// Member Constructor
-		DefRABFlowSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			std::string const & AirLoopName, // name of air loop that will use "warmest zone" strategy
-			int const AirLoopNum, // index of named air loop
-			std::string const & Sched, // name of a schedule of supply air setpoint temperatures
-			int const SchedPtr, // index of the above schedule
-			Real64 const FlowSetPt, // mass flow rate setpoint (kg/s)
-			int const RABMixInNode,
-			int const SupMixInNode,
-			int const MixOutNode,
-			int const RABSplitOutNode,
-			int const SysOutNode,
-			int const AllSetPtMgrIndex // index of RAB SP manager in AllSetPtMgr structure
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			Sched( Sched ),
-			SchedPtr( SchedPtr ),
-			FlowSetPt( FlowSetPt ),
-			RABMixInNode( RABMixInNode ),
-			SupMixInNode( SupMixInNode ),
-			MixOutNode( MixOutNode ),
-			RABSplitOutNode( RABSplitOutNode ),
-			SysOutNode( SysOutNode ),
-			AllSetPtMgrIndex( AllSetPtMgrIndex )
-		{}
+		void calculate();
 
 	};
 
@@ -1061,30 +720,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefMultiZoneAverageCoolingSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & AirLoopName, // name of air loop that will use "MultiZone:Cooling:Average" strategy
-			int const AirLoopNum, // index of named air loop
-			Real64 const MinSetTemp, // minimum supply air setpoint temperature [C]
-			Real64 const MaxSetTemp, // maximum supply air setpoint temperature [C]
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt // the temperature setpoint [C]
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1112,30 +748,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefMultiZoneAverageHeatingSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & AirLoopName, // name of air loop that will use "MultiZone:Heating:Average" strategy
-			int const AirLoopNum, // index of named air loop
-			Real64 const MinSetTemp, // minimum supply air setpoint temperature [C]
-			Real64 const MaxSetTemp, // maximum supply air setpoint temperature [C]
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt // the temperature setpoint [C]
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1163,30 +776,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefMultiZoneAverageMinHumSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & AirLoopName, // name of air loop using MultiZone:MinimumHumidity:Average strategy
-			int const AirLoopNum, // index of named air loop
-			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
-			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
-			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
-			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			MinSetHum( MinSetHum ),
-			MaxSetHum( MaxSetHum ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1214,30 +804,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefMultiZoneAverageMaxHumSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & AirLoopName, // name of air loop using MultiZone:MaximumHumidity:Average strategy
-			int const AirLoopNum, // index of named air loop
-			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
-			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
-			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
-			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			MinSetHum( MinSetHum ),
-			MaxSetHum( MaxSetHum ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1265,30 +832,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefMultiZoneMinHumSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & AirLoopName, // name of air loop using SetpointManager:MultiZone:Humidity:Minimum
-			int const AirLoopNum, // index of named air loop
-			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
-			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
-			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
-			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			MinSetHum( MinSetHum ),
-			MaxSetHum( MaxSetHum ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1316,30 +860,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefMultiZoneMaxHumSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & AirLoopName, // name of air loop using SetpointManager:MultiZone:Humidity:Maximum
-			int const AirLoopNum, // index of named air loop
-			Real64 const MinSetHum, // minimum supply air humidity ratio [kg/kg]
-			Real64 const MaxSetHum, // maximum supply air humidity ratio [kg/kg]
-			int const NumCtrlNodes, // number of nodes whose humidity ratio is being set
-			Array1_int const & CtrlNodes, // nodes where humidity ratio is being set
-			Real64 const SetPt // the humidity ratio setpoint [kg/kg]
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			AirLoopName( AirLoopName ),
-			AirLoopNum( AirLoopNum ),
-			MinSetHum( MinSetHum ),
-			MaxSetHum( MaxSetHum ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1369,32 +890,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineFollowOATempSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & RefTempType, // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
-			int const RefTypeMode, // set to iRefTempType_WetBulb or iRefTempType_DryBulb
-			Real64 const Offset, // Offset temperature difference
-			Real64 const MinSetTemp, // Minimum supply air setpoint temperature
-			Real64 const MaxSetTemp, // Maximum supply air setpoint temperature
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			RefTempType( RefTempType ),
-			RefTypeMode( RefTypeMode ),
-			Offset( Offset ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1426,34 +922,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineFollowSysNodeTempSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			int const RefNodeNum, // reference node number
-			std::string const & RefTempType, // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
-			int const RefTypeMode, // set to iRefTempType_WetBulb or iRefTempType_DryBulb
-			Real64 const Offset, // Offset temperature difference
-			Real64 const MinSetTemp, // Minimum supply air setpoint temperature
-			Real64 const MaxSetTemp, // Maximum supply air setpoint temperature
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			RefNodeNum( RefNodeNum ),
-			RefTempType( RefTempType ),
-			RefTypeMode( RefTypeMode ),
-			Offset( Offset ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1487,32 +956,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineGroundTempSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & RefGroundTempObjType, // Reference Temperature type (Available choices are listed below)
-			int const RefTypeMode, // set to iRefGroundTempObjType_xxxx based on RefGroundTempObjType
-			Real64 const Offset, // Offset temperature difference
-			Real64 const MinSetTemp, // Minimum supply air setpoint temperature
-			Real64 const MaxSetTemp, // Maximum supply air setpoint temperature
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			RefGroundTempObjType( RefGroundTempObjType ),
-			RefTypeMode( RefTypeMode ),
-			Offset( Offset ),
-			MinSetTemp( MinSetTemp ),
-			MaxSetTemp( MaxSetTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1563,54 +1007,7 @@ namespace SetPointManager {
 			TypeNum( 0 )
 		{}
 
-		// Member Constructor
-		DefineCondEntSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & CondEntTempSched, // Optional schedule
-			int const CondEntTempSchedPtr, // default condenser entering water temperature schedule Index
-			Real64 const TowerDsnInletAirWetBulb, // cooling tower design inlet air wetbulb temperature
-			int const MinTwrWbCurve, // minimum design wetbulb temperature curve name
-			int const MinOaWbCurve, // minimum outside air wetbulb temperature curve name
-			int const OptCondEntCurve, // optimized condenser entering water temperature curve name
-			Real64 const MinimumLiftTD, // minimum lift
-			Real64 const MaxCondEntTemp, // maximum condenser entering water temp
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			std::string const & CtrlNodeListName,
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt, // the temperature set point [C]
-			int const ChillerIndexPlantSide, // plant side chiller index
-			int const ChillerIndexDemandSide, // demand side chiller index
-			int const BranchIndexPlantSide, // plant side branch index
-			int const BranchIndexDemandSide, // demand side branch index
-			int const LoopIndexPlantSide, // plant side loop index
-			int const LoopIndexDemandSide, // deand side loop index
-			int const TypeNum // chiller type number
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			CondEntTempSched( CondEntTempSched ),
-			CondEntTempSchedPtr( CondEntTempSchedPtr ),
-			TowerDsnInletAirWetBulb( TowerDsnInletAirWetBulb ),
-			MinTwrWbCurve( MinTwrWbCurve ),
-			MinOaWbCurve( MinOaWbCurve ),
-			OptCondEntCurve( OptCondEntCurve ),
-			MinimumLiftTD( MinimumLiftTD ),
-			MaxCondEntTemp( MaxCondEntTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( CtrlNodeListName ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt ),
-			ChillerIndexPlantSide( ChillerIndexPlantSide ),
-			ChillerIndexDemandSide( ChillerIndexDemandSide ),
-			BranchIndexPlantSide( BranchIndexPlantSide ),
-			BranchIndexDemandSide( BranchIndexDemandSide ),
-			LoopIndexPlantSide( LoopIndexPlantSide ),
-			LoopIndexDemandSide( LoopIndexDemandSide ),
-			TypeNum( TypeNum )
-		{}
+		void calculate();
 
 	};
 
@@ -1633,18 +1030,20 @@ namespace SetPointManager {
 		int ChllrVarIndex; // report variable index
 		int ChlPumpVarType; // report variable type
 		int ChlPumpVarIndex; // report variable index
-		int ClTowerVarType; // report variable type
-		int ClTowerVarIndex; // report variable index
+		Array1D_int ClTowerVarType; // report variable type
+		Array1D_int ClTowerVarIndex; // report variable index
 		int CndPumpVarType; // report variable type
 		int CndPumpVarIndex; // report variable index
 		int TypeNum; // chiller type number
-		int TowerNum; // cooling tower number
+		Array1D_int TowerNum; // cooling tower number
 		int CondLoopNum; // condenser loop number
-		int CondBranchNum; // condenser branch number
+		Array1D_int CondTowerBranchNum; // condenser branch number
+		int numTowers; // number of towers to query
 		int CondPumpNum; // condenser pump number
 		int CondPumpBranchNum; // condenser branch number for pump
 		int ChilledPumpNum; // chilled water pump number
 		int ChilledPumpBranchNum; // chilled water branch number for pump
+		bool SetupIdealCondEntSetPtVars; // flag for initialization of meters and such
 
 		// Default Constructor
 		DefineIdealCondEntSetPointManager() :
@@ -1660,80 +1059,34 @@ namespace SetPointManager {
 			ChllrVarIndex( 0 ),
 			ChlPumpVarType( 0 ),
 			ChlPumpVarIndex( 0 ),
-			ClTowerVarType( 0 ),
-			ClTowerVarIndex( 0 ),
 			CndPumpVarType( 0 ),
 			CndPumpVarIndex( 0 ),
 			TypeNum( 0 ),
-			TowerNum( 0 ),
 			CondLoopNum( 0 ),
-			CondBranchNum( 0 ),
+			numTowers( 0 ),
 			CondPumpNum( 0 ),
 			CondPumpBranchNum( 0 ),
 			ChilledPumpNum( 0 ),
-			ChilledPumpBranchNum( 0 )
+			ChilledPumpBranchNum( 0 ),
+			SetupIdealCondEntSetPtVars( true )
 		{}
 
-		// Member Constructor
-		DefineIdealCondEntSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			Real64 const MinimumLiftTD, // minimum lift
-			Real64 const MaxCondEntTemp, // maximum condenser entering water temp
-			int const NumCtrlNodes, // number of nodes whose temperature is being set
-			std::string const & CtrlNodeListName,
-			Array1_int const & CtrlNodes, // nodes where temperature is being set
-			Real64 const SetPt, // the temperature set point [C]
-			int const ChillerIndexPlantSide, // plant side chiller index
-			int const BranchIndexPlantSide, // plant side branch index
-			int const LoopIndexPlantSide, // plant side loop index
-			int const ChllrVarType, // report variable type
-			int const ChllrVarIndex, // report variable index
-			int const ChlPumpVarType, // report variable type
-			int const ChlPumpVarIndex, // report variable index
-			int const ClTowerVarType, // report variable type
-			int const ClTowerVarIndex, // report variable index
-			int const CndPumpVarType, // report variable type
-			int const CndPumpVarIndex, // report variable index
-			int const TypeNum, // chiller type number
-			int const TowerNum, // cooling tower number
-			int const CondLoopNum, // condenser loop number
-			int const CondBranchNum, // condenser branch number
-			int const CondPumpNum, // condenser pump number
-			int const CondPumpBranchNum, // condenser branch number for pump
-			int const ChilledPumpNum, // chilled water pump number
-			int const ChilledPumpBranchNum // chilled water branch number for pump
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			MinimumLiftTD( MinimumLiftTD ),
-			MaxCondEntTemp( MaxCondEntTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodeListName( CtrlNodeListName ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt ),
-			ChillerIndexPlantSide( ChillerIndexPlantSide ),
-			BranchIndexPlantSide( BranchIndexPlantSide ),
-			LoopIndexPlantSide( LoopIndexPlantSide ),
-			ChllrVarType( ChllrVarType ),
-			ChllrVarIndex( ChllrVarIndex ),
-			ChlPumpVarType( ChlPumpVarType ),
-			ChlPumpVarIndex( ChlPumpVarIndex ),
-			ClTowerVarType( ClTowerVarType ),
-			ClTowerVarIndex( ClTowerVarIndex ),
-			CndPumpVarType( CndPumpVarType ),
-			CndPumpVarIndex( CndPumpVarIndex ),
-			TypeNum( TypeNum ),
-			TowerNum( TowerNum ),
-			CondLoopNum( CondLoopNum ),
-			CondBranchNum( CondBranchNum ),
-			CondPumpNum( CondPumpNum ),
-			CondPumpBranchNum( CondPumpBranchNum ),
-			ChilledPumpNum( ChilledPumpNum ),
-			ChilledPumpBranchNum( ChilledPumpBranchNum )
-		{}
+		void calculate();
+
+		void SetupMeteredVarsForSetPt();
+
+		Real64 calculateCurrentEnergyUsage();
+
+		void
+		setupSetPointAndFlags(
+			Real64 & TotEnergy,
+			Real64 & TotEnergyPre, 
+			Real64 & CondWaterSetPoint, 
+			Real64 & CondTempLimit, 
+			bool & RunOptCondEntTemp, 
+			bool & RunSubOptCondEntTemp,
+			bool & RunFinalOptCondEntTemp
+		);
 
 	};
 
@@ -1763,32 +1116,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineSZOneStageCoolinggSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
-			int const ControlZoneNum, // number (index into Zone array) of control zone
-			int const ZoneNodeNum, // zone node number
-			Real64 const CoolingOnTemp, // minimum supply air setpoint temperature
-			Real64 const CoolingOffTemp, // maximum supply air setpoint temperature
-			int const NumCtrlNodes,
-			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( ControlZoneName ),
-			ControlZoneNum( ControlZoneNum ),
-			ZoneNodeNum( ZoneNodeNum ),
-			CoolingOnTemp( CoolingOnTemp ),
-			CoolingOffTemp( CoolingOffTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1818,32 +1146,7 @@ namespace SetPointManager {
 			SetPt( 0.0 )
 		{}
 
-		// Member Constructor
-		DefineSZOneStageHeatingSetPointManager(
-			std::string const & Name,
-			std::string const & CtrlVarType, // type of variable to be set
-			int const CtrlTypeMode, // set to iCtrlVarType_xxxx
-			std::string const & ControlZoneName, // name of the control zone (zone with main thermostat)
-			int const ControlZoneNum, // number (index into Zone array) of control zone
-			int const ZoneNodeNum, // zone node number
-			Real64 const HeatingOnTemp, // minimum supply air setpoint temperature
-			Real64 const HeatingOffTemp, // maximum supply air setpoint temperature
-			int const NumCtrlNodes,
-			Array1_int const & CtrlNodes, // node numbers of nodes where setpoint is to be set
-			Real64 const SetPt // the setpoint
-		) :
-			Name( Name ),
-			CtrlVarType( CtrlVarType ),
-			CtrlTypeMode( CtrlTypeMode ),
-			ControlZoneName( ControlZoneName ),
-			ControlZoneNum( ControlZoneNum ),
-			ZoneNodeNum( ZoneNodeNum ),
-			HeatingOnTemp( HeatingOnTemp ),
-			HeatingOffTemp( HeatingOffTemp ),
-			NumCtrlNodes( NumCtrlNodes ),
-			CtrlNodes( CtrlNodes ),
-			SetPt( SetPt )
-		{}
+		void calculate();
 
 	};
 
@@ -1938,7 +1241,10 @@ namespace SetPointManager {
 		CompOpType( 0 ),
 		SetPt( 0.0 )
 		{}
-		
+
+		// Calculation method
+		void calculate();
+
 	};
 
 	// Object Data
@@ -1995,97 +1301,6 @@ namespace SetPointManager {
 	SimSetPointManagers();
 
 	void
-	CalcScheduledSetPoint( int & SetPtMgrNum );
-
-	void
-	CalcScheduledTESSetPoint( int & SetPtMgrNum );
-	
-	void
-	CalcScheduledDualSetPoint( int & SetPtMgrNum );
-
-	void
-	CalcOutsideAirSetPoint(
-		int & SetPtMgrNum,
-		Optional_int_const NodeNum = _, // When Init Calls this routine, it passes the cur node number
-		Optional_bool_const InitFlag = _ // When Init Calls this routine, it passes True
-	);
-
-	void
-	CalcSingZoneRhSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcSingZoneHtSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcSingZoneClSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcSZOneStageCoolingSetPt( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcSZOneStageHeatingSetPt( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcSingZoneMinHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcSingZoneMaxHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcMixedAirSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcOAPretreatSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcWarmestSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcColdestSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcWarmestSetPointTempFlow( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcRABFlowSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcMultiZoneAverageHeatingSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcMultiZoneAverageCoolingSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcMultiZoneAverageMinHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcMultiZoneAverageMaxHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcMultiZoneMinHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcMultiZoneMaxHumSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcFollowOATempSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcFollowSysNodeTempSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcGroundTempSetPoint( int const SetPtMgrNum ); // number of the current setpoint manager being simulated
-
-	void
-	CalcCondEntSetPoint( int const SetPtMgrNum ); // number of the current set point manager being simulated
-
-	void
-	CalcIdealCondEntSetPoint( int const SetPtMgrNum ); // number of the current set point manager being simulated
-
-	void
-	SetupMeteredVarsForSetPt( int const SetPtMgrNum ); // number of this setpoint manager (only Ideal Cond Reset)
-
-	void
 	UpdateSetPointManagers();
 
 	void
@@ -2107,6 +1322,11 @@ namespace SetPointManager {
 	);
 
 	void
+	ResetHumidityRatioCtrlVarType(
+		int const NodeNum
+		);
+
+	void
 	CheckIfAnyIdealCondEntSetPoint();
 
 	int
@@ -2121,29 +1341,13 @@ namespace SetPointManager {
 								 int const CompOpType,
 								 int const ControlNodeNum
 								 );
+
+	bool
+	GetCoilFreezingCheckFlag( int const MixedAirSPMNum );
+
+	int
+	GetMixedAirNumWithCoilFreezingCheck( int const MixedAirNode );
 	
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SetPointManager
 

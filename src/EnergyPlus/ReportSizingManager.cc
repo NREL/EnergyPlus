@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <string>
 
@@ -15,6 +73,7 @@
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <DXCoils.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <InputProcessor.hh>
@@ -292,6 +351,7 @@ namespace ReportSizingManager {
 		using DataGlobals::InitConvTemp;;
 		using namespace DataSizing;
 		using namespace DataHVACGlobals;
+		using DXCoils::ValidateADP;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using General::SolveRegulaFalsi;
@@ -300,8 +360,10 @@ namespace ReportSizingManager {
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdpPb;
 		using Psychrometrics::PsyWFnTdbH;
+		using Psychrometrics::PsyTdbFnHW;
 		using Psychrometrics::PsyTdpFnWPb;
 		using Psychrometrics::PsyWFnTdbRhPb;
+		using Psychrometrics::PsyRhFnTdbWPb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyTwbFnTdbWPb;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -374,6 +436,8 @@ namespace ReportSizingManager {
 		Array1D< Real64 > Par( 4 ); // array passed to RegulaFalsi
 		Real64 DesOAFlowFrac;   // design outdoor air flow volume fraction
 		std::string ScalableSM; // scalable sizing methods label for reporting
+		Real64 const RatedInletAirTemp( 26.6667 ); // 26.6667C or 80F
+		Real64 const RatedInletAirHumRat( 0.01125 ); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
 		AutosizeDes = 0.0;
 		AutosizeUser = 0.0;
@@ -432,7 +496,7 @@ namespace ReportSizingManager {
 			if ( !IsAutoSize && !SizingDesRunThisZone && !SizingDesValueFromParent ) {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
-				if ( PrintWarningFlag && SizingResult > 0.0 ) {
+				if ( PrintWarningFlag && SizingResult > 0.0 && !DataScalableCapSizingON ) {
 					if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 						SizingResult /= ( 1 - DataBypassFrac ); // back out bypass fraction applied in GetInput
 						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
@@ -849,6 +913,11 @@ namespace ReportSizingManager {
 								AutosizeDes = 0.389 + 7684.0*RatedVolFlowPerRatedTotCap;
 							}
 						}
+
+						// check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
+						DesMassFlow = DataFlowUsedForSizing * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
+						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DesMassFlow, AutosizeDes, CallingRoutine );
+
 					} else {
 						AutosizeDes = 1.0;
 					}
@@ -904,6 +973,8 @@ namespace ReportSizingManager {
 								CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
 								if ( DataTotCapCurveIndex > 0 ) {
 									TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
+								} else if ( DataTotCapCurveValue > 0 ) {
+									TotCapTempModFac = DataTotCapCurveValue;
 								} else {
 									TotCapTempModFac = 1.0;
 								}
@@ -1167,6 +1238,26 @@ namespace ReportSizingManager {
 					}
 				} else if (SizingType == MaxHeaterOutletTempSizing) {
 					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+				} else if( SizingType == ZoneCoolingLoadSizing ) {
+					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolLoad;
+				} else if( SizingType == ZoneHeatingLoadSizing ) {
+					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
+				} else if( SizingType == MinSATempCoolingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
+						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp - ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat, FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+					}
+				} else if( SizingType == MaxSATempHeatingSizing ) {
+					if ( DataCapacityUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0 ) {
+						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp + ( DataCapacityUsedForSizing / ( DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat, FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp ) ) );
+					} else{
+						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+						ShowContinueError( "SizingString = " + SizingString + ", DataCapacityUsedForSizing = " + TrimSigDigits( DataCapacityUsedForSizing, 1 ) );
+						ShowContinueError( "SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits( DataFlowUsedForSizing, 1 ) );
+					}
 				} else {
 					// should never happen
 				}
@@ -1463,6 +1554,11 @@ namespace ReportSizingManager {
 								AutosizeDes = 0.389 + 7684.0*RatedVolFlowPerRatedTotCap;
 							}
 						}
+
+						// check that the autosized SHR corresponds to a valid apperatus dew point (ADP) temperature
+						DesMassFlow = DataFlowUsedForSizing * PsyRhoAirFnPbTdbW( StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, CallingRoutine );
+						AutosizeDes = ValidateADP( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, DataCapacityUsedForSizing, DesMassFlow, AutosizeDes, CallingRoutine );
+
 					} else {
 						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName );
 						ShowContinueError( "... DataFlowUsedForSizing and DataCapacityUsedForSizing " + SizingString + " must both be greater than 0." );
@@ -1861,7 +1957,7 @@ namespace ReportSizingManager {
 			if ( DataEMSOverrideON ) {
 				SizingResult = DataEMSOverride;
 			} else {
-				SizingResult = AutosizeDes;
+				AutosizeUser = SizingResult;
 			}
 		} else {
 			AutosizeUser = SizingResult;
@@ -1872,11 +1968,11 @@ namespace ReportSizingManager {
 				if ( SELECT_CASE_var == SupplyAirFlowRate || SELECT_CASE_var == None ) {
 					ScalableSM = "User-Specified (scaled by flow / zone) ";
 				} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-					ScalableSM = "User-Specified(scaled by flow / area) ";
+					ScalableSM = "User-Specified (scaled by flow / area) ";
 				} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow || SELECT_CASE_var == FractionOfAutosizedHeatingAirflow ) {
-					ScalableSM = "User-Specified(scaled by fractional multiplier) ";
+					ScalableSM = "User-Specified (scaled by fractional multiplier) ";
 				} else if ( SELECT_CASE_var == FlowPerCoolingCapacity || SELECT_CASE_var == FlowPerHeatingCapacity ) {
-					ScalableSM = "User-Specified(scaled by flow / capacity) ";
+					ScalableSM = "User-Specified (scaled by flow / capacity) ";
 				} else {
 					ScalableSM = "Design Size ";
 				}}
@@ -1889,9 +1985,9 @@ namespace ReportSizingManager {
 				ScalableSM = "User-Specified ";
 				if ( SizingResult == AutoSize ) ScalableSM = "Design Size ";
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				ScalableSM = "User-Specified(scaled by capacity / area) ";
+				ScalableSM = "User-Specified (scaled by capacity / area) ";
 			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity || SELECT_CASE_var == FractionOfAutosizedCoolingCapacity ) {
-				ScalableSM = "User-Specified(scaled by fractional multiplier) ";
+				ScalableSM = "User-Specified (scaled by fractional multiplier) ";
 			} else {
 				ScalableSM = "Design Size ";
 			}
@@ -1972,12 +2068,23 @@ namespace ReportSizingManager {
 						}
 					}
 				} else {
-					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag ) {
+					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag && !( DataScalableSizingON || DataScalableCapSizingON ) ) {
 						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
 								ShowContinueError( "User-Specified " + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
+								ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
+								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+							}
+						}
+					} else if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag && ( DataScalableSizingON || DataScalableCapSizingON ) ) {
+						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, ScalableSM + SizingString, AutosizeUser );
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
+								ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
+								ShowContinueError( ScalableSM + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
 								ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
@@ -2108,29 +2215,6 @@ namespace ReportSizingManager {
 			}
 		}
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // ReportSizingManager
 

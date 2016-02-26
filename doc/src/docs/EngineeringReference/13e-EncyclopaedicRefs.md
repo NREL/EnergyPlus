@@ -1,3 +1,4 @@
+
 <!--RemoveStart-->
 Simulation Models – Encyclopedic Reference
 ==========================================
@@ -2709,6 +2710,22 @@ The input object SetpointManager:MixedAir provides a setpoint manager that takes
 
 <div>$${T_{set}} = {T_{set,ref}} - ({T_{fan,outlet}} - {T_{fan,inlet}})$$</div>
 
+When inputs of optional fields, Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node, are provided, the setpoint temperature at the mixed air node is given below based on supply fan placement and reference node location:
+
+Blow through placement:
+
+<div>$${T_{set}} = max(T_{set,ref}, T_{min}) - ({T_{coil,outlet}} - {T_{coil,inlet}}) - ({T_{fan,outlet}} - {T_{fan,inlet}})$$</div>
+
+Draw through placement:
+
+When the reference node is the cooling coil outlet node:
+
+<div>$${T_{set}} = max(T_{set,ref}, T_{min}) - ({T_{coil,outlet}} - {T_{coil,inlet}})$$</div>
+
+When the reference node is the unitary system outlet node:
+
+<div>$${T_{set}} = max(T_{set,ref} - ({T_{fan,outlet}} - {T_{fan,inlet}}), T_{min}) - ({T_{coil,outlet}} - {T_{coil,inlet}})$$</div>
+
 ### Outdoor Air Pretreat
 
 The input object SetpointManager:OutdoorAirPretreat provides a setpoint manager that is meant to be used in conjunction with an OutdoorAir:Mixer. The outdoor air pretreat setpoint manager is used to establish a temperature or humidity ratio setpoint in the outdoor air stream flowing into the outdoor air stream node of an outdoor air mixer. This setpoint manager determines the required setpoint in the outdoor air stream to produce the reference setpoint in the mixed air stream after mixing with return air. For example, if the temperature setpoint at the mixed air node is 15C, the return air temperature is 20C, and the outdoor air flow fraction is 0.5, the outdoor air pretreat setpoint would be set to 10C. This setpoint manager references four user-specified nodes to obtain the following values:
@@ -3025,7 +3042,7 @@ MinSetPoint, MaxSetPoint and Offset are specified by the user as the input in ob
 
 ### Condenser Entering Water Temperature Reset
 
-The object resets the condenser entering water temperature to the optimal cooling tower water set point temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place boundary conditions on the “optimized” set point value. The optimized condenser entering water temperature may not be valid every timestep then will be limited algorithmically by two boundary curves. The first of these boundary curves is given by:
+The object resets the condenser entering water temperature to the optimal cooling tower water set point temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place limit conditions on the “optimized” set point value. The optimized condenser entering water temperature may not be valid every timestep then will be limited algorithmically by two boundary curves. The first of these boundary curves is given by:
 
 *MinDsnWB = C1 + C2\*OaWb + C3\*WPLR + C4\*TwrDsnWB + C5\*NF*
 
@@ -3103,9 +3120,14 @@ A graph of the curve can be depicted as follows:
 
 Figure 294. Optimum EWT vs PLR & OaWb
 
-
-
 The optimized condenser entering water temperature is calculated but is not necessarily used each timestep. If OptCondEntTemp does not fall within the bounds established by MinDsnWB and MinActualWb, then the value from the Default Condenser Entering Water Temperature Schedule is used for the Condenser Entering Water Set Point instead.
+
+#### Special Note for Multiple Towers
+
+This control scheme is available for multiple towers by following two steps:
+
+ - Use average tower conditions in the curves for the independent variables related to the towers
+ - Make sure the setpoint is applied to either the condenser supply outlet node or use a node list to apply it to each tower outlet node
 
 ### Ideal Condenser Entering Water Temperature Reset
 

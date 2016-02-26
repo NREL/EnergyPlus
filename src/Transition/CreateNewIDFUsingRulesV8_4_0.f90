@@ -481,6 +481,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   END IF
                 END DO
 
+              CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! we'll be adding a new flow rate field F5 to autosize
+                OutArgs(1:4) = InArgs(1:4)
+                OutArgs(5) = 'Autosize'
+                OutArgs(6:17) = InArgs(5:16)
+                CurArgs = CurArgs + 1
+                
               CASE('CONTROLLER:MECHANICALVENTILATION')
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -694,6 +703,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 else
                   OutArgs(17)=InArgs(17) ! Redundant, but clear
                 endif
+
+              CASE('ZONEAIRMASSFLOWCONSERVATION')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1) ! no change to F1
+                if (SameString(InArgs(1), "YES")) then
+                  OutArgs(2) = InArgs(2)
+                else ! IDD validation should require either YES or NO, so this is "NO"
+                  OutArgs(2) = "None"
+                endif
+                OutArgs(3) = "MixingSourceZonesOnly"
+                CurArgs = CurArgs + 1
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

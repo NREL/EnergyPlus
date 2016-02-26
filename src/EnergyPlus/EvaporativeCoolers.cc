@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -660,31 +718,28 @@ namespace EvaporativeCoolers {
 				SetupTankDemandComponent( EvapCond( EvapCoolNum ).EvapCoolerName, cCurrentModuleObject, EvapCond( EvapCoolNum ).EvapWaterSupplyName, ErrorsFound, EvapCond( EvapCoolNum ).EvapWaterSupTankID, EvapCond( EvapCoolNum ).EvapWaterTankDemandARRID );
 			}
 			EvapCond( EvapCoolNum ).DirectEffectiveness = rNumericArgs( 1 );
-			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 2 );
 
-			if ( lNumericFieldBlanks( 3 ) ) {
-				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = 0.0;
-			} else {
-				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 3 );
-			}
-			if ( lNumericFieldBlanks( 4 ) ) {
+			EvapCond( EvapCoolNum ).VolFlowRate = rNumericArgs( 2 );
+			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 3 );
+			EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 4 );
+			if ( lNumericFieldBlanks( 5 ) ) {
 				EvapCond( EvapCoolNum ).DriftFraction = 0.0;
 			} else {
-				EvapCond( EvapCoolNum ).DriftFraction = rNumericArgs( 4 );
+				EvapCond( EvapCoolNum ).DriftFraction = rNumericArgs( 5 );
 			}
-			if ( lNumericFieldBlanks( 5 ) ) {
+			if ( lNumericFieldBlanks( 6 ) ) {
 				EvapCond( EvapCoolNum ).BlowDownRatio = 0.0;
 			} else {
-				EvapCond( EvapCoolNum ).BlowDownRatio = rNumericArgs( 5 );
+				EvapCond( EvapCoolNum ).BlowDownRatio = rNumericArgs( 6 );
 			}
-			if ( lNumericFieldBlanks( 6 ) || lNumericFieldBlanks( 7 ) || lNumericFieldBlanks( 8 ) ) {
+			if ( lNumericFieldBlanks( 7 ) || lNumericFieldBlanks( 8 ) || lNumericFieldBlanks( 9 ) ) {
 				EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = false;
 			} else {
-				if ( !lNumericFieldBlanks( 6 ) && !lNumericFieldBlanks( 7 ) && !lNumericFieldBlanks( 8 ) ) {
+				if ( !lNumericFieldBlanks( 7 ) && !lNumericFieldBlanks( 8 ) && !lNumericFieldBlanks( 9 ) ) {
 					EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = true;
-					EvapCond( EvapCoolNum ).MinOATDBEvapCooler = rNumericArgs( 6 );
-					EvapCond( EvapCoolNum ).MaxOATWBEvapCooler = rNumericArgs( 7 );
-					EvapCond( EvapCoolNum ).MaxOATDBEvapCooler = rNumericArgs( 8 );
+					EvapCond( EvapCoolNum ).MinOATDBEvapCooler = rNumericArgs( 7 );
+					EvapCond( EvapCoolNum ).MaxOATWBEvapCooler = rNumericArgs( 8 );
+					EvapCond( EvapCoolNum ).MaxOATDBEvapCooler = rNumericArgs( 9 );
 				} else {
 					EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = false;
 				}
@@ -943,7 +998,7 @@ namespace EvaporativeCoolers {
 		static int AirSysBranchLoop( 0 );
 		static int BranchComp( 0 );
 		bool HardSizeNoDesRun;			// Indicator to a hard-sized field with no design sizing data
-		bool IsAutoSize;				// Indicator to autosize 
+		bool IsAutoSize;				// Indicator to autosize
 		Real64 IndirectVolFlowRateDes;	// Autosized volume flow rate for reporting
 		Real64 IndirectVolFlowRateUser;	// Hardsized volume flow rate for reporting
 		bool SizingDesRunThisAirSys;	// true if a particular air system had a Sizing:System object and system sizing done
@@ -1033,7 +1088,7 @@ namespace EvaporativeCoolers {
 				if ( CoolerOnMainAirLoop ) {
 					IndirectVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 				} else if ( CoolerOnOApath ) {
-					IndirectVolFlowRateDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+					IndirectVolFlowRateDes = max( FinalSysSizing( CurSysNum ).DesOutAirVolFlow, 0.5*FinalSysSizing( CurSysNum ).DesMainVolFlow );
 				}
 				// apply scaling factor the secondary air fan flow rate
 				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
@@ -1069,7 +1124,7 @@ namespace EvaporativeCoolers {
 			} else {
 				if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 && IndirectVolFlowRateDes > 0.0 ) {
 					IndirectVolFlowRateUser = EvapCond( EvapCoolNum ).IndirectVolFlowRate;
-					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName,
 						"Design Size Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateDes,
 						"User-Specified Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateUser );
 					if ( DisplayExtraWarnings ) {
@@ -1099,7 +1154,7 @@ namespace EvaporativeCoolers {
 			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
-					//ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName, 
+					//ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName,
 						//"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
 				//}
 			} else {  // Autosize or hardsize with design data
@@ -1112,11 +1167,11 @@ namespace EvaporativeCoolers {
 			}
 		} else if ( CurZoneEqNum > 0 ) { //zone equipment
 			// zone equip evap coolers
-			
+
 			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
-				//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
+				//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName,
 				//"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
 				//}
 			} else {  // Autosize or hardsize with design data
@@ -1129,20 +1184,18 @@ namespace EvaporativeCoolers {
 		if ( !HardSizeNoDesRun ) {
 			if ( IsAutoSize ) {
 				EvapCond( EvapCoolNum ).VolFlowRate = volFlowRateDes;
-				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
-				//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
-					//"Design Size Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
-
 				// only these two evap coolers has primary air design flow rate
-				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial || EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial  ) {
-					ReportSizingOutput( CompType, EvapCond( EvapCoolNum ).EvapCoolerName, "Design Size Primary Air Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
+					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
+				} else if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
+					ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
 				}
-
 			} else {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
 				//if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 && IndirectVolFlowRateDes > 0.0 ) {
 					//IndirectVolFlowRateUser = EvapCond( EvapCoolNum ).IndirectVolFlowRate;
-					//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					//ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName,
 						//"Design Size Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateDes,
 						//"User-Specified Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateUser );
 					//if ( DisplayExtraWarnings ) {
@@ -1202,7 +1255,7 @@ namespace EvaporativeCoolers {
 					IndirectVolFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
 					// Face air velocity of 3m/s is assumed
 					PadAreaDes = IndirectVolFlowRateDes / 3.0;
-				}				
+				}
 			} else {
 
 			}
@@ -1210,7 +1263,7 @@ namespace EvaporativeCoolers {
 			if ( !HardSizeNoDesRun ) {
 				if ( IsAutoSize ) {
 					EvapCond( EvapCoolNum ).PadArea = PadAreaDes;
-					ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
 						"Design Size Celdek Pad Area [m2]", PadAreaDes );
 				} else {
 					if ( EvapCond( EvapCoolNum ).PadArea > 0.0 && PadAreaDes > 0.0 ) {
@@ -1238,19 +1291,19 @@ namespace EvaporativeCoolers {
 			if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
 				HardSizeNoDesRun = true;
 			}
-			// The following regression equation is used to determine pad depth, 
-			// assuming saturation effectiveness of 70% and face air velocity of 3m/s: 
+			// The following regression equation is used to determine pad depth,
+			// assuming saturation effectiveness of 70% and face air velocity of 3m/s:
 			// Effectiveness = 0.792714 + 0.958569D - 0.25193V - 1.03215D^2 + 0.0262659V^2 + 0.914869DV -
 			// 1.48241VD^2 - 0.018992V^3D + 1.13137D^3V + 0.0327622V^3D^2 - 0.145384D^3V^2
 			PadDepthDes = 0.17382;
 			if ( IsAutoSize ) {
 				EvapCond( EvapCoolNum ).PadDepth = PadDepthDes;
-				ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName, 
+				ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
 					"Design Size Celdek Pad Depth [m]", PadDepthDes );
 			} else {
 				if ( EvapCond( EvapCoolNum ).PadDepth > 0.0 && PadDepthDes > 0.0 ) {
 					PadDepthUser = EvapCond( EvapCoolNum ).PadDepth;
-					ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					ReportSizingOutput( "EvaporativeCooler:Direct:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
 						"Design Size Celdek Pad Depth [m]", PadDepthDes, "User-Specified Celdek Pad Depth [m]", PadDepthUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( PadDepthDes - PadDepthUser ) / PadDepthUser ) > AutoVsHardSizingThreshold ) {
@@ -1265,7 +1318,7 @@ namespace EvaporativeCoolers {
 				}
 			}
 		}
-		
+
 		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectCELDEKPAD ) {
 			IsAutoSize = false;
 
@@ -1281,7 +1334,7 @@ namespace EvaporativeCoolers {
 				// search for this component in Air loop branches.
 				for ( AirSysBranchLoop = 1; AirSysBranchLoop <= PrimaryAirSystem( CurSysNum ).NumBranches; ++AirSysBranchLoop) {
 					for ( BranchComp = 1; BranchComp <= PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).TotalComponents; ++BranchComp ) {
-						if ( SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name, 
+						if ( SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name,
 							EvapCond( EvapCoolNum ).EvapCoolerName ) ) {
 							CoolerOnMainAirLoop = true;
 						}
@@ -1328,7 +1381,7 @@ namespace EvaporativeCoolers {
 			if ( !HardSizeNoDesRun ) {
 				if ( IsAutoSize ) {
 					EvapCond( EvapCoolNum ).IndirectPadArea = PadAreaDes;
-					ReportSizingOutput( "EvaporativeCooler:Indirect:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName, 
+					ReportSizingOutput( "EvaporativeCooler:Indirect:CelDekPad", EvapCond( EvapCoolNum ).EvapCoolerName,
 						"Design Size Celdek Pad Area [m2]", PadAreaDes );
 				} else {
 					if ( EvapCond( EvapCoolNum ).IndirectPadArea > 0.0 && PadAreaDes > 0.0 ) {
@@ -1353,8 +1406,8 @@ namespace EvaporativeCoolers {
 			if ( EvapCond( EvapCoolNum ).IndirectPadDepth == AutoSize ) {
 				IsAutoSize = true;
 			}
-			// The following regression equation is used to determine pad depth, 
-			// assuming saturation effectiveness of 70% and face air velocity of 3m/s: 
+			// The following regression equation is used to determine pad depth,
+			// assuming saturation effectiveness of 70% and face air velocity of 3m/s:
 			// Effectiveness = 0.792714 + 0.958569D - 0.25193V - 1.03215D^2 + 0.0262659V^2 + 0.914869DV -
 			// 1.48241VD^2 - 0.018992V^3D + 1.13137D^3V + 0.0327622V^3D^2 - 0.145384D^3V^2
 
@@ -1394,7 +1447,7 @@ namespace EvaporativeCoolers {
 				ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
 			}
 		}
-		
+
 		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
 			// recirculating water pump sizing: Primary Air Design flow Rate (m3/s) * Pump Sizing Factor (W/(m3/s)
 			if ( EvapCond( EvapCoolNum ).RecircPumpPower == AutoSize ) {
@@ -1402,7 +1455,7 @@ namespace EvaporativeCoolers {
 				ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).RecircPumpPower );
 			}
 		}
-		
+
 	}
 
 	// End Initialization Section of the Module
@@ -1953,7 +2006,6 @@ namespace EvaporativeCoolers {
 
 		// Using/Aliasing
 		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::OutBaroPress;
 		using CurveManager::CurveValue;
 
@@ -2206,7 +2258,6 @@ namespace EvaporativeCoolers {
 
 		// Using/Aliasing
 		using DataEnvironment::OutDryBulbTemp;
-		using DataEnvironment::OutWetBulbTemp;
 		using DataEnvironment::OutBaroPress;
 		using CurveManager::CurveValue;
 		using General::SolveRegulaFalsi;
@@ -3653,7 +3704,7 @@ namespace EvaporativeCoolers {
 		for ( UnitLoop = 1; UnitLoop <= NumZoneEvapUnits; ++UnitLoop ) {
 
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Rate [W]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Rate [W]", ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
 			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Heating Rate [W]", ZoneEvapUnit( UnitLoop ).UnitLatentHeatingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
@@ -3908,7 +3959,7 @@ namespace EvaporativeCoolers {
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		Real64 TempSize; // autosized value of coil input field
-		int FieldNum = 1; // IDD numeric field number where input field description is found
+		int FieldNum; // IDD numeric field number where input field description is found
 		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
@@ -4560,29 +4611,6 @@ namespace EvaporativeCoolers {
 
 	//        End of Reporting subroutines for the EvaporativeCoolers Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // EvaporativeCoolers
 

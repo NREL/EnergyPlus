@@ -22,7 +22,7 @@ debug = False
 
 def usage():
     print("""Script should be called with 4 positional arguments:
- - the path to a repository 
+ - the path to a repository
  - the path to a markdown output file
  - the path to a html output file
  - the path to a local git executable
@@ -68,6 +68,16 @@ for valid_pr_type in ValidPRTypes:
 query_args = urlencode({'access_token': github_token})
 # use the GitHub API to get pull request info
 for pr_num in pr_numbers:
+
+    # we need to skip very low numbers of pull requests, for example:
+    # - a user wants to contribute a change to E+, so they create a fork/branch
+    # - their operations result in a pull request into their own repo, so the counting starts at #1...
+    # we're at like 5000+, so if we just skip anything less than 1000, we'll be good.
+    # And look, I am even using lambdas to prove I don't hate them
+    expected_good_num = lambda n : int(pr_num) < 1000
+    if expected_good_num(pr_num):
+        continue
+
     # set the url for this pull request
     github_url = "https://api.github.com/repos/NREL/EnergyPlus/issues/" + pr_num + '?' + query_args
 
@@ -85,15 +95,19 @@ for pr_num in pr_numbers:
     # mine the data
     title = j['title']
     labels = j['labels']
-    if len(labels) != 1:
-        print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels (%i)...expected 1" % (
-            pr_num, title, len(labels)))
-    else:
-        key = 'Unknown'
-        first_label_name = labels[0]['name']
-        if first_label_name in ValidPRTypes:
-            key = first_label_name
-        PRS[key].append([pr_num, title])
+    for label in labels:
+		key = 'Unknown'
+		label_name = label['name']
+		if label_name in ValidPRTypes:
+			PRS[label_name].append([pr_num, title])
+    #if len(labels) != 1:
+        #print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels (%i)...expected 1" % (pr_num, title, len(labels)))
+    #else:
+        #key = 'Unknown'
+        #first_label_name = labels[0]['name']
+        #if first_label_name in ValidPRTypes:
+            #key = first_label_name
+        #PRS[key].append([pr_num, title])
 
 # Now write the nice markdown output file
 with io.open(md_file, 'w') as f:
@@ -107,7 +121,7 @@ with io.open(md_file, 'w') as f:
             out(' - [#' + pr[0] + '](' + EPlusRepoPath + '/pull/' + pr[0] + ') : ' + pr[1])
 
     out('# ChangeLog')
-    out('Consists of pull requests merged in GitHub since the last release.')
+    out('Consists of pull requests merged in since the last release.')
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')
@@ -146,7 +160,7 @@ with io.open(html_file, 'w') as f2:
     out('}')
     out('</style>')
     out('<h1>EnergyPlus ChangeLog</h1>')
-    out('This file is auto-generated from merged pull requests on GitHub.')
+    out('This file is auto-generated from merged pull requests in the repository.')
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')

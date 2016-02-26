@@ -1,4 +1,63 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 #include <string>
 
@@ -7,7 +66,6 @@
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -31,6 +89,7 @@
 #include <DataSystemVariables.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingDevices.hh>
+#include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <EconomicTariff.hh>
 #include <EMSManager.hh>
@@ -46,6 +105,7 @@
 #include <ScheduleManager.hh>
 #include <SolarShading.hh>
 #include <SurfaceGeometry.hh>
+#include <SurfaceOctree.hh>
 #include <UtilityRoutines.hh>
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
@@ -281,6 +341,18 @@ namespace HeatBalanceManager {
 		// Get the heat balance input at the beginning of the simulation only
 		if ( ManageHeatBalanceGetInputFlag ) {
 			GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+
+			// Surface octree setup
+			//  The surface octree holds live references to surfaces so it must be updated
+			//   if in the future surfaces are altered after this point
+			if ( TotSurfaces >= DaylightingManager::octreeCrossover ) { // Octree can be active
+				if ( GetNumObjectsFound( "Daylighting:Controls" ) > 0 ) { // Daylighting is active
+					surfaceOctree.init( DataSurfaces::Surface ); // Set up surface octree
+				}
+			}
+
+			for ( auto & surface : DataSurfaces::Surface ) surface.set_computed_geometry(); // Set up extra surface geometry info for PierceSurface
+
 			ManageHeatBalanceGetInputFlag = false;
 		}
 
@@ -477,7 +549,7 @@ namespace HeatBalanceManager {
 				Construct( CNum ).IsUsed = true;
 			}
 		}
-		Unused = TotConstructs - count( Construct.IsUsed() );
+		Unused = TotConstructs - std::count_if( Construct.begin(), Construct.end(), []( DataHeatBalance::ConstructionData const & e ){ return e.IsUsed; } );
 		if ( Unused > 0 ) {
 			if ( ! DisplayExtraWarnings ) {
 				ShowWarningError( "CheckUsedConstructions: There are " + RoundSigDigits( Unused ) + " nominally unused constructions in input." );
@@ -661,12 +733,12 @@ namespace HeatBalanceManager {
 		static gio::Fmt Format_724( "('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')" );
 		static gio::Fmt Format_726( "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')" );
 		static gio::Fmt Format_727( "(' Zone Air Solution Algorithm, ',A)" );
-		static gio::Fmt Format_728( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')" );
+		static gio::Fmt Format_728( "('! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')" );
 		static gio::Fmt Format_730( "(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)" );
-		static gio::Fmt Format_729( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
+		static gio::Fmt Format_729( "('! <Zone Air Generic Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
 		static gio::Fmt Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
-		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Simulation {Yes/No}')");
-		static gio::Fmt Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A)");
+		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration {AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')" );
+		static gio::Fmt Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)" );
 
 		//Assign the values to the building data
 
@@ -1094,51 +1166,81 @@ namespace HeatBalanceManager {
 		// A new object is added by B. Nigusse, 02/14
 		CurrentModuleObject = "ZoneAirMassFlowConservation";
 		NumObjects = GetNumObjectsFound(CurrentModuleObject);
+		ZoneAirMassFlow.EnforceZoneMassBalance = false;
 
 		if ( NumObjects > 0 ) {
 			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( NumAlpha > 0 ) {
 				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
 				if ( SELECT_CASE_var == "YES" ) {
+					ZoneAirMassFlow.BalanceMixing = true;
 					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+					AlphaName( 1 ) = "Yes";
 				} else if ( SELECT_CASE_var == "NO" ) {
-					ZoneAirMassFlow.EnforceZoneMassBalance = false;
+					ZoneAirMassFlow.BalanceMixing = false;
+					AlphaName( 1 ) = "No";
 				} else {
-					ZoneAirMassFlow.EnforceZoneMassBalance = false;
-					AlphaName(1) = "NO";
-					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO" );
+					ZoneAirMassFlow.BalanceMixing = false;
+					AlphaName(1) = "No";
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = No" );
 				}}
 			}
 			if ( NumAlpha > 1 ) {
 				{ auto const SELECT_CASE_var( AlphaName( 2 ) );
 				if ( SELECT_CASE_var == "ADDINFILTRATIONFLOW" ) {
-					ZoneAirMassFlow.InfiltrationTreatment = true;
+					ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+					AlphaName( 2 ) = "AddInfiltrationFlow";
 					if ( !Contaminant.CO2Simulation ) Contaminant.SimulateContaminants = true;
 				} else if ( SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW" ) {
-					ZoneAirMassFlow.InfiltrationTreatment = 2;
+					ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
+					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+					AlphaName( 2 ) = "AddInfiltrationFlow";
+					if ( !Contaminant.CO2Simulation ) Contaminant.SimulateContaminants = true;
+				} else if ( SELECT_CASE_var == "NONE" ) {
+					ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
+					AlphaName( 2 ) = "None";
 				} else {
-					ZoneAirMassFlow.InfiltrationTreatment = 1;
-					AlphaName(2) = "ADDINFILTRATIONFLOW";
-					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = NO" );
+					ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+					AlphaName( 2 ) = "AddInfiltrationFlow";
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = AddInfiltrationFlow" );
 				}}
 			} else {
-				ZoneAirMassFlow.InfiltrationTreatment = 1;
-				AlphaName(2) = "ADDINFILTRATIONFLOW";
+				ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+				ZoneAirMassFlow.EnforceZoneMassBalance = true;
+				AlphaName( 2 ) = "AddInfiltrationFlow";
+			}
+			if ( ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow ) {
+				AlphaName( 3 ) = "N/A";
+			} else {
+				if ( NumAlpha > 2 ) {
+						{ auto const SELECT_CASE_var( AlphaName( 3 ) );
+						if ( SELECT_CASE_var == "MIXINGSOURCEZONESONLY" ) {
+							ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+							AlphaName( 3 ) = "MixingSourceZonesOnly";
+						} else if ( SELECT_CASE_var == "ALLZONES" ) {
+							ZoneAirMassFlow.InfiltrationZoneType = AllZones;
+							AlphaName( 3 ) = "AllZones";
+						} else {
+							ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+							AlphaName( 3 ) = "MixingSourceZonesOnly";
+							ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames( 3 ) + ". The default choice is assigned = MixingSourceZonesOnly" );
+						}}
+				} else {
+					ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+					AlphaName( 3 ) = "MixingSourceZonesOnly";
+				}
 			}
 		} else {
 			ZoneAirMassFlow.EnforceZoneMassBalance = false;
-			AlphaName(1) = "NO";
 		}
-		//// allocate if the global variable ZoneAirMassFlow is ON
-		//if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
-		//	MassConservation.allocate( NumOfZones );
-		//}
 
 		gio::write( OutputFileInits, Format_732 );
 		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
-			gio::write( OutputFileInits, Format_733 ) << "Yes";
+			gio::write( OutputFileInits, Format_733 ) << "Yes" << AlphaName( 1 ) << AlphaName( 2 ) << AlphaName( 3 );
 		} else {
-			gio::write( OutputFileInits, Format_733 ) << "No";
+			gio::write( OutputFileInits, Format_733 ) << "No" << "N/A" << "N/A" << "N/A";
 		}
 
 	}
@@ -3618,19 +3720,22 @@ namespace HeatBalanceManager {
 		Construct.allocate( TotConstructs );
 		//Note: If TotWindow5Constructs > 0, additional constructions are created in
 		//subr. SearchWindow5DataFile corresponding to those found on the data file.
-		//Initialize CTF and History terms.
-		Construct.NumCTFTerms() = 0;
-		Construct.NumHistories() = 0;
+		for ( auto & e : Construct ) {
+			// Initialize CTF and History terms
+			e.NumCTFTerms = 0;
+			e.NumHistories = 0;
 
-		//Initialize some heat source/sink variables
-		Construct.SourceSinkPresent() = false; // "default" is no source or sink present
-		Construct.SolutionDimensions() = 1; // "default" is 1-D heat transfer
-		Construct.SourceAfterLayer() = 0; // this has no meaning if a source/sink is not present
-		Construct.TempAfterLayer() = 0; // this has no meaning if a source/sink is not present
-		Construct.ThicknessPerpend() = 0.0; // this has no meaning if a source/sink is not present
+			// Initialize some heat source/sink variables
+			e.SourceSinkPresent = false; // "default" is no source or sink present
+			e.SolutionDimensions = 1; // "default" is 1-D heat transfer
+			e.SourceAfterLayer = 0; // this has no meaning if a source/sink is not present
+			e.TempAfterLayer = 0; // this has no meaning if a source/sink is not present
+			e.ThicknessPerpend = 0.0; // this has no meaning if a source/sink is not present
 
-		Construct.W5FrameDivider() = 0;
-		Construct.FromWindow5DataFile() = false;
+			e.W5FrameDivider = 0;
+			e.FromWindow5DataFile = false;
+		}
+
 
 		ConstrNum = 0;
 
@@ -3762,7 +3867,7 @@ namespace HeatBalanceManager {
 				ShowContinueError( "Construction=" + Construct( TotRegConstructs + ConstrNum ).Name + " is affected." );
 				Construct( TotRegConstructs + ConstrNum ).SolutionDimensions = 1;
 			}
-			Construct( TotRegConstructs + ConstrNum ).ThicknessPerpend = DummyProps( 4 );
+			Construct( TotRegConstructs + ConstrNum ).ThicknessPerpend = DummyProps( 4 ) / 2.0;
 
 			//Set the total number of layers for the construction
 			Construct( TotRegConstructs + ConstrNum ).TotLayers = ConstructNumAlpha - 1;
@@ -4472,8 +4577,10 @@ namespace HeatBalanceManager {
 			MaxLoadZoneRpt = 0.0;
 			CountWarmupDayPoints = 0;
 
-			SurfaceWindow.ThetaFace() = 296.15;
-			SurfaceWindow.EffInsSurfTemp() = 23.0;
+			for ( auto & e : SurfaceWindow ) {
+				e.ThetaFace = 296.15;
+				e.EffInsSurfTemp = 23.0;
+			}
 
 		}
 
@@ -4578,7 +4685,6 @@ namespace HeatBalanceManager {
 		MCPTM.dimension( NumOfZones, 0.0 );
 		MixingMassFlowZone.dimension( NumOfZones, 0.0 );
 		MixingMassFlowXHumRat.dimension( NumOfZones, 0.0 );
-		ZoneMassBalanceRepVarFlag.dimension( NumOfZones, true );
 		ZoneReOrder.allocate( NumOfZones );
 		ZoneMassBalanceFlag.dimension( NumOfZones, false );
 		ZoneInfiltrationFlag.dimension( NumOfZones, false );
@@ -5051,6 +5157,7 @@ namespace HeatBalanceManager {
 		using namespace DataReportingFlags;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksHVACSizeDesignDay;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -5073,7 +5180,7 @@ namespace HeatBalanceManager {
 		// Time step level reporting:
 
 		ReportScheduleValues();
-		if ( ! WarmupFlag && DoOutputReporting ) {
+		if ( !WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
 			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
@@ -8054,31 +8161,6 @@ Label1000: ;
 		if ( ErrorsFound ) ShowFatalError( "Error in complex fenestration input." );
 
 	}
-
-	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HeatBalanceManager
 

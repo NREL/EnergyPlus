@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -18,6 +18,16 @@
 
 namespace ObjexxFCL {
 namespace fmt {
+
+// Globals
+fmt::Binary_num_put * binary_num_put( new fmt::Binary_num_put );
+fmt::Exponent_num_put * exponent_num_put( new fmt::Exponent_num_put );
+fmt::Engineering_num_put * engineering_num_put( new fmt::Engineering_num_put );
+fmt::Scientific_num_put * scientific_num_put( new fmt::Scientific_num_put );
+std::locale const binary_locale( std::locale(), binary_num_put );
+std::locale const exponent_locale( std::locale(), exponent_num_put );
+std::locale const engineering_locale( std::locale(), engineering_num_put );
+std::locale const scientific_locale( std::locale(), scientific_num_put );
 
 // Input /////
 

@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef Furnaces_hh_INCLUDED
 #define Furnaces_hh_INCLUDED
 
@@ -372,297 +430,15 @@ namespace Furnaces {
 			WaterCyclingMode( 0 )
 		{}
 
-		// Member Constructor
-		FurnaceEquipConditions(
-			std::string const & Name, // Name of the Furnace
-			int const FurnaceType_Num, // Numeric Equivalent for Furnace Type
-			int const FurnaceIndex, // Index to furnace
-			int const SchedPtr, // Index to furnace operating schedule
-			int const FanSchedPtr, // Index to fan operating mode schedule
-			int const FanAvailSchedPtr, // Index to fan availability schedule
-			int const ControlZoneNum, // Index to controlled zone
-			int const ZoneSequenceCoolingNum, // Index to cooling sequence/priority for this zone
-			int const ZoneSequenceHeatingNum, // Index to heating sequence/priority for this zone
-			int const CoolingCoilType_Num, // Numeric Equivalent for Cooling Coil Type
-			int const CoolingCoilIndex, // Index to cooling coil
-			int const ActualDXCoilIndexForHXAssisted, // Index to DX cooling coil when HX assisted
-			bool const CoolingCoilUpstream, // Indicates if cooling coil is upstream of heating coil
-			int const HeatingCoilType_Num, // Numeric Equivalent for Heating Coil Type
-			int const HeatingCoilIndex, // Index to heating coil
-			int const ReheatingCoilType_Num, // Numeric Equivalent for Reheat Coil Type
-			int const ReheatingCoilIndex, // Index to reheat coil
-			std::string const & HeatingCoilName, // name of heating coil
-			std::string const & HeatingCoilType, // type of heating coil
-			int const CoilControlNode, // control node for hot water and steam heating coils
-			int const HWCoilAirInletNode, // air inlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
-			int const HWCoilAirOutletNode, // air outlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
-			int const SuppCoilAirInletNode, // air inlet node number of HW coil for HeatCool Reheat Coil
-			int const SuppCoilAirOutletNode, // air outlet node number of HW coil for HeatCool Reheat Coil
-			int const SuppHeatCoilType_Num, // Numeric Equivalent for Supplemental Heat Coil Type
-			int const SuppHeatCoilIndex, // Index to supplemental heater
-			int const SuppCoilControlNode, // control node for steam and hot water heating coil
-			std::string const & SuppHeatCoilName, // name of supplemental heating coil
-			std::string const & SuppHeatCoilType, // type of supplemental heating coil
-			int const FanType_Num, // Integer equivalent of fan type (1=OnOff, 2 = ConstVolume)
-			int const FanIndex, // Index to fan object
-			int const FurnaceInletNodeNum, // Furnace inlet node number
-			int const FurnaceOutletNodeNum, // Furnace inlet node number
-			int const OpMode, // operation mode: 1 = cycling fan, cycling coils
-			int const LastMode, // last mode of operation, coolingmode or heatingmode
-			int const AirFlowControl, // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
-			int const FanPlace, // fan placement; 1=blow through, 2=draw through
-			int const NodeNumOfControlledZone, // Node number of controlled zone air node
-			int const WatertoAirHPType, // Type of water to air heat pump model used
-			Real64 const CoolingConvergenceTolerance, // Convergence tolerance for cooling,
-			Real64 const HeatingConvergenceTolerance, // Convergence tolerance for heating,
-			Real64 const DesignHeatingCapacity, // Nominal Capacity of Heating Coil [W]
-			Real64 const DesignCoolingCapacity, // Nominal Capacity of Cooling Coil [W]
-			Real64 const CoolingCoilSensDemand, // Sensible demand on Cooling Coil [W]
-			Real64 const HeatingCoilSensDemand, // Sensible demand on Heating Coil [W]
-			Real64 const CoolingCoilLatentDemand, // Latent demand on Cooling Coil [W]
-			Real64 const DesignSuppHeatingCapacity, // Nominal Capacity of Supplemental Heating Coil [W]
-			Real64 const DesignFanVolFlowRate, // Vol Flow through the Furnace being Simulated [m**3/Sec]
-			bool const DesignFanVolFlowRateEMSOverrideOn, // if true, then EMS is calling to override autosize fan flow
-			Real64 const DesignFanVolFlowRateEMSOverrideValue, // EMS value for override of fan flow rate autosize [m3/s]
-			Real64 const DesignMassFlowRate, // Design mass flow rate through furnace [kg/s]
-			Real64 const MaxCoolAirVolFlow, // supply air volumetric flow rate during cooling operation [m3/s]
-			bool const MaxCoolAirVolFlowEMSOverrideOn, // if true, EMS is calling to override autosize flow during cooling
-			Real64 const MaxCoolAirVolFlowEMSOverrideValue, // EMS value for override of flow during cooling [m3/s]
-			Real64 const MaxHeatAirVolFlow, // supply air volumetric flow rate during cooling operation [m3/s]
-			bool const MaxHeatAirVolFlowEMSOverrideOn, // if true, EMS is calling to override autosize flow during heating
-			Real64 const MaxHeatAirVolFlowEMSOverrideValue, // EMS value for override of flow during heating operation [m3/s]
-			Real64 const MaxNoCoolHeatAirVolFlow, // supply air volumetric flow rate when no cooling or heating [m3/s]
-			bool const MaxNoCoolHeatAirVolFlowEMSOverrideOn, // if true, EMS is calling to override autosize no heatcool rate
-			Real64 const MaxNoCoolHeatAirVolFlowEMSOverrideValue, // EMS value for override of flow during no heat cool [m3/s]
-			Real64 const MaxCoolAirMassFlow, // supply air mass flow rate during cooling operation [kg/s]
-			Real64 const MaxHeatAirMassFlow, // supply air mass flow rate during heating operation [kg/s]
-			Real64 const MaxNoCoolHeatAirMassFlow, // supply air mass flow rate when no cooling or heating [kg/s]
-			Real64 const MaxHeatCoilFluidFlow, // water or steam mass flow rate for heating coil [kg/s]
-			Real64 const MaxSuppCoilFluidFlow, // water or steam mass flow rate for supplemental heating coil [kg/s]
-			Real64 const ControlZoneMassFlowFrac, // Fraction of furnace flow to control zone
-			Real64 const DesignMaxOutletTemp, // Maximum supply air temperature from furnace heater [C]
-			Real64 const MdotFurnace, // Mass flow rate through furnace [kg/s]
-			Real64 const FanPartLoadRatio, // Part load ratio of furnace fan (mdot actual/mdot design)
-			Real64 const CompPartLoadRatio, // Part load ratio of furnace compressor (load / steady-state output)
-			Real64 const WSHPRuntimeFrac, // Runtime fraction of water source heat pump
-			Real64 const CoolPartLoadRatio, // Cooling part load ratio
-			Real64 const HeatPartLoadRatio, // Heating part load ratio
-			Real64 const MinOATCompressor, // Minimum outdoor operating temperature for heat pump compressor
-			Real64 const MaxOATSuppHeat, // Maximum outdoor dry-bulb temperature for
-			int const CondenserNodeNum, // Node number of outdoor condenser/compressor
-			Real64 const MaxONOFFCyclesperHour, // Maximum ON/OFF Cycling Rate [cycles/hr]
-			Real64 const HPTimeConstant, // Heat Pump Time Constant [s]
-			Real64 const OnCyclePowerFraction, // Fraction of on-cycle power use [~]
-			Real64 const FanDelayTime, // Fan delay time, time delay for the HP's fan to
-			bool const Humidistat, // Humidistat control (heatcool units only and not heatpump)
-			bool const InitHeatPump, // Heat pump initialization flag (for error reporting)
-			int const DehumidControlType_Num, // 0 = None, 1=MultiMode, 2=CoolReheat
-			int const LatentMaxIterIndex, // Index to recurring warning message
-			int const LatentRegulaFalsiFailedIndex, // Index to recurring warning message
-			int const LatentRegulaFalsiFailedIndex2, // Index to recurring warning message
-			int const SensibleMaxIterIndex, // Index to recurring warning message
-			int const SensibleRegulaFalsiFailedIndex, // Index to recurring warning message
-			int const WSHPHeatMaxIterIndex, // Index to recurring warning message
-			int const WSHPHeatRegulaFalsiFailedIndex, // Index to recurring warning message
-			int const DXHeatingMaxIterIndex, // Index to recurring warning message
-			int const DXHeatingRegulaFalsiFailedIndex, // Index to recurring warning messages
-			int const HeatingMaxIterIndex, // Index to recurring warning message
-			int const HeatingMaxIterIndex2, // Index to recurring warning message
-			int const HeatingRegulaFalsiFailedIndex, // Index to recurring warning messages
-			Real64 const ActualFanVolFlowRate, // Volumetric flow rate from fan object
-			Real64 const HeatingSpeedRatio, // Fan speed ratio in heating mode
-			Real64 const CoolingSpeedRatio, // Fan speed ratio in cooling mode
-			Real64 const NoHeatCoolSpeedRatio, // Fan speed ratio when no cooling or heating
-			int const ZoneInletNode, // Zone inlet node number in the controlled zone
-			Real64 const SenLoadLoss, // Air distribution system sensible loss
-			Real64 const LatLoadLoss, // Air distribution system latent loss
-			Real64 const SensibleLoadMet, // System sensible load
-			Real64 const LatentLoadMet, // System latent load
-			Real64 const DehumidInducedHeatingDemandRate, // Additional heating demand on supplemental heater
-			int const CoilOutletNode, // outlet node for hot water and steam heating coil
-			int const LoopNum, // plant loop index for water and steam heating coil
-			int const LoopSide, // plant loop side  index for water and steam heating coil
-			int const BranchNum, // plant loop branch index for water and steam heating coil
-			int const CompNum, // plant loop component index for water and steam heating coil
-			int const SuppCoilOutletNode, // outlet node for hot water and steam supplemental heating coil
-			int const LoopNumSupp, // plant loop index for water and steam supplemental heating coil
-			int const LoopSideSupp, // plant loop side  index for  water and steam supplemental heating coil
-			int const BranchNumSupp, // plant loop branch index for water and steam supplemental heating coil
-			int const CompNumSupp, // plant loop component index for water and steam supplemental heating coil
-			int const HotWaterCoilMaxIterIndex, // Index to recurring warning message
-			int const HotWaterCoilMaxIterIndex2, // Index to recurring warning message
-			bool const EMSOverrideSensZoneLoadRequest, // if true, then EMS is calling to override zone load
-			Real64 const EMSSensibleZoneLoadValue, // Value EMS is directing to use
-			bool const EMSOverrideMoistZoneLoadRequest, // if true, then EMS is calling to override zone load
-			Real64 const EMSMoistureZoneLoadValue, // Value EMS is directing to use
-			int const HeatCoolMode, // System operating mode (0 = floating, 1 = cooling, 2 = heating)
-			int const NumOfSpeedCooling, // The number of speeds for cooling
-			int const NumOfSpeedHeating, // The number of speeds for heating
-			Real64 const IdleSpeedRatio, // idle air fan ratio
-			Real64 const IdleVolumeAirRate, // idle air flow rate
-			Real64 const IdleMassFlowRate, // idle air flow rate
-			Real64 const FanVolFlow, // fan volumetric flow rate
-			bool const CheckFanFlow, // Supply airflow check
-			Array1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
-			Array1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
-			Array1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
-			Array1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
-			Array1< Real64 > const & MSHeatingSpeedRatio, // Fan speed ratio in heating mode
-			Array1< Real64 > const & MSCoolingSpeedRatio, // Fan speed ratio in cooling mode
-			int const CompSpeedNum,
-			Real64 const CompSpeedRatio,
-			int const ErrIndexCyc,
-			int const ErrIndexVar,
-			int const WaterCyclingMode // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
-		) :
-			Name( Name ),
-			FurnaceType_Num( FurnaceType_Num ),
-			FurnaceIndex( FurnaceIndex ),
-			SchedPtr( SchedPtr ),
-			FanSchedPtr( FanSchedPtr ),
-			FanAvailSchedPtr( FanAvailSchedPtr ),
-			ControlZoneNum( ControlZoneNum ),
-			ZoneSequenceCoolingNum( ZoneSequenceCoolingNum ),
-			ZoneSequenceHeatingNum( ZoneSequenceHeatingNum ),
-			CoolingCoilType_Num( CoolingCoilType_Num ),
-			CoolingCoilIndex( CoolingCoilIndex ),
-			ActualDXCoilIndexForHXAssisted( ActualDXCoilIndexForHXAssisted ),
-			CoolingCoilUpstream( CoolingCoilUpstream ),
-			HeatingCoilType_Num( HeatingCoilType_Num ),
-			HeatingCoilIndex( HeatingCoilIndex ),
-			ReheatingCoilType_Num( ReheatingCoilType_Num ),
-			ReheatingCoilIndex( ReheatingCoilIndex ),
-			HeatingCoilName( HeatingCoilName ),
-			HeatingCoilType( HeatingCoilType ),
-			CoilControlNode( CoilControlNode ),
-			HWCoilAirInletNode( HWCoilAirInletNode ),
-			HWCoilAirOutletNode( HWCoilAirOutletNode ),
-			SuppCoilAirInletNode( SuppCoilAirInletNode ),
-			SuppCoilAirOutletNode( SuppCoilAirOutletNode ),
-			SuppHeatCoilType_Num( SuppHeatCoilType_Num ),
-			SuppHeatCoilIndex( SuppHeatCoilIndex ),
-			SuppCoilControlNode( SuppCoilControlNode ),
-			SuppHeatCoilName( SuppHeatCoilName ),
-			SuppHeatCoilType( SuppHeatCoilType ),
-			FanType_Num( FanType_Num ),
-			FanIndex( FanIndex ),
-			FurnaceInletNodeNum( FurnaceInletNodeNum ),
-			FurnaceOutletNodeNum( FurnaceOutletNodeNum ),
-			OpMode( OpMode ),
-			LastMode( LastMode ),
-			AirFlowControl( AirFlowControl ),
-			FanPlace( FanPlace ),
-			NodeNumOfControlledZone( NodeNumOfControlledZone ),
-			WatertoAirHPType( WatertoAirHPType ),
-			CoolingConvergenceTolerance( CoolingConvergenceTolerance ),
-			HeatingConvergenceTolerance( HeatingConvergenceTolerance ),
-			DesignHeatingCapacity( DesignHeatingCapacity ),
-			DesignCoolingCapacity( DesignCoolingCapacity ),
-			CoolingCoilSensDemand( CoolingCoilSensDemand ),
-			HeatingCoilSensDemand( HeatingCoilSensDemand ),
-			CoolingCoilLatentDemand( CoolingCoilLatentDemand ),
-			DesignSuppHeatingCapacity( DesignSuppHeatingCapacity ),
-			DesignFanVolFlowRate( DesignFanVolFlowRate ),
-			DesignFanVolFlowRateEMSOverrideOn( DesignFanVolFlowRateEMSOverrideOn ),
-			DesignFanVolFlowRateEMSOverrideValue( DesignFanVolFlowRateEMSOverrideValue ),
-			DesignMassFlowRate( DesignMassFlowRate ),
-			MaxCoolAirVolFlow( MaxCoolAirVolFlow ),
-			MaxCoolAirVolFlowEMSOverrideOn( MaxCoolAirVolFlowEMSOverrideOn ),
-			MaxCoolAirVolFlowEMSOverrideValue( MaxCoolAirVolFlowEMSOverrideValue ),
-			MaxHeatAirVolFlow( MaxHeatAirVolFlow ),
-			MaxHeatAirVolFlowEMSOverrideOn( MaxHeatAirVolFlowEMSOverrideOn ),
-			MaxHeatAirVolFlowEMSOverrideValue( MaxHeatAirVolFlowEMSOverrideValue ),
-			MaxNoCoolHeatAirVolFlow( MaxNoCoolHeatAirVolFlow ),
-			MaxNoCoolHeatAirVolFlowEMSOverrideOn( MaxNoCoolHeatAirVolFlowEMSOverrideOn ),
-			MaxNoCoolHeatAirVolFlowEMSOverrideValue( MaxNoCoolHeatAirVolFlowEMSOverrideValue ),
-			MaxCoolAirMassFlow( MaxCoolAirMassFlow ),
-			MaxHeatAirMassFlow( MaxHeatAirMassFlow ),
-			MaxNoCoolHeatAirMassFlow( MaxNoCoolHeatAirMassFlow ),
-			MaxHeatCoilFluidFlow( MaxHeatCoilFluidFlow ),
-			MaxSuppCoilFluidFlow( MaxSuppCoilFluidFlow ),
-			ControlZoneMassFlowFrac( ControlZoneMassFlowFrac ),
-			DesignMaxOutletTemp( DesignMaxOutletTemp ),
-			MdotFurnace( MdotFurnace ),
-			FanPartLoadRatio( FanPartLoadRatio ),
-			CompPartLoadRatio( CompPartLoadRatio ),
-			WSHPRuntimeFrac( WSHPRuntimeFrac ),
-			CoolPartLoadRatio( CoolPartLoadRatio ),
-			HeatPartLoadRatio( HeatPartLoadRatio ),
-			MinOATCompressor( MinOATCompressor ),
-			MaxOATSuppHeat( MaxOATSuppHeat ),
-			CondenserNodeNum( CondenserNodeNum ),
-			MaxONOFFCyclesperHour( MaxONOFFCyclesperHour ),
-			HPTimeConstant( HPTimeConstant ),
-			OnCyclePowerFraction( OnCyclePowerFraction ),
-			FanDelayTime( FanDelayTime ),
-			Humidistat( Humidistat ),
-			InitHeatPump( InitHeatPump ),
-			DehumidControlType_Num( DehumidControlType_Num ),
-			LatentMaxIterIndex( LatentMaxIterIndex ),
-			LatentRegulaFalsiFailedIndex( LatentRegulaFalsiFailedIndex ),
-			LatentRegulaFalsiFailedIndex2( LatentRegulaFalsiFailedIndex2 ),
-			SensibleMaxIterIndex( SensibleMaxIterIndex ),
-			SensibleRegulaFalsiFailedIndex( SensibleRegulaFalsiFailedIndex ),
-			WSHPHeatMaxIterIndex( WSHPHeatMaxIterIndex ),
-			WSHPHeatRegulaFalsiFailedIndex( WSHPHeatRegulaFalsiFailedIndex ),
-			DXHeatingMaxIterIndex( DXHeatingMaxIterIndex ),
-			DXHeatingRegulaFalsiFailedIndex( DXHeatingRegulaFalsiFailedIndex ),
-			HeatingMaxIterIndex( HeatingMaxIterIndex ),
-			HeatingMaxIterIndex2( HeatingMaxIterIndex2 ),
-			HeatingRegulaFalsiFailedIndex( HeatingRegulaFalsiFailedIndex ),
-			ActualFanVolFlowRate( ActualFanVolFlowRate ),
-			HeatingSpeedRatio( HeatingSpeedRatio ),
-			CoolingSpeedRatio( CoolingSpeedRatio ),
-			NoHeatCoolSpeedRatio( NoHeatCoolSpeedRatio ),
-			ZoneInletNode( ZoneInletNode ),
-			SenLoadLoss( SenLoadLoss ),
-			LatLoadLoss( LatLoadLoss ),
-			SensibleLoadMet( SensibleLoadMet ),
-			LatentLoadMet( LatentLoadMet ),
-			DehumidInducedHeatingDemandRate( DehumidInducedHeatingDemandRate ),
-			CoilOutletNode( CoilOutletNode ),
-			LoopNum( LoopNum ),
-			LoopSide( LoopSide ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			SuppCoilOutletNode( SuppCoilOutletNode ),
-			LoopNumSupp( LoopNumSupp ),
-			LoopSideSupp( LoopSideSupp ),
-			BranchNumSupp( BranchNumSupp ),
-			CompNumSupp( CompNumSupp ),
-			HotWaterCoilMaxIterIndex( HotWaterCoilMaxIterIndex ),
-			HotWaterCoilMaxIterIndex2( HotWaterCoilMaxIterIndex2 ),
-			EMSOverrideSensZoneLoadRequest( EMSOverrideSensZoneLoadRequest ),
-			EMSSensibleZoneLoadValue( EMSSensibleZoneLoadValue ),
-			EMSOverrideMoistZoneLoadRequest( EMSOverrideMoistZoneLoadRequest ),
-			EMSMoistureZoneLoadValue( EMSMoistureZoneLoadValue ),
-			HeatCoolMode( HeatCoolMode ),
-			NumOfSpeedCooling( NumOfSpeedCooling ),
-			NumOfSpeedHeating( NumOfSpeedHeating ),
-			IdleSpeedRatio( IdleSpeedRatio ),
-			IdleVolumeAirRate( IdleVolumeAirRate ),
-			IdleMassFlowRate( IdleMassFlowRate ),
-			FanVolFlow( FanVolFlow ),
-			CheckFanFlow( CheckFanFlow ),
-			HeatVolumeFlowRate( MaxSpedLevels, HeatVolumeFlowRate ),
-			HeatMassFlowRate( MaxSpedLevels, HeatMassFlowRate ),
-			CoolVolumeFlowRate( MaxSpedLevels, CoolVolumeFlowRate ),
-			CoolMassFlowRate( MaxSpedLevels, CoolMassFlowRate ),
-			MSHeatingSpeedRatio( MaxSpedLevels, MSHeatingSpeedRatio ),
-			MSCoolingSpeedRatio( MaxSpedLevels, MSCoolingSpeedRatio ),
-			CompSpeedNum( CompSpeedNum ),
-			CompSpeedRatio( CompSpeedRatio ),
-			ErrIndexCyc( ErrIndexCyc ),
-			ErrIndexVar( ErrIndexVar ),
-			WaterCyclingMode( WaterCyclingMode )
-		{}
-
 	};
 
 	// Object Data
 	extern Array1D< FurnaceEquipConditions > Furnace;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimFurnace(
@@ -905,31 +681,6 @@ namespace Furnaces {
 		Real64 const MoistureLoad, // moisture load to be met (W)
 		Real64 & PartLoadRatio // coil part-load ratio
 	);
-
-	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // Furnaces
 

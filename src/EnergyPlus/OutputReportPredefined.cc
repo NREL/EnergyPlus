@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
@@ -151,6 +209,7 @@ namespace OutputReportPredefined {
 	int pdchOpUfactFilm;
 	int pdchOpUfactNoFilm;
 	int pdchOpGrArea;
+	int pdchOpNetArea;
 	int pdchOpAzimuth;
 	int pdchOpTilt;
 	int pdchOpDir;
@@ -775,6 +834,7 @@ namespace OutputReportPredefined {
 		pdchOpUfactFilm = 0;
 		pdchOpUfactNoFilm = 0;
 		pdchOpGrArea = 0;
+		pdchOpNetArea = 0;
 		pdchOpAzimuth = 0;
 		pdchOpTilt = 0;
 		pdchOpDir = 0;
@@ -1281,6 +1341,7 @@ namespace OutputReportPredefined {
 		pdchOpUfactFilm = newPreDefColumn( pdstOpaque, "U-Factor with Film [W/m2-K]" );
 		pdchOpUfactNoFilm = newPreDefColumn( pdstOpaque, "U-Factor no Film [W/m2-K]" );
 		pdchOpGrArea = newPreDefColumn( pdstOpaque, "Gross Area [m2]" );
+		pdchOpNetArea = newPreDefColumn( pdstOpaque, "Net Area [m2]" );
 		pdchOpAzimuth = newPreDefColumn( pdstOpaque, "Azimuth [deg]" );
 		pdchOpTilt = newPreDefColumn( pdstOpaque, "Tilt [deg]" );
 		pdchOpDir = newPreDefColumn( pdstOpaque, "Cardinal Direction" );
@@ -1518,7 +1579,7 @@ namespace OutputReportPredefined {
 		pdchZnClCalcDesAirFlow = newPreDefColumn( pdstZoneClSize, "Calculated Design Air Flow [m3/s]" );
 		pdchZnClUserDesAirFlow = newPreDefColumn( pdstZoneClSize, "User Design Air Flow [m3/s]" );
 		pdchZnClDesDay = newPreDefColumn( pdstZoneClSize, "Design Day Name" );
-		pdchZnClPkTime = newPreDefColumn( pdstZoneClSize, "Date/Time Of Peak" );
+		pdchZnClPkTime = newPreDefColumn( pdstZoneClSize, "Date/Time Of Peak {TIMESTAMP}" );
 		pdchZnClPkTstatTemp = newPreDefColumn( pdstZoneClSize, "Thermostat Setpoint Temperature at Peak Load [C]" );
 		pdchZnClPkIndTemp = newPreDefColumn( pdstZoneClSize, "Indoor Temperature at Peak Load [C]" );
 		pdchZnClPkIndHum = newPreDefColumn( pdstZoneClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
@@ -1534,7 +1595,7 @@ namespace OutputReportPredefined {
 		pdchZnHtCalcDesAirFlow = newPreDefColumn( pdstZoneHtSize, "Calculated Design Air Flow [m3/s]" );
 		pdchZnHtUserDesAirFlow = newPreDefColumn( pdstZoneHtSize, "User Design Air Flow [m3/s]" );
 		pdchZnHtDesDay = newPreDefColumn( pdstZoneHtSize, "Design Day Name" );
-		pdchZnHtPkTime = newPreDefColumn( pdstZoneHtSize, "Date/Time Of Peak" );
+		pdchZnHtPkTime = newPreDefColumn( pdstZoneHtSize, "Date/Time Of Peak {TIMESTAMP}" );
 		pdchZnHtPkTstatTemp = newPreDefColumn( pdstZoneHtSize, "Thermostat Setpoint Temperature at Peak Load [C]" );
 		pdchZnHtPkIndTemp = newPreDefColumn( pdstZoneHtSize, "Indoor Temperature at Peak Load [C]" );
 		pdchZnHtPkIndHum = newPreDefColumn( pdstZoneHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]" );
@@ -1556,9 +1617,9 @@ namespace OutputReportPredefined {
 		pdchPlantSizCalcVdot = newPreDefColumn( pdstPlantSize, "Coincident Design Volume Flow Rate [m3/s]" );
 		pdchPlantSizCoincYesNo = newPreDefColumn( pdstPlantSize, "Coincident Size Adjusted" );
 		pdchPlantSizDesDay = newPreDefColumn( pdstPlantSize, "Peak Sizing Period Name" );
-		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period" );
-		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day" );
-		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute" );
+		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period {TIMESTAMP}[day]" );
+		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day {TIMESTAMP}[hr]" );
+		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute {TIMESTAMP}[min]" );
 
 		// System Summary Report
 
@@ -1649,65 +1710,65 @@ namespace OutputReportPredefined {
 		pdstEMelecvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Electricity" );
 		pdchEMelecannual = newPreDefColumn( pdstEMelecvalues, "Electricity Annual Value [GJ]" );
 		pdchEMelecminvalue = newPreDefColumn( pdstEMelecvalues, "Electricity Minimum Value [W]" );
-		pdchEMelecminvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Minimum" );
+		pdchEMelecminvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMelecmaxvalue = newPreDefColumn( pdstEMelecvalues, "Electricity Maximum Value [W]" );
-		pdchEMelecmaxvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Maximum" );
+		pdchEMelecmaxvaluetime = newPreDefColumn( pdstEMelecvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Gas Sub Table
 		pdstEMgasvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Gas" );
 		pdchEMgasannual = newPreDefColumn( pdstEMgasvalues, "Gas Annual Value [GJ]" );
 		pdchEMgasminvalue = newPreDefColumn( pdstEMgasvalues, "Gas Minimum Value [W]" );
-		pdchEMgasminvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Minimum" );
+		pdchEMgasminvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMgasmaxvalue = newPreDefColumn( pdstEMgasvalues, "Gas Maximum Value [W]" );
-		pdchEMgasmaxvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Maximum" );
+		pdchEMgasmaxvaluetime = newPreDefColumn( pdstEMgasvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Cool SubTable
 		pdstEMcoolvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Cooling" );
 		pdchEMcoolannual = newPreDefColumn( pdstEMcoolvalues, "Cooling Annual Value [GJ]" );
 		pdchEMcoolminvalue = newPreDefColumn( pdstEMcoolvalues, "Cooling Minimum Value [W]" );
-		pdchEMcoolminvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Minimum" );
+		pdchEMcoolminvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMcoolmaxvalue = newPreDefColumn( pdstEMcoolvalues, "Cooling Maximum Value [W]" );
-		pdchEMcoolmaxvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Maximum" );
+		pdchEMcoolmaxvaluetime = newPreDefColumn( pdstEMcoolvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Water SubTable
 		pdstEMwatervalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Water" );
 		pdchEMwaterannual = newPreDefColumn( pdstEMwatervalues, "Annual Value [m3]" );
 		pdchEMwaterminvalue = newPreDefColumn( pdstEMwatervalues, "Minimum Value [m3/s]" );
-		pdchEMwaterminvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Minimum" );
+		pdchEMwaterminvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMwatermaxvalue = newPreDefColumn( pdstEMwatervalues, "Maximum Value [m3/s]" );
-		pdchEMwatermaxvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Maximum" );
+		pdchEMwatermaxvaluetime = newPreDefColumn( pdstEMwatervalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other KG SubTable
 		pdstEMotherKGvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other by Weight/Mass" );
 		pdchEMotherKGannual = newPreDefColumn( pdstEMotherKGvalues, "Annual Value [kg]" );
 		pdchEMotherKGminvalue = newPreDefColumn( pdstEMotherKGvalues, "Minimum Value [kg/s]" );
-		pdchEMotherKGminvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Minimum" );
+		pdchEMotherKGminvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherKGmaxvalue = newPreDefColumn( pdstEMotherKGvalues, "Maximum Value [kg/s]" );
-		pdchEMotherKGmaxvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Maximum" );
+		pdchEMotherKGmaxvaluetime = newPreDefColumn( pdstEMotherKGvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other M3 SubTable
 		pdstEMotherM3values = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other Volumetric" );
 		pdchEMotherM3annual = newPreDefColumn( pdstEMotherM3values, "Annual Value [m3]" );
 		pdchEMotherM3minvalue = newPreDefColumn( pdstEMotherM3values, "Minimum Value [m3/s]" );
-		pdchEMotherM3minvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Minimum" );
+		pdchEMotherM3minvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherM3maxvalue = newPreDefColumn( pdstEMotherM3values, "Maximum Value [m3/s]" );
-		pdchEMotherM3maxvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Maximum" );
+		pdchEMotherM3maxvaluetime = newPreDefColumn( pdstEMotherM3values, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other M3 SubTable
 		pdstEMotherLvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other Liquid/Gas" );
 		pdchEMotherLannual = newPreDefColumn( pdstEMotherLvalues, "Annual Value [L]" );
 		pdchEMotherLminvalue = newPreDefColumn( pdstEMotherLvalues, "Minimum Value [L]" );
-		pdchEMotherLminvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Minimum" );
+		pdchEMotherLminvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherLmaxvalue = newPreDefColumn( pdstEMotherLvalues, "Maximum Value [L]" );
-		pdchEMotherLmaxvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Maximum" );
+		pdchEMotherLmaxvaluetime = newPreDefColumn( pdstEMotherLvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Other J SubTable
 		pdstEMotherJvalues = newPreDefSubTable( pdrEnergyMeters, "Annual and Peak Values - Other" );
 		pdchEMotherJannual = newPreDefColumn( pdstEMotherJvalues, "Annual Value [GJ]" );
 		pdchEMotherJminvalue = newPreDefColumn( pdstEMotherJvalues, "Minimum Value [W]" );
-		pdchEMotherJminvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Minimum" );
+		pdchEMotherJminvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Minimum {TIMESTAMP}" );
 		pdchEMotherJmaxvalue = newPreDefColumn( pdstEMotherJvalues, "Maximum Value [W]" );
-		pdchEMotherJmaxvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Maximum" );
+		pdchEMotherJmaxvaluetime = newPreDefColumn( pdstEMotherJvalues, "Timestamp of Maximum {TIMESTAMP}" );
 
 		// Sensible Heat Gain Component Report
 		pdrSensibleGain = newPreDefReport( "SensibleHeatGainSummary", "SHGS", "Sensible Heat Gain Summary" );
@@ -1735,7 +1796,7 @@ namespace OutputReportPredefined {
 
 		pdstSHGSpkCl = newPreDefSubTable( pdrSensibleGain, "Peak Cooling Sensible Heat Gain Components" );
 
-		pdchSHGSClTimePeak = newPreDefColumn( pdstSHGSpkCl, "Time of Peak" );
+		pdchSHGSClTimePeak = newPreDefColumn( pdstSHGSpkCl, "Time of Peak {TIMESTAMP}" );
 		pdchSHGSClHvacHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
 		pdchSHGSClHvacCl = newPreDefColumn( pdstSHGSpkCl, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
 		pdchSHGSClHvacATUHt = newPreDefColumn( pdstSHGSpkCl, "HVAC Terminal Unit Sensible Air Heating [W]" );
@@ -1757,7 +1818,7 @@ namespace OutputReportPredefined {
 
 		pdstSHGSpkHt = newPreDefSubTable( pdrSensibleGain, "Peak Heating Sensible Heat Gain Components" );
 
-		pdchSHGSHtTimePeak = newPreDefColumn( pdstSHGSpkHt, "Time of Peak" );
+		pdchSHGSHtTimePeak = newPreDefColumn( pdstSHGSpkHt, "Time of Peak {TIMESTAMP}" );
 		pdchSHGSHtHvacHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Heating [W]" );
 		pdchSHGSHtHvacCl = newPreDefColumn( pdstSHGSpkHt, "HVAC Zone Eq & Other Sensible Air Cooling [W]" );
 		pdchSHGSHtHvacATUHt = newPreDefColumn( pdstSHGSpkHt, "HVAC Terminal Unit Sensible Air Heating [W]" );
@@ -2552,29 +2613,6 @@ namespace OutputReportPredefined {
 		newPreDefColumn = numColumnTag;
 		return newPreDefColumn;
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutputReportPredefined
 

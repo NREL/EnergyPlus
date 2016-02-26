@@ -1,24 +1,12 @@
-
 ![](media/ep.gif)
 
 <br/>
-<p><h1>EnergyPlus<sup>TM</sup> Documentation</h1></p>
+<p><h1>EnergyPlus<sup>TM</sup> Documentation, v8.4.0</h1></p>
 <hr>
 <h1>Input Output Reference</h1>
 <h2>The Encyclopedic Reference to EnergyPlus Input and Output</h2>
 <br/>
 <p><i>(the ins and outs of EnergyPlus)</i></p>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 <br/>
 <p><small>COPYRIGHT (c) 1996-2015 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF ILLINOIS AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA THROUGH THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ALL RIGHTS RESERVED. NO PART OF THIS MATERIAL MAY BE REPRODUCED OR TRANSMITTED IN ANY FORM OR BY ANY MEANS WITHOUT THE PRIOR WRITTEN PERMISSION OF THE UNIVERSITY OF ILLINOIS OR THE ERNEST ORLANDO LAWRENCE BERKELEY NATIONAL LABORATORY. ENERGYPLUS IS A TRADEMARK OF THE US DEPARTMENT OF ENERGY.</small></p>
 <p style="page-break-after:always;"></p>
@@ -767,7 +755,7 @@ Table 1. Values for "Terrain"
 
 #### Warmup Convergence
 
-The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisifed too early and you may not get the results you expect from the actual simulation.
+The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will “converge” at each environment (each sizing period or run period set as Yes in the SimulationControl object). EnergyPlus “runs” the first day of the environment (starting with a set of hard-coded initial conditions: temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches “maximum number of warmup days”. Note that setting the convergence tolerance values too loose will cause the program to be satisifed too early and you may not get the results you expect from the actual simulation.
 
 #### Field: Loads Convergence Tolerance Value
 
@@ -2781,17 +2769,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
 
-#### Field: Kusuda-Achebach Average Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average surface temperature to be applied to the Kusuda-Achenbach farfield boundary temperature correlation, in °C
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
-#### Field: Kusuda-Achebach Average Amplitude of Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean surface temperature variation from average used in determining the farfield boundary conditions.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-
-The phase shift of minimum surface temperature, or the day of the year when the minimum surface temperature occurs.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 
@@ -2852,11 +2836,10 @@ Site:GroundDomain:Slab,
     1.8,                !- Soil Thermal Conductivity
     3200,               !- Soil Density
     836,                !- Soil Specific Heat
-    30,   !- Soil Moisture Content Volume Fraction
-    50,   !- Soil Moisture Content Volume Fraction at Saturation
-    15.5, !- Kusuda-Achenbach Average Surface Temperature
-    12.8, !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3, !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+    30,                 !- Soil Moisture Content Volume Fraction
+    50,                 !- Soil Moisture Content Volume Fraction at Saturation
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                            !- Name of Undisturbed Ground Temperature Object
     1,    !- Evapotranspiration Ground Cover Parameter
     GroundCoupledOSCM,      !- Name of Floor Boundary Condition Model
     InGrade,                !- Slab Location (InGrade/OnGrade)
@@ -2882,12 +2865,11 @@ Site:GroundDomain:Slab,
     1.8,                !- Soil Thermal Conductivity {W/m-K}
     3200,               !- Soil Density {kg/m3}
     836,                !- Soil Specific Heat {J/kg-K}
-    30,          !- Soil Moisture Content Volume Fraction
-    50,          !- Soil Moisture Content Volume Fraction at Saturation
-    15.5,        !- Kusuda-Achenbach Average Surface Temperature
-    12.8,   !- Kusuda-Achenbach Average Amplitude of Surface Temperature
-    17.3,   !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-    1,           !- Evapotranspiration Ground Cover Parameter
+    30,                 !- Soil Moisture Content Volume Fraction
+    50,                 !- Soil Moisture Content Volume Fraction at Saturation
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;            !- Name of Undisturbed Ground Temperature Object
+    1,                  !- Evapotranspiration Ground Cover Parameter
     GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
     OnGrade,            !- Slab Location (InGrade/OnGrade)
     ,                   !- Slab Material Name
@@ -2901,7 +2883,7 @@ Site:GroundDomain:Slab,
     Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
 ```
 
-### Site:GroundDomain Outputs
+### Site:GroundDomain:Slab Outputs
 
 The following output variables are available.
 
@@ -2910,17 +2892,17 @@ The following output variables are available.
 
 #### Zone Coupled Surface Heat Flux [W/m2]
 
-This is the value of the heat flux provided to the GroundDomain as a boundary condition which is determined by taking the average of all surfaces coupled to the domains OtherSideBoudaryCondition model.
+This is the value of the heat flux provided to the GroundDomain as a boundary condition. This is calculated by taking the average heat flux of all surfaces coupled to the domain's SurfaceProperty:OtherSideConditionsModel model.
 
 #### Zone Coupled Surface Temperature [C]
 
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled surfaces as an outside boundary condition.
+This is the value of the SurfaceProperty:OtherSideConditionsModel surface temperature. This is the temperature provided to the ground coupled surfaces as an outside boundary condition.
 
 ### Site:GroundDomain:Basement
 
 This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the SurfaceProperty:OtherSideConditionsModel object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the BuildingSurface:Detailed object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects.
 
-![](media/image012.png)
+![](media/image900.png)
 
 Figure: Basement Configuration
 
@@ -2935,9 +2917,8 @@ Site:GroundDomain:Basement,
     836,                     !- Soil Specific Heat {J/kg-K}
     30,                      !- Soil Moisture Content Volume Fraction {percent}
     50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    15.5,                    !- Kusuda-Achenbach Average Surface Temperature {C}
-    12.8,                    !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-    17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Object
+    KATemps;                 !- Name of Undisturbed Ground Temperature Object
     1,                       !- Evapotranspiration Ground Cover Parameter
     BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
     Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
@@ -2989,17 +2970,13 @@ A nominal value of soil moisture content to be used when evaluating soil thermal
 
 A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
 
-#### Field: Kusuda-Achebach Average Ground Surface Temperature
+#### Field: Type of Undisturbed Ground Temperature Object
 
-The annual average ground surface temperature to be applied to the Kusuda-Achenbach far-field boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this, and the following two parameters for the simulation. In which case, this field and the following two can be left blank.
+This is the type of undisturbed ground temperature object that is used to determine the ground temperature.
 
-#### Field: Kusuda-Achebach Average Amplitude of Ground Surface Temperature
+#### Field: Name of Undisturbed Ground Temperature Object
 
-The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous and following parameters. In which case, this field, the previous field, and the following field can be left blank.
-
-#### Field: Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
-
-The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous two parameters. In which case, this field, the previous two fields can be left blank.
+This is the name of the undisturbed ground temperature object that is used to determine the ground temperature.
 
 #### Field: Evapotranspiration Ground Cover Parameter
 
@@ -3053,7 +3030,7 @@ Alpha field indicating whether the domain will update temperatures at each zone 
 
 Integer field indicating the density of the finite difference ground domain cells between the basement and the far field boundaries. Default value is 4. Total number of ground domain cells, insulation cells, and ground surface cells are indicated as outputs to the eio file.
 
-Site:GroundDomain:Basement Output Variables
+### Site:GroundDomain:Basement Outputs
 
 The following output variables are available.
 
@@ -3071,7 +3048,7 @@ This is the value of the heat flux provided to ground domain as a boundary condi
 
 #### Wall Interface Temperature [C]
 
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the basement wall surfaces as an outside boundary condition.
+This is the value of the SurfaceProperty:OtherSideConditionsModel surface temperature. This is the temperature provided to the basement wall surfaces as an outside boundary condition.
 
 #### Floor Interface Heat Flux [W/m2]
 
@@ -3079,7 +3056,7 @@ This is the value of the heat flux provided to ground domain as a boundary condi
 
 #### Floor Interface Temperature [C]
 
-This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled floor surfaces as an outside boundary condition.
+This is the value of the SurfaceProperty:OtherSideConditionsModel surface temperature. This is the temperature provided to the ground coupled floor surfaces as an outside boundary condition.
 
 
 
@@ -4700,6 +4677,15 @@ This outputs the count of iterations on the inner solver loop of CondFD for each
 #### CondFD Surface Temperature Node &lt;X&gt; [C]
 
 This will output temperatures for a node in the surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file
+
+#### CondFD Surface Heat Flux Node &lt;X&gt; [W/m2]
+
+This will output heat flux at each node in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. A positive value indicates heat flowing towards the inside face of the surface. Note that this matches the sign convention for Surface Inside Face Conduction Heat Transfer Rate per Area and is opposite the sign of Surface OUtside Face Conduction Heat Transfer Rate per Area.
+
+#### CondFD Surface Heat Capacitance Outer Half Node &lt;X&gt; [W/m2-K]
+#### CondFD Surface Heat Capacitance Inner Half Node &lt;X&gt; [W/m2-K]
+
+These will output the half-node heat capacitance in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. For this output, the heat capacitance is defined as the product of specific heat, density, and node thickness. Zero is reported for R-layer half-nodes and for undefined half-nodes.  There is no outer half-node for Node 1 which is the outside face of the surface, and there is no inner half-node for Node N which is the inside face of the surface. CondFD Surface Heat Capacitance is only available with Output:Diagnostics,DisplayAdvancedReportVariables.
 
 ### MaterialProperty:HeatAndMoistureTransfer:Settings
 
@@ -8633,7 +8619,7 @@ These output variables represent the sum of all heat gains throughout the zone i
 
 ### ZoneList
 
-The ZoneList object defines a list of Zone objects. It is primarily used with the ZoneGroup object to provide a generalized way for doing "Floor Multipliers". (See the ZoneGroup description below.)  The associated ZoneList output variables also provide a way to aggregate and organize zone loads.
+The ZoneList object defines a list of Zone objects. It is primarily used with the ZoneGroup object to provide a generalized way for doing "Floor Multipliers". (See the ZoneGroup description below.) The associated ZoneList output variables also provide a way to aggregate and organize zone loads.
 
 Zone lists are not exclusive. A zone can be referenced be more than one ZoneList object.
 
@@ -8641,16 +8627,16 @@ Zone lists are not exclusive. A zone can be referenced be more than one ZoneList
 
 The name of the ZoneList object. Must be unique across ZoneLists.
 
-#### Field: Zone 1 – 20 Name
+#### Field: Zone 1 - Zone 20 Name
 
 Reference to a Zone object. This field is extensible; for greater than 20 zones, edit the IDD to add more *Zone Name* fields.
 
-Z```idf
-oneList,
-  Mid Floor List,  !- Name
-  Mid West Zone,  !- Zone 1 Name
-  Mid Center Zone,  !- Zone 2 Name
-  Mid East Zone;  !- Zone 3 Name
+```idf
+ZoneList,
+  Mid Floor List,  !- Name
+  Mid West Zone,   !- Zone 1 Name
+  Mid Center Zone, !- Zone 2 Name
+  Mid East Zone;   !- Zone 3 Name
 ```
 
 
@@ -8736,7 +8722,9 @@ EnergyPlus allows for several surface types:
 
 - **Shading:Zone:Detailed**
 
-Each of the preceding surfaces has “correct” geometry specifications. BuildingSurface and Fenestration surfaces (heat transfer surfaces) are used to describe the important elements of the building (walls, roofs, floors, windows, doors) that will determine the interactions of the building surfaces with the outside environment parameters and the internal space requirements. These surfaces are also used to represent “interzone” heat transfer. During specification of surfaces, several “outside” environments may be chosen:
+Each of the preceding surfaces has “correct” geometry specifications. BuildingSurface and Fenestration surfaces (heat transfer surfaces) are used to describe the important elements of the building (walls, roofs, floors, windows, doors) that will determine the interactions of the building surfaces with the outside environment parameters and the internal space requirements. These surfaces are also used to represent “interzone” heat transfer. All surfaces are modeled as a thin plane (with no thickness) except that material thicknesses are taken into account for heat transfer calculations. 
+
+During specification of surfaces, several “outside” environments may be chosen:
 
 - **Ground** – when the surface is in touch with the ground (e.g. slab floors)
 
@@ -8768,7 +8756,7 @@ Each of the preceding surfaces has “correct” geometry specifications. Buildi
 
 - The zone that contains the other surface that is adjactent to this surface but is not entered in input.
 
-Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coeffients neither inside nor outside are used in the description – these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction.
+Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coeffients neither inside nor outside are used in the description – these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction. When a surface is connected as the outside boundary condition for another surface, the two surfaces may be in the same plane, or they may be separated to imply thickness.
 
 **Shading** surfaces are used to describe aspects of the site which do not directly impact the physical interactions of the environmental parameters but may significantly shade the building during specific hours of the day or time so the year (e.g. trees, bushes, mountains, nearby buildings which aren’t being simulated as part of this facility, etc.)
 
@@ -13577,7 +13565,7 @@ This is the string referenced in the Surface statement that is using OtherSideMo
 
 #### Field: Type of Modeling
 
-This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ”GapConvectionRadiation” or “UndergroundPipingSystemSurface.”
+This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ”GapConvectionRadiation,” “UndergroundPipingSystemSurface,” and "GroundCoupledSurface."
 
 ![OtherSideConditionsFig](media/image070.png)
 
@@ -17319,7 +17307,7 @@ This field is the name of the schedule that approximates the amount of air movem
 
 #### Field: Thermal Comfort Model Type (up to 5 allowed)
 
-The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55,, and AdaptiveCEN15251, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, and the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251 results for this particular people statement. Note that since up to five models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all five models if desired. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. For descriptions of the thermal comfort calculations, see the Engineering Reference document.
+The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55,, and AdaptiveCEN15251, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, and the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251 results for this particular people statement. AdaptiveASH55 is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 33.5C.  AdaptiveCEN15251 is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 30.0C. Note that since up to five models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all five models if desired. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. For descriptions of the thermal comfort calculations, see the Engineering Reference document.
 
 The following IDF example allows for a maximum of 31 people with scheduled occupancy of “Office Occupancy”, 60% radiant using an Activity Schedule of “Activity Sch”. The example allows for thermal comfort reporting.
 
@@ -17611,11 +17599,11 @@ This field is the “thermal sensation vote” (TSV) calculated using the KSU tw
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model 90% Acceptability Status []
 
-This field is to report whether the operative temperature falls into the 90% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the 90% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status [ ]
 
-This field is to report whether the operative temperature falls into the 80% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the 80% acceptability limits of the adaptive comfort in ASHRAE 55-2010. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature [C]
 
@@ -17625,27 +17613,27 @@ If the .epw file is used, the field reports the simple running average of the da
 
 #### Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature [C]
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80% acceptability limits for indoor operative temperature are defined as no greater than 2.5 degrees C from the adaptive comfort temperature. The 90% acceptability limits are defined as no greater than 3.5 degrees C from the adaptive comfort temperature.
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80% acceptability limits for indoor operative temperature are defined as no greater than 3.5 degrees C from the adaptive comfort temperature. The 90% acceptability limits are defined as no greater than 2.5 degrees C from the adaptive comfort temperature. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 33.5C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status
 
-This field is to report whether the operative temperature falls into the Category I (90% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category I (90% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status
 
-This field is to report whether the operative temperature falls into the Category II (80% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category II (80% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status
 
-This field is to report whether the operative temperature falls into the Category III (65% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable.
+This field is to report whether the operative temperature falls into the Category III (65% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature
 
-This field reports the weighted average of the outdoor air temperature of the previous five days, an input parameter for the CEN-15251 adaptive comfort model.
+This field reports the weighted average of the outdoor air temperature of the previous seven days, an input parameter for the CEN-15251 adaptive comfort model.
 
 #### Zone Thermal Comfort CEN 15251 Adaptive Model Temperature
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively.
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 30.0C).
 
 ### Simplified ASHRAE 55-2004 Graph Related Outputs
 
@@ -17880,59 +17868,212 @@ The fraction of heat from lights that goes into the zone as long-wave (thermal) 
 
 The fraction of heat from lights that goes into the zone as visible (short-wave) radiation. The program calculates how much of this radiation is absorbed by the inside surfaces of the zone according the area times solar absorptance product of these surfaces.
 
-Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table 14 for overhead fluorescent lighting for the luminaire configurations shown in Figure 51.
+Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table 14 for overhead fluorescent lighting for a variety of luminaire configurations. The data is based on ASHRAE 1282-RP "Lighting Heat Gain Distribution in Buildings" by Daniel E. Fisher and Chanvit Chantrasrisalai.
 
-Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. These values assume that no light heat goes into an adjacent zone. Source: *Lighting Handbook: Reference & Application*, 8<sup>th</sup> Edition, Illuminating Engineering Society of North America, New York, 1993, p. 355.
+Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. 
 
 <table class="table table-striped">
   <tr>
-    <th rowspan="2">Field Name</th>
-    <th colspan="5">Luminaire Configuration, Flourescent Lighting</th>
+    <th>Fixture No.</th>
+    <th>Luminaire Feature</th>
+    <th>Return Air Fraction</th>
+    <th>Fraction Radiant</th>
+    <th>Fraction Visible</th>
+    <th>fconvected</th>
   </tr>
   <tr>
-    <td>Suspended</td>
-    <td>Surface Mount</td>
-    <td>Recessed</td>
-    <td>Luminous and louvered ceiling</td>
-    <td>Return-air ducted</td>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8</td>
+    <td>0.31</td>
+    <td>0.22</td>
+    <td>0.20</td>
+    <td>0.27</td>
   </tr>
   <tr>
-    <td>Return Air Fraction</td>
-    <td>0.0</td>
-    <td>0.0</td>
-    <td>0.0</td>
-    <td>0.0</td>
+    <td>2</td>
+    <td>Recessed, Acrylic Lens, Non-Vented, T8</td>
+    <td>0.56</td>
+    <td>0.12</td>
+    <td>0.20</td>
+    <td>0.12</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8</td>
+    <td>0.28</td>
+    <td>0.19</td>
+    <td>0.20</td>
+    <td>0.33</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Recessed, Acrylic Lens, Vented, T8</td>
+    <td>0.54</td>
+    <td>0.10</td>
+    <td>0.18</td>
+    <td>0.18</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8</td>
+    <td>0.34</td>
+    <td>0.17</td>
+    <td>0.16</td>
+    <td>0.33</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>Recessed, Volumetric, T5</td>
+    <td>0.54</td>
+    <td>0.13</td>
+    <td>0.20</td>
+    <td>0.13</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>Downlights, Compact Fluorescent, DTT</td>
+    <td>0.86</td>
+    <td>0.04</td>
+    <td>0.10</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>Downlights, Compact Fluorescent, TRT</td>
+    <td>0.78</td>
+    <td>0.09</td>
+    <td>0.13</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>9a</td>
+    <td>Downlights, Incandescent, A21</td>
+    <td>0.29</td>
+    <td>0.10</td>
+    <td>0.6</td>
+    <td>0.01</td>
+  </tr>
+  <tr>
+    <td>9b</td>
+    <td>Downlights, Incandescent, BR40</td>
+    <td>0.21</td>
+    <td>0.08</td>
+    <td>0.71</td>
+    <td>0.00</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>Surface Mounted, T5HO</td>
+    <td>0.00</td>
+    <td>0.27</td>
+    <td>0.23</td>
+    <td>0.50</td>
+  </tr>
+  <tr>
+    <td>11</td>
+    <td>Pendant, Direct/Indirect, T8</td>
+    <td>0.00</td>
+    <td>0.32</td>
+    <td>0.23</td>
+    <td>0.45</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>Pendant, Indirect, T5HO</td>
+    <td>0.00</td>
+    <td>0.32</td>
+    <td>0.25</td>
+    <td>0.43</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Ducted</td>
+    <td>0.27</td>
+    <td>0.27</td>
+    <td>0.21</td>
+    <td>0.25</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Ducted</td>
+    <td>0.27</td>
+    <td>0.22</td>
+    <td>0.17</td>
+    <td>0.34</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.45</td>
+    <td>0.30</td>
+    <td>0.22</td>
+    <td>0.03</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.43</td>
+    <td>0.25</td>
+    <td>0.21</td>
+    <td>0.11</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.43</td>
+    <td>0.27</td>
+    <td>0.18</td>
+    <td>0.12</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Recessed, Parabolic Louver, Non-Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.10</td>
+    <td>0.16</td>
+    <td>0.20</td>
     <td>0.54</td>
   </tr>
   <tr>
-    <td>Fraction Radiant</td>
-    <td>0.42</td>
-    <td>0.72</td>
-    <td>0.37</td>
-    <td>0.37</td>
-    <td>0.18</td>
+    <td>3</td>
+    <td>Recessed, Parabolic Louver, Vented, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.11</td>
+    <td>0.15</td>
+    <td>0.19</td>
+    <td>0.55</td>
   </tr>
   <tr>
-    <td>Fraction Visible</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-    <td>0.18</td>
-  </tr>
-  <tr>
-    <td>f<sub>convected</sub></td>
-    <td>0.40</td>
-    <td>0.10</td>
-    <td>0.45</td>
-    <td>0.45</td>
-    <td>0.10</td>
+    <td>5</td>
+    <td>Recessed, Direct/Indirect, T8 - Half Typical Supply Airflow Rate</td>
+    <td>0.04</td>
+    <td>0.13</td>
+    <td>0.16</td>
+    <td>0.67</td>
   </tr>
 </table>
-
-![](media/image086.svg)
-
-Figure 51. Overhead fluorescent luminaire configurations.
 
 #### Field: Fraction Replaceable
 
@@ -19153,7 +19294,7 @@ The steam equipment district heating consumption in Watts (for power) or Joules 
 
 Note that zone energy consumption is not reported for OTHER EQUIPMENT and does not go on any meter.
 
-### ElectricEquipment :ITE:AirCooled
+### ElectricEquipment:ITE:AirCooled
 
 This object describes air-cooled electric information technology equipment (ITE) which has variable power consumption as a function of loading and temperature.
 
@@ -19568,6 +19709,8 @@ This field is the name of the zone (ref: **Zone**) and links a particular ZoneCo
 
 This field denotes the design carbon dioxide generation rate (m<sup>3</sup>/s). The design value is modified by the schedule fraction (see Field: Schedule Name). The resulting volumetric generation rate is converted to mass generation rate using the current zone indoor air density at each time step. The rate can be either positive or negative. A positive value represents a source rate (CO<sub>2</sub> addition to the zone air) and a negative value represents a sink rate (CO<sub>2</sub> removal from the zone air).
 
+When the mass design generation rate is available, a conversion is required to meet input requirement with volumetric flow rate. This can be accomplished by the mass flow rate divided by the density of carbon dioxide.  
+
 #### Field: Schedule Name
 
 This field is the name of the schedule (ref: Schedules) that modifies the design carbon dioxide generation rate (see previous field). The schedule values can be any positive number between 0.0 and 1.0. For each simulation time step, the actual CO<sub>2</sub> generation rate in a zone is the product of the Design Generation Rate field (above) and the value specified by this schedule.
@@ -19597,9 +19740,9 @@ This output is the net carbond dioxide internal gain/loss in m3/s for an individ
 
 This output variable reports the total (net) carbon dioxide internal gains/losses in cubic meters per second for a zone, including impacts from three objects: ZoneContaminantSourceAndSink:CarbonDioxide, People, and GasEquipment. Positive values denote carbon dioxide generation (gain or source), while negative values denote carbon dioxide removal (loss or sink).
 
-### ZoneContaminantSourceAndSink:GenericContaminant:Constant
+### ZoneContaminantSourceAndSink:Generic:Constant
 
-The ZoneContaminantSourceAndSink:GenericContaminant:Constant object specifies the generic contaminant generation rate and removal rate coefficient in a zone. The associated fraction schedules are required for allowing users to change the magnitude of sources and sinks. The object is equivalent to the combination of the constant coefficient model and the burst source model defined in the sources and sinks element types of CONTAM 3.0. The basic equation used to calculate generic contaminant source and sink for the constant model is given below:
+The ZoneContaminantSourceAndSink:Generic:Constant object specifies the generic contaminant generation rate and removal rate coefficient in a zone. The associated fraction schedules are required for allowing users to change the magnitude of sources and sinks. The object is equivalent to the combination of the constant coefficient model and the burst source model defined in the sources and sinks element types of CONTAM 3.0. The basic equation used to calculate generic contaminant source and sink for the constant model is given below:
 
 <div>\[{S_f}(t) = {G_f}(t)*{F_G} - {R_f}(t){C_f}(t)*1.0E - 6*{F_R}\]</div>
 
@@ -19619,15 +19762,17 @@ where
 
 #### Field: Name
 
-This field represents a unique identifying name in a group referring Generic contaminantSourceAndSinkNames.
+This field represents a unique identifying name.
 
 #### Field: Zone Name
 
 This field signifies the Name of the zone with constant generic contaminant source and sink.
 
-#### Field: Maximum Generation Rate
+#### Field: Design Generation Rate
 
-This field denotes the full generic contaminant maximum generation rate (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
+This field denotes the full generic contaminant design generation rate (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
+
+When the mass generation rate is available, the rate must be converted to a volume flow rate. Use the mass flow rate divided by the vapor density of the generic contaminant.  
 
 #### Field: Generation Schedule Name
 
@@ -19641,33 +19786,31 @@ This field denotes the full generic contaminant design removal coefficient (m<su
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design generation rate (R<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>R</sub> in the above equation.
 
-
-
 An IDF example is provided below:
 
 ```idf
-  ZoneContaminantSourceAndSink:GenericContaminant:Constant,
+  ZoneContaminantSourceAndSink:Generic:Constant,
     NORTH ZONE GC,          !- Name
     NORTH ZONE,             !- Zone Name
     1.0E-6,                 !- Design Generation Rate {m3/s}
-    GC Source Schedule,     !- Schedule Name
+    GC Source Schedule,     !- Generation Schedule Name
     1.0E-7,                 !- Design Removal Coefficient {m3/s}
     GC Removal Schedule;    !- Removal Schedule Name
 ```
 
-### ZoneContaminantSourceAndSink:GenericContaminant:Constant Outputs
+### ZoneContaminantSourceAndSink:Generic:Constant Outputs
 
-When a ZoneContaminantSourceAndSink:GenericContaminant:Constant object is specified, the following output variables are available:
+When a ZoneContaminantSourceAndSink:Generic:Constant object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Constant Source Generation Volume Flow Rate [m3/s]
 
 #### Generic Air Contaminant Constant Source Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:GenericContaminant:Constant object. The generation rate is a sum of generation and removal rates. The zone air generic contaminant level at the previous zone time step is used in the removal rate calculation.
+This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:Generic:Constant object. The generation rate is a sum of generation and removal rates. The zone air generic contaminant level at the previous zone time step is used in the removal rate calculation.
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven
+### SurfaceContaminantSourceAndSink:Generic:PressureDriven
 
-The SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven object specifies the generic contaminant generation rate coefficient, which is used to calculate the generation rate due to the pressure difference across the surface. The object is equivalent to the pressure driven model defined in the sources and sinks element types of CONTAM 3.0. This object assumes to work with the AirflowNetwork model. The surface has to be defined in the AirflowNetwork:Multizone:Surface. Although the model is designed to be applied to radon and soil gas entry, it is expanded to be applied to all contaminant transport, including generic contaminant. However, it should be used in caution. The basic equation used to calculate generic contaminant source for the pressure driven constant model is provided below:
+The SurfaceContaminantSourceAndSink:Generic:PressureDriven object specifies the generic contaminant generation rate coefficient, which is used to calculate the generation rate due to the pressure difference across the surface. The object is equivalent to the pressure driven model defined in the sources and sinks element types of CONTAM 3.0. This object assumes to work with the AirflowNetwork model. The surface has to be defined in the AirflowNetwork:Multizone:Surface. Although the model is designed to be applied to radon and soil gas entry, it is expanded to be applied to all contaminant transport, including generic contaminant. However, it should be used in caution. The basic equation used to calculate generic contaminant source for the pressure driven constant model is provided below:
 
 <div>\[{S_f}(t) = {H_f}(t)*{F_G}*{\left( {{P_j} - {P_i}} \right)^n}\]</div>
 
@@ -19687,7 +19830,7 @@ P*<sub>j</sub>* <sub>     </sub> = Pressure in an adjacent zone for a inter
 
 #### Field: Name
 
-The field signifies the unique identifying name in a group referring GenericContaminantSourceAndSinkNames.
+The field signifies the unique identifying name.
 
 #### Field: Surface Name
 
@@ -19697,14 +19840,14 @@ This field represents the name of the surface as a generic contaminant source us
 
 This field denotes the generic contaminant design generation coefficient (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions times the pressure difference with a power exponent across a surface. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
 
-#### Field: Generation Schedule Name
+#### Field: Generation Exponent
 
-This field is the name of the schedule (ref: Schedule) that modifies the maximum design generation rate. This fraction between 0.0 and 1.0 is noted as F<sub>G</sub> in the above equation.
+This field denotes the flow power exponent,* n*, in the contaminant source equation. The valid range is 0.0 to 1.0, 
 
 An IDF example is provided below:
 
 ```idf
-  SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven,
+  SurfaceContaminantSourceAndSink:Generic:PressureDriven,
     WEST ZONE GC BLD,       !- Name
     Zn001:Wall001,          !- Surface Name
     1.0E-6,                 !- Design Generation Rate Coefficient {m3/s}
@@ -19713,17 +19856,17 @@ An IDF example is provided below:
 ```
 
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven Outputs
+### SurfaceContaminantSourceAndSink:Generic:PressureDriven Outputs
 
-When a SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven object is specified, the following output variables are available:
+When a SurfaceContaminantSourceAndSink:Generic:PressureDriven object is specified, the following output variables are available:
 
 ZONE,Average,Generic Air Contaminant Pressure Driven Generation Volume Flow Rate [m3/s]
 
 #### Generic Air Contaminant Pressure Driven Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant:PressureDriven object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:PressureDriven object.
 
-### ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel
+### ZoneContaminantSourceAndSink:Generic:CutoffModel
 
 The ZoneContaminantSourceAndSink:Generic contaminant:CutoffModel object specifies the generic contaminant generation rate based on the cutoff concentration model. The basic equation used to calculate generic contaminant source for the pressure driven constant model is given below:
 
@@ -19743,51 +19886,53 @@ where
 
 #### Field: Name
 
-The field signifies the unique identifying name in a group referring GenericContaminantSourceAndSinkNames.
+The field signifies the unique identifying name.
 
 #### Field: Zone Name
 
 This field represents the name of the zone with generic contaminant source and sink using the cutoff model.
 
-#### Field: Design Generation Rate
+#### Field: Design Generation Rate Coefficient
 
 This field denotes the full generic contaminant design generation rate (m<sup>3</sup>/s). The design generation rate is the maximum amount of generic contaminant expected at design conditions. The design value is modified by the schedule fraction (see Field:Generation Schedule Name).
+
+When the mass generation rate is available, the rate must be converted to a volume flow rate. Use the mass flow rate divided by the vapor density of the generic contaminant.  
 
 #### Field: Generation Schedule Name
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design generation rate (G<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>G</sub> in the above equation.
 
-#### Field: Cutoff Concentration
+#### Field: Cutoff Generic Contaminant at which Emission Ceases
 
-This field is the generic contaminant cutoff concentration level where the source ceases its emission.
+This field is the generic contaminant cutoff concentration level where the source ceases its emission. 
 
 ** **
 
 An IDF example is provided below:
 
 ```idf
-ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel,
+ZoneContaminantSourceAndSink:Generic:CutoffModel,
     NORTH ZONE GC CutoffModel,          !- Name
     NORTH ZONE,             !- Zone Name
-    1.0E-5,                 !- Design Generation Rate {m3/s}
+    1.0E-5,                 !- Design Generation Rate Coefficient {m3/s}
     GC Source Schedule,     !- Schedule Name
-    100000;                 !- Cutoff Concentration {ppm}
+    100000;                 !- Cutoff Generic Contaminant at which Emission Ceases {ppm}
 ```
 
 
-### ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel Outputs
+### ZoneContaminantSourceAndSink:Generic:CutoffModel Outputs
 
-When a ZoneContaminantSourceAndSink:GenericContaminant:CutoffModel object is specified, the following output variables are available:
+When a ZoneContaminantSourceAndSink:Generic:CutoffModel object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Cutoff Model Generation Volume Flow Rate [m3/s]
 
 #### Generic Air Contaminant Cutoff Model Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant: CutoffModel object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:CutoffModel object.
 
-### ZoneContaminantSourceAndSink:GenericContaminant:DecaySource
+### ZoneContaminantSourceAndSink:Generic:DecaySource
 
-The ZoneContaminantSourceAndSink:GenericContaminant:DecaySource object specifies the generic contaminant generation rate based on the decay source model. The basic equation used to calculate generic contaminant source for the decay source model is given below:
+The ZoneContaminantSourceAndSink:Generic:DecaySource object specifies the generic contaminant generation rate based on the decay source model. The basic equation used to calculate generic contaminant source for the decay source model is given below:
 
 <div>\[{S_f}(t) = {G_f}(t){F_G}\exp ( - t/{t_c})\]</div>
 
@@ -19805,19 +19950,19 @@ t     = Time since the start of emission [second]
 
 #### Field: Name
 
-This field is the unique identifying name in a group referring GenericContaminantSourceAndSinkNames.
+This field is the unique identifying name.
 
 #### Field: Zone Name
 
 This field represents the name of the zone with a generic contaminant decaying source.
 
-#### Field: Initial Generation Rate
+#### Field: Initial Emission Rate
 
-This field denotes the initial generic contaminant design generation rate (m<sup>3</sup>/s). The generation is controlled by a schedule, as defined in the next field.Generic contaminant generation begins when the schedule changes from a zero to a non-zero value (between zero and one). The initial generation rate is equal to the schedule value times the initial generation rate. A single schedule may be used to initiate several emissions at different times.(see Field:Generation Schedule Name).
+This field denotes the initial generic contaminant design emission rate (m<sup>3</sup>/s). The generation is controlled by a schedule, as defined in the next field. Generic contaminant emission begins when the schedule changes from a zero to a non-zero value (between zero and one). The initial emission rate is equal to the schedule value times the initial generation rate. A single schedule may be used to initiate several emissions at different times.(see Field:Generation Schedule Name).
 
-#### Field: Generation Schedule Name
+#### Field: Schedule Name
 
-This field is the name of the schedule (ref: Schedule) that modifies the maximum design generation rate (G<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>G</sub> in the above equation. When the value is equal to 1, the generation rate is used and time is reset to zero. When the value is equal to zero, the schedule value is ignored in the equation.
+This field is the name of the schedule (ref: Schedule) that modifies the maximum design emission rate (G<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>G</sub> in the above equation. When the value is equal to 1, the generation rate is used and time is reset to zero. When the value is equal to zero, the schedule value is ignored in the equation.
 
 #### Field: Decay Time Constant
 
@@ -19828,18 +19973,18 @@ Note: The variable t, time since the start of emission, will be reset to zero, w
 An IDF example is provided below:
 
 ```idf
-ZoneContaminantSourceAndSink:GenericContaminant:DecaySource,
+ZoneContaminantSourceAndSink:Generic:DecaySource,
     WEST ZONE GC DecaySource,           !- Name
     WEST ZONE,              !- Zone Name
     1.0E-5,                 !- Initial Emission Rate {m3/s}
     GC Source Schedule,     !- Schedule Name
-    100000;                  !- Delay Time Constant {s}
+    100000;                 !- Delay Time Constant {s}
 ```
 
 
-### ZoneContaminantSourceAndSink:GenericContaminant:DecaySource Outputs
+### ZoneContaminantSourceAndSink:Generic:DecaySource Outputs
 
-When a ZoneContaminantSourceAndSink:GenericContaminant:DecaySource object is specified, the following output variables are available:
+When a ZoneContaminantSourceAndSink:Generic:DecaySource object is specified, the following output variables are available:
 
 Zone,Average,Generic Air Contaminant Decay Model Generation Volume Flow Rate [m3/s]
 
@@ -19847,15 +19992,15 @@ Zone,Average,Generic Air Contaminant Decay Model Generation Emission Start Elaps
 
 #### Generic Air Contaminant Decay Model Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant decay rate from each SurfaceContaminantSourceAndSink:GenericContaminant:DecaySource object.
+This output is the average generic contaminant decay rate from each SurfaceContaminantSourceAndSink:Generic:DecaySource object.
 
 #### Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time [s]
 
 This output is the decay time since the start of emission. The start time is either at the beginning of each run period, including design day simulations, or the time when the egenration schedule value is zero.
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion
+### SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion
 
-The SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
+The SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object specifies the generic contaminant generation rate from surface diffusion. The object is equivalent to the boundary layer diffusion model driven model defined in the sources and sinks element types of CONTAM 3.0.
 
 The boundary layer diffusion controlled reversible sink/source model with a linear sorption isotherm follows the descriptions presented in [Axley 1991]. The boundary layer refers to the region above the surface of a material through which a concentration gradient exists between the near-surface concentration and the air-phase concentration. The rate at which a contaminant is transferred onto a surface (sink) is defined as:
 
@@ -19877,26 +20022,28 @@ where
 
 #### Field: Name
 
-This field signifies a unique identifying name in a group referring GenericContaminanteSourceAndSinkNames.
+This field signifies a unique identifying name.
 
 #### Field: Surface Name
 
 This field denotes the name of the surface as a generic contaminant reversible source or sink using the boundary layer diffusion model.
 
-#### Field: Film Transfer Coefficient
+#### Field: Mass Transfer Coefficient
 
 This field specifies the average mass transfer coefficient of the contaminant generic contaminant within the boundary layer (or film) above the surface of the adsorbent.
 
-#### Field: Henry Partition Coefficient
+#### Field: Schedule Name
+
+This field is the name of the schedule (ref: Schedule) that modifies the mass transfer coefficient with the value between 0.0 and 1.0. 
+
+#### Field: Henry Adsorption Constant or Partition Coefficient
 
 This field denotes the generic contaminant Henry partition coefficient in the units of dimensionless. The coefficient relates the concentration of the contaminant generic contaminant in the bulk-air to that at the surface of the adsorption material.
-
-
 
 An IDF example is provided below:
 
 ```idf
-SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion,
+SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
     WEST ZONE GC BLD,       !- Name
     Zn001:Wall001,          !- Surface Name
     1.0E-2,                 !- Mass Transfer Coefficient {m/s}
@@ -19904,10 +20051,9 @@ SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion,
     2.0;                    !- Henry adsorption constant or partition coefficient
 ```
 
+### SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion Outputs
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:BoundaryLayerDiffusion Outputs
-
-When a SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion object is specified, the following output variables are available:
+When a SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]
 
@@ -19915,15 +20061,15 @@ ZONE,Average, Generic Air Contaminant Boundary Layer Diffusion Inside Face Conce
 
 #### Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant:BoudaryLayerDiffusion object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion object.
 
 #### Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration [ppm]
 
 This output is the average generic contaminant level at the interior surface.
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink
+### SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink
 
-The SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink object specifies the generic contaminant removal rate from a surface. The object is equivalent to the deposition velocity sink model defined in CONTAM 3.0 sources and sinks element types.
+The SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink object specifies the generic contaminant removal rate from a surface. The object is equivalent to the deposition velocity sink model defined in CONTAM 3.0 sources and sinks element types.
 
 The deposition velocity model provides for the input of a sink’s characteristic in the familiar term of deposition velocity. The removal stops when the sink concentration level is higher than the zone air concentration level. The deposition velocity model equation is:
 
@@ -19945,7 +20091,7 @@ F<sub>R</sub>   = Schedule or control signal value at time *t* [-]
 
 #### Field: Name
 
-This field denotes a unique identifying name in a group referring GenericContaminant SourceAndSinkNames.
+This field denotes a unique identifying name.
 
 #### Field: Surface Name
 
@@ -19955,14 +20101,14 @@ This field represents the name of the surface as a generic contaminant sink usin
 
 This field specifies the deposition velocity to the surface of the adsorbent in the units of m/s.
 
-#### Field: Removal Schedule Name
+#### Field: Schedule Name
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design removal rate (S<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>R</sub> in the above equation.
 
 An IDF example is provided below:
 
 ```idf
-SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink,
+SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink,
     EAST ZONE GC DVS,       !- Name
     Zn002:Wall001,          !- Surface Name
     1.0E-3,                 !- Deposition Velocity {m/s}
@@ -19970,9 +20116,9 @@ SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink,
 ```
 
 
-### SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink Outputs
+### SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink Outputs
 
-The following output variables are available when the SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink
+The following output variables are available when the SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink
 
 object is specified.
 
@@ -19980,11 +20126,11 @@ ZONE,Average, Generic Air Contaminant Deposition Velocity Removal Volume Flow Ra
 
 #### Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:GenericContaminant:DepositionVelocitySink object.
+This output is the average generic contaminant generation rate from each SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink object.
 
-### ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink
+### ZoneContaminantSourceAndSink:Generic:DepositionRateSink
 
-The ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink object specifies the generic contaminant removal rate from a zone. The object is equivalent to the deposition rate sink model defined in CONTAM 3.0 sources and sinks element types.
+The ZoneContaminantSourceAndSink:Generic:DepositionRateSink object specifies the generic contaminant removal rate from a zone. The object is equivalent to the deposition rate sink model defined in CONTAM 3.0 sources and sinks element types.
 
 The deposition rate model provides for the input of a sink’s characteristic in the familiar term of deposition rate in a zone. The removal stops when the sink concentration level is higher than the zone air concentration level. The deposition rate model equation is:
 
@@ -20006,7 +20152,7 @@ F<sub>R</sub>   = Schedule or control signal value at time *t* [dimensionless]
 
 #### Field: Name
 
-This field denotes a unique identifying name in a group referring GenericContaminantSourceAndSinkNames.
+This field denotes a unique identifying name.
 
 #### Field: Zone Name
 
@@ -20016,16 +20162,14 @@ This field represents the name of the zone as a generic contaminant sink using t
 
 This field specifies the deposition rate to the zone in the units of 1/s.
 
-#### Field: Removal Schedule Name
+#### Field: Schedule Name
 
 This field is the name of the schedule (ref: Schedule) that modifies the maximum design removal rate (S<sub>f</sub>). This fraction between 0.0 and 1.0 is noted as F<sub>R</sub> in the above equation.
-
-
 
 An IDF example is provided below:
 
 ```idf
-ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink,
+ZoneContaminantSourceAndSink:Generic:DepositionRateSink,
     NORTH ZONE GC DRS,      !- Name
     NORTH ZONE,             !- Zone Name
     1.0E-5,                 !- Deposition Rate {m3/s}
@@ -20033,13 +20177,13 @@ ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink,
 ```
 
 
-### ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink Outputs
+### ZoneContaminantSourceAndSink:Generic:DepositionRateSink Outputs
 
-When the ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink object is specified, the following output variables are available:
+When the ZoneContaminantSourceAndSink:Generic:DepositionRateSink object is specified, the following output variables are available:
 
 ZONE,Average, Generic Air Contaminant Deposition Rate Removal Volume Flow Rate [m3/s]
 
 #### Generic Air Contaminant Deposition Rate Removal Volume Flow Rate [m3/s]
 
-This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:GenericContaminant:DepositionRateSink object.
+This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:Generic:DepositionRateSink object.
 

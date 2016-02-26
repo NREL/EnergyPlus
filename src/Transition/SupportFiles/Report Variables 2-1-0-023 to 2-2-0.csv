@@ -1,0 +1,19 @@
+2.1.0.023,2.2.0,
+16,16, This number should be the number of following lines
+PV Array Electric Power Delivered,PV Array Electric Power Generated,
+PV Array Electric Energy Delivered,PV Array Electric Energy Generated,
+Debug Free Cooling Heat Exchanger Coupling Status,Free Cooling Heat Exchanger Operation Status,
+Generator Total Heat Recovery Rate,Generator Thermal Power Produced,
+Generator Total Heat Recovery Rate,Generator Thermal Energy Produced,
+FuelCell Heat Recovery Rate,Generator Thermal Power Produced,
+FuelCell Heat Recovery Energy ,Generator Thermal Energy Produced ,
+Generator Rate of Heat Recovery,Generator Thermal Power Produced,
+Generator Fuel Energy Use HHV,Generator Fuel Consumption HHV Basis,
+Generator Fuel Energy Use Rate HHV,Generator Fuel Consumption Rate HHV Basis,
+Generator Fuel Energy Use LHV,Generator Fuel Consumption LHV Basis,
+Generator Fuel Energy Use Rate LHV,Generator Fuel Consumption Rate LHV Basis,
+FuelCell Fuel Energy Use HHV,Generator Fuel Consumption HHV Basis,
+FuelCell Fuel Energy Use Rate HHV,Generator Fuel Consumption Rate HHV Basis,
+FuelCell Fuel Energy Use LHV,Generator Fuel Consumption LHV Basis
+FuelCell Fuel Energy Use Rate LHV,Generator Fuel Consumption Rate LHV Basis
+old variable name,new variable name -- put variable names in quotes (before this line) and leave off units -- <DELETE> to delete

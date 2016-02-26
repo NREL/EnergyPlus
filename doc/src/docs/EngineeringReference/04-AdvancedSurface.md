@@ -300,6 +300,10 @@ The foliage energy balance is given by:
 
 <div>$${F_f} = {\sigma_f}\left[ {{I_S}^ \downarrow (1 - {\alpha_f}) + {\varepsilon_f}{I_{ir}}^ \downarrow  - {\varepsilon_f}\sigma {T_f}^4} \right] + \frac{{{\sigma_f}{\varepsilon_g}{\varepsilon_f}\sigma }}{{{\varepsilon_1}}}\left( {{T_g}^4 - {T_f}^4} \right) + {H_f} + {L_f}$$</div>
 
+Where sigma_f is calculated as a function of Leaf-Area-Index (LAI):
+
+<div> $$ \sigma_f = 0.9 - 0.7 \exp{-0.75 LAI } $$ </div>
+
 In addition to convective and sensible heat transfer this equation accounts for both the short and longwave radiation absorbed by the vegetation, including the effects of multiple reflections. The sensible and latent heat flux terms (H<sub>f</sub> and L<sub>f­</sub>) are somewhat complicated and therefore discussed in some detail below.
 
 ##### Sensible heat flux in the foliage layer

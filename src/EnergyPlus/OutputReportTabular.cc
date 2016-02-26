@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -10,6 +68,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
@@ -40,13 +99,15 @@
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <LowTempRadiantSystem.hh>
-#include <ManageElectricPower.hh>
+#include <ElectricPowerServiceManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
+#include <OutputReportTabularAnnual.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SQLiteProcedures.hh>
+#include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <VentilatedSlab.hh>
 #include <ZonePlenum.hh>
@@ -85,6 +146,7 @@ namespace OutputReportTabular {
 	//                                      |--> BinResultsBelow
 	//                                      |
 	//                                      |--> BinObjVarID
+	//
 	//                                      |--> MonthlyFieldSetInput
 	//   MonthlyInput --------------------->|
 	//                                      |--> MonthlyTable --> MonthlyColumns
@@ -113,6 +175,7 @@ namespace OutputReportTabular {
 	using DataGlobals::OutputFileDebug;
 	using namespace DataGlobalConstants;
 	using namespace OutputReportPredefined;
+	using namespace DataHeatBalance;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
@@ -168,9 +231,9 @@ namespace OutputReportTabular {
 
 	// arrays for time binned results
 
-	int OutputTableBinnedCount;
-	int BinResultsTableCount;
-	int BinResultsIntervalCount;
+	int OutputTableBinnedCount( 0 );
+	int BinResultsTableCount( 0 );
+	int BinResultsIntervalCount( 0 );
 
 	int const numNamedMonthly( 62 );
 	// These reports are detailed/named in routine InitializePredefinedMonthlyTitles
@@ -186,7 +249,7 @@ namespace OutputReportTabular {
 	int TOCEntriesCount( 0 );
 	int TOCEntriesSize( 0 );
 
-	int UnitConvSize;
+	int UnitConvSize( 0 );
 
 	bool WriteTabularFiles( false );
 
@@ -271,6 +334,10 @@ namespace OutputReportTabular {
 	Real64 gatherElecPurchased( 0.0 );
 	int meterNumElecSurplusSold( 0 );
 	Real64 gatherElecSurplusSold( 0.0 );
+	int meterNumElecStorage = ( 0 );
+	Real64 gatherElecStorage = ( 0.0 );
+	int meterNumPowerConversion = ( 0 );
+	Real64 gatherPowerConversion = ( 0.0 );
 	// for on site thermal source components on BEPS report
 	int meterNumWaterHeatRecovery( 0 );
 	Real64 gatherWaterHeatRecovery( 0.0 );
@@ -339,18 +406,15 @@ namespace OutputReportTabular {
 	Array3D< Real64 > peopleInstantSeq;
 	Array3D< Real64 > peopleLatentSeq;
 	Array3D< Real64 > peopleRadSeq;
-	Array3D< Real64 > peopleDelaySeq;
 
 	Array3D< Real64 > lightInstantSeq;
 	Array3D< Real64 > lightRetAirSeq;
 	Array3D< Real64 > lightLWRadSeq; // long wave thermal radiation
 	Array3D< Real64 > lightSWRadSeq; // short wave visible radiation
-	Array3D< Real64 > lightDelaySeq;
 
 	Array3D< Real64 > equipInstantSeq;
 	Array3D< Real64 > equipLatentSeq;
 	Array3D< Real64 > equipRadSeq;
-	Array3D< Real64 > equipDelaySeq;
 
 	Array3D< Real64 > refrigInstantSeq;
 	Array3D< Real64 > refrigRetAirSeq;
@@ -361,12 +425,9 @@ namespace OutputReportTabular {
 
 	Array3D< Real64 > hvacLossInstantSeq;
 	Array3D< Real64 > hvacLossRadSeq;
-	Array3D< Real64 > hvacLossDelaySeq;
 
 	Array3D< Real64 > powerGenInstantSeq;
 	Array3D< Real64 > powerGenRadSeq;
-	Array3D< Real64 > powerGenDelaySeq;
-
 	Array3D< Real64 > infilInstantSeq;
 	Array3D< Real64 > infilLatentSeq;
 
@@ -379,10 +440,6 @@ namespace OutputReportTabular {
 	Array3D< Real64 > feneCondInstantSeq;
 	//REAL(r64), DIMENSION(:,:,:),ALLOCATABLE,PUBLIC  :: feneSolarInstantSeq
 	Array3D< Real64 > feneSolarRadSeq;
-	Array3D< Real64 > feneSolarDelaySeq;
-
-	Array3D< Real64 > surfDelaySeq;
-
 	int maxUniqueKeyCount( 0 );
 
 	// for the XML report must keep track fo the active sub-table name and report set by other routines
@@ -413,7 +470,183 @@ namespace OutputReportTabular {
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
 
+	namespace {
+		bool GatherMonthlyResultsForTimestepRunOnce( true );
+		bool UpdateTabularReportsGetInput( true );
+		bool GatherHeatGainReportfirstTime( true );
+		bool AllocateLoadComponentArraysDoAllocate( true );
+	}
+
 	// Functions
+	void
+	clear_state(){
+		GatherMonthlyResultsForTimestepRunOnce =  true;
+		UpdateTabularReportsGetInput = true;
+		GatherHeatGainReportfirstTime = true;
+		AllocateLoadComponentArraysDoAllocate = true;
+		OutputTableBinnedCount = 0;
+		BinResultsTableCount = 0;
+		BinResultsIntervalCount = 0;
+		MonthlyInputCount = 0;
+		sizeMonthlyInput = 0;
+		MonthlyFieldSetInputCount = 0;
+		sizeMonthlyFieldSetInput = 0;
+		MonthlyTablesCount = 0;
+		MonthlyColumnsCount = 0;
+		IsMonthGathered = Array1D_bool ( 12, false );
+		TOCEntriesCount = 0;
+		TOCEntriesSize = 0;
+		UnitConvSize = 0;
+		WriteTabularFiles = false;
+		unitsStyle = 0;
+		numStyles = 0;
+		TabularOutputFile = Array1D< std::ofstream * > ( maxNumStyles, { &csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream } );
+		del = Array1D_string ( maxNumStyles );
+		TableStyle = Array1D_int ( maxNumStyles, 0 );
+		timeInYear = 0.0;
+		displayTabularBEPS = false;
+		displayLEEDSummary = false;
+		displayTabularCompCosts = false;
+		displayTabularVeriSum = false;
+		displayComponentSizing = false;
+		displaySurfaceShadowing = false;
+		displayDemandEndUse = false;
+		displayAdaptiveComfort = false;
+		displaySourceEnergyEndUseSummary = false;
+		displayZoneComponentLoadSummary = false;
+		meterNumTotalsBEPS = Array1D_int ( numResourceTypes, 0 );
+		meterNumTotalsSource = Array1D_int ( numSourceTypes, 0 );
+		fuelfactorsused = Array1D_bool ( numSourceTypes, false );
+		ffUsed = Array1D_bool ( numResourceTypes, false );
+		SourceFactors = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		ffSchedUsed = Array1D_bool ( numResourceTypes, false );
+		ffSchedIndex = Array1D_int ( numResourceTypes, 0 );
+		meterNumEndUseBEPS = Array2D_int ( numResourceTypes, NumEndUses, 0 );
+		meterNumEndUseSubBEPS.deallocate();
+//		resourceTypeNames.deallocate();
+//		sourceTypeNames.deallocate();
+//		endUseNames.deallocate();
+		gatherTotalsBEPS = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		gatherTotalsBySourceBEPS = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		gatherTotalsSource = Array1D< Real64 > ( numSourceTypes, 0.0 );
+		gatherTotalsBySource= Array1D< Real64 > ( numSourceTypes, 0.0 );
+		gatherEndUseBEPS = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
+		gatherEndUseBySourceBEPS = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
+		gatherEndUseSubBEPS.deallocate();
+		gatherDemandTotal = Array1D< Real64 > ( numResourceTypes, 0.0 );
+		gatherDemandEndUse = Array2D< Real64 > ( numResourceTypes, NumEndUses, 0.0 );
+		gatherDemandEndUseSub.deallocate();
+		gatherDemandTimeStamp = Array1D_int ( numResourceTypes, 0 );
+		gatherElapsedTimeBEPS = 0.0;
+		buildingGrossFloorArea = 0.0;
+		buildingConditionedFloorArea = 0.0;
+		fuelFactorSchedulesUsed = false;
+		meterNumPowerFuelFireGen = 0;
+		gatherPowerFuelFireGen = 0.0;
+		meterNumPowerPV = 0;
+		gatherPowerPV = 0.0;
+		meterNumPowerWind = 0;
+		gatherPowerWind = 0.0;
+		OverallNetEnergyFromStorage = 0.0;
+		meterNumPowerHTGeothermal = 0;
+		gatherPowerHTGeothermal = 0.0;
+		meterNumElecProduced = 0;
+		gatherElecProduced = 0.0;
+		meterNumElecPurchased = 0;
+		gatherElecPurchased = 0.0;
+		meterNumElecSurplusSold = 0;
+		gatherElecSurplusSold = 0.0;
+		meterNumWaterHeatRecovery = 0;
+		gatherWaterHeatRecovery = 0.0;
+		meterNumAirHeatRecoveryCool = 0;
+		gatherAirHeatRecoveryCool = 0.0;
+		meterNumAirHeatRecoveryHeat = 0;
+		gatherAirHeatRecoveryHeat = 0.0;
+		meterNumHeatHTGeothermal = 0;
+		gatherHeatHTGeothermal = 0.0;
+		meterNumHeatSolarWater = 0;
+		gatherHeatSolarWater = 0.0;
+		meterNumHeatSolarAir = 0;
+		gatherHeatSolarAir = 0.0;
+		meterNumRainWater = 0;
+		gatherRainWater = 0.0;
+		meterNumCondensate = 0;
+		gatherCondensate = 0.0;
+		meterNumGroundwater = 0;
+		gatherWellwater = 0.0;
+		meterNumMains = 0;
+		gatherMains = 0.0;
+		meterNumWaterEndUseTotal = 0;
+		gatherWaterEndUseTotal = 0.0;
+		sourceFactorElectric = 0.0;
+		sourceFactorNaturalGas = 0.0;
+		efficiencyDistrictCooling = 0.0;
+		efficiencyDistrictHeating = 0.0;
+		sourceFactorSteam = 0.0;
+		sourceFactorGasoline = 0.0;
+		sourceFactorDiesel = 0.0;
+		sourceFactorCoal = 0.0;
+		sourceFactorFuelOil1 = 0.0;
+		sourceFactorFuelOil2 = 0.0;
+		sourceFactorPropane = 0.0;
+		sourceFactorOtherFuel1 = 0.0;
+		sourceFactorOtherFuel2 = 0.0;
+		DesignDayName.deallocate();
+		DesignDayCount = 0;
+		radiantPulseUsed.deallocate();
+		radiantPulseTimestep.deallocate();
+		radiantPulseReceived.deallocate();
+		loadConvectedNormal.deallocate();
+		loadConvectedWithPulse.deallocate();
+		netSurfRadSeq.deallocate();
+		decayCurveCool.deallocate();
+		decayCurveHeat.deallocate();
+		ITABSFseq.deallocate();
+		TMULTseq.deallocate();
+		peopleInstantSeq.deallocate();
+		peopleLatentSeq.deallocate();
+		peopleRadSeq.deallocate();
+		lightInstantSeq.deallocate();
+		lightRetAirSeq.deallocate();
+		lightLWRadSeq.deallocate();
+		lightSWRadSeq.deallocate();
+		equipInstantSeq.deallocate();
+		equipLatentSeq.deallocate();
+		equipRadSeq.deallocate();
+		refrigInstantSeq.deallocate();
+		refrigRetAirSeq.deallocate();
+		refrigLatentSeq.deallocate();
+		waterUseInstantSeq.deallocate();
+		waterUseLatentSeq.deallocate();
+		hvacLossInstantSeq.deallocate();
+		hvacLossRadSeq.deallocate();
+		powerGenInstantSeq.deallocate();
+		powerGenRadSeq.deallocate();
+		infilInstantSeq.deallocate();
+		infilLatentSeq.deallocate();
+		zoneVentInstantSeq.deallocate();
+		zoneVentLatentSeq.deallocate();
+		interZoneMixInstantSeq.deallocate();
+		interZoneMixLatentSeq.deallocate();
+		feneCondInstantSeq.deallocate();
+		feneSolarRadSeq.deallocate();
+		maxUniqueKeyCount = 0;
+		OutputTableBinned.deallocate();
+		BinResults.deallocate();
+		BinResultsBelow.deallocate();
+		BinResultsAbove.deallocate();
+		BinObjVarID.deallocate();
+		BinStatistics.deallocate();
+		namedMonthly.deallocate();
+		MonthlyFieldSetInput.deallocate();
+		MonthlyInput.deallocate();
+		MonthlyTables.deallocate();
+		MonthlyColumns.deallocate();
+		TOCEntries.deallocate();
+		UnitConv.deallocate();
+
+		OutputReportTabular::ResetTabularReports();
+	}
 
 	void
 	UpdateTabularReports( int const IndexTypeKey ) // What kind of data to update (Zone, HVAC)
@@ -450,14 +683,15 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
+
 
 		if ( IndexTypeKey != ZoneTSReporting && IndexTypeKey != HVACTSReporting ) {
 			ShowFatalError( "Invalid reporting requested -- UpdateTabularReports" );
 		}
 
-		if ( GetInput ) {
+		if ( UpdateTabularReportsGetInput ) {
 			GetInputTabularMonthly();
+			OutputReportTabularAnnual::GetInputTabularAnnual();
 			GetInputTabularTimeBins();
 			GetInputTabularStyle();
 			GetInputTabularPredefined();
@@ -466,19 +700,22 @@ namespace OutputReportTabular {
 			GetInputFuelAndPollutionFactors();
 			SetupUnitConversions();
 			AddTOCZoneLoadComponentTable();
-			GetInput = false;
+			UpdateTabularReportsGetInput = false;
 			date_and_time( _, _, _, td );
 		}
 		if ( DoOutputReporting && WriteTabularFiles && ( KindOfSim == ksRunPeriodWeather ) ) {
 			if ( IndexTypeKey == stepTypeZone ) {
 				gatherElapsedTimeBEPS += TimeStepZone;
 			}
-			GatherMonthlyResultsForTimestep( IndexTypeKey );
-			GatherBinResultsForTimestep( IndexTypeKey );
-			GatherBEPSResultsForTimestep( IndexTypeKey );
-			GatherSourceEnergyEndUseResultsForTimestep( IndexTypeKey );
-			GatherPeakDemandForTimestep( IndexTypeKey );
-			GatherHeatGainReport( IndexTypeKey );
+			if ( DoWeathSim ) {
+				GatherMonthlyResultsForTimestep( IndexTypeKey );
+				OutputReportTabularAnnual::GatherAnnualResultsForTimeStep( IndexTypeKey );
+				GatherBinResultsForTimestep( IndexTypeKey );
+				GatherBEPSResultsForTimestep( IndexTypeKey );
+				GatherSourceEnergyEndUseResultsForTimestep( IndexTypeKey );
+				GatherPeakDemandForTimestep( IndexTypeKey );
+				GatherHeatGainReport( IndexTypeKey );
+			}
 		}
 	}
 
@@ -923,17 +1160,21 @@ namespace OutputReportTabular {
 		MonthlyTables.allocate( MonthlyTablesCount );
 		MonthlyColumns.allocate( MonthlyColumnsCount );
 		// Initialize tables and results
-		MonthlyTables.keyValue() = "";
-		MonthlyTables.firstColumn() = 0;
-		MonthlyTables.numColumns() = 0;
+		for ( auto & e : MonthlyTables ) {
+			e.keyValue.clear();
+			e.firstColumn = 0;
+			e.numColumns = 0;
+		}
 
-		MonthlyColumns.varName() = "";
-		MonthlyColumns.varNum() = 0;
-		MonthlyColumns.typeOfVar() = 0;
-		MonthlyColumns.avgSum() = 0;
-		MonthlyColumns.stepType() = 0;
-		MonthlyColumns.units() = "";
-		MonthlyColumns.aggType() = 0;
+		for ( auto & e : MonthlyColumns ) {
+			e.varName.clear();
+			e.varNum = 0;
+			e.typeOfVar = 0;
+			e.avgSum = 0;
+			e.stepType = 0;
+			e.units.clear();
+			e.aggType = 0;
+		}
 		for ( colNum = 1; colNum <= MonthlyColumnsCount; ++colNum ) {
 			MonthlyColumns( colNum ).reslt = 0.0;
 			MonthlyColumns( colNum ).timeStamp = 0;
@@ -1330,20 +1571,27 @@ namespace OutputReportTabular {
 			}
 		}
 		// clear the binning arrays to zeros
-		BinResults.mnth() = 0.0;
-		BinResultsBelow.mnth() = 0.0;
-		BinResultsAbove.mnth() = 0.0;
-		BinResults.hrly() = 0.0;
-		BinResultsBelow.hrly() = 0.0;
-		BinResultsAbove.hrly() = 0.0;
+		for ( auto & e : BinResults ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsBelow ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsAbove ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
 
 		// initialize statistics counters
-		BinStatistics.minimum() = huge( bigVal );
-		BinStatistics.maximum() = -huge( bigVal );
-		BinStatistics.n() = 0;
-		BinStatistics.sum() = 0.0;
-		BinStatistics.sum2() = 0.0;
-
+		for ( auto & e : BinStatistics ) {
+			e.minimum = huge( bigVal );
+			e.maximum = -huge( bigVal );
+			e.n = 0;
+			e.sum = 0.0;
+			e.sum2 = 0.0;
+		}
 	}
 
 	bool
@@ -1876,6 +2124,8 @@ namespace OutputReportTabular {
 			meterNumPowerPV = GetMeterIndex( "Photovoltaic:ElectricityProduced" );
 			meterNumPowerWind = GetMeterIndex( "WindTurbine:ElectricityProduced" );
 			meterNumPowerHTGeothermal = GetMeterIndex( "HTGeothermal:ElectricityProduced" );
+			meterNumElecStorage = GetMeterIndex( "ElectricStorage:ElectricityProduced" );
+			meterNumPowerConversion = GetMeterIndex( "PowerConversion:ElectricityProduced");
 			meterNumElecProduced = GetMeterIndex( "ElectricityProduced:Facility" );
 			meterNumElecPurchased = GetMeterIndex( "ElectricityPurchased:Facility" );
 			meterNumElecSurplusSold = GetMeterIndex( "ElectricitySurplusSold:Facility" );
@@ -1894,6 +2144,8 @@ namespace OutputReportTabular {
 			gatherElecProduced = 0.0;
 			gatherElecPurchased = 0.0;
 			gatherElecSurplusSold = 0.0;
+			gatherElecStorage = 0.0;
+			gatherPowerConversion = 0.0;
 
 			// get meter numbers for onsite thermal components on BEPS report
 			meterNumWaterHeatRecovery = GetMeterIndex( "HeatRecovery:EnergyTransfer" );
@@ -3270,6 +3522,7 @@ namespace OutputReportTabular {
 		static std::string const Component_Cost_Economics_Summary( "Component Cost Economics Summary" );
 		static std::string const Component_Sizing_Summary( "Component Sizing Summary" );
 		static std::string const Surface_Shadowing_Summary( "Surface Shadowing Summary" );
+		static std::string const Adaptive_Comfort_Summary( "Adaptive Comfort Summary" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3318,6 +3571,9 @@ namespace OutputReportTabular {
 				if ( displaySurfaceShadowing ) {
 					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Surface_Shadowing_Summary, Entire_Facility ) << "\">Surface Shadowing Summary</a>\n";
 				}
+				if ( displayAdaptiveComfort ){
+					tbl_stream << "<br><a href=\"#" << MakeAnchorName( Adaptive_Comfort_Summary, Entire_Facility ) << "\">Adaptive Comfort Summary</a>\n";
+				}
 				for ( kReport = 1; kReport <= numReportName; ++kReport ) {
 					if ( reportName( kReport ).show ) {
 						tbl_stream << "<br><a href=\"#" << MakeAnchorName( reportName( kReport ).namewithspaces, Entire_Facility ) << "\">" << reportName( kReport ).namewithspaces << "</a>\n";
@@ -3357,6 +3613,7 @@ namespace OutputReportTabular {
 							}
 						}
 					}
+					OutputReportTabularAnnual::AddAnnualTableOfContents( tbl_stream );
 				}
 				//add entries specifically added using AddTOCEntry
 				for ( iEntry = 1; iEntry <= TOCEntriesCount; ++iEntry ) {
@@ -3475,6 +3732,16 @@ namespace OutputReportTabular {
 						if ( OutputTableBinned( iInObj ).avgSum == isSum ) { // if it is a summed variable
 							curValue /= ( elapsedTime * SecInHour );
 						}
+						// round the value to the number of signficant digits used in the final output report
+						if ( curIntervalSize < 1 ) {
+							curValue = round( curValue * 10000.0 ) / 10000.0; // four significant digits
+						}
+						else if ( curIntervalSize >= 10 ) {
+							curValue = round( curValue ); // zero significant digits
+						}
+						else {
+							curValue = round( curValue * 100.0 ) / 100.0; // two significant digits
+						}
 						// check if the value is above the maximum or below the minimum value
 						// first before binning the value within the range.
 						if ( curValue < curIntervalStart ) {
@@ -3566,7 +3833,7 @@ namespace OutputReportTabular {
 		Real64 oldScanValue;
 		// local copies of some of the MonthlyColumns array references since
 		// profiling showed that they were slow.
-		static bool RunOnce( true );
+
 		static Array1D_int MonthlyColumnsTypeOfVar;
 		static Array1D_int MonthlyColumnsStepType;
 		static Array1D_int MonthlyColumnsAggType;
@@ -3576,18 +3843,29 @@ namespace OutputReportTabular {
 
 		if ( ! DoWeathSim ) return;
 
-		//create temporary arrays to speed processing of these arrays
-		if ( RunOnce ) {
-			//MonthlyColumns
-			MonthlyColumnsTypeOfVar = MonthlyColumns.typeOfVar();
-			MonthlyColumnsStepType = MonthlyColumns.stepType();
-			MonthlyColumnsAggType = MonthlyColumns.aggType();
-			MonthlyColumnsVarNum = MonthlyColumns.varNum();
-			//MonthlyTables
-			MonthlyTablesNumColumns = MonthlyTables.numColumns();
+		// create temporary arrays to speed processing of these arrays
+		if ( GatherMonthlyResultsForTimestepRunOnce ) {
+			// MonthlyColumns
+			MonthlyColumnsTypeOfVar.allocate( MonthlyColumns.I() );
+			MonthlyColumnsStepType.allocate( MonthlyColumns.I() );
+			MonthlyColumnsAggType.allocate( MonthlyColumns.I() );
+			MonthlyColumnsVarNum.allocate( MonthlyColumns.I() );
+			for ( int i = MonthlyColumns.l(), e = MonthlyColumns.u(); i <= e; ++i ) {
+				auto const & col( MonthlyColumns( i ) );
+				MonthlyColumnsTypeOfVar( i ) = col.typeOfVar;
+				MonthlyColumnsStepType( i ) = col.stepType;
+				MonthlyColumnsAggType( i ) = col.aggType;
+				MonthlyColumnsVarNum( i ) = col.varNum;
+			}
 
-			//set flag so this block is only executed once
-			RunOnce = false;
+			// MonthlyTables
+			MonthlyTablesNumColumns.allocate( MonthlyTables.I() );
+			for ( int i = MonthlyTables.l(), e = MonthlyTables.u(); i <= e; ++i ) {
+				MonthlyTablesNumColumns( i ) = MonthlyTables( i ).numColumns;
+			}
+
+			// set flag so this block is only executed once
+			GatherMonthlyResultsForTimestepRunOnce = false;
 		}
 
 		elapsedTime = TimeStepSys;
@@ -3961,6 +4239,8 @@ namespace OutputReportTabular {
 			gatherElecProduced += GetCurrentMeterValue( meterNumElecProduced );
 			gatherElecPurchased += GetCurrentMeterValue( meterNumElecPurchased );
 			gatherElecSurplusSold += GetCurrentMeterValue( meterNumElecSurplusSold );
+			gatherElecStorage += GetCurrentMeterValue( meterNumElecStorage );
+			gatherPowerConversion += GetCurrentMeterValue( meterNumPowerConversion );
 			// gather the onsite thermal components
 			gatherWaterHeatRecovery += GetCurrentMeterValue( meterNumWaterHeatRecovery );
 			gatherAirHeatRecoveryCool += GetCurrentMeterValue( meterNumAirHeatRecoveryCool );
@@ -4300,6 +4580,7 @@ namespace OutputReportTabular {
 		using DataHeatBalance::ZoneWinHeatGainRep;
 		using DataHeatBalance::ZoneWinHeatLossRep;
 		using DataHeatBalance::BuildingPreDefRep;
+		using DataHeatBalance::Zone;
 		using VentilatedSlab::VentSlab;
 		using VentilatedSlab::NumOfVentSlabs;
 		using LowTempRadiantSystem::HydrRadSys;
@@ -4347,7 +4628,8 @@ namespace OutputReportTabular {
 		static Real64 bldgHtPk( 0.0 );
 		static Real64 bldgClPk( 0.0 );
 		static Real64 timeStepRatio( 0.0 );
-		static bool firstTime( true );
+
+		Real64 mult; // zone list and group multipliers
 
 		int ActualTimeMin;
 
@@ -4357,12 +4639,12 @@ namespace OutputReportTabular {
 
 		if ( IndexTypeKey == stepTypeZone ) return; //only add values over the HVAC timestep basis
 
-		if ( firstTime ) {
+		if ( GatherHeatGainReportfirstTime ) {
 			radiantHeat.allocate( NumOfZones );
 			radiantCool.allocate( NumOfZones );
 			ATUHeat.allocate( NumOfZones );
 			ATUCool.allocate( NumOfZones );
-			firstTime = false;
+			GatherHeatGainReportfirstTime = false;
 		}
 		//clear the radiant surface accumulation variables
 		radiantHeat = 0.0;
@@ -4375,48 +4657,50 @@ namespace OutputReportTabular {
 		//--------------------
 		timeStepRatio = TimeStepSys / TimeStepZone; //the fraction of the zone time step used by the system timestep
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
 			//People Sensible Heat Addition
-			ZonePreDefRep( iZone ).SHGSAnPeoplAdd += ZnRpt( iZone ).PeopleSenGain * timeStepRatio;
+			ZonePreDefRep( iZone ).SHGSAnPeoplAdd += ZnRpt( iZone ).PeopleSenGain * mult * timeStepRatio;
 			//Lights Sensible Heat Addition
-			ZonePreDefRep( iZone ).SHGSAnLiteAdd += ZnRpt( iZone ).LtsTotGain * timeStepRatio;
+			ZonePreDefRep( iZone ).SHGSAnLiteAdd += ZnRpt( iZone ).LtsTotGain * mult * timeStepRatio;
 			//HVAC Input Sensible Air Heating
 			//HVAC Input Sensible Air Cooling
 			if ( ( ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem ) > 0.0 ) {
-				ZonePreDefRep( iZone ).SHGSAnHvacHt += ZnAirRpt( iZone ).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt( iZone ).SumNonAirSystem * TimeStepSys * SecInHour;
+				ZonePreDefRep( iZone ).SHGSAnHvacHt += ZnAirRpt( iZone ).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt( iZone ).SumNonAirSystem * mult * TimeStepSys * SecInHour;
 			} else {
-				ZonePreDefRep( iZone ).SHGSAnHvacCl += ZnAirRpt( iZone ).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt( iZone ).SumNonAirSystem * TimeStepSys * SecInHour;
+				ZonePreDefRep( iZone ).SHGSAnHvacCl += ZnAirRpt( iZone ).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt( iZone ).SumNonAirSystem * mult * TimeStepSys * SecInHour;
 			}
 			//Interzone Air Transfer Heat Addition
 			//Interzone Air Transfer Heat Removal
 			if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-				ZonePreDefRep( iZone ).SHGSAnIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones * TimeStepSys * SecInHour;
+				ZonePreDefRep( iZone ).SHGSAnIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones * mult * TimeStepSys * SecInHour;
 			} else {
-				ZonePreDefRep( iZone ).SHGSAnIzaRem += ZnAirRpt( iZone ).SumMCpDTzones * TimeStepSys * SecInHour;
+				ZonePreDefRep( iZone ).SHGSAnIzaRem += ZnAirRpt( iZone ).SumMCpDTzones * mult * TimeStepSys * SecInHour;
 			}
 			//Window Heat Addition
 			//Window Heat Removal
-			ZonePreDefRep( iZone ).SHGSAnWindAdd += ZoneWinHeatGainRepEnergy( iZone ) * timeStepRatio;
-			ZonePreDefRep( iZone ).SHGSAnWindRem -= ZoneWinHeatLossRepEnergy( iZone ) * timeStepRatio;
+			ZonePreDefRep( iZone ).SHGSAnWindAdd += ZoneWinHeatGainRepEnergy( iZone ) * mult * timeStepRatio;
+			ZonePreDefRep( iZone ).SHGSAnWindRem -= ZoneWinHeatLossRepEnergy( iZone ) * mult * timeStepRatio;
 			//Infiltration Heat Addition
 			//Infiltration Heat Removal
 			if ( ZnAirRpt( iZone ).SumMCpDtInfil > 0.0 ) {
-				ZonePreDefRep( iZone ).SHGSAnInfilAdd += ZnAirRpt( iZone ).SumMCpDtInfil * TimeStepSys * SecInHour;
+				ZonePreDefRep( iZone ).SHGSAnInfilAdd += ZnAirRpt( iZone ).SumMCpDtInfil * mult * TimeStepSys * SecInHour;
 			} else {
-				ZonePreDefRep( iZone ).SHGSAnInfilRem += ZnAirRpt( iZone ).SumMCpDtInfil * TimeStepSys * SecInHour;
+				ZonePreDefRep( iZone ).SHGSAnInfilRem += ZnAirRpt( iZone ).SumMCpDtInfil * mult * TimeStepSys * SecInHour;
 			}
 			//Equipment Sensible Heat Addition
 			//Equipment Sensible Heat Removal
 			// the following variables are already gains so they do not need to be converted by multiplying by time.
 			eqpSens = ( ZnRpt( iZone ).ElecRadGain + ZnRpt( iZone ).GasRadGain + ZnRpt( iZone ).HWRadGain + ZnRpt( iZone ).SteamRadGain + ZnRpt( iZone ).OtherRadGain + ZnRpt( iZone ).ElecConGain + ZnRpt( iZone ).GasConGain + ZnRpt( iZone ).HWConGain + ZnRpt( iZone ).SteamConGain + ZnRpt( iZone ).OtherConGain ) * timeStepRatio;
 			if ( eqpSens > 0.0 ) {
-				ZonePreDefRep( iZone ).SHGSAnEquipAdd += eqpSens;
+				ZonePreDefRep( iZone ).SHGSAnEquipAdd += eqpSens * mult;
 			} else {
-				ZonePreDefRep( iZone ).SHGSAnEquipRem += eqpSens;
+				ZonePreDefRep( iZone ).SHGSAnEquipRem += eqpSens * mult;
 			}
 		}
 		// HVAC annual heating by ATU
 		// HVAC annual cooling by ATU
 		for ( iunit = 1; iunit <= NumAirDistUnits; ++iunit ){
+			// HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
 			curZone = AirDistUnit( iunit ).ZoneNum;
 			if ( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
 				ZonePreDefRep( curZone ).SHGSAnHvacATUHt += AirDistUnit( iunit ).HeatGain;
@@ -4427,6 +4711,7 @@ namespace OutputReportTabular {
 		}
 		iunit = 0;
 		for ( iunit = 1; iunit <= NumDirectAir; ++iunit ){
+			// HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
 			curZone = DirectAir( iunit ).ZoneNum;
 			if ( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
 				ZonePreDefRep( curZone ).SHGSAnHvacATUHt += DirectAir( iunit ).HeatEnergy;
@@ -4440,41 +4725,46 @@ namespace OutputReportTabular {
 		// HVAC Input Cooled Surface Cooling
 		for ( iRadiant = 1; iRadiant <= NumOfVentSlabs; ++iRadiant ) {
 			curZone = VentSlab( iRadiant ).ZonePtr;
-			if ( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
-				ZonePreDefRep( curZone ).SHGSAnSurfHt += VentSlab( iRadiant ).RadHeatingEnergy;
-				ZonePreDefRep( curZone ).SHGSAnSurfCl -= VentSlab( iRadiant ).RadCoolingEnergy;
-				radiantHeat( curZone ) = VentSlab( iRadiant ).RadHeatingPower;
-				radiantCool( curZone ) = -VentSlab( iRadiant ).RadCoolingPower;
+			mult = Zone( curZone ).Multiplier * Zone( curZone ).ListMultiplier;
+			if( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
+				ZonePreDefRep( curZone ).SHGSAnSurfHt += VentSlab( iRadiant ).RadHeatingEnergy * mult;
+				ZonePreDefRep( curZone ).SHGSAnSurfCl -= VentSlab( iRadiant ).RadCoolingEnergy * mult;
+				radiantHeat( curZone ) = VentSlab( iRadiant ).RadHeatingPower * mult;
+				radiantCool( curZone ) = -VentSlab( iRadiant ).RadCoolingPower * mult;
 			}
 		}
 		for ( iRadiant = 1; iRadiant <= NumOfHydrLowTempRadSys; ++iRadiant ) {
 			curZone = HydrRadSys( iRadiant ).ZonePtr;
-			if ( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
-				ZonePreDefRep( curZone ).SHGSAnSurfHt += HydrRadSys( iRadiant ).HeatEnergy;
-				ZonePreDefRep( curZone ).SHGSAnSurfCl -= HydrRadSys( iRadiant ).CoolEnergy;
-				radiantHeat( curZone ) += HydrRadSys( iRadiant ).HeatPower;
-				radiantCool( curZone ) -= HydrRadSys( iRadiant ).CoolPower;
+			mult = Zone( curZone ).Multiplier * Zone( curZone ).ListMultiplier;
+			if( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
+				ZonePreDefRep( curZone ).SHGSAnSurfHt += HydrRadSys( iRadiant ).HeatEnergy * mult;
+				ZonePreDefRep( curZone ).SHGSAnSurfCl -= HydrRadSys( iRadiant ).CoolEnergy * mult;
+				radiantHeat( curZone ) += HydrRadSys( iRadiant ).HeatPower * mult;
+				radiantCool( curZone ) -= HydrRadSys( iRadiant ).CoolPower * mult;
 			}
 		}
 		for ( iRadiant = 1; iRadiant <= NumOfCFloLowTempRadSys; ++iRadiant ) {
 			curZone = CFloRadSys( iRadiant ).ZonePtr;
-			if ( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
-				ZonePreDefRep( curZone ).SHGSAnSurfHt += CFloRadSys( iRadiant ).HeatEnergy;
-				ZonePreDefRep( curZone ).SHGSAnSurfCl -= CFloRadSys( iRadiant ).CoolEnergy;
-				radiantHeat( curZone ) += CFloRadSys( iRadiant ).HeatPower;
-				radiantCool( curZone ) -= CFloRadSys( iRadiant ).CoolPower;
+			mult = Zone( curZone ).Multiplier * Zone( curZone ).ListMultiplier;
+			if( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
+				ZonePreDefRep( curZone ).SHGSAnSurfHt += CFloRadSys( iRadiant ).HeatEnergy * mult;
+				ZonePreDefRep( curZone ).SHGSAnSurfCl -= CFloRadSys( iRadiant ).CoolEnergy * mult;
+				radiantHeat( curZone ) += CFloRadSys( iRadiant ).HeatPower * mult;
+				radiantCool( curZone ) -= CFloRadSys( iRadiant ).CoolPower * mult;
 			}
 		}
 		for ( iRadiant = 1; iRadiant <= NumOfElecLowTempRadSys; ++iRadiant ) {
 			curZone = ElecRadSys( iRadiant ).ZonePtr;
-			if ( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
-				ZonePreDefRep( curZone ).SHGSAnSurfHt += ElecRadSys( iRadiant ).HeatEnergy;
-				radiantHeat( curZone ) += ElecRadSys( iRadiant ).HeatPower;
+			mult = Zone( curZone ).Multiplier * Zone( curZone ).ListMultiplier;
+			if( ( curZone > 0 ) && ( curZone <= NumOfZones ) ) {
+				ZonePreDefRep( curZone ).SHGSAnSurfHt += ElecRadSys( iRadiant ).HeatEnergy * mult;
+				radiantHeat( curZone ) += ElecRadSys( iRadiant ).HeatPower * mult;
 			}
 		}
 		// Opaque Surface Conduction and Other Heat Addition
 		// Opaque Surface Conduction and Other Heat Removal
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			// ZonePreDefRep variables above already inlude zone list and group multipliers
 			total = ZonePreDefRep( iZone ).SHGSAnPeoplAdd + ZonePreDefRep( iZone ).SHGSAnLiteAdd + ZonePreDefRep( iZone ).SHGSAnHvacHt + ZonePreDefRep( iZone ).SHGSAnHvacCl + ZonePreDefRep( iZone ).SHGSAnIzaAdd + ZonePreDefRep( iZone ).SHGSAnIzaRem + ZonePreDefRep( iZone ).SHGSAnWindAdd + ZonePreDefRep( iZone ).SHGSAnWindRem + ZonePreDefRep( iZone ).SHGSAnInfilAdd + ZonePreDefRep( iZone ).SHGSAnInfilRem + ZonePreDefRep( iZone ).SHGSAnEquipAdd + ZonePreDefRep( iZone ).SHGSAnEquipRem + ZonePreDefRep( iZone ).SHGSAnSurfHt + ZonePreDefRep( iZone ).SHGSAnSurfCl;
 			total = -total; //want to know the negative value of the sum since the row should add up to zero
 			if ( total > 0 ) {
@@ -4487,9 +4777,12 @@ namespace OutputReportTabular {
 		// ZONE PEAK COOLING AND HEATING
 		//--------------------------------
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-			if ( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem ) > 0 ) {
-				if ( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem ) > ZonePreDefRep( iZone ).htPeak ) {
-					ZonePreDefRep( iZone ).htPeak = ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem;
+			mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
+			// RR I can't get the Infiltration Heat Addition/Removal columns to add up.
+			// THis is the only suspect line, mixing MCpDt terms and a power term looks fishy.
+			if( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult ) > 0 ) {
+				if( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult ) > ZonePreDefRep( iZone ).htPeak ) {
+					ZonePreDefRep( iZone ).htPeak = ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 					//determine timestamp
 					//      ActualTimeS = CurrentTime-TimeStepZone+SysTimeElapsed
 					//      ActualtimeE = ActualTimeS+TimeStepSys
@@ -4500,49 +4793,52 @@ namespace OutputReportTabular {
 					ZonePreDefRep( iZone ).htPtTimeStamp = timestepTimeStamp;
 					//HVAC Input Sensible Air Heating
 					//HVAC Input Sensible Air Cooling
-					ZonePreDefRep( iZone ).SHGSHtHvacHt = ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem;
+					// non-HVAC ZnAirRpt variables DO NOT include zone multipliers
+					ZonePreDefRep( iZone ).SHGSHtHvacHt = ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 					ZonePreDefRep( iZone ).SHGSHtHvacCl = 0.0;
 					// HVAC Input Heated Surface Heating
 					// HVAC Input Cooled Surface Cooling
-					ZonePreDefRep( iZone ).SHGSHtSurfHt = radiantHeat( iZone );
-					ZonePreDefRep( iZone ).SHGSHtSurfCl = radiantCool( iZone );
+					ZonePreDefRep( iZone ).SHGSHtSurfHt = radiantHeat( iZone ); // multipliers included above
+					ZonePreDefRep( iZone ).SHGSHtSurfCl = radiantCool( iZone ); // multipliers included above
 					// HVAC ATU Heating at Heat Peak
 					// HVAC ATU Cooling at Heat Peak
-					ZonePreDefRep( iZone ).SHGSHtHvacATUHt = ATUHeat( iZone );
-					ZonePreDefRep( iZone ).SHGSHtHvacATUCl = ATUCool( iZone );
+					ZonePreDefRep( iZone ).SHGSHtHvacATUHt = ATUHeat( iZone ); // multipliers included above
+					ZonePreDefRep( iZone ).SHGSHtHvacATUCl = ATUCool( iZone ); // multipliers included above
 					//People Sensible Heat Addition
-					ZonePreDefRep( iZone ).SHGSHtPeoplAdd = ZnRpt( iZone ).PeopleSenGainRate;
+					ZonePreDefRep( iZone ).SHGSHtPeoplAdd = ZnRpt( iZone ).PeopleSenGainRate * mult;
 					//Lights Sensible Heat Addition
-					ZonePreDefRep( iZone ).SHGSHtLiteAdd = ZnRpt( iZone ).LtsTotGainRate;
+					ZonePreDefRep( iZone ).SHGSHtLiteAdd = ZnRpt( iZone ).LtsTotGainRate * mult;
 					//Equipment Sensible Heat Addition
 					//Equipment Sensible Heat Removal
+					// non-HVAC ZnAirRpt variables DO NOT include zone multipliers
 					eqpSens = ZnRpt( iZone ).ElecRadGainRate + ZnRpt( iZone ).GasRadGainRate + ZnRpt( iZone ).HWRadGainRate + ZnRpt( iZone ).SteamRadGainRate + ZnRpt( iZone ).OtherRadGainRate + ZnRpt( iZone ).ElecConGainRate + ZnRpt( iZone ).GasConGainRate + ZnRpt( iZone ).HWConGainRate + ZnRpt( iZone ).SteamConGainRate + ZnRpt( iZone ).OtherConGainRate;
 					if ( eqpSens > 0.0 ) {
-						ZonePreDefRep( iZone ).SHGSHtEquipAdd = eqpSens;
+						ZonePreDefRep( iZone ).SHGSHtEquipAdd = eqpSens * mult;
 						ZonePreDefRep( iZone ).SHGSHtEquipRem = 0.0;
 					} else {
 						ZonePreDefRep( iZone ).SHGSHtEquipAdd = 0.0;
-						ZonePreDefRep( iZone ).SHGSHtEquipRem = eqpSens;
+						ZonePreDefRep( iZone ).SHGSHtEquipRem = eqpSens * mult;
 					}
 					//Window Heat Addition
 					//Window Heat Removal
-					ZonePreDefRep( iZone ).SHGSHtWindAdd = ZoneWinHeatGainRep( iZone );
-					ZonePreDefRep( iZone ).SHGSHtWindRem = -ZoneWinHeatLossRep( iZone );
+					ZonePreDefRep( iZone ).SHGSHtWindAdd = ZoneWinHeatGainRep( iZone ) * mult;
+					ZonePreDefRep( iZone ).SHGSHtWindRem = -ZoneWinHeatLossRep( iZone ) * mult;
+					// mixing object heat addition and removal
 					if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-						ZonePreDefRep( iZone ).SHGSHtIzaAdd = ZnAirRpt( iZone ).SumMCpDTzones;
+						ZonePreDefRep( iZone ).SHGSHtIzaAdd = ZnAirRpt( iZone ).SumMCpDTzones * mult;
 						ZonePreDefRep( iZone ).SHGSHtIzaRem = 0.0;
 					} else {
 						ZonePreDefRep( iZone ).SHGSHtIzaAdd = 0.0;
-						ZonePreDefRep( iZone ).SHGSHtIzaRem = ZnAirRpt( iZone ).SumMCpDTzones;
+						ZonePreDefRep( iZone ).SHGSHtIzaRem = ZnAirRpt( iZone ).SumMCpDTzones * mult;
 					}
 					//Infiltration Heat Addition
 					//Infiltration Heat Removal
 					if ( ZnAirRpt( iZone ).SumMCpDtInfil > 0.0 ) {
-						ZonePreDefRep( iZone ).SHGSHtInfilAdd = ZnAirRpt( iZone ).SumMCpDtInfil;
+						ZonePreDefRep( iZone ).SHGSHtInfilAdd = ZnAirRpt( iZone ).SumMCpDtInfil * mult;
 						ZonePreDefRep( iZone ).SHGSHtInfilRem = 0.0;
 					} else {
 						ZonePreDefRep( iZone ).SHGSHtInfilAdd = 0.0;
-						ZonePreDefRep( iZone ).SHGSHtInfilRem = ZnAirRpt( iZone ).SumMCpDtInfil;
+						ZonePreDefRep( iZone ).SHGSHtInfilRem = ZnAirRpt( iZone ).SumMCpDtInfil * mult;
 					}
 					// Opaque Surface Conduction and Other Heat Addition
 					// Opaque Surface Conduction and Other Heat Removal
@@ -4557,8 +4853,8 @@ namespace OutputReportTabular {
 					}
 				}
 			} else {
-				if ( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantCool( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem ) < ZonePreDefRep( iZone ).clPeak ) {
-					ZonePreDefRep( iZone ).clPeak = ZnAirRpt( iZone ).SumMCpDTsystem + radiantCool( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem;
+				if( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantCool( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult ) < ZonePreDefRep( iZone ).clPeak ) {
+					ZonePreDefRep( iZone ).clPeak = ZnAirRpt( iZone ).SumMCpDTsystem + radiantCool( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 					//determine timestamp
 					//      ActualTimeS = CurrentTime-TimeStepZone+SysTimeElapsed
 					//      ActualtimeE = ActualTimeS+TimeStepSys
@@ -4570,7 +4866,7 @@ namespace OutputReportTabular {
 					//HVAC Input Sensible Air Heating
 					//HVAC Input Sensible Air Cooling
 					ZonePreDefRep( iZone ).SHGSClHvacHt = 0.0;
-					ZonePreDefRep( iZone ).SHGSClHvacCl = ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem;
+					ZonePreDefRep( iZone ).SHGSClHvacCl = ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 					// HVAC Input Heated Surface Heating
 					// HVAC Input Cooled Surface Cooling
 					ZonePreDefRep( iZone ).SHGSClSurfHt = radiantHeat( iZone );
@@ -4580,38 +4876,39 @@ namespace OutputReportTabular {
 					ZonePreDefRep( iZone ).SHGSClHvacATUHt = ATUHeat( iZone );
 					ZonePreDefRep( iZone ).SHGSClHvacATUCl = ATUCool( iZone );
 					//People Sensible Heat Addition
-					ZonePreDefRep( iZone ).SHGSClPeoplAdd = ZnRpt( iZone ).PeopleSenGainRate;
+					ZonePreDefRep( iZone ).SHGSClPeoplAdd = ZnRpt( iZone ).PeopleSenGainRate * mult;
 					//Lights Sensible Heat Addition
-					ZonePreDefRep( iZone ).SHGSClLiteAdd = ZnRpt( iZone ).LtsTotGainRate;
+					ZonePreDefRep( iZone ).SHGSClLiteAdd = ZnRpt( iZone ).LtsTotGainRate * mult;
 					//Equipment Sensible Heat Addition
 					//Equipment Sensible Heat Removal
 					eqpSens = ZnRpt( iZone ).ElecRadGainRate + ZnRpt( iZone ).GasRadGainRate + ZnRpt( iZone ).HWRadGainRate + ZnRpt( iZone ).SteamRadGainRate + ZnRpt( iZone ).OtherRadGainRate + ZnRpt( iZone ).ElecConGainRate + ZnRpt( iZone ).GasConGainRate + ZnRpt( iZone ).HWConGainRate + ZnRpt( iZone ).SteamConGainRate + ZnRpt( iZone ).OtherConGainRate;
 					if ( eqpSens > 0.0 ) {
-						ZonePreDefRep( iZone ).SHGSClEquipAdd = eqpSens;
+						ZonePreDefRep( iZone ).SHGSClEquipAdd = eqpSens * mult;
 						ZonePreDefRep( iZone ).SHGSClEquipRem = 0.0;
 					} else {
 						ZonePreDefRep( iZone ).SHGSClEquipAdd = 0.0;
-						ZonePreDefRep( iZone ).SHGSClEquipRem = eqpSens;
+						ZonePreDefRep( iZone ).SHGSClEquipRem = eqpSens * mult;
 					}
 					//Window Heat Addition
 					//Window Heat Removal
-					ZonePreDefRep( iZone ).SHGSClWindAdd = ZoneWinHeatGainRep( iZone );
-					ZonePreDefRep( iZone ).SHGSClWindRem = -ZoneWinHeatLossRep( iZone );
-					if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-						ZonePreDefRep( iZone ).SHGSClIzaAdd = ZnAirRpt( iZone ).SumMCpDTzones;
+					ZonePreDefRep( iZone ).SHGSClWindAdd = ZoneWinHeatGainRep( iZone ) * mult;
+					ZonePreDefRep( iZone ).SHGSClWindRem = -ZoneWinHeatLossRep( iZone ) * mult;
+					// mixing object cool addition and removal
+					if( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
+						ZonePreDefRep( iZone ).SHGSClIzaAdd = ZnAirRpt( iZone ).SumMCpDTzones * mult;
 						ZonePreDefRep( iZone ).SHGSClIzaRem = 0.0;
 					} else {
 						ZonePreDefRep( iZone ).SHGSClIzaAdd = 0.0;
-						ZonePreDefRep( iZone ).SHGSClIzaRem = ZnAirRpt( iZone ).SumMCpDTzones;
+						ZonePreDefRep( iZone ).SHGSClIzaRem = ZnAirRpt( iZone ).SumMCpDTzones * mult;
 					}
 					//Infiltration Heat Addition
 					//Infiltration Heat Removal
 					if ( ZnAirRpt( iZone ).SumMCpDtInfil > 0.0 ) {
-						ZonePreDefRep( iZone ).SHGSClInfilAdd = ZnAirRpt( iZone ).SumMCpDtInfil;
+						ZonePreDefRep( iZone ).SHGSClInfilAdd = ZnAirRpt( iZone ).SumMCpDtInfil * mult;
 						ZonePreDefRep( iZone ).SHGSClInfilRem = 0.0;
 					} else {
 						ZonePreDefRep( iZone ).SHGSClInfilAdd = 0.0;
-						ZonePreDefRep( iZone ).SHGSClInfilRem = ZnAirRpt( iZone ).SumMCpDtInfil;
+						ZonePreDefRep( iZone ).SHGSClInfilRem = ZnAirRpt( iZone ).SumMCpDtInfil * mult;
 					}
 					// Opaque Surface Conduction and Other Heat Addition
 					// Opaque Surface Conduction and Other Heat Removal
@@ -4633,10 +4930,11 @@ namespace OutputReportTabular {
 		bldgHtPk = 0.0;
 		bldgClPk = 0.0;
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-			if ( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem ) > 0 ) {
-				bldgHtPk += ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem;
+			mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
+			if( ( ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult ) > 0 ) {
+				bldgHtPk += ZnAirRpt( iZone ).SumMCpDTsystem + radiantHeat( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 			} else {
-				bldgClPk += ZnAirRpt( iZone ).SumMCpDTsystem + radiantCool( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem;
+				bldgClPk += ZnAirRpt( iZone ).SumMCpDTsystem + radiantCool( iZone ) + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 			}
 		}
 		if ( bldgHtPk > BuildingPreDefRep.htPeak ) {
@@ -4669,9 +4967,10 @@ namespace OutputReportTabular {
 			BuildingPreDefRep.SHGSHtInfilRem = 0.0;
 			BuildingPreDefRep.SHGSHtOtherRem = 0.0;
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+				mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
 				//HVAC Input Sensible Air Heating
 				//HVAC Input Sensible Air Cooling
-				BuildingPreDefRep.SHGSHtHvacHt += ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem;
+				BuildingPreDefRep.SHGSHtHvacHt += ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 				// HVAC Input Heated Surface Heating
 				// HVAC Input Cooled Surface Cooling
 				BuildingPreDefRep.SHGSHtSurfHt += radiantHeat( iZone );
@@ -4681,32 +4980,33 @@ namespace OutputReportTabular {
 				BuildingPreDefRep.SHGSHtHvacATUHt += ATUHeat( iZone );
 				BuildingPreDefRep.SHGSHtHvacATUCl += ATUCool( iZone );
 				//People Sensible Heat Addition
-				BuildingPreDefRep.SHGSHtPeoplAdd += ZnRpt( iZone ).PeopleSenGainRate;
+				BuildingPreDefRep.SHGSHtPeoplAdd += ZnRpt( iZone ).PeopleSenGainRate * mult;
 				//Lights Sensible Heat Addition
-				BuildingPreDefRep.SHGSHtLiteAdd += ZnRpt( iZone ).LtsTotGainRate;
+				BuildingPreDefRep.SHGSHtLiteAdd += ZnRpt( iZone ).LtsTotGainRate * mult;
 				//Equipment Sensible Heat Addition
 				//Equipment Sensible Heat Removal
 				eqpSens = ZnRpt( iZone ).ElecRadGainRate + ZnRpt( iZone ).GasRadGainRate + ZnRpt( iZone ).HWRadGainRate + ZnRpt( iZone ).SteamRadGainRate + ZnRpt( iZone ).OtherRadGainRate + ZnRpt( iZone ).ElecConGainRate + ZnRpt( iZone ).GasConGainRate + ZnRpt( iZone ).HWConGainRate + ZnRpt( iZone ).SteamConGainRate + ZnRpt( iZone ).OtherConGainRate;
 				if ( eqpSens > 0.0 ) {
-					BuildingPreDefRep.SHGSHtEquipAdd += eqpSens;
+					BuildingPreDefRep.SHGSHtEquipAdd += eqpSens * mult;
 				} else {
-					BuildingPreDefRep.SHGSHtEquipRem += eqpSens;
+					BuildingPreDefRep.SHGSHtEquipRem += eqpSens * mult;
 				}
 				//Window Heat Addition
 				//Window Heat Removal
-				BuildingPreDefRep.SHGSHtWindAdd += ZoneWinHeatGainRep( iZone );
-				BuildingPreDefRep.SHGSHtWindRem -= ZoneWinHeatLossRep( iZone );
-				if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-					BuildingPreDefRep.SHGSHtIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones;
+				BuildingPreDefRep.SHGSHtWindAdd += ZoneWinHeatGainRep( iZone ) * mult;
+				BuildingPreDefRep.SHGSHtWindRem -= ZoneWinHeatLossRep( iZone ) * mult;
+				// mixing object heat addition and removal
+				if( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
+					BuildingPreDefRep.SHGSHtIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones * mult;
 				} else {
-					BuildingPreDefRep.SHGSHtIzaRem += ZnAirRpt( iZone ).SumMCpDTzones;
+					BuildingPreDefRep.SHGSHtIzaRem += ZnAirRpt( iZone ).SumMCpDTzones * mult;
 				}
 				//Infiltration Heat Addition
 				//Infiltration Heat Removal
 				if ( ZnAirRpt( iZone ).SumMCpDtInfil > 00 ) {
-					BuildingPreDefRep.SHGSHtInfilAdd += ZnAirRpt( iZone ).SumMCpDtInfil;
+					BuildingPreDefRep.SHGSHtInfilAdd += ZnAirRpt( iZone ).SumMCpDtInfil * mult;
 				} else {
-					BuildingPreDefRep.SHGSHtInfilRem += ZnAirRpt( iZone ).SumMCpDtInfil;
+					BuildingPreDefRep.SHGSHtInfilRem += ZnAirRpt( iZone ).SumMCpDtInfil * mult;
 				}
 			}
 			// Opaque Surface Conduction and Other Heat Addition
@@ -4749,9 +5049,10 @@ namespace OutputReportTabular {
 			BuildingPreDefRep.SHGSClInfilRem = 0.0;
 			BuildingPreDefRep.SHGSClOtherRem = 0.0;
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+				mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
 				//HVAC Input Sensible Air Heating
 				//HVAC Input Sensible Air Cooling
-				BuildingPreDefRep.SHGSClHvacCl += ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem;
+				BuildingPreDefRep.SHGSClHvacCl += ZnAirRpt( iZone ).SumMCpDTsystem + ZnAirRpt( iZone ).SumNonAirSystem * mult;
 				// HVAC Input Heated Surface Heating
 				// HVAC Input Cooled Surface Cooling
 				BuildingPreDefRep.SHGSClSurfHt += radiantHeat( iZone );
@@ -4761,32 +5062,33 @@ namespace OutputReportTabular {
 				BuildingPreDefRep.SHGSClHvacATUHt += ATUHeat( iZone );
 				BuildingPreDefRep.SHGSClHvacATUCl += ATUCool( iZone );
 				//People Sensible Heat Addition
-				BuildingPreDefRep.SHGSClPeoplAdd += ZnRpt( iZone ).PeopleSenGainRate;
+				BuildingPreDefRep.SHGSClPeoplAdd += ZnRpt( iZone ).PeopleSenGainRate * mult;
 				//Lights Sensible Heat Addition
-				BuildingPreDefRep.SHGSClLiteAdd += ZnRpt( iZone ).LtsTotGainRate;
+				BuildingPreDefRep.SHGSClLiteAdd += ZnRpt( iZone ).LtsTotGainRate * mult;
 				//Equipment Sensible Heat Addition
 				//Equipment Sensible Heat Removal
 				eqpSens = ZnRpt( iZone ).ElecRadGainRate + ZnRpt( iZone ).GasRadGainRate + ZnRpt( iZone ).HWRadGainRate + ZnRpt( iZone ).SteamRadGainRate + ZnRpt( iZone ).OtherRadGainRate + ZnRpt( iZone ).ElecConGainRate + ZnRpt( iZone ).GasConGainRate + ZnRpt( iZone ).HWConGainRate + ZnRpt( iZone ).SteamConGainRate + ZnRpt( iZone ).OtherConGainRate;
 				if ( eqpSens > 0.0 ) {
-					BuildingPreDefRep.SHGSClEquipAdd += eqpSens;
+					BuildingPreDefRep.SHGSClEquipAdd += eqpSens * mult;
 				} else {
-					BuildingPreDefRep.SHGSClEquipRem += eqpSens;
+					BuildingPreDefRep.SHGSClEquipRem += eqpSens * mult;
 				}
 				//Window Heat Addition
 				//Window Heat Removal
-				BuildingPreDefRep.SHGSClWindAdd += ZoneWinHeatGainRep( iZone );
-				BuildingPreDefRep.SHGSClWindRem -= ZoneWinHeatLossRep( iZone );
-				if ( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
-					BuildingPreDefRep.SHGSClIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones;
+				BuildingPreDefRep.SHGSClWindAdd += ZoneWinHeatGainRep( iZone ) * mult;
+				BuildingPreDefRep.SHGSClWindRem -= ZoneWinHeatLossRep( iZone ) * mult;
+				// mixing object cool addition and removal
+				if( ZnAirRpt( iZone ).SumMCpDTzones > 0.0 ) {
+					BuildingPreDefRep.SHGSClIzaAdd += ZnAirRpt( iZone ).SumMCpDTzones * mult;
 				} else {
-					BuildingPreDefRep.SHGSClIzaRem += ZnAirRpt( iZone ).SumMCpDTzones;
+					BuildingPreDefRep.SHGSClIzaRem += ZnAirRpt( iZone ).SumMCpDTzones * mult;
 				}
 				//Infiltration Heat Addition
 				//Infiltration Heat Removal
 				if ( ZnAirRpt( iZone ).SumMCpDtInfil > 00 ) {
-					BuildingPreDefRep.SHGSClInfilAdd += ZnAirRpt( iZone ).SumMCpDtInfil;
+					BuildingPreDefRep.SHGSClInfilAdd += ZnAirRpt( iZone ).SumMCpDtInfil * mult;
 				} else {
-					BuildingPreDefRep.SHGSClInfilRem += ZnAirRpt( iZone ).SumMCpDtInfil;
+					BuildingPreDefRep.SHGSClInfilRem += ZnAirRpt( iZone ).SumMCpDtInfil * mult;
 				}
 			}
 			// Opaque Surface Conduction and Other Heat Addition
@@ -4828,6 +5130,7 @@ namespace OutputReportTabular {
 
 		FillWeatherPredefinedEntries();
 		FillRemainingPredefinedEntries();
+
 		if ( WriteTabularFiles ) {
 			// call each type of report in turn
 			WriteBEPSTable();
@@ -4844,6 +5147,7 @@ namespace OutputReportTabular {
 			if ( DoWeathSim ) {
 				WriteMonthlyTables();
 				WriteTimeBinTables();
+				OutputReportTabularAnnual::WriteAnnualTables();
 			}
 		}
 		EchoInputFile = FindUnitNumber( DataStringGlobals::outputAuditFileName );
@@ -5039,7 +5343,7 @@ namespace OutputReportTabular {
 				if ( lineType == AshStdDes2Line ) lineType = AshStdDes3Line;
 				if ( lineType == AshStdDes1Line ) lineType = AshStdDes2Line;
 				if ( lineType == AshStdLine ) lineType = AshStdDes1Line;
-				if ( has( lineIn, "ASHRAE Standards" ) ) lineType = AshStdLine;
+				if ( has( lineIn, "ASHRAE Standard" ) ) lineType = AshStdLine;
 
 				{ auto const SELECT_CASE_var( lineType );
 				if ( SELECT_CASE_var == StatisticsLine ) { // Statistics for USA_CA_San.Francisco_TMY2
@@ -5386,7 +5690,7 @@ namespace OutputReportTabular {
 					}
 				} else if ( ( SELECT_CASE_var == AshStdLine ) || ( SELECT_CASE_var == AshStdDes1Line ) || ( SELECT_CASE_var == AshStdDes2Line ) || ( SELECT_CASE_var == AshStdDes3Line ) ) {
 					//  - Climate type "1A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
-					if ( has( lineIn, "Standards" ) ) {
+					if ( has( lineIn, "Standard" ) ) {
 						ashZone = lineIn.substr( 16, 2 );
 						if ( ashZone[ 1 ] == '"' ) ashZone[ 1 ] = ' ';
 						PreDefTableEntry( pdchWthrVal, "ASHRAE Climate Zone", ashZone );
@@ -5463,7 +5767,6 @@ namespace OutputReportTabular {
 		//   na
 
 		// Return value
-		std::string resultString; // Result String
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5478,36 +5781,25 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string::size_type startPos = 0;
 
-		std::string procIn; // processed input string
-		std::string::size_type startTab;
-		std::string::size_type endTab;
-		std::string::size_type inLen;
+		auto endPos = inString.find_first_of( tb );
+		if ( colNum == 1 ) {
+			if ( endPos == std::string::npos ) return inString;
+			return inString.substr( startPos, endPos - startPos );
+		}
+		if ( endPos == std::string::npos ) return "";
 
-		procIn = inString;
-		inLen = len( procIn );
-		startTab = std::string::npos;
-		endTab = index( procIn, tb );
-		if ( endTab != std::string::npos ) {
-			procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-		} else {
-			endTab = inLen; // one character past the end of string since substract one when extracting
+		int numCols = 1;
+		while ( numCols < colNum ) {
+			startPos = endPos + 1;
+			endPos = inString.find_first_of( tb, startPos );
+			++numCols;
+			if ( endPos == std::string::npos ) break;
 		}
-		for ( int i = 2; i <= colNum; ++i ) { // already have first column identified so do loop only if for column 2 or greater.
-			startTab = endTab;
-			endTab = index( procIn, tb );
-			if ( endTab != std::string::npos ) {
-				procIn[ endTab ] = ' '; // replace tab with space so next search doesn't find this tab again
-			} else {
-				endTab = inLen; // one character past the end of string since substract one when extracting
-			}
-		}
-		if ( startTab < endTab ) {
-			resultString = procIn.substr( startTab + 1, endTab - startTab - 1 ); // extract but leave tab characters out
-		} else {
-			resultString = "";
-		}
-		return resultString;
+		if ( colNum > numCols ) return "";
+		if ( endPos == std::string::npos ) endPos = inString.size();
+		return inString.substr( startPos, endPos - startPos );
 	}
 
 	void
@@ -5573,6 +5865,7 @@ namespace OutputReportTabular {
 		int iLight;
 		int zonePt;
 		int iZone;
+		Real64 mult; // zone list and group multipliers
 		static Real64 totalVolume( 0.0 );
 		static int numUncondZones( 0 );
 		static int numCondZones( 0 );
@@ -5608,6 +5901,7 @@ namespace OutputReportTabular {
 		consumptionTotal = 0.0;
 		for ( iLight = 1; iLight <= TotLights; ++iLight ) {
 			zonePt = Lights( iLight ).ZonePtr;
+			mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier;
 			if ( Zone( zonePt ).SystemZoneNodeNumber > 0 ) { //conditioned y/n
 				PreDefTableEntry( pdchInLtCond, Lights( iLight ).Name, "Y" );
 			} else {
@@ -5624,7 +5918,7 @@ namespace OutputReportTabular {
 				HrsPerWeek = 24 * 7 * Lights( iLight ).SumConsumption / ( Lights( iLight ).DesignLevel * gatherElapsedTimeBEPS * SecInHour );
 				PreDefTableEntry( pdchInLtFullLoadHrs, Lights( iLight ).Name, HrsPerWeek );
 			}
-			PreDefTableEntry( pdchInLtConsump, Lights( iLight ).Name, Lights( iLight ).SumConsumption / 1000000000.0 );
+			PreDefTableEntry( pdchInLtConsump, Lights( iLight ).Name, Lights( iLight ).SumConsumption * mult / 1000000000.0 );
 			consumptionTotal += Lights( iLight ).SumConsumption / 1000000000.0;
 		}
 		PreDefTableEntry( pdchInLtConsump, "Interior Lighting Total", consumptionTotal );
@@ -5660,18 +5954,18 @@ namespace OutputReportTabular {
 						PreDefTableEntry( pdchOaoAvgNumOcc2, Zone( iZone ).Name, ZonePreDefRep( iZone ).NumOccAccum / ZonePreDefRep( iZone ).NumOccAccumTime );
 					}
 					//Mechanical ventilation
-					if ( ZonePreDefRep( iZone ).TotTimeOcc > 0 ) {
+					if ( Zone( iZone ).Volume > 0 && ZonePreDefRep( iZone ).TotTimeOcc > 0 ) {
 						PreDefTableEntry( pdchOaoAvgMechVent, Zone( iZone ).Name, ZonePreDefRep( iZone ).MechVentVolTotal / ( ZonePreDefRep( iZone ).TotTimeOcc * Zone( iZone ).Volume * Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier ), 3 );
 					}
 					if ( ( Zone( iZone ).Volume > 0 ) && ( ZonePreDefRep( iZone ).TotTimeOcc > 0 ) ) {
-						PreDefTableEntry( pdchOaoMinMechVent, Zone( iZone ).Name, ZonePreDefRep( iZone ).MechVentVolMin / Zone( iZone ).Volume * Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier, 3 );
+						PreDefTableEntry( pdchOaoMinMechVent, Zone( iZone ).Name, ZonePreDefRep( iZone ).MechVentVolMin / ( Zone( iZone ).Volume * Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier ), 3 );
 					}
 					//infiltration
-					if ( ZonePreDefRep( iZone ).TotTimeOcc > 0 ) {
+					if( Zone( iZone ).Volume > 0 && ZonePreDefRep( iZone ).TotTimeOcc > 0 ) {
 						PreDefTableEntry( pdchOaoAvgInfil, Zone( iZone ).Name, ZonePreDefRep( iZone ).InfilVolTotal / ( ZonePreDefRep( iZone ).TotTimeOcc * Zone( iZone ).Volume ), 3 );
 					}
 					if ( ( Zone( iZone ).Volume > 0 ) && ( ZonePreDefRep( iZone ).TotTimeOcc > 0 ) ) {
-						PreDefTableEntry( pdchOaoMinInfil, Zone( iZone ).Name, ZonePreDefRep( iZone ).InfilVolMin / Zone( iZone ).Volume, 3 );
+						PreDefTableEntry( pdchOaoMinInfil, Zone( iZone ).Name, ZonePreDefRep( iZone ).InfilVolMin / ( Zone( iZone ).Volume ), 3 );
 					}
 					//AFN infiltration -- check that afn sim is being done.
 					if ( SimulateAirflowNetwork < AirflowNetworkControlMultizone ) {
@@ -5682,18 +5976,18 @@ namespace OutputReportTabular {
 							ZonePreDefRep( iZone ).AFNInfilVolTotal = 0.0;
 						}
 					}
-					if ( ZonePreDefRep( iZone ).TotTimeOcc > 0 ) {
+					if( Zone( iZone ).Volume > 0 && ZonePreDefRep( iZone ).TotTimeOcc > 0 ) {
 						PreDefTableEntry( pdchOaoAvgAFNInfil, Zone( iZone ).Name, ZonePreDefRep( iZone ).AFNInfilVolTotal / ( ZonePreDefRep( iZone ).TotTimeOcc * Zone( iZone ).Volume ), 3 );
 					}
 					if ( ( Zone( iZone ).Volume > 0 ) && ( ZonePreDefRep( iZone ).TotTimeOcc > 0 ) ) {
-						PreDefTableEntry( pdchOaoMinAFNInfil, Zone( iZone ).Name, ZonePreDefRep( iZone ).AFNInfilVolMin / Zone( iZone ).Volume, 3 );
+						PreDefTableEntry( pdchOaoMinAFNInfil, Zone( iZone ).Name, ZonePreDefRep( iZone ).AFNInfilVolMin / ( Zone( iZone ).Volume ), 3 );
 					}
 					//simple 'ZoneVentilation'
-					if ( ZonePreDefRep( iZone ).TotTimeOcc > 0 ) {
+					if( Zone( iZone ).Volume > 0 && ZonePreDefRep( iZone ).TotTimeOcc > 0 ) {
 						PreDefTableEntry( pdchOaoAvgSimpVent, Zone( iZone ).Name, ZonePreDefRep( iZone ).SimpVentVolTotal / ( ZonePreDefRep( iZone ).TotTimeOcc * Zone( iZone ).Volume ), 3 );
 					}
 					if ( ( Zone( iZone ).Volume > 0 ) && ( ZonePreDefRep( iZone ).TotTimeOcc > 0 ) ) {
-						PreDefTableEntry( pdchOaoMinSimpVent, Zone( iZone ).Name, ZonePreDefRep( iZone ).SimpVentVolMin / Zone( iZone ).Volume, 3 );
+						PreDefTableEntry( pdchOaoMinSimpVent, Zone( iZone ).Name, ZonePreDefRep( iZone ).SimpVentVolMin / ( Zone( iZone ).Volume ), 3 );
 					}
 
 					//Zone volume
@@ -5739,9 +6033,9 @@ namespace OutputReportTabular {
 			//annual
 			// PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
 			// PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
-			PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacHt - 
+			PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacHt -
 				ZonePreDefRep( iZone ).SHGSAnHvacATUHt ) * convertJtoGJ, 3 );
-			PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacCl - 
+			PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ( ZonePreDefRep( iZone ).SHGSAnHvacCl -
 				ZonePreDefRep( iZone ).SHGSAnHvacATUCl ) * convertJtoGJ, 3 );
 			PreDefTableEntry( pdchSHGSAnHvacATUHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacATUHt * convertJtoGJ, 3 );
 			PreDefTableEntry( pdchSHGSAnHvacATUCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacATUCl * convertJtoGJ, 3 );
@@ -6427,11 +6721,11 @@ namespace OutputReportTabular {
 			columnWidth = 14; //array assignment - same for all columns
 			tableBody.allocate( curIntervalCount + 3, 39 );
 			tableBody = "";
-			columnHead = "-";
+			columnHead = "- [hr]";
 			tableBody( 1, 1 ) = "less than";
 			tableBody( 1, 2 ) = RealToStr( curIntervalStart, numIntervalDigits );
 			for ( nCol = 1; nCol <= curIntervalCount; ++nCol ) {
-				columnHead( nCol + 1 ) = IntToStr( nCol );
+				columnHead( nCol + 1 ) = IntToStr( nCol ) + " [hr]";
 				//beginning of interval
 				tableBody( nCol + 1, 1 ) = RealToStr( curIntervalStart + ( nCol - 1 ) * curIntervalSize, numIntervalDigits ) + "<=";
 				//end of interval
@@ -6572,8 +6866,7 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
-		using ManageElectricPower::ElecStorage;
-		using ManageElectricPower::NumElecStorageDevices;
+		using DataWater::StorageTankDataStruct;
 		using DataHVACGlobals::deviationFromSetPtThresholdHtg;
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
 		using ScheduleManager::GetScheduleName;
@@ -6642,7 +6935,6 @@ namespace OutputReportTabular {
 		std::string curNameWithSIUnits;
 		std::string curNameAndUnits;
 		int indexUnitConv;
-		std::string tableString;
 		Real64 processFraction;
 		Real64 processElecCost;
 		Real64 processGasCost;
@@ -6754,13 +7046,16 @@ namespace OutputReportTabular {
 			gatherPowerPV /= largeConversionFactor;
 			gatherPowerWind /= largeConversionFactor;
 			gatherPowerHTGeothermal /= largeConversionFactor;
+			gatherPowerConversion /= largeConversionFactor;
 			gatherElecProduced /= largeConversionFactor;
 			gatherElecPurchased /= largeConversionFactor;
 			gatherElecSurplusSold /= largeConversionFactor;
 
 			// get change in overall state of charge for electrical storage devices.
-			if ( NumElecStorageDevices > 0 ) {
-				OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge() ) );
+			if ( facilityElectricServiceObj->numElecStorageDevices > 0 ) {
+				// All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not necessary
+				// OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
+				OverallNetEnergyFromStorage = gatherElecStorage;
 				OverallNetEnergyFromStorage /= largeConversionFactor;
 			} else {
 				OverallNetEnergyFromStorage = 0.0;
@@ -7645,11 +7940,11 @@ namespace OutputReportTabular {
 			}
 
 			//---- Electric Loads Satisfied Sub-Table
-			rowHead.allocate( 13 );
+			rowHead.allocate( 14 );
 			columnHead.allocate( 2 );
 			columnWidth.allocate( 2 );
 			columnWidth = 14; //array assignment - same for all columns
-			tableBody.allocate( 2, 13 );
+			tableBody.allocate( 2, 14 );
 
 			{ auto const SELECT_CASE_var( unitsStyle );
 			if ( SELECT_CASE_var == unitsStyleJtoKWH ) {
@@ -7665,34 +7960,36 @@ namespace OutputReportTabular {
 			rowHead( 2 ) = "High Temperature Geothermal*";
 			rowHead( 3 ) = "Photovoltaic Power";
 			rowHead( 4 ) = "Wind Power";
-			rowHead( 5 ) = "Net Decrease in On-Site Storage";
-			rowHead( 6 ) = "Total On-Site Electric Sources";
-			rowHead( 7 ) = "";
-			rowHead( 8 ) = "Electricity Coming From Utility";
-			rowHead( 9 ) = "Surplus Electricity Going To Utility";
-			rowHead( 10 ) = "Net Electricity From Utility";
-			rowHead( 11 ) = "";
-			rowHead( 12 ) = "Total On-Site and Utility Electric Sources";
-			rowHead( 13 ) = "Total Electricity End Uses";
+			rowHead( 5 ) = "Power Conversion";
+			rowHead( 6 ) = "Net Decrease in On-Site Storage";
+			rowHead( 7 ) = "Total On-Site Electric Sources";
+			rowHead( 8 ) = "";
+			rowHead( 9 ) = "Electricity Coming From Utility";
+			rowHead( 10 ) = "Surplus Electricity Going To Utility";
+			rowHead( 11 ) = "Net Electricity From Utility";
+			rowHead( 12 ) = "";
+			rowHead( 13 ) = "Total On-Site and Utility Electric Sources";
+			rowHead( 14 ) = "Total Electricity End Uses";
 
 			tableBody = "";
 
 			// show annual values
 			unconvert = largeConversionFactor / 1000000000.0; //to avoid double converting, the values for the LEED report should be in GJ
 
-			tableBody( 1, 1 ) = RealToStr( gatherPowerFuelFireGen, 2 );
-			tableBody( 1, 2 ) = RealToStr( gatherPowerHTGeothermal, 2 );
-			tableBody( 1, 3 ) = RealToStr( gatherPowerPV, 2 );
+			tableBody( 1, 1 ) = RealToStr( gatherPowerFuelFireGen, 3 );
+			tableBody( 1, 2 ) = RealToStr( gatherPowerHTGeothermal, 3 );
+			tableBody( 1, 3 ) = RealToStr( gatherPowerPV, 3 );
 			PreDefTableEntry( pdchLeedRenAnGen, "Photovoltaic", unconvert * gatherPowerPV, 2 );
-			tableBody( 1, 4 ) = RealToStr( gatherPowerWind, 2 );
+			tableBody( 1, 4 ) = RealToStr( gatherPowerWind, 3 );
 			PreDefTableEntry( pdchLeedRenAnGen, "Wind", unconvert * gatherPowerWind, 2 );
-			tableBody( 1, 5 ) = RealToStr( OverallNetEnergyFromStorage, 2 );
-			tableBody( 1, 6 ) = RealToStr( gatherElecProduced, 2 );
-			tableBody( 1, 8 ) = RealToStr( gatherElecPurchased, 2 );
-			tableBody( 1, 9 ) = RealToStr( gatherElecSurplusSold, 2 );
-			tableBody( 1, 10 ) = RealToStr( gatherElecPurchased - gatherElecSurplusSold, 2 );
-			tableBody( 1, 12 ) = RealToStr( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ), 2 );
-			tableBody( 1, 13 ) = RealToStr( collapsedTotal( 1 ), 2 );
+			tableBody( 1, 5 ) = RealToStr( gatherPowerConversion, 3 );
+			tableBody( 1, 6 ) = RealToStr( OverallNetEnergyFromStorage, 3 );
+			tableBody( 1, 7 ) = RealToStr( gatherElecProduced, 3 );
+			tableBody( 1, 9 ) = RealToStr( gatherElecPurchased, 3 );
+			tableBody( 1, 10 ) = RealToStr( gatherElecSurplusSold, 3 );
+			tableBody( 1, 11 ) = RealToStr( gatherElecPurchased - gatherElecSurplusSold, 3 );
+			tableBody( 1, 13 ) = RealToStr( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ), 3 );
+			tableBody( 1, 14 ) = RealToStr( collapsedTotal( 1 ), 3 );
 
 			// show annual percentages
 			if ( collapsedTotal( 1 ) > 0 ) {
@@ -7700,13 +7997,14 @@ namespace OutputReportTabular {
 				tableBody( 2, 2 ) = RealToStr( 100.0 * gatherPowerHTGeothermal / collapsedTotal( 1 ), 2 );
 				tableBody( 2, 3 ) = RealToStr( 100.0 * gatherPowerPV / collapsedTotal( 1 ), 2 );
 				tableBody( 2, 4 ) = RealToStr( 100.0 * gatherPowerWind / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 5 ) = RealToStr( 100.0 * OverallNetEnergyFromStorage / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 6 ) = RealToStr( 100.0 * gatherElecProduced / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 8 ) = RealToStr( 100.0 * gatherElecPurchased / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 9 ) = RealToStr( 100.0 * gatherElecSurplusSold / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 10 ) = RealToStr( 100.0 * ( gatherElecPurchased - gatherElecSurplusSold ) / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 12 ) = RealToStr( 100.0 * ( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ) ) / collapsedTotal( 1 ), 2 );
-				tableBody( 2, 13 ) = RealToStr( 100.0, 2 );
+				tableBody( 2, 5 ) = RealToStr( 100.0 * gatherPowerConversion / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 6 ) = RealToStr( 100.0 * OverallNetEnergyFromStorage / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 7 ) = RealToStr( 100.0 * gatherElecProduced / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 9 ) = RealToStr( 100.0 * gatherElecPurchased / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 10 ) = RealToStr( 100.0 * gatherElecSurplusSold / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 11 ) = RealToStr( 100.0 * ( gatherElecPurchased - gatherElecSurplusSold ) / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 13 ) = RealToStr( 100.0 * ( gatherElecProduced + ( gatherElecPurchased - gatherElecSurplusSold ) ) / collapsedTotal( 1 ), 2 );
+				tableBody( 2, 14 ) = RealToStr( 100.0, 2 );
 			}
 
 			// heading for the entire sub-table
@@ -7832,8 +8130,8 @@ namespace OutputReportTabular {
 			tableBody( 1, 4 ) = RealToStr( totalOnsiteWater / waterConversionFactor, 2 );
 
 			if ( allocated( WaterStorage ) ) {
-				initialStorage = sum( WaterStorage.InitialVolume() );
-				finalStorage = sum( WaterStorage.ThisTimeStepVolume() );
+				initialStorage = sum( WaterStorage, &StorageTankDataStruct::InitialVolume );
+				finalStorage = sum( WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume );
 				StorageChange = initialStorage - finalStorage;
 			} else {
 				initialStorage = 0.0;
@@ -8015,8 +8313,6 @@ namespace OutputReportTabular {
 		Real64 largeConversionFactor;
 		Real64 areaConversionFactor;
 		Real64 convBldgCondFloorArea;
-		std::string curNameWithSIUnits;
-		std::string curNameAndUnits;
 
 		if ( displaySourceEnergyEndUseSummary ) {
 			// show the headers of the report
@@ -8242,8 +8538,6 @@ namespace OutputReportTabular {
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
 		using DataWater::WaterStorage;
-		using ManageElectricPower::ElecStorage;
-		using ManageElectricPower::NumElecStorageDevices;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9013,6 +9307,7 @@ namespace OutputReportTabular {
 		using DataEnvironment::RunPeriodStartDayOfWeek;
 		using DataEnvironment::WeatherFileLocationTitle;
 		using DataHeatBalance::Zone;
+		using DataHeatBalance::ZoneData;
 		using DataHeatBalance::BuildingAzimuth;
 		using DataHeatBalance::TotLights;
 		using DataHeatBalance::Lights;
@@ -9525,8 +9820,10 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 			}
 
-			if ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) > 0.0 || sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) > 0.0 ) {
-				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
+			Real64 const totExtGrossWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossWallArea_Multiplied ) );
+			Real64 const totExtGrossGroundWallArea_Multiplied( sum( Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied ) );
+			if ( totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0 ) {
+				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied ) ) / ( totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied );
 				if ( pdiff > 0.019 ) {
 					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls" );
 					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100.0, 1 ) + "% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions." );
@@ -9536,8 +9833,8 @@ namespace OutputReportTabular {
 					//         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
 					ShowContinueError( "Check classes of surfaces and tilts for discrepancies." );
 					ShowContinueError( "Total wall area by ASHRAE 90.1 definition=" + stripped( RealToStr( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ), 3 ) ) + " m2." );
-					ShowContinueError( "Total exterior wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ), 3 ) ) + " m2." );
-					ShowContinueError( "Total ground contact wall area from user entered classes=" + stripped( RealToStr( sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ), 3 ) ) + " m2." );
+					ShowContinueError( "Total exterior wall area from user entered classes=" + stripped( RealToStr( totExtGrossWallArea_Multiplied, 3 ) ) + " m2." );
+					ShowContinueError( "Total ground contact wall area from user entered classes=" + stripped( RealToStr( totExtGrossGroundWallArea_Multiplied, 3 ) ) + " m2." );
 				}
 			}
 			//---- Space Summary Sub-Table
@@ -10130,7 +10427,7 @@ namespace OutputReportTabular {
 				}
 				if ( foundEntry == 0 ) break; //leave main loop - all items put into tables
 				//clear active items
-				CompSizeTableEntry.active() = false;
+				for ( auto & e : CompSizeTableEntry ) e.active = false;
 				//make an unwritten item that is of the same type active - these will be the
 				//entries for the particular subtable.
 				for ( iTableEntry = 1; iTableEntry <= numCompSizeTableEntry; ++iTableEntry ) {
@@ -10488,9 +10785,9 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool DoAllocate( true );
 
-		if ( DoAllocate ) {
+
+		if ( AllocateLoadComponentArraysDoAllocate ) {
 			//For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
 			radiantPulseUsed.allocate( {0,TotDesDays + TotRunDesPersDays}, NumOfZones );
 			radiantPulseUsed = 0.0;
@@ -10518,8 +10815,6 @@ namespace OutputReportTabular {
 			peopleLatentSeq = 0.0;
 			peopleRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			peopleRadSeq = 0.0;
-			peopleDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-			peopleDelaySeq = 0.0;
 			lightInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			lightInstantSeq = 0.0;
 			lightRetAirSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
@@ -10528,16 +10823,12 @@ namespace OutputReportTabular {
 			lightLWRadSeq = 0.0;
 			lightSWRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			lightSWRadSeq = 0.0;
-			lightDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-			lightLWRadSeq = 0.0;
 			equipInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			equipInstantSeq = 0.0;
 			equipLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			equipLatentSeq = 0.0;
 			equipRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			equipRadSeq = 0.0;
-			equipDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-			equipDelaySeq = 0.0;
 			refrigInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			refrigInstantSeq = 0.0;
 			refrigRetAirSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
@@ -10552,14 +10843,10 @@ namespace OutputReportTabular {
 			hvacLossInstantSeq = 0.0;
 			hvacLossRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			hvacLossRadSeq = 0.0;
-			hvacLossDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-			hvacLossDelaySeq = 0.0;
 			powerGenInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			powerGenInstantSeq = 0.0;
 			powerGenRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			powerGenRadSeq = 0.0;
-			powerGenDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-			powerGenDelaySeq = 0.0;
 			infilInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 			infilInstantSeq = 0.0;
 			infilLatentSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
@@ -10578,11 +10865,7 @@ namespace OutputReportTabular {
 			//  feneSolarInstantSeq = 0.0d0
 			feneSolarRadSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 			feneSolarRadSeq = 0.0;
-			feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-			feneSolarDelaySeq = 0.0;
-			surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-			surfDelaySeq = 0.0;
-			DoAllocate = false;
+			AllocateLoadComponentArraysDoAllocate = false;
 		}
 	}
 
@@ -10880,182 +11163,6 @@ namespace OutputReportTabular {
 		}
 	}
 
-	void
-	ComputeDelayedComponents()
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Jason Glazer
-		//       DATE WRITTEN   September 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		//   For load component report, convert the sequence of radiant gains
-		//   for people and equipment and other internal loads into convective
-		//   gains based on the decay curves.
-
-		// METHODOLOGY EMPLOYED:
-		//   For each step of sequence from each design day, compute the
-		//   contributations from previous timesteps multiplied by the decay
-		//   curve. Rather than store every internal load's radiant contribution
-		//   to each surface, the TMULT and ITABSF sequences were also stored
-		//   which allocates the total radiant to each surface in the zone. The
-		//   formula used is:
-		//       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using DataSurfaces::Surface;
-		using DataSurfaces::TotSurfaces;
-		using DataSurfaces::SurfaceClass_Window;
-		using DataEnvironment::TotDesDays;
-		using DataEnvironment::TotRunDesPersDays;
-		using DataGlobals::NumOfTimeStepInHour;
-		using DataSizing::CalcFinalZoneSizing;
-		using DataZoneEquipment::ZoneEquipConfig;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		int iZone;
-		int jSurf;
-		int kTimeStep;
-		int lDesHtCl;
-		int mStepBack;
-		int desSelected;
-		bool isCooling;
-		Real64 QRadThermInAbsMult;
-		Real64 peopleConvFromSurf;
-		Real64 peopleConvIntoZone;
-		Array1D< Real64 > peopleRadIntoSurf;
-		Real64 equipConvFromSurf;
-		Real64 equipConvIntoZone;
-		Array1D< Real64 > equipRadIntoSurf;
-		Real64 hvacLossConvFromSurf;
-		Real64 hvacLossConvIntoZone;
-		Array1D< Real64 > hvacLossRadIntoSurf;
-		Real64 powerGenConvFromSurf;
-		Real64 powerGenConvIntoZone;
-		Array1D< Real64 > powerGenRadIntoSurf;
-		Real64 lightLWConvFromSurf;
-		Real64 lightLWConvIntoZone;
-		Array1D< Real64 > lightLWRadIntoSurf;
-		Real64 lightSWConvFromSurf;
-		Real64 lightSWConvIntoZone;
-		Real64 feneSolarConvFromSurf;
-		Real64 feneSolarConvIntoZone;
-		Real64 adjFeneSurfNetRadSeq;
-
-		peopleRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
-		equipRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
-		hvacLossRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
-		powerGenRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
-		lightLWRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
-		// deallocate after writing?  LKL
-		if ( allocated( CalcFinalZoneSizing ) ) {
-			for ( lDesHtCl = 1; lDesHtCl <= 2; ++lDesHtCl ) { //iterates between heating and cooling design day
-				isCooling = lDesHtCl == 2; //flag for when cooling design day otherwise heating design day
-				for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-					if ( ! ZoneEquipConfig( iZone ).IsControlled ) continue;
-					if ( isCooling ) {
-						desSelected = CalcFinalZoneSizing( iZone ).CoolDDNum;
-					} else {
-						desSelected = CalcFinalZoneSizing( iZone ).HeatDDNum;
-					}
-					if ( desSelected == 0 ) continue;
-					for ( kTimeStep = 1; kTimeStep <= NumOfTimeStepInHour * 24; ++kTimeStep ) {
-						peopleConvIntoZone = 0.0;
-						equipConvIntoZone = 0.0;
-						hvacLossConvIntoZone = 0.0;
-						powerGenConvIntoZone = 0.0;
-						lightLWConvIntoZone = 0.0;
-						lightSWConvIntoZone = 0.0;
-						feneSolarConvIntoZone = 0.0;
-						adjFeneSurfNetRadSeq = 0.0;
-						for ( jSurf = 1; jSurf <= TotSurfaces; ++jSurf ) {
-							if ( ! Surface( jSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
-							if ( Surface( jSurf ).Zone == iZone ) {
-								//determine for each timestep the amount of radiant heat for each end use absorbed in each surface
-								QRadThermInAbsMult = TMULTseq( desSelected, kTimeStep, iZone ) * ITABSFseq( desSelected, kTimeStep, jSurf ) * Surface( jSurf ).Area;
-								peopleRadIntoSurf( kTimeStep ) = peopleRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
-								equipRadIntoSurf( kTimeStep ) = equipRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
-								hvacLossRadIntoSurf( kTimeStep ) = hvacLossRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
-								powerGenRadIntoSurf( kTimeStep ) = powerGenRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
-								lightLWRadIntoSurf( kTimeStep ) = lightLWRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
-								//for each time step, step back through time and apply decay curve
-								peopleConvFromSurf = 0.0;
-								equipConvFromSurf = 0.0;
-								hvacLossConvFromSurf = 0.0;
-								powerGenConvFromSurf = 0.0;
-								lightLWConvFromSurf = 0.0;
-								lightSWConvFromSurf = 0.0;
-								feneSolarConvFromSurf = 0.0;
-								for ( mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack ) {
-									if ( isCooling ) {
-										peopleConvFromSurf += peopleRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
-										equipConvFromSurf += equipRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
-										hvacLossConvFromSurf += hvacLossRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
-										powerGenConvFromSurf += powerGenRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
-										lightLWConvFromSurf += lightLWRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
-										// short wave is already accumulated by surface
-										lightSWConvFromSurf += lightSWRadSeq( desSelected, kTimeStep - mStepBack + 1, jSurf ) * decayCurveCool( mStepBack, jSurf );
-										feneSolarConvFromSurf += feneSolarRadSeq( desSelected, kTimeStep - mStepBack + 1, jSurf ) * decayCurveCool( mStepBack, jSurf );
-									} else {
-										peopleConvFromSurf += peopleRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
-										equipConvFromSurf += equipRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
-										hvacLossConvFromSurf += hvacLossRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
-										powerGenConvFromSurf += powerGenRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
-										lightLWConvFromSurf += lightLWRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
-										// short wave is already accumulated by surface
-										lightSWConvFromSurf += lightSWRadSeq( desSelected, kTimeStep - mStepBack + 1, jSurf ) * decayCurveHeat( mStepBack, jSurf );
-										feneSolarConvFromSurf += feneSolarRadSeq( desSelected, kTimeStep - mStepBack + 1, jSurf ) * decayCurveHeat( mStepBack, jSurf );
-									}
-								}
-								peopleConvIntoZone += peopleConvFromSurf;
-								equipConvIntoZone += equipConvFromSurf;
-								hvacLossConvIntoZone += hvacLossConvFromSurf;
-								powerGenConvIntoZone += powerGenConvFromSurf;
-								lightLWConvIntoZone += lightLWConvFromSurf;
-								lightSWConvIntoZone += lightSWConvFromSurf;
-								feneSolarConvIntoZone += feneSolarConvFromSurf;
-								// determine the remaining convective heat from the surfaces that are not based
-								// on any of these other loads
-								//negative because heat from surface should be positive
-								surfDelaySeq( desSelected, kTimeStep, jSurf ) = -loadConvectedNormal( desSelected, kTimeStep, jSurf ) - netSurfRadSeq( desSelected, kTimeStep, jSurf ) - ( peopleConvFromSurf + equipConvFromSurf + hvacLossConvFromSurf + powerGenConvFromSurf + lightLWConvFromSurf + lightSWConvFromSurf + feneSolarConvFromSurf ); //remove net radiant for the surface
-								// also remove the net radiant component on the instanteous conduction for fenestration
-								if ( Surface( jSurf ).Class == SurfaceClass_Window ) {
-									adjFeneSurfNetRadSeq += netSurfRadSeq( desSelected, kTimeStep, jSurf );
-								}
-							}
-						}
-						peopleDelaySeq( desSelected, kTimeStep, iZone ) = peopleConvIntoZone;
-						equipDelaySeq( desSelected, kTimeStep, iZone ) = equipConvIntoZone;
-						hvacLossDelaySeq( desSelected, kTimeStep, iZone ) = hvacLossConvIntoZone;
-						powerGenDelaySeq( desSelected, kTimeStep, iZone ) = powerGenConvIntoZone;
-						//combine short wave (visible) and long wave (thermal) impacts
-						lightDelaySeq( desSelected, kTimeStep, iZone ) = lightLWConvIntoZone + lightSWConvIntoZone;
-						feneSolarDelaySeq( desSelected, kTimeStep, iZone ) = feneSolarConvIntoZone;
-						// also remove the net radiant component on the instanteous conduction for fenestration
-						feneCondInstantSeq( desSelected, kTimeStep, iZone ) -= adjFeneSurfNetRadSeq;
-					}
-				}
-			}
-		}
-	}
 
 	void
 	WriteZoneLoadComponentTable()
@@ -11064,7 +11171,7 @@ namespace OutputReportTabular {
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   March 2012
 		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  Amir Roth, Feb 2016 (unified with ComputeDelayedComponents to simplify code and debugging)
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//   Write the tables for the ZoneLoadComponentSummary and
@@ -11115,6 +11222,7 @@ namespace OutputReportTabular {
 		using DataSurfaces::SurfaceClass_Floor;
 		using DataSurfaces::SurfaceClass_Roof;
 		using DataSurfaces::SurfaceClass_Door;
+		using DataSurfaces::SurfaceClass_Window;
 		using DataSurfaces::OSC;
 		using DataSizing::CalcFinalZoneSizing;
 		using DataSizing::NumTimeStepsInAvg;
@@ -11184,15 +11292,9 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		static int CoolDesSelected( 0 ); // design day selected for cooling
-		static int HeatDesSelected( 0 ); // design day selected for heating
-		static int timeCoolMax( 0 ); // Time Step at Cool max
-		static int timeHeatMax( 0 ); // Time Step at Heat Max
-		static int iZone( 0 );
-		static int jTime( 0 );
-		static int k( 0 );
-		static int kSurf( 0 );
-		static int ZoneNum( 0 );
+		if ( !(displayZoneComponentLoadSummary && CompLoadReportIsReq) )
+			return;
+
 		Array1D< Real64 > seqData; // raw data sequence that has not been averaged yet
 		Array1D< Real64 > AvgData; // sequence data after averaging
 		int NumOfTimeStepInDay;
@@ -11204,7 +11306,6 @@ namespace OutputReportTabular {
 		Real64 totalGrandTotal;
 		Real64 powerConversion;
 		int tempConvIndx; // temperature conversion index
-		std::string stringWithTemp;
 		int curExtBoundCond;
 		Real64 mult; // zone multiplier
 
@@ -11214,1005 +11315,1216 @@ namespace OutputReportTabular {
 		Array1D_string rowHead;
 		Array2D_string tableBody;
 
-		if ( displayZoneComponentLoadSummary && CompLoadReportIsReq ) {
-			ComputeDelayedComponents();
-			NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
-			seqData.allocate( NumOfTimeStepInDay );
-			AvgData.allocate( NumOfTimeStepInDay );
-			delayOpaque.allocate( rGrdTot );
-			totalColumn.allocate( rGrdTot );
-			percentColumn.allocate( rGrdTot );
-			grandTotalRow.allocate( cPerc );
-
-			//establish unit conversion factors
-			if ( unitsStyle == unitsStyleInchPound ) {
-				powerConversion = getSpecificUnitMultiplier( "W", "Btu/h" ); //or kBtuh?
-				tempConvIndx = getSpecificUnitIndex( "C", "F" );
-			} else {
-				powerConversion = 1.0;
-				tempConvIndx = 0; //when zero is used with ConvertIP the value is returned unconverted
-			}
-
-			// show the line definition for the decay curves
-			if ( ShowDecayCurvesInEIO ) {
-				gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
-				gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
-			}
-
-			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-				if ( ! ZoneEquipConfig( iZone ).IsControlled ) continue;
-				mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
-				if ( mult == 0.0 ) mult = 1.0;
-
-				//---- Cooling Peak Load Components Sub-Table
-				WriteReportHeaders( "Zone Component Load Summary", Zone( iZone ).Name, isAverage );
-
-				rowHead.allocate( rGrdTot );
-				columnHead.allocate( cPerc );
-				columnWidth.dimension( cPerc, 14 ); //array assignment - same for all columns
-				tableBody.allocate( cPerc, rGrdTot );
-
-				if ( unitsStyle != unitsStyleInchPound ) {
-					columnHead( cSensInst ) = "Sensible - Instant [W]";
-					columnHead( cSensDelay ) = "Sensible - Delayed [W]";
-					columnHead( cSensRA ) = "Sensible - Return Air [W]";
-					columnHead( cLatent ) = "Latent [W]";
-					columnHead( cTotal ) = "Total [W]";
-					columnHead( cPerc ) = "%Grand Total";
-				} else {
-					columnHead( cSensInst ) = "Sensible - Instant [Btu/h]";
-					columnHead( cSensDelay ) = "Sensible - Delayed [Btu/h]";
-					columnHead( cSensRA ) = "Sensible - Return Air [Btu/h]";
-					columnHead( cLatent ) = "Latent [Btu/h]";
-					columnHead( cTotal ) = "Total [Btu/h]";
-					columnHead( cPerc ) = "%Grand Total";
-				}
-
-				//internal gains
-				rowHead( rPeople ) = "People";
-				rowHead( rLights ) = "Lights";
-				rowHead( rEquip ) = "Equipment";
-				rowHead( rRefrig ) = "Refrigeration Equipment";
-				rowHead( rWaterUse ) = "Water Use Equipment";
-				rowHead( rPowerGen ) = "Power Generation Equipment";
-				rowHead( rHvacLoss ) = "HVAC Equipment Losses";
-				rowHead( rRefrig ) = "Refrigeration";
-				//misc
-				rowHead( rDOAS ) = "DOAS Direct to Zone";
-				rowHead( rInfil ) = "Infiltration";
-				rowHead( rZoneVent ) = "Zone Ventilation";
-				rowHead( rIntZonMix ) = "Interzone Mixing";
-				//opaque surfaces
-				rowHead( rRoof ) = "Roof";
-				rowHead( rIntZonCeil ) = "Interzone Ceiling";
-				rowHead( rOtherRoof ) = "Other Roof";
-				rowHead( rExtWall ) = "Exterior Wall";
-				rowHead( rIntZonWall ) = "Interzone Wall";
-				rowHead( rGrdWall ) = "Ground Contact Wall";
-				rowHead( rOtherWall ) = "Other Wall";
-				rowHead( rExtFlr ) = "Exterior Floor";
-				rowHead( rIntZonFlr ) = "Interzone Floor";
-				rowHead( rGrdFlr ) = "Ground Contact Floor";
-				rowHead( rOtherFlr ) = "Other Floor";
-				//subsurfaces
-				rowHead( rFeneCond ) = "Fenestration Conduction";
-				rowHead( rFeneSolr ) = "Fenestration Solar";
-				rowHead( rOpqDoor ) = "Opaque Door";
-				rowHead( rGrdTot ) = "Grand Total";
-
-				tableBody = "";
-				totalColumn = 0.0;
-				percentColumn = 0.0;
-				grandTotalRow = 0.0;
-
-				CoolDesSelected = CalcFinalZoneSizing( iZone ).CoolDDNum;
-				timeCoolMax = CalcFinalZoneSizing( iZone ).TimeStepNumAtCoolMax;
-				if ( CoolDesSelected != 0 && timeCoolMax != 0 ) {
-
-					//PEOPLE
-					seqData = peopleInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rPeople ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = peopleLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rPeople ) += AvgData( timeCoolMax );
-					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
-
-					seqData = peopleDelaySeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rPeople ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
-
-					//LIGHTS
-					seqData = lightInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rLights ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = lightRetAirSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensRA, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rLights ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
-
-					seqData = lightDelaySeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rLights ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
-
-					//EQUIPMENT
-					seqData = equipInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rEquip ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = equipLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rEquip ) += AvgData( timeCoolMax );
-					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
-
-					seqData = equipDelaySeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rEquip ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
-
-					//REFRIGERATION EQUIPMENT
-					seqData = refrigInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rRefrig ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = refrigRetAirSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensRA, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rRefrig ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
-
-					seqData = refrigLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rRefrig ) += AvgData( timeCoolMax );
-					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
-
-					//WATER USE EQUIPMENT
-					seqData = waterUseInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rWaterUse ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rWaterUse ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = waterUseLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rWaterUse ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rWaterUse ) += AvgData( timeCoolMax );
-					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
-
-					//HVAC EQUIPMENT LOSSES
-					seqData = hvacLossInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rHvacLoss ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = hvacLossDelaySeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rHvacLoss ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
-
-					//POWER GENERATION EQUIPMENT
-					seqData = powerGenInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rPowerGen ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rPowerGen ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = powerGenDelaySeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rPowerGen ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
-
-					//DOAS
-					tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax );
-					grandTotalRow( cSensInst ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax );
-
-					tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax );
-					grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax );
-
-					//INFILTRATION
-					seqData = infilInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rInfil ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rInfil ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = infilLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rInfil ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rInfil ) += AvgData( timeCoolMax );
-					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
-
-					//ZONE VENTILATION
-					seqData = zoneVentInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rZoneVent ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rZoneVent ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = zoneVentLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rZoneVent ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rZoneVent ) += AvgData( timeCoolMax );
-					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
-
-					//INTERZONE MIXING
-					seqData = interZoneMixInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rIntZonMix ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					seqData = interZoneMixLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rIntZonMix ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
-					grandTotalRow( cLatent ) += AvgData( timeCoolMax );
-
-					//FENESTRATION CONDUCTION
-					seqData = feneCondInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rFeneCond ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rFeneCond ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
-
-					//FENESTRATION SOLAR
-					//      seqData = feneSolarInstantSeq(iZone,:,CoolDesSelected) * powerConversion
-					//      CALL MovingAvg(seqData,NumOfTimeStepInDay,NumTimeStepsInAvg,AvgData)
-					//      tableBody(rFeneSolr,cSensInst)  = TRIM(RealToStr(AvgData(timeCoolMax),2))
-					//      totalColumn(rFeneSolr) = totalColumn(rFeneSolr) + AvgData(timeCoolMax)
-					//      grandTotalRow(cSensInst) = grandTotalRow(cSensInst) + AvgData(timeCoolMax)
-
-					seqData = feneSolarDelaySeq( CoolDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rFeneSolr ) = RealToStr( AvgData( timeCoolMax ), 2 );
-					totalColumn( rFeneSolr ) += AvgData( timeCoolMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
-
-					//opaque surfaces - must combine individual surfaces by class and other side conditions
-					delayOpaque = 0.0;
-					for ( kSurf = 1; kSurf <= TotSurfaces; ++kSurf ) {
-						if ( ! Surface( kSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
-						if ( Surface( kSurf ).Zone == iZone ) {
-							curExtBoundCond = Surface( kSurf ).ExtBoundCond;
-							//if exterior is other side coefficients using ground preprocessor terms then
-							//set it to ground instead of other side coefficients
-							if ( curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt ) {
-								if ( has_prefixi( OSC( Surface( kSurf ).OSCPtr ).Name, "surfPropOthSdCoef" ) ) {
-									curExtBoundCond = Ground;
-								}
-							}
-							seqData = surfDelaySeq( CoolDesSelected, _, kSurf );
-							MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-							singleSurfDelay = AvgData( timeCoolMax ) * powerConversion;
-							{ auto const SELECT_CASE_var( Surface( kSurf ).Class );
-							if ( SELECT_CASE_var == SurfaceClass_Wall ) {
-								{ auto const SELECT_CASE_var1( curExtBoundCond );
-								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
-									delayOpaque( rExtWall ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) ) {
-									delayOpaque( rGrdWall ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
-									delayOpaque( rOtherWall ) += singleSurfDelay;
-								} else { //interzone
-									delayOpaque( rIntZonWall ) += singleSurfDelay;
-								}}
-							} else if ( SELECT_CASE_var == SurfaceClass_Floor ) {
-								{ auto const SELECT_CASE_var1( curExtBoundCond );
-								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
-									delayOpaque( rExtFlr ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) ) {
-									delayOpaque( rGrdFlr ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
-									delayOpaque( rOtherFlr ) += singleSurfDelay;
-								} else { //interzone
-									delayOpaque( rIntZonFlr ) += singleSurfDelay;
-								}}
-							} else if ( SELECT_CASE_var == SurfaceClass_Roof ) {
-								{ auto const SELECT_CASE_var1( curExtBoundCond );
-								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
-									delayOpaque( rRoof ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) || ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
-									delayOpaque( rOtherRoof ) += singleSurfDelay;
-								} else { //interzone
-									delayOpaque( rIntZonCeil ) += singleSurfDelay;
-								}}
-							} else if ( SELECT_CASE_var == SurfaceClass_Door ) {
-								delayOpaque( rOpqDoor ) += singleSurfDelay;
-							}}
-						}
-					}
-					for ( k = rRoof; k <= rOtherFlr; ++k ) {
-						tableBody( cSensDelay, k ) = RealToStr( delayOpaque( k ), 2 );
-						totalColumn( k ) += delayOpaque( k );
-						grandTotalRow( cSensDelay ) += delayOpaque( k );
-					}
-					tableBody( cSensDelay, rOpqDoor ) = RealToStr( delayOpaque( rOpqDoor ), 2 );
-					totalColumn( rOpqDoor ) += delayOpaque( rOpqDoor );
-					grandTotalRow( cSensDelay ) += delayOpaque( rOpqDoor );
-				}
-
-				//GRAND TOTAL ROW
-				totalGrandTotal = 0.0;
-				for ( k = 1; k <= cLatent; ++k ) {
-					tableBody( k, rGrdTot ) = RealToStr( grandTotalRow( k ), 2 );
-					totalGrandTotal += grandTotalRow( k );
-				}
-				tableBody( cTotal, rGrdTot ) = RealToStr( totalGrandTotal, 2 );
-
-				//TOTAL COLUMN AND PERCENT COLUMN
-				for ( k = 1; k <= rOpqDoor; ++k ) { //to last row before total
-					tableBody( cTotal, k ) = RealToStr( totalColumn( k ), 2 );
-					if ( totalGrandTotal != 0.0 ) {
-						tableBody( cPerc, k ) = RealToStr( 100 * totalColumn( k ) / totalGrandTotal, 2 );
-					}
-				}
-
-				WriteSubtitle( "Estimated Cooling Peak Load Components" );
-				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
-				}
-
-				//---- Cooling Peak Conditions
-
-				rowHead.allocate( 10 );
-				columnHead.allocate( 1 );
-				columnWidth.allocate( 1 );
-				columnWidth = 14; //array assignment - same for all columns
-				tableBody.allocate( 1, 10 );
-
-				columnHead( 1 ) = "Value";
-				if ( unitsStyle != unitsStyleInchPound ) {
-					rowHead( 1 ) = "Time of Peak Load";
-					rowHead( 2 ) = "Outside  Dry Bulb Temperature [C]";
-					rowHead( 3 ) = "Outside  Wet Bulb Temperature [C]";
-					rowHead( 4 ) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
-					rowHead( 5 ) = "Zone Dry Bulb Temperature [C]";
-					rowHead( 6 ) = "Zone Relative Humdity [%]";
-					rowHead( 7 ) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
-					rowHead( 8 ) = "Peak Design Sensible Load [W]";
-					rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [W]";
-					rowHead( 10 ) = "Difference [W]";
-				} else {
-					rowHead( 1 ) = "Time of Peak Load";
-					rowHead( 2 ) = "Outside  Dry Bulb Temperature [F]";
-					rowHead( 3 ) = "Outside  Wet Bulb Temperature [F]";
-					rowHead( 4 ) = "Outside Humidity Ratio at Peak [lbWater/lbAir]";
-					rowHead( 5 ) = "Zone Dry Bulb Temperature [F]";
-					rowHead( 6 ) = "Zone Relative Humdity [%]";
-					rowHead( 7 ) = "Zone Humidity Ratio at Peak [lbWater/lbAir]";
-					rowHead( 8 ) = "Peak Design Sensible Load [Btu/h]";
-					rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
-					rowHead( 10 ) = "Difference [Btu/h]";
-				}
-
-				tableBody = "";
-
-				if ( timeCoolMax != 0 ) {
-
-					//Time of Peak Load
-					tableBody( 1, 1 ) = CoolPeakDateHrMin( iZone );
-
-					//Outside  Dry Bulb Temperature
-					tableBody( 1, 2 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ) ), 2 );
-
-					//Outside  Wet Bulb Temperature
-					//use standard sea level air pressure because air pressure is not tracked with sizing data
-					if ( CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ) < 1.0 && CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ) > 0.0 ) {
-						tableBody( 1, 3 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 101325.0 ) ), 2 );
-					}
-
-					//Outside Humidity Ratio at Peak
-					tableBody( 1, 4 ) = RealToStr( CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 5 );
-
-					//Zone Dry Bulb Temperature
-					tableBody( 1, 5 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ) ), 2 );
-
-					//Zone Relative Humdity
-					//use standard sea level air pressure because air pressure is not tracked with sizing data
-					tableBody( 1, 6 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 101325.0 ), 2 );
-
-					//Zone Humidity Ratio at Peak
-					tableBody( 1, 7 ) = RealToStr( CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 5 );
-
-				}
-
-				//Peak Design Sensible Load
-				tableBody( 1, 8 ) = RealToStr( ( CalcFinalZoneSizing( iZone ).DesCoolLoad / mult ) * powerConversion, 2 );
-
-				//Estimated Instant + Delayed Sensible Load
-				tableBody( 1, 9 ) = RealToStr( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ), 2 );
-
-				//Difference
-				tableBody( 1, 10 ) = RealToStr( ( CalcFinalZoneSizing( iZone ).DesCoolLoad / mult ) * powerConversion - ( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ) ), 2 );
-
-				WriteSubtitle( "Cooling Peak Conditions" );
-				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
-				}
-
-				//    !
-				//    !---- Radiant to Convective Decay Curves for Cooling
-				//    !
-				//    numObj = 0
-				//    !determine the number of surfaces to include
-				//    DO kSurf = 1, TotSurfaces
-				//      ZoneNum = Surface(kSurf)%Zone
-				//      IF (ZoneNum .NE. iZone) CYCLE
-				//      IF (ZoneNum .EQ. 0) CYCLE
-				//      IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
-				//      numObj = numObj + 1
-				//    END DO
-				//    ALLOCATE(rowHead(numObj))
-				//    ALLOCATE(columnHead(16))
-				//    ALLOCATE(columnWidth(16))
-				//    columnWidth = 14 !array assignment - same for all columns
-				//    ALLOCATE(tableBody(numObj,16))
-				//    columnHead(1) = 'Time 1'
-				//    columnHead(2) = 'Time 2'
-				//    columnHead(3) = 'Time 3'
-				//    columnHead(4) = 'Time 4'
-				//    columnHead(5) = 'Time 5'
-				//    columnHead(6) = 'Time 6'
-				//    columnHead(7) = 'Time 7'
-				//    columnHead(8) = 'Time 8'
-				//    columnHead(9) = 'Time 9'
-				//    columnHead(10) = 'Time 10'
-				//    columnHead(11) = 'Time 11'
-				//    columnHead(12) = 'Time 12'
-				//    columnHead(13) = 'Time 13'
-				//    columnHead(14) = 'Time 14'
-				//    columnHead(15) = 'Time 15'
-				//    columnHead(16) = 'Time 16'
-				//    tableBody = ''
-				//    objCount = 0
-				//    DO kSurf = 1, TotSurfaces
-				//      ZoneNum = Surface(kSurf)%Zone
-				//      IF (ZoneNum .NE. iZone) CYCLE
-				//      IF (ZoneNum .EQ. 0) CYCLE
-				//      IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
-				//      objCount = objCount + 1
-				//      rowHead(objCount) = TRIM(Surface(kSurf)%Name)
-				//      DO jTime = 1, 16
-				//        tableBody(objCount,jTime) = TRIM(RealToStr(decayCurveCool(kSurf,jTime),3))
-				//      END DO
-				//    END DO
-				//    CALL WriteSubtitle('Radiant to Convective Decay Curves for Cooling')
-				//    CALL WriteTable(tableBody,rowHead,columnHead,columnWidth)
-				//    CALL CreateSQLiteTabularDataRecords(tableBody,rowHead,columnHead,&
-				//                                        'ZoneComponentLoadDetail',&
-				//                                        TRIM(Zone(iZone)%Name),&
-				//                                        'Radiant to Convective Decay Curves for Cooling')
-				//    DEALLOCATE(columnHead)
-				//    DEALLOCATE(rowHead)
-				//    DEALLOCATE(columnWidth)
-				//    DEALLOCATE(tableBody)
-
-				// Put the decay curve into the EIO file
-				if ( ShowDecayCurvesInEIO ) {
-					for ( kSurf = 1; kSurf <= TotSurfaces; ++kSurf ) {
-						ZoneNum = Surface( kSurf ).Zone;
-						if ( ZoneNum != iZone ) continue;
-						if ( ZoneNum == 0 ) continue;
-						if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
-						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Cooling," << Zone( iZone ).Name << Surface( kSurf ).Name; }
-						for ( jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
-							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << decayCurveCool( jTime, kSurf ); }
-						}
-						{ IOFlags flags; flags.ADVANCE( "YES" ); gio::write( OutputFileInits, "()", flags ); } //put a line feed at the end of the line
-					}
-				}
-
-				//---- Heating Peak Load Components Sub-Table
-				rowHead.allocate( rGrdTot );
-				columnHead.allocate( cPerc );
-				columnWidth.dimension( cPerc, 14 ); //array assignment - same for all columns
-				tableBody.allocate( cPerc, rGrdTot );
-
-				if ( unitsStyle != unitsStyleInchPound ) {
-					columnHead( cSensInst ) = "Sensible - Instant [W]";
-					columnHead( cSensDelay ) = "Sensible - Delayed [W]";
-					columnHead( cSensRA ) = "Sensible - Return Air [W]";
-					columnHead( cLatent ) = "Latent [W]";
-					columnHead( cTotal ) = "Total [W]";
-					columnHead( cPerc ) = "%Grand Total";
-				} else {
-					columnHead( cSensInst ) = "Sensible - Instant [Btu/h]";
-					columnHead( cSensDelay ) = "Sensible - Delayed [Btu/h]";
-					columnHead( cSensRA ) = "Sensible - Return Air [Btu/h]";
-					columnHead( cLatent ) = "Latent [Btu/h]";
-					columnHead( cTotal ) = "Total [Btu/h]";
-					columnHead( cPerc ) = "%Grand Total";
-				}
-
-				//internal gains
-				rowHead( rPeople ) = "People";
-				rowHead( rLights ) = "Lights";
-				rowHead( rEquip ) = "Equipment";
-				rowHead( rRefrig ) = "Refrigeration Equipment";
-				rowHead( rWaterUse ) = "Water Use Equipment";
-				rowHead( rPowerGen ) = "Power Generation Equipment";
-				rowHead( rHvacLoss ) = "HVAC Equipment Losses";
-				rowHead( rRefrig ) = "Refrigeration";
-				//misc
-				rowHead( rDOAS ) = "DOAS";
-				rowHead( rInfil ) = "Infiltration";
-				rowHead( rZoneVent ) = "Zone Ventilation";
-				rowHead( rIntZonMix ) = "Interzone Mixing";
-				//opaque surfaces
-				rowHead( rRoof ) = "Roof";
-				rowHead( rIntZonCeil ) = "Interzone Ceiling";
-				rowHead( rOtherRoof ) = "Other Roof";
-				rowHead( rExtWall ) = "Exterior Wall";
-				rowHead( rIntZonWall ) = "Interzone Wall";
-				rowHead( rGrdWall ) = "Ground Contact Wall";
-				rowHead( rOtherWall ) = "Other Wall";
-				rowHead( rExtFlr ) = "Exterior Floor";
-				rowHead( rIntZonFlr ) = "Interzone Floor";
-				rowHead( rGrdFlr ) = "Ground Contact Floor";
-				rowHead( rOtherFlr ) = "Other Floor";
-				//subsurfaces
-				rowHead( rFeneCond ) = "Fenestration Conduction";
-				rowHead( rFeneSolr ) = "Fenestration Solar";
-				rowHead( rOpqDoor ) = "Opaque Door";
-				rowHead( rGrdTot ) = "Grand Total";
-
-				tableBody = "";
-				totalColumn = 0.0;
-				percentColumn = 0.0;
-				grandTotalRow = 0.0;
-
-				HeatDesSelected = CalcFinalZoneSizing( iZone ).HeatDDNum;
-				timeHeatMax = CalcFinalZoneSizing( iZone ).TimeStepNumAtHeatMax;
-				if ( HeatDesSelected != 0 && timeHeatMax != 0 ) {
-
-					//PEOPLE
-					seqData = peopleInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rPeople ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = peopleLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rPeople ) += AvgData( timeHeatMax );
-					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
-
-					seqData = peopleDelaySeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rPeople ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
-
-					//LIGHTS
-					seqData = lightInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rLights ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = lightRetAirSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensRA, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rLights ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
-
-					seqData = lightDelaySeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rLights ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
-
-					//EQUIPMENT
-					seqData = equipInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rEquip ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = equipLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rEquip ) += AvgData( timeHeatMax );
-					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
-
-					seqData = equipDelaySeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rEquip ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
-
-					//REFRIGERATION EQUIPMENT
-					seqData = refrigInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rRefrig ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = refrigRetAirSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensRA, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rRefrig ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
-
-					seqData = refrigLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rRefrig ) += AvgData( timeHeatMax );
-					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
-
-					//WATER USE EQUIPMENT
-					seqData = waterUseInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rWaterUse ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rWaterUse ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = waterUseLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rWaterUse ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rWaterUse ) += AvgData( timeHeatMax );
-					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
-
-					//HVAC EQUIPMENT LOSSES
-					seqData = hvacLossInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rHvacLoss ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = hvacLossDelaySeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rHvacLoss ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
-
-					//POWER GENERATION EQUIPMENT
-					seqData = powerGenInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rPowerGen ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rPowerGen ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = powerGenDelaySeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rPowerGen ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
-
-					//DOAS
-					tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
-					grandTotalRow( cSensDelay ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
-
-					tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax ), 2 );
-					totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
-					grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
-
-					//INFILTRATION
-					seqData = infilInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rInfil ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rInfil ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = infilLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rInfil ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rInfil ) += AvgData( timeHeatMax );
-					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
-
-					//ZONE VENTILATION
-					seqData = zoneVentInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rZoneVent ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rZoneVent ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = zoneVentLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rZoneVent ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rZoneVent ) += AvgData( timeHeatMax );
-					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
-
-					//INTERZONE MIXING
-					seqData = interZoneMixInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rIntZonMix ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					seqData = interZoneMixLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cLatent, rIntZonMix ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
-					grandTotalRow( cLatent ) += AvgData( timeHeatMax );
-
-					//FENESTRATION CONDUCTION
-					seqData = feneCondInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensInst, rFeneCond ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rFeneCond ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
-
-					//FENESTRATION SOLAR
-					//      seqData = feneSolarInstantSeq(iZone,:,HeatDesSelected) * powerConversion
-					//      CALL MovingAvg(seqData,NumOfTimeStepInDay,NumTimeStepsInAvg,AvgData)
-					//      tableBody(rFeneSolr,cSensInst)  = TRIM(RealToStr(AvgData(timeHeatMax),2))
-					//      totalColumn(rFeneSolr) = totalColumn(rFeneSolr) + AvgData(timeHeatMax)
-					//      grandTotalRow(cSensInst) = grandTotalRow(cSensInst) + AvgData(timeHeatMax)
-
-					seqData = feneSolarDelaySeq( HeatDesSelected, _, iZone ) * powerConversion;
-					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-					tableBody( cSensDelay, rFeneSolr ) = RealToStr( AvgData( timeHeatMax ), 2 );
-					totalColumn( rFeneSolr ) += AvgData( timeHeatMax );
-					grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
-
-					//opaque surfaces - must combine individual surfaces by class and other side conditions
-					delayOpaque = 0.0;
-					for ( kSurf = 1; kSurf <= TotSurfaces; ++kSurf ) {
-						if ( ! Surface( kSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
-						if ( Surface( kSurf ).Zone == iZone ) {
-							curExtBoundCond = Surface( kSurf ).ExtBoundCond;
-							//if exterior is other side coefficients using ground preprocessor terms then
-							//set it to ground instead of other side coefficients
-							if ( curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt ) {
-								if ( has_prefixi( OSC( Surface( kSurf ).OSCPtr ).Name, "surfPropOthSdCoef" ) ) {
-									curExtBoundCond = Ground;
-								}
-							}
-							seqData = surfDelaySeq( HeatDesSelected, _, kSurf );
-							MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
-							singleSurfDelay = AvgData( timeHeatMax ) * powerConversion;
-							{ auto const SELECT_CASE_var( Surface( kSurf ).Class );
-							if ( SELECT_CASE_var == SurfaceClass_Wall ) {
-								{ auto const SELECT_CASE_var1( curExtBoundCond );
-								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
-									delayOpaque( rExtWall ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) ) {
-									delayOpaque( rGrdWall ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
-									delayOpaque( rOtherWall ) += singleSurfDelay;
-								} else { //interzone
-									delayOpaque( rIntZonWall ) += singleSurfDelay;
-								}}
-							} else if ( SELECT_CASE_var == SurfaceClass_Floor ) {
-								{ auto const SELECT_CASE_var1( curExtBoundCond );
-								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
-									delayOpaque( rExtFlr ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) ) {
-									delayOpaque( rGrdFlr ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
-									delayOpaque( rOtherFlr ) += singleSurfDelay;
-								} else { //interzone
-									delayOpaque( rIntZonFlr ) += singleSurfDelay;
-								}}
-							} else if ( SELECT_CASE_var == SurfaceClass_Roof ) {
-								{ auto const SELECT_CASE_var1( curExtBoundCond );
-								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
-									delayOpaque( rRoof ) += singleSurfDelay;
-								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) || ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
-									delayOpaque( rOtherRoof ) += singleSurfDelay;
-								} else { //interzone
-									delayOpaque( rIntZonCeil ) += singleSurfDelay;
-								}}
-							} else if ( SELECT_CASE_var == SurfaceClass_Door ) {
-								delayOpaque( rOpqDoor ) += singleSurfDelay;
-							}}
-						}
-					}
-					for ( k = rRoof; k <= rOtherFlr; ++k ) {
-						tableBody( cSensDelay, k ) = RealToStr( delayOpaque( k ), 2 );
-						totalColumn( k ) += delayOpaque( k );
-						grandTotalRow( cSensDelay ) += delayOpaque( k );
-					}
-					tableBody( cSensDelay, rOpqDoor ) = RealToStr( delayOpaque( rOpqDoor ), 2 );
-					totalColumn( rOpqDoor ) += delayOpaque( rOpqDoor );
-					grandTotalRow( cSensDelay ) += delayOpaque( rOpqDoor );
-				}
-
-				//GRAND TOTAL ROW
-				totalGrandTotal = 0.0;
-				for ( k = 1; k <= cLatent; ++k ) {
-					tableBody( k, rGrdTot ) = RealToStr( grandTotalRow( k ), 2 );
-					totalGrandTotal += grandTotalRow( k );
-				}
-				tableBody( cTotal, rGrdTot ) = RealToStr( totalGrandTotal, 2 );
-
-				//TOTAL COLUMN AND PERCENT COLUMN
-				for ( k = 1; k <= rOpqDoor; ++k ) { //to last row before total
-					tableBody( cTotal, k ) = RealToStr( totalColumn( k ), 2 );
-					if ( totalGrandTotal != 0.0 ) {
-						tableBody( cPerc, k ) = RealToStr( 100 * totalColumn( k ) / totalGrandTotal, 2 );
-					}
-				}
-
-				WriteSubtitle( "Estimated Heating Peak Load Components" );
-				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
-				}
-
-				//---- Heating Peak Conditions Sub-Table
-
-				rowHead.allocate( 10 );
-				columnHead.allocate( 1 );
-				columnWidth.allocate( 1 );
-				columnWidth = 14; //array assignment - same for all columns
-				tableBody.allocate( 1, 10 );
-
-				columnHead( 1 ) = "Value";
-				if ( unitsStyle != unitsStyleInchPound ) {
-					rowHead( 1 ) = "Time of Peak Load";
-					rowHead( 2 ) = "Outside  Dry Bulb Temperature [C]";
-					rowHead( 3 ) = "Outside  Wet Bulb Temperature [C]";
-					rowHead( 4 ) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
-					rowHead( 5 ) = "Zone Dry Bulb Temperature [C]";
-					rowHead( 6 ) = "Zone Relative Humdity [%]";
-					rowHead( 7 ) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
-					rowHead( 8 ) = "Peak Design Sensible Load [W]";
-					rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [W]";
-					rowHead( 10 ) = "Difference [W]";
-				} else {
-					rowHead( 1 ) = "Time of Peak Load";
-					rowHead( 2 ) = "Outside  Dry Bulb Temperature [F]";
-					rowHead( 3 ) = "Outside  Wet Bulb Temperature [F]";
-					rowHead( 4 ) = "Outside Humidity Ratio at Peak [lbWater/lbAir]";
-					rowHead( 5 ) = "Zone Dry Bulb Temperature [F]";
-					rowHead( 6 ) = "Zone Relative Humdity [%]";
-					rowHead( 7 ) = "Zone Humidity Ratio at Peak [lbWater/lbAir]";
-					rowHead( 8 ) = "Peak Design Sensible Load [Btu/h]";
-					rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
-					rowHead( 10 ) = "Difference [Btu/h]";
-				}
-
-				tableBody = "";
-
-				if ( timeHeatMax != 0 ) {
-					//Time of Peak Load
-					tableBody( 1, 1 ) = HeatPeakDateHrMin( iZone );
-
-					//Outside  Dry Bulb Temperature
-					tableBody( 1, 2 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ) ), 2 );
-
-					//Outside  Wet Bulb Temperature
-					//use standard sea level air pressure because air pressure is not tracked with sizing data
-					if ( CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ) < 1.0 && CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ) > 0.0 ) {
-						tableBody( 1, 3 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 101325.0 ) ), 2 );
-					}
-
-					//Humidity Ratio at Peak
-					tableBody( 1, 4 ) = RealToStr( CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 5 );
-
-					//Zone Dry Bulb Temperature
-					tableBody( 1, 5 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ) ), 2 );
-
-					//Zone Relative Temperature
-					//use standard sea level air pressure because air pressure is not tracked with sizing data
-					tableBody( 1, 6 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 101325.0 ), 2 );
-
-					//Zone Relative Humdity
-					tableBody( 1, 7 ) = RealToStr( CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 5 );
-
-				}
-
-				//Peak Design Sensible Load
-				tableBody( 1, 8 ) = RealToStr( ( -CalcFinalZoneSizing( iZone ).DesHeatLoad / mult ) * powerConversion, 2 ); //change sign
-
-				//Estimated Instant + Delayed Sensible Load
-				tableBody( 1, 9 ) = RealToStr( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ), 2 );
-
-				//Difference
-				tableBody( 1, 10 ) = RealToStr( ( -CalcFinalZoneSizing( iZone ).DesHeatLoad / mult ) * powerConversion - ( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ) ), 2 );
-
-				WriteSubtitle( "Heating Peak Conditions" );
-				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
-				}
-
-				//    !
-				//    !---- Radiant to Convective Decay Curves for Heating
-				//    !
-				//    numObj = 0
-				//    !determine the number of surfaces to include
-				//    DO kSurf = 1, TotSurfaces
-				//      ZoneNum = Surface(kSurf)%Zone
-				//      IF (ZoneNum .NE. iZone) CYCLE
-				//      IF (ZoneNum .EQ. 0) CYCLE
-				//      IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
-				//      numObj = numObj + 1
-				//    END DO
-				//    ALLOCATE(rowHead(numObj))
-				//    ALLOCATE(columnHead(16))
-				//    ALLOCATE(columnWidth(16))
-				//    columnWidth = 14 !array assignment - same for all columns
-				//    ALLOCATE(tableBody(numObj,16))
-				//    columnHead(1) = 'Time 1'
-				//    columnHead(2) = 'Time 2'
-				//    columnHead(3) = 'Time 3'
-				//    columnHead(4) = 'Time 4'
-				//    columnHead(5) = 'Time 5'
-				//    columnHead(6) = 'Time 6'
-				//    columnHead(7) = 'Time 7'
-				//    columnHead(8) = 'Time 8'
-				//    columnHead(9) = 'Time 9'
-				//    columnHead(10) = 'Time 10'
-				//    columnHead(11) = 'Time 11'
-				//    columnHead(12) = 'Time 12'
-				//    columnHead(13) = 'Time 13'
-				//    columnHead(14) = 'Time 14'
-				//    columnHead(15) = 'Time 15'
-				//    columnHead(16) = 'Time 16'
-				//    tableBody = ''
-				//    objCount = 0
-				//    DO kSurf = 1, TotSurfaces
-				//      ZoneNum = Surface(kSurf)%Zone
-				//      IF (ZoneNum .NE. iZone) CYCLE
-				//      IF (ZoneNum .EQ. 0) CYCLE
-				//      IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
-				//      objCount = objCount + 1
-				//      rowHead(objCount) = TRIM(Surface(kSurf)%Name)
-				//      DO jTime = 1, 16
-				//        tableBody(objCount,jTime) = TRIM(RealToStr(decayCurveHeat(kSurf,jTime),3))
-				//      END DO
-				//    END DO
-				//    CALL WriteSubtitle('Radiant to Convective Decay Curves for Heating')
-				//    CALL WriteTable(tableBody,rowHead,columnHead,columnWidth)
-				//    CALL CreateSQLiteTabularDataRecords(tableBody,rowHead,columnHead,&
-				//                                        'ZoneComponentLoadDetail',&
-				//                                        TRIM(Zone(iZone)%Name),&
-				//                                        'Radiant to Convective Decay Curves for Heating')
-				//    DEALLOCATE(columnHead)
-				//    DEALLOCATE(rowHead)
-				//    DEALLOCATE(columnWidth)
-				//    DEALLOCATE(tableBody)
-
-				// Put the decay curve into the EIO file
-				if ( ShowDecayCurvesInEIO ) {
-					for ( kSurf = 1; kSurf <= TotSurfaces; ++kSurf ) {
-						ZoneNum = Surface( kSurf ).Zone;
-						if ( ZoneNum != iZone ) continue;
-						if ( ZoneNum == 0 ) continue;
-						if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
-						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Heating," << Zone( iZone ).Name << Surface( kSurf ).Name; }
-						for ( jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
-							{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << decayCurveHeat( jTime, kSurf ); }
-						}
-						{ IOFlags flags; flags.ADVANCE( "YES" ); gio::write( OutputFileInits, "()", flags ); } //put a line feed at the end of the line
-					}
-				}
-
-			}
+		// Delayed components are moved into this function so that we can calculate them one zone at a time
+		// with Array1D
+		Array1D< Real64 > peopleDelaySeqHeat;
+		Array1D< Real64 > peopleDelaySeqCool;
+		Array1D< Real64 > lightDelaySeqHeat;
+		Array1D< Real64 > lightDelaySeqCool;
+		Array1D< Real64 > equipDelaySeqHeat;
+		Array1D< Real64 > equipDelaySeqCool;
+		Array1D< Real64 > hvacLossDelaySeqHeat;
+		Array1D< Real64 > hvacLossDelaySeqCool;
+		Array1D< Real64 > powerGenDelaySeqHeat;
+		Array1D< Real64 > powerGenDelaySeqCool;
+		Array1D< Real64 > feneSolarDelaySeqHeat;
+		Array1D< Real64 > feneSolarDelaySeqCool;
+		Array2D< Real64 > surfDelaySeqHeat;
+		Array2D< Real64 > surfDelaySeqCool;
+
+		peopleDelaySeqHeat.dimension( NumOfTimeStepInHour * 24, 0.0 );
+		peopleDelaySeqHeat = 0.0;
+		peopleDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+		peopleDelaySeqCool = 0.0;
+		lightDelaySeqHeat.allocate( NumOfTimeStepInHour * 24 );
+		lightDelaySeqHeat = 0.0;
+		lightDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+		lightDelaySeqCool = 0.0;
+		equipDelaySeqHeat.allocate( NumOfTimeStepInHour * 24 );
+		equipDelaySeqHeat = 0.0;
+		equipDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+		equipDelaySeqCool = 0.0;
+		hvacLossDelaySeqHeat.allocate( NumOfTimeStepInHour * 24 );
+		hvacLossDelaySeqHeat = 0.0;
+		hvacLossDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+		hvacLossDelaySeqCool = 0.0;
+		powerGenDelaySeqHeat.allocate( NumOfTimeStepInHour * 24 );
+		powerGenDelaySeqHeat = 0.0;
+		powerGenDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+		powerGenDelaySeqCool = 0.0;
+		feneSolarDelaySeqHeat.allocate( NumOfTimeStepInHour * 24 );
+		feneSolarDelaySeqHeat = 0.0;
+		feneSolarDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+		feneSolarDelaySeqCool = 0.0;
+		surfDelaySeqHeat.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
+		surfDelaySeqHeat = 0.0;
+		surfDelaySeqCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
+		surfDelaySeqCool = 0.0;
+
+		Array1D< Real64 > peopleRadIntoSurf;
+		Array1D< Real64 > equipRadIntoSurf;
+		Array1D< Real64 > hvacLossRadIntoSurf;
+		Array1D< Real64 > powerGenRadIntoSurf;
+		Array1D< Real64 > lightLWRadIntoSurf;
+
+		peopleRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+		equipRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+		hvacLossRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+		powerGenRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+		lightLWRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
+
+		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
+		seqData.allocate( NumOfTimeStepInDay );
+		AvgData.allocate( NumOfTimeStepInDay );
+		delayOpaque.allocate( rGrdTot );
+		totalColumn.allocate( rGrdTot );
+		percentColumn.allocate( rGrdTot );
+		grandTotalRow.allocate( cPerc );
+
+		//establish unit conversion factors
+		if ( unitsStyle == unitsStyleInchPound ) {
+			powerConversion = getSpecificUnitMultiplier( "W", "Btu/h" ); //or kBtuh?
+			tempConvIndx = getSpecificUnitIndex( "C", "F" );
+		} else {
+			powerConversion = 1.0;
+			tempConvIndx = 0; //when zero is used with ConvertIP the value is returned unconverted
 		}
 
-	}
+		// show the line definition for the decay curves
+		if ( ShowDecayCurvesInEIO ) {
+			gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+			gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+		}
+
+		for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			if ( ! ZoneEquipConfig( iZone ).IsControlled ) continue;
+			mult = Zone( iZone ).Multiplier * Zone( iZone ).ListMultiplier;
+			if ( mult == 0.0 ) mult = 1.0;
+
+			ZoneData &zd( Zone( iZone ) );
+			if ( allocated( CalcFinalZoneSizing ) ) {
+
+				// Heating design days
+				int desSelected = CalcFinalZoneSizing( iZone ).HeatDDNum;
+				if ( desSelected != 0 ) {
+
+					for ( int kTimeStep = 1; kTimeStep <= NumOfTimeStepInHour * 24; ++kTimeStep ) {
+						Real64 peopleConvIntoZone = 0.0;
+						Real64 equipConvIntoZone = 0.0;
+						Real64 hvacLossConvIntoZone = 0.0;
+						Real64 powerGenConvIntoZone = 0.0;
+						Real64 lightLWConvIntoZone = 0.0;
+						Real64 lightSWConvIntoZone = 0.0;
+						Real64 feneSolarConvIntoZone = 0.0;
+						Real64 adjFeneSurfNetRadSeq = 0.0;
+
+						for ( int jSurf = zd.SurfaceFirst; jSurf <= zd.SurfaceLast; ++jSurf ) {
+							if ( ! Surface( jSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
+
+							//determine for each timestep the amount of radiant heat for each end use absorbed in each surface
+							Real64 QRadThermInAbsMult = TMULTseq( desSelected, kTimeStep, iZone ) * ITABSFseq( desSelected, kTimeStep, jSurf ) * Surface( jSurf ).Area;
+							peopleRadIntoSurf( kTimeStep ) = peopleRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							equipRadIntoSurf( kTimeStep ) = equipRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							hvacLossRadIntoSurf( kTimeStep ) = hvacLossRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							powerGenRadIntoSurf( kTimeStep ) = powerGenRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							lightLWRadIntoSurf( kTimeStep ) = lightLWRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							//for each time step, step back through time and apply decay curve
+							Real64 peopleConvFromSurf = 0.0;
+							Real64 equipConvFromSurf = 0.0;
+							Real64 hvacLossConvFromSurf = 0.0;
+							Real64 powerGenConvFromSurf = 0.0;
+							Real64 lightLWConvFromSurf = 0.0;
+							Real64 lightSWConvFromSurf = 0.0;
+							Real64 feneSolarConvFromSurf = 0.0;
+							for ( int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack ) {
+								peopleConvFromSurf += peopleRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
+								equipConvFromSurf += equipRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
+								hvacLossConvFromSurf += hvacLossRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
+								powerGenConvFromSurf += powerGenRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
+								lightLWConvFromSurf += lightLWRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveHeat( mStepBack, jSurf );
+								// short wave is already accumulated by surface
+								lightSWConvFromSurf += lightSWRadSeq( desSelected, kTimeStep - mStepBack + 1, jSurf ) * decayCurveHeat( mStepBack, jSurf );
+								feneSolarConvFromSurf += feneSolarRadSeq( desSelected, kTimeStep - mStepBack + 1, jSurf ) * decayCurveHeat( mStepBack, jSurf );
+							} // for mStepBack
+							peopleConvIntoZone += peopleConvFromSurf;
+							equipConvIntoZone += equipConvFromSurf;
+							hvacLossConvIntoZone += hvacLossConvFromSurf;
+							powerGenConvIntoZone += powerGenConvFromSurf;
+							lightLWConvIntoZone += lightLWConvFromSurf;
+							lightSWConvIntoZone += lightSWConvFromSurf;
+							feneSolarConvIntoZone += feneSolarConvFromSurf;
+							// determine the remaining convective heat from the surfaces that are not based
+							// on any of these other loads
+							//negative because heat from surface should be positive
+							surfDelaySeqHeat( kTimeStep, jSurf ) = -loadConvectedNormal( desSelected, kTimeStep, jSurf ) - netSurfRadSeq( desSelected, kTimeStep, jSurf ) - ( peopleConvFromSurf + equipConvFromSurf + hvacLossConvFromSurf + powerGenConvFromSurf + lightLWConvFromSurf + lightSWConvFromSurf + feneSolarConvFromSurf ); //remove net radiant for the surface
+							// also remove the net radiant component on the instanteous conduction for fenestration
+							if ( Surface( jSurf ).Class == SurfaceClass_Window ) {
+								adjFeneSurfNetRadSeq += netSurfRadSeq( desSelected, kTimeStep, jSurf );
+							}
+						} // for jSurf
+						peopleDelaySeqHeat( kTimeStep ) = peopleConvIntoZone;
+						equipDelaySeqHeat( kTimeStep ) = equipConvIntoZone;
+						hvacLossDelaySeqHeat( kTimeStep ) = hvacLossConvIntoZone;
+						powerGenDelaySeqHeat( kTimeStep ) = powerGenConvIntoZone;
+						//combine short wave (visible) and long wave (thermal) impacts
+						lightDelaySeqHeat( kTimeStep ) = lightLWConvIntoZone + lightSWConvIntoZone;
+						feneSolarDelaySeqHeat( kTimeStep ) = feneSolarConvIntoZone;
+						// also remove the net radiant component on the instanteous conduction for fenestration
+						feneCondInstantSeq( desSelected, kTimeStep, iZone ) -= adjFeneSurfNetRadSeq;
+					} // for kTimeStep
+				} // if desSelected != 0
+
+				// Cooling design days
+				desSelected = CalcFinalZoneSizing( iZone ).CoolDDNum;
+				if ( desSelected != 0 ) {
+
+					for ( int kTimeStep = 1; kTimeStep <= NumOfTimeStepInHour * 24; ++kTimeStep ) {
+						Real64 peopleConvIntoZone = 0.0;
+						Real64 equipConvIntoZone = 0.0;
+						Real64 hvacLossConvIntoZone = 0.0;
+						Real64 powerGenConvIntoZone = 0.0;
+						Real64 lightLWConvIntoZone = 0.0;
+						Real64 lightSWConvIntoZone = 0.0;
+						Real64 feneSolarConvIntoZone = 0.0;
+						Real64 adjFeneSurfNetRadSeq = 0.0;
+
+						for ( int jSurf = zd.SurfaceFirst; jSurf <= zd.SurfaceLast; ++jSurf ) {
+							if ( ! Surface( jSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
+
+							//determine for each timestep the amount of radiant heat for each end use absorbed in each surface
+							Real64 QRadThermInAbsMult = TMULTseq( desSelected, kTimeStep, iZone ) * ITABSFseq( desSelected, kTimeStep, jSurf ) * Surface( jSurf ).Area;
+							peopleRadIntoSurf( kTimeStep ) = peopleRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							equipRadIntoSurf( kTimeStep ) = equipRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							hvacLossRadIntoSurf( kTimeStep ) = hvacLossRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							powerGenRadIntoSurf( kTimeStep ) = powerGenRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							lightLWRadIntoSurf( kTimeStep ) = lightLWRadSeq( desSelected, kTimeStep, iZone ) * QRadThermInAbsMult;
+							//for each time step, step back through time and apply decay curve
+							Real64 peopleConvFromSurf = 0.0;
+							Real64 equipConvFromSurf = 0.0;
+							Real64 hvacLossConvFromSurf = 0.0;
+							Real64 powerGenConvFromSurf = 0.0;
+							Real64 lightLWConvFromSurf = 0.0;
+							Real64 lightSWConvFromSurf = 0.0;
+							Real64 feneSolarConvFromSurf = 0.0;
+							for ( int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack ) {
+								peopleConvFromSurf += peopleRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
+								equipConvFromSurf += equipRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
+								hvacLossConvFromSurf += hvacLossRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
+								powerGenConvFromSurf += powerGenRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
+								lightLWConvFromSurf += lightLWRadIntoSurf( kTimeStep - mStepBack + 1 ) * decayCurveCool( mStepBack, jSurf );
+								// short wave is already accumulated by surface
+								lightSWConvFromSurf += lightSWRadSeq( desSelected, kTimeStep - mStepBack + 1, jSurf ) * decayCurveCool( mStepBack, jSurf );
+								feneSolarConvFromSurf += feneSolarRadSeq( desSelected, kTimeStep - mStepBack + 1, jSurf ) * decayCurveCool( mStepBack, jSurf );
+							} // for mStepBack
+							peopleConvIntoZone += peopleConvFromSurf;
+							equipConvIntoZone += equipConvFromSurf;
+							hvacLossConvIntoZone += hvacLossConvFromSurf;
+							powerGenConvIntoZone += powerGenConvFromSurf;
+							lightLWConvIntoZone += lightLWConvFromSurf;
+							lightSWConvIntoZone += lightSWConvFromSurf;
+							feneSolarConvIntoZone += feneSolarConvFromSurf;
+							// determine the remaining convective heat from the surfaces that are not based
+							// on any of these other loads
+							//negative because heat from surface should be positive
+							surfDelaySeqCool( kTimeStep, jSurf ) = -loadConvectedNormal( desSelected, kTimeStep, jSurf ) - netSurfRadSeq( desSelected, kTimeStep, jSurf ) - ( peopleConvFromSurf + equipConvFromSurf + hvacLossConvFromSurf + powerGenConvFromSurf + lightLWConvFromSurf + lightSWConvFromSurf + feneSolarConvFromSurf ); //remove net radiant for the surface
+							// also remove the net radiant component on the instanteous conduction for fenestration
+							if ( Surface( jSurf ).Class == SurfaceClass_Window ) {
+								adjFeneSurfNetRadSeq += netSurfRadSeq( desSelected, kTimeStep, jSurf );
+							}
+						} // for jSurf
+						peopleDelaySeqCool( kTimeStep ) = peopleConvIntoZone;
+						equipDelaySeqCool( kTimeStep ) = equipConvIntoZone;
+						hvacLossDelaySeqCool( kTimeStep ) = hvacLossConvIntoZone;
+						powerGenDelaySeqCool( kTimeStep ) = powerGenConvIntoZone;
+						//combine short wave (visible) and long wave (thermal) impacts
+						lightDelaySeqCool( kTimeStep ) = lightLWConvIntoZone + lightSWConvIntoZone;
+						feneSolarDelaySeqCool( kTimeStep ) = feneSolarConvIntoZone;
+						// also remove the net radiant component on the instanteous conduction for fenestration
+						feneCondInstantSeq( desSelected, kTimeStep, iZone ) -= adjFeneSurfNetRadSeq;
+					} // for kTimeStep
+				} // if desSelected != 0
+
+			} // if allocated( CalcFinalZoneSizing )
+
+			//---- Cooling Peak Load Components Sub-Table
+			WriteReportHeaders( "Zone Component Load Summary", Zone( iZone ).Name, isAverage );
+
+			rowHead.allocate( rGrdTot );
+			columnHead.allocate( cPerc );
+			columnWidth.dimension( cPerc, 14 ); //array assignment - same for all columns
+			tableBody.allocate( cPerc, rGrdTot );
+
+			if ( unitsStyle != unitsStyleInchPound ) {
+				columnHead( cSensInst ) = "Sensible - Instant [W]";
+				columnHead( cSensDelay ) = "Sensible - Delayed [W]";
+				columnHead( cSensRA ) = "Sensible - Return Air [W]";
+				columnHead( cLatent ) = "Latent [W]";
+				columnHead( cTotal ) = "Total [W]";
+				columnHead( cPerc ) = "%Grand Total";
+			} else {
+				columnHead( cSensInst ) = "Sensible - Instant [Btu/h]";
+				columnHead( cSensDelay ) = "Sensible - Delayed [Btu/h]";
+				columnHead( cSensRA ) = "Sensible - Return Air [Btu/h]";
+				columnHead( cLatent ) = "Latent [Btu/h]";
+				columnHead( cTotal ) = "Total [Btu/h]";
+				columnHead( cPerc ) = "%Grand Total";
+			}
+
+			//internal gains
+			rowHead( rPeople ) = "People";
+			rowHead( rLights ) = "Lights";
+			rowHead( rEquip ) = "Equipment";
+			rowHead( rRefrig ) = "Refrigeration Equipment";
+			rowHead( rWaterUse ) = "Water Use Equipment";
+			rowHead( rPowerGen ) = "Power Generation Equipment";
+			rowHead( rHvacLoss ) = "HVAC Equipment Losses";
+			rowHead( rRefrig ) = "Refrigeration";
+			//misc
+			rowHead( rDOAS ) = "DOAS Direct to Zone";
+			rowHead( rInfil ) = "Infiltration";
+			rowHead( rZoneVent ) = "Zone Ventilation";
+			rowHead( rIntZonMix ) = "Interzone Mixing";
+			//opaque surfaces
+			rowHead( rRoof ) = "Roof";
+			rowHead( rIntZonCeil ) = "Interzone Ceiling";
+			rowHead( rOtherRoof ) = "Other Roof";
+			rowHead( rExtWall ) = "Exterior Wall";
+			rowHead( rIntZonWall ) = "Interzone Wall";
+			rowHead( rGrdWall ) = "Ground Contact Wall";
+			rowHead( rOtherWall ) = "Other Wall";
+			rowHead( rExtFlr ) = "Exterior Floor";
+			rowHead( rIntZonFlr ) = "Interzone Floor";
+			rowHead( rGrdFlr ) = "Ground Contact Floor";
+			rowHead( rOtherFlr ) = "Other Floor";
+			//subsurfaces
+			rowHead( rFeneCond ) = "Fenestration Conduction";
+			rowHead( rFeneSolr ) = "Fenestration Solar";
+			rowHead( rOpqDoor ) = "Opaque Door";
+			rowHead( rGrdTot ) = "Grand Total";
+
+			tableBody = "";
+			totalColumn = 0.0;
+			percentColumn = 0.0;
+			grandTotalRow = 0.0;
+
+			int CoolDesSelected = CalcFinalZoneSizing( iZone ).CoolDDNum;
+			int timeCoolMax = CalcFinalZoneSizing( iZone ).TimeStepNumAtCoolMax;
+			if ( CoolDesSelected != 0 && timeCoolMax != 0 ) {
+
+				//PEOPLE
+				seqData = peopleInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rPeople ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = peopleLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rPeople ) += AvgData( timeCoolMax );
+				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+
+				seqData = peopleDelaySeqCool( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rPeople ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rPeople ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+
+				//LIGHTS
+				seqData = lightInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rLights ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = lightRetAirSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensRA, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rLights ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
+
+				seqData = lightDelaySeqCool( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rLights ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rLights ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+
+				//EQUIPMENT
+				seqData = equipInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rEquip ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = equipLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rEquip ) += AvgData( timeCoolMax );
+				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+
+				seqData = equipDelaySeqCool( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rEquip ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rEquip ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+
+				//REFRIGERATION EQUIPMENT
+				seqData = refrigInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rRefrig ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = refrigRetAirSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensRA, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rRefrig ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensRA ) += AvgData( timeCoolMax );
+
+				seqData = refrigLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rRefrig ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rRefrig ) += AvgData( timeCoolMax );
+				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+
+				//WATER USE EQUIPMENT
+				seqData = waterUseInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rWaterUse ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rWaterUse ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = waterUseLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rWaterUse ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rWaterUse ) += AvgData( timeCoolMax );
+				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+
+				//HVAC EQUIPMENT LOSSES
+				seqData = hvacLossInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rHvacLoss ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = hvacLossDelaySeqCool( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rHvacLoss ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rHvacLoss ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+
+				//POWER GENERATION EQUIPMENT
+				seqData = powerGenInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rPowerGen ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rPowerGen ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = powerGenDelaySeqCool( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rPowerGen ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+
+				//DOAS
+				tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax ), 2 );
+				totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax );
+				grandTotalRow( cSensInst ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASHeatAddSeq( timeCoolMax );
+
+				tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax ), 2 );
+				totalColumn( rDOAS ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax );
+				grandTotalRow( cLatent ) += CalcZoneSizing( CoolDesSelected, iZone ).DOASLatAddSeq( timeCoolMax );
+
+				//INFILTRATION
+				seqData = infilInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rInfil ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rInfil ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = infilLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rInfil ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rInfil ) += AvgData( timeCoolMax );
+				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+
+				//ZONE VENTILATION
+				seqData = zoneVentInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rZoneVent ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rZoneVent ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = zoneVentLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rZoneVent ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rZoneVent ) += AvgData( timeCoolMax );
+				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+
+				//INTERZONE MIXING
+				seqData = interZoneMixInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rIntZonMix ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				seqData = interZoneMixLatentSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rIntZonMix ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rIntZonMix ) += AvgData( timeCoolMax );
+				grandTotalRow( cLatent ) += AvgData( timeCoolMax );
+
+				//FENESTRATION CONDUCTION
+				seqData = feneCondInstantSeq( CoolDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rFeneCond ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rFeneCond ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensInst ) += AvgData( timeCoolMax );
+
+				//FENESTRATION SOLAR
+				//      seqData = feneSolarInstantSeq(iZone,:,CoolDesSelected) * powerConversion
+				//      CALL MovingAvg(seqData,NumOfTimeStepInDay,NumTimeStepsInAvg,AvgData)
+				//      tableBody(rFeneSolr,cSensInst)  = TRIM(RealToStr(AvgData(timeCoolMax),2))
+				//      totalColumn(rFeneSolr) = totalColumn(rFeneSolr) + AvgData(timeCoolMax)
+				//      grandTotalRow(cSensInst) = grandTotalRow(cSensInst) + AvgData(timeCoolMax)
+
+				seqData = feneSolarDelaySeqCool( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rFeneSolr ) = RealToStr( AvgData( timeCoolMax ), 2 );
+				totalColumn( rFeneSolr ) += AvgData( timeCoolMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeCoolMax );
+
+				//opaque surfaces - must combine individual surfaces by class and other side conditions
+				delayOpaque = 0.0;
+				for ( int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf ) {
+					if ( ! Surface( kSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
+
+					curExtBoundCond = Surface( kSurf ).ExtBoundCond;
+					//if exterior is other side coefficients using ground preprocessor terms then
+					//set it to ground instead of other side coefficients
+					if ( curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt ) {
+						if ( has_prefixi( OSC( Surface( kSurf ).OSCPtr ).Name, "surfPropOthSdCoef" ) ) {
+							curExtBoundCond = Ground;
+						}
+					}
+					seqData = surfDelaySeqCool( _, kSurf );
+					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+					singleSurfDelay = AvgData( timeCoolMax ) * powerConversion;
+					{ auto const SELECT_CASE_var( Surface( kSurf ).Class );
+						if ( SELECT_CASE_var == SurfaceClass_Wall ) {
+							{ auto const SELECT_CASE_var1( curExtBoundCond );
+								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
+									delayOpaque( rExtWall ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) ) {
+									delayOpaque( rGrdWall ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
+									delayOpaque( rOtherWall ) += singleSurfDelay;
+								} else { //interzone
+									delayOpaque( rIntZonWall ) += singleSurfDelay;
+								}}
+						} else if ( SELECT_CASE_var == SurfaceClass_Floor ) {
+							{ auto const SELECT_CASE_var1( curExtBoundCond );
+								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
+									delayOpaque( rExtFlr ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) ) {
+									delayOpaque( rGrdFlr ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
+									delayOpaque( rOtherFlr ) += singleSurfDelay;
+								} else { //interzone
+									delayOpaque( rIntZonFlr ) += singleSurfDelay;
+								}}
+						} else if ( SELECT_CASE_var == SurfaceClass_Roof ) {
+							{ auto const SELECT_CASE_var1( curExtBoundCond );
+								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
+									delayOpaque( rRoof ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) || ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
+									delayOpaque( rOtherRoof ) += singleSurfDelay;
+								} else { //interzone
+									delayOpaque( rIntZonCeil ) += singleSurfDelay;
+								}}
+						} else if ( SELECT_CASE_var == SurfaceClass_Door ) {
+							delayOpaque( rOpqDoor ) += singleSurfDelay;
+						}}
+				}
+			}
+			for ( int k = rRoof; k <= rOtherFlr; ++k ) {
+				tableBody( cSensDelay, k ) = RealToStr( delayOpaque( k ), 2 );
+				totalColumn( k ) += delayOpaque( k );
+				grandTotalRow( cSensDelay ) += delayOpaque( k );
+			}
+			tableBody( cSensDelay, rOpqDoor ) = RealToStr( delayOpaque( rOpqDoor ), 2 );
+			totalColumn( rOpqDoor ) += delayOpaque( rOpqDoor );
+			grandTotalRow( cSensDelay ) += delayOpaque( rOpqDoor );
+
+			//GRAND TOTAL ROW
+			totalGrandTotal = 0.0;
+			for ( int k = 1; k <= cLatent; ++k ) {
+				tableBody( k, rGrdTot ) = RealToStr( grandTotalRow( k ), 2 );
+				totalGrandTotal += grandTotalRow( k );
+			}
+			tableBody( cTotal, rGrdTot ) = RealToStr( totalGrandTotal, 2 );
+
+			//TOTAL COLUMN AND PERCENT COLUMN
+			for ( int k = 1; k <= rOpqDoor; ++k ) { //to last row before total
+				tableBody( cTotal, k ) = RealToStr( totalColumn( k ), 2 );
+				if ( totalGrandTotal != 0.0 ) {
+					tableBody( cPerc, k ) = RealToStr( 100 * totalColumn( k ) / totalGrandTotal, 2 );
+				}
+			}
+
+			WriteSubtitle( "Estimated Cooling Peak Load Components" );
+			WriteTable( tableBody, rowHead, columnHead, columnWidth );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
+			}
+
+			//---- Cooling Peak Conditions
+
+			rowHead.allocate( 10 );
+			columnHead.allocate( 1 );
+			columnWidth.allocate( 1 );
+			columnWidth = 14; //array assignment - same for all columns
+			tableBody.allocate( 1, 10 );
+
+			columnHead( 1 ) = "Value";
+			if ( unitsStyle != unitsStyleInchPound ) {
+				rowHead( 1 ) = "Time of Peak Load";
+				rowHead( 2 ) = "Outside  Dry Bulb Temperature [C]";
+				rowHead( 3 ) = "Outside  Wet Bulb Temperature [C]";
+				rowHead( 4 ) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
+				rowHead( 5 ) = "Zone Dry Bulb Temperature [C]";
+				rowHead( 6 ) = "Zone Relative Humdity [%]";
+				rowHead( 7 ) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
+				rowHead( 8 ) = "Peak Design Sensible Load [W]";
+				rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [W]";
+				rowHead( 10 ) = "Difference [W]";
+			} else {
+				rowHead( 1 ) = "Time of Peak Load";
+				rowHead( 2 ) = "Outside  Dry Bulb Temperature [F]";
+				rowHead( 3 ) = "Outside  Wet Bulb Temperature [F]";
+				rowHead( 4 ) = "Outside Humidity Ratio at Peak [lbWater/lbAir]";
+				rowHead( 5 ) = "Zone Dry Bulb Temperature [F]";
+				rowHead( 6 ) = "Zone Relative Humdity [%]";
+				rowHead( 7 ) = "Zone Humidity Ratio at Peak [lbWater/lbAir]";
+				rowHead( 8 ) = "Peak Design Sensible Load [Btu/h]";
+				rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
+				rowHead( 10 ) = "Difference [Btu/h]";
+			}
+
+			tableBody = "";
+
+			if ( timeCoolMax != 0 ) {
+
+				//Time of Peak Load
+				tableBody( 1, 1 ) = CoolPeakDateHrMin( iZone );
+
+				//Outside  Dry Bulb Temperature
+				tableBody( 1, 2 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ) ), 2 );
+
+				//Outside  Wet Bulb Temperature
+				//use standard sea level air pressure because air pressure is not tracked with sizing data
+				if ( CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ) < 1.0 && CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ) > 0.0 ) {
+					tableBody( 1, 3 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 101325.0 ) ), 2 );
+				}
+
+				//Outside Humidity Ratio at Peak
+				tableBody( 1, 4 ) = RealToStr( CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 5 );
+
+				//Zone Dry Bulb Temperature
+				tableBody( 1, 5 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ) ), 2 );
+
+				//Zone Relative Humdity
+				//use standard sea level air pressure because air pressure is not tracked with sizing data
+				tableBody( 1, 6 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 101325.0 ), 2 );
+
+				//Zone Humidity Ratio at Peak
+				tableBody( 1, 7 ) = RealToStr( CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 5 );
+
+			}
+
+			//Peak Design Sensible Load
+			tableBody( 1, 8 ) = RealToStr( ( CalcFinalZoneSizing( iZone ).DesCoolLoad / mult ) * powerConversion, 2 );
+
+			//Estimated Instant + Delayed Sensible Load
+			tableBody( 1, 9 ) = RealToStr( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ), 2 );
+
+			//Difference
+			tableBody( 1, 10 ) = RealToStr( ( CalcFinalZoneSizing( iZone ).DesCoolLoad / mult ) * powerConversion - ( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ) ), 2 );
+
+			WriteSubtitle( "Cooling Peak Conditions" );
+			WriteTable( tableBody, rowHead, columnHead, columnWidth );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
+			}
+
+			//    !
+			//    !---- Radiant to Convective Decay Curves for Cooling
+			//    !
+			//    numObj = 0
+			//    !determine the number of surfaces to include
+			//    DO kSurf = 1, TotSurfaces
+			//      ZoneNum = Surface(kSurf)%Zone
+			//      IF (ZoneNum .NE. iZone) CYCLE
+			//      IF (ZoneNum .EQ. 0) CYCLE
+			//      IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
+			//      numObj = numObj + 1
+			//    END DO
+			//    ALLOCATE(rowHead(numObj))
+			//    ALLOCATE(columnHead(16))
+			//    ALLOCATE(columnWidth(16))
+			//    columnWidth = 14 !array assignment - same for all columns
+			//    ALLOCATE(tableBody(numObj,16))
+			//    columnHead(1) = 'Time 1'
+			//    columnHead(2) = 'Time 2'
+			//    columnHead(3) = 'Time 3'
+			//    columnHead(4) = 'Time 4'
+			//    columnHead(5) = 'Time 5'
+			//    columnHead(6) = 'Time 6'
+			//    columnHead(7) = 'Time 7'
+			//    columnHead(8) = 'Time 8'
+			//    columnHead(9) = 'Time 9'
+			//    columnHead(10) = 'Time 10'
+			//    columnHead(11) = 'Time 11'
+			//    columnHead(12) = 'Time 12'
+			//    columnHead(13) = 'Time 13'
+			//    columnHead(14) = 'Time 14'
+			//    columnHead(15) = 'Time 15'
+			//    columnHead(16) = 'Time 16'
+			//    tableBody = ''
+			//    objCount = 0
+			//    DO kSurf = 1, TotSurfaces
+			//      ZoneNum = Surface(kSurf)%Zone
+			//      IF (ZoneNum .NE. iZone) CYCLE
+			//      IF (ZoneNum .EQ. 0) CYCLE
+			//      IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
+			//      objCount = objCount + 1
+			//      rowHead(objCount) = TRIM(Surface(kSurf)%Name)
+			//      DO jTime = 1, 16
+			//        tableBody(objCount,jTime) = TRIM(RealToStr(decayCurveCool(kSurf,jTime),3))
+			//      END DO
+			//    END DO
+			//    CALL WriteSubtitle('Radiant to Convective Decay Curves for Cooling')
+			//    CALL WriteTable(tableBody,rowHead,columnHead,columnWidth)
+			//    CALL CreateSQLiteTabularDataRecords(tableBody,rowHead,columnHead,&
+			//                                        'ZoneComponentLoadDetail',&
+			//                                        TRIM(Zone(iZone)%Name),&
+			//                                        'Radiant to Convective Decay Curves for Cooling')
+			//    DEALLOCATE(columnHead)
+			//    DEALLOCATE(rowHead)
+			//    DEALLOCATE(columnWidth)
+			//    DEALLOCATE(tableBody)
+
+			// Put the decay curve into the EIO file
+			if ( ShowDecayCurvesInEIO ) {
+				for ( int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf ) {
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Cooling," << Zone( iZone ).Name << ',' << Surface( kSurf ).Name; }
+					for ( int jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
+						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << ',' << decayCurveCool( jTime, kSurf ); }
+					}
+					{ IOFlags flags; flags.ADVANCE( "YES" ); gio::write( OutputFileInits, "()", flags ); } //put a line feed at the end of the line
+				}
+			}
+
+			//---- Heating Peak Load Components Sub-Table
+			rowHead.allocate( rGrdTot );
+			columnHead.allocate( cPerc );
+			columnWidth.dimension( cPerc, 14 ); //array assignment - same for all columns
+			tableBody.allocate( cPerc, rGrdTot );
+
+			if ( unitsStyle != unitsStyleInchPound ) {
+				columnHead( cSensInst ) = "Sensible - Instant [W]";
+				columnHead( cSensDelay ) = "Sensible - Delayed [W]";
+				columnHead( cSensRA ) = "Sensible - Return Air [W]";
+				columnHead( cLatent ) = "Latent [W]";
+				columnHead( cTotal ) = "Total [W]";
+				columnHead( cPerc ) = "%Grand Total";
+			} else {
+				columnHead( cSensInst ) = "Sensible - Instant [Btu/h]";
+				columnHead( cSensDelay ) = "Sensible - Delayed [Btu/h]";
+				columnHead( cSensRA ) = "Sensible - Return Air [Btu/h]";
+				columnHead( cLatent ) = "Latent [Btu/h]";
+				columnHead( cTotal ) = "Total [Btu/h]";
+				columnHead( cPerc ) = "%Grand Total";
+			}
+
+			//internal gains
+			rowHead( rPeople ) = "People";
+			rowHead( rLights ) = "Lights";
+			rowHead( rEquip ) = "Equipment";
+			rowHead( rRefrig ) = "Refrigeration Equipment";
+			rowHead( rWaterUse ) = "Water Use Equipment";
+			rowHead( rPowerGen ) = "Power Generation Equipment";
+			rowHead( rHvacLoss ) = "HVAC Equipment Losses";
+			rowHead( rRefrig ) = "Refrigeration";
+			//misc
+			rowHead( rDOAS ) = "DOAS";
+			rowHead( rInfil ) = "Infiltration";
+			rowHead( rZoneVent ) = "Zone Ventilation";
+			rowHead( rIntZonMix ) = "Interzone Mixing";
+			//opaque surfaces
+			rowHead( rRoof ) = "Roof";
+			rowHead( rIntZonCeil ) = "Interzone Ceiling";
+			rowHead( rOtherRoof ) = "Other Roof";
+			rowHead( rExtWall ) = "Exterior Wall";
+			rowHead( rIntZonWall ) = "Interzone Wall";
+			rowHead( rGrdWall ) = "Ground Contact Wall";
+			rowHead( rOtherWall ) = "Other Wall";
+			rowHead( rExtFlr ) = "Exterior Floor";
+			rowHead( rIntZonFlr ) = "Interzone Floor";
+			rowHead( rGrdFlr ) = "Ground Contact Floor";
+			rowHead( rOtherFlr ) = "Other Floor";
+			//subsurfaces
+			rowHead( rFeneCond ) = "Fenestration Conduction";
+			rowHead( rFeneSolr ) = "Fenestration Solar";
+			rowHead( rOpqDoor ) = "Opaque Door";
+			rowHead( rGrdTot ) = "Grand Total";
+
+			tableBody = "";
+			totalColumn = 0.0;
+			percentColumn = 0.0;
+			grandTotalRow = 0.0;
+
+			int HeatDesSelected = CalcFinalZoneSizing( iZone ).HeatDDNum;
+			int timeHeatMax = CalcFinalZoneSizing( iZone ).TimeStepNumAtHeatMax;
+			if ( HeatDesSelected != 0 && timeHeatMax != 0 ) {
+
+				//PEOPLE
+				seqData = peopleInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rPeople ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = peopleLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rPeople ) += AvgData( timeHeatMax );
+				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+
+				seqData = peopleDelaySeqHeat( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rPeople ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rPeople ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+
+				//LIGHTS
+				seqData = lightInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rLights ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = lightRetAirSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensRA, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rLights ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
+
+				seqData = lightDelaySeqHeat( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rLights ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rLights ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+
+				//EQUIPMENT
+				seqData = equipInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rEquip ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = equipLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rEquip ) += AvgData( timeHeatMax );
+				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+
+				seqData = equipDelaySeqHeat( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rEquip ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rEquip ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+
+				//REFRIGERATION EQUIPMENT
+				seqData = refrigInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rRefrig ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = refrigRetAirSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensRA, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rRefrig ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensRA ) += AvgData( timeHeatMax );
+
+				seqData = refrigLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rRefrig ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rRefrig ) += AvgData( timeHeatMax );
+				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+
+				//WATER USE EQUIPMENT
+				seqData = waterUseInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rWaterUse ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rWaterUse ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = waterUseLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rWaterUse ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rWaterUse ) += AvgData( timeHeatMax );
+				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+
+				//HVAC EQUIPMENT LOSSES
+				seqData = hvacLossInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rHvacLoss ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = hvacLossDelaySeqHeat( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rHvacLoss ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rHvacLoss ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+
+				//POWER GENERATION EQUIPMENT
+				seqData = powerGenInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rPowerGen ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rPowerGen ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = powerGenDelaySeqHeat( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rPowerGen ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rPowerGen ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+
+				//DOAS
+				tableBody( cSensInst, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax ), 2 );
+				totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+				grandTotalRow( cSensDelay ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASHeatAddSeq( timeHeatMax );
+
+				tableBody( cLatent, rDOAS ) = RealToStr( CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax ), 2 );
+				totalColumn( rDOAS ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+				grandTotalRow( cLatent ) += CalcZoneSizing( HeatDesSelected, iZone ).DOASLatAddSeq( timeHeatMax );
+
+				//INFILTRATION
+				seqData = infilInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rInfil ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rInfil ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = infilLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rInfil ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rInfil ) += AvgData( timeHeatMax );
+				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+
+				//ZONE VENTILATION
+				seqData = zoneVentInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rZoneVent ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rZoneVent ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = zoneVentLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rZoneVent ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rZoneVent ) += AvgData( timeHeatMax );
+				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+
+				//INTERZONE MIXING
+				seqData = interZoneMixInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rIntZonMix ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				seqData = interZoneMixLatentSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cLatent, rIntZonMix ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rIntZonMix ) += AvgData( timeHeatMax );
+				grandTotalRow( cLatent ) += AvgData( timeHeatMax );
+
+				//FENESTRATION CONDUCTION
+				seqData = feneCondInstantSeq( HeatDesSelected, _, iZone ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensInst, rFeneCond ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rFeneCond ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensInst ) += AvgData( timeHeatMax );
+
+				//FENESTRATION SOLAR
+				//      seqData = feneSolarInstantSeq(iZone,:,HeatDesSelected) * powerConversion
+				//      CALL MovingAvg(seqData,NumOfTimeStepInDay,NumTimeStepsInAvg,AvgData)
+				//      tableBody(rFeneSolr,cSensInst)  = TRIM(RealToStr(AvgData(timeHeatMax),2))
+				//      totalColumn(rFeneSolr) = totalColumn(rFeneSolr) + AvgData(timeHeatMax)
+				//      grandTotalRow(cSensInst) = grandTotalRow(cSensInst) + AvgData(timeHeatMax)
+
+				seqData = feneSolarDelaySeqHeat( _ ) * powerConversion;
+				MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+				tableBody( cSensDelay, rFeneSolr ) = RealToStr( AvgData( timeHeatMax ), 2 );
+				totalColumn( rFeneSolr ) += AvgData( timeHeatMax );
+				grandTotalRow( cSensDelay ) += AvgData( timeHeatMax );
+
+				//opaque surfaces - must combine individual surfaces by class and other side conditions
+				delayOpaque = 0.0;
+				for ( int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf ) {
+					if ( ! Surface( kSurf ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
+
+					curExtBoundCond = Surface( kSurf ).ExtBoundCond;
+					//if exterior is other side coefficients using ground preprocessor terms then
+					//set it to ground instead of other side coefficients
+					if ( curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt ) {
+						if ( has_prefixi( OSC( Surface( kSurf ).OSCPtr ).Name, "surfPropOthSdCoef" ) ) {
+							curExtBoundCond = Ground;
+						}
+					}
+					seqData = surfDelaySeqHeat( _, kSurf );
+					MovingAvg( seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData );
+					singleSurfDelay = AvgData( timeHeatMax ) * powerConversion;
+					{ auto const SELECT_CASE_var( Surface( kSurf ).Class );
+						if ( SELECT_CASE_var == SurfaceClass_Wall ) {
+							{ auto const SELECT_CASE_var1( curExtBoundCond );
+								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
+									delayOpaque( rExtWall ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) ) {
+									delayOpaque( rGrdWall ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
+									delayOpaque( rOtherWall ) += singleSurfDelay;
+								} else { //interzone
+									delayOpaque( rIntZonWall ) += singleSurfDelay;
+								}}
+						} else if ( SELECT_CASE_var == SurfaceClass_Floor ) {
+							{ auto const SELECT_CASE_var1( curExtBoundCond );
+								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
+									delayOpaque( rExtFlr ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) ) {
+									delayOpaque( rGrdFlr ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
+									delayOpaque( rOtherFlr ) += singleSurfDelay;
+								} else { //interzone
+									delayOpaque( rIntZonFlr ) += singleSurfDelay;
+								}}
+						} else if ( SELECT_CASE_var == SurfaceClass_Roof ) {
+							{ auto const SELECT_CASE_var1( curExtBoundCond );
+								if ( SELECT_CASE_var1 == ExternalEnvironment ) {
+									delayOpaque( rRoof ) += singleSurfDelay;
+								} else if ( ( SELECT_CASE_var1 == Ground ) || ( SELECT_CASE_var1 == GroundFCfactorMethod ) || ( SELECT_CASE_var1 == OtherSideCoefNoCalcExt ) || ( SELECT_CASE_var1 == OtherSideCoefCalcExt ) || ( SELECT_CASE_var1 == OtherSideCondModeledExt ) ) {
+									delayOpaque( rOtherRoof ) += singleSurfDelay;
+								} else { //interzone
+									delayOpaque( rIntZonCeil ) += singleSurfDelay;
+								}}
+						} else if ( SELECT_CASE_var == SurfaceClass_Door ) {
+							delayOpaque( rOpqDoor ) += singleSurfDelay;
+						}}
+				}
+			}
+			for ( int k = rRoof; k <= rOtherFlr; ++k ) {
+				tableBody( cSensDelay, k ) = RealToStr( delayOpaque( k ), 2 );
+				totalColumn( k ) += delayOpaque( k );
+				grandTotalRow( cSensDelay ) += delayOpaque( k );
+			}
+			tableBody( cSensDelay, rOpqDoor ) = RealToStr( delayOpaque( rOpqDoor ), 2 );
+			totalColumn( rOpqDoor ) += delayOpaque( rOpqDoor );
+			grandTotalRow( cSensDelay ) += delayOpaque( rOpqDoor );
+
+			//GRAND TOTAL ROW
+			totalGrandTotal = 0.0;
+			for ( int k = 1; k <= cLatent; ++k ) {
+				tableBody( k, rGrdTot ) = RealToStr( grandTotalRow( k ), 2 );
+				totalGrandTotal += grandTotalRow( k );
+			}
+			tableBody( cTotal, rGrdTot ) = RealToStr( totalGrandTotal, 2 );
+
+			//TOTAL COLUMN AND PERCENT COLUMN
+			for ( int k = 1; k <= rOpqDoor; ++k ) { //to last row before total
+				tableBody( cTotal, k ) = RealToStr( totalColumn( k ), 2 );
+				if ( totalGrandTotal != 0.0 ) {
+					tableBody( cPerc, k ) = RealToStr( 100 * totalColumn( k ) / totalGrandTotal, 2 );
+				}
+			}
+
+			WriteSubtitle( "Estimated Heating Peak Load Components" );
+			WriteTable( tableBody, rowHead, columnHead, columnWidth );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
+			}
+
+			//---- Heating Peak Conditions Sub-Table
+
+			rowHead.allocate( 10 );
+			columnHead.allocate( 1 );
+			columnWidth.allocate( 1 );
+			columnWidth = 14; //array assignment - same for all columns
+			tableBody.allocate( 1, 10 );
+
+			columnHead( 1 ) = "Value";
+			if ( unitsStyle != unitsStyleInchPound ) {
+				rowHead( 1 ) = "Time of Peak Load";
+				rowHead( 2 ) = "Outside  Dry Bulb Temperature [C]";
+				rowHead( 3 ) = "Outside  Wet Bulb Temperature [C]";
+				rowHead( 4 ) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
+				rowHead( 5 ) = "Zone Dry Bulb Temperature [C]";
+				rowHead( 6 ) = "Zone Relative Humdity [%]";
+				rowHead( 7 ) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
+				rowHead( 8 ) = "Peak Design Sensible Load [W]";
+				rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [W]";
+				rowHead( 10 ) = "Difference [W]";
+			} else {
+				rowHead( 1 ) = "Time of Peak Load";
+				rowHead( 2 ) = "Outside  Dry Bulb Temperature [F]";
+				rowHead( 3 ) = "Outside  Wet Bulb Temperature [F]";
+				rowHead( 4 ) = "Outside Humidity Ratio at Peak [lbWater/lbAir]";
+				rowHead( 5 ) = "Zone Dry Bulb Temperature [F]";
+				rowHead( 6 ) = "Zone Relative Humdity [%]";
+				rowHead( 7 ) = "Zone Humidity Ratio at Peak [lbWater/lbAir]";
+				rowHead( 8 ) = "Peak Design Sensible Load [Btu/h]";
+				rowHead( 9 ) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
+				rowHead( 10 ) = "Difference [Btu/h]";
+			}
+
+			tableBody = "";
+
+			if ( timeHeatMax != 0 ) {
+				//Time of Peak Load
+				tableBody( 1, 1 ) = HeatPeakDateHrMin( iZone );
+
+				//Outside  Dry Bulb Temperature
+				tableBody( 1, 2 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ) ), 2 );
+
+				//Outside  Wet Bulb Temperature
+				//use standard sea level air pressure because air pressure is not tracked with sizing data
+				if ( CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ) < 1.0 && CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ) > 0.0 ) {
+					tableBody( 1, 3 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 101325.0 ) ), 2 );
+				}
+
+				//Humidity Ratio at Peak
+				tableBody( 1, 4 ) = RealToStr( CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 5 );
+
+				//Zone Dry Bulb Temperature
+				tableBody( 1, 5 ) = RealToStr( ConvertIP( tempConvIndx, CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ) ), 2 );
+
+				//Zone Relative Temperature
+				//use standard sea level air pressure because air pressure is not tracked with sizing data
+				tableBody( 1, 6 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 101325.0 ), 2 );
+
+				//Zone Relative Humdity
+				tableBody( 1, 7 ) = RealToStr( CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 5 );
+
+			}
+
+			//Peak Design Sensible Load
+			tableBody( 1, 8 ) = RealToStr( ( -CalcFinalZoneSizing( iZone ).DesHeatLoad / mult ) * powerConversion, 2 ); //change sign
+
+			//Estimated Instant + Delayed Sensible Load
+			tableBody( 1, 9 ) = RealToStr( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ), 2 );
+
+			//Difference
+			tableBody( 1, 10 ) = RealToStr( ( -CalcFinalZoneSizing( iZone ).DesHeatLoad / mult ) * powerConversion - ( grandTotalRow( cSensInst ) + grandTotalRow( cSensDelay ) ), 2 );
+
+			WriteSubtitle( "Heating Peak Conditions" );
+			WriteTable( tableBody, rowHead, columnHead, columnWidth );
+			if ( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
+			}
+
+			//    !
+			//    !---- Radiant to Convective Decay Curves for Heating
+			//    !
+			//    numObj = 0
+			//    !determine the number of surfaces to include
+			//    DO kSurf = 1, TotSurfaces
+			//      ZoneNum = Surface(kSurf)%Zone
+			//      IF (ZoneNum .NE. iZone) CYCLE
+			//      IF (ZoneNum .EQ. 0) CYCLE
+			//      IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
+			//      numObj = numObj + 1
+			//    END DO
+			//    ALLOCATE(rowHead(numObj))
+			//    ALLOCATE(columnHead(16))
+			//    ALLOCATE(columnWidth(16))
+			//    columnWidth = 14 !array assignment - same for all columns
+			//    ALLOCATE(tableBody(numObj,16))
+			//    columnHead(1) = 'Time 1'
+			//    columnHead(2) = 'Time 2'
+			//    columnHead(3) = 'Time 3'
+			//    columnHead(4) = 'Time 4'
+			//    columnHead(5) = 'Time 5'
+			//    columnHead(6) = 'Time 6'
+			//    columnHead(7) = 'Time 7'
+			//    columnHead(8) = 'Time 8'
+			//    columnHead(9) = 'Time 9'
+			//    columnHead(10) = 'Time 10'
+			//    columnHead(11) = 'Time 11'
+			//    columnHead(12) = 'Time 12'
+			//    columnHead(13) = 'Time 13'
+			//    columnHead(14) = 'Time 14'
+			//    columnHead(15) = 'Time 15'
+			//    columnHead(16) = 'Time 16'
+			//    tableBody = ''
+			//    objCount = 0
+			//    DO kSurf = 1, TotSurfaces
+			//      ZoneNum = Surface(kSurf)%Zone
+			//      IF (ZoneNum .NE. iZone) CYCLE
+			//      IF (ZoneNum .EQ. 0) CYCLE
+			//      IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
+			//      objCount = objCount + 1
+			//      rowHead(objCount) = TRIM(Surface(kSurf)%Name)
+			//      DO jTime = 1, 16
+			//        tableBody(objCount,jTime) = TRIM(RealToStr(decayCurveHeat(kSurf,jTime),3))
+			//      END DO
+			//    END DO
+			//    CALL WriteSubtitle('Radiant to Convective Decay Curves for Heating')
+			//    CALL WriteTable(tableBody,rowHead,columnHead,columnWidth)
+			//    CALL CreateSQLiteTabularDataRecords(tableBody,rowHead,columnHead,&
+			//                                        'ZoneComponentLoadDetail',&
+			//                                        TRIM(Zone(iZone)%Name),&
+			//                                        'Radiant to Convective Decay Curves for Heating')
+			//    DEALLOCATE(columnHead)
+			//    DEALLOCATE(rowHead)
+			//    DEALLOCATE(columnWidth)
+			//    DEALLOCATE(tableBody)
+
+			// Put the decay curve into the EIO file
+			if ( ShowDecayCurvesInEIO ) {
+				for ( int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf ) {
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(4A)", flags ) << "Radiant to Convective Decay Curves for Heating," << Zone( iZone ).Name << ',' << Surface( kSurf ).Name; }
+					for ( int jTime = 1; jTime <= min( NumOfTimeStepInHour * 24, 36 ); ++jTime ) {
+						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A,F6.3)", flags ) << ',' << decayCurveHeat( jTime, kSurf ); }
+					}
+					{ IOFlags flags; flags.ADVANCE( "YES" ); gio::write( OutputFileInits, "()", flags ); } //put a line feed at the end of the line
+				}
+			} // if ShowDecayCurvesInEIO
+
+		} // for iZone
+
+		peopleRadIntoSurf.deallocate();
+		equipRadIntoSurf.deallocate();
+		hvacLossRadIntoSurf.deallocate();
+		powerGenRadIntoSurf.deallocate();
+		lightLWRadIntoSurf.deallocate();
+
+		peopleDelaySeqHeat.deallocate();
+		peopleDelaySeqCool.deallocate();
+		lightDelaySeqHeat.deallocate();
+		lightDelaySeqCool.deallocate();
+		equipDelaySeqHeat.deallocate();
+		equipDelaySeqCool.deallocate();
+		hvacLossDelaySeqHeat.deallocate();
+		hvacLossDelaySeqCool.deallocate();
+		powerGenDelaySeqHeat.deallocate();
+		powerGenDelaySeqCool.deallocate();
+		feneSolarDelaySeqHeat.deallocate();
+		feneSolarDelaySeqCool.deallocate();
+		surfDelaySeqHeat.deallocate();
+		surfDelaySeqCool.deallocate();
+
+	} // WriteZoneLoadComponentTable()
 
 	void
 	WriteReportHeaders(
@@ -12948,6 +13260,29 @@ namespace OutputReportTabular {
 	}
 
 	std::string
+	ConvertUnicodeToUTF8( unsigned long const codepoint )
+	{
+		// Taken from http://stackoverflow.com/a/19968992/2358662 and http://stackoverflow.com/a/148766/2358662
+		std::string s;
+		if ( codepoint <= 0x7f ) {
+			s.push_back( static_cast<char>( codepoint ) );
+		} else if ( codepoint <= 0x7ff ) {
+			s.push_back( static_cast<char>( 0xc0 | ( ( codepoint >> 6 ) & 0x1f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( codepoint & 0x3f ) ) );
+		} else if ( codepoint <= 0xffff ) {
+			s.push_back( static_cast<char>( 0xe0 | ( ( codepoint >> 12 ) & 0x0f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( ( codepoint >> 6 ) & 0x3f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( codepoint & 0x3f ) ) );
+		} else if ( codepoint <= 0x10ffff ) {
+			s.push_back( static_cast<char>( 0xf0 | ( ( codepoint >> 18 ) & 0x07 ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( ( codepoint >> 12 ) & 0x3f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( ( codepoint >> 6 ) & 0x3f ) ) );
+			s.push_back( static_cast<char>( 0x80 | ( codepoint & 0x3f ) ) );
+		}
+		return s;
+	}
+
+	std::string
 	ConvertToEscaped( std::string const & inString ) // Input String
 	{
 		// SUBROUTINE INFORMATION:
@@ -12961,46 +13296,74 @@ namespace OutputReportTabular {
 		//   so it excludes:
 		//               " ' < > &
 
-		// METHODOLOGY EMPLOYED:
-		//   na
+		if ( inString.empty() ) return "";
 
-		// Return value
-		std::string outString; // Result String
+		std::string s;
+		auto const inputSize = inString.size();
+		s.reserve( inputSize );
+		size_t index( 0 );
+		char c;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		for ( std::string::size_type iIn = 0; iIn < len( inString ); ++iIn ) {
-			char const c( inString[ iIn ] );
-			int const curCharVal = int( c );
-			if ( curCharVal == 34 ) { //  "
-				outString += "&quot;";
-			} else if ( curCharVal == 38 ) { //   &
-				outString += "&amp;";
-			} else if ( curCharVal == 39 ) { //   '
-				outString += "&apos;";
-			} else if ( curCharVal == 60 ) { //   <
-				outString += "&lt;";
-			} else if ( curCharVal == 62 ) { //   >
-				outString += "&gt;";
-			} else if ( curCharVal == 176 ) { //   degree
-				outString += '*'; // replace degree symbol with asterisk to avoid errors from various XML editors
-			} else { // most characters are fine
-				outString += c;
+		while ( true ) {
+			if ( index == inputSize ) break;
+			c = inString[ index++ ];
+			if ( c == '\"' ) {
+				s += "&quot;";
+			} else if ( c == '&' ) {
+				s += "&amp;";
+			} else if ( c == '\'' ) {
+				s += "&apos;";
+			} else if ( c == '<' ) {
+				s += "&lt;";
+			} else if ( c == '>' ) {
+				s += "&gt;";
+			} else if ( c == char( 176 ) ) {
+				s += "&deg;";
+			} else if ( c == '\xC2' ) {
+				if ( index == inputSize ) {
+					s += '\xC2';
+				} else {
+					c = inString[ index++ ];
+					if ( c == '\xB0' ) {
+						s += "&deg;";
+					} else {
+						s += '\xC2';
+						s += c;
+					}
+				}
+			} else if ( c == '\xB0' ) {
+				s += "&deg;";
+			} else if ( c == '\\' ) {
+				if ( index == inputSize ) break;
+				c = inString[ index++ ];
+				if ( c == '"' ) {
+					s += "&quot;";
+				} else if ( c == '\'' ) {
+					s += "&apos;";
+				} else if ( c == 'u' || c == 'x' ) {
+					int remainingLen = inputSize - index;
+					unsigned long codePoint( 0 );
+					if ( c == 'u' && remainingLen > 3 ) {
+						codePoint = std::stoul( inString.substr( index, 4 ), nullptr, 16 );
+						index += 4;
+					} else if ( c == 'x' && remainingLen > 1 ) {
+						codePoint = std::stoul( inString.substr( index, 2 ), nullptr, 16 );
+						index += 2;
+					}
+					auto const unicodeString = ConvertUnicodeToUTF8( codePoint );
+					if ( unicodeString == "\xC2\xB0" ) { // only check for degree at this point
+						s += "&deg;";
+					} else {
+						s += unicodeString;
+					}
+				} else {
+					s += c;
+				}
+			} else {
+				s += c;
 			}
 		}
-		return outString;
+		return s;
 	}
 
 	void
@@ -13074,6 +13437,335 @@ namespace OutputReportTabular {
 			}
 		}
 	}
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	//    ROUTINES TO RESET GATHERED VALUES TO ZERO
+
+	//======================================================================================================================
+	//======================================================================================================================
+
+	void
+	ResetTabularReports()
+	{
+		// Jason Glazer - October 2015
+		// Reset all gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		using ThermalComfort::ResetThermalComfortSimpleASH55;
+		using ThermalComfort::ResetSetPointMet;
+		using OutputProcessor::isFinalYear;
+
+		gatherElapsedTimeBEPS = 0.0;
+		ResetMonthlyGathering();
+		OutputReportTabularAnnual::ResetAnnualGathering();
+		ResetBinGathering();
+		ResetBEPSGathering();
+		ResetSourceEnergyEndUseGathering();
+		ResetPeakDemandGathering();
+		ResetHeatGainGathering();
+		ResetRemainingPredefinedEntries();
+		ResetThermalComfortSimpleASH55();
+		ResetSetPointMet();
+		ResetAdaptiveComfort();
+		isFinalYear = true;
+	}
+
+	void
+	ResetMonthlyGathering(){
+		// Jason Glazer - October 2015
+		// Reset all monthly gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		int iInput;
+		int jTable;
+		int kColumn;
+		int curTable;
+		int curCol;
+		static Real64 BigNum( 0.0 );
+
+		for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
+			for ( jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
+				curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
+				for ( kColumn = 1; kColumn <= MonthlyTables( curTable ).numColumns; ++kColumn ) {
+					curCol = kColumn + MonthlyTables( curTable ).firstColumn - 1;
+					MonthlyColumns( curCol ).timeStamp = 0;
+					MonthlyColumns( curCol ).duration = 0.0;
+					if ( MonthlyColumns( curCol ).aggType == aggTypeMaximum || MonthlyColumns( curCol ).aggType == aggTypeMaximumDuringHoursShown ){
+						MonthlyColumns( curCol ).reslt = -huge( BigNum );
+					}
+					else if ( MonthlyColumns( curCol ).aggType == aggTypeMinimum || MonthlyColumns( curCol ).aggType == aggTypeMinimumDuringHoursShown ){
+						MonthlyColumns( curCol ).reslt = huge( BigNum );
+					}
+					else {
+						MonthlyColumns( curCol ).reslt = 0.0;
+					}
+				}
+			}
+		}
+	}
+
+	void
+	ResetBinGathering(){
+		// Jason Glazer - October 2015
+		// Reset all timebins gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+
+		// clear the binning arrays to zeros
+		for ( auto & e : BinResults ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsBelow ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+		for ( auto & e : BinResultsAbove ) {
+			e.mnth = 0.0;
+			e.hrly = 0.0;
+		}
+
+		// re-initialize statistics counters
+		for ( auto & e : BinStatistics ) {
+			e.minimum = huge( bigVal );
+			e.maximum = -huge( bigVal );
+			e.n = 0;
+			e.sum = 0.0;
+			e.sum2 = 0.0;
+		}
+	}
+
+	void
+	ResetBEPSGathering(){
+		// Jason Glazer - October 2015
+		// Reset all ABUPS gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherTotalsBEPS = 0.0;
+		gatherEndUseBEPS = 0.0;
+		gatherEndUseSubBEPS = 0.0;
+		gatherTotalsSource = 0.0;
+		// reset the specific componenents being gathered
+		gatherPowerFuelFireGen = 0.0;
+		gatherPowerPV = 0.0;
+		gatherPowerWind = 0.0;
+		gatherPowerHTGeothermal = 0.0;
+		gatherElecProduced = 0.0;
+		gatherElecPurchased = 0.0;
+		gatherElecSurplusSold = 0.0;
+		gatherElecStorage = 0.0;
+		gatherPowerConversion = 0.0;
+		gatherWaterHeatRecovery = 0.0;
+		gatherAirHeatRecoveryCool = 0.0;
+		gatherAirHeatRecoveryHeat = 0.0;
+		gatherHeatHTGeothermal = 0.0;
+		gatherHeatSolarWater = 0.0;
+		gatherHeatSolarAir = 0.0;
+		gatherRainWater = 0.0;
+		gatherCondensate = 0.0;
+		gatherWellwater = 0.0;
+		gatherMains = 0.0;
+		gatherWaterEndUseTotal = 0.0;
+	}
+
+	void
+	ResetSourceEnergyEndUseGathering(){
+		// Jason Glazer - October 2015
+		// Reset all source energy end use table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherTotalsBySourceBEPS = 0.0;
+		gatherEndUseBySourceBEPS = 0.0;
+	}
+
+	void
+	ResetPeakDemandGathering(){
+		// Jason Glazer - October 2015
+		// Reset all demand end use components table gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		gatherDemandTotal = 0.0;
+		gatherDemandTimeStamp = 0;
+		gatherDemandEndUse = 0.0;
+		gatherDemandEndUseSub = 0.0;
+
+	}
+
+	void
+	ResetHeatGainGathering(){
+		// Jason Glazer - October 2015
+		// Reset all sensible heat gas summary report gathering arrays to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		using DataHeatBalance::ZonePreDefRep;
+		using DataHeatBalance::BuildingPreDefRep;
+		int iZone;
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			ZonePreDefRep( iZone ).SHGSAnPeoplAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnLiteAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacHt = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacCl = 0.;
+			ZonePreDefRep( iZone ).SHGSAnIzaAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnIzaRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnWindAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnWindRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnInfilAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnInfilRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnEquipAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnEquipRem = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacATUHt = 0.;
+			ZonePreDefRep( iZone ).SHGSAnHvacATUCl = 0.;
+			ZonePreDefRep( iZone ).SHGSAnSurfHt = 0.;
+			ZonePreDefRep( iZone ).SHGSAnSurfCl = 0.;
+			ZonePreDefRep( iZone ).SHGSAnOtherAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSAnOtherRem = 0.;
+			ZonePreDefRep( iZone ).htPeak = 0.;
+			ZonePreDefRep( iZone ).htPtTimeStamp = 0;
+			ZonePreDefRep( iZone ).SHGSHtHvacHt = 0.;
+			ZonePreDefRep( iZone ).SHGSHtHvacCl = 0.;
+			ZonePreDefRep( iZone ).SHGSHtSurfHt = 0.;
+			ZonePreDefRep( iZone ).SHGSHtSurfCl = 0.;
+			ZonePreDefRep( iZone ).SHGSHtHvacATUHt = 0.;
+			ZonePreDefRep( iZone ).SHGSHtHvacATUCl = 0.;
+			ZonePreDefRep( iZone ).SHGSHtPeoplAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtLiteAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtEquipAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtEquipRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtWindAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtWindRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtIzaAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtIzaRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtInfilAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtInfilRem = 0.;
+			ZonePreDefRep( iZone ).SHGSHtOtherAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSHtOtherRem = 0.;
+			ZonePreDefRep( iZone ).clPeak = 0.;
+			ZonePreDefRep( iZone ).clPtTimeStamp = 0;
+			ZonePreDefRep( iZone ).SHGSClHvacHt = 0.;
+			ZonePreDefRep( iZone ).SHGSClHvacCl = 0.;
+			ZonePreDefRep( iZone ).SHGSClSurfHt = 0.;
+			ZonePreDefRep( iZone ).SHGSClSurfCl = 0.;
+			ZonePreDefRep( iZone ).SHGSClHvacATUHt = 0.;
+			ZonePreDefRep( iZone ).SHGSClHvacATUCl = 0.;
+			ZonePreDefRep( iZone ).SHGSClPeoplAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClLiteAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClEquipAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClEquipRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClWindAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClWindRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClIzaAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClIzaRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClInfilAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClInfilRem = 0.;
+			ZonePreDefRep( iZone ).SHGSClOtherAdd = 0.;
+			ZonePreDefRep( iZone ).SHGSClOtherRem = 0.;
+		}
+
+		BuildingPreDefRep.htPeak = 0.;
+		BuildingPreDefRep.htPtTimeStamp = 0;
+		BuildingPreDefRep.SHGSHtHvacHt = 0.0;
+		BuildingPreDefRep.SHGSHtHvacCl = 0.0;
+		BuildingPreDefRep.SHGSHtHvacATUHt = 0.0;
+		BuildingPreDefRep.SHGSHtHvacATUCl = 0.0;
+		BuildingPreDefRep.SHGSHtSurfHt = 0.0;
+		BuildingPreDefRep.SHGSHtSurfCl = 0.0;
+		BuildingPreDefRep.SHGSHtPeoplAdd = 0.0;
+		BuildingPreDefRep.SHGSHtLiteAdd = 0.0;
+		BuildingPreDefRep.SHGSHtEquipAdd = 0.0;
+		BuildingPreDefRep.SHGSHtWindAdd = 0.0;
+		BuildingPreDefRep.SHGSHtIzaAdd = 0.0;
+		BuildingPreDefRep.SHGSHtInfilAdd = 0.0;
+		BuildingPreDefRep.SHGSHtOtherAdd = 0.0;
+		BuildingPreDefRep.SHGSHtEquipRem = 0.0;
+		BuildingPreDefRep.SHGSHtWindRem = 0.0;
+		BuildingPreDefRep.SHGSHtIzaRem = 0.0;
+		BuildingPreDefRep.SHGSHtInfilRem = 0.0;
+		BuildingPreDefRep.SHGSHtOtherRem = 0.0;
+
+		BuildingPreDefRep.clPeak = 0.;
+		BuildingPreDefRep.clPtTimeStamp = 0;
+		BuildingPreDefRep.SHGSClHvacHt = 0.0;
+		BuildingPreDefRep.SHGSClHvacCl = 0.0;
+		BuildingPreDefRep.SHGSClSurfHt = 0.0;
+		BuildingPreDefRep.SHGSClSurfCl = 0.0;
+		BuildingPreDefRep.SHGSClHvacATUHt = 0.0;
+		BuildingPreDefRep.SHGSClHvacATUCl = 0.0;
+		BuildingPreDefRep.SHGSClPeoplAdd = 0.0;
+		BuildingPreDefRep.SHGSClLiteAdd = 0.0;
+		BuildingPreDefRep.SHGSClEquipAdd = 0.0;
+		BuildingPreDefRep.SHGSClWindAdd = 0.0;
+		BuildingPreDefRep.SHGSClIzaAdd = 0.0;
+		BuildingPreDefRep.SHGSClInfilAdd = 0.0;
+		BuildingPreDefRep.SHGSClOtherAdd = 0.0;
+		BuildingPreDefRep.SHGSClEquipRem = 0.0;
+		BuildingPreDefRep.SHGSClWindRem = 0.0;
+		BuildingPreDefRep.SHGSClIzaRem = 0.0;
+		BuildingPreDefRep.SHGSClInfilRem = 0.0;
+		BuildingPreDefRep.SHGSClOtherRem = 0.0;
+
+	}
+
+	void
+	ResetRemainingPredefinedEntries(){
+		// Jason Glazer - October 2015
+		// Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year simulations
+		// so that only last year is reported in tabular reports
+		using DataHeatBalance::TotLights;
+		using DataHeatBalance::Lights;
+		using ExteriorEnergyUse::ExteriorLights;
+		using ExteriorEnergyUse::NumExteriorLights;
+		using DataHeatBalance::Zone;
+		using DataHeatBalance::ZonePreDefRep;
+
+		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+		int iLight;
+		int iZone;
+
+		for ( iLight = 1; iLight <= TotLights; ++iLight ) {
+			Lights( iLight ).SumTimeNotZeroCons = 0.;
+			Lights( iLight ).SumConsumption = 0.;
+		}
+		for ( iLight = 1; iLight <= NumExteriorLights; ++iLight ) {
+			ExteriorLights( iLight ).SumTimeNotZeroCons = 0.;
+			ExteriorLights( iLight ).SumConsumption = 0.;
+		}
+		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
+			if ( Zone( iZone ).SystemZoneNodeNumber >= 0 ) { //conditioned zones only
+				if ( Zone( iZone ).isNominalOccupied ) {
+					ZonePreDefRep( iZone ).MechVentVolTotal = 0.;
+					ZonePreDefRep( iZone ).MechVentVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).InfilVolTotal = 0.;
+					ZonePreDefRep( iZone ).InfilVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).AFNInfilVolTotal = 0.;
+					ZonePreDefRep( iZone ).AFNInfilVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).SimpVentVolTotal = 0.;
+					ZonePreDefRep( iZone ).SimpVentVolMin = huge( bigVal );
+					ZonePreDefRep( iZone ).TotTimeOcc = 0.;
+				}
+			}
+		}
+	}
+
+	void
+	ResetAdaptiveComfort()
+	{
+	// Jason Glazer - October 2015
+	// Reset accumulation variable for adaptive comfort report to zero for multi-year simulations
+	// so that only last year is reported in tabular reports
+		using DataHeatBalance::People;
+		using DataHeatBalance::TotPeople;
+		int i;
+		if ( displayAdaptiveComfort && TotPeople > 0 ) {
+			for ( i = 1; i <= TotPeople; ++i ) {
+				if ( People( i ).AdaptiveASH55 ) {
+					People( i ).TimeNotMetASH5590 = 0.;
+					People( i ).TimeNotMetASH5580 = 0.;
+				}
+				if ( People( i ).AdaptiveCEN15251 ) {
+					People( i ).TimeNotMetCEN15251CatI = 0.;
+					People( i ).TimeNotMetCEN15251CatII = 0.;
+					People( i ).TimeNotMetCEN15251CatIII = 0.;
+				}
+			}
+		}
+	}
+
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -14355,29 +15047,6 @@ Label900: ;
 		}
 		return getSpecificUnitIndex;
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutputReportTabular
 

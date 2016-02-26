@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef MicroturbineElectricGenerator_hh_INCLUDED
 #define MicroturbineElectricGenerator_hh_INCLUDED
 
@@ -231,183 +289,6 @@ namespace MicroturbineElectricGenerator {
 			ThermEffFTempElevErrorIndex( 0 )
 		{}
 
-		// Member Constructor
-		MTGeneratorSpecs(
-			std::string const & Name, // User identifier (name)
-			Real64 const RefElecPowerOutput, // Reference Electrical Power Output from generator (W)
-			Real64 const MinElecPowerOutput, // Minimum Electrical Power Output (W)
-			Real64 const MaxElecPowerOutput, // Maximum Electrical Power Output (W)
-			Real64 const RefThermalPowerOutput, // Reference Electrical Power Output from generator (W)
-			Real64 const MinThermalPowerOutput, // Minimum Electrical Power Output (W)
-			Real64 const MaxThermalPowerOutput, // Maximum Electrical Power Output (W)
-			Real64 const RefElecEfficiencyLHV, // Reference Electrical Efficiency based on fuel LHV
-			Real64 const RefCombustAirInletTemp, // Reference Combustion Air Inlet Temperature (C)
-			Real64 const RefCombustAirInletHumRat, // Reference Combustion Air Inlet Humidity Ratio (kg/kg)
-			Real64 const RefElevation, // Reference Elevation (m)
-			int const ElecPowFTempElevCurveNum, // Curve index for Electrical Power as a function of temp and elev.
-			int const ElecEffFTempCurveNum, // Curve index for Electrical Efficiency function of temp
-			int const ElecEffFPLRCurveNum, // Curve index for Electrical Efficiency as a function of PLR
-			Real64 const FuelHigherHeatingValue, // Higher Heating Value for Fuel (kJ/kg)
-			Real64 const FuelLowerHeatingValue, // Lower Heating Value for Fuel (kJ/kg)
-			Real64 const StandbyPower, // Standby Power entered by user (W)
-			Real64 const AncillaryPower, // Ancillary Power entered by user (W)
-			int const AncillaryPowerFuelCurveNum, // Index to ancillary power modifer curve (function of fuel input)
-			int const HeatRecInletNodeNum, // Heat Recovery Water Inlet Node number
-			int const HeatRecOutletNodeNum, // Heat Recovery Water Outlet Node number
-			Real64 const RefThermalEffLHV, // Reference Thermal Efficiency (LHV Basis)
-			Real64 const RefInletWaterTemp, // Reference Inlet Water Temperature for heat recovery (C)
-			bool const InternalFlowControl, // A9, \field Heat Recovery Water Flow Operating Mode
-			bool const PlantFlowControl, // Default = Plant Control
-			Real64 const RefHeatRecVolFlowRate, // Reference Heat Recovery Water Flow Rate (m3/s)
-			int const HeatRecFlowFTempPowCurveNum, // Curve index for Heat Recovery Water Flow Rate function of temp & power
-			int const ThermEffFTempElevCurveNum, // Curve index for Thermal Efficiency function of temp & elevation
-			int const HeatRecRateFPLRCurveNum, // Curve index for Heat Recovery Rate function of part-load ratio
-			int const HeatRecRateFTempCurveNum, // Curve index for Heat Recovery Rate function of inlet water temp
-			int const HeatRecRateFWaterFlowCurveNum, // Curve index for Heat Recovery Rate function of water flow rate
-			Real64 const HeatRecMinVolFlowRate, // Minimum Heat Recovery Water volume Flow Rate (m3/s)
-			Real64 const HeatRecMaxVolFlowRate, // Maximum Heat Recovery Water volume Flow Rate (m3/s)
-			Real64 const HeatRecMaxWaterTemp, // Maximum Heat Recovery Water Temperature (C)
-			int const CombustionAirInletNodeNum, // Combustion Air Inlet Node number
-			int const CombustionAirOutletNodeNum, // Combustion Air Outlet (Exhaust) Node number
-			bool const ExhAirCalcsActive, // Flag to enable exhaust air calculations
-			Real64 const RefExhaustAirMassFlowRate, // Reference Exhaust Air Mass Flow Rate (kg/s)
-			Real64 const ExhaustAirMassFlowRate, // Actual Exhaust Air Mass Flow Rate (kg/s)
-			int const ExhFlowFTempCurveNum, // Curve index for Exhaust Air Flow Rate function of inlet air temp
-			int const ExhFlowFPLRCurveNum, // Curve index for Exhaust Air Flow Rate function of part-load ratio
-			Real64 const NomExhAirOutletTemp, // Nominal Exhaust Air Outlet Temperature (C)
-			int const ExhAirTempFTempCurveNum, // Curve index for Exhaust Air Temperature function of inlet air temp
-			int const ExhAirTempFPLRCurveNum, // Curve index for Exhaust Air Temperature function of part-load ratio
-			Real64 const ExhaustAirTemperature, // Combustion exhaust air temperature (C)
-			Real64 const ExhaustAirHumRat, // Combustion exhaust air humidity ratio (kg/kg)
-			int const CompType_Num,
-			Real64 const RefCombustAirInletDensity, // Reference combustion air inlet density (kg/m3)
-			Real64 const MinPartLoadRat, // Min allowed operating frac full load
-			Real64 const MaxPartLoadRat, // Max allowed operating frac full load
-			Real64 const FuelEnergyUseRateHHV, // Rate of Fuel Energy required to run microturbine, HHV basis (W)
-			Real64 const FuelEnergyUseRateLHV, // Rate of Fuel Energy required to run microturbine, LHV basis (W)
-			Real64 const QHeatRecovered, // Recovered exhaust energy rate to heat water  (W)
-			Real64 const ExhaustEnergyRec, // Recovered exhaust energy to heat water (J)
-			Real64 const DesignHeatRecMassFlowRate, // Design Water mass flow rate through heat recovery loop (kg/s)
-			bool const HeatRecActive, // TRUE when heat recovery water inlet and outlet nodes are defined
-			Real64 const HeatRecInletTemp, // Inlet Temperature of the heat recovery fluid (C)
-			Real64 const HeatRecOutletTemp, // Outlet Temperature of the heat recovery fluid (C)
-			Real64 const HeatRecMinMassFlowRate, // Minimum heat recovery water mass flow rate (kg/s)
-			Real64 const HeatRecMaxMassFlowRate, // Maximum heat recovery water mass flow rate (kg/s)
-			Real64 const HeatRecMdot, // Heat Recovery Loop Mass flow rate (kg/s)
-			int const HRLoopNum, // cooling water plant loop index number, for heat recovery
-			int const HRLoopSideNum, // cooling water plant loop side index, for heat recovery
-			int const HRBranchNum, // cooling water plant loop branch index, for heat recovery
-			int const HRCompNum, // cooling water plant loop component index, for heat recovery
-			Real64 const FuelMdot, // Fuel Amount used (kg/s)
-			Real64 const ElecPowerGenerated, // Electric power generated (W)
-			Real64 const StandbyPowerRate, // Standby power rate this time step (W)
-			Real64 const AncillaryPowerRate, // Ancillary power rate this time step (W)
-			int const PowerFTempElevErrorIndex, // Index to power as a function of temp/elevation warning message
-			int const EffFTempErrorIndex, // Index to efficiency as a function of temperature warning message
-			int const EffFPLRErrorIndex, // Index to efficiency as a function of PLR warning message
-			int const ExhFlowFTempErrorIndex, // Index to exhaust flow as a function of temp warning message
-			int const ExhFlowFPLRErrorIndex, // Index to exhaust flow as a function of PLR warning message
-			int const ExhTempFTempErrorIndex, // Index to exhaust temp as a function of temp warning message
-			int const ExhTempFPLRErrorIndex, // Index to exhaust temp as a function of PLR warning message
-			int const HRMinFlowErrorIndex, // Index to reclaim water flow rate warning message
-			int const HRMaxFlowErrorIndex, // Index to reclaim water flow rate warning message
-			int const ExhTempLTInletTempIndex, // Index to exhaust temp < combustion inlet air temp warning messages
-			int const ExhHRLTInletHRIndex, // Index to exhaust hum rat < combustion inlet air hum rat warning messages
-			int const AnciPowerIterErrorIndex, // Index to Ancillary Power iteration loop warning messages
-			int const AnciPowerFMdotFuelErrorIndex, // Index to Ancillary Power as a function of fuel input warning messages
-			int const HeatRecRateFPLRErrorIndex, // Index to heat recovery rate as a function of PLR warning messages
-			int const HeatRecRateFTempErrorIndex, // Index to heat recovery rate as a function of temp warning messages
-			int const HeatRecRateFFlowErrorIndex, // Index to heat recovery rate as a function of flow warning messages
-			int const ThermEffFTempElevErrorIndex // Index to thermal efficiency as a function of temp/elevation warnings
-		) :
-			Name( Name ),
-			RefElecPowerOutput( RefElecPowerOutput ),
-			MinElecPowerOutput( MinElecPowerOutput ),
-			MaxElecPowerOutput( MaxElecPowerOutput ),
-			RefThermalPowerOutput( RefThermalPowerOutput ),
-			MinThermalPowerOutput( MinThermalPowerOutput ),
-			MaxThermalPowerOutput( MaxThermalPowerOutput ),
-			RefElecEfficiencyLHV( RefElecEfficiencyLHV ),
-			RefCombustAirInletTemp( RefCombustAirInletTemp ),
-			RefCombustAirInletHumRat( RefCombustAirInletHumRat ),
-			RefElevation( RefElevation ),
-			ElecPowFTempElevCurveNum( ElecPowFTempElevCurveNum ),
-			ElecEffFTempCurveNum( ElecEffFTempCurveNum ),
-			ElecEffFPLRCurveNum( ElecEffFPLRCurveNum ),
-			FuelHigherHeatingValue( FuelHigherHeatingValue ),
-			FuelLowerHeatingValue( FuelLowerHeatingValue ),
-			StandbyPower( StandbyPower ),
-			AncillaryPower( AncillaryPower ),
-			AncillaryPowerFuelCurveNum( AncillaryPowerFuelCurveNum ),
-			HeatRecInletNodeNum( HeatRecInletNodeNum ),
-			HeatRecOutletNodeNum( HeatRecOutletNodeNum ),
-			RefThermalEffLHV( RefThermalEffLHV ),
-			RefInletWaterTemp( RefInletWaterTemp ),
-			InternalFlowControl( InternalFlowControl ),
-			PlantFlowControl( PlantFlowControl ),
-			RefHeatRecVolFlowRate( RefHeatRecVolFlowRate ),
-			HeatRecFlowFTempPowCurveNum( HeatRecFlowFTempPowCurveNum ),
-			ThermEffFTempElevCurveNum( ThermEffFTempElevCurveNum ),
-			HeatRecRateFPLRCurveNum( HeatRecRateFPLRCurveNum ),
-			HeatRecRateFTempCurveNum( HeatRecRateFTempCurveNum ),
-			HeatRecRateFWaterFlowCurveNum( HeatRecRateFWaterFlowCurveNum ),
-			HeatRecMinVolFlowRate( HeatRecMinVolFlowRate ),
-			HeatRecMaxVolFlowRate( HeatRecMaxVolFlowRate ),
-			HeatRecMaxWaterTemp( HeatRecMaxWaterTemp ),
-			CombustionAirInletNodeNum( CombustionAirInletNodeNum ),
-			CombustionAirOutletNodeNum( CombustionAirOutletNodeNum ),
-			ExhAirCalcsActive( ExhAirCalcsActive ),
-			RefExhaustAirMassFlowRate( RefExhaustAirMassFlowRate ),
-			ExhaustAirMassFlowRate( ExhaustAirMassFlowRate ),
-			ExhFlowFTempCurveNum( ExhFlowFTempCurveNum ),
-			ExhFlowFPLRCurveNum( ExhFlowFPLRCurveNum ),
-			NomExhAirOutletTemp( NomExhAirOutletTemp ),
-			ExhAirTempFTempCurveNum( ExhAirTempFTempCurveNum ),
-			ExhAirTempFPLRCurveNum( ExhAirTempFPLRCurveNum ),
-			ExhaustAirTemperature( ExhaustAirTemperature ),
-			ExhaustAirHumRat( ExhaustAirHumRat ),
-			CompType_Num( CompType_Num ),
-			RefCombustAirInletDensity( RefCombustAirInletDensity ),
-			MinPartLoadRat( MinPartLoadRat ),
-			MaxPartLoadRat( MaxPartLoadRat ),
-			FuelEnergyUseRateHHV( FuelEnergyUseRateHHV ),
-			FuelEnergyUseRateLHV( FuelEnergyUseRateLHV ),
-			QHeatRecovered( QHeatRecovered ),
-			ExhaustEnergyRec( ExhaustEnergyRec ),
-			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
-			HeatRecActive( HeatRecActive ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMinMassFlowRate( HeatRecMinMassFlowRate ),
-			HeatRecMaxMassFlowRate( HeatRecMaxMassFlowRate ),
-			HeatRecMdot( HeatRecMdot ),
-			HRLoopNum( HRLoopNum ),
-			HRLoopSideNum( HRLoopSideNum ),
-			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum ),
-			FuelMdot( FuelMdot ),
-			ElecPowerGenerated( ElecPowerGenerated ),
-			StandbyPowerRate( StandbyPowerRate ),
-			AncillaryPowerRate( AncillaryPowerRate ),
-			PowerFTempElevErrorIndex( PowerFTempElevErrorIndex ),
-			EffFTempErrorIndex( EffFTempErrorIndex ),
-			EffFPLRErrorIndex( EffFPLRErrorIndex ),
-			ExhFlowFTempErrorIndex( ExhFlowFTempErrorIndex ),
-			ExhFlowFPLRErrorIndex( ExhFlowFPLRErrorIndex ),
-			ExhTempFTempErrorIndex( ExhTempFTempErrorIndex ),
-			ExhTempFPLRErrorIndex( ExhTempFPLRErrorIndex ),
-			HRMinFlowErrorIndex( HRMinFlowErrorIndex ),
-			HRMaxFlowErrorIndex( HRMaxFlowErrorIndex ),
-			ExhTempLTInletTempIndex( ExhTempLTInletTempIndex ),
-			ExhHRLTInletHRIndex( ExhHRLTInletHRIndex ),
-			AnciPowerIterErrorIndex( AnciPowerIterErrorIndex ),
-			AnciPowerFMdotFuelErrorIndex( AnciPowerFMdotFuelErrorIndex ),
-			HeatRecRateFPLRErrorIndex( HeatRecRateFPLRErrorIndex ),
-			HeatRecRateFTempErrorIndex( HeatRecRateFTempErrorIndex ),
-			HeatRecRateFFlowErrorIndex( HeatRecRateFFlowErrorIndex ),
-			ThermEffFTempElevErrorIndex( ThermEffFTempElevErrorIndex )
-		{}
-
 	};
 
 	struct ReportVars
@@ -452,47 +333,6 @@ namespace MicroturbineElectricGenerator {
 			StandbyEnergy( 0.0 ),
 			ExhAirMassFlowRate( 0.0 ),
 			ExhAirTemperature( 0.0 )
-		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const PowerGen, // Reporting: Electric power produced (W)
-			Real64 const EnergyGen, // Reporting: Electric energy produced (J)
-			Real64 const QHeatRecovered, // Reporting: Heat recovered from exhaust to heat water (W)
-			Real64 const ExhaustEnergyRec, // Reporting: Heat recovered from exhaust to heat water (J)
-			Real64 const FuelEnergyUseRateHHV, // Reporting: Fuel Energy use rate, HHV basis (W)
-			Real64 const FuelEnergyHHV, // Reporting: Fuel Energy used (J)
-			Real64 const FuelMdot, // Reporting: Fuel Amount used (kg/s)
-			Real64 const ElectricEfficiencyLHV, // Reporting: Electric efficiency LHV (-)
-			Real64 const ThermalEfficiencyLHV, // Reporting: Thermal (heat recovery to water) efficiency LHV (-)
-			Real64 const HeatRecInletTemp, // Reporting: Heat Recovery Loop Inlet Temperature (C)
-			Real64 const HeatRecOutletTemp, // Reporting: Heat Recovery Loop Outlet Temperature (C)
-			Real64 const HeatRecMdot, // Reporting: Heat Recovery Loop Mass flow rate (kg/s)
-			Real64 const AncillaryPowerRate, // Reporting: Ancillary power use rate (W)
-			Real64 const AncillaryEnergy, // Reporting: Ancillary energy use (J)
-			Real64 const StandbyPowerRate, // Reporting: Standby power use rate (W)
-			Real64 const StandbyEnergy, // Reporting: Standby energy use (J)
-			Real64 const ExhAirMassFlowRate, // Actual Exhaust Air Mass Flow Rate (kg/s)
-			Real64 const ExhAirTemperature // Combustion exhaust air temperature (C)
-		) :
-			PowerGen( PowerGen ),
-			EnergyGen( EnergyGen ),
-			QHeatRecovered( QHeatRecovered ),
-			ExhaustEnergyRec( ExhaustEnergyRec ),
-			FuelEnergyUseRateHHV( FuelEnergyUseRateHHV ),
-			FuelEnergyHHV( FuelEnergyHHV ),
-			FuelMdot( FuelMdot ),
-			ElectricEfficiencyLHV( ElectricEfficiencyLHV ),
-			ThermalEfficiencyLHV( ThermalEfficiencyLHV ),
-			HeatRecInletTemp( HeatRecInletTemp ),
-			HeatRecOutletTemp( HeatRecOutletTemp ),
-			HeatRecMdot( HeatRecMdot ),
-			AncillaryPowerRate( AncillaryPowerRate ),
-			AncillaryEnergy( AncillaryEnergy ),
-			StandbyPowerRate( StandbyPowerRate ),
-			StandbyEnergy( StandbyEnergy ),
-			ExhAirMassFlowRate( ExhAirMassFlowRate ),
-			ExhAirTemperature( ExhAirTemperature )
 		{}
 
 	};

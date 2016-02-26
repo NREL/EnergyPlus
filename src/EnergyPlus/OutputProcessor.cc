@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <algorithm>
 #include <cassert>
@@ -201,6 +259,7 @@ namespace OutputProcessor {
 	bool ProduceVariableDictionary( false );
 
 	int MaxNumSubcategories( 1 );
+	bool isFinalYear( false );
 
 	namespace {
 		// These were static variables within different functions. They were pulled out into the namespace
@@ -213,6 +272,7 @@ namespace OutputProcessor {
 		Real64 LStartMin( -1.0 ); // Helps set minutes for timestamp output
 		Real64 LEndMin( -1.0 ); // Helps set minutes for timestamp output
 		bool GetMeterIndexFirstCall( true ); //trigger setup in GetMeterIndex
+		bool InitFlag( true );
 	}
 
 	// All routines should be listed here whether private or not
@@ -315,6 +375,7 @@ namespace OutputProcessor {
 		LStartMin = -1.0;
 		LEndMin = -1.0;
 		GetMeterIndexFirstCall = true ;
+		InitFlag = true;
 		TimeValue.deallocate();
 		RVariableTypes.deallocate();
 		IVariableTypes.deallocate();
@@ -1271,8 +1332,8 @@ namespace OutputProcessor {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Array1D_string StateVariables( 3 );
-		Array1D_string NonStateVariables( 4 );
+		static Array1D_string StateVariables( 3 );
+		static Array1D_string NonStateVariables( 4 );
 		static bool Initialized( false );
 		int Item;
 
@@ -1284,6 +1345,7 @@ namespace OutputProcessor {
 			NonStateVariables( 2 ) = "NONSTATE";
 			NonStateVariables( 3 ) = "SUM";
 			NonStateVariables( 4 ) = "SUMMED";
+			Initialized = true;
 		}
 
 		ValidateVariableType = 1;
@@ -1608,7 +1670,6 @@ namespace OutputProcessor {
 		cCurrentModuleObject = "Meter:Custom";
 		NumCustomMeters = GetNumObjectsFound( cCurrentModuleObject );
 
-		auto const EnergyMeters_Name( EnergyMeters.Name() ); // Member array
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
@@ -1616,7 +1677,7 @@ namespace OutputProcessor {
 			MeterCreated = false;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EnergyMeters_Name, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
+			VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -1768,7 +1829,7 @@ namespace OutputProcessor {
 			MeterCreated = false;
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EnergyMeters_Name, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
+			VerifyName( cAlphaArgs( 1 ), EnergyMeters, NumEnergyMeters, IsNotOK, IsBlank, "Meter Names" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				continue;
@@ -2282,7 +2343,13 @@ namespace OutputProcessor {
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).DYAccRptNum );
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).MNAccRptNum );
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).SMAccRptNum );
-		} else {
+			EnergyMeters( NumEnergyMeters ).FinYrSMValue = 0.0;
+			EnergyMeters( NumEnergyMeters ).FinYrSMMaxVal = MaxSetValue;
+			EnergyMeters( NumEnergyMeters ).FinYrSMMaxValDate = 0;
+			EnergyMeters( NumEnergyMeters ).FinYrSMMinVal = MinSetValue;
+			EnergyMeters( NumEnergyMeters ).FinYrSMMinValDate = 0;
+		}
+		else {
 			ShowFatalError( "Requested to Add Meter which was already present=" + Name );
 		}
 		if ( ! ResourceType.empty() ) {
@@ -2653,6 +2720,13 @@ namespace OutputProcessor {
 		} else if ( endUseMeter == "WINDTURBINES" || endUseMeter == "WT" || endUseMeter == "WINDTURBINE" ) {
 			EndUse = "WindTurbine";
 
+		} else if ( endUseMeter == "ELECTRICSTORAGE" ) {
+			EndUse = "ElectricStorage";
+
+		} else if ( endUseMeter == "POWERCONVERSION") {
+
+			EndUse = "PowerConversion";
+
 		} else if ( endUseMeter == "HEAT RECOVERY FOR COOLING" || endUseMeter == "HEATRECOVERYFORCOOLING" || endUseMeter == "HEATRECOVERYCOOLING" ) {
 			EndUse = "HeatRecoveryForCooling";
 
@@ -2954,6 +3028,10 @@ namespace OutputProcessor {
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).MNMaxVal, EnergyMeters( Meter ).MNMaxValDate, EnergyMeters( Meter ).MNMinVal, EnergyMeters( Meter ).MNMinValDate );
 				EnergyMeters( Meter ).SMValue += MeterValue( Meter );
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).SMMaxVal, EnergyMeters( Meter ).SMMaxValDate, EnergyMeters( Meter ).SMMinVal, EnergyMeters( Meter ).SMMinValDate );
+				if ( isFinalYear ){
+					EnergyMeters( Meter ).FinYrSMValue += MeterValue( Meter );
+					SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).FinYrSMMaxVal, EnergyMeters( Meter ).FinYrSMMaxValDate, EnergyMeters( Meter ).FinYrSMMinVal, EnergyMeters( Meter ).FinYrSMMinValDate );
+				}
 			} else {
 				EnergyMeters( Meter ).TSValue = EnergyMeters( EnergyMeters( Meter ).SourceMeter ).TSValue - MeterValue( Meter );
 				EnergyMeters( Meter ).HRValue += EnergyMeters( Meter ).TSValue;
@@ -2964,12 +3042,109 @@ namespace OutputProcessor {
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).MNMaxVal, EnergyMeters( Meter ).MNMaxValDate, EnergyMeters( Meter ).MNMinVal, EnergyMeters( Meter ).MNMinValDate );
 				EnergyMeters( Meter ).SMValue += EnergyMeters( Meter ).TSValue;
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).SMMaxVal, EnergyMeters( Meter ).SMMaxValDate, EnergyMeters( Meter ).SMMinVal, EnergyMeters( Meter ).SMMinValDate );
+				if ( isFinalYear ){
+					EnergyMeters( Meter ).FinYrSMValue += EnergyMeters( Meter ).TSValue;
+					SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).FinYrSMMaxVal, EnergyMeters( Meter ).FinYrSMMaxValDate, EnergyMeters( Meter ).FinYrSMMinVal, EnergyMeters( Meter ).FinYrSMMinValDate );
+				}
 			}
 		}
 
 		MeterValue = 0.0; // Ready for next update
 
 	}
+
+	void
+	ResetAccumulationWhenWarmupComplete()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jason Glazer
+		//       DATE WRITTEN   June 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Resets the accumulating meter values. Needed after warmup period is over to
+		// reset the totals on meters so that they are not accumulated over the warmup period
+
+		// METHODOLOGY EMPLOYED:
+		// Cycle through the meters and reset all accumulating values
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Meter; // Loop Control
+		int Loop; // Loop Variable
+
+		for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
+			EnergyMeters( Meter ).HRValue = 0.0;
+			EnergyMeters( Meter ).HRMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).HRMaxValDate = 0;
+			EnergyMeters( Meter ).HRMinVal = MinSetValue;
+			EnergyMeters( Meter ).HRMinValDate = 0;
+
+			EnergyMeters( Meter ).DYValue = 0.0;
+			EnergyMeters( Meter ).DYMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).DYMaxValDate = 0;
+			EnergyMeters( Meter ).DYMinVal = MinSetValue;
+			EnergyMeters( Meter ).DYMinValDate = 0;
+
+			EnergyMeters( Meter ).MNValue = 0.0;
+			EnergyMeters( Meter ).MNMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).MNMaxValDate = 0;
+			EnergyMeters( Meter ).MNMinVal = MinSetValue;
+			EnergyMeters( Meter ).MNMinValDate = 0;
+
+			EnergyMeters( Meter ).SMValue = 0.0;
+			EnergyMeters( Meter ).SMMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).SMMaxValDate = 0;
+			EnergyMeters( Meter ).SMMinVal = MinSetValue;
+			EnergyMeters( Meter ).SMMinValDate = 0;
+
+			EnergyMeters( Meter ).FinYrSMValue = 0.0;
+			EnergyMeters( Meter ).FinYrSMMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).FinYrSMMaxValDate = 0;
+			EnergyMeters( Meter ).FinYrSMMinVal = MinSetValue;
+			EnergyMeters( Meter ).FinYrSMMinValDate = 0;
+
+		}
+
+		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
+			RVar >>= RVariableTypes( Loop ).VarPtr;
+			auto & rVar( RVar() );
+			if ( rVar.ReportFreq == ReportMonthly || rVar.ReportFreq == ReportSim ) {
+				rVar.StoreValue = 0.0;
+				rVar.NumStored = 0;
+			}
+		}
+
+		for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
+			IVar >>= IVariableTypes( Loop ).VarPtr;
+			auto & iVar( IVar() );
+			if ( iVar.ReportFreq == ReportMonthly || iVar.ReportFreq == ReportSim ) {
+				iVar.StoreValue = 0;
+				iVar.NumStored = 0;
+			}
+		}
+	}
+
+
+
 
 	void
 	SetMinMax(
@@ -3113,7 +3288,7 @@ namespace OutputProcessor {
 		}
 
 		if ( NumEnergyMeters > 0 ) {
-			EnergyMeters.TSValue() = 0.0;
+			for ( auto & e : EnergyMeters ) e.TSValue = 0.0;
 		}
 
 	}
@@ -3405,9 +3580,11 @@ namespace OutputProcessor {
 		}
 
 		if ( NumEnergyMeters > 0 ) {
-			EnergyMeters.SMValue() = 0.0;
-			EnergyMeters.SMMinVal() = MinSetValue;
-			EnergyMeters.SMMaxVal() = MaxSetValue;
+			for ( auto & e : EnergyMeters ) {
+				e.SMValue = 0.0;
+				e.SMMinVal = MinSetValue;
+				e.SMMaxVal = MaxSetValue;
+			}
 		}
 
 	}
@@ -3456,53 +3633,53 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			int const RT_forIPUnits( EnergyMeters( Loop ).RT_forIPUnits );
 			if ( RT_forIPUnits == RT_IPUnits_Electricity ) {
-				PreDefTableEntry( pdchEMelecannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMelecminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMelecminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMelecmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMelecmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMelecannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue * convertJtoGJ );
+				PreDefTableEntry( pdchEMelecminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMelecminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMelecmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMelecmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Gas ) {
-				PreDefTableEntry( pdchEMgasannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMgasminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMgasminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMgasmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMgasmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMgasannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue * convertJtoGJ );
+				PreDefTableEntry( pdchEMgasminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMgasminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMgasmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMgasmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Cooling ) {
-				PreDefTableEntry( pdchEMcoolannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMcoolminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMcoolminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMcoolmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMcoolmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMcoolannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue * convertJtoGJ );
+				PreDefTableEntry( pdchEMcoolminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMcoolminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMcoolmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMcoolmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Water ) {
-				PreDefTableEntry( pdchEMwaterannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue );
-				PreDefTableEntry( pdchEMwaterminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMwaterminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMwatermaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMwatermaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMwaterannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue );
+				PreDefTableEntry( pdchEMwaterminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMwaterminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMwatermaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMwatermaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherKG ) {
-				PreDefTableEntry( pdchEMotherKGannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue );
-				PreDefTableEntry( pdchEMotherKGminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec, 3 );
-				PreDefTableEntry( pdchEMotherKGminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherKGmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec, 3 );
-				PreDefTableEntry( pdchEMotherKGmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMotherKGannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue );
+				PreDefTableEntry( pdchEMotherKGminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherKGminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMotherKGmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherKGmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherM3 ) {
-				PreDefTableEntry( pdchEMotherM3annual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue, 3 );
-				PreDefTableEntry( pdchEMotherM3minvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec, 3 );
-				PreDefTableEntry( pdchEMotherM3minvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherM3maxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec, 3 );
-				PreDefTableEntry( pdchEMotherM3maxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMotherM3annual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue, 3 );
+				PreDefTableEntry( pdchEMotherM3minvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherM3minvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMotherM3maxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherM3maxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherL ) {
-				PreDefTableEntry( pdchEMotherLannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue, 3 );
-				PreDefTableEntry( pdchEMotherLminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec, 3 );
-				PreDefTableEntry( pdchEMotherLminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherLmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec, 3 );
-				PreDefTableEntry( pdchEMotherLmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMotherLannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue, 3 );
+				PreDefTableEntry( pdchEMotherLminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherLminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMotherLmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec, 3 );
+				PreDefTableEntry( pdchEMotherLmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			} else {
-				PreDefTableEntry( pdchEMotherJannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMotherJminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMotherJminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherJmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
-				PreDefTableEntry( pdchEMotherJmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
+				PreDefTableEntry( pdchEMotherJannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMValue * convertJtoGJ );
+				PreDefTableEntry( pdchEMotherJminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMinVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMotherJminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMinValDate ) );
+				PreDefTableEntry( pdchEMotherJmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).FinYrSMMaxVal / TimeStepZoneSec );
+				PreDefTableEntry( pdchEMotherJmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).FinYrSMMaxValDate ) );
 			}
 		}
 
@@ -4533,7 +4710,6 @@ namespace OutputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string NumberOut; // Character for producing "number out"
 
 		if ( UpdateDataDuringWarmupExternalInterface && ! ReportDuringWarmup ) return;
 
@@ -7407,7 +7583,9 @@ GetVariableKeyCountandType(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	static Array1D_int keyVarIndexes; // Array index for specific key name
 	static int curKeyVarIndexLimit; // current limit for keyVarIndexes
-	static bool InitFlag( true ); // for initting the keyVarIndexes array
+	//////////// hoisted into namespace ////////////////////////////////////////////////
+	// static bool InitFlag( true ); // for initting the keyVarIndexes array
+	////////////////////////////////////////////////////////////////////////////////////
 	int Loop; // Loop counters
 	int Loop2;
 	std::string::size_type Position; // Starting point of search string
@@ -7954,21 +8132,6 @@ ProduceRDDMDD()
 			StoreType( 0 )
 		{}
 
-		// Member Constructor
-		VariableTypes(
-			int const RealIntegerType, // Real= 1, Integer=2
-			int const VarPtr, // pointer to real/integer VariableTypes structures
-			int const IndexType,
-			int const StoreType,
-			std::string const & UnitsString
-		) :
-			RealIntegerType( RealIntegerType ),
-			VarPtr( VarPtr ),
-			IndexType( IndexType ),
-			StoreType( StoreType ),
-			UnitsString( UnitsString )
-		{}
-
 	};
 
 	//  See if Report Variables should be turned on
@@ -8020,7 +8183,7 @@ ProduceRDDMDD()
 	}
 
 	Array1D_string VariableNames( NumVariablesForOutput );
-	VariableNames = DDVariableTypes( {1,NumVariablesForOutput} ).VarNameOnly();
+	for ( int i = 1; i <= NumVariablesForOutput; ++i ) VariableNames( i ) = DDVariableTypes( i ).VarNameOnly;
 	Array1D_int iVariableNames( NumVariablesForOutput );
 
 	if ( SortByName ) {
@@ -8180,28 +8343,6 @@ AddToOutputVariableList(
 	}
 
 }
-
-	//     NOTICE
-	
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

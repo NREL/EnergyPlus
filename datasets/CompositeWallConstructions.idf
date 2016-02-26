@@ -18,8 +18,7 @@
 ! Total wall thickness = 5.00in (0.127m)
 ! Material layer names follow:
 
-!  Version,
-!    8.3;                    !- Version Identifier
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
   Construction,
     Composite 2x4 Wood Stud R11,  !- Name

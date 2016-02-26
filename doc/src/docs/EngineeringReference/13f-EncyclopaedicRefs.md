@@ -409,13 +409,6 @@ Table 81.  Nomenclature list for Fanger model
 <td>PPD</td>
 </tr>
 <tr>
-<td>P<sub>sk</sub></td>
-<td>Saturated water vapor pressure at required skin temperature</td>
-<td>Torr</td>
-<td>-</td>
-<td>SatSkinVapPress</td>
-</tr>
-<tr>
 <td>Q<sub>c</sub></td>
 <td>The rate of convective heat loss</td>
 <td>W/m<sup>2</sup></td>
@@ -472,13 +465,6 @@ Table 81.  Nomenclature list for Fanger model
 <td>AbsRadTemp</td>
 </tr>
 <tr>
-<td>T<sub>skr</sub></td>
-<td>Skin temperature required to achieve thermal comfort</td>
-<td>°C</td>
-<td> </td>
-<td>SkinComfTemp</td>
-</tr>
-<tr>
 <td>W</td>
 <td>The rate of heat loss due to the performance of work</td>
 <td>W/m<sup>2</sup></td>
@@ -510,9 +496,9 @@ Fanger developed the model based on the research he performed at Kansas State Un
 
 <span>\(L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W\)</span>                                                         W/m<sup>2</sup>
 
-<span>\({Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_a}) + 0.0014M(34 - {T_a})\)</span>     W/m<sup>2</sup>
+<span>\({Q_{res}} = {E_{res}} + {C_{res}} = 0.000017M(5867 - {P_a}) + 0.0014M(34 - {T_a})\)</span>     W/m<sup>2</sup>
 
-LatRespHeatLoss = 0.0023\*ActLevel\*(44. - VapPress)
+LatRespHeatLoss = 0.000017\*ActLevel\*(5867. - VapPress)
 
 DryRespHeatLoss = 0.0014\*ActLevel\*(34.- AirTemp)
 
@@ -520,15 +506,15 @@ RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
 
 <span>\({Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})\)</span>                                                               W/m<sup>2</sup>
 
-<span>\({Q_r} = {f_{eff}}{f_{cl}}\varepsilon \sigma ({T_{cla}}^4 - {T_{ra}}^4)\)</span>                                                       W/m<sup>2</sup>
+<span>Q<sub>r</sub> = 3.96\*f<sub>cl</sub>\*[(0.01\*T<sub>cla</sub>)^4 - (0.01\*T<sub>ra</sub>)^4]</span>                                                       W/m<sup>2</sup>
 
 <span>\({Q_{dry}} = {Q_c} + {Q_r}\)</span>                                                                         W/m<sup>2</sup>
 
 ConvHeatLos = CloBodyRat\*Hc\*(CloSurfTemp - AirTemp)
 
-RadHeatLoss = RadSurfEff\*CloBodyRat\*SkinEmiss\*StefanBoltz &
+RadHeatLoss = 3.96\*CloBodyRat &
 
-\*(AbsCloSurfTemp\*\*4 - AbsRadTemp\*\*4)
+\*[(0.01\*AbsCloSurfTemp)\*\*4 - (0.01\*AbsRadTemp)\*\*4]
 
 DryHeatLoss = ConvHeatLoss + RadHeatLoss
 
@@ -536,7 +522,7 @@ For<span>\(H > 58.2\)</span>, <span>\({E_{rsw}} = 0.42(H - 58.2)\)</span>   �
 
 For <span>\(H \le 58.2\)</span>, <span>\({E_{rsw}} = 0\)</span>                                                           W/m<sup>2</sup>
 
-<span>\({E_{diff}} = 0.68 \times 0.61({P_{sk}} - {P_a}) = 0.4148({P_{sk}} - {P_a})\)</span>                        W/m<sup>2</sup>
+<span>E<sub>diff</sub> = 0.00305\*(5733.0 - 6.99H - P<sub>a</sub>)</span>                        W/m<sup>2</sup>
 
 <span>\({E_{sk}} = {E_{rsw}} + {E_{diff}}\)</span>                                                                      W/m<sup>2</sup>
 
@@ -544,27 +530,11 @@ EvapHeatLossRegComf = 0.42\*(IntHeatProd - ActLevelConv)
 
 EvapHeatLossRegComf = 0.0
 
-EvapHeatLossDiff = 0.4148\*(SkinComfVpress - VapPress)
+EvapHeatLossDiff = 0.00305\*(5733.0 - 6.99\*IntHeatProd - VapPress)
 
 EvapHeatLoss = EvapHeatLossRegComf + EvapHeatLossDiff
 
-Where,
-
-0.68 is the passive water vapor diffusion rate, (g/h·m<sup>2</sup>·Torr)
-
-0.61 is the latent heat of water, (W·h/g)
-
-P<sub>sk</sub> is the saturated water vapor pressure at the skin temperature required to achieve the thermal comfort
-
-<span>\({P_{sk}} = 1.92{T_{skr}} - 25.3\)</span>                                                                Torr
-
-SatSkinVapPress = 1.92\*SkinTempComf - 25.3
-
-<span>\({T_{skr}} = 35.7 - 0.028H\)</span>                                                               °C
-
-SkinTempComf = 35.7 - 0.028\*IntHeatProd
-
-By determining the skin temperature and evaporative sweat rate that a thermally comfortable person would have in a given set of conditions, the model calculates the energy loss (L). Then, using the thermal sensation votes from subjects at KSU and Denmark, a Predicted Mean Vote (PMV) thermal sensation scale is based on how the energy loss (L) deviates from the metabolic rate (M) in the following form:
+The Fanger model was developed using the thermal sensation votes from subjects at KSU and Denmark, and the Predicted Mean Vote (PMV) thermal sensation scale is based on how the energy loss (L) deviates from the metabolic rate (M) in the following form:
 
 <div>$$PMV = (0.303{e^{ - 0.036M}} + 0.028)(H - L)$$</div>
 
@@ -1658,7 +1628,7 @@ Adaptive comfort model, intended for use in naturally ventilated buildings, dete
 
 In ASHRAE Standard 55, the monthly mean outdoor air temperature, used in the adaptive comfort model, is defined as the simple running average of the previous thirty daily average outdoor air temperatures.
 
-The model defines two comfort regions: 80% Acceptability, and 90% Acceptability. If the monthly mean outdoor air temperature is not within the specified domain, the model is not applicable.
+The model defines two comfort regions: 80% Acceptability, and 90% Acceptability. If the monthly mean outdoor air temperature is not within the specified domain of 10.0 to 33.5C, the model is not applicable.
 
 ![](media/image6814.png)
 
@@ -1700,7 +1670,7 @@ For a detailed description of this model, please see *ASHRAE Standard 55-2010, T
 
 The EN15251-2007 is similar to ASHRAE 55-2010, but with slightly different curves of the indoor operative temperature and acceptability limits (Fig. 2). The model, intended for use in naturally ventilated buildings, determines the acceptability of indoor conditions given the 7-day weighted mean outdoor air temperature and the indoor operative temperature. The 7-day weighted mean outdoor air temperature (T<sub>rm</sub>) is defined as the weighted running average of the previous 7 daily average outdoor air temperatures.
 
-This weighted running average is calculated from a full annual weather file that must be specified for the simulation. This is used as an index for occupant adaptation to outdoor conditions, and determines the acceptability of indoor conditions. The model also accounts for people’s clothing adaptation in naturally conditioned spaces by relating the acceptable range of indoor temperatures to the outdoor climate, so it is not necessary to estimate the clothing values for the space. No humidity or air-speed limits are required when this option is used. The model defines three comfort regions: Category I (90%) Acceptability, Category II (80%) Acceptability, and Category III (65%) Acceptability. If T<sub>rm</sub> is not within the specified domain, the model is not applicable.
+This weighted running average is calculated from a full annual weather file that must be specified for the simulation. This is used as an index for occupant adaptation to outdoor conditions, and determines the acceptability of indoor conditions. The model also accounts for people’s clothing adaptation in naturally conditioned spaces by relating the acceptable range of indoor temperatures to the outdoor climate, so it is not necessary to estimate the clothing values for the space. No humidity or air-speed limits are required when this option is used. The model defines three comfort regions: Category I (90%) Acceptability, Category II (80%) Acceptability, and Category III (65%) Acceptability. If T<sub>rm</sub> is not within the specified domain of 10.0 to 30.0C, the model is not applicable.
 
 ![](media/image6819.png)
 
@@ -2442,15 +2412,17 @@ where
 
 *q<sub>oncycloss,n</sub>* and *q<sub>offcycloss,n</sub>* are defined as:
 
-<div>$${q_{oncycloss,n}} = U{A_{oncyc,n}}({T_{amb}} - {T_n})$$</div>
+<div>$${q_{oncycloss,n}} = ({UA_{tank}} + UA_add,n)({T_{amb}} - {T_n})$$</div>
 
-<div>$${q_{offcycloss,n}} = U{A_{offcyc,n}}({T_{amb}} - {T_n})$$</div>
+<div>$${q_{offcycloss,n}} = ({UA_{tank} + UA_{flue}})({T_{amb}} - {T_n})$$</div>
 
 where
 
-*UA<sub>oncyc,n</sub>* = on-cycle loss coefficient to ambient environment (zero when off)
+*UA<sub>tank</sub>* = loss coefficient to ambient environment for the tank
 
-*UA<sub>offcyc,n</sub>* = off-cycle loss coefficient to ambient environment (zero when on)
+*UA<sub>add,n</sub>* = additional node loss coefficient
+
+*UA<sub>flue</sub>* = additional off-cycle flue loss coefficient to ambient environment  (zero when on)
 
 *T<sub>amb</sub>* = temperature of ambient environment
 
@@ -3956,7 +3928,7 @@ If the unit is on and <span>\({\dot Q_{cc}}\)</span>&lt; 0 and the thermostat ty
 
 When modeling multi-speed fan in FanCoil unit, capacity is modulated using speed ratio or part load ratio.  The supply air fan speed is varied while operating the coils at maximum water flow. When there is no system load to meet, the water control valve is fully closed. When the FanCoil fan is cycling between two consecutive fan speed levels a speed ratio is calculated, but when the FanCoil unit cycles between the minimum fan speed and off-position, then part load ratio is calculated. The fan may be off or run continuously at lowest speed to provide ventilation air depending the fan operating schedule specified. When the FanCoil is operating at the lowest fan speed (Speed = 1), the water flow rate is reported as the average for the time step by multiplying the maximum water flow by part load ratio. The speed ratio and part-load ratio are calculated such that the FanCoil unit satisfies the required system zone cooling or heating load.The set of equations used for the multi-speed fan capacity control methods in FanCoil unit are summarized next.
 
-###### Cycling Between Stages
+###### Cycling Between Speeds
 
 When the supply fan is cycling between consecutive speeds, then the speed ratio (SR) and the average mass flow rate are calculated as follows:
 
@@ -3964,7 +3936,7 @@ When the supply fan is cycling between consecutive speeds, then the speed ratio 
 <div>$${\dot m} = {\dot m_{on, n}} {SR_{n}} + {\dot m_{on, n-1}} (1 - {SR_{n}})$$</div>
 <div>$${\dot m{w}} = {\dot m_{w, max}}$$</div>
 
-###### Cycling OnOff at Lowest Stage
+###### Cycling OnOff at Lowest Speed
 
 The average supply air flow rate calculation when the fan is running at the lowest fan speed level depends on the fan operating schedule and load. The fan coil unit part load ratio is given by:
 
@@ -4004,6 +3976,42 @@ SystemLoad 	= system load to be met by the fan coil unit, (W)
 
 {FullLoadOutput_{n}} 	= fully load fan coil unit output at fan speed level n, (W)
 
+##### ASHRAE 90.1
+
+The ASHRAE90.1 control method uses a simple technique to adjust fan speed based on zone design sensible load. The specific section of the Standard is described as:
+
+    Section 6.4.3.10 (“Single Zone Variable-Air-Volume Controls”) of ASHRAE Standard 90.1-2010.
+    HVAC systems shall have variable airflow controls as follows:
+    (a) Air-handling and fan-coil units with chilled-water cooling coils and supply fans with motors 
+        greater than or equal to 5 hp shall have their supply fans controlled by two-speed motors or
+        variable-speed drives. At cooling demands less than or equal to 50%, the supply fan controls
+        shall be able to reduce the airflow to no greater than the larger of the following:
+        • One-half of the full fan speed, or
+        • The volume of outdoor air required to meet the ventilation requirements of Standard 62.1.
+    (b) Effective January 1, 2012, all air-conditioning equipment and air-handling units with direct
+        expansion cooling and a cooling capacity at AHRI conditions greater than or equal to 110,000
+        Btu/h that serve single zones shall have their supply fans controlled by two-speed motors or
+        variable-speed drives. At cooling demands less than or equal to 50%, the supply fan controls
+        shall be able to reduce the airflow to no greater than the larger of the following:
+        • Two-thirds of the full fan speed, or
+        • The volume of outdoor air required to meet the ventilation requirements of Standard 62.1.
+
+This control method assumes that a simulation sizing run is performed to determine the zone design sensible cooling and heating load <span>\({\dot Q_{z,design}}\)</span>.
+
+For fan coil units, the limit used to determine if reduced zone loads are met with reduced fan speed is the fan coil's Low Speed Supply Air Flow Ratio input.
+
+<div>$${\dot Q_{reduced}} = {\dot Q_{z,design}} * {Ratio_{fan,low{\rm{ }}speed}}$$</div>
+
+If the zone load, <span>\({\dot Q_{z,req}}\)</span>, is less than <span>\({Q_{reduced}}\)</span> then the fan is maintained at the reduced speed while the water coils (or electric heating coil) are modulated to meet the zone load.
+
+If the zone load is greater than the design zone sensible load, <span>\({\dot Q_{z,design}}\)</span>, the fan will operate at the maximum supply air flow rate and the water or electric heating coils will modulate to meet the zone load.
+
+If the zone load is between these two extremes, the fan and coil will modulate to meet the zone load.
+
+An example of the ASHRAE 90.1 control method is provided in the following figure. In this figure, the X-axis represents the zone cooling (-) or heating (+) load.
+
+![](media/SZVAV_Fan_Control_FanCoil.jpg)<br>
+Single-Zone VAV Fan Control for Fan Coil Units
 
 #### References
 
@@ -5241,43 +5249,174 @@ The fraction of evaporation rate, *f*, also depends mainly on the soil cover and
 
 Relative humidity, *r<sub>a</sub>*, is also calculated from EnergyPlus weather data by averaging individual relative humidity values of the whole year.
 
-The soil thermal diffusivity (m<sup>2</sup>/s), *α<sub>s</sub>*, and conductivity (W/m°C), *k<sub>s</sub>*, varies with the density and moisture content. According to the 1991 ASHRAE Handbook of HVAC Applications (Table 4, pp. 11.4), the following values are recommended under different conditions.
+The soil thermal diffusivity (m<sup>2</sup>/s), *α<sub>s</sub>*, and conductivity (W/m°C), *k<sub>s</sub>*, varies with the density and moisture content. From Table 3.3, pg. 26 of ASHRAE's Ground Source Heat Pumpss--Design of Geothermal Systems for Commercial and Institutional Buildings, 1997, the following values are recommended under different conditions.
 
-<table class="table table-striped">
-<tr>
-<td>Soil condition</td>
-<td>k<sub>s</sub> (W/m°C)</td>
-<td>α<sub>s</sub> x 10<sup>-7</sup> (m<sup>2</sup>/s)</td>
-</tr>
-<tr>
-<td>Heavy soil, saturated</td>
-<td>2.42</td>
-<td>9.04</td>
-</tr>
-<tr>
-<td>Heavy soil, damp solid masonry</td>
-<td>1.30</td>
-<td>6.45</td>
-</tr>
-<tr>
-<td>Heavy soil, dry</td>
-<td>0.865</td>
-<td>5.16</td>
-</tr>
-<tr>
-<td>Light soil, damp</td>
-<td>-</td>
-<td>-</td>
-</tr>
-<tr>
-<td>Light soil, dry</td>
-<td>0.346</td>
-<td>2.80</td>
-</tr>
-
+<table>
+  <tr>
+    <th></th>
+    <th>Moisture Content</th>
+    <th>5%</th>
+    <th>5%</th>
+    <th>10%</th>
+    <th>10%</th>
+    <th>15%</th>
+    <th>15%</th>
+    <th>20%</th>
+    <th>20%</th>
+  </tr>
+  <tr>
+    <td>Soil <br>Type</td>
+    <td>Dry Density<br>[kg/m3]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+    <td>k<br>[W/m-K]</td>
+    <td>α<sub>s</sub><br>[m2/s]</td>
+  </tr>
+  <tr>
+    <td>Coarse 100%<br>Sand</td>
+    <td>1922</td>
+    <td>2.77</td>
+    <td>1.34E-06</td>
+    <td>2.94</td>
+    <td>1.24E-06</td>
+    <td>3.29</td>
+    <td>1.18E-06</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>1602</td>
+    <td>1.90</td>
+    <td>1.18E-06</td>
+    <td>2.34</td>
+    <td>1.18E-06</td>
+    <td>2.51</td>
+    <td>1.08E-06</td>
+    <td>2.68</td>
+    <td>8.82E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>1281</td>
+    <td>1.38</td>
+    <td>1.18E-06</td>
+    <td>1.56</td>
+    <td>9.14E-07</td>
+    <td>1.56</td>
+    <td>8.06E-07</td>
+    <td>1.47</td>
+    <td>6.99E-07</td>
+  </tr>
+  <tr>
+    <td>Fine Grain<br>100% Clay</td>
+    <td>1922</td>
+    <td>1.21</td>
+    <td>5.91E-07</td>
+    <td>1.21</td>
+    <td>4.84E-07</td>
+    <td>1.64</td>
+    <td>5.70E-07</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>1602</td>
+    <td>0.95</td>
+    <td>5.70E-07</td>
+    <td>0.95</td>
+    <td>4.73E-07</td>
+    <td>1.12</td>
+    <td>4.73E-07</td>
+    <td>1.21</td>
+    <td>5.16E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>1281</td>
+    <td>0.69</td>
+    <td>4.84E-07</td>
+    <td>0.74</td>
+    <td>4.62E-07</td>
+    <td>0.81</td>
+    <td>4.73E-07</td>
+    <td>0.87</td>
+    <td>4.09E-07</td>
+  </tr>
 </table>
 
+The following information is also available for reference from Table 4, pg. 34.6 of the ASHRAE Applications Handbook, 2015.
 
+<table>
+  <tr>
+    <th>Soils</th>
+    <th>Moisture<br>Content</th>
+    <th>Density<br>[kg/m3]</th>
+    <th>k<br>[W/m-K]</th>
+    <th>α<sub>s</sub><br>[m^2/s]</th>
+  </tr>
+  <tr>
+    <td>Heavy clay</td>
+    <td>15% water</td>
+    <td>1922</td>
+    <td>1.558</td>
+    <td>5.914E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>5% water</td>
+    <td>1922</td>
+    <td>1.212</td>
+    <td>6.452E-07</td>
+  </tr>
+  <tr>
+    <td>Light clay</td>
+    <td>15% water</td>
+    <td>1281</td>
+    <td>0.865</td>
+    <td>4.624E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>5% water</td>
+    <td>1281</td>
+    <td>0.692</td>
+    <td>4.839E-07</td>
+  </tr>
+  <tr>
+    <td>Heavy sand</td>
+    <td>15% water</td>
+    <td>1922</td>
+    <td>3.115</td>
+    <td>1.129E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>5% water</td>
+    <td>1922</td>
+    <td>2.596</td>
+    <td>1.344E-06</td>
+  </tr>
+  <tr>
+    <td>Light sand</td>
+    <td>15% water</td>
+    <td>1281</td>
+    <td>1.558</td>
+    <td>8.065E-07</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>5% water</td>
+    <td>1281</td>
+    <td>1.385</td>
+    <td>9.677E-07</td>
+  </tr>
+</table>
 
 Annual angular frequency, *w*, is equal to 1.992 x 10<sup>-7</sup>rad/s, and dampening depth (m), D, is calculated from the following equation:
 
