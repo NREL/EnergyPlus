@@ -28,6 +28,7 @@ set( test_src
   DemandResponse.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
+  ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
@@ -36,6 +37,7 @@ set( test_src
   FaultsManager.unit.cc
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
+  FluidProperties.unit.cc
   Furnaces.unit.cc
   General.unit.cc
   GroundHeatExchangers.unit.cc
@@ -46,6 +48,7 @@ set( test_src
   Humidifiers.unit.cc
   HVACControllers.unit.cc
   HVACFourPipeBeam.unit.cc
+  HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   HVACUnitarySystem.unit.cc
@@ -56,7 +59,6 @@ set( test_src
   InputProcessor.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
-  ManageElectricPower.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
   NodeInputManager.unit.cc

@@ -96,6 +96,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -2056,6 +2057,463 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 
 }
 
+TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
+
+	bool ErrorsFound( false );
+	int InletNode( 0 ); // UnitarySystem inlet node number
+	int OutletNode( 0 ); // UnitarySystem outlet node number
+	int ControlZoneNum( 0 ); // index to control zone
+	int UnitarySysNum( 1 ); // UnitarySystem index
+	int AirLoopNum( 0 );  // UnitarySystem airloop index
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.4;",
+		"  ",
+
+		"  Zone,",
+		"    SPACE2-1,                !- Name",
+		"    0,                       !- Direction of Relative North {deg}",
+		"    0,                       !- X Origin {m}",
+		"    0,                       !- Y Origin {m}",
+		"    0,                       !- Z Origin {m}",
+		"    1,                       !- Type",
+		"    1,                       !- Multiplier",
+		"    2.438400269,             !- Ceiling Height {m}",
+		"    103.311355591;           !- Volume {m3}",
+
+		"ZoneControl:Thermostat,",
+		"  SPACE2-1 Thermostat,                                     !- Name",
+		"  SPACE2-1,                                                !- Zone or ZoneList Name",
+		"  HVACTemplate-Always 4,                                   !- Control Type Schedule Name",
+		"  ThermostatSetpoint:DualSetpoint,                         !- Control Object Type",
+		"  All Zones Dual SP Control;                               !- Control Name",
+
+		"ZoneHVAC:EquipmentConnections,",
+		"  SPACE2-1,                                                !- Zone Name",
+		"  SPACE2-1 Equipment,                                      !- Zone Conditioning Equipment List Name",
+		"  SPACE2-1 Zone Inlet Node,                                !- Zone Air Inlet Node or NodeList Name",
+		"  SPACE2-1 Zone Exhaust Node,                              !- Zone Air Exhaust Node or NodeList Name",
+		"  SPACE2-1 Zone Air Node,                                  !- Zone Air Node Name",
+		"  SPACE2-1 Return Outlet;                                  !- Zone Return Air Node Name",
+
+		"ZoneHVAC:EquipmentList,",
+		"  SPACE2-1 Equipment,                                      !- Name",
+		"  AirLoopHVAC:UnitarySystem,                               !- Zone Equipment Object Type",
+		"  Sys 2 Furnace DX Cool MultiSpd Unitary System,           !- Zone Equipment Name",
+		"  1,                                                       !- Zone Equipment Cooling Sequence",
+		"  1;                                                       !- Zone Equipment Heating or No-Load Sequence",
+
+		"ThermostatSetpoint:DualSetpoint,",
+		"  All Zones Dual SP Control,                               !- Name",
+		"  Htg-SetP-Sch,                                            !- Heating Setpoint Temperature Schedule Name",
+		"  Clg-SetP-Sch;                                            !- Cooling Setpoint Temperature Schedule Name",
+
+		"ScheduleTypeLimits,",
+		"  HVACTemplate Any Number;                                 !- Name",
+
+		"Schedule:Compact,",
+		"  HVACTemplate-Always 4,                                   !- Name",
+		"  HVACTemplate Any Number,                                 !- Schedule Type Limits Name",
+		"  Through: 12/31,                                          !- Field 1",
+		"  For: AllDays,                                            !- Field 2",
+		"  Until: 24:00,                                            !- Field 3",
+		"  4;                                                       !- Field 4",
+
+		"  Schedule:Compact,",
+		"    Htg-SetP-Sch,            !- Name",
+		"    Temperature,             !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: WeekDays CustomDay1 CustomDay2, !- Field 2",
+		"    Until: 6:00,13.0,        !- Field 3",
+		"    Until: 7:00,18.0,        !- Field 5",
+		"    Until: 21:00,23.0,       !- Field 7",
+		"    Until: 24:00,13.0,       !- Field 9",
+		"    For: WeekEnds Holiday,   !- Field 11",
+		"    Until: 24:00,13.0,       !- Field 12",
+		"    For: SummerDesignDay,    !- Field 14",
+		"    Until: 24:00,13.0,       !- Field 15",
+		"    For: WinterDesignDay,    !- Field 17",
+		"    Until: 24:00,23.0;       !- Field 18",
+
+		"! For cooling, recover 1 hr early",
+
+		"  Schedule:Compact,",
+		"    Clg-SetP-Sch,            !- Name",
+		"    Temperature,             !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: WeekDays CustomDay1 CustomDay2, !- Field 2",
+		"    Until: 7:00,32.0,        !- Field 3",
+		"    Until: 21:00,24.0,       !- Field 5",
+		"    Until: 24:00,32.0,       !- Field 7",
+		"    For: WeekEnds Holiday,   !- Field 9",
+		"    Until: 24:00,32.0,       !- Field 10",
+		"    For: SummerDesignDay,    !- Field 12",
+		"    Until: 24:00,24.0,       !- Field 13",
+		"    For: WinterDesignDay,    !- Field 15",
+		"    Until: 24:00,32.0;       !- Field 16",
+
+		"  Schedule:Compact,",
+		"    FanAvailSched,           !- Name",
+		"    Fraction,                !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: WeekDays CustomDay1 CustomDay2, !- Field 2",
+		"    Until: 7:00,0.0,         !- Field 3",
+		"    Until: 21:00,1.0,        !- Field 5",
+		"    Until: 24:00,0.0,        !- Field 7",
+		"    For: Weekends Holiday,   !- Field 9",
+		"    Until: 24:00,0.0,        !- Field 10",
+		"    For: SummerDesignDay,    !- Field 12",
+		"    Until: 24:00,1.0,        !- Field 13",
+		"    For: WinterDesignDay,    !- Field 15",
+		"    Until: 24:00,1.0;        !- Field 16",
+
+		"  Schedule:Compact,",
+		"    Min OA Sched,            !- Name",
+		"    Fraction,                !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: WeekDays CustomDay1 CustomDay2, !- Field 2",
+		"    Until: 8:00,0.0,         !- Field 3",
+		"    Until: 21:00,1.0,        !- Field 5",
+		"    Until: 24:00,0.0,        !- Field 7",
+		"    For: Weekends Holiday,   !- Field 9",
+		"    Until: 24:00,0.0,        !- Field 10",
+		"    For: SummerDesignDay,    !- Field 12",
+		"    Until: 24:00,1.0,        !- Field 13",
+		"    For: WinterDesignDay,    !- Field 15",
+		"    Until: 24:00,1.0;        !- Field 16",
+
+		"  Sizing:Parameters,",
+		"    1.2,                     !- Heating Sizing Factor",
+		"    1.2;                     !- Cooling Sizing Factor",
+
+
+		"AvailabilityManagerAssignmentList,",
+		"  Sys 2 Furnace DX Cool MultiSpd Availability Managers,    !- Name",
+		"  AvailabilityManager:Scheduled,                           !- Availability Manager Object Type",
+		"  Sys 2 Furnace DX Cool MultiSpd Availability;             !- Availability Manager Name",
+
+		"AvailabilityManager:Scheduled,",
+		"  Sys 2 Furnace DX Cool MultiSpd Availability,             !- Name",
+		"  HVACTemplate-Always 1;                                   !- Schedule Name",
+
+		"Schedule:Compact,",
+		"  HVACTemplate-Always 1,                                   !- Name",
+		"  HVACTemplate Any Number,                                 !- Schedule Type Limits Name",
+		"  Through: 12/31,                                          !- Field 1",
+		"  For: AllDays,                                            !- Field 2",
+		"  Until: 24:00,                                            !- Field 3",
+		"  1;                                                       !- Field 4",
+
+		"AirLoopHVAC:UnitarySystem,",
+		"  Sys 2 Furnace DX Cool MultiSpd Unitary System,           !- Name",
+		"  Load,                                                    !- Control Type",
+		"  SPACE2-1,                                                !- Controlling Zone or Thermostat Location",
+		"  None,                                                    !- Dehumidification Control Type",
+		"  ,                                                        !- Availability Schedule Name",
+		"  SPACE2-1 Zone Exhaust Node,                              !- Air Inlet Node Name",
+		"  SPACE2-1 Zone Inlet Node,                                !- Air Outlet Node Name",
+		"  Fan:VariableVolume,                                      !- Supply Fan Object Type",
+		"  Sys 2 Furnace DX Cool MultiSpd Supply Fan,               !- Supply Fan Name",
+		"  DrawThrough,                                             !- Fan Placement",
+		"  FanAvailSched,                                           !- Supply Air Fan Operating Mode Schedule Name",
+		"  Coil:Heating:Electric,                                   !- Heating Coil Object Type",
+		"  Sys 2 Furnace DX Cool MultiSpd Heating Coil,             !- Heating Coil Name",
+		"  1.0,                                                     !- DX Heating Coil Sizing Ratio",
+		"  Coil:Cooling:DX:MultiSpeed,                              !- Cooling Coil Object Type",
+		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil,             !- Cooling Coil Name",
+		"  ,                                                        !- Use DOAS DX Cooling Coil",
+		"  ,                                                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}",
+		"  ,                                                        !- Latent Load Control",
+		"  ,                                                        !- Supplemental Heating Coil Object Type",
+		"  ,                                                        !- Supplemental Heating Coil Name",
+		"  SupplyAirFlowRate,                                       !- Cooling Supply Air Flow Rate Method",
+		"  0.23122,                                                 !- Cooling Supply Air Flow Rate {m3/s}",
+		"  ,                                                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2",
+		"  ,                                                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate",
+		"  ,                                                        !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W",
+		"  SupplyAirFlowRate,                                       !- Heating Supply Air Flow Rate Method",
+		"  0.23122,                                                 !- Heating Supply Air Flow Rate {m3/s}",
+		"  ,                                                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2",
+		"  ,                                                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate",
+		"  ,                                                        !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W",
+		"  SupplyAirFlowRate,                                       !- No Load Supply Air Flow Rate Method",
+		"  0.23122,                                                 !- No Load Supply Air Flow Rate {m3/s}",
+		"  ,                                                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2",
+		"  ,                                                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate",
+		"  ,                                                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate",
+		"  ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W",
+		"  ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W",
+		"  Autosize,                                                !- Maximum Supply Air Temperature {C}",
+		"  21,                                                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
+		"  ,                                                        !- Outdoor Dry-Bulb Temperature Sensor Node Name",
+		"  ,                                                        !- Maximum Cycling Rate",
+		"  ,                                                        !- Heat Pump Time Constant",
+		"  ,                                                        !- Fraction of On-Cycle Power Use",
+		"  ,                                                        !- Heat Pump Fan Delay Time",
+		"  ,                                                        !- Ancilliary On-Cycle Electric Power",
+		"  ,                                                        !- Ancilliary Off-Cycle Electric Power",
+		"  ,                                                        !- Design Heat Recovery Water Flow Rate",
+		"  ,                                                        !- Maximum Temperature for Heat Recovery",
+		"  ,                                                        !- Heat Recovery Water Inlet Node Name",
+		"  ,                                                        !- Heat Recovery Water Outlet Node Name",
+		"  UnitarySystemPerformance:Multispeed,                     !- Design Specification Multispeed Object Type",
+		"  Sys 2 Furnace DX Cool MultiSpd Unitary System MultiSpeed Performance;  !- Design Specification Multispeed Object Name",
+
+		"UnitarySystemPerformance:Multispeed,",
+		"  Sys 2 Furnace DX Cool MultiSpd Unitary System MultiSpeed Performance,  !- Name",
+		"  1,                                                       !- Number of Speeds for Heating",
+		"  3,                                                       !- Number of Speeds for Cooling",
+		"  No,                                                      !- Single Mode Operation",
+		"  1.0,                                                     !- Heating Speed 1 Supply Air Flow Ratio",
+		"  0.333,                                                   !- Cooling Speed 1 Supply Air Flow Ratio",
+		"  1.0,                                                     !- Heating Speed 2 Supply Air Flow Ratio",
+		"  0.666,                                                   !- Cooling Speed 2 Supply Air Flow Ratio",
+		"  1.0,                                                     !- Heating Speed 3 Supply Air Flow Ratio",
+		"  1.0;,                                                    !- Cooling Speed 3 Supply Air Flow Ratio",
+
+		"Coil:Cooling:DX:MultiSpeed,",
+		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil,             !- Name",
+		"  ,                                                        !- Availability Schedule Name",
+		"  SPACE2-1 Zone Exhaust Node,                              !- Air Inlet Node Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil Outlet,      !- Air Outlet Node Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name",
+		"  AirCooled,                                               !- Condenser Type",
+		"  ,                                                        !- Supply Water Storage Tank Name",
+		"  ,                                                        !- Condensate Collection Water Storage Tank Name",
+		"  No,                                                      !- Apply Part Load Fraction to Speeds Greater than 1",
+		"  No,                                                      !- Apply Latent Degradation to Speeds Greater than 1",
+		"  0.0,                                                     !- Crankcase Heater Capacity {W}",
+		"  10.0,                                                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+		"  ,                                                        !- Basin Heater Capacity {W/K}",
+		"  ,                                                        !- Basin Heater Setpoint Temperature {C}",
+		"  ,                                                        !- Basin Heater Operating Schedule Name",
+		"  Electricity,                                             !- Fuel Type",
+		"  3,                                                       !- Number of Speeds",
+		"  1459.77157,                                              !- Speed 1 Gross Rated Total Cooling Capacity {W}",
+		"  0.75232,                                                 !- Speed 1 Gross Rated Sensible Heat Ratio",
+		"  3,                                                       !- Speed 1 Gross Rated Cooling COP {W/W}",
+		"  7.70720E-002,                                            !- Speed 1 Rated Air Flow Rate {m3/s}",
+		"  ,                                                        !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil Cap-FT,         !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil Cap-FF,         !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil EIR-FT,         !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil EIR-FF,         !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil PLF,            !- Speed 1 Part Load Fraction Correlation Curve Name",
+		"  0,                                                       !- Speed 1 Nominal Time for Condensate Removal to Begin",
+		"  0,                                                       !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+		"  0,                                                       !- Speed 1 Maximum Cycling Rate",
+		"  0,                                                       !- Speed 1 Latent Capacity Time Constant",
+		"  0.2,                                                     !- Speed 1 Rated Waste Heat Fraction of Power Input {dimensionless}",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil WH-FT,          !- Speed 1 Waste Heat Function of Temperature Curve Name",
+		"  ,                                                        !- Speed 1 Evaporative Condenser Effectiveness {dimensionless}",
+		"  ,                                                        !- Speed 1 Evaporative Condenser Air Flow Rate {m3/s}",
+		"  ,                                                        !- Speed 1 Rated Evaporative Condenser Pump Power Consumption {W}",
+		"  2919.54314,                                              !- Speed 2 Gross Rated Total Cooling Capacity {W}",
+		"  0.75232,                                                 !- Speed 2 Gross Rated Sensible Heat Ratio",
+		"  3,                                                       !- Speed 2 Gross Rated Cooling COP {W/W}",
+		"  0.15414,                                                 !- Speed 2 Rated Air Flow Rate {m3/s}",
+		"  ,                                                        !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil Cap-FT,         !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil Cap-FF,         !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil EIR-FT,         !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil EIR-FF,         !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil PLF,            !- Speed 2 Part Load Fraction Correlation Curve Name",
+		"  0,                                                       !- Speed 2 Nominal Time for Condensate Removal to Begin",
+		"  0,                                                       !- Speed 2 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+		"  0,                                                       !- Speed 2 Maximum Cycling Rate",
+		"  0,                                                       !- Speed 2 Latent Capacity Time Constant",
+		"  0.2,                                                     !- Speed 2 Rated Waste Heat Fraction of Power Input {dimensionless}",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil WH-FT,          !- Speed 2 Waste Heat Function of Temperature Curve Name",
+		"  ,                                                        !- Speed 2 Evaporative Condenser Effectiveness {dimensionless}",
+		"  ,                                                        !- Speed 2 Evaporative Condenser Air Flow Rate {m3/s}",
+		"  ,                                                        !- Speed 2 Rated Evaporative Condenser Pump Power Consumption {W}",
+		"  4379.31471,                                              !- Speed 3 Gross Rated Total Cooling Capacity {W}",
+		"  0.75232,                                                 !- Speed 3 Gross Rated Sensible Heat Ratio",
+		"  3,                                                       !- Speed 3 Gross Rated Cooling COP {W/W}",
+		"  0.23122,                                                 !- Speed 3 Rated Air Flow Rate {m3/s}",
+		"  ,                                                        !- Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil Cap-FT,         !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil Cap-FF,         !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil EIR-FT,         !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil EIR-FF,         !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil PLF,            !- Speed 3 Part Load Fraction Correlation Curve Name",
+		"  0,                                                       !- Speed 3 Nominal Time for Condensate Removal to Begin",
+		"  0,                                                       !- Speed 3 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+		"  0,                                                       !- Speed 3 Maximum Cycling Rate",
+		"  0,                                                       !- Speed 3 Latent Capacity Time Constant",
+		"  0.2,                                                     !- Speed 3 Rated Waste Heat Fraction of Power Input {dimensionless}",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil WH-FT,          !- Speed 3 Waste Heat Function of Temperature Curve Name",
+		"  ,                                                        !- Speed 3 Evaporative Condenser Effectiveness {dimensionless}",
+		"  ,                                                        !- Speed 3 Evaporative Condenser Air Flow Rate {m3/s}",
+		"  ;                                                        !- Speed 3 Rated Evaporative Condenser Pump Power Consumption {W}",
+
+		"Curve:Biquadratic,",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil Cap-FT,         !- Name",
+		"  0.476428E+00,                                            !- Coefficient1 Constant",
+		"  0.401147E-01,                                            !- Coefficient2 x",
+		"  0.226411E-03,                                            !- Coefficient3 x**2",
+		"  -0.827136E-03,                                           !- Coefficient4 y",
+		"  -0.732240E-05,                                           !- Coefficient5 y**2",
+		"  -0.446278E-03,                                           !- Coefficient6 x*y",
+		"  0.0,                                                     !- Minimum Value of x",
+		"  50.0,                                                    !- Maximum Value of x",
+		"  0.0,                                                     !- Minimum Value of y",
+		"  50.0,                                                    !- Maximum Value of y",
+		"  0.0,                                                     !- Minimum Curve Output",
+		"  5.0,                                                     !- Maximum Curve Output",
+		"  Temperature,                                             !- Input Unit Type for X",
+		"  Temperature,                                             !- Input Unit Type for Y",
+		"  Dimensionless;                                           !- Output Unit Type",
+
+		"Curve:Cubic,",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil Cap-FF,         !- Name",
+		"  .47278589,                                               !- Coefficient1 Constant",
+		"  1.2433415,                                               !- Coefficient2 x",
+		"  -1.0387055,                                              !- Coefficient3 x**2",
+		"  .32257813,                                               !- Coefficient4 x**3",
+		"  0.5,                                                     !- Minimum Value of x",
+		"  1.5;                                                     !- Maximum Value of x",
+
+		"Curve:Biquadratic,",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil EIR-FT,         !- Name",
+		"  0.632475E+00,                                            !- Coefficient1 Constant",
+		"  -0.121321E-01,                                           !- Coefficient2 x",
+		"  0.507773E-03,                                            !- Coefficient3 x**2",
+		"  0.155377E-01,                                            !- Coefficient4 y",
+		"  0.272840E-03,                                            !- Coefficient5 y**2",
+		"  -0.679201E-03,                                           !- Coefficient6 x*y",
+		"  0.0,                                                     !- Minimum Value of x",
+		"  50.0,                                                    !- Maximum Value of x",
+		"  0.0,                                                     !- Minimum Value of y",
+		"  50.0,                                                    !- Maximum Value of y",
+		"  0.0,                                                     !- Minimum Curve Output",
+		"  5.0,                                                     !- Maximum Curve Output",
+		"  Temperature,                                             !- Input Unit Type for X",
+		"  Temperature,                                             !- Input Unit Type for Y",
+		"  Dimensionless;                                           !- Output Unit Type",
+
+		"Curve:Cubic,",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil EIR-FF,         !- Name",
+		"  .47278589,                                               !- Coefficient1 Constant",
+		"  1.2433415,                                               !- Coefficient2 x",
+		"  -1.0387055,                                              !- Coefficient3 x**2",
+		"  .32257813,                                               !- Coefficient4 x**3",
+		"  0.5,                                                     !- Minimum Value of x",
+		"  1.5;                                                     !- Maximum Value of x",
+
+		"Curve:Quadratic,",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil PLF,            !- Name",
+		"  0.85,                                                    !- Coefficient1 Constant",
+		"  0.15,                                                    !- Coefficient2 x",
+		"  0,                                                       !- Coefficient3 x**2",
+		"  0,                                                       !- Minimum Value of x",
+		"  1;                                                       !- Maximum Value of x",
+
+		"Curve:Biquadratic,",
+		"  Sys 2 Furnace DX Cool MultiSpd Cool Coil WH-FT,          !- Name",
+		"  1.0,                                                     !- Coefficient1 Constant",
+		"  0.0,                                                     !- Coefficient2 x",
+		"  0.0,                                                     !- Coefficient3 x**2",
+		"  0.0,                                                     !- Coefficient4 y",
+		"  0.0,                                                     !- Coefficient5 y**2",
+		"  0.0,                                                     !- Coefficient6 x*y",
+		"  0,                                                       !- Minimum Value of x",
+		"  50,                                                      !- Maximum Value of x",
+		"  0,                                                       !- Minimum Value of y",
+		"  50,                                                      !- Maximum Value of y",
+		"  ,                                                        !- Minimum Curve Output",
+		"  ,                                                        !- Maximum Curve Output",
+		"  Temperature,                                             !- Input Unit Type for X",
+		"  Temperature,                                             !- Input Unit Type for Y",
+		"  Dimensionless;                                           !- Output Unit Type",
+
+		"OutdoorAir:Node,",
+		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil Condenser Inlet,  !- Name",
+		"  -1;                                                      !- Height Above Ground",
+
+		"Coil:Heating:Electric,",
+		"  Sys 2 Furnace DX Cool MultiSpd Heating Coil,             !- Name",
+		"  ,                                                        !- Availability Schedule Name",
+		"  1,                                                       !- Efficiency",
+		"  0.23122,                                                 !- Nominal Capacity of the Coil {W}",
+		"  Sys 2 Furnace DX Cool MultiSpd Cooling Coil Outlet,      !- Air Inlet Node Name",
+		"  Sys 2 Furnace DX Cool MultiSpd Heating Coil Outlet,      !- Air Outlet Node Name",
+		"  ;                                                        !- Coil Temp Setpoint Node",
+
+		"Fan:VariableVolume,",
+		"  Sys 2 Furnace DX Cool MultiSpd Supply Fan,               !- Name",
+		"  HVACTemplate-Always 1,                                   !- Availability Schedule Name",
+		"  0.7,                                                     !- Fan Efficiency",
+		"  600,                                                     !- Pressure Rise {Pa}",
+		"  0.23122,                                                 !- Maximum Flow Rate {m3/s}",
+		"  Fraction,                                                !- Fan Power Minimum Flow Rate Input Method",
+		"  0.0,                                                     !- Fan Power Minimum Flow Fraction",
+		"  ,                                                        !- Fan Power Minimum Air Flow Rate {m3/s}",
+		"  0.9,                                                     !- Motor Efficiency",
+		"  1,                                                       !- Motor in Airstream Fraction",
+		"  0.0015302446,                                            !- Fan Power Coefficient 1",
+		"  0.0052080574,                                            !- Fan Power Coefficient 2",
+		"  1.1086242,                                               !- Fan Power Coefficient 3",
+		"  -0.11635563,                                             !- Fan Power Coefficient 4",
+		"  0,                                                       !- Fan Power Coefficient 5",
+		"  Sys 2 Furnace DX Cool MultiSpd Heating Coil Outlet,      !- Air Inlet Node Name",
+		"  SPACE2-1 Zone Inlet Node;                                !- Air Outlet Node Name",
+
+		"OutdoorAir:NodeList,",
+		"  Sys 2 Furnace DX Cool MultiSpd Outdoor Air Inlet;        !- Node or NodeList Name 1",
+
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+
+	NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+	MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+	ProcessScheduleInput();
+
+	GetZoneData( ErrorsFound ); // read zone data
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+	GetZoneEquipmentData(); // read zone equipment
+
+	GetUnitarySystemInput(); // get input
+
+	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
+	EXPECT_EQ( UnitarySystem( 1 ).UnitarySystemType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
+
+	InletNode = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
+	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
+	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
+
+	AirLoopNum = ZoneEquipConfig( 1 ).AirLoopNum;
+	HeatingLoad = false;
+	CoolingLoad = false;
+
+	// zone predicted load is assume to be heating and the unitary system zone equipment
+	// inlet and outlet air conditions were set for heating 
+	HeatingLoad = true;
+	// set up zone equipment inlet node condtions
+	Node( InletNode ).Temp = 17.57;
+	Node( InletNode ).HumRat = 0.007;
+	Node( InletNode ).Enthalpy = PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat );
+	Node( InletNode ).MassFlowRate = 0.25;
+	// set  zone equipment outlet node conditions
+	Node( OutletNode ).Temp = 21.1;
+	Node( OutletNode ).HumRat = 0.007;
+	Node( OutletNode ).Enthalpy = PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat );
+	Node( OutletNode ).MassFlowRate = 0.25;
+	// set zone conditions
+	Node( ControlZoneNum ).Temp = 23.0;
+	Node( ControlZoneNum ).HumRat = 0.0070;
+	Node( ControlZoneNum ).Enthalpy = PsyHFnTdbW( Node( ControlZoneNum ).Temp, Node( ControlZoneNum ).HumRat );
+
+	// calculate the "Unitary System Total Cooling/Heating Rate" report variables
+	ReportUnitarySystem( UnitarySysNum, AirLoopNum );
+	EXPECT_NEAR( 483.5, UnitarySystem( UnitarySysNum ).TotCoolEnergyRate, 1.0 );
+	EXPECT_EQ( 0.0, UnitarySystem( UnitarySysNum ).TotHeatEnergyRate );
+
+}
+
+	
 TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
 	std::string const idf_objects = delimited_string( {
@@ -2721,7 +3179,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
 
 	SimulationManager::GetProjectData();
-
+	createFacilityElectricPowerServiceObject();
 	DataGlobals::BeginSimFlag = true;
 	DataGlobals::DoingSizing = true;
 	SizingManager::ManageSizing();
@@ -2749,7 +3207,6 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 	ASSERT_EQ( UnitarySystem( 1 ).DesignCoolingCapacity, DXCoil( UnitarySystem( 1 ).CoolingCoilIndex ).MSRatedTotCap( UnitarySystem( 1 ).NumOfSpeedCooling ) );
 
 }
-
 
 TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 
