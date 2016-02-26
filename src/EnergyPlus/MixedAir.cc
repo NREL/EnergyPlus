@@ -3053,12 +3053,12 @@ namespace MixedAir {
 
 				// Make sure all zones with mechanical ventilation are on the correct air loop
 				TempMechVentArrayCounter = 0;
+				int AirLoopZoneInfoSize = static_cast <int> ( AirLoopZoneInfo.size() );
 				for ( NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone ) {
 					ZoneNum = vent_mech.Zone( NumMechVentZone );
 					auto const & zone( Zone( ZoneNum ) );
 					FoundZone = false;
-
-					if ( AirLoopZoneInfo.size() >= AirLoopNum ){
+					if ( AirLoopZoneInfoSize >= AirLoopNum ){
 						for ( AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo( AirLoopNum ).NumZones; ++AirLoopZoneInfoZoneNum ) {
 							NumZone = AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( AirLoopZoneInfoZoneNum );
 							if ( ZoneNum == NumZone ) {
@@ -3126,7 +3126,7 @@ namespace MixedAir {
 				}
 
 				// Check to see if any zones on an air loop are not accounted for by a mechanical ventilation object
-				if ( AirLoopZoneInfo.size() >= AirLoopNum ){
+				if ( AirLoopZoneInfoSize >= AirLoopNum ){
 					for ( AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo( AirLoopNum ).NumZones; ++AirLoopZoneInfoZoneNum ) {
 						NumZone = AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( AirLoopZoneInfoZoneNum );
 						FoundAreaZone = false;
