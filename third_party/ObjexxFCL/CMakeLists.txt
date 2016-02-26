@@ -5,78 +5,76 @@ if (UNIX)
 endif()
 
 set(src
-  src/ObjexxFCL/Array1A.fwd.hh
-  src/ObjexxFCL/Array1A.hh
-  src/ObjexxFCL/Array1.all.fwd.hh
-  src/ObjexxFCL/Array1.all.hh
-  src/ObjexxFCL/Array1D.fwd.hh
-  src/ObjexxFCL/Array1D.hh
-  src/ObjexxFCL/Array1.fwd.hh
-  src/ObjexxFCL/Array1.hh
-  src/ObjexxFCL/Array1.Project.MArray.hh
-  src/ObjexxFCL/Array1S.fwd.hh
-  src/ObjexxFCL/Array1S.hh
-  src/ObjexxFCL/Array1S.Project.MArray.hh
-  src/ObjexxFCL/Array2A.fwd.hh
-  src/ObjexxFCL/Array2A.hh
-  src/ObjexxFCL/Array2.all.fwd.hh
-  src/ObjexxFCL/Array2.all.hh
-  src/ObjexxFCL/Array2D.fwd.hh
-  src/ObjexxFCL/Array2D.hh
-  src/ObjexxFCL/Array2.fwd.hh
-  src/ObjexxFCL/Array2.hh
-  src/ObjexxFCL/Array2.Project.MArray.hh
-  src/ObjexxFCL/Array2S.fwd.hh
-  src/ObjexxFCL/Array2S.hh
-  src/ObjexxFCL/Array2S.Project.MArray.hh
-  src/ObjexxFCL/Array3A.fwd.hh
-  src/ObjexxFCL/Array3A.hh
-  src/ObjexxFCL/Array3.all.fwd.hh
-  src/ObjexxFCL/Array3.all.hh
-  src/ObjexxFCL/Array3D.fwd.hh
-  src/ObjexxFCL/Array3D.hh
-  src/ObjexxFCL/Array3.fwd.hh
-  src/ObjexxFCL/Array3.hh
-  src/ObjexxFCL/Array3S.fwd.hh
-  src/ObjexxFCL/Array3S.hh
-  src/ObjexxFCL/Array4A.fwd.hh
-  src/ObjexxFCL/Array4A.hh
-  src/ObjexxFCL/Array4.all.fwd.hh
-  src/ObjexxFCL/Array4.all.hh
-  src/ObjexxFCL/Array4D.fwd.hh
-  src/ObjexxFCL/Array4D.hh
-  src/ObjexxFCL/Array4.fwd.hh
-  src/ObjexxFCL/Array4.hh
-  src/ObjexxFCL/Array4S.fwd.hh
-  src/ObjexxFCL/Array4S.hh
-  src/ObjexxFCL/Array5A.fwd.hh
-  src/ObjexxFCL/Array5A.hh
-  src/ObjexxFCL/Array5.all.fwd.hh
-  src/ObjexxFCL/Array5.all.hh
-  src/ObjexxFCL/Array5D.fwd.hh
-  src/ObjexxFCL/Array5D.hh
-  src/ObjexxFCL/Array5.fwd.hh
-  src/ObjexxFCL/Array5.hh
-  src/ObjexxFCL/Array5S.fwd.hh
-  src/ObjexxFCL/Array5S.hh
-  src/ObjexxFCL/Array6A.fwd.hh
-  src/ObjexxFCL/Array6A.hh
-  src/ObjexxFCL/Array6.all.fwd.hh
-  src/ObjexxFCL/Array6.all.hh
-  src/ObjexxFCL/Array6D.fwd.hh
-  src/ObjexxFCL/Array6D.hh
-  src/ObjexxFCL/Array6.fwd.hh
-  src/ObjexxFCL/Array6.hh
-  src/ObjexxFCL/Array6S.fwd.hh
-  src/ObjexxFCL/Array6S.hh
+  src/ObjexxFCL/align.hh
+  src/ObjexxFCL/AlignedAllocator.hh
   src/ObjexxFCL/Array.all.fwd.hh
   src/ObjexxFCL/Array.all.hh
   src/ObjexxFCL/Array.functions.hh
   src/ObjexxFCL/Array.fwd.hh
   src/ObjexxFCL/Array.hh
+  src/ObjexxFCL/array.iterator.hh
+  src/ObjexxFCL/Array1.all.fwd.hh
+  src/ObjexxFCL/Array1.all.hh
+  src/ObjexxFCL/Array1.fwd.hh
+  src/ObjexxFCL/Array1.hh
+  src/ObjexxFCL/Array1A.fwd.hh
+  src/ObjexxFCL/Array1A.hh
+  src/ObjexxFCL/Array1D.fwd.hh
+  src/ObjexxFCL/Array1D.hh
+  src/ObjexxFCL/Array1S.fwd.hh
+  src/ObjexxFCL/Array1S.hh
+  src/ObjexxFCL/Array2.all.fwd.hh
+  src/ObjexxFCL/Array2.all.hh
+  src/ObjexxFCL/Array2.fwd.hh
+  src/ObjexxFCL/Array2.hh
+  src/ObjexxFCL/Array2A.fwd.hh
+  src/ObjexxFCL/Array2A.hh
+  src/ObjexxFCL/Array2D.fwd.hh
+  src/ObjexxFCL/Array2D.hh
+  src/ObjexxFCL/Array2S.fwd.hh
+  src/ObjexxFCL/Array2S.hh
+  src/ObjexxFCL/Array3.all.fwd.hh
+  src/ObjexxFCL/Array3.all.hh
+  src/ObjexxFCL/Array3.fwd.hh
+  src/ObjexxFCL/Array3.hh
+  src/ObjexxFCL/Array3A.fwd.hh
+  src/ObjexxFCL/Array3A.hh
+  src/ObjexxFCL/Array3D.fwd.hh
+  src/ObjexxFCL/Array3D.hh
+  src/ObjexxFCL/Array3S.fwd.hh
+  src/ObjexxFCL/Array3S.hh
+  src/ObjexxFCL/Array4.all.fwd.hh
+  src/ObjexxFCL/Array4.all.hh
+  src/ObjexxFCL/Array4.fwd.hh
+  src/ObjexxFCL/Array4.hh
+  src/ObjexxFCL/Array4A.fwd.hh
+  src/ObjexxFCL/Array4A.hh
+  src/ObjexxFCL/Array4D.fwd.hh
+  src/ObjexxFCL/Array4D.hh
+  src/ObjexxFCL/Array4S.fwd.hh
+  src/ObjexxFCL/Array4S.hh
+  src/ObjexxFCL/Array5.all.fwd.hh
+  src/ObjexxFCL/Array5.all.hh
+  src/ObjexxFCL/Array5.fwd.hh
+  src/ObjexxFCL/Array5.hh
+  src/ObjexxFCL/Array5A.fwd.hh
+  src/ObjexxFCL/Array5A.hh
+  src/ObjexxFCL/Array5D.fwd.hh
+  src/ObjexxFCL/Array5D.hh
+  src/ObjexxFCL/Array5S.fwd.hh
+  src/ObjexxFCL/Array5S.hh
+  src/ObjexxFCL/Array6.all.fwd.hh
+  src/ObjexxFCL/Array6.all.hh
+  src/ObjexxFCL/Array6.fwd.hh
+  src/ObjexxFCL/Array6.hh
+  src/ObjexxFCL/Array6A.fwd.hh
+  src/ObjexxFCL/Array6A.hh
+  src/ObjexxFCL/Array6D.fwd.hh
+  src/ObjexxFCL/Array6D.hh
+  src/ObjexxFCL/Array6S.fwd.hh
+  src/ObjexxFCL/Array6S.hh
   src/ObjexxFCL/ArrayInitializer.fwd.hh
   src/ObjexxFCL/ArrayInitializer.hh
-  src/ObjexxFCL/array.iterator.hh
   src/ObjexxFCL/ArrayRS.fwd.hh
   src/ObjexxFCL/ArrayRS.hh
   src/ObjexxFCL/ArrayS.all.fwd.hh
@@ -95,14 +93,16 @@ set(src
   src/ObjexxFCL/byte.hh
   src/ObjexxFCL/CArray.fwd.hh
   src/ObjexxFCL/CArray.hh
+  src/ObjexxFCL/CArrayA.fwd.hh
+  src/ObjexxFCL/CArrayA.hh
   src/ObjexxFCL/CArrayP.fwd.hh
   src/ObjexxFCL/CArrayP.hh
   src/ObjexxFCL/char.constants.cc
   src/ObjexxFCL/char.constants.hh
   src/ObjexxFCL/char.functions.cc
   src/ObjexxFCL/char.functions.hh
-  src/ObjexxFCL/ChunkExponent.hh
   src/ObjexxFCL/Chunk.hh
+  src/ObjexxFCL/ChunkExponent.hh
   src/ObjexxFCL/ChunkVector.fwd.hh
   src/ObjexxFCL/ChunkVector.hh
   src/ObjexxFCL/Cstring.cc
@@ -121,9 +121,9 @@ set(src
   src/ObjexxFCL/Format.hh
   src/ObjexxFCL/FormattedIO.hh
   src/ObjexxFCL/gio.cc
+  src/ObjexxFCL/gio.hh
   src/ObjexxFCL/gio_Fmt.fwd.hh
   src/ObjexxFCL/gio_Fmt.hh
-  src/ObjexxFCL/gio.hh
   src/ObjexxFCL/GlobalStreams.cc
   src/ObjexxFCL/GlobalStreams.hh
   src/ObjexxFCL/Index.cc
@@ -141,9 +141,13 @@ set(src
   src/ObjexxFCL/IOFlags.cc
   src/ObjexxFCL/IOFlags.fwd.hh
   src/ObjexxFCL/IOFlags.hh
+  src/ObjexxFCL/MArray.all.fwd.hh
+  src/ObjexxFCL/MArray.all.hh
+  src/ObjexxFCL/MArray.functions.hh
+  src/ObjexxFCL/MArray.fwd.hh
+  src/ObjexxFCL/MArray.hh
   src/ObjexxFCL/MArray1.fwd.hh
   src/ObjexxFCL/MArray1.hh
-  src/ObjexxFCL/MArray1.Project.MArray.hh
   src/ObjexxFCL/MArray2.fwd.hh
   src/ObjexxFCL/MArray2.hh
   src/ObjexxFCL/MArray3.fwd.hh
@@ -154,13 +158,9 @@ set(src
   src/ObjexxFCL/MArray5.hh
   src/ObjexxFCL/MArray6.fwd.hh
   src/ObjexxFCL/MArray6.hh
-  src/ObjexxFCL/MArray.all.fwd.hh
-  src/ObjexxFCL/MArray.all.hh
-  src/ObjexxFCL/MArray.functions.hh
-  src/ObjexxFCL/MArray.fwd.hh
-  src/ObjexxFCL/MArray.hh
   src/ObjexxFCL/MArrayR.fwd.hh
   src/ObjexxFCL/MArrayR.hh
+  src/ObjexxFCL/member.functions.hh
   src/ObjexxFCL/noexcept.hh
   src/ObjexxFCL/numeric.cc
   src/ObjexxFCL/numeric.hh
@@ -228,19 +228,21 @@ set(src
 )
 
 set( test_src
+  tst/unit/Array.unit.cc
   tst/unit/Array1.unit.cc
   tst/unit/Array2.unit.cc
   tst/unit/Array3.unit.cc
   tst/unit/Array4.unit.cc
   tst/unit/Array5.unit.cc
   tst/unit/Array6.unit.cc
+  tst/unit/ArrayInitializer.unit.cc
   tst/unit/ArrayS.unit.cc
-  tst/unit/Array.unit.cc
   tst/unit/Backspace.unit.cc
   tst/unit/bit.unit.cc
   tst/unit/byte.unit.cc
-  tst/unit/CArrayP.unit.cc
   tst/unit/CArray.unit.cc
+  tst/unit/CArrayA.unit.cc
+  tst/unit/CArrayP.unit.cc
   tst/unit/char.functions.unit.cc
   tst/unit/Chunk.unit.cc
   tst/unit/ChunkVector.unit.cc
@@ -251,11 +253,12 @@ set( test_src
   tst/unit/fmt.unit.cc
   tst/unit/gio.unit.cc
   tst/unit/GlobalStreams.unit.cc
+  tst/unit/Index.unit.cc
   tst/unit/IndexRange.unit.cc
   tst/unit/IndexSlice.unit.cc
-  tst/unit/Index.unit.cc
   tst/unit/main.cc
   tst/unit/MArray.unit.cc
+  tst/unit/member.functions.unit.cc
   tst/unit/numeric.unit.cc
   tst/unit/ObjexxFCL.unit.hh
   tst/unit/Optional.unit.cc
@@ -264,6 +267,7 @@ set( test_src
   tst/unit/Reference.Optional.unit.cc
   tst/unit/Reference.unit.cc
   tst/unit/Required.unit.cc
+  tst/unit/Sticky.unit.cc
   tst/unit/Stream.unit.cc
   tst/unit/string.functions.unit.cc
   tst/unit/TypeTraits.unit.cc

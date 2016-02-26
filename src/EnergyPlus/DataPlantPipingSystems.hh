@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataPlantPipingSystems_hh_INCLUDED
 #define DataPlantPipingSystems_hh_INCLUDED
 
@@ -165,21 +223,6 @@ namespace DataPlantPipingSystems {
 			Beta( 0.0 )
 		{}
 
-		// Member Constructor
-		BaseCell(
-			Real64 const Temperature, // C
-			Real64 const Temperature_PrevIteration, // C
-			Real64 const Temperature_PrevTimeStep, // C
-			Real64 const Beta, // K/W
-			BaseThermalPropertySet const & Properties
-		) :
-			Temperature( Temperature ),
-			Temperature_PrevIteration( Temperature_PrevIteration ),
-			Temperature_PrevTimeStep( Temperature_PrevTimeStep ),
-			Beta( Beta ),
-			Properties( Properties )
-		{}
-
 	};
 
 	struct RadialCellInformation // : Inherits BaseCell
@@ -192,19 +235,6 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		RadialCellInformation()
-		{}
-
-		// Member Constructor
-		RadialCellInformation(
-			BaseCell const & MyBase,
-			Real64 const RadialCentroid,
-			Real64 const InnerRadius,
-			Real64 const OuterRadius
-		) :
-			MyBase( MyBase ),
-			RadialCentroid( RadialCentroid ),
-			InnerRadius( InnerRadius ),
-			OuterRadius( OuterRadius )
 		{}
 
 	};
@@ -221,19 +251,6 @@ namespace DataPlantPipingSystems {
 		FluidCellInformation()
 		{}
 
-		// Member Constructor
-		FluidCellInformation(
-			BaseCell const & MyBase,
-			Real64 const PipeInnerRadius,
-			Real64 const Volume,
-			ExtendedFluidProperties const & Properties
-		) :
-			MyBase( MyBase ),
-			PipeInnerRadius( PipeInnerRadius ),
-			Volume( Volume ),
-			Properties( Properties )
-		{}
-
 	};
 
 	struct CartesianPipeCellInformation // Specialized cell information only used by cells which contain pipes
@@ -248,23 +265,6 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		CartesianPipeCellInformation()
-		{}
-
-		// Member Constructor
-		CartesianPipeCellInformation(
-			Array1< RadialCellInformation > const & Soil,
-			RadialCellInformation const & Insulation,
-			RadialCellInformation const & Pipe,
-			FluidCellInformation const & Fluid,
-			Real64 const RadialSliceWidth,
-			Real64 const InterfaceVolume
-		) :
-			Soil( Soil ),
-			Insulation( Insulation ),
-			Pipe( Pipe ),
-			Fluid( Fluid ),
-			RadialSliceWidth( RadialSliceWidth ),
-			InterfaceVolume( InterfaceVolume )
 		{}
 
 	};
@@ -422,19 +422,6 @@ namespace DataPlantPipingSystems {
 		GridRegion()
 		{}
 
-		// Member Constructor
-		GridRegion(
-			Real64 const Min,
-			Real64 const Max,
-			int const RegionType, // From Enum: RegionType
-			Array1< Real64 > const & CellWidths
-		) :
-			Min( Min ),
-			Max( Max ),
-			RegionType( RegionType ),
-			CellWidths( CellWidths )
-		{}
-
 	};
 
 	struct TempGridRegionData
@@ -501,21 +488,6 @@ namespace DataPlantPipingSystems {
 		NeighborInformation()
 		{}
 
-		// Member Constructor
-		NeighborInformation(
-			Real64 const ThisCentroidToNeighborCentroid,
-			Real64 const ThisCentroidToNeighborWall,
-			Real64 const ThisWallToNeighborCentroid,
-			Real64 const ConductionResistance,
-			Point3DInteger const & NeighborCellIndeces
-		) :
-			ThisCentroidToNeighborCentroid( ThisCentroidToNeighborCentroid ),
-			ThisCentroidToNeighborWall( ThisCentroidToNeighborWall ),
-			ThisWallToNeighborCentroid( ThisWallToNeighborCentroid ),
-			ConductionResistance( ConductionResistance ),
-			NeighborCellIndeces( NeighborCellIndeces )
-		{}
-
 	};
 
 	struct RadialSizing
@@ -528,15 +500,6 @@ namespace DataPlantPipingSystems {
 		RadialSizing()
 		{}
 
-		// Member Constructor
-		RadialSizing(
-			Real64 const InnerDia,
-			Real64 const OuterDia
-		) :
-			InnerDia( InnerDia ),
-			OuterDia( OuterDia )
-		{}
-
 	};
 
 	struct DirectionNeighbor_Dictionary
@@ -547,15 +510,6 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		DirectionNeighbor_Dictionary()
-		{}
-
-		// Member Constructor
-		DirectionNeighbor_Dictionary(
-			int const Direction, // From Enum: Direction
-			NeighborInformation const & Value
-		) :
-			Direction( Direction ),
-			Value( Value )
 		{}
 
 	};
@@ -581,41 +535,6 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		CartesianCell()
-		{}
-
-		// Member Constructor
-		CartesianCell(
-			BaseCell const & MyBase,
-			int const X_index,
-			int const Y_index,
-			int const Z_index,
-			Real64 const X_min,
-			Real64 const X_max,
-			Real64 const Y_min,
-			Real64 const Y_max,
-			Real64 const Z_min,
-			Real64 const Z_max,
-			Point3DReal const & Centroid,
-			int const CellType, // From Enum: CellType
-			int const PipeIndex,
-			Array1< DirectionNeighbor_Dictionary > const & NeighborInformation,
-			CartesianPipeCellInformation const & PipeCellData
-		) :
-			MyBase( MyBase ),
-			X_index( X_index ),
-			Y_index( Y_index ),
-			Z_index( Z_index ),
-			X_min( X_min ),
-			X_max( X_max ),
-			Y_min( Y_min ),
-			Y_max( Y_max ),
-			Z_min( Z_min ),
-			Z_max( Z_max ),
-			Centroid( Centroid ),
-			CellType( CellType ),
-			PipeIndex( PipeIndex ),
-			NeighborInformation( NeighborInformation ),
-			PipeCellData( PipeCellData )
 		{}
 
 	};
@@ -661,17 +580,6 @@ namespace DataPlantPipingSystems {
 			GeometricSeriesCoefficient( 0.0 )
 		{}
 
-		// Member Constructor
-		DistributionStructure(
-			int const MeshDistribution, // From Enum: MeshDistribution
-			int const RegionMeshCount,
-			Real64 const GeometricSeriesCoefficient
-		) :
-			MeshDistribution( MeshDistribution ),
-			RegionMeshCount( RegionMeshCount ),
-			GeometricSeriesCoefficient( GeometricSeriesCoefficient )
-		{}
-
 	};
 
 	struct MeshProperties
@@ -683,17 +591,6 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		MeshProperties()
-		{}
-
-		// Member Constructor
-		MeshProperties(
-			DistributionStructure const & X,
-			DistributionStructure const & Y,
-			DistributionStructure const & Z
-		) :
-			X( X ),
-			Y( Y ),
-			Z( Z )
 		{}
 
 	};
@@ -712,19 +609,6 @@ namespace DataPlantPipingSystems {
 			MaximumTemperatureLimit( 1000.0 ),
 			Convergence_CurrentToPrevIteration( 0.0 ),
 			MaxIterationsPerTS( 0 )
-		{}
-
-		// Member Constructor
-		SimulationControl(
-			Real64 const MinimumTemperatureLimit,
-			Real64 const MaximumTemperatureLimit,
-			Real64 const Convergence_CurrentToPrevIteration,
-			int const MaxIterationsPerTS
-		) :
-			MinimumTemperatureLimit( MinimumTemperatureLimit ),
-			MaximumTemperatureLimit( MaximumTemperatureLimit ),
-			Convergence_CurrentToPrevIteration( Convergence_CurrentToPrevIteration ),
-			MaxIterationsPerTS( MaxIterationsPerTS )
 		{}
 
 	};
@@ -763,35 +647,6 @@ namespace DataPlantPipingSystems {
 			BasementFloorYIndex( -1 )
 		{}
 
-		// Member Constructor
-		BasementZoneInfo(
-			Real64 const Depth, // m
-			Real64 const Width, // m
-			Real64 const Length, // m
-			bool const ShiftPipesByWidth,
-			std::string const & WallBoundaryOSCMName,
-			int const WallBoundaryOSCMIndex,
-			std::string const & FloorBoundaryOSCMName,
-			int const FloorBoundaryOSCMIndex,
-			Array1_int const & WallSurfacePointers,
-			Array1_int const & FloorSurfacePointers,
-			int const BasementWallXIndex,
-			int const BasementFloorYIndex
-		) :
-			Depth( Depth ),
-			Width( Width ),
-			Length( Length ),
-			ShiftPipesByWidth( ShiftPipesByWidth ),
-			WallBoundaryOSCMName( WallBoundaryOSCMName ),
-			WallBoundaryOSCMIndex( WallBoundaryOSCMIndex ),
-			FloorBoundaryOSCMName( FloorBoundaryOSCMName ),
-			FloorBoundaryOSCMIndex( FloorBoundaryOSCMIndex ),
-			WallSurfacePointers( WallSurfacePointers ),
-			FloorSurfacePointers( FloorSurfacePointers ),
-			BasementWallXIndex( BasementWallXIndex ),
-			BasementFloorYIndex( BasementFloorYIndex )
-		{}
-
 	};
 
 	struct DirectionReal_Dictionary
@@ -804,15 +659,6 @@ namespace DataPlantPipingSystems {
 		DirectionReal_Dictionary() :
 			Direction( 0 ),
 			Value( 0.0 )
-		{}
-
-		// Member Constructor
-		DirectionReal_Dictionary(
-			int const Direction, // From Enum: Direction
-			Real64 const Value
-		) :
-			Direction( Direction ),
-			Value( Value )
 		{}
 
 	};
@@ -844,31 +690,6 @@ namespace DataPlantPipingSystems {
 			AverageBasementWallTemperature( 0.0 )
 		{}
 
-		// Member Constructor
-		ReportingInformation(
-			Array1< DirectionReal_Dictionary > const & SurfaceHeatTransfer,
-			Real64 const TotalBoundaryHeatTransfer,
-			Real64 const EnergyStoredInCells,
-			Real64 const AverageSurfaceTemperature,
-			Real64 const PipeCircuitHeatTransferMCpDT,
-			Real64 const PipeCircuitHeatTransferUADT,
-			Real64 const BasementWallHeatTransfer,
-			Real64 const BasementFloorHeatTransfer,
-			Real64 const AverageBasementFloorTemperature,
-			Real64 const AverageBasementWallTemperature
-		) :
-			SurfaceHeatTransfer( SurfaceHeatTransfer ),
-			TotalBoundaryHeatTransfer( TotalBoundaryHeatTransfer ),
-			EnergyStoredInCells( EnergyStoredInCells ),
-			AverageSurfaceTemperature( AverageSurfaceTemperature ),
-			PipeCircuitHeatTransferMCpDT( PipeCircuitHeatTransferMCpDT ),
-			PipeCircuitHeatTransferUADT( PipeCircuitHeatTransferUADT ),
-			BasementWallHeatTransfer( BasementWallHeatTransfer ),
-			BasementFloorHeatTransfer( BasementFloorHeatTransfer ),
-			AverageBasementFloorTemperature( AverageBasementFloorTemperature ),
-			AverageBasementWallTemperature( AverageBasementWallTemperature )
-		{}
-
 	};
 
 	struct MeshPartitions
@@ -880,17 +701,6 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		MeshPartitions()
-		{}
-
-		// Member Constructor
-		MeshPartitions(
-			Array1< MeshPartition > const & X,
-			Array1< MeshPartition > const & Y,
-			Array1< MeshPartition > const & Z
-		) :
-			X( X ),
-			Y( Y ),
-			Z( Z )
 		{}
 
 	};
@@ -907,17 +717,6 @@ namespace DataPlantPipingSystems {
 			Theta_liq( 0.3 ),
 			Theta_sat( 0.5 ),
 			GroundCoverCoefficient( 0.408 )
-		{}
-
-		// Member Constructor
-		MoistureInfo(
-			Real64 const Theta_liq, // volumetric moisture content of the soil
-			Real64 const Theta_sat, // volumetric moisture content of soil at saturation
-			Real64 const GroundCoverCoefficient
-		) :
-			Theta_liq( Theta_liq ),
-			Theta_sat( Theta_sat ),
-			GroundCoverCoefficient( GroundCoverCoefficient )
 		{}
 
 	};
@@ -944,25 +743,6 @@ namespace DataPlantPipingSystems {
 			CurWindSpeed( 2.6 ),
 			CurIncidentSolar( 0.0 ),
 			CurRelativeHumidity( 100.0 )
-		{}
-
-		// Member Constructor
-		CurSimConditionsInfo(
-			Real64 const PrevSimTimeSeconds,
-			Real64 const CurSimTimeSeconds,
-			Real64 const CurSimTimeStepSize,
-			Real64 const CurAirTemp,
-			Real64 const CurWindSpeed,
-			Real64 const CurIncidentSolar,
-			Real64 const CurRelativeHumidity
-		) :
-			PrevSimTimeSeconds( PrevSimTimeSeconds ),
-			CurSimTimeSeconds( CurSimTimeSeconds ),
-			CurSimTimeStepSize( CurSimTimeStepSize ),
-			CurAirTemp( CurAirTemp ),
-			CurWindSpeed( CurWindSpeed ),
-			CurIncidentSolar( CurIncidentSolar ),
-			CurRelativeHumidity( CurRelativeHumidity )
 		{}
 
 	};
@@ -996,31 +776,6 @@ namespace DataPlantPipingSystems {
 			FluidHeatLoss( 0.0 ),
 			PipeCellCoordinatesSet( false ),
 			IsActuallyPartOfAHorizontalTrench( false )
-		{}
-
-		// Member Constructor
-		PipeSegmentInfo(
-			std::string const & Name,
-			PointF const & PipeLocation,
-			Point const & PipeCellCoordinates,
-			int const FlowDirection, // From Enum: SegmentFlow
-			int const ParentCircuitIndex,
-			Real64 const InletTemperature,
-			Real64 const OutletTemperature,
-			Real64 const FluidHeatLoss,
-			bool const PipeCellCoordinatesSet,
-			bool const IsActuallyPartOfAHorizontalTrench
-		) :
-			Name( Name ),
-			PipeLocation( PipeLocation ),
-			PipeCellCoordinates( PipeCellCoordinates ),
-			FlowDirection( FlowDirection ),
-			ParentCircuitIndex( ParentCircuitIndex ),
-			InletTemperature( InletTemperature ),
-			OutletTemperature( OutletTemperature ),
-			FluidHeatLoss( FluidHeatLoss ),
-			PipeCellCoordinatesSet( PipeCellCoordinatesSet ),
-			IsActuallyPartOfAHorizontalTrench( IsActuallyPartOfAHorizontalTrench )
 		{}
 
 	};
@@ -1113,93 +868,6 @@ namespace DataPlantPipingSystems {
 			FluidHeatLoss( 0.0 )
 		{}
 
-		// Member Constructor
-		PipeCircuitInfo(
-			std::string const & Name,
-			std::string const & InletNodeName,
-			std::string const & OutletNodeName,
-			int const InletNodeNum,
-			int const OutletNodeNum,
-			Point3DInteger const & CircuitInletCell,
-			Point3DInteger const & CircuitOutletCell,
-			Array1_string const & PipeSegmentNames,
-			Array1_int const & PipeSegmentIndeces,
-			int const ParentDomainIndex,
-			RadialSizing const & PipeSize,
-			RadialSizing const & InsulationSize,
-			Real64 const RadialMeshThickness,
-			bool const HasInsulation,
-			Real64 const DesignVolumeFlowRate,
-			Real64 const DesignMassFlowRate,
-			Real64 const Convergence_CurrentToPrevIteration,
-			int const MaxIterationsPerTS,
-			int const NumRadialCells,
-			BaseThermalPropertySet const & PipeProperties,
-			BaseThermalPropertySet const & InsulationProperties,
-			Array1< Point3DInteger > const & ListOfCircuitPoints,
-			bool const CheckEquipName,
-			bool const NeedToFindOnPlantLoop,
-			bool const IsActuallyPartOfAHorizontalTrench,
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum,
-			Real64 const CurFluidDensity,
-			Real64 const CurFluidViscosity,
-			Real64 const CurFluidConductivity,
-			Real64 const CurFluidPrandtl,
-			Real64 const CurFluidSpecificHeat,
-			ExtendedFluidProperties const & CurFluidPropertySet,
-			Real64 const CurCircuitInletTemp,
-			Real64 const CurCircuitFlowRate,
-			Real64 const CurCircuitConvectionCoefficient,
-			Real64 const InletTemperature,
-			Real64 const OutletTemperature,
-			Real64 const FluidHeatLoss
-		) :
-			Name( Name ),
-			InletNodeName( InletNodeName ),
-			OutletNodeName( OutletNodeName ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			CircuitInletCell( CircuitInletCell ),
-			CircuitOutletCell( CircuitOutletCell ),
-			PipeSegmentNames( PipeSegmentNames ),
-			PipeSegmentIndeces( PipeSegmentIndeces ),
-			ParentDomainIndex( ParentDomainIndex ),
-			PipeSize( PipeSize ),
-			InsulationSize( InsulationSize ),
-			RadialMeshThickness( RadialMeshThickness ),
-			HasInsulation( HasInsulation ),
-			DesignVolumeFlowRate( DesignVolumeFlowRate ),
-			DesignMassFlowRate( DesignMassFlowRate ),
-			Convergence_CurrentToPrevIteration( Convergence_CurrentToPrevIteration ),
-			MaxIterationsPerTS( MaxIterationsPerTS ),
-			NumRadialCells( NumRadialCells ),
-			PipeProperties( PipeProperties ),
-			InsulationProperties( InsulationProperties ),
-			ListOfCircuitPoints( ListOfCircuitPoints ),
-			CheckEquipName( CheckEquipName ),
-			NeedToFindOnPlantLoop( NeedToFindOnPlantLoop ),
-			IsActuallyPartOfAHorizontalTrench( IsActuallyPartOfAHorizontalTrench ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			CurFluidDensity( CurFluidDensity ),
-			CurFluidViscosity( CurFluidViscosity ),
-			CurFluidConductivity( CurFluidConductivity ),
-			CurFluidPrandtl( CurFluidPrandtl ),
-			CurFluidSpecificHeat( CurFluidSpecificHeat ),
-			CurFluidPropertySet( CurFluidPropertySet ),
-			CurCircuitInletTemp( CurCircuitInletTemp ),
-			CurCircuitFlowRate( CurCircuitFlowRate ),
-			CurCircuitConvectionCoefficient( CurCircuitConvectionCoefficient ),
-			InletTemperature( InletTemperature ),
-			OutletTemperature( OutletTemperature ),
-			FluidHeatLoss( FluidHeatLoss )
-		{}
-
 	};
 
 	struct ZoneCoupledSurfaceData
@@ -1230,31 +898,6 @@ namespace DataPlantPipingSystems {
 			InsulationConductivity( 0.0 ),
 			InsulationDensity( 0.0 )
 
-		{}
-
-		// Member Constructor
-		ZoneCoupledSurfaceData(
-			std::string Name,
-			int const IndexInSurfaceArray,
-			Real64 const SurfaceArea,
-			Real64 const Width,
-			Real64 const Length,
-			Real64 const Depth,
-			Real64 const Conductivity,
-			Real64 const Density,
-			Real64 const InsulationConductivity,
-			Real64 const InsulationDensity
-		) :
-			Name( Name ),
-			IndexInSurfaceArray( IndexInSurfaceArray ),
-			SurfaceArea( SurfaceArea ),
-			Width( Width ),
-			Length( Length ),
-			Depth( Depth ),
-			Conductivity( Conductivity ),
-			Density( Density ),
-			InsulationConductivity( InsulationConductivity ),
-			InsulationDensity( InsulationDensity )
 		{}
 
 	};
@@ -1399,156 +1042,6 @@ namespace DataPlantPipingSystems {
 			NumGroundSurfCells( 0 ),
 			NumInsulationCells( 0 )
 
-		{}
-
-		// Member Constructor
-		FullDomainStructureInfo(
-			std::string const & Name,
-			Array1_string const & CircuitNames,
-			Array1_int const & CircuitIndeces,
-			int const MaxIterationsPerTS,
-			bool const OneTimeInit,
-			bool const BeginSimInit,
-			bool const BeginSimEnvrn,
-			bool const DomainNeedsSimulation,
-			bool const DomainNeedsToBeMeshed,
-			bool const IsActuallyPartOfAHorizontalTrench,
-			bool const HasAPipeCircuit,
-			bool const IsZoneCoupledSlab,
-			bool const HasCoupledBasement,
-			MeshExtents const & Extents,
-			MeshProperties const & Mesh,
-			BaseThermalPropertySet const & GroundProperties,
-			BaseThermalPropertySet const & SlabProperties,
-			BaseThermalPropertySet const & BasementInterfaceProperties,
-			BaseThermalPropertySet const & HorizInsProperties,
-			BaseThermalPropertySet const & VertInsProperties,
-			SimulationControl const & SimControls,
-			FarfieldInfo const & Farfield,
-			BasementZoneInfo const & BasementZone,
-			MoistureInfo const & Moisture,
-			MeshPartitions const & Partitions,
-			CurSimConditionsInfo const & Cur,
-			ReportingInformation const & Reporting,
-			bool const HasBasement,
-			Array1 <ZoneCoupledSurfaceData> const & ZoneCoupledSurfaces,
-			int const ZoneCoupledOSCMIndex,
-			Real64 const PerimeterOffset,
-			bool const SlabInGradeFlag,
-			int const SlabMaterialNum,
-			Real64 const SlabWidth,
-			Real64 const SlabLength,
-			Real64 const SlabThickness,
-			Real64 const XIndex,
-			Real64 const YIndex,
-			Real64 const ZIndex,
-			bool const HorizInsPresentFlag,
-			int const HorizInsMaterialNum,
-			Real64 const HorizInsThickness,
-			Real64 const HorizInsWidth,
-			Real64 const HeatFlux,
-			Real64 const WallHeatFlux,
-			Real64 const FloorHeatFlux,
-			Real64 const AggregateHeatFlux,
-			Real64 const AggregateWallHeatFlux,
-			Real64 const AggregateFloorHeatFlux,
-			int const NumHeatFlux,
-			bool const ResetHeatFluxFlag,
-			Real64 const ConvCoeff,
-			bool const FullHorizInsPresent,
-			bool const VertInsPresentFlag,
-			int const VertInsMaterialNum,
-			Real64 const VertInsThickness,
-			Real64 const VertInsDepth,
-			int const XWallIndex,
-			int const YFloorIndex,
-			int const ZWallIndex,
-			int const InsulationXIndex,
-			int const InsulationYIndex,
-			int const InsulationZIndex,
-			bool const SimTimestepFlag,
-			bool const SimHourlyFlag,
-			Real64 ZoneCoupledSurfaceTemp,
-			Real64 BasementWallTemp,
-			Real64 BasementFloorTemp,
-			int const NumDomainCells,
-			int const NumGroundSurfCells,
-			int const NumInsulationCells,
-
-			Array3< CartesianCell > const & Cells
-		) :
-			Name( Name ),
-			CircuitNames( CircuitNames ),
-			CircuitIndeces( CircuitIndeces ),
-			MaxIterationsPerTS( MaxIterationsPerTS ),
-			OneTimeInit( OneTimeInit ),
-			BeginSimInit( BeginSimInit ),
-			BeginSimEnvrn( BeginSimEnvrn ),
-			DomainNeedsSimulation( DomainNeedsSimulation ),
-			DomainNeedsToBeMeshed( DomainNeedsToBeMeshed ),
-			IsActuallyPartOfAHorizontalTrench( IsActuallyPartOfAHorizontalTrench ),
-			HasAPipeCircuit( HasAPipeCircuit ),
-			IsZoneCoupledSlab( IsZoneCoupledSlab ),
-			HasCoupledBasement( HasCoupledBasement ),
-			Extents( Extents ),
-			Mesh( Mesh ),
-			GroundProperties( GroundProperties ),
-			SlabProperties( SlabProperties ),
-			BasementInterfaceProperties( BasementInterfaceProperties ),
-			HorizInsProperties( HorizInsProperties ),
-			VertInsProperties( VertInsProperties ),
-			SimControls( SimControls ),
-			Farfield( Farfield ),
-			BasementZone( BasementZone ),
-			Moisture( Moisture ),
-			Partitions( Partitions ),
-			Cur( Cur ),
-			Reporting( Reporting ),
-			HasBasement( HasBasement ),
-			ZoneCoupledSurfaces( ZoneCoupledSurfaces ),
-			ZoneCoupledOSCMIndex( ZoneCoupledOSCMIndex ),
-			PerimeterOffset( PerimeterOffset ),
-			SlabInGradeFlag( SlabInGradeFlag ),
-			SlabMaterialNum( SlabMaterialNum ),
-			SlabWidth( SlabWidth ),
-			SlabLength( SlabLength ),
-			SlabThickness( SlabThickness ),
-			XIndex( XIndex ),
-			YIndex( YIndex ),
-			ZIndex( ZIndex ),
-			HorizInsPresentFlag( HorizInsPresentFlag ),
-			HorizInsMaterialNum( HorizInsMaterialNum ),
-			HorizInsThickness( HorizInsThickness ),
-			HorizInsWidth( HorizInsWidth ),
-			HeatFlux( HeatFlux ),
-			WallHeatFlux( WallHeatFlux ),
-			FloorHeatFlux( FloorHeatFlux ),
-			AggregateHeatFlux( AggregateHeatFlux ),
-			AggregateWallHeatFlux( AggregateWallHeatFlux ),
-			AggregateFloorHeatFlux( AggregateFloorHeatFlux ),
-			NumHeatFlux( NumHeatFlux ),
-			ResetHeatFluxFlag( ResetHeatFluxFlag ),
-			ConvCoeff( ConvCoeff ),
-			FullHorizInsPresent( FullHorizInsPresent ),
-			VertInsPresentFlag( VertInsPresentFlag ),
-			VertInsMaterialNum( VertInsMaterialNum ),
-			VertInsThickness( VertInsThickness ),
-			VertInsDepth( VertInsDepth ),
-			XWallIndex( XWallIndex ),
-			YFloorIndex( YFloorIndex ),
-			ZWallIndex( ZWallIndex ),
-			InsulationXIndex( InsulationXIndex ),
-			InsulationYIndex( InsulationYIndex ),
-			InsulationZIndex( InsulationZIndex ),
-			SimTimestepFlag( SimTimestepFlag ),
-			SimHourlyFlag( SimHourlyFlag ),
-			ZoneCoupledSurfaceTemp( ZoneCoupledSurfaceTemp ),
-			BasementWallTemp( BasementWallTemp ),
-			BasementFloorTemp( BasementFloorTemp ),
-			NumDomainCells( NumDomainCells ),
-			NumGroundSurfCells( NumGroundSurfCells ),
-			NumInsulationCells( NumInsulationCells ),
-			Cells( Cells )
 		{}
 
 	};

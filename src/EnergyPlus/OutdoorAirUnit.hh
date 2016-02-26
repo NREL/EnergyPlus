@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef OutdoorAirUnit_hh_INCLUDED
 #define OutdoorAirUnit_hh_INCLUDED
 
@@ -111,47 +169,6 @@ namespace OutdoorAirUnit {
 			MaxWaterMassFlow( 0.0 ),
 			MinVolWaterFlow( 0.0 ),
 			MinWaterMassFlow( 0.0 )
-		{}
-
-		// Member Constructor
-		OAEquipList(
-			std::string const & ComponentName,
-			std::string const & ComponentType,
-			int const ComponentType_Num, // Parameterized Component Types this module can address
-			int const ComponentIndex, // Which one in list -- updated by routines called from here
-			int const CoilAirInletNode,
-			int const CoilAirOutletNode,
-			int const CoilWaterInletNode,
-			int const CoilWaterOutletNode,
-			int const CoilPlantTypeOfNum,
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum,
-			int const FluidIndex, // used in Steam...
-			Real64 const MaxVolWaterFlow,
-			Real64 const MaxWaterMassFlow,
-			Real64 const MinVolWaterFlow,
-			Real64 const MinWaterMassFlow
-		) :
-			ComponentName( ComponentName ),
-			ComponentType( ComponentType ),
-			ComponentType_Num( ComponentType_Num ),
-			ComponentIndex( ComponentIndex ),
-			CoilAirInletNode( CoilAirInletNode ),
-			CoilAirOutletNode( CoilAirOutletNode ),
-			CoilWaterInletNode( CoilWaterInletNode ),
-			CoilWaterOutletNode( CoilWaterOutletNode ),
-			CoilPlantTypeOfNum( CoilPlantTypeOfNum ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			FluidIndex( FluidIndex ),
-			MaxVolWaterFlow( MaxVolWaterFlow ),
-			MaxWaterMassFlow( MaxWaterMassFlow ),
-			MinVolWaterFlow( MinVolWaterFlow ),
-			MinWaterMassFlow( MinWaterMassFlow )
 		{}
 
 	};
@@ -286,149 +303,15 @@ namespace OutdoorAirUnit {
 			TotHeatingRate( 0.0 )
 		{}
 
-		// Member Constructor
-		OAUnitData(
-			std::string const & Name, // name of unit
-			std::string const & SchedName, // availability schedule
-			int const SchedPtr, // index to schedule
-			std::string const & ZoneName, // Name of zone the system is serving
-			int const ZonePtr, // Point to this zone in the Zone derived type
-			int const ZoneNodeNum, // index of zone air node in node structure
-			std::string const & UnitControlType, // Control type for the system
-			int const ControlType, // Unit Control type indicator
-			int const AirInletNode, // inlet air node number
-			int const AirOutletNode, // outlet air node number
-			std::string const & SFanName, // name of supply fan
-			int const SFan_Index, // index in fan structure
-			int const SFanType, // type of fan in cFanTypes
-			int const SFanAvailSchedPtr, // supply fan availability sched from fan object
-			int const FanPlace, // fan placement; blow through and draw through
-			Real64 const FanCorTemp, // correction temperature
-			bool const FanEffect, // .TRUE. if unit has a fan type of draw through
-			int const SFanOutletNode, // supply fan outlet node number
-			std::string const & ExtFanName, // name of exhaust fan
-			int const ExtFan_Index, // index in fan structure
-			int const ExtFanType, // type of fan in cFanTypes
-			int const ExtFanAvailSchedPtr, // exhaust fan availability sched from fan object
-			bool const ExtFan, // true if there is an exhaust fan
-			std::string const & OutAirSchedName, // schedule of fraction for outside air (all controls)
-			int const OutAirSchedPtr, // index to schedule
-			int const OutsideAirNode, // outside air node number
-			Real64 const OutAirVolFlow, // m3/s
-			Real64 const OutAirMassFlow, // kg/s
-			Real64 const ExtAirVolFlow, // m3/s
-			Real64 const ExtAirMassFlow, // kg/s
-			std::string const & ExtAirSchedName, // schedule of fraction for exhaust air
-			int const ExtOutAirSchedPtr, // index to schedule
-			Real64 const SMaxAirMassFlow, // kg/s
-			Real64 const EMaxAirMassFlow, // kg/s
-			Real64 const SFanMaxAirVolFlow, // m3/s
-			Real64 const EFanMaxAirVolFlow, // m3/s
-			std::string const & HiCtrlTempSched, // Schedule name for the High Control Air temperature
-			int const HiCtrlTempSchedPtr, // Schedule index for the High Control Air temperature
-			std::string const & LoCtrlTempSched, // Schedule name for the Low Control Air temperature
-			int const LoCtrlTempSchedPtr, // Schedule index for the Low Control Air temperature
-			int const OperatingMode, // operating condition( NeutralMode, HeatingMode, CoolingMode)
-			int const ControlCompTypeNum,
-			int const CompErrIndex,
-			Real64 const AirMassFlow, // kg/s
-			int const UnBalancedErrCount, // Counter for recurring warning message
-			int const UnBalancedErrIndex, // Index to recurring warning message
-			int const NumComponents,
-			std::string const & ComponentListName,
-			Real64 const CompOutSetTemp, // component outlet setpoint temperature
-			int const AvailStatus,
-			std::string const & AvailManagerListName, // Name of an availability manager list object
-			Array1< OAEquipList > const & OAEquip,
-			Real64 const TotCoolingRate, // Rate of total cooling delivered to the zone [W]
-			Real64 const TotCoolingEnergy, // Total cooling energy delivered by the OAU supply air to the zone [J]
-			Real64 const SensCoolingRate, // Rate of sensible cooling delivered to the zone [W]
-			Real64 const SensCoolingEnergy, // Sensible cooling energy delivered by the OAU supply air to the zone [J]
-			Real64 const LatCoolingRate, // Rate of latent cooling delivered to the zone [W]
-			Real64 const LatCoolingEnergy, // Latent cooling energy delivered by the OAU supply air to the zone [J]
-			Real64 const ElecFanRate, // Total electric use rate (power) for supply/exhaust fans [W]
-			Real64 const ElecFanEnergy, // Electric energy use for supply fan and exhaust fan [J]
-			Real64 const SensHeatingEnergy, // sensible heating energy delivered by the ERV supply air to the zone [J]
-			Real64 const SensHeatingRate, // rate of sensible heating delivered to the zone [W]
-			Real64 const LatHeatingEnergy, // latent heating energy delivered by the ERV supply air to the zone [J]
-			Real64 const LatHeatingRate, // rate of latent heating delivered to the zone [W]
-			Real64 const TotHeatingEnergy, // total heating energy delivered by the ERV supply air to the zone [J]
-			Real64 const TotHeatingRate // rate of total heating delivered to the zone [W]
-		) :
-			Name( Name ),
-			SchedName( SchedName ),
-			SchedPtr( SchedPtr ),
-			ZoneName( ZoneName ),
-			ZonePtr( ZonePtr ),
-			ZoneNodeNum( ZoneNodeNum ),
-			UnitControlType( UnitControlType ),
-			ControlType( ControlType ),
-			AirInletNode( AirInletNode ),
-			AirOutletNode( AirOutletNode ),
-			SFanName( SFanName ),
-			SFan_Index( SFan_Index ),
-			SFanType( SFanType ),
-			SFanAvailSchedPtr( SFanAvailSchedPtr ),
-			FanPlace( FanPlace ),
-			FanCorTemp( FanCorTemp ),
-			FanEffect( FanEffect ),
-			SFanOutletNode( SFanOutletNode ),
-			ExtFanName( ExtFanName ),
-			ExtFan_Index( ExtFan_Index ),
-			ExtFanType( ExtFanType ),
-			ExtFanAvailSchedPtr( ExtFanAvailSchedPtr ),
-			ExtFan( ExtFan ),
-			OutAirSchedName( OutAirSchedName ),
-			OutAirSchedPtr( OutAirSchedPtr ),
-			OutsideAirNode( OutsideAirNode ),
-			OutAirVolFlow( OutAirVolFlow ),
-			OutAirMassFlow( OutAirMassFlow ),
-			ExtAirVolFlow( ExtAirVolFlow ),
-			ExtAirMassFlow( ExtAirMassFlow ),
-			ExtAirSchedName( ExtAirSchedName ),
-			ExtOutAirSchedPtr( ExtOutAirSchedPtr ),
-			SMaxAirMassFlow( SMaxAirMassFlow ),
-			EMaxAirMassFlow( EMaxAirMassFlow ),
-			SFanMaxAirVolFlow( SFanMaxAirVolFlow ),
-			EFanMaxAirVolFlow( EFanMaxAirVolFlow ),
-			HiCtrlTempSched( HiCtrlTempSched ),
-			HiCtrlTempSchedPtr( HiCtrlTempSchedPtr ),
-			LoCtrlTempSched( LoCtrlTempSched ),
-			LoCtrlTempSchedPtr( LoCtrlTempSchedPtr ),
-			OperatingMode( OperatingMode ),
-			ControlCompTypeNum( ControlCompTypeNum ),
-			CompErrIndex( CompErrIndex ),
-			AirMassFlow( AirMassFlow ),
-			UnBalancedErrCount( UnBalancedErrCount ),
-			UnBalancedErrIndex( UnBalancedErrIndex ),
-			NumComponents( NumComponents ),
-			ComponentListName( ComponentListName ),
-			CompOutSetTemp( CompOutSetTemp ),
-			AvailStatus( AvailStatus ),
-			AvailManagerListName( AvailManagerListName ),
-			OAEquip( OAEquip ),
-			TotCoolingRate( TotCoolingRate ),
-			TotCoolingEnergy( TotCoolingEnergy ),
-			SensCoolingRate( SensCoolingRate ),
-			SensCoolingEnergy( SensCoolingEnergy ),
-			LatCoolingRate( LatCoolingRate ),
-			LatCoolingEnergy( LatCoolingEnergy ),
-			ElecFanRate( ElecFanRate ),
-			ElecFanEnergy( ElecFanEnergy ),
-			SensHeatingEnergy( SensHeatingEnergy ),
-			SensHeatingRate( SensHeatingRate ),
-			LatHeatingEnergy( LatHeatingEnergy ),
-			LatHeatingRate( LatHeatingRate ),
-			TotHeatingEnergy( TotHeatingEnergy ),
-			TotHeatingRate( TotHeatingRate )
-		{}
-
 	};
 
 	// Object Data
 	extern Array1D< OAUnitData > OutAirUnit;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimOutdoorAirUnit(
@@ -507,35 +390,7 @@ namespace OutdoorAirUnit {
 	int
 	GetOutdoorAirUnitReturnAirNode( int const OAUnitNum );
 
-	// Clears the global data in OutdoorAirUnit.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
-
 	//*****************************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // OutdoorAirUnit
 

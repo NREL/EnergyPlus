@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef HVACUnitarySystem_hh_INCLUDED
 #define HVACUnitarySystem_hh_INCLUDED
 
@@ -117,26 +175,13 @@ namespace HVACUnitarySystem {
 		int NumOfSpeedHeating; // The number of speeds for heating
 		Array1D< Real64 > CoolingVolFlowRatio; // The ratio of flow to max for this speed
 		Array1D< Real64 > HeatingVolFlowRatio; // The ratio of flow to max for this speed
+		bool SingleModeFlag; // If yes, single mode operation
 
 		// Default Constructor
 		DesignSpecMSHPData() :
 			NumOfSpeedCooling( 0 ),
-			NumOfSpeedHeating( 0 )
-		{}
-
-		// Member Constructor
-		DesignSpecMSHPData(
-			std::string const & Name, // Name of the design specification MSHP
-			int const NumOfSpeedCooling, // The number of speeds for cooling
-			int const NumOfSpeedHeating, // The number of speeds for heating
-			Array1< Real64 > const & CoolingVolFlowRatio, // The ratio of flow to max for this speed
-			Array1< Real64 > const & HeatingVolFlowRatio // The ratio of flow to max for this speed
-		) :
-			Name( Name ),
-			NumOfSpeedCooling( NumOfSpeedCooling ),
-			NumOfSpeedHeating( NumOfSpeedHeating ),
-			CoolingVolFlowRatio( CoolingVolFlowRatio ),
-			HeatingVolFlowRatio( HeatingVolFlowRatio )
+			NumOfSpeedHeating( 0 ),
+			SingleModeFlag( false )
 		{}
 
 	};
@@ -421,6 +466,7 @@ namespace HVACUnitarySystem {
 		int HeatCountAvail; // Counter used to minimize the occurrence of output warnings
 		int HeatIndexAvail; // Index used to minimize the occurrence of output warnings
 		bool FirstPass; // used to determine when first call is made
+		int SingleMode; // Single mode operation Yes/No; 1=Yes, 0=No
 
 		// Default Constructor
 		UnitarySystemData() :
@@ -668,528 +714,8 @@ namespace HVACUnitarySystem {
 			CoolIndexAvail( 0 ),
 			HeatCountAvail( 0 ),
 			HeatIndexAvail( 0 ),
-			FirstPass( true )
-		{}
-
-		// Member Constructor
-		UnitarySystemData(
-			std::string const & UnitarySystemType, // Type of Unitary System
-			int const UnitarySystemType_Num, // integer type of Unitary System
-			std::string const & Name, // Name of the Unitary System
-			bool const HeatPump, // TRUE if both cooling and heating coils are DX
-			int const SysAvailSchedPtr, // System Availability schedule
-			int const UnitarySystemInletNodeNum, // Parent inlet node number
-			int const UnitarySystemOutletNodeNum, // Parent outlet node number
-			int const CondenserType, // type of condenser (AirCooled, EvapCooled, WaterCooled)
-			bool const AirLoopEquipment, // identifies that this system is part of an air loop
-			int const ControlZoneNum, // Index to controlled zone
-			int const ZoneSequenceCoolingNum, // Index to cooling sequence/priority for this zone
-			int const ZoneSequenceHeatingNum, // Index to heating sequence/priority for this zone
-			int const NodeNumOfControlledZone, // Node number of controlled zone
-			int const ZoneInletNode, // Zone inlet node number in the controlled zone
-			Real64 const ControlZoneMassFlowFrac, // Fraction of flow to control zone
-			bool const Humidistat, // Set to True if dehumidification control mode is set to
-			Real64 const DesignMaxOutletTemp, // Maximum supply air temperature from heater [C]
-			int const CondenserNodeNum, // index to condenser air inlet node
-			int const DehumidControlType_Num, // Set to Dehumid Control None, CoolReheat or MultiMode
-			int const AirFlowControl, // UseCompressorOnFlow or UseCompressorOffFlow
-			int const ControlType, // Setpoint or Load based control
-			bool const RequestAutoSize, // determines if inputs need autosizing
-			bool const RunOnSensibleLoad, // logical determines if this system will run to
-			bool const RunOnLatentLoad, // logical determines if this system will run to
-			bool const RunOnLatentOnlyWithSensible, // allow latent dehumidification only if sensible load exists
-			int const DehumidificationMode, // Dehumidification mode for multimode coil,
-			int const FanOpMode, // Fan operating mode (see parameter above)
-			int const LastMode, // last mode of operation, coolingmode or heatingmode
-			Real64 const AncillaryOnPower, // Ancillary On-Cycle Electric Power [W]
-			Real64 const AncillaryOffPower, // Ancillary Off-Cycle Electric Power [W]
-			std::string const & DesignSpecMultispeedHPType, // Object type for specifying multispeed flow rates
-			std::string const & DesignSpecMultispeedHPName, // Object name for specifying multispeed flow rates
-			std::string const & CoolingCoilName, // coil name (eliminate after blank is accepted in CALL)
-			int const CoolingCoilType_Num, // numeric coil type
-			int const CoolingCoilIndex, // index to specific cooling coil
-			Real64 const DesignCoolingCapacity, // cooling coil capacity (W)
-			int const CoolingCoilAvailSchPtr, // cooling coil availability schedule index
-			int const ActualDXCoilIndexForHXAssisted, // index to DX coil used in HX assisted object
-			Real64 const DOASDXCoolingCoilMinTout, // DOAS DX Cooling coil outlet air minimum temperature
-			bool const ISHundredPercentDOASDXCoil, // logical determines if this system will run as 100% DOAS
-			bool const CoolCoilExists, // True if a cooling coil is specified in the unitary system
-			int const FrostControlStatus, // DOAS coil system frost control status
-			int const CoolCoilInletNodeNum, // Cooling coil air inlet node number
-			int const CoolCoilOutletNodeNum, // Cooling coil air outlet node number
-			int const CoolCoilFluidOutletNodeNum, // Cooling coil fluid outlet node number (from Plant Loop data)
-			int const CoolCoilLoopNum, // Plant loop num of chilled water coil
-			int const CoolCoilLoopSide, // Supply side or demand side
-			int const CoolCoilBranchNum, // Branch of number of the cooling coil in the plant loop
-			int const CoolCoilCompNum, // Comp num of the cooling coil in the plant loop
-			int const CoolCoilFluidInletNode, // Cooling coil fluid inlet node
-			Real64 const MaxCoolCoilFluidFlow, // Maximum cooling coil fluid flow for chilled water coil
-			bool const CoolingCoilUpstream, // Set to true when coolign coil is upstream in the unitary system
-			Real64 const CoolCompPartLoadRatio, // Unitary system compressor part load ratio in cooling
-			std::string const & HeatingCoilName, // coil name (eliminate after blank is accepted in CALL)
-			int const HeatingCoilType_Num, // numeric coil type
-			int const HeatingCoilIndex, // index to specific heating coil
-			Real64 const DesignHeatingCapacity, // heating coil capacity (W)
-			Real64 const HeatingSizingRatio, // ratio of heating coil to cooling coil size
-			bool const DXHeatingCoil, // specifies if heating coil is DX
-			int const HeatCoilInletNodeNum, // Heating coil air inlet node number
-			int const HeatCoilOutletNodeNum, // Heating coil air outlet node number
-			int const HeatCoilFluidOutletNodeNum, // Heating coil fluid outlet node number (from Plant Loop data)
-			int const HeatingCoilPLFCurveIndex, // PLF curve index (not used yet?)
-			int const HeatingCoilAvailSchPtr, // heating coil availability schedule index
-			bool const HeatCoilExists, // True if a heating coil is specified in the unitary system
-			int const HeatCoilLoopNum, // Plant loop num of hot water or steam coil
-			int const HeatCoilLoopSide, // Supply side or demand side
-			int const HeatCoilBranchNum, // Branch of number of the heating coil in the plant loop
-			int const HeatCoilCompNum, // Comp num of the heating coil in the plant loop
-			int const HeatCoilFluidInletNode, // Heating coil fluid inlet node
-			Real64 const MaxHeatCoilFluidFlow, // Maximum heating coil fluid flow for hot water or steam coil
-			Real64 const HeatCompPartLoadRatio, // Unitary system compressor part load ratio in heating
-			std::string const & SuppHeatCoilName, // coil name (eliminate after blank is accepted in CALL)
-			int const SuppHeatCoilType_Num, // numeric coil type
-			int const SuppHeatCoilIndex, // index to specific supplemental heating coil
-			Real64 const DesignSuppHeatingCapacity, // supplemental heating coil capacity (W)
-			int const SuppCoilFluidInletNode, // supplemental heating coil water/steam inlet node
-			int const SuppCoilFluidOutletNodeNum, // Supplemental coil fluid outlet node number (from Plant Loop data)
-			int const SuppCoilAirInletNode, // supplemental heating coil air inlet node
-			int const SuppCoilAirOutletNode, // supplemental heating coil air outlet node
-			int const SuppCoilAvailSchPtr, // supplemental heating coil availability schedule index
-			Real64 const MaxSuppCoilFluidFlow, // supplemental heating coil maximum water/steam flow rate (m3/s)
-			Real64 const MaxOATSuppHeat, // Maximum outdoor dry-bulb temperature for supplemental coil [C]
-			bool const SuppCoilExists, // True if a supp coil is specified in the unitary system
-			int const SuppCoilLoopNum, // Plant loop num of supplemental coil
-			int const SuppCoilLoopSide, // Supply side or demand side
-			int const SuppCoilBranchNum, // Branch of number of the supplemental coil in the plant loop
-			int const SuppCoilCompNum, // Comp num of the supplemental coil in the plant loop
-			int const FanType_Num, // Fan type num i.e. OnOff, ConstVol, VAV
-			int const FanIndex, // index of fan of a particular type
-			Real64 const ActualFanVolFlowRate, // Actual or design fan volume flow rate
-			int const FanOpModeSchedPtr, // fan operating mode schedule pointer
-			int const FanAvailSchedPtr, // fan availability schedule pointer
-			int const FanPlace, // Blow through or DrawThrough Fan
-			bool const FanExists, // True if a fan is specified in the unitary system
-			Real64 const FanDelayTime, // Fan delay time, time delay for the HP's fan to
-			Real64 const MaxCoolAirVolFlow, // Maximum coil air volumetric flow for cooling [m3/s]
-			Real64 const MaxHeatAirVolFlow, // Maximum coil air volumetric flow for heating [m3/s]
-			Real64 const MaxNoCoolHeatAirVolFlow, // Maximum coil air volumetric flow for no cooling or heating [m3/s]
-			Real64 const DesignFanVolFlowRate, // Design fan volume flow rate [m3/s]
-			Real64 const DesignMassFlowRate, // Design mass flow rate [m3/s]
-			Real64 const MaxCoolAirMassFlow, // Maximum coil air mass flow for cooling [kg/s]
-			Real64 const MaxHeatAirMassFlow, // Maximum coil air mass flow for heating [kg/s]
-			Real64 const MaxNoCoolHeatAirMassFlow, // Maximum coil air mass flow for no cooling or heating [kg/s]
-			int const CoolingSAFMethod, // Supply air flow method for cooling
-			int const HeatingSAFMethod, // Supply air flow method for heating
-			int const NoCoolHeatSAFMethod, // Supply air flow method for no cooling or heating
-			Real64 const MinOATCompressor, // Minimum outdoor temperature below which compressor if off
-			Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of unitary system [cycles/hr]
-			Real64 const HPTimeConstant, // Heat pump time constant [s]
-			Real64 const OnCyclePowerFraction, // Fraction of on-cycle power use [~]
-			Real64 const DesignHRWaterVolumeFlow, // Design water volume flow rate through heat recovery loop [m3/s]
-			Real64 const WSHPRuntimeFrac, // Runtime fraction of water source heat pump
-			Real64 const HeatingCoilSensDemand, // Sensible demand on Heating Coil [W]
-			Real64 const CoolingCoilSensDemand, // Sensible demand on Cooling Coil [W]
-			Real64 const CoolingCoilLatentDemand, // Latent demand on Cooling Coil [W]
-			int const HeatRecoveryInletNodeNum, // Node number on heat recovery water inlet
-			int const HeatRecoveryOutletNodeNum, // Node number on heat recovery water outlet
-			bool const HeatRecActive, // True when entered Heat Rec Vol Flow Rate > 0
-			Real64 const DesignHeatRecMassFlowRate, // Design water mass flow rate through heat recovery loop [kg/s]
-			Real64 const MaxHROutletWaterTemp, // Maximum outlet water temperature for heat recovery [C]
-			int const HRLoopNum, // plant loop number for heat recovery
-			int const HRLoopSideNum, // Plant loop side (supply or demand) for heat recovery
-			int const HRBranchNum, // plant loop branch for heat recovery
-			int const HRCompNum, // plant loop component for heat recovery
-			int const SystemHeatControlNodeNum, // the node number of the node with the setpoint
-			int const SystemCoolControlNodeNum, // the node number of the node with the setpoint
-			int const SuppHeatControlNodeNum, // the node number of the node with the setpoint
-			Real64 const DesiredOutletTemp, // the setpoint temperature at the unit outlet node
-			Real64 const DesiredOutletHumRat, // the setpoint humidity ratio at the unit outlet node
-			Real64 const CoolingPartLoadFrac, // part load cooling fraction for current timestep
-			Real64 const HeatingPartLoadFrac, // part load heating fraction for current timestep
-			Real64 const SuppHeatPartLoadFrac, // part load supp heating fraction for current timestep
-			Real64 const SupHeaterLoad, // Supplemental Heat Load for current timestep
-			Real64 const SenLoadLoss, // Air distribution system sensible loss [W]
-			Real64 const LatLoadLoss, // Air distribution system latent loss [W]
-			Real64 const SensibleLoadMet, // System sensible load [W]
-			Real64 const LatentLoadMet, // System latent load [W]
-			bool const InitHeatPump, // Heat pump initialization flag (for error reporting)
-			int const WaterCyclingMode, // Heat Pump Coil water flow mode; See def in DataHVACGlobals,
-			int const HeatCoolMode, // System operating mode (0 = floating, 1 = cooling, 2 = heating)
-			int const NumOfSpeedCooling, // The number of speeds for cooling
-			int const NumOfSpeedHeating, // The number of speeds for heating
-			Real64 const IdleSpeedRatio, // idle air fan ratio
-			Real64 const IdleVolumeAirRate, // idle air flow rate [m3/s]
-			Real64 const IdleMassFlowRate, // idle air flow rate [kg/s]
-			bool const CheckFanFlow, // Supply airflow check
-			Array1< Real64 > const & HeatVolumeFlowRate, // Supply air volume flow rate during heating operation
-			Array1< Real64 > const & HeatMassFlowRate, // Supply air mass flow rate during heating operation
-			Array1< Real64 > const & CoolVolumeFlowRate, // Supply air volume flow rate during cooling operation
-			Array1< Real64 > const & CoolMassFlowRate, // Supply air mass flow rate during cooling operation
-			Array1< Real64 > const & MSHeatingSpeedRatio, // Fan speed ratio in heating mode
-			Array1< Real64 > const & MSCoolingSpeedRatio, // Fan speed ratio in cooling mode
-			Real64 const NoHeatCoolSpeedRatio, // Fan speed ratio when no cooling or heating
-			int const DesignSpecMSHPIndex, // Index to design specification multispeed heat pump object
-			bool const MultiSpeedCoolingCoil, // TRUE when cooling coil multispeed
-			bool const MultiSpeedHeatingCoil, // TRUE when heating coil multispeed
-			bool const VarSpeedCoolingCoil, // TRUE when cooling coil variable speed
-			bool const VarSpeedHeatingCoil, // TRUE when heating coil variable speed
-			int const CoolingSpeedNum, // speed number for multispeed cooling coils types
-			int const HeatingSpeedNum, // speed number for multispeed heating coils types
-			Real64 const CoolingSpeedRatio, // current compressor speed ratio (variable speed)
-			Real64 const CoolingFanSpeedRatio, // current fan speed ratio
-			Real64 const HeatingSpeedRatio, // current compressor speed ratio (variable speed)
-			Real64 const HeatingFanSpeedRatio, // current fan speed ratio
-			Real64 const CoolingCycRatio, // cycling part load ratio (variable speed)
-			Real64 const HeatingCycRatio, // cycling part load ratio (variable speed)
-			Real64 const PartLoadFrac, // part load fraction for current time step (single speed)
-			Real64 const FanPartLoadRatio, // Unitary system fan part load ratio
-			Real64 const CompPartLoadRatio, // Unitary system compressor part load ratio
-			Real64 const ElecPower, // Unitary System Electric Power
-			Real64 const ElecPowerConsumption, // Electricity power comsumption: CondenserFan+CCHeater+Defrost+aux
-			Real64 const TotCoolEnergyRate, // Unitary System Total Cooling Rate [W]
-			Real64 const SensCoolEnergyRate, // Unitary System Sensible Cooling Rate [W]
-			Real64 const LatCoolEnergyRate, // Unitary System Latent Cooling Rate [W]
-			Real64 const TotHeatEnergyRate, // Unitary System Total Heating Rate [W]
-			Real64 const SensHeatEnergyRate, // Unitary System Sensible Heating Rate [W]
-			Real64 const LatHeatEnergyRate, // Unitary System Latent Heating Rate [W]
-			Real64 const TotalAuxElecPower, // Unitary System Ancillary Electric Power [W]
-			Real64 const HeatingAuxElecConsumption, // Unitary System Heating Ancillary Electric Energy [J]
-			Real64 const CoolingAuxElecConsumption, // Unitary System Cooling Ancillary Electric Energy [J]
-			Real64 const HeatRecoveryRate, // Unitary System Heat Recovery Rate [W]
-			Real64 const HeatRecoveryEnergy, // Unitary System Heat Recovery Energy [J]
-			Real64 const HeatRecoveryInletTemp, // Unitary System Heat Recovery Inlet Temperature [C]
-			Real64 const HeatRecoveryOutletTemp, // Unitary System Heat Recovery Outlet Temperature [C]
-			Real64 const HeatRecoveryMassFlowRate, // Unitary System Heat Recovery Fluid Mass Flow Rate [kg/s]
-			Real64 const DehumidInducedHeatingDemandRate, // Unitary System
-			Real64 const EMSSensibleZoneLoadValue, // Value EMS is directing to use
-			Real64 const EMSMoistureZoneLoadValue, // Value EMS is directing to use
-			int const SpeedNum, // speed number of active multi- or variable-speed coil
-			Real64 const SpeedRatio, // current compressor speed ratio (variable speed)
-			Real64 const CycRatio, // cycling part load ratio (variable speed)
-			int const TESOpMode, // operting mode of TES DX Cooling coil
-			int const HXAssistedSensPLRIter, // used in HX Assisted calculations
-			int const HXAssistedSensPLRIterIndex, // used in HX Assisted calculations
-			int const HXAssistedSensPLRFail, // used in HX Assisted calculations
-			int const HXAssistedSensPLRFailIndex, // used in HX Assisted calculations
-			int const HXAssistedSensPLRFail2, // used in HX Assisted calculations
-			int const HXAssistedSensPLRFailIndex2, // used in HX Assisted calculations
-			int const HXAssistedLatPLRIter, // used in HX Assisted calculations
-			int const HXAssistedLatPLRIterIndex, // used in HX Assisted calculations
-			int const HXAssistedLatPLRFail, // used in HX Assisted calculations
-			int const HXAssistedLatPLRFailIndex, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRIter, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRIterIndex, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRFail, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRFailIndex, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRFail2, // used in HX Assisted calculations
-			int const HXAssistedCRLatPLRFailIndex2, // used in HX Assisted calculations
-			int const SensPLRIter, // used in cool coil calculations
-			int const SensPLRIterIndex, // used in cool coil calculations
-			int const SensPLRFail, // used in cool coil calculations
-			int const SensPLRFailIndex, // used in cool coil calculations
-			int const LatPLRIter, // used in cool coil calculations
-			int const LatPLRIterIndex, // used in cool coil calculations
-			int const LatPLRFail, // used in cool coil calculations
-			int const LatPLRFailIndex, // used in cool coil calculations
-			int const HeatCoilSensPLRIter, // used in heat coil calculations
-			int const HeatCoilSensPLRIterIndex, // used in heat coil calculations
-			int const HeatCoilSensPLRFail, // used in heat coil calculations
-			int const HeatCoilSensPLRFailIndex, // used in heat coil calculations
-			int const SuppHeatCoilSensPLRIter, // used in supp heat coil calculations
-			int const SuppHeatCoilSensPLRIterIndex, // used in supp heat coil calculations
-			int const SuppHeatCoilSensPLRFail, // used in supp heat coil calculations
-			int const SuppHeatCoilSensPLRFailIndex, // used in supp heat coil calculations
-			int const DXCoilSensPLRIter, // used in DXCoil calculations
-			int const DXCoilSensPLRIterIndex, // used in DXCoil calculations
-			int const DXCoilSensPLRFail, // used in DXCoil calculations
-			int const DXCoilSensPLRFailIndex, // used in DXCoil calculations
-			int const MSpdSensPLRIter, // used in MultiSpeed calculations
-			int const MSpdSensPLRIterIndex, // used in MultiSpeed calculations
-			int const MSpdCycSensPLRIter, // used in MultiSpeed calculations
-			int const MSpdCycSensPLRIterIndex, // used in MultiSpeed calculations
-			int const MSpdLatPLRIter, // used in MultiSpeed calculations
-			int const MSpdLatPLRIterIndex, // used in MultiSpeed calculations
-			int const MSpdCycLatPLRIter, // used in MultiSpeed calculations
-			int const MSpdCycLatPLRIterIndex, // used in MultiSpeed calculations
-			int const MaxIterIndex, // used in PLR calculations for sensible load
-			int const RegulaFalsIFailedIndex, // used in PLR calculations for sensible load
-			int const LatMaxIterIndex, // used in PLR calculations for moisture load
-			int const LatRegulaFalsIFailedIndex, // used in PLR calculations for moisture load
-			bool const DesignFanVolFlowRateEMSOverrideOn, // If true, then EMS is calling to override autosize fan flow
-			bool const MaxHeatAirVolFlowEMSOverrideOn, // If true, then EMS is calling to override autosize fan flow
-			bool const MaxCoolAirVolFlowEMSOverrideOn, // If true, then EMS is calling to override autosize fan flow
-			bool const MaxNoCoolHeatAirVolFlowEMSOverrideOn, // If true, then EMS is calling to override autosize fan flow
-			Real64 const DesignFanVolFlowRateEMSOverrideValue, // EMS value for override of fan flow rate autosize [m3/s]
-			Real64 const MaxHeatAirVolFlowEMSOverrideValue, // EMS value for override of fan flow rate autosize [m3/s]
-			Real64 const MaxCoolAirVolFlowEMSOverrideValue, // EMS value for override of fan flow rate autosize [m3/s]
-			Real64 const MaxNoCoolHeatAirVolFlowEMSOverrideValue, // EMS value for override of fan flow rate autosize [m3/s]
-			bool const EMSOverrideSensZoneLoadRequest, // If true, then EMS is calling to override zone load
-			bool const EMSOverrideMoistZoneLoadRequest, // If true, then EMS is calling to override zone load
-			int const StageNum, // Stage number specified by staged thermostat
-			bool const Staged, // Using Staged thermostat
-			int const CoolCountAvail, // Counter used to minimize the occurrence of output warnings
-			int const CoolIndexAvail, // Index used to minimize the occurrence of output warnings
-			int const HeatCountAvail, // Counter used to minimize the occurrence of output warnings
-			int const HeatIndexAvail, // Index used to minimize the occurrence of output warnings
-			bool const FirstPass // used to determine when first call is made
-		) :
-			UnitarySystemType( UnitarySystemType ),
-			UnitarySystemType_Num( UnitarySystemType_Num ),
-			Name( Name ),
-			HeatPump( HeatPump ),
-			SysAvailSchedPtr( SysAvailSchedPtr ),
-			UnitarySystemInletNodeNum( UnitarySystemInletNodeNum ),
-			UnitarySystemOutletNodeNum( UnitarySystemOutletNodeNum ),
-			CondenserType( CondenserType ),
-			AirLoopEquipment( AirLoopEquipment ),
-			ControlZoneNum( ControlZoneNum ),
-			ZoneSequenceCoolingNum( ZoneSequenceCoolingNum ),
-			ZoneSequenceHeatingNum( ZoneSequenceHeatingNum ),
-			NodeNumOfControlledZone( NodeNumOfControlledZone ),
-			ZoneInletNode( ZoneInletNode ),
-			ControlZoneMassFlowFrac( ControlZoneMassFlowFrac ),
-			Humidistat( Humidistat ),
-			DesignMaxOutletTemp( DesignMaxOutletTemp ),
-			CondenserNodeNum( CondenserNodeNum ),
-			DehumidControlType_Num( DehumidControlType_Num ),
-			AirFlowControl( AirFlowControl ),
-			ControlType( ControlType ),
-			RequestAutoSize( RequestAutoSize ),
-			RunOnSensibleLoad( RunOnSensibleLoad ),
-			RunOnLatentLoad( RunOnLatentLoad ),
-			RunOnLatentOnlyWithSensible( RunOnLatentOnlyWithSensible ),
-			DehumidificationMode( DehumidificationMode ),
-			FanOpMode( FanOpMode ),
-			LastMode( LastMode ),
-			AncillaryOnPower( AncillaryOnPower ),
-			AncillaryOffPower( AncillaryOffPower ),
-			DesignSpecMultispeedHPType( DesignSpecMultispeedHPType ),
-			DesignSpecMultispeedHPName( DesignSpecMultispeedHPName ),
-			CoolingCoilName( CoolingCoilName ),
-			CoolingCoilType_Num( CoolingCoilType_Num ),
-			CoolingCoilIndex( CoolingCoilIndex ),
-			DesignCoolingCapacity( DesignCoolingCapacity ),
-			CoolingCoilAvailSchPtr( CoolingCoilAvailSchPtr ),
-			ActualDXCoilIndexForHXAssisted( ActualDXCoilIndexForHXAssisted ),
-			DOASDXCoolingCoilMinTout( DOASDXCoolingCoilMinTout ),
-			ISHundredPercentDOASDXCoil( ISHundredPercentDOASDXCoil ),
-			CoolCoilExists( CoolCoilExists ),
-			FrostControlStatus( FrostControlStatus ),
-			CoolCoilInletNodeNum( CoolCoilInletNodeNum ),
-			CoolCoilOutletNodeNum( CoolCoilOutletNodeNum ),
-			CoolCoilFluidOutletNodeNum( CoolCoilFluidOutletNodeNum ),
-			CoolCoilLoopNum( CoolCoilLoopNum ),
-			CoolCoilLoopSide( CoolCoilLoopSide ),
-			CoolCoilBranchNum( CoolCoilBranchNum ),
-			CoolCoilCompNum( CoolCoilCompNum ),
-			CoolCoilFluidInletNode( CoolCoilFluidInletNode ),
-			MaxCoolCoilFluidFlow( MaxCoolCoilFluidFlow ),
-			CoolingCoilUpstream( CoolingCoilUpstream ),
-			CoolCompPartLoadRatio( CoolCompPartLoadRatio ),
-			HeatingCoilName( HeatingCoilName ),
-			HeatingCoilType_Num( HeatingCoilType_Num ),
-			HeatingCoilIndex( HeatingCoilIndex ),
-			DesignHeatingCapacity( DesignHeatingCapacity ),
-			HeatingSizingRatio( HeatingSizingRatio ),
-			DXHeatingCoil( DXHeatingCoil ),
-			HeatCoilInletNodeNum( HeatCoilInletNodeNum ),
-			HeatCoilOutletNodeNum( HeatCoilOutletNodeNum ),
-			HeatCoilFluidOutletNodeNum( HeatCoilFluidOutletNodeNum ),
-			HeatingCoilPLFCurveIndex( HeatingCoilPLFCurveIndex ),
-			HeatingCoilAvailSchPtr( HeatingCoilAvailSchPtr ),
-			HeatCoilExists( HeatCoilExists ),
-			HeatCoilLoopNum( HeatCoilLoopNum ),
-			HeatCoilLoopSide( HeatCoilLoopSide ),
-			HeatCoilBranchNum( HeatCoilBranchNum ),
-			HeatCoilCompNum( HeatCoilCompNum ),
-			HeatCoilFluidInletNode( HeatCoilFluidInletNode ),
-			MaxHeatCoilFluidFlow( MaxHeatCoilFluidFlow ),
-			HeatCompPartLoadRatio( HeatCompPartLoadRatio ),
-			SuppHeatCoilName( SuppHeatCoilName ),
-			SuppHeatCoilType_Num( SuppHeatCoilType_Num ),
-			SuppHeatCoilIndex( SuppHeatCoilIndex ),
-			DesignSuppHeatingCapacity( DesignSuppHeatingCapacity ),
-			SuppCoilFluidInletNode( SuppCoilFluidInletNode ),
-			SuppCoilFluidOutletNodeNum( SuppCoilFluidOutletNodeNum ),
-			SuppCoilAirInletNode( SuppCoilAirInletNode ),
-			SuppCoilAirOutletNode( SuppCoilAirOutletNode ),
-			SuppCoilAvailSchPtr( SuppCoilAvailSchPtr ),
-			MaxSuppCoilFluidFlow( MaxSuppCoilFluidFlow ),
-			MaxOATSuppHeat( MaxOATSuppHeat ),
-			SuppCoilExists( SuppCoilExists ),
-			SuppCoilLoopNum( SuppCoilLoopNum ),
-			SuppCoilLoopSide( SuppCoilLoopSide ),
-			SuppCoilBranchNum( SuppCoilBranchNum ),
-			SuppCoilCompNum( SuppCoilCompNum ),
-			FanType_Num( FanType_Num ),
-			FanIndex( FanIndex ),
-			ActualFanVolFlowRate( ActualFanVolFlowRate ),
-			FanOpModeSchedPtr( FanOpModeSchedPtr ),
-			FanAvailSchedPtr( FanAvailSchedPtr ),
-			FanPlace( FanPlace ),
-			FanExists( FanExists ),
-			FanDelayTime( FanDelayTime ),
-			MaxCoolAirVolFlow( MaxCoolAirVolFlow ),
-			MaxHeatAirVolFlow( MaxHeatAirVolFlow ),
-			MaxNoCoolHeatAirVolFlow( MaxNoCoolHeatAirVolFlow ),
-			DesignFanVolFlowRate( DesignFanVolFlowRate ),
-			DesignMassFlowRate( DesignMassFlowRate ),
-			MaxCoolAirMassFlow( MaxCoolAirMassFlow ),
-			MaxHeatAirMassFlow( MaxHeatAirMassFlow ),
-			MaxNoCoolHeatAirMassFlow( MaxNoCoolHeatAirMassFlow ),
-			CoolingSAFMethod( CoolingSAFMethod ),
-			HeatingSAFMethod( HeatingSAFMethod ),
-			NoCoolHeatSAFMethod( NoCoolHeatSAFMethod ),
-			MinOATCompressor( MinOATCompressor ),
-			MaxONOFFCyclesperHour( MaxONOFFCyclesperHour ),
-			HPTimeConstant( HPTimeConstant ),
-			OnCyclePowerFraction( OnCyclePowerFraction ),
-			DesignHRWaterVolumeFlow( DesignHRWaterVolumeFlow ),
-			WSHPRuntimeFrac( WSHPRuntimeFrac ),
-			HeatingCoilSensDemand( HeatingCoilSensDemand ),
-			CoolingCoilSensDemand( CoolingCoilSensDemand ),
-			CoolingCoilLatentDemand( CoolingCoilLatentDemand ),
-			HeatRecoveryInletNodeNum( HeatRecoveryInletNodeNum ),
-			HeatRecoveryOutletNodeNum( HeatRecoveryOutletNodeNum ),
-			HeatRecActive( HeatRecActive ),
-			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
-			MaxHROutletWaterTemp( MaxHROutletWaterTemp ),
-			HRLoopNum( HRLoopNum ),
-			HRLoopSideNum( HRLoopSideNum ),
-			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum ),
-			SystemHeatControlNodeNum( SystemHeatControlNodeNum ),
-			SystemCoolControlNodeNum( SystemCoolControlNodeNum ),
-			SuppHeatControlNodeNum( SuppHeatControlNodeNum ),
-			DesiredOutletTemp( DesiredOutletTemp ),
-			DesiredOutletHumRat( DesiredOutletHumRat ),
-			CoolingPartLoadFrac( CoolingPartLoadFrac ),
-			HeatingPartLoadFrac( HeatingPartLoadFrac ),
-			SuppHeatPartLoadFrac( SuppHeatPartLoadFrac ),
-			SupHeaterLoad( SupHeaterLoad ),
-			SenLoadLoss( SenLoadLoss ),
-			LatLoadLoss( LatLoadLoss ),
-			SensibleLoadMet( SensibleLoadMet ),
-			LatentLoadMet( LatentLoadMet ),
-			InitHeatPump( InitHeatPump ),
-			WaterCyclingMode( WaterCyclingMode ),
-			HeatCoolMode( HeatCoolMode ),
-			NumOfSpeedCooling( NumOfSpeedCooling ),
-			NumOfSpeedHeating( NumOfSpeedHeating ),
-			IdleSpeedRatio( IdleSpeedRatio ),
-			IdleVolumeAirRate( IdleVolumeAirRate ),
-			IdleMassFlowRate( IdleMassFlowRate ),
-			CheckFanFlow( CheckFanFlow ),
-			HeatVolumeFlowRate( HeatVolumeFlowRate ),
-			HeatMassFlowRate( HeatMassFlowRate ),
-			CoolVolumeFlowRate( CoolVolumeFlowRate ),
-			CoolMassFlowRate( CoolMassFlowRate ),
-			MSHeatingSpeedRatio( MSHeatingSpeedRatio ),
-			MSCoolingSpeedRatio( MSCoolingSpeedRatio ),
-			NoHeatCoolSpeedRatio( NoHeatCoolSpeedRatio ),
-			DesignSpecMSHPIndex( DesignSpecMSHPIndex ),
-			MultiSpeedCoolingCoil( MultiSpeedCoolingCoil ),
-			MultiSpeedHeatingCoil( MultiSpeedHeatingCoil ),
-			VarSpeedCoolingCoil( VarSpeedCoolingCoil ),
-			VarSpeedHeatingCoil( VarSpeedHeatingCoil ),
-			CoolingSpeedNum( CoolingSpeedNum ),
-			HeatingSpeedNum( HeatingSpeedNum ),
-			CoolingSpeedRatio( CoolingSpeedRatio ),
-			CoolingFanSpeedRatio( CoolingFanSpeedRatio ),
-			HeatingSpeedRatio( HeatingSpeedRatio ),
-			HeatingFanSpeedRatio( HeatingFanSpeedRatio ),
-			CoolingCycRatio( CoolingCycRatio ),
-			HeatingCycRatio( HeatingCycRatio ),
-			PartLoadFrac( PartLoadFrac ),
-			FanPartLoadRatio( FanPartLoadRatio ),
-			CompPartLoadRatio( CompPartLoadRatio ),
-			ElecPower( ElecPower ),
-			ElecPowerConsumption( ElecPowerConsumption ),
-			TotCoolEnergyRate( TotCoolEnergyRate ),
-			SensCoolEnergyRate( SensCoolEnergyRate ),
-			LatCoolEnergyRate( LatCoolEnergyRate ),
-			TotHeatEnergyRate( TotHeatEnergyRate ),
-			SensHeatEnergyRate( SensHeatEnergyRate ),
-			LatHeatEnergyRate( LatHeatEnergyRate ),
-			TotalAuxElecPower( TotalAuxElecPower ),
-			HeatingAuxElecConsumption( HeatingAuxElecConsumption ),
-			CoolingAuxElecConsumption( CoolingAuxElecConsumption ),
-			HeatRecoveryRate( HeatRecoveryRate ),
-			HeatRecoveryEnergy( HeatRecoveryEnergy ),
-			HeatRecoveryInletTemp( HeatRecoveryInletTemp ),
-			HeatRecoveryOutletTemp( HeatRecoveryOutletTemp ),
-			HeatRecoveryMassFlowRate( HeatRecoveryMassFlowRate ),
-			DehumidInducedHeatingDemandRate( DehumidInducedHeatingDemandRate ),
-			EMSSensibleZoneLoadValue( EMSSensibleZoneLoadValue ),
-			EMSMoistureZoneLoadValue( EMSMoistureZoneLoadValue ),
-			SpeedNum( SpeedNum ),
-			SpeedRatio( SpeedRatio ),
-			CycRatio( CycRatio ),
-			TESOpMode( TESOpMode ),
-			HXAssistedSensPLRIter( HXAssistedSensPLRIter ),
-			HXAssistedSensPLRIterIndex( HXAssistedSensPLRIterIndex ),
-			HXAssistedSensPLRFail( HXAssistedSensPLRFail ),
-			HXAssistedSensPLRFailIndex( HXAssistedSensPLRFailIndex ),
-			HXAssistedSensPLRFail2( HXAssistedSensPLRFail2 ),
-			HXAssistedSensPLRFailIndex2( HXAssistedSensPLRFailIndex2 ),
-			HXAssistedLatPLRIter( HXAssistedLatPLRIter ),
-			HXAssistedLatPLRIterIndex( HXAssistedLatPLRIterIndex ),
-			HXAssistedLatPLRFail( HXAssistedLatPLRFail ),
-			HXAssistedLatPLRFailIndex( HXAssistedLatPLRFailIndex ),
-			HXAssistedCRLatPLRIter( HXAssistedCRLatPLRIter ),
-			HXAssistedCRLatPLRIterIndex( HXAssistedCRLatPLRIterIndex ),
-			HXAssistedCRLatPLRFail( HXAssistedCRLatPLRFail ),
-			HXAssistedCRLatPLRFailIndex( HXAssistedCRLatPLRFailIndex ),
-			HXAssistedCRLatPLRFail2( HXAssistedCRLatPLRFail2 ),
-			HXAssistedCRLatPLRFailIndex2( HXAssistedCRLatPLRFailIndex2 ),
-			SensPLRIter( SensPLRIter ),
-			SensPLRIterIndex( SensPLRIterIndex ),
-			SensPLRFail( SensPLRFail ),
-			SensPLRFailIndex( SensPLRFailIndex ),
-			LatPLRIter( LatPLRIter ),
-			LatPLRIterIndex( LatPLRIterIndex ),
-			LatPLRFail( LatPLRFail ),
-			LatPLRFailIndex( LatPLRFailIndex ),
-			HeatCoilSensPLRIter( HeatCoilSensPLRIter ),
-			HeatCoilSensPLRIterIndex( HeatCoilSensPLRIterIndex ),
-			HeatCoilSensPLRFail( HeatCoilSensPLRFail ),
-			HeatCoilSensPLRFailIndex( HeatCoilSensPLRFailIndex ),
-			SuppHeatCoilSensPLRIter( SuppHeatCoilSensPLRIter ),
-			SuppHeatCoilSensPLRIterIndex( SuppHeatCoilSensPLRIterIndex ),
-			SuppHeatCoilSensPLRFail( SuppHeatCoilSensPLRFail ),
-			SuppHeatCoilSensPLRFailIndex( SuppHeatCoilSensPLRFailIndex ),
-			DXCoilSensPLRIter( DXCoilSensPLRIter ),
-			DXCoilSensPLRIterIndex( DXCoilSensPLRIterIndex ),
-			DXCoilSensPLRFail( DXCoilSensPLRFail ),
-			DXCoilSensPLRFailIndex( DXCoilSensPLRFailIndex ),
-			MSpdSensPLRIter( MSpdSensPLRIter ),
-			MSpdSensPLRIterIndex( MSpdSensPLRIterIndex ),
-			MSpdCycSensPLRIter( MSpdCycSensPLRIter ),
-			MSpdCycSensPLRIterIndex( MSpdCycSensPLRIterIndex ),
-			MSpdLatPLRIter( MSpdLatPLRIter ),
-			MSpdLatPLRIterIndex( MSpdLatPLRIterIndex ),
-			MSpdCycLatPLRIter( MSpdCycLatPLRIter ),
-			MSpdCycLatPLRIterIndex( MSpdCycLatPLRIterIndex ),
-			MaxIterIndex( MaxIterIndex ),
-			RegulaFalsIFailedIndex( RegulaFalsIFailedIndex ),
-			LatMaxIterIndex( LatMaxIterIndex ),
-			LatRegulaFalsIFailedIndex( LatRegulaFalsIFailedIndex ),
-			DesignFanVolFlowRateEMSOverrideOn( DesignFanVolFlowRateEMSOverrideOn ),
-			MaxHeatAirVolFlowEMSOverrideOn( MaxHeatAirVolFlowEMSOverrideOn ),
-			MaxCoolAirVolFlowEMSOverrideOn( MaxCoolAirVolFlowEMSOverrideOn ),
-			MaxNoCoolHeatAirVolFlowEMSOverrideOn( MaxNoCoolHeatAirVolFlowEMSOverrideOn ),
-			DesignFanVolFlowRateEMSOverrideValue( DesignFanVolFlowRateEMSOverrideValue ),
-			MaxHeatAirVolFlowEMSOverrideValue( MaxHeatAirVolFlowEMSOverrideValue ),
-			MaxCoolAirVolFlowEMSOverrideValue( MaxCoolAirVolFlowEMSOverrideValue ),
-			MaxNoCoolHeatAirVolFlowEMSOverrideValue( MaxNoCoolHeatAirVolFlowEMSOverrideValue ),
-			EMSOverrideSensZoneLoadRequest( EMSOverrideSensZoneLoadRequest ),
-			EMSOverrideMoistZoneLoadRequest( EMSOverrideMoistZoneLoadRequest ),
-			StageNum( StageNum ),
-			Staged( Staged ),
-			CoolCountAvail( CoolCountAvail ),
-			CoolIndexAvail( CoolIndexAvail ),
-			HeatCountAvail( HeatCountAvail ),
-			HeatIndexAvail( HeatIndexAvail ),
-			FirstPass( FirstPass )
+			FirstPass( true ),
+			SingleMode( 0 )
 		{}
 
 	};
@@ -1203,12 +729,6 @@ namespace HVACUnitarySystem {
 		UnitarySystemNumericFieldData()
 		{}
 
-		// Member Constructor
-		UnitarySystemNumericFieldData(
-			Array1_string const & FieldNames // Name of the UnitarySystem numeric field descriptions
-		) :
-			FieldNames( FieldNames )
-		{}
 	};
 
 	// Object Data
@@ -1217,6 +737,9 @@ namespace HVACUnitarySystem {
 	extern Array1D< UnitarySystemNumericFieldData > UnitarySystemNumericFields;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimUnitarySystem(
@@ -1651,29 +1174,6 @@ namespace HVACUnitarySystem {
 	clear_state();
 
 } // HVACUnitarySystem
-
-	// *****************************************************************************
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of CalIFornia through Ernest OrlanDO Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to DO so.
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 
 } // EnergyPlus

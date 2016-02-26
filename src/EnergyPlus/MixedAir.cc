@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 #include <string>
@@ -38,6 +96,7 @@
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HVACUnitarySystem.hh>
+#include <Humidifiers.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -47,6 +106,7 @@
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <SetPointManager.hh>
 #include <SteamCoils.hh>
 #include <TranspiredCollector.hh>
 #include <UserDefinedComponents.hh>
@@ -151,6 +211,7 @@ namespace MixedAir {
 	int const DXHeatPumpSystem( 19 );
 	int const Coil_UserDefined( 20 );
 	int const UnitarySystem( 21 );
+	int const Humidifier( 22 );
 
 	int const ControllerSimple( 1 );
 	int const ControllerOutsideAir( 2 );
@@ -446,12 +507,12 @@ namespace MixedAir {
 		static std::string CompType; //Tuned Made static
 		static std::string CompName; //Tuned Made static
 		static std::string CtrlName; //Tuned Made static
-		bool FatalErrorFlag;
-		bool Sim;
-		bool OAHeatCoil;
-		bool OACoolCoil;
-		bool OAHX;
-		bool ReSim;
+		bool FatalErrorFlag( false );
+		bool Sim( true );
+		bool OAHeatCoil( false );
+		bool OACoolCoil( false );
+		bool OAHX( false );
+		bool ReSim( false );
 
 		// SimOutsideAirSys can handle only 1 controller right now.  This must be
 		// an Outside Air Controller.  This is because of the lack of iteration
@@ -460,11 +521,8 @@ namespace MixedAir {
 		//    CtrlName = OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
 		//    CALL SimOAController(CtrlName,FirstHVACIteration)
 		//  END DO
-		FatalErrorFlag = false;
 		CtrlName = OutsideAirSys( OASysNum ).ControllerName( 1 );
 		CurOASysNum = OASysNum;
-		Sim = true;
-		ReSim = false;
 		SimOAController( CtrlName, OutsideAirSys( OASysNum ).ControllerIndex( 1 ), FirstHVACIteration, AirLoopNum );
 
 		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
@@ -584,7 +642,7 @@ namespace MixedAir {
 		using HVACUnitarySystem::SimUnitarySystem;
 		using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
-
+		using Humidifiers::SimHumidifier;
 		// Locals
 		// SUBROUTINE ARGUMENTS:
 
@@ -716,6 +774,13 @@ namespace MixedAir {
 				SimDesiccantDehumidifier( CompName, FirstHVACIteration, CompIndex );
 			}
 			OAHX = true;
+
+			// Humidifiers
+		} else if ( SELECT_CASE_var == Humidifier ) { // 'Humidifier:Steam:Electric'
+			// 'Humidifier:Steam:Gas'
+			if ( Sim ) {
+				SimHumidifier( CompName, FirstHVACIteration, CompIndex );
+			}
 
 			// Unglazed Transpired Solar Collector
 		} else if ( SELECT_CASE_var == Unglazed_SolarCollector ) { // 'SolarCollector:UnglazedTranspired'
@@ -1169,6 +1234,11 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Desiccant;
 				} else if ( SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:SYSTEM" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Desiccant;
+					// Humidifiers: Humidifier:Steam:Electric and Humidifier:Steam:Gas
+				} else if ( SELECT_CASE_var == "HUMIDIFIER:STEAM:ELECTRIC" ) {
+					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Humidifier;
+				} else if ( SELECT_CASE_var == "HUMIDIFIER:STEAM:GAS" ) {
+					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Humidifier;
 
 					// Unglazed Transpired Solar Collector
 				} else if ( SELECT_CASE_var == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED" ) {
@@ -2326,6 +2396,8 @@ namespace MixedAir {
 		using DataContaminantBalance::Contaminant;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
+		using SetPointManager::GetMixedAirNumWithCoilFreezingCheck;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -2634,6 +2706,7 @@ namespace MixedAir {
 			ShowContinueError( "...The high humidity control option will be disabled and the simulation continues." );
 		}
 
+		OAController( OutAirNum ).MixedAirSPMNum = GetMixedAirNumWithCoilFreezingCheck( OAController( OutAirNum ).MixNode );
 
 	}
 
@@ -2745,7 +2818,7 @@ namespace MixedAir {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		/////////// hoisted into namespace 
+		/////////// hoisted into namespace
 		//static bool MyOneTimeFlag( true ); // One-time initialization flag
 		//static bool MySetPointCheckFlag( true ); // One-time initialization flag
 		//static bool SetUpAirLoopHVACVariables( true ); // One-time initialization flag
@@ -3196,6 +3269,10 @@ namespace MixedAir {
 
 					SetupOutputVariable( "Air System Mixed Air Mass Flow Rate [kg/s]", OAController( OAControllerLoop ).MixMassFlow, "System", "Average", airloopName );
 
+					if ( OAController( OAControllerLoop ).MixedAirSPMNum > 0 ) {
+						SetupOutputVariable( "Air System Outdoor Air Maximum Flow Fraction []", OAController( OAControllerLoop ).MaxOAFracBySetPoint, "System", "Average", airloopName );
+					}
+
 					if ( AnyEnergyManagementSystemInModel ) {
 						SetupEMSInternalVariable( "Outdoor Air Controller Maximum Mass Flow Rate", OAController( OAControllerLoop ).Name, "[kg/s]", OAController( OAControllerLoop ).MaxOAMassFlowRate );
 						SetupEMSInternalVariable( "Outdoor Air Controller Minimum Mass Flow Rate", OAController( OAControllerLoop ).Name, "[kg/s]", OAController( OAControllerLoop ).MinOAMassFlowRate );
@@ -3500,6 +3577,7 @@ namespace MixedAir {
 		using DataGlobals::DisplayExtraWarnings;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::DoingSizing;
+		using SetPointManager::GetCoilFreezingCheckFlag;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -3579,6 +3657,7 @@ namespace MixedAir {
 		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
 		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
 		Real64 CO2PeopleGeneration; // CO2 generation from people at design level
+		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
 
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
@@ -4092,8 +4171,17 @@ namespace MixedAir {
 		}
 
 		// Define an outside air signal
+		if ( OAController( OAControllerNum ).MixedAirSPMNum > 0 ) {
+			OAController( OAControllerNum ).CoolCoilFreezeCheck = GetCoilFreezingCheckFlag( OAController( OAControllerNum ).MixedAirSPMNum );
+		} else {
+			OAController( OAControllerNum ).CoolCoilFreezeCheck = false;
+		}
 		if ( std::abs( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp ) > SmallTempDiff ) {
 			OutAirSignal = ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).MixSetTemp ) / ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp );
+			if ( OAController( OAControllerNum ).CoolCoilFreezeCheck ) {
+				OAController( OAControllerNum ).MaxOAFracBySetPoint = 0.0;
+				MaximumOAFracBySetPoint = OutAirSignal;
+			}
 		} else {
 			if ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).MixSetTemp < 0.0 ) {
 				if ( OAController( OAControllerNum ).RetTemp - OAController( OAControllerNum ).InletTemp >= 0.0 ) {
@@ -4271,6 +4359,16 @@ namespace MixedAir {
 				}
 			}
 
+		}
+
+		if ( OAController( OAControllerNum ).CoolCoilFreezeCheck ) {
+			MaximumOAFracBySetPoint = min( max( MaximumOAFracBySetPoint, 0.0 ), 1.0 );
+			OAController( OAControllerNum ).MaxOAFracBySetPoint = MaximumOAFracBySetPoint;
+			if ( MaximumOAFracBySetPoint < OutAirMinFrac ) {
+				OutAirMinFrac = MaximumOAFracBySetPoint;
+				if ( AirLoopNum > 0 ) AirLoopFlow( AirLoopNum ).MinOutAir = OutAirMinFrac * OAController( OAControllerNum ).MixMassFlow;
+			}
+			OASignal = min( MaximumOAFracBySetPoint, OASignal );
 		}
 
 		OAController( OAControllerNum ).OAMassFlow = OASignal * OAController( OAControllerNum ).MixMassFlow;
@@ -5347,22 +5445,19 @@ namespace MixedAir {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string CompType;
 		std::string CompName;
-		bool Sim;
-		bool FirstHVACIteration;
-		bool OAHeatingCoil;
-		bool OACoolingCoil;
+		bool Sim( false );
+		bool FirstHVACIteration( false );
+		bool OAHeatingCoil( false );
+		bool OACoolingCoil( false );
 		int CompNum;
-		int AirLoopNum;
-		bool OAHX;
+		int AirLoopNum( 0 );
+		bool OAHX( false );
 
 		if ( GetOASysInputFlag ) {
 			GetOutsideAirSysInputs();
 			GetOASysInputFlag = false;
 		}
 
-		Sim = false;
-		FirstHVACIteration = false;
-		AirLoopNum = 0;
 		NumHeatingCoils = 0;
 		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNumber ).NumComponents; ++CompNum ) {
 			CompType = OutsideAirSys( OASysNumber ).ComponentType( CompNum );
@@ -5374,6 +5469,66 @@ namespace MixedAir {
 		}
 
 		return NumHeatingCoils;
+
+	}
+
+	int
+	GetOASysNumHXs( int const OASysNumber ) 
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl, Rongpeng Zhang
+		//       DATE WRITTEN   Oct. 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// After making sure get input is done, the number of heat recovery exchangers in the
+		// OA System is returned.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Return value
+		int NumHX; // number of heat exchangers in this OA System
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int CompNum;
+		int CompNum_end;
+
+		if( GetOASysInputFlag ) {
+			GetOutsideAirSysInputs();
+			GetOASysInputFlag = false;
+		}
+
+		NumHX = 0;
+
+		auto const & componentType_Num = OutsideAirSys( OASysNumber ).ComponentType_Num;
+		for( CompNum = 1, CompNum_end = OutsideAirSys( OASysNumber ).NumComponents; CompNum <= CompNum_end; ++CompNum ) {
+			int const componentTypeNum = componentType_Num( CompNum );
+			if ( HeatXchngr == componentTypeNum || Desiccant == componentTypeNum ) {
+				++NumHX;
+			}
+		}
+
+		return NumHX;
 
 	}
 
@@ -5417,22 +5572,19 @@ namespace MixedAir {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string CompType;
 		std::string CompName;
-		bool Sim;
-		bool FirstHVACIteration;
-		bool OAHeatingCoil;
-		bool OACoolingCoil;
+		bool Sim( false );
+		bool FirstHVACIteration( false );
+		bool OAHeatingCoil( false );
+		bool OACoolingCoil( false );
 		int CompNum;
-		int AirLoopNum;
-		bool OAHX;
+		int AirLoopNum( 0 );
+		bool OAHX( false );
 
 		if ( GetOASysInputFlag ) {
 			GetOutsideAirSysInputs();
 			GetOASysInputFlag = false;
 		}
 
-		Sim = false;
-		FirstHVACIteration = false;
-		AirLoopNum = 0;
 		NumCoolingCoils = 0;
 		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNumber ).NumComponents; ++CompNum ) {
 			CompType = OutsideAirSys( OASysNumber ).ComponentType( CompNum );
@@ -6536,29 +6688,6 @@ namespace MixedAir {
 
 	// End of Utility Section of the Module
 	//******************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // MixedAir
 

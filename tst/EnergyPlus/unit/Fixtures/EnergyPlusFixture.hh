@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef EnergyPlusFixture_hh_INCLUDED
 #define EnergyPlusFixture_hh_INCLUDED
 
@@ -18,11 +76,11 @@ namespace EnergyPlus {
 	// everything is cleaned up properly
 	struct RedirectCout
 	{
-		RedirectCout( std::unique_ptr<std::ostringstream> const & m_buffer ) 
+		RedirectCout( std::unique_ptr<std::ostringstream> const & m_buffer )
 		: m_old_buffer( std::cout.rdbuf( m_buffer->rdbuf() ) )
 		{ }
 
-		~RedirectCout( )
+		~RedirectCout()
 		{
 			std::cout.rdbuf( m_old_buffer.release() );
 		}
@@ -35,11 +93,11 @@ namespace EnergyPlus {
 	// everything is cleaned up properly
 	struct RedirectCerr
 	{
-		RedirectCerr( std::unique_ptr<std::ostringstream> const & m_buffer ) 
+		RedirectCerr( std::unique_ptr<std::ostringstream> const & m_buffer )
 		: m_old_buffer( std::cerr.rdbuf( m_buffer->rdbuf() ) )
 		{ }
 
-		~RedirectCerr( )
+		~RedirectCerr()
 		{
 			std::cerr.rdbuf( m_old_buffer.release() );
 		}
@@ -153,18 +211,30 @@ namespace EnergyPlus {
 		static void use_cached_idd();
 
 		// This will compare either a STL container or ObjexxFCL container
-		// Pass a container you want to compare against an expected container. You can pass in an existing 
+		// Pass a container you want to compare against an expected container. You can pass in an existing
 		// container or use an initializer list like below.
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return true if containers are equal and false if they are not.
-		// Example Usage: 
+		// Example Usage:
 		// 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
 		// 		EXPECT_TRUE( compare_containers( Array1D_bool( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
 		template < class T, class T2 >
-		bool compare_containers( T const & expected_container, T2 const & actual_container );
+		bool compare_containers( T const & expected_container, T2 const & actual_container )
+		{
+			bool is_valid = ( expected_container.size() == actual_container.size() );
+			EXPECT_EQ( expected_container.size(), actual_container.size() ) << "Containers are not equal size.";
+			auto expected = expected_container.begin();
+			auto actual = actual_container.begin();
+			for ( ; expected != expected_container.end(); ++expected, ++actual ) {
+				// This may fail due to floating point issues for float and double...
+				EXPECT_EQ( *expected, *actual ) << "Incorrect 0-based index: " << ( expected - expected_container.begin() );
+				is_valid = ( *expected == *actual );
+			}
+			return is_valid;
+		}
 
-		// This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any 
+		// This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
 		// delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
 		std::string delimited_string( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL );
 
@@ -242,14 +312,14 @@ namespace EnergyPlus {
 		// Will return true if data structures match and false if they do not.
 		// Usage (assuming "Version,8.3;" was parsed as an idf snippet):
 		// 		EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
-		bool compare_idf( 
-			std::string const & name, 
-			int const num_alphas, 
-			int const num_numbers, 
-			std::vector< std::string > const & alphas, 
-			std::vector< bool > const & alphas_blank, 
-			std::vector< Real64 > const & numbers, 
-			std::vector< bool > const & numbers_blank 
+		bool compare_idf(
+			std::string const & name,
+			int const num_alphas,
+			int const num_numbers,
+			std::vector< std::string > const & alphas,
+			std::vector< bool > const & alphas_blank,
+			std::vector< Real64 > const & numbers,
+			std::vector< bool > const & numbers_blank
 		);
 
 	private:

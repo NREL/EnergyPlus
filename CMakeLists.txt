@@ -2,6 +2,10 @@ Project(EnergyPlus)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
+  CMAKE_POLICY(SET CMP0054 NEW) # CMake 3.1 added this policy
+endif()
+
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_VERSION_MAJOR 8 )
@@ -39,6 +43,14 @@ else()
   set(GIT_DIR "")
 endif()
 
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+    "MinSizeRel" "RelWithDebInfo")
+endif()
 
 set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
@@ -59,15 +71,16 @@ endif()
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
+option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
 option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-# we don't need all devs to have Python installed.  There are 2 cases where we do want it
-# 1. Doing regression testing; which would be: BUILD_TESTING AND ENABLE_REGRESSION_TESTING
-# 2. Doing package building, since Python is going to be our tool for some things; thus: BUILD_PACKAGE
+# we are making python a required dependency, so find it here...starting off by requiring at least 2.7
+find_package(PythonInterp 2.7 REQUIRED)
 
-if( ( BUILD_TESTING AND ENABLE_REGRESSION_TESTING ) OR ( BUILD_PACKAGE ) )
-  find_package(PythonInterp 2.7 REQUIRED)
+# then we can add python-based tests for it
+if ( BUILD_TESTING )
+  add_test( NAME VerifyIDFsInCMakeFolder COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/scripts/dev/VerifyIDFsInCMake.py" "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" )
 endif()
 
 if( BUILD_TESTING )
@@ -132,6 +145,7 @@ endif()
 include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
 
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
@@ -170,6 +184,20 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
   ADD_SUBDIRECTORY(tst/jsoncpp/unit)
+
+  option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
+
+  if (BUILD_PERFORMANCE_TESTS)
+
+    if (UNIX AND NOT APPLE)
+      option( VALGRIND_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via valgrind / callgrind" OFF )
+
+      if (VALGRIND_ANALYZE_PERFORMANCE_TESTS)
+        find_program(VALGRIND NAMES valgrind PATH /usr/bin /usr/local/bin)
+      endif()
+    endif()
+    ADD_SUBDIRECTORY(performance_tests)
+  endif()
 endif()
 
 configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
@@ -215,7 +243,7 @@ endif()
 
 
 set(OPTIMIZABLE_TARGETS
-  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib energypluslib2
+  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib
     )
 if(NOT APPLE AND NOT MSVC)
   list(APPEND OPTIMIZABLE_TARGETS parser)
@@ -356,4 +384,3 @@ endif()
 if (BUILD_DOCS)
   add_subdirectory(doc/src)
 endif()
-

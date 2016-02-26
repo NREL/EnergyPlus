@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 #include <string>
@@ -319,8 +377,6 @@ namespace PlantCentralGSHP {
 		// auto-size the chiller heater components
 		if ( Wrapper( WrapperNum ).ControlMode == SmartMixing ) {
 			for ( NumChillerHeater = 1; NumChillerHeater <= Wrapper( WrapperNum ).ChillerHeaterNums; ++NumChillerHeater ) {
-				PltSizNum = 0;
-				PltSizCondNum = 0;
 				ErrorsFound = false;
 
 				// find the appropriate Plant Sizing object
@@ -592,19 +648,6 @@ namespace PlantCentralGSHP {
 
 		// LOCAL VARIABLES
 		static std::string CompName; // component name
-		std::string temp_char; // temporary character variable
-		std::string temp_char1; // temporary character variable
-		std::string temp_char2; // temporary character variable
-		std::string EvapInletNodeName; // virtual evaporator inlet node name for chiller heater
-		std::string EvapOutletNodeName; // virtual evaporator outlet node name for chiller heater
-		std::string CondInletNodeName; // virtual condenser inlet node name for chiller heater
-		std::string CondOutletNodeName; // virtual condenser outlet node name for chiller heater
-		std::string LoadsideInletNodeName; // virtual load inlet node name for heat pump
-		std::string LoadsideOutletNodeName; // virtual load outlet node name for heat pump
-		std::string SourcesideInletNodeName; // virtual source inlet node name for heat pump
-		std::string SourcesideOutletNodeName; // virtual source outlet node name for heat pump
-		std::string DummyInletNodeName; // virtual dummy inlet node name
-		std::string DummyOutletNodeName; // virtual dummy inlet node name
 		static bool ErrorsFound( false ); // True when input errors are found
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -903,11 +946,6 @@ namespace PlantCentralGSHP {
 		// na
 
 		// LOCAL VARIABLES
-		std::string EvapInletNodeName; // Evaporator inlet node name
-		std::string EvapOutletNodeName; // Evaporator outlet node name
-		std::string CondInletNodeName; // Condenser inlet node name
-		std::string CondOutletNodeName; // Condenser outlet node name
-		std::string temp_char; // temporary character variable
 		std::string StringVar; // Used for EIRFPLR warning messages
 		static bool CHErrorsFound( false ); // True when input errors are found
 		bool IsNotOK; // Flag to verify name
@@ -1563,7 +1601,7 @@ namespace PlantCentralGSHP {
 		static bool IsLoadCoolRemaining( true );
 		static bool NextCompIndicator( false ); // Component indicator when identical chiller heaters exist
 		int LoopSideNum; // Plant loop side which contains the current chiller (usually supply side)
-		int CompNum; // Component number in the loop  REAL(r64) :: FRAC
+		int CompNum( 0 ); // Component number in the loop  REAL(r64) :: FRAC
 		int ChillerHeaterNum; // Chiller heater number
 		int CurrentMode; // Current operational mode, cooling or simultaneous cooling and heating mode
 		int IdenticalUnitCounter; // Pointer to count number of identical unit passed
@@ -1587,10 +1625,10 @@ namespace PlantCentralGSHP {
 		Real64 GLHEDensityRatio; // Fraction between starndarized density and local density in the condenser side
 		Real64 CHWDensityRatio; // Fraction between starndarized density and local density in the chilled water side
 		Real64 EvaporatorCapMin; // Minimum capacity of the evaporator
-		Real64 EvaporatorLoad; // Cooling load evaporator should meet
+		Real64 EvaporatorLoad( 0.0 ); // Cooling load evaporator should meet
 		Real64 HeatingPower; // Electric power use for heating
 		Real64 CHWInletMassFlowRate; // Chilled water inlet mass flow rate
-		Real64 CurAvailCHWMassFlowRate; // Maximum available mass flow rate for current chiller heater
+		Real64 CurAvailCHWMassFlowRate( 0.0 ); // Maximum available mass flow rate for current chiller heater
 		Real64 EvapMassFlowRateCalc; // Evaporator mass flow rate calculated
 		Real64 EvapDeltaTempCalc; // Evaporator temperature difference calculated
 		Real64 EvapOutletTempCalc; // Evaporator outlet temperature calculated
@@ -1606,12 +1644,9 @@ namespace PlantCentralGSHP {
 		Real64 CondDensity; // Condenser water density
 		Real64 ActualCOP; // Actual performance of individual chiller heater
 
-		EvaporatorLoad = 0.0;
 		EvaporatorLoad = Wrapper( WrapperNum ).WrapperCoolingLoad;
 		LoopSideNum = Wrapper( WrapperNum ).CWLoopSideNum;
 		CHWInletMassFlowRate = Node( Wrapper( WrapperNum ).CHWInletNodeNum ).MassFlowRate;
-		CurAvailCHWMassFlowRate = 0.0;
-		CompNum = 0;
 
 		for ( ChillerHeaterNum = 1; ChillerHeaterNum <= Wrapper( WrapperNum ).ChillerHeaterNums; ++ChillerHeaterNum ) {
 
@@ -2039,7 +2074,7 @@ namespace PlantCentralGSHP {
 		static bool IsLoadHeatRemaining( true ); // Ture if heating load remains for this chiller heater
 		static bool NextCompIndicator( false ); // Component indicator when identical chiller heaters exist
 		int LoopSideNum; // Plant loop side which contains the current chiller (usually supply side)
-		int CompNum; // Component number
+		int CompNum( 0 ); // Component number
 		int ChillerHeaterNum; // Chiller heater number
 		int CurrentMode; // Current operational mode, heating or simultaneous cooling and heating mode
 		int IdenticalUnitCounter; // Pointer to count number of identical unit passed
@@ -2059,14 +2094,14 @@ namespace PlantCentralGSHP {
 		Real64 ReferenceCOP; // Reference coefficient of performance, from user input
 		Real64 PartLoadRat; // Operating part load ratio
 		Real64 TempLowLimitEout; // Evaporator low temp. limit cut off [C]
-		Real64 CondenserLoad; // Remaining heating load that this wrapper should meet
+		Real64 CondenserLoad( 0.0 ); // Remaining heating load that this wrapper should meet
 		Real64 HeatingLoadToMeet; // Heating load that this chiller heater should meet
 		Real64 GLHEDensityRatio; // The density ratio of source water to the initialized source water
 		Real64 HWDensityRatio; // The density ratio of hot water to the initialized hot water
 		Real64 CondenserCapMin; // Minimum condenser capacity
 		Real64 CoolingPower; // Evaporator cooling power to produce heat for heating
 		Real64 HWInletMassFlowRate; // Hot water inlet mass flow rate
-		Real64 CurAvailHWMassFlowRate; // Maximum available hot water mass within the wrapper bank
+		Real64 CurAvailHWMassFlowRate( 0.0 ); // Maximum available hot water mass within the wrapper bank
 		Real64 CondDeltaTempCalc; // Temperature differnece between condenser inlet and outlet calculated
 		Real64 CondOutletTempCalc; // Condenser outlet temperature calculated
 		Real64 CondMassFlowRateCalc; // Condenser mass flow rate calculated
@@ -2082,12 +2117,9 @@ namespace PlantCentralGSHP {
 		Real64 CondDensity; // Condenser water density
 		Real64 ActualCOP; // Actual performance of individual chiller heater
 
-		CondenserLoad = 0.0;
 		CondenserLoad = Wrapper( WrapperNum ).WrapperHeatingLoad;
 		LoopSideNum = Wrapper( WrapperNum ).HWLoopSideNum;
 		HWInletMassFlowRate = Node( Wrapper( WrapperNum ).HWInletNodeNum ).MassFlowRate;
-		CurAvailHWMassFlowRate = 0.0;
-		CompNum = 0;
 
 		// Flow
 		for ( ChillerHeaterNum = 1; ChillerHeaterNum <= Wrapper( WrapperNum ).ChillerHeaterNums; ++ChillerHeaterNum ) {
@@ -2569,16 +2601,16 @@ namespace PlantCentralGSHP {
 		Real64 GLHEInletMassFlowRate; // Chiller heater bank condenser loop intlet mass flow rate
 		Real64 GLHEOutletMassFlowRate; // Chiller heater bank condenser loop outlet mass flow rate
 		Real64 GLHEBypassMassFlowRate; // Chiller heater bank condenser loop bypass mass flow rate
-		Real64 WrapperElecPowerCool; // Chiller heater bank total cooling electricity [W]
-		Real64 WrapperElecPowerHeat; // Chiller heater bank total heating electricity [W]
-		Real64 WrapperCoolRate; // Chiller heater bank total cooling rate [W]
-		Real64 WrapperHeatRate; // Chiller heater bank total heating rate [W]
-		Real64 WrapperGLHERate; // Chiller heater bank total condenser heat transfer rate [W]
-		Real64 WrapperElecEnergyCool; // Chiller heater bank total electric cooling energy [J]
-		Real64 WrapperElecEnergyHeat; // Chiller heater bank total electric heating energy [J]
-		Real64 WrapperCoolEnergy; // Chiller heater bank total cooling energy [J]
-		Real64 WrapperHeatEnergy; // Chiller heater bank total heating energy [J]
-		Real64 WrapperGLHEEnergy; // Chiller heater bank total condenser heat transfer energy [J]
+		Real64 WrapperElecPowerCool( 0.0 ); // Chiller heater bank total cooling electricity [W]
+		Real64 WrapperElecPowerHeat( 0.0 ); // Chiller heater bank total heating electricity [W]
+		Real64 WrapperCoolRate( 0.0 ); // Chiller heater bank total cooling rate [W]
+		Real64 WrapperHeatRate( 0.0 ); // Chiller heater bank total heating rate [W]
+		Real64 WrapperGLHERate( 0.0 ); // Chiller heater bank total condenser heat transfer rate [W]
+		Real64 WrapperElecEnergyCool( 0.0 ); // Chiller heater bank total electric cooling energy [J]
+		Real64 WrapperElecEnergyHeat( 0.0 ); // Chiller heater bank total electric heating energy [J]
+		Real64 WrapperCoolEnergy( 0.0 ); // Chiller heater bank total cooling energy [J]
+		Real64 WrapperHeatEnergy( 0.0 ); // Chiller heater bank total heating energy [J]
+		Real64 WrapperGLHEEnergy( 0.0 ); // Chiller heater bank total condenser heat transfer energy [J]
 		int CurrentMode; // Current operation mode indicator
 
 		//Autodesk:Uninit Initialize variables used uninitialized
@@ -2608,7 +2640,6 @@ namespace PlantCentralGSHP {
 			GLHEInletMassFlowRate = Node( GLHEInletNodeNum ).MassFlowRateMaxAvail;
 			LoopSideNum = Wrapper( WrapperNum ).CWLoopSideNum;
 			LoopSide = Wrapper( WrapperNum ).CWLoopSideNum;
-			CurCoolingLoad = 0.0;
 			Wrapper( WrapperNum ).WrapperCoolingLoad = 0.0;
 			CurCoolingLoad = std::abs( MyLoad );
 			Wrapper( WrapperNum ).WrapperCoolingLoad = CurCoolingLoad;
@@ -2623,7 +2654,6 @@ namespace PlantCentralGSHP {
 			HWInletMassFlowRate = Node( HWInletNodeNum ).MassFlowRateMaxAvail;
 			GLHEInletMassFlowRate = Node( GLHEInletNodeNum ).MassFlowRateMaxAvail;
 			LoopSideNum = Wrapper( WrapperNum ).HWLoopSideNum;
-			CurHeatingLoad = 0.0;
 			Wrapper( WrapperNum ).WrapperHeatingLoad = 0.0;
 			CurHeatingLoad = MyLoad;
 			Wrapper( WrapperNum ).WrapperHeatingLoad = CurHeatingLoad;
@@ -2633,18 +2663,6 @@ namespace PlantCentralGSHP {
 			}
 			if ( HWInletMassFlowRate == 0.0 ) GLHEInletMassFlowRate = 0.0;
 		}
-
-		// Initialize local variables
-		WrapperElecPowerCool = 0.0;
-		WrapperElecPowerHeat = 0.0;
-		WrapperCoolRate = 0.0;
-		WrapperHeatRate = 0.0;
-		WrapperGLHERate = 0.0;
-		WrapperElecEnergyCool = 0.0;
-		WrapperElecEnergyHeat = 0.0;
-		WrapperCoolEnergy = 0.0;
-		WrapperHeatEnergy = 0.0;
-		WrapperGLHEEnergy = 0.0;
 
 		if ( LoopNum == Wrapper( WrapperNum ).CWLoopNum ) {
 			if ( Wrapper( WrapperNum ).ControlMode == SmartMixing ) {
@@ -2987,7 +3005,6 @@ namespace PlantCentralGSHP {
 								WrapperElecPowerCool = 0.0;
 								WrapperCoolRate = 0.0;
 								WrapperElecEnergyCool = 0.0;
-								WrapperElecEnergyCool = 0.0;
 							}
 							// Calculate chilled water outlet temperature
 							if ( CHWInletMassFlowRate > 0.0 ) {
@@ -3303,29 +3320,6 @@ namespace PlantCentralGSHP {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PlantCentralGSHP
 
