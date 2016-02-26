@@ -668,7 +668,7 @@ namespace ThermalComfort {
 					if ( present( PNum ) ) {
 						AirTemp = Tset;
 					} else {
-						AirTemp = ZTAV( ZoneNum );
+						AirTemp = ZTAVComf( ZoneNum );
 					}
 				}
 			} else {
@@ -973,7 +973,7 @@ namespace ThermalComfort {
 			if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
 				AirTemp = TCMF( ZoneNum ); //PH 3/7/04
 			} else {
-				AirTemp = ZTAV( ZoneNum );
+				AirTemp = ZTAVComf( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
 			RelHum = PsyRhFnTdbWPb( AirTemp, ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
@@ -1405,7 +1405,7 @@ namespace ThermalComfort {
 			if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
 				AirTemp = TCMF( ZoneNum ); //PH 3/7/04
 			} else {
-				AirTemp = ZTAV( ZoneNum );
+				AirTemp = ZTAVComf( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
 			RelHum = PsyRhFnTdbWPb( AirTemp, ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
@@ -2241,11 +2241,11 @@ namespace ThermalComfort {
 				if ( IsZoneDV( iZone ) || IsZoneUI( iZone ) ) {
 					CurAirTemp = TCMF( iZone );
 				} else {
-					CurAirTemp = ZTAV( iZone );
+					CurAirTemp = ZTAVComf( iZone );
 				}
 				CurMeanRadiantTemp = MRT( iZone );
 				OperTemp = CurAirTemp * 0.5 + CurMeanRadiantTemp * 0.5;
-				HumidRatio = ZoneAirHumRat( iZone );
+				HumidRatio = ZoneAirHumRatAvgComf( iZone );
 				//for debugging
 				//ThermalComfortInASH55(iZone)%dCurAirTemp = CurAirTemp
 				//ThermalComfortInASH55(iZone)%dCurMeanRadiantTemp = CurMeanRadiantTemp
@@ -2794,7 +2794,7 @@ namespace ThermalComfort {
 			if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
 				AirTemp = TCMF( ZoneNum );
 			} else {
-				AirTemp = ZTAV( ZoneNum );
+				AirTemp = ZTAVComf( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
 			OpTemp = ( AirTemp + RadTemp ) / 2.0;
@@ -3020,7 +3020,7 @@ namespace ThermalComfort {
 			if ( IsZoneDV( ZoneNum ) || IsZoneUI( ZoneNum ) ) {
 				AirTemp = TCMF( ZoneNum );
 			} else {
-				AirTemp = ZTAV( ZoneNum );
+				AirTemp = ZTAVComf( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
 			OpTemp = ( AirTemp + RadTemp ) / 2.0;
