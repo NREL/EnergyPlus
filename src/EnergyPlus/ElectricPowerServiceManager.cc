@@ -1853,10 +1853,10 @@ namespace EnergyPlus {
 	}
 
 	GeneratorController::GeneratorController(
-		std::string objectName,
-		std::string objectType,
+		std::string const & objectName,
+		std::string const & objectType,
 		Real64 ratedElecPowerOutput,
-		std::string availSchedName,
+		std::string const & availSchedName,
 		Real64 thermalToElectRatio
 	):
 		compGenTypeOf_Num( 0 ),
@@ -2024,7 +2024,7 @@ namespace EnergyPlus {
 	}
 
 	DCtoACInverter::DCtoACInverter(
-		std::string const objectName
+		std::string const & objectName
 	):
 		aCPowerOut( 0.0 ),
 		aCEnergyOut( 0.0 ),
@@ -2376,7 +2376,7 @@ namespace EnergyPlus {
 	}
 
 	ACtoDCConverter::ACtoDCConverter(
-		std::string const objectName
+		std::string const & objectName
 	):
 		efficiency( 0.0 ),
 		aCPowerIn( 0.0 ),
@@ -2614,7 +2614,7 @@ namespace EnergyPlus {
 	}
 
 	ElectricStorage::ElectricStorage( // main constructor
-		std::string objectName
+		std::string const & objectName
 	):
 			storedPower( 0.0 ),
 			storedEnergy( 0.0 ),
@@ -3596,7 +3596,7 @@ namespace EnergyPlus {
 
 	// constructor
 	ElectricTransformer::ElectricTransformer(
-		std::string objectName
+		std::string const & objectName
 	):
 			myOneTimeFlag_( true ),
 			availSchedPtr_( 0 ),

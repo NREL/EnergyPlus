@@ -96,7 +96,7 @@ public: // Methods
 
 	// Constructor
 	DCtoACInverter(
-		std::string objectName
+		std::string const & objectName
 	);
 
 	void
@@ -188,7 +188,7 @@ public: // Methods
 
 	// Constructor
 	ACtoDCConverter(
-		std::string const objectName
+		std::string const & objectName
 	);
 
 	void
@@ -271,7 +271,7 @@ public: //methods
 	
 	// Constructor
 	ElectricStorage(
-		std::string objectName
+		std::string const & objectName
 		// need object type
 	);
 
@@ -317,9 +317,9 @@ public: //methods
 
 	bool
 	determineCurrentForBatteryDischarge(
-		Real64& curI0,
-		Real64& curT0,
-		Real64& curVolt,
+		Real64 & curI0,
+		Real64 & curT0,
+		Real64 & curVolt,
 		Real64 const Pw,
 		Real64 const q0,
 		int const CurveNum,
@@ -474,7 +474,7 @@ public: //methods
 
 	// Constructor
 	ElectricTransformer(
-		std::string objectName
+		std::string const & objectName
 	);
 
 	Real64
@@ -541,8 +541,6 @@ private: //data
 	//calculated and from elsewhere vars
 	Real64 ratedNL_; // rated no load losses, user input or calculated [W]
 	Real64 ratedLL_; // rated load losses, user input or calculated [W]
-
-
 	int overloadErrorIndex_; // used for warning message when transformer is overloaded
 	//results and reporting
 	Real64 efficiency_; // transformer efficiency
@@ -576,11 +574,11 @@ public: // Methods
 
 	// Constructor
 	GeneratorController(
-		std::string objectName,
-		std::string objectType,
-		Real64 ratedElecPowerOutput,
-		std::string availSchedName,
-		Real64 thermalToElectRatio
+		std::string const & objectName,
+		std::string const & objectType,
+		Real64 const ratedElecPowerOutput,
+		std::string const & availSchedName,
+		Real64 const thermalToElectRatio
 	);
 
 	void
@@ -903,7 +901,6 @@ private: // data
 	int numPowerOutTransformers_;
 	std::string powerOutTransformerName_;
 	std::unique_ptr < ElectricTransformer >  powerOutTransformerObj_;
-
 	Real64 wholeBldgRemainingLoad_;
 	Real64 electricityProd_; // Current Electric Produced from Equipment (J)
 	Real64 electProdRate_; // Current Electric Production Rate from Equipment (W)
@@ -921,7 +918,6 @@ private: // data
 	Real64 elecProducedStorageRate_; // Current Rate of power to(-)/from(+) storage
 	Real64 elecProducedPowerConversionRate_; // Current rate of power loss from power conversion, negative (W)
 	Real64 elecProducedCoGenRate_; // Current Rate of Cogeneration generators produced ( W )
-
 	Real64 pvTotalCapacity_; // for LEED report, total installed PV capacity
 	Real64 windTotalCapacity_; // for LEED report, total installed wind capacity
 
