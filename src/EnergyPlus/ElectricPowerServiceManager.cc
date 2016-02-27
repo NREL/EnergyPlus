@@ -202,8 +202,8 @@ namespace EnergyPlus {
 				powerOutTransformerObj_->reinitZoneGainsAtBeginEnvironment();
 		}
 		if ( numLoadCenters_ > 0 ) {
-			for ( auto loop = 0; loop < numLoadCenters_; ++loop ) {
-				elecLoadCenterObjs[ loop ]->reinitZoneGainsAtBeginEnvironment();
+			for ( auto & e : elecLoadCenterObjs ) {
+				e->reinitZoneGainsAtBeginEnvironment();
 			}
 		}
 	}
@@ -462,38 +462,109 @@ namespace EnergyPlus {
 	void
 	ElectricPowerServiceManager::checkLoadCenters() {
 	
-		//issue #5302, detect if storage used on more than one load center. This is really a kind of GlobalNames issue, 
+		//issue #5302, detect if storage used on more than one load center. This is really a kind of GlobalNames issue.
+		// expanded to all devices on a load center
+		bool errorsFound = false;
 
 		//first fill in a vector of names
 		std::vector < std::string > storageNames;
 		std::vector < std::string > genListNames;
+		std::vector < std::string > inverterNames;
+		std::vector < std::string > converterNames;
+		std::vector < std::string > transformerNames;
 		for ( auto & e : elecLoadCenterObjs ) {
 			if ( e->storageObj != nullptr ) {
-				storageNames.emplace_back( e->storageObj->name );
+				storageNames.emplace_back( e->storageObj->name() );
 			}
 			if ( ! e->elecGenCntrlObj.empty()  ) {
 				genListNames.emplace_back( e->generatorListName() );
 			}
+			if ( e->inverterObj != nullptr ) {
+				inverterNames.emplace_back( e->inverterObj->name() );
+			}
+			if ( e->converterObj != nullptr ) {
+				converterNames.emplace_back( e->converterObj->name() );
+			}
+			if ( e->transformerObj != nullptr ) {
+				transformerNames.emplace_back( e->transformerObj->name() );
+			}
 		}
 
-		//then check the vector for duplicates. 
+		//then check the vectors for duplicates. 
 		for ( std::size_t i = 0; i < storageNames.size(); ++i ) {
 			for ( std::size_t j = 0; j < storageNames.size(); ++j ) {
 				if ( storageNames[ i ] == storageNames[ j ] && i != j ) {
-					ShowWarningError( "ElectricPowerServiceManager::checkLoadCenters, the electrical storage device named = " + storageNames[ i ] + " is used on more than one ElectricLoadCenter:Distribution input object." );
+					ShowSevereError( "ElectricPowerServiceManager::checkLoadCenters, the electrical storage device named = " + storageNames[ i ] + " is used in more than one ElectricLoadCenter:Distribution input object." );
 					ShowContinueError( "Electric Load Centers cannot share the same storage device." );
+					errorsFound = true;
+					break;
 				}
+			}
+			if ( errorsFound ) {
+				break;
 			}
 		}
 
 		for ( std::size_t i = 0; i < genListNames.size(); ++i ) {
 			for ( std::size_t j = 0; j < genListNames.size(); ++j ) {
 				if ( genListNames[ i ] == genListNames[ j ] && i != j ) {
-					ShowWarningError( "ElectricPowerServiceManager::checkLoadCenters, the generator list named = " + genListNames[ i ] + " is used on more than one ElectricLoadCenter:Distribution input object." );
+					ShowSevereError( "ElectricPowerServiceManager::checkLoadCenters, the generator list named = " + genListNames[ i ] + " is used in more than one ElectricLoadCenter:Distribution input object." );
 					ShowContinueError( "Electric Load Centers cannot share the same generator list (ElectricLoadCenter:Generators)." );
+					errorsFound = true;
+					break;
 				}
 			}
+			if ( errorsFound ) {
+				break;
+			}
 		}
+
+		for ( std::size_t i = 0; i < inverterNames.size(); ++i ) {
+			for ( std::size_t j = 0; j < inverterNames.size(); ++j ) {
+				if ( inverterNames[ i ] == inverterNames[ j ] && i != j ) {
+					ShowSevereError( "ElectricPowerServiceManager::checkLoadCenters, the inverter device named = " + inverterNames[ i ] + " is used in more than one ElectricLoadCenter:Distribution input object." );
+					ShowContinueError( "Electric Load Centers cannot share the same inverter device." );
+					errorsFound = true;
+					break;
+				}
+			}
+			if ( errorsFound ) {
+				break;
+			}
+		}
+
+		for ( std::size_t i = 0; i < converterNames.size(); ++i ) {
+			for ( std::size_t j = 0; j < converterNames.size(); ++j ) {
+				if ( converterNames[ i ] == converterNames[ j ] && i != j ) {
+					ShowSevereError( "ElectricPowerServiceManager::checkLoadCenters, the converter device named = " + converterNames[ i ] + " is used in more than one ElectricLoadCenter:Distribution input object." );
+					ShowContinueError( "Electric Load Centers cannot share the same converter device." );
+					errorsFound = true;
+					break;
+				}
+			}
+			if ( errorsFound ) {
+				break;
+			}
+		}
+
+		for ( std::size_t i = 0; i < transformerNames.size(); ++i ) {
+			for ( std::size_t j = 0; j < transformerNames.size(); ++j ) {
+				if ( transformerNames[ i ] == transformerNames[ j ] && i != j ) {
+					ShowSevereError( "ElectricPowerServiceManager::checkLoadCenters, the transformer device named = " + transformerNames[ i ] + " is used in more than one ElectricLoadCenter:Distribution input object." );
+					ShowContinueError( "Electric Load Centers cannot share the same transformer device." );
+					errorsFound = true;
+					break;
+				}
+			}
+			if ( errorsFound ) {
+				break;
+			}
+		}
+
+		if ( errorsFound ) { // throw fatal, these errors could fatal out in internal gains with missleading data
+			ShowFatalError( "ElectricPowerServiceManager::checkLoadCenters, preceding errors terminate program." );
+		}
+
 	}
 
 	ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
@@ -836,7 +907,7 @@ namespace EnergyPlus {
 			if ( transformerItemNum > 0 ) {
 				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, transformerItemNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 				if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 3 ), "LoadCenterPowerConditioning" ) ) { // this is the right kind of transformer
-					transformerObj_ = std::unique_ptr < ElectricTransformer >( new ElectricTransformer (transformerName_ ) );
+					transformerObj = std::unique_ptr < ElectricTransformer >( new ElectricTransformer (transformerName_ ) );
 				} else {
 					ShowWarningError( "Transformer named " + transformerName_ + " associated with the load center named " + name_ + " should have " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " set to LoadCenterPowerConditioning." );
 				}
@@ -848,7 +919,7 @@ namespace EnergyPlus {
 
 		if ( ! errorsFound && converterPresent_ ) {
 			// call AC to DC converter constructor
-			converterObj_ = std::unique_ptr< ACtoDCConverter >( new ACtoDCConverter( converterName_ ) );
+			converterObj = std::unique_ptr< ACtoDCConverter >( new ACtoDCConverter( converterName_ ) );
 		}
 
 		//Setup general output variables for reporting in the electric load center
@@ -902,15 +973,15 @@ namespace EnergyPlus {
 			}
 		}
 
-		if ( converterObj_ != nullptr ) {
-			converterObj_->simulate( storOpCVDrawRate );
+		if ( converterObj != nullptr ) {
+			converterObj->simulate( storOpCVDrawRate );
 		}
 
-		if ( transformerObj_ != nullptr ) {
+		if ( transformerObj != nullptr ) {
 			if ( storOpCVFeedInRate > 0.0 ) {
-				transformerObj_->manageTransformers( storOpCVFeedInRate );
+				transformerObj->manageTransformers( storOpCVFeedInRate );
 			} else if ( storOpCVDrawRate > 0.0 ) {
-				transformerObj_->manageTransformers( subpanelDrawRate );
+				transformerObj->manageTransformers( subpanelDrawRate );
 			}
 		}
 		updateLoadCenterGeneratorRecords();
@@ -1423,30 +1494,30 @@ namespace EnergyPlus {
 			}
 			case ElectricBussType::aCBussStorage :
 			case ElectricBussType::dCBussInverterACStorage : {
-				if ( transformerObj_ == nullptr ) {
+				if ( transformerObj == nullptr ) {
 					adjustedFeedInRequest = subpanelFeedInRequest;
 					adjustedDrawRequest   = subpanelDrawRequest;
 				} else {
-					adjustedFeedInRequest = subpanelFeedInRequest + transformerObj_->getLossRateForOutputPower( subpanelFeedInRequest );
-					adjustedDrawRequest   = subpanelDrawRequest - transformerObj_->getLossRateForInputPower( subpanelDrawRequest );
+					adjustedFeedInRequest = subpanelFeedInRequest + transformerObj->getLossRateForOutputPower( subpanelFeedInRequest );
+					adjustedDrawRequest   = subpanelDrawRequest - transformerObj->getLossRateForInputPower( subpanelDrawRequest );
 				}
 				break;
 			}
 			case ElectricBussType::dCBussInverterDCStorage : {
 				// can we get updated power conditioning losses here?
-				if ( transformerObj_ == nullptr ) {
+				if ( transformerObj == nullptr ) {
 					adjustedFeedInRequest = subpanelFeedInRequest + inverterObj->getLossRateForOutputPower( subpanelFeedInRequest );
-					if ( converterObj_ == nullptr ) { // some operation schemes will never need a converter
+					if ( converterObj == nullptr ) { // some operation schemes will never need a converter
 						adjustedDrawRequest   = subpanelDrawRequest;
 					} else {
-						adjustedDrawRequest   = subpanelDrawRequest - converterObj_->getLossRateForInputPower( subpanelDrawRequest );
+						adjustedDrawRequest   = subpanelDrawRequest - converterObj->getLossRateForInputPower( subpanelDrawRequest );
 					}
 				} else {
-					adjustedFeedInRequest = subpanelFeedInRequest + inverterObj->getLossRateForOutputPower( subpanelFeedInRequest ) + transformerObj_->getLossRateForOutputPower( subpanelFeedInRequest );
-					if ( converterObj_ == nullptr ) {
-						adjustedDrawRequest   = subpanelDrawRequest - transformerObj_->getLossRateForInputPower( subpanelDrawRequest );
+					adjustedFeedInRequest = subpanelFeedInRequest + inverterObj->getLossRateForOutputPower( subpanelFeedInRequest ) + transformerObj->getLossRateForOutputPower( subpanelFeedInRequest );
+					if ( converterObj == nullptr ) {
+						adjustedDrawRequest   = subpanelDrawRequest - transformerObj->getLossRateForInputPower( subpanelDrawRequest );
 					} else {
-						adjustedDrawRequest   = subpanelDrawRequest - converterObj_->getLossRateForInputPower( subpanelDrawRequest ) - transformerObj_->getLossRateForInputPower( subpanelDrawRequest );
+						adjustedDrawRequest   = subpanelDrawRequest - converterObj->getLossRateForInputPower( subpanelDrawRequest ) - transformerObj->getLossRateForInputPower( subpanelDrawRequest );
 					}
 				}
 				break;
@@ -1651,8 +1722,8 @@ namespace EnergyPlus {
 			}
 		}
 
-		if ( transformerObj_ != nullptr ){
-			transformerObj_->reinitAtBeginEnvironment();
+		if ( transformerObj != nullptr ){
+			transformerObj->reinitAtBeginEnvironment();
 		}
 
 		if ( storageObj != nullptr ) {
@@ -1663,28 +1734,28 @@ namespace EnergyPlus {
 			inverterObj->reinitAtBeginEnvironment();
 		}
 
-		if ( converterObj_ != nullptr ) {
-			converterObj_->reinitAtBeginEnvironment();
+		if ( converterObj != nullptr ) {
+			converterObj->reinitAtBeginEnvironment();
 		}
 	}
 
 	void 
 	ElectPowerLoadCenter::reinitZoneGainsAtBeginEnvironment()
 	{
-		if (transformerObj_ != nullptr ){
-			transformerObj_->reinitZoneGainsAtBeginEnvironment();
+		if (transformerObj != nullptr ){
+			transformerObj->reinitZoneGainsAtBeginEnvironment();
 		}
 
 		if ( storageObj != nullptr ) {
 			storageObj->reinitZoneGainsAtBeginEnvironment();
 		}
 
-		if ( inverterPresent && inverterObj != nullptr ) {
+		if ( inverterObj != nullptr ) {
 			inverterObj->reinitZoneGainsAtBeginEnvironment();
 		}
 
-		if ( converterObj_ != nullptr ) {
-			converterObj_->reinitZoneGainsAtBeginEnvironment();
+		if ( converterObj != nullptr ) {
+			converterObj->reinitZoneGainsAtBeginEnvironment();
 		}
 	}
 
@@ -1692,7 +1763,7 @@ namespace EnergyPlus {
 	ElectPowerLoadCenter::transformerName()
 	{
 		if ( transformerPresent_ ) {
-			return transformerName_;		
+			return transformerName_;
 		} else {
 			return "";
 		}
@@ -1719,8 +1790,8 @@ namespace EnergyPlus {
 			}
 			// no inverter, no storage, so generator production equals subpanel feed in
 			subpanelFeedInRate = genElectProdRate;
-			if ( transformerObj_ != nullptr ) {
-				subpanelFeedInRate -= transformerObj_->getLossRateForInputPower( genElectProdRate );
+			if ( transformerObj != nullptr ) {
+				subpanelFeedInRate -= transformerObj->getLossRateForInputPower( genElectProdRate );
 			}
 			subpanelDrawRate   = 0.0;
 
@@ -1733,13 +1804,13 @@ namespace EnergyPlus {
 				genElectProdRate += gc->electProdRate; 
 				genElectricProd  += gc->electricityProd;
 			}
-			if ( storagePresent_ ) {
+			if ( storageObj != nullptr ) {
 				subpanelFeedInRate = genElectProdRate + storOpCVDischargeRate - storOpCVChargeRate;
 			} else {
 				subpanelFeedInRate = genElectProdRate;
 			}
-			if ( transformerObj_ != nullptr ) {
-				subpanelFeedInRate -= transformerObj_->getLossRateForInputPower( subpanelFeedInRate );
+			if ( transformerObj != nullptr ) {
+				subpanelFeedInRate -= transformerObj->getLossRateForInputPower( subpanelFeedInRate );
 			}
 			subpanelDrawRate   = 0.0;
 			break;
@@ -1755,8 +1826,8 @@ namespace EnergyPlus {
 			if ( inverterObj != nullptr ) {
 				subpanelFeedInRate = inverterObj->getACPowerOut();
 			}
-			if ( transformerObj_ != nullptr ) {
-				subpanelFeedInRate -= transformerObj_->getLossRateForInputPower( subpanelFeedInRate );
+			if ( transformerObj != nullptr ) {
+				subpanelFeedInRate -= transformerObj->getLossRateForInputPower( subpanelFeedInRate );
 			}
 			subpanelDrawRate   = 0.0;
 			break;
@@ -1773,12 +1844,12 @@ namespace EnergyPlus {
 				subpanelFeedInRate = inverterObj->getACPowerOut();
 			}
 
-			if ( converterObj_ != nullptr ) {
-				subpanelDrawRate   = converterObj_->getACPowerIn();
+			if ( converterObj != nullptr ) {
+				subpanelDrawRate   = converterObj->getACPowerIn();
 			}
-			if ( transformerObj_ != nullptr ) {
-				subpanelFeedInRate -= transformerObj_->getLossRateForInputPower( subpanelFeedInRate );
-				subpanelDrawRate   += transformerObj_->getLossRateForOutputPower( subpanelDrawRate );
+			if ( transformerObj != nullptr ) {
+				subpanelFeedInRate -= transformerObj->getLossRateForInputPower( subpanelFeedInRate );
+				subpanelDrawRate   += transformerObj->getLossRateForOutputPower( subpanelDrawRate );
 			}
 			break;
 		}
@@ -1794,9 +1865,9 @@ namespace EnergyPlus {
 			}
 
 			subpanelDrawRate   = storOpCVDrawRate; // no converter for AC storage
-			if ( transformerObj_ != nullptr ) {
-				subpanelFeedInRate -= transformerObj_->getLossRateForInputPower( subpanelFeedInRate );
-				subpanelDrawRate   += transformerObj_->getLossRateForOutputPower( subpanelDrawRate );
+			if ( transformerObj != nullptr ) {
+				subpanelFeedInRate -= transformerObj->getLossRateForInputPower( subpanelFeedInRate );
+				subpanelDrawRate   += transformerObj->getLossRateForOutputPower( subpanelDrawRate );
 			}
 			break;
 		}
@@ -2228,6 +2299,11 @@ namespace EnergyPlus {
 		return aCEnergyOut;
 	}
 
+	std::string
+	DCtoACInverter::name(){
+		return name_;
+	}
+
 	Real64
 	DCtoACInverter::getLossRateForOutputPower( 
 		Real64 const powerOutOfInverter
@@ -2528,6 +2604,12 @@ namespace EnergyPlus {
 		return ( 1.0 - efficiency ) * aCPowerIn;
 	}
 
+	std::string
+	ACtoDCConverter::name()
+	{
+		return name_;
+	}
+
 	void
 	ACtoDCConverter::calcEfficiency()
 	{
@@ -2684,7 +2766,7 @@ namespace EnergyPlus {
 		if ( foundStorage ) {
 			InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, storageIDFObjectNum, DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs, numNums, iOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
-			name          = DataIPShortCuts::cAlphaArgs( 1 );
+			name_          = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
 
 			if ( DataIPShortCuts::lAlphaFieldBlanks( 2 ) ) {
@@ -2723,7 +2805,7 @@ namespace EnergyPlus {
 				maxPowerDraw_            = DataIPShortCuts::rNumericArgs( 5 );
 				maxPowerStore_           = DataIPShortCuts::rNumericArgs( 6 );
 				startingEnergyStored_    = DataIPShortCuts::rNumericArgs( 7 );
-				SetupOutputVariable( "Electric Storage Simple Charge State [J]", electEnergyinStorage_, "System", "Average", name ); // issue #4921
+				SetupOutputVariable( "Electric Storage Simple Charge State [J]", electEnergyinStorage_, "System", "Average", name_ ); // issue #4921
 				break;
 			}
 			
@@ -2812,14 +2894,14 @@ namespace EnergyPlus {
 				cutoffV_              = DataIPShortCuts::rNumericArgs( 12 );
 				maxChargeRate_        = DataIPShortCuts::rNumericArgs( 13 );
 
-				SetupOutputVariable( "Electric Storage Operating Mode Index []", storageMode_, "System", "Average", name );
-				SetupOutputVariable( "Electric Storage Battery Charge State [Ah]", absoluteSOC_, "System", "Average", name );  // issue #4921
-				SetupOutputVariable( "Electric Storage Charge Fraction []", fractionSOC_, "System", "Average", name );
-				SetupOutputVariable( "Electric Storage Total Current [A]", batteryCurrent_, "System", "Average", name );
-				SetupOutputVariable( "Electric Storage Total Voltage [V]", batteryVoltage_, "System", "Average", name );
+				SetupOutputVariable( "Electric Storage Operating Mode Index []", storageMode_, "System", "Average", name_ );
+				SetupOutputVariable( "Electric Storage Battery Charge State [Ah]", absoluteSOC_, "System", "Average", name_ );  // issue #4921
+				SetupOutputVariable( "Electric Storage Charge Fraction []", fractionSOC_, "System", "Average", name_ );
+				SetupOutputVariable( "Electric Storage Total Current [A]", batteryCurrent_, "System", "Average", name_ );
+				SetupOutputVariable( "Electric Storage Total Voltage [V]", batteryVoltage_, "System", "Average", name_ );
 
 				if ( lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes ) {
-					SetupOutputVariable( "Electric Storage Degradation Fraction []", batteryDamage_, "System", "Average", name );
+					SetupOutputVariable( "Electric Storage Degradation Fraction []", batteryDamage_, "System", "Average", name_ );
 				}
 				break;
 			}
@@ -2830,18 +2912,18 @@ namespace EnergyPlus {
 
 			} // switch storage model type
 
-			SetupOutputVariable( "Electric Storage Charge Power [W]", storedPower, "System", "Average", name  );
-			SetupOutputVariable( "Electric Storage Charge Energy [J]", storedEnergy, "System", "Sum", name  );
-			SetupOutputVariable( "Electric Storage Production Decrement Energy [J]", decrementedEnergyStored, "System", "Sum", name , _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
-			SetupOutputVariable( "Electric Storage Discharge Power [W]", drawnPower, "System", "Average", name  );
-			SetupOutputVariable( "Electric Storage Discharge Energy [J]", drawnEnergy, "System", "Sum", name , _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
-			SetupOutputVariable( "Electric Storage Thermal Loss Rate [W]", thermLossRate_, "System", "Average", name  );
-			SetupOutputVariable( "Electric Storage Thermal Loss Energy [J]", thermLossEnergy_, "System", "Sum", name  );
+			SetupOutputVariable( "Electric Storage Charge Power [W]", storedPower, "System", "Average", name_  );
+			SetupOutputVariable( "Electric Storage Charge Energy [J]", storedEnergy, "System", "Sum", name_  );
+			SetupOutputVariable( "Electric Storage Production Decrement Energy [J]", decrementedEnergyStored, "System", "Sum", name_ , _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
+			SetupOutputVariable( "Electric Storage Discharge Power [W]", drawnPower, "System", "Average", name_  );
+			SetupOutputVariable( "Electric Storage Discharge Energy [J]", drawnEnergy, "System", "Sum", name_ , _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
+			SetupOutputVariable( "Electric Storage Thermal Loss Rate [W]", thermLossRate_, "System", "Average", name_  );
+			SetupOutputVariable( "Electric Storage Thermal Loss Energy [J]", thermLossEnergy_, "System", "Sum", name_  );
 			if ( DataGlobals::AnyEnergyManagementSystemInModel ) {
 				if ( storageModelMode_ == StorageModelType::simpleBucketStorage ) {
-					SetupEMSInternalVariable( "Electrical Storage Simple Maximum Capacity", name , "[J]", maxEnergyCapacity_ );
+					SetupEMSInternalVariable( "Electrical Storage Simple Maximum Capacity", name_ , "[J]", maxEnergyCapacity_ );
 				} else if ( storageModelMode_ == StorageModelType::kiBaMBattery ) {
-					SetupEMSInternalVariable( "Electrical Storage Battery Maximum Capacity", name , "[Ah]", maxAhCapacity_ );
+					SetupEMSInternalVariable( "Electrical Storage Battery Maximum Capacity", name_ , "[Ah]", maxAhCapacity_ );
 				}
 			}
 
@@ -2849,11 +2931,11 @@ namespace EnergyPlus {
 				switch ( storageModelMode_ )
 				{
 				case StorageModelType::simpleBucketStorage: {
-					SetupZoneInternalGain( zoneNum_, "ElectricLoadCenter:Storage:Simple", name , DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageSimple, qdotConvZone_, _, qdotRadZone_ );
+					SetupZoneInternalGain( zoneNum_, "ElectricLoadCenter:Storage:Simple", name_ , DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageSimple, qdotConvZone_, _, qdotRadZone_ );
 					break;
 				}
 				case StorageModelType::kiBaMBattery: {
-					SetupZoneInternalGain( zoneNum_, "ElectricLoadCenter:Storage:Battery", name , DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageBattery, qdotConvZone_, _, qdotRadZone_ );
+					SetupZoneInternalGain( zoneNum_, "ElectricLoadCenter:Storage:Battery", name_ , DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageBattery, qdotConvZone_, _, qdotRadZone_ );
 					break;
 				}
 				case StorageModelType::storageTypeNotSet: {
@@ -3043,6 +3125,12 @@ namespace EnergyPlus {
 		} else if ( storageModelMode_ == StorageModelType::kiBaMBattery ) {
 			simulateKineticBatteryModel( powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit,controlSOCMinFracLimit );
 		}
+	}
+
+	std::string
+	ElectricStorage::name()
+	{
+		return name_;
 	}
 
 	void
@@ -3253,7 +3341,7 @@ namespace EnergyPlus {
 
 			bool const ok = determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, dischargeCurveNum_, k, c, qmax, E0c, internalR_ );
 			if ( !ok ) {
-				ShowFatalError( "ElectricLoadCenter:Storage:Battery named=\"" + name + "\". Battery discharge current could not be estimated due to iteration limit reached. " );
+				ShowFatalError( "ElectricLoadCenter:Storage:Battery named=\"" + name_ + "\". Battery discharge current could not be estimated due to iteration limit reached. " );
 				//issue #5301, need more diagnostics for this. 
 			}
 
@@ -4029,6 +4117,12 @@ namespace EnergyPlus {
 	{
 		qdotConvZone_      = 0.0;
 		qdotRadZone_       = 0.0;
+	}
+
+	std::string
+	ElectricTransformer::name()
+	{
+		return name_;
 	}
 
 } // EnergyPlus namespace

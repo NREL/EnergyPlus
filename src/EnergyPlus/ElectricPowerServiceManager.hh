@@ -124,6 +124,8 @@ public: // Methods
 	Real64
 	getACEnergyOut();
 
+	std::string
+	name();
 
 private: //Methods
 
@@ -218,6 +220,9 @@ public: // Methods
 	getLossRateForInputPower(
 		Real64 const powerIntoConverter //AC power going into inverter
 	);
+
+	std::string
+	name();
 
 private: //methods
 	
@@ -333,7 +338,12 @@ public: //methods
 		Real64 const InternalR
 	);
 
+	std::string
+	name();
+
 private: //methods
+
+
 
 	void
 	simulateSimpleBucketModel( // request charge discharge and 
@@ -383,7 +393,7 @@ public: //data public for unit tests
 	Real64 drawnPower; // [W]
 	Real64 drawnEnergy; // [J]
 	Real64 decrementedEnergyStored; // [J] this is the negative of StoredEnergy
-	std::string name; // name of this electrical storage module
+
 
 private: //data
 
@@ -398,6 +408,8 @@ private: //data
 		lifeCalculationYes,
 		lifeCalculationNo
 	};
+
+	std::string name_; // name of this electrical storage module
 	int maxRainflowArrayBounds_;
 	int const maxRainflowArrayInc_ = 100;
 	bool myWarmUpFlag_;
@@ -503,6 +515,9 @@ public: //methods
 
 	void
 	reinitZoneGainsAtBeginEnvironment();
+
+	std::string
+	name();
 
 private: //data
 
@@ -705,7 +720,9 @@ public: // data public for unit test
 	};
 
 
-	std::unique_ptr < ElectricStorage > storageObj;  
+	std::unique_ptr < ElectricStorage > storageObj;
+	std::unique_ptr < ACtoDCConverter > converterObj;
+	std::unique_ptr < ElectricTransformer > transformerObj;
 	int numGenerators; // Number of Generators
 	std::vector < std::unique_ptr <GeneratorController> > elecGenCntrlObj; // generator controller objects
 	ElectricBussType bussType; // is this load center powered by AC or DC generators
@@ -771,7 +788,6 @@ private: // data
 	std::string storageName_; // hold name for verificaton and error messages
 	bool transformerPresent_; // should only be transformers for on-site load center, not facility service 
 	std::string transformerName_; // hold name for verificaton and error messages
-	std::unique_ptr < ElectricTransformer > transformerObj_;
 	Real64 totalPowerRequest_; // Total electric power request from the load center (W)
 	Real64 totalThermalPowerRequest_; // Total thermal power request from the load center (W)
 	StorageOpScheme storageScheme_; // what options are available for charging storage.
@@ -779,7 +795,6 @@ private: // data
 	int trackStorageOpMeterIndex_; // points to meter being 
 	bool converterPresent_;
 	std::string converterName_;
-	std::unique_ptr < ACtoDCConverter > converterObj_;
 	Real64 maxStorageSOCFraction_; // Fraction of storage capacity used as upper limit for controlling charging (don't overcharge the batteries)
 	Real64 minStorageSOCFraction_; // Fraction of storage capacity used as lower limit for controlling discharging (dont drain the batteries too far)
 	Real64 designStorageChargePower_; // rate of electric power drawn from grid to go into storage
