@@ -303,6 +303,9 @@ public: //methods
 	void
 	reinitZoneGainsAtBeginEnvironment();
 
+	void
+	reinitAtEndWarmup();
+
 	Real64
 	getDrawnPower();
 

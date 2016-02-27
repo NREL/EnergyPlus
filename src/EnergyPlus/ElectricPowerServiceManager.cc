@@ -2901,12 +2901,12 @@ namespace EnergyPlus {
 			thisTimeStepAvailable_ = initialCharge * availableFrac_;
 			thisTimeStepBound_ = initialCharge * ( 1.0 - availableFrac_ );
 			if ( lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes ) {
-				count0_ = 1; // Index 0 is for initial SOC, so new input starts from index 2.
+				count0_ = 1; // Index 0 is for initial SOC, so new input starts from index 1.
 				b10_[ 0 ] = startingSOC_; // the initial fractional SOC is stored as the reference
-				x0_[ 0 ] = 0;
+				x0_[ 0 ] = 0.0;
 				for (auto loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
 					b10_[ loop ] = 0.0;
-					x0_[ loop ] = 0;
+					x0_[ loop ] = 0.0;
 				}
 				for (auto loop = 0; loop < cycleBinNum_; ++loop) {
 					oneNmb0_[ loop ] = 0.0;
@@ -2926,8 +2926,46 @@ namespace EnergyPlus {
 	}
 
 	void
+	ElectricStorage::reinitAtEndWarmup()
+	{
+		// need to reset initial state of charge at beginning of environment but after warm up is complete
+		lastTimeStepStateOfCharge_ = startingEnergyStored_;
+		thisTimeStepStateOfCharge_ = startingEnergyStored_;
+		if ( storageModelMode_ == StorageModelType::kiBaMBattery ) {
+			Real64 initialCharge = maxAhCapacity_ * startingSOC_;
+			lastTwoTimeStepAvailable_ = initialCharge * availableFrac_;
+			lastTwoTimeStepBound_ = initialCharge * ( 1.0 - availableFrac_ );
+			lastTimeStepAvailable_ = initialCharge * availableFrac_;
+			lastTimeStepBound_ = initialCharge * ( 1.0 - availableFrac_ );
+			thisTimeStepAvailable_ = initialCharge * availableFrac_;
+			thisTimeStepBound_ = initialCharge * ( 1.0 - availableFrac_ );
+			if ( lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes ) {
+				count0_ = 1; // Index 0 is for initial SOC, so new input starts from index 1.
+				b10_[ 0 ] = startingSOC_; // the initial fractional SOC is stored as the reference
+				x0_[ 0 ] = 0.0;
+				for (auto loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
+					b10_[ loop ] = 0.0;
+					x0_[ loop ] = 0.0;
+				}
+				for (auto loop = 0; loop < cycleBinNum_; ++loop) {
+					oneNmb0_[ loop ] = 0.0;
+					nmb0_[ loop ] = 0.0;
+				}
+				batteryDamage_ = 0.0;
+			}
+		}
+		myWarmUpFlag_ = false;
+	}
+
+
+	void
 	ElectricStorage::timeCheckAndUpdate()
 	{
+
+		if ( myWarmUpFlag_ && ! DataGlobals::WarmupFlag ) {
+			reinitAtEndWarmup();
+		}
+
 		Real64 timeElapsedLoc = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 		if ( timeElapsed_ != timeElapsedLoc ) { //time changed, update last with "current" result from previous time
 			if ( storageModelMode_ == StorageModelType::kiBaMBattery && lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes ) {
