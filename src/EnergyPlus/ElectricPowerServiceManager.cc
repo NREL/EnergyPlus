@@ -117,8 +117,6 @@ namespace EnergyPlus {
 		if ( ! DataGlobals::BeginEnvrnFlag ) {
 			facilityElectricServiceObj->newEnvironmentInternalGainsFlag = true;
 		}
-
-
 	}
 
 
@@ -222,7 +220,6 @@ namespace EnergyPlus {
 				// call Electric Power Load Center constructor, in place
 				elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( iLoadCenterNum) );
 			}
-	
 		} else {
 			// issue #4639. see if there are any generators, inverters, converters, or storage devcies, that really need a ElectricLoadCenter:Distribution
 			int numGenLists   = InputProcessor::GetNumObjectsFound( "ElectricLoadCenter:Generators" );
@@ -267,7 +264,6 @@ namespace EnergyPlus {
 			int iOStat; // IO Status when calling get input subroutine
 			int facilityPowerInTransformerIDFObjNum = 0;
 			bool foundInFromGridTransformer = false;
-
 
 			DataIPShortCuts::cCurrentModuleObject =  "ElectricLoadCenter:Transformer";
 			for ( auto loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
@@ -346,7 +342,6 @@ namespace EnergyPlus {
 		if (facilityPowerInTransformerPresent_ ) {
 			facilityPowerInTransformerObj_->setupMeterIndices();
 		}
-
 	}
 
 	void
@@ -394,8 +389,7 @@ namespace EnergyPlus {
 	ElectricPowerServiceManager::updateWholeBuildingRecords()
 	{
 
-		// main panel clearing house.
-
+		// main panel balancing.
 		totalBldgElecDemand_ = GetInstantMeterValue( elecFacilityIndex_, 1 ) / DataGlobals::TimeStepZoneSec;
 		totalHVACElecDemand_ = GetInstantMeterValue( elecFacilityIndex_, 2 ) / ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
 		totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
@@ -406,9 +400,7 @@ namespace EnergyPlus {
 		elecProducedPowerConversionRate_ = GetInstantMeterValue( elecProducedPowerConversionIndex_, 2 ) / ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
 
 		electProdRate_ = elecProducedCoGenRate_ +  elecProducedPVRate_ + elecProducedWTRate_ + elecProducedStorageRate_ + elecProducedPowerConversionRate_;
-
 		electricityProd_ = electProdRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; //whole building
-
 
 		//Report the Total Electric Power Purchased [W], If negative then there is extra power to be sold or stored.
 		electPurchRate_ = totalElectricDemand_ - electProdRate_;
@@ -454,8 +446,7 @@ namespace EnergyPlus {
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchLeedRenRatCap, "Photovoltaic", pvTotalCapacity_ / 1000, 2 );
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchLeedRenRatCap, "Wind", windTotalCapacity_ / 1000, 2 );
 
-		//future work: this legacy approach is relying on the correct power output to have been placed in the Generator list.  There could be a difference between this control input and the actual size of the systems as defined in the generator objects.
-
+		//future work: this legacy approach is relying on the correct power output to have been placed in the Generator list.  There could be a difference between this control input and the actual size of the systems as defined in the generator objects themselves.  This method should be replaced with queries that check the capacity from the generator models.
 	}
 
 	void
@@ -853,7 +844,6 @@ namespace EnergyPlus {
 				ShowSevereError( "Transformer named " + transformerName_ + ", was not found for the load center named " + name_ );
 				errorsFound =  true;
 			}
-
 		}
 
 		if ( ! errorsFound && converterPresent_ ) {
@@ -862,7 +852,6 @@ namespace EnergyPlus {
 		}
 
 		//Setup general output variables for reporting in the electric load center
-
 		SetupOutputVariable( "Electric Load Center Produced Electric Power [W]",genElectProdRate, "System", "Average", name_ );
 		SetupOutputVariable( "Electric Load Center Produced Electric Energy [J]",genElectricProd, "System", "Sum", name_ );
 		SetupOutputVariable( "Electric Load Center Supplied Electric Power [W]", subpanelFeedInRate, "System", "Average", name_ );
@@ -945,8 +934,6 @@ namespace EnergyPlus {
 		// Both the Demand Limit and Track Electrical schemes will sequentially load the available generators.  All demand
 		Real64 loadCenterElectricLoad = 0.0;
 		Real64 remainingLoad          = 0.0;
-
-//		Real64 thermalProdRate        = 0.0;
 		Real64 customMeterDemand      = 0.0;
 
 		switch ( genOperationScheme_ ) 
@@ -1598,7 +1585,6 @@ namespace EnergyPlus {
 					storOpIsCharging      = false;
 				}
 			}
-
 		}
 
 		//check against the controller limits
@@ -1722,7 +1708,6 @@ namespace EnergyPlus {
 	ElectPowerLoadCenter::updateLoadCenterGeneratorRecords()
 	{
 
-
 		switch ( bussType )
 		{
 		case ElectricBussType::aCBuss: {
@@ -1826,7 +1811,6 @@ namespace EnergyPlus {
 			thermalProdRate += gc->thermProdRate;
 			thermalProd     += gc->thermalProd;
 		}
-
 	}
 
 	void
@@ -1952,7 +1936,7 @@ namespace EnergyPlus {
 		electricityProd   = 0.0;
 		electProdRate     = 0.0;
 		thermalProd       = 0.0;
-		thermProdRate   = 0.0;
+		thermProdRate     = 0.0;
 	}
 
 	void
@@ -2258,7 +2242,6 @@ namespace EnergyPlus {
 			dCPowerIn = powerOutOfInverter;
 			calcEfficiency();
 			dCPowerIn = powerOutOfInverter / efficiency;
-
 		}
 
 		calcEfficiency();
@@ -2268,7 +2251,6 @@ namespace EnergyPlus {
 		}
 		calcEfficiency();
 		return ( 1.0 - efficiency ) * dCPowerIn;
-
 	}
 
 	void
@@ -2317,19 +2299,15 @@ namespace EnergyPlus {
 			case InverterModelType::curveFuncOfPower: {
 
 				Real64 normalizedPower = dCPowerIn / ratedPower_;
-
 				efficiency = CurveManager::CurveValue( curveNum_, normalizedPower );
-
 				efficiency = max( efficiency, minEfficiency_ );
 				efficiency = min( efficiency, maxEfficiency_ );
-
 
 				break;
 			}
 			case InverterModelType::simpleConstantEff: 
 			case InverterModelType::notYetSet: {
 				// do nothing
-
 				break;
 			}
 		} // end switch
@@ -2340,7 +2318,7 @@ namespace EnergyPlus {
 		Real64 const powerIntoInverter
 	)
 	{
-		dCPowerIn = powerIntoInverter;
+		dCPowerIn  = powerIntoInverter;
 		dCEnergyIn = dCPowerIn * ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
 			// check availability schedule
 		if ( ScheduleManager::GetCurrentScheduleValue( availSchedPtr_ ) > 0.0 ) {
@@ -2370,9 +2348,9 @@ namespace EnergyPlus {
 		conversionLossEnergy = conversionLossPower * ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
 		conversionLossEnergyDecrement = -1.0 * conversionLossEnergy;
 		thermLossRate    = dCPowerIn - aCPowerOut + ancillACuseRate;
-		thermLossEnergy = thermLossRate * ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
-		qdotConvZone    = thermLossRate * ( 1.0 - zoneRadFract_ );
-		qdotRadZone     = thermLossRate * zoneRadFract_;
+		thermLossEnergy  = thermLossRate * ( DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour );
+		qdotConvZone     = thermLossRate * ( 1.0 - zoneRadFract_ );
+		qdotRadZone      = thermLossRate * zoneRadFract_;
 	}
 
 	ACtoDCConverter::ACtoDCConverter(
@@ -2431,7 +2409,6 @@ namespace EnergyPlus {
 
 			if ( InputProcessor::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "SimpleFixed" ) ) {
 				modelType_ = ConverterModelType::simpleConstantEff;
-
 			} else if ( InputProcessor::SameString(  DataIPShortCuts::cAlphaArgs( 3 ), "FunctionOfPower" ) ) {
 				modelType_ = ConverterModelType::curveFuncOfPower;
 			} else {
@@ -2496,7 +2473,6 @@ namespace EnergyPlus {
 			if ( zoneNum_ > 0 ) {
 					SetupZoneInternalGain( zoneNum_, "ElectricLoadCenter:Storage:Converter", name_, DataHeatBalance::IntGainTypeOf_ElectricLoadCenterConverter, qdotConvZone, _, qdotRadZone );
 			}
-
 
 		} else {
 			ShowSevereError( routineName + " did not find power converter name = " + objectName);
@@ -3097,11 +3073,11 @@ namespace EnergyPlus {
 
 		// updates and reports
 		electEnergyinStorage_ = thisTimeStepStateOfCharge_; //[J]
-		storedPower          = pelIntoStorage_;
-		storedEnergy         = pelIntoStorage_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+		storedPower           = pelIntoStorage_;
+		storedEnergy          = pelIntoStorage_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 		decrementedEnergyStored = -1.0 * storedEnergy;
-		drawnPower           = pelFromStorage_;
-		drawnEnergy          = pelFromStorage_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+		drawnPower            = pelFromStorage_;
+		drawnEnergy           = pelFromStorage_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 		thermLossRate_        = max( storedPower * ( 1.0 - energeticEfficCharge_ ), drawnPower * ( 1.0 - energeticEfficDischarge_ ) );
 		thermLossEnergy_      = thermLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
@@ -3235,7 +3211,6 @@ namespace EnergyPlus {
 				drawnPower = 0.0;
 				drawnEnergy = 0.0;
 				return;
-
 			}
 
 			bool const ok = determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, dischargeCurveNum_, k, c, qmax, E0c, internalR_ );
@@ -3264,11 +3239,9 @@ namespace EnergyPlus {
 				Ef = E0c + CurveManager::CurveValue( dischargeCurveNum_, Xf );
 				Volt = Ef - I0 * internalR_;
 			}
-
 			if ( Volt < cutoffV_ ) {
 				I0 = 0.0;
 			}
-
 		} // if discharging
 
 		if ( ( ! charging ) && ( ! discharging ) ) {
@@ -3325,9 +3298,8 @@ namespace EnergyPlus {
 			qdotRadZone_ = ( ( zoneRadFract_ ) * thermLossRate_ ) * numBattery_;
 		}
 
-		powerCharge = storedPower;
+		powerCharge    = storedPower;
 		powerDischarge = drawnPower;
-
 
 	}
 	
@@ -3393,7 +3365,6 @@ namespace EnergyPlus {
 				Xf = 1.0;
 			} 
 
-			
 			Ef = E0c + CurveManager::CurveValue( CurveNum, Xf ); //E0c+Ad*Xf+Cd*X/(Dd-Xf)
 			curVolt = Ef - curI0 * InternalR;
 		//add div by zero protection #5301
@@ -3402,14 +3373,14 @@ namespace EnergyPlus {
 			} else {
 				Inew = 1.0;
 			}
-			
+
 		// add div by zero protection #5301
 			if ( Inew != 0.0 ) {
 				Tnew = qmaxf / Inew;
 			} else {
 				Tnew = 1.0;
 			}
-			
+
 			error = std::abs( Inew - curI0 );
 			++countForIteration;
 			if ( countForIteration > 1000 ) {
@@ -3439,7 +3410,6 @@ namespace EnergyPlus {
 			}
 		}
 		return (!exceedIterationLimit);
-
 	}
 
 	void
@@ -3451,7 +3421,7 @@ namespace EnergyPlus {
 		int & count, // calculated here - stored for next timestep in main loop
 		std::vector < Real64 > & Nmb, // calculated here - stored for next timestep in main loop
 		std::vector < Real64 > & OneNmb // calculated here - stored for next timestep in main loop
-	//	int const dim // end dimension of array
+
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -3470,27 +3440,13 @@ namespace EnergyPlus {
 		// Ariduru S. 2004. Fatigue life calculation by rainflow cycle counting method.
 		//                  Master Thesis, Middle East Technical University.
 
-		// Argument array dimensioning
-	//	B1.dim( {1,dim} );
-	//	X.dim( {1,dim} );
-	//	Nmb.dim( {1,numbin} );
-	//	OneNmb.dim( {1,numbin} );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		//Array B1 stores the value of points
 		//Array X stores the value of two data points' difference.
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int num;
 
 		X[ count ] = input - B1[ count - 1 ]; // calculate the difference between two data (current and previous)
@@ -3550,13 +3506,6 @@ namespace EnergyPlus {
 		// Check the rest of the half cycles every time step
 		OneNmb = Nmb; // Array Nmb (Bins) will be used for the next time step later.
 		// OneNmb is used to show the current output only.
-		// Ideally, the following clean-up counting is needed at the last system time step in each simulation environemnt.
-		// Because of the difficulty in knowing the above information, the clean-up counting is skipped. Skipping this has
-		// little impact on the simulation results.
-		//   DO k = 1, count-1
-		//     num = NINT((ABS(X(k))*numbin*10+5)/10) !Bin number
-		//     OneNmb(num) = OneNmb(num)+0.5d0
-		//   ENDDO
 
 	}
 
@@ -3566,7 +3515,6 @@ namespace EnergyPlus {
 		int const m,
 		int const n,
 		std::vector < Real64 > & B
-	//	int const dim // end dimension of arrays
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -3577,11 +3525,6 @@ namespace EnergyPlus {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Utility subroutine for rainflow cycle counting
-
-
-		// Argument array dimensioning
-	//	A.dim( {1,dim} );
-	//	B.dim( {1,dim} );
 
 		int ShiftNum; // Loop variable
 
@@ -3788,7 +3731,6 @@ namespace EnergyPlus {
 				SetupOutputVariable( "Transformer Conversion Electric Loss Energy [J]", powerConversionMeteredLosses_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );
 			}
 
-
 			if ( zoneNum_ > 0 ) {
 				SetupZoneInternalGain( zoneNum_, "ElectricLoadCenter:Transformer", name_, DataHeatBalance::IntGainTypeOf_ElectricLoadCenterTransformer, qdotConvZone_, _, qdotRadZone_ );
 			}
@@ -3808,8 +3750,7 @@ namespace EnergyPlus {
 		Real64 const powerOutOfTransformer
 	) 
 	{
-		// TODO run model with power out level arg
-		// use lagged value for now
+
 		manageTransformers( powerOutOfTransformer );
 
 		return totalLossRate_;
@@ -4004,7 +3945,6 @@ namespace EnergyPlus {
 			qdotConvZone_ = ( 1.0 - zoneRadFrac_ ) * thermalLossRate_;
 			qdotRadZone_ = ( zoneRadFrac_ ) * thermalLossRate_;
 		}
-
 	}
 
 	void
