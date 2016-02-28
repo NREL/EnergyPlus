@@ -76,33 +76,25 @@
 
 namespace EnergyPlus {
 
-	enum class ThermalLossDestination : int {
-		heatLossNotDetermined = 0,
-		zoneGains,
-		lostToOutside
-	};
+enum class ThermalLossDestination : int {
+	heatLossNotDetermined = 0,
+	zoneGains,
+	lostToOutside
+};
 
-	void
-	initializeElectricPowerServiceZoneGains();
+void
+initializeElectricPowerServiceZoneGains();
 
 class DCtoACInverter
 {
 
 public: // Methods
 
-	// Destructor
-	~DCtoACInverter()
-	{}
-
 	// Constructor
-	DCtoACInverter(
-		std::string const & objectName
-	);
+	DCtoACInverter( std::string const & objectName );
 
 	void
-	simulate( 
-		Real64 const powerIntoInverter
-	);
+	simulate( Real64 const powerIntoInverter );
 
 	void
 	reinitAtBeginEnvironment();
@@ -111,47 +103,27 @@ public: // Methods
 	reinitZoneGainsAtBeginEnvironment();
 
 	Real64
-	getThermLossRate();
+	thermLossRate() const;
 
 	Real64
-	getLossRateForOutputPower(
-		Real64 const powerOutOfInverter
-	);
+	getLossRateForOutputPower( Real64 const powerOutOfInverter );
 
 	Real64
-	getACPowerOut();
+	aCPowerOut() const;
 
 	Real64
-	getACEnergyOut();
+	aCEnergyOut() const;
 
-	std::string
-	name();
+	std::string const &
+	name() const;
 
 private: //Methods
 
 	void
 	calcEfficiency();
 
-
-
-public: // data public for unit test
-	Real64 aCPowerOut;
-	Real64 aCEnergyOut;
-	//results and reporting
-	Real64 efficiency;
-	Real64 dCPowerIn;
-	Real64 dCEnergyIn;
-	Real64 conversionLossPower;
-	Real64 conversionLossEnergy;
-	Real64 conversionLossEnergyDecrement;
-	Real64 thermLossRate;
-	Real64 thermLossEnergy;
-	Real64 qdotConvZone;
-	Real64 qdotRadZone;
-	Real64 ancillACuseRate;
-	Real64 ancillACuseEnergy;
-
 private: // data
+
 	enum class InverterModelType : int {
 		notYetSet,
 		cECLookUpTableModel,
@@ -160,13 +132,27 @@ private: // data
 	};
 
 	std::string name_; // user identifier
+	Real64 aCPowerOut_;
+	Real64 aCEnergyOut_;
+	Real64 efficiency_;
+	Real64 dCPowerIn_;
+	Real64 dCEnergyIn_;
+	Real64 conversionLossPower_;
+	Real64 conversionLossEnergy_;
+	Real64 conversionLossEnergyDecrement_;
+	Real64 thermLossRate_;
+	Real64 thermLossEnergy_;
+	Real64 qdotConvZone_;
+	Real64 qdotRadZone_;
+	Real64 ancillACuseRate_;
+	Real64 ancillACuseEnergy_;
 	InverterModelType modelType_; // type of inverter model used
 	int availSchedPtr_; // number for availability schedule.
 	ThermalLossDestination heatLossesDestination_;
 	int zoneNum_; // destination zone for heat losses from inverter.
 	Real64 zoneRadFract_; // radiative fraction for thermal losses to zone
 	Real64 nominalVoltage_; // CEC lookup table model
-	std::vector < Real64 > nomVoltEfficiencyARR_; // eff at 10, 20, 30, 50, 75, & 100% CEC lookup table model
+	std::vector< Real64 > nomVoltEfficiencyARR_; // eff at 10, 20, 30, 50, 75, & 100% CEC lookup table model
 	int curveNum_; // curve index for eff as func of power
 	Real64 ratedPower_; // rated, max continuous power output level for inverter
 	Real64 minPower_;
@@ -181,22 +167,13 @@ private: // data
 class ACtoDCConverter
 {
 
-
 public: // Methods
 
-	// Destructor
-	~ACtoDCConverter()
-	{}
-
 	// Constructor
-	ACtoDCConverter(
-		std::string const & objectName
-	);
+	ACtoDCConverter( std::string const & objectName );
 
 	void
-	simulate(
-		Real64 const powerOutFromConverter
-	); // Load Center number counter
+	simulate( Real64 const powerOutFromConverter ); 
 
 	void
 	reinitAtBeginEnvironment();
@@ -205,48 +182,30 @@ public: // Methods
 	reinitZoneGainsAtBeginEnvironment();
 
 	Real64
-	getThermLossRate();
+	thermLossRate() const;
 
 	Real64
-	getDCPowerOut();
+	dCPowerOut() const;
 
 	Real64
-	getDCEnergyOut();
+	dCEnergyOut() const;
 
 	Real64 
-	getACPowerIn();
+	aCPowerIn() const;
 
 	Real64
-	getLossRateForInputPower(
-		Real64 const powerIntoConverter //AC power going into inverter
-	);
+	getLossRateForInputPower( Real64 const powerIntoConverter ); //AC power going into inverter
 
-	std::string
-	name();
+	std::string const &
+	name() const;
 
 private: //methods
-	
+
 	void
 	calcEfficiency();
 
-public: // data public for unit test
-	
-	Real64 efficiency;
-	Real64 aCPowerIn;
-	Real64 aCEnergyIn;
-	Real64 dCPowerOut;
-	Real64 dCEnergyOut;
-	Real64 conversionLossPower;
-	Real64 conversionLossEnergy;
-	Real64 conversionLossEnergyDecrement;
-	Real64 thermLossRate;
-	Real64 thermLossEnergy;
-	Real64 qdotConvZone;
-	Real64 qdotRadZone;
-	Real64 ancillACuseRate;
-	Real64 ancillACuseEnergy;
-
 private: // data
+
 	enum class ConverterModelType : int {
 		notYetSet,
 		curveFuncOfPower,
@@ -254,6 +213,20 @@ private: // data
 	};
 
 	std::string name_; // user identifier
+	Real64 efficiency_;
+	Real64 aCPowerIn_;
+	Real64 aCEnergyIn_;
+	Real64 dCPowerOut_;
+	Real64 dCEnergyOut_;
+	Real64 conversionLossPower_;
+	Real64 conversionLossEnergy_;
+	Real64 conversionLossEnergyDecrement_;
+	Real64 thermLossRate_;
+	Real64 thermLossEnergy_;
+	Real64 qdotConvZone_;
+	Real64 qdotRadZone_;
+	Real64 ancillACuseRate_;
+	Real64 ancillACuseEnergy_;
 	int availSchedPtr_; // number for availability schedule.
 	ConverterModelType modelType_; // type of inverter model used
 	int curveNum_; // performance curve or table index
@@ -270,15 +243,8 @@ class ElectricStorage
 
 public: //methods
 
-	// Destructor
-	~ElectricStorage()
-	{}
-	
 	// Constructor
-	ElectricStorage(
-		std::string const & objectName
-		// need object type
-	);
+	ElectricStorage( std::string const & objectName );
 
 	void
 	timeCheckAndUpdate();
@@ -297,9 +263,6 @@ public: //methods
 	calcAndReportSimpleBucketModel();
 
 	void
-	trailCalcKinetcBatteryModel();
-
-	void
 	calcAndReportKineticBatteryModel();
 
 	void
@@ -312,16 +275,16 @@ public: //methods
 	reinitAtEndWarmup();
 
 	Real64
-	getDrawnPower();
+	drawnPower() const;
 
 	Real64
-	getStoredPower();
+	storedPower() const;
 
 	Real64
-	getDrawnEnergy();
+	drawnEnergy() const;
 
 	Real64
-	getStoredEnergy();
+	storedEnergy() const;
 
 	bool
 	determineCurrentForBatteryDischarge(
@@ -338,12 +301,10 @@ public: //methods
 		Real64 const InternalR
 	);
 
-	std::string
-	name();
+	std::string const &
+	name() const;
 
 private: //methods
-
-
 
 	void
 	simulateSimpleBucketModel( // request charge discharge and 
@@ -369,31 +330,22 @@ private: //methods
 	rainflow(
 		int const numbin, // numbin = constant value
 		Real64 const input, // input = input value from other object (battery model)
-		std::vector < Real64 > & B1, // stores values of points, calculated here - stored for next timestep
-		std::vector < Real64 > & X, // stores values of two data point difference, calculated here - stored for next timestep
+		std::vector< Real64 > & B1, // stores values of points, calculated here - stored for next timestep
+		std::vector< Real64 > & X, // stores values of two data point difference, calculated here - stored for next timestep
 		int & count, // calculated here - stored for next timestep in main loop
-		std::vector < Real64 > & Nmb, // calculated here - stored for next timestep in main loop
-		std::vector < Real64 > & OneNmb // calculated here - stored for next timestep in main loop
+		std::vector< Real64 > & Nmb, // calculated here - stored for next timestep in main loop
+		std::vector< Real64 > & OneNmb // calculated here - stored for next timestep in main loop
 	//	int const dim // end dimension of array
 	);
 
-
 	void
 	shift(
-		std::vector < Real64 > & A,
+		std::vector< Real64 > & A,
 		int const m,
 		int const n,
-		std::vector < Real64 > & B
+		std::vector< Real64 > & B
 	//	int const dim // end dimension of arrays
 	);
-
-public: //data public for unit tests
-	Real64 storedPower; // [W]
-	Real64 storedEnergy; // [J]
-	Real64 drawnPower; // [W]
-	Real64 drawnEnergy; // [J]
-	Real64 decrementedEnergyStored; // [J] this is the negative of StoredEnergy
-
 
 private: //data
 
@@ -410,10 +362,14 @@ private: //data
 	};
 
 	std::string name_; // name of this electrical storage module
+	Real64 storedPower_; // [W]
+	Real64 storedEnergy_; // [J]
+	Real64 drawnPower_; // [W]
+	Real64 drawnEnergy_; // [J]
+	Real64 decrementedEnergyStored_; // [J] this is the negative of StoredEnergy
 	int maxRainflowArrayBounds_;
 	int const maxRainflowArrayInc_ = 100;
 	bool myWarmUpFlag_;
-
 	StorageModelType storageModelMode_; // type of model parameter, SimpleBucketStorage
 	int availSchedPtr_; // availability schedule index.
 	ThermalLossDestination heatLossesDestination_; // mode for where thermal losses go
@@ -460,13 +416,12 @@ private: //data
 	Real64 lastTwoTimeStepBound_; // [Ah] bound charge at the previous two timesteps
 	//battery life calculation variables
 	int count0_;
-	std::vector < Real64 > b10_;
-	std::vector < Real64 > x0_;
-	std::vector < Real64 > nmb0_;
-	std::vector < Real64 > oneNmb0_;
+	std::vector< Real64 > b10_;
+	std::vector< Real64 > x0_;
+	std::vector< Real64 > nmb0_;
+	std::vector< Real64 > oneNmb0_;
 	//report
 	Real64 electEnergyinStorage_; // [J] state of charge
-
 	Real64 thermLossRate_; // [W]
 	Real64 thermLossEnergy_; // [J]
 	int storageMode_; // [ ] mode of operation 0 for idle, 1 for discharging, 2 for charging
@@ -483,29 +438,17 @@ class ElectricTransformer
 
 public: //methods
 
-	// Destructor
-	~ElectricTransformer()
-	{}
-
 	// Constructor
-	ElectricTransformer(
-		std::string const & objectName
-	);
+	ElectricTransformer( std::string const & objectName );
 
 	Real64
-	getLossRateForOutputPower(
-		Real64 const powerOutOfTransformer
-	);
+	getLossRateForOutputPower( Real64 const powerOutOfTransformer );
 
 	Real64
-	getLossRateForInputPower(
-		Real64 const powerIntoTransformer
-	);
+	getLossRateForInputPower( Real64 const powerIntoTransformer );
 
 	void
-	manageTransformers(
-		Real64 const surplusPowerOutFromLoadCenters
-	);
+	manageTransformers( Real64 const surplusPowerOutFromLoadCenters );
 
 	void
 	setupMeterIndices();
@@ -516,8 +459,8 @@ public: //methods
 	void
 	reinitZoneGainsAtBeginEnvironment();
 
-	std::string
-	name();
+	std::string const &
+	name() const;
 
 private: //data
 
@@ -551,9 +494,9 @@ private: //data
 	Real64 ratedTemp_; // reference temperature for nameplate efficiency [C]
 	Real64 maxPUL_; // per unit load for maximum efficiency []
 	bool considerLosses_; // if true, consider transformer lossses in metering
-	std::vector < std::string > wiredMeterNames_; // names of the meters wired to transformer
-	std::vector < int > wiredMeterPtrs_; // array of "pointers" to meters wired to transformer
-	std::vector < bool > specialMeter_; // indicates whether a meter needs special consideration
+	std::vector< std::string > wiredMeterNames_; // names of the meters wired to transformer
+	std::vector< int > wiredMeterPtrs_; // array of "pointers" to meters wired to transformer
+	std::vector< bool > specialMeter_; // indicates whether a meter needs special consideration
 	// Electricity:Facility and Electricity:HVAC are two special
 	// meters because tranformer loss is part of them
 	//calculated and from elsewhere vars
@@ -585,10 +528,7 @@ private: //data
 class GeneratorController
 {
 
-public: // Methods
-	// Destructor
-	~GeneratorController()
-	{}
+public: // Method
 
 	// Constructor
 	GeneratorController(
@@ -612,6 +552,7 @@ public: // Methods
 	reinitAtBeginEnvironment();
 
 public: // data // might make this class a friend of ElectPowerLoadCenter?
+
 	enum class GeneratorType : int {
 		notYetSet = 0,
 		iCEngine,
@@ -622,7 +563,6 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
 		microturbine,
 		windTurbine
 	};
-
 
 	std::string name; // user identifier
 	std::string typeOfName; // equipment type
@@ -657,14 +597,8 @@ class ElectPowerLoadCenter
 
 public: // Methods
 
-	// Destructor
-	~ElectPowerLoadCenter()
-	{}
-
 	// Constructor
-	ElectPowerLoadCenter(
-		int const objectNum
-	);
+	ElectPowerLoadCenter( int const objectNum );
 
 	void
 	manageElecLoadCenter(
@@ -681,11 +615,11 @@ public: // Methods
 	void
 	reinitZoneGainsAtBeginEnvironment();
 
-	std::string
-	transformerName();
+	std::string const &
+	transformerName() const;
 
-	std::string
-	generatorListName();
+	std::string const &
+	generatorListName() const;
 
 	void
 	updateLoadCenterGeneratorRecords();
@@ -699,46 +633,37 @@ private: //Methods
 	);
 
 	void
-	dispatchStorage(
-		Real64 const remainingPowerDemand
-	);
+	dispatchStorage( Real64 const remainingPowerDemand );
 
-	void
-	calcLoadCenterThermalLoad(
-		Real64 & thermalLoad // heat rate called for from cogenerator(watts)
-	);
+	Real64
+	calcLoadCenterThermalLoad(); // returns heat rate called for from cogenerator(watts)
 
 public: // data public for unit test
 
 	enum class ElectricBussType : int {
-		notYetSet,
+		notYetSet = 0,
 		aCBuss,
 		dCBussInverter,
 		aCBussStorage,
 		dCBussInverterDCStorage,
 		dCBussInverterACStorage
 	};
-
-
-	std::unique_ptr < ElectricStorage > storageObj;
-	std::unique_ptr < ACtoDCConverter > converterObj;
-	std::unique_ptr < ElectricTransformer > transformerObj;
+	
+	std::unique_ptr< ElectricStorage > storageObj;
+	std::unique_ptr< ACtoDCConverter > converterObj;
+	std::unique_ptr< ElectricTransformer > transformerObj;
 	int numGenerators; // Number of Generators
-	std::vector < std::unique_ptr <GeneratorController> > elecGenCntrlObj; // generator controller objects
+	std::vector< std::unique_ptr< GeneratorController > > elecGenCntrlObj; // generator controller objects
 	ElectricBussType bussType; // is this load center powered by AC or DC generators
-
-
 	Real64 thermalProd; // Current thermal energy Produced from generators in load center (J)
 	Real64 thermalProdRate; // Current thermal energy production rate from generators in load center (W)
 	bool inverterPresent;
 	std::string inverterName; // hold name for verificaton and error messages
-	std::unique_ptr < DCtoACInverter > inverterObj;
-
+	std::unique_ptr< DCtoACInverter > inverterObj;
 	Real64 subpanelFeedInRequest; 
 	// subpanel terms, interact with main panel
 	Real64 subpanelFeedInRate; // Current AC electric power fed into main panel by load center, adjusted by inverter if any (W)
 	Real64 subpanelDrawRate; // Current AC electric power draw from main panel into load center (W)
-
 	// storage operation terms, 
 	Real64 genElectricProd; // Current electric produced by generators in the load center, DC or AC (J)
 	Real64 genElectProdRate; // Current electric power produced by generators in the load center, DC or AC (W)
@@ -819,40 +744,40 @@ public: // Creation
 
 	// Default Constructor
 	ElectricPowerServiceManager() :
-			newEnvironmentInternalGainsFlag( true ),
-			numElecStorageDevices( 0 ),
-			getInputFlag_( true ),
-			newEnvironmentFlag_( true ),
-			numLoadCenters_( 0 ),
-			numTransformers_( 0 ),
-			setupMeterIndexFlag_( true ),
-			elecFacilityIndex_( 0 ),
-			elecProducedCoGenIndex_( 0 ),
-			elecProducedPVIndex_( 0 ),
-			elecProducedWTIndex_( 0 ),
-			elecProducedStorageIndex_( 0 ),
-			elecProducedPowerConversionIndex_( 0 ),
-			name_( "Whole Building" ),
-			facilityPowerInTransformerPresent_( false ),
-			numPowerOutTransformers_( 0 ),
-			wholeBldgRemainingLoad_( 0.0 ),
-			electricityProd_( 0.0 ),
-			electProdRate_( 0.0 ),
-			electricityPurch_( 0.0 ),
-			electPurchRate_( 0.0 ),
-			electSurplusRate_( 0.0 ),
-			electricitySurplus_( 0.0 ),
-			electricityNetRate_( 0.0 ),
-			electricityNet_( 0.0 ),
-			totalBldgElecDemand_( 0.0 ),
-			totalHVACElecDemand_( 0.0 ),
-			totalElectricDemand_( 0.0 ),
-			elecProducedPVRate_( 0.0 ),
-			elecProducedWTRate_( 0.0 ),
-			elecProducedStorageRate_( 0.0 ),
-			elecProducedPowerConversionRate_( 0.0 ),
-			elecProducedCoGenRate_( 0.0 )
-		{}
+		newEnvironmentInternalGainsFlag( true ),
+		numElecStorageDevices( 0 ),
+		getInputFlag_( true ),
+		newEnvironmentFlag_( true ),
+		numLoadCenters_( 0 ),
+		numTransformers_( 0 ),
+		setupMeterIndexFlag_( true ),
+		elecFacilityIndex_( 0 ),
+		elecProducedCoGenIndex_( 0 ),
+		elecProducedPVIndex_( 0 ),
+		elecProducedWTIndex_( 0 ),
+		elecProducedStorageIndex_( 0 ),
+		elecProducedPowerConversionIndex_( 0 ),
+		name_( "Whole Building" ),
+		facilityPowerInTransformerPresent_( false ),
+		numPowerOutTransformers_( 0 ),
+		wholeBldgRemainingLoad_( 0.0 ),
+		electricityProd_( 0.0 ),
+		electProdRate_( 0.0 ),
+		electricityPurch_( 0.0 ),
+		electPurchRate_( 0.0 ),
+		electSurplusRate_( 0.0 ),
+		electricitySurplus_( 0.0 ),
+		electricityNetRate_( 0.0 ),
+		electricityNet_( 0.0 ),
+		totalBldgElecDemand_( 0.0 ),
+		totalHVACElecDemand_( 0.0 ),
+		totalElectricDemand_( 0.0 ),
+		elecProducedPVRate_( 0.0 ),
+		elecProducedWTRate_( 0.0 ),
+		elecProducedStorageRate_( 0.0 ),
+		elecProducedPowerConversionRate_( 0.0 ),
+		elecProducedCoGenRate_( 0.0 )
+	{}
 
 public: // Methods
 
@@ -874,6 +799,7 @@ public: // Methods
 	verifyCustomMetersElecPowerMgr();
 
 private: //Methods
+
 	void
 	getPowerManagerInput();
 
@@ -896,11 +822,13 @@ private: //Methods
 	checkLoadCenters();
 
 public: // data
+
 	bool newEnvironmentInternalGainsFlag;
 	int numElecStorageDevices;
-	std::vector< std::unique_ptr < ElectPowerLoadCenter > > elecLoadCenterObjs;
+	std::vector< std::unique_ptr< ElectPowerLoadCenter > > elecLoadCenterObjs;
 
 private: // data
+
 	bool getInputFlag_; // control if object needs to get input and call factory methods
 	bool newEnvironmentFlag_; //control if object needs to reinit at beginning of a new environment period
 	int numLoadCenters_;
@@ -915,10 +843,10 @@ private: // data
 	std::string name_;
 	bool facilityPowerInTransformerPresent_;
 	std::string facilityPowerInTransformerName_; // hold name for verificaton and error messages
-	std::unique_ptr < ElectricTransformer > facilityPowerInTransformerObj_;
+	std::unique_ptr< ElectricTransformer > facilityPowerInTransformerObj_;
 	int numPowerOutTransformers_;
 	std::string powerOutTransformerName_;
-	std::unique_ptr < ElectricTransformer >  powerOutTransformerObj_;
+	std::unique_ptr< ElectricTransformer >  powerOutTransformerObj_;
 	Real64 wholeBldgRemainingLoad_;
 	Real64 electricityProd_; // Current Electric Produced from Equipment (J)
 	Real64 electProdRate_; // Current Electric Production Rate from Equipment (W)
@@ -941,13 +869,13 @@ private: // data
 
 }; // class ElectricPowerServiceManager
 
-	extern std::unique_ptr< ElectricPowerServiceManager > facilityElectricServiceObj;
+extern std::unique_ptr< ElectricPowerServiceManager > facilityElectricServiceObj;
 
-	void
-	createFacilityElectricPowerServiceObject();
+void
+createFacilityElectricPowerServiceObject();
 
-	void
-	clearFacilityElectricPowerServiceObject();
+void
+clearFacilityElectricPowerServiceObject();
 
 
 } // EnergyPlus namespace
