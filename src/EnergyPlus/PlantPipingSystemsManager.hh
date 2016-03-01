@@ -849,7 +849,7 @@ namespace PlantPipingSystemsManager {
 	Real64
 	EvaluateFieldCellTemperature(
 		int const DomainNum,
-		CartesianCell const & ThisCell
+		CartesianCell & ThisCell
 	);
 
 	//*********************************************************************************************!
@@ -859,7 +859,7 @@ namespace PlantPipingSystemsManager {
 	Real64
 	EvaluateGroundSurfaceTemperature(
 		int const DomainNum,
-		CartesianCell const & cell
+		CartesianCell & cell
 	);
 
 	//*********************************************************************************************!
@@ -869,7 +869,7 @@ namespace PlantPipingSystemsManager {
 	Real64
 	EvaluateAdiabaticSurfaceTemperature(
 		int const DomainNum,
-		CartesianCell const & cell
+		CartesianCell & cell
 	);
 
 	//*********************************************************************************************!
@@ -879,7 +879,7 @@ namespace PlantPipingSystemsManager {
 	Real64
 	EvaluateBasementCellTemperature(
 		int const DomainNum,
-		CartesianCell const & cell
+		CartesianCell & cell
 	);
 
 	//*********************************************************************************************!
@@ -910,7 +910,7 @@ namespace PlantPipingSystemsManager {
 	Real64
 	EvaluateZoneInterfaceTemperature(
 		int const DomainNum,
-		CartesianCell const & cell
+		CartesianCell & cell
 	);
 
 	//*********************************************************************************************!
@@ -951,7 +951,7 @@ namespace PlantPipingSystemsManager {
 	Real64
 	EvaluateFarfieldBoundaryTemperature(
 		int const DomainNum,
-		CartesianCell const & cell
+		CartesianCell & cell
 	);
 
 	//*********************************************************************************************!
@@ -1162,6 +1162,15 @@ namespace PlantPipingSystemsManager {
 		int const DomainNum,
 		CartesianCell const & cell
 	);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
+#ifdef CalcEnergyBalance
+	void
+	UpdateEnergyBalance( int const DomainNum );
+#endif
 
 } // PlantPipingSystemsManager
 

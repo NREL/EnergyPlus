@@ -72,6 +72,8 @@
 #include <DataGlobals.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
+#define CalcEnergyBalance = true
+
 namespace EnergyPlus {
 
 namespace DataPlantPipingSystems {
@@ -216,6 +218,12 @@ namespace DataPlantPipingSystems {
 		Real64 Temperature_PrevTimeStep; // C
 		Real64 Beta; // K/W
 		BaseThermalPropertySet Properties;
+#ifdef CalcEnergyBalance
+		Real64 energyImbalance = 0.0;
+		Array1D< Real64 > energyFromEachSide;
+		Real64 sumEnergyFromAllSides = 0.0;
+		Real64 totalEnergyChange = 0.0;
+#endif
 
 		// Default Constructor
 		BaseCell() :
@@ -991,6 +999,13 @@ namespace DataPlantPipingSystems {
 
 		// Main 3D cells array
 		Array3D< CartesianCell > Cells;
+
+#ifdef CalcEnergyBalance
+		Real64 MaxEnergyImbalance = 0.0;
+		int MaxEnergyImbalance_XLocation = 0;
+		int MaxEnergyImbalance_YLocation = 0;
+		int MaxEnergyImbalance_ZLocation = 0;
+#endif
 
 		// Default Constructor
 		FullDomainStructureInfo() :
