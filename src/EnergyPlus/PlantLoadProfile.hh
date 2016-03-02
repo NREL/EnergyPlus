@@ -86,6 +86,10 @@ namespace PlantLoadProfile {
 
 	struct PlantProfileData : public PlantComponent
 	{
+		virtual
+		~PlantProfileData()
+		{}
+
 		// Members
 		std::string Name; // Name of Plant Load Profile object
 		int TypeNum; // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
@@ -151,11 +155,12 @@ namespace PlantLoadProfile {
 		void
 		simulate( const PlantLocation & calledFromLocation,
 			  bool const FirstHVACIteration,
-			  Real64 & CurLoad
-			 );
+			  Real64 & CurLoad,
+			  bool const RunFlag
+			 ) override;
 
 		void
-		onInitLoopEquip( const PlantLocation & calledFromLocation );
+		onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
 
 		void
 		InitPlantProfile();

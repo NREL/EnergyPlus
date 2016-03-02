@@ -194,7 +194,7 @@ namespace GroundHeatExchangers {
 		this->initGLHESimVars();
 	}
 
-	void GLHEBase::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 & EP_UNUSED( CurLoad ) ) {
+	void GLHEBase::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
 		this->initGLHESimVars();
 		this->calcGroundHeatExchanger();
 		this->updateGHX();
