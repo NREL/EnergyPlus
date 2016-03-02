@@ -436,6 +436,8 @@ namespace DataSurfaces {
 	// zone-side of shade plus gap air convection to zone) + (IR and
 	// convection from frame) + (IR and convection from divider if no
 	// interior shade) (W)
+	Array1D< Real64 > WinHeatTransfer; // Total heat transfer through the window = WinTransSolar + conduction
+	// through glazing and frame
 	Array1D< Real64 > WinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
 	Array1D< Real64 > WinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
 
@@ -485,6 +487,7 @@ namespace DataSurfaces {
 	Array1D< Real64 > WinHeatLossRepEnergy; // Energy of WinHeatLossRep [J]
 	Array1D< Real64 > WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
 	Array1D< Real64 > WinGapConvHtFlowRepEnergy; // Energy of WinGapConvHtFlowRep [J]
+	Array1D< Real64 > WinHeatTransferRepEnergy; // Energy of WinHeatTransfer [J]
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
@@ -856,6 +859,7 @@ namespace DataSurfaces {
 		WinDifSolar.deallocate();
 		WinDirSolTransAtIncAngle.deallocate();
 		WinHeatGain.deallocate();
+		WinHeatTransfer.deallocate();
 		WinHeatGainRep.deallocate();
 		WinHeatLossRep.deallocate();
 		WinGainConvGlazToZoneRep.deallocate();
@@ -890,6 +894,7 @@ namespace DataSurfaces {
 		WinHeatLossRepEnergy.deallocate();
 		WinShadingAbsorbedSolarEnergy.deallocate();
 		WinGapConvHtFlowRepEnergy.deallocate();
+		WinHeatTransferRepEnergy.deallocate();
 		Surface.deallocate();
 		SurfaceWindow.deallocate();
 		FrameDivider.deallocate();
@@ -914,11 +919,11 @@ namespace DataSurfaces {
 	}
 
 	void
-	CheckSurfaceOutBulbTempAt() 
+	CheckSurfaceOutBulbTempAt()
 	{
 		// Using/Aliasing
 		using DataEnvironment::SetOutBulbTempAt_error;
-		
+
 		Real64 minBulb = 0.0;
 		for ( auto & surface : Surface ) {
 			minBulb = min( minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp );

@@ -420,6 +420,8 @@ namespace DataSurfaces {
 	// zone-side of shade plus gap air convection to zone) + (IR and
 	// convection from frame) + (IR and convection from divider if no
 	// interior shade) (W)
+	extern Array1D< Real64 > WinHeatTransfer; // Total heat transfer through the window = WinTransSolar + conduction
+	// through glazing and frame
 	extern Array1D< Real64 > WinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
 	extern Array1D< Real64 > WinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
 
@@ -469,6 +471,7 @@ namespace DataSurfaces {
 	extern Array1D< Real64 > WinHeatLossRepEnergy; // Energy of WinHeatLossRep [J]
 	extern Array1D< Real64 > WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
 	extern Array1D< Real64 > WinGapConvHtFlowRepEnergy; // Energy of WinGapConvHtFlowRep [J]
+	extern Array1D< Real64 > WinHeatTransferRepEnergy; // Energy of WinHeatTransfer [J]
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
@@ -1035,7 +1038,6 @@ namespace DataSurfaces {
 		Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
 		Real64 ConvHeatGainToZoneAir; // Convective heat gain to zone air from window gap airflow (W)
 		Real64 RetHeatGainToZoneAir; // Convective heat gain to return air sent to zone [W]
-		Real64 DividerConduction; // Conduction through divider from outside to inside face (W)
 		Real64 OtherConvHeatGain; // other convective = total conv - standard model prediction for EQL window model (W)
 		int BlindNumber; // Blind number for a window with a blind
 		Array1D< Real64 > EffShBlindEmiss; // Effective emissivity of interior blind or shade
@@ -1232,7 +1234,6 @@ namespace DataSurfaces {
 			ConvHeatFlowNatural( 0.0 ),
 			ConvHeatGainToZoneAir( 0.0 ),
 			RetHeatGainToZoneAir( 0.0 ),
-			DividerConduction( 0.0 ),
 			OtherConvHeatGain( 0.0 ),
 			BlindNumber( 0 ),
 			EffShBlindEmiss( MaxSlatAngs, 0.0 ),
@@ -1337,7 +1338,7 @@ namespace DataSurfaces {
 			ConvHeatFlowNatural = 0.0;
 			ConvHeatGainToZoneAir = 0.0;
 			RetHeatGainToZoneAir = 0.0;
-			DividerConduction = 0.0;
+			DividerHeatGain = 0.0;
 			BlTsolBmBm = 0.0;
 			BlTsolBmDif = 0.0;
 			BlTsolDifDif = 0.0;

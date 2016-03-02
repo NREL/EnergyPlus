@@ -2539,7 +2539,7 @@ Site:GroundTemperature:Shallow are used by the Surface Ground Heat Exchanger (i.
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the .5 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions of the building location.
 
-This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required.
 
 #### Field: Month Temperature(s) – 12 fields in all
 
@@ -2558,7 +2558,7 @@ Site:GroundTemperature:Deep are used by the Pond Ground Heat Exchanger object (i
 
 Note that the ground temperatures included in full year weather files may be suitable of being used for the values in these fields – namely, the 4 m depth temperatures that are calculated for “undisturbed” soil of “typical” conditions. However, you may wish to use some other change effect – based on the weather conditions or special knowledge of the building location.
 
-This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required. 
+This object may be used for objects requiring "undisturbed" ground temperatures. In these instances, the "name" input field is not required.
 
 #### Field: Month Temperature(s) – 12 fields in all
 
@@ -2608,7 +2608,7 @@ An IDF example:
     962,         !- Soil Density {kg/m3}
     2576,        !- Soil Specific Heat {J/kg-K}
     30,          !- Soil Moisture Content Volume Fraction {percent}
-    50,          !- Soil Moisture Content Volume Fraction at Saturation {percent} 
+    50,          !- Soil Moisture Content Volume Fraction at Saturation {percent}
     0.408;       !- Evapotranspiration Ground Cover Parameter
 ```
 
@@ -2617,7 +2617,7 @@ An IDF example:
 
 Site:GroundTemperature:Undisturbed:KusudaAchenbach may be used by all objects requiring "undisturbed" ground temperatures. It provides an undisturbed ground temperature based on the correlation developed by Kusuda T. and P. Achenbach. 1965. The correlation uses three parameters for ground temperature at the surface to define a correlation for undisturbed ground temperatures as a function of depth and time. If one thinks of the ground temperature for a given depth as a sinusoid, the average ground temperature, amplitude (average difference between maximum ground temperature and minimum ground temperature), and the phase shift (day of minimum surface temperature) are all required to define the correlation.
 
-If the parameters are left blank they can be autocalculated by including soil surface temperatures in the input using the Site:GroundTemperature:Shallow object. They can also be calculated by using the CalcSoilSurfTemp preprocessor. 
+If the parameters are left blank they can be autocalculated by including soil surface temperatures in the input using the Site:GroundTemperature:Shallow object. They can also be calculated by using the CalcSoilSurfTemp preprocessor.
 
 Kusuda, T. and P.R. Achenbach. 1965. 'Earth Temperatures and Thermal Diffusivity at Selected Stations in the United States.' *ASHRAE Transactions*. 71(1): 61-74.
 
@@ -2964,7 +2964,7 @@ The specific heat of dry soil, in J/kg-K. If moisture is defined in this object,
 
 #### Field: Soil Moisture Content Volume Fraction
 
-A nominal value of soil moisture content to be used when evaluating soil thermal properties. 
+A nominal value of soil moisture content to be used when evaluating soil thermal properties.
 
 #### Field: Soil Moisture Content Volume Fraction at Saturation
 
@@ -2984,11 +2984,11 @@ Numeric field specifies the ground cover effects used in the evapotranspiration 
 
 #### Field: Basement Floor Boundary Condition Model Name
 
-This is the name of the other side boundary condition model used for the basement floor surface. 
+This is the name of the other side boundary condition model used for the basement floor surface.
 
-#### Field: Horizontal Insulation 
+#### Field: Horizontal Insulation
 
-Alpha field indicates whether horizontal insulation is present. Options include “YES” and “NO”. 
+Alpha field indicates whether horizontal insulation is present. Options include “YES” and “NO”.
 
 #### Field: Horizontal Insulation Name
 
@@ -3010,7 +3010,7 @@ Depth of basement floor surface referenced from the ground surface, in meters. T
 
 Name of the other side condition boundary model used for the basement walls.
 
-#### Field: Vertical Insulation 
+#### Field: Vertical Insulation
 
 Alpha field indicates whether vertical insulation is present. Options include “YES” and “NO”.
 
@@ -8722,7 +8722,7 @@ EnergyPlus allows for several surface types:
 
 - **Shading:Zone:Detailed**
 
-Each of the preceding surfaces has “correct” geometry specifications. BuildingSurface and Fenestration surfaces (heat transfer surfaces) are used to describe the important elements of the building (walls, roofs, floors, windows, doors) that will determine the interactions of the building surfaces with the outside environment parameters and the internal space requirements. These surfaces are also used to represent “interzone” heat transfer. All surfaces are modeled as a thin plane (with no thickness) except that material thicknesses are taken into account for heat transfer calculations. 
+Each of the preceding surfaces has “correct” geometry specifications. BuildingSurface and Fenestration surfaces (heat transfer surfaces) are used to describe the important elements of the building (walls, roofs, floors, windows, doors) that will determine the interactions of the building surfaces with the outside environment parameters and the internal space requirements. These surfaces are also used to represent “interzone” heat transfer. All surfaces are modeled as a thin plane (with no thickness) except that material thicknesses are taken into account for heat transfer calculations.
 
 During specification of surfaces, several “outside” environments may be chosen:
 
@@ -10908,6 +10908,10 @@ Output variables applicable only to exterior windows and glass doors:
 
 * Zone,Sum,Surface Window Heat Loss Energy [J]
 
+* Zone,Average,Surface Window Net Heat Transfer Rate [W]
+
+* Zone,Sum,Surface Window Net Heat Transfer Energy [J]
+
 * Zone,Average,Surface Window Glazing Beam to Beam Solar Transmittance[]
 
 * Zone,Average,Surface Window Glazing Beam to Diffuse Solar Transmittance []
@@ -11132,7 +11136,7 @@ Former Name: Prior to version 7.1, these outputs were called “Surface Ext Ther
 
 Beam solar radiation from the exterior windows in a zone incident on the inside face of a surface in the zone. If Solar Distribution in the BUILDING object is equal to MinimalShadowing or FullExterior, it is assumed that all beam solar from exterior windows falls on the floor. In this case the value of this output variable can be greater than zero only for floor surfaces. If Solar Distribution equals FullInteriorExterior the program tracks where beam solar from exterior windows falls inside the zone, in which case the value of this variable can be greater than zero for floor as well as wall surfaces. Different versions of the report are available including the basic incident rate (W), a per unit area flux (W/m2), and an energy version (J).
 
-#### 
+####
 
 #### Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate [W]
 
@@ -11486,17 +11490,63 @@ For an airflow window, the forced convective heat flow from the gap through whic
 
 #### Surface Window Heat Gain Energy [J]
 
-The total heat flow to the zone from the glazing, frame and divider of an exterior window when the total heat flow is positive.
+The total heat flow **to the zone** from the glazing, frame and divider of an exterior window when the total heat flow is positive.
 
 For a window *without an interior shading device*, this heat flow is equal to:
 
-[Surface Window Transmitted Solar Radiation Rate (see definition, above)]
++ [Surface Window Transmitted Solar Radiation Rate (see definition, above)]
 
 + [Convective heat flow to the zone from the zone side of the glazing]
 
 + [Net IR heat flow to the zone from zone side of the glazing]
 
-– [Short-wave radiation from zone transmitted back out the window]
++ [Short-wave radiation from zone transmitted back out the window]
+
++ [Convection to zone from window frame and divider, if present]
+
+Here, short-wave radiation is that from lights and diffuse interior solar radiation.
+
+For a window *with an interior shading device*, this heat flow is equal to:
+
++ [Surface Window Transmitted Solar Radiation Rate]
+
++ [Convective heat flow to the zone from the air flowing through the gap between glazing and shading device]
+
++ [Convective heat flow to the zone from the zone side of the shading device]
+
++ [Net IR heat flow to the zone from the zone side of the glazing]
+
++ [Net IR heat flow to the zone from the zone side of the shading device]
+
++ [Short-wave radiation from zone transmitted back out the window]
+
++ [Convection to zone from window frame and divider, if present]
+
+The total window heat flow can also be thought of as the sum of the solar and conductive gain **to the zone** from the window.
+
+#### Surface Window Heat Loss Rate [W]
+
+#### Surface Window Heat Loss Energy [J]
+
+The absolute value of the total heat flow through an exterior window when the total heat flow is negative. (See definition of “total heat flow” under “Surface Window Heat Gain Rate,” above.)
+
+#### Surface Window Net Heat Transfer Rate [W]
+
+#### Surface Window Net Heat Transfer Energy [J]
+
+The total heat flow through the glazing, frame and divider of an exterior window. Negative values imply heat flow to the exterior.
+
+The important distinction between this output variable and those for "Surface Window Heat Gain/Loss" is that this represents the net heat flow through the window and not the heat flow **to the zone**. The only difference is the heat flow **to the zone** does not account for radiation from the opaque frame and divider components. This is because these components, as a simplification, do not participate in the overall radiative exchange with other surfaces in the zone.
+
+For a window *without an interior shading device*, this heat flow is equal to:
+
++ [Surface Window Transmitted Solar Radiation Rate (see definition, above)]
+
++ [Convective heat flow to the zone from the zone side of the glazing]
+
++ [Net IR heat flow to the zone from zone side of the glazing]
+
++ [Short-wave radiation from zone transmitted back out the window]
 
 + [Conduction to zone from window frame and divider, if present]
 
@@ -11514,17 +11564,9 @@ For a window *with an interior shading device*, this heat flow is equal to:
 
 + [Net IR heat flow to the zone from the zone side of the shading device]
 
-– [Short-wave radiation from zone transmitted back out the window]
++ [Short-wave radiation from zone transmitted back out the window]
 
 + [Conduction to zone from window frame and divider, if present]
-
-The total window heat flow can also be thought of as the sum of the solar and conductive gain from the window glazing.
-
-#### Surface Window Heat Loss Rate [W]
-
-#### Surface Window Heat Loss Energy [J]
-
-The absolute value of the total heat flow through an exterior window when the total heat flow is negative. (See definition of “total heat flow” under “Surface Window Heat Gain Rate,” above.)
 
 #### Surface Window Glazing Beam to Beam Solar Transmittance []
 
@@ -16561,7 +16603,7 @@ This model simulates a thermal zone using a network approach by assuming intra-z
     AirflowNetwork:Intrazone:Node
     AirflowNetwork:Intrazone:Linkage
 
-The first *five* **objects** are described below. The last two objects are described in the Airflow Network Model section. 
+The first *five* **objects** are described below. The last two objects are described in the Airflow Network Model section.
 
 ### RoomAirSettings:AirflowNetwork
 
@@ -16570,7 +16612,7 @@ This object provides inputs in a thermal zone needed for the RoomAirflowNetwork 
 #### Field: Name
 
 This is a unique character string associated with this instance of the RoomAirSettings:AirflowNetwork object.
- 
+
 #### Field: Zone Name
 
 The name of the EnergyPlus thermal zone corresponding to the RoomAir model zone.
@@ -16581,13 +16623,13 @@ This is the name of a RoomAir:Node:AirflowNetwork object that contains the senso
 
 #### Field: RoomAir:Node:AirflowNetwork x Name
 
-The name of a RoomAir:Node:AirflowNetwork object defined elsewhere.  This node will receive the fraction of internal gains, and HVAC equipment, and a list of surface names exposed to this node with convective heat transfer. 
+The name of a RoomAir:Node:AirflowNetwork object defined elsewhere.  This node will receive the fraction of internal gains, and HVAC equipment, and a list of surface names exposed to this node with convective heat transfer.
 
 An IDF example input is:
 
 ```idf
   RoomAirSettings:AirflowNetwork,
-    NORTH_ZONE,     !- Name 
+    NORTH_ZONE,     !- Name
     NORTH_ZONE,              !- Zone Name
     RoomAir Schedule,        !- Availability Schedule Name
     NORTH_ZONE,              !- Control Point RoomAir:Node Name
@@ -16605,7 +16647,7 @@ This object is used to define a node in a thermal zone. The input specifies the 
 
 #### Field: Name
 
-This is a unique character string associated with this instance of the RoomAirSettings:AirflowNetwork object. 
+This is a unique character string associated with this instance of the RoomAirSettings:AirflowNetwork object.
 
 #### Field: Zone Name
 
@@ -16643,7 +16685,7 @@ This object is used to provide a list of connected adjacent surfaces with convec
 
 #### Field: Name
 
-This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:AdjacentSurfaceList object. 
+This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:AdjacentSurfaceList object.
 
 #### Field: Surface x Name
 
@@ -16656,23 +16698,23 @@ The field specifies a surface name based on the order from 1 to 21. The maximum 
 ```
 ### RoomAir:Node:AirflowNetwork:InternalGains
 
-This object is used to define a list of internal gains in the same zone and associated fraction assigned to this particular node. 
+This object is used to define a list of internal gains in the same zone and associated fraction assigned to this particular node.
 
 #### Field: Name
 
-This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:InternalGains object. 
+This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:InternalGains object.
 
 #### Field: Internal Gain Object x Type
 
-The field specifies an internal gain object type based on the list in the Energy+. 
+The field specifies an internal gain object type based on the list in the Energy+.
 
 #### Field: Internal Gain Object x Name
 
 The field specifies an internal gain object name based on the list in the Energy+.
- 
+
 #### Field: Fraction of Gains to Node x
 
-The field specifies a fraction of the particular internal gain object assigned to this node. 
+The field specifies a fraction of the particular internal gain object assigned to this node.
 
 ```idf
   RoomAir:Node:AirflowNetwork:InternalGains,
@@ -16692,11 +16734,11 @@ The field specifies a fraction of the particular internal gain object assigned t
 
 ### RoomAir:Node:AirflowNetwork:HVACEquipment
 
-This object is used to define a list of HVAC equipment objects in the same zone and associated fractions assigned to this particular node. 
+This object is used to define a list of HVAC equipment objects in the same zone and associated fractions assigned to this particular node.
 
 #### Field: Name
 
-This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:HVACEquipment object. 
+This is a unique character string associated with this instance of the RoomAir:Node:AirflowNetwork:HVACEquipment object.
 
 #### Field: ZoneHVAC or Air Terminal Equipment Object Type x
 
@@ -16706,20 +16748,20 @@ The field specifies an object type of ZoneHVAC equipment or terminal type based 
 
 The field specifies the object name based on the object type defined in the previous field.  
 
-#### Field: Fraction of Output or Supply Air from HVAC Equipment x 
+#### Field: Fraction of Output or Supply Air from HVAC Equipment x
 
-The field specifies a fraction of supply air from the particular equipment to this node. 
+The field specifies a fraction of supply air from the particular equipment to this node.
 
-#### Field: Fraction of Input or Return Air from HVAC Equipment x 
+#### Field: Fraction of Input or Return Air from HVAC Equipment x
 
-The field specifies a fraction of return air from the particular equipment to this node. 
+The field specifies a fraction of return air from the particular equipment to this node.
 
 ```idf
   RoomAir:Node:AirflowNetwork:HVACEquipment,
     CentralUpper_HVAC,        !- Name
     ZoneHVAC:PackagedTerminalAirConditioner, !- ZoneHVAC or Air Terminal Equipment Object Type 1
     NORTH_ZONE PTAC,       !- ZoneHVAC or Air Terminal Equipment Object Name 1
-    0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1 
+    0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1
     0.14;                   !- Fraction of Input or Return Air to HVAC Equipment 1
 ```
 
@@ -16988,7 +17030,7 @@ A sum of internal latent gains assigned to a Room Air node in a zone.
 
 #### HVAC,Average,RoomAirflowNetwork Node NonAirSystemResponse [W]
 
-A sum of system convective gains, collected via NonAirSystemResponse, and assigned to a Room Air node in a zone. 
+A sum of system convective gains, collected via NonAirSystemResponse, and assigned to a Room Air node in a zone.
 
 #### HVAC,Average,RoomAirflowNetwork Node SysDepZoneLoadsLagged [W]
 
@@ -17870,7 +17912,7 @@ The fraction of heat from lights that goes into the zone as visible (short-wave)
 
 Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible are given in Table 14 for overhead fluorescent lighting for a variety of luminaire configurations. The data is based on ASHRAE 1282-RP "Lighting Heat Gain Distribution in Buildings" by Daniel E. Fisher and Chanvit Chantrasrisalai.
 
-Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations. 
+Table 14. Approximate values of Return Air Fraction, Fraction Radiant and Fraction Visible for overhead fluorescent lighting for different luminaire configurations.
 
 <table class="table table-striped">
   <tr>
@@ -19374,9 +19416,9 @@ Specifies the type of connection between the zone and the ITE air inlet node. Th
 
 AdjustedSupply = This option is used to apply a recirculation adjustment to the ITE inlet conditions. If this option is specified, then the Supply Air Node Name is required and the air inlet temperature to the ITE will be the current supply air node temperature adjusted by the current recirculation fraction. All heat output is added to the zone air heat balance as a convective gain. AdjustedSupply is the default.
 
-ZoneAirNode = This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain. 
+ZoneAirNode = This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain.
 
-RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. RoomAirModelType and RoomAir:Node). 
+RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. RoomAirModelType and RoomAir:Node).
 
 #### Field: Air Inlet Room Air Model Node Name
 
@@ -19842,7 +19884,7 @@ This field denotes the generic contaminant design generation coefficient (m<sup>
 
 #### Field: Generation Exponent
 
-This field denotes the flow power exponent,* n*, in the contaminant source equation. The valid range is 0.0 to 1.0, 
+This field denotes the flow power exponent,* n*, in the contaminant source equation. The valid range is 0.0 to 1.0,
 
 An IDF example is provided below:
 
@@ -19904,7 +19946,7 @@ This field is the name of the schedule (ref: Schedule) that modifies the maximum
 
 #### Field: Cutoff Generic Contaminant at which Emission Ceases
 
-This field is the generic contaminant cutoff concentration level where the source ceases its emission. 
+This field is the generic contaminant cutoff concentration level where the source ceases its emission.
 
 ** **
 
@@ -20034,7 +20076,7 @@ This field specifies the average mass transfer coefficient of the contaminant ge
 
 #### Field: Schedule Name
 
-This field is the name of the schedule (ref: Schedule) that modifies the mass transfer coefficient with the value between 0.0 and 1.0. 
+This field is the name of the schedule (ref: Schedule) that modifies the mass transfer coefficient with the value between 0.0 and 1.0.
 
 #### Field: Henry Adsorption Constant or Partition Coefficient
 
@@ -20186,4 +20228,3 @@ ZONE,Average, Generic Air Contaminant Deposition Rate Removal Volume Flow Rate [
 #### Generic Air Contaminant Deposition Rate Removal Volume Flow Rate [m3/s]
 
 This output is the average generic contaminant generation rate from each ZoneContaminantSourceAndSink:Generic:DepositionRateSink object.
-
