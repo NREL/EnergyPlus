@@ -10874,20 +10874,38 @@ namespace HVACUnitarySystem {
 		UnitarySystem( UnitarySysNum ).CompPartLoadRatio = max( UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio, UnitarySystem( UnitarySysNum ).HeatCompPartLoadRatio );
 
 		if ( HeatingLoad ) {
-			UnitarySystem( UnitarySysNum ).TotCoolEnergyRate = 0.0;
-			UnitarySystem( UnitarySysNum ).SensCoolEnergyRate = 0.0;
-			UnitarySystem( UnitarySysNum ).LatCoolEnergyRate = 0.0;
-			UnitarySystem( UnitarySysNum ).TotHeatEnergyRate = std::abs( max( 0.0, QTotUnitOut ) );
-			UnitarySystem( UnitarySysNum ).SensHeatEnergyRate = std::abs( max( 0.0, QSensUnitOut ) );
-			UnitarySystem( UnitarySysNum ).LatHeatEnergyRate = std::abs( max( 0.0, ( QTotUnitOut - QSensUnitOut ) ) );
+			if ( QTotUnitOut > 0.0 ) {  // heating
+				UnitarySystem( UnitarySysNum ).TotCoolEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).SensCoolEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).LatCoolEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).TotHeatEnergyRate = std::abs( max( 0.0, QTotUnitOut ) );
+				UnitarySystem( UnitarySysNum ).SensHeatEnergyRate = std::abs( max( 0.0, QSensUnitOut ) );
+				UnitarySystem( UnitarySysNum ).LatHeatEnergyRate = std::abs( max( 0.0, ( QTotUnitOut - QSensUnitOut ) ) );
+			} else {
+				UnitarySystem( UnitarySysNum ).TotCoolEnergyRate = std::abs( min( 0.0, QTotUnitOut ) );
+				UnitarySystem( UnitarySysNum ).SensCoolEnergyRate = std::abs( min( 0.0, QSensUnitOut ) );
+				UnitarySystem( UnitarySysNum ).LatCoolEnergyRate = std::abs( min( 0.0, ( QTotUnitOut - QSensUnitOut ) ) );
+				UnitarySystem( UnitarySysNum ).TotHeatEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).SensHeatEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).LatHeatEnergyRate = 0.0;
+			}
 		} else {
-			UnitarySystem( UnitarySysNum ).TotCoolEnergyRate = std::abs( min( 0.0, QTotUnitOut ) );
-			UnitarySystem( UnitarySysNum ).SensCoolEnergyRate = std::abs( min( 0.0, QSensUnitOut ) );
-			UnitarySystem( UnitarySysNum ).LatCoolEnergyRate = std::abs( min( 0.0, ( QTotUnitOut - QSensUnitOut ) ) );
-			UnitarySystem( UnitarySysNum ).TotHeatEnergyRate = 0.0;
-			UnitarySystem( UnitarySysNum ).SensHeatEnergyRate = 0.0;
-			UnitarySystem( UnitarySysNum ).LatHeatEnergyRate = 0.0;
-		}
+			if ( QTotUnitOut <= 0.0 ) {  // cooling
+				UnitarySystem( UnitarySysNum ).TotCoolEnergyRate = std::abs( min( 0.0, QTotUnitOut ) );
+				UnitarySystem( UnitarySysNum ).SensCoolEnergyRate = std::abs( min( 0.0, QSensUnitOut ) );
+				UnitarySystem( UnitarySysNum ).LatCoolEnergyRate = std::abs( min( 0.0, ( QTotUnitOut - QSensUnitOut ) ) );
+				UnitarySystem( UnitarySysNum ).TotHeatEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).SensHeatEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).LatHeatEnergyRate = 0.0;
+			} else {
+				UnitarySystem( UnitarySysNum ).TotCoolEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).SensCoolEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).LatCoolEnergyRate = 0.0;
+				UnitarySystem( UnitarySysNum ).TotHeatEnergyRate = std::abs( max( 0.0, QTotUnitOut ) );
+				UnitarySystem( UnitarySysNum ).SensHeatEnergyRate = std::abs( max( 0.0, QSensUnitOut ) );
+				UnitarySystem( UnitarySysNum ).LatHeatEnergyRate = std::abs( max( 0.0, ( QTotUnitOut - QSensUnitOut ) ) );
+			}
+		} 
 
 		if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 			if ( CompOnMassFlow > 0.0 ) {

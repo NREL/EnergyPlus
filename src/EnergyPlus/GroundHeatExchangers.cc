@@ -1328,7 +1328,11 @@ namespace GroundHeatExchangers {
 			for ( J = 1; J <= ( N - LastHourN( 1 ) ); ++J ) {
 				SumQnHr += QnSubHr( J ) * std::abs( prevTimeSteps( J ) - prevTimeSteps( J + 1 ) );
 			}
-			SumQnHr /= std::abs( prevTimeSteps( 1 ) - prevTimeSteps( J ) );
+			if ( prevTimeSteps( 1 ) != prevTimeSteps( J ) ){
+				SumQnHr /= std::abs( prevTimeSteps( 1 ) - prevTimeSteps( J ) );
+			} else {
+				SumQnHr /= 0.05; // estimated small timestep
+			}
 			QnHr = eoshift( QnHr, -1, SumQnHr );
 			LastHourN = eoshift( LastHourN, -1, N );
 		}
@@ -2245,7 +2249,7 @@ namespace GroundHeatExchangers {
 			InitComponentNodes( 0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
 
 			lastQnSubHr = 0.0;
-			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime ); 
+			Node( inletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime );
 			Node( outletNodeNum ).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds( coilDepth, CurTime );
 
 			// zero out all history arrays
