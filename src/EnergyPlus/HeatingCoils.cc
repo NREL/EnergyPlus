@@ -3349,7 +3349,7 @@ namespace HeatingCoils {
 		int const CoilNum, // Number of electric or gas heating Coil
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this coil is used 
 		) {
 
 		// FUNCTION INFORMATION:
@@ -3360,37 +3360,11 @@ namespace HeatingCoils {
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function sets data to Heating Coil using the coil index and arguments passed
-		// If incorrect coil index is passed, ErrorsFound is returned as true
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
-		// Return value
-		// na
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// Obtains and Allocates HeatingCoil related parameters from input file
-		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
+		if ( GetCoilsInputFlag ) { 
 			GetHeatingCoilInput();
 			GetCoilsInputFlag = false;
 		}

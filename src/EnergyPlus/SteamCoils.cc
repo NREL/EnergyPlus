@@ -2463,54 +2463,27 @@ namespace SteamCoils {
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function sets data to water Heating Coil using the coil index and arguments passed
-		// If incorrect coil index is passed, ErrorsFound is returned as true
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
-		// Return value
-		// na
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// Obtains and Allocates water coil parameters from input file
-		// Obtains and Allocates SteamCoil related parameters from input file
-		if ( GetSteamCoilsInputFlag ) { //First time subroutine has been entered
+		if ( GetSteamCoilsInputFlag ) {
 			GetSteamCoilInput();
 			GetSteamCoilsInputFlag = false;
 		}
 
 		if ( CoilNum <= 0 || CoilNum > NumSteamCoils ) {
 			ShowSevereError( "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits( CoilNum ) + " should be >0 and <" + TrimSigDigits( NumSteamCoils ) );
-				ErrorsFound = true;
-				return;
+			ErrorsFound = true;
+			return;
 		}
 
 		if ( present( DesiccantRegenerationCoil ) ) {
-				SteamCoil( CoilNum ).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
+			 SteamCoil( CoilNum ).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
 		}
 
 		if ( present( DesiccantDehumIndex ) ) {
-				SteamCoil( CoilNum ).DesiccantDehumNum = DesiccantDehumIndex;
+			 SteamCoil( CoilNum ).DesiccantDehumNum = DesiccantDehumIndex;
 		}
 
 	}

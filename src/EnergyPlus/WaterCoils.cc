@@ -6186,36 +6186,10 @@ Label10: ;
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function sets data to water Heating Coil using the coil index and arguments passed
-		// If incorrect coil index is passed, ErrorsFound is returned as true
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
-		// Return value
-		// na
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// Obtains and Allocates water coil parameters from input file
 		if ( GetWaterCoilsInputFlag ) {
 			GetWaterCoilInput();
 			GetWaterCoilsInputFlag = false;
