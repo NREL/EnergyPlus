@@ -37,6 +37,7 @@ set( test_src
   FaultsManager.unit.cc
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
+  FluidProperties.unit.cc
   Furnaces.unit.cc
   General.unit.cc
   GroundHeatExchangers.unit.cc

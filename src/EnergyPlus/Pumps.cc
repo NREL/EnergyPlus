@@ -194,7 +194,7 @@ namespace Pumps {
 		NumPumpsFullLoad = 0;
 		GetInputFlag = true;
 		PumpMassFlowRate = 0.0 ;
-		PumpHeattoFluid= 0.0 ; 
+		PumpHeattoFluid= 0.0 ;
 		Power= 0.0 ;
 		ShaftPower= 0.0 ;
 		PumpEquip.deallocate();
@@ -1870,9 +1870,9 @@ namespace Pumps {
 		//  auto sized or manually sized.  Thus, this must go after the flow sizing block above.
 		if ( PumpEquip( PumpNum ).NomPowerUseWasAutoSized ) {
 			if ( PumpEquip( PumpNum ).NomVolFlowRate >= SmallWaterVolFlow ) {
-				switch ( PumpEquip( PumpNum ).powerSizingMethod ) 
+				switch ( PumpEquip( PumpNum ).powerSizingMethod )
 				{
-		
+
 				case sizePowerPerFlow: {
 					TotalEffic = PumpEquip( PumpNum ).NomPumpHead / PumpEquip( PumpNum ).powerPerFlowScalingFactor;
 					break;
