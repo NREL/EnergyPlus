@@ -1177,7 +1177,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 
-	/*BeginEnvrnFlag = false;*/
 	bool ErrorsFound( false ); // function returns true on error
 	bool FirstHVACIteration( true ); // TRUE if 1st HVAC simulation of system timestep
 	bool DoNotTerminateIter( true ); // iteration flag
@@ -1197,8 +1196,8 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	Real64 HWMassFlowRate( 0.0 ); // hot water coil water mass flow rate, m3/s
 	Real64 UHAirMassFlowRate( 0.0 ); // unit heate air mass flow rate 
 	Real64 UHHeatingRate( 0.0 ); // unit heate heating rate
-	Real64 UHEnteringAirEnthaly( 0.0 ); // unit heater entering air enthalpy
-	Real64 UHLeavingAirEnthaly( 0.0 ); // unit heater leaving air enthalpy
+	Real64 UHEnteringAirEnthalpy( 0.0 ); // unit heater entering air enthalpy
+	Real64 UHLeavingAirEnthalpy( 0.0 ); // unit heater leaving air enthalpy
 	Real64 HWCoilHeatingRate( 0.0 ); // hot water heating coil heating rate
 
 	std::string const idf_objects = delimited_string( {
@@ -1320,6 +1319,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	EXPECT_FALSE( ErrorsFound );
 	EXPECT_EQ( 1, NumOfUnitHeats );
 	EXPECT_EQ( "ZONE2UNITHEAT", UnitHeat( 1 ).Name );
+	//GetUnitHeaterInputFlag = false;
 
 	ErrorsFound = false;
 	ZoneEqUnitHeater = true;
@@ -1368,31 +1368,29 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	Node( Fan( 1 ).InletNodeNum ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( Fan( 1 ).InletNodeNum ).Temp, Node( Fan( 1 ).InletNodeNum ).HumRat );
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); 
 
+	WCWaterInletNode = WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum;
+	WCWaterOutletNode = WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum;
+	Node( WCWaterInletNode ).Temp = 60.0;
+
 	DataGlobals::BeginEnvrnFlag =  true;
 	SysSizingCalc = true;
 
+	UHAirInletNode = UnitHeat( UnitHeatNum ).AirInNode;
+	UHAirOutletNode = UnitHeat( UnitHeatNum ).AirOutNode;
 
-	while ( DoNotTerminateIter ) {
+	SimUnitHeater( UnitHeat( UnitHeatNum ).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum );
+	// SimUnitHeater does not converge on the first call: the unit heater deliveres more the required heating load. But ite meets 
+	// on the second call (iteration).   
+	SimUnitHeater( UnitHeat( UnitHeatNum ).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum );
+	UHAirMassFlowRate = Node( UHAirInletNode ).MassFlowRate;
+	UHEnteringAirEnthalpy = PsyHFnTdbW( Node( UHAirInletNode ).Temp, Node( UHAirInletNode ).HumRat );
+	UHLeavingAirEnthalpy = PsyHFnTdbW( Node( UHAirOutletNode ).Temp, Node( UHAirOutletNode ).HumRat );	
+	UHHeatingRate = UHAirMassFlowRate * ( UHLeavingAirEnthalpy - UHEnteringAirEnthalpy );
 
-		SimUnitHeater( UnitHeat( UnitHeatNum ).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum );
-		
-		UHAirInletNode = UnitHeat( UnitHeatNum ).AirInNode;
-		UHAirOutletNode = UnitHeat( UnitHeatNum ).AirOutNode;
-		UHAirMassFlowRate = Node( UHAirInletNode ).MassFlowRate;
-		UHEnteringAirEnthaly = PsyHFnTdbW( Node( UHAirInletNode ).Temp, Node( UHAirInletNode ).HumRat );
-		UHLeavingAirEnthaly = PsyHFnTdbW( Node( UHAirOutletNode ).Temp, Node( UHAirOutletNode ).HumRat );
-	
-		UHHeatingRate = UHAirMassFlowRate * ( UHLeavingAirEnthaly - UHEnteringAirEnthaly );
-
-		if ( std::abs( ZoneSysEnergyDemand( 1 ).RemainingOutputRequired - UHHeatingRate ) < ConvTol ) {
-			DoNotTerminateIter = false;
-		}
-	}
 	EXPECT_NEAR( UHHeatingRate, UnitHeat( UnitHeatNum ).HeatPower, ConvTol );
 
 	HWMassFlowRate = WaterCoils::WaterCoil( CoilNum ).InletWaterMassFlowRate;
-	WCWaterInletNode = WaterCoils::WaterCoil( 1 ).WaterInletNodeNum;
-	WCWaterOutletNode = WaterCoils::WaterCoil( 1 ).WaterOutletNodeNum;
+
 	CpHW = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "UnitTest" );
 	HWCoilHeatingRate = HWMassFlowRate * CpHW * ( Node( WCWaterInletNode ).Temp - Node( WCWaterOutletNode ).Temp );
 	EXPECT_NEAR( HWCoilHeatingRate, WaterCoils::WaterCoil( CoilNum ).TotWaterHeatingCoilRate, ConvTol );

@@ -164,13 +164,22 @@ namespace UnitHeater {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
+
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool InitUnitHeaterOneTimeFlag( true );
+		bool GetUnitHeaterInputFlag( true );
+	}
+
 	bool HCoilOn; // TRUE if the heating coil (gas or electric especially) should be running
 	int NumOfUnitHeats; // Number of unit heaters in the input file
 	Real64 QZnReq; // heating or cooling needed by zone [watts]
 	Array1D_bool MySizeFlag;
 	Array1D_bool CheckEquipName;
-	bool MyOneTimeFlag( true );
-	bool GetInputFlag( true ); // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
 
@@ -190,8 +199,8 @@ namespace UnitHeater {
 		CheckEquipName.deallocate();
 		UnitHeat.deallocate();
 		UnitHeatNumericFields.deallocate();
-		MyOneTimeFlag = true;
-		GetInputFlag = true;
+		InitUnitHeaterOneTimeFlag = true;
+		GetUnitHeaterInputFlag = true;
 	}
 
 	void
@@ -242,9 +251,9 @@ namespace UnitHeater {
 		int UnitHeatNum; // index of unit heater being simulated
 
 		// FLOW:
-		if ( GetInputFlag ) {
+		if ( GetUnitHeaterInputFlag ) {
 			GetUnitHeaterInput();
-			GetInputFlag = false;
+			GetUnitHeaterInputFlag = false;
 		}
 
 		// Find the correct Unit Heater Equipment
@@ -721,7 +730,7 @@ namespace UnitHeater {
 		// FLOW:
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitUnitHeaterOneTimeFlag ) {
 
 			MyEnvrnFlag.allocate( NumOfUnitHeats );
 			MySizeFlag.allocate( NumOfUnitHeats );
@@ -731,7 +740,7 @@ namespace UnitHeater {
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
 			MyZoneEqFlag = true;
-			MyOneTimeFlag = false;
+			InitUnitHeaterOneTimeFlag = false;
 
 		}
 

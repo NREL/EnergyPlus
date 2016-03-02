@@ -91,8 +91,6 @@ namespace UnitHeater {
 	extern Real64 QZnReq; // heating or cooling needed by zone [watts]
 	extern Array1D_bool MySizeFlag;
 	extern Array1D_bool CheckEquipName;
-	extern bool MyOneTimeFlag;
-	extern bool GetInputFlag; // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
 
