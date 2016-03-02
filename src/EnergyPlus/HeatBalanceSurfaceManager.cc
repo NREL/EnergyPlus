@@ -1130,6 +1130,14 @@ namespace HeatBalanceSurfaceManager {
 				if ( isExterior ) {
 					++numExtSurfaces( Surface( iSurf ).Class );
 				}
+				if ( Surface( iSurf ).Class == SurfaceClass_Window ){
+					if ( SurfaceWindow( iSurf ).OriginalClass == SurfaceClass_GlassDoor || SurfaceWindow( iSurf ).OriginalClass == SurfaceClass_TDD_Diffuser ){
+						++numSurfaces( SurfaceWindow( iSurf ).OriginalClass );
+						if ( isExterior ) {
+							++numExtSurfaces( SurfaceWindow( iSurf ).OriginalClass );
+						}
+					}
+				}
 			}
 		}
 		// go through all the surfaces again and this time insert the net area results
