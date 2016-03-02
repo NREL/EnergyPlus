@@ -5820,10 +5820,10 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatRecActive = true;
 				errFlag = false;
 				if ( ! lAlphaBlanks( iHRWaterInletNodeAlphaNum ) && ! lAlphaBlanks( iHRWaterOutletNodeAlphaNum ) ) {
-					UnitarySystem( UnitarySysNum ).HeatRecoveryInletNodeNum = GetOnlySingleNode( Alphas( iHRWaterInletNodeAlphaNum ), errFlag, "Unitary System Heat receovery", Alphas( iNameAlphaNum ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsParent );
-					UnitarySystem( UnitarySysNum ).HeatRecoveryOutletNodeNum = GetOnlySingleNode( Alphas( iHRWaterOutletNodeAlphaNum ), errFlag, "Unitary System Heat receovery", Alphas( iNameAlphaNum ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsParent );
+					UnitarySystem( UnitarySysNum ).HeatRecoveryInletNodeNum = GetOnlySingleNode( Alphas( iHRWaterInletNodeAlphaNum ), errFlag, CurrentModuleObject, Alphas( iNameAlphaNum ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+					UnitarySystem( UnitarySysNum ).HeatRecoveryOutletNodeNum = GetOnlySingleNode( Alphas( iHRWaterOutletNodeAlphaNum ), errFlag, CurrentModuleObject, Alphas( iNameAlphaNum ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 
-					TestCompSet( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iHRWaterInletNodeAlphaNum ), Alphas( iHRWaterOutletNodeAlphaNum ), "Unitary System Heat receovery Nodes" );
+					TestCompSet( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iHRWaterInletNodeAlphaNum ), Alphas( iHRWaterOutletNodeAlphaNum ), "Unitary System Heat Recovery Nodes" );
 
 					if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) {
 						SetMSHPDXCoilHeatRecoveryFlag( UnitarySystem( UnitarySysNum ).CoolingCoilIndex );
