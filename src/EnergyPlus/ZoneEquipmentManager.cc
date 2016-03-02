@@ -3779,6 +3779,7 @@ namespace ZoneEquipmentManager {
 		Real64 BuildingZoneMixingFlow;
 		Real64 StdReturnNodeMassFlow;
 		Real64 UserReturnNodeMassFlow;
+		Real64 UnbalancedExhaustDelta;
 		int Iteration;
 		int ZoneNum1;
 
@@ -3964,7 +3965,9 @@ namespace ZoneEquipmentManager {
 			}
 			// Calculate an air loop return air flow rate
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-				if ( ( ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).RetFlowAdjustment ) > ( AirLoopFlow( AirLoopNum ).SupFlow + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) || ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).RetFlowAdjustment ) > ( AirLoopFlow( AirLoopNum ).MaxOutAir + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) ) && !AirLoopFlow( AirLoopNum ).FlowError && AirLoopsSimOnce ) {
+				UnbalancedExhaustDelta = (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).RetFlowAdjustment) - (AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced);
+				UnbalancedExhaustDelta = max(UnbalancedExhaustDelta, (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).RetFlowAdjustment) - (AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced) );
+				if ( (UnbalancedExhaustDelta > SmallMassFlow) && !AirLoopFlow( AirLoopNum ).FlowError && AirLoopsSimOnce ) {
 					if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
 						ShowWarningError( "In AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " there is unbalanced exhaust air flow." );
 						ShowContinueErrorTimeStamp( "" );

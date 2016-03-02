@@ -2055,6 +2055,7 @@ namespace LowTempRadiantSystem {
 		Real64 WaterVolFlowMaxDes;		// Design water volume flow rate for reproting
 		Real64 WaterVolFlowMaxUser;		// User hard-sized water volume flow rate for reproting
 
+		DesCoilLoad = 0.0;
 		DataScalableCapSizingON = false;
 		DataFracOfAutosizedHeatingCapacity = 1.0;
 
@@ -2087,6 +2088,10 @@ namespace LowTempRadiantSystem {
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
 						ElecRadSys( RadSysNum ).MaxElecPower = TempSize;
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + ElecRadSys( RadSysNum ).Name + "\"." );
+						ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\"." );
+						ErrorsFound = true;
 					}
 				} else {
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
@@ -2161,6 +2166,12 @@ namespace LowTempRadiantSystem {
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat == AutoSize ) {
+							ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys( RadSysNum ).Name + "\"." );
+							ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\"." );
+							ErrorsFound = true;
+						}
 					}
 				} else { // Autosize or hard-size with sizing run
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
@@ -2281,6 +2292,12 @@ namespace LowTempRadiantSystem {
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+						if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxCool == AutoSize ) {
+							ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys( RadSysNum ).Name + "\"." );
+							ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Cooling Design Capacity Method = \"FractionOfAutosizedCoolingCapacity\"." );
+							ErrorsFound = true;
+						}
 					}
 				} else { // Autosize or hard-size with sizing run
 					if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {

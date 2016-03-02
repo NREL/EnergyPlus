@@ -123,7 +123,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.4;
+  Version,8.5;
 
   Building,
     Building,                !- Name
@@ -3119,7 +3119,6 @@
     SPACE1-1 In Node,        !- Air Outlet Node Name
     SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     0.3,                     !- Maximum Air Flow Rate {m3/s}
-    SPACE1-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     SPACE1-1 Zone Coil,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
@@ -3133,7 +3132,6 @@
     SPACE2-1 In Node,        !- Air Outlet Node Name
     SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
-    SPACE2-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     SPACE2-1 Zone Coil,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
@@ -3146,7 +3144,6 @@
     SPACE3-1 In Node,        !- Air Outlet Node Name
     SPACE3-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
-    SPACE3-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     SPACE3-1 Zone Coil,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
@@ -3159,7 +3156,6 @@
     SPACE4-1 In Node,        !- Air Outlet Node Name
     SPACE4-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
-    SPACE4-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     SPACE4-1 Zone Coil,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
@@ -3172,7 +3168,6 @@
     SPACE5-1 In Node,        !- Air Outlet Node Name
     SPACE5-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
-    SPACE5-1 Zone Coil Water In Node,  !- Hot Water or Steam Inlet Node Name
     Coil:Heating:Water,      !- Reheat Coil Object Type
     SPACE5-1 Zone Coil,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
