@@ -1179,7 +1179,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 
 	bool ErrorsFound( false ); // function returns true on error
 	bool FirstHVACIteration( true ); // TRUE if 1st HVAC simulation of system timestep
-	bool DoNotTerminateIter( true ); // iteration flag
 
 	int UnitHeatNum( 1 ); // unit heat index
 	int ZoneNum( 1 ); // zone index
