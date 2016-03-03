@@ -1054,44 +1054,53 @@ namespace EnergyPlus {
 
 		// expect full flow and meet capacity
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
-		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).FanAirVolFlow, 0.0000000001 );
+		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow, 0.0000000001 );
 
 		// expect minimum flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 1000.0;
 		QZnReq = 1000.0;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
-		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).FanAirVolFlow * FanCoil( 1 ).LowSpeedRatio, 0.0000000001 );
+		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow * FanCoil( 1 ).LowSpeedRatio, 0.0000000001 );
 
 		// expect modulated flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 2500.0;
 		QZnReq = 2500.0;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
-		EXPECT_GT( Node( 1 ).MassFlowRate, FanCoil( 1 ).FanAirVolFlow * FanCoil( 1 ).LowSpeedRatio );
-		EXPECT_LT( Node( 1 ).MassFlowRate, FanCoil( 1 ).FanAirVolFlow );
+		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
+		EXPECT_GT( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow * FanCoil( 1 ).LowSpeedRatio );
+		EXPECT_LT( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow );
 
 		// expect full flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
-		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -4255.0;  // need to fix cooling mode to meet the load if excess of maximum (e.g., 4000 W)
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -4000.0;
+		QZnReq = -4000.0;
+		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
+		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
+		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow, 0.0000000001 );
+
+		// expect full flow and meet capacity
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -4255.0;
 		QZnReq = -4255.0;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
-		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).FanAirVolFlow, 0.0000000001 );
+		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow, 0.0000000001 );
 
 		// expect minimum flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -1000.0;
 		QZnReq = -1000.0;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
-		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).FanAirVolFlow * FanCoil( 1 ).LowSpeedRatio, 0.0000000001 );
+		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow * FanCoil( 1 ).LowSpeedRatio, 0.0000000001 );
 
 		// expect modulated flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -2500.0;
 		QZnReq = -2500.0;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
-		EXPECT_GT( Node( 1 ).MassFlowRate, FanCoil( 1 ).FanAirVolFlow * FanCoil( 1 ).LowSpeedRatio );
-		EXPECT_LT( Node( 1 ).MassFlowRate, FanCoil( 1 ).FanAirVolFlow );
+		EXPECT_GT( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow * FanCoil( 1 ).LowSpeedRatio );
+		EXPECT_LT( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow );
 
 		DataGlobals::DoingSizing = false;
 
