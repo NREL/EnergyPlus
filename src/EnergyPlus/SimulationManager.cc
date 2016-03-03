@@ -528,7 +528,10 @@ namespace SimulationManager {
 								SurfaceGeometry::CosBldgRelNorth = std::cos( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
 								SurfaceGeometry::SinBldgRelNorth = std::sin( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
 								for ( size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum ) {
-                                    for ( int n = 1; n <= DataSurfaces::Surface( SurfNum ).Sides; ++n ) {
+                                    					if ( DataSurfaces::Surface( SurfNum ).Sides == 0 ) {
+										continue;
+									}
+									for ( int n = 1; n <= DataSurfaces::Surface( SurfNum ).Sides; ++n ) {
                                         //int const ZoneNum = 1;
                                         //Real64 Xb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x * SurfaceGeometry::CosZoneRelNorth( ZoneNum ) - DataSurfaces::Surface( SurfNum ).Vertex( n ).y * SurfaceGeometry::SinZoneRelNorth( ZoneNum ) + DataHeatBalance::Zone( ZoneNum ).OriginX;
                                         //Real64 Yb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x * SurfaceGeometry::SinZoneRelNorth( ZoneNum ) + DataSurfaces::Surface( SurfNum ).Vertex( n ).y * SurfaceGeometry::CosZoneRelNorth( ZoneNum ) + DataHeatBalance::Zone( ZoneNum ).OriginY;
