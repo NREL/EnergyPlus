@@ -86,6 +86,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -1137,6 +1138,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		BeginSimFlag = true;
 		BeginEnvrnFlag = true;
 		ZoneSizingCalc = true;
+		createFacilityElectricPowerServiceObject();
 		SizingManager::ManageSizing();
 
 		ErrorsFound = false;
@@ -1179,7 +1181,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 
 	bool ErrorsFound( false ); // function returns true on error
 	bool FirstHVACIteration( true ); // TRUE if 1st HVAC simulation of system timestep
-	bool DoNotTerminateIter( true ); // iteration flag
 
 	int UnitHeatNum( 1 ); // unit heat index
 	int ZoneNum( 1 ); // zone index
@@ -1319,7 +1320,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	EXPECT_FALSE( ErrorsFound );
 	EXPECT_EQ( 1, NumOfUnitHeats );
 	EXPECT_EQ( "ZONE2UNITHEAT", UnitHeat( 1 ).Name );
-	//GetUnitHeaterInputFlag = false;
 
 	ErrorsFound = false;
 	ZoneEqUnitHeater = true;
@@ -1379,18 +1379,17 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	UHAirOutletNode = UnitHeat( UnitHeatNum ).AirOutNode;
 
 	SimUnitHeater( UnitHeat( UnitHeatNum ).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum );
-	// SimUnitHeater does not converge on the first call: the unit heater deliveres more the required heating load. But ite meets 
-	// on the second call (iteration).   
+	// SimUnitHeater does not converge on the first call: the unit heater deliveres more than required heating load. But it meets 
+	// on the second call (iteration). I suspect it may be an initialization issue related to ControlCompOutput routine
 	SimUnitHeater( UnitHeat( UnitHeatNum ).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum );
+	// verify the total heat rate deleivered by the unit heater
 	UHAirMassFlowRate = Node( UHAirInletNode ).MassFlowRate;
 	UHEnteringAirEnthalpy = PsyHFnTdbW( Node( UHAirInletNode ).Temp, Node( UHAirInletNode ).HumRat );
 	UHLeavingAirEnthalpy = PsyHFnTdbW( Node( UHAirOutletNode ).Temp, Node( UHAirOutletNode ).HumRat );	
 	UHHeatingRate = UHAirMassFlowRate * ( UHLeavingAirEnthalpy - UHEnteringAirEnthalpy );
-
 	EXPECT_NEAR( UHHeatingRate, UnitHeat( UnitHeatNum ).HeatPower, ConvTol );
-
+	// verify the heat rate delivered by the hot water heating coil 
 	HWMassFlowRate = WaterCoils::WaterCoil( CoilNum ).InletWaterMassFlowRate;
-
 	CpHW = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "UnitTest" );
 	HWCoilHeatingRate = HWMassFlowRate * CpHW * ( Node( WCWaterInletNode ).Temp - Node( WCWaterOutletNode ).Temp );
 	EXPECT_NEAR( HWCoilHeatingRate, WaterCoils::WaterCoil( CoilNum ).TotWaterHeatingCoilRate, ConvTol );
