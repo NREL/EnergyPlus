@@ -78,14 +78,16 @@ namespace EnergyPlus {
 
 enum class ThermalLossDestination : int {
 	heatLossNotDetermined = 0,
-	zoneGains,
-	lostToOutside
+	zoneGains, // device thermal losses are added to a zone as internal gains
+	lostToOutside // device thermal losses have no destination
 };
 
 void
 initializeElectricPowerServiceZoneGains();
 
 class DCtoACInverter
+	// This class is for modelling a power conversion device that takes DC power in and produces AC power out.
+	// This class combines three separate input objects that have different methods of determining efficiency.
 {
 
 public: // Methods
@@ -165,6 +167,8 @@ private: // data
 
 
 class ACtoDCConverter
+	// This class is for modelling a power conversion device that takes AC power in and produces DC power out.
+
 {
 
 public: // Methods
@@ -239,6 +243,8 @@ private: // data
 };
 
 class ElectricStorage
+	// This class is for modeling a device for storing electric power over time.
+	// This class combines two separate input objects that have different models.
 {
 
 public: //methods
@@ -434,6 +440,7 @@ private: //data
 }; //ElectricStorage
 
 class ElectricTransformer
+	// This class is for modeling a power conversion device that changes from one voltage to another, or serves as an isolation transformer
 {
 
 public: //methods
@@ -526,6 +533,7 @@ private: //data
 }; //ElectricTransformer
 
 class GeneratorController
+	// this class is used as part of the supervisory control and calling of electric power generators.  Each instances is for one generator
 {
 
 public: // Method
@@ -590,10 +598,10 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
 }; //class GeneratorController
 
 class ElectPowerLoadCenter
+	// This class if for modeling a load center which can be thought of as a kind of subpanel that connects power equipment to a main panel
+	// multiple subpanels can be connected to the main panel and each ElectPowerLoadCenter object is a subpanel
+	// Each load center will contain other power conversion devices and/or generator(s).
 {
-
-// a load center can be thought of as a kind of subpanel that connects power equipment to the main panel
-// multiple subpanels can be connected to the main panel and each ElectPowerLoadCenter object is a subpanel
 
 public: // Methods
 
@@ -737,7 +745,8 @@ private: // data
 
 }; //class ElectPowerLoadCenter
 
-class ElectricPowerServiceManager // 
+class ElectricPowerServiceManager //
+	//This class if the top level object for modeling complex electric power service.  It contains transformers and/or load center(s).
 {
 
 public: // Creation
@@ -876,7 +885,6 @@ createFacilityElectricPowerServiceObject();
 
 void
 clearFacilityElectricPowerServiceObject();
-
 
 } // EnergyPlus namespace
 #endif //ElectricPowerServiceManager_hh_INCLUDED
