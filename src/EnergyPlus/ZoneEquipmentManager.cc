@@ -187,15 +187,15 @@ namespace ZoneEquipmentManager {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-		namespace {
+	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
 	// to facilitate easier unit testing of those functions.
 	// These are purposefully not in the header file as an extern variable. No one outside of this should
 	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
 	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-
 		bool InitZoneEquipmentOneTimeFlag( true );
 		bool InitZoneEquipmentEnvrnFlag( true );
+		bool FirstPassZoneEquipFlag( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 	}
 
 	Array1D< Real64 > AvgData; // scratch array for storing averaged data
@@ -219,8 +219,9 @@ namespace ZoneEquipmentManager {
 		AvgData.deallocate(); // scratch array for storing averaged data
 		DefaultSimOrder.deallocate();
 		NumOfTimeStepInDay = 0; // number of zone time steps in a day
-		GetZoneEquipmentInputFlag = true ;
+		GetZoneEquipmentInputFlag = true;
 		PrioritySimOrder.deallocate();
+		FirstPassZoneEquipFlag = true;
 	}
 
 	void
@@ -3028,7 +3029,6 @@ namespace ZoneEquipmentManager {
 
 		static bool SupPathInletChanged( false );
 		static bool FirstCall; // indicates first call to supply air path components
-		static bool FirstPassZoneEquip( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 		static bool MyOneTimeFlag( true );
 		bool ErrorFlag;
 		static bool ValidSAMComp( false );
@@ -3123,7 +3123,7 @@ namespace ZoneEquipmentManager {
 				DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
 
 				// Reset ZoneEqSizing data (because these may change from one equipment type to the next)
-				if ( FirstPassZoneEquip ) {
+				if ( FirstPassZoneEquipFlag ) {
 					ZoneEqSizing( ControlledZoneNum ).AirVolFlow = 0.0;
 					ZoneEqSizing( ControlledZoneNum ).MaxHWVolFlow = 0.0;
 					ZoneEqSizing( ControlledZoneNum ).MaxCWVolFlow = 0.0;
@@ -3366,7 +3366,7 @@ namespace ZoneEquipmentManager {
 			}
 		} // End of controlled zone loop
 		CurZoneEqNum = 0;
-		FirstPassZoneEquip = false;
+		FirstPassZoneEquipFlag = false;
 
 		//This is the call to the Supply Air Path after the components are simulated to update
 		//  the path inlets
