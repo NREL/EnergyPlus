@@ -190,7 +190,11 @@ namespace FanCoilUnits {
 
 	// DERIVED TYPE DEFINITIONS
 
-	// MODULE VARIABLE DECLARATIONS:
+	// MODULE VARIABLE DECLARATIONS:	
+	namespace {
+		bool InitFanCoilUnitsOneTimeFlag( true );
+		bool InitFanCoilUnitsCheckInZoneEquipmentListFlag( false ); // True after the Zone Equipment List has been checked for items
+	}
 
 	int NumFanCoils( 0 );
 	int Num4PipeFanCoils( 0 );
@@ -225,6 +229,8 @@ namespace FanCoilUnits {
 		CoolingLoad = false;
 		FanCoil.deallocate();
 		FanCoilNumericFields.deallocate();
+		InitFanCoilUnitsOneTimeFlag = true;
+		InitFanCoilUnitsCheckInZoneEquipmentListFlag = false;
 	}
 
 	void
@@ -964,8 +970,6 @@ namespace FanCoilUnits {
 		int OutsideAirNode; // outside air node number in fan coil loop
 		int AirRelNode; // relief air node number in fan coil loop
 		Real64 RhoAir; // air density at InNode
-		static bool MyOneTimeFlag( true );
-		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MyPlantScanFlag;
@@ -976,7 +980,7 @@ namespace FanCoilUnits {
 		// FLOW:
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitFanCoilUnitsOneTimeFlag ) {
 
 			MyEnvrnFlag.allocate( NumFanCoils );
 			MySizeFlag.allocate( NumFanCoils );
@@ -986,7 +990,7 @@ namespace FanCoilUnits {
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
 			MyZoneEqFlag = true;
-			MyOneTimeFlag = false;
+			InitFanCoilUnitsOneTimeFlag = false;
 
 		}
 
@@ -1031,8 +1035,8 @@ namespace FanCoilUnits {
 			MyPlantScanFlag( FanCoilNum ) = false;
 		}
 
-		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
-			ZoneEquipmentListChecked = true;
+		if ( ! InitFanCoilUnitsCheckInZoneEquipmentListFlag && ZoneEquipInputsFilled ) {
+			InitFanCoilUnitsCheckInZoneEquipmentListFlag = true;
 			for ( Loop = 1; Loop <= NumFanCoils; ++Loop ) {
 				if ( CheckZoneEquipmentList( FanCoil( Loop ).UnitType, FanCoil( Loop ).Name ) ) continue;
 				ShowSevereError( "InitFanCoil: FanCoil Unit=[" + FanCoil( Loop ).UnitType + ',' + FanCoil( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
