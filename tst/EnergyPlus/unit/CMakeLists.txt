@@ -26,6 +26,7 @@ set( test_src
   DataSurfaces.unit.cc
   DataZoneEquipment.unit.cc
   DemandResponse.unit.cc
+  DesiccantDehumidifiers.unit.cc
   DOASEffectOnZoneSizing.unit.cc
   DXCoils.unit.cc
   ElectricPowerServiceManager.unit.cc
@@ -93,6 +94,7 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   ThermalComfort.unit.cc
+  UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
