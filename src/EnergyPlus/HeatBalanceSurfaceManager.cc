@@ -423,6 +423,7 @@ namespace HeatBalanceSurfaceManager {
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the zone, modify the zone  Dry/Wet BulbTemps
 		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
 
 		SetZoneWindSpeedAt();
 		//  DO ZoneNum = 1, NumOfZones
@@ -433,6 +434,7 @@ namespace HeatBalanceSurfaceManager {
 		// Bulk Initialization for Temperatures & WindSpeed
 		// using the surface centroids, modify the surface Dry/Wet BulbTemps
 		SetSurfaceOutBulbTempAt();
+		CheckSurfaceOutBulbTempAt();
 
 		SetSurfaceWindSpeedAt();
 		//  DO SurfNum = 1, TotSurfaces
@@ -848,6 +850,7 @@ namespace HeatBalanceSurfaceManager {
 		Array1D_int numExtSurfaces( 20 );
 		int frameDivNum;
 		bool isExterior;
+		Array1D< Real64 > computedNetArea; // holds the gross wall area minus the window and door areas
 
 		// the following variables are for the CalcNominalWindowCond call but only SHGCSummer is needed
 		Real64 nomCond;
@@ -880,6 +883,9 @@ namespace HeatBalanceSurfaceManager {
 		numSurfaces = 0;
 		numExtSurfaces = 0;
 
+		computedNetArea.allocate( TotSurfaces );
+		computedNetArea = 0.0; // start at zero, add wall area and subtract window and door area
+
 		for ( iSurf = 1; iSurf <= TotSurfaces; ++iSurf ) {
 			zonePt = Surface( iSurf ).Zone;
 			//only exterior surfaces including underground
@@ -894,6 +900,7 @@ namespace HeatBalanceSurfaceManager {
 					PreDefTableEntry( pdchOpUfactNoFilm, surfName, NominalU( Surface( iSurf ).Construction ), 3 );
 					mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier;
 					PreDefTableEntry( pdchOpGrArea, surfName, Surface( iSurf ).GrossArea * mult );
+					computedNetArea(iSurf) += Surface( iSurf ).GrossArea * mult;
 					curAzimuth = Surface( iSurf ).Azimuth;
 					PreDefTableEntry( pdchOpAzimuth, surfName, curAzimuth );
 					curTilt = Surface( iSurf ).Tilt;
@@ -934,6 +941,7 @@ namespace HeatBalanceSurfaceManager {
 					PreDefTableEntry( pdchFenDividerAreaOf1, surfName, dividerArea );
 					PreDefTableEntry( pdchFenGlassAreaOf1, surfName, windowArea - ( frameArea + dividerArea ) );
 					PreDefTableEntry( pdchFenArea, surfName, windowAreaWMult );
+					computedNetArea( Surface( iSurf ).BaseSurf ) -= windowAreaWMult;
 					nomUfact = NominalU( Surface( iSurf ).Construction );
 					PreDefTableEntry( pdchFenUfact, surfName, nomUfact, 3 );
 					//if the construction report is requested the SummerSHGC is already calculated
@@ -1071,6 +1079,7 @@ namespace HeatBalanceSurfaceManager {
 					mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier;
 					PreDefTableEntry( pdchDrGrArea, surfName, Surface( iSurf ).GrossArea * mult );
 					PreDefTableEntry( pdchDrParent, surfName, Surface( iSurf ).BaseSurfName );
+					computedNetArea( Surface( iSurf ).BaseSurf ) -= Surface( iSurf ).GrossArea * mult;
 
 				}}
 			} else {
@@ -1116,11 +1125,24 @@ namespace HeatBalanceSurfaceManager {
 					}
 				}
 			}
-			// do counts - use classification (note using numeric.  if class assignments change, this won't work)
 			if ( ( Surface( iSurf ).Class <= 20 ) && ( Surface( iSurf ).Class >= 1 ) ) {
 				++numSurfaces( Surface( iSurf ).Class );
 				if ( isExterior ) {
 					++numExtSurfaces( Surface( iSurf ).Class );
+				}
+			}
+		}
+		// go through all the surfaces again and this time insert the net area results
+		for ( iSurf = 1; iSurf <= TotSurfaces; ++iSurf ) {
+			zonePt = Surface( iSurf ).Zone;
+			//only exterior surfaces including underground
+			if ( ( Surface( iSurf ).ExtBoundCond == ExternalEnvironment ) || ( Surface( iSurf ).ExtBoundCond == Ground ) || ( Surface( iSurf ).ExtBoundCond == GroundFCfactorMethod ) ) {
+				isExterior = true;
+				{ auto const SELECT_CASE_var( Surface( iSurf ).Class );
+				if ( ( SELECT_CASE_var == SurfaceClass_Wall ) || ( SELECT_CASE_var == SurfaceClass_Floor ) || ( SELECT_CASE_var == SurfaceClass_Roof ) ) {
+					surfName = Surface( iSurf ).Name;
+					PreDefTableEntry( pdchOpNetArea, surfName, computedNetArea( iSurf ) );
+				}
 				}
 			}
 		}

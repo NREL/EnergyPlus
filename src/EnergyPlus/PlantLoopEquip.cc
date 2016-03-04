@@ -308,19 +308,19 @@ namespace PlantLoopEquip {
 		//Pipe has no special types at the moment, so find it this way
 		if ( GeneralEquipType == GenEquipTypes_Pipe ) {
 			if ( EquipTypeNum == TypeOf_Pipe ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipeSteam ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipeExterior ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipeInterior ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipeUnderground ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_PipingSystemPipeCircuit ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
@@ -773,7 +773,7 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_HeatExchanger ) {
 
 			if ( EquipTypeNum == TypeOf_FluidToFluidPlantHtExchg ) {
-				SimFluidHeatExchanger( LoopNum, LoopSideNum, sim_component.TypeOf, sim_component.Name, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad );
+				SimFluidHeatExchanger( LoopNum, LoopSideNum, sim_component.TypeOf, sim_component.Name, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -791,13 +791,13 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_GroundHeatExchanger ) {
 
 			if ( EquipTypeNum == TypeOf_GrndHtExchgVertical ) { // 'GROUND HEAT EXCHANGER:VERTICAL'
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSurface ) { // 'GROUND HEAT EXCHANGER:SURFACE'
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgPond ) { // 'GROUND HEAT EXCHANGER:POND'
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgHorizTrench ) {
 				SimPipingSystemCircuit( sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration );
@@ -807,7 +807,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSlinky ) { // 'GROUND HEAT EXCHANGER:SLINKY'
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 
 			}
@@ -961,7 +961,7 @@ namespace PlantLoopEquip {
 		} else if ( GeneralEquipType == GenEquipTypes_LoadProfile ) { // DSU2 draft out InitLoopEquip on a demand side component
 
 			if ( EquipTypeNum == TypeOf_PlantLoadProfile ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;
 

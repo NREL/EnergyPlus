@@ -144,6 +144,11 @@ namespace loc {
 
 	struct SurfaceGroundHeatExchangerData : PlantComponent
 	{
+
+		virtual
+		~SurfaceGroundHeatExchangerData()
+		{}
+
 		// Members
 		// Input data
 		std::string Name; // name of surface GHE
@@ -302,7 +307,7 @@ namespace loc {
 			SurfaceArea( 0.0 )
 		{}
 
-		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
 
 		static PlantComponent * factory( int const objectType, std::string const objectName );
 

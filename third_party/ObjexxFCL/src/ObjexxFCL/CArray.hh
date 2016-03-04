@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -491,8 +491,7 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			T const data_i( data_[ i ] );
-			length_sq += data_i * data_i;
+			length_sq += data_[ i ] * data_[ i ];
 		}
 		return std::sqrt( length_sq );
 	}
@@ -503,8 +502,7 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			T const data_i( data_[ i ] );
-			length_sq += data_i * data_i;
+			length_sq += data_[ i ] * data_[ i ];
 		}
 		return length_sq;
 	}
@@ -590,19 +588,75 @@ public: // Modifier
 
 public: // Subscript
 
-	// CArray( i ) const: 1-Based Indexing
+	// CArray[ i ] const: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value && std::is_const< T >::value >::type >
 	Tr
-	operator ()( size_type const i ) const
+	operator []( I const i ) const
+	{
+		assert( i < size_ );
+		return data_[ i ];
+	}
+
+	// CArray[ i ] const: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value && std::is_const< T >::value >::type, typename = void >
+	Tr
+	operator []( I const i ) const
+	{
+		assert( ( i >= 0 ) && ( static_cast< size_type >( i ) < size_ ) );
+		return data_[ i ];
+	}
+
+	// CArray[ i ]: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value >::type >
+	T &
+	operator []( I const i )
+	{
+		assert( i < size_ );
+		return data_[ i ];
+	}
+
+	// CArray[ i ]: 0-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value >::type, typename = void >
+	T &
+	operator []( I const i )
+	{
+		assert( ( i >= 0 ) && ( static_cast< size_type >( i ) < size_ ) );
+		return data_[ i ];
+	}
+
+	// CArray( i ) const: 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value && std::is_const< T >::value >::type >
+	Tr
+	operator ()( I const i ) const
+	{
+		assert( ( i > 0u ) && ( i <= size_ ) );
+		return data_[ i - 1 ];
+	}
+
+	// CArray( i ) const: 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value && std::is_const< T >::value >::type, typename = void >
+	Tr
+	operator ()( I const i ) const
+	{
+		assert( ( i > 0 ) && ( static_cast< size_type >( i ) <= size_ ) );
+		return data_[ i - 1 ];
+	}
+
+	// CArray( i ): 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_unsigned< I >::value >::type >
+	T &
+	operator ()( I const i )
 	{
 		assert( ( i > 0u ) && ( i <= size_ ) );
 		return data_[ i - 1 ];
 	}
 
 	// CArray( i ): 1-Based Indexing
+	template< typename I, class = typename std::enable_if< std::is_integral< I >::value && std::is_signed< I >::value >::type, typename = void >
 	T &
-	operator ()( size_type const i )
+	operator ()( I const i )
 	{
-		assert( ( i > 0u ) && ( i <= size_ ) );
+		assert( ( i > 0 ) && ( static_cast< size_type >( i ) <= size_ ) );
 		return data_[ i - 1 ];
 	}
 
@@ -697,8 +751,7 @@ magnitude( CArray< T > const & a )
 {
 	T mag_sq( T( 0 ) );
 	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		T const a_i( a[ i ] );
-		mag_sq += a_i * a_i;
+		mag_sq += a[ i ] * a[ i ];
 	}
 	return std::sqrt( mag_sq );
 }
@@ -711,8 +764,7 @@ magnitude_squared( CArray< T > const & a )
 {
 	T mag_sq( T( 0 ) );
 	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		T const a_i( a[ i ] );
-		mag_sq += a_i * a_i;
+		mag_sq += a[ i ] * a[ i ];
 	}
 	return mag_sq;
 }

@@ -219,7 +219,7 @@ namespace loc {
 		return nullptr;
 	}
 
-	void SurfaceGroundHeatExchangerData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 & EP_UNUSED( CurLoad ) ) {
+	void SurfaceGroundHeatExchangerData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
 		this->InitSurfaceGroundHeatExchanger();
 		this->CalcSurfaceGroundHeatExchanger( FirstHVACIteration );
 		this->UpdateSurfaceGroundHeatExchngr();
