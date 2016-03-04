@@ -10887,10 +10887,13 @@ Label50: ;
 					OutletAirHumRat = HSOutletAirHumRat;
 					OutletAirDryBulbTemp = HSOutletAirDryBulbTemp;
 				} else {
-					Hfg = PsyHfgAirFnWTdb( MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp );
-					// Average outlet HR
-					OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
-					OutletAirHumRat = ( HSOutletAirHumRat * SpeedRatio ) + ( LSOutletAirHumRat * ( 1.0 - SpeedRatio ) );
+					if ( FanOpMode == ContFanCycCoil ) {
+						Hfg = PsyHfgAirFnWTdb( MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp );
+						// Average outlet HR
+						OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
+					} else {
+						OutletAirHumRat = ( HSOutletAirHumRat * SpeedRatio ) + ( LSOutletAirHumRat * ( 1.0 - SpeedRatio ) );
+					}
 					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 					if ( OutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
 						OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
@@ -10942,7 +10945,7 @@ Label50: ;
 				DXCoil( DXCoilNum ).OutletAirTemp = OutletAirDryBulbTemp;
 				DXCoil( DXCoilNum ).CrankcaseHeaterPower = 0.0;
 
-			} else if ( CycRatio > 0.0 || ( CycRatio > 0.0 && SingleMode == 1 ) ) {
+			} else if ( CycRatio > 0.0 ) {
 
 				if ( FanOpMode == CycFanCycCoil ) AirMassFlow /= CycRatio;
 				if ( FanOpMode == ContFanCycCoil ) AirMassFlow = MSHPMassFlowRateHigh;
