@@ -91,6 +91,7 @@
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
+#include <PlantValves.hh>
 #include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
@@ -1195,6 +1196,7 @@ namespace PlantManager {
 						} else if ( SameString( this_comp_type, "TemperingValve" ) ) {
 							this_comp.TypeOf_Num = TypeOf_ValveTempering;
 							this_comp.GeneralEquipType = GenEquipTypes_Valve;
+							this_comp.compPtr = PlantValves::TemperValveData::factory( TypeOf_ValveTempering, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "HeatExchanger:FluidToFluid" ) ) {
 							this_comp.TypeOf_Num = TypeOf_FluidToFluidPlantHtExchg;
 							this_comp.GeneralEquipType = GenEquipTypes_HeatExchanger;
