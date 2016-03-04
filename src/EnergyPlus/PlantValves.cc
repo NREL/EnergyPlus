@@ -233,7 +233,6 @@ namespace PlantValves {
 		using DataPlant::GenEquipTypes_Pump;
 		using DataBranchAirLoopPlant::ControlType_Active;
 		using InputProcessor::SameString;
-		using DataHVACGlobals::NumPlantLoops;
 		using PlantUtilities::InitComponentNodes;
 
 		// Locals
@@ -256,8 +255,6 @@ namespace PlantValves {
 		bool SetPointNodeOkay; // input data check
 		bool Stream2NodeOkay; // input data check
 		bool IsBranchActive; // input data check
-
-		int numLoopSides; // set to SIZE(PlantLoop(i)%LoopSide)
 
 		bool errFlag;
 
