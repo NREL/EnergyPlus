@@ -1024,7 +1024,7 @@ namespace PlantLoopEquip {
 
 			if ( EquipTypeNum == TypeOf_WaterUseConnection ) {
 
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration , CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;

@@ -89,6 +89,11 @@ namespace WaterUse {
 	// Data
 	struct WaterConnections_T : public PlantComponent
 	{
+
+		virtual
+		~WaterConnections_T()
+		{}
+
 		// Static members
 		static Array1D< WaterConnections_T > sm_instances;
 		static int sm_numInstances;
@@ -186,7 +191,7 @@ namespace WaterUse {
 		// Instance methods
 	public:
 		void
-		simulate ( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override ;
+		simulate ( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override ;
 		
 		// Default Constructor
 		WaterConnections_T() :

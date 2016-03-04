@@ -471,7 +471,8 @@ namespace WaterUse {
 	void
 	WaterConnections_T::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ),
 					bool const FirstHVACIteration,
-					Real64 & EP_UNUSED( CurLoad ) )
+					Real64 & EP_UNUSED( CurLoad ),
+					bool const EP_UNUSED( RunFlag ) )
 	{
 
 		// SUBROUTINE INFORMATION:
