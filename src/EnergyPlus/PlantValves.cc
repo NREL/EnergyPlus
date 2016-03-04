@@ -147,7 +147,7 @@ namespace PlantValves {
 
 	}
 
-	void TemperValveData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 & EP_UNUSED( CurLoad ) ) {
+	void TemperValveData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Simulation manager for Plant valves

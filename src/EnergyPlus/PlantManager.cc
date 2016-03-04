@@ -87,15 +87,19 @@
 #include <OutputProcessor.hh>
 #include <PipeHeatTransfer.hh>
 #include <Pipes.hh>
+#include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
 #include <PlantValves.hh>
+#include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
+#include <WaterUse.hh>
 
 namespace EnergyPlus {
 
@@ -981,6 +985,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
 							this_comp.GeneralEquipType = GenEquipTypes_WaterUse;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+							this_comp.compPtr = WaterUse::WaterConnections_T::factory( CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Coil:Cooling:Water" ) ) {
 							this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
 							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
@@ -1017,6 +1022,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_PlantLoadProfile;
 							this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+							this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory( CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Vertical" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgVertical;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
@@ -1026,10 +1032,12 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData::factory( TypeOf_GrndHtExchgSurface, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Pond" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = PondGroundHeatExchanger::PondGroundHeatExchangerData::factory( TypeOf_GrndHtExchgPond, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Slinky" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;

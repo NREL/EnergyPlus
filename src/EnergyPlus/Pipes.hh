@@ -93,6 +93,10 @@ namespace Pipes {
 
 	struct LocalPipeData : public PlantComponent
 	{
+		virtual
+		~LocalPipeData()
+		{}
+
 		// Members
 		std::string Name;
 		int TypeOf; // type of pipe
@@ -124,7 +128,7 @@ namespace Pipes {
 			static PlantComponent * factory( int objectType, std::string objectName );
 
 		public:
-			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
 
 	};
 

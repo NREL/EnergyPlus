@@ -194,7 +194,7 @@ namespace GroundHeatExchangers {
 		this->initGLHESimVars();
 	}
 
-	void GLHEBase::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 & EP_UNUSED( CurLoad ) ) {
+	void GLHEBase::simulate( const PlantLocation & EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
 		this->initGLHESimVars();
 		this->calcGroundHeatExchanger();
 		this->updateGHX();
@@ -1222,7 +1222,11 @@ namespace GroundHeatExchangers {
 			for ( J = 1; J <= ( N - LastHourN( 1 ) ); ++J ) {
 				SumQnHr += QnSubHr( J ) * std::abs( prevTimeSteps( J ) - prevTimeSteps( J + 1 ) );
 			}
-			SumQnHr /= std::abs( prevTimeSteps( 1 ) - prevTimeSteps( J ) );
+			if ( prevTimeSteps( 1 ) != prevTimeSteps( J ) ){
+				SumQnHr /= std::abs( prevTimeSteps( 1 ) - prevTimeSteps( J ) );
+			} else {
+				SumQnHr /= 0.05; // estimated small timestep
+			}
 			QnHr = eoshift( QnHr, -1, SumQnHr );
 			LastHourN = eoshift( LastHourN, -1, N );
 		}

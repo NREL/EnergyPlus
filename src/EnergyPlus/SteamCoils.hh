@@ -163,6 +163,8 @@ namespace SteamCoils {
 		int CompNum; // index for plant component for steam coil
 		int Coil_PlantTypeNum; // plant level index for coil type
 		Real64 OperatingCapacity; // capacity of steam coil at operating conditions (W)
+		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
+		int DesiccantDehumNum; // index to desiccant dehumidifier object
 
 		// Default Constructor
 		SteamCoilEquipConditions() :
@@ -215,7 +217,9 @@ namespace SteamCoils {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			Coil_PlantTypeNum( 0 ),
-			OperatingCapacity( 0.0 )
+			OperatingCapacity( 0.0 ),
+			DesiccantRegenerationCoil( false ),
+			DesiccantDehumNum( 0 )
 		{}
 
 	};
@@ -386,6 +390,26 @@ namespace SteamCoils {
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
+	);
+
+	//// register that a coil is used as a regeneration air heating coil in
+	//// desiccant dehumidification system
+	//void
+	//SetSteamCoilAsDesicRegenCoil(
+	//	std::string const & CoilType, // must match coil types in this module
+	//	std::string const & CoilName, // must match coil names for the coil type
+	//	int & DesiccantDehumIndex, // index of desiccant dehumidifier
+	//	bool & ErrorsFound // set to true if problem
+	//);
+
+	// sets data to a coil that is used as a regeneration air heating coil in
+	// desiccant dehumidification system
+	void
+	SetSteamCoilData(
+		int const CoilNum, // index of hot steam heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex = _ // Index for the desiccant dehum system where this caoil is used 
 	);
 
 	// End of Utility subroutines for the SteamCoil Module

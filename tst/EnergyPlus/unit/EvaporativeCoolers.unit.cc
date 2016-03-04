@@ -279,7 +279,7 @@ namespace EnergyPlus {
 		DataSizing::NumSysSizInput = 1;
 		DataSizing::SysSizInput.allocate( 1 );
 		DataSizing::SysSizInput( 1 ).AirLoopNum = 1;
-		
+
 		// allocate
 		DataSizing::CurSysNum = 1;
 		FinalSysSizing.allocate( CurSysNum );
@@ -337,7 +337,7 @@ namespace EnergyPlus {
 		PrimaryAirDesignFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 		SecondaryAirDesignFlow = PrimaryAirDesignFlow * EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
 
-		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop 
+		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop
 		SizeEvapCooler( EvapCoolNum );
 		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
 		EXPECT_EQ( SecondaryAirDesignFlow, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
@@ -363,16 +363,16 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest ) {
-		
+
 		int const EvapCoolNum( 1 );
 		Real64 PrimaryAirDesignFlow( 0.0 );
 		Real64 RecirWaterPumpDesignPower( 0.0 );
-		
+
 		DataSizing::SysSizingRunDone = true;
 		DataSizing::NumSysSizInput = 1;
 		DataSizing::SysSizInput.allocate( 1 );
 		DataSizing::SysSizInput( 1 ).AirLoopNum = 1;
-		
+
 
 		DataSizing::CurSysNum = 1;
 		FinalSysSizing.allocate( CurSysNum );
@@ -730,7 +730,7 @@ namespace EnergyPlus {
 		// Set Primary Air Data
 		PrimaryAirSystem( CurSysNum ).NumBranches = 1;
 		PrimaryAirSystem( CurSysNum ).Branch( 1 ).TotalComponents = 1;
-		
+
 		std::string const idf_objects = delimited_string( {
 			"	Version,8.4;",
 			"	EvaporativeCooler:Indirect:ResearchSpecial,",
@@ -778,7 +778,7 @@ namespace EnergyPlus {
 		PrimaryAirDesignFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 		SecondaryAirDesignFlow = PrimaryAirDesignFlow * EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
 
-		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop 
+		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop
 		SizeEvapCooler( EvapCoolNum );
 		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
 		EXPECT_EQ( SecondaryAirDesignFlow, EvapCond( EvapCoolNum ).IndirectVolFlowRate );

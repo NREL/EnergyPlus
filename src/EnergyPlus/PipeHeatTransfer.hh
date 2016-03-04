@@ -122,6 +122,11 @@ namespace PipeHeatTransfer {
 
 	struct PipeHTData : public PlantComponent
 	{
+
+		virtual
+		~PipeHTData()
+		{}
+
 		// Members
 		// Input data
 		std::string Name;
@@ -313,7 +318,7 @@ namespace PipeHeatTransfer {
 		PlantComponent * factory( int objectType, std::string objectName );
 
 		void
-		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad );
+		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
 
 		void
 		PushInnerTimeStepArrays();

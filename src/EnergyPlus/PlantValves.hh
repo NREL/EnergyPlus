@@ -134,10 +134,14 @@ namespace PlantValves {
 
 		{}
 
+		virtual
+		~TemperValveData()
+		{}
+
 		public:
 			static PlantComponent * factory( int objectType, std::string objectName );
 
-			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
 
 		private:
 			void init();

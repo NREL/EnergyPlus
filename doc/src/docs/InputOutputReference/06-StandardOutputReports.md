@@ -510,6 +510,18 @@ The Standard 62.1 Summary (key: Standard62.1Summary) produces a report that is c
 
 The Energy Meters Summary (key: EnergyMeters) (which is a slight misnomer as some meters may not be strictly energy) provides the annual period (runperiod) results for each meter (reference the meter data dictionary file (.mdd) and/or the meter details file (.mtd). The results are broken out by fuel type (resource type) in this report.
 
+#### LEED Summary
+
+The LEED Summary report provides many of the simulation results required for certification of Energy and Atmosphere Credit 1 Optimized Energy Performance according to the LEED Green Building Rating System™. The report can be produced by specifying LEEDSummary in Output:Table:SummaryReports which is also part of the AllSummary option. Directly following is an example of this report.
+
+#### Object Count Summary
+
+The Object Count Summary provides the count on the number of specific objects in the file. The key used to obtain this report is ObjectCountSummary.
+
+#### Component Cost Economics Summary
+
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. The key used to obtain this report is ComponentCostEconomicsSummary.
+
 ### Predefined Monthly Summary Reports
 
 The predefined monthly report options are shown below. The key name of the predefined monthly report is all that is needed to have that report appear in the tabular output file. After each report name below are the output variables and aggregation types used. These cannot be modified when using the predefined reports but if changes are desired, a Output:Table:Monthly can be used instead. The StandardReports.idf file in the DataSets directory includes a Output:Table:Monthly that exactly corresponds to the predefined monthly reports shown below. They can be copied into an IDF file and extended if additional variables are desired. A listing of each available key for predefined monthly summary reports follows with a discrption of the variables included.
