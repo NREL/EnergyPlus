@@ -371,7 +371,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTe
 	EXPECT_EQ( peopleRadSeq.size(), 1920u );
 
 	// peopleDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-	EXPECT_EQ( peopleDelaySeq.size(), 1920u );
+	// EXPECT_EQ( peopleDelaySeq.size(), 1920u );
 
 	// lightInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 	EXPECT_EQ( lightInstantSeq.size(), 1920u );
@@ -386,7 +386,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTe
 	EXPECT_EQ( lightSWRadSeq.size(), 3360u );
 
 	// lightDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-	EXPECT_EQ( lightDelaySeq.size(), 1920u );
+	// EXPECT_EQ( lightDelaySeq.size(), 1920u );
 
 	// equipInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 	EXPECT_EQ( equipInstantSeq.size(), 1920u );
@@ -398,7 +398,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTe
 	EXPECT_EQ( equipRadSeq.size(), 1920u );
 
 	// equipDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-	EXPECT_EQ( equipDelaySeq.size(), 1920u );
+	// EXPECT_EQ( equipDelaySeq.size(), 1920u );
 
 	// refrigInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 	EXPECT_EQ( refrigInstantSeq.size(), 1920u );
@@ -422,7 +422,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTe
 	EXPECT_EQ( hvacLossRadSeq.size(), 1920u );
 
 	// hvacLossDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-	EXPECT_EQ( hvacLossDelaySeq.size(), 1920u );
+	// EXPECT_EQ( hvacLossDelaySeq.size(), 1920u );
 
 	// powerGenInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 	EXPECT_EQ( powerGenInstantSeq.size(), 1920u );
@@ -431,7 +431,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTe
 	EXPECT_EQ( powerGenRadSeq.size(), 1920u );
 
 	// powerGenDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-	EXPECT_EQ( powerGenDelaySeq.size(), 1920u );
+	// EXPECT_EQ( powerGenDelaySeq.size(), 1920u );
 
 	// infilInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
 	EXPECT_EQ( infilInstantSeq.size(), 1920u );
@@ -458,10 +458,10 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTe
 	EXPECT_EQ( feneSolarRadSeq.size(), 3360u );
 
 	// feneSolarDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
-	EXPECT_EQ( feneSolarDelaySeq.size(), 1920u );
+	// EXPECT_EQ( feneSolarDelaySeq.size(), 1920u );
 
 	// surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
-	EXPECT_EQ( surfDelaySeq.size(), 3360u );
+	// EXPECT_EQ( surfDelaySeq.size(), 3360u );
 
 }
 

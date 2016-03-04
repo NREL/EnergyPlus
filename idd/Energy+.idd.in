@@ -671,8 +671,8 @@ ZoneAirMassFlowConservation,
        \memo infiltration object mass flow rates.
        \memo If either mixing or infiltration is active, then the zone air mass flow
        \memo balance calculation will attempt to enforce conservation of mass for each zone.
-       \note If mixing is "No" and infiltration is "None", then the zone air mass flow
-       \note calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
+       \memo If mixing is "No" and infiltration is "None", then the zone air mass flow
+       \memo calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
        \unique-object
        \min-fields 3
   A1,  \field Adjust Zone Mixing For Zone Air Mass Flow Balance
@@ -20735,10 +20735,12 @@ SwimmingPool:Indoor,
   N6,  \field Pool Heating System Maximum Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
   N7,  \field Pool Miscellaneous Equipment Power
        \note Power input per pool water flow rate
        \units W/(m3/s)
+       \ip-units W/(gal/min)
        \type real
        \minimum 0.0
   A8,  \field Setpoint Temperature Schedule
@@ -22248,6 +22250,7 @@ ZoneCoolTower:Shower,
  N1, \field Maximum Water Flow Rate
      \required-field
      \units m3/s
+     \ip-units gal/min
      \type real
  N2, \field Effective Tower Height
      \note This field is from either the spray or the wet pad to the top of the outlet.
@@ -24318,6 +24321,7 @@ Exterior:WaterEquipment,
   N1 , \field Design Level
        \required-field
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   A4 ; \field End-Use Subcategory
@@ -32480,6 +32484,7 @@ ZoneHVAC:FourPipeFanCoil,
         \key VariableFanVariableFlow
         \key VariableFanConstantFlow
         \key MultiSpeedFan
+        \key ASHRAE90VariableFan
    N1 , \field Maximum Supply Air Flow Rate
         \required-field
         \autosizable
@@ -32523,8 +32528,9 @@ ZoneHVAC:FourPipeFanCoil,
         \key Fan:VariableVolume
         \note Fan type must be according to capacity control method (see I/O)
         \note For ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.
-        \note For CyclingFan, a Fan:OnOff is valid.
+        \note For CyclingFan a Fan:OnOff is valid.
         \note For VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.
+        \note For ASHRAE90.1 a Fan:OnOff or Fan:VariableVolume is valid.
         \note The fan's inlet node should be the same as the outdoor air mixer's mixed air node.
    A10, \field Supply Air Fan Name
         \required-field
@@ -32584,7 +32590,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
-   A17; \field Supply Air Fan Operating Mode Schedule Name
+   A17, \field Supply Air Fan Operating Mode Schedule Name
         \type object-list
         \object-list ScheduleNames
         \note Enter the name of a schedule that controls fan operation. Schedule Name values of 0 denote
@@ -32592,6 +32598,20 @@ ZoneHVAC:FourPipeFanCoil,
         \note than 0 denote constant fan operation (fan runs continually regardless of coil operation).
         \note The fan operating mode defaults to cycling fan operation if this field is left blank.
         \note This input field is currently used with MultiStageFan capacity control method
+   N11, \field Minimum Supply Air Temperature in Cooling Mode
+        \note For Capacity Control Method = ASHRAE90VariableFan, enter the minimum air temperature in cooling mode.
+        \note Leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1. In this case, a zone sizing simulation is required.
+        \type real
+        \minimum 0.0
+        \autosizable
+        \default autosize
+   N12; \field Maximum Supply Air Temperature in Heating Mode
+        \note For Capacity Control Method = ASHRAE90VariableFan, enter the maximum air temperature in heating mode.
+        \note Leave this field blank or enter 0 to control to the zone load per ASHRAE 90.1. In this case, a zone sizing simulation is required.
+        \type real
+        \minimum 0.0
+        \autosizable
+        \default autosize
 
 ZoneHVAC:WindowAirConditioner,
         \memo Window air conditioner. Forced-convection cooling-only unit with supply fan, direct
@@ -34209,6 +34229,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \autosizable
        \type real
        \units m3/s
+       \ip-units gal/min
   N7,  \field Convergence Tolerance
        \type real
        \minimum> 0.0
@@ -36782,6 +36803,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \default MeanAirTemperature
    N3 , \field Rated Flow Rate
         \units m3/s
+        \ip-units gal/min
         \autosizable
    A6 , \field Pump Flow Rate Schedule Name
         \note Modifies the Rated Flow Rate of the pump on a time basis
@@ -39312,12 +39334,14 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
   N2 , \field Design Chilled Water Volume Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \autosizable
        \default autosize
   N3 , \field Design Hot Water Volume Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \autosizable
        \default autosize
@@ -39350,6 +39374,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \note The volume flow rate of chilled water per meter of beam length at the rating point.
        \type real
        \units m3/s-m
+       \ip-units gal/min-ft
        \minimum> 0.0
        \default 0.00005
   A11, \field Beam Cooling Capacity Temperature Difference Modification Factor Curve Name
@@ -39392,6 +39417,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
        \note The volume flow rate of hoy water per meter of beam length at the rating point.
        \type real
        \units m3/s-m
+       \ip-units gal/min-ft
        \minimum> 0.0
        \default 0.00005
   A14, \field Beam Heating Capacity Temperature Difference Modification Factor Curve Name
@@ -39457,6 +39483,7 @@ AirTerminal:SingleDuct:ConstantVolume:CooledBeam,
   N2,  \field Maximum Total Chilled Water Volumetric Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \autosizable
        \default autosize
@@ -45615,6 +45642,7 @@ Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N2,  \field Nominal Cooling Coil Capacity
         \required-field
         \type real
@@ -45783,6 +45811,7 @@ Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N2,  \field Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
         \required-field
@@ -45930,6 +45959,7 @@ Coil:Cooling:WaterToAirHeatPump:EquationFit,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
         \autosizable
    N3,  \field Gross Rated Total Cooling Capacity
         \note Total cooling capacity not accounting for the effect of supply air fan heat
@@ -46069,6 +46099,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N5,  \field Rated Water Flow Rate At Selected Nominal Speed Level
         \units m3/s
+        \ip-units gal/min
         \type real
         \autosizable
         \default autosize
@@ -46124,6 +46155,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N13, \field Speed 1 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
         \required-field
@@ -46208,6 +46240,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N19, \field Speed 2 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A14, \field Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -46283,6 +46316,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N25, \field Speed 3 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A21, \field Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -46365,6 +46399,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N31, \field Speed 4 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A28, \field Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -46447,6 +46482,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N37, \field Speed 5 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A35, \field Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -46529,6 +46565,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N43, \field Speed 6 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A42, \field Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -46611,6 +46648,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N49, \field Speed 7 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A49, \field Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -46693,6 +46731,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N55, \field Speed 8 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A56, \field Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -46775,6 +46814,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N61, \field Speed 9 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A63, \field Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -46857,6 +46897,7 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N67, \field Speed 10 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A70, \field Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -46951,6 +46992,7 @@ Coil:Heating:WaterToAirHeatPump:EquationFit,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
         \autosizable
    N3,  \field Gross Rated Heating Capacity
         \note Heating capacity not accounting for the effect of supply air fan heat
@@ -47042,6 +47084,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N5,  \field Rated Water Flow Rate At Selected Nominal Speed Level
         \units m3/s
+        \ip-units gal/min
         \type real
         \autosizable
         \default autosize
@@ -47072,6 +47115,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \required-field
    N9,  \field Speed 1 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
         \required-field
@@ -47151,6 +47195,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N14, \field Speed 2 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A14, \field Speed 2 Heating Capacity Function of Temperature Curve Name
@@ -47222,6 +47267,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N19, \field Speed 3 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A21, \field Speed 3 Heating Capacity Function of Temperature Curve Name
@@ -47299,6 +47345,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N24, \field Speed 4 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A28, \field Speed 4 Heating Capacity Function of Temperature Curve Name
@@ -47376,6 +47423,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N29, \field Speed 5 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A35, \field Speed 5 Heating Capacity Function of Temperature Curve Name
@@ -47453,6 +47501,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N34, \field Speed 6 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A42, \field Speed 6 Heating Capacity Function of Temperature Curve Name
@@ -47530,6 +47579,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N39, \field Speed 7 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A49, \field Speed 7 Heating Capacity Function of Temperature Curve Name
@@ -47607,6 +47657,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N44, \field Speed 8 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A56, \field Speed 8 Heating Capacity Function of Temperature Curve Name
@@ -47684,6 +47735,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N49, \field Speed 9 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A63, \field Speed 9 Heating Capacity Function of Temperature Curve Name
@@ -47761,6 +47813,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \minimum 0
    N54, \field Speed 10 Reference Unit Rated Water Flow Rate
         \units m3/s
+        \ip-units gal/min
         \type real
         \minimum 0
    A70, \field Speed 10 Heating Capacity Function of Temperature Curve Name
@@ -47892,6 +47945,7 @@ Coil:WaterHeating:AirToWaterHeatPump:Pumped,
   N8 , \field Rated Condenser Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \autocalculatable
        \note Condenser water flow rate corresponding to rated coil performance
@@ -48276,6 +48330,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
   N8 , \field Rated Condenser Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \autocalculatable
        \note Condenser water flow rate corresponding to rated coil performance
@@ -48403,6 +48458,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \required-field
   N16, \field Speed 1 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
        \required-field
@@ -48490,6 +48546,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N22, \field Speed 2 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N23, \field Speed 2 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48569,6 +48626,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N28, \field Speed 3 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N29, \field Speed 3 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48648,6 +48706,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N34, \field Speed 4 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N35, \field Speed 4 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48727,6 +48786,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N40, \field Speed 5 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N41, \field Speed 5 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48806,6 +48866,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N46, \field Speed 6 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N47, \field Speed 6 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48885,6 +48946,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N52, \field Speed 7 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N53, \field Speed 7 Reference Unit Water Pump Input Power At Rated Conditions
@@ -48964,6 +49026,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N58, \field Speed 8 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N59, \field Speed 8 Reference Unit Water Pump Input Power At Rated Conditions
@@ -49043,6 +49106,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N64, \field Speed 9 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N65, \field Speed 9 Reference Unit Water Pump Input Power At Rated Conditions
@@ -49122,6 +49186,7 @@ Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,
        \minimum 0
   N70, \field Speed 10 Reference Unit Rated Water Flow Rate
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0
   N71, \field Speed 10 Reference Unit Water Pump Input Power At Rated Conditions
@@ -49281,11 +49346,13 @@ Coil:WaterHeating:Desuperheater,
        \required-field
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \note The operating water flow rate.
   N7 , \field Water Pump Power
        \type real
        \units W
+       \ip-units W
        \minimum 0.0
        \default 0.0
        \note The water circulation pump electric power.
@@ -49533,6 +49600,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \note This field is required when Storage Type is UserDefinedFluidType
   N1 , \field Fluid Storage Volume
        \units m3
+       \ip-units gal
        \type real
        \minimum> 0
        \note required field if Storage Type is Water or UserDefinedFluidType
@@ -50266,6 +50334,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
   N40, \field Storage Tank Plant Connection Design Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
   N41, \field Storage Tank Plant Connection Heat Transfer Effectiveness
        \type real
@@ -50501,16 +50570,17 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note This is the nominal design pump power of water recirculation and spray for evaporation at design air flow
        \note rates and cooler design effectiveness
        \autosizable
-       \default autosize 
+       \default autosize
   N4 , \field Water Pump Power Sizing Factor
        \type real
        \units W/(m3/s)
+       \ip-units W/(gal/min)
        \default 90.0
        \note This field is used when the previous field is set to autosize. The pump power is scaled with Secondary Air
        \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power
        \note sizing factor was estimated from pump power and secondary air design flow rates inputs from energyplus example
        \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Secondary Air Design Flow Rate). The factor ranges from
-       \note 55.0 to 150.0 [W/(m3/s)] were noted. The pump power can be sized to zero by setting this factor to zero. 
+       \note 55.0 to 150.0 [W/(m3/s)] were noted. The pump power can be sized to zero by setting this factor to zero.
   A5 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
        \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Air
@@ -50527,7 +50597,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
-       \default autosize   
+       \default autosize
   N6 , \field Secondary Air Flow Scaling Factor
        \type real
        \units dimensionless
@@ -50539,7 +50609,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units W
        \note This is the fan design power at Secondary Design Air Flow Rate. This is the nominal design power at full speed.
        \autosizable
-       \default autosize   
+       \default autosize
   N8 , \field Secondary Air Fan Sizing Specific Power
        \type real
        \units W/(m3/s)
@@ -50569,7 +50639,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \units m3/s
        \minimum> 0.0
        \autosizable
-       \default autosize 
+       \default autosize
   N10, \field Dewpoint Effectiveness Factor
        \type real
        \minimum 0.0
@@ -50685,12 +50755,13 @@ EvaporativeCooler:Direct:ResearchSpecial,
   N4 , \field Water Pump Power Sizing Factor
        \type real
        \units W/(m3/s)
+       \ip-units W/(gal/min)
        \default 90.0
        \note This field is used when the previous field is set to autosize. The pump power is scaled with Secondary Air
        \note Design Air Flow Rate. This value was backed out from inputs in energy plus example files. Average Pump Power
        \note sizing factor was estimated from pump power and primary air design flow rates inputs from energyplus example
        \note files is about 90.0 [W/(m3/s)] (=90.0 ~ Pump Power / Primary Air Design Flow Rate). The factor ranges from
-       \note 55.0 to 150.0 [W/(m3/s)]. The pump power can be sized to zero by setting this factor to zero. 
+       \note 55.0 to 150.0 [W/(m3/s)]. The pump power can be sized to zero by setting this factor to zero.
   A4 , \field Water Pump Power Modifier Curve Name
        \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
        \note x = ff = flow fraction on the primary air. The flow fraction is the secondary air flow rate during current operation divided
@@ -51118,13 +51189,22 @@ Dehumidifier:Desiccant:System,
        \key Coil:Heating:Gas
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
-       \note works with gas, electric, hot water and steam heating coils
+       \note works with gas, electric, hot water and steam heating coils.
+       \note For autosizing the regeneration air heating coil the 
+       \note Design Coil Inlet Air Condition used is the outdoor air condition
+       \note if the desiccant system is on the primary air loop, or else if the  
+       \note desiccant system is on outdoor air system then it is the return air
+       \note condition. The Design Coil Outlet Air Temperature is the Regeneration
+       \note Inlet Air Setpoint Temperature specified in the input field below.   
   A10, \field Regeneration Air Heater Name
        \type object-list
        \object-list HeatingCoilName
   N1,  \field Regeneration Inlet Air Setpoint Temperature
        \type real
        \units C
+       \default 46.0
+       \note This value is also used as regeneration air heater design coil air
+       \note outlet temperature for autosizing calculation of the heater.
   A11, \field Companion Cooling Coil Object Type
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
@@ -52086,6 +52166,7 @@ AirLoopHVAC:UnitarySystem,
   N25, \field Design Heat Recovery Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
@@ -52134,6 +52215,15 @@ UnitarySystemPerformance:Multispeed,
        \maximum 10
        \note Used only for Multi speed coils
        \note Enter the number of the following sets of data for air flow rates.
+  A2 , \field Single Mode Operation
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note Controls coil operation during each HVAC timestep. 
+       \note This choice does not apply to speed 1 operation.
+       \note Yes = operate at the highest speed possible without exceeding the current load.
+       \note No = allow operation at the average of two adjacent speeds to match the current load.
   N3 , \field Heating Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
@@ -53259,6 +53349,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
         \note Used for heat recovery to an EnergyPlus plant loop.
         \units m3/s
+        \ip-units gal/min
         \minimum 0.0
         \default 0.0
    N7,  \field Maximum Temperature for Heat Recovery
@@ -53781,6 +53872,7 @@ AirConditioner:VariableRefrigerantFlow,
   N23, \field Water Condenser Volume Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \autosizable
        \note Only used when Condenser Type = WaterCooled.
   N24, \field Evaporative Condenser Effectiveness
@@ -54459,11 +54551,13 @@ Controller:WaterCoil,
   N2 , \field Maximum Actuated Flow
        \type real
        \units m3/s
+       \ip-units gal/min
        \autosizable
   N3 ; \field Minimum Actuated Flow
        \type real
        \default 0.0000001
        \units m3/s
+       \ip-units gal/min
 
 Controller:OutdoorAir,
        \memo Controller to set the outdoor air flow rate for an air loop. Control options include
@@ -58856,6 +58950,7 @@ PipingSystem:Underground:PipeCircuit,
         \required-field
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0
    A2,  \field Circuit Inlet Node
         \required-field
@@ -59088,7 +59183,7 @@ Pump:VariableSpeed,
         \type choice
         \key PowerPerFlow
         \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-        \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+        \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
         \key PowerPerFlowPerPressure
         \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
         \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
@@ -59197,7 +59292,7 @@ Pump:ConstantSpeed,
        \type choice
        \key PowerPerFlow
        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
        \key PowerPerFlowPerPressure
        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
@@ -59285,7 +59380,7 @@ Pump:VariableSpeed:Condensate,
        \type choice
        \key PowerPerFlow
        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
        \key PowerPerFlowPerPressure
        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
@@ -59378,7 +59473,7 @@ HeaderedPumps:ConstantSpeed,
        \type choice
        \key PowerPerFlow
        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
        \key PowerPerFlowPerPressure
        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
@@ -59397,7 +59492,7 @@ HeaderedPumps:ConstantSpeed,
        \units W/((m3/s)-Pa)
        \ip-units W/((gal/min)-ftH20)
        \minimum> 0
-       
+
 HeaderedPumps:VariableSpeed,
        \memo This Headered pump object describes a pump bank with more than 1 pump in parallel
        \min-fields 14
@@ -59484,7 +59579,7 @@ HeaderedPumps:VariableSpeed,
        \type choice
        \key PowerPerFlow
        \note PowerPerFlow indicates that Design Electric Power per Unit Flow Rate is used as scaling factor.
-       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor 
+       \note Design Power Consumption = Design Maximum Flow Rate * scaling factor
        \key PowerPerFlowPerPressure
        \note PowerPerFlowPerPressure indicates that Design Shaft Power per Unit Flow Rate per Unit Head is used as scaling factor.
        \note Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency
@@ -59558,6 +59653,7 @@ LoadProfile:Plant,
        \required-field
        \type real
        \units m3/s
+       \ip-units gal/min
   A5 ; \field Flow Rate Fraction Schedule Name
        \required-field
        \type object-list
@@ -59590,6 +59686,7 @@ SolarCollectorPerformance:FlatPlate,
        \type real
        \minimum> 0
        \units m3/s
+       \ip-units gal/min
   A3 , \field Test Correlation Type
        \required-field
        \type choice
@@ -59644,6 +59741,7 @@ SolarCollector:FlatPlate:Water,
        \type real
        \minimum> 0
        \units m3/s
+       \ip-units gal/min
 
 SolarCollector:FlatPlate:PhotovoltaicThermal,
        \memo Models hybrid photovoltaic-thermal (PVT) solar collectors that convert incident solar
@@ -59742,6 +59840,7 @@ SolarCollector:IntegralCollectorStorage,
        \type real
        \minimum> 0
        \units m3/s
+       \ip-units gal/min
 
 SolarCollectorPerformance:IntegralCollectorStorage,
        \memo Thermal and optical performance parameters for a single glazed solar collector with
@@ -59763,6 +59862,7 @@ SolarCollectorPerformance:IntegralCollectorStorage,
        \type real
        \minimum> 0
        \units m3
+       \ip-units gal
   N3,  \field Bottom Heat Loss Conductance
        \required-field
        \type real
@@ -60953,6 +61053,7 @@ Chiller:Absorption:Indirect,
   N11, \field Design Generator Fluid Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \autosizable
        \note  For variable flow this is the max flow and for constant flow this is the flow.
   N12, \field Temperature Lower Limit Generator Inlet
@@ -61076,6 +61177,7 @@ Chiller:Absorption,
        \type real
        \autosizable
        \units m3/s
+       \ip-units gal/min
        \minimum> 0.0
   N17, \field Degree of Subcooling in Steam Generator
        \type real
@@ -61973,11 +62075,13 @@ HeatPump:WaterToWater:EquationFit:Heating,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N2,  \field Rated Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N3,  \field Rated Heating Capacity
         \required-field
         \type real
@@ -62041,11 +62145,13 @@ HeatPump:WaterToWater:EquationFit:Cooling,
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N2,  \field Rated Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
+        \ip-units gal/min
    N3,  \field Rated Cooling Capacity
         \required-field
         \type real
@@ -63404,6 +63510,7 @@ CoolingTower:VariableSpeed:Merkel,
   N6 , \field Design Water Flow Rate per Unit of Nominal Capacity
        \note This field is only used if the previous is set to autocalculate and performance input method is NominalCapacity
        \units m3/s-W
+       \ip-units gal/min-W
        \default 5.382E-8
        \type real
   N7 , \field Design Air Flow Rate
@@ -65343,6 +65450,7 @@ GroundHeatExchanger:HorizontalTrench,
         \required-field
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0
    N2 , \field Trench Length in Pipe Axial Direction
         \note This is the total pipe axial length of the heat exchanger
@@ -65470,6 +65578,7 @@ GroundHeatExchanger:Slinky,
    N1 , \field Design Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0
         \default 0.002
    N2 , \field Soil Thermal Conductivity
@@ -65749,6 +65858,7 @@ WaterHeater:Mixed,
        \note Not yet implemented
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum 0.0
        \default 0.0
   N7 , \field Heater Ignition Delay
@@ -66320,6 +66430,7 @@ WaterHeater:Sizing,
   N3 , \field Nominal Tank Volume for Autosizing Plant Connections
        \type real
        \units m3
+       \ip-units gal
        \note Only used if Design Mode = PeakDraw and the water heater also
        \note has autosized flow rates for connections on the demand side of a plant loop
   N4 , \field Number of Bedrooms
@@ -66333,21 +66444,25 @@ WaterHeater:Sizing,
   N6 , \field Storage Capacity per Person
        \type real
        \units m3/Person
+       \ip-units gal/Person
        \note Only used for Design Mode = PerPerson
        \minimum 0.0
   N7 , \field Recovery Capacity per Person
        \type real
        \units m3/hr-person
+       \ip-units gal/hr-person
        \note Only used for Design Mode = PerPerson
        \minimum 0.0
   N8 , \field Storage Capacity per Floor Area
        \type real
        \units m3/m2
+       \ip-units gal/ft2
        \note Only used for Design Mode = PerFloorArea
        \minimum 0.0
   N9 , \field Recovery Capacity per Floor Area
        \type real
        \units m3/hr-m2
+       \ip-units gal/hr-ft2
        \note Only used for Design Mode = PerFloorArea
        \minimum 0.0
   N10 , \field Number of Units
@@ -66355,16 +66470,19 @@ WaterHeater:Sizing,
        \note Only used for Design Mode = PerUnit
   N11 , \field Storage Capacity per Unit
        \units m3
+       \ip-units gal
        \type real
        \note Only used for Design Mode = PerUnit
        \minimum 0.0
   N12 , \field Recovery Capacity PerUnit
        \units m3/hr
+       \ip-units gal/hr
        \type real
        \note Only used for Design Mode = PerUnit
        \minimum 0.0
   N13 ,\field Storage Capacity per Collector Area
        \units m3/m2
+       \ip-units gal/ft2
        \type real
        \note Only used for Design Mode = PerSolarCollectorArea
        \minimum 0.0
@@ -66423,6 +66541,7 @@ WaterHeater:HeatPump:PumpedCondenser,
   N2 , \field Condenser Water Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \minimum> 0
        \autocalculatable
        \note Actual water flow rate through the heat pump's water coil (condenser).
@@ -71515,10 +71634,22 @@ SetpointManager:MixedAir,
   A5 , \field Fan Outlet Node Name
        \required-field
        \type node
-  A6 ; \field Setpoint Node or NodeList Name
+  A6 , \field Setpoint Node or NodeList Name
        \required-field
        \type node
        \note Node(s) at which the temperature will be set
+  A7 , \field Cooling Coil Inlet Node Name
+       \type node
+       \note Optional field used to limit economizer operation to prevent freezing of DX cooling coil.
+  A8 , \field Cooling coil Outlet Node Name
+       \type node
+       \note Optional field used to limit economizer operation to prevent freezing of DX cooling coil.
+  N1 ; \field Minimum Temperature at Cooling Coil Outlet Node
+       \type real
+       \units C
+       \minimum> 0.0
+       \default 7.2
+       \note Optional field used to limit economizer operation to prevent freezing of DX cooling coil.
 
 SetpointManager:OutdoorAirPretreat,
        \min-fields 11
@@ -72493,11 +72624,13 @@ Refrigeration:CompressorRack,
   N3,   \field Water-Cooled Condenser Design Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0.0
         \note Applicable only when loop flow type is ConstantFlow.
   N4,   \field Water-Cooled Condenser Maximum Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0.0
   N5,   \field Water-Cooled Condenser Maximum Water Outlet Temperature
         \type real
@@ -73020,12 +73153,14 @@ Refrigeration:Condenser:WaterCooled,
   N5 ,  \field Water Design Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \note note required units must be converted from L/s as specified in ARI 450-2007
         \minimum> 0.0
         \note Applicable only when loop flow type is Constant Flow.
   N6 ,  \field Water Maximum Flow Rate
         \type real
         \units m3/s
+        \ip-units gal/min
         \minimum> 0.0
   N7 ,  \field Water Maximum Water Outlet Temperature
         \type real
@@ -73781,7 +73916,8 @@ Refrigeration:SecondarySystem,
   N2 ,  \field Evaporator Flow Rate for Secondary Fluid
         \type real
         \minimum 0.0
-        \units M3/s
+        \units m3/s
+        \ip-units gal/min
         \note For "FluidAlwaysLiquid", at least one of the two, Evaporator Capacity OR
         \note    Evaporator Flow Rate for Secondary Fluid, is required.
         \note For "FluidPhaseChange" loops, this input is not used. (see PhaseChange Circulating
@@ -73816,7 +73952,8 @@ Refrigeration:SecondarySystem,
   N7 ,  \field Total Pump Flow Rate
         \type real
         \minimum 0.0
-        \units M3/s
+        \units m3/s
+        \ip-units gal/min
         \note For "FluidAlwaysLiquid",if not input, Evaporator Flow Rate for Secondary Fluid
         \note       will be used.
         \note For "FluidPhaseChange", if not input, this will be calculated using the
@@ -75578,6 +75715,7 @@ Generator:MicroTurbine,
  N14, \field Reference Heat Recovery Water Flow Rate
       \type real
       \units m3/s
+      \ip-units gal/min
       \minimum> 0.0
  A10, \field Heat Recovery Water Flow Rate Function of Temperature and Power Curve Name
       \type object-list
@@ -75623,11 +75761,13 @@ Generator:MicroTurbine,
  N15, \field Minimum Heat Recovery Water Flow Rate
       \type real
       \units m3/s
+      \ip-units gal/min
       \minimum 0.0
       \default 0.0
  N16, \field Maximum Heat Recovery Water Flow Rate
       \type real
       \units m3/s
+      \ip-units gal/min
       \minimum 0.0
       \default 0.0
  N17, \field Maximum Heat Recovery Water Temperature
@@ -76317,6 +76457,7 @@ Generator:FuelCell:ExhaustGasToWaterHeatExchanger,
       \type node
   N1, \field Heat Recovery Water Maximum Flow Rate
       \units m3/s
+      \ip-units gal/min
   A4, \field Exhaust Outlet Air Node Name
       \type node
   A5, \field Heat Exchanger Calculation Method
@@ -76977,6 +77118,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N2 , \field Generator 1 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A5 , \field Generator 2 Name
        \type object-list
        \object-list GeneratorNames
@@ -76998,6 +77141,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N4,  \field Generator 2 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A8,  \field Generator 3 Name
        \type object-list
        \object-list GeneratorNames
@@ -77019,6 +77164,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N6,  \field Generator 3 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A11, \field Generator 4 Name
        \type object-list
        \object-list GeneratorNames
@@ -77040,6 +77187,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N8,  \field Generator 4 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A14, \field Generator 5 Name
        \type object-list
        \object-list GeneratorNames
@@ -77061,6 +77210,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N10, \field Generator 5 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A17, \field Generator 6 Name
        \type object-list
        \object-list GeneratorNames
@@ -77082,6 +77233,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N12,  \field Generator 6 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A20, \field Generator 7 Name
        \type object-list
        \object-list GeneratorNames
@@ -77103,6 +77256,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N14, \field Generator 7 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A23, \field Generator 8 Name
        \type object-list
        \object-list GeneratorNames
@@ -77124,6 +77279,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N16, \field Generator 8 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A26, \field Generator 9 Name
        \type object-list
        \object-list GeneratorNames
@@ -77145,6 +77302,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N18, \field Generator 9 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A29, \field Generator 10 Name
        \type object-list
        \object-list GeneratorNames
@@ -77166,6 +77325,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N20, \field Generator 10 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A32, \field Generator 11 Name
        \type object-list
        \object-list GeneratorNames
@@ -77187,6 +77348,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N22, \field Generator 11 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A35, \field Generator 12 Name
        \type object-list
        \object-list GeneratorNames
@@ -77208,6 +77371,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N24, \field Generator 12 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A38, \field Generator 13 Name
        \type object-list
        \object-list GeneratorNames
@@ -77229,6 +77394,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N26, \field Generator 13 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A41, \field Generator 14 Name
        \type object-list
        \object-list GeneratorNames
@@ -77250,6 +77417,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N28, \field Generator 14 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A44, \field Generator 15 Name
        \type object-list
        \object-list GeneratorNames
@@ -77271,6 +77440,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N30, \field Generator 15 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A47, \field Generator 16 Name
        \type object-list
        \object-list GeneratorNames
@@ -77292,6 +77463,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N32, \field Generator 16 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A50, \field Generator 17 Name
        \type object-list
        \object-list GeneratorNames
@@ -77313,6 +77486,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N34, \field Generator 17 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A53, \field Generator 18 Name
        \type object-list
        \object-list GeneratorNames
@@ -77334,6 +77509,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N36, \field Generator 18 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A56, \field Generator 19 Name
        \type object-list
        \object-list GeneratorNames
@@ -77355,6 +77532,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N38, \field Generator 19 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A59, \field Generator 20 Name
        \type object-list
        \object-list GeneratorNames
@@ -77376,6 +77555,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N40, \field Generator 20 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A62, \field Generator 21 Name
        \type object-list
        \object-list GeneratorNames
@@ -77397,6 +77578,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N42, \field Generator 21 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A65, \field Generator 22 Name
        \type object-list
        \object-list GeneratorNames
@@ -77418,6 +77601,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N44, \field Generator 22 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A68, \field Generator 23 Name
        \type object-list
        \object-list GeneratorNames
@@ -77439,6 +77624,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N46, \field Generator 23 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A71, \field Generator 24 Name
        \type object-list
        \object-list GeneratorNames
@@ -77460,6 +77647,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N48, \field Generator 24 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A74, \field Generator 25 Name
        \type object-list
        \object-list GeneratorNames
@@ -77481,6 +77670,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N50, \field Generator 25 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A77, \field Generator 26 Name
        \type object-list
        \object-list GeneratorNames
@@ -77502,6 +77693,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N52, \field Generator 26 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A80, \field Generator 27 Name
        \type object-list
        \object-list GeneratorNames
@@ -77523,6 +77716,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N54, \field Generator 27 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A83, \field Generator 28 Name
        \type object-list
        \object-list GeneratorNames
@@ -77544,6 +77739,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N56, \field Generator 28 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A86, \field Generator 29 Name
        \type object-list
        \object-list GeneratorNames
@@ -77565,6 +77762,8 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N58, \field Generator 29 Rated Thermal to Electrical Power Ratio
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
   A89, \field Generator 30 Name
        \type object-list
        \object-list GeneratorNames
@@ -77586,7 +77785,9 @@ ElectricLoadCenter:Generators,
        \type object-list
        \object-list ScheduleNames
   N60; \field Generator 30 Rated Thermal to Electrical Power Ratio
-
+       \note Required field when generator is used by an ElectricLoadCenter:Distribution object with Generator Operation Scheme set to FollowThermal or FollowThermalLimitElectrical
+       \type real
+       
 ElectricLoadCenter:Inverter:Simple,
         \memo Electric power inverter to convert from direct current (DC) to alternating current
         \memo (AC) in an electric load center that contains photovoltaic modules. This input
@@ -77872,11 +78073,13 @@ ElectricLoadCenter:Transformer,
   A3,  \field Transformer Usage
        \type choice
        \key PowerInFromGrid
-       \key PowerOutFromOnsiteGeneration
+       \key PowerOutToGrid
+       \key LoadCenterPowerConditioning
        \default PowerInFromGrid
        \note A transformer can be used to transfer electric energy from utility grid to
        \note building (PowerInFromGrid)or from building on-site generation to
-       \note the grid (PowerOutFromOnsiteGeneration)
+       \note the grid (PowerOutToGrid) or within a load center to match generation 
+       \note to the facility service main panel (LoadCenterPowerConditioning)
   A4,  \field Zone Name
        \type object-list
        \object-list ZoneNames
@@ -78019,16 +78222,20 @@ ElectricLoadCenter:Transformer,
        \note Must be an electric meter (with electricity as the resource type)
        \note Only required when transformer is used for power in from the utility grid
 
+
 ElectricLoadCenter:Distribution,
+       \memo Describes a subpanel 
        \memo a list of meters that can be reported are available after a run on
        \memo the meter dictionary file (.mdd) if the Output:VariableDictionary has been requested.
   A1 , \field Name
        \required-field
   A2 , \field Generator List Name
+       \note Name of an ElectricLoadCenter:Generators object
        \type object-list
        \object-list GeneratorLists
   A3,  \field Generator Operation Scheme Type
-       \note required if Generator List is entered.
+       \note Determines how generators are to be controlled
+       \note Required if Generator List is entered.
        \type choice
        \key Baseload
        \key DemandLimit
@@ -78037,14 +78244,15 @@ ElectricLoadCenter:Distribution,
        \key TrackMeter
        \key FollowThermal
        \key FollowThermalLimitElectrical
-  N1,  \field Demand Limit Scheme Purchased Electric Demand Limit
+  N1,  \field Generator Demand Limit Scheme Purchased Electric Demand Limit
        \type real
        \units W
-  A4,  \field Track Schedule Name Scheme Schedule Name
+  A4,  \field Generator Track Schedule Name Scheme Schedule Name
        \note required when Generator Operation Scheme Type=TrackSchedule
+       \note schedule values in Watts
        \type object-list
        \object-list ScheduleNames
-  A5,  \field Track Meter Scheme Meter Name
+  A5,  \field Generator Track Meter Scheme Meter Name
        \note required when Generator Operation Scheme Type=TrackMeter
        \type external-list
        \external-list autoRDDmeter
@@ -78056,7 +78264,7 @@ ElectricLoadCenter:Distribution,
        \key DirectCurrentWithInverterDCStorage
        \key DirectCurrentWithInverterACStorage
        \default AlternatingCurrent
-  A7,  \field Inverter Object Name
+  A7,  \field Inverter Name
        \note required when Electrical Buss Type=DirectCurrentWithInverter, DirectCurrentWithInverterDCStorage,
        \note or DirectCurrentWithInverterACStorage
        \type object-list
@@ -78066,11 +78274,132 @@ ElectricLoadCenter:Distribution,
        \note or DirectCurrentWithInverterACStorage
        \type object-list
        \object-list ElecStorageList
-  A9;  \field Transformer Object Name
-       \note required when power needs to be output from on-site generation to the grid via transformer
+  A9,  \field Transformer Object Name
+       \note required when power needs to be output from on-site generation or storage to the grid via transformer
        \type object-list
        \object-list TransformerNames
+  A10, \field Storage Operation Scheme
+       \note Select method to govern how storage charge and discharge is controlled
+       \type choice
+       \key TrackFacilityElectricDemandStoreExcessOnSite
+       \note TrackFacilityElectricDemandStoreExcessOnSite indicates that storage control will follow the facility power demand 
+       \note while accounting for any on-site generation.  Only excess on site generation  gets stored (legacy behavior).
+       \default TrackFacilityElectricDemandStoreExcessOnSite
+       \key TrackMeterDemandStoreExcessOnSite
+       \note TrackMeterDemandStoreExcessOnSite indicates that storage discharge control will follow an electric meter named in the field called Storage Control Track Meter Name.  This scheme is similiar 
+       \note to TrackFacilityElectricDemandStoreExcessOnSite except that instead of the main facility electric meter, the control is based off of a user-selected meter.
+       \key TrackChargeDischargeSchedules
+       \note TrackChargeDischargeSchedules indicates that control will follow the charging and discharging power and schedules defined in the fields called Maximum Storage Charge Grid Supply Power,
+       \note Storage Charge Grid Supply Power Fraction Schedule Name, Design Storage Discharge Grid Export Power, and Storage Discharge Grid Export Fraction Schedule Name.
+       \key FacilityDemandLeveling
+       \note FacilityDemandLeveling indicates that storage control will attempt to control the facility's power demand drawn from the utility service to a prescribed level.
+       \note The target utility demand is entered in the fields called Storage Control Utility Demand Limit and Storage Control Utility Demand Limit Fraction Schedule Name
+       \note This scheme first accounts for any on-site generation and during times of high use will discharge storage to reduce facility grid demand to meet the target level
+       \note and during times of low use will charge storage from the grid to increase facility grid demand to meet the target level. 
+  A11, \field Storage Control Track Meter Name
+       \note required when Storage Operation Scheme is set to TrackMeterDemandStoreExcessOnSite.
+       \type external-list
+       \external-list autoRDDmeter
+  A12, \field Storage Converter Object Name
+       \note Name of an ElectricLoadCenter:Storage:Converter used to convert AC to DC when charging DC storage from grid supply.
+       \note A converter is expected when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules
+       \note A single bidirectional device will reference both an inverter object (DC to AC) and a converter object (AC to DC).
+       \type object-list
+       \object-list ConverterList
+  N2 , \field Maximum Storage State of Charge Fraction
+       \note Fraction of storage capacity used as upper limit for controlling charging, for all storage operation schemes.
+       \type real
+       \default 1.0
+  N3,  \field Minimum Storage State of Charge Fraction
+       \note Fraction of storage capacity used as lower limit for controlling discharging, for all storage operation schemes.
+       \type real
+       \default 0.0
+  N4 , \field Design Storage Control Charge Power
+       \note Maximum rate that electric power can be charged into storage.
+       \note Storage charging adjusted downward for conversion losses.
+       \note Rate is modified by fractional values in the schedule named in the next field. 
+       \note Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
+       \type real
+       \units W
+  A13, \field Storage Charge Power Fraction Schedule Name
+       \note Controls timing and magnitude of charging storage.
+       \note Required field if Storage Operation Scheme is set to TrackChargeDischargeSchedules.
+       \note Schedule values should be fractions from 0.0 to 1.0, inclusive.
+       \type object-list
+       \object-list ScheduleNames
+  N5 , \field Design Storage Control Discharge Power
+       \note Maximum rate that electric power can be discharged from storage.
+       \note Rate is modified by fractional values in the schedule named in the next field. 
+       \note Required field when using Storage Operation Schemes FacilityDemandLeveling or TrackChargeDischargeSchedules.
+       \type real
+       \units W
+  A14, \field Storage Discharge Power Fraction Schedule Name
+       \note Controls timing and magnitude of discharging storage
+       \note Required field if Storage Operation Scheme is set to TrackChargeDischargeSchedules.
+       \note Schedule values should be fractions from 0.0 to 1.0, inclusive.
+  N6,  \field Storage Control Utility Demand Target
+       \note Target utility service demand power for discharge control.  Storage draws are adjusted upwards for conversion losses. 
+       \note Required field for FacilityDemandLeveling storage operation scheme
+       \type real
+       \units W
+  A15; \field Storage Control Utility Demand Target Fraction Schedule Name
+       \note Modifies the target utility service demand power over time.
+       \note Schedule values should be fractions from -1.0 to 1.0, inclusive.
+       \note if omitted a schedule value of 1.0 is used. Negative values indicate export to grid
+       \note Schedule is used if Storage Operation Scheme is set to FacilityDemandLeveling.
+       \type object-list
+       \object-list ScheduleNames
 
+
+  ElectricLoadCenter:Storage:Converter,
+        \memo This model is for converting AC to DC for grid-supplied charging of DC storage
+        \min-fields 4
+   A1 , \field Name
+        \reference ConverterList
+   A2 , \field Availability Schedule Name
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the converter is always available.
+        \type object-list
+        \object-list ScheduleNames
+   A3 , \field Power Conversion Efficiency Method
+        \type choice
+        \key SimpleFixed
+        \default SimpleFixed
+        \note SimpleFixed indicates power conversion losses are based on Simple Fixed Efficiency
+        \key FunctionOfPower
+        \note FunctionOfPower indicates power conversion losses are a function of normalized power using a curve or table.
+   N1 , \field Simple Fixed Efficiency
+        \note Constant efficiency for conversion of AC to DC at all power levels.
+        \note Field is only used when Power Conversion Efficiency Method is set to SimpleFixed.
+        \type real
+        \minimum> 0.0
+        \maximum 1.0
+        \default 0.95
+   N2,  \field Design Maximum Continuous Input Power
+        \note Required field when Power Conversion Efficiency Method is set to FunctionOfPower.
+        \type real
+        \units W
+   A4 , \field Efficiency Function of Power Curve Name
+        \note Curve or table with a single independent variable that describes efficiency as a function of normalized power.
+        \note The "x" input for curve or table is the ratio of current input power divided by design power in the previous field
+        \note Required field when Power Conversion Efficiency Method is set to FunctionOfPower.
+        \type object-list
+        \object-list UniVariateCurves
+        \object-list UniVariateTables
+   N3 , \field Ancillary Power Consumed In Standby
+        \note Optional standby power consumed when converter is available but no power is being conditioned. 
+        \type real
+        \units W
+   A5 , \field Zone Name
+        \note enter name of zone to receive converter losses as heat
+        \note if blank then converter is assumed to be outdoors
+        \type object-list
+        \object-list ZoneNames
+   N4 ; \field Radiative Fraction
+        \note fraction of zone heat gains treated as thermal radiation
+        \minimum 0.0
+        \maximum 1.0
+        
 \group Water Systems
 
 WaterUse:Equipment,
@@ -78091,6 +78420,7 @@ WaterUse:Equipment,
   N1 , \field Peak Flow Rate
        \required-field
        \units m3/s
+       \ip-units gal/min
        \type real
        \minimum 0.0
   A3 , \field Flow Rate Fraction Schedule Name
@@ -78220,17 +78550,21 @@ WaterUse:Storage,
   N1 , \field Maximum Capacity
        \type real
        \units m3
+       \ip-units gal
        \note Defaults to unlimited capacity.
   N2 , \field Initial Volume
        \type real
        \units m3
+       \ip-units gal
   N3 , \field Design In Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \note Defaults to unlimited flow.
   N4 , \field Design Out Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \note Defaults to unlimited flow.
   A3 , \field Overflow Destination
        \type object-list
@@ -78245,14 +78579,17 @@ WaterUse:Storage,
   N5 , \field Float Valve On Capacity
        \type real
        \units m3
+       \ip-units gal
        \note Lower range of target storage level e.g. float valve kicks on
   N6 , \field Float Valve Off Capacity
        \type real
        \units m3
+       \ip-units gal
        \note Upper range of target storage level e.g. float valve kicks off
   N7 , \field Backup Mains Capacity
        \type real
        \units m3
+       \ip-units gal
        \note Lower range of secondary target storage level
        \note used to keep tanks at a minimum level using
        \note mains water if well can't keep up
@@ -78306,6 +78643,7 @@ WaterUse:Well,
   N2 , \field Pump Rated Flow Rate
        \type real
        \units m3/s
+       \ip-units gal/min
   N3 , \field Pump Rated Head
        \type real
        \units Pa
@@ -78317,9 +78655,11 @@ WaterUse:Well,
   N6 , \field Well Recovery Rate
        \type real
        \units m3/s
+       \ip-units gal/min
   N7 , \field Nominal Well Storage Volume
        \type real
        \units m3
+       \ip-units gal
   A3 , \field Water Table Depth Mode
        \type choice
        \key Constant
@@ -78358,6 +78698,7 @@ WaterUse:RainCollector,
   N2 , \field Maximum Collection Rate
        \type real
        \units m3/s
+       \ip-units gal/min
        \note Defaults to unlimited flow.
   A5 , \field Collection Surface 1 Name
        \begin-extensible

@@ -107,8 +107,10 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -138,7 +140,6 @@
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
-#include <EnergyPlus/ManageElectricPower.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -294,8 +295,10 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DesiccantDehumidifiers::clear_state();
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();
+		clearFacilityElectricPowerServiceObject();
 		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
 		FanCoilUnits::clear_state();
@@ -324,7 +327,6 @@ namespace EnergyPlus {
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();
-		ManageElectricPower::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
 		NodeInputManager::clear_state();
