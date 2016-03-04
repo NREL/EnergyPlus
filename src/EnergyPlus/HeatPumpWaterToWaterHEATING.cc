@@ -918,7 +918,7 @@ namespace EnergyPlus {
 
 	}
 
-	void HeatPumpWaterToWaterParameterEstimationHeating::simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad )
+	void HeatPumpWaterToWaterParameterEstimationHeating::simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const EP_UNUSED( RunFlag ) )
 	{
 		//       SUBROUTINE INFORMATION:
 		//       AUTHOR    Arun

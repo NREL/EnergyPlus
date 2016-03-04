@@ -81,7 +81,7 @@ namespace EnergyPlus {
 		virtual ~HeatPumpWaterToWaterParameterEstimationHeating() {}
 
 		void 
-		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad ) override;
+		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
 
 		void
 		InitGshp(); // GSHP number

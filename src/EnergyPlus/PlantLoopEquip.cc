@@ -480,7 +480,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_HPWaterPEHeating ) {
-				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 			} else if ( EquipTypeNum == TypeOf_HPWaterEFCooling ) {
 				SimHPWatertoWaterSimple( sim_component.TypeOf, EquipTypeNum, sim_component.Name, EquipNum, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, LoopNum ); //DSU
 				if ( InitLoopEquip ) {
