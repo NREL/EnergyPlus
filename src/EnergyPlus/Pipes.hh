@@ -65,8 +65,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
+
+	// Forward Declarations
+	struct PlantLocation;
 
 namespace Pipes {
 
@@ -87,10 +91,14 @@ namespace Pipes {
 
 	// Types
 
-	struct LocalPipeData
+	struct LocalPipeData : public PlantComponent
 	{
+		virtual
+		~LocalPipeData()
+		{}
+
 		// Members
-		std::string Name; // main plant (cooling) loop ID
+		std::string Name;
 		int TypeOf; // type of pipe
 		int InletNodeNum; // Node number on the inlet side of the plant
 		int OutletNodeNum; // Node number on the inlet side of the plant
@@ -116,6 +124,12 @@ namespace Pipes {
 			EnvrnFlag( true )
 		{}
 
+		public:
+			static PlantComponent * factory( int objectType, std::string objectName );
+
+		public:
+			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
+
 	};
 
 	// Object Data
@@ -126,37 +140,7 @@ namespace Pipes {
 	clear_state();
 
 	void
-	SimPipes(
-		int const CompType,
-		std::string & PipeName,
-		int & CompIndex,
-		Real64 const MaxVolFlowRate,
-		bool const InitLoopEquip,
-		bool const FirstHVACIteration
-	);
-
-	// End Plant Loop Module Driver Subroutines
-	//******************************************************************************
-
-	// Beginning of Plant Loop Module Get Input subroutines
-	//******************************************************************************
-
-	void
 	GetPipeInput();
-
-	// End of Get Input subroutines for the Plant Loop Module
-	//******************************************************************************
-
-	// Beginning Initialization Section of the Plant Loop Module
-	//******************************************************************************
-
-	void
-	InitializePipes(
-		int const PipeType, // Type of Pipe
-		std::string const & PipeName, // Name of Pipe
-		int & PipeNum, // Index into pipe structure for name
-		Real64 const MaxVolFlowRate // unused at present time
-	);
 
 } // Pipes
 
