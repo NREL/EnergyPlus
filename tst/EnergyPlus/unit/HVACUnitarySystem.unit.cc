@@ -236,14 +236,14 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
 	EXPECT_EQ( 0.6, CompOffMassFlow );
 	EXPECT_EQ( 1.2, CompOnMassFlow );
-	EXPECT_EQ( 1.2, MSHPMassFlowRateLow ); // at speed = 1, MSHPMassFlowRateLow is proportional to PLR (PLR = 1 here)
+	EXPECT_EQ( 0.6, MSHPMassFlowRateLow );
 	EXPECT_EQ( 1.2, MSHPMassFlowRateHigh );
 
 	PartLoadRatio = 0.5;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
 	EXPECT_EQ( 0.6, CompOffMassFlow );
 	EXPECT_EQ( 1.2, CompOnMassFlow );
-	EXPECT_EQ( 0.6, MSHPMassFlowRateLow ); // at speed = 1, MSHPMassFlowRateLow is proportional to PLR (PLR = 0.5 here)
+	EXPECT_EQ( 0.6, MSHPMassFlowRateLow );
 	EXPECT_EQ( 1.2, MSHPMassFlowRateHigh );
 
 	PartLoadRatio = 1.0;
@@ -261,7 +261,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
 	EXPECT_EQ( 0.25, CompOffMassFlow );
 	EXPECT_EQ( 0.25, CompOnMassFlow );
-	EXPECT_EQ( 0.25, MSHPMassFlowRateLow ); // at speed = 1, MSHPMassFlowRateLow is proportional to PLR (PLR = 1 here)
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
 
 	// cooling load at various speeds
@@ -289,7 +289,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
 	EXPECT_EQ( 0.2, CompOffMassFlow ); // CompOffMassFlow equal to idle mass flow rate
 	EXPECT_EQ( 0.3, CompOnMassFlow );
-	EXPECT_EQ( 0.3, MSHPMassFlowRateLow ); // at speed = 1, MSHPMassFlowRateLow is proportional to PLR (PLR = 1 here)
+	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
 
 	// constant fan mode should not drop to idle flow rate at speed = 1
