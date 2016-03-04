@@ -46,5 +46,5 @@ The summary table called Electric Loads Satisfied has been revised to include a 
 ### Outdoor Air Summary tabular report bugfix ###
 Fixed the number of occupants in the Outdoor Air Summary Report for multiplied zones. The values are now consistent with the table footnote: *Values shown for a single zone without multipliers*. [#5216](https://github.com/NREL/EnergyPlus/pull/5216)
 
-### System Ventilation Requirements tabular report ### 
-This report is now produced for Sizing:System System Outdoor Air Method = ZoneSum and VentilationRateProcedure. Previously this report was only produced when using VentilationRateProcedure. [#5216](https://github.com/NREL/EnergyPlus/pull/5216)
+### Standard 62.1 Summary System Ventilation Requirements tabular report ### 
+This report is now populated for Sizing:System System Outdoor Air Method = ZoneSum and VentilationRateProcedure. Previously this report was generated with no data (empty cells) for OA method=ZoneSum. [#5216](https://github.com/NREL/EnergyPlus/pull/5216)
