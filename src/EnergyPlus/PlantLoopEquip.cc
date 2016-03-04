@@ -238,7 +238,7 @@ namespace PlantLoopEquip {
 
 		// using PlantLoadProfile::PlantProfileData::simulate;
 		using WaterCoils::UpdateWaterToAirCoilPlantConnection;
-		using WaterUse::SimulateWaterUseConnection;
+		// using WaterUse::WaterConnectionsType::simulate;
 		using SolarCollectors::SimSolarCollector;
 		using BaseboardRadiator::UpdateBaseboardPlantConnection;
 		using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
@@ -1024,7 +1024,7 @@ namespace PlantLoopEquip {
 
 			if ( EquipTypeNum == TypeOf_WaterUseConnection ) {
 
-				SimulateWaterUseConnection( EquipTypeNum, sim_component.Name, EquipNum, InitLoopEquip, FirstHVACIteration );
+				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 				if ( InitLoopEquip ) {
 					sim_component.CompNum = EquipNum;

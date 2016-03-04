@@ -109,170 +109,370 @@ namespace WaterUse {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	int const HeatRecoveryHXIdeal( 1 );
-	int const HeatRecoveryHXCounterFlow( 2 );
-	int const HeatRecoveryHXCrossFlow( 3 );
-
-	int const HeatRecoveryConfigPlant( 1 );
-	int const HeatRecoveryConfigEquipment( 2 );
-	int const HeatRecoveryConfigPlantAndEquip( 3 );
-
-	static std::string const BlankString;
-
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	int NumWaterEquipment( 0 );
-	int NumWaterConnections( 0 );
 	//INTEGER :: MaxIterationsErrorCount =0
-	bool GetWaterUseInputFlag( true );
-
-	Array1D_bool CheckEquipName;
-	Array1D_bool CheckPlantLoop;
 
 	// SUBROUTINE SPECIFICATIONS:
 
-	// Object Data
-	Array1D< WaterEquipmentType > WaterEquipment;
-	Array1D< WaterConnectionsType > WaterConnections;
+	// Types
 
-	// MODULE SUBROUTINES:
-
-	// Functions
-
-	void
-	clear_state()
+	// Don't think this needs to inherit from PlantComponent since it doesn't "simulate"
+	struct WaterEquipment_T
 	{
-		NumWaterEquipment = 0;
-		NumWaterConnections = 0;
-		GetWaterUseInputFlag = true;
-		CheckEquipName.deallocate();
-		CheckPlantLoop.deallocate();
-		WaterEquipment.deallocate();
-		WaterConnections.deallocate();
-	}
+		// Static members
+		static Array1D< WaterEquipment_T > sm_instances;
+		static int sm_numInstances;
+		
+		// Members
+		std::string Name; // Name of DHW
+		std::string m_EndUseSubcatName;
+		int m_Connections; // Index for WATER USE CONNECTIONS object
+		Real64 m_PeakVolFlowRate; // Peak volumetric flow rate, also water consumption rate (m3/s)
+		int m_FlowRateFracSchedule; // Pointer to schedule object
+		Real64 m_ColdVolFlowRate;
+		Real64 m_HotVolFlowRate;
+		Real64 m_TotalVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
+		Real64 m_ColdMassFlowRate;
+		Real64 m_HotMassFlowRate;
+		Real64 m_TotalMassFlowRate; // Mass flow rate (kg/s)
+		Real64 m_DrainMassFlowRate;
+		int m_ColdTempSchedule; // Index for schedule object
+		int m_HotTempSchedule; // Index for schedule object
+		int m_TargetTempSchedule; // Index for schedule object
+		Real64 m_ColdTemp; // Cold supply water temperature (C)
+		Real64 m_HotTemp; // Hot supply water temperature (C)
+		Real64 m_TargetTemp; // Target (mixed) water temperature (C)
+		Real64 m_MixedTemp; // Actual outlet (mixed) water temperature (C)
+		Real64 m_DrainTemp;
+		int m_ZoneNum; // Index for zone object
+		int m_SensibleFracSchedule; // Pointer to schedule object
+		Real64 m_SensibleRate;
+		Real64 m_SensibleEnergy;
+		Real64 m_SensibleRateNoMultiplier;
+		int m_LatentFracSchedule; // Pointer to schedule object
+		Real64 m_LatentRate;
+		Real64 m_LatentEnergy;
+		Real64 m_LatentRateNoMultiplier;
+		Real64 m_MoistureRate;
+		Real64 m_MoistureMass;
+		Real64 m_ColdVolume; // Water consumption (m3)
+		Real64 m_HotVolume; // Water consumption (m3)
+		Real64 m_TotalVolume; // Water consumption (m3)
+		Real64 m_Power; // Heating rate required to meet the mixed water temperature (W)
+		Real64 m_Energy; // Heating energy required to meet the mixed water temperature (J)
+
+		// Default Constructor
+		WaterEquipment_T() :
+			m_Connections( 0 ),
+			m_PeakVolFlowRate( 0.0 ),
+			m_FlowRateFracSchedule( 0 ),
+			m_ColdVolFlowRate( 0.0 ),
+			m_HotVolFlowRate( 0.0 ),
+			m_TotalVolFlowRate( 0.0 ),
+			m_ColdMassFlowRate( 0.0 ),
+			m_HotMassFlowRate( 0.0 ),
+			m_TotalMassFlowRate( 0.0 ),
+			m_DrainMassFlowRate( 0.0 ),
+			m_ColdTempSchedule( 0 ),
+			m_HotTempSchedule( 0 ),
+			m_TargetTempSchedule( 0 ),
+			m_ColdTemp( 0.0 ),
+			m_HotTemp( 0.0 ),
+			m_TargetTemp( 0.0 ),
+			m_MixedTemp( 0.0 ),
+			m_DrainTemp( 0.0 ),
+			m_ZoneNum( 0 ),
+			m_SensibleFracSchedule( 0 ),
+			m_SensibleRate( 0.0 ),
+			m_SensibleEnergy( 0.0 ),
+			m_SensibleRateNoMultiplier( 0.0 ),
+			m_LatentFracSchedule( 0 ),
+			m_LatentRate( 0.0 ),
+			m_LatentEnergy( 0.0 ),
+			m_LatentRateNoMultiplier( 0.0 ),
+			m_MoistureRate( 0.0 ),
+			m_MoistureMass( 0.0 ),
+			m_ColdVolume( 0.0 ),
+			m_HotVolume( 0.0 ),
+			m_TotalVolume( 0.0 ),
+			m_Power( 0.0 ),
+			m_Energy( 0.0 )
+		{}
+
+		// Reset Some Values to Zeros
+		void
+		reset()
+		{
+			m_SensibleRate = 0.0;
+			m_SensibleEnergy = 0.0;
+			m_LatentRate = 0.0;
+			m_LatentEnergy = 0.0;
+			m_MixedTemp = 0.0;
+			m_TotalMassFlowRate = 0.0;
+			m_DrainTemp = 0.0;
+		}
+
+		void
+		CalcEquipmentFlowRates( );
+		
+		void
+		CalcEquipmentDrainTemp( );
+		
+	};
+
+	Array1D< WaterEquipment_T > WaterEquipment_T::sm_instances;
+	int WaterEquipment_T::sm_numInstances = 0;
 
 	void
-	SimulateWaterUse( bool const FirstHVACIteration )
+	WaterEquipment_T::CalcEquipmentFlowRates( )
 	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   August 2006
-		//       MODIFIED       Brent Griffith, March 2010, seperated plant connected to different sim routine
+		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This routine is called from non zone equipment manager and serves to call
-		// water use and connections that are not connected to a full plant loop
+		// Calculate desired hot and cold water flow rates
 
 		// METHODOLOGY EMPLOYED:
 
 		// Using/Aliasing
-		using General::RoundSigDigits;
+		using ScheduleManager::GetCurrentScheduleValue;
+		using Psychrometrics::RhoH2O;
+		using DataEnvironment::WaterMainsTemp;
+		using DataHeatBalance::Zone;
 
 		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIterations( 100 );
-		Real64 const Tolerance( 0.1 ); // Make input?
-
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int WaterEquipNum;
 		int WaterConnNum;
-		int NumIteration;
-		static int MaxIterationsErrorCount;
-		static bool MyEnvrnFlag( true );
 
 		// FLOW:
-		if ( GetWaterUseInputFlag ) {
-			GetWaterUseInput();
-			GetWaterUseInputFlag = false;
+		WaterConnNum = m_Connections;
+
+		if ( WaterConnNum > 0 ) {
+			// Get water temperature conditions from the CONNECTIONS object
+			m_ColdTemp = WaterConnections_T::sm_instances( WaterConnNum ).m_ColdTemp;
+			m_HotTemp = WaterConnections_T::sm_instances( WaterConnNum ).m_HotTemp;
+
+		} else {
+			// Get water temperature conditions from the WATER USE EQUIPMENT schedules
+			if ( m_ColdTempSchedule > 0 ) {
+				m_ColdTemp = GetCurrentScheduleValue( m_ColdTempSchedule );
+			} else { // If no ColdTempSchedule, use the mains temperature
+				m_ColdTemp = WaterMainsTemp;
+			}
+
+			if ( m_HotTempSchedule > 0 ) {
+				m_HotTemp = GetCurrentScheduleValue( m_HotTempSchedule );
+			} else { // If no HotTempSchedule, use all cold water
+				m_HotTemp = m_ColdTemp;
+			}
 		}
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			MaxIterationsErrorCount = 0;
-			if ( NumWaterEquipment > 0 ) {
-				for ( auto & e : WaterEquipment ) {
-					e.SensibleRate = 0.0;
-					e.SensibleEnergy = 0.0;
-					e.LatentRate = 0.0;
-					e.LatentEnergy = 0.0;
-					e.MixedTemp = 0.0;
-					e.TotalMassFlowRate = 0.0;
-					e.DrainTemp = 0.0;
-				}
-			}
-
-			if ( NumWaterConnections > 0 ) {
-				for ( auto & e : WaterConnections ) e.TotalMassFlowRate = 0.0;
-			}
-
-			MyEnvrnFlag = false;
+		if ( m_TargetTempSchedule > 0 ) {
+			m_TargetTemp = GetCurrentScheduleValue( m_TargetTempSchedule );
+		} else { // If no TargetTempSchedule, use all hot water
+			m_TargetTemp = m_HotTemp;
 		}
 
-		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
-
-		// Simulate all unconnected WATER USE EQUIPMENT objects
-		for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
-			if ( WaterEquipment( WaterEquipNum ).Connections == 0 ) {
-				CalcEquipmentFlowRates( WaterEquipNum );
-				CalcEquipmentDrainTemp( WaterEquipNum );
+		// Get the requested total flow rate
+		// 11-17-2006 BG Added multipliers in next block
+		if ( m_ZoneNum > 0 ) {
+			if ( m_FlowRateFracSchedule > 0 ) {
+				m_TotalVolFlowRate = m_PeakVolFlowRate * GetCurrentScheduleValue( m_FlowRateFracSchedule ) * Zone( m_ZoneNum ).Multiplier * Zone( m_ZoneNum ).ListMultiplier;
+			} else {
+				m_TotalVolFlowRate = m_PeakVolFlowRate * Zone( m_ZoneNum ).Multiplier * Zone( m_ZoneNum ).ListMultiplier;
 			}
-		} // WaterEquipNum
+		} else {
+			if ( m_FlowRateFracSchedule > 0 ) {
+				m_TotalVolFlowRate = m_PeakVolFlowRate * GetCurrentScheduleValue( m_FlowRateFracSchedule );
+			} else {
+				m_TotalVolFlowRate = m_PeakVolFlowRate;
+			}
+		}
 
-		ReportStandAloneWaterUse();
+		m_TotalMassFlowRate = m_TotalVolFlowRate * RhoH2O( InitConvTemp );
 
-		// Simulate WATER USE CONNECTIONS objects and connected WATER USE EQUIPMENT objects
-		for ( WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum ) {
+		// Calculate hot and cold water mixing at the tap
+		if ( m_TotalMassFlowRate > 0.0 ) {
+			// Calculate the flow rates needed to meet the target temperature
+			if ( m_HotTemp == m_ColdTemp ) { // Avoid divide by zero
+				// There is no hot water
+				m_HotMassFlowRate = 0.0;
 
-			if ( ! WaterConnections( WaterConnNum ).StandAlone ) continue; // only model non plant connections here
+				// Need a special case for HotTemp < ColdTemp, due to bad user input  (but could happen in a plant loop accidentally)
 
-			InitConnections( WaterConnNum );
+			} else if ( m_TargetTemp > m_HotTemp ) {
+				m_HotMassFlowRate = m_TotalMassFlowRate;
 
-			NumIteration = 0;
+			} else {
+				m_HotMassFlowRate = m_TotalMassFlowRate * ( m_TargetTemp - m_ColdTemp ) / ( m_HotTemp - m_ColdTemp );
+			}
 
-			while ( true ) {
-				++NumIteration;
+			if ( m_HotMassFlowRate < 0.0 ) {
+				// Target temp is colder than the cold water temp; don't allow colder
+				m_HotMassFlowRate = 0.0;
+			}
 
-				CalcConnectionsFlowRates( WaterConnNum, FirstHVACIteration );
-				CalcConnectionsDrainTemp( WaterConnNum );
-				CalcConnectionsHeatRecovery( WaterConnNum );
+			m_ColdMassFlowRate = m_TotalMassFlowRate - m_HotMassFlowRate;
 
-				if ( WaterConnections( WaterConnNum ).TempError < Tolerance ) {
-					break;
-				} else if ( NumIteration > MaxIterations ) {
-					if ( ! WarmupFlag ) {
-						if ( WaterConnections( WaterConnNum ).MaxIterationsErrorIndex == 0 ) {
-							ShowWarningError( "WaterUse:Connections = " + WaterConnections( WaterConnNum ).Name + ":  Heat recovery temperature did not converge" );
-							ShowContinueErrorTimeStamp( "" );
-						}
-						ShowRecurringWarningErrorAtEnd( "WaterUse:Connections = " + WaterConnections( WaterConnNum ).Name + ":  Heat recovery temperature did not converge", WaterConnections( WaterConnNum ).MaxIterationsErrorIndex );
-					}
-					break;
-				}
+			if ( m_ColdMassFlowRate < 0.0 ) m_ColdMassFlowRate = 0.0;
 
-			} // WHILE
+			m_MixedTemp = ( m_ColdMassFlowRate * m_ColdTemp + m_HotMassFlowRate * m_HotTemp ) / m_TotalMassFlowRate;
+		} else {
+			m_HotMassFlowRate = 0.0;
+			m_ColdMassFlowRate = 0.0;
+			m_MixedTemp = m_TargetTemp;
+		}
 
-			UpdateWaterConnections( WaterConnNum );
+	} // WaterEquipment_T::CalcEquipmentFlowRates( )
 
-			ReportWaterUse( WaterConnNum );
-
-		} // WaterConnNum
-
-	}
 
 	void
-	SimulateWaterUseConnection(
-		int const EP_UNUSED( EquipTypeNum ),
-		std::string const & CompName,
-		int & CompIndex,
-		bool const InitLoopEquip,
-		bool const FirstHVACIteration
-	)
+	WaterEquipment_T::CalcEquipmentDrainTemp( )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Peter Graham Ellis
+		//       DATE WRITTEN   August 2006
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculate drainwater temperature and heat and moisture gains to zone.
+
+		// METHODOLOGY EMPLOYED:
+
+		// Using/Aliasing
+		using ScheduleManager::GetCurrentScheduleValue;
+		using Psychrometrics::CPHW;
+		using Psychrometrics::PsyWFnTdbRhPb;
+		using Psychrometrics::PsyRhoAirFnPbTdbW;
+		using Psychrometrics::PsyHfgAirFnWTdb;
+		using DataHeatBalFanSys::MAT;
+		using DataHeatBalFanSys::ZoneAirHumRat;
+		using DataHeatBalance::Zone;
+		using DataEnvironment::OutBaroPress;
+		using DataGlobals::SecInHour;
+		using DataHVACGlobals::TimeStepSys;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 ZoneMAT;
+		Real64 ZoneHumRat;
+		Real64 ZoneHumRatSat;
+		Real64 RhoAirDry;
+		Real64 ZoneMassMax;
+		Real64 FlowMassMax;
+		Real64 MoistureMassMax;
+
+		static std::string const RoutineName( "CalcEquipmentDrainTemp" );
+
+		// FLOW:
+
+		m_SensibleRate = 0.0;
+		m_SensibleEnergy = 0.0;
+		m_LatentRate = 0.0;
+		m_LatentEnergy = 0.0;
+
+		if ( ( m_ZoneNum == 0 ) || ( m_TotalMassFlowRate == 0.0 ) ) {
+			m_DrainTemp = m_MixedTemp;
+			m_DrainMassFlowRate = m_TotalMassFlowRate;
+
+		} else {
+			ZoneMAT = MAT( m_ZoneNum );
+
+			if ( m_SensibleFracSchedule == 0 ) {
+				m_SensibleRate = 0.0;
+				m_SensibleEnergy = 0.0;
+			} else {
+				m_SensibleRate = GetCurrentScheduleValue( m_SensibleFracSchedule ) * m_TotalMassFlowRate * CPHW( InitConvTemp ) * ( m_MixedTemp - ZoneMAT );
+				m_SensibleEnergy = m_SensibleRate * TimeStepSys * SecInHour;
+			}
+
+			if ( m_LatentFracSchedule == 0 ) {
+				m_LatentRate = 0.0;
+				m_LatentEnergy = 0.0;
+			} else {
+				ZoneHumRat = ZoneAirHumRat( m_ZoneNum );
+				ZoneHumRatSat = PsyWFnTdbRhPb( ZoneMAT, 1.0, OutBaroPress, RoutineName ); // Humidratio at 100% relative humidity
+				RhoAirDry = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMAT, 0.0 );
+
+				ZoneMassMax = ( ZoneHumRatSat - ZoneHumRat ) * RhoAirDry * Zone( m_ZoneNum ).Volume; // Max water that can be evaporated to zone
+				FlowMassMax = m_TotalMassFlowRate * TimeStepSys * SecInHour; // Max water in flow
+				MoistureMassMax = min( ZoneMassMax, FlowMassMax );
+
+				m_MoistureMass = GetCurrentScheduleValue( m_LatentFracSchedule ) * MoistureMassMax;
+				m_MoistureRate = m_MoistureMass / ( TimeStepSys * SecInHour );
+
+				m_LatentRate = m_MoistureRate * PsyHfgAirFnWTdb( ZoneHumRat, ZoneMAT );
+				m_LatentEnergy = m_LatentRate * TimeStepSys * SecInHour;
+			}
+
+			m_DrainMassFlowRate = m_TotalMassFlowRate - m_MoistureRate;
+
+			if ( m_DrainMassFlowRate == 0.0 ) {
+				m_DrainTemp = m_MixedTemp;
+			} else {
+				m_DrainTemp = ( m_TotalMassFlowRate * CPHW( InitConvTemp ) * m_MixedTemp - m_SensibleRate - m_LatentRate ) / ( m_DrainMassFlowRate * CPHW( InitConvTemp ) );
+			}
+		}
+
+	} // WaterEquipment_T::CalcEquipmentDrainTemp()
+
+	// WaterConnections_T implementation
+	
+	// MODULE VARIABLE DECLARATIONS:
+
+	// Functions
+
+	Array1D< WaterConnections_T > WaterConnections_T::sm_instances;
+	int WaterConnections_T::sm_numInstances = 0;
+	bool WaterConnections_T::sm_GetInputFlag = true;
+	
+	void
+	clear_state()
+	{
+		WaterConnections_T::sm_GetInputFlag = true;
+		WaterEquipment_T::sm_instances.deallocate();
+		WaterEquipment_T::sm_numInstances = 0;
+		WaterConnections_T::sm_instances.deallocate();
+		WaterConnections_T::sm_numInstances = 0;
+	}
+
+
+	PlantComponent *
+	WaterConnections_T::factory( const std::string objectName )
+	{
+		if ( sm_GetInputFlag ) {
+			GetInput();
+			sm_GetInputFlag = false;
+		}
+
+		for ( WaterConnections_T & waterConn : sm_instances ) {
+			if ( waterConn.Name == objectName )
+				return &waterConn;
+		}
+		
+		ShowFatalError( "WaterConnections_T::factory: Unit not found=" + objectName );
+		return nullptr;
+	} // factory( )
+
+	void
+	WaterConnections_T::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ),
+					bool const FirstHVACIteration,
+					Real64 & EP_UNUSED( CurLoad ),
+					bool const EP_UNUSED( RunFlag ) )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -301,50 +501,20 @@ namespace WaterUse {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER :: WaterEquipNum
-		int WaterConnNum;
-		int NumIteration;
 		static int MaxIterationsErrorCount;
 		static bool MyEnvrnFlag( true );
 
 		// FLOW:
-		if ( GetWaterUseInputFlag ) {
-			GetWaterUseInput();
-			GetWaterUseInputFlag = false;
-		}
-
-		if ( CompIndex == 0 ) {
-			WaterConnNum = FindItemInList( CompName, WaterConnections );
-			if ( WaterConnNum == 0 ) {
-				ShowFatalError( "SimulateWaterUseConnection: Unit not found=" + CompName );
-			}
-			CompIndex = WaterConnNum;
-		} else {
-			WaterConnNum = CompIndex;
-			if ( WaterConnNum > NumWaterConnections || WaterConnNum < 1 ) {
-				ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + TrimSigDigits( WaterConnNum ) + ", Number of Units=" + TrimSigDigits( NumWaterConnections ) + ", Entered Unit name=" + CompName );
-			}
-			if ( CheckEquipName( WaterConnNum ) ) {
-				if ( CompName != WaterConnections( WaterConnNum ).Name ) {
-					ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + TrimSigDigits( WaterConnNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + WaterConnections( WaterConnNum ).Name );
-				}
-				CheckEquipName( WaterConnNum ) = false;
-			}
-		}
-
-		if ( InitLoopEquip ) {
-			return;
-		}
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
 			MaxIterationsErrorCount = 0;
-			if ( NumWaterEquipment > 0 ) {
-				for ( int i = WaterEquipment.l(), e = WaterEquipment.u(); i <= e; ++i ) {
-					WaterEquipment( i ).reset();
-				}
+			if ( WaterEquipment_T::sm_numInstances > 0 ) {
+				for ( WaterEquipment_T & waterEquip : WaterEquipment_T::sm_instances )
+					waterEquip.reset();
 			}
 
-			if ( NumWaterConnections > 0 ) {
-				for ( auto & e : WaterConnections ) e.TotalMassFlowRate = 0.0;
+			if ( sm_numInstances > 0 ) {
+				for ( WaterConnections_T & waterConn : sm_instances ) waterConn.m_TotalMassFlowRate = 0.0;
 			}
 
 			MyEnvrnFlag = false;
@@ -352,40 +522,39 @@ namespace WaterUse {
 
 		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
 
-		InitConnections( WaterConnNum );
+		InitConnections( );
 
-		NumIteration = 0;
+		int NumIteration = 0;
 
 		while ( true ) {
 			++NumIteration;
 
-			CalcConnectionsFlowRates( WaterConnNum, FirstHVACIteration );
-			CalcConnectionsDrainTemp( WaterConnNum );
-			CalcConnectionsHeatRecovery( WaterConnNum );
+			CalcConnectionsFlowRates( FirstHVACIteration );
+			CalcConnectionsDrainTemp( );
+			CalcConnectionsHeatRecovery( );
 
-			if ( WaterConnections( WaterConnNum ).TempError < Tolerance ) {
+			if ( m_TempError < Tolerance ) {
 				break;
 			} else if ( NumIteration > MaxIterations ) {
 				if ( ! WarmupFlag ) {
-					if ( WaterConnections( WaterConnNum ).MaxIterationsErrorIndex == 0 ) {
-						ShowWarningError( "WaterUse:Connections = " + WaterConnections( WaterConnNum ).Name + ":  Heat recovery temperature did not converge" );
+					if ( m_MaxIterationsErrorIndex == 0 ) {
+						ShowWarningError( "WaterUse:Connections = " + Name + ":  Heat recovery temperature did not converge" );
 						ShowContinueErrorTimeStamp( "" );
 					}
-					ShowRecurringWarningErrorAtEnd( "WaterUse:Connections = " + WaterConnections( WaterConnNum ).Name + ":  Heat recovery temperature did not converge", WaterConnections( WaterConnNum ).MaxIterationsErrorIndex );
+					ShowRecurringWarningErrorAtEnd( "WaterUse:Connections = " + Name + ":  Heat recovery temperature did not converge", m_MaxIterationsErrorIndex );
 				}
 				break;
 			}
 
 		} // WHILE
 
-		UpdateWaterConnections( WaterConnNum );
-
-		ReportWaterUse( WaterConnNum );
+		UpdateWaterConnections( );
+		ReportWaterUse( );
 
 	}
 
 	void
-	GetWaterUseInput()
+	WaterConnections_T::GetInput()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -421,47 +590,37 @@ namespace WaterUse {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
-		int NumAlphas; // Number of Alphas for each GetObjectItem call
-		int NumNumbers; // Number of Numbers for each GetObjectItem call
-		//unused1208  INTEGER                        :: NumArgs
-		int WaterEquipNum;
-		int WaterConnNum;
-		int AlphaNum;
-		int thisWaterEquipNum;
-
-		// FLOW:
+		bool ErrorsFound = false; // Set to true if errors in input, fatal at end of routine
 
 		cCurrentModuleObject = "WaterUse:Equipment";
-		NumWaterEquipment = GetNumObjectsFound( cCurrentModuleObject );
+		WaterEquipment_T::sm_numInstances = GetNumObjectsFound( cCurrentModuleObject );
 
-		if ( NumWaterEquipment > 0 ) {
-			WaterEquipment.allocate( NumWaterEquipment );
+		if ( WaterEquipment_T::sm_numInstances > 0 ) {
+			WaterEquipment_T::sm_instances.allocate( WaterEquipment_T::sm_numInstances );
 
-			for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
+			for ( int WaterEquipNum = 1; WaterEquipNum <= WaterEquipment_T::sm_numInstances; ++WaterEquipNum ) {
+				int NumAlphas, NumNumbers; // Number of Alphas and Numbers for each GetObjectItemCall
+				int IOStatus;
 				GetObjectItem( cCurrentModuleObject, WaterEquipNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				WaterEquipment_T & waterEquip = WaterEquipment_T::sm_instances( WaterEquipNum );
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterEquipment, WaterEquipNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				bool IsNotOK = false, IsBlank = false;
+				VerifyName( cAlphaArgs( 1 ), WaterEquipment_T::sm_instances, WaterEquipNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 				}
-				WaterEquipment( WaterEquipNum ).Name = cAlphaArgs( 1 );
+				waterEquip.Name = cAlphaArgs( 1 );
 
-				WaterEquipment( WaterEquipNum ).EndUseSubcatName = cAlphaArgs( 2 );
+				waterEquip.m_EndUseSubcatName = cAlphaArgs( 2 );
 
-				WaterEquipment( WaterEquipNum ).PeakVolFlowRate = rNumericArgs( 1 );
+				waterEquip.m_PeakVolFlowRate = rNumericArgs( 1 );
 
 				if ( ( NumAlphas > 2 ) && ( ! lAlphaFieldBlanks( 3 ) ) ) {
-					WaterEquipment( WaterEquipNum ).FlowRateFracSchedule = GetScheduleIndex( cAlphaArgs( 3 ) );
+					waterEquip.m_FlowRateFracSchedule = GetScheduleIndex( cAlphaArgs( 3 ) );
 					// If no FlowRateFracSchedule, fraction defaults to 1.0
 
-					if ( WaterEquipment( WaterEquipNum ).FlowRateFracSchedule == 0 ) {
+					if ( waterEquip.m_FlowRateFracSchedule == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
@@ -469,9 +628,9 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 3 ) && ( ! lAlphaFieldBlanks( 4 ) ) ) {
-					WaterEquipment( WaterEquipNum ).TargetTempSchedule = GetScheduleIndex( cAlphaArgs( 4 ) );
+					waterEquip.m_TargetTempSchedule = GetScheduleIndex( cAlphaArgs( 4 ) );
 
-					if ( WaterEquipment( WaterEquipNum ).TargetTempSchedule == 0 ) {
+					if ( waterEquip.m_TargetTempSchedule == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
@@ -479,11 +638,11 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 4 ) && ( ! lAlphaFieldBlanks( 5 ) ) ) {
-					WaterEquipment( WaterEquipNum ).HotTempSchedule = GetScheduleIndex( cAlphaArgs( 5 ) );
+					waterEquip.m_HotTempSchedule = GetScheduleIndex( cAlphaArgs( 5 ) );
 					// If no HotTempSchedule, there is no hot water.
 					// HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
-					if ( WaterEquipment( WaterEquipNum ).HotTempSchedule == 0 ) {
+					if ( waterEquip.m_HotTempSchedule == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
@@ -491,10 +650,10 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 5 ) && ( ! lAlphaFieldBlanks( 6 ) ) ) {
-					WaterEquipment( WaterEquipNum ).ColdTempSchedule = GetScheduleIndex( cAlphaArgs( 6 ) );
+					waterEquip.m_ColdTempSchedule = GetScheduleIndex( cAlphaArgs( 6 ) );
 					// If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
-					if ( WaterEquipment( WaterEquipNum ).ColdTempSchedule == 0 ) {
+					if ( waterEquip.m_ColdTempSchedule == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
@@ -502,9 +661,9 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 6 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
-					WaterEquipment( WaterEquipNum ).Zone = FindItemInList( cAlphaArgs( 7 ), Zone );
+					waterEquip.m_ZoneNum = FindItemInList( cAlphaArgs( 7 ), Zone );
 
-					if ( WaterEquipment( WaterEquipNum ).Zone == 0 ) {
+					if ( waterEquip.m_ZoneNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
@@ -512,9 +671,9 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 7 ) && ( ! lAlphaFieldBlanks( 8 ) ) ) {
-					WaterEquipment( WaterEquipNum ).SensibleFracSchedule = GetScheduleIndex( cAlphaArgs( 8 ) );
+					waterEquip.m_SensibleFracSchedule = GetScheduleIndex( cAlphaArgs( 8 ) );
 
-					if ( WaterEquipment( WaterEquipNum ).SensibleFracSchedule == 0 ) {
+					if ( waterEquip.m_SensibleFracSchedule == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
@@ -522,9 +681,9 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 8 ) && ( ! lAlphaFieldBlanks( 9 ) ) ) {
-					WaterEquipment( WaterEquipNum ).LatentFracSchedule = GetScheduleIndex( cAlphaArgs( 9 ) );
+					waterEquip.m_LatentFracSchedule = GetScheduleIndex( cAlphaArgs( 9 ) );
 
-					if ( WaterEquipment( WaterEquipNum ).LatentFracSchedule == 0 ) {
+					if ( waterEquip.m_LatentFracSchedule == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
@@ -538,48 +697,50 @@ namespace WaterUse {
 		}
 
 		cCurrentModuleObject = "WaterUse:Connections";
-		NumWaterConnections = GetNumObjectsFound( cCurrentModuleObject );
+		sm_numInstances = GetNumObjectsFound( cCurrentModuleObject );
 
-		if ( NumWaterConnections > 0 ) {
-			WaterConnections.allocate( NumWaterConnections );
+		if ( sm_numInstances > 0 ) {
+			sm_instances.allocate( sm_numInstances );
 
-			for ( WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum ) {
+			for ( int WaterConnNum = 1; WaterConnNum <= sm_numInstances; ++WaterConnNum ) {
+				int NumAlphas, NumNumbers; // Number of Alphas and Numbers for each GetObjectItemCall
+				int IOStatus;
 				GetObjectItem( cCurrentModuleObject, WaterConnNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				WaterConnections_T & waterConn = sm_instances( WaterConnNum );
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterConnections, WaterConnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				bool IsNotOK = false, IsBlank = false;
+				VerifyName( cAlphaArgs( 1 ), sm_instances, WaterConnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 				}
-				WaterConnections( WaterConnNum ).Name = cAlphaArgs( 1 );
+				waterConn.Name = cAlphaArgs( 1 );
 
 				if ( ( ! lAlphaFieldBlanks( 2 ) ) || ( ! lAlphaFieldBlanks( 3 ) ) ) {
-					WaterConnections( WaterConnNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-					WaterConnections( WaterConnNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+					waterConn.m_InletNode = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+					waterConn.m_OutletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 					// Check plant connections
 					TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "DHW Nodes" );
 				} else {
 					// If no plant nodes are connected, simulate in stand-alone mode.
-					WaterConnections( WaterConnNum ).StandAlone = true;
+					waterConn.m_StandAlone = true;
 				}
 
 				if ( ! lAlphaFieldBlanks( 4 ) ) {
-					SetupTankDemandComponent( WaterConnections( WaterConnNum ).Name, cCurrentModuleObject, cAlphaArgs( 4 ), ErrorsFound, WaterConnections( WaterConnNum ).SupplyTankNum, WaterConnections( WaterConnNum ).TankDemandID );
+					SetupTankDemandComponent( waterConn.Name, cCurrentModuleObject, cAlphaArgs( 4 ), ErrorsFound, waterConn.m_SupplyTankNum, waterConn.m_TankDemandID );
 				}
 
 				if ( ! lAlphaFieldBlanks( 5 ) ) {
-					SetupTankSupplyComponent( WaterConnections( WaterConnNum ).Name, cCurrentModuleObject, cAlphaArgs( 5 ), ErrorsFound, WaterConnections( WaterConnNum ).RecoveryTankNum, WaterConnections( WaterConnNum ).TankSupplyID );
+					SetupTankSupplyComponent( waterConn.Name, cCurrentModuleObject, cAlphaArgs( 5 ), ErrorsFound, waterConn.m_RecoveryTankNum, waterConn.m_TankSupplyID );
 				}
 
 				if ( ! lAlphaFieldBlanks( 6 ) ) {
-					WaterConnections( WaterConnNum ).HotTempSchedule = GetScheduleIndex( cAlphaArgs( 6 ) );
+					waterConn.m_HotTempSchedule = GetScheduleIndex( cAlphaArgs( 6 ) );
 					// If no HotTempSchedule, there is no hot water.
 					// HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
-					if ( WaterConnections( WaterConnNum ).HotTempSchedule == 0 ) {
+					if ( waterConn.m_HotTempSchedule == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
@@ -587,10 +748,10 @@ namespace WaterUse {
 				}
 
 				if ( ! lAlphaFieldBlanks( 7 ) ) {
-					WaterConnections( WaterConnNum ).ColdTempSchedule = GetScheduleIndex( cAlphaArgs( 7 ) );
+					waterConn.m_ColdTempSchedule = GetScheduleIndex( cAlphaArgs( 7 ) );
 					// If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
-					if ( WaterConnections( WaterConnNum ).ColdTempSchedule == 0 ) {
+					if ( waterConn.m_ColdTempSchedule == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
@@ -598,15 +759,15 @@ namespace WaterUse {
 				}
 
 				if ( ( ! lAlphaFieldBlanks( 8 ) ) && ( cAlphaArgs( 8 ) != "NONE" ) ) {
-					WaterConnections( WaterConnNum ).HeatRecovery = true;
+					waterConn.m_HeatRecovery = true;
 
 					{ auto const SELECT_CASE_var( cAlphaArgs( 8 ) );
 					if ( SELECT_CASE_var == "IDEAL" ) {
-						WaterConnections( WaterConnNum ).HeatRecoveryHX = HeatRecoveryHXIdeal;
+						waterConn.m_HeatRecoveryHX = HeatRecoveryHX_T::Ideal;
 					} else if ( SELECT_CASE_var == "COUNTERFLOW" ) {
-						WaterConnections( WaterConnNum ).HeatRecoveryHX = HeatRecoveryHXCounterFlow;
+						waterConn.m_HeatRecoveryHX = HeatRecoveryHX_T::CounterFlow;
 					} else if ( SELECT_CASE_var == "CROSSFLOW" ) {
-						WaterConnections( WaterConnNum ).HeatRecoveryHX = HeatRecoveryHXCrossFlow;
+						waterConn.m_HeatRecoveryHX = HeatRecoveryHX_T::CrossFlow;
 					} else {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + cAlphaArgs( 8 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -615,11 +776,11 @@ namespace WaterUse {
 
 					{ auto const SELECT_CASE_var( cAlphaArgs( 9 ) );
 					if ( SELECT_CASE_var == "PLANT" ) {
-						WaterConnections( WaterConnNum ).HeatRecoveryConfig = HeatRecoveryConfigPlant;
+						waterConn.m_HeatRecoveryConfig = HeatRecoveryConfig_T::Plant;
 					} else if ( SELECT_CASE_var == "EQUIPMENT" ) {
-						WaterConnections( WaterConnNum ).HeatRecoveryConfig = HeatRecoveryConfigEquipment;
+						waterConn.m_HeatRecoveryConfig = HeatRecoveryConfig_T::Equipment;
 					} else if ( SELECT_CASE_var == "PLANTANDEQUIPMENT" ) {
-						WaterConnections( WaterConnNum ).HeatRecoveryConfig = HeatRecoveryConfigPlantAndEquip;
+						waterConn.m_HeatRecoveryConfig = HeatRecoveryConfig_T::PlantAndEquip;
 					} else {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -627,384 +788,173 @@ namespace WaterUse {
 					}}
 				}
 
-				WaterConnections( WaterConnNum ).HXUA = rNumericArgs( 1 );
+				waterConn.m_HXUA = rNumericArgs( 1 );
 
-				WaterConnections( WaterConnNum ).WaterEquipment.allocate( NumAlphas - 9 );
+				waterConn.m_localWaterEquipment.allocate( NumAlphas - 9 );
 
-				for ( AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum ) {
-					WaterEquipNum = FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment );
+				for ( int AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum ) {
+					int WaterEquipNum = FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment_T::sm_instances );
 
 					if ( WaterEquipNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( AlphaNum ) + '=' + cAlphaArgs( AlphaNum ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						ErrorsFound = true;
 					} else {
-						if ( WaterEquipment( WaterEquipNum ).Connections > 0 ) {
+						WaterEquipment_T & waterEquip = WaterEquipment_T::sm_instances( WaterEquipNum );
+						if ( waterEquip.m_Connections > 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  WaterUse:Equipment = " + cAlphaArgs( AlphaNum ) + " is already referenced by another object." );
 							ErrorsFound = true;
 						} else {
-							WaterEquipment( WaterEquipNum ).Connections = WaterConnNum;
+							waterEquip.m_Connections = WaterConnNum;
 
-							++WaterConnections( WaterConnNum ).NumWaterEquipment;
-							WaterConnections( WaterConnNum ).WaterEquipment( WaterConnections( WaterConnNum ).NumWaterEquipment ) = WaterEquipNum;
+							++waterConn.m_NumWaterEquipment;
+							waterConn.m_localWaterEquipment( waterConn.m_NumWaterEquipment ) = WaterEquipNum;
 
-							WaterConnections( WaterConnNum ).PeakVolFlowRate += WaterEquipment( WaterEquipNum ).PeakVolFlowRate; // this does not include possible multipliers
+							waterConn.m_PeakVolFlowRate += waterEquip.m_PeakVolFlowRate; // this does not include possible multipliers
 						}
 					}
 				}
 
-			} // WaterConnNum
+			} // for WaterConnNum
 
 			if ( ErrorsFound ) ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
-
-			if ( NumWaterConnections > 0 ) {
-				CheckEquipName.allocate( NumWaterConnections );
-				CheckPlantLoop.allocate( NumWaterConnections );
-				CheckEquipName = true;
-				CheckPlantLoop = true;
-			}
-
-		}
+		} // if sm_numInstances > 0
 
 		// determine connection's peak mass flow rates.
-		if ( NumWaterConnections > 0 ) {
-			for ( WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum ) {
-				WaterConnections( WaterConnNum ).PeakMassFlowRate = 0.0;
-				for ( WaterEquipNum = 1; WaterEquipNum <= WaterConnections( WaterConnNum ).NumWaterEquipment; ++WaterEquipNum ) {
-					thisWaterEquipNum = WaterConnections( WaterConnNum ).WaterEquipment( WaterEquipNum );
-					if ( WaterEquipment( thisWaterEquipNum ).Zone > 0 ) {
-						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( InitConvTemp ) * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).Multiplier * Zone( WaterEquipment( thisWaterEquipNum ).Zone ).ListMultiplier;
+		if ( sm_numInstances > 0 ) {
+			for ( WaterConnections_T & waterConn : sm_instances ) {
+				waterConn.m_PeakMassFlowRate = 0.0;
+				for ( int thisWaterEquipNum : waterConn.m_localWaterEquipment ) {
+					WaterEquipment_T & thisWaterEquip = WaterEquipment_T::sm_instances( thisWaterEquipNum );
+					if ( thisWaterEquip.m_ZoneNum > 0 ) {
+						waterConn.m_PeakMassFlowRate += thisWaterEquip.m_PeakVolFlowRate * RhoH2O( InitConvTemp ) * Zone( thisWaterEquip.m_ZoneNum ).Multiplier * Zone( thisWaterEquip.m_ZoneNum ).ListMultiplier;
 					} else { // can't have multipliers
-						WaterConnections( WaterConnNum ).PeakMassFlowRate += WaterEquipment( thisWaterEquipNum ).PeakVolFlowRate * RhoH2O( InitConvTemp );
+						waterConn.m_PeakMassFlowRate += thisWaterEquip.m_PeakVolFlowRate * RhoH2O( InitConvTemp );
 					}
 				}
-				RegisterPlantCompDesignFlow( WaterConnections( WaterConnNum ).InletNode, WaterConnections( WaterConnNum ).PeakMassFlowRate / RhoH2O( InitConvTemp ) );
+				RegisterPlantCompDesignFlow( waterConn.m_InletNode, waterConn.m_PeakMassFlowRate / RhoH2O( InitConvTemp ) );
 			}
 		}
 
 		// Setup EQUIPMENT report variables (now that connections have been established)
 		// CurrentModuleObject='WaterUse:Equipment'
-		for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
+		for ( WaterEquipment_T & waterEquip : WaterEquipment_T::sm_instances ) {
 
-			SetupOutputVariable( "Water Use Equipment Hot Water Mass Flow Rate [kg/s]", WaterEquipment( WaterEquipNum ).HotMassFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Hot Water Mass Flow Rate [kg/s]", waterEquip.m_HotMassFlowRate, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Cold Water Mass Flow Rate [kg/s]", WaterEquipment( WaterEquipNum ).ColdMassFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Cold Water Mass Flow Rate [kg/s]", waterEquip.m_ColdMassFlowRate, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Total Mass Flow Rate [kg/s]", WaterEquipment( WaterEquipNum ).TotalMassFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Total Mass Flow Rate [kg/s]", waterEquip.m_TotalMassFlowRate, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Hot Water Volume Flow Rate [m3/s]", WaterEquipment( WaterEquipNum ).HotVolFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Hot Water Volume Flow Rate [m3/s]", waterEquip.m_HotVolFlowRate, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Cold Water Volume Flow Rate [m3/s]", WaterEquipment( WaterEquipNum ).ColdVolFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Cold Water Volume Flow Rate [m3/s]", waterEquip.m_ColdVolFlowRate, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Total Volume Flow Rate [m3/s]", WaterEquipment( WaterEquipNum ).TotalVolFlowRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Total Volume Flow Rate [m3/s]", waterEquip.m_TotalVolFlowRate, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Hot Water Volume [m3]", WaterEquipment( WaterEquipNum ).HotVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Hot Water Volume [m3]", waterEquip.m_HotVolume, "System", "Sum", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Cold Water Volume [m3]", WaterEquipment( WaterEquipNum ).ColdVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Cold Water Volume [m3]", waterEquip.m_ColdVolume, "System", "Sum", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Total Volume [m3]", WaterEquipment( WaterEquipNum ).TotalVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "Water", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
-			SetupOutputVariable( "Water Use Equipment Mains Water Volume [m3]", WaterEquipment( WaterEquipNum ).TotalVolume, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "MainsWater", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
+			SetupOutputVariable( "Water Use Equipment Total Volume [m3]", waterEquip.m_TotalVolume, "System", "Sum", waterEquip.Name, _, "Water", "WATERSYSTEMS", waterEquip.m_EndUseSubcatName, "Plant" );
+			SetupOutputVariable( "Water Use Equipment Mains Water Volume [m3]", waterEquip.m_TotalVolume, "System", "Sum", waterEquip.Name, _, "MainsWater", "WATERSYSTEMS", waterEquip.m_EndUseSubcatName, "Plant" );
 
-			SetupOutputVariable( "Water Use Equipment Hot Water Temperature [C]", WaterEquipment( WaterEquipNum ).HotTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Hot Water Temperature [C]", waterEquip.m_HotTemp, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Cold Water Temperature [C]", WaterEquipment( WaterEquipNum ).ColdTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Cold Water Temperature [C]", waterEquip.m_ColdTemp, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Target Water Temperature [C]", WaterEquipment( WaterEquipNum ).TargetTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Target Water Temperature [C]", waterEquip.m_TargetTemp, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Mixed Water Temperature [C]", WaterEquipment( WaterEquipNum ).MixedTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Mixed Water Temperature [C]", waterEquip.m_MixedTemp, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Drain Water Temperature [C]", WaterEquipment( WaterEquipNum ).DrainTemp, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Drain Water Temperature [C]", waterEquip.m_DrainTemp, "System", "Average", waterEquip.Name );
 
-			SetupOutputVariable( "Water Use Equipment Heating Rate [W]", WaterEquipment( WaterEquipNum ).Power, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
+			SetupOutputVariable( "Water Use Equipment Heating Rate [W]", waterEquip.m_Power, "System", "Average", waterEquip.Name );
 
-			if ( WaterEquipment( WaterEquipNum ).Connections == 0 ) {
-				SetupOutputVariable( "Water Use Equipment Heating Energy [J]", WaterEquipment( WaterEquipNum ).Energy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "DISTRICTHEATING", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
+			if ( waterEquip.m_Connections == 0 ) {
+				SetupOutputVariable( "Water Use Equipment Heating Energy [J]", waterEquip.m_Energy, "System", "Sum", waterEquip.Name, _, "DISTRICTHEATING", "WATERSYSTEMS", waterEquip.m_EndUseSubcatName, "Plant" );
 
-			} else if ( WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).StandAlone ) {
-				SetupOutputVariable( "Water Use Equipment Heating Energy [J]", WaterEquipment( WaterEquipNum ).Energy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "DISTRICTHEATING", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
+			} else if ( sm_instances( waterEquip.m_Connections ).m_StandAlone ) {
+				SetupOutputVariable( "Water Use Equipment Heating Energy [J]", waterEquip.m_Energy, "System", "Sum", waterEquip.Name, _, "DISTRICTHEATING", "WATERSYSTEMS", waterEquip.m_EndUseSubcatName, "Plant" );
 
 			} else { // The EQUIPMENT is coupled to a plant loop via a CONNECTIONS object
-				SetupOutputVariable( "Water Use Equipment Heating Energy [J]", WaterEquipment( WaterEquipNum ).Energy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name, _, "ENERGYTRANSFER", "WATERSYSTEMS", WaterEquipment( WaterEquipNum ).EndUseSubcatName, "Plant" );
+				SetupOutputVariable( "Water Use Equipment Heating Energy [J]", waterEquip.m_Energy, "System", "Sum", waterEquip.Name, _, "ENERGYTRANSFER", "WATERSYSTEMS", waterEquip.m_EndUseSubcatName, "Plant" );
 			}
 
-			if ( WaterEquipment( WaterEquipNum ).Zone > 0 ) {
-				SetupOutputVariable( "Water Use Equipment Zone Sensible Heat Gain Rate [W]", WaterEquipment( WaterEquipNum ).SensibleRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
-				SetupOutputVariable( "Water Use Equipment Zone Sensible Heat Gain Energy [J]", WaterEquipment( WaterEquipNum ).SensibleEnergy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+			if ( waterEquip.m_ZoneNum > 0 ) {
+				SetupOutputVariable( "Water Use Equipment Zone Sensible Heat Gain Rate [W]", waterEquip.m_SensibleRate, "System", "Average", waterEquip.Name );
+				SetupOutputVariable( "Water Use Equipment Zone Sensible Heat Gain Energy [J]", waterEquip.m_SensibleEnergy, "System", "Sum", waterEquip.Name );
 
-				SetupOutputVariable( "Water Use Equipment Zone Latent Gain Rate [W]", WaterEquipment( WaterEquipNum ).LatentRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
-				SetupOutputVariable( "Water Use Equipment Zone Latent Gain Energy [J]", WaterEquipment( WaterEquipNum ).LatentEnergy, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+				SetupOutputVariable( "Water Use Equipment Zone Latent Gain Rate [W]", waterEquip.m_LatentRate, "System", "Average", waterEquip.Name );
+				SetupOutputVariable( "Water Use Equipment Zone Latent Gain Energy [J]", waterEquip.m_LatentEnergy, "System", "Sum", waterEquip.Name );
 
-				SetupOutputVariable( "Water Use Equipment Zone Moisture Gain Mass Flow Rate [kg/s]", WaterEquipment( WaterEquipNum ).MoistureRate, "System", "Average", WaterEquipment( WaterEquipNum ).Name );
-				SetupOutputVariable( "Water Use Equipment Zone Moisture Gain Mass [kg]", WaterEquipment( WaterEquipNum ).MoistureMass, "System", "Sum", WaterEquipment( WaterEquipNum ).Name );
+				SetupOutputVariable( "Water Use Equipment Zone Moisture Gain Mass Flow Rate [kg/s]", waterEquip.m_MoistureRate, "System", "Average", waterEquip.Name );
+				SetupOutputVariable( "Water Use Equipment Zone Moisture Gain Mass [kg]", waterEquip.m_MoistureMass, "System", "Sum", waterEquip.Name );
 
-				SetupZoneInternalGain( WaterEquipment( WaterEquipNum ).Zone, "WaterUse:Equipment", WaterEquipment( WaterEquipNum ).Name, IntGainTypeOf_WaterUseEquipment, WaterEquipment( WaterEquipNum ).SensibleRateNoMultiplier, _, _, WaterEquipment( WaterEquipNum ).LatentRateNoMultiplier );
+				SetupZoneInternalGain( waterEquip.m_ZoneNum, "WaterUse:Equipment", waterEquip.Name, IntGainTypeOf_WaterUseEquipment, waterEquip.m_SensibleRateNoMultiplier, _, _, waterEquip.m_LatentRateNoMultiplier );
 
 			}
 
-		} // WaterEquipNum
+		} // waterEquip
 
 		// Setup CONNECTIONS report variables (don't put any on meters; they are metered at WATER USE EQUIPMENT level)
 		// CurrentModuleObject='WaterUse:Connections'
-		for ( WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum ) {
+		for ( WaterConnections_T & waterConn : sm_instances ) {
 
-			SetupOutputVariable( "Water Use Connections Hot Water Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).HotMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Hot Water Mass Flow Rate [kg/s]", waterConn.m_HotMassFlowRate, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Cold Water Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).ColdMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Cold Water Mass Flow Rate [kg/s]", waterConn.m_ColdMassFlowRate, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Total Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).TotalMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Total Mass Flow Rate [kg/s]", waterConn.m_TotalMassFlowRate, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Drain Water Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).DrainMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Drain Water Mass Flow Rate [kg/s]", waterConn.m_DrainMassFlowRate, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Heat Recovery Mass Flow Rate [kg/s]", WaterConnections( WaterConnNum ).RecoveryMassFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Mass Flow Rate [kg/s]", waterConn.m_RecoveryMassFlowRate, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Hot Water Volume Flow Rate [m3/s]", WaterConnections( WaterConnNum ).HotVolFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Hot Water Volume Flow Rate [m3/s]", waterConn.m_HotVolFlowRate, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Cold Water Volume Flow Rate [m3/s]", WaterConnections( WaterConnNum ).ColdVolFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Cold Water Volume Flow Rate [m3/s]", waterConn.m_ColdVolFlowRate, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Total Volume Flow Rate [m3/s]", WaterConnections( WaterConnNum ).TotalVolFlowRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Total Volume Flow Rate [m3/s]", waterConn.m_TotalVolFlowRate, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Hot Water Volume [m3]", WaterConnections( WaterConnNum ).HotVolume, "System", "Sum", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Hot Water Volume [m3]", waterConn.m_HotVolume, "System", "Sum", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Cold Water Volume [m3]", WaterConnections( WaterConnNum ).ColdVolume, "System", "Sum", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Cold Water Volume [m3]", waterConn.m_ColdVolume, "System", "Sum", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Total Volume [m3]", WaterConnections( WaterConnNum ).TotalVolume, "System", "Sum", WaterConnections( WaterConnNum ).Name ); //, &
+			SetupOutputVariable( "Water Use Connections Total Volume [m3]", waterConn.m_TotalVolume, "System", "Sum", waterConn.Name ); //, &
 			// ResourceTypeKey='Water', EndUseKey='DHW', EndUseSubKey=EndUseSubcategoryName, GroupKey='Plant')
 			// tHIS WAS double counting
 
-			SetupOutputVariable( "Water Use Connections Hot Water Temperature [C]", WaterConnections( WaterConnNum ).HotTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Hot Water Temperature [C]", waterConn.m_HotTemp, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Cold Water Temperature [C]", WaterConnections( WaterConnNum ).ColdTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Cold Water Temperature [C]", waterConn.m_ColdTemp, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Drain Water Temperature [C]", WaterConnections( WaterConnNum ).DrainTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Drain Water Temperature [C]", waterConn.m_DrainTemp, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Return Water Temperature [C]", WaterConnections( WaterConnNum ).ReturnTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Return Water Temperature [C]", waterConn.m_ReturnTemp, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Waste Water Temperature [C]", WaterConnections( WaterConnNum ).WasteTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Waste Water Temperature [C]", waterConn.m_WasteTemp, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Heat Recovery Water Temperature [C]", WaterConnections( WaterConnNum ).RecoveryTemp, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Water Temperature [C]", waterConn.m_RecoveryTemp, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Heat Recovery Effectiveness []", WaterConnections( WaterConnNum ).Effectiveness, "System", "Average", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Effectiveness []", waterConn.m_Effectiveness, "System", "Average", waterConn.Name );
 
-			SetupOutputVariable( "Water Use Connections Heat Recovery Rate [W]", WaterConnections( WaterConnNum ).RecoveryRate, "System", "Average", WaterConnections( WaterConnNum ).Name );
-			SetupOutputVariable( "Water Use Connections Heat Recovery Energy [J]", WaterConnections( WaterConnNum ).RecoveryEnergy, "System", "Sum", WaterConnections( WaterConnNum ).Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Rate [W]", waterConn.m_RecoveryRate, "System", "Average", waterConn.Name );
+			SetupOutputVariable( "Water Use Connections Heat Recovery Energy [J]", waterConn.m_RecoveryEnergy, "System", "Sum", waterConn.Name );
 			// Does this go on a meter?
 
 			// To do:  Add report variable for starved flow when tank can't deliver?
 
-			if ( ! WaterConnections( WaterConnNum ).StandAlone ) {
-				SetupOutputVariable( "Water Use Connections Plant Hot Water Energy [J]", WaterConnections( WaterConnNum ).Energy, "System", "Sum", WaterConnections( WaterConnNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "WATERSYSTEMS", _, "Plant" );
+			if ( ! waterConn.m_StandAlone ) {
+				SetupOutputVariable( "Water Use Connections Plant Hot Water Energy [J]", waterConn.m_Energy, "System", "Sum", waterConn.Name, _, "PLANTLOOPHEATINGDEMAND", "WATERSYSTEMS", _, "Plant" );
 			}
 
-		} // WaterConnNum
+		} // waterConn
 
-	}
+	} // WaterConnections_T::GetInput()
 
 	void
-	CalcEquipmentFlowRates( int const WaterEquipNum )
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   August 2006
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Calculate desired hot and cold water flow rates
-
-		// METHODOLOGY EMPLOYED:
-
-		// Using/Aliasing
-		using ScheduleManager::GetCurrentScheduleValue;
-		using Psychrometrics::RhoH2O;
-		using DataEnvironment::WaterMainsTemp;
-		using DataHeatBalance::Zone;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int WaterConnNum;
-
-		// FLOW:
-		WaterConnNum = WaterEquipment( WaterEquipNum ).Connections;
-
-		if ( WaterConnNum > 0 ) {
-			// Get water temperature conditions from the CONNECTIONS object
-			WaterEquipment( WaterEquipNum ).ColdTemp = WaterConnections( WaterConnNum ).ColdTemp;
-			WaterEquipment( WaterEquipNum ).HotTemp = WaterConnections( WaterConnNum ).HotTemp;
-
-		} else {
-			// Get water temperature conditions from the WATER USE EQUIPMENT schedules
-			if ( WaterEquipment( WaterEquipNum ).ColdTempSchedule > 0 ) {
-				WaterEquipment( WaterEquipNum ).ColdTemp = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).ColdTempSchedule );
-			} else { // If no ColdTempSchedule, use the mains temperature
-				WaterEquipment( WaterEquipNum ).ColdTemp = WaterMainsTemp;
-			}
-
-			if ( WaterEquipment( WaterEquipNum ).HotTempSchedule > 0 ) {
-				WaterEquipment( WaterEquipNum ).HotTemp = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).HotTempSchedule );
-			} else { // If no HotTempSchedule, use all cold water
-				WaterEquipment( WaterEquipNum ).HotTemp = WaterEquipment( WaterEquipNum ).ColdTemp;
-			}
-		}
-
-		if ( WaterEquipment( WaterEquipNum ).TargetTempSchedule > 0 ) {
-			WaterEquipment( WaterEquipNum ).TargetTemp = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).TargetTempSchedule );
-		} else { // If no TargetTempSchedule, use all hot water
-			WaterEquipment( WaterEquipNum ).TargetTemp = WaterEquipment( WaterEquipNum ).HotTemp;
-		}
-
-		// Get the requested total flow rate
-		// 11-17-2006 BG Added multipliers in next block
-		if ( WaterEquipment( WaterEquipNum ).Zone > 0 ) {
-			if ( WaterEquipment( WaterEquipNum ).FlowRateFracSchedule > 0 ) {
-				WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).PeakVolFlowRate * GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).FlowRateFracSchedule ) * Zone( WaterEquipment( WaterEquipNum ).Zone ).Multiplier * Zone( WaterEquipment( WaterEquipNum ).Zone ).ListMultiplier;
-			} else {
-				WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).PeakVolFlowRate * Zone( WaterEquipment( WaterEquipNum ).Zone ).Multiplier * Zone( WaterEquipment( WaterEquipNum ).Zone ).ListMultiplier;
-			}
-		} else {
-			if ( WaterEquipment( WaterEquipNum ).FlowRateFracSchedule > 0 ) {
-				WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).PeakVolFlowRate * GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).FlowRateFracSchedule );
-			} else {
-				WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).PeakVolFlowRate;
-			}
-		}
-
-		WaterEquipment( WaterEquipNum ).TotalMassFlowRate = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * RhoH2O( InitConvTemp );
-
-		// Calculate hot and cold water mixing at the tap
-		if ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate > 0.0 ) {
-			// Calculate the flow rates needed to meet the target temperature
-			if ( WaterEquipment( WaterEquipNum ).HotTemp == WaterEquipment( WaterEquipNum ).ColdTemp ) { // Avoid divide by zero
-				// There is no hot water
-				WaterEquipment( WaterEquipNum ).HotMassFlowRate = 0.0;
-
-				// Need a special case for HotTemp < ColdTemp, due to bad user input  (but could happen in a plant loop accidentally)
-
-			} else if ( WaterEquipment( WaterEquipNum ).TargetTemp > WaterEquipment( WaterEquipNum ).HotTemp ) {
-				WaterEquipment( WaterEquipNum ).HotMassFlowRate = WaterEquipment( WaterEquipNum ).TotalMassFlowRate;
-
-			} else {
-				WaterEquipment( WaterEquipNum ).HotMassFlowRate = WaterEquipment( WaterEquipNum ).TotalMassFlowRate * ( WaterEquipment( WaterEquipNum ).TargetTemp - WaterEquipment( WaterEquipNum ).ColdTemp ) / ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
-			}
-
-			if ( WaterEquipment( WaterEquipNum ).HotMassFlowRate < 0.0 ) {
-				// Target temp is colder than the cold water temp; don't allow colder
-				WaterEquipment( WaterEquipNum ).HotMassFlowRate = 0.0;
-			}
-
-			WaterEquipment( WaterEquipNum ).ColdMassFlowRate = WaterEquipment( WaterEquipNum ).TotalMassFlowRate - WaterEquipment( WaterEquipNum ).HotMassFlowRate;
-
-			if ( WaterEquipment( WaterEquipNum ).ColdMassFlowRate < 0.0 ) WaterEquipment( WaterEquipNum ).ColdMassFlowRate = 0.0;
-
-			WaterEquipment( WaterEquipNum ).MixedTemp = ( WaterEquipment( WaterEquipNum ).ColdMassFlowRate * WaterEquipment( WaterEquipNum ).ColdTemp + WaterEquipment( WaterEquipNum ).HotMassFlowRate * WaterEquipment( WaterEquipNum ).HotTemp ) / WaterEquipment( WaterEquipNum ).TotalMassFlowRate;
-		} else {
-			WaterEquipment( WaterEquipNum ).HotMassFlowRate = 0.0;
-			WaterEquipment( WaterEquipNum ).ColdMassFlowRate = 0.0;
-			WaterEquipment( WaterEquipNum ).MixedTemp = WaterEquipment( WaterEquipNum ).TargetTemp;
-		}
-
-	}
-
-	void
-	CalcEquipmentDrainTemp( int const WaterEquipNum )
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   August 2006
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Calculate drainwater temperature and heat and moisture gains to zone.
-
-		// METHODOLOGY EMPLOYED:
-
-		// Using/Aliasing
-		using ScheduleManager::GetCurrentScheduleValue;
-		using Psychrometrics::CPHW;
-		using Psychrometrics::PsyWFnTdbRhPb;
-		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using Psychrometrics::PsyHfgAirFnWTdb;
-		using DataHeatBalFanSys::MAT;
-		using DataHeatBalFanSys::ZoneAirHumRat;
-		using DataHeatBalance::Zone;
-		using DataEnvironment::OutBaroPress;
-		using DataGlobals::SecInHour;
-		using DataHVACGlobals::TimeStepSys;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ZoneNum;
-		Real64 ZoneMAT;
-		Real64 ZoneHumRat;
-		Real64 ZoneHumRatSat;
-		Real64 RhoAirDry;
-		Real64 ZoneMassMax;
-		Real64 FlowMassMax;
-		Real64 MoistureMassMax;
-
-		static std::string const RoutineName( "CalcEquipmentDrainTemp" );
-
-		// FLOW:
-
-		WaterEquipment( WaterEquipNum ).SensibleRate = 0.0;
-		WaterEquipment( WaterEquipNum ).SensibleEnergy = 0.0;
-		WaterEquipment( WaterEquipNum ).LatentRate = 0.0;
-		WaterEquipment( WaterEquipNum ).LatentEnergy = 0.0;
-
-		if ( ( WaterEquipment( WaterEquipNum ).Zone == 0 ) || ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate == 0.0 ) ) {
-			WaterEquipment( WaterEquipNum ).DrainTemp = WaterEquipment( WaterEquipNum ).MixedTemp;
-			WaterEquipment( WaterEquipNum ).DrainMassFlowRate = WaterEquipment( WaterEquipNum ).TotalMassFlowRate;
-
-		} else {
-			ZoneNum = WaterEquipment( WaterEquipNum ).Zone;
-			ZoneMAT = MAT( ZoneNum );
-
-			if ( WaterEquipment( WaterEquipNum ).SensibleFracSchedule == 0 ) {
-				WaterEquipment( WaterEquipNum ).SensibleRate = 0.0;
-				WaterEquipment( WaterEquipNum ).SensibleEnergy = 0.0;
-			} else {
-				WaterEquipment( WaterEquipNum ).SensibleRate = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).SensibleFracSchedule ) * WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).MixedTemp - ZoneMAT );
-				WaterEquipment( WaterEquipNum ).SensibleEnergy = WaterEquipment( WaterEquipNum ).SensibleRate * TimeStepSys * SecInHour;
-			}
-
-			if ( WaterEquipment( WaterEquipNum ).LatentFracSchedule == 0 ) {
-				WaterEquipment( WaterEquipNum ).LatentRate = 0.0;
-				WaterEquipment( WaterEquipNum ).LatentEnergy = 0.0;
-			} else {
-				ZoneHumRat = ZoneAirHumRat( ZoneNum );
-				ZoneHumRatSat = PsyWFnTdbRhPb( ZoneMAT, 1.0, OutBaroPress, RoutineName ); // Humidratio at 100% relative humidity
-				RhoAirDry = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMAT, 0.0 );
-
-				ZoneMassMax = ( ZoneHumRatSat - ZoneHumRat ) * RhoAirDry * Zone( ZoneNum ).Volume; // Max water that can be evaporated to zone
-				FlowMassMax = WaterEquipment( WaterEquipNum ).TotalMassFlowRate * TimeStepSys * SecInHour; // Max water in flow
-				MoistureMassMax = min( ZoneMassMax, FlowMassMax );
-
-				WaterEquipment( WaterEquipNum ).MoistureMass = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).LatentFracSchedule ) * MoistureMassMax;
-				WaterEquipment( WaterEquipNum ).MoistureRate = WaterEquipment( WaterEquipNum ).MoistureMass / ( TimeStepSys * SecInHour );
-
-				WaterEquipment( WaterEquipNum ).LatentRate = WaterEquipment( WaterEquipNum ).MoistureRate * PsyHfgAirFnWTdb( ZoneHumRat, ZoneMAT );
-				WaterEquipment( WaterEquipNum ).LatentEnergy = WaterEquipment( WaterEquipNum ).LatentRate * TimeStepSys * SecInHour;
-			}
-
-			WaterEquipment( WaterEquipNum ).DrainMassFlowRate = WaterEquipment( WaterEquipNum ).TotalMassFlowRate - WaterEquipment( WaterEquipNum ).MoistureRate;
-
-			if ( WaterEquipment( WaterEquipNum ).DrainMassFlowRate == 0.0 ) {
-				WaterEquipment( WaterEquipNum ).DrainTemp = WaterEquipment( WaterEquipNum ).MixedTemp;
-			} else {
-				WaterEquipment( WaterEquipNum ).DrainTemp = ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate * CPHW( InitConvTemp ) * WaterEquipment( WaterEquipNum ).MixedTemp - WaterEquipment( WaterEquipNum ).SensibleRate - WaterEquipment( WaterEquipNum ).LatentRate ) / ( WaterEquipment( WaterEquipNum ).DrainMassFlowRate * CPHW( InitConvTemp ) );
-			}
-		}
-
-	}
-
-	void
-	InitConnections( int const WaterConnNum )
+	WaterConnections_T::InitConnections( )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1033,85 +983,72 @@ namespace WaterUse {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int OutletNode;
-		static bool MyOneTimeFlag( true ); // one time flag                    !DSU
-		static Array1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
 		bool errFlag;
 
-		if ( MyOneTimeFlag ) { //DSU
-			SetLoopIndexFlag.dimension( NumWaterConnections, true ); //DSU
-			MyOneTimeFlag = false; //DSU
-		} //DSU
-
-		if ( SetLoopIndexFlag( WaterConnNum ) ) { //DSU
-			if ( allocated( PlantLoop ) && ! WaterConnections( WaterConnNum ).StandAlone ) { //DSU
+		if ( m_SetLoopIndexFlag ) { // Set to true in WaterConnections_T constructor
+			if ( allocated( PlantLoop ) && ! m_StandAlone ) { //DSU
 				errFlag = false;
-				ScanPlantLoopsForObject( WaterConnections( WaterConnNum ).Name, TypeOf_WaterUseConnection, WaterConnections( WaterConnNum ).PlantLoopNum, WaterConnections( WaterConnNum ).PlantLoopSide, WaterConnections( WaterConnNum ).PlantLoopBranchNum, WaterConnections( WaterConnNum ).PlantLoopCompNum, _, _, _, _, _, errFlag ); //DSU | DSU | DSU | DSU | DSU | DSU | DSU
+				ScanPlantLoopsForObject( Name, TypeOf_WaterUseConnection, m_PlantLoopNum, m_PlantLoopSide, m_PlantLoopBranchNum, m_PlantLoopCompNum, _, _, _, _, _, errFlag ); //DSU | DSU | DSU | DSU | DSU | DSU | DSU
 				if ( errFlag ) { //DSU
 					ShowFatalError( "InitConnections: Program terminated due to previous condition(s)." ); //DSU
 				} //DSU
-				SetLoopIndexFlag( WaterConnNum ) = false; //DSU
+				m_SetLoopIndexFlag = false; //DSU
 			} //DSU
-			if ( WaterConnections( WaterConnNum ).StandAlone ) SetLoopIndexFlag( WaterConnNum ) = false;
+			if ( m_StandAlone ) m_SetLoopIndexFlag = false;
 		}
 
 		// Set the cold water temperature
-		if ( WaterConnections( WaterConnNum ).SupplyTankNum > 0 ) {
-			WaterConnections( WaterConnNum ).ColdSupplyTemp = WaterStorage( WaterConnections( WaterConnNum ).SupplyTankNum ).Twater;
+		if ( m_SupplyTankNum > 0 ) {
+			m_ColdSupplyTemp = WaterStorage( m_SupplyTankNum ).Twater;
 
-		} else if ( WaterConnections( WaterConnNum ).ColdTempSchedule > 0 ) {
-			WaterConnections( WaterConnNum ).ColdSupplyTemp = GetCurrentScheduleValue( WaterConnections( WaterConnNum ).ColdTempSchedule );
+		} else if ( m_ColdTempSchedule > 0 ) {
+			m_ColdSupplyTemp = GetCurrentScheduleValue( m_ColdTempSchedule );
 
 		} else {
-			WaterConnections( WaterConnNum ).ColdSupplyTemp = WaterMainsTemp;
+			m_ColdSupplyTemp = WaterMainsTemp;
 		}
 
 		// Initially set ColdTemp to the ColdSupplyTemp; with heat recovery, ColdTemp will change during iteration
-		WaterConnections( WaterConnNum ).ColdTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp;
+		m_ColdTemp = m_ColdSupplyTemp;
 
 		// Set the hot water temperature
-		if ( WaterConnections( WaterConnNum ).StandAlone ) {
-			if ( WaterConnections( WaterConnNum ).HotTempSchedule > 0 ) {
-				WaterConnections( WaterConnNum ).HotTemp = GetCurrentScheduleValue( WaterConnections( WaterConnNum ).HotTempSchedule );
+		if ( m_StandAlone ) {
+			if ( m_HotTempSchedule > 0 ) {
+				m_HotTemp = GetCurrentScheduleValue( m_HotTempSchedule );
 			} else {
 				// If no HotTempSchedule, use all cold water
-				WaterConnections( WaterConnNum ).HotTemp = WaterConnections( WaterConnNum ).ColdTemp;
+				m_HotTemp = m_ColdTemp;
 			}
 
 		} else {
-			InletNode = WaterConnections( WaterConnNum ).InletNode;
-			OutletNode = WaterConnections( WaterConnNum ).OutletNode;
-
-			if ( BeginEnvrnFlag && WaterConnections( WaterConnNum ).Init ) {
+			if ( BeginEnvrnFlag && m_Init ) {
 				// Clear node initial conditions
-				if ( InletNode > 0 && OutletNode > 0 ) {
-					InitComponentNodes( 0.0, WaterConnections( WaterConnNum ).PeakMassFlowRate, InletNode, OutletNode, WaterConnections( WaterConnNum ).PlantLoopNum, WaterConnections( WaterConnNum ).PlantLoopSide, WaterConnections( WaterConnNum ).PlantLoopBranchNum, WaterConnections( WaterConnNum ).PlantLoopCompNum );
+				if ( m_InletNode > 0 && m_OutletNode > 0 ) {
+					InitComponentNodes( 0.0, m_PeakMassFlowRate, m_InletNode, m_OutletNode, m_PlantLoopNum, m_PlantLoopSide, m_PlantLoopBranchNum, m_PlantLoopCompNum );
 
-					WaterConnections( WaterConnNum ).ReturnTemp = Node( InletNode ).Temp;
+					m_ReturnTemp = Node( m_InletNode ).Temp;
 				}
 
-				WaterConnections( WaterConnNum ).Init = false;
+				m_Init = false;
 			}
 
-			if ( ! BeginEnvrnFlag ) WaterConnections( WaterConnNum ).Init = true;
+			if ( ! BeginEnvrnFlag ) m_Init = true;
 
-			if ( InletNode > 0 ) {
+			if ( m_InletNode > 0 ) {
 				if ( ! DoingSizing ) {
-					WaterConnections( WaterConnNum ).HotTemp = Node( InletNode ).Temp;
+					m_HotTemp = Node( m_InletNode ).Temp;
 				} else {
 					// plant loop will not be running so need a value here.
 					// should change to use tank setpoint but water use connections don't have knowledge of the tank they are fed by
-					WaterConnections( WaterConnNum ).HotTemp = 60.0;
+					m_HotTemp = 60.0;
 				}
 			}
 		}
 
-	}
+	} // WaterConnections_T::InitConnections()
 
 	void
-	CalcConnectionsFlowRates(
-		int const WaterConnNum,
+	WaterConnections_T::CalcConnectionsFlowRates(
 		bool const FirstHVACIteration
 	)
 	{
@@ -1136,72 +1073,56 @@ namespace WaterUse {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int WaterEquipNum;
-		int Loop;
-		int InletNode;
-		int OutletNode;
-		int LoopNum;
-		int LoopSideNum;
-		Real64 AvailableFraction;
-		Real64 DesiredHotWaterMassFlow; // store original request
-
 		// FLOW:
-		WaterConnections( WaterConnNum ).ColdMassFlowRate = 0.0;
-		WaterConnections( WaterConnNum ).HotMassFlowRate = 0.0;
+		m_ColdMassFlowRate = 0.0;
+		m_HotMassFlowRate = 0.0;
 
-		for ( Loop = 1; Loop <= WaterConnections( WaterConnNum ).NumWaterEquipment; ++Loop ) {
-			WaterEquipNum = WaterConnections( WaterConnNum ).WaterEquipment( Loop );
+		for ( int WaterEquipNum : m_localWaterEquipment ) {
+			WaterEquipment_T & waterEquip = WaterEquipment_T::sm_instances( WaterEquipNum );
+			waterEquip.CalcEquipmentFlowRates( );
 
-			CalcEquipmentFlowRates( WaterEquipNum );
-
-			WaterConnections( WaterConnNum ).ColdMassFlowRate += WaterEquipment( WaterEquipNum ).ColdMassFlowRate;
-			WaterConnections( WaterConnNum ).HotMassFlowRate += WaterEquipment( WaterEquipNum ).HotMassFlowRate;
+			m_ColdMassFlowRate += waterEquip.m_ColdMassFlowRate;
+			m_HotMassFlowRate += waterEquip.m_HotMassFlowRate;
 		} // Loop
 
-		WaterConnections( WaterConnNum ).TotalMassFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate + WaterConnections( WaterConnNum ).HotMassFlowRate;
+		m_TotalMassFlowRate = m_ColdMassFlowRate + m_HotMassFlowRate;
 
-		if ( ! WaterConnections( WaterConnNum ).StandAlone ) { // Interact with the plant loop
-			InletNode = WaterConnections( WaterConnNum ).InletNode;
-			OutletNode = WaterConnections( WaterConnNum ).OutletNode;
-			LoopNum = WaterConnections( WaterConnNum ).PlantLoopNum;
-			LoopSideNum = WaterConnections( WaterConnNum ).PlantLoopSide;
-			if ( InletNode > 0 ) {
+		if ( ! m_StandAlone ) { // Interact with the plant loop
+			if ( m_InletNode > 0 ) {
 				if ( FirstHVACIteration ) {
 					// Request the mass flow rate from the demand side manager
 					//        Node(InletNode)%MassFlowRate = WaterConnections(WaterConnNum)%HotMassFlowRate
 					//        Node(InletNode)%MassFlowRateMaxAvail = WaterConnections(WaterConnNum)%PeakMassFlowRate
 					//        Node(InletNode)%MassFlowRateMinAvail = 0.0D0
-					SetComponentFlowRate( WaterConnections( WaterConnNum ).HotMassFlowRate, InletNode, OutletNode, LoopNum, LoopSideNum, WaterConnections( WaterConnNum ).PlantLoopBranchNum, WaterConnections( WaterConnNum ).PlantLoopCompNum );
+					SetComponentFlowRate( m_HotMassFlowRate, m_InletNode, m_OutletNode, m_PlantLoopNum, m_PlantLoopSide, m_PlantLoopBranchNum, m_PlantLoopCompNum );
 
 				} else {
-					DesiredHotWaterMassFlow = WaterConnections( WaterConnNum ).HotMassFlowRate;
-					SetComponentFlowRate( DesiredHotWaterMassFlow, InletNode, OutletNode, LoopNum, LoopSideNum, WaterConnections( WaterConnNum ).PlantLoopBranchNum, WaterConnections( WaterConnNum ).PlantLoopCompNum );
+					Real64 DesiredHotWaterMassFlow = m_HotMassFlowRate;
+					SetComponentFlowRate( DesiredHotWaterMassFlow, m_InletNode, m_OutletNode, m_PlantLoopNum, m_PlantLoopSide, m_PlantLoopBranchNum, m_PlantLoopCompNum );
 					//DSU3   Node(InletNode)%MassFlowRate = MIN(WaterConnections(WaterConnNum)%HotMassFlowRate, Node(InletNode)%MassFlowRateMaxAvail)
 					//DSU3   Node(InletNode)%MassFlowRate = MAX(WaterConnections(WaterConnNum)%HotMassFlowRate, Node(InletNode)%MassFlowRateMinAvail)
 					// readjust if more than actual available mass flow rate determined by the demand side manager
-					if ( ( WaterConnections( WaterConnNum ).HotMassFlowRate != DesiredHotWaterMassFlow ) && ( WaterConnections( WaterConnNum ).HotMassFlowRate > 0.0 ) ) { // plant didn't give what was asked for
+					if ( ( m_HotMassFlowRate != DesiredHotWaterMassFlow ) && ( m_HotMassFlowRate > 0.0 ) ) { // plant didn't give what was asked for
 
 						//DSU3   Node(InletNode)%MassFlowRate = Node(InletNode)%MassFlowRateMaxAvail
 
-						AvailableFraction = DesiredHotWaterMassFlow / WaterConnections( WaterConnNum ).HotMassFlowRate;
+						Real64 AvailableFraction = DesiredHotWaterMassFlow / m_HotMassFlowRate;
 
 						//DSU3    WaterConnections(WaterConnNum)%HotMassFlowRate = Node(InletNode)%MassFlowRateMaxAvail
-						WaterConnections( WaterConnNum ).ColdMassFlowRate = WaterConnections( WaterConnNum ).TotalMassFlowRate - WaterConnections( WaterConnNum ).HotMassFlowRate; // Preserve the total mass flow rate
+						m_ColdMassFlowRate = m_TotalMassFlowRate - m_HotMassFlowRate; // Preserve the total mass flow rate
 
 						// Proportionally reduce hot water and increase cold water for all WATER USE EQUIPMENT
-						for ( Loop = 1; Loop <= WaterConnections( WaterConnNum ).NumWaterEquipment; ++Loop ) {
-							WaterEquipNum = WaterConnections( WaterConnNum ).WaterEquipment( Loop );
-
+						for ( int WaterEquipNum : m_localWaterEquipment ) {
+							WaterEquipment_T & waterEquip = WaterEquipment_T::sm_instances( WaterEquipNum );
 							// Recalculate flow rates for water equipment within connection
-							WaterEquipment( WaterEquipNum ).HotMassFlowRate *= AvailableFraction;
-							WaterEquipment( WaterEquipNum ).ColdMassFlowRate = WaterEquipment( WaterEquipNum ).TotalMassFlowRate - WaterEquipment( WaterEquipNum ).HotMassFlowRate;
+							waterEquip.m_HotMassFlowRate *= AvailableFraction;
+							waterEquip.m_ColdMassFlowRate = waterEquip.m_TotalMassFlowRate - waterEquip.m_HotMassFlowRate;
 
 							// Recalculate mixed water temperature
-							if ( WaterEquipment( WaterEquipNum ).TotalMassFlowRate > 0.0 ) {
-								WaterEquipment( WaterEquipNum ).MixedTemp = ( WaterEquipment( WaterEquipNum ).ColdMassFlowRate * WaterEquipment( WaterEquipNum ).ColdTemp + WaterEquipment( WaterEquipNum ).HotMassFlowRate * WaterEquipment( WaterEquipNum ).HotTemp ) / WaterEquipment( WaterEquipNum ).TotalMassFlowRate;
+							if ( waterEquip.m_TotalMassFlowRate > 0.0 ) {
+								waterEquip.m_MixedTemp = ( waterEquip.m_ColdMassFlowRate * waterEquip.m_ColdTemp + waterEquip.m_HotMassFlowRate * waterEquip.m_HotTemp ) / waterEquip.m_TotalMassFlowRate;
 							} else {
-								WaterEquipment( WaterEquipNum ).MixedTemp = WaterEquipment( WaterEquipNum ).TargetTemp;
+								waterEquip.m_MixedTemp = waterEquip.m_TargetTemp;
 							}
 						} // Loop
 					}
@@ -1209,22 +1130,22 @@ namespace WaterUse {
 			}
 		}
 
-		if ( WaterConnections( WaterConnNum ).SupplyTankNum > 0 ) {
+		if ( m_SupplyTankNum > 0 ) {
 			// Set the demand request for supply water from water storage tank
-			WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-			WaterStorage( WaterConnections( WaterConnNum ).SupplyTankNum ).VdotRequestDemand( WaterConnections( WaterConnNum ).TankDemandID ) = WaterConnections( WaterConnNum ).ColdVolFlowRate;
+			m_ColdVolFlowRate = m_ColdMassFlowRate / RhoH2O( InitConvTemp );
+			WaterStorage( m_SupplyTankNum ).VdotRequestDemand( m_TankDemandID ) = m_ColdVolFlowRate;
 
 			// Check if cold flow rate should be starved by restricted flow from tank
 			// Currently, the tank flow is not really starved--water continues to flow at the tank water temperature
 			// But the user can see the error by comparing report variables for TankVolFlowRate < ColdVolFlowRate
-			WaterConnections( WaterConnNum ).TankVolFlowRate = WaterStorage( WaterConnections( WaterConnNum ).SupplyTankNum ).VdotAvailDemand( WaterConnections( WaterConnNum ).TankDemandID );
-			WaterConnections( WaterConnNum ).TankMassFlowRate = WaterConnections( WaterConnNum ).TankVolFlowRate * RhoH2O( InitConvTemp );
+			m_TankVolFlowRate = WaterStorage( m_SupplyTankNum ).VdotAvailDemand( m_TankDemandID );
+			m_TankMassFlowRate = m_TankVolFlowRate * RhoH2O( InitConvTemp );
 		}
 
-	}
+	} // WaterConnections_T::CalcConnectionsFlowRates()
 
 	void
-	CalcConnectionsDrainTemp( int const WaterConnNum )
+	WaterConnections_T::CalcConnectionsDrainTemp( )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1244,36 +1165,30 @@ namespace WaterUse {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int WaterEquipNum;
-		int Loop;
-		Real64 MassFlowTempSum;
-
 		// FLOW:
-		WaterConnections( WaterConnNum ).DrainMassFlowRate = 0.0;
-		MassFlowTempSum = 0.0;
+		m_DrainMassFlowRate = 0.0;
+		Real64 MassFlowTempSum = 0.0;
 
-		for ( Loop = 1; Loop <= WaterConnections( WaterConnNum ).NumWaterEquipment; ++Loop ) {
-			WaterEquipNum = WaterConnections( WaterConnNum ).WaterEquipment( Loop );
+		for ( int waterEquipNum : m_localWaterEquipment ) {
+			WaterEquipment_T & waterEquip = WaterEquipment_T::sm_instances( waterEquipNum );
+			waterEquip.CalcEquipmentDrainTemp( );
 
-			CalcEquipmentDrainTemp( WaterEquipNum );
-
-			WaterConnections( WaterConnNum ).DrainMassFlowRate += WaterEquipment( WaterEquipNum ).DrainMassFlowRate;
-			MassFlowTempSum += WaterEquipment( WaterEquipNum ).DrainMassFlowRate * WaterEquipment( WaterEquipNum ).DrainTemp;
+			m_DrainMassFlowRate += waterEquip.m_DrainMassFlowRate;
+			MassFlowTempSum += waterEquip.m_DrainMassFlowRate * waterEquip.m_DrainTemp;
 		} // Loop
 
-		if ( WaterConnections( WaterConnNum ).DrainMassFlowRate > 0.0 ) {
-			WaterConnections( WaterConnNum ).DrainTemp = MassFlowTempSum / WaterConnections( WaterConnNum ).DrainMassFlowRate;
+		if ( m_DrainMassFlowRate > 0.0 ) {
+			m_DrainTemp = MassFlowTempSum / m_DrainMassFlowRate;
 		} else {
-			WaterConnections( WaterConnNum ).DrainTemp = WaterConnections( WaterConnNum ).HotTemp;
+			m_DrainTemp = m_HotTemp;
 		}
 
-		WaterConnections( WaterConnNum ).DrainVolFlowRate = WaterConnections( WaterConnNum ).DrainMassFlowRate * RhoH2O( InitConvTemp );
+		m_DrainVolFlowRate = m_DrainMassFlowRate * RhoH2O( InitConvTemp );
 
-	}
+	} // WaterConnections_T::CalcConnectionsDrainTemp()
 
 	void
-	CalcConnectionsHeatRecovery( int const WaterConnNum )
+	WaterConnections_T::CalcConnectionsHeatRecovery( )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1295,97 +1210,92 @@ namespace WaterUse {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 CapacityRatio;
-		Real64 NTU;
-		Real64 ExpVal;
-		Real64 HXCapacityRate;
-		Real64 DrainCapacityRate;
-		Real64 MinCapacityRate;
-
 		// FLOW:
-		if ( ! WaterConnections( WaterConnNum ).HeatRecovery ) {
-			WaterConnections( WaterConnNum ).RecoveryTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp;
-			WaterConnections( WaterConnNum ).ReturnTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp;
-			WaterConnections( WaterConnNum ).WasteTemp = WaterConnections( WaterConnNum ).DrainTemp;
+		if ( ! m_HeatRecovery ) {
+			m_RecoveryTemp = m_ColdSupplyTemp;
+			m_ReturnTemp = m_ColdSupplyTemp;
+			m_WasteTemp = m_DrainTemp;
 
-		} else if ( WaterConnections( WaterConnNum ).TotalMassFlowRate == 0.0 ) {
-			WaterConnections( WaterConnNum ).Effectiveness = 0.0;
-			WaterConnections( WaterConnNum ).RecoveryRate = 0.0;
-			WaterConnections( WaterConnNum ).RecoveryTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp;
-			WaterConnections( WaterConnNum ).ReturnTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp;
-			WaterConnections( WaterConnNum ).WasteTemp = WaterConnections( WaterConnNum ).DrainTemp;
+		} else if ( m_TotalMassFlowRate == 0.0 ) {
+			m_Effectiveness = 0.0;
+			m_RecoveryRate = 0.0;
+			m_RecoveryTemp = m_ColdSupplyTemp;
+			m_ReturnTemp = m_ColdSupplyTemp;
+			m_WasteTemp = m_DrainTemp;
 
 		} else { // WaterConnections(WaterConnNum)%TotalMassFlowRate > 0.0
 
-			{ auto const SELECT_CASE_var( WaterConnections( WaterConnNum ).HeatRecoveryConfig );
-			if ( SELECT_CASE_var == HeatRecoveryConfigPlant ) {
-				WaterConnections( WaterConnNum ).RecoveryMassFlowRate = WaterConnections( WaterConnNum ).HotMassFlowRate;
-			} else if ( SELECT_CASE_var == HeatRecoveryConfigEquipment ) {
-				WaterConnections( WaterConnNum ).RecoveryMassFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate;
-			} else if ( SELECT_CASE_var == HeatRecoveryConfigPlantAndEquip ) {
-				WaterConnections( WaterConnNum ).RecoveryMassFlowRate = WaterConnections( WaterConnNum ).TotalMassFlowRate;
-			}}
-
-			HXCapacityRate = CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).RecoveryMassFlowRate;
-			DrainCapacityRate = CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).DrainMassFlowRate;
-			MinCapacityRate = min( DrainCapacityRate, HXCapacityRate );
-
-			{ auto const SELECT_CASE_var( WaterConnections( WaterConnNum ).HeatRecoveryHX );
-			if ( SELECT_CASE_var == HeatRecoveryHXIdeal ) {
-				WaterConnections( WaterConnNum ).Effectiveness = 1.0;
-
-			} else if ( SELECT_CASE_var == HeatRecoveryHXCounterFlow ) { // Unmixed
-				CapacityRatio = MinCapacityRate / max( DrainCapacityRate, HXCapacityRate );
-				NTU = WaterConnections( WaterConnNum ).HXUA / MinCapacityRate;
-				if ( CapacityRatio == 1.0 ) {
-					WaterConnections( WaterConnNum ).Effectiveness = NTU / ( 1.0 + NTU );
-				} else {
-					ExpVal = std::exp( -NTU * ( 1.0 - CapacityRatio ) );
-					WaterConnections( WaterConnNum ).Effectiveness = ( 1.0 - ExpVal ) / ( 1.0 - CapacityRatio * ExpVal );
+			{ auto const SELECT_CASE_var( m_HeatRecoveryConfig );
+				if ( SELECT_CASE_var == HeatRecoveryConfig_T::Plant ) {
+					m_RecoveryMassFlowRate = m_HotMassFlowRate;
+				} else if ( SELECT_CASE_var == HeatRecoveryConfig_T::Equipment ) {
+					m_RecoveryMassFlowRate = m_ColdMassFlowRate;
+				} else if ( SELECT_CASE_var == HeatRecoveryConfig_T::PlantAndEquip ) {
+					m_RecoveryMassFlowRate = m_TotalMassFlowRate;
 				}
-
-			} else if ( SELECT_CASE_var == HeatRecoveryHXCrossFlow ) { // Unmixed
-				CapacityRatio = MinCapacityRate / max( DrainCapacityRate, HXCapacityRate );
-				NTU = WaterConnections( WaterConnNum ).HXUA / MinCapacityRate;
-				WaterConnections( WaterConnNum ).Effectiveness = 1.0 - std::exp( ( std::pow( NTU, 0.22 ) / CapacityRatio ) * ( std::exp( -CapacityRatio * std::pow( NTU, 0.78 ) ) - 1.0 ) );
-			}}
-
-			WaterConnections( WaterConnNum ).RecoveryRate = WaterConnections( WaterConnNum ).Effectiveness * MinCapacityRate * ( WaterConnections( WaterConnNum ).DrainTemp - WaterConnections( WaterConnNum ).ColdSupplyTemp );
-
-			WaterConnections( WaterConnNum ).RecoveryTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp + WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
-
-			WaterConnections( WaterConnNum ).WasteTemp = WaterConnections( WaterConnNum ).DrainTemp - WaterConnections( WaterConnNum ).RecoveryRate / ( CPHW( InitConvTemp ) * WaterConnections( WaterConnNum ).TotalMassFlowRate );
-
-			if ( WaterConnections( WaterConnNum ).RecoveryTankNum > 0 ) {
-				WaterStorage( WaterConnections( WaterConnNum ).RecoveryTankNum ).VdotAvailSupply( WaterConnections( WaterConnNum ).TankSupplyID ) = WaterConnections( WaterConnNum ).DrainVolFlowRate;
-				WaterStorage( WaterConnections( WaterConnNum ).RecoveryTankNum ).TwaterSupply( WaterConnections( WaterConnNum ).TankSupplyID ) = WaterConnections( WaterConnNum ).WasteTemp;
 			}
 
-			{ auto const SELECT_CASE_var( WaterConnections( WaterConnNum ).HeatRecoveryConfig );
-			if ( SELECT_CASE_var == HeatRecoveryConfigPlant ) {
-				WaterConnections( WaterConnNum ).TempError = 0.0; // No feedback back to the cold supply
-				//WaterConnections(WaterConnNum)%ColdTemp = WaterConnections(WaterConnNum)%ColdSupplyTemp
-				WaterConnections( WaterConnNum ).ReturnTemp = WaterConnections( WaterConnNum ).RecoveryTemp;
+			Real64 HXCapacityRate = CPHW( InitConvTemp ) * m_RecoveryMassFlowRate;
+			Real64 DrainCapacityRate = CPHW( InitConvTemp ) * m_DrainMassFlowRate;
+			Real64 MinCapacityRate = min( DrainCapacityRate, HXCapacityRate );
 
-			} else if ( SELECT_CASE_var == HeatRecoveryConfigEquipment ) {
-				WaterConnections( WaterConnNum ).TempError = std::abs( WaterConnections( WaterConnNum ).ColdTemp - WaterConnections( WaterConnNum ).RecoveryTemp );
+			{ auto const SELECT_CASE_var( m_HeatRecoveryHX );
+				if ( SELECT_CASE_var == HeatRecoveryHX_T::Ideal ) {
+					m_Effectiveness = 1.0;
+					
+				} else if ( SELECT_CASE_var == HeatRecoveryHX_T::CounterFlow ) { // Unmixed
+					Real64 CapacityRatio = MinCapacityRate / max( DrainCapacityRate, HXCapacityRate );
+					Real64 NTU = m_HXUA / MinCapacityRate;
+					if ( CapacityRatio == 1.0 ) {
+						m_Effectiveness = NTU / ( 1.0 + NTU );
+					} else {
+					Real64 ExpVal = std::exp( -NTU * ( 1.0 - CapacityRatio ) );
+					m_Effectiveness = ( 1.0 - ExpVal ) / ( 1.0 - CapacityRatio * ExpVal );
+					}
 
-				WaterConnections( WaterConnNum ).ColdTemp = WaterConnections( WaterConnNum ).RecoveryTemp;
-				WaterConnections( WaterConnNum ).ReturnTemp = WaterConnections( WaterConnNum ).ColdSupplyTemp;
+				} else if ( SELECT_CASE_var == HeatRecoveryHX_T::CrossFlow ) { // Unmixed
+					Real64 CapacityRatio = MinCapacityRate / max( DrainCapacityRate, HXCapacityRate );
+					Real64 NTU = m_HXUA / MinCapacityRate;
+					m_Effectiveness = 1.0 - std::exp( ( std::pow( NTU, 0.22 ) / CapacityRatio ) * ( std::exp( -CapacityRatio * std::pow( NTU, 0.78 ) ) - 1.0 ) );
+				}
+			}
 
-			} else if ( SELECT_CASE_var == HeatRecoveryConfigPlantAndEquip ) {
-				WaterConnections( WaterConnNum ).TempError = std::abs( WaterConnections( WaterConnNum ).ColdTemp - WaterConnections( WaterConnNum ).RecoveryTemp );
+			m_RecoveryRate = m_Effectiveness * MinCapacityRate * ( m_DrainTemp - m_ColdSupplyTemp );
 
-				WaterConnections( WaterConnNum ).ColdTemp = WaterConnections( WaterConnNum ).RecoveryTemp;
-				WaterConnections( WaterConnNum ).ReturnTemp = WaterConnections( WaterConnNum ).RecoveryTemp;
-			}}
+			m_RecoveryTemp = m_ColdSupplyTemp + m_RecoveryRate / ( CPHW( InitConvTemp ) * m_TotalMassFlowRate );
+
+			m_WasteTemp = m_DrainTemp - m_RecoveryRate / ( CPHW( InitConvTemp ) * m_TotalMassFlowRate );
+
+			if ( m_RecoveryTankNum > 0 ) {
+				WaterStorage( m_RecoveryTankNum ).VdotAvailSupply( m_TankSupplyID ) = m_DrainVolFlowRate;
+				WaterStorage( m_RecoveryTankNum ).TwaterSupply( m_TankSupplyID ) = m_WasteTemp;
+			}
+
+			{ auto const SELECT_CASE_var( m_HeatRecoveryConfig );
+				if ( SELECT_CASE_var == HeatRecoveryConfig_T::Plant ) {
+					m_TempError = 0.0; // No feedback back to the cold supply
+					//WaterConnections(WaterConnNum)%ColdTemp = WaterConnections(WaterConnNum)%ColdSupplyTemp
+					m_ReturnTemp = m_RecoveryTemp;
+					
+				} else if ( SELECT_CASE_var == HeatRecoveryConfig_T::Equipment ) {
+					m_TempError = std::abs( m_ColdTemp - m_RecoveryTemp );
+					
+					m_ColdTemp = m_RecoveryTemp;
+					m_ReturnTemp = m_ColdSupplyTemp;
+					
+				} else if ( SELECT_CASE_var == HeatRecoveryConfig_T::PlantAndEquip ) {
+					m_TempError = std::abs( m_ColdTemp - m_RecoveryTemp );
+					
+					m_ColdTemp = m_RecoveryTemp;
+					m_ReturnTemp = m_RecoveryTemp;
+				}
+			} // SELECT_CASE_var( m_HeatRecoveryConfig )
 		}
 
-	}
+	} // WaterConnections_T::CalcConnectionsHeatRecovery()
 
 	void
-	UpdateWaterConnections( int const WaterConnNum )
+	WaterConnections_T::UpdateWaterConnections( )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1407,30 +1317,22 @@ namespace WaterUse {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int OutletNode;
-		int LoopNum;
-
 		// FLOW:
-		InletNode = WaterConnections( WaterConnNum ).InletNode;
-		OutletNode = WaterConnections( WaterConnNum ).OutletNode;
-		LoopNum = WaterConnections( WaterConnNum ).PlantLoopNum;
 
-		if ( InletNode > 0 && OutletNode > 0 ) {
+		if ( m_InletNode > 0 && m_OutletNode > 0 ) {
 			// Pass all variables from inlet to outlet node
-			SafeCopyPlantNode( InletNode, OutletNode, LoopNum );
+			SafeCopyPlantNode( m_InletNode, m_OutletNode, m_PlantLoopNum );
 			// DSU3 Node(OutletNode) = Node(InletNode)
 
 			// Set outlet node variables that are possibly changed
-			Node( OutletNode ).Temp = WaterConnections( WaterConnNum ).ReturnTemp;
+			Node( m_OutletNode ).Temp = m_ReturnTemp;
 			// should add enthalpy update to return?
 		}
 
-	}
+	} // WaterConnections_T::UpdateWaterConnections()
 
 	void
-	ReportStandAloneWaterUse()
+	WaterConnections_T::ReportStandAloneWaterUse()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1454,31 +1356,30 @@ namespace WaterUse {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		int WaterEquipNum;
-
 		// FLOW:
-		for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
-			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( InitConvTemp );
-			WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).ColdVolFlowRate + WaterEquipment( WaterEquipNum ).HotVolFlowRate;
+		for ( WaterEquipment_T & waterEquip : WaterEquipment_T::sm_instances ) {
+			
+			waterEquip.m_ColdVolFlowRate = waterEquip.m_ColdMassFlowRate / RhoH2O( InitConvTemp );
+			waterEquip.m_HotVolFlowRate = waterEquip.m_HotMassFlowRate / RhoH2O( InitConvTemp );
+			waterEquip.m_TotalVolFlowRate = waterEquip.m_ColdVolFlowRate + waterEquip.m_HotVolFlowRate;
 
-			WaterEquipment( WaterEquipNum ).ColdVolume = WaterEquipment( WaterEquipNum ).ColdVolFlowRate * TimeStepSys * SecInHour;
-			WaterEquipment( WaterEquipNum ).HotVolume = WaterEquipment( WaterEquipNum ).HotVolFlowRate * TimeStepSys * SecInHour;
-			WaterEquipment( WaterEquipNum ).TotalVolume = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * TimeStepSys * SecInHour;
+			waterEquip.m_ColdVolume = waterEquip.m_ColdVolFlowRate * TimeStepSys * SecInHour;
+			waterEquip.m_HotVolume = waterEquip.m_HotVolFlowRate * TimeStepSys * SecInHour;
+			waterEquip.m_TotalVolume = waterEquip.m_TotalVolFlowRate * TimeStepSys * SecInHour;
 
-			if ( WaterEquipment( WaterEquipNum ).Connections == 0 ) {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
+			if ( waterEquip.m_Connections == 0 ) {
+				waterEquip.m_Power = waterEquip.m_HotMassFlowRate * CPHW( InitConvTemp ) * ( waterEquip.m_HotTemp - waterEquip.m_ColdTemp );
 			} else {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
+				waterEquip.m_Power = waterEquip.m_HotMassFlowRate * CPHW( InitConvTemp ) * ( waterEquip.m_HotTemp - sm_instances( waterEquip.m_Connections ).m_ReturnTemp );
 			}
 
-			WaterEquipment( WaterEquipNum ).Energy = WaterEquipment( WaterEquipNum ).Power * TimeStepSys * SecInHour;
+			waterEquip.m_Energy = waterEquip.m_Power * TimeStepSys * SecInHour;
 		}
 
 	}
 
 	void
-	ReportWaterUse( int const WaterConnNum )
+	WaterConnections_T::ReportWaterUse( )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1499,49 +1400,43 @@ namespace WaterUse {
 		using Psychrometrics::RhoH2O;
 		using Psychrometrics::CPHW;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		int Loop;
-		int WaterEquipNum;
-
 		// FLOW:
-		for ( Loop = 1; Loop <= WaterConnections( WaterConnNum ).NumWaterEquipment; ++Loop ) {
-			WaterEquipNum = WaterConnections( WaterConnNum ).WaterEquipment( Loop );
-			WaterEquipment( WaterEquipNum ).ColdVolFlowRate = WaterEquipment( WaterEquipNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-			WaterEquipment( WaterEquipNum ).HotVolFlowRate = WaterEquipment( WaterEquipNum ).HotMassFlowRate / RhoH2O( InitConvTemp );
-			WaterEquipment( WaterEquipNum ).TotalVolFlowRate = WaterEquipment( WaterEquipNum ).ColdVolFlowRate + WaterEquipment( WaterEquipNum ).HotVolFlowRate;
+		for ( int WaterEquipNum : m_localWaterEquipment ) {
+			WaterEquipment_T & waterEquip = WaterEquipment_T::sm_instances( WaterEquipNum );
+			waterEquip.m_ColdVolFlowRate = waterEquip.m_ColdMassFlowRate / RhoH2O( InitConvTemp );
+			waterEquip.m_HotVolFlowRate = waterEquip.m_HotMassFlowRate / RhoH2O( InitConvTemp );
+			waterEquip.m_TotalVolFlowRate = waterEquip.m_ColdVolFlowRate + waterEquip.m_HotVolFlowRate;
 
-			WaterEquipment( WaterEquipNum ).ColdVolume = WaterEquipment( WaterEquipNum ).ColdVolFlowRate * TimeStepSys * SecInHour;
-			WaterEquipment( WaterEquipNum ).HotVolume = WaterEquipment( WaterEquipNum ).HotVolFlowRate * TimeStepSys * SecInHour;
-			WaterEquipment( WaterEquipNum ).TotalVolume = WaterEquipment( WaterEquipNum ).TotalVolFlowRate * TimeStepSys * SecInHour;
+			waterEquip.m_ColdVolume = waterEquip.m_ColdVolFlowRate * TimeStepSys * SecInHour;
+			waterEquip.m_HotVolume = waterEquip.m_HotVolFlowRate * TimeStepSys * SecInHour;
+			waterEquip.m_TotalVolume = waterEquip.m_TotalVolFlowRate * TimeStepSys * SecInHour;
 
-			if ( WaterEquipment( WaterEquipNum ).Connections == 0 ) {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterEquipment( WaterEquipNum ).ColdTemp );
+			if ( waterEquip.m_Connections == 0 ) {
+				waterEquip.m_Power = waterEquip.m_HotMassFlowRate * CPHW( InitConvTemp ) * ( waterEquip.m_HotTemp - waterEquip.m_ColdTemp );
 			} else {
-				WaterEquipment( WaterEquipNum ).Power = WaterEquipment( WaterEquipNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterEquipment( WaterEquipNum ).HotTemp - WaterConnections( WaterEquipment( WaterEquipNum ).Connections ).ReturnTemp );
+				waterEquip.m_Power = waterEquip.m_HotMassFlowRate * CPHW( InitConvTemp ) * ( waterEquip.m_HotTemp - sm_instances( waterEquip.m_Connections ).m_ReturnTemp );
 			}
 
-			WaterEquipment( WaterEquipNum ).Energy = WaterEquipment( WaterEquipNum ).Power * TimeStepSys * SecInHour;
+			waterEquip.m_Energy = waterEquip.m_Power * TimeStepSys * SecInHour;
 		}
 
-		WaterConnections( WaterConnNum ).ColdVolFlowRate = WaterConnections( WaterConnNum ).ColdMassFlowRate / RhoH2O( InitConvTemp );
-		WaterConnections( WaterConnNum ).HotVolFlowRate = WaterConnections( WaterConnNum ).HotMassFlowRate / RhoH2O( InitConvTemp );
-		WaterConnections( WaterConnNum ).TotalVolFlowRate = WaterConnections( WaterConnNum ).ColdVolFlowRate + WaterConnections( WaterConnNum ).HotVolFlowRate;
+		m_ColdVolFlowRate = m_ColdMassFlowRate / RhoH2O( InitConvTemp );
+		m_HotVolFlowRate = m_HotMassFlowRate / RhoH2O( InitConvTemp );
+		m_TotalVolFlowRate = m_ColdVolFlowRate + m_HotVolFlowRate;
 
-		WaterConnections( WaterConnNum ).ColdVolume = WaterConnections( WaterConnNum ).ColdVolFlowRate * TimeStepSys * SecInHour;
-		WaterConnections( WaterConnNum ).HotVolume = WaterConnections( WaterConnNum ).HotVolFlowRate * TimeStepSys * SecInHour;
-		WaterConnections( WaterConnNum ).TotalVolume = WaterConnections( WaterConnNum ).TotalVolFlowRate * TimeStepSys * SecInHour;
+		m_ColdVolume = m_ColdVolFlowRate * TimeStepSys * SecInHour;
+		m_HotVolume = m_HotVolFlowRate * TimeStepSys * SecInHour;
+		m_TotalVolume = m_TotalVolFlowRate * TimeStepSys * SecInHour;
 
-		WaterConnections( WaterConnNum ).Power = WaterConnections( WaterConnNum ).HotMassFlowRate * CPHW( InitConvTemp ) * ( WaterConnections( WaterConnNum ).HotTemp - WaterConnections( WaterConnNum ).ReturnTemp );
-		WaterConnections( WaterConnNum ).Energy = WaterConnections( WaterConnNum ).Power * TimeStepSys * SecInHour;
+		m_Power = m_HotMassFlowRate * CPHW( InitConvTemp ) * ( m_HotTemp - m_ReturnTemp );
+		m_Energy = m_Power * TimeStepSys * SecInHour;
 
-		WaterConnections( WaterConnNum ).RecoveryEnergy = WaterConnections( WaterConnNum ).RecoveryRate * TimeStepSys * SecInHour;
+		m_RecoveryEnergy = m_RecoveryRate * TimeStepSys * SecInHour;
 
-	}
+	} // WaterConnections_T::ReportWaterUse()
 
 	void
-	CalcWaterUseZoneGains()
+	WaterConnections_T::CalcWaterUseZoneGains()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1557,44 +1452,43 @@ namespace WaterUse {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
+		using DataHeatBalance::ZoneData;
 		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int WaterEquipNum;
-		int ZoneNum;
 		static bool MyEnvrnFlag( true );
 
 		// FLOW:
-		if ( NumWaterEquipment == 0 ) return;
+		if ( WaterEquipment_T::sm_numInstances == 0 ) return;
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			for ( auto & e : WaterEquipment ) {
-				e.SensibleRate = 0.0;
-				e.SensibleEnergy = 0.0;
-				e.SensibleRateNoMultiplier = 0.0;
-				e.LatentRate = 0.0;
-				e.LatentEnergy = 0.0;
-				e.LatentRateNoMultiplier = 0.0;
-				e.MixedTemp = 0.0;
-				e.TotalMassFlowRate = 0.0;
-				e.DrainTemp = 0.0;
-				e.ColdVolFlowRate = 0.0;
-				e.HotVolFlowRate = 0.0;
-				e.TotalVolFlowRate = 0.0;
-				e.ColdMassFlowRate = 0.0;
-				e.HotMassFlowRate = 0.0;
+			for ( WaterEquipment_T & waterEquip : WaterEquipment_T::sm_instances ) {
+				waterEquip.m_SensibleRate = 0.0;
+				waterEquip.m_SensibleEnergy = 0.0;
+				waterEquip.m_SensibleRateNoMultiplier = 0.0;
+				waterEquip.m_LatentRate = 0.0;
+				waterEquip.m_LatentEnergy = 0.0;
+				waterEquip.m_LatentRateNoMultiplier = 0.0;
+				waterEquip.m_MixedTemp = 0.0;
+				waterEquip.m_TotalMassFlowRate = 0.0;
+				waterEquip.m_DrainTemp = 0.0;
+				waterEquip.m_ColdVolFlowRate = 0.0;
+				waterEquip.m_HotVolFlowRate = 0.0;
+				waterEquip.m_TotalVolFlowRate = 0.0;
+				waterEquip.m_ColdMassFlowRate = 0.0;
+				waterEquip.m_HotMassFlowRate = 0.0;
 			}
 			MyEnvrnFlag = false;
 		}
 
 		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
 
-		for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
-			if ( WaterEquipment( WaterEquipNum ).Zone == 0 ) continue;
-			ZoneNum = WaterEquipment( WaterEquipNum ).Zone;
-			WaterEquipment( WaterEquipNum ).SensibleRateNoMultiplier = WaterEquipment( WaterEquipNum ).SensibleRate / ( Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier ); // CR7401, back out multipliers
-			WaterEquipment( WaterEquipNum ).LatentRateNoMultiplier = WaterEquipment( WaterEquipNum ).LatentRate / ( Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier ); // CR7401, back out multipliers
+		for ( WaterEquipment_T & waterEquip : WaterEquipment_T::sm_instances ) {
+			if ( waterEquip.m_ZoneNum == 0 ) continue;
+			ZoneData & z = Zone( waterEquip.m_ZoneNum );
+			waterEquip.m_SensibleRateNoMultiplier = waterEquip.m_SensibleRate / ( z.Multiplier * z.ListMultiplier ); // CR7401, back out multipliers
+			waterEquip.m_LatentRateNoMultiplier = waterEquip.m_LatentRate / ( z.Multiplier * z.ListMultiplier ); // CR7401, back out multipliers
 		}
 
 		//  ! this routine needs to model approx zone gains for use during sizing
@@ -1605,8 +1499,115 @@ namespace WaterUse {
 		//    END DO
 		//  ENDIF
 
-	}
+	} // CalcWaterUseZoneGains()
 
-} // WaterUse
+	void
+	WaterConnections_T::SimulateWaterUse( bool const FirstHVACIteration )
+	{
 
-} // EnergyPlus
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Peter Graham Ellis
+		//       DATE WRITTEN   August 2006
+		//       MODIFIED       Brent Griffith, March 2010, seperated plant connected to different sim routine
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This routine is called from non zone equipment manager and serves to call
+		// water use and connections that are not connected to a full plant loop
+
+		// METHODOLOGY EMPLOYED:
+
+		// Using/Aliasing
+		using General::RoundSigDigits;
+
+		// Locals
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		int const MaxIterations( 100 );
+		Real64 const Tolerance( 0.1 ); // Make input?
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static int MaxIterationsErrorCount;
+		static bool MyEnvrnFlag( true );
+
+		// FLOW:
+		if ( sm_GetInputFlag ) {
+			GetInput();
+			sm_GetInputFlag = false;
+		}
+
+		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
+			MaxIterationsErrorCount = 0;
+			if ( WaterEquipment_T::sm_numInstances > 0 ) {
+				for ( WaterEquipment_T & waterEquip : WaterEquipment_T::sm_instances ) {
+					waterEquip.m_SensibleRate = 0.0;
+					waterEquip.m_SensibleEnergy = 0.0;
+					waterEquip.m_LatentRate = 0.0;
+					waterEquip.m_LatentEnergy = 0.0;
+					waterEquip.m_MixedTemp = 0.0;
+					waterEquip.m_TotalMassFlowRate = 0.0;
+					waterEquip.m_DrainTemp = 0.0;
+				}
+			}
+
+			if ( sm_numInstances > 0 ) {
+				for ( WaterConnections_T & waterConn : sm_instances ) waterConn.m_TotalMassFlowRate = 0.0;
+			}
+
+			MyEnvrnFlag = false;
+		}
+
+		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
+
+		// Simulate all unconnected WATER USE EQUIPMENT objects
+		for ( WaterEquipment_T & waterEquip : WaterEquipment_T::sm_instances ) {
+			if ( waterEquip.m_Connections == 0 ) {
+				waterEquip.CalcEquipmentFlowRates( );
+				waterEquip.CalcEquipmentDrainTemp( );
+			}
+		} // WaterEquipNum
+
+		ReportStandAloneWaterUse();
+
+		// Simulate WATER USE CONNECTIONS objects and connected WATER USE EQUIPMENT objects
+		for ( WaterConnections_T & waterConn : sm_instances ) {
+			if ( ! waterConn.m_StandAlone ) continue; // only model non plant connections here
+
+			waterConn.InitConnections( );
+
+			int NumIteration = 0;
+
+			while ( true ) {
+				++NumIteration;
+
+				waterConn.CalcConnectionsFlowRates( FirstHVACIteration );
+				waterConn.CalcConnectionsDrainTemp( );
+				waterConn.CalcConnectionsHeatRecovery( );
+
+				if ( waterConn.m_TempError < Tolerance ) {
+					break;
+				} else if ( NumIteration > MaxIterations ) {
+					if ( ! WarmupFlag ) {
+						if ( waterConn.m_MaxIterationsErrorIndex == 0 ) {
+							ShowWarningError( "WaterUse:Connections = " + waterConn.Name + ":  Heat recovery temperature did not converge" );
+							ShowContinueErrorTimeStamp( "" );
+						}
+						ShowRecurringWarningErrorAtEnd( "WaterUse:Connections = " + waterConn.Name + ":  Heat recovery temperature did not converge", waterConn.m_MaxIterationsErrorIndex );
+					}
+					break;
+				}
+
+			} // while true
+
+			waterConn.UpdateWaterConnections( );
+
+			waterConn.ReportWaterUse( );
+
+		} // for WaterConnNum
+
+	} // WaterConnections_T::SimulateWaterUse()
+
+} // namespace WaterUse
+
+} // namespace EnergyPlus

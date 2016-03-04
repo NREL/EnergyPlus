@@ -123,7 +123,6 @@ namespace NonZoneEquipmentManager {
 		using DataGlobals::ZoneSizingCalc;
 		using InputProcessor::GetNumObjectsFound;
 		using WaterThermalTanks::SimulateWaterHeaterStandAlone;
-		using WaterUse::SimulateWaterUse;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -139,7 +138,7 @@ namespace NonZoneEquipmentManager {
 			CountNonZoneEquip = false;
 		}
 
-		SimulateWaterUse( FirstHVACIteration ); // simulate non-plant loop water use.
+		WaterUse::WaterConnections_T::SimulateWaterUse( FirstHVACIteration ); // simulate non-plant loop water use.
 
 		if ( ! ZoneSizingCalc ) {
 			for ( WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum ) {
