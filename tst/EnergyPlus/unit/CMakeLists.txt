@@ -72,6 +72,7 @@ set( test_src
   OutputReportData.unit.cc
   OutputReportTabular.unit.cc
   OutputReportTabularAnnual.unit.cc
+  Photovoltaics.unit.cc
   PierceSurface.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
