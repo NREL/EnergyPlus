@@ -1924,7 +1924,9 @@ namespace EnergyPlus {
 		electricityProd( 0.0 ),
 		electProdRate( 0.0 ),
 		thermalProd( 0.0 ),
-		thermProdRate( 0.0 )
+		thermProdRate( 0.0 ),
+		errCountNegElectProd_( 0 ),
+		errCountNegThermProd_( 0 )
 	{
 
 		std::string const routineName = "GeneratorController constructor ";
@@ -2068,6 +2070,28 @@ namespace EnergyPlus {
 			break;
 		}
 		} // end switch
+
+		//check if generator production has gone wrong and is negative, reset to zero and warn
+		if ( electricPowerOutput < 0.0 ) {
+			if ( errCountNegElectProd_ == 0 ) {
+				ShowWarningMessage( typeOfName + " named " + name  + " is producing negative electric power, check generator inputs." );
+				ShowContinueError( "Electric power production rate =" + General::RoundSigDigits( electricPowerOutput, 4 ) );
+				ShowContinueError( "The power will be set to zero, and the simulation continues... " );
+			}
+			ShowRecurringWarningErrorAtEnd( typeOfName + " named " + name  + " is producing negative electric power ", errCountNegElectProd_,electricPowerOutput, electricPowerOutput );
+			electricPowerOutput = 0.0;
+		}
+
+		if ( thermalPowerOutput < 0.0 ) {
+			if ( errCountNegThermProd_ == 0 ) {
+				ShowWarningMessage( typeOfName + " named " + name  + " is producing negative thermal power, check generator inputs." );
+				ShowContinueError( "Thermal power production rate =" + General::RoundSigDigits( thermalPowerOutput, 4 ) );
+				ShowContinueError( "The power will be set to zero, and the simulation continues... " );
+			}
+			ShowRecurringWarningErrorAtEnd( typeOfName + " named " + name  + " is producing negative thermal power ", errCountNegThermProd_,thermalPowerOutput, thermalPowerOutput );
+			thermalPowerOutput = 0.0;
+		}
+
 	}
 
 	DCtoACInverter::DCtoACInverter(
