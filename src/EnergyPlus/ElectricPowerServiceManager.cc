@@ -2082,16 +2082,6 @@ namespace EnergyPlus {
 			electricPowerOutput = 0.0;
 		}
 
-		if ( thermalPowerOutput < 0.0 ) {
-			if ( errCountNegThermProd_ == 0 ) {
-				ShowWarningMessage( typeOfName + " named " + name  + " is producing negative thermal power, check generator inputs." );
-				ShowContinueError( "Thermal power production rate =" + General::RoundSigDigits( thermalPowerOutput, 4 ) );
-				ShowContinueError( "The power will be set to zero, and the simulation continues... " );
-			}
-			ShowRecurringWarningErrorAtEnd( typeOfName + " named " + name  + " is producing negative thermal power ", errCountNegThermProd_,thermalPowerOutput, thermalPowerOutput );
-			thermalPowerOutput = 0.0;
-		}
-
 	}
 
 	DCtoACInverter::DCtoACInverter(
