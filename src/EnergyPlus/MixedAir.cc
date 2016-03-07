@@ -3279,6 +3279,7 @@ namespace MixedAir {
 						SetupEMSActuator( "Outdoor Air Controller", OAController( OAControllerLoop ).Name, "Air Mass Flow Rate", "[kg/s]", OAController( OAControllerLoop ).EMSOverrideOARate, OAController( OAControllerLoop ).EMSOARateValue );
 					}
 
+					VentMechObjectNum = OAController( OAControllerLoop ).VentMechObjectNum;
 					if ( VentMechObjectNum > 0 ){
 						if (!VentilationMechanical( VentMechObjectNum ).DCVFlag){
 							AirLoopControlInfo( thisAirLoop ).AirLoopDCVFlag = false;
