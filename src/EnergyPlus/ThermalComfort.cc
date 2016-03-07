@@ -584,10 +584,7 @@ namespace ThermalComfort {
 	CalcThermalComfortFanger(
 		Optional_int_const PNum, // People number for thermal comfort control
 		Optional< Real64 const > Tset, // Temperature setpoint for thermal comfort control
-		Optional< Real64 > PMVResult, // PMV value for thermal comfort control
-		Optional< Real64 > setActLevel,
-		Optional< Real64 > setWorkEff,
-		Optional< Real64 > setCloUnit
+		Optional< Real64 > PMVResult // PMV value for thermal comfort control
 	)
 	{
 
@@ -718,16 +715,6 @@ namespace ThermalComfort {
 			} else {
 				ShowSevereError( "PEOPLE=\"" + People( PeopleNum ).Name + "\", Incorrect Clothing Type" );
 			}}
-			// for unit testing
-			if ( present( setActLevel ) ) {
-				ActLevel = setActLevel;
-			}
-			if ( present( setWorkEff ) ) {
-				WorkEff = setWorkEff;
-			}
-			if ( present( setCloUnit ) ) {
-				CloUnit = setCloUnit;
-			}
 
 			if ( IsZoneCV( ZoneNum ) ) {
 				if ( ZoneUCSDCV( ZoneNum ).VforComfort == VComfort_Jet ) {
