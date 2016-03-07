@@ -167,7 +167,6 @@ namespace NodeInputManager {
 		NumCheckNodes = 0;
 		MaxCheckNodes = 0;
 		NodeVarsSetup = false;
-		NodeWetBulbRepReq.deallocate();
 		NodeLists.deallocate();
 	}
 
