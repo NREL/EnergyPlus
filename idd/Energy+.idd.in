@@ -38691,10 +38691,14 @@ AirTerminal:SingleDuct:VAV:NoReheat,
        \key Constant
        \key FixedFlowRate
        \key Scheduled
+       \default Constant
        \note Constant = Constant Minimum Air Flow Fraction (a fraction of Maximum Air Flow Rate)
        \note FixedFlowRate = Fixed Minimum Air Flow Rate (a fixed minimum air volume flow rate)
        \note Scheduled = Scheduled Minimum Air Flow Fraction (a fraction of Maximum Air Flow
   N2 , \field Constant Minimum Air Flow Fraction
+       \type real
+       \autosizable
+       \default autosize
        \note This field is used if the field Zone Minimum Air Flow Input Method is Constant
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
@@ -38702,6 +38706,8 @@ AirTerminal:SingleDuct:VAV:NoReheat,
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
        \units m3/s
+       \autosizable
+       \default autosize
        \note This field is used if the field Zone Minimum Air Flow Input Method is FixedFlowRate.
        \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
        \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
@@ -38817,12 +38823,14 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \type choice
        \key Normal
        \key Reverse
-       \default Normal
+       \key ReverseWithLimits
+       \default ReverseWithLimits
   N7 , \field Maximum Flow per Zone Floor Area During Reheat
        \type real
        \units m3/s-m2
-       \autocalculatable
-       \note Used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = Reverse
+       \autosizable
+       \default autosize
+       \note Used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = ReverseWithLimits
        \note When autocalculating, the maximum flow per zone is set to 0.002032 m3/s-m2 (0.4 cfm/sqft)
        \note This optional field limits the maximum flow allowed in reheat mode.
        \note If this field and the following field are left blank, the maximum flow will not be limited.
@@ -38830,8 +38838,9 @@ AirTerminal:SingleDuct:VAV:Reheat,
        \note Maximum Air Flow Rate.
   N8 , \field Maximum Flow Fraction During Reheat
        \type real
-       \autocalculatable
-       \note Used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = Reverse
+       \autosizable
+       \default autosize
+       \note Used only when Reheat Coil Object Type = Coil:Heating:Water and Damper Heating Action = ReverseWithLimits
        \note When autocalculating, the maximum flow fraction is set to the ratio of
        \note 0.002032 m3/s-m2 (0.4 cfm/sqft) multiplied by the zone floor area and the
        \note Maximum Air Flow Rate.
