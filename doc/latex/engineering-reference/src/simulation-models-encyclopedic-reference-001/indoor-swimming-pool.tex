@@ -1,0 +1,143 @@
+\section{Indoor Swimming Pool }\label{indoor-swimming-pool}
+
+The modeling of the indoor swimming pool is integrated into the surface heat balance procedures already in EnergyPlus with special modifications for radiation between the pool water surface and the surrounding of the space, convection to the surrounding air, evaporation of water, conduction to the pool bottom, and solar radiation absorbed in the pool water, the pool heating system, the presence of a cover, etc. Effectively, the pool water mass is ``added'' to or lumped into the inside face of the surface to which the pool is ``linked''. Conduction through the floor uses the standard CTF formulation, however the heat balance is modified to include other terms specific to the pool water.
+
+Some assumptions of the model are given below, followed by more details of individual components of the model.
+
+\begin{itemize}
+\tightlist
+\item
+  The pool water is lumped together at the inside face of a surface and follows the standard EnergyPlus heat balance methodology with some modifications based on the pool model details described in this section.
+\item
+  The pool itself must reference a surface that is specifically defined as a floor and it covers the entire floor to which it is linked.
+\item
+  The pool cannot by part of a low temperature radiant system (meaning that the construction of the floor cannot have any embedded pipes for heating or cooling). In addition, the floor/pool cannot be defined with any movable insulation or be defined as a ventilated slab.
+\item
+  The pool/floor surface must use the standard CTF solution algorithm.
+\item
+  The pool may be covered and the fraction covered is defined by user input. This value may vary from 0.0 to 1.0.
+\item
+  The pool cover has an impact on evaporation, convection, short-wavelength radiation, and long-wavelength radiation. Each of these has a separate user input that reduces the heat transfer parameter from the maximum achieved with a cover. While the cover percentage is allowed to vary via a user schedule input, each individual parameter for these four heat transfer modes is a fixed constant. For evaporation and convection, the factors simply reduce the amount of heat transfer proportionally. For the radiation terms, the factors reduce the amount of radiation that impacts the surface (pool) directly. The remaining radiation is assumed to be convected off of the pool cover to the zone air.
+\item
+  Pool water heating is achieved by defining the pool as a component on the demand side of a plant loop.
+\item
+  Makeup water replaces any evaporation of water from the pool surface and the user has control over the temperature of the makeup water.
+\item
+  The pool is controlled to a particular temperature defined by user input.
+\item
+  Evaporation of water from the pool is added to the zone moisture balance and affects the zone humidity ratio.
+\item
+  The pool depth is small in comparison to its surface area. Thus, heat transfer through the pool walls is neglected. This is in keeping with the standard assumption of one-dimensional heat transfer through surfaces in EnergyPlus.
+\end{itemize}
+
+\subsection{Energy Balance of Indoor Swimming Pool}\label{energy-balance-of-indoor-swimming-pool}
+
+Heat losses from indoor swimming pools occur by a variety of mechanisms. Sensible heat transfer by convection, latent heat loss associated with evaporation, and net radiative heat exchange with the surrounding occur at the pool surface. Conductive heat losses take place through the bottom of the pool. Other heat gains/losses are associated with the pool water heating system, the replacement of evaporated water with makeup water The energy balance of the indoor swimming pool estimates the heat gains/losses occurring due to:
+
+\begin{itemize}
+\tightlist
+\item
+  convection from the pool water surface
+\item
+  evaporation from the pool water surface
+\item
+  radiation from the pool water surface
+\item
+  conduction to bottom of pool
+\item
+  fresh pool water supply
+\item
+  pool water heating by the plant
+\item
+  changes in the pool water temperature
+\end{itemize}
+
+Detailed methods for estimating these heat losses and gains of the indoor swimming pools are described in the subsections below.
+
+\subsection{Convection from the pool water surface}\label{convection-from-the-pool-water-surface}
+
+The convection between the pool water and the zone are defined using:
+
+\begin{equation}
+Q_{conv} = h \cdot A \cdot (T_p – T_a)
+\end{equation}
+
+\begin{equation}
+h = 0.22 \cdot (T_p – T_a)1/3
+\end{equation}
+
+where
+
+\(Q_{conv}\) = Convective heat transfer rate (Btu/h·ft2)
+
+\(h\) = Convection heat transfer coefficient (Btu/h· ft2·⁰F)
+
+\(T_p\) = Pool water temperature (⁰F)
+
+\(T_a\) = Air temperature over pool (⁰F)
+
+When a cover is present, the cover and the cover convection factor reduce the heat transfer coefficient proportionally. For example, if the pool is half covered and the pool cover reduces convection by 50\%, the convective heat transfer coefficient is reduced by 25\% from the value calculated using the above equation.
+
+\subsection{Evaporation from the pool water surface}\label{evaporation-from-the-pool-water-surface}
+
+There are 5 main variables used to calculate the evaporation rate (\(Q_{evap}\)):
+
+\begin{itemize}
+\tightlist
+\item
+  Pool water surface area
+\item
+  Pool water temperature
+\item
+  Room air temperature
+\item
+  Room air relative humidity
+\item
+  Pool water agitation and Activity Factor
+\end{itemize}
+
+\begin{equation}
+\dot{m}_{evap} = 0.1 \cdot A \cdot AF \cdot (P_w – P_{dp})
+\end{equation}
+
+where
+
+\(\dot{m}_{evap}\) = Evaporation Rate of pool water (lb/h)
+
+\(A\) = Surface area of pool water (ft²)
+
+\(AF\) = Activity factor
+
+\(P_w\) = Saturation vapor pressure at surface of pool water (in. Hg)
+
+\(P_{dp}\) = Partial vapor pressure at room air dew point (in. Hg)
+
+Typical Activity Factor (AF)
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Type of Pool & Activity Factor (AF) \tabularnewline \midrule
+\endhead
+Recreational & 0.5 \tabularnewline
+Physical Therapy & 0.65 \tabularnewline
+Competition & 0.65 \tabularnewline
+Diving & 0.65 \tabularnewline
+Elderly Swimmers & 0.5 \tabularnewline
+Hotel & 0.8 \tabularnewline
+Whirlpool, Spa & 1.0 \tabularnewline
+Condominium & 0.65 \tabularnewline
+Fitness Club & 0.65 \tabularnewline
+Public, Schools & 1.0 \tabularnewline
+Wave Pool, Water Slides & 1.5 – 2.0 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{References}\label{references-030}
+
+ASHRAE (2011). 2011 ASHRAE Handbook -- HVAC Applications. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc., p.5.6-5.9.
+
+Janis, R. and W. Tao (2005). Mechanical and Electrical Systems in Buildings. 3rd ed. Upper Saddle River, NJ: Pearson Education, Inc., p.246.
+
+Kittler, R. (1989). Indoor Natatorium Design and Energy Recycling. ASHRAE Transactions 95(1), p.521-526.
+
+Smith, C., R. Jones, and G. Löf (1993). Energy Requirements and Potential Savings for Heated Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.

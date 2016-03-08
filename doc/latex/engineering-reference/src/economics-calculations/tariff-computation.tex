@@ -1,0 +1,55 @@
+\section{Tariff Computation}\label{tariff-computation}
+
+The EnergyPlus economic (Utility Costs) objects related to computing utility bills include:
+
+\begin{itemize}
+\item
+  UtilityCost:Tariff
+\item
+  UtilityCost:Qualify
+\item
+  UtilityCost:Charge:Simple
+\item
+  UtilityCost:Charge:Block
+\item
+  UtilityCost:Ratchet
+\item
+  UtilityCost:Variable
+\item
+  UtilityCost:Computation
+\end{itemize}
+
+This section builds upon the discussion that appears in the Input Output Reference under the heading ``EnergyPlus Economics.''~ The actual computation of monthly utility bills is not difficult since it is mostly consists of multiplying energy consumptions or demands by the price on a per unit basis and adding different bill components.~ The implementation in EnergyPlus becomes more complex since the objects were crafted to allow a great deal of~ flexibility in specifying a utility tariff while, at the same time, being as simple as possible.
+
+The following discussion on variables and hierarchies is based on the text that appears in the Input Output Reference.
+
+\subsection{Conceptual Framework -- Variables and Hierarchy}\label{conceptual-framework-variables-and-hierarchy}
+
+To understand how to use the utility bill calculation portion of EnergyPlus you first need to understand some important concepts of variables and hierarchy.~ A variable, for the purposes of this section, is simply a named holder of a series of numbers. In most cases, the variable will be a named holder of 12 numbers, one number for each monthly utility bill. Here is a visualization of a variable called Electric Energy Use:
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Month & Electric Energy Use \tabularnewline \midrule
+\endhead
+January & 12143 \tabularnewline
+February & 13454 \tabularnewline
+March & 14178 \tabularnewline
+April & 14876 \tabularnewline
+May & 15343 \tabularnewline
+June & 16172 \tabularnewline
+July & 16105 \tabularnewline
+August & 15762 \tabularnewline
+September & 14543 \tabularnewline
+October & 13987 \tabularnewline
+November & 13287 \tabularnewline
+December & 12403 \tabularnewline
+\bottomrule
+\end{longtable}
+
+In addition, the hierarchy shown in the first diagram in this section also represents dependencies that are included when determining the order of computation.
+
+The resulting order of computation is shown at the bottom of the economics report.
+
+\subsection{Computation Steps}\label{computation-steps}
+
+Once the order that the formulas should be computed is known, the actual evaluation of the formulas is based on a simple Last In First Out (LIFO) stack.~ This is a common method to compute expressions where values are stored on the stack and operands work off of the top of the stack.

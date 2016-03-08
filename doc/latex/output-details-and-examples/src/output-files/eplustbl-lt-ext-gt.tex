@@ -1,0 +1,342 @@
+\section{eplustbl.\textless{}ext\textgreater{}}\label{eplustbl.ext}
+
+The eplustbl file contains the tabular output results that are created when using the following objects:
+
+\begin{itemize}
+\item
+  Output:Table:SummaryReports
+\item
+  Output:Table:TimeBins
+\item
+  Output:Table:Monthly
+\item
+  UtilityCost:Tariff
+\item
+  ComponentCost:Line Item
+\end{itemize}
+
+The format and the extension for the file depends on the setting of the ColumnSeparator field of the Output:Table:Style object. The choices of HTML, tab, fixed, comma, and XML result in eplustbl.htm, eplustbl.tab, eplustbl.txt, eplustbl.csv, eplustbl.xml respectively. The HTML version of the report also includes a table of contents that allows easier navigation through the file.
+
+By default the energy units reported in all of the eplustbl files are in Joules (J) but the UnitConversion field of the Output:Table:Style object allows for the values to be reported in MJ, GJ or in kWh. In addition, the Output:Table:Style object can specify for the tables to be in IP units for all fields.
+
+\subsection{Output:Table:SummaryReports}\label{outputtablesummaryreports}
+
+Several predefined reports are available from the Output:Table:SummaryReports object including the following. (spaces are inserted in names for readability; keys are included in the Input Data Dictionary or by just removing the spaces):
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary
+\end{itemize}
+
+Lists all following applicable tables with ``Summary'' in the name.
+
+\begin{itemize}
+\tightlist
+\item
+  All Monthly
+\end{itemize}
+
+Lists all following applicable tables with ``Monthly'' in the name.
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary And Monthly
+\end{itemize}
+
+Lists all following applicable tables with both ``Summary'' and ``Monthly'' in the name. This does not include the Zone Component Load Summary report.
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary and Sizing Period
+\end{itemize}
+
+Lists the All Summary tables as well as the Zone Component Load report (currently the only Sizing Period report). Please note that the Zone Component Load report does increase the run time because it repeats sizing periods.
+
+\begin{itemize}
+\tightlist
+\item
+  All Summary Monthly and Sizing Period
+\end{itemize}
+
+Lists the All Summary tables, the Monthly tables as well as the Zone Component Load report (currently the only Sizing Period report). Please note that the Zone Component Load report does increase the run time because it repeats sizing periods.
+
+\begin{itemize}
+\item
+  Annual Building Utility Performance Summary
+\item
+  Input Verification and Results Summary
+\item
+  Demand End Use Components Summary
+\item
+  Source Energy End Use Components Summary
+\item
+  Climatic Data Summary
+\item
+  Equipment Summary
+\item
+  Envelope Summary
+\item
+  Surface Shadowing Summary
+\item
+  Shading Summary
+\item
+  Lighting Summary
+\item
+  HVAC Sizing Summary
+\item
+  System Summary
+\item
+  Component Sizing Summary
+\item
+  Outdoor Air Summary
+\item
+  Object Count Summary
+\item
+  Component Cost Economics Summary
+\item
+  Energy Meters
+\item
+  Sensible Heat Gain Summary
+\item
+  Standard 62.1 Summary
+\item
+  Zone Component Load Summary
+\item
+  Zone Cooling Summary Monthly
+\item
+  Zone Heating Summary Monthly
+\item
+  Zone Electric Summary Monthly
+\item
+  Space Gains Monthly
+\item
+  Peak Space Gains Monthly
+\item
+  Space Gain Components At Cooling Peak Monthly
+\item
+  Energy Consumption Electricity Natural Gas Monthly
+\item
+  Energy Consumption Electricity Generated Propane Monthly
+\item
+  Energy Consumption Diesel FuelOil Monthly
+\item
+  Energy Consumption District Heating Cooling Monthly
+\item
+  Energy Consumption Coal Gasoline Monthly
+\item
+  End Use Energy Consumption Electricity Monthly
+\item
+  End Use Energy Consumption NaturalGas Monthly
+\item
+  End Use Energy Consumption Diesel Monthly
+\item
+  End Use Energy Consumption FuelOil Monthly
+\item
+  End Use Energy Consumption Coal Monthly
+\item
+  End Use Energy Consumption Propane Monthly
+\item
+  End Use Energy Consumption Gasoline Monthly
+\item
+  Peak Energy End Use Electricity Part1 Monthly
+\item
+  Peak Energy End Use Electricity Part2 Monthly
+\item
+  Electric Components Of Peak Demand Monthly
+\item
+  Peak Energy End Use NaturalGas Monthly
+\item
+  Peak Energy End Use Diesel Monthly
+\item
+  Peak Energy End Use FuelOil Monthly
+\item
+  Peak Energy End Use Coal Monthly
+\item
+  Peak Energy End Use Propane Monthly
+\item
+  Peak Energy End Use Gasoline Monthly
+\item
+  Setpoints Not Met With Temperatures Monthly
+\item
+  Comfort Report Simple55 Monthly
+\item
+  Unglazed Transpired Solar Collector Summary Monthly
+\item
+  Occupant Comfort Data Summary Monthly
+\item
+  Chiller Report Monthly
+\item
+  Tower Report Monthly
+\item
+  Boiler Report Monthly
+\item
+  DX Report Monthly
+\item
+  Window Report Monthly
+\item
+  Window Energy Report Monthly
+\item
+  Window Zone Summary Monthly
+\item
+  Window Energy Zone Summary Monthly
+\item
+  Average Outdoor Conditions Monthly
+\item
+  Outdoor Conditions Maximum DryBulb Monthly
+\item
+  Outdoor Conditions Minimum DryBulb Monthly
+\item
+  Outdoor Conditions Maximum WetBulb Monthly
+\item
+  Outdoor Conditions Maximum DewPoint Monthly
+\item
+  Outdoor Ground Conditions Monthly
+\item
+  WindowAC Report Monthly
+\item
+  Water Heater Report Monthly
+\item
+  Generator Report Monthly
+\item
+  Daylighting Report Monthly
+\item
+  Coil Report Monthly
+\item
+  PlantLoop Demand Report Monthly
+\item
+  Fan Report Monthly
+\item
+  Pump Report Monthly
+\item
+  CondLoop Demand Report Monthly
+\item
+  Zone Temperature Oscillation Report Monthly
+\item
+  AirLoop System Energy And Water Use Monthly
+\item
+  AirLoop System Component Loads Monthly
+\item
+  AirLoop System Component Energy Use Monthly
+\item
+  Mechanical Ventilation Loads Monthly
+\end{itemize}
+
+Each of these reports is made up of several sub-tables of information. Examples of some of the tables are shown below. To enable all of the reports the single All Summary may be specified.
+
+\subsection{Annual Building Utility Performance Summary}\label{annual-building-utility-performance-summary}
+
+The Annual Building Utility Performance Summary report provides an overview of energy consumption in the building for different end uses. The following is an example this report (some columns may be truncated due to page size). The key used to obtain this report is AnnualBuildingUtilityPerformanceSummary.
+
+In the \emph{Comfort and Setpoint Not Met Summary} sub-table, facility hours represents the total number of hours that any single zone did not meet the comfort or setpoint criteria. It is not weighted by number of zones or number of occupants.
+
+The values in the \emph{End Uses} sub-table are from report meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd).
+
+Report: Annual Building Utility Performance Summary
+
+For: Entire Facility
+
+Timestamp: 2009-02-10 12:39:35
+
+Values gathered over 8760.00 hours
+
+Site and Source Energy
+
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+\toprule 
+~ & Total Energy (GJ) & Energy Per Total Building Area (MJ/m2) & Energy Per Conditioned Building Area (MJ/m2) \tabularnewline \midrule
+\endhead
+Total Site Energy & 194.80 & 210.09 & 210.09 \tabularnewline
+Net Site Energy & 194.80 & 210.09 & 210.09 \tabularnewline
+Total Source Energy & 532.25 & 574.04 & 574.04 \tabularnewline
+Net Source Energy & 532.25 & 574.04 & 574.04 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{XML Tabular Output}\label{xml-tabular-output}
+
+The tables discussed in this section can also be output in an XML format that may be easier for some other programs to extract specific results. An excerpt of the XML file format is shown below. This report presents the same output results as the other tabular report formats but using XML tags.
+
+\textless{}?xml version = ``1.0''?\textgreater{}
+
+\textless{}EnergyPlusTabularReports\textgreater{}
+
+~ \textless{}BuildingName\textgreater{}NONE\textless{}/BuildingName\textgreater{}
+
+~ \textless{}EnvironmentName\textgreater{}Chicago Ohare Intl Ap IL USA TMY3 WMO\# = 725300\textless{}/EnvironmentName\textgreater{}
+
+~ \textless{}WeatherFileLocationTitle\textgreater{}Chicago Ohare Intl Ap IL USA TMY3 WMO\# = 725300\textless{}/WeatherFileLocationTitle\textgreater{}
+
+~ \textless{}ProgramVersion\textgreater{}EnergyPlus, Version 8.0, YMD = 2013.02.18 15:50\textless{}/ProgramVersion\textgreater{}
+
+~ \textless{}SimulationTimestamp\textgreater{}
+
+~~~ \textless{}Date\textgreater{}
+
+~~~~~ 2013-02-18
+
+~~~ \textless{}/Date\textgreater{}
+
+~~~ \textless{}Time\textgreater{}
+
+~~~~~ 15:50:33
+
+~~~ \textless{}/Time\textgreater{}
+
+~ \textless{}/SimulationTimestamp\textgreater{}
+
+\textless{}AnnualBuildingUtilityPerformanceSummary\textgreater{}
+
+~ \textless{}for\textgreater{}Entire Facility\textless{}/for\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}TotalSiteEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}200671.97\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}NetSiteEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}200671.97\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}143.32\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}TotalSourceEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}442504.19\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}316.04\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}316.04\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+~ \textless{}SiteAndSourceEnergy\textgreater{}
+
+~~~ \textless{}name\textgreater{}NetSourceEnergy\textless{}/name\textgreater{}
+
+~~~ \textless{}TotalEnergy units = ``kBtu''\textgreater{}397810.98\textless{}/TotalEnergy\textgreater{}
+
+~~~ \textless{}EnergyPerTotalBuildingArea units = ``kBtu/ft2''\textgreater{}284.12\textless{}/EnergyPerTotalBuildingArea\textgreater{}
+
+~~~ \textless{}EnergyPerConditionedBuildingArea units = ``kBtu/ft2''\textgreater{}284.12\textless{}/EnergyPerConditionedBuildingArea\textgreater{}
+
+~ \textless{}/SiteAndSourceEnergy\textgreater{}
+
+\emph{An actual file will be much longer than this example but follows this format.}

@@ -1,0 +1,21 @@
+\section{Air Loop Simulation Environment Variables}\label{air-loop-simulation-environment-variables}
+
+To facilitate comparing the runtime performance of various solution techniques for the air loop simulation a mechanism to track runtime statistics has been implemented in EnergyPlus. To facilitate debugging the air loop simulation a tracing mechanism operating either at the air loop-level or at the controller-level has been implemented in EnergyPlus.~ To use, one uses the ``Set'' command and the value as indicated.
+
+\subsubsection{TRACK\_AIRLOOP: Runtime performance tracker for air loop simulation}\label{trackux5fairloop-runtime-performance-tracker-for-air-loop-simulation}
+
+Setting to ``yes'' will cause EnergyPlus to track the performance of the air loop simulation at runtime and dump the results in a file named ``statistics.HVACControllers.csv'' upon ending the simulation.~ (Uses logical variable \textbf{TrackAirLoopEnvFlag} in module DataSystemVariables).
+
+Set TRACK\_AIRLOOP = yes
+
+\subsubsection{TRACE\_AIRLOOP: Air loop simulation tracer}\label{traceux5fairloop-air-loop-simulation-tracer}
+
+Setting to ``yes'' will cause EnergyPlus to write to a trace file named ``controller.\textless{}Air Loop Name\textgreater{}.csv'' the converged solutions of all controllers defined on each air loop, at each HVAC iteration.~ (Uses logical variable \textbf{TraceAirLoopEnvFlag} in module DataSystemVariables).
+
+Set TRACE\_AIRLOOP = yes
+
+\subsubsection{TRACE\_HVACCONTROLLER: Individual HVAC controller tracer}\label{traceux5fhvaccontroller-individual-hvac-controller-tracer}
+
+Setting to ``yes'' will cause EnergyPlus to write to a trace file named ``controller.\textless{}Controller Name\textgreater{}.csv'' a detailed description of each controller iteration at each HVAC iteration.~ (Uses logical variable \textbf{TraceControllerEnvFlag} in module DataSystemVariables).
+
+Set TRACE\_HVACCONTROLLER = yes

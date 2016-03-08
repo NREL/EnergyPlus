@@ -1,0 +1,37 @@
+\documentclass[12pt,twoside,letterpaper,titlepage]{report}
+
+\usepackage{amssymb,amsmath}
+\usepackage{mathspec}
+\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{graphicx,grffile}
+\usepackage[table,svgnames]{xcolor}
+\usepackage{longtable,booktabs}
+\usepackage{listings}
+\PassOptionsToPackage{hyphens}{url}\usepackage[breaklinks=true]{hyperref}
+
+
+% Font Settings
+\setmainfont[]{Calibri}
+\setmonofont[Mapping=tex-ansi]{Inconsolata}
+
+% The depth of numbering for sections
+\setcounter{secnumdepth}{4}
+
+% Listing Settings
+\lstset{
+  backgroundcolor=\color{BlanchedAlmond!20!white},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,
+  breaklines=true,
+  frame=bottomline,
+  keepspaces=true,
+}
+
+% Provide better table spacing
+% From https://www.inf.ethz.ch/personal/markusp/teaching/guides/guide-tables.pdf
+\renewcommand{\arraystretch}{1.2} 
+
+\graphicspath{{media/}}
+
+\pagestyle{headings}

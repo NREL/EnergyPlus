@@ -1,0 +1,77 @@
+\section{Zone Controls }\label{zone-controls}
+
+\subsection{Thermostatic Zone Control}\label{thermostatic-zone-control}
+
+The input object ZoneControl:Thermostat provides a way for the zone to be controlled to a specified temperature.~ ZoneControl:Thermostat references a control type schedule and one or more control type objects which in turn reference one or more setpoint schedules.
+
+The control type schedule and the list of control type/name pairs are directly related.~ The schedule defines the type of control that is to be used during for each hour.~ Valid control types are
+
+0 - Uncontrolled (No specification or default)
+
+1 - Single Heating Setpoint
+
+2 - Single Cooling SetPoint
+
+3 - Single Heating/Cooling Setpoint
+
+4 - Dual Setpoint (Heating and Cooling) with deadband
+
+If the schedule referenced in the ZoneControl statement has a value of 4 for a particular hour, this indicates that during that hour ``dual setpoint with deadband control'' is to be used.~ The specific ``dual setpoint with deadband'' control object to be used is specified in the list of control type/name pairs.~ Then the specific control type objects reference the thermostat setpoint temperature schedule to be used.~ Because only one control can be specified for each control type in a ZoneControl statement, there are only four pairs possible in a particular ZoneControl type/name list.~ This is because individual controls can be defined hourly, thus giving the user a full range of flexibility.~ Since putting in the name of the control type directly in the schedule would be very cumbersome, the control types are assigned a number which is used in the hourly schedule profile.
+
+For more information see ZoneControl:Thermostat in the Input Output Reference and succeeding sections in this document.
+
+\subsection{Zone Thermostats}\label{zone-thermostats}
+
+The schema for the current set of four zone thermostats is given below.~ In each case, the keyword is accompanied by an identifying name and either one or two schedule names (depending on whether the control is a single or dual setpoint control).~ The schedule defines a temperature setpoint for the control type.~ The schedule would be defined through the standard schedule syntax described earlier in this document.~ For an uncontrolled zone no thermostat is specified or necessary.~ See the Input Output Reference for more details.
+
+The control type schedule and the list of control type/name pairs are directly related.~ The schedule defines the type of control that is to be used during for each hour.~ Valid Control Types are
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\toprule 
+Control Type Value & Control Type Name \tabularnewline \midrule
+\endhead
+0 & Uncontrolled (No specification or default) \tabularnewline
+1 & Single Heating Setpoint (input object ThermostatSetpoint:SingleHeating) \tabularnewline
+2 & Single Cooling SetPoint (input object ThermostatSetpoint:SingleCooling) \tabularnewline
+3 & Single Heating/Cooling Setpoint (input object ThermostatSetpoint:SingleHeatingOrCooling) \tabularnewline
+4 & Dual Setpoint (Heating and Cooling) with deadband (input object ThermostatSetpoint:DualSetpoint) \tabularnewline
+\bottomrule
+\end{longtable}
+
+For the no thermal comfort control (uncontrolled) case, the control will revert to thermostat control if specified. If the thermal comfort control is specified as ``uncontrolled'' for a particular period and thermostat control is not specified in the input, then conditions will float.
+
+For the ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating case there would be a heating only thermal comfort setpoint temperature.~ The setpoint is calculated based on the selected thermal comfort model and varied throughout the simulation but only heating is allowed with this thermal comfort control type.
+
+~~~~~ CASE (Single Thermal Comfort Heating Setpoint:Fanger)
+
+~~~~~ TempControlType(ZoneNum) = SingleHeatingSetpoint
+
+~~~~~ TempZoneThermostatSetPoint(ZoneNum) = Calculated Zone Setpoint from Fanger heating setpoint PMV
+
+For the ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling case there would be a cooling only thermal comfort setpoint temperature.~ The setpoint is calculated based on the selected thermal comfort model and varied throughout the simulation but only cooling is allowed with this thermal comfort control type.
+
+~~~~~ CASE (Single Thermal Comfort Cooling Setpoint:Fanger)
+
+~~~~~ TempControlType(ZoneNum) = SingleCoolingSetPoint
+
+~~~~~ TempZoneThermostatSetPoint(ZoneNum) = Calculated Zone Setpoint from Fanger cooling setpoint PMV
+
+For the ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling there would be heating and cooling thermal comfort zone control objects.~ The setpoint is calculated based on the selected thermal comfort model and varied throughout the simulation for both heating and cooling. With this thermal comfort control type only 1 setpoint profile is needed or used.
+
+~~~~~ CASE (Single Thermal Comfort Heating Cooling Setpoint:Fanger)
+
+~~~~~ TempControlType(ZoneNum) = SingleHeatCoolSetPoint
+
+~~~~~ TempZoneThermostatSetPoint(ZoneNum) = Calculated Zone Setpoint from Fanger heating and cooling
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ setpoint PMV
+
+For ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint there would be heating and cooling thermal comfort control objects.~ For this case both a heating and cooling setpoint can be calculated based on the selected thermal comfort model for any given time period.~ The thermal comfort setpoint temperature can be varied throughout the simulation for both heating and cooling.
+
+~~~~~ CASE (Dual Thermal Comfort Setpoint with Deadband:Fanger)
+
+~~~~~ TempControlType(ZoneNum) = DualSetPointWithDeadBand
+
+~~~~~ ZoneThermostatSetPointLo(ZoneNum) = Calculated Zone Setpoint from Fanger heating setpoint PMV
+
+~~~~~ ZoneThermostatSetPointHi(ZoneNum) = Calculated Zone Setpoint from Fanger cooling setpoint PMV

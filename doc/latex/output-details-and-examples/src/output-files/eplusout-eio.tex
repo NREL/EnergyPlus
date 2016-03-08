@@ -1,0 +1,1885 @@
+\section{eplusout.eio}\label{eplusout.eio}
+
+This file contains some standard and some optional ``reports''. It is intended to be a somewhat intelligent report of input conditions when they don't fit well in other places or when they aren't substantial enough for their own ``file''. (e.g. \textbf{eplusout.bnd})~ Contents of the file are somewhat documented in various places in the \href{file:///E:/Docs4PDFs/InputOutputReference.pdf}{Input Output Reference document} -- as results of objects. This file or portions of it can be easily imported into spreadsheet programs and more analysis done there. Contents of this file include construction details, location information, ``environment'' information, number of ``warmup'' days required in each environment.
+
+The form of the file is a data dictionary line followed by the data. In this case, the data dictionary line precedes the first ``data'' line though there may be several defining ``dictionary lines''. Each dictionary line will show the field as \textless{}field name\textgreater{} followed by other fields that will be in the data lines. Data will be displayed similarly. Each field of dictionary or data will be separated from the next by a comma ``,'' -- and produce a comma delimited file. However, the lines for data will not be contiguous -- some follow a stream of consciousness of the EnergyPlus execution.
+
+This section is subdivided into grouped sections by type.
+
+Note that the lines in the eplusout.eio file can be extremely long (current limit is 500 characters).
+
+\subsection{Simulation Parameters}\label{simulation-parameters}
+
+! \textless{}Version\textgreater{}, Version ID
+
+~Version, \textless{}version\textgreater{}
+
+! \textless{}Timesteps per Hour\textgreater{}, \#TimeSteps, Minutes per TimeStep
+
+~Timesteps Per Hour,~ 4, 15
+
+! \textless{}Run Control\textgreater{}, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation
+
+~Run Control, Yes, Yes, No, No, Yes
+
+! \textless{}GroundTemperatures\textgreater{}, Months From Jan to Dec \{Deg C\}
+
+~GroundTemperatures,~ 20.03,~ 20.03,~ 20.13,~ 20.30,~ 20.43,~ 20.52,~ 20.62,~ 20.77,~ 20.78,~ 20.55,~ 20.44,~ 20.20
+
+! \textless{}GroundTemperatures:Surface\textgreater{}, Months From Jan to Dec \{Deg C\}
+
+~GroundTemperatures:Surface,~ 18.00,~ 18.00,~ 18.00,~ 18.00,~ 18.00,~ 18.00,~ 18.00,~ 18.00,~ 18.00,~ 18.00,~ 18.00,~ 18.00
+
+! \textless{}GroundTemperatures:Deep\textgreater{}, Months From Jan to Dec \{Deg C\}
+
+~GroundTemperatures:Deep,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00
+
+! \textless{}GroundReflectances\textgreater{}, Months From Jan to Dec \{dimensionless\}
+
+~GroundReflectances,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20
+
+! \textless{}Snow Ground Reflectance Modifiers\textgreater{}, Normal, Daylighting \{dimensionless\}
+
+~Snow Ground Reflectance Modifiers,~~ 1.000,~~ 1.000
+
+! \textless{}Snow GroundReflectances\textgreater{}, Months From Jan to Dec \{dimensionless\}
+
+~Snow GroundReflectances,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20
+
+! \textless{}Snow GroundReflectances For Daylighting\textgreater{}, Months From Jan to Dec \{dimensionless\}
+
+~Snow GroundReflectances For Daylighting,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20
+
+! \textless{}Location\textgreater{}, Location Name, Latitude \{N+/S- Deg\}, Longitude \{E+/W- Deg\},~ Time Zone Number \{GMT+/-\}, Elevation \{m\},~ Standard Pressure at Elevation \{Pa\}
+
+Location,CHICAGO IL USA TMY2-94846 WMO\# = 725300,41.78,-87.75,-6.00,190.00,99063.
+
+! \textless{}Building Information\textgreater{}, Building Name,North Axis \{deg\},Terrain,~ Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value,~ Solar Distribution,Maximum Number of Warmup Days,Minimum Number of Warmup Days
+
+~Building, BUILDING,~ 30.000,City,~~ 0.04000,~~ 0.40000,FullExterior,25,6
+
+! Inside Convection Algorithm, Value \{Simple \textbar{} Detailed \textbar{} CeilingDiffuser\}
+
+Inside Convection Algorithm,Simple
+
+! Outside Convection Algorithm, Value \{Simple \textbar{} Detailed\}
+
+Outside Convection Algorithm,Simple
+
+! Solution Algorithm, Value \{CTF \textbar{} EMPD \textbar{} CONDFD \textbar{} HAMT\}
+
+Solution Algorithm, CTF
+
+! Sky Radiance Distribution, Value \{Anisotropic\}
+
+Sky Radiance Distribution,Anisotropic
+
+! \textless{}Environment:Site Atmospheric Variation\textgreater{},Wind Speed Profile Exponent \{\},Wind Speed Profile Boundary Layer Thickness \{m\},Air Temperature Gradient Coefficient \{K/m\}
+
+Environment:Site Atmospheric Variation,0.330,460.000,6.500000E-003
+
+! \textless{} Input Surface Geometry Information\textgreater{},Starting Corner,Vertex Input Direction,Coordinate System
+
+~SurfaceGeometry,UpperLeftCorner,CounterClockwise,RelativeCoordinateSystem
+
+! \textless{}Program Control Information:Threads/Parallel Sims\textgreater{}, Threading Supported,Maximum Number of Threads, Env Set Threads (OMP\_NUM\_THREADS), EP Env Set Threads (EP\_OMP\_NUM\_THREADS). IDF Set Threads, Number of Threads Used (Interior Radiant Exchange), Number NominalSurface, Number Parallel Sims
+
+Program Control:Threads/Parallel Sims, Yes,2, Not Set, Not Set, Not Set, 2, 60, N/A
+
+The simulation parameters output is the simplest form of reporting in the \textbf{eplusout.eio} file. Each of the ``header'' records (lines starting with an ``!'') are followed immediately by the one and only data line. By and large, these data lines are all merely echoes of the entries in the IDF (or defaulted for blank fields). For most of these descriptions, you can look at the object fields (of same name) in the \href{file:///E:/Docs4PDFs/InputOutputReference.pdf}{Input Output Reference} document.
+
+\subsection{Version}\label{version}
+
+! \textless{}Version\textgreater{}, Version ID
+
+~Version, \textless{}version\textgreater{}
+
+This is the version of the IDF as entered in the IDF file. If it does not match the current EnergyPlus Version, a warning will be issued and show in the \textbf{eplusout.err} file.
+
+\subsection{Timestep}\label{timestep}
+
+! \textless{}Timesteps per Hour\textgreater{}, \#TimeSteps, Minutes per TimeStep
+
+~Timesteps Per Hour,~ 4, 15
+
+This is the number of timesteps in hour as entered in the IDF file as well as showing how many minutes will encompass each timestep (i.e.~4 timesteps in hour = 15 minutes per timestep).
+
+\subsection{SimulationControl}\label{simulationcontrol}
+
+! \textless{}Run Control\textgreater{}, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation, Do HVAC Sizing Simulation
+
+~Run Control, Yes, Yes, Yes, No, Yes, No
+
+This shows how the sizing and running (design days vs.~weather file) will be accomplished. Design days are required for sizing but do not necessarily need to be ``run'' after sizing has completed. Thus, the user can choose to do sizing, not do a ``normal'' calculation with the design day definitions but then go ahead and run the full simulation year. Some advanced sizing methods require also running HVAC Sizing Simulations.
+
+\subsection{Building}\label{building}
+
+! \textless{}Building Information\textgreater{}, Building Name,North Axis \{deg\},Terrain,~ Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value,~ Solar Distribution,Maximum Number of Warmup Days
+
+~Building Information, BUILDING,~ 30.000,City,~~ 0.04000,~~ 0.40000,FullExterior,25
+
+This shows the values put in for the Building Object in the IDF.
+
+\subsection{Inside Convection Algorithm}\label{inside-convection-algorithm}
+
+! \textless{}Inside Convection Algorithm\textgreater{}, Value \{Simple \textbar{} Detailed \textbar{} CeilingDiffuser\}
+
+Inside Convection Algorithm,Simple
+
+This shows the global inside (interior) convection algorithm selected by the IDF value. This may be overridden by zone entries or even surface entries.
+
+\subsection{Outside Convection Algorithm}\label{outside-convection-algorithm}
+
+! \textless{}Outside Convection Algorithm\textgreater{}, Value \{Simple \textbar{} Detailed ! TARP ! MoWitt ! DOE-2 ! BLAST\}
+
+Outside Convection Algorithm,Simple
+
+This shows the global outside (exterior) convection algorithm selected by the IDF value. This may be overridden by zone entries or even surface entries.
+
+\subsection{Solution Algorithm}\label{solution-algorithm}
+
+! \textless{}Solution Algorithm\textgreater{}, Value \{CTF \textbar{} EMPD \textbar{} CONDFD \textbar{} HAMT\},Inside Surface Max Temperature Limit\{C\}
+
+Solution Algorithm, CTF,200
+
+This shows the solution algorithm approach selected by the IDF value and Inside Surface Max Temperature override or default value.
+
+\subsection{Sky Radiance Distribution}\label{sky-radiance-distribution}
+
+! \textless{}Sky Radiance Distribution\textgreater{}, Value \{Anisotropic\}
+
+Sky Radiance Distribution,Anisotropic
+
+This shows the solution algorithm approach used in the simulation. As this value cannot be changed by the user, it is shown for information only.
+
+\subsection{Site Atmospheric Variation}\label{site-atmospheric-variation}
+
+! \textless{}Environment:Site Atmospheric Variation\textgreater{},Wind Speed Profile Exponent \{\},Wind Speed Profile Boundary Layer Thickness \{m\},Air Temperature Gradient Coefficient \{K/m\}
+
+Environment:Site Atmospheric Variation,0.330,460.000,6.500000E-003
+
+This shows actual values used for Site Atmospheric Variations.
+
+\subsection{Shadowing/Sun Position Calculations}\label{shadowingsun-position-calculations}
+
+! \textless{}Shadowing/Sun Position Calculations\textgreater{} {[}Annual Simulations{]}, Calculation Method, Value \{days\}, Allowable Number Figures in Shadow Overlap \{\}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm
+
+Shadowing/Sun Position Calculations, AverageOverDaysInFrequency, 20, 15000, SutherlandHodgman, SimpleSkyDiffuseModeling
+
+This shows how many days between the re-calculation of solar position during a weather file simulation. While a smaller number of days will lead to a more accurate solar position estimation (solar position is important in shadowing as well as determining how much solar enters the space), it also increases the calculation time necessarily to complete the simulation. The default, re-calculating every 20 days, gives a good compromise. The allowable number of figures in a shadow overlap can be increased if necessary for the model. There are two calculation methods available: AverageOverDaysInFrequency (default) and DetailedTimestepIntegration.
+
+\subsection{AirflowNetwork Model:Control}\label{airflownetwork-modelcontrol}
+
+! \textless{}AirflowNetwork Model:Control\textgreater{}, No Multizone or Distribution/Multizone with Distribution/Multizone without Distribution/Multizone with Distribution only during Fan Operation
+
+AirflowNetwork Model:Control,MultizoneWithoutDistribution
+
+This shows the AirflowNetwork Model:Control selected by the IDF value in the object AirflowNetwork:SimulationControl.
+
+\subsection{AirflowNetwork Model:Wind Direction}\label{airflownetwork-modelwind-direction}
+
+! \textless{}AirflowNetwork Model:Wind Direction\textgreater{}, Wind Direction \#1 to n (degree)
+
+AirflowNetwork Model:Wind Direction, 0.0,30.0,60.0,90.0,120.0,150.0,180.0,210.0,240.0,270.0,300.0,330.0
+
+\subsubsection{Field: \textless{}AirflowNetwork Model:Wind Direction\textgreater{}}\label{field-airflownetwork-modelwind-direction}
+
+This field contains the field name ``AirflowNetwork Model:Wind Direction''.
+
+\subsubsection{Field: Wind Direction \#1 to n}\label{field-wind-direction-1-to-n}
+
+These values are the wind directions corresponding to the first through the Nth wind pressure coefficient value. If Wind Pressure Coefficient Type = Input in the AirflowNetwork:SimulationControl object, the wind directions described here are the inputs specified in the AirflowNetwork:MultiZone:WindPressureCoefficientArray object,. If Wind Pressure Coefficient Type = SurfaceAverageCalculation in the AirflowNetwork:SimulationControl object, the wind directions are also described here and are fixed at 30 degree increments.
+
+\subsection{AirflowNetwork Model:Wind Pressure Coefficients}\label{airflownetwork-modelwind-pressure-coefficients}
+
+! \textless{}AirflowNetwork Model:Wind Pressure Coefficients\textgreater{}, Name, Wind Pressure Coefficients \#1 to n (dimensionless)
+
+AirflowNetwork Model:Wind Pressure Coefficients, NFACADE\_WPCVALUE, 0.60,0.48,4.00E-002,-0.56,-0.56,-0.42,-0.37,-0.42,-0.56,-0.56,4.00E-002,0.48
+
+AirflowNetwork Model:Wind Pressure Coefficients, EFACADE\_WPCVALUE, -0.56,4.00E-002,0.48,0.60,0.48,4.00E-002,-0.56,-0.56,-0.42,-0.37,-0.42,-0.56
+
+AirflowNetwork Model:Wind Pressure Coefficients, SFACADE\_WPCVALUE, -0.37,-0.42,-0.56,-0.56,4.00E-002,0.48,0.60,0.48,4.00E-002,-0.56,-0.56,-0.42
+
+AirflowNetwork Model:Wind Pressure Coefficients, WFACADE\_WPCVALUE, -0.56,-0.56,-0.42,-0.37,-0.42,-0.56,-0.56,4.00E-002,0.48,0.60,0.48,4.00E-002
+
+\subsubsection{Field:~ \textless{} AirflowNetwork Model: Wind Pressure Coefficients\textgreater{}}\label{field-airflownetwork-model-wind-pressure-coefficients}
+
+This field contains the constant ``AirflowNetwork Model: Wind Pressure Coefficients'' for each line.
+
+\subsubsection{Field: Name}\label{field-name}
+
+This is the WindPressureCoefficientValues object name entered from the IDF.
+
+\subsubsection{Field: Wind Pressure Coefficients \#1 to n}\label{field-wind-pressure-coefficients-1-to-n}
+
+These values are the wind pressure coefficient for the building façade. These wind pressure coefficient values correspond to the first through Nth wind directions reported above for \textless{}AirflowNetwork Model:Wind Direction\textgreater{}. If Wind Pressure Coefficient Type = INPUT in the AirflowNetwork:SimulationControl object, the wind pressure coefficients described here are the inputs specified in the AirflowNetwork:MultiZone:Wind Pressure Coefficient Values object,. If Wind Pressure Coefficient Type = SurfaceAverageCalculation in the AirflowNetwork:SimulationControl object, the wind pressure coefficients are calculated internally and also described here.
+
+\subsection{Zone Volume Capacitance Multiplier}\label{zone-volume-capacitance-multiplier}
+
+! \textless{}Zone Volume Capacitance Multiplier\textgreater{}, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier
+
+Zone Volume Capacitance Multiplier,~~ 1.000, 1.000, 1.000, 1.000
+
+This shows the zone volume capacitance multipliers selected by the IDF value or defaulted. The object for this item is ZoneCapacitanceMultiplier:ResearchSpecial.
+
+\subsubsection{Field: Sensible Heat Capacity Multiplier}\label{field-sensible-heat-capacity-multiplier}
+
+Value used to alter the effective heat capacitance of the zone air volume.
+
+\subsubsection{Field: Moisture Capacity Multiplier}\label{field-moisture-capacity-multiplier}
+
+Value used to alter the effective moisture capacitance of the zone air volume.
+
+\subsubsection{Field: Carbon Dioxide Capacity Multiplier}\label{field-carbon-dioxide-capacity-multiplier}
+
+Value used to alter the effective carbon dioxide capacitance of the zone air volume.
+
+\subsubsection{Field: Generic Contaminant Capacity Multiplier}\label{field-generic-contaminant-capacity-multiplier}
+
+Value used to alter the effective generic contaminant capacitance of the zone air volume.
+
+\subsubsection{Surface Geometry}\label{surface-geometry}
+
+! \textless{}SurfaceGeometry\textgreater{},Starting Corner,Vertex Input Direction,Coordinate System,Daylight Reference Point Coordinate System,Rectangular (Simple) Surface Coordinate System
+
+Surface Geometry, UpperLeftCorner, Counterclockwise, RelativeCoordinateSystem, RelativeCoordinateSystem, RelativeToZoneOrigin
+
+This shows the expected order of the vertices for each surface. The object for this item is GlobalGeometryRules.
+
+\subsubsection{Field: Starting Corner}\label{field-starting-corner}
+
+Value used to designate which corner the surface(s) start with.
+
+\subsubsection{Field: Vertex Input Direction}\label{field-vertex-input-direction}
+
+Value whether the coordinates for the surface are entered clockwise or counter-clockwise.
+
+\subsubsection{Field: Coordinate System}\label{field-coordinate-system}
+
+Value whether the coordinate system is World/Absolute or Relative.
+
+\subsubsection{Field: Daylight Reference Point Coordinate System}\label{field-daylight-reference-point-coordinate-system}
+
+If daylighting is used, this describes the coordinate system for entering daylight reference points.
+
+\subsubsection{Field: Rectangular (Simple) Surface Coordinate System}\label{field-rectangular-simple-surface-coordinate-system}
+
+For simple surfaces (Wall, Window, Door, and so forth) the coordinate system that is used to describe their starting point.
+
+\subsection{Program Control}\label{program-control}
+
+! \textless{}Program Control Information:Threads/Parallel Sims\textgreater{}, Threading Supported,Maximum Number of Threads, Env Set Threads (OMP\_NUM\_THREADS), EP Env Set Threads (EP\_OMP\_NUM\_THREADS). IDF Set Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number Parallel Sims
+
+Program Control:Threads/Parallel Sims, Yes,2, Not Set, Not Set, Not Set, 2, 60, N/A
+
+More examples:
+
+Program Control:Threads/Parallel Sims, Yes,2, Not Set, Not Set, Not Set, 1, 6, N/A
+
+Program Control:Threads/Parallel Sims, Yes,2, Not Set, Not Set, 1, 1, 46, N/A
+
+This describes the threading that may be active for the simulation. The ProgramControl object is used for this output. As described in that object, only the Interior Radiant Exchange calculation has been exposed to use threading, goal being to speed up calculations but may not always be the most beneficial.
+
+\subsubsection{Field: Threading Supported}\label{field-threading-supported}
+
+The compile of the program has to support threading (OpenMP for now). If it is compiled thus, this field will be \textbf{Yes}.~ Otherwise it will be \textbf{No}.
+
+\subsubsection{Field: Maximum Number of Threads}\label{field-maximum-number-of-threads}
+
+Regardless of whether the compile has supported threading, the system is queried for the number of threads possible -- that number is entered in this field.
+
+\subsubsection{Field: Env Set Threads (OMP\_NUM\_THREADS)}\label{field-env-set-threads-ompux5fnumux5fthreads}
+
+The Environment Variable OMP\_NUM\_THREADS can be manually inserted to set the number of system threads to be used. This would be reported here if set.~ If not set, \textbf{Not Set} will be shown. This is a system variable, but suggest that you use the following environment variable if you want to manually control the number of threads.
+
+\subsubsection{Field: EP Env Set Threads (EP\_OMP\_NUM\_THREADS)}\label{field-ep-env-set-threads-epux5fompux5fnumux5fthreads}
+
+The Environment Variable EP\_OMP\_NUM\_THREADS can be manually inserted to set the number of system threads to be used. This would be reported here if set.~ If not set, \textbf{Not Set} will be shown.
+
+\subsubsection{Field: IDF Set Threads}\label{field-idf-set-threads}
+
+If you use the ProgramControl object in your IDF, you can again manually control the number of threads to be used. This would be reported here if set.~ If not set, \textbf{Not Set} will be shown.
+
+\subsubsection{Field: Number of Threads Used (Interior Radiant Exchange)}\label{field-number-of-threads-used-interior-radiant-exchange}
+
+This is the number of threads that was actually used in the Interior Radiant Exchange routines (which calculates the interior surface temperatures).
+
+\subsubsection{Field: Number Nominal Surfaces}\label{field-number-nominal-surfaces}
+
+This is the number of ``nominal'' surfaces (based on surface objects) that a quick calculation from the program has found. If the number of surfaces is not greater than 30, then the number of threads to be used will be set by the program to 1.
+
+\subsubsection{Field: Number Parallel Sims}\label{field-number-parallel-sims}
+
+This is the number of windowed/parallel simulations being run simultaneously as set by EP-Launch or other scripts distributed with the EnergyPlus program. Third party distributions may also set this item.
+
+\subsection{Climate Group Outputs}\label{climate-group-outputs}
+
+Climate related variables appear in two places for EnergyPlus outputs. Certain objects that are invariant throughout a simulation period have lines appear in the eplusout.eio file:
+
+! \textless{}Environment:Weather Station\textgreater{},Wind Sensor Height Above Ground \{m\},Wind Speed Profile Exponent \{\},Wind Speed Profile Boundary Layer Thickness \{m\},Air Temperature Sensor Height Above Ground \{m\},Wind Speed Modifier Coefficient {[}Internal{]},Temperature Modifier Coefficient {[}Internal{]}
+
+Environment:Weather Station,10.000,0.140,270.000,1.500,1.586,9.750E-003
+
+! \textless{}Environment:Site Atmospheric Variation\textgreater{},Wind Speed Profile Exponent \{\},Wind Speed Profile Boundary Layer Thickness \{m\},Air Temperature Gradient Coefficient \{K/m\}
+
+Environment:Site Atmospheric Variation,~~ 0.220, 370.000, 0.006500
+
+! \textless{}Location\textgreater{}, Location Name, Latitude, Longitude, Time Zone Number, Elevation \{m\}
+
+~Location, DENVER COLORADO,~~ 39.75, -104.87,~~ -7.00,~~~~~ 1610.26
+
+In addition for each ``environment'' simulated, information about the environment is shown:
+
+! \textless{}Environment\textgreater{},Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration \{\#days\}, Source:Start DayOfWeek,~ Use Daylight Savings, Use Holidays, Apply Weekend Holiday Rule
+
+! \textless{}Environment:Special Days\textgreater{}, Special Day Name, Special Day Type, Source, Start Date, Duration \{\#days\}
+
+! \textless{}Environment:Daylight Saving\textgreater{}, Daylight Saving Indicator, Source, Start Date, End Date
+
+! \textless{}Environment:Design\_Day\_Misc\textgreater{},DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,Eq of Time \{minutes\}, Solar Declination Angle \{deg\}, Solar Model
+
+! \textless{}Environment:WarmupDays\textgreater{}, NumberofWarmupDays
+
+For example, a DesignDay:
+
+Environment,PHOENIX ARIZONA WINTER,DesignDay, 1/21, 1/21,MONDAY,~ 1,N/A,N/A,N/A,N/A
+
+Environment:Daylight Saving,No,DesignDay
+
+Environment:Design\_Day\_Misc, 21,1228.9,0.1414,5.7310E-002,1.0,-11.14,-20.0
+
+A Design RunPeriod:
+
+Environment,EXTREME SUMMER WEATHER PERIOD FOR DESIGN,User Selected WeatherFile Typical/Extreme Period (Design) = Summer Extreme,07/13,07/19,SummerDesignDay,~ 7,Use RunPeriod Specified Day,No ,No ,No ,No ,No
+
+Environment:Daylight Saving,No,RunPeriod Object
+
+Environment:WarmupDays,~ 3
+
+Or a RunPeriod (Name listed in the RunPeriod output is dependent on user input for the RunPeriod object -- when a blank is input, the name of the weather file location is used):
+
+Environment,CHICAGO IL TMY2-94846 WMO\# = 725300,WeatherRunPeriod, 1/ 1,12/31,SUNDAY,365,UseWeatherFile,Yes,Yes,No
+
+Environment:Daylight Saving,No,
+
+Environment:Special Days,NEW YEARS DAY,Holiday,WeatherFile, 1/ 1,~ 1
+
+Environment:Special Days,MEMORIAL DAY,Holiday,WeatherFile, 5/31,~ 1
+
+Environment:Special Days,INDEPENDENCE DAY,Holiday,WeatherFile, 7/ 5,~ 1
+
+Environment:Special Days,LABOR DAY,Holiday,WeatherFile, 9/ 6,~ 1
+
+Environment:Special Days,THANKSGIVING,Holiday,WeatherFile,11/25,~ 1
+
+Environment:Special Days,CHRISTMAS,Holiday,WeatherFile,12/25,~ 1
+
+Environment:WarmupDays,~ 4
+
+Note that in this display, using ``weekend rule'' and specific date holidays, the actual observed dates are shown in the output display -- in the example above, Independence Day (July 4) is actually observed on July 5.
+
+\subsection{Climate Group -- Simple Outputs}\label{climate-group-simple-outputs}
+
+Some of the climate outputs are a ``simple'' group. The ``header'' line is followed immediately by the data line.
+
+\subsection{Location}\label{location}
+
+This output represents the location data used for the simulation. Note that if a runperiod is used, the IDF ``Location'' is ignored and the location from the weather file is used instead.
+
+\subsubsection{Field: \textless{}Location\textgreater{}}\label{field-location}
+
+This data field will contain the constant ``Location''.
+
+\subsubsection{Field: Location Name}\label{field-location-name}
+
+This is the name given to the location whether from the IDF or the weather file.
+
+\subsubsection{Field: Latitude}\label{field-latitude}
+
+This is the latitude of the site, expressed decimally. Convention uses positive (+) values for North of the Equator and negative (-) values for South of the Equator. For example, S 30° 15' is expressed as --30.25.
+
+\subsubsection{Field: Longitude}\label{field-longitude}
+
+This is the longitude of the site, expressed decimally. Convention uses positive (+) values for East of the Greenwich meridian and negative (-) values for West of the Greenwich meridian. For example, E 130° 45' is expressed as +130.75.
+
+\subsubsection{Field: Time Zone Number}\label{field-time-zone-number}
+
+This is the time zone of the site, expressed decimally. Convention uses positive (+) values for GMT+ (Longitude East of the Greenwich meridian) and negative (-) values for GMT- (Longitude West of the Greenwich meridian). For example, the time zone for Central US time is --6. The time zone for parts of Newfoundland is --3.5 (-3 hours, 30 minutes from GMT).
+
+\subsubsection{Field: Elevation \{m\}}\label{field-elevation-m}
+
+This is the elevation of the site. Units are m.
+
+\subsection{Weather Station}\label{weather-station}
+
+\subsubsection{Field: Wind Sensor Height Above Ground \{m\}}\label{field-wind-sensor-height-above-ground-m}
+
+This is the wind sensor height above ground for weather data measurements.
+
+\subsubsection{Field: Wind Speed Profile Exponent}\label{field-wind-speed-profile-exponent}
+
+The wind speed profile exponent for the terrain surrounding the weather station.
+
+\subsubsection{Field: Wind Speed Profile Boundary Layer Thickness \{m\}}\label{field-wind-speed-profile-boundary-layer-thickness-m}
+
+The wind speed profile boundary layer thickness {[}m{]} for the terrain surrounding the weather station.
+
+\subsubsection{Field: Air Temperature Sensor Height Above Ground \{m\}}\label{field-air-temperature-sensor-height-above-ground-m}
+
+The height {[}m{]} above ground for the air temperature sensor.
+
+\subsubsection{Field: Wind Speed Modifier Coefficient {[}Internal{]}}\label{field-wind-speed-modifier-coefficient-internal}
+
+This field is intended to provide a slight help for the user to determine the calculations that will be used to calculate the Wind Speed at a specific height at the site.
+
+The full calculation for Local Wind Speed is:
+
+\begin{equation}
+\text{LocalWindSpeed} = \text{WindSpeed}_{met} \left( \frac{\text{WindBoundaryLayerThickness}_{met}}{\text{AirSensorHeight}_{met}} \right)^{\text{WindExponent}_{met}} \left(\frac{\text{HeightAboveGround}_{site/component}}{\text{WindBoundaryLayerThickness}_{site}}\right)^{\text{SiteWindExponent}}
+\end{equation}
+
+The Wind Speed Modifier Coefficient {[}Internal{]} simplifies the equation to:
+
+\begin{equation}
+\text{LocalWindSpeed} = \text{WindSpeed}_{met} \left( \text{WindSpeedModifier} \right) \left(\frac{\text{HeightAboveGround}_{site/component}}{\text{WindBoundaryLayerThickness}_{site}}\right)^{\text{SiteWindExponent}}
+\end{equation}
+
+Where the Wind Speed Modifier encapsulates:
+
+\begin{equation}
+\text{WindSpeedModifier} = \left( \frac{\text{WindBoundaryLayerThickness}_{met}}{\text{AirSensorHeight}_{met}} \right)^{\text{WindExponent}_{met}}
+\end{equation}
+
+Where
+
+\begin{itemize}
+\tightlist
+\item
+  met = meteorological station
+\item
+  site = location of the building
+\end{itemize}
+
+\subsubsection{Field:Temperature Modifier Coefficient {[}Internal{]}}\label{fieldtemperature-modifier-coefficient-internal}
+
+This field is intended to provide a slight help for the user to determine the calculations that will be used to calculate the air (dry-bulb) or wet-bulb temperature at a specific height at the site.
+
+The site temperature modifier coefficient (TMC) is defined as:
+
+\begin{equation}
+TMC = frac{ \text{AtmosphericTemperatureGradient} \cdot \text{EarthRadius} \cdot \text{TemperatureSensorHeight}_{met} }
+                  { \text{EarthRadius} + \text{TemperatureSensorHeight}_{met} }
+\end{equation}
+
+Then, the temperature at a height above ground is calculated as:
+
+\begin{equation}
+\text{ActualTemperature} = \text{Temperature}_{met} + TMC - 
+    frac{ \text{TemperatureGradient}_{site} * \text{EarthRadius} * \text{Height}_{site/component} }
+        { \text{EarthRadius} + \text{Height}_{site/component} }
+\end{equation}
+
+Where
+
+\begin{itemize}
+\tightlist
+\item
+  met = meteorological station
+\item
+  site = location of the building
+\end{itemize}
+
+\subsection{Site Atmospheric Variation}\label{site-atmospheric-variation-1}
+
+\subsubsection{Field: Wind Speed Profile Exponent}\label{field-wind-speed-profile-exponent-1}
+
+The wind speed profile exponent for the terrain surrounding the site.
+
+\subsubsection{Field: Wind Speed Profile Boundary Layer Thickness \{m\}}\label{field-wind-speed-profile-boundary-layer-thickness-m-1}
+
+The wind speed profile boundary layer thickness {[}m{]} for the terrain surrounding the site.
+
+\subsubsection{Field: Air Temperature Gradient Coefficient \{K/m\}}\label{field-air-temperature-gradient-coefficient-km}
+
+The air temperature gradient coefficient {[}K/m{]} is a research option that allows the user to control the variation in outdoor air temperature as a function of height above ground. The real physical value is 0.0065 K/m.
+
+\subsection{Ground Temperatures and Ground Reflectances}\label{ground-temperatures-and-ground-reflectances}
+
+! \textless{}Site:GroundTemperature:BuildingSurface\textgreater{}, Months From Jan to Dec \{Deg C\}
+
+~Site:GroundTemperature:BuildingSurface,~ 20.03,~ 20.03,~ 20.13,~ 20.30,~ 20.43,~ 20.52,~ 20.62,~ 20.77,~ 20.78,~ 20.55,~ 20.44,~ 20.20
+
+! \textless{}Site:GroundTemperature:FCfactorMethod\textgreater{}, Months From Jan to Dec \{Deg C\}
+
+~Site:GroundTemperature:FCfactorMethod,~ -1.89,~ -3.06,~ -0.99,~~ 2.23,~ 10.68,~ 17.20,~ 21.60,~ 22.94,~ 20.66,~ 15.60,~~ 8.83,~~ 2.56
+
+! \textless{}Site:GroundTemperature:Shallow\textgreater{}, Months From Jan to Dec \{Deg C\}
+
+~Site:GroundTemperature:Shallow,~ 13.00,~ 13.00,~ 13.00,~ 13.00,~ 13.00,~ 13.00,~ 13.00,~ 13.00,~ 13.00,~ 13.00,~ 13.00,~ 13.00
+
+! \textless{}Site:GroundTemperature:Deep\textgreater{}, Months From Jan to Dec \{Deg C\}
+
+~Site:GroundTemperature:Deep,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00,~ 16.00
+
+! \textless{}Site:GroundReflectance\textgreater{}, Months From Jan to Dec \{dimensionless\}
+
+~Site:GroundReflectance,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20
+
+! \textless{}Site:GroundReflectance:SnowModifier\textgreater{}, Normal, Daylighting \{dimensionless\}
+
+~Site:GroundReflectance:SnowModifier,~~ 1.000,~~ 1.000
+
+! \textless{}Site:GroundReflectance:Snow\textgreater{}, Months From Jan to Dec \{dimensionless\}
+
+~Site:GroundReflectance:Snow,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20
+
+! \textless{}Site:GroundReflectance:Snow:Daylighting\textgreater{}, Months From Jan to Dec \{dimensionless\}
+
+~Site:GroundReflectance:Snow:Daylighting,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20,~ 0.20
+
+\subsection{Ground Temperatures}\label{ground-temperatures}
+
+\subsubsection{Field: \textless{}GroundTemperatures\textgreater{}}\label{field-groundtemperatures}
+
+This data field will contain the constant ``GroundTemperatures''.
+
+\subsubsection{Field Set (1-12) -- Monthly Ground Temperatures}\label{field-set-1-12-monthly-ground-temperatures}
+
+There will be a set of 12 numbers -- the ground temperatures by month: January, February, March, April, May, June, July, August, September, October, November, December. Units are C.
+
+\subsection{Ground Reflectance}\label{ground-reflectance}
+
+\subsubsection{Field: \textless{}GroundReflectances\textgreater{}}\label{field-groundreflectances}
+
+This data field will contain the constant ``GroundReflectances''.
+
+\subsubsection{Field Set (1-12) -- Monthly Ground Reflectances}\label{field-set-1-12-monthly-ground-reflectances}
+
+There will be a set of 12 numbers -- the ground reflectances by month: January, February, March, April, May, June, July, August, September, October, November, December.
+
+\subsection{Snow Ground Reflectance Modifiers}\label{snow-ground-reflectance-modifiers}
+
+It is generally accepted that snow resident on the ground increases the basic ground reflectance. EnergyPlus allows the user control over the snow ground reflectance for both ``normal ground reflected solar'' calculations (see above) and snow ground reflected solar modified for daylighting. This is the display of the user entered or defaulted values.
+
+\subsubsection{Field: \textless{}Snow Ground Reflectance~ Modifiers\textgreater{}}\label{field-snow-ground-reflectance-modifiers}
+
+This data field will contain the constant ``Snow Ground Reflectance Modifiers''.
+
+\subsubsection{Field: Normal}\label{field-normal}
+
+This field is the value between 0.0 and 1.0 which is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values).
+
+\begin{equation}
+\text{GroundReflectance}_{used} = \text{GroundReflectance} \cdot \text{Modifier}_{snow}
+\end{equation}
+
+\subsubsection{Field: Daylighting}\label{field-daylighting}
+
+This field is the value between 0.0 and 1.0 which is used to modified the basic monthly ground reflectance when snow is on the ground (from design day input or weather data values).
+
+\begin{equation}
+\text{DaylightingGroundReflectance}_{used} = \text{GroundReflectance} \cdot \text{Modifier}_{snow}
+\end{equation}
+
+\subsection{Snow Ground Reflectance}\label{snow-ground-reflectance}
+
+This data is the result of using the Snow Ground Reflectance modifier and the basic Ground Reflectance value.
+
+\subsubsection{Field: \textless{}GroundReflectances\textgreater{}}\label{field-groundreflectances-1}
+
+This data field will contain the constant ``Snow GroundReflectances''.
+
+\subsubsection{Field Set (1-12) -- Monthly Snow Ground Reflectances}\label{field-set-1-12-monthly-snow-ground-reflectances}
+
+There will be a set of 12 numbers -- the snow ground reflectances by month: January, February, March, April, May, June, July, August, September, October, November, December.
+
+\subsection{Snow Ground Reflectance for Daylighting}\label{snow-ground-reflectance-for-daylighting}
+
+This data is the result of using the Snow Ground Reflectance for Daylighting modifier and the basic Ground Reflectance value.
+
+\subsubsection{Field: \textless{} Snow GroundReflectances For Daylighting\textgreater{}}\label{field-snow-groundreflectances-for-daylighting}
+
+This data field will contain the constant ``Snow GroundReflectances For Daylighting''.
+
+\subsubsection{Field Set (1-12) -- Monthly Snow Ground Reflectances for Daylighting}\label{field-set-1-12-monthly-snow-ground-reflectances-for-daylighting}
+
+There will be a set of 12 numbers -- the ground reflectances by month: January, February, March, April, May, June, July, August, September, October, November, December.
+
+\subsection{Climate Group -- Not so Simple Outputs}\label{climate-group-not-so-simple-outputs}
+
+For each ``environment'' simulated, a set of outputs is produced. The header group is only produced once. (The Design Day Misc header is produced only when there is a design day.)
+
+! \textless{}Environment\textgreater{},Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration \{\#days\}, Source:Start DayOfWeek,~ Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule
+
+! \textless{}Environment:Special Days\textgreater{}, Special Day Name, Special Day Type, Source, Start Date, Duration \{\#days\}
+
+! \textless{}Environment:Daylight Saving\textgreater{}, Daylight Saving Indicator, Source, Start Date, End Date
+
+! \textless{}Environment:Design\_Day\_Misc\textgreater{},DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,Eq of Time \{minutes\}, Solar Declination Angle \{deg\}
+
+! \textless{}Environment:WarmupDays\textgreater{}, NumberofWarmupDays
+
+\subsection{Environment Line}\label{environment-line}
+
+Each ``environment'' (i.e.~each design day, each run period) will have this line shown.
+
+\subsubsection{Field: \textless{}Environment\textgreater{}}\label{field-environment}
+
+This field will have the constant ``Environment'' in each data line.
+
+\subsubsection{Field:Environment Name}\label{fieldenvironment-name}
+
+This field will have the ``name'' of the environment. For example, the design day name (``DENVER COLORADO SUMMER'') or the weather file location name (``BOULDER CO TMY2-94018 WMO\# = 724699'').
+
+\subsubsection{Field:Environment Type}\label{fieldenvironment-type}
+
+This will be ``DesignDay'' for design day simulations and ``WeatherRunPeriod'' for weather file run periods.
+
+\subsubsection{Field: Start Date}\label{field-start-date}
+
+This will have the month/day that is the starting date for the simulation period. (7/21, for example).
+
+\subsubsection{Field: End Date}\label{field-end-date}
+
+This will have the month/day that is the ending date for the simulation period. Note that Design Days are only one day and the end date will be the same as the start date.
+
+\subsubsection{Field: Start DayOfWeek}\label{field-start-dayofweek}
+
+For weather periods, this will be the designated starting day of week. For design days, it will be the day type listed for the design day object (e.g.~SummerDesignDay or Monday).
+
+\subsubsection{Field: Duration \{\#days\}}\label{field-duration-days}
+
+Number of days in the simulation period will be displayed in this field. Design days are only 1 day.
+
+\subsubsection{Field: Source:Start DayOfWeek}\label{field-sourcestart-dayofweek}
+
+This field will list the ``source'' of the Start Day of Week listed earlier. This could be the RunPeriod command from the input file or the Weather File if the UseWeatherFile option was chosen in the RunPeriod command. For design days, this will be ``N/A''.
+
+\subsubsection{Field: Use Daylight Saving}\label{field-use-daylight-saving}
+
+This field reflects the value of the Use Daylight Saving field of the RunPeriod object. For design days, this will be ``N/A''.
+
+\subsubsection{Field: Use Holidays}\label{field-use-holidays}
+
+This field reflects the value of the Use Holidays field of the RunPeriod object. For design days, this will be ``N/A''.
+
+\subsubsection{Field: Apply Weekend Holiday Rule}\label{field-apply-weekend-holiday-rule}
+
+For design days, this will show ``N/A''. For weather periods, this will show ``Yes'' if the Apply Weekend Holiday Rule is in effect or ``No'' if it isn't.
+
+\subsection{Design Day Misc Line}\label{design-day-misc-line}
+
+This line is shown for each design day simulated. It is not shown for sizing runs that do not subsequently use the design day as a simulation period.
+
+\subsubsection{Field: \textless{}Design Day Misc\textgreater{}}\label{field-design-day-misc}
+
+This is a constant that will display ``Environment:Design\_Day\_Misc''.
+
+\subsubsection{Field:DayOfYear}\label{fielddayofyear}
+
+This is the Julian day of year for the design day (i.e.~Jan 1 is 1, Jan 31 is 31).
+
+\subsubsection{Field:ASHRAE A Coeff}\label{fieldashrae-a-coeff}
+
+Reference ASHRAE HOF 30 -- this is the A Coefficient in Wh/m\(^{2}\) calculated from EnergyPlus.
+
+\subsubsection{Field:ASHRAE B Coeff}\label{fieldashrae-b-coeff}
+
+Likewise, this is the ASHRAE B Coefficient (dimensionless).
+
+\subsubsection{Field:ASHRAE C Coeff}\label{fieldashrae-c-coeff}
+
+This is the ASHRAE C Coefficient (dimensionless).
+
+\subsubsection{Field:Solar Constant-Annual Variation}\label{fieldsolar-constant-annual-variation}
+
+This is the calculated solar constant using the given location and day of year.
+
+\subsubsection{Field:Eq of Time \{minutes\}}\label{fieldeq-of-time-minutes}
+
+This is the calculated equation of time (minutes) using the given location and day of year.
+
+\subsubsection{Field: Solar Declination Angle \{deg\}}\label{field-solar-declination-angle-deg}
+
+This is the solar declination angle for the day of year, degrees.
+
+\subsection{Special Day Line}\label{special-day-line}
+
+\subsubsection{Field: \textless{}Environment:Special Days\textgreater{}}\label{field-environmentspecial-days}
+
+This is a constant that will display ``Environment:SpecialDays''.
+
+\subsubsection{Field: Special Day Name}\label{field-special-day-name}
+
+This is the user designated name for the special day.
+
+\subsubsection{Field: Special Day Type}\label{field-special-day-type}
+
+This shows the type for the special day (e.g.~Holiday).
+
+\subsubsection{Field: Source}\label{field-source}
+
+This will display ``InputFile'' if it was specified in the IDF or ``WeatherFile'' if it came from the weather file designation.
+
+\subsubsection{Field: Start Date}\label{field-start-date-1}
+
+This shows the starting date as month/day (e.g.~7/4).
+
+\subsubsection{Field: Duration \{\#days\}}\label{field-duration-days-1}
+
+This shows how many days the special day period continues. Usually, holidays are only 1 day duration.
+
+\subsection{Daylight Saving Line}\label{daylight-saving-line}
+
+\subsubsection{Field: \textless{}Environment:Daylight Saving\textgreater{}}\label{field-environmentdaylight-saving}
+
+This is a constant that will display ``Environment:DaylightSaving''.
+
+\subsubsection{Field: Daylight Saving Indicator}\label{field-daylight-saving-indicator}
+
+This will be Yes if daylight saving is to be observed for this simulation period and No if it is not observed.
+
+\subsubsection{Field: Source}\label{field-source-1}
+
+This will show the source of this invocation (or non-invocation). Inputfile if DaylightSavingPeriod was entered (weather files only), WeatherFile if used in the Weather file and selected in the Run Period object and designday if that was the source.
+
+\subsubsection{Field: Start Date}\label{field-start-date-2}
+
+If the indicator field is Yes, then this field will be displayed and the month/day (e.g.~4/1) that starts the daylight saving period observance will be shown.
+
+\subsubsection{Field: End Date}\label{field-end-date-1}
+
+If the indicator field is Yes, then this field will be displayed and the month/day (e.g.~10/29) that ends the daylight saving period observance will be shown.
+
+\subsection{Zone Outputs}\label{zone-outputs}
+
+\subsection{Zone Summary}\label{zone-summary}
+
+An overall zone summary is shown:
+
+! \textless{}Zone Summary\textgreater{}, Number of Zones, Number of Surfaces, Number of SubSurfaces
+
+~Zone Summary,19,158,12
+
+As indicated:
+
+\subsubsection{Field: \textless{}Zone Summary\textgreater{}}\label{field-zone-summary}
+
+This field contains the constant ``Zone Summary''.
+
+\subsubsection{Field: Number of Zones}\label{field-number-of-zones}
+
+This field will contain the number of zones in the simulation.
+
+\subsubsection{Field: Number of Surfaces}\label{field-number-of-surfaces}
+
+This field will contain the total number of surfaces in the simulation.
+
+\subsubsection{Field: Number of SubSurfaces}\label{field-number-of-subsurfaces}
+
+This field will contain the total number of subsurfaces in the simulation.
+
+\subsection{Zone Information}\label{zone-information}
+
+Each zone is summarized in a simple set of statements as shown below:
+
+! \textless{}Zone Information\textgreater{},Zone Name,North Axis \{deg\},Origin X-Coordinate \{m\},Origin Y-Coordinate \{m\},Origin Z-Coordinate \{m\},Centroid X-Coordinate \{m\},Centroid Y-Coordinate \{m\},Centroid Z-Coordinate \{m\},Type,Zone Multiplier,Zone List Multiplier,Minimum X \{m\},Maximum X \{m\},Minimum Y \{m\},Maximum Y \{m\},Minimum Z \{m\},Maximum Z \{m\},Ceiling Height \{m\},Volume \{m3\},Zone Inside Convection Algorithm \{Simple-Detailed-CeilingDiffuser-TrombeWall\},Zone Outside Convection Algorithm \{Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST\}, Floor Area \{m2\},Exterior Gross Wall Area \{m2\},Exterior Net Wall Area \{m2\},Exterior Window Area \{m2\}, Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces,~ Part of Total Building Area
+
+~Zone Information, PSI FOYER,0.0,0.00,0.00,0.00,8.56,-1.80,2.27,1,1,1,0.00,16.34,-9.51,4.88,0.00,6.10,3.81,368.12,Detailed,DOE-2,96.62,70.61,70.61,106.84,6,1,0,Yes
+
+~Zone Information, DORM ROOMS AND COMMON AREAS,0.0,0.00,6.10,0.00,18.35,11.26,3.05,1,1,1,3.57,31.70,-4.75,25.36,0.00,6.10,6.10,2723.33,Detailed,DOE-2,445.93,312.15,267.56,52.59,10,22,0,Yes
+
+~Zone Information, LEFT FORK,-36.9,0.00,31.70,0.00,22.07,31.46,3.05,1,1,1,19.02,25.12,25.36,37.55,0.00,6.10,6.10,453.07,Detailed,DOE-2,74.32,185.81,135.64,50.17,6,10,0,Yes
+
+~Zone Information, MIDDLE FORK,0.0,4.88,35.36,0.00,31.21,28.41,3.05,1,1,1,25.12,37.31,21.70,35.11,0.00,6.10,6.10,453.07,Detailed,DOE-2,74.32,185.81,155.71,30.10,6,1,0,Yes
+
+~Zone Information, RIGHT FORK,36.9,10.97,35.36,0.00,36.70,20.48,3.05,1,1,1,29.99,43.40,15.85,25.12,0.00,6.10,6.10,453.07,Detailed,DOE-2,74.32,185.81,135.64,50.17,6,10,0,Yes
+
+\subsubsection{Field:~ \textless{}Zone Information\textgreater{}}\label{field-zone-information}
+
+This field contains the constant ``Zone Information'' for each line.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name}
+
+This is the Zone Name entered from the IDF.
+
+\subsubsection{Field: North Axis \{deg\}}\label{field-north-axis-deg}
+
+This is the North Axis entered from the IDF. Note that this is used primarily in the positioning of the building when ``relative'' coordinates are used -- however, the Daylighting:Detailed object also uses this. Units are degrees, clockwise from North.
+
+\subsubsection{Fields: X Origin \{m\}, Y Origin \{m\}, Z Origin \{m\}}\label{fields-x-origin-m-y-origin-m-z-origin-m}
+
+This is the origin vertex \{X,Y,Z\} entered from the IDF. Note that this is used primarily in the positioning of the building when ``relative'' coordinates are used -- however, the Daylighting:Detailed object also uses this. Units are m.
+
+\subsubsection{Field: TypeField: Multiplier}\label{field-typefield-multiplier}
+
+This is the multiplier (must be integral) entered from the IDF.
+
+\subsubsection{Field: Ceiling Height \{m\}}\label{field-ceiling-height-m}
+
+This is the ceiling height entered, if any, in the IDF. Ceiling height is also heuristically calculated from the surfaces in the zone -- however, not all surfaces need to be entered and sometimes the user would rather enter the ceiling height for the zone. If no ceiling height was entered (i.e.~the default of 0), this field will be the calculated value. A minor warning message will be issued if the calculated value is significantly different than the entered value. Units are m.
+
+\subsubsection{Field: Volume \{m3\}}\label{field-volume-m3}
+
+Like the ceiling height, this user can also enter this value in the IDF. Volume is also heuristically calculated using the ceiling height (entered or calculated) as well as the calculated floor area (see later field). If entered here, this value will be used rather than the calculated value. A minor warning message will be issued if the calculated value is significantly different than the entered value. Units are m\(^{3}\).
+
+\subsubsection{Field: Zone Inside Convection Algorithm \{Simple-Detailed-CeilingDiffuser-TrombeWall\}}\label{field-zone-inside-convection-algorithm-simple-detailed-ceilingdiffuser-trombewall}
+
+The interior convection algorithm shown earlier (entire building) can be overridden for each zone by an entry in the individual Zone object. This field will show which method is operational for the zone.
+
+\subsubsection{Field:~ Floor Area \{m2\}}\label{field-floor-area-m2}
+
+This field is calculated from the floor surfaces entered for the zone. Units are m\(^{2}\).
+
+\subsubsection{Field: Exterior Gross Wall Area \{m2\}}\label{field-exterior-gross-wall-area-m2}
+
+This field is calculated from the exterior wall surfaces entered for the zone. Units are m\(^{2}\).
+
+\subsubsection{Field: Exterior Net Wall Area \{m2\}}\label{field-exterior-net-wall-area-m2}
+
+This field is calculated from the exterior wall surfaces entered for the zone. Any sub-surface area is subtracted from the gross area to determine the net area. Units are m\(^{2}\).
+
+\subsubsection{Field: Exterior Window Area \{m2\}}\label{field-exterior-window-area-m2}
+
+This field is calculated from the exterior window surfaces entered for the zone. Units are m\(^{2}\).
+
+\subsubsection{Field: Number of Surfaces}\label{field-number-of-surfaces-1}
+
+This field is a count of the number of base surfaces in the zone.
+
+\subsubsection{Field: Number of SubSurfaces}\label{field-number-of-subsurfaces-1}
+
+This field is a count of the number of subsurfaces (windows, doors, glass doors and the list) in the zone.
+
+\subsubsection{Field: Number of Shading SubSurfaces}\label{field-number-of-shading-subsurfaces}
+
+This field is a count of the number of shading surfaces (overhangs, fins) for the zone.
+
+\subsubsection{Field: Part of Total Building Area}\label{field-part-of-total-building-area}
+
+This field displays ``Yes'' when the zone is to be considered part of the total building floor area or ``No'' when it's not to be considered. This consideration has no impact on simulation but on reporting. Namely, when the value is ``no'', the zone is not part of the Total Floor Area as shown in the Annual Building Utility Performance Summary tables. In addition, when ``No'' is specified, the area is excluded from both the conditioned floor area and the total floor area in the Building Area sub table and the Normalized Metrics sub tables.
+
+\subsection{Internal Gains Outputs}\label{internal-gains-outputs}
+
+\subsection{Zone Internal Gains}\label{zone-internal-gains}
+
+Nominal Zone Internal Gains (people, lights, electric equipment, etc.) are summarized:
+
+! \textless{}Zone Internal Gains/Equipment Information - Nominal\textgreater{},Zone Name, Floor Area \{m2\},\# Occupants,Area per Occupant \{m2/person\},Occupant per Area \{person/m2\},Interior Lighting \{W/m2\},Electric Load \{W/m2\},Gas Load \{W/m2\},Other Load \{W/m2\},Hot Water Eq \{W/m2\},Steam Equipment \{W/m2\},Sum Loads per Area \{W/m2\},Outdoor Controlled Baseboard Heat
+
+~Zone Internal Gains, PLENUM-1,463.60,0.0,N/A,0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,No
+
+~Zone Internal Gains, SPACE1-1,99.16,11.0,9.015,0.111,15.974,10.649,0.000,0.000,0.000,0.000,26.624,No
+
+~Zone Internal Gains, SPACE2-1,42.74,5.0,8.547,0.117,16.006,10.670,0.000,0.000,0.000,0.000,26.676,No
+
+~Zone Internal Gains, SPACE3-1,96.48,11.0,8.771,0.114,16.418,10.945,0.000,0.000,0.000,0.000,27.363,No
+
+~Zone Internal Gains, SPACE4-1,42.74,5.0,8.547,0.117,16.006,10.670,0.000,0.000,0.000,0.000,26.676,No
+
+~Zone Internal Gains, SPACE5-1,182.49,20.0,9.125,0.110,16.242,10.828,0.000,0.000,0.000,0.000,27.070,No
+
+\subsubsection{Field:~ \textless{}Zone Internal Gains/Equipment Information - Nominal\textgreater{}}\label{field-zone-internal-gainsequipment-information---nominal}
+
+This field contains the constant ``Zone Internal Gains'' for each line.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-1}
+
+This is the Zone Name entered from the IDF.
+
+\subsubsection{Field: Floor Area \{m2\}}\label{field-floor-area-m2-1}
+
+This is the floor area for the zone.
+
+\subsubsection{Field: \# Occupants}\label{field-occupants}
+
+This is the nominal number of occupants (from the PEOPLE statements).
+
+\subsubsection{Field: Area per Occupant \{m2/person\}}\label{field-area-per-occupant-m2person}
+
+This is the Zone Floor Area per occupant (person).
+
+\subsubsection{Field: Occupant per Area \{person/m2\}}\label{field-occupant-per-area-personm2}
+
+This is the number of occupants per area.
+
+\subsubsection{Field: Interior Lighting \{W/m2\}}\label{field-interior-lighting-wm2}
+
+This is the lighting (Lights) per floor area.
+
+\subsubsection{Field: Electric Load \{W/m2\}}\label{field-electric-load-wm2}
+
+This is the electric equipment load (\textbf{Electric Equipment}) per floor area.
+
+\subsubsection{Field: Gas Load \{W/m2\}}\label{field-gas-load-wm2}
+
+This is the gas equipment load (\textbf{Gas Equipment}) per floor area.
+
+\subsubsection{Field: Other Load \{W/m2}\label{field-other-load-wm2}
+
+This is the other equipment load (\textbf{Other Equipment}) per floor area.
+
+\subsubsection{Field: Hot Water Eq \{W/m2\}}\label{field-hot-water-eq-wm2}
+
+This is the hot water equipment load (\textbf{Hot Water Equipment}) per floor area.
+
+\subsubsection{Field: Steam Equipment \{W/m2\}}\label{field-steam-equipment-wm2}
+
+This is the steam equipment load (\textbf{Steam Equipment}) per floor area.
+
+\subsubsection{Field: Sum Loads per Area \{W/m2\}}\label{field-sum-loads-per-area-wm2}
+
+This is the nominal sum of loads per area (equipment). This metric can be useful for incorrect (too much) loads in a zone.
+
+\subsubsection{Field: Outdoor Controlled Baseboard Heat}\label{field-outdoor-controlled-baseboard-heat}
+
+This field is ``yes'' if there is outdoor controlled baseboard heat in a Zone.
+
+\subsection{People Gains}\label{people-gains}
+
+! \textless{}People Internal Gains - Nominal\textgreater{},Name,Schedule Name,Zone Name,Zone Floor Area \{m2\},\# Zone Occupants,Number of People \{\},People/Floor Area \{person/m2\},Floor Area per person \{m2/person\},Fraction Radiant,Fraction Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum Number of People,Nominal Maximum Number of People
+
+People Internal Gains,~ SPACE1-1 PEOPLE 1, OCCUPY-1, SPACE1-1, 99.16, 11.0, 11.0, 0.111, 9.015, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
+
+~People Internal Gains,~ SPACE2-1 PEOPLE 1, OCCUPY-1, SPACE2-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
+
+~People Internal Gains,~ SPACE3-1 PEOPLE 1, OCCUPY-1, SPACE3-1, 96.48, 11.0, 11.0, 0.114, 8.771, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
+
+~People Internal Gains,~ SPACE4-1 PEOPLE 1, OCCUPY-1, SPACE4-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
+
+~People Internal Gains,~ SPACE5-1 PEOPLE 1, OCCUPY-1, SPACE5-1, 182.49, 20.0, 20.0, 0.110, 9.125, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 20
+
+\subsubsection{Field: \textless{}People Internal Gains - Nominal\textgreater{}}\label{field-people-internal-gains---nominal}
+
+This field contains the constant ``People Internal Gains'' for each line.
+
+\subsubsection{Field: Name}\label{field-name-1}
+
+This field contains the name of the People statement from the IDF file.
+
+\subsubsection{Field: Schedule Name}\label{field-schedule-name}
+
+This is the schedule of occupancy fraction -- the fraction is applied to the number of occupants for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-2}
+
+This is the name of the Zone for the people/occupants.
+
+\subsubsection{Field: Zone Floor Area \{m2\}}\label{field-zone-floor-area-m2}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: \# Zone Occupants}\label{field-zone-occupants}
+
+This is the total number of occupants for the zone.
+
+\subsubsection{Field: Number of People}\label{field-number-of-people}
+
+This is the specific number of people for this statement (nominal).
+
+\subsubsection{Field: People/Floor Area \{person/m2\}}\label{field-peoplefloor-area-personm2}
+
+This value represents the number of people density (this statement) per area (zone floor area).
+
+\subsubsection{Field: Floor Area per person \{m2/person\}}\label{field-floor-area-per-person-m2person}
+
+This is the floor area per person (this statement)
+
+\subsubsection{Field: Fraction Radiant}\label{field-fraction-radiant}
+
+This is the fraction radiant for each person (this statement).
+
+\subsubsection{Field: Fraction Convected}\label{field-fraction-convected}
+
+This is the fraction convected for each person (this statement).
+
+\subsubsection{Field: Sensible Fraction Calculation}\label{field-sensible-fraction-calculation}
+
+This field will show ``Autocalculate'' if the default calculation for sensible fraction of load is to be used. Or a specific value can be entered. If so, that value will be displayed.
+
+\subsubsection{Field: Activity level}\label{field-activity-level}
+
+This field will show the activity level schedule name.
+
+\subsubsection{Field: ASHRAE 55 Warnings}\label{field-ashrae-55-warnings}
+
+If this field shows ``yes'', then ASHRAE 55 comfort warnings are enabled. If ``no'', then no ASHRAE 55 comfort warnings are calculated or issued.
+
+\textbf{The following fields are shown only when one of the Comfort calculations (Fanger, KSU, Pierce) is used.}
+
+\subsubsection{Field: MRT Calculation Type}\label{field-mrt-calculation-type}
+
+This field's value will be one of the valid MRT calculation types (Zone Averaged, Surface Weighted, Angle Factor).
+
+\subsubsection{Field: Work Efficiency}\label{field-work-efficiency}
+
+This field will be the work efficiency schedule name for this people statement.
+
+\subsubsection{Field: Clothing}\label{field-clothing}
+
+This field will be the clothing schedule name for this people statement.
+
+\subsubsection{Field: Air Velocity}\label{field-air-velocity}
+
+This field will be the air velocity schedule name for this people statement.
+
+\subsubsection{Field: Fanger Calculation}\label{field-fanger-calculation}
+
+This field will be ``yes'' if Fanger calculations are enabled for this people statement; otherwise it will be ``no''.
+
+\subsubsection{Field: Pierce Calculation}\label{field-pierce-calculation}
+
+This field will be ``yes'' if Pierce calculations are enabled for this people statement; otherwise it will be ``no''.
+
+\subsubsection{Field: KSU Calculation}\label{field-ksu-calculation}
+
+This field will be ``yes'' if KSU calculations are enabled for this people statement; otherwise it will be ``no''.
+
+\subsubsection{Field: Carbon Dioxide Generation Rate}\label{field-carbon-dioxide-generation-rate}
+
+This numeric input field specifies carbon dioxide generation rate per person with units of m3/s-W. The total carbon dioxide generation rate from this object is:
+
+Number of People * People Schedule * People Activity * Carbon Dioxide Generation Rate. The default value is 3.82E-8 m3/s-W (obtained from ASHRAE Standard 62.1-2007 value at 0.0084 cfm/met/person over the general adult population). The maximum value can be 10 times the default value.
+
+\subsubsection{Field: Nominal Minimum Number of People}\label{field-nominal-minimum-number-of-people}
+
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value (annual) for the people schedule. It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Nominal Maximum Number of People}\label{field-nominal-maximum-number-of-people}
+
+This numeric field is the calculated maximum number of people based on the number of people field * the maxnimum value (annual) for the people schedule. It may be useful in diagnosing errors that occur during simulation.
+
+\subsection{Lights Gains}\label{lights-gains}
+
+! \textless{}Lights Internal Gains - Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Lighting Level \{W\}, Lights/Floor Area \{W/m2\}, Lights per person \{W/person\}, Fraction Return Air, Fraction Radiant, Fraction Short Wave, Fraction Convected, Fraction Replaceable, End-Use Category, Nominal Minimum Lighting Level \{W\}, Nominal Maximum Lighting Level \{W\}
+
+Lights Internal Gains,~ SPACE1-1 LIGHTS 1, LIGHTS-1, SPACE1-1, 99.16, 11.0, 1584.000, 15.974, 144.000, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 79.200, 1584.000
+
+~Lights Internal Gains,~ SPACE2-1 LIGHTS 1, LIGHTS-1, SPACE2-1, 42.74, 5.0, 684.000, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 34.200, 684.000
+
+~Lights Internal Gains,~ SPACE3-1 LIGHTS 1, LIGHTS-1, SPACE3-1, 96.48, 11.0, 1584.000, 16.418, 144.000, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 79.200, 1584.000
+
+~Lights Internal Gains,~ SPACE4-1 LIGHTS 1, LIGHTS-1, SPACE4-1, 42.74, 5.0, 684.000, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 34.200, 684.000
+
+~Lights Internal Gains,~ SPACE5-1 LIGHTS 1, LIGHTS-1, SPACE5-1, 182.49, 20.0, 2964.000, 16.242, 148.200, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 148.200, 2964.000
+
+\subsubsection{Field: \textless{}Lights Internal Gains - Nominal\textgreater{}}\label{field-lights-internal-gains---nominal}
+
+This field contains the constant ``Lights Internal Gains'' for each line.
+
+\subsubsection{Field: Name}\label{field-name-2}
+
+This field contains the name of the Lights statement from the IDF file.
+
+\subsubsection{Field: Schedule Name}\label{field-schedule-name-1}
+
+This is the schedule of lights fraction -- the fraction is applied to the nominal lighting level for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-3}
+
+This is the name of the Zone for the lights.
+
+\subsubsection{Field: Zone Floor Area \{m2\}}\label{field-zone-floor-area-m2-1}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: \# Zone Occupants}\label{field-zone-occupants-1}
+
+This is the total number of occupants for the zone.
+
+\subsubsection{Field: Lighting Level \{W\}}\label{field-lighting-level-w}
+
+This is the nominal lighting level (this statement) in Watts.
+
+\subsubsection{Field: Lights/Floor Area \{W/m2\}}\label{field-lightsfloor-area-wm2}
+
+This is the watts per floor area (this statement)
+
+\subsubsection{Field: Lights per person \{W/person\}}\label{field-lights-per-person-wperson}
+
+This is the watts per person that this statement represents.
+
+\subsubsection{Field: Fraction Return Air}\label{field-fraction-return-air}
+
+This is the fraction return air for this statement.
+
+\subsubsection{Field: Fraction Radiant}\label{field-fraction-radiant-1}
+
+This is the fraction radiant for this lighting level.
+
+\subsubsection{Field: Fraction Short Wave}\label{field-fraction-short-wave}
+
+This is the fraction short wave for this lighting level.
+
+\subsubsection{Field: Fraction Convected}\label{field-fraction-convected-1}
+
+This is the fraction convected for this lighting level.
+
+\subsubsection{Field: Fraction Replaceable}\label{field-fraction-replaceable}
+
+This is the fraction replaceable for this lighting level. For daylighting calculations, this value should either be 0 (no dimming control) or 1 (full dimming control).
+
+\subsubsection{Field: End-Use Category}\label{field-end-use-category}
+
+This field shows the end-use category for this lights statement. Usage can be reported by end-use category.
+
+\subsubsection{Field: Nominal Minimum Lighting Level \{W\}}\label{field-nominal-minimum-lighting-level-w}
+
+This numeric field is the calculated minimum amount of lighting in Watts based on the calculated lighting level (above) * the minimum value (annual) for the lights schedule. It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Nominal Maximum Lighting Level \{W\}}\label{field-nominal-maximum-lighting-level-w}
+
+This numeric field is the calculated maximum amount of lighting in Watts based on the calculated lighting level (above) * the maximum value (annual) for the lights schedule. It may be useful in diagnosing errors that occur during simulation.
+
+\subsection{Equipment (Electric, Gas, Steam, Hot Water) Gains}\label{equipment-electric-gas-steam-hot-water-gains}
+
+These equipments are all reported similarly. Electric Equipment is used in the example below:
+
+! \textless{}ElectricEquipment Internal Gains - Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Equipment Level \{W\}, Equipment/Floor Area \{W/m2\}, Equipment per person \{W/person\}, Fraction Latent, Fraction Radiant, Fraction Lost, Fraction Convected, End-Use SubCategory, Nominal Minimum Equipment Level \{W\}, Nominal Maximum Equipment Level \{W\}
+
+ElectricEquipment Internal Gains,~ SPACE1-1 ELECEQ 1, EQUIP-1, SPACE1-1, 99.16, 11.0, 1056.000, 10.649, 96.000, 0.000, 0.300, 0.000, 0.700, General, 21.120, 950.400
+
+~ElectricEquipment Internal Gains,~ SPACE2-1 ELECEQ 1, EQUIP-1, SPACE2-1, 42.74, 5.0, 456.000, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, General, 9.120, 410.400
+
+~ElectricEquipment Internal Gains,~ SPACE3-1 ELECEQ 1, EQUIP-1, SPACE3-1, 96.48, 11.0, 1056.000, 10.945, 96.000, 0.000, 0.300, 0.000, 0.700, General, 21.120, 950.400
+
+~ElectricEquipment Internal Gains,~ SPACE4-1 ELECEQ 1, EQUIP-1, SPACE4-1, 42.74, 5.0, 456.000, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, General, 9.120, 410.400
+
+~ElectricEquipment Internal Gains,~ SPACE5-1 ELECEQ 1, EQUIP-1, SPACE5-1, 182.49, 20.0, 1976.000, 10.828, 98.800, 0.000, 0.300, 0.000, 0.700, General, 39.520, 1778.400
+
+\subsubsection{Field: \textless{}{[}Specific{]} Equipment Internal Gains - Nominal\textgreater{}}\label{field-specific-equipment-internal-gains---nominal}
+
+This field will contain the type of equipment internal gain in each line (i.e.~Electric Equipment Internal Gains, Gas Equipment Internal Gains, \ldots{}).
+
+\subsubsection{Field: Name}\label{field-name-3}
+
+This field contains the name of the equipment statement from the IDF file.
+
+\subsubsection{Field: Schedule Name}\label{field-schedule-name-2}
+
+This is the schedule of equipment fraction -- the fraction is applied to the nominal equipment level for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-4}
+
+This is the name of the Zone for the equipment.
+
+\subsubsection{Field: Zone Floor Area \{m2\}}\label{field-zone-floor-area-m2-2}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: \# Zone Occupants}\label{field-zone-occupants-2}
+
+This is the total number of occupants for the zone.
+
+\subsubsection{Field: Equipment Level \{W\}}\label{field-equipment-level-w}
+
+This is the nominal equipment level (in Watts) for the statement.
+
+\subsubsection{Field: Equipment/Floor Area \{W/m2\}}\label{field-equipmentfloor-area-wm2}
+
+This is the watts per floor area (this statement)
+
+\subsubsection{Field: Equipment per person \{W/person\}}\label{field-equipment-per-person-wperson}
+
+This is the watts per person that this statement represents.
+
+\subsubsection{Field: Fraction Latent}\label{field-fraction-latent}
+
+This is the fraction latent for this equipment.
+
+\subsubsection{Field: Fraction Radiant}\label{field-fraction-radiant-2}
+
+This is the fraction radiant for this equipment.
+
+\subsubsection{Field: Fraction Lost}\label{field-fraction-lost}
+
+This is the fraction lost (not attributed to the zone) for this equipment.
+
+\subsubsection{Field: Fraction Convected}\label{field-fraction-convected-2}
+
+This is the fraction convected for this equipment.
+
+\subsubsection{Field: End-Use SubCategory}\label{field-end-use-subcategory}
+
+This field shows the end-use category for this statement. Usage can be reported by end-use category.
+
+\subsubsection{Field: Nominal Minimum Equipment Level \{W\}}\label{field-nominal-minimum-equipment-level-w}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value (annual) for the equipment schedule. It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Nominal Maximum Equipment Level \{W\}}\label{field-nominal-maximum-equipment-level-w}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value (annual) for the equipment schedule. It may be useful in diagnosing errors that occur during simulation.
+
+\subsection{Other Equipment Gains}\label{other-equipment-gains}
+
+Other equipment report is shown below (does not have an end-use category -- is not attached to any normal meter):
+
+! \textless{}OtherEquipment Internal Gains - Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Equipment Level \{W\}, Equipment/Floor Area \{W/m2\}, Equipment per person \{W/person\}, Fraction Latent, Fraction Radiant, Fraction Lost, Fraction Convected, Nominal Minimum Equipment Level \{W\}, Nominal Maximum Equipment Level \{W\}
+
+OtherEquipment Internal Gains,~ TEST 352A, ALWAYSON, ZONE ONE, 232.26, 0.0, 352.000, 1.516, N/A, 0.000, 0.000, 0.000, 1.000, 352.000, 352.000
+
+~OtherEquipment Internal Gains,~ TEST 352 MINUS, ALWAYSON, ZONE ONE, 232.26, 0.0, -352.000, -1.516, N/A, 0.000, 0.000, 0.000, 1.000, -352.000, -352.000
+
+\subsubsection{Field: \textless{}Other Equipment Internal Gains - Nominal\textgreater{}}\label{field-other-equipment-internal-gains---nominal}
+
+This field contains the constant ``OtherEquipment Internal Gains'' for each line.
+
+\subsubsection{Field: Name}\label{field-name-4}
+
+This field contains the name of the equipment statement from the IDF file.
+
+\subsubsection{Field: Schedule Name}\label{field-schedule-name-3}
+
+This is the schedule of equipment fraction -- the fraction is applied to the nominal equipment level for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-5}
+
+This is the name of the Zone for the equipment.
+
+\subsubsection{Field: Zone Floor Area \{m2\}}\label{field-zone-floor-area-m2-3}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: \# Zone Occupants}\label{field-zone-occupants-3}
+
+This is the total number of occupants for the zone.
+
+\subsubsection{Field: Equipment Level \{W\}}\label{field-equipment-level-w-1}
+
+This is the nominal equipment level (in Watts) for the statement.
+
+\subsubsection{Field: Equipment/Floor Area \{W/m2\}}\label{field-equipmentfloor-area-wm2-1}
+
+This is the watts per floor area (this statement)
+
+\subsubsection{Field: Equipment per person \{W/person\}}\label{field-equipment-per-person-wperson-1}
+
+This is the watts per person that this statement represents.
+
+\subsubsection{Field: Fraction Latent}\label{field-fraction-latent-1}
+
+This is the fraction latent for this equipment.
+
+\subsubsection{Field: Fraction Radiant}\label{field-fraction-radiant-3}
+
+This is the fraction radiant for this equipment.
+
+\subsubsection{Field: Fraction Lost}\label{field-fraction-lost-1}
+
+This is the fraction lost (not attributed to the zone) for this equipment.
+
+\subsubsection{Field: Fraction Convected}\label{field-fraction-convected-3}
+
+This is the fraction convected for this equipment.
+
+\subsubsection{Field: Nominal Minimum Equipment Level \{W\}}\label{field-nominal-minimum-equipment-level-w-1}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value (annual) for the equipment schedule. It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Nominal Maximum Equipment Level \{W\}}\label{field-nominal-maximum-equipment-level-w-1}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value (annual) for the equipment schedule. It may be useful in diagnosing errors that occur during simulation.
+
+\subsection{Outdoor Controlled Baseboard Heat}\label{outdoor-controlled-baseboard-heat}
+
+! \textless{}Outdoor Controlled Baseboard Heat Internal Gains - Nominal\textgreater{},Name,Schedule Name,Zone Name,Zone Floor Area \{m2\},\# Zone Occupants,Capacity at Low Temperature \{W\},Low Temperature \{C\},Capacity at High Temperature \{W\},High Temperature \{C\},Fraction Radiant,Fraction Convected,End-Use Subcategory
+
+~Outdoor Controlled Baseboard Heat Internal Gains, SPACE4-1 BBHEAT 1,EQUIP-1,SPACE4-1,42.74,5.0,1500.000,0.000,500.000,10.000,0.500,0.500,Baseboard Heat
+
+\subsubsection{Field: \textless{}Outdoor Controlled Baseboard Heat Internal Gains - Nominal\textgreater{}}\label{field-outdoor-controlled-baseboard-heat-internal-gains---nominal}
+
+This field contains the constant ``Outdoor Controlled Baseboard Heat Internal Gains'' for each line.
+
+\subsubsection{Field: Name}\label{field-name-5}
+
+This field contains the name of the baseboard heat statement from the IDF file.
+
+\subsubsection{Field: Schedule Name}\label{field-schedule-name-4}
+
+This is the schedule of equipment fraction -- the fraction is applied to the nominal equipment level for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-6}
+
+This is the name of the Zone for the equipment.
+
+\subsubsection{Field: Zone Floor Area \{m2\}}\label{field-zone-floor-area-m2-4}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: \# Zone Occupants}\label{field-zone-occupants-4}
+
+This is the total number of occupants for the zone.
+
+\subsubsection{Field: Capacity at Low Temperature \{W\}}\label{field-capacity-at-low-temperature-w}
+
+This is the capacity (in Watts) of the equipment at low outdoor temperature.
+
+\subsubsection{Field: Low Temperature \{C\}}\label{field-low-temperature-c}
+
+This is the low outdoor temperature (dry-bulb) for the capacity in the previous field. If the outdoor dry-bulb temperature (degrees Celsius) is at or below the low temperature, thebaseboard heater operates at the low temperature capacity.
+
+\subsubsection{Field: Capacity at High Temperature \{W\}}\label{field-capacity-at-high-temperature-w}
+
+This is the capacity (in Watts) of the equipment at high outdoor temperature.
+
+\subsubsection{Field: High Temperature \{C\}}\label{field-high-temperature-c}
+
+This is the high outdoor temperature (dry-bulb) for the capacity in the previous field. If the outdoor dry-bulb temperature (degrees Celsius) is exceeds the high temperature, thebaseboard heater turns off.
+
+\subsubsection{Field: Fraction Radiant}\label{field-fraction-radiant-4}
+
+This is the fraction radiant for this equipment.
+
+\subsubsection{Field: Fraction Convected}\label{field-fraction-convected-4}
+
+This is the fraction convected for this equipment.
+
+\subsubsection{Field: EndUse Subcategory}\label{field-enduse-subcategory}
+
+This field shows the enduse category for this statement. Usage can be reported by enduse category.
+
+\subsection{Simple Airflow Outputs}\label{simple-airflow-outputs}
+
+\subsection{Infiltration, Ventilation, Mixing, Cross Mixing Statistics}\label{infiltration-ventilation-mixing-cross-mixing-statistics}
+
+Infiltration, Ventilation, Mixing, Cross Mixing are only specified when the Airflow Model is ``Simple'' (no Airflow Network).
+
+\subsection{Infiltration}\label{infiltration}
+
+! \textless{}Infiltration Airflow Stats - Nominal\textgreater{},Name,Schedule Name,Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants,Design Volume Flow Rate \{m3/s\},Volume Flow Rate/Floor Area \{m3/s/m2\},Volume Flow Rate/Exterior Surface Area \{m3/s/m2\},ACH - Air Changes per Hour,Equation A - Constant Term Coefficient \{\},Equation B - Temperature Term Coefficient \{1/C\},Equation C - Velocity Term Coefficient \{s/m\}, Equation D - Velocity Squared Term Coefficient \{s2/m2\}
+
+ZoneInfiltration Airflow Stats, SPACE1-1 INFIL 1,INFIL-SCH,SPACE1-1,99.16,11.0,3.200E-002,3.227E-004,4.372E-004,0.482,0.000,0.000,0.224,0.000
+
+~ZoneInfiltration Airflow Stats, SPACE2-1 INFIL 1,INFIL-SCH,SPACE2-1,42.74,5.0,1.400E-002,3.276E-004,3.838E-004,0.488,0.000,0.000,0.224,0.000
+
+~ZoneInfiltration Airflow Stats, SPACE3-1 INFIL 1,INFIL-SCH,SPACE3-1,96.48,11.0,3.200E-002,3.317E-004,4.372E-004,0.482,0.000,0.000,0.224,0.000
+
+~ZoneInfiltration Airflow Stats, SPACE4-1 INFIL 1,INFIL-SCH,SPACE4-1,42.74,5.0,1.400E-002,3.276E-004,3.838E-004,0.488,0.000,0.000,0.224,0.000
+
+~ZoneInfiltration Airflow Stats, SPACE5-1 INFIL 1,INFIL-SCH,SPACE5-1,182.49,20.0,6.200E-002,3.397E-004,N/A,0.499,0.000,0.000,0.224,0.000
+
+\subsubsection{Field: \textless{}Infiltration Airflow Stats - Nominal\textgreater{}}\label{field-infiltration-airflow-stats---nominal}
+
+This field contains the constant ``Infiltration Airflow Stats'' for each line.
+
+\subsubsection{Field: Name}\label{field-name-6}
+
+This field contains the name of the infiltration statement from the IDF file.
+
+\subsubsection{Field: Schedule Name}\label{field-schedule-name-5}
+
+This is the schedule of use fraction -- the fraction is applied to the nominal volume flow rate for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-7}
+
+This is the name of the Zone for the infiltration.
+
+\subsubsection{Field: Zone Floor Area \{m2\}}\label{field-zone-floor-area-m2-5}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: \# Zone Occupants}\label{field-zone-occupants-5}
+
+This is the total number of occupants for the zone.
+
+\subsubsection{Field: Design Volume Flow Rate \{m3/s\}}\label{field-design-volume-flow-rate-m3s}
+
+This is the nominal flow rate for the infiltration in m3/s.
+
+\subsubsection{Field: Volume Flow Rate/Floor Area \{m3/s/m2\}}\label{field-volume-flow-ratefloor-area-m3sm2}
+
+This field is the volume flow rate density per floor area (flow rate per floor area) for infiltration.
+
+\subsubsection{Field: Volume Flow Rate/Exterior Surface Area \{m3/s/m2\}}\label{field-volume-flow-rateexterior-surface-area-m3sm2}
+
+This field is the volume flow rate density per exterior surface area (flow rate per exterior area) for infiltration.
+
+\subsubsection{Field: ACH - Air Changes per Hour}\label{field-ach---air-changes-per-hour}
+
+This field is the air changes per hour for the given infiltration rate.
+
+\subsubsection{Field: Equation A - Constant Term Coefficient}\label{field-equation-a---constant-term-coefficient}
+
+Actual infiltration amount is an equation based value:
+
+\begin{equation}
+\text{Infiltration} = I_{design} F_{schedule} \left[ A + B \left| T_{zone}-T_{odb} \right| + C\left(\text{WindSpeed}\right) + D\left(\text{WindSpeed}^2\right)  \right]
+\end{equation}
+
+This field value is the A coefficient in the above equation.
+
+\subsubsection{Field: Equation B - Temperature Term Coefficient \{1/C\}}\label{field-equation-b---temperature-term-coefficient-1c}
+
+This field value is the B coefficient in the above equation.
+
+\subsubsection{Field: Equation C - Velocity Term Coefficient \{s/m\}}\label{field-equation-c---velocity-term-coefficient-sm}
+
+This field value is the C coefficient in the above equation.
+
+\subsubsection{Field:~ Equation D - Velocity Squared Term Coefficient \{s2/m2\}}\label{field-equation-d---velocity-squared-term-coefficient-s2m2}
+
+This field value is the D coefficient in the above equation.
+
+\subsection{Ventilation}\label{ventilation}
+
+! \textless{}Ventilation Airflow Stats - Nominal\textgreater{},Name,Schedule Name,Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants,Design Volume Flow Rate \{m3/s\},Volume Flow Rate/Floor Area \{m3/s/m2\},Volume Flow Rate/person Area \{m3/s/person\},ACH - Air Changes per Hour,Fan Type \{Exhaust;Intake;Natural/None\},Fan Pressure Rise \{?\},Fan Efficiency \{\},Equation A - Constant Term Coefficient \{\},Equation B - Temperature Term Coefficient \{1/C\},Equation C - Velocity Term Coefficient \{s/m\}, Equation D - Velocity Squared Term Coefficient \{s2/m2\},Minimum Indoor Temperature/Schedule,Maximum Indoor Temperature/Schedule,Delta Temperature/Schedule,Minimum Outdoor Temperature/Schedule,Maximum Outdoor Temperature/Schedule,Maximum WindSpeed
+
+~Ventilation Airflow Stats, SPACE1-1 VENTL 1,NIGHTVENTSCHED,SPACE1-1,99.16,11.0,5.295E-002,5.340E-004,4.814E-003,0.797,Intake,67.000,0.7,1.000,0.000,0.000,0.000,MININDOORTEMP,MAXINDOORTEMP,DELTATEMP,MINOUTDOORTEMP,MAXOUTDOORTEMP,40.00
+
+~Ventilation Airflow Stats, SPACE1-1 VENTL 2,NIGHTVENTSCHED,SPACE1-1,99.16,11.0,5.295E-002,5.340E-004,4.814E-003,0.797,Intake,67.000,0.7,1.000,0.000,0.000,0.000,MININDOORTEMP,MAXINDOORTEMP,DELTATEMP,MINOUTDOORTEMP,MAXOUTDOORTEMP,40.00
+
+~Ventilation Airflow Stats, SPACE2-1 VENTL 1,NIGHTVENTSCHED,SPACE2-1,42.74,5.0,7.030E-002,1.645E-003,1.406E-002,2.450,Intake,67.000,0.7,1.000,0.000,0.000,0.000,18.00,100.00,2.00,-100.00,100.00,40.00
+
+Ventilation Airflow Stats, RESISTIVE ZONE VENTL 1,INF-SCHED,RESISTIVE ZONE,37.16,3.0,2.000E-002,5.382E-004,6.667E-003,0.636,Natural,0.000,1.0,0.606,2.020E-002,5.980E-004,0.000,18.00,100.00,1.00,-100.00,100.00,40.00
+
+~Ventilation Airflow Stats, EAST ZONE VENTL 1,INF-SCHED,EAST ZONE,37.16,3.0,2.000E-002,5.382E-004,6.667E-003,0.636,Natural,0.000,1.0,0.606,2.020E-002,5.980E-004,0.000,18.00,100.00,1.00,-100.00,100.00,40.00
+
+~Ventilation Airflow Stats, NORTH ZONE VENTL 1,INF-SCHED,NORTH ZONE,55.74,4.0,2.000E-002,3.588E-004,5.000E-003,0.424,Natural,0.000,1.0,0.606,2.020E-002,5.980E-004,0.000,18.00,100.00,1.00,-100.00,100.00,40.00
+
+\subsubsection{Field: \textless{}Ventilation Airflow Stats - Nominal\textgreater{}}\label{field-ventilation-airflow-stats---nominal}
+
+This field contains the constant ``Ventilation Airflow Stats'' for each line.
+
+\subsubsection{Field: Name}\label{field-name-7}
+
+This field contains the name of the ventilation statement from the IDF file.
+
+\subsubsection{Field: Schedule Name}\label{field-schedule-name-6}
+
+This is the schedule of use fraction -- the fraction is applied to the nominal volume flow rate for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-8}
+
+This is the name of the Zone for the ventilation.
+
+\subsubsection{Field: Zone Floor Area \{m2\}}\label{field-zone-floor-area-m2-6}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: \# Zone Occupants}\label{field-zone-occupants-6}
+
+This is the total number of occupants for the zone.
+
+\subsubsection{Field: Design Volume Flow Rate \{m3/s\}}\label{field-design-volume-flow-rate-m3s-1}
+
+This is the nominal flow rate for the ventilation in m3/s.
+
+\subsubsection{Field: Volume Flow Rate/Floor Area \{m3/s/m2\}}\label{field-volume-flow-ratefloor-area-m3sm2-1}
+
+This field is the volume flow rate density per floor area (flow rate per floor area) for ventilation.
+
+\subsubsection{Field: Volume Flow Rate/person Area \{m3/s/person\}}\label{field-volume-flow-rateperson-area-m3sperson}
+
+This field is the volume flow rate density per person (flow rate per person) for ventilation.
+
+\subsubsection{Field: ACH - Air Changes per Hour}\label{field-ach---air-changes-per-hour-1}
+
+This field is the air changes per hour for the given ventilation rate.
+
+\subsubsection{Field: Fan Type \{Exhaust;Intake;Natural\}}\label{field-fan-type-exhaustintakenatural}
+
+This field shows the entered value for the type of ventilation {[}NATURAL, EXHAUST, or INTAKE{]}. Natural ventilation is the air movement/exchange a result of openings in the building façade and does not consume any fan energy. For either EXHAUST or INTAKE, values for fan pressure and efficiency define the fan electric consumption. For NATURAL and EXHAUST ventilation, the conditions of the air entering the space are assumed to be equivalent to outdoor air conditions. For INTAKE ventilation, an appropriate amount of fan heat is added to the air stream.
+
+\subsubsection{Field: Fan Pressure Rise \{Pa\}}\label{field-fan-pressure-rise-pa}
+
+Operational when Fan Type is INTAKE or EXHAUST, this is the pressure rise experienced across the fan in Pascals (N/m\(^{2}\)). This is a function of the fan and plays a role in determining the amount of energy consumed by the fan.
+
+\subsubsection{Field: Fan Efficiency}\label{field-fan-efficiency}
+
+Operational when Fan Type is INTAKE or EXHAUST, this is the total fan efficiency (a decimal number between 0.0 and 1.0). This is a function of the fan and plays a role in determining the amount of energy consumed by the fan.
+
+\subsubsection{Field: Equation A - Constant Term Coefficient}\label{field-equation-a---constant-term-coefficient-1}
+
+Actual ventilation amount is an equation based value:
+
+\begin{equation}
+\text{Ventilation} = V_{design} F_{schedule} \left[ A + B \left| T_{zone}-T_{odb} \right| + C\left(\text{WindSpeed}\right) + D\left(\text{WindSpeed}^2\right)  \right]
+\end{equation}
+
+This field value is the A coefficient in the above equation.
+
+\subsubsection{Field: Equation B - Temperature Term Coefficient \{1/C\}}\label{field-equation-b---temperature-term-coefficient-1c-1}
+
+This field value is the B coefficient in the above equation.
+
+\subsubsection{Field: Equation C - Velocity Term Coefficient \{s/m\}}\label{field-equation-c---velocity-term-coefficient-sm-1}
+
+This field value is the C coefficient in the above equation.
+
+\subsubsection{Field:~ Equation D - Velocity Squared Term Coefficient \{s2/m2\}}\label{field-equation-d---velocity-squared-term-coefficient-s2m2-1}
+
+This field value is the D coefficient in the above equation.
+
+\subsubsection{Field: Minimum Indoor Temperature\{C\}/Schedule}\label{field-minimum-indoor-temperaturecschedule}
+
+This is the indoor temperature (in Celsius) below which ventilation is shutoff. As the values can also be entered as a schedule, the schedule name may be listed here rather than a temperature.
+
+\subsubsection{Field: Maximum Indoor Temperature\{C\}/Schedule}\label{field-maximum-indoor-temperaturecschedule}
+
+This is the indoor temperature (in Celsius) above which ventilation is shutoff. As the values can also be entered as a schedule, the schedule name may be listed here rather than a temperature.
+
+\subsubsection{Field: Delta Temperature\{C\}/Schedule}\label{field-delta-temperaturecschedule}
+
+This is the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which ventilation is shutoff. As the values can also be entered as a schedule, the schedule name may be listed here rather than a temperature.
+
+\subsubsection{Field: Minimum Outdoor Temperature\{C\}/Schedule}\label{field-minimum-outdoor-temperaturecschedule}
+
+This is the outdoor temperature (in Celsius) below which ventilation is shut off. As the values can also be entered as a schedule, the schedule name may be listed here rather than a temperature.
+
+\subsubsection{Field: Maximum Outdoor Temperature\{C\}/Schedule}\label{field-maximum-outdoor-temperaturecschedule}
+
+This is the outdoor temperature (in Celsius) above which ventilation is shut off. As the values can also be entered as a schedule, the schedule name may be listed here rather than a temperature.
+
+\subsubsection{Field: Maximum WindSpeed\{m/s\}}\label{field-maximum-windspeedms}
+
+This is the wind speed (m/s) above which ventilation is shut off.
+
+\subsection{Mixing}\label{mixing}
+
+! \textless{}Mixing Airflow Stats - Nominal\textgreater{},Name,Schedule Name,Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants,Design Volume Flow Rate \{m3/s\},Volume Flow Rate/Floor Area \{m3/s/m2\},Volume Flow Rate/person Area \{m3/s/person\},ACH - Air Changes per Hour,From/Source Zone,Delta Temperature \{C\}
+
+~Mixing Airflow Stats, RESISTIVE ZONE MIXNG 1,ZONE MIXING,RESISTIVE ZONE,37.16,3.0,5.000E-002,1.345E-003,1.667E-002,1.589,EAST ZONE,0.00
+
+\subsubsection{Field: \textless{}Mixing Airflow Stats - Nominal\textgreater{}}\label{field-mixing-airflow-stats---nominal}
+
+This field contains the constant ``Mixing Airflow Stats'' for each line.
+
+\subsubsection{Field: Name}\label{field-name-8}
+
+This field contains the name of the mixing statement from the IDF file.
+
+\subsubsection{Field: Schedule Name}\label{field-schedule-name-7}
+
+This is the schedule of use fraction -- the fraction is applied to the nominal volume flow rate for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-9}
+
+This is the name of the Zone for the mixing.
+
+\subsubsection{Field: Zone Floor Area \{m2\}}\label{field-zone-floor-area-m2-7}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: \# Zone Occupants}\label{field-zone-occupants-7}
+
+This is the total number of occupants for the zone.
+
+\subsubsection{Field: Design Volume Flow Rate \{m3/s\}}\label{field-design-volume-flow-rate-m3s-2}
+
+This is the nominal flow rate for the mixing in m3/s.
+
+\subsubsection{Field: Volume Flow Rate/Floor Area \{m3/s/m2\}}\label{field-volume-flow-ratefloor-area-m3sm2-2}
+
+This field is the volume flow rate density per floor area (flow rate per floor area) for mixing.
+
+\subsubsection{Field: Volume Flow Rate/person Area \{m3/s/person\}}\label{field-volume-flow-rateperson-area-m3sperson-1}
+
+This field is the volume flow rate density per person (flow rate per person) for mixing.
+
+\subsubsection{Field: ACH - Air Changes per Hour}\label{field-ach---air-changes-per-hour-2}
+
+This field is the air changes per hour for the given mixing rate.
+
+\subsubsection{Field: From/Source Zone}\label{field-fromsource-zone}
+
+This is the source zone for the mixing rate.
+
+\subsubsection{Field: Delta Temperature \{C\}}\label{field-delta-temperature-c}
+
+This number controls when mixing air from the source zone is sent to the receiving zone. This parameter is a temperature \{units Celsius\}. If this field is positive, the temperature of the zone from which the air is being drawn (source zone) must be ``Delta Temperature'' warmer than the receiving zone air or else no mixing occurs. If this field is negative, the temperature of the source zone must be ``Delta Temperature'' cooler than the receiving zone air or else no mixing occurs. If this parameter is zero, mixing occurs regardless of the relative zone temperatures.
+
+\subsection{Cross Mixing}\label{cross-mixing}
+
+! \textless{}CrossMixing Airflow Stats - Nominal\textgreater{},Name,Schedule Name,Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants,Design Volume Flow Rate \{m3/s\},Volume Flow Rate/Floor Area \{m3/s/m2\},Volume Flow Rate/person Area \{m3/s/person\},ACH - Air Changes per Hour,From/Source Zone,Delta Temperature \{C\}
+
+~CrossMixing Airflow Stats, EAST ZONE XMIXNG 1,ZONE MIXING,EAST ZONE,37.16,3.0,0.100,2.691E-003,3.333E-002,3.178,NORTH ZONE,1.00
+
+~CrossMixing Airflow Stats, NORTH ZONE XMIXNG 1,ZONE MIXING,NORTH ZONE,55.74,4.0,0.100,1.794E-003,2.500E-002,2.119,EAST ZONE,1.00
+
+\subsubsection{Field: \textless{}CrossMixing Airflow Stats - Nominal\textgreater{}}\label{field-crossmixing-airflow-stats---nominal}
+
+This field contains the constant ``CrossMixing Airflow Stats'' for each line.
+
+\subsubsection{Field: Name}\label{field-name-9}
+
+This field contains the name of the mixing statement from the IDF file.
+
+\subsubsection{Field: Schedule Name}\label{field-schedule-name-8}
+
+This is the schedule of use fraction -- the fraction is applied to the nominal volume flow rate for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name-10}
+
+This is the name of the Zone for the mixing.
+
+\subsubsection{Field: Zone Floor Area \{m2\}}\label{field-zone-floor-area-m2-8}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: \# Zone Occupants}\label{field-zone-occupants-8}
+
+This is the total number of occupants for the zone.
+
+\subsubsection{Field: Design Volume Flow Rate \{m3/s\}}\label{field-design-volume-flow-rate-m3s-3}
+
+This is the nominal flow rate for the mixing in m3/s.
+
+\subsubsection{Field: Volume Flow Rate/Floor Area \{m3/s/m2\}}\label{field-volume-flow-ratefloor-area-m3sm2-3}
+
+This field is the volume flow rate density per floor area (flow rate per floor area) for mixing.
+
+\subsubsection{Field: Volume Flow Rate/person Area \{m3/s/person\}}\label{field-volume-flow-rateperson-area-m3sperson-2}
+
+This field is the volume flow rate density per person (flow rate per person) for mixing.
+
+\subsubsection{Field: ACH - Air Changes per Hour}\label{field-ach---air-changes-per-hour-3}
+
+This field is the air changes per hour for the given mixing rate.
+
+\subsubsection{Field: From/Source Zone}\label{field-fromsource-zone-1}
+
+This is the source zone for the mixing -- air is exchanged equally between the two zones.
+
+\subsubsection{Field: Delta Temperature \{C\}}\label{field-delta-temperature-c-1}
+
+This number controls when mixing air from the source zone is sent to the receiving zone. This parameter is a temperature \{units Celsius\}. If this field is positive, the temperature of the zone from which air is being drawn (``source zone'') must be ``Delta Temperature'' warmer than the zone air or no mixing occurs. If this field is zero, mixing occurs regardless of the relative air temperatures. Negative values for ``Delta Temperature'' are not permitted.
+
+\subsection{RefrigerationDoor Mixing}\label{refrigerationdoor-mixing}
+
+! \textless{}RefrigerationDoorMixing~ Airflow Stats - Nominal\textgreater{}, Name, Zone 1 Name, Zone 2 Name, Door Opening Schedule Name, Door Height \{m\},Door Area \{m2\},Door Protection Type
+
+~RefrigerationDoorMixing Airflow Stats, FREEZER1\_SUBFREEZER1, FREEZER\_1, SUBFREEZER, FREEZER1DOORSCHEDA, 1.800, 2.300, StripCurtain
+
+~RefrigerationDoorMixing Airflow Stats, FREEZER5\_COOLER2, COOLER\_2, FREEZER\_5, FREEZER5DOORSCHEDA, 1.800, 2.300, AirCurtain
+
+\subsubsection{Field: \textless{}RefrigerationDoorMixing Airflow Stats - Nominal\textgreater{}}\label{field-refrigerationdoormixing-airflow-stats---nominal}
+
+This field contains the constant ``RefrigerationDoor Airflow Stats'' for each line.
+
+\subsubsection{Field: Name}\label{field-name-10}
+
+This field contains the name of the mixing statement from the IDF file.
+
+\subsubsection{Field: Zone 1 Name}\label{field-zone-1-name}
+
+This is the name of one of the two Zones for the mixing.
+
+\subsubsection{Field: Zone 2 Name}\label{field-zone-2-name}
+
+This is the name of the other Zone for the mixing.
+
+\subsubsection{Field: Door Opening Schedule Name}\label{field-door-opening-schedule-name}
+
+This is the schedule of use fraction -- the fraction is applied to the nominal volume flow rate for the statement. Limits are {[}0,1{]}.
+
+\subsubsection{Field: Door Height \{m\}}\label{field-door-height-m}
+
+This is the nominal flow rate for the mixing in m3/s.
+
+\subsubsection{Field: Door Area \{m2\}}\label{field-door-area-m2}
+
+This is the floor area (m2) of the zone.
+
+\subsubsection{Field: Door Protection Type}\label{field-door-protection-type}
+
+This is one of three keywords, None, StripCurtain, or AirCurtain.
+
+\subsection{Shading Summary}\label{shading-summary}
+
+Similar to the Zone Summary, the Shading Summary:
+
+! \textless{}Shading Summary\textgreater{}, Number of Fixed Detached Shades, Number of Building Detached Shades, Number of Attached Shades
+
+~Shading Summary,0,6,14
+
+\subsubsection{Field: \textless{}Shading Summary\textgreater{}}\label{field-shading-summary}
+
+This field contains the constant ``Shading Summary''.
+
+\subsubsection{Field: Number of Fixed Detached Shades}\label{field-number-of-fixed-detached-shades}
+
+This field contains the number of fixed detached shades (e.g.~Shading:Site or Shading:Site:Detailed) in the simulation.
+
+\subsubsection{Field: Number of Building Detached Shades}\label{field-number-of-building-detached-shades}
+
+This field contains the number of building relative detached shades (e.g.~Shading:Building or Shading:Building:Detailed) in the simulation.
+
+\subsubsection{Field: Number of Attached Shades}\label{field-number-of-attached-shades}
+
+This field contains the number of building attached shading surfaces (e.g.~Overhang, Shading:Zone:Detailed, etc.) in the simulation.
+
+\subsection{Surface Details Report}\label{surface-details-report}
+
+A good example of this is the surface details report(s) (\textbf{Output:Surfaces:List, Details;} \textbf{Output:Surfaces:List, Vertices; Output:Surfaces:List, DetailsWithVertices;}). Excerpt from the file:
+
+\textbf{Line 1:}! \textless{}Zone/Shading Surfaces\textgreater{}\textbf{,}\textless{}Zone Name\textgreater{}/\#Shading Surfaces,\# Surfaces, Vertices are shown starting at Upper-Left-Corner = \textgreater{} Counter-Clockwise = \textgreater{} World Coordinates
+
+\textbf{Line 2:}! \textless{}HeatTransfer/Shading/Frame/Divider\_Surface\textgreater{},Surface Name,Surface Class, Base Surface,Construction,Nominal U (w/o film coefs),Nominal U (with film coefs),Area (Net), Area (Gross), Area (Sunlit Calc), Aimuth, Tilt, \textasciitilde{}Width, \textasciitilde{}Height, Reveal, \textless{}ExtBoundCondition\textgreater{}, \textless{}ExtConvCoeffCalc\textgreater{}, \textless{}IntConvCoeffCalc\textgreater{},\textless{}SunExposure\textgreater{},\textless{}WindExposure\textgreater{},ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,\#Sides, \{Vertex 1\},,, \{Vertex 2\},,, \{Vertex 3\},,, \{Vertex 4\}, ,,\{etc\}
+
+\textbf{Line 3:} ! \textless{}Units\textgreater{},,,,,\{W/m2-K\},\{W/m2-K\},\{m2\},\{m2\},\{m2\},\{deg\},\{deg\},\{m\},\{m\},\{m\},,,,,,,,,,X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\}
+
+\textbf{Ex Line 1:} Shading\_Surfaces,Number of Shading Surfaces,~~ 10
+
+\textbf{Ex Line 2:} Shading\_Surface,WEST SIDE BUSHES,Detached Shading:Building,,,,, 180.0, 180.0, 180.0, 90.0, 90.0, 60.00, 3.00,,,,,,,,,,, 4, -5.00, 0.00, 3.00, -5.00, 0.00, 0.00, -5.00, 60.00, 0.00, -5.00, 60.00, 3.00
+
+\textbf{Ex Line 2:} Shading\_Surface,EAST SIDE TREE1,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 270.0, 90.0, 20.00, 50.99,,,,,,,,,,, 3, 70.00, 30.00, 50.00, 70.00, 40.00, 0.00, 70.00, 20.00, 0.00
+
+\textbf{Ex Line 2:} Shading\_Surface,EAST SIDE TREE2,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 0.0, 90.0, 20.00, 50.99,,,,,,,,,,, 3, 70.00, 30.00, 50.00, 80.00, 30.00, 0.00, 60.00, 30.00, 0.00
+
+\textbf{Ex Line 1:} Zone\_Surfaces,HEARTLAND AREA,~~ 35
+
+\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL001,Wall,,EXTERIOR,0.644, 0.588, 136.0, 200.0, 136.0, 180.0, 90.0, 20.0, 10.0, 0.00,ExternalEnvironment,ASHRAEDetailed,ASHRAEDetailed,SunExposed,WindExposed, 0.50, 0.50, 0.67,~ 0.33, 4, 20.00, 10.00, 10.00, 20.00, 10.00, 0.00, 40.00, 10.00, 0.00, 40.00, 10.00, 10.00
+
+\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL001:WIN001,Window,ZN001:WALL001,SINGLE PANE HW WINDOW,N/A,6.121, 64.00000, 64.00000, 64.00000,180.0, 90.0, 8.00, 8.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,~ 0.50,~ 0.50,~ 0.71,~ 0.29, 4, 26.00, 10.00, 8.10, 26.00, 10.00, 0.10, 34.00, 10.00, 0.10, 34.00, 10.00, 8.10
+
+\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL002,Wall,,EXTERIOR,0.644,0.588, 155.0, 200.0, 155.0, 90.0, 90.0, 20.00, 10.00, 0.00,ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50,~ 0.50,~ 0.73,~ 0.27, 4, 50.00, 20.00, 10.00, 50.00, 20.00, 0.00, 50.00, 40.00, 0.00, 50.00, 40.00, 10.00
+
+\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL002:WIN001,Window,ZN001:WALL002,SINGLE PANE HW WINDOW,N/A,6.121, 15.0, 15.0, 15.0, 90.0, 90.0, 3.00, 5.00,~ 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,~ 0.50,~ 0.50,~ 0.76,~ 0.24, 4, 50.00, 22.20, 7.30, 50.00, 22.20, 2.30, 50.00, 25.20, 2.30, 50.00, 25.20, 7.30
+
+\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL002:WIN002,Window,ZN001:WALL002,SINGLE PANE HW WINDOW, N/A, 6.121, 15.00, 15.00, 15.00, 90.00, 90.00, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.71, 0.29, 4, 50.00, 28.50, 7.30, 50.00, 28.50, 2.30, 50.00, 31.50, 2.30, 50.00, 31.50, 7.30
+
+\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN001:WALL002:WIN003, Window, ZN001:WALL002, SINGLE PANE HW WINDOW, N/A, 6.121, 15.00, 15.00, 15.00, 90.00, 90.00, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.77, 0.23, 4, 50.00, 35.30, 7.30, 50.00, 35.30, 2.30, 50.00, 38.30, 2.30, 50.00, 38.30, 7.30
+
+\textless{}reduced for brevity\textgreater{}
+
+\textbf{Ex Line 1:} Zone\_Surfaces,MAINE WING,~~ 12
+
+\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN005:WALL001, Wall, , EXTERIOR, 0.644, 0.588, 100.00, 100.00, 100.00, 180.00, 90.00, 10.00, 10.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.74, 0.26, 4, 50.00, 40.00, 10.00, 50.00, 40.00, 0.00, 60.00, 40.00, 0.00, 60.00, 40.00, 10.00
+
+\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN005:FLR001, Floor, , SLAB FLOOR, 17.040, 3.314, 400.00, 400.00, 400.00, 90.00, 180.00, 20.00, 20.00, 0.00, Ground, N/A-Ground, ASHRAEDetailed, NoSun, NoWind, 1.00, 0.00, 1.00, 0.00, 4, 60.00, 40.00, 0.00, 40.00, 40.00, 0.00, 40.00, 60.00, 0.00, 60.00, 60.00, 0.00
+
+\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN005:ROOF001, Roof, , ROOF31, 0.790, 0.688, 400.00, 400.00, 400.00, 180.00, 0.00, 20.00, 20.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.00, 1.00, 2.41E-002, 0.98, 4, 40.00, 60.00, 10.00, 40.00, 40.00, 10.00, 60.00, 40.00, 10.00, 60.00, 60.00, 10.00
+
+\subsubsection{Description of the Detailed Surfaces Report(s)}\label{description-of-the-detailed-surfaces-reports}
+
+The preceding excerpt includes the surface details \emph{and} vertices. You can also obtain the report with \emph{just} the details or \emph{just} the vertices.
+
+\textbf{Line 1:}! \textless{}Zone/Shading Surfaces\textgreater{}\textbf{,}\textless{}Zone Name\textgreater{}/\#Shading Surfaces,\# Surfaces, Vertices are shown starting at Upper-Left-Corner = \textgreater{} Counter-Clockwise = \textgreater{} World Coordinates
+
+When a line is shown with the comment character (!) in the first position, it signifies a informational ``header'' record for the report. In addition, ``Line 1'' is also a header for the subsequent ``real'' surface lines.
+
+\subsubsection{Field: \textless{}Zone/Shading Surfaces\textgreater{}}\label{field-zoneshading-surfaces}
+
+This field is a dual purpose field. For beginning of the Shading Surfaces, it will show ``Shading\_Surfaces''. At each Zone, it will show ``Zone\_Surfaces''.
+
+\subsubsection{Field: \textless{}Zone Name\textgreater{}/\#Shading Surfaces}\label{field-zone-nameshading-surfaces}
+
+This field is a dual purpose field. It will either show the Zone Name of the subsequent surfaces or the ``Number of Shading Surfaces'' for the entire building.
+
+\subsubsection{Field: \# Surfaces}\label{field-surfaces}
+
+This field, then, specifies the number of surfaces of the type (zone or shading) that will follow.
+
+The example lines illustrate:
+
+Shading\_Surfaces,Number of Shading Surfaces,~~ 10
+
+Zone\_Surfaces,HEARTLAND AREA,~~ 35
+
+Zone\_Surfaces,MAINE WING,~~ 12
+
+\textbf{Line 2:}! \textless{}HeatTransfer/Shading/Frame/Divider\_Surface\textgreater{}, Surface Name, Surface Class, Base Surface, Construction, Nominal U (w/o film coefs), Nominal U (with film coefs), Area (Net), Area (Gross), Area (Sunlit Calc), Azimuth, Tilt, \textasciitilde{}Width, \textasciitilde{}Height, Reveal, \textless{}ExtBoundCondition\textgreater{}, \textless{}ExtConvCoeffCalc\textgreater{}, \textless{}IntConvCoeffCalc\textgreater{}, \textless{}SunExposure\textgreater{}, \textless{}WindExposure\textgreater{}, ViewFactorToGround, ViewFactorToSky, ViewFactorToGround-IR, ViewFactorToSky-IR, \#Sides, \{Vertex 1\},,, \{Vertex 2\},,, \{Vertex 3\},,, \{Vertex 4\}, ,,\{etc\}
+
+\textbf{Line 3:} ! \textless{}Units\textgreater{},,,,,\{W/m2-K\},\{W/m2-K\},\{m2\},\{m2\},\{m2\},\{deg\},\{deg\},\{m\},\{m\},\{m\},,,,,,,,,,X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\}
+
+Line 2 shows the full detail of each surface record with Line 3 used for illustrating the units of individual fields (as appropriate).
+
+The first four fields (\textless{}HeatTransfer/ShadingSurface\textgreater{},Surface Name, Surface Class, Base Surface) are included in all the Surface reports (Details, Vertices, Details with Vertices).
+
+\subsubsection{Field: \textless{}HeatTransfer/Shading/Frame/Divider\_Surface\textgreater{}}\label{field-heattransfershadingframedividerux5fsurface}
+
+For shading surfaces, this will be a constant ``Shading\_Surface''. For heat transfer surfaces, this will be a constant ``HeatTransfer\_Surface''. For Frame and Divider Surfaces, it will be a constant ``Frame/Divider\_Surface'' with the proper type showing in the Surface Class.
+
+\subsubsection{Field: Surface Name}\label{field-surface-name}
+
+This field will contain the actual surface name as entered in the IDF.
+
+\subsubsection{Field: Surface Class}\label{field-surface-class}
+
+This field contains the surface class (e.g.~Window, Door, Wall, Roof) as entered in the IDF.
+
+\subsubsection{Field: Base Surface}\label{field-base-surface}
+
+This field contains the base surface name if this surface is a sub-surface (i.e.~Window, Door).
+
+\subsubsection{Fields in Details and Details with Vertices report.}\label{fields-in-details-and-details-with-vertices-report.}
+
+\subsubsection{Field: Construction}\label{field-construction}
+
+This field will contain the name of the construction used for the surface. (Will be empty for shading surfaces).
+
+\subsubsection{Field: Nominal U (w/o film coefs)}\label{field-nominal-u-wo-film-coefs}
+
+A nominal thermal conductance for the surface is calculated for the surface. It does not include interior or exterior film coefficients as this is calculated during the simulation and is dependent on several factors that may change during the simulation time period. Units for this field are W/m\(^{2}\)-K.
+
+For windows, no value is reported because the film coefficients cannot be removed from the U-value.
+
+\subsubsection{Field: Nominal U (with film coefs)}\label{field-nominal-u-with-film-coefs}
+
+A nominal thermal conductance for the surface is calculated for the surface, including film coefficients. Units for this field are W/m\(^{2}\)-K.
+
+For opaque surfaces, interior and exterior film coefficients are added to the surface construction based on the prescribed R-values for interior and exterior film coefficients as found in ASHRAE 90.1-2004, Appendix A, and shown below:~ The SI values are the exact values used inside EnergyPlus.
+
+\begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
+\toprule 
+Surface Class & Interior Film Coefficient & Exterior Film Coefficient \tabularnewline \midrule
+\endhead
+ & (ft2-F-hr/BTU) & (m2-K/W) & (ft2-F-hr/BTU) & (m2-K/W) \tabularnewline
+WALL & 0.68 & 0.1197548 & 0.17 & 0.0299387 \tabularnewline
+FLOOR & 0.92 & 0.1620212 & 0.46 & 0.0810106 \tabularnewline
+CEILING/ROOF & 0.61 & 0.1074271 & 0.46 & 0.0810106 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{How to Access the SQLite Data}\label{how-to-access-the-sqlite-data}
+
+The SQL database can be accessed in a number of ways, including via the command line, through ODBC, or through as SQLite's API interface. SQLite uses the industry standard SQL 92 language.
+
+\subsubsection{Command Line}\label{command-line}
+
+One of the simplest ways to access the data in the SQL database is by way of the SQL command line tool (i.e., sqlite3). A brief description of how to use sqlite3 for each computing platform is given below.
+
+\subsubsection{Windows XP and Windows Vista}\label{windows-xp-and-windows-vista}
+
+While Windows does not ship with sqlite3 installed, the sqlite3 binary can be downloaded from the SQLite webpage (www.sqlite.org/download.html). After downloading the precompiled binary, install it in the EnergyPlus directory.
+
+Once the sqlite3 executable is installed, access the program from the command line by typing ``sqlite3'' at the DOS prompt.
+
+\subsubsection{Linux}\label{linux}
+
+The sqlite3 command line tool comes preinstalled on a number of more recent Linux releases. To see if sqlite3 is available (and which version is installed), type ``sqlite3 --version'' from the command line. If sqlite3 is not installed, the sqlite3 binary, as well as source code, can be downloaded from the SQLite webpage (http://www.sqlite.org/download.html) and installed in the directory of your choice.
+
+\subsubsection{Macintosh OS X}\label{macintosh-os-x}
+
+The sqlite3 program comes standard on MacOS X 10.5. From the command line, type ``sqlite3 --version'' to see which version of sqlite3 is installed.~ In order to access the database created by EnergyPlus, version 3 or later is required.
+
+\subsubsection{Accessing the Data from the Command Line}\label{accessing-the-data-from-the-command-line}
+
+Once it has been confirmed that SQLite3 is installed on your machine, the SQL database can be accessed by typing:
+
+\begin{lstlisting}
+sqlite3 <database name>
+\end{lstlisting}
+
+at the command line, where \textless{}database name \textgreater{} is the name of the SQL database (e.g., sqlite3 eplusout.sql).
+
+The sqlite.org \href{http://www.sqlite.org/sqlite.html}{website} gives examples of how sqlite3 can be used to access and output data in various formats.
+
+\subsubsection{ODBC}\label{odbc}
+
+ODBC allows access to the SQL database from a variety of programs, including Microsoft Excel, Microsoft Access, and FileMaker. How to install and use ODBC drivers is outside the scope of this document, and more information can be found at the following websites:
+
+Macintosh ODBC drivers:
+
+http://www.actualtechnologies.com/
+
+Windows and Linux ODBC information and drivers:
+
+http://www.sqlite.org/cvstrac/wiki?p = SqliteOdbc
+
+http://www.ch-werner.de/sqliteodbc/
+
+\subsubsection{API}\label{api}
+
+Sqlite3 includes a rich C++ API (detailed on the SQLite website \href{http://www.sqlite.org/cintro.html}{www.sqlite.org/cintro.html}), and wrappers for the API interface are available in a variety of programming languages, including Fortran, TCL, and Ruby (see \href{http://www.sqlite.org/cvstrac/wiki?p\%20=\%20SqliteWrappers}{www.sqlite.org/cvstrac/wiki?p = SqliteWrappers} for more information).

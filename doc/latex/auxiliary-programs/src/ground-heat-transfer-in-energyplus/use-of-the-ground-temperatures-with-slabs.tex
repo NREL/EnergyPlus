@@ -1,0 +1,70 @@
+\section{Caution}\label{caution}
+
+For ground-contact surfaces in EnergyPlus, it is important to specify appropriate ground temperatures. Do not use the ``undisturbed'' ground temperatures from the weather data. These values are too extreme for the soil under a conditioned building. For best results, use the Slab or Basement program described in this section to calculate custom monthly average ground temperatures. This is especially important for residential applications and very small buildings. If one of these ground temperature preprocessors is not used, for typical commercial buildings in the USA, a reasonable default value is 2C less than the average indoor space temperature.
+
+\section{Introduction}\label{introduction-003}
+
+There are two difficulties behind linking ground heat transfer calculations to EnergyPlus. One is the fact that the conduction calculations in EnergyPlus (and in DOE-2 and BLAST previously) are one-dimensional and the ground heat transfer calculations are two or three-dimensional. This causes severe modeling problems irrespective of the methods being used for the ground heat transfer calculation. The other difficulty is the markedly different time scales involved in the processes. Basically, the zone model is on an hour scale and the ground heat transfer is on a monthly time scale. The basic heat balance based zone model of EnergyPlus has to be considered as the foundation for building energy simulation at the present time and for some time in the future. Thus, it is necessary to be able to relate ground heat transfer calculations to that model.
+
+The heat balance zone model considers a single room or thermal zone in a building and performs a heat balance on it. A fundamental modeling assumption is that the faces of the enclosure are isothermal planes. A ground heat transfer calculation usually considers an entire building and the earth that surrounds it, resulting in non-isothermal face planes where there is ground contact. While it is not impossible to imagine multi-zone, whole building models that include the surrounding earth and non-isothermal building surfaces, such models will not be practical for some time in the future, and their usefulness even then is not clear.
+
+The EnergyPlus development team addressed the problem and decided that the most reasonable first step would be to partially decouple the ground heat transfer calculation from the thermal zone calculation. The most important parameter for the zone calculation is the outside face temperature of the building surface that is in contact with the ground. Thus this becomes a reasonable ``separation plane'' for the two calculations. It was further decided that the current usage of monthly average ground temperature was reasonable for this separation plane temperature as well, since the time scales of the building heat transfer processes are so much shorter than those of the ground heat transfer processes.
+
+Using the separation plane premise, the 3D ground heat transfer programs for slabs developed by Bahnfleth (1989, 1990) were modified by Clements (2004) to produce outside face temperatures. EnergyPlus permits separate monthly average inside temperatures as input. The program produces outside face temperatures for the core area and the perimeter area of the slab. It is described in the section ``Use of the Ground Temperatures with Slabs'' below.
+
+A 3D basement program also is included with EnergyPlus. This is described below in Using Ground Temperatures with Basements. It uses the same principle as the slab procedure; it determines the outside face (surface) temperature of the walls and floor of a basement in contact with the ground.
+
+It should be noted that either for slabs or basements the ground heat transfer is usually small unless the building is very small or has some special characteristics.
+
+Multiple Ground Temperatures shows how the OtherSideCoefficients object of EnergyPlus can be used to supply multiple ground temperatures.
+
+\section{Use of the Ground Temperatures with Slabs}\label{use-of-the-ground-temperatures-with-slabs}
+
+The Slab program produces temperature profiles for the outside surface at the core and at the perimeter of the slab. It also produces the average based on the perimeter and core areas used in the calculation. This allows the user to apply the Slab temperatures one of two ways in EnergyPlus:
+
+\emph{Option 1 - Core and Perimeter Temperatures}: The EnergyPlus OtherSideCoefficients object can be used to provide two sets of twelve monthly average ground temperature values. In this way, both the perimeter and the core values from the Slab program can be used in the succeeding EnergyPlus run. This method assumes that the floor slab will be described using at least two different heat transfer surfaces. The use of OtherSideCoefficients to provide additional ground contact surfaces is described in detail in the ``Multiple Ground Temperatures'' section below.
+
+\emph{Option 2 - Average Temperatures:} Use the monthly average temperatures produced by the Slab program in the EnergyPlus GroundTemperatures object. This will provide an average ground temperature at the outside face of any heat transfer surface whose OutsideFaceEnvironment field is set to ``ground''.
+
+EnergyPlus accepts twelve separate monthly average inside temperatures. In addition, it is possible to add an hourly sinusoidal variation of the inside temperature with a 24 hour period sine function. This was included to show the effect of something such as night setback on the face temperature. Generally, the effect is quite small.
+
+First the results for a monthly specified constant average inside temperature. The location is Minneapolis, and the slab is insulated.
+
+\begin{lstlisting}
+Monthly Slab Outside Face Temperatures, C
+Perimeter Area: 304.00  Core Area: 1296.00
+Month   Average   Perimeter    Core      Inside
+1      17.67     16.11      18.03       18.0
+2      17.45     15.92      17.81       18.0
+3      17.43     16.07      17.74       18.0
+4      19.00     17.82      19.27       20.0
+5      19.24     18.23      19.48       20.0
+6      19.31     18.42      19.52       20.0
+7      20.92     20.14      21.11       22.0
+8      21.17     20.44      21.35       22.0
+9      21.22     20.45      21.40       22.0
+10      21.21     20.26      21.44       22.0
+11      19.62     18.54      19.88       20.0
+12      19.35     17.99      19.67       20.0
+\end{lstlisting}
+
+The resulting heat flux is shown below. The inside heat transfer coefficient and slab thermal properties are specified in the input file. For this example the total thermal resistance from the inside air to the slab bottom surface was 0.27 (m\(^{2}\) C)/W. This value is controlled by the user with the inside heat transfer coefficient and slab thermal properties values in the slab program input file.
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+Month & Average & Perimeter & Core & Inside & Perimeter Heat Flux W/m & Average Heat Flux W/m \tabularnewline \midrule
+\endhead
+1 & 17.67 & 16.11 & 18.03 & 18 & 7.00 & 1.22 \tabularnewline
+2 & 17.45 & 15.92 & 17.81 & 18 & 7.70 & 2.04 \tabularnewline
+3 & 17.43 & 16.07 & 17.74 & 18 & 7.15 & 2.11 \tabularnewline
+4 & 19 & 17.82 & 19.27 & 20 & 8.07 & 3.70 \tabularnewline
+5 & 19.24 & 18.23 & 19.48 & 20 & 6.56 & 2.81 \tabularnewline
+6 & 19.31 & 18.42 & 19.52 & 20 & 5.85 & 2.56 \tabularnewline
+7 & 20.92 & 20.14 & 21.11 & 22 & 6.89 & 4.00 \tabularnewline
+8 & 21.17 & 20.44 & 21.35 & 22 & 5.78 & 3.07 \tabularnewline
+9 & 21.22 & 20.45 & 21.4 & 22 & 5.74 & 2.89 \tabularnewline
+10 & 21.21 & 20.26 & 21.44 & 22 & 6.44 & 2.93 \tabularnewline
+11 & 19.62 & 18.54 & 19.88 & 20 & 5.41 & 1.41 \tabularnewline
+12 & 19.35 & 17.99 & 19.67 & 20 & 7.44 & 2.41 \tabularnewline
+\bottomrule
+\end{longtable}
