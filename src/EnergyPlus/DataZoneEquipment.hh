@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef DataZoneEquipment_hh_INCLUDED
 #define DataZoneEquipment_hh_INCLUDED
 
@@ -84,7 +142,8 @@ namespace DataZoneEquipment {
 	extern Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
 	extern Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
 	extern Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
-
+	extern Array1D< Real64 > ZMAT; // Zone air temperature for zone air mixing
+	extern Array1D< Real64 > ZHumRat; // Zone air humidity ratio zone air mixing
 	// Utility routines for module
 
 	// Types
@@ -111,31 +170,6 @@ namespace DataZoneEquipment {
 			ReportVarIndexType( 0 ),
 			ReportVarType( 0 ),
 			CurMeterReading( 0.0 )
-		{}
-
-		// Member Constructor
-		EquipMeterData(
-			std::string const & ReportVarName,
-			std::string const & ReportVarUnits,
-			int const ResourceType,
-			std::string const & EndUse,
-			int const EndUse_CompMode,
-			std::string const & Group,
-			int const ReportVarIndex,
-			int const ReportVarIndexType,
-			int const ReportVarType,
-			Real64 const CurMeterReading
-		) :
-			ReportVarName( ReportVarName ),
-			ReportVarUnits( ReportVarUnits ),
-			ResourceType( ResourceType ),
-			EndUse( EndUse ),
-			EndUse_CompMode( EndUse_CompMode ),
-			Group( Group ),
-			ReportVarIndex( ReportVarIndex ),
-			ReportVarIndexType( ReportVarIndexType ),
-			ReportVarType( ReportVarType ),
-			CurMeterReading( CurMeterReading )
 		{}
 
 	};
@@ -193,61 +227,6 @@ namespace DataZoneEquipment {
 			TotPlantSupplyOther( 0.0 ),
 			PlantSupplyOtherEff( 0.0 ),
 			PeakPlantSupplyOtherEff( 0.0 )
-		{}
-
-		// Member Constructor
-		SubSubEquipmentData(
-			std::string const & TypeOf, // The 'keyWord' identifying  component type
-			std::string const & Name, // Component name
-			int const EquipIndex, // Component Index for routines
-			bool const ON, // When true, the designated component or operation scheme is available
-			int const InletNodeNum,
-			int const OutletNodeNum,
-			int const NumMeteredVars,
-			Array1< EquipMeterData > const & MeteredVar, // Index of energy output report data
-			int const EnergyTransComp, // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
-			int const ZoneEqToPlantPtr, // 0=No plant loop connection, >=0 index to ZoneEqToPlant array
-			int const OpMode,
-			Real64 const Capacity,
-			Real64 const Efficiency,
-			Real64 const TotPlantSupplyElec,
-			Real64 const PlantSupplyElecEff,
-			Real64 const PeakPlantSupplyElecEff,
-			Real64 const TotPlantSupplyGas,
-			Real64 const PlantSupplyGasEff,
-			Real64 const PeakPlantSupplyGasEff,
-			Real64 const TotPlantSupplyPurch,
-			Real64 const PlantSupplyPurchEff,
-			Real64 const PeakPlantSupplyPurchEff,
-			Real64 const TotPlantSupplyOther,
-			Real64 const PlantSupplyOtherEff,
-			Real64 const PeakPlantSupplyOtherEff
-		) :
-			TypeOf( TypeOf ),
-			Name( Name ),
-			EquipIndex( EquipIndex ),
-			ON( ON ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			NumMeteredVars( NumMeteredVars ),
-			MeteredVar( MeteredVar ),
-			EnergyTransComp( EnergyTransComp ),
-			ZoneEqToPlantPtr( ZoneEqToPlantPtr ),
-			OpMode( OpMode ),
-			Capacity( Capacity ),
-			Efficiency( Efficiency ),
-			TotPlantSupplyElec( TotPlantSupplyElec ),
-			PlantSupplyElecEff( PlantSupplyElecEff ),
-			PeakPlantSupplyElecEff( PeakPlantSupplyElecEff ),
-			TotPlantSupplyGas( TotPlantSupplyGas ),
-			PlantSupplyGasEff( PlantSupplyGasEff ),
-			PeakPlantSupplyGasEff( PeakPlantSupplyGasEff ),
-			TotPlantSupplyPurch( TotPlantSupplyPurch ),
-			PlantSupplyPurchEff( PlantSupplyPurchEff ),
-			PeakPlantSupplyPurchEff( PeakPlantSupplyPurchEff ),
-			TotPlantSupplyOther( TotPlantSupplyOther ),
-			PlantSupplyOtherEff( PlantSupplyOtherEff ),
-			PeakPlantSupplyOtherEff( PeakPlantSupplyOtherEff )
 		{}
 
 	};
@@ -312,67 +291,6 @@ namespace DataZoneEquipment {
 			PeakPlantSupplyOtherEff( 0.0 )
 		{}
 
-		// Member Constructor
-		SubEquipmentData(
-			bool const Parent, // When true, the designated component is made up of sub-components
-			int const NumSubSubEquip,
-			std::string const & TypeOf, // The 'keyWord' identifying  component type
-			std::string const & Name, // Component name
-			int const EquipIndex, // Component Index for routines
-			bool const ON, // When true, the designated component or operation scheme is available
-			int const InletNodeNum,
-			int const OutletNodeNum,
-			int const NumMeteredVars,
-			Array1< EquipMeterData > const & MeteredVar, // Index of energy output report data
-			Array1< SubSubEquipmentData > const & SubSubEquipData, // Component list
-			int const EnergyTransComp, // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
-			int const ZoneEqToPlantPtr, // 0=No plant loop connection, >0 index to ZoneEqToPlant array
-			int const OpMode,
-			Real64 const Capacity,
-			Real64 const Efficiency,
-			Real64 const TotPlantSupplyElec,
-			Real64 const PlantSupplyElecEff,
-			Real64 const PeakPlantSupplyElecEff,
-			Real64 const TotPlantSupplyGas,
-			Real64 const PlantSupplyGasEff,
-			Real64 const PeakPlantSupplyGasEff,
-			Real64 const TotPlantSupplyPurch,
-			Real64 const PlantSupplyPurchEff,
-			Real64 const PeakPlantSupplyPurchEff,
-			Real64 const TotPlantSupplyOther,
-			Real64 const PlantSupplyOtherEff,
-			Real64 const PeakPlantSupplyOtherEff
-		) :
-			Parent( Parent ),
-			NumSubSubEquip( NumSubSubEquip ),
-			TypeOf( TypeOf ),
-			Name( Name ),
-			EquipIndex( EquipIndex ),
-			ON( ON ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			NumMeteredVars( NumMeteredVars ),
-			MeteredVar( MeteredVar ),
-			SubSubEquipData( SubSubEquipData ),
-			EnergyTransComp( EnergyTransComp ),
-			ZoneEqToPlantPtr( ZoneEqToPlantPtr ),
-			OpMode( OpMode ),
-			Capacity( Capacity ),
-			Efficiency( Efficiency ),
-			TotPlantSupplyElec( TotPlantSupplyElec ),
-			PlantSupplyElecEff( PlantSupplyElecEff ),
-			PeakPlantSupplyElecEff( PeakPlantSupplyElecEff ),
-			TotPlantSupplyGas( TotPlantSupplyGas ),
-			PlantSupplyGasEff( PlantSupplyGasEff ),
-			PeakPlantSupplyGasEff( PeakPlantSupplyGasEff ),
-			TotPlantSupplyPurch( TotPlantSupplyPurch ),
-			PlantSupplyPurchEff( PlantSupplyPurchEff ),
-			PeakPlantSupplyPurchEff( PeakPlantSupplyPurchEff ),
-			TotPlantSupplyOther( TotPlantSupplyOther ),
-			PlantSupplyOtherEff( PlantSupplyOtherEff ),
-			PeakPlantSupplyOtherEff( PeakPlantSupplyOtherEff )
-		{}
-
 	};
 
 	struct AirIn
@@ -400,29 +318,6 @@ namespace DataZoneEquipment {
 			NetBranchCoilDemand( 0.0 )
 		{}
 
-		// Member Constructor
-		AirIn(
-			int const InNode, // Air distribution unit inlet node
-			int const OutNode, // Air distribution unit Outlet node
-			bool const SupplyAirPathExists,
-			int const MainBranchIndex,
-			int const SupplyBranchIndex,
-			int const AirDistUnitIndex, // equipment number in EquipList
-			int const SupplyAirPathIndex,
-			Real64 const NetBranchCoilDemand,
-			Array1< SubSubEquipmentData > const & Coil
-		) :
-			InNode( InNode ),
-			OutNode( OutNode ),
-			SupplyAirPathExists( SupplyAirPathExists ),
-			MainBranchIndex( MainBranchIndex ),
-			SupplyBranchIndex( SupplyBranchIndex ),
-			AirDistUnitIndex( AirDistUnitIndex ),
-			SupplyAirPathIndex( SupplyAirPathIndex ),
-			NetBranchCoilDemand( NetBranchCoilDemand ),
-			Coil( Coil )
-		{}
-
 	};
 
 	struct EquipConfiguration
@@ -437,9 +332,12 @@ namespace DataZoneEquipment {
 		int ReturnAirNode;
 		int NumInletNodes;
 		int NumExhaustNodes;
+		int NumReturnFlowBasisNodes; // number of return air flow basis nodes
+		int ReturnFlowSchedPtrNum; // return air flow fraction schedule pointer
 		bool FlowError; // flow error flag
 		Array1D_int InletNode; // zone supply air inlet nodes
 		Array1D_int ExhaustNode; // zone air exhaust nodes
+		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
 		int AirLoopNum; // the air loop index for this controlled zone
 		int FanOpMode; // =0 if no central sys;
@@ -465,6 +363,8 @@ namespace DataZoneEquipment {
 		bool InWallActiveElement; // Convection adapation, true if zone has in-wall HVAC
 		bool InCeilingActiveElement; // Convection adapation,
 		// true when zone has in-ceiling HVAC
+		int ADUNum; // index of Air Distribution Unit
+		int SDUNum; // index of Single Duct Uncontrolled
 
 		// Default Constructor
 		EquipConfiguration() :
@@ -475,6 +375,8 @@ namespace DataZoneEquipment {
 			ReturnAirNode( 0 ),
 			NumInletNodes( 0 ),
 			NumExhaustNodes( 0 ),
+			NumReturnFlowBasisNodes( 0 ),
+			ReturnFlowSchedPtrNum( 0 ),
 			FlowError( false ),
 			ReturnZonePlenumCondNum( 0 ),
 			AirLoopNum( 0 ),
@@ -487,64 +389,9 @@ namespace DataZoneEquipment {
 			SupLeakToRetPlen( false ),
 			InFloorActiveElement( false ),
 			InWallActiveElement( false ),
-			InCeilingActiveElement( false )
-		{}
-
-		// Member Constructor
-		EquipConfiguration(
-			std::string const & ZoneName,
-			int const ActualZoneNum, // index into the Zone data
-			std::string const & EquipListName,
-			int const EquipListIndex,
-			std::string const & ControlListName,
-			int const ZoneNode,
-			int const ReturnAirNode,
-			int const NumInletNodes,
-			int const NumExhaustNodes,
-			bool const FlowError, // flow error flag
-			Array1_int const & InletNode, // zone supply air inlet nodes
-			Array1_int const & ExhaustNode, // zone air exhaust nodes
-			int const ReturnZonePlenumCondNum, // number of the zone's return air plenum
-			int const AirLoopNum, // the air loop index for this controlled zone
-			int const FanOpMode, // =0 if no central sys;
-			bool const ZonalSystemOnly, // TRUE if served by a zonal system (only)
-			bool const IsControlled, // True when this is a controlled zone.
-			Real64 const ZoneExh, // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
-			Real64 const ZoneExhBalanced, // balanced zone exhaust mass flow rate [kg/s]
-			Real64 const PlenumMassFlow, // zone air mass flow rate induced from plenum [kg/s]
-			Array1< AirIn > const & AirDistUnitHeat, // dimensioned to number of zone inlet nodes
-			Array1< AirIn > const & AirDistUnitCool, // dimensioned to number of zone inlet nodes.
-			bool const SupLeakToRetPlen, // True if there is supply duct leak to the
-			bool const InFloorActiveElement, // Convection adapation, true if zone has in-floor HVAC
-			bool const InWallActiveElement, // Convection adapation, true if zone has in-wall HVAC
-			bool const InCeilingActiveElement // Convection adapation,
-		) :
-			ZoneName( ZoneName ),
-			ActualZoneNum( ActualZoneNum ),
-			EquipListName( EquipListName ),
-			EquipListIndex( EquipListIndex ),
-			ControlListName( ControlListName ),
-			ZoneNode( ZoneNode ),
-			ReturnAirNode( ReturnAirNode ),
-			NumInletNodes( NumInletNodes ),
-			NumExhaustNodes( NumExhaustNodes ),
-			FlowError( FlowError ),
-			InletNode( InletNode ),
-			ExhaustNode( ExhaustNode ),
-			ReturnZonePlenumCondNum( ReturnZonePlenumCondNum ),
-			AirLoopNum( AirLoopNum ),
-			FanOpMode( FanOpMode ),
-			ZonalSystemOnly( ZonalSystemOnly ),
-			IsControlled( IsControlled ),
-			ZoneExh( ZoneExh ),
-			ZoneExhBalanced( ZoneExhBalanced ),
-			PlenumMassFlow( PlenumMassFlow ),
-			AirDistUnitHeat( AirDistUnitHeat ),
-			AirDistUnitCool( AirDistUnitCool ),
-			SupLeakToRetPlen( SupLeakToRetPlen ),
-			InFloorActiveElement( InFloorActiveElement ),
-			InWallActiveElement( InWallActiveElement ),
-			InCeilingActiveElement( InCeilingActiveElement )
+			InCeilingActiveElement( false ),
+			ADUNum( 0 ),
+			SDUNum( 0 )
 		{}
 
 	};
@@ -607,67 +454,6 @@ namespace DataZoneEquipment {
 			OpMode( 0 )
 		{}
 
-		// Member Constructor
-		EquipmentData(
-			bool const Parent, // When true, the designated component is made up of sub-components
-			int const NumSubEquip,
-			std::string const & TypeOf, // The 'keyWord' identifying  component type
-			std::string const & Name, // Component name
-			bool const ON, // When true, the designated component or operation scheme is available
-			int const NumInlets,
-			int const NumOutlets,
-			Array1_int const & InletNodeNums,
-			Array1_int const & OutletNodeNums,
-			int const NumMeteredVars,
-			Array1< EquipMeterData > const & MeteredVar, // Index of energy output report data
-			Array1< SubEquipmentData > const & SubEquipData, // Component list
-			int const EnergyTransComp, // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
-			int const ZoneEqToPlantPtr, // 0=No plant loop connection, >0 index to ZoneEqToPlant array
-			Real64 const TotPlantSupplyElec,
-			Real64 const PlantSupplyElecEff,
-			Real64 const PeakPlantSupplyElecEff,
-			Real64 const TotPlantSupplyGas,
-			Real64 const PlantSupplyGasEff,
-			Real64 const PeakPlantSupplyGasEff,
-			Real64 const TotPlantSupplyPurch,
-			Real64 const PlantSupplyPurchEff,
-			Real64 const PeakPlantSupplyPurchEff,
-			Real64 const TotPlantSupplyOther,
-			Real64 const PlantSupplyOtherEff,
-			Real64 const PeakPlantSupplyOtherEff,
-			Real64 const Capacity,
-			int const OpMode
-		) :
-			Parent( Parent ),
-			NumSubEquip( NumSubEquip ),
-			TypeOf( TypeOf ),
-			Name( Name ),
-			ON( ON ),
-			NumInlets( NumInlets ),
-			NumOutlets( NumOutlets ),
-			InletNodeNums( InletNodeNums ),
-			OutletNodeNums( OutletNodeNums ),
-			NumMeteredVars( NumMeteredVars ),
-			MeteredVar( MeteredVar ),
-			SubEquipData( SubEquipData ),
-			EnergyTransComp( EnergyTransComp ),
-			ZoneEqToPlantPtr( ZoneEqToPlantPtr ),
-			TotPlantSupplyElec( TotPlantSupplyElec ),
-			PlantSupplyElecEff( PlantSupplyElecEff ),
-			PeakPlantSupplyElecEff( PeakPlantSupplyElecEff ),
-			TotPlantSupplyGas( TotPlantSupplyGas ),
-			PlantSupplyGasEff( PlantSupplyGasEff ),
-			PeakPlantSupplyGasEff( PeakPlantSupplyGasEff ),
-			TotPlantSupplyPurch( TotPlantSupplyPurch ),
-			PlantSupplyPurchEff( PlantSupplyPurchEff ),
-			PeakPlantSupplyPurchEff( PeakPlantSupplyPurchEff ),
-			TotPlantSupplyOther( TotPlantSupplyOther ),
-			PlantSupplyOtherEff( PlantSupplyOtherEff ),
-			PeakPlantSupplyOtherEff( PeakPlantSupplyOtherEff ),
-			Capacity( Capacity ),
-			OpMode( OpMode )
-		{}
-
 	};
 
 	struct EquipList
@@ -688,29 +474,6 @@ namespace DataZoneEquipment {
 			NumOfEquipTypes( 0 )
 		{}
 
-		// Member Constructor
-		EquipList(
-			std::string const & Name, // Name of the equipment list
-			int const NumOfEquipTypes, // Number of items on this list
-			Array1_string const & EquipType,
-			Array1_int const & EquipType_Num,
-			Array1_string const & EquipName,
-			Array1_int const & EquipIndex,
-			Array1_int const & CoolingPriority,
-			Array1_int const & HeatingPriority,
-			Array1< EquipmentData > const & EquipData // Index of energy output report data
-		) :
-			Name( Name ),
-			NumOfEquipTypes( NumOfEquipTypes ),
-			EquipType( EquipType ),
-			EquipType_Num( EquipType_Num ),
-			EquipName( EquipName ),
-			EquipIndex( EquipIndex ),
-			CoolingPriority( CoolingPriority ),
-			HeatingPriority( HeatingPriority ),
-			EquipData( EquipData )
-		{}
-
 	};
 
 	struct ControlList
@@ -724,19 +487,6 @@ namespace DataZoneEquipment {
 		// Default Constructor
 		ControlList() :
 			NumOfControls( 0 )
-		{}
-
-		// Member Constructor
-		ControlList(
-			std::string const & Name,
-			int const NumOfControls,
-			Array1_string const & ControlType,
-			Array1_string const & ControlName
-		) :
-			Name( Name ),
-			NumOfControls( NumOfControls ),
-			ControlType( ControlType ),
-			ControlName( ControlName )
 		{}
 
 	};
@@ -767,39 +517,6 @@ namespace DataZoneEquipment {
 			NumNodes( 0 )
 		{}
 
-		// Member Constructor
-		SupplyAir(
-			std::string const & Name,
-			int const NumOfComponents,
-			int const InletNodeNum,
-			Array1_string const & ComponentType,
-			Array1_int const & ComponentType_Num,
-			Array1_string const & ComponentName,
-			Array1_int const & ComponentIndex,
-			Array1_int const & SplitterIndex,
-			Array1_int const & PlenumIndex,
-			int const NumOutletNodes,
-			Array1_int const & OutletNode,
-			int const NumNodes,
-			Array1_int const & Node,
-			Array1_int const & NodeType
-		) :
-			Name( Name ),
-			NumOfComponents( NumOfComponents ),
-			InletNodeNum( InletNodeNum ),
-			ComponentType( ComponentType ),
-			ComponentType_Num( ComponentType_Num ),
-			ComponentName( ComponentName ),
-			ComponentIndex( ComponentIndex ),
-			SplitterIndex( SplitterIndex ),
-			PlenumIndex( PlenumIndex ),
-			NumOutletNodes( NumOutletNodes ),
-			OutletNode( OutletNode ),
-			NumNodes( NumNodes ),
-			Node( Node ),
-			NodeType( NodeType )
-		{}
-
 	};
 
 	struct ReturnAir
@@ -819,25 +536,6 @@ namespace DataZoneEquipment {
 			OutletNodeNum( 0 )
 		{}
 
-		// Member Constructor
-		ReturnAir(
-			std::string const & Name,
-			int const NumOfComponents,
-			int const OutletNodeNum,
-			Array1_string const & ComponentType,
-			Array1_int const & ComponentType_Num,
-			Array1_string const & ComponentName,
-			Array1_int const & ComponentIndex
-		) :
-			Name( Name ),
-			NumOfComponents( NumOfComponents ),
-			OutletNodeNum( OutletNodeNum ),
-			ComponentType( ComponentType ),
-			ComponentType_Num( ComponentType_Num ),
-			ComponentName( ComponentName ),
-			ComponentIndex( ComponentIndex )
-		{}
-
 	};
 
 	// Object Data
@@ -849,6 +547,10 @@ namespace DataZoneEquipment {
 	extern Array1D< ReturnAir > ReturnAirPath;
 
 	// Functions
+	// Clears the global data in DataZoneEquipment.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 	void
 	GetZoneEquipmentData();
@@ -887,29 +589,6 @@ namespace DataZoneEquipment {
 		Optional_bool_const PerPersonNotSet = _, // when calculation should not include occupants (e.g., dual duct)
 		Optional_bool_const MaxOAVolFlowFlag = _ // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
 	);
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // DataZoneEquipment
 

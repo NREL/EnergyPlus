@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 #ifndef HVACVariableRefrigerantFlow_hh_INCLUDED
 #define HVACVariableRefrigerantFlow_hh_INCLUDED
 
@@ -77,8 +135,19 @@ namespace HVACVariableRefrigerantFlow {
 
 	//MODULE VARIABLE DECLARATIONS:
 	extern bool GetVRFInputFlag; // Flag set to make sure you get input once
+	extern bool MyOneTimeFlag; // One time flag used to allocate MyEnvrnFlag and MySizeFlag
+	extern bool MyOneTimeSizeFlag; // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 	extern Array1D_bool CheckEquipName; // Flag set to check equipment connections once
-	extern int NumVRFCond; // total number of VRF condensers
+	extern bool ZoneEquipmentListNotChecked; // False after the Zone Equipment List has been checked for items
+	extern Array1D_bool MyEnvrnFlag; // Flag for initializing at beginning of each new environment
+	extern Array1D_bool MySizeFlag; // False after TU has been sized
+	extern Array1D_bool MyBeginTimeStepFlag; // Flag to sense beginning of time step
+	extern Array1D_bool MyVRFFlag; // used for sizing VRF inputs one time
+	extern Array1D_bool MyVRFCondFlag; // used to reset timer counter
+	extern Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+	extern int NumVRFCond; // total number of VRF condensers (All VRF Algorithm Types)
+	extern int NumVRFCond_SysCurve; // total number of VRF condensers with VRF Algorithm Type 1 
+	extern int NumVRFCond_FluidTCtrl; // total number of VRF condensers with VRF Algorithm Type 2 
 	extern int NumVRFTU; // total number of VRF terminal units
 	extern int NumVRFTULists; // The number of VRF TU lists
 	extern Real64 CompOnMassFlow; // Supply air mass flow rate w/ compressor ON
@@ -127,6 +196,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Members
 		std::string Name; // Name of the VRF Terminal Unit
 		int VRFSystemTypeNum; // integer equivalent of system type
+		int VRFAlgorithmTypeNum; // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
 		int VRFPlantTypeOfNum; // integer equivalent of index to DataPlant type
 		int SourceLoopNum; // plant data for water-coole only
 		int SourceLoopSideNum; // plant data for water-coole only
@@ -201,6 +271,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 CompressorSizeRatio; // ratio of min compressor size to total capacity
 		int NumCompressors; // number of compressors in VRF condenser
 		Real64 MaxOATCCHeater; // maximum outdoor air dry-bulb temp for crankcase heater operation (C)
+		//begin variables used for Defrost 
 		int DefrostEIRPtr; // index to defrost EIR curve
 		Real64 DefrostFraction; // defrost time period fraction (hr)
 		int DefrostStrategy; // Type of defrost (reversecycle or resistive)
@@ -209,6 +280,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 DefrostPower; // power used during defrost (W)
 		Real64 DefrostConsumption; // energy used during defrost (J)
 		Real64 MaxOATDefrost; // maximum outdoor air dry-bulb temp for defrost operation (C)
+		//end variables used for Defrost 
 		int CondenserType; // condenser type, evap- or air-cooled
 		int CondenserNodeNum; // condenser inlet node number
 		bool SkipCondenserNodeNumCheck; // used to check for duplicate node names
@@ -293,10 +365,56 @@ namespace HVACVariableRefrigerantFlow {
 		bool EMSOverrideHPOperatingMode;
 		Real64 EMSValueForHPOperatingMode;
 		int HPOperatingModeErrorIndex;
+		
+		//The following are for the Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+		std::string RefrigerantName; // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
+		Real64 RatedEvapCapacity; // Rated Evaporative Capacity [W]
+		Real64 RatedCompPower; // Rated Evaporative Capacity [W]
+		Real64 CondensingTemp; // VRV system outdoor unit condensing temperature [C]
+		Real64 EvaporatingTemp; // VRV system outdoor unit evaporating temperature [C]
+		Real64 IUEvaporatingTemp; // VRV system indoor unit evaporating temperature, min among all indoor units [C]
+		Real64 IUCondensingTemp; // VRV system indoor unit condensing temperature, max among all indoor units [C]
+		Real64 IUEvapTempLow; // VRV system indoor unit evaporating temperature, lower bound[C]
+		Real64 IUEvapTempHigh; // VRV system indoor unit evaporating temperature, higher bound [C]
+		Real64 IUCondTempLow; // VRV system indoor unit condensing temperature, lower bound [C]
+		Real64 IUCondTempHigh; // VRV system indoor unit condensing temperature, higher bound [C]
+		Real64 OUEvapTempLow; // VRV system outdoor unit evaporating temperature, lower bound[C]
+		Real64 OUEvapTempHigh; // VRV system outdoor unit evaporating temperature, higher bound [C]
+		Real64 OUCondTempLow; // VRV system outdoor unit condensing temperature, lower bound [C]
+		Real64 OUCondTempHigh; // VRV system outdoor unit condensing temperature, higher bound [C]
+		Real64 OUAirFlowRate; // Max condenser air flow rate  [m3/s]
+		Real64 SH; // VRF outdoor unit superheating degrees [C]
+		Real64 SC; // VRF outdoor unit subcooling degrees [C]
+		Real64 C1Te; // VRF Outdoor Unit Coefficient 1 to calculate Te,req [--]
+		Real64 C2Te; // VRF Outdoor Unit Coefficient 2 to calculate Te,req [--]
+		Real64 C3Te; // VRF Outdoor Unit Coefficient 3 to calculate Te,req [--]
+		Real64 C1Tc; // VRF Outdoor Unit Coefficient 1 to calculate Tc,req [--]
+		Real64 C2Tc; // VRF Outdoor Unit Coefficient 2 to calculate Tc,req [--]
+		Real64 C3Tc; // VRF Outdoor Unit Coefficient 3 to calculate Tc,req [--]
+		int AlgorithmIUCtrl; //VRF indoor unit contrl algorithm, 1-High sensible, 2-Te/Tc constant
+		Real64 EvapTempFixed; // Indoor unit evaporating temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
+		Real64 CondTempFixed; // Inddor unit condensing temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
+		Real64 RatedCondFanPower; // Outdoor unit fan power at rated conditions [W]
+		Real64 CondFanPower; // Outdoor unit fan power at real conditions[W]
+		Real64 CompActSpeed; // Compressor speed [rps]
+		Real64 NcompCooling; // compressor electric power at cooling mode [W]
+		Real64 NcompHeating; // compressor electric power at heating mode [W]
+		Array1D< Real64 > CompressorSpeed; // compressor speed array [rps]
+		Array1D_int OUCoolingCAPFT; // index to outdoor unit cooling capacity function of temperature at different compressor speed
+		Array1D_int OUCoolingPWRFT; // index to outdoor unit cooling power function of temperature at different compressor speed
+		Real64 CompMaxDeltaP; // maximum compressor pressure rise [Pa]
+		Real64 RefPipDia;  // diameter of refrigerant pipe that links the outdoor unit to the indoor units [m]
+		Real64 RefPipLen;  // length of refrigerant pipe that links the outdoor unit to the indoor units [m]
+		Real64 RefPipEquLen; // Equivilent length of refrigerant pipe for pressure drop calculations [m]
+		Real64 RefPipHei; // height of refrigerant pipe that links the outdoor unit to the indoor units [m]
+		Real64 RefPipInsThi; // thickness of refrigerant pipe insulation [m]
+		Real64 RefPipInsCon; // thermal conductivity of refrigerant pipe insulation [W/mk]
+		Real64 VRFOperationSimPath; // simulation path indicating the VRF operation mode [--]
 
 		// Default Constructor
 		VRFCondenserEquipment() :
 			VRFSystemTypeNum( 0 ),
+			VRFAlgorithmTypeNum( 0 ),
 			VRFPlantTypeOfNum( 0 ),
 			SourceLoopNum( 0 ),
 			SourceLoopSideNum( 0 ),
@@ -454,336 +572,46 @@ namespace HVACVariableRefrigerantFlow {
 			BasinHeaterSchedulePtr( 0 ),
 			EMSOverrideHPOperatingMode( false ),
 			EMSValueForHPOperatingMode( 0.0 ),
-			HPOperatingModeErrorIndex( 0 )
-		{}
-
-		// Member Constructor
-		VRFCondenserEquipment(
-			std::string const & Name, // Name of the VRF Terminal Unit
-			int const VRFSystemTypeNum, // integer equivalent of system type
-			int const VRFPlantTypeOfNum, // integer equivalent of index to DataPlant type
-			int const SourceLoopNum, // plant data for water-coole only
-			int const SourceLoopSideNum, // plant data for water-coole only
-			int const SourceBranchNum, // plant data for water-coole only
-			int const SourceCompNum, // plant data for water-coole only
-			Real64 const WaterCondenserDesignMassFlow, // plant data for water-coole only
-			Real64 const WaterCondenserMassFlow, // Water condenser flow rate (kg/s)
-			Real64 const QCondenser, // Water condenser heat rejection/absorption (W)
-			Real64 const QCondEnergy, // Water condenser heat rejection/aborption energy (J)
-			Real64 const CondenserSideOutletTemp, // Water condenser outlet temp (C)
-			int const SchedPtr, // Pointer to the correct schedule
-			Real64 const CoolingCapacity, // Nominal VRF heat pump cooling capacity (W)
-			Real64 const TotalCoolingCapacity, // Nominal VRF heat pump cooling capacity (W)
-			Real64 const CoolingCombinationRatio, // Ratio or terminal unit cooling capacity to VRF condenser capacity
-			Real64 const VRFCondPLR, // Condenser part-load ratio wrt total capacity
-			Real64 const VRFCondRTF, // Condenser runtime fraction
-			Real64 const VRFCondCyclingRatio, // Condenser cycling ratio below MinPLR
-			Real64 const CondenserInletTemp, // Condenser entering air temperature (C)
-			Real64 const CoolingCOP, // Nominal VRF heat pump cooling COP (W/W)
-			Real64 const OperatingCoolingCOP, // Operating VRF heat pump cooling COP (W/W)
-			Real64 const RatedCoolingPower, // Rated cooling power = Rated Cooling Capacity / Rated COP (W)
-			Real64 const HeatingCapacity, // Nominal VRF heat pump heating capacity (W)
-			Real64 const HeatingCapacitySizeRatio, // Ratio of heating to cooling when autosizing
-			bool const LockHeatingCapacity, // used in sizing to size VRF heat cap to VRF cool cap
-			Real64 const TotalHeatingCapacity, // Nominal VRF heat pump heating capacity (W)
-			Real64 const HeatingCombinationRatio, // Ratio or terminal unit heating capacity to VRF condenser capacity
-			Real64 const HeatingCOP, // Nominal VRF heat pump heating COP
-			Real64 const OperatingHeatingCOP, // Operating VRF heat pump heating COP
-			Real64 const RatedHeatingPower, // Rated heating power = Rated Heating Capacity / Rated COP (W)
-			Real64 const MinOATCooling, // Minimum outdoor air dry-bulb temp in cooling mode (C)
-			Real64 const MaxOATCooling, // Maximum outdoor air dry-bulb temp in cooling mode (C)
-			Real64 const MinOATHeating, // Minimum outdoor air dry-bulb temp in heating mode (C)
-			Real64 const MaxOATHeating, // Maximum outdoor air dry-bulb temp in heating mode (C)
-			int const CoolCapFT, // index to cooling capacity function of temperature curve
-			int const CoolEIRFT, // index to cooling EIR function of temperature curve
-			int const HeatCapFT, // index to heating capacity function of temperature curve
-			int const HeatEIRFT, // index to heating EIR function of temperature curve
-			int const CoolBoundaryCurvePtr, // index to cooling capacity boundary curve
-			int const HeatBoundaryCurvePtr, // index to cooling capacity boundary curve
-			int const EIRCoolBoundaryCurvePtr, // index to cooling EIR boundary curve
-			int const CoolEIRFPLR1, // index to cooling EIR function of PLR curve < 1
-			int const CoolEIRFPLR2, // index to cooling EIR function of PLR curve >= 1
-			int const CoolCapFTHi, // index to cooling capacity function of temperature curve
-			int const CoolEIRFTHi, // index to cooling EIR function of temperature curve
-			int const HeatCapFTHi, // index to heating capacity function of temperature curve
-			int const HeatEIRFTHi, // index to heating EIR function of temperature curve
-			int const EIRHeatBoundaryCurvePtr, // index to heating EIR boundary curve
-			int const HeatEIRFPLR1, // index to heating EIR function of PLR curve < 1
-			int const HeatEIRFPLR2, // index to heating EIR function of PLR curve >= 1
-			int const CoolPLFFPLR, // index to cooling PLF function of PLR curve
-			int const HeatPLFFPLR, // index to heating PLF function of PLR curve
-			int const HeatingPerformanceOATType, // Temperature type for heating performance curves
-			Real64 const MinPLR, // minimum PLR before cycling occurs
-			int const MasterZonePtr, // index to master thermostat zone
-			int const MasterZoneTUIndex, // index to TU in master thermostat zone
-			int const ThermostatPriority, // VRF priority control (1=LoadPriority, 2=ZonePriority, etc)
-			int const SchedPriorityPtr, // VRF priority control schedule pointer
-			int const ZoneTUListPtr, // index to zone terminal unit list
-			bool const HeatRecoveryUsed, // .TRUE. = heat recovery used
-			Real64 const VertPipeLngth, // vertical piping length (m)
-			int const PCFLengthCoolPtr, // piping correction factor for length in cooling mode curve index
-			int const PCFLengthCoolPtrType, // PCF for length curve type
-			Real64 const PCFHeightCool, // piping correction factor for height in cooling mode
-			Real64 const EquivPipeLngthCool, // equivalent piping length for cooling
-			Real64 const PipingCorrectionCooling, // piping correction factor for cooling
-			int const PCFLengthHeatPtr, // piping correction factor for length in heating mode curve index
-			int const PCFLengthHeatPtrType, // PCF for length curve type
-			Real64 const PCFHeightHeat, // piping correction factor for height in heating mode
-			Real64 const EquivPipeLngthHeat, // equivalent piping length for heating
-			Real64 const PipingCorrectionHeating, // piping correction factor for heating
-			Real64 const CCHeaterPower, // crankcase heater power per compressor (W)
-			Real64 const CompressorSizeRatio, // ratio of min compressor size to total capacity
-			int const NumCompressors, // number of compressors in VRF condenser
-			Real64 const MaxOATCCHeater, // maximum outdoor air dry-bulb temp for crankcase heater operation (C)
-			int const DefrostEIRPtr, // index to defrost EIR curve
-			Real64 const DefrostFraction, // defrost time period fraction (hr)
-			int const DefrostStrategy, // Type of defrost (reversecycle or resistive)
-			int const DefrostControl, // type of defrost control (timed or ondemand)
-			Real64 const DefrostCapacity, // capacity of resistive defrost heating element (W)
-			Real64 const DefrostPower, // power used during defrost (W)
-			Real64 const DefrostConsumption, // energy used during defrost (J)
-			Real64 const MaxOATDefrost, // maximum outdoor air dry-bulb temp for defrost operation (C)
-			int const CondenserType, // condenser type, evap- or air-cooled
-			int const CondenserNodeNum, // condenser inlet node number
-			bool const SkipCondenserNodeNumCheck, // used to check for duplicate node names
-			int const CondenserOutletNodeNum, // condenser outlet node number
-			Real64 const WaterCondVolFlowRate, // water condenser volume flow rate (m3/s)
-			Real64 const EvapCondEffectiveness, // evaporative condenser effectiveness
-			Real64 const EvapCondAirVolFlowRate, // air volume flow rate through condenser (m3/s)
-			Real64 const EvapCondPumpPower, // evaporative condenser water pump power (W)
-			int const CoolCombRatioPTR, // index to cooling combination ratio curve pointer
-			int const HeatCombRatioPTR, // index to heating combination ratio curve pointer
-			int const OperatingMode, // VRF Condenser operating mode, 0=off, 1=cooling, 2=heating, 3=HR
-			Real64 const ElecPower, // VRF Condenser power (W)
-			Real64 const ElecCoolingPower, // VRF Condenser power in cooling mode (W)
-			Real64 const ElecHeatingPower, // VRF Condenser power in heating mode (W)
-			Real64 const CoolElecConsumption, // VRF Condenser cooling energy (J)
-			Real64 const HeatElecConsumption, // VRF Condenser heating energy (J)
-			Real64 const CrankCaseHeaterPower, // VRF Condenser crankcase heater power (W)
-			Real64 const CrankCaseHeaterElecConsumption, // VRF Condenser crankcase heater energy (J)
-			Real64 const EvapCondPumpElecPower, // VRF Condenser evaporatively cooled condenser pump power (W)
-			Real64 const EvapCondPumpElecConsumption, // VRF Condenser evaporatively cooled condenser pump elec consumption (J)
-			Real64 const EvapWaterConsumpRate, // VRF Condenser evaporatively cooled condenser water consumption (m3/s)
-			int const HRMaxTempLimitIndex, // Warning message recurring error index
-			int const CoolingMaxTempLimitIndex, // Warning message recurring error index
-			int const HeatingMaxTempLimitIndex, // Warning message recurring error index
-			int const FuelType, // Fuel type
-			Real64 const SUMultiplier, // exponential timer for mode changes
-			Real64 const TUCoolingLoad, // total TU cooling load for each VRF system
-			Real64 const TUHeatingLoad, // total TU heating load for each VRF system
-			bool const SwitchedMode, // used to derate capacity/power when system changes operating mode
-			Real64 const OperatingCOP, // Operating VRF heat pump COP (total TU capacity/total power)
-			Real64 const MinOATHeatRecovery, // Minimum outdoor air temperature for heat recovery operation (C)
-			Real64 const MaxOATHeatRecovery, // Maximum outdoor air temperature for heat recovery operation (C)
-			int const HRCAPFTCool, // Index to cool capacity as a function of temperature curve for heat recovery
-			Real64 const HRCAPFTCoolConst, // constant used if curve is blank
-			int const HRCAPFTCoolType, // Curve type for HRCAPFTCool
-			Real64 const HRInitialCoolCapFrac, // Fractional cooling degradation at the start of heat recovery from cooling mode
-			Real64 const HRCoolCapTC, // Time constant used to recover from intial degratation in cooling heat recovery
-			int const HREIRFTCool, // Index to cool EIR as a function of temperature curve for heat recovery
-			Real64 const HREIRFTCoolConst, // constant used if curve is blank
-			int const HREIRFTCoolType, // Curve type for HREIRFTCool
-			Real64 const HRInitialCoolEIRFrac, // Fractional EIR degradation at the start of heat recovery from cooling mode
-			Real64 const HRCoolEIRTC, // Time constant used to recover from intial degratation in cooling heat recovery
-			int const HRCAPFTHeat, // Index to heat capacity as a function of temperature curve for heat recovery
-			Real64 const HRCAPFTHeatConst, // constant used if curve is blank
-			int const HRCAPFTHeatType, // Curve type for HRCAPFTHeat
-			Real64 const HRInitialHeatCapFrac, // Fractional heating degradation at the start of heat recovery from heating mode
-			Real64 const HRHeatCapTC, // Time constant used to recover from intial degratation in heating heat recovery
-			int const HREIRFTHeat, // Index to heat EIR as a function of temperature curve for heat recovery
-			Real64 const HREIRFTHeatConst, // constant used if curve is blank
-			int const HREIRFTHeatType, // Curve type for HREIRFTHeat
-			Real64 const HRInitialHeatEIRFrac, // Fractional EIR degradation at the start of heat recovery from heating mode
-			Real64 const HRHeatEIRTC, // Time constant used to recover from intial degratation in heating heat recovery
-			bool const HRCoolingActive, // heat recovery mode active in cooling mode
-			bool const HRHeatingActive, // heat recovery mode active in heating mode
-			bool const ModeChange, // tracks changes in operating mode
-			bool const HRModeChange, // tracks changes in heat recovery operating mode
-			Real64 const HRTimer, // timer used to model changes in system performance as mode changes
-			Real64 const HRTime, // length of time system has been in same mode (hr)
-			int const EIRFTempCoolErrorIndex, // warning message index for recurring warnings
-			int const EIRFTempHeatErrorIndex, // warning message index for recurring warnings
-			int const DefrostHeatErrorIndex, // warning message index for recurring warnings
-			int const EvapWaterSupplyMode, // where does water come from
-			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
-			int const EvapWaterSupTankID,
-			int const EvapWaterTankDemandARRID,
-			std::string const & CondensateCollectName, // name of water source e.g. water storage tank
-			int const CondensateTankID,
-			int const CondensateTankSupplyARRID,
-			Real64 const CondensateVdot, // rate of water condensation from air stream [m3/s]
-			Real64 const CondensateVol, // amount of water condensed from air stream [m3]
-			Real64 const BasinHeaterPowerFTempDiff, // Basin heater capacity per degree C below setpoint (W/C)
-			Real64 const BasinHeaterSetPointTemp, // setpoint temperature for basin heater operation (C)
-			Real64 const BasinHeaterPower, // Basin heater power (W)
-			Real64 const BasinHeaterConsumption, // Basin heater energy consumption (J)
-			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
-			bool const EMSOverrideHPOperatingMode,
-			Real64 const EMSValueForHPOperatingMode,
-			int const HPOperatingModeErrorIndex
-		) :
-			Name( Name ),
-			VRFSystemTypeNum( VRFSystemTypeNum ),
-			VRFPlantTypeOfNum( VRFPlantTypeOfNum ),
-			SourceLoopNum( SourceLoopNum ),
-			SourceLoopSideNum( SourceLoopSideNum ),
-			SourceBranchNum( SourceBranchNum ),
-			SourceCompNum( SourceCompNum ),
-			WaterCondenserDesignMassFlow( WaterCondenserDesignMassFlow ),
-			WaterCondenserMassFlow( WaterCondenserMassFlow ),
-			QCondenser( QCondenser ),
-			QCondEnergy( QCondEnergy ),
-			CondenserSideOutletTemp( CondenserSideOutletTemp ),
-			SchedPtr( SchedPtr ),
-			CoolingCapacity( CoolingCapacity ),
-			TotalCoolingCapacity( TotalCoolingCapacity ),
-			CoolingCombinationRatio( CoolingCombinationRatio ),
-			VRFCondPLR( VRFCondPLR ),
-			VRFCondRTF( VRFCondRTF ),
-			VRFCondCyclingRatio( VRFCondCyclingRatio ),
-			CondenserInletTemp( CondenserInletTemp ),
-			CoolingCOP( CoolingCOP ),
-			OperatingCoolingCOP( OperatingCoolingCOP ),
-			RatedCoolingPower( RatedCoolingPower ),
-			HeatingCapacity( HeatingCapacity ),
-			HeatingCapacitySizeRatio( HeatingCapacitySizeRatio ),
-			LockHeatingCapacity( LockHeatingCapacity ),
-			TotalHeatingCapacity( TotalHeatingCapacity ),
-			HeatingCombinationRatio( HeatingCombinationRatio ),
-			HeatingCOP( HeatingCOP ),
-			OperatingHeatingCOP( OperatingHeatingCOP ),
-			RatedHeatingPower( RatedHeatingPower ),
-			MinOATCooling( MinOATCooling ),
-			MaxOATCooling( MaxOATCooling ),
-			MinOATHeating( MinOATHeating ),
-			MaxOATHeating( MaxOATHeating ),
-			CoolCapFT( CoolCapFT ),
-			CoolEIRFT( CoolEIRFT ),
-			HeatCapFT( HeatCapFT ),
-			HeatEIRFT( HeatEIRFT ),
-			CoolBoundaryCurvePtr( CoolBoundaryCurvePtr ),
-			HeatBoundaryCurvePtr( HeatBoundaryCurvePtr ),
-			EIRCoolBoundaryCurvePtr( EIRCoolBoundaryCurvePtr ),
-			CoolEIRFPLR1( CoolEIRFPLR1 ),
-			CoolEIRFPLR2( CoolEIRFPLR2 ),
-			CoolCapFTHi( CoolCapFTHi ),
-			CoolEIRFTHi( CoolEIRFTHi ),
-			HeatCapFTHi( HeatCapFTHi ),
-			HeatEIRFTHi( HeatEIRFTHi ),
-			EIRHeatBoundaryCurvePtr( EIRHeatBoundaryCurvePtr ),
-			HeatEIRFPLR1( HeatEIRFPLR1 ),
-			HeatEIRFPLR2( HeatEIRFPLR2 ),
-			CoolPLFFPLR( CoolPLFFPLR ),
-			HeatPLFFPLR( HeatPLFFPLR ),
-			HeatingPerformanceOATType( HeatingPerformanceOATType ),
-			MinPLR( MinPLR ),
-			MasterZonePtr( MasterZonePtr ),
-			MasterZoneTUIndex( MasterZoneTUIndex ),
-			ThermostatPriority( ThermostatPriority ),
-			SchedPriorityPtr( SchedPriorityPtr ),
-			ZoneTUListPtr( ZoneTUListPtr ),
-			HeatRecoveryUsed( HeatRecoveryUsed ),
-			VertPipeLngth( VertPipeLngth ),
-			PCFLengthCoolPtr( PCFLengthCoolPtr ),
-			PCFLengthCoolPtrType( PCFLengthCoolPtrType ),
-			PCFHeightCool( PCFHeightCool ),
-			EquivPipeLngthCool( EquivPipeLngthCool ),
-			PipingCorrectionCooling( PipingCorrectionCooling ),
-			PCFLengthHeatPtr( PCFLengthHeatPtr ),
-			PCFLengthHeatPtrType( PCFLengthHeatPtrType ),
-			PCFHeightHeat( PCFHeightHeat ),
-			EquivPipeLngthHeat( EquivPipeLngthHeat ),
-			PipingCorrectionHeating( PipingCorrectionHeating ),
-			CCHeaterPower( CCHeaterPower ),
-			CompressorSizeRatio( CompressorSizeRatio ),
-			NumCompressors( NumCompressors ),
-			MaxOATCCHeater( MaxOATCCHeater ),
-			DefrostEIRPtr( DefrostEIRPtr ),
-			DefrostFraction( DefrostFraction ),
-			DefrostStrategy( DefrostStrategy ),
-			DefrostControl( DefrostControl ),
-			DefrostCapacity( DefrostCapacity ),
-			DefrostPower( DefrostPower ),
-			DefrostConsumption( DefrostConsumption ),
-			MaxOATDefrost( MaxOATDefrost ),
-			CondenserType( CondenserType ),
-			CondenserNodeNum( CondenserNodeNum ),
-			SkipCondenserNodeNumCheck( SkipCondenserNodeNumCheck ),
-			CondenserOutletNodeNum( CondenserOutletNodeNum ),
-			WaterCondVolFlowRate( WaterCondVolFlowRate ),
-			EvapCondEffectiveness( EvapCondEffectiveness ),
-			EvapCondAirVolFlowRate( EvapCondAirVolFlowRate ),
-			EvapCondPumpPower( EvapCondPumpPower ),
-			CoolCombRatioPTR( CoolCombRatioPTR ),
-			HeatCombRatioPTR( HeatCombRatioPTR ),
-			OperatingMode( OperatingMode ),
-			ElecPower( ElecPower ),
-			ElecCoolingPower( ElecCoolingPower ),
-			ElecHeatingPower( ElecHeatingPower ),
-			CoolElecConsumption( CoolElecConsumption ),
-			HeatElecConsumption( HeatElecConsumption ),
-			CrankCaseHeaterPower( CrankCaseHeaterPower ),
-			CrankCaseHeaterElecConsumption( CrankCaseHeaterElecConsumption ),
-			EvapCondPumpElecPower( EvapCondPumpElecPower ),
-			EvapCondPumpElecConsumption( EvapCondPumpElecConsumption ),
-			EvapWaterConsumpRate( EvapWaterConsumpRate ),
-			HRMaxTempLimitIndex( HRMaxTempLimitIndex ),
-			CoolingMaxTempLimitIndex( CoolingMaxTempLimitIndex ),
-			HeatingMaxTempLimitIndex( HeatingMaxTempLimitIndex ),
-			FuelType( FuelType ),
-			SUMultiplier( SUMultiplier ),
-			TUCoolingLoad( TUCoolingLoad ),
-			TUHeatingLoad( TUHeatingLoad ),
-			SwitchedMode( SwitchedMode ),
-			OperatingCOP( OperatingCOP ),
-			MinOATHeatRecovery( MinOATHeatRecovery ),
-			MaxOATHeatRecovery( MaxOATHeatRecovery ),
-			HRCAPFTCool( HRCAPFTCool ),
-			HRCAPFTCoolConst( HRCAPFTCoolConst ),
-			HRCAPFTCoolType( HRCAPFTCoolType ),
-			HRInitialCoolCapFrac( HRInitialCoolCapFrac ),
-			HRCoolCapTC( HRCoolCapTC ),
-			HREIRFTCool( HREIRFTCool ),
-			HREIRFTCoolConst( HREIRFTCoolConst ),
-			HREIRFTCoolType( HREIRFTCoolType ),
-			HRInitialCoolEIRFrac( HRInitialCoolEIRFrac ),
-			HRCoolEIRTC( HRCoolEIRTC ),
-			HRCAPFTHeat( HRCAPFTHeat ),
-			HRCAPFTHeatConst( HRCAPFTHeatConst ),
-			HRCAPFTHeatType( HRCAPFTHeatType ),
-			HRInitialHeatCapFrac( HRInitialHeatCapFrac ),
-			HRHeatCapTC( HRHeatCapTC ),
-			HREIRFTHeat( HREIRFTHeat ),
-			HREIRFTHeatConst( HREIRFTHeatConst ),
-			HREIRFTHeatType( HREIRFTHeatType ),
-			HRInitialHeatEIRFrac( HRInitialHeatEIRFrac ),
-			HRHeatEIRTC( HRHeatEIRTC ),
-			HRCoolingActive( HRCoolingActive ),
-			HRHeatingActive( HRHeatingActive ),
-			ModeChange( ModeChange ),
-			HRModeChange( HRModeChange ),
-			HRTimer( HRTimer ),
-			HRTime( HRTime ),
-			EIRFTempCoolErrorIndex( EIRFTempCoolErrorIndex ),
-			EIRFTempHeatErrorIndex( EIRFTempHeatErrorIndex ),
-			DefrostHeatErrorIndex( DefrostHeatErrorIndex ),
-			EvapWaterSupplyMode( EvapWaterSupplyMode ),
-			EvapWaterSupplyName( EvapWaterSupplyName ),
-			EvapWaterSupTankID( EvapWaterSupTankID ),
-			EvapWaterTankDemandARRID( EvapWaterTankDemandARRID ),
-			CondensateCollectName( CondensateCollectName ),
-			CondensateTankID( CondensateTankID ),
-			CondensateTankSupplyARRID( CondensateTankSupplyARRID ),
-			CondensateVdot( CondensateVdot ),
-			CondensateVol( CondensateVol ),
-			BasinHeaterPowerFTempDiff( BasinHeaterPowerFTempDiff ),
-			BasinHeaterSetPointTemp( BasinHeaterSetPointTemp ),
-			BasinHeaterPower( BasinHeaterPower ),
-			BasinHeaterConsumption( BasinHeaterConsumption ),
-			BasinHeaterSchedulePtr( BasinHeaterSchedulePtr ),
-			EMSOverrideHPOperatingMode( EMSOverrideHPOperatingMode ),
-			EMSValueForHPOperatingMode( EMSValueForHPOperatingMode ),
-			HPOperatingModeErrorIndex( HPOperatingModeErrorIndex )
+			HPOperatingModeErrorIndex( 0 ),
+			RatedEvapCapacity( 40000.0 ),
+			RatedCompPower( 14000.0 ),
+			CondensingTemp( 44.0 ),
+			EvaporatingTemp( 6.0 ),
+			IUEvaporatingTemp( 6.0 ), 
+			IUCondensingTemp( 44.0 ),
+			IUEvapTempLow( 4.0 ),
+			IUEvapTempHigh( 13.0 ),
+			IUCondTempLow( 42.0 ), 
+			IUCondTempHigh( 46.0 ),
+			OUEvapTempLow( -30.0 ),
+			OUEvapTempHigh( 20.0 ),
+			OUCondTempLow( 30.0 ), 
+			OUCondTempHigh( 96.0 ),
+			OUAirFlowRate( 0.0 ),	             
+			SH( 0.0 ),                       			         
+			SC( 0.0 ),                       			         
+			C1Te( 0.0 ),	                   			         
+			C2Te( 0.0 ),                     			         
+			C3Te( 0.0 ),                     			         
+			C1Tc( 0.0 ),	                   			         
+			C2Tc( 0.0 ),                     			         
+			C3Tc( 0.0 ),                     			         
+			AlgorithmIUCtrl( 1 ),            
+			EvapTempFixed( 0.0 ),            			         
+			CondTempFixed( 0.0 ),            			         
+			RatedCondFanPower( 0.0 ),   
+			CondFanPower( 0.0 ),  
+			CompActSpeed( 0.0 ),   
+			NcompCooling( 0.0 ),   
+			NcompHeating( 0.0 ),   		 	      		 
+			CompMaxDeltaP( 0.0 ),         	                     
+			RefPipDia( 0.0 ),         	                         
+			RefPipLen( 0.0 ),         	           
+			RefPipEquLen( 0.0 ),
+			RefPipHei( 0.0 ),       	                         
+			RefPipInsThi( 0.0 ),
+			RefPipInsCon( 0.0 ),
+			VRFOperationSimPath( 0.0 )
 		{}
 
 	};
@@ -811,43 +639,6 @@ namespace HVACVariableRefrigerantFlow {
 		// Default Constructor
 		TerminalUnitListData() :
 			NumTUInList( 0 )
-		{}
-
-		// Member Constructor
-		TerminalUnitListData(
-			std::string const & Name, // Name of the VRF Terminal Unit List
-			int const NumTUInList, // Number of VRF Terminal Units in List
-			Array1_int const & ZoneTUPtr, // index to VRF Terminal Unit
-			Array1_string const & ZoneTUName, // Name of the VRF Terminal Unit
-			Array1_bool const & IsSimulated, // TRUE if TU has been simulated
-			Array1< Real64 > const & TotalCoolLoad, // Total zone cooling coil load met by TU
-			Array1< Real64 > const & TotalHeatLoad, // Total zone heating coil load met by TU
-			Array1_bool const & CoolingCoilPresent, // FALSE if coil not present
-			Array1_bool const & HeatingCoilPresent, // FALSE if coil not present
-			Array1_bool const & TerminalUnitNotSizedYet, // TRUE if terminal unit not sized
-			Array1_bool const & HRHeatRequest, // defines a heating load on VRFTerminalUnits when QZnReq < 0
-			Array1_bool const & HRCoolRequest, // defines a cooling load on VRFTerminalUnits when QZnReq > 0
-			Array1_bool const & CoolingCoilAvailable, // cooling coil availability scheduled on
-			Array1_bool const & HeatingCoilAvailable, // cooling coil availability scheduled on
-			Array1_int const & CoolingCoilAvailSchPtr, // cooilng coil availability schedule index
-			Array1_int const & HeatingCoilAvailSchPtr // heating coil availability schedule index
-		) :
-			Name( Name ),
-			NumTUInList( NumTUInList ),
-			ZoneTUPtr( ZoneTUPtr ),
-			ZoneTUName( ZoneTUName ),
-			IsSimulated( IsSimulated ),
-			TotalCoolLoad( TotalCoolLoad ),
-			TotalHeatLoad( TotalHeatLoad ),
-			CoolingCoilPresent( CoolingCoilPresent ),
-			HeatingCoilPresent( HeatingCoilPresent ),
-			TerminalUnitNotSizedYet( TerminalUnitNotSizedYet ),
-			HRHeatRequest( HRHeatRequest ),
-			HRCoolRequest( HRCoolRequest ),
-			CoolingCoilAvailable( CoolingCoilAvailable ),
-			HeatingCoilAvailable( HeatingCoilAvailable ),
-			CoolingCoilAvailSchPtr( CoolingCoilAvailSchPtr ),
-			HeatingCoilAvailSchPtr( HeatingCoilAvailSchPtr )
 		{}
 
 	};
@@ -1002,157 +793,6 @@ namespace HVACVariableRefrigerantFlow {
 			HVACSizingIndex( 0 )
 		{}
 
-		// Member Constructor
-		VRFTerminalUnitEquipment(
-			std::string const & Name, // Name of the VRF Terminal Unit
-			int const VRFTUType_Num, // DataHVACGlobals VRF Terminal Unit type
-			int const SchedPtr, // Pointer to the correct schedule
-			int const VRFSysNum, // index to VRF Condenser
-			int const TUListIndex, // index to VRF Terminal Unit List
-			int const IndexToTUInTUList, // index to TU in VRF Terminal Unit List
-			int const ZoneNum, // index to zone where VRF Terminal Unit resides
-			int const VRFTUInletNodeNum, // VRF Terminal Unit inlet node number
-			int const VRFTUOutletNodeNum, // VRF Terminal Unit outlet node number
-			int const VRFTUOAMixerOANodeNum, // OA node number for this TU's OA mixer
-			int const VRFTUOAMixerRelNodeNum, // Relief node number for this TU's OA mixer
-			int const VRFTUOAMixerRetNodeNum, // Return node number for this TU's OA mixer
-			Real64 const MaxCoolAirVolFlow, // supply air volumetric flow rate during cooling operation [m3/s]
-			Real64 const MaxHeatAirVolFlow, // supply air volumetric flow rate during heating operation [m3/s]
-			Real64 const MaxNoCoolAirVolFlow, // supply air volumetric flow rate when no cooling [m3/s]
-			Real64 const MaxNoHeatAirVolFlow, // supply air volumetric flow rate when no heating [m3/s]
-			Real64 const MaxCoolAirMassFlow, // supply air mass flow rate during cooling operation [kg/s]
-			Real64 const MaxHeatAirMassFlow, // supply air mass flow rate during heating operation [kg/s]
-			Real64 const MaxNoCoolAirMassFlow, // supply air mass flow rate when no cooling [kg/s]
-			Real64 const MaxNoHeatAirMassFlow, // supply air mass flow rate when no heating [kg/s]
-			Real64 const CoolOutAirVolFlow, // OA volumetric flow rate during cooling operation [m3/s]
-			Real64 const HeatOutAirVolFlow, // OA volumetric flow rate during heating operation [m3/s]
-			Real64 const NoCoolHeatOutAirVolFlow, // OA volumetric flow rate when no cooling or heating [m3/s]
-			Real64 const CoolOutAirMassFlow, // OA mass flow rate during cooling operation [kg/s]
-			Real64 const HeatOutAirMassFlow, // OA mass flow rate during heating operation [kg/s]
-			Real64 const NoCoolHeatOutAirMassFlow, // OA mass flow rate when no cooling or heating [kg/s]
-			int const FanOpModeSchedPtr, // Pointer to the correct fan operating mode schedule
-			int const FanAvailSchedPtr, // Pointer to the correct fan availability schedule
-			int const FanIndex, // Index to fan object
-			Real64 const FanPower, // power reported by fan component
-			int const OpMode, // operation mode: 1 = cycling fan, cycling coil 2 = constant fan, cycling coil
-			int const FanPlace, // fan placement; 1=blow through, 2=draw through
-			Real64 const ActualFanVolFlowRate, // volumetric flow rate from fan object
-			std::string const & OAMixerName, // name of outside air mixer
-			int const OAMixerIndex, // index to outside air mixer
-			bool const OAMixerUsed, // true if OA Mixer object is used
-			int const CoolCoilIndex, // index to terminal unit cooling coil
-			int const HeatCoilIndex, // index to terminal unit heating coil
-			int const DXCoolCoilType_Num, // type of VRF cooling coil
-			int const DXHeatCoilType_Num, // type of VRF cooling coil
-			Real64 const ParasiticElec, // parasitic electric for VRF terminal unit
-			Real64 const ParasiticOffElec, // parasitic electric for VRF terminal unit when off
-			Real64 const HeatingSpeedRatio, // Fan speed ratio in heating mode
-			Real64 const HeatingCapacitySizeRatio, // Ratio of heating to cooling when autosizing
-			Real64 const CoolingSpeedRatio, // Fan speed ratio in cooling mode
-			Real64 const ParasiticCoolElecPower, // Terminal unit cooling parasitic electric power [W]
-			Real64 const ParasiticHeatElecPower, // Terminal unit heating parasitic electric power [W]
-			Real64 const ParasiticElecCoolConsumption, // Terminal unit parasitic electric consumption in cooling [J]
-			Real64 const ParasiticElecHeatConsumption, // Terminal unit parasitic electric consumption in heating [J]
-			bool const CoolingCoilPresent, // FALSE if coil not present
-			bool const HeatingCoilPresent, // FALSE if coil not present
-			std::string const & AvailManagerListName, // Name of an availability manager list object
-			int const AvailStatus,
-			Real64 const TerminalUnitSensibleRate, // sensible cooling/heating rate of VRF terminal unit (W)
-			Real64 const TerminalUnitLatentRate, // latent dehumidificatino/humidification rate of VRF terminal unit (W)
-			Real64 const TotalCoolingRate, // report variable for total cooling rate (W)
-			Real64 const TotalHeatingRate, // report variable for total heating rate (W)
-			Real64 const SensibleCoolingRate, // report variable for sensible cooling rate (W)
-			Real64 const SensibleHeatingRate, // report variable for sensible heating rate (W)
-			Real64 const LatentCoolingRate, // report variable for latent cooling rate (W)
-			Real64 const LatentHeatingRate, // report variable for latent heating rate (W)
-			Real64 const TotalCoolingEnergy, // report variable for total cooling energy (J)
-			Real64 const TotalHeatingEnergy, // report variable for total heating energy (J)
-			Real64 const SensibleCoolingEnergy, // report variable for sensible cooling energy (J)
-			Real64 const SensibleHeatingEnergy, // report variable for sensible heating energy (J)
-			Real64 const LatentCoolingEnergy, // report variable for latent cooling energy (J)
-			Real64 const LatentHeatingEnergy, // report variable for latent heating energy (J)
-			bool const EMSOverridePartLoadFrac, // User defined EMS function
-			Real64 const EMSValueForPartLoadFrac, // user defined value for EMS function
-			int const IterLimitExceeded, // index used for warning messages
-			int const FirstIterfailed, // index used for warning messages
-			int const ZonePtr, // pointer to a zone served by a VRF terminal
-			int const HVACSizingIndex // index of a HVACSizing object for a VRF terminal
-		) :
-			Name( Name ),
-			VRFTUType_Num( VRFTUType_Num ),
-			SchedPtr( SchedPtr ),
-			VRFSysNum( VRFSysNum ),
-			TUListIndex( TUListIndex ),
-			IndexToTUInTUList( IndexToTUInTUList ),
-			ZoneNum( ZoneNum ),
-			VRFTUInletNodeNum( VRFTUInletNodeNum ),
-			VRFTUOutletNodeNum( VRFTUOutletNodeNum ),
-			VRFTUOAMixerOANodeNum( VRFTUOAMixerOANodeNum ),
-			VRFTUOAMixerRelNodeNum( VRFTUOAMixerRelNodeNum ),
-			VRFTUOAMixerRetNodeNum( VRFTUOAMixerRetNodeNum ),
-			MaxCoolAirVolFlow( MaxCoolAirVolFlow ),
-			MaxHeatAirVolFlow( MaxHeatAirVolFlow ),
-			MaxNoCoolAirVolFlow( MaxNoCoolAirVolFlow ),
-			MaxNoHeatAirVolFlow( MaxNoHeatAirVolFlow ),
-			MaxCoolAirMassFlow( MaxCoolAirMassFlow ),
-			MaxHeatAirMassFlow( MaxHeatAirMassFlow ),
-			MaxNoCoolAirMassFlow( MaxNoCoolAirMassFlow ),
-			MaxNoHeatAirMassFlow( MaxNoHeatAirMassFlow ),
-			CoolOutAirVolFlow( CoolOutAirVolFlow ),
-			HeatOutAirVolFlow( HeatOutAirVolFlow ),
-			NoCoolHeatOutAirVolFlow( NoCoolHeatOutAirVolFlow ),
-			CoolOutAirMassFlow( CoolOutAirMassFlow ),
-			HeatOutAirMassFlow( HeatOutAirMassFlow ),
-			NoCoolHeatOutAirMassFlow( NoCoolHeatOutAirMassFlow ),
-			FanOpModeSchedPtr( FanOpModeSchedPtr ),
-			FanAvailSchedPtr( FanAvailSchedPtr ),
-			FanIndex( FanIndex ),
-			FanPower( FanPower ),
-			OpMode( OpMode ),
-			FanPlace( FanPlace ),
-			ActualFanVolFlowRate( ActualFanVolFlowRate ),
-			OAMixerName( OAMixerName ),
-			OAMixerIndex( OAMixerIndex ),
-			OAMixerUsed( OAMixerUsed ),
-			CoolCoilIndex( CoolCoilIndex ),
-			HeatCoilIndex( HeatCoilIndex ),
-			DXCoolCoilType_Num( DXCoolCoilType_Num ),
-			DXHeatCoilType_Num( DXHeatCoilType_Num ),
-			ParasiticElec( ParasiticElec ),
-			ParasiticOffElec( ParasiticOffElec ),
-			HeatingSpeedRatio( HeatingSpeedRatio ),
-			HeatingCapacitySizeRatio( HeatingCapacitySizeRatio ),
-			CoolingSpeedRatio( CoolingSpeedRatio ),
-			ParasiticCoolElecPower( ParasiticCoolElecPower ),
-			ParasiticHeatElecPower( ParasiticHeatElecPower ),
-			ParasiticElecCoolConsumption( ParasiticElecCoolConsumption ),
-			ParasiticElecHeatConsumption( ParasiticElecHeatConsumption ),
-			CoolingCoilPresent( CoolingCoilPresent ),
-			HeatingCoilPresent( HeatingCoilPresent ),
-			AvailManagerListName( AvailManagerListName ),
-			AvailStatus( AvailStatus ),
-			TerminalUnitSensibleRate( TerminalUnitSensibleRate ),
-			TerminalUnitLatentRate( TerminalUnitLatentRate ),
-			TotalCoolingRate( TotalCoolingRate ),
-			TotalHeatingRate( TotalHeatingRate ),
-			SensibleCoolingRate( SensibleCoolingRate ),
-			SensibleHeatingRate( SensibleHeatingRate ),
-			LatentCoolingRate( LatentCoolingRate ),
-			LatentHeatingRate( LatentHeatingRate ),
-			TotalCoolingEnergy( TotalCoolingEnergy ),
-			TotalHeatingEnergy( TotalHeatingEnergy ),
-			SensibleCoolingEnergy( SensibleCoolingEnergy ),
-			SensibleHeatingEnergy( SensibleHeatingEnergy ),
-			LatentCoolingEnergy( LatentCoolingEnergy ),
-			LatentHeatingEnergy( LatentHeatingEnergy ),
-			EMSOverridePartLoadFrac( EMSOverridePartLoadFrac ),
-			EMSValueForPartLoadFrac( EMSValueForPartLoadFrac ),
-			IterLimitExceeded( IterLimitExceeded ),
-			FirstIterfailed( FirstIterfailed ),
-			ZonePtr( ZonePtr ),
-			HVACSizingIndex( HVACSizingIndex )
-		{}
-
 	};
 
 
@@ -1165,12 +805,6 @@ namespace HVACVariableRefrigerantFlow {
 		VRFTUNumericFieldData()
 		{}
 
-		// Member Constructor
-		VRFTUNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-			) :
-			FieldNames( FieldNames )
-		{}
 	};
 
 
@@ -1218,6 +852,11 @@ namespace HVACVariableRefrigerantFlow {
 
 	void
 	GetVRFInput();
+
+	void
+	GetVRFInputData(
+		bool & ErrorsFound // flag for errors in GetInput
+	);
 
 	// End of Get Input subroutines for the Module
 	//******************************************************************************
@@ -1344,31 +983,75 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 & MaxLimit // Maximum terminal unit capacity for coils in same operating mode [W]
 	);
 
+	// Clears the global data in CurveManager.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 	// End of Utility subroutines for the Module
 	// *****************************************************************************
 
-	//     NOTICE
+	
+	// Begin of Methods for New VRF Model: Fluid Temperature Control
+	//******************************************************************************
+	void
+	CalcVRFIUTeTc_FluidTCtrl(
+		int const IndexVRFCondenser // index to VRF Outdoor Unit
+	);
+	
+	void
+	CalcVRFIUVariableTeTc(
+		int const VRFTUNum, // the number of the VRF TU to be simulated
+		Real64 & EvapTemp, // evaporating temperature
+		Real64 & CondTemp  // condensing temperature 
+	);
+		
+	void
+	ControlVRF_FluidTCtrl(
+		int const VRFTUNum, // Index to VRF terminal unit
+		Real64 const QZnReq, // Index to zone number
+		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+		Real64 & PartLoadRatio, // unit part load ratio
+		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
+	);
+	
+	void
+	CalcVRF_FluidTCtrl(
+		int const VRFTUNum, // Unit index in VRF terminal unit array
+		bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+		Real64 const PartLoadRatio, // compressor part load fraction
+		Real64 & LoadMet, // load met by unit (W)
+		Real64 & OnOffAirFlowRatio, // ratio of ON air flow to average air flow
+		Optional< Real64 > LatOutputProvided = _ // delivered latent capacity (W)
+	);
 
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
+	void
+	CalcVRFCondenser_FluidTCtrl(
+		int const VRFCond, // index to VRF condenser
+		bool const FirstHVACIteration // flag for first time through HVAC system simulation
+	);
+	
+	Real64
+	CalVRFTUAirFlowRate_FluidTCtrl(
+		int VRFTUNum, // TU index
+		Real64 PartLoadRatio, // part load ratio of the coil 
+		bool FirstHVACIteration // FirstHVACIteration flag
+	);
+	
+	Real64
+	VRFTUAirFlowResidual_FluidTCtrl(
+		Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU 
+		Array1< Real64 > const & Par // par(1) = VRFTUNum
+	);
+	
+	Real64 
+	CompResidual_FluidTCtrl( 
+		Real64 const Te, // Outdoor unit evaporating temperature
+		Array1< Real64 > const & Par // Array of parameters
+	);
 
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	// End of Methods for New VRF Model: Fluid Temperature Control
+	// *****************************************************************************
 
 } // HVACVariableRefrigerantFlow
 

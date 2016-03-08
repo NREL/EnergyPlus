@@ -53,7 +53,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.3;
+  Version,8.5;
 
   Building,
     FHX House,               !- Name
@@ -674,9 +674,8 @@
     2576,                    !- Soil Specific Heat {J/kg-K}
     30,                      !- Soil Moisture Content Volume Fraction {percent}
     50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    15.5,                    !- Kusuda-Achenbach Average Surface Temperature {C}
-    12.8,                    !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-    17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,    !- Type of Undisturbed Ground Temperature Model
+    KATemps,                 !- Name of Undisturbed Ground Temperature Model
     Yes,                     !- This Domain Includes Basement Surface Interaction
     6,                       !- Width of Basement Floor in Ground Domain {m}
     2.5,                     !- Depth of Basement Wall In Ground Domain {m}
@@ -688,6 +687,15 @@
     0.408,                   !- Evapotranspiration Ground Cover Parameter
     1,                       !- Number of Pipe Circuits Entered for this Domain
     My Pipe Circuit;         !- Pipe Circuit 1
+    
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,                 !- Name of object
+    1.08,                    !- Soil Thermal Conductivity {W/m-K}
+    962,                     !- Soil Density {kg/m3}
+    2576,                    !- Soil Specific Heat {J/kg-K}
+    15.5,                    !- Annual average surface temperature {C}
+    12.8,                    !- Annual amplitude of surface temperature {delta C}
+    17.3;                    !- Phase shift of minimum surface temperature {days}
 
   PipingSystem:Underground:PipeCircuit,
     My Pipe Circuit,         !- Name

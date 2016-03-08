@@ -1,9 +1,66 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -81,6 +138,12 @@ namespace SizingManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+	 NumAirLoops = 0;
+	}
+
 
 	void
 	ManageSizing()
@@ -164,6 +227,9 @@ namespace SizingManager {
 		int iZoneCalcIter; // index for repeating the zone sizing calcs
 		static bool runZeroingOnce( true );
 		bool isUserReqCompLoadReport;
+		Real64 DOASHeatGainRateAtHtPk( 0.0 ); // zone heat gain rate from the DOAS at the heating peak [W]
+		Real64 DOASHeatGainRateAtClPk( 0.0 ); // zone heat gain rate from the DOAS at the cooling peak [W]
+		Real64 TStatSetPtAtPk( 0.0 ); // thermostat set point at peak
 
 		// FLOW:
 
@@ -572,11 +638,19 @@ namespace SizingManager {
 					if ( DDNum > 0 && TimeStepAtPeak > 0 ) {
 						TempAtPeak = DesDayWeath( DDNum ).Temp( TimeStepAtPeak );
 						HumRatAtPeak = DesDayWeath( DDNum ).HumRat( TimeStepAtPeak );
+						DOASHeatGainRateAtClPk = CalcZoneSizing( DDNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepAtPeak );
+						TStatSetPtAtPk = ZoneSizing( DDNum, CtrlZoneNum ).CoolTstatTempSeq( TimeStepAtPeak );
 					} else {
 						TempAtPeak = 0.0;
 						HumRatAtPeak = 0.0;
+						DOASHeatGainRateAtClPk = 0.0;
+						TStatSetPtAtPk = 0.0;
 					}
-					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Cooling", CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad, FinalZoneSizing( CtrlZoneNum ).DesCoolLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).CoolDesDay, CoolPeakDateHrMin( CtrlZoneNum ), TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, FinalZoneSizing( CtrlZoneNum ).MinOA );
+					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Cooling", CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad,
+						FinalZoneSizing( CtrlZoneNum ).DesCoolLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow,
+						FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).CoolDesDay, CoolPeakDateHrMin( CtrlZoneNum ),
+						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants,
+						FinalZoneSizing( CtrlZoneNum ).MinOA, DOASHeatGainRateAtClPk );
 					curName = FinalZoneSizing( CtrlZoneNum ).ZoneName;
 					PreDefTableEntry( pdchZnClCalcDesLd, curName, CalcFinalZoneSizing( CtrlZoneNum ).DesCoolLoad );
 					PreDefTableEntry( pdchZnClUserDesLd, curName, FinalZoneSizing( CtrlZoneNum ).DesCoolLoad );
@@ -587,11 +661,13 @@ namespace SizingManager {
 					PreDefTableEntry( pdchZnClUserDesAirFlow, curName, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, 3 );
 					PreDefTableEntry( pdchZnClDesDay, curName, FinalZoneSizing( CtrlZoneNum ).CoolDesDay );
 					PreDefTableEntry( pdchZnClPkTime, curName, CoolPeakDateHrMin( CtrlZoneNum ) );
-					PreDefTableEntry( pdchZnClPkTstatTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).CoolTstatTemp );
+					PreDefTableEntry( pdchZnClPkTstatTemp, curName, TStatSetPtAtPk );
 					PreDefTableEntry( pdchZnClPkIndTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak );
 					PreDefTableEntry( pdchZnClPkIndHum, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, 5 );
 					PreDefTableEntry( pdchZnClPkOATemp, curName, TempAtPeak );
 					PreDefTableEntry( pdchZnClPkOAHum, curName, HumRatAtPeak, 5 );
+					PreDefTableEntry(pdchZnClPkOAMinFlow, curName, FinalZoneSizing( CtrlZoneNum ).MinOA, 3 );
+					PreDefTableEntry( pdchZnClPkDOASHeatGain, curName, DOASHeatGainRateAtClPk );
 				}
 				if ( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
 					TimeStepAtPeak = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax;
@@ -599,11 +675,19 @@ namespace SizingManager {
 					if ( DDNum > 0 && TimeStepAtPeak > 0 ) {
 						TempAtPeak = DesDayWeath( DDNum ).Temp( TimeStepAtPeak );
 						HumRatAtPeak = DesDayWeath( DDNum ).HumRat( TimeStepAtPeak );
+						DOASHeatGainRateAtHtPk = CalcZoneSizing( DDNum, CtrlZoneNum ).DOASHeatAddSeq( TimeStepAtPeak );
+						TStatSetPtAtPk = ZoneSizing( DDNum, CtrlZoneNum ).HeatTstatTempSeq( TimeStepAtPeak );
 					} else {
 						TempAtPeak = 0.0;
 						HumRatAtPeak = 0.0;
+						DOASHeatGainRateAtHtPk = 0.0;
+						TStatSetPtAtPk = 0.0;
 					}
-					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Heating", CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad, FinalZoneSizing( CtrlZoneNum ).DesHeatLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).HeatDesDay, HeatPeakDateHrMin( CtrlZoneNum ), TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants, FinalZoneSizing( CtrlZoneNum ).MinOA );
+					ReportZoneSizing( FinalZoneSizing( CtrlZoneNum ).ZoneName, "Heating", CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad,
+						FinalZoneSizing( CtrlZoneNum ).DesHeatLoad, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow,
+						FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).HeatDesDay, HeatPeakDateHrMin( CtrlZoneNum ),
+						TempAtPeak, HumRatAtPeak, Zone( ZoneNum ).FloorArea, Zone( ZoneNum ).TotOccupants,
+						FinalZoneSizing( CtrlZoneNum ).MinOA, DOASHeatGainRateAtHtPk );
 					curName = FinalZoneSizing( CtrlZoneNum ).ZoneName;
 					PreDefTableEntry( pdchZnHtCalcDesLd, curName, CalcFinalZoneSizing( CtrlZoneNum ).DesHeatLoad );
 					PreDefTableEntry( pdchZnHtUserDesLd, curName, FinalZoneSizing( CtrlZoneNum ).DesHeatLoad );
@@ -614,16 +698,18 @@ namespace SizingManager {
 					PreDefTableEntry( pdchZnHtUserDesAirFlow, curName, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, 3 );
 					PreDefTableEntry( pdchZnHtDesDay, curName, FinalZoneSizing( CtrlZoneNum ).HeatDesDay );
 					PreDefTableEntry( pdchZnHtPkTime, curName, HeatPeakDateHrMin( CtrlZoneNum ) );
-					PreDefTableEntry( pdchZnHtPkTstatTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).HeatTstatTemp );
+					PreDefTableEntry( pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk );
 					PreDefTableEntry( pdchZnHtPkIndTemp, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak );
 					PreDefTableEntry( pdchZnHtPkIndHum, curName, CalcFinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, 5 );
 					PreDefTableEntry( pdchZnHtPkOATemp, curName, TempAtPeak );
 					PreDefTableEntry( pdchZnHtPkOAHum, curName, HumRatAtPeak, 5 );
+					PreDefTableEntry( pdchZnHtPkOAMinFlow, curName, FinalZoneSizing( CtrlZoneNum ).MinOA, 3 );
+					PreDefTableEntry( pdchZnHtPkDOASHeatGain, curName, DOASHeatGainRateAtHtPk );
 				}
 			}
 			// Deallocate arrays no longer needed
 			ZoneSizing.deallocate();
-			CalcZoneSizing.deallocate();
+			// CalcZoneSizing.deallocate();
 		}
 		if ( SysSizingRunDone ) {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
@@ -1247,21 +1333,6 @@ namespace SizingManager {
 				ZoneListActive( false )
 			{}
 
-			// Member Constructor
-			GlobalMiscObject(
-				std::string const & Name,
-				int const ZoneOrZoneListPtr,
-				int const NumOfZones,
-				int const StartPtr,
-				bool const ZoneListActive
-			) :
-				Name( Name ),
-				ZoneOrZoneListPtr( ZoneOrZoneListPtr ),
-				NumOfZones( NumOfZones ),
-				StartPtr( StartPtr ),
-				ZoneListActive( ZoneListActive )
-			{}
-
 		};
 
 		// Object Data
@@ -1726,6 +1797,38 @@ namespace SizingManager {
 						ShowContinueError( "... valid values are DesignDay, Flow/Zone or DesignDayWithLimit." );
 						ErrorsFound = true;
 					}}
+					if ( cAlphaArgs( 8 ) == "YES" ) {
+						ZoneSizingInput( ZoneSizIndex ).AccountForDOAS = true;
+					}
+					else {
+						ZoneSizingInput( ZoneSizIndex ).AccountForDOAS = false;
+					}
+					if ( ZoneSizingInput( ZoneSizIndex ).AccountForDOAS ) {
+						{auto const DOASControlMethod( cAlphaArgs( 9 ) );
+							if ( DOASControlMethod == "NEUTRALSUPPLYAIR" ) {
+								ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy = DOANeutralSup;
+							}
+							else if ( DOASControlMethod == "NEUTRALDEHUMIDIFIEDSUPPLYAIR" ) {
+								ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy = DOANeutralDehumSup;
+							}
+							else if ( DOASControlMethod == "COLDSUPPLYAIR" ) {
+								ZoneSizingInput( ZoneSizIndex ).DOASControlStrategy = DOACoolSup;
+							}
+							else {
+								ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+								ShowContinueError( "... incorrect " + cAlphaFieldNames( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
+								ShowContinueError( "... valid values are NeutralSupplyAir, NeutralDehumidifiedSupplyAir or ColdSupplyAir." );
+								ErrorsFound = true;
+							}
+						}
+						ZoneSizingInput( ZoneSizIndex ).DOASLowSetpoint = rNumericArgs( 17 );
+						ZoneSizingInput( ZoneSizIndex ).DOASHighSetpoint = rNumericArgs( 18 );
+						if ( rNumericArgs( 17 ) > 0.0 && rNumericArgs( 18 ) > 0.0 && rNumericArgs( 17 ) >= rNumericArgs( 18 ) ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+							ShowContinueError( "... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint" );
+							ErrorsFound = true;
+						}
+					}
 				}
 			}
 		}
@@ -2071,7 +2174,7 @@ namespace SizingManager {
 			SysSizInput( SysSizIndex ).CoolSupTemp = rNumericArgs( iCentralCoolDesignSATempNumericNum );
 			SysSizInput( SysSizIndex ).HeatSupTemp = rNumericArgs( iCentralHeatDesignSATempNumericNum );
 			SysSizInput( SysSizIndex ).CoolSupHumRat = rNumericArgs( iCentralCoolDesignSAHumRatNumericNum );
-			SysSizInput( SysSizIndex).HeatSupHumRat = rNumericArgs( iCentralHeatDesignSAHumRatNumericNum );
+			SysSizInput( SysSizIndex ).HeatSupHumRat = rNumericArgs( iCentralHeatDesignSAHumRatNumericNum );
 			//  N11, \field Cooling Design Air Flow Rate
 			//      \note This input is used if Cooling Design Air Flow Method is Flow/System
 			//      \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
@@ -2193,9 +2296,16 @@ namespace SizingManager {
 				SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_ZoneSum;
 			} else if ( systemOAMethod == "VENTILATIONRATEPROCEDURE" ) {
 				SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_VRP;
-				if ( SysSizInput( SysSizIndex ).DesOutAirVolFlow > 0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
-					ShowContinueError("SystemOAMethod is set to VRP and " + cNumericFieldNames( iDesignOAVolFlowNumericNum ) + " > 0, user entry will be ignored.");
+				if ( SysSizInput( SysSizIndex ).LoadSizeType == Ventilation ) {
+					ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid combination of inputs." );
+					ShowContinueError( cAlphaFieldNames( iLoadTypeSizeAlphaNum ) + " = " + cAlphaArgs( iLoadTypeSizeAlphaNum ) + " and " + cAlphaFieldNames( iSystemOASMethodAlphaNum ) + " = " + cAlphaArgs( iSystemOASMethodAlphaNum ) + "." );
+					ShowContinueError( "Resetting System Outdoor Air Method to ZoneSum." );
+					SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_ZoneSum;
+				} else {
+					if ( SysSizInput( SysSizIndex ).DesOutAirVolFlow > 0 ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
+						ShowContinueError( "SystemOAMethod is set to VRP and " + cNumericFieldNames( iDesignOAVolFlowNumericNum ) + " > 0, user entry will be ignored." );
+					}
 				}
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
@@ -2383,11 +2493,13 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}
 			PlantSizData.allocate( NumPltSizInput );
-			PlantSizData.PlantLoopName() = "";
-			PlantSizData.ExitTemp() = 0.0;
-			PlantSizData.DeltaT() = 0.0;
-			PlantSizData.LoopType() = 0;
-			PlantSizData.DesVolFlowRate() = 0.0;
+			for ( auto & e : PlantSizData ) {
+				e.PlantLoopName.clear();
+				e.ExitTemp = 0.0;
+				e.DeltaT = 0.0;
+				e.LoopType = 0;
+				e.DesVolFlowRate = 0.0;
+			}
 			for ( int i=1; i<=NumPltSizInput; ++i ) {
 				PlantSizData(i).ConcurrenceOption = NonCoincident;
 				PlantSizData(i).NumTimeStepsInAvg = 1;
@@ -2591,7 +2703,8 @@ namespace SizingManager {
 		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
 		Real64 const FloorArea, // zone floor area [m2]
 		Real64 const TotOccs, // design number of occupants for the zone
-		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
+		Real64 const MinOAVolFlow, // zone design minimum outside air flow rate [m3/s]
+		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 	)
 	{
 
@@ -2631,19 +2744,19 @@ namespace SizingManager {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		static gio::Fmt Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}')" );
-		static gio::Fmt Format_991( "(' Zone Sizing Information',13(', ',A))" );
+		static gio::Fmt Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, Calc DOAS Heat Addition Rate {W}')" );
+		static gio::Fmt Format_991( "(' Zone Sizing Information',14(', ',A))" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );
 			MyOneTimeFlag = false;
 		}
 
-		gio::write( OutputFileInits, Format_991 ) << ZoneName << LoadType << RoundSigDigits( CalcDesLoad, 5 ) << RoundSigDigits( UserDesLoad, 5 ) << RoundSigDigits( CalcDesFlow, 5 ) << RoundSigDigits( UserDesFlow, 5 ) << DesDayName << PeakHrMin << RoundSigDigits( PeakTemp, 5 ) << RoundSigDigits( PeakHumRat, 5 ) << RoundSigDigits( FloorArea, 5 ) << RoundSigDigits( TotOccs, 5 ) << RoundSigDigits( MinOAVolFlow, 5 );
+		gio::write( OutputFileInits, Format_991 ) << ZoneName << LoadType << RoundSigDigits( CalcDesLoad, 5 ) << RoundSigDigits( UserDesLoad, 5 ) << RoundSigDigits( CalcDesFlow, 5 ) << RoundSigDigits( UserDesFlow, 5 ) << DesDayName << PeakHrMin << RoundSigDigits( PeakTemp, 5 ) << RoundSigDigits( PeakHumRat, 5 ) << RoundSigDigits( FloorArea, 5 ) << RoundSigDigits( TotOccs, 5 ) << RoundSigDigits( MinOAVolFlow, 5 ) << RoundSigDigits( DOASHeatAddRate , 5 );
 
 		// BSLLC Start
 		if ( sqlite ) {
-			sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow );
+			sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
 		}
 		// BSLLC Finish
 
@@ -3314,30 +3427,6 @@ namespace SizingManager {
 		}
 
 	}
-
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SizingManager
 

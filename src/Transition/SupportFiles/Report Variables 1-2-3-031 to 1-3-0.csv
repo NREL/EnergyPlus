@@ -1,0 +1,131 @@
+1.2.3.031,1.3.0.xxx,
+128,128, This number should be the number of following lines
+Number of COMIS iterations,<DELETE>,
+Opening Factor Multiplier for COMIS Venting Modulation,Opening Factor Multiplier for Venting Modulation,
+Inside Temp Setpoint for COMIS Venting,Inside Temp Setpoint for AirflowNetwork Venting,
+Air Flow from FromZone to ToZone through COMIS Link,AirflowNetwork Volume Flow Rate from Node 2 to 1,
+Air Flow from ToZone to FromZone through COMIS Link,AirflowNetwork Volume Flow Rate from Node 1 to 2,
+Wind pressure,AirflowNetwork Wind pressure,
+ADS Node Temperature,AirflowNetwork Node Temperature,
+ADS Node Humidity Ratio,AirflowNetwork Node Humidity Ratio,
+ADS Node Total Pressure,AirflowNetwork Node Total Pressure,
+ADS Node Reference Pressure,AirflowNetwork Node Reference Pressure,
+ADS Linkage Mass Flow Rate,AirflowNetwork Mass Flow Rate from Node 1 to 2,
+ADS Linkage Mass Flow Rate,AirflowNetwork Mass Flow Rate from Node 2 to 1,
+ADS Linkage Pressure Difference,AirflowNetwork Linkage Pressure Difference,
+ADS MultiZone Flow Sensible Gain Rate,AirflowNetwork Infiltration Sensible Gain Rate,
+ADS MultiZone Flow Sensible Gain Rate,AirflowNetwork Mixing Sensible Gain Rate
+ADS MultiZone Flow Sensible Gain,AirflowNetwork Infiltration Sensible Gain
+ADS MultiZone Flow Sensible Gain,AirflowNetwork Mixing Sensible Gain
+ADS MultiZone Flow Sensible Loss Rate,AirflowNetwork Infiltration Sensible Loss Rate
+ADS MultiZone Flow Sensible Loss Rate,AirflowNetwork Mixing Sensible Loss Rate
+ADS MultiZone Flow Sensible Loss,AirflowNetwork Infiltration Sensible Loss
+ADS MultiZone Flow Sensible Loss,AirflowNetwork Mixing Sensible Loss
+ADS MultiZone Flow Latent Gain Rate,AirflowNetwork Infiltration Latent Gain Rate
+ADS MultiZone Flow Latent Gain Rate,AirflowNetwork Mixing Latent Gain Rate
+ADS MultiZone Flow Latent Gain,AirflowNetwork Infiltration Latent Gain
+ADS MultiZone Flow Latent Gain,AirflowNetwork Mixing Latent Gain 
+ADS MultiZone Flow Latent Loss Rate,AirflowNetwork Infiltration Latent Loss Rate
+ADS MultiZone Flow Latent Loss Rate,AirflowNetwork Mixing Latent Loss Rate
+ADS MultiZone Flow Latent Loss,AirflowNetwork Infiltration Latent Loss
+ADS MultiZone Flow Latent Loss,AirflowNetwork Mixing Latent Loss
+ADS Duct Leak Sensible Gain Rate,AirflowNetwork Duct Leak Sensible Gain Rate
+ADS Duct Leak Sensible Gain,AirflowNetwork Duct Leak Sensible Gain
+ADS Duct Leak Sensible Loss Rate,AirflowNetwork Duct Leak Sensible Loss Rate
+ADS Duct Leak Sensible Loss,AirflowNetwork Duct Leak Sensible Loss
+ADS Duct Leak Latent Gain Rate,AirflowNetwork Duct Leak Latent Gain Rate
+ADS Duct Leak Latent Gain,AirflowNetwork Duct Leak Latent Gain
+ADS Duct Leak Latent Loss Rate,AirflowNetwork Duct Leak Latent Loss Rate
+ADS Duct Leak Latent Loss,AirflowNetwork Duct Leak Latent Loss
+ADS Duct Conduction Sensible Gain Rate,AirflowNetwork Duct Conduction Sensible Gain Rate
+ADS Duct Conduction Sensible Gain,AirflowNetwork Duct Conduction Sensible Gain
+ADS Duct Conduction Sensible Loss Rate,AirflowNetwork Duct Conduction Sensible Loss Rate
+ADS Duct Conduction Sensible Loss,AirflowNetwork Duct Conduction Sensible Loss
+ADS Duct Diffusion Latent Gain Rate,AirflowNetwork Duct Diffusion Latent Gain Rate
+ADS Duct Diffusion Latent Gain,AirflowNetwork Duct Diffusion Latent Gain
+ADS Duct Diffusion Latent Loss Rate,AirflowNetwork Duct Diffusion Latent Loss Rate
+ADS Duct Diffusion Latent Loss,AirflowNetwork Duct Diffusion Latent Loss
+ADS Total Sensible Gain Rate,AirflowNetwork Distribution Sensible Gain Rate
+ADS Total Sensible Gain Rate,AirflowNetwork Infiltration Sensible Gain Rate
+ADS Total Sensible Gain Rate,AirflowNetwork Mixing Sensible Gain Rate
+ADS Total Sensible Gain,AirflowNetwork Distribution Sensible Gain
+ADS Total Sensible Gain,AirflowNetwork Infiltration Sensible Gain
+ADS Total Sensible Gain,AirflowNetwork Mixing Sensible Gain
+ADS Total Sensible Loss Rate,AirflowNetwork Distribution Sensible Loss Rate
+ADS Total Sensible Loss Rate,AirflowNetwork Infiltration Sensible Loss Rate
+ADS Total Sensible Loss Rate,AirflowNetwork Mixing Sensible Loss Rate
+ADS Total Sensible Loss,AirflowNetwork Distribution Sensible Loss
+ADS Total Sensible Loss,AirflowNetwork Infiltration Sensible Loss
+ADS Total Sensible Loss,AirflowNetwork Mixing Sensible Loss
+ADS Total Latent Gain Rate,AirflowNetwork Distribution Latent Gain Rate
+ADS Total Latent Gain Rate,AirflowNetwork Infiltration Latent Gain Rate
+ADS Total Latent Gain Rate,AirflowNetwork Mixing Latent Gain Rate
+ADS Total Latent Gain,AirflowNetwork Distribution Latent Gain
+ADS Total Latent Gain,AirflowNetwork Infiltration Latent Gain
+ADS Total Latent Gain,AirflowNetwork Mixing Latent Gain
+ADS Total Latent Loss Rate,AirflowNetwork Distribution Latent Loss Rate
+ADS Total Latent Loss Rate,AirflowNetwork Infiltration Latent Loss Rate
+ADS Total Latent Loss Rate,AirflowNetwork Mixing Latent Loss Rate
+ADS Total Latent Loss,AirflowNetwork Distribution Latent Loss
+ADS Total Latent Loss,AirflowNetwork Infiltration Latent Loss
+ADS Total Latent Loss,AirflowNetwork Mixing Latent Loss
+GeneralLights:Electricity*,InteriorLights:Electricity
+TaskLights:Electricity*,TaskLights:InteriorLights:Electricity
+Cat00_ZoneSource:*,General:InteriorEquipment:
+Cat01_ZoneSource:*,Category 01:InteriorEquipment:
+Cat02_ZoneSource:*,Category 02:InteriorEquipment:
+Cat03_ZoneSource:*,Category 03:InteriorEquipment:
+Cat04_ZoneSource:*,Category 04:InteriorEquipment:
+Cat05_ZoneSource:*,Category 05:InteriorEquipment:
+Cat06_ZoneSource:*,Category 06:InteriorEquipment:
+Cat07_ZoneSource:*,Category 07:InteriorEquipment:
+Cat08_ZoneSource:*,Category 08:InteriorEquipment:
+Cat09_ZoneSource:*,Category 09:InteriorEquipment:
+Cat10_ZoneSource:*,Category 10:InteriorEquipment:
+Cat11_ZoneSource:*,Category 11:InteriorEquipment:
+Cat12_ZoneSource:*,Category 12:InteriorEquipment:
+Cat13_ZoneSource:*,Category 13:InteriorEquipment:
+Cat14_ZoneSource:*,Category 14:InteriorEquipment:
+Cat15_ZoneSource:*,Category 15:InteriorEquipment:
+Cat16_ZoneSource:*,Category 16:InteriorEquipment:
+Cat17_ZoneSource:*,Category 17:InteriorEquipment:
+Cat18_ZoneSource:*,Category 18:InteriorEquipment:
+Cat19_ZoneSource:*,Category 19:InteriorEquipment:
+Cat20_ZoneSource:*,Category 20:InteriorEquipment:
+Cat21_ZoneSource:*,Category 21:InteriorEquipment:
+Cat22_ZoneSource:*,Category 22:InteriorEquipment:
+Cat23_ZoneSource:*,Category 23:InteriorEquipment:
+Cat24_ZoneSource:*,Category 24:InteriorEquipment:
+Cat25_ZoneSource:*,Category 25:InteriorEquipment:
+ZoneSource:*,InteriorEquipment:
+Zone Electric Equipment Cat00*,Zone Electric Equipment
+Zone Electric Equipment Cat01*,Zone Electric Equipment
+Zone Electric Equipment Cat02*,Zone Electric Equipment
+Zone Electric Equipment Cat03*,Zone Electric Equipment
+Zone Electric Equipment Cat04*,Zone Electric Equipment
+Zone Electric Equipment Cat05*,Zone Electric Equipment
+Zone Electric Equipment Cat06*,Zone Electric Equipment
+Zone Electric Equipment Cat07*,Zone Electric Equipment
+Zone Electric Equipment Cat08*,Zone Electric Equipment
+Zone Electric Equipment Cat09*,Zone Electric Equipment
+Zone Electric Equipment Cat10*,Zone Electric Equipment
+Zone Electric Equipment Cat11*,Zone Electric Equipment
+Zone Electric Equipment Cat12*,Zone Electric Equipment
+Zone Electric Equipment Cat13*,Zone Electric Equipment
+Zone Electric Equipment Cat14*,Zone Electric Equipment
+Zone Electric Equipment Cat15*,Zone Electric Equipment
+Zone Electric Equipment Cat16*,Zone Electric Equipment
+Zone Electric Equipment Cat17*,Zone Electric Equipment
+Zone Electric Equipment Cat18*,Zone Electric Equipment
+Zone Electric Equipment Cat19*,Zone Electric Equipment
+Zone Electric Equipment Cat20*,Zone Electric Equipment
+Zone Electric Equipment Cat21*,Zone Electric Equipment
+Zone Electric Equipment Cat22*,Zone Electric Equipment
+Zone Electric Equipment Cat23*,Zone Electric Equipment
+Zone Electric Equipment Cat24*,Zone Electric Equipment
+Zone Electric Equipment Cat25*,Zone Electric Equipment
+Task Lights*,<DELETE>
+Zone Task Lights*,<DELETE>
+Miscellaneous:Gas,<DELETE>
+Miscellaneous:Electric,<DELETE>
+old variable name,new variable name -- put variable names in quotes and leave off units

@@ -5,11 +5,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -291,14 +291,32 @@ bit_cshift( T const & x, S const & shift ) // x<0 behavior varies in Fortran ISH
 }
 
 // Bit Arithmetic Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_unsigned< T >::value >::type >
 inline
 T
 bit_ashift( T const & x, S const & shift )
 {
-	static auto const x_bits( bit_size( x ) );
+	auto const x_bits( std::numeric_limits< T >::digits );
 	if ( shift >= S( 0 ) ) {
 		return ( shift < x_bits ? x << shift : T( 0 ) );
+	} else { // Negative (right) shift
+		if ( x >= T( 0 ) ) {
+			return ( -shift < x_bits ? x >> -shift : T( 0 ) );
+		} else {
+			return ( -shift < x_bits ? x >> -shift | ~( ( S( 1 ) << ( x_bits + shift ) ) - 1 ) : T( 0 ) );
+		}
+	}
+}
+
+// Bit Arithmetic Shifted
+template< typename T, typename S, class = typename std::enable_if< std::is_signed< T >::value >::type, typename = void >
+inline
+T
+bit_ashift( T const & x, S const & shift )
+{
+	auto const x_bits( std::numeric_limits< T >::digits + 1 );
+	if ( shift >= S( 0 ) ) {
+		return ( shift < x_bits ? *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) << shift : T( 0 ) );
 	} else { // Negative (right) shift
 		if ( x >= T( 0 ) ) {
 			return ( -shift < x_bits ? x >> -shift : T( 0 ) );

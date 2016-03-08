@@ -55,7 +55,7 @@
 ! Environmental Emissions:
 ! Utility Tariffs:
 
-  Version,8.3;
+  Version,8.5;
 
   Building,
     AutoBuilt Model,         !- Name
@@ -67,7 +67,7 @@
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
-  Timestep,12;
+  Timestep,60;
 
   SurfaceConvectionAlgorithm:Inside,TARP;
 

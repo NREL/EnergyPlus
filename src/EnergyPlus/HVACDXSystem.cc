@@ -1,8 +1,65 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -116,6 +173,16 @@ namespace HVACDXSystem {
 	//*************************************************************************
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		NumDXSystem = 0;
+		EconomizerFlag = false;
+		GetInputFlag = true;
+		CheckEquipName.deallocate();
+		DXCoolingSystem.deallocate();
+	}
 
 	void
 	SimDXCoolingSystem(
@@ -820,6 +887,7 @@ namespace HVACDXSystem {
 		using VariableSpeedCoils::SimVariableSpeedCoils;
 		using VariableSpeedCoils::VarSpeedCoil;
 		using PackagedThermalStorageCoil::SimTESCoil;
+		using PackagedThermalStorageCoil::ControlTESIceStorageTankCoil;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1932,133 +2000,13 @@ namespace HVACDXSystem {
 
 				} else if ( SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling ) {
 
-					// First get the control mode that the child coil is in
-					SimTESCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).FanOpMode, DXCoolingSystem( DXSystemNum ).TESOpMode, DXCoolingSystem( DXSystemNum ).PartLoadFrac );
-					if ( DXCoolingSystem( DXSystemNum ).TESOpMode == OffMode || DXCoolingSystem( DXSystemNum ).TESOpMode == ChargeOnlyMode ) { // cannot cool
-						PartLoadFrac = 0.0;
-					} else {
-						// Get no load result
-						PartLoadFrac = 0.0;
-						SimTESCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).FanOpMode, DXCoolingSystem( DXSystemNum ).TESOpMode, PartLoadFrac );
-						NoOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-						NoLoadHumRatOut = Node( OutletNode ).HumRat;
-
-						// Get full load result
-						PartLoadFrac = 1.0;
-						SimTESCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).FanOpMode, DXCoolingSystem( DXSystemNum ).TESOpMode, PartLoadFrac );
-						FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-						FullLoadHumRatOut = Node( OutletNode ).HumRat;
-
-						ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-						//         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
-						if ( ( NoOutput - ReqOutput ) < Acc ) {
-							PartLoadFrac = 0.0;
-							//         If the FullOutput is greater than (insufficient cooling) or very near the ReqOutput,
-							//         run the compressor at PartLoadFrac = 1.
-						} else if ( ( FullOutput - ReqOutput ) > Acc ) {
-							PartLoadFrac = 1.0;
-							//         Else find the PLR to meet the load
-						} else {
-							if ( Node( OutletNode ).Temp > DesOutTemp ) {
-								PartLoadFrac = 1.0;
-							} else {
-								Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
-								Par( 2 ) = DesOutTemp;
-								Par( 3 ) = DXCoolingSystem( DXSystemNum ).TESOpMode;
-								Par( 4 ) = DXCoolingSystem( DXSystemNum ).DXCoolingCoilOutletNodeNum;
-								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, TESCoilResidual, 0.0, 1.0, Par );
-								if ( SolFla == -1 ) {
-									if ( ! WarmupFlag ) {
-										if ( DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
-											++DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter;
-											ShowWarningError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + DXCoolingSystem( DXSystemNum ).Name );
-											ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
-											ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
-										}
-										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
-									}
-								} else if ( SolFla == -2 ) {
-									PartLoadFrac = ReqOutput / FullOutput;
-									if ( ! WarmupFlag ) {
-										if ( DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail < 1 ) {
-											++DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail;
-											ShowWarningError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + DXCoolingSystem( DXSystemNum ).Name );
-											ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
-										}
-										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
-									}
-
-								}
-
-							}
-						}
-						//         If system does not operate to meet sensible load, use no load humidity ratio to test against humidity setpoint,
-						//         else use operating humidity ratio to test against humidity setpoint
-						if ( PartLoadFrac == 0.0 ) {
-							OutletHumRatDXCoil = NoLoadHumRatOut;
-						} else {
-							OutletHumRatDXCoil = Node( OutletNode ).HumRat;
-						}
-						// If humidity setpoint is not satisfied and humidity control type is CoolReheat,
-						// then overcool to meet moisture load
-
-						if ( ( OutletHumRatDXCoil > DesOutHumRat ) && ( PartLoadFrac < 1.0 ) && ( DXCoolingSystem( DXSystemNum ).DehumidControlType == DehumidControl_CoolReheat ) ) {
-							//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
-							//           do not run the compressor
-							if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-								//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
-								//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
-								//           run the compressor at PartLoadFrac = 1.
-							} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
-								PartLoadFrac = 1.0;
-								//           Else find the PLR to meet the load
-							} else {
-								Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
-								Par( 2 ) = DesOutHumRat;
-								Par( 3 ) = DXCoolingSystem( DXSystemNum ).TESOpMode;
-								Par( 4 ) = DXCoolingSystem( DXSystemNum ).DXCoolingCoilOutletNodeNum;
-								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, TESCoilHumRatResidual, 0.0, 1.0, Par );
-								if ( SolFla == -1 ) {
-									if ( ! WarmupFlag ) {
-										if ( DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter < 1 ) {
-											++DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter;
-											ShowWarningError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " + DXCoolingSystem( DXSystemNum ).Name );
-											ShowContinueError( "Estimated part-load ratio   = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
-											ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
-										}
-										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.", DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIterIndex, PartLoadFrac, PartLoadFrac );
-									}
-								} else if ( SolFla == -2 ) {
-									//               RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
-									if ( NoLoadHumRatOut - FullLoadHumRatOut != 0.0 ) {
-										PartLoadFrac = ( NoLoadHumRatOut - DesOutHumRat ) / ( NoLoadHumRatOut - FullLoadHumRatOut );
-									} else {
-										PartLoadFrac = 1.0;
-									}
-									if ( ! WarmupFlag ) {
-										if ( DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFail < 1 ) {
-											++DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFail;
-											ShowWarningError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + DXCoolingSystem( DXSystemNum ).Name );
-											ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
-										}
-										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics follow.", DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFailIndex, PartLoadFrac, PartLoadFrac );
-									}
-								}
-							}
-						} // End if humidity ratio setpoint not met - CoolReheat humidity control
-
-					} // operating mode can cool
-					if ( PartLoadFrac > 1.0 ) {
-						PartLoadFrac = 1.0;
-					} else if ( PartLoadFrac < 0.0 ) {
-						PartLoadFrac = 0.0;
-					}
+					ControlTESIceStorageTankCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).DXCoolingSystemType,
+						DXCoolingSystem( DXSystemNum ).FanOpMode, DesOutTemp, DesOutHumRat, PartLoadFrac,
+						DXCoolingSystem( DXSystemNum ).TESOpMode, DXCoolingSystem( DXSystemNum ).DehumidControlType,
+						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIterIndex,
+						DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilSensPLRFailIndex,
+						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIterIndex,
+						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFailIndex );
 
 				} else {
 					ShowFatalError( "ControlDXSystem: Invalid DXCoolingSystem coil type = " + DXCoolingSystem( DXSystemNum ).CoolingCoilType );
@@ -3266,29 +3214,6 @@ namespace HVACDXSystem {
 
 	//        End of Calculation subroutines for the DXCoolingSystem Module
 	// *****************************************************************************
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // HVACDXSystem
 

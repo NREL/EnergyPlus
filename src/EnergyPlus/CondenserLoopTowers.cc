@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -132,7 +190,8 @@ namespace CondenserLoopTowers {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumSimpleTowers( 0 ); // Number of similar towers
-
+	bool GetInput( true );
+	bool InitTowerOneTimeFlag( true );
 	//? The following block of variables are used to carry model results for a tower instance
 	//   across sim, update, and report routines.  Simulation manager must be careful
 	//   in models with multiple towers.
@@ -174,6 +233,29 @@ namespace CondenserLoopTowers {
 	//*************************************************************************
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumSimpleTowers = 0;
+		GetInput = true;
+		InitTowerOneTimeFlag = true;
+		InletWaterTemp = 0.0;
+		OutletWaterTemp = 0.0;
+		WaterInletNode = 0;
+		WaterOutletNode = 0;
+		WaterMassFlowRate = 0.0;
+		Qactual = 0.0;
+		CTFanPower = 0.0;
+		AirFlowRateRatio = 0.0;
+		BasinHeaterPower = 0.0;
+		WaterUsage = 0.0;
+		FanCyclingRatio = 0.0;
+		CheckEquipName.deallocate();
+		SimpleTower.deallocate();
+		SimpleTowerInlet.deallocate();
+		SimpleTowerReport.deallocate();
+		VSTower.deallocate();
+	}
 
 	void
 	SimTowers(
@@ -226,7 +308,7 @@ namespace CondenserLoopTowers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
+
 		int TowerNum;
 
 		//GET INPUT
@@ -2125,7 +2207,7 @@ namespace CondenserLoopTowers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
-		static bool MyOneTimeFlag( true );
+
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool OneTimeFlagForEachTower;
 		//  LOGICAL                                 :: FatalError
@@ -2137,13 +2219,13 @@ namespace CondenserLoopTowers {
 		Real64 rho; // local density of fluid
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( InitTowerOneTimeFlag ) {
 			MyEnvrnFlag.allocate( NumSimpleTowers );
 			OneTimeFlagForEachTower.allocate( NumSimpleTowers );
 
 			OneTimeFlagForEachTower = true;
 			MyEnvrnFlag = true;
-			MyOneTimeFlag = false;
+			InitTowerOneTimeFlag = false;
 
 		}
 
@@ -2278,9 +2360,9 @@ namespace CondenserLoopTowers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizCondNum; // Plant Sizing index for condenser loop
+		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
 		int SolFla; // Flag of solver
-		Real64 DesTowerLoad; // Design tower load [W]
+		Real64 DesTowerLoad( 0.0 ); // Design tower load [W]
 		Real64 UA0; // Lower bound for UA [W/C]
 		Real64 UA1; // Upper bound for UA [W/C]
 		Real64 UA; // Calculated UA value
@@ -2310,8 +2392,6 @@ namespace CondenserLoopTowers {
 		Real64 AssumedExitTemp; // default for cp fo nominal capacity of hard sized with UA method
 		bool ErrorsFound;
 
-		PltSizCondNum = 0;
-		DesTowerLoad = 0.0;
 		tmpDesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 		tmpHighSpeedFanPower = SimpleTower( TowerNum ).HighSpeedFanPower;
 		tmpHighSpeedAirFlowRate = SimpleTower( TowerNum ).HighSpeedAirFlowRate;
@@ -4206,6 +4286,16 @@ namespace CondenserLoopTowers {
 			return;
 		}
 
+		if ( std::abs( MyLoad ) <= SmallLoad ) {
+		// tower doesn't need to do anything
+			OutletWaterTemp = Node( WaterInletNode ).Temp;
+			CTFanPower = 0.0;
+			AirFlowRateRatio = 0.0;
+			Qactual = 0.0;
+			CalcBasinHeaterPower( SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff, SimpleTower( TowerNum ).BasinHeaterSchedulePtr, SimpleTower( TowerNum ).BasinHeaterSetPointTemp, BasinHeaterPower );
+			return;
+		}
+
 		// first find free convection cooling rate
 		UAdesignPerCell = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 		AirFlowRatePerCell = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
@@ -4215,7 +4305,10 @@ namespace CondenserLoopTowers {
 
 		FreeConvQdot = WaterMassFlowRate * CpWater * ( Node( WaterInletNode ).Temp - OutletWaterTempOFF );
 		CTFanPower = 0.0;
+
 		if ( std::abs( MyLoad ) <= FreeConvQdot ) { // can meet load with free convection and fan off
+
+
 			OutletWaterTemp = OutletWaterTempOFF;
 			AirFlowRateRatio = 0.0;
 			Qactual = FreeConvQdot;
@@ -4471,7 +4564,7 @@ namespace CondenserLoopTowers {
 		// "An Improved Cooling Tower Algorithm for the CoolToolsTM Simulation Model".
 		// ASHRAE Transactions 2002, V. 108, Pt. 1.
 		// York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
-		// Form 160.00-SG2 (0502). © 2002.
+		// Form 160.00-SG2 (0502). 2002.
 
 		// Using/Aliasing
 		using General::SolveRegulaFalsi;
@@ -4959,7 +5052,7 @@ namespace CondenserLoopTowers {
 		// "An Improved Cooling Tower Algorithm for the CoolToolsTM Simulation Model".
 		// ASHRAE Transactions 2002, V. 108, Pt. 1.
 		// York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
-		// Form 160.00-SG2 (0502). © 2002.
+		// Form 160.00-SG2 (0502). 2002.
 
 		// Using/Aliasing
 		using General::SolveRegulaFalsi;
@@ -5044,7 +5137,7 @@ namespace CondenserLoopTowers {
 		// "An Improved Cooling Tower Algorithm for the CoolToolsTM Simulation Model".
 		// ASHRAE Transactions 2002, V. 108, Pt. 1.
 		// York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
-		// Form 160.00-SG2 (0502). © 2002.
+		// Form 160.00-SG2 (0502). 2002.
 
 		// USE STATEMENTS:
 		// na
@@ -5918,29 +6011,6 @@ namespace CondenserLoopTowers {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // CondenserLoopTowers
 

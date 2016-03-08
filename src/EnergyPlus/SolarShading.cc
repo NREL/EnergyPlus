@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -6,7 +64,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/MArray.functions.hh>
+#include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Vector3.hh>
 
@@ -154,6 +212,17 @@ namespace SolarShading {
 	int ShadowingCalcFrequency( 0 ); // Frequency for Shadowing Calculations
 	int ShadowingDaysLeft( 0 ); // Days left in current shadowing period
 	bool debugging( false );
+	namespace {
+	// These were static variables within different functions. They were pulled out into the namespace
+	// to facilitate easier unit testing of those functions.
+	// These are purposefully not in the header file as an extern variable. No one outside of this should
+	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool MustAllocSolarShading( true );
+		bool GetInputFlag( true );
+		bool firstTime( true );
+	}
+
 	std::ofstream shd_stream; // Shading file stream
 	Array1D_int HCNS; // Surface number of back surface HC figures
 	Array1D_int HCNV; // Number of vertices of each HC figure
@@ -206,6 +275,73 @@ namespace SolarShading {
 	// MODULE SUBROUTINES:
 
 	// Functions
+	void
+	clear_state()
+	{
+		MaxHCV= 15;
+		MaxHCS= 1500;
+		MAXHCArrayBounds = 0;
+		MAXHCArrayIncrement = 0;
+		NVS = 0;
+		NumVertInShadowOrClippedSurface = 0;
+		CurrentSurfaceBeingShadowed = 0;
+		CurrentShadowingSurface = 0;
+		OverlapStatus = 0;
+		CTHETA.deallocate();
+		FBKSHC = 0;
+		FGSSHC = 0;
+		FINSHC = 0;
+		FRVLHC = 0;
+		FSBSHC = 0;
+		LOCHCA = 0;
+		NBKSHC = 0;
+		NGSSHC = 0;
+		NINSHC = 0;
+		NRVLHC = 0;
+		NSBSHC = 0;
+		CalcSkyDifShading = false;
+		ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
+		ShadowingDaysLeft =0; // Days left in current shadowing period
+		debugging = false;
+		MustAllocSolarShading = true;
+		GetInputFlag = true;
+		firstTime = true;
+		HCNS.deallocate();
+		HCNV.deallocate();
+		HCA.deallocate();
+		HCB.deallocate();
+		HCC.deallocate();
+		HCX.deallocate();
+		HCY.deallocate();
+		WindowRevealStatus.deallocate();
+		HCAREA.deallocate();
+		HCT.deallocate();
+		ISABSF.deallocate();
+		SAREA.deallocate();
+		NumTooManyFigures = 0;
+		NumTooManyVertices = 0;
+		NumBaseSubSurround = 0;
+		XShadowProjection = 0.0;
+		YShadowProjection = 0.0;
+		XTEMP.deallocate();
+		XVC.deallocate();
+		XVS.deallocate();
+		YTEMP.deallocate();
+		YVC.deallocate();
+		YVS.deallocate();
+		ZVC.deallocate();
+		ATEMP.deallocate();
+		BTEMP.deallocate();
+		CTEMP.deallocate();
+		XTEMP1.deallocate();
+		YTEMP1.deallocate();
+		maxNumberOfFigures = 0;
+		TrackTooManyFigures.deallocate();
+		TrackTooManyVertices.deallocate();
+		TrackBaseSubSurround.deallocate();
+		DBZoneIntWin.deallocate();
+		ISABSF.deallocate();
+	}
 
 	void
 	InitSolarCalculations()
@@ -241,9 +377,6 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		static bool GetInputFlag( true );
-		static bool firstTime( true );
 
 		// FLOW:
 #ifdef EP_Count_Calls
@@ -766,22 +899,26 @@ namespace SolarShading {
 		//  IntDifIncInsSurfAmountRepEnergy=0.0
 		QRadSWwinAbsTotEnergy.dimension( TotSurfaces, 0.0 );
 		WinShadingAbsorbedSolarEnergy.dimension( TotSurfaces, 0.0 );
-		SurfaceWindow.BmSolAbsdOutsReveal() = 0.0;
-		SurfaceWindow.BmSolRefldOutsRevealReport() = 0.0;
-		SurfaceWindow.BmSolAbsdInsReveal() = 0.0;
-		SurfaceWindow.BmSolRefldInsReveal() = 0.0;
-		SurfaceWindow.BmSolRefldInsRevealReport() = 0.0;
-		SurfaceWindow.OutsRevealDiffOntoGlazing() = 0.0;
-		SurfaceWindow.InsRevealDiffOntoGlazing() = 0.0;
-		SurfaceWindow.InsRevealDiffIntoZone() = 0.0;
-		SurfaceWindow.OutsRevealDiffOntoFrame() = 0.0;
-		SurfaceWindow.InsRevealDiffOntoFrame() = 0.0;
+		for ( auto & e : SurfaceWindow ) {
+			e.BmSolAbsdOutsReveal = 0.0;
+			e.BmSolRefldOutsRevealReport = 0.0;
+			e.BmSolAbsdInsReveal = 0.0;
+			e.BmSolRefldInsReveal = 0.0;
+			e.BmSolRefldInsRevealReport = 0.0;
+			e.OutsRevealDiffOntoGlazing = 0.0;
+			e.InsRevealDiffOntoGlazing = 0.0;
+			e.InsRevealDiffIntoZone = 0.0;
+			e.OutsRevealDiffOntoFrame = 0.0;
+			e.InsRevealDiffOntoFrame = 0.0;
+		}
 
 		// Added report variables for inside reveal to debug CR 7596. TH 5/26/2009
-		SurfaceWindow.InsRevealDiffOntoGlazingReport() = 0.0;
-		SurfaceWindow.InsRevealDiffIntoZoneReport() = 0.0;
-		SurfaceWindow.InsRevealDiffOntoFrameReport() = 0.0;
-		SurfaceWindow.BmSolAbsdInsRevealReport() = 0.0;
+		for ( auto & e : SurfaceWindow ) {
+			e.InsRevealDiffOntoGlazingReport = 0.0;
+			e.InsRevealDiffIntoZoneReport = 0.0;
+			e.InsRevealDiffOntoFrameReport = 0.0;
+			e.BmSolAbsdInsRevealReport = 0.0;
+		}
 
 		DisplayString( "Initializing Zone Report Variables" );
 		// CurrentModuleObject='Zone'
@@ -1394,47 +1531,36 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int I; // Loop Control (vertex counter)
-		int NVRS; // Number of vertices of the receiving surface
-		int NVSS; // Number of vertices of the shadow casting surface
-		Real64 ZMAX; // Highest point of the shadow casting surface
-		Real64 DOTP( 0.0 ); // Dot Product
 
 		// Object Data
-		Vector AVec; // Vector from vertex 2 to vertex 1, both same surface
-		Vector BVec; // Vector from vertex 2 to vertex 3, both same surface
-		Vector CVec; // Vector perpendicular to surface at vertex 2
-		Vector DVec; // Vector from vertex 2 of first surface to vertex 'n' of second surface
-
-		auto const & surface_R( Surface( NRS ) );
-		auto const & surface_C( Surface( NSS ) );
 
 		CannotShade = true;
-		NVRS = surface_R.Sides;
-		NVSS = surface_C.Sides;
 
 		// see if no point of shadow casting surface is above low point of receiving surface
 
+		auto const & surface_C( Surface( NSS ) );
+		if ( surface_C.OutNormVec( 3 ) > 0.9999 ) return; // Shadow Casting Surface is horizontal and facing upward
 		auto const & vertex_C( surface_C.Vertex );
-		ZMAX = maxval( vertex_C( {1,surface_C.Sides} ).z() );
+		Real64 ZMAX( vertex_C( 1 ).z );
+		for ( int i = 2, e = surface_C.Sides; i <= e; ++i ) {
+			ZMAX = std::max( ZMAX, vertex_C( i ).z );
+		}
 		if ( ZMAX <= ZMIN ) return;
-
-		// SEE IF Shadow Casting Surface IS HORIZONTAL AND FACING UPWARD.
-
-		if ( surface_C.OutNormVec( 3 ) > 0.9999 ) return;
 
 		// SEE IF ANY VERTICES OF THE Shadow Casting Surface ARE ABOVE THE PLANE OF THE receiving surface
 
+		auto const & surface_R( Surface( NRS ) );
 		auto const & vertex_R( surface_R.Vertex );
-		auto const & vertex_R_2( vertex_R( 2 ) );
-		AVec = vertex_R( 1 ) - vertex_R_2;
-		BVec = vertex_R( 3 ) - vertex_R_2;
+		auto const vertex_R_2( vertex_R( 2 ) );
+		Vector const AVec( vertex_R( 1 ) - vertex_R_2 ); // Vector from vertex 2 to vertex 1 of receiving surface
+		Vector const BVec( vertex_R( 3 ) - vertex_R_2 ); // Vector from vertex 2 to vertex 3 of receiving surface
 
-		CVec = cross( BVec, AVec );
+		Vector const CVec( cross( BVec, AVec ) ); // Vector perpendicular to surface at vertex 2
 
-		for ( I = 1; I <= NVSS; ++I ) {
-			DVec = vertex_C( I ) - vertex_R_2;
-			DOTP = dot( CVec, DVec );
+		int const NVSS = surface_C.Sides; // Number of vertices of the shadow casting surface
+		Real64 DOTP( 0.0 ); // Dot Product
+		for ( int I = 1; I <= NVSS; ++I ) {
+			DOTP = dot( CVec, vertex_C( I ) - vertex_R_2 );
 			if ( DOTP > TolValue ) break; // DO loop
 		}
 
@@ -1442,15 +1568,15 @@ namespace SolarShading {
 
 		if ( DOTP > TolValue ) {
 
-			auto const & vertex_C_2( vertex_C( 2 ) );
-			AVec = vertex_C( 1 ) - vertex_C_2;
-			BVec = vertex_C( 3 ) - vertex_C_2;
+			auto const vertex_C_2( vertex_C( 2 ) );
+			Vector const AVec( vertex_C( 1 ) - vertex_C_2 );
+			Vector const BVec( vertex_C( 3 ) - vertex_C_2 );
 
-			CVec = cross( BVec, AVec );
+			Vector const CVec( cross( BVec, AVec ) );
 
-			for ( I = 1; I <= NVRS; ++I ) {
-				DVec = vertex_R( I ) - vertex_C_2;
-				DOTP = dot( CVec, DVec );
+			int const NVRS = surface_R.Sides; // Number of vertices of the receiving surface
+			for ( int I = 1; I <= NVRS; ++I ) {
+				DOTP = dot( CVec, vertex_R( I ) - vertex_C_2 );
 				if ( DOTP > TolValue ) {
 					CannotShade = false;
 					break; // DO loop
@@ -1793,18 +1919,24 @@ namespace SolarShading {
 
 		inside = false;
 		if ( ignorex ) {
-			polygon.x() = polygon_3d.y();
-			polygon.y() = polygon_3d.z();
+			for ( int i = 1; i <= nsides; ++i ) {
+				polygon( i ).x = polygon_3d( i ).y;
+				polygon( i ).y = polygon_3d( i ).z;
+			}
 			point.x = point_3d.y;
 			point.y = point_3d.z;
 		} else if ( ignorey ) {
-			polygon.x() = polygon_3d.x();
-			polygon.y() = polygon_3d.z();
+			for ( int i = 1; i <= nsides; ++i ) {
+				polygon( i ).x = polygon_3d( i ).x;
+				polygon( i ).y = polygon_3d( i ).z;
+			}
 			point.x = point_3d.x;
 			point.y = point_3d.z;
 		} else if ( ignorez ) {
-			polygon.x() = polygon_3d.x();
-			polygon.y() = polygon_3d.y();
+			for ( int i = 1; i <= nsides; ++i ) {
+				polygon( i ).x = polygon_3d( i ).x;
+				polygon( i ).y = polygon_3d( i ).y;
+			}
 			point.x = point_3d.x;
 			point.y = point_3d.y;
 		} else { // Illegal
@@ -2801,36 +2933,37 @@ namespace SolarShading {
 				} else {
 					HFunct = XTEMP1_S * HCA_E + YTEMP1_S * HCB_E + HCC_E;
 					if ( HFunct <= 0.0 ) { // Test vertex is not in the clipping plane
+						if ( NVTEMP < 2 * ( MaxVerticesPerSurface + 1 )){  // avoid assigning to element outside of XTEMP array size
+							KK = NVTEMP;
+							++NVTEMP;
+							Real64 const ATEMP_S( ATEMP( S ) );
+							Real64 const BTEMP_S( BTEMP( S ) );
+							Real64 const CTEMP_S( CTEMP( S ) );
+							W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
+							if ( W != 0.0 ) {
+								Real64 const W_inv( 1.0 / W );
+								XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
+								YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
+							}
+							else {
+								XTEMP( NVTEMP ) = SafeDivide( HCC_E * BTEMP_S - HCB_E * CTEMP_S, W );
+								YTEMP( NVTEMP ) = SafeDivide( HCA_E * CTEMP_S - HCC_E * ATEMP_S, W );
+							}
+							INTFLAG = true;
 
-						KK = NVTEMP;
-						++NVTEMP;
-						Real64 const ATEMP_S( ATEMP( S ) );
-						Real64 const BTEMP_S( BTEMP( S ) );
-						Real64 const CTEMP_S( CTEMP( S ) );
-						W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
-						if ( W != 0.0 ) {
-							Real64 const W_inv( 1.0 / W );
-							XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
-							YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
-						} else {
-							XTEMP( NVTEMP ) = SafeDivide( HCC_E * BTEMP_S - HCB_E * CTEMP_S, W );
-							YTEMP( NVTEMP ) = SafeDivide( HCA_E * CTEMP_S - HCC_E * ATEMP_S, W );
-						}
-						INTFLAG = true;
-
-						if ( E == NV2 ) { // Remove near-duplicates on last edge
-							if ( KK != 0 ) {
-								auto const x( XTEMP( NVTEMP ) );
-								auto const y( YTEMP( NVTEMP ) );
-								for ( int K = 1; K <= KK; ++K ) {
-									if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
-									if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
-									NVTEMP = KK;
-									break; // K loop
+							if ( E == NV2 ) { // Remove near-duplicates on last edge
+								if ( KK != 0 ) {
+									auto const x( XTEMP( NVTEMP ) );
+									auto const y( YTEMP( NVTEMP ) );
+									for ( int K = 1; K <= KK; ++K ) {
+										if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
+										if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
+										NVTEMP = KK;
+										break; // K loop
+									}
 								}
 							}
 						}
-
 					}
 				}
 				S = P;
@@ -3344,8 +3477,10 @@ namespace SolarShading {
 			AOSurf = 0.0;
 			BackSurfaces = 0;
 			OverlapAreas = 0.0;
-			SurfaceWindow.OutProjSLFracMult() = 1.0;
-			SurfaceWindow.InOutProjSLFracMult() = 1.0;
+			for ( auto & e : SurfaceWindow ) {
+				e.OutProjSLFracMult = 1.0;
+				e.InOutProjSLFracMult = 1.0;
+			}
 		} else {
 			SunlitFracHR( HourOfDay, {1,TotSurfaces} ) = 0.0;
 			SunlitFrac( TimeStep, HourOfDay, {1,TotSurfaces} ) = 0.0;
@@ -3708,7 +3843,7 @@ namespace SolarShading {
 			if ( ! ShadowingSurf && Surface( GRSNR ).BaseSurf != GRSNR ) continue; // Skip subsurfaces (SBS)
 
 			// Get the lowest point of receiving surface
-			ZMIN = minval( Surface( GRSNR ).Vertex.z() );
+			ZMIN = minval( Surface( GRSNR ).Vertex, &Vector::z );
 
 			// Check every surface as a possible shadow casting surface ("SS" = shadow sending)
 			NGSS = 0;
@@ -4955,7 +5090,9 @@ namespace SolarShading {
 		// window with horizontally-slatted blind into zone at current time (m2)
 		static Array1D< Real64 > WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through
 		// window with horizontally-slatted blind into zone at current time (m2)
-		static bool MustAlloc( true ); // True when local arrays must be allocated
+		/////////// hoisted into namespace renamed to ////////////
+		//static bool MustAlloc( true ); // True when local arrays must be allocated
+		////////////////////////
 		Real64 TBmDenom; // TBmDenominator
 
 		Real64 TBmBmShBlSc; // Beam-beam transmittance for window with shade, blind, screen, or switchable glazing
@@ -5004,7 +5141,7 @@ namespace SolarShading {
 		int iSSG; // scheduled surface gains counter
 		Real64 SolarIntoZone; // Solar radiation into zone to current surface
 
-		if ( MustAlloc ) {
+		if ( MustAllocSolarShading ) {
 			DBZoneIntWin.allocate( NumOfZones );
 			IntBeamAbsByShadFac.allocate( TotSurfaces );
 			ExtBeamAbsByShadFac.allocate( TotSurfaces );
@@ -5012,7 +5149,7 @@ namespace SolarShading {
 			WinTransDifSolar.allocate( TotSurfaces );
 			WinTransDifSolarGnd.allocate( TotSurfaces );
 			WinTransDifSolarSky.allocate( TotSurfaces );
-			MustAlloc = false;
+			MustAllocSolarShading = false;
 		}
 
 #ifdef EP_Count_Calls
@@ -5051,7 +5188,6 @@ namespace SolarShading {
 		ZoneDifSolFrIntWinsRep = 0.0;
 		IntBeamAbsByShadFac = 0.0;
 		ExtBeamAbsByShadFac = 0.0;
-		SurfaceWindow.BmSolTransThruIntWinRep() = 0.0;
 		//energy
 		WinBmSolarEnergy = 0.0;
 		WinBmBmSolarEnergy = 0.0;
@@ -5063,7 +5199,11 @@ namespace SolarShading {
 		ZoneBmSolFrIntWinsRepEnergy = 0.0;
 		ZoneDifSolFrExtWinsRepEnergy = 0.0;
 		ZoneDifSolFrIntWinsRepEnergy = 0.0;
-		SurfaceWindow.BmSolTransThruIntWinRepEnergy() = 0.0;
+
+		for ( auto & window : SurfaceWindow ) {
+			window.BmSolTransThruIntWinRep = 0.0;
+			window.BmSolTransThruIntWinRepEnergy = 0.0;
+		}
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -10757,29 +10897,6 @@ namespace SolarShading {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // SolarShading
 

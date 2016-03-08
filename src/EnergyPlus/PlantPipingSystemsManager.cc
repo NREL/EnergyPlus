@@ -1,6 +1,65 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include <memory>
 #include <set>
 #include <utility>
 
@@ -26,6 +85,7 @@
 #include <DataSurfaces.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -291,7 +351,9 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 	void
-	InitAndSimGroundDomains()
+	SimulateGroundDomains(
+		bool initOnly
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -376,6 +438,8 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).ResetHeatFluxFlag = false;
 			}
 
+			if ( !initOnly ) {
+
 			// Aggregate the heat flux
 			// Zone-coupled slab
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
@@ -410,6 +474,7 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).DomainNeedsSimulation = true;
 			}
 			PerformIterationLoop( DomainNum, _ );
+		}
 		}
 
 		if ( WriteEIOFlag ) {
@@ -702,7 +767,7 @@ namespace PlantPipingSystemsManager {
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
 		using General::TrimSigDigits;
-		using DataGlobals::SecsInDay;
+		using namespace GroundTemperatureManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -818,21 +883,13 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Moisture.Theta_liq = rNumericArgs( 13 ) / 100.0;
 			PipingSystemDomains( DomainNum ).Moisture.Theta_sat = rNumericArgs( 14 ) / 100.0;
 
-			// Farfield model parameters, validated min/max by IP
-			PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = rNumericArgs( 15 );
-			PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = rNumericArgs( 16 );
-			PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = rNumericArgs( 17 );
-
-			// Unit conversion
-			PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
-
 			// check if there is a basement
-			if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
+			if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).HasBasement = true;
-			} else if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
+			} else if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).HasBasement = false;
 			} else {
-				IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cAlphaFieldNames( 5 ), cAlphaArgs( 5 ), "Must enter either yes or no.", ErrorsFound );
+				IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cAlphaFieldNames( 7 ), cAlphaArgs( 7 ), "Must enter either yes or no.", ErrorsFound );
 			}
 
 			// more work to do if there is a basement
@@ -840,27 +897,27 @@ namespace PlantPipingSystemsManager {
 
 				// check if there are blank inputs related to the basement,
 				// IP can't catch this because they are inherently optional if there ISN'T a basement
-				if ( lNumericFieldBlanks( 18 ) || lNumericFieldBlanks( 19 ) || lAlphaFieldBlanks( 6 ) || lAlphaFieldBlanks( 7 ) || lAlphaFieldBlanks( 8 ) ) {
+				if ( lNumericFieldBlanks( 15 ) || lNumericFieldBlanks( 16 ) || lAlphaFieldBlanks( 8 ) || lAlphaFieldBlanks( 9 ) || lAlphaFieldBlanks( 10 ) ) {
 					ShowSevereError( "Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' + cAlphaArgs( 1 ) );
 					ShowContinueError( "Object specified to have a basement, while at least one basement input was left blank." );
 					ErrorsFound = true;
 				}
 
 				// get dimensions for meshing
-				CurIndex = 18;
+				CurIndex = 15;
 				PipingSystemDomains( DomainNum ).BasementZone.Width = rNumericArgs( CurIndex );
 				if ( PipingSystemDomains( DomainNum ).BasementZone.Width <= 0.0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cNumericFieldNames( CurIndex ), rNumericArgs( CurIndex ), "Basement width must be a positive nonzero value.", ErrorsFound );
 				}
 
-				CurIndex = 19;
+				CurIndex = 16;
 				PipingSystemDomains( DomainNum ).BasementZone.Depth = rNumericArgs( CurIndex );
 				if ( PipingSystemDomains( DomainNum ).BasementZone.Depth <= 0.0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ug_GeneralDomain, cAlphaArgs( 1 ), cNumericFieldNames( CurIndex ), rNumericArgs( CurIndex ), "Basement depth must be a positive nonzero value.", ErrorsFound );
 				}
 
 				// check for dimension shift
-				CurIndex = 6;
+				CurIndex = 8;
 				if ( SameString( cAlphaArgs( CurIndex ), "YES" ) ) {
 					PipingSystemDomains( DomainNum ).BasementZone.ShiftPipesByWidth = true;
 				} else if ( SameString( cAlphaArgs( CurIndex ), "NO" ) ) {
@@ -870,7 +927,7 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// get boundary condition model names and indeces --error check
-				CurIndex = 7;
+				CurIndex = 9;
 				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName = cAlphaArgs( CurIndex );
 				PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
 				if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
@@ -885,7 +942,7 @@ namespace PlantPipingSystemsManager {
 					}
 				}
 
-				CurIndex = 8;
+				CurIndex = 10;
 				PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName = cAlphaArgs( CurIndex );
 				PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM );
 				if ( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex <= 0 ) {
@@ -903,22 +960,25 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// get some convergence tolerances, minimum/maximum are enforced by the IP, along with default values if user left them blank
-			PipingSystemDomains( DomainNum ).SimControls.Convergence_CurrentToPrevIteration = rNumericArgs( 20 );
-			PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS = rNumericArgs( 21 );
+			PipingSystemDomains( DomainNum ).SimControls.Convergence_CurrentToPrevIteration = rNumericArgs( 17 );
+			PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS = rNumericArgs( 18 );
 
 			// additional evapotranspiration parameter, min/max validated by IP
-			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 22 );
+			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 19 );
 
 			// Allocate the circuit placeholder arrays
-			NumCircuitsInThisDomain = int( rNumericArgs( 23 ) );
+			NumCircuitsInThisDomain = int( rNumericArgs( 20 ) );
 			PipingSystemDomains( DomainNum ).CircuitNames.allocate( NumCircuitsInThisDomain );
 			PipingSystemDomains( DomainNum ).CircuitIndeces.allocate( NumCircuitsInThisDomain );
 
 			// Check for blank or missing or mismatched number...
-			NumAlphasBeforePipeCircOne = 8;
+			NumAlphasBeforePipeCircOne = 10;
 			for ( CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr ) {
 				PipingSystemDomains( DomainNum ).CircuitNames( CircuitCtr ) = cAlphaArgs( CircuitCtr + NumAlphasBeforePipeCircOne );
 			}
+
+			// Initialize ground temperature model and set pointer reference
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 5 ), cAlphaArgs( 6 ) );
 
 		}
 
@@ -958,19 +1018,15 @@ namespace PlantPipingSystemsManager {
 			using namespace DataIPShortCuts;
 			using DataSurfaces::OSCM;
 			using General::TrimSigDigits;
-			using DataGlobals::SecsInDay;
 			using DataHeatBalance::Material;
-			using DataEnvironment::PubGroundTempSurfFlag;
-			using DataEnvironment::PubGroundTempSurface;
+			using DataHeatBalance::TotMaterials;
+			using namespace GroundTemperatureManager;
 
 			// Locals
 			// SUBROUTINE ARGUMENT DEFINITIONS:
 
 			// SUBROUTINE PARAMETER DEFINITIONS:
 			static std::string const RoutineName( "ReadZoneCoupledDomainInputs" );
-			int const MonthsInYear( 12 );
-			Real64 const LargeNumber( 10000.0 );
-			Real64 const AvgDaysInMonth( 365.0 / 12.0 );
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			int ZoneCoupledDomainCtr;
@@ -979,7 +1035,6 @@ namespace PlantPipingSystemsManager {
 			int NumNumbers; // Number of Numbers for each GetObjectItem call
 			int IOStatus; // Used in GetObjectItem
 			int NumSurfacesWithThisOSCM;
-			int MonthIndex;
 			int SurfCtr;
 			bool IsBlank;
 			bool IsNotOK;
@@ -997,11 +1052,7 @@ namespace PlantPipingSystemsManager {
 				Real64 SoilSpecificHeat;
 				Real64 MoistureContent;
 				Real64 SaturationMoistureContent;
-				Real64 KusudaAvgSurfTemp;
-				Real64 KusudaAvgAmplitude;
-				Real64 KusudaPhaseShift;
 				Real64 EvapotranspirationCoeff;
-				bool UseGroundTempDataForKusuda;
 				Real64 MinSurfTemp;
 				int MonthOfMinSurfTemp;
 				Real64 HorizInsWidth;
@@ -1022,68 +1073,13 @@ namespace PlantPipingSystemsManager {
 					SoilSpecificHeat( 0.0 ),
 					MoistureContent( 0.0 ),
 					SaturationMoistureContent( 0.0 ),
-					KusudaAvgSurfTemp( 0.0 ),
-					KusudaAvgAmplitude( 0.0 ),
-					KusudaPhaseShift( 0.0 ),
 					EvapotranspirationCoeff( 0.0 ),
-					UseGroundTempDataForKusuda( false ),
 					MinSurfTemp( 0.0 ),
 					MonthOfMinSurfTemp( 0 ),
 					HorizInsWidth( 0.0 ),
 					VertInsDepth( 0.0 ),
 					OSCMIndex( 0 )
 				{}
-				// Member Constructor
-				GroundDomainData(
-					std::string const & ObjName,
-					Real64 const Depth,
-					Real64 const AspectRatio,
-					Real64 const PerimeterOffset,
-					Real64 const SoilConductivity,
-					Real64 const SoilDensity,
-					Real64 const SoilSpecificHeat,
-					Real64 const MoistureContent,
-					Real64 const SaturationMoistureContent,
-					Real64 const KusudaAvgSurfTemp,
-					Real64 const KusudaAvgAmplitude,
-					Real64 const KusudaPhaseShift,
-					Real64 const EvapotranspirationCoeff,
-					bool const UseGroundTempDataForKusuda,
-					Real64 const MinSurfTemp,
-					int const MonthOfMinSurfTemp,
-					Real64 const HorizInsWidth,
-					Real64 const VertInsDepth,
-					int const OSCMIndex,
-					std::string const & OSCMName,
-					std::string const & SlabMaterial,
-					std::string const & HorizInsMaterial,
-					std::string const & VertInsMaterial
-					) :
-				ObjName( ObjName ),
-					Depth( Depth ),
-					AspectRatio( AspectRatio ),
-					PerimeterOffset( PerimeterOffset ),
-					SoilConductivity( SoilConductivity ),
-					SoilDensity( SoilDensity ),
-					SoilSpecificHeat( SoilSpecificHeat ),
-					MoistureContent( MoistureContent ),
-					SaturationMoistureContent( SaturationMoistureContent ),
-					KusudaAvgSurfTemp( KusudaAvgSurfTemp ),
-					KusudaAvgAmplitude( KusudaAvgAmplitude ),
-					KusudaPhaseShift( KusudaPhaseShift ),
-					EvapotranspirationCoeff( EvapotranspirationCoeff ),
-					UseGroundTempDataForKusuda( UseGroundTempDataForKusuda ),
-					MinSurfTemp( MinSurfTemp ),
-					MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
-					HorizInsWidth( HorizInsWidth ),
-					VertInsDepth( VertInsDepth ),
-					OSCMIndex( OSCMIndex ),
-					OSCMName( OSCMName ),
-					SlabMaterial( SlabMaterial ),
-					HorizInsMaterial( HorizInsMaterial ),
-					VertInsMaterial( VertInsMaterial )
-				{}
-
 			};
 
 			// Object Data
@@ -1118,7 +1114,7 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// Read in the rest of the inputs into the local type for clarity during transition
-				Domain( ZoneCoupledDomainCtr ).OSCMName = cAlphaArgs( 2 );
+				Domain( ZoneCoupledDomainCtr ).OSCMName = cAlphaArgs( 4 );
 				Domain( ZoneCoupledDomainCtr ).Depth = rNumericArgs( 1 );
 				Domain( ZoneCoupledDomainCtr ).AspectRatio = rNumericArgs( 2 );
 				Domain( ZoneCoupledDomainCtr ).PerimeterOffset = rNumericArgs( 3 );
@@ -1127,18 +1123,14 @@ namespace PlantPipingSystemsManager {
 				Domain( ZoneCoupledDomainCtr ).SoilSpecificHeat = rNumericArgs( 6 );
 				Domain( ZoneCoupledDomainCtr ).MoistureContent = rNumericArgs( 7 );
 				Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent = rNumericArgs( 8 );
-				Domain( ZoneCoupledDomainCtr ).KusudaAvgSurfTemp = rNumericArgs( 9 );
-				Domain( ZoneCoupledDomainCtr ).KusudaAvgAmplitude = rNumericArgs( 10 );
-				Domain( ZoneCoupledDomainCtr ).KusudaPhaseShift = rNumericArgs( 11 );
-				Domain( ZoneCoupledDomainCtr ).EvapotranspirationCoeff = rNumericArgs( 12 );
-				Domain( ZoneCoupledDomainCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 10 ) || lNumericFieldBlanks( 11 ) || lNumericFieldBlanks( 12 );
-				Domain( ZoneCoupledDomainCtr ).HorizInsWidth = rNumericArgs( 13 );
-				Domain( ZoneCoupledDomainCtr ).VertInsDepth = rNumericArgs( 14 );
+				Domain( ZoneCoupledDomainCtr ).EvapotranspirationCoeff = rNumericArgs( 9 );
+				Domain( ZoneCoupledDomainCtr ).HorizInsWidth = rNumericArgs( 10 );
+				Domain( ZoneCoupledDomainCtr ).VertInsDepth = rNumericArgs( 11 );
 
 				// Set flag for slab in-grade or slab on-grade
-				if ( SameString( cAlphaArgs( 3 ), "INGRADE" ) ) {
+				if ( SameString( cAlphaArgs( 5 ), "INGRADE" ) ) {
 					PipingSystemDomains( DomainCtr ).SlabInGradeFlag = true;
-				} else if ( SameString( cAlphaArgs( 3 ), "ONGRADE" ) ) {
+				} else if ( SameString( cAlphaArgs( 5 ), "ONGRADE" ) ) {
 					PipingSystemDomains( DomainCtr ).SlabInGradeFlag = false;
 				} else {
 					ShowContinueError( "Slab location not determined." );
@@ -1147,10 +1139,10 @@ namespace PlantPipingSystemsManager {
 
 				// Get slab material properties
 				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ) {
-					Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 4 );
-					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 4 ), Material );
+					Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 6 );
+					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).SlabMaterialNum == 0 ) {
-						ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
 						ShowContinueError( "Found in " + PipingSystemDomains( DomainCtr ).Name );
 						ErrorsFound = true;
 					} else {
@@ -1164,9 +1156,9 @@ namespace PlantPipingSystemsManager {
 
 				// set flag for horizontal insulation
 				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ) {
-					if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
+					if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
 						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
-					} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
+					} else if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
 						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
 					} else {
 						ShowContinueError( "Must enter either yes or no for horizontal insulation." );
@@ -1176,10 +1168,10 @@ namespace PlantPipingSystemsManager {
 
 				// Get horizontal insulation material properties
 				if ( PipingSystemDomains( DomainCtr ).HorizInsPresentFlag ) {
-					Domain( ZoneCoupledDomainCtr ).HorizInsMaterial = cAlphaArgs( 6 );
-					PipingSystemDomains( DomainCtr ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material );
+					Domain( ZoneCoupledDomainCtr ).HorizInsMaterial = cAlphaArgs( 8 );
+					PipingSystemDomains( DomainCtr ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).HorizInsMaterialNum == 0 ) {
-						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + "=" + cAlphaArgs( 8 ) );
 						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).HorizInsMaterial );
 						ErrorsFound = true;
 					} else {
@@ -1190,9 +1182,9 @@ namespace PlantPipingSystemsManager {
 					}
 
 					// Set flag for horizontal insulation extents
-					if ( SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
+					if ( SameString( cAlphaArgs( 9 ), "PERIMETER" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = false;
-					} else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
+					} else if ( SameString( cAlphaArgs( 9 ), "FULL" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = true;
 					} else {
 						ShowContinueError( "Must enter either PERIMETER or FULL for horizontal insulation extents." );
@@ -1204,9 +1196,9 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// set flag for vertical insulation
-				if ( SameString( cAlphaArgs( 8 ), "NO" ) ) {
+				if ( SameString( cAlphaArgs( 10 ), "NO" ) ) {
 					PipingSystemDomains( DomainCtr ).VertInsPresentFlag = false;
-				} else if ( SameString( cAlphaArgs( 8 ), "YES" ) ) {
+				} else if ( SameString( cAlphaArgs( 10 ), "YES" ) ) {
 					PipingSystemDomains( DomainCtr ).VertInsPresentFlag = true;
 				} else {
 					ShowContinueError( "Must enter either yes or no for vertical insulation." );
@@ -1215,10 +1207,10 @@ namespace PlantPipingSystemsManager {
 
 				// Get vertical insulation material properties
 				if ( PipingSystemDomains( DomainCtr ).VertInsPresentFlag ) {
-					Domain( ZoneCoupledDomainCtr ).VertInsMaterial = cAlphaArgs( 9 );
-					PipingSystemDomains( DomainCtr ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 9 ), Material );
+					Domain( ZoneCoupledDomainCtr ).VertInsMaterial = cAlphaArgs( 11 );
+					PipingSystemDomains( DomainCtr ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 11 ), Material, TotMaterials );
 					if ( PipingSystemDomains( DomainCtr ).VertInsMaterialNum == 0 ) {
-						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + "=" + cAlphaArgs( 9 ) );
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 11 ) + "=" + cAlphaArgs( 11 ) );
 						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).VertInsMaterial );
 						ErrorsFound = true;
 					} else {
@@ -1242,9 +1234,9 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).PerimeterOffset = Domain( ZoneCoupledDomainCtr ).PerimeterOffset;
 
 				// Set simulation interval flag
-				if ( SameString( cAlphaArgs( 10 ), "TIMESTEP" ) ) {
+				if ( SameString( cAlphaArgs( 12 ), "TIMESTEP" ) ) {
 					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
-				} else if ( SameString( cAlphaArgs( 10 ), "HOURLY" ) ) {
+				} else if ( SameString( cAlphaArgs( 12 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
 				} else {
 					ShowContinueError( "Could not determine slab simulation interval. Check input." );
@@ -1315,51 +1307,8 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).Moisture.Theta_liq = Domain( ZoneCoupledDomainCtr ).MoistureContent / 100.0;
 				PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = Domain( ZoneCoupledDomainCtr ).SaturationMoistureContent / 100.0;
 
-				// Farfield model parameters
-				if ( !Domain( ZoneCoupledDomainCtr ).UseGroundTempDataForKusuda ) {
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = Domain( ZoneCoupledDomainCtr ).KusudaAvgSurfTemp;
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = Domain( ZoneCoupledDomainCtr ).KusudaAvgAmplitude;
-					PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( ZoneCoupledDomainCtr ).KusudaPhaseShift;
-				} else {
-					// If ground temp data was not brought in manually in GETINPUT,
-					// then we must get it from the surface ground temperatures
-
-					if ( !PubGroundTempSurfFlag ) {
-						ShowSevereError( "Input problem for " + ObjName_ZoneCoupled_Slab + '=' + Domain( ZoneCoupledDomainCtr ).ObjName );
-						ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-						ShowContinueError( "This is required for the ground domain if farfield parameters are" );
-						ShowContinueError( " not directly entered into the input object." );
-						ErrorsFound = true;
-					}
-
-					// Calculate Average Ground Temperature for all 12 months of the year:
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = 0.0;
-					for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-						PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature += PubGroundTempSurface( MonthIndex );
-					}
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature /= MonthsInYear;
-
-					// Calculate Average Amplitude from Average:
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = 0.0;
-					for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-						PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude += std::abs( PubGroundTempSurface( MonthIndex ) - PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature );
-					}
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
-
-					// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-					Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp = 0;
-					Domain( ZoneCoupledDomainCtr ).MinSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-					for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-						if ( PubGroundTempSurface( MonthIndex ) <= Domain( ZoneCoupledDomainCtr ).MinSurfTemp ) {
-							Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp = MonthIndex;
-							Domain( ZoneCoupledDomainCtr ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
-						}
-					}
-					PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( ZoneCoupledDomainCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
-				}
-
-				// Unit conversion
-				PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
+				// Farfield model
+				PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 				// Other parameters
 				PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -1411,10 +1360,8 @@ namespace PlantPipingSystemsManager {
 		using namespace DataIPShortCuts;
 		using DataSurfaces::OSCM;
 		using General::TrimSigDigits;
-		using DataGlobals::SecsInDay;
 		using DataHeatBalance::Material;
-		using DataEnvironment::PubGroundTempSurfFlag;
-		using DataEnvironment::PubGroundTempSurface;
+		using DataHeatBalance::TotMaterials;
 
 
 		// Locals
@@ -1422,9 +1369,6 @@ namespace PlantPipingSystemsManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadBasementInputs" );
-		int const MonthsInYear( 12 );
-		Real64 const LargeNumber( 10000.0 );
-		Real64 const AvgDaysInMonth( 365.0 / 12.0 );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BasementCtr;
@@ -1434,7 +1378,6 @@ namespace PlantPipingSystemsManager {
 		int IOStatus; // Used in GetObjectItem
 		int CurIndex;
 		int NumSurfacesWithThisOSCM;
-		int MonthIndex;
 		bool IsBlank;
 		bool IsNotOK;
 		Real64 ThisArea;
@@ -1452,7 +1395,6 @@ namespace PlantPipingSystemsManager {
 			Real64 VertInsDepth;
 			std::string HorizInsMaterial;
 			std::string VertInsMaterial;
-			bool UseGroundTempDataForKusuda;
 
 			// Default Constructor
 			GroundDomainData() :
@@ -1462,35 +1404,7 @@ namespace PlantPipingSystemsManager {
 				MinSurfTemp( 0.0 ),
 				MonthOfMinSurfTemp( 0 ),
 				HorizInsWidth( 0.0 ),
-				VertInsDepth( 0.0 ),
-				UseGroundTempDataForKusuda( false )
-			{}
-
-			// Member Constructor
-			GroundDomainData(
-				std::string const & ObjName,
-				Real64 const Depth,
-				Real64 const AspectRatio,
-				Real64 const PerimeterOffset,
-				Real64 const MinSurfTemp,
-				int const MonthOfMinSurfTemp,
-				Real64 const HorizInsWidth,
-				Real64 const VertInsDepth,
-				std::string const & HorizInsMaterial,
-				std::string const & VertInsMaterial,
-				bool const UseGroundTempDataForKusuda
-			) :
-				ObjName( ObjName ),
-				Depth( Depth ),
-				AspectRatio( AspectRatio ),
-				PerimeterOffset( PerimeterOffset ),
-				MinSurfTemp( MinSurfTemp ),
-				MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
-				HorizInsWidth( HorizInsWidth ),
-				VertInsDepth( VertInsDepth ),
-				HorizInsMaterial( HorizInsMaterial ),
-				VertInsMaterial( VertInsMaterial ),
-				UseGroundTempDataForKusuda( UseGroundTempDataForKusuda )
+				VertInsDepth( 0.0 )
 			{}
 
 		};
@@ -1530,8 +1444,8 @@ namespace PlantPipingSystemsManager {
 			Domain( BasementCtr ).Depth = rNumericArgs( 1 );
 			Domain( BasementCtr ).AspectRatio = rNumericArgs( 2 );
 			Domain( BasementCtr ).PerimeterOffset = rNumericArgs( 3 );
-			Domain( BasementCtr ).HorizInsWidth = rNumericArgs( 13 );
-			Domain( BasementCtr ).VertInsDepth = rNumericArgs( 15 );
+			Domain( BasementCtr ).HorizInsWidth = rNumericArgs( 10 );
+			Domain( BasementCtr ).VertInsDepth = rNumericArgs( 12 );
 
 			// Soil properties, validated min/max by IP
 			PipingSystemDomains( DomainNum ).GroundProperties.Conductivity = rNumericArgs( 4 );
@@ -1542,73 +1456,22 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Moisture.Theta_liq = rNumericArgs( 7 ) / 100.0;
 			PipingSystemDomains( DomainNum ).Moisture.Theta_sat = rNumericArgs( 8 ) / 100.0;
 
-			// Farfield model parameters, validated min/max by IP
-			Domain( BasementCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 9 ) || lNumericFieldBlanks( 10 ) || lNumericFieldBlanks( 11 );
-
-			if ( !Domain( BasementCtr ).UseGroundTempDataForKusuda ) {
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = rNumericArgs( 9 );
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = rNumericArgs( 10 );
-				PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = rNumericArgs( 11 );
-			} else {
-				// If ground temp data was not brought in manually in GETINPUT,
-				// then we must get it from the surface ground temperatures
-
-				if ( !PubGroundTempSurfFlag ) {
-					ShowSevereError( "Input problem for " + ObjName_ZoneCoupled_Basement + '=' + Domain( BasementCtr ).ObjName );
-					ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-					ShowContinueError( "This is required for the ground domain if farfield parameters are" );
-					ShowContinueError( " not directly entered into the input object." );
-					ErrorsFound = true;
-				}
-
-				// Calculate Average Ground Temperature for all 12 months of the year:
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature = 0.0;
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature += PubGroundTempSurface( MonthIndex );
-				}
-
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature /= MonthsInYear;
-
-				// Calculate Average Amplitude from Average:
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude = 0.0;
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude += std::abs( PubGroundTempSurface( MonthIndex ) - PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature );
-				}
-
-				PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
-
-				// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-				Domain( BasementCtr ).MonthOfMinSurfTemp = 0;
-				Domain( BasementCtr ).MinSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					if ( PubGroundTempSurface( MonthIndex ) <= Domain( BasementCtr ).MinSurfTemp ) {
-						Domain( BasementCtr ).MonthOfMinSurfTemp = MonthIndex;
-						Domain( BasementCtr ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
-					}
-				}
-
-				PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( BasementCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
-			}
-
-			// Unit conversion
-			PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
-
 			// check if there are blank inputs related to the basement,
-			if ( lNumericFieldBlanks( 14 ) || lAlphaFieldBlanks( 3 ) || lAlphaFieldBlanks( 8 ) ) {
+			if ( lNumericFieldBlanks( 11 ) || lAlphaFieldBlanks( 5 ) || lAlphaFieldBlanks( 10 ) ) {
 				ShowSevereError( "Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "At least one basement input was left blank." );
 				ErrorsFound = true;
 			}
 
 			// Basement zone depth
-			CurIndex = 14;
+			CurIndex = 11;
 			PipingSystemDomains( DomainNum ).BasementZone.Depth = rNumericArgs( CurIndex );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.Depth <= 0.0 ) {
 				IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled_Basement, cAlphaArgs( 1 ), cNumericFieldNames( CurIndex ), rNumericArgs( CurIndex ), "Basement depth must be a positive nonzero value.", ErrorsFound );
 			}
 
 			// get boundary condition model names and indeces --error check
-			CurIndex = 2;
+			CurIndex = 4;
 			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName = cAlphaArgs( CurIndex );
 			PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMName, OSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex <= 0 ) {
@@ -1626,7 +1489,7 @@ namespace PlantPipingSystemsManager {
 				}
 			}
 
-			CurIndex = 6;
+			CurIndex = 8;
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName = cAlphaArgs( CurIndex );
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
@@ -1646,14 +1509,14 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS = 250;
 
 			// additional evapotranspiration parameter, min/max validated by IP
-			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 12 );
+			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 9 );
 
 			// assign the mesh count
 			int meshCount;
-			if ( lNumericFieldBlanks( 16 ) ) {
+			if ( lNumericFieldBlanks( 13 ) ) {
 				meshCount = 4;
 			} else {
-				meshCount = rNumericArgs( 16 );
+				meshCount = rNumericArgs( 13 );
 			}
 
 			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = meshCount;
@@ -1671,9 +1534,9 @@ namespace PlantPipingSystemsManager {
 
 			// set flag for horizontal insulation
 			// Check cAlphaArgs value
-			if ( SameString( cAlphaArgs( 3 ), "NO" ) ) {
+			if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).HorizInsPresentFlag = false;
-			} else if ( SameString( cAlphaArgs( 3 ), "YES" ) ) {
+			} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).HorizInsPresentFlag = true;
 			} else {
 				ShowContinueError( "Must enter either yes or no for horizontal insulation." );
@@ -1682,10 +1545,10 @@ namespace PlantPipingSystemsManager {
 
 			// Get horizontal insulation material properties
 			if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
-				Domain( BasementCtr ).HorizInsMaterial = cAlphaArgs( 4 );
-				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 4 ), Material );
+				Domain( BasementCtr ).HorizInsMaterial = cAlphaArgs( 6 );
+				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material, TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).HorizInsMaterialNum == 0 ) {
-					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
 					ShowContinueError( "Found in " + Domain( BasementCtr ).HorizInsMaterial );
 					ErrorsFound = true;
 				} else {
@@ -1696,9 +1559,9 @@ namespace PlantPipingSystemsManager {
 				}
 
 				// Set flag for horizontal insulation extents
-				if ( SameString( cAlphaArgs( 5 ), "PERIMETER" ) ) {
+				if ( SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = false;
-				} else if ( SameString( cAlphaArgs( 5 ), "FULL" ) ) {
+				} else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = true;
 				} else {
 					ShowContinueError( "Must enter either PERIMETER or FULL for horizontal insulation extents." );
@@ -1710,9 +1573,9 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// set flag for vertical insulation
-			if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
+			if ( SameString( cAlphaArgs( 9 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).VertInsPresentFlag = false;
-			} else if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
+			} else if ( SameString( cAlphaArgs( 9 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).VertInsPresentFlag = true;
 			} else {
 				ShowContinueError( "Must enter either yes or no for vertical insulation." );
@@ -1721,10 +1584,10 @@ namespace PlantPipingSystemsManager {
 
 			// Get vertical insulation material properties
 			if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ) {
-				Domain( BasementCtr ).VertInsMaterial = cAlphaArgs( 8 );
-				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material );
+				Domain( BasementCtr ).VertInsMaterial = cAlphaArgs( 10 );
+				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 10 ), Material, TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).VertInsMaterialNum == 0 ) {
-					ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + "=" + cAlphaArgs( 8 ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
 					ShowContinueError( "Found in " + Domain( BasementCtr ).VertInsMaterial );
 					ErrorsFound = true;
 				} else {
@@ -1739,14 +1602,17 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Set simulation interval flag
-			if ( SameString( cAlphaArgs( 9 ), "TIMESTEP" ) ) {
+			if ( SameString( cAlphaArgs( 11 ), "TIMESTEP" ) ) {
 				PipingSystemDomains( DomainNum ).SimTimestepFlag = true;
-			} else if ( SameString( cAlphaArgs( 9 ), "HOURLY" ) ) {
+			} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
 				PipingSystemDomains( DomainNum ).SimHourlyFlag = true;
 			} else {
 				ShowContinueError( "Could not determine basement simulation interval. Check input." );
 				ShowFatalError( "Preceding error causes program termination." );
 			}
+
+			// Farfield ground temperature model
+			PipingSystemDomains( DomainNum ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 2 ), cAlphaArgs( 3 ) );
 
 			// Domain perimeter offset
 			PipingSystemDomains( DomainNum ).PerimeterOffset = Domain( BasementCtr ).PerimeterOffset;
@@ -2041,21 +1907,16 @@ namespace PlantPipingSystemsManager {
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
-		using DataGlobals::SecsInDay;
 		using namespace DataLoopNode;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
-		using DataEnvironment::PubGroundTempSurfFlag;
-		using DataEnvironment::PubGroundTempSurface;
+		using namespace GroundTemperatureManager;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReadHorizontalTrenchInputs" );
-		int const MonthsInYear( 12 );
-		Real64 const LargeNumber( 10000.0 );
-		Real64 const AvgDaysInMonth( 365.0 / 12.0 );
 
 		// DERIVED TYPE DEFINITIONS:
 
@@ -2072,7 +1933,6 @@ namespace PlantPipingSystemsManager {
 		int SegmentCtr;
 		int NumPipeSegments;
 		int ThisCircuitPipeSegmentCounter;
-		int MonthIndex;
 
 		struct HorizontalTrenchData
 		{
@@ -2095,11 +1955,7 @@ namespace PlantPipingSystemsManager {
 			Real64 InterPipeSpacing;
 			Real64 MoistureContent;
 			Real64 SaturationMoistureContent;
-			Real64 KusudaAvgSurfTemp;
-			Real64 KusudaAvgAmplitude;
-			Real64 KusudaPhaseShift;
 			Real64 EvapotranspirationCoeff;
-			bool UseGroundTempDataForKusuda;
 			Real64 MinSurfTemp;
 			int MonthOfMinSurfTemp;
 
@@ -2120,68 +1976,9 @@ namespace PlantPipingSystemsManager {
 				InterPipeSpacing( 0.0 ),
 				MoistureContent( 0.0 ),
 				SaturationMoistureContent( 0.0 ),
-				KusudaAvgSurfTemp( 0.0 ),
-				KusudaAvgAmplitude( 0.0 ),
-				KusudaPhaseShift( 0.0 ),
 				EvapotranspirationCoeff( 0.0 ),
-				UseGroundTempDataForKusuda( false ),
 				MinSurfTemp( 0.0 ),
 				MonthOfMinSurfTemp( 0 )
-			{}
-
-			// Member Constructor
-			HorizontalTrenchData(
-				std::string const & ObjName,
-				std::string const & InletNodeName,
-				std::string const & OutletNodeName,
-				Real64 const AxialLength,
-				Real64 const PipeID,
-				Real64 const PipeOD,
-				int const NumPipes,
-				Real64 const BurialDepth,
-				Real64 const DesignFlowRate,
-				Real64 const SoilConductivity,
-				Real64 const SoilDensity,
-				Real64 const SoilSpecificHeat,
-				Real64 const PipeConductivity,
-				Real64 const PipeDensity,
-				Real64 const PipeSpecificHeat,
-				Real64 const InterPipeSpacing,
-				Real64 const MoistureContent,
-				Real64 const SaturationMoistureContent,
-				Real64 const KusudaAvgSurfTemp,
-				Real64 const KusudaAvgAmplitude,
-				Real64 const KusudaPhaseShift,
-				Real64 const EvapotranspirationCoeff,
-				bool const UseGroundTempDataForKusuda,
-				Real64 const MinSurfTemp,
-				int const MonthOfMinSurfTemp
-			) :
-				ObjName( ObjName ),
-				InletNodeName( InletNodeName ),
-				OutletNodeName( OutletNodeName ),
-				AxialLength( AxialLength ),
-				PipeID( PipeID ),
-				PipeOD( PipeOD ),
-				NumPipes( NumPipes ),
-				BurialDepth( BurialDepth ),
-				DesignFlowRate( DesignFlowRate ),
-				SoilConductivity( SoilConductivity ),
-				SoilDensity( SoilDensity ),
-				SoilSpecificHeat( SoilSpecificHeat ),
-				PipeConductivity( PipeConductivity ),
-				PipeDensity( PipeDensity ),
-				PipeSpecificHeat( PipeSpecificHeat ),
-				InterPipeSpacing( InterPipeSpacing ),
-				MoistureContent( MoistureContent ),
-				SaturationMoistureContent( SaturationMoistureContent ),
-				KusudaAvgSurfTemp( KusudaAvgSurfTemp ),
-				KusudaAvgAmplitude( KusudaAvgAmplitude ),
-				KusudaPhaseShift( KusudaPhaseShift ),
-				EvapotranspirationCoeff( EvapotranspirationCoeff ),
-				UseGroundTempDataForKusuda( UseGroundTempDataForKusuda ),
-				MinSurfTemp( MinSurfTemp ),
-				MonthOfMinSurfTemp( MonthOfMinSurfTemp )
 			{}
 
 		};
@@ -2239,11 +2036,7 @@ namespace PlantPipingSystemsManager {
 			HGHX( HorizontalGHXCtr ).PipeSpecificHeat = rNumericArgs( 13 );
 			HGHX( HorizontalGHXCtr ).MoistureContent = rNumericArgs( 14 );
 			HGHX( HorizontalGHXCtr ).SaturationMoistureContent = rNumericArgs( 15 );
-			HGHX( HorizontalGHXCtr ).KusudaAvgSurfTemp = rNumericArgs( 16 );
-			HGHX( HorizontalGHXCtr ).KusudaAvgAmplitude = rNumericArgs( 17 );
-			HGHX( HorizontalGHXCtr ).KusudaPhaseShift = rNumericArgs( 18 );
-			HGHX( HorizontalGHXCtr ).EvapotranspirationCoeff = rNumericArgs( 19 );
-			HGHX( HorizontalGHXCtr ).UseGroundTempDataForKusuda = lNumericFieldBlanks( 16 ) || lNumericFieldBlanks( 17 ) || lNumericFieldBlanks( 18 );
+			HGHX( HorizontalGHXCtr ).EvapotranspirationCoeff = rNumericArgs( 16 );
 
 			//******* We'll first set up the domain ********
 			// the extents will be: Zmax = axial length; Ymax = burial depth*2; Xmax = ( NumPipes+1 )*HorizontalPipeSpacing
@@ -2271,50 +2064,7 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainCtr ).Moisture.Theta_sat = HGHX( HorizontalGHXCtr ).SaturationMoistureContent / 100.0;
 
 			// Farfield model parameters
-			if ( ! HGHX( HorizontalGHXCtr ).UseGroundTempDataForKusuda ) {
-				PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = HGHX( HorizontalGHXCtr ).KusudaAvgSurfTemp;
-				PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = HGHX( HorizontalGHXCtr ).KusudaAvgAmplitude;
-				PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = HGHX( HorizontalGHXCtr ).KusudaPhaseShift;
-			} else {
-				// If ground temp data was not brought in manually in GETINPUT,
-				// then we must get it from the surface ground temperatures
-
-				if ( ! PubGroundTempSurfFlag ) {
-					ShowSevereError( "Input problem for " + ObjName_HorizTrench + '=' + HGHX( HorizontalGHXCtr ).ObjName );
-					ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
-					ShowContinueError( "This is required for the horizontal ground heat exchanger if farfield parameters are" );
-					ShowContinueError( " not directly entered into the input object." );
-					ErrorsFound = true;
-				}
-
-				// Calculate Average Ground Temperature for all 12 months of the year:
-				PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = 0.0;
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature += PubGroundTempSurface( MonthIndex );
-				}
-				PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature /= MonthsInYear;
-
-				// Calculate Average Amplitude from Average:
-				PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = 0.0;
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude += std::abs( PubGroundTempSurface( MonthIndex ) - PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature );
-				}
-				PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
-
-				// Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
-				HGHX( HorizontalGHXCtr ).MonthOfMinSurfTemp = 0;
-				HGHX( HorizontalGHXCtr ).MinSurfTemp = LargeNumber; // Set high month 1 temp will be lower and actually get updated
-				for ( MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex ) {
-					if ( PubGroundTempSurface( MonthIndex ) <= HGHX( HorizontalGHXCtr ).MinSurfTemp ) {
-						HGHX( HorizontalGHXCtr ).MonthOfMinSurfTemp = MonthIndex;
-						HGHX( HorizontalGHXCtr ).MinSurfTemp = PubGroundTempSurface( MonthIndex );
-					}
-				}
-				PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = HGHX( HorizontalGHXCtr ).MonthOfMinSurfTemp * AvgDaysInMonth;
-			}
-
-			// Unit conversion
-			PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
+			PipingSystemDomains( DomainCtr ).Farfield.groundTempModel = GetGroundTempModelAndInit( cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
 
 			// Other parameters
 			PipingSystemDomains( DomainCtr ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -2527,15 +2277,15 @@ namespace PlantPipingSystemsManager {
 
 		if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
 			// Zone-coupled slab outputs
-			SetupOutputVariable( "Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Slab Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		} else if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
 			// Zone-coupled basement wall outputs
-			SetupOutputVariable( "Wall Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "Wall Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Wall Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Wall Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 			// Zone-coupled basement floor outputs
-			SetupOutputVariable( "Floor Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).FloorHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-			SetupOutputVariable( "Floor Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Floor Interface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).FloorHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "GroundDomain Basement Floor Interface Temperature [C]", PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		}
 
 	}
@@ -3254,14 +3004,19 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Array1D_int ISWAP( 1 );
-		int ISWAP1;
 
 		using std::swap;
 
 		for ( int I = X.l1(), I_end = X.u1() - 1; I <= I_end; ++I ) {
-			ISWAP = minloc( X( {I,_} ).rDimension() );  //Do Slicing and minloc is expensive: Replace
-			ISWAP1 = ISWAP( 1 ) + I - 1;
+			int loc( 1 ), l( 1 );
+			Real64 r_min( std::numeric_limits< Real64 >::max() );
+			for ( int j = I, j_end = X.u1(); j <= j_end; ++j, ++l ) {
+				if ( X( j ).rDimension < r_min ) {
+					r_min = X( j ).rDimension;
+					loc = l;
+				}
+			}
+			int const ISWAP1( loc + I - 1 );
 			if ( ISWAP1 != I ) swap( X( I ), X( ISWAP1 ) );
 		}
 
@@ -5279,7 +5034,7 @@ namespace PlantPipingSystemsManager {
 					LeftRegionExtent = ThesePartitionRegions( Index - 1 ).Max;
 				}
 				// Coupled-basement model has adjacent partitions: ThesePartitionRegions( 0 ) and ThesePartitionRegions( 1 ). Do not add a mesh region to the left of ThesePartitionRegions( 1 ).-SA
-				if ( !PipingSystemDomains( DomainNum ).HasCoupledBasement || ( PipingSystemDomains( DomainNum ).HasCoupledBasement && ( Index == 0 || Index == 2 ) ) ) {
+				if ( ! PipingSystemDomains( DomainNum ).HasCoupledBasement || ( Index == 0 || Index == 2 ) ) {
 					//'add a mesh region to the "left" of the partition
 					++PreviousUbound;
 					TempRegions( PreviousUbound ) = TempGridRegionData( LeftRegionExtent, ThisRegion.Min, DirDirection );
@@ -7788,7 +7543,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::SecsInDay;
+		using namespace GroundTemperatureManager;
 
 		// Return value
 		Real64 RetVal;
@@ -7798,27 +7553,15 @@ namespace PlantPipingSystemsManager {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 z;
-		Real64 Term1;
-		Real64 Term2;
 		Real64 Diffusivity;
-		Real64 SecondsInYear;
-		Real64 KATemp;
-		Real64 KAAmp;
-		Real64 KAPhase;
 		Real64 CurTime;
 
-		KATemp = PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperature;
-		KAAmp = PipingSystemDomains( DomainNum ).Farfield.AverageGroundTemperatureAmplitude;
-		KAPhase = PipingSystemDomains( DomainNum ).Farfield.PhaseShiftOfMinGroundTemp;
 		CurTime = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
 
-		SecondsInYear = SecsInDay * 365.0;
 		z = PipingSystemDomains( DomainNum ).Extents.Ymax - cell.Centroid.Y;
 		Diffusivity = BaseThermalPropertySet_Diffusivity( PipingSystemDomains( DomainNum ).GroundProperties );
 
-		Term1 = -z * std::sqrt( Pi / ( SecondsInYear * Diffusivity ) );
-		Term2 = ( 2 * Pi / SecondsInYear ) * ( CurTime - KAPhase - ( z / 2 ) * std::sqrt( SecondsInYear / ( Pi * Diffusivity ) ) );
-		RetVal = KATemp - KAAmp * std::exp( Term1 ) * std::cos( Term2 );
+		RetVal = PipingSystemDomains( DomainNum ).Farfield.groundTempModel->getGroundTempAtTimeInSeconds( z, CurTime );
 
 		return RetVal;
 
@@ -8373,7 +8116,6 @@ namespace PlantPipingSystemsManager {
 
 			Numerator = 0.0;
 			Denominator = 0.0;
-			Resistance = 0.0;
 
 			//'convenience variables
 			ThisRadialCellOuterRadius = ThisCell.PipeCellData.Soil( rCtr ).OuterRadius;
@@ -9635,29 +9377,6 @@ namespace PlantPipingSystemsManager {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PlantPipingSystemsManager
 

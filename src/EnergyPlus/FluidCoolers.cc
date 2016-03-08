@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -397,68 +455,8 @@ namespace FluidCoolers {
 				}
 			}
 
-			//   Design entering water temperature, design entering air temperature and design entering air
-			//   wetbulb temperature must be specified for the both the performance input methods
-			if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp <= 0.0 ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 3 ) + "\", entered value <= 0.0, but must be > 0 " );
-				ErrorsFound = true;
-			}
-			if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp <= 0.0 ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 4 ) + "\", entered value <= 0.0, but must be > 0 " );
-				ErrorsFound = true;
-			}
-			if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp <= 0.0 ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 5 ) + "\", entered value <= 0.0, but must be > 0 " );
-				ErrorsFound = true;
-			}
-			if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp <= SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) {
-				ShowSevereError( cCurrentModuleObject + "= \"" + AlphArray( 1 ) + "\"," + cNumericFieldNames( 3 ) + " must be greater than " + cNumericFieldNames( 4 ) + '.' );
-				ErrorsFound = true;
-			}
-			if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp <= SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp ) {
-				ShowSevereError( cCurrentModuleObject + "= \"" + AlphArray( 1 ) + "\"," + cNumericFieldNames( 4 ) + " must be greater than " + cNumericFieldNames( 5 ) + '.' );
-				ErrorsFound = true;
-			}
-			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate <= 0.0 && SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate != AutoSize ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 7 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
-				ErrorsFound = true;
-			}
-			if ( SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate <= 0.0 && SimpleFluidCooler( ! FluidCoolerNum ).DesignWaterFlowRateWasAutoSized ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 6 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
-				ErrorsFound = true;
-			}
-			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower <= 0.0 && SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower != AutoSize ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 8 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
-				ErrorsFound = true;
-			}
+			ErrorsFound = ErrorsFound || TestFluidCoolerSingleSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
 
-			//   Check various inputs for both the performance input methods
-			if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
-				SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
-				if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA <= 0.0 && SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA != AutoSize ) {
-					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 1 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
-					ErrorsFound = true;
-				}
-			} else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
-				SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
-				if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity <= 0.0 ) {
-					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 2 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
-					ErrorsFound = true;
-				}
-				if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA != 0.0 ) {
-					if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA > 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Nominal fluid cooler capacity and design fluid cooler UA have been specified." );
-					} else {
-						ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Nominal fluid cooler capacity has been specified and design fluid cooler UA is being autosized." );
-					}
-					ShowContinueError( "Design fluid cooler UA field must be left blank when nominal fluid cooler capacity performance input method is used." );
-					ErrorsFound = true;
-				}
-			} else { // Fluid cooler performance input method is not specified as a valid "choice"
-				ShowSevereError( cCurrentModuleObject + "= \"" + AlphArray( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
-				ShowContinueError( "... must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\"." );
-				ErrorsFound = true;
-			}
 		} // End Single-Speed fluid cooler Loop
 
 		cCurrentModuleObject = cFluidCooler_TwoSpeed;
@@ -533,7 +531,7 @@ namespace FluidCoolers {
 				}
 			}
 
-			ErrorsFound = TestFluidCoolerTwoSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
+			ErrorsFound = ErrorsFound || TestFluidCoolerTwoSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
 		}
 
 		if ( ErrorsFound ) {
@@ -560,6 +558,114 @@ namespace FluidCoolers {
 			SetupOutputVariable( "Cooling Tower Fan Electric Energy [J]", SimpleFluidCoolerReport( FluidCoolerNum ).FanEnergy, "System", "Sum", SimpleFluidCooler( FluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
 		}
 
+	}
+
+	bool
+	TestFluidCoolerSingleSpeedInputForDesign(
+		std::string const & cCurrentModuleObject,
+		Array1D<std::string> const &  AlphArray,
+		Array1D<std::string> const & cNumericFieldNames,
+		Array1D<std::string> const & cAlphaFieldNames,
+		int const &	FluidCoolerNum
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR:          Chandan Sharma
+		//       DATE WRITTEN:    August 2008
+		//       MODIFIED         Chandan Sharma, FSEC, April 2010
+		//       RE-ENGINEERED    Jason Glazer, GARD Analytics, February 2015, refactor into a separate function
+
+		// PURPOSE OF THIS FUNCTION:
+		// Separate the testing of inputs related to design so that it could be called from the unit tests
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// Based on GetTowerInput subroutine from Don Shirey, Jan 2001 and Sept/Oct 2002;
+
+		// Using/Aliasing
+		using DataSizing::AutoSize;
+		using InputProcessor::SameString;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		bool ErrorsFound = false;
+
+		//   Design entering water temperature, design entering air temperature and design entering air
+		//   wetbulb temperature must be specified for the both the performance input methods
+		if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp <= 0.0 ) {
+			ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 3 ) + "\", entered value <= 0.0, but must be > 0 " );
+			ErrorsFound = true;
+		}
+		if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp <= 0.0 ) {
+			ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 4 ) + "\", entered value <= 0.0, but must be > 0 " );
+			ErrorsFound = true;
+		}
+		if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp <= 0.0 ) {
+			ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 5 ) + "\", entered value <= 0.0, but must be > 0 " );
+			ErrorsFound = true;
+		}
+		if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp <= SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) {
+			ShowSevereError( cCurrentModuleObject + "= \"" + AlphArray( 1 ) + "\"," + cNumericFieldNames( 3 ) + " must be greater than " + cNumericFieldNames( 4 ) + '.' );
+			ErrorsFound = true;
+		}
+		if ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp <= SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp ) {
+			ShowSevereError( cCurrentModuleObject + "= \"" + AlphArray( 1 ) + "\"," + cNumericFieldNames( 4 ) + " must be greater than " + cNumericFieldNames( 5 ) + '.' );
+			ErrorsFound = true;
+		}
+		if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate <= 0.0 && SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate != AutoSize ) {
+			ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 7 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
+			ErrorsFound = true;
+		}
+		if ( SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate <= 0.0 && !SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRateWasAutoSized ) {
+				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 6 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
+			ErrorsFound = true;
+		}
+		if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower <= 0.0 && SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower != AutoSize ) {
+			ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 8 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
+			ErrorsFound = true;
+		}
+
+		//   Check various inputs for both the performance input methods
+		if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
+			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
+			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA <= 0.0 && SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA != AutoSize ) {
+				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 1 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
+				ErrorsFound = true;
+			}
+		}
+		else if ( SameString( AlphArray( 4 ), "NominalCapacity" ) ) {
+			SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num = PIM_NominalCapacity;
+			if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity <= 0.0 ) {
+				ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 2 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
+				ErrorsFound = true;
+			}
+			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA != 0.0 ) {
+				if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA > 0.0 ) {
+					ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Nominal fluid cooler capacity and design fluid cooler UA have been specified." );
+				}
+				else {
+					ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Nominal fluid cooler capacity has been specified and design fluid cooler UA is being autosized." );
+				}
+				ShowContinueError( "Design fluid cooler UA field must be left blank when nominal fluid cooler capacity performance input method is used." );
+				ErrorsFound = true;
+			}
+		}
+		else { // Fluid cooler performance input method is not specified as a valid "choice"
+			ShowSevereError( cCurrentModuleObject + "= \"" + AlphArray( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
+			ShowContinueError( "... must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\"." );
+			ErrorsFound = true;
+		}
+		return ErrorsFound;
 	}
 
 	bool
@@ -951,9 +1057,9 @@ namespace FluidCoolers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizCondNum; // Plant Sizing index for condenser loop
+		int PltSizCondNum( 0 ); // Plant Sizing index for condenser loop
 		int SolFla; // Flag of solver
-		Real64 DesFluidCoolerLoad; // Design fluid cooler load [W]
+		Real64 DesFluidCoolerLoad( 0.0 ); // Design fluid cooler load [W]
 		Real64 UA0; // Lower bound for UA [W/C]
 		Real64 UA1; // Upper bound for UA [W/C]
 		Real64 UA; // Calculated UA value
@@ -969,8 +1075,6 @@ namespace FluidCoolers {
 		Real64 tmpHighSpeedEvapFluidCoolerUA; // local temporary for high speed cooler UA
 		bool ErrorsFound;
 
-		PltSizCondNum = 0;
-		DesFluidCoolerLoad = 0.0;
 		tmpDesignWaterFlowRate = SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate;
 		tmpHighSpeedFanPower = SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower;
 		tmpHighSpeedAirFlowRate = SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate;
@@ -2125,29 +2229,6 @@ namespace FluidCoolers {
 		}
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // FluidCoolers
 

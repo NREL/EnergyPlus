@@ -1,3 +1,61 @@
+// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
+// reserved.
+//
+// If you have questions about your rights to use or distribute this software, please contact
+// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
+// features, functionality or performance of the source code ("Enhancements") to anyone; however,
+// if you choose to make your Enhancements available either publicly, or directly to Lawrence
+// Berkeley National Laboratory, without imposing a separate written license agreement for such
+// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
+// perpetual license to install, use, modify, prepare derivative works, incorporate into other
+// computer software, distribute, and sublicense such enhancements or derivative works thereof,
+// in binary and source code form.
+
 // C++ Headers
 #include <cassert>
 #include <cmath>
@@ -372,7 +430,7 @@ namespace PackagedTerminalHeatPump {
 		OnOffFanPartLoadFraction = 1.0;
 
 		if ( UnitOn ) {
-			if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 ) {
+			if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 				SimVariableSpeedHP( PTUnitNum, ZoneNum, FirstHVACIteration, QZnReq, QLatReq, OnOffAirFlowRatio, OpMode, HXUnitOn );
 			} else {
 				ControlPTUnitOutput( PTUnitNum, FirstHVACIteration, OpMode, QZnReq, ZoneNum, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
@@ -389,7 +447,7 @@ namespace PackagedTerminalHeatPump {
 		// calculate delivered capacity
 		AirMassFlow = Node( InletNode ).MassFlowRate;
 
-		if ( PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 ) {
+		if ( ! PTUnit( PTUnitNum ).useVSCoilModel ) {
 			CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 		} else {
 			// calculate delivered capacity
@@ -404,7 +462,7 @@ namespace PackagedTerminalHeatPump {
 		QSensUnitOutNoATM = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 		QTotUnitOut = AirMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 
-		if ( PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 ) {
+		if ( ! PTUnit( PTUnitNum ).useVSCoilModel ) {
 			// report variables
 			if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 				PTUnit( PTUnitNum ).CompPartLoadRatio = PartLoadFrac;
@@ -884,6 +942,7 @@ namespace PackagedTerminalHeatPump {
 			if ( Alphas( 9 ) == "COIL:HEATING:DX:VARIABLESPEED" && Alphas( 11 ) == "COIL:COOLING:DX:VARIABLESPEED" ) {
 				if ( PTUnit( PTUnitNum ).DXHeatCoilIndex > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
 					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndex );
+					PTUnit( PTUnitNum ).useVSCoilModel = true;
 				}
 			}
 
@@ -1758,6 +1817,7 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
 				errFlag = false;
 				PTUnit( PTUnitNum ).DesignCoolingCapacity = GetCoilCapacityVariableSpeed( PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, errFlag );
+				PTUnit( PTUnitNum ).useVSCoilModel = true;
 				if ( errFlag ) {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 					ErrorsFound = true;
@@ -2035,6 +2095,7 @@ namespace PackagedTerminalHeatPump {
 			} else if ( Alphas( 9 ) == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" && Alphas( 11 ) == "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) {
 				if ( PTUnit( PTUnitNum ).DXHeatCoilIndex > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
 					SetVarSpeedCoilData( PTUnit( PTUnitNum ).DXCoolCoilIndexNum, ErrorsFound, _, PTUnit( PTUnitNum ).DXHeatCoilIndex );
+					PTUnit( PTUnitNum ).useVSCoilModel = true;
 				}
 			} else {
 				ShowContinueError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
@@ -2919,7 +2980,7 @@ namespace PackagedTerminalHeatPump {
 			MySizeFlag( PTUnitNum ) = false;
 		}
 
-		if ( ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXCoolCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) && ( 0 == PTUnit( PTUnitNum ).NumOfSpeedCooling ) ) {
+		if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 && ! MySizeFlag( PTUnitNum ) ) {
 
 			SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 			PTUnit( PTUnitNum ).NumOfSpeedCooling = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NumOfSpeeds;
@@ -3012,7 +3073,7 @@ namespace PackagedTerminalHeatPump {
 			PartLoadFrac = 0.0;
 		}
 
-		if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 ) { //BoS, variable-speed water source hp
+		if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 && ! MySizeFlag( PTUnitNum ) ) { //BoS, variable-speed water source hp
 			//PTUnit(PTUnitNum)%IdleMassFlowRate = RhoAir*PTUnit(PTUnitNum)%IdleVolumeAirRate
 			NumOfSpeedCooling = PTUnit( PTUnitNum ).NumOfSpeedCooling;
 			NumOfSpeedHeating = PTUnit( PTUnitNum ).NumOfSpeedHeating;
@@ -3206,7 +3267,7 @@ namespace PackagedTerminalHeatPump {
 		if ( ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil || PTUnit( PTUnitNum ).ATMixerExists ) && GetCurrentScheduleValue( PTUnit( PTUnitNum ).SchedPtr ) > 0.0 && ( ( GetCurrentScheduleValue( PTUnit( PTUnitNum ).FanAvailSchedPtr ) > 0.0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) ) {
 
 			SupHeaterLoad = 0.0;
-			if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+			if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 				CalcVarSpeedHeatPump( PTUnitNum, ZoneNum, FirstHVACIteration, Off, 1, 0.0, 0.0, NoCompOutput, LatentOutput, QZnReq, 0.0, OnOffAirFlowRatio, SupHeaterLoad, false );
 			} else {
 				CalcPTUnit( PTUnitNum, FirstHVACIteration, 0.0, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, false );
@@ -3229,7 +3290,7 @@ namespace PackagedTerminalHeatPump {
 						HeatingLoad = true;
 					}
 					PartLoadFrac = 1.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, &
 						//      ZoneEquipConfig(ZoneNum)%AirLoopNum, OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
@@ -3243,7 +3304,7 @@ namespace PackagedTerminalHeatPump {
 						QZnReq = 0.0;
 						HeatingLoad = false;
 						PartLoadFrac = 0.0;
-						if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+						if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 							SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 							//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 							//       OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3256,7 +3317,7 @@ namespace PackagedTerminalHeatPump {
 					QZnReq = 0.0;
 					CoolingLoad = false;
 					PartLoadFrac = 0.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 						//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 						//         OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3277,7 +3338,7 @@ namespace PackagedTerminalHeatPump {
 					}
 					HeatingLoad = false;
 					PartLoadFrac = 1.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 						// CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 						//     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3292,7 +3353,7 @@ namespace PackagedTerminalHeatPump {
 						QZnReq = 0.0;
 						CoolingLoad = false;
 						PartLoadFrac = 0.0;
-						if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+						if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 							SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 							//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 							//      OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -3305,7 +3366,7 @@ namespace PackagedTerminalHeatPump {
 					QZnReq = 0.0;
 					HeatingLoad = false;
 					PartLoadFrac = 0.0;
-					if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 1 ) {
+					if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 						SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 						//CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
 						//     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
@@ -6646,29 +6707,6 @@ namespace PackagedTerminalHeatPump {
 		SetVSHPAirFlow( PTUnitNum, ZoneNum, PartLoadRatio, OnOffAirFlowRatio );
 
 	}
-
-	//     NOTICE
-
-	//     Copyright (c) 1996-2015 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // PackagedTerminalHeatPump
 

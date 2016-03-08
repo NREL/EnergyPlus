@@ -125,7 +125,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.5;
 
   Building,
     Building,                !- Name
@@ -2229,7 +2229,7 @@
 	0.80, 					 !- Speed 1 Sensible Heat Transfer Ratio of Reference Unit
 	0.020140,                !- Speed 1 Air Flow Rate of Reference Unit
 	0.000018,                !- Speed 1 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 1 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 1 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2241,7 +2241,7 @@
 	0.79, 					 !- Speed 2 Sensible Heat Transfer Ratio of Reference Unit
 	0.040280,                !- Speed 2 Air Flow Rate of Reference Unit
 	0.000036,                !- Speed 2 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 2 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 2 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2253,7 +2253,7 @@
 	0.78, 					 !- Speed 3 Sensible Heat Transfer Ratio of Reference Unit
 	0.060420,                !- Speed 3 Air Flow Rate of Reference Unit
 	0.000054,                !- Speed 3 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 3 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 3 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2265,7 +2265,7 @@
 	0.77, 					 !- Speed 4 Sensible Heat Transfer Ratio of Reference Unit
 	0.080560,                !- Speed 4 Air Flow Rate of Reference Unit
 	0.000072,                !- Speed 4 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 4 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 4 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2277,7 +2277,7 @@
 	0.76, 					 !- Speed 5 Sensible Heat Transfer Ratio of Reference Unit
 	0.100700,                !- Speed 5 Air Flow Rate of Reference Unit
 	0.000090,                !- Speed 5 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 5 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 5 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2289,7 +2289,7 @@
 	0.75, 					 !- Speed 6 Sensible Heat Transfer Ratio of Reference Unit
 	0.120840,                !- Speed 6 Air Flow Rate of Reference Unit
 	0.000108,                !- Speed 6 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 6 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 6 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2301,7 +2301,7 @@
 	0.74, 					 !- Speed 7 Sensible Heat Transfer Ratio of Reference Unit
 	0.140980,                !- Speed 7 Air Flow Rate of Reference Unit
 	0.000126,                !- Speed 7 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 7 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 7 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2313,7 +2313,7 @@
 	0.73, 					 !- Speed 8 Sensible Heat Transfer Ratio of Reference Unit
 	0.161120,                !- Speed 8 Air Flow Rate of Reference Unit
 	0.000144,                !- Speed 8 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 8 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 8 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2325,7 +2325,7 @@
 	0.72, 					 !- Speed 9 Sensible Heat Transfer Ratio of Reference Unit
 	0.181260,                !- Speed 9 Air Flow Rate of Reference Unit
 	0.000162,                !- Speed 9 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 9 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 9 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2337,7 +2337,7 @@
 	0.70, 					 !- Speed 10 Sensible Heat Transfer Ratio of Reference Unit
 	0.201400,                !- Speed 10 Air Flow Rate of Reference Unit
 	0.000179,                !- Speed 10 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 10 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 10 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2408,7 +2408,7 @@
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
-	
+
   Curve:Cubic,
    ConstantCubic,   !- Name
    1,               !- Coefficient1 Constant
@@ -2459,8 +2459,6 @@
     FOR: AllDays,            !- Field 2
     UNTIL: 5:00,0,           !- Field 3
     UNTIL: 7:00,0.003,       !- Field 5
-    UNTIL: 13:00,0,          !- Field 7
-    UNTIL: 13:10,0.001,      !- Field 9
     UNTIL: 18:00,0,          !- Field 11
     UNTIL: 18:30,0.003,      !- Field 13
     UNTIL: 24:00,0;          !- Field 15
@@ -2567,7 +2565,7 @@
 	0.80, 					 !- Speed 1 Sensible Heat Transfer Ratio of Reference Unit
 	0.020140,                !- Speed 1 Air Flow Rate of Reference Unit
 	0.000018,                !- Speed 1 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 1 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 1 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2579,7 +2577,7 @@
 	0.79, 					 !- Speed 2 Sensible Heat Transfer Ratio of Reference Unit
 	0.040280,                !- Speed 2 Air Flow Rate of Reference Unit
 	0.000036,                !- Speed 2 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 2 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 2 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2591,7 +2589,7 @@
 	0.78, 					 !- Speed 3 Sensible Heat Transfer Ratio of Reference Unit
 	0.060420,                !- Speed 3 Air Flow Rate of Reference Unit
 	0.000054,                !- Speed 3 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 3 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 3 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2603,7 +2601,7 @@
 	0.77, 					 !- Speed 4 Sensible Heat Transfer Ratio of Reference Unit
 	0.080560,                !- Speed 4 Air Flow Rate of Reference Unit
 	0.000072,                !- Speed 4 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 4 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 4 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2615,7 +2613,7 @@
 	0.76, 					 !- Speed 5 Sensible Heat Transfer Ratio of Reference Unit
 	0.100700,                !- Speed 5 Air Flow Rate of Reference Unit
 	0.000090,                !- Speed 5 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 5 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 5 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2627,7 +2625,7 @@
 	0.75, 					 !- Speed 6 Sensible Heat Transfer Ratio of Reference Unit
 	0.120840,                !- Speed 6 Air Flow Rate of Reference Unit
 	0.000108,                !- Speed 6 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 6 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 6 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2639,7 +2637,7 @@
 	0.74, 					 !- Speed 7 Sensible Heat Transfer Ratio of Reference Unit
 	0.140980,                !- Speed 7 Air Flow Rate of Reference Unit
 	0.000126,                !- Speed 7 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 7 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 7 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2651,7 +2649,7 @@
 	0.73, 					 !- Speed 8 Sensible Heat Transfer Ratio of Reference Unit
 	0.161120,                !- Speed 8 Air Flow Rate of Reference Unit
 	0.000144,                !- Speed 8 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 8 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 8 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2663,7 +2661,7 @@
 	0.72, 					 !- Speed 9 Sensible Heat Transfer Ratio of Reference Unit
 	0.181260,                !- Speed 9 Air Flow Rate of Reference Unit
 	0.000162,                !- Speed 9 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 9 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 9 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2675,7 +2673,7 @@
 	0.70, 					 !- Speed 10 Sensible Heat Transfer Ratio of Reference Unit
 	0.201400,                !- Speed 10 Air Flow Rate of Reference Unit
 	0.000179,                !- Speed 10 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 10 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 10 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2800,7 +2798,7 @@
 	0.80, 					 !- Speed 1 Sensible Heat Transfer Ratio of Reference Unit
 	0.020140,                !- Speed 1 Air Flow Rate of Reference Unit
 	0.000018,                !- Speed 1 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 1 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 1 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2812,7 +2810,7 @@
 	0.79, 					 !- Speed 2 Sensible Heat Transfer Ratio of Reference Unit
 	0.040280,                !- Speed 2 Air Flow Rate of Reference Unit
 	0.000036,                !- Speed 2 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 2 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 2 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2824,7 +2822,7 @@
 	0.78, 					 !- Speed 3 Sensible Heat Transfer Ratio of Reference Unit
 	0.060420,                !- Speed 3 Air Flow Rate of Reference Unit
 	0.000054,                !- Speed 3 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 3 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 3 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2836,7 +2834,7 @@
 	0.77, 					 !- Speed 4 Sensible Heat Transfer Ratio of Reference Unit
 	0.080560,                !- Speed 4 Air Flow Rate of Reference Unit
 	0.000072,                !- Speed 4 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 4 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 4 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2848,7 +2846,7 @@
 	0.76, 					 !- Speed 5 Sensible Heat Transfer Ratio of Reference Unit
 	0.100700,                !- Speed 5 Air Flow Rate of Reference Unit
 	0.000090,                !- Speed 5 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 5 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 5 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2860,7 +2858,7 @@
 	0.75, 					 !- Speed 6 Sensible Heat Transfer Ratio of Reference Unit
 	0.120840,                !- Speed 6 Air Flow Rate of Reference Unit
 	0.000108,                !- Speed 6 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 6 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 6 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2872,7 +2870,7 @@
 	0.74, 					 !- Speed 7 Sensible Heat Transfer Ratio of Reference Unit
 	0.140980,                !- Speed 7 Air Flow Rate of Reference Unit
 	0.000126,                !- Speed 7 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 7 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 7 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2884,7 +2882,7 @@
 	0.73, 					 !- Speed 8 Sensible Heat Transfer Ratio of Reference Unit
 	0.161120,                !- Speed 8 Air Flow Rate of Reference Unit
 	0.000144,                !- Speed 8 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 8 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 8 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2896,7 +2894,7 @@
 	0.72, 					 !- Speed 9 Sensible Heat Transfer Ratio of Reference Unit
 	0.181260,                !- Speed 9 Air Flow Rate of Reference Unit
 	0.000162,                !- Speed 9 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 9 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 9 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -2908,7 +2906,7 @@
 	0.70, 					 !- Speed 10 Sensible Heat Transfer Ratio of Reference Unit
 	0.201400,                !- Speed 10 Air Flow Rate of Reference Unit
 	0.000179,                !- Speed 10 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 10 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 10 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3057,7 +3055,7 @@
 	0.80, 					 !- Speed 1 Sensible Heat Transfer Ratio of Reference Unit
 	0.020140,                !- Speed 1 Air Flow Rate of Reference Unit
 	0.000018,                !- Speed 1 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 1 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 1 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3069,7 +3067,7 @@
 	0.79, 					 !- Speed 2 Sensible Heat Transfer Ratio of Reference Unit
 	0.040280,                !- Speed 2 Air Flow Rate of Reference Unit
 	0.000036,                !- Speed 2 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 2 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 2 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3081,7 +3079,7 @@
 	0.78, 					 !- Speed 3 Sensible Heat Transfer Ratio of Reference Unit
 	0.060420,                !- Speed 3 Air Flow Rate of Reference Unit
 	0.000054,                !- Speed 3 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 3 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 3 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3093,7 +3091,7 @@
 	0.77, 					 !- Speed 4 Sensible Heat Transfer Ratio of Reference Unit
 	0.080560,                !- Speed 4 Air Flow Rate of Reference Unit
 	0.000072,                !- Speed 4 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 4 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 4 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3105,7 +3103,7 @@
 	0.76, 					 !- Speed 5 Sensible Heat Transfer Ratio of Reference Unit
 	0.100700,                !- Speed 5 Air Flow Rate of Reference Unit
 	0.000090,                !- Speed 5 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 5 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 5 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3117,7 +3115,7 @@
 	0.75, 					 !- Speed 6 Sensible Heat Transfer Ratio of Reference Unit
 	0.120840,                !- Speed 6 Air Flow Rate of Reference Unit
 	0.000108,                !- Speed 6 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 6 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 6 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3129,7 +3127,7 @@
 	0.74, 					 !- Speed 7 Sensible Heat Transfer Ratio of Reference Unit
 	0.140980,                !- Speed 7 Air Flow Rate of Reference Unit
 	0.000126,                !- Speed 7 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 7 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 7 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3141,7 +3139,7 @@
 	0.73, 					 !- Speed 8 Sensible Heat Transfer Ratio of Reference Unit
 	0.161120,                !- Speed 8 Air Flow Rate of Reference Unit
 	0.000144,                !- Speed 8 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 8 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 8 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3153,7 +3151,7 @@
 	0.72, 					 !- Speed 9 Sensible Heat Transfer Ratio of Reference Unit
 	0.181260,                !- Speed 9 Air Flow Rate of Reference Unit
 	0.000162,                !- Speed 9 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 9 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 9 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -3165,7 +3163,7 @@
 	0.70, 					 !- Speed 10 Sensible Heat Transfer Ratio of Reference Unit
 	0.201400,                !- Speed 10 Air Flow Rate of Reference Unit
 	0.000179,                !- Speed 10 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 10 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 10 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4257,7 +4255,7 @@
 	0.80, 					 !- Speed 1 Sensible Heat Transfer Ratio of Reference Unit
 	0.020140,                !- Speed 1 Air Flow Rate of Reference Unit
 	0.000018,                !- Speed 1 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 1 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 1 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4269,7 +4267,7 @@
 	0.79, 					 !- Speed 2 Sensible Heat Transfer Ratio of Reference Unit
 	0.040280,                !- Speed 2 Air Flow Rate of Reference Unit
 	0.000036,                !- Speed 2 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 2 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 2 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4281,7 +4279,7 @@
 	0.78, 					 !- Speed 3 Sensible Heat Transfer Ratio of Reference Unit
 	0.060420,                !- Speed 3 Air Flow Rate of Reference Unit
 	0.000054,                !- Speed 3 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 3 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 3 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4293,7 +4291,7 @@
 	0.77, 					 !- Speed 4 Sensible Heat Transfer Ratio of Reference Unit
 	0.080560,                !- Speed 4 Air Flow Rate of Reference Unit
 	0.000072,                !- Speed 4 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 4 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 4 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4305,7 +4303,7 @@
 	0.76, 					 !- Speed 5 Sensible Heat Transfer Ratio of Reference Unit
 	0.100700,                !- Speed 5 Air Flow Rate of Reference Unit
 	0.000090,                !- Speed 5 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 5 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 5 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4317,7 +4315,7 @@
 	0.75, 					 !- Speed 6 Sensible Heat Transfer Ratio of Reference Unit
 	0.120840,                !- Speed 6 Air Flow Rate of Reference Unit
 	0.000108,                !- Speed 6 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 6 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 6 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4329,7 +4327,7 @@
 	0.74, 					 !- Speed 7 Sensible Heat Transfer Ratio of Reference Unit
 	0.140980,                !- Speed 7 Air Flow Rate of Reference Unit
 	0.000126,                !- Speed 7 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 7 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 7 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4341,7 +4339,7 @@
 	0.73, 					 !- Speed 8 Sensible Heat Transfer Ratio of Reference Unit
 	0.161120,                !- Speed 8 Air Flow Rate of Reference Unit
 	0.000144,                !- Speed 8 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 8 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 8 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4353,7 +4351,7 @@
 	0.72, 					 !- Speed 9 Sensible Heat Transfer Ratio of Reference Unit
 	0.181260,                !- Speed 9 Air Flow Rate of Reference Unit
 	0.000162,                !- Speed 9 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 9 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 9 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name
@@ -4365,7 +4363,7 @@
 	0.70, 					 !- Speed 10 Sensible Heat Transfer Ratio of Reference Unit
 	0.201400,                !- Speed 10 Air Flow Rate of Reference Unit
 	0.000179,                !- Speed 10 water Air Flow Rate of Reference Unit
-	10.0,                    !- Speed 10 Water Pump Power of Reference Unit	
+	10.0,                    !- Speed 10 Water Pump Power of Reference Unit
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Heating Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Heating Capacity Function of Water Flow Fraction Curve Name

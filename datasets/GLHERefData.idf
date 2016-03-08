@@ -19,7 +19,7 @@
 ! is 0.75in. Dia. SDR11 HDPE. The fluid is water. The borehole/length ratio is 0.06
 ! (76.2m/4.572m [300ft/15ft])
 
-!  Version,8.3;
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
 !************ LINE CONFIGURATION: 1 x 2, line, Standard Grout *****************
 ! The G-function is defined by the following data pairs

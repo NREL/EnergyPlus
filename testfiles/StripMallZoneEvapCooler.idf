@@ -49,7 +49,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 10
 
-  Version,8.3;
+  Version,8.5;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4166,6 +4166,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Primary Design Air Flow Rate  
     55.0,                    !- Recirculating Water Pump Power Consumption {W}
     ,                        !- Water Pump Power Sizing Factor
     ,                        !- Water Pump Power Modifier Curve Name
@@ -4402,6 +4403,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Primary Design Air Flow Rate  
     55.0,                    !- Recirculating Water Pump Power Consumption {W}
     ,                        !- Water Pump Power Sizing Factor
     ,                        !- Water Pump Power Modifier Curve Name
@@ -4672,6 +4674,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
     ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Primary Design Air Flow Rate  
     55.0,                    !- Recirculating Water Pump Power Consumption {W}
     ,                        !- Water Pump Power Sizing Factor
     ,                        !- Water Pump Power Modifier Curve Name

@@ -96,7 +96,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.5;
 
 !----------------------------------------------------------------
 
@@ -246,30 +246,38 @@
 
   Site:GroundDomain:Slab,
     IngradeCoupledSlab,      !- Name
-    5,                       !- Month
-    1,                       !- Day of Month
-    5,                       !- Day Type
-    1.8,                     !- Maximum Dry-Bulb Temperature {C}
-    3200,                    !- Daily Dry-Bulb Temperature Range {deltaC}
-    836,                     !- Dry-Bulb Temperature Range Modifier Type
-    30,                      !- Dry-Bulb Temperature Range Modifier Day Schedule Name
-    50,                      !- Humidity Condition Type
-    15.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
-    12.8,                    !- Humidity Condition Day Schedule Name
-    17.3,                    !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-    1,                       !- Enthalpy at Maximum Dry-Bulb {J/kg}
-    GroundCoupledOSCM,       !- Daily Wet-Bulb Temperature Range {deltaC}
-    InGrade,                 !- Barometric Pressure {Pa}
-    Slab Material-In-grade,  !- Wind Speed {m/s}
-    Yes,                     !- Wind Direction {deg}
-    Slab Insulation,         !- Rain Indicator
-    Full,                    !- Snow Indicator
-    ,                        !- Daylight Saving Time Indicator
-    Yes,                     !- Solar Model Indicator
-    Slab Insulation,         !- Beam Solar Day Schedule Name
-    2,                       !- Diffuse Solar Day Schedule Name
-    Timestep;                !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    5,                       !- Ground Domain Depth {m}
+    1,                       !- Aspect Ratio
+    5,                       !- Domain Perimeter Offset {m}
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    30,                      !- Soil Moisture Content Volume Fraction {percent}
+    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,    !- Type of Undisturbed Ground Temperature Model
+    KATemps,                 !- Name of Undisturbed Ground Temperature Model
+    1,                       !- Evapotranspiration Ground Cover Parameter
+    GroundCoupledOSCM,       !- Name of Floor Boundary Condition Model
+    InGrade,                 !- Slab Location (InGrade/OnGrade)
+    Slab Material-In-grade,  !- Slab Material Name
+    Yes,                     !- Horizontal Insulation (Yes/No)
+    Slab Insulation,         !- Horizontal Insulation Material Name
+    Full,                    !- Full Horizontal or Perimeter Only (Full/Perimeter)
+    ,                        !- Perimeter insulation width (m)
+    Yes,                     !- Vertical Insulation (Yes/No)
+    Slab Insulation,         !- Vertical Insulation Name
+    2,                       !- Vertical perimeter insulation depth from surface (m)
+    Timestep;                !- Domain Simulation Interval. (Timestep/Hourly)
 
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    KATemps,                 !- Name of object
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    15.5,                    !- Annual average surface temperature {C}
+    12.8,                    !- Annual amplitude of surface temperature {delta C}
+    17.3;                    !- Phase shift of minimum surface temperature{days}
+    
   Material,
     WD10,                    !- Name
     MediumSmooth,            !- Roughness
@@ -3400,9 +3408,9 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
-  Output:Variable,*,Zone Coupled Surface Heat Flux,hourly;
+  Output:Variable,*,GroundDomain Slab Zone Coupled Surface Heat Flux,hourly;
 
-  Output:Variable,*,Zone Coupled Surface Temperature,hourly;
+  Output:Variable,*,GroundDomain Slab Zone Coupled Surface Temperature,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;
 

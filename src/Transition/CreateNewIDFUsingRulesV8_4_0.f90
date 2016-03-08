@@ -132,7 +132,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: ThisObjectName
   CHARACTER(len=MaxNameLength) :: LookingForTankName
 
-  INTEGER :: I, CurField
+  INTEGER :: I, CurField, KAindex=0, SearchNum
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -481,6 +481,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   END IF
                 END DO
 
+              CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! we'll be adding a new flow rate field F5 to autosize
+                OutArgs(1:4) = InArgs(1:4)
+                OutArgs(5) = 'Autosize'
+                OutArgs(6:17) = InArgs(5:16)
+                CurArgs = CurArgs + 1
+                
               CASE('CONTROLLER:MECHANICALVENTILATION')
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -490,6 +499,157 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 IF ( SameString( InArgs(4), "ProportionalControl" ) ) THEN
                   OutArgs(4) = 'ProportionalControlBasedonOccupancySchedule'
                 END IF
+
+              CASE('SITE:GROUNDDOMAIN:SLAB')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:4)=InArgs(1:4) ! No change at all
+                OutArgs(5:7)=InArgs(5:7) ! No change -- store for later -- yes redundant here I know
+                OutArgs(8:9)=InArgs(8:9) ! No change at all
+                OutArgs(10)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(11),'(A6,I2)') "KATemp", KAindex
+                OutArgs(12:23) = InArgs(13:24)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(5:7)
+                OutArgs(5:7)=InArgs(10:12)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.
+
+              CASE('SITE:GROUNDDOMAIN:BASEMENT')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:4)=InArgs(1:4) ! No change at all
+                OutArgs(5:7)=InArgs(5:7) ! No change -- store for later -- yes redundant here I know
+                OutArgs(8:9)=InArgs(8:9) ! No change at all
+                OutArgs(10)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(11),'(A6,I2)') "KATemp", KAindex
+                OutArgs(12:24) = InArgs(13:25)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(5:7)
+                OutArgs(5:7)=InArgs(10:12)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.
+
+              CASE('PIPINGSYSTEM:UNDERGROUND:DOMAIN')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:13)=InArgs(1:13) ! No change at all
+                OutArgs(14:16)=InArgs(14:16) ! No change -- store for later -- yes redundant here I know
+                OutArgs(17:18)=InArgs(17:18) ! No change at all
+                OutArgs(19)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(20),'(A6,I2)') "KATemp", KAindex
+                OutArgs(21:CurArgs-1) = InArgs(22:CurArgs)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(14:16)
+                OutArgs(5:7)=InArgs(19:21)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.                
+
+              CASE('PIPE:UNDERGROUND')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:7)=InArgs(1:7) ! No change at all
+                OutArgs(8)=InArgs(8) ! No change -- store for later -- yes redundant here I know
+                OutArgs(9)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(10),'(A6,I2)') "KATemp", KAindex
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                DO SearchNum = 1, NumIDFRecords
+                  ThisObjectType = IDFRecords(SearchNum)%Name
+                  IF ( UBOUND(IDFRecords(SearchNum)%Alphas, 1) > 0 ) THEN
+                    ThisObjectName = IDFRecords(SearchNum)%Alphas(1)
+                  ELSE
+                    ThisObjectName = "<nothing>"
+                  END IF
+                  IF (MakeUPPERCase(ThisObjectType) /= 'MATERIAL') CYCLE
+                  IF (MakeUPPERCase(ThisObjectName) == MakeUPPERCase(InArgs(8))) THEN
+                    ! We have our match
+                    WRITE(diflfn,fmta) '! Found a material to match the soil material; name ='//IDFRecords(SearchNum)%Alphas(1)
+                    OutArgs(2) = IDFRecords(SearchNum)%Numbers(2)
+                    OutArgs(3) = IDFRecords(SearchNum)%Numbers(3)
+                    OutArgs(4) = IDFRecords(SearchNum)%Numbers(4)
+                  END IF
+                END DO
+                OutArgs(5:7)=InArgs(9:11)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.     
+
+              CASE('GROUNDHEATEXCHANGER:HORIZONTALTRENCH')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:10)=InArgs(1:10) ! No change at all
+                OutArgs(11:13)=InArgs(11:13) ! No change -- store for later -- yes redundant here I know
+                OutArgs(14:18)=InArgs(14:18) ! No change at all
+                OutArgs(19)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(20),'(A6,I2)') "KATemp", KAindex
+                OutArgs(21) = InArgs(22)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(11:13)
+                OutArgs(5:7)=InArgs(19:21)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.                
+
+              CASE('GROUNDHEATEXCHANGER:SLINKY')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:4)=InArgs(1:4) ! No change at all
+                OutArgs(5:7)=InArgs(5:7) ! No change -- store for later -- yes redundant here I know
+                OutArgs(8:19)=InArgs(8:19) ! No change at all
+                OutArgs(20)="Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+                KAindex = KAindex + 1
+                write(OutArgs(21),'(A6,I2)') "KATemp", KAindex
+                OutArgs(22) = InArgs(23)
+                CurArgs = CurArgs - 1
+                ! Write the now truncated site:grounddomain object
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                ! Now build the new KA object
+                ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                write(OutArgs(1),'(A6,I2)') "KATemp", KAindex
+                ! Now copy things over from the slab object
+                OutArgs(2:4)=InArgs(5:7)
+                OutArgs(5:7)=InArgs(20:22)
+                CALL WriteOutIDFLines(DifLfn,ObjectName,7,OutArgs,NwFldNames,NwFldUnits)
+                Written = .true.                
               
               ! This was actually missed in the 8.1 to 8.2 transition, so it is included here as a redundancy
               CASE('HVACTEMPLATE:PLANT:CHILLEDWATERLOOP')
@@ -543,6 +703,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 else
                   OutArgs(17)=InArgs(17) ! Redundant, but clear
                 endif
+
+              CASE('ZONEAIRMASSFLOWCONSERVATION')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = InArgs(1) ! no change to F1
+                if (SameString(InArgs(1), "YES")) then
+                  OutArgs(2) = InArgs(2)
+                else ! IDD validation should require either YES or NO, so this is "NO"
+                  OutArgs(2) = "None"
+                endif
+                OutArgs(3) = "MixingSourceZonesOnly"
+                CurArgs = CurArgs + 1
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

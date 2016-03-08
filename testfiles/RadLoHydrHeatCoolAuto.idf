@@ -2,7 +2,8 @@
 ! Basic file description:  1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor.
 !
-! Highlights:              Basic test of the hydronic radiant heating and cooling system with autosizing
+! Highlights:              Basic test of hydronic radiant heating and cooling systems with autosizing and two different
+!                          scalable sizing methods (CapacityPerFloorArea and FractionOfAutosizedHeatingCapacity)
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -99,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.5;
 
   Timestep,6;
 
@@ -1895,7 +1896,7 @@
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Hot Water Flow {m3/s}
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-    West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
+    West Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -1904,7 +1905,7 @@
     ,                        !- Fraction of Autosized Cooling Design Capacity
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-    Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
+    Zone 1 Cooling Water Outlet Node, !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     ,                        !- Condensation Control Type
@@ -1920,22 +1921,22 @@
     0.013,                   !- Hydronic Tubing Inside Diameter {m}
     autosize,                !- Hydronic Tubing Length {m}
     MeanAirTemperature,      !- Temperature Control Type
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    CapacityPerFloorArea,    !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W}
+    156.94370330083649,      !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Hot Water Flow {m3/s}
     East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     East Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    Autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    CapacityPerFloorArea,    !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W}
+    139.91913569011186,      !- Cooling Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Cooling Design Capacity
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-    Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
+    Zone 2 Cooling Water Outlet Node, !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     ,                        !- Condensation Control Type
@@ -1951,19 +1952,19 @@
     0.013,                   !- Hydronic Tubing Inside Diameter {m}
     autosize,                !- Hydronic Tubing Length {m}
     MeanAirTemperature,      !- Temperature Control Type
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
+    FractionOfAutosizedHeatingCapacity,   !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
+    1.0,                     !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Hot Water Flow {m3/s}
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-    North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
+    North Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    Autosize,                !- Cooling Design Capacity {W}
+    FractionOfAutosizedCoolingCapacity,   !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W}
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
+    1.0,                     !- Fraction of Autosized Cooling Design Capacity
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name

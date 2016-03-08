@@ -2,11 +2,11 @@
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
-// Version: 4.0.0
+// Version: 4.1.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -199,6 +199,23 @@ TEST( Array1Test, ConstructionVector3 )
 	EXPECT_EQ( 11, v( 1 ) );
 	EXPECT_EQ( 22, v( 2 ) );
 	EXPECT_EQ( 33, v( 3 ) );
+}
+
+TEST( Array1Test, ConstructionIterator )
+{
+	std::vector< int > v{ { 11, 22, 33 } };
+	Array1D_int a( v.begin(), v.end() );
+	EXPECT_EQ( 3u, a.size() );
+	EXPECT_EQ( 3u, a.size1() );
+	EXPECT_EQ( 1, a.l() );
+	EXPECT_EQ( 1, a.l1() );
+	EXPECT_EQ( 3, a.u() );
+	EXPECT_EQ( 3, a.u1() );
+	EXPECT_EQ( Array1D_int::IR( 1, 3 ), a.I() );
+	EXPECT_EQ( Array1D_int::IR( 1, 3 ), a.I1() );
+	EXPECT_EQ( 11, a( 1 ) );
+	EXPECT_EQ( 22, a( 2 ) );
+	EXPECT_EQ( 33, a( 3 ) );
 }
 
 static void initializer_function( Array1D_string & a )
@@ -456,17 +473,28 @@ TEST( Array1Test, ConstructionOneBasedInitializerList )
 	EXPECT_EQ( 33, r( 3 ) );
 }
 
-TEST( Array1Test, AssignmentBasic )
+TEST( Array1Test, AssignmentCopy )
 {
 	Array1D_double v( 22, 55.5 );
 	Array1D_double const w( 13, 6.789 );
 	v = w;
 	EXPECT_TRUE( eq( w, v ) );
-	v = 45.6;
+	v = 45.5;
 	EXPECT_EQ( 13u, v.size() );
-	for ( int i = 1; i <= 13; ++i ) {
-		EXPECT_EQ( 45.6, v( i ) );
-	}
+	EXPECT_TRUE( eq( v, 45.5 ) );
+}
+
+TEST( Array1Test, AssignmentMove )
+{
+	Array1D_double v( 22, 55.5 );
+	v = Array1D_double( 13, 6.75 );
+	EXPECT_EQ( 13u, v.size() );
+	EXPECT_TRUE( eq( v, 6.75 ) );
+	Array1D_double w;
+	w = std::move( v );
+	EXPECT_EQ( 0u, v.size() );
+	EXPECT_EQ( 13u, w.size() );
+	EXPECT_TRUE( eq( w, 6.75 ) );
 }
 
 TEST( Array1Test, ArrayTail )
@@ -660,6 +688,16 @@ TEST( Array1Test, Dimension )
 	EXPECT_EQ( 17, A( 3 ) );
 	EXPECT_EQ( 17, A( 4 ) );
 
+	A.dimension( { 1, 5 }, 42 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 5, A.u() );
+	EXPECT_EQ( 5u, A.size() );
+	EXPECT_EQ( 42, A( 1 ) );
+	EXPECT_EQ( 42, A( 2 ) );
+	EXPECT_EQ( 42, A( 3 ) );
+	EXPECT_EQ( 42, A( 4 ) );
+	EXPECT_EQ( 42, A( 5 ) );
+
 	A.dimension( { 4, 6 }, dimension_initializer_function );
 	EXPECT_EQ( 4, A.l() );
 	EXPECT_EQ( 6, A.u() );
@@ -816,6 +854,110 @@ TEST( Array1Test, Redimension )
 		EXPECT_EQ( 2, A( 3 ) );
 		EXPECT_EQ( 2, A( 4 ) );
 	}
+
+	{ // No moving
+		Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+		A.redimension( 4 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 2, A( 2 ) );
+		EXPECT_EQ( 3, A( 3 ) );
+		EXPECT_EQ( 4, A( 4 ) );
+		A.redimension( 5, 6 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 5, A.u() );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 2, A( 2 ) );
+		EXPECT_EQ( 3, A( 3 ) );
+		EXPECT_EQ( 4, A( 4 ) );
+		EXPECT_EQ( 6, A( 5 ) );
+		EXPECT_EQ( 5u, A.capacity() );
+		A.redimension( 6, 7 ); // Reallocates
+		EXPECT_EQ( 6u, A.capacity() );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 6, A.u() );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 2, A( 2 ) );
+		EXPECT_EQ( 3, A( 3 ) );
+		EXPECT_EQ( 4, A( 4 ) );
+		EXPECT_EQ( 6, A( 5 ) );
+		EXPECT_EQ( 7, A( 6 ) );
+	}
+
+	{ // No overlap
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { -5, -1 }, 3 );
+		EXPECT_EQ( -5, A.l() );
+		EXPECT_EQ( -1, A.u() );
+		EXPECT_EQ( 3, A( -5 ) );
+		EXPECT_EQ( 3, A( -4 ) );
+		EXPECT_EQ( 3, A( -3 ) );
+		EXPECT_EQ( 3, A( -2 ) );
+		EXPECT_EQ( 3, A( -1 ) );
+	}
+
+	{ // No overlap
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { 11, 15 }, 3 );
+		EXPECT_EQ( 11, A.l() );
+		EXPECT_EQ( 15, A.u() );
+		EXPECT_EQ( 3, A( 11 ) );
+		EXPECT_EQ( 3, A( 12 ) );
+		EXPECT_EQ( 3, A( 13 ) );
+		EXPECT_EQ( 3, A( 14 ) );
+		EXPECT_EQ( 3, A( 15 ) );
+	}
+
+	{ // Up 1 overlap
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { 5, 9 }, 3 );
+		EXPECT_EQ( 5, A.l() );
+		EXPECT_EQ( 9, A.u() );
+		EXPECT_EQ( 5, A( 5 ) );
+		EXPECT_EQ( 3, A( 6 ) );
+		EXPECT_EQ( 3, A( 7 ) );
+		EXPECT_EQ( 3, A( 8 ) );
+		EXPECT_EQ( 3, A( 9 ) );
+	}
+
+	{ // Down 1 overlap
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { -3, 1 }, 3 );
+		EXPECT_EQ( -3, A.l() );
+		EXPECT_EQ( 1, A.u() );
+		EXPECT_EQ( 3, A( -3 ) );
+		EXPECT_EQ( 3, A( -2 ) );
+		EXPECT_EQ( 3, A( -1 ) );
+		EXPECT_EQ( 3, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+	}
+
+	{ // Up 1 overlap with reallocation
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { 5, 10 }, 3 );
+		EXPECT_EQ( 5, A.l() );
+		EXPECT_EQ( 10, A.u() );
+		EXPECT_EQ( 5, A( 5 ) );
+		EXPECT_EQ( 3, A( 6 ) );
+		EXPECT_EQ( 3, A( 7 ) );
+		EXPECT_EQ( 3, A( 8 ) );
+		EXPECT_EQ( 3, A( 9 ) );
+		EXPECT_EQ( 3, A( 10 ) );
+	}
+
+	{ // Down 1 overlap with reallocation
+		Array1D_int A( { 1, 2, 3, 4, 5 } );
+		A.redimension( { -4, 1 }, 3 );
+		EXPECT_EQ( -4, A.l() );
+		EXPECT_EQ( 1, A.u() );
+		EXPECT_EQ( 3, A( -4 ) );
+		EXPECT_EQ( 3, A( -3 ) );
+		EXPECT_EQ( 3, A( -2 ) );
+		EXPECT_EQ( 3, A( -1 ) );
+		EXPECT_EQ( 3, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+	}
 }
 
 TEST( Array1Test, Append )
@@ -828,6 +970,71 @@ TEST( Array1Test, Append )
 	EXPECT_EQ( 6u, A.capacity() );
 	EXPECT_EQ( 1, A( 1 ) );
 	EXPECT_EQ( 6, A( 6 ) );
+	A.reserve( 7 ); // So next append doesn't reallocate
+	A.append( 7 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 7, A.u() );
+	EXPECT_EQ( 7u, A.size() );
+	EXPECT_EQ( 7u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 7, A( 7 ) );
+}
+
+TEST( Array1Test, Front_And_Back )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	EXPECT_EQ( 1, A.front() );
+	EXPECT_EQ( 5, A.back() );
+}
+
+TEST( Array1Test, Push_Back_Copy )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	int const i6( 6 ), i7( 7 ), i8( 8 ), i9( 9 );
+	A.push_back( i6 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 6, A.u() );
+	EXPECT_EQ( 6u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	A.push_back( i7 );
+	A.push_back( i8 );
+	A.push_back( i9 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 9, A.u() );
+	EXPECT_EQ( 9u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 7, A( 7 ) );
+	EXPECT_EQ( 8, A( 8 ) );
+	EXPECT_EQ( 9, A( 9 ) );
+}
+
+TEST( Array1Test, Push_Back_Move )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	A.push_back( 6 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 6, A.u() );
+	EXPECT_EQ( 6u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	A.push_back( 7 );
+	A.push_back( 8 );
+	A.push_back( 9 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 9, A.u() );
+	EXPECT_EQ( 9u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 7, A( 7 ) );
+	EXPECT_EQ( 8, A( 8 ) );
+	EXPECT_EQ( 9, A( 9 ) );
 }
 
 TEST( Array1Test, Push_Back_Empty )
@@ -838,19 +1045,33 @@ TEST( Array1Test, Push_Back_Empty )
 	EXPECT_EQ( 1, A.u() );
 	EXPECT_EQ( 1u, A.size() );
 	EXPECT_EQ( 1u, A.capacity() );
+	EXPECT_EQ( 1, A[ 0 ] );
 	EXPECT_EQ( 1, A( 1 ) );
 }
 
-TEST( Array1Test, Push_Back )
+TEST( Array1Test, Push_Back_Aggregate )
 {
-	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
-	A.push_back( 6 );
+	struct agg { int a, b; };
+	Array1D< agg > A;
+	A.push_back( { 11, 22 } );
 	EXPECT_EQ( 1, A.l() );
-	EXPECT_EQ( 6, A.u() );
-	EXPECT_EQ( 6u, A.size() );
-	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A.u() );
+	EXPECT_EQ( 1u, A.size() );
+	EXPECT_EQ( 1u, A.capacity() );
+	EXPECT_EQ( 11, A[ 0 ].a );
+	EXPECT_EQ( 22, A( 1 ).b );
+}
+
+TEST( Array1Test, Push_Back_SelfRef )
+{
+	Array1D_int A( { 1 } );
+	EXPECT_EQ( 1u, A.size() );
+	EXPECT_EQ( 1u, A.capacity() );
 	EXPECT_EQ( 1, A( 1 ) );
-	EXPECT_EQ( 6, A( 6 ) );
+	A.push_back( A( 1 ) );
+	EXPECT_EQ( 2u, A.size() );
+	EXPECT_EQ( 2u, A.capacity() );
+	EXPECT_EQ( 1, A( 2 ) );
 }
 
 TEST( Array1Test, Pop_Back )
@@ -861,10 +1082,227 @@ TEST( Array1Test, Pop_Back )
 	EXPECT_EQ( 4u, A.size() );
 }
 
-TEST( Array1Test, Front )
+TEST( Array1Test, Insert_Copy )
 {
 	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
-	EXPECT_EQ( 1, A.front() );
+	int const six( 6 ), seven( 7 ), nine( 9 );
+	A.insert( A.end(), six );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 6, A.u() );
+	EXPECT_EQ( 6u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	A.insert( A.end(), seven );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 7, A.u() );
+	EXPECT_EQ( 7u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 7, A( 7 ) );
+	A.insert( A.begin(), A( 7 ) ); // Self-referential
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 8, A.u() );
+	EXPECT_EQ( 8u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 7, A( 1 ) );
+	EXPECT_EQ( 1, A( 2 ) );
+	EXPECT_EQ( 2, A( 3 ) );
+	EXPECT_EQ( 6, A( 7 ) );
+	EXPECT_EQ( 7, A( 8 ) );
+	A.insert( A.end(), nine );
+	A.insert( A.end(), nine );
+	A.insert( A.end(), nine );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 11, A.u() );
+	EXPECT_EQ( 11u, A.size() );
+	EXPECT_EQ( 20u, A.capacity() );
+	EXPECT_EQ( 7, A( 1 ) );
+	EXPECT_EQ( 1, A( 2 ) );
+	EXPECT_EQ( 2, A( 3 ) );
+	EXPECT_EQ( 6, A( 7 ) );
+	EXPECT_EQ( 7, A( 8 ) );
+	EXPECT_EQ( 9, A( 9 ) );
+	EXPECT_EQ( 9, A( 10 ) );
+	EXPECT_EQ( 9, A( 11 ) );
+}
+
+TEST( Array1Test, Insert_Move )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	A.insert( A.end(), 6 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 6, A.u() );
+	EXPECT_EQ( 6u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	A.insert( A.end(), 7 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 7, A.u() );
+	EXPECT_EQ( 7u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 7, A( 7 ) );
+	A.insert( A.begin(), 0 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 8, A.u() );
+	EXPECT_EQ( 8u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 0, A[ 0 ] );
+	EXPECT_EQ( 1, A[ 1 ] );
+	EXPECT_EQ( 6, A[ 6 ] );
+	EXPECT_EQ( 7, A[ 7 ] );
+	A.insert( A.begin() + 3, 3u, 3 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 11, A.u() );
+	EXPECT_EQ( 11u, A.size() );
+	EXPECT_EQ( 20u, A.capacity() );
+	EXPECT_EQ( 0, A[ 0 ] );
+	EXPECT_EQ( 1, A[ 1 ] );
+	EXPECT_EQ( 2, A[ 2 ] );
+	EXPECT_EQ( 3, A[ 3 ] );
+	EXPECT_EQ( 3, A[ 4 ] );
+	EXPECT_EQ( 3, A[ 5 ] );
+	EXPECT_EQ( 3, A[ 6 ] );
+	EXPECT_EQ( 4, A[ 7 ] );
+	EXPECT_EQ( 5, A[ 8 ] );
+	EXPECT_EQ( 6, A[ 9 ] );
+	EXPECT_EQ( 7, A[ 10 ] );
+}
+
+TEST( Array1Test, Insert_Multiples )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	A.insert( A.end(), 3u, 6 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 8, A.u() );
+	EXPECT_EQ( 8u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 6, A( 7 ) );
+	EXPECT_EQ( 6, A( 8 ) );
+	A.insert( A.begin() + 3, 3u, 3 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 11, A.u() );
+	EXPECT_EQ( 11u, A.size() );
+	EXPECT_EQ( 20u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 2, A( 2 ) );
+	EXPECT_EQ( 3, A( 3 ) );
+	EXPECT_EQ( 3, A( 4 ) );
+	EXPECT_EQ( 3, A( 5 ) );
+	EXPECT_EQ( 3, A( 6 ) );
+	EXPECT_EQ( 4, A( 7 ) );
+	EXPECT_EQ( 5, A( 8 ) );
+	EXPECT_EQ( 6, A( 9 ) );
+	EXPECT_EQ( 6, A( 10 ) );
+	EXPECT_EQ( 6, A( 11 ) );
+	A.insert( A.begin(), 2u, A( 7 ) );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 13, A.u() );
+	EXPECT_EQ( 13u, A.size() );
+	EXPECT_EQ( 20u, A.capacity() );
+	EXPECT_EQ( 4, A( 1 ) );
+	EXPECT_EQ( 4, A( 2 ) );
+	EXPECT_EQ( 1, A( 3 ) );
+	EXPECT_EQ( 2, A( 4 ) );
+	EXPECT_EQ( 5, A( 10 ) );
+	EXPECT_EQ( 6, A( 11 ) );
+	EXPECT_EQ( 6, A( 12 ) );
+	EXPECT_EQ( 6, A( 13 ) );
+}
+
+TEST( Array1Test, Insert_Iterator )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	std::vector< int > const v( { 6, 7, 8 } );
+	A.insert( A.end(), v.begin(), v.end() );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 8, A.u() );
+	EXPECT_EQ( 8u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 2, A( 2 ) );
+	EXPECT_EQ( 3, A( 3 ) );
+	EXPECT_EQ( 4, A( 4 ) );
+	EXPECT_EQ( 5, A( 5 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 7, A( 7 ) );
+	EXPECT_EQ( 8, A( 8 ) );
+}
+
+TEST( Array1Test, Insert_Initializer_List )
+{
+	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
+	A.insert( A.end(), { 6, 7, 8 } );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 8, A.u() );
+	EXPECT_EQ( 8u, A.size() );
+	EXPECT_EQ( 10u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 2, A( 2 ) );
+	EXPECT_EQ( 3, A( 3 ) );
+	EXPECT_EQ( 4, A( 4 ) );
+	EXPECT_EQ( 5, A( 5 ) );
+	EXPECT_EQ( 6, A( 6 ) );
+	EXPECT_EQ( 7, A( 7 ) );
+	EXPECT_EQ( 8, A( 8 ) );
+}
+
+TEST( Array1Test, Emplace )
+{
+	Array1D_int A( { 1 } );
+	EXPECT_EQ( 1u, A.size() );
+	EXPECT_EQ( 1, A( 1 ) );
+	A.insert( A.end(), 2 );
+	EXPECT_EQ( 2u, A.size() );
+	EXPECT_EQ( 2, A( 2 ) );
+}
+
+TEST( Array1Test, Emplace_Back )
+{
+	Array1D_int A( { 1 } );
+	EXPECT_EQ( 1u, A.size() );
+	EXPECT_EQ( 1, A( 1 ) );
+	A.emplace_back( 2 );
+	EXPECT_EQ( 2u, A.size() );
+	EXPECT_EQ( 2, A( 2 ) );
+}
+
+TEST( Array1Test, Emplace_Back_SelfRef )
+{
+	Array1D_int A( { 1 } );
+	EXPECT_EQ( 1u, A.size() );
+	EXPECT_EQ( 1u, A.capacity() );
+	EXPECT_EQ( 1, A( 1 ) );
+	A.emplace_back( A( 1 ) );
+	EXPECT_EQ( 2u, A.size() );
+	EXPECT_EQ( 2u, A.capacity() );
+	EXPECT_EQ( 1, A( 2 ) );
+}
+
+TEST( Array1Test, Erase )
+{
+	Array1D_int A( { 1, 2, 3 } );
+	A.erase( A.begin() );
+	EXPECT_EQ( 2u, A.size() );
+	EXPECT_EQ( 2, A( 1 ) );
+	EXPECT_EQ( 3, A( 2 ) );
+}
+
+TEST( Array1Test, Erase_Iterator )
+{
+	Array1D_int A( { 1, 2, 3, 4, 5, 6 } );
+	A.erase( A.begin() + 1, A.begin() + 3 );
+	EXPECT_EQ( 4u, A.size() );
+	EXPECT_EQ( 1, A( 1 ) );
+	EXPECT_EQ( 4, A( 2 ) );
+	EXPECT_EQ( 5, A( 3 ) );
+	EXPECT_EQ( 6, A( 4 ) );
 }
 
 TEST( Array1Test, Reserve )
@@ -909,6 +1347,22 @@ TEST( Array1Test, Swap )
 	for ( int i = A.l(); i <= A.u(); ++i ) {
 		EXPECT_EQ( 22, A( i ) );
 	}
+}
+
+TEST( Array1Test, Resize )
+{
+	Array1D_int A;
+	A.reserve( 6u );
+	A.allocate( 6 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 6, A.u() );
+	EXPECT_EQ( 6u, A.size() );
+	EXPECT_EQ( 6u, A.capacity() );
+	A.allocate( 3 );
+	EXPECT_EQ( 1, A.l() );
+	EXPECT_EQ( 3, A.u() );
+	EXPECT_EQ( 3u, A.size() );
+	EXPECT_EQ( 3u, A.capacity() );
 }
 
 TEST( Array1Test, Functions )

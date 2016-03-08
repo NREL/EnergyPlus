@@ -105,7 +105,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.5;
 
   Building,
     Building,                !- Name
@@ -121,8 +121,9 @@
 
   ZoneAirMassFlowConservation,
     Yes,                     !- Adjust Zone Mixing For Zone Air Mass Flow Balance
-    AddInfiltrationFlow;     !- Source Zone Infiltration Treatment
-
+    AddInfiltrationFlow,     !- Infiltration Balancing Method
+    MixingSourceZonesOnly;   !- Infiltration Balancing Zones  
+    
   SurfaceConvectionAlgorithm:Inside,Simple;
 
   SurfaceConvectionAlgorithm:Outside,SimpleCombined;
@@ -3559,66 +3560,6 @@
 
   Output:Variable,SPACE5-1,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,SPACE1-1,Zone Supply Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE1-1,Zone Exhaust Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE1-1,Zone Return Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE1-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE1-1,Zone Mixing Source Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE1-1,Zone Mass Balance Infiltration Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE2-1,Zone Supply Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE2-1,Zone Exhaust Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE2-1,Zone Return Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE2-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE2-1,Zone Mixing Source Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE2-1,Zone Mass Balance Infiltration Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE3-1,Zone Supply Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE3-1,Zone Exhaust Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE3-1,Zone Return Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE3-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE3-1,Zone Mixing Source Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE3-1,Zone Mass Balance Infiltration Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE4-1,Zone Supply Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE4-1,Zone Exhaust Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE4-1,Zone Return Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE4-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE4-1,Zone Mixing Source Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE4-1,Zone Mass Balance Infiltration Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE5-1,Zone Supply Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE5-1,Zone Exhaust Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE5-1,Zone Return Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE5-1,Zone Mixing Receiving Air Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE5-1,Zone Mixing Source Air Mass Flow Rate,hourly;
-
-  !Output:Variable,SPACE5-1,Zone Mass Balance Infiltration Air Mass Flow Rate, hourly;
-
   Output:Variable,SPACE1-1 In Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE1-1 Out Node,System Node Mass Flow Rate,hourly;
@@ -3642,7 +3583,11 @@
   Output:Variable,SPACE5-1 Exhaust Fan Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,*,Zone Infiltration Standard Density Volume Flow Rate,hourly;
-
-  Output:Variable,*,Zone Infiltration Air Mass Flow Balance Status,hourly;
-
-  !Output:Diagnostics,DisplayExtraWarnings;
+  Output:Variable,*,Zone Mixing Standard Density Air Volume Flow Rate,hourly;
+  Output:Variable,*,Zone Air Mass Balance Supply Mass Flow Rate,hourly;
+  Output:Variable,*,Zone Air Mass Balance Exhaust Mass Flow Rate,hourly;
+  Output:Variable,*,Zone Air Mass Balance Return Mass Flow Rate,hourly;
+  Output:Variable,*,Zone Air Mass Balance Mixing Receiving Mass Flow Rate,hourly;
+  Output:Variable,*,Zone Air Mass Balance Mixing Source Mass Flow Rate,hourly;
+  Output:Variable,*,Zone Air Mass Balance Infiltration Mass Flow Rate,hourly;
+  Output:Variable,*,Zone Air Mass Balance Infiltration Status,hourly;

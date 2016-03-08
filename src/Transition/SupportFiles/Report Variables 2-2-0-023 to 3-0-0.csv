@@ -1,0 +1,68 @@
+2.2.0.023,3.0.0,
+65,65, This number should be the number of report variables in the following list
+Refrigerated Case Compressor Rack Electric Power,Refrigeration Compressor Rack Electric Power,
+Refrigerated Case Compressor Rack Electric Consumption,Refrigeration Compressor Rack Electric Consumption,
+Refrigerated Case Rack Condenser Fan Electric Power,Refrigeration Compressor Rack Condenser Fan Electric Power,
+Refrigerated Case Rack Condenser Fan Electric Consumption,Refrigeration Compressor Rack Condenser Fan Electric Consumption,
+Refrigerated Case Rack Total Heat Transfer Rate,Refrigeration Compressor Rack Total Heat Transfer Rate,
+Refrigerated Case Rack Total Heat Transfer Energy,Refrigeration Compressor Rack Total Heat Transfer Energy,
+Refrigerated Case Compressor Rack COP,Refrigeration Compressor Rack COP,
+Refrigerated Case Rack Evap Condenser Pump Electric Power,Refrigeration Compressor Rack Evap Condenser Pump Electric Power,
+Refrigerated Case Rack Evap Condenser Pump Elec Consumption,Refrigeration Compressor Rack Evap Condenser Pump Elec Consumption,
+Refrigerated Case Rack Evap Cond Basin Heater Elec Power,Refrigeration Compressor Rack Evap Cond Basin Heater Elec Power,
+Refrigerated Case Rack Evap Cond Basin Heater Elec Consumption,Refrigeration Compressor Rack Evap Cond Basin Heater Elec Consumption,
+Refrigerated Case Rack Evap Condenser Water Consumption Rate,Refrigeration Compressor Rack Evap Condenser Water Consumption Rate,
+Refrigerated Case Rack Evap Condenser Water Consumption,Refrigeration Compressor Rack Evap Condenser Water Consumption,
+Pipe Heat Transfer Mass Flow Rate,Pipe Heat Transfer fluid mass flow rate,
+Pipe Heat Transfer Inlet Temperature,Pipe Heat Transfer fluid inlet temperature,
+Pipe Heat Transfer Outlet Temperature,Pipe Heat Transfer fluid outlet temperature,
+PIPE HEAT TRANSFER PIPE TEMPERATURE AT INLET,<DELETE>,
+PIPE HEAT TRANSFER PIPE TEMPERATURE AT OUTLET,<DELETE>,
+System Cycle On/Off Status,Air Loop System Cycle On/Off Status,
+PV Array Current,<DELETE>,
+PV Array Voltage,<DELETE>,
+PV Array Electric Power Generated,PV Generator DC Power,
+PV Array Electric Energy Generated,PV Generator DC Energy ,
+PV Generator Inverter Power Delivered,Inverter AC Power Output,"<key mismatch if not wildcarded, so use *>"
+PV Generator Inverter Energy Delivered,Inverter AC Energy Output,"<key mismatch if not wildcarded, so use *>"
+PV Array Load Met,<DELETE>,
+PV Array Load Unmet,<DELETE>,
+PV Array Excess Electric Power,<DELETE>,
+PV Array Excess Electric Energy,<DELETE>,
+PV Array Current at MPP,<DELETE>,
+PV Array Voltage at MPP,<DELETE>,
+PV Array Current at 1/2 Voc,<DELETE>,
+PV Array Current at 1/2(Voc + Vmpp),<DELETE>
+Hot Water Equipment Purchased Heating Consumption Rate,Hot Water Equipment District Heating Consumption Rate
+Hot Water Equipment Purchased Heating Consumption,Hot Water Equipment District Heating Consumption
+Zone Hot Water Equipment Purchased Heating Consumption Rate,Zone Hot Water Equipment District Heating Consumption Rate
+Zone Hot Water Equipment Purchased Heating Consumption,Zone Hot Water Equipment District Heating Consumption
+Steam Equipment Purchased Heating Consumption Rate,Steam Equipment District Heating Consumption Rate
+Steam Equipment Purchased Heating Consumption,Steam Equipment District Heating Consumption
+Zone Steam Equipment Purchased Heating Consumption Rate,Zone Steam Equipment District Heating Consumption Rate
+Zone Steam Equipment Purchased Heating Consumption,Zone Steam Equipment District Heating Consumption
+Purchased Chilled Water Energy,District Chilled Water Energy
+Purchased Chilled Water Rate,District Chilled Water Rate
+Purchased Cooling Rate,District Cooling Rate
+Purchased Cooling Inlet Temp,District Cooling Inlet Temp
+Purchased Cooling Outlet Temp,District Cooling Outlet Temp
+Purchased Cooling Mass Flow Rate,District Cooling Mass Flow Rate
+Purchased Hot Water Energy,District Hot Water Energy
+Purchased Hot Water Rate,District Hot Water Rate
+Purchased Heating Rate,District Heating Rate
+Purchased Heating Inlet Temp,District Heating Inlet Temp
+Purchased Heating Outlet Temp,District Heating Outlet Temp
+Purchased Heating Mass Flow Rate,District Heating Mass Flow Rate
+Purchased Air Heating Energy,Ideal Loads Air Heating Energy
+Purchased Air Heating Rate,Ideal Loads Air Heating Rate
+Purchased Air Sensible Cooling Energy,Ideal Loads Air Sensible Cooling Energy
+Purchased Air Sensible Cooling Rate,Ideal Loads Air Sensible Cooling Rate
+Purchased Air Total Cooling Energy,Ideal Loads Air Total Cooling Energy
+Purchased Air Total Cooling Rate,Ideal Loads Air Total Cooling Rate
+Mech Ventilation - Purchased Energy Increase,Mech Ventilation - Ideal Loads Air Energy Increase
+Mech Ventilation - Purchased Energy Decrease,Mech Ventilation - Ideal Loads Air Energy Decrease
+PurchasedCooling:*,DistrictCooling:
+PurchasedHeating:*,DistrictHeating:
+Heating:PurchasedHeating,Heating:DistrictHeating
+Cooling:PurchasedCooling,Cooling:DistrictCooling
+old variable name,new variable name -- add variable names (before this line) and leave off units -- <DELETE> to delete

@@ -61,16 +61,20 @@ def get_level_zero_comma_locations(line):
 
 
 def get_arguments_based_on_comma_locations(line, comma_locations):
-    arguments = []
-    comma_locations_length = len(comma_locations)
-    for i in range(comma_locations_length + 1):
-        if i == 0:
-            arguments.append(line[0:comma_locations[i]].strip())
-        elif i == comma_locations_length:
-            arguments.append(line[comma_locations[i - 1] + 1:].strip())
-        else:
-            arguments.append(line[comma_locations[i - 1] + 1:comma_locations[i]].strip())
-    return arguments
+    try:
+        arguments = []
+        comma_locations_length = len(comma_locations)
+        for i in range(comma_locations_length + 1):
+            if i == 0:
+                arguments.append(line[0:comma_locations[i]].strip())
+            elif i == comma_locations_length:
+                arguments.append(line[comma_locations[i - 1] + 1:].strip())
+            else:
+                arguments.append(line[comma_locations[i - 1] + 1:comma_locations[i]].strip())
+        return arguments
+    except:
+        print (line)
+        return None
 
 
 def process_variable_name_and_units(argument):
@@ -171,17 +175,24 @@ def main():
                     # parse out data from the variable name first
                     variable_name, variable_units = process_variable_name_and_units(arguments[0])
 
-                    # the second can be taken as-is
-                    actual_variable = arguments[1]
+                    try:
 
-                    # the third should be processed for quotes
-                    index_type_key = arguments[2]
+                        # the second can be taken as-is
+                        actual_variable = arguments[1]
 
-                    # same for the fourth
-                    variable_type_key = arguments[3]
+                        # the third should be processed for quotes
+                        index_type_key = arguments[2]
 
-                    # same for the fifth I guess
-                    keyed_value = arguments[4]
+                        # same for the fourth
+                        variable_type_key = arguments[3]
+
+                        # same for the fifth I guess
+                        keyed_value = arguments[4]
+
+                    except:
+                        
+                        print("Something went wrong processing this variable line:")
+                        print(working_line)
 
                     # add to the array
                     thisOV = OutputVariableCall(file_name, line_number, variable_name, variable_units, actual_variable,

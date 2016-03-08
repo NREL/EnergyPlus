@@ -95,7 +95,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.3;
+  Version,8.5;
 
   Timestep,6;
 
@@ -1798,7 +1798,7 @@
   ZoneHVAC:FourPipeFanCoil,
     Zone1FanCoil,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    MultiStageFan,           !- Capacity Control Method
+    MultiSpeedFan,           !- Capacity Control Method
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     ,                        !- Low Speed Supply Air Flow Ratio
     ,                        !- Medium Speed Supply Air Flow Ratio
@@ -1904,7 +1904,7 @@
   ZoneHVAC:FourPipeFanCoil,
     Zone2FanCoil,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    MultiStageFan,           !- Capacity Control Method
+    MultiSpeedFan,           !- Capacity Control Method
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     ,                        !- Low Speed Supply Air Flow Ratio
     ,                        !- Medium Speed Supply Air Flow Ratio
@@ -2010,7 +2010,7 @@
   ZoneHVAC:FourPipeFanCoil,
     Zone3FanCoil,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    MultiStageFan,           !- Capacity Control Method
+    MultiSpeedFan,           !- Capacity Control Method
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     ,                        !- Low Speed Supply Air Flow Ratio
     ,                        !- Medium Speed Supply Air Flow Ratio
