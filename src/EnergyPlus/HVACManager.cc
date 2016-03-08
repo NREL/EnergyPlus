@@ -1794,7 +1794,7 @@ namespace HVACManager {
 							FlowRatio = Node( SupplyNode ).MassFlowRate / Node( SupplyNode ).MassFlowRateSetPoint;
 							for ( ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesCooled; ++ZonesCooledIndex ) {
 								TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitCoolInletNodes( ZonesCooledIndex );
-								Node( TermInletNode ).MassFlowRateMinAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+								Node( TermInletNode ).MassFlowRateMaxAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
 							}
 						}
 						if ( ( Node( SupplyNode ).MassFlowRateSetPoint - Node( SupplyNode ).MassFlowRate ) < -HVACFlowRateToler * 0.01 ) {
@@ -1811,7 +1811,7 @@ namespace HVACManager {
 								FlowRatio = Node( SupplyNode ).MassFlowRate / Node( SupplyNode ).MassFlowRateSetPoint;
 								for ( ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesCooled; ++ZonesCooledIndex ) {
 									TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitCoolInletNodes( ZonesCooledIndex );
-									Node( TermInletNode ).MassFlowRateMaxAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+									Node( TermInletNode ).MassFlowRateMinAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
 								}
 							}
 						}
@@ -1828,7 +1828,7 @@ namespace HVACManager {
 							FlowRatio = Node( SupplyNode ).MassFlowRate / Node( SupplyNode ).MassFlowRateSetPoint;
 							for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesHeated; ++ZonesHeatedIndex ) {
 								TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitHeatInletNodes( ZonesHeatedIndex );
-								Node( TermInletNode ).MassFlowRateMinAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+								Node( TermInletNode ).MassFlowRateMaxAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
 							}
 						}
 						if ( ( Node( SupplyNode ).MassFlowRateSetPoint - Node( SupplyNode ).MassFlowRate ) < -HVACFlowRateToler * 0.01 ) {
@@ -1845,7 +1845,7 @@ namespace HVACManager {
 								FlowRatio = Node( SupplyNode ).MassFlowRate / Node( SupplyNode ).MassFlowRateSetPoint;
 								for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopIndex ).NumZonesHeated; ++ZonesHeatedIndex ) {
 									TermInletNode = AirToZoneNodeInfo( AirLoopIndex ).TermUnitHeatInletNodes( ZonesHeatedIndex );
-									Node( TermInletNode ).MassFlowRateMaxAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
+									Node( TermInletNode ).MassFlowRateMinAvail = Node( TermInletNode ).MassFlowRate * FlowRatio;
 								}
 							}
 						}

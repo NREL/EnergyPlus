@@ -10752,7 +10752,7 @@ namespace HVACUnitarySystem {
 				// zone equipment needs to set flow since no other device regulates flow (ZoneHVAC /= AirLoopEquipment)
 				if ( !UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
 					Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
-					Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
+//					Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
 				}
 				if ( AverageUnitMassFlow > 0.0 ) {
 					OnOffAirFlowRatio = 1.0;
@@ -10761,7 +10761,7 @@ namespace HVACUnitarySystem {
 				}
 			} else {
 				Node( InletNode ).MassFlowRate = AverageUnitMassFlow;
-				Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
+//				Node( InletNode ).MassFlowRateMaxAvail = AverageUnitMassFlow;
 				if ( AverageUnitMassFlow > 0.0 ) {
 					OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
 				} else {
