@@ -42,3 +42,9 @@ The metering of photovoltaic power production has been changed.  Previously it w
 There is a new sub end use meter type called PowerConversion which ends up on "PowerConversion:ElectricityProduced" and the inverter (and new AC to DC Converter) meter the electric power losses from power conversion on this meter (as negative values). 
 
 The summary table called Electric Loads Satisfied has been revised to include a new row called Power Conversion. The precision of reported values has been increased. This is the sum of power losses from converting between AC and DC or between different voltage AC.  The inverter, converter, and some applications of transformers now meter their losses on PowerConversion:ElectricityProduced and that is what fills this new row.  The old values for "Photovoltaic Power" should match the sum of the new values for "Photovoltaic Power" and "Power Conversion."  This row includes transformer power conversion losses when the transformer is used to export power back to the grid. 
+
+### Outdoor Air Summary tabular report bugfix ###
+Fixed the number of occupants in the Outdoor Air Summary Report for multiplied zones. The values are now consistent with the table footnote: *Values shown for a single zone without multipliers*. [#5216](https://github.com/NREL/EnergyPlus/pull/5216)
+
+### Standard 62.1 Summary System Ventilation Requirements tabular report ### 
+This report is now populated for Sizing:System System Outdoor Air Method = ZoneSum and VentilationRateProcedure. Previously this report was generated with no data (empty cells) for OA method=ZoneSum. [#5216](https://github.com/NREL/EnergyPlus/pull/5216)

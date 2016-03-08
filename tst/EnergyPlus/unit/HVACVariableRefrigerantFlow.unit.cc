@@ -1732,6 +1732,7 @@ namespace EnergyPlus {
 
 		std::string const idf_objects = delimited_string( {
 			"Version,8.3;",
+			" BUILDING, VRFTest_SysCurve_WaterCooled, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
 			" ",
 			"AirConditioner:VariableRefrigerantFlow,",
 			"  VRF Water Cooled HP,     !- Heat Pump Name",
