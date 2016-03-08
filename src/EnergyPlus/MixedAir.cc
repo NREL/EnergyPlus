@@ -3204,6 +3204,9 @@ namespace MixedAir {
 		// without AirloopHVAC objects).
 		if ( InitOAControllerSetUpAirLoopHVACVariables ) {
 			if ( NumPrimaryAirSys > 0 ) {
+				if ( !allocated( AirLoopZoneInfo ) ){
+					AirLoopZoneInfo.allocate( NumPrimaryAirSys );
+				}
 				// Added code to report (TH, 10/20/2008):
 				//   air economizer status (1 = on, 0 = off or does not exist), and
 				//   actual and minimum outside air fraction (0 to 1)
@@ -3280,7 +3283,7 @@ namespace MixedAir {
 					}
 
 					VentMechObjectNum = OAController( OAControllerLoop ).VentMechObjectNum;
-					if ( VentMechObjectNum > 0 ){
+					if ( VentMechObjectNum > 0 && thisAirLoop > 0){
 						if (!VentilationMechanical( VentMechObjectNum ).DCVFlag){
 							AirLoopControlInfo( thisAirLoop ).AirLoopDCVFlag = false;
 						}
@@ -3300,8 +3303,8 @@ namespace MixedAir {
 								ZoneNum = vent_mech.Zone(NumMechVentZone);
 								auto const & zone(Zone(ZoneNum));
 								FoundZone = false;
-								for (AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo(AirLoopNum).NumZones; ++AirLoopZoneInfoZoneNum) {
-									NumZone = AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(AirLoopZoneInfoZoneNum);
+								for (AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo(thisAirLoop).NumZones; ++AirLoopZoneInfoZoneNum) {
+									NumZone = AirLoopZoneInfo( thisAirLoop ).ActualZoneNumber( AirLoopZoneInfoZoneNum );
 									if (ZoneNum == NumZone) {
 										FoundZone = true;
 										++TempMechVentArrayCounter;
@@ -3366,8 +3369,8 @@ namespace MixedAir {
 							}
 
 							// Check to see if any zones on an air loop are not accounted for by a mechanical ventilation object
-							for (AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo(AirLoopNum).NumZones; ++AirLoopZoneInfoZoneNum) {
-								NumZone = AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(AirLoopZoneInfoZoneNum);
+							for ( AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo( thisAirLoop ).NumZones; ++AirLoopZoneInfoZoneNum ) {
+								NumZone = AirLoopZoneInfo( thisAirLoop ).ActualZoneNumber( AirLoopZoneInfoZoneNum );
 								FoundAreaZone = false;
 								FoundPeopleZone = false;
 								for (NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone) {
