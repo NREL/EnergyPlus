@@ -252,6 +252,9 @@ namespace OutputReportTabular {
 	int UnitConvSize( 0 );
 
 	bool WriteTabularFiles( false );
+	bool GetInput( true );
+	bool firstTimeGatherHGReport( true );
+
 
 	// Allow up to five output files to be created
 	int const maxNumStyles( 5 );
@@ -9437,13 +9440,21 @@ namespace OutputReportTabular {
 		static std::string Wm2_unitName;
 
 		//zone summary total
-		static Array1D< Real64 > zstArea( 4, 0.0 );
-		static Array1D< Real64 > zstVolume( 4, 0.0 );
-		static Array1D< Real64 > zstWallArea( 4, 0.0 );
-		static Array1D< Real64 > zstWindowArea( 4, 0.0 );
-		static Array1D< Real64 > zstLight( 4, 0.0 );
-		static Array1D< Real64 > zstPeople( 4, 0.0 );
-		static Array1D< Real64 > zstPlug( 4, 0.0 );
+		static Array1D< Real64 > zstArea( 4 );
+		static Array1D< Real64 > zstVolume( 4 );
+		static Array1D< Real64 > zstWallArea( 4 );
+		static Array1D< Real64 > zstWindowArea( 4 );
+		static Array1D< Real64 > zstLight( 4 );
+		static Array1D< Real64 > zstPeople( 4 );
+		static Array1D< Real64 > zstPlug( 4 );
+
+		zstArea = 0.0;
+		zstVolume = 0.0;
+		zstWallArea = 0.0;
+		zstWindowArea = 0.0;
+		zstLight = 0.0;
+		zstPeople  = 0.0;
+		zstPlug = 0.0;
 
 		// misc
 		Real64 pdiff;
