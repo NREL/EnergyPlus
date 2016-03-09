@@ -3,7 +3,10 @@
 The transient air mass balance equation for the change in zone air carbon dioxide concentration may be expressed as follows:
 
 \begin{equation}
-{\rho_{air}}{V_z}{C_{CO2}}\frac{{dC_z^t}}{{dt}} = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{1.0}^6}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{zi}} - C_z^t} \right)\; + {\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right) + {\dot m_{sys}}\left( {{C_{\sup }} - C_z^t} \right)
+\begin{array}{l}
+{\rho_{air}}{V_z}{C_{CO2}}\frac{{dC_z^t}}{{dt}} = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}*{{1.0}^6}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{zi}} - C_z^t} \right)\; + {\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right) \\
+\quad \quad \quad \quad + {\dot m_{sys}}\left( {{C_{\sup }} - C_z^t} \right)
+\end{array}
 \end{equation}
 
 where:
@@ -45,8 +48,10 @@ In order to calculate the derivative term with respect to time, the first order 
 The zone air carbon dioxide concentration update at the current time step using the EulerMethod may be expressed as follows:
 
 \begin{equation}
+\begin{array}{l}
 {\rho_{air}}{V_Z}{C_{CO2}}{\left( {\delta t} \right)^{ - 1}}\left( {C_z^t - C_z^{t - \delta t}} \right) = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} *{10^6} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{zi}} - C_z^t} \right) \\
 \quad \quad \quad \quad + {\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right) + {\dot m_{sys}}\left( {{C_{\sup }} - C_z^t} \right)
+\end{array}
 \end{equation}
 
 To preserve the stability of the calculation of the zone carbon dioxide concentration, the third order differential approximation, derived by a Taylor Series and used in the calculation of the next time step's zone air temperature, is also applied to the zone air carbon dioxide calculations. This algorithm is the default choice and is defined as ThirdOrderBackwardDifference in the ZoneAirHeatBalanceAlgorithm object.

@@ -13,7 +13,7 @@ A qualitative comparison between the performance of Transparent Insulation and o
 \begin{figure}[hbtp] % fig 26
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image399.png}
-\caption{  Energy Flows of Opaquely and Transparently Insulated Walls (Wood and Jesch 1993). \protect \label{fig:energy-flows-of-opaquely-and-transparently}}
+\caption{  Energy Flows of Opaquely and Transparently Insulated Walls (Wood and Jesch 1993). \protect \label{fig:energy-flows-of-opaquely-and-transparently}}
 \end{figure}
 
 While both types of insulation reduce energy losses from the building via conduction through the building surfaces, transparent insulation allows solar radiation to penetrate deeper into the surface construction.~ This increases the construction internal temperature and can result in heat being conducted into the building under the proper weather conditions.~ This can be seen in the lower half of the above figure during a sunny day.~ The temperature plot shows a maximum between the transparent insulation and the rest of the surface construction.~ As a result, the temperature gradient results in heat transfer from this point into the interior space, causing a heating effect on the zone.~ Thus, the advantage of transparent insulation is that, like opaque insulation, it reduces winter heat transfer losses during low or no solar conditions and has the possibility of providing heating during sunny winter days.~ It should be noted that this same effect in summer could be detrimental to the cooling loads of a building since the introduction of solar radiation closer to the space will increase the solar heating within the zone.~ Most systems counteract this with a shading device or with sophisticated transparent insulation systems.
@@ -35,7 +35,7 @@ Cross-sections of each of these types is shown in the figure below.~ The arrows 
 \begin{figure}[hbtp] % fig 27
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image400.png}
-\caption{  Geometrical Categories of Classification for Transparent Insulation Material (Wood and Jesch 1993). \protect \label{fig:geometrical-categories-of-classification-for}}
+\caption{  Geometrical Categories of Classification for Transparent Insulation Material (Wood and Jesch 1993). \protect \label{fig:geometrical-categories-of-classification-for}}
 \end{figure}
 
 \subsection{TIM- Basic Mathematical Model}\label{tim--basic-mathematical-model}
@@ -43,7 +43,7 @@ Cross-sections of each of these types is shown in the figure below.~ The arrows 
 \begin{figure}[hbtp] % fig 28
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image401.png}
-\caption{  Cross Section of TIM and wall, showing energy flow \protect \label{fig:cross-section-of-tim-and-wall-showing-energy}}
+\caption{  Cross Section of TIM and wall, showing energy flow \protect \label{fig:cross-section-of-tim-and-wall-showing-energy}}
 \end{figure}
 
 Mathematical model to calculate amount of energy absorbed at the surface of moveable insulation (TIM) and at the Outside surface of the Wall.
@@ -58,23 +58,23 @@ The total solar gain on any exterior surface is a combination of the absorption 
 
 Where,
 
-a\(_{ }\) = solar absorptance of the surface
+a\(_{ }\) = solar absorptance of the surface
 
 \(\theta\) ~~ = angle of incidence of the sun's rays
 
-S\(_{ }\) = area of the surface
+S\(_{ }\) = area of the surface
 
-S\(_{ }\) = sunlit area of the surface
+S\(_{ }\) = sunlit area of the surface
 
-I\(_{ }\) = intensity of the beam (direct) radiation
+I\(_{ }\) = intensity of the beam (direct) radiation
 
-I\(_{ }\) = intensity of the sky diffuse radiation
+I\(_{ }\) = intensity of the sky diffuse radiation
 
-I\(_{ }\) = intensity of the beam (direct) radiation
+I\(_{ }\) = intensity of the beam (direct) radiation
 
-F\(_{ }\) = angle factor between the surface and the sky
+F\(_{ }\) = angle factor between the surface and the sky
 
-F\(_{ }\) = angle factor between the surface and the ground
+F\(_{ }\) = angle factor between the surface and the ground
 
 Now,
 
@@ -118,16 +118,17 @@ Where,
 
 \emph{QSO}~~~~~~~~~~ = Short wave radiant flux absorbed at surface of Wall.
 
-a\(_{ }\) = Absorptance of TIM
+a\(_{ }\) = Absorptance of TIM
 
-t\(_{ }\) = Transmittance of TIM.
+t\(_{ }\) = Transmittance of TIM.
 
-a\(_{ }\) = Absorptance of Wall.
+a\(_{ }\) = Absorptance of Wall.
 
-r \(_{ }\) = Reflectance of Wall surface
+r \(_{ }\) = Reflectance of Wall surface
 
 Following is the FORTRAN Code used in the HeatBalanceSurfaceManager module, to determine the short wave radiation absorbed on outside of movable insulation and the short wave radiation absorbed on outside of opaque surface of the wall.
 
+\begin{lstlisting}
 IF (Surface(SurfNum)\%MaterialMovInsulExt.GT.0)~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~\&
 
 ~~~ CALL EvalOutsideMovableInsulation(SurfNum,HMovInsul,RoughIndexMovInsul,AbsExt)
@@ -147,6 +148,7 @@ IF (Surface(SurfNum)\%MaterialMovInsulExt.GT.0)~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~ (~ (Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar/AbsExt)~~ \&
 
 ~~~~~~~~~~~~~~~~~~~~~~~ +(1-Material(Construct(ConstrNum)\%LayerPoint(1))\%AbsorpSolar)~ )
+\end{lstlisting}
 
 \subsection{Sample Test Run Cases: -- Comparison}\label{sample-test-run-cases-comparison}
 

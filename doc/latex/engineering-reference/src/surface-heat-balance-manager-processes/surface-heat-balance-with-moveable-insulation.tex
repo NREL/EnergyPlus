@@ -175,22 +175,14 @@ From Equation
 
 \begin{lstlisting}
 ! Outside heat balance case: Movable insulation, slow conduction, simple convection
-
-~F2 = DBLE(HmovInsul) / ( DBLE(HmovInsul) + DBLE(HExtSurf(SurfNum)) )
-
-~TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)~ \&
-
-~~~~~~~~~~~~~~~~~~~ +DBLE(QRadSWOutAbs(SurfNum) )~ \&
-
-~~~~~~~~~~ +Construct(ConstrNum)\%CTFCross(0)*TempSurfIn(SurfNum)~ \&
-
-~~~~~~~~~~ +F2* ( DBLE(QRadSWOutMvIns(SurfNum))~~~~~~~~~~~~~~~~~~ \&
-
-~~~~~~~~~~ + DBLE(HExtSurf(SurfNum))* DBLE(TempExt) )~~ )~~~~~~~~ \&
-
-~~~~~~~~~~ /( Construct(ConstrNum)\%CTFOutside(0) + DBLE(HmovInsul) \&
-
-~~~~~~~~~ - F2* DBLE(HMovInsul))
+ F2 = DBLE(HmovInsul) / ( DBLE(HmovInsul) + DBLE(HExtSurf(SurfNum)) )
+ TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                       &
+                    +DBLE(QRadSWOutAbs(SurfNum) )                   &
+           +Construct(ConstrNum)\%CTFCross(0)*TempSurfIn(SurfNum)   &
+           +F2* ( DBLE(QRadSWOutMvIns(SurfNum))                     &
+           + DBLE(HExtSurf(SurfNum))* DBLE(TempExt) ) )             &
+           /( Construct(ConstrNum)\%CTFOutside(0) + DBLE(HmovInsul) &
+          - F2* DBLE(HMovInsul))
 \end{lstlisting}
 
 \subsubsection{\texorpdfstring{Case6: Y\(_{0}\) not small, simple conductance, with movable insulation:}{Case6: Y\_\{0\} not small, simple conductance, with movable insulation:}}\label{case6-yux5f0-not-small-simple-conductance-with-movable-insulation-1}
@@ -200,16 +192,16 @@ From Equation
 \begin{lstlisting}
 ! Outside heat balance case: Movable insulation, quick conduction, simple convection
 F2 = DBLE(HmovInsul) / ( DBLE(HmovInsul) + DBLE(HExtSurf(SurfNum)) )
-TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)~~~~~~~~~~~~ \&
-DBLE(QRadSWOutAbs(SurfNum))~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+F2*( DBLE(QRadSWOutMvIns(SurfNum))~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(HExtSurf(SurfNum))* DBLE(TempExt)~ )~~~~~~~~~~~~~~ \&
-+F1*( CTFConstInPart(SurfNum)~~~~~~~~~~~~~~~~~~~~ ~~~~~~~\&
-+DBLE(QRadSWInAbs(SurfNum))~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(QRadThermInAbs(SurfNum))~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(HConvIn(SurfNum))*MAT(ZoneNum)~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(NetLWRadToSurf(SurfNum))~ ) )~~~~~~~~~~~~~~~~~~~~ \&
-/( Construct(ConstrNum)\%CTFOutside(0) + DBLE(HmovInsul)~ \&
+TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)              &
+DBLE(QRadSWOutAbs(SurfNum))                               &
++F2*( DBLE(QRadSWOutMvIns(SurfNum))                       &
++DBLE(HExtSurf(SurfNum))* DBLE(TempExt) )                 &
++F1*( CTFConstInPart(SurfNum)                             &
++ DBLE(QRadSWInAbs(SurfNum))                              &
++ DBLE(QRadThermInAbs(SurfNum))                           &
++ DBLE(HConvIn(SurfNum))*MAT(ZoneNum)                     &
++ DBLE(NetLWRadToSurf(SurfNum)) ) )                       &
+/( Construct(ConstrNum)\%CTFOutside(0) + DBLE(HmovInsul)  &
 -F2* DBLE(HMovInsul )- F1*Construct(ConstrNum)\%CTFCross(0) )
 \end{lstlisting}
 
@@ -219,16 +211,16 @@ From Equation
 
 \begin{lstlisting}
 ! Outside heat balance case: Movable insulation, slow conduction, detailed convection
-F2 = DBLE(HMovInsul)/ ( DBLE(HMovInsul) + DBLE(HExtSurf(SurfNum)) \&
-~~~~~~~~~~ +DBLE(HSky) + DBLE(HGround) )
-TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(QRadSWOutAbs(SurfNum))~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+Construct(ConstrNum)\%CTFCross(0)*TempSurfIn(SurfNum)~~~~~~~~~~~~ \&
-+F2*( DBLE(QRadSWOutMvIns(SurfNum))~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(HExtSurf(SurfNum))*DBLE(TempExt)~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(HSky)*DBLE(SkyTemp)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(HGround)*DBLE(OutDryBulbTemp) ) )~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-/( Construct(ConstrNum)\%CTFOutside(0)~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
+F2 = DBLE(HMovInsul)/ ( DBLE(HMovInsul) + DBLE(HExtSurf(SurfNum))  &
+           +DBLE(HSky) + DBLE(HGround) )
+TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                       &
++DBLE(QRadSWOutAbs(SurfNum))                                       &
++Construct(ConstrNum)\%CTFCross(0)*TempSurfIn(SurfNum)             &
++F2*( DBLE(QRadSWOutMvIns(SurfNum))                                &
++DBLE(HExtSurf(SurfNum))*DBLE(TempExt)                             &
++DBLE(HSky)*DBLE(SkyTemp)                                          &
++DBLE(HGround)*DBLE(OutDryBulbTemp) ) )                            &
+/( Construct(ConstrNum)\%CTFOutside(0)                             &
 +DBLE(HMovInsul) - F2*DBLE(HMovInsul) )
 \end{lstlisting}
 
@@ -238,22 +230,22 @@ From Equation
 
 \begin{lstlisting}
 ! Outside heat balance case: Movable insulation, quick conduction, detailed convection
-F2 = DBLE(HMovInsul)/ ( DBLE(HMovInsul) + DBLE(HExtSurf(SurfNum)) \&
-~~~~~~~~~~ +DBLE(HSky) + DBLE(HGround) )
-TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(QRadSWOutAbs(SurfNum)) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\&
-+F1*( CTFConstInPart(SurfNum)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(QRadSWInAbs(SurfNum))~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(QRadThermInAbs(SurfNum))~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(HConvIn(SurfNum))*MAT(ZoneNum)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(NetLWRadToSurf(SurfNum)) )~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+F2*( DBLE(QRadSWOutMvIns(SurfNum))~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(HExtSurf(SurfNum))*DBLE(TempExt)~~~~~~~~~~~~~~~~~~~~ ~~~~~~~\&
-+DBLE(HSky)*DBLE(SkyTemp)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(HGround)*DBLE(OutDryBulbTemp) )~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-/( Construct(ConstrNum)\%CTFOutside(0)~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \&
-+DBLE(HMovInsul) - F2*DBLE(HMovInsul)~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~\&
--F1*Construct(ConstrNum)\%CTFCross(0)~~ )
+F2 = DBLE(HMovInsul)/ ( DBLE(HMovInsul) + DBLE(HExtSurf(SurfNum)) &
+           +DBLE(HSky) + DBLE(HGround) )
+TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                      &
++DBLE(QRadSWOutAbs(SurfNum))                                      &
++F1*( CTFConstInPart(SurfNum)                                     &
++DBLE(QRadSWInAbs(SurfNum))                                       &
++DBLE(QRadThermInAbs(SurfNum))                                    &
++DBLE(HConvIn(SurfNum))*MAT(ZoneNum)                              &
++DBLE(NetLWRadToSurf(SurfNum)) )                                  &
++F2*( DBLE(QRadSWOutMvIns(SurfNum))                               &
++DBLE(HExtSurf(SurfNum))*DBLE(TempExt)                            &
++DBLE(HSky)*DBLE(SkyTemp)                                         &
++DBLE(HGround)*DBLE(OutDryBulbTemp) )                             &
+/( Construct(ConstrNum)\%CTFOutside(0)                            &
++DBLE(HMovInsul) - F2*DBLE(HMovInsul)                             &
+-F1*Construct(ConstrNum)\%CTFCross(0) )
 \end{lstlisting}
 
 \subsection{Fortran Variable Descriptions}\label{fortran-variable-descriptions}
