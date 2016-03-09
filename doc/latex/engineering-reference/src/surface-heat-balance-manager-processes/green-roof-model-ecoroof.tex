@@ -41,7 +41,7 @@ As with a traditional roof, the energy balance of an green roof is dominated by 
 \begin{figure}[hbtp] % fig 35
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image509.png}
-\caption{  The Energy Balance for a Green Roof. \protect \label{fig:the-energy-balance-for-a-green-roof.}}
+\caption{  The Energy Balance for a Green Roof. \protect \label{fig:the-energy-balance-for-a-green-roof.}}
 \end{figure}
 
 The energy budget analysis follows the Fast All Season Soil Strength (FASST) model developed by Frankenstein and Koenig for the US Army Corps of Engineers. FASST was developed, in part, to determine the ability of soils to support manned and unmanned vehicles and personnel movement. In order to accomplish this, however, FASST tracks the energy and moisture balance (including ice and snow) within a vegetated soil. It is a one-dimensional model that draws heavily from other plant canopy models including BATS (Dickinson et al.) and SiB (Sellers et al.). We have implemented FASST here with only a few modifications to adapt it for use with a relatively thin soil layer. The sign convention used assumes all heat fluxes are positive when energy is absorbed into the layer.
@@ -253,7 +253,7 @@ where \(C_{en}^g\) is the near ground bulk transfer coefficient for Latent heat 
 
 \subsection{Linearization}\label{linearization}
 
-In order to solve the foliage and soil heat budget equations, the 4\(^{h}\) \(^{ }\)order terms T\(_{f}\)\(^{4}\) and T\(_{g}\)\(^{4}\) ~and mixing ratio terms q\(_{t}\) and q\(_{t}\) \(_{ }\)are linearized as given by Deardorff:
+In order to solve the foliage and soil heat budget equations, the 4\(^{h}\) \(^{ }\)order terms T\(_{f}\)\(^{4}\) and T\(_{g}\)\(^{4}\) ~and mixing ratio terms q\(_{t}\) and q\(_{t}\) \(_{ }\)are linearized as given by Deardorff:
 
 \begin{equation}
 {\left[ {T_f^{\left( {n + 1} \right)}} \right]^4} = {\left[ {T_f^n} \right]^4} + 4{\left[ {T_f^n} \right]^3}\left[ {T_f^{n + 1} - T_f^n} \right]
@@ -391,9 +391,9 @@ R\(_{b}\)~~~~~~~~~~~~~ = ~~~~~~~~~ bulk Richardson number
 
 R\(_{v}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ gas constant for water vapor (461.53 J/kgK)
 
-\emph{T\(_{ }\)} = ~~~~~~~~~ the air temperature at the instrument height (Kelvin)
+\emph{T\(_{ }\)} = ~~~~~~~~~ the air temperature at the instrument height (Kelvin)
 
-T\(_{ }\) ~ ~~~~~~~~~ = ~~~~~~~~~ air temperature with in the canopy (Kelvin)
+T\(_{ }\) ~ ~~~~~~~~~ = ~~~~~~~~~ air temperature with in the canopy (Kelvin)
 
 T\emph{\(_{f}\)}~~ ~~~~~~~~~~~ = ~~~~~~~~~ leaf temperature (Kelvin)
 
@@ -413,19 +413,25 @@ Z\(_{o}\)\(^{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ foliage roughness length scale (m)
 
 \subsubsection{Greek letters}\label{greek-letters-000}
 
-a\(_{f}\)~~~ ~~~~~~~~~~~ = ~~~~~~~~~ albedo (short wave reflectivity) of the canopy
+~~~~~\alpha\(_{f}\)~~~ ~~~~~~~~~~~ = ~~~~~~~~~ albedo (short wave reflectivity) of the canopy
 
-a\(_{g}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ albedo (short wave reflectivity) of ground surface \(_{}\)~~~~~~~~~~~~~ = ~~~~~~~~~ \(_{}\) \(_{ }\) ~~~~~~~~~~~ = ~~~~~~~~~ emissivity of canopy \(_{ }\) ~~~~~~~~~~~ = ~~~~~~~~~ emissivity of the ground surface
+\alpha\(_{g}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ albedo (short wave reflectivity) of ground surface
 
-G\(_{h}\)~~~~~~~~~~~~~~~~~~~ = ~~~~~~~~~~~~~stability factor
+\varepsilon\(_{1}\)~~~~~~~~~~~~~ = ~~~~~~~~~ \varepsilon\(_{g}\) + \varepsilon\(_{f}\)  - \varepsilon\(_{f}\)\varepsilon\(_{g}\)
 
-r\(_{a}\)~ ~~~~~~~~~~~~ = ~~~~~~~~ density of air at instrument height (kg/m\(^{3}\))
+\varepsilon\(_{f}\) ~~~~~~~~~~~ = ~~~~~~~~~ emissivity of canopy 
 
-r\(_{f}\)~ ~~~~~~~~~~~~~ = ~~~~~~~~ density of air at foliage temperature (kg/m\(^{3}\))
+\varepsilon\(_{g}\) ~~~~~~~~~~~ = ~~~~~~~~~ emissivity of the ground surface
 
-r\(_{f}\)~ ~~~~~~~~~~~~ = ~~~~~~~~ density of air at foliage temperature (kg/m\(^{3}\))
+\Gamma\(_{h}\)~~~~~~~~~~~~~~~~~~~ = ~~~~~~~~~~~~~stability factor
 
-r\(_{g}\)~~~~~~~~~~~~~ = ~~~~~~~~ density of air at ground surface temperature (kg/m\(^{3}\))
+\rho\(_{a}\)~ ~~~~~~~~~~~~ = ~~~~~~~~ density of air at instrument height (kg/m\(^{3}\))
+
+\rho\(_{f}\)~ ~~~~~~~~~~~~~ = ~~~~~~~~ density of air at foliage temperature (kg/m\(^{3}\))
+
+\rho\(_{f}\)~ ~~~~~~~~~~~~ = ~~~~~~~~ density of air at foliage temperature (kg/m\(^{3}\))
+
+\rho\(_{g}\)~~~~~~~~~~~~~ = ~~~~~~~~ density of air at ground surface temperature (kg/m\(^{3}\))
 
 \(\sigma\) ~ ~~~~~~~~~~~ = ~~~~~~~~~ the Stefan-Boltzmann constant (5.699*10\(^{8}\) W/m\(^{2}\) ºK\(^{4}\))
 
@@ -433,7 +439,7 @@ r\(_{g}\)~~~~~~~~~~~~~ = ~~~~~~~~ density of air at ground surface temperature (
 
 \subsubsection{Subscripts and superscripts}\label{subscripts-and-superscripts-000}
 
-a~~~~~~~~~~~~~~~ = ~~~~~~~~~ air
+~~~~~a~~~~~~~~~~~~~~~ = ~~~~~~~~~ air
 
 af~~~~~~~~~~~~~~ = ~~~~~~~~~ air within the foliage layer
 

@@ -111,6 +111,11 @@ k\(_{1}\) is the change in conductivity per degree temperature difference from 2
 As of Version 7, the CondFD implementation was changed to evaluate the thermal conductivity at the interface between nodes, as shown below. In this case, EnergyPlus uses a linear interpolation between nodal points.
 
 \begin{equation}
+\medmuskip=0mu
+\thinmuskip=0mu
+\thickmuskip=0mu
+\nulldelimiterspace=0pt
+\scriptspace=0pt
 {C_p}\rho {\rm{\Delta x}}\frac{{T_i^{j + 1} - T_i^j}}{{{\rm{\Delta }}t}} = \frac{1}{2}\left[ {\left( {{k_W}\frac{{\left( {T_{i + 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}} + {k_E}\frac{{\left( {T_{i - 1}^{j + 1} - T_i^{j + 1}} \right)}}{{{\rm{\Delta x}}}}} \right) + \left( {{k_W}\frac{{\left( {T_{i + 1}^j - T_i^j} \right)}}{{{\rm{\Delta x}}}} + {k_E}\frac{{\left( {T_{i - 1}^j - T_i^j} \right)}}{{{\rm{\Delta x}}}}} \right)} \right]
 \end{equation}
 
@@ -167,7 +172,8 @@ After the CondFD node temperatures have been solved for a given timestep, the he
 for the remaining nodes
 
 \begin{equation}
-{QDreport_{i} = QDreport_{i+1}+HeatCap1_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old}\right)}{\Delta t}-QSource_{i}+HeatCap2_{i}* \frac{\left(T_{i,new}-T_{i,old}\right)}{\Delta t}}
+{QDreport_{i} = QDreport_{i+1}+HeatCap1_{i+1}* \frac{\left(T_{i+1,new}-T_{i+1,old}\right)}{\Delta t}-QSource_{i}+HeatCap2_{i} \\
+\quad \quad \quad \quad * \frac{\left(T_{i,new}-T_{i,old}\right)}{\Delta t}}
 \end{equation}
 
 Where:
