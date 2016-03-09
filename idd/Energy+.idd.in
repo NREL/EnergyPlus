@@ -296,6 +296,7 @@
 !      s/m                    =>   s/ft                0.3048
 !      V/K                    =>   V/F                 0.555555555555556
 !      W                      =>   Btu/h               3.4121412858518
+!      W/((m3/s)-Pa)          =>   W/((gal/min)-ftH20) 0.188582274697355
 !      W/(m3/s)               =>   W/(ft3/min)         0.0004719475
 !      W/K                    =>   Btu/h-F             1.89563404769544
 !      W/m                    =>   Btu/h-ft            1.04072
@@ -312,24 +313,30 @@
 !
 !      kPa                    =>   inHg                0.29523
 !      m                      =>   in                  39.3700787401575
+!      m3/hr                  =>   gal/hr              264.172037284185
+!      m3/hr-m2               =>   gal/hr-ft2          24.5423853466941
+!      m3/hr-person           =>   gal/hr-person       264.172037284185
+!      m3/m2                  =>   gal/ft2             24.5423853466941
+!      m3/person              =>   gal/person          264.172037284185
 !      m3/s                   =>   gal/min             15850.3222370511
+!      m3/s-m                 =>   gal/min-ft          4831.17821785317
+!      m3/s-W                 =>   (gal/min)/(Btu/h)   4645.27137336702
 !      Pa                     =>   ftH2O               0.00033455
 !      Pa                     =>   inH2O               0.00401463
 !      Pa                     =>   inHg                0.00029613
 !      Pa                     =>   Pa                  1
 !      W                      =>   W                   1
+!      W/(m3/s)               =>   W/(gal/min)         0.0000630902
 !      W/m2                   =>   W/m2                1
 !      W/m-K                  =>   Btu/h-ft-F          0.577796066000163
 !      W/person               =>   W/person            1
-!      W/(m3/s)               =>   W/(gal/min)         0.0000630902
-!      W/((m3/s)-Pa)          =>   W/((gal/min)-ftH20) 0.188554
 !
 ! Units fields that are not translated
 !      $
 !      1/hr
 !      A
+!      A/V                 
 !      Ah
-!      A/V
 !      Availability
 !      Control
 !      cycles/hr
@@ -671,8 +678,8 @@ ZoneAirMassFlowConservation,
        \memo infiltration object mass flow rates.
        \memo If either mixing or infiltration is active, then the zone air mass flow
        \memo balance calculation will attempt to enforce conservation of mass for each zone.
-       \note If mixing is "No" and infiltration is "None", then the zone air mass flow
-       \note calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
+       \memo If mixing is "No" and infiltration is "None", then the zone air mass flow
+       \memo calculation defaults to assume self-balanced simple flow mixing and infiltration objects.
        \unique-object
        \min-fields 3
   A1,  \field Adjust Zone Mixing For Zone Air Mass Flow Balance
@@ -51185,13 +51192,22 @@ Dehumidifier:Desiccant:System,
        \key Coil:Heating:Gas
        \key Coil:Heating:Water
        \key Coil:Heating:Steam
-       \note works with gas, electric, hot water and steam heating coils
+       \note works with gas, electric, hot water and steam heating coils.
+       \note For autosizing the regeneration air heating coil the 
+       \note Design Coil Inlet Air Condition used is the outdoor air condition
+       \note if the desiccant system is on the primary air loop, or else if the  
+       \note desiccant system is on outdoor air system then it is the return air
+       \note condition. The Design Coil Outlet Air Temperature is the Regeneration
+       \note Inlet Air Setpoint Temperature specified in the input field below.   
   A10, \field Regeneration Air Heater Name
        \type object-list
        \object-list HeatingCoilName
   N1,  \field Regeneration Inlet Air Setpoint Temperature
        \type real
        \units C
+       \default 46.0
+       \note This value is also used as regeneration air heater design coil air
+       \note outlet temperature for autosizing calculation of the heater.
   A11, \field Companion Cooling Coil Object Type
        \type choice
        \key Coil:Cooling:DX:SingleSpeed
@@ -63497,7 +63513,7 @@ CoolingTower:VariableSpeed:Merkel,
   N6 , \field Design Water Flow Rate per Unit of Nominal Capacity
        \note This field is only used if the previous is set to autocalculate and performance input method is NominalCapacity
        \units m3/s-W
-       \ip-units gal/min-W
+       \ip-units (gal/min)/(Btu/h)
        \default 5.382E-8
        \type real
   N7 , \field Design Air Flow Rate
@@ -66430,8 +66446,8 @@ WaterHeater:Sizing,
        \minimum 1
   N6 , \field Storage Capacity per Person
        \type real
-       \units m3/Person
-       \ip-units gal/Person
+       \units m3/person
+       \ip-units gal/person
        \note Only used for Design Mode = PerPerson
        \minimum 0.0
   N7 , \field Recovery Capacity per Person
@@ -78333,7 +78349,7 @@ ElectricLoadCenter:Distribution,
        \note Modifies the target utility service demand power over time.
        \note Schedule values should be fractions from -1.0 to 1.0, inclusive.
        \note if omitted a schedule value of 1.0 is used. Negative values indicate export to grid
-       \not Schedule is used if Storage Operation Scheme is set to FacilityDemandLeveling.
+       \note Schedule is used if Storage Operation Scheme is set to FacilityDemandLeveling.
        \type object-list
        \object-list ScheduleNames
 
