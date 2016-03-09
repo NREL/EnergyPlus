@@ -7,4 +7,6 @@ Floor Interface Temperature,GroundDomain Basement Floor Interface Temperature
 Zone Coupled Surface Heat Flux,GroundDomain Slab Zone Coupled Surface Heat Flux
 Zone Coupled Surface Temperature,GroundDomain Slab Zone Coupled Surface Temperature
 Availability Manager Optimum Start Hours Before Occupancy,Availability Manager Optimum Start Time Before Occupancy,
+Electric Storage Charge State, Electric Storage Simple Charge State
+Electric Storage Charge State, Electric Storage Battery Charge Sate
 old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete

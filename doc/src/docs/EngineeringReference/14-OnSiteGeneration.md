@@ -1,10 +1,16 @@
 On-Site Generation
 ==================
 
+This section discusses on-site generation, electric storage, and power conversion models related to serving the facility with electric power.  
+
+
 Electric Load Center Distribution Manager
 -----------------------------------------
 
 ### Overview
+
+
+
 
 The electric load center distribution manager (object name: ElectricLoadCenter:Distribution) operates on-site generators specified in the simulation and reports the amount of generated and purchased electricity. Electric load centers really serve as a “load” to the generators and “supply” power to the rest of the building. The internal meters used by EnergyPlus for reporting do all of the demand tracking. For more details on the individual inputs required see the Input Output Reference document.
 
@@ -804,7 +810,7 @@ Table 91. Nomenclature for Sandia PV model
 <td>Cell temperature inside module (°C)</td>
 </tr>
 <tr>
-<td>δ(T<sub>c</sub>)</td>
+<td>&sigma;(T<sub>c</sub>)</td>
 <td>‘Thermal voltage’ per cell at temperature T<sub>c</sub>, approximately 1 volt for a typical 26-cell crystalline silicon module</td>
 </tr>
 <tr>
@@ -892,35 +898,35 @@ Table 91. Nomenclature for Sandia PV model
 <td>Current at V = 0.5 (Vmp + Voc) and at reference conditions</td>
 </tr>
 <tr>
-<td>α<sub>Isc</sub></td>
+<td>&alpha;<sub>Isc</sub></td>
 <td>Normalized temperature coefficient for I<sub>sc</sub> (1/°C)</td>
 </tr>
 <tr>
-<td>α<sub>Imp</sub></td>
+<td>&alpha;<sub>Imp</sub></td>
 <td>Normalized temperature coefficient for I<sub>mp</sub> (1/°C)</td>
 </tr>
 <tr>
-<td>β<sub>Voc</sub>(E<sub>e</sub>)</td>
+<td>&beta;<sub>Voc</sub>(E<sub>e</sub>)</td>
 <td>Temperature coefficient for module open-circuit-voltage as function of E<sub>e</sub></td>
 </tr>
 <tr>
-<td>β<sub>Voco</sub></td>
+<td>&beta;<sub>Voco</sub></td>
 <td>Temperature coefficient for module open-circuit-voltage at reference conditions</td>
 </tr>
 <tr>
-<td>m<sub>βVoco</sub></td>
+<td>m<sub>&beta;Voco</sub></td>
 <td>Coefficient for irradiance dependence of open-circuit-voltage-temperature coefficient, often zero (V/°C)</td>
 </tr>
 <tr>
-<td>β<sub>Vmp</sub>(E<sub>e</sub>)</td>
+<td>&beta;<sub>Vmp</sub>(E<sub>e</sub>)</td>
 <td>Temperature coefficient for module maximum-power-voltage as a function of E<sub>e</sub></td>
 </tr>
 <tr>
-<td>β<sub>Vmpo</sub></td>
+<td>&beta;<sub>Vmpo</sub></td>
 <td>Temperature coefficient for module maximum-power-voltage at reference conditions</td>
 </tr>
 <tr>
-<td>m<sub>βVmpo</sub></td>
+<td>m<sub>&beta;Vmpo</sub></td>
 <td>Cofficient for irradiance dependence of maximum-power-voltage-temperature coefficient, often zero (V/°C)</td>
 </tr>
 <tr>
@@ -956,7 +962,7 @@ Table 91. Nomenclature for Sandia PV model
 <td>Reference solar irradiance (1000 W/m<sup>2</sup>)</td>
 </tr>
 <tr>
-<td>ΔT</td>
+<td>&delta;T</td>
 <td>Temperature difference between T<sub>c</sub> and T<sub>m</sub>at E<sub>o</sub>(°C),
 (This is d(Tc) in Sandia database)</td>
 </tr>
@@ -1508,13 +1514,13 @@ The Micro CHP model has a number of different operating modes.  The operating m
 </tr>
 <tr>
 <td>Stand By</td>
-<td>Availability schedule value ≠ 0</td>
+<td>Availability schedule value &neq; 0</td>
 <td>Consumes stand by power but no fuel</td>
 </tr>
 <tr>
 <td>Warm Up</td>
 <td>Load (thermal or electric) &gt; 0.0
-Availability schedule value ≠ 0
+Availability schedule value &neq; 0
 Time Delay &lt; elapsed time since entering warm up mode
 Engine temp &lt; nominal engine temp</td>
 <td>Two alternate sub-modes:  Stirling Engines use warm up by “nominal engine temperature” while Internal Combustion Engines use “time delay”
@@ -1522,14 +1528,14 @@ Fuel is consumed but no power is produced</td>
 </tr>
 <tr>
 <td>Normal Operation</td>
-<td>Load (thermal or electric) &gt; 0.0 Availability schedule value ≠ 0 Time Delay &gt; elapsed time since entering warm up mode
+<td>Load (thermal or electric) &gt; 0.0 Availability schedule value &neq; 0 Time Delay &gt; elapsed time since entering warm up mode
 Engine temp &gt;= nominal temp</td>
 <td>Fuel is consumed and power is produced</td>
 </tr>
 <tr>
 <td>Cool Down</td>
 <td>Load (thermal or electric) = 0.0
-Availability schedule value ≠ 0</td>
+Availability schedule value &neq; 0</td>
 <td>Two alternate sub-modes where engine can be forced to go thru a complete cool down cycle before allowed to go back into warm up or normal mode.
 No fuel is consumed and no power is produced.</td>
 </tr>
@@ -1953,7 +1959,7 @@ The chordal velocity (*V<sub>c</sub>*), normal velocity (*V<sub>n</sub>*), and r
 
 <div>$$W = \sqrt {V_c^2 + V_n^2} $$</div>
 
-The expression for the non-dimensional angle of attack (*α*) with no consideration of blade pitch is:
+The expression for the non-dimensional angle of attack (*&alpha;*) with no consideration of blade pitch is:
 
 <div>$$\alpha  = {\tan ^{ - 1}}\left[ {\frac{{\sin \theta }}{{{{(\omega R} \mathord{\left/ {\vphantom {{(\omega R} {{V_{Local}})/({{{V_a}} \mathord{\left/ {\vphantom {{{V_a}} {{V_{Local}}}}} \right. } {{V_{Local}}}}}}} \right. } {{V_{Local}})/({{{V_a}} \mathord{\left/ {\vphantom {{{V_a}} {{V_{Local}}}}} \right. } {{V_{Local}}}}}}) + \cos \theta }}} \right]$$</div>
 
@@ -2117,7 +2123,7 @@ Table 92. Nomenclature for Wind Turbine model
 <tr>
 <td>T<sub>Local</sub></td>
 <td>local air temperature at rotor height</td>
-<td>℃</td>
+<td>&deg;C</td>
 </tr>
 <tr>
 <td>v</td>
@@ -2185,27 +2191,27 @@ Table 92. Nomenclature for Wind Turbine model
 <td>m</td>
 </tr>
 <tr>
-<td>α</td>
+<td>&alpha;</td>
 <td>blade angle of attack</td>
 <td>deg</td>
 </tr>
 <tr>
-<td>θ</td>
+<td>&theta;</td>
 <td>azimuth angle in VAWT and pitch angle in HAWT</td>
 <td>deg</td>
 </tr>
 <tr>
-<td>ρ<sub>Local</sub></td>
+<td>&rho;<sub>Local</sub></td>
 <td>local density of air at rotor height</td>
 <td>kg/m3</td>
 </tr>
 <tr>
-<td>ω</td>
+<td>&omega;</td>
 <td>angular velocity of turbine</td>
 <td>rad/s</td>
 </tr>
 <tr>
-<td>ω<sub>Local</sub></td>
+<td>&omega;<sub>Local</sub></td>
 <td>local humidity ratio at rotor height</td>
 <td>kg-H2O/kg-air</td>
 </tr>
@@ -2215,27 +2221,27 @@ Table 92. Nomenclature for Wind Turbine model
 <td> </td>
 </tr>
 <tr>
-<td>λ</td>
+<td>&lambda;</td>
 <td>tip speed ratio</td>
 <td> </td>
 </tr>
 <tr>
-<td>λ<sub>i</sub></td>
+<td>&lambda;<sub>i</sub></td>
 <td>tip speed ratio at the i<sup>th</sup> pitch</td>
 <td> </td>
 </tr>
 <tr>
-<td>δ<sub>met</sub></td>
+<td>&sigma;<sub>met</sub></td>
 <td>wind boundary layer thickness of meteorological station, 270</td>
 <td>m</td>
 </tr>
 <tr>
-<td>δ</td>
+<td>&sigma;</td>
 <td>site boundary layer thickness, 370</td>
 <td>m</td>
 </tr>
 <tr>
-<td>η</td>
+<td>&eta;</td>
 <td>wind turbine system efficiency</td>
 <td> </td>
 </tr>

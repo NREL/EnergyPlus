@@ -2,10 +2,14 @@ Project(EnergyPlus)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
+  CMAKE_POLICY(SET CMP0054 NEW) # CMake 3.1 added this policy
+endif()
+
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_VERSION_MAJOR 8 )
-set( CMAKE_VERSION_MINOR 4 )
+set( CMAKE_VERSION_MINOR 5 )
 set( CMAKE_VERSION_PATCH 0 )
 
 set( PREV_RELEASE_SHA "832e4bb" )
@@ -141,6 +145,7 @@ endif()
 include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
 
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
@@ -238,7 +243,7 @@ endif()
 
 
 set(OPTIMIZABLE_TARGETS
-  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib energypluslib2
+  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib
     )
 if(NOT APPLE AND NOT MSVC)
   list(APPEND OPTIMIZABLE_TARGETS parser)

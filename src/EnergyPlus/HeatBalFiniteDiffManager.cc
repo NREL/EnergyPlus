@@ -731,7 +731,6 @@ namespace HeatBalFiniteDiffManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Lay;
 		int SurfNum;
-		std::string LayChar;
 
 		Real64 dxn; // Intermediate calculation of nodal spacing. This is the full dx. There is
 		// a half dxn thick node at each surface. dxn is the "capacitor" spacing.
@@ -1076,7 +1075,7 @@ namespace HeatBalFiniteDiffManager {
 				if ( DisplayAdvancedReportVariables ) {
 					SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 					SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-			}
+				}
 			}
 
 		} // End of the Surface Loop for Report Variable Setup
@@ -2427,7 +2426,7 @@ namespace HeatBalFiniteDiffManager {
 		//      IF ((TH(SurfNum,1,2) > MaxSurfaceTempLimit) .OR. &
 		//          (TH(SurfNum,1,2) < MinSurfaceTempLimit) ) THEN
 		if ( WarmupFlag ) ++WarmupSurfTemp;
-		if ( ! WarmupFlag || ( WarmupFlag && WarmupSurfTemp > 10 ) || DisplayExtraWarnings ) {
+		if ( ! WarmupFlag || WarmupSurfTemp > 10 || DisplayExtraWarnings ) {
 			if ( CheckTemperature < MinSurfaceTempLimit ) {
 				if ( Surface( SurfNum ).LowTempErrCount == 0 ) {
 					ShowSevereMessage( "Temperature (low) out of bounds [" + RoundSigDigits( CheckTemperature, 2 ) + "] for zone=\"" + Zone( ZoneNum ).Name + "\", for surface=\"" + Surface( SurfNum ).Name + "\"" );

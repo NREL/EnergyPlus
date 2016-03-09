@@ -612,7 +612,7 @@ The DElight method of analyzing daylighting in buildings is very similar to that
 
 There are two primary differences between the Detailed and DElight methods of calculating interior illuminance levels. The first is that DElight includes the capability of analyzing complex fenestration systems that include geometrically complicated shading systems (e.g., roof monitors) and/or optically complicated glazings (e.g., prismatic or holographic glass). The second key difference is that DElight uses a radiosity method to calculate the effects of light reflection inside a zone. These methods are discussed in more detail in the engineering documentation.
 
-There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the Detailed method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles). Another is the DElight ability to include more than two reference points in its interior illuminance and electric lighting reduction calculations. A third is the current lack of visual quality (e.g., glare) calculations performed by DElight. Fourth, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the Detailed method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details.
+There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the Detailed method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles). Another is the DElight ability to include more than two reference points in its interior illuminance and electric lighting reduction calculations. A third is the current lack of visual quality (e.g., glare) calculations performed by DElight. Fourth, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the Detailed method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details. Fifth, when using DElight daylighting the presence of exterior shading surfaces such as overhangs is ignored.
 
 Input for invoking the DElight method involves three object types: **Daylighting:DELight:Controls**, **Daylighting:DELight:ReferencePoint**, and **Daylighting:DELight:ComplexFenestration**. Each of these objects is described below.
 
@@ -7625,7 +7625,7 @@ The design supply air temperature for cooling in degrees Celsius. This should be
 
 #### Field: Central Heating Design Supply Air Temperature
 
-The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil.
+The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system.
 
 #### Field: Type of Zone Sum to Use
 
@@ -7641,11 +7641,11 @@ Entering *Yes* means the system will be sized for heating using 100% outdoor air
 
 #### Field: Central Cooling Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Central Heating Design Supply Air Humidity Ratio
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. (kgWater/kgDryAir) The default is .008.
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system. The default is .008 (kgWater/kgDryAir).
 
 #### Field: Cooling Supply Air Flow Rate Method
 
@@ -14138,7 +14138,7 @@ This model is an equation-fit model from the catalog data which resembles a blac
 
 **HeatPump:WaterToWater:ParameterEstimation:Heating**
 
-This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently “hardwired” to fluid property R22.
+This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently “hardwired” to fluid property R22. FluidProperties:* objects for R-22 must be included in the idf file. These may be copied from DataSets\FluidPropertiesRefData.idf.
 
 Descriptions and strength of each respective model is available in the following references:
 
@@ -14188,38 +14188,41 @@ This numeric field contains the rated volumetric flow rate on the source side of
 
 This numeric field contains the rated cooling capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data.
 
-#### Field: Rated Cooling COP
+#### Field: Rated Cooling Power Consumption
 
-This numeric field contains the rated cooling COP of the heat pump in W/W.  The default value is 4.0.
+Rated cooling power consumption, in W.
 
-
-
-#### Fields: Cooling Capacity Coefficients
+#### Fields: Cooling Capacity Coefficients 1-5
 
 Five fields are used to describe the coefficients for the Cooling Capacity curve. More details on how these coefficients are used are described in the Engineering Reference.
 
-#### Field: Cooling Capacity Coefficient 1-5
+#### Field: Cooling Compressor Power Coefficients 1-5
 
-These numeric fields contain the five coefficients for the heat pump capacity.
+Five fields are used to decribe the coefficients for the Cooling Compressor Power curve.
 
 An idf example:
 
 ```idf
-HeatPump:WaterToWater:EquationFit:Cooling,
-    GshpCLG,     !- Water to Water Heat Pump Name
-    GshpCLG SourceSide Inlet Node,  !- Source Side Inlet Node
-    GshpCLG SourceSide Outlet Node, !- Source Side Outlet Node
-    GshpCLG LoadSide Inlet Node,    !- Load Side Inlet Node
-    GshpCLG LoadSide Outlet Node,   !- Load Side Outlet Node
-    1.89E-03,    !- Rated Load Side Flow Rate {m3/s}
-    1.89E-03,    !- Rated Source Side Flow Rate {m3/s}
-    39890.91,    !- Rated Cooling Capacity {W}
-    4.0,         !- Rated Cooling COP {W/W}
-    -1.52030596, !- Cooling Capacity Coefficient 1
-    3.46625667,  !- Cooling Capacity Coefficient 2
-    -1.32267797, !- Cooling Capacity Coefficient 3
-    0.09395678,  !- Cooling Capacity Coefficient 4
-    0.038975504; !- Cooling Capacity Coefficient 5
+  HeatPump:WaterToWater:EquationFit:Cooling,
+    GshpCLG,                 !- Name
+    GshpCLG SourceSide Inlet Node,      !- Source Side Inlet Node Name
+    GshpCLG SourceSide Outlet Node,     !- Source Side Outlet Node Name
+    GshpCLG LoadSide Inlet Node,        !- Load Side Inlet Node Name
+    GshpCLG LoadSide Outlet Node,       !- Load Side Outlet Node Name
+    1.89E-03,                !- Rated Load Side Flow Rate {m3/s}
+    1.89E-03,                !- Rated Source Side Flow Rate {m3/s}
+    39890.91,                !- Rated Cooling Capacity {W}
+    4790.00,                 !- Rated Cooling Power Consumption {W}
+    -1.52030596,             !- Cooling Capacity Coefficient 1
+    3.46625667,              !- Cooling Capacity Coefficient 2
+    -1.32267797,             !- Cooling Capacity Coefficient 3
+    0.09395678,              !- Cooling Capacity Coefficient 4
+    0.038975504,             !- Cooling Capacity Coefficient 5
+    -8.59564386,             !- Cooling Compressor Power Coefficient 1
+    0.96265085,              !- Cooling Compressor Power Coefficient 2
+    8.69489229,              !- Cooling Compressor Power Coefficient 3
+    0.02501669,              !- Cooling Compressor Power Coefficient 4
+    -0.20132665;             !- Cooling Compressor Power Coefficient 5
 ```
 
 
@@ -14302,6 +14305,7 @@ This output variable represents the average fluid flow rate through the load sid
 
 This output variable represents the average fluid flow rate through the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
+
 ### HeatPump:WaterToWater:EquationFit:Heating
 
 #### Field: Name
@@ -14336,38 +14340,43 @@ This numeric field contains the rated volumetric flow rate on the source side of
 
 This numeric field contains the rated heating capacity of the heat pump in W. This corresponds to the highest load side heat transfer rate listed in the catalog data.
 
-#### Field: Rated Heating COP
+#### Field: Rated Heating Power Consumption
 
-This numeric field contains the rated heating COP of the heat pump in W/W.  The default value is 4.0.
+Rated heating power consumption, in W.
 
-#### Fields: Heating Capacity Coefficients
+#### Fields: Heating Capacity Coefficients 1-5
 
 Five fields are used to describe the coefficients for the Heating Capacity curve. More details on how these coefficients are used are described in the Engineering Reference.
 
-#### Field: Heating Capacity Coefficient 1-5
+#### Field: Heating Compressor Power Coefficients 1-5
 
-These numeric fields contain the five coefficients for the heat pump capacity.
+Five fields are used to describe the coefficients for the Heating Compressor Power curve.
 
 An idf example:
 
 
 
 ```idf
-HeatPump:WaterToWater:EquationFit:Heating,
-    GshpHeating, !- Water to Water Heat Pump Name
-    GshpHeating SourceSide Inlet Node,  !- Source Side Inlet Node
-    GshpHeating SourceSide Outlet Node, !- Source Side Outlet Node
-    GshpHeating LoadSide Inlet Node,    !- Load Side Inlet Node
-    GshpHeating LoadSide Outlet Node,   !- Load Side Outlet Node
-    1.89E-03,    !- Rated Load Side Flow Rate {m3/s}
-    1.89E-03,    !- Rated Source Side Flow Rate {m3/s}
-    39040.92,    !- Rated Heating Capacity {W}
-    4.0,         !- Rated Heating COP {W/W}
-    -3.33491153, !- Heating Capacity Coefficient 1
-    -0.51451946, !- Heating Capacity Coefficient 2
-    4.51592706,  !- Heating Capacity Coefficient 3
-    0.01797107,  !- Heating Capacity Coefficient 4
-    0.155797661; !- Heating Capacity Coefficient 5
+  HeatPump:WaterToWater:EquationFit:Heating,
+    GshpHeating,             !- Name
+    GshpHeating SourceSide Inlet Node,      !- Source Side Inlet Node Name
+    GshpHeating SourceSide Outlet Node,     !- Source Side Outlet Node Name
+    GshpHeating LoadSide Inlet Node,        !- Load Side Inlet Node Name
+    GshpHeating LoadSide Outlet Node,       !- Load Side Outlet Node Name
+    1.89E-03,                !- Rated Load Side Flow Rate {m3/s}
+    1.89E-03,                !- Rated Source Side Flow Rate {m3/s}
+    39040.92,                !- Rated Heating Capacity {W}
+    5130.00,                 !- Rated Heating Power Consumption {W}
+    -3.33491153,             !- Heating Capacity Coefficient 1
+    -0.51451946,             !- Heating Capacity Coefficient 2
+    4.51592706,              !- Heating Capacity Coefficient 3
+    0.01797107,              !- Heating Capacity Coefficient 4
+    0.155797661,             !- Heating Capacity Coefficient 5
+    -8.93121751,             !- Heating Compressor Power Coefficient 1
+    8.57035762,              !- Heating Compressor Power Coefficient 2
+    1.29660976,              !- Heating Compressor Power Coefficient 3
+    -0.21629222,             !- Heating Compressor Power Coefficient 4
+    0.033862378;             !- Heating Compressor Power Coefficient 5
 ```
 
 

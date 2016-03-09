@@ -157,29 +157,6 @@ namespace HeatBalFiniteDiffManager {
 			DeltaTime( 0 )
 		{}
 
-		// Member Constructor
-		ConstructionDataFD(
-			Array1_string const & Name, // Name of construction
-			Array1< Real64 > const & DelX,
-			Array1< Real64 > const & TempStability,
-			Array1< Real64 > const & MoistStability,
-			Array1_int const & NodeNumPoint,
-			Array1< Real64 > const & Thickness,
-			Array1< Real64 > const & NodeXlocation, // sized to TotNode, contains X distance in m from outside face
-			int const TotNodes,
-			int const DeltaTime
-		) :
-			Name( Name ),
-			DelX( DelX ),
-			TempStability( TempStability ),
-			MoistStability( MoistStability ),
-			NodeNumPoint( NodeNumPoint ),
-			Thickness( Thickness ),
-			NodeXlocation( NodeXlocation ),
-			TotNodes( TotNodes ),
-			DeltaTime( DeltaTime )
-		{}
-
 	};
 
 	struct SurfaceDataFD
@@ -251,21 +228,6 @@ namespace HeatBalFiniteDiffManager {
 			tk1( 0.0 ),
 			numTempEnth( 0 ),
 			numTempCond( 0 )
-		{}
-
-		// Member Constructor
-		MaterialDataFD(
-			Real64 const tk1, // Temperature coefficient for thermal conductivity
-			int const numTempEnth, // number of Temperature/Enthalpy pairs
-			int const numTempCond, // number of Temperature/Conductivity pairs
-			Array2< Real64 > const & TempEnth, // Temperature enthalpy Function Pairs,
-			Array2< Real64 > const & TempCond // Temperature thermal conductivity Function Pairs,
-		) :
-			tk1( tk1 ),
-			numTempEnth( numTempEnth ),
-			numTempCond( numTempCond ),
-			TempEnth( TempEnth ),
-			TempCond( TempCond )
 		{}
 
 	};

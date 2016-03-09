@@ -110,6 +110,7 @@ namespace SimAirServingZones {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
+	extern Array1D< Real64 > VbzByZone; // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
 	extern bool GetAirLoopInputFlag; // Flag set to make sure you get input once
 	extern int NumOfTimeStepInDay; // number of zone time steps in a day
 
@@ -234,6 +235,16 @@ namespace SimAirServingZones {
 
 	void
 	UpdateSysSizingForScalableInputs( int const AirLoopNum );
+
+	Real64
+	GetHeatingSATempForSizing(
+		int const IndexAirLoop // air loop index 
+	);
+
+	Real64
+	GetHeatingSATempHumRatForSizing(
+		int const IndexAirLoop // air loop index 
+	);
 
 	// End Algorithm Section of the Module
 	// *****************************************************************************

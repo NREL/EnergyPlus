@@ -107,15 +107,17 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Furnaces.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
@@ -127,18 +129,17 @@
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
-#include <EnergyPlus/HVACUnitarySystem.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
+#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+
 #include <EnergyPlus/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
-#include <EnergyPlus/ManageElectricPower.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -157,6 +158,7 @@
 #include <EnergyPlus/PlantManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -293,13 +295,15 @@ namespace EnergyPlus {
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
 		DataZoneEquipment::clear_state();
+		DesiccantDehumidifiers::clear_state();
 		DirectAirManager::clear_state();
 		DXCoils::clear_state();
+		clearFacilityElectricPowerServiceObject();
 		EMSManager::clear_state();
 		ExteriorEnergyUse::clear_state();
-		FluidProperties::clear_state();
 		FanCoilUnits::clear_state();
 		Fans::clear_state();
+		FluidProperties::clear_state();
 		Furnaces::clear_state();
 		GlobalNames::clear_state();
 		GroundHeatExchangers::clear_state();
@@ -323,7 +327,6 @@ namespace EnergyPlus {
 		InputProcessor::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();
-		ManageElectricPower::clear_state();
 		MixedAir::clear_state();
 		MixerComponent::clear_state();
 		NodeInputManager::clear_state();
@@ -342,6 +345,7 @@ namespace EnergyPlus {
 		PlantPressureSystem::clear_state();
 		PlantUtilities::clear_state();
 		Pipes::clear_state();
+		PollutionModule::clear_state();
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
@@ -403,20 +407,6 @@ namespace EnergyPlus {
 		if ( m_idd_cache ) {
 			m_idd_cache->use_cached_namespace_variables();
 		}
-	}
-
-	template < typename T, class T2 >
-	bool EnergyPlusFixture::compare_containers( T const & expected_container, T2 const & actual_container ) {
-		bool is_valid = ( expected_container.size() == actual_container.size() );
-		EXPECT_EQ( expected_container.size(), actual_container.size() ) << "Containers are not equal size.";
-		auto expected = expected_container.begin();
-		auto actual = actual_container.begin();
-		for ( ; expected != expected_container.end(); ++expected, ++actual ) {
-			// This may fail due to floating point issues for float and double...
-			EXPECT_EQ( *expected, *actual ) << "Incorrect 0-based index: " << ( expected - expected_container.begin() );
-			is_valid = ( *expected == *actual );
-		}
-		return is_valid;
 	}
 
 	std::string EnergyPlusFixture::delimited_string( std::vector<std::string> const & strings, std::string const & delimiter ) {

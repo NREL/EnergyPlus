@@ -62,6 +62,7 @@
 // C++ Headers
 #include <iosfwd>
 #include <type_traits>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -171,6 +172,9 @@ namespace InputProcessor {
 
 	// Types
 
+	template <class T> struct is_shared_ptr : std::false_type {};
+	template <class T> struct is_shared_ptr<std::shared_ptr<T> > : std::true_type {};
+
 	struct RangeCheckDef
 	{
 		// Members
@@ -203,39 +207,6 @@ namespace InputProcessor {
 			DefAutoCalculate( false ),
 			AutoCalculatable( false ),
 			AutoCalculateValue( 0.0 )
-		{}
-
-		// Member Constructor
-		RangeCheckDef(
-			bool const MinMaxChk, // true when Min/Max has been added
-			int const FieldNumber, // which field number this is
-			std::string const & FieldName, // Name of the field
-			Vector2_string const & MinMaxString, // appropriate Min/Max Strings
-			Vector2< Real64 > const & MinMaxValue, // appropriate Min/Max Values
-			Vector2_int const & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
-			bool const DefaultChk, // true when default has been entered
-			Real64 const Default, // Default value
-			bool const DefAutoSize, // Default value is "autosize"
-			bool const AutoSizable, // True if this field can be autosized
-			Real64 const AutoSizeValue, // Value to return for autosize field
-			bool const DefAutoCalculate, // Default value is "autocalculate"
-			bool const AutoCalculatable, // True if this field can be autocalculated
-			Real64 const AutoCalculateValue // Value to return for autocalculate field
-		) :
-			MinMaxChk( MinMaxChk ),
-			FieldNumber( FieldNumber ),
-			FieldName( FieldName ),
-			MinMaxString( MinMaxString ),
-			MinMaxValue( MinMaxValue ),
-			WhichMinMax( WhichMinMax ),
-			DefaultChk( DefaultChk ),
-			Default( Default ),
-			DefAutoSize( DefAutoSize ),
-			AutoSizable( AutoSizable ),
-			AutoSizeValue( AutoSizeValue ),
-			DefAutoCalculate( DefAutoCalculate ),
-			AutoCalculatable( AutoCalculatable ),
-			AutoCalculateValue( AutoCalculateValue )
 		{}
 
 	};
@@ -283,50 +254,6 @@ namespace InputProcessor {
 			NumFound( 0 )
 		{}
 
-		// Member Constructor
-		ObjectsDefinition(
-			std::string const & EP_UNUSED( Name ), // Name of the Object
-			int const NumParams, // Number of parameters to be processed for each object
-			int const NumAlpha, // Number of Alpha elements in the object
-			int const NumNumeric, // Number of Numeric elements in the object
-			int const MinNumFields, // Minimum number of fields to be passed to the Get routines
-			bool const NameAlpha1, // True if the first alpha appears to "name" the object for error messages
-			bool const UniqueObject, // True if this object has been designated \unique-object
-			bool const RequiredObject, // True if this object has been designated \required-object
-			bool const ExtensibleObject, // True if this object has been designated \extensible
-			int const ExtensibleNum, // how many fields to extend
-			int const LastExtendAlpha, // Count for extended alpha fields
-			int const LastExtendNum, // Count for extended numeric fields
-			int const ObsPtr, // If > 0, object is obsolete and this is the
-			Array1_bool const & AlphaOrNumeric, // Positionally, whether the argument
-			Array1_bool const & ReqField, // True for required fields
-			Array1_bool const & AlphRetainCase, // true if retaincase is set for this field (alpha fields only)
-			Array1_string const & AlphFieldChks, // Field names for alphas
-			Array1_string const & AlphFieldDefs, // Defaults for alphas
-			Array1< RangeCheckDef > const & NumRangeChks, // Used to range check and default numeric fields
-			int const NumFound // Number of this object found in IDF
-		) :
-			NumParams( NumParams ),
-			NumAlpha( NumAlpha ),
-			NumNumeric( NumNumeric ),
-			MinNumFields( MinNumFields ),
-			NameAlpha1( NameAlpha1 ),
-			UniqueObject( UniqueObject ),
-			RequiredObject( RequiredObject ),
-			ExtensibleObject( ExtensibleObject ),
-			ExtensibleNum( ExtensibleNum ),
-			LastExtendAlpha( LastExtendAlpha ),
-			LastExtendNum( LastExtendNum ),
-			ObsPtr( ObsPtr ),
-			AlphaOrNumeric( AlphaOrNumeric ),
-			ReqField( ReqField ),
-			AlphRetainCase( AlphRetainCase ),
-			AlphFieldChks( AlphFieldChks ),
-			AlphFieldDefs( AlphFieldDefs ),
-			NumRangeChks( NumRangeChks ),
-			NumFound( NumFound )
-		{}
-
 	};
 
 	struct SectionsDefinition
@@ -338,15 +265,6 @@ namespace InputProcessor {
 		// Default Constructor
 		SectionsDefinition() :
 			NumFound( 0 )
-		{}
-
-		// Member Constructor
-		SectionsDefinition(
-			std::string const & Name, // Name of the Section
-			int const NumFound // Number of this object found in IDF
-		) :
-			Name( Name ),
-			NumFound( NumFound )
 		{}
 
 	};
@@ -364,19 +282,6 @@ namespace InputProcessor {
 			FirstRecord( 0 ),
 			FirstLineNo( 0 ),
 			LastRecord( 0 )
-		{}
-
-		// Member Constructor
-		FileSectionsDefinition(
-			std::string const & Name, // Name of this section
-			int const FirstRecord, // Record number of first object in section
-			int const FirstLineNo, // Record number of first object in section
-			int const LastRecord // Record number of last object in section
-		) :
-			Name( Name ),
-			FirstRecord( FirstRecord ),
-			FirstLineNo( FirstLineNo ),
-			LastRecord( LastRecord )
 		{}
 
 	};
@@ -402,26 +307,6 @@ namespace InputProcessor {
 			ObjectDefPtr( 0 )
 		{}
 
-		// Member Constructor
-		LineDefinition(
-			std::string const & EP_UNUSED( Name ), // Object name for this record
-			int const NumAlphas, // Number of alphas on this record
-			int const NumNumbers, // Number of numbers on this record
-			int const ObjectDefPtr, // Which Object Def is this
-			Array1_string const & Alphas, // Storage for the alphas
-			Array1_bool const & AlphBlank, // Set to true if this field was blank on input
-			Array1< Real64 > const & Numbers, // Storage for the numbers
-			Array1_bool const & NumBlank // Set to true if this field was blank on input
-		) :
-			NumAlphas( NumAlphas ),
-			NumNumbers( NumNumbers ),
-			ObjectDefPtr( ObjectDefPtr ),
-			Alphas( Alphas ),
-			AlphBlank( AlphBlank ),
-			Numbers( Numbers ),
-			NumBlank( NumBlank )
-		{}
-
 	};
 
 	struct SecretObjects
@@ -440,23 +325,6 @@ namespace InputProcessor {
 			Used( false ),
 			Transitioned( false ),
 			TransitionDefer( false )
-		{}
-
-		// Member Constructor
-		SecretObjects(
-			std::string const & OldName, // Old Object Name
-			std::string const & NewName, // New Object Name if applicable
-			bool const Deleted, // true if this (old name) was deleted
-			bool const Used, // true when used (and reported) in this input file
-			bool const Transitioned, // true if old name will be transitioned to new object within IP
-			bool const TransitionDefer // true if old name will be transitioned to new object within IP
-		) :
-			OldName( OldName ),
-			NewName( NewName ),
-			Deleted( Deleted ),
-			Used( Used ),
-			Transitioned( Transitioned ),
-			TransitionDefer( TransitionDefer )
 		{}
 
 	};
@@ -805,6 +673,62 @@ namespace InputProcessor {
 		return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
 	}
 
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str,
+		std::false_type
+	)
+	{
+		using valueType = typename std::iterator_traits< InputIterator >::value_type;
+		//static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s.name == str; } );
+		if ( it != last ) return it - first + 1; // 1-based return index
+
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s.name, str ); } );
+		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+
+		return 0; // Not found
+	}
+
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str,
+		std::true_type
+	)
+	{
+		using valueType = typename std::iterator_traits< InputIterator >::value_type;
+		//static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+
+		auto const it = std::find_if( first, last, [ &str ] ( const valueType & s ) { return s->name == str; } );
+		if ( it != last ) return it - first + 1; // 1-based return index
+
+		auto const it2 = std::find_if( first, last, [ &str ] ( const valueType & s ) { return equali( s->name, str ); } );
+		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+
+		return 0; // Not found
+	}
+
+	template < typename InputIterator >
+	inline
+	int
+	FindItem(
+		InputIterator first,
+		InputIterator last,
+		std::string const & str
+	)
+	{
+		return FindItem( first, last, str, is_shared_ptr< typename std::iterator_traits< InputIterator >::value_type >{} );
+	}
+
 	int
 	FindItem(
 		std::string const & String,
@@ -964,6 +888,33 @@ namespace InputProcessor {
 	{
 		// case insensitive comparison
 		return equali( s, t );
+	}
+
+	template < typename InputIterator >
+	inline
+	void
+	VerifyName(
+		InputIterator first,
+		InputIterator last,
+		std::string const & NameToVerify,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	)
+	{
+		IsBlank = false;
+		ErrorFound = false;
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+			return;
+		}
+		int Found = FindItem( first, last, NameToVerify );
+		if ( Found != 0 ) {
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+			ErrorFound = true;
+		}
 	}
 
 	void

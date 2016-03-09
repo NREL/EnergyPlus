@@ -1333,21 +1333,6 @@ namespace SizingManager {
 				ZoneListActive( false )
 			{}
 
-			// Member Constructor
-			GlobalMiscObject(
-				std::string const & Name,
-				int const ZoneOrZoneListPtr,
-				int const NumOfZones,
-				int const StartPtr,
-				bool const ZoneListActive
-			) :
-				Name( Name ),
-				ZoneOrZoneListPtr( ZoneOrZoneListPtr ),
-				NumOfZones( NumOfZones ),
-				StartPtr( StartPtr ),
-				ZoneListActive( ZoneListActive )
-			{}
-
 		};
 
 		// Object Data
@@ -2189,7 +2174,7 @@ namespace SizingManager {
 			SysSizInput( SysSizIndex ).CoolSupTemp = rNumericArgs( iCentralCoolDesignSATempNumericNum );
 			SysSizInput( SysSizIndex ).HeatSupTemp = rNumericArgs( iCentralHeatDesignSATempNumericNum );
 			SysSizInput( SysSizIndex ).CoolSupHumRat = rNumericArgs( iCentralCoolDesignSAHumRatNumericNum );
-			SysSizInput( SysSizIndex).HeatSupHumRat = rNumericArgs( iCentralHeatDesignSAHumRatNumericNum );
+			SysSizInput( SysSizIndex ).HeatSupHumRat = rNumericArgs( iCentralHeatDesignSAHumRatNumericNum );
 			//  N11, \field Cooling Design Air Flow Rate
 			//      \note This input is used if Cooling Design Air Flow Method is Flow/System
 			//      \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
@@ -2311,9 +2296,16 @@ namespace SizingManager {
 				SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_ZoneSum;
 			} else if ( systemOAMethod == "VENTILATIONRATEPROCEDURE" ) {
 				SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_VRP;
-				if ( SysSizInput( SysSizIndex ).DesOutAirVolFlow > 0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
-					ShowContinueError("SystemOAMethod is set to VRP and " + cNumericFieldNames( iDesignOAVolFlowNumericNum ) + " > 0, user entry will be ignored.");
+				if ( SysSizInput( SysSizIndex ).LoadSizeType == Ventilation ) {
+					ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid combination of inputs." );
+					ShowContinueError( cAlphaFieldNames( iLoadTypeSizeAlphaNum ) + " = " + cAlphaArgs( iLoadTypeSizeAlphaNum ) + " and " + cAlphaFieldNames( iSystemOASMethodAlphaNum ) + " = " + cAlphaArgs( iSystemOASMethodAlphaNum ) + "." );
+					ShowContinueError( "Resetting System Outdoor Air Method to ZoneSum." );
+					SysSizInput( SysSizIndex ).SystemOAMethod = SOAM_ZoneSum;
+				} else {
+					if ( SysSizInput( SysSizIndex ).DesOutAirVolFlow > 0 ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
+						ShowContinueError( "SystemOAMethod is set to VRP and " + cNumericFieldNames( iDesignOAVolFlowNumericNum ) + " > 0, user entry will be ignored." );
+					}
 				}
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );

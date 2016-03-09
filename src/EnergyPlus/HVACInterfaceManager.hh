@@ -140,49 +140,6 @@ namespace HVACInterfaceManager {
 			PriFlowRequest( 0.0 )
 		{}
 
-		// Member Constructor
-		CommonPipeData(
-			int const CommonPipeType, // type of common pipe used if any
-			int const SupplySideInletPumpType,
-			int const DemandSideInletPumpType,
-			int const FlowDir, // Direction in which flow is in Common Pipe
-			Real64 const Flow, // Flow in the Common Pipe
-			Real64 const Temp,
-			Real64 const SecCPLegFlow, // Mass flow in the secondary side Common pipe leg
-			Real64 const PriCPLegFlow, // Mass flow in the primary side Common pipe leg
-			Real64 const SecToPriFlow, // Mass flow in the pipe from Secondary to primary side
-			Real64 const PriToSecFlow, // Mass flow in the pipe from primary to Secondary side
-			Real64 const PriInTemp, // Temperature at primary inlet node
-			Real64 const PriOutTemp, // Temperature at primary outlet node
-			Real64 const SecInTemp, // Temperature at secondary inlet node
-			Real64 const SecOutTemp, // Temperature at secondary outlet node
-			Real64 const PriInletSetPoint, // Setpoint at Primary inlet node
-			Real64 const SecInletSetPoint, // Setpoint at Secondary inlet node
-			bool const PriInletControlled, // True if Primary inlet node is controlled
-			bool const SecInletControlled, // True if secondary inlet is controlled
-			Real64 const PriFlowRequest // total flow request on supply side.
-		) :
-			CommonPipeType( CommonPipeType ),
-			SupplySideInletPumpType( SupplySideInletPumpType ),
-			DemandSideInletPumpType( DemandSideInletPumpType ),
-			FlowDir( FlowDir ),
-			Flow( Flow ),
-			Temp( Temp ),
-			SecCPLegFlow( SecCPLegFlow ),
-			PriCPLegFlow( PriCPLegFlow ),
-			SecToPriFlow( SecToPriFlow ),
-			PriToSecFlow( PriToSecFlow ),
-			PriInTemp( PriInTemp ),
-			PriOutTemp( PriOutTemp ),
-			SecInTemp( SecInTemp ),
-			SecOutTemp( SecOutTemp ),
-			PriInletSetPoint( PriInletSetPoint ),
-			SecInletSetPoint( SecInletSetPoint ),
-			PriInletControlled( PriInletControlled ),
-			SecInletControlled( SecInletControlled ),
-			PriFlowRequest( PriFlowRequest )
-		{}
-
 	};
 
 	// Object Data

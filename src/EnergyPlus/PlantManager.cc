@@ -80,18 +80,22 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PipeHeatTransfer.hh>
 #include <Pipes.hh>
+#include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
 #include <PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
+#include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -746,8 +750,6 @@ namespace PlantManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using namespace BranchInputManager;
-		using Pipes::InitializePipes;
-		using PipeHeatTransfer::InitializeHeatTransferPipes;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -889,22 +891,27 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Pipe;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_Pipe, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Adiabatic:Steam" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeSteam;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = Pipes::LocalPipeData::factory( TypeOf_PipeSteam, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Outdoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeExterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeExterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Indoor" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeInterior;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeInterior, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Pipe:Underground" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipeUnderground;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
 							this_comp.CurOpSchemeType = NoControlOpSchemeType;
+							this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory( TypeOf_PipeUnderground, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "PipingSystem:Underground:PipeCircuit" ) ) {
 							this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
 							this_comp.GeneralEquipType = GenEquipTypes_Pipe;
@@ -1012,22 +1019,27 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_PlantLoadProfile;
 							this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+							this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory( CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Vertical" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgVertical;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgVertical, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData::factory( TypeOf_GrndHtExchgSurface, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Pond" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = PondGroundHeatExchanger::PondGroundHeatExchangerData::factory( TypeOf_GrndHtExchgPond, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Slinky" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgSlinky, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "Chiller:Electric:EIR" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1588,7 +1600,7 @@ namespace PlantManager {
 									//                            TempLoop%Branch(BranchNum)%Comp(CompNum)%CompNum, &
 									//                            0.0d0)
 								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior ) {
-									InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
+									//InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
 								}
 							}
 						}
@@ -3061,9 +3073,8 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PlantSizNum; // index of Plant Sizing data for this loop
+		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
 
-		PlantSizNum = 0;
 		if ( PlantLoop( LoopNum ).PlantSizNum == 0 ) {
 			if ( NumPltSizInput > 0 ) {
 				PlantSizNum = FindItemInList( PlantLoop( LoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
@@ -3107,7 +3118,7 @@ namespace PlantManager {
 		using ReportSizingManager::ReportSizingOutput;
 
 		// Locals
-		bool InitLoopEquip;
+		bool InitLoopEquip( true );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3121,37 +3132,23 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PlantSizNum; // index of Plant Sizing data for this loop
+		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
 		int BranchNum; // DO loop counter for cycling through branches on a demand side loop
 		int CompNum; // DO loop counter for cycling through components on a demand side loop
 		int SupNodeNum; // component inlet water node number
 		int WaterCompNum; // DO loop counter for cycling through all the components that demand water
-		bool ErrorsFound; // If errors detected in input
-		bool SimNestedLoop;
-		bool ReSize;
-		bool AllSizFac;
-		Real64 LoopSizFac;
+		bool ErrorsFound( false ); // If errors detected in input
+		// bool SimNestedLoop( false );
+		bool ReSize( false );
+		bool AllSizFac( true );
+		Real64 LoopSizFac( 0.0 );
 		Real64 AvLoopSizFac;
-		Real64 PlantSizFac;
-		Real64 MaxSizFac;
+		Real64 PlantSizFac( 1.0 );
+		Real64 MaxSizFac( 0.0 );
 		Real64 BranchSizFac;
-		Real64 NumBrSizFac;
+		Real64 NumBrSizFac( 0.0 );
 		Real64 FluidDensity( 0.0 ); // local value from glycol routine
-		bool Finalize;
-
-		Finalize = OkayToFinish;
-		PlantSizNum = 0;
-		ErrorsFound = false;
-		LoopSizFac = 0.0;
-		// InitLoopEquip = .FALSE.
-		InitLoopEquip = true;
-		SimNestedLoop = false;
-
-		AllSizFac = true;
-		MaxSizFac = 0.0;
-		PlantSizFac = 1.0;
-		NumBrSizFac = 0.0;
-		ReSize = false;
+		bool Finalize( OkayToFinish );
 
 		if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) {
 			ReSize = true;
@@ -3361,7 +3358,7 @@ namespace PlantManager {
 		using DataPlant::PlantLoop;
 
 		// Locals
-		bool InitLoopEquip;
+		// bool InitLoopEquip( true );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3375,23 +3372,17 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PlantSizNum; // index of Plant Sizing data for this loop
+		int PlantSizNum( 0 ); // index of Plant Sizing data for this loop
 		int BranchNum; // DO loop counter for cycling through branches on a demand side loop
 		int CompNum; // DO loop counter for cycling through components on a demand side loop
 		int SupNodeNum; // component inlet water node number
 		int WaterCompNum; // DO loop counter for cycling through all the components that demand water
-		bool ErrorsFound; // If errors detected in input
-		bool SimNestedLoop;
+		bool ErrorsFound( false ); // If errors detected in input
+		// bool SimNestedLoop( false );
 		bool ReSize;
 
 		Real64 FluidDensity( 0.0 ); // local value from glycol routine
 
-		PlantSizNum = 0;
-		ErrorsFound = false;
-
-		// InitLoopEquip = .FALSE.
-		InitLoopEquip = true;
-		SimNestedLoop = false;
 		Real64 PlantSizeFac;
 
 
@@ -4399,10 +4390,6 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
-						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgVertical ) { // = 91
-							this_component.FlowCtrl = ControlType_Active;
-							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );
 

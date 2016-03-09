@@ -163,6 +163,8 @@ namespace SteamCoils {
 		int CompNum; // index for plant component for steam coil
 		int Coil_PlantTypeNum; // plant level index for coil type
 		Real64 OperatingCapacity; // capacity of steam coil at operating conditions (W)
+		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
+		int DesiccantDehumNum; // index to desiccant dehumidifier object
 
 		// Default Constructor
 		SteamCoilEquipConditions() :
@@ -215,118 +217,9 @@ namespace SteamCoils {
 			BranchNum( 0 ),
 			CompNum( 0 ),
 			Coil_PlantTypeNum( 0 ),
-			OperatingCapacity( 0.0 )
-		{}
-
-		// Member Constructor
-		SteamCoilEquipConditions(
-			std::string const & Name, // Name of the SteamCoil
-			std::string const & SteamCoilTypeA, // Type of SteamCoil ie. Heating or Cooling
-			int const SteamCoilType, // Type of SteamCoil ie. Heating or Cooling
-			int const SteamCoilModel, // Type of SteamCoil ie. Simple, Detailed, etc.
-			int const SteamCoilType_Num,
-			std::string const & Schedule, // SteamCoil Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			Real64 const InletAirMassFlowRate, // MassFlow through the SteamCoil being Simulated [kg/s]
-			Real64 const OutletAirMassFlowRate, // MassFlow throught the SteamCoil being Simulated[kg/s]
-			Real64 const InletAirTemp, // Inlet Air Temperature Operating Condition [C]
-			Real64 const OutletAirTemp, // Outlet Air Temperature Operating Condition [C]
-			Real64 const InletAirHumRat, // Inlet Air Humidity Ratio Operating Condition
-			Real64 const OutletAirHumRat, // Outlet Air Humidity Ratio Calculated Condition
-			Real64 const InletAirEnthalpy, // Inlet Air enthalpy [J/kg]
-			Real64 const OutletAirEnthalpy, // Outlet Air enthalpy [J/kg]
-			Real64 const TotSteamCoilLoad, // Total Load on the Coil [W]
-			Real64 const SenSteamCoilLoad, // Sensible Load on the Coil [W]
-			Real64 const TotSteamHeatingCoilEnergy, // Total Heating Coil energy of the Coil [J]
-			Real64 const TotSteamCoolingCoilEnergy, // Total Cooling Coil energy of the Coil [J]
-			Real64 const SenSteamCoolingCoilEnergy, // Sensible Cooling Coil energy of the Coil [J]
-			Real64 const TotSteamHeatingCoilRate, // Total Heating Coil Rate on the Coil [W]
-			Real64 const LoopLoss, // Loss in loop due to cond return to atm pressure
-			Real64 const TotSteamCoolingCoilRate, // Total Cooling Coil Rate on the Coil [W]
-			Real64 const SenSteamCoolingCoilRate, // Sensible Cooling Coil Rate on the Coil [W]
-			Real64 const LeavingRelHum, // Simple Coil Latent Model requires User input for leaving RH
-			Real64 const DesiredOutletTemp, // Temp desired at the outlet (C)
-			Real64 const DesiredOutletHumRat, // Humudity Ratio desired at outlet (C)
-			Real64 const InletSteamTemp, // Inlet Steam Temperature [C]
-			Real64 const OutletSteamTemp, // Outlet Steam Temperature [C]
-			Real64 const InletSteamMassFlowRate, // Inlet Steam Mass Flow Rate [Kg/s]
-			Real64 const OutletSteamMassFlowRate, // Outlet Steam Mass Flow Rate [Kg/s]
-			Real64 const MaxSteamVolFlowRate, // Maximum water Volume flow rate [m3/s]
-			Real64 const MaxSteamMassFlowRate, // Maximum water mass flow rate [Kg/s]
-			Real64 const InletSteamEnthalpy, // Inlet Water Enthalpy (J/Kg)
-			Real64 const OutletWaterEnthalpy, // Outlet Water Enthalpy (J/kg)
-			Real64 const InletSteamPress, // Pressure at steam inlet (Pa)
-			Real64 const InletSteamQuality, // Quality of steam at inlet
-			Real64 const OutletSteamQuality, // Quality of steam at outlet
-			Real64 const DegOfSubcooling,
-			Real64 const LoopSubcoolReturn,
-			int const AirInletNodeNum, // Inlet node number at air side
-			int const AirOutletNodeNum, // Outlet node number at air side
-			int const SteamInletNodeNum, // SteamInletNodeNum
-			int const SteamOutletNodeNum, // SteamOutletNodeNum
-			int const TempSetPointNodeNum, // If applicable : node number that the temp setpoint exists.
-			int const TypeOfCoil, // Control of Coil , temperature or Zone load
-			int const FluidIndex, // Fluid index for FluidProperties (Steam)
-			int const LoopNum, // index for plant loop with steam coil
-			int const LoopSide, // index for plant loop side for steam coil
-			int const BranchNum, // index for plant branch for steam coil
-			int const CompNum, // index for plant component for steam coil
-			int const Coil_PlantTypeNum, // plant level index for coil type
-			Real64 const OperatingCapacity // capacity of steam coil at operating conditions (W)
-		) :
-			Name( Name ),
-			SteamCoilTypeA( SteamCoilTypeA ),
-			SteamCoilType( SteamCoilType ),
-			SteamCoilModel( SteamCoilModel ),
-			SteamCoilType_Num( SteamCoilType_Num ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			InletAirMassFlowRate( InletAirMassFlowRate ),
-			OutletAirMassFlowRate( OutletAirMassFlowRate ),
-			InletAirTemp( InletAirTemp ),
-			OutletAirTemp( OutletAirTemp ),
-			InletAirHumRat( InletAirHumRat ),
-			OutletAirHumRat( OutletAirHumRat ),
-			InletAirEnthalpy( InletAirEnthalpy ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			TotSteamCoilLoad( TotSteamCoilLoad ),
-			SenSteamCoilLoad( SenSteamCoilLoad ),
-			TotSteamHeatingCoilEnergy( TotSteamHeatingCoilEnergy ),
-			TotSteamCoolingCoilEnergy( TotSteamCoolingCoilEnergy ),
-			SenSteamCoolingCoilEnergy( SenSteamCoolingCoilEnergy ),
-			TotSteamHeatingCoilRate( TotSteamHeatingCoilRate ),
-			LoopLoss( LoopLoss ),
-			TotSteamCoolingCoilRate( TotSteamCoolingCoilRate ),
-			SenSteamCoolingCoilRate( SenSteamCoolingCoilRate ),
-			LeavingRelHum( LeavingRelHum ),
-			DesiredOutletTemp( DesiredOutletTemp ),
-			DesiredOutletHumRat( DesiredOutletHumRat ),
-			InletSteamTemp( InletSteamTemp ),
-			OutletSteamTemp( OutletSteamTemp ),
-			InletSteamMassFlowRate( InletSteamMassFlowRate ),
-			OutletSteamMassFlowRate( OutletSteamMassFlowRate ),
-			MaxSteamVolFlowRate( MaxSteamVolFlowRate ),
-			MaxSteamMassFlowRate( MaxSteamMassFlowRate ),
-			InletSteamEnthalpy( InletSteamEnthalpy ),
-			OutletWaterEnthalpy( OutletWaterEnthalpy ),
-			InletSteamPress( InletSteamPress ),
-			InletSteamQuality( InletSteamQuality ),
-			OutletSteamQuality( OutletSteamQuality ),
-			DegOfSubcooling( DegOfSubcooling ),
-			LoopSubcoolReturn( LoopSubcoolReturn ),
-			AirInletNodeNum( AirInletNodeNum ),
-			AirOutletNodeNum( AirOutletNodeNum ),
-			SteamInletNodeNum( SteamInletNodeNum ),
-			SteamOutletNodeNum( SteamOutletNodeNum ),
-			TempSetPointNodeNum( TempSetPointNodeNum ),
-			TypeOfCoil( TypeOfCoil ),
-			FluidIndex( FluidIndex ),
-			LoopNum( LoopNum ),
-			LoopSide( LoopSide ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			Coil_PlantTypeNum( Coil_PlantTypeNum ),
-			OperatingCapacity( OperatingCapacity )
+			OperatingCapacity( 0.0 ),
+			DesiccantRegenerationCoil( false ),
+			DesiccantDehumNum( 0 )
 		{}
 
 	};
@@ -497,6 +390,26 @@ namespace SteamCoils {
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
+	);
+
+	//// register that a coil is used as a regeneration air heating coil in
+	//// desiccant dehumidification system
+	//void
+	//SetSteamCoilAsDesicRegenCoil(
+	//	std::string const & CoilType, // must match coil types in this module
+	//	std::string const & CoilName, // must match coil names for the coil type
+	//	int & DesiccantDehumIndex, // index of desiccant dehumidifier
+	//	bool & ErrorsFound // set to true if problem
+	//);
+
+	// sets data to a coil that is used as a regeneration air heating coil in
+	// desiccant dehumidification system
+	void
+	SetSteamCoilData(
+		int const CoilNum, // index of hot steam heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex = _ // Index for the desiccant dehum system where this caoil is used 
 	);
 
 	// End of Utility subroutines for the SteamCoil Module

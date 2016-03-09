@@ -247,16 +247,9 @@ namespace WindowComplexManager {
 			int State; // State in which basis first occurs
 
 			// Default Constructor
-			TempBasisIdx()
-			{}
-
-			// Member Constructor
-			TempBasisIdx(
-				int const Basis, // Basis no in basis table
-				int const State // State in which basis first occurs
-			) :
-				Basis( Basis ),
-				State( State )
+			TempBasisIdx() :
+			Basis( 0 ),
+			State( 0 )
 			{}
 
 		};
@@ -832,7 +825,7 @@ namespace WindowComplexManager {
 		int IncRay; // Index of incident ray corresponding to beam direction
 		Real64 Theta; // Theta angle of incident ray correspongind to beam direction
 		Real64 Phi; // Phi angle of incident ray correspongind to beam direction
-		int IHit; // hit flag
+		bool hit; // hit flag
 		int TotHits; // hit counter
 		auto & complexWindow( ComplexWind( iSurf ) );
 		auto & complexWindowGeom( complexWindow.Geom( iState ) );
@@ -861,7 +854,6 @@ namespace WindowComplexManager {
 						complexWindowGeom.SolBmIndex[ lHT ] = 0;
 					}
 					for ( int I = 1, nGnd = complexWindowGeom.NGnd; I <= nGnd; ++I, ++lHTI ) { // Gnd pt loop
-						IHit = 0;
 						TotHits = 0;
 						Vector const gndPt( complexWindowGeom.GndPt( I ) );
 						for ( int JSurf = 1, eSurf = TotSurfaces; JSurf <= eSurf; ++JSurf ) {
@@ -870,13 +862,14 @@ namespace WindowComplexManager {
 							// skip surfaces that face away from the ground point
 							if ( dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector ) >= 0.0 ) continue;
 							// Looking for surfaces between GndPt and sun
-							PierceSurface( JSurf, gndPt, SunDir, IHit, HitPt );
-							if ( IHit == 0 ) continue;
-							// Are not going into the details of whether a hit surface is transparent
-							// Since this is ultimately simply weighting the transmittance, so great
-							// detail is not warranted
-							++TotHits;
-							break;
+							PierceSurface( JSurf, gndPt, SunDir, HitPt, hit );
+							if ( hit ) {
+								// Are not going into the details of whether a hit surface is transparent
+								// Since this is ultimately simply weighting the transmittance, so great
+								// detail is not warranted
+								++TotHits;
+								break;
+							}
 						}
 						if ( TotHits > 0 ) {
 							complexWindowGeom.SolBmGndWt[ lHTI ] = 0.0; // [ lHTI ] == ( Hour, TS, I )
@@ -911,7 +904,6 @@ namespace WindowComplexManager {
 			}
 			std::size_t lHTI( complexWindowGeom.SolBmGndWt.index( HourOfDay, TimeStep, 1 ) ); // Linear index for ( HourOfDay, TimeStep, I )
 			for ( int I = 1, nGnd = complexWindowGeom.NGnd; I <= nGnd; ++I, ++lHTI ) { // Gnd pt loop
-				IHit = 0;
 				TotHits = 0;
 				Vector const gndPt( complexWindowGeom.GndPt( I ) );
 				for ( int JSurf = 1; JSurf <= TotSurfaces; ++JSurf ) {
@@ -920,13 +912,14 @@ namespace WindowComplexManager {
 					// skip surfaces that face away from the ground point
 					if ( dot( SunDir, Surface( JSurf ).NewellSurfaceNormalVector ) >= 0.0 ) continue;
 					// Looking for surfaces between GndPt and sun
-					PierceSurface( JSurf, gndPt, SunDir, IHit, HitPt );
-					if ( IHit == 0 ) continue;
-					// Are not going into the details of whether a hit surface is transparent
-					// Since this is ultimately simply weighting the transmittance, so great
-					// detail is not warranted
-					++TotHits;
-					break;
+					PierceSurface( JSurf, gndPt, SunDir, HitPt, hit );
+					if ( hit ) {
+						// Are not going into the details of whether a hit surface is transparent
+						// Since this is ultimately simply weighting the transmittance, so great
+						// detail is not warranted
+						++TotHits;
+						break;
+					}
 				}
 				if ( TotHits > 0 ) {
 					complexWindowGeom.SolBmGndWt[ lHTI ] = 0.0; // [ lHTI ] == ( HourOfDay, TimeStep, I )
@@ -1631,7 +1624,7 @@ namespace WindowComplexManager {
 		Real64 Azimuth; // Complex fenestration azimuth
 		Real64 Tilt; // Complex fenestration tilt
 		int ElemNo; // Grid index variable
-		int IHit; // Surface intersection flag
+		bool hit; // Surface intersection flag
 		int I; // Temp Indices
 		int J;
 		int IRay; // Ray index variable
@@ -1674,20 +1667,10 @@ namespace WindowComplexManager {
 			Real64 HitDsq; // Squared distance to the current hit pt
 
 			// Default Constructor
-			BackHitList()
-			{}
-
-			// Member Constructor
-			BackHitList(
-				int const KBkSurf, // Back surface index of the hit surface
-				int const HitSurf, // Surface number of the hit surface
-				Vector const & HitPt, // coords of hit pt (world syst)
-				Real64 const HitDsq // Squared distance to the current hit pt
-			) :
-				KBkSurf( KBkSurf ),
-				HitSurf( HitSurf ),
-				HitPt( HitPt ),
-				HitDsq( HitDsq )
+			BackHitList() :
+			KBkSurf( 0 ),
+			HitSurf( 0 ),
+			HitDsq( 0.0 )
 			{}
 
 		};
@@ -1771,7 +1754,6 @@ namespace WindowComplexManager {
 				++Geom.NSkyUnobs;
 			}
 			// Exterior reveal shadowing/reflection treatment should be inserted here
-			IHit = 0;
 			TotHits = 0;
 			for ( JSurf = 1; JSurf <= TotSurfaces; ++JSurf ) {
 				// the following test will cycle on anything except exterior surfaces and shading surfaces
@@ -1781,9 +1763,8 @@ namespace WindowComplexManager {
 				//  skip surfaces that face away from the window
 				DotProd = dot( Geom.sInc( IRay ), Surface( JSurf ).NewellSurfaceNormalVector );
 				if ( DotProd >= 0.0 ) continue;
-				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sInc( IRay ), IHit, HitPt );
-				if ( IHit <= 0 ) continue;
-				IHit = 0; //A hit, clear the hit flag for the next cycle
+				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sInc( IRay ), HitPt, hit );
+				if ( !hit ) continue; // Miss: Try next surface
 				if ( TotHits == 0 ) {
 					//  First hit for this ray
 					TotHits = 1;
@@ -1951,15 +1932,13 @@ namespace WindowComplexManager {
 		TmpSjdotN.allocate( Geom.Trn.NBasis, NBkSurf );
 		//Find the intersections of the basis rays with the back surfaces
 		for ( IRay = 1; IRay <= Geom.Trn.NBasis; ++IRay ) { //ray loop
-			IHit = 0;
 			TotHits = 0;
 			//  Insert treatment of intersection & reflection from interior reveals here
 			for ( KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf ) { //back surf loop
 				BaseSurf = Surface( ISurf ).BaseSurf; //ShadowComb is organized by base surface
 				JSurf = ShadowComb( BaseSurf ).BackSurf( KBkSurf ); //these are all proper back surfaces
-				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sTrn( IRay ), IHit, HitPt );
-				if ( IHit <= 0 ) continue;
-				IHit = 0; //A hit, clear the hit flag for the next cycle
+				PierceSurface( JSurf, Surface( ISurf ).Centroid, Geom.sTrn( IRay ), HitPt, hit );
+				if ( !hit ) continue; // Miss: Try next surface
 				if ( TotHits == 0 ) {
 					//  First hit for this ray
 					TotHits = 1;
@@ -3342,15 +3321,12 @@ namespace WindowComplexManager {
 		Tini = WindowThermalModel( ThermalModelNum ).InitialTemperature - KelvinConv;
 		Pini = WindowThermalModel( ThermalModelNum ).InitialPressure;
 
-		if ( CalcCondition == noCondition ) {
-			ZoneNum = Surface( SurfNum ).Zone;
-		}
-
 		nlayer = Construct( ConstrNum ).TotSolidLayers;
 		isky = 3; // IR radiation is provided from external source
 		iwd = 0; // assume windward for now.  TODO compare surface normal with wind direction
 
 		if ( CalcCondition == noCondition ) {
+			ZoneNum = Surface( SurfNum ).Zone;
 
 			// determine reference air temperature for this surface
 			{ auto const SELECT_CASE_var( Surface( SurfNum ).TAirRef );

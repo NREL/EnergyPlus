@@ -169,6 +169,8 @@ namespace HeatingCoils {
 		Array1D< Real64 > MSNominalCapacity; // Nominal Capacity MS AC Furnace [W]
 		Array1D< Real64 > MSEfficiency; // Efficiency for MS AC Furnace [dimensionless]
 		Array1D< Real64 > MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
+		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
+		int DesiccantDehumNum; // index to desiccant dehumidifier object
 
 		// Default Constructor
 		HeatingCoilEquipConditions() :
@@ -210,106 +212,9 @@ namespace HeatingCoils {
 			PLFErrorCount( 0 ),
 			ReclaimHeatingSourceIndexNum( 0 ),
 			ReclaimHeatingSource( 0 ),
-			NumOfStages( 0 )
-		{}
-
-		// Member Constructor
-		HeatingCoilEquipConditions(
-			std::string const & Name, // Name of the HeatingCoil
-			std::string const & HeatingCoilType, // Type of HeatingCoil ie. Heating or Cooling
-			std::string const & HeatingCoilModel, // Type of HeatingCoil ie. Simple, Detailed, etc.
-			int const HCoilType_Num,
-			std::string const & Schedule, // HeatingCoil Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			int const InsuffTemperatureWarn, // Used for recurring error message
-			Real64 const InletAirMassFlowRate, // MassFlow through the HeatingCoil being Simulated [kg/Sec]
-			Real64 const OutletAirMassFlowRate,
-			Real64 const InletAirTemp,
-			Real64 const OutletAirTemp,
-			Real64 const InletAirHumRat,
-			Real64 const OutletAirHumRat,
-			Real64 const InletAirEnthalpy,
-			Real64 const OutletAirEnthalpy,
-			Real64 const HeatingCoilLoad, // Total Load on the Coil [J]
-			Real64 const HeatingCoilRate, // Total Coil Rate on the Coil [W]
-			Real64 const GasUseLoad, // Gas Usage of Coil [J]
-			Real64 const ElecUseLoad, // Electric Usage of Coil [J]
-			Real64 const GasUseRate, // Gas Usage of Coil [W]
-			Real64 const ElecUseRate, // Electric Usage of Coil [W]
-			Real64 const Efficiency, // HeatingCoil Efficiency Value
-			Real64 const NominalCapacity, // Nominal Capacity of Coil [W]
-			Real64 const DesiredOutletTemp,
-			Real64 const DesiredOutletHumRat,
-			Real64 const AvailTemperature, // Used in heat recovery test [C]
-			int const AirInletNodeNum,
-			int const AirOutletNodeNum,
-			int const TempSetPointNodeNum, // If applicable this is the node number that the temp setpoint exists.
-			int const Control,
-			int const PLFCurveIndex, // Index for part-load factor curve index for gas heating coil
-			Real64 const ParasiticElecLoad, // parasitic electric load associated with the gas heating coil
-			Real64 const ParasiticGasLoad, // parasitic gas load associated with the gas heating coil
-			Real64 const ParasiticGasRate, // avg. parasitic gas consumption rate with the gas heating coil
-			Real64 const ParasiticGasCapacity, // capacity of parasitic gas consumption rate, input by user [W]
-			Real64 const RTF, // Heater runtime fraction, including PLF curve impacts
-			int const RTFErrorIndex, // used in recurring error warnings
-			int const RTFErrorCount, // used in recurring error warnings
-			int const PLFErrorIndex, // used in recurring error warnings
-			int const PLFErrorCount, // used in recurring error warnings
-			std::string const & ReclaimHeatingCoilName, // Name of reclaim heating coil
-			int const ReclaimHeatingSourceIndexNum, // Index to reclaim heating source (condenser) of a specific type
-			int const ReclaimHeatingSource, // The source for the Reclaim Heating Coil
-			int const NumOfStages, // Number of speeds
-			Array1< Real64 > const & MSNominalCapacity, // Nominal Capacity MS AC Furnace [W]
-			Array1< Real64 > const & MSEfficiency, // Efficiency for MS AC Furnace [dimensionless]
-			Array1< Real64 > const & MSParasiticElecLoad // Parasitic elec load MS AC Furnace (gas only) [W]
-		) :
-			Name( Name ),
-			HeatingCoilType( HeatingCoilType ),
-			HeatingCoilModel( HeatingCoilModel ),
-			HCoilType_Num( HCoilType_Num ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			InsuffTemperatureWarn( InsuffTemperatureWarn ),
-			InletAirMassFlowRate( InletAirMassFlowRate ),
-			OutletAirMassFlowRate( OutletAirMassFlowRate ),
-			InletAirTemp( InletAirTemp ),
-			OutletAirTemp( OutletAirTemp ),
-			InletAirHumRat( InletAirHumRat ),
-			OutletAirHumRat( OutletAirHumRat ),
-			InletAirEnthalpy( InletAirEnthalpy ),
-			OutletAirEnthalpy( OutletAirEnthalpy ),
-			HeatingCoilLoad( HeatingCoilLoad ),
-			HeatingCoilRate( HeatingCoilRate ),
-			GasUseLoad( GasUseLoad ),
-			ElecUseLoad( ElecUseLoad ),
-			GasUseRate( GasUseRate ),
-			ElecUseRate( ElecUseRate ),
-			Efficiency( Efficiency ),
-			NominalCapacity( NominalCapacity ),
-			DesiredOutletTemp( DesiredOutletTemp ),
-			DesiredOutletHumRat( DesiredOutletHumRat ),
-			AvailTemperature( AvailTemperature ),
-			AirInletNodeNum( AirInletNodeNum ),
-			AirOutletNodeNum( AirOutletNodeNum ),
-			TempSetPointNodeNum( TempSetPointNodeNum ),
-			Control( Control ),
-			PLFCurveIndex( PLFCurveIndex ),
-			ParasiticElecLoad( ParasiticElecLoad ),
-			ParasiticGasLoad( ParasiticGasLoad ),
-			ParasiticGasRate( ParasiticGasRate ),
-			ParasiticGasCapacity( ParasiticGasCapacity ),
-			RTF( RTF ),
-			RTFErrorIndex( RTFErrorIndex ),
-			RTFErrorCount( RTFErrorCount ),
-			PLFErrorIndex( PLFErrorIndex ),
-			PLFErrorCount( PLFErrorCount ),
-			ReclaimHeatingCoilName( ReclaimHeatingCoilName ),
-			ReclaimHeatingSourceIndexNum( ReclaimHeatingSourceIndexNum ),
-			ReclaimHeatingSource( ReclaimHeatingSource ),
-			NumOfStages( NumOfStages ),
-			MSNominalCapacity( MSNominalCapacity ),
-			MSEfficiency( MSEfficiency ),
-			MSParasiticElecLoad( MSParasiticElecLoad )
+			NumOfStages( 0 ),
+			DesiccantRegenerationCoil( false ),
+			DesiccantDehumNum( 0 )
 		{}
 
 	};
@@ -322,12 +227,6 @@ namespace HeatingCoils {
 		HeatingCoilNumericFieldData()
 		{}
 
-		// Member Constructor
-		HeatingCoilNumericFieldData(
-			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
-		) :
-			FieldNames( FieldNames )
-		{}
 	};
 
 	// Object Data
@@ -530,6 +429,16 @@ namespace HeatingCoils {
 	// Needed for unit tests, should not be normally called.
 	void
 	clear_state();
+
+	// sets data to a coil that is used as a regeneration air heating coil in
+	// desiccant dehumidification system
+	void
+	SetHeatingCoilData(
+		int const CoilNum, // Number of electric or gas heating Coil
+		bool & ErrorsFound, // Set to true if certain errors found
+		Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+		Optional_int DesiccantDehumIndex = _ // Index for the desiccant dehum system where this caoil is used 
+	);
 
 	//        End of Utility subroutines for the HeatingCoil Module
 

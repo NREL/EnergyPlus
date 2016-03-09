@@ -130,45 +130,6 @@ namespace PlantValves {
 			CompNum( 0 )
 		{}
 
-		// Member Constructor
-		TemperValveData(
-			std::string const & Name, // User identifier
-			int const PltInletNodeNum, // Node number on the inlet side of the plant
-			int const PltOutletNodeNum, // Node number on the outlet side of the plant
-			int const PltStream2NodeNum, // Node number on the outlet side of the second stream
-			int const PltSetPointNodeNum, // Node number for the setpoint node.
-			int const PltPumpOutletNodeNum, // node number for the pump outlet (for flow rate)
-			bool const Init, // flag for initializationL true means do the initializations
-			Real64 const FlowDivFract, // Fraction of flow sent down diversion path
-			Real64 const Stream2SourceTemp, // Temperature [C] of stream 2 being mixed
-			Real64 const InletTemp, // Temperature [C] of inlet to valve
-			Real64 const SetPointTemp, // setpoint Temperatures [C] at control node.
-			Real64 const MixedMassFlowRate, // Flow rate downstream of mixer [kg/s]
-			Real64 const DivertedFlowRate, // flow rate through tempering valve's diversion path [kg/s]
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			Name( Name ),
-			PltInletNodeNum( PltInletNodeNum ),
-			PltOutletNodeNum( PltOutletNodeNum ),
-			PltStream2NodeNum( PltStream2NodeNum ),
-			PltSetPointNodeNum( PltSetPointNodeNum ),
-			PltPumpOutletNodeNum( PltPumpOutletNodeNum ),
-			Init( Init ),
-			FlowDivFract( FlowDivFract ),
-			Stream2SourceTemp( Stream2SourceTemp ),
-			InletTemp( InletTemp ),
-			SetPointTemp( SetPointTemp ),
-			MixedMassFlowRate( MixedMassFlowRate ),
-			DivertedFlowRate( DivertedFlowRate ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
-		{}
-
 	};
 
 	// Object Data

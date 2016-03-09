@@ -440,7 +440,6 @@ namespace HVACStandAloneERV {
 			}
 
 			errFlag = false;
-			HXSupAirFlowRate = 0.0;
 			HXSupAirFlowRate = GetGenericSupplyAirFlowRate( StandAloneERV( StandAloneERVNum ).HeatExchangerName, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "... occurs in " + CurrentModuleObject + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\"" );
@@ -474,7 +473,6 @@ namespace HVACStandAloneERV {
 			//Set the SA Design Fan Volume Flow Rate
 			// get from fan module
 			errFlag = false;
-			SAFanVolFlowRate = 0.0;
 			SAFanVolFlowRate = GetFanDesignVolumeFlowRate( cFanTypes( SAFanTypeNum ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "... occurs in " + CurrentModuleObject + " =" + StandAloneERV( StandAloneERVNum ).Name );
@@ -502,7 +500,6 @@ namespace HVACStandAloneERV {
 			//Set the EA Design Fan Volume Flow Rate
 			// get from fan module
 			errFlag = false;
-			EAFanVolFlowRate = 0.0;
 			EAFanVolFlowRate = GetFanDesignVolumeFlowRate( cFanTypes( EAFanTypeNum ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "... occurs in " + CurrentModuleObject + " =" + StandAloneERV( StandAloneERVNum ).Name );
@@ -1824,7 +1821,7 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 
 		// Return value
-		int AirInletNode; // returned air inlet node number of the ERV unit
+		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1895,7 +1892,7 @@ namespace HVACStandAloneERV {
 		using InputProcessor::SameString;
 
 		// Return value
-		int AirInletNode; // returned air inlet node number of the ERV unit
+		int AirInletNode( 0 ); // returned air inlet node number of the ERV unit
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:

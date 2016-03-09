@@ -220,7 +220,19 @@ namespace EnergyPlus {
 		// 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
 		// 		EXPECT_TRUE( compare_containers( Array1D_bool( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
 		template < class T, class T2 >
-		bool compare_containers( T const & expected_container, T2 const & actual_container );
+		bool compare_containers( T const & expected_container, T2 const & actual_container )
+		{
+			bool is_valid = ( expected_container.size() == actual_container.size() );
+			EXPECT_EQ( expected_container.size(), actual_container.size() ) << "Containers are not equal size.";
+			auto expected = expected_container.begin();
+			auto actual = actual_container.begin();
+			for ( ; expected != expected_container.end(); ++expected, ++actual ) {
+				// This may fail due to floating point issues for float and double...
+				EXPECT_EQ( *expected, *actual ) << "Incorrect 0-based index: " << ( expected - expected_container.begin() );
+				is_valid = ( *expected == *actual );
+			}
+			return is_valid;
+		}
 
 		// This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
 		// delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.

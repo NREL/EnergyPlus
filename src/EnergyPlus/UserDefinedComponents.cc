@@ -1358,8 +1358,8 @@ namespace UserDefinedComponents {
 				if ( ! lAlphaFieldBlanks( 14 ) ) {
 
 					UserAirTerminal( CompLoop ).Zone.ZoneNum = FindItemInList( cAlphaArgs( 14 ), Zone );
-					if ( UserZoneAirHVAC( CompLoop ).Zone.ZoneNum == 0 ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 16 ) );
+					if ( UserAirTerminal( CompLoop ).Zone.ZoneNum == 0 ) {
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Ambient Zone Name not found = " + cAlphaArgs( 14 ) );
 						ErrorsFound = true;
 					} else {
 						UserAirTerminal( CompLoop ).Zone.DeviceHasInternalGains = true;
@@ -2062,7 +2062,7 @@ namespace UserDefinedComponents {
 		std::string const & CoilName,
 		int & CoilIndex,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 
@@ -2124,7 +2124,7 @@ namespace UserDefinedComponents {
 		std::string const & CoilName,
 		int & CoilAirInletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 
@@ -2189,7 +2189,7 @@ namespace UserDefinedComponents {
 		std::string const & CoilName,
 		int & CoilAirOutletNode,
 		bool & ErrorsFound,
-		std::string const CurrentModuleObject
+		std::string const & CurrentModuleObject
 	)
 	{
 

@@ -2723,6 +2723,10 @@ namespace OutputProcessor {
 		} else if ( endUseMeter == "ELECTRICSTORAGE" ) {
 			EndUse = "ElectricStorage";
 
+		} else if ( endUseMeter == "POWERCONVERSION") {
+
+			EndUse = "PowerConversion";
+
 		} else if ( endUseMeter == "HEAT RECOVERY FOR COOLING" || endUseMeter == "HEATRECOVERYFORCOOLING" || endUseMeter == "HEATRECOVERYCOOLING" ) {
 			EndUse = "HeatRecoveryForCooling";
 
@@ -4706,7 +4710,6 @@ namespace OutputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string NumberOut; // Character for producing "number out"
 
 		if ( UpdateDataDuringWarmupExternalInterface && ! ReportDuringWarmup ) return;
 
@@ -8127,21 +8130,6 @@ ProduceRDDMDD()
 			VarPtr( 0 ),
 			IndexType( 0 ),
 			StoreType( 0 )
-		{}
-
-		// Member Constructor
-		VariableTypes(
-			int const RealIntegerType, // Real= 1, Integer=2
-			int const VarPtr, // pointer to real/integer VariableTypes structures
-			int const IndexType,
-			int const StoreType,
-			std::string const & UnitsString
-		) :
-			RealIntegerType( RealIntegerType ),
-			VarPtr( VarPtr ),
-			IndexType( IndexType ),
-			StoreType( StoreType ),
-			UnitsString( UnitsString )
 		{}
 
 	};

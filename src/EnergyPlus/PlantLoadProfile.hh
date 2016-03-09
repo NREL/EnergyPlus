@@ -65,11 +65,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace PlantLoadProfile {
-
 	// Using/Aliasing
 
 	// Data
@@ -84,8 +84,12 @@ namespace PlantLoadProfile {
 
 	// Types
 
-	struct PlantProfileData
+	struct PlantProfileData : public PlantComponent
 	{
+		virtual
+		~PlantProfileData()
+		{}
+
 		// Members
 		std::string Name; // Name of Plant Load Profile object
 		int TypeNum; // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
@@ -143,96 +147,44 @@ namespace PlantLoadProfile {
 			SetLoopIndexFlag( true )
 		{}
 
-		// Member Constructor
-		PlantProfileData(
-			std::string const & Name, // Name of Plant Load Profile object
-			int const TypeNum, // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
-			int const WLoopNum, // water plant loop index number                      !DSU
-			int const WLoopSideNum, // water plant loop side index                        !DSU
-			int const WLoopBranchNum, // water plant loop branch index                      !DSU
-			int const WLoopCompNum, // water plant loop component index                   !DSU
-			bool const Init, // Flag for initialization:  TRUE means do the init
-			bool const InitSizing, // Flag for initialization of plant sizing
-			int const InletNode,
-			Real64 const InletTemp, // Inlet temperature (C)
-			int const OutletNode,
-			Real64 const OutletTemp, // Outlet temperature (C)
-			int const LoadSchedule, // Pointer to schedule object
-			bool const EMSOverridePower, // if true, then EMS is calling to override power level
-			Real64 const EMSPowerValue, // value EMS is directing to use for power [W]
-			Real64 const PeakVolFlowRate, // Peak volumetric flow rate, also water consumption rate (m3/s)
-			int const FlowRateFracSchedule, // Pointer to schedule object
-			Real64 const VolFlowRate, // Volumetric flow rate (m3/s)
-			Real64 const MassFlowRate, // Mass flow rate (kg/s)
-			bool const EMSOverrideMassFlow,
-			Real64 const EMSMassFlowValue,
-			Real64 const Power, // Power required to meet the load (W)
-			Real64 const Energy, // Energy required to meet the load (J)
-			Real64 const HeatingEnergy, // Heating Energy required to meet the load (J)
-			Real64 const CoolingEnergy, // Cooling Energy required to meet the load (J)
-			bool const SetLoopIndexFlag
-		) :
-			Name( Name ),
-			TypeNum( TypeNum ),
-			WLoopNum( WLoopNum ),
-			WLoopSideNum( WLoopSideNum ),
-			WLoopBranchNum( WLoopBranchNum ),
-			WLoopCompNum( WLoopCompNum ),
-			Init( Init ),
-			InitSizing( InitSizing ),
-			InletNode( InletNode ),
-			InletTemp( InletTemp ),
-			OutletNode( OutletNode ),
-			OutletTemp( OutletTemp ),
-			LoadSchedule( LoadSchedule ),
-			EMSOverridePower( EMSOverridePower ),
-			EMSPowerValue( EMSPowerValue ),
-			PeakVolFlowRate( PeakVolFlowRate ),
-			FlowRateFracSchedule( FlowRateFracSchedule ),
-			VolFlowRate( VolFlowRate ),
-			MassFlowRate( MassFlowRate ),
-			EMSOverrideMassFlow( EMSOverrideMassFlow ),
-			EMSMassFlowValue( EMSMassFlowValue ),
-			Power( Power ),
-			Energy( Energy ),
-			HeatingEnergy( HeatingEnergy ),
-			CoolingEnergy( CoolingEnergy ),
-			SetLoopIndexFlag( SetLoopIndexFlag )
-		{}
+		// Functions
+		static
+		PlantComponent *
+		factory( std::string objectName );
 
+		void
+		simulate( const PlantLocation & calledFromLocation,
+			  bool const FirstHVACIteration,
+			  Real64 & CurLoad,
+			  bool const RunFlag
+			 ) override;
+
+		void
+		onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
+
+		void
+		InitPlantProfile();
+
+		void
+		UpdatePlantProfile();
+
+		void
+		ReportPlantProfile();
 	};
 
 	// Object Data
 	extern Array1D< PlantProfileData > PlantProfile;
 
-	// Functions
-	void
-	clear_state();
-
-	void
-	SimulatePlantProfile(
-		std::string const & EquipTypeName, // description of model (not used until different types of profiles)
-		std::string const & EquipName, // the user-defined name
-		int const EquipTypeNum, // the plant parameter ID for equipment model
-		int & ProfileNum, // the index for specific load profile
-		bool const FirstHVACIteration,
-		bool const InitLoopEquip // flag indicating if called in special initialization mode.
-	);
-
+	// This could be static inside the class
 	void
 	GetPlantProfileInput();
 
+	// As could this
 	void
-	InitPlantProfile( int const ProfileNum );
+	clear_state();
 
-	void
-	UpdatePlantProfile( int const ProfileNum );
+} // namespace PlantLoadProfile
 
-	void
-	ReportPlantProfile( int const ProfileNum );
-
-} // PlantLoadProfile
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

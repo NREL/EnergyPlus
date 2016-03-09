@@ -116,6 +116,14 @@ namespace DataHVACGlobals {
 	extern int const HeatingDefrostSizing; // request sizing for heating defrost capacity
 	extern int const MaxHeaterOutletTempSizing; // request sizing for heating coil maximum outlet temperature
 	extern int const AutoCalculateSizing; // identifies an autocalulate input
+	extern int const ZoneCoolingLoadSizing; // zone cooling sensible load (zsz file)
+	extern int const ZoneHeatingLoadSizing; // zome heating sensible load (zsz file)
+	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	extern int const HeatingCoilDesAirInletTempSizing; // design inlet air temperature for heating coil
+	extern int const HeatingCoilDesAirOutletTempSizing; // design outlet air temperature for heating coil
+	extern int const HeatingCoilDesAirInletHumRatSizing; // design inlet air humidity ratio for heating coil
+
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser
@@ -435,27 +443,6 @@ namespace DataHVACGlobals {
 			OpType( 0 )
 		{}
 
-		// Member Constructor
-		ComponentSetPtData(
-			std::string const & EquipmentType,
-			std::string const & EquipmentName,
-			int const NodeNumIn,
-			int const NodeNumOut,
-			Real64 const EquipDemand,
-			Real64 const DesignFlowRate,
-			std::string const & HeatOrCool,
-			int const OpType
-		) :
-			EquipmentType( EquipmentType ),
-			EquipmentName( EquipmentName ),
-			NodeNumIn( NodeNumIn ),
-			NodeNumOut( NodeNumOut ),
-			EquipDemand( EquipDemand ),
-			DesignFlowRate( DesignFlowRate ),
-			HeatOrCool( HeatOrCool ),
-			OpType( OpType )
-		{}
-
 	};
 
 	struct DefineZoneCompAvailMgrs
@@ -484,33 +471,6 @@ namespace DataHVACGlobals {
 			Count ( 0 )
 		{}
 
-		// Member Constructor
-		DefineZoneCompAvailMgrs(
-			int const NumAvailManagers, // number of availability managers for this system
-			int const AvailStatus, // system availability status
-			int const StartTime, // cycle on time (in SimTimeSteps)
-			int const StopTime, // cycle off time (in SimTimeSteps)
-			std::string const & AvailManagerListName, // name of each availability manager
-			Array1_string const & AvailManagerName, // name of each availability manager
-			Array1_int const & AvailManagerType, // type of availability manager
-			Array1_int const & AvailManagerNum, // index for availability manager
-			int const ZoneNum, // cycle off time (in SimTimeSteps)
-			bool const Input,
-			int const Count
-		) :
-			NumAvailManagers( NumAvailManagers ),
-			AvailStatus( AvailStatus ),
-			StartTime( StartTime ),
-			StopTime( StopTime ),
-			AvailManagerListName( AvailManagerListName ),
-			AvailManagerName( AvailManagerName ),
-			AvailManagerType( AvailManagerType ),
-			AvailManagerNum( AvailManagerNum ),
-			ZoneNum( ZoneNum ),
-			Input( Input ),
-			Count ( Count )
-		{}
-
 	};
 
 	struct ZoneCompTypeData
@@ -524,15 +484,6 @@ namespace DataHVACGlobals {
 			TotalNumComp( 0 )
 		{}
 
-		// Member Constructor
-		ZoneCompTypeData(
-			Array1< DefineZoneCompAvailMgrs > const & ZoneCompAvailMgrs,
-			int const TotalNumComp // total number of components of a zone equip type
-		) :
-			ZoneCompAvailMgrs( ZoneCompAvailMgrs ),
-			TotalNumComp( TotalNumComp )
-		{}
-
 	};
 
 	struct OptStartDataType
@@ -544,17 +495,6 @@ namespace DataHVACGlobals {
 
 		// Default Constructor
 		OptStartDataType()
-		{}
-
-		// Member Constructor
-		OptStartDataType(
-			Array1_int const & ActualZoneNum,
-			Array1< Real64 > const & OccStartTime,
-			Array1_bool const & OptStartFlag
-		) :
-			ActualZoneNum( ActualZoneNum ),
-			OccStartTime( OccStartTime ),
-			OptStartFlag( OptStartFlag )
 		{}
 
 	};

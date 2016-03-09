@@ -558,7 +558,7 @@ namespace LowTempRadiantSystem {
 		HydronicRadiantSysNumericFields.allocate( NumOfHydrLowTempRadSys );
 
 		// make sure data is gotten for surface lists
-		BaseNum = GetNumberOfSurfaceLists();
+		GetNumberOfSurfaceLists();
 
 		// Obtain all of the user data related to hydronic low temperature radiant systems...
 		BaseNum = 0;
@@ -704,10 +704,12 @@ namespace LowTempRadiantSystem {
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
-					ShowContinueError( "Input for " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
-					ShowContinueError( "Blank field not allowed for " + cNumericFields( 3 ) );
-					ErrorsFound = true;
+					if( ( !lAlphaBlanks( 7 ) ) || ( !lAlphaBlanks( 8 ) ) ) {
+						ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
+						ShowContinueError( "Blank field not allowed for " + cNumericFields( 3 ) );
+						ErrorsFound = true;
+					}
 				}
 			} else if ( SameString( Alphas( 6 ), "CapacityPerFloorArea" ) ) {
 				HydrRadSys( Item ).HeatingCapMethod = CapacityPerFloorArea;
@@ -794,10 +796,12 @@ namespace LowTempRadiantSystem {
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
-					ShowContinueError( "Input for " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
-					ShowContinueError( "Blank field not allowed for " + cNumericFields( 8 ) );
-					ErrorsFound = true;
+					if( ( !lAlphaBlanks( 11 ) ) || ( !lAlphaBlanks( 12 ) ) ) {
+						ShowSevereError( CurrentModuleObject + " = " + HydrRadSys( Item ).Name );
+						ShowContinueError( "Input for " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
+						ShowContinueError( "Blank field not allowed for " + cNumericFields( 8 ) );
+						ErrorsFound = true;
+					}
 				}
 			} else if ( SameString( Alphas( 10 ), "CapacityPerFloorArea" ) ) {
 				HydrRadSys( Item ).CoolingCapMethod = CapacityPerFloorArea;
@@ -2026,20 +2030,20 @@ namespace LowTempRadiantSystem {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
-		int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
+		int PltSizHeatNum( 0 ); // index of plant sizing object for 1st heating loop
+		int PltSizCoolNum( 0 ); // index of plant sizing object for 1st cooling loop
 		int SurfNum; // surface index in radiant system data structure
-		bool ErrorsFound; // If errors detected in input
+		bool ErrorsFound( false ); // If errors detected in input
 		Real64 rho;
 		Real64 Cp;
-		bool IsAutoSize; // Indicator to autosize
-		Real64 MaxElecPowerDes; // Design electric power for reproting
-		Real64 WaterVolFlowMaxHeatDes; // Design hot water flow for reproting
-		Real64 WaterVolFlowMaxHeatUser; // User hard-sized hot water flow for
-		Real64 WaterVolFlowMaxCoolDes; // Design chilled water flow for reproting
-		Real64 WaterVolFlowMaxCoolUser; // User hard-sized chilled water flow for reproting
-		Real64 TubeLengthDes; // Design tube length for reproting
-		Real64 TubeLengthUser; // User hard-sized tube length for reproting
+		bool IsAutoSize( false ); // Indicator to autosize
+		// Real64 MaxElecPowerDes( 0.0 ); // Design electric power for reproting
+		Real64 WaterVolFlowMaxHeatDes( 0.0 ); // Design hot water flow for reproting
+		Real64 WaterVolFlowMaxHeatUser( 0.0 ); // User hard-sized hot water flow for
+		Real64 WaterVolFlowMaxCoolDes( 0.0 ); // Design chilled water flow for reproting
+		Real64 WaterVolFlowMaxCoolUser( 0.0 ); // User hard-sized chilled water flow for reproting
+		Real64 TubeLengthDes( 0.0 ); // Design tube length for reproting
+		Real64 TubeLengthUser( 0.0 ); // User hard-sized tube length for reproting
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -2049,28 +2053,15 @@ namespace LowTempRadiantSystem {
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 		Real64 DesCoilLoad; // design autosized or user specified capacity
-		int OpMode;				// System operating mode
+		int OpMode( 1 );				// System operating mode
 		int HeatNode;			// Hot water inlet node to determine system operating mode
 		int CoolNode;			// Chilled water inlet node to determine system operating mode
 		Real64 WaterVolFlowMaxDes;		// Design water volume flow rate for reproting
 		Real64 WaterVolFlowMaxUser;		// User hard-sized water volume flow rate for reproting
 
-		ErrorsFound = false;
-		IsAutoSize = false;
 		DesCoilLoad = 0.0;
-		MaxElecPowerDes = 0.0;
-		MaxElecPowerDes = 0.0;
-		WaterVolFlowMaxHeatDes = 0.0;
-		WaterVolFlowMaxHeatUser = 0.0;
-		WaterVolFlowMaxCoolDes = 0.0;
-		WaterVolFlowMaxCoolUser = 0.0;
-		TubeLengthDes = 0.0;
-		TubeLengthUser = 0.0;
 		DataScalableCapSizingON = false;
 		DataFracOfAutosizedHeatingCapacity = 1.0;
-		OpMode = 1;
-		PltSizHeatNum = 0;
-		PltSizCoolNum = 0;
 
 		if ( SystemType == ElectricSystem ) {
 
@@ -2101,6 +2092,10 @@ namespace LowTempRadiantSystem {
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
 						ElecRadSys( RadSysNum ).MaxElecPower = TempSize;
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + ElecRadSys( RadSysNum ).Name + "\"." );
+						ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\"." );
+						ErrorsFound = true;
 					}
 				} else {
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
@@ -2175,6 +2170,12 @@ namespace LowTempRadiantSystem {
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat == AutoSize ) {
+							ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys( RadSysNum ).Name + "\"." );
+							ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\"." );
+							ErrorsFound = true;
+						}
 					}
 				} else { // Autosize or hard-size with sizing run
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
@@ -2295,6 +2296,12 @@ namespace LowTempRadiantSystem {
 						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+						if ( HydrRadSys( RadSysNum ).WaterVolFlowMaxCool == AutoSize ) {
+							ShowSevereError( RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys( RadSysNum ).Name + "\"." );
+							ShowContinueError( "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the Cooling Design Capacity Method = \"FractionOfAutosizedCoolingCapacity\"." );
+							ErrorsFound = true;
+						}
 					}
 				} else { // Autosize or hard-size with sizing run
 					if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
