@@ -79,6 +79,7 @@
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
@@ -106,6 +107,7 @@ using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
+using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
@@ -1094,8 +1096,30 @@ namespace EnergyPlus {
 		DefrostWatts = VRF( VRFCond ).VRFCondRTF * ( VRF( VRFCond ).HeatingCapacity / 1.01667 ) * VRF( VRFCond ).DefrostFraction;
 		ASSERT_EQ( DefrostWatts, VRF( VRFCond ).DefrostPower ); // defrost power calculation check
 
-		// clean up
-		ZoneSysEnergyDemand.deallocate();
+		// test other ThermostatPriority control types
+		ZoneThermostatSetPointHi.allocate( 1 );
+		ZoneThermostatSetPointHi = 24.0;
+		ZoneThermostatSetPointLo.allocate( 1 );
+		ZoneThermostatSetPointLo = 21.0;
+		TempControlType.allocate( 1 );
+		TempControlType = 4;
+		ZT.allocate( 1 );
+		ZT = 25.0;
+
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = -VRF( VRFCond ).CoolingCapacity; // set load equal to the VRF cooling capacity
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = -VRF( VRFCond ).CoolingCapacity;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = -VRF( VRFCond ).CoolingCapacity - 1000.0;
+
+		Node( VRF( VRFCond ).CondenserNodeNum ).Temp = 35.0; // AHRI condition at 95 F db
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = 25.0;
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Temp = 35.0; // AHRI condition at 95 F db
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).HumRat = 0.01; // don't care
+
+		VRF( VRFCond ).MasterZonePtr = 0;
+		VRF( VRFCond ).MasterZoneTUIndex = 0;
+		VRF( VRFCond ).ThermostatPriority = ThermostatOffsetPriority;
+		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired, 5.0 ); // system output should be less than 0
 
 	}
 
